@@ -5,6 +5,10 @@ description: Map a DECIDED logical architecture onto provider-idiomatic Azure fo
 
 # Azure SaaS Architect
 
+**Reading key:** API means application programming interface; DB means
+database. The service map below uses current product names as choices to
+verify, not as fixed quota or price claims.
+
 ## Purpose
 
 Produce an Azure service architecture for a multi-tenant SaaS that a team
@@ -129,9 +133,9 @@ to evaluate; they do not verify a current Azure offering, limit or price.
      name-and-place for enterprise estates — these govern
      workforce/operator access to the estate, NOT the product's end-user
      authorization.
-   - Current shape: Microsoft consolidates these in the unified Defender
-     portal (Sentinel now GA there); portal packaging and tier names are
-     verification items against current Azure docs.
+   - Verify the current Defender/Sentinel portal integration, availability,
+     packaging and tier names against current Azure documentation before
+     prescribing an operator workflow.
    The mapper NAMES and PLACES these services and ties them to isolation,
    cost, and maturity; deep threat modeling belongs to `threat-modeler` /
    `ai-threat-modeler`. Pipeline design itself belongs to
@@ -189,9 +193,9 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 
 ## Gotchas
 
-- Per-tenant Azure SQL databases without elastic pools price like a
-  separate server per tenant; pools are the silo-model default — verify
-  current pool limits before promising tenant counts.
+- Per-tenant Azure SQL databases without elastic pools may each carry a
+  cost floor; compare current per-database and pool pricing for the tenant
+  shape before choosing a silo model or promising tenant counts.
 - Cosmos DB partition-key-per-tenant pools hit noisy-neighbor throughput
   sharing; heavy tenants may need their own containers — design the
   promotion path now.

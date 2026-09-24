@@ -1,5 +1,14 @@
 # Skill-contract audit — baseline report
 
+> **Reading key, checked 2026-09-24:** This report freezes a pre-remediation
+> skill-contract scan. Its 409 findings describe that exact corpus, not 409
+> current defects. Read the [PR #88 delivery closeout](../README.md) and
+> [active runner backlog](../../../roadmaps/behavioral-eval-runner-backlog.md)
+> for later status. P0 and P1 are this report's priority bands; `INFO` is an
+> informational classification. A `SEMANTIC-REVIEW CANDIDATE` needs a human
+> reading before its wording can be treated as a defect. The original counts
+> and finding rows below remain the frozen audit evidence.
+
 - Tool: `audit-skill-contracts` v1.13.0 (engine sha256 `7fdf02290b0b15ed…`)
 - Repo SHA: `000352f55b71f0c3e897a482d279d34bfaa3d66b` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
 - Corpus content hash: `9443a936961bb15a92dfc733009fc70dc48f0b37116d7ce63c43b86fe7f040dd` (704 files, 4023009 bytes)

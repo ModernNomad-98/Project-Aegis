@@ -1,5 +1,14 @@
 # Independent exact-head review: APPROVE
 
+> **Current reading, checked 2026-09-24:** This verdict applies to the exact
+> September 10 revision below. Pull request (PR) #88 later merged; this review
+> did not restore the lost original calibration inputs or their approval. Use
+> the [replacement candidate summary](../ber-replacement-candidate-1-summary.md)
+> and [active runner backlog](../../roadmaps/behavioral-eval-runner-backlog.md)
+> for current gates. SDK means software development kit; POSIX describes the
+> Unix-like verification environment; DCO means Developer Certificate of
+> Origin, the commit sign-off check.
+
 Reviewer: independent_phase01_review, read-only. Date: 2026-09-10.
 HEAD: 8f92e916f86bc0b9df618fb6a7887bd531df8fea.
 Tree: 499e7e96bd524fe024aec94ed69d11a17f783e13.

@@ -2,6 +2,13 @@
 
 Detail file for `cloud-architecture-decider`. Loaded on demand.
 
+**Reading key:** DPA means data processing agreement; IdP means identity
+provider; VPC means virtual private cloud; p95 is the 95th percentile;
+IaaS means infrastructure as a service; PaaS means platform as a service;
+SSR means server-side rendering; BaaS means backend as a service; IAM means
+identity and access management. The owning skill explains the remaining
+decision terms and authority boundaries.
+
 ## Nine-axis requirements record template
 
 | Axis | Question to answer | Typical source | Verified/Assumed |
@@ -31,39 +38,41 @@ Filters eliminate options before scoring. Derive from:
 - **Non-negotiable integrations**: services the product cannot leave
   (existing IdP, marketplace commitments, customer VPC peering).
 
-## Abstraction ladder (rung selection)
+## Deployment pattern selection
 
-Pick the **highest rung the workload tolerates**, then a provider within it — a
-higher rung hands more operational surface (OS patching, account topology, IAM,
-network) to the platform, the right default for a small team. Reach DOWN the
-ladder only for a named reason (control, cost at proven scale, residency, a
-capability the platform lacks). Named providers are **current market examples of
-each category, not recommendations** — pricing, free tiers, and runtime limits
-are volatile verification items, checked at decision time, never asserted.
+Choose a compatible pattern for each workload component, then a provider for
+each. Prefer the least operational burden that meets verified requirements.
+These patterns overlap: a managed frontend, database and function runtime can
+be combined. A hyperscaler offers multiple patterns and requires per-service
+operational choices; it is not the highest abstraction by default. Choose more
+operational control only for a named reason (cost at proven scale, residency or
+a capability gap). Named providers are **current market examples, not
+recommendations** — pricing, free tiers and runtime limits are volatile
+verification items, checked at decision time, never asserted.
 
-| Rung (low→high abstraction) | You own vs the platform | Example providers | Fits when | Ceiling that forces a step |
+| Pattern or service category | You own vs the platform | Example providers | Fits when | Ceiling that forces a change |
 | --- | --- | --- | --- | --- |
 | IaaS / VPS | You: OS, patching, runtime. Platform: hardware. | Hyperscaler VMs, DigitalOcean Droplets, Linode | Full control; custom kernels/daemons; lift-and-shift | Ops burden exceeds team capacity |
 | Container PaaS | You: the container. Platform: host, scaling, deploy. | Render, Railway, Fly.io | "Just deploy my app + DB"; long-running services | Pricing/scale limits; a service the platform lacks |
 | Managed Jamstack / SSR host | You: frontend + functions. Platform: build, CDN, deploy. | Vercel, Netlify, Cloudflare Pages | Static/SSR frontend + serverless API; push-to-deploy | Long-running/stateful backend that won't fit functions |
-| Managed data / Postgres-BaaS | You: schema + policies. Platform: DB, auth, storage, backups. | Supabase, Neon | Managed relational DB + auth/storage without DBA ops | Extreme scale/tuning; an engine the BaaS doesn't offer |
+| Managed data / Postgres-BaaS | You: schema + policies. Platform: managed database; verify identity, file storage and backup features for the chosen service. | Supabase, Neon | Managed relational database; combine other services only after capability checks | Extreme scale/tuning; an engine the BaaS doesn't offer |
 | Edge / serverless functions | You: function code. Platform: global runtime, per-call scaling. | Cloudflare Workers, Fly.io | Global low-latency; bursty/event compute; stateless | Stateful/long-running work; runtime/time limits |
-| Hyperscaler managed services | You: choose per-service managed-vs-self. Platform: the catalog. | AWS, Azure, GCP | Deep compliance/scale/integration; broad service needs | (the floor — most control, most ops) |
+| Hyperscaler managed services | You: select and govern each service. Platform: service-specific operations. | AWS, Azure, GCP | Deep compliance/scale/integration; broad service needs | Service-specific cost, limits or operational burden |
 
 Notes:
 
-- **Engine heritage matters — state it precisely.** Supabase and Neon are
-  Postgres-native. PlanetScale is Vitess/MySQL-heritage that added Postgres
-  support only recently — do not conflate it with the Postgres-native BaaS
-  options; name the engine when it drives a decision.
-- **Rungs are not mutually exclusive per system.** A common modern shape is a
+- **Engine heritage matters — state it precisely.** Verify the selected
+  provider's current database engine and supported features at decision time;
+  do not treat different managed databases as interchangeable when engine
+  behavior drives the design.
+- **Patterns are not mutually exclusive per system.** A common modern shape is a
   Jamstack/SSR host for the frontend + a Postgres-BaaS for data + edge functions
-  for global paths — score each surface on its own rung.
-- **Cost model differs by rung:** per-invocation (edge/serverless),
+  for global paths — score each surface on its own pattern.
+- **Cost model differs by pattern:** per-invocation (edge/serverless),
   per-VM/per-container (IaaS/PaaS), or bandwidth/egress (Jamstack/CDN) — a
-  workload cheap on one rung can be punitive on another.
+  workload cheap on one pattern can be punitive on another.
 
-Durable decision axes (these age slowly; brands do not): abstraction rung · ops
+Durable decision axes (these age slowly; brands do not): operational abstraction · ops
 maturity · workload shape (static/SSR vs long-running/stateful vs edge/event) ·
 cost model · compliance/residency · lock-in / exit cost. Decide on these; the
 brand names are refreshable examples a future update swaps without touching the
@@ -71,7 +80,7 @@ logic.
 
 ## Scoring rubric (surviving options only)
 
-Score each surviving option 1–5 per axis across **abstraction rung × provider ×
+Score each surviving option 1–5 per axis across **deployment pattern × provider ×
 deployment posture** (not provider × posture alone), with a one-line written
 rationale per cell — the rationale is the deliverable, the number is a summary:
 
@@ -83,19 +92,19 @@ rationale per cell — the rationale is the deliverable, the number is a summary
 | Region coverage | All required regions, all required services | Gaps needing workarounds |
 | Exit cost | Portable primitives, standard APIs | Proprietary services at the core |
 
-The rung is chosen first (highest the workload tolerates, see § Abstraction
-ladder); providers are then scored within it and, where the choice is close,
-across adjacent rungs. Deployment postures to score alongside providers:
+The compatible patterns are identified first (see Deployment pattern
+selection); providers are then scored within each pattern and across viable
+alternatives. Deployment postures to score alongside providers:
 single-provider, multi-cloud (score its duplicated-expertise cost explicitly),
 hybrid (on-prem + cloud), stay-as-is (always score the incumbent — migration
 cost counts against challengers, not the incumbent).
 
 ## Managed-vs-self-hosted decision table
 
-This is the per-capability refinement WITHIN the chosen rung (see § Abstraction
-ladder). On the higher rungs most rows are settled by the platform (a
-Postgres-BaaS or Jamstack host is managed by definition); the table bites most
-on the IaaS and hyperscaler rungs, where each capability is a separate call.
+This is the per-capability refinement within the chosen patterns (see
+Deployment pattern selection). A managed data or frontend platform settles
+more rows by default; an IaaS or mixed hyperscaler stack requires a separate
+choice for each capability.
 
 | Capability | Default | Self-host only when | Operational bill to accept |
 | --- | --- | --- | --- |

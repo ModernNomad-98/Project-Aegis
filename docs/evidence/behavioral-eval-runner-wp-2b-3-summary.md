@@ -1,5 +1,11 @@
 # Behavioral Eval Runner — WP-2B-3 Stages A1–A2: sanitized implementation summary
 
+**Reading key:** Behavioral Eval Runner (BER) work package (WP) 2B-3 is the
+calibration package; owner decision 1 (OD-1) is the later human ratification
+of measured results. SDK means software development kit. A pull request (PR)
+is a proposed repository change. Identifiers such as `BER-DEC-008` refer to
+dated decisions at the revision described here.
+
 > Historical implementation and preflight snapshot. Its owner-label approval
 > refers to the original hash-bound inputs, whose bytes are now unavailable.
 > PR #88's engineering corrections have since merged; this snapshot's approval
@@ -7,6 +13,7 @@
 > [new-computer handoff](ber-recovery-2026-09-11/README.md) for missing inputs and
 > the [active backlog](../roadmaps/behavioral-eval-runner-backlog.md) for execution
 > gates. Measured calibration and OD-1 ratification remain unfinished.
+> Later references to PR #88 as draft or unmerged are historical.
 
 **Scope: the OFFLINE Stage A1 slice of WP-2B-3 (Measured Judge Calibration and OD-1
 Ratification Gate) under BER-DEC-008 — the calibration-only provider transport,

@@ -5,6 +5,9 @@ description: 'Design cell-based (blast-radius) partitioning for a multi-tenant S
 
 # Cell-Based Architecture Designer
 
+**Reading key:** SaaS means software as a service. A single point of failure
+(SPOF) is a shared component whose failure can stop every cell.
+
 ## Purpose
 
 Partition a platform into **cells** — self-contained stack subsets, each with
@@ -76,7 +79,8 @@ a single cell does should be able to take down another cell.
    a global concern.
 4. **Design the thin cell-router.** The ONLY global data-plane component:
    resolve tenant → cell from the routing table and forward. It must stay
-   thin — no business logic, no per-tenant data — or it becomes the
+   thin — no business logic or tenant business data beyond the routing
+   identifier and tenant-to-cell mapping — or it becomes the
    shared-fate component cells were meant to eliminate.
 5. **Plan cell-by-cell deployment.** Deploy, migrate, and canary one cell at a
    time; a bad change is contained to one cell's tenants. State the rollout
@@ -100,7 +104,7 @@ Premise check: <is blast-radius reduction the dominant lever? evidence /
   cheaper-lever recommendation if not>
 Cell definition: <what one cell contains — compute/data/cache/queue/workers>
 Tenant→cell mapping: <assignment, placement policy, routing-table location>
-Cell-router: <thin resolve-and-forward; explicitly no business logic / no data>
+Cell-router: <thin resolve-and-forward; no business logic or tenant business data beyond routing identifiers and mapping>
 Cell-by-cell deployment: <rollout order, per-cell health gate, halt rule>
 Cross-cell / global concerns: <concern → how served without shared fate>
 Migration / rebalancing runbook: <move a tenant; rebalance a hot cell;
@@ -116,7 +120,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       one cell, with no runtime dependency on another cell.
 - [ ] Every tenant maps to exactly one cell; the placement policy and the
       routing-table location are stated.
-- [ ] The cell-router carries no business logic and no per-tenant data — it
+- [ ] The cell-router carries no business logic or tenant business data beyond
+      the routing identifier and tenant-to-cell mapping — it
       cannot become the shared-fate component.
 - [ ] Deployment is per-cell with a halt rule; a bad change cannot reach the
       whole fleet before a cell's health gate catches it.
