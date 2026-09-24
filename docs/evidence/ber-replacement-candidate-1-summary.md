@@ -1,5 +1,25 @@
 # BER replacement calibration candidate 1 — sanitized checkpoint
 
+> **Current reading, checked 2026-09-24:** This page is a public, sanitized
+> candidate-preparation record for the owner and reviewers. It contains no
+> private cases or proposed per-item labels. The packet remains **PENDING**
+> human label review; storage in the private repository is not approval to
+> unseal holdout cases, call a provider, or ratify calibration. Use the
+> [current Behavioral Eval Runner backlog](../roadmaps/behavioral-eval-runner-backlog.md#start-here-status-and-routes)
+> for the remaining gates.
+
+**Reading key:** Behavioral Eval Runner (BER) is the evaluation tool;
+`BER-DEC` identifies an entry in its owner decision log; a pull request (PR)
+proposes a repository change. Owner decision one (OD-1) is the later human
+ratification of measured calibration. SHA-256 is the 256-bit Secure Hash
+Algorithm used for exact-content identity; a command-line interface (CLI)
+exposes commands. `OWNER_WAIT` means execution pauses for the owner's
+required decision. `PASS` and `FAIL` are synthetic candidate-composition
+labels in the table, not owner-approved gold verdicts. `CRITICAL` is the
+highest reported quality-severity class. `LF` is the line-feed newline byte;
+the checkout policy preserves the packet's exact bytes across platforms.
+None of these labels changes the packet's PENDING status.
+
 Prepared 2026-09-23 under BER-DEC-010 from Project Aegis source commit
 `874750ea5d503b2f2711f520bd6de09bb1381b0b` (tree
 `1339c9c6d2c95196899d72994d91136c73d2da55`); the preparation branch

@@ -1,5 +1,12 @@
 # Independent read-only reviews — 2026-09-12
 
+**Reading key:** These reviews concern a candidate for Behavioral Eval Runner
+(BER) pull request (PR) #88. A command-line interface (CLI) exposes commands;
+Portable Operating System Interface (POSIX) names Unix-like host behavior;
+quality assurance (QA) is independent test review. Owner decision (OD) is a
+later human calibration disposition. Candidate approval here is engineering
+review, not a GitHub approving review or owner permission for a live run.
+
 > **Current reading, checked 2026-09-23:** These reviews cover the exact
 > candidate commit and tree identified below. Pull request (PR) #88 later
 > merged with its scoped corrections; the [delivery closeout](README.md)

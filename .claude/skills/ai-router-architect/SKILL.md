@@ -6,6 +6,12 @@ disable-model-invocation: true
 
 # AI Router Architect
 
+**Reading key:** A software development kit (SDK) is a provider's programming
+package; an application programming interface (API) is its call boundary.
+Personally identifiable information (PII) can identify a person. This
+manual-only skill designs routing and live-provider wiring; it does not grant
+permission to use credentials or call a provider.
+
 ## Purpose
 
 Design the single layer every model call flows through, so the AI system has
@@ -77,8 +83,10 @@ and `ai-cost-guardrail-designer` rather than redoing their work.
    degraded responses when all providers fail; a circuit breaker per provider.
    Define what "degraded" returns to the caller.
 7. **Design the kill switch.** Disable a provider, a model, a feature, or a
-   tenant fast without a deploy — for incidents or cost spikes. Wire confirmed
-   incidents to `incident-response-runbook`.
+   tenant fast without a deploy — for incidents or cost spikes. Route a
+   confirmed live incident to the human incident owner and approved runbook;
+   activating the switch requires the applicable live authority. Use
+   `incident-response-runbook` to author or improve the procedure.
 8. **Handle idempotency and side effects.** Retries must not duplicate
    side-effecting calls; carry an idempotency key where a call triggers an
    external effect (compose `api-event-architect` for the pattern).
@@ -93,7 +101,7 @@ Routing: <task/cost/latency/availability → model tier> (deterministic, logged)
 Cost/rate enforcement: <caps/budgets/rate/concurrency at the choke point> (→ ai-cost-guardrail-designer)
 Telemetry contract: <per-call metrics, attribution, redaction> (→ observability-operator)
 Failure handling: <retry/backoff (idempotent only) | fallback order | degraded response | circuit breaker>
-Kill switch: <granularity, no-deploy, trigger> (→ incident-response-runbook)
+Kill switch: <granularity, no-deploy, trigger, human authority and approved runbook>
 Idempotency: <key/dedup for side-effecting calls> (→ api-event-architect)
 Residual risk: <what remains + named acceptor>
 ```

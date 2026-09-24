@@ -1,5 +1,19 @@
 # Behavioral Eval Runner — WP-2B-0 capability-and-evidence spike: repository-safe summary
 
+**Reading key:** Behavioral Eval Runner (BER) work package (WP) 2B-0 was a
+bounded capability and evidence investigation. R1–R5 are the five capability
+evidence gates recorded in the [runner backlog](../roadmaps/behavioral-eval-runner-backlog.md):
+R1 activation observation, R2 judge calibration, R3 cost observability,
+R4 tool-path confinement, and R5 execution-profile observability and
+isolation.
+`BER-DEC` identifies a runner decision-log entry. Owner decision (OD) one is
+the later human calibration ratification. Continuous integration (CI) runs
+automated checks; SHA-256 is the 256-bit Secure Hash Algorithm used for exact
+content identity. The bold owner outcome below is the **original WP-2B-0
+decision**. Its “WP-2B-1: NOT AUTHORIZED” sentence describes what that
+specific request could not start; the later-status banner records subsequent
+authorized delivery.
+
 > **Current reading, checked 2026-09-23:** The Outcome B and R1–R5 labels
 > below are the accepted result of work package 2B-0 (WP-2B-0), not today's
 > phase queue. WP-2B-1, WP-2B-2 and the scoped calibration engineering later

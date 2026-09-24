@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of 2026-09-24 after pull request (PR) #208, this remains the active
+As of 2026-09-24 after pull request (PR) #209, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -10,9 +10,11 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-The exact #207 tree contains **554 tracked Markdown files**. Nine corrected
-pages received recorded [full-checklist acceptance](../evidence/documentation/full-page-readability-sample-2026-09-23.md),
-leaving **545 pages** without it at that checkpoint. Earlier screens of skill
+The exact #209 tree contains **555 tracked Markdown files**. Thirty existing
+pages received recorded full-checklist acceptance across the
+[first nine-page sample](../evidence/documentation/full-page-readability-sample-2026-09-23.md)
+and [21-page batch](../evidence/documentation/full-page-readability-batch-after-208-2026-09-24.md),
+leaving **525 pages** without it at that checkpoint. Earlier screens of skill
 entrypoints and references corrected particular pages; they did not accept
 every page against the checklist below. Continue the remaining page-by-page
 review. The [current forecast](aegis-backlog-forecast.md#start-here--current-reading)
@@ -196,8 +198,19 @@ This batching procedure is a work plan. It does not mark earlier screens as
 full-page acceptance or grant provider, private-input, real-host or deployment
 authority.
 
+**Named page follow-up found during the batch after PR #209:**
+`.claude/skills/agentic-loop-designer/SKILL.md` describes a second failure on
+identical input as proof of a deterministic failure. A transient provider
+outage or rate limit can fail twice; the repeated failure proves only that
+the retry allowance was exhausted. The page is **not accepted**. Correct its
+retry classification in a focused skill-contract change, review matching
+evaluation cases, and independently accept the revised page. Provisional
+remaining estimate for this bounded correction is **1–2 active hours** within
+the documentation range; it grants no provider call or live retry.
+
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Full-page batch after PR #209, started 2026-09-24 approximately 00:29 UTC | Nine skill pages, one evaluation-harness reference and ten runner evidence pages; [page-level record](../evidence/documentation/full-page-readability-batch-after-209-2026-09-24.md) | Two independent read-only reviewers accepted 20 distinct pages after correction. A separate agentic-loop retry defect remains open in the named follow-up above. Historical evidence, manual-only gates and human incident routing were checked. Expected post-merge inventory: 556 Markdown pages, 50 previously existing pages with full-page acceptance, 506 without it; reconcile against the exact merge tree. The selected backlog forecast at start remains 150–394 active hours. |
 | Full-page batch after PR #208, started 2026-09-24 approximately 00:09 UTC | Ten agent skill pages, one startup reference and ten other reader pages; [page-level evidence](../evidence/documentation/full-page-readability-batch-after-208-2026-09-24.md) | Independent read-only reviewers accepted 21 existing pages after correction or unchanged. The evidence note records each outcome and reviewer interval. At the expected 555-page post-merge inventory, 30 existing pages have recorded full-page acceptance and 525 do not; reconcile with the exact merge tree. The selected backlog forecast at start is 150–394 active hours, with 55–200 for documentation. |
 | First component guides, started 2026-09-23 16:12 UTC | `tools/behavioral_eval_runner/README.md`, `tools/aegis_delivery_control/README.md`, `docs/README.md` | Rewritten around purpose, workflow, examples, functions and limits. Local commands and links passed; independent read-only review found no remaining blocker after corrections. Root README navigation remains a separate batch. |
 | Maintainer guide batch, PR #122 | `docs/offline-ci.md`, `docs/approval-lifecycle-grading.md`, `SECURITY.md` | Added purpose, normal use and terms to three active guides; [batch evidence](../evidence/documentation/readability-maintainer-guides-2026-09-23.md). Other documentation remains open. |

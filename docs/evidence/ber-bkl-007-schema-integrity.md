@@ -1,5 +1,15 @@
 # BER-BKL-007 schema integrity review record
 
+**Reading key for maintainers and reviewers:** Behavioral Eval Runner (BER)
+backlog item 007 (`BER-BKL-007`) covers final record schemas. Work package
+2B-1A (WP-2B-1A) was its bounded implementation; `BER-DEC` identifies the
+runner decision entry that authorized it. A command-line interface (CLI)
+exposes commands, and continuous integration (CI) runs automated checks.
+JavaScript Object Notation (JSON) and YAML are data formats; YAML expands to
+“YAML Ain't Markup Language.” The conditional DONE statement below was true
+before pull request #104 merged; the dated current-reading banner gives its
+later delivery status.
+
 > **Current reading, checked 2026-09-23:** The conditional DONE wording below
 > was recorded before pull request (PR) #104 merged. BER-BKL-007 (the Behavioral
 > Eval Runner schema-integrity backlog item) is now **DONE** for its scoped

@@ -1,5 +1,17 @@
 # Behavioral Eval Runner: resume on a new computer
 
+**Reading key for maintainers:** Behavioral Eval Runner (BER) is the offline
+evaluation tool. A pull request (PR) proposes a repository change;
+continuous integration (CI) runs automated checks. A ZIP file is a compressed
+archive; CPython is the standard Python interpreter used here. A software
+development kit (SDK) is a provider's programming package. YAML means “YAML
+Ain't Markup Language”; PyYAML is its Python parser dependency, and Python
+Package Index (PyPI) is the package
+download registry. A2 and A3 are identifiers for historical evidence records
+in the recovered packet, not current run authority. The command example is
+for restoring committed source on a new Windows computer; confirm current
+versions and gates in [offline CI](../../offline-ci.md) before using it.
+
 ## Recovery continuation snapshot — 2026-09-12
 
 Start new development from `main`. PR #88's engineering corrections, PR #90's

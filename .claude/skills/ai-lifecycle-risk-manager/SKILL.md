@@ -1,9 +1,18 @@
 ---
 name: ai-lifecycle-risk-manager
-description: 'Operationalize the NIST AI RMF as the org''s AI risk program — the four Core functions (GOVERN cross-cutting, MAP context and risks, MEASURE analysis and tracking, MANAGE prioritization and response) applied across the AI lifecycle: design, development, deployment, operation, decommission. The AI RMF 1.0 is VOLUNTARY (released 2023-01-26, under revision per NIST; Generative AI Profile NIST-AI-600-1) — a risk method, NOT a certification target; the certifiable wrapper is its companion iso-42001-aims-architect. Composes ai-governance-risk-reviewer (per-feature tiering), ai-threat-modeler, ai-evaluation-harness, and incident-response-runbook rather than restating them. Use when adopting the AI RMF, standing up an org-level AI risk program across the lifecycle, or building an RMF profile. Do NOT use for one AI feature''s go/no-go (ai-governance-risk-reviewer), the certifiable AIMS (iso-42001-aims-architect), or a feature''s threat enumeration (ai-threat-modeler).'
+description: 'Operationalize the National Institute of Standards and Technology (NIST) Artificial Intelligence (AI) Risk Management Framework (RMF) as an organization risk program across design, development, deployment, operation, and decommissioning. Its GOVERN, MAP, MEASURE, and MANAGE functions form a voluntary risk method, not a certification. Compose ai-governance-risk-reviewer for feature tiering, ai-threat-modeler, ai-evaluation-harness, and incident-response-runbook for procedure authoring. Use when adopting the AI RMF or building an organization profile. Do NOT use for one feature go/no-go, a certifiable AI management system (AIMS), or one feature threat inventory.'
 ---
 
 # AI Lifecycle Risk Manager
+
+**Reading key:** The National Institute of Standards and Technology (NIST)
+Artificial Intelligence (AI) Risk Management Framework (RMF) is a voluntary
+risk method. An AI management system (AIMS) is a separate management-system
+structure; this page does not claim RMF certification. The
+`incident-response-runbook` skill authors procedures; a human incident owner
+uses an approved runbook for a live response.
+ISO/IEC names standards issued jointly by the International Organization for
+Standardization (ISO) and International Electrotechnical Commission (IEC).
 
 ## Purpose
 
@@ -46,8 +55,8 @@ lifecycle-stage triggers, instead of an RMF poster on the wall.
 2. Existing risk practice to compose: `ai-governance-risk-reviewer`
    feature reviews, `ai-threat-modeler` outputs, `ai-evaluation-harness`
    datasets/thresholds, `ai-sdlc-operating-model` stage/authority
-   contract, `agent-authorization-matrix`, incident history
-   (`incident-response-runbook` postmortems), containment posture
+   contract, `agent-authorization-matrix`, incident history and human-owned
+   postmortems (`incident-response-runbook` can help author procedures), containment posture
    (`agent-containment-reviewer`).
 3. The NIST AI RMF text in hand (AI RMF 1.0 and, when generative AI is in
    scope, the Generative AI Profile NIST-AI-600-1) — category-level
@@ -88,9 +97,10 @@ lifecycle-stage triggers, instead of an RMF poster on the wall.
    dropped.
 5. **Operationalize MANAGE.** Prioritization against risk appetite,
    treatment decisions (avoid/mitigate/transfer/accept — acceptance by a
-   named human via `human-approval-boundary`), response wiring
-   (`incident-response-runbook`, kill-switch/containment authority via
-   `agent-containment-reviewer`), and residual-risk communication.
+   named human via `human-approval-boundary`), response procedures authored
+   with `incident-response-runbook`, and kill-switch/containment design via
+   `agent-containment-reviewer`. A human incident owner follows an approved
+   runbook and holds live response authority. Communicate residual risk.
 6. **Wire lifecycle triggers.** Per stage transition (design→dev,
    dev→deploy, deploy→operate, material change, decommission): which
    function activities re-run, who signs. Decommission gets real steps —
