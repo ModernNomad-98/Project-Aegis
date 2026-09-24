@@ -12,6 +12,16 @@ Project Aegis is a library of role and discipline skills for AI-assisted SaaS en
 Skills live in `.claude/skills/<skill-name>/SKILL.md` (open Agent Skills format: YAML frontmatter + workflow doc).
 Before designing, reviewing, or fixing anything, find the matching skill there and follow its SKILL.md.
 Skills whose description begins "MANUAL-ONLY" must never be auto-applied — use them only when the user names them explicitly.
+**Source-library owner preference, 2026-09-24: dogfood Aegis skills.** In
+Role A, every coding agent and delegated subagent must identify and read the
+matching Aegis skill before any source-library task, including task management,
+troubleshooting, design, implementation, review, investigation, delivery, or
+documentation, then use its applicable workflow and checks. Name the skill
+used in the work report; if no skill fits, say so briefly. Pass this
+requirement to delegated agents. This applies to future
+source-library work and does not make a MANUAL-ONLY skill automatic or grant
+any new execution, publication, or merge authority. The owner's direct task
+instructions still take precedence.
 When actually invoking any Aegis skill, tell the user its exact name and, in
 plain language, why it applies now, what it will inspect or do, and what
 result or decision it will produce. Afterward, explain what it found, what
