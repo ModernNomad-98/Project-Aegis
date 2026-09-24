@@ -24004,10 +24004,10 @@ class SQLiteStateStoreTests(unittest.TestCase):
             connection.close()
         self.store.load_verified("repo-1")
 
-        class ContactAlreadyClaimed:
+        class ContactAcceptedForCessationCheck:
             @staticmethod
-            def _contact_committed_validator(*args, **kwargs) -> None:
-                return None
+            def _contact_committed_validator(*args, **kwargs) -> bool:
+                return True
 
         containment_spec = parse_validator_containment_spec(
             intent.containment_spec_json
@@ -24026,7 +24026,7 @@ class SQLiteStateStoreTests(unittest.TestCase):
                     synthetic_validator_output_size("late-result", "PASS"),
                 ),
                 self.authority,
-                ContactAlreadyClaimed(),
+                ContactAcceptedForCessationCheck(),
                 committed,
                 intent,
                 usage_units=1,
@@ -25936,6 +25936,18 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertEqual(self._row_count("adapter_contacts"), 1)
         self.assertEqual(self.store.table_counts()["validator_intents"], 1)
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            contact_head = connection.execute(
+                "SELECT head_hash FROM runs WHERE run_id = 'run-1'"
+            ).fetchone()[0]
+        self.oracle.allowed_head = contact_head
+        with self.assertRaisesRegex(DispatchDenied, "contact already exists"):
+            adapter._execute_committed(
+                capability, request, self.authority, self.store, committed,
+                intent,
+            )
+        self.assertIsNone(adapter.reconcile(capability.claim_id))
+        self.assertEqual(self._row_count("adapter_contacts"), 1)
 
     def test_f20_result_commit_crashes_never_launder_containment(self) -> None:
         intent, capability, committed, adapter, request = (

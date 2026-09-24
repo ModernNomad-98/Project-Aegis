@@ -1098,7 +1098,7 @@ class SyntheticValidatorAdapter:
             )
             return None if lose_result else result
 
-        store._contact_committed_validator(
+        new_contact = store._contact_committed_validator(
             intent,
             capability,
             commit,
@@ -1109,6 +1109,10 @@ class SyntheticValidatorAdapter:
                 capability, request, intent
             ),
         )
+        if not new_contact:
+            raise DispatchDenied(
+                "synthetic validator contact already exists; reconcile its outcome"
+            )
         if failure_hook is not None:
             failure_hook("after_validator_contact_before_result_transaction")
         return contact()
