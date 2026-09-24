@@ -1,9 +1,17 @@
 ---
 name: agentic-loop-designer
-description: Design an agentic loop's shape and bounds — single-shot vs agentic as an EXPLICIT up-front decision (never default to a loop); clamped iteration ceilings; TYPED retryability (a policy rejection is TERMINAL, never retried; a transient failure is retried once on IDENTICAL input (reproducibility key) to classify flake vs deterministic); honest terminal states (an empty result is a legitimate stop, never forced into fabricated output); plan-act-observe-reflect with a defined stop. A loop needs an honest way to stop, including the honest empty set. Consumes iteration/cost caps from ai-cost-guardrail-designer (budget is an input; this owns loop SEMANTICS/stopping); designs the structure agent-failure-recovery plugs into; the loop runs INSIDE agent-harness-architect's harness. Use when deciding whether a task needs a loop, designing retry/stop behavior, or when an agent loops unbounded or fabricates on empty. DESIGNS the loop; manipulation attack review belongs to agent-goal-hijack-defender and ai-threat-modeler.
+description: Design an agentic loop's shape and bounds — decide explicitly whether a loop is needed; clamp iteration ceilings; classify failures before retrying; stop on policy denials and permanent errors; retry a transient failure at most once on identical input only when the operation is safe to repeat; distinguish retry exhaustion and unknown outcomes from proven permanent failures; report empty results honestly. Consumes cost caps from ai-cost-guardrail-designer, gives recovery checkpoints to agent-failure-recovery, and runs inside agent-harness-architect's harness. Use for loop design, retry and stop behavior, unbounded loops, or fabricated results. Manipulation attack review belongs to agent-goal-hijack-defender and ai-threat-modeler.
 ---
 
 # Agentic Loop Designer
+
+**Terms used here:** A *transient failure* is an event such as a timeout or
+temporary service error that may clear without changing the request. A
+*permanent failure* has evidence such as a validation error that the same
+request cannot succeed. An *idempotent operation* can be repeated without
+adding another external effect. A *reproducibility key* identifies the exact
+input bytes; it does not prove that external state stayed the same or that a
+side effect occurred only once.
 
 ## Purpose
 
@@ -13,12 +21,16 @@ no loop is needed. The deliverable is a loop design with five load-bearing
 parts: (1) the single-shot-vs-agentic decision made EXPLICITLY up front,
 with the reasons recorded — a loop is a cost and a risk you take on purpose,
 not a default; (2) clamped iteration ceilings that cannot be exceeded; (3)
-TYPED retryability — every failure is classified before any retry: a policy
-rejection is TERMINAL and never retried, a transient failure is retried
-exactly once on IDENTICAL input so the second outcome classifies it as flake
-or deterministic, and a reproducibility key (the hash of the exact input)
-keeps that classification honest; (4) honest terminal states — success,
-policy-stop, deterministic-failure, ceiling/budget-stop, and the honest
+TYPED retryability — every failure is classified before any retry: policy
+rejections and evidenced permanent errors stop immediately; a transient
+failure may be retried at most once on identical input only when repeating
+the operation is safe, within the budget, and allowed by any retry delay.
+Success after retry shows an intermittent outcome; a second transient failure
+exhausts the retry without establishing its cause. An uncertain side effect
+stops unless idempotency is proven. A reproducibility key records the exact
+input, but cannot prove external state or deduplication; (4) honest terminal
+states — success, policy-stop, deterministic-failure, retry-exhausted,
+unknown-outcome, ceiling/budget-stop, and the honest
 empty set: an empty result is a legitimate stop, never forced into
 fabricated output; and (5) a plan → act → observe → reflect structure with
 the stop check run every iteration. This skill DESIGNS the loop; the
@@ -36,8 +48,8 @@ PRODUCES the artifact those skills review.
 - Use when: an agent loops unbounded, retries policy rejections, re-rolls
   failures with tweaked prompts until something passes, or pads an empty
   result into invented output.
-- Use when: retry behavior needs to distinguish flake from deterministic
-  failure and nobody can currently tell which is which.
+- Use when: retry behavior needs to distinguish a typed permanent failure,
+  an intermittent success, retry exhaustion, and an unknown side effect.
 - Auto-invocable: a pure design skill — it produces a loop specification and
   changes no live system.
 - Do NOT use when: the job is the ATTACK REVIEW of the loop — can injected
@@ -72,8 +84,9 @@ PRODUCES the artifact those skills review.
    how it stops today, and any history of runaway runs or fabricated
    endings.
 3. The failure surface: which step failures are policy rejections, which
-   are transient (network, rate limit, timeout), and which are
-   deterministic — and whether the code can currently tell them apart.
+   are transient (network, rate limit, timeout), which are evidenced
+   permanent failures, and which have an uncertain side effect; determine
+   whether the code can tell them apart and whether a retry is safe.
 4. The caps in force (`ai-cost-guardrail-designer` output if present):
    iteration/cost/recursion bounds the loop must respect as inputs.
 5. The harness context (`agent-harness-architect` output if present): the
@@ -104,16 +117,25 @@ PRODUCES the artifact those skills review.
      authorization failure, a refused action is never retried — retrying a
      policy stop is an attempt to wear the gate down, and each attempt burns
      budget probing a boundary that will not move.
-   - **Transient failure → retry ONCE on IDENTICAL input.** The retry's
-     purpose is classification: same input, second outcome. Pass = flake
-     (continue); identical failure = deterministic (terminal, surface it).
-     A **reproducibility key** — the hash of the exact input — proves the
-     input was identical; a "retry" with a tweaked prompt is a NEW attempt
-     wearing a retry's clothes, and it destroys the classification.
-   - **Deterministic failure → TERMINAL.** Surface it with its evidence;
-     do not re-roll hoping for a different answer.
+   - **Evidenced permanent failure → TERMINAL.** A validation error that
+     cannot succeed on the same request needs no retry. Surface the evidence.
+   - **Transient failure → at most ONE retry on IDENTICAL input.** First
+     establish that the prior effect is known absent, or that safe or
+     idempotent repetition is proven despite an uncertain response. Meet
+     any required retry delay, and ensure the retry fits
+     the iteration and cost ceilings. A successful retry is an observed
+     intermittent success. A second timeout or temporary service error is
+     `retry-exhausted`: stop and report that the cause is unresolved. Do not
+     call repeated transient failures deterministic. The **reproducibility
+     key** (hash of the exact input) verifies the input bytes only; a changed
+     prompt is a new attempt, not a retry. The key does not prove unchanged
+     external state or deduplicate effects.
+   - **Uncertain side effect → unknown-outcome.** If an operation may have
+     acted before timing out, stop without retrying unless idempotency and
+     safe repetition are established. Report the uncertainty to the caller.
 5. **Define the honest terminal states.** Enumerate them: success;
-   policy-stop; deterministic-failure; ceiling/budget-stop; and the honest
+   policy-stop; deterministic-failure; retry-exhausted (cause unresolved);
+   unknown-outcome; ceiling/budget-stop; and the honest
    EMPTY SET — "nothing matched" is a legitimate, first-class answer. The
    loop never pads, invents, or force-fills an empty result into output
    that looks like success. Downstream must be able to distinguish every
@@ -123,10 +145,12 @@ PRODUCES the artifact those skills review.
    `agent-failure-recovery` handles the recovery; this design gives it
    something to recover.
 7. **Prove the stops can fire.** Design the tests: the ceiling actually
-   halts a run; a policy rejection is demonstrably not retried; the retry
-   classifier is fed a deterministic failure and correctly terminates (and
-   a flake, and correctly continues); the empty set reaches the caller as
-   empty. A verifier that cannot fail is theater with an exit code — a stop
+   halts a run; a policy rejection and an evidenced permanent failure are
+   demonstrably not retried; a safe transient succeeds
+   after one retry or reaches retry-exhausted after a second transient; an
+   uncertain side effect stops without idempotency proof; changed input is
+   a new attempt; and the empty set reaches the caller as empty. A verifier
+   that cannot fail is theater with an exit code — a stop
    condition that has never fired in a test is an unbounded loop you
    haven't met yet.
 8. **Deliver the design** in the Output Format, seams cited: budget, the
@@ -143,16 +167,21 @@ Ceilings: <hard iteration cap; per-iteration and total bounds consumed from
   ai-cost-guardrail-designer>
 Retryability (typed):
   policy rejection → TERMINAL, never retried
-  transient → retry ONCE on identical input (reproducibility key: <input
-    hash>); pass=flake, identical-fail=deterministic
-  deterministic → TERMINAL, surfaced with evidence
+  evidenced permanent error → TERMINAL, no retry
+  transient → at most ONE retry on identical input only if safe/idempotent,
+    within ceilings, and after any required delay (input hash: <hash>);
+    success=intermittent success; second transient=retry-exhausted, cause
+    unresolved
+  uncertain side effect → unknown-outcome unless safe repetition is proven
 Terminal states: <success | policy-stop | deterministic-failure |
-  ceiling-stop | HONEST EMPTY SET> — each distinguishable downstream;
+  retry-exhausted | unknown-outcome | ceiling/budget-stop | HONEST EMPTY SET>
+  — each distinguishable downstream;
   empty is never padded into output
 Checkpoints/resume: <per-iteration persisted state; what
   agent-failure-recovery can plug into>
-Stop proofs: <ceiling-fires test; policy-not-retried test; classifier
-  must-fail test (deterministic + flake); empty-reaches-caller test>
+Stop proofs: <ceiling-fires; policy and permanent errors not retried;
+  safe transient succeeds or exhausts one retry; changed input is a new
+  attempt; uncertain side effect stops without idempotency; empty reaches caller>
 Handoffs: budget/caps → ai-cost-guardrail-designer; call gating →
   agent-harness-architect; broken-state recovery → agent-failure-recovery;
   attack review → agent-goal-hijack-defender + ai-threat-modeler
@@ -170,14 +199,18 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       hitting it is an honest named terminal state.
 - [ ] Every failure is typed before any retry; policy rejections are
       TERMINAL and demonstrably never retried.
-- [ ] The transient retry is exactly once, on IDENTICAL input, under a
-      reproducibility key — and its outcome classifies flake vs
-      deterministic.
+- [ ] A transient retry occurs at most once on identical input only when
+      repetition is safe, ceilings allow it, and any required delay is met.
+      A second transient is retry-exhausted, with cause unresolved.
+- [ ] Evidenced permanent errors stop without retry; uncertain side effects
+      stop unless idempotency and safe repetition are established. The input
+      hash is not treated as proof of external state or deduplication.
 - [ ] The terminal states are enumerated and downstream-distinguishable,
       including the honest empty set; nothing pads empty into output.
 - [ ] Per-iteration checkpoints give `agent-failure-recovery` a socket.
 - [ ] Every stop has a designed proof it can fire — ceiling, policy-stop,
-      classifier, and empty-set delivery all have must-fail/must-fire
+      retry exhaustion, uncertain side effects, and empty-set delivery have
+      must-fail/must-fire
       tests.
 - [ ] The yields are stated: manipulation attack review →
       agent-goal-hijack-defender + ai-threat-modeler; seams cited, not
@@ -192,14 +225,15 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - Retrying a policy rejection is not resilience — it is probing a gate.
   The commonest form: catching ALL exceptions in one handler and retrying,
   which silently converts denials into retry storms.
-- A retry with a tweaked prompt classifies nothing: two different inputs
-  with two outcomes tells you the inputs differed. Identical input is what
-  makes the second run evidence — that is what the reproducibility key is
-  for.
+- A retry with a tweaked prompt is a new attempt. Identical input makes the
+  outcomes comparable, but repeating a timeout does not prove its cause.
+  An input hash does not establish what happened in an external service.
+- A timeout after a side effect may leave the outcome unknown. Do not repeat
+  that operation without evidence that repetition is safe and idempotent.
 - The empty set is where fabrication pressure concentrates: a loop that
   "must return something" will eventually return something false. Empty
   reaching the caller as empty is a feature the design must defend, not a
-  UX bug to paper over.
+  user experience (UX) bug to paper over.
 - A ceiling that only lives in a prompt ("stop after 10 tries") is not a
   ceiling — the clamp must be enforced by the code that runs the loop, not
   requested of the model inside it.
@@ -220,8 +254,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   policy stops are terminal by design, and automated gate-probing is not a
   loop feature this skill will design.
 - The failure surface cannot be typed — the system cannot distinguish a
-  policy denial from a transient error from a deterministic bug → fix the
-  error taxonomy first (`error-taxonomy-designer` for the model, the
+  policy denial from a transient error, a permanent error, or an uncertain
+  side effect → fix the error taxonomy first (`error-taxonomy-designer` for the model, the
   harness for denial signaling); typed retryability over untyped failures
   is guesswork.
 - No iteration/cost caps exist to consume → obtain them from

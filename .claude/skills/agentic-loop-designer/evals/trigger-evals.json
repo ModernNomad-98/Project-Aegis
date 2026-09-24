@@ -12,7 +12,7 @@
   "cases": [
     {
       "id": "loop-semantics-win-here",
-      "prompt": "Decide whether this task even needs an agentic loop, and if so design it: a hard iteration cap, policy rejections never retried, transient failures retried once on the identical input to tell flake from deterministic, and an empty result delivered honestly as empty.",
+      "prompt": "Decide whether this task needs an agentic loop, and if so design it: a hard iteration cap, policy denials never retried, safe transient operations retried at most once on identical input, a second transient reported as retry-exhausted with unresolved cause, and an empty result delivered honestly as empty.",
       "expected_skill": "agentic-loop-designer",
       "should_not_trigger": ["ai-cost-guardrail-designer", "agent-containment-reviewer", "agent-goal-hijack-defender"],
       "note": "SEAM CASE (primary) — the single-shot decision, typed retryability, and honest terminal states are loop SEMANTICS. No budget authoring, no fleet containment, no attack review is requested.",

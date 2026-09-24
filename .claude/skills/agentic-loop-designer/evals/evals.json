@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "agentic-loop-designer",
-  "description": "Behavior cases for agentic loop shape and bounds: the explicit single-shot-vs-agentic decision, clamped ceilings, typed retryability (policy-stops-terminal, retry-once-identical with a reproducibility key), honest terminal states including the empty set, stop proofs, and the design-not-review seam.",
+  "description": "Behavior cases for agentic loop shape and bounds: the explicit single-shot-versus-loop decision, hard ceilings, typed failures, safe retries at most once, honest terminal states including the empty set, stop proofs, and the design-versus-review boundary.",
   "cases": [
     {
       "id": "positive-research-loop-design",
@@ -12,9 +12,9 @@
         "assertions": [
           "Makes the single-shot-vs-agentic decision explicitly first and records why observation-dependence justifies a loop here.",
           "Structures plan → act → observe → reflect with the stop check every iteration, and clamps a hard iteration ceiling consumed from ai-cost-guardrail-designer's caps.",
-          "Types the retryability: policy rejections TERMINAL and never retried; transient failures retried exactly once on IDENTICAL input under a reproducibility key to classify flake vs deterministic.",
-          "Enumerates honest terminal states — success, policy-stop, deterministic-failure, ceiling-stop, and the honest empty set — each distinguishable downstream.",
-          "Designs the stop proofs (ceiling fires, policy-not-retried, classifier must-fail, empty-reaches-caller) and yields the manipulation attack review to agent-goal-hijack-defender / ai-threat-modeler."
+          "Types failures before retry: policy denials and evidenced permanent errors stop immediately; a transient may retry at most once on identical input only when repetition is safe and within limits.",
+          "Enumerates honest terminal states — success, policy-stop, deterministic-failure, retry-exhausted with unresolved cause, unknown-outcome, ceiling or budget stop, and the honest empty set — each distinguishable downstream.",
+          "Designs tests for ceiling, policy denial, permanent error, safe transient success and exhaustion, uncertain side effects, and empty delivery; yields manipulation attack review to agent-goal-hijack-defender and ai-threat-modeler."
         ]
       }
     },
@@ -39,10 +39,23 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Types the failures before any retry: the policy denial becomes TERMINAL (never retried — retrying a policy stop is gate-probing), the timeout becomes transient, the empty search becomes a legitimate terminal state, not a failure at all.",
-          "Replaces retry-with-tweaks with retry ONCE on IDENTICAL input under a reproducibility key, and states why: a tweaked input classifies nothing — identical input makes the second outcome evidence for flake vs deterministic.",
+          "Types failures before retry: the policy denial stops without retry, a timeout needs an effect and idempotency check before any retry, and the empty search is a legitimate terminal state rather than a failure.",
+          "Replaces retry-with-tweaks with at most one identical-input retry only for a safe or idempotent operation within the ceiling and any required delay. A changed prompt is a new attempt, and an input hash does not prove external state or deduplication.",
           "Clamps the ceiling and makes hitting it an honest named terminal state.",
-          "Designs the proof that the classifier can fail (a deterministic failure correctly terminates; a flake correctly continues) — a verifier that cannot fail is theater with an exit code."
+          "Designs proof that an evidenced permanent error gets zero retries, a safe transient can succeed after one retry, and a second transient stops as retry-exhausted with cause unresolved."
+        ]
+      }
+    },
+    {
+      "id": "edge-uncertain-side-effect",
+      "type": "should_trigger",
+      "prompt": "A write request timed out after it may have created a record. We have a hash of the original input but no idempotency key or outcome confirmation. Should the loop retry the write?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops as unknown-outcome without retrying the write until idempotency and safe repetition are proven.",
+          "Explains that identical input and its hash do not prove whether the external side effect happened or prevent a duplicate record.",
+          "Keeps the outcome distinct from a deterministic failure and from a second typed transient failure."
         ]
       }
     },
