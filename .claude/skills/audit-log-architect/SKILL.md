@@ -1,9 +1,17 @@
 ---
 name: audit-log-architect
-description: Design a durable, tenant-scoped audit log system — an audit event taxonomy (authentication events, access-control changes, data access and exports, admin/support actions, security events, billing changes), a record schema (actor, tenant, action, target, outcome, correlation id, timestamp), integrity guarantees (append-only, tamper-evidence, an explicit audit-write-failure policy), retention and redaction rules, tenant-scoped access to audit data, and negative tests proving audit writes cannot be silently skipped and audit reads cannot cross tenants. Includes a migration path for introducing auditing to a live system with rollback. Use when building or overhauling audit logging, when compliance (SOC 2, ISO 27001, customer contracts) requires an audit trail, or when audit events are currently ad-hoc console logs. Do NOT use for API/webhook event contracts consumed by integrations (api-event-architect), for observability/tracing design, or for deciding who may do what (authorization-matrix-designer).
+description: Design a durable, tenant-scoped audit log system with an event taxonomy, record schema, append-only integrity, write-failure policy, retention, redaction, scoped reads, and negative tests. Include rollout and safe rollback for a live system. Use for audit logging and compliance trails such as System and Organization Controls 2 (SOC 2), International Organization for Standardization/International Electrotechnical Commission (ISO/IEC) 27001, or customer contracts. Do NOT use for external event contracts (api-event-architect), observability, or permission design (authorization-matrix-designer).
 ---
 
 # Audit Log Architect
+
+Here, **ISO/IEC 27001** is the information-security management standard of
+the International Organization for Standardization and International
+Electrotechnical Commission. **PII** means personally identifiable
+information, **IP** means Internet Protocol, **ORM** means object-relational
+mapper, **DB** means database, and **WORM** means write once, read many.
+**HIPAA** means the United States Health Insurance Portability and
+Accountability Act; whether it applies depends on the actual system and data.
 
 ## Purpose
 
@@ -18,7 +26,7 @@ access — a grep-able stdout stream is not an audit trail.
 
 ## Use When
 
-- Use when: compliance (SOC 2, ISO 27001, HIPAA-adjacent, enterprise
+- Use when: compliance (SOC 2, ISO/IEC 27001, HIPAA-adjacent, enterprise
   contracts) requires demonstrable audit trails.
 - Use when: audit-worthy actions are currently ad-hoc `logger.info` calls
   with no schema, durability, or access story.
@@ -92,9 +100,10 @@ access — a grep-able stdout stream is not an audit trail.
 8. **Plan the rollout to a live system**: emit-only first (no consumer),
    verify volume and schema against real traffic, then attach views and
    alerts; backfill is usually impossible — state the audit-coverage start
-   date honestly rather than fabricating history. Rollback: emission can be
-   disabled per category without touching business logic; already-written
-   records are never deleted by a rollback.
+   date honestly rather than fabricating history. Rollback may disable
+   optional emission per category; for a security-critical category, retain
+   the fail-closed or guaranteed-queue policy until a reviewed coverage
+   change is approved. Already-written records are never deleted.
 
 ## Output Format
 
@@ -112,7 +121,8 @@ Access model: <tenant-scoped views; staff access audited; raw-store access:
   none>
 Negative-test plan: <test — attempted violation — expected result>
 Rollout & rollback: <emit-only → verify → attach consumers; coverage start
-  date; per-category disable; records never deleted>
+  date; optional-category disable only; mandatory coverage retained;
+  records never deleted>
 Assumptions & open questions: <each with risk-if-wrong / who answers>
 ```
 

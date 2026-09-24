@@ -1,4 +1,10 @@
-# Permanent offline CI — prepared follow-up
+# Permanent offline continuous integration (CI) — prepared follow-up
+
+Reading key: Behavioral Eval Runner (BER); software development kit (SDK);
+YAML (YAML Ain't Markup Language), the workflow configuration format. Decision
+D60 is the repository's
+historical enforcement decision in the
+[reconciliation](../../reconciliation/step-0-reconciliation-v4.md).
 
 > Historical prepared plan. This work shipped in
 > [PR #91](../offline-ci-2026-09-12/DELIVERY.md), including the Windows native-shell

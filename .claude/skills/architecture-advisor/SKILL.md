@@ -5,6 +5,10 @@ description: Advise on the architecture STYLE/paradigm for what someone is build
 
 # Architecture Advisor
 
+Here, **SOA** means service-oriented architecture and **ops** means
+operations. A style recommendation compares deployment and team constraints
+before choosing a pattern.
+
 ## Purpose
 
 The architecture-style decision is where teams most reliably choose by

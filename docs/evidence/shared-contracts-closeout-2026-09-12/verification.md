@@ -1,5 +1,16 @@
 # Shared contracts: implementation verification
 
+> **Current reading, checked 2026-09-24:** This is the initial candidate
+> checkpoint for pull request (PR) #90. That change later merged; see the
+> [delivery record](README.md). The corrected verification below supersedes
+> these initial results. The submission and merge steps at the end describe
+> what remained on September 12, not a current permission requirement.
+
+Reading key: Behavioral Eval Runner (BER); Portable Operating System Interface
+(POSIX), meaning the Unix-like test environment here; software development kit
+(SDK); 256-bit Secure Hash Algorithm 2 digest (SHA-256); architecture decision
+record (ADR). An ATX heading is a Markdown heading beginning with `#`.
+
 The [corrected-revision verification](corrected-verification.md) supersedes this
 initial candidate record after GitHub review found two additional issues. It
 records 987 passing BER tests on each platform and 113 acceptance cases on the

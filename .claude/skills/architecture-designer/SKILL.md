@@ -1,9 +1,12 @@
 ---
 name: architecture-designer
-description: Design or redesign system structure — components, dependencies, data ownership, integration points — grounded in an inspection of the CURRENT architecture first, never from an imagined one. Produces a component map, dependency map, coupling/cohesion risk list, data-ownership map, tradeoff analysis, an ADR draft for the key decision, and an incremental migration plan from current to target state. Use when asked how a system or feature should be structured, whether something should be a module or a service, where a new integration belongs, or when a proposed change has structural consequences. Do NOT use for pure domain-concept modeling (domain-modeler) or for recording an already-made decision (adr-writer).
+description: Design or redesign system structure from an inspection of the current code and architecture. Produce component, dependency, and data-ownership maps, tradeoffs, an architecture decision record (ADR) draft, and an incremental migration plan. Use for structural feature or system decisions. Do NOT use for domain-concept modeling (domain-modeler) or recording an already-made decision (adr-writer).
 ---
 
 # Architecture Designer
+
+Here, **CI** means continuous integration and **deps** means dependencies.
+An **ADR** is an architecture decision record for a pivotal choice.
 
 ## Purpose
 

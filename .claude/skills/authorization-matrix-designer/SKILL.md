@@ -1,9 +1,17 @@
 ---
 name: authorization-matrix-designer
-description: Design the authorization model for a multi-tenant SaaS as an explicit roles × permissions × resources matrix — platform roles vs tenant roles, object-level authorization rules for every tenant-owned resource, an enforcement-point map (UI, API, service, background job, integration), deny-by-default posture, impersonation/support-access rules, and a negative-test plan proving forbidden actions actually fail. Includes an additive migration and rollback path for role changes. Use when designing or overhauling roles and permissions, when authorization checks are scattered and inconsistent across the codebase, when adding a sensitive capability or a new role, or when support/admin access needs safe rules. Do NOT use for plan/feature gating — "does this PLAN include X" is plan-entitlement-architect; "can this ROLE do X" is this skill. Not for recording what happened (audit-log-architect) or for auditing existing RLS policies (Phase 4 security pack).
+description: Design authorization for multi-tenant software as a service (SaaS) as an explicit roles × permissions × resources matrix. Include object-level rules, enforcement points, deny-by-default behavior, brokered support access, negative tests, and a safe migration and rollback plan. Use when roles or permissions need design or repair. Do NOT use for plan entitlements (plan-entitlement-architect), audit records (audit-log-architect), or row-level security (RLS) policy review (rls-policy-auditor).
 ---
 
 # Authorization Matrix Designer
+
+Here, **RBAC** means role-based access control, **UI** means user interface,
+**API** means application programming interface, **SQL** means Structured
+Query Language, **IDOR** means insecure direct object reference, and **QA**
+means quality assurance. **SOC 2** means System and Organization Controls 2;
+**ISO/IEC 27001** is the information-security management standard published
+by the International Organization for Standardization and International
+Electrotechnical Commission.
 
 ## Purpose
 
@@ -53,7 +61,7 @@ accumulation of `if (user.isAdmin)` checks discovered later by a pen test.
    background jobs, integrations/webhooks, admin console.
 5. Current support/staff access practice — what actually happens today when
    support needs to see tenant data.
-6. Compliance requirements naming access control (SOC 2, ISO, customer
+6. Compliance requirements naming access control (SOC 2, ISO/IEC 27001, customer
    contracts demanding least privilege or access reviews).
 
 ## Workflow
@@ -88,9 +96,10 @@ accumulation of `if (user.isAdmin)` checks discovered later by a pen test.
    cross-tenant, and expired-impersonation cases (catalog in references).
 8. **Plan migration and rollback** for role changes: introduce new
    permissions additively, dual-check (old and new logic in shadow
-   comparison) before cutover, keep a flag to revert to the old check, and
-   never widen a role's reach silently — widening is a change the human
-   approves.
+   comparison) before cutover. A revert flag is usable only if the old
+   check still passes deny-by-default and cross-tenant negative tests;
+   otherwise halt and obtain an approved safer rollback. Never widen a
+   role's reach silently — widening is a change the human approves.
 
 ## Output Format
 
@@ -105,7 +114,7 @@ Enforcement-point map: <surface → where the check runs → authoritative layer
 Brokered access rules: <grant, scope, time-box, visibility, audit event>
 Negative-test plan: <actor — attempted action — expected denial>
 Migration & rollback: <additive introduction → shadow dual-check → cutover →
-  revert flag; widenings requiring approval listed>
+  tested safe revert or halt; widenings requiring approval listed>
 Assumptions & open questions: <each with risk-if-wrong / who answers>
 ```
 
@@ -122,8 +131,8 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - [ ] Support/impersonation is grant-based, scoped, time-boxed, and audited.
 - [ ] Every sensitive permission has at least one negative test; revoked and
       cross-tenant cases are covered.
-- [ ] Role migrations are additive with shadow dual-check and a revert path;
-      silent widenings: none.
+- [ ] Role migrations are additive with shadow dual-check; any revert path
+      passes denial and cross-tenant tests; silent widenings: none.
 - [ ] Authorization (role CAN) is not conflated with entitlement (plan
       INCLUDES) anywhere in the matrix.
 

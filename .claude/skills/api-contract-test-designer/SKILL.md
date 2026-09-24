@@ -1,9 +1,15 @@
 ---
 name: api-contract-test-designer
-description: Design contract tests that VERIFY implementations against API, command, provider, webhook, and edge-function contracts WITHOUT UI tests — request/response schema validation (shape, types, required fields, error envelope), provider-side and consumer-side roles, versioning checks, and backward-compatibility gates (additive vs breaking diff rules) wired into CI. Contract = does the shape/version hold; not the business flow behind it. Produces the verification design and hands implementation off. Use when asked to contract-test an API/webhook/RPC surface, prevent breaking API consumers or partners, verify a provider's responses match what consumers were promised, or gate schema drift in CI. Do NOT use to DESIGN the contract itself — versioning policy, envelopes, rate limits are api-event-architect, which this skill verifies; not for end-to-end flow through internal boundaries (integration-test-designer) or browser tests (playwright-e2e-engineer).
+description: Design contract tests that verify application programming interface (API), command, provider, webhook, and edge-function shapes without user-interface (UI) tests. Specify provider- and consumer-side schema checks, version coverage, and compatibility gates in continuous integration (CI); additive changes still need consumer checks. Use for API/webhook or remote-procedure-call contract verification and schema-drift gates. Do NOT use to design the contract (api-event-architect), test internal business flows (integration-test-designer), or test browser journeys (playwright-e2e-engineer).
 ---
 
 # API Contract Test Designer
+
+An application programming interface (API) exposes a contract to consumers.
+Here, **UI** means user interface, **RPC** means remote procedure call,
+**JSON** means JavaScript Object Notation, **SDK** means software development
+kit, **DB** means database, **CI** means continuous integration, and **PR**
+means pull request.
 
 ## Purpose
 
@@ -67,9 +73,11 @@ tolerate what providers actually send).
    envelope; response validates against schema (success AND error paths);
    webhook payloads validate before send.
 4. **Design the compatibility gate:** schema diff per PR classified by rule —
-   additive (new optional field, new endpoint) passes; breaking (removed/
-   renamed field, type change, new required field, narrowed enum) fails
-   unless a new version + deprecation path per the contract's policy exists.
+   additive (new optional field, new endpoint) is a pass candidate only
+   after consumer-side compatibility tests confirm actual consumers tolerate
+   it; breaking (removed/renamed field, type change, new required field,
+   narrowed enum) fails unless a new version + deprecation path per the
+   contract's policy exists.
 5. **Cover version coverage explicitly:** every version still in its support
    window has provider-side tests; sunset versions' tests retire WITH the
    version, via `regression-suite-curator`.
@@ -89,7 +97,7 @@ Roles: <surface → provider-side / consumer-side obligations>
 Schema validation specs:
   <id> — <surface × version> — <request|response|webhook|error-envelope>
        — validates <schema ref> — negatives <invalid input → contracted error>
-Compatibility gate: <diff rules additive-pass/breaking-fail + version policy hook>
+Compatibility gate: <additive candidate + consumer checks / breaking fail + version policy hook>
 Version coverage: <versions in support window → specs; retiring versions noted>
 Fake-fidelity plan: <which fixtures/recordings re-validate against providers, cadence>
 CI placement: <PR blocking suite, diff artifact, scheduled re-validation>

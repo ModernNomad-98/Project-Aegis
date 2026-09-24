@@ -1,9 +1,12 @@
 ---
 name: api-doc-generator-designer
-description: Design GENERATED API reference documentation — reference produced from the API's source of truth (OpenAPI/GraphQL schema, type annotations, docstrings) so it can't drift from the implementation, the split between what to auto-generate (the exhaustive reference) and what to hand-write (guides, examples, overviews), enriching the source of truth so descriptions/examples are single-sourced, the generation toolchain and where it slots into the docs pipeline, try-it/auth/error docs, and versioning the reference with the API. Documents an API that api-event-architect designed; keeps the reference honest by generating it, not hand-maintaining it. Use when generating API reference from a schema or code, keeping API docs in sync, or choosing an API-doc toolchain. Do NOT use to design the API CONTRACT itself (api-event-architect), the general docs pipeline (docs-as-code-architect), or organize docs by type (diataxis-doc-organizer).
+description: Design generated application programming interface (API) reference documentation from a verified schema or code source, with a check that the source matches the implementation. Split exhaustive generated reference from authored guides and examples; enrich the source, choose a generation toolchain, and version the reference with the API. Use when API docs drift or a reference generator is needed. Do NOT use to design the API contract (api-event-architect), the general docs pipeline (docs-as-code-architect), or the documentation structure (diataxis-doc-organizer).
 ---
 
 # API Doc Generator Designer
+
+Here, **CI** means continuous integration, **SDK** means software development
+kit, and **SoT** means source of truth.
 
 ## Purpose
 
@@ -11,14 +14,16 @@ Hand-maintained API reference is wrong the moment the API changes and
 nobody edits the docs — a parameter gets renamed, the docs still show the
 old name, and every integrator hits the wall. The fix is to stop
 maintaining reference by hand: generate it from the API's source of truth
-so it CAN'T drift. This skill designs that generation — what the source of
+so it stays aligned to a verified source. Generation alone cannot catch a
+stale schema or inaccurate code comments; validate the source against the
+implementation. This skill designs that generation — what the source of
 truth is (OpenAPI/GraphQL schema, type annotations, docstrings), how the
 exhaustive reference is generated from it, the clean split between
 generated reference and hand-written guides/examples, enriching the
 schema so descriptions and examples are single-sourced, the toolchain and
 its place in the docs pipeline, and versioning the reference with the API.
 It documents an API that `api-event-architect` designed; its whole point
-is a reference that stays honest because it's generated, not typed.
+is a reference checked against the implementation and generated, not typed.
 
 ## Use When
 
@@ -66,9 +71,9 @@ is a reference that stays honest because it's generated, not typed.
    real first task; generating from nothing isn't possible.
 2. **Generate the exhaustive reference.** Endpoints/operations, types,
    parameters (required/optional, formats), responses, and the error
-   catalog — all generated so they match the implementation by
-   construction. This is the drift-killer: generated reference can't fall
-   behind because it IS the schema, rendered.
+   catalog — all generated from the verified source. Check the schema or
+   annotations against implemented behavior in CI; rendering a stale
+   source faithfully still produces a stale reference.
 3. **Split generated vs authored.** Generate the reference (the complete
    machinery). Hand-write the quickstart, guides/how-tos, conceptual
    overviews, and curated examples — generation produces those badly. Map
@@ -93,7 +98,7 @@ is a reference that stays honest because it's generated, not typed.
    changelog/diff between versions is generated where possible. Coordinate
    the versioning/deprecation POLICY with `api-event-architect`.
 8. **Deliver** the generation design in the Output Format, with the
-   source of truth, the generated/authored split, and the sync guarantee
+   source of truth, the generated/authored split, and the alignment checks
    explicit.
 
 Source-of-truth options, the generated-vs-authored split table, schema-
@@ -111,7 +116,7 @@ Enrichment:     descriptions/examples live IN the schema/docstrings (single-sour
 Examples:       request/response validated against schema; auth docs; error catalog from taxonomy
 Toolchain:      generator=<...>; try-it console?; plugs into docs pipeline (docs-as-code-architect)
 Versioning:     reference matches API version; deprecations from schema; diff/changelog
-Sync guarantee: reference generated, never hand-maintained → cannot drift
+Alignment checks: generated reference + source-to-implementation validation
 Boundaries:     contract → api-event-architect; pipeline → docs-as-code-architect;
                 corpus org → diataxis-doc-organizer
 ```
@@ -120,6 +125,8 @@ Boundaries:     contract → api-event-architect; pipeline → docs-as-code-arch
 
 - [ ] The reference generates from a machine-readable source of truth; if
       none exists, adopting one is named as the first task.
+- [ ] The source is checked against implemented endpoints and behavior;
+      generation alone does not prove it is current.
 - [ ] The exhaustive reference (endpoints/types/params/responses/errors)
       is generated, not hand-written.
 - [ ] The generated-vs-authored split is explicit (reference generated;
