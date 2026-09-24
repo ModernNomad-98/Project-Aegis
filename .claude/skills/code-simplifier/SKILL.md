@@ -6,6 +6,10 @@ disable-model-invocation: true
 
 # Code Simplifier
 
+**Reading key:** DI means dependency injection; JSON means JavaScript Object
+Notation; API means application programming interface. This manual-only skill
+edits only the code the user explicitly names.
+
 ## Purpose
 
 Make named code simpler while provably changing nothing about its behavior.

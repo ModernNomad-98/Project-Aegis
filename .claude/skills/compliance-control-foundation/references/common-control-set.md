@@ -2,12 +2,14 @@
 
 Starter structure for the framework-agnostic catalog. Every control follows
 the same row shape (ID, objective, owner, mechanism, evidence hook, status).
-The mechanism column maps to SHIPPED skills/artifacts by name — the batch
-maps controls that largely already exist (D9); it does not rebuild them.
+The right-hand column lists shipped skills and candidate artifacts to inspect.
+It is a design/review route, not proof that a control operates. Mark a control
+implemented only after checking its running mechanism, owner and dated
+operating evidence; otherwise record partial or missing status.
 
 ## Domain 1 — Access control
 
-| Starter control | Typical mechanism (shipped) |
+| Starter control | Design/review route or candidate artifact to verify |
 | --- | --- |
 | Role/permission model, deny-by-default | `authorization-matrix-designer` matrix + enforcement-point map |
 | Object-level / tenant-scoped authorization | `rls-policy-auditor` audit + `multi-tenant-security-tester` negative suite |
@@ -17,7 +19,7 @@ maps controls that largely already exist (D9); it does not rebuild them.
 
 ## Domain 2 — Cryptography
 
-| Starter control | Typical mechanism (shipped) |
+| Starter control | Design/review route or candidate artifact to verify |
 | --- | --- |
 | Secret/key custody, rotation, exposure | `secrets-identity-hardener` |
 | Session/token security flags | `secrets-identity-hardener` |
@@ -25,7 +27,7 @@ maps controls that largely already exist (D9); it does not rebuild them.
 
 ## Domain 3 — Change management
 
-| Starter control | Typical mechanism (shipped) |
+| Starter control | Design/review route or candidate artifact to verify |
 | --- | --- |
 | Change classification + validation floor | `change-classification-gate` |
 | Human approval at risk boundaries | `human-approval-boundary` |
@@ -35,7 +37,7 @@ maps controls that largely already exist (D9); it does not rebuild them.
 
 ## Domain 4 — Logging & monitoring
 
-| Starter control | Typical mechanism (shipped) |
+| Starter control | Design/review route or candidate artifact to verify |
 | --- | --- |
 | Tenant-scoped audit trail (taxonomy, schema, integrity, retention) | `audit-log-architect` |
 | Operational telemetry, alerts, health | `observability-operator`, `slo-reliability-architect` |
@@ -43,14 +45,14 @@ maps controls that largely already exist (D9); it does not rebuild them.
 
 ## Domain 5 — Incident response
 
-| Starter control | Typical mechanism (shipped) |
+| Starter control | Design/review route or candidate artifact to verify |
 | --- | --- |
 | Severity ladder, roles, comms, postmortem | `incident-response-runbook` |
 | Containment/rollback execution path | `rollback-runbook-author` artifact invoked by reference |
 
 ## Domain 6 — Vendor management
 
-| Starter control | Typical mechanism (shipped) |
+| Starter control | Design/review route or candidate artifact to verify |
 | --- | --- |
 | Dependency/CI/artifact supply chain (incl. AI/ML + agentic surface) | `supply-chain-security-reviewer` (D6/D7 extensions included) |
 | Provider data-use/retention terms for AI vendors | `ai-governance-risk-reviewer` data-governance step |
@@ -58,7 +60,7 @@ maps controls that largely already exist (D9); it does not rebuild them.
 
 ## Domain 7 — Risk assessment
 
-| Starter control | Typical mechanism (shipped) |
+| Starter control | Design/review route or candidate artifact to verify |
 | --- | --- |
 | Technical threat modeling (input to risk register) | `threat-modeler`, `ai-threat-modeler` |
 | Risk register with owners, treatment decisions | often MISSING as a maintained artifact — net-new; the ISO projections require it (6.1) |
@@ -66,7 +68,7 @@ maps controls that largely already exist (D9); it does not rebuild them.
 
 ## Domain 8 — AI governance (include when ISO 42001 / AI RMF in scope)
 
-| Starter control | Typical mechanism (shipped) |
+| Starter control | Design/review route or candidate artifact to verify |
 | --- | --- |
 | AI-SDLC stage/authority contract | `ai-sdlc-operating-model` |
 | Standing agent authority (merge/deploy/auto-merge) | `agent-authorization-matrix` |
@@ -88,7 +90,8 @@ maps controls that largely already exist (D9); it does not rebuild them.
 [CC-<domain>-<nn>] <control name>
 Objective:      <the risk this treats, one line>
 Owner:          <named human or role>
-Mechanism:      <named skill/artifact/process — or MISSING>
+Mechanism:      <verified running system or maintained process — or MISSING>
+Design route:   <named skill if relevant; not evidence of operation>
 Evidence hook:  <artifact + where it accrues> (→ compliance-evidence-collector)
 Status:         implemented | partial (<residue>) | missing
 ```

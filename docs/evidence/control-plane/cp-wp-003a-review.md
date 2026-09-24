@@ -1,5 +1,10 @@
 # CP-WP-003A offline capability proof review
 
+**Reading key:** PR means pull request; CLI means command-line interface;
+ACL means access-control list; ETA means estimated time to complete. The
+`CP-WP` code means control-plane work package and identifies a bounded scope,
+not authority for a real operation.
+
 > **Current reading, checked 2026-09-23:** Control-plane work package 003A
 > (CP-WP-003A) is **DONE** as an offline synthetic proof through
 > [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123).

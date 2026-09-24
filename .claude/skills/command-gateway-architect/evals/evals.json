@@ -10,7 +10,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Inventories COMMANDS (protected mutations) rather than endpoints, and defines one per-command pipeline with a fixed order: validate → authenticate actor from token → authorize → derive tenant/resource scope from trusted rows → idempotency → execute → emit audit + events → safe error envelope.",
+          "Inventories COMMANDS (protected mutations) rather than endpoints, and defines one per-command pipeline with a fixed order: validate → authenticate actor from token → derive trusted target tenant/resource scope → authorize that resolved target → idempotency → execute → emit audit + events → safe error envelope.",
           "States the no-direct-client-writes invariant AND names the datastore backstop (RLS/write-deny) that makes the gateway the sole write authority, not merely the polite one.",
           "Delegates the authorization policy to authorization-matrix-designer and the audit record schema to audit-log-architect rather than re-authoring them.",
           "Produces an enforcement-point map (command × stage) and flags any write that reads scope from the body or skips audit as a finding."

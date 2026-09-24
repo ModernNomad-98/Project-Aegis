@@ -1,5 +1,12 @@
 # Agentic loop retry correction — 2026-09-24
 
+> **Current reading, checked 2026-09-24:** Pull request (PR) #211 merged the
+> [corrected agentic-loop skill](../../../.claude/skills/agentic-loop-designer/SKILL.md).
+> Later instructions to record time after merge and the 557/51/506 page
+> inventory below describe the pre-merge checkpoint. Use the
+> [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+> for the current inventory.
+
 **Terms:** Coordinated Universal Time (UTC) records review times;
 JavaScript Object Notation (JSON) is the format of the evaluation files;
 estimated time to complete (ETA) is the planning estimate.

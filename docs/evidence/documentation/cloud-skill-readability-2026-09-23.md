@@ -1,5 +1,13 @@
 # Cloud architecture skill readability — 2026-09-23
 
+> **Current reading, checked 2026-09-24:** This is the earlier AWS and Azure
+> skill reading batch. Its no-push/no-pull-request statements describe the
+> writer's checkpoint, not the delivered state. Read the current
+> [AWS skill](../../../.claude/skills/aws-saas-architect/SKILL.md) and
+> [Azure skill](../../../.claude/skills/azure-saas-architect/SKILL.md);
+> pull request #214 later revised the Azure guidance. The original review
+> findings and timing below remain historical evidence.
+
 ## Scope and timing
 
 This bounded documentation batch improves the Amazon Web Services (AWS) and

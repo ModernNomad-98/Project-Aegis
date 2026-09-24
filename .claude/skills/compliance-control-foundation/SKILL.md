@@ -1,9 +1,17 @@
 ---
 name: compliance-control-foundation
-description: Author the framework-agnostic common control set that ISO 27001, ISO 42001, and SOC 2 work all consumes — one catalog across access control, cryptography, change management, logging/monitoring, incident response, vendor management, and risk assessment, each control written ONCE with objective, owner, implementing mechanism, and evidence hook, then projected per framework instead of rebuilt per framework. Controls MAP to shipped implementations by name (authorization-matrix-designer, rls-policy-auditor, audit-log-architect, incident-response-runbook, and the rest of the Phase 3/4 packs) — this skill documents and maps, never rebuilds. Use when starting a compliance program, asked for a common/baseline control set, or when multiple frameworks threaten parallel control lists. Do NOT use for one framework's management system (the iso-*/soc2-* projections), control→criteria references (multi-framework-crosswalk), or gap assessment (compliance-gap-auditor).
+description: Author the framework-agnostic common control set that ISO 27001, ISO 42001, and SOC 2 work all consumes — one catalog across access control, cryptography, change management, logging/monitoring, incident response, vendor management, and risk assessment, each control written ONCE with objective, owner, verified operating mechanism or gap, and evidence hook, then projected per framework instead of rebuilt per framework. Shipped skills identify design and review routes; they do not prove that an organization operates a control. Map verified running systems and processes by name. Use when starting a compliance program, asked for a common/baseline control set, or when multiple frameworks threaten parallel control lists. Do NOT use for one framework's management system (the iso-*/soc2-* projections), control→criteria references (multi-framework-crosswalk), or gap assessment (compliance-gap-auditor).
 ---
 
 # Compliance Control Foundation
+
+**Reading key:** ISO is the International Organization for Standardization;
+SOC 2 is an American Institute of Certified Public Accountants (AICPA)
+attestation framework, and CPA means certified public accountant. AI means
+artificial intelligence; RLS means row-level security; RMF means risk
+management framework. NIS2 is the European Union's second Network and
+Information Security Directive; US and EU mean United States and European
+Union.
 
 ## Purpose
 
@@ -13,12 +21,13 @@ projections (`iso-27001-isms-architect`, `iso-42001-aims-architect`,
 change-management, logging, incident-response, vendor-management, and
 risk-assessment controls are written once and satisfy every framework via
 `multi-framework-crosswalk` — never three parallel control lists. Each
-control states its objective, owner, the concrete implementing mechanism
-(named shipped skill or system artifact), its evidence hook for
+control states its objective, owner, the verified operating mechanism
+(system or process), its evidence hook for
 `compliance-evidence-collector`, and an honest implementation status. The
-batch premise (D9): most technical controls already exist in the shipped
-Phase 3/4 packs — this skill MAPS them into compliance shape and exposes
-what is genuinely missing; it does not re-derive or re-implement them.
+shipped Phase 3/4 skills provide design and review routes, not evidence that
+technical controls operate in this organization. This skill maps verified
+systems and processes into compliance shape and exposes what is missing;
+it does not re-derive or re-implement them.
 
 ## Use When
 
@@ -40,7 +49,7 @@ what is genuinely missing; it does not re-derive or re-implement them.
 
 ## Inputs to Inspect
 
-1. Shipped control artifacts to map, not rebuild: the authorization matrix
+1. Candidate control artifacts to inspect, not assume implemented: the authorization matrix
    (`authorization-matrix-designer`), RLS audit + negative tests
    (`rls-policy-auditor`, `multi-tenant-security-tester`), tenant-isolation
    review (`tenant-isolation-reviewer`), secret/credential posture
@@ -67,10 +76,11 @@ what is genuinely missing; it does not re-derive or re-implement them.
 1. **Confirm scope and consumers.** Which frameworks will project from this
    catalog, and who owns it. No target framework or owner named → Stop
    Conditions.
-2. **Inventory existing controls from shipped artifacts.** Walk the inputs
-   above and list what already operates: mechanism, where it lives, who
-   runs it. Map-don't-rebuild is the rule — a control that exists gets a
-   pointer, never a re-specification.
+2. **Inventory verified operating controls.** Walk the candidate routes
+   above and inspect actual running systems, maintained processes and dated
+   evidence. List what operates, where it lives and who runs it. A shipped
+   skill alone is a design route, not an implemented mechanism. Map a verified
+   control by pointer rather than re-specifying it.
 3. **Normalize into the seven domains** using
    [references/common-control-set.md](references/common-control-set.md):
    access control, cryptography, change management, logging & monitoring,
@@ -79,7 +89,7 @@ what is genuinely missing; it does not re-derive or re-implement them.
    eighth domain when ISO 42001 / AI RMF is in scope.
 4. **Write each control once.** Per control: stable ID, objective (what
    risk it treats), description, named owner, implementing mechanism
-   (named skill/system artifact — evidence it exists), evidence hook
+   (verified system/process artifact, or MISSING), evidence hook
    (what proves it operates — feeds `compliance-evidence-collector`), and
    status: implemented / partial / missing, with the residue named.
 5. **Keep it framework-neutral.** No clause or criteria citations in the
@@ -105,7 +115,8 @@ Per control:
   [CC-<domain>-<nn>] <name>
     Objective: <risk treated>
     Owner: <named human/role>
-    Mechanism: <named shipped skill / system artifact / process — or MISSING>
+    Mechanism: <verified running system / maintained process — or MISSING>
+    Design/review route: <named skill, if useful; not proof of operation>
     Evidence hook: <what proves operation> (→ compliance-evidence-collector)
     Status: implemented | partial (<residue>) | missing
 Known residue carried: <e.g. crypto design review, app-config hardening>
@@ -116,8 +127,8 @@ Framework references: none here — see multi-framework-crosswalk
 
 - [ ] Every control has a stable ID, objective, named owner, mechanism (or
       explicit MISSING), evidence hook, and honest status.
-- [ ] Existing implementations are mapped by name to shipped artifacts —
-      nothing that exists was re-specified from scratch.
+- [ ] Existing implementations are mapped to verified operating systems or
+      maintained processes; a shipped skill alone never earns implemented status.
 - [ ] All seven domains covered (plus AI governance when 42001/RMF in
       scope); domain gaps stated, not skipped.
 - [ ] Zero framework clause/criteria citations inside the catalog.
@@ -150,9 +161,9 @@ Framework references: none here — see multi-framework-crosswalk
 - Vocabulary capture: writing the catalog in one framework's idiom (e.g.
   TSC phrasing) makes the other projections awkward — keep control
   language plain and operational.
-- The rebuild temptation: the shipped Phase 3/4 skills already implement
-  most technical controls; re-specifying them here creates a second source
-  of truth that rots. Point, don't paraphrase.
+- The rebuild temptation: shipped Phase 3/4 skills can guide design and
+  review, while verified operating controls are mapped by pointer. Neither
+  route justifies rewriting another control's implementation here.
 - Owners must be humans/roles, not team abstractions — auditors ask "who",
   and so does `compliance-gap-auditor`.
 

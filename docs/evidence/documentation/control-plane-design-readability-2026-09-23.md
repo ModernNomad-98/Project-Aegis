@@ -1,5 +1,12 @@
 # Control-plane design entry point — 2026-09-23
 
+> **Current reading, checked 2026-09-24:** This batch delivered a clearer
+> entry point to the [control-plane design](../../design/resumable-control-plane-v1.md).
+> Later statements that independent review or Actions checks were pending
+> describe the original candidate. The [control-plane work-package (CP-WP)
+> backlog](../../roadmaps/resumable-control-plane-backlog.md) gives current
+> package status and authority.
+
 ## Purpose and scope
 
 This note records a bounded readability change to the

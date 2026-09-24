@@ -1,5 +1,13 @@
 # Behavioral Eval Runner backlog readability batch — 2026-09-23
 
+> **Current reading, checked 2026-09-24:** This bounded batch delivered a
+> reading route into the [current Behavioral Eval Runner backlog](../../roadmaps/behavioral-eval-runner-backlog.md).
+> Later statements that independent review or exact-head continuous
+> integration (CI) checks remain pending describe this note's original
+> candidate. An `AEGIS-APR` code is an entry in the
+> [approval register](../../approvals/APPROVAL_REGISTER.md), not a new grant
+> created by this note.
+
 ## Scope and forecast
 
 This batch adds a current entry point to the [Behavioral Eval Runner (BER)

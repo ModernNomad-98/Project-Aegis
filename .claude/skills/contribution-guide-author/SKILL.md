@@ -5,6 +5,11 @@ description: Design a CONTRIBUTING guide that takes a contributor from zero to a
 
 # Contribution Guide Author
 
+**Reading key:** PR means pull request; CI means continuous integration;
+CLA means contributor license agreement; DCO means Developer Certificate of
+Origin, recorded through commit sign-off; README is the repository's
+introductory guide.
+
 ## Purpose
 
 A would-be contributor arrives with a fix and leaves without merging it,

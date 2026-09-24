@@ -1,5 +1,11 @@
 # Control-plane backlog readability batch — 2026-09-23
 
+> **Current reading, checked 2026-09-24:** This batch delivered the current
+> entry point to the [control-plane (CP) work-package (WP) backlog](../../roadmaps/resumable-control-plane-backlog.md).
+> Its older 175–394-hour estimate and pending-review text describe the
+> original checkpoint. A pull request (PR) is a proposed repository change;
+> current package authority and status are in the linked backlog.
+
 ## Purpose and scope
 
 This note records a bounded readability review of the

@@ -5,6 +5,10 @@ description: 'Design a SAFE dynamic-testing (DAST) harness against a RUNNING app
 
 # DAST Safety Harness Designer
 
+**Reading key:** DAST means dynamic application security testing against a
+running system; SAST means static application security testing of source;
+DoS means denial of service; PII means personally identifiable information.
+
 ## Purpose
 
 Dynamic testing sends real traffic at live software, so the dangerous part is
