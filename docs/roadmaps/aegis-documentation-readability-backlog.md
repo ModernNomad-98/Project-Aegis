@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #255 on 2026-09-24, this remains the active
+As of merged pull request (PR) #257 on 2026-09-24, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -10,7 +10,7 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-The current merged tree contains **585 tracked Markdown files**: **541
+The current merged tree contains **587 tracked Markdown files**: **543
 reader pages** with recorded full-checklist acceptance and **44 synthetic
 fixtures** with classification and integrity checks. The protected
 `scripts/tests/fixtures/README.md` and its new
@@ -23,7 +23,9 @@ the corrections recorded below and merged through #250. PR #253 added the
 reviewed BER-BKL-009 scope proposal and reaccepted the corrected candidate
 summary. PRs #254 and #255 changed existing governance and tracking pages;
 the [five-merge checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-255)
-reconciles their status. **Zero known pages** remain in the bounded sweep.
+reconciles their status. PR #257 added the reviewed operator runbook and
+integration evidence record; both passed full-page review. **Zero known pages**
+remain in the bounded sweep.
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
 below are historical snapshots; the
@@ -35,10 +37,10 @@ records the #245 baseline's **1–3 documentation active hours** for the two
 notes. Their acceptance closes that residual, and #249 separately delivered
 the 8–16-hour offline holdout-support item. The **87–178 active-hour** selected
 residual after #250 is historical. The owner's bounded BER-BKL-009 approval,
-effective on #255, leaves **79–162 active hours** for the other eleven selected
-rows, one offline implementation package capped at 16 active hours, and an
-unestimated later BER-BKL-009 residual. The selected total therefore has no
-finite current estimate.
+effective on #255, left one offline implementation package capped at 16 active
+hours. PR #257 delivered that package. Current selected work has **79–162
+active hours** for the other eleven selected rows and an unestimated later
+BER-BKL-009 residual. The selected total therefore has no finite current estimate.
 Future new or changed pages still need the acceptance check below. The
 [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
 and [delivery control-plane guide](../../tools/aegis_delivery_control/README.md)

@@ -6,17 +6,19 @@ This is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. The [five-merge checkpoint after #255](#five-merge-checkpoint--2026-09-24-after-pull-request-255)
 reassesses every selected and optional row. PR #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
-documentation residual. PR #253 added one reviewed reader page, making the
-merged tree **585 pages**: 541 accepted readers and 44 classified fixtures,
-with zero known pending pages. The owner's 2026-09-24 approval of the
+documentation residual. PR #253 added one reviewed reader page; PR #257 added
+two more. The merged tree has **587 pages**: 543 accepted readers and 44
+classified fixtures, with zero known pending pages. PR #257 delivered the
+bounded offline integration and consumed APR-023. The owner's 2026-09-24 approval of the
 [bounded BER-BKL-009 synthetic integration](#material-owner-decision--2026-09-24-ber-bkl-009),
 made effective by merged PR #255,
 supersedes the old 8–16-hour whole-item estimate and therefore the old
 87–178-hour selected total. The current selected work has **79–162 active
-hours for the other eleven items, plus an offline package capped at 16 active
-implementation hours, plus unestimated BER-BKL-009 host, runtime, privacy and
-cleanup work**. No finite new selected or all-options total is defensible
-until that residual is scoped.
+hours for the other eleven items, plus unestimated BER-BKL-009 host, runtime,
+privacy and cleanup work**. The offline package is delivered. The owner chose
+a new disposable Linux virtual machine as the R4/R5 Stage A candidate, but its
+identity and provisioning remain unset. No finite new selected or all-options
+total is defensible until that residual is scoped.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
 the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-255--2026-09-24)
@@ -29,15 +31,15 @@ The owner answered "Approve this bounded scope" to the exact synthetic-only
 [PR #253 proposal](ber-bkl-009-policy-scope-amendment-proposal.md). The
 separate BER-DEC-013 and APR-023 governance amendment merged in PR #255 as
 `0318b1ecde3ebf5f34bb32f8793efc37b574af39`. The one ten-path
-implementation branch must start from that exact merge. Its 16 active-hour,
-1,500 added code/test lines and $0 external-spend **caps are ceilings, not an
-estimate**. The earlier 8–16-hour BER-BKL-009 whole-item row cannot be carried
+implementation branch started from that exact merge and delivered in PR #257.
+Its 16 active-hour, 1,500 added code/test lines and $0 external-spend caps
+were ceilings, not an estimate. The earlier 8–16-hour BER-BKL-009 whole-item row cannot be carried
 forward as a forecast for the newly split scope.
 
 | Current selected component | Active work after the owner decision |
 | --- | ---: |
 | Other eleven selected rows from the #250 checkpoint | 79–162 hours |
-| Bounded BER-BKL-009 offline integration | At most 16 hours; no narrower estimate yet |
+| Bounded BER-BKL-009 offline integration | Delivered in PR #257; 0 hours remaining in this package |
 | BER-BKL-009 real-host, runtime, privacy and cleanup residual | TBD pending a named host and separate scope |
 | **Selected total** | **No finite estimate yet** |
 

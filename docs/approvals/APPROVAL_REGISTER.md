@@ -586,3 +586,49 @@ generic skill guidance that would require asking for the same approval again.
 - **Expiry / use limit:** Work in this conversation session only; no calendar
   expiry or one-use count stated. It is not a standing all-work grant for later
   sessions.
+
+### AEGIS-APR-025: PR #257 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE when granted; later consumed by AEGIS-APR-026.
+- **Date / Grantor:** 2026-09-24 / Peter Nguyen.
+- **Reason:** Permit the independently reviewed synthetic evidence-policy
+  integration to merge after its protected runner paths triggered the guard.
+- **Scope allowed:** The owner's exact reply was "approved" to the pending
+  PR-specific decision for [PR #257](https://github.com/ModernNomad-98/Project-Aegis/pull/257)
+  at head `7176009113fa208a1b2e816d90d7f929805e93ae`: a one-time
+  `gate-guard` exception and administrator merge. Exact-head Linux and Windows
+  checks passed; `gate-guard` failed because the PR changed protected runner
+  paths. The local offline suite and independent reviews passed.
+- **Scope FORBIDDEN:** This reply covered only that PR and head. It did not
+  waive other checks, grant another protected-guard exception, or authorize
+  host, provider, private-data, production or deletion work.
+- **Evidence:** Direct owner reply "approved" on 2026-09-24 in the Project
+  Aegis conversation following the PR #257 exception question and explanation
+  of the guard; [PR #257 merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/257).
+- **Expiry / use limit:** One PR #257 merge; no calendar expiry stated.
+
+### AEGIS-APR-026: Consumption of PR #257 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-025.
+- **Status at recording:** AEGIS-APR-025 has no remaining use.
+- **Effective at:** 2026-09-24 22:04:09 UTC.
+- **Recorded at / By:** 2026-09-24 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The sole approved administrator merge completed.
+- **Evidence:** [PR #257](https://github.com/ModernNomad-98/Project-Aegis/pull/257)
+  merged as `53351b3fac3d75cbbc23341cc96dbeadc1e116ee`.
+
+### AEGIS-APR-027: Consumption of synthetic policy-integration grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-023.
+- **Status at recording:** AEGIS-APR-023 has no remaining use.
+- **Effective at:** 2026-09-24 22:04:09 UTC.
+- **Recorded at / By:** 2026-09-24 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The one bounded synthetic implementation package authorized by
+  AEGIS-APR-023 was delivered. Later real-host, privacy, runtime and cleanup
+  gates remain outside that grant.
+- **Evidence:** [PR #257](https://github.com/ModernNomad-98/Project-Aegis/pull/257)
+  merged as `53351b3fac3d75cbbc23341cc96dbeadc1e116ee`;
+  [integration review](../evidence/ber-bkl-009-policy-integration-review.md).
