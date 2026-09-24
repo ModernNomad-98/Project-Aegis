@@ -1,10 +1,14 @@
 # Behavioral Eval Runner offline holdout-support review
 
-**Current reading, 2026-09-24:** This is an in-progress synthetic implementation
-record. No measured calibration or private sealed holdout has run. Four focused
-offline suites and the full unsandboxed Windows suite pass locally. Independent
-security, recovery and quality review is complete with corrections applied.
-Pinned Linux, the exact implementation head, and hosted checks remain pending.
+**Current reading, 2026-09-24:** The synthetic offline support merged in
+[pull request #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249)
+as `fa37c0e545dfd096e8327ca5357b0dfc6e2f8bb5`. Its implementation head
+is `bf72d391831c9c6c30eedd295d07a2ff32b47fe4` with tree
+`cd4f944406ac79884de204f4d1e135e444316383`. Linux and Windows GitHub
+Actions passed at the reviewed head. The verification ledger below records
+the earlier premerge candidate; its pending entries are historical. No
+measured calibration or private sealed holdout has run, and the execution
+source and freeze remain unselected. The merge grants no provider request.
 
 Behavioral Eval Runner (BER) work package 2B-3 (WP-2B-3) measures a semantic
 judge against an owner-approved dataset. Owner decision one (OD-1) is the later
@@ -46,9 +50,13 @@ closes but before its result summary is written, `recover_summary()` reads the
 verified chain and outcomes and writes only the missing summary. It creates no
 SDK client or new provider attempt and refuses an incomplete or stopped pass.
 Independent review of the candidate found issues that were corrected before
-this checkpoint. Final full-suite and hosted results remain pending.
+merge. The full Windows suite and exact-head Linux and Windows Actions passed
+before #249 merged.
 
-## Verification ledger
+## Premerge verification ledger — historical
+
+The following results and pending checks describe the candidate before #249
+merged. Times in this record use Coordinated Universal Time (UTC).
 
 | Check | Result at this checkpoint |
 | --- | --- |

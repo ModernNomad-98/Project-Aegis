@@ -17,9 +17,9 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [five-merge checkpoint after pull request #238](#checkpoint-after-pull-request-238--2026-09-24)
+The latest [five-merge checkpoint after pull request #245](#checkpoint-after-pull-request-245--2026-09-24)
 reconsiders every open work item and links the [current remaining-work
-forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-238).
+forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-245).
 The table and dated checkpoints below preserve their original estimates and
 observed intervals; older pending or in-progress cells are historical, not
 current work status. Active-work estimates and observed wall time are different
@@ -41,6 +41,41 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Checkpoint after pull request #245 — 2026-09-24
+
+Five requests merged after #244: #139, #197, #239, #235 and #245. The table
+uses GitHub `mergedAt` receipts. The prior-merge interval includes unrelated
+work, review, CI, queue time and owner waiting; it is not active labor or a
+package duration. #244 merged at 10:25:42 UTC.
+
+| Merged request and scope | Exact merge commit | Published package estimate or bound | Prior-merge wall interval |
+| --- | --- | ---: | ---: |
+| [#139](https://github.com/ModernNomad-98/Project-Aegis/pull/139): synthetic BER evidence-policy proof | `b4b1195d6162728ffc37d22d038a08e3722db7c0` | At most 8 active h under APR-012; actual active split unavailable | 5h31m34s |
+| [#197](https://github.com/ModernNomad-98/Project-Aegis/pull/197): runner command-effects explanation | `ebaba9362e3eedba2f419a9072c6477f3ce23024` | 1–3 active h | 1m27s |
+| [#239](https://github.com/ModernNomad-98/Project-Aegis/pull/239): protected fixture README | `66ae4deb5f5600a4ab54f0a86bee858b8b9d7c76` | 1–3 active h | 1m22s |
+| [#235](https://github.com/ModernNomad-98/Project-Aegis/pull/235): offline holdout-support grant | `0196fe5b4eb30ca72c4bd61d51bedc9489a62115` | 1–2 active h governance preparation; 8–16 h implementation still open | 16m43s |
+| [#245](https://github.com/ModernNomad-98/Project-Aegis/pull/245): owner approval register | `72eb42f9e951f70caea0ce45fd0241560e19cbc3` | No separate active estimate published | 39s |
+
+The five prior-merge intervals span **10:25:42–16:17:27 UTC** and total
+**5h51m45s**. This is elapsed wall time including owner decisions; active-only,
+review, CI, queue and owner-wait splits are unavailable. PRs #139, #197 and
+#239 had passing Linux and Windows jobs and a sole protected guard failure;
+the owner approved separate one-time exceptions, now consumed in APR-014–019.
+PRs #235 and #245 had all exact-head Actions green. The
+[forecast checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-245)
+reassesses all 14 selected and seven optional rows. The #239 README closure
+and two newly introduced evidence notes left **1–3 active documentation
+hours** at the #245 baseline. The notes' corrected-candidate full-page
+acceptance in this checkpoint PR reduces that to zero known pages on merge.
+At the historical #245 baseline, non-documentation was **95–194**, so note
+acceptance alone would have moved the selected total from **96–197** to
+**95–194**. PR #249 later delivered the 8–16-hour offline holdout-support
+item; with the notes and two subsequent reader pages accepted in this PR,
+current selected work becomes **87–178 active hours**, or **103–218** with
+both optional Issue #101 helpers. #139 delivered only the offline BKL-009
+increment; #235 authorized one bounded synthetic WP-2B-3 support package.
+Neither selects a live host, private input, provider allowance or OD-1 result.
 
 ## Checkpoint after pull request #238 — 2026-09-24
 
