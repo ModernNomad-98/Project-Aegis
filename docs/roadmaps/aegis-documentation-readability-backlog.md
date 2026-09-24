@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of the documentation batch after pull request (PR) #216 on 2026-09-24,
+As of the five-merge checkpoint after pull request (PR) #217 on 2026-09-24,
 this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -354,6 +354,24 @@ The previous and current batch ETA are both **3–6 active hours**. The
 changes documentation from **50–175** to **45–170 active hours** and selected
 backlog from **145–369** to **140–364 active hours**. Acceptance remains
 **IN PROGRESS**; the unreviewed pages retain their pending status.
+
+## Five-merge ledger checkpoint after pull request #217 — 2026-09-24
+
+The exact #217 merge `f6a05e97b68108a9de0c81f37ce48b8ffe55d78c`
+contains **562 tracked Markdown pages**. Since the #212 checkpoint,
+four 20-page batches accepted **80 distinct existing pages** and four
+new review notes entered the inventory. Acceptance rose from 71 to
+**151**; pending pages fell from 487 to **411**. The disjoint pending
+buckets are 268 skill, 48 previously corrected primary, 33 dated
+notes/tracking, 18 other reader and 44 synthetic fixture pages.
+
+The [full five-merge forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-217)
+rechecked every selected and optional row. Its unchanged per-page
+assumptions produce **44.92–158.1 raw documentation hours**, outwardly
+rounded to **40–160**. Other selected work remains **95–194**; the
+selected total changes from the #212 checkpoint's **145–369** to
+**135–354 active hours**. Acceptance remains **IN PROGRESS**. The
+previous and current checkpoint ETA are both **1–2 active hours**.
 
 ## Ledger update for the batch after pull request #216 — 2026-09-24
 
