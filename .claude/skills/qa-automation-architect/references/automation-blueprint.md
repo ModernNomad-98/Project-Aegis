@@ -1,6 +1,9 @@
 # Automation Blueprint Reference
 
-Detail file for `qa-automation-architect`. Loaded on demand.
+Detail file for [qa-automation-architect](../SKILL.md). Loaded on demand.
+JS/TS means JavaScript/TypeScript; SaaS is software as a service; CI is
+continuous integration; E2E is end-to-end; a11y means accessibility; DB is
+database.
 
 ## Default stack table (JS/TS SaaS baseline — adjust to repo reality)
 
@@ -45,7 +48,9 @@ Import boundary: `tests/**` may import from `src` public entry points and
 ## CI tier worksheet
 
 - PR tier budget: target < 10 min wall clock; shard when over.
-- Merge tier: smoke E2E (critical journeys only).
+- Pre-merge queue tier, when configured: smoke E2E can be a merge gate;
+  post-merge main smoke E2E is required verification with a failure response,
+  not a retroactive merge gate.
 - Nightly: full E2E, a11y scans, long suites — triaged every morning by a
   named owner.
 - Retry policy: max 1 retry, only on E2E tier, every retry logged and

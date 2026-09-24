@@ -1,6 +1,6 @@
 ---
 name: pagination-cursor-designer
-description: 'Design pagination for list endpoints and UIs: choose cursor/keyset or offset with drift and deep-page costs stated, define a versioned integrity-protected cursor holding sort keys and direction, require deterministic ordering and a concurrency stability policy, set page-size bounds and honest end signaling, and apply tenant/permission scope server-side from trusted context on every page. Encoded cursor keys are decodable; encrypt if confidential. Choose load-more, numbered, or infinite-scroll UI with tradeoffs. Owns pagination mechanics within the endpoint contract owned by api-event-architect. Use for pagination design or skip/repeat bugs. Do NOT design routes/rate limits (api-event-architect) or tune one query plan (query-plan-reader).'
+description: 'Design pagination for list endpoints and UIs: choose cursor/keyset or offset with drift and deep-page costs stated, define a versioned integrity-protected cursor holding sort keys, direction and sort/filter fingerprint, require deterministic ordering and a concurrency stability policy, set page-size bounds and honest end signaling, and apply tenant/permission scope server-side from trusted context on every page. Encoded cursor keys are decodable; encrypt if confidential. Choose load-more, numbered, or infinite-scroll UI with tradeoffs. Owns pagination mechanics within the endpoint contract owned by api-event-architect. Use for pagination design or skip/repeat bugs. Do NOT design routes/rate limits (api-event-architect) or tune one query plan (query-plan-reader).'
 ---
 
 # Pagination Cursor Designer
@@ -76,12 +76,14 @@ of the endpoint it rides on belong to `api-event-architect`.
    repeat/vanish. State the exact ORDER BY.
 3. **Specify the cursor contents and encoding.** The cursor carries the
    last row's ordering tuple (sort value(s) + tiebreaker) and the
-   direction and deterministic tiebreaker. Treat it as an opaque client
+   direction, deterministic tiebreaker, and versioned fingerprint of the
+   normalized sort/filter query. Treat it as an opaque client
    contract, not a secret: Base64 is decodable. Version and integrity-protect
    the payload; encrypt if ordering keys are confidential. A primary key may
    be a tiebreaker if its visibility is acceptable; otherwise use a suitable
-   surrogate. Never trust tenant scope from the cursor or expose a raw SQL
-   offset.
+   surrogate. Verify the fingerprint against the current query and reject a
+   changed sort/filter. Never trust tenant scope from the cursor or expose a
+   raw SQL offset.
 4. **Bind tenant/permission scope into the query, not the cursor.** The
    authorization predicate is applied server-side on every page from
    trusted context (session/token), never trusted from cursor contents.

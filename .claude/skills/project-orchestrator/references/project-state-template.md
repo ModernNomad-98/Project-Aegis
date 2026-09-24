@@ -1,5 +1,8 @@
 # `docs/project-state.md` — schema and template
 
+Companion to [project-orchestrator](../SKILL.md). SHA-256 is a file-content
+digest; MVP means minimum viable product; `v1` means first release.
+
 This is workspace-persisted memory after a verified write. Git-tracked, locally
 committed and remote-persisted require their own verified evidence; this workflow
 does not imply a push or backup. The
@@ -221,9 +224,13 @@ types exactly as defined above.
 
 ## Current users/roles — projection (refresh from records)
 
+> Current projection — refresh from authoritative recorded decisions and accepted artifacts.
+
 - <role — what they do with the product>
 
 ## Current success definition — projection (refresh from records)
+
+> Current projection — refresh from authoritative recorded decisions and accepted artifacts.
 
 - <the observable outcome that means v1 worked, derived from the accepted spec>
 
@@ -287,11 +294,20 @@ types exactly as defined above.
 
 > Current projection — refresh from authoritative recorded decisions and accepted artifacts.
 
-- In scope for v1: job create/assign/complete; crew list; customer status link.
+- In scope for v1: job create/assign/complete; customer status link.
 - Explicitly OUT of scope for v1: invoicing, scheduling optimization, a mobile app.
 - Basis: approved by user on 2026-02-20 (see Approval A-001 and Decision PS-001).
 
+## Current users/roles — projection (refresh from records)
+
+> Current projection — refresh from authoritative recorded decisions and accepted artifacts.
+
+- Office dispatchers create, assign and complete jobs; site contacts view the
+  status link for their own job.
+
 ## Current success definition — projection (refresh from records)
+
+> Current projection — refresh from authoritative recorded decisions and accepted artifacts.
 
 - A dispatcher can create a job, assign a crew, and mark it done, and the site
   contact receives a working status link — with no job lost on paper.

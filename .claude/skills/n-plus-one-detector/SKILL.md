@@ -103,7 +103,7 @@ before proceeding.
      use, not globally).
    - *Dynamic/conditional relations (resolvers, polymorphic):* batched
      loader — collect keys per request tick, one IN-key query,
-     memoized per request scope; price: loader infrastructure and
+     memoized per request and authenticated tenant/permission scope; price: loader infrastructure and
      per-request cache lifecycle.
    - *Aggregates per row:* one grouped aggregate query joined back,
      never per-row COUNT calls.
@@ -199,7 +199,8 @@ Residual: <paths with the same pattern not yet fixed — listed, not implied don
 - Per-request memoization leaking across requests: a loader cache
   scoped wrong (process-global) serves user A's rows to user B —
   in multi-tenant systems this is a data leak, not just staleness.
-  The request scope is a correctness boundary.
+  Request lifetime and authenticated tenant/permission scope are both
+  correctness boundaries, including in admin requests spanning tenants.
 - GraphQL-style resolvers reinvent N+1 per field: each field resolver
   fetching independently is the architecture working as designed —
   batched loaders per entity type are the standing fix, not per-query

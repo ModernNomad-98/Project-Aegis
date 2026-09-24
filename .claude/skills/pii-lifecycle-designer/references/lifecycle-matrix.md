@@ -41,7 +41,7 @@ Residency:      <region + replication reality>
 | Relational table | row delete (hard) / flag (soft — NOT deletion) | soft-delete flags sold as erasure; FK-orphaned copies |
 | Log stream | retention expiry only — no per-record delete | redact at EMISSION; retroactive scrubbing is rarely real |
 | Cache | TTL expiry + explicit key purge | keys derived from PII; long TTLs outliving the source delete |
-| Search index | document removal + segment merge lag | stale segments serving "deleted" docs briefly |
+| Search index | delete becomes query-visible after refresh; deleted bytes are reclaimed later during segment merge | verify refresh visibility separately from physical reclaim timing |
 | Vector store | embedding delete keyed by source-doc id | embeddings with no source linkage = undeletable |
 | Analytics (columnar/lake) | partition rewrite or crypto-erasure | append-only formats needing rewrite jobs — schedule them |
 | Queue/stream | retention expiry; compaction tombstones | compacted topics keeping latest-per-key forever |

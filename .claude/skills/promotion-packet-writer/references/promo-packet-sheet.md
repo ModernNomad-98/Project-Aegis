@@ -1,6 +1,8 @@
 # Promo Packet Sheet
 
-Detail for `promotion-packet-writer`. Read on demand.
+Detail for [promotion-packet-writer](../SKILL.md). Read on demand.
+ORG means organization; ADR means architecture decision record; eng means
+engineering. The examples are illustrative, not an employer's rubric.
 
 ## Rubric-dimension map (typical)
 

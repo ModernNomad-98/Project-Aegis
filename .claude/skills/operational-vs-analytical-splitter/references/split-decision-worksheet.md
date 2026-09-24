@@ -18,9 +18,9 @@ measure.
 | Mechanism | Freshness delivered | Cost to adopt | Right for | Wrong for | Caveats |
 |---|---|---|---|---|---|
 | Stay on primary | current transaction | none | true OLTP; reads needing current-txn visibility | anything scanning large ranges at peak | the default that must be EARNED, not assumed |
-| Read replica | seconds (lag) | low | OLTP-shaped reads that tolerate lag; failover duty | OLAP shapes (they hammer the replica; lag poisons co-tenants) | read-your-writes cases must be enumerated |
+| Read replica | measured replication lag (seconds only as an illustrative target) | low | OLTP-shaped reads that tolerate measured lag; failover only when provider/config supports it | OLAP shapes (they hammer the replica; lag poisons co-tenants) | read-your-writes cases and lag objective must be enumerated |
 | Materialized / pre-aggregated view | refresh interval | low–medium | KNOWN query shapes, bounded count | ad-hoc/exploratory analytics | refresh budget: cost × frequency × count is new load |
-| CDC → analytical store | minutes | high | true OLAP, history, ad-hoc analytics, BI | a single known query a view could serve | prescribes streaming-event-architect + warehouse-lake-architect |
+| CDC → analytical store | measured end-to-end lag (minutes only as an illustrative target) | high | true OLAP, history, ad-hoc analytics, BI | a single known query a view could serve | define freshness objective and verify measured lag; compose streaming-event-architect + warehouse-lake-architect |
 | Cache | TTL / invalidation-bound | medium | repeated identical reads, high fan-out | anything needing correctness on write | hands to caching-strategy-designer; invalidation is the real cost |
 
 Cheapest-adequate rule: justify each verdict against the next-cheaper row.

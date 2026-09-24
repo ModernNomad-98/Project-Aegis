@@ -27,8 +27,9 @@ layer's spelling.
   loading (fixes one page, bloats twelve).
 - **Resolver N+1** → batched loader per entity type: collect keys
   during the resolution tick, issue ONE `WHERE key IN (...)` query,
-  memoize per request. Loader cache lifecycle = the request, never the
-  process (tenant-leak hazard otherwise).
+  memoize per request and authenticated tenant/permission scope. Loader cache
+  lifecycle = the request, never the process; an admin request spanning
+  tenants also needs separated cache keys or loaders per scope.
 - **Repeated identical** → per-request memoization at the accessor
   (request-scoped cache or loader reuse). Not a TTL cache — the scope
   is one request, correctness-bounded.

@@ -12,7 +12,7 @@
         "assertions": [
           "Chooses cursor (keyset) paging for the large, deep-scrolled collection and states why offset is rejected (drift + O(offset) deep-page cost), naming the access pattern.",
           "Specifies a strict total ordering: sort column(s) PLUS a deterministic tiebreaker (primary key) so no two rows tie across a page edge.",
-          "Defines a versioned, integrity-protected cursor carrying the ordering tuple and direction; treats Base64 as decodable and encrypts if keys or an ID tiebreaker are confidential, while exposing no raw offset.",
+          "Defines a versioned, integrity-protected cursor carrying the ordering tuple, direction and sort/filter fingerprint; treats Base64 as decodable and encrypts if keys or an ID tiebreaker are confidential, while exposing no raw offset.",
           "Applies the account/tenant scope predicate server-side on every page from trusted context, not from cursor contents.",
           "Sets a default and an enforced maximum page size, and signals end-of-results with an absent/null next cursor."
         ]
@@ -54,7 +54,7 @@
         "triggers": true,
         "assertions": [
           "Refuses to source the tenant/authorization scope from the cursor: a forged or stale cursor claiming another tenant would then read that tenant's rows — a cross-tenant isolation hole.",
-          "Keeps the auth/tenant predicate applied server-side from the authenticated context on every page; only ordering keys and direction live in the cursor.",
+          "Keeps the auth/tenant predicate applied server-side from the authenticated context on every page; ordering keys, direction and query fingerprint live in the cursor, never trusted tenant scope.",
           "Explains that a tampered cursor must at worst error or return the caller's own rows, never another scope's.",
           "Still allows non-security filters to be encoded, but re-validates them against the caller's permissions server-side."
         ]

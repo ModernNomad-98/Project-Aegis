@@ -1,6 +1,9 @@
 # Risk & Layer Catalog
 
-Detail file for `qa-strategy-architect`. Loaded on demand.
+Detail file for [qa-strategy-architect](../SKILL.md). Loaded on demand.
+E2E means end-to-end; RLS is row-level security; API is application
+programming interface; CI is continuous integration; QA is quality
+assurance; a11y means accessibility.
 
 ## Risk taxonomy (starting checklist, not a ceiling)
 
@@ -22,11 +25,11 @@ Detail file for `qa-strategy-architect`. Loaded on demand.
 Ask in order; first "yes" picks the layer:
 
 1. Can the risk be proven with pure inputs/outputs, no I/O? → **unit**.
-2. Does the risk live at a real boundary (service, command, DB, auth,
+2. Is the risk "producer and consumer disagree on shape/version"? →
+   **contract** (`api-contract-test-designer`).
+3. Does the risk live at a real runtime boundary (service, command, DB, auth,
    permissions) but not require a browser? → **integration**
    (`integration-test-designer`).
-3. Is the risk "producer and consumer disagree on shape/version"? →
-   **contract** (`api-contract-test-designer`).
 4. Is the risk "a whole user journey breaks in the real UI" AND the journey is
    business-critical? → **E2E** (`playwright-e2e-engineer`) — budget these;
    each E2E journey must name why lower layers were insufficient.
@@ -50,6 +53,7 @@ that doubles cost and halves signal.
 ## CI placement defaults
 
 - PR: unit, integration, contract, lint, build — blocking.
-- Merge/main: smoke E2E — blocking.
+- Post-merge/main: smoke E2E — required verification with an owner and
+  response path; it cannot retroactively block the completed merge.
 - Nightly: full E2E, long suites, a11y scans — non-blocking but triaged daily.
 - Anything non-blocking needs an owner and a triage cadence or it is noise.

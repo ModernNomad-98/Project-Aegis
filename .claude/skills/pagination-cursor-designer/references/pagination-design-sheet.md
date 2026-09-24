@@ -52,7 +52,8 @@ server-side, never taken from the cursor.
 payload = json({
   "v": 1,                 // bump when the shape changes
   "k": [<last_created_at>, <last_id>],  // ordering tuple only
-  "d": "next"             // direction
+  "d": "next",            // direction
+  "q": <versioned sort/filter fingerprint> // binds this traversal's query shape
 })
 cursor = base64url(payload || integrity_tag(payload, server_key))
 ```
@@ -60,12 +61,13 @@ cursor = base64url(payload || integrity_tag(payload, server_key))
 - Opaque is a client contract: clients treat it as a token, but Base64 is
   reversible. Verify the integrity tag and version before using its keys.
   Encrypt the payload if ordering keys or an ID tiebreaker are confidential.
-- Contains ordering keys + direction only. A primary-key tiebreaker is valid
+- Contains ordering keys, direction and a sort/filter fingerprint only. A primary-key tiebreaker is valid
   when its visibility policy allows it; otherwise choose a safe surrogate.
   No tenant id, no auth scope,
   no raw SQL offset, no total/position.
-- On decode, validate `v`; reject unknown versions. Re-apply auth scope
-  from the authenticated context, not from the cursor.
+- On decode, validate `v` and compare `q` with the current normalized query;
+  reject unknown versions or changed sort/filter. Re-apply tenant and auth
+  scope from the authenticated server context, never from the cursor.
 
 ## Total-count strategies
 

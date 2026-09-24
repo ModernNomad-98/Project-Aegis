@@ -46,7 +46,7 @@ central processing unit; **GC** means garbage collection.
 2. **Owner** — a team/rotation, not a person's name.
 3. **Runbook link** — resolvable, pointing at the relevant
    `incident-response-runbook` section.
-4. **Threshold justification** — derived from N days/weeks of signal
+4. **Threshold justification** — derived from a documented number of days/weeks of signal
    history, or labeled `provisional — tune by <date>`.
 
 ## Noise classification table
@@ -55,7 +55,7 @@ central processing unit; **GC** means garbage collection.
 | --- | --- | --- |
 | Fires on deploys, self-resolves | bad threshold / missing deploy-awareness | widen window, deploy markers, burn-rate form |
 | Fires in bursts for one cause | missing dedup/grouping | group by root label; inhibition rules |
-| Cause-alert paging (CPU, GC, pod restart) | should be ticket/dashboard | demote per design; symptom alert covers paging |
+| Cause-alert paging (CPU, GC, pod restart) | often ticket/dashboard; imminent resource exhaustion may justify paging under the owning incident/SLO policy | route severity by the policy and observed impact; do not demote blindly |
 | Fires nightly at backup/cron | predictable saturation | schedule-aware threshold or fix the contention (product work) |
 | Genuinely intermittent product failure | NOT alert noise | route to `systematic-debugger` — do not tune away real signal |
 
