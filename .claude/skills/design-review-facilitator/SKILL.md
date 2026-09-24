@@ -60,6 +60,12 @@ group to one and hands the record to `adr-writer`.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Prepare the review.** With explicit communication authority, circulate
    the design ahead with a required
    pre-read; state the review's PURPOSE and the decision it must reach;
@@ -98,6 +104,9 @@ The review-preparation checklist, the anti-pattern countermeasures
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 DESIGN REVIEW OUTCOME — <design/effort>
 Purpose:       <what this review had to decide>
@@ -114,6 +123,8 @@ Boundaries:    write the design → tech-spec-writer; code review → code-revie
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] The design was circulated with a required pre-read; the right
       reviewers (incl. skeptics + cross-cutting owners) were present.
 - [ ] The decision the review must reach was framed at the start.

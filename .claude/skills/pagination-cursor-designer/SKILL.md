@@ -61,6 +61,12 @@ of the endpoint it rides on belong to `api-event-architect`.
 
 ## Workflow
 
+When the human must choose a count strategy or page experience, define the
+terms; explain each viable option's purpose, user benefit, drawback, and
+money/setup/maintenance cost or uncertainty. Recommend the fit from list size,
+churn, and user need before asking one decision question. Keep factual access-
+pattern discovery and authorization for contract changes separate.
+
 1. **Choose the model against the access pattern.** Offset/limit is
    acceptable ONLY for small, low-churn, human-browsed lists where
    random page access matters and drift is tolerable — state that
@@ -128,10 +134,14 @@ End signal:   nextCursor null at end; prevCursor=<...>; total=<none|estimate|exa
 Sort change:  cursor invalidated → reset to first page (stated to client)
 Deleted-row:  resume from next row in order
 Surface:      load-more | infinite | numbered — tradeoff noted
+User choice (if needed): <explained count/page options, costs/unknowns, pros/cons, recommendation + why>
 Boundaries:   contract/routes/rate-limits → api-event-architect; keyset query tuning → query-plan-reader
 ```
 
 ## Validation Checklist
+
+- [ ] Any count or page choice put to the human explains terms, costs, and
+      tradeoffs before one question; the answer alone changes no API contract.
 
 - [ ] The ORDER BY is a strict total order — a deterministic tiebreaker
       is present, so no two rows tie.
@@ -187,8 +197,8 @@ Boundaries:   contract/routes/rate-limits → api-event-architect; keyset query 
   this skill designs only the pagination inside that contract.
 - A required exact total count on a huge, high-churn collection is
   mandated despite its cost → surface the performance tradeoff and the
-  alternatives (estimate, separate count endpoint) to a human rather
-  than baking an expensive `COUNT(*)` into every page.
+  explained alternatives (estimate, separate count endpoint) and a reasoned
+  recommendation to a human rather than baking `COUNT(*)` into every page.
 - Changing an already-published cursor format would break live clients →
   flag it as a contract-breaking change for `api-event-architect`'s
   versioning/deprecation process; do not silently alter the format.

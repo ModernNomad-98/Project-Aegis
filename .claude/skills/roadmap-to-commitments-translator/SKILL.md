@@ -58,6 +58,13 @@ uncertain; this extracts the firm-promise slice from it.
 
 ## Workflow
 
+When asking the named human to resolve an over-capacity commitment, define
+capacity and confidence; explain why committing less, adding capacity, or
+accepting lower confidence is viable, with delivery benefit, drawback, and
+money/time/ongoing-support cost or uncertainty for each. Recommend the
+evidence-supported path before one decision question. This advice never
+creates a commitment; the separate named-human approval record still governs.
+
 **Two modes — state which one you are in.** Before the steps below, decide the
 mode, because the lifecycle uses this skill in two different places:
 
@@ -116,7 +123,7 @@ mode, because the lifecycle uses this skill in two different places:
    unstated gap is where stakeholders invent promises you never made.
 6. **Refuse over-commitment; surface the tradeoff.** When asked to commit
    beyond capacity, don't quietly pad estimates until it "fits" — present
-   the tradeoff: commit to less, add capacity, or explicitly accept lower
+   the explained tradeoff: commit to less, add capacity, or explicitly accept lower
    confidence. A padded commitment is a lie with a schedule.
 7. **Deliver** the commitment set and the explicitly-not-committed set in
    the Output Format, with the capacity basis and dependencies shown.
@@ -161,6 +168,7 @@ Dependencies:  <known dependencies + state → cross-team-dependency-negotiator 
 NOT committed (directional): <excluded roadmap items + reason (capacity/dependency/uncertainty)
                  | all delivery items — readiness is NOT COMMIT-ABLE>
 Over-commit tradeoff: <if asked for more: commit-less | add-capacity | accept-lower-confidence>
+Choice context (if asking): <terms, option costs/unknowns, pros/cons, recommendation + why>
 Boundaries:    build the roadmap → roadmap-under-uncertainty-planner; specific dep →
                cross-team-dependency-negotiator; ranking → prioritization-frame-picker
 ```
@@ -192,6 +200,9 @@ the recorded `Approval scope`; anything beyond it requires a new named-human
 approval, never a silent widening.
 
 ## Validation Checklist
+
+- [ ] An over-capacity owner choice has a taught comparison and recommendation
+      before one question; the answer is not reported as an approved commitment.
 
 - [ ] Commit-able items are separated from aspirational by confidence,
       capacity, AND dependency-clarity.

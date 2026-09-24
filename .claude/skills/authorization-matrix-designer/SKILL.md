@@ -66,6 +66,12 @@ accumulation of `if (user.isAdmin)` checks discovered later by a pen test.
 
 ## Workflow
 
+When a sensitive permission policy needs an owner choice, define the roles,
+resource, and action; compare viable grants and restrictions by reason, user
+benefit, security drawback, and money/setup/upkeep cost or uncertainty.
+Recommend the least-privilege fit with context before one decision question;
+the answer does not authorize widening access or implementing the matrix.
+
 1. **Inventory resources and actions.** Every tenant-owned resource type ×
    its actions, flagging the sensitive ones. This is the matrix's column
    space; an action not in the inventory cannot be secured.
@@ -116,9 +122,13 @@ Negative-test plan: <actor — attempted action — expected denial>
 Migration & rollback: <additive introduction → shadow dual-check → cutover →
   tested safe revert or halt; widenings requiring approval listed>
 Assumptions & open questions: <each with risk-if-wrong / who answers>
+Owner choice (if needed): <terms, viable permission options, costs/unknowns, pros/cons, recommendation + why>
 ```
 
 ## Validation Checklist
+
+- [ ] Any owner-facing permission choice is explained with costs and tradeoffs
+      before one question; the answer is not treated as implementation approval.
 
 - [ ] Deny-by-default stated and structural: the matrix contains allows only;
       nothing is "allowed unless".
@@ -179,7 +189,8 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
   existing role's reach → `human-approval-boundary` with the blast radius
   before it enters the matrix.
 - Business ambiguity about who should hold a sensitive permission → present
-  options with consequences; do not assign sensitive defaults silently.
+  the explained options and a least-privilege recommendation; do not assign
+  sensitive defaults silently.
 - Asked to implement the permission system in the same pass → separate,
   scoped implementation task; this skill delivers the design and tests plan.
 

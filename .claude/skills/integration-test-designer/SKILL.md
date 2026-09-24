@@ -57,6 +57,12 @@ negative cases, and CI placement.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Draw the boundary map first.** For the module under test, list every
    boundary and classify: REAL in this suite (service calls, DB reads/writes,
    auth middleware, permission checks) or FAKED seam (third-party HTTP, email/
@@ -91,6 +97,9 @@ negative cases, and CI placement.
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 INTEGRATION TEST DESIGN — <module/scope>
 Boundary map: <boundary → REAL | FAKED (rationale)>
@@ -110,6 +119,8 @@ Exit criteria: <what "this layer is covered" means for the module>
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] Boundary map classifies EVERY dependency as real or faked, each fake
       with rationale — no ambient unlisted mocks.
 - [ ] Database, auth, and permission paths under test are REAL; any mock of
@@ -140,9 +151,12 @@ Exit criteria: <what "this layer is covered" means for the module>
 
 ## Stop Conditions
 
-- No real database/service can be provisioned in test or CI → say so and
-  present options (containerized DB, CI service) via the automation
-  architecture rather than silently degrading to mocked "integration".
+- A real database/service is unavailable for local test runs, CI runs, or
+  both → identify the affected environment. Compare viable ways to provision
+  a real dependency there; a local container and a CI service may both be
+  needed. Explain each option under the build-choice rule and ask only one
+  environment's decision per turn. Never silently degrade to mocked
+  "integration".
 - The module has no seam between it and a third-party dependency (direct SDK
   calls everywhere) → designing the test requires a product refactor;
   surface it as a separate classified change.

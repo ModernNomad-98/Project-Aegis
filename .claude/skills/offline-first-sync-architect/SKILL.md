@@ -68,6 +68,12 @@ a bug, not a strategy — this skill refuses it.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Scope the offline surface honestly.** Not everything needs to work
    offline. Classify operations: read-offline (cache + serve), create-offline
    (queue + optimistic), edit-offline (queue + optimistic + conflict risk),
@@ -123,6 +129,9 @@ a bug, not a strategy — this skill refuses it.
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 OFFLINE-FIRST SYNC DESIGN — <system/domain>
 Offline surface: <per operation: read/create/edit/delete — offline? — conflict risk>
@@ -147,6 +156,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] The offline surface is scoped per operation with conflict risk stated;
       not everything is made offline by reflex.
 - [ ] The write queue is durable (survives restart), ordered, scoped/encrypted,

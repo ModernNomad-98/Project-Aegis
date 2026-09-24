@@ -51,6 +51,12 @@ tenant semantics get rebuilt; this skill exists so they are built once.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Inventory candidate concepts** from code, docs, and UI. List every
    tenant-shaped noun and where each appears. Contradictions between code and
    docs are findings, not choices to make silently.
@@ -84,6 +90,9 @@ tenant semantics get rebuilt; this skill exists so they are built once.
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 TENANT MODEL — <product>
 Tenant definition: <one sentence: unit of ownership, billing, administration>
@@ -104,6 +113,8 @@ Handoffs: multi-tenant-data-architect (schema), authorization-matrix-designer
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] Tenant defined in one sentence covering ownership, billing, and
       administration — or an explicit hierarchy where they diverge.
 - [ ] Roles attach to memberships, not users; the model works for a user in
@@ -146,8 +157,9 @@ Handoffs: multi-tenant-data-architect (schema), authorization-matrix-designer
   tenant definition cannot be assumed on their behalf.
 - Code, docs, and UI contradict each other on core concepts → run
   `source-of-truth-reconciler` before modeling on top of the conflict.
-- Tenant merge/split semantics are requested and genuinely ambiguous → stop
-  and present options; both are data-destructive if guessed wrong.
+- The semantics of a requested tenant merge or split are genuinely ambiguous
+  → stop and clarify the intended outcome, then present viable ways to carry
+  out that operation; guessing could destroy or misassign data.
 - Asked to implement schema or permissions in the same pass → hand off per
   the output's Handoffs line; confirm scope before any code.
 

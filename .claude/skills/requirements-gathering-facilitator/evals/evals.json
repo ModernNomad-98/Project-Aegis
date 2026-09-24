@@ -28,7 +28,8 @@
           "Names the disagreement explicitly instead of averaging it into a vague compromise.",
           "Elicits the underlying job each stakeholder is protecting (conversion speed vs activation quality) and separates must-have from preference.",
           "Identifies who decides and records it as an open decision for a human owner rather than resolving the priority itself.",
-          "Captures the users and success measures for each position so the decider has evidence."
+          "Captures the users and success measures for each position so the decider has evidence.",
+          "Before presenting self-serve and human-assisted onboarding as a choice, explains the terms, why each fits, case-specific costs and trade-offs, and a reasoned recommendation when facts suffice; otherwise asks one missing constraint first. The choice does not authorize implementation."
         ]
       }
     },

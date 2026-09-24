@@ -70,6 +70,12 @@ a target, a budget, and a page.
 
 ## Workflow
 
+When an undeliverable service promise requires a human choice, define SLA,
+SLO, and the measured gap; explain viable promise changes and architecture
+work by reason, user impact, pros, cons, and money/setup/upkeep cost or
+uncertainty. Recommend the evidence-supported path before one decision
+question. A choice does not revise a contract or authorize infrastructure work.
+
 1. **Inventory the journeys**: enumerate the user journeys worth a
    reliability promise (login, core workflow, checkout/billing, data
    export, API integration paths), each with its user population, business
@@ -136,9 +142,13 @@ Tenant dimension: <per-tenant views needed — noisy-neighbor signals —
   tier-differentiated targets>
 Review cadence: <rhythms + staleness triggers>
 Assumptions & open questions: <each with risk-if-wrong / who answers>
+Promise choice (if needed): <explained paths, costs/unknowns, pros/cons, recommendation + why>
 ```
 
 ## Validation Checklist
+
+- [ ] A human-facing promise/architecture choice is explained before one
+      question; contract and infrastructure authority remain separate.
 
 - [ ] Every SLO traces to a user journey with named business impact — no
       SLO exists because a metric was available.
@@ -183,7 +193,8 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
   present aspirations as commitments.
 - The commercially promised SLA exceeds what the architecture can
   plausibly deliver → surface the gap to the human as a commercial/
-  architecture decision (`human-approval-boundary` for the tradeoff);
+  architecture decision with explained paths and a reasoned recommendation
+  (`human-approval-boundary` for the tradeoff);
   do not design SLOs that paper over it.
 - Journey inventory cannot be established (nobody can say what users
   depend on) → stop; route to product/`qa-strategy-architect` risk

@@ -51,6 +51,12 @@ not this skill.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Confirm scope with the human:** exactly which files/functions, and the
    no-go list (public API, behavior, dependencies, formatting-only sweeps).
 2. **Run the covering tests — record the green baseline.** If coverage over
@@ -74,6 +80,9 @@ not this skill.
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 SIMPLIFICATION — <target>
 Baseline: <test command + green result; coverage note>
@@ -86,6 +95,8 @@ Behavior changed: NONE (or: stop — see report)
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] Human explicitly requested simplification of this named target.
 - [ ] Green baseline recorded BEFORE the first edit, on the same suite used
       after.

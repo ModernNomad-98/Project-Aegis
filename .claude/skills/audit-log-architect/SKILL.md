@@ -61,6 +61,12 @@ access — a grep-able stdout stream is not an audit trail.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Build the event taxonomy** from the starter set in
    [references/audit-event-taxonomy.md](references/audit-event-taxonomy.md):
    authentication, access-control changes, data access/export, admin and
@@ -107,6 +113,9 @@ access — a grep-able stdout stream is not an audit trail.
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 AUDIT LOG DESIGN — <product/scope>
 Event taxonomy: <category → concrete actions recorded; explicit exclusions
@@ -128,6 +137,8 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] Every sensitive permission and brokered-access rule from the
       authorization design has a corresponding audit event.
 - [ ] Actor is always a resolvable identity; impersonation carries both

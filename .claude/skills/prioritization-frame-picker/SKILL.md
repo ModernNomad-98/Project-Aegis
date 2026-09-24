@@ -65,6 +65,12 @@ set over horizons is `roadmap-under-uncertainty-planner`'s.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Frame the decision before the framework.** State what's being
    ranked, toward what outcome, with what input quality and time horizon.
    The wrong frame applied rigorously is worse than the right frame
@@ -105,6 +111,9 @@ sensitivity-check method:
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 PRIORITIZATION — <what's being ranked>, toward <outcome>
 Frame:        <RICE | WSJF | value/effort | ICE | Kano | opportunity | MoSCoW> — why it fits; limits
@@ -120,6 +129,8 @@ Handoff:      sequencing over time → roadmap-under-uncertainty-planner
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] The decision is framed (object, outcome, input quality, time
       horizon) before a framework is chosen.
 - [ ] The framework is matched to the situation with its fit AND limits

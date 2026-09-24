@@ -76,6 +76,12 @@ that makes the target achievable by design rather than by hope.
 
 ## Workflow
 
+For any user-facing build choice, define terms and each viable path's purpose;
+compare case-specific pros/cons and money, setup, and maintenance costs (mark
+unknowns). Recommend one and why, then ask one atomic decision question. If a
+deciding fact is missing, ask only for that fact this turn. A choice does not
+authorize execution.
+
 1. **Fix the target and its percentile.** One budget document per
    percentile that matters (typically p95 or p99 user-perceived).
    If no ratified target exists, state the assumption in the header
@@ -135,6 +141,9 @@ worksheet, and the budget-claim review template:
 
 ## Output Format
 
+When asking for a build choice, show the explained options and justified
+recommendation before the one question.
+
 ```
 LATENCY BUDGET — <path/journey> @ <percentile>
 Target: <N ms p<XX>> — provenance: <SLO ref | contract | ASSUMED (flagged for ratification)>
@@ -156,6 +165,8 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
 
 ## Validation Checklist
 
+- [ ] User-facing build choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one atomic question.
 - [ ] The target's percentile is stated and singular per document; the
       provenance is an SLO ref or a LOUD assumption flag.
 - [ ] The budget table's arithmetic closes: allocations + headroom =
