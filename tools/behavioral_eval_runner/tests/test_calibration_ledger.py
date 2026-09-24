@@ -85,6 +85,42 @@ def _events(path: str) -> list[dict]:
         return [json.loads(line) for line in fh if line.strip()]
 
 
+HOLDOUT_BINDING = {
+    "freeze_sha256": "a" * 64,
+    "dataset_sha256": DATASET_SHA,
+    "audited_head_sha": "b" * 40,
+    "audited_tree_sha": "c" * 40,
+    "development_manifest_sha256": "d" * 64,
+    "development_summary_sha256": "e" * 64,
+    "max_output_tokens": 8192,
+}
+
+
+def _record_metadata_ok(ledger: cl.CalibrationLedger) -> None:
+    reservation = ledger.reserve(
+        kind=cl.RequestKind.METADATA, logical_judgment_id=None,
+        attempt_number=1, estimated_input_tokens=0,
+        max_output_tokens=0, day="2026-08-20",
+        dataset_sha256=None, stage="DEVELOPMENT",
+    )
+    ledger.record(
+        reservation, provider_response_id=None,
+        provider_request_trace_id=None,
+        requested_model="gpt-5.5-2026-04-23",
+        returned_model=cl.AUTHORIZED_MODEL_SNAPSHOT,
+        request_timestamp_utc=T0, completion_timestamp_utc=T1,
+        latency_ms=5, response_status="OK",
+        incomplete_details_reason=None,
+        usage=cl.ProviderUsage.zero(), outcome_kind="METADATA_OK",
+    )
+
+
+def _ready_holdout(ledger: cl.CalibrationLedger) -> None:
+    _record_metadata_ok(ledger)
+    ledger.record_run_state(cl.RUN_STATE_OWNER_WAIT)
+    ledger.authorize_holdout_transition(**HOLDOUT_BINDING)
+
+
 class TestTerminalAccounting(unittest.TestCase):
     def test_invalid_usage_keeps_reservation_available_for_terminal_record(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -700,6 +736,7 @@ class TestPersistentDeadlines(unittest.TestCase):
             ledger.begin_active_segment("DEVELOPMENT", at=0.0)
             ledger.end_active_segment(at=5.5 * 3600)
             # Holdout stage itself has room (1 h < 4 h)...
+            _ready_holdout(ledger)
             ledger.begin_active_segment("SEALED_HOLDOUT", at=6.0 * 3600)
             ledger.end_active_segment(at=7.0 * 3600)
             self.assertLess(
@@ -733,6 +770,134 @@ class TestPersistentDeadlines(unittest.TestCase):
                 ledger.check_deadlines("DEVELOPMENT")
             kinds = [e["event_kind"] for e in _events(path)]
             self.assertIn("DEADLINE_STOP", kinds)
+
+
+class TestDurableHoldoutTransition(unittest.TestCase):
+    def test_owner_wait_and_metadata_are_required(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger = _ledger(tmp)
+            with self.assertRaises(CalibrationLedgerError):
+                ledger.authorize_holdout_transition(**HOLDOUT_BINDING)
+            with self.assertRaises(CalibrationLedgerError):
+                ledger.authorize_holdout_transition(
+                    **{**HOLDOUT_BINDING, "max_output_tokens": 8191}
+                )
+            ledger.record_run_state(cl.RUN_STATE_OWNER_WAIT)
+            with self.assertRaises(CalibrationLedgerError):
+                ledger.authorize_holdout_transition(**HOLDOUT_BINDING)
+            with self.assertRaises(CalibrationLedgerError):
+                ledger.record_run_state(cl.RUN_STATE_PAUSED)
+            with self.assertRaises(CalibrationReservationDenied):
+                _reserve(ledger)
+
+    def test_exact_binding_survives_reopen_and_replay_is_denied(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "wp.jsonl")
+            ledger = cl.CalibrationLedger(path, declare_first_segment=True)
+            _ready_holdout(ledger)
+            transition = [e for e in _events(path)
+                          if e["event_kind"] == "HOLDOUT_TRANSITION"]
+            self.assertEqual(len(transition), 1)
+            self.assertEqual(transition[0]["max_output_tokens"], 8192)
+            resumed = cl.CalibrationLedger(path)
+            resumed.require_holdout_binding(**HOLDOUT_BINDING)
+            resumed.require_holdout_dispatch_binding(
+                freeze_sha256=HOLDOUT_BINDING["freeze_sha256"],
+                dataset_sha256=HOLDOUT_BINDING["dataset_sha256"],
+                audited_head_sha=HOLDOUT_BINDING["audited_head_sha"],
+                audited_tree_sha=HOLDOUT_BINDING["audited_tree_sha"],
+                max_output_tokens=HOLDOUT_BINDING["max_output_tokens"],
+            )
+            with self.assertRaises(CalibrationLedgerError):
+                resumed.require_holdout_dispatch_binding(
+                    freeze_sha256="0" * 64,
+                    dataset_sha256=HOLDOUT_BINDING["dataset_sha256"],
+                    audited_head_sha=HOLDOUT_BINDING["audited_head_sha"],
+                    audited_tree_sha=HOLDOUT_BINDING["audited_tree_sha"],
+                    max_output_tokens=HOLDOUT_BINDING["max_output_tokens"],
+                )
+            with self.assertRaises(CalibrationLedgerError):
+                resumed.authorize_holdout_transition(**HOLDOUT_BINDING)
+            with self.assertRaises(CalibrationLedgerError):
+                resumed.require_holdout_binding(
+                    **{**HOLDOUT_BINDING, "audited_tree_sha": "0" * 40}
+                )
+            self.assertEqual(resumed.current_run_state(),
+                             cl.RUN_STATE_HOLDOUT_ACTIVE)
+            with self.assertRaises(CalibrationLedgerError):
+                resumed.begin_active_segment("SEALED_HOLDOUT", at=1.0)
+
+    def test_no_holdout_segment_or_transport_before_transition(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger = _ledger(tmp)
+            with self.assertRaises(CalibrationLedgerError):
+                ledger.begin_active_segment("SEALED_HOLDOUT", at=1.0)
+            with self.assertRaises(CalibrationStopError):
+                ledger.require_active_transport("SEALED_HOLDOUT")
+
+    def test_frozen_cap_dataset_and_single_segment(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "wp.jsonl")
+            ledger = cl.CalibrationLedger(path, declare_first_segment=True)
+            _ready_holdout(ledger)
+            ledger.begin_active_segment("SEALED_HOLDOUT", at=1.0)
+            ledger.require_active_transport("SEALED_HOLDOUT")
+            with self.assertRaises(CalibrationReservationDenied):
+                ledger.reserve(
+                    kind=cl.RequestKind.METADATA, logical_judgment_id=None,
+                    attempt_number=1, estimated_input_tokens=0,
+                    max_output_tokens=0, day="2026-08-20",
+                    dataset_sha256=None, stage="SEALED_HOLDOUT",
+                )
+            kwargs = dict(
+                kind=cl.RequestKind.JUDGMENT_ATTEMPT,
+                logical_judgment_id="holdout-1", attempt_number=1,
+                estimated_input_tokens=100, max_output_tokens=8192,
+                day="2026-08-20", dataset_sha256=DATASET_SHA,
+                stage="SEALED_HOLDOUT",
+            )
+            with self.assertRaises(CalibrationReservationDenied):
+                ledger.reserve(**{**kwargs, "max_output_tokens": 8191})
+            with self.assertRaises(CalibrationReservationDenied):
+                ledger.reserve(**{**kwargs, "dataset_sha256": "0" * 64})
+            reservation = ledger.reserve(**kwargs)
+            self.assertEqual(reservation.max_output_tokens, 8192)
+            _record_ok(ledger, reservation)
+            self.assertEqual(ledger.cumulative().total_external_requests, 2)
+            ledger.end_active_segment(at=2.0)
+            reopened = cl.CalibrationLedger(path)
+            with self.assertRaises(CalibrationStopError):
+                reopened.require_active_transport("SEALED_HOLDOUT")
+            with self.assertRaises(CalibrationReservationDenied):
+                reopened.reserve(**kwargs)
+            with self.assertRaises(CalibrationLedgerError):
+                ledger.begin_active_segment("SEALED_HOLDOUT", at=3.0)
+            with self.assertRaises(CalibrationStopError):
+                ledger.require_active_transport("DEVELOPMENT")
+
+    def test_orphan_and_open_segment_block_transition(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "wp.jsonl")
+            ledger = cl.CalibrationLedger(path, declare_first_segment=True)
+            _record_metadata_ok(ledger)
+            ledger.begin_active_segment("DEVELOPMENT", at=1.0)
+            ledger.record_run_state(cl.RUN_STATE_OWNER_WAIT)
+            with self.assertRaises(CalibrationLedgerError):
+                ledger.authorize_holdout_transition(**HOLDOUT_BINDING)
+            ledger.end_active_segment(at=2.0)
+            ledger.authorize_holdout_transition(**HOLDOUT_BINDING)
+            self.assertEqual(cl.verify_ledger_chain(path), len(_events(path)))
+
+    def test_failed_segment_fsync_never_opens_transport(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger = _ledger(tmp)
+            _ready_holdout(ledger)
+            with patch.object(cl.os, "fsync", side_effect=OSError("disk failure")):
+                with self.assertRaises(OSError):
+                    ledger.begin_active_segment("SEALED_HOLDOUT", at=1.0)
+            self.assertFalse(any(s[0] == "SEALED_HOLDOUT" for s in ledger._segments))
+            with self.assertRaises(CalibrationStopError):
+                ledger.require_active_transport("SEALED_HOLDOUT")
 
 
 if __name__ == "__main__":  # pragma: no cover

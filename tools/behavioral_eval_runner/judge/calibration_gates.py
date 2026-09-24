@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Mapping
+from weakref import WeakKeyDictionary
 
 from ..enums import StrictEnum
 from ..errors import SchemaValidationError
@@ -180,6 +181,14 @@ _AUTHORIZATION_KEY = object()
 # must pin the canonical artifact digest in the audited source, independently
 # of caller-provided content. Tests patch this trust anchor with synthetic data.
 APPROVED_HOLDOUT_FREEZE_SHA256: str | None = None
+# A reviewed owner disposition must pin both audited source identities before
+# any holdout dispatch. A caller's current checkout is never its own approval.
+APPROVED_HOLDOUT_EXECUTION_HEAD_SHA: str | None = None
+APPROVED_HOLDOUT_EXECUTION_TREE_SHA: str | None = None
+
+_ISSUED_DEVELOPMENT_DISPATCH: WeakKeyDictionary[
+    CalibrationDispatchAuthorization, tuple[Any, ...]
+] = WeakKeyDictionary()
 
 
 class CalibrationDispatchAuthorization:
@@ -196,6 +205,8 @@ class CalibrationDispatchAuthorization:
         "dataset_sha256",
         "approval_statement",
         "authorized_request_ids",
+        "_sealed",
+        "__weakref__",
     )
 
     def __init__(
@@ -217,6 +228,30 @@ class CalibrationDispatchAuthorization:
         self.dataset_sha256 = dataset_sha256
         self.approval_statement = approval_statement
         self.authorized_request_ids = frozenset(authorized_request_ids)
+        self._sealed = True
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        if getattr(self, "_sealed", False):
+            raise CalibrationAuthorizationError(
+                "development authorization is immutable"
+            )
+        object.__setattr__(self, name, value)
+
+    def _snapshot(self) -> tuple[Any, ...]:
+        return (
+            self.stage, self.dataset_sha256, self.approval_statement,
+            self.authorized_request_ids,
+        )
+
+    def validate_current(self) -> None:
+        if (
+            self not in _ISSUED_DEVELOPMENT_DISPATCH
+            or self._snapshot() != _ISSUED_DEVELOPMENT_DISPATCH[self]
+            or self.stage is not ExecutionStage.DEVELOPMENT
+        ):
+            raise CalibrationAuthorizationError(
+                "development dispatch authorization was forged or altered"
+            )
 
 
 def authorize_calibration_dispatch(
@@ -301,13 +336,15 @@ def authorize_calibration_dispatch(
         for item in dataset.items
         if item.split is CandidateSplit.DEVELOPMENT
     )
-    return CalibrationDispatchAuthorization(
+    authorization = CalibrationDispatchAuthorization(
         stage=stage,
         dataset_sha256=dataset_identity.dataset_sha256,
         approval_statement=approval.approval_statement,
         authorized_request_ids=authorized_request_ids,
         _key=_AUTHORIZATION_KEY,
     )
+    _ISSUED_DEVELOPMENT_DISPATCH[authorization] = authorization._snapshot()
+    return authorization
 
 
 # ----------------------------------------------------- holdout freeze gate
@@ -534,4 +571,149 @@ def authorize_holdout_access(
         authorization._item_hashes = frozenset(
             sha256_of_obj(item.to_dict()) for item in dataset.items
             if item.split is CandidateSplit.SEALED_HOLDOUT)
+    return authorization
+
+
+# Holdout dispatch is deliberately distinct from development dispatch. The
+# latter remains DEVELOPMENT-only, including after a freeze is approved.
+_ISSUED_HOLDOUT_DISPATCH: WeakKeyDictionary[
+    HoldoutDispatchAuthorization, tuple[Any, ...]
+] = WeakKeyDictionary()
+
+
+class HoldoutDispatchAuthorization:
+    """A closed, gate-issued authorization for one frozen holdout identity.
+
+    Object identity is registered only by the factory. A forged ``__new__``
+    instance, or one with altered slots, cannot pass ``validate_current``.
+    """
+
+    __slots__ = (
+        "stage", "dataset_sha256", "approval_statement",
+        "authorized_request_ids", "max_output_tokens",
+        "freeze_contract_sha256", "approved_head_sha", "approved_tree_sha",
+        "freeze_authorization", "_sealed", "__weakref__",
+    )
+
+    def __init__(
+        self, *, dataset_sha256: str, approval_statement: str,
+        authorized_request_ids: frozenset[str], max_output_tokens: int,
+        freeze_contract_sha256: str, approved_head_sha: str,
+        approved_tree_sha: str,
+        freeze_authorization: HoldoutFreezeAuthorization,
+        _key: object | None = None,
+    ) -> None:
+        if _key is not _AUTHORIZATION_KEY:
+            raise CalibrationAuthorizationError(
+                "HoldoutDispatchAuthorization is issued only by "
+                "authorize_holdout_dispatch"
+            )
+        self.stage = ExecutionStage.SEALED_HOLDOUT
+        self.dataset_sha256 = dataset_sha256
+        self.approval_statement = approval_statement
+        self.authorized_request_ids = frozenset(authorized_request_ids)
+        self.max_output_tokens = max_output_tokens
+        self.freeze_contract_sha256 = freeze_contract_sha256
+        self.approved_head_sha = approved_head_sha
+        self.approved_tree_sha = approved_tree_sha
+        self.freeze_authorization = freeze_authorization
+        self._sealed = True
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        if getattr(self, "_sealed", False):
+            raise CalibrationAuthorizationError("holdout authorization is immutable")
+        object.__setattr__(self, name, value)
+
+    def _snapshot(self) -> tuple[Any, ...]:
+        return (
+            self.stage, self.dataset_sha256, self.approval_statement,
+            self.authorized_request_ids, self.max_output_tokens,
+            self.freeze_contract_sha256, self.approved_head_sha,
+            self.approved_tree_sha, self.freeze_authorization,
+        )
+
+    def validate_current(self) -> None:
+        if (
+            self not in _ISSUED_HOLDOUT_DISPATCH
+            or self._snapshot() != _ISSUED_HOLDOUT_DISPATCH[self]
+            or self.stage is not ExecutionStage.SEALED_HOLDOUT
+            or self.approved_head_sha != APPROVED_HOLDOUT_EXECUTION_HEAD_SHA
+            or self.approved_tree_sha != APPROVED_HOLDOUT_EXECUTION_TREE_SHA
+        ):
+            raise CalibrationAuthorizationError(
+                "holdout dispatch authorization was altered or audited "
+                "source approval is no longer pinned"
+            )
+        self.freeze_authorization.validate()
+        artifact = self.freeze_authorization.artifact
+        if (
+            self.freeze_contract_sha256 != artifact.freeze_contract_sha256
+            or self.max_output_tokens != artifact.holdout_max_output_tokens
+            or self.dataset_sha256 != artifact.frozen_sha256["dataset"]
+            or len(self.authorized_request_ids) != 120
+        ):
+            raise CalibrationAuthorizationError(
+                "holdout dispatch no longer matches the frozen contract"
+            )
+
+
+def authorize_holdout_dispatch(
+    *, approval: OwnerLabelApproval | None,
+    dataset_identity: DatasetIdentity, dataset: Any,
+    freeze_artifact: HoldoutFreezeArtifact | None,
+    current_head_sha: str, current_tree_sha: str,
+) -> HoldoutDispatchAuthorization:
+    """Issue the 120-item, source-pinned, owner-frozen dispatch token."""
+    for value, pin, name in (
+        (current_head_sha, APPROVED_HOLDOUT_EXECUTION_HEAD_SHA, "head"),
+        (current_tree_sha, APPROVED_HOLDOUT_EXECUTION_TREE_SHA, "tree"),
+    ):
+        if (
+            not isinstance(pin, str) or len(pin) != 40
+            or set(pin) - _HEX or value != pin
+        ):
+            raise HoldoutAccessError(
+                f"holdout {name} lacks an independently pinned audited source"
+            )
+    # Reuse the owner/dataset/split/guide gate without granting development
+    # access to the holdout. It also verifies the supplied dataset object.
+    development = authorize_calibration_dispatch(
+        approval=approval, dataset_identity=dataset_identity,
+        dataset=dataset, stage=ExecutionStage.DEVELOPMENT,
+    )
+    freeze = authorize_holdout_access(
+        freeze_artifact=freeze_artifact, dataset=dataset,
+    )
+    from .calibration_dataset import (
+        calibration_request_id, holdout_items, split_map_sha256,
+    )
+
+    if (
+        freeze.artifact.frozen_sha256["dataset"] != dataset_identity.dataset_sha256
+        or freeze.artifact.frozen_sha256["split_map"]
+        != dataset_identity.split_map_sha256
+        or split_map_sha256(dataset) != dataset_identity.split_map_sha256
+    ):
+        raise HoldoutAccessError(
+            "owner freeze does not bind the approved dataset and split map"
+        )
+    request_ids = frozenset(
+        calibration_request_id(item.item_id, dataset_identity.dataset_sha256)
+        for item in holdout_items(dataset, freeze)
+    )
+    if len(request_ids) != 120 or request_ids & development.authorized_request_ids:
+        raise HoldoutAccessError(
+            "holdout request ids must be 120 distinct, development-disjoint ids"
+        )
+    authorization = HoldoutDispatchAuthorization(
+        dataset_sha256=dataset_identity.dataset_sha256,
+        approval_statement=approval.approval_statement,
+        authorized_request_ids=request_ids,
+        max_output_tokens=freeze.artifact.holdout_max_output_tokens,
+        freeze_contract_sha256=freeze.artifact.freeze_contract_sha256,
+        approved_head_sha=current_head_sha, approved_tree_sha=current_tree_sha,
+        freeze_authorization=freeze, _key=_AUTHORIZATION_KEY,
+    )
+    _ISSUED_HOLDOUT_DISPATCH[authorization] = authorization._snapshot()
+    authorization.validate_current()
     return authorization

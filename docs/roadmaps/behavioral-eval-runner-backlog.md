@@ -34,7 +34,7 @@ supersessions in [section 20a of the merged design](../design/behavioral-eval-ru
 | --- | --- | --- |
 | WP-2B-0, 2B-1, 2B-1A, 2B-2 | **DONE** within offline or limited scopes. Outcome B accepted unresolved host limits; the grading stack is non-live. | No measured calibration or live host follows. Read the [phase records](#7-phase-work-package-register--wp-2b-0--wp-2b-7). |
 | WP-2B-1B / BKL-009 | **AUTHORIZED** for one synthetic offline proof by [APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof) and BER-DEC-011. [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day policy; [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) was open at this checkpoint. BKL-009 remains partial. | Real-host enforcement and cleanup need separate scope. See [WP-2B-1B](#wp-2b-1b--offline-evidence-policy-proof) and [BKL-009](#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy). |
-| WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; measured calibration and OD-1 ratification remain unfinished. | Labels, source, allowance and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate) and the [offline holdout proposal](ber-wp2b3-holdout-execution-scope.md). |
+| WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; BER-DEC-012 separately grants one bounded synthetic offline holdout-support branch. Measured calibration and OD-1 ratification remain unfinished. | Labels, selected execution source, allowance and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate), the [offline scope](ber-wp2b3-holdout-execution-scope.md), and the [implementation review](../evidence/ber-wp2b3-holdout-offline-review.md). |
 | R1–R5 | Outcome B accepted their WP-2B-0 dispositions; R2 and R4/R5 technical proofs remain unresolved. | Read the [evidence-gate records](#6-phase-2b-0-evidence-gates--r1r5); selected-host proof is needed before a baseline claim. |
 | WP-2B-4 through 2B-7 | WP-2B-4 is **BLOCKED**; 2B-5, 2B-6 and 2B-7 remain **BACKLOG**. | Each needs its own prerequisites and reviewed authority. |
 
@@ -992,6 +992,23 @@ privacy release, provider call, or cleanup.
   [replacement plan](../evidence/ber-recovery-2026-09-11/replacement-plan.md).
   The original 35 owner decisions remain recorded in the authorization package;
   this cleanup neither ratifies OD-1 nor changes execution limits.
+
+  BER-DEC-012, effective at PR #235 merge
+  `0196fe5b4eb30ca72c4bd61d51bedc9489a62115` on 2026-09-24, authorizes
+  one bounded synthetic offline holdout-support implementation on
+  `feat/ber-wp2b3-holdout-offline-support`. Its review record is
+  [here](../evidence/ber-wp2b3-holdout-offline-review.md). This increment may
+  implement and test the typed holdout gate, same-ledger transition, frozen
+  output cap, one-pass driver and evidence-only summary recovery with synthetic
+  fixtures. Four focused suites currently pass (29 gate, 49 ledger, 48 provider,
+  7 holdout-driver tests); independent security, recovery and quality review
+  completed with fixes. The full unsandboxed Windows suite passes (1,050 tests,
+  14 expected skips); pinned Linux and exact-head Actions remain pending.
+  Production freeze, source and development-evidence pins
+  remain unset. This increment cannot select the
+  live execution source, approve private labels, establish provider allowance,
+  unseal the holdout or satisfy OD-1. The implementation and its exact-head
+  checks are pending review at this branch checkpoint.
 
   **Historical note (governance rule
   5 — this record is redefined, not deleted):** the former WP-2B-3 NON-LIVE semantic-judge

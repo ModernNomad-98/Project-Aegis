@@ -11,8 +11,11 @@ import os
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
-from tools.behavioral_eval_runner.canonical import canonical_bytes, sha256_hex
+from tools.behavioral_eval_runner.canonical import (
+    canonical_bytes, sha256_hex, sha256_of_obj,
+)
 from tools.behavioral_eval_runner.judge import calibration_dataset as cd
 from tools.behavioral_eval_runner.judge import calibration_envelope as ce
 from tools.behavioral_eval_runner.judge import calibration_gates as cg
@@ -709,6 +712,171 @@ class TestHoldoutDispatchBoundary(ProviderCase):
         self.assertEqual(
             set(self.authorization.authorized_request_ids), expected
         )
+
+    def test_mutated_development_token_cannot_become_holdout_token(self) -> None:
+        request, envelope_bytes = self._holdout_request()
+        fake = FakeSdkClient([fake_response("{}")])
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.authorization, ledger=self.ledger,
+            sdk_client=fake, exception_types=FAKE_EXCEPTIONS,
+        )
+        # Simulate a caller bypassing ordinary attribute assignment.
+        object.__setattr__(self.authorization, "stage",
+                           cg.ExecutionStage.SEALED_HOLDOUT)
+        object.__setattr__(self.authorization, "authorized_request_ids",
+                           frozenset({request.request_id}))
+        with self.assertRaises(CalibrationAuthorizationError):
+            client.dispatch(request, envelope_bytes)
+        self.assertEqual(fake.responses.calls, [])
+
+
+class TestGateIssuedHoldoutProvider(ProviderCase):
+    """Synthetic freeze and fake SDK prove the separate provider boundary."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        identity = cg.DatasetIdentity(
+            dataset_id=self.dataset.dataset_id,
+            dataset_version=self.dataset.version,
+            dataset_sha256=self.dataset.dataset_sha256(),
+            split_map_sha256=cd.split_map_sha256(self.dataset),
+            labeling_guide_sha256="c" * 64,
+        )
+        approval = cg.OwnerLabelApproval(
+            status=cg.OwnerApprovalStatus.APPROVED,
+            approved_by="Peter Nguyen (synthetic test fixture)",
+            approval_statement="synthetic owner approval for offline test",
+            approval_date="2026-08-20",
+            dataset_id=identity.dataset_id,
+            dataset_version=identity.dataset_version,
+            dataset_sha256=identity.dataset_sha256,
+            split_map_sha256=identity.split_map_sha256,
+            labeling_guide_sha256=identity.labeling_guide_sha256,
+        )
+        payload = cg.HoldoutFreezeArtifact.example_dict()
+        payload["holdout_max_output_tokens"] = 16384
+        payload["frozen_sha256"]["dataset"] = identity.dataset_sha256
+        payload["frozen_sha256"]["split_map"] = identity.split_map_sha256
+        payload["freeze_contract_sha256"] = cg.freeze_contract_sha256(payload)
+        artifact = cg.HoldoutFreezeArtifact.from_dict(payload)
+        for name, value in (
+            ("APPROVED_HOLDOUT_FREEZE_SHA256", sha256_of_obj(artifact.to_dict())),
+            ("APPROVED_HOLDOUT_EXECUTION_HEAD_SHA", "a" * 40),
+            ("APPROVED_HOLDOUT_EXECUTION_TREE_SHA", "b" * 40),
+        ):
+            active_patch = patch.object(cg, name, value)
+            active_patch.start()
+            self.addCleanup(active_patch.stop)
+        self.holdout_authorization = cg.authorize_holdout_dispatch(
+            approval=approval, dataset_identity=identity,
+            dataset=self.dataset, freeze_artifact=artifact,
+            current_head_sha="a" * 40, current_tree_sha="b" * 40,
+        )
+        holdout_item = next(
+            item for item in self.dataset.items
+            if item.split is cd.CandidateSplit.SEALED_HOLDOUT
+        )
+        content = cd.CalibrationItemContent.from_item(
+            holdout_item,
+            holdout_authorization=self.holdout_authorization.freeze_authorization,
+        )
+        envelope = ce.build_calibration_envelope(content)
+        self.holdout_request = ce.build_calibration_judge_request(
+            content=content, envelope=envelope,
+            dataset_id=self.dataset.dataset_id,
+            dataset_version=self.dataset.version,
+            dataset_sha256=identity.dataset_sha256,
+        )
+        self.holdout_envelope_bytes = canonical_bytes(
+            {key: envelope[key] for key in sorted(envelope)}
+        )
+
+    def _start_holdout(self, *, freeze_sha256: str | None = None) -> None:
+        self.ledger.end_active_segment(time.time())
+        self.ledger.record_run_state(cl.RUN_STATE_OWNER_WAIT)
+        self.ledger.authorize_holdout_transition(
+            freeze_sha256=freeze_sha256 or sha256_of_obj(
+                self.holdout_authorization.freeze_authorization.artifact.to_dict()
+            ),
+            dataset_sha256=self.holdout_authorization.dataset_sha256,
+            audited_head_sha=self.holdout_authorization.approved_head_sha,
+            audited_tree_sha=self.holdout_authorization.approved_tree_sha,
+            development_manifest_sha256="d" * 64,
+            development_summary_sha256="e" * 64,
+            max_output_tokens=self.holdout_authorization.max_output_tokens,
+        )
+        self.ledger.begin_active_segment("SEALED_HOLDOUT", time.time())
+
+    def test_holdout_cap_reaches_sdk_and_durable_reservation(self) -> None:
+        self._start_holdout()
+        fake = FakeSdkClient([fake_response("{}")])
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.holdout_authorization,
+            ledger=self.ledger, sdk_client=fake,
+            exception_types=FAKE_EXCEPTIONS,
+        )
+        response = client.dispatch(
+            self.holdout_request, self.holdout_envelope_bytes
+        )
+        self.assertIs(response.transport_outcome, TransportOutcome.OK)
+        self.assertEqual(len(fake.responses.calls), 1)
+        self.assertEqual(fake.responses.calls[0]["max_output_tokens"], 16384)
+        started = [event for event in self._ledger_events(self.ledger_path)
+                   if event["event_kind"] == "ATTEMPT_STARTED"
+                   and event["request_kind"] ==
+                   cl.RequestKind.JUDGMENT_ATTEMPT.value]
+        self.assertEqual(len(started), 1)
+        self.assertEqual(started[0]["max_output_tokens"], 16384)
+
+    def test_holdout_requires_durable_transition_before_transport(self) -> None:
+        fake = FakeSdkClient([fake_response("{}")])
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.holdout_authorization,
+            ledger=self.ledger, sdk_client=fake,
+            exception_types=FAKE_EXCEPTIONS,
+        )
+        with self.assertRaises(CalibrationStopError):
+            client.dispatch(self.holdout_request, self.holdout_envelope_bytes)
+        self.assertEqual(fake.responses.calls, [])
+
+    def test_mismatched_durable_freeze_blocks_fake_transport(self) -> None:
+        self._start_holdout(freeze_sha256="f" * 64)
+        fake = FakeSdkClient([fake_response("{}")])
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.holdout_authorization,
+            ledger=self.ledger, sdk_client=fake,
+            exception_types=FAKE_EXCEPTIONS,
+        )
+        with self.assertRaises(CalibrationStopError):
+            client.dispatch(self.holdout_request, self.holdout_envelope_bytes)
+        self.assertEqual(fake.responses.calls, [])
+
+    def test_holdout_refuses_second_metadata_request(self) -> None:
+        self._start_holdout()
+        fake = FakeSdkClient([])
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.holdout_authorization,
+            ledger=self.ledger, sdk_client=fake,
+            exception_types=FAKE_EXCEPTIONS,
+        )
+        with self.assertRaises(CalibrationStopError) as caught:
+            client.request_model_availability_metadata()
+        self.assertIs(caught.exception.stop_reason,
+                      CalibrationStopReason.UNAUTHORIZED_EXECUTION_STAGE)
+        self.assertEqual(fake.metadata_calls, [])
+
+    def test_revoked_source_pin_blocks_fake_transport(self) -> None:
+        self._start_holdout()
+        fake = FakeSdkClient([fake_response("{}")])
+        client = cp.OpenAICalibrationJudgeClient(
+            authorization=self.holdout_authorization,
+            ledger=self.ledger, sdk_client=fake,
+            exception_types=FAKE_EXCEPTIONS,
+        )
+        with patch.object(cg, "APPROVED_HOLDOUT_EXECUTION_HEAD_SHA", None):
+            with self.assertRaises(CalibrationAuthorizationError):
+                client.dispatch(self.holdout_request, self.holdout_envelope_bytes)
+        self.assertEqual(fake.responses.calls, [])
 
 
 class TestUnclassifiedTransportException(ProviderCase):
