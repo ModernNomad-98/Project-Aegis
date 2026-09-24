@@ -10,14 +10,15 @@ It expressly requires a separate reviewed implementation grant.
 
 ## Current boundary and proposed increment
 
-[PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) delivered
-the bounded BER decision-log entry 011 (BER-DEC-011) synthetic proof. Its
-`OfflinePolicyWriter` requires an
-explicit classification decision for every input and the final report; the
-receipts bind one first-writer timestamp and a 30-day bundle review date through
-the Stage A input-evidence manifest, Stage B final-evidence manifest, final
-report and detached finalization marker. Stage A is the hash-bound input
-bundle; Stage B is the final result and verification chain.
+The input-evidence stage (Stage A) is the hash-bound input bundle. The
+final-evidence stage (Stage B) is the final result and verification chain.
+[Pull request (PR) #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139)
+delivered the bounded synthetic proof authorized by BER decision-log entry
+011 (BER-DEC-011). Its `OfflinePolicyWriter` requires an explicit
+classification decision for every input and the final report; the receipts
+bind one first-writer timestamp and a 30-day bundle review date through the
+Stage A manifest, Stage B manifest, final report and detached finalization
+marker.
 Expired, failed and incomplete bundles are preserved. The [offline review](../evidence/ber-bkl-009a-offline-review.md)
 records the tests and limits. Existing `expiration_at` fields still mean each
 artifact's own expiry; they are not the complete-bundle review date. The
@@ -31,6 +32,16 @@ and [policy target](ber-bkl-009-evidence-policy-decision.md) require those
 controls before item 009 can close. Older pages that call PR #139 open are
 historical checkpoints; the merged code and PR history decide the current
 implementation state.
+
+The goal of this increment is to make the selected complete-bundle policy
+usable by an explicitly opted-in local caller while preserving accepted
+receipt bytes and refusing unknown host facts. Its non-goals are real-host
+attestation, production driver integration, publication clearance and evidence
+deletion. Keeping the current metadata defaults would allow a caller to
+mistake implicit classification for review; changing the published evidence
+schema would require a separate versioned decision; and implementing real-host
+controls now would require a named host and its own authority. Those options
+are outside this proposal.
 
 **Proposed owner choice:** authorize one follow-up **offline, synthetic-only**
 implementation package to make the selected policy usable by explicitly
@@ -52,7 +63,7 @@ new scope instead of silently widening it.
 | `tools/behavioral_eval_runner/tests/test_evidence_policy.py` | Cover the expanded policy entry point, exact first-evidence clock, complete bundle, classification and refusal cases using owned synthetic directories. |
 | `tools/behavioral_eval_runner/tests/test_evidence.py` | Guard the existing Stage A/B hash chain, marker binding and legacy byte compatibility. |
 | `tools/behavioral_eval_runner/tests/test_evidence_policy_preflight.py` (new) | Test missing, false, conflicting and simulated passing host facts without querying the operating system. |
-| `tools/behavioral_eval_runner/README.md` | Explain the opt-in local API, stop states and the difference between synthetic proof and host verification. |
+| `tools/behavioral_eval_runner/README.md` | Explain the opt-in local application programming interface (API), stop states and the difference between synthetic proof and host verification. |
 | `docs/roadmaps/ber-bkl-009-operator-policy-runbook.md` (new) | Document the owner-review procedure: inventory and verify a bundle, determine review eligibility, preserve failed/incomplete bundles, inspect proposed cleanup targets and record a sanitized decision. It may describe future manual deletion prerequisites but contain no executable deletion command. |
 | `docs/roadmaps/behavioral-eval-runner-backlog.md` | Append the owner-approved decision and an accurate dated implementation checkpoint only after the owner grants it; retain PARTIALLY DELIVERED until later host gates pass. |
 | `docs/evidence/ber-bkl-009-policy-integration-review.md` (new) | Record exact source revision, changed paths and line count, synthetic commands/results, independent review, and unresolved host/privacy/cleanup gates. |
@@ -63,6 +74,16 @@ host adapter. Even a synthetic `PASS` means `SIMULATION_ONLY`; it cannot attest
 that any selected host passed. No production
 driver wiring, provider adapter change, automatic timer or deletion routine is
 included.
+
+The proposed rollout would be opt-in at the local writer/verifier interface;
+existing callers and the published `1.0.0-wp2b1` byte contract must remain
+valid. New runs could return to the legacy path, while an already policy-bound
+bundle would stay on its policy verification path and be preserved. Historical
+legacy evidence would need no schema migration. Structured stop reasons and a
+sanitized review record would provide observability without raw transcripts or
+host identifiers. Synthetic tests would cover refusal and compatibility; the
+later host adapter, privacy review and cleanup procedure remain open questions
+for the owner and independent security reviewer.
 
 ## Acceptance and delivery gates
 
@@ -86,7 +107,8 @@ included.
    future cleanup request; expiration alone does not authorize deletion.
 4. Focused policy/evidence tests, the full offline BER suite, skill validation,
    whitespace and path-scope checks, independent architecture/security review,
-   and exact-head Linux and Windows GitHub Actions pass. The implementation PR
+   and exact-head Linux and Windows continuous integration (CI) checks pass.
+   The implementation PR
    carries a Developer Certificate of Origin sign-off. A protected gate-guard
    failure needs its own owner disposition; it is not a green check.
 5. The evidence review records the observed results and remaining limits
@@ -95,7 +117,7 @@ included.
 
 ## Boundaries and later owner gates
 
-This grant, if approved, would cover only the synthetic package above. It
+The proposed grant, if approved, would cover only the synthetic package above. It
 would authorize **no** real or selected host access, ACL or BitLocker change,
 recovery-key handling, service principal, private calibration source, sealed
 holdout, credential use, provider call, live run, public release of raw content,
@@ -103,7 +125,8 @@ or operator cleanup. Preserve any failed/incomplete bundle. No automatic or
 manual deletion is authorized by a review-eligibility date or this proposal.
 
 The later real-host package must name the exact source and execution host,
-prove owner-plus-SYSTEM access with inheritance disabled on the Windows work
+prove owner-plus-SYSTEM (the Windows built-in service account) access with
+inheritance disabled on the Windows work
 package 2B-3 (WP-2B-3) root or obtain a separately approved reader matrix,
 verify encryption
 on that host and recovery-key custody, bind actual creation sites and driver

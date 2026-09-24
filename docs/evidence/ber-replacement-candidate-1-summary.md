@@ -70,9 +70,11 @@ hidden holdout.
 2. Reconcile changed dataset/guide/source pins and unknown historical usage;
    verify the current host, credential, provider project, remaining allowance
    and BER-DEC-008 preflight. A private commit alone grants no provider call.
-3. Review missing holdout execution support separately. Development results
-   lead to OWNER_WAIT; later holdout freeze needs its own owner decision, and
-   OD-1 follows measured holdout evidence.
+3. Synthetic offline holdout execution support merged in
+   [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249).
+   Its production source and freeze pins remain unset. Development results
+   lead to OWNER_WAIT; a later holdout freeze needs its own owner decision,
+   and OD-1 follows measured holdout evidence.
 
 The current `calibration_dataset.py` module docstring predates BER-DEC-010 and
 describes the old external-only dataset location. BER-DEC-010 governs this
