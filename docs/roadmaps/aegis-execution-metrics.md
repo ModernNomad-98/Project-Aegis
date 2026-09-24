@@ -17,9 +17,11 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [five-merge checkpoint after pull request #250](#checkpoint-after-pull-request-250--2026-09-24)
-reconsiders every open work item and links the [current remaining-work
-forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-250).
+The latest completed [five-merge checkpoint after pull request #250](#checkpoint-after-pull-request-250--2026-09-24)
+reconsiders every open work item at that time. The later [BER-BKL-009 owner
+decision update](aegis-backlog-forecast.md#material-owner-decision--2026-09-24-ber-bkl-009)
+supersedes its whole-item estimate and selected total; the next full checkpoint
+is due after the fifth merge following #250.
 The table and dated checkpoints below preserve their original estimates and
 observed intervals; older pending or in-progress cells are historical, not
 current work status. Active-work estimates and observed wall time are different

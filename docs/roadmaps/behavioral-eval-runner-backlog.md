@@ -1,6 +1,6 @@
 # Behavioral Eval Runner — Durable Backlog and Phase Register
 
-> **Current reading, checked 2026-09-24 after pull request #249:** This is the
+> **Current reading, checked 2026-09-24 after pull request #254:** This is the
 > permanent continuation and decision register for Behavioral Eval Runner
 > maintainers and coding agents. The dated delivery checkpoints below remain
 > historical evidence. Use the current map and owning work-package record
@@ -33,7 +33,7 @@ supersessions in [section 20a of the merged design](../design/behavioral-eval-ru
 | Work or evidence gate | Current disposition | What remains |
 | --- | --- | --- |
 | WP-2B-0, 2B-1, 2B-1A, 2B-2 | **DONE** within offline or limited scopes. Outcome B accepted unresolved host limits; the grading stack is non-live. | No measured calibration or live host follows. Read the [phase records](#7-phase-work-package-register--wp-2b-0--wp-2b-7). |
-| WP-2B-1B / BKL-009 | The bounded synthetic offline proof **DELIVERED** in [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) under [APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof) and BER-DEC-011. [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day policy; BKL-009 remains **PARTIAL**. | Real-host access, encryption, privacy and cleanup need separate scope. See [WP-2B-1B](#wp-2b-1b--offline-evidence-policy-proof) and [BKL-009](#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy). |
+| WP-2B-1B / BKL-009 | The bounded synthetic offline proof **DELIVERED** in [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) under consumed APR-012 and BER-DEC-011. [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day policy. The owner approved a further bounded synthetic integration; BER-DEC-013 and APR-023 make it effective on this separate reviewed governance PR's merge. BKL-009 remains **PARTIAL**. | Implement only from that merge commit and within the [ten-path scope](ber-bkl-009-policy-scope-amendment-proposal.md). Real-host access, encryption, privacy and cleanup need separate scope. See [BKL-009](#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy). |
 | WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; BER-DEC-012 granted the bounded synthetic offline holdout support now delivered in [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249). Measured calibration and OD-1 ratification remain unfinished. | Labels, selected execution source, allowance and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate), the [offline scope](ber-wp2b3-holdout-execution-scope.md), and the [implementation review](../evidence/ber-wp2b3-holdout-offline-review.md). |
 | R1–R5 | Outcome B accepted their WP-2B-0 dispositions; R2 and R4/R5 technical proofs remain unresolved. | Read the [evidence-gate records](#6-phase-2b-0-evidence-gates--r1r5); selected-host proof is needed before a baseline claim. |
 | WP-2B-4 through 2B-7 | WP-2B-4 is **BLOCKED**; 2B-5, 2B-6 and 2B-7 remain **BACKLOG**. | Each needs its own prerequisites and reviewed authority. |
@@ -1701,6 +1701,10 @@ authorization decisions in §13 remain unchanged.
   in APR-009. BER-DEC-011 authorizes only the bounded offline synthetic proof
   after its separate reviewed governance merge. Real-host access, encryption,
   privacy and operator cleanup remain unimplemented and separately gated.
+  The owner approved the [ten-path synthetic integration proposal](ber-bkl-009-policy-scope-amendment-proposal.md)
+  on 2026-09-24. BER-DEC-013 and APR-023 authorize that one follow-up package
+  only after this separate reviewed governance PR merges; the complete item
+  remains PARTIALLY DELIVERED.
 - **Source / evidence:** Merged design §13 ("Access, retention, redaction": least-
   privilege readers; access-controlled evidence root; encryption-at-rest where
   sensitivity requires; per-artifact retention class with a defined retention period and
@@ -3531,6 +3535,65 @@ proposed behavior but did not itself authorize this branch.
   allowance and host/credential preflight, development `OWNER_WAIT`, owner
   freeze of holdout cap/hashes, one measured holdout pass and OD-1 review remain
   separate decisions.
+
+### BER-DEC-013: Bounded synthetic evidence-policy integration — OWNER APPROVED
+
+**Owner decision:** On 2026-09-24 Peter Nguyen answered "Approve this bounded
+scope" to the question approving only the synthetic BER-BKL-009 follow-up in
+the merged [PR #253 scope proposal](ber-bkl-009-policy-scope-amendment-proposal.md).
+The question named ten exact paths, at most 16 active implementation hours,
+1,500 added code/test lines and $0 external spend, and required this separate
+reviewed decision-log amendment to merge before implementation starts. The
+owner's answer authorizes the bounded package; this decision and
+[APR-023](../approvals/APPROVAL_REGISTER.md#aegis-apr-023-bounded-synthetic-evidence-policy-integration)
+become effective only on this governance PR's reviewed merge.
+
+- **Scope and start:** One opt-in, offline, synthetic-only integration of the
+  selected 30-day complete-bundle policy for local callers and operators.
+  Create one implementation branch directly from this governance PR's exact
+  merge commit; record its SHA and tree before making code changes. Preserve
+  the published `1.0.0-wp2b1` evidence bytes, receipt/hash chain, existing
+  per-artifact `expiration_at` meaning and legacy callers. Already
+  policy-bound bundles remain on the policy verification path.
+- **Exact paths:** `tools/behavioral_eval_runner/evidence_policy.py`,
+  `tools/behavioral_eval_runner/evidence.py`,
+  `tools/behavioral_eval_runner/evidence_policy_preflight.py` (new),
+  `tools/behavioral_eval_runner/tests/test_evidence_policy.py`,
+  `tools/behavioral_eval_runner/tests/test_evidence.py`,
+  `tools/behavioral_eval_runner/tests/test_evidence_policy_preflight.py` (new),
+  `tools/behavioral_eval_runner/README.md`,
+  `docs/roadmaps/ber-bkl-009-operator-policy-runbook.md` (new), this backlog,
+  and `docs/evidence/ber-bkl-009-policy-integration-review.md` (new). The
+  merged proposal defines the permitted change and acceptance test at each
+  path; no other implementation path is in scope.
+- **Limits and behavior:** At most 16 active implementation hours, 1,500 added
+  code/test lines and $0 task-controlled external spend. Require explicit
+  versioned policy references and content-specific classifications for every
+  policy-bound input and report; no implicit `INTERNAL` or
+  `sanitized_by_construction` trust. Bind one first-evidence clock and 30-day
+  complete-bundle review date across both stages and the detached marker; a
+  later report cannot extend it. Missing, forged, expired, conflicting or
+  incomplete chains fail closed and remain preserved. Synthetic preflight
+  consumes caller-supplied facts only, stops on unknown or contradictory exact
+  path, ownership, access, inheritance, encryption or recovery-key facts, and
+  marks any passing result `SIMULATION_ONLY`, never host attestation. The
+  operator runbook may inventory and propose review; it may not contain an
+  executable deletion command.
+- **Delivery:** One DCO-signed implementation PR with exact-path staging,
+  focused and full offline BER tests, skill validation, whitespace/path/line
+  cap checks, independent architecture and security review, sanitized
+  integration evidence, and exact-head Linux and Windows Actions. A failed
+  protected gate guard needs a separate PR-specific owner disposition.
+  Stop for a new owner decision before any bound, published schema or accepted
+  byte shape would change.
+- **Excluded and later gates:** No real host access or attestation, ACL or
+  encryption change, recovery-key handling, production driver wiring, private
+  labels or sealed holdout, credential, provider call, live run, publication
+  clearance, automatic timer, evidence deletion, dependency or workflow
+  change. This does not authorize a later BER phase or mark BER-BKL-009 DONE.
+  Host access, runtime binding, actual redaction/privacy review and
+  marker-gated cleanup need separate owner choices and evidence. Expiration
+  never authorizes deletion.
 
 ## 14. Continuation instructions for a brand-new session
 
