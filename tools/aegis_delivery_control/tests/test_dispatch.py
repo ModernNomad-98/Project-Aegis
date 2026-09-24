@@ -278,6 +278,31 @@ def _launch_validator_until_terminated(
 
 
 class MediatedDispatchTests(unittest.TestCase):
+    def test_observation_intake_denies_lookalike_adapter_before_contact(self) -> None:
+        effect = EffectObservationCommand(
+            "observation-1", "command-1", "event-1", "repo-1", "run-1",
+            "item-1", "effect-1", "attempt-1", "claim-1", "settlement-1", "",
+        )
+        validator = ValidatorObservationCommand(
+            "observation-2", "command-2", "event-2", "repo-1", "run-1",
+            "item-1", "intent-1", "settlement-2", "hash-2",
+        )
+        for coordinator_type, method_name, command in (
+            (SyntheticDispatchCoordinator, "intake_effect_receipt", effect),
+            (SyntheticValidationCoordinator, "intake_result", validator),
+        ):
+            with self.subTest(method=method_name):
+                store = MagicMock()
+                store.is_canonical = True
+                store._repository_id = "repo-1"
+                target = MagicMock()
+                coordinator = coordinator_type(
+                    store, TransitionEngine(), SyntheticAuthority(b"u" * 32), target
+                )
+                with self.assertRaisesRegex(DispatchDenied, "synthetic"):
+                    getattr(coordinator, method_name)(command)
+                self.assertEqual(target.mock_calls, [])
+
     def test_unproven_target_denied_before_any_intent_or_contact(self) -> None:
         authority = SyntheticAuthority(b"u" * 32)
         store = MagicMock()
