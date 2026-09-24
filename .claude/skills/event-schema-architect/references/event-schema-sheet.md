@@ -34,7 +34,8 @@ Properties:
   item_count      integer  required
   coupon_code     string   optional
   plan            enum     optional   [free, pro, enterprise]
-PII flag: none (ids only)
+PII flag: classify order_id and any linkable identifier under the product's
+  data policy; identifiers are not automatically non-personal
 ```
 
 Rules: type every property; required vs optional; enums for categoricals;
@@ -52,10 +53,10 @@ Defined ONCE so every event joins and segments the same way.
 ## Identity stitching
 
 - Anonymous events carry an anonymous_id before login.
-- On identify, alias anonymous_id → user_id so pre-login events join the
-  identified user (critical for top-of-funnel).
-- Carry account_id/tenant_id for B2B multi-tenant analysis; guarantee
-  tenant context is never missing.
+- On identify, alias anonymous_id → user_id only after a verified association
+  so pre-login events can join the identified user without fabricated identity.
+- Carry account_id/tenant_id when known for B2B multi-tenant analysis; mark
+  unknown tenant context explicitly on pre-identify events.
 - Keep keys stable; a churning user_id fragments the same person.
 
 ## Governance & versioning

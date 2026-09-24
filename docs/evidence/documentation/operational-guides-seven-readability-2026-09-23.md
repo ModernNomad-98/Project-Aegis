@@ -1,5 +1,10 @@
 # Seven operational guides: current-reading correction
 
+**Current reading (2026-09-24):** This seven-guide correction was delivered.
+Its draft-freeze pending-review language below is historical. Use the
+[documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+and the linked current guides below for present status.
+
 Date: 2026-09-23. Edit start: 21:08:20 UTC. Base: `37c018d166f0647703b4a0f7009ae0ca4c5e32b0`
 (merged pull request #169). Prior smaller screen estimate: 2–4 active hours;
 this bounded seven-page correction estimate: 4–8 active hours. The selected

@@ -5,6 +5,12 @@ description: Design the frontend's share of performance — metrics in the loadi
 
 # Frontend Perf Engineer
 
+Terms: **SSR** means server-side rendering; **SSG** means static site
+generation; **CSR** means client-side rendering; **CI** means continuous
+integration; **QA** means quality assurance; **HTTP** means Hypertext Transfer
+Protocol; **UI** means user interface; **E2E** means end to end; **API** means
+application programming interface.
+
 ## Purpose
 
 The backend answers in 80ms and the user waits four seconds: a
@@ -123,11 +129,11 @@ about prescribing it.
    states designed, not assumed), progressive rendering of
    above-the-fold first. Perceived work never replaces step 2–6 —
    it is the residue's treatment, and the design says so.
-8. **Install the budgets.** Bundle-size budgets per route (gzip
+8. **Design the budgets.** Specify bundle-size budgets per route (gzip
    numbers, with the rationale) and metric budgets per key page on
-   the stated device class — wired as CI gates: size budgets at
+   the stated device class and proposed CI gate placement: size budgets at
    build time (composing `vite-build-qa-engineer`'s surface), metric
-   budgets via `performance-test-harness` lab runs where wired.
+   budgets via `performance-test-harness` lab runs if implemented.
    A new dependency that blows the size budget claims it in review —
    the frontend twin of the latency budget-claim rule.
 9. **Deliver** in the Output Format: evidence, the ranked plan
@@ -178,7 +184,7 @@ Routed out: <API-side share → latency-budget-architect table; harness mechanic
       no reflexive memoize-everything.
 - [ ] Perceived-performance work is labeled as residue treatment, and
       optimistic UI has designed rollback states.
-- [ ] Budgets exist with numbers, device class, and CI gate placement;
+- [ ] The budget design names numbers, device class, and CI gate placement;
       the dependency budget-claim rule is stated.
 - [ ] Measurement is routed to the harness; build verification to
       vite-build-qa-engineer.

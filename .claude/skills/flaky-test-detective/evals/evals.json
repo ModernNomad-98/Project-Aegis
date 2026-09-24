@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "flaky-test-detective",
-  "description": "Trigger and behavior cases for flake casework: classify with evidence, reproduce with counts, fix one cause, prove stability with repeated runs, never retry/sleep/weaken.",
+  "description": "Trigger and behavior cases for flake casework: classify with evidence, reproduce with counts, fix one cause, measure bounded stability with repeated runs, never retry/sleep/weaken.",
   "cases": [
     {
       "id": "positive-intermittent-ci-failure",

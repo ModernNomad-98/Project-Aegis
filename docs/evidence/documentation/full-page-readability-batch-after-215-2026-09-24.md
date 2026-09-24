@@ -1,5 +1,11 @@
 # Twenty-page full-page readability batch after pull request #215
 
+**Current reading (2026-09-24):** PR #216 delivered this batch. Its
+candidate and future check language below is the pre-merge record. Use the
+[documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+for present acceptance counts; the twenty page dispositions remain the
+original review evidence.
+
 This page records full-checklist review of ten skill entrypoints and ten
 historical evidence pages from the exact pull request (PR) #215 merge
 `4e09c54b511a43672c282bc75c41061ec4f2f878`. The previous and new

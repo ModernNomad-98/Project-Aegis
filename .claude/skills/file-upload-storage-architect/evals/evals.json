@@ -10,8 +10,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Chooses direct-to-storage vs proxied with a stated reason, and for direct uploads has the app issue a scoped signed URL and record intent rather than trust a client success report.",
-          "Scopes signed URLs to one verb + one object key + short expiry (never prefix/bucket) with server-derived keys of the form tenant/<random-id>, so a client cannot escape its tenant prefix.",
+          "Chooses direct-to-storage vs proxied with a stated reason, and for direct uploads has the app issue a scoped signed URL, record intent and verify object existence/metadata at storage before completion rather than trust a client success report.",
+          "Scopes signed URLs to one verb + one object key + short expiry (never prefix/bucket) with server-derived keys that cannot escape the tenant's chosen bucket or prefix.",
           "Validates size at the storage layer and type by magic bytes/content, not extension, and scans files before they are served or processed (quarantine until clean).",
           "Designs storage tenancy (shared bucket + tenant prefix or per-tenant bucket) and hands the resulting access policy to rls-policy-auditor; designs retention with orphan cleanup and delete-propagation."
         ]

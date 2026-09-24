@@ -48,8 +48,10 @@ refusal compliance.
 Corpus: run coverage (run vs UNRUN), spend vs cap, quarantine list with
 reasons, judge-error rate, cases flagged unjudgeable-as-written.
 
-UNRUN is the default state of every case in every report. A case acquires
-another state only from an actual execution in the reported run.
+UNRUN is the default state of a case without an execution observation in the
+reported run. A case acquires another state only from an actual observation;
+the shipped offline runner's recorded controls do not establish a general
+live skill-session result.
 
 ## Sampling tiers and cost arithmetic
 
@@ -97,7 +99,8 @@ report that looks complete. Budget guardrail patterns:
 
 ## Non-claims language (include verbatim in every design deliverable)
 
-> No runner exists as of this design. No eval case has been executed. This
-> document specifies how execution WOULD work; nothing in it is an eval
-> result, and the library's eval convention remains structural-only until a
-> built runner produces real, reported runs.
+> The shipped Behavioral Eval Runner supports offline preparation and grading
+> of recorded controls; it does not provide general live skill-session or
+> provider dispatch. This document specifies proposed live execution and
+> judging. It executed no case and supplies no result. An unobserved case
+> remains UNRUN; further live/provider implementation requires its own grant.

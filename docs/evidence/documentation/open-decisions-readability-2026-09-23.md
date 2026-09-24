@@ -1,5 +1,11 @@
 # Open decisions index readability batch — 2026-09-23
 
+**Current reading (2026-09-24):** Read the
+[open-decisions index](../../roadmaps/aegis-open-decisions-2026-09-23.md)
+and [approval register](../../approvals/APPROVAL_REGISTER.md) for current
+owner decisions. The #139 head/check snapshot and original estimates below
+belong to this dated batch.
+
 ## Scope and forecast
 
 This bounded batch updates the [open-decisions page](../../roadmaps/aegis-open-decisions-2026-09-23.md)

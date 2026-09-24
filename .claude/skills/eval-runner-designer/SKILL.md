@@ -1,21 +1,29 @@
 ---
 name: eval-runner-designer
-description: Design how a skill library's evals would actually EXECUTE — the runner left open where the eval convention is structural-only (files exist and parse; nothing runs). Covers harness architecture (fresh, isolated session per case with the library loaded), trigger verification (the expected skill fires; should_not_trigger neighbors stay silent), assertion judging (deterministic checks vs rubric-guided LLM judge), refusal-case semantics, reporting with honest UNRUN status, cost and sampling tiers, flake policy for stochastic triggering, and advisory-first CI wiring. Design/spec ONLY — it never claims a runner exists, never reports evals as "passing" without one, and builds or runs nothing. Use when asked how skill evals would run, execute, or score, or to close a structural-only eval gap. Do NOT use to judge whether eval CASES are real or hollow (skill-quality-reviewer), to evaluate an AI feature's behavior (ai-evaluation-harness), or for product test automation (qa-automation-architect).
+description: Design how skill-library eval cases would execute in an isolated live session and be judged, while distinguishing the shipped offline Behavioral Eval Runner from unbuilt live/provider dispatch. Covers fresh-session isolation, trigger verification, deterministic versus semantic judging, refusal cases, honest UNRUN status, cost, flake policy and advisory CI. Design/spec ONLY — it does not execute cases or report passing results without recorded observations; further live/provider implementation requires its own grant. Use when asked how skill evals would run, execute or score. Do NOT use to judge whether eval CASES are real or hollow (skill-quality-reviewer), evaluate an AI feature's behavior (ai-evaluation-harness), or build product test automation (qa-automation-architect).
 ---
 
 # Eval Runner Designer
 
+Terms: **D3** is the repository's structural-evaluation decision in
+[the skill generation standard](../../../docs/skill-generation-standard.md);
+**CI** means continuous integration; **AI** means artificial intelligence;
+**LLM** means large language model; **E2E** means end to end; **PR** means
+pull request.
+
 ## Purpose
 
-Turn "evals exist" into "evals could be executed" — by design, honestly. A
-library whose eval convention is structural-only (the validator proves the
-files are present and parse; decision D3 in this repo) carries a standing
-gap: nothing ever exercises the cases, so no one may claim they pass. This
-skill closes the DESIGN half of that gap: a complete, buildable
+Turn "evals exist" into an honest design for executing skill cases. Decision
+D3 keeps skill eval files structurally validated, while the
+[shipped Behavioral Eval Runner](../../../tools/behavioral_eval_runner/README.md)
+provides offline preparation and grading of recorded synthetic controls.
+It has no general live skill-session or provider dispatch. The standing
+gap is live skill invocation and semantic judging; no case may be called
+passing without its own recorded observation. This skill closes the DESIGN
+half of that gap: a complete, buildable
 specification of the runner — execution semantics per case type, judging,
 reporting, cost, flake policy, CI posture — while keeping the honesty rule
-intact: until a runner is built and run, eval results do not exist, and this
-skill never implies otherwise.
+intact: this design creates no execution result and never implies otherwise.
 
 ## Use When
 
@@ -89,8 +97,8 @@ skill never implies otherwise.
    case failures or passes.
 4. **Design the report.** Per-case PASS / FAIL / ERROR / UNRUN; per-skill
    rollup; corpus health metrics (trigger accuracy, discrimination wins,
-   refusal compliance). UNRUN is the default state of every case — the
-   report shape itself preserves the no-runner-yet honesty.
+   refusal compliance). UNRUN is the default for a case without a recorded
+   execution observation; the report must preserve that distinction.
 5. **Model cost and sampling tiers.** Full-corpus cost ≈ cases × repeats ×
    (session + judge) calls. Define tiers: changed-skills-only on a PR,
    sampled cross-section on cadence, full corpus rarely — plus a spend cap
@@ -106,8 +114,8 @@ skill never implies otherwise.
    record and a human decision. The structural validator remains the
    required floor throughout — the runner extends it, never replaces it.
 8. **Deliver the design** in the Output Format, with open decisions listed
-   and the non-claims section stating plainly: no runner exists as of this
-   design; nothing here is an eval result.
+   and the non-claims section distinguishing shipped offline capability from
+   proposed live/provider execution; nothing here is an eval result.
 
 Execution-semantics tables, the judging decision table, report schema,
 sampling-tier math, and flake-policy parameters:
@@ -118,7 +126,7 @@ sampling-tier math, and flake-policy parameters:
 ```
 EVAL RUNNER DESIGN — <library / repo>
 Corpus:         <N skills, M evals.json cases, K trigger-evals cases; case types found>
-Convention:     structural-only today (<where that is recorded>); this design changes no convention
+Convention:     D3 structural skill-eval files; shipped offline runner; no general live skill-session dispatch
 Execution:      <per case type: session setup, pass condition, isolation rule>
 Judging:        <deterministic checks | LLM-judge rubric source, judge independence, JUDGE_ERROR handling>
 Reporting:      <per-case states incl. UNRUN default; per-skill rollup; corpus metrics>
@@ -126,7 +134,7 @@ Cost & sampling:<full-run cost model; tiers (PR / cadence / full); spend cap + k
 Flake policy:   <repeats N, quorum rule, quarantine visibility>
 CI posture:     advisory lane first; promotion criteria: <stability record + human decision>; structural validator stays required
 Open decisions: <judge model choice, repeat counts, budget owner, …>
-Non-claims:     no runner exists as of this design; no eval has been executed; nothing above is a result
+Non-claims:     offline runner exists; this design executed no case and supplies no result; live/provider path remains gated
 ```
 
 ## Validation Checklist
@@ -175,12 +183,12 @@ Non-claims:     no runner exists as of this design; no eval has been executed; n
 
 ## Stop Conditions
 
-- Asked to state or record that the library's evals PASS → refuse: no
-  runner exists; a design is not execution. The structural-only convention
-  stands until a built runner produces real results.
+- Asked to state that an unobserved skill case PASSES → refuse: the shipped
+  offline runner does not establish a live skill-session result, and a design
+  is not execution. Report the case as UNRUN until valid observations exist.
 - Asked to BUILD the runner as part of this design → stop at the spec:
-  implementation is a separate, separately-approved task (it adds code, CI
-  lanes, and spend). Hand over the design and say so.
+  additional live/provider implementation is a separate, separately-approved
+  task (it adds code, CI lanes, and spend). Hand over the design and say so.
 - Asked to weaken or remove the structural validator because "the runner
   will cover it" → refuse; the floor stays.
 - The eval corpus is unreadable or its case-type conventions cannot be

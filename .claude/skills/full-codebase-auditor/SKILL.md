@@ -5,6 +5,12 @@ description: 'Audit an ENTIRE repository with inventory-first discipline — enu
 
 # Full Codebase Auditor
 
+Terms: **CI/CD** means continuous integration and continuous delivery;
+**IaC** means infrastructure as code; **CLI** means command-line interface;
+**ADR** means architecture decision record; **CVE** means Common
+Vulnerabilities and Exposures; **authn** means authentication; **authz**
+means authorization.
+
 ## Purpose
 
 Deliver a whole-repository audit whose coverage is provable: the inventory
@@ -56,7 +62,9 @@ check), and no category ever borrows the confidence of a stronger one.
 3. **Audit per dimension, collecting evidence:**
    - *Architecture:* real component boundaries, dependency direction
      violations, shared-data coupling, doc-vs-code drift.
-   - *Security:* secrets in history/config, authn/authz patterns at
+   - *Security:* presence, path and type of secrets in history/config
+     without copying credential values; route apparent live exposure to a
+     human and `sensitive-disclosure-guard`; authn/authz patterns at
      boundaries, input validation, dependency CVE exposure, dangerous
      defaults. (Repo-level review, not a pentest — say so.)
    - *Quality:* hotspot complexity × churn, duplication concentrations,
@@ -120,8 +128,9 @@ Executive summary: <≤6 sentences, state + top risks + recommended next steps>
   UNLISTED depth-limiting is not.
 - A test suite can be green and enforce nothing — check CI wiring and
   assertion quality, not the badge.
-- Secrets live in git HISTORY after deletion from HEAD; scan history, and
-  treat any found credential as live until rotation is confirmed.
+- Secrets can remain in git HISTORY after deletion from HEAD. Check for
+  exposure without reproducing values in the report, and treat any found
+  credential as live until rotation is confirmed.
 - Monorepos hide whole projects in subdirectories with their own manifests
   and CI — the inventory census must catch them or the audit lies.
 - Recency bias: last quarter's code reflects the current team; five-year-old
@@ -133,8 +142,9 @@ Executive summary: <≤6 sentences, state + top risks + recommended next steps>
   inventory, propose a staged plan (inventory now, dimensions per pass), and
   let the human pick rather than delivering thin uniform coverage silently.
 - A live, exploitable vulnerability or leaked credential is found →
-  surface immediately via `human-approval-boundary`; report-writing never
-  queues behind an active exposure.
+  surface presence/path/type immediately to a human through
+  `human-approval-boundary` and `sensitive-disclosure-guard`, without
+  copying the value; report-writing never queues behind an active exposure.
 - Audit would require executing untrusted code (builds, installs, hooks) →
   static-only unless the human approves a sandboxed run.
 - The repo's identity/remote doesn't match what the audit was commissioned

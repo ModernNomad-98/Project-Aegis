@@ -11,7 +11,7 @@
         "triggers": true,
         "assertions": [
           "Classifies the flag as a temporary release flag and plans progressive stages (internal → canary/% → cohorts → GA) with per-stage advance AND rollback criteria.",
-          "Defines a small guardrail-metric set (errors, latency, checkout conversion) each with a rollback threshold, automatic where possible, plus a tested kill switch.",
+          "Defines a small guardrail-metric set (errors, latency, checkout conversion) each with a rollback threshold, automatic where possible, plus a kill-switch test procedure and pre-ramp evidence gate.",
           "Chooses the fail-safe default: if the flag service is down, evaluate to the OLD checkout, not the half-built new path.",
           "Assigns an owner and a post-GA removal trigger, with cleanup of the flag AND the dead code path in the plan.",
           "Notes that executing the rollout on production follows the approval path, not this design skill."

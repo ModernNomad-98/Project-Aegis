@@ -1,16 +1,18 @@
 ---
 name: feature-flag-rollout-strategist
-description: 'Design the ROLLOUT STRATEGY for shipping a change safely behind a flag — classify the flag by purpose (release, ops/kill-switch, experiment, permission — release flags stay separate from permanent entitlements), plan progressive delivery (internal → canary/% → cohorts → GA), define sticky targeting, set guardrail metrics with auto-rollback criteria and a tested kill switch, choose the fail-safe default when the flag service is down, and manage the lifecycle so release flags are removed after GA (flag debt). Owns HOW a change is de-risked — NOT the entitlement/permission model: WHO a plan or role includes is plan-entitlement-architect / authorization-matrix-designer, and an experiment''s DESIGN/readout is ab-test-designer. Use when planning a staged rollout, a canary or percentage ramp, a kill switch, or flag cleanup. Do NOT use to model plan/feature entitlements (plan-entitlement-architect), role permissions (authorization-matrix-designer), or design/analyze an A/B test (ab-test-designer).'
+description: 'Design the ROLLOUT STRATEGY for a change behind a flag — classify the flag by purpose (release, ops/kill-switch, experiment, permission — release flags stay separate from permanent entitlements), plan progressive delivery (internal → canary/% → cohorts → GA), define sticky targeting, set guardrail metrics with auto-rollback criteria and a pre-ramp kill-switch test gate, choose the fail-safe default when the flag service is down, and manage the lifecycle so release flags are removed after GA (flag debt). Owns HOW a change is de-risked — NOT the entitlement/permission model: WHO a plan or role includes is plan-entitlement-architect / authorization-matrix-designer, and an experiment''s DESIGN/readout is ab-test-designer. Use when planning a staged rollout, a canary or percentage ramp, a kill switch, or flag cleanup. Do NOT use to model plan/feature entitlements (plan-entitlement-architect), role permissions (authorization-matrix-designer), or design/analyze an A/B test (ab-test-designer).'
 ---
 
 # Feature Flag Rollout Strategist
+
+Terms: **GA** means general availability; **UX** means user experience.
 
 ## Purpose
 
 Feature flags are simultaneously the best way to ship safely and the
 easiest way to create a permanent mess. Done well, a change reaches 1%
 of internal users, bakes against guardrail metrics, expands to cohorts,
-and hits GA — with a kill switch that has actually been tested. Done
+and hits GA only after a kill-switch test has produced required evidence. Done
 badly, a "temporary" release flag becomes load-bearing config three
 years later, a percentage rollout flip-flops users between variants
 because assignment isn't sticky, and the flag is quietly conflated with
@@ -78,8 +80,8 @@ de-risked into production — not who is entitled to it.
 4. **Set guardrails and automatic rollback.** A SMALL set of metrics that
    must not regress (error rate, latency, a key conversion/correctness
    signal), each with a threshold that triggers rollback — automatic
-   where possible. Define the kill switch and require it to be TESTED,
-   not assumed.
+   where possible. Specify the kill-switch test procedure and the evidence
+   required before a rollout stage advances; do not assume a test ran.
 5. **Choose the fail-safe default.** What the flag evaluates to if the
    flag service is down or slow — the SAFE state (usually "old behavior"
    for a release flag; "protective" for a kill switch). A flag that fails
@@ -110,7 +112,7 @@ Stages:       internal → canary/% → cohorts → GA
   per stage:  population, bake time, ADVANCE criteria (guardrails green), ROLLBACK criteria
 Targeting:    sticky by <stable id>; first segments; exclusions
 Guardrails:   <small metric set> each with rollback threshold; automatic where possible
-Kill switch:  <mechanism> — TESTED; who can trigger; how fast
+Kill switch:  <mechanism>; test procedure and required evidence before ramp; who can trigger; how fast
 Fail-safe:    flag-service-down default = <safe state> (release → old behavior)
 Interactions: <risky flag combinations; cross-surface consistency; caching>
 Lifecycle:    owner + removal trigger; cleanup = delete flag + dead code path
@@ -127,7 +129,7 @@ Boundaries:   entitlement → plan-entitlement-architect / authorization-matrix-
 - [ ] Targeting is sticky by a stable id; a user doesn't flip variants
       across sessions/surfaces.
 - [ ] A small guardrail-metric set has rollback thresholds, automatic
-      where possible, plus a TESTED kill switch.
+      where possible, plus a kill-switch test plan and pre-ramp evidence gate.
 - [ ] The fail-safe default (flag service down) is the safe state, not
       unfinished code failing open.
 - [ ] Risky flag interactions and cross-surface consistency are

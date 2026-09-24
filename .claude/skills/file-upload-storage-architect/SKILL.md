@@ -5,6 +5,14 @@ description: Design file/object storage and upload flows for a multi-tenant SaaS
 
 # File Upload Storage Architect
 
+Terms: **SaaS** means software as a service; **URL** means uniform resource
+locator; **PII** means personally identifiable information; **RLS** means
+row-level security; **CDN** means content delivery network; **MIME** means
+Multipurpose Internet Mail Extensions; **XSS** means cross-site scripting;
+**DB** means database; **HTML** means Hypertext Markup Language; **SVG**
+means Scalable Vector Graphics. **HTTP** means Hypertext Transfer Protocol;
+its **PUT** method uploads and **GET** method retrieves.
+
 ## Purpose
 
 File uploads are a security and cost surface disguised as a convenience:
@@ -72,7 +80,9 @@ this owns the storage architecture.
    Proxied (through the app) only when the app must inspect/transform every
    byte inline, accepting the size cap and compute cost. State the choice and
    why. For direct uploads, the app issues a signed URL and RECORDS the
-   intended object; it does not trust the client to report success.
+   intended object. Before marking it complete, the server checks object
+   existence and expected metadata at storage; it does not trust a client
+   success report.
 2. **Scope signed URLs narrowly and briefly.** A signed URL grants exactly
    one verb (PUT for upload, GET for download) on exactly one object key, with
    a short expiry (minutes, not days), and — for uploads — a content-length
@@ -82,8 +92,9 @@ this owns the storage architecture.
 3. **Design storage tenancy.** Shared bucket with a mandatory tenant path
    prefix (`<tenant-id>/<random-object-id>`) or per-tenant buckets, chosen to
    match the data-tenancy model. The access rule: a signed URL or policy for
-   tenant A can only ever name keys under A's prefix; a client cannot craft a
-   key that escapes its tenant. Hand the resulting bucket/RLS policy to
+   tenant A can only ever name objects in A's bucket or under A's prefix,
+   according to the chosen model; a client cannot craft a key that escapes
+   its tenant. Hand the resulting bucket/RLS policy to
    `rls-policy-auditor` for verification.
 4. **Validate on CONTENT, not name.** Enforce the size cap at the storage
    layer (not just client-side), and validate type by magic bytes / content
@@ -116,12 +127,12 @@ this owns the storage architecture.
 
 ```
 FILE UPLOAD & STORAGE DESIGN — <system/domain>
-Upload flow:    <direct-to-storage | proxied> + why; app records intent, does
-  not trust client success report
+Upload flow:    <direct-to-storage | proxied> + why; app records intent and
+  verifies object existence/metadata at storage before completion
 Signed URLs:    <one verb + one object key + short expiry + size/type constraint;
-  never prefix/bucket-scoped; key = server-derived tenant/<random-id>>
+  never prefix/bucket-scoped; server-derived key in tenant bucket or prefix>
 Storage tenancy: <shared bucket + tenant prefix | per-tenant bucket>; a signed
-  URL/policy for A names only A's keys → policy audit to rls-policy-auditor
+  URL/policy for A names only A's bucket/prefix keys → policy audit to rls-policy-auditor
 Validation:     <storage-enforced size cap; magic-byte/content-type check, not
   extension; mismatch → reject/quarantine>
 Scanning:       <malware/content scan before serve/process; quarantine/pending
@@ -139,11 +150,12 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 ## Validation Checklist
 
 - [ ] Upload flow (direct vs proxied) is chosen with a stated reason; direct
-      uploads have the app record intent and not trust a client success report.
+      uploads record intent and verify storage existence/metadata before
+      completion, without trusting a client success report.
 - [ ] Signed URLs grant one verb on one object key with a short expiry and
       size/type constraints — never prefix- or bucket-scoped.
-- [ ] Object keys are server-derived (`tenant/<random-id>`); a client cannot
-      craft a key that escapes its tenant prefix.
+- [ ] Object keys are server-derived; a client cannot craft a key outside
+      its tenant's bucket or prefix, according to the selected tenancy model.
 - [ ] Size cap is enforced at the storage layer; type is validated by content/
       magic bytes, not extension or client MIME.
 - [ ] Files are scanned before serve/process and held in quarantine until

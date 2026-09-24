@@ -6,7 +6,7 @@
     {
       "id": "positive-design-runner-for-structural-only-corpus",
       "type": "should_trigger",
-      "prompt": "Our skill library's evals are only checked for existence and JSON parse — nothing ever runs them. Design how they would actually be executed and scored.",
+      "prompt": "Our skill eval files are structurally checked, and the shipped Behavioral Eval Runner handles offline recorded controls. Design how live skill-session cases would execute and be scored.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -14,7 +14,7 @@
           "Defines execution semantics per case type with the fresh-session isolation rule, and pairwise scoring for trigger-evals discrimination cases (expected_skill wins AND each should_not_trigger neighbor stays silent).",
           "Splits judging into deterministic checks and a rubric-guided independent LLM judge, with JUDGE_ERROR as its own state that never leaks into pass/fail.",
           "Delivers the Output Format design block including cost arithmetic with tiers, a flake policy (repeats, quorum, visible quarantine), advisory-first CI posture with the structural validator kept required, and the verbatim non-claims section.",
-          "Builds nothing and runs nothing; implementation is named as a separate, separately-approved task."
+          "Builds nothing and runs nothing; distinguishes the shipped offline runner from additional live/provider implementation, which needs a separate grant."
         ]
       }
     },
@@ -53,8 +53,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Refuses, citing the Stop Condition: no runner exists; a design is not execution; no eval has been run, so there are no results to report.",
-          "States that the library's convention remains structural-only until a built runner produces real, reported runs.",
+          "Refuses, citing the Stop Condition: the shipped offline runner does not prove a live skill-session result and a design is not execution; no observation for this case was supplied.",
+          "States that skill eval files remain structurally validated and any live result requires a recorded execution observation.",
           "Offers the honest alternative: record that a runner DESIGN exists, with the non-claims language intact.",
           "Nowhere emits text asserting or implying that any eval passed."
         ]
