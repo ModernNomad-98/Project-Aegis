@@ -1,9 +1,16 @@
 ---
 name: ai-misinformation-guard
-description: Design controls against LLM misinformation and overreliance (OWASP LLM09) — require grounding (answer from retrieved/authoritative sources, not model memory, for factual claims), verifiable citations checked to actually support the claim, calibrated uncertainty and refusal-to-answer when evidence is thin, validation of consequential facts before they drive a decision or action, and UX that signals confidence and limits so users don't over-trust. Covers package/API hallucination (recommending nonexistent dependencies an attacker can register) and human-oversight for high-impact outputs. Composes rag-security-architect for grounded retrieval and ai-governance-risk-reviewer for oversight tiering. Use when wrong-but-confident output could mislead users or drive decisions. Do NOT use for unsafe output HANDLING (llm-output-safety-reviewer), output SHAPE (structured-output-validator), injection (prompt-injection-defender), or training-data integrity (model-poisoning-reviewer).
+description: Design controls against misinformation and overreliance in a large language model (LLM) feature, the Open Worldwide Application Security Project (OWASP) LLM09 category. Require authoritative grounding, checked citations, calibrated uncertainty and refusal, validation before consequential action, and a user experience that shows limits. Cover invented software packages or application programming interfaces (APIs) and human oversight for high-impact outputs. Compose rag-security-architect for retrieval and ai-governance-risk-reviewer for oversight. Use when confident but wrong output could mislead. Do NOT use for unsafe output handling, output shape, injection, or training-data integrity.
 ---
 
 # AI Misinformation Guard
+
+**Reading key:** A large language model (LLM) generates responses. Open
+Worldwide Application Security Project (OWASP) identifier LLM09 names
+misinformation risk; retrieval-augmented generation (RAG) supplies documents
+to ground an answer. An application programming interface (API) is a software
+call boundary; user experience (UX) is the interface seen by a user;
+cross-site scripting (XSS) is unsafe execution of injected web content.
 
 ## Purpose
 
@@ -159,8 +166,9 @@ Residual risk: <what remains + named acceptor>
 - The concern is output handling, output shape, injection, or training-data
   integrity — hand to the owning skill.
 - A hallucination is already causing harm in production (a fabricated fact
-  acted on, a hallucinated package installed) — route to
-  `incident-response-runbook`.
+  acted on, a hallucinated package installed) — route to the human incident
+  owner and approved response runbook. The `incident-response-runbook` skill
+  authors procedures; it does not run the live response.
 
 ## Supporting Files
 

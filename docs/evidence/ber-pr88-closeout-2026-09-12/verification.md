@@ -1,5 +1,17 @@
 # Candidate verification — 2026-09-12
 
+**Reading key:** This is candidate test evidence for Behavioral Eval Runner
+(BER) pull request (PR) #88. A software development kit (SDK) is a provider's
+programming package; Portable Operating System Interface (POSIX) identifies
+Unix-like host behavior. Developer Certificate of Origin (DCO) is commit
+sign-off. User identifier (UID) and group identifier (GID) are operating-system
+identity fields. Owner decision (OD) is a later human calibration disposition.
+YAML means “YAML Ain't Markup Language”; PyYAML is its Python parser
+dependency. Quality assurance (QA) means
+independent test review. `TEMP` and `TMP` name temporary-directory
+environment variables. The counts below belong to the exact named
+candidate, not every later tree.
+
 > **Current reading, checked 2026-09-23:** The test counts below bind to the
 > named candidate commit and tree, not to every later revision. Pull request
 > (PR) #88 subsequently merged; the [delivery closeout](README.md) records

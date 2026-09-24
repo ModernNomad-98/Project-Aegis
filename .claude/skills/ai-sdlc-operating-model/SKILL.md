@@ -1,9 +1,14 @@
 ---
 name: ai-sdlc-operating-model
-description: Define the end-to-end operating model for AI-assisted software work — the named stages (context, classify, plan, implement, validate, review, merge, close, learn), the authority holder at each (human, agent, or agent-with-approval), each stage's entry/exit gate, and its enforcing discipline skill — composing the Phase 1 pack plus agent-authorization-matrix, agent-memory-governance, and agent-governance-audit into one contract. Use when asked how humans and AI agents should plan, build, review, merge, and close work together, when adopting agents on a team or repo, when agent work is undisciplined (skipped review, surprise merges, missing evidence), or when writing or overhauling an AI-SDLC policy. Produces the operating-model document and a gap list against observed practice. Do NOT use to enforce a single stage in-flight (the stage skills own that), define standing agent permissions (agent-authorization-matrix), or audit one change's compliance (agent-governance-audit).
+description: "Define the end-to-end software development lifecycle (SDLC) operating model for artificial-intelligence-assisted work: context, classify, plan, implement, validate, review, merge, close, and learn. Name the human or agent authority holder, entry and exit gates, and owning skill at each stage. Compose agent-authorization-matrix, agent-memory-governance, and agent-governance-audit. Use when designing how humans and agents build together, adopting agents on a team, correcting skipped review or surprise merges, or writing an AI-assisted SDLC policy. Produce an operating model and evidence-based gap list. Do NOT use to enforce one stage, define standing permissions, or audit one change's compliance."
 ---
 
 # AI-Era SDLC Operating Model
+
+**Reading key:** Artificial intelligence (AI) assists the software
+development lifecycle (SDLC). A pull request (PR) proposes a repository
+change; continuous integration (CI) runs automated checks. This skill
+defines a team process, not a new grant of agent authority.
 
 ## Purpose
 

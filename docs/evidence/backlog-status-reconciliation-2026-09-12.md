@@ -1,5 +1,22 @@
 # Backlog status reconciliation — 2026-09-12
 
+> **Current reading, checked 2026-09-24:** This crosswalk records what was
+> reconciled on September 12, 2026. Its present-tense references to an open
+> runner schema item or unfinished pull request #88 belong to that date;
+> subsequent requests merged. Use the
+> [current Behavioral Eval Runner backlog](../roadmaps/behavioral-eval-runner-backlog.md#start-here-status-and-routes)
+> and [evidence index](README.md) for today's status. The original crosswalk
+> below remains historical and grants no new implementation or execution.
+
+**Reading key:** Behavioral Eval Runner (BER) is the evaluation tool;
+`BER-BKL` names a runner backlog item; `BER-DEC` names a runner decision-log
+entry; shorter `D` labels identify catalog decisions. `AEGIS-APR` names an
+owner approval-register entry. Owner
+decision (OD) is a later human disposition of measured calibration. A pull
+request (PR) proposes a repository change. The old status words below apply
+to the dated source revision, not necessarily to current main. Row-level
+security (RLS) restricts database rows by the acting user's policy.
+
 The owner requested cleanup of stale entries for completed work. Source inspected:
 `review/ber-phase01-corrections` at `6bd5abadd16a3ab6cfd89cc15dfaa5572ac9dedd`;
 merged main at `000352f55b71f0c3e897a482d279d34bfaa3d66b`.

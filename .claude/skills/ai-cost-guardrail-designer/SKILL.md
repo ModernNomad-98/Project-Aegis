@@ -1,9 +1,19 @@
 ---
 name: ai-cost-guardrail-designer
-description: Design cost and consumption guardrails for an LLM feature covering both spend and unbounded-consumption abuse (OWASP LLM10 — denial-of-service and denial-of-wallet) — per-request token caps (input and output), per-user/tenant/plan budgets and cost-aware (token-based, not request-count) rate limits, model selection by task, concurrency and queue limits, loop/recursion bounds for agents, input-size limits, a fail-closed spend kill switch and degraded-mode fallback, and cost/usage telemetry with alerts before the budget is gone. Composes saas-cost-architect for unit economics and observability-operator for the metering. Use when adding budgets/quotas/rate limits to an AI feature, or defending against token-drain, denial-of-wallet, or stolen-key LLMjacking. Do NOT use for whole-product cost modeling (saas-cost-architect), plan feature gating (plan-entitlement-architect), implementing the alerts (observability-operator), or model routing/fallback logic (ai-router-architect).
+description: Design cost and consumption guardrails for a large language model (LLM) feature, covering spend and unbounded-consumption abuse (Open Worldwide Application Security Project identifier LLM10). Specify token caps, per-user/tenant/plan budgets, cost-aware rate limits, task-aware model choice, concurrency and queue bounds, agent loop limits, input limits, a fail-closed spend kill switch, degraded fallback, and telemetry. Compose saas-cost-architect for unit economics and observability-operator for metering. Use for budgets, quotas, rate limits, token drain, denial of wallet, or stolen-key model abuse. Do NOT use for whole-product cost models, plan feature gating, alert implementation, or model routing.
 ---
 
 # AI Cost Guardrail Designer
+
+**Reading key:** A large language model (LLM) generates responses using
+metered tokens. Open Worldwide Application Security Project (OWASP) code
+LLM10 names unbounded consumption. Common Weakness Enumeration (CWE) item
+636 describes a control that fails open instead of securely denying a call.
+An application programming interface (API) is a software call boundary;
+continuous integration (CI) runs automated checks. “LLMjacking” means abuse
+of a stolen model-provider credential to consume the owner's allowance.
+First in, first out (FIFO) is a queue order that serves earlier arrivals
+before later ones.
 
 ## Purpose
 
@@ -105,7 +115,8 @@ the guardrail design.
    the denial-of-wallet vector (CWE-636). The kill switch inherits the same
    rule: a broken budget-state check ENGAGES it, never disengages. The general
    fail-closed discipline is `error-handling-security-reviewer`'s; this is its
-   AI-spend application. Wire confirmed abuse to `incident-response-runbook`.
+   AI-spend application. Route confirmed live abuse to the human incident
+   owner and approved response runbook; this skill designs the control.
 7. **Add the provider-side backstop.** Application controls are not the last
    line: set a HARD spend cap on the provider account itself (a ceiling that
    stops inference) and billing-anomaly/spike alerts that fire before a large
@@ -246,10 +257,12 @@ Residual exposure: <worst-case spend + named acceptor>
   concrete consumption surface.
 - The unit economics/budget envelope is undefined — get it from
   `saas-cost-architect`; caps need a number to enforce.
-- A spend spike is happening NOW — route to `incident-response-runbook` and
-  the kill switch; design follows containment. If a leaked/compromised
-  provider key is suspected, treat it as an incident and rotate via
-  `secrets-identity-hardener`.
+- A spend spike is happening NOW — route to the human incident owner and
+  approved response runbook. The owner decides whether to activate the kill
+  switch or rotate a suspected compromised key under the applicable live
+  authority; this skill designs those controls. Use
+  `incident-response-runbook` to author or improve the procedure and
+  `secrets-identity-hardener` to design credential custody and rotation.
 - The ask is really key custody/rotation/storage mechanics
   (`secrets-identity-hardener`) or a general fail-closed review of error paths
   (`error-handling-security-reviewer`) — hand to the owning skill; this skill

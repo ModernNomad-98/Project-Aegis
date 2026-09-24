@@ -1,5 +1,15 @@
 # PR #88 engineering closeout — 2026-09-12
 
+**Reading key for maintainers:** A pull request (PR) proposes a repository
+change; Behavioral Eval Runner (BER) is the evaluation tool; a work package
+(WP) is a bounded delivery unit. Continuous integration (CI) runs automated
+checks. A software development kit (SDK) is a provider's programming package;
+Portable Operating System Interface (POSIX) identifies the Unix-like host
+behavior discussed here. Developer Certificate of Origin (DCO) is the commit
+sign-off; quality assurance (QA) is independent test review; owner decision
+(OD) is a later human calibration disposition. This is a dated closeout, not
+a current authorization to run calibration.
+
 > **Delivered.** [PR #88](https://github.com/ModernNomad-98/Project-Aegis/pull/88)
 > merged at `f5e04ad07a5fd2b34b7470bffd38a50c15ce691a`; its tree matches tested head
 > `d53752d2b600410da122d4b85429c35f30d7c873`.
@@ -10,6 +20,10 @@
 > authority is now recorded in the [owner register](../../approvals/APPROVAL_REGISTER.md).
 > Measured calibration remains unfinished; see the
 > [current backlog](../../roadmaps/behavioral-eval-runner-backlog.md).
+> A later [sanitized replacement candidate summary](../ber-replacement-candidate-1-summary.md)
+> records a **PENDING** 160-case packet. Its private labels are not approved;
+> the historical “replacement preparation plan remains open” wording below
+> describes the original closeout date.
 
 This record continues the [Phase 0/1 review](../behavioral-eval-runner-phase01-review.md).
 The owner authorized implementation, offline tests, commits, pushes and normal

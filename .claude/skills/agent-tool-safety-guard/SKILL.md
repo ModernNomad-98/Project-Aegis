@@ -1,9 +1,17 @@
 ---
 name: agent-tool-safety-guard
-description: Design or review least-privilege tool/function access for an LLM agent, containing excessive agency and tool misuse (OWASP LLM06 + ASI02) — build the per-tool permission matrix (side effects, blast radius, who it runs as), validate arguments against a schema before execution, run tools with the CALLING USER's authority (not a service account's), gate irreversible/high-impact actions behind human approval, map tool-chain abuse paths where one tool's output drives another's arguments, and class code-execution tools (interpreter/shell/eval) as maximal blast radius needing sandbox plus approval (the tool-side ASI05 slice). Composes human-approval-boundary and agent-authorization-matrix. Use when an agent can call tools/functions/APIs and you need to scope what it may do. Do NOT use for injection defense (prompt-injection-defender), the sandbox itself (llm-output-safety-reviewer), retrieval authz (rag-security-architect), or standing merge/deploy authority (agent-authorization-matrix).
+description: Design or review least-privilege tool and function access for a large language model (LLM) agent, containing excessive agency and tool misuse. Covers Open Worldwide Application Security Project (OWASP) identifiers LLM06 (excessive agency), ASI02 (tool misuse), and the tool-enabled ASI05 code-execution slice. Build a per-tool permission matrix, validate arguments before execution, use the calling user's authority, gate high-impact actions behind human approval, and map tool-chain abuse. Code-execution tools need a sandbox and approval. Composes human-approval-boundary and agent-authorization-matrix. Use when an agent can call tools, functions or application programming interfaces (APIs). Do NOT use for injection defense, sandbox design, retrieval authorization, or standing merge/deploy authority.
 ---
 
 # Agent Tool Safety Guard
+
+**Reading key:** A large language model (LLM) agent can request tool calls.
+Open Worldwide Application Security Project (OWASP) code LLM06 names
+excessive agency; agentic codes ASI02 and ASI05 refer here to tool misuse and
+tool-enabled code execution. An application programming interface (API) is a
+software call boundary; natural language (NL) is ordinary user text.
+`authz` means authorization, and remote code execution (RCE) means an
+attacker can cause code to run across a trust boundary.
 
 ## Purpose
 
@@ -94,7 +102,9 @@ from `human-approval-boundary`; standing agent authority from
 7. **Design containment and telemetry.** Rate/quantity limits per tool,
    a kill switch to disable a tool or the agent, and logging of every tool
    call with arguments and outcome (compose `observability-operator`).
-   Confirmed abuse routes to `incident-response-runbook`.
+   Confirmed live abuse routes to the human incident owner, who follows the
+   approved response runbook. The `incident-response-runbook` skill can
+   author or improve that procedure later; it does not run the incident.
 8. **Design the red-team cases.** For each high-risk tool: an injection or
    hallucination that tries to trigger it out of scope, with the expected
    SAFE outcome (denied at authz/approval). Hand to `ai-evaluation-harness`.
@@ -131,7 +141,7 @@ Residual risk: <what remains + named acceptor>
       sandbox-required (per `llm-output-safety-reviewer`), approval-gated,
       with misuse and NL-driven execution paths mapped (ASI02/ASI05).
 - [ ] Kill switch, per-tool limits, and per-call telemetry are specified;
-      abuse routes to `incident-response-runbook`.
+      live abuse routes to the human incident owner and approved runbook.
 
 ## Tool Permission Rules
 
@@ -179,8 +189,10 @@ Residual risk: <what remains + named acceptor>
   the fix through `human-approval-boundary`.
 - The gap is really injection reaching the tools, code execution, or standing
   merge/deploy authority — hand to the owning skill.
-- A review finds a tool already being abused in production — route to
-  `incident-response-runbook`.
+- A review finds a tool already being abused in production — route to the
+  human incident owner and approved response runbook. Activating a kill
+  switch or revoking access is a separately authorized live action; use
+  `incident-response-runbook` only to author or improve the procedure.
 
 ## Supporting Files
 

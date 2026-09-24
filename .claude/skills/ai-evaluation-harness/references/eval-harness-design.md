@@ -1,23 +1,43 @@
 # AI evaluation harness design
 
-Detail for `ai-evaluation-harness`. Absorbs the AI security test harness
-(reconciliation §3). Manual-only: runs spend tokens/money.
+This reference helps developers design a per-feature artificial intelligence
+(AI) evaluation dataset, graders and regression gate. Follow the owning
+[AI Evaluation Harness skill](../SKILL.md) for the workflow and its manual-only
+execution boundary. The security cases come from
+[reconciliation section 3](../../../../docs/reconciliation/step-0-reconciliation-v4.md);
+designing them is offline, while an actual model run spends tokens and money.
+
+**Reading key:** A large language model (LLM) generates responses;
+continuous integration (CI) runs automated checks; a pull request (PR)
+proposes a repository change. The 95th percentile (p95) latency is the time
+at or below which 95 percent of measured calls finish. ROUGE is a
+reference-answer text-overlap metric. `N` is the number of repeated samples
+per case. Decision D3 in the linked reconciliation requires honest reporting:
+structural evaluation-file validation does not prove a model run passed.
+This page is for feature-specific evaluations; the separate
+[Behavioral Eval Runner](../../../../tools/behavioral_eval_runner/README.md)
+has its own bounded calibration workflow and authority gates.
 
 ## Dataset composition
 
 Three case classes, versioned together:
 
-- **Representative** — sampled from the real input distribution the feature
-  serves. This measures whether it does its job. Keep it current with usage.
+- **Representative** — sample cases to reflect the real input distribution
+  the feature serves, using synthetic or explicitly authorized, redacted
+  cases. This measures whether it does its job. Keep it current with usage
+  without copying private
+  production data into a public evaluation set.
 - **Adversarial / red-team** — injection, jailbreak, data-exfiltration,
   tool-misuse, and disclosure probes. Sourced from `ai-threat-modeler` abuse
   cases, `prompt-injection-defender`'s payload catalog,
   `agent-tool-safety-guard`'s out-of-scope-trigger cases, and
   `rag-security-architect`'s cross-tenant retrieval cases. This measures
   whether it stays safe under attack.
-- **Regression** — every past production failure and every fixed bug, frozen
-  with its expected correct behavior. This measures whether old failures stay
-  fixed.
+- **Regression** — every past production failure and every fixed bug,
+  represented by a synthetic or explicitly authorized, redacted reproduction
+  frozen with its expected correct behavior. This measures whether old
+  failures stay fixed without copying raw incident or customer content into
+  public fixtures.
 
 Each case: `id`, `inputs`, `expected` (assertion or reference), `dimension`,
 `source`. Version the dataset; review changes like code.
@@ -62,8 +82,9 @@ Assert the SAFE OUTCOME, verifiably:
 - **Disclosure / prompt leakage:** system prompt / secrets not revealed
   (`system-prompt-leakage-reviewer` canaries).
 
-Use canary tokens: plant a unique marker as a "secret" in context and assert
-it never appears in output.
+Use synthetic canary tokens: plant a unique marker in authorized test context
+and assert it never appears in output. Never put a real secret or private
+production datum into this fixture by default.
 
 ## CI gate design
 
@@ -86,6 +107,8 @@ it never appears in output.
 
 ## Honesty (decision D3)
 
-There is no shared runner; this harness is per-feature. Report only runs that
-actually executed, with real numbers and real spend. Never claim "evals pass"
-as a substitute for running them.
+This reference designs per-feature evaluation cases. The separate Behavioral
+Eval Runner has a bounded Project Aegis calibration workflow; its existence
+does not authorize a per-feature provider run. Report only runs that actually
+executed, with real numbers and real spend. Never claim "evals pass" as a
+substitute for running them.

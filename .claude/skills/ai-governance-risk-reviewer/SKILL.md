@@ -1,9 +1,19 @@
 ---
 name: ai-governance-risk-reviewer
-description: Review the governance and risk posture of an AI feature — classify its risk tier by impact (who is affected, reversibility, autonomy, sensitive-data and rights exposure), assign accountable human ownership, require appropriate human oversight (advisory / human-in-the-loop / human-on-the-loop) matched to the tier, check user-facing AI disclosure and consent, data-use and retention posture, a model/feature card documenting intended use and known limits, and a map from applicable obligations (EU AI Act tiers, NIST AI RMF functions) to concrete controls. Composes ai-sdlc-operating-model, agent-governance-audit, and human-approval-boundary rather than restating them. Use for an AI risk assessment, an AI feature's go/no-go governance review, or AI-policy readiness. Do NOT use to audit one change's process compliance (agent-governance-audit), enumerate technical attack threats (ai-threat-modeler), or define the SDLC lifecycle (ai-sdlc-operating-model).
+description: "Review the governance and risk posture of an artificial intelligence (AI) feature: classify impact, assign a human owner, match human oversight to risk, check disclosure, consent, data use, retention, and a feature card, then map applicable European Union (EU) AI Act obligations and voluntary National Institute of Standards and Technology (NIST) AI Risk Management Framework (RMF) functions to controls. Composes ai-sdlc-operating-model, agent-governance-audit, and human-approval-boundary. Use for feature risk or policy review. Do NOT use for one change's process audit, technical threat modeling, or the software development lifecycle (SDLC) design."
 ---
 
 # AI Governance & Risk Reviewer
+
+**Reading key:** The European Union (EU) AI Act and the United States
+National Institute of Standards and Technology (NIST) Artificial Intelligence
+Risk Management Framework (AI RMF) are obligation and risk-method sources.
+Human in the loop (HITL) means a person approves each relevant decision;
+human on the loop (HOTL) means a person supervises and can intervene.
+Personally identifiable information (PII) can identify a person; user
+experience (UX) is what the user sees and can do. A pull request (PR)
+proposes a repository change; the software development lifecycle (SDLC)
+covers design through release.
 
 ## Purpose
 
@@ -130,7 +140,7 @@ Needs legal review: <items>
   to see the decision, have time and information to intervene, and not be
   rubber-stamping (see `human-agent-trust-reviewer` for consent fatigue).
 - Disclosure gaps hide in "helpful" UX: a support bot that never says it's a
-  bot, an AI-written email sent as a person. Material AF interaction needs
+  bot, an AI-written email sent as a person. Material AI interaction needs
   disclosure.
 - Provider data terms are part of governance: sending customer data to a model
   that trains on it can breach contracts and privacy law even if technically
@@ -150,7 +160,9 @@ Needs legal review: <items>
 - The question is really one change's process compliance, the technical threat
   model, or the SDLC lifecycle — hand to the owning skill.
 - A governance gap corresponds to an active harm in production — route to
-  `incident-response-runbook`.
+  the human incident owner and approved response runbook. The
+  `incident-response-runbook` skill authors or improves the procedure; it
+  does not run the incident.
 
 ## Supporting Files
 

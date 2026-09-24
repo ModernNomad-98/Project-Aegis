@@ -29,7 +29,7 @@ to the dated record that reports them.
 | --- | --- | --- |
 | Which backlog statuses were corrected in September 2026 | [Backlog status crosswalk](backlog-status-reconciliation-2026-09-12.md) | A dated correction, not a complete current inventory. |
 | Why the first BER host/capability spike accepted limited scope | [WP-2B-0 summary](behavioral-eval-runner-wp-2b-0-summary.md) | Outcome B is historical; later offline packages shipped, while live gates remain. |
-| What the offline runner core delivered | [WP-2B-1 summary](behavioral-eval-runner-wp-2b-1-summary.md) | Non-live control-plane evidence; no provider execution proof. |
+| What the offline runner core delivered | [WP-2B-1 summary](behavioral-eval-runner-wp-2b-1-summary.md) | Behavioral Eval Runner control evidence only; no provider execution proof. |
 | What the non-live Scenario A graders delivered | [WP-2B-2 summary](behavioral-eval-runner-wp-2b-2-summary.md) | Mock and recorded evidence only; no measured judge calibration. |
 | What the original calibration engineering and preflight recorded | [WP-2B-3 summary](behavioral-eval-runner-wp-2b-3-summary.md) | Its original approved input bytes are unavailable; current labels and execution are separate gates. |
 | How schema-integrity work was checked | [BKL-007 review](ber-bkl-007-schema-integrity.md) | PR #104 merged; the old conditional DONE statement is historical. |

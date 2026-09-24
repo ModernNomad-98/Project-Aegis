@@ -1,5 +1,18 @@
 # PR #88, then shared skill contracts — audited execution plan
 
+**Reading key:** This is a historical plan for Behavioral Eval Runner (BER)
+pull request (PR) #88, not an instruction to restart it. Owner decision (OD)
+is a later human calibration disposition. A software development kit (SDK)
+is a provider's programming package; Portable Operating System Interface
+(POSIX) refers to Unix-like host behavior; Developer Certificate of Origin
+(DCO) means commit sign-off. Priority zero (P0) and priority one (P1) mark
+finding urgency, with P0 the more urgent class. Continuous integration (CI)
+runs automated checks. Quality assurance (QA) means independent test review;
+JavaScript Object Notation (JSON) is a data format; a large language model
+(LLM) generates model output. An estimated time to complete (ETA) is a work
+forecast. `TEMP` and `TMP` name temporary-directory environment variables,
+not the repository root.
+
 > **Current reading, checked 2026-09-23:** This is the preflight plan as it
 > stood before delivery. Pull request (PR) #88's engineering, PR #90's shared
 > contracts and PR #91's offline continuous integration (CI) have since merged.

@@ -1,10 +1,16 @@
 ---
 name: ai-evaluation-harness
-description: 'MANUAL-ONLY; never auto-invoke. Design and run the evaluation harness for an LLM feature — a versioned dataset (representative, adversarial/red-team, and regression cases), graders per dimension (task quality, schema adherence, safety/refusal, groundedness/hallucination, injection resistance, latency, cost), pass/fail thresholds, and a CI gate that blocks a prompt/model/retrieval/provider change on regression. Absorbs the AI security test harness: injection, jailbreak, data-exfiltration, and tool-misuse suites are first-class dimensions. Running it spends tokens and money, so it is manual-only. Use when building AI evals, a golden dataset, regression gates for AI changes, or encoding red-team cases from ai-threat-modeler / prompt-injection-defender / agent-tool-safety-guard. Do NOT use for the code-change test pyramid (regression-suite-curator / qa-automation-architect), the threat model itself (ai-threat-modeler), or live production monitoring (observability-operator).'
+description: 'MANUAL-ONLY; never auto-invoke. Design and run the evaluation harness for a large language model (LLM) feature: a versioned dataset, quality and safety graders, pass/fail thresholds, and a continuous integration (CI) gate that blocks regressions. Include representative, adversarial, and regression cases; measure schema, refusal, grounding, injection resistance, latency, and cost. Running the harness can spend tokens and money, so it is manual-only. Use for evaluation datasets, regression gates, or red-team cases from ai-threat-modeler, prompt-injection-defender, and agent-tool-safety-guard. Do NOT use for the code-change test pyramid, threat-model design, or live production monitoring.'
 disable-model-invocation: true
 ---
 
 # AI Evaluation Harness
+
+**Reading key:** A large language model (LLM) generates responses;
+continuous integration (CI) runs automated checks. Decision D3 is the
+historical honesty rule used here: a report must not claim a run that did not
+execute. This manual-only skill may incur provider cost when actually run;
+the page alone grants no execution authority.
 
 ## Purpose
 
@@ -156,7 +162,9 @@ Not run / deferred: <what and why>
   `ai-threat-modeler` / `prompt-injection-defender` / `agent-tool-safety-guard`;
   this harness runs suites, it doesn't invent the threat model.
 - A run reveals an active safety regression already shipped to production —
-  route to `incident-response-runbook`.
+  route to the human incident owner and approved response runbook. The
+  `incident-response-runbook` skill can improve that procedure later; it
+  does not execute the live response.
 
 ## Supporting Files
 

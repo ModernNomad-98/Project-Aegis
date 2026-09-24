@@ -1,9 +1,18 @@
 ---
 name: ai-threat-modeler
-description: Build the AI-specific threat model for an LLM feature, RAG pipeline, or agent BEFORE it ships — inventory AI assets (prompts, models, vector stores, tools, credentials) and trust boundaries where user input, retrieved documents, tool outputs, and model outputs are all untrusted by default; enumerate threats per boundary against the OWASP LLM Top 10 (injection, disclosure, poisoning, prompt leakage, excessive agency, unbounded consumption); write abuse cases from attacker behavior; rank risks by concrete exploit path; and map every mitigation to an owning skill plus a red-team/eval case. Composes threat-modeler for the classic STRIDE surface. Use when a feature contains a model call, retrieval step, or agent loop and needs a threat model or AI risk analysis. Do NOT use for non-AI features (threat-modeler), to design one specific defense (prompt-injection-defender, rag-security-architect), review a diff (security-pr-reviewer), or build/run red-team evals (ai-evaluation-harness).
+description: Build an artificial-intelligence-specific threat model for a large language model (LLM) feature, retrieval-augmented generation (RAG) pipeline, or agent before release. Inventory prompts, models, stores, tools, credentials and trust boundaries; enumerate Open Worldwide Application Security Project (OWASP) LLM Top 10 threats; write attacker abuse cases; rank concrete exploit paths; and map mitigations to owning skills and evaluation cases. Compose threat-modeler for conventional application threats. Use for a model call, retrieval step or agent loop needing risk analysis. Do NOT use for non-AI features, one specific defense, diff review, or running evaluations.
 ---
 
 # AI Threat Modeler
+
+**Reading key:** A large language model (LLM) generates responses;
+retrieval-augmented generation (RAG) brings outside documents into its
+context. The Open Worldwide Application Security Project (OWASP) LLM Top 10
+lists model-specific risks. STRIDE is a conventional threat checklist:
+spoofing, tampering, repudiation, information disclosure, denial of service,
+and elevation of privilege. Server-side request forgery (SSRF) makes a
+server fetch an attacker-chosen address. This skill designs a threat model;
+it does not conduct live incident response.
 
 ## Purpose
 
@@ -160,8 +169,9 @@ Accepted/deferred risks: <risk — named acceptor — review date>
 - The feature turns out to have no model call, retrieval, or agent loop —
   hand to `threat-modeler` and stop.
 - Modeling reveals an apparently ACTIVE exploitation (injection already
-  landing, budget already draining) — report immediately and route to
-  `incident-response-runbook`; containment is a human decision.
+  landing, budget already draining) — report immediately to the human
+  incident owner, who follows the approved response runbook. Containment is
+  a human decision; `incident-response-runbook` only authors procedures.
 - The risk acceptance decision itself (ship despite X) belongs to a named
   human via `human-approval-boundary` — never accepted silently here.
 
