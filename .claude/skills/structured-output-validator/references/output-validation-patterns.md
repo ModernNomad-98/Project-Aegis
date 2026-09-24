@@ -1,5 +1,10 @@
 # Structured output validation patterns
 
+Use this reference with the [Structured Output Validator](../SKILL.md).
+
+JSON means JavaScript Object Notation; API means application programming
+interface; URL means uniform resource locator; XSS means cross-site scripting.
+
 Detail for `structured-output-validator`. The model response is untrusted
 input; validate it against a contract before any code acts on it.
 

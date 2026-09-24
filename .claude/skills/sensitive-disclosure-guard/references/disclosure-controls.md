@@ -1,6 +1,7 @@
 # Sensitive disclosure controls
 
-Detail for `sensitive-disclosure-guard`. OWASP LLM02 (Sensitive Information
+Use this reference with the [Sensitive Disclosure Guard](../SKILL.md).
+OWASP LLM02 (Sensitive Information
 Disclosure), 2025. Three leak surfaces: INTO the model, BACK from the model,
 RECORDED about the call.
 
@@ -59,8 +60,10 @@ documents, tool outputs — before assembly:
 ## Provider posture questions
 
 - Retention window for inputs/outputs; deletion on request.
-- Does the provider TRAIN on inputs? If yes, sensitive data must not be sent
-  (or must be redacted/minimized first) — training-on-inputs is disclosure
+- Does the provider TRAIN on inputs? If yes, removing unnecessary fields
+  alone does not make the remaining sensitive fields safe to send. Remove or
+  de-identify them, or establish explicit authorization for that provider
+  use before sending. Training-on-inputs is a disclosure consideration
   regardless of transport security.
 - Region/residency and sub-processors vs the data's regulatory needs.
 - Governance PERMISSION for the data use is `ai-governance-risk-reviewer`;

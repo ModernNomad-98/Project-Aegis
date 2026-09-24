@@ -1,5 +1,7 @@
 # System-prompt leakage checks
 
+Use this reference with the [System Prompt Leakage Reviewer](../SKILL.md).
+
 Detail for `system-prompt-leakage-reviewer`. OWASP LLM07 (System Prompt
 Leakage), 2025. Doctrine: **the system prompt is not a security control.**
 Review it as if it will be public — because it will be.

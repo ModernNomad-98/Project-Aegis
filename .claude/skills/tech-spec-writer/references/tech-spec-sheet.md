@@ -1,6 +1,12 @@
 # Tech Spec Sheet
 
+Use this reference with the [Tech Spec Writer](../SKILL.md).
+
 Detail for `tech-spec-writer`. Read on demand.
+
+API means application programming interface; ADR means architecture decision
+record; authn means authentication; authz means authorization; PII means
+personally identifiable information; E2E means end to end.
 
 ## Tech-spec template
 

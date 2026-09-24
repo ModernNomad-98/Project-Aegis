@@ -1,5 +1,12 @@
 # Isolation Surface Checklist
 
+Use this reference with the [Tenant Isolation Reviewer](../SKILL.md).
+
+RLS means row-level security; IDOR means insecure direct object reference;
+SQL means Structured Query Language; API means application programming
+interface; DB means database; CSV means comma-separated values; RAG means
+retrieval-augmented generation.
+
 Supporting detail for `tenant-isolation-reviewer`. Every review classifies all
 fifteen surfaces; none may be silently skipped.
 

@@ -30,6 +30,7 @@ itself); edits to the rules are themselves forced-full changes.
 scripts/**                  # repo automation
 package-lock.json  pnpm-lock.yaml  *.lockb   # dependency reality
 CLAUDE.md  AGENTS.md  .cursor/**             # agent instruction files
+.claude/skills/**  .codex/**                 # skill and agent configuration
 validation-rules.*          # this artifact itself
 
 # overrides — never-docs-only (disqualify docs-only; classify per rules)
@@ -47,8 +48,10 @@ src/**            → fast             # unless a forced-full path matched
 
 Notes on contentious rows:
 
-- **`**/*.md` docs-only**: safe ONLY because agent-instruction files are in
-  the override lists — a rulebook .md steers behavior and is not
+- **`**/*.md` docs-only**: safe ONLY after all agent-instruction and skill
+  entrypoint files in this repository are in the override lists. Add any
+  new instruction paths there before applying this starter rule; a rulebook
+  .md steers behavior and is not
   documentation in the validation sense.
 - **`scripts/**` forced-full**: repo automation runs with repo authority;
   treat as code with reach.

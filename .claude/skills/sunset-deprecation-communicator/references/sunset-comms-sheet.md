@@ -1,6 +1,9 @@
 # Sunset Comms Sheet
 
-Detail for `sunset-deprecation-communicator`. Read on demand.
+This sheet helps readers of the [Sunset Deprecation Communicator](../SKILL.md)
+plan an authorized retirement. An application programming interface (API)
+is a software contract; Request for Comments (RFC) documents define the
+HTTP header formats used below.
 
 ## Impact-assessment checklist
 
@@ -21,8 +24,9 @@ Detail for `sunset-deprecation-communicator`. Read on demand.
 | No parity replacement | Reconsider or extend; state honestly |
 
 Always meet at least the standing policy's minimum
-(`api-event-architect`). Hold the date; use grandfathering, not
-date-slipping, as the pressure valve.
+(`api-event-architect`). Prefer scoped grandfathering when appropriate.
+If contracts or compliance require a revised date, obtain the applicable
+owner decision and communicate the new date consistently.
 
 ## Escalating communication schedule
 
@@ -38,8 +42,9 @@ Every message: what / why / when / what-to-do / where-to-get-help.
 
 ## API deprecation signals
 
-- `Deprecation: <date>` and `Sunset: <date>` response headers (RFC-style)
-  on the deprecated surface.
+- `Deprecation: @1688169599` uses an RFC 9745 structured-field date
+  (Unix seconds); `Sunset: Sun, 31 Dec 2023 23:59:59 GMT` uses an RFC 8594
+  HTTP-date. Replace these illustrative dates with the approved schedule.
 - `Link` header to the migration docs where supported.
 - Changelog + versioned docs marking the version/endpoint deprecated.
 - Optional: warning field in the response body during the window.

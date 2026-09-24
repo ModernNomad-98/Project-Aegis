@@ -22,8 +22,11 @@ are clues to review, while the built client artifact is the exposure proof.
 | CI-only | Used by pipelines, not runtime | no | deploy token, registry password |
 | deploy-only | Injected at deploy, not in repo/build | no | prod DB URL, KMS key id |
 
-Rule: if a variable is server-only but reachable by the client bundle, it is a
-finding. Classification is per variable and written down.
+Rule: classify intended use and observed exposure separately. If a variable
+is server-only but reachable by the client bundle, it is a finding. A public
+variable may still be misused as a credential elsewhere. Record each
+variable's lifecycle location, consumers, observed artifact exposure, and
+intended class without printing its value.
 
 ## Client-bundle exposure checks (verify the ARTIFACT, not the convention)
 
@@ -44,14 +47,16 @@ Turn this into an automated check (test or CI step) so it stays enforced.
 
 1. Identify every consumer of the credential before rotating (rotation can
    break other services).
-2. Get approval (`human-approval-boundary`) — rotation touches live systems.
+2. Check the complete effective approval record for an applicable active
+   grant; obtain missing rotation scope before touching live systems.
 3. Issue a new credential in the provider/secret manager.
 4. Update the secret store / deploy config to the new value.
 5. Verify the app works on the new credential; verify the OLD credential is
    rejected where testable.
 6. Revoke the old credential.
 7. If the old secret is in git history, treat history purge (BFG/filter-repo)
-   as a SEPARATE approval-gated action — rotation is what actually restores
+   as a separate action whose scope must be covered by an applicable active
+   grant or a new owner decision. Rotation is what restores credential
    secrecy; purge is cleanup.
 
 ## Least-privilege service accounts

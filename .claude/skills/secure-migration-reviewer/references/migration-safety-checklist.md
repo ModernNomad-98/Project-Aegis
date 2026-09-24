@@ -46,7 +46,10 @@ destructiveness, deploy order, and locking. Deep RLS policy correctness is
 1. **Expand:** add new column/table (nullable/defaulted, non-breaking).
 2. **Migrate:** backfill data (scoped, idempotent).
 3. **Switch:** deploy code that writes/reads the new shape.
-4. **Contract:** only after all pods run new code, drop the old column/table.
+4. **Contract:** only after all active readers and writers, including jobs,
+   integrations and rollback paths, no longer require the old shape, and
+   observed zero-reader and required negative-test evidence passes, schedule
+   the old column/table for removal.
 
 Never drop/rename in the same deploy as the code change — old instances still
 use the old shape during rollout.
@@ -73,4 +76,4 @@ State clearly which is true:
 Any migration touching RLS, policies, grants, roles, or tenant columns must
 ship negative tests before "safe": route to `rls-policy-auditor` (DB layer)
 and `multi-tenant-security-tester` (app layer). The verdict is not "go" until
-those tests exist.
+those tests pass with recorded evidence under the intended effective roles.

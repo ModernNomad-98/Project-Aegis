@@ -48,8 +48,9 @@ N+1. Stand-down: unfreeze deploys, comms completion message.
 BAD-WINDOW DATA
 - New version wrote: <what>
 - Old version reads it: <safely / unsafely because …>
-- Repair: <steps / "none needed" + reason>. Destructive repair requires
-  human approval AT EXECUTION TIME.
+- Repair: <steps / "none needed" + reason>. Before destructive repair,
+  check the complete effective approval record for an applicable active
+  grant; obtain only missing scope before execution.
 
 COMMS
 - At start: <who/channel/template>

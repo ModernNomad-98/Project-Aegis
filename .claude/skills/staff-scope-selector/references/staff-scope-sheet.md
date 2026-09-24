@@ -1,5 +1,10 @@
 # Staff Scope Sheet
 
+Use this reference with the [Staff Scope Selector](../SKILL.md).
+
+Here, staff means a senior individual contributor whose impact extends
+beyond a single team, rather than a people-management title.
+
 Detail for `staff-scope-selector`. Read on demand.
 
 ## Staff archetypes (Larson/Cutler-style)

@@ -1,6 +1,7 @@
 # Platform Deployment Models & Control-Plane Catalog
 
-Supporting detail for `saas-platform-architect`. Read on demand.
+Use this reference with the [SaaS Platform Architect](../SKILL.md). Read on
+demand.
 
 ## Deployment model catalog (decided per component)
 
@@ -28,8 +29,9 @@ Every platform needs an answer (present / partial / missing / deferred) for:
 - Feature flags with tenant/plan/cohort targeting.
 - Analytics: tenant-tagged, aggregation rules that don't leak small cohorts.
 
-Rule: control-plane capabilities are always pooled; what varies is the data
-plane.
+Control-plane capabilities may be pooled, siloed, or mixed. Choose the model
+per capability and document tenant routing, authority boundaries, residency,
+and the operational cost of the selected model.
 
 ## Single-tenant → multi-tenant conversion patterns
 
@@ -38,10 +40,12 @@ plane.
 2. **Data scoping second** — add tenant keys and scoping to stores (design
    with `multi-tenant-data-architect`); backfill with the single existing
    tenant; verify counts.
-3. **Enforcement third** — turn on scoped reads/writes behind a flag; run
-   dual-read verification before cutting over.
-4. **Onboard tenant #2 last** — only after negative tests prove tenant #1
-   cannot be reached from the new tenant's context
+3. **Enforcement third** — make scoped reads and writes fail closed, and run
+   dual-read verification before cutting over. A flag may control rollout
+   timing but must never bypass tenant authorization.
+4. **Onboard tenant #2 last** — only after effective tenant scoping is
+   enforced and negative tests prove tenant #1 cannot be reached from the
+   new tenant's context
    (`tenant-isolation-reviewer`).
 
 Each step ships alone and rolls back alone. The rollback for step N must not

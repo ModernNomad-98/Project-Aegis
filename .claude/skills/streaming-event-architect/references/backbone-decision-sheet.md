@@ -17,10 +17,10 @@ guarantee.
 | Property | Durable log/stream | Work queue |
 |---|---|---|
 | Consumers | Many independent groups, each with its own position | Competing consumers, one delivery per message |
-| Replay | Yes — offset/time rewind within retention | No — consumed is gone (redelivery ≠ replay) |
+| Replay | Offset/time rewind within retention when supported and authorized | Transport-dependent: some queues retain or redrive messages; define the exact recovery and redrive contract instead of assuming replay is impossible |
 | Ordering | Per partition key | Usually none once concurrency > 1 |
 | Fits | State transfer, fan-out facts, audit-adjacent history, CDC | Task distribution, commands, jobs with retries |
-| Anti-fit | Work distribution needing per-message ack semantics | Anything needing replay or multiple readers |
+| Anti-fit | Work distribution needing per-message ack semantics | Independent consumer positions or time/offset replay when the chosen queue cannot provide them |
 
 Rule of thumb: facts about what happened → stream; work to be done → queue.
 A flow needing both (fan-out AND per-consumer work semantics) is usually a
@@ -51,7 +51,7 @@ documents one way batches can reorder when idempotence is disabled.
 | Claim | What it actually requires | Verdict |
 |---|---|---|
 | at-most-once | Fire and forget; loss accepted | Rarely acceptable for facts |
-| at-least-once | Redelivery on failure + IDEMPOTENT consumers | Default posture |
+| at-least-once | Transport can redeliver until acknowledged; consumers need idempotent effects or deduplication for safe repeats | Common delivery posture; effect semantics must be specified separately |
 | exactly-once (platform) | Transactional produce+consume inside ONE platform's boundary | Real but narrow; effects outside the platform are not covered |
 | exactly-once (end-to-end) | Every side effect transactional with the offset store | Not generally achievable — design idempotency instead |
 

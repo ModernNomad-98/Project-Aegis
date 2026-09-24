@@ -73,8 +73,9 @@ it changes no skill, adds no hook, and collects nothing itself.
    - *Completion hint:* the skill's workflow ran to its deliverable vs was
      abandoned — coarse (delivered / abandoned / unknown), not a quality
      score.
-   - *Non-events:* skills with zero invocations over the stated window —
-     computed from the library list minus observed names, never from memory.
+   - *Non-events:* skills with zero invocations over an eligible window —
+     computed from skills shipped and exposed to the observed host/workload
+     during that window minus observed names, never from memory.
 2. **Fix the minimization rules.** Capture skill NAMES and coarse enums
    only. Never captured, at any tier: prompt text, response content, user
    identifiers, repo/product names, file paths. The library measures itself,
@@ -91,8 +92,9 @@ it changes no skill, adds no hook, and collects nothing itself.
 4. **Define aggregation and the review cadence.** Per-skill: fire count,
    auto-vs-explicit ratio, wrong-fire count, completion hints, last-fired
    date. Per-cluster: which sibling wins contested requests. Library-wide:
-   never-fired list for the window. State the window explicitly; a
-   never-fired verdict is only as good as the window is representative.
+   never-fired list for the window. State each skill's ship date and eligible
+   host/workload exposure; a never-fired verdict is only as good as the
+   window's representativeness.
 5. **Set thresholds that convert counts into actions.**
    - An auto-invocable skill fires only when explicitly named, never auto →
      possible trigger-description failure → re-review by
@@ -100,7 +102,7 @@ it changes no skill, adds no hook, and collects nothing itself.
      are expected to behave this way and are exempt from this inference.
    - Repeated wrong-fires against the same neighbor → collision evidence →
      discriminating trigger-evals + description fix on both sides.
-   - Zero fires across N consecutive windows AND not exempt → deprecation
+   - Zero fires across N consecutive eligible exposure windows AND not exempt → deprecation
      candidate → evidence package to `skill-deprecation-planner`.
    Every threshold names its action and its consumer; a number with no
    consequence is decoration.
@@ -110,7 +112,7 @@ it changes no skill, adds no hook, and collects nothing itself.
    design requires an explicit exemption list with a reason per entry, and
    the rule that usage alone never condemns an exempt skill.
 7. **Specify the evidence-package format** for downstream consumers: window,
-   tiers of the supporting signal, per-skill numbers with denominators,
+   tiers of the supporting signal, ship date and exposure, per-skill numbers with denominators,
    known blind spots — so `skill-deprecation-planner` receives evidence, not
    a verdict, and the human decision stays informed.
 8. **Deliver the design** in the Output Format. Implementation (adding
@@ -142,8 +144,8 @@ Not designed:  <what this design deliberately leaves out, and why>
       schema.
 - [ ] Every capture point carries an evidence tier, and tiers that don't
       exist today are stated as not existing (no imagined tier-1 hooks).
-- [ ] The never-fired computation derives from the full library list minus
-      observations, with the window stated.
+- [ ] The never-fired computation derives from eligible shipped skills minus
+      observations, with ship date, host/workload exposure and window stated.
 - [ ] Every threshold names both its action and its consumer.
 - [ ] The rare-but-critical exemption list exists with a reason per entry.
 - [ ] Denominators are defined for every rate (fires per session, per task

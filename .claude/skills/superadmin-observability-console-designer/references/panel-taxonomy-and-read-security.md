@@ -1,6 +1,6 @@
 # Panel taxonomy & the cross-tenant read-security model
 
-Reference for `superadmin-observability-console-designer`. Generalized from
+Use this reference with the [Superadmin Observability Console Designer](../SKILL.md). Generalized from
 three independent production multi-tenant implementations that converged on
 the same security core; product-agnostic by construction. Sections: the
 read-security model (1), the panel menu (2), the server-shaped read model
@@ -158,10 +158,11 @@ The most commonly missing panel — ask for it explicitly.
 
 **Surface:**
 
-- Connection-pool saturation: active vs max connections, example warn ~70% / crit
-  ~85%, tuned to observed platform limits — a leading indicator of serverless-meets-Postgres
+- Connection-pool saturation: active vs max connections; illustrative warn
+  ~70% / crit ~85% must be calibrated to observed platform limits and load — a leading indicator of serverless-meets-Postgres
   failure.
-- Cache-hit ratio (warn <95%, crit <90%), total DB size, top-N tables by
+- Cache-hit ratio (illustrative warn <95%, crit <90%; calibrate before use),
+  total DB size, top-N tables by
   row estimate + disk size.
 - Slow queries: in-flight queries above a threshold, with duration, state,
   a truncated query preview, user, and application name.
@@ -202,8 +203,10 @@ assertions:
 - Regression/test-run results where the platform records them.
 - "Covered by tests" claims rendered as status, tied to the covering suite.
 
-Posture = the latest verification result with its timestamp. A green badge
-without a run date is an assertion, not posture. Surface the
+Posture = the latest verification result with its timestamp and freshness
+limit. Once that limit passes, show a visibly stale or unknown state even if
+the last result was green. A green badge without a run date is an assertion,
+not posture. Surface the
 DB-native-vs-external-backend decision here with the self-monitoring caveat
 named: first-party telemetry in the product's own DB means a DB outage
 blinds the console exactly when it is needed; external synthetic probes are
@@ -212,7 +215,8 @@ the mitigation lane.
 ## 6. Honest-gap typing
 
 - A panel with no data source ships as `wired: false` plus a human-readable
-  message — a typed, rendered placeholder, not an omission.
+  message — a typed, rendered placeholder, not an omission. Live response
+  actions require a current runbook and a named human responder.
 - The console carries a known-gaps page listing what it cannot see and why.
 - "Not wired" is itself a monitoring datum: it tells the operator where
   confidence must NOT be placed. A console that silently omits what it

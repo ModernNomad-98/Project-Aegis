@@ -1,5 +1,11 @@
 # Skill Quality Review — per-check criteria
 
+Use this reference with the [Skill Quality Reviewer](../SKILL.md).
+
+RLS means row-level security; LLM means large language model; ASI denotes
+an agentic security issue identifier; MCP means Model Context Protocol;
+TALI means Task-Authorized Local Implementation.
+
 The mechanical validator (`scripts/validate-skills.py`) is the entry gate.
 Everything it enforces — frontmatter parse, `name` == directory, description
 present and < 1024 chars, no broad `allowed-tools`, SKILL.md < 500 lines, all
