@@ -3,6 +3,8 @@
 Templates backing the workflow. Purpose-first commands; exact invocations
 only where platform-stable. Placeholders (`<table>`, `<tenant-id>`)
 throughout — never live identifiers.
+The owning [data migration runbook skill](../SKILL.md) defines the
+document-only scope and the authorization needed to execute a live run.
 Here, **p99** means the 99th-percentile response time on the primary path.
 
 ## Batching-rationale worksheet

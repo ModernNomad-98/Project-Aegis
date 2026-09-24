@@ -2,6 +2,11 @@
 
 Detail for `cross-team-dependency-negotiator`. Read on demand.
 
+The owning [dependency negotiation skill](../SKILL.md) defines the workflow.
+API means application programming interface. `NEED` and `OWE` mark the two
+directions of a dependency; `wk` means week in the dated examples. A proposed
+commitment is not agreed until both named owners accept it.
+
 ## Dependency-map format (both ways)
 
 ```

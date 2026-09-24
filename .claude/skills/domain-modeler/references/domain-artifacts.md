@@ -2,6 +2,11 @@
 
 Supporting detail for `domain-modeler`. Read on demand.
 
+The owning [domain model skill](../SKILL.md) defines the modeling workflow.
+An entity has identity across changes; a value object is defined by its
+attributes; an aggregate is a consistency boundary around related entities;
+a bounded context is the domain area in which these terms have one meaning.
+
 ## Entity vs. value object — the two-question test
 
 | Question | Entity | Value object |

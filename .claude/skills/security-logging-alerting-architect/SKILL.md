@@ -1,6 +1,6 @@
 ---
 name: security-logging-alerting-architect
-description: 'Design the security-event detection and alerting layer — DETECTION coverage (what must be logged: authn failures/anomalies, access-control denials, privilege/config changes, injection/abuse signals, sensitive-data access), ALERTING rules (alert vs ticket, thresholds justified against baselines, correlation, noise control), and response WIRING (every alert has an owner, severity, escalation, runbook link). Closes OWASP Top 10:2025 A09 (Security Logging and Alerting Failures). Use when designing security monitoring/detection/alerting or asking "would we notice this attack?". Do NOT use for the audit RECORD (audit-log-architect — records, never detects/alerts), system/perf telemetry or alert-config edits (observability-operator), reliability SLOs/paging (slo-reliability-architect), or the playbook AFTER an alert (incident-response-runbook — this designs what fires it).'
+description: 'Design the security-event detection and alerting layer — DETECTION coverage (what must be logged: authn failures/anomalies, access-control denials, privilege/config changes, injection/abuse signals, sensitive-data access), ALERTING rules (alert vs ticket, thresholds justified against baselines, correlation, noise control), and response WIRING (every alert has an owner, severity, escalation, runbook link). Addresses the detection and alerting portion of OWASP Top 10:2025 A09 (Security Logging and Alerting Failures). Use when designing security monitoring/detection/alerting or asking "would we notice this attack?". Do NOT use for the audit RECORD (audit-log-architect — records, never detects/alerts), system/perf telemetry or alert-config edits (observability-operator), reliability SLOs/paging (slo-reliability-architect), or the playbook AFTER an alert (incident-response-runbook — this designs what fires it).'
 ---
 
 # Security Logging & Alerting Architect
@@ -13,9 +13,9 @@ them detectable), ALERTING rules per event class (what fires an alert vs a
 ticket, thresholds justified against observed baselines, correlation and noise
 control so real attacks are not buried), and response WIRING (every alert
 routes to a named owner with severity, escalation path, and runbook link).
-This closes OWASP Top 10:2025 A09 — Security Logging and Alerting Failures:
-the failure class where a breach succeeds not because nothing was logged, but
-because nothing DETECTED it, nothing ALERTED, or nobody was wired to respond.
+This addresses the detection and alerting portion of OWASP Top 10:2025 A09 —
+Security Logging and Alerting Failures. Log integrity, safe content handling,
+retention and backup require their own audit-log design and operating controls.
 Design-only and model-invocable: this skill edits no code and no live alert
 configuration — implementation is handed to the operating skills.
 
@@ -58,7 +58,8 @@ configuration — implementation is handed to the operating skills.
    logging gaps this skill feeds back as requirements.
 3. The authorization matrix and tenant model: access denials, privilege/role
    changes, and cross-tenant attempts are first-class detection events, and
-   tenant context is a mandatory field on every security event.
+   include tenant context when known or derivable; pre-tenant and global
+   events record an explicit unknown or not-applicable tenant state.
 4. The current alert inventory and its noise level: what already fires,
    alerts/day, acknowledgment and action rates — thresholds set without this
    baseline are guesses and must be labeled as such with a tuning date.
@@ -81,14 +82,17 @@ configuration — implementation is handed to the operating skills.
    abuse-signal spikes), and sensitive-data access/export.
 2. **Map required events against what is actually logged.** For each required
    event: does a record exist, does it carry the fields detection needs
-   (actor, tenant, target, outcome, source, correlation id, timestamp)?
+   (actor, tenant when known or its explicit unresolved state, target,
+   outcome, source, correlation id, timestamp)?
    Missing events/fields become logging requirements handed to
    `audit-log-architect` or the owning service — with the rule that security
    events must be structured, not prose log lines.
 3. **Classify each event class into a detection posture:** log-only (needed
    for investigation), ticket (aggregated review), or alert (a human reacts
-   now). The default for a new class is ticket until a justified threshold
-   exists — alerting on everything is how alerting fails.
+   now). Choose immediate alerts for high-severity single events when the
+   threat and response need them. For rate-based classes without a measured
+   baseline, begin with a ticket or a labeled provisional threshold and
+   tuning date; alerting on everything is how alerting fails.
 4. **Design the alert rules.** Per alerting class: the trigger condition
    (single event or threshold/correlation over a window), the threshold and
    its justification against the observed baseline, and the noise controls —
@@ -141,8 +145,8 @@ A security detection & alerting design containing:
       and a runbook link.
 - [ ] Noise controls (dedup/aggregation/suppression) are bounded and owned —
       no unbounded suppression that could hide a real attack.
-- [ ] Tenant context is a required field on every security event in the
-      coverage map.
+- [ ] Every security event has tenant context when known or an explicit
+      unknown/not-applicable state in the coverage map.
 - [ ] Each alert has a defined safe way to prove it fires end-to-end, or is
       listed as unverifiable.
 - [ ] The design changed no code and no live alert config; every change is

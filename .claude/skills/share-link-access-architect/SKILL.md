@@ -65,19 +65,23 @@ vetted cryptographic primitives, it does not invent them.
 ## Workflow
 
 1. **Design the token.** Opaque and high-entropy (unguessable — never a
-   sequential or derivable id), carrying no authority of its own (a lookup key
-   whose scope lives server-side; if it must carry claims, it is signed and
-   scoped). Default-on expiry with a maximum lifetime, and revocation that is
+   sequential or derivable id), with no embedded scope or claims (possession
+   is bearer authority; its scope lives server-side. If it must carry claims,
+   use a vetted signed and scoped format). Default-on expiry with a maximum
+   lifetime, and revocation that is
    immediate and checked server-side on every use.
 2. **Bind per-link scope.** Each token maps to exactly ONE resource (or an
    explicit small set) and ONE permission level — least privilege. The scope is
-   stored server-side keyed by the token, never inferred from the token or read
-   from a client parameter. A view link cannot be escalated to edit by changing
+   stored server-side behind a token verifier or keyed fingerprint, not a
+   plaintext bearer token, and never inferred from the token or read from a
+   client parameter. A view link cannot be escalated to edit by changing
    a request.
 3. **Design the guest session.** A valid token mints an ephemeral, link-scoped
    session — NOT a tenant membership and NOT a role. It can touch only the
    link's resource at the link's permission and expires with the link. It never
-   inherits the sharer's other access.
+   inherits the sharer's other access. Recheck link expiry, revocation and
+   scope on every guest-session request, so a minted session cannot outlive
+   a revoked link.
 4. **Add optional gating.** For sensitive shares, a password or OTP on top of
    the link (the link is something-you-have; the password something-you-know).
    Rate-limit the gate and lock out on brute force.
@@ -90,25 +94,32 @@ vetted cryptographic primitives, it does not invent them.
    boundary: the link exposes exactly the shared resource and nothing else — no
    navigation to sibling records, no tenant-wide reads. A link that widens
    beyond its resource is the bug this skill exists to prevent.
+   Treat the bearer link as a secret in URL handling: suppress it from
+   request logs and analytics, prevent referrer leakage, and avoid exposing
+   it in page assets or third-party navigation.
 7. **Specify the audit contract.** Record link creation (who, resource, scope,
-   expiry), each access (token, time, IP within privacy limits), gate
+   expiry), each access (non-secret link id or keyed fingerprint, time, IP
+   within privacy limits; never the raw bearer token), gate
    attempts, and revocation — emitted into `audit-log-architect`'s schema.
 
 ## Output Format
 
 ```
 SHARE-LINK ACCESS DESIGN — <product/resource>
-Token: <opaque, high-entropy source; carries-no-authority | signed+scoped;
+Token: <opaque, high-entropy source; no embedded scope/claims | vetted signed+scoped;
   expiry default + max lifetime; revocation immediate, checked every use>
-Per-link scope: <token → one resource(set) + one permission; stored
-  server-side; no client-supplied scope; no view→edit escalation>
-Guest session: <ephemeral, link-scoped; NOT a membership/role; expires with link>
+Per-link scope: <verified token → one resource(set) + one permission;
+  server-side verifier/fingerprint, no plaintext token storage or
+  client-supplied scope; no view→edit escalation>
+Guest session: <ephemeral, link-scoped; NOT a membership/role; recheck link
+  expiry/revocation/scope on every request>
 Optional gating: <password/one-time passcode (OTP); rate-limited;
   lockout on brute force>
 Enumeration/abuse defense: <entropy, per-token+IP-address rate limit, uniform
   invalid/expired/revoked response, creation cap>
 Tenant blast radius: <link exposes exactly the resource; no sibling/tenant reach>
-Audit: <creation / access / gate attempts / revocation → audit-log schema>
+Audit: <creation / access by non-secret link id or keyed fingerprint / gate
+  attempts / revocation → audit-log schema; never raw token>
 Open questions / risks: <each with risk-if-wrong / who answers>
 ```
 
@@ -119,9 +130,12 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - [ ] Every link has an expiry and can be revoked, and revocation is checked
       server-side on every use (not just a hidden UI button).
 - [ ] Scope is bound per link to one resource + one permission, stored
-      server-side; a view link cannot be escalated to edit.
+      server-side behind a verifier/fingerprint; a view link cannot be
+      escalated to edit.
 - [ ] The guest session is ephemeral and link-scoped — it is not a membership,
-      inherits no other access, and expires with the link.
+      inherits no other access, and rechecks expiry/revocation on each request.
+- [ ] Bearer tokens are absent from audit/request logs, analytics and
+      referrer disclosures; server-side verification uses a token verifier.
 - [ ] Invalid / expired / revoked / never-existed tokens return one uniform
       response — no existence oracle.
 - [ ] The link cannot reach sibling resources or tenant-wide data; the scope is
@@ -135,8 +149,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - The token is a bearer credential: whoever holds it is the actor, so it must
   be unguessable, least-privileged, expiring, and revocable — the four
   properties are non-negotiable, not options.
-- Scope lives server-side keyed by the token; nothing about what a link can do
-  is read from the client or inferred from the token value.
+- Scope lives server-side behind a verifier/fingerprint; nothing about what
+  a link can do is read from the client or inferred from the token value.
 - No existence oracle: the response for a token that never existed and one that
   expired or was revoked is identical.
 - The guest session never inherits the sharer's memberships, roles, or reach —

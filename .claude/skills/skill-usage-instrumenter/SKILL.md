@@ -63,7 +63,8 @@ it changes no skill, adds no hook, and collects nothing itself.
 ## Workflow
 
 1. **Define the signal taxonomy.** Four families:
-   - *Invocation:* skill name, auto-trigger vs explicit call, timestamp,
+   - *Invocation:* skill name, auto-trigger vs explicit call, coarse time
+     bucket rather than an exact timestamp,
      coarse task class (e.g. "review", "build", "audit" — a small fixed
      enum, never free text).
    - *Correction (wrong-fire):* user overrode or redirected the skill
@@ -77,8 +78,9 @@ it changes no skill, adds no hook, and collects nothing itself.
 2. **Fix the minimization rules.** Capture skill NAMES and coarse enums
    only. Never captured, at any tier: prompt text, response content, user
    identifiers, repo/product names, file paths. The library measures itself,
-   not its users — a usage record must be publishable inside the library
-   repo without redaction.
+   not its users. Keep raw events access-restricted; publish only aggregated
+   counts with a stated minimum-count threshold so sparse skill/task/time
+   combinations cannot identify a person or project.
 3. **Map capture points and assign evidence tiers.** Host-recorded events
    (harness logs, invocation records) are tier 1. Self-reported mentions
    (closeout reports listing skills used) are tier 2 — subject to
@@ -92,8 +94,10 @@ it changes no skill, adds no hook, and collects nothing itself.
    never-fired list for the window. State the window explicitly; a
    never-fired verdict is only as good as the window is representative.
 5. **Set thresholds that convert counts into actions.**
-   - Fires only when explicitly named, never auto → trigger-description
-     failure smell → re-review by `skill-quality-reviewer` (check 1/2).
+   - An auto-invocable skill fires only when explicitly named, never auto →
+     possible trigger-description failure → re-review by
+     `skill-quality-reviewer` (check 1/2). Explicit-only/manual-only skills
+     are expected to behave this way and are exempt from this inference.
    - Repeated wrong-fires against the same neighbor → collision evidence →
      discriminating trigger-evals + description fix on both sides.
    - Zero fires across N consecutive windows AND not exempt → deprecation
@@ -165,8 +169,8 @@ Not designed:  <what this design deliberately leaves out, and why>
   either a long window or explicit workload framing.
 - Minimization creep: "just capture the prompt this once, for debugging"
   converts a self-measurement layer into user surveillance. The
-  publishable-in-repo test is the line: if the record couldn't be committed
-  openly, it captures too much.
+  publishable-aggregate test is the line: if a sparse combination could
+  identify a person or project, aggregate further or keep it restricted.
 - Wrong-fire vs preference: a user redirecting a skill choice sometimes
   means the trigger misfired, sometimes means the user wanted a different
   tool for a valid overlap. Correction events are evidence for review, not

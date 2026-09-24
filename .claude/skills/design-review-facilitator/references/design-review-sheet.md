@@ -2,6 +2,10 @@
 
 Detail for `design-review-facilitator`. Read on demand.
 
+The owning [design review skill](../SKILL.md) defines the meeting and decision
+workflow. Pre-read means material circulated before the review; HiPPO means
+highest-paid person's opinion; ADR means architecture decision record.
+
 ## Preparation checklist
 
 - [ ] Design circulated with a REQUIRED pre-read by an authorized sender (or postpone).
@@ -26,7 +30,7 @@ Detail for `design-review-facilitator`. Read on demand.
 | Outcome | Meaning | Next |
 |---|---|---|
 | Approved | Build it as designed | Record decision (adr-writer) |
-| Approved-with-changes | Build with listed changes | Owner applies; no re-review needed |
+| Approved-with-changes | Build only with the bounded changes listed in the decision | Owner applies listed changes; re-review if they alter the agreed design, risk or authority boundary |
 | Needs-rework | Material issues | Author revises; re-review |
 | Blocked-on-X | Can't decide until X | Name X + owner + date |
 
