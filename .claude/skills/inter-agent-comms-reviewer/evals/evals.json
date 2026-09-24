@@ -12,7 +12,7 @@
         "assertions": [
           "Flags the unauthenticated queue as the headline finding: any local process can publish, so a rogue producer can task the workers — requires per-producer broker authentication and per-topic ACLs, not localhost trust.",
           "Requires end-to-end message signing (channel TLS alone leaves broker-position tampering invisible), replay bounds (nonce/timestamp/expiry, idempotent side-effecting commands), and topology allowlisting of who may publish and consume.",
-          "Enforces authenticated ≠ trusted on the receiver: a task message may inform work but cannot re-task a worker beyond its pinned goal, change permissions, or assert approvals from message text.",
+          "Enforces authenticated ≠ trusted on the receiver: ordinary peer content may inform work but cannot re-task, change permissions or assert approvals; task mutation requires a separate verified authorized channel.",
           "Ranks findings by attack path (spoof/tamper/replay → what the receiving worker would DO) and hands spoof/tamper/replay red-team cases to ai-evaluation-harness."
         ]
       }

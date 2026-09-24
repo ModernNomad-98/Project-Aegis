@@ -37,7 +37,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Refuses to trust a client-supplied scope value: reading site_id from the request is the intra-tenant IDOR, exactly analogous to trusting a client tenant_id.",
+          "Allows a client-requested narrower filter only after intersecting it with the server-derived grant set; refuses to treat site_id from the request as authority, which would be an intra-tenant IDOR.",
           "Derives the user's scope set server-side from the grant model, binds it once per request, and propagates it to every query including the edge/gateway layer.",
           "Explains UI filtering is not enforcement — the authoritative scope filter lives server-side."
         ]

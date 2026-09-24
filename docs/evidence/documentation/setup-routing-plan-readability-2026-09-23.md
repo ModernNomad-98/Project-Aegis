@@ -1,5 +1,12 @@
 # Setup routing plan readability batch — 2026-09-23
 
+**Current reading (2026-09-24):** Use the
+[issue #101 setup routing plan](../../roadmaps/aegis-setup-routing-plan.md)
+and [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+for current package status. Package 2/3 and future-package wording below
+records the original checkpoint; keep its 23-link, five-anchor and timing
+receipts. **UTC** means Coordinated Universal Time.
+
 ## Scope and forecast
 
 This bounded batch reviews the [issue #101 setup routing plan](../../roadmaps/aegis-setup-routing-plan.md)

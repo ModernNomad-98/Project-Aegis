@@ -5,6 +5,12 @@ description: Design integration tests — the layer BETWEEN unit and E2E — tha
 
 # Integration Test Designer
 
+Terms: **E2E** means end to end; **CI** means continuous integration;
+**API** means application programming interface; **DB** means database;
+**UI** means user interface; **IDOR** means insecure direct object reference;
+**HTTP** means Hypertext Transfer Protocol; **SMS** means Short Message
+Service; **PR** means pull request; **SDK** means software development kit.
+
 ## Purpose
 
 Design the test layer that proves modules work through their REAL boundaries
@@ -79,7 +85,9 @@ negative cases, and CI placement.
    constraints (per-worker DB), which tier runs the suite (usually PR,
    blocking).
 7. **Hand off implementation** with the spec quality bar: each spec names
-   setup, action, and observable assertions (response + persisted state).
+   setup, action, and observable assertions: response plus relevant persisted
+   state for writes, unchanged state for rejected writes, and response plus
+   relevant baseline for reads.
 
 ## Output Format
 
@@ -90,7 +98,8 @@ Data strategy: <seed/factory source, isolation mechanism, cleanup>
 Auth-context minting: <how personas/roles are created via real paths>
 Specs:
   <id> — <behavior> — setup <fixtures/persona> — action <real call path>
-       — assert <response AND persisted state> — negatives <invalid/denied/failure>
+       — assert <response + write state | rejected-write unchanged state |
+         read response + relevant baseline> — negatives <invalid/denied/failure>
 Rerouted items: <specs that belong to unit/E2E/security layers + where sent>
 Environment assumptions: <DB/container/CI services required>
 CI placement: <tier, runtime budget, parallelization constraints>
@@ -106,7 +115,8 @@ Exit criteria: <what "this layer is covered" means for the module>
 - [ ] Database, auth, and permission paths under test are REAL; any mock of
       them reroutes the spec to unit.
 - [ ] Auth context minted through real code paths, not fabricated internals.
-- [ ] Every spec asserts persisted state, not just the returned value.
+- [ ] Write specs assert relevant persisted state; rejected writes assert
+      unchanged state; read-only specs assert response and relevant baseline.
 - [ ] Negative cases present per boundary (invalid, denied, seam failure).
 - [ ] Data isolation strategy supports parallel runs.
 - [ ] No browser anywhere in the design; no cross-tenant security matrices

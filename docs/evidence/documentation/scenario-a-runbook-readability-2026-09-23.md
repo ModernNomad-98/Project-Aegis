@@ -1,5 +1,12 @@
 # Scenario A runbook readability batch — 2026-09-23
 
+**Current reading (2026-09-24):** Read the
+[Scenario A runbook](../../acceptance/scenario-a-runbook.md) and
+[documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+for current instructions. The 113-test, nine-version and fresh-session
+receipts below belong to this dated review. **ID** means identifier;
+**PDT** means Pacific Daylight Time.
+
 ## Scope and finding
 
 This documentation-only batch reviewed

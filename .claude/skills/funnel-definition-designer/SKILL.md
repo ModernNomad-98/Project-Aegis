@@ -5,6 +5,9 @@ description: Define product funnels and conversion/retention measurement rigorou
 
 # Funnel Definition Designer
 
+Terms: **QA** means quality assurance. An **n-day** retention window counts
+returning users within a specified number of days after the starting event.
+
 ## Purpose
 
 "Our conversion is 34%." Thirty-four percent of what, measured how, over
@@ -133,9 +136,9 @@ Boundaries:    schema → event-schema-architect; firing → product-analytics-i
 - The denominator is where funnels lie: quietly change the population
   (all signups vs signups who reached step 1) and the same event data
   yields wildly different "conversion". Pin it and state it.
-- A conversion rate with no window is meaningless — over an infinite
-  window nearly everyone eventually converts. Every rate carries its
-  window.
+- A conversion rate with no window is hard to interpret: an unbounded
+  window can inflate measured conversion and hide time-to-convert, while
+  some users never convert. Every rate carries its window.
 - Users vs sessions vs events answer different questions and give
   different numbers; mixing them across steps produces a funnel that
   can't be reasoned about. Pick one, state it.

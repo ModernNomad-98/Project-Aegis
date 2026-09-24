@@ -1,5 +1,12 @@
 # Roadmap deeper-section status and terms
 
+**Current reading (2026-09-24):** The eventual-PR wording below describes
+this batch before delivery. Read the current
+[Behavioral Eval Runner backlog](../../roadmaps/behavioral-eval-runner-backlog.md)
+and [approval register](../../approvals/APPROVAL_REGISTER.md) for present
+gates. The original #139 protected-guard boundary and base facts remain
+historical evidence.
+
 Date: 2026-09-23. This bounded correction followed an independent read-only
 screen of three roadmap pages; the setup routing plan needed no new edit.
 The broader documentation item previously carried **80–200 active hours**;

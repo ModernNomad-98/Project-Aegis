@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "integration-test-designer",
-  "description": "Trigger and behavior cases for the between-unit-and-E2E layer: real service/DB/auth/permission boundaries, named faked seams, persisted-state assertions, no browser.",
+  "description": "Trigger and behavior cases for the between-unit-and-E2E layer: real service/DB/auth/permission boundaries, named faked seams, state assertions appropriate to writes and reads, no browser.",
   "cases": [
     {
       "id": "positive-command-through-real-stack",
@@ -12,7 +12,7 @@
         "assertions": [
           "Produces a boundary map: service, database, auth middleware, and permission checks REAL; third-party seams and clock FAKED with one-line rationale each.",
           "Mints auth context through real code paths (signup/invite services or real token issuer), never by injecting fabricated session objects.",
-          "Every spec asserts persisted database state as well as the response, and includes invalid-input and permission-denied negatives.",
+          "Write specs assert response plus relevant persisted state; rejected writes assert unchanged state; read-only specs assert the observable response and relevant baseline, with invalid-input and permission-denied negatives.",
           "Defines seeded-data isolation supporting parallel runs and states CI placement; hands implementation off."
         ]
       }

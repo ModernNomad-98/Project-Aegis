@@ -1,5 +1,11 @@
 # Root README workspace routing readability batch — 2026-09-23
 
+**Current reading (2026-09-24):** Use the [root README](../../../README.md)
+and [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+for present routing and progress. The 503-page inventory and timing below
+describe this original batch. **BER** means Behavioral Eval Runner; **UTC**
+means Coordinated Universal Time.
+
 ## Scope and reason
 
 This bounded batch clarifies the first-screen path through the [root README](../../../README.md).

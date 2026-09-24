@@ -1256,6 +1256,24 @@ is **140–364 selected active hours** after that candidate batch. Active-only,
 review, CI and queue durations are not separately instrumented; the batch PR
 will report observed first-work-to-merge wall time against the original ETA.
 
+## Documentation batch after pull request #218 — 2026-09-24
+
+At approximately **02:53 UTC**, the next 20-page full-checklist batch
+began from the exact #218 merge
+`694333c0b7ebc697272b03705700c845fcc6462a`. Its comparable
+prior batch ETA and new item ETA are both **3–6 active hours**.
+Selected backlog at start was **135–354 active hours**, including
+**40–160** for documentation. Two read-only agents audited disjoint
+ten-page sets. The
+[page-level record](../evidence/documentation/full-page-readability-batch-after-218-2026-09-24.md)
+records 20 existing-page outcomes and scope limits. The interim
+[forecast](aegis-backlog-forecast.md#documentation-batch-estimate--2026-09-24-after-pull-request-218)
+narrows to **135–349 selected active hours**, with **40–155** for
+documentation. Active-only, review, CI and queue durations are not
+separately instrumented; the batch PR will report observed wall time
+against its original ETA. Independent corrected-candidate review,
+exact-head Actions and merge are pending.
+
 ## Checkpoint after pull request #217 — 2026-09-24
 
 At approximately **02:45 UTC**, the five-merge checkpoint began from the

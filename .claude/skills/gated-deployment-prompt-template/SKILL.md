@@ -5,6 +5,8 @@ description: 'Author the reusable operator prompt template gating a RECURRING cl
 
 # Gated Deployment Prompt Template
 
+Terms: **PR** means pull request; **env-var** means environment variable.
+
 ## Purpose
 
 Turn improvised risky operations into templated, evidence-calibrated ones.

@@ -12,7 +12,7 @@
         "assertions": [
           "Establishes blast radius FIRST: checks the rename for missing moved/state-move blocks (delete+create of a stateful database) before any style findings.",
           "Reviews the security-group change for widening (CIDR/port deltas) and the provider bumps for behavior/default changes on touched resource types.",
-          "Files severity-ranked findings with file:line evidence and proposed corrections, plus an apply-safety verdict and an honest not-reviewed list.",
+          "Files severity-ranked findings with file:line evidence and proposed corrections, plus a conditional apply-safety review verdict and an honest not-reviewed list; when plan or runtime state is unavailable, says insufficient evidence rather than claiming approval to apply.",
           "Executes nothing: no apply, no plan against a live backend — requests plan output from the human if safety hinges on it."
         ]
       }
