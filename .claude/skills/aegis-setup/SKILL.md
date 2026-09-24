@@ -52,12 +52,14 @@ never authorizes a tool, provider, model or agent.
    "Choose Aegis only". Never save a helper choice as completed or attempt an
    install, connection, provider call or fallback from local to online.
 4. If the user chooses Aegis only, on supported Windows PowerShell run:
-   `powershell -NoProfile -File .claude/skills/aegis-setup/scripts/selection.ps1 -Action select -ProjectRoot <absolute-checkout-root>`.
+   `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/aegis-setup/scripts/selection.ps1 -Action select -ProjectRoot "<absolute-checkout-root>"`.
+   This setting applies to that PowerShell process. If host policy still blocks
+   the script, report the save as unavailable; do not change machine policy.
    A missing path, failed write, unsupported OS or malformed prior record is
    not completion. Report the actual result. On another OS, continue ordinary
    Aegis use and say saved-state support is unverified/unavailable.
-5. On "Help me change my Aegis setup", run `-Action status` first and show
-   the project scope and current state. Missing means unselected, ordinary
+5. On "Help me change my Aegis setup", use the same command with `-Action status`
+   first. Show the project scope and current state. Missing means unselected, ordinary
    Aegis behavior. If the record is corrupt or an unknown version, explain
    that no helper is active; offer an **explicit** Aegis-only repair. Only after
    the person chooses repair, run `-Action repair` for that same root. An
