@@ -16,6 +16,13 @@ review. No live Scenario A or general corpus run is available. The
 current gates; the [design](../../docs/design/behavioral-eval-runner-v1.md)
 contains the complete contract.
 
+In this guide, a **manifest** lists prepared files or test cases and their
+expected properties. A **hash** is a fingerprint calculated from file or
+record bytes to detect changes; a matching hash does not approve the content.
+A **fixture** is prepared test data or a recorded observation used for an
+offline check. **JavaScript Object Notation (JSON)** is the file format used
+for the structured examples and command inputs below.
+
 ## A normal offline workflow
 
 1. **Inventory cases.** `census` reads a pinned Git revision and counts skill
@@ -47,6 +54,24 @@ revision:
 ```bash
 python -m tools.behavioral_eval_runner census --repo . --ref 1af342712d27d5e6ea482b3f451106b4dccaf125 --out census.json --canonical
 ```
+
+This command **creates or replaces `census.json` in the current directory**.
+Choose an output path deliberately, especially when working in the source
+checkout. Omit `--out` to print the result without creating that file.
+`--canonical` selects a stable JSON representation so the same input produces
+the same serialized bytes and hash.
+
+The main workflow commands have these input and output effects. None starts a
+live assistant or sends a request to a model provider:
+
+| Command | Reads | Writes or prints |
+| --- | --- | --- |
+| `census` | Skills and cases at `--ref` in `--repo`. | Prints the full census JSON without `--out`. With `--out`, creates or replaces that JSON file and prints output metadata. |
+| `materialize` | Objects at the requested Git commit and expected tree, with a selected profile and workspace role. It verifies the supplied identities; it does not establish owner approval. | Copies inputs and writes three manifests under required `--dest`, which must be fresh or empty; prints a preparation record. |
+| `preflight` | A required `--manifest` JSON list of case requirements and optional `--env` JSON declaring available capabilities. | Compares the declarations and prints `RUNNABLE` (eligible under those declarations) or `PRECHECK_EXCLUDED` (excluded before execution) per case, with reasons. It does not probe the host or approve a run. |
+| `schedule` | Required `--selection` JSON and optional work and cost caps. | Prints a deterministic queue and budget accounting; it does not dispatch the queue. |
+| `grade-fixture` | A required `--grader` selector, trusted grading `--plan`, and recorded `--evidence`. | Prints one deterministic Scenario A grader result. |
+| `verify-evidence` | Bundles below required `--root`; optional `--stage` selects input, final, or both reports. Final verification also checks the linked input bundle. | Prints integrity results for the supplied evidence; it does not execute cases. |
 
 The optional `--verify-baseline` flag checks one pinned historical census (882
 behavioral cases and 858 trigger cases). A later revision may legitimately
