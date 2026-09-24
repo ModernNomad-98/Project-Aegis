@@ -736,6 +736,7 @@ class SyntheticDispatchCoordinator:
         source_control_evidence: SyntheticSourceControlEvidence | None = None,
         failure_hook: FailureHook | None = None,
     ) -> ObservationReceipt:
+        require_synthetic_dispatch(self._authority, self._adapter)
         command.validate()
         if command.settlement_hash:
             raise DispatchDenied(
@@ -1035,6 +1036,7 @@ class SyntheticValidationCoordinator:
         *,
         failure_hook: FailureHook | None = None,
     ) -> ObservationReceipt:
+        require_synthetic_validation(self._authority, self._adapter)
         command.validate()
         if not self._adapter.is_canonical_for(command.repository_id):
             raise DispatchDenied(

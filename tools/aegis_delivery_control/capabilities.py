@@ -123,14 +123,18 @@ def verify_freshness(
     current_source: FreshnessProof | None = None,
 ) -> None:
     """Require an independent anchor or a complete current source view."""
-    if type(candidate) is not FreshnessProof or candidate.sequence < 0 or not candidate.head_hash:
+    if (type(candidate) is not FreshnessProof or type(candidate.sequence) is not int
+            or candidate.sequence < 0 or type(candidate.head_hash) is not str
+            or not candidate.head_hash):
         raise DispatchDenied("invalid freshness proof")
     if independent_anchor is None and current_source is None:
         raise DispatchDenied("freshness capability unavailable")
     for reference in (independent_anchor, current_source):
         if reference is None:
             continue
-        if type(reference) is not FreshnessProof or reference.sequence < 0 or not reference.head_hash:
+        if (type(reference) is not FreshnessProof or type(reference.sequence) is not int
+                or reference.sequence < 0 or type(reference.head_hash) is not str
+                or not reference.head_hash):
             raise DispatchDenied("invalid freshness reference")
         if candidate != reference:
             raise DispatchDenied("stale or contradictory checkpoint")

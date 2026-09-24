@@ -35,6 +35,10 @@ def verify_synthetic_evidence(
 ) -> dict[str, object]:
     """Verify original bytes and the one closed synthetic fixture payload."""
     try:
+        if any(type(value) is not str or not value.strip() for value in (
+            expected_binding, expected_writer, expected_stage,
+        )):
+            raise ValueError("invalid synthetic evidence identity")
         record = json.loads(original.decode("ascii"))
         if not isinstance(record, dict) or canonical_bytes(record) != original:
             raise ValueError("noncanonical evidence")

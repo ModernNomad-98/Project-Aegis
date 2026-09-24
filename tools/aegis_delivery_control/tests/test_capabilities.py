@@ -76,6 +76,18 @@ class CapabilityProofTests(unittest.TestCase):
             verify_freshness(later, independent_anchor=later, current_source=old)
         verify_freshness(later, independent_anchor=later, current_source=later)
 
+    def test_freshness_rejects_malformed_field_types(self) -> None:
+        valid = FreshnessProof(1, "head")
+        for malformed in (
+            FreshnessProof(True, "head"), FreshnessProof(1.0, "head"),
+            FreshnessProof("1", "head"), FreshnessProof(1, b"head"),
+        ):
+            with self.subTest(malformed=malformed):
+                with self.assertRaises(DispatchDenied):
+                    verify_freshness(malformed, independent_anchor=valid)
+                with self.assertRaises(DispatchDenied):
+                    verify_freshness(valid, independent_anchor=malformed)
+
     def test_containment_negative_matrix(self) -> None:
         good = ContainmentProbe(True, True, True, False, True, True, True)
         verify_containment(good)
@@ -117,6 +129,14 @@ class CapabilityProofTests(unittest.TestCase):
             for payload, kwargs in cases:
                 with self.subTest(payload=payload, kwargs=kwargs):
                     with self.assertRaises(DispatchDenied):
+                        verify_synthetic_evidence(payload, **kwargs)
+            for field in ("binding", "writer", "stage"):
+                for invalid in ("", " ", None, 0):
+                    bad = {**record, field: invalid}
+                    payload = canonical_bytes(bad)
+                    kwargs = {**arguments, f"expected_{field}": invalid,
+                              "expected_hash": hashlib.sha256(payload).hexdigest()}
+                    with self.subTest(field=field, invalid=invalid), self.assertRaises(DispatchDenied):
                         verify_synthetic_evidence(payload, **kwargs)
 
     def test_unknown_billing_retains_worst_case_and_slot(self) -> None:
