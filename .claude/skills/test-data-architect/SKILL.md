@@ -5,10 +5,14 @@ description: Design the test-data strategy across all test layers — determinis
 
 # Test Data Architect
 
+**Reading key:** PII is personally identifiable information; E2E is
+end-to-end; DB is database; API is application programming interface; TTL is
+time to live; CI is continuous integration.
+
 ## Purpose
 
 Design the data foundation every test layer stands on: deterministic,
-parallel-safe, PII-free, and owned. The output is a data design — persona and
+parallel-safe, PII-safe, and owned. The output is a data design — persona and
 tenant catalog, factory/seed architecture per layer, isolation and cleanup
 rules, and an evolution policy tied to schema changes — that engineer skills
 wire into their suites. Bad test data is the quiet cause of half of "flaky"
@@ -110,8 +114,9 @@ Handoffs: <wiring → engineer skills; storage layout → qa-automation-architec
 - [ ] Determinism rules cover generated values, time, and ordering.
 - [ ] Parallel isolation is structural (namespacing), not conventional
       ("please don't touch user1").
-- [ ] Zero production data; synthetic rules stated; any anonymization path
-      explicitly approved.
+- [ ] No raw production data; synthetic rules stated. Any approved
+      production-derived dataset meets the documented de-identification
+      method and approval conditions.
 - [ ] Cleanup is structural with traceable run markers; TTL for orphans.
 - [ ] Seed evolution coupled to schema changes with a named owner.
 - [ ] Security-fixture compatibility (A/B tenants) confirmed, not re-owned.

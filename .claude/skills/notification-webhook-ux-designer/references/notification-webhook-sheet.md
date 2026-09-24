@@ -56,9 +56,9 @@ the low-urgency band.
 | Payload | Authorized redacted view and metadata; exact raw body is unavailable in this UI |
 | Actions | Replay this delivery; copy authorized, redacted payload only |
 
-Replay note: manual replay re-sends the SAME event; it is safe only
-because the consumer is idempotent (a contract requirement, not an
-option). Surface that caveat next to the replay control.
+Replay note: manual replay re-sends the SAME event and can repeat downstream
+side effects. Enable it only when the consumer's idempotency has been
+verified for this event; show the operator that warning next to the control.
 
 ## Signing-secret rotation UX
 

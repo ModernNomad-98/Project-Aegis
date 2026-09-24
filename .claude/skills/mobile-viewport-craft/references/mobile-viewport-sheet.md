@@ -41,10 +41,11 @@ padding-top:    env(safe-area-inset-top);
 
 ## Touch targets
 
-- Minimum ~44×44px (iOS HIG) / 48dp (Material) with spacing between
+- iOS hit region generally at least 44×44 points (pt); apply the platform's
+  corresponding web/CSS sizing rules and Material's 48dp guidance, with spacing between
   adjacent targets.
-- The HIT AREA must match the visual — pad the control, don't rely on the
-  glyph. Two 44px targets with no gap still cause mis-taps.
+- The hit area may exceed the visual glyph; pad the control. Adjacent targets
+  with no gap can still cause mis-taps.
 - Place primary actions in the thumb-reachable zone (bottom third on
   large phones); top corners are a stretch one-handed.
 

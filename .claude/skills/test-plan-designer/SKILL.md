@@ -5,6 +5,11 @@ description: Design the concrete test plan for ONE feature, change, or release �
 
 # Test Plan Designer
 
+**Reading key:** QA is quality assurance; PR is pull request; RLS is
+row-level security; CI is continuous integration. Severity 1 and 2 below
+mean the project's two highest incident/defect levels; use the project's
+actual severity policy when it differs.
+
 ## Purpose
 
 Produce an executable test plan for a single feature, change, or release: what
@@ -26,8 +31,10 @@ and hands each group to the right engineer skill; it does not implement them.
 - Do NOT use when: the ask is to write the step-by-step manual cases — the
   plan names WHICH manual cases exist; `manual-test-case-creator` writes them.
 - Do NOT use when: the ask is to implement tests — hand off to
-  `vitest-unit-component-engineer`, `integration-test-designer`,
-  `api-contract-test-designer`, or `playwright-e2e-engineer` per the plan.
+  `vitest-unit-component-engineer` or `playwright-e2e-engineer` where they
+  fit. `integration-test-designer` and `api-contract-test-designer` design
+  boundary and contract specifications; name the implementing engineer for
+  those plans according to the repository's toolchain.
 
 ## Inputs to Inspect
 
@@ -118,7 +125,8 @@ Handoffs: <plan group → engineer skill; open questions>
   classification (`change-classification-gate`) first; the validation floor
   changes the plan.
 - Asked to also execute the plan in the same pass → execution is a separate
-  step by the named engineer skills; confirm scope first.
+  step by the named engineer skills; check the applicable user grant and
+  confirm only scope it does not already cover.
 
 ## Supporting Files
 

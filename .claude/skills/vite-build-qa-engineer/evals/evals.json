@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "vite-build-qa-engineer",
-  "description": "Trigger and behavior cases for Vite build QA: VITE_ env audit, dist-level secret proof, build/preview parity, output inspection, honest claims. Manual-only (runs builds/preview).",
+  "description": "Trigger and behavior cases for Vite build QA: configured env-prefix audit, method-scoped dist secret check, build/preview parity, output inspection, honest claims. Manual-only (runs builds/preview).",
   "cases": [
     {
       "id": "positive-pre-deploy-verification",
@@ -10,8 +10,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Inventories VITE_ vars per mode plus define/plugin injection paths, flagging secret-shaped ones before building.",
-          "Runs the real deploy-mode build, then searches dist/ (including sourcemaps) for known secret values and patterns, stating the search method with the claim.",
+          "Inventories configured exposed-prefix vars per mode plus define/plugin injection paths, flagging secret-shaped ones before building.",
+          "Runs the real deploy-mode build, then searches dist/ (including sourcemaps) for known secret values and patterns without printing secret bytes, stating the method-scoped claim.",
           "Verifies preview parity: deep links under base, dynamic imports, mode-dependent behavior.",
           "Reports with command output and hands any confirmed exposure to secrets-identity-hardener for relocation and rotation."
         ]

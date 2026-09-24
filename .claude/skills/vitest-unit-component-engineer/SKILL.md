@@ -6,6 +6,10 @@ disable-model-invocation: true
 
 # Vitest Unit & Component Engineer
 
+**Reading key:** UI is user interface; DOM is document object model; API is
+application programming interface; CI is continuous integration; E2E is
+end-to-end; DB is database.
+
 ## Purpose
 
 Implement fast, deterministic Vitest tests at the isolated layer: pure
@@ -39,7 +43,8 @@ command and its result.
 2. Existing Vitest setup: `vitest.config.*` (environment, setupFiles,
    globals, coverage), existing test conventions and helpers.
 3. The installed versions: vitest, Testing Library packages, jsdom/happy-dom
-   (via lockfile — API differences matter; compose `docs-first-implementer`
+   (start with the lockfile, then verify installed versions when API
+   differences matter; compose `docs-first-implementer`
    when uncertain).
 4. The plan item or requirement each test verifies (risk-traced, per
    `test-plan-designer` if present).
@@ -67,7 +72,8 @@ command and its result.
    network (fail the suite on unmocked fetch), no order dependence.
 6. **Run the suite and report honestly:** exact command, pass/fail counts,
    runtime. A new test must fail when the behavior it guards is broken —
-   spot-check by mutating the subject or the assertion once (then restore).
+   spot-check with an isolated fixture or a scoped temporary mutation of the
+   subject or assertion, then restore and verify the worktree before reporting.
 7. **Wire coverage/CI only if in scope:** thresholds per the automation
    blueprint (`qa-automation-architect`), not invented here.
 

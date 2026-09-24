@@ -83,18 +83,18 @@ id enumerated from tenant B and receives tenant B's invoice, because the
 handler filters by id only."
 Bad: "Attacker exploits IDOR." (no persona, no steps, no payoff → not testable)
 
-## Exploit-path requirement for HIGH severity
+## Consequence and exploit-path confidence
 
-A HIGH-ranked threat states: **who** (persona), **from where** (surface/entry),
-**doing what** (steps), **getting what** (asset + blast radius). Missing any
-element → mark the threat description incomplete and assign an owner to
-verify the missing step with a named experiment or test. Keep a provisional
-priority based on plausible impact and exposure; missing documentation alone
-must not lower severity. Record a final severity after the exploit path and
-mitigations have been checked.
+State **who** (persona), **from where** (surface/entry), **doing what**
+(steps), and **getting what** (asset + blast radius) when evidenced. Mark
+missing steps as hypotheses with an owner and named verification check.
+Rank potential consequence from plausible impact and exposure, and report
+exploit-path confidence separately. Missing path evidence alone does not
+lower the consequence; update confidence as checks complete.
 
 ## Mitigation → test mapping
 
-Every mitigation row produces at least one negative test: execute the abuse
-case, expect denial/failure. Implementable tenant/authz tests → hand to
+Every mitigation row produces a concrete validation check. For prevention,
+execute the abuse case and expect denial/failure; for detection or recovery,
+verify the signal or recovery outcome. Implementable tenant/authz tests → hand to
 `multi-tenant-security-tester`; control build → `appsec-implementer`.

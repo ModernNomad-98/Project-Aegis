@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "threat-modeler",
-  "description": "Trigger and behavior cases for threat modeling: asset/actor/boundary map before threats, STRIDE per boundary, abuse cases, exploit-path-gated severity, mitigations mapped to negative tests.",
+  "description": "Trigger and behavior cases for threat modeling: asset/actor/boundary map before threats, STRIDE per boundary, abuse cases, consequence and confidence ranking, mitigations mapped to validation checks.",
   "cases": [
     {
       "id": "positive-file-upload-feature",
@@ -13,7 +13,7 @@
           "Maps assets, actors (including anonymous link holder and wrong-tenant authenticated user), trust boundaries, and data flows before enumerating threats.",
           "Enumerates STRIDE threats per boundary and includes mandatory tenant-isolation and object-level authorization rows on the data-access boundary.",
           "Writes abuse cases as concrete attacker steps with a payoff, and ranks HIGH risks only when a concrete exploit path is stated.",
-          "Maps each threat to a mitigation and each mitigation to a negative test, handing test implementation to multi-tenant-security-tester and control build to appsec-implementer."
+          "Maps each threat to a mitigation and each mitigation to a suitable validation check, including negative tests where denial is the claim; hands test implementation to multi-tenant-security-tester and control build to appsec-implementer."
         ]
       }
     },

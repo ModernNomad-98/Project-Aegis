@@ -1,7 +1,10 @@
 # Local CI Mirror Preflight — Procedure Detail
 
-Companion to `local-ci-mirror-preflight`. Commands shown are for a
+Companion to [local-ci-mirror-preflight](../SKILL.md). Commands shown are for a
 GitHub-Actions repo; adapt the derivation source for other CI systems.
+CI means continuous integration; E2E means end-to-end; PR means pull request;
+`gh` is the GitHub command-line tool. Local preflight classifies local
+evidence; required real CI checks remain gates under repository policy.
 
 ## 1. Derivation table
 
@@ -59,7 +62,7 @@ evidence.
 | --- | --- | --- |
 | `PR-caused` | fails on work, passes on baseline (both runs cited) | fix before commit — blocking |
 | `pre-existing-on-main` | fails on baseline with same signature | report it; do NOT fix inside this PR (scope drift) — route to its own task/issue |
-| `CI-infrastructure` | cause is env/runner/network/tooling (evidence: works on retry with no code change, missing local service, rate limit) | note; not blocking; expect real CI to differ |
+| `CI-infrastructure` | cause is env/runner/network/tooling (evidence: works on retry with no code change, missing local service, rate limit) | note as a local-preflight limitation; required real CI remains blocking if its gate fails |
 | `cannot-determine-locally` | no faithful local equivalent (secrets, vendor actions, matrix) | carry as named residual risk to real CI |
 
 Timeouts: record expected vs observed duration; a run killed by timeout is
