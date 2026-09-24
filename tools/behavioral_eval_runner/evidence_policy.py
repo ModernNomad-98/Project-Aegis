@@ -123,7 +123,9 @@ def _decision_record(artifact: ClassifiedArtifact) -> dict[str, str]:
     path = _validate_artifact_path(
         artifact.relative_path, allow_final_report=artifact.relative_path == FINAL_REPORT_NAME
     )
-    if _identity(path) in {_identity(STAGE_A_POLICY), _identity(STAGE_B_POLICY)}:
+    if _identity(path) in {_identity(name) for name in (
+        STAGE_A_POLICY, STAGE_B_POLICY, INPUT_MANIFEST_NAME, FINAL_MANIFEST_NAME, MARKER_NAME,
+    )}:
         raise EvidenceError("policy receipt path is reserved")
     return {
         "path": path,
@@ -181,7 +183,7 @@ class OfflinePolicyWriter:
         )
         _claim_policy_receipt(self.writer.root, STAGE_A_POLICY, receipt.content)
         inputs = [receipt] + [
-            EvidenceArtifact(a.relative_path, a.content, _metadata(a.decision))
+            EvidenceArtifact(_validate_artifact_path(a.relative_path), a.content, _metadata(a.decision))
             for a in artifacts
         ]
         result = self.writer.finalize_input_evidence(
@@ -227,7 +229,7 @@ class OfflinePolicyWriter:
         ), created_at=claimed_at)
         _claim_policy_receipt(self.writer.root, STAGE_B_POLICY, receipt.content)
         outputs = [
-            EvidenceArtifact(a.relative_path, a.content, _metadata(a.decision))
+            EvidenceArtifact(_validate_artifact_path(a.relative_path), a.content, _metadata(a.decision))
             for a in artifacts
         ] + [receipt]
         result = self.writer.finalize_final_bundle(

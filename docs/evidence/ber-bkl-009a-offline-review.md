@@ -45,12 +45,12 @@ fixture against the exact pre-policy grant-base `evidence.py` object
 
 | Check | Observed result |
 | --- | --- |
-| Focused policy and evidence tests | 52 tests passed, 2 expected platform skips; exit 0 after independent-audit corrections. |
+| Focused policy and evidence tests | 54 tests run, 52 passed, 2 expected platform skips; exit 0 after independent-audit corrections. |
 | Skill validator | 185 skills valid, zero warnings. |
 | Diff whitespace check | `git diff --check` passed locally. |
-| Full offline Behavioral Eval Runner suite | Corrected candidate: 1,022 tests passed, 14 expected skips, exit 0 under repository-owner context. The earlier sandbox-user run had 12 environment errors: Git rejected the worktree's owner identity and one synthetic process-tree kill lacked permission. |
+| Full offline Behavioral Eval Runner suite | Current correction: 1,024 tests run, 14 expected skips, exit 0 under repository-owner context. The sandbox-user run had 12 environment errors: Git rejected the worktree's owner identity and one synthetic process-tree kill lacked permission. |
 | Independent architecture/security review | Astra re-audit found no remaining code blocker after the eight corrected findings, including both writer races. Root final review remains. |
-| Exact-head Linux/Windows Actions | Pending implementation PR. |
+| Exact-head Linux/Windows Actions | Pending on corrected PR #139 head. |
 
 Negative fixtures cover receipt-only Stage A, final-report omission, matched
 invalid metadata enums, repeated writer reset and interleaved Stage A/B writers,
@@ -100,10 +100,10 @@ branch or merges PR #139 into main.
 The single conflict was in the backlog's work-package status paragraph. The
 resolution retains main's explanation of the effective grant and pending
 PR #139 guard decision, together with this implementation's dated checkpoint.
-The complete `tools/behavioral_eval_runner/` subtree, including its tests and
-README, remains identical to reviewed implementation commit
-`8928383f0838e2d99ee3a89c44b98b7aba7f1c9b`. The PR still changes only its
-seven authorized paths and adds 971 code/test lines, leaving 29 below the cap.
+At that checkpoint, the complete `tools/behavioral_eval_runner/` subtree, including its tests and
+README, was identical to reviewed implementation commit
+`8928383f0838e2d99ee3a89c44b98b7aba7f1c9b`. The PR then changed only its
+seven authorized paths and added 971 code/test lines, leaving 29 below the cap.
 
 | Local command or check | Observed result |
 | --- | --- |
@@ -121,7 +121,7 @@ documentation changes; the unchanged runner subtree was verified again and
 skill validation was repeated. This records the tested content precisely; it
 does not claim a fresh full-suite run or hosted checks on the later commit.
 Independent read-only review of the integrated head and this evidence update
-found no blocker: seven authorized paths, unchanged runner files, 971 added
+found no blocker at that checkpoint: seven authorized paths, unchanged runner files, 971 added
 code/test lines, 79 resolving local file links, and 185 valid skills with no
 warnings. Exact-head Linux/Windows Actions remain a delivery gate. The
 PR-specific protected-file disposition remains pending, and the earlier
@@ -134,3 +134,25 @@ active hour; active-only time was not instrumented. The published selected
 backlog estimate at start was 150–394 active hours. At the 00:36:44 UTC
 post-review checkpoint, observed wall time was 11 minutes 13 seconds.
 Publication and any eventual PR merge timing must be recorded separately.
+
+## Path-identity correction — 2026-09-24
+
+The later PR #139 review reproduced two policy defects. The receipt recorded
+normalized artifact paths while Stage A and B passed original path spellings
+to the writer; a backslash input could leave a claimed receipt and manifest
+before failing verification. The policy also accepted case aliases of the
+input manifest, final manifest and marker on case-sensitive hosts. The writer
+now uses the validated normalized path in both stages and reserves those
+control names by casefolded identity before the first write. Synthetic tests
+cover both stages and prewrite rejection. These corrections do not change the
+legacy manifest, report or marker schema.
+
+On this corrected candidate, the focused command above ran **54 tests, 52
+passed, 2 expected platform skips**. The complete offline runner suite ran
+**1,024 tests, 1,010 passed, 14 expected skips** under repository-owner
+context. Both exited zero. A sandbox-user full run reported 12 environment
+errors from Git ownership and synthetic process-tree permissions; it is not
+counted as passing. Two independent read-only Sol reviews accepted the code
+and tests. The seven authorized PR paths remain unchanged; added code/test
+lines total **993 of 1,000**, leaving 7. Exact-head hosted CI and the
+PR-specific protected-file guard disposition remain pending.

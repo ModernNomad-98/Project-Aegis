@@ -88,6 +88,26 @@ class PolicyCase(unittest.TestCase):
 
 
 class TestPolicy(PolicyCase):
+    def test_backslash_paths_use_normalized_receipt_identity(self) -> None:
+        with patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=FIRST), \
+             patch("tools.behavioral_eval_runner.evidence._utc_now_iso", return_value=FIRST):
+            sha = self.writer.finalize_input([
+                ClassifiedArtifact("inputs\\one.txt", b"synthetic input", decision())
+            ]).input_evidence_manifest_sha256
+        self.assertTrue(os.path.exists(os.path.join(self.root, "inputs", "one.txt")))
+        with patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=LATER), \
+             patch("tools.behavioral_eval_runner.evidence._utc_now_iso", return_value=LATER):
+            self.writer.finalize_final(self.report(sha), [
+                ClassifiedArtifact("outputs\\one.txt", b"synthetic output", decision("output"))
+            ], decision("report"), "OFFLINE_DEMONSTRATION")
+        self.assertIn("outputs/one.txt", {a["path"] for a in self.read(FINAL_MANIFEST_NAME)["artifacts"]})
+
+    def test_control_name_case_aliases_fail_before_first_write(self) -> None:
+        for name in (INPUT_MANIFEST_NAME, FINAL_MANIFEST_NAME, MARKER_NAME):
+            with self.subTest(name=name), self.assertRaises(EvidenceError):
+                self.writer.finalize_input([ClassifiedArtifact(name.upper(), b"alias", decision())])
+            self.assertEqual(os.listdir(self.root), [])
+
     def test_complete_deadline_and_detached_marker_binding(self) -> None:
         self.complete()
         result = self.verify_at("2030-03-02T22:59:59Z")
