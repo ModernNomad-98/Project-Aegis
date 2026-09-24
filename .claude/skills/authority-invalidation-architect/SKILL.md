@@ -1,9 +1,15 @@
 ---
 name: authority-invalidation-architect
-description: 'Diagnose and design the fix for the "change didn''t take effect" access-bug class — a removed user still sees the data, a revoked role still works, logout doesn''t end the session, a plan change still shows the old tier, a deleted item stays visible: inventory every place the old authority survives (server session records, JWT/token claims until expiry, client-side stores and data caches, server/CDN caches, live realtime subscriptions, database session context, search indexes, signed URLs), locate which holds the stale copy, design the invalidation or forced refresh per surface against a stated revocation-latency bound (deny direction first: revoked access must actually revoke), and verify with before/after tests that access changed. Composes caching-strategy-designer, realtime-subscription-architect, plan-entitlement-architect, share-link-access-architect, rls-policy-auditor. Do NOT use to design a cache, author the permission matrix, or when access never worked — this owns changes that failed to propagate.'
+description: 'Diagnose access changes that failed to take effect: revoked roles or memberships, logout, plan changes, or deletion. Inventory old authority in sessions, JSON Web Token (JWT) claims, client and server caches, live subscriptions, database context, search indexes, and signed links. Locate the holder with evidence, design invalidation against an owner-confirmed revocation bound, and verify denial first. Composes caching-strategy-designer, realtime-subscription-architect, plan-entitlement-architect, share-link-access-architect, and rls-policy-auditor. Do NOT use to design a cache, author permissions, or fix access that never worked.'
 ---
 
 # Authority Invalidation Architect
+
+Here, **JWT** means JSON Web Token, **TTL** means time to live, **HTTP**
+means Hypertext Transfer Protocol, **CDN** means content delivery network,
+**RLS** means row-level security, **UI** means user interface, and **URL**
+means uniform resource locator. React Query, SWR, and Apollo below are names
+of client data-cache tools.
 
 ## Purpose
 
@@ -105,8 +111,10 @@ the differential and verify battery no single-surface skill can see whole.
    entitlement resolution; search indexes; signed URLs. Mark which exist
    in THIS app — a surface that exists and is never dispositioned is the
    next incident.
-3. **Locate the holder — the differential.** Use the tells: works in an
-   incognito window → a client-side copy; fixes itself after a consistent
+3. **Locate the holder — the differential.** Use the tells as hypotheses:
+   works in an incognito window → compare old and fresh session claims and
+   server decisions before attributing the difference to a client copy;
+   fixes itself after a consistent
    interval → token claims (the interval is the access TTL) or a cache
    TTL; stops after reconnect → a live subscription; wrong on one app
    instance only → an in-process cache; wrong only in search → the index.
@@ -243,9 +251,9 @@ Handoffs: <secrets-identity-hardener (custody impl) |
 ## Gotchas
 
 - JWT claims are stale by design, not by bug: role/tenant/plan claims
-  minted at sign-in do not observe the database change; managed-auth
-  platforms (e.g. Supabase, Firebase) default access TTLs around an hour
-  — the removal "not working" often just IS that TTL, chosen by nobody.
+  minted at sign-in do not observe a database change. Verify the actual
+  provider and application access-token TTL and server-side checks; the
+  removal may remain ineffective for that measured interval.
 - The open-tab problem: a removed user's already-loaded app keeps a
   working token and rendered state; with no per-request server check and
   no purge signal, they retain full access until the token expires — no
@@ -261,10 +269,10 @@ Handoffs: <secrets-identity-hardener (custody impl) |
   missed-mutation-path class `caching-strategy-designer` names for caches
   applies equally to authority signals, and one missed path is a
   permanent hole.
-- "Works in incognito" is diagnostic gold: a fresh profile has no client
-  state and no cookies, so if incognito behaves correctly the holder is a
-  client-side copy; if incognito is also wrong, the holder is
-  server-side.
+- "Works in incognito" is a clue, not proof of a client-side copy: the
+  private session also gets fresh cookies and token claims. Compare the
+  old and fresh sessions' claims and server-side authorization decisions
+  before naming the holder.
 - The grant direction embarrasses quietly: the newly invited member can't
   see the workspace until they sign out and back in, because their claims
   were minted before the invite — the same mechanism as the security
@@ -290,9 +298,10 @@ Handoffs: <secrets-identity-hardener (custody impl) |
   per-change default menu with consequences and stop; do not invent a
   deny-direction tolerance on anyone's behalf.
 - The evidence shows a live cross-tenant leak (not stale authority of a
-  formerly entitled principal) → stop and route to the isolation path —
-  `rls-policy-auditor` / `tenant-isolation-reviewer` — that is an active
-  incident, not a propagation design task.
+  formerly entitled principal) → stop and route the active incident to
+  the human incident owner and current approved response runbook. After
+  containment, use `rls-policy-auditor` / `tenant-isolation-reviewer`
+  for isolation review; this is not a propagation design task.
 
 ## Supporting Files
 

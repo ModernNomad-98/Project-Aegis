@@ -1,5 +1,9 @@
 # Shared skill contracts — implementation and review record
 
+Pull request (PR) identifies a repository change; continuous integration (CI)
+means automated repository checks. The dated reading key below explains the
+other codes used in this record.
+
 > **Delivered.** [PR #90](https://github.com/ModernNomad-98/Project-Aegis/pull/90)
 > merged at `82dfebee7dadb68207bead5cb10fa3c562f21c1e`.
 > [Main verification 34674269186](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/34674269186)

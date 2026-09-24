@@ -1,4 +1,15 @@
-# Offline CI delivery — 2026-09-12
+# Offline continuous integration (CI) delivery — 2026-09-12
+
+**Current reading, checked 2026-09-24:** This records the delivered pull
+request (PR) #91 and its main-branch verification. Later calibration and live
+work is tracked in the [current Behavioral Eval Runner (BER) backlog](../../roadmaps/behavioral-eval-runner-backlog.md).
+The “delivery waits” sentence in section 6 describes the release gate at this
+historical checkpoint, not a pending merge today.
+
+Reading key: AEGIS-APR-002 is the owner approval register's administrator-merge
+grant; owner decision 1 (OD-1) and work package WP-2B-4 remain separate BER
+gates. Developer Certificate of Origin (DCO) is the commit sign-off check.
+`actionlint` checks GitHub Actions workflow syntax.
 
 ## 1. Summary
 

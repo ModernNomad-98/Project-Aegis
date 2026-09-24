@@ -8,6 +8,14 @@
 > owns remaining calibration and live-execution gates. Keep this review's
 > original findings and candidate test result as historical evidence.
 
+Reading key: Phase 0/1 names the early offline calibration-control engineering
+scope. Software development kit (SDK) and input/output (I/O) describe the
+mocked transport path below. `BUDGET_TELEMETRY_UNAVAILABLE`, `RUN_STOPPED`,
+`DEADLINE_EXCEEDED`, and `METADATA_OK` are recorded runner status codes, not
+new approvals. Owner decision 1 (OD-1) and work packages WP-2B-3/WP-2B-4
+retain the gates in the linked backlog. The “review pending” line near the end
+records this candidate's September 10 checkpoint; PR #88 later merged.
+
 2026-09-10. Independent read-only review of local commit
 `40bfabc91b60d46f201a575911d0f2a9edac2a2e` (tree
 `a9e12ad61aafb0434bf36e256553fdf634c58053`) requested changes. The reviewer

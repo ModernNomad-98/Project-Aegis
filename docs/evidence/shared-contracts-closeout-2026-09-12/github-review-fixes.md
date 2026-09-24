@@ -1,5 +1,15 @@
 # GitHub review corrections
 
+> **Current reading, checked 2026-09-24:** These are historical corrections to
+> the first revision of pull request (PR) #90. The corrected implementation
+> later passed [verification](corrected-verification.md), and PR #90
+> [merged](README.md). The final future-tense sentence records the state when
+> the findings were written.
+
+Reading key: `P2` is the reviewer's priority-two label. `PASS`, `FAIL`, and
+`ERROR` are distinct approval-grader result codes; malformed evidence returns
+`ERROR`. Behavioral Eval Runner (BER) names the offline test suite.
+
 The automatic review of PR #90 revision
 `e9b8ec03c6a462fb9a33cb0a2c90a275de25ba9c` completed on 2026-09-12 with two P2
 findings. Both were reproduced and corrected; the earlier local reviews missed

@@ -1,10 +1,14 @@
 ---
 name: appsec-implementer
-description: MANUAL-ONLY; never auto-invoke. Implement a specific, already-decided application-security control in code — input validation at a boundary, output encoding, parameterized queries, authorization checks on a resource, secure session/cookie flags, safe file handling, SSRF/redirect allowlists, or a security fix for a known finding — test-first, with the control proven by a failing-then-passing negative test and no scope creep. Use when a threat model, security review, or the user has NAMED the control to build and you are editing the codebase to add it. Side-effecting and manual-only. Do NOT use to decide WHICH controls are needed (threat-modeler), review a diff (security-pr-reviewer), harden secrets/identity broadly (secrets-identity-hardener), or author RLS policies (rls-policy-auditor).
+description: MANUAL-ONLY; never auto-invoke. Implement a named, already-decided application security (AppSec) control in code, such as input validation, output encoding, parameterized queries, authorization, safe sessions/files, or server-side request forgery (SSRF) and redirect allowlists. Prove it test-first with a failing-then-passing negative test and no scope creep. Use when the user or an approved review has named the exact control to build. Side-effecting and manual-only. Do NOT use to choose controls (threat-modeler), review a diff (security-pr-reviewer), harden identity broadly (secrets-identity-hardener), or author row-level security (RLS) policies (rls-policy-auditor).
 disable-model-invocation: true
 ---
 
 # AppSec Implementer
+
+Here, **API** means application programming interface, **ORM** means
+object-relational mapper, **UX** means user experience, and **authz** means
+authorization. The `§` symbol denotes a section.
 
 ## Purpose
 
@@ -110,7 +114,8 @@ Handoff: security-pr-reviewer to verify the diff.
 ## Security Rules
 
 - No security control ships without a negative test that fails before it and
-  passes after — an untested control is unverified (master-prompt §6).
+  passes after — an untested control is unverified (the repository's
+  [historical master prompt, section 6](../../../docs/prompts/claude-skills-master-generation-prompts-v4.md)).
 - Controls are enforced server-side / authoritatively; client-side checks are
   UX, never the security boundary.
 - Never hand-roll cryptography, token generation, or password hashing — use

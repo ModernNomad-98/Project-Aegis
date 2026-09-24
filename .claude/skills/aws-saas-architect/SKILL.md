@@ -1,6 +1,6 @@
 ---
 name: aws-saas-architect
-description: Map a DECIDED logical architecture onto provider-idiomatic AWS for a multi-tenant SaaS — account topology (Organizations, SCPs), identity (IAM roles, Cognito, OIDC federation), network (VPCs, PrivateLink, ALB/CloudFront with WAF), Secrets Manager/KMS, data with an explicit tenant-isolation strategy per store (Aurora/RDS, DynamoDB, S3), compute chosen by team maturity (ECS/Fargate, EKS, Lambda), messaging (SQS, SNS, EventBridge), CloudWatch/CloudTrail observability, Security Hub/GuardDuty/Inspector posture, Terraform/CDK IaC, and cost-allocation-tag cost controls. Every choice ties to tenant isolation, cost, and operational maturity; quota/instance-type/price claims become verification items, never asserted from memory. Use when asked to design or review AWS architecture for a SaaS, lay out AWS accounts, or choose between AWS options. Do NOT use to decide WHETHER AWS (cloud-architecture-decider), for Azure (azure-saas-architect), tenancy semantics (saas-platform-architect), or IaC diffs (iac-reviewer).
+description: Map a decided logical architecture onto Amazon Web Services (AWS) for multi-tenant software as a service (SaaS). Design account, identity, network, data isolation, compute, messaging, observability, security, infrastructure-as-code, and cost choices tied to team maturity. Treat quotas, regional availability, instance types, and prices as current-documentation verification items. Use for AWS architecture and account layout. Do NOT use to choose the provider (cloud-architecture-decider), define tenancy semantics (saas-platform-architect), or review infrastructure-as-code changes (iac-reviewer).
 ---
 
 # AWS SaaS Architect
@@ -10,7 +10,8 @@ description: Map a DECIDED logical architecture onto provider-idiomatic AWS for 
 Produce an AWS service architecture for a multi-tenant SaaS that a team can
 build and operate: account topology, per-capability service selections with
 rationale, tenant-isolation strategy per data store, identity and network
-topology, security posture, IaC strategy, and cost controls. The discipline
+topology, security posture, infrastructure as code (IaC) strategy, and cost
+controls. The discipline
 is provider-idiomatic-without-invention: use AWS primitives the way AWS
 documents them — IAM-first isolation, multi-account boundaries, tag-based
 attribution — and leave instance types, quotas, regional availability, and

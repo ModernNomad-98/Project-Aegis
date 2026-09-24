@@ -1,9 +1,13 @@
 ---
 name: api-event-architect
-description: Design external API and event contracts for a multi-tenant SaaS — tenant context derived from credentials (never client-supplied tenant ids on data paths), resource/route conventions, versioning and deprecation policy with sunset windows, idempotency for mutations, per-tenant and per-plan rate limits, and webhook/event-feed contracts (versioned envelope schemas, tenant-scoped subscriptions, at-least-once delivery with retries, signing and replay protection). Produces API contract conventions, an event taxonomy with schemas, a webhook delivery policy, and a contract migration/rollback plan. Use when designing or overhauling a public API, adding webhooks or an event feed for integrations, when partners keep breaking on contract changes, or when API rate limiting needs a tenant/plan dimension. Do NOT use for the internal audit trail (audit-log-architect), internal service-to-service architecture (architecture-designer), or role/permission design (authorization-matrix-designer).
+description: Design external application programming interface (API) and event contracts for multi-tenant software as a service (SaaS). Tenant context comes from credentials by default; an explicitly authorized partner or aggregator may select only tenants allowed by its credential. Define routes, versioning, idempotency, rate limits, and signed tenant-scoped webhook delivery. Produce contract conventions, event schemas, delivery policy, and migration plan. Use for public API or webhook design and partner contract changes. Do NOT use for internal audit trails (audit-log-architect), internal service structure (architecture-designer), or permission design (authorization-matrix-designer).
 ---
 
 # API & Event Architect
+
+Here, **UX** means user experience, **SSRF** means server-side request
+forgery, and **HMAC** means hash-based message authentication code. In a
+delivery policy, **N** is a chosen retry count, not a fixed default.
 
 ## Purpose
 
@@ -64,11 +68,12 @@ promise explicit before integrations harden around accidents.
 ## Workflow
 
 1. **Pin the tenant-context contract.** Tenant identity derives from the
-   credential (token claims / key binding), resolved server-side. No data
-   endpoint accepts a tenant id from the client; multi-tenant-capable
-   credentials (partner/aggregator tokens) name the tenant explicitly per
-   call against an allow-list bound to the credential — the exception is
-   designed, not defaulted.
+   credential (token claims / key binding), resolved server-side. Ordinary
+   client credentials cannot select a different tenant on a data endpoint.
+   An explicitly authorized multi-tenant partner or aggregator credential
+   may name a tenant per call only after the server validates that selection
+   against the tenant allow-list bound to that credential. This exception is
+   designed and tested, never assumed by default.
 2. **Set resource conventions**: naming, ids (opaque, non-enumerable where
    resources are tenant-owned), pagination, filtering, error shape
    (machine-readable codes; error detail must not leak other tenants'

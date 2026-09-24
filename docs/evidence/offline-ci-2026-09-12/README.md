@@ -1,7 +1,14 @@
-# Offline CI implementation verification
+# Offline continuous integration (CI) implementation verification
 
-**Delivered:** PR #91 is merged and main verification passed. See the
+**Delivered:** Pull request (PR) #91 is merged and main verification passed. See the
 [delivery record](DELIVERY.md). The checkpoints below preserve pre-merge evidence.
+
+Reading key: software development kit (SDK); operating system (OS);
+Behavioral Eval Runner (BER); Developer Certificate of Origin
+(DCO). Owner decision 1 (OD-1) and work package WP-2B-4 are separate gates in
+the [current BER backlog](../../roadmaps/behavioral-eval-runner-backlog.md).
+The local pre-hosted statements below describe the September 12 checkpoint,
+not the present state of CI delivery.
 
 Implementation tested: `b483d4e0b98d76b64c8053c99397eb5a296c7705`.
 Base: PR #90 merge `82dfebee7dadb68207bead5cb10fa3c562f21c1e`.

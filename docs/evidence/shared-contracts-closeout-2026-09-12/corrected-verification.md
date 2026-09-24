@@ -12,7 +12,8 @@
 
 In the table, **POSIX** means the Unix-like test environment; **SDK** means
 software development kit; and **DCO** means Developer Certificate of Origin,
-the commit sign-off check. The corrected implementation is
+the commit sign-off check. POSIX expands to Portable Operating System Interface;
+SDK cases here use mocked provider responses. The corrected implementation is
 `4d6d292168d8a6fb47b7593870409d61707bdd7a`, tree
 `facb8ed563fd722e2e5bfdf918e64bc8c1854969`. Both platform runs used this exact
 committed revision; the Windows worktree stayed clean throughout the run.

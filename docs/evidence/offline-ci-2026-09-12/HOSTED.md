@@ -8,6 +8,12 @@
 > commands and limits, use the [CI guide](../../offline-ci.md). Do not treat
 > the earlier failed workflow as today's delivery status or erase its evidence.
 
+Reading key: Developer Certificate of Origin (DCO); software development kit
+(SDK); Behavioral Eval Runner (BER); Portable Operating System Interface
+(POSIX), the Unix-like host environment. Owner decision 1 (OD-1) and work
+package WP-2B-4 remain governed by the
+[current BER backlog](../../roadmaps/behavioral-eval-runner-backlog.md).
+
 [PR #91](https://github.com/ModernNomad-98/Project-Aegis/pull/91) implementation
 `0444f46a459150b9fb2aeae168dc5d03b8135b96` passed both verification jobs in
 [run 34675606660](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/34675606660).

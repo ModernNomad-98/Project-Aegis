@@ -1,5 +1,17 @@
 # Shared-contract candidate dispositions — 2026-09-12
 
+**Reading key, checked 2026-09-24:** This is the historical pull request (PR) #90
+audit ledger, not a fresh scan of current skills. Fingerprints and rule IDs
+identify the original findings. `confirmed-fixed` means a scoped defect was
+repaired in that delivery; `false-positive` means the matched text was not that
+rule's defect. `SIDE-004` concerns side effects, `ARTF-001` concerns artifact
+durability, `STATE-001` concerns an empty-state marker, and `ROUTE-002` is an
+informational routing observation. Architecture decision record (ADR),
+Behavioral Eval Runner (BER), and Task-Authorized Local Implementation (TALI)
+appear in the dispositions. See the [merged delivery](README.md) and the
+[current skill standard](../../skill-generation-standard.md). The 98 table
+rows below remain the original review judgments.
+
 All 98 semantic candidates in the clean merged-main audit were reviewed in context: **19 confirmed and fixed, 79 false positives, zero unresolved**. Three additional write-boundary defects were found adjacent to regex matches and are recorded separately. These are scoped review judgments, not proof of measured model behavior.
 
 The immutable input is [before.json](before.json), engine v1.13.0 at `f5e04ad07a5fd2b34b7470bffd38a50c15ce691a`. [Machine-readable dispositions](candidate-dispositions.json) preserve the complete finding, unique fingerprint and rationale. Informational ROUTE-002 rows are routing census observations, not unresolved defect assertions. The frozen earlier v1.12.0 historical baseline is unchanged.
