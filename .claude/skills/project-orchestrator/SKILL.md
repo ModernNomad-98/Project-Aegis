@@ -241,12 +241,12 @@ here.
   of a SaaS/multi-customer product:* `saas-platform-architect`,
   `tenant-modeler` → `multi-tenant-data-architect`,
   `authorization-matrix-designer`.
-- **Stage 4 — Make it safe.** *Invoke by evidence of the feature, not on the
-  default path:* `threat-modeler` / `ai-threat-modeler`;
+- **Stage 4 — Make it safe.** *Only by evidence:* `threat-modeler` / `ai-threat-modeler`;
   `tenant-isolation-reviewer`, `share-link-access-architect`,
-  `file-upload-storage-architect`, `prompt-injection-defender` *(manual-only —
-  the routing invariant applies)*, `structured-output-validator`,
-  `ai-cost-guardrail-designer`.
+  `file-upload-storage-architect`, `prompt-injection-defender` *(manual-only)*,
+  `structured-output-validator`, `ai-cost-guardrail-designer`. For AI agent
+  runtimes: `agent-harness-architect`, `model-context-designer`, conditional
+  `agentic-loop-designer` — follow [AI path](../../../docs/paths/add-ai-safely.md).
 - **Stage 5 — Plan the work.** → `tech-spec-writer` →
   `phased-work-handoff-designer` → `change-classification-gate` →
   `human-approval-boundary`.
@@ -278,10 +278,10 @@ here.
   routing invariant applies)* → `rollback-runbook-author` →
   `incident-response-runbook`. *If merge == deploy on the platform:*
   `merge-is-deploy-governance`. Route FROM the decider's result; never
-  re-derive or copy its decision model here.
+  re-derive or copy its decision model here; for several reviewers and plain-language skill explanations, use the [guided release path](../../../docs/paths/release-with-agents.md).
 - **Stage 9 — Decide to release.** → `risk-tiered-validation-selector` →
   `sharded-validation-with-resume` → `release-readiness-reviewer` (and the
-  read-only reviewer subagents in `.claude/agents/`).
+  read-only reviewer subagents in `.claude/agents/` when available and relevant); the reviewer advises and the owner authorizes; Aegis's control plane is synthetic only.
 
 **The manual-only routing invariant.** Before routing to ANY skill, check its
 invocation posture. A **manual-only** target (`disable-model-invocation: true`;

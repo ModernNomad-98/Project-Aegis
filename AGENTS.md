@@ -12,6 +12,13 @@ Project Aegis is a library of role and discipline skills for AI-assisted SaaS en
 Skills live in `.claude/skills/<skill-name>/SKILL.md` (open Agent Skills format: YAML frontmatter + workflow doc).
 Before designing, reviewing, or fixing anything, find the matching skill there and follow its SKILL.md.
 Skills whose description begins "MANUAL-ONLY" must never be auto-applied — use them only when the user names them explicitly.
+When actually invoking any Aegis skill, tell the user its exact name and, in
+plain language, why it applies now, what it will inspect or do, and what
+result or decision it will produce. Afterward, explain what it found, what
+remains uncertain, and which action needs the user's decision. Keep this brief
+and tied to the actual work; announcing a possible skill is not an invocation.
+This teaching step never relaxes a manual-only boundary or substitutes
+explanation for evidence or approval.
 Evidence over assumption: verify against the repo and live systems before acting, and treat volatile facts (versions, counts, tool behavior) as verification items, not truths.
 
 **Source-library owner approvals.** For work on `ModernNomad-98/Project-Aegis` in
