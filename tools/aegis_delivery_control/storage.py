@@ -25739,7 +25739,7 @@ class SQLiteStateStore:
         containment_digest: str | None = None,
         containment_verifier: Callable[[], str] | None = None,
         failure_hook: FailureHook | None = None,
-    ) -> None:
+    ) -> bool:
         with self._writer_lock(), closing(
             self._connect()
         ) as connection:
@@ -25965,7 +25965,7 @@ class SQLiteStateStore:
                             "validator contact replay binding is inconsistent"
                         )
                     connection.rollback()
-                    return
+                    return False
                 run = connection.execute(
                     "SELECT lifecycle_state, continuation_cursor FROM runs "
                     "WHERE run_id = ? AND "
@@ -26146,6 +26146,7 @@ class SQLiteStateStore:
             except BaseException:
                 connection.rollback()
                 raise
+        return True
 
     def _record_validator_initiation_disabled(
         self,
