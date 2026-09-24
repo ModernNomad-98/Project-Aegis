@@ -4,12 +4,12 @@
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. At the latest recorded [five-merge checkpoint after pull
-request #207](#five-merge-checkpoint--2026-09-23-after-pull-request-207), the
-selected remaining work totals **150–394 active hours**, including **55–200
+request #212](#five-merge-checkpoint--2026-09-24-after-pull-request-212), the
+selected remaining work totals **145–369 active hours**, including **50–175
 active hours** for the repository-wide documentation readability sweep. That
-checkpoint was recorded on 2026-09-23; later work should be checked against
+checkpoint was recorded on 2026-09-24; later work should be checked against
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-207--2026-09-23)
+the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-212--2026-09-24)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
 
@@ -1642,6 +1642,70 @@ The shorter candidate residual model assumed minutes per long roadmap or
 backlog page and was rejected as insufficient for full-page acceptance.
 Re-estimate after the measured sample; keep the normal five-merge checkpoint.
 No implementation or approval gate changes in this interim accounting.
+
+## Five-merge checkpoint — 2026-09-24, after pull request #212
+
+Five requests merged after #207, in order #208, #209, #210, #211 and #212.
+The exact base is the #212 merge `ba24016d209be6e49171be52332887558db16ab2`.
+The [measurement checkpoint](aegis-execution-metrics.md#checkpoint-after-pull-request-212--2026-09-24)
+records each original estimate and observed wall interval. All three exact-head
+checks passed for each request. The #212 [exact-main run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35942609209)
+passed at the merge commit. These short documentation and correction intervals
+do not measure active coding throughput; owner waiting and GitHub queue time
+are excluded from the estimates below.
+
+| Merged request and scope | Merge commit | Original package ETA | Observed first-work-to-merge wall time |
+| --- | --- | ---: | ---: |
+| [#208](https://github.com/ModernNomad-98/Project-Aegis/pull/208): preceding forecast | `754fc7a02f85c1f05dc32b4bbd70c1b616979b50` | 1–2 active hours | About 11m27s |
+| [#209](https://github.com/ModernNomad-98/Project-Aegis/pull/209): 21-page acceptance batch | `f1bfaece5b68551f75e910470becd17ed61ccb7e` | 3–6 active hours | About 19m31s |
+| [#210](https://github.com/ModernNomad-98/Project-Aegis/pull/210): 20-page acceptance batch | `80fbdbb4b6319dc1e7cafc9a57235a77360f9763` | 3–6 active hours | About 25m24s |
+| [#211](https://github.com/ModernNomad-98/Project-Aegis/pull/211): retry semantics correction | `2efae405d555815383abc1d9f713f3e4549eef84` | 1–2 active hours | About 10m29s |
+| [#212](https://github.com/ModernNomad-98/Project-Aegis/pull/212): 20-page acceptance batch | `ba24016d209be6e49171be52332887558db16ab2` | 3–6 active hours | About 16m10s |
+
+The exact tree has **558 tracked Markdown pages**. The earlier nine-page
+sample, the 21 and 20-page batches, the one-page retry correction and the
+latest 20-page batch accepted **71 distinct existing pages**. Four new dated
+notes entered the inventory after #207; therefore **487 pages** lack recorded
+full-page acceptance. The disjoint pending buckets are **308 skill pages,
+59 previously corrected primary pages, 58 dated notes or tracking pages,
+18 other reader pages and 44 synthetic fixtures**. Earlier sorted screens
+remain progress, not full-page acceptance.
+
+The residual model retains the #207 per-page assumptions: 4–12 minutes for
+each skill page, 8–25 for each corrected primary page, 3–10 for each dated
+note, and 20–60 for each other reader page. Fixtures add 1–3 active hours,
+corrections 8–20, integration 4–8, and the upper tail 0–30. The arithmetic is
+**50.3–174.85 active hours**, rounded to **50–175** for documentation. This
+is a planning range; a timed stratified review is still needed to calibrate
+the per-page rates. No non-documentation implementation or authorization gate
+closed in these five merges.
+
+| Selected open work item | Previous remaining active hours | Revised remaining active hours | Remaining gate after #212 |
+| --- | ---: | ---: | --- |
+| Work package 2B-3 candidate inputs | 1–4 | 1–4 | Owner semantic and label review of private replacement inputs |
+| Behavioral Eval Runner item 009 evidence policy | 8–16 | 8–16 | PR #139 guard disposition; real-host enforcement later |
+| Work package 2B-3 execution support | 8–16 | 8–16 | Separate exact offline holdout executor grant and implementation |
+| Work package 2B-3 measurement and owner decision 1 | 4–10 | 4–10 | Reviewed inputs, source, allowance, development result and holdout freeze |
+| Selected-host capability proof | 12–24 | 12–24 | Named host and measured isolation |
+| Work package 2B-4 | 12–24 | 12–24 | Calibration and host proof before limited live suite |
+| Work package 2B-5 | 8–16 | 8–16 | Package 2B-4 gate before generic corpus |
+| Work package 2B-6 | 8–16 | 8–16 | Later scheduling, cost, quarantine and dataset operations |
+| Work package 2B-7 | 4–8 | 4–8 | Later advisory continuous integration and operator workflow |
+| Control-plane work package 003 | 8–16 | 8–16 | Real source, freshness, containment, evidence and billing proof |
+| Control-plane work package 004 | 8–16 | 8–16 | Delivery target and package-003 prerequisites |
+| Issue #101 package 4 | 8–16 | 8–16 | Pinned host, cases, budget, execution authority and comparison |
+| Issue #101 package 7 | 6–12 | 6–12 | Release evaluation after selected integration outcomes |
+| Repository-wide documentation readability | 55–200 | **50–175** | 487 pages lack full-page acceptance; timed stratified review remains |
+| **Selected remaining total** | **150–394** | **145–369** | Non-documentation **95–194** plus documentation **50–175** |
+
+The seven optional rows from the #207 checkpoint retain their estimates and
+selection gates. Both optional issue #101 helpers together add **16–40**
+active hours, changing the bounded selected-plus-both total from **166–434**
+to **161–409**. Additional host and product quantities, strategic expansion,
+multi-judge arbitration and future control-plane architecture remain
+unbounded. No finite all-options total or calendar date is supportable. Start
+the next five-merge counter after #212, and revise sooner if verified scope or
+an owner decision materially changes the remaining work.
 
 ## Five-merge checkpoint — 2026-09-23, after pull request #207
 
