@@ -3,11 +3,20 @@
 ## Start here — current reading
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
-to start blocked work. The [18-page candidate batch after #234](#documentation-batch-estimate--2026-09-24-after-pull-request-234)
-would put selected remaining work at **120–299 active hours** on merge,
+to start blocked work. The [18-page batch after #234](#documentation-batch-estimate--2026-09-24-after-pull-request-234)
+put selected remaining work at **120–299 active hours** on merge,
 including **25–105 active hours** for repository-wide documentation
 readability. The [five-merge checkpoint after #232](#five-merge-checkpoint--2026-09-24-after-pull-request-232)
 reassessed every selected and optional row. Later work should be checked against
+the [whole remaining-page candidate after #237](aegis-documentation-readability-backlog.md#documentation-batches):
+84 reader-page acceptances, 44 fixture classifications, and the new note
+passed independent review; the protected fixture README remains for a separate
+guarded correction. On this PR's merge, the known documentation residual is
+**one page / 1–3 active hours** excluding owner wait, and the other selected
+rows retain **95–194 active hours**, so selected remaining work becomes
+**96–197 active hours**. This is a prospective completion estimate, not an
+observed work rate. Confidential conduct intake remains a separate owner
+decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
 the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-232--2026-09-24)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)

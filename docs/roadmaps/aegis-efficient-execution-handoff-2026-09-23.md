@@ -27,8 +27,10 @@ integration (CI) checks are not selected-host proof.
 
 Start with the [owner approval register](../approvals/APPROVAL_REGISTER.md)
 for authorization and later lifecycle events, then the owning backlog or
-setup plan above for exact status. The [latest forecast](aegis-backlog-forecast.md#start-here--current-reading)
-estimates **175–394 remaining active hours** of selected work; it does not
+setup plan above for exact status. At this page's 2026-09-23 check, the
+[forecast](aegis-backlog-forecast.md#start-here--current-reading)
+estimated **175–394 remaining active hours** of selected work; follow the link
+for the current range. It does not
 grant implementation or provider authority. Review the current branch, head,
 checks and open PRs before choosing a task. Do not restart §5 from this dated
 handoff.

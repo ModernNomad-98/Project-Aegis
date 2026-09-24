@@ -79,15 +79,42 @@ the D8 OWASP Top 10:2025 audit — `security-logging-alerting-architect` (A09) a
 `error-handling-security-reviewer` (A10) — so all 10 web-app categories now have an owning
 skill. The **SaaS architecture-depth pack** (D12.11) then completed in two builds: the
 10-skill **strong cluster** (D31) and the 4-skill **low-priority set** (D32), resolving all 14
-candidates and bringing the library to **175 skills**. **D33** then ran a library-wide
+candidates and bringing the library to **175 skills**.
+
+**D33** then ran a library-wide
 `skill-quality-reviewer` sweep that landed corrections only, and D34–D36 were
-documentation-only — no change to the count. **D38** added
+documentation-only — no change to the count.
+
+**D38** added
 `project-orchestrator`, the beginner-facing top-level lifecycle router that is the library's
-front door (175→176). **D42** built the **CONSTRAIN/CURATE design pack** —
+front door (175→176).
+
+**D42** built the **CONSTRAIN/CURATE design pack** —
 `agent-harness-architect`, `model-context-designer`, and `agentic-loop-designer`, plus an
 extension of `structured-output-validator` — making the doctrine's D41 inward-facing pillars
 real: the DESIGN skills for the AI's own operating environment (harness, context, loop) that
-produce what the agentic-security clusters review (176→179). Most recently, **D44** built the **Security scanning & orchestration pack** (D12.10, the last banked capability) — `security-scan-orchestrator`, `sast-orchestration-designer`, and `dast-safety-harness-designer` — the ORCHESTRATION layer that runs and aggregates security scans (SAST/DAST/whole-repo) and yields finding TRIAGE to the judgment skills (179→182). **D45** extended `cloud-architecture-decider` with the full deployment abstraction ladder — rung × provider × posture, adding the modern managed-platform tier and GCP — with no count change. **D46** built `authority-invalidation-architect` — the symptom-triggered owner of the "change didn't take effect" access-bug class (a removed user still sees data, a revoked role still works, logout doesn't end the session), composing the per-surface mechanism owners rather than restating them (182→183). Most recently, **D47** built `superadmin-observability-console-designer` — the cross-tenant superadmin MONITORING-console design owner, closing the three-way pointer hole (`admin-console-architect` punts telemetry to `observability-operator`, which operates backends rather than designing consoles): the layered panel IA plus the cross-tenant read-security model, composing the ~12 feed owners rather than restating them — bringing it to **184 skills** (183→184).
+produce what the agentic-security clusters review (176→179).
+
+**D44** built the **Security scanning & orchestration pack** (D12.10, the last
+banked capability) — `security-scan-orchestrator`,
+`sast-orchestration-designer`, and `dast-safety-harness-designer` — the
+orchestration layer that runs and aggregates security scans
+(SAST/DAST/whole-repo) and yields finding triage to the judgment skills
+(179→182). **D45** extended `cloud-architecture-decider` with the full
+deployment abstraction ladder — rung × provider × posture, adding the modern
+managed-platform tier and GCP — with no count change.
+
+**D46** built `authority-invalidation-architect` — the symptom-triggered owner
+of the "change didn't take effect" access-bug class (a removed user still sees
+data, a revoked role still works, logout doesn't end the session), composing
+the per-surface mechanism owners rather than restating them (182→183).
+
+**D47** built `superadmin-observability-console-designer` — the cross-tenant
+superadmin monitoring-console design owner, closing the three-way pointer hole
+(`admin-console-architect` punts telemetry to `observability-operator`, which
+operates backends rather than designing consoles): the layered panel IA plus
+the cross-tenant read-security model, composing the ~12 feed owners rather
+than restating them — bringing it to **184 skills** (183→184).
 
 ## Delivery update — 2026-09-12
 

@@ -8,7 +8,7 @@ comparison](#agreed-first-local-comparison-for-package-4), and the
 users invoke the manual [`aegis-setup`](../../.claude/skills/aegis-setup/SKILL.md)
 skill for the four-choice conversation; this plan grants no execution authority.
 
-Package 1 delivered design and candidate screening. Package 2 delivers a
+Package 1 delivered design and candidate screening. Package 2 delivered a
 manual-only four-choice setup conversation and tested Windows PowerShell
 Aegis-only saved selection. Optional helpers remain unavailable. No optional
 helper model or host hook is installed, connected or evaluated, and there is
