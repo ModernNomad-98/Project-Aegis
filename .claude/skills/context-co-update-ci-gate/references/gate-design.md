@@ -7,7 +7,7 @@ does not edit pipeline files.
 ## Check logic (pseudocode)
 
 ```
-changed  = files changed in PR vs base          # e.g. git diff --name-only origin/<base>...HEAD
+changed  = files changed in PR vs base          # e.g. git diff --no-renames --name-only origin/<base>...HEAD
 IMPORTANT = [ globs from the design ]           # e.g. src/api/**, **/migrations/**, .github/workflows/**, AGENTS.md
 CONTEXT   = [ docs/REPO_CONTEXT_MAP.md, docs/context/** ]   # the protected artifacts
 
@@ -28,7 +28,9 @@ Notes:
 - The marker line must carry a REASON; a bare "Context-Update: none" fails.
 - A PR whose only changes ARE the context artifacts passes trivially (the
   map may be updated on its own).
-- Renames/deletes of important paths count as touching them.
+- Renames/deletes of important paths count as touching them. With
+  `--no-renames`, a rename appears as a deletion and an addition, so match
+  both the old and new paths against the important-path globs.
 
 ## GitHub Actions shape (reference)
 
@@ -47,7 +49,7 @@ jobs:
       - name: enforce co-update
         run: |
           # compare against the PR base, not HEAD~1 (multi-commit PRs)
-          git diff --name-only "origin/${{ github.base_ref }}"...HEAD > changed.txt
+          git diff --no-renames --name-only "origin/${{ github.base_ref }}"...HEAD > changed.txt
           # ... apply the pseudocode above; exit 1 on FAIL
 ```
 
@@ -100,11 +102,11 @@ teaches people to fight the gate, not maintain the map.
 
 | Glob | Why |
 | --- | --- |
-| `src/**` API/route/service roots | The map's architecture sections describe them. |
-| `**/migrations/**`, schema files | Schema drift is the most expensive kind. |
+| `src/**` | API, route and service roots described by the map's architecture sections. |
+| `**/migrations/**`, `**/schema/**` | Candidate schema paths; replace with the repo's actual layout. |
 | `.github/workflows/**` | Pipeline behavior is context; also self-protects this gate. |
-| Agent-instruction files (`CLAUDE.md`, `AGENTS.md`, etc.) | Sessions act on them; stale ones steer agents wrong. |
-| Auth/RLS/policy paths | Security posture claims in the map must track them. |
+| `CLAUDE.md`, `AGENTS.md`, `**/AGENTS.md` | Agent instructions steer sessions; add actual repo-specific instruction paths. |
+| `**/auth/**`, `**/rls/**`, `**/policies/**` | Candidate security paths; calibrate to the repo's actual enforcement files. |
 
 Keep the list short enough that a triggered gate is nearly always RIGHT —
 the gate's authority comes from its precision, not its coverage.

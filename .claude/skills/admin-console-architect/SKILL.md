@@ -83,7 +83,11 @@ does not grant anyone real production access.
    (operator identity, tenant, action, target, reason/ticket, timestamp) via
    `audit-log-architect`'s schema, and the emission is not skippable. An
    operator reading a customer's data is itself an audited event, not just
-   writes. State how a read cannot happen without its audit record.
+   writes. Cover the console's API and background paths as well as its user
+   interface. Define a durable record with actor, tenant, target, action,
+   reason, timestamp and outcome; deny the data return or mutation if the
+   audit record cannot be committed. Test that failure path for both reads
+   and writes.
 3. **Design impersonation / support-mode with hard boundaries.** The security-
    critical surface:
    - **It is always clearly impersonation, never silent.** The session is
@@ -133,8 +137,9 @@ Posture:        DESIGN ONLY — enforces the authz policy; grants no real access
   runs no operator actions (those follow the approval path).
 Operator personas → tiers: <persona — tier (view-ops/write-ops/superadmin) —
   can see / can do; enforced against authorization-matrix-designer's policy>
-Cross-tenant audit: <every action (READ and write) emits operator/tenant/action/
-  target/reason record via audit-log-architect; emission not skippable>
+Cross-tenant audit: <every action (READ and write), including API/background
+  paths, commits operator/tenant/target/action/reason/time/outcome via
+  audit-log-architect; fail closed if durable recording fails>
 Impersonation/support-mode: <always-marked; bounded (allowed vs gated/forbidden
   actions); consent/ticket gate; records real operator + impersonated user;
   time-boxed auto-expiry>

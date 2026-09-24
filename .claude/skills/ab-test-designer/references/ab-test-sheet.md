@@ -30,18 +30,20 @@ Never "we'll just keep an eye on it and call it when it's significant".
 
 ## Multiple comparisons
 
-Testing many metrics/segments inflates false positives (1-in-20 clears
-p<0.05 under the null):
+Testing many metrics/segments inflates false positives: under independent
+null tests at p<0.05, about one in twenty would pass by chance in expectation,
+not with certainty.
 - Pre-register ONE primary metric; others are guardrails or exploratory.
-- If multiple primary comparisons are unavoidable, correct (Bonferroni /
-  Benjamini-Hochberg).
+- If multiple primary comparisons are unavoidable, preselect a correction
+  matching the decision: Bonferroni controls family-wise error; Benjamini–
+  Hochberg controls the expected false discovery rate across discoveries.
 - Post-hoc segment "wins" are hypotheses to confirm, not results.
 
 ## Validity checks (run before trusting a result)
 
 | Check | What it catches |
 |---|---|
-| Sample ratio mismatch (SRM) | Split arrives off (e.g. 53/47) → broken bucketing/logging; invalid |
+| Sample ratio mismatch (SRM) | Test observed allocation against the planned split and sample size; a significant mismatch triggers assignment/exposure/logging investigation before outcome inference |
 | Simpson's paradox | Aggregate reverses within segments as segment sizes shift |
 | Novelty / primacy | Early behavior ≠ steady state; needs enough time |
 | Guardrail regressions | A "win" that tanks revenue/latency/retention is not a win |
@@ -50,7 +52,9 @@ p<0.05 under the null):
 ## Reading a result
 
 - Report **effect size + confidence interval**, not a bare p-value.
-- "Not significant" = "couldn't detect an effect ≥ MDE", NOT "no effect".
+- "Not significant" is inconclusive unless the confidence interval rules out
+  effects at or above the prespecified practical threshold; it is not proof
+  of no effect.
   A wide CI around zero = "we don't know".
 - Judge the effect against the MDE you set for a reason.
 - Decision: ship / kill / iterate, stating the effect, its interval,

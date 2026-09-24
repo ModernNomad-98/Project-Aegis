@@ -35,6 +35,9 @@ a threat row (or an explicit "not applicable, because…").
 ### Server → data store
 - Every query on this path carries tenant scope? Server-derived, never
   client-supplied? RLS or equivalent enforced (hand to `rls-policy-auditor`)?
+- For a tenant-scoped invoice read, does the server also verify that the
+  caller's role may read that particular invoice, rather than trusting a
+  tenant match alone? Record both isolation and object authorization rows.
 - Service-role / superuser credentials confined to server runtime, never
   exposed to a path a tenant can influence?
 
@@ -68,7 +71,7 @@ state why in one line.
 | Persona | Capability | Why it matters |
 |---|---|---|
 | Anonymous | No credentials | Public endpoints, signup, password reset, webhooks |
-| Authenticated, wrong tenant | Valid login, different org | The most common real SaaS attacker; drives IDOR/isolation rows |
+| Authenticated, wrong tenant | Valid login, different org | Models valid credentials used across tenant boundaries; drives IDOR/isolation rows |
 | Authenticated, lower role | Valid login, insufficient role | Privilege escalation, admin-action reach |
 | Malicious insider | Support/admin console access | Brokered access, audit, blast radius |
 | Compromised dependency | Runs in build/runtime | Supply-chain, secret exfiltration |

@@ -1,6 +1,6 @@
 # Vitest Patterns
 
-Detail file for `vitest-unit-component-engineer`. Loaded on demand.
+Detail file for [vitest-unit-component-engineer](../SKILL.md). Loaded on demand.
 
 ## Environment selection table
 
@@ -13,6 +13,15 @@ Detail file for `vitest-unit-component-engineer`. Loaded on demand.
 
 Declare per file with `// @vitest-environment jsdom` or per glob with
 `environmentMatchGlobs` — visible intent either way.
+
+A small pure-function test stays in `node` and checks behavior, not just
+construction:
+
+```ts
+import { expect, test } from 'vitest';
+import { clamp } from '../src/clamp'; // replace with the real module path
+test('clamps above the allowed range', () => expect(clamp(12)).toBe(10));
+```
 
 ## Mock-seam patterns
 
@@ -35,10 +44,19 @@ component's semantics — which also feeds `accessibility-test-harness`).
 
 Interactions: `userEvent` over `fireEvent` (real event sequences).
 Async: `findBy*` / `waitFor` with a specific assertion — never sleep.
+For a component test, declare `// @vitest-environment jsdom`, render the
+component, find the button with `getByRole('button', { name: 'Save' })`, click
+with `userEvent`, and assert the visible saved state. An owned API-adapter
+call can be a secondary assertion, but cannot replace the rendered outcome.
+Restore owned-boundary mocks and real timers in `afterEach`; when fake timers
+are needed with `userEvent`, configure its timer-advance hook explicitly.
 
 ## Determinism recipes
 
-- Freeze time zone in config (`TZ=UTC` in test env) or make code TZ-explicit.
+- Freeze time zone in the test runner's cross-platform environment setup (for
+  example, set `process.env.TZ = 'UTC'` before date-sensitive modules load) or
+  make code time-zone explicit; POSIX `TZ=UTC command` syntax is not portable
+  to every Windows shell.
 - One assertion of truth per behavior; table-drive boundaries with
   `test.each`.
 - Isolation check: run with `--sequence.shuffle` locally when touching suite

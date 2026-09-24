@@ -1,6 +1,9 @@
 # Contribution Guide Sheet
 
-Detail for `contribution-guide-author`. Read on demand.
+Detail for `contribution-guide-author`. Read on demand. Here **CI** means
+continuous integration, **PR** means pull request, **CLA** means contributor
+license agreement, **DCO** means Developer Certificate of Origin, and **OSS**
+means open-source software.
 
 ## Zero-to-merged section skeleton
 
@@ -11,7 +14,7 @@ Detail for `contribution-guide-author`. Read on demand.
 <code, docs, triage, issues — set the scope>
 
 ## Find something to work on
-<good-first-issues; issue labels; ask before big changes>
+<good-first-issues; issue labels; where to ask questions; ask before big changes>
 
 ## Set up locally
 <clone / install / build / run / test — exact, verified, prereqs stated>
@@ -49,7 +52,9 @@ Broken setup is the #1 contribution killer — verify like a quickstart.
 | "Write tests" | required test check + `run: <cmd>` |
 | "Format commits like…" | commit lint / template |
 
-Contributors run a command; they don't memorize prose. Tell them how to
+`<cmd>` is a placeholder: replace it with the project's verified executable
+command before publishing the guide. Contributors run a command; they don't
+memorize prose. Tell them how to
 pass CI before pushing.
 
 ## Expectation-setting patterns
@@ -68,6 +73,7 @@ pass CI before pushing.
 
 ## Product-agnostic
 
-Use placeholders (`<project>`, `<cmd>`, `<chat>`), single-source commands,
+Use placeholders (`<project>`, `<cmd>`, `<chat>` for a question channel),
+single-source commands,
 and keep the guide matched to the project's REAL process. A stale
 CONTRIBUTING is worse than none.

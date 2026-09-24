@@ -24,6 +24,14 @@ a secret only in the map is still shipped.
 Claim discipline: report "none found by value+pattern search over <file
 classes>" — never "no secrets in bundle" as an absolute.
 
+For example, place a synthetic `EXAMPLE_SERVER_TOKEN` in a test-only build
+input and scan each shipped file class. The scanner compares bytes in memory
+and reports only `dist/assets/app.js: presence`, without printing the value,
+matching line or bundle excerpt. Treat a pattern hit as a finding to inspect
+under the authorized evidence boundary; a pattern can also match harmless
+text. Record the exact file classes searched and redact paths in shared
+reports when they disclose sensitive structure.
+
 ## Parity walk checklist (vite preview)
 
 - Direct-URL load of every top-level route and one deep nested route
@@ -40,11 +48,15 @@ Record: `vite build --mode <real>` + `vite preview` versions and flags.
 
 - Size budget: compare `dist/assets/*.js` gzip sizes against a checked-in
   budget file; fail on regression > threshold, print the diff table.
+  Example: baseline `app.js` 100 KiB gzip, candidate 112 KiB, allowed increase
+  10 KiB: fail by 2 KiB and investigate the changed modules.
 - Unexpected inclusion: fail if entry chunk contains modules matching a
   denylist (server-only SDKs, node builtins polyfilled by accident,
   devtools).
 - Sourcemap policy: assert presence/absence of `*.map` and of
   `//# sourceMappingURL` in shipped JS matches the repo policy per mode.
+  For example, a production mode that forbids published maps fails if either
+  a `.map` file or a source-map reference ships, even when other scans pass.
 
 Placement of these checks in PR/merge tiers: per the
 `qa-automation-architect` blueprint.

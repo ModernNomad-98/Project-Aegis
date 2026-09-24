@@ -3,9 +3,9 @@
 ## Start here — current reading
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
-to start blocked work. The [40-page candidate batch after #233](#documentation-batch-estimate--2026-09-24-after-pull-request-233)
-would put selected remaining work at **120–304 active hours** on merge,
-including **25–110 active hours** for repository-wide documentation
+to start blocked work. The [18-page candidate batch after #234](#documentation-batch-estimate--2026-09-24-after-pull-request-234)
+would put selected remaining work at **120–299 active hours** on merge,
+including **25–105 active hours** for repository-wide documentation
 readability. The [five-merge checkpoint after #232](#five-merge-checkpoint--2026-09-24-after-pull-request-232)
 reassessed every selected and optional row. Later work should be checked against
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
@@ -1642,6 +1642,30 @@ The shorter candidate residual model assumed minutes per long roadmap or
 backlog page and was rejected as insufficient for full-page acceptance.
 Re-estimate after the measured sample; keep the normal five-merge checkpoint.
 No implementation or approval gate changes in this interim accounting.
+
+## Documentation-batch estimate — 2026-09-24, after pull request #234
+
+The [18-page skill batch](../evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md)
+starts from the exact #234 merge
+`5c46c7b3e61712674051eb734fa7d099a10aae4f`. Eighteen distinct
+existing skill pages gain full-page acceptance after six independent
+corrected-candidate reviews. One new dated review note raises the candidate
+inventory from 575 to **576 Markdown pages**; accepted existing pages rise
+from 431 to **449**, and **127 remain**: zero skill entrypoints/references,
+48 previously corrected primary pages, 17 dated notes/tracking pages, 18
+other reader pages and 44 synthetic fixtures. The new note remains pending.
+
+The unchanged residual model calculates **26.25–101.8333 raw active hours**:
+`48×8/60 + 17×3/60 + 18×20/60 + 1 + 8 + 4` at the lower end;
+`48×25/60 + 17×10/60 + 18×60/60 + 3 + 20 + 8 + 30` at the upper end.
+Outward five-hour planning bounds change documentation from **25–110** to
+**25–105 active hours**. The other selected rows remain **95–194**, so
+selected remaining work changes from **120–304** to **120–299 active
+hours**. Both optional issue #101 helpers would make **136–339**; other
+optional rows and the unbounded all-options status are unchanged. The
+previous documentation estimate was **25–110**, and this batch's separate
+estimate is **3–6 active hours**. The next full per-item checkpoint follows
+five merges after the #233 forecast checkpoint; #234 is the first.
 
 ## Documentation-batch estimate — 2026-09-24, after pull request #233
 

@@ -6,7 +6,7 @@
 
 # ADR-NNNN: <Short imperative title, e.g. "Use Postgres row-level security for tenant isolation">
 
-Status: proposed <!-- proposed | accepted | superseded by ADR-MMMM -->
+Status: proposed <!-- use repository vocabulary: proposed | accepted | rejected | deprecated | superseded by ADR-MMMM -->
 Date: YYYY-MM-DD
 Review by: YYYY-MM-DD <!-- specific date to re-check the assumptions below -->
 
