@@ -73,11 +73,19 @@ review of DDL someone already wrote.
 3. **Design the expand stage.** Introduce the new shape alongside the old —
    new column/table, nullable or defaulted, no old object touched.
    Compatibility guarantee to state: old code ignores the new shape
-   entirely; new code can read old rows (null-tolerant reads).
+   entirely; new code can read old rows (null-tolerant reads). Use the
+   version/schema matrix in
+   [references/evolution-stage-playbook.md](references/evolution-stage-playbook.md)
+   to prove old code on the expanded schema and new code on the old schema
+   during a rolling deploy; specify a fallback when the old schema cannot
+   yet store or expose the new shape.
 4. **Design the migrate stage.** Dual-write from application code (writes
    land in both shapes), backfill existing rows in batches, then move reads
    to the new shape behind a verifiable switch. State the guarantee both
    directions: either code version produces rows the other can read. The
+   plan must say how new code reads old-only writes until every writer has
+   moved, and when dual writes can safely begin or end. Verify each
+   concurrent code/schema pair in the version/schema matrix. The
    backfill's operational execution is handed to
    `data-migration-runbook-author`; this plan states WHAT must be true
    after it (row parity, checksum match).
@@ -88,8 +96,9 @@ review of DDL someone already wrote.
    belongs here, never in expand.
 6. **Define per-stage verification gates.** Each stage ends with an
    observable check before the next starts: expand — schema present, no
-   errors from old code; migrate — parity evidence (counts/checksums, reads
-   served from new shape); contract — proof of zero readers of the old
+   errors from old code and supported new-code/old-schema fallback; migrate —
+   parity evidence (counts/checksums, reads served from new shape) and
+   old-only write/read compatibility; contract — proof of zero readers of the old
    shape over a stated window (query stats, log scan) before any drop.
 7. **Map each stage to release boundaries.** State which stage rides which
    deploy, what the rollback of each stage is (expand and dual-write stages

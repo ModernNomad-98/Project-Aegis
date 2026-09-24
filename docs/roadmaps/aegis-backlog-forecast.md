@@ -3,13 +3,13 @@
 ## Start here — current reading
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
-to start blocked work. The [documentation-batch estimate after #224](#documentation-batch-estimate--2026-09-24-after-pull-request-224)
-provisionally puts selected remaining work at **130–334 active hours**,
-including **35–140 active hours** for repository-wide documentation
+to start blocked work. The [documentation-batch estimate after #225](#documentation-batch-estimate--2026-09-24-after-pull-request-225)
+provisionally puts selected remaining work at **130–329 active hours**,
+including **35–135 active hours** for repository-wide documentation
 readability. The last complete [five-merge checkpoint after #222](#five-merge-checkpoint--2026-09-24-after-pull-request-222)
 reassessed every selected and optional row. Later work should be checked against
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#documentation-batch-after-pull-request-224--2026-09-24)
+the [execution measurements](aegis-execution-metrics.md#documentation-batch-after-pull-request-225--2026-09-24)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
 
@@ -1642,6 +1642,29 @@ The shorter candidate residual model assumed minutes per long roadmap or
 backlog page and was rejected as insufficient for full-page acceptance.
 Re-estimate after the measured sample; keep the normal five-merge checkpoint.
 No implementation or approval gate changes in this interim accounting.
+
+## Documentation-batch estimate — 2026-09-24, after pull request #225
+
+The [next 20-page acceptance batch](../evidence/documentation/full-page-readability-batch-after-225-2026-09-24.md)
+starts from the exact #225 merge
+`bc9e48b070fe99085757ce1d9cb0b791640e0d42`. Ten skill entrypoints
+and ten skill references gain full-page acceptance. One new review note
+brings the candidate inventory to **569 Markdown pages**; **291 existing
+pages** have full-page acceptance and **278 remain**. The disjoint pending
+buckets are **158 skill pages, 48 previously corrected primary pages,
+10 dated notes/tracking pages, 18 other reader pages and 44 synthetic
+fixtures**. The new note remains pending.
+
+The unchanged #222 residual model calculates **36.4333–132.2667 active
+hours**: `158×4/60 + 48×8/60 + 10×3/60 + 18×20/60 + 1 + 8 + 4` at the
+lower end; `158×12/60 + 48×25/60 + 10×10/60 + 18×60/60 + 3 + 20 + 8 + 30`
+at the upper end. Outward five-hour planning bounds narrow documentation
+from **35–140** to **35–135 active hours**. The other 13 selected rows
+remain **95–194**, so the selected total moves from **130–334** to
+**130–329 active hours**. Both optional issue #101 helpers would make
+**146–369**; other optional rows and the unbounded all-options status are
+unchanged. This is the fourth completed merge after #222 if the candidate
+merges; the full per-item checkpoint follows one more merge.
 
 ## Documentation-batch estimate — 2026-09-24, after pull request #224
 

@@ -7,6 +7,13 @@ It is a design/review route, not proof that a control operates. Mark a control
 implemented only after checking its running mechanism, owner and dated
 operating evidence; otherwise record partial or missing status.
 
+The owning [compliance control skill](../SKILL.md) defines how this scaffold is
+used. PII means personally identifiable information; SOC System and
+Organization Controls; ISO International Organization for Standardization;
+RMF risk management framework; AI-SDLC artificial intelligence software
+development life cycle. Framework names here are mapping routes, not
+certification claims.
+
 ## Domain 1 — Access control
 
 | Starter control | Design/review route or candidate artifact to verify |
@@ -41,7 +48,7 @@ operating evidence; otherwise record partial or missing status.
 | --- | --- |
 | Tenant-scoped audit trail (taxonomy, schema, integrity, retention) | `audit-log-architect` |
 | Operational telemetry, alerts, health | `observability-operator`, `slo-reliability-architect` |
-| Security-event detection/alerting | GAP by design (D8/A09 backlog: `security-logging-alerting-architect`) — carry as missing |
+| Security-event detection/alerting | `security-logging-alerting-architect` supplies the design route (D28 closed the skill-coverage gap); inspect implementation and dated operating evidence before marking this control active |
 
 ## Domain 5 — Incident response
 

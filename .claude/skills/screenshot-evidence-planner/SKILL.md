@@ -124,9 +124,11 @@ Adoption: <which producers follow this (manual/clickthrough/playwright) +
   sidecar/report table is the source of truth; the filename is a locator.
 - Retention "forever" turns evidence into a liability archive of PII —
   retention windows are part of the policy, not an afterthought.
-- Playwright's auto-artifacts (traces, failure screenshots) contain unmasked
-  real data by design — classify their storage separately (short retention,
-  restricted access) instead of pretending they're policy-compliant evidence.
+- Playwright's auto-artifacts (traces, failure screenshots) can capture
+  sensitive data before a masking pass. Prefer synthetic data and disable
+  sensitive auto-artifacts. If a capture cannot be masked before storage,
+  it is not compliant evidence; handle any separately approved transient
+  restricted capture under its own access and deletion rules.
 - Checkpoints defined against unstable demo data produce unjudgeable
   captures — stable/seeded data is a capture-quality rule, not a nicety.
 - A policy nobody can follow in-flow (20 manual fields per capture) will be

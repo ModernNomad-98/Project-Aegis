@@ -2,6 +2,10 @@
 
 Supporting detail for `code-reviewer`. Read on demand.
 
+The owning [code review skill](../SKILL.md) defines the verdict process.
+Authz means authorization, authn authentication, SSRF server-side request
+forgery, and N+1 one query per item after an initial query.
+
 ## Severity definitions
 
 | Severity | Definition | Boundary examples |

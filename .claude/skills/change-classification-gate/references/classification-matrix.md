@@ -2,6 +2,11 @@
 
 Supporting detail for `change-classification-gate`. Read on demand.
 
+The owning [change classification skill](../SKILL.md) defines the gate.
+DDL means data definition language, RLS row-level security, IaC infrastructure
+as code, and CI/CD continuous integration and delivery. The table's class
+names describe the changed behavior and required validation.
+
 ## Per-class definitions and validation detail
 
 | Class | Counts as | Validation detail beyond the floor |

@@ -40,7 +40,7 @@ biggest line item is fiction with a spreadsheet.
   numbers — the append-only event table, rate-card versioning, idempotent
   cost entries, additive rollups, and invoice reconciliation are
   `usage-metering-and-cost-attribution-pipeline-designer`; this skill is the
-  economic MODEL those numbers feed, not the ETL.
+  economic MODEL those numbers feed, not the extract-transform-load (ETL) pipeline.
 
 ## Inputs to Inspect
 
@@ -77,7 +77,9 @@ biggest line item is fiction with a spreadsheet.
 4. **Compute unit economics**: cost per tenant (attributed + overhead
    share), per seat, per plan tier — against revenue per the price book.
    Present distributions, not just averages: the mean tenant is profitable
-   in almost every broken model; the P95 tenant is the finding.
+   in almost every broken model; the 95th-percentile (P95) cost tenant can
+   reveal a concentration hidden by the mean. Compare cost with that
+   tenant's revenue before calling its margin unprofitable.
 5. **Name the exposures**: unbounded variable costs (AI tokens, egress,
    storage growth) with worst-case-per-tenant math; noisy-neighbor cost
    concentration (top tenant's share); allowance arbitrage (plan allowances

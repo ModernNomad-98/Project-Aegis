@@ -1,6 +1,6 @@
 ---
 name: secure-migration-reviewer
-description: Review a database migration for security and deploy safety before it ships — privilege and GRANT changes, RLS/policy enablement gaps (a new tenant table with no policy), unsafe defaults, destructive or irreversible operations (DROP, non-nullable-without-default, type narrowing), data backfills that bypass tenant scope, lock/downtime risk, and forward/rollback safety with deploy-order coupling to code. Produces severity-ranked findings with evidence, a rollback assessment, and required negative tests for any tenant/authorization-affecting change. Use when reviewing a migration/DDL change or gating one before deploy. Delegates deep RLS-policy analysis to rls-policy-auditor. Do NOT use for app-code diffs (security-pr-reviewer), dependency/CI risk (supply-chain-security-reviewer), or SAST triage (static-analysis-reviewer).
+description: Review a database migration for security and deploy safety before it ships — privilege/GRANT changes, effective RLS scope for the intended app role, unsafe defaults, destructive or irreversible operations, tenant-scoped backfills, lock/downtime risk, and forward/rollback safety with deploy-order coupling. A new tenant table with RLS enabled but no applicable policy is default-denied, an availability finding rather than exposure. Produces evidenced findings, rollback assessment, and negative tests for tenant/authorization changes. Use to review or gate a migration/DDL change. Delegate deep RLS analysis to rls-policy-auditor. Do NOT use for app-code diffs (security-pr-reviewer), dependency/CI risk (supply-chain-security-reviewer), or SAST triage (static-analysis-reviewer).
 ---
 
 # Secure Migration Reviewer
@@ -12,7 +12,8 @@ Decide whether a database migration is safe to deploy — on the security axis
 locks, rollback, deploy order). The deliverable is severity-ranked findings
 with evidence, a rollback assessment, and — for any change that affects tenant
 scope or authorization — required negative tests. A migration that enables RLS
-but adds no policy, adds a tenant table with no scoping, widens a GRANT, or
+but adds no applicable policy for the intended app role (blocking legitimate
+access by default), adds a tenant table with RLS disabled, widens a GRANT, or
 drops a column the currently-deployed code still reads is a finding here, not
 after the incident. Deep RLS policy-text analysis is delegated to
 `rls-policy-auditor`; this skill owns the whole-migration verdict.
@@ -59,8 +60,11 @@ after the incident. Deep RLS policy-text analysis is delegated to
 2. **Classify the change** (`change-classification-gate`): schema/migration is
    high-validation and crosses `human-approval-boundary` for production.
 3. **Security pass:**
-   - New tenant-owned table → is RLS enabled AND a restrictive policy present?
-     RLS enabled with no policy, or a table with no scoping, is a finding.
+   - New tenant-owned table → is RLS enabled, and does the intended app role
+     have an effective tenant-scoped policy? RLS enabled with no applicable
+     policy defaults to deny and may block use; RLS disabled or an overbroad
+     applicable grant can expose rows. A restrictive-only policy cannot
+     grant access without a matching permissive policy.
      Route policy-text correctness to `rls-policy-auditor`.
    - GRANT/REVOKE/role changes → does it widen access (e.g. `GRANT ALL`, grant
      to `anon`/public, new BYPASSRLS)? Least privilege preserved?
@@ -109,7 +113,8 @@ Not reviewed: <areas + why>
 ## Validation Checklist
 
 - [ ] Both up and down (rollback) reviewed; missing rollback flagged.
-- [ ] New tenant tables checked for RLS enablement AND a restrictive policy;
+- [ ] New tenant tables checked for RLS enablement and effective tenant scope
+      for the intended app role;
       policy-text audit routed to `rls-policy-auditor`.
 - [ ] GRANT/REVOKE/role/DEFINER changes assessed for privilege widening.
 - [ ] Backfills/data ops checked for correct tenant scope and credentials.
@@ -122,8 +127,9 @@ Not reviewed: <areas + why>
 
 ## Security Rules
 
-- A new tenant-owned table without RLS enabled and a restrictive policy is a
-  finding — "we'll add the policy later" is an unprotected window.
+- A new tenant-owned table with RLS disabled or an overbroad effective grant
+  can be exposed. RLS enabled with no applicable policy denies by default;
+  treat its missing intended access as an availability finding, not exposure.
 - Widening GRANTs, granting to `anon`/public, or introducing BYPASSRLS on a
   request-path role is a finding; least privilege is the default.
 - Backfills that touch tenant data must carry correct tenant scope; a
