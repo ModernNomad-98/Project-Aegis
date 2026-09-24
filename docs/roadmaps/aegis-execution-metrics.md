@@ -17,9 +17,9 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [five-merge checkpoint after pull request #227](#checkpoint-after-pull-request-227--2026-09-24)
+The latest [five-merge checkpoint after pull request #232](#checkpoint-after-pull-request-232--2026-09-24)
 reconsiders every open work item and links the [current remaining-work
-forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-227).
+forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-232).
 The table and dated checkpoints below preserve their original estimates and
 observed intervals; older pending or in-progress cells are historical, not
 current work status. Active-work estimates and observed wall time are different
@@ -1401,6 +1401,40 @@ documentation. Active-only, review, CI and queue durations are not
 separately instrumented; the batch PR will report observed wall time
 against its original ETA. Independent corrected-candidate review,
 exact-head Actions and merge remain required.
+
+## Checkpoint after pull request #232 — 2026-09-24
+
+The five-merge forecast checkpoint began from the exact #232 merge
+`970aad27524bccc8a3f342bc990215904253be53`. The preceding checkpoint
+and this bounded item each estimate **1–2 active hours**. The selected
+remaining forecast at start and after the checkpoint is **125–309 active
+hours**; the #227 checkpoint was **130–324**. The
+[every-item forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-232)
+reassesses 14 selected and seven optional rows. The exact merge tree has
+**574 tracked Markdown pages**, **391** with recorded full-page acceptance
+and **183** pending. Documentation is **30–115**; the unchanged other 13
+selected rows total **95–194 active hours**. Independent read-only agents
+checked the tree, category arithmetic, row estimates and authority gates.
+
+| Merged PR | Original package ETA | Observed available wall interval | Exact-main Actions |
+| --- | ---: | ---: | --- |
+| [#228](https://github.com/ModernNomad-98/Project-Aegis/pull/228) | 1–2 active hours | 8m50s prior merge to merge; first-work start unavailable | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35960351056) |
+| [#229](https://github.com/ModernNomad-98/Project-Aegis/pull/229) | 3–6 active hours | 19m12s prior merge to merge; first-work start unavailable | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35961765170) |
+| [#230](https://github.com/ModernNomad-98/Project-Aegis/pull/230) | 3–6 active hours | 18m45s prior merge to merge; first-work start unavailable | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35963177961) |
+| [#231](https://github.com/ModernNomad-98/Project-Aegis/pull/231) | 3–6 active hours | 18m36s prior merge to merge; first-work start unavailable | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35964645740) |
+| [#232](https://github.com/ModernNomad-98/Project-Aegis/pull/232) | 3–6 active hours | 18m30s prior merge to merge; first-work start unavailable | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35966166419) |
+
+All five exact-head Linux, Windows and protected-file checks passed. The
+five available intervals sum to **1h23m53s**, using GitHub `mergedAt`
+receipts and the PR comments. They include work, review, CI and merge wait;
+active labor, review, CI, queue and owner-wait splits were not separately
+instrumented. They are not a throughput sample. No non-documentation
+implementation or separate owner gate closed. PR #139 and #197 remain open
+with failed protected-file guards, each requiring its own disposition. The
+Behavioral Eval Runner holdout-executor implementation grant remains
+separate; live/provider execution has further gates. This checkpoint PR
+will report its observed available wall interval beside the original ETA
+at merge.
 
 ## Checkpoint after pull request #227 — 2026-09-24
 
