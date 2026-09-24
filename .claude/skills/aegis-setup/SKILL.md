@@ -51,8 +51,16 @@ never authorizes a tool, provider, model or agent.
 3. If the user explores a helper, mark it **unavailable** and always offer
    "Choose Aegis only". Never save a helper choice as completed or attempt an
    install, connection, provider call or fallback from local to online.
-4. If the user chooses Aegis only, on supported Windows PowerShell run:
-   `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/aegis-setup/scripts/selection.ps1 -Action select -ProjectRoot "<absolute-checkout-root>"`.
+4. If the user chooses Aegis only, from the checkout root on supported Windows
+   PowerShell run:
+
+   ```powershell
+   $aegisProjectRoot = (Resolve-Path -LiteralPath .).ProviderPath
+   powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/aegis-setup/scripts/selection.ps1 -Action select -ProjectRoot $aegisProjectRoot
+   ```
+
+   Pass the resolved path variable for `status` and `repair` too; inserting a
+   path containing `$` into a double-quoted command expands part of that path.
    This setting applies to that PowerShell process. If host policy still blocks
    the script, report the save as unavailable; do not change machine policy.
    A missing path, failed write, unsupported OS or malformed prior record is
