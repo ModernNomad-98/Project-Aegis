@@ -3,13 +3,14 @@
 ## Start here — current reading
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
-to start blocked work. The [five-merge checkpoint after #250](#five-merge-checkpoint--2026-09-24-after-pull-request-250)
-reassessed every selected and optional row at that time. PR #249 delivered the
+to start blocked work. The [five-merge checkpoint after #255](#five-merge-checkpoint--2026-09-24-after-pull-request-255)
+reassesses every selected and optional row. PR #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
 documentation residual. PR #253 added one reviewed reader page, making the
 merged tree **585 pages**: 541 accepted readers and 44 classified fixtures,
 with zero known pending pages. The owner's 2026-09-24 approval of the
-[bounded BER-BKL-009 synthetic integration](#material-owner-decision--2026-09-24-ber-bkl-009)
+[bounded BER-BKL-009 synthetic integration](#material-owner-decision--2026-09-24-ber-bkl-009),
+made effective by merged PR #255,
 supersedes the old 8–16-hour whole-item estimate and therefore the old
 87–178-hour selected total. The current selected work has **79–162 active
 hours for the other eleven items, plus an offline package capped at 16 active
@@ -18,7 +19,7 @@ cleanup work**. No finite new selected or all-options total is defensible
 until that residual is scoped.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-250--2026-09-24)
+the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-255--2026-09-24)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
 
@@ -26,8 +27,9 @@ before treating its totals as current.
 
 The owner answered "Approve this bounded scope" to the exact synthetic-only
 [PR #253 proposal](ber-bkl-009-policy-scope-amendment-proposal.md). The
-separate BER-DEC-013 and APR-023 governance amendment on this PR must merge
-before the one ten-path implementation branch starts. Its 16 active-hour,
+separate BER-DEC-013 and APR-023 governance amendment merged in PR #255 as
+`0318b1ecde3ebf5f34bb32f8793efc37b574af39`. The one ten-path
+implementation branch must start from that exact merge. Its 16 active-hour,
 1,500 added code/test lines and $0 external-spend **caps are ceilings, not an
 estimate**. The earlier 8–16-hour BER-BKL-009 whole-item row cannot be carried
 forward as a forecast for the newly split scope.
@@ -41,10 +43,8 @@ forward as a forecast for the newly split scope.
 
 Both optional Issue #101 helpers would add 16–40 hours if selected; all other
 optional and strategic work remains outside this selected view. This owner
-decision triggers an early forecast update, and the next merge after #254 also
-completes the five-merge review cycle. Preserve the dated #250 checkpoint below
-as its historical estimate; perform the full next checkpoint against the exact
-merge receipt.
+decision triggered an early forecast update. The full five-merge reassessment
+is recorded below; the dated #250 checkpoint remains historical.
 
 For requirements and remaining gates, use the owning [Behavioral Eval Runner
 (BER) backlog](behavioral-eval-runner-backlog.md), [control-plane (CP)
@@ -59,6 +59,64 @@ tables below are retained as historical snapshots. Their dated estimates,
 pending decisions, and statements about what will happen next describe their
 original checkpoints. Follow the latest checkpoint and the owning records for
 current status and authorization.
+
+## Five-merge checkpoint — 2026-09-24, after pull request #255
+
+The five requests after #250 were #251–#255. Their [exact GitHub merge
+receipts](aegis-execution-metrics.md#checkpoint-after-pull-request-255--2026-09-24)
+span 17:56:33–18:59:41 UTC, or **1h03m08s** of elapsed wall time. This
+includes review, CI, owner waiting and overlapping work; it is neither active
+labor nor a measured delivery rate. #251 recorded the previous checkpoint
+and consumed the #249 guard exception; #252 persisted the owner's Aegis
+skill-use preference; #253 merged the BER-BKL-009 scope proposal and corrected
+current status; #254 recorded consumption of APR-012 and closed post-#253
+reading status; #255 made the bounded offline BER-BKL-009 grant effective
+through BER-DEC-013/APR-023. These requests did not deliver the authorized
+integration or close another selected implementation row.
+
+The #255 tree has **585 tracked Markdown files**: **541 accepted reader
+pages** and **44 classified synthetic fixtures**, with **zero known pending
+pages** in the bounded sweep. The owner still needs to supply a working private
+Code of Conduct intake route and an independent recipient. The #250 historical
+selected total of 87–178 hours included a provisional 8–16 hours for all of
+BER-BKL-009. The approved offline package now has a **ceiling of 16 active
+implementation hours**, not an estimate; its real-host, runtime, privacy and
+cleanup residual has no scoped estimate. No finite selected total follows.
+
+| Selected remaining work item | Current active-work estimate or bound | Gate or uncertainty after #255 |
+| --- | ---: | --- |
+| WP-2B-3 candidate inputs | 1–4 h | Owner must inspect private candidate labels, guide and exact hashes. |
+| BER-BKL-009 offline integration | At most 16 h; estimate pending | BER-DEC-013/APR-023 effective at #255; one synthetic-only implementation from exact merge, ten paths and no real-host or provider access. |
+| BER-BKL-009 later policy work | TBD | Named host, runtime binding, actual privacy/redaction review and marker-gated cleanup require separate scopes. |
+| WP-2B-3 measurement and OD-1 | 4–10 h | Private labels, source/allowance, measured development result and holdout freeze remain. |
+| Selected-host R4/R5 capability proof | 12–24 h | Named host and separate Stage A probe authority remain; later model-driven proof remains gated. |
+| WP-2B-4 | 12–24 h | Calibration, OD-1 and host proof precede a limited live suite and separate grant. |
+| WP-2B-5 | 8–16 h | WP-2B-4 and separate generic-corpus phase grant remain. |
+| WP-2B-6 | 8–16 h | WP-2B-5 plus scheduling, cost, quarantine and dataset operations grant remain. |
+| WP-2B-7 | 4–8 h | WP-2B-6 and separate advisory CI/operator grant remain. |
+| CP-WP-003 | 8–16 h | Real source, independent freshness, containment, evidence and billing proof remain. |
+| CP-WP-004 | 8–16 h | CP-WP-003 real proof, one selected target/operation and separate grant remain. |
+| Issue #101 package 4 | 8–16 h | Exact SDK-managed host, versions and Stage 4A offline then Stage 4B host authority remain. |
+| Issue #101 package 7 | 6–12 h | Release evaluation depends on selected integration outcomes and separate proof. |
+| Documentation readability | 0 known pending | 541 accepted readers; future new or changed pages require acceptance. |
+| **Other eleven selected rows** | **79–162 h** | Ranges retained after checking dependencies; no one of these five merges closed a row. |
+| **Selected total** | **No finite estimate** | Add the bounded offline package and unestimated later BER-BKL-009 work to the eleven-row subtotal. |
+
+All **seven optional rows** were reconsidered. Issue #101 package 5 remains
+**8–20 h** if a local helper is selected after the package-4 comparison;
+package 6 remains **8–20 h** after host proof and separate provider authority.
+Both would add **16–40 h** to the known eleven-row subtotal, but still yield
+no finite selected-plus-both total because BER-BKL-009's later work is TBD.
+BER-BKL-010 remains **4–12 h** after OD-4 and BKL-009; BER-BKL-014 remains
+**8–20 h per additional selected host** after v1 Claude Code adapter
+completion, per-host capability proof, and owner adoption/budget; BER-BKL-015
+remains **8–24 h per selected product** after stable WP-2B-5/6 and an actual
+consumer choice. Strategic skill/framework expansion and multi-judge
+arbitration/future control-plane architecture remain unbounded until their
+adoption scope is selected. The full all-options backlog has no finite total.
+Start the next five-merge counter after #255; revise sooner for a material
+scope or owner decision. None of these estimates grants private-input, host,
+provider, spend or deployment authority.
 
 ## Five-merge checkpoint — 2026-09-24, after pull request #250
 
