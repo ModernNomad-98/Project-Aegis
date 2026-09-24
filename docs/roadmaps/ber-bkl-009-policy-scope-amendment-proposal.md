@@ -8,6 +8,13 @@ DELIVERED**. An Aegis approval-register entry (APR-009) records the owner's
 selection of the [30-day complete-bundle policy](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection).
 It expressly requires a separate reviewed implementation grant.
 
+**Decision update, 2026-09-24:** The owner answered "Approve this bounded
+scope" to this proposal. The separate [BER-DEC-013](behavioral-eval-runner-backlog.md#ber-dec-013-bounded-synthetic-evidence-policy-integration--owner-approved)
+and [APR-023](../approvals/APPROVAL_REGISTER.md#aegis-apr-023-bounded-synthetic-evidence-policy-integration)
+amendment governs the implementation and becomes effective only when its
+reviewed governance PR merges. This proposal remains a scope record, not the
+authorization itself.
+
 ## Current boundary and proposed increment
 
 The input-evidence stage (Stage A) is the hash-bound input bundle. The

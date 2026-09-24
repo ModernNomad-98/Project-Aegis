@@ -524,3 +524,65 @@ generic skill guidance that would require asking for the same approval again.
   separate from the PR #139 guard exception consumed by AEGIS-APR-015.
 - **Evidence:** [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139)
   merged as `b4b1195d6162728ffc37d22d038a08e3722db7c0`.
+
+### AEGIS-APR-023: Bounded synthetic evidence-policy integration
+
+- **Event:** GRANT.
+- **Status at recording:** Owner approved; ACTIVE only after the separate
+  reviewed governance PR containing BER-DEC-013 and this entry merges.
+- **Date / Grantor:** 2026-09-24 / Peter Nguyen.
+- **Reason:** Make the selected 30-day complete-bundle policy usable by an
+  explicitly opted-in local caller while preserving the shipped evidence bytes
+  and refusing unknown host facts.
+- **Scope allowed:** The owner's exact answer was "Approve this bounded scope"
+  to the question approving the synthetic-only BER-BKL-009 follow-up in the
+  merged [PR #253 proposal](../roadmaps/ber-bkl-009-policy-scope-amendment-proposal.md):
+  exactly its ten named implementation paths, at most 16 active implementation
+  hours, 1,500 added code/test lines, and $0 task-controlled external spend.
+  It authorizes one opt-in, offline, synthetic implementation package, subject
+  to that proposal's acceptance and delivery gates. Create the implementation
+  branch directly from this governance PR's exact merge commit and record that
+  commit and tree. A signed code PR needs focused and full offline BER tests,
+  skill validation, independent architecture/security review, and exact-head
+  Linux and Windows Actions. A simulated passing preflight must say
+  `SIMULATION_ONLY`; unknown or contradictory host facts must stop. Preserve
+  legacy evidence bytes and failed/incomplete bundles.
+- **Scope FORBIDDEN:** No other path, real-host access or attestation, access
+  control or encryption change, recovery-key handling, provider call, private
+  input, credential, live run, production driver wiring, publication clearance,
+  evidence deletion, dependency or unversioned schema/accepted-byte change is
+  covered. A protected gate-guard failure still needs its own PR-specific owner
+  disposition; this entry does not waive a failed check or close BER-BKL-009's
+  later host, privacy, runtime and cleanup gates.
+- **Evidence:** Direct owner reply on 2026-09-24 to the exact-scope question in
+  the Project Aegis conversation, quoted above; the ten paths and behavior are
+  in the merged [PR #253 proposal](../roadmaps/ber-bkl-009-policy-scope-amendment-proposal.md).
+- **Expiry / use limit:** One bounded synthetic implementation package; no
+  calendar expiry stated. Stop and return for a new scope if any cap or boundary
+  would be exceeded.
+
+### AEGIS-APR-024: Session-scoped commit, push and merge approval
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE for the work in this Project Aegis conversation
+  session, subject to the stated checks.
+- **Date / Grantor:** 2026-09-24 / Peter Nguyen.
+- **Reason:** Avoid repeated delivery approvals for already authorized work in
+  this session.
+- **Scope allowed:** The owner's exact instruction was: "I pre-approve all
+  commit,push, merge from the work in this session as long as local tests and
+  github action checks are green". It covers commits, pushes and merges for
+  separately authorized Project Aegis source-library work in this session
+  when applicable local tests and GitHub Actions checks are green. For a new
+  head, local checks precede commit/push; exact-head Actions are checked after
+  publication and before merge, because they cannot run on that head before
+  push. Existing APR-013 administrator-merge terms remain in force.
+- **Scope FORBIDDEN:** This delivery grant does not start or enlarge a work
+  package, waive a failed local test or GitHub Actions check, waive a protected
+  guard, alter branch protection, or authorize provider, host, private-data,
+  deployment or release work. A separate applicable work grant is still needed.
+- **Evidence:** Direct owner message in the Project Aegis conversation on
+  2026-09-24, quoted above, during the ongoing backlog delivery loop.
+- **Expiry / use limit:** Work in this conversation session only; no calendar
+  expiry or one-use count stated. It is not a standing all-work grant for later
+  sessions.

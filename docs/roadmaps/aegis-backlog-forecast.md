@@ -4,20 +4,47 @@
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. The [five-merge checkpoint after #250](#five-merge-checkpoint--2026-09-24-after-pull-request-250)
-reassessed every remaining selected and optional row. PR #249 delivered the
+reassessed every selected and optional row at that time. PR #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
-documentation residual. The merged #250 tree had **584 pages**: 540 accepted
-reader pages and 44 classified fixtures. PR #253 added one reviewed reader
-page, making the merged tree **585 pages** with 541 accepted readers and zero
-known pending pages. Twelve
-selected items remain at **87–178 active hours**; both optional Issue #101
-helpers would make it **103–218**. These estimates still depend on owner
-decisions and provisional real-host scope.
+documentation residual. PR #253 added one reviewed reader page, making the
+merged tree **585 pages**: 541 accepted readers and 44 classified fixtures,
+with zero known pending pages. The owner's 2026-09-24 approval of the
+[bounded BER-BKL-009 synthetic integration](#material-owner-decision--2026-09-24-ber-bkl-009)
+supersedes the old 8–16-hour whole-item estimate and therefore the old
+87–178-hour selected total. The current selected work has **79–162 active
+hours for the other eleven items, plus an offline package capped at 16 active
+implementation hours, plus unestimated BER-BKL-009 host, runtime, privacy and
+cleanup work**. No finite new selected or all-options total is defensible
+until that residual is scoped.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
 the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-250--2026-09-24)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
+
+## Material owner decision — 2026-09-24, BER-BKL-009
+
+The owner answered "Approve this bounded scope" to the exact synthetic-only
+[PR #253 proposal](ber-bkl-009-policy-scope-amendment-proposal.md). The
+separate BER-DEC-013 and APR-023 governance amendment on this PR must merge
+before the one ten-path implementation branch starts. Its 16 active-hour,
+1,500 added code/test lines and $0 external-spend **caps are ceilings, not an
+estimate**. The earlier 8–16-hour BER-BKL-009 whole-item row cannot be carried
+forward as a forecast for the newly split scope.
+
+| Current selected component | Active work after the owner decision |
+| --- | ---: |
+| Other eleven selected rows from the #250 checkpoint | 79–162 hours |
+| Bounded BER-BKL-009 offline integration | At most 16 hours; no narrower estimate yet |
+| BER-BKL-009 real-host, runtime, privacy and cleanup residual | TBD pending a named host and separate scope |
+| **Selected total** | **No finite estimate yet** |
+
+Both optional Issue #101 helpers would add 16–40 hours if selected; all other
+optional and strategic work remains outside this selected view. This owner
+decision triggers an early forecast update, and the next merge after #254 also
+completes the five-merge review cycle. Preserve the dated #250 checkpoint below
+as its historical estimate; perform the full next checkpoint against the exact
+merge receipt.
 
 For requirements and remaining gates, use the owning [Behavioral Eval Runner
 (BER) backlog](behavioral-eval-runner-backlog.md), [control-plane (CP)
