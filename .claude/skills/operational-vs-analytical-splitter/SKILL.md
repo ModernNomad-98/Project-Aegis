@@ -5,6 +5,11 @@ description: 'Decide which workloads must leave the operational (transactional) 
 
 # Operational vs Analytical Splitter
 
+Reading key: online transaction processing (OLTP) serves short operational
+reads and writes; online analytical processing (OLAP) serves broad scans and
+aggregations; change data capture (CDC) streams source changes; business
+intelligence (BI) is reporting and analysis.
+
 ## Purpose
 
 The operational store exists to serve transactions in milliseconds; the

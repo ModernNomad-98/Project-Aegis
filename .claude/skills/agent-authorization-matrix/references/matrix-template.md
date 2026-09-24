@@ -1,5 +1,7 @@
 # Agent Authorization Matrix — taxonomy and template
 
+Use this with the [Agent Authorization Matrix](../SKILL.md) and the [owner approval register](../../../../docs/approvals/APPROVAL_REGISTER.md). PR means pull request; CI means continuous integration; APR identifies an approval-register record. A durable grant has an expiry or review date only when its owner specified one.
+
 ## Action taxonomy
 
 Classify every cell by what the action TRIGGERS, not what the git verb is
@@ -56,7 +58,8 @@ This example is not a grant to a repository that copied these skills.
 
 - **One-time** — covers exactly the named action, once. Default.
 - **Durable** — covers a class of actions; valid only when the human's wording
-  says so, applied no wider than that wording, with an expiry or review date.
+  says so, applied no wider than that wording. Record an expiry or review
+  date only if the owner specified one; a standing grant may have no expiry.
 - Record approvals where the audit stage can find them (PR thread, approval
   log) — an approval that cannot be cited later does not exist for governance
   purposes (see `agent-governance-audit`).

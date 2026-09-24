@@ -1,6 +1,6 @@
 ---
 name: offline-first-sync-architect
-description: Design the client OFFLINE data layer for a multi-tenant SaaS — write-while-offline queue, optimistic apply + rollback on server reject, conflict detection/resolution (last-write-wins / field-merge / CRDT / manual), local persistence (IndexedDB/SQLite), background sync when connectivity returns, and online↔offline reconciliation with integrity. Produces the sync-engine design, the conflict-resolution policy, the local-store + queue schema, and the reconciliation contract. Use when the app must work offline or on flaky networks, when queued offline edits conflict on reconnect, or when optimistic updates get lost or duplicated. Do NOT use for the offline/optimistic-rollback UX STATES themselves (edge-state-ux-designer — it renders the state; this is the engine behind it), the server/distributed CACHE (caching-strategy-designer), or live ONLINE server→client push (realtime-subscription-architect — the in-batch seam). This designs the sync engine; conflicts that silently lose data are refused.
+description: 'Design the client offline data layer for a multi-tenant SaaS: durable write queue, optimistic projection with rejection handling that preserves conflicted unsynced edits, explicit conflict detection and resolution, local persistence, background sync, and integrity-checked reconciliation. Produces the sync-engine design, conflict policy, local-store and queue schema, and reconciliation contract. Use for offline/flaky-network behavior, reconnect conflicts, or lost/duplicated optimistic writes. Do NOT design offline UX states (edge-state-ux-designer), server caching (caching-strategy-designer), or online server-to-client push (realtime-subscription-architect). Refuse silent loss of conflict drafts.'
 ---
 
 # Offline-First Sync Architect
@@ -81,10 +81,12 @@ a bug, not a strategy — this skill refuses it.
    (what the client last saw), and a timestamp. The queue survives app
    restart and is scoped/encrypted per the tenant/auth model.
 3. **Design optimistic apply + rollback.** An offline write applies to the
-   local store immediately (optimistic) and enqueues. On sync, if the server
-   ACCEPTS, the optimistic state is confirmed; if it REJECTS (validation,
-   authz, conflict), the optimistic change is ROLLED BACK locally and the UX
-   is told (hand the rendering to `edge-state-ux-designer`). An optimistic
+   local projection immediately (optimistic) and enqueues. On sync, if the
+   server ACCEPTS, confirm it. On validation or authorization rejection,
+   retract the optimistic projection and explain the rejection. On conflict,
+   retract the unconfirmed projection but retain the local edit as a conflict
+   draft/queue entry for merge or manual resolution; never silently discard
+   it. Tell the UX layer (`edge-state-ux-designer`) which state applies. An optimistic
    update that is never confirmed or rolled back — left on screen as if saved
    — is the core bug to avoid.
 4. **Design conflict detection.** On sync, compare the write's base version
@@ -126,8 +128,9 @@ OFFLINE-FIRST SYNC DESIGN — <system/domain>
 Offline surface: <per operation: read/create/edit/delete — offline? — conflict risk>
 Local store + queue: <store tech; working set; durable ordered queue; per write:
   client-id (idempotency), change, base version, timestamp; scoped/encrypted>
-Optimistic apply/rollback: <apply local immediately; on accept confirm; on reject
-  roll back + notify UX (→ edge-state-ux-designer); never leave unconfirmed-as-saved>
+Optimistic apply/rollback: <apply local projection; on accept confirm; on reject
+  retract projection + notify UX; on conflict preserve unsynced draft for
+  resolution; never leave unconfirmed-as-saved>
 Conflict detection: <versioning mechanism (version/vector-clock/updated-at);
   base-version compare; diverged = conflict>
 Conflict resolution (per data type): <LWW (with acknowledged discard) | field-merge

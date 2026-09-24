@@ -5,6 +5,12 @@ description: Design the end-to-end lifecycle for personal data across the WHOLE 
 
 # PII Lifecycle Designer
 
+Reading key: personally identifiable information (PII) is data that can
+identify a person; a data subject request (DSR) asks for access or erasure;
+time to live (TTL) is an expiry period; and service-level agreement (SLA)
+names a tracked completion target. Pseudonymized matching tokens can still
+be personal data.
+
 ## Purpose
 
 Personal data is easy to collect and nearly impossible to un-collect: it
@@ -81,8 +87,10 @@ pack's job, and keeping PII out of LLM context is
    with what retention TODAY vs designed. The map includes the
    embarrassing rows — logs and free-text fields — or it is fiction.
 3. **Design minimization at collection.** Per field: purpose stated or
-   field dropped; collection-time transforms (store the hash where only
-   matching is needed; truncate where precision is unneeded); default-off
+   field dropped; collection-time transforms (use a keyed matching token,
+   such as a keyed hash with controlled key custody, where matching alone
+   is needed; classify it as personal data if linkable; truncate where
+   precision is unneeded); default-off
    for enrichment. New-field discipline: adding a personal-data field
    requires a purpose and a retention class in the same change — a
    review-time rule.

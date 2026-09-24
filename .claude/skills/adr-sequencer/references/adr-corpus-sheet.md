@@ -1,5 +1,7 @@
 # ADR Corpus Sheet
 
+Use this [Architecture Decision Record (ADR) reference](../SKILL.md) to maintain a decision index and chronology. LRU means least recently used.
+
 Detail for `adr-sequencer`. Read on demand.
 
 ## Index / log format

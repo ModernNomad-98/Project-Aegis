@@ -12,7 +12,7 @@
         "assertions": [
           "Scopes the offline surface per operation (read/create/edit/delete) with conflict risk noted, rather than making everything offline by reflex.",
           "Designs a durable, ordered on-device queue where each write carries a client-generated idempotency id, the intended change, and a base version, plus the local store (IndexedDB/SQLite), scoped and encrypted.",
-          "Designs optimistic apply with rollback on server reject (never leaving an unconfirmed change on screen as saved), handing the state rendering to edge-state-ux-designer.",
+          "Designs optimistic projection withdrawal on server rejection, preserving any conflicting unsynced edit as a draft/queue entry for resolution instead of silently discarding it; hands state rendering to edge-state-ux-designer.",
           "Designs background sync that dedups on the client-generated id so retried syncs never duplicate, plus reconciliation with a cursor and integrity checks (no duplicate creates, tombstones for deletes)."
         ]
       }

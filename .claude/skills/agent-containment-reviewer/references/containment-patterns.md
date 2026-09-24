@@ -1,5 +1,7 @@
 # Agent Containment Patterns (ASI08 + ASI10)
 
+Use this with the [Agent Containment Reviewer](../SKILL.md). ASI08 is the Open Worldwide Application Security Project (OWASP) agentic cascading-failure category; ASI10 is the rogue-agent category. Live containment follows the authorized human incident owner and current approved runbook.
+
 Detail file for `agent-containment-reviewer`. Read on demand.
 
 ## 1. Failure-domain mapping
@@ -97,5 +99,6 @@ A kill switch passes only if ALL hold:
 7. **Reachable:** named humans, bounded time-to-execute, works when the
    agent platform itself is degraded.
 
-Execution order during a real event belongs to `incident-response-runbook`;
-this rubric is what that runbook invokes by reference.
+During a real event, the authorized human incident owner follows the current
+approved runbook and chooses execution order. `incident-response-runbook`
+authors or updates that runbook; this rubric supplies design criteria.

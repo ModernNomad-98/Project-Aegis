@@ -12,7 +12,7 @@
         "assertions": [
           "Chooses cursor (keyset) paging for the large, deep-scrolled collection and states why offset is rejected (drift + O(offset) deep-page cost), naming the access pattern.",
           "Specifies a strict total ordering: sort column(s) PLUS a deterministic tiebreaker (primary key) so no two rows tie across a page edge.",
-          "Defines an opaque, versioned cursor carrying the last row's ordering tuple and direction, exposing no raw offset or internal id the client could depend on.",
+          "Defines a versioned, integrity-protected cursor carrying the ordering tuple and direction; treats Base64 as decodable and encrypts if keys or an ID tiebreaker are confidential, while exposing no raw offset.",
           "Applies the account/tenant scope predicate server-side on every page from trusted context, not from cursor contents.",
           "Sets a default and an enforced maximum page size, and signals end-of-results with an absent/null next cursor."
         ]

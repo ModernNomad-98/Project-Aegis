@@ -1,5 +1,7 @@
 # Aegis setup state contract, version 1
 
+Use this with the [Aegis Setup skill](../SKILL.md) for its exact local-state format and fail-closed rules. SHA-256 is a 256-bit cryptographic digest; UTF-8 is Unicode text encoding; JSON is JavaScript Object Notation; UTC is Coordinated Universal Time.
+
 Support is limited to a single-user Windows PowerShell 5.1 host and one local
 checkout. `selection.ps1` obtains the user-local application data directory
 from Windows and writes under `ProjectAegis\setup\v1`. It rejects a checkout
