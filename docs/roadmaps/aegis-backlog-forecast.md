@@ -7,8 +7,9 @@ to start blocked work. The [five-merge checkpoint after #245](#five-merge-checkp
 reassessed every selected and optional row. PR #239 closed the original
 protected reader-page residual. Two evidence notes introduced by #139 and #197
 received independent full-page acceptance in this checkpoint PR; on its
-accepted merge, documentation has **zero known pending pages**. At the #245
-checkpoint, other selected work retained **95–194 active hours**. Since then,
+accepted merge, documentation has **zero known pending pages** in the current
+**584-page tree**: 540 accepted reader pages and 44 classified fixtures. At the
+#245 checkpoint, other selected work retained **95–194 active hours**. Since then,
 [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249) delivered
 the 8–16-hour offline holdout-support item. With the two notes accepted here,
 current selected remaining work is **87–178 active hours**; both optional
@@ -46,14 +47,17 @@ each reviewed head. #139, #197 and #239 merged under separate owner-approved,
 now-consumed protected guard exceptions in APR-014–019. #235 and #245 had all
 exact-head Actions green. No provider or real-host execution occurred.
 
-The #245 tree has **582 tracked Markdown files**. The #238 pending reader
+The #245 tree had **582 tracked Markdown files**. The #238 pending reader
 page was corrected in #239, whose new review note was accepted. The #139 and
 #197 evidence notes entered the tree before #239; corrected current-reading
 versions passed two independent full-page reviews in this checkpoint PR. The
-baseline residual was **1–3 documentation active hours**. On this PR's
-accepted merge, it becomes **zero known pages** and the inventory comprises
-538 accepted readers and 44 classified fixtures. This is a small bounded
-follow-up, not a measured throughput rate. Confidential conduct intake
+baseline residual was **1–3 documentation active hours**. This PR's corrected
+versions close those two notes; the #245 inventory becomes 538 accepted
+readers and 44 classified fixtures. PRs #248 and #249 subsequently added two
+reviewed reader pages, bringing the candidate tree to **584 pages**: 540
+accepted readers and 44 classified fixtures, with zero known pending pages on
+this PR's accepted merge. This is a small bounded follow-up, not a measured
+throughput rate. Confidential conduct intake
 still needs a private route and separate recipient decision.
 
 | Selected open work item | After #238 active hours | Revised after #245 | Remaining gate or reason |
@@ -72,7 +76,7 @@ still needs a private route and separate recipient decision.
 | Issue #101 package 4 | 8–16 | 8–16 | #237 prepared options; host and comparison authority remain unselected |
 | Issue #101 package 7 | 6–12 | 6–12 | Release evaluation follows selected integration outcomes |
 | Documentation readability | 1–3 | **0 on this PR's accepted merge** | #239 closed the protected README; two new notes passed corrected-candidate review |
-| **Selected remaining total** | **96–197** | **95–194 on this PR's accepted merge** | Non-documentation subtotal 95–194 |
+| **Selected remaining total** | **96–197** | **95–194 at the #245 baseline after note acceptance** | Non-documentation subtotal 95–194 before #249 |
 
 All **14 selected** and **seven optional** rows were reconsidered. The optional
 rows remain Issue #101 package 5 **8–20** if selected; package 6 **8–20**
@@ -81,7 +85,10 @@ per selected host**; BER-BKL-015 **8–24 per selected product**; strategic skil
 and framework expansion unbounded until scoped; and multi-judge arbitration
 plus future control-plane architecture unbounded until adopted. Both optional
 Issue #101 helpers would add **16–40**, making selected-plus-both **111–234**
-after this PR's accepted merge. The full all-options
+at the #245 baseline after note acceptance. PR #249 subsequently delivered
+WP-2B-3 offline execution support, reducing current selected work to
+**87–178 active hours** and selected-plus-both to **103–218** on this PR's
+accepted merge. The full all-options
 backlog has no finite total. Start the next five-merge counter after #245;
 re-estimate sooner when a material owner choice changes scope.
 

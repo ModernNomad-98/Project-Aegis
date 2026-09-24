@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #247 on 2026-09-24, this remains the active
+As of merged pull request (PR) #249 on 2026-09-24, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -10,15 +10,17 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-The current candidate tree contains **582 tracked Markdown files**: **538
+The current candidate tree contains **584 tracked Markdown files**: **540
 reader pages** with recorded full-checklist acceptance and **44 synthetic
 fixtures** with classification and integrity checks. The protected
 `scripts/tests/fixtures/README.md` and its new
 [review record](../evidence/documentation/fixture-readme-closure-after-238-2026-09-24.md)
 merged in #239, closing the original bounded pending set. PRs #139 and #197
 had each added an evidence note before that merge. Their dated current-reading
-corrections passed two independent full-page reviews in this checkpoint;
-on this PR's accepted merge, **zero known pages** remain in the bounded sweep.
+corrections passed two independent full-page reviews in this checkpoint.
+PRs #248 and #249 each added a reader page; both passed full-page review after
+the corrections recorded below. On this PR's accepted merge, **zero known
+pages** remain in the bounded sweep.
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
 below are historical snapshots; the
@@ -27,8 +29,9 @@ accounts for the earlier batch. The [#244 forecast](aegis-backlog-forecast.md#st
 gave a conditional **95–194 selected active-hour** residual after #239's
 accepted merge. The [five-merge checkpoint after #245](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-245)
 records the #245 baseline's **1–3 documentation active hours** for the two
-notes; their acceptance in this PR reduces the conditional selected residual
-to **95–194 active hours** on merge.
+notes. Their acceptance closes that residual, and #249 separately delivered
+the 8–16-hour offline holdout-support item. The conditional selected residual
+is now **87–178 active hours** on this PR's accepted merge.
 Future new or changed pages still need the acceptance check below. The
 [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
 and [delivery control-plane guide](../../tools/aegis_delivery_control/README.md)
@@ -221,8 +224,9 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Reader-page follow-up after merged PRs #248 and #249, 2026-09-24 | [Multi-agent release path](../paths/release-with-agents.md) and [BER offline holdout review](../evidence/ber-wp2b3-holdout-offline-review.md) | Both new pages received full-page review and corrected-candidate acceptance in this PR. The release path's links and manual-only boundaries were checked, and first-use abbreviations were expanded. The holdout note now identifies the merged #249 source and separates historical premerge checks from the current status. On this PR's accepted merge, the candidate has 584 tracked Markdown files: 540 accepted reader pages, 44 classified fixtures and zero known pending pages. |
 | Setup skill follow-up after merged PR #246, 2026-09-24 | `.claude/skills/aegis-setup/SKILL.md` changed its Windows command example in #246 | Two read-only full-page reviews found one false cross-host key claim and first-use abbreviations. This checkpoint corrects them and obtains corrected-candidate review; prior accepted-page status remains valid on this PR's merge. The script's 44 synthetic selection assertions and #246 exact-head Actions passed. |
-| Current-tree note follow-up after PR #245, 2026-09-24 | [BER offline policy review](../evidence/ber-bkl-009a-offline-review.md) and [runner command-effects note](../evidence/documentation/ber-runner-command-effects-2026-09-23.md) added by PRs #139 and #197 | The #245 baseline had 582 Markdown files: 536 accepted readers, 44 classified fixtures and these two pending notes. Dated current-reading corrections passed two independent full-page reviews; links, first-use terms and historical status were checked. On this PR's accepted merge, the 582-file tree has 538 accepted readers, 44 classified fixtures and zero known pending pages. Previous ETA 1–3 active hours; new ETA 0. |
+| Current-tree note follow-up after PR #245, 2026-09-24 | [BER offline policy review](../evidence/ber-bkl-009a-offline-review.md) and [runner command-effects note](../evidence/documentation/ber-runner-command-effects-2026-09-23.md) added by PRs #139 and #197 | The #245 baseline had 582 Markdown files: 536 accepted readers, 44 classified fixtures and these two pending notes. Dated current-reading corrections passed two independent full-page reviews; links, first-use terms and historical status were checked. At that checkpoint, accepting the two notes would have yielded 538 accepted readers, 44 classified fixtures and zero known pending pages. Previous ETA 1–3 active hours; new ETA 0. Later #248 and #249 additions are counted in the row above. |
 | Last protected reader page, merged as PR #239 on 2026-09-24 | `scripts/tests/fixtures/README.md` and its new [review record](../evidence/documentation/fixture-readme-closure-after-238-2026-09-24.md) | Owner approved a PR-specific protected guard exception after independent review; Linux and Windows passed, and PR #239 merged as `66ae4deb5f5600a4ab54f0a86bee858b8b9d7c76`. The original #238 pending set closed; the #239 tree had 582 Markdown pages because PRs #139 and #197 had added two evidence notes. Confidential conduct intake remains a separate owner decision. |
 | Last protected reader page after merged PR #238, draft PR #239 | `scripts/tests/fixtures/README.md`; [one-page review and guard record](../evidence/documentation/fixture-readme-closure-after-238-2026-09-24.md) | The reader correction passed independent review and offline checks. It remains pending because the exact PR's `gate-guard` exception has not been granted. Previous and current remaining documentation ETA are 1–3 active hours until owner disposition and merge; on accepted merge, the bounded inventory closes at zero known pages. Confidential conduct intake remains a separate owner decision. |
 | Whole remaining-page batch after merged PR #237, merged as PR #238 | All 129 pending pages reviewed: 85 reader pages and 44 synthetic fixtures; [exact page-level disposition](../evidence/documentation/full-page-readability-all-remaining-after-237-2026-09-24.md) | Six disjoint read-only reviewers completed baseline full-page reviews; 84 reader pages and the new note passed corrected-candidate or unchanged review, while the protected fixture README remained pending. Ten hash-pinned Scenario A fixtures matched their manifest; all 44 fixtures were unchanged since #205. Previous and whole-batch documentation ETA was 25–105 active hours; the merged tree has one page left at 1–3 active hours excluding owner wait, making the selected total 96–197. Exact-head checks passed; post-merge verification is recorded in the PR. Confidential conduct intake remains a separate owner decision. |

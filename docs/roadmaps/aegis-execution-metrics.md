@@ -67,9 +67,13 @@ PRs #235 and #245 had all exact-head Actions green. The
 reassesses all 14 selected and seven optional rows. The #239 README closure
 and two newly introduced evidence notes left **1–3 active documentation
 hours** at the #245 baseline. The notes' corrected-candidate full-page
-acceptance in this checkpoint PR reduces that to zero known pages on merge;
-non-documentation remains **95–194**, so selected total moves from the
-baseline **96–197** to **95–194** on accepted merge. #139 delivered only the offline BKL-009
+acceptance in this checkpoint PR reduces that to zero known pages on merge.
+At the historical #245 baseline, non-documentation was **95–194**, so note
+acceptance alone would have moved the selected total from **96–197** to
+**95–194**. PR #249 later delivered the 8–16-hour offline holdout-support
+item; with the notes and two subsequent reader pages accepted in this PR,
+current selected work becomes **87–178 active hours**, or **103–218** with
+both optional Issue #101 helpers. #139 delivered only the offline BKL-009
 increment; #235 authorized one bounded synthetic WP-2B-3 support package.
 Neither selects a live host, private input, provider allowance or OD-1 result.
 

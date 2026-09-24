@@ -14,7 +14,8 @@ Open **your product repository** and say:
 
 > Use `project-orchestrator` to prepare this app for release. Identify the exact
 > release candidate and deployment trigger. Where separate read-only agents
-> are supported, assign relevant code, security and QA reviews with separate
+> are supported, assign relevant code, security and quality assurance (QA)
+> reviews with separate
 > contexts. Tell me which Aegis skill you actually invoke, why it applies,
 > what it checks and what its result means in plain language. Give me an
 > evidence-backed release recommendation before any live change.
@@ -33,7 +34,7 @@ or permission to release.
 | --- | --- | --- |
 | Coordinating assistant using [`project-orchestrator`](../../.claude/skills/project-orchestrator/SKILL.md) | Read project state and repository, name the exact commit or proposed release artifact, establish the target environment and what action triggers deployment, then select relevant specialists. | One candidate and one list of open questions, reviews and approvals. |
 | Independent read-only reviewers, if your host supports them | Review separate lenses using `.claude/agents/` definitions such as `secure-saas-reviewer`, `qa-automation-lead`, and `release-readiness-reviewer`; invoke the matching skills when their methods apply. Each reviewer receives the same candidate identity and only the material needed for its lens. | Separate findings with scope and evidence; disagreements stay visible. Agent output alone cannot approve or deploy. |
-| Release readiness reviewer | Apply [`release-readiness-reviewer`](../../.claude/skills/release-readiness-reviewer/SKILL.md) to the **same** candidate, aggregating CI, artifact provenance, change-relevant testing, security and migration findings, rollback, monitoring and recorded approvals. | An advisory GO / NO-GO with cited blockers and unknowns. |
+| Release readiness reviewer | Apply [`release-readiness-reviewer`](../../.claude/skills/release-readiness-reviewer/SKILL.md) to the **same** candidate, aggregating continuous integration (CI) results, artifact provenance, change-relevant testing, security and migration findings, rollback, monitoring and recorded approvals. | An advisory GO (ready) or NO-GO (blocked) recommendation with cited blockers and unknowns. |
 | Human owner and one authorized execution path | Decide whether to release under the applicable permission policy; use the existing CI or deployment procedure when authorized, then verify what actually shipped. | An approval tied to the release identity, one operation/receipt trail, smoke checks and closeout. |
 
 If the assistant's host has no independent agents, use the same skills in
@@ -57,7 +58,8 @@ actual risks instead of repeating the same review to spend more tokens.
    [`secure-migration-reviewer`](../../.claude/skills/secure-migration-reviewer/SKILL.md)
    route; a release without a viable rollback path uses
    [`rollback-runbook-author`](../../.claude/skills/rollback-runbook-author/SKILL.md)
-   to prepare one. A live agent feature may also need the AI runtime design
+   to prepare one. A live agent feature may also need the artificial intelligence
+   (AI) runtime design
    skills below. Describe what each invoked specialist checked, not just its
    name or verdict.
 3. **Check the candidate as a whole.** Apply
