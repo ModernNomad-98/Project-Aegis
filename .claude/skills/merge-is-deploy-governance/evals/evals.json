@@ -14,7 +14,7 @@
           "Promotes PR-time required checks (named exactly) to the authoritative pre-production gate and routes any sufficiency gaps.",
           "Reclassifies post-merge checks as verification whose failure is an incident-class signal, never a gate.",
           "Records branch protection as a conversation draft with a proposed repository path with its source labeled and the ownership rule: a named human role changes protection, never agents.",
-          "States the accepted-risk exposure window (duration, blast radius, named accepter) and the revert-PR-then-auto-redeploy rollback primitive with strategy-correct mechanics."
+          "States the exposure window (duration and blast radius); records a named authorized risk owner and date only if acceptance is verified, otherwise marks it pending and routes the decision. Defines revert-PR-then-auto-redeploy with strategy-correct mechanics."
         ]
       }
     },

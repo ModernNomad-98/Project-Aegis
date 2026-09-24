@@ -53,8 +53,8 @@ the low-urgency band.
 | Response status | 2xx / 4xx / 5xx / timeout |
 | Latency | Consumer responsiveness |
 | Attempt count | Which retry (retry policy = api-event-architect) |
-| Payload | Inspect the exact body sent (signed per contract) |
-| Actions | Replay this delivery; copy payload |
+| Payload | Authorized redacted view and metadata; exact raw body is unavailable in this UI |
+| Actions | Replay this delivery; copy authorized, redacted payload only |
 
 Replay note: manual replay re-sends the SAME event; it is safe only
 because the consumer is idempotent (a contract requirement, not an
@@ -62,7 +62,8 @@ option). Surface that caveat next to the replay control.
 
 ## Signing-secret rotation UX
 
-1. Show current secret presence (reveal-once on creation).
+1. Show current secret presence; reveal a newly generated value once only
+   when authorized by the owner and policy. Never expose an existing secret.
 2. "Rotate" generates a new secret; BOTH old and new are valid during an
    overlap window (dual-valid) so in-flight deliveries verifying the old
    secret succeed.

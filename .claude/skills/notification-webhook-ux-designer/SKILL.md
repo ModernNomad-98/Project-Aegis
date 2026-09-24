@@ -97,8 +97,10 @@ skill designs the UX on top of it.
    environments. Surface the subscription model `api-event-architect`
    defined; do not invent a second one.
 7. **Design delivery observability.** A delivery log per endpoint: event,
-   timestamp, response status, latency, attempt count, and payload
-   inspection with filtering. This is the first thing an integrator needs
+   timestamp, response status, latency, attempt count, and authorized,
+   redacted payload inspection with filtering. Restrict views to the
+   endpoint's authorized integrators and omit secrets and sensitive fields.
+   This is the first thing an integrator needs
    and the most commonly missing.
 8. **Design self-service reliability tools.** Test-send / ping to a new
    endpoint, MANUAL replay of a specific failed delivery (with the
@@ -107,8 +109,10 @@ skill designs the UX on top of it.
    handling: alert the integrator, and surface any auto-disable-after-N-
    failures policy `api-event-architect` set (display it; don't redefine
    it).
-9. **Design signing-secret UX.** Show the current secret (or its
-   presence), support rotation with an overlap window so in-flight
+9. **Design signing-secret UX.** Show whether a secret exists; reveal a
+   newly generated secret only when the owner and policy allow it, ideally
+   once at creation. Do not expose an existing stored secret. Support
+   rotation with an overlap window so in-flight
    deliveries verifying against the old secret don't break, and make the
    verification instructions discoverable.
 

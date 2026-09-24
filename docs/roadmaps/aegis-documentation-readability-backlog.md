@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of the documentation batch after pull request (PR) #219 on 2026-09-24,
+As of the documentation batch after pull request (PR) #220 on 2026-09-24,
 this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -11,15 +11,15 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-The batch candidate tree contains **564 tracked Markdown files**. **191
+The batch candidate tree contains **565 tracked Markdown files**. **211
 distinct existing pages** received recorded full-checklist acceptance across the
 [first nine-page sample](../evidence/documentation/full-page-readability-sample-2026-09-23.md)
-and the later batches recorded below, leaving **373 pages** without it.
+and the later batches recorded below, leaving **354 pages** without it.
 Earlier screens of skill
 entrypoints and references corrected particular pages; they did not accept
 every page against the checklist below. Continue the remaining page-by-page
 review. The [current forecast](aegis-backlog-forecast.md#start-here--current-reading)
-estimates **40–155 active hours** for documentation and **135–349 active
+estimates **40–150 active hours** for documentation and **135–344 active
 hours** for the selected backlog. The [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
 and [delivery control-plane guide](../../tools/aegis_delivery_control/README.md)
 explain their shipped offline workflows and limits. This reading route grants
@@ -211,6 +211,7 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Full-page batch after PR #220, started approximately 03:24 UTC on 2026-09-24 | Ten skill entrypoints and ten historical evidence pages; [page-level review](../evidence/documentation/full-page-readability-batch-after-220-2026-09-24.md) | Disjoint read-only audits selected 20 distinct pending pages; nine skills and nine evidence pages were corrected, one skill and one evidence page accepted unchanged. Candidate inventory: 565 Markdown pages, 211 accepted existing pages and 354 pending. The [interim estimate](aegis-backlog-forecast.md#documentation-batch-estimate--2026-09-24-after-pull-request-220) is 40–150 documentation and 135–344 selected active hours. Independent corrected-candidate review, exact-head Actions and merge remain required. |
 | Full-page batch after PR #219, started approximately 03:09 UTC on 2026-09-24 | Ten skill entrypoints and ten historical evidence pages; [page-level review](../evidence/documentation/full-page-readability-batch-after-219-2026-09-24.md) | Disjoint read-only audits selected 20 distinct pending pages; eight skills and ten evidence pages were corrected, two skills accepted unchanged. Candidate inventory: 564 Markdown pages, 191 accepted existing pages and 373 pending. The [interim estimate](aegis-backlog-forecast.md#documentation-batch-estimate--2026-09-24-after-pull-request-219) remains 40–155 documentation and 135–349 selected active hours. Independent corrected-candidate review, exact-head Actions and merge remain required. |
 | Full-page batch after PR #218, started approximately 02:53 UTC on 2026-09-24 | Ten skill entrypoints and ten historical evidence pages; [page-level review](../evidence/documentation/full-page-readability-batch-after-218-2026-09-24.md) | Disjoint read-only audits selected 20 distinct pending pages; ten skills and seven evidence pages were corrected, three evidence pages accepted unchanged. Candidate inventory: 563 Markdown pages, 171 accepted existing pages and 392 pending. The [interim estimate](aegis-backlog-forecast.md#documentation-batch-estimate--2026-09-24-after-pull-request-218) is 40–155 documentation and 135–349 selected active hours. Independent corrected-candidate review, exact-head Actions and merge remain required. |
 | Full-page batch after PR #216, started approximately 02:28 UTC on 2026-09-24 | Ten skill entrypoints and ten historical evidence pages; [page-level review](../evidence/documentation/full-page-readability-batch-after-216-2026-09-24.md) | Disjoint read-only audits selected 20 distinct pending pages; ten skills and seven evidence pages were corrected, three evidence pages accepted unchanged. Candidate inventory: 562 Markdown pages, 151 accepted existing pages and 411 pending. The [interim estimate](aegis-backlog-forecast.md#documentation-batch-estimate--2026-09-24-after-pull-request-216) is 40–160 documentation and 135–354 selected active hours. Independent corrected-candidate review, exact-head Actions and merge remain required. |
@@ -356,6 +357,24 @@ The previous and current batch ETA are both **3–6 active hours**. The
 changes documentation from **50–175** to **45–170 active hours** and selected
 backlog from **145–369** to **140–364 active hours**. Acceptance remains
 **IN PROGRESS**; the unreviewed pages retain their pending status.
+
+## Ledger update for the batch after pull request #220 — 2026-09-24
+
+The candidate starts from the exact #220 merge
+`afe5f456ccf20cba8a8cf3e168fdfd547dd1b80c`. One new review note
+raises the Markdown inventory from 564 to **565**. Twenty distinct existing
+pages gain full-page acceptance, raising the accepted count from 191 to
+**211**. Thus **354** remain: 238 skill, 48 previously corrected primary,
+6 dated notes/tracking, 18 other reader and 44 synthetic fixture pages.
+Ten selected skill pages and ten selected dated evidence notes leave those
+respective buckets; the new note enters the dated bucket as pending.
+
+The previous and current batch ETA are both **3–6 active hours**. The
+[interim residual model](aegis-backlog-forecast.md#documentation-batch-estimate--2026-09-24-after-pull-request-220)
+narrows from 42.6833–151.1 to 41.5667–147.6 raw hours. Outward five-hour
+rounding changes documentation from **40–155** to **40–150 active hours**
+and selected backlog from **135–349** to **135–344 active hours**.
+Acceptance remains **IN PROGRESS**.
 
 ## Ledger update for the batch after pull request #219 — 2026-09-24
 

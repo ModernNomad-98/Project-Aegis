@@ -31,8 +31,10 @@ table that is itself treated as an isolation control.
 | DB session variable (+ policy) | Per-connection/session | Connection pooling resetting or leaking the variable across requests |
 | Job context envelope | Queue message carries tenant id explicitly | Fan-out jobs that iterate tenants inside one context |
 
-Whichever is chosen: one binding point, no data-path API accepts a tenant id
-from the client, and the escape hatches are enumerated in the design.
+Whichever is chosen: one trusted binding point. A data-path API may accept
+a tenant selector only after server-side membership and operation-scope
+validation; raw client input never becomes query context. Enumerate escape
+hatches in the design.
 
 ## Retrofit migration pattern (expand → contract)
 

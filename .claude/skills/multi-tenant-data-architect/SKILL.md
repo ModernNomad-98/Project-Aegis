@@ -1,6 +1,6 @@
 ---
 name: multi-tenant-data-architect
-description: Design the tenant-scoped data layer — choose and justify the scoping strategy per store (shared tables with tenant key, schema-per-tenant, database-per-tenant, or mixed), define the tenant-context propagation contract from request to query (server-derived, never client-supplied), map data ownership, handle shared/reference data, plan indexing and partitioning by tenant, and produce a tenant data migration plan with verification and rollback. Also outputs a data-layer isolation test matrix. Use when designing storage for a multi-tenant product, retrofitting tenant scoping onto existing tables, planning a tenant data migration/re-shard, or deciding where a new store (cache, search index, vector store) gets its tenant scoping. Do NOT use to define tenant semantics (tenant-modeler), to audit an existing system for leaks (tenant-isolation-reviewer), or to author/audit RLS policies — policy-level authoring and audit belong to the Phase 4 security pack.
+description: Design the tenant-scoped data layer — choose a scoping strategy per store, define server-validated tenant-context propagation from request to query, map ownership and shared data, plan tenant indexing and migration with verification and rollback, and output an isolation test matrix. A client tenant selector may be used for an authorized multi-tenant principal only after server-side membership validation; data queries use the resulting trusted context. Use when designing multi-tenant storage, retrofitting tenant scoping, planning migration/re-sharding, or scoping a new store. Do NOT use to define tenant semantics (tenant-modeler), audit leaks (tenant-isolation-reviewer), or author/audit RLS policies.
 ---
 
 # Multi-Tenant Data Architect
@@ -13,8 +13,10 @@ the query that touches it. Deliverables: a per-store scoping decision with
 tradeoffs, a tenant-context propagation contract, a data ownership map,
 shared-data rules, a migration plan with verification and rollback, and a
 data-layer isolation test matrix. The discipline: scoping is decided per
-store, and tenant context is derived server-side — a design where the client
-names the tenant is a leak with extra steps.
+store, and tenant context is validated and bound server-side. A client
+selector is permitted for a principal authorized in multiple tenants only
+after membership and operation scope are checked; an unchecked selector is
+a cross-tenant leak.
 
 ## Use When
 
@@ -69,11 +71,12 @@ names the tenant is a leak with extra steps.
    pooled (tenant key + enforced scoping), schema-per-tenant,
    database-per-tenant, or mixed. Justify per store; a mixed answer is
    normal, an unjustified one is not.
-4. **Define the tenant-context propagation contract**: tenant id is derived
-   server-side from the authenticated principal, bound once per request/job,
-   and carried explicitly to every query — named mechanism (middleware +
-   scoped repository, ORM default scope, session variable). Client-supplied
-   tenant ids on data paths are forbidden by contract.
+4. **Define the tenant-context propagation contract**: derive allowed
+   tenants from the authenticated principal; if the client selects one,
+   validate membership and operation scope server-side. Bind the validated
+   tenant once per request/job and carry that trusted context to every query
+   via a named mechanism (middleware, scoped repository, ORM default scope,
+   or session variable). Never trust a raw client-supplied tenant id.
 5. **Map data ownership**: every table/store → one owning component; classify
    tables as tenant-owned (scoped), shared/reference (read-only to tenants),
    or platform (control-plane; no tenant business data). Flag anything that
@@ -102,7 +105,7 @@ Tenant scoping key: <which hierarchy level, from the tenant model>
 Store inventory & scoping decisions:
   <store — pooled(mechanism)/schema/db/mixed — justification>
 Tenant-context propagation contract: <derivation point → binding → query
-  mechanism; client-supplied tenant ids forbidden on data paths>
+  mechanism; client selector validation; raw client ids never trusted>
 Data ownership map: <table/store → owner → tenant-owned/shared/platform>
 Indexing & partitioning: <tenant-key-leading indexes; partitioning + the
   number driving it>
@@ -133,8 +136,9 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 
 - Every tenant-owned table/entry/object carries the tenant scope key; scoping
   by joins-through-ownership alone is declared and justified where used.
-- Tenant context is derived from the authenticated principal server-side —
-  never from request bodies, query params, or file contents.
+- Tenant context is derived from the authenticated principal and, when
+  applicable, a server-validated tenant selector. Request bodies, query
+  parameters and files never become trusted context without that check.
 - Cross-tenant queries exist only in named, audited platform paths (support,
   billing aggregation, platform analytics), each listed in the design.
 - Defense in depth is stated: application scoping plus database-level
@@ -165,7 +169,9 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - Data volume/skew facts unknown AND they would flip pooled-vs-partitioned →
   ask for the numbers; do not design for imagined scale.
 - The migration touches production data destructively (drops, rewrites) →
-  `human-approval-boundary` before any executable step is specified.
+  draft the steps and safety gates under the task's design authority;
+  `human-approval-boundary` applies before production execution unless an
+  existing scoped grant already covers it.
 - Residency/compliance requirements surface mid-design that force physical
   separation → re-run the scoping decision; do not bolt a region onto a
   pooled design.

@@ -8,7 +8,12 @@ description: Review the integrity of the data and pipelines that shape a model's
 ## Purpose
 
 Review whether an attacker can corrupt a model's behavior by poisoning the
-data or feedback that shapes it (LLM04). The scope is the pipelines you run
+data or feedback that shapes it (OWASP large language model data/model
+poisoning category LLM04). Reinforcement learning from human feedback
+(RLHF) and retrieval-augmented generation (RAG) are named here before their
+abbreviations below. D6 is the repository's recorded Phase 7 decision
+anchoring its AI security map to the OWASP Top 10 for LLM Applications
+(2025). The scope is the pipelines you run
 that influence what the model learns or treats as ground truth: training and
 fine-tuning datasets, RLHF/feedback loops, and the RAG/embedding INGESTION
 path (which turns external content into retrievable "truth"). The output is

@@ -1,5 +1,10 @@
 # Second 20 skill references: bounded readability correction — 2026-09-23
 
+## Current reading
+
+This is dated delivery evidence. Its original base, estimates, counts and
+pending status describe that batch. Use the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md) and [forecast](../../roadmaps/aegis-backlog-forecast.md) for current totals, and the linked owning pages for current guidance. The pending checkpoint language is historical. AI means artificial intelligence. D6 is the [recorded Phase 7 decision](../../reconciliation/step-0-reconciliation-v4.md#phase-7--ai-security--llm-systems-p1) anchoring the security map to the Open Worldwide Application Security Project (OWASP) Top 10 for large language model applications.
+
 ## Scope and estimate
 
 The read-only screen covered sorted reference Markdown files 21–40 under
