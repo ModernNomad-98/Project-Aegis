@@ -1,5 +1,12 @@
 # Remaining active-page reading keys
 
+**Current reading (2026-09-24):** The “no files committed or pushed”
+sentence and timings below describe the local draft. Use the
+[documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+and [skill catalog](../../skills-catalog.md) for current status. The
+25/25 review, 34-line correction and timing receipts remain historical
+evidence.
+
 Date: 2026-09-23. Times use Coordinated Universal Time (UTC). Edit start:
 21:29:03 UTC. Base:
 `e6148322eefd085eeba9c58ef0c89876b90c9f71` (merged pull request #173).

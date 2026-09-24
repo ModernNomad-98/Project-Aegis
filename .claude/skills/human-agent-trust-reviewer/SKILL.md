@@ -5,6 +5,11 @@ description: 'Adversarially review the human-approval layer of an agent system f
 
 # Human-Agent Trust Reviewer
 
+Terms: **OWASP** means Open Worldwide Application Security Project;
+**ASI09** is Human-Agent Trust Exploitation in its Agentic AI threat list;
+**UX** means user experience; **AI** means artificial intelligence; **UI**
+means user interface; **PR** means pull request.
+
 ## Purpose
 
 Adversarially review the human oversight layer of an agent system (ASI09):
@@ -73,7 +78,8 @@ actually hold against a manipulative or manipulated agent.
 3. **Measure fatigue.** From telemetry (or design its collection via
    `observability-operator`): requests per approver per day, approval
    rate, median decision time, deny rate over time. Near-100% approval at
-   seconds-per-decision is a rubber stamp — the gate exists on paper only.
+   seconds-per-decision is a possible fatigue signal; inspect request
+   quality, risk mix and sampled decisions before judging the gate.
 4. **Check approval-necessity calibration.** Fatigue is usually
    manufactured by over-gating: if low-impact actions flood the queue,
    recalibrate with `human-approval-boundary` / `agent-tool-safety-guard`

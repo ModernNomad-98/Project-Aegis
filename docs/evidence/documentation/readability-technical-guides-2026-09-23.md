@@ -1,5 +1,13 @@
 # Technical guide readability review: 2026-09-23
 
+**Current reading (2026-09-24):** This bounded guide correction was
+delivered. The older exact-head-required language and 80–200/185–414
+estimates below are its original checkpoint. Use the
+[documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md)
+for current acceptance and estimate. Terms below: **AI** means artificial
+intelligence; **JSON** means JavaScript Object Notation; **YAML** means
+YAML Ain't Markup Language; **SHA-256** means Secure Hash Algorithm 256.
+
 This record covers two active guides in the [repository-wide documentation
 readability backlog](../../roadmaps/aegis-documentation-readability-backlog.md).
 It is for a reviewer checking the exact pages, findings, changes and limits of

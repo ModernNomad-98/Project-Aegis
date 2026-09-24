@@ -115,8 +115,9 @@ write this, did not ship the change, and is reading it at 3am.
    (`regression-suite-curator` promotion path), alert/dashboard fix
    (`observability-operator`), runbook fix (this artifact), architecture
    item (`architecture-designer`), or named accepted risk with an owner —
-   no finding evaporates. Action items get owners and dates; unowned
-   action items are recorded as accepted risks, visibly.
+   no finding evaporates. Action items get owners and dates; an unowned
+   item stays open and escalated until an authorized owner accepts the risk
+   explicitly. Silence is not risk acceptance.
 
 ## Output Format
 

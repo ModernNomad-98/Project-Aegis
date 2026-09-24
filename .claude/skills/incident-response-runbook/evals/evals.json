@@ -49,7 +49,7 @@
         "triggers": true,
         "assertions": [
           "Keeps the process light where it can but refuses evaporating findings: every finding routes to a named disposition — regression test, alert fix, runbook fix, architecture item, or an OWNED accepted risk.",
-          "Explains that the regression-test handoff (regression-suite-curator) is the mechanism that stops repeat incidents, and unowned action items are recorded visibly as accepted risks rather than dropped."
+          "Explains that the regression-test handoff (regression-suite-curator) helps stop repeat incidents, and unowned action items stay open and escalated until an authorized owner explicitly accepts a named risk."
         ]
       }
     }

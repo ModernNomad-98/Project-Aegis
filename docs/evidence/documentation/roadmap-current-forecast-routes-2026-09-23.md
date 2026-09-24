@@ -1,5 +1,11 @@
 # Current forecast link correction
 
+**Current reading (2026-09-24):** The #186-at-base and pending-independent-
+review language below belongs to the draft checkpoint. The
+[current forecast](../../roadmaps/aegis-backlog-forecast.md) remains the
+status route. Preserve the four-link, 121-link and 23-anchor receipts
+below as evidence of this correction.
+
 Date: 2026-09-23. Times use Coordinated Universal Time (UTC). Edit start:
 22:24:37 UTC. Base: `761915207f7974b3d4cab7fb099216188ef3e968`
 (merged pull request #191). The prior 15-page read-only screen was estimated

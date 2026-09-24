@@ -1,17 +1,19 @@
 ---
 name: human-approval-boundary
-description: Stop and obtain explicit human approval before work touches schema changes or destructive migrations, RLS or security policy, production data, secrets, deployments or releases, billing, git history rewrites, broad multi-file refactors, or any behavior whose security impact is unclear. Use when a task is about to cross one of those boundaries, or when ambiguity would change what gets built. Produces a structured approval request (action, blast radius, reversibility, options) and halts until answered. Does not gate low-risk docs-only work.
+description: Check current task instructions, prior conversation grants and the owner approval register before a risky action. Proceed within an active scoped grant; obtain a new explicit human approval only when the action is not covered or its security impact is unclear. Covers schema changes or destructive migrations, RLS or security policy, production data, secrets, deployments or releases, billing, git history rewrites and broad multi-file refactors. Use when a task approaches one of these boundaries or ambiguity would change what gets built. Produces a precise approval request and halts only for the uncovered action. Does not gate low-risk docs-only work.
 ---
 
 # Human Approval Boundary
 
+Terms: **RLS** means row-level security.
+
 ## Purpose
 
-Guarantee that high-risk actions never execute on inferred consent. This skill
-detects when in-progress work is about to cross a risk boundary, halts BEFORE
-the crossing, and produces an approval request precise enough for the human to
-decide in one read. It also carries the stop-when-unclear rule: when ambiguity
-changes security or data behavior, stopping IS the correct output.
+Guarantee that high-risk actions stay within explicit authority. This skill
+checks current instructions and active standing or task-specific grants before
+a risk boundary. It proceeds within a matching grant and asks only for an
+uncovered or ambiguous action. When needed, the approval request states the
+exact action and impact so the human can decide in one read.
 
 ## Use When
 
@@ -34,22 +36,28 @@ changes security or data behavior, stopping IS the correct output.
    the machine or get published?
 3. Blast radius: which systems, environments, tenants, and users are affected.
 4. Prior approvals in this conversation — exact wording and scope.
-5. Repo policy: protected paths, contribution rules, ownership signals.
+5. The repository's owner approval register if one exists, including later
+   lifecycle events, and repo policy for protected paths and contribution.
 
 ## Workflow
 
 1. **Detect the boundary before executing the risky step** — never after.
-2. **Halt the risky step.** Safe, unrelated portions of the task may continue.
-3. **Compose the approval request** (see Output Format): exact action, why it
+2. **Check active authority.** Match the exact action to current user
+   instructions, conversation grants and the approval register's scope and
+   lifecycle. A durable grant applies to later matching actions until changed
+   or revoked. Proceed within a matching grant without asking again.
+3. **Only if no grant covers the action, prepare it for review.** Continue safe, authorized
+   work; halt only the uncovered risky step.
+4. **For the uncovered action, compose the approval request** (see Output Format): exact action, why it
    is needed, blast radius, reversibility and rollback, options including
    do-nothing, and a recommendation.
-4. **Wait for an explicit answer.** Silence, enthusiasm about the overall task,
+5. **For the uncovered action, wait for an explicit answer.** Silence, enthusiasm about the overall task,
    or approval of a DIFFERENT step is not approval of this one.
-5. **Record the approval's scope:** one-time (this action only) or durable
+6. **Record the approval's scope:** one-time (this action only) or durable
    (explicitly stated to cover a class of actions). Apply it no wider than its
    wording.
-6. **Proceed strictly within the approved scope.** A new boundary means a new
-   request.
+7. **Proceed strictly within the approved scope.** Ask again only when the
+   next action falls outside active authority.
 
 ## Output Format
 
@@ -78,8 +86,8 @@ Awaiting explicit approval — halted until answered.
 
 ## Gotchas
 
-- Approval does not transfer between contexts: "yes" to a migration on staging
-  is not "yes" on production; approval in one task is not approval in the next.
+- Approval follows its recorded scope across tasks when durable. "Yes" to
+  staging does not cover production unless its wording explicitly does.
 - Bundling several risky actions into one broad question manufactures consent —
   split them.
 - "The user seemed to want this" and "they approved the overall plan" are the
@@ -97,7 +105,7 @@ This skill IS a stop condition. Additionally:
   unknown, even if no listed boundary is provably crossed.
 - The human's answer is ambiguous → ask again; do not interpret charitably.
 - Approval arrives for a variant of the action ("yes, but only X") → re-scope
-  and confirm before executing.
+  to X and proceed within X. Clarify only if X is ambiguous.
 
 ## Supporting Files
 

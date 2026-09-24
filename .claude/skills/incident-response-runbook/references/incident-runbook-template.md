@@ -52,8 +52,8 @@ send.
 4. What went well / poorly IN THE RESPONSE (paging, triage, comms,
    runbook accuracy).
 5. Findings → dispositions (table below).
-6. Action items with owner + date; unowned items recorded as accepted
-   risks, visibly.
+6. Action items with owner + date; unowned items stay open and escalated
+   until an authorized owner explicitly accepts a named risk.
 
 ## Finding-disposition table (every finding lands somewhere)
 

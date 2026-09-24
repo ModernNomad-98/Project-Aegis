@@ -5,6 +5,13 @@ description: 'Review infrastructure-as-code changes (Terraform, Bicep, CloudForm
 
 # IaC Reviewer
 
+Terms: **IaC** means infrastructure as code; **CDK** means Cloud
+Development Kit; **PR** means pull request; **IAM** means identity and
+access management; **RBAC** means role-based access control; **DDL** means
+data definition language; **DML** means data manipulation language;
+**CI/CD** means continuous integration and continuous delivery; **DB**
+means database.
+
 ## Purpose
 
 Produce a deploy-safety and security review of an infrastructure-as-code
@@ -110,8 +117,9 @@ Findings (severity-ranked, file:line each):
 Tenant-isolation impact: <collapsed/preserved boundaries, or n/a + why>
 Drift notes: <IaC vs documented architecture mismatches>
 Cost flags: <order-of-magnitude impacts, attribution/tagging gaps>
-Apply-safety verdict: <safe to apply / safe with corrections / do not apply
-  — one-line reason>
+Apply-safety verdict: <no blocker found in reviewed evidence | corrections
+  required | do not apply | insufficient evidence without plan/runtime state
+  — one-line reason; review is not execution approval>
 Not reviewed: <what this review could not see (state, runtime, modules)>
 ```
 

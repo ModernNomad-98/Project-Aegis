@@ -13,7 +13,7 @@
       "should_not_trigger": [
         "change-classification-gate"
       ],
-      "reason": "A risky action is imminent — the boundary halts it; classification already happened or is moot."
+      "reason": "A risky action is imminent — the boundary checks current and standing grants and halts only if this exact action is uncovered; classification already happened or is moot."
     },
     {
       "id": "rigor-question-goes-to-classification",

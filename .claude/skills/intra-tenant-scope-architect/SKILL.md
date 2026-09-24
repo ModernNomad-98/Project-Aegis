@@ -5,6 +5,11 @@ description: Design a second mandatory data-scoping axis BELOW the tenant (locat
 
 # Intra-Tenant Scope Architect
 
+Terms: **HQ** means headquarters; **ORM** means object-relational mapper;
+**IDOR** means insecure direct object reference; **RLS** means row-level
+security; **SQL** means structured query language; **UI** means user
+interface.
+
 ## Purpose
 
 Design a **second mandatory scoping axis below the tenant** — a location,
@@ -69,7 +74,10 @@ a dimension inside a tenant, it does not define or replace the tenant.
    reroute if either is true.
 2. **Model the scope dimension.** The scope entity (site/region/unit), its
    relationship to the tenant (a scope belongs to exactly one tenant), and
-   whether scopes nest (region → site) — nesting changes the predicate.
+   whether scopes nest (region → site). If nesting is supported, expand a
+   granted parent to its authorized descendants server-side before building
+   the effective scope predicate; do not assume a region ID directly matches
+   site rows.
 3. **Design the per-user scope-grant model.** A user is granted one or more
    scope values within their tenant; state how a new user gets a default scope
    and how grants are added/revoked. This grant set is the source of truth the
@@ -80,19 +88,21 @@ a dimension inside a tenant, it does not define or replace the tenant.
    small and audited.
 5. **Write the composite row-filter predicate.** Every scoped table carries
    the scope key and enforces
-   `tenant_id = current_tenant AND (scope_id = ANY(current_user_scopes) OR
+   `tenant_id = current_tenant AND (scope_id = ANY(effective_user_scopes) OR
    current_user_is_tenant_wide)` — deny-by-default on scope exactly as tenant
    scoping is deny-by-default on tenant. List which tables are scoped vs
    deliberately tenant-wide.
 6. **Define server-side propagation.** The user's scope set is derived
    server-side from the grant model, bound once per request/job like tenant
    context, and carried to every query — including any edge/gateway layer that
-   builds filters. A client-supplied scope value is the intra-tenant IDOR;
-   forbid it by contract.
+   builds filters. A client may request a narrower filter, but the server
+   intersects it with the authorized effective scope set; it never accepts
+   a client value as a grant.
 7. **Plan the live migration.** Add the scope column (nullable → backfill →
    NOT NULL), assign existing users a scope set, add the composite predicate in
    shadow, verify per-scope counts, then enforce. This reshapes a live schema —
-   this skill DESIGNS the migration; it does not run it. Defer the RLS policy
+   name each stage's rollback condition and no-return gate. This skill
+   DESIGNS the migration; it does not run it. Defer the RLS policy
    SQL correctness to `rls-policy-auditor`; here the axis and predicate SHAPE
    are the deliverable.
 
@@ -102,15 +112,17 @@ a dimension inside a tenant, it does not define or replace the tenant.
 INTRA-TENANT SCOPE DESIGN — <product/tenant model>
 Axis confirmed: <site/region/unit; NOT a child tenant, NOT a sharing grant>
 Scope model: <scope entity → belongs to one tenant; nesting? region→site>
-Per-user scope-grant model: <how users are granted scopes; default; revoke>
+Per-user scope-grant model: <how users are granted scopes; nested expansion if
+  supported; default; revoke>
 Role classification: <scope-restricted roles | tenant-wide (bypass) roles>
 Composite predicate (every scoped table): tenant_id = current_tenant AND
-  (scope_id = ANY(current_user_scopes) OR current_user_is_tenant_wide)
+  (scope_id = ANY(effective_user_scopes) OR current_user_is_tenant_wide)
 Scoped vs tenant-wide tables: <which carry the scope key; which don't and why>
 Propagation contract: <scope set derived server-side, bound once, carried to
-  app + edge queries; client-supplied scope forbidden>
+  app + edge queries; client request may narrow but never grant scope>
 Live migration: <add column → backfill → assign scopes → shadow predicate →
-  verify per-scope counts → enforce — DESIGNED, not executed>
+  verify per-scope counts → enforce; rollback condition/no-return gate per
+  stage — DESIGNED, not executed>
 Open questions / risks: <each with risk-if-wrong / who answers>
 ```
 
@@ -125,8 +137,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - [ ] The user's scope set is derived server-side from the grant model and
       bound once per request; no query trusts a client-supplied scope value.
 - [ ] Propagation reaches the edge/gateway layer too, not just the app layer.
-- [ ] The migration is expand → backfill → shadow → verify → enforce, each step
-      reversible; it is designed, not executed.
+- [ ] The migration is expand → backfill → shadow → verify → enforce, with
+      rollback conditions and no-return gates per stage; designed, not executed.
 - [ ] RLS policy SQL correctness is deferred to `rls-policy-auditor`; this
       delivers the axis and predicate shape.
 
@@ -135,8 +147,9 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - The scope axis is SUBORDINATE to the tenant axis — it filters within a
   tenant and never crosses one. The predicate always keeps `tenant_id =
   current_tenant` as the outer condition; scope is the inner one.
-- Scope, like tenant, is derived server-side from the authenticated
-  principal's grants — never from request bodies, query params, or headers.
+- Scope authority, like tenant authority, is derived server-side from the
+  authenticated principal's grants. Request bodies, query params or headers
+  may ask for a narrower view but never enlarge the grant set.
 - Deny-by-default on scope: a scoped row with no matching grant is invisible,
   the same posture as an out-of-tenant row.
 - Tenant-wide bypass is an enumerated exception, not a default: the roles that
@@ -151,8 +164,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   scope. Get this one clause exactly right.
 - One scoped table is missed and it becomes the intra-tenant leak — the same
   failure mode as an unscoped store at the tenant layer, one level down.
-- A client-supplied scope value is trusted "because the UI already filters" —
-  that is the intra-tenant IDOR in its purest form.
+- A client-supplied scope value is treated as authority "because the UI
+  already filters" — that is the intra-tenant IDOR in its purest form.
 - Scopes that should nest (a region contains sites) but are modeled flat, so a
   regional lead can't see their own sites without a grant per site.
 - Confusing a scope (a filter inside one tenant) with a child tenant (a

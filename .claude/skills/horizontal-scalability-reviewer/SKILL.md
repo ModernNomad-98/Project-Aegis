@@ -5,6 +5,10 @@ description: 'Review whether a system can scale OUT (add nodes) rather than only
 
 # Horizontal Scalability Reviewer
 
+Terms: **DB** means database; **LB** means load balancer; **DoS** means
+denial of service; **SLO** means service-level objective; **TTL** means
+time to live; **N** denotes the number of running instances.
+
 ## Purpose
 
 A system that runs fine on one box can fail the instant a second box joins
@@ -96,7 +100,9 @@ findings may point to.
    the LB, stop taking new work, finish or safely hand off in-flight
    requests/jobs/connections, within a bounded grace period? A missing drain
    drops user requests and in-flight jobs on every deploy. Verify readiness/
-   liveness probes distinguish "starting" from "healthy" from "draining."
+   readiness stops new traffic while liveness remains healthy through the
+   bounded drain, until controlled shutdown. Check the actual probe and
+   termination behavior.
 8. **Rank findings by blast radius and deliver the verdict.** Each finding:
    component/file, the scale-out failure it causes, blast radius (silent
    data wrongness > dropped work > uneven load), and remediation. Defer:
