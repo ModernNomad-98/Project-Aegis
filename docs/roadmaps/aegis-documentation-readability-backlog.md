@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of the documentation batch after pull request (PR) #221 on 2026-09-24,
+As of the five-merge checkpoint after pull request (PR) #222 on 2026-09-24,
 this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -11,7 +11,7 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-The batch candidate tree contains **566 tracked Markdown files**. **231
+The exact #222 merge tree contains **566 tracked Markdown files**. **231
 distinct existing pages** received recorded full-checklist acceptance across the
 [first nine-page sample](../evidence/documentation/full-page-readability-sample-2026-09-23.md)
 and the later batches recorded below, leaving **335 pages** without it.
@@ -358,6 +358,29 @@ The previous and current batch ETA are both **3–6 active hours**. The
 changes documentation from **50–175** to **45–170 active hours** and selected
 backlog from **145–369** to **140–364 active hours**. Acceptance remains
 **IN PROGRESS**; the unreviewed pages retain their pending status.
+
+## Five-merge ledger checkpoint after pull request #222 — 2026-09-24
+
+The exact #222 merge `7a913818c49bd0d5ee4a07faee6cb75bc0b524de`
+contains **566 tracked Markdown pages**. Since the #217 checkpoint,
+four 20-page batches accepted **80 distinct existing pages** and four
+new review notes entered the inventory. Acceptance rose from 151 to
+**231**; pending pages fell from 411 to **335**. Disjoint pending buckets
+are **218 skill, 48 previously corrected primary, 7 dated notes/tracking,
+18 other reader and 44 synthetic fixture pages**. The four batch notes
+record disjoint accepted paths; the hash-pinned Scenario A fixtures remain
+pending and unchanged.
+
+The [full five-merge forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-222)
+rechecked all 14 selected and seven optional rows. The unchanged per-page
+assumptions yield **40.2833–143.7667 raw documentation hours**, rounded
+outward to **40–145**. Other selected work remains **95–194**, so the
+selected total changes from the #217 checkpoint's **135–354** to
+**135–339 active hours**. The previous and current checkpoint ETA are
+both **1–2 active hours**. Acceptance remains **IN PROGRESS**; the
+next five-merge counter starts after #222. PR #139 and #197 guard
+dispositions and the separate Behavioral Eval Runner holdout-executor
+implementation grant remain pending.
 
 ## Ledger update for the batch after pull request #221 — 2026-09-24
 

@@ -17,9 +17,9 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [five-merge checkpoint after pull request #217](#checkpoint-after-pull-request-217--2026-09-24)
+The latest [five-merge checkpoint after pull request #222](#checkpoint-after-pull-request-222--2026-09-24)
 reconsiders every open work item and links the [current remaining-work
-forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-217).
+forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-222).
 The table and dated checkpoints below preserve their original estimates and
 observed intervals; older pending or in-progress cells are historical, not
 current work status. Active-work estimates and observed wall time are different
@@ -1255,6 +1255,42 @@ records 20 accepted existing pages and the scope limits. The interim
 is **140–364 selected active hours** after that candidate batch. Active-only,
 review, CI and queue durations are not separately instrumented; the batch PR
 will report observed first-work-to-merge wall time against the original ETA.
+
+## Checkpoint after pull request #222 — 2026-09-24
+
+At approximately **04:00 UTC**, the five-merge forecast checkpoint began
+from the exact #222 merge
+`7a913818c49bd0d5ee4a07faee6cb75bc0b524de`. The preceding checkpoint
+and this bounded item each estimate **1–2 active hours**. The selected
+remaining forecast at start and after the checkpoint is **135–339 active
+hours**; the #217 checkpoint was **135–354**. The
+[every-item forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-222)
+reassesses 14 selected and seven optional rows. The exact merge tree has
+**566 tracked Markdown pages**, **231** with recorded full-page acceptance
+and **335** pending. Documentation is **40–145**; the unchanged other 13
+selected rows total **95–194 active hours**. Independent read-only agents
+checked the tree, category arithmetic, row estimates and authority gates.
+
+| Merged PR | Original package ETA | Observed first-work-to-merge wall time | Exact-main Actions |
+| --- | ---: | ---: | --- |
+| [#218](https://github.com/ModernNomad-98/Project-Aegis/pull/218) | 1–2 active hours | About 6m41s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35949023976) |
+| [#219](https://github.com/ModernNomad-98/Project-Aegis/pull/219) | 3–6 active hours | About 14m57s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35950164559) |
+| [#220](https://github.com/ModernNomad-98/Project-Aegis/pull/220) | 3–6 active hours | About 15m48s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35951339362) |
+| [#221](https://github.com/ModernNomad-98/Project-Aegis/pull/221) | 3–6 active hours | About 17m27s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35952498930) |
+| [#222](https://github.com/ModernNomad-98/Project-Aegis/pull/222) | 3–6 active hours | About 17m49s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35953714246) |
+
+All five exact-head Linux, Windows and protected-file checks and all five
+exact-main runs passed. The
+five reported wall intervals total about **1h12m42s** of package wall time;
+they include review, CI and merge wait and are not active labor or a
+throughput estimate. No non-documentation implementation or separate owner
+gate closed. PR #139 and #197 remain open with failed protected-file
+guards, each requiring its own disposition. The Behavioral Eval Runner
+holdout-executor implementation grant remains separate; live/provider
+execution has further gates. Active-only effort, review, CI and queue
+durations were not separately instrumented for the current checkpoint;
+the checkpoint PR will report its observed wall interval beside the
+original ETA at merge.
 
 ## Documentation batch after pull request #221 — 2026-09-24
 
