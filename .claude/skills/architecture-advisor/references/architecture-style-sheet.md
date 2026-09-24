@@ -1,6 +1,9 @@
 # Architecture Style Sheet
 
-Detail for `architecture-advisor`. Read on demand.
+Detail for the owning [Architecture Advisor](../SKILL.md). Read on demand.
+Service-oriented architecture (SOA) separates services behind contracts;
+"ops" means the operational work of deploying, monitoring and recovering
+them.
 
 ## Need-interview checklist (BEFORE advising)
 

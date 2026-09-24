@@ -1,6 +1,10 @@
 # Authorization Matrix Templates & Negative-Test Catalog
 
-Supporting detail for `authorization-matrix-designer`. Read on demand.
+Supporting detail for the owning [Authorization Matrix Designer](../SKILL.md).
+Read on demand. User interface (UI) is the visible control surface; an
+application programming interface (API) is the server contract; insecure
+direct object reference (IDOR) is an object access attempt without the
+required authorization check.
 
 ## Permission naming convention
 

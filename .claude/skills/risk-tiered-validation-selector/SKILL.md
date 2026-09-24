@@ -5,6 +5,9 @@ description: 'Machine-classify a change''s touched files into impact classes tha
 
 # Risk-Tiered Validation Selector
 
+**Reading key:** RLS means row-level security; continuous integration (CI)
+runs automated checks; a pull request (PR) proposes a repository change.
+
 ## Purpose
 
 Spend validation where risk lives — mechanically, and erring expensive. Flat
@@ -43,9 +46,10 @@ artifacts.
 
 ## Inputs to Inspect
 
-1. The changed file set (for a live classification): `git diff --name-only`
-   against the PR base — the classifier's only input is files, never the
-   author's description of them.
+1. The changed file set (for a live classification): use
+   `git diff --name-status -M <base>...HEAD` or an equivalent structured
+   diff so both old and new rename paths and deletions are classified.
+   Input comes from Git paths, never the author's description.
 2. The repo's risk topology (for design): where schema/migrations, auth/RLS,
    payment paths, CI workflows, agent-instruction files, generated code, and
    pure-docs trees live — these seed the lists.

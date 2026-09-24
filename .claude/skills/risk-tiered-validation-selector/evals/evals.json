@@ -10,7 +10,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Classifies from the changed file list (git diff --name-only against the base), never from the PR description.",
+          "Classifies from a structured Git diff against the base, including both rename paths and deletions, never from the PR description.",
           "Shows the matched rule per file; the workflow file hits the forced-full/never-docs-only override.",
           "Aggregate tier is FULL by max-over-files — no averaging because 'most files are docs'.",
           "Names the checks the full tier runs, handing execution to local-ci-mirror-preflight / CI."

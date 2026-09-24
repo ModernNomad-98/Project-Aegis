@@ -5,6 +5,13 @@ description: Audit and (where asked) author row-level-security policies for a te
 
 # RLS Policy Auditor
 
+**Reading key:** RLS means row-level security; JWT means JSON Web Token;
+SQL means Structured Query Language; DDL means data definition language.
+`GRANT` assigns database privileges; `BYPASSRLS` lets a database role skip
+row policies. PostgreSQL's [row-security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
+and [policy](https://www.postgresql.org/docs/current/sql-createpolicy.html)
+documentation define the effective behavior described here.
+
 ## Purpose
 
 Produce a database-level verdict on whether row-level security actually
@@ -12,9 +19,10 @@ enforces tenant and role scope, plus the negative tests that prove it. This
 skill absorbs both policy authoring and negative-test design (reconciliation
 §3): it inspects each table's SELECT/INSERT/UPDATE/DELETE policies for the
 classic failure modes, writes or corrects policies where asked, and ALWAYS
-delivers a per-command negative-test plan. RLS enabled is not RLS enforced —
-a table with RLS on and no restrictive policy, or a policy that trusts a
-client-supplied tenant id, is a finding. The deliverable is severity-ranked
+delivers a per-command negative-test plan. RLS enabled needs an effective
+policy review: no applicable policy defaults to deny for a role subject to
+RLS, while an over-broad permissive policy or client-supplied tenant scope
+can expose rows. The deliverable is severity-ranked
 findings with the offending policy quoted, remediation, and executable
 negative tests as SQL/session sequences.
 
@@ -61,15 +69,19 @@ negative tests as SQL/session sequences.
    being enforced. Undefined boundary → stop and route to `tenant-modeler`.
 2. **Inventory tables** that hold tenant-owned data; for each, record whether
    RLS is ENABLED, whether it is FORCED (owners bypass otherwise), and which
-   policies exist per command. A tenant table with RLS disabled or unforced is
-   an immediate finding.
+   policies exist per command. RLS disabled on a tenant table is a finding.
+   If RLS is not forced, determine whether the table-owner role can serve
+   user-influenced requests; owner bypass is a risk only with a reachable path.
 3. **Audit each command separately — SELECT, INSERT, UPDATE, DELETE** — using
    [references/rls-audit-checklist.md](references/rls-audit-checklist.md):
    - **SELECT/USING:** does every row require the caller's tenant scope?
-   - **INSERT/WITH CHECK:** can a row be written with another tenant's id, or
-     with no tenant id? Missing `WITH CHECK` on INSERT is a write-side hole.
-   - **UPDATE:** both `USING` (which rows) AND `WITH CHECK` (resulting row) —
-     a missing `WITH CHECK` lets a row be moved to another tenant.
+   - **INSERT/effective check:** can a row be written with another tenant's
+     id, or no tenant id? No applicable policy denies; an INSERT policy uses
+     `WITH CHECK` to permit rows.
+   - **UPDATE:** audit both existing-row `USING` and resulting-row checks.
+     If `WITH CHECK` is omitted from an UPDATE/ALL policy, PostgreSQL uses
+     its `USING` expression for the new row too; inspect the effective
+     expression, not just whether the clause is written.
    - **DELETE/USING:** can a caller delete another tenant's rows?
 4. **Hunt the classic failure modes:** missing tenant scope; deny-by-default
    gap (permissive policy that ORs open access); **recursion** (policy calls a
@@ -85,16 +97,20 @@ negative tests as SQL/session sequences.
    client-controlled input). No demonstrable path → cap at medium and name
    the confirming test.
 6. **Author/correct policies where asked** — deny-by-default, tenant scope
-   from server context, `WITH CHECK` on write commands, `SECURITY INVOKER`
+   from server context, explicit `WITH CHECK` where it makes the write rule
+   clearer or different from `USING`, `SECURITY INVOKER`
    helpers with fixed `search_path` unless a DEFINER is justified and minimal.
    Present as a migration for `secure-migration-reviewer` to gate; do not
    apply to a live DB from this skill.
 7. **Write the negative-test plan (mandatory)** per command and per failure
    mode: set the session to tenant A, attempt B's rows for SELECT/UPDATE/
    DELETE (expect zero rows / zero affected), attempt INSERT/UPDATE writing
-   B's tenant id (expect rejection), attempt as anon/service-role, and include
-   the positive control (A affects only A's rows). Provide as runnable SQL
-   session sequences.
+   B's tenant id (expect rejection for the scoped app role), and include
+   the positive control (A affects only A's rows). Test anonymous access
+   against its intended policy. For service/owner/BYPASSRLS roles, verify
+   they are unreachable from client-influenced paths and document any
+   separately authorized privileged operation and expected access. Provide
+   runnable SQL session sequences.
 8. **Deliver** findings, corrected policies (if authored), and the negative
    tests, with an honest list of tables/commands not audited.
 
@@ -123,21 +139,26 @@ Handoffs: <secure-migration-reviewer to gate the migration; multi-tenant-securit
 - [ ] Every tenant table's RLS enabled/forced status recorded; unprotected
       tables flagged.
 - [ ] SELECT, INSERT, UPDATE, DELETE audited SEPARATELY per table.
-- [ ] INSERT and UPDATE `WITH CHECK` presence verified (write-side holes).
+- [ ] Effective INSERT and UPDATE new-row checks verified, including
+      UPDATE/ALL implicit `USING` fallback when `WITH CHECK` is absent.
 - [ ] Recursion, SECURITY DEFINER search_path, broad GRANTs, service-role
       leakage, and frontend-derived scope each explicitly checked.
 - [ ] Every finding quotes the offending policy (or "absent") and states a
       concrete cross-tenant path; CRITICALs have a demonstrable path.
-- [ ] A per-command negative-test plan exists with positive controls,
-      including anon and service-role attempts.
+- [ ] Per-command negative tests and positive controls cover the scoped
+      application and anonymous roles; privileged-role reachability and
+      intended bypass are checked separately.
 - [ ] Authored policies are deny-by-default and use server-derived scope;
       delivered as a migration, not applied live.
 - [ ] Not-audited list present.
 
 ## Security Rules
 
-- RLS enabled ≠ enforced: a table with RLS on and no restrictive policy, or a
-  permissive policy that ORs open access, is treated as unprotected.
+- RLS enabled with no applicable policy defaults to deny for roles subject to
+  RLS; this may block legitimate access but is not cross-tenant exposure.
+  Audit the effective command/role policy: permissive policies OR together,
+  restrictive policies AND with that grant, and bypass roles/owners may
+  avoid RLS unless FORCE is used where applicable.
 - Client-supplied / frontend-derived tenant scope in a policy is a finding
   regardless of demonstrated exploit — tenant scope must come from
   server-established session/JWT context.
@@ -151,18 +172,19 @@ Handoffs: <secure-migration-reviewer to gate the migration; multi-tenant-securit
 
 ## Gotchas
 
-- A correct SELECT policy with a missing INSERT `WITH CHECK` lets tenant A
-  create rows owned by tenant B — write-side holes hide behind read-side
-  correctness.
-- UPDATE needs BOTH `USING` and `WITH CHECK`; with only `USING`, a caller can
-  update their own row to carry another tenant's id (tenant hopping).
+- A correct SELECT policy does not prove INSERT safety: inspect the applicable
+  INSERT check and role, and test writing another tenant's id.
+- UPDATE requires safe existing-row and new-row checks. An omitted explicit
+  `WITH CHECK` on UPDATE/ALL reuses `USING`; tenant hopping requires an
+  effective check that permits the resulting wrong-tenant row.
 - Policies calling a helper that selects the same table re-enter RLS and
   either recurse or silently return nothing under load — test, don't assume.
-- `FORCE ROW LEVEL SECURITY` matters: without it the table owner (often the
-  migration/app role) bypasses policies entirely.
-- Postgres RLS is deny-by-default only once a policy exists; enabling RLS with
-  zero policies denies all — but a single permissive policy can reopen
-  everything, so read every policy, not just the first.
+- `FORCE ROW LEVEL SECURITY` matters when owner-role requests must be
+  constrained; without it the owner bypasses policies. Check whether that
+  role is reachable from a user-influenced request path.
+- PostgreSQL RLS with zero applicable policies denies all rows to roles
+  subject to RLS. A permissive policy can grant rows, so read every policy
+  and test with the actual application role.
 - A DEFINER helper that returns rows to the caller can launder around the
   caller's own RLS — audit what the helper returns, not just that it exists.
 

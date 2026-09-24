@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "release-readiness-reviewer",
-  "description": "Trigger and behavior cases for the evidence-based ship/no-ship gate: evidence pinned to the release commit, unknown = No-Go, rollback/migration artifacts demanded not authored, override routed to humans.",
+  "description": "Trigger and behavior cases for the evidence-based ship/no-ship gate: checks pinned to the exact candidate or shipping tree, unknown = No-Go, rollback/migration artifacts demanded not authored, override routed to humans.",
   "cases": [
     {
       "id": "positive-release-gate",
@@ -10,7 +10,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Pins the release scope to exact commits/artifact and verifies CI evidence on the shipping SHA with run links — branch-level green is not accepted as release-commit evidence.",
+          "Pins release scope to exact commits/artifact and verifies CI evidence on the shipping SHA, or the exact gated candidate before an auto-deploying merge, with run links; branch-level green is insufficient.",
           "Gates the migration on secure-migration-reviewer evidence and the release on a rollback runbook that names its primitive and rehearsal status — authoring neither inline.",
           "Checks flag default states have recorded decisions, observability coverage for the new surface, and approvals matching the change class.",
           "Delivers GO/NO-GO leading with the single biggest reason, with each blocking item naming the evidence that would flip it."

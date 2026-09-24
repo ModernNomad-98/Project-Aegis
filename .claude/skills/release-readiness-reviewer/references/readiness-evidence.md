@@ -1,13 +1,16 @@
 # Readiness Evidence Reference
 
-Detail file for `release-readiness-reviewer`. Loaded on demand.
+Detail file for the owning [Release Readiness Reviewer](../SKILL.md).
+Loaded on demand. For an auto-deploying merge, the pre-merge gate uses the
+exact PR head or merge-queue candidate; verify the final merged commit and
+artifact afterward. Unknown on a blocking dimension remains NO-GO.
 
 ## Evidence table template — pass/blocking criteria per dimension
 
 | Dimension | Passing evidence looks like | Blocking when |
 | --- | --- | --- |
-| CI on release commit | every required check ran ON the shipping SHA, result + run link | any required check missing/failed/not-run on that SHA; evidence only from another commit |
-| Artifact provenance | artifact stamped with commit + run id; deploy consumes THIS artifact | rebuild-at-deploy; unstamped artifact; provenance chain broken |
+| CI on gated tree | every required check ran on the exact shipping SHA, or on the exact PR/merge-queue candidate before auto-deploying merge, with result + run link and final-commit follow-up | required check missing/failed/not-run on the gated tree; evidence only from an unrelated branch tip |
+| Artifact provenance | shipping artifact stamped with commit + run id and deploy consumes it; before an auto-deploying merge, verified build/provenance contract with actual artifact checked afterward | untracked rebuild-at-deploy; unstamped artifact; provenance chain broken |
 | Test signal | suites that ran exercise the changed surface (coverage-mapper cross-check) | green suites that never touch the changed module; retried-to-green on release-relevant checks unexplained |
 | Migrations | `secure-migration-reviewer` output for every migration in scope | any unreviewed migration; review found blockers unresolved |
 | Rollback path | runbook for THIS release shape: primitive named, migration posture covered, rehearsal status stated | no runbook; "revert the commit" without deploy/data story; runbook assumptions broken by this scope |
@@ -31,7 +34,8 @@ Detail file for `release-readiness-reviewer`. Loaded on demand.
 
 - Branch protection / pipeline config → the required-check list
   (`ci-pipeline-architect` design).
-- CI run API/UI filtered to the release SHA → check states + links.
+- CI run API/UI filtered to the exact gated tree SHA → check states + links;
+  verify the final shipping SHA after an auto-deploying merge.
 - Artifact registry metadata → provenance fields.
 - Migration PR + `secure-migration-reviewer` report.
 - `rollback-runbook-author` artifact + rehearsal log.

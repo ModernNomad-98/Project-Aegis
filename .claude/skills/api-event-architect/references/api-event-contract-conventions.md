@@ -1,6 +1,11 @@
 # API & Event Contract Conventions
 
-Supporting detail for `api-event-architect`. Read on demand.
+Supporting detail for the owning [API Event Architect](../SKILL.md).
+Read on demand. An application programming interface (API) exposes a
+software contract; RFC 3339 specifies a timestamp format; HMAC-SHA256 is
+a keyed signature algorithm; server-side request forgery (SSRF) is an
+attacker-controlled request to an unintended destination. `2xx` means an
+HTTP success response.
 
 ## Event envelope schema (versioned)
 
@@ -31,16 +36,19 @@ Supporting detail for `api-event-architect`. Read on demand.
 | Ordering | Not guaranteed (or: per-resource-key ordering, only if truly implemented) |
 | Retry schedule | e.g. exponential with jitter: 1m, 5m, 30m, 2h, 12h → dead-letter |
 | Failure policy | After N consecutive dead-letters → subscription disabled + notification |
-| Signing | HMAC-SHA256 over timestamp + body; per-subscription secret, rotatable with overlap window |
+| Signing | HMAC-SHA256 over a precisely specified timestamp encoding and the exact raw body bytes; per-subscription secret, rotatable with overlap window |
 | Replay protection | Reject signatures older than tolerance (e.g. 5 min) |
 | Redelivery | Manual redelivery window (e.g. 7 days) via API/console |
 | Target validation | HTTPS only; SSRF checks; no redirect following |
 
 ## Consumer checklist (ships with the docs — part of the contract)
 
-- Verify the signature and timestamp before parsing.
+- Verify the signature against the exact received body bytes and timestamp
+  encoding before parsing; compare signatures safely.
 - Deduplicate by event `id` (at-least-once delivery).
-- Return 2xx fast; process async — slow handlers get retried as failures.
+- Persist or durably enqueue the event before returning `2xx`; then process
+  asynchronously. An acknowledgement before durable handoff can lose an
+  event even when the sender considers delivery complete.
 - Do not depend on ordering; fetch current state via API when it matters.
 - Rotate secrets on schedule; support two active secrets during overlap.
 

@@ -5,11 +5,14 @@ description: 'Design real-time client delivery for a multi-tenant SaaS — WebSo
 
 # Realtime Subscription Architect
 
-Terms used below: **SSE** means server-sent events, **DB** means database,
+Terms used below: a **WebSocket** is a persistent two-way client connection;
+**SSE** means server-sent events, **DB** means database,
 **DLQ** means dead-letter queue, and **CDC** means change data capture. **TTL**
 means time to live for expiring presence state; **LB** means load balancer.
 **IDOR** means insecure direct object reference, and **OOM** means out of
-memory. These names do not change the per-tenant and per-user authorization
+memory. **SaaS** means software as a service; **API** means application
+programming interface; **authz** means authorization. These names do not
+change the per-tenant and per-user authorization
 checks required below.
 
 ## Purpose
@@ -78,9 +81,11 @@ question is server-to-server event flow it belongs to
 
 1. **Model channels around authority, not convenience.** Define the channel
    namespace so the thing that is authorized IS the channel key — e.g.
-   `tenant:<id>:resource:<id>`. The server derives the tenant/resource from
-   trusted state; a client MUST NOT be able to subscribe to an arbitrary
-   channel string it constructs. Enumerate channel types and their audience.
+   `tenant:<id>:resource:<id>`. The server derives tenant scope from
+   authenticated state and verifies any client-selected resource against
+   that actor's current permissions before deriving the channel key. A
+   client-supplied channel string is never authority. Enumerate channel
+   types and their audience.
 2. **Authorize at subscribe time — and re-check as authority changes.** The
    security property: a subscribe request is authorized server-side against
    the same policy the write path uses, at subscribe time. Connect-time-only

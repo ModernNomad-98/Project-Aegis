@@ -1,7 +1,10 @@
 # Audit Event Taxonomy (Starter)
 
-Supporting detail for `audit-log-architect`. The taxonomy is a completeness
-contract: an action not listed is an explicit exclusion, not an oversight.
+Supporting detail for the owning [Audit Log Architect](../SKILL.md).
+Multi-factor authentication (MFA) adds a second login factor; an application
+programming interface (API) exposes a software contract. The taxonomy is a
+completeness contract: an action not listed requires a documented exclusion
+decision and owner, so absence is not mistaken for deliberate scope.
 
 | Category | Must-record actions | Grain guidance |
 | --- | --- | --- |
