@@ -370,3 +370,112 @@ generic skill guidance that would require asking for the same approval again.
   merged at `e783f0f772700d30e203390b31e56c25187a1bc6`.
 - **Expiry / use limit:** One bounded implementation package; no calendar
   expiry stated. No broader BER-BKL-009 work follows automatically.
+
+### AEGIS-APR-013: Later condition on standing administrator merges
+
+- **Event:** GRANT; later clarification of AEGIS-APR-002 for future routine use.
+- **Status at recording:** ACTIVE.
+- **Date / Grantor:** 2026-09-24 / Peter Nguyen.
+- **Reason:** Preserve the owner's updated standing merge condition across
+  sessions and computers.
+- **Scope allowed:** The owner's exact instruction was: "I pre-approve all admin
+  merges required as long as local tests and github actions are green". Apply
+  this condition to future routine administrator merges for this source
+  repository, within the separately authorized work being delivered.
+- **Scope FORBIDDEN:** The instruction does not grant a routine administrator
+  merge with a failing local test or GitHub Actions check. A separate,
+  PR-specific owner exception may address a documented guard failure; this
+  standing condition is not such an exception. It does not authorize unrelated
+  work or change branch protection.
+- **Evidence:** Direct owner message in the Project Aegis conversation on
+  2026-09-24, quoted above, after the owner separately approved the guarded
+  merges of PRs #139 and #197. The earlier recurring administrator-merge grant
+  is AEGIS-APR-002; this later condition governs routine future use.
+- **Expiry / use limit:** None stated; recurring conditional approval.
+
+### AEGIS-APR-014: PR #139 protected-file guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-015.
+- **Date / Grantor:** 2026-09-24 / Peter Nguyen.
+- **Reason:** Permit the reviewed offline BER evidence-policy proof through its
+  documented protected-file guard failure.
+- **Scope allowed:** The owner's exact answer was "Approve this PR and merge"
+  to the question approving a one-time gate-guard exception and merge of
+  [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) at
+  `515432d43c574ad778ba7f0ece1ca47ecf477cbf`. Linux and Windows checks
+  passed; `gate-guard` was the sole failing check.
+- **Scope FORBIDDEN:** PR #139 only at that reviewed head; no other failed
+  check, PR, guard-policy change, or later BER phase is covered.
+- **Evidence:** Direct owner reply to the exact-head question in the Project
+  Aegis conversation on 2026-09-24, quoted above.
+- **Expiry / use limit:** One PR #139 merge; no calendar expiry stated.
+
+### AEGIS-APR-015: Consumption of PR #139 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-014.
+- **Status at recording:** AEGIS-APR-014 has no remaining use.
+- **Effective at:** 2026-09-24 15:57:16 UTC.
+- **Recorded at / By:** 2026-09-24 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The sole approved administrator merge completed.
+- **Evidence:** [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139)
+  merged as `b4b1195d6162728ffc37d22d038a08e3722db7c0`.
+
+### AEGIS-APR-016: PR #197 protected-file guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-017.
+- **Date / Grantor:** 2026-09-24 / Peter Nguyen.
+- **Reason:** Permit the reviewed BER runner README explanation through its
+  documented protected-file guard failure.
+- **Scope allowed:** The owner's exact answer was "Approve this PR and merge"
+  to the separate one-time gate-guard question for
+  [PR #197](https://github.com/ModernNomad-98/Project-Aegis/pull/197) at
+  `4c176f68e101c64d3efb95c368f8d45c3b231ab6`. Linux and Windows passed;
+  `gate-guard` was the sole failing check.
+- **Scope FORBIDDEN:** PR #197 only at that reviewed head; no other failed
+  check, PR, or change to the guard or branch protection is covered.
+- **Evidence:** Direct owner reply to the exact-head question in the Project
+  Aegis conversation on 2026-09-24, quoted above.
+- **Expiry / use limit:** One PR #197 merge; no calendar expiry stated.
+
+### AEGIS-APR-017: Consumption of PR #197 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-016.
+- **Status at recording:** AEGIS-APR-016 has no remaining use.
+- **Effective at:** 2026-09-24 15:58:43 UTC.
+- **Recorded at / By:** 2026-09-24 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The sole approved administrator merge completed.
+- **Evidence:** [PR #197](https://github.com/ModernNomad-98/Project-Aegis/pull/197)
+  merged as `ebaba9362e3eedba2f419a9072c6477f3ce23024`.
+
+### AEGIS-APR-018: PR #239 protected-file guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-019.
+- **Date / Grantor:** 2026-09-24 / Peter Nguyen.
+- **Reason:** Permit the independently reviewed fixture README and evidence
+  note through their documented protected-file guard failure.
+- **Scope allowed:** The owner's exact answer was "Approve this PR and merge"
+  to the one-time gate-guard question for
+  [PR #239](https://github.com/ModernNomad-98/Project-Aegis/pull/239) at
+  `7999709e442535e03ca687bcc1b6e1cb5a9ad949`. Linux and Windows passed;
+  `gate-guard` was the sole failing check.
+- **Scope FORBIDDEN:** PR #239 only at that reviewed head; no other failed
+  check, PR, or change to the guard or branch protection is covered.
+- **Evidence:** Direct owner reply to the exact-head question in the Project
+  Aegis conversation on 2026-09-24, quoted above.
+- **Expiry / use limit:** One PR #239 merge; no calendar expiry stated.
+
+### AEGIS-APR-019: Consumption of PR #239 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-018.
+- **Status at recording:** AEGIS-APR-018 has no remaining use.
+- **Effective at:** 2026-09-24 16:00:05 UTC.
+- **Recorded at / By:** 2026-09-24 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The sole approved administrator merge completed.
+- **Evidence:** [PR #239](https://github.com/ModernNomad-98/Project-Aegis/pull/239)
+  merged as `66ae4deb5f5600a4ab54f0a86bee858b8b9d7c76`.
