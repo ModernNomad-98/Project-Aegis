@@ -43,8 +43,10 @@ must NOT touch. The negative boundary is what makes parallelism safe.
 
 ## Inputs to Inspect
 
-1. The split itself: the lanes, their intended surfaces, and the plan of
-   record that approved the split (phases, scope).
+1. The split itself: the lanes, their intended surfaces, and the current
+   human instruction or task plan that assigns them (phases and scope where
+   specified). A formal approved plan is not a prerequisite to a direct
+   authorized human lane assignment.
 2. The source of the knowledge being distilled: the actual request
    lifecycle in code (entry points, handlers, data flow), the contracts the
    lane consumes/provides (API shapes, events, schemas), conventions and
@@ -61,7 +63,7 @@ must NOT touch. The negative boundary is what makes parallelism safe.
 
 1. **Fix the lane's identity:** name, surface (paths/modules), its repeating
    UNIT of work (e.g. "one read handler", "one route + component pair"), and
-   which plan/phase approved it.
+   which current instruction or plan assigned it.
 2. **Distill the request lifecycle for THIS lane** — from entry to exit as
    the code actually implements it, each hop cited (file:line or file+symbol).
    Uncitable lifecycle claims are labeled `unverified` or omitted; a guide
@@ -87,8 +89,9 @@ must NOT touch. The negative boundary is what makes parallelism safe.
 7. **Cite or flag everything load-bearing.** Full guide template with the
    evidence-citation convention:
    [references/lane-guide-template.md](references/lane-guide-template.md).
-8. **Deliver one guide per lane** into the repo's docs (dated), linked from
-   the plan of record; the lane's first task starts by reading it.
+8. **Deliver one guide per lane** before its first task. Put it in the
+   authorized task location, dated and linked from the task plan when one
+   exists. Commit it only when the task authorizes a repository commit.
 
 ## Output Format
 
@@ -116,7 +119,8 @@ Evidence:         every load-bearing claim cited or labeled unverified
       shared surfaces have a named owner/coordination rule.
 - [ ] The guide cites the shared implementation contract instead of
       restating it (one source of truth for inter-lane interfaces).
-- [ ] The guide is dated, committed, and linked from the plan of record.
+- [ ] The guide is dated, available to the lane before work, and linked from
+      the task plan when one exists; any commit fits task authority.
 - [ ] Nothing in the recipe instructs beyond the lane's recorded authority.
 
 ## Gotchas

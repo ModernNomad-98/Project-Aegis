@@ -1,6 +1,6 @@
 ---
 name: latency-budget-architect
-description: 'Decompose an end-to-end latency target into per-hop engineering budgets — map the path (edge → gateway → services → stores → third parties), allocate milliseconds per hop including the overhead nobody budgets (serialization, queue wait, connection setup, retries), do the tail math honestly (percentiles do not add; fan-out exposes a dependency''s tail at 1-(0.99)^N), derive timeouts and retries FROM budgets instead of folklore, keep explicit headroom, and define violation attribution plus the rule that a new dependency on the path must claim budget. CONSUMES the journey target from slo-reliability-architect (or flags its assumption loudly): SLOs say what users must experience and when to page; budgets say which component may spend which milliseconds. Use when allocating a latency target across services, deriving timeouts/retries, or when end-to-end latency has no per-hop owner. Do NOT use to set SLOs/error budgets or alerting (slo-reliability-architect), or to measure (performance-test-harness).'
+description: 'Decompose an end-to-end latency target into per-hop engineering budgets — map the path (edge → gateway → services → stores → third parties), allocate milliseconds per hop including overhead (serialization, queue wait, connection setup, retries), and do tail math with explicit dependence assumptions. Under independent branch tails, fan-out exposure is 1-(0.99)^N; correlated tails require measured or bounded joint behavior. Derive timeouts and retries from budgets, keep explicit headroom, and define violation attribution plus the rule that a new dependency must claim budget. CONSUMES the journey target from slo-reliability-architect (or flags its assumption): SLOs say what users must experience; budgets say which component may spend which milliseconds. Use when allocating a latency target across services or deriving timeouts/retries. Do NOT use to set SLOs/error budgets or alerting (slo-reliability-architect), or to measure (performance-test-harness).'
 ---
 
 # Latency Budget Architect
@@ -86,7 +86,8 @@ that makes the target achievable by design rather than by hope.
    Parallel fan-out composes at the SLOWEST branch — and the tail
    math is where designs lie to themselves: hitting N parallel
    dependencies, the request experiences a dependency's p99 with
-   probability 1-(0.99)^N — at N=10, roughly one request in ten rides
+   probability 1-(0.99)^N only when branch tail events are independent —
+   at N=10, roughly one request in ten rides
    a tail. Fan-out on the path means per-branch budgets must be set
    at a stricter percentile than the end-to-end promise.
 3. **Allocate the budget per hop.** Start from measured reality
@@ -143,7 +144,7 @@ Budget table:
   retry allowance: <hop, count, backoff — funded from whose budget>
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
-Tail math: <fan-out branches budgeted at p<stricter> because 1-(0.99)^N = <exposure>>
+Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
 Timeouts: <per hop: timeout ≈ budget + tolerance; cascade check upstream ≥ downstream×retries+ε>
 Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
@@ -173,14 +174,15 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
 
 ## Gotchas
 
-- Percentiles don't add: p99(A)+p99(B) is not p99(A+B) — summing
-  per-hop p99s overbudgets the path; budgeting hops at p50 while
-  promising p99 underbudgets it catastrophically. Budget per-hop at
-  the percentile the composition math requires, and say which.
-- The fan-out tail trap: ten parallel 20ms calls feel like 20ms until
-  the p99 math (1-(0.99)^10 ≈ 9.6%) puts a tail on one in ten
-  requests. Wide fan-out paths need per-branch budgets at p99.9-class
-  strictness or a hedging strategy the headroom funds.
+- Percentiles don't add: p99(A)+p99(B) is not p99(A+B). The sum can
+  overestimate or underestimate the path's p99 depending on dependence and
+  distribution. Budget per-hop using measured or bounded joint behavior,
+  and state the assumptions.
+- The fan-out tail trap: with ten independent branches, each having a 1%
+  chance of exceeding its threshold, 1-(0.99)^10 ≈ 9.6% of requests have
+  at least one exceedance. Correlated branches can change that figure.
+  Choose branch budgets from measured or bounded joint tails, or fund a
+  hedging strategy from headroom.
 - Serialization is a hop: JSON encode/decode of a fat payload can
   cost more than the service call it wraps — and it appears in no
   service's dashboard because it happens in the caller. The overhead

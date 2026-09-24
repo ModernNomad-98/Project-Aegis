@@ -1,6 +1,6 @@
 ---
 name: iso-42001-aims-architect
-description: 'Design ISO/IEC 42001:2023 certification readiness — the AI management system (AIMS) per harmonized clauses 4–10 plus the AI-specific machinery: AI risk assessment (6.1.2/8.2), AI risk treatment (6.1.3/8.3), and AI system impact assessment (6.1.4/8.4 — impact on individuals and societies, distinct from org risk), with Annex A control-objective selection (public Annex A counts CONFLICT across sources and are never stated; use the licensed text). Net-new is mostly management-system artifacts; AI operational controls MAP to the shipped Phase 1.5 governance pack and ai-governance-risk-reviewer via compliance-control-foundation. Composes statement-of-applicability-author, compliance-evidence-collector, and ai-lifecycle-risk-manager (NIST AI RMF as the risk method underneath). Use for ISO 42001 readiness or building an AI management system. Do NOT use for one AI feature''s posture (ai-governance-risk-reviewer), the RMF program (ai-lifecycle-risk-manager), the ISMS (iso-27001-isms-architect), or the SoA document.'
+description: 'Design ISO/IEC 42001:2023 certification readiness — the AI management system (AIMS) under clauses 4–10, AI risk assessment and treatment, AI system impact assessment, and Annex A control-objective selection. Verify details against licensed text; public Annex A counts conflict. Shipped Phase 1.5 guidance and ai-governance-risk-reviewer provide design routes through compliance-control-foundation, while organizational controls and evidence require separate verification. Composes statement-of-applicability-author, compliance-evidence-collector, and ai-lifecycle-risk-manager. Use for ISO 42001 readiness or AIMS design. Do NOT use for one feature''s posture (ai-governance-risk-reviewer), the RMF program (ai-lifecycle-risk-manager), the ISMS (iso-27001-isms-architect), or the SoA document.'
 ---
 
 # ISO 42001 AIMS Architect
@@ -10,13 +10,15 @@ description: 'Design ISO/IEC 42001:2023 certification readiness — the AI manag
 Design the AI Management System that ISO/IEC 42001:2023 certification
 audits examine. The standard reuses the harmonized management-system
 skeleton (clauses 4–10, same shape as 27001 — verified from the standard's
-TOC) and adds AI-specific machinery: AI risk assessment (6.1.2/8.2), AI
+table of contents) and adds AI-specific machinery: AI risk assessment (6.1.2/8.2), AI
 risk treatment (6.1.3/8.3), and the AI system impact assessment
 (6.1.4/8.4) that evaluates consequences for individuals and societies, not
-just the organization. For this repo's operating model the D9 premise is
-strong: the shipped Phase 1.5 governance pack and
-`ai-governance-risk-reviewer` are exactly what a 42001 auditor points at
-for AI operational control — this skill wraps them in the certifiable
+just the organization. D9 is the roadmap's design premise that shipped
+skills route control work. The Phase 1.5 governance pack and
+`ai-governance-risk-reviewer` provide design guidance, not proof that a
+consumer organization has implemented or operated AI controls. Verify
+mechanisms, owners, status, and evidence before mapping them. This skill
+wraps verified mechanisms in the certifiable
 management system (scope, policy, impact assessments, SoA via
 `statement-of-applicability-author`, internal audit, management review)
 rather than re-deriving them. Readiness design only; certification is the
@@ -52,12 +54,13 @@ accredited body's decision.
 2. The AI system inventory: which systems/features use AI, their roles
    (provider/user of AI), autonomy levels, and affected parties — seeded
    from `ai-governance-risk-reviewer` outputs where they exist.
-3. Shipped AI governance artifacts to map, not rebuild: the Phase 1.5 pack
+3. Shipped AI governance guidance to use as design routes: the Phase 1.5 pack
    (`ai-sdlc-operating-model` stages/authority, `agent-authorization-matrix`
    standing authority, `agent-memory-governance`, `agent-governance-audit`
    per-change audits), `ai-governance-risk-reviewer` feature reviews,
    `ai-threat-modeler` threat models, `ai-evaluation-harness` eval
-   practice.
+   practice. Inspect separate organizational artifacts before calling any
+   mapped mechanism implemented or auditable.
 4. The `compliance-control-foundation` catalog (AI governance domain) and
    any existing ISMS — 42001 alongside 27001 shares context/leadership/
    support machinery; design the delta, not a duplicate.
@@ -98,9 +101,10 @@ accredited body's decision.
    existing machinery, not beside it. Third-party AI (providers, models)
    maps to `supply-chain-security-reviewer`'s AI/ML surface plus vendor
    management.
-6. **Select Annex A control objectives via the foundation.** Map existing
-   mechanisms (Phase 1.5 pack, Phase 7 AI-security skills) to objectives;
-   genuine gaps get owners. Counts and identifiers come only from the
+6. **Select Annex A control objectives via the foundation.** Use Phase 1.5
+   and Phase 7 skills to find candidate routes; map only verified operated
+   mechanisms with evidence to objectives. Missing or unverified mechanisms
+   get owners and verification actions. Counts and identifiers come only from the
    licensed Annex A — public sources conflict.
 7. **Build performance evaluation (clause 9) and improvement (clause 10).**
    Internal audit program covering the AIMS (per-change audits from
@@ -138,7 +142,8 @@ Readiness plan: <artifact → owner → date>; certification decision belongs to
       (6.1.3 → SoA), impact on individuals/societies (6.1.4) — the impact
       assessment is not folded into org risk.
 - [ ] Existing governance artifacts (Phase 1.5 pack,
-      ai-governance-risk-reviewer) mapped as operational mechanisms, not
+      ai-governance-risk-reviewer) used as design routes; only separately
+      verified operated organizational controls map as mechanisms, not
       re-specified.
 - [ ] Annex A selection cites only licensed-text entries; no counts stated
       from public sources.
@@ -155,7 +160,7 @@ Readiness plan: <artifact → owner → date>; certification decision belongs to
   (first edition, 2023-12; harmonized clauses 4–10 incl. 6.1.2–6.1.4;
   Annex A normative "Reference control objectives and controls", Annex B
   normative guidance, C/D informative; developed by ISO/IEC JTC 1/SC 42 —
-  structure verified from the standard's TOC). SOC 2 is an AICPA
+  structure verified from the standard's table of contents). SOC 2 is an AICPA
   **attestation** — never conflate.
 - **Never state 42001 Annex A control/objective counts**: secondary
   sources conflict ("38 controls / 9 objectives" vs "42 objectives") —
@@ -182,10 +187,10 @@ Readiness plan: <artifact → owner → date>; certification decision belongs to
   harmonized structure exists so context, leadership, documented
   information, audit, and review machinery can be shared. Design the
   delta.
-- Per-feature reviews don't aggregate by themselves: a folder of
-  `ai-governance-risk-reviewer` reports is operational evidence, but the
-  AIMS needs the system-level register and assessment processes those
-  reports feed.
+- Per-feature reviews don't aggregate by themselves: reports produced by
+  the organization and tied to verified operated controls can contribute
+  operational evidence, but the AIMS also needs the system-level register
+  and assessment processes those reports feed.
 - Fast-moving AI vendors churn the third-party surface: model/provider
   changes are AIMS-relevant changes — wire them into change management
   and impact-assessment triggers, or the system rots in a quarter.

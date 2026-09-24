@@ -1,5 +1,16 @@
 # Fifth skill-reference screen, first half — 2026-09-23
 
+## Current reading
+
+This is dated delivery evidence. Its original base commit, estimates, counts,
+and pending-review language describe that historical batch. For current
+acceptance totals and remaining work, use the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md) and [forecast](../../roadmaps/aegis-backlog-forecast.md); follow the linked owning skill or reference for current guidance. This note does not grant implementation or merge authority.
+
+Reading key: D6 is the [recorded Phase 7 reconciliation decision](../../reconciliation/step-0-reconciliation-v4.md#phase-7--ai-security--llm-systems-p1)
+anchoring the security mapping to the Open Worldwide Application Security
+Project (OWASP) Top 10 for large language model (LLM) applications
+(2025). The historical D6 link below points to that decision, not a new grant.
+
 ## Scope and timing
 
 This bounded documentation batch makes the first ten reference pages in the

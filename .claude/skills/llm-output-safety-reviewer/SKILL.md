@@ -7,7 +7,8 @@ description: 'Review how an application consumes LLM output for improper output 
 
 ## Purpose
 
-Review whether an application handles model output safely (LLM05): the model
+Review whether an application handles model output safely (OWASP large
+language model output-handling category LLM05): the model
 output is untrusted data, and every place it flows — a rendered page, a
 database query, a shell command, a file path, a URL, a tool argument, or a
 store it will later be read from — is a potential injection or execution sink.
@@ -21,11 +22,13 @@ the flow from model output to impact.
 - Use when: model output is rendered as HTML/markdown, executed as SQL/shell/
   code, written to files, used to build URLs or requests, passed as tool
   arguments, or stored and later re-consumed.
-- Use when: reviewing an AI feature's output path for XSS, injection, RCE,
-  SSRF, path traversal, or second-order (stored-output) issues.
+- Use when: reviewing an AI feature's output path for cross-site scripting
+  (XSS), injection, remote code execution (RCE), server-side request
+  forgery (SSRF), path traversal, or second-order (stored-output) issues.
 - Use when: an agent generates code that the system then runs.
 - Use when: an AUTONOMOUS agent loop generates and executes code with no
-  human between generate and run (ASI05) — sandbox boundaries and escape
+  human between generate and run (OWASP agentic code-execution category
+  ASI05) — sandbox boundaries and escape
   paths, in-sandbox persistence between runs, package installs inside the
   sandbox, and which natural-language inputs can reach an execution path.
 - Do NOT use when: the concern is the SHAPE/type of structured output —

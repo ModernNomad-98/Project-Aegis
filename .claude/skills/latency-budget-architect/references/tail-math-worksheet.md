@@ -15,22 +15,25 @@ it are fiction.
 
 ## Fan-out tail exposure
 
-Probability at least one of N parallel branches rides its own p99:
+Probability at least one of N parallel branches exceeds its own p99
+threshold, assuming independent branch tail events:
 
 ```
 P(tail) = 1 - 0.99^N     N=3: 3.0%   N=10: 9.6%   N=30: 26%
 ```
 
-Consequence: promising p95 end-to-end over N=10 fan-out requires
-per-branch behavior well beyond p99 (budget branches at ~p99.5+, or
-hedge, or narrow the fan-out). Worked example:
+Correlated branch tails change this probability. When independence is not
+supported, use measured joint tails or state a conservative bound. For ten
+independent branches, a p95 join target needs each branch's threshold near
+p99.49 or stricter, before other path latency is counted. Worked example:
 
 ```
 Target: 300ms p95 user-perceived
 Shape: gateway → auth → [10 parallel shard reads] → assemble
-Naive: shard budget 100ms "p99" ⇒ ~9.6% of requests see a shard tail
-Fix:   shard budget 100ms at p99.5 (per-branch), or hedge at 60ms
-       (duplicate cost funded from headroom), or reduce fan-out
+Naive under independence: shard budget 100ms "p99" ⇒ ~9.6% of requests exceed it
+Possible design: budget each shard at p99.5, or hedge at 60ms
+       (duplicate cost funded from headroom), or reduce fan-out;
+       verify the joint path distribution and overhead against the p95 target
 ```
 
 ## Overhead rows checklist (every budget includes them)

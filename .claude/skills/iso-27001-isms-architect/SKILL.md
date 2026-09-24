@@ -1,6 +1,6 @@
 ---
 name: iso-27001-isms-architect
-description: Design ISO/IEC 27001:2022 certification readiness — the ISMS per clauses 4–10 (context incl. the Amd 1:2024 climate-relevance check, leadership, risk assessment/treatment incl. the 6.1.3 process behind the SoA, support and documented information, operation, performance evaluation incl. internal audit and management review cadence, improvement) plus Annex A selection across the four themes (A.5 Organizational, A.6 People, A.7 Physical, A.8 Technological — public control counts are secondary-sourced; verify against the licensed text). Net-new is mostly management-system artifacts (risk register, internal audit, management review); technical controls MAP to shipped skills via compliance-control-foundation. Composes statement-of-applicability-author and compliance-evidence-collector. Use for ISO 27001 readiness, building an ISMS, or 27001 scoping. Do NOT use for the SoA document itself, the AIMS (iso-42001-aims-architect), SOC 2 (soc2-trust-criteria-mapper), or readiness gaps (compliance-gap-auditor).
+description: Design ISO/IEC 27001:2022 certification readiness — the ISMS under clauses 4–10 and Annex A selection across organizational, people, physical, and technological themes. Include the Amd 1:2024 climate-relevance check, risk treatment and Statement of Applicability, internal audit, management review, and documented information. Verify details against licensed text. Shipped skills provide control design routes via compliance-control-foundation; organizational implementation and evidence require separate verification. Composes statement-of-applicability-author and compliance-evidence-collector. Use for ISO 27001 readiness, ISMS design, or scoping. Do NOT use to write the SoA, design an AIMS (iso-42001-aims-architect), map SOC 2 (soc2-trust-criteria-mapper), or assess readiness gaps (compliance-gap-auditor).
 ---
 
 # ISO 27001 ISMS Architect
@@ -11,12 +11,14 @@ Design the Information Security Management System that ISO/IEC 27001:2022
 certification audits examine: the clause 4–10 machinery (scope and context,
 leadership, risk-driven planning, support, operation, performance
 evaluation, improvement) wrapped around Annex A control selection. The
-D9 premise applies hard here: for an org with the shipped Phase 3/4 packs,
-most Annex A-relevant technical controls already exist — the net-new work
-is the management system itself (risk register and treatment process,
+D9 is the roadmap's design premise that existing skills can route control
+work. Shipped Phase 3/4 skill guidance does not establish that an organization
+has implemented, operated, or evidenced any Annex A control. Verify each
+actual mechanism, owner, status, and evidence before treating it as existing.
+The management-system work includes the risk register and treatment process,
 Statement of Applicability via `statement-of-applicability-author`,
 internal audit program, management review cadence, documented information
-discipline) plus the evidence plumbing via `compliance-evidence-collector`.
+discipline plus the evidence plumbing via `compliance-evidence-collector`.
 This skill produces the ISMS design and certification-readiness plan; it
 never asserts the org is certified — an accredited certification body
 decides that.
@@ -45,8 +47,9 @@ decides that.
    and the Annex A table; without it, design proceeds on verified structure
    only (clauses 4–10, four Annex A themes) with every finer claim flagged
    for verification.
-2. The `compliance-control-foundation` catalog and crosswalk rows — what
-   controls exist, their owners, mechanisms, and statuses.
+2. The `compliance-control-foundation` catalog and crosswalk rows as design
+   routes; separately inspect the organization's deployed controls, owners,
+   operating status, and evidence.
 3. Organizational context: business, interested parties and their
    requirements, legal/regulatory/contractual obligations, and whether
    climate change is a relevant issue (Amd 1:2024 amends context clauses;
@@ -82,8 +85,9 @@ decides that.
 6. **Select Annex A controls via the foundation.** Walk the four themes
    (A.5 Organizational, A.6 People, A.7 Physical, A.8 Technological)
    against the catalog using
-   [references/isms-clause-map.md](references/isms-clause-map.md): existing
-   mechanism → map; genuine gap → net-new control with owner. Never cite
+   [references/isms-clause-map.md](references/isms-clause-map.md): verified
+   operated mechanism → map with evidence; missing or unverified mechanism →
+   gap with owner and verification action. Never cite
    theme counts without the licensed table in hand.
 7. **Build performance evaluation (clause 9).** Monitoring/measurement
    choices, the INTERNAL AUDIT PROGRAM (scope, independence, schedule
@@ -93,7 +97,7 @@ decides that.
 8. **Close the loop (clause 10).** Nonconformity and corrective-action
    process — route findings the same way `incident-response-runbook`
    routes postmortem actions: every finding lands with an owner or is
-   explicitly accepted.
+   explicitly accepted by an authorized risk owner with a recorded rationale.
 9. **Produce the readiness plan.** Artifact list with owners and dates,
    evidence program handoff, and open verification items (clause wording,
    Annex A specifics) for the licensed text.
@@ -124,7 +128,8 @@ Readiness plan: <artifact → owner → date>; certification decision belongs to
       delegated to "the team".
 - [ ] Risk register + treatment process feed the SoA; the SoA document
       itself is delegated to `statement-of-applicability-author`.
-- [ ] Annex A selection maps to the foundation catalog — existing
+- [ ] Annex A selection maps verified operated mechanisms to the foundation
+      catalog and assigns verification actions for unknown controls — existing
       mechanisms mapped, not re-specified; genuine gaps carry owners.
 - [ ] Internal audit program and management review cadence designed with
       evidence hooks.
@@ -138,7 +143,7 @@ Readiness plan: <artifact → owner → date>; certification decision belongs to
 - ISO/IEC 27001:2022 is a **certifiable** management-system standard
   (third edition, 2022-10; clauses 4–10; Annex A normative, "Information
   security controls reference" — structure verified from the standard's
-  own TOC). SOC 2 is an AICPA **attestation** — never conflate.
+  own table of contents). SOC 2 is an AICPA **attestation** — never conflate.
 - Annex A four themes are verified; the **93 = 37/8/14/34 theme counts are
   secondary-sourced — verify against the licensed Annex A table before
   citing**, and prefer not citing counts at all.

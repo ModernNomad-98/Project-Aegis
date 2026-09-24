@@ -44,7 +44,7 @@ instrument that runs and measures it.
   designing — attribution is `profiling-methodology-designer`;
   fixes belong to the D12.3 layer skills.
 - Do NOT use when: designing the test DATA itself (fixtures,
-  factories, PII-safe synthesis) — `test-data-architect` owns data
+  factories, personally identifiable information (PII)-safe synthesis) — `test-data-architect` owns data
   generation conventions; this plan states the volumes and shapes it
   needs from them.
 - Do NOT use when: functional test coverage under concurrency is the
@@ -58,7 +58,8 @@ instrument that runs and measures it.
 1. Production traffic evidence: endpoint mix (which calls, what
    proportion), arrival patterns (steady vs bursty, daily peaks),
    payload-size distribution, think-time behavior for session-shaped
-   flows — from access logs, gateway metrics, or APM. No evidence →
+   flows — from access logs, gateway metrics, or application performance
+   monitoring (APM). No evidence →
    the model is assumption-flagged, never silently invented.
 2. The tenant reality: tenant count and size distribution (the
    many-small / few-whale shape), per-tenant request rates, and known
@@ -69,7 +70,7 @@ instrument that runs and measures it.
    seeded to (via `test-data-architect` conventions) for queries to
    behave truthfully.
 4. The numbers that judge the test: SLO targets, latency budgets,
-   error-rate floors — from their owners; plus the capacity question
+   maximum error-rate bounds — from their owners; plus the capacity question
    being asked (target load, growth multiple).
 5. The candidate target environment(s) and their blast radius: what
    the load can touch (dedicated perf environment, staging), what it
@@ -122,7 +123,7 @@ instrument that runs and measures it.
    stop the run — with the safe-stop being load removal, never
    mid-run reconfiguration).
 7. **Tie pass/fail to owned numbers.** Per scenario: the cited
-   threshold (SLO target at load, budget at load, error floor),
+   threshold (SLO target at load, budget at load, maximum error-rate bound),
    per-tenant bounds for the neighbor scenarios, and — for
    stress-to-break — no pass/fail but a required OUTPUT: the knee
    point, the failure mode (graceful shed vs cascade), and the

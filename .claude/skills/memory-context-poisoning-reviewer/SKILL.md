@@ -7,7 +7,8 @@ description: Review an agent's persistent memory and stored context for poisonin
 
 ## Purpose
 
-Review whether an attacker can corrupt what an agent REMEMBERS (ASI06):
+Review whether an attacker can corrupt what an agent REMEMBERS (OWASP
+agentic memory-poisoning category ASI06):
 persistent memory, stored context, learned facts, and preferences that
 survive the current exchange and steer future behavior. Poisoned memory is
 worse than a poisoned prompt — it persists across sessions, gets recalled
@@ -16,9 +17,12 @@ planted it. The review traces every write path into memory, every recall
 path out, and the scoping between tenants/users/sessions, producing
 severity-ranked findings each with a poisoning path (attacker input → stored
 entry → later corrupted behavior) and the write-validation, provenance,
-scoping, TTL, and purge/rollback controls that close it. Training-time
-corruption is `model-poisoning-reviewer` (LLM04); retrieval authorization is
-`rag-security-architect` (LLM08) — this skill owns the agent's own state.
+scoping, time-to-live (TTL), and purge/rollback controls that close it.
+Training-time corruption is `model-poisoning-reviewer` (OWASP model data
+poisoning category LLM04); retrieval authorization is
+`rag-security-architect` (OWASP vector/embedding weakness category LLM08).
+Retrieval-augmented generation (RAG) indexes and authorization (authz) belong
+to that retrieval review; this skill owns the agent's own state.
 
 ## Use When
 
