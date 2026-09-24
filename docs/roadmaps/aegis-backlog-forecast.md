@@ -3,22 +3,16 @@
 ## Start here — current reading
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
-to start blocked work. The [18-page batch after #234](#documentation-batch-estimate--2026-09-24-after-pull-request-234)
-put selected remaining work at **120–299 active hours** on merge,
-including **25–105 active hours** for repository-wide documentation
-readability. The [five-merge checkpoint after #232](#five-merge-checkpoint--2026-09-24-after-pull-request-232)
-reassessed every selected and optional row. Later work should be checked against
-the [whole remaining-page candidate after #237](aegis-documentation-readability-backlog.md#documentation-batches):
-84 reader-page acceptances, 44 fixture classifications, and the new note
-passed independent review; the protected fixture README remains for a separate
-guarded correction. On this PR's merge, the known documentation residual is
-**one page / 1–3 active hours** excluding owner wait, and the other selected
-rows retain **95–194 active hours**, so selected remaining work becomes
-**96–197 active hours**. This is a prospective completion estimate, not an
-observed work rate. Confidential conduct intake remains a separate owner
-decision. Also check
+to start blocked work. The [five-merge checkpoint after #238](#five-merge-checkpoint--2026-09-24-after-pull-request-238)
+reassessed every selected and optional row. Merged #238 left **one protected
+reader page / 1–3 active hours** for documentation, excluding owner wait.
+The other selected rows retain **95–194 active hours**, so selected remaining
+work is **96–197 active hours**. Draft PR #239 proposes the last page's
+correction; only its accepted merge would reduce this bounded documentation
+inventory to zero known pages and leave **95–194 selected active hours**.
+Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-232--2026-09-24)
+the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-238--2026-09-24)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
 
@@ -35,6 +29,68 @@ tables below are retained as historical snapshots. Their dated estimates,
 pending decisions, and statements about what will happen next describe their
 original checkpoints. Follow the latest checkpoint and the owning records for
 current status and authorization.
+
+## Five-merge checkpoint — 2026-09-24, after pull request #238
+
+Five requests merged after [#232](#five-merge-checkpoint--2026-09-24-after-pull-request-232):
+#233, #234, #236, #237 and #238. The exact #238 merge commit is
+`a092f8e07429c75cdc06d46befe084cb84a35d13`. The
+[measurement checkpoint](aegis-execution-metrics.md#checkpoint-after-pull-request-238--2026-09-24)
+records each merge and the available wall interval. Exact-head and exact-main
+Linux and Windows checks passed for the five merges; active-only, review, CI
+and queue time cannot be separated from their merge intervals. None of these
+merges closed a non-documentation package or an owner decision.
+
+The #238 tree has **579 tracked Markdown files**: **534 reader pages** with
+recorded full-checklist acceptance, **44 synthetic fixtures** with an integrity
+and classification disposition, and **one pending reader page**,
+`scripts/tests/fixtures/README.md`. Since #232, accepted reader pages rose by
+**143**: 40 in #234, 18 in #236, and 84 existing pages plus one new review note
+in #238. Five new Markdown files entered the tree. The last README needs the
+separate guarded PR #239 and its own owner disposition. The residual model is
+**1–3 documentation active hours**, excluding owner wait. The previous full
+checkpoint assigned **30–115**; the latest interim #236 estimate was
+**25–105**. The large batch is an acceptance count, not a measured active-work
+rate or evidence to change the per-page time assumptions.
+
+| Selected open work item | #232 remaining active hours | Revised after #238 | Remaining gate or reason |
+| --- | ---: | ---: | --- |
+| WP-2B-3 candidate inputs | 1–4 | 1–4 | Owner semantic and exact-label review |
+| BER-BKL-009 evidence policy | 8–16 | 8–16 | PR #139 protected guard disposition; real-host enforcement later |
+| WP-2B-3 execution support | 8–16 | 8–16 | PR #235 remains a proposed offline implementation grant |
+| WP-2B-3 measurement and OD-1 | 4–10 | 4–10 | Reviewed inputs, source, allowance, development result and holdout freeze |
+| Selected-host capability proof | 12–24 | 12–24 | Named host and measured isolation |
+| WP-2B-4 | 12–24 | 12–24 | Calibration and host proof before limited live suite |
+| WP-2B-5 | 8–16 | 8–16 | WP-2B-4 gate before generic corpus |
+| WP-2B-6 | 8–16 | 8–16 | Later scheduling, cost, quarantine and dataset operations |
+| WP-2B-7 | 4–8 | 4–8 | Later advisory CI and operator workflow |
+| CP-WP-003 | 8–16 | 8–16 | Real source, freshness, containment, evidence and billing proof |
+| CP-WP-004 | 8–16 | 8–16 | Selected target and CP-WP-003 prerequisites |
+| Issue #101 package 4 | 8–16 | 8–16 | #237 is preparation, not a selected host or comparison result |
+| Issue #101 package 7 | 6–12 | 6–12 | Release evaluation after selected integration outcomes |
+| Documentation readability | 30–115 | **1–3** | One protected reader page remains in #239 |
+| **Selected remaining total** | **125–309** | **96–197** | **95–194 non-documentation** plus **1–3 documentation** |
+
+All **14 selected** and **seven optional** rows were reconsidered. The seven
+optional rows remain: Issue #101 package 5 **8–20** if selected; package 6
+**8–20** with separate provider authority; BER-BKL-010 **4–12**;
+BER-BKL-014 **8–20 per selected host**; BER-BKL-015 **8–24 per selected
+product**; strategic skill and framework expansion unbounded until a batch is
+selected; and multi-judge arbitration plus future control-plane architecture
+unbounded until adoption and scope are chosen. Both optional Issue #101 helpers
+would add **16–40**, making selected-plus-both **112–237 active hours**. The
+full all-options backlog still has no finite total.
+
+Subsequently, #240–#243 corrected defects in the delivered setup and offline
+control-plane boundaries. These four merges do not deliver Issue #101 package
+4 or 7, the CP real-capability proof, or any provider or host authority. The
+selected estimates above therefore remain the current planning bounds. PR
+#239 is still unmerged, so neither zero documentation residual nor the
+conditional **95–194 selected** total is an observed closure. The separate
+confidential conduct intake decision remains open. Four merges followed #238
+through #243; this checkpoint PR is the fifth on accepted merge and adds no
+selected implementation scope. Start the next five-merge counter after this
+checkpoint merges. Re-estimate sooner if a material owner decision changes scope.
 
 Baseline: 2026-09-23, after PR #106. This is an active-work forecast for the
 remaining scope in the [execution handoff](aegis-efficient-execution-handoff-2026-09-23.md),
