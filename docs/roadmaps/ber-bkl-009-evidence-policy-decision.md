@@ -1,5 +1,18 @@
 # BER-BKL-009 — final evidence handling decision proposal
 
+**Reader key:** This page is for the owner and reviewers of Behavioral Eval
+Runner (BER) backlog item 009 (`BER-BKL-009`). `BER-DEC` names a runner
+decision-log entry; `AEGIS-APR` names an owner approval-register entry; a work
+package (WP) is a bounded delivery unit. Stage A binds the pre-judge input
+evidence snapshot and manifest; Stage B binds the final report, manifest and
+detached marker. The judge may consume only the verified allowed subset of
+Stage A inputs.
+An access control list (ACL) sets access permissions; continuous integration
+(CI) runs automated checks; a pull request (PR) proposes a repository change;
+an operating system (OS) is the host platform. Section 13 of the
+[runner design](../design/behavioral-eval-runner-v1.md) defines the evidence
+metadata contract. The options below are historical after the owner's choice.
+
 > **Current status, 2026-09-23:** Behavioral Eval Runner (BER) backlog item 009
 > has an owner-selected 30-day complete-bundle policy under
 > [AEGIS-APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection).

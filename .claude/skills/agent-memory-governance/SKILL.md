@@ -1,10 +1,15 @@
 ---
 name: agent-memory-governance
-description: MANUAL-ONLY; never auto-invoke. Govern persistent agent memory as a curated, verified artifact — write rules (only confirmed durable facts with provenance and absolute dates; never secrets, credentials, tokens, or PII; never facts the repo itself records), trust rules (memory is a lead, not truth — reconcile remembered repo/PR/branch state against live git and gh output before acting on it), and hygiene (dedupe, correct stale entries, delete wrong ones, index consistency). Invoke explicitly to establish memory rules, audit or clean a memory store, decide whether a fact belongs in memory, or after a stale-memory incident — e.g. parallel sessions acting on remembered PR state that no longer matched the live repo. Produces rules plus per-entry audit dispositions; memory files edited only after approval — memory steers future sessions. Do NOT use to resolve a live conflict between docs, code, or instructions (source-of-truth-reconciler) or to load context at task start (agent-startup-context-gate).
+description: MANUAL-ONLY; never auto-invoke. Govern persistent agent memory as a curated, verified artifact. Keep only confirmed durable facts with provenance and dates; never keep secrets or personally identifiable information (PII). Recheck remembered repository, pull request (PR), and branch state against live evidence; deduplicate and correct stale entries. Invoke explicitly to establish memory rules, audit a memory store, or recover from a stale-memory mistake. Memory edits require separate approval. Do NOT use for live source conflicts or task-start context loading.
 disable-model-invocation: true
 ---
 
 # Agent Memory Governance
+
+**Reading key:** Personally identifiable information (PII) is information
+that can identify a person. A pull request (PR) proposes a repository change.
+This manual-only skill governs what agents may remember; it does not itself
+authorize memory edits.
 
 ## Purpose
 

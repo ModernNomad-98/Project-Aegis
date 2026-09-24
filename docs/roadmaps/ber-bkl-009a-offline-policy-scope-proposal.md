@@ -1,5 +1,13 @@
 # Behavioral Eval Runner evidence policy: offline first-increment proposal
 
+**Reader key:** This page is for the owner and reviewers of the bounded
+Behavioral Eval Runner (BER) offline proof. `AEGIS-APR` identifies an owner
+approval-register entry; `BER-DEC` identifies a runner decision-log entry;
+`BER-BKL-009A` is the offline increment of backlog item 009. A pull request
+(PR) proposes a repository change, and continuous integration (CI) runs
+automated checks. The original proposal below remains historical; its linked
+approval and decision record set the current scope.
+
 > **Current status, 2026-09-23:** The owner approved this bounded synthetic
 > offline proof in [AEGIS-APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof)
 > and the merged [BER-DEC-011 decision](behavioral-eval-runner-backlog.md#ber-dec-011-bounded-offline-evidence-policy-proof).

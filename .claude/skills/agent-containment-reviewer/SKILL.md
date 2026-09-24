@@ -1,9 +1,14 @@
 ---
 name: agent-containment-reviewer
-description: 'Review whether a multi-agent system contains failure and drift (OWASP Agentic ASI08+ASI10 merged) — cascade half (ASI08): blast-radius isolation, bounded trust of upstream outputs, circuit breakers on inter-agent calls, checkpoints/rollback in multi-step pipelines, retry-storm and fan-out limits; rogue half (ASI10): drift detection against a behavioral baseline, agent inventory/lifecycle (no orphaned or shadow agents), and kill switches that sever authority (credentials revoked, not just processes killed), tested and reachable. Same inputs both halves: agent topology, autonomy boundaries, kill/rollback paths. Composes ai-cost-guardrail-designer (spend/loop bounds) + incident-response-runbook (execution). Use for multi-agent blast radius, drift detection, agent registries, or kill-switch design/review. Do NOT use for attacker-directed goal alteration (agent-goal-hijack-defender), spend/token caps alone (ai-cost-guardrail-designer), or running a live incident (incident-response-runbook).'
+description: 'Review whether a multi-agent system contains failure and drift. Covers the Open Worldwide Application Security Project (OWASP) agentic failure-cascade identifier ASI08 and rogue-agent identifier ASI10: blast-radius isolation, bounded trust, circuit breakers, checkpoints, retry and fan-out limits, drift detection, inventory, and kill switches that sever authority. Inputs are agent topology, autonomy boundaries, and kill/rollback paths. Composes ai-cost-guardrail-designer for spend bounds and incident-response-runbook for procedure authoring. Use for multi-agent blast radius, drift, registries, or kill-switch design/review. Do NOT use for attacker-directed goal alteration (agent-goal-hijack-defender), spend caps alone (ai-cost-guardrail-designer), or a live incident (the human incident owner follows the approved runbook).'
 ---
 
 # Agent Containment Reviewer
+
+**Reading key:** The Open Worldwide Application Security Project (OWASP)
+agentic identifiers used here are ASI08 (failure cascades) and ASI10 (rogue
+agents). An application programming interface (API) is a software call
+boundary; denial of service (DoS) means a service becomes unavailable.
 
 ## Purpose
 
@@ -19,8 +24,9 @@ exists, and a kill switch that severs its AUTHORITY, not just its process?
 The output is severity-ranked findings each with a propagation or drift
 path and the isolation, breaker, checkpoint, inventory, and kill-switch
 controls that close it. Spend containment composes
-`ai-cost-guardrail-designer`; executing containment during an incident is
-`incident-response-runbook`.
+`ai-cost-guardrail-designer`. During a live incident, the human incident
+owner follows the approved response runbook. The `incident-response-runbook`
+skill authors or improves that procedure; it does not execute containment.
 
 ## Use When
 
@@ -37,10 +43,11 @@ controls that close it. Spend containment composes
   (`agent-goal-hijack-defender` — hijack has an adversary; drift does not).
 - Do NOT use when: the only concern is spend/token/loop budgets
   (`ai-cost-guardrail-designer` — composed here for the cost dimension).
-- Do NOT use when: an incident is live and needs running
-  (`incident-response-runbook` executes; this skill designs what it will
-  execute), or the question is message-layer security
-  (`inter-agent-comms-reviewer`).
+- Do NOT use when: an incident is live and needs a human incident owner to
+  follow the approved runbook. This skill designs containment controls; the
+  `incident-response-runbook` skill authors the procedure but does not run
+  an incident. For message-layer security, use
+  `inter-agent-comms-reviewer`.
 
 ## Inputs to Inspect
 
@@ -98,7 +105,7 @@ controls that close it. Spend containment composes
    fence its queued work, notify downstream consumers, and leave an audit
    record. Kill switches are TESTED (rehearsal cadence, staleness triggers)
    and reachable by named humans in bounded time. Execution during a real
-   event is `incident-response-runbook`'s.
+   event belongs to the human incident owner following an approved runbook.
 8. **Rank findings.** Each: propagation/drift path → concrete impact →
    control (isolate, break, checkpoint, register, baseline, kill). State
    what was not reviewed.
@@ -117,7 +124,7 @@ Rogue/drift findings (ASI10, severity-ranked):
 Inventory: <registered / orphaned / shadow / zombie agents>
 Kill switches: <per-agent + fleet: what each actually revokes; tested when; reachable by whom>
 Checkpoints/rollback: <pipeline resume/rollback points; side-effect enumeration>
-Composed: cost amplification → ai-cost-guardrail-designer | execution → incident-response-runbook
+Composed: cost amplification → ai-cost-guardrail-designer | procedure authoring → incident-response-runbook | live execution → human incident owner
 Not reviewed: <areas + why>
 ```
 
@@ -181,9 +188,10 @@ Not reviewed: <areas + why>
 
 - No topology, autonomy, or lifecycle information is available — stop; this
   skill reviews a concrete agent system, not the concept of containment.
-- An agent is actively rogue or a cascade is in progress — route to
-  `incident-response-runbook` (this skill's kill-switch design is what it
-  invokes); do not run the incident from a review.
+- An agent is actively rogue or a cascade is in progress — notify the human
+  incident owner to follow the approved response runbook. Use
+  `incident-response-runbook` later to author or improve that procedure;
+  do not run the incident from a review.
 - Executing a kill switch, revoking credentials, or decommissioning agents
   now — side-effecting human calls via `human-approval-boundary`; this
   skill designs the paths.

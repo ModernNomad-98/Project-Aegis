@@ -6,6 +6,11 @@ disable-model-invocation: true
 
 # Agent Authorization Matrix
 
+**Reading key:** A pull request (PR) proposes a repository change;
+continuous integration (CI) runs automated checks; a command-line interface
+(CLI) is a terminal tool. This skill writes an authority policy and is
+manual-only; it does not grant permission to merge or deploy.
+
 ## Purpose
 
 Make agent authority explicit instead of inferred. This skill produces the

@@ -5,6 +5,11 @@ description: 'Design the governed operating environment an AI agent runs inside 
 
 # Agent Harness Architect
 
+**Reading key:** A large language model (LLM) generates model responses;
+a software development kit (SDK) is a provider's programming interface.
+This skill designs a governed harness; implementation and live authority
+remain separate decisions.
+
 ## Purpose
 
 An agent's authority is a property of its environment, not of its obedience.

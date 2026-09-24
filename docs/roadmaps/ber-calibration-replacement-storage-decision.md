@@ -1,5 +1,11 @@
 # BER replacement calibration input storage — owner decision proposal
 
+**Reading key:** Behavioral Eval Runner (BER) is the evaluation tool;
+`BER-DEC` names an entry in its decision log. A pull request (PR) records
+reviewed source changes. `PENDING` describes candidate labels awaiting the
+owner's exact-byte review. Work package (WP) means a bounded delivery unit;
+SHA-256 is the 256-bit Secure Hash Algorithm used to identify exact content.
+
 > **Current reading, checked 2026-09-23:** The pending-amendment wording below
 > records the original proposal. Peter selected private GitHub input storage;
 > BER-DEC-010 merged in [PR #106](https://github.com/ModernNomad-98/Project-Aegis/pull/106),
@@ -8,11 +14,6 @@
 > packet. This is storage and candidate preparation only. The 160 candidate
 > labels, provider execution, and owner decision 1 (OD-1) remain unapproved.
 > Use the [current BER backlog](behavioral-eval-runner-backlog.md) for gates.
-
-**Reading key:** Behavioral Eval Runner (BER) is the evaluation tool;
-`BER-DEC` names an entry in its decision log. A pull request (PR) records
-reviewed source changes. `PENDING` describes candidate labels awaiting the
-owner's exact-byte review.
 
 Prepared: 2026-09-23. Status: OWNER STORAGE CHOICE RECORDED; BER-DEC amendment
 pending. This is not dataset approval or execution authority. Governing package:

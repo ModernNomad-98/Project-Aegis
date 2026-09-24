@@ -1,6 +1,6 @@
 ---
 name: agent-startup-context-gate
-description: Run at the start of any repository or coding task, before reading or writing code. Verifies the working directory is the intended repo (git remote, landmark files), reads project instructions, status, and architecture docs, and separates verified facts from assumptions and missing information. Use when starting work in a repo, when told to cd into a path and build something there, or when resuming a session whose context may be stale. Halts and asks instead of building when the location or repo identity cannot be verified — a path that exists is not proof it is the right repo.
+description: Run at the start of any repository or coding task, before reading or writing code. Verifies the working directory and workspace role from available evidence, reads project instructions and status docs, and separates verified facts from assumptions and missing information. A fresh product repository may have no remote, commits, application files, or project-state document. Use when starting work in a repo, when told to cd into a path and build something there, or when resuming a session whose context may be stale. Ask when the intended location or role is genuinely ambiguous — a path that exists is not proof it is the right repo.
 ---
 
 # Agent Startup Context Gate
@@ -29,8 +29,9 @@ confidently building in the wrong place or against stale context.
 
 ## Inputs to Inspect
 
-1. **Location identity:** working directory path; `git remote -v`; `git status`;
-   current branch; `git log --oneline -5`.
+1. **Location identity:** working directory path, task-named workspace, and
+   available `git remote -v`, `git status`, branch, and recent history. A fresh
+   zero-commit product repository may have no remote or history.
 2. **Landmark files:** README title and purpose statement; expected top-level
    directories; project manifest (`package.json`, `pyproject.toml`, `.sln`, …).
 3. **Agent instructions:** `CLAUDE.md` (root and nested), `AGENTS.md`, and any
@@ -41,20 +42,31 @@ confidently building in the wrong place or against stale context.
 
 ## Workflow
 
-1. **Verify location identity first — before any other read or write.** Confirm
-   the path exists, is a git repository, and matches the repo the task names.
-   Require at least TWO independent signals: e.g. `git remote -v` matches the
-   expected repo URL/name, AND a landmark file (README title, expected
-   directory) matches. "The path exists" is zero signals.
-2. **On any identity failure, stop.** If the path is missing, empty, not a git
-   repo, has a different remote, or lacks the expected landmarks: halt, report
-   exactly what was found versus what was expected, and ask. Never `git init`,
-   scaffold, or start the task in an unverified location (see Gotchas).
+1. **Verify location and role before task writes or skill selection.** Reading
+   local instructions and source landmarks is part of this verification. Confirm
+   that the current path is the task's intended workspace using available
+   independent signals, such as a matching remote and project landmarks in an
+   established repository. For Project Aegis source-library work, require the
+   four source-package landmarks in `AGENTS.md`; copied startup files alone
+   do not establish source-library role. Classify as consumer/product when
+   task and local evidence support it; otherwise ask one role question. A fresh
+   Stage 0 product repository can have zero commits, no remote, no application
+   files and no `docs/project-state.md`. Use the task-named current workspace
+   and its instructions to classify it as the product repository. "The path
+   exists" alone is zero signals.
+2. **On genuine identity ambiguity or contradiction, stop.** A missing target,
+   a remote pointing to a different named project, or conflicting project
+   landmarks needs one found-versus-expected clarification before writing.
+   A missing remote, history, application file or source-library landmark in
+   a fresh product repository is not by itself a failure. Do not redirect a
+   fresh product into a sibling folder. Never initialize or scaffold a
+   genuinely unverified location (see Gotchas).
 3. **Check working-tree state.** Note the branch, whether it is behind origin,
    and any uncommitted changes the task did not mention. Fetch if currency
    matters to the task.
-4. **Read the governing instructions** (CLAUDE.md / AGENTS.md / repo standards),
-   then the canonical status docs, in the precedence order of
+4. **Finish the governing-instruction and status pass** after the initial
+   role check. Read the relevant CLAUDE.md / AGENTS.md / repo standards in
+   full, then the canonical status docs, in the precedence order of
    [references/context-source-checklist.md](references/context-source-checklist.md).
 5. **Confirm every task-referenced file exists** and skim each for relevance. A
    referenced-but-missing file is a blocker to surface, not to improvise around.
@@ -72,9 +84,9 @@ task asks for one):
 ```
 STARTUP CONTEXT REPORT
 Location: <path> — VERIFIED | FAILED
-  Expected: <repo/remote the task implies>
-  Found:    <remote, branch, landmarks actually observed>
-  Signals:  <the ≥2 independent signals used>
+  Expected: <task-named workspace and role>
+  Found:    <available remote, branch, landmarks and instructions>
+  Signals:  <independent location/role evidence used; missing fresh-repo signals identified>
 Working tree: <branch, ahead/behind, dirty files if any>
 Instructions read: <files, in order>
 Facts:        <each with file:line or command evidence>
@@ -85,7 +97,8 @@ Verdict: PROCEED | HALTED — <question for the human>
 
 ## Validation Checklist
 
-- [ ] Location verified with at least two independent signals, not just path existence.
+- [ ] Location and role verified from available independent evidence; absent
+      remote/history is not treated as failure in a fresh product repository.
 - [ ] Every fact cites its evidence (file:line or command output).
 - [ ] No assumption silently promoted to fact.
 - [ ] Every task-referenced file confirmed present, or flagged missing.
@@ -93,10 +106,12 @@ Verdict: PROCEED | HALTED — <question for the human>
 
 ## Gotchas
 
-- **A path that exists is not the right path.** Real incident: the target
-  directory existed but was empty — not the expected git repo at all — and the
-  agent scaffolded a brand-new project inside it instead of stopping. Emptiness
-  or missing landmarks is an identity FAILURE, not an invitation to build.
+- **A path that exists is not the right path.** In an established-repository
+  task, an empty directory with no matching project evidence is ambiguous;
+  do not scaffold it. A task that names a fresh Stage 0 product repository
+  with copied startup instructions is different: absent commits, remote and
+  application files can be its expected state. Work in that current workspace
+  after reading its instructions and confirming the intended role.
 - Multiple clones or worktrees of the same repo can coexist on one machine; the
   remote matches in all of them, so also check branch and recent commits.
 - Windows paths differ by case and spacing; near-miss directory names look right
@@ -109,9 +124,11 @@ Verdict: PROCEED | HALTED — <question for the human>
 ## Stop Conditions
 
 - Target path does not exist → stop and ask.
-- Target path exists but is empty, is not a git repository, or lacks the
-  expected remote/landmarks → stop, report found-vs-expected, ask. Do not init,
-  scaffold, or build there.
+- An established repository's expected identity evidence is missing, or the
+  intended role remains genuinely ambiguous after reading instructions →
+  stop, report found versus expected, and ask one clarification. A fresh
+  product repository may legitimately lack commits, a remote, application
+  files and source-library landmarks.
 - `git remote` points at a different repository than the task names → stop.
 - Uncommitted changes or an unexpected branch the task does not account for →
   stop and ask before touching the tree.
