@@ -1,8 +1,9 @@
 # Plan Reading Guide
 
-Operator interpretation, divergence causes, sargability, and index
-worksheets. Store-agnostic: operator names vary by engine; the shapes and
-diagnostics do not.
+Use this guide with the [Query Plan Reader](../SKILL.md). It covers operator
+interpretation, estimate divergence, sargability (whether a predicate lets
+the store use an index), and index worksheets. Operator names and diagnostics
+vary by engine; verify each interpretation against the actual store.
 
 ## Operator-reading table
 
@@ -13,12 +14,12 @@ diagnostics do not.
 | Nested-loop join | small outer × indexed inner | outer misestimated (est≪actual) — the planner thought "small" |
 | Hash join | large unsorted inputs, enough memory | hash spills to disk (memory indicator); build side misestimated |
 | Merge join | both inputs already ordered | explicit sorts feeding it that dominate cost |
-| Sort | small input; top-N with limit | spill-to-disk markers; sort of millions to return 20 (missing ordered index) |
+| Sort | small input; a bounded top-N sort that retains only the best N rows for a limit | spill-to-disk markers; sort of millions to return 20 (check whether an ordered index fits) |
 | Aggregate | after selective filtering | over the whole table per request — analytical shape on the operational path |
 
 ## Estimate-vs-actual divergence — causes in likelihood order
 
-1. **Stale statistics** — refresh is the cheapest fix in the catalog;
+1. **Stale statistics** — refresh may be the cheapest fix in the catalog;
    check the store's stats timestamp for the touched tables FIRST.
 2. **Correlated predicates** — planner multiplies independent
    selectivities (`country='X' AND region='X-north'`); fixes: extended/
@@ -39,7 +40,7 @@ diagnostics do not.
 | implicit cast (param type ≠ column type) | match the types — the invisible sargability killer |
 | leading-wildcard match | trigram/text-search structures, or accept the scan honestly |
 | `OR` across columns | union of two indexed branches, or composite redesign |
-| `NOT IN (subquery)` with nulls | `NOT EXISTS` (semantics AND speed) |
+| `NOT IN (subquery)` with nulls | Inspect three-valued NULL behavior first. `NOT EXISTS` may express the intended anti-join, but it changes results when NULLs are possible; add explicit null guards or keep the original behavior as required, then compare outputs. |
 | big `OFFSET` pagination | keyset: `WHERE (sort_key, id) > (last_seen...) ORDER BY ... LIMIT n` — offset degrades linearly by design |
 | `SELECT *` feeding row-fetch cost | project needed columns; enables covering |
 
@@ -73,8 +74,10 @@ Expected plan change: <node X: scan → seek; loops N→M; sort eliminated?>
 
 ## Write-statement capture idiom (safety)
 
-Analyze-style execution of INSERT/UPDATE/DELETE runs the write. Capture
-inside an explicit transaction that rolls back (`BEGIN; EXPLAIN ANALYZE
-<stmt>; ROLLBACK;` — your engine's equivalent), on non-production data
-paths, or use estimate-only capture and say so in the verdict. Production
-capture follows the repo's approval conventions — never a default.
+`EXPLAIN ANALYZE` executes the statement, including writes. On a disposable
+non-production fixture, an engine-specific explicit transaction followed by
+rollback can restore transactional database changes; it cannot undo external
+calls, sequence increments, or other nontransactional side effects. Check the
+statement and triggers first. Use estimate-only capture when execution is
+unsafe and say so in the verdict. Production capture follows the repo's
+approval conventions — never a default.

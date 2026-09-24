@@ -2,7 +2,9 @@
 
 Companion to [../SKILL.md](../SKILL.md). Checklists and formats for the
 staged retirement of a library skill. Everything here is PLAN material —
-execution of any stage is a separate, human-approved operation.
+execution of a stage requires an applicable active human grant. A standing
+grant may cover more than one stage; check its effective scope before asking
+for a new approval.
 
 ## Reverse-link sweep procedure
 

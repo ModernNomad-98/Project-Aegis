@@ -60,7 +60,9 @@ changes through human approval.
    server-only currently reachable by the client is a finding to fix.
 2. **Classify the change** (`change-classification-gate`); rotating live
    credentials, editing production config, or touching deploy secrets crosses
-   `human-approval-boundary` — get approval before those steps.
+   `human-approval-boundary` — check the complete effective approval record
+   for an applicable active grant and obtain any missing scope before those
+   steps.
 3. **Write the proving check first** where feasible: a test or build assertion
    that the server-only secret does NOT appear in the client bundle / is not
    readable from the browser. Confirm it FAILS against the current exposed
@@ -69,7 +71,7 @@ changes through human approval.
    manager or server-only env; load at runtime server-side; replace client
    references to server secrets with a server-side proxy/endpoint.
 5. **Rotate what leaked.** A secret that was committed or client-exposed is
-   compromised — rotate it (with approval), don't just relocate it. Deleting
+   compromised — rotate it under an applicable grant, don't just relocate it. Deleting
    it from source without rotation leaves a live credential in git history.
 6. **Least-privilege service accounts:** narrow grants to what's needed;
    record what was removed and why.
@@ -124,7 +126,8 @@ Handoff: security-pr-reviewer to verify; ops to complete rotations if pending.
 - Never print, log, echo, or commit secret VALUES; operate on names and
   locations. Tests assert on absence/behavior, not on the secret's content.
 - Rotating live credentials, editing production config, or changing deploy
-  secrets requires explicit human approval (`human-approval-boundary`).
+  secrets requires applicable explicit human authority
+  (`human-approval-boundary`); an effective standing grant may supply it.
 - Least privilege is the default for machine identities; broad grants require
   written justification.
 
@@ -147,8 +150,9 @@ Handoff: security-pr-reviewer to verify; ops to complete rotations if pending.
 ## Stop Conditions
 
 - Rotating a live credential, editing production config, or rewriting git
-  history to purge a secret → stop for explicit approval
-  (`human-approval-boundary`); these are irreversible or broadly impactful.
+  history to purge a secret → stop unless the action is covered by an
+  applicable active human grant; obtain any missing scope through
+  `human-approval-boundary`. These are irreversible or broadly impactful.
 - The only safe fix requires an ops action outside the repo (rotate a cloud
   key, revoke a token in a provider console) → stop and hand off with exact
   steps; do not fake completion.

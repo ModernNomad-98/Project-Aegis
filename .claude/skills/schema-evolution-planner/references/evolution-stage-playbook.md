@@ -1,13 +1,14 @@
 # Evolution Stage Playbook
 
-Detail for the three stages, the compatibility matrix, the backfill handoff
-contract, and the deprecation register. `SKILL.md` owns the workflow; this
-file owns the tables and templates.
+Use this playbook with the [Schema Evolution Planner](../SKILL.md). It covers
+the three stages, compatibility matrix, backfill handoff, and deprecation
+register. The owning skill sets the workflow.
 
 ## Compatibility matrix (state per stage)
 
-For each stage, fill all four cells — a stage ships only when every cell is
-"works":
+For each stage, assess all four cells over the actual overlapping deployment
+and rollback window. A stage ships only when every combination that can occur
+in that window works; record why any other combination is impossible:
 
 | | old schema shape | new schema shape |
 |---|---|---|
@@ -40,12 +41,14 @@ A cell that cannot be made to work forces a stage split, not a caveat.
   zero over a stated window.
 
 ### Contract
-- Stop dual-writes (code change), enter the old shape in the deprecation
+- Stop dual-writes only after proving old writers and rollback paths no longer
+  need the old shape. Enter the old shape in the deprecation
   register, tighten constraints that expand had to defer (NOT NULL, type,
   FK), and schedule — not execute — the physical drop.
 - Gate evidence before the drop ships: zero readers of the old shape over a
-  stated observation window, from query statistics or log scan; the
-  register entry's earliest-drop release reached.
+  stated observation window, from query statistics or log scan; rollback
+  paths no longer require it; the register entry's earliest-drop release
+  reached.
 
 ## Deprecation register format
 

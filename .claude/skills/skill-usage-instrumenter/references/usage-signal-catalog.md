@@ -30,8 +30,10 @@ is not a quality score and must not grow into one.
 
 ### Non-event (computed, not captured)
 
-`never_fired = shipped_list − distinct(invocation.skill)` over the stated
-window. Always derived from the CURRENT shipped list at computation time.
+`never_fired = eligible_shipped_skills − distinct(invocation.skill)` over the
+stated window. A skill is eligible only from its actual ship date and where
+its invocation host was exposed to relevant work. Record a shorter exposure
+window or insufficient exposure; do not count pre-ship days as zero fires.
 
 ## Minimization table
 
@@ -63,7 +65,7 @@ the host doesn't expose is fiction with a schema.
 | --- | --- | --- |
 | Fires only `explicit`, never `auto` | Trigger-description re-review | `skill-quality-reviewer` (checks 1–2) |
 | Repeated corrections toward the same neighbor | Discriminating trigger-evals + description fix on BOTH sides | Skill authors; re-review |
-| Zero fires across N consecutive windows AND not exempt | Deprecation evidence package | `skill-deprecation-planner` |
+| Zero fires across N consecutive eligible exposure windows AND not exempt | Deprecation evidence package, with ship date and host/workload coverage | `skill-deprecation-planner` |
 | High fires + high `abandoned` | Substance review (fires but doesn't help) | `skill-quality-reviewer` (check 5) |
 | One sibling wins all contested requests in a cluster | Consider absorbing the loser | `skill-quality-reviewer` → possibly `skill-deprecation-planner` |
 
@@ -97,6 +99,8 @@ removals require the same scrutiny as a deprecation.
 ```
 USAGE EVIDENCE — <skill-name>
 Window:        <start–end; workload representativeness note>
+Ship date:     <date the skill became available in the observed host>
+Exposure:      <eligible hosts and relevant workload; uncovered periods>
 Tier:          <1 | 2 — and what each tier contributed>
 Invocations:   <count; auto/explicit split; last-fired date>
 Corrections:   <count; toward which neighbors>

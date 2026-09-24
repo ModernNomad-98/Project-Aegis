@@ -1,6 +1,6 @@
 # Standing Approval Policy — Full Template & Mechanics
 
-Companion to `standing-approval-and-auto-advance`. The template below is what
+Companion to the [Standing Approval and Auto Advance](../SKILL.md). The template below is what
 the skill instantiates for a repo; every `<placeholder>` is filled by the
 adopting HUMAN, not by an agent.
 
@@ -22,7 +22,9 @@ Arming auto-merge is forbidden to agents by default and requires its own
 separate, explicit recorded decision before any change to that rule. An
 approval to merge does not also approve arming auto-merge.
 An agent finding auto-merge already armed treats it as a hazard:
-disarm (`gh pr merge --disable-auto <n>`) and flag — never let it ride.
+check current authority for changing that PR state, then disarm
+(`gh pr merge --disable-auto <n>`) if covered; otherwise flag and stop
+the affected merge path for a human decision.
 
 ## 2. Standing scope (named steps only)
 
@@ -62,7 +64,9 @@ The owner instruction always wins.
 Sessions operating under this policy OPEN with:
 > Operating under standing approval APR-<NNN>: <one-line scope>.
 > Opt-out: "<EXACT PHRASE>". Merge profile: <profile>.
-A session that does not restate the policy does not enjoy it.
+A session that does not restate the policy cannot claim this template's
+auto-advance coverage. An independently effective direct owner grant remains
+effective within its own scope and lifecycle.
 
 ## 7. Reviewer-block path
 

@@ -4,6 +4,9 @@ Detail file for the owning [Release Readiness Reviewer](../SKILL.md).
 Loaded on demand. For an auto-deploying merge, the pre-merge gate uses the
 exact PR head or merge-queue candidate; verify the final merged commit and
 artifact afterward. Unknown on a blocking dimension remains NO-GO.
+CI means continuous integration; PR means pull request; SHA denotes a
+commit hash; API means application programming interface; UI means user
+interface; CODEOWNERS is the repository file assigning code review owners.
 
 ## Evidence table template — pass/blocking criteria per dimension
 

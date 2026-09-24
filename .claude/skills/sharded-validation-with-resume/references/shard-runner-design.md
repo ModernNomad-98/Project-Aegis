@@ -1,5 +1,12 @@
 # Sharded Validation — Runner & Gate Design Detail
 
+Use this reference with the [Sharded Validation With Resume](../SKILL.md).
+
+JSON means JavaScript Object Notation; CI means continuous integration;
+API means application programming interface; UI means user interface;
+E2E means end to end; SHA denotes a commit hash; p95 means the 95th
+percentile of observed duration.
+
 Companion to `sharded-validation-with-resume`. All shapes are reference
 designs; installation into CI is a handoff to `ci-pipeline-architect` or a
 human.

@@ -61,17 +61,25 @@ forbidden action, with the expected result. Include a positive control.
 The SQL below is an illustrative plan for **synthetic fixtures in an isolated,
 disposable non-production database**. It includes write statements to expose
 policy failures. Do not paste it into a live or customer database. Run each
-adapted case in a transaction that is rolled back, and verify the fixture is
+adapted case in a separate transaction or savepoint that is rolled back, and verify the fixture is
 unchanged afterward. Skip execution if triggers or external effects cannot be
 isolated or reversed. This skill delivers the plan, not live execution.
 
+Run these checks as the application's actual restricted database role with
+verified synthetic session claims. A claim setting by itself does not switch
+database roles, and the owner, superuser and `BYPASSRLS` roles can bypass
+row-level security. Expected statement errors abort a PostgreSQL transaction
+until it is rolled back to a savepoint or restarted.
+
 ```sql
 -- SELECT isolation
+-- Connect as the restricted member role used by the application.
 SET request.jwt.claims = '{"tenant_id":"A", "role":"member"}';
 SELECT count(*) FROM invoices WHERE tenant_id = 'B';   -- EXPECT 0
 SELECT count(*) FROM invoices WHERE tenant_id = 'A';   -- positive control: > 0
 
 -- INSERT write-side
+-- Use a separate transaction/savepoint; roll back after the expected error.
 SET request.jwt.claims = '{"tenant_id":"A"}';
 INSERT INTO invoices (tenant_id, amount) VALUES ('B', 100);  -- EXPECT rejected
 
@@ -81,8 +89,8 @@ UPDATE invoices SET tenant_id = 'B' WHERE id = '<A-row>';     -- EXPECT rejected
 -- DELETE cross-tenant
 DELETE FROM invoices WHERE tenant_id = 'B';                   -- EXPECT 0 affected
 
--- anonymous caller; privileged service-role reachability is audited separately
-RESET request.jwt.claims;  -- anon
+-- Reconnect or SET ROLE as the actual restricted anonymous role.
+RESET request.jwt.claims;  -- clears claims; does not itself change DB role
 SELECT count(*) FROM invoices;                               -- EXPECT 0 (or only public)
 ```
 

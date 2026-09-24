@@ -15,7 +15,9 @@ best → worst:
 
 1. **Filtered ANN query** — the vector search includes tenant + ACL
    predicates evaluated by the store during search (metadata filtering /
-   pre-filtering). Only authorized candidates are ever scored.
+   pre-filtering). Verify where the store applies the filter; the required
+   guarantee is that returned hits and metadata are authorized. Do not claim
+   unscoped candidates were never scored without evidence of that search path.
 2. **Namespace/collection per principal scope** — the query targets only the
    tenant's namespace, derived server-side from the authenticated tenant.
    Combine with per-document ACL filters for user-level control.

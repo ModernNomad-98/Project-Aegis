@@ -1,11 +1,19 @@
 # Isolation Tactics
 
-Supporting detail for `systematic-debugger`. Read on demand.
+Use these tactics with the [Systematic Debugger](../SKILL.md). Read on demand.
+
+FD means file descriptor; DST means daylight saving time; UTC means
+Coordinated Universal Time; DNS means Domain Name System; TLS means
+Transport Layer Security.
 
 ## Bisection recipes
 
 - **Change bisection:** `git bisect start; git bisect bad HEAD; git bisect good <last-known-good>` with the reproduction as the test command (`git bisect run <cmd>` when it exits nonzero on failure). Preconditions: clean tree, deterministic repro — a flaky test makes bisect lie confidently.
-- **Dependency bisection:** when the window spans a lockfile change, bisect the lockfile alone (checkout old lockfile on new code and vice versa) to split "our code vs their code" in one experiment.
+- **Dependency bisection:** when the window spans a lockfile change, compare
+  old and new lockfiles with code revisions in isolated disposable worktrees.
+  If an isolated checkout is unavailable, first record the exact state of
+  unrelated changes and restore it after each experiment; never overwrite
+  another task's lockfile edits.
 - **Data bisection:** binary-search the failing input — half the file, half the rows, half the request body — keeping whichever half still fails.
 - **Config bisection:** diff the failing environment's resolved config against a working one, then flip suspects one at a time toward the failing value.
 

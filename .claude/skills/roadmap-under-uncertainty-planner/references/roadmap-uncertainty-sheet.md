@@ -1,6 +1,12 @@
 # Roadmap Uncertainty Sheet
 
+Use this reference with the [Roadmap Under Uncertainty Planner](../SKILL.md).
+
 Detail for `roadmap-under-uncertainty-planner`. Read on demand.
+
+In the time-boxed example, Q means calendar quarter; H2+ means the second
+half of the year or later. Set the actual planning calendar before using
+these labels.
 
 ## Horizon models
 
@@ -18,7 +24,7 @@ with "subject to change" — the chart wins the reader's belief.
 | Confidence | Precision allowed | Language |
 |---|---|---|
 | High (now) | supported estimated range | "currently planned", "estimated" |
-| Medium (next) | quarter | "planned", "expected" |
+| Medium (next) | quarter | "planned", "expected" (directional and nonbinding until the appropriate human commitment decision) |
 | Low (later) | none — theme only | "exploring", "intend to" |
 
 The failure mode is high precision + low confidence (an exact date on a

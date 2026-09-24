@@ -1,6 +1,12 @@
 # README Sheet
 
+Use this reference with the [Readme Craftsman](../SKILL.md).
+
 Detail for `readme-craftsman`. Read on demand.
+
+CLI means command-line interface; API means application programming
+interface; GIF means Graphics Interchange Format; ADR means architecture
+decision record.
 
 ## First-screen checklist (highest leverage)
 

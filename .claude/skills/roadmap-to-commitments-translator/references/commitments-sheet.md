@@ -1,6 +1,7 @@
 # Commitments Sheet
 
-Detail for `roadmap-to-commitments-translator`. Read on demand.
+This worksheet helps readers of the [Roadmap to Commitments Translator](../SKILL.md)
+turn directional roadmap themes into capacity-backed candidate commitments.
 
 ## Commit-able criteria (all three) — then the approval gate
 
@@ -22,25 +23,28 @@ REQUIRED` and `Committed` stays `none`, however strong the technical evidence.
 ## Capacity-math worksheet
 
 ```
-Raw capacity        = team size × sprint velocity (from EVIDENCE, not hope)
+Raw capacity        = observed team sprint velocity (from evidence, not hope)
+  OR the sum of observed per-person capacity, adjusted for availability
   − maintenance/support load
   − interrupt/on-call load
   − risk buffer (higher if past commitments missed)
 = Committable capacity
 ```
 
-Committable capacity is always well below headcount. Commit to that, not
-to the best case.
+Do not multiply a team-level velocity by team size: team size is already
+reflected in that velocity. Subtract only loads not already reflected in the
+observed baseline. Commit to measured available capacity, not the best case.
 
 ## Outcome → deliverable translation
 
-| Roadmap (theme/outcome) | Commitment (deliverable + range) |
+| Roadmap (theme/outcome) | Candidate deliverable + range before approval |
 |---|---|
 | "Improve onboarding" | "Ship the new onboarding flow, weeks 6–8" |
 | "Reduce checkout friction" | "Launch one-page checkout to 50%, weeks 4–6" |
 | "Explore AI assist" | (stays directional — not committable) |
 
-Commit to a concrete, verifiable deliverable with an honest RANGE.
+Propose a concrete, verifiable deliverable with an honest range. Call it a
+commitment only after the named human approval in final commitment mode.
 
 ## Date discipline
 
@@ -51,12 +55,14 @@ Commit to a concrete, verifiable deliverable with an honest RANGE.
 
 ## Gap communication
 
-State BOTH lists, always:
+In final commitment mode, state both lists after the named human decision:
 ```
 COMMITTED (we will deliver): <...>
 NOT COMMITTED (directional, and why): <item — capacity | dependency | uncertainty>
 ```
-The unstated gap is where stakeholders invent promises you never made.
+In readiness mode, label the first list **candidate committable set** and
+keep `Committed` as `none`. The unstated gap is where stakeholders invent
+promises you never made.
 
 ## Over-commitment tradeoff (when asked for more than capacity)
 

@@ -1,5 +1,11 @@
 # Triage Rubric — dispositions, five-axis ranking, false-positive patterns
 
+Use this reference with the [Static Analysis Reviewer](../SKILL.md).
+
+PII means personally identifiable information; SaaS means software as a
+service; SQL means Structured Query Language; ORM means object-relational
+mapper; XSS means cross-site scripting; FP means false positive.
+
 Progressive-disclosure detail for `static-analysis-reviewer`. A scanner hit is
 a lead; the triage is the verdict.
 

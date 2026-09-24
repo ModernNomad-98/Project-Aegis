@@ -1,6 +1,7 @@
 # Conflict Resolution — Worked Examples
 
-Supporting detail for `source-of-truth-reconciler`. Read on demand.
+Use these examples with the [Source of Truth Reconciler](../SKILL.md). Read
+on demand.
 
 ## Example 1 — Doc vs code (IS-question → repo state wins)
 
@@ -9,7 +10,9 @@ Claim A: `docs/architecture.md:41` — "the public API is rate-limited to
 Claim B: `middleware/ratelimit.ts:17` — `limit: 60`.
 
 - Type: IS (what does the system do today?).
-- Verdict: code wins (rule 2). Current behavior is 60 req/min.
+- Verdict: the examined repository tree configures 60 requests per minute.
+  Confirm the deployed revision and effective runtime configuration before
+  asserting current production behavior; the code alone does not prove it.
 - Assumption surfaced: no other middleware overrides this value (checked the
   middleware chain; none found).
 - Follow-up proposed: correct `docs/architecture.md:41`, OR — if 100 was the

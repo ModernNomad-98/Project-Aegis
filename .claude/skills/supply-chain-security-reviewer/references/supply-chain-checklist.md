@@ -1,5 +1,7 @@
 # Supply-Chain Checklist — CI/CD paths, triage, pinning, provenance
 
+Use this reference with the [Supply Chain Security Reviewer](../SKILL.md).
+
 Progressive-disclosure detail for `supply-chain-security-reviewer`.
 Supply-chain assurance asks where artifacts came from and whether they were
 tampered with, alongside vulnerability counts.
@@ -27,7 +29,9 @@ tampered with, alongside vulnerability counts.
 
 For each flagged CVE / advisory:
 
-1. Is the vulnerable package a **direct** or **transitive** dep? (from lockfile)
+1. Is the vulnerable package a **direct** or **transitive** dependency?
+   Compare the lockfile with the resolved installed graph in the reviewed
+   environment; a lockfile entry alone does not prove what was installed.
 2. Is the vulnerable **code path called** by this project, or only present?
 3. Is it a **runtime**, **build/dev-only**, or **test-only** dependency?
 4. Is there a **fixed version**, and does upgrading break anything?
@@ -144,7 +148,9 @@ components is `inter-agent-comms-reviewer` (ASI07).
 ## HIGH-severity gate
 
 A HIGH/CRITICAL finding must state a compromise path: weakness → attacker
-action → **code execution or secret theft**. Reachable runtime exploit,
+action → material impact, which may include code execution, secret theft,
+data exposure or corruption, unauthorized action, or availability loss.
+Reachable runtime exploit,
 install-time script execution, an untrusted-CI-to-secret path, or loading a
 pickle-serialized model from an untrusted source qualifies. A latent
 unreachable CVE does not — rank it low and say why.

@@ -1,5 +1,7 @@
 # Elicitation Sheet
 
+Use this reference with the [Requirements Gathering Facilitator](../SKILL.md).
+
 Detail for `requirements-gathering-facilitator`. Read on demand.
 
 ## How to use this sheet (INTERNAL CHECKLIST — never a questionnaire)
@@ -118,7 +120,8 @@ information or decision target) and one quoted Ask (one atomic question).
 
 ## The observed compound failure and its decomposition
 
-A live Stage 1 turn bundled FOUR targets into one turn. It is recorded ONLY as an
+A requirements-discovery turn (the owning workflow's first stage) bundled
+FOUR targets into one turn. It is recorded ONLY as an
 INVALID example, never reusable as a card:
 
 INVALID — four targets (current process + actor + recent incident + failure point):

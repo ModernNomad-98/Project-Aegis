@@ -1,5 +1,17 @@
 # Security Review Passes
 
+Use this reference with the [Security Pr Reviewer](../SKILL.md).
+
+IDOR means insecure direct object reference; SaaS means software as a
+service; JWT means JSON Web Token; UI means user interface; GraphQL is a
+query API language; REST means representational state transfer; RPC means
+remote procedure call; SQL means Structured Query Language; NoSQL means
+nonrelational database; PII means personally identifiable information;
+SSRF means server-side request forgery; CORS means cross-origin resource
+sharing; RLS means row-level security; CI means continuous integration;
+SAST means static application security testing; CodeQL is GitHub's code
+query analysis system.
+
 Progressive-disclosure detail for `security-pr-reviewer`. Run these passes over
 an obtained diff; anchor every finding to file:line and give HIGH+ an exploit
 path.

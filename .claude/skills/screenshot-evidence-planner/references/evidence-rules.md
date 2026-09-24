@@ -40,7 +40,7 @@ Pattern: `<cp-id>--<route-or-case>--<persona>--<build>--<yyyymmdd-hhmmss>.png`
 
 | Class | Contents | Rule |
 | --- | --- | --- |
-| M0 public | synthetic seed data only | no masking needed — preferred path |
+| M0 public | verified synthetic seed data and a whole-frame inspection showing no secrets, sensitive content, or other tenant data | no masking needed after inspection — preferred path |
 | M1 internal | internal test accounts, no PII | mask tokens/keys if visible |
 | M2 sensitive | any real PII, financials, tenant names | block-out before storage; restricted store |
 | M3 cross-tenant | any other tenant's data visible | do not store; recapture with seeded data; report as an isolation observation |

@@ -17,7 +17,7 @@ depends on and how it is built — not just whether a scanner printed CVEs. The
 review applies SLSA-style provenance thinking to dependencies, lockfiles,
 install/build scripts, CI/CD workflows, and artifacts, and reports
 severity-ranked findings where each carries a compromise path (how an attacker
-gets from the weakness to code execution or secret theft), an exploitability
+gets from the weakness to material impact), an exploitability
 verdict (reachable/exploitable vs latent), and a concrete remediation. A CVE
 in a package that is never called on a reachable path is triaged as such, not
 treated as an automatic critical; a `postinstall` script pulling a remote blob
@@ -122,9 +122,11 @@ is a finding whether or not a scanner flagged it.
    server is code that answers your agent's tool calls — live message
    security is `inter-agent-comms-reviewer` (ASI07).
 7. **Rank findings** with a compromise path and exploitability verdict.
-   High severity REQUIRES a path from the weakness to code execution/secret
-   theft; a reachable exploit or a plausible install-time execution qualifies,
-   a latent unreachable CVE does not.
+   High severity REQUIRES a path from the weakness to material impact such
+   as code execution, secret theft, data exposure or corruption,
+   unauthorized action, or availability loss. A reachable exploit or a
+   plausible install-time execution can qualify; a latent unreachable CVE
+   does not.
 8. **Remediate concretely:** pin (to SHA/version+hash), upgrade (state the
    safe version), remove, or isolate (least-privilege token, split trusted/
    untrusted jobs). Note accepted risk only with written rationale.
@@ -137,7 +139,7 @@ Dependency set: <direct N / transitive M — from lockfile>
 Scanner triage: reachable-TP <n> | latent-TP <n> | false-positive <n> | dup <n>
 Findings (severity-ranked):
   [CRITICAL|HIGH|MEDIUM|LOW] <area: dep / script / CI / artifact>
-    Compromise path: <weakness → attacker action → code exec / secret theft>
+    Compromise path: <weakness → attacker action → material impact>
     Exploitability: <reachable/exploitable | install-time | latent>
     Remediation: <pin SHA / upgrade to <v> / remove / isolate / split job>
 Install/build execution: <scripts that run + risk>
@@ -172,8 +174,8 @@ Not reviewed: <areas + why>
 
 - Scanner output is input, not truth (master-prompt §6): a CVE is triaged by
   reachability and exploitability before it gets a severity.
-- High-severity claims require a compromise path to code execution or secret
-  theft; "a CVE exists" without a reachable/exploitable path is not high.
+- High-severity claims require a compromise path to material impact;
+  "a CVE exists" without a reachable/exploitable path is not high.
 - Unpinned third-party CI actions (mutable tags) are a finding — pin to a
   full commit SHA.
 - `pull_request_target`/privileged workflows that check out and run untrusted

@@ -1,6 +1,11 @@
 # Currency Audit Sheet
 
+Use this reference with the [Source Currency Auditor](../SKILL.md).
+
 Detail for `source-currency-auditor`. Read on demand.
+
+API means application programming interface; URL means uniform resource
+locator.
 
 ## Citation-class thresholds (by volatility)
 

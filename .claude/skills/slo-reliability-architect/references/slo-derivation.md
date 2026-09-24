@@ -34,7 +34,10 @@ Budget burn rate = (error rate) / (1 − target). Standard two-window form:
 Exact multipliers/windows are tuned to the SLO window and traffic shape —
 the table is the pattern, not gospel. Both-windows-firing suppresses
 deploy-blip false pages. Cause signals (CPU, GC, restarts, queue depth)
-appear on the diagnostic dashboard the page links to — they do not page.
+appear on the diagnostic dashboard the page links to. A cause signal may
+also page when the owning incident policy identifies a direct urgent failure
+mode, such as imminent resource exhaustion; give it its own threshold,
+runbook, and owner rather than assuming all cause signals are diagnostic only.
 
 ## Error-budget policy template
 

@@ -1,12 +1,13 @@
 # Curation Rules
 
-Detail file for `regression-suite-curator`. Loaded on demand.
+Use this reference with the [Regression Suite Curator](../SKILL.md). Loaded
+on demand.
 
 ## Promotion rules
 
 | Trigger | Rule |
 | --- | --- |
-| Bug fixed (sev ≥ threshold) | regression test exists at the layer that would have caught it, or a work item is filed — no fix closes without one (regression-first, roadmap #190) |
+| Bug fixed (severity at or above the agreed threshold) | regression test exists at the layer that would have caught it, or a work item is filed — no fix closes without one (the regression-first rule; `roadmap #190` is historical planning context, not a current gate) |
 | Incident postmortem | named untested paths → tests promoted to the tier the postmortem implies (usually PR or smoke) |
 | Smoke candidacy | proves a critical journey or invariant; runtime-cheap; historically stable; each member has a one-line reason |
 | Security negative test | permanent by default on arrival (from multi-tenant-security-tester / incident fixes) |
@@ -39,7 +40,11 @@ Per tier: budget (from the automation blueprint) vs sum of member runtimes.
 Overflow resolution order:
 
 1. Retire decided-retirements first (free protection-neutral wins).
-2. Demote never-failed + duplicate-adjacent members to the next tier down.
+2. Consider demotion only when equivalent surviving coverage is demonstrated
+   by assertion and failure-mode comparison, and the next tier still meets
+   the required detection time. A test's never-failed history or proximity
+   to a similar test is insufficient; protected tests retain their gate
+   unless the applicable owner approves a change.
 3. Parallelize/shard (architecture change → qa-automation-architect).
 4. Only then trade protection — escalated, never silent.
 
