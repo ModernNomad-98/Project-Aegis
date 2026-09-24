@@ -3444,6 +3444,64 @@ model call, and evidence artifact.
   that PR can merge. BER-BKL-009 stays partially delivered until its later
   host, privacy and operator controls are implemented and evidenced.
 
+### BER-DEC-012: Proposed offline holdout-support implementation grant — PENDING
+
+**Proposal only. This entry records no owner decision and grants no implementation
+authority. Do not merge it as an effective decision until Peter Nguyen approves
+the exact scope below; replace this notice with the verbatim decision and its
+source during review.** The merged [WP-2B-3 scope packet](ber-wp2b3-holdout-execution-scope.md)
+defines the proposed behavior but does not itself authorize this branch.
+
+- **Decision requested:** Amend BER-DEC-008 only to permit one bounded, synthetic,
+  offline holdout-support implementation branch. If approved, this grant becomes
+  effective only when the reviewed governance PR containing the approved decision
+  merges. Preserve BER-DEC-008's measured-execution branch and clone, original
+  source baseline, model, SDK, thresholds, budgets, deadlines, retry terms,
+  evidence root, and one-pass rule. The offline branch is not a selected live
+  execution source and receives no provider allowance.
+- **Repository, branch and base:** `ModernNomad-98/Project-Aegis`;
+  `feat/ber-wp2b3-holdout-offline-support`, created directly from the approved
+  grant's exact merge commit. Record that commit and tree, reconcile intervening
+  normative BER changes, and do not repoint or rewrite the original branch.
+- **Exact implementation paths:** New `tools/behavioral_eval_runner/judge/calibration_holdout_driver.py`
+  and `tools/behavioral_eval_runner/tests/test_calibration_holdout_driver.py`;
+  existing `judge/calibration_development_driver.py`, `judge/calibration_gates.py`,
+  `judge/calibration_ledger.py`, `judge/calibration_provider.py`,
+  `judge/calibration_dataset.py`, `tests/test_calibration_development_driver.py`,
+  `tests/test_calibration_gates.py`, `tests/test_calibration_ledger.py`, and
+  `tests/test_calibration_provider.py`, all under `tools/behavioral_eval_runner/`;
+  plus that component's `README.md`, this backlog's lifecycle entry, and one
+  sanitized `docs/evidence/ber-wp2b3-holdout-offline-review.md`. Compose the
+  existing ledger, provider, authorization, freeze, dataset and evidence-root
+  contracts; change existing source only for the shared typed holdout path.
+  Do not add a second ledger or widen the generic BER command-line interface.
+- **Limits and delivery:** At most 16 active implementation hours and 2,000 added
+  code/test lines; stop for reviewed scope change at either limit. Synthetic
+  temporary fixtures only, zero provider/model/metadata calls, zero live
+  sessions, zero dependency installs and USD $0 task-controlled spend. One
+  DCO-signed code PR with exact-path staging, focused and full offline BER
+  regression tests on Windows and pinned Linux, independent security/recovery/QA
+  review, and exact-head Actions. A protected-file guard failure requires its
+  own documented owner disposition; the PR #104 exception does not transfer.
+- **Fail-closed behavior:** Reject wrong or unapproved input hashes, missing
+  independently pinned owner freeze, invalid cap, changed source SHA/tree,
+  failed external-root check, unresolved historical usage, or wrong stage before
+  provider contact. A future authorized holdout sees only 120 frozen items after
+  the gate and never receives expected labels in the judge envelope. One durable
+  run/segment/ledger accounts for metadata, both stages, retries, reservations
+  and settlements. Unknown outcomes never start an automatic second pass or
+  refill allowance. Incomplete, refusal, transport and schema outcomes remain
+  `JUDGE_ERROR`; preserve evidence, forbid retry-until-green, and report all six
+  BER-DEC-008 thresholds without claiming owner decision one (OD-1).
+- **Excluded and later gates:** No private holdout records or labels, credentials,
+  provider calls, unsealing, new spend, changed execution source, WP-2B-4,
+  deployment or OD-1 ratification follows from this proposal. Owner approval of
+  exact private dataset/split/guide/hashes, a later owner-reviewed amendment
+  selecting audited execution SHA/tree and any branch change, reconciled
+  allowance and host/credential preflight, development `OWNER_WAIT`, owner
+  freeze of holdout cap/hashes, one measured holdout pass and OD-1 review remain
+  separate decisions.
+
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008
