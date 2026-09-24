@@ -848,6 +848,13 @@ the sole owner of actual advisory CI integration).
   authority, provider/model call, private input, live execution or later
   phase advance. BER-DEC-011 is the governing authorization.
 
+**2026-09-23 implementation checkpoint:** The opt-in synthetic policy proof is
+under review on `feat/ber-bkl-009a-offline-policy`. Its ordinary, hash-listed
+policy receipts hold one 30-day bundle review deadline while legacy
+per-artifact expiration metadata keeps its original meaning. BER-BKL-009
+remains PARTIALLY DELIVERED; this checkpoint does not authorize a real host,
+privacy release, provider call, or cleanup.
+
 ### WP-2B-2 — Scenario A Grading Stack (deterministic + semantic, non-live)
 
 - **ID:** WP-2B-2

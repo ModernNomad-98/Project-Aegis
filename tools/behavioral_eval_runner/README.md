@@ -61,7 +61,7 @@ and options.
 | `models.py`, `enums.py`, `schemas/`, `identity.py`, `canonical.py` | Define versioned record shapes, stable identities and canonical hashes. Reject invalid or unexpected fields. |
 | `pathsafe.py`, `execution_profile.py`, `containment.py`, `process_control.py` | Keep paths within intended roots, describe host capabilities honestly, and expose process-control interfaces. Synthetic tests do not prove real-host containment. |
 | `budget.py`, `scheduler.py` | Reserve bounded work before dispatch and build a deterministic queue. Unknown costs, absent caps or deadline violations close the gate. |
-| `aggregation.py`, `reporting.py`, `evidence.py` | Combine attempts without an unearned pass, report coverage, and write and verify a two-stage evidence chain. |
+| `aggregation.py`, `reporting.py`, `evidence.py`, `evidence_policy.py` | Combine attempts without an unearned pass, report coverage, write and verify a two-stage evidence chain, and optionally check its synthetic complete-bundle policy. |
 | `graders/`, `judge/` | Grade recorded Scenario A controls against trusted plans. Deterministic graders cannot decide semantic assertions; the generic judge provider denies live dispatch. |
 | `cli.py` | Expose offline inventory, preparation, grading, evidence and status commands. There is no general live-run command. |
 
@@ -73,6 +73,44 @@ records, combine recorded attempts, check grading inputs and outputs, exercise
 mock calibration, report capabilities, validate synthetic candidate data, and
 report authorization status. The envelope command prints repository-safe
 metadata rather than private raw content.
+
+## Offline complete-bundle policy proof
+
+`evidence_policy.py` provides an **opt-in Python application programming
+interface (API) for synthetic fixtures**.
+`OfflinePolicyWriter.finalize_input` requires at least one explicitly classified
+input and stamps its first evidence time from the writer's Coordinated Universal
+Time (UTC) clock; callers
+cannot supply a creation timestamp. `finalize_final` requires an explicit
+classification decision for the report and each other final artifact.
+`verify_policy_bundle` checks the existing Stage A/B hashes and detached
+marker, then the content-bound decisions and one deadline: first writer-stamped
+creation time plus 30 consecutive 24-hour periods. At that deadline the
+checker refuses an active-bundle acceptance claim and preserves all files for
+owner review. It never deletes or publishes a bundle.
+
+The two versioned policy receipts (`policy/stage-a.json` and
+`policy/stage-b.json`) are **ordinary artifacts** in their respective
+manifests. The final manifest hashes the Stage B receipt; the detached marker
+hashes that manifest and the final report. The marker is not a manifest entry.
+Existing `expiration_at` fields still describe **each artifact's own**
+creation time plus its retention class. The opt-in receipt's
+`bundle_review_at` is the distinct, controlling complete-bundle review date;
+a later report does not extend it. Legacy evidence writer calls keep their
+previous serialized bytes and hashes.
+
+Run the local synthetic checks with:
+
+```bash
+python -B -m unittest tools.behavioral_eval_runner.tests.test_evidence_policy tools.behavioral_eval_runner.tests.test_evidence
+```
+
+This checker proves internal consistency and the writer API's timestamp
+source, not independent clock attestation against someone able to rewrite the
+entire bundle. A cited classification decision is required and hash-bound to
+content; metadata cannot prove redaction or public-release safety. Real-host
+access controls, encryption, privacy review, cleanup and provider execution
+remain separate gates in the [policy backlog](../../docs/roadmaps/behavioral-eval-runner-backlog.md).
 
 ## Calibration is a separate gated workflow
 

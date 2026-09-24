@@ -339,6 +339,77 @@ def _manifest_entry(artifact: EvidenceArtifact) -> dict[str, Any]:
     }
 
 
+def _write_or_verify_prewritten(
+    root: str, path: str, content: bytes, prewritten: frozenset[str]
+) -> str:
+    if path not in prewritten:
+        return _atomic_write(root, path, content)
+    target = os.path.join(root, *path.split("/"))
+    try:
+        if _POSIX_EVIDENCE_ATOMIC:
+            root_fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+            try:
+                parent_fd = os.open("policy", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                                    dir_fd=root_fd)
+                try:
+                    fd = os.open(path.split("/")[-1], os.O_RDONLY | os.O_NOFOLLOW,
+                                 dir_fd=parent_fd)
+                    with os.fdopen(fd, "rb") as handle:
+                        actual = handle.read()
+                finally:
+                    os.close(parent_fd)
+            finally:
+                os.close(root_fd)
+        else:
+            refuse_reparse_chain(target, root)
+            with open(target, "rb") as handle:
+                actual = handle.read()
+    except (OSError, UnsafePathError) as exc:
+        raise EvidenceError("prewritten policy receipt is unavailable or unsafe") from exc
+    if actual != content:
+        raise EvidenceError("prewritten policy receipt bytes changed")
+    return target
+
+
+def _claim_policy_receipt(root: str, path: str, content: bytes) -> None:
+    """Exclusive, retained claim; never remove partial or failed evidence."""
+    if path not in ("policy/stage-a.json", "policy/stage-b.json"):
+        raise EvidenceError("invalid policy claim path")
+    _refuse_symlink_root(root)
+    leaf = path.split("/")[-1]
+    try:
+        if _POSIX_EVIDENCE_ATOMIC:
+            root_fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+            try:
+                try:
+                    os.mkdir("policy", 0o700, dir_fd=root_fd)
+                except FileExistsError:
+                    pass
+                parent_fd = os.open("policy", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                                    dir_fd=root_fd)
+                try:
+                    fd = os.open(leaf, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                                 0o600, dir_fd=parent_fd)
+                    with os.fdopen(fd, "wb") as handle:
+                        handle.write(content)
+                finally:
+                    os.close(parent_fd)
+            finally:
+                os.close(root_fd)
+        else:
+            parent = os.path.join(root, "policy")
+            refuse_reparse_chain(parent, root)
+            os.makedirs(parent, exist_ok=True)
+            refuse_reparse_chain(parent, root)
+            fd = os.open(os.path.join(parent, leaf), os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+                         0o600)
+            with os.fdopen(fd, "wb") as handle:
+                handle.write(content)
+            refuse_reparse_chain(os.path.join(parent, leaf), root)
+    except (OSError, UnsafePathError) as exc:
+        raise EvidenceError("policy receipt claim failed; existing evidence preserved") from exc
+
+
 def _check_no_self_hash(content: bytes, own_hash: str, label: str) -> None:
     if own_hash.encode("ascii") in content:
         raise CircularEvidenceError(
@@ -382,7 +453,8 @@ class EvidenceWriter:
 
     # ------------------------------------------------------------- stage A
     def finalize_input_evidence(
-        self, artifacts: list[EvidenceArtifact]
+        self, artifacts: list[EvidenceArtifact], *,
+        _prewritten: frozenset[str] = frozenset(),
     ) -> InputEvidenceBundle:
         entries: list[dict[str, Any]] = []
         seen: set[str] = set()
@@ -393,7 +465,7 @@ class EvidenceWriter:
             seen.add(path)
             entry = _manifest_entry(artifact)
             _check_no_self_hash(artifact.content, entry["sha256"], path)
-            _atomic_write(self.root, path, artifact.content)
+            _write_or_verify_prewritten(self.root, path, artifact.content, _prewritten)
             entries.append(entry)
         manifest = {
             "schema_version": SCHEMA_VERSION,
@@ -418,7 +490,13 @@ class EvidenceWriter:
         input_manifest_sha256: str,
         final_status: str,
         finalized_at: str | None = None,
+        report_metadata: ArtifactMetadata | None = None,
+        _prewritten: frozenset[str] = frozenset(),
     ) -> FinalEvidenceBundle:
+        if report_metadata is not None and report_metadata.created_at is not None:
+            raise EvidenceError("policy report created_at must be writer-stamped")
+        if report_metadata is not None and finalized_at is not None:
+            raise EvidenceError("policy report finalized_at cannot be caller-supplied")
         # D2: the report must belong to THIS run — a report for another run is
         # rejected at finalization.
         if final_report.get("run_id") != self.run_id:
@@ -443,6 +521,7 @@ class EvidenceWriter:
                 )
         report_bytes = canonical_bytes(dict(final_report))
         report_sha = sha256_hex(report_bytes)
+        policy_report_created_at = _utc_now_iso() if report_metadata is not None else None
         report_path = _atomic_write(self.root, FINAL_REPORT_NAME, report_bytes)
 
         entries: list[dict[str, Any]] = []
@@ -454,21 +533,36 @@ class EvidenceWriter:
             seen.add(path)
             entry = _manifest_entry(artifact)
             _check_no_self_hash(artifact.content, entry["sha256"], path)
-            _atomic_write(self.root, path, artifact.content)
+            _write_or_verify_prewritten(self.root, path, artifact.content, _prewritten)
             entries.append(entry)
-        report_created_at = finalized_at or _utc_now_iso()
-        report_entry = {
-            "path": FINAL_REPORT_NAME,
-            "bytes": len(report_bytes),
-            "sha256": report_sha,
-            "sensitivity": Sensitivity.INTERNAL.value,
-            "redaction_state": RedactionState.SANITIZED_BY_CONSTRUCTION.value,
-            "retention_class": RetentionClass.DAYS_30.value,
-            "created_at": report_created_at,
-            "expiration_at": _expiration_for(report_created_at, RetentionClass.DAYS_30),
-            "access_policy_ref": "BER-DEC-006-build-evidence-handling",
-            "preserve_on_failure": True,
-        }
+        report_created_at = policy_report_created_at or finalized_at or _utc_now_iso()
+        if report_metadata is None:
+            # Keep the legacy report bytes and metadata exactly as shipped.
+            report_entry = {
+                "path": FINAL_REPORT_NAME,
+                "bytes": len(report_bytes),
+                "sha256": report_sha,
+                "sensitivity": Sensitivity.INTERNAL.value,
+                "redaction_state": RedactionState.SANITIZED_BY_CONSTRUCTION.value,
+                "retention_class": RetentionClass.DAYS_30.value,
+                "created_at": report_created_at,
+                "expiration_at": _expiration_for(report_created_at, RetentionClass.DAYS_30),
+                "access_policy_ref": "BER-DEC-006-build-evidence-handling",
+                "preserve_on_failure": True,
+            }
+        else:
+            report_entry = _manifest_entry(EvidenceArtifact(
+                FINAL_REPORT_NAME,
+                report_bytes,
+                ArtifactMetadata(
+                    sensitivity=report_metadata.sensitivity,
+                    redaction_state=report_metadata.redaction_state,
+                    retention_class=report_metadata.retention_class,
+                    access_policy_ref=report_metadata.access_policy_ref,
+                    preserve_on_failure=report_metadata.preserve_on_failure,
+                    created_at=report_created_at,
+                ),
+            ))
         entries.append(report_entry)
 
         # The final manifest lists every final artifact INCLUDING the final
@@ -488,6 +582,9 @@ class EvidenceWriter:
             )
         manifest_path = _atomic_write(self.root, FINAL_MANIFEST_NAME, manifest_bytes)
 
+        marker_finalized_at = (
+            _utc_now_iso() if report_metadata is not None else report_created_at
+        )
         marker = {
             "schema_version": SCHEMA_VERSION,
             "marker_kind": "detached_finalization_marker",
@@ -495,7 +592,7 @@ class EvidenceWriter:
             "final_evidence_manifest_sha256": manifest_sha,
             "final_report_sha256": report_sha,
             "final_status": final_status,
-            "finalized_at": report_created_at,
+            "finalized_at": marker_finalized_at,
             "note": (
                 "detached per the non-circular protocol: not listed in the "
                 "manifest it names; contains no hash of itself; its own "
