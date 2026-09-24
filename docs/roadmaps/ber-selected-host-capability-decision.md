@@ -14,7 +14,7 @@ Operating system (OS) means the selected host platform; `BER-DEC` identifies
 an entry in the runner decision log. Stage A is the proposed offline host
 probe without model or provider calls.
 
-> **Current reading, checked 2026-09-23:** The owner selected a disposable
+> **Current reading, checked 2026-09-24:** The owner selected a disposable
 > Unix-like host *direction*, but no named host or selected-host proof is recorded.
 > This page remains a proposal; even its offline Stage A probe needs a separate
 > grant. Use the [BER backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes)
@@ -109,6 +109,75 @@ The Stage B probe is still not WP-2B-4's live scenario suite and does not
 approve calibration labels, renewed WP-2B-3 spending, BER evidence policy, or
 CP execution. Each has its own authority and prerequisite. No approval of a
 model-driven call is requested by this document.
+
+## Source-only Stage A test plan — prepared 2026-09-24
+
+This is a **candidate command and evidence plan**, not permission to execute
+on a host. The selected host, operating-system version, execution account,
+owned absolute scratch root, source revision, Python version, evidence access,
+duration and exact command list must first be named in a separate reviewed
+and merged BER-DEC Stage A grant. The commands below refer to tests already
+in this repository; a later grant must pin their exact source SHA and arguments.
+Generic CI success does not substitute for a run on that chosen host. The
+proposed host run would put every synthetic temporary path inside the approved
+root, including `TMPDIR`/`TMP` and Windows `TEMP` if that negative-only option
+is later selected, and stop if that confinement cannot be shown.
+
+| Candidate command from pinned repository root | Required observation and limit |
+| --- | --- |
+| `python -B -m tools.behavioral_eval_runner version` | Capture the runner version. Record Python, adapter and host versions separately in the later authorized host inventory. |
+| `python -B -m tools.behavioral_eval_runner capabilities` | Capture source-reported statuses, including `UNRUN`, `UNAVAILABLE` and `NON_BASELINE`; this command does not report runner version or attest to the selected host. |
+| `python -B -m unittest tools.behavioral_eval_runner.tests.test_evidence.TestEvidenceWriterTrustedRoot -v` | Symlinked evidence roots and POSIX parent swaps fail closed; no outside write. The POSIX parent-swap case must run, not skip, if selected. |
+| `python -B -m unittest tools.behavioral_eval_runner.tests.test_review_blockers.TestMaterializationWriteReparse tools.behavioral_eval_runner.tests.test_materialize.TestSyntheticMaterialization.test_empty_area_swap_cannot_redirect_creation -v` | Synthetic parent/area-root and reparse/symlink swaps cannot redirect writes; no outside file appears. Required POSIX swap cases must run. |
+| `python -B -m unittest tools.behavioral_eval_runner.tests.test_process_control.TestProcessTreeKill tools.behavioral_eval_runner.tests.test_review_blockers.TestSupervisorDescendantCleanup -v` | Check watchdog timeout, leader termination and fail-closed handling of an unobservable tree. `test_posix_background_child_terminated_after_leader_exit` independently checks one background child's process ID after its leader exits and must run on the selected POSIX host. The timeout test does not independently check the grandchild ID on POSIX, and one child fixture cannot prove every escape or descendant path. Record process IDs only in protected raw evidence. |
+| `python -B -m unittest tools.behavioral_eval_runner.tests.test_execution_profile tools.behavioral_eval_runner.tests.test_review_blockers.TestExecutionProfileIsolation tools.behavioral_eval_runner.tests.test_review_blockers.TestExecutionProfileDerivedClaims tools.behavioral_eval_runner.tests.test_containment -v` | Missing or inherited profile fields prevent baseline eligibility; synthetic containment denies disallowed reads and egress. Mocks cannot prove the real selected profile or effective agent tool paths. |
+| No candidate command yet for hardlink, leaf-rename and interrupted-write cases in the Stage A proof table above | Record `NOT_RUN` for each until the exact host grant names a reviewed synthetic fixture and expected negative result. These gaps cannot be inferred from passing parent/root swap tests. |
+
+The later grant should name all five required POSIX test IDs explicitly:
+`test_posix_parent_swap_fails_closed`,
+`test_posix_area_root_swap_fails_closed`,
+`test_posix_parent_swap_between_check_and_open_fails_closed`,
+`test_empty_area_swap_cannot_redirect_creation`, and
+`test_posix_background_child_terminated_after_leader_exit`. A skip of any
+required case is an unmet proof, not a pass.
+
+Entry criteria for any later host execution are an exact approved host/account
+and scratch-root boundary, a pinned signed source commit and tree, approved
+synthetic fixture/command list, evidence readers and retention, and a stop
+rule for unclear path, identity, access-control list, encryption or key custody.
+The later host reviewer must also perform a separately authorized read-only
+inventory of the actual R5 configuration surfaces listed above: managed,
+user, project and local settings; every `CLAUDE.md` scope; memory, skills,
+agents, plugins, hooks and Model Context Protocol servers; sandbox, tool and
+permission rules; executable path/hash, adapter version, configuration home,
+environment allowlist, managed-policy identity and update state. Existing
+`synthetic_isolated_profile` fixtures and `RealHostContainment` capability
+reports do not establish these facts. No installation, credential or provider
+call is part of this source-only plan.
+
+The sanitized `stage-a-capability-summary/v1` record would contain: grant ID;
+exact source commit/tree and runner/adapter/Python versions; an owner-assigned
+host alias whose real identifier remains outside Git; OS/version and disposable
+boundary class; scratch-root alias; UTC start/end; each approved command's
+exit status, test count, skips and skip IDs, elapsed time and sanitized output
+digest; an R4/R5 row with observed mechanism, `VERIFIED`, `UNAVAILABLE`,
+`UNKNOWN` or `NOT_RUN`, limitation and protected-artifact reference; the R5
+configuration inventory with source/isolation/impact; and an independent
+reviewer disposition. Raw host paths, process IDs, users, secrets and evidence
+stay in the separately approved external root under its access and retention
+rules. A missing fact remains unknown in the public summary.
+
+Stop and preserve the synthetic evidence on a source/root/account mismatch,
+path escape, unresolved ACL or encryption fact, unexpected network/provider/
+credential/private access, nonzero test, required POSIX skip, surviving child,
+or inherited/unisolated R5 configuration. The one-child POSIX no-survivor
+test above supports only its observed fixture; broader descendant/escape
+paths require a separately named host-specific observation. Such a result is
+`NON_BASELINE` or
+`UNAVAILABLE`, not a partial pass. Passing these offline cases could support
+a **Stage A capability observation only**. Effective Read/Edit/Write,
+WebFetch/network, MCP, plugin, hook and subagent confinement requires the
+separate model-driven Stage B authorization and proof.
 
 ## Exact owner decision needed next
 
