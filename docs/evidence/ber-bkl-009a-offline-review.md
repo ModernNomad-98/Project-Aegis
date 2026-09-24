@@ -87,3 +87,50 @@ time was not instrumented. The first new implementation file was created at
 At the 18:13:55 UTC local completion checkpoint, observed wall time since
 that file creation was 32 minutes 18 seconds, including test waits. Added
 code/test lines total 971, below the 1,000-line grant cap.
+
+## Integration verification — 2026-09-24
+
+Pull request (PR) #139 was updated locally with already-merged main revisions
+`754fc7a02f85c1f05dc32b4bbd70c1b616979b50` (PR #208) and
+`f1bfaece5b68551f75e910470becd17ed61ccb7e` (PR #209). The local integration
+head is `9cd78be746f81803824bf642258664ba652c9a27`. Both merge commits carry
+a Developer Certificate of Origin sign-off. Neither operation publishes the
+branch or merges PR #139 into main.
+
+The single conflict was in the backlog's work-package status paragraph. The
+resolution retains main's explanation of the effective grant and pending
+PR #139 guard decision, together with this implementation's dated checkpoint.
+The complete `tools/behavioral_eval_runner/` subtree, including its tests and
+README, remains identical to reviewed implementation commit
+`8928383f0838e2d99ee3a89c44b98b7aba7f1c9b`. The PR still changes only its
+seven authorized paths and adds 971 code/test lines, leaving 29 below the cap.
+
+| Local command or check | Observed result |
+| --- | --- |
+| `python -B scripts/validate-skills.py` | 185 skills valid, zero warnings; exit 0 before and after the PR #209 integration. |
+| `python -B scripts/tests/test_validator.py` | 91 gate self-test assertions passed; exit 0. |
+| `python -B -m tools.behavioral_eval_runner self-check` | All 21 checks passed; live dispatch disabled; exit 0. |
+| `python -B -m unittest tools.behavioral_eval_runner.tests.test_evidence_policy tools.behavioral_eval_runner.tests.test_evidence` | 52 tests run, two expected platform skips; exit 0. |
+| `python -B -m unittest discover -s tools/behavioral_eval_runner/tests -p 'test_*.py'` | 1,022 tests run in 171.815 seconds, 14 expected skips; exit 0 under repository-owner context. |
+| Conflict, scope and whitespace checks | No unresolved conflict; seven authorized PR paths; `git diff --check` passed. |
+| Local file links in this record and the backlog | All 79 checked targets resolved. |
+
+The test commands above ran on the resolved PR #208 working tree committed as
+`27078574d90805b16dcf39b42a9af226eac3c28f`. PR #209 then brought in only
+documentation changes; the unchanged runner subtree was verified again and
+skill validation was repeated. This records the tested content precisely; it
+does not claim a fresh full-suite run or hosted checks on the later commit.
+Independent read-only review of the integrated head and this evidence update
+found no blocker: seven authorized paths, unchanged runner files, 971 added
+code/test lines, 79 resolving local file links, and 185 valid skills with no
+warnings. Exact-head Linux/Windows Actions remain a delivery gate. The
+PR-specific protected-file disposition remains pending, and the earlier
+real-host and policy limitations still apply.
+
+This integration started at 2026-09-24 00:25:31 UTC. At the 00:33:07 UTC local
+checkpoint, observed wall time was 7 minutes 36 seconds, including test and
+Git waits. The previous and revised integration estimates are both 0.5–1
+active hour; active-only time was not instrumented. The published selected
+backlog estimate at start was 150–394 active hours. At the 00:36:44 UTC
+post-review checkpoint, observed wall time was 11 minutes 13 seconds.
+Publication and any eventual PR merge timing must be recorded separately.
