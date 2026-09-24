@@ -13,8 +13,9 @@ from tools.behavioral_eval_runner.canonical import canonical_bytes, sha256_hex
 from tools.behavioral_eval_runner.enums import RedactionState, Sensitivity
 from tools.behavioral_eval_runner.errors import EvidenceError, EvidenceIntegrityError
 from tools.behavioral_eval_runner.evidence import (
-    ArtifactMetadata, EvidenceArtifact, FINAL_MANIFEST_NAME,
+    ArtifactMetadata, EvidenceArtifact, EvidenceWriter, FINAL_MANIFEST_NAME,
     FINAL_REPORT_NAME, INPUT_MANIFEST_NAME, MARKER_NAME, verify_final_bundle,
+    verify_local_bundle,
 )
 from tools.behavioral_eval_runner.evidence_policy import (
     ClassifiedArtifact, ClassificationDecision, OfflinePolicyWriter,
@@ -88,6 +89,101 @@ class PolicyCase(unittest.TestCase):
 
 
 class TestPolicy(PolicyCase):
+    def test_stage_b_policy_lookalike_cannot_pass_legacy_path(self) -> None:
+        legacy = EvidenceWriter(self.root, RUN)
+        sha = legacy.finalize_input_evidence([
+            EvidenceArtifact("inputs/one.txt", b"synthetic input")
+        ]).input_evidence_manifest_sha256
+        with self.assertRaisesRegex(EvidenceError, "policy Stage B receipt"):
+            legacy.finalize_final_bundle(
+                self.report(sha), [EvidenceArtifact(STAGE_B_POLICY, b"{}")],
+                sha, "OFFLINE_DEMONSTRATION",
+            )
+        self.assertFalse(os.path.exists(os.path.join(self.root, FINAL_REPORT_NAME)))
+
+        # Simulate a pre-existing or externally forged bundle: keep the legacy
+        # hashes valid while placing a policy-looking receipt in Stage B only.
+        legacy.finalize_final_bundle(
+            self.report(sha), [EvidenceArtifact("outputs/one.txt", b"{}")],
+            sha, "OFFLINE_DEMONSTRATION",
+        )
+        source = os.path.join(self.root, "outputs", "one.txt")
+        target = os.path.join(self.root, *STAGE_B_POLICY.split("/"))
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        os.replace(source, target)
+        manifest = self.read(FINAL_MANIFEST_NAME)
+        next(entry for entry in manifest["artifacts"]
+             if entry["path"] == "outputs/one.txt")["path"] = STAGE_B_POLICY
+        manifest_sha = self.write(FINAL_MANIFEST_NAME, manifest)
+        marker = self.read(MARKER_NAME)
+        marker["final_evidence_manifest_sha256"] = manifest_sha
+        self.write(MARKER_NAME, marker)
+        self.assertTrue(verify_final_bundle(self.root))
+        with self.assertRaises(EvidenceIntegrityError):
+            verify_local_bundle(self.root)
+        os.remove(target)
+        with self.assertRaises(EvidenceIntegrityError):
+            verify_local_bundle(self.root)
+
+    def test_prewritten_flag_cannot_replace_policy_stage_a_with_defaults(self) -> None:
+        self.stage_a()
+        manifest_path = os.path.join(self.root, INPUT_MANIFEST_NAME)
+        with open(manifest_path, "rb") as handle:
+            before = handle.read()
+        receipt = canonical_bytes(self.read(STAGE_A_POLICY))
+        with self.assertRaisesRegex(EvidenceError, "policy-bound Stage A"):
+            self.writer.writer.finalize_input_evidence(
+                [EvidenceArtifact(STAGE_A_POLICY, receipt)],
+                _prewritten=frozenset({STAGE_A_POLICY}),
+            )
+        with open(manifest_path, "rb") as handle:
+            self.assertEqual(handle.read(), before)
+        self.assertEqual(verify_policy_input(self.root)["bundle_review_at"], DEADLINE)
+
+    def test_boolean_policy_flag_cannot_finalize_with_default_report_metadata(self) -> None:
+        sha = self.stage_a()
+        stage_b_path = os.path.join(self.root, *STAGE_B_POLICY.split("/"))
+        with open(stage_b_path, "wb") as handle:
+            handle.write(b"{}")  # an interrupted, untrusted receipt claim
+        with self.assertRaises(EvidenceError):
+            self.writer.writer.finalize_final_bundle(
+                self.report(sha), [], sha, "OFFLINE_DEMONSTRATION",
+                report_metadata=ArtifactMetadata(),
+                _prewritten=frozenset({STAGE_B_POLICY}),
+                _policy_bound=True,
+            )
+        self.assertFalse(os.path.exists(os.path.join(self.root, FINAL_REPORT_NAME)))
+        with open(stage_b_path, "rb") as handle:
+            self.assertEqual(handle.read(), b"{}")
+
+    def test_legacy_writer_cannot_downgrade_policy_stage_a(self) -> None:
+        sha = self.stage_a()
+        with self.assertRaisesRegex(EvidenceError, "policy-bound Stage A"):
+            self.writer.writer.finalize_final_bundle(
+                self.report(sha), [], sha, "OFFLINE_DEMONSTRATION",
+            )
+        self.assertFalse(os.path.exists(os.path.join(self.root, FINAL_REPORT_NAME)))
+        os.remove(os.path.join(self.root, *STAGE_A_POLICY.split("/")))
+        with self.assertRaisesRegex(EvidenceError, "policy-bound Stage A"):
+            self.writer.writer.finalize_final_bundle(
+                self.report(sha), [], sha, "OFFLINE_DEMONSTRATION",
+            )
+        with self.assertRaises(EvidenceIntegrityError):
+            verify_local_bundle(self.root)
+        self.assertFalse(os.path.exists(os.path.join(self.root, FINAL_REPORT_NAME)))
+
+    def test_local_verifier_keeps_policy_semantics_and_explicit_requirement(self) -> None:
+        self.complete()
+        with patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=LATER):
+            self.assertEqual(verify_local_bundle(self.root)["bundle_review_at"], DEADLINE)
+        self.assertTrue(verify_final_bundle(self.root))
+        with patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=DEADLINE):
+            with self.assertRaises(EvidenceIntegrityError):
+                verify_local_bundle(self.root)
+        os.remove(os.path.join(self.root, *STAGE_A_POLICY.split("/")))
+        with self.assertRaises(EvidenceIntegrityError):
+            verify_local_bundle(self.root, require_policy=True)
+
     def test_backslash_paths_use_normalized_receipt_identity(self) -> None:
         with patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=FIRST), \
              patch("tools.behavioral_eval_runner.evidence._utc_now_iso", return_value=FIRST):

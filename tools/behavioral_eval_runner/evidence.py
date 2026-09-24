@@ -42,6 +42,9 @@ INPUT_MANIFEST_NAME = "input_evidence_manifest.json"
 FINAL_MANIFEST_NAME = "final_evidence_manifest.json"
 FINAL_REPORT_NAME = "final_report.json"
 MARKER_NAME = "finalization_marker.json"
+# Internal handoff from the validating OfflinePolicyWriter. The private
+# _prewritten and _policy_bound arguments are data, not authorization.
+_POLICY_WRITE_TOKEN = object()
 
 _RETENTION_DAYS = {
     RetentionClass.DAYS_30: 30,
@@ -455,7 +458,20 @@ class EvidenceWriter:
     def finalize_input_evidence(
         self, artifacts: list[EvidenceArtifact], *,
         _prewritten: frozenset[str] = frozenset(),
+        _policy_bound: object | None = None,
     ) -> InputEvidenceBundle:
+        # A policy receipt is a claimed first-write artifact. A legacy writer
+        # must not replace it or manufacture a policy-looking Stage A manifest.
+        policy_receipt = "policy/stage-a.json"
+        policy_claim = (policy_receipt in {a.relative_path.replace("\\", "/") for a in artifacts}
+                        or _has_policy_claim(self.root))
+        if policy_claim:
+            if _policy_bound is not _POLICY_WRITE_TOKEN or policy_receipt not in _prewritten:
+                raise EvidenceError("policy-bound Stage A requires the claimed policy writer")
+            if os.path.lexists(os.path.join(self.root, INPUT_MANIFEST_NAME)):
+                raise EvidenceError("policy Stage A already exists; preserving prior evidence")
+        elif _policy_bound is not None:
+            raise EvidenceError("policy Stage A receipt is missing")
         entries: list[dict[str, Any]] = []
         seen: set[str] = set()
         for artifact in artifacts:
@@ -475,6 +491,10 @@ class EvidenceWriter:
         }
         manifest_bytes = canonical_bytes(manifest)
         manifest_path = _atomic_write(self.root, INPUT_MANIFEST_NAME, manifest_bytes)
+        if _policy_bound is _POLICY_WRITE_TOKEN:
+            from .evidence_policy import verify_policy_input
+
+            verify_policy_input(self.root)
         return InputEvidenceBundle(
             root=self.root,
             manifest_path=manifest_path,
@@ -492,7 +512,26 @@ class EvidenceWriter:
         finalized_at: str | None = None,
         report_metadata: ArtifactMetadata | None = None,
         _prewritten: frozenset[str] = frozenset(),
+        _policy_bound: object | None = None,
     ) -> FinalEvidenceBundle:
+        # The policy writer validates Stage A before entering here and claims
+        # Stage B first. Refuse a legacy Stage B downgrade before writing the
+        # final report, even if its caller supplies an otherwise valid hash.
+        stage_b_receipt = "policy/stage-b.json"
+        if (stage_b_receipt in {a.relative_path.replace("\\", "/") for a in artifacts}
+                and _policy_bound is not _POLICY_WRITE_TOKEN):
+            raise EvidenceError("policy Stage B receipt requires the claimed policy writer")
+        if _has_policy_claim(self.root) and _policy_bound is not _POLICY_WRITE_TOKEN:
+            raise EvidenceError("policy-bound Stage A requires policy finalization")
+        if _policy_bound is not None and _policy_bound is not _POLICY_WRITE_TOKEN:
+            raise EvidenceError("invalid policy writer handoff")
+        if _policy_bound is _POLICY_WRITE_TOKEN and (
+            not _has_stage_a_policy_claim(self.root)
+            or report_metadata is None
+            or stage_b_receipt not in _prewritten
+            or not os.path.lexists(os.path.join(self.root, "policy", "stage-b.json"))
+        ):
+            raise EvidenceError("policy finalization requires explicit report metadata and claimed receipt")
         if report_metadata is not None and report_metadata.created_at is not None:
             raise EvidenceError("policy report created_at must be writer-stamped")
         if report_metadata is not None and finalized_at is not None:
@@ -601,6 +640,10 @@ class EvidenceWriter:
         }
         marker_bytes = canonical_bytes(marker)
         marker_path = _atomic_write(self.root, MARKER_NAME, marker_bytes)
+        if _policy_bound is _POLICY_WRITE_TOKEN:
+            from .evidence_policy import verify_policy_bundle
+
+            verify_policy_bundle(self.root)
         return FinalEvidenceBundle(
             root=self.root,
             final_report_path=report_path,
@@ -627,6 +670,32 @@ def _load_json_bytes(root: str, name: str) -> tuple[dict[str, Any], bytes]:
     if not isinstance(parsed, dict):
         raise EvidenceIntegrityError(f"evidence artifact {name} is not an object")
     return parsed, content
+
+
+def _manifest_claims(root: str, manifest_name: str, receipt: str) -> bool:
+    if not os.path.lexists(os.path.join(root, manifest_name)):
+        return False
+    manifest, _ = _load_json_bytes(root, manifest_name)
+    artifacts = manifest.get("artifacts")
+    return isinstance(artifacts, list) and any(
+        isinstance(entry, Mapping) and entry.get("path") == receipt
+        for entry in artifacts
+    )
+
+
+def _has_stage_a_policy_claim(root: str) -> bool:
+    if os.path.lexists(os.path.join(root, "policy", "stage-a.json")):
+        return True
+    return _manifest_claims(root, INPUT_MANIFEST_NAME, "policy/stage-a.json")
+
+
+def _has_policy_claim(root: str) -> bool:
+    """Detect either policy stage, including a receipt omitted from disk."""
+    return (
+        _has_stage_a_policy_claim(root)
+        or os.path.lexists(os.path.join(root, "policy", "stage-b.json"))
+        or _manifest_claims(root, FINAL_MANIFEST_NAME, "policy/stage-b.json")
+    )
 
 
 def _verify_manifest_artifacts(
@@ -770,6 +839,20 @@ def verify_final_bundle(root: str) -> dict[str, str]:
         "final_report_sha256": report_sha,
         "finalization_marker_sha256": marker_sha,
     }
+
+
+def verify_local_bundle(root: str, *, require_policy: bool = False) -> dict[str, str]:
+    """Verify local evidence, keeping a policy-bound bundle on its policy path.
+
+    An opted-in caller sets ``require_policy`` so even a missing Stage A receipt
+    cannot silently fall back to legacy integrity-only verification. Existing
+    low-level hash verifiers retain their original structural meaning.
+    """
+    if require_policy or _has_policy_claim(root):
+        from .evidence_policy import verify_policy_bundle
+
+        return verify_policy_bundle(root)
+    return verify_final_bundle(root)
 
 
 class JudgeInputGate:

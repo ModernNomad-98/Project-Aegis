@@ -24,6 +24,7 @@ from .evidence import (
     FINAL_REPORT_NAME,
     INPUT_MANIFEST_NAME,
     MARKER_NAME,
+    _POLICY_WRITE_TOKEN,
     _claim_policy_receipt,
     _load_json_bytes,
     _validate_artifact_path,
@@ -187,9 +188,9 @@ class OfflinePolicyWriter:
             for a in artifacts
         ]
         result = self.writer.finalize_input_evidence(
-            inputs, _prewritten=frozenset({STAGE_A_POLICY})
+            inputs, _prewritten=frozenset({STAGE_A_POLICY}),
+            _policy_bound=_POLICY_WRITE_TOKEN,
         )
-        verify_policy_input(self.writer.root)
         return result
 
     def finalize_final(self, final_report: Mapping[str, Any],
@@ -236,8 +237,8 @@ class OfflinePolicyWriter:
             final_report, outputs, stage_a["input_evidence_manifest_sha256"],
             final_status, report_metadata=_metadata(report_decision),
             _prewritten=frozenset({STAGE_B_POLICY}),
+            _policy_bound=_POLICY_WRITE_TOKEN,
         )
-        verify_policy_bundle(self.writer.root)
         return result
 
 
