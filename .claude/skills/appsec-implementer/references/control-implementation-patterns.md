@@ -1,6 +1,11 @@
 # Control Implementation Patterns
 
-Progressive-disclosure detail for `appsec-implementer`. Each pattern gives the
+Progressive-disclosure detail for the owning [AppSec Implementer](../SKILL.md).
+Cross-site scripting (XSS) executes attacker markup in a browser;
+SQL/NoSQL injection changes a database query; an object relational mapper
+(ORM) builds queries from code; insecure direct object reference (IDOR)
+exposes an object without authorization; server-side request forgery
+(SSRF) redirects a server request. Each pattern gives the
 boundary the control belongs at, the minimal implementation notes, and the
 shape of the negative test that proves it. Always reuse the project's existing
 utilities; these are checklists, not copy-paste code.

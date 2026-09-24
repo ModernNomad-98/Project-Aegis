@@ -1,15 +1,19 @@
 ---
 name: release-readiness-reviewer
-description: 'Run the ship/no-ship gate for a specific release on EVIDENCE, not vibes — every dimension is answered by a verifiable artifact or recorded as MISSING: CI check states on the release commit (run links), artifact provenance, test signal meaningful for THIS change, migration review (secure-migration-reviewer), a rollback path naming its primitive and rehearsal status (rollback-runbook-author''s artifact), flag defaults, docs, observability readiness, and approvals per change class. Unknown on a blocking item is a No-Go with the evidence that would flip it, never a benefit-of-the-doubt pass. Produces go/no-go, blocking items, risks, and the evidence table. This skill is the PROCEDURE; the same-named read-only subagent composes it. Use when asked whether a release/deploy/merge is ready, to run a release checklist, or to gate a risky change. Do NOT use for line-level review (code-reviewer / security-pr-reviewer), pipeline design (ci-pipeline-architect), or writing the rollback plan (rollback-runbook-author).'
+description: 'Run the ship/no-ship gate for a specific release on EVIDENCE — every blocking dimension cites an artifact or is MISSING: CI on the exact candidate or shipping tree, artifact provenance, change-relevant tests, migration review, rollback path and rehearsal, flag defaults, docs, observability, and approvals. For auto-deploy-on-merge, gate the exact PR or merge-queue candidate before merge and verify the final commit afterward. Unknown on a blocking item is No-Go with the evidence that would flip it. Produces go/no-go, blockers, risks and an evidence table. The same-named read-only subagent composes this procedure. Use for release/deploy/merge readiness or a risky change gate. Do NOT use for line review (code-reviewer), pipeline design (ci-pipeline-architect), or writing rollback plans (rollback-runbook-author).'
 ---
 
 # Release Readiness Reviewer
+
+**Reading key:** Continuous integration (CI) runs automated checks; a pull
+request (PR) proposes a change before merge. A release commit is the exact
+commit that ships; a merge queue may test a combined candidate tree first.
 
 ## Purpose
 
 Produce a go/no-go decision for a specific release that a stranger could
 audit: an evidence table where every readiness dimension cites a verifiable
-artifact (a CI run on the release commit, a migration review, a rollback
+artifact (a CI run on the exact candidate or shipping tree, a migration review, a rollback
 runbook, a dashboard) or is honestly recorded as missing — and missing
 evidence on a blocking dimension is a No-Go with the exact evidence that
 would flip it. The discipline is evidence-not-vibes: "the tests should be
@@ -43,8 +47,10 @@ exists to catch.
 
 1. The exact release scope: commit range / PR set / artifact version going
    out. No identified scope, no gate.
-2. CI state ON THE RELEASE COMMIT: which required checks ran, their
-   results, run links — not the branch's general health.
+2. CI state on the exact tree available at the gate: shipping commit for a
+   post-merge release, or exact PR head / merge-queue candidate when merge
+   automatically deploys. Record which checks ran, results and links; plan
+   verification on the final merged commit after merge.
 3. The built artifact and its provenance (commit, run id) from the
    pipeline's artifact governance.
 4. Migrations in the release: `secure-migration-reviewer` output or its
@@ -65,15 +71,20 @@ exists to catch.
 1. **Fix the release scope**: exactly what ships — commits, artifact
    version, migrations included, flags touched. Scope ambiguity is a stop,
    not a footnote.
-2. **Verify CI evidence on the release commit**: enumerate required checks
+2. **Verify CI evidence on the gated tree**: enumerate required checks
    (from branch protection / pipeline design), confirm each ran on the
-   shipping commit with its result and run link. A check that is required
+   exact shipping commit when it exists, or the exact PR head/merge-queue
+   candidate before an auto-deploying merge. Record the correspondence and
+   any combined-tree risk; verify the final merged/deployed commit afterward.
+   A check that is required
    but did not run (renamed job, skipped stage) is a blocking finding, not
    an assumption of green. Retried-to-green runs are noted with their
    first-failure signal.
 3. **Verify the artifact**: the thing deploying is the thing that was
-   tested — provenance links artifact → commit → CI run. "We'll rebuild it
-   during deploy" breaks that chain and is a finding.
+   tested — provenance links artifact → commit → CI run. If an auto-deploying
+   merge builds the artifact afterward, verify the build/provenance contract
+   before merge and the actual artifact against the merged commit afterward.
+   An untracked rebuild during deploy breaks the chain and is a finding.
 4. **Assess test-signal meaningfulness for THIS change**: do the suites
    that ran actually exercise the changed surface (consult
    `test-coverage-mapper` output when available)? A green suite that never
@@ -106,7 +117,7 @@ Verdict: <GO / NO-GO — single biggest reason>
 Evidence table:
   <dimension — artifact cited (link/path/run id) OR "MISSING: <what would
    provide it>" — pass/blocking/risk>
-  (dimensions: CI on release commit, artifact provenance, test signal,
+  (dimensions: CI on exact gated tree, artifact provenance, test signal,
    migrations, rollback path, flags, docs/changelog, observability,
    approvals)
 Blocking items: <each: what, why blocking, the exact evidence that flips it>
@@ -121,9 +132,11 @@ Not verified: <dimensions this review could not reach and why>
 - [ ] Every dimension cites a verifiable artifact or an explicit MISSING
       entry — zero dimensions passed on assertion ("should be", "usually
       is", "I'm told").
-- [ ] CI evidence is from the release commit specifically, with run links;
-      required-but-not-run checks were caught.
-- [ ] Artifact provenance chains deploy → commit → CI run.
+- [ ] CI evidence is from the exact shipping commit or, before an
+      auto-deploying merge, the exact gated PR/merge-queue candidate;
+      required-but-not-run checks and final-commit follow-up are recorded.
+- [ ] Artifact provenance chains deploy → commit → CI run, with actual
+      post-merge verification when an auto-deploying merge builds it.
 - [ ] Test signal was assessed against the changed surface, not just
       suite-level green.
 - [ ] Migrations gated on `secure-migration-reviewer` evidence; rollback
@@ -134,9 +147,10 @@ Not verified: <dimensions this review could not reach and why>
 
 ## Gotchas
 
-- The branch being green is not the release commit being green — last-
-  minute merges and cherry-picks ship untested combinations. Always pin
-  evidence to the shipping SHA.
+- The branch being green is not proof of the exact candidate. Pin the
+  pre-merge gate to its head or merge-queue tree; last-minute combined
+  changes need new evidence, and the final shipping SHA needs post-merge
+  verification.
 - Required checks silently stop running when jobs are renamed; branch
   protection reports them as pending/stale, and humans read the overall
   green tick anyway.
@@ -157,8 +171,8 @@ Not verified: <dimensions this review could not reach and why>
 - The release scope cannot be pinned to exact commits/artifacts → stop;
   a gate on an ambiguous scope certifies nothing.
 - Evidence systems are unreachable (no CI access, no artifact store) →
-  report which dimensions are unverifiable and stop short of a verdict;
-  an evidence-based gate without evidence access is theater.
+  report **No-Go** for each unverifiable blocking dimension and the exact
+  evidence needed to reconsider it; unknown is not a pass.
 - The verdict would be overridden ("we're shipping anyway, just sign it
   off") → decline to convert a No-Go into a Go; record the blocking items
   and route the override decision to `human-approval-boundary` — the

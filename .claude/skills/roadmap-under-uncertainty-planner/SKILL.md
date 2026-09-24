@@ -5,6 +5,9 @@ description: Plan a product roadmap under uncertainty — organize by non-bindin
 
 # Roadmap Under Uncertainty Planner
 
+**Reading key:** A Gantt chart is a dated schedule that draws work as bars
+across a timeline; it can imply delivery promises that have not been made.
+
 ## Purpose
 
 The classic roadmap is a lie told in good faith: a tidy Gantt chart of

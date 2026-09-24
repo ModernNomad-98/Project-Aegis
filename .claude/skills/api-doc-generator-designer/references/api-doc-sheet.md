@@ -1,13 +1,18 @@
 # API Doc Sheet
 
-Detail for `api-doc-generator-designer`. Read on demand.
+Detail for the owning [API Doc Generator Designer](../SKILL.md).
+Read on demand. An application programming interface (API) exposes a
+software contract; source of truth (SoT) means the authoritative contract;
+REST and remote procedure call (RPC) name common API styles; a software
+development kit (SDK) is a client library; continuous integration (CI)
+runs automated checks.
 
 ## Source-of-truth options
 
 | Source | Good for | Notes |
 |---|---|---|
 | OpenAPI/Swagger | REST APIs | Rich ecosystem; validate examples against it |
-| GraphQL schema | GraphQL APIs | Introspection = built-in SoT |
+| GraphQL schema | GraphQL APIs | Schema is the SoT; introspection can expose it when enabled |
 | Protobuf/gRPC | RPC APIs | Generate from `.proto` |
 | Typed signatures | SDK/library APIs | TypeDoc, Sphinx autodoc, etc. |
 | Structured docstrings | Library APIs | Only as complete as the docstrings |

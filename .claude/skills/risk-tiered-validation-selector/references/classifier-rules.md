@@ -1,6 +1,7 @@
 # Risk-Tiered Validation — Classifier Rules Artifact
 
-Companion to `risk-tiered-validation-selector`. The rules live in the repo as
+Companion to the owning [Risk-Tiered Validation Selector](../SKILL.md).
+The rules live in the repo as
 a diffable artifact (a rules table consumed by a script, or the script
 itself); edits to the rules are themselves forced-full changes.
 
@@ -98,7 +99,8 @@ run.
   40-file docs diff is a full change.
 - **File-count heuristics** ("small diff, fast tier") — size is not risk.
 - **Trusting the PR description** — the classifier's input is
-  `git diff --name-only <base>...HEAD`, nothing else.
+  a structured Git diff such as `git diff --name-status -M <base>...HEAD`,
+  including both rename paths and deletions.
 - **Silent rules growth** — rules added ad hoc in someone's head. The
   artifact is the classifier; if it isn't in the diff, it isn't a rule.
 - **Exception culture** — "just this once, fast" is how fail-closed dies;

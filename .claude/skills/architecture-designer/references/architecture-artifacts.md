@@ -1,6 +1,8 @@
 # Architecture Artifact Quality Bars
 
-Supporting detail for `architecture-designer`. Read on demand.
+Supporting detail for the owning [Architecture Designer](../SKILL.md).
+Read on demand. HTTP is the Hypertext Transfer Protocol; remote procedure
+call (RPC) is a direct request to invoke another component's operation.
 
 ## Boundary contract catalog
 
@@ -9,7 +11,7 @@ Every edge in the component map gets one of these labels:
 | Contract | Coupling | Failure mode to note |
 | --- | --- | --- |
 | Sync call (HTTP/RPC/in-process interface) | Temporal + availability | Callee down → caller degraded; timeout/retry semantics required |
-| Async event | Schema only | Consumer lag, duplicate delivery, ordering |
+| Async event | Schema, delivery, ordering, version and temporal semantics | Consumer lag, duplicate delivery, ordering |
 | Shared table/store | Total (schema, timing, locks) | Any writer migration breaks every reader; declare it, plan to retire it |
 | File/batch handoff | Schema + schedule | Partial files, reprocessing, idempotency |
 | Anticorruption adapter | Contained | Translation drift; adapter becomes the de-facto spec |

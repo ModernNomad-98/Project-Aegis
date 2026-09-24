@@ -1,6 +1,11 @@
 # Contract Test Patterns
 
-Detail file for `api-contract-test-designer`. Loaded on demand.
+Detail file for the owning [API Contract Test Designer](../SKILL.md).
+Loaded on demand. An application programming interface (API) exposes a
+software contract; a pull request (PR) proposes a change; continuous
+integration (CI) runs checks. OpenAPI is a machine-readable API schema;
+JSON is JavaScript Object Notation; SQL is Structured Query Language;
+`5xx` means a server-error response class.
 
 ## Provider-side vs consumer-side obligations
 
@@ -33,8 +38,10 @@ never leak. Authorization CORRECTNESS (who gets the 403) is
 
 ## Fake-fidelity recipes
 
-- Recorded fixtures: re-record or re-validate against the provider sandbox on
-  a schedule (weekly/CI cron); diff failures open a task, not a silent update.
+- Recorded fixtures: re-record or re-validate against the provider sandbox
+  on a schedule only when that external execution is authorized; offline
+  contract checks can run in CI without provider access. Diff failures
+  open a task, not a silent update.
 - Hand-written fakes: generate from the provider schema where possible;
   otherwise validate fake outputs against the schema in the contract suite.
 - Every integration-suite faked seam (`integration-test-designer` boundary

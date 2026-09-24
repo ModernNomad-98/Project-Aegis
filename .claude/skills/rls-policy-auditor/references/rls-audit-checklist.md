@@ -16,15 +16,17 @@ policy-based row security. RLS enabled is not RLS enforced.
   role that end users can reach)?
 
 ### INSERT (`WITH CHECK`)
-- Is there a `WITH CHECK` at all? Missing = any row can be inserted, including
-  with another tenant's id → write-side hole.
-- Does `WITH CHECK` force `tenant_id = <server-derived caller tenant>`?
+- Is there an applicable INSERT/ALL policy and what is its effective
+  new-row check? No applicable policy defaults to deny; an INSERT policy
+  needs `WITH CHECK`, while an ALL policy may reuse `USING`.
+- Does the effective check force `tenant_id = <server-derived caller tenant>`?
 - Can the client supply `tenant_id`/`owner_id` and have it honored?
 
 ### UPDATE (`USING` AND `WITH CHECK`)
 - `USING` restricts WHICH rows can be updated (caller's tenant only)?
-- `WITH CHECK` restricts the RESULTING row (can't move a row to another
-  tenant)? Missing `WITH CHECK` = tenant hopping.
+- Does the effective new-row check restrict the RESULTING row? For an
+  UPDATE/ALL policy, omitted `WITH CHECK` reuses `USING`; an unsafe
+  effective expression, not mere omission, permits tenant hopping.
 
 ### DELETE (`USING`)
 - Can the caller delete only their tenant's rows? Any role with unrestricted
@@ -79,14 +81,17 @@ UPDATE invoices SET tenant_id = 'B' WHERE id = '<A-row>';     -- EXPECT rejected
 -- DELETE cross-tenant
 DELETE FROM invoices WHERE tenant_id = 'B';                   -- EXPECT 0 affected
 
--- anon / service-role
+-- anonymous caller; privileged service-role reachability is audited separately
 RESET request.jwt.claims;  -- anon
 SELECT count(*) FROM invoices;                               -- EXPECT 0 (or only public)
 ```
 
 Adapt the context-setting mechanism to the project (Supabase JWT claims,
 `SET LOCAL app.tenant_id`, connection role, etc.). Every table × command that
-matters gets a row; the not-audited list captures the rest.
+matters gets a row; the not-audited list captures the rest. Audit separately
+whether owner, service and BYPASSRLS roles can be reached from a
+client-influenced path; do not expect their intended privileged operations
+to be denied by row policies that they bypass.
 
 ## Handoffs
 

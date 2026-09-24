@@ -1,6 +1,6 @@
 ---
 name: rag-security-architect
-description: Design or review the security of a RAG / retrieval pipeline and its vector store (OWASP LLM08) — enforce authorization AT RETRIEVAL TIME so a query only ever returns documents the calling user and tenant may see (never post-retrieval filtering), scope every vector index/namespace by tenant, carry document-level ACLs into the query filter, and address embedding-specific risks (inversion, membership inference, poisoned documents, stale-permission re-embedding). Composes tenant-isolation-reviewer and multi-tenant-data-architect for tenant scoping rather than re-deriving it. Use when building or reviewing RAG retrieval, a vector store, or semantic search over access-controlled or multi-tenant data. Do NOT use for injection via retrieved content once in context (prompt-injection-defender), training-time corpus poisoning (model-poisoning-reviewer), disclosure in the completion (sensitive-disclosure-guard), or generic tenant-data design (multi-tenant-data-architect).
+description: Design or review the security of a RAG retrieval pipeline and vector store (OWASP LLM08) — enforce authorization AT RETRIEVAL TIME so a query returns only documents the calling user and tenant may see, scope every index/namespace by tenant, carry document ACLs into the query filter, and address embedding inversion, membership inference, poisoned documents, and stale permission metadata. Compose tenant-isolation-reviewer and multi-tenant-data-architect for tenant scoping. Use for RAG retrieval or semantic search over access-controlled data. Do NOT use for injection in retrieved content (prompt-injection-defender), training-time poisoning (model-poisoning-reviewer), disclosure in the completion (sensitive-disclosure-guard), or generic tenant-data design (multi-tenant-data-architect).
 ---
 
 # RAG Security Architect
@@ -53,8 +53,9 @@ and `multi-tenant-data-architect`, not re-invented here.
 4. Tenant scoping of the store: shared index with a filter, namespace per
    tenant, or database per tenant; `tenant-isolation-reviewer` findings for
    the vector-store surface.
-5. Ingestion/permission sync: what happens to embeddings when a document's
-   ACL changes or a document is deleted; re-embedding and deletion paths.
+5. Ingestion/permission sync: how indexed ACL metadata changes when a
+   document's permissions change, how deleted vectors are removed, and
+   when changed source content actually requires re-embedding.
 6. Embedding/model details relevant to inversion and membership inference:
    what data is embedded, whether embeddings or raw chunks are returned to
    clients.
@@ -76,8 +77,9 @@ and `multi-tenant-data-architect`, not re-invented here.
    Compose `multi-tenant-data-architect` for the per-store scoping decision.
 4. **Propagate document-level ACLs into the index.** Store the authorization
    metadata (owner, tenant, allowed roles/groups) alongside each chunk so it
-   can be a query predicate. Decide how ACL changes and deletions propagate to
-   embeddings — stale permissions on embedded content are a leak.
+   can be a query predicate. Decide how ACL metadata changes and deletions
+   propagate to the index; stale permissions on indexed content are a leak.
+   Re-embed when content changes, not merely because ACL metadata changes.
 5. **Address embedding-specific risks (LLM08):** embedding inversion (raw
    source recoverable from vectors — don't expose embeddings to clients,
    consider the sensitivity of what's embedded); membership inference; and
@@ -99,7 +101,7 @@ and `multi-tenant-data-architect`, not re-invented here.
 RAG (RETRIEVAL-AUGMENTED GENERATION) SECURITY DESIGN/REVIEW — <system>
 Query trace: <query → embed → search → filter → context> | Authorization point: <retrieval | after retrieval (finding)>
 Vector-store tenant scoping: <namespace/index/filter mechanism + can-it-be-omitted>
-Document access-control-list (ACL) propagation: <metadata stored | how ACL change/delete flows to embeddings>
+Document access-control-list (ACL) propagation: <metadata stored | how ACL change/delete flows to the index>
 Embedding risks (OWASP LLM08):
   Inversion: <embeddings exposed? sensitivity of embedded data>
   Membership inference: <exposure + mitigation>
@@ -118,7 +120,7 @@ Not reviewed: <areas + why>
       permissions; the tenant filter cannot be silently omitted.
 - [ ] Vector-store isolation mechanism is named and its bypass conditions
       stated (composed from multi-tenant-data-architect, not re-derived).
-- [ ] ACL-change and deletion propagation to embeddings is specified; stale
+- [ ] ACL-change and deletion propagation to the index is specified; stale
       permissions are treated as a leak.
 - [ ] Embedding inversion, membership inference, and document poisoning are
       each addressed or explicitly ruled out with a reason.
@@ -135,7 +137,7 @@ Not reviewed: <areas + why>
 - Retrieved content remains untrusted as INSTRUCTIONS even when authorized as
   DATA — retrieval authz does not make document content safe to obey
   (`prompt-injection-defender` owns that half).
-- Deletion and permission changes must reach the embeddings; an index is a
+- Deletion and permission changes must reach the index; an index is a
   copy of the data and inherits its access rules.
 
 ## Gotchas
@@ -153,8 +155,9 @@ Not reviewed: <areas + why>
   chunk into the next document leaks content the user can't see.
 - Deleting the source row but leaving the embedding is a classic residual
   leak — the "deleted" document keeps answering queries.
-- Re-embedding after an ACL tightening is easy to forget; the old vector
-  keeps the old (looser) permission until it's rebuilt.
+- Updating indexed ACL metadata after a permission tightening is easy to
+  forget; the old vector may remain retrievable under the old permission
+  until the index metadata or affected index entry is updated.
 
 ## Stop Conditions
 

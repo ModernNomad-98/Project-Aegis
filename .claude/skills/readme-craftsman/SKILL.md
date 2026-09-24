@@ -5,6 +5,11 @@ description: Craft or overhaul a README so a newcomer can understand, evaluate, 
 
 # README Craftsman
 
+**Reading key:** A README is the repository's first guide; a command-line
+interface (CLI) is a text-command entrypoint; an application programming
+interface (API) is a software contract; continuous integration (CI) runs
+automated checks.
+
 ## Purpose
 
 The README is a project's front door, and most are either a locked door

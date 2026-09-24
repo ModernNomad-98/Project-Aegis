@@ -5,6 +5,9 @@ description: Translate a directional, uncertainty-aware roadmap into what a team
 
 # Roadmap to Commitments Translator
 
+**Reading key:** Objectives and key results (OKRs) are a planning method
+that pairs an outcome goal with measurable results.
+
 ## Purpose
 
 A roadmap is a set of bets; a commitment is a promise. The damage comes

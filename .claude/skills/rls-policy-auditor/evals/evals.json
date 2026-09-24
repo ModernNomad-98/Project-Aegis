@@ -12,8 +12,8 @@
         "assertions": [
           "Records RLS enabled/forced status per table and audits SELECT, INSERT, UPDATE, DELETE policies separately.",
           "Explicitly checks recursion, SECURITY DEFINER search_path, over-broad GRANTs, service-role leakage, and frontend-derived tenant scope.",
-          "Flags missing INSERT/UPDATE WITH CHECK as write-side holes and quotes the offending or absent policy per finding.",
-          "Delivers a per-command negative-test plan (tenant A attempts B's rows, anon, service-role) with positive controls as runnable SQL sessions."
+          "Checks effective INSERT/UPDATE new-row policy expressions, including UPDATE/ALL implicit USING fallback, and quotes the offending or absent policy per finding.",
+          "Delivers per-command tenant and anonymous-role negative tests with positive controls, and separately audits whether owner/service/BYPASSRLS roles are reachable from user-influenced paths."
         ]
       }
     },
@@ -24,7 +24,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Explains a correct SELECT policy is insufficient and checks INSERT WITH CHECK and UPDATE USING+WITH CHECK for tenant hopping.",
+          "Explains a correct SELECT policy is insufficient and checks effective INSERT and UPDATE new-row rules, including implicit USING fallback, for tenant hopping.",
           "Specifies negative tests for inserting another tenant's id and updating a row to another tenant, not just the read path."
         ]
       }
