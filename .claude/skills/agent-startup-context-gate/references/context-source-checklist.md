@@ -2,7 +2,13 @@
 
 Supporting detail for `agent-startup-context-gate`. Read on demand.
 
-## Identity signals (need at least two independent ones)
+## Identity signals for established repositories
+
+Use independent signals available for the repository role. A matching remote
+and project landmark are strong evidence for an established checkout. A fresh
+consumer/product repository may have no remote, history, manifest or
+application files yet; do not turn their absence into a source-library claim
+or an automatic halt.
 
 | Signal | How to check | What confirms |
 | --- | --- | --- |
@@ -13,8 +19,14 @@ Supporting detail for `agent-startup-context-gate`. Read on demand.
 | Recent history | `git log --oneline -5` | Commit subjects are plausibly this project's work. |
 
 Two signals from the SAME row (e.g. two README lines) count as one. Path
-existence and directory name count as zero signals — near-miss and empty
-directories pass both.
+existence and directory name alone count as zero signals — near-miss and
+unintended empty directories pass both. Read local `AGENTS.md` role rules:
+Project Aegis source-library role requires all four source-package landmarks
+listed there. Copied startup instructions without those landmarks do not
+establish source-library role. For a task-named fresh Stage 0 consumer workspace,
+use the task location plus local role/instruction evidence; record missing
+remote, history or product manifest as expected unknowns. Ask one location or
+role question only if evidence genuinely remains ambiguous or contradictory.
 
 ## Reading precedence (stop at the depth the task needs)
 

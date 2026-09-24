@@ -1,9 +1,15 @@
 ---
 name: agent-governance-audit
-description: Audit whether an AI-assisted change actually followed governance discipline — classification and scope lock, human approval at each crossed boundary, merge/deploy authority (WHO merged, who armed auto-merge), real validation evidence, security review where required, closeout completeness (incl. intentionally-not-done), and governed memory/doc updates. Per-control verdicts PASS/FAIL/UNVERIFIABLE cite primary evidence; closeout claims are cross-checked, never trusted; missing evidence is never a PASS. Use when asked if a change or PR followed process, for post-incident review, to spot-check agent work before widening autonomy, or to verify a closeout's claims. Read-only; changes nothing. Do NOT use to gate an upcoming ship/merge (release-readiness-reviewer — this skill is the retrospective did-it-follow-process verdict), write the closeout for your own finished work (ai-closeout-reporter), audit whole-repo code health (full-codebase-auditor), or review diff correctness (code-reviewer / security-pr-reviewer).
+description: 'Audit whether an artificial-intelligence-assisted change followed governance rules: classification, scope, human approvals, merge/deploy authority, validation, security review, closeout, and memory or documentation updates. Each control receives a PASS, FAIL, or UNVERIFIABLE verdict citing primary evidence; missing evidence never passes. Use for retrospective review of a change or pull request (PR), post-incident review, autonomy spot checks, or closeout verification. Read-only; changes nothing. Do NOT use as an upcoming release gate, to write your own closeout, to audit code health, or to review diff correctness.'
 ---
 
 # Agent Governance Audit
+
+**Reading key:** A pull request (PR) proposes a repository change;
+continuous integration (CI) runs automated checks; a secure hash algorithm
+(SHA) commit identifier names an exact Git revision. Verdicts PASS, FAIL and
+UNVERIFIABLE respectively mean demonstrated compliance, demonstrated breach
+and insufficient evidence.
 
 ## Purpose
 

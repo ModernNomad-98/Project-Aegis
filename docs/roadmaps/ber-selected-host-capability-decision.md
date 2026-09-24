@@ -1,12 +1,7 @@
 # BER selected-host R4/R5 capability decision proposal
 
-> **Current reading, checked 2026-09-23:** The owner selected a disposable
-> Unix-like host *direction*, but no named host or selected-host proof is recorded.
-> This page remains a proposal; even its offline Stage A probe needs a separate
-> grant. Use the [BER backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes)
-> for current work-package and evidence-gate status.
-
-**Reading key:** Behavioral Eval Runner (BER) is the evaluation tool; work
+**Reading key for owner and host reviewers:** Behavioral Eval Runner (BER) is
+the evaluation tool; work
 package 2B-0 (WP-2B-0) is its earlier evidence phase. Requirement R4 concerns
 effective tool-path confinement; R5 concerns execution-profile observability
 and isolation. POSIX is a Unix-like operating-system interface; continuous
@@ -15,6 +10,15 @@ Access control list (ACL), Model Context Protocol (MCP), and Secure Hash
 Algorithm (SHA, used here for source identity) name technical surfaces in the
 proposed probe. `NON_BASELINE` means the result cannot qualify for a measured
 baseline; `UNAVAILABLE` means the named capability was not demonstrated.
+Operating system (OS) means the selected host platform; `BER-DEC` identifies
+an entry in the runner decision log. Stage A is the proposed offline host
+probe without model or provider calls.
+
+> **Current reading, checked 2026-09-23:** The owner selected a disposable
+> Unix-like host *direction*, but no named host or selected-host proof is recorded.
+> This page remains a proposal; even its offline Stage A probe needs a separate
+> grant. Use the [BER backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes)
+> for current work-package and evidence-gate status.
 
 Prepared 2026-09-23 from public `main` at
 `75d1e6e662ed48f0ec9f6b04c4c52e6f39ead319`. **Decision proposal only.**

@@ -1,9 +1,16 @@
 ---
 name: agent-identity-privilege-reviewer
-description: Review agent identities and privilege paths (OWASP Agentic ASI03) — verify every agent has a distinct least-privilege identity (no shared god service account), credentials are task- and time-scoped, delegation chains (user → agent → sub-agent → tool) attenuate authority and never amplify it, confused-deputy paths are closed (agent privilege exploited by a lower-privilege requester), and every action attributes to both the human principal and the acting agent. Complements secrets-identity-hardener (custody/rotation fixer); this reviews the identity ARCHITECTURE. Use when reviewing what identities agents run as, scoping agent credentials, designing delegation/on-behalf-of semantics, or hunting privilege escalation in multi-agent systems. Do NOT use for secret storage/rotation (secrets-identity-hardener), per-tool authority enforcement (agent-tool-safety-guard), standing agent-vs-human SDLC authority (agent-authorization-matrix), or end-user RBAC (authorization-matrix-designer).
+description: Review agent identities and privilege paths under the Open Worldwide Application Security Project (OWASP) agentic identity identifier ASI03. Check distinct least-privilege identities, scoped credentials, delegation that only reduces authority, confused-deputy paths, and attribution to both human and agent. Complements secrets-identity-hardener for custody and rotation. Use for agent identity and delegation design or privilege-escalation review. Do NOT use for secret storage, per-tool enforcement, software-development lifecycle (SDLC) merge/deploy authority, or end-user role-based access control (RBAC); those have separate owning skills.
 ---
 
 # Agent Identity & Privilege Reviewer
+
+**Reading key:** Open Worldwide Application Security Project (OWASP) agentic
+identifier ASI03 covers identity and privilege here. An application
+programming interface (API) is a software access boundary; the software
+development lifecycle (SDLC) covers build through release; role-based access
+control (RBAC) grants permissions through roles; identity and access
+management (IAM) governs accounts and permissions; DB means database.
 
 ## Purpose
 
@@ -163,8 +170,10 @@ Not reviewed: <areas + why>
   stop; this skill reviews concrete identity architecture, not intentions.
 - A live over-privileged path with active abuse indicators is found
   (credential used from unexpected context, cross-tenant reach exercised) —
-  route to `incident-response-runbook`; revocation is a human call executed
-  via `secrets-identity-hardener`.
+  route to the human incident owner and the approved response runbook;
+  revocation is a human call. Use `incident-response-runbook` later to
+  author or improve the procedure and `secrets-identity-hardener` to design
+  credential controls, rather than asking either skill to run the response.
 - Fixes require creating/splitting identities or changing IAM/scopes in a
   live system — propose the target model; applying it is a classified,
   approved step (`human-approval-boundary`).

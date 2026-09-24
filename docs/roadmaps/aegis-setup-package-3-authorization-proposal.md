@@ -1,5 +1,14 @@
 # Issue #101 package 3 — offline advisory-contract scope
 
+**Reader key:** This page is for the owner and reviewers of issue #101 package
+3. An identifier (ID) names a catalog entry; the Developer Certificate of
+Origin (DCO) is commit sign-off; continuous integration (CI) runs automated
+checks. Behavioral Eval Runner (BER) names the separate evaluation tool;
+control plane (CP) names the delivery kernel. The package 3 advisory contract
+has shipped, while the proposal below preserves its earlier decision context.
+A pull request (PR) proposes a repository change; `AEGIS-APR` identifies an
+entry in the owner approval register.
+
 > **Current status, 2026-09-23:** Package 3 shipped in
 > [PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121)
 > under [owner approval AEGIS-APR-008](../approvals/APPROVAL_REGISTER.md#aegis-apr-008-issue-101-offline-advisory-routing-contract).

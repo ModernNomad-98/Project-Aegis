@@ -1,6 +1,6 @@
 ---
 name: agent-failure-recovery
-description: MANUAL-ONLY; never auto-invoke. Recover from a broken working state — failed or interrupted runs, dirty or conflicted trees, partial or wrong commits, broken branches, blocked permissions — without losing work. Invoke explicitly when an agent session ended badly or git state looks wrong. Diagnoses read-only first, preserves everything (rescue branch or labeled stash, untracked files included) before changing anything, and never runs destructive cleanup (reset --hard, clean, force-push, branch -D) without a verified backup and explicit approval. Manual-only, because recovery itself mutates git state.
+description: MANUAL-ONLY; never auto-invoke. Recover from a broken working state — failed or interrupted runs, dirty or conflicted trees, partial or wrong commits, broken branches, blocked permissions — without losing work. Invoke explicitly when an agent session ended badly or git state looks wrong. Diagnoses read-only first, inventories ignored as well as untracked files, and verifies a rescue ref, stash or safe copy covers every valuable path before changing anything. A normal stash with -u does not include ignored files. Never run destructive cleanup (reset --hard, clean, force-push, branch -D) without a verified backup and explicit approval. Manual-only, because recovery itself mutates git state.
 disable-model-invocation: true
 ---
 
@@ -33,8 +33,9 @@ All read-only, before ANY mutation:
 2. In-progress operation markers: `.git/MERGE_HEAD`, `.git/rebase-merge/`,
    `.git/rebase-apply/`, `.git/CHERRY_PICK_HEAD`.
 3. `git stash list`, `git log --oneline -10`, `git reflog -15`.
-4. Untracked files that exist only in the working tree — the one class git
-   cannot bring back; highest preservation priority.
+4. Untracked **and ignored** files that exist only in the working tree.
+   Inspect `git status --ignored` and identify valuable generated artifacts;
+   neither class is recoverable from Git history unless separately saved.
 5. What the failed run was TRYING to do (task context, partial outputs).
 
 ## Workflow
@@ -45,8 +46,10 @@ All read-only, before ANY mutation:
    permission.
 2. **Preserve before touching.** Create a rescue ref — `git branch
    rescue/<date>-<context>` at HEAD — and/or `git stash push -u -m "<context>"`
-   for uncommitted + untracked work. Copy non-git artifacts to scratch. Record
-   every ref and path created.
+   for tracked and non-ignored untracked work. The `-u` option does **not**
+   preserve ignored files. Copy valuable ignored or other non-Git artifacts
+   to a safe scratch location, verify the copies against their sources, and
+   record every ref, stash and path created before any recovery mutation.
 3. **Recover minimally**, using the matching playbook in
    [references/recovery-playbooks.md](references/recovery-playbooks.md).
    Prefer additive, reversible operations (new branch, `stash apply`,
@@ -70,7 +73,8 @@ Follow-ups: <e.g., secret rotation, force-push decision awaiting approval>
 ## Validation Checklist
 
 - [ ] No mutating command ran before the preservation step completed.
-- [ ] Untracked files preserved (`stash -u`, copy, or an explicit "none present").
+- [ ] Untracked and ignored files inventoried; each valuable path preserved
+      by the appropriate stash or verified copy, or explicitly marked absent.
 - [ ] Every destructive command either avoided, or run only with a verified
       backup ref AND fresh explicit approval.
 - [ ] Recovered state verified, not assumed (status + build/tests where
@@ -80,9 +84,9 @@ Follow-ups: <e.g., secret rotation, force-push decision awaiting approval>
 
 ## Gotchas
 
-- The reflog is a recovery source, not a safety net: untracked files never
-  enter it. They are the first thing to preserve and the only thing git cannot
-  restore.
+- The reflog is a recovery source, not a safety net: untracked and ignored
+  files never enter it. A normal `stash -u` also omits ignored files. Inventory
+  and verify their safe copies before relying on a clean working tree.
 - `git checkout -- <path>` and `git restore <path>` silently discard
   working-tree edits — they belong to the destructive set even though they
   look mild.
