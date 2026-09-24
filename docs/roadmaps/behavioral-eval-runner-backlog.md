@@ -1698,13 +1698,15 @@ authorization decisions in §13 remain unchanged.
   integration, including the recorded GitHub recovery direction; do not
   rebuild the existing writer.
   The owner selected the [30-day complete-bundle policy](ber-bkl-009-evidence-policy-decision.md)
-  in APR-009. BER-DEC-011 authorizes only the bounded offline synthetic proof
-  after its separate reviewed governance merge. Real-host access, encryption,
-  privacy and operator cleanup remain unimplemented and separately gated.
+  in APR-009. BER-DEC-011's bounded offline synthetic proof was delivered in
+  PR #139 and its one-package APR-012 grant is consumed by APR-022. Real-host
+  access, encryption, privacy and operator cleanup remain unimplemented and
+  separately gated.
   The owner approved the [ten-path synthetic integration proposal](ber-bkl-009-policy-scope-amendment-proposal.md)
-  on 2026-09-24. BER-DEC-013 and APR-023 authorize that one follow-up package
-  only after this separate reviewed governance PR merges; the complete item
-  remains PARTIALLY DELIVERED.
+  on 2026-09-24. BER-DEC-013 and APR-023 authorized that one follow-up package
+  when the separate governance PR #255 merged as
+  `0318b1ecde3ebf5f34bb32f8793efc37b574af39`; the complete item remains
+  PARTIALLY DELIVERED.
 - **Source / evidence:** Merged design §13 ("Access, retention, redaction": least-
   privilege readers; access-controlled evidence root; encryption-at-rest where
   sensitivity requires; per-artifact retention class with a defined retention period and
@@ -1722,7 +1724,9 @@ authorization decisions in §13 remain unchanged.
   production policy's enforcement and host-specific proof remain separate
   from that implementation and the temporary scoped terms in BER-DEC-006/008.
 - **Trigger to begin:** Prepare the remaining policy and operator integration under
-  a scoped follow-up; preserve the existing writer and recorded scope limitations.
+  BER-DEC-013/APR-023 from the exact #255 grant merge; preserve the existing
+  writer and recorded scope limitations. Later host and cleanup work needs a
+  separate grant.
 - **Expected deliverable:** A written evidence-governance policy fixing: retention
   periods per retention class; access groups and the least-privilege read matrix;
   the encryption-at-rest mechanism and its key custody; redaction/sanitization rules
@@ -1747,6 +1751,18 @@ authorization decisions in §13 remain unchanged.
 - **Completion evidence:** Merged policy + evidence-writer PR(s); the owner's recorded
   parameter decisions; status updated here through a reviewed PR.
 - **Supersedes / superseded by:** None.
+
+**2026-09-24 synthetic integration checkpoint:** The implementation branch
+`feat/ber-bkl009-policy-integration` was created directly from the #255 grant
+merge above (tree `d35f4a6af25e4d5dd29641e0fa271bf782b1e7df`). Its
+candidate adds a policy-bound local verification path, refusal of implicit
+metadata and legacy Stage B downgrade, caller-supplied synthetic host-fact
+preflight, and an [operator review runbook](ber-bkl-009-operator-policy-runbook.md).
+The [sanitized integration review](../evidence/ber-bkl-009-policy-integration-review.md)
+records the exact candidate, tests, independent review and remaining gates.
+This checkpoint describes a candidate until its implementation PR passes its
+own exact-head checks and merges; it does not assert host attestation,
+production driver binding, publication clearance or cleanup authority.
 
 ### BER-BKL-010 — Evidence signing or immutable external storage beyond SHA-256
 

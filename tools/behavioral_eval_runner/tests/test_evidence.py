@@ -24,6 +24,7 @@ from tools.behavioral_eval_runner.evidence import (
     MARKER_NAME,
     verify_final_bundle,
     verify_input_evidence,
+    verify_local_bundle,
 )
 from tools.behavioral_eval_runner.models import (
     default_unselected_aggregate,
@@ -136,6 +137,12 @@ class TestStageA(_BundleCase):
         for name, pinned_sha in expected.items():
             with self.subTest(name=name), open(os.path.join(self.root, name), "rb") as handle:
                 self.assertEqual(sha256_hex(handle.read()), pinned_sha)
+        self.assertEqual(
+            verify_local_bundle(self.root)["input_evidence_manifest_sha256"],
+            stage_a.input_evidence_manifest_sha256,
+        )
+        with self.assertRaises(EvidenceIntegrityError):
+            verify_local_bundle(self.root, require_policy=True)
 
     def test_input_manifest_requires_supported_version(self) -> None:
         self.writer.finalize_input_evidence(_artifacts())

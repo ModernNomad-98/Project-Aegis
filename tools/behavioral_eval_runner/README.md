@@ -10,7 +10,8 @@ application feature installed with the skills.
 **Current state:** General runner and Scenario A grading commands operate on
 offline or recorded synthetic data. They do not start a live assistant or
 send a model request. A separate gated calibration development driver exists,
-and an approved synthetic offline holdout-support increment is being built.
+and the synthetic offline holdout-support increment was delivered in
+[PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249).
 Measured calibration has not started: replacement labels still need owner
 review. No live Scenario A or general corpus run is available. The
 [active backlog](../../docs/roadmaps/behavioral-eval-runner-backlog.md) records
@@ -35,8 +36,12 @@ for the structured examples and command inputs below.
    `grade-fixture` compares a trusted grading plan with recorded observations.
    A semantic assertion that needs a model cannot silently pass a deterministic
    grader.
-4. **Verify and report.** `verify-evidence` checks the input and final bundles.
-   Aggregation and reporting preserve unrun, uncertain and blocked outcomes.
+4. **Verify and report.** `verify-evidence` checks the input and final bundles
+   for structural integrity only; it does not accept a policy-bound bundle.
+   For an opted-in policy bundle, use the Python
+   `verify_local_bundle(root, require_policy=True)` entry point described
+   below. Aggregation and reporting preserve unrun, uncertain and blocked
+   outcomes.
 
 For example, these safe commands report the installed version and available
 capabilities, then check offline invariants. They do not run a case or contact
@@ -87,7 +92,7 @@ and options.
 | `models.py`, `enums.py`, `schemas/`, `identity.py`, `canonical.py` | Define versioned record shapes, stable identities and canonical hashes. Reject invalid or unexpected fields. |
 | `pathsafe.py`, `execution_profile.py`, `containment.py`, `process_control.py` | Keep paths within intended roots, describe host capabilities honestly, and expose process-control interfaces. Synthetic tests do not prove real-host containment. |
 | `budget.py`, `scheduler.py` | Reserve bounded work before dispatch and build a deterministic queue. Unknown costs, absent caps or deadline violations close the gate. |
-| `aggregation.py`, `reporting.py`, `evidence.py`, `evidence_policy.py` | Combine attempts without an unearned pass, report coverage, write and verify a two-stage evidence chain, and optionally check its synthetic complete-bundle policy. |
+| `aggregation.py`, `reporting.py`, `evidence.py`, `evidence_policy.py`, `evidence_policy_preflight.py` | Combine attempts without an unearned pass, report coverage, write and verify a two-stage evidence chain, and optionally check its synthetic complete-bundle policy and caller-supplied host facts. |
 | `graders/`, `judge/` | Grade recorded Scenario A controls against trusted plans. Deterministic graders cannot decide semantic assertions; the generic judge provider denies live dispatch. |
 | `cli.py` | Expose offline inventory, preparation, grading, evidence and status commands. There is no general live-run command. |
 
@@ -100,10 +105,15 @@ mock calibration, report capabilities, validate synthetic candidate data, and
 report authorization status. The envelope command prints repository-safe
 metadata rather than private raw content.
 
-## Offline complete-bundle policy proof
+## Offline complete-bundle policy integration
 
 `evidence_policy.py` provides an **opt-in Python application programming
-interface (API) for synthetic fixtures**.
+interface (API) for synthetic fixtures and local callers**. Use
+`OfflinePolicyWriter` only when every caller input and the final report has an
+explicit `ClassificationDecision` with a versioned access-policy reference
+and a content-specific decision reference. The ordinary `EvidenceWriter`
+keeps its legacy serialization for unbound bundles; it must not complete an
+already policy-bound Stage A bundle through implicit metadata defaults.
 `OfflinePolicyWriter.finalize_input` requires at least one explicitly classified
 input and stamps its first evidence time from the writer's Coordinated Universal
 Time (UTC) clock; callers
@@ -114,6 +124,25 @@ marker, then the content-bound decisions and one deadline: first writer-stamped
 creation time plus 30 consecutive 24-hour periods. At that deadline the
 checker refuses an active-bundle acceptance claim and preserves all files for
 owner review. It never deletes or publishes a bundle.
+
+For a local verification entry point, `evidence.verify_local_bundle(root,
+require_policy=True)` insists on the policy path and refuses missing policy
+claims; its default mode recognizes a policy-bound Stage A claim and routes to
+the policy verifier. The lower-level `verify_final_bundle` remains an
+integrity-only verifier for legacy callers. A policy claim must never be
+silently treated as an ordinary legacy bundle.
+
+`evidence_policy_preflight.evaluate_synthetic_host_facts` accepts a
+`SyntheticHostFacts` record supplied by the caller. It does not query the
+operating system. The proposed root must be a matching, normalized absolute
+POSIX or Windows drive path supplied by the caller; relative, ambiguous or
+volume-root paths stop. Missing, false, contradictory or malformed assertions
+about that exact path, ownership, access-control list (ACL), inheritance,
+encryption or recovery-key custody return `STOP` with sanitized reason codes.
+Complete, consistent assertions return `SIMULATION_ONLY`, which is **not**
+real-host attestation or permission to run. The
+[operator review runbook](../../docs/roadmaps/ber-bkl-009-operator-policy-runbook.md)
+describes inventory, verification and owner review without deletion.
 
 The two versioned policy receipts (`policy/stage-a.json` and
 `policy/stage-b.json`) are **ordinary artifacts** in their respective
@@ -128,7 +157,7 @@ previous serialized bytes and hashes.
 Run the local synthetic checks with:
 
 ```bash
-python -B -m unittest tools.behavioral_eval_runner.tests.test_evidence_policy tools.behavioral_eval_runner.tests.test_evidence
+python -B -m unittest tools.behavioral_eval_runner.tests.test_evidence_policy tools.behavioral_eval_runner.tests.test_evidence tools.behavioral_eval_runner.tests.test_evidence_policy_preflight
 ```
 
 This checker proves internal consistency and the writer API's timestamp
@@ -158,15 +187,16 @@ await human review. Hidden holdout transcripts and labels must stay out of
 this public repository and judge requests. See the
 [replacement plan](../../docs/evidence/ber-recovery-2026-09-11/replacement-plan.md)
 and [offline holdout support scope](../../docs/roadmaps/ber-wp2b3-holdout-execution-scope.md).
-BER-DEC-012 now authorizes a bounded implementation using synthetic temporary
-fixtures only. The holdout driver uses the same durable ledger and refuses a
+BER-DEC-012 authorized the bounded implementation delivered in PR #249 using
+synthetic temporary fixtures only. The holdout driver uses the same durable
+ledger and refuses a
 second pass after its one-way transition. It can rebuild a missing result
 summary from a fully closed, verified pass without another provider request.
 The production freeze, audited source and development evidence pins remain
 unset. The [offline review record](../../docs/evidence/ber-wp2b3-holdout-offline-review.md)
-tracks focused and full Windows test results, independent review and pending
-pinned Linux checks.
-This source branch is not an approved live execution revision. The general
+records focused and full Windows tests, independent review, and exact-head
+Linux and Windows checks for that merged synthetic package. It is not an
+approved live execution revision. The general
 runner command-line interface
 has no holdout command, and a later measured holdout still needs its separate
 gates.
