@@ -23,6 +23,20 @@ try {
     Assert-Selection ($first.Record.setup_completed_at_utc -eq $first.Record.selected_at_utc) 'completion timestamp'
     $again = Read-AegisSelection $project $state
     Assert-Selection ($again.Record.project_key -eq $first.Record.project_key) 'later session reads same project'
+    $forwardProject = $project.Replace('\', '/')
+    Assert-Selection ((Get-AegisSelectionPath $forwardProject $state).Key -ceq $first.Record.project_key) 'ordinary slash spelling keeps project key'
+    foreach ($alias in @('\\?\', '\\.\', '//?/', '//./')) {
+        $aliasProject = $alias + $project
+        $aliasState = $alias + $state
+        Expect-Error { Get-AegisSelectionPath $aliasProject $state } 'namespace project alias rejected'
+        Expect-Error { Get-AegisSelectionPath $project $aliasState } 'namespace state alias rejected'
+        Expect-Error { Get-AegisSelectionPath $project ($alias + (Join-Path $project 'state')) } 'inside state alias rejected'
+    }
+    foreach ($invalid in @('C:relative', '\root-relative', '\\server\share\folder', '//server/share/folder')) {
+        Expect-Error { Get-AegisSelectionPath $invalid $state } 'nonlocal or relative project rejected'
+        Expect-Error { Get-AegisSelectionPath $project $invalid } 'nonlocal or relative state rejected'
+    }
+    Expect-Error { Get-AegisSelectionPath $project ([IO.Path]::GetPathRoot($project)) } 'drive-root state rejected'
     Start-Sleep -Milliseconds 20
     $second = Save-AegisOnlySelection $project $state
     Assert-Selection ($second.Record.selected_at_utc -eq $first.Record.selected_at_utc) 'overwrite keeps original selection time'
@@ -62,5 +76,11 @@ try {
     Expect-Error { Get-AegisSelectionPath $moved (Join-Path $moved 'state') } 'state under checkout rejected'
     Write-Output "PASS: $checks selection assertions"
 } finally {
-    if ([IO.Directory]::Exists($sandbox)) { [IO.Directory]::Delete($sandbox, $true) }
+    $sandboxFull = [IO.Path]::GetFullPath($sandbox)
+    $tempPrefix = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd('\') + '\'
+    if (-not $sandboxFull.StartsWith($tempPrefix, [StringComparison]::OrdinalIgnoreCase) -or
+        [IO.Path]::GetFileName($sandboxFull) -notmatch '^aegis-setup-test-[0-9a-f]{32}$') {
+        throw 'Test cleanup target is outside the generated temporary fixture.'
+    }
+    if ([IO.Directory]::Exists($sandboxFull)) { [IO.Directory]::Delete($sandboxFull, $true) }
 }
