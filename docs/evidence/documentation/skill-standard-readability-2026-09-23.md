@@ -1,5 +1,10 @@
 # Skill standard readability batch: 2026-09-23
 
+## Current reading
+
+This is dated delivery evidence. Its original base, estimates, counts and
+pending status describe that batch. Use the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md) and [forecast](../../roadmaps/aegis-backlog-forecast.md) for current totals, and the linked owning pages for current guidance. The review instructions and pending pull-request language below describe the original batch. In the [current standard](../../skill-generation-standard.md), D49 records host portability discovery, D50 strict YAML (the structured text format for skill metadata) enforcement, and D3 structural-only evaluation validation; these decision keys are not new grants.
+
 This dated record covers one page in the
 [documentation readability backlog](../../roadmaps/aegis-documentation-readability-backlog.md):
 the [skill generation standard](../../skill-generation-standard.md). It is

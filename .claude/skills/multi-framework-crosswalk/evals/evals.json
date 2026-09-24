@@ -10,8 +10,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Builds one row per foundation control with per-framework reference, FULL/PARTIAL(residue)/NONE satisfaction, and verified/unverified status, under a pinned-editions header.",
-          "Fills cells only from the provided framework texts and marks joint satisfactions (several controls jointly covering one criterion) explicitly.",
+          "Builds one row per foundation control with per-framework reference, FULL/PARTIAL(residue)/NONE design coverage, and verified/unverified text status under a pinned-editions header; makes no operated-control claim without separate organizational evidence.",
+          "Fills cells only from the provided framework texts and marks joint design coverage (several proposed controls jointly mapping to one criterion) explicitly, without asserting operated satisfaction.",
           "Computes the coverage summary from the table itself rather than quoting the 60–80% industry estimate as fact.",
           "Routes PARTIAL residues to compliance-gap-auditor and reference columns to the SoA author and projections."
         ]

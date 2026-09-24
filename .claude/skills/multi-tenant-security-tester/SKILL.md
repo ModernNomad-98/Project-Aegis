@@ -64,8 +64,9 @@ those grants; if authority is absent, propose the operation and obtain it
 before proceeding.
 
 1. **Confirm a defined boundary and a real target.** Pin the tenant
-   definition and the enforcement point. Undefined or no runnable system →
-   stop.
+   definition and the enforcement point. Undefined semantics → stop and
+   route to `tenant-modeler`. With no runnable system, deliver implementable
+   specifications only and mark all such coverage unproven.
 2. **Design the two-tenant fixture.** Seed tenant A and tenant B each with
    owned resources, plus users at each relevant role in each tenant, plus an
    anonymous caller. Record ids so tests can attempt B's ids as A.

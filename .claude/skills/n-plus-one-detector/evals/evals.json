@@ -13,8 +13,8 @@
           "Builds the evidence table first: statement shapes × repetitions × per-query time, identifying the 1-parent + N-children N+1 signature.",
           "Locates the injection site at file/path level (the serializer/template/loop touching the lazy relation) — the fix lands at the touch point.",
           "Designs scoped eager/preload for the known-ahead relations (NOT global eager loading), or a batched IN-key load where relations are conditional, with each fix's price stated.",
-          "Verifies by re-measuring: statement count drops to the designed number (2–3), and the replacement query's plan is sanity-checked at realistic volume.",
-          "Installs a query-count budget assertion for the endpoint wired to a real counter hook, and lists sibling paths with the same pattern as residual."
+          "For this diagnosis-and-design request, specifies how to re-measure the after-count and sanity-check the replacement query plan, labeling both unmeasured until an authorized implementation runs.",
+          "Proposes a query-count budget assertion for the endpoint with a real counter hook and lists sibling paths as residual; does not claim the guard was installed."
         ]
       }
     },

@@ -1,6 +1,6 @@
 ---
 name: merge-is-deploy-governance
-description: 'When the platform auto-deploys every merge to mainline, author the standing governance that makes merge==deploy safe: document that reality (including what does NOT auto-deploy); promote PR-time validation to the AUTHORITATIVE pre-production gate; reclassify post-merge validation as verification, never a gate; record the branch-protection config in-repo with WHO may change it (a human, never agents); state the accepted-risk exposure window; define rollback as revert-PR-then-auto-redeploy (squash: git revert <sha>; true merge: choose a mainline parent for -m). Standing PIPELINE governance, not a per-release verdict. Use when merge deploys mainline, when post-merge checks are treated as a gate, when protection config lives only in the web UI, or after a surprise deploy-on-merge. Do NOT use to gate one release (release-readiness-reviewer), author rollback runbooks (rollback-runbook-author), define who may merge (agent-authorization-matrix), or design stages (ci-pipeline-architect).'
+description: 'When the platform auto-deploys every merge to mainline, author standing merge/deploy governance: document what deploys, make PR-time validation the authoritative pre-production gate, treat post-merge checks as verification, record human-owned branch protection, state the exposure window and whether an authorized risk owner accepted it, and define strategy-correct revert-and-redeploy rollback. Publishing a draft does not accept risk. Use when merge deploys mainline, post-merge checks are mistaken for a gate, protection lives only in a web UI, or a surprise deploy occurs. Do NOT gate one release (release-readiness-reviewer), author rollback runbooks (rollback-runbook-author), define who may merge (agent-authorization-matrix), or design CI stages (ci-pipeline-architect).'
 ---
 
 # Merge-Is-Deploy Governance
@@ -99,10 +99,11 @@ honor applicable existing user grants without asking for the same grant again.
    role's act, never an agent's**, with changes recorded as dated diffs to
    this doc. The recorded config is verified against the live config on a
    cadence (drift check), with API-vs-UI source labeled.
-5. **State the accepted-risk exposure window:** from merge to verified
-   deploy, `<duration>` where `<blast radius>` is exposed if PR validation
-   missed something. Name who accepted it and when. An unstated window is
-   an unaccepted risk being taken anyway.
+5. **State the exposure window and acceptance status:** from merge to
+   verified deploy, `<duration>` where `<blast radius>` is exposed if PR
+   validation missed something. Name the authorized risk owner and dated
+   acceptance when one exists; otherwise mark `pending risk-owner acceptance`
+   and route the decision. Publishing this document does not accept risk.
 6. **Define the rollback primitive: revert-PR-then-auto-redeploy.** The
    revert rides the same authoritative gate (a revert PR with required
    checks) and the platform redeploys on its merge. Mechanics must match
@@ -128,7 +129,7 @@ Branch protection (recorded <date>, source: <API|human-dictated>):
                     <required checks, strictness, reviews, who may merge>
                     changes: <named human role> only — never agents; dated diffs here
 Exposure window:    merge → verified deploy ≈ <duration>; blast radius <scope>;
-                    accepted by <who> on <date>
+                    accepted by <authorized risk owner> on <date> | pending risk-owner acceptance
 Rollback primitive: revert PR → gate → merge → auto-redeploy
                     (squash: git revert <commit>; true merge: inspect parents,
                     then use -m <chosen-parent-number>)
@@ -146,8 +147,8 @@ Gaps routed:        <check gaps, signal gaps, ownership gaps → owning skills/h
       incident-on-failure consequence stated.
 - [ ] Branch-protection draft has source and proposed path labeled, drift-check
       cadence set, and the human-only change rule (never agents) explicit.
-- [ ] Exposure window stated with duration, blast radius, and a named
-      accepter — no silent risk.
+- [ ] Exposure window states duration and blast radius, plus an authorized
+      risk owner's dated acceptance or explicit pending status and owner route.
 - [ ] Revert mechanics match the repo's merge strategy (squash ⇒ ordinary
       `git revert <sha>`); revert's limits stated and runbook routed.
 - [ ] This doc changes only via reviewed PRs (it is itself an

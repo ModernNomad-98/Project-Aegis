@@ -26,8 +26,8 @@
         "triggers": true,
         "assertions": [
           "Minimizes first: asks whether the model needs the raw value or a reference/derivative, and prefers the reference.",
-          "Puts what must ride on a transient never-persisted channel and marks every segment PERSISTED or TRANSIENT explicitly.",
-          "Checks the transient guarantee against EVERY persisted store — conversation log, traces, analytics, error reports — not just the obvious prompt log.",
+          "Keeps what must ride out of controlled application stores and marks every segment PERSISTED or TRANSIENT explicitly; checks provider retention before claiming end-to-end non-persistence.",
+          "Checks the transient design against every controlled store — conversation log, traces, analytics, error reports — not just the obvious prompt log.",
           "Designs the proof that a transient segment is demonstrably absent from persisted stores, and defers redaction/echo mechanics to sensitive-disclosure-guard by name."
         ]
       }

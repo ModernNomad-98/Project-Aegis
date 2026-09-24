@@ -1,5 +1,10 @@
 # User-path and acceptance runbook deeper correction
 
+## Current reading
+
+This is dated delivery evidence. Its original base, estimates, counts and
+pending status describe that batch. Use the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md) and [forecast](../../roadmaps/aegis-backlog-forecast.md) for current totals, and the linked owning pages for current guidance. The eventual pull-request wall-time language is historical. Current acceptance guidance lives in the three linked owning guides; this note does not authorize execution.
+
 Date: 2026-09-23. This correction follows an independent full-page screen
 of four acceptance and user-path pages. The broader documentation item was
 previously estimated at **80–200 active hours**; this bounded correction

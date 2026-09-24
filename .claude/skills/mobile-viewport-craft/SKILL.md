@@ -61,7 +61,7 @@ network performance on mobile are `frontend-perf-engineer`'s.
    actually matter, and the minimum supported width.
 2. The surfaces in scope and their content: navigation, forms, data
    tables/dashboards, media — each has different reflow needs.
-3. The existing layout system: CSS approach (fl/grid, framework), current
+3. The existing layout system: CSS approach (flex/grid, framework), current
    breakpoints, use of viewport units, and any known mobile breakage
    (horizontal scroll, clipped panels, tiny taps).
 4. Interaction inventory: anything currently hover-dependent (tooltips,

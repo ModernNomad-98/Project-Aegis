@@ -1,5 +1,10 @@
 # Final 16 skill references: bounded readability correction — 2026-09-23
 
+## Current reading
+
+This is dated delivery evidence. Its original base, estimates, counts and
+pending status describe that batch. Use the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md) and [forecast](../../roadmaps/aegis-backlog-forecast.md) for current totals, and the linked owning pages for current guidance. The 46-row and five-link receipts, and separate review and merge times, remain historical.
+
 ## Scope and estimate
 
 The read-only screen covered sorted reference Markdown files 141–156 under

@@ -1,6 +1,6 @@
 ---
 name: model-context-designer
-description: 'Design what enters and leaves a model''s context window — a curated diet, not open access: context assembled SERVER-SIDE under hard token/size caps; every input passes a CLOSED schema; secrets/PII/raw payloads minimized or carried on a transient never-persisted channel with the persisted-vs-transient split explicit; what the model saw RECONSTRUCTIBLE afterward; exclusions designed and documented, never accidental. The context window is a supply chain — an unverified input is an unverified output. Distinct from agent-startup-context-gate (session-START loading; this is runtime per-call assembly), ai-cost-guardrail-designer (prices the spend; this decides the CONTENT), and rag-security-architect (who may retrieve; this curates what retrieval feeds the window). Use when designing prompt/context assembly, deciding what an agent may see, or when context is stuffed ad hoc. DESIGNS the curated context; the poisoning attack review belongs to memory-context-poisoning-reviewer.'
+description: 'Design what enters and leaves a model context window: assemble vetted inputs server-side under caps and closed schemas, minimize sensitive data, separate controlled-store persistence from transient segments, verify provider retention before claiming end-to-end non-persistence, make reconstruction limits explicit, and document exclusions. Distinct from agent-startup-context-gate (session start), ai-cost-guardrail-designer (cost), and rag-security-architect (retrieval authorization). Use when designing prompt/context assembly or deciding what an agent may see. Poisoning attack review belongs to memory-context-poisoning-reviewer.'
 ---
 
 # Model Context Designer
@@ -15,8 +15,9 @@ parts, never handed to the model as open access to a data source; (2) hard
 token/size caps per segment and in total, with deterministic priority and
 truncation rules; (3) CLOSED input schemas — every segment that enters the
 window passes a defined shape; (4) secrets, personal data, and raw payloads
-minimized, and what must ride anyway carried on a transient never-persisted
-channel, with the persisted-vs-transient split explicit per segment; (5)
+minimized, and what must ride anyway excluded from controlled application
+stores where possible, with provider retention separately checked and the
+persisted-vs-transient split explicit per segment; (5)
 reconstructibility — what the model saw on any past call can be established
 afterward; and (6) designed exclusions — what is deliberately NOT in the
 window, documented with reasons, so absence is a decision rather than an
@@ -103,8 +104,10 @@ reviews.
    the dock, not after they ship.
 5. **Minimize and split persisted-vs-transient.** Secrets, personal data,
    and raw payloads: first minimize (does the model need the value, or a
-   reference/derivative?); what must ride anyway goes on a transient
-   never-persisted channel. Mark every segment PERSISTED or TRANSIENT
+   reference/derivative?); what must ride anyway goes on a transient channel
+   excluded from controlled application stores and logs. Check provider-side
+   retention, logging and processing terms before claiming it is never
+   persisted anywhere. Mark every segment PERSISTED or TRANSIENT
    explicitly — an unmarked segment defaults to the strictest treatment.
 6. **Design reconstructibility honestly.** What the model saw must be
    establishable afterward: persisted segments by content or
@@ -165,7 +168,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - [ ] Every input passes a closed schema before entering the window;
       schema failures are rejected, not admitted.
 - [ ] Secrets/PII/raw payloads are minimized first; what rides is on the
-      transient never-persisted channel; the split is explicit.
+      transient channel excluded from controlled application persistence;
+      provider retention and logging are checked separately.
 - [ ] What the model saw is reconstructible afterward, with the transient
       limitation stated honestly (class/shape/hash, never stored content).
 - [ ] Exclusions are designed and documented with reasons — nothing is
@@ -183,7 +187,7 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   the absence of it — and every unverified byte admitted is an unverified
   byte in the answer.
 - Prompt logs are where transient data goes to become permanent: the
-  never-persisted channel must be checked against EVERY store — traces,
+  transient channel must be checked against every controlled store — traces,
   analytics, conversation history, error reports — not just the obvious log.
 - A cap without a designed priority order silently drops the most important
   segment on the worst day; "truncate from the end" is a decision, make it

@@ -10,6 +10,7 @@ Editions pinned:
   TSC 2017 (revised PoF 2022, AICPA)  — criteria text in hand: yes/no
   NIST AI RMF 1.0                     — Core text in hand: yes/no (note: RMF 1.0 under revision — check current)
 Rule: cells fill ONLY from text in hand; otherwise `unverified`. No memory-recalled IDs.
+Coverage level: DESIGN ONLY unless organizational implementation and operation evidence is separately verified and cited.
 ```
 
 ## Row
@@ -17,13 +18,14 @@ Rule: cells fill ONLY from text in hand; otherwise `unverified`. No memory-recal
 ```
 | Control (foundation) | 27001 Annex A | SOC 2 TSC | 42001 Annex A | AI RMF fn | Notes |
 | --- | --- | --- | --- | --- | --- |
-| CC-<dom>-<nn> <name> | <ref> · FULL/PARTIAL(<residue>)/NONE · verified/unverified | same shape | same shape | GOVERN/MAP/MEASURE/MANAGE/n-a | joint sets, edition notes |
+| CC-<dom>-<nn> <name> | <ref> · FULL/PARTIAL(<residue>)/NONE design coverage · text verified/unverified | same shape | same shape | GOVERN/MAP/MEASURE/MANAGE/n-a | joint design coverage, edition notes; operated evidence if claimed |
 ```
 
 ## Satisfaction vocabulary
 
-- **FULL** — the control as implemented covers the requirement's
-  substance. Not "mostly."
+- **FULL** — the control design covers the requirement's substance. Label
+  this design coverage; claim operational satisfaction only after separately
+  verifying organizational implementation and evidence. Not "mostly."
 - **PARTIAL(<residue>)** — names exactly what is not covered; residue
   feeds `compliance-gap-auditor`.
 - **NONE** — listed only when the absence is informative (expected

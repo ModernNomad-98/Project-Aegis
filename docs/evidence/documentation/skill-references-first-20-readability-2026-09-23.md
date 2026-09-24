@@ -1,5 +1,10 @@
 # First skill-reference readability batch — 2026-09-23
 
+## Current reading
+
+This is dated delivery evidence. Its original base, estimates, counts and
+pending status describe that batch. Use the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md) and [forecast](../../roadmaps/aegis-backlog-forecast.md) for current totals, and the linked owning pages for current guidance. The writer-local Developer Certificate of Origin (DCO), no-push and pending-pull-request language is historical. AI means artificial intelligence.
+
 ## Scope and timing
 
 This bounded batch makes three on-demand skill reference pages readable when

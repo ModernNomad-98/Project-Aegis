@@ -1,5 +1,10 @@
 # Seventh 20 skill references: bounded readability correction — 2026-09-23
 
+## Current reading
+
+This is dated delivery evidence. Its original base, estimates, counts and
+pending status describe that batch. Use the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md) and [forecast](../../roadmaps/aegis-backlog-forecast.md) for current totals, and the linked owning pages for current guidance. Independent-review-pending language is historical. SOC 2 is the System and Organization Controls 2 attestation; UTF-8 is Unicode text encoding. The current administrator-merge grant is in the [owner approval register](../../approvals/APPROVAL_REGISTER.md).
+
 ## Scope and estimates
 
 The read-only screen covered sorted reference Markdown files 121–140 under

@@ -1,5 +1,10 @@
 # Fourth 20 skill references: bounded readability correction — 2026-09-23
 
+## Current reading
+
+This is dated delivery evidence. Its original base, estimates, counts and
+pending status describe that batch. Use the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md) and [forecast](../../roadmaps/aegis-backlog-forecast.md) for current totals, and the linked owning pages for current guidance. The 156-reference inventory and 175–394-hour estimate are dated snapshots. UTF-8 means Unicode text encoding.
+
 ## Scope and estimates
 
 The read-only screen covered sorted reference Markdown files 61–80 under

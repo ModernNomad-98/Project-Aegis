@@ -1,21 +1,28 @@
 ---
 name: multi-framework-crosswalk
-description: 'Maintain the control crosswalk — the do-the-work-once engine between compliance-control-foundation and the framework projections: one row per control mapping it to ISO 27001:2022 Annex A, SOC 2 TSC, and ISO 42001:2023 Annex A references, plus optionally its NIST AI RMF function — with edition pinning and FULL/PARTIAL satisfaction honesty. Published crosswalks put cross-framework overlap at roughly 60–80% — an industry estimate, never a standard-derived figure. Every cell is a CLAIM verified against framework text in hand; rows are never filled from memory — unverified cells stay marked unverified. Use when mapping one control set to multiple frameworks, deduplicating compliance work across 27001/42001/SOC 2, or answering which frameworks a control satisfies. Do NOT use to define controls (compliance-control-foundation), decide applicability (statement-of-applicability-author), scope engagements (soc2-trust-criteria-mapper), or assess gaps (compliance-gap-auditor).'
+description: 'Maintain the control crosswalk between compliance-control-foundation and framework projections: map each control to ISO 27001 Annex A, SOC 2 Trust Services Criteria, ISO 42001 Annex A, and optionally NIST AI RMF functions. Pin editions and label FULL/PARTIAL/NONE design coverage; do not claim operated satisfaction without separate organizational evidence. Verify every reference against framework text in hand and mark unavailable cells unverified. Use to map one control set across frameworks or deduplicate design work. Do NOT define controls (compliance-control-foundation), decide applicability (statement-of-applicability-author), scope engagements (soc2-trust-criteria-mapper), or assess gaps (compliance-gap-auditor).'
 ---
 
 # Multi-Framework Crosswalk
 
 ## Purpose
 
-Make "write the control once, satisfy every framework" real. The crosswalk
+Reading key: TSC means Trust Services Criteria; NIST AI RMF means the
+National Institute of Standards and Technology Artificial Intelligence Risk
+Management Framework; ISMS means information security management system;
+AIMS means AI management system; SoA means Statement of Applicability; and
+PoF means Points of Focus. Framework references are design mappings until
+separate organizational operation and evidence are verified.
+
+Make "write the control once, map it across frameworks" practical. The crosswalk
 holds one row per `compliance-control-foundation` control, mapping it to
 its ISO 27001:2022 Annex A reference, SOC 2 TSC reference, ISO 42001:2023
 Annex A reference, and — for AI controls — the NIST AI RMF function it
 serves. It is the engine the projections consume (so the ISMS, AIMS, and
 SOC 2 mapping never fork the control set) and the honest ledger of where
-overlap actually holds: a row states FULL or PARTIAL satisfaction per
-framework, because "roughly maps" is how orgs discover mid-audit that one
-control satisfied a third of a criterion. Reference integrity is the whole
+overlap may hold: a row states FULL or PARTIAL design coverage per
+framework. Actual satisfaction requires separately verified organizational
+implementation and operation. Reference integrity is the whole
 value: every cell is a claim against a pinned framework edition, verified
 against the text in hand or marked unverified.
 
@@ -58,7 +65,7 @@ against the text in hand or marked unverified.
    drift invalidates cells silently.
 2. **Establish the row shape** from
    [assets/crosswalk-row-template.md](assets/crosswalk-row-template.md):
-   control ID → per-framework reference + satisfaction level
+   control ID → per-framework reference + design coverage level
    (FULL / PARTIAL <residue> / NONE) + verification status
    (verified-against-text / unverified).
 3. **Fill cells only from text in hand.** Walk each control against each
@@ -66,9 +73,11 @@ against the text in hand or marked unverified.
    Missing framework text → cells stay `unverified: text not in hand`,
    never guessed. Control IDs recalled from memory are forbidden — this
    is the rule that keeps the crosswalk trustworthy.
-4. **Judge satisfaction honestly.** FULL only when the control as
-   implemented covers the framework requirement's substance; PARTIAL
-   names the residue (e.g. an access-control mechanism that covers
+4. **Judge mapping coverage honestly.** FULL design coverage means the
+   proposed control design covers the framework requirement's substance;
+   it does not assert implementation. Claim FULL operational satisfaction
+   only with separately verified organizational implementation and evidence.
+   PARTIAL names the residue (e.g. an access-control mechanism that covers
    provisioning but not periodic review). The 60–80% overlap folklore is
    an industry estimate — your rows are the actual number; expect
    AI-specific 42001 objectives and Privacy criteria to map thin.
@@ -83,7 +92,7 @@ against the text in hand or marked unverified.
    silently.
 7. **Hand off.** Rows → projections (selection and criteria maps), SoA
    author (reference column for included controls), gap auditor
-   (satisfaction levels expose thin coverage), evidence collector
+   (design coverage levels expose thin mappings), evidence collector
    (one artifact can evidence several frameworks via the row).
 
 ## Output Format
@@ -92,13 +101,14 @@ against the text in hand or marked unverified.
 CONTROL CROSSWALK — <org> v<n>
 Editions pinned: ISO/IEC 27001:2022 [+Amd 1:2024] | ISO/IEC 42001:2023 | TSC 2017 (rev. PoF 2022) | NIST AI RMF 1.0
 Texts in hand: <which framework tables are available; columns without text stay unverified>
+Coverage level: DESIGN ONLY | VERIFIED OPERATED <organizational evidence refs>
 Per row:
   [CC-<id>] <control name>
-    27001 Annex A: <ref(s) | none> — FULL|PARTIAL(<residue>)|NONE — verified|unverified
-    SOC 2 TSC:     <ref(s) | none> — FULL|PARTIAL(<residue>)|NONE — verified|unverified
-    42001 Annex A: <ref(s) | none> — FULL|PARTIAL(<residue>)|NONE — verified|unverified
+    27001 Annex A: <ref(s) | none> — FULL|PARTIAL(<residue>)|NONE design coverage — text verified|unverified
+    SOC 2 TSC:     <ref(s) | none> — FULL|PARTIAL(<residue>)|NONE design coverage — text verified|unverified
+    42001 Annex A: <ref(s) | none> — FULL|PARTIAL(<residue>)|NONE design coverage — text verified|unverified
     AI RMF fn:     <GOVERN|MAP|MEASURE|MANAGE | n/a>
-Joint satisfactions: <criterion/control-objective ← {control set}>
+Joint design coverage: <criterion/control-objective ← {control set}>
 Coverage summary: <per framework: full/partial/none counts from THIS table — not the 60–80% folklore>
 Unverified cells: <list — the verification backlog>
 ```
@@ -109,11 +119,11 @@ Unverified cells: <list — the verification backlog>
       framework-first rows without a control.
 - [ ] Every filled cell was verified against the pinned framework text in
       hand; every unfilled/unavailable cell says `unverified`, not a guess.
-- [ ] Satisfaction levels are FULL/PARTIAL/NONE with residue named for
-      every PARTIAL.
+- [ ] Mapping coverage is labeled design-only unless operated controls and
+      evidence were separately verified; PARTIAL names every residue.
 - [ ] Editions pinned per column; edition changes tracked as re-open
       events, not silent updates.
-- [ ] Joint satisfactions listed explicitly; no criterion silently
+- [ ] Joint design coverage listed explicitly; no criterion silently
       "covered" by an unstated set of controls.
 - [ ] Coverage summary computed from the table itself; the 60–80% figure
       appears only as flagged industry context, if at all.
@@ -169,7 +179,7 @@ Unverified cells: <list — the verification backlog>
 ## Supporting Files
 
 - [assets/crosswalk-row-template.md](assets/crosswalk-row-template.md) —
-  the row/column template with edition-pinning header, satisfaction
+  the row/column template with edition-pinning header, design coverage
   vocabulary, and verification-status rules.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the compliance

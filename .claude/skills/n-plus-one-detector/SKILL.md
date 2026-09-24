@@ -16,7 +16,8 @@ guilty. This skill detects chatty data-access patterns with evidence
 (query counts per request, logs, and object-relational mapper (ORM)
 instrumentation), designs the pattern-matched fix (eager loading, batching,
 joins, denormalization —
-each with its price), and installs the regression guard: a query-count
+each with its price), and specifies or, when implementation is authorized,
+installs the regression guard: a query-count
 budget asserted in tests, because N+1s return the moment someone adds a
 field to a template. Latency that scales with result-set size is this
 skill's signature symptom.
@@ -122,13 +123,13 @@ before proceeding.
    invalidation debt, and the first cache miss replays the storm.
    After the pattern is fixed, a genuine staleness-tolerant candidate
    may route to `caching-strategy-designer` on its own merits.
-4. **Verify by re-measuring the count.** Same operation, same data
+4. **Verify by re-measuring the count when a fix is implemented.** Same operation, same data
    shape: statement count drops to the designed number (typically 2–3),
    wall-clock drops accordingly, and — the check that catches over-
    correction — the replacement queries' plans are sane
    (`query-plan-reader` if the new IN-key or join query is itself
    heavy at volume).
-5. **Install the regression guard.** A query-count budget assertion in
+5. **Specify or install the regression guard according to task scope.** A query-count budget assertion in
    the integration layer for the fixed operation: "renders with ≤ K
    queries" (exact-count where stable, small budget where seeding
    varies). The budget documents intent — the next lazy touch fails a
@@ -136,8 +137,9 @@ before proceeding.
    instrumentation hook; keep budgets on the endpoints that matter,
    not everywhere (assertion noise erodes the guard).
 6. **Report** in the Output Format: evidence table, injection sites,
-   fix per site with price, measured before/after counts, and the
-   guard's location.
+   fix per site with price, measured before/after counts when implementation
+   and measurement occurred, otherwise an explicit unmeasured status and
+   proposed guard location.
 
 Pattern catalog with fix templates, counter-instrumentation options,
 and query-budget assertion patterns:
@@ -170,12 +172,13 @@ Residual: <paths with the same pattern not yet fixed — listed, not implied don
       no global eager-loading, no reflexive cache.
 - [ ] One-to-many joins were checked for row-width explosion; batched
       two-query shapes preferred where they explode.
-- [ ] Before/after statement counts are measured, not estimated; the
-      after-count equals the design.
-- [ ] The replacement query's own plan was sanity-checked at realistic
-      volume (large IN lists, big joins).
-- [ ] A query-count budget assertion exists for the fixed operation,
-      wired to a real counter hook.
+- [ ] When an authorized fix was run, before/after counts were measured and
+      the after-count meets the design. Otherwise the proposed fix and guard
+      are labeled unmeasured.
+- [ ] When a replacement query ran, its plan was checked at realistic volume;
+      otherwise the plan check is an explicit implementation task.
+- [ ] When a guard was authorized and installed, its query-count assertion
+      uses a real counter hook; otherwise the proposed guard is specified.
 - [ ] Unfixed sibling paths with the same pattern are listed as
       residual.
 

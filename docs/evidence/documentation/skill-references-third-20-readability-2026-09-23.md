@@ -1,5 +1,10 @@
 # Third skill-reference readability batch — 2026-09-23
 
+## Current reading
+
+This is dated delivery evidence. Its original base, estimates, counts and
+pending status describe that batch. Use the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md) and [forecast](../../roadmaps/aegis-backlog-forecast.md) for current totals, and the linked owning pages for current guidance. The local final-check and Developer Certificate of Origin (DCO) statement are historical. p99 means the 99th percentile; A1 is the pre-switch verification abort and A4 the post-switch serving-error abort in the linked migration runbook.
+
 ## Scope and timing
 
 This bounded documentation batch makes three on-demand reference pages clear

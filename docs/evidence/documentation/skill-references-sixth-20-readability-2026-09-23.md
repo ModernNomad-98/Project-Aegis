@@ -1,5 +1,10 @@
 # Sixth skill-reference readability batch — 2026-09-23
 
+## Current reading
+
+This is dated delivery evidence. Its original base, estimates, counts and
+pending status describe that batch. Use the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md) and [forecast](../../roadmaps/aegis-backlog-forecast.md) for current totals, and the linked owning pages for current guidance. Writer-stopped and independent-review-pending language is historical. RAG means retrieval-augmented generation; RLS means row-level security; SQL means Structured Query Language.
+
 ## Scope and timing
 
 This bounded documentation batch corrects four standalone reference pages in

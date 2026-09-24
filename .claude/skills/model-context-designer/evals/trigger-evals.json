@@ -12,7 +12,7 @@
   "cases": [
     {
       "id": "context-curation-wins-here",
-      "prompt": "Decide what goes into our model's context each call: which segments from which sources, assembled server-side under hard token caps with a designed truncation order, sensitive values on a transient never-persisted channel, exclusions documented, and what it saw reconstructible afterward.",
+      "prompt": "Decide what goes into our model's context each call: which segments from which sources, assembled server-side under hard token caps with a designed truncation order, sensitive values excluded from controlled application stores, provider retention checked, exclusions documented, and what it saw reconstructible afterward.",
       "expected_skill": "model-context-designer",
       "should_not_trigger": ["agent-startup-context-gate", "ai-cost-guardrail-designer", "rag-security-architect"],
       "note": "SEAM CASE (primary) — segments, caps, schemas, the persisted/transient split, reconstructibility, and designed exclusions are the curation contract. No session-start verification, no budget authoring, no retrieval authz is requested.",
