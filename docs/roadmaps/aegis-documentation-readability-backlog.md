@@ -199,17 +199,18 @@ full-page acceptance or grant provider, private-input, real-host or deployment
 authority.
 
 **Named page follow-up found during the batch after PR #209:**
-`.claude/skills/agentic-loop-designer/SKILL.md` describes a second failure on
-identical input as proof of a deterministic failure. A transient provider
-outage or rate limit can fail twice; the repeated failure proves only that
-the retry allowance was exhausted. The page is **not accepted**. Correct its
-retry classification in a focused skill-contract change, review matching
-evaluation cases, and independently accept the revised page. Provisional
-remaining estimate for this bounded correction is **1–2 active hours** within
-the documentation range; it grants no provider call or live retry.
+`.claude/skills/agentic-loop-designer/SKILL.md` previously treated a second
+identical transient failure as proof of a deterministic failure. The focused
+correction in [the retry review record](../evidence/documentation/agentic-loop-retry-correction-2026-09-24.md)
+distinguishes retry exhaustion from a proven permanent error and stops an
+uncertain side effect without safe repetition. The revised page is **corrected
+and accepted** after independent review; its two evaluation files were updated.
+The original and current estimate were **1–2 active hours** within the
+documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Agentic loop retry correction, started 2026-09-24 approximately 00:55 UTC | One skill page and its two evaluation files; [page-level review](../evidence/documentation/agentic-loop-retry-correction-2026-09-24.md) | The skill page is corrected and accepted after independent review. The error taxonomy, safe retry rule, terminal states and evaluation cases now agree. Expected post-merge inventory: 557 Markdown pages, 51 accepted existing pages, 506 without full-page acceptance; reconcile against the exact merge tree. |
 | Full-page batch after PR #209, started 2026-09-24 approximately 00:29 UTC | Nine skill pages, one evaluation-harness reference and ten runner evidence pages; [page-level record](../evidence/documentation/full-page-readability-batch-after-209-2026-09-24.md) | Two independent read-only reviewers accepted 20 distinct pages after correction. A separate agentic-loop retry defect remains open in the named follow-up above. Historical evidence, manual-only gates and human incident routing were checked. Expected post-merge inventory: 556 Markdown pages, 50 previously existing pages with full-page acceptance, 506 without it; reconcile against the exact merge tree. The selected backlog forecast at start remains 150–394 active hours. |
 | Full-page batch after PR #208, started 2026-09-24 approximately 00:09 UTC | Ten agent skill pages, one startup reference and ten other reader pages; [page-level evidence](../evidence/documentation/full-page-readability-batch-after-208-2026-09-24.md) | Independent read-only reviewers accepted 21 existing pages after correction or unchanged. The evidence note records each outcome and reviewer interval. At the expected 555-page post-merge inventory, 30 existing pages have recorded full-page acceptance and 525 do not; reconcile with the exact merge tree. The selected backlog forecast at start is 150–394 active hours, with 55–200 for documentation. |
 | First component guides, started 2026-09-23 16:12 UTC | `tools/behavioral_eval_runner/README.md`, `tools/aegis_delivery_control/README.md`, `docs/README.md` | Rewritten around purpose, workflow, examples, functions and limits. Local commands and links passed; independent read-only review found no remaining blocker after corrections. Root README navigation remains a separate batch. |
