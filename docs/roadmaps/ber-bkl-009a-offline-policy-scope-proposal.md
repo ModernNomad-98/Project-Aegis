@@ -8,14 +8,15 @@ approval-register entry; `BER-DEC` identifies a runner decision-log entry;
 automated checks. The original proposal below remains historical; its linked
 approval and decision record set the current scope.
 
-> **Current status, 2026-09-23:** The owner approved this bounded synthetic
+> **Current status, 2026-09-24:** The owner approved this bounded synthetic
 > offline proof in [AEGIS-APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof)
 > and the merged [BER-DEC-011 decision](behavioral-eval-runner-backlog.md#ber-dec-011-bounded-offline-evidence-policy-proof).
 > The owner had already selected the 30-day complete-bundle policy in
 > [AEGIS-APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection).
-> [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) is not
-> merged into this checkout; the [backlog](behavioral-eval-runner-backlog.md#wp-2b-1b--offline-evidence-policy-proof)
-> records it as open at its checkpoint. Recheck its live state before acting.
+> [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) merged
+> as `b4b1195d6162728ffc37d22d038a08e3722db7c0`, delivering the bounded
+> synthetic proof. The [current backlog](behavioral-eval-runner-backlog.md#wp-2b-1b--offline-evidence-policy-proof)
+> keeps BKL-009 partial; older open-PR checkpoints are historical.
 > No real-host run, private input, provider call or cleanup follows from this
 > grant. The options below preserve the pre-approval proposal as history.
 

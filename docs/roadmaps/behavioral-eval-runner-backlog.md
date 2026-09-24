@@ -1794,13 +1794,15 @@ authorization decisions in §13 remain unchanged.
   thresholds meaningful over time.
 - **Dependencies:** WP-2B-2 DONE for the non-live drift/recalibration-trigger representation
   and dataset-structure half (the former WP-2B-3 NON-LIVE scaffold scope is absorbed by
-  WP-2B-2); the measured dataset-operations half follows WP-2B-3 — the Measured Judge
-  Calibration and OD-1 Ratification Gate — and its future reviewed and merged
-  authorization; a reviewed design successor for any multi-judge arbitration (it would
+  WP-2B-2); the measured dataset-operations half follows completed WP-2B-3
+  calibration and owner decision 1 (OD-1) ratification under the existing
+  BER-DEC-008 phase authorization, plus a separate reviewed grant for ongoing
+  operations; a reviewed design successor for any multi-judge arbitration (it would
   extend §8).
 - **Trigger to begin:** WP-2B-2 delivers the non-live drift/recalibration trigger
   representation and calibration-dataset structure; measured dataset operations begin after
-  WP-2B-3's future authorization and measured calibration; an owner-approved design
+  completed WP-2B-3 measured calibration and OD-1 ratification, subject to a
+  separate ongoing-operations grant; an owner-approved design
   successor (arbitration half).
 - **Expected deliverable:** Dataset-operations procedures (labeling, versioning, growth,
   re-baselining triggers); periodic agreement measurement against the ratified
