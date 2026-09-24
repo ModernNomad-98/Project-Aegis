@@ -1,16 +1,20 @@
 ---
 name: tenant-isolation-reviewer
-description: Review an existing multi-tenant system or design for cross-tenant leakage across EVERY surface — identity, data, API, storage, logs, analytics, support tooling, exports, imports, background jobs, search, AI retrieval, billing, feature flags, and audit — not just the database. Produces severity-ranked isolation findings with file:line evidence, an isolation test matrix per surface, negative tests proving tenant A cannot reach tenant B's data, and an explicit not-inspected list. Use when asked whether tenant isolation is sound, before onboarding a security-sensitive customer, before exposing a new surface (export, search, AI feature, support view) to tenants, or after an isolation incident. Do NOT use to define what a tenant is (tenant-modeler) or to design the data layer (multi-tenant-data-architect); this skill reviews real systems — no code or concrete design, no review.
+description: Review an existing multi-tenant system or design for cross-tenant leakage across EVERY surface — identity, data, API, storage, logs, analytics, support tooling, exports, imports, background jobs, search, AI retrieval, billing, feature flags, and audit — not just the database. Produces severity-ranked isolation findings with file:line evidence, an isolation test matrix per surface, a negative-test plan for tenant A versus tenant B, and an explicit not-inspected list. Use when asked whether tenant isolation is sound, before onboarding a security-sensitive customer, before exposing a new surface (export, search, AI feature, support view) to tenants, or after an isolation incident. Do NOT use to define what a tenant is (tenant-modeler) or to design the data layer (multi-tenant-data-architect); this skill reviews real systems — no code or concrete design, no review.
 ---
 
 # Tenant Isolation Reviewer
+
+**Reading key:** RLS means row-level security; IDOR means insecure direct
+object reference, an authorization flaw where a changed object identifier
+exposes another user's data.
 
 ## Purpose
 
 Produce an evidence-based verdict on whether tenants can reach each other's
 data, across every surface the system exposes — not only the database. The
 deliverables are severity-ranked findings with evidence, an isolation test
-matrix, negative tests that prove denial, and — just as important — an honest
+matrix, a negative-test plan that checks denial, and — just as important — an honest
 list of surfaces NOT inspected. A surface never examined is reported as
 not-inspected, never assumed safe; "we use tenant_id everywhere" is a claim,
 not a finding.

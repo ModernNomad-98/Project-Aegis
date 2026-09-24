@@ -5,6 +5,9 @@ description: Audit what the EXISTING tests actually cover — map requirements, 
 
 # Test Coverage Mapper
 
+**Reading key:** API means application programming interface; CI means
+continuous integration; E2E means end-to-end tests.
+
 ## Purpose
 
 Produce an evidence-based map of what the current test suite proves, and —
@@ -39,8 +42,8 @@ uncovered path first, at the cheapest reliable layer.
    criteria, incident history, bug tracker patterns.
 4. Coverage tool output if available (lcov, istanbul, coverage.py) — as a
    lead generator for unexecuted code, never as the verdict.
-5. CI config: which tests actually run and gate; a test excluded from CI
-   covers nothing in practice.
+5. CI config: which tests actually run and gate; identify tests run only
+   manually or outside CI as non-gating evidence, with their run provenance.
 
 ## Workflow
 
@@ -53,8 +56,9 @@ uncovered path first, at the cheapest reliable layer.
    assert nothing meaningful — snapshot-everything, expect(true), render-only),
    or none. Note the layer of each verifying test.
 3. **Cross-check with coverage-tool output** where available: unexecuted
-   lines confirm "none"; executed-but-unasserted code is theater, which
-   percentage tools cannot see — say so explicitly.
+   lines show no execution in that measured run, not the absence of tests in
+   other suites; executed-but-unasserted code may be theater, which percentage
+   tools cannot establish alone — inspect assertions and say so explicitly.
 4. **Classify each gap by risk** using the strategy's risk inventory (or a
    quick impact × likelihood pass if no strategy exists): critical-journey
    gaps, security-relevant gaps (delegate specification of cross-tenant/authz
@@ -89,7 +93,8 @@ Handoffs: <fill items → test-plan-designer or engineer skills;
 - [ ] Coverage claims cite the verifying test (file:line), not filenames or
       percentages.
 - [ ] Theater tests identified and excluded from "covered".
-- [ ] CI-excluded/skipped tests not counted as coverage.
+- [ ] Skipped or unrun tests are not counted as observed coverage; verified
+      manually run tests are labeled non-gating with their run provenance.
 - [ ] Every gap has a risk rationale and a recommended cheapest layer.
 - [ ] Not-inspected areas listed explicitly with reasons.
 - [ ] No fix implementation attempted — gaps are handed off.

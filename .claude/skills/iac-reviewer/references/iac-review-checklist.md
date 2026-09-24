@@ -1,6 +1,11 @@
 # IaC Review Checklist Reference
 
-Detail file for `iac-reviewer`. Loaded on demand.
+Detail file for [iac-reviewer](../SKILL.md). Loaded on demand.
+IaC means infrastructure as code; AZ is availability zone; NSG is network
+security group; CIDR is Classless Inter-Domain Routing network notation;
+IAM is identity and access management; RBAC is role-based access control;
+ACL is access control list; ARM is Azure Resource Manager; CDK is Cloud
+Development Kit.
 
 ## Blast-radius checklist (run FIRST)
 
@@ -37,8 +42,9 @@ Detail file for `iac-reviewer`. Loaded on demand.
 ## Secrets & state checklist
 
 - [ ] Literal credentials/keys/tokens in source, tfvars, parameter files.
-- [ ] Secret values passed as plain resource attributes → captured in state;
-      should be secret-store references.
+- [ ] Secret values passed as plain resource attributes may be captured in
+      state. A secret-store reference helps only when the provider stores the
+      reference rather than a resolved value; verify resource and state behavior.
 - [ ] State backend: encrypted, locked, access-controlled; state not
       committed to the repo.
 - [ ] Outputs exporting sensitive values without sensitive marking.

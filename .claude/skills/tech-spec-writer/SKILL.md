@@ -5,6 +5,10 @@ description: 'Write a TECHNICAL SPEC / design doc for a non-trivial engineering 
 
 # Tech Spec Writer
 
+**Reading key:** ADR means architecture decision record, RFC means request
+for comments, API means application programming interface, and PII means
+personally identifiable information.
+
 ## Purpose
 
 A substantial change built without a technical spec is a change whose

@@ -34,7 +34,7 @@ secondary-sourced — verify against the licensed table; avoid citing counts.
 | A.5 Organizational | risk assessment, vendor mgmt, incident response, logging policy domains | policy suite completeness, threat-intel, cloud-use policy, evidence of reviews |
 | A.6 People | change mgmt (approval discipline) partially | screening, terms, awareness training records, disciplinary process |
 | A.7 Physical | — (SaaS orgs largely inherit from providers) | provider-inheritance documentation; office/device physical controls |
-| A.8 Technological | access control, crypto, change mgmt, logging & monitoring domains (shipped Phase 3/4 packs) | data-leakage prevention breadth, backup verification, the D8 residues (crypto design review, security alerting) |
+| A.8 Technological | access control, change mgmt, logging & monitoring domains (shipped Phase 3/4 packs, including D28 security alerting design) | crypto design review, data-leakage prevention breadth, backup verification, and operating evidence for implemented controls |
 
 Selection rule: per Annex A entry → include/exclude decision is the SoA's
 (with 6.1.3 trace); this map only pre-sorts where mechanisms already exist

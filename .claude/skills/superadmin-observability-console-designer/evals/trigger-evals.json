@@ -26,7 +26,7 @@
       "expected_skill": "superadmin-observability-console-designer",
       "should_not_trigger": ["admin-console-architect", "security-logging-alerting-architect"],
       "note": "The what-to-show + how-to-secure-the-READ question. Which security events to DETECT would be security-logging-alerting-architect; here the events exist and the question is the console that displays them.",
-      "reason": "Panel selection with restraint plus the cross-tenant read-security model (registry, three-layer re-check, read-only-by-default, denied-access-as-metric) is this skill's core."
+      "reason": "Panel selection with restraint plus the cross-tenant read-security model (registry, two server-side checks, cosmetic UI guard, read-only-by-default, denied-access-as-metric) is this skill's core."
     },
     {
       "id": "impersonation-and-actions-go-to-admin-console-architect",

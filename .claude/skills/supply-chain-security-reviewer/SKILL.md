@@ -5,6 +5,11 @@ description: 'Review software supply-chain risk with SLSA-style provenance think
 
 # Supply-Chain Security Reviewer
 
+**Reading key:** SLSA is Supply-chain Levels for Software Artifacts, a
+provenance framework; CVE is Common Vulnerabilities and Exposures; CI/CD is
+continuous integration and delivery; MCP is Model Context Protocol; A2A is
+agent-to-agent communication. LLM03 and ASI04 are OWASP AI risk identifiers.
+
 ## Purpose
 
 Assess whether an attacker can compromise the software through what it
@@ -51,7 +56,8 @@ is a finding whether or not a scanner flagged it.
 
 1. Manifests and lockfiles: `package.json`/`package-lock.json`/`pnpm-lock`/
    `yarn.lock`, `requirements.txt`/`poetry.lock`, `go.mod`/`go.sum`, etc. —
-   the lockfile is the source of truth for what actually installs.
+   the lockfile records the intended resolved set; verify the installed graph
+   and build platform for what actually ships.
 2. Scanner output if provided (Dependabot/`npm audit`/Snyk/Trivy/OSV) — input
    to triage, never the final verdict.
 3. CI/CD workflows: `.github/workflows/*`, pipeline configs — triggers,
@@ -67,7 +73,8 @@ is a finding whether or not a scanner flagged it.
 7. AI/ML artifacts if any (LLM03): third-party base models, downloaded
    datasets, and fine-tuning adapters — their source/registry, revision
    pinning (a mutable tag/`latest` is not pinned), serialization format
-   (pickle/`torch.load` execute code on load; prefer safetensors), and
+   (unsafe pickle or unrestricted `torch.load` can execute code on load;
+   prefer safetensors or a verified restricted loading mode), and
    license/provenance. Acquisition only — integrity of data you curate or
    pipelines you run is `model-poisoning-reviewer`.
 8. Agentic components if any (ASI04): MCP server packages and their
@@ -102,7 +109,8 @@ is a finding whether or not a scanner flagged it.
    For **AI/ML artifacts (LLM03)** — third-party models, datasets, adapters —
    see [references/supply-chain-checklist.md](references/supply-chain-checklist.md):
    pin to an immutable revision/digest (not a mutable tag or `latest`), prefer
-   safetensors over pickle/`torch.load` formats that execute code on load,
+   safetensors over unrestricted pickle loading; check the actual `torch.load`
+   version and `weights_only` mode before judging its deserialization risk,
    confirm the source registry and license, and treat a downloaded artifact as
    untrusted until its provenance checks out. Integrity of data you curate or
    pipelines you run stays with `model-poisoning-reviewer`. For **agentic
@@ -191,10 +199,13 @@ Not reviewed: <areas + why>
   scope, or unpinned actions — those are not "vulnerabilities" it scans for.
 - Bumping a dependency to clear a CVE can pull a new maintainer's compromised
   release — review the upgrade target, don't just accept "latest".
-- AI model formats execute code: loading a pickle-based checkpoint (`torch.load`,
-  `pickle.load`, some `.bin`/`.pt`/`.ckpt`) runs arbitrary code on load — a
-  "downloaded model" is a "run this file". Prefer safetensors; treat pickle
-  artifacts from untrusted sources as install-time RCE.
+- Unsafe model deserialization can execute code: `pickle.load` and
+  `torch.load(..., weights_only=False)` can run arbitrary code from an
+  untrusted checkpoint. Current PyTorch defaults to a restricted
+  `weights_only=True` loader; verify the installed version, mode, and any
+  allowlisted globals. Prefer safetensors where suitable and never treat an
+  untrusted artifact as safe solely from its `.bin`/`.pt`/`.ckpt` suffix.
+  See [PyTorch's loading guidance](https://docs.pytorch.org/docs/stable/generated/torch.load.html).
 - A model/dataset pinned to a mutable hub tag or `latest` is not pinned — the
   remote can change under you; pin to an immutable revision/commit/digest.
 - MCP servers are dependencies with hands: a malicious or hijacked server

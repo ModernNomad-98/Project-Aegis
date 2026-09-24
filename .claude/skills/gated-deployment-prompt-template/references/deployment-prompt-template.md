@@ -1,8 +1,10 @@
 # Gated Deployment Prompt — Template Skeleton & History Index
 
-Companion to `gated-deployment-prompt-template`. Everything below is
+Companion to [gated-deployment-prompt-template](../SKILL.md). Everything below is
 product-agnostic; `<angle-bracket>` values are filled by the OPERATOR at run
 time. Credentials appear as environment-variable names only.
+ETA means estimated time to complete; PR means pull request; APR is an
+approval-register entry identifier, whose scope must cover the specific run.
 
 ## Operator prompt skeleton
 
@@ -104,6 +106,6 @@ env-var names only.
 | --- | --- |
 | Is this migration itself safe (locks, reversibility, data loss)? | `secure-migration-reviewer` — its verdict is a required input above |
 | The executable rollback steps referenced by the stop conditions | `rollback-runbook-author` |
-| Production is broken NOW | `incident-response-runbook` |
+| Production is broken NOW | Contact the authorized incident owner and follow the current approved runbook; `incident-response-runbook` authors or updates that runbook |
 | What does merging auto-deploy, and who owns branch protection? | `merge-is-deploy-governance` — the operator-applied remainder it identifies is what this template gates |
 | May an agent run any of this at all? | `agent-authorization-matrix` floors + the approval register entry |

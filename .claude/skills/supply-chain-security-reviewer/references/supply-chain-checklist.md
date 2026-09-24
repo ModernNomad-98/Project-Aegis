@@ -88,12 +88,13 @@ downloaded datasets, and fine-tuning adapters. Review them like any untrusted
 package. Scope: ACQUISITION. Integrity of data you curate or pipelines you run
 (training sets, feedback loops, RAG ingestion) is `model-poisoning-reviewer`.
 
-- **Serialization / format (code execution on load):** pickle-based formats —
-  `torch.load`, `pickle.load`, many `.bin`/`.pt`/`.ckpt` checkpoints, and
-  Python-code custom layers — execute arbitrary code when loaded. A downloaded
-  model in these formats is install-time RCE. Prefer **safetensors**; treat
-  pickle artifacts from untrusted sources as a critical finding unless scanned
-  and sandboxed.
+- **Serialization / format (code execution on unsafe load):** `pickle.load`,
+  `torch.load(..., weights_only=False)`, and Python-code custom layers can
+  execute arbitrary code from an untrusted artifact. Current PyTorch defaults
+  to restricted `weights_only=True`; verify the installed version, loading
+  mode, and allowlisted globals. File suffixes such as `.bin`/`.pt`/`.ckpt`
+  do not prove the mode. Prefer **safetensors** where suitable; do not treat
+  scanning alone as proof that untrusted pickle can be loaded safely.
 - **Pinning:** pin models/datasets to an immutable revision (commit hash /
   content digest), never a mutable hub tag or `latest` — the remote can change
   under you. An unpinned model reference is unpinned dependency risk.

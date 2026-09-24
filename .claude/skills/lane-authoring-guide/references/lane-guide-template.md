@@ -1,7 +1,10 @@
 # Lane Authoring Guide — Template & Authoring Notes
 
-Companion to `lane-authoring-guide`. One guide per lane, authored BEFORE the
+Companion to [lane-authoring-guide](../SKILL.md). One guide per lane, authored BEFORE the
 lane's first unit of work.
+PR means pull request; SHA is a commit identifier; API means application
+programming interface; DB is database; `§` denotes a document section;
+APR is an approval-register entry.
 
 ## Citation convention
 
@@ -23,7 +26,7 @@ tell distilled knowledge from planner assumption.
 ```markdown
 # Lane Guide — <lane name>            (authored <YYYY-MM-DD>, baseline <SHA>)
 
-Approved by: <plan-of-record doc/phase>   Coordinator: <named human/role>
+Approved by: <approval-register entry or exact phase grant>   Coordinator: <named human/role>
 
 ## 1. Lane identity
 - Surface: <paths/modules this lane owns>

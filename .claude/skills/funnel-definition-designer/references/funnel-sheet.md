@@ -1,6 +1,9 @@
 # Funnel Sheet
 
-Detail for `funnel-definition-designer`. Read on demand.
+Detail for [funnel-definition-designer](../SKILL.md). Read on demand.
+
+A **cohort** is the defined group entering the funnel; a **counting model**
+chooses whether people, sessions, or events are counted at each step.
 
 ## Counting model
 
@@ -26,7 +29,7 @@ every number.
 |---|---|
 | Same session | Strictest; lowest rate |
 | 24h / 7d | Common; state which |
-| Unbounded | Inflates — nearly everyone eventually converts |
+| Unbounded | Can increase the observed rate; effect depends on cohort age and censoring |
 
 Never report a rate without its window. An unwindowed conversion is
 uninterpretable.

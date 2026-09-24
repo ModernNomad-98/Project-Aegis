@@ -45,7 +45,7 @@ design error and an audit finding — the object of assessment differs.
 | AIMS need | Shipped mechanism |
 | --- | --- |
 | AI SDLC stage/authority contract | `ai-sdlc-operating-model` |
-| Standing agent authority (merge/deploy/auto-merge bans) | `agent-authorization-matrix` |
+| Standing agent authority (scoped grants and restrictions for merge, deployment, and automation; check the current approval register) | `agent-authorization-matrix` |
 | Agent memory write/trust/hygiene | `agent-memory-governance` |
 | Per-change process compliance evidence | `agent-governance-audit` |
 | Per-feature risk tier, oversight, disclosure, model card | `ai-governance-risk-reviewer` |

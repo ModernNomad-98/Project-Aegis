@@ -1,6 +1,9 @@
 # Boundary Catalog
 
-Detail file for `integration-test-designer`. Loaded on demand.
+Detail file for [integration-test-designer](../SKILL.md). Loaded on demand.
+REAL means the actual dependency participates in the test; FAKED means a
+controlled substitute. DB is database, SDK is software development kit, and
+2xx denotes a successful HTTP response status.
 
 ## Boundary classification table (template)
 

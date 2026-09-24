@@ -1,9 +1,14 @@
 ---
 name: superadmin-observability-console-designer
-description: 'Design the cross-tenant superadmin OBSERVABILITY/monitoring console for a multi-tenant SaaS — the surface operators use to SEE platform health (signups, DB health, security, cost, incidents): layered panel IA (one health answer first, drill-downs, escalation badges, restraint), the cross-tenant READ-security model (deny-all-RLS platform-admin registry, no self-service grant, three-layer server-side re-check, read-only-by-default with privileged-write-only telemetry, denied-access-as-metric, break-glass CONTENT reveal), a server-shaped read model, honest-gap typing (wired: false), and the DB/query-perf panel. Every panel''s feed is COMPOSED from its owning skill, never restated. Use when designing a superadmin/platform-health monitoring console — what it shows, how it is secured. Do NOT use for cross-tenant ACTIONS/impersonation/break-glass ELEVATION (admin-console-architect), wiring/operating the telemetry backend (observability-operator), or deciding SLOs/what pages (slo-reliability-architect).'
+description: 'Design the superadmin monitoring console for a multi-tenant SaaS — the surface operators use to SEE platform health (signups, DB health, security, cost, incidents): layered panel IA (one health answer first, drill-downs, escalation badges, restraint), the cross-tenant READ-security model (deny-all-RLS platform-admin registry, no self-service grant, two server-side enforcement checks plus a cosmetic UI guard, read-only-by-default with privileged-write-only telemetry, denied-access-as-metric, break-glass CONTENT reveal), a server-shaped read model, honest-gap typing (wired: false), and the DB/query-perf panel. Every panel''s feed is COMPOSED from its owning skill, never restated. Use when designing a superadmin/platform-health monitoring console — what it shows, how it is secured. Do NOT use for cross-tenant ACTIONS/impersonation/break-glass ELEVATION (admin-console-architect), wiring/operating the telemetry backend (observability-operator), or deciding SLOs/what pages (slo-reliability-architect).'
 ---
 
 # Superadmin Observability Console Designer
+
+**Reading key:** IA is information architecture; DB is database; RLS is
+row-level security; ETL is extract, transform, load; OLTP is online transaction
+processing; APM is application performance monitoring. CORS means cross-origin
+resource sharing and is explained at the admin-endpoint boundary below.
 
 ## Purpose
 
@@ -98,14 +103,14 @@ access — so it is safe for model invocation.
      platform-admin; grants happen out-of-band through the privileged
      operational lane, under the repo's approval path
      (`human-approval-boundary`).
-   - **Three-layer server-side re-check, independent at every layer:**
-     (1) the UI guard is cosmetic (redirect only); (2) every privileged
+   - **Two server-side enforcement checks plus a cosmetic UI guard:**
+     (1) the UI guard redirects only; (2) every privileged
      endpoint re-derives the actor FROM THE VERIFIED TOKEN — client-supplied
      ids are ignored — and re-checks the registry per request; (3) every
      platform-scope table ALSO gates SELECT on the same membership check, so
      a bypassed endpoint still hits the database wall. One SECURITY-DEFINER
-     membership function (`is_platform_admin(uid)`-shaped) keeps all three
-     layers consistent.
+     membership function (`is_platform_admin(uid)`-shaped) keeps the two
+     enforcement checks consistent.
    - **Two caller lanes**: human admins (token → registry check) and machine
      callers (cron/schedulers via a dedicated secret or service identity),
      the machine lane fire-and-forget where possible. Destructive batch
@@ -146,7 +151,7 @@ access — so it is safe for model invocation.
    confidence; "not wired" is itself a monitoring datum.
 5. **Spec the DB/query-performance panel** (the most commonly missing one —
    full spec in the reference): connection-pool saturation (active vs max,
-   ~70%/85% warn/crit), cache-hit ratio, DB size, top-N per-table rows +
+   example ~70%/85% warn/crit thresholds tuned to observed platform limits), cache-hit ratio, DB size, top-N per-table rows +
    disk, slow queries (duration, state, truncated preview, user), and a
    capacity-runway forecast with statistical gating. Fed by privileged
    SECURITY-DEFINER routines over the DB's own stats views, snapshotted on a
@@ -207,8 +212,8 @@ Handoffs: <actions → admin-console-architect; backend wiring →
 - [ ] The platform-admin registry is a dedicated table with deny-all RLS and
       grant provenance; no profile flag, no tenant-role escalation path, no
       self-service grant.
-- [ ] Every privileged read path re-checks membership server-side at all
-      three layers (cosmetic UI guard, per-request endpoint check from the
+- [ ] Every privileged read path checks membership at the two server-side
+      enforcement layers (per-request endpoint check from the
       verified token, table-level RLS), via one shared membership function.
 - [ ] The console is read-only by default: telemetry, audit, and alert
       tables are privileged-lane write-only — an admin session cannot
@@ -263,9 +268,10 @@ Handoffs: <actions → admin-console-architect; backend wiring →
 - Telemetry lives in the OLTP store, so producers own retention: every
   snapshot job prunes its own history, or the monitoring tables become the
   platform's next storage problem.
-- Permissive CORS on admin endpoints is survivable ONLY because every
-  request is independently authenticated — never let "it's an internal
-  console" relax per-request auth.
+- Restrict cross-origin resource sharing (CORS) on admin endpoints to approved
+  origins and credential behavior, and authenticate and authorize every request.
+  Per-request authentication alone does not make credentialed cross-origin
+  reads safe.
 - Console sprawl is the everything-at-once anti-pattern: mixing operator
   panels with engineering artifacts (threat models, architecture docs)
   buries the health answer. Restraint is a design deliverable, not a style

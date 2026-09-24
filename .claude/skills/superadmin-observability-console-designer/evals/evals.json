@@ -10,7 +10,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Designs the read-security model BEFORE any panel: a dedicated platform-admin registry (separate from tenant roles, deny-all RLS, grant provenance, no self-service grant path) and the three-layer server-side re-check (cosmetic UI guard, per-request endpoint check from the verified token, table-level RLS) backed by one SECURITY-DEFINER membership function.",
+          "Designs the read-security model BEFORE any panel: a dedicated platform-admin registry (separate from tenant roles, deny-all RLS, grant provenance, no self-service grant path), two server-side enforcement checks (per-request endpoint check from the verified token and table-level RLS), and a cosmetic UI guard, backed by one SECURITY-DEFINER membership function.",
           "Produces a layered IA with one health answer first and grouped drill-downs with escalation badges, explicitly practicing restraint (a panel menu selected from, not filled).",
           "States read-only-by-default: telemetry/audit/alert tables are privileged-write-only, and cross-tenant actions route to admin-console-architect's mediated command path, not the read console.",
           "Types every panel {feed-owner, read-scope, wired?} and names the owning feed skill per panel (slo-reliability-architect, audit-log-architect, security-logging-alerting-architect, synthetic-monitoring-architect, usage-metering-and-cost-attribution-pipeline-designer, product-analytics-instrumenter) without re-explaining how any feed is produced.",
