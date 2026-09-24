@@ -1143,3 +1143,65 @@ at about **23:14 UTC**, after #202 merged, and this isolated worktree was
 created from that exact merge. Active-only effort is not instrumented.
 Local checks, independent audit, pull-request checks and the final observed
 first-work-to-merge interval will be recorded by the forecast pull request.
+
+## Checkpoint after pull request #207 — 2026-09-23
+
+Five requests merged after #202, in order #204, #203, #205, #206 and #207.
+All times are September 23, 2026, in Coordinated Universal Time (UTC).
+**ETA** means estimated time to complete a bounded package; **m** and **s**
+mean minutes and seconds. Endpoints are GitHub pull-request `mergedAt`
+events; preparation starts come from the request body or timing comment.
+The exact #207 merge is `69c055bdb862f305b511fcef5a0120a1af8918c4`.
+
+| Pull request and bounded package | Original ETA | First work (UTC) | Merge event (UTC) | Observed first-work-to-merge wall time |
+| --- | ---: | ---: | ---: | ---: |
+| [#204 — preceding five-merge forecast](https://github.com/ModernNomad-98/Project-Aegis/pull/204) | 1–2 active hours | Approximately 23:14 | 23:23:32 | About 9½ minutes |
+| [#203 — user paths and acceptance runbook](https://github.com/ModernNomad-98/Project-Aegis/pull/203) | 1–2 active hours | Approximately 23:06 | 23:24:23 | About 18 minutes |
+| [#205 — historical evidence reading](https://github.com/ModernNomad-98/Project-Aegis/pull/205) | 2–4 active hours | Approximately 23:20 | 23:28:26 | About 8½ minutes |
+| [#206 — documentation progress accounting and batching](https://github.com/ModernNomad-98/Project-Aegis/pull/206) | 2–4 combined active hours | Approximately 23:24 | 23:39:23 | About 15 minutes |
+| [#207 — nine-page full-checklist sample](https://github.com/ModernNomad-98/Project-Aegis/pull/207) | 2–4 active hours initially; 4–8 before page review | 23:35:27 | 23:56:59 | 21m32s |
+| **Five-merge cycle** | **No single combined active ETA** | **Approximately 23:06 earliest work** | **23:56:59 last merge** | **About 51 minutes overlapping span** |
+
+Four starts have minute-level precision, so their wall intervals and the
+cycle span are approximate. The five intervals overlap and include page
+selection, edits, independent review, GitHub checks and waits. Active-only
+labor and queue time were not separately instrumented; do not add these
+intervals as labor or extrapolate them to runtime work. Every package began
+with a selected-backlog estimate of **175–394 active hours**.
+
+At the exact #207 tree, **554 tracked Markdown files** exist. Pull requests
+#203 and #205 corrected specific pages; #206 reconciled the 553-file
+inventory and created a larger-batch workflow; #207 independently accepted
+nine corrected pages against the documentation checklist. The
+[nine-page evidence](../evidence/documentation/full-page-readability-sample-2026-09-23.md)
+records disjoint reviewer intervals and limits. The other pages are not
+implicitly accepted. None of the five PRs closed a non-documentation
+implementation, private-label, provider or selected-host gate.
+
+All five final PR heads passed Linux, Windows and protected-file checks before
+merge. Exact-main runs passed for #204
+[35933367116](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35933367116),
+#203 [35933438019](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35933438019),
+#205 [35933773787](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35933773787),
+and #206 [35934669429](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35934669429).
+The #207 [main run 35936082668](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/35936082668)
+also passed at the exact merge commit.
+
+The [every-item forecast](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-23-after-pull-request-207)
+reassesses all **14 selected** and **seven optional** rows. The
+non-documentation subtotal remains **95–194 active hours**. The
+documentation estimate is provisionally **55–200 active hours**, so the
+selected total is **150–394 active hours**. These are scope-based estimates,
+not a measured per-page throughput rate. The forecast states the residual
+model and uncertainty; the full all-options
+backlog remains unbounded. The separate owner decisions for #139, #197 and
+the offline holdout grant are not counted as delivered implementation.
+
+### Preparation and editing time for this checkpoint
+
+Previous and new checkpoint estimates are both **1–2 active hours**. The
+selected backlog estimate at start was **175–394 active hours**. Preparation
+began after the #207 merge at approximately **23:57 UTC** in an isolated
+worktree at that exact merge. The eventual forecast pull request will record
+its final first-work-to-merge wall interval; active-only effort remains
+separate and uninstrumented.
