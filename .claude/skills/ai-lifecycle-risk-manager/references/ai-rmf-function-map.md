@@ -1,6 +1,8 @@
 # AI RMF Function Map
 
-Verified on NIST/AIRC pages: AI RMF 1.0 released 2023-01-26, voluntary;
+Follow the owning [AI Lifecycle Risk Manager skill](../SKILL.md).
+Verified against the [NIST AI RMF page](https://www.nist.gov/itl/ai-risk-management-framework)
+on 2026-09-24: AI RMF 1.0 released 2023-01-26, voluntary;
 Core = four functions (govern, map, measure, manage); GOVERN is
 "a cross-cutting function that is infused throughout AI risk management";
 Generative AI Profile NIST-AI-600-1 (2024-07-26); NIST notes 1.0 is under
@@ -12,7 +14,7 @@ text in hand.**
 | Stage | MAP | MEASURE | MANAGE | GOVERN thread |
 | --- | --- | --- | --- | --- |
 | Design | intake via `ai-governance-risk-reviewer` (tier, affected parties); `ai-threat-modeler` for the technical surface; provider/model provenance via `supply-chain-security-reviewer` | eval plan + thresholds designed (`ai-evaluation-harness`) | treatment decisions into the design; no-go escalation path | named owner assigned; appetite check |
-| Development | context updates on scope change | evals run pre-merge; red-team cases | gaps fixed or accepted (named human, `human-approval-boundary`) | `ai-sdlc-operating-model` stage gates; `agent-authorization-matrix` authority |
+| Development | context updates on scope change | design and validate offline evaluation cases; run model/provider evals pre-merge only with separate execution authority | gaps fixed or accepted (named human, `human-approval-boundary`) | `ai-sdlc-operating-model` stage gates; `agent-authorization-matrix` authority |
 | Deployment | final categorization; disclosure posture | regression gate on release (`release-readiness-reviewer` evidence) | rollback/kill-switch wiring (`agent-containment-reviewer`, `rollback-runbook-author`) | deploy authority per matrix |
 | Operation | drift in context (new users, new data) re-maps | behavior/drift monitoring (`observability-operator`), eval re-runs on model/provider change | incidents via `incident-response-runbook`; containment authority severs credentials | periodic program review; register review cadence |
 | Decommission | dependent-system map | final-state verification | model retirement; data/memory disposition (`agent-memory-governance`); credential revocation | sign-off by system owner |

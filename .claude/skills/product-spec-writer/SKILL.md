@@ -5,6 +5,11 @@ description: 'Write a product specification for a feature — the problem and th
 
 # Product Spec Writer
 
+**Reading key:** A product requirements document (PRD) is a product spec;
+quality assurance (QA) checks behavior against it; user interface (UI)
+means the screens and controls people use. An architecture decision record
+(ADR) records a technical choice and its consequences.
+
 ## Purpose
 
 A product spec is the contract between "we agreed on the problem" and

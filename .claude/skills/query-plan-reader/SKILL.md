@@ -6,10 +6,18 @@ disable-model-invocation: true
 
 # Query Plan Reader
 
+**Reading key:** `EXPLAIN` shows a database's planned query operations;
+`EXPLAIN ANALYZE` also executes the query to capture actual runtime data
+where supported, so it needs a safe environment and authority. An object
+relational mapper (ORM) builds queries from code; online analytical
+processing (OLAP) describes aggregate-heavy analysis workloads.
+
 ## Purpose
 
-A slow query is interrogated, not guessed at: the execution plan says
-exactly where the time goes — the scan that reads ten million rows to
+A slow query is interrogated, not guessed at: an estimated execution plan
+shows the planner's expected work; a plan captured with actual runtime
+statistics helps locate measured time and row-count divergence. It may reveal
+the scan that reads ten million rows to
 return twelve, the join strategy chosen off a row estimate that is wrong
 by four orders of magnitude, the sort spilling to disk — and almost every
 "add an index?" debate dissolves once the plan is on the table. This

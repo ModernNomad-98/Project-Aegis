@@ -60,12 +60,12 @@ governance pack rather than restating it.
 
 ## Workflow
 
-1. **Classify the risk tier.** Score impact by: who is affected and how many,
+1. **Set an internal impact tier.** Score impact by: who is affected and how many,
    reversibility of a wrong output, degree of autonomy, sensitivity of data,
-   and effect on people's rights/access/safety. Land on a tier (e.g.
-   minimal / limited / high / unacceptable) using
+   and effect on people's rights/access/safety. Use the internal bands in
    [references/ai-governance-framework.md](references/ai-governance-framework.md).
-   No feature purpose/impact available → Stop Conditions.
+   This heuristic does not classify the system under the EU AI Act; route
+   that legal determination to counsel. No purpose/impact → Stop Conditions.
 2. **Match oversight to tier.** Higher tiers require stronger human oversight:
    advisory-only (human decides) → human-in-the-loop (human approves each
    action) → human-on-the-loop (human monitors, can intervene). Verify the

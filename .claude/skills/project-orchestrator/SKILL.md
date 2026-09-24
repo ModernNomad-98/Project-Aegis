@@ -60,14 +60,15 @@ skill fills** (`ai-sdlc-operating-model` disclaims in-flight navigation).
    STATE SNAPSHOT entry — the file is append-only, so the newest snapshot IS
    the current state), the approved brief + MVP scope, decision log, and open
    questions. This file is the map coordinate; read it before anything else.
-   Absent = stage zero.
+   If absent, infer stage from the repo; absence alone is not stage zero.
 2. **The user's repo, to corroborate the state file — and its ROLE.** This is
    the user's PRODUCT/consumer repo, not the Project Aegis skills library:
-   detect role from evidence — a product carries app/source/spec artifacts; the
-   library is a `.claude/skills/*/SKILL.md` corpus with AGENTS.md governance. A
-   fresh product repo that merely CONTAINS copied `.claude` skills is STILL the
-   product repo — never call it "the skills library itself". Then read the
-   landmark files that reveal the stage: a spec doc, a domain/architecture doc or
+   detect role from evidence. Source-library role needs README `# Project
+   Aegis`, `docs/skills-catalog.md`, `scripts/validate-skills.py`, and
+   `artifacts/audits/skill-contract-audit-baseline.json`. Copied skills,
+   AGENTS.md or CLAUDE.md do not prove source role. If genuinely ambiguous,
+   ask one role/location question and write nothing. Read product files
+   that reveal stage: a spec doc, a domain/architecture doc or
    ADRs, application source, migrations, tests, CI, deploy/IaC. No state file and
    no repo = discovery. An approved spec whose **four Stage 2 owner DECISION rows
    are all recorded** with no code = ready for architecture; an approved spec
@@ -92,8 +93,8 @@ are its LATEST dated STATE SNAPSHOT entry (latest snapshot wins; there is no
 mutable header field to trust or update) — then inspect the repo (input 2).
 Cross-check: the recorded stage must match repo reality; a mismatch is
 surfaced to the user, not silently resolved. Output a one-line "you are here"
-in plain language. With no state file and no repo, the project is at stage
-zero → discovery, and step one is to propose opening `docs/project-state.md`
+in plain language. No repo, or a zero-commit product repo without app files
+or state, means stage zero → discovery. Propose opening `docs/project-state.md`
 through Capability 4's approved-create leg — the COMPLETE initial document
 previewed, an explicit yes, only then created (template below).
 

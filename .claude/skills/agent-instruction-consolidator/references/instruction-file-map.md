@@ -1,8 +1,11 @@
 # Agent Instruction File Map
 
-Supporting detail for `agent-instruction-consolidator`. Locations, owning
-tools, scope, and precedence semantics. Verify against current tool docs when
-something looks off — tools change these conventions.
+Supporting detail for the owning [Agent Instruction Consolidator](../SKILL.md).
+Locations, owning tools, scope, and precedence semantics are examples to
+verify against current tool documentation before changing instructions;
+tool conventions change. `AGENTS.md` is a repository instruction file used
+by some coding agents; `applyTo` is Copilot's file-pattern scope field;
+`.mdc` is a Cursor rule-file format.
 
 ## Known instruction files
 

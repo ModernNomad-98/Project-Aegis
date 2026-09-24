@@ -5,6 +5,12 @@ description: Design the profiling methodology that answers "where does the time 
 
 # Profiling Methodology Designer
 
+**Reading key:** CPU is the processor; input/output (I/O) is time spent
+reading, writing or waiting on external resources; just-in-time (JIT)
+compilation turns code into machine instructions during execution. The
+99th-percentile (p99) latency is the time at or below which 99 percent of
+measured requests complete.
+
 ## Purpose
 
 Guessing is the dominant performance methodology in the wild: someone

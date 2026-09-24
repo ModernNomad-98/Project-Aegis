@@ -1,6 +1,6 @@
 ---
 name: prioritization-frame-picker
-description: Pick and apply the RIGHT prioritization framework for a decision instead of defaulting to one — match the situation to a frame (RICE, WSJF/cost-of-delay, value-vs-effort/ICE, Kano, opportunity scoring, MoSCoW), surface the inputs each frame needs and how reliable they are, guard against false rigor (a precise RICE score built from guessed numbers), handle must-do and incomparable items OUTSIDE the score, and produce a ranked list with the frame's assumptions and sensitivity made explicit. Owns the RANKING method and its honest application; sequencing the ranked set over time is roadmap-under-uncertainty-planner's. Use when a backlog needs ranking, when stakeholders argue about priority, when a scoring model is being gamed or over-trusted, or when choosing a prioritization method. Do NOT use to sequence/communicate a roadmap over horizons (roadmap-under-uncertainty-planner), to spec one feature (product-spec-writer), or to elicit the underlying requirements (requirements-gathering-facilitator).
+description: Pick a prioritization framework for a decision — match the situation to a frame (RICE, WSJF/cost-of-delay, value-vs-effort/ICE, Kano, opportunity scoring, MoSCoW), surface its inputs and reliability, guard against false rigor, handle must-do and incomparable items outside the score, and produce a ranked list or honest categories/groups with assumptions and applicable uncertainty explicit. Owns the prioritization method; sequencing over time is roadmap-under-uncertainty-planner's. Use when a backlog needs ranking, stakeholders argue about priority, a scoring model is gamed or over-trusted, or a method must be chosen. Do NOT use to sequence a roadmap (roadmap-under-uncertainty-planner), spec one feature (product-spec-writer), or elicit requirements (requirements-gathering-facilitator).
 ---
 
 # Prioritization Frame Picker
@@ -79,19 +79,22 @@ set over horizons is `roadmap-under-uncertainty-planner`'s.
    needs and mark it evidence or guess. Use the confidence factor (RICE's
    confidence, or an explicit discount) to deflate scores built on
    guesses — that is what it's for.
-4. **Refuse false rigor.** Score in ranges or buckets (t-shirt sizes),
-   not false decimals; run a sensitivity check (does the ranking hold if
-   a soft input is off by 2×?). If the order flips on a guess, the
-   ranking is a coin flip wearing a spreadsheet.
+4. **Refuse false rigor.** Where the frame uses numeric inputs, score in
+   ranges or buckets (t-shirt sizes), not false decimals; test whether
+   the order holds if a soft input is off by 2×. For category frames such
+   as Kano or MoSCoW, record the classification evidence and uncertain
+   boundaries instead of inventing a numeric sensitivity calculation.
 5. **Handle items the formula can't.** Pull must-dos (compliance,
    security, reliability) into a protected lane rather than letting a low
    value score bury them. Flag strategic bets that score poorly but
    matter, and genuinely incomparable items, for explicit human judgment
    — the frame informs, it doesn't overrule.
-6. **Produce the ranking honestly.** The ordered list, the inputs and
-   their quality, the confidence, the sensitivity result, and the items
-   handled outside the frame. Make the assumptions visible so the
-   argument is about them, not about the number.
+6. **Produce the result honestly.** Return a ranked list when the chosen
+   frame supports one. MoSCoW returns ordered groups with within-group
+   ties; Kano returns satisfaction categories without inherent priority.
+   If a total order is required, use a second suitable frame or ask the
+   human to decide. Include inputs and their quality, confidence,
+   the applicable sensitivity result, and items handled outside the frame.
 7. **Hand off.** State that sequencing the ranked set over horizons —
    with dependencies, capacity, and re-planning — is
    `roadmap-under-uncertainty-planner`'s job.
@@ -106,9 +109,9 @@ sensitivity-check method:
 PRIORITIZATION — <what's being ranked>, toward <outcome>
 Frame:        <RICE | WSJF | value/effort | ICE | Kano | opportunity | MoSCoW> — why it fits; limits
 Inputs:       <inputs the frame needs, each marked [evidence] | [guess]>
-Ranking:      <ordered list with scores in ranges/buckets, not false decimals>
+Result:       <ranked list, MoSCoW ordered groups, or Kano categories without priority>
 Confidence:   <how much the input quality supports the order>
-Sensitivity:  <does the order hold if a soft input is off 2×? which pairs flip?>
+Sensitivity:  <numeric-input order test, or category-boundary uncertainty>
 Outside the frame:
   Must-do lane: <compliance/security/keep-lights-on — protected, not value-scored>
   Strategic/incomparable: <flagged for human judgment>
@@ -123,12 +126,12 @@ Handoff:      sequencing over time → roadmap-under-uncertainty-planner
       stated — not defaulted.
 - [ ] Every input is marked evidence or guess; guesses discount the
       score via a confidence factor.
-- [ ] Scores are ranges/buckets, not false decimals; a sensitivity check
-      is run and flips are reported.
+- [ ] Numeric scores are ranges/buckets, not false decimals; applicable
+      sensitivity or category-boundary uncertainty is reported.
 - [ ] Must-dos are in a protected lane; strategic/incomparable items are
       flagged for human judgment, not buried by the formula.
-- [ ] The ranking's assumptions are explicit so debate targets them, not
-      the number.
+- [ ] Assumptions and ties are explicit; Kano categories are not treated
+      as a priority order or a total order.
 - [ ] Sequencing over time is handed to `roadmap-under-uncertainty-planner`.
 
 ## Gotchas

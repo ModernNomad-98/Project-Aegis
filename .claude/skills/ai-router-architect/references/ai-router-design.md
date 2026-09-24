@@ -1,6 +1,6 @@
 # AI router / model-gateway design
 
-Detail for `ai-router-architect`. Manual-only: wires live providers and
+Detail for the owning [AI Router Architect](../SKILL.md). Manual-only: wires live providers and
 credentials.
 
 ## Why centralize
@@ -16,8 +16,10 @@ logic stay OUT (compose the owning skills) or the router becomes a god object.
 
 - Keys server-side only, injected from a secret store at runtime; never in the
   client bundle, never in a `VITE_`/`NEXT_PUBLIC_`/other public-prefixed var.
-- Verify with a client-bundle-absence check (grep the built `dist/` for the
-  key value AND pattern) — compose `secrets-identity-hardener`.
+- Verify client-bundle absence with a synthetic canary or a non-secret key
+  fingerprint plus a scan for public-prefixed variable names. Never put a
+  real key value in a search command, log, test artifact or report; compose
+  `secrets-identity-hardener`.
 - Per-provider key with least-privilege scope; rotation path documented.
 - If the browser must stream, proxy through the server; do not hand the key to
   the client.
@@ -69,7 +71,9 @@ content — metadata only. Implementation → `observability-operator`.
 - Runtime config, NO deploy required (a deploy-gated switch is useless mid-
   incident).
 - Trigger: manual or burn-rate-automatic (compose `ai-cost-guardrail-designer`).
-- Confirmed incident → `incident-response-runbook`.
+- Confirmed live incident → the authorized human incident owner and current
+  approved response runbook. Use `incident-response-runbook` to author or
+  review a response document, not to claim live authority.
 
 ## Idempotency & side effects
 

@@ -1,6 +1,7 @@
 # Stage-Gate Map — default composition table
 
-The default lifecycle the operating model starts from. Every row composes an
+The default lifecycle for the owning [AI SDLC Operating Model](../SKILL.md).
+Every row composes an
 existing skill by name; the model document cites this table and adapts rows to
 the repo — it never copies skill procedures into itself.
 
@@ -13,7 +14,7 @@ the repo — it never copies skill procedures into itself.
 | Implement | scope + approvals in place | diff matches declared intent; only intended files staged | agent | `reviewable-diff-discipline` (with `docs-first-implementer`, `tdd-engineer` as the work demands) | scoped diff; commit trail |
 | Validate | diff complete | change-class validation floor met with real outputs | agent | class floor from `change-classification-gate`; Phase 5 QA skills as applicable | command outputs, CI runs |
 | Review | validation green | human/agent review recorded; security lens where class requires | human (agent may pre-review) | `code-reviewer` / `security-pr-reviewer` | review record on the PR |
-| Merge | review + checks green | merged BY THE AUTHORITY HOLDER — per matrix, a named human for protected branches; agents open PRs and stop; agents never arm auto-merge | human | `agent-authorization-matrix` | merge event traceable to a human decision |
+| Merge | review + checks green | merge by the authority holder under the applicable matrix and current approval register; absent a scoped grant, obtain the named human decision | human, or agent within a recorded merge grant | `agent-authorization-matrix` | merge event traceable to the authority and approval record |
 | Close | merged (or work stopped) | closeout delivered incl. intentionally-not-done | agent | `ai-closeout-reporter` | closeout report |
 | Learn | closeout delivered | memory updated per write rules; periodic compliance spot-check scheduled | agent proposes; human approves memory/policy edits | `agent-memory-governance`, `agent-governance-audit` | governed memory entries; audit reports |
 
