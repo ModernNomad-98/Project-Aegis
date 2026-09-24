@@ -6,6 +6,11 @@ disable-model-invocation: true
 
 # Prompt Injection Defender
 
+**Reading key:** OWASP is the Open Worldwide Application Security Project;
+LLM means large language model; RAG means retrieval-augmented generation;
+API means application programming interface; XML means Extensible Markup
+Language. LLM01 is OWASP's prompt-injection category.
+
 ## Purpose
 
 Design the defense-in-depth against prompt injection — the LLM01 risk where

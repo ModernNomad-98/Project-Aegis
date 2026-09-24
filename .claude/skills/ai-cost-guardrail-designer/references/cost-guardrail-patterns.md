@@ -1,6 +1,6 @@
 # AI cost & consumption guardrail patterns
 
-Detail for `ai-cost-guardrail-designer`. OWASP LLM10 (Unbounded Consumption —
+Detail for the owning [AI Cost Guardrail Designer](../SKILL.md). OWASP LLM10 (Unbounded Consumption —
 DoS and denial-of-wallet), 2025.
 
 ## Layered limit catalog
@@ -67,7 +67,8 @@ The cheapest attacker action that maximizes your spend is the thing to bound.
 At a limit, fail SAFE (bounded), never open (unbounded):
 
 - Serve a cached/previous answer.
-- Downgrade to a smaller/cheaper model.
+- Downgrade to a smaller/cheaper model only if the call fits the remaining
+  reserved budget and retains the required quality and safety controls.
 - Queue with backpressure and a user-visible "busy, try later".
 - Refuse with a clear message and a retry-after.
 - NEVER "on budget-check error, allow" — that converts a bug into unlimited
@@ -84,8 +85,8 @@ denial-of-wallet vector (CWE-636, "Not Failing Securely").
 - The kill switch inherits the rule: a broken budget-state check ENGAGES the
   switch, it does not disengage it.
 - "Never block a paying customer" is not a reason to fail open — degrade
-  (cached / smaller-model / retry-after) instead, which bounds spend without
-  allowing unbounded calls.
+  (cached / a smaller-model call that fits the remaining reservation /
+  retry-after) instead, which bounds spend without allowing unbounded calls.
 - The general fail-closed / error-path discipline is
   `error-handling-security-reviewer`'s (OWASP A10); this is its AI-spend-
   specific application.
@@ -96,20 +97,19 @@ denial-of-wallet vector (CWE-636, "Not Failing Securely").
 - Trigger: manual, or automatic on a burn-rate threshold.
 - Must be fast and not require a deploy. Compose `ai-router-architect` /
   `observability-operator` for the plumbing; confirmed abuse →
-  `incident-response-runbook`.
+  the authorized human incident owner and current approved response runbook.
 
 ## Provider-side backstop
 
 Application controls are not the last line of defense — the provider account
 itself needs a backstop:
 
-- **Hard spend cap** — a ceiling on the provider account that STOPS inference,
-  independent of your application's budgets.
-- **Billing-anomaly / spike alerts** — fire before a large invoice lands, on
-  the account's own spend curve.
-- Most major LLM providers offer both, but they are typically OPTIONAL and OFF
-  BY DEFAULT. An org that set up its account once and never revisited billing
-  is exposed by default — the design must explicitly VERIFY they are on.
+- **Account controls** — verify the chosen provider's current spend-limit,
+  quota and alert capabilities and their enforcement semantics. A warning
+  threshold or delayed billing alert is not a hard stop.
+- **Application bound** — retain a fail-closed reservation and call limit
+  even if a provider advertises a hard account cap; verify any cap with a
+  safe test before relying on it.
 - Honest scope: these are configuration actions the skill FLAGS as
   verify-at-design-time, not architecture the skill builds.
 

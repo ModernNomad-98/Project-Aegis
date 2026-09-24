@@ -5,6 +5,14 @@ description: 'Design the INSTRUMENTATION for product analytics — where/how the
 
 # Product Analytics Instrumenter
 
+**Reading key:** Personally identifiable information (PII) can identify a
+person; quality assurance (QA) checks that tracking works; a software
+development kit (SDK) is a provider's client library; user interface (UI)
+means what a user interacts with; an internet protocol (IP) address can be
+personal data. GDPR and CCPA refer to European Union and California privacy
+laws; Do Not Track (DNT) is a browser preference whose handling must be
+checked against the product's applicable policy and law.
+
 ## Purpose
 
 A perfect tracking plan produces zero insight if the events don't fire,

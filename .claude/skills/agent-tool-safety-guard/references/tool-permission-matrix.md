@@ -1,6 +1,6 @@
 # Agent tool permission matrix & abuse catalog
 
-Detail for `agent-tool-safety-guard`. OWASP LLM06 (Excessive Agency), 2025;
+Detail for the owning [Agent Tool Safety Guard](../SKILL.md). OWASP LLM06 (Excessive Agency), 2025;
 extended for the OWASP Agentic Top 10 (2026): ASI02 (Tool Misuse and
 Exploitation) and the tool-side slice of ASI05 (Unexpected Code Execution).
 
@@ -83,7 +83,9 @@ which tool inputs, and place validation/approval at the harmful edges.
   `ai-cost-guardrail-designer` / `ai-router-architect` for the switch plumbing).
 - Log every tool call: tool, validated arguments, caller identity, outcome,
   cost (compose `observability-operator`); redact sensitive arguments.
-- Confirmed abuse → `incident-response-runbook`.
+- Confirmed live abuse → the authorized human incident owner and the current
+  approved response runbook. The `incident-response-runbook` skill can help
+  author or review a runbook; it is not a live response authority.
 
 ## Tool misuse & code-execution tools (ASI02 / ASI05 extension)
 

@@ -1,18 +1,21 @@
 # AI governance & risk framework
 
-Use this `ai-governance-risk-reviewer` reference to tier a feature's risk, set
+Use this [AI Governance Risk Reviewer](../SKILL.md) reference to tier a feature's risk, set
 human oversight, and map applicable obligations to actual controls. The
 companion method is the National Institute of Standards and Technology (NIST)
 Artificial Intelligence Risk Management Framework (AI RMF) 1.0, with its
-GOVERN/MAP/MEASURE/MANAGE functions. Regulatory tiering language mirrors the
-European Union (EU) AI Act risk tiers. **PII** means personally identifiable
+GOVERN/MAP/MEASURE/MANAGE functions. The tier rubric below is an internal
+impact heuristic, not a European Union (EU) AI Act classification. Actual
+obligations depend on the [current regulation](https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng),
+the system's use and role, and legal review. **PII** means personally identifiable
 information; **HITL** and **HOTL** mean human-in-the-loop and human-on-the-loop
 oversight, respectively. This is a mapping scaffold, NOT legal advice — flag
 items for counsel.
 
 ## Risk-tiering rubric
 
-Score the feature on each axis, then take the highest:
+Score the feature on each axis, then use the highest impact to select an
+internal review level. This does not determine a legal risk category.
 
 | Axis | Low → High |
 |---|---|
@@ -23,22 +26,24 @@ Score the feature on each axis, then take the highest:
 | Data sensitivity | public → business → personal/sensitive/special-category |
 | Rights/safety | convenience → access/opportunity → safety/legal rights |
 
-Tier bands (mirrors EU AI Act framing):
+Internal review bands:
 - **Minimal** — low on all axes; standard controls suffice.
-- **Limited** — user-facing; transparency obligations (tell users it's AI).
-- **High** — affects rights/access/safety, or autonomous with real
+- **Elevated** — meaningful user exposure or uncertainty; review applicable
+  disclosure and oversight duties with counsel rather than assuming every
+  user-facing system shares one legal category.
+- **High impact** — affects rights/access/safety, or autonomous with real
   consequence; needs strong oversight, documentation, evaluation, accountability.
-- **Unacceptable** — prohibited practice (e.g. manipulative or rights-violating
-  use). Escalate; do not bless.
+- **Potentially prohibited** — credible prohibited-practice concern. Escalate
+  for legal review; do not approve through this rubric.
 
 ## Oversight-to-tier matrix
 
 | Tier | Minimum oversight |
 |---|---|
 | Minimal | advisory; monitoring |
-| Limited | advisory + AI disclosure to users |
-| High | human-in-the-loop OR human-on-the-loop with real intervention capability, accountable owner, incident path |
-| Unacceptable | not permitted |
+| Elevated | advisory + applicable disclosure review |
+| High impact | human-in-the-loop OR human-on-the-loop with real intervention capability, accountable owner, incident path |
+| Potentially prohibited | stop for legal review |
 
 Oversight is real only if the human sees the decision, has the information and
 time to intervene, and is not rubber-stamping (cross-ref

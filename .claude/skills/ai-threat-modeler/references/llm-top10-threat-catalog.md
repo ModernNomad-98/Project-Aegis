@@ -1,6 +1,7 @@
 # OWASP LLM Top 10 (2025) — threat catalog for AI threat modeling
 
-Per-category threat shapes and abuse-case seeds. Use during Workflow step 4.
+Per-category threat shapes and abuse-case seeds for the owning
+[AI Threat Modeler skill](../SKILL.md). Use during its Workflow step 4.
 Source framework: OWASP Top 10 for LLM Applications (2025), LLM01–LLM10.
 Anchoring decision: reconciliation doc D6.
 

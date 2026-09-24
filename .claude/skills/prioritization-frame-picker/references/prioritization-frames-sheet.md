@@ -19,7 +19,7 @@ automatic priority over required work.
 | Value vs Effort / ICE | Fast, coarse first cut | Value, effort (+ confidence) | Too coarse for close calls |
 | Kano | Classify satisfaction types | User research on features | Not a total order; classification only |
 | Opportunity scoring | Find under-served needs | Importance vs satisfaction | Needs survey data |
-| MoSCoW | Release scoping | Must/Should/Could/Won't judgment | Everything becomes "Must" without discipline |
+| MoSCoW | Release scoping | Must/Should/Could/Won't judgment | Ordered groups, not a total order; everything becomes "Must" without discipline |
 
 Match to the decision. The wrong frame applied rigorously beats nothing —
 but the right frame applied roughly beats the wrong frame applied
@@ -35,14 +35,19 @@ precisely.
 
 ## Refusing false rigor
 
-- Score in **buckets** (S/M/L, or 1/3/5/8) not false decimals.
+- Where the frame uses numbers, score in **buckets** (S/M/L, or 1/3/5/8)
+  rather than false decimals. MoSCoW yields ordered groups with ties; Kano
+  classifies satisfaction without an inherent priority order. Do not invent
+  scores or within-group rank.
 - The output order is only as precise as the softest input.
 - Present ranges where inputs are uncertain, not point values.
 
 ## Sensitivity check
 
-1. For each soft input, vary it across its plausible range (e.g. ±2×).
-2. Re-rank. Note which pairs flip order.
+1. For numeric frames, vary each soft input across its plausible range
+   (e.g. ±2×). For category frames, inspect uncertain group boundaries.
+2. Re-rank numeric results and note pairs that flip; keep category ties
+   visible, or use a second frame or human choice for a total order.
 3. If the top ranking is stable → trust it. If it flips on a guess →
    report "too close to call on current evidence", not a false order.
 
@@ -63,6 +68,7 @@ The frame informs; it does not overrule required or strategic work.
 
 ## Handoff
 
-The ranked, assumption-explicit list goes to
+The ranked list, MoSCoW groups, or Kano categories, with assumptions and
+ties explicit, go to
 `roadmap-under-uncertainty-planner` for sequencing over horizons with
 dependencies, capacity, and re-planning.

@@ -5,6 +5,11 @@ description: Design the test-automation architecture that implements a QA strate
 
 # QA Automation Architect
 
+**Reading key:** Quality assurance (QA) is the testing discipline;
+continuous integration (CI) runs automated checks; end-to-end (E2E)
+tests exercise a whole user journey; a database (DB) stores application
+data; a pull request (PR) proposes a repository change.
+
 ## Purpose
 
 Produce the automation blueprint that turns layer decisions into a working,
@@ -70,7 +75,10 @@ engineer skills.
 6. **Place suites in CI:** PR / merge / nightly tiers with runtime budgets,
    sharding plan, cache strategy, retry policy (retries mask flakes —
    bounded, logged, and always fed to `flaky-test-detective`), and the
-   quarantine mechanism governed by `regression-suite-curator`.
+   quarantine mechanism governed by `regression-suite-curator`. If a merge
+   deploys automatically, any required release gate runs before merge;
+   post-merge checks verify the deployment rather than decide whether to
+   permit it.
 7. **Write the migration plan:** ordered, small steps from current state to
    the blueprint, each independently shippable and verifiable.
 

@@ -1,5 +1,11 @@
 # Memory Governance — rule sets, entry format, live checks
 
+Follow the owning [Agent Memory Governance skill](../SKILL.md) and its
+manual-only boundary. A pull request (PR) proposes a repository change;
+personally identifiable information (PII) can identify a person. This page
+is a review aid: memory changes require the human approval described by
+the owning skill.
+
 ## WRITE rules (what may enter memory)
 
 1. Confirmed durable facts only. Test: "can a single routine command make this

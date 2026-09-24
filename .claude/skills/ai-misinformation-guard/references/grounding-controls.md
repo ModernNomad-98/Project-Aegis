@@ -1,6 +1,6 @@
 # Grounding & anti-misinformation controls
 
-Detail for `ai-misinformation-guard`. OWASP LLM09 (Misinformation), 2025.
+Detail for the owning [AI Misinformation Guard](../SKILL.md). OWASP LLM09 (Misinformation), 2025.
 Truth is a separate axis from shape (`structured-output-validator`) and safety
 (`llm-output-safety-reviewer`).
 
@@ -58,8 +58,10 @@ creative tasks.
 - Features that recommend dependencies, APIs, commands, or config can invent
   names that don't exist — and models invent the SAME plausible names
   repeatedly, which attackers pre-register (slopsquatting).
-- Verify every recommended package/API/command exists against a registry/
-  allowlist BEFORE surfacing or (worse) installing it.
+- Before recommending or installing a package, API, or command, verify its
+  identity, ownership and provenance against an approved allowlist and an
+  authoritative source. Registry existence alone is insufficient because
+  an attacker may pre-register the hallucinated name.
 - Route install-time trust to `supply-chain-security-reviewer`.
 
 ## Overreliance-aware UX

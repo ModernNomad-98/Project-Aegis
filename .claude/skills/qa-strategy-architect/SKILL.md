@@ -5,6 +5,11 @@ description: Define the product- or repo-level QA strategy — a risk inventory 
 
 # QA Strategy Architect
 
+**Reading key:** Quality assurance (QA) is the testing discipline;
+end-to-end (E2E) tests exercise a whole user journey; continuous
+integration (CI) runs automated checks; a pull request (PR) proposes a
+repository change; a database (DB) stores application data.
+
 ## Purpose
 
 Produce the governing QA strategy for a product or repository: what risks
@@ -70,7 +75,8 @@ coverage mapping audits against it, and automation architecture implements it.
 6. **Place the CI gates:** which layers run on PR, on merge, nightly; what is
    allowed to be non-blocking and why; flake policy pointer
    (`flaky-test-detective` owns diagnosis, `regression-suite-curator` owns
-   suite membership).
+   suite membership). If merging automatically deploys, put every required
+   release gate before merge; use post-merge checks to verify deployment.
 7. **Name ownership and exit criteria:** who owns each layer, who fixes red,
    and the strategy's own review date.
 
