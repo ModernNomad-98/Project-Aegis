@@ -5,6 +5,11 @@ description: 'Design the async job/worker EXECUTION model for a multi-tenant Saa
 
 # Background Job Orchestration Architect
 
+**Reading key:** SaaS means software as a service; a dead-letter queue (DLQ)
+holds jobs that exhausted safe retries. CDC means change data capture; SLA
+means service-level agreement; DST means daylight saving time; API means
+application programming interface; CPU means central processing unit.
+
 ## Purpose
 
 Work that outlives a request — sending a batch of emails, generating an
@@ -76,8 +81,10 @@ transport belongs to `streaming-event-architect`.
      and the classifier separating retryable (transient) from poison (never
      succeeds) — retrying poison forever is a self-inflicted outage.
    - **Visibility timeout / lease**: how long a picked-up job is invisible
-     before it is redelivered, sized above the job's real runtime so a slow
-     job is not double-run by a premature redelivery.
+     before it is redelivered. Bound execution below a fixed lease or renew
+     the lease with a worker heartbeat for variable-duration jobs; detect
+     lost workers to reduce premature redelivery. Renewal can still fail or
+     arrive late, so keep the effect idempotent under duplicate execution.
    - **Dead-letter queue**: where a job goes after max attempts, WHO owns
      draining it, and the alert when it fills — a DLQ without an owner is
      where jobs die silently.
@@ -115,7 +122,7 @@ BACKGROUND JOB EXECUTION DESIGN — <system/domain>
 Job catalog: <job — trigger — duration — side effects — idempotent? — priority>
 Per-job execution contract:
   <job>: idempotency=<key/guard> retry=<attempts, backoff, retryable-vs-poison>
-  visibility-timeout=<lease > runtime> DLQ=<dest, owner, drain SLA, alert>
+  visibility-timeout=<bounded runtime + lease, or renewable lease + heartbeat/failure rule> DLQ=<dest, owner, drain SLA, alert>
   resumability=<checkpoint granularity | n/a>
 Fairness:       <per-tenant queues / concurrency caps / priority lanes; how a
   tenant flood is bounded so others keep flowing>
@@ -135,8 +142,9 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       effects have a guard — redelivery cannot double-apply.
 - [ ] Every job has retry attempts, backoff with jitter, and a
       retryable-vs-poison classifier — nothing retries forever.
-- [ ] Every job has a visibility timeout sized above its real runtime, and a
-      DLQ with a named owner, drain SLA, and fill alert.
+- [ ] Every job has a visibility timeout above a bounded runtime or safe
+      lease renewal with heartbeat/failure handling; its DLQ has a named
+      owner, drain SLA, and fill alert.
 - [ ] Long jobs checkpoint and resume; a crash mid-job does not restart from
       zero or double-apply completed units.
 - [ ] Per-tenant fairness is designed: one tenant's flood is bounded and

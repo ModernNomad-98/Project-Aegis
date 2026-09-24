@@ -1,5 +1,13 @@
 # Behavioral Eval Runner — WP-2B-2 Scenario A Grading Stack: sanitized implementation summary
 
+> **Current reading, checked 2026-09-24:** This is the historical offline
+> grading summary for Behavioral Eval Runner (BER) work package (WP) 2B-2.
+> Pull requests (PRs) #85 and #86 later delivered its bounded offline stack.
+> The D9, `BER-DEC-008` and provider-adapter status statements below describe
+> that original revision; use the [active BER backlog](../roadmaps/behavioral-eval-runner-backlog.md)
+> for current calibration and authority gates. `BER-DEC` codes identify dated
+> runner decisions, not permission for a provider call.
+
 **Scope: the authorized NON-LIVE Scenario A Grading Stack — deterministic graders over
 recorded synthetic evidence, the non-live semantic-judge scaffold, and the
 deterministic/mock calibration harness. ZERO runner-generated, grading-stack-generated, or

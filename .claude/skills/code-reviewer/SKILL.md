@@ -5,6 +5,12 @@ description: 'Review an ACTUAL diff — a PR, branch delta, or staged/working ch
 
 # Code Reviewer
 
+**Reading key:** PR means pull request, a proposed code change; CI means
+continuous integration; RLS means row-level security; authz means
+authorization; I/O means input and output.
+An N+1 query pattern means one list query triggers an additional database
+query for each returned item.
+
 ## Purpose
 
 Produce a review a maintainer can act on: findings ordered by severity, each

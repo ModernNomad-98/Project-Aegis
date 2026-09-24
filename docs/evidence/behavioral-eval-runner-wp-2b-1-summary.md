@@ -1,5 +1,13 @@
 # Behavioral Eval Runner — WP-2B-1 offline runner core: sanitized implementation summary
 
+> **Current reading, checked 2026-09-24:** This is the historical delivery
+> summary for Behavioral Eval Runner (BER) work package (WP) 2B-1. Pull
+> request (PR) #83 later merged this offline core. Statements below about its
+> next authorized step describe the original checkpoint. Use the
+> [active BER backlog](../roadmaps/behavioral-eval-runner-backlog.md) for the
+> current phase and gates. `BER-DEC` codes identify dated runner decisions;
+> they do not grant new work by appearing here.
+
 **Scope: the authorized non-live Behavioral Eval Runner control plane and minimum
 guardrails. NO live model/provider dispatch, NO live Claude Code session, NO Scenario A,
 NO generic eval execution, NO graders (WP-2B-2), NO semantic judge (WP-2B-3).**

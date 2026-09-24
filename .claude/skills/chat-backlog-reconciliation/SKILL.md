@@ -5,6 +5,10 @@ description: 'On a cadence, extract decisions, bugs, and backlog items that exis
 
 # Chat Backlog Reconciliation
 
+**Reading key:** AI means artificial intelligence; PR means pull request, a
+proposed repository change; ADR means architecture decision record. SHA means
+Secure Hash Algorithm; a recorded SHA identifies the exact source revision.
+
 ## Purpose
 
 Move truth out of chat and prove it against the repo. AI-assisted work

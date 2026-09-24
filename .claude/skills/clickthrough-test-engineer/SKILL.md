@@ -6,6 +6,9 @@ disable-model-invocation: true
 
 # Clickthrough Test Engineer
 
+**Reading key:** UI means user interface; URL means web address; PR means pull
+request, a proposed repository change; a11y is shorthand for accessibility.
+
 ## Purpose
 
 Perform a disciplined interactive walkthrough of a running application and

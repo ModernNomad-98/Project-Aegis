@@ -1,5 +1,13 @@
 # CP-WP-001 — reconciliation and review evidence
 
+> **Current reading, checked 2026-09-24:** This is historical review evidence
+> for control-plane (CP) work package (WP) 001. Pull request (PR) #95 later
+> merged its design contract; CP-WP-002 later delivered a synthetic offline
+> kernel. The stop-before-merge findings and review cycles below describe the
+> candidate revisions named there. Use the [control-plane backlog](../../roadmaps/resumable-control-plane-backlog.md)
+> for current package status and authority. BER means Behavioral Eval Runner;
+> the two components have separate runtime and approval boundaries.
+
 Date: 2026-09-12. Owner: Peter Nguyen. Repository: ModernNomad-98/Project-Aegis. Base: `57e6928d2849aa5377daf52c723b85736292585d`. Branch:
 `docs/cp-wp-001-durable-state-authority-recovery`.
 

@@ -100,8 +100,9 @@ weakened.
    choice records its rollback primitive — the hook
    `rollback-runbook-author` builds on.
 6. **Align branch protection**: required checks list matches the
-   merge-blocking stages exactly (a "required" check that no longer runs
-   blocks nothing), stale-review dismissal, and no bypass actors beyond
+   merge-blocking stages exactly (a required check that no longer runs stays
+   expected or pending and blocks merge until protection is updated),
+   stale-review dismissal, and no bypass actors beyond
    the governed list.
 7. **Write or edit the pipeline files** (the side-effecting step): scoped
    diff per `reviewable-diff-discipline`, pinned action/step versions per
@@ -171,9 +172,9 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
   PR code is the classic misconfiguration.
 - Caches restored into privileged jobs can carry poisoned artifacts from
   unprivileged runs — separate cache namespaces by trust level.
-- A required check whose job was renamed blocks nothing: branch protection
-  references check NAMES, and drift between workflow and protection is
-  silent.
+- A required check whose job was renamed can leave the old required name
+  expected or pending, blocking merge. Synchronize branch protection with
+  the new job name as an explicit reviewed change; do not bypass the gate.
 - "Temporarily" continue-on-error on a failing security stage is how scan
   gates die; expiry-dated skips only, visibly reported.
 - Deploy jobs that run on every merge to main make rollback a new deploy

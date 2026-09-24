@@ -1,5 +1,13 @@
 # Independent preservation review — 2026-09-11
 
+> **Current reading, checked 2026-09-24:** This is an independent local
+> preservation verdict for source, artifacts and the listed runtime wheels.
+> It did not recover the original calibration input bytes or owner approval.
+> Use the [replacement candidate summary](../ber-replacement-candidate-1-summary.md)
+> and [active runner backlog](../../roadmaps/behavioral-eval-runner-backlog.md)
+> for current gates. SHA-256 is the Secure Hash Algorithm 256-bit digest;
+> ZIP is the archive format; CPython is the Python reference implementation.
+
 Reviewer: `independent_phase01_review`, read-only.
 Verdict: PASS; no blocking findings.
 

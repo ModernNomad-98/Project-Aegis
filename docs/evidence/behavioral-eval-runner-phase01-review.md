@@ -1,5 +1,11 @@
 # BER Phase 0/1 — PR #88 reconciliation and local corrections
 
+**Reading key:** Behavioral Eval Runner (BER) is the offline evaluation
+component; a pull request (PR) is a proposed repository change. Owner
+decision 1 (OD-1) is the later human decision on measured calibration. Codes
+such as `BER-DEC-008` identify the dated decision records, and numbered
+findings identify review threads at the revision stated below.
+
 > Historical review at the revision below. PR #88 subsequently merged, including
 > its reviewed corrections; see the [delivery closeout](ber-pr88-closeout-2026-09-12/README.md).
 > Open-thread and unmerged-PR statements below describe that original review

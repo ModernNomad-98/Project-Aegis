@@ -5,6 +5,11 @@ description: Classify a requested change before starting work — docs-only, UI/
 
 # Change Classification Gate
 
+**Reading key:** UI means user interface; API means application programming
+interface; RLS means row-level security; IaC means infrastructure as code; AI
+means artificial intelligence; QA means quality assurance; CI means continuous
+integration.
+
 ## Purpose
 
 Decide HOW MUCH rigor a change needs before any of it is written. This skill
@@ -49,7 +54,8 @@ layer between a request and the discipline the request deserves.
    and state it to the human before implementing whenever an approval-class is
    present.
 5. Route approval-required classes through `human-approval-boundary` BEFORE
-   touching them.
+   touching them. Check whether an existing, still-active human approval
+   already covers the exact action and scope before requesting another.
 6. **Scope lock:** during implementation, any file or layer outside the contract
    triggers reclassification (return to step 2) — do not keep coding into the
    new class.
@@ -111,8 +117,8 @@ Scope contract:  <expected files/dirs>
 
 ## Stop Conditions
 
-- Mid-task scope growth into a new class → stop, reclassify, obtain the new
-  approval before proceeding.
+- Mid-task scope growth into a new class → stop and reclassify. Proceed only
+  under a still-active approval covering the expanded scope, or obtain one.
 - The change cannot be confidently classified (unclear which layers it touches)
   → stop and ask.
 - A class's validation floor cannot be met (e.g., no test runner available for

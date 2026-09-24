@@ -13,6 +13,7 @@
           "Builds the nine-axis requirements-and-constraints record first, marking each entry verified (with source) or assumed, before naming any provider service.",
           "Shapes a provider-neutral logical architecture in capability language with zero product names.",
           "Derives hard filters from tenant isolation and compliance before scoring, and scores operational maturity against what the team has actually run in production.",
+          "Compares compatible managed frontend, data, and function patterns per workload component, and does not rank a hyperscaler catalog as automatically the highest abstraction; selects it only when verified constraints or capabilities justify the choice.",
           "Answers managed-vs-self-hosted (the Kubernetes question) per capability with a named reason and the accepted operational bill, and hands the decision record to adr-writer and service mapping to azure-saas-architect or aws-saas-architect."
         ]
       }

@@ -5,6 +5,10 @@ description: Decide what gets cached, where, and how it stays correct — candid
 
 # Caching Strategy Designer
 
+**Reading key:** HTTP means Hypertext Transfer Protocol; CDN means content
+delivery network; DB means database; TTL means time to live, the expiry limit
+for a cached value; API means application programming interface.
+
 ## Purpose
 
 There are only two hard things in computer science, and this skill owns
