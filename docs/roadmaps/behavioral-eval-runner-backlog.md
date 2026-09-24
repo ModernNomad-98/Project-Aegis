@@ -3444,18 +3444,21 @@ model call, and evidence artifact.
   that PR can merge. BER-BKL-009 stays partially delivered until its later
   host, privacy and operator controls are implemented and evidenced.
 
-### BER-DEC-012: Proposed offline holdout-support implementation grant — PENDING
+### BER-DEC-012: Bounded offline holdout-support implementation grant — OWNER APPROVED
 
-**Proposal only. This entry records no owner decision and grants no implementation
-authority. Do not merge it as an effective decision until Peter Nguyen approves
-the exact scope below; replace this notice with the verbatim decision and its
-source during review.** The merged [WP-2B-3 scope packet](ber-wp2b3-holdout-execution-scope.md)
-defines the proposed behavior but does not itself authorize this branch.
+**Owner decision:** Peter Nguyen answered "aprooved" on 2026-09-24 to the
+one-at-a-time question approving PR #235's exact offline BER holdout-support
+grant at `9644ef079db763802223180ae5b11af39919c781`, after the pros and
+cons were explained. The question identified 14 named paths, at most 16 active
+hours and 2,000 added code/test lines, USD $0, synthetic data only, and no
+private inputs or provider calls. This grant becomes effective only when the
+reviewed governance PR recording this decision merges. The merged
+[WP-2B-3 scope packet](ber-wp2b3-holdout-execution-scope.md) defines the
+proposed behavior but did not itself authorize this branch.
 
-- **Decision requested:** Amend BER-DEC-008 only to permit one bounded, synthetic,
-  offline holdout-support implementation branch. If approved, this grant becomes
-  effective only when the reviewed governance PR containing the approved decision
-  merges. Preserve BER-DEC-008's measured-execution branch and clone, original
+- **Scope allowed:** Amend BER-DEC-008 only to permit one bounded, synthetic,
+  offline holdout-support implementation branch after this reviewed PR merges.
+  Preserve BER-DEC-008's measured-execution branch and clone, original
   source baseline, model, SDK, thresholds, budgets, deadlines, retry terms,
   evidence root, and one-pass rule. The offline branch is not a selected live
   execution source and receives no provider allowance.
@@ -3495,7 +3498,7 @@ defines the proposed behavior but does not itself authorize this branch.
   BER-DEC-008 thresholds without claiming owner decision one (OD-1).
 - **Excluded and later gates:** No private holdout records or labels, credentials,
   provider calls, unsealing, new spend, changed execution source, WP-2B-4,
-  deployment or OD-1 ratification follows from this proposal. Owner approval of
+  deployment or OD-1 ratification follows from this grant. Owner approval of
   exact private dataset/split/guide/hashes, a later owner-reviewed amendment
   selecting audited execution SHA/tree and any branch change, reconciled
   allowance and host/credential preflight, development `OWNER_WAIT`, owner

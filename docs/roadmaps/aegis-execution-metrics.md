@@ -74,20 +74,20 @@ delivered setup and offline control-plane defects; they did not close the
 remaining owner, real-host or provider gates. Four merges followed #238 before
 this checkpoint; its accepted merge would be the fifth.
 
-## Proposed BER-DEC-012 holdout-support grant — 2026-09-24
+## Owner-approved BER-DEC-012 holdout-support grant — 2026-09-24
 
 The first recorded preparation checkpoint is 08:02 UTC on 2026-09-24, from
 `main` at `5c46c7b3e61712674051eb734fa7d099a10aae4f` after PR #234.
 The previous execution-support estimate was **8–16 active hours**. This
-separate governance proposal is estimated at **1–2 active hours**; it does not
-reduce the implementation estimate until an owner decision and delivery change
-the scope. The selected remaining backlog was **120–304 active hours** at the
+separate governance proposal is estimated at **1–2 active hours**; the owner
+decision alone does not reduce the implementation estimate before delivery.
+The selected remaining backlog was **120–304 active hours** at the
 PR #234 checkpoint, of which documentation was **25–110** and other selected
 work **95–194**; the full optional adoption backlog had no finite total.
 Actual active time, review/CI time and owner waiting are not yet measured.
-The [proposed decision](behavioral-eval-runner-backlog.md#ber-dec-012-proposed-offline-holdout-support-implementation-grant--pending)
-is **PENDING** and creates no implementation, private-input, provider or
-spending authority. Record the observed wall interval and separate known
+The [owner-approved decision](behavioral-eval-runner-backlog.md#ber-dec-012-bounded-offline-holdout-support-implementation-grant--owner-approved)
+becomes effective only on this reviewed governance PR's merge. It grants no
+private-input, provider or spending authority. Record the observed wall interval and separate known
 review, CI and owner waiting after the governance PR reaches a disposition.
 
 | Work package | First recorded checkpoint (UTC) | Estimated active work | Actual active work | Review / CI | Owner waiting | Status |
