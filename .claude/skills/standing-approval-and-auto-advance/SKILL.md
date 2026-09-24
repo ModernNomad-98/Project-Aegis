@@ -94,8 +94,10 @@ opens this door.
    [references/standing-approval-policy.md](references/standing-approval-policy.md).
 5. **Define the opt-out phrase.** One explicit, unambiguous phrase (e.g.
    "HOLD: manual approvals this session") that suspends the standing
-   approval instantly, mid-loop, no questions asked. Document where it may
-   be said (prompt, PR comment) and that it always wins over the policy.
+   approval instantly, mid-loop, no questions asked. Any clear current-session
+   owner pause or stop instruction has the same effect, regardless of exact
+   words. Document where it may be said (prompt, PR comment) and that it
+   always wins over the policy.
 6. **Template merge-after-green as OPT-IN only.** The source pattern
    includes default-on autonomous merge after green validation. This library
    never makes that the default profile. Without a separate applicable human
@@ -104,11 +106,11 @@ opens this door.
    apply its actual scope, lifecycle, and later constraints. Green checks
    alone never supply approval. Do not treat a grant to merge as permission
    to arm GitHub auto-merge; that action needs its own explicit decision.
-7. **Write the reviewer-block exception path.** A human review request,
-   requested change, failing required check, or ANY reviewer objection
-   suspends auto-advance for that item: the loop stops, states what blocked,
-   and waits. Auto-advance never argues with, re-requests, or routes around
-   a reviewer.
+7. **Write the reviewer-block exception path.** A failing required check or
+   objection requiring an owner/scope decision suspends auto-advance for that
+   item: state what blocked and wait for that decision. Ordinary requested
+   fixes within the active task's authorization are addressed and reviewed
+   again before advancing. Auto-advance never routes around a reviewer.
 8. **Route the adopted policy to record.** The human's adoption is a grant:
    record it via `scoped-approval-register` (scope allowed = the named loop;
    scope FORBIDDEN = the floors and everything unnamed). Recommend
@@ -144,7 +146,8 @@ Adoption:                     pending human approval → then recorded via scope
 - [ ] The opt-out phrase is defined, exact, and documented as always winning.
 - [ ] The prompt pattern forces per-session restatement of scope + opt-out.
 - [ ] Phase-advance is bounded to already-named-and-approved phases.
-- [ ] The reviewer-block path suspends the loop rather than arguing with it.
+- [ ] The reviewer-block path suspends the loop for a hold or unresolved
+      owner/scope objection; ordinary in-scope fixes are re-reviewed.
 - [ ] The rationale cites the ungoverned-auto-merge incident; the policy is
       delivered as a DRAFT for human adoption, not enacted by this skill.
 

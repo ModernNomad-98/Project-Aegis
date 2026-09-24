@@ -2,6 +2,10 @@
 
 Detail for `feature-flag-rollout-strategist`. Read on demand.
 
+The owning [feature flag rollout skill](../SKILL.md) defines the plan and
+live-change boundary. GA means general availability, A/B a randomized
+comparison of two variants, and p95/p99 the 95th/99th percentile.
+
 ## Flag-type classification (decide FIRST)
 
 | Type | Lifetime | Purpose | Owner skill if mislabeled |

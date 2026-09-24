@@ -46,7 +46,8 @@ while reconciling is stated with its risk.
 4. **Apply precedence** (default; a repo policy overrides it):
    1. Explicit current-session user instruction — unless it rests on stale
       facts (surface and confirm first) or crosses a safety boundary (route to
-      `human-approval-boundary`).
+      `human-approval-boundary` when the conflict requires a normative or
+      authorization decision).
    2. For IS-questions: actual repo state — code, tests, migrations.
    3. Docs marked canonical / current reconciliation records — for
       SHOULD-questions these outrank code (intent-vs-implementation drift is a
@@ -79,8 +80,9 @@ Blocked: <conflicts with no winner — questions for the human>
 - [ ] IS vs SHOULD recorded per conflict.
 - [ ] No stale source silently edited; fixes proposed as follow-ups.
 - [ ] Every assumption listed with its risk-if-wrong.
-- [ ] Security- or data-affecting conflicts routed to `human-approval-boundary`,
-      not decided by precedence.
+- [ ] Unresolved normative, authorization, or proposed posture changes in
+      security/data handling route to `human-approval-boundary`; read-only
+      IS-questions report verified current behavior without changing it.
 
 ## Gotchas
 
@@ -98,8 +100,10 @@ Blocked: <conflicts with no winner — questions for the human>
 
 ## Stop Conditions
 
-- The conflict affects security, data handling, tenant isolation, or
-  destructive behavior → stop; hand to `human-approval-boundary`.
+- An unresolved SHOULD-question or proposed change affects security, data
+  handling, tenant isolation, or destructive behavior → stop and route the
+  decision to `human-approval-boundary`. A read-only IS-question can report
+  verified current behavior and its evidence without authorizing a change.
 - Two sources of equal current standing disagree and no repo precedence policy
   exists → stop and ask.
 - Resolution would require rewriting docs or history beyond the current task's

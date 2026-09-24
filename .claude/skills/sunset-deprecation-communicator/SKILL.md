@@ -1,9 +1,13 @@
 ---
 name: sunset-deprecation-communicator
-description: Plan and communicate the sunset or deprecation of a PRODUCT feature or public API to the USERS and integrators who depend on it — establish the (already-made) decision's rationale, assess impact (who uses it, what breaks), define the migration path to the replacement, set a timeline with a deprecation window and a firm sunset date, and build the multi-channel escalating communication plan (announcement, in-app, docs, reminder emails; for APIs deprecation/sunset headers + changelog), plus grandfathering and transition support. The center of gravity is USER communication and migration. This is NOT the retirement of a library SKILL (mark→redirect→remove, reverse-link sweep, catalog rows) — that is skill-deprecation-planner. Use when sunsetting a feature, deprecating an API version/endpoint, or announcing an end-of-life to customers. Do NOT use to retire a skill in THIS library (skill-deprecation-planner) or set the standing API deprecation POLICY (api-event-architect).
+description: Plan and draft the sunset or deprecation of a PRODUCT feature or public API for USERS and integrators — establish the already-made decision's rationale, assess impact, define the migration path, set a deprecation window and firm sunset date, and prepare an escalating multi-channel communication plan plus grandfathering and support. Planning only; sending customer messages or changing live headers needs its own authorization. This is NOT retirement of a library SKILL (skill-deprecation-planner). Use when planning a feature or API sunset and its customer announcement. Do NOT use to retire a library skill or set the standing API deprecation POLICY (api-event-architect).
 ---
 
 # Sunset & Deprecation Communicator
+
+**Terms:** API means application programming interface. This skill drafts
+the plan and messages; actual customer outreach or live header changes
+follow their own applicable authorization.
 
 ## Purpose
 
@@ -27,8 +31,8 @@ COMMUNICATION and MIGRATION for external users. It is deliberately not
   need a migration path and warning.
 - Use when: deprecating a public API version, endpoint, or field that
   integrators depend on, with a compatibility/sunset window.
-- Use when: announcing an end-of-life to customers and you need the
-  timeline, channels, and messaging planned.
+- Use when: planning an end-of-life announcement and you need the
+  timeline, channels, and messaging drafted.
 - Use when: a heavy-usage or contractual customer needs grandfathering,
   exceptions, or extended-support handling during a sunset.
 - Do NOT use when: the thing being retired is a SKILL in this library —

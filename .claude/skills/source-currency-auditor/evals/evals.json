@@ -12,8 +12,8 @@
         "assertions": [
           "Inventories external-source citations across skills (standards editions, URLs, research, versions, prices/limits, dated facts) and where each is cited.",
           "Sets staleness thresholds by fact-class volatility rather than one flat age.",
-          "Classifies each citation current/stale/superseded/broken with a reason and prioritizes by load-bearing × volatility.",
-          "Flags for human re-verification and changes/verifies nothing itself.",
+          "Classifies citations as stale by age, superseded/broken only with dated evidence, or unverified; prioritizes by load-bearing × volatility.",
+          "Flags for separately authorized re-verification and changes/verifies nothing in this sweep.",
           "Routes framework-edition specifics to framework-edition-tracker and recommends a re-run cadence."
         ]
       }
@@ -39,10 +39,10 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Flags BROKEN (dead link) citations as claims with no backing — high priority.",
-          "Distinguishes SUPERSEDED (replaced/withdrawn source, actively misinforming) from merely old-but-valid.",
-          "Records the reason per flag and prioritizes accordingly.",
-          "Recommends re-verification/replacement via the human/owner step."
+          "Treats the user's dead-link and replacement claims as UNVERIFIED until a dated authoritative check supports BROKEN or SUPERSEDED status.",
+          "Distinguishes evidenced SUPERSEDED (replaced/withdrawn source) from merely old-but-valid.",
+          "Records dated evidence for any BROKEN/SUPERSEDED flag and prioritizes accordingly.",
+          "Recommends re-verification/replacement under applicable authorization."
         ]
       }
     },
@@ -54,7 +54,7 @@
         "triggers": true,
         "assertions": [
           "Refuses to certify currency from memory — confirming requires checking the live source, and asserting from memory makes the auditor the stale claim.",
-          "Flags the volatile citations for human re-verification against live sources (a Stop Condition).",
+          "Flags the volatile citations for separately authorized re-verification against live sources (a Stop Condition).",
           "Marks nothing as confirmed-current without a live check.",
           "Does not change or verify anything itself."
         ]

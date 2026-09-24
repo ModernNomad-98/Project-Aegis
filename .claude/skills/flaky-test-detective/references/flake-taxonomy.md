@@ -2,6 +2,15 @@
 
 Detail file for `flaky-test-detective`. Loaded on demand.
 
+The owning [flaky-test skill](../SKILL.md) defines the investigation.
+TZ means time zone, DST daylight saving time, OOM out of memory, and CI
+continuous integration. Verify runner flags against the pinned installed
+version before using a reproduction command.
+The [Vitest migration guide](https://vitest.dev/guide/migration.html)
+documents removed pool options; consult the installed version's CLI before
+using worker flags. The [Playwright test CLI](https://playwright.dev/docs/test-cli)
+documents repeat and worker options.
+
 ## Classification taxonomy with signatures
 
 | Category | Typical signature |
@@ -25,7 +34,8 @@ Multiple distinct failure messages → assume multiple causes; split cases.
 2. **Order shuffle:** Vitest `--sequence.shuffle --sequence.seed=<s>`;
    rerun with the failing seed to pin ordering deps.
 3. **Parallel stress:** run with the CI worker count locally
-   (`--pool=threads --poolOptions.threads.maxThreads=<n>` / Playwright
+   (use the pinned Vitest version's worker setting, such as `--maxWorkers`
+   where supported / Playwright
    `--workers=<n>`); shared-state flakes surface here.
 4. **Environment pinning:** `TZ=<ci-tz> LANG=<ci-locale>`; match CI Node
    version; constrain CPU (e.g., run under load) to simulate runner

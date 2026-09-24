@@ -2,6 +2,10 @@
 
 Detail for `event-schema-architect`. Read on demand.
 
+The owning [event schema skill](../SKILL.md) defines compatibility decisions.
+API means application programming interface, PII personally identifiable
+information, enum an enumerated allowed-value set, and B2B business to business.
+
 ## Which "event" skill owns this? (three-way)
 
 | Kind of event | Consumer | Owner skill |

@@ -4,6 +4,10 @@ Vocabulary, worksheets, and gate examples backing the workflow.
 Vendor-neutral: the metric trio is named by what it measures; map to
 your measurement stack's current names.
 
+The owning [frontend performance skill](../SKILL.md) defines measurement.
+CSR means client-side rendering, SSR server-side rendering, SSG static site
+generation, RTT round-trip time, KB kilobyte, and PR pull request.
+
 ## Metric model (the standard trio, vendor-neutral)
 
 | Class | What users feel | Typical dominant causes |
@@ -62,10 +66,10 @@ DELETIONS FIRST: the plan's first section is what leaves.
 
 | Strategy | First paint | Interactivity bill |
 |---|---|---|
-| CSR only | slowest | pay once (parse/execute) |
-| SSR + full hydration | fast paint | full hydration freeze right at first interaction — count it |
-| SSR + partial/lazy hydration (islands) | fast paint | pay per island on demand — the usual best trade |
-| SSG for static routes | fastest | minimal — prefer where content allows |
+| CSR only | often slower first content under comparable conditions; measure this route | pay once (parse/execute) |
+| SSR + full hydration | can improve first paint; measure server response and route | hydration may delay or block interaction; count its JavaScript work |
+| SSR + partial/lazy hydration (islands) | can improve first paint; measure this route | defer work by island, with later interaction cost; compare against full hydration |
+| SSG for static routes | often fast for cacheable content; measure network and route behavior | minimal — prefer where content allows |
 
 ## Runtime-pattern evidence guide
 

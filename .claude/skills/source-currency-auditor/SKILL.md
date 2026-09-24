@@ -1,6 +1,6 @@
 ---
 name: source-currency-auditor
-description: 'Audit the library''s skills that cite external sources against a known-good source list, and flag every citation older than a stated threshold (N months) — or superseded/broken — for re-verification. The broad currency sweep: inventory external-source citations across all skills (standards editions, external docs/URLs, research, tool versions, prices/limits, dated facts), check each against a known-good list, flag stale/broken/superseded citations with the reason, and prioritize by how load-bearing and volatile the claim is. A periodic staleness gate, not an edition-specific tracker. Reports for re-verification; verifies nothing itself and changes nothing. Use when auditing citation freshness across the library, setting a currency threshold, or periodically sweeping for stale external references. Do NOT use to track specific framework EDITIONS and their deltas (framework-edition-tracker), propose mapping edits (framework-mapping-refresher), or review a skill''s overall quality (skill-quality-reviewer).'
+description: 'Audit the library''s external-source citations using dated metadata and a known-good list. Inventory standards editions, external docs/URLs, research, versions, prices/limits and dated facts; flag age beyond a threshold and prioritize by importance and volatility. Mark superseded/broken only when supplied evidence establishes that status. Live lookup is a separate authorized verification step; this skill does not certify currency or edit sources. Use for periodic library-wide citation freshness sweeps. Do NOT use for framework edition deltas (framework-edition-tracker), mapping edits (framework-mapping-refresher), or overall skill quality (skill-quality-reviewer).'
 ---
 
 # Source Currency Auditor
@@ -12,9 +12,9 @@ world moved under it — a cited price changed, a linked doc 404s, a
 research finding was superseded, a tool version is three majors behind.
 None of it shows in the code; the library just slowly decays against
 reality. This skill runs the broad currency sweep: it inventories every
-external-source citation across the library, checks each against a
-known-good source list and a staleness threshold, and flags what's stale,
-broken, or superseded — for re-verification, prioritized by how
+external-source citation across the library, compares dated metadata with a
+known-good source list and a staleness threshold, and flags age or evidenced
+breakage/supersession — for re-verification, prioritized by how
 load-bearing and how volatile the claim is. It is a periodic gate on
 external-truth decay, complementary to `framework-edition-tracker`'s
 narrow focus on standard editions. It flags; it does not verify or fix —
@@ -66,19 +66,23 @@ trusting memory.
    prices and model ids stale in weeks, tool versions in months, and
    foundational research in years. Set an effective threshold per fact
    class, stricter where the world moves faster.
-3. **Check each citation against the known-good list.** Classify: current,
-   STALE (older than its threshold — needs re-verification), SUPERSEDED (a
-   newer source exists), or BROKEN (dead link/removed source). Record the
-   reason per flag.
+3. **Compare each citation with the supplied dated source record.** Classify
+   STALE when its age exceeds the threshold. Mark SUPERSEDED or BROKEN only
+   when a supplied, dated authoritative comparison establishes a newer
+   source or dead link. Otherwise mark UNVERIFIED, even if the citation is
+   within its age threshold; that alone does not prove it current. Record
+   the evidence and its date per status.
 4. **Prioritize by load-bearing × volatility.** A stale citation
    underpinning a core recommendation outranks a stale aside; a volatile
    fact outranks a stable one. Order the flags so re-verification effort
    goes where wrongness costs most.
-5. **Flag for re-verification — verify nothing yourself.** Currency can
-   only be confirmed against the live source, not asserted from memory.
+5. **Flag for re-verification — do not assert live status from memory.**
+   Currency can only be confirmed against the live source or a supplied
+   dated authoritative verification. A new live lookup is a separate
+   authorized step, not an automatic side effect of this sweep.
    Produce the list of citations needing re-check, each with reason and
-   priority; the actual re-verification (and any fix) is a separate,
-   human/owner step. Route framework-edition specifics to
+   priority; the actual re-verification (and any fix) follows its separate
+   applicable authorization. Route framework-edition specifics to
    `framework-edition-tracker` for the deep dive.
 6. **Recommend a cadence.** This is a periodic gate — state how often to
    run it (and tighter for the volatile-fact skills), so currency stays a
@@ -97,9 +101,10 @@ SOURCE CURRENCY AUDIT
 Inventory:     <cited fact | source | where cited | stated date/version | class>
 Thresholds:    per fact-class (volatile: weeks/months; stable: years)
 Flags:
-  <citation>: STALE (age>threshold) | SUPERSEDED (newer source) | BROKEN (dead) — reason
+  <citation>: STALE (age>threshold) | SUPERSEDED/BROKEN (dated evidence) |
+              UNVERIFIED — reason and evidence date
 Priority:      load-bearing × volatility — highest first
-Re-verify:     list for HUMAN/owner re-check (this skill verifies nothing);
+Re-verify:     list for separately authorized re-check (this sweep verifies nothing);
                framework-edition specifics → framework-edition-tracker
 Cadence:       recommended re-run interval (tighter for volatile-fact skills)
 Changes:       NONE (audit only)
@@ -112,11 +117,11 @@ Boundaries:    editions/deltas → framework-edition-tracker; propose edits →
 - [ ] External-source citations are inventoried across the library (what,
       where, stated date/version).
 - [ ] Thresholds are set by fact-class volatility, not one flat age.
-- [ ] Each citation is classified current / stale / superseded / broken
-      with a reason.
+- [ ] Each citation has a supported stale / superseded / broken / unverified
+      status with its reason and evidence date; age alone does not certify current.
 - [ ] Flags are prioritized by load-bearing × volatility.
-- [ ] The output flags for re-verification; this skill verifies nothing
-      and changes nothing.
+- [ ] The output flags for re-verification; no new live lookup or edit occurs
+      without its own authorization.
 - [ ] Framework-edition specifics are routed to `framework-edition-tracker`.
 - [ ] A re-run cadence is recommended.
 - [ ] Edition-delta, mapping-edit, and quality-review concerns are handed

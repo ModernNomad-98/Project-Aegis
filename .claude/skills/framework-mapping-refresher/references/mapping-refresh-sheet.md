@@ -2,6 +2,10 @@
 
 Detail for `framework-mapping-refresher`. Read on demand.
 
+The owning [framework mapping skill](../SKILL.md) defines the proposal-only
+workflow. PR means pull request, GAP a missing mapped coverage area, and
+edition the specific published version of a framework.
+
 ## Precondition
 
 Start from a VERIFIED delta (from `framework-edition-tracker`). Unverified
