@@ -1,7 +1,11 @@
 # Error Model Sheet
 
 Use these `error-taxonomy-designer` tables to choose stable error codes, a
-caller-safe envelope, and one mapping boundary. **HTTP** means Hypertext
+caller-safe envelope, and one mapping boundary. The owning
+[error taxonomy skill](../SKILL.md) defines the decision workflow. HTTP 4xx
+means a client-error response, 5xx a server-error response, and JSON
+JavaScript Object Notation.
+**HTTP** means Hypertext
 Transfer Protocol, **SQL** means Structured Query Language, **ORM** means
 object-relational mapping, **IP** means Internet Protocol, and **PII** means
 personally identifiable information. **CLI** means command-line interface;
@@ -18,9 +22,9 @@ personally identifiable information. **CLI** means command-line interface;
 | Conflict / invalid state | `state.conflict` | 409 | client | No — resolve conflict |
 | Rate limited | `rate.limited` | 429 | client | Yes — after `retryAfter` |
 | Quota / entitlement | `entitlement.exceeded` | 403/402 | client | No — until plan changes |
-| Dependency unavailable | `dependency.unavailable` | 503 | dependency | Yes — backoff |
+| Dependency unavailable | `dependency.unavailable` | 503 | dependency | Retry with backoff only for a safe/idempotent operation or with a valid idempotency key |
 | Timeout | `dependency.timeout` | 504 | server/dependency | Yes — backoff, idempotent only |
-| Internal | `internal.error` | 500 | server | Sometimes — treat as transient |
+| Internal | `internal.error` | 500 | server | Only if the operation is safe/idempotent or protected by an idempotency key and the failure is transient |
 
 Codes are namespaced and additive-only once shipped. Status is the
 transport mapping; the code is the stable contract clients branch on.

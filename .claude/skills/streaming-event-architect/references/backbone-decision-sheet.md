@@ -35,10 +35,16 @@ stream feeding per-consumer queues.
 | composite tenant+entity | Per entity, tenant co-location not guaranteed | Low |
 | random/none | None | None — only for commutative effects |
 
-State the guarantee as: **"ordered per `<key>`, unordered across keys"** on
-every flow card. If cross-entity ordering is claimed as a need, demand the
+State the intended per-key order and the producer, routing, retry and consumer
+assumptions needed to preserve it on every flow card. Do not promise it from
+the key alone; include sequence/idempotency handling if retries or concurrent
+producers can reorder. Cross-key order is not implied. If cross-entity
+ordering is claimed as a need, demand the
 concrete failure story before designing for it — it usually dissolves into
 per-entity ordering plus an idempotent projection.
+Verify producer retry and in-flight behavior against the selected broker;
+[Kafka producer configuration](https://kafka.apache.org/40/configuration/producer-configs/)
+documents one way batches can reorder when idempotence is disabled.
 
 ## Delivery semantics — the honest table
 

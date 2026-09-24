@@ -2,6 +2,11 @@
 
 Supporting detail for `full-codebase-auditor`. Read on demand.
 
+The owning [full-codebase audit skill](../SKILL.md) defines evidence and
+coverage standards. CI means continuous integration, CORS cross-origin
+resource sharing, CVE common vulnerabilities and exposures, ADR architecture
+decision record, and CLI command-line interface.
+
 ## Inventory census (run before ANY finding)
 
 1. **Tree:** list top-level directories; classify each: source | tests |

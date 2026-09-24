@@ -2,6 +2,12 @@
 
 Detail for `framework-edition-tracker`. Read on demand.
 
+The owning [framework edition skill](../SKILL.md) defines verification.
+OWASP means Open Worldwide Application Security Project, ISO International
+Organization for Standardization, SOC 2 System and Organization Controls 2,
+NIST National Institute of Standards and Technology, and RMF risk management
+framework.
+
 ## Edition-register format
 
 ```

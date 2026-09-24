@@ -120,9 +120,7 @@ Open items: <controls awaiting risk-treatment decisions>
 - The SoA obligation and its tie to the risk-treatment process come from
   clause 6.1.3 — verify the exact clause wording against the licensed
   standard before quoting it.
-- **Never state ISO 27001 Annex A control counts** (the widely cited
-  93 = 37/8/14/34 across A.5 Organizational / A.6 People / A.7 Physical /
-  A.8 Technological is from secondary sources) **without verifying against
+- **Never state ISO 27001 Annex A control counts without verifying against
   the Annex A table itself**; never state ISO 42001 Annex A counts at all
   from memory — secondary sources conflict, so counts come only from the
   standard text in hand.

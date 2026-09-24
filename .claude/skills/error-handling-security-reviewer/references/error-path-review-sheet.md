@@ -3,6 +3,10 @@
 The four lenses with the concrete patterns to hunt. Language-agnostic; the
 shapes below appear in every stack.
 
+The owning [error-path security skill](../SKILL.md) defines the review
+workflow. `authz` means authorization, SQL Structured Query Language, IP
+Internet Protocol, and tenant the customer boundary used for data isolation.
+
 ## Lens 1 — Fail-open defaults
 
 Hunt for a security decision whose failure branch is anything but DENY:

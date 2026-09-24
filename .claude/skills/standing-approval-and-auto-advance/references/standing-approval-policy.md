@@ -53,7 +53,9 @@ re-scoped, or inserted phases end auto-advance and return to the human.
 ## 5. Opt-out phrase
 
 "<EXACT PHRASE>" — said in prompt or PR comment, suspends this policy
-immediately, mid-loop, for the session/PR named. Always wins.
+immediately, mid-loop, for the session/PR named. Any clear current-session
+owner pause or stop instruction does the same without matching these bytes.
+The owner instruction always wins.
 
 ## 6. Required prompt pattern (per session)
 
@@ -64,10 +66,11 @@ A session that does not restate the policy does not enjoy it.
 
 ## 7. Reviewer-block path
 
-Any of: change-requested review, human comment asking to hold, failing
-required check the agent cannot fix inside scope, or ANY reviewer objection
-→ the loop STOPS for that item, states what blocked it, and waits.
-The agent never re-requests review, argues, or routes around a reviewer.
+A human hold, failing required check that cannot be fixed within scope, or
+reviewer objection requiring an owner/scope decision stops auto-advance for
+that item until resolved. Ordinary requested changes within active scope are
+fixed and re-reviewed before advancing. The agent never argues with or
+routes around a reviewer.
 
 ## 8. Rationale (do not delete)
 

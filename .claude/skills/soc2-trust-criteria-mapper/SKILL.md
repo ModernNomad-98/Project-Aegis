@@ -5,6 +5,11 @@ description: 'Scope a SOC 2 engagement — an AICPA ATTESTATION (a CPA''s examin
 
 # SOC 2 Trust Criteria Mapper
 
+**Terms:** AICPA is the American Institute of Certified Public Accountants;
+CPA is certified public accountant; TSC are the Trust Services Criteria; ASEC
+is the AICPA Assurance Services Executive Committee; SLA is service-level
+agreement; DPA is data processing agreement.
+
 ## Purpose
 
 Scope the SOC 2 engagement correctly before anyone burns a quarter

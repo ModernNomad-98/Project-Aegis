@@ -10,7 +10,7 @@ Detail for `source-currency-auditor`. Read on demand.
 | Model ids / API versions | weeks–months | tight |
 | Tool / library versions | months | months |
 | Standard editions | years (irregular) | track via framework-edition-tracker |
-| External docs/URLs (existence) | any time | check liveness each run |
+| External docs/URLs (existence) | any time | flag for live check unless a dated verification is supplied |
 | Foundational research | years | loose |
 
 One flat threshold both over-nags stable facts and misses volatile ones.
@@ -22,7 +22,7 @@ One flat threshold both over-nags stable facts and misses volatile ones.
 | STALE | Older than its class threshold; may still be valid | Re-verify |
 | SUPERSEDED | A newer/replacement source exists; actively misinforms | High |
 | BROKEN | Dead link / removed source; no backing | High |
-| current | Within threshold, confirmed against live source | — |
+| UNVERIFIED | No dated authoritative comparison is available; age alone does not certify current | Re-verify |
 
 Broken and superseded outrank merely stale.
 
@@ -37,10 +37,13 @@ Order re-verification so wrongness cost drives effort.
 
 ## Flag, don't verify
 
-Currency is confirmed only against the LIVE source. This skill:
+Currency is confirmed only against the live source or a supplied dated
+authoritative verification. This skill:
 - Flags citations needing re-verification (with reason + priority).
-- Does NOT certify "still current" from memory.
-- Does NOT edit/fix — re-verification and updates are human/owner steps.
+- Does NOT certify "still current" from age or memory; live lookup is a
+  separate authorized step.
+- Does NOT edit/fix — re-verification and updates follow their own
+  applicable authorization.
 
 ## Handoffs
 

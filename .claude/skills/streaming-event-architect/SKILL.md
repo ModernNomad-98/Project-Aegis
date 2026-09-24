@@ -5,6 +5,9 @@ description: Design the INTERNAL event/streaming data backbone between services 
 
 # Streaming Event Architect
 
+**Terms:** CDC means change data capture, DLQ dead-letter queue, and SLA
+service-level agreement.
+
 ## Purpose
 
 Event pipelines fail in ways request/response systems never do: messages
@@ -65,7 +68,8 @@ the internal stream feeds it.
    boundaries, and whether ordering across tables matters downstream.
 5. Tenant model constraints (from `multi-tenant-data-architect` outputs if
    present): whether streams are tenant-mixed with keyed isolation or
-   tenant-separated, and what tenant context every event must carry.
+   tenant-separated, and what tenant context a tenant-scoped event carries;
+   global events record an explicit unknown/not-applicable tenant state.
 6. Existing schema/contract conventions: any registry or payload versioning
    already in force, and `api-event-architect` artifacts for events that
    ultimately feed external surfaces.
@@ -80,9 +84,12 @@ the internal stream feeds it.
    multi-consumer, ordered per partition) vs work queue (competing
    consumers, ack/redeliver) — by fan-out, replay need, and ordering need.
    State the choice per flow, not one global answer.
-3. **Design keys and partitions.** The partition key defines the ONLY
-   ordering guarantee: state it as "ordered per <key>, unordered across
-   keys". Key by the entity whose effects must sequence (commonly
+3. **Design keys and partitions.** A partition key is necessary for a
+   per-key ordering design, but producer order, routing, broker retry
+   settings and consumer handling must preserve it. State the actual
+   guarantee and non-guarantees; use sequence checks and idempotency when
+   concurrent producers or retries can reorder records. Key by the entity
+   whose effects must sequence (commonly
    entity-id; tenant-id alone creates hot partitions for large tenants —
    note skew). Estimate partition counts from peak rate and consumer
    parallelism, with headroom for rebalancing.
@@ -131,7 +138,8 @@ CDC mechanisms) and the per-flow guarantee card format:
 STREAMING BACKBONE DESIGN — <system/domain>
 Flows:          <N producer→consumer flows, classified>
 Per-flow card:
-  <flow>: transport=<stream|queue> key=<key> ordering="per <key> only"
+  <flow>: transport=<stream|queue> key=<key> ordering=<per-key guarantee,
+          producer/broker/consumer assumptions and non-guarantees>
   delivery=at-least-once + idempotent consumer (dedup=<mechanism>)
   retry=<policy> DLQ=<dest, owner, drain SLA> replay=<procedure>
   retention=<time/size|compacted> schema=<version, compat rule>
@@ -155,7 +163,8 @@ Explicit non-guarantees: <what this design does NOT promise (e.g., cross-key ord
       consumers may rely on.
 - [ ] Schema rules cover both directions: producer evolution policy and
       consumer tolerance policy.
-- [ ] Tenant context: events carry it; hot-partition risk from tenant
+- [ ] Tenant context: tenant-scoped events carry it; global events mark
+      unknown/not-applicable explicitly; hot-partition risk from tenant
       keying is assessed.
 - [ ] The external boundary is explicit: which events feed
       `api-event-architect` surfaces and where the handoff happens.
@@ -163,9 +172,10 @@ Explicit non-guarantees: <what this design does NOT promise (e.g., cross-key ord
 
 ## Gotchas
 
-- "Ordered" without a scope is a lie waiting to page you: streams order
-  per partition key only. Cross-key and cross-topic sequencing requires
-  design (sequence numbers, sagas), not assumption.
+- "Ordered" without a scope is a lie waiting to page you: per-partition
+  order also depends on producer order, retry settings, routing and consumer
+  handling. Cross-key and cross-topic sequencing requires design
+  (sequence numbers, sagas), not assumption.
 - Exactly-once marketing: platform transactions cover produce/consume
   within that platform; the moment a consumer touches an external system,
   you are back to at-least-once + idempotency. Say so in the design.

@@ -1,9 +1,12 @@
 ---
 name: structured-output-validator
-description: 'Design the schema and validation strategy for an LLM''s structured output so downstream code never trusts an unvalidated response — define the output contract (fields, types, enums, ranges, formats), encode it in TYPES where possible so non-compliant output is unrepresentable, and walk every response up the ladder BEFORE use: parse → strict schema → policy/banned-content scan — failures logged as safety evidence and rejected, never silently repaired — plus bounded failure handling and semantic checks beyond shape (allowed sets, tenant-scoped ids, referential sanity). Shape-valid is not safe-to-act: validated output still goes to llm-output-safety-reviewer (sinks) and agent-tool-safety-guard (tool authz). Use when a model returns JSON/structured data an app parses, or to make an AI output contract enforceable. Do NOT use for injection/execution sinks (llm-output-safety-reviewer), tool permissions (agent-tool-safety-guard), factual accuracy (ai-misinformation-guard), or the routing layer (ai-router-architect).'
+description: 'Design the schema and validation strategy for an LLM''s structured output so downstream code never trusts an unvalidated response — define the output contract (fields, types, enums, ranges, formats), encode it in TYPES where possible, and validate BEFORE use: parse → strict schema → semantic checks → policy/banned-content scan. Failures are logged as safety evidence and rejected, never silently repaired; shape failures may use bounded repair-retry. Shape-valid is not safe-to-act: validated output still goes to llm-output-safety-reviewer (sinks) and agent-tool-safety-guard (tool authz). Use when a model returns JSON/structured data an app parses, or to make an AI output contract enforceable. Do NOT use for injection/execution sinks (llm-output-safety-reviewer), tool permissions (agent-tool-safety-guard), factual accuracy (ai-misinformation-guard), or the routing layer (ai-router-architect).'
 ---
 
 # Structured Output Validator
+
+**Terms:** LLM means large language model, JSON JavaScript Object Notation,
+XSS cross-site scripting, and `authz` authorization.
 
 ## Purpose
 
@@ -13,7 +16,8 @@ anything acts on it. The deliverable is: the output contract (required fields,
 types, enums, ranges, formats) — encoded at the TYPE level where possible so a
 non-compliant output is unrepresentable, not merely rejected; the fixed
 validate-before-use ladder every response walks (parse → strict schema →
-policy/banned-content scan), whose failures are logged as safety evidence and
+semantic checks → policy/banned-content scan), whose failures are logged as
+safety evidence and
 rejected, never silently repaired; the failure handling (reject / bounded
 repair-retry / fallback); and the semantic checks that shape validation alone
 misses (value allowlists, tenant-scoped ids, referential sanity). Crucially,
@@ -66,9 +70,12 @@ authorization), which own the harm-prevention half.
    wire, where types cannot reach. No downstream usage/contract to inspect →
    Stop Conditions.
 2. **Validate before use, always — as a fixed ladder.** Every model response
-   walks parse → strict schema → policy/banned-content scan (step 4) before
-   any field is read or acted on. Direct use of `JSON.parse` output without
-   validation is the finding this closes. Use provider JSON-mode/tool-schema
+   walks parse → strict schema → semantic checks → policy/banned-content
+   scan (step 4) before any field is used downstream or acted on. The
+   validator reads fields for semantic checks; application code does not
+   consume them until the full ladder passes. Direct use of `JSON.parse`
+   output without validation is the finding this closes. Use provider
+   JSON-mode/tool-schema
    to constrain generation, but STILL validate — provider modes reduce, not
    eliminate, malformed output.
 3. **Add semantic validation beyond shape** using
@@ -76,8 +83,8 @@ authorization), which own the harm-prevention half.
    values in allowed sets (not just "is a string"), ids that exist and are
    tenant-scoped to the caller, cross-field consistency, referential sanity.
    A schema-valid response can still carry a wrong-tenant id.
-4. **Run the policy/banned-content scan as a NAMED ladder step.** After parse
-   and schema, scan for content the contract BANS: denylisted terms or
+4. **Run the policy/banned-content scan as a NAMED ladder step.** After parse,
+   schema and semantic checks, scan for content the contract BANS: denylisted terms or
    content classes, embedded links or instructions where none belong,
    anything the feature must never emit. A scan failure is LOGGED AS SAFETY
    EVIDENCE (what was caught, when, from which input class) and the output
@@ -112,7 +119,7 @@ STRUCTURED OUTPUT CONTRACT — <feature>
 Schema: <fields: required/type/enum/range/format | nesting | array bounds>
 Type-level encoding: <what the types make unrepresentable | where the runtime
   schema still guards the wire>
-Validation ladder: parse → strict schema → policy/banned-content scan
+Validation ladder: parse → strict schema → semantic checks → policy/banned-content scan
   (<where it runs, before which action>)
 Semantic checks: <value allowlists | tenant-scoped ids | cross-field/referential>
 Policy scan: <banned classes | failures logged as safety evidence + rejected,
@@ -134,7 +141,8 @@ Residual risk: <what remains + named acceptor>
       illegal outputs unrepresentable, with the runtime schema still guarding
       the wire.
 - [ ] Every response walks the full ladder (parse → strict schema →
-      policy/banned-content scan) BEFORE any field is used; no direct use of
+      semantic checks → policy/banned-content scan) BEFORE downstream use;
+      no direct use of
       parsed-but-unvalidated output.
 - [ ] Semantic checks beyond shape are present (value allowlists, tenant-scoped
       ids, referential sanity).
@@ -159,8 +167,8 @@ Residual risk: <what remains + named acceptor>
   (semantic check + `agent-tool-safety-guard`).
 - Fail closed by default: reject invalid output; repair-retry is bounded to
   avoid a cost/latency loop; never partially act on an invalid response.
-- The ladder is fixed — parse → strict schema → policy/banned-content scan —
-  and nothing acts on a response until it clears all three; scan failures
+- The ladder is fixed — parse → strict schema → semantic checks → policy/banned-content scan —
+  and nothing acts on a response until it clears all four steps; scan failures
   are safety evidence (logged) and rejections (never silently repaired).
 - A validator or scan that has never failed in a test is unproven — a
   verifier that cannot fail is theater with an exit code; prove each rung
