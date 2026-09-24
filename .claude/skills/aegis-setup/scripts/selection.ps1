@@ -1,11 +1,23 @@
 # Aegis setup selection, Windows PowerShell 5.1. Dot-source for offline tests.
 Set-StrictMode -Version Latest
 
+function Get-AegisLocalFullPath {
+    param([string]$Path, [string]$Label)
+    # Namespace, UNC, rooted-relative, and drive-relative spellings can give
+    # different project keys or defeat the state-inside-checkout comparison.
+    if ($Path -notmatch '^[A-Za-z]:[\\/](?![\\/])') {
+        throw "$Label path must be an ordinary absolute local drive path."
+    }
+    return [System.IO.Path]::GetFullPath($Path)
+}
+
 function Get-AegisCanonicalRoot {
     param([Parameter(Mandatory)][string]$ProjectRoot)
-    if (-not [System.IO.Path]::IsPathRooted($ProjectRoot)) { throw 'Project path must be absolute.' }
-    $full = [System.IO.Path]::GetFullPath($ProjectRoot).TrimEnd('\')
-    if ($full + '\' -eq [System.IO.Path]::GetPathRoot($ProjectRoot)) { throw 'Project path must name a checkout directory.' }
+    $full = Get-AegisLocalFullPath $ProjectRoot 'Project'
+    if ($full.Equals([System.IO.Path]::GetPathRoot($full), [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Project path must name a checkout directory.'
+    }
+    $full = $full.TrimEnd('\')
     if (-not [System.IO.Directory]::Exists($full)) { throw 'Project directory does not exist.' }
     $part = [System.IO.DirectoryInfo]$full
     while ($null -ne $part) {
@@ -19,8 +31,11 @@ function Get-AegisCanonicalRoot {
 
 function Assert-AegisStateRoot {
     param([string]$StateRoot, [string]$ProjectRoot)
-    if (-not [System.IO.Path]::IsPathRooted($StateRoot)) { throw 'State path must be absolute.' }
-    $full = [System.IO.Path]::GetFullPath($StateRoot).TrimEnd('\')
+    $full = Get-AegisLocalFullPath $StateRoot 'State'
+    if ($full.Equals([System.IO.Path]::GetPathRoot($full), [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'State path must name a directory below the drive root.'
+    }
+    $full = $full.TrimEnd('\')
     $project = Get-AegisCanonicalRoot $ProjectRoot
     if ($full.Equals($project, [StringComparison]::OrdinalIgnoreCase) -or
         $full.StartsWith($project + '\', [StringComparison]::OrdinalIgnoreCase)) {

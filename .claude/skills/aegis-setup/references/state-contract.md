@@ -4,10 +4,15 @@ Use this with the [Aegis Setup skill](../SKILL.md) for its exact local-state for
 
 Support is limited to a single-user Windows PowerShell 5.1 host and one local
 checkout. `selection.ps1` obtains the user-local application data directory
-from Windows and writes under `ProjectAegis\setup\v1`. It rejects a checkout
-or state path containing a reparse redirect and rejects state inside the
-checkout. The project key is lowercase SHA-256 of the uppercase absolute
-physical checkout root (UTF-8). A moved checkout has a different key.
+from Windows and writes under `ProjectAegis\setup\v1`. Project and state paths
+must use ordinary absolute local drive spellings (`C:\...` or `C:/...`). UNC,
+device-namespace, drive-relative and rooted-relative spellings are rejected;
+the state directory cannot be the drive root. The script rejects paths with
+reparse redirects and state inside the checkout. The project key is lowercase
+SHA-256 of the uppercase normalized absolute checkout path (UTF-8). A moved
+checkout has a different key. This lexical and reparse-point check does not
+prove identity across short-name aliases, substituted drives or mapped drives;
+those spellings are outside the supported single-checkout contract.
 
 Each `<key>.json` has exactly these fields: `schema_version: 1`,
 `project_key`, `choice: "aegis-only"`, `state: "selected"`,
