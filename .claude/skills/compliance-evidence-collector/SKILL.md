@@ -5,13 +5,22 @@ description: 'Design the operating-effectiveness evidence program SOC 2 Type 2 d
 
 # Compliance Evidence Collector
 
+**Reading key:** SOC 2 is a service-organization controls attestation;
+ISO means International Organization for Standardization; CI means
+continuous integration; PR means pull request; QA means quality assurance;
+PII means personally identifiable information. AICPA is the American
+Institute of Certified Public Accountants, and CPA means certified public
+accountant.
+
 ## Purpose
 
 Turn "we have controls" into "we can prove the controls operated across the
 whole period." SOC 2 Type 2 examines operating effectiveness over an audit
 window, and ISO surveillance audits re-check an operating management system
-— both die on evidence holes: a control with no artifact for March is a
-finding even if it ran perfectly. This skill produces the evidence program:
+— both can have evidence holes: a control with no artifact for an expected
+operating interval is a finding even if it ran. A missing March artifact is
+a gap when that control's agreed cadence required March evidence. This skill
+produces the evidence program:
 per-control evidence specs (type, cadence, population, collector, retention,
 integrity), the register that accrues them, and a window-coverage audit that
 exposes holes before an auditor does. It formalizes what already exists —

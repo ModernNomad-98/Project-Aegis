@@ -5,6 +5,11 @@ description: 'Design the CI gate that FAILS any PR touching "important" paths wi
 
 # Context Co-Update CI Gate
 
+**Reading key:** CI means continuous integration; PR means pull request;
+SHA means Secure Hash Algorithm and identifies the exact scanned commit;
+API means application programming interface; RLS means row-level security;
+YAML is the configuration file format used by many CI workflows.
+
 ## Purpose
 
 Make context freshness mechanical instead of aspirational. Every repo with a

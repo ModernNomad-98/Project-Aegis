@@ -5,6 +5,11 @@ description: 'Author the operator-executable runbook for a DATA move — backfil
 
 # Data Migration Runbook Author
 
+**Reading key:** CDC means change data capture; DDL means data definition
+language; RLS means row-level security; PR means pull request; p99 means the
+99th percentile; GC means garbage collection; CLI means command-line
+interface. This skill writes an operator runbook; it does not execute a move.
+
 ## Purpose
 
 Data moves fail operationally more often than logically: the batch size

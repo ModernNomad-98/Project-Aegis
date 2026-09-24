@@ -1,5 +1,12 @@
 # Contributor merge guidance clarification
 
+> **Current reading, checked 2026-09-24:** This contribution-guide
+> clarification was delivered. The later sentence saying a pull request
+> will record wall time describes its original draft. Use current
+> [CONTRIBUTING.md](../../../CONTRIBUTING.md) and the
+> [owner approval register](../../approvals/APPROVAL_REGISTER.md) for today's
+> merge conditions; this note preserves the historical review scope.
+
 Date: 2026-09-23. This bounded correction started after the five-merge
 forecast draft. The item had no previously published estimate; a comparable
 small-document batch was estimated at 1–3 active hours. This correction's

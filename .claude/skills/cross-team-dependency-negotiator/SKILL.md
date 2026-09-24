@@ -5,6 +5,10 @@ description: Identify, negotiate, and track the cross-team dependencies an effor
 
 # Cross-Team Dependency Negotiator
 
+**Reading key:** API means application programming interface; SPOF means
+single point of failure. A draft dependency request is not a commitment from
+another team.
+
 ## Purpose
 
 The dependency you didn't negotiate is the one that slips two days before
@@ -66,7 +70,9 @@ interface contract is `api-event-architect`'s.
 3. **Negotiate a concrete commitment.** Not "we'll try" — a specific
    deliverable, against a defined interface/contract, by a date, with a
    named owner on both sides, written down. Vague goodwill is not a plan;
-   a commitment you can point to is.
+   a commitment you can point to is. Contact another team only with explicit
+   user authority to do so; otherwise prepare the request for the human and
+   mark the commitment pending until the other team actually agrees.
 4. **De-risk against slippage.** For each critical dependency: a fallback
    if it's late, decoupling where possible (build against the contract
    with a stub/mock, feature-flag the integration off, parallelize), and
@@ -109,8 +115,9 @@ Boundaries:    roadmap→commitments = roadmap-to-commitments-translator; integr
 - [ ] Dependencies are mapped BOTH ways (need and owe), with critical-path
       ones marked.
 - [ ] Each dependency was surfaced early, not discovered at integration.
-- [ ] Every critical dependency has a CONCRETE commitment (deliverable,
-      interface, date, owner both sides), written down — not "we'll help".
+- [ ] Every critical dependency has an actual, written commitment
+      (deliverable, interface, date, owner both sides), or is visibly pending
+      human outreach and the other team's response — not "we'll help".
 - [ ] Critical dependencies are de-risked (fallback, decoupling, SPOFs
       named) so a slip is a setback, not a stop.
 - [ ] The other team's competing priorities are accounted for (incentive/

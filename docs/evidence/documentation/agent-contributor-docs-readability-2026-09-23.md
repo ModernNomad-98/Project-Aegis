@@ -1,5 +1,12 @@
 # Agent and contributor document reading keys
 
+> **Current reading, checked 2026-09-24:** This seven-page documentation
+> batch was delivered; later statements that re-review or checks were pending
+> describe the writer's original checkpoint. For current instructions, use
+> [AGENTS.md](../../../AGENTS.md), [CONTRIBUTING.md](../../../CONTRIBUTING.md)
+> and the [documentation ledger](../../roadmaps/aegis-documentation-readability-backlog.md).
+> This note remains evidence of the exact scope and checks at its date.
+
 Date: 2026-09-23. Times use Coordinated Universal Time (UTC). Edit start:
 22:01:17 UTC. Base: `d5b007b0a3cc2bd43806a16970f19c84be9a86b0`
 (merged pull request #186). The preceding 15-page read-only screen was

@@ -11,7 +11,7 @@
         "triggers": true,
         "assertions": [
           "Produces ONE framework-agnostic catalog across the seven domains (plus AI governance for 42001), not per-framework lists.",
-          "Maps existing mechanisms to shipped artifacts by name (authorization matrix, RLS audit, audit log, incident runbook, supply-chain review) instead of re-specifying them.",
+          "Maps verified operating mechanisms and dated evidence by name while using shipped skills only as design/review routes; a shipped skill alone never earns implemented status.",
           "Gives every control an ID, objective, named owner, mechanism or MISSING, evidence hook, and implemented/partial/missing status.",
           "Keeps framework clause/criteria citations out of the catalog, deferring them to multi-framework-crosswalk."
         ]
@@ -24,7 +24,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Inventories the existing artifacts first and maps them as implemented controls rather than starting from a blank framework template.",
+          "Inventories candidate artifacts and verifies which mechanisms actually operate before marking any control implemented, rather than starting from a blank framework template.",
           "Carries known residue honestly (e.g. encryption design review, security-event alerting, access recertification) as partial/missing instead of claiming full coverage.",
           "Marks net-new needs (risk register, access reviews, vendor assessments) as missing controls with owners to assign."
         ]

@@ -1,9 +1,15 @@
 ---
 name: command-gateway-architect
-description: 'Design a single server-side-mediated write path — a command bus — for protected mutations in a multi-tenant SaaS: a command registry plus a per-command pipeline (validate payload → authenticate the actor from the token, never from client-supplied identity → authorize against policy → server-derive tenant/resource scope from trusted rows → idempotency → execute → emit audit + domain events → safe error envelope), plus the no-direct-client-writes invariant for protected actions. Produces the command catalog, the pipeline contract, and an enforcement-point map. Use when mutations are scattered across endpoints or client SDKs, when tenant scope is read from the request body, or when adding a sensitive write. Do NOT use for the external API/webhook contract (api-event-architect), the role/permission policy itself (authorization-matrix-designer), or the audit record schema (audit-log-architect) — this dispatches through them.'
+description: 'Design a single server-side-mediated write path — a command bus — for protected mutations in a multi-tenant SaaS: a command registry plus a per-command pipeline (validate payload → authenticate the actor from the token, never from client-supplied identity → derive trusted target tenant/resource scope → authorize that resolved target against policy → idempotency → execute → emit audit + domain events → safe error envelope), plus the no-direct-client-writes invariant for protected actions. Produces the command catalog, the pipeline contract, and an enforcement-point map. Use when mutations are scattered across endpoints or client SDKs, when tenant scope is read from the request body, or when adding a sensitive write. Do NOT use for the external API/webhook contract (api-event-architect), the role/permission policy itself (authorization-matrix-designer), or the audit record schema (audit-log-architect) — this dispatches through them.'
 ---
 
 # Command Gateway Architect
+
+**Reading key:** SaaS means software as a service; SDK means software
+development kit; RPC means remote procedure call; RLS means row-level
+security; DLQ means dead-letter queue; DB means database; SQL means Structured
+Query Language; UUID means universally unique identifier. `authz` means
+authorization and `txn` means a database transaction.
 
 ## Purpose
 
@@ -11,7 +17,7 @@ A multi-tenant SaaS leaks and corrupts data through the same door: writes
 that skip a check because each endpoint re-implements its own. This skill
 designs the opposite — one server-side-mediated write path (a command bus)
 that every protected mutation flows through, so validation, actor
-authentication, authorization, tenant-scope derivation, idempotency, audit,
+authentication, trusted target derivation, authorization, idempotency, audit,
 and event emission happen in ONE ordered pipeline instead of being copied,
 half-applied, and forgotten per route. The deliverable is a command catalog,
 a per-command pipeline contract with the steps fixed in order, and an
@@ -75,11 +81,15 @@ never accepted from the client.
       bounds) — reject malformed input before any authz work.
    2. **Authenticate the actor** from the verified token/session ONLY. The
       client never states who it is on a write.
-   3. **Authorize** the actor against policy for this command + target
-      (deny-by-default; call `authorization-matrix-designer`'s rules).
-   4. **Derive tenant/resource scope server-side** from trusted rows (look
-      the target up, read its `tenant_id` from the DB, confirm it matches
-      the actor's tenant) — never from the request body.
+   3. **Derive tenant/resource scope server-side** from trusted state. For an
+      existing target, look up its row and read its real `tenant_id`; for a
+      create, derive the destination from authenticated server-side context.
+      A client-supplied scope value is never authority. Do not expose lookup
+      details to the caller before authorization.
+   4. **Authorize** the actor against policy for this command and the
+      resolved target and tenant (deny-by-default; call
+      `authorization-matrix-designer`'s rules). Confirm the actor may act in
+      that tenant before executing the command.
    5. **Idempotency**: an idempotency key per mutating command; a repeated
       key returns the first result without re-executing side effects.
    6. **Execute** the state change transactionally.
@@ -120,8 +130,8 @@ Invariant: all protected writes flow through the gateway; direct client
 Command catalog:
   <Command — inputs — target resource — side effects — sensitive? y/n>
 Pipeline contract (fixed order, every command):
-  validate → authenticate(actor from token) → authorize(<policy source>) →
-  derive-scope(from trusted rows) → idempotency(<key, store, retention>) →
+  validate → authenticate(actor from token) → derive-scope(from trusted state) →
+  authorize(<policy source, resolved target>) → idempotency(<key, store, retention>) →
   execute(txn) → emit(audit + events) → safe-error-envelope
 Idempotency: <key source, dedup store, replay response, concurrency control>
 Error envelope: <shape, codes, no-existence-oracle rule, leak rules>
@@ -138,10 +148,11 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       the pipeline.
 - [ ] Actor identity is taken from the verified token on EVERY command —
       no command trusts a client-supplied actor/role.
-- [ ] Tenant/resource scope is derived from trusted rows on every command;
-      no command reads scope from the request body.
-- [ ] Authorize is deny-by-default and delegates to the authorization
-      model, not re-implemented per command.
+- [ ] Tenant/resource scope is derived from trusted server state: existing
+      targets from rows, creates from authenticated server context. No
+      command treats request-body scope as authority.
+- [ ] Authorization follows trusted target derivation, is deny-by-default,
+      and delegates to the authorization model rather than a per-command copy.
 - [ ] Every mutating command has an idempotency contract (key, store,
       replay response) — retries cannot double-apply side effects.
 - [ ] A successful write cannot skip its audit record or event emission
