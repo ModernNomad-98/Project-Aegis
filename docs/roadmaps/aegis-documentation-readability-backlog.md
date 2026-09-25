@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #284 on 2026-09-25 Coordinated Universal Time
+As of merged pull request (PR) #285 on 2026-09-25 Coordinated Universal Time
 (UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -11,9 +11,11 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-The merged tree contains **589 tracked Markdown files**: **545
+The #285 merged tree contains **589 tracked Markdown files**: **545
 reader pages** with recorded full-checklist acceptance and **44 synthetic
-fixtures** with classification and integrity checks. The protected
+fixtures** with classification and integrity checks. The reviewed Stage 4B
+decision packet in this change adds one accepted reader page; the resulting
+tree will contain **590 pages: 546 readers and 44 fixtures**. The protected
 `scripts/tests/fixtures/README.md` and its new
 [review record](../evidence/documentation/fixture-readme-closure-after-238-2026-09-24.md)
 merged in #239, closing the original bounded pending set. PRs #139 and #197
@@ -92,6 +94,15 @@ and Windows green, the protected-path guard failing and its one-time exception
 question pending. This checkpoint revises the same three tracking pages and
 adds no Markdown page or fixture. Two independent full-page reviews of these
 revised pages accepted the content, counts and 340 local links and anchors.
+
+The [Stage 4B host-proof decision packet](aegis-setup-package-4b-host-proof-protocol.md)
+adds one reader page after #285. Two independent full-page reviews accepted
+its factual boundary, user-choice explanations and local links after the
+planning-only decision wording was clarified. The [setup route](aegis-setup-routing-plan.md)
+now links the packet and corrects its stale Stage 4A grant status. The packet
+does not close Stage 4B execution or authorize a host session. On merge, the
+readability inventory becomes **590 tracked Markdown pages: 546 accepted
+readers and 44 classified fixtures**, with zero known pending pages.
 
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
