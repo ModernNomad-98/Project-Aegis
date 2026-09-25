@@ -6,7 +6,8 @@ This is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. The [owner's issue #101 host-path choice](#material-owner-decision--2026-09-25-issue-101-host-path)
 and the subsequent bounded Stage 4A grant are the latest scope changes. The
 [five-merge checkpoint after #284](#five-merge-checkpoint--2026-09-25-after-pull-request-284)
-is the latest full reassessment. Pull request (PR) #249 delivered the
+is the latest recorded full reassessment; the later source-only updates below
+do not replace it. Pull request (PR) #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
 documentation residual. PR #253 added one reviewed reader page; PR #257 added
 two more. PR #260 added one reviewed setup page and #269 added a reviewed
@@ -18,8 +19,14 @@ bringing that tree to **590 pages: 546 accepted readers and 44 classified
 fixtures**. Merged [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
 added two reviewed offline reader pages, and the three reviewed
 [current source-only packets](#current-source-only-packets--2026-09-25)
-bring this update to **595 pages: 551 accepted readers and 44 classified
-fixtures**, with zero known pending pages. The packets prepare later owner decisions;
+brought that checkpoint to **595 pages: 551 accepted readers and 44 classified
+fixtures**. The later reviewed [CP candidate matrix](cp-wp-003-named-candidate-matrix.md),
+[Stage 4B preflight template](aegis-setup-package-4b-preflight-manifest-template.md)
+and [CP public-contract inspection](cp-wp-003-dynamodb-public-contract-inspection.md)
+bring the current tree through merged PR #305 to **598 pages: 554 accepted
+readers and 44 classified fixtures**, with zero known pending pages in the
+[readability ledger](aegis-documentation-readability-backlog.md#start-here--current-reading).
+The packets prepare later owner decisions;
 none grants a real host session, private-input access, provider call, operation
 or deletion. PR #257 delivered the
 bounded offline integration and consumed APR-023. The owner's 2026-09-24
