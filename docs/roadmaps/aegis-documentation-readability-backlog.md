@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #265 on 2026-09-25 UTC, this remains the active
+As of merged pull request (PR) #267 on 2026-09-25 UTC, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -40,13 +40,21 @@ Markdown file.
 This post-#265 checkpoint rechecks the existing forecast, execution metrics and
 this ledger through independent full-page reviews; no page enters the pending
 set and the tracked count remains 588.
-The issue #101 host-path candidate revises five existing reader pages: its
+Merged PR #267 revised five existing reader pages for the issue #101 host path: its
 setup plan, Stage 4A proposal, feasibility evidence, forecast and this ledger.
 Two independent read-only reviews accepted their full pages after terminology,
-forecast and lockfile corrections, and checked their relative links. It adds
-no page; acceptance remains conditional on the candidate's local and GitHub
-checks and merge.
-**Zero known pages** remain in the bounded sweep.
+forecast and lockfile corrections, and checked their relative links. It added
+no page; the accepted reader and fixture counts remain 544 and 44.
+The [BER-BKL-009 static source inventory](../evidence/ber-bkl-009-static-source-inventory.md)
+is one new reader page proposed after #267. It records the shipped source
+boundaries and remaining host, runtime, privacy and cleanup connections without
+running a host probe. If included, this candidate would have **589 Markdown
+pages**: 545 accepted readers and 44 classified fixtures. Two independent
+read-only reviews accepted the inventory and this ledger after corrections to
+deadline-check attribution, inventory scope, first-use terms and #267 status.
+The candidate still needs exact-head GitHub checks and merge before these new
+counts become the merged-tree counts. **Zero known pages** remain pending in
+this accepted candidate.
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
 below are historical snapshots; the
