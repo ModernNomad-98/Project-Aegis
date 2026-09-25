@@ -49,8 +49,9 @@ those remaining checks manually.
 ## Inputs to Inspect
 
 1. The target standard and obligation: select a WCAG version and level
-   (for example, 2.2 AA) from compliance requirements or contracts. If none
-   governs, propose a version and level and confirm them before citing criteria.
+   from compliance requirements or contracts. If none governs, verify the
+   current W3C versions and criteria, then propose a version and level and
+   confirm them before citing criteria.
 2. The surfaces in scope: routes, critical journeys, the component library
    (design-system components multiply coverage — one accessible Button fixes
    a thousand instances).
@@ -68,7 +69,17 @@ those remaining checks manually.
 
 1. **Pin the standard and scope.** WCAG version + level + the surface list
    (critical journeys first, component library in parallel). Every later
-   finding cites its criterion.
+   finding cites its criterion. If the owner must choose, explain that a
+   version identifies a dated set of criteria and a level (A, AA, or AAA)
+   sets how demanding the target is. First show any contractual floor;
+   compare only viable targets against it. Explain why each is viable,
+   which users/checks it covers and misses, and the likely audit/remediation
+   setup and ongoing upkeep. Tooling or audit prices vary; verify quotes
+   when money matters. Recommend the target that meets the obligation and
+   product needs with the least unjustified burden, explain why and what
+   missing requirement would change it, then ask one version-and-level
+   decision question. Never imply a lower target
+   removes an existing legal or contractual obligation.
 2. **Split checks: automated vs manual — explicitly.** Machines catch
    missing names/labels, role misuse, contrast (mostly), duplicate ids,
    ARIA validity; humans judge focus order sensibility, announcement
@@ -106,6 +117,9 @@ those remaining checks manually.
 ```
 A11Y HARNESS (ACCESSIBILITY TEST HARNESS) — <scope>
 Standard: <Web Content Accessibility Guidelines (WCAG) version/level + obligation source>
+Standard decision, if owner choice: <plain terms; viable targets; coverage,
+  gaps, setup/money/upkeep or unknowns; recommendation + why + what could
+  change it; one question>
 Scope: <journeys, routes, components>
 Automated tier:
   <layer (component/end-to-end/continuous-integration lint/contrast) →
@@ -125,6 +139,8 @@ Handoffs: <wiring → engineer skills; fixes → product/code-reviewer>
 ## Validation Checklist
 
 - [ ] WCAG version/level pinned and every check cites a criterion.
+- [ ] An owner choice of target includes the obligation floor, explained
+      options and costs, a reasoned recommendation, and one decision question.
 - [ ] Automated/manual split is explicit; nothing automation can't judge is
       claimed as automated coverage.
 - [ ] Keyboard checklist covers reach-everything, visible focus, no traps,

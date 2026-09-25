@@ -56,6 +56,16 @@ failure artifacts wiring, and the real run output.
 1. **Confirm the journey list is small and critical.** Each spec = one
    user-meaningful journey with a named risk. Reject UI-tree crawling —
    route breadth to `clickthrough-test-engineer` or component layers.
+   If scope needs an owner decision, explain a critical-journey smoke tier
+   (few full-browser paths on each PR) versus a broader nightly tier (more
+   paths off the PR gate). The smoke tier gives fast deployment evidence but
+   misses lower-priority paths; nightly adds coverage at the cost of runner
+   minutes, fixture upkeep and later feedback. Use measured or estimated
+   runtime and CI pricing where available; mark unknown money/setup/upkeep.
+   Recommend critical paths within the PR budget and the remainder nightly,
+   explain which named risks justify E2E, then ask one scope/budget question.
+   A scope answer does not expand this manual-only invocation or authorize
+   new product test hooks.
 2. **Set up auth state once per persona:** project-dependency setup that logs
    in via the UI or API and saves `storageState`; tests reuse state, never
    re-login per test. Personas map to `test-data-architect` seeds.
@@ -96,6 +106,8 @@ Commands run: <exact commands>
 Results: <real output — pass/fail, runtime, retries (pass-on-retry called out)>
 Artifacts: <traces/screenshots/videos + CI upload wiring>
 CI placement: <tier, sharding, budget>
+Scope choice: <if owner decision needed: smoke vs nightly terms, named risk,
+               runtime and money/setup/upkeep, pros/cons, recommendation and why, one question>
 Handoffs: <flakes → flaky-test-detective; semantics gaps → accessibility-test-harness;
           non-browser items → integration-test-designer>
 ```
@@ -111,6 +123,8 @@ Handoffs: <flakes → flaky-test-detective; semantics gaps → accessibility-tes
 - [ ] Failure artifacts (trace at minimum) wired locally and in CI.
 - [ ] Suite RUN with real output; pass-on-retry reported and routed.
 - [ ] Suite runtime within the tier budget.
+- [ ] An owner-facing journey-scope choice explains the runtime and upkeep
+      tradeoff and recommends a tier for each risk before asking.
 
 ## Gotchas
 

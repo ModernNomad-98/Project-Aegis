@@ -89,6 +89,15 @@ it changes no skill, adds no hook, and collects nothing itself.
    is tier 3 and never sufficient for action. Where the host exposes no
    hook, design the tier-2 path honestly rather than pretending tier 1
    exists.
+   If the owner must choose a capture path, explain that tier 2 is a
+   closeout self-report and a host hook records invocation at its source.
+   Compare tier 2's low setup cost and reporting bias with a hook's better
+   coverage and host-integration, privacy-review and upkeep costs. State
+   money, setup time, ongoing care and unknown host access/costs. Recommend
+   tier 2 for an immediate, labeled baseline when hooks are unavailable;
+   recommend a hook when reliable wrong-fire or never-fired decisions need
+   tier 1 and host ownership is available. Ask one capture-path question;
+   choosing a path does not authorize implementing a hook or collecting.
 4. **Define aggregation and the review cadence.** Per-skill: fire count,
    auto-vs-explicit ratio, wrong-fire count, completion hints, last-fired
    date. Per-cluster: which sibling wins contested requests. Library-wide:
@@ -129,6 +138,8 @@ SKILL USAGE INSTRUMENTATION DESIGN — <library / host>
 Signals:       <invocation | correction | completion-hint | non-event — fields per family>
 Minimization:  captured: <fields>; never captured: prompt/response content, user identifiers, live names/paths
 Capture points:<host hook(s) found → tier 1 | self-report path → tier 2; honest statement of which exist today>
+Capture choice:<if owner decision needed: terms, fit, costs, pros/cons,
+               recommendation and why, one question>
 Aggregation:   <per-skill, per-cluster, library-wide views; window: <stated>>
 Cadence:       <review rhythm + who reviews>
 Thresholds:    <signal pattern → action → consumer (skill-quality-reviewer | trigger-evals fix | skill-deprecation-planner)>
@@ -144,6 +155,8 @@ Not designed:  <what this design deliberately leaves out, and why>
       schema.
 - [ ] Every capture point carries an evidence tier, and tiers that don't
       exist today are stated as not existing (no imagined tier-1 hooks).
+- [ ] Any capture-path choice compares tier-2 bias with hook coverage,
+      money/setup/upkeep and host access, then recommends a path with why.
 - [ ] The never-fired computation derives from eligible shipped skills minus
       observations, with ship date, host/workload exposure and window stated.
 - [ ] Every threshold names both its action and its consumer.

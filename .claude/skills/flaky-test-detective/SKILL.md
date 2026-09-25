@@ -81,6 +81,11 @@ the operation and obtain it before proceeding.
    the flake is a FINDING about production behavior — route the product fix
    (`systematic-debugger`/owner) and keep the test; do not "harden" the test
    into hiding a real race.
+   If timing or remedy requires a user choice, explain the viable paths and
+   why each applies, their coverage and user risk, money/setup/upkeep or
+   unknowns, and the recommended path with its reason and the fact that
+   could change it. Ask one scoped decision question before acting; keep
+   forbidden masking fixes out of the options.
 5. **Fix that one cause at the test layer** when it is a test bug: real
    isolation (own data per `test-data-architect` patterns), await the actual
    condition (web-first/waitFor semantics per the layer's engineer skill),
@@ -105,6 +110,8 @@ Classification: <category + evidence + refutable hypothesis>
 Reproduction: <exact commands/conditions → counts (fails k/N under X)>
 Cause: <the ONE demonstrated cause>
 Triage: <test bug | product bug (routed with evidence) | infra (routed)>
+Choice, if needed: <viable remedies and reasons; costs/risks;
+  recommendation + why + what could change it; one question>
 Fix: <the one change made; forbidden-fix check passed>
 Stability evidence: <before k/N vs after 0/N under identical conditions, N=<n>, limits>
 Quarantine action: <none | released | extended (owner, ticket, expiry)>
@@ -118,6 +125,8 @@ Prevention: <pattern note; chronic-offender flag → regression-suite-curator>
       recorded (or the honest why-not).
 - [ ] Exactly ONE cause fixed in this case.
 - [ ] Product-side races routed as product bugs, test kept honest.
+- [ ] Any user-facing remedy choice explained viable paths, costs and risks,
+      a reasoned recommendation, and one scoped question.
 - [ ] No retries/sleeps/loosened assertions/deletions as "fixes".
 - [ ] Bounded stability evidence reports repeated runs under the reproducing
       condition, N and limitations, not one green run or proof of absence.
@@ -154,7 +163,16 @@ Prevention: <pattern note; chronic-offender flag → regression-suite-curator>
   test-side work; route immediately as a product bug with the reproduction.
 - The "fix" would be a retry/sleep/weakened assertion because the real fix
   needs product refactoring → surface the tradeoff for a scoped decision
-  instead of silently degrading the test.
+  instead of silently degrading the test. Explain that a product refactor
+  changes the code causing the race, while a weaker test can pass despite
+  the bug. Compare a scoped product fix with temporarily quarantining the
+  honest test under the existing owner/ticket/expiry policy, if allowed;
+  explain coverage, user risk, engineering setup time, any infrastructure
+  or money cost, and upkeep for each. Reject retry/sleep/loosened assertions
+  as a cure because they mask the reproduced cause. Recommend the product
+  fix when the race is demonstrated, name any constraint that would change
+  timing, then ask one scoped decision question. Do not treat the answer as
+  authority for product edits beyond the existing grant.
 - Flake source is shared CI infrastructure beyond the repo → route to the
   infra owner with evidence; don't mutate tests to mask infra.
 
