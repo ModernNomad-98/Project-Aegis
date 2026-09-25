@@ -632,3 +632,36 @@ generic skill guidance that would require asking for the same approval again.
 - **Evidence:** [PR #257](https://github.com/ModernNomad-98/Project-Aegis/pull/257)
   merged as `53351b3fac3d75cbbc23341cc96dbeadc1e116ee`;
   [integration review](../evidence/ber-bkl-009-policy-integration-review.md).
+
+### AEGIS-APR-028: Agent-assisted disposable VirtualBox VM setup
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE for one disposable VM setup; Ubuntu guest
+  installation and final configuration remain to be verified.
+- **Date / Grantor:** 2026-09-24 / Peter Nguyen.
+- **Reason:** Prepare the owner-controlled Linux candidate for a later,
+  separately authorized BER R4/R5 Stage A capability proof.
+- **Scope allowed:** The owner's exact reply was "Approve agent-assisted VM
+  setup" to a question authorizing verified VirtualBox and Ubuntu downloads,
+  installation with owner participation for Windows elevation and an Ubuntu
+  password, and one disposable VM with four virtual CPUs, 8 GiB memory and a
+  dynamically allocated 60 GiB disk. The [reviewed setup proposal](../roadmaps/ber-virtualbox-stage-a-setup-proposal.md)
+  supplies the chosen VirtualBox/Linux platform, temporary setup networking
+  and no-sharing boundaries. The VM uses the existing VirtualBox default
+  machine folder, whose personal path is kept outside this public register.
+  The owner keeps passwords
+  private. Exact installed software and VM configuration must be verified.
+- **Scope FORBIDDEN:** This grant does not authorize BER Stage A or Stage B
+  tests, source transfer into the guest, provider/model calls, private inputs,
+  credentials in chat or source, paid services, production use, changes to
+  Windows security or hypervisor features, or VM/evidence deletion. A separate
+  BER-DEC grant is required before even the offline Stage A host probe.
+- **Evidence:** Direct owner reply on 2026-09-24 to the agent-assisted VM setup
+  question in the Project Aegis conversation. VirtualBox 7.2.20 was already
+  installed when setup resumed; its existing installer matched Oracle's
+  published SHA-256 and the installed executable had a valid Oracle signature.
+  The Ubuntu 24.04.5.1 ISO matched Ubuntu's published SHA-256. These supply
+  chain checks do not substitute for verifying the installed guest.
+- **Expiry / use limit:** One named disposable VM setup in this session; no
+  calendar expiry stated. Stop for review if the host, identity, isolation or
+  software configuration differs materially from the approved setup.

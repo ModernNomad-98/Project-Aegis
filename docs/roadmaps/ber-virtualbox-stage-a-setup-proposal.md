@@ -1,9 +1,13 @@
 # BER R4/R5 Stage A: disposable VirtualBox host proposal
 
-> **Proposal, checked 2026-09-24.** The owner chose a new disposable Linux
-> virtual machine (VM) under their control and selected VirtualBox as the
-> platform. No VirtualBox installation, VM creation, host probe or BER Stage A
-> grant has been approved by those choices. The [capability decision](ber-selected-host-capability-decision.md)
+> **Current reading, checked 2026-09-24.** The owner chose a new disposable
+> Linux virtual machine (VM) under their control and selected VirtualBox.
+> [APR-028](../approvals/APPROVAL_REGISTER.md#aegis-apr-028-agent-assisted-disposable-virtualbox-vm-setup)
+> separately approved agent-assisted setup. VirtualBox 7.2.20 was already
+> installed and verified when provisioning began; the Ubuntu 24.04.5.1 ISO
+> was downloaded and verified, and the configured VM booted to its installer.
+> Guest installation and final offline configuration are not yet verified.
+> No BER Stage A host probe is authorized. The [capability decision](ber-selected-host-capability-decision.md)
 > remains the authority and test-plan source.
 
 ## Why this host
@@ -41,8 +45,13 @@ Sources checked 2026-09-24: [Oracle's 7.2 Windows installation guide](https://do
 [Ubuntu's VirtualBox walkthrough](https://ubuntu.com/tutorials/how-to-run-ubuntu-desktop-on-a-virtual-machine-using-virtualbox).
 Version and license terms should be rechecked immediately before downloading.
 
-The version-pinned public downloads proposed for that later provisioning
-decision are:
+The version-pinned public downloads originally proposed before APR-028 are
+below. The owner-approved setup encountered VirtualBox 7.2.20 already
+installed, so no 7.2.18 download or downgrade was performed. The existing
+7.2.20 Windows installer matched Oracle's [published SHA-256 list](https://download.virtualbox.org/virtualbox/7.2.20/SHA256SUMS)
+at `a81777d2b36380ce042a29e9c554cf032eb46a793f62e3cc82e7411e535c2c26`,
+and the installed `VBoxManage` reported `7.2.20r175154` with a valid Oracle
+signature. The proposed Ubuntu ISO and its checksum remained unchanged.
 
 | File | Official source | SHA-256 in the publisher's 2026-09-24 checksum list |
 | --- | --- | --- |
@@ -54,12 +63,13 @@ Verify the downloaded file hashes against the independently retrieved
 and [Ubuntu checksum list](https://releases.ubuntu.com/24.04/SHA256SUMS)
 before running either installer. Do not download the Extension Pack.
 
-## Reviewable setup boundary
+## Reviewable setup boundary at proposal time
 
-The read-only Windows inventory found Windows 11 Professional, hardware
+Before APR-028, the read-only Windows inventory found Windows 11 Professional, hardware
 virtualization enabled, and enough reported CPU, memory and free disk for a
 modest VM. It did not find `VBoxManage`, the Hyper-V PowerShell module, or
-`vmrun` on `PATH`; no VirtualBox installation or Linux VM was verified. The
+`vmrun` on `PATH`; no VirtualBox installation or Linux VM was verified at that
+proposal checkpoint. The
 Windows hypervisor reports active. The administrator-only feature query was
 unavailable, so do not infer which Windows feature activates it.
 
@@ -85,13 +95,15 @@ inside the VM. Record exact installer hashes, VM settings, guest OS/Python versi
 source identity and the absence of shared folders/network in protected raw
 evidence, then publish only a sanitized summary.
 
-### Guided setup sequence after a provisioning grant
+### Original guided setup sequence, before APR-028
 
-These are the planned steps, **not instructions to execute yet**. The agent
-can automate downloads, hash checks, VM configuration and evidence capture.
-The owner may need to approve Windows administrator prompts and set the
-initial Ubuntu password privately. A later provisioning grant must pin the
-host storage location and exact actions before either party starts.
+These steps record the pre-approval plan. APR-028 now authorizes the bounded
+VM setup described at the top of this page; it does not authorize step 4's
+source transfer or a BER host probe. VirtualBox 7.2.20 was already installed,
+so step 1's proposed 7.2.18 download and installation was skipped. The agent
+can verify downloads, configure the VM and capture sanitized setup evidence.
+The owner sets the initial Ubuntu password privately. Read the current status
+and APR-028 before using any step below.
 
 1. Download only the two version-pinned files above from their publisher
    links. In PowerShell, `Get-FileHash -Algorithm SHA256 <downloaded-file>`
@@ -144,14 +156,13 @@ host storage location and exact actions before either party starts.
 
 ## Separate decisions and stop conditions
 
-1. **Provisioning decision:** Review the exact VirtualBox/Ubuntu versions,
-   download links and hashes, VM file location, resource limits, administrator
-   actions, network allowance during setup, transfer method, time ceiling and
-   cleanup plan. Pin the exact signed commit and archive boundary for the
-   proposed step-4 source transfer. If transfer is not granted, skip step 4
-   but still disable networking in step 5; a later grant must cover transfer.
-   Only an explicit grant can authorize installation or VM creation. The
-   owner may choose manual guided setup or agent automation.
+1. **Provisioning decision:** APR-028 authorizes one agent-assisted disposable
+   VM setup with owner-controlled passwords and the boundaries above. The
+   verified installed VirtualBox version is 7.2.20, and the Ubuntu ISO is
+   24.04.5.1. Source transfer in step 4 is **not** granted; skip it and disable
+   networking after guest setup. Any later source transfer must pin its exact
+   signed commit, archive boundary, method and evidence handling separately.
+   No deletion or Windows security-setting change follows from APR-028.
 2. **Stage A decision:** After the VM exists and its facts are verified, review
    and merge a BER-DEC grant pinning this host/account/scratch root, signed
    source, exact commands from the [source-only test plan](ber-selected-host-capability-decision.md#source-only-stage-a-test-plan--prepared-2026-09-24),

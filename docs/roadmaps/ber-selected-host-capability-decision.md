@@ -16,8 +16,10 @@ probe without model or provider calls.
 
 > **Current reading, checked 2026-09-24:** The owner selected a **new disposable
 > Linux virtual machine under their control** as the Stage A candidate and
-> chose VirtualBox for its setup plan. No machine identity, installation,
-> provisioning approval or selected-host proof is recorded. See the
+> chose VirtualBox for its setup plan. APR-028 approved agent-assisted
+> provisioning; VirtualBox 7.2.20 is installed and the named VM booted the
+> verified Ubuntu installer. Guest installation and final configuration remain
+> unverified, and no selected-host capability proof is recorded. See the
 > [VirtualBox setup proposal](ber-virtualbox-stage-a-setup-proposal.md).
 > This page remains a proposal; even its offline Stage A probe needs a separate
 > grant. Use the [BER backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes)
@@ -50,17 +52,19 @@ has been demonstrated. These limits are recorded in
 [`evidence.py`](../../tools/behavioral_eval_runner/evidence.py),
 [`process_control.py`](../../tools/behavioral_eval_runner/process_control.py),
 and the R4/R5 backlog entries. The owner chose a new disposable Linux virtual
-machine as the candidate; none has been identified or provisioned.
+machine as the candidate. At this proposal's original checkpoint, none had
+been identified or provisioned; APR-028 later authorized setup and the named
+VM booted its verified Ubuntu installer. Guest installation remains unverified.
 
 | Candidate | Useful next evidence | Current limit / decision |
 | --- | --- | --- |
 | Existing Windows host | Reproduce known negative path/process result, inspect profile surface and prove denial paths without network/model dispatch | Cannot claim baseline while mid-write prevention and post-leader reaping are unproven; a Windows fix needs a separately reviewed native/host mechanism and exact tests |
-| Owner-selected disposable POSIX host | Reproduce POSIX writer/process negative tests and inspect a clean execution profile on the actual chosen host | Host availability, identity, isolation, permissions, secret custody and probe authority are unknown; generic Linux CI has run but selected-host proof remains absent |
+| Owner-selected disposable POSIX host | Reproduce POSIX writer/process negative tests and inspect a clean execution profile on the actual chosen host | The named VM booted its Ubuntu installer; completed guest identity, isolation, permissions, secret custody and probe authority remain unverified or pending. Generic Linux CI has run but selected-host proof remains absent. |
 
 **Chosen candidate direction:** a new disposable Linux virtual machine under
 the owner's control, with VirtualBox as the planned platform. Its identity,
-configuration, provisioning and probe
-authority remain pending. This is a path to testing the implemented mechanisms,
+configuration and creation have begun under APR-028; guest verification and
+probe authority remain pending. This is a path to testing the implemented mechanisms,
 not a claim that Linux already meets R4/R5. Do not substitute an arbitrary CI
 runner for the selected deployment host.
 
@@ -186,10 +190,11 @@ separate model-driven Stage B authorization and proof.
 
 1. The owner selected a new disposable Linux virtual machine under their
    control as the Stage A candidate in the Project Aegis conversation on
-   2026-09-24 and chose VirtualBox for the setup plan. Specify its OS/version, account,
-   isolation boundary, permitted scratch root and allowed tools; separately
-   authorize any provisioning or access credential. This choice alone grants
-   no host operation.
+   2026-09-24 and chose VirtualBox for the setup plan. APR-028 separately
+   authorized agent-assisted provisioning, and the named VM booted its verified
+   Ubuntu installer. Finish and verify the guest OS/version, account,
+   isolation boundary, permitted scratch root and allowed tools. This setup
+   grant does not authorize a BER host probe or access to private inputs.
 2. After selection, review a BER-DEC Stage A grant with exact commands,
    source pin, root, evidence handling, time ceiling and stop conditions.
    The current proposal does not authorize even a read-only host probe on a
