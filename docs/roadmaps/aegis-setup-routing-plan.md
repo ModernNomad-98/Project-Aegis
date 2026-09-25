@@ -262,6 +262,58 @@ sampling/uncertainty method, hardware, time and spend caps before results are
 seen. Changing them after holdout requires a new version and review. A severe
 safety failure stops selection even if average token count improves.
 
+## Package 7 readiness against issue #101 acceptance
+
+**Readiness: blocked, not a release claim.** The rows below follow the live
+[issue #101 acceptance criteria](https://github.com/ModernNomad-98/Project-Aegis/issues/101)
+in order. "Offline" means synthetic checks, not a supported host workflow.
+The [package 2 review](../evidence/setup/issue-101-package-2-review.md),
+[package 3 review](../evidence/setup/issue-101-package-3-review.md), and
+[Stage 4A review](../evidence/setup/issue-101-package-4a-offline-review.md)
+are the shipped evidence; the [Stage 4B protocol](aegis-setup-package-4b-host-proof-protocol.md)
+defines missing host receipts. A checked issue box requires the full criterion,
+not just the shipped portion.
+
+| Nontechnical experience criterion | Evidence and remaining proof |
+| --- | --- |
+| Four choices before install or connection | Shipped in the manual [`aegis-setup` skill](../../.claude/skills/aegis-setup/SKILL.md); helpers are labeled unavailable. An actual host conversation still needs independent observation. |
+| Model names, alternatives and measured recommendation | Candidate names and screening are documented above. No model has comparative results or a supported recommendation. |
+| Terms, setup, cost, token impact, difficulty, fit and processing location | The skill explains the choices, tradeoffs, unknown costs and Aegis-only recommendation. A selected helper's real price, fit and destination require evaluation; no savings is measured. |
+| Direct and guided Aegis-only completion, including return from helper exploration | The Windows PowerShell save/change/repair and offline tests cover this path; observe it in the supported host before a package 7 claim. No helper download, credential or call is part of that implementation. |
+| One understandable question at a time; no hardware quiz | Required by the skill and covered by its review cases; verify the actual host conversation, including Help me choose. |
+| Measured computer facts without fabricated guarantees | No live machine check or supported helper profile exists; Stage 4B and later CPU comparison must supply the measurements. |
+| Later-session recovery and tested change/disable path | Windows PowerShell tests cover saved Aegis-only selection, status and repair for one user and checkout. Helper disablement and other operating systems remain untested. |
+| Failed setup never appears verified | The state contract and offline tests fail closed; an actual host must demonstrate incomplete and failed cases. No helper `verified` state is emitted today. |
+
+| Routing, safety and host criterion | Evidence and remaining proof |
+| --- | --- |
+| Host calls adapter and consumes validated advice, per version | Stage 4A has synthetic callback tests only. Stage 4B needs correlated invocation, host permission/action and telemetry receipts for one pinned SDK profile; CLI/editor support remains unproved. |
+| Explicit choices and manual-only restrictions | Package 3 validates offered IDs and explicit invocation; Stage 4A checks synthetic agent/skill facts. Stage 4B must prove actual host enforcement. |
+| Required instructions, approvals, reviews and checks survive advice | Offline contract requires mandatory IDs and has no authority field; real multi-turn host enforcement and final review obligations are missing. |
+| Installed-catalog eligibility and bad-output handling | Package 3 covers synthetic unknown, malformed, stale and timeout cases; Stage 4A covers synthetic fail-closed dispatch. Effective host catalog and fallback are unproved. |
+| Existing-authority fallback; local never silently online | Offline fake adapter and bridge have no online route. Host-visible fallback and destination enforcement need Stage 4B receipts. |
+| Credentials absent from chat, tracked state, logs and evidence | Shipped packages use no credential. Any future provider path needs independently reviewed secret custody and redacted evidence. |
+| Hosted fields, minimization, limits and failure behavior | Package 3 bounds synthetic requests and rejects extra fields. No hosted destination, account, budget or live call is approved or verified. |
+
+| Evaluation and claims criterion | Evidence and remaining proof |
+| --- | --- |
+| CPU Laya/Decider, Aegis/rules and optional OpenJev comparison | Shortlist and exclusions are documented above; no checkpoint install, CPU run or paired result exists. |
+| Predeclared criteria, exact configurations and justified default | Protocol above exists, but exact host, model pins, case counts, tolerance, spend limits, results and selection decision are missing. Aegis only remains eligible. |
+| Same reviewed held-out agent and skill cases | Case design is specified above. No independently reviewed sealed partition or leakage-controlled comparison has run. |
+| Whole-task quality, safety, latency, memory, tokens and total cost | Measures are specified above. No paired complete-task traces, cached/uncached accounting or measured cost exists. |
+| Provider-specific threshold calibration | No model has been run or calibrated on suitable development data; a score is not proof. |
+| Savings and billing claims | No measured saving exists. Future reports must distinguish assistant tokens, provider charges and fixed subscription billing. |
+| Registration, validation, tests and independent release review | The setup skill is in the [catalog](../skills-catalog.md) and packages 2–4A have offline checks. Package 7 still needs exact-release validation, host/OS support evidence, independent UX/security/authority review, and honest user documentation before a release claim. |
+| BER and control-plane boundaries stay intact | This plan grants neither BER live dispatch nor control-plane real execution. Their separate [BER](behavioral-eval-runner-backlog.md) and [control-plane](resumable-control-plane-backlog.md) gates still apply. |
+
+Package 7 can be scoped only after separately authorized Stage 4B actual-host
+proof and a later approved, predeclared comparison and selection. Packages 5/6
+remain conditional on that decision. If no helper clears the gate, evaluate
+and release the Aegis-only path on its supported host/OS without inventing an
+integration, model default or savings claim. Record exact host/OS versions,
+held-out results, independent reviews, final registration and required checks
+against the actual release commit before changing this status.
+
 ## Historical options and architecture decision record (ADR) draft
 
 | Option | Delivery/cost | Operability and failure | Reversibility |
