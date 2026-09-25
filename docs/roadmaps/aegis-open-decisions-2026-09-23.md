@@ -1,6 +1,6 @@
 # Project Aegis — next owner decisions
 
-> **Current reading, checked 2026-09-23 after pull request #144:** The table and
+> **Current reading, checked 2026-09-24 after pull request #262:** The table and
 > sequence under [Original decision packet](#original-decision-packet-after-pr-107)
 > preserve the proposal prepared after #107. They are not today's queue. Use
 > the index below with the [approval register](../approvals/APPROVAL_REGISTER.md),
@@ -24,18 +24,19 @@ repository checks, not a selected-host proof. A source SHA is a commit hash;
 
 | Topic | Current status and next gate |
 | --- | --- |
-| BER evidence policy (BKL-009) | [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day complete-bundle policy. [APR-012](../approvals/APPROVAL_REGISTER.md#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof) authorized one synthetic offline proof; [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) was open at this checkpoint. Real-host storage, access, redaction and operator cleanup controls remain incomplete. Follow the [BER backlog](behavioral-eval-runner-backlog.md); policy selection does not approve deletion or a live run. |
+| BER evidence policy (BKL-009) | [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day complete-bundle policy. The synthetic proof merged in [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139), and the bounded synthetic integration merged in [PR #257](https://github.com/ModernNomad-98/Project-Aegis/pull/257); APR-012 and APR-023 are consumed in APR-022 and APR-027. Real-host access, encryption, privacy and operator cleanup remain unscoped. Follow the [BER backlog](behavioral-eval-runner-backlog.md); these offline deliveries do not approve deletion or a live run. |
 | Replacement candidate labels | The public [sanitized candidate checkpoint](../evidence/ber-replacement-candidate-1-summary.md) records 160 pending candidates. Owner semantic review and exact-byte label approval remain open; this index does not inspect or approve private inputs. |
 | BER WP-2B-3 source, allowance and OD-1 | The [offline holdout execution proposal](ber-wp2b3-holdout-execution-scope.md) is a proposal, not an implementation grant or a renewed provider allowance. Historical accounting, exact reviewed execution source, labels, host proof and an explicit call/token/dollar cap remain prerequisites. No measured result or OD-1 ratification exists. |
-| BER host and R4/R5 | The owner selected a disposable POSIX **direction**, but no named host or selected-host capability proof is recorded. The [host decision proposal](ber-selected-host-capability-decision.md) distinguishes generic Linux CI from host evidence; any offline probe needs its own bounded authority. |
+| BER host and R4/R5 | The owner selected a new disposable Linux VM on VirtualBox; [PR #260](https://github.com/ModernNomad-98/Project-Aegis/pull/260) merged its setup proposal. The owner separately approved agent-assisted VM provisioning in APR-028; installation remains in progress at this check. The [host decision proposal](ber-selected-host-capability-decision.md) distinguishes generic Linux CI from host evidence. No Stage A probe is authorized or recorded. |
 | CP-WP-003 | [APR-006](../approvals/APPROVAL_REGISTER.md#aegis-apr-006-control-plane-offline-capability-proofs-first-increment) and [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123) delivered the synthetic CP-WP-003A proof. The [CP backlog](resumable-control-plane-backlog.md) still blocks real source authority, independent freshness, containment, evidence and billing claims. The delivered proof grants no real dispatch. |
 | CP-WP-004 | No delivery target is selected. The [CP backlog](resumable-control-plane-backlog.md) requires CP-WP-003 prerequisites and a separately approved integration with exact receipt, rollback and budget terms. |
 | Issue #101 setup and routing | Package 1 planning ([PR #109](https://github.com/ModernNomad-98/Project-Aegis/pull/109)), package 2 Windows Aegis-only setup ([PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124)), and package 3 offline advisory contract ([PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121)) shipped within bounded scopes. The [setup plan](aegis-setup-routing-plan.md) keeps package 4 host proof and comparison pending separate authority, packages 5/6 conditional, and package 7 pending. No optional helper is selected. |
 | Confidential conduct-reporting intake | The [Code of Conduct](../../CODE_OF_CONDUCT.md#enforcement) now states that no confidential route or independent recipient has been published. The original [D59 finding](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) remains an owner decision: provide a usable private contact and alternate recipient before claiming confidential intake. Do not put sensitive incident details in a public issue. |
 
-At this page's #144 check, the [forecast](aegis-backlog-forecast.md#start-here--current-reading)
-put selected remaining work at **175–394 active hours**. Follow that link for
-the current estimate. It is a scope estimate, not
+The [current forecast after #260](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-260)
+places the other eleven selected rows at **79–162 active hours**, plus an
+unestimated BER-BKL-009 host, runtime, privacy and cleanup residual. The
+selected total therefore has no finite estimate. It is a scope estimate, not
 permission to start a gated package. The independent gates in the original
 packet below still apply where the current index marks them open.
 

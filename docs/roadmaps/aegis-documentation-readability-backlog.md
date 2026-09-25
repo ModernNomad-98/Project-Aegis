@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #261 on 2026-09-24, this remains the active
+As of merged pull request (PR) #262 on 2026-09-24, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -28,6 +28,10 @@ integration evidence record; both passed full-page review. The new
 [VirtualBox Stage A setup proposal](ber-virtualbox-stage-a-setup-proposal.md)
 merged in #260 with one reviewed reader page. PR #261 updated build-choice
 guidance in existing skill and project pages; it added no Markdown file.
+PR #262 updated three existing forecast, measurement and readability pages.
+This current-route and VM-approval update changes existing pages only; its
+approval register, decision routes, host proposal and this ledger received
+full-page review. The tracked count remains 588.
 **Zero known pages** remain in the bounded sweep.
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
