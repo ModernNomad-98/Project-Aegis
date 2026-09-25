@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #267 on 2026-09-25 UTC, this remains the active
+As of merged pull request (PR) #269 on 2026-09-25 UTC, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -10,7 +10,7 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-The merged tree contains **588 tracked Markdown files**: **544
+The merged tree contains **589 tracked Markdown files**: **545
 reader pages** with recorded full-checklist acceptance and **44 synthetic
 fixtures** with classification and integrity checks. The protected
 `scripts/tests/fixtures/README.md` and its new
@@ -46,15 +46,22 @@ Two independent read-only reviews accepted their full pages after terminology,
 forecast and lockfile corrections, and checked their relative links. It added
 no page; the accepted reader and fixture counts remain 544 and 44.
 The [BER-BKL-009 static source inventory](../evidence/ber-bkl-009-static-source-inventory.md)
-is one new reader page proposed after #267. It records the shipped source
+merged in PR #269 as one new reader page. It records the shipped source
 boundaries and remaining host, runtime, privacy and cleanup connections without
-running a host probe. If included, this candidate would have **589 Markdown
-pages**: 545 accepted readers and 44 classified fixtures. Two independent
-read-only reviews accepted the inventory and this ledger after corrections to
-deadline-check attribution, inventory scope, first-use terms and #267 status.
-The candidate still needs exact-head GitHub checks and merge before these new
-counts become the merged-tree counts. **Zero known pages** remain pending in
-this accepted candidate.
+running a host probe. Two independent read-only reviews accepted the inventory
+and this ledger after corrections to deadline-check attribution, inventory
+scope, first-use terms and #267 status. Its exact-head GitHub checks and merge
+made **589 pages**, 545 accepted readers and 44 classified fixtures, the
+merged-tree inventory. **Zero known pages** remain pending in that tree.
+The proposed issue #101 public archive packet revises two existing accepted
+reader pages: the [host feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md)
+and [Stage 4A proposal](aegis-setup-package-4a-host-preparation-proposal.md).
+Two independent full-page reviews accepted the corrected packet, including its
+110-archive and alternate 107-archive static checks, exact dependency limits,
+links and pending implementation grant. This ledger's update is a candidate
+pending independent review. If its local checks, exact-head GitHub Actions and
+merge pass, the accepted candidate remains **589 tracked Markdown pages**:
+545 reader pages and 44 classified fixtures, with zero known pending pages.
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
 below are historical snapshots; the
@@ -268,6 +275,7 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Issue #101 public archive packet after merged PR #269, candidate 2026-09-25 | [Host feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md) and [Stage 4A proposal](aegis-setup-package-4a-host-preparation-proposal.md) | Two existing reader pages revised for the 110-entry and preferred 107-entry static archive checks. Two independent full-page reviews accepted the corrected pages and their links. This ledger update awaits independent review, local checks, exact-head GitHub Actions and merge; if accepted, the tracked count stays 589: 545 reader pages, 44 fixtures, zero known pending. |
 | Current-reading follow-up merged in PR #253 after #252, 2026-09-24 | [BER-BKL-009A historical proposal](ber-bkl-009a-offline-policy-scope-proposal.md) and root `AGENTS.md` | The proposal's current-status banner was corrected from an unmerged #139 claim to its verified merge and partial BKL-009 status; the historical proposal below remains unchanged. The source-library skill-use preference added in #252 received two independent read-only reviews, preserving Role A scope, the manual-only boundary and user authority. Both existing pages retain accepted status. |
 | BER evidence-policy scope and candidate-summary follow-up merged in PR #253, 2026-09-24 | [BER-BKL-009 scope proposal](ber-bkl-009-policy-scope-amendment-proposal.md) and [replacement candidate summary](../evidence/ber-replacement-candidate-1-summary.md) | Two independent full-page reviews accepted the new proposal after first-use, attribution, proposed-versus-delivered, and rollback wording corrections. They also reaccepted the corrected candidate summary after its stale holdout-support sentence was replaced with the merged #249 status and unset production pins. Links, authority limits, and exact ten-path scope were checked. The merged tree has 585 tracked Markdown files: 541 accepted readers and 44 classified fixtures, with zero known pending pages. |
 | Reader-page follow-up after merged PRs #248 and #249, 2026-09-24 | [Multi-agent release path](../paths/release-with-agents.md) and [BER offline holdout review](../evidence/ber-wp2b3-holdout-offline-review.md) | Both new pages received full-page review and corrected-candidate acceptance in this PR. The release path's links and manual-only boundaries were checked, and first-use abbreviations were expanded. The holdout note now identifies the merged #249 source and separates historical premerge checks from the current status. On this PR's accepted merge, the candidate has 584 tracked Markdown files: 540 accepted reader pages, 44 classified fixtures and zero known pending pages. |
