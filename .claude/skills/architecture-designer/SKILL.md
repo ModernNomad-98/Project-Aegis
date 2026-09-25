@@ -66,6 +66,11 @@ a system that does not exist.
 6. **Run the tradeoff analysis:** at least two viable options compared across
    complexity, delivery speed, operability, cost, reversibility, and failure
    modes. Recommend one; say what would change the recommendation.
+   Before asking the user to choose a build option, define unfamiliar terms,
+   explain why each option is viable, and give case-specific pros and cons.
+   Separate money, setup effort, delivery time, and ongoing upkeep; use $0
+   when there is no direct purchase cost and label uncertain figures. Explain
+   why the recommendation fits this system and team.
 7. **Draft the ADR** for the pivotal decision (context, decision,
    alternatives, consequences) — hand to `adr-writer` for completion with
    rollback plan and review date.
@@ -83,9 +88,10 @@ Forces (ranked): <what this design optimizes, in order>
 Target component map: <component — responsibility — allowed deps — boundary contract>
 Data ownership map: <store/table → owning component; flagged shared writes>
 Coupling/cohesion risks: <each with consequence>
-Options considered: <A vs B (vs C) across complexity, speed, operability,
-  cost, reversibility, failure modes>
-Recommendation: <option + what would change it>
+Options considered: <plain-language meaning and reason for A vs B (vs C);
+  pros/cons; money, setup, delivery-time, upkeep costs; complexity,
+  reversibility, failure modes>
+Recommendation: <option + why it fits + what would change it>
 ADR draft: <context, decision, alternatives, consequences> → adr-writer
 Migration plan: <increment → verification → stop point>, order matters
 Assumptions & open questions: <each with risk-if-wrong / who answers>
@@ -101,6 +107,9 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - [ ] Every data store has exactly one owner in the target map.
 - [ ] At least two options genuinely compared; the recommendation names its
       reversal condition.
+- [ ] Any user-facing build choice explains terminology, reason for each
+      option, pros/cons, costs including time and upkeep, and the recommended
+      fit before asking the user to decide.
 - [ ] Migration plan increments are individually shippable and verifiable.
 - [ ] No implementation performed — this skill designs; it does not restructure
       code.

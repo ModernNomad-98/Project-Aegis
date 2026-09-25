@@ -84,6 +84,11 @@ the honest answer is a boring modular monolith.
    consistency need — not generic bullet points anyone could copy. The
    operational cost of distribution is weighed against this org's ability
    to pay it.
+   When presenting styles for the user's choice, define unfamiliar terms and
+   explain why each candidate is relevant. State its likely money, setup,
+   delivery-time, and ongoing operations costs for this team; say when a
+   category costs $0 directly but still takes staff time. Mark unknown amounts
+   as estimates or unknowns rather than inventing prices.
 4. **Make a clear recommendation with reasoning.** One recommended style
    (or hybrid), with the argument for it grounded in the need. Advice that
    won't commit to a recommendation is just a menu.
@@ -116,8 +121,9 @@ ARCHITECTURE STYLE ADVISORY — <system>
 Need (interviewed): domain · load/traffic shape · team size + ops maturity ·
                     deployment constraints · scaling/change expectations · consistency/latency
 Relevant candidates: <only the 2–4 that fit> (not a textbook dump)
-Per candidate (THIS case): pros / cons tied to the interviewed constraints
-RECOMMENDATION:      <style/hybrid> — reasoning grounded in the need
+Per candidate (THIS case): plain-language meaning and why considered;
+  pros / cons and money, setup, delivery-time, ongoing operations costs
+RECOMMENDATION:      <style/hybrid> — why it best fits the need
 Sensitivity:         what would change it (team growth, traffic, isolation need, ...)
 Neutrality note:     trend-trap resisted both ways; distributed-monolith risk flagged if relevant
 Handoffs:            concrete architecture + migration → architecture-designer;
@@ -134,6 +140,9 @@ Handoffs:            concrete architecture + migration → architecture-designer
       them.
 - [ ] Tradeoffs are specific to THIS case, tied to the interviewed
       constraints — not generic.
+- [ ] Before asking the user to choose, each candidate is explained in plain
+      language with its reason, pros/cons, and money/time/setup/upkeep costs;
+      unknown amounts are labeled, including a direct $0 where applicable.
 - [ ] There is a clear recommendation WITH reasoning, not just a menu.
 - [ ] The sensitivity (what would change the recommendation) is stated.
 - [ ] Trend-chasing is resisted in both directions; a boring modular
