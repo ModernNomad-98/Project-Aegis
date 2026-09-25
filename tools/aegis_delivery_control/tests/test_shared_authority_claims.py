@@ -52,6 +52,33 @@ class SharedAuthorityClaimTests(unittest.TestCase):
             self.first.verify_validator_for_intent(capability)
         self.first.verify_validator_intent_committed(capability, "event", "hash")
 
+    def test_validator_marker_accepts_exact_other_instance_recovery(self) -> None:
+        grant = SyntheticValidatorGrant(
+            "grant", "repo", "effect", "revision", "check", "input",
+            "attempt", "scope", "containment",
+        )
+        self.first.register_validator(grant)
+        self.second.register_validator(grant)
+        capability = self.first.claim_or_recover_validator(*grant.__dict__.values())
+        self.second.claim_or_recover_validator(*grant.__dict__.values())
+
+        # The first writer has checked the claim and committed its local intent.
+        # Its marker acknowledgement is delayed while another instance replays it.
+        self.first.verify_validator_for_intent(capability)
+        self.second.mark_or_recover_validator_intent_committed(
+            capability, "event", "hash"
+        )
+        self.first.mark_validator_intent_committed(capability, "event", "hash")
+        self.first.verify_validator_intent_committed(capability, "event", "hash")
+        with self.assertRaisesRegex(DispatchDenied, "another durable intent"):
+            self.first.mark_validator_intent_committed(
+                capability, "other-event", "other-hash"
+            )
+        with self.assertRaisesRegex(DispatchDenied, "another durable intent"):
+            self.second.mark_validator_intent_committed(
+                capability, "other-event", "other-hash"
+            )
+
     def test_explicit_validator_claim_is_durable_and_strict(self) -> None:
         grant = SyntheticValidatorGrant(
             "grant", "repo", "effect", "revision", "check", "input",
