@@ -8,10 +8,11 @@ retain their original meaning. No cleanup or host-security action exists here.
 from __future__ import annotations
 
 import datetime as dt
+import json
 import os
 import re
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from .canonical import canonical_bytes, sha256_hex
 from .enums import RedactionState, RetentionClass, Sensitivity
@@ -27,6 +28,8 @@ from .evidence import (
     _POLICY_WRITE_TOKEN,
     _claim_policy_receipt,
     _load_json_bytes,
+    _require_final_status,
+    _validated_final_report_bytes,
     _validate_artifact_path,
     verify_final_bundle,
     verify_input_evidence,
@@ -138,13 +141,25 @@ def _decision_record(artifact: ClassifiedArtifact) -> dict[str, str]:
     }
 
 
-def _records(artifacts: list[ClassifiedArtifact]) -> list[dict[str, str]]:
+def _records(artifacts: Sequence[ClassifiedArtifact]) -> list[dict[str, str]]:
     records = [_decision_record(item) for item in artifacts]
     paths = [record["path"] for record in records]
     identities = [_identity(path) for path in paths]
     if _identity(FINAL_REPORT_NAME) in identities or len(identities) != len(set(identities)):
         raise EvidenceError("duplicate policy artifact path")
     return sorted(records, key=lambda record: record["path"])
+
+
+def _check_path_conflicts(paths: list[str]) -> None:
+    """Reject file targets that need another file target as a directory."""
+    identities = [_identity(path).replace("\\", "/") for path in paths]
+    targets = set(identities)
+    if len(targets) != len(identities):
+        raise EvidenceError("policy artifact paths conflict before receipt claim")
+    for path in identities:
+        parts = path.split("/")
+        if any("/".join(parts[:index]) in targets for index in range(1, len(parts))):
+            raise EvidenceError("policy artifact paths conflict before receipt claim")
 
 
 def _receipt(stage: str, run_id: str, first: str, records: list[dict[str, str]],
@@ -171,9 +186,14 @@ class OfflinePolicyWriter:
         self.writer = EvidenceWriter(root, run_id)
 
     def finalize_input(self, artifacts: list[ClassifiedArtifact]):
-        if not artifacts:
+        artifact_snapshot = tuple(artifacts)
+        if not artifact_snapshot:
             raise EvidenceError("policy Stage A needs a first input artifact")
-        records = _records(artifacts)  # validate before first evidence write
+        records = _records(artifact_snapshot)  # validate before first evidence write
+        _check_path_conflicts([record["path"] for record in records] + [
+            STAGE_A_POLICY, STAGE_B_POLICY, INPUT_MANIFEST_NAME,
+            FINAL_REPORT_NAME, FINAL_MANIFEST_NAME, MARKER_NAME,
+        ])
         if os.listdir(self.writer.root):
             raise EvidenceError("policy Stage A requires an empty root; existing evidence is preserved")
         first = _iso(_parse_time(_now()))  # writer clock, normalized before first write
@@ -182,11 +202,11 @@ class OfflinePolicyWriter:
             _receipt("stage_a", self.writer.run_id, first, records),
             created_at=first,
         )
-        _claim_policy_receipt(self.writer.root, STAGE_A_POLICY, receipt.content)
         inputs = [receipt] + [
             EvidenceArtifact(_validate_artifact_path(a.relative_path), a.content, _metadata(a.decision))
-            for a in artifacts
+            for a in artifact_snapshot
         ]
+        _claim_policy_receipt(self.writer.root, STAGE_A_POLICY, receipt.content)
         result = self.writer.finalize_input_evidence(
             inputs, _prewritten=frozenset({STAGE_A_POLICY}),
             _policy_bound=_POLICY_WRITE_TOKEN,
@@ -201,14 +221,22 @@ class OfflinePolicyWriter:
         report_decision.validate()
         if not isinstance(final_report, Mapping):
             raise EvidenceError("final report must be an object")
+        _require_final_status(final_status)
+        artifact_snapshot = tuple(artifacts)
         stage_a = verify_policy_input(self.writer.root)
-        records = _records(artifacts)
+        records = _records(artifact_snapshot)
         stage_a_manifest, stage_a_bytes = _load_json_bytes(self.writer.root, INPUT_MANIFEST_NAME)
         if sha256_hex(stage_a_bytes) != stage_a["input_evidence_manifest_sha256"]:
             raise EvidenceIntegrityError("Stage A changed before finalization preflight")
         prior_paths = {_identity(entry["path"]) for entry in stage_a_manifest["artifacts"]}
         if any(_identity(record["path"]) in prior_paths for record in records):
             raise EvidenceError("final artifact would overwrite Stage A evidence")
+        _check_path_conflicts(
+            [entry["path"] for entry in stage_a_manifest["artifacts"]]
+            + [record["path"] for record in records]
+            + [STAGE_B_POLICY, INPUT_MANIFEST_NAME, FINAL_REPORT_NAME,
+               FINAL_MANIFEST_NAME, MARKER_NAME]
+        )
         if any(os.path.lexists(os.path.join(self.writer.root, *record["path"].split("/")))
                for record in records):
             raise EvidenceError("final artifact target already exists; preserving prior bytes")
@@ -218,7 +246,11 @@ class OfflinePolicyWriter:
             raise EvidenceError("final bundle already exists; existing evidence is preserved")
         if any(record["path"] == FINAL_REPORT_NAME for record in records):
             raise EvidenceError("final report path is reserved")
-        report_content = canonical_bytes(dict(final_report))
+        report_content = _validated_final_report_bytes(
+            final_report, self.writer.run_id, stage_a["input_evidence_manifest_sha256"]
+        )
+        # Use the validated snapshot for both the receipt hash and base writer.
+        report_snapshot = json.loads(report_content)
         records.append(_decision_record(ClassifiedArtifact(
             FINAL_REPORT_NAME, report_content, report_decision,
         )))
@@ -228,13 +260,13 @@ class OfflinePolicyWriter:
             "stage_b", self.writer.run_id, stage_a["first_created_at"],
             records, stage_a["input_evidence_manifest_sha256"],
         ), created_at=claimed_at)
-        _claim_policy_receipt(self.writer.root, STAGE_B_POLICY, receipt.content)
         outputs = [
             EvidenceArtifact(_validate_artifact_path(a.relative_path), a.content, _metadata(a.decision))
-            for a in artifacts
+            for a in artifact_snapshot
         ] + [receipt]
+        _claim_policy_receipt(self.writer.root, STAGE_B_POLICY, receipt.content)
         result = self.writer.finalize_final_bundle(
-            final_report, outputs, stage_a["input_evidence_manifest_sha256"],
+            report_snapshot, outputs, stage_a["input_evidence_manifest_sha256"],
             final_status, report_metadata=_metadata(report_decision),
             _prewritten=frozenset({STAGE_B_POLICY}),
             _policy_bound=_POLICY_WRITE_TOKEN,
