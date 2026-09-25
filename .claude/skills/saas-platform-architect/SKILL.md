@@ -80,6 +80,12 @@ multi-tenant" is a slogan, not an architecture.
 7. **Run the tradeoff analysis**: at least two viable platform options
    compared across isolation strength, operability, cost, delivery speed, and
    reversibility. Recommend one; name what would change the recommendation.
+   For a choice the user must make, define terms such as pooled, siloed, and
+   bridge in plain language and why each option is under consideration.
+   Explain case-specific pros/cons and money, setup, delivery-time, and
+   continuing upkeep costs before asking; use $0 for no direct purchase cost
+   while counting staff effort, and label uncertain amounts. State why the
+   recommendation fits this tenant population and team's capacity.
 8. **Write the rollout plan**: ordered, individually shippable increments from
    current to target, each with a verification step and a rollback. For
    single-tenant conversions, identity and data scoping move first — never the
@@ -96,8 +102,9 @@ Deployment model (per component): <component — pooled/siloed/bridge — isolat
 Control plane / data plane split: <capability → plane; straddlers flagged>
 Capability inventory: <capability — present/partial/missing — build/buy/defer>
 Tenant flows: onboard and offboard at platform level
-Options considered: <A vs B across isolation, operability, cost, speed, reversibility>
-Recommendation: <option + reversal condition>
+Options considered: <plain-language meaning and reason for A vs B; pros/cons;
+  money, setup, delivery-time, upkeep costs; isolation and reversibility>
+Recommendation: <option + why it fits + reversal condition>
 Rollout plan: <increment → verification → rollback>, order matters
 Assumptions & open questions: <each with risk-if-wrong / who answers>
 ```
@@ -114,6 +121,9 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
       residency and enterprise isolation.
 - [ ] At least two options genuinely compared; recommendation names its
       reversal condition.
+- [ ] Any user-facing build choice explains terms, reasons, pros/cons, and
+      money/time/setup/upkeep costs before asking; recommendation explains fit
+      and uncertain cost figures are labeled.
 - [ ] Every rollout increment is individually shippable with a verification
       step and a rollback.
 - [ ] No implementation performed — this skill designs; it does not migrate.

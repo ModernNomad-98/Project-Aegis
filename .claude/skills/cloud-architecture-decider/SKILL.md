@@ -142,6 +142,11 @@ is handed to `adr-writer`.
    Multi-cloud gets scored for its real costs (duplicated expertise,
    lowest-common-denominator services) — it must earn its place, not be a
    default hedge.
+   When a provider, deployment pattern, or posture is a user-facing choice,
+   define unfamiliar terms and why each option survived. Explain each one's
+   pros and cons, verified or estimated money cost, setup and delivery time,
+   and continuing upkeep before requesting a choice. A $0 software tier can
+   still consume team time; mark unknown prices instead of guessing.
 6. **Decide managed-vs-self-hosted per capability** — the per-capability
    refinement of the pattern choice: default managed; self-hosting requires a
    named reason (cost at proven scale, capability gap, residency) plus the
@@ -188,9 +193,10 @@ Hard filters applied: <isolation/compliance/region filters → options and
   options eliminated, with the filter that killed each>
 Deployment patterns: <compatible pattern for each component + why; options
   ruled out and by what (workload shape / residency / compliance)>
-Options scored: <pattern × provider × posture — cost model / operational fit /
-  integration / regions / exit cost — rationale per axis>
-Decision: <patterns + providers + deployment posture — the one-paragraph why>
+Options scored: <plain-language meaning + why each pattern × provider × posture
+  is considered; pros/cons; money, setup, delivery-time and upkeep costs;
+  operational fit / integration / regions / exit cost — rationale per axis>
+Decision: <patterns + providers + deployment posture — why this fits best>
 Managed vs self-hosted: <capability → posture → named reason → operational
   bill accepted>
 Tradeoffs & exit costs: <what is given up; lock-in services; cost to leave;
@@ -219,6 +225,9 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - [ ] Scoring is pattern × provider × posture and includes operational maturity
       ("can this team run it") and exit cost — not just feature/price
       comparison, and not provider × posture alone.
+- [ ] Before a user-facing build choice, terms, reasons, pros/cons, and
+      money/time/setup/upkeep costs are clear; current prices and free tiers
+      are verified or labeled unknown, and the recommendation explains fit.
 - [ ] Multi-cloud, if chosen, carries its duplicated-expertise and
       lowest-common-denominator costs in writing; if rejected, the rejection
       is recorded.
