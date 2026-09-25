@@ -665,3 +665,81 @@ generic skill guidance that would require asking for the same approval again.
 - **Expiry / use limit:** One named disposable VM setup in this session; no
   calendar expiry stated. Stop for review if the host, identity, isolation or
   software configuration differs materially from the approved setup.
+
+### AEGIS-APR-029: PR #274 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE when granted; later consumed by AEGIS-APR-030.
+- **Date / Grantor:** 2026-09-25 UTC / Peter Nguyen.
+- **Reason:** Permit the reviewed BER receipt-prevalidation fix to merge after
+  its protected BER paths triggered the guard.
+- **Scope allowed:** The owner's exact answer was "Approve exact-head exception
+  and merge (Recommended)" to the question approving a one-time `gate-guard`
+  exception and administrator merge of
+  [PR #274](https://github.com/ModernNomad-98/Project-Aegis/pull/274) at
+  `7768ed543eea321102ad7f6d3e4b2aebaa862380`. The question reported
+  1,070 local tests passed and 14 skipped; exact-head Linux and Windows checks
+  passed, while only `gate-guard` failed because of protected BER paths.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. This
+  grant did not change the guard or branch protection, or authorize another
+  BER work package.
+- **Evidence:** Direct owner answer quoted above in the Project Aegis
+  conversation on 2026-09-25 UTC; the [PR #274 merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/274)
+  confirms the exact head and check results.
+- **Expiry / use limit:** One merge of PR #274 at the named head; consumed at
+  the merge recorded in AEGIS-APR-030.
+
+### AEGIS-APR-030: Consumption of PR #274 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-029.
+- **Status at recording:** AEGIS-APR-029 has no remaining use.
+- **Effective at:** 2026-09-25 04:18:23 UTC.
+- **Recorded at / By:** 2026-09-25 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The sole exact-head administrator merge completed.
+- **Evidence:** [PR #274](https://github.com/ModernNomad-98/Project-Aegis/pull/274)
+  merged head `7768ed543eea321102ad7f6d3e4b2aebaa862380` as
+  `97e61c590091a3388dc504d72d61ea283772c2fa` at the time above.
+
+### AEGIS-APR-031: Issue #101 Stage 4A offline bridge implementation
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE for one bounded offline implementation.
+- **Date / Grantor:** 2026-09-25 UTC / Peter Nguyen.
+- **Reason:** Prove synthetic callback routing and denial behavior before any
+  real SDK session or provider use.
+- **Scope allowed:** The owner's exact answer was "Approve bounded offline
+  implementation (Recommended)" to the Stage 4A question covering the
+  [reviewed proposal](../roadmaps/aegis-setup-package-4a-host-preparation-proposal.md)
+  merged in [PR #271](https://github.com/ModernNomad-98/Project-Aegis/pull/271).
+  This authorizes the proposal's exact 11 paths and synthetic offline
+  callback/bridge tests, at most 12 active implementation hours, 1,200 added
+  handwritten code/test lines and $0 task-controlled external spend. The
+  preferred pinned dependency resolution contains 107 packages; the SDK uses
+  Anthropic commercial terms. A scripts-disabled install may occur only after
+  review of the exact committed lock and package bodies passes. The grant covers the
+  proposal's fail-closed test matrix and pinned offline CI steps.
+- **Exact implementation files:** `tools/aegis_setup/host_bridge/.gitignore`,
+  `tools/aegis_setup/host_bridge/package.json`,
+  `tools/aegis_setup/host_bridge/package-lock.json`,
+  `tools/aegis_setup/host_bridge/tsconfig.json`,
+  `tools/aegis_setup/host_bridge/bridge.ts`,
+  `tools/aegis_setup/host_bridge/contract_worker.py`,
+  `tools/aegis_setup/host_bridge/bridge.test.ts`,
+  `tools/aegis_setup/host_bridge/README.md`,
+  `docs/roadmaps/aegis-setup-routing-plan.md`,
+  `docs/evidence/setup/issue-101-package-4a-offline-review.md`, and
+  `.github/workflows/validate-skills.yml`.
+- **Scope FORBIDDEN:** No SDK `query()`, Claude CLI process, provider/model
+  call, credentials, private data, VM work or deployment. Synthetic tests
+  cannot claim real Claude interception or token savings. This grant does not
+  waive a later protected CI guard failure; that requires a separate decision.
+  Stop for a reviewed scope change before exceeding any cap or path boundary.
+- **Evidence:** Direct owner answer quoted above in the Project Aegis
+  conversation on 2026-09-25 UTC to the exact-scope question. That question
+  also disclosed local downloads, disk space, future maintenance and Anthropic
+  commercial terms, and required exact lock and package-body safety review
+  before scripts-disabled installation. The 11-path proposal was merged in
+  PR #271 before the grant.
+- **Expiry / use limit:** One bounded Stage 4A offline implementation; no
+  calendar expiry stated. Stage 4B requires separate authority.
