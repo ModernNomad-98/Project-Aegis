@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of this three-packet update on 2026-09-25 Coordinated Universal Time
+As of this named-candidate research update on 2026-09-25 Coordinated Universal Time
 (UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -11,9 +11,14 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-This updated tree contains **595 tracked Markdown files**: **551
+This updated tree contains **596 tracked Markdown files**: **552
 reader pages** with recorded full-checklist acceptance and **44 synthetic
-fixtures** with classification and integrity checks. PR #286 added the reviewed
+fixtures** with classification and integrity checks. The new
+[CP-WP-003 named-candidate matrix](cp-wp-003-named-candidate-matrix.md)
+adds one reviewed reader page after the 595-page three-packet checkpoint;
+independent factual and readability reviews accepted its source-backed comparison
+after corrections to receipt consistency and append-only proof wording.
+PR #286 added the reviewed
 [Stage 4B decision packet](aegis-setup-package-4b-host-proof-protocol.md)
 as one accepted reader page after the #285 inventory of 589. The protected
 `scripts/tests/fixtures/README.md` and its new
