@@ -27669,6 +27669,45 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         self.assertFalse(wrong_report.reconciliation_authorized)
 
+    def test_t22_missing_run_requires_independent_freshness(self) -> None:
+        class RaisingFreshnessOracle:
+            def verify(self, repository_id, catalog_head, run_heads):
+                raise RuntimeError("synthetic source unavailable")
+
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        request = TerminalRestartRequest(
+            "missing-run-request", "repo-1", "run-2", LifecycleState.STOPPED,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        catalog_head, run_heads = self.store.load_verified(
+            "repo-1", authority=self.authority,
+        )
+
+        for oracle, expected_verification in (
+            (CompleteFreshnessOracle("stale-head", run_heads),
+             TerminalRestartVerification.LOCAL_FRESHNESS_UNVERIFIED),
+            (RaisingFreshnessOracle(),
+             TerminalRestartVerification.LOCAL_FRESHNESS_UNVERIFIED),
+            (CompleteFreshnessOracle(catalog_head, run_heads),
+             TerminalRestartVerification.VERIFIED_CURRENT),
+        ):
+            report = SyntheticReadCoordinator(
+                SQLiteStateReader(self.database_path, oracle, "repo-1", self.authority),
+                TransitionEngine(),
+            ).report_terminal_restart(request)
+            self.assertEqual(report.verification, expected_verification)
+            self.assertEqual(report.disposition, TerminalRestartDisposition.UNVERIFIED)
+            self.assertEqual(report.dispatch_posture, DispatchPosture.CLOSED)
+            self.assertFalse(report.restart_advancement_authorized)
+
     def test_t22_repeated_restart_read_cannot_reset_budget_or_release_slot(self) -> None:
         committed = self._commit_planned_intent(
             self.request(), self.capability, self.authority,
