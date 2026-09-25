@@ -98,6 +98,30 @@ test('changed or missing fresh authority between advice and dispatch denies', as
   assert.equal(denied(await missing.preToolUse(agent)), true);
 });
 
+test('equivalent authority with reordered object keys passes, but changed array order denies', async () => {
+  const reordered = Object.fromEntries(Object.entries({ ...base,
+    agents: base.agents.map(o => ({ read_only: o.read_only, description: o.description, id: o.id })),
+    skills: base.skills.map(o => ({ manual_only: o.manual_only, description: o.description, id: o.id })),
+  }).reverse()) as AuthoritySnapshot;
+  let calls = 0;
+  const equivalent = createOfflineCallbacks({ snapshot: () => ++calls === 1 ? base : reordered, advice: reply });
+  assert.equal(noDecision(await equivalent.preToolUse(agent)), true);
+  let changedCalls = 0;
+  const changed = createOfflineCallbacks({ snapshot: () => ++changedCalls === 1 ? base : {
+    ...reordered, agents: [...reordered.agents].reverse(),
+  }, advice: reply });
+  assert.equal(denied(await changed.preToolUse(agent)), true);
+});
+
+test('missing offer flags deny when runtime facts bypass the required TypeScript contract', async () => {
+  const withoutReadOnly = { ...base, agents: [{ id: 'reviewer', description: 'Reviews code' }] } as unknown as AuthoritySnapshot;
+  const withoutManualOnly = { ...base, skills: [{ id: 'api', description: 'Reviews APIs' }] } as unknown as AuthoritySnapshot;
+  for (const facts of [withoutReadOnly, withoutManualOnly]) {
+    const callbacks = createOfflineCallbacks({ snapshot: () => facts, advice: reply });
+    assert.equal(denied(await callbacks.preToolUse(agent)), true);
+  }
+});
+
 test('malformed, duplicate-key, oversized and contaminated replies deny', async () => {
   for (const advise of [() => '{', () => '{"version":"1","version":"1"}',
     () => 'x'.repeat(1025), req => reply(req).replace('"cat-1"', '"stale"'),
