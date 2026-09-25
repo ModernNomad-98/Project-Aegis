@@ -2,6 +2,10 @@
 
 **Status: proposal for owner review, 2026-09-25 UTC.** This page grants no SDK session, provider or model call, credential access, installation, helper evaluation, VM work, or deployment. Stage 4B execution has no defensible ETA yet. Drafting this packet is new work estimated at **1–2 active hours**; it is not Stage 4B execution time. The [selected backlog](aegis-backlog-forecast.md#start-here--current-reading) remains **71–146 active hours plus unestimated work**, so it has no finite total.
 
+The [preflight manifest template](aegis-setup-package-4b-preflight-manifest-template.md)
+shows the exact profile, authority, permission, case, privacy and budget fields
+that a later execution request must fill. Its blank fields grant no live access.
+
 The [setup plan](aegis-setup-routing-plan.md) requires proof that a selected host invokes an interception hook, consumes its decision, keeps the host's ordinary authority in charge, and exposes complete-task telemetry. The [Stage 4A proposal](aegis-setup-package-4a-host-preparation-proposal.md) selected a separate Claude Agent SDK managed session on native Windows for synthetic preparation. [APR-031](../approvals/APPROVAL_REGISTER.md#aegis-apr-031-issue-101-stage-4a-offline-bridge-implementation) authorized its one bounded offline implementation, now complete under [APR-036](../approvals/APPROVAL_REGISTER.md#aegis-apr-036-stage-4a-offline-bridge-package-completed). The [source feasibility record](../evidence/setup/issue-101-package-4a-host-feasibility.md) documents SDK callback shapes and limits. The [offline bridge in PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281) merged at `ea40ab481ff78267cd5f151c393e946805ba8d01` on 2026-09-25 at 07:43:44 UTC from exact head `fd2e27e48fcfe85a5361345ebe70bb424e422abf`. It supplies synthetic callback evidence, **not real-host proof**. No real authority snapshot source, callback receipt, decision-consumption receipt, or main/subagent token trace is established by Stage 4A.
 
 ## Decision requested and plain terms
