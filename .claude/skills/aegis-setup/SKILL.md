@@ -36,19 +36,31 @@ never authorizes a tool, provider, model or agent.
 
 ## Workflow
 
-1. Show all four choices before asking which one the user wants:
+1. Before any preference question, explain that **Aegis** is the current skill
+   library used with the person's existing assistant. A **helper** would be an
+   additional decision service, not a replacement for that assistant. **Local**
+   means running that future service on the person's computer; **online** means
+   sending selected task text to a separate remote service. Explain why someone
+   might consider each path, its benefit, its tradeoff, and its money, setup and
+   maintenance costs (or say when a cost is unknown). Show all four choices:
 
-   | Choice | Who it suits and practical effect |
-   | --- | --- |
-   | **Aegis only** | People who want the current skills and assistant with no extra setup or helper fee. The existing assistant still processes task text in its usual location. This is the only completable choice today. |
-   | **Aegis plus a local helper** | People interested in a future helper on their computer. It would need separate installation, machine fit and testing; it could add setup effort and local compute cost. The whole coding workflow would still use the existing assistant, so it would not become fully offline. Unavailable today. |
-   | **Aegis plus an online helper** | People interested in a future remote decision service. It would need a separately reviewed destination, account/terms, credential and possible extra cost. Selected task text would leave the machine for that service. Unavailable today; do not ask for a credential. |
-   | **Help me choose** | People who want one simple preference question at a time. Start by asking whether they want Aegis working now without extra setup. Recommend Aegis only as the currently completable path; explain either helper on request and offer Aegis only again. |
+   | Choice | Why consider it and benefit | Tradeoff, cost and availability |
+   | --- | --- | --- |
+   | **Aegis only** | Use the current skills with the existing assistant now; no helper setup or maintenance. | No claimed helper benefit or measured savings. No extra helper fee; existing assistant costs and its usual task-text processing still apply. **Only completable choice today.** |
+   | **Aegis plus a local helper** | A future decision service on this computer could keep the text it handles local. | Separate installation, machine-fit checks, testing and maintenance; hardware, electricity and time costs are unknown. The existing assistant still processes the rest of the coding workflow, so this would not make it fully offline. **Unavailable today.** |
+   | **Aegis plus an online helper** | A future remote decision service could avoid running that helper on this computer. | Selected task text would go to a separately reviewed destination; account/terms, credential, connection and maintenance would need review. Any extra service fee is unknown; existing assistant costs remain. **Unavailable today; do not request a credential.** |
+   | **Help me choose** | Get guidance if the terms or tradeoffs are unclear. | This is a conversation path, not another setup or a saved selection; it adds no helper fee. Recommend the available Aegis-only path, then ask one simple preference question. |
 
 2. Explain that **tokens are units of text processing**. A helper might change
    token use, but no savings have been measured; existing assistant costs
-   remain. No model or helper is selected or recommended here. Ask no hardware
-   threshold question.
+   remain. Recommend **Aegis only** because it works now without a helper
+   installation, extra helper fee or unverified processing destination. This is
+   a recommendation for the setup path, not for a model or helper. Give that
+   reason before asking one atomic preference question, such as "Would you like
+   to select Aegis only for this checkout now?" Ask only when the person's
+   choice is not already explicit. For **Help me choose**, ask whether they want
+   Aegis working now without extra setup; explain either helper on request and
+   offer Aegis only again. Ask no hardware threshold question.
 3. If the user explores a helper, mark it **unavailable** and always offer
    "Choose Aegis only". Never save a helper choice as completed or attempt an
    install, connection, provider call or fallback from local to online.
