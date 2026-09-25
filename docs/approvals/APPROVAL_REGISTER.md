@@ -825,3 +825,39 @@ generic skill guidance that would require asking for the same approval again.
 - **Evidence:** [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
   merged as `ea40ab481ff78267cd5f151c393e946805ba8d01` at the time above.
   This closes one Stage 4A implementation; it is not Stage 4B host proof.
+
+### AEGIS-APR-037: PR #304 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-038; no remaining use.
+- **Date / Grantor:** 2026-09-25 UTC / Peter Nguyen.
+- **Reason:** Permit the independently reviewed synthetic BER Stage A expiry
+  repair to merge after its protected BER paths triggered the guard.
+- **Scope allowed:** The owner's exact reply was "approved" to the one-time
+  `gate-guard` exception request for
+  [PR #304](https://github.com/ModernNomad-98/Project-Aegis/pull/304) at
+  `df7e5b2bb5b6b3211fada10ead0f8c723874d6d5`. The request reported
+  1,074 local offline BER tests with 14 expected skips, independent review,
+  passing exact-head Linux and Windows Actions, and a `gate-guard` failure
+  solely because protected BER source paths changed. The grant covered one
+  administrator merge of that exact head through that guard result.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. This
+  did not alter branch protection or authorize a real host, provider call,
+  private input, production driver, publication or evidence deletion.
+- **Evidence:** Direct owner reply quoted above in the Project Aegis
+  conversation; the [PR #304 merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/304)
+  confirms the exact head and check results.
+- **Expiry / use limit:** One merge of PR #304 at the named head; consumed
+  by the merge recorded in AEGIS-APR-038.
+
+### AEGIS-APR-038: Consumption of PR #304 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-037.
+- **Status at recording:** AEGIS-APR-037 has no remaining use.
+- **Effective at:** 2026-09-25 23:30:28 UTC.
+- **Recorded at / By:** 2026-09-25 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The sole exact-head administrator merge completed.
+- **Evidence:** [PR #304](https://github.com/ModernNomad-98/Project-Aegis/pull/304)
+  merged `df7e5b2bb5b6b3211fada10ead0f8c723874d6d5` as
+  `e6f13e3376e2b5d7ad85ab6ca097dedde96f5fe2` at the time above.

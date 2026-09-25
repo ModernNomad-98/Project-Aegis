@@ -1,6 +1,6 @@
 # Behavioral Eval Runner — Durable Backlog and Phase Register
 
-> **Current reading, checked 2026-09-24 after pull request #257:** This is the
+> **Current reading, checked 2026-09-25 after pull request #304:** This is the
 > permanent continuation and decision register for Behavioral Eval Runner
 > maintainers and coding agents. The dated delivery checkpoints below remain
 > historical evidence. Use the current map and owning work-package record
@@ -37,6 +37,15 @@ supersessions in [section 20a of the merged design](../design/behavioral-eval-ru
 | WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; BER-DEC-012 granted the bounded synthetic offline holdout support now delivered in [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249). Measured calibration and OD-1 ratification remain unfinished. | Labels, selected execution source, allowance and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate), the [offline scope](ber-wp2b3-holdout-execution-scope.md), and the [implementation review](../evidence/ber-wp2b3-holdout-offline-review.md). |
 | R1–R5 | Outcome B accepted their WP-2B-0 dispositions; R2 and R4/R5 technical proofs remain unresolved. | Read the [evidence-gate records](#6-phase-2b-0-evidence-gates--r1r5); selected-host proof is needed before a baseline claim. |
 | WP-2B-4 through 2B-7 | WP-2B-4 is **BLOCKED**; 2B-5, 2B-6 and 2B-7 remain **BACKLOG**. | Each needs its own prerequisites and reviewed authority. |
+
+Merged [PR #304](https://github.com/ModernNomad-98/Project-Aegis/pull/304)
+repaired an offline BKL-009 policy-bound read path: an expired Stage A now
+stops judge input verification and reads, and Stage B finalization rejects it
+before writing. Legacy structural inspection remains available. The one-time
+protected guard exception was consumed at this exact merge under
+[APR-037/038](../approvals/APPROVAL_REGISTER.md#aegis-apr-037-pr-304-protected-gate-guard-exception).
+This repair does not close BKL-009's real-host, privacy, runtime or cleanup
+gates.
 
 For the binding start rule, read the [work-package authorization
 protocol](#work-package-authorization-protocol-binding) and the [append-only
