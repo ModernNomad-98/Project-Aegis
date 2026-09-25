@@ -2157,6 +2157,47 @@ class SyntheticAuthority:
         with self._lock:
             if capability.claim_id in self._committed_claims:
                 raise DispatchDenied("synthetic capability already committed an intent")
+            self._verify_durable_claim_uncommitted(
+                "effect_source_claims", capability
+            )
+
+    def _verify_durable_claim_uncommitted(
+        self,
+        table: str,
+        capability: SyntheticCapability | SyntheticValidatorCapability,
+    ) -> None:
+        """Check current shared state; a startup snapshot cannot authorize reuse."""
+        if self._validator_claim_store_path is None:
+            return
+        connection = None
+        try:
+            connection = self._validator_claim_connection()
+            connection.execute("BEGIN IMMEDIATE")
+            row = connection.execute(
+                f"SELECT claim_id, capability_json, state FROM {table} "
+                "WHERE grant_id = ?", (capability.grant_id,),
+            ).fetchone()
+            if row is None or (
+                row["claim_id"], row["capability_json"]
+            ) != (
+                capability.claim_id,
+                json.dumps(capability.__dict__, sort_keys=True, separators=(",", ":")),
+            ):
+                raise DispatchDenied("durable source claim binding is unavailable")
+            if row["state"] != "CLAIMED":
+                raise DispatchDenied("synthetic capability already committed an intent")
+            connection.commit()
+        except (sqlite3.Error, OSError) as exc:
+            if connection is not None:
+                connection.rollback()
+            raise DispatchDenied("durable source claim state is unavailable") from exc
+        except BaseException:
+            if connection is not None:
+                connection.rollback()
+            raise
+        finally:
+            if connection is not None:
+                connection.close()
 
     def mark_intent_committed(
         self,
@@ -2194,7 +2235,7 @@ class SyntheticAuthority:
         expected = (intent_event_id, intent_event_hash)
         with self._lock:
             prior_binding = self._effect_commit_bindings.get(capability.claim_id)
-            if prior_binding is not None:
+            if prior_binding is not None and self._validator_claim_store_path is None:
                 if prior_binding != expected:
                     raise DispatchDenied(
                         "effect claim committed another durable intent"
@@ -2256,12 +2297,55 @@ class SyntheticAuthority:
     ) -> None:
         self.verify_issued(capability)
         with self._lock:
+            if self._validator_claim_store_path is not None:
+                self._verify_durable_claim_committed(
+                    "effect_source_claims", capability,
+                    (intent_event_id, intent_event_hash),
+                )
+                return
             if self._effect_commit_bindings.get(capability.claim_id) != (
                 intent_event_id, intent_event_hash,
             ):
                 raise DispatchDenied(
                     "effect source claim is not bound to the durable intent"
                 )
+
+    def _verify_durable_claim_committed(
+        self,
+        table: str,
+        capability: SyntheticCapability | SyntheticValidatorCapability,
+        expected: tuple[str, str],
+    ) -> None:
+        connection = None
+        try:
+            connection = self._validator_claim_connection()
+            connection.execute("BEGIN IMMEDIATE")
+            row = connection.execute(
+                f"SELECT claim_id, capability_json, state, intent_event_id, "
+                f"intent_event_hash FROM {table} WHERE grant_id = ?",
+                (capability.grant_id,),
+            ).fetchone()
+            if row is None or (
+                row["claim_id"], row["capability_json"], row["state"],
+                row["intent_event_id"], row["intent_event_hash"],
+            ) != (
+                capability.claim_id,
+                json.dumps(capability.__dict__, sort_keys=True, separators=(",", ":")),
+                "INTENT_COMMITTED", *expected,
+            ):
+                raise DispatchDenied("source claim is not bound to the durable intent")
+            connection.commit()
+        except (sqlite3.Error, OSError) as exc:
+            if connection is not None:
+                connection.rollback()
+            raise DispatchDenied("durable source claim state is unavailable") from exc
+        except BaseException:
+            if connection is not None:
+                connection.rollback()
+            raise
+        finally:
+            if connection is not None:
+                connection.close()
 
     def register_validator(self, grant: SyntheticValidatorGrant) -> None:
         if any(not value for value in grant.__dict__.values()):
@@ -2349,6 +2433,41 @@ class SyntheticAuthority:
                     containment_digest=containment_digest,
                 ),
             )
+            if self._validator_claim_store_path is not None:
+                capability_json = json.dumps(
+                    capability.__dict__, sort_keys=True, separators=(",", ":")
+                )
+                connection = self._validator_claim_connection()
+                try:
+                    connection.execute("BEGIN IMMEDIATE")
+                    durable_grant = connection.execute(
+                        "SELECT grant_json FROM validator_source_grants WHERE "
+                        "grant_id = ?", (grant_id,),
+                    ).fetchone()
+                    if durable_grant is None or json.loads(
+                        str(durable_grant["grant_json"])
+                    ) != grant.__dict__:
+                        raise DispatchDenied(
+                            "synthetic validator grant durable binding mismatch"
+                        )
+                    if connection.execute(
+                        "SELECT 1 FROM validator_source_claims WHERE grant_id = ?",
+                        (grant_id,),
+                    ).fetchone() is not None:
+                        raise DispatchDenied(
+                            "synthetic validator grant was already claimed"
+                        )
+                    connection.execute(
+                        "INSERT INTO validator_source_claims VALUES "
+                        "(?, ?, ?, 'CLAIMED', NULL, NULL)",
+                        (grant_id, claim_id, capability_json),
+                    )
+                    connection.commit()
+                except BaseException:
+                    connection.rollback()
+                    raise
+                finally:
+                    connection.close()
             self._validator_claims[grant_id] = capability
             return capability
 
@@ -2479,7 +2598,7 @@ class SyntheticAuthority:
     def release_uncommitted_validator_claim(
         self, capability: SyntheticValidatorCapability
     ) -> None:
-        """Undo this exact in-memory claim after its writer transaction rolls back."""
+        """Release the local handle; keep a durable claim for exact recovery."""
         self.verify_validator_evidence(capability)
         with self._lock:
             issued = self._validator_claims.get(capability.grant_id)
@@ -2491,6 +2610,9 @@ class SyntheticAuthority:
                 raise DispatchDenied(
                     "committed synthetic validator claim cannot be released"
                 )
+            self._verify_durable_claim_uncommitted(
+                "validator_source_claims", capability
+            )
             del self._validator_claims[capability.grant_id]
 
     def verify_validator_issued(
@@ -2529,6 +2651,9 @@ class SyntheticAuthority:
                 raise DispatchDenied(
                     "synthetic validator capability already committed an intent"
                 )
+            self._verify_durable_claim_uncommitted(
+                "validator_source_claims", capability
+            )
 
     def mark_validator_intent_committed(
         self,
@@ -2623,6 +2748,11 @@ class SyntheticAuthority:
         self.verify_validator_issued(capability)
         expected = (intent_event_id, intent_event_hash)
         with self._lock:
+            if self._validator_claim_store_path is not None:
+                self._verify_durable_claim_committed(
+                    "validator_source_claims", capability, expected
+                )
+                return
             if self._validator_commit_bindings.get(capability.claim_id) != expected:
                 raise DispatchDenied(
                     "validator source claim is not bound to the durable intent"
