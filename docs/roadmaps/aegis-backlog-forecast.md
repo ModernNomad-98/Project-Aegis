@@ -12,7 +12,12 @@ documentation residual. PR #253 added one reviewed reader page; PR #257 added
 two more. PR #260 added one reviewed setup page and #269 added a reviewed
 Behavioral Eval Runner (BER) source inventory, making **589 pages**: 545
 accepted readers and 44
-classified fixtures, with zero known pending pages. PR #257 delivered the
+classified fixtures at that point. Merged [PR #286](https://github.com/ModernNomad-98/Project-Aegis/pull/286)
+added the reviewed [Stage 4B host-proof planning packet](aegis-setup-package-4b-host-proof-protocol.md),
+bringing the current tree to **590 pages: 546 accepted readers and 44
+classified fixtures**, with zero known pending pages. The packet prepares an
+owner decision; it grants no real host session, provider call or helper
+comparison. PR #257 delivered the
 bounded offline integration and consumed APR-023. The owner's 2026-09-24
 approval of the [bounded BER-BKL-009 synthetic integration](#material-owner-decision--2026-09-24-ber-bkl-009),
 made effective by merged PR #255,
