@@ -93,6 +93,12 @@ organize the content (that's `diataxis-doc-organizer`) or write it.
    MECHANICS; the human-facing guide content is `contribution-guide-author`'s.
 9. **Deliver** the pipeline design in the Output Format, with the CI gate
    and sample-testing explicitly specified.
+10. **Explain choices to contributors.** When a format, generator, search
+    service, or CI gate needs human selection, define unfamiliar terms,
+    connect each option to the project's needs, compare pros and cons and
+    money, setup time, and maintenance effort; include a $0 option only
+    when one exists and is verified. Then recommend one with a reason.
+    Mark unknown pricing for verification rather than guessing.
 
 Generator selection factors, the CI-checks catalog (link/prose/build/
 sample), and the docs-versioning patterns:
@@ -103,6 +109,8 @@ sample), and the docs-versioning patterns:
 ```
 DOCS-AS-CODE PIPELINE — <project>
 Location/format: in-repo path; <Markdown/MDX/rST/AsciiDoc>; generator=<...> — why
+Choice guide:    <terms, reason, money/setup/maintenance cost, pros and cons,
+                 recommended format/generator/search/check options and why>
 Pipeline:       local preview; per-PR preview build; deploy-on-merge; rollback
 Review:         docs via PR; CODEOWNERS for docs paths
 CI checks:      build gate; link-check (internal + sampled external); prose/style lint;
@@ -121,6 +129,8 @@ Boundaries:     content org → diataxis-doc-organizer; README → readme-crafts
       alongside code, with a docs CODEOWNER.
 - [ ] The design chooses a generator/format for stated reasons (versioning/
       API/search/i18n), not fashion.
+- [ ] Contributor-facing choices define terms and explain reasons, money,
+      setup and maintenance costs, pros/cons, and a justified recommendation.
 - [ ] Per-PR preview builds, deploy-on-merge, and rollback are specified
       in the pipeline design.
 - [ ] The CI design covers buildability, link-checking, prose/style, and

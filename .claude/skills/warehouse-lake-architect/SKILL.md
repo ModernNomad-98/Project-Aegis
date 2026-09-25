@@ -127,6 +127,13 @@ are `streaming-event-architect`.
    named per source (batch/CDC/streaming — transport design handed to
    `streaming-event-architect`) and an incremental adoption path from the
    current estate.
+10. **Teach the estate-class choice.** Before asking the team to select
+    warehouse, lake, or lakehouse, define each term in plain language.
+    Compare fit, practical pros and cons, money, setup time, and ongoing
+    platform care; include a $0 incremental option only when one exists
+    and is verified. Recommend the class supported by workload and team
+    maturity, explain why, and flag unverified prices instead of inventing
+    them.
 
 Estate-class decision table, zone contract template, modeling and SCD
 guidance, and the partitioning worksheet:
@@ -137,6 +144,8 @@ guidance, and the partitioning worksheet:
 ```
 ANALYTICAL ESTATE DESIGN — <scope>
 Estate class:  warehouse | lake | lakehouse — decided by <workload/maturity evidence>
+Choice guide:  <terms, reason, money/setup/upkeep cost, pros and cons,
+                recommended class and why; unknown costs to verify>
 Zones:         raw → conformed → curated; per-zone owner/write/read/retention/contract
 Marts:         <per mart: consumers, modeling (dimensional|wide), SCD policy, freshness SLA>
 Tenant scoping: key carried in all zones; per-tenant access path for customer-facing;
@@ -155,6 +164,8 @@ Not decided here: split verdicts (splitter), transport (streaming), provider map
 
 - [ ] The estate class cites workload and team-maturity evidence; the
       why-not for the adjacent class is stated.
+- [ ] The owner-facing estate choice defines terms, compares money, setup
+      and upkeep costs and pros/cons, and justifies the recommendation.
 - [ ] Every zone has an owner, write authority, read audience, retention,
       and a stated contract; BI reads curated only.
 - [ ] Tenant key present in every zone; every cross-tenant mart is named,
