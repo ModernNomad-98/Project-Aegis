@@ -15,7 +15,7 @@ from tools.behavioral_eval_runner.enums import RedactionState, Sensitivity
 from tools.behavioral_eval_runner.errors import EvidenceError, EvidenceIntegrityError
 from tools.behavioral_eval_runner.evidence import (
     ArtifactMetadata, EvidenceArtifact, EvidenceWriter, FINAL_MANIFEST_NAME,
-    FINAL_REPORT_NAME, INPUT_MANIFEST_NAME, MARKER_NAME, verify_final_bundle,
+    FINAL_REPORT_NAME, INPUT_MANIFEST_NAME, JudgeInputGate, MARKER_NAME, verify_final_bundle,
     verify_local_bundle,
 )
 from tools.behavioral_eval_runner.evidence_policy import (
@@ -390,6 +390,59 @@ class TestPolicy(PolicyCase):
                 self.verify_at(as_of)
         self.assertTrue(os.path.exists(os.path.join(self.root, MARKER_NAME)))
 
+    def test_policy_stage_a_gate_denies_at_deadline_and_on_later_read(self) -> None:
+        self.stage_a()
+        gate = JudgeInputGate(self.root)
+        with patch("tools.behavioral_eval_runner.evidence_policy._now",
+                   return_value="2030-03-02T22:59:59Z"):
+            self.assertTrue(gate.verify())
+            self.assertEqual(gate.read_artifact("inputs/one.txt"), b"synthetic input")
+        with patch("tools.behavioral_eval_runner.evidence_policy._now",
+                   return_value=DEADLINE):
+            with self.assertRaisesRegex(EvidenceIntegrityError, "review deadline"):
+                gate.read_artifact("inputs/one.txt")
+            with self.assertRaisesRegex(EvidenceIntegrityError, "review deadline"):
+                JudgeInputGate(self.root).verify()
+
+    def test_policy_stage_a_gate_rechecks_receipt_on_read(self) -> None:
+        self.stage_a()
+        gate = JudgeInputGate(self.root)
+        with patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=LATER):
+            gate.verify()
+            receipt = self.read(STAGE_A_POLICY)
+            receipt["classification_decisions"][0]["decision_ref"] = "synthetic-review:tampered"
+            self.write(STAGE_A_POLICY, receipt)
+            with self.assertRaises(EvidenceIntegrityError):
+                gate.read_artifact("inputs/one.txt")
+
+    def test_late_policy_claim_cannot_use_legacy_gate_read(self) -> None:
+        EvidenceWriter(self.root, RUN).finalize_input_evidence([
+            EvidenceArtifact("inputs/one.txt", b"synthetic input")
+        ])
+        gate = JudgeInputGate(self.root)
+        gate.verify()
+        policy_path = os.path.join(self.root, *STAGE_A_POLICY.split("/"))
+        os.makedirs(os.path.dirname(policy_path), exist_ok=True)
+        Path(policy_path).write_bytes(b"{}")
+        with self.assertRaises(EvidenceIntegrityError):
+            gate.read_artifact("inputs/one.txt")
+
+    def test_expired_stage_a_cannot_write_stage_b(self) -> None:
+        sha = self.stage_a()
+        before = {
+            os.path.relpath(os.path.join(folder, name), self.root): Path(folder, name).read_bytes()
+            for folder, _, names in os.walk(self.root) for name in names
+        }
+        with patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=DEADLINE), \
+             patch("tools.behavioral_eval_runner.evidence._utc_now_iso", return_value=DEADLINE):
+            with self.assertRaisesRegex(EvidenceIntegrityError, "review deadline"):
+                self.writer.finalize_final(self.report(sha), [], decision("report"), "EXPIRED")
+        after = {
+            os.path.relpath(os.path.join(folder, name), self.root): Path(folder, name).read_bytes()
+            for folder, _, names in os.walk(self.root) for name in names
+        }
+        self.assertEqual(after, before)
+
     def test_empty_or_unclassified_stage_a_rejected_before_write(self) -> None:
         for items in ([], [EvidenceArtifact("x", b"raw")],
                       [ClassifiedArtifact("x", b"raw", None)]):
@@ -628,7 +681,7 @@ class TestPolicy(PolicyCase):
         times = iter((LATER, "2030-02-01T02:00:00Z", "2030-02-01T03:00:00Z"))
         with patch("tools.behavioral_eval_runner.evidence._utc_now_iso", side_effect=lambda: next(times)), \
              patch("tools.behavioral_eval_runner.evidence_policy._now",
-                   side_effect=[LATER, "2030-02-01T05:00:00Z"]):
+                   side_effect=[LATER, LATER, "2030-02-01T05:00:00Z"]):
             self.writer.finalize_final(
                 self.report(sha),
                 [ClassifiedArtifact("outputs/one.txt", b"synthetic output", decision("output"))],
