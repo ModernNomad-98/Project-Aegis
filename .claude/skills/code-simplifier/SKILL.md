@@ -129,6 +129,11 @@ Behavior changed: NONE (or: stop — see report)
 
 - No or thin test coverage over the target, and the human has not explicitly
   accepted unprotected simplification → stop and present the two options.
+  Explain that characterization tests record current behavior, including
+  existing bugs. Compare adding those tests with accepting unprotected edits:
+  why each path exists, case-specific benefit and risk, test-writing time,
+  ongoing upkeep, and any monetary cost or unknown. Recommend the safer route
+  and explain why before asking for the missing decision.
 - A planned move turns out to require a behavior or contract change →
   stop that move, list it under "not done", and report — changing it needs
   its own approved task.

@@ -79,6 +79,14 @@ tool in the performance pack — one query, its plan, its verdict.
 
 ## Workflow
 
+When a plan verdict presents a user-facing build choice, explain terms such
+as statistics refresh, query rewrite, index and schema adjustment. State why
+each viable route would address this plan, its case-specific benefits and
+drawbacks, and purchase, implementation and ongoing costs (or unknowns).
+Recommend one using measured plan evidence and explain why. Ask one decision
+at a time only when a decision is needed; a recommendation does not authorize
+the database change.
+
 Explicit human invocation selects this execution-capable skill; it does not
 expand the allowed target or activate Task-Authorized Local Implementation
 (TALI). TALI is a separate route requiring its own classification and activation
@@ -150,8 +158,10 @@ Dominant cost: <node, share of total, why the planner chose it>
 Divergence:   <est vs actual at key nodes; statistics state>
 Tenant overlay: <tenant/row-security predicates present + their cost note | n/a>
 Fixes (ranked):
-  1. <fix> — expected plan change: <shape> — price: <write amp/storage/maintenance>
+  1. <fix> — why this plan supports it; benefit and drawback; expected plan
+     change: <shape>; price: <money, implementation time, write amp/storage/upkeep>
   2. ...
+Recommendation: <preferred fix and why; decision required, if any>
 Re-verify:    <re-plan under same params+volume; expected shape; surface-level timing check>
 Routed out:   <splitter | caching-strategy-designer | secure-migration-reviewer | none>
 Not addressed: <what this verdict deliberately leaves alone>
@@ -168,6 +178,8 @@ Not addressed: <what this verdict deliberately leaves alone>
       checked BEFORE any index was designed.
 - [ ] Every recommended index states column order rationale and its
       write/storage price; no index-everything lists.
+- [ ] User-facing choices explain terms, reasons, costs or unknowns,
+      case-specific pros/cons, and a justified recommendation.
 - [ ] Rewrites preserve semantics (stated) — a faster query returning
       different rows is a bug, not a fix.
 - [ ] Tenant predicates/row-security cost was read, and recommended
@@ -222,8 +234,9 @@ Not addressed: <what this verdict deliberately leaves alone>
   fiction; route to test-data provisioning before diagnosing.
 - The requested outcome is "make it fast without changing the query or
   the schema and without any new index" and the plan shows the
-  dominant cost is structural → present the honest options and stop;
-  there is no incantation.
+  dominant cost is structural → explain the required structural changes,
+  benefits, drawbacks, money/time/upkeep costs, and the evidenced preferred
+  route before asking which constraint can change; there is no incantation.
 - The query's SHAPE is analytical on an operational store and tuning
   headroom is an order of magnitude short of the need → deliver the
   plan verdict AND route placement to

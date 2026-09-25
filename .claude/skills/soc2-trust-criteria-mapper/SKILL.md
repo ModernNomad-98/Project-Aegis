@@ -62,6 +62,16 @@ evidence design hands to `compliance-evidence-collector`.
 
 ## Workflow
 
+Before asking the user to choose a boundary, category, report type, window,
+or subservice-organization treatment, explain each term in plain language
+and why that decision matters to this engagement. Compare viable options
+using the customer's commitments and available control evidence: benefits,
+drawbacks, CPA fees or other direct spend, setup/evidence labor, and ongoing
+control upkeep. Mark amounts and timing unknown until a CPA firm quotes or
+confirms them. Recommend one option with the case-specific reason, then ask
+one decision question. A scoping choice does not authorize an engagement or
+purchase.
+
 1. **Confirm the ask.** Who wants the report, for what system, by when.
    No customer-driver and no system named → Stop Conditions.
 2. **Draw the system boundary.** The report describes A SYSTEM: services,
@@ -88,6 +98,9 @@ evidence design hands to `compliance-evidence-collector`.
    already operated. (Definitions are CPA-firm-sourced — see Precision
    Rules.) Window length balances customer expectation vs how long
    controls have actually operated; plan it WITH the CPA firm.
+   Explain that Type 1 can add a separate examination fee and staff cycle
+   before Type 2, while Type 2 needs evidence gathered and maintained across
+   its window. Do not imply either has a universal fixed price or duration.
 5. **Map criteria to mechanisms.** Per selected category, walk criteria
    against the foundation catalog via `multi-framework-crosswalk`:
    mechanism exists → map + evidence hook; genuine gap → owner + date
@@ -103,6 +116,10 @@ evidence design hands to `compliance-evidence-collector`.
    examines).
 
 ## Output Format
+
+When asking for a scope choice, show the terms, decision reason, case-specific
+pros and cons, direct and labor/upkeep costs or labeled unknowns, and the
+justified recommendation before the one question.
 
 ```
 SOC 2 SCOPING — <org/system>
@@ -122,6 +139,8 @@ Language check: "attestation/examination/report" — never "certification/certif
 
 - [ ] Every included category traces to a named customer commitment;
       every exclusion is recorded with rationale.
+- [ ] User-facing choices explain terms, reasons, costs or unknowns,
+      pros/cons, and a justified recommendation before one question.
 - [ ] The system boundary names services, infrastructure, software,
       people, procedures, and data — and includes what customers actually
       buy.
