@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #274 on 2026-09-25 Coordinated Universal Time
+As of merged pull request (PR) #282 on 2026-09-25 Coordinated Universal Time
 (UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -69,17 +69,25 @@ the ledger; local checks and GitHub Actions passed before merge. The merged
 tree remains **589 tracked Markdown pages**: 545 reader pages and 44 classified
 fixtures, with zero known pending pages. PRs #272 and #273 changed existing
 skill pages, and #274 changed existing Behavioral Eval Runner (BER) source and
-tests. They added no Markdown pages; the 589-page count remains current.
+tests. PR #278 recorded the consumed #274 guard exception and the bounded
+Stage 4A grant in the existing approval register. PR #279 revised existing
+choice skills; PR #280 accepted the previous three-page checkpoint after two
+independent full-page reviews. PR #282 refreshed two existing current-route
+reader pages after an independent full-page review. None added a Markdown page.
+The #282 tree
+still has 589 tracked pages: 545 accepted readers and 44 classified fixtures,
+with zero known pending pages.
 
-The [five-merge checkpoint after #270](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-25-after-pull-request-270)
-covers exactly #266–#270; #271 is the first later merge, followed by #272–#274.
-It records **1h23m14s
-wall time**, not an active-work rate, and rechecks ten selected ranges totaling
-**71–146 active hours**, plus unestimated issue #101 Stages 4A/4B and the BER
-host, runtime, privacy and cleanup residual. The selected total remains
-unbounded. This checkpoint changes only three existing tracking pages; their
-full-page acceptance is pending independent review before publication. No new
-Markdown page or fixture change is proposed.
+The [five-merge checkpoint after #278](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-25-after-pull-request-278)
+covers #271, #272, #273, #274 and #278. GitHub merge receipts span **42m01s
+observed wall time**, including review, checks and waiting, so they do not
+measure an active-work rate. Ten selected ranges remain **71–146 active hours**;
+issue #101 Stages 4A/4B and the BER host, runtime, privacy and cleanup
+residual have no reliable ETA. The selected total remains without a finite
+estimate. #279, #280 and #282 are the first three subsequent merges. This checkpoint
+revises the same three tracking pages and adds no Markdown page or fixture.
+Two independent full-page reviews accepted these corrected pages, their
+current-versus-historical status, terminology, links, counts and merge receipts.
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
 below are historical snapshots; the

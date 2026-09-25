@@ -5,7 +5,7 @@
 This is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. The [owner's issue #101 host-path choice](#material-owner-decision--2026-09-25-issue-101-host-path)
 and the subsequent bounded Stage 4A grant are the latest scope changes. The
-[five-merge checkpoint after #270](#five-merge-checkpoint--2026-09-25-after-pull-request-270)
+[five-merge checkpoint after #278](#five-merge-checkpoint--2026-09-25-after-pull-request-278)
 is the latest full reassessment. Pull request (PR) #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
 documentation residual. PR #253 added one reviewed reader page; PR #257 added
@@ -32,7 +32,7 @@ or all-options
 total is defensible until the unestimated residuals are scoped.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-270--2026-09-25)
+the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-278--2026-09-25)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
 
@@ -65,8 +65,64 @@ Stage 4A design and Stage 4B host execution scope.
 
 Optional issue #101 helpers retain their conditional **16–40 active-hour**
 combined range after a successful Stage 4B comparison and separate grants.
-The seven optional rows were last fully reassessed in the dated #270
+The seven optional rows were last fully reassessed in the dated #278
 checkpoint below. The paused VirtualBox VM remains outside this SDK route.
+
+## Five-merge checkpoint — 2026-09-25, after pull request #278
+
+The five merges after #270 were #271, #272, #273, #274 and #278. Their
+[GitHub merge receipts](aegis-execution-metrics.md#checkpoint-after-pull-request-278--2026-09-25)
+span 04:03:07–04:45:08 Coordinated Universal Time (UTC) on 2026-09-25:
+**42m01s observed wall time**. Review, continuous integration (CI), owner
+waiting and concurrent work are included. Active work was not separately
+instrumented, so the interval is not a delivery rate. #271 reviewed static
+software development kit (SDK) archives; #272 and #273 improved skill choice
+guidance; #274 repaired offline receipt prevalidation; #278 recorded the
+consumed #274 protected-guard exception and the owner's bounded Stage 4A grant
+as APR-031. None completed a selected implementation row or real-host proof.
+
+The #278 tree has **589 tracked Markdown files**: **545 accepted reader pages**
+and **44 classified fixtures**, with zero known pending pages at that merge.
+The ten estimated selected rows retain **71–146 active hours** after rechecking
+their prerequisites. These five merges supplied no measured duration or evidence
+closing their gates. The Stage 4A approval is a **12 active-hour ceiling**, not
+its remaining-work estimate. Stage 4B and the BER-BKL-009 host, runtime, privacy
+and cleanup residual lack executable scope and estimates. The selected and
+all-options totals have no finite estimate. In the table, WP means work package,
+OD-1 means owner decision 1, CP means control plane, and BKL means backlog item.
+R1/R4/R5 are runner evidence requirements; the [runner backlog](behavioral-eval-runner-backlog.md)
+and [control-plane backlog](resumable-control-plane-backlog.md) define their gates.
+
+| Selected remaining work item | Active-work planning range | Gate after #278 |
+| --- | ---: | --- |
+| WP-2B-3 candidate inputs | 1–4 h | Owner inspection of private 160-case labels, guide and exact hashes. |
+| WP-2B-3 measurement and OD-1 | 4–10 h | Label approval, reviewed live source and allowance, host proof, measured result and ratification. |
+| Selected-host R4/R5 capability proof | 12–24 h, provisional | VirtualBox VM setup paused; guest checks and separate Stage A grant remain. |
+| WP-2B-4 | 12–24 h | Calibration, OD-1, R1/R4/R5 evidence and separate live grant. |
+| WP-2B-5 | 8–16 h | WP-2B-4 and separate generic-corpus phase grant. |
+| WP-2B-6 | 8–16 h | WP-2B-5 plus scheduling, cost, quarantine and dataset authority. |
+| WP-2B-7 | 4–8 h | WP-2B-6 and separate advisory CI/operator grant. |
+| CP-WP-003 | 8–16 h, provisional | Real atomic authority, independent freshness, containment, evidence and billing proof. |
+| CP-WP-004 | 8–16 h | CP-WP-003 real proof, selected operation and separate grant. |
+| Issue #101 package 7 | 6–12 h | Release review depends on package-4 host proof and selected helper integration. |
+| **Ten-row planning subtotal** | **71–146 h** | Provisional host uncertainty remains; not a delivery promise. |
+| Issue #101 Stage 4A offline bridge | TBD; approved ceiling 12 h | APR-031 permits only bounded synthetic implementation; real SDK/host proof remains outside scope. |
+| Issue #101 Stage 4B host proof | TBD | Pinned execution scope and separate grant. |
+| BER-BKL-009 host/runtime/privacy/cleanup | TBD | Named host, runtime design and separate authority. |
+| Documentation readability | 0 known pending at #278 | Accept newly changed pages after full-page review. |
+| **Selected total** | **No finite estimate** | Stage 4A, Stage 4B and BER residual remain unestimated. |
+
+The seven optional rows remain conditional: issue #101 packages 5 and 6 are
+**8–20 active hours each** after Stage 4B and separate approvals; BER-BKL-010
+is **4–12 hours**; BER-BKL-014 is **8–20 hours per additional host**; and
+BER-BKL-015 is **8–24 hours per selected product**. Strategic skill expansion,
+multi-judge arbitration and future control-plane architecture remain
+unbounded until selected and scoped. The two issue #101 helpers together would
+add **16–40 hours** if selected. None makes the all-options total finite.
+PRs #279, #280 and #282 subsequently merged choice guidance, the preceding
+checkpoint and current decision routes without closing an implementation row.
+They start the next five-merge cycle. The VirtualBox VM remains paused.
+
 
 ## Material owner decision — 2026-09-24, BER-BKL-009
 

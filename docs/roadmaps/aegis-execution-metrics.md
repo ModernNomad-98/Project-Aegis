@@ -17,7 +17,7 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest completed [five-merge checkpoint after pull request #270](#checkpoint-after-pull-request-270--2026-09-25)
+The latest completed [five-merge checkpoint after pull request #278](#checkpoint-after-pull-request-278--2026-09-25)
 reconsiders every selected and optional row. The [BER-BKL-009 owner
 decision](aegis-backlog-forecast.md#material-owner-decision--2026-09-24-ber-bkl-009)
 supersedes the old whole-item estimate and selected total. PR #257 delivered
@@ -48,6 +48,38 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Checkpoint after pull request #278 — 2026-09-25
+
+The five merges after #270 were #271, #272, #273, #274 and #278. GitHub
+`mergedAt` receipts span **04:03:07–04:45:08 UTC on 2026-09-25**, or
+**42m01s observed wall time**. These intervals include concurrent work,
+review, CI and owner waiting; the active-work split was not instrumented.
+They cannot establish an active-work delivery rate.
+
+| Merged request and scope | Exact merge commit | Published estimate or bound | Prior-merge wall interval |
+| --- | --- | --- | ---: |
+| [#271](https://github.com/ModernNomad-98/Project-Aegis/pull/271): static 107-package SDK archive review | `9c4c9effd5d93c0f74a756630090bb30d59df6e6` | No separate active estimate; no runtime proof | 2m47s |
+| [#272](https://github.com/ModernNomad-98/Project-Aegis/pull/272): conditional choice guidance | `98851a911cb36c438b1c725f0edf7b3f9bd3992c` | No separate active estimate | 1m24s |
+| [#273](https://github.com/ModernNomad-98/Project-Aegis/pull/273): platform and data choice guidance | `396ccb28032ca95cfcccd8e1e4a4431d0f3a994e` | No separate active estimate | 8m59s |
+| [#274](https://github.com/ModernNomad-98/Project-Aegis/pull/274): BER receipt-prevalidation repair | `97e61c590091a3388dc504d72d61ea283772c2fa` | No selected-row closure; local BER suite 1,070 passed, 14 skipped | 2m06s |
+| [#278](https://github.com/ModernNomad-98/Project-Aegis/pull/278): record guard consumption and Stage 4A grant | `abb7db6f8ea0fbe8c5034509332ebb375fcb0510` | APR-031 caps Stage 4A at 12 active h; ceiling, not ETA | 26m45s |
+
+The [full reassessment](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-25-after-pull-request-278)
+retains **71–146 active hours** across ten selected estimated rows, plus
+unestimated issue #101 Stages 4A and 4B and the BER-BKL-009 host, runtime,
+privacy and cleanup residual. The selected and all-options totals have no
+finite estimate. APR-031 authorizes bounded synthetic Stage 4A work only.
+Neither #271 archive review nor #278 approval record establishes a real host
+proof. The VirtualBox VM remains paused.
+
+The #278 tree has **589 tracked Markdown files**: 545 accepted reader pages
+and 44 classified fixtures, with zero known pending pages. #279, #280 and #282
+subsequently merged existing-page choice guidance, the preceding checkpoint
+and current decision routes; they begin the next five-merge cycle. At #282,
+the tracked file count remains 589. Two independent full-page reviews accepted
+the current checkpoint pages.
+
 
 ## Checkpoint after pull request #270 — 2026-09-25
 
