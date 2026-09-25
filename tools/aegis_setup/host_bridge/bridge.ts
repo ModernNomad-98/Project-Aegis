@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import type { SyncHookJSONOutput } from '@anthropic-ai/claude-agent-sdk';
 
-export type Offer = { id: string; description: string; read_only?: boolean; manual_only?: boolean };
+export type AgentOffer = { id: string; description: string; read_only: boolean };
+export type SkillOffer = { id: string; description: string; manual_only: boolean };
 export type AuthoritySnapshot = {
   generation: string;
   fresh: boolean;
@@ -12,8 +13,8 @@ export type AuthoritySnapshot = {
   policy_version: string;
   synopsis: string;
   stage: 'discovery' | 'design' | 'implementation' | 'review' | 'release';
-  agents: Offer[];
-  skills: Offer[];
+  agents: AgentOffer[];
+  skills: SkillOffer[];
   mandatory_agents: string[];
   mandatory_skills: string[];
   selected_agents: string[];
@@ -61,6 +62,13 @@ function requestFrom(snapshot: AuthoritySnapshot): string {
   });
 }
 
+function canonicalJson(value: AuthoritySnapshot): string {
+  return JSON.stringify(value, (_key, item) =>
+    item !== null && typeof item === 'object' && !Array.isArray(item)
+      ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0))
+      : item);
+}
+
 function validAuthority(s: AuthoritySnapshot, p: Proposal): boolean {
   if (!s || s.fresh !== true || s.destination !== 'local' || s.local_only !== true ||
       s.ordinary_permission !== 'allow' || !id.test(s.generation) || !id.test(p.target)) return false;
@@ -96,13 +104,13 @@ async function evaluate(facts: HostFacts, proposal: Proposal): Promise<boolean> 
     if (!Number.isInteger(timeout) || timeout < 1 || timeout > 5000) return false;
     const before = await bounded(() => facts.snapshot(), timeout);
     if (!validAuthority(before, proposal)) return false;
-    const binding = JSON.stringify(before);
+    const binding = canonicalJson(before);
     const request = requestFrom(before);
     if (Buffer.byteLength(request, 'utf8') > 4096) return false;
     const response = await bounded(() => facts.advice(request), timeout);
     if (typeof response !== 'string' || Buffer.byteLength(response, 'utf8') > 1024) return false;
     const after = await bounded(() => facts.snapshot(), timeout);
-    if (binding !== JSON.stringify(after) || !validAuthority(after, proposal)) return false;
+    if (binding !== canonicalJson(after) || !validAuthority(after, proposal)) return false;
     return validateLocally(request, response, proposal, facts);
   } catch {
     return false;
