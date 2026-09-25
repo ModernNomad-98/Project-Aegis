@@ -32,8 +32,10 @@ Windows as the **offline package 4A prototype direction**. The
 and [source-based feasibility check](../evidence/setup/issue-101-package-4a-host-feasibility.md)
 define the offline boundary. The owner subsequently approved bounded synthetic
 Stage 4A implementation under [APR-031](../approvals/APPROVAL_REGISTER.md#aegis-apr-031-issue-101-stage-4a-offline-bridge-implementation).
-Its [PR #281 candidate](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
-remains under exact-head review. The
+The [Stage 4A offline bridge in PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+merged as `ea40ab481ff78267cd5f151c393e946805ba8d01` on
+2026-09-25 at 07:43:44 UTC. [APR-036](../approvals/APPROVAL_REGISTER.md#aegis-apr-036-stage-4a-offline-bridge-package-completed)
+records completion of APR-031's one bounded package. The
 [Stage 4B host-proof decision packet](aegis-setup-package-4b-host-proof-protocol.md)
 sets out a later planning choice. No real SDK session, provider call, host proof
 or package-4 comparison is authorized or completed.
@@ -270,8 +272,8 @@ select a provider.
 Delivery sequence: (1) package 1 planning — **delivered**; (2) package 2
 conversation and Windows Aegis-only saved selection — **delivered**; (3)
 package 3 offline contract and fake adapter — **delivered**; (4A) synthetic
-SDK callback prototype — **bounded implementation authorized under APR-031;
-PR #281 under review**; (4B) actual SDK host mechanics proof —
+SDK callback prototype — **delivered offline in merged PR #281; APR-031
+consumed by APR-036**; (4B) actual SDK host mechanics proof —
 **planning packet available, execution pending separate authority**;
 then a predeclared helper comparison — **separate proposal, selection and grant
 after the host proof**; (5) packages 5 and 6 local/online
