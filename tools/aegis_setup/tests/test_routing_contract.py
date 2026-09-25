@@ -127,6 +127,17 @@ class RoutingContractTests(unittest.TestCase):
         self.assertEqual(FakeAdapter(response(fallback="online")).advise(self.request).disposition, "invalid")
         self.assertEqual(FakeAdapter(response(status="online")).advise(self.request).disposition, "invalid")
 
+    def test_malformed_unhashable_failure_has_no_selection(self):
+        class UnhashableFailure(str):
+            __hash__ = None
+
+        for failure in ([], {}, UnhashableFailure("timeout")):
+            with self.subTest(failure=type(failure).__name__):
+                result = FakeAdapter(response(), failure=failure).advise(self.request)
+                self.assertEqual(result.disposition, "invalid")
+                self.assertEqual(result.agents, ())
+                self.assertEqual(result.skills, ())
+
     def test_read_only_flag_cannot_be_changed_by_advice(self):
         self.assertTrue(self.request.agents[0].read_only)
         self.assertEqual(decide(self.request, response(read_only=False)).disposition, "invalid")

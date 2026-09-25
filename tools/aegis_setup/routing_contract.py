@@ -184,7 +184,7 @@ def decide(request: Request, raw: bytes | str | Mapping[str, Any] | None = None,
            *, failure: str | None = None) -> Decision:
     """Validate untrusted advice. All failures carry empty selections."""
     if failure is not None:
-        if failure not in {"timeout", "unavailable"}:
+        if type(failure) is not str or failure not in {"timeout", "unavailable"}:
             return Decision("invalid", reason="unknown adapter failure")
         return Decision(failure, reason="adapter failure")
     try:
