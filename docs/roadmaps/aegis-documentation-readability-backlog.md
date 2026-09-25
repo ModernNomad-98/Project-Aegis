@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #262 on 2026-09-24, this remains the active
+As of merged pull request (PR) #265 on 2026-09-25 UTC, this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -29,12 +29,16 @@ integration evidence record; both passed full-page review. The new
 merged in #260 with one reviewed reader page. PR #261 updated build-choice
 guidance in existing skill and project pages; it added no Markdown file.
 PR #262 updated three existing forecast, measurement and readability pages.
-This current-route and VM-approval update changes existing pages only; its
+PR #263 corrected the setup skill's choice guidance. This current-route and
+VM-approval update in #264 changed existing pages only; its
 approval register, decision routes, host proposal and this ledger received
 full-page review. The tracked count remains 588.
-The issue #101 package-4A candidate refresh reaccepts its existing proposal
+PR #265's issue #101 package-4A candidate refresh reaccepted its existing proposal
 after an independent full-page review and a separate source check; it adds no
 Markdown file.
+This post-#265 checkpoint rechecks the existing forecast, execution metrics and
+this ledger through independent full-page reviews; no page enters the pending
+set and the tracked count remains 588.
 **Zero known pages** remain in the bounded sweep.
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
@@ -128,14 +132,16 @@ the files in bounded batches so unrelated technical changes stay separate.
 
 ## Delivery and estimate
 
-Status: **IN PROGRESS**. Start with the two component READMEs and the root/index
-navigation, then continue through the full inventory in reviewable batches.
+Status at launch: **IN PROGRESS**. The original sequence began with the two
+component READMEs and the root/index navigation, then the full inventory in
+reviewable batches. The following estimates are historical; use the current
+reading above for remaining work.
 Previously stated estimate for the narrower component-guide item was 4–8
 active hours; after the repository-wide clarification an interim estimate
-was 24–60. The inventory-based provisional estimate is **80–200 active hours**
+was 24–60. The inventory-based provisional estimate was **80–200 active hours**
 for the entire documentation sweep, excluding owner waiting and GitHub queue
-time. Re-estimate from actual batch measurements. Do not mark this item DONE
-after only the two component READMEs are improved.
+time. The plan called for re-estimation from batch measurements and did not
+allow DONE status after only the two component READMEs were improved.
 
 This documentation work does not authorize provider calls, deployment,
 private calibration input publication, approval changes or later-phase runtime
