@@ -5,7 +5,7 @@
 This page is for maintainers and coding agents tracking Project Aegis work.
 **ETA** means estimated time to complete a work item; **PR** means pull
 request; **CI** means continuous integration; and **UTC** means Coordinated
-Universal Time. Codes such as **BER-BKL-007** (Behavioral Eval Runner backlog
+Universal Time. **SDK** means software development kit; **VM** means virtual machine. Codes such as **BER-BKL-007** (Behavioral Eval Runner backlog
 item 007), **WP-2B-1A** (work package 2B-1A), and **OD-1** (owner decision 1)
 identify records in the [runner backlog](behavioral-eval-runner-backlog.md),
 where their scope and gates are explained. The codes are identifiers, not
@@ -17,7 +17,7 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest completed [five-merge checkpoint after pull request #265](#checkpoint-after-pull-request-265--2026-09-25)
+The latest completed [five-merge checkpoint after pull request #270](#checkpoint-after-pull-request-270--2026-09-25)
 reconsiders every selected and optional row. The [BER-BKL-009 owner
 decision](aegis-backlog-forecast.md#material-owner-decision--2026-09-24-ber-bkl-009)
 supersedes the old whole-item estimate and selected total. PR #257 delivered
@@ -48,6 +48,39 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Checkpoint after pull request #270 — 2026-09-25
+
+The five merges after #265 were #266, #267, #268, #269 and #270. GitHub
+`mergedAt` receipts span **02:39:53–04:03:07 UTC on 2026-09-25**, or
+**1h23m14s** of wall time. Active work, review, CI and owner waiting were
+not separately instrumented. These intervals include overlapping work and
+cannot establish an active-work delivery rate.
+
+| Merged request and scope | Exact merge commit | Published estimate or bound | Prior-merge wall interval |
+| --- | --- | --- | ---: |
+| [#266](https://github.com/ModernNomad-98/Project-Aegis/pull/266): checkpoint after #265 | `101aae2211a22988e2e303becf99ff12797ee73b` | No separate active estimate published | 12m20s |
+| [#267](https://github.com/ModernNomad-98/Project-Aegis/pull/267): select issue #101 offline SDK prototype direction | `69be30a3a71d21c70f13a6b20d7da5e15e023d17` | Stage 4A proposed 12-hour ceiling is not an estimate or implementation grant | 36m26s |
+| [#268](https://github.com/ModernNomad-98/Project-Aegis/pull/268): reject malformed setup adapter failure values | `febaa42a778f0298ec40c91087f2ae2a60fc9265` | No separate active estimate published | 18m30s |
+| [#269](https://github.com/ModernNomad-98/Project-Aegis/pull/269): static BER evidence-policy source inventory | `c13d94dc73c9407c4d7495fd0b36054ca2e4d3c0` | No separate active estimate published | 56s |
+| [#270](https://github.com/ModernNomad-98/Project-Aegis/pull/270): teach user-facing architecture choices | `3b11c7cd8618b0c63c99d4c0c78d83ead3555549` | No separate active estimate published | 15m02s |
+
+None closed a selected implementation row; #268 repaired an existing offline
+contract. #267 split issue #101 package 4 into separately unestimated offline
+Stage 4A and actual-host Stage 4B. The [full reassessment](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-25-after-pull-request-270)
+therefore retains **71–146 active hours** for ten other rows, plus those two
+stages and the unestimated BER-BKL-009 host, runtime, privacy and cleanup
+residual. The selected and all-options totals have no finite estimate. The
+VirtualBox VM remains paused; no Stage A host proof occurred.
+
+The #270 tree has **589 tracked Markdown files**: 545 accepted reader pages
+and 44 classified fixtures, with zero known pending pages. #269 added the
+reviewed source inventory; #270 changed four existing skill pages. PR #271
+subsequently merged the SDK archive-review packet without adding a page; it
+is the first merge in the next cycle, not part of these five receipts. Its
+static dependency checks do not establish runtime compatibility or grant
+implementation. Start the next five-merge counter after #270; revise sooner
+for a material owner or scope decision.
 
 ## Checkpoint after pull request #265 — 2026-09-25
 
