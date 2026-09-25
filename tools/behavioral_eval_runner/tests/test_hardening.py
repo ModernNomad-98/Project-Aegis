@@ -13,6 +13,7 @@ import os
 import tempfile
 import unittest
 
+from tools.behavioral_eval_runner import RUNNER_VERSION, SCHEMA_VERSION
 from tools.behavioral_eval_runner.aggregation import AttemptSet, aggregate_case
 from tools.behavioral_eval_runner.budget import BudgetCaps, BudgetLedger
 from tools.behavioral_eval_runner.cli import scan_package_sources
@@ -101,6 +102,8 @@ class TestEvidenceGateHardening(unittest.TestCase):
         writer = EvidenceWriter(self.root, RUN)
         report = {
             "report_kind": "behavioral_eval_run_report",
+            "schema_version": SCHEMA_VERSION,
+            "runner_version": RUNNER_VERSION,
             "run_id": RUN,
             "run_evidence_binding": {
                 "input_evidence_manifest_sha256": self.bundle.input_evidence_manifest_sha256
