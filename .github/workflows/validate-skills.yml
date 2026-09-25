@@ -60,6 +60,17 @@ jobs:
           # the point of pinning it.
           python-version: '3.14'
 
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
+        with:
+          node-version: '24'
+
+      - name: Install pinned offline bridge dependencies without scripts
+        working-directory: tools/aegis_setup/host_bridge
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run offline bridge callback tests
+        run: python scripts/ci/record-check.py setup-bridge -- node --test tools/aegis_setup/host_bridge/bridge.test.ts
+
       # PyYAML powers the spec-strict frontmatter parse (decision D50); the
       # validator fails closed without it. Pinned exactly in requirements.txt
       # (decision D55) so CI is reproducible and dependabot has a file to bump.
@@ -154,6 +165,17 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
           python-version: '3.14'
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
+        with:
+          node-version: '24'
+
+      - name: Install pinned offline bridge dependencies without scripts
+        working-directory: tools/aegis_setup/host_bridge
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run offline bridge callback tests
+        run: python scripts/ci/record-check.py setup-bridge -- node --test tools/aegis_setup/host_bridge/bridge.test.ts
 
       # One native command per step preserves its exit status in PowerShell.
       - name: Install pinned offline-check dependencies

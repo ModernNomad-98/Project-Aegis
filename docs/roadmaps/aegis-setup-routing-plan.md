@@ -30,9 +30,14 @@ managed session on native
 Windows as the **offline package 4A prototype direction**. The
 [package 4A preparation proposal](aegis-setup-package-4a-host-preparation-proposal.md)
 and [source-based feasibility check](../evidence/setup/issue-101-package-4a-host-feasibility.md)
-define what remains to review. This choice was explicitly for planning. No SDK
-installation, bridge implementation, SDK session, provider call, host proof or
-package-4 comparison has been authorized or completed.
+define what remains to review. On 2026-09-25 the owner separately approved
+the proposal's bounded Stage 4A offline implementation: its exact 11 paths,
+at most 12 active hours and 1,200 added handwritten code/test lines, and $0
+external spend. A scripts-disabled install is allowed only after review of
+the exact 107-package lock and package bodies. This does not authorize an SDK
+session, Claude process, provider call, credentials, private data, VM work,
+deployment, or Stage 4B host proof. The implementation and its CI result
+remain subject to review; no package-4 comparison is complete.
 
 ## Dated product decisions
 
@@ -44,6 +49,7 @@ package-4 comparison has been authorized or completed.
 | 2026-09-23, owner local-evaluation shortlist in issue #101 | Evaluate Laya and Mapika/Decider 0.8B first on ordinary central processing units (CPUs); compare OpenJev as an optional wrapper around the same Decider checkpoint | Governing package-4 research order, not an installed helper, production selection or execution grant |
 | 2026-09-23, this package 1 design | Keep the baseline usable without an add-on; use a single advisory contract and separate setup/host/adapter responsibilities | Proposed implementation architecture, subject to review and package 2/3 authority |
 | 2026-09-25, owner reply to the package-4 host-path question | Use the recommended separate SDK managed Windows session for the first offline prototype | Planning direction only; a reviewed package-4A implementation grant and later package-4B host grant remain separate |
+| 2026-09-25, owner Stage 4A reply in this work session | Approve the reviewed offline bridge proposal's exact 11 paths, 12 active-hour and 1,200 handwritten code/test-line ceilings, $0 external spend, and conditional scripts-disabled install after exact lock/body review | Stage 4A offline implementation only; Stage 4B and real host/provider access remain unapproved |
 
 ## Historical source snapshot and design forces
 
@@ -266,8 +272,8 @@ select a provider.
 Delivery sequence: (1) package 1 planning — **delivered**; (2) package 2
 conversation and Windows Aegis-only saved selection — **delivered**; (3)
 package 3 offline contract and fake adapter — **delivered**; (4A) synthetic
-SDK callback prototype — **planning path selected, implementation pending a
-separate grant**; (4B) actual SDK host proof and predeclared comparison —
+SDK callback prototype — **bounded offline implementation approved and in
+progress**; (4B) actual SDK host proof and predeclared comparison —
 **pending separate authority**; (5) packages 5 and 6 local/online
 integrations — **conditional on 4B**; (6) package 7 full evaluation and release
 review — **pending**. Stop at each remaining boundary when its authority,
