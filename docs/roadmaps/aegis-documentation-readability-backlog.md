@@ -2,7 +2,8 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #269 on 2026-09-25 UTC, this remains the active
+As of merged pull request (PR) #274 on 2026-09-25 Coordinated Universal Time
+(UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -31,20 +32,20 @@ merged in #260 with one reviewed reader page. PR #261 updated build-choice
 guidance in existing skill and project pages; it added no Markdown file.
 PR #262 updated three existing forecast, measurement and readability pages.
 PR #263 corrected the setup skill's choice guidance. This current-route and
-VM-approval update in #264 changed existing pages only; its
+virtual machine (VM) approval update in #264 changed existing pages only; its
 approval register, decision routes, host proposal and this ledger received
-full-page review. The tracked count remains 588.
+full-page review. The tracked count then remained 588.
 PR #265's issue #101 package-4A candidate refresh reaccepted its existing proposal
 after an independent full-page review and a separate source check; it adds no
 Markdown file.
-This post-#265 checkpoint rechecks the existing forecast, execution metrics and
-this ledger through independent full-page reviews; no page enters the pending
-set and the tracked count remains 588.
+PR #266's post-#265 checkpoint rechecked the existing forecast, execution
+metrics and this ledger through independent full-page reviews; no page entered
+the pending set and the tracked count remained 588.
 Merged PR #267 revised five existing reader pages for the issue #101 host path: its
 setup plan, Stage 4A proposal, feasibility evidence, forecast and this ledger.
 Two independent read-only reviews accepted their full pages after terminology,
 forecast and lockfile corrections, and checked their relative links. It added
-no page; the accepted reader and fixture counts remain 544 and 44.
+no page; the accepted reader and fixture counts then remained 544 and 44.
 The [BER-BKL-009 static source inventory](../evidence/ber-bkl-009-static-source-inventory.md)
 merged in PR #269 as one new reader page. It records the shipped source
 boundaries and remaining host, runtime, privacy and cleanup connections without
@@ -53,15 +54,32 @@ and this ledger after corrections to deadline-check attribution, inventory
 scope, first-use terms and #267 status. Its exact-head GitHub checks and merge
 made **589 pages**, 545 accepted readers and 44 classified fixtures, the
 merged-tree inventory. **Zero known pages** remain pending in that tree.
-The proposed issue #101 public archive packet revises two existing accepted
+PR #270 revised four existing architecture skill pages to teach user-facing
+choices; two independent reviews accepted their explanations. PR #271's
+issue #101 public software development kit (SDK) archive packet revised two
+existing accepted
 reader pages: the [host feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md)
 and [Stage 4A proposal](aegis-setup-package-4a-host-preparation-proposal.md).
 Two independent full-page reviews accepted the corrected packet, including its
 110-archive and alternate 107-archive static checks, exact dependency limits,
-links and pending implementation grant. This ledger's update is a candidate
-pending independent review. If its local checks, exact-head GitHub Actions and
-merge pass, the accepted candidate remains **589 tracked Markdown pages**:
-545 reader pages and 44 classified fixtures, with zero known pending pages.
+links and the then-pending implementation grant. The owner granted bounded
+offline Stage 4A work after #271; actual host work remains separate. A separate
+independent review accepted
+the ledger; local checks and GitHub Actions passed before merge. The merged
+tree remains **589 tracked Markdown pages**: 545 reader pages and 44 classified
+fixtures, with zero known pending pages. PRs #272 and #273 changed existing
+skill pages, and #274 changed existing Behavioral Eval Runner (BER) source and
+tests. They added no Markdown pages; the 589-page count remains current.
+
+The [five-merge checkpoint after #270](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-25-after-pull-request-270)
+covers exactly #266–#270; #271 is the first later merge, followed by #272–#274.
+It records **1h23m14s
+wall time**, not an active-work rate, and rechecks ten selected ranges totaling
+**71–146 active hours**, plus unestimated issue #101 Stages 4A/4B and the BER
+host, runtime, privacy and cleanup residual. The selected total remains
+unbounded. This checkpoint changes only three existing tracking pages; their
+full-page acceptance is pending independent review before publication. No new
+Markdown page or fixture change is proposed.
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
 below are historical snapshots; the
@@ -275,7 +293,7 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
-| Issue #101 public archive packet after merged PR #269, candidate 2026-09-25 | [Host feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md) and [Stage 4A proposal](aegis-setup-package-4a-host-preparation-proposal.md) | Two existing reader pages revised for the 110-entry and preferred 107-entry static archive checks. Two independent full-page reviews accepted the corrected pages and their links. This ledger update awaits independent review, local checks, exact-head GitHub Actions and merge; if accepted, the tracked count stays 589: 545 reader pages, 44 fixtures, zero known pending. |
+| Issue #101 public archive packet merged in PR #271, 2026-09-25 | [Host feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md) and [Stage 4A proposal](aegis-setup-package-4a-host-preparation-proposal.md) | Two existing reader pages were revised for the 110-entry and preferred 107-entry static archive checks. Two independent full-page reviews accepted the corrected pages and their links. Local checks and exact-head GitHub Actions passed before merge. The merged tree stayed at 589 tracked Markdown files: 545 accepted reader pages, 44 classified fixtures and zero known pending. |
 | Current-reading follow-up merged in PR #253 after #252, 2026-09-24 | [BER-BKL-009A historical proposal](ber-bkl-009a-offline-policy-scope-proposal.md) and root `AGENTS.md` | The proposal's current-status banner was corrected from an unmerged #139 claim to its verified merge and partial BKL-009 status; the historical proposal below remains unchanged. The source-library skill-use preference added in #252 received two independent read-only reviews, preserving Role A scope, the manual-only boundary and user authority. Both existing pages retain accepted status. |
 | BER evidence-policy scope and candidate-summary follow-up merged in PR #253, 2026-09-24 | [BER-BKL-009 scope proposal](ber-bkl-009-policy-scope-amendment-proposal.md) and [replacement candidate summary](../evidence/ber-replacement-candidate-1-summary.md) | Two independent full-page reviews accepted the new proposal after first-use, attribution, proposed-versus-delivered, and rollback wording corrections. They also reaccepted the corrected candidate summary after its stale holdout-support sentence was replaced with the merged #249 status and unset production pins. Links, authority limits, and exact ten-path scope were checked. The merged tree has 585 tracked Markdown files: 541 accepted readers and 44 classified fixtures, with zero known pending pages. |
 | Reader-page follow-up after merged PRs #248 and #249, 2026-09-24 | [Multi-agent release path](../paths/release-with-agents.md) and [BER offline holdout review](../evidence/ber-wp2b3-holdout-offline-review.md) | Both new pages received full-page review and corrected-candidate acceptance in this PR. The release path's links and manual-only boundaries were checked, and first-use abbreviations were expanded. The holdout note now identifies the merged #249 source and separates historical premerge checks from the current status. On this PR's accepted merge, the candidate has 584 tracked Markdown files: 540 accepted reader pages, 44 classified fixtures and zero known pending pages. |
