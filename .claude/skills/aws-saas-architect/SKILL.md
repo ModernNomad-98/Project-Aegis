@@ -149,6 +149,12 @@ services or assert their availability in a region.
 11. **Emit verification items**: every claim that depends on a quota,
     instance type, regional availability, or price is listed as "verify
     against current AWS docs".
+12. **Teach consequential choices before requesting one.** For each service
+    or topology choice the team must make, define unfamiliar terms in plain
+    language, state the workload and tenancy reason, compare practical pros
+    and cons, and recommend one option with its reason. Include money,
+    setup time, and ongoing operations; call out a $0 incremental charge
+    only when verified, and put unverified prices in Verification items.
 
 ## Output Format
 
@@ -164,6 +170,8 @@ Observability & secrets: <CloudWatch/X-Ray/CloudTrail wiring, Secrets Manager + 
 Security controls and delivery pipeline: <Security Hub (CSPM/threat split), GuardDuty, Inspector/Macie/Detective/Access Analyzer placements, SCPs/Config, OIDC deploy path>
 Infrastructure-as-code strategy: <tool, state/environment layout, module conventions>
 Cost controls: <budgets, views, attribution feed, top-3 cost risks>
+Choice guide: <for each owner choice: terms, reason, money/setup/ongoing cost,
+  pros and cons, recommended option and why>
 Verification items: <each quota/type/region/price-dependent claim → verify against current AWS docs>
 Assumptions & open questions: <each with risk-if-wrong / who answers>
 ```
@@ -184,6 +192,9 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
       per-account afterthoughts.
 - [ ] Cost controls key on activated cost-allocation tags and name this
       design's top cost risks.
+- [ ] Choices shown to a human explain terms, reasons, money/time/setup and
+      upkeep costs, pros/cons, and a justified recommendation; unverified
+      price claims remain verification items.
 - [ ] Tenancy semantics, pipeline internals, and IaC diff review were
       delegated, not restated.
 
