@@ -18,6 +18,20 @@ function Expect-Error($operation, $message) {
 try {
     $fresh = Read-AegisSelection $project $state
     Assert-Selection ($fresh.Status -eq 'unselected') 'missing record is unselected'
+    $occupiedProject = Join-Path $sandbox 'occupied-checkout'
+    [IO.Directory]::CreateDirectory($occupiedProject) | Out-Null
+    $occupied = Get-AegisSelectionPath $occupiedProject $state
+    [IO.Directory]::CreateDirectory($occupied.Path) | Out-Null
+    foreach ($operation in @(
+        { Read-AegisSelection $occupiedProject $state },
+        { Save-AegisOnlySelection $occupiedProject $state -Repair },
+        { Save-AegisOnlySelection $occupiedProject $state }
+    )) {
+        $failure = $null
+        try { & $operation | Out-Null } catch { $failure = $_.Exception.Message }
+        Assert-Selection ($failure -like '*occupied by a directory*inspect it manually*') 'occupied record path fails closed with manual recovery guidance'
+    }
+    Assert-Selection ([IO.Directory]::Exists($occupied.Path)) 'failed status and saves leave occupied record path untouched'
     $specialProject = Join-Path $sandbox 'checkout $literal with space'
     [IO.Directory]::CreateDirectory($specialProject) | Out-Null
     $resolvedProject = (Resolve-Path -LiteralPath $specialProject).ProviderPath
