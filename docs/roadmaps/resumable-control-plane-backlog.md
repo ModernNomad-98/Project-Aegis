@@ -21,15 +21,23 @@ boundary; `F` identifies a finding-specific negative acceptance family. The
 delivery and required evidence were recorded; `BLOCKED` means entry conditions
 or authority are absent. Neither status grants the next package automatically.
 
-**Current status, 2026-09-23:** the repository contains an offline, synthetic
-state and recovery kernel and an offline negative capability proof. Neither is
-a live delivery integration. A green synthetic check does not authorize a real
-provider call, deployment, source claim, or evidence operation.
+**Current status, 2026-09-25:** the repository contains an offline, synthetic
+state and recovery kernel and an offline negative capability proof. Merged
+[PR #294](https://github.com/ModernNomad-98/Project-Aegis/pull/294) repaired two
+shared SQLite database (a local transactional file store) claim defects:
+intent verification could use stale
+per-instance claim state after another instance committed, and an explicit
+validator claim was not durably reserved across instances. The repair checks
+current shared rows before intent use, persists explicit validator claims, and
+tests cross-instance commit, recovery, release, missing-row and database-error
+cases. These checks do not prove target nonduplication or cross-store atomicity.
+This is still not a live delivery integration. A green synthetic check does not
+authorize a real provider call, deployment, source claim, or evidence operation.
 
 | Work package | Delivered or pending | Where to verify it |
 | --- | --- | --- |
 | CP-WP-001: state, authority, and recovery contract | DONE: documentation contract only, [PR #95](https://github.com/ModernNomad-98/Project-Aegis/pull/95) | [Design](../design/resumable-control-plane-v1.md) and [review evidence](../evidence/control-plane/cp-wp-001-review.md) |
-| CP-WP-002: offline state and recovery kernel | DONE: synthetic-only code, [PR #99](https://github.com/ModernNomad-98/Project-Aegis/pull/99) | [Package guide](../../tools/aegis_delivery_control/README.md) and [detailed status below](#5-separate-work-packages-current-status) |
+| CP-WP-002: offline state and recovery kernel | DONE: synthetic-only code, [PR #99](https://github.com/ModernNomad-98/Project-Aegis/pull/99); shared-claim repair merged in [PR #294](https://github.com/ModernNomad-98/Project-Aegis/pull/294) | [Package guide](../../tools/aegis_delivery_control/README.md) and [detailed status below](#5-separate-work-packages-current-status) |
 | CP-WP-003A: first offline capability proof | DONE: synthetic failure probes, [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123) | [Review evidence](../evidence/control-plane/cp-wp-003a-review.md) and [approval AEGIS-APR-006](../approvals/APPROVAL_REGISTER.md#aegis-apr-006-control-plane-offline-capability-proofs-first-increment) |
 | CP-WP-003: real authority, evidence, and execution capability | BLOCKED: real source, freshness, selected-host containment, evidence, and billing proofs need separate scope and authority | [Detailed status below](#5-separate-work-packages-current-status) and [offline proof proposal](cp-wp-003-offline-proof-proposal.md) |
 | CP-WP-004: one bounded real integration | BLOCKED: package 003 prerequisites and an approved target are absent | [Detailed status below](#5-separate-work-packages-current-status) |
