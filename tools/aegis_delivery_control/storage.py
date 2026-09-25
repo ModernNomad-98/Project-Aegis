@@ -44801,13 +44801,25 @@ class SQLiteStateReader:
                 (self._repository_id, request.run_id),
             ).fetchone()
             if run is None:
+                try:
+                    fresh = bool(
+                        self._freshness_oracle.verify(
+                            self._repository_id, catalog_head, run_heads
+                        )
+                    )
+                except Exception:
+                    fresh = False
                 return TerminalRestartReport(
                     request.request_id, request.repository_id, request.run_id,
-                    TerminalRestartVerification.VERIFIED_CURRENT,
+                    (
+                        TerminalRestartVerification.VERIFIED_CURRENT
+                        if fresh else TerminalRestartVerification.LOCAL_FRESHNESS_UNVERIFIED
+                    ),
                     TerminalRestartDisposition.UNVERIFIED,
                     None, True, None, None, catalog_head, None,
                     SQLiteStateStore._run_heads_digest(run_heads), False,
-                    DispatchPosture.CLOSED, False, False, "RUN_UNAVAILABLE",
+                    DispatchPosture.CLOSED, False, False,
+                    "RUN_UNAVAILABLE" if fresh else "INDEPENDENT_FRESHNESS_UNVERIFIED",
                 )
             observed_state = LifecycleState(str(run["lifecycle_state"]))
             terminal = observed_state in {
