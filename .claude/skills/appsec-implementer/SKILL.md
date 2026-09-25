@@ -60,6 +60,12 @@ what to build and it does not opportunistically refactor.
 1. **Confirm the control is decided and singular.** Restate the one control
    and the abuse case it closes. If undecided or plural, stop and route to
    `threat-modeler`.
+   If the chosen control still leaves a user-facing implementation choice,
+   explain each viable path in plain terms, why it applies to this abuse
+   case, security benefits and residual risks, money/setup/upkeep or unknowns,
+   and a recommendation with its reason and the fact that could change it.
+   Ask one decision question before taking that path; a choice alone grants
+   no new execution authority.
 2. **Classify the change** (`change-classification-gate`) and confirm the
    approval path — security-control code changes need review; production
    config/secret changes cross `human-approval-boundary`.
@@ -85,6 +91,8 @@ what to build and it does not opportunistically refactor.
 APPSEC CONTROL IMPLEMENTED — <control name>
 Closes: <threat/finding id + abuse case>
 Change class: <class> — approval: <path / obtained?>
+Choice, if needed: <paths and reasons; costs/risks; recommendation + why +
+  what could change it; one decision question>
 Negative test (red→green):
   command: <cmd>
   before: FAIL — <intended failure reason>
@@ -100,6 +108,8 @@ Handoff: security-pr-reviewer to verify the diff.
 ## Validation Checklist
 
 - [ ] The control was named/decided before implementation — not invented here.
+- [ ] Any user-facing implementation choice was explained with viable paths,
+      costs and risks, a reasoned recommendation, and one question.
 - [ ] A negative test was written first and confirmed failing for the right
       reason before the fix.
 - [ ] The same test passes after the change; full relevant suite still green;
@@ -151,6 +161,17 @@ Handoff: security-pr-reviewer to verify the diff.
   `rls-policy-auditor` / `secure-migration-reviewer` territory; hand off.
 - The only correct fix is a dependency upgrade with breaking changes → stop
   and surface the tradeoff rather than silently pinning or forcing it.
+  Explain that a breaking upgrade changes an API or behavior callers rely on.
+  Compare the viable paths for this finding: upgrade and adapt callers now,
+  use a supported compatible security release if one actually closes the
+  issue, or contain exposure temporarily with a named owner and deadline
+  when neither can land immediately. For each, state the security coverage
+  and residual risk, compatibility/regression cost, money or vendor cost,
+  setup time, and ongoing maintenance; mark unknowns and verify current
+  support/prices. Recommend the path that closes the named vulnerability
+  without unacceptable breakage, explain why, then ask one scoped decision
+  question. A preference is not approval to change production dependencies
+  or policy; follow the existing approval path before acting.
 
 ## Supporting Files
 

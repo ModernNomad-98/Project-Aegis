@@ -96,6 +96,16 @@ are `streaming-event-architect`.
    tables where one consumer's read path dominates. State the
    slowly-changing-dimension policy per dimension (overwrite vs history
    rows) driven by whether consumers ask "as it was then" questions.
+   Where the owner must choose, teach the history policy per dimension:
+   type 1 overwrites the current value (simple, low storage/upkeep, loses
+   past values); type 2 adds dated rows (answers as-it-was-then questions,
+   more storage, joins and correction/erasure work); hybrid keeps history
+   only for named attributes (selective cost, more rules and testing).
+   Explain why each fits or fails this dimension's queries and retention/
+   PII rules. Compare money, setup time, upkeep and unknown data volume;
+   recommend type 1 without historical questions, type 2 where dated
+   truth is required, and hybrid only for a clear subset. Ask one history
+   policy question per dimension; do not override PII deletion duties.
 4. **Carry tenant scoping through every zone.** Tenant key mandatory on
    every tenant-owned row in every zone — aggregation may only drop it in
    marts DECLARED cross-tenant (internal-only, access-controlled).
@@ -148,6 +158,8 @@ Choice guide:  <terms, reason, money/setup/upkeep cost, pros and cons,
                 recommended class and why; unknown costs to verify>
 Zones:         raw → conformed → curated; per-zone owner/write/read/retention/contract
 Marts:         <per mart: consumers, modeling (dimensional|wide), SCD policy, freshness SLA>
+History choice:<per dimension needing owner choice: type 1|type 2|hybrid,
+                terms, fit, costs, pros/cons, recommendation and why, one question>
 Tenant scoping: key carried in all zones; per-tenant access path for customer-facing;
                 cross-tenant marts: <named + justification + access> | none
 PII per zone:  <raw/conformed/curated allowances per pii-lifecycle-designer rules;
@@ -166,6 +178,8 @@ Not decided here: split verdicts (splitter), transport (streaming), provider map
       why-not for the adjacent class is stated.
 - [ ] The owner-facing estate choice defines terms, compares money, setup
       and upkeep costs and pros/cons, and justifies the recommendation.
+- [ ] Each dimension history choice explains type 1/2/hybrid fit and
+      cost, recommends from real query/retention needs, and preserves PII rules.
 - [ ] Every zone has an owner, write authority, read audience, retention,
       and a stated contract; BI reads curated only.
 - [ ] Tenant key present in every zone; every cross-tenant mart is named,

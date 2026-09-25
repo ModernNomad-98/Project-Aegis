@@ -78,6 +78,17 @@ skill is as governed as shipping one. It plans; it never deletes.
    - *Defect:* the skill is wrong/harmful as written; note whether a fix
      was considered and why retirement wins.
    No qualifying trigger → no plan; say so.
+   For uncovered successor residue, explain the owner's choices before
+   seeking a disposition: *carry* it into the successor (preserves behavior,
+   adds authoring/eval upkeep); *repair* the retiring skill or another named
+   owner (keeps the capability but delays retirement); *drop* it deliberately
+   (less maintenance, lost coverage, requires owner acknowledgment); or
+   *defer* retirement (no immediate coverage loss, continued duplicate or
+   defective-skill upkeep). Compare fit, money, setup time and ongoing care
+   from the actual residue and mark unknowns. Recommend carrying critical
+   uncovered behavior; recommend repair or deferral when safe coverage is
+   not ready. Ask one disposition question per independent residue decision.
+   No choice alone authorizes editing or executing a retirement stage.
 2. **Run the reverse-link sweep.** Enumerate every inbound reference and
    assign each a disposition: *repoint* (to the successor), *rewrite* (the
    neighbor's yield clause or trigger-eval case no longer needs the seam),
@@ -119,7 +130,10 @@ procedure, and retired-record conventions:
 ```
 SKILL DEPRECATION PLAN — <skill-name>
 Trigger:      superseded (successor: <name>) | absorbed (base: <name>) | disuse (evidence: tier/window) | defect
-Coverage diff: <what the successor covers | what is intentionally dropped (owner-acknowledged) | "n/a">
+Coverage diff: <what the successor covers | per residue: carry, repair,
+               owner-acknowledged drop, or defer retirement | "n/a">
+Residue choice: <if needed: terms, fit, pros/cons, money/setup/upkeep,
+                 recommendation and why, one question>
 Reverse links: <N inbound references → disposition table: repoint | rewrite | annotate-historical>
 Stage 1 MARK:      <description notice + successor; registration annotations; decision-log entry> — rollback: <revert marking commit>
 Stage 2 REDIRECT:  <grace window + dates; straggler monitoring source> — rollback: <un-mark; window closes>
@@ -134,8 +148,10 @@ Not planned:  <what this plan deliberately leaves out, and why>
 - [ ] Exactly one qualifying trigger is established with its evidence; no
       plan rests on "seems unused" or "feels old".
 - [ ] For supersession: the coverage diff exists and every residue item is
-      either carried, or intentionally dropped with owner acknowledgment —
-      none silent.
+      carried, assigned a verified repair before removal, or intentionally
+      dropped with owner acknowledgment; deferral pauses retirement.
+- [ ] Any residue choice explains all viable dispositions, costs and a
+      recommendation tied to the uncovered behavior.
 - [ ] The reverse-link sweep enumerated ALL inbound references (skills,
       trigger-evals, catalog, README, agents, config) and every row has a
       disposition.
