@@ -17,13 +17,16 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest completed [five-merge checkpoint after pull request #260](#checkpoint-after-pull-request-260--2026-09-24)
+The latest completed [five-merge checkpoint after pull request #265](#checkpoint-after-pull-request-265--2026-09-25)
 reconsiders every selected and optional row. The [BER-BKL-009 owner
 decision](aegis-backlog-forecast.md#material-owner-decision--2026-09-24-ber-bkl-009)
 supersedes the old whole-item estimate and selected total. PR #257 delivered
 the bounded offline integration; host, runtime, privacy and cleanup work
-remain unestimated. A disposable VirtualBox Linux VM is the selected Stage A
-candidate, but it has not been provisioned or probed.
+remain unestimated. The selected disposable VirtualBox Linux VM was created
+under APR-028, but its guest login repeatedly stalled and the owner paused
+setup. It was last verified powered off with networking disabled and an empty
+virtual DVD drive. Guest completion checks remain unfinished. The Stage A
+host probe has not occurred and requires a separate grant.
 The table and dated checkpoints below preserve their original estimates and
 observed intervals; older pending or in-progress cells are historical, not
 current work status. Active-work estimates and observed wall time are different
@@ -45,6 +48,36 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Checkpoint after pull request #265 — 2026-09-25
+
+Five requests merged after #260 in first-parent order: #261, #262, #263,
+#264 and #265. These GitHub `mergedAt` intervals begin with #260 at
+2026-09-24 22:33:06 UTC. They include review, CI, owner waiting and
+overlapping work, so they are not an active-work delivery rate. The active,
+review, CI and waiting splits were not instrumented.
+
+| Merged request and scope | Exact merge commit | Published estimate or bound | Prior-merge wall interval |
+| --- | --- | --- | ---: |
+| [#261](https://github.com/ModernNomad-98/Project-Aegis/pull/261): teach build choices across Aegis skills | `7045e20ee24cd5856d935c0f5922183015116286` | No separate active estimate published | 8m36s |
+| [#262](https://github.com/ModernNomad-98/Project-Aegis/pull/262): post-#260 checkpoint | `83df835bc61060ddcd15ab8989c8526d4d018356` | No separate active estimate published | 13m22s |
+| [#263](https://github.com/ModernNomad-98/Project-Aegis/pull/263): setup-skill choice education correction | `c2897a55a3523ae2a8b957496c0fa0cc0da8697d` | No separate active estimate published | 1h07m24s |
+| [#264](https://github.com/ModernNomad-98/Project-Aegis/pull/264): APR-028 VM setup grant and decision routes | `3ea3ad53ba939cd9e241b797d88cd1f8361ebe4e` | No separate active estimate published; grant did not authorize a BER probe | 3m35s |
+| [#265](https://github.com/ModernNomad-98/Project-Aegis/pull/265): conditional issue #101 SDK scope packet | `5eca7137fe02ca80423b1a94acf5f6852fadf04b` | 12 active h is a proposed Stage 4A ceiling, not an estimate or grant | 2h33m50s |
+
+The interval spans **2026-09-24 22:33:06–2026-09-25 02:39:53 UTC**, or
+**4h06m47s**. None of the five PRs closed a selected implementation package.
+The #265 tree has **588 tracked Markdown files**: 544 accepted reader pages
+and 44 classified fixtures, with zero known pending pages in the bounded
+readability sweep. The owner selected VirtualBox and separately approved
+one VM setup. Host-side setup reached an Ubuntu login and a nonsudo
+`aegisprobe` account, but repeated graphical login stalls led the owner to
+pause it; the VM was then cleanly powered off with all network adapters
+disabled and its virtual DVD empty. This is setup observation, not R4/R5
+capability evidence. The [forecast checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-25-after-pull-request-265)
+retains the eleven-row **79–162 active-hour** planning subtotal plus an
+unestimated BER-BKL-009 residual. The selected and all-options totals remain
+without finite estimates. Start the next five-merge counter after #265.
 
 ## Checkpoint after pull request #260 — 2026-09-24
 

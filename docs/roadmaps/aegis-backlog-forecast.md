@@ -3,7 +3,7 @@
 ## Start here — current reading
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
-to start blocked work. The [five-merge checkpoint after #260](#five-merge-checkpoint--2026-09-24-after-pull-request-260)
+to start blocked work. The [five-merge checkpoint after #265](#five-merge-checkpoint--2026-09-25-after-pull-request-265)
 reassesses every selected and optional row. PR #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
 documentation residual. PR #253 added one reviewed reader page; PR #257 added
@@ -18,11 +18,14 @@ supersedes the old 8–16-hour whole-item estimate and therefore the old
 hours for the other eleven items, plus unestimated BER-BKL-009 host, runtime,
 privacy and cleanup work**. The offline package is delivered. The owner chose
 a new disposable Linux virtual machine with VirtualBox as the R4/R5 Stage A
-candidate, but its identity and provisioning remain unset. No finite new selected or all-options
+candidate. Setup began under APR-028 and reached an Ubuntu login, but repeated
+graphical stalls led the owner to pause it. The VM was last verified powered
+off, with networking disabled and its virtual DVD empty; guest completion
+checks and a Stage A host probe remain undone. No finite new selected or all-options
 total is defensible until that residual is scoped.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-260--2026-09-24)
+the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-265--2026-09-25)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
 
@@ -62,6 +65,58 @@ tables below are retained as historical snapshots. Their dated estimates,
 pending decisions, and statements about what will happen next describe their
 original checkpoints. Follow the latest checkpoint and the owning records for
 current status and authorization.
+
+## Five-merge checkpoint — 2026-09-25, after pull request #265
+
+The five merges after #260 were #261, #262, #263, #264 and #265. Their
+[exact GitHub receipts](aegis-execution-metrics.md#checkpoint-after-pull-request-265--2026-09-25)
+span 2026-09-24 22:33:06–2026-09-25 02:39:53 UTC, or **4h06m47s** of
+wall time. This includes review, CI, owner waiting and concurrent work; no
+active-work rate can be derived. The five PRs taught build choices, reconciled
+the previous checkpoint, corrected setup guidance, recorded the approved VM
+setup, and prepared a conditional issue #101 SDK scope. None closed a selected
+implementation row. The VM setup was performed outside these PRs and paused
+after graphical login stalls; it did not run a BER host probe.
+
+The #265 tree still has **588 tracked Markdown files**: **544 accepted reader
+pages** and **44 classified fixtures**, with **zero known pending pages** in
+the bounded readability sweep. PR #265 changed only two existing pages and
+recorded their review. Confidential conduct intake remains a separate owner
+decision. The BER-BKL-009 real-host, runtime, privacy and cleanup residual
+has no scoped estimate. The following eleven rows retain their prior planning
+ranges because these merges supplied no measured implementation duration or
+new authority to close them; the paused VM adds uncertainty to host proof.
+
+| Selected remaining work item | Active-work planning range | Gate or uncertainty after #265 |
+| --- | ---: | --- |
+| WP-2B-3 candidate inputs | 1–4 h | Owner must inspect the private 160-case label packet, guide and exact hashes. |
+| WP-2B-3 measurement and OD-1 | 4–10 h | Label approval, execution source/allowance, measured development result and holdout freeze remain. |
+| Selected-host R4/R5 capability proof | 12–24 h, provisional | Disposable VM exists but guest checks and login repair are paused; Stage A probe needs a separate grant. |
+| WP-2B-4 | 12–24 h | Calibration, OD-1, R1/R4/R5 evidence and a separate live grant precede the limited suite. |
+| WP-2B-5 | 8–16 h | WP-2B-4 completion and a separate generic-corpus phase grant remain. |
+| WP-2B-6 | 8–16 h | WP-2B-5 plus scheduling, cost, quarantine and dataset operations grant remain. |
+| WP-2B-7 | 4–8 h | WP-2B-6 and separate advisory CI/operator grant remain. |
+| CP-WP-003 | 8–16 h, provisional | Real atomic approval source, independent freshness, containment, evidence and billing proof remain. |
+| CP-WP-004 | 8–16 h | CP-WP-003 real proof, one selected operation and a separate grant remain. |
+| Issue #101 package 4 | 8–16 h, provisional | No host path selected or code grant. The #265 Stage 4A 12-hour ceiling is hypothetical, not an estimate; selection requires a separate 4A/4B reforecast. |
+| Issue #101 package 7 | 6–12 h | End-to-end release review depends on package 4 proof and any selected helper integration. |
+| Documentation readability | 0 known pending | 544 accepted readers; future changes require acceptance. |
+| **Eleven-row planning subtotal** | **79–162 h** | Includes provisional host and package-4 ranges; not a delivery promise. |
+| BER-BKL-009 host, runtime, privacy and cleanup residual | TBD | Needs named host, separate scope and privacy/runtime/cleanup decisions. |
+| **Selected total** | **No finite estimate** | The subtotal excludes the unestimated BER residual. |
+
+All seven optional rows were reconsidered without an adoption decision:
+issue #101 package 5 remains **8–20 h** after a package-4 comparison;
+package 6 remains **8–20 h** after host proof and separate provider authority;
+BER-BKL-010 remains **4–12 h** after OD-4 and BKL-009; BER-BKL-014 remains
+**8–20 h per selected additional host**; BER-BKL-015 remains **8–24 h per
+selected product**; strategic skill/framework expansion and multi-judge
+arbitration or future control-plane architecture remain unbounded until
+selected and scoped. Both optional #101 helpers would add **16–40 h** to the
+known subtotal if selected, without making the selected or all-options totals
+finite. No estimate or owner choice here authorizes private labels, provider
+calls, host probing, paid work or deployment. Start the next five-merge
+counter after #265; revise sooner for a material owner or scope decision.
 
 ## Five-merge checkpoint — 2026-09-24, after pull request #260
 
