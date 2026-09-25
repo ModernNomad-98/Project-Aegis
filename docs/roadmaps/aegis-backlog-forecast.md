@@ -51,9 +51,10 @@ The [WP-2B-3 measurement prerequisite packet](ber-wp2b3-measurement-prerequisite
 orders private candidate review, live source and allowance reconciliation,
 selected-host proof, development, holdout freeze and OD-1. The
 [CP-WP-003 authority packet](cp-wp-003-real-authority-decision-packet.md)
-now links the completed [named-candidate research](cp-wp-003-named-candidate-matrix.md)
-and asks for direction on a first read-only contract inspection before any
-separate source or host grant. The [BER-BKL-009 residual proposal](ber-bkl-009-residual-host-runtime-privacy-cleanup-proposal.md)
+links the completed [named-candidate research](cp-wp-003-named-candidate-matrix.md)
+and [DynamoDB public-contract inspection](cp-wp-003-dynamodb-public-contract-inspection.md).
+The next selected-source authenticated inspection needs an exact candidate and a
+separate reviewed grant. The [BER-BKL-009 residual proposal](ber-bkl-009-residual-host-runtime-privacy-cleanup-proposal.md)
 scopes later host, runtime, privacy and cleanup decisions. The offline grants
 do not extend to these real phases. [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
 delivered the bounded offline Stage 4A bridge at merge
@@ -69,8 +70,10 @@ hours**; Stage 4B and the BER-BKL-009 real residual remain unestimated, so the
 selected total has no finite ETA. The
 CP packet's former 4–8-hour candidate-research range is now completed
 source-only work, outside the selected subtotal and not CP-WP-003 real proof.
-Its provisional 4–8-hour read-only inspection range remains conditional on
-owner direction and any needed separate grant. The dated
+The first published-contract inspection is also complete and outside the selected
+subtotal. The provisional 4–8-hour range now applies only to a later
+selected-source authenticated read-only inspection after owner direction and
+a separate reviewed grant. The dated
 [five-merge checkpoint](#five-merge-checkpoint--2026-09-25-after-pull-request-284)
 below preserves its #284 counts and PR-head status as historical evidence.
 
