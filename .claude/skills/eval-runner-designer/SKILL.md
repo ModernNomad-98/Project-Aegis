@@ -116,6 +116,12 @@ intact: this design creates no execution result and never implies otherwise.
 8. **Deliver the design** in the Output Format, with open decisions listed
    and the non-claims section distinguishing shipped offline capability from
    proposed live/provider execution; nothing here is an eval result.
+   When an open decision requires the owner's choice, first explain each
+   technical term in plain language, why the choice matters, each viable
+   option's money (including $0), setup time, ongoing run and maintenance
+   costs, pros and cons, and a recommendation tied to the corpus and budget.
+   Resolve routine design parameters from evidence without asking the owner;
+   treat a choice the owner already stated as settled, not an open question.
 
 Execution-semantics tables, the judging decision table, report schema,
 sampling-tier math, and flake-policy parameters:
@@ -133,7 +139,10 @@ Reporting:      <per-case states incl. UNRUN default; per-skill rollup; corpus m
 Cost & sampling:<full-run cost model; tiers (PR / cadence / full); spend cap + kill switch>
 Flake policy:   <repeats N, quorum rule, quarantine visibility>
 CI posture:     advisory lane first; promotion criteria: <stability record + human decision>; structural validator stays required
-Open decisions: <judge model choice, repeat counts, budget owner, …>
+Open decisions: <only unresolved owner choices; decide routine judge/repeat
+  parameters from evidence and record them above>
+Owner choice brief (only if needed): <terms; why now; options with money,
+  setup/run/maintenance costs, pros and cons; recommendation and why it fits>
 Non-claims:     offline runner exists; this design executed no case and supplies no result; live/provider path remains gated
 ```
 
@@ -152,6 +161,8 @@ Non-claims:     offline runner exists; this design executed no case and supplies
 - [ ] CI posture is advisory-first with stated promotion criteria; the
       structural validator is never replaced.
 - [ ] The non-claims section is present verbatim in the deliverable.
+- [ ] Any owner-facing choice explains terms, costs, pros and cons, and a
+      reasoned recommendation before requesting a decision.
 
 ## Gotchas
 

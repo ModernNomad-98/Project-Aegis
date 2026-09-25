@@ -101,6 +101,15 @@ vetted cryptographic primitives, it does not invent them.
    expiry), each access (non-secret link id or keyed fingerprint, time, IP
    within privacy limits; never the raw bearer token), gate
    attempts, and revocation — emitted into `audit-log-architect`'s schema.
+8. **Explain owner-facing choices before asking.** For a real choice such as
+   allowing unauthenticated access or adding a password/one-time passcode,
+   define the terms and why the choice matters. Compare viable options by
+   money (including $0), setup time, ongoing support/maintenance cost,
+   security and usability pros and cons. Recommend the option that fits the
+   resource's sensitivity and audience, with a reason. Decide routine token
+   mechanics from evidence; do not turn them into owner approval requests.
+   If the owner already specified no-login links or another choice, treat it
+   as settled and explain its implications without asking again.
 
 ## Output Format
 
@@ -121,6 +130,8 @@ Tenant blast radius: <link exposes exactly the resource; no sibling/tenant reach
 Audit: <creation / access by non-secret link id or keyed fingerprint / gate
   attempts / revocation → audit-log schema; never raw token>
 Open questions / risks: <each with risk-if-wrong / who answers>
+Owner choice brief (only if needed): <terms; why now; options with money,
+  setup/maintenance costs, pros and cons; recommendation and why it fits>
 ```
 
 ## Validation Checklist
@@ -143,6 +154,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - [ ] Optional password/OTP gates are rate-limited with brute-force lockout.
 - [ ] Creation, access, gate attempts, and revocation are audited via
       `audit-log-architect`.
+- [ ] Any owner-facing choice is explained with terms, costs, tradeoffs and
+      a reasoned recommendation before the question is asked.
 
 ## Security Rules
 
