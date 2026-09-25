@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #282 on 2026-09-25 Coordinated Universal Time
+As of merged pull request (PR) #284 on 2026-09-25 Coordinated Universal Time
 (UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -74,20 +74,25 @@ Stage 4A grant in the existing approval register. PR #279 revised existing
 choice skills; PR #280 accepted the previous three-page checkpoint after two
 independent full-page reviews. PR #282 refreshed two existing current-route
 reader pages after an independent full-page review. None added a Markdown page.
-The #282 tree
+PR #283 updated the existing three checkpoint pages and #284 improved choice
+guidance in eleven existing skill pages. Both added no Markdown file. The #284 tree
 still has 589 tracked pages: 545 accepted readers and 44 classified fixtures,
 with zero known pending pages.
 
-The [five-merge checkpoint after #278](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-25-after-pull-request-278)
-covers #271, #272, #273, #274 and #278. GitHub merge receipts span **42m01s
+The [five-merge checkpoint after #284](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-25-after-pull-request-284)
+covers #279, #280, #282, #283 and #284. GitHub merge receipts span **40m31s
 observed wall time**, including review, checks and waiting, so they do not
 measure an active-work rate. Ten selected ranges remain **71–146 active hours**;
 issue #101 Stages 4A/4B and the BER host, runtime, privacy and cleanup
 residual have no reliable ETA. The selected total remains without a finite
-estimate. #279, #280 and #282 are the first three subsequent merges. This checkpoint
-revises the same three tracking pages and adds no Markdown page or fixture.
-Two independent full-page reviews accepted these corrected pages, their
-current-versus-historical status, terminology, links, counts and merge receipts.
+estimate. Stage 4A's approved 12-hour limit is a ceiling, not a remaining
+estimate. [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+remains open at `0bb51c19bd42261a5604fb25762069ce7867141b` with Linux
+and Windows green, the protected-path guard failing and its one-time exception
+question pending. This checkpoint revises the same three tracking pages and
+adds no Markdown page or fixture. Two independent full-page reviews of these
+revised pages accepted the content, counts and 340 local links and anchors.
+
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
 below are historical snapshots; the

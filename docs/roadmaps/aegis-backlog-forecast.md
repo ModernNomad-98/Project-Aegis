@@ -5,7 +5,7 @@
 This is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. The [owner's issue #101 host-path choice](#material-owner-decision--2026-09-25-issue-101-host-path)
 and the subsequent bounded Stage 4A grant are the latest scope changes. The
-[five-merge checkpoint after #278](#five-merge-checkpoint--2026-09-25-after-pull-request-278)
+[five-merge checkpoint after #284](#five-merge-checkpoint--2026-09-25-after-pull-request-284)
 is the latest full reassessment. Pull request (PR) #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
 documentation residual. PR #253 added one reviewed reader page; PR #257 added
@@ -32,7 +32,7 @@ or all-options
 total is defensible until the unestimated residuals are scoped.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-278--2026-09-25)
+the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-284--2026-09-25)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
 
@@ -65,8 +65,58 @@ Stage 4A design and Stage 4B host execution scope.
 
 Optional issue #101 helpers retain their conditional **16–40 active-hour**
 combined range after a successful Stage 4B comparison and separate grants.
-The seven optional rows were last fully reassessed in the dated #278
+The seven optional rows were last fully reassessed in the dated #284
 checkpoint below. The paused VirtualBox VM remains outside this SDK route.
+
+## Five-merge checkpoint — 2026-09-25, after pull request #284
+
+The five merges after #278 were #279, #280, #282, #283 and #284. Their
+[merge receipts](aegis-execution-metrics.md#checkpoint-after-pull-request-284--2026-09-25)
+span 04:45:08–05:25:39 Coordinated Universal Time (UTC) on 2026-09-25:
+**40m31s observed wall time**. Review, continuous integration (CI), owner
+waiting and concurrent work are included. Active work was not separately
+instrumented; this is not an active-work rate. #279 and #284 improved choice
+guidance in existing skills, with #284 covering eleven skills. #280 and #283
+updated checkpoint documents; #282 refreshed current decision routes. None
+closed a selected implementation row or established a real-host proof.
+
+The #284 tree has **589 tracked Markdown files**: **545 accepted reader pages**
+and **44 classified fixtures**, with zero known pending pages at that merge.
+The ten selected estimated rows remain **71–146 active hours**. These merges
+provided no new measured package duration or evidence to change their ranges
+and gates. Work package (WP), owner decision 1 (OD-1), control plane (CP),
+backlog item (BKL), and runner requirements R1/R4/R5 are defined in the
+[runner backlog](behavioral-eval-runner-backlog.md) and
+[control-plane backlog](resumable-control-plane-backlog.md).
+
+| Selected remaining work item | Active-work planning range | Gate after #284 |
+| --- | ---: | --- |
+| WP-2B-3 candidate inputs | 1–4 h | Owner inspection of private 160-case labels, guide and exact hashes. |
+| WP-2B-3 measurement and OD-1 | 4–10 h | Label approval, reviewed live source and allowance, host proof, measured result and ratification. |
+| Selected-host R4/R5 capability proof | 12–24 h, provisional | VirtualBox VM setup paused; guest checks and separate Stage A grant remain. |
+| WP-2B-4 | 12–24 h | Calibration, OD-1, R1/R4/R5 evidence and separate live grant. |
+| WP-2B-5 | 8–16 h | WP-2B-4 and separate generic-corpus phase grant. |
+| WP-2B-6 | 8–16 h | WP-2B-5 plus scheduling, cost, quarantine and dataset authority. |
+| WP-2B-7 | 4–8 h | WP-2B-6 and separate advisory CI/operator grant. |
+| CP-WP-003 | 8–16 h, provisional | Real atomic authority, independent freshness, containment, evidence and billing proof. |
+| CP-WP-004 | 8–16 h | CP-WP-003 real proof, selected operation and separate grant. |
+| Issue #101 package 7 | 6–12 h | Release review depends on package-4 host proof and selected helper integration. |
+| **Ten-row planning subtotal** | **71–146 h** | Provisional host uncertainty remains; no delivery promise. |
+| Issue #101 Stage 4A offline bridge | TBD; approved ceiling 12 h | APR-031 permits bounded synthetic implementation. [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281) remains open at `0bb51c19bd42261a5604fb25762069ce7867141b`; Linux and Windows pass, but the protected-path guard fails and its one-time exception question is pending. |
+| Issue #101 Stage 4B host proof | TBD | Pinned execution scope and separate grant. |
+| BER-BKL-009 host/runtime/privacy/cleanup | TBD | Named host, runtime design and separate authority. |
+| Documentation readability | 0 known pending at #284 | Accept newly changed pages after full-page review. |
+| **Selected total** | **No finite estimate** | Stage 4A, Stage 4B and BER residual remain unestimated. |
+
+The seven optional rows remain conditional: issue #101 packages 5 and 6 are
+**8–20 active hours each** after Stage 4B and separate approvals; BER-BKL-010
+is **4–12 hours**; BER-BKL-014 is **8–20 hours per additional host**; and
+BER-BKL-015 is **8–24 hours per selected product**. Strategic skill expansion,
+multi-judge arbitration and future control-plane architecture remain
+unbounded until selected and scoped. The two issue #101 helpers together would
+add **16–40 hours** if selected. The all-options total has no finite estimate.
+Two independent full-page reviews accepted this checkpoint; the live PR #281
+status and post-merge #284 checks were verified before publication.
 
 ## Five-merge checkpoint — 2026-09-25, after pull request #278
 
