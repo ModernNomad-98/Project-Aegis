@@ -100,3 +100,102 @@ destination, or ordinary permissions. Stage 4A can use fresh **synthetic**
 host-owned snapshots to test denial before each proposed dispatch. Stage 4B
 must identify real sources and prove real callback invocation, consumption,
 full dispatch coverage and complete-task main/subagent telemetry.
+
+## Full public archive screen for the initial candidate lock (2026-09-25 UTC)
+
+The temporary version-3 lock above was used as the exact dependency population
+for a **read-only static archive screen**. Its SHA-256 is
+`dc869bd02f2ff679fb91c26ced5c7670ddb2156f91744a972d05e64d1d906df7`.
+All 110 public registry tarballs were downloaded to temporary storage and
+parsed without installing packages, running scripts, importing modules,
+starting the bundled CLI, or contacting a model provider. The tarballs total
+**842,011,242 compressed bytes** of cumulative download traffic across all
+eight optional platform packages. The temporary audit retained roughly 1.3 MB
+of report data, not the tarballs. The traffic figure is not the expected size
+of one platform's installed tree. All 110 whole-archive SHA-512 values matched
+the exact lock integrity values, and all embedded package names, versions and
+license fields matched the lock metadata. The screen recorded zero download, parse or
+integrity errors. This supports archive identity for this temporary resolution;
+it does not establish safe code, reproducible builds or SDK runtime behavior.
+
+The archive manifests declare **zero `preinstall`, `install` or `postinstall`
+hooks** and eight `prepare` scripts. An eventual offline installation should
+still use `npm ci --ignore-scripts --no-audit --no-fund` only after a separately
+approved implementation grant and committed lockfile review. The 110 license
+metadata fields remain 90 MIT, seven ISC, two BSD-3-Clause, one BSD-2-Clause,
+one Unlicense, one Anthropic SDK license pointer and eight Anthropic native
+package pointers. License text or a license pointer was found in 109 of the
+110 archives. The exception is `standardwebhooks@1.1.1`: its package manifest
+says MIT and its tarball lacks `LICENSE`, `COPYING` or `NOTICE`. The other
+checked releases allowed by the `^1.0.0` dependency range, `1.0.0` and
+`1.1.0`, also lack those files. The upstream
+[JavaScript package manifest](https://github.com/standard-webhooks/standard-webhooks/blob/main/libraries/javascript/package.json)
+identifies MIT while the
+[repository root license](https://github.com/standard-webhooks/standard-webhooks/blob/main/LICENSE)
+says Apache-2.0.
+Resolve the applicable published-package text with its maintainer or an
+authoritative package-specific source before treating this license review as
+closed. The SDK and native packages point to
+[Anthropic commercial terms](https://github.com/anthropics/claude-agent-sdk-typescript/blob/main/LICENSE.md).
+The SDK peer range also permits `@anthropic-ai/sdk@0.93.0` and `0.94.0`;
+their public manifests omit `standardwebhooks`, while `0.95.0` introduces it.
+This was checked with `npm.cmd view '@anthropic-ai/sdk@<version>' dependencies
+--json` for each exact version. See the npm package records for
+[0.93.0](https://www.npmjs.com/package/@anthropic-ai/sdk/v/0.93.0),
+[0.94.0](https://www.npmjs.com/package/@anthropic-ai/sdk/v/0.94.0), and
+[0.95.0](https://www.npmjs.com/package/@anthropic-ai/sdk/v/0.95.0).
+An exact `0.94.0` alternate lock was subsequently screened below. Neither
+the peer range nor static archives demonstrate runtime compatibility.
+
+Each of the eight native binary sizes and SHA-256 values below matched the SDK
+archive manifest. These are **binary-content checks**, separate from the
+whole-tarball SHA-512 checks; no binary was executed.
+
+| `@anthropic-ai/claude-agent-sdk-` suffix, all `0.3.281` | Binary bytes | SHA-256 |
+| --- | ---: | --- |
+| `darwin-arm64` | 220,931,760 | `a922981f6f3b55a251ef9f9dbaa0621a5f99cbcb5ca67f8a797476ccfc83f626` |
+| `darwin-x64` | 229,263,712 | `a9355cbb0d291ce948efcf61a6ef397401672f64fa5e5e67bca092fed6cd9088` |
+| `linux-arm64` | 236,773,368 | `dd27b36438a4fed1670cd29bad2fda6a73b628b6da55443e5c2f647fe6ed328f` |
+| `linux-arm64-musl` | 229,128,008 | `4f72ebbb08706651e7a2204303793700698f4046bc31f3e7e65b381063b7c210` |
+| `linux-x64` | 237,375,560 | `56fe3da88458465fb27d7e9299dddb3fead55750fb9c2de795f233b5eea6dce1` |
+| `linux-x64-musl` | 231,137,376 | `30220a5cf0628634599e0ede13a5cc814d21880116abf762f0598a33636f7bca` |
+| `win32-arm64` | 228,774,560 | `103730182fe4dd36b8ff7791a408ac6144b2c40e35ab7b56b3561ce1d385ecbb` |
+| `win32-x64` | 240,767,648 | `39be063c2512b43347fe7b0ab18c46f1596141701c9c5fc895ddfca9a051067c` |
+
+The SDK manifest's explicit `testedWrapperVersions` list ends at `0.3.280`,
+although this candidate wrapper and bundled CLI are `0.3.281` and `2.1.281`.
+Archive identity therefore does not demonstrate this wrapper/CLI pair's
+compatibility. The selected Windows prototype also cannot establish Linux
+runtime compatibility merely because the Linux x64 binary hash matches. Those
+checks belong to later, separately authorized host execution.
+
+## Preferred offline peer candidate: API SDK 0.94.0
+
+A second temporary version-3 lock keeps Agent SDK `0.3.281`, MCP SDK `1.30.1`
+and Zod `4.6.5`, and resolves the allowed `@anthropic-ai/sdk@0.94.0` peer.
+Its SHA-256 is
+`403a823392845956bde0f7a8d78c103571dc86c680659194f8f231cc7f52776d`.
+It has 107 dependency entries, including the same eight native packages.
+**106 entries have identical name, version and integrity** to the 110-entry
+lock above, so their archive checks are reusable. The one changed archive is
+`@anthropic-ai/sdk@0.94.0`: its 706,201-byte tarball matched registry SHA-512
+`sha512-OVlCttk5MyeTGtrWX5+F3MJOfEMDuEjK8+rm9aQMDfRPWndVMbhk37QG8WLnVbcc7huyUGngVMjT7iMN2llySA==`.
+It bundles an MIT `LICENSE`, declares no `preinstall`, `install` or
+`postinstall` hook, and lists `json-schema-to-ts` as its only ordinary
+dependency. The alternate drops `standardwebhooks`, `@stablelib/base64` and
+`fast-sha256`, with no newly added package. Thus all **107/107** exact
+archives have static integrity, manifest and license coverage through the
+106 reused checks plus the new archive check. Its license metadata population
+is 88 MIT, seven ISC, two BSD-3-Clause, one BSD-2-Clause, one Anthropic SDK
+pointer and eight native-package pointers. No archive in this alternate
+resolution declares an installation hook; the reviewed `prepare` scripts
+still justify `--ignore-scripts` for any later authorized install.
+
+The `0.94.0` resolution is the **preferred candidate for an offline TypeScript
+bridge** because it removes the package with unresolved published-license
+attribution while preserving the SDK's declared peer range. This is a
+supply-chain preference, not a claim that the SDK wrapper, bundled CLI and
+older API SDK work together at runtime. A committed lock, package-body safety
+review and separate Stage 4A implementation grant remain pending. The later
+host proof must test executable compatibility without assuming it from the
+static archive screen. No package was installed or executed in this review.

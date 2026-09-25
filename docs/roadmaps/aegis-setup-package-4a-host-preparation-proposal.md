@@ -80,8 +80,8 @@ it matches the SDK manifest. The Windows archive integrity is
 The SDK and Windows package manifests declare no install scripts or ordinary
 `dependencies` entries. The SDK declares peer ranges for `@anthropic-ai/sdk`,
 `@modelcontextprotocol/sdk` and `zod`, plus exact-version platform packages.
-Compatible current peer candidates are `0.128.0`, `1.30.1` and `4.6.5`;
-these are **examples, not an approved resolved tree**. The Model Context
+The first peer examples were `0.128.0`, `1.30.1` and `4.6.5`;
+these were **examples, not an approved resolved tree**. The Model Context
 Protocol (MCP) peer alone
 declares 16 direct dependencies. A generated exact lockfile must fix every
 resolved package and integrity value; separately inspect each resolved
@@ -94,17 +94,55 @@ not establish compatibility of wrapper `0.3.281` with its bundled CLI. The
 [package evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md)
 records the checks and their limits.
 
-A temporary, **metadata-only** npm lockfile candidate with exact roots SDK
+A temporary npm lockfile candidate with exact roots SDK
 `0.3.281`, Anthropic API SDK `0.128.0`, MCP SDK `1.30.1` and Zod `4.6.5`
 resolved 110 dependency entries besides the root record, all with integrity
-values. Their exact registry
-manifests declare no `preinstall`, `install` or `postinstall` scripts; no
-package was installed. This candidate includes `@hono/node-server@2.1.1`,
+values. A later read-only static screen downloaded and inspected all 110
+public archives. All archive SHA-512 values matched the lock, all embedded
+name/version/license metadata matched, and the eight native binary SHA-256 and
+size values matched the SDK manifest. The 110 tarballs generated 842,011,242
+compressed bytes of cumulative download traffic including all eight optional
+platforms; one-platform CI is not expected to install all eight. The archive
+manifests declare no
+`preinstall`, `install` or `postinstall` hooks and eight `prepare` scripts.
+No package was installed or executed. This candidate includes
+`@hono/node-server@2.1.1`,
 which requires Node.js 20 or newer, so the candidate's effective minimum is
 20 even though the top-level SDK metadata says 18. The local Node 24.19.0
 meets that constraint. The candidate lock is not yet a committed dependency
-set or a review of 110 package bodies; Stage 4A still needs that review before
-installation.
+set or a safety audit of 110 package bodies. A specific license ambiguity
+remains: `standardwebhooks@1.1.1` declares MIT in its package manifest but
+bundles no license file, as do the other checked releases allowed by its
+`^1.0.0` dependency range, `1.0.0` and `1.1.0`. Its upstream
+[JavaScript package manifest](https://github.com/standard-webhooks/standard-webhooks/blob/main/libraries/javascript/package.json)
+says MIT, while the
+[repository root license](https://github.com/standard-webhooks/standard-webhooks/blob/main/LICENSE)
+says Apache-2.0. Resolve the applicable package terms
+before closing the dependency review. The SDK and native packages point to
+[Anthropic commercial terms](https://github.com/anthropics/claude-agent-sdk-typescript/blob/main/LICENSE.md).
+Older allowed API SDK peer releases
+[0.93.0](https://www.npmjs.com/package/@anthropic-ai/sdk/v/0.93.0) and
+[0.94.0](https://www.npmjs.com/package/@anthropic-ai/sdk/v/0.94.0) omit
+`standardwebhooks`; [0.95.0](https://www.npmjs.com/package/@anthropic-ai/sdk/v/0.95.0)
+introduces it. A second temporary exact lock uses API SDK `0.94.0`. Its
+SHA-256 is
+`403a823392845956bde0f7a8d78c103571dc86c680659194f8f231cc7f52776d`.
+It has 107 dependency entries including eight native packages. Of those,
+106 have the same name, version and integrity as the fully inspected
+`0.128.0` lock. The one changed API SDK archive is 706,201 bytes, matches its
+registry SHA-512, bundles an MIT `LICENSE`, declares no installation hook and
+has `json-schema-to-ts` as its sole ordinary dependency. The alternate removes
+`standardwebhooks`, `@stablelib/base64` and `fast-sha256` without adding a
+package. All 107 exact archives therefore have static identity, license and
+script coverage by reuse plus the new check. Its license metadata fields are
+88 MIT, seven ISC, two BSD-3-Clause, one BSD-2-Clause, one Anthropic SDK
+pointer and eight native-package pointers. No archive declares an
+installation hook. **Prefer this `0.94.0` peer for the offline TypeScript
+candidate** because it removes the unresolved `standardwebhooks` package.
+This does not prove the older peer is compatible with wrapper `0.3.281` or
+its bundled CLI. Neither lock is committed, installed or a final dependency
+approval. The [archive evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md#preferred-offline-peer-candidate-api-sdk-0940)
+records both digests, all eight native hashes and review limits.
 
 For review, a possible **separate Stage 4A-offline grant** would cap work at
 12 active implementation hours, 1,200 added handwritten code/test lines and
@@ -143,6 +181,22 @@ call. The existing 4,096-byte request and 1,024-byte response limits remain.
 The continuous integration (CI) workflow must run the new offline tests on
 the pinned package.
 
+For a later authorized implementation, add a recorded offline bridge test
+step to each existing CI job: Linux `validate-skills` and Windows
+`windows-offline-checks`. Use a full commit SHA for `actions/setup-node`, pin
+Node 24 on both hosts, disable the package-manager cache, supply no provider
+credentials, and install only from the committed lock with
+`npm ci --ignore-scripts --no-audit --no-fund`. Run
+`node --test tools/aegis_setup/host_bridge/bridge.test.ts` through the
+repository's record-check mechanism
+so the existing required checks cover it. The test process must import only
+the bridge and synthetic fixtures: no SDK `query()`, bundled CLI process,
+provider call or real host callback. CI must assert the positive and denial
+cases listed below, plus that every failure returns an explicit denial and
+does not invoke an online fallback. A later CI workflow edit is a protected
+path and requires its own exact-head gate-guard disposition if that check
+blocks a PR; this packet does not grant such an exception.
+
 For offline tests, a trusted synthetic `AuthoritySnapshot` must supply
 current eligible agent and skill IDs and their flags; mandatory and explicit
 selections; genuine direct manual invocation; catalog and policy versions;
@@ -170,10 +224,13 @@ and return a denial. The proposed lockfile review must precede any
 Claude process.
 
 This is **not yet an implementation-ready grant**. The host path is selected,
-the two primary archives have been inspected, and a temporary dependency
-resolution has been screened; a committed lockfile and package-body review
-remain. A later reviewed approval must make the exact
-file list, limits and denial behavior effective. Actual SDK callback
+both exact candidate resolutions and all eight native hashes passed static
+identity checks. The original `0.128.0` resolution still has the
+`standardwebhooks` license ambiguity; the preferred `0.94.0` resolution
+excludes it. A committed lockfile, package-body safety review, and wrapper/CLI
+compatibility remain open. A later
+reviewed approval must make the exact file list, limits and denial behavior
+effective. Actual SDK callback
 invocation, dispatch consumption and main/subagent token evidence remain
 Stage 4B host proof.
 
@@ -182,8 +239,9 @@ Stage 4B host proof.
 1. **Planning choice resolved:** use a separate SDK-managed TypeScript
    session on native Windows as the first offline prototype. SDK `0.3.281`
    bundles CLI `2.1.281`; this does not qualify the owner's current CLI/editor
-   as a verified supported host. The exact transitive lockfile, license set
-   and executable compatibility are still unverified.
+   as a verified supported host. Both temporary transitive resolutions passed
+   static archive checks. Prefer API SDK `0.94.0` for the offline candidate;
+   a committed lockfile and executable compatibility remain unverified.
 2. Choose the separate implementation grant's exact files, hours, added-line
    cap and zero or bounded external spend. An offline callback test cannot
    establish actual host interception. Any actual SDK session, model-backed
