@@ -35,7 +35,16 @@ Stage 4A implementation under [APR-031](../approvals/APPROVAL_REGISTER.md#aegis-
 The [Stage 4A offline bridge in PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
 merged as `ea40ab481ff78267cd5f151c393e946805ba8d01` on
 2026-09-25 at 07:43:44 UTC. [APR-036](../approvals/APPROVAL_REGISTER.md#aegis-apr-036-stage-4a-offline-bridge-package-completed)
-records completion of APR-031's one bounded package. The
+records completion of APR-031's one bounded package. Merged
+[PR #299](https://github.com/ModernNomad-98/Project-Aegis/pull/299)
+requires explicit agent `read_only` and skill `manual_only` flags in synthetic
+offers. It compares authority snapshots independently of object-key order,
+while preserving array order and denying changed facts. Its reviewed head
+`db2a3ae2ff0b657689c78aa4bf2a96e9282c5b26` merged as
+`97b9d68804f32f049286e9d09cac4597afa6beea` on 2026-09-25 at 09:58 UTC;
+12 local
+offline tests, the 185-skill validator and the PR's Linux, Windows and
+`gate-guard` checks passed. This remains synthetic-only. The
 [Stage 4B host-proof decision packet](aegis-setup-package-4b-host-proof-protocol.md)
 sets out a later planning choice. No real SDK session, provider call, host proof
 or package-4 comparison is authorized or completed.
@@ -76,14 +85,15 @@ support change, disablement and recovery without stale verified claims.
 
 ## Component map: shipped seams and future work
 
-The first two rows and the offline contract are shipped. Other rows describe
-future host integration or conditional helpers; none grants new authority.
+The setup skill, state writer, offline bridge and advisory contract are shipped.
+Other rows describe future host integration or conditional helpers; none grants
+new authority.
 
 | Component | Responsibility and allowed dependency | Owned state |
 | --- | --- | --- |
 | Shipped `aegis-setup` skill (package 2) | Show four choices; save only an explicit Aegis-only choice on tested Windows PowerShell; never install or connect a helper | No credential or provider state |
 | Shipped state writer (package 2) | Validate and atomically save one user's Aegis-only selection for one checkout | `selected` record and `unselected` missing status; no helper verification or secret |
-| Proposed offline bridge (package 4A) | On fake SDK callback inputs, combine the shipped Python advice with fresh synthetic host-owned eligibility and policy facts; deny unsafe candidate dispatch | Ephemeral synthetic request/result only; no host or provider authority |
+| Shipped offline bridge (package 4A) | On fake SDK callback inputs, combine the shipped Python advice with fresh synthetic host-owned eligibility and policy facts; deny unsafe candidate dispatch. PR #299 requires offer flags and binds snapshots independently of object-key order. | Ephemeral synthetic request/result only; no host or provider authority |
 | Future host proof (package 4B) | On an authorized pinned SDK session, derive real eligible agent/skill identifiers (IDs), then prove callback invocation, decision consumption and complete-task telemetry on synthetic cases; helper comparison needs a later separate proposal and grant | Ephemeral host request/result and measured telemetry; no authority grants |
 | Future eligibility and policy gate | Apply host permissions, explicit choices, manual-only flags, required specialists/reviews and stage rules before dispatch and after advice | Current host and catalog policy, not model output |
 | Shipped offline advisory contract (package 3) | Validate bounded synthetic offers and recommendations or abstentions with typed failures; fake adapter has no host hook or dispatch | In-memory request/result only; no provider configuration or credential |

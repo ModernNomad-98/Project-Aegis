@@ -31,13 +31,20 @@ validator claim was not durably reserved across instances. The repair checks
 current shared rows before intent use, persists explicit validator claims, and
 tests cross-instance commit, recovery, release, missing-row and database-error
 cases. These checks do not prove target nonduplication or cross-store atomicity.
+Merged [PR #298](https://github.com/ModernNomad-98/Project-Aegis/pull/298)
+then fixed exact validator intent-marker replay across instances: a delayed writer
+accepts another instance's marker for the same committed intent, while a
+different event or hash still denies. Its reviewed head
+`365f9c98e7fd22430b69cd4d1cbd2453da5004b6` merged as
+`91ea4503790c6d6862f0b222bca8e1140f9954c1`; local checks and the PR's
+Linux, Windows and `gate-guard` checks passed. This remains synthetic-only.
 This is still not a live delivery integration. A green synthetic check does not
 authorize a real provider call, deployment, source claim, or evidence operation.
 
 | Work package | Delivered or pending | Where to verify it |
 | --- | --- | --- |
 | CP-WP-001: state, authority, and recovery contract | DONE: documentation contract only, [PR #95](https://github.com/ModernNomad-98/Project-Aegis/pull/95) | [Design](../design/resumable-control-plane-v1.md) and [review evidence](../evidence/control-plane/cp-wp-001-review.md) |
-| CP-WP-002: offline state and recovery kernel | DONE: synthetic-only code, [PR #99](https://github.com/ModernNomad-98/Project-Aegis/pull/99); shared-claim repair merged in [PR #294](https://github.com/ModernNomad-98/Project-Aegis/pull/294) | [Package guide](../../tools/aegis_delivery_control/README.md) and [detailed status below](#5-separate-work-packages-current-status) |
+| CP-WP-002: offline state and recovery kernel | DONE: synthetic-only code, [PR #99](https://github.com/ModernNomad-98/Project-Aegis/pull/99); shared-claim repair in [PR #294](https://github.com/ModernNomad-98/Project-Aegis/pull/294); exact validator marker replay fix in [PR #298](https://github.com/ModernNomad-98/Project-Aegis/pull/298) | [Package guide](../../tools/aegis_delivery_control/README.md) and [detailed status below](#5-separate-work-packages-current-status) |
 | CP-WP-003A: first offline capability proof | DONE: synthetic failure probes, [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123) | [Review evidence](../evidence/control-plane/cp-wp-003a-review.md) and [approval AEGIS-APR-006](../approvals/APPROVAL_REGISTER.md#aegis-apr-006-control-plane-offline-capability-proofs-first-increment) |
 | CP-WP-003: real authority, evidence, and execution capability | BLOCKED: real source, freshness, selected-host containment, evidence, and billing proofs need separate scope and authority | [Detailed status below](#5-separate-work-packages-current-status) and [offline proof proposal](cp-wp-003-offline-proof-proposal.md) |
 | CP-WP-004: one bounded real integration | BLOCKED: package 003 prerequisites and an approved target are absent | [Detailed status below](#5-separate-work-packages-current-status) |
