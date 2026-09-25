@@ -17,8 +17,9 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [five-merge checkpoint after pull request #284](#checkpoint-after-pull-request-284--2026-09-25)
-reconsiders every selected and optional row. The [BER-BKL-009 owner
+The latest [catch-up checkpoint after pull request #306](#catch-up-checkpoint-after-pull-request-306--2026-09-25)
+reconsiders every selected and optional row and records four missed five-merge
+windows. The [BER-BKL-009 owner
 decision](aegis-backlog-forecast.md#material-owner-decision--2026-09-24-ber-bkl-009)
 supersedes the old whole-item estimate and selected total. PR #257 delivered
 the bounded offline integration; host, runtime, privacy and cleanup work
@@ -48,6 +49,79 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Catch-up checkpoint after pull request #306 — 2026-09-25
+
+The [current full reassessment](aegis-backlog-forecast.md#catch-up-checkpoint--2026-09-25-after-pull-request-306)
+uses main `03f03807270e3527712a3182589218b54289efde`. Twenty-two
+PRs merged after the last full snapshot at #284. Four five-merge checkpoints
+were missed; the records below recover their receipts, not missing historical
+reassessments. They are sorted by GitHub `mergedAt`, not PR number.
+
+| Chronological window | Five merged PRs, in order | UTC interval on 2026-09-25 | Observed wall time |
+| --- | --- | --- | ---: |
+| 1 | #285, #286, #287, #281, #289 | 05:25:39–08:06:53 | 2h41m14s |
+| 2 | #288, #290, #292, #291, #293 | 08:06:53–08:45:42 | 38m49s |
+| 3 | #294, #295, #296, #297, #298 | 08:45:42–09:55:55 | 1h10m13s |
+| 4 | #299, #300, #301, #302, #303 | 09:55:55–17:08:01 | 7h12m06s |
+| Partial next window | #305, #306 | 17:08:01–17:38:47 | 30m46s |
+
+The complete #284-to-#306 interval is **12h13m08s wall time**. It
+includes concurrent work, gaps, review, CI and owner waiting; these components
+were not separately instrumented. Active time, review time, CI wait and owner
+wait are **unavailable**, not zero. Merge spacing is not package duration or an
+active-work delivery rate. The PR bodies provide no separate package ETA for
+these source-only updates and repairs. #281 reports about 27 minutes from
+worktree creation to commit, explicitly not active-only time; APR-031's
+12-hour limit was a ceiling. No retrospective numerical ETA is invented.
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Exact-main Actions |
+| --- | --- | --- | --- |
+| [#285](https://github.com/ModernNomad-98/Project-Aegis/pull/285): docs: checkpoint backlog after PR 284 | `cba890e65a8585ad5ac6fcafe14517f51a9bd5ba` | 05:40:52 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36099574235) |
+| [#286](https://github.com/ModernNomad-98/Project-Aegis/pull/286): docs: prepare Stage 4B host-proof decision | `dc4a6402c35763e3d538054f383d6ae136ecd0bf` | 05:51:47 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36100346167) |
+| [#287](https://github.com/ModernNomad-98/Project-Aegis/pull/287): docs: reconcile current inventory after PR 286 | `85ee0286afe595944e2f2b592affa7a24080fc30` | 06:02:43 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36101118608) |
+| [#281](https://github.com/ModernNomad-98/Project-Aegis/pull/281): feat: add bounded offline setup host bridge candidate | `ea40ab481ff78267cd5f151c393e946805ba8d01` | 07:43:44 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36109129965) |
+| [#289](https://github.com/ModernNomad-98/Project-Aegis/pull/289): docs: close Stage 4A merge approval lifecycle | `693e46b6426b93c10bbd2ac257033e23ce31411c` | 08:06:53 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36111166310) |
+| [#288](https://github.com/ModernNomad-98/Project-Aegis/pull/288): docs: scope gated CP and BER follow-ups | `f86aaa0181d716323589ef169940406fc576953b` | 08:07:37 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36111234190) |
+| [#290](https://github.com/ModernNomad-98/Project-Aegis/pull/290): docs: compare named control-plane authority candidates | `dc460d5948b18675e829d29e8a25d8458e1bafa1` | 08:29:29 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36113203575) |
+| [#292](https://github.com/ModernNomad-98/Project-Aegis/pull/292): docs: harden Stage 4B permission and telemetry proof | `4e8f67dc1bff38927e0ec834502454eba227a64a` | 08:32:35 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36113495770) |
+| [#291](https://github.com/ModernNomad-98/Project-Aegis/pull/291): fix: preserve host permission flow after offline advice | `7e300e41bc84487bd254e42d81b61b96ce38cdd1` | 08:33:12 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36113552080) |
+| [#293](https://github.com/ModernNomad-98/Project-Aegis/pull/293): docs: reconcile CP research and Stage 4A callback fix | `05604fb3629bb148aed29c4eaf986ae6af4ca3f8` | 08:45:42 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36114683200) |
+| [#294](https://github.com/ModernNomad-98/Project-Aegis/pull/294): fix: verify shared synthetic claims before intent use | `aaf7fa6411476fee5b042d6e6188dfe5128d7453` | 09:07:03 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36116643356) |
+| [#295](https://github.com/ModernNomad-98/Project-Aegis/pull/295): docs: record shared synthetic claim repair | `fd17e2187ff58578dcc5396a4411a06536b974e0` | 09:20:08 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36117851519) |
+| [#296](https://github.com/ModernNomad-98/Project-Aegis/pull/296): docs: prepare Stage 4B preflight manifest | `aecef650bc44c271b83c2ec830e7352ddda4c118` | 09:30:04 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36118780908) |
+| [#297](https://github.com/ModernNomad-98/Project-Aegis/pull/297): docs(cp): refine independent freshness candidates | `fdce0abc50b835accc7e68bea58d5b6880ea5f4f` | 09:40:24 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36119752344) |
+| [#298](https://github.com/ModernNomad-98/Project-Aegis/pull/298): fix(cp): accept recovered validator intent marker replay | `91ea4503790c6d6862f0b222bca8e1140f9954c1` | 09:55:55 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36121187792) |
+| [#299](https://github.com/ModernNomad-98/Project-Aegis/pull/299): fix(setup): bind offline snapshots independent of key order | `97b9d68804f32f049286e9d09cac4597afa6beea` | 09:58:00 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36121373141) |
+| [#300](https://github.com/ModernNomad-98/Project-Aegis/pull/300): docs: record synthetic CP and setup fixes | `3fbc87c2df45a5215d3f36bc46d554f2d8306c95` | 10:06:56 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36122205920) |
+| [#301](https://github.com/ModernNomad-98/Project-Aegis/pull/301): docs(cp): inspect DynamoDB public authority contracts | `fbf5bcd10a0d81c820a006bc51dcbff1223f01d7` | 14:10:10 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36145683392) |
+| [#302](https://github.com/ModernNomad-98/Project-Aegis/pull/302): Fix terminal restart freshness for unavailable runs | `a1218d4be73647e73fc190521c563e21a73a234b` | 16:46:08 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36162856875) |
+| [#303](https://github.com/ModernNomad-98/Project-Aegis/pull/303): Record CP T22 freshness-report repair | `85682c03e6c3bb9f920839e5b798ecd54ccc2b3c` | 17:08:01 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36165186432) |
+| [#305](https://github.com/ModernNomad-98/Project-Aegis/pull/305): Map issue 101 package 7 release readiness | `fb54a3d8eafc71609ad6fb76519f5ee7d8265832` | 17:23:37 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36166839344) |
+| [#306](https://github.com/ModernNomad-98/Project-Aegis/pull/306): Reconcile current readability forecast count | `03f03807270e3527712a3182589218b54289efde` | 17:38:47 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36168428074) |
+
+#281 delivered the bounded Stage 4A bridge and #289 recorded consumption of
+its implementation grant and protected-guard exception. #291/#299 repaired
+synthetic callback behavior; #294/#298/#302 repaired synthetic control-plane
+behavior. #290/#297/#301 completed or refined public CP research, and #305
+mapped package-7 readiness. Other merges reconciled source-only plans and
+records. They do not supply real host, source, provider or measured-savings proof.
+
+All ten selected estimated rows remain **71–146 active hours**. Stage 4A has
+zero remaining hours in its delivered bounded package; Stage 4B and the
+BER-BKL-009 real residual remain TBD. Seven optional rows were reconsidered;
+their ranges remain unchanged. Selected and all-options totals remain nonfinite.
+The #306 tree has **598 tracked Markdown files**, classified in the ledger as
+554 accepted readers and 44 fixtures with zero known pending pages. This
+checkpoint changes existing pages only, which still need independent review.
+
+For this catch-up documentation package, the comparable earlier checkpoint
+estimate was **1–2 active hours**; the new planning estimate is **1–2 active
+hours**. Its own active/review/CI/wait split is unavailable. Record an observed
+available wall interval at delivery rather than retroactively filling those
+fields. Continue the cadence from #303: #305 and #306 consume two of the next
+five merges; three more trigger the next full reassessment. A material owner
+decision or verified scope change triggers an earlier update.
 
 ## Checkpoint after pull request #284 — 2026-09-25
 
