@@ -889,11 +889,20 @@ class JudgeInputGate:
         self.root = os.path.realpath(root)
         self._verified_manifest_sha: str | None = None
         self._verified: dict[str, str] = {}
+        self._policy_bound = False
 
     def verify(self) -> str:
+        policy_bound = _has_policy_claim(self.root)
+        if policy_bound:
+            from .evidence_policy import verify_active_policy_input
+
+            policy_sha = verify_active_policy_input(self.root)["input_evidence_manifest_sha256"]
         manifest_sha, verified = _verify_input_evidence_full(self.root)
+        if policy_bound and manifest_sha != policy_sha:
+            raise EvidenceIntegrityError("Stage A changed after policy verification")
         self._verified_manifest_sha = manifest_sha
         self._verified = verified
+        self._policy_bound = policy_bound
         return manifest_sha
 
     @property
@@ -906,6 +915,12 @@ class JudgeInputGate:
                 "input evidence must be verified before any read "
                 "(judge constructors may consume only manifest-verified artifacts)"
             )
+        if self._policy_bound or _has_policy_claim(self.root):
+            from .evidence_policy import verify_active_policy_input
+
+            policy_sha = verify_active_policy_input(self.root)["input_evidence_manifest_sha256"]
+            if policy_sha != self._verified_manifest_sha:
+                raise EvidenceIntegrityError("Stage A changed since policy verification")
         path = _validate_artifact_path(relative_path)
         expected_sha = self._verified.get(path)
         if expected_sha is None:

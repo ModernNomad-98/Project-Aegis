@@ -223,7 +223,7 @@ class OfflinePolicyWriter:
             raise EvidenceError("final report must be an object")
         _require_final_status(final_status)
         artifact_snapshot = tuple(artifacts)
-        stage_a = verify_policy_input(self.writer.root)
+        stage_a = verify_active_policy_input(self.writer.root)
         records = _records(artifact_snapshot)
         stage_a_manifest, stage_a_bytes = _load_json_bytes(self.writer.root, INPUT_MANIFEST_NAME)
         if sha256_hex(stage_a_bytes) != stage_a["input_evidence_manifest_sha256"]:
@@ -377,6 +377,14 @@ def verify_policy_input(root: str) -> dict[str, str]:
         "bundle_review_at": receipt["bundle_review_at"],
         "input_evidence_manifest_sha256": input_sha,
     }
+
+
+def verify_active_policy_input(root: str) -> dict[str, str]:
+    """Verify policy Stage A for an active reader, including its deadline."""
+    stage_a = verify_policy_input(root)
+    if _parse_time(_now()) >= _parse_time(stage_a["bundle_review_at"]):
+        raise EvidenceIntegrityError("Stage A reached review deadline; preserve for owner review")
+    return stage_a
 
 
 def verify_policy_bundle(root: str) -> dict[str, str]:
