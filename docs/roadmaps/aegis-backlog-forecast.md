@@ -14,19 +14,23 @@ Behavioral Eval Runner (BER) source inventory, making **589 pages**: 545
 accepted readers and 44
 classified fixtures at that point. Merged [PR #286](https://github.com/ModernNomad-98/Project-Aegis/pull/286)
 added the reviewed [Stage 4B host-proof planning packet](aegis-setup-package-4b-host-proof-protocol.md),
-bringing the current tree to **590 pages: 546 accepted readers and 44
-classified fixtures**, with zero known pending pages. The packet prepares an
-owner decision; it grants no real host session, provider call or helper
-comparison. PR #257 delivered the
+bringing that tree to **590 pages: 546 accepted readers and 44 classified
+fixtures**. Merged [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+added two reviewed offline reader pages, and the three reviewed
+[current source-only packets](#current-source-only-packets--2026-09-25)
+bring this update to **595 pages: 551 accepted readers and 44 classified
+fixtures**, with zero known pending pages. The packets prepare later owner decisions;
+none grants a real host session, private-input access, provider call, operation
+or deletion. PR #257 delivered the
 bounded offline integration and consumed APR-023. The owner's 2026-09-24
 approval of the [bounded BER-BKL-009 synthetic integration](#material-owner-decision--2026-09-24-ber-bkl-009),
 made effective by merged PR #255,
 supersedes the old 8–16-hour whole-item estimate and therefore the old
 87–178-hour selected total. After removing the superseded issue #101 package-4
 8–16-hour combined row, current selected work has **71–146 active hours for
-ten unaffected rows**, plus unestimated issue #101 Stages 4A and 4B and
-BER-BKL-009 host, runtime, privacy and cleanup work. The BER offline package
-is delivered. The owner chose
+ten unaffected rows**, plus unestimated issue #101 Stage 4B and
+BER-BKL-009 host, runtime, privacy and cleanup work. The bounded Stage 4A
+offline bridge and BER offline package are delivered. The owner chose
 a new disposable Linux virtual machine (VM) with VirtualBox as the R4/R5 Stage A
 candidate. Setup began under APR-028 and reached an Ubuntu login, but repeated
 graphical stalls led the owner to pause it. The VM was last verified powered
@@ -41,6 +45,30 @@ the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-re
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
 
+## Current source-only packets — 2026-09-25
+
+The [WP-2B-3 measurement prerequisite packet](ber-wp2b3-measurement-prerequisite-decision-packet.md)
+orders private candidate review, live source and allowance reconciliation,
+selected-host proof, development, holdout freeze and OD-1. The
+[CP-WP-003 authority packet](cp-wp-003-real-authority-decision-packet.md)
+asks only for named source, host and operation candidate research before a
+separate proof grant. The [BER-BKL-009 residual proposal](ber-bkl-009-residual-host-runtime-privacy-cleanup-proposal.md)
+scopes later host, runtime, privacy and cleanup decisions. The offline grants
+do not extend to these real phases. [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+delivered the bounded offline Stage 4A bridge at merge
+`ea40ab481ff78267cd5f151c393e946805ba8d01`; its one-time protected
+guard exception is consumed. It establishes no real SDK host proof or token
+savings. The VM remains paused.
+
+These packets close no selected implementation row; PR #281 closed the bounded
+Stage 4A offline package. The ten estimated rows remain **71–146 active
+hours**; Stage 4B and the BER-BKL-009 real residual remain unestimated, so the
+selected total has no finite ETA. The
+CP packet's candidate-research range is a separate planning estimate, not
+completed work credit or a revision of CP-WP-003's real-proof range. The dated
+[five-merge checkpoint](#five-merge-checkpoint--2026-09-25-after-pull-request-284)
+below preserves its #284 counts and PR-head status as historical evidence.
+
 ## Material owner decision — 2026-09-25, issue #101 host path
 
 The owner selected the [recommended separate software development kit
@@ -51,25 +79,28 @@ that selection did not authorize SDK installation, code, a host session or a
 provider call. The owner separately approved bounded offline Stage 4A
 implementation on 2026-09-25 under the linked proposal: eleven paths, at most
 12 active hours and 1,200 handwritten code/test lines, and $0 external spend.
-Stage 4A is a synthetic callback implementation in progress;
-Stage 4B is the later actual SDK host proof and comparison. The earlier
+Stage 4A's synthetic callback implementation was delivered in PR #281;
+Stage 4B is the later actual SDK host mechanics proof, with helper comparison
+requiring its own later selection and grant. The earlier
 8–16-hour whole-package row cannot cover both. Subtracting corresponding
 low and high estimates from the #265 eleven-row subtotal leaves ten unchanged
 rows: `79 − 8 = 71` and `162 − 16 = 146` active hours. This is a scope split, not completed
 work credit. The approved 12-hour Stage 4A implementation limit is a ceiling,
-not a remaining-work estimate. Separate estimates require a reviewed lockfile,
-Stage 4A design and Stage 4B host execution scope.
+not a remaining-work estimate. A separate Stage 4B execution estimate still
+requires its exact host, authority, telemetry and provider scope.
 
 | Current selected component | Active-work estimate | Remaining boundary |
 | --- | ---: | --- |
 | Ten unaffected selected rows from the #265 checkpoint | 71–146 h | Existing dependencies and provisional host uncertainty remain. |
-| Issue #101 Stage 4A: offline callback prototype | TBD; approved implementation ceiling 12 h | The bounded offline grant is active; exact lock and package-body review precede any scripts-disabled install. No SDK query, CLI process or real host proof is authorized. |
-| Issue #101 Stage 4B: actual host proof and comparison | TBD | Pinned execution scope, callback-consumption proof, telemetry and a separate grant remain. |
+| Issue #101 Stage 4A: offline callback prototype | Delivered in PR #281; 0 h remaining in bounded package | Its lock/body review and synthetic tests are complete; no SDK query, CLI process or real host proof follows. |
+| Issue #101 Stage 4B: actual host mechanics proof | TBD | Pinned execution scope, callback-consumption proof, telemetry and a separate grant remain. |
 | BER-BKL-009 host, runtime, privacy and cleanup residual | TBD | Its separate scope and authority gates remain. |
-| **Selected total** | **No finite estimate** | Both issue #101 stages and BER residual remain unestimated. |
+| **Selected total** | **No finite estimate** | Stage 4B and BER residual remain unestimated. |
 
 Optional issue #101 helpers retain their conditional **16–40 active-hour**
-combined range after a successful Stage 4B comparison and separate grants.
+combined range after Stage 4B host proof, a separately approved helper
+comparison and separate integration grants. The later helper comparison is
+conditional and unestimated; it is outside the selected subtotal and total.
 The seven optional rows were last fully reassessed in the dated #284
 checkpoint below. The paused VirtualBox VM remains outside this SDK route.
 

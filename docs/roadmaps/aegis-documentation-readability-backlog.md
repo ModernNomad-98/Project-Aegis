@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #286 on 2026-09-25 Coordinated Universal Time
+As of this three-packet update on 2026-09-25 Coordinated Universal Time
 (UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -11,7 +11,7 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-The merged tree contains **590 tracked Markdown files**: **546
+This updated tree contains **595 tracked Markdown files**: **551
 reader pages** with recorded full-checklist acceptance and **44 synthetic
 fixtures** with classification and integrity checks. PR #286 added the reviewed
 [Stage 4B decision packet](aegis-setup-package-4b-host-proof-protocol.md)
@@ -85,13 +85,13 @@ The [five-merge checkpoint after #284](aegis-backlog-forecast.md#five-merge-chec
 covers #279, #280, #282, #283 and #284. GitHub merge receipts span **40m31s
 observed wall time**, including review, checks and waiting, so they do not
 measure an active-work rate. Ten selected ranges remain **71–146 active hours**;
-issue #101 Stages 4A/4B and the BER host, runtime, privacy and cleanup
-residual have no reliable ETA. The selected total remains without a finite
-estimate. Stage 4A's approved 12-hour limit is a ceiling, not a remaining
-estimate. [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
-remains open at `0bb51c19bd42261a5604fb25762069ce7867141b` with Linux
+at that #284 checkpoint, issue #101 Stages 4A/4B and the BER host, runtime,
+privacy and cleanup residual had no reliable ETA. The selected total had no
+finite estimate. Stage 4A's approved 12-hour limit was a ceiling, not a
+remaining estimate. [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+was then open at `0bb51c19bd42261a5604fb25762069ce7867141b` with Linux
 and Windows green, the protected-path guard failing and its one-time exception
-question pending. This checkpoint revises the same three tracking pages and
+question pending. This historical checkpoint revised the same three tracking pages and
 adds no Markdown page or fixture. Two independent full-page reviews of these
 revised pages accepted the content, counts and 340 local links and anchors.
 
@@ -101,8 +101,23 @@ its factual boundary, user-choice explanations and local links after the
 planning-only decision wording was clarified. The [setup route](aegis-setup-routing-plan.md)
 now links the packet and corrects its stale Stage 4A grant status. The packet
 does not close Stage 4B execution or authorize a host session. The current
-readability inventory is **590 tracked Markdown pages: 546 accepted
+readability inventory at #286 was **590 tracked Markdown pages: 546 accepted
 readers and 44 classified fixtures**, with zero known pending pages.
+
+Merged [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+added two reviewed offline reader pages, the
+[Stage 4A offline review](../evidence/setup/issue-101-package-4a-offline-review.md)
+and [host bridge guide](../../tools/aegis_setup/host_bridge/README.md).
+Its protected guard exception was consumed at the exact merged head; neither
+page proves real host interception. This update adds three independently
+reviewed reader pages: the
+[WP-2B-3 measurement prerequisite packet](ber-wp2b3-measurement-prerequisite-decision-packet.md),
+[CP-WP-003 authority candidate packet](cp-wp-003-real-authority-decision-packet.md),
+and [BER-BKL-009 residual proposal](ber-bkl-009-residual-host-runtime-privacy-cleanup-proposal.md).
+Their factual and full-page readability reviews accepted the corrected
+authority boundaries, choices, estimates and links. They add no fixture and
+close no implementation gate. The resulting inventory is **595 pages: 551
+accepted readers and 44 classified fixtures**, with zero known pending pages.
 
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
@@ -117,11 +132,13 @@ the 8–16-hour offline holdout-support item. The **87–178 active-hour** selec
 residual after #250 is historical. The owner's bounded BER-BKL-009 approval,
 effective on #255, left one offline implementation package capped at 16 active
 hours. PR #257 delivered that package. The later issue #101 host-path choice
-splits its former 8–16-hour combined package-4 row into separately unestimated
-offline Stage 4A and actual-host Stage 4B work. The current
+split its former 8–16-hour combined package-4 row into separately unestimated
+offline Stage 4A and actual-host Stage 4B work. PR #281 later delivered the
+bounded Stage 4A offline package. The current
 [forecast](aegis-backlog-forecast.md#material-owner-decision--2026-09-25-issue-101-host-path)
-therefore has **71–146 active hours** for ten unaffected rows, plus those two
-unestimated stages and the later BER-BKL-009 residual. The selected total has
+therefore has **71–146 active hours** for ten unaffected rows, plus unestimated
+Stage 4B host proof and the BER-BKL-009 residual. The later helper comparison
+is conditional and outside the selected total. The selected total has
 no finite current estimate.
 Future new or changed pages still need the acceptance check below. The
 [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
