@@ -30,9 +30,13 @@ managed session on native
 Windows as the **offline package 4A prototype direction**. The
 [package 4A preparation proposal](aegis-setup-package-4a-host-preparation-proposal.md)
 and [source-based feasibility check](../evidence/setup/issue-101-package-4a-host-feasibility.md)
-define what remains to review. This choice was explicitly for planning. No SDK
-installation, bridge implementation, SDK session, provider call, host proof or
-package-4 comparison has been authorized or completed.
+define the offline boundary. The owner subsequently approved bounded synthetic
+Stage 4A implementation under [APR-031](../approvals/APPROVAL_REGISTER.md#aegis-apr-031-issue-101-stage-4a-offline-bridge-implementation).
+Its [PR #281 candidate](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+remains under exact-head review. The
+[Stage 4B host-proof decision packet](aegis-setup-package-4b-host-proof-protocol.md)
+sets out a later planning choice. No real SDK session, provider call, host proof
+or package-4 comparison is authorized or completed.
 
 ## Dated product decisions
 
@@ -43,7 +47,7 @@ package-4 comparison has been authorized or completed.
 | 2026-09-23, owner routing clarification in issue #101 | Use Jev-style structured decisions to assign bounded work to eligible agents with suitable skills and measure complete-task token use | Governing evaluation objective; no vendor chosen |
 | 2026-09-23, owner local-evaluation shortlist in issue #101 | Evaluate Laya and Mapika/Decider 0.8B first on ordinary central processing units (CPUs); compare OpenJev as an optional wrapper around the same Decider checkpoint | Governing package-4 research order, not an installed helper, production selection or execution grant |
 | 2026-09-23, this package 1 design | Keep the baseline usable without an add-on; use a single advisory contract and separate setup/host/adapter responsibilities | Proposed implementation architecture, subject to review and package 2/3 authority |
-| 2026-09-25, owner reply to the package-4 host-path question | Use the recommended separate SDK managed Windows session for the first offline prototype | Planning direction only; a reviewed package-4A implementation grant and later package-4B host grant remain separate |
+| 2026-09-25, owner reply to the package-4 host-path question | Use the recommended separate SDK managed Windows session for the first offline prototype | Planning direction at the time; bounded Stage 4A implementation was later granted by APR-031, while Stage 4B host execution remains separately gated |
 
 ## Historical source snapshot and design forces
 
@@ -78,10 +82,10 @@ future host integration or conditional helpers; none grants new authority.
 | Shipped `aegis-setup` skill (package 2) | Show four choices; save only an explicit Aegis-only choice on tested Windows PowerShell; never install or connect a helper | No credential or provider state |
 | Shipped state writer (package 2) | Validate and atomically save one user's Aegis-only selection for one checkout | `selected` record and `unselected` missing status; no helper verification or secret |
 | Proposed offline bridge (package 4A) | On fake SDK callback inputs, combine the shipped Python advice with fresh synthetic host-owned eligibility and policy facts; deny unsafe candidate dispatch | Ephemeral synthetic request/result only; no host or provider authority |
-| Future host proof (package 4B) | On an authorized pinned SDK session, derive real eligible agent/skill identifiers (IDs), prove callback invocation and decision consumption, then run the predeclared comparison | Ephemeral host request/result and measured telemetry; no authority grants |
+| Future host proof (package 4B) | On an authorized pinned SDK session, derive real eligible agent/skill identifiers (IDs), then prove callback invocation, decision consumption and complete-task telemetry on synthetic cases; helper comparison needs a later separate proposal and grant | Ephemeral host request/result and measured telemetry; no authority grants |
 | Future eligibility and policy gate | Apply host permissions, explicit choices, manual-only flags, required specialists/reviews and stage rules before dispatch and after advice | Current host and catalog policy, not model output |
 | Shipped offline advisory contract (package 3) | Validate bounded synthetic offers and recommendations or abstentions with typed failures; fake adapter has no host hook or dispatch | In-memory request/result only; no provider configuration or credential |
-| Conditional local/online providers (packages 5/6, after package 4B) | Compute advice only after selection, host proof and separate integration authority | Future local weights or hosted service; credentials must remain outside chat and tracked state |
+| Conditional local/online providers (packages 5/6, after host proof and helper selection) | Compute advice only after a separately approved comparison and selection, host proof and separate integration authority | Future local weights or hosted service; credentials must remain outside chat and tracked state |
 | Future evidence and evaluator (packages 4/7) | Freeze reviewed cases and report paired host workflows, costs, failures and claims | Versioned sanitized protocol/results; any sensitive test input in separately approved private storage |
 
 The package-2 writer owns the only setup write: an Aegis-only selection for one
@@ -266,9 +270,12 @@ select a provider.
 Delivery sequence: (1) package 1 planning — **delivered**; (2) package 2
 conversation and Windows Aegis-only saved selection — **delivered**; (3)
 package 3 offline contract and fake adapter — **delivered**; (4A) synthetic
-SDK callback prototype — **planning path selected, implementation pending a
-separate grant**; (4B) actual SDK host proof and predeclared comparison —
-**pending separate authority**; (5) packages 5 and 6 local/online
-integrations — **conditional on 4B**; (6) package 7 full evaluation and release
+SDK callback prototype — **bounded implementation authorized under APR-031;
+PR #281 under review**; (4B) actual SDK host mechanics proof —
+**planning packet available, execution pending separate authority**;
+then a predeclared helper comparison — **separate proposal, selection and grant
+after the host proof**; (5) packages 5 and 6 local/online
+integrations — **conditional on 4B host proof and a separately approved helper
+comparison and selection**; (6) package 7 full evaluation and release
 review — **pending**. Stop at each remaining boundary when its authority,
 evidence or acceptance is missing.
