@@ -66,8 +66,9 @@ production.
 1. **Prove the ceiling first.** Demand evidence: write TPS at saturation, a
    table size causing real maintenance pain, or a dated growth forecast to a
    hard limit. No evidence → recommend the single-primary + read-replica +
-   indexing path, name exactly what to measure to revisit, and STOP. This gate
-   is the skill's core, not a formality.
+   indexing path, explain that recommendation using the Choice guide below,
+   name exactly what to measure to revisit, and STOP. This gate is the
+   skill's core, not a formality.
 2. **Exhaust the cheaper levers.** Indexing and partial indexes, read replicas
    for read pressure, and declarative table PARTITIONING within one node in
    this design (range/hash/list partitions — a table-SIZE and maintenance
@@ -93,6 +94,13 @@ production.
    update routing. Name the rollback condition and no-return gate for each
    stage; do not promise that every completed stage is reversible. This
    reshapes production data. This skill DESIGNS the runbook; it does not run it.
+7. **Explain the scaling decision to the owner.** Define partitioning,
+   sharding, replicas, and unfamiliar terms in plain language. Compare
+   practical pros and cons of the viable levers, money, setup/migration time,
+   and ongoing operations (including a $0 incremental path where one exists
+   and is verified).
+   Recommend the least complex option that meets the evidenced ceiling and
+   say why; identify costs that still need measurement or current quotes.
 
 ## Output Format
 
@@ -102,6 +110,8 @@ Ceiling evidence: <write TPS / table size / forecast — or "no evidence →
   DON'T SHARD; measure X" recommendation and stop>
 Cheaper levers considered: <indexing / partial indexes / replicas / in-node
   partitioning — why each is or isn't sufficient>
+Choice guide: <terms, scaling reason, money/setup/upkeep cost, pros and cons,
+  recommended lever and why; unknown costs to verify>
 Shard key: <chosen key; tenant_id + its hot-tenant limit; cardinality/skew>
 Partitioning scheme per table: <table → range/hash/list → why, vs query pattern>
 Cross-shard cost: <joins / transactions / uniqueness / fan-out — each named>
@@ -116,6 +126,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       assumed; with no evidence the design recommends NOT sharding.
 - [ ] Cheaper levers (indexing, replicas, in-node partitioning) are considered
       and explicitly ruled sufficient or insufficient before sharding.
+- [ ] Owner-facing options define terms, explain the ceiling, compare money,
+      setup and upkeep costs and pros/cons, and justify the recommendation.
 - [ ] Partitioning (one node) and sharding (across nodes) are not conflated.
 - [ ] The shard key is justified against cardinality, skew, and query-locality;
       the tenant_id hot-tenant limit is stated.

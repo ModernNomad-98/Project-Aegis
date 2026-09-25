@@ -9,6 +9,7 @@ import os
 import tempfile
 import unittest
 
+from tools.behavioral_eval_runner import RUNNER_VERSION, SCHEMA_VERSION
 from tools.behavioral_eval_runner.budget import BudgetCaps, BudgetLedger
 from tools.behavioral_eval_runner.enums import (
     AggregateBlocker,
@@ -208,6 +209,8 @@ class TestEvidenceBinding(unittest.TestCase):
             writer, stage_a = self._bundle(root, "run-A")
             report = {
                 "report_kind": "behavioral_eval_run_report",
+                "schema_version": SCHEMA_VERSION,
+                "runner_version": RUNNER_VERSION,
                 "run_id": "run-B",  # wrong run
                 "run_evidence_binding": {
                     "input_evidence_manifest_sha256": stage_a.input_evidence_manifest_sha256
@@ -224,6 +227,8 @@ class TestEvidenceBinding(unittest.TestCase):
             writer, stage_a = self._bundle(root, "run-A")
             report = {
                 "report_kind": "behavioral_eval_run_report",
+                "schema_version": SCHEMA_VERSION,
+                "runner_version": RUNNER_VERSION,
                 "run_id": "run-A",
                 "run_evidence_binding": {
                     "input_evidence_manifest_sha256": stage_a.input_evidence_manifest_sha256

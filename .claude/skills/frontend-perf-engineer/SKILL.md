@@ -140,6 +140,12 @@ about prescribing it.
    (deletion first), per-fix expected metric movement, and the
    budget table with gate placement. Measured verification runs
    through the harness; this design predicts, the harness confirms.
+   For any user-facing choice in the plan (including font swap policy,
+   feature fidelity, or budget claim), define the terms, why each viable
+   path exists, its measured or estimated metric effect and user impact,
+   money/setup/upkeep or unknowns, and the recommended path with its reason
+   and the missing fact that could change it. Ask one decision question at
+   a time; do not silently spend or relax a budget.
 
 Metric-model vocabulary, weight-audit worksheet, split/asset/hydration
 decision tables, and budget-gate examples:
@@ -164,6 +170,8 @@ Perceived: <skeletons/optimistic UI for the residue — with reconciliation stat
 BUDGETS: <per-route size budgets; per-page metric budgets @ device class;
           CI gate placement → vite-build-qa-engineer surface + performance-test-harness>
 Expected movement: <per fix: which metric, direction, rough magnitude>
+Choices, if any: <plain options and reasons; effects/costs; recommendation
+                 + why + what could change it; one decision question each>
 Routed out: <API-side share → latency-budget-architect table; harness mechanics;
              build correctness>
 ```
@@ -188,6 +196,8 @@ Routed out: <API-side share → latency-budget-architect table; harness mechanic
       the dependency budget-claim rule is stated.
 - [ ] Measurement is routed to the harness; build verification to
       vite-build-qa-engineer.
+- [ ] User-facing font, fidelity, or budget choices explain viable options,
+      effects and costs, a reasoned recommendation, and one question each.
 
 ## Gotchas
 
@@ -242,7 +252,15 @@ Routed out: <API-side share → latency-budget-architect table; harness mechanic
 - The design would require product decisions (dropping features,
   visible fidelity loss — heavy imagery, animation) → present the
   options with their metric movement and stop for the product
-  owner's call; perf does not silently outrank product intent.
+  owner's call; perf does not silently outrank product intent. Define
+  the affected metric and the visual or functional change plainly.
+  Compare preserving the feature with a measured optimization, reducing
+  its weight or fidelity, and removing it when those paths are viable.
+  For each, estimate metric movement, user benefit/loss, implementation
+  time, money or service cost, and maintenance; identify unmeasured values
+  as unknown. Recommend the path fitting the stated user need and budget,
+  explain why, then ask one product decision question. A budget exception
+  still needs the recorded review described above.
 - Asked to also implement the harness runs, edit CI pipelines, or
   restructure the build system in the same pass → hand those slices
   to `performance-test-harness`, `ci-pipeline-architect`, and

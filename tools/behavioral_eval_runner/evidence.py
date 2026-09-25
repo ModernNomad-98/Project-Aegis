@@ -21,6 +21,7 @@ final manifest + a DETACHED finalization marker. Rules enforced here:
 from __future__ import annotations
 
 import datetime as _dt
+import json
 import os
 import stat
 from dataclasses import dataclass, field
@@ -72,6 +73,11 @@ def _require_report_record_versions(report: Mapping[str, Any]) -> None:
                     f"final report {name}[{index}] must be an object"
                 )
             _require_supported_version(record, f"final report {name}[{index}]")
+
+
+def _require_final_status(value: Any, error_type: type[EvidenceError] = EvidenceError) -> None:
+    if not isinstance(value, str) or not value:
+        raise error_type("final_status must be a nonempty string")
 
 
 def _utc_now_iso() -> str:
@@ -439,6 +445,39 @@ class FinalEvidenceBundle:
     finalization_marker_sha256: str
 
 
+def _validated_final_report_bytes(
+    final_report: Mapping[str, Any], run_id: str, input_manifest_sha256: str,
+) -> bytes:
+    """Validate the report's run binding before any final evidence is claimed."""
+    report_bytes = canonical_bytes(dict(final_report))
+    report = json.loads(report_bytes)
+    _require_supported_version(report, "final report")
+    _require_report_record_versions(report)
+    if not isinstance(report.get("runner_version"), str) or not report["runner_version"]:
+        raise EvidenceIntegrityError("final report has no runner_version")
+    if report.get("run_id") != run_id:
+        raise EvidenceError(
+            f"final report run_id {report.get('run_id')!r} does not "
+            f"match the writer's run_id {run_id!r}"
+        )
+    binding = report.get("run_evidence_binding")
+    if (
+        not isinstance(binding, Mapping)
+        or binding.get("input_evidence_manifest_sha256") != input_manifest_sha256
+    ):
+        raise EvidenceError(
+            "the final report must carry run_evidence_binding."
+            "input_evidence_manifest_sha256 (stage A binding)"
+        )
+    for forbidden in ("final_evidence_manifest_sha256", "final_report_sha256"):
+        if forbidden in binding:
+            raise CircularEvidenceError(
+                f"the final report must not carry {forbidden}; those hashes "
+                "live only in the detached marker"
+            )
+    return report_bytes
+
+
 class EvidenceWriter:
     """Trusted control-plane evidence writer for one run's bundle root."""
 
@@ -536,29 +575,12 @@ class EvidenceWriter:
             raise EvidenceError("policy report created_at must be writer-stamped")
         if report_metadata is not None and finalized_at is not None:
             raise EvidenceError("policy report finalized_at cannot be caller-supplied")
+        _require_final_status(final_status)
         # D2: the report must belong to THIS run — a report for another run is
         # rejected at finalization.
-        if final_report.get("run_id") != self.run_id:
-            raise EvidenceError(
-                f"final report run_id {final_report.get('run_id')!r} does not "
-                f"match the writer's run_id {self.run_id!r}"
-            )
-        binding = final_report.get("run_evidence_binding")
-        if (
-            not isinstance(binding, Mapping)
-            or binding.get("input_evidence_manifest_sha256") != input_manifest_sha256
-        ):
-            raise EvidenceError(
-                "the final report must carry run_evidence_binding."
-                "input_evidence_manifest_sha256 (stage A binding)"
-            )
-        for forbidden in ("final_evidence_manifest_sha256", "final_report_sha256"):
-            if forbidden in binding:
-                raise CircularEvidenceError(
-                    f"the final report must not carry {forbidden}; those hashes "
-                    "live only in the detached marker"
-                )
-        report_bytes = canonical_bytes(dict(final_report))
+        report_bytes = _validated_final_report_bytes(
+            final_report, self.run_id, input_manifest_sha256
+        )
         report_sha = sha256_hex(report_bytes)
         policy_report_created_at = _utc_now_iso() if report_metadata is not None else None
         report_path = _atomic_write(self.root, FINAL_REPORT_NAME, report_bytes)
@@ -793,6 +815,7 @@ def verify_final_bundle(root: str) -> dict[str, str]:
 
     marker, marker_bytes = _load_json_bytes(root, MARKER_NAME)
     _require_supported_version(marker, "finalization marker")
+    _require_final_status(marker.get("final_status"), EvidenceIntegrityError)
     if marker.get("marker_kind") != "detached_finalization_marker":
         raise EvidenceIntegrityError("missing detached finalization marker")
     if marker.get("run_id") != run_id:

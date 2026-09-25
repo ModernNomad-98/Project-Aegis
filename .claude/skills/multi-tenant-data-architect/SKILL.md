@@ -96,6 +96,15 @@ a cross-tenant leak.
 9. **Emit the data-layer isolation test matrix**: per store × operation,
    the negative expectation (tenant A's context cannot read/write tenant B's
    rows/objects/entries), handed to `tenant-isolation-reviewer` and QA.
+10. **Explain owner-facing choices before asking.** When scale, residency or
+    isolation needs an owner decision, define terms such as pooled storage,
+    schema per tenant and database per tenant, and explain why the choice
+    affects this product. Compare viable options by money (including $0),
+    migration/setup time, ongoing operations/maintenance cost, isolation
+    benefits and drawbacks. Recommend one from measured volume, compliance
+    needs and team capacity, with a reason. Resolve routine per-store design
+    choices from evidence without asking the owner. Treat a choice already
+    stated by the owner as settled; explain its implications without re-asking.
 
 ## Output Format
 
@@ -114,6 +123,8 @@ Migration plan: <expand → backfill → verify → enforce → contract; rollba
   per step; verification = per-tenant counts/checksums>
 Isolation test matrix (data layer): <store × operation × expected denial>
 Assumptions & open questions: <each with risk-if-wrong / who answers>
+Owner choice brief (only if needed): <terms; why now; options with money,
+  setup/migration/maintenance costs, pros and cons; recommendation and fit>
 ```
 
 ## Validation Checklist
@@ -131,6 +142,8 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - [ ] The isolation test matrix covers every store, not just the primary DB.
 - [ ] No RLS policy SQL authored; enforcement location decided, policy
       authoring deferred to the Phase 4 pack.
+- [ ] Any owner-facing choice explains terms, costs, pros and cons, and a
+      reasoned recommendation before requesting the decision.
 
 ## Tenant Isolation Rules
 

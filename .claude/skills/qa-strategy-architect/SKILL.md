@@ -79,6 +79,14 @@ coverage mapping audits against it, and automation architecture implements it.
    release gate before merge; use post-merge checks to verify deployment.
 7. **Name ownership and exit criteria:** who owns each layer, who fixes red,
    and the strategy's own review date.
+8. **Teach any owner-facing tradeoff before asking.** If release risk or
+   staffing requires an owner choice, define the test-layer and CI terms,
+   explain why the choice matters, and compare viable options by money
+   (including $0), setup time, ongoing execution/maintenance cost, coverage
+   benefits and drawbacks. Recommend the least costly reliable fit for the
+   ranked risk and explain why. Choose routine test-layer assignments from
+   evidence without asking the owner. Treat an already stated owner choice as
+   settled and explain its implications without re-asking.
 
 ## Output Format
 
@@ -94,6 +102,8 @@ Ownership: <layer → owner; red-build policy>
 Delegations: <security negatives → multi-tenant-security-tester / rls-policy-auditor;
              per-change plans → test-plan-designer; tooling → qa-automation-architect>
 Exit criteria & review date: <when this strategy is met; when it is re-reviewed>
+Owner choice brief (only if needed): <terms; why now; options with money,
+  setup/run/maintenance costs, pros and cons; recommendation and fit>
 ```
 
 ## Validation Checklist
@@ -106,6 +116,8 @@ Exit criteria & review date: <when this strategy is met; when it is re-reviewed>
 - [ ] CI placement defined (PR/merge/nightly) with named non-blocking exceptions.
 - [ ] Ownership and exit criteria stated; review date set.
 - [ ] Security negative testing delegated, not duplicated.
+- [ ] Any owner-facing choice explains terms, costs, pros and cons, and a
+      reasoned recommendation before requesting the decision.
 
 ## Gotchas
 

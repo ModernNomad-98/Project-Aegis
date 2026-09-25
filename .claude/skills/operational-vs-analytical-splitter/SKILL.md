@@ -118,6 +118,12 @@ whole split unnecessary (`query-plan-reader`).
 7. **State the residual load honestly.** What remains on the operational
    store after the split, projected headroom, and the trigger for the
    NEXT split review (growth threshold or new workload class).
+8. **Teach each offload choice.** Before asking an owner to choose, define
+   unfamiliar terms such as replica and CDC, explain the pain and freshness
+   requirement, compare the options' pros and cons, and estimate money,
+   setup time, and ongoing care (including $0 incremental spend if verified).
+   Recommend the least costly option that meets the evidence and state why;
+   label unknown costs for verification.
 
 Mechanism decision table, freshness-tier definitions, and the workload
 classification worksheet:
@@ -132,6 +138,8 @@ Pain attribution:     <symptom → workload, with evidence source>
 Per-workload verdict:
   <workload>: mechanism=<replica|CDC→analytical|materialized|cache|stay>
   freshness: tolerated=<t> delivered=<d>  rationale=<why not cheaper option>
+  choice guide: <terms; reason; money/setup/upkeep cost; pros/cons;
+    recommended mechanism and why>
   handoff=<warehouse-lake-architect | streaming-event-architect | caching-strategy-designer | n/a>
 Split boundary:  stays=<list> stop-doing=<workloads banned from primary + enforcement>
 Cutover order:   <sequenced moves, each with dual-run + sign-off gate>
@@ -149,6 +157,8 @@ Escape checked:  <the one-bad-query check was performed; result>
       every mechanism choice delivers within it.
 - [ ] Each mechanism choice explains why the CHEAPER option was rejected
       (replica before warehouse, view before pipeline).
+- [ ] Human-facing verdicts define terms, explain the need, compare money,
+      setup and upkeep costs and pros/cons, and justify the recommendation.
 - [ ] The stop-doing list exists with an enforcement mechanism — a split
       that lets new dashboards quietly return to the primary is temporary.
 - [ ] Cutover moves have dual-run windows and consumer sign-off, not

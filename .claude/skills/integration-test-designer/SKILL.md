@@ -57,11 +57,15 @@ negative cases, and CI placement.
 
 ## Workflow
 
-For any user-facing build choice, define terms and each viable path's purpose;
-compare case-specific pros/cons and money, setup, and maintenance costs (mark
-unknowns). Recommend one and why, then ask one atomic decision question. If a
-deciding fact is missing, ask only for that fact this turn. A choice does not
-authorize execution.
+When a human must choose a real-dependency environment for a local or CI
+integration suite, define unfamiliar terms and each viable option and why it
+fits. Compare case-specific fidelity, isolation, CI runtime, money, setup
+time, and ongoing upkeep; state unknown costs instead of guessing. Recommend
+one from the affected environment's constraints and explain why it fits the
+user's goals and what fact would change the recommendation before one atomic
+decision question. Ask for a missing deciding fact first when needed. Keep
+routine design choices within this skill; a preference does not authorize
+provisioning or test execution.
 
 1. **Draw the boundary map first.** For the module under test, list every
    boundary and classify: REAL in this suite (service calls, DB reads/writes,
@@ -97,8 +101,9 @@ authorize execution.
 
 ## Output Format
 
-When asking for a build choice, show the explained options and justified
-recommendation before the one question.
+When asking for this build choice, show each option's meaning, reason,
+case-specific benefits and limits, money/setup/upkeep or unknowns, and
+a justified recommendation before the one decision question.
 
 ```
 INTEGRATION TEST DESIGN — <module/scope>

@@ -76,11 +76,16 @@ the internal stream feeds it.
 
 ## Workflow
 
-For any user-facing build choice, define terms and each viable path's purpose;
-compare case-specific pros/cons and money, setup, and maintenance costs (mark
-unknowns). Recommend one and why, then ask one atomic decision question. If a
-deciding fact is missing, ask only for that fact this turn. A choice does not
-authorize execution.
+When a human must choose a backbone path such as replayable stream versus
+work queue or global ordering versus throughput, define unfamiliar terms and
+each viable option and why it fits. Compare case-specific ordering, replay,
+throughput, failure handling, money, setup time, and ongoing upkeep; state
+unknown costs instead of guessing. Recommend one from the flow evidence and
+explain why it fits the user's goals and what fact would change the
+recommendation before one atomic decision question. Ask for a missing
+deciding fact first when needed. Keep routine design choices within this
+skill; a preference does not authorize broker provisioning or
+implementation.
 
 1. **Inventory flows and classify each.** For every producer→consumer
    flow: fire-and-forget notification, state-transfer (fact/event-carried
@@ -140,8 +145,9 @@ CDC mechanisms) and the per-flow guarantee card format:
 
 ## Output Format
 
-When asking for a build choice, show the explained options and justified
-recommendation before the one question.
+When asking for this build choice, show each option's meaning, reason,
+case-specific benefits and limits, money/setup/upkeep or unknowns, and
+a justified recommendation before the one decision question.
 
 ```
 STREAMING BACKBONE DESIGN — <system/domain>

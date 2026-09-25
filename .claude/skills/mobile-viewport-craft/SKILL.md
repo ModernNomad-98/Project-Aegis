@@ -114,6 +114,12 @@ network performance on mobile are `frontend-perf-engineer`'s.
 9. **Name boundaries and deliver** the per-surface craft spec: weight/
    network → `frontend-perf-engineer`; states → `edge-state-ux-designer`;
    a11y verification → `accessibility-test-harness`.
+   For any user-facing layout choice (including wide-table or navigation
+   pattern), define unfamiliar terms and explain why each viable pattern
+   fits this content, what it preserves or loses, accessibility and use
+   effects, money/setup/upkeep or unknowns, and a recommendation with its
+   reason and the missing fact that could change it. Ask one decision
+   question at a time; keep binding accessibility requirements intact.
 
 Breakpoint patterns, the touch-target and safe-area reference, the
 viewport-unit cheat sheet, and wide-table reflow options:
@@ -133,6 +139,8 @@ Input:        <HTML input type + inputmode virtual-keyboard hint; font-size ≥1
 Hover/gesture: hover-only affordances → touch equivalents; custom gestures discoverable, no browser conflict
 Layout:       reflow-vs-hide per region; wide-table pattern chosen (cards|scroll+frozen|priority) w/ tradeoff;
               nav pattern; responsive media
+Choices, if any: <plain options and reasons; effects/costs; recommendation
+                 + why + what could change it; one decision question each>
 Orientation:  rotation-safe; OS text-scale/200% zoom respected (a11y intent)
 Boundaries:   weight/network → frontend-perf-engineer; states → edge-state-ux-designer;
               a11y verify → accessibility-test-harness
@@ -152,6 +160,8 @@ Boundaries:   weight/network → frontend-perf-engineer; states → edge-state-u
       gestures don't conflict with browser gestures.
 - [ ] Wide content has a deliberate reflow pattern with its tradeoff
       stated; nothing critical is hidden to "fit".
+- [ ] User-facing layout choices explain viable patterns, effects and costs,
+      a reasoned recommendation, and one question each.
 - [ ] Orientation change is safe and OS text-scaling/200% zoom doesn't
       clip or overlap (recorded for a11y verification).
 - [ ] Weight/performance, state design, and a11y verification are handed
@@ -200,7 +210,15 @@ Boundaries:   weight/network → frontend-perf-engineer; states → edge-state-u
 - Meeting a touch-target or zoom-safety minimum would require dropping a
   feature or an a11y obligation the product must keep → surface the
   tradeoff to a human rather than silently shrinking targets below the
-  usable/accessible floor.
+  usable/accessible floor. Explain the affected feature, touch target
+  (the area a finger can activate), and zoom-safety requirement in plain
+  language. Compare viable layouts such as reflow, disclosure with the
+  action still reachable, or feature redesign; state what each preserves
+  or loses, usability and accessibility risk, implementation time, money
+  or tooling cost, and upkeep. Do not offer violating a binding a11y
+  obligation as a valid option. Recommend the compliant layout that best
+  keeps the primary task usable, explain why, then ask one decision
+  question; keep accessibility verification with its owning harness.
 
 ## Supporting Files
 

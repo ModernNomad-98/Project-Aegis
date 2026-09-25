@@ -105,7 +105,20 @@ review of DDL someone already wrote.
    roll back by reverting code; post-contract rollback requires the
    deprecation register's restore note), and where the point of no return
    is — the physical drop.
-8. **Hand off.** Each stage's migration file → `secure-migration-reviewer`
+8. **Explain the rollout choice when downtime is proposed.** A staged
+   migration keeps old and new shapes usable through separate releases;
+   planned downtime pauses writes/traffic for a coordinated change. Explain
+   why each is viable for this store, the staged path's extra releases,
+   dual-write/backfill work and upkeep, and the downtime path's outage,
+   rollback and missed-consumer risks. Estimate money, setup time and
+   ongoing maintenance from the known volume, traffic and release model;
+   label unknowns. Recommend staged rollout for overlapping versions and
+   live traffic. Recommend downtime only when the owner accepts a bounded
+   outage and all consumers and recovery steps are verified. Ask one
+   decision question; if downtime is chosen, record the exception and hand
+   its execution design to the runbook owner. The answer is not execution
+   authority and does not turn a breaking one-shot change into this staged plan.
+9. **Hand off.** Each stage's migration file → `secure-migration-reviewer`
    before it ships; the backfill/cutover execution →
    `data-migration-runbook-author`; the finished plan is recorded per the
    repo's decision conventions.
@@ -124,6 +137,8 @@ Stage 1 EXPAND:   <DDL intent> — compat: <old×new guarantee> — gate: <check
 Stage 2 MIGRATE:  <dual-write + backfill + read-switch> — compat: <both directions> — gate: <parity evidence>
 Stage 3 CONTRACT: <stop dual-write; deprecation-register entry; drop schedule> — gate: <zero-reader evidence over window>
 Release mapping:  <stage → deploy/release boundary>
+Rollout choice:   <when owner choice is needed: terms, fit, pros/cons,
+                   money/setup/upkeep, recommendation and why, one question>
 Rollback:         <per stage; point of no return = physical drop>
 Handoffs:         migrations → secure-migration-reviewer; execution → data-migration-runbook-author
 Not covered:      <explicitly out of scope for this plan>
@@ -143,6 +158,8 @@ Not covered:      <explicitly out of scope for this plan>
 - [ ] The deprecation register entry exists for anything left physically
       present but logically dead.
 - [ ] Rollback is stated per stage and the point of no return is explicit.
+- [ ] If downtime is offered, its outage and recovery tradeoff is explained
+      against staged rollout with costs and a reasoned recommendation.
 
 ## Gotchas
 

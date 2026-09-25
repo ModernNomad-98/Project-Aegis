@@ -119,6 +119,16 @@ the traffic it drives comes from `load-test-planner` scenarios.
    where no owner-set number exists. The harness NEVER invents a
    threshold silently — an uncited number is a finding against the
    design itself.
+   When no owner-set target exists, explain the choice: seek a proper
+   latency/SLO budget (a product reliability commitment) or record an
+   interim team threshold (a temporary, labeled comparison rule). A
+   proper target takes stakeholder and measurement time but supports a
+   defensible blocking gate; an interim rule can start advisory checks
+   sooner but may be too loose or strict and needs review/replacement.
+   Compare money, setup time and upkeep using known team/CI costs, mark
+   unknowns, recommend proper target-setting for blocking gates and an
+   interim advisory rule only if the team needs evidence now. Ask one
+   target-path question; never silently promote an interim number.
 6. **Place tiers in CI.** Per-PR: fast smoke (a bounded subset at
    light load — minutes, not hours) catching gross regressions;
    nightly: the full measured set at target load against baselines;
@@ -158,6 +168,8 @@ Baselines: <per measurement; versioned with code; refresh-on-approved-change rul
 Detection: <repeat count N, percentile comparison, noise band derivation,
             warm-up discard policy; single-run diffs banned>
 Thresholds: <each gate → cited source (budget|SLO|frontend budget|recorded decision)>
+Target choice: <if absent: proper target vs interim advisory threshold,
+                terms, costs, pros/cons, recommendation and why, one question>
 CI tiers: per-PR smoke <scope, minutes> | nightly full <scope> | pre-release <load-test-planner scenarios>
           advisory→blocking promotion rule: <stability window>
 Report: <conditions stamp, baseline ref, variance, PASS/FAIL/ADVISORY/UNRUN;
@@ -177,6 +189,8 @@ Execution posture: dedicated environments; production/shared-infra touches
 - [ ] Detection uses repeat runs with a variance-derived noise band;
       no single-run diff anywhere in the design.
 - [ ] Every threshold cites its source; zero invented numbers.
+- [ ] If targets are absent, the owner sees the proper-target versus interim
+      advisory tradeoff, costs and recommendation before choosing.
 - [ ] Per-PR tier fits its pipeline time budget; heavier tiers are
       placed where they can afford to run.
 - [ ] New gates start advisory with a stated promotion rule.

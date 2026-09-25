@@ -6,6 +6,7 @@ import json
 import os
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from tools.behavioral_eval_runner import RUNNER_VERSION, SCHEMA_VERSION
@@ -89,6 +90,162 @@ class PolicyCase(unittest.TestCase):
 
 
 class TestPolicy(PolicyCase):
+    def test_stage_a_claim_uses_artifact_snapshot(self) -> None:
+        artifacts = [input_artifact()]
+        claim = policy_module._claim_policy_receipt
+        def mutate_after_claim(root: str, path: str, content: bytes) -> None:
+            claim(root, path, content)
+            if path == STAGE_A_POLICY:
+                artifacts[0] = ClassifiedArtifact("../invalid", b"changed", decision())
+        with patch.object(policy_module, "_claim_policy_receipt", side_effect=mutate_after_claim), \
+             patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=FIRST), \
+             patch("tools.behavioral_eval_runner.evidence._utc_now_iso", return_value=FIRST):
+            self.writer.finalize_input(artifacts)
+        self.assertEqual(Path(self.root, "inputs", "one.txt").read_bytes(), b"synthetic input")
+        self.assertEqual(verify_policy_input(self.root)["bundle_review_at"], DEADLINE)
+
+    def test_stage_a_path_conflicts_fail_before_claim_and_allow_retry(self) -> None:
+        invalid_paths = (
+            ("policy",),
+            ("x", "x/y"),
+            ("policy/stage-a.json/x",),
+            ("input_evidence_manifest.json/x",),
+        )
+        for paths in invalid_paths:
+            with self.subTest(paths=paths):
+                artifacts = [ClassifiedArtifact(path, b"synthetic", decision()) for path in paths]
+                with self.assertRaisesRegex(EvidenceError, "paths conflict"):
+                    self.writer.finalize_input(artifacts)
+                self.assertEqual(os.listdir(self.root), [])
+        self.stage_a()
+        self.assertEqual(verify_policy_input(self.root)["bundle_review_at"], DEADLINE)
+
+    def test_invalid_report_preserves_stage_a_and_allows_corrected_retry(self) -> None:
+        sha = self.stage_a()
+        def tree() -> dict[str, bytes]:
+            return {
+                os.path.relpath(os.path.join(folder, name), self.root):
+                Path(folder, name).read_bytes()
+                for folder, _, names in os.walk(self.root) for name in names
+            }
+        before = tree()
+        invalid = (
+            ({**self.report(sha), "run_id": "another-run"}, "run_id"),
+            ({**self.report(sha), "run_evidence_binding": {
+                "input_evidence_manifest_sha256": "0" * 64}}, "stage A binding"),
+            ({**self.report(sha), "run_evidence_binding": {
+                "input_evidence_manifest_sha256": sha,
+                "final_report_sha256": "0" * 64}}, "final_report_sha256"),
+        )
+        for report, reason in invalid:
+            with self.subTest(reason=reason), self.assertRaisesRegex(EvidenceError, reason):
+                self.writer.finalize_final(report, [], decision("report"), "INVALID")
+            self.assertEqual(tree(), before)
+        with patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=LATER), \
+             patch("tools.behavioral_eval_runner.evidence._utc_now_iso", return_value=LATER):
+            self.writer.finalize_final(self.report(sha), [], decision("report"), "CORRECTED")
+        self.assertEqual(self.read(MARKER_NAME)["final_status"], "CORRECTED")
+        self.assertTrue(self.verify_at(LATER))
+
+    def test_stage_b_path_conflict_preserves_stage_a_and_allows_retry(self) -> None:
+        sha = self.stage_a()
+        before = {
+            os.path.relpath(os.path.join(folder, name), self.root): Path(folder, name).read_bytes()
+            for folder, _, names in os.walk(self.root) for name in names
+        }
+        with self.assertRaisesRegex(EvidenceError, "paths conflict"):
+            self.writer.finalize_final(
+                self.report(sha),
+                [ClassifiedArtifact("inputs", b"collision", decision("output"))],
+                decision("report"), "INVALID",
+            )
+        after = {
+            os.path.relpath(os.path.join(folder, name), self.root): Path(folder, name).read_bytes()
+            for folder, _, names in os.walk(self.root) for name in names
+        }
+        self.assertEqual(after, before)
+        with patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=LATER), \
+             patch("tools.behavioral_eval_runner.evidence._utc_now_iso", return_value=LATER):
+            self.writer.finalize_final(self.report(sha), [], decision("report"), "CORRECTED")
+        self.assertTrue(self.verify_at(LATER))
+
+    def test_stage_b_report_version_and_status_fail_before_claim_then_retry(self) -> None:
+        sha = self.stage_a()
+        before = {
+            os.path.relpath(os.path.join(folder, name), self.root): Path(folder, name).read_bytes()
+            for folder, _, names in os.walk(self.root) for name in names
+        }
+        invalid_reports = (
+            {**self.report(sha), "schema_version": "unsupported"},
+            {key: value for key, value in self.report(sha).items() if key != "runner_version"},
+            {**self.report(sha), "attempts": [{"schema_version": "unsupported"}]},
+        )
+        for report in invalid_reports:
+            with self.subTest(report=report), self.assertRaises(EvidenceError):
+                self.writer.finalize_final(report, [], decision("report"), "INVALID")
+        for status in ({}, float("nan"), ""):
+            with self.subTest(status=status), self.assertRaises(EvidenceError):
+                self.writer.finalize_final(self.report(sha), [], decision("report"), status)
+        after = {
+            os.path.relpath(os.path.join(folder, name), self.root): Path(folder, name).read_bytes()
+            for folder, _, names in os.walk(self.root) for name in names
+        }
+        self.assertEqual(after, before)
+        with patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=LATER), \
+             patch("tools.behavioral_eval_runner.evidence._utc_now_iso", return_value=LATER):
+            self.writer.finalize_final(self.report(sha), [], decision("report"), "CORRECTED")
+        self.assertTrue(self.verify_at(LATER))
+
+    def test_stage_b_claim_uses_artifact_snapshot(self) -> None:
+        sha = self.stage_a()
+        artifacts = [ClassifiedArtifact("outputs/one.txt", b"original", decision("output"))]
+        claim = policy_module._claim_policy_receipt
+        def mutate_after_claim(root: str, path: str, content: bytes) -> None:
+            claim(root, path, content)
+            if path == STAGE_B_POLICY:
+                artifacts[0] = ClassifiedArtifact("../invalid", b"changed", decision("output"))
+        with patch.object(policy_module, "_claim_policy_receipt", side_effect=mutate_after_claim), \
+             patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=LATER), \
+             patch("tools.behavioral_eval_runner.evidence._utc_now_iso", return_value=LATER):
+            self.writer.finalize_final(self.report(sha), artifacts, decision("report"), "SNAPSHOT")
+        self.assertEqual(Path(self.root, "outputs", "one.txt").read_bytes(), b"original")
+        self.assertTrue(self.verify_at(LATER))
+
+    def test_report_mutation_during_receipt_claim_uses_validated_snapshot(self) -> None:
+        sha = self.stage_a()
+        report = self.report(sha)
+        claim = policy_module._claim_policy_receipt
+        def mutate_after_claim(root: str, path: str, content: bytes) -> None:
+            claim(root, path, content)
+            if path == STAGE_B_POLICY:
+                report["run_id"] = "another-run"
+                report["run_evidence_binding"]["input_evidence_manifest_sha256"] = "0" * 64
+        with patch.object(policy_module, "_claim_policy_receipt", side_effect=mutate_after_claim), \
+             patch("tools.behavioral_eval_runner.evidence_policy._now", return_value=LATER), \
+             patch("tools.behavioral_eval_runner.evidence._utc_now_iso", return_value=LATER):
+            self.writer.finalize_final(report, [], decision("report"), "SNAPSHOT")
+        self.assertEqual(self.read(FINAL_REPORT_NAME)["run_id"], RUN)
+        self.assertEqual(
+            self.read(FINAL_REPORT_NAME)["run_evidence_binding"]["input_evidence_manifest_sha256"],
+            sha,
+        )
+        self.assertTrue(self.verify_at(LATER))
+
+    def test_report_snapshot_is_validated_instead_of_live_mapping_getters(self) -> None:
+        sha = self.stage_a()
+        class MisleadingReport(dict):
+            def get(self, key, default=None):
+                if key == "run_id":
+                    return RUN
+                if key == "run_evidence_binding":
+                    return {"input_evidence_manifest_sha256": sha}
+                return super().get(key, default)
+        report = MisleadingReport(self.report(sha))
+        report["run_id"] = "another-run"
+        with self.assertRaisesRegex(EvidenceError, "run_id"):
+            self.writer.finalize_final(report, [], decision("report"), "INVALID")
+        self.assertFalse(os.path.exists(os.path.join(self.root, *STAGE_B_POLICY.split("/"))))
+
     def test_stage_b_policy_lookalike_cannot_pass_legacy_path(self) -> None:
         legacy = EvidenceWriter(self.root, RUN)
         sha = legacy.finalize_input_evidence([

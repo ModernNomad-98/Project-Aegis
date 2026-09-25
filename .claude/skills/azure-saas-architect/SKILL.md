@@ -155,6 +155,12 @@ to evaluate; they do not verify a current Azure offering, limit or price.
 
 ## Output Format
 
+Before asking the team to choose a service or topology, define unfamiliar
+terms and explain why the choice matters for this workload and tenant model.
+Compare practical pros and cons, money, setup time, and ongoing operations;
+recommend an option and explain why. Treat unverified prices as Verification
+items, including any claimed $0 incremental charge.
+
 ```
 AZURE SAAS ARCHITECTURE — <product/scope>
 Management & tagging: <mgmt groups, subscriptions, resource-group + tag standard>
@@ -167,6 +173,8 @@ Observability & secrets: <Monitor/App Insights/Log Analytics wiring, Key Vault l
 Delivery pipeline and security controls: <OIDC deploy path, Azure Policy guardrails, Defender for Cloud plans, Sentinel (if detection-and-response practice), CASB / ID Protection placements>
 Infrastructure-as-code strategy: <tool, state/environment layout, module conventions>
 Cost controls: <budgets, views, attribution feed, top-3 cost risks>
+Choice guide: <for each owner choice: terms, reason, money/setup/ongoing cost,
+  pros and cons, recommended option and why>
 Verification items: <each SKU/limit/region/price-dependent claim → verify against current Azure docs>
 Assumptions & open questions: <each with risk-if-wrong / who answers>
 ```
@@ -187,6 +195,9 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
       meters; no plan/tier claim is asserted from memory.
 - [ ] Cost controls key on the tagging standard and name the top cost risks
       of this specific design.
+- [ ] Choices shown to a human explain terms, reasons, money/time/setup and
+      upkeep costs, pros/cons, and a justified recommendation; unverified
+      price claims remain verification items.
 - [ ] Tenancy semantics, pipeline internals, and IaC diff review were
       delegated (`saas-platform-architect`/`multi-tenant-data-architect`,
       `ci-pipeline-architect`, `iac-reviewer`), not restated.

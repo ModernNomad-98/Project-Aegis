@@ -70,6 +70,19 @@
           "Lexical search and vector search may coexist as a hybrid, but the vector half and its security are deferred there."
         ]
       }
+    },
+    {
+      "id": "choice-engine-education",
+      "type": "should_trigger",
+      "prompt": "We have 40,000 tenant-scoped records and need typo-tolerant search. Should we use Postgres full-text/trigram or buy a dedicated search service? Please let me choose before we build.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines full-text/trigram and a dedicated search engine in plain language and explains why each is viable for this corpus and relevance need.",
+          "Compares case-specific relevance, freshness, tenant isolation, money, setup time, and ongoing upkeep; marks unknown prices rather than inventing them.",
+          "Recommends one path from the stated evidence, gives a reason and the fact that could change it, then asks one atomic decision question before any build action."
+        ]
+      }
     }
   ]
 }
