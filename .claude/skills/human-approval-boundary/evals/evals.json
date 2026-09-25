@@ -82,7 +82,7 @@
     {
       "id": "build-path-choice-versus-prepared-action",
       "type": "should_trigger",
-      "prompt": "Draft two approval requests for deploying my app: (1) I must first choose between a managed hosting service and a self-managed virtual machine, and I have not stated a budget or maintenance capacity; (2) the managed service is already chosen and configured, and I only need approval to deploy this prepared release. Do not execute either deployment.",
+      "prompt": "Draft two approval requests for deploying my app: (1) I must first choose between a managed hosting service and a self-managed virtual machine, and I have not stated a budget or maintenance capacity; (2) the managed service is already chosen and configured. I need approval to deploy app release v2.4.1 to the production service web-prod, which serves 120 staff users. This release has no data migration; rollback is redeploying v2.4.0. Do not execute either deployment.",
       "expect": {
         "triggers": true,
         "assertions": [
