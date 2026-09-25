@@ -61,11 +61,25 @@ function Get-AegisSelectionPath {
     return [pscustomobject]@{ Key = $key; Directory = $base; Path = [IO.Path]::Combine($base, "$key.json") }
 }
 
+function Get-AegisRecordPathKind {
+    param([string]$Path)
+    try { $attributes = [IO.File]::GetAttributes($Path) }
+    catch [System.IO.FileNotFoundException] { return 'missing' }
+    catch [System.IO.DirectoryNotFoundException] { return 'missing' }
+    catch { throw "Selection record path cannot be inspected; inspect it manually before selecting again. $($_.Exception.Message)" }
+    if (($attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw 'Selection record is a redirect; repair it manually.'
+    }
+    if (($attributes -band [IO.FileAttributes]::Directory) -ne 0) {
+        throw 'Selection record path is occupied by a directory; inspect it manually before selecting again.'
+    }
+    return 'file'
+}
+
 function Read-AegisSelection {
     param([string]$ProjectRoot, [string]$StateRoot)
     $location = Get-AegisSelectionPath $ProjectRoot $StateRoot
-    if (-not [IO.File]::Exists($location.Path)) { return [pscustomobject]@{ Status='unselected'; Path=$location.Path; Record=$null } }
-    if (([IO.File]::GetAttributes($location.Path) -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'Selection record is a redirect; repair it manually.' }
+    if ((Get-AegisRecordPathKind $location.Path) -eq 'missing') { return [pscustomobject]@{ Status='unselected'; Path=$location.Path; Record=$null } }
     try {
         $raw = [IO.File]::ReadAllText($location.Path, [Text.Encoding]::UTF8)
         $rawNames = @([regex]::Matches($raw, '"([A-Za-z_]+)"\s*:') | ForEach-Object { $_.Groups[1].Value.ToLowerInvariant() })
@@ -107,7 +121,7 @@ function Save-AegisOnlySelection {
     if ($null -eq $lock) { throw 'Another setup writer is active; retry later.' }
     $temp = $null
     try {
-        $existing = [IO.File]::Exists($location.Path)
+        $existing = (Get-AegisRecordPathKind $location.Path) -eq 'file'
         if ($Repair -and -not $existing) { throw 'No record needs repair.' }
         if ($Repair) {
             try { $null = Read-AegisSelection $ProjectRoot $StateRoot; throw 'Record is valid; use select.' }
