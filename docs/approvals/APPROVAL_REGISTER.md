@@ -743,3 +743,85 @@ generic skill guidance that would require asking for the same approval again.
   PR #271 before the grant.
 - **Expiry / use limit:** One bounded Stage 4A offline implementation; no
   calendar expiry stated. Stage 4B requires separate authority.
+
+### AEGIS-APR-032: PR #281 original-head gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE for the named head only; later expired without
+  use as recorded in AEGIS-APR-033.
+- **Date / Grantor:** 2026-09-25 UTC / Peter Nguyen.
+- **Reason:** Permit the reviewed Stage 4A offline bridge PR to pass its
+  protected-path `gate-guard` failure at the then-current exact head.
+- **Scope allowed:** The owner's exact reply was "allow" to the PR #281
+  exact-head exception request for
+  `0bb51c19bd42261a5604fb25762069ce7867141b`. Its scope was the
+  one-time protected `gate-guard` exception and administrator merge of that
+  head of [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281).
+- **Scope FORBIDDEN:** No other PR or head was covered; no host session,
+  provider call, credential use, VM work or Stage 4B execution was granted.
+- **Evidence:** Direct owner reply quoted above in the Project Aegis
+  conversation on 2026-09-25 UTC to the original exact-head request.
+- **Expiry / use limit:** One merge at the named head; the head changed before
+  merge, so this exception had no remaining applicable use.
+
+### AEGIS-APR-033: Original PR #281 exception expired unused
+
+- **Event:** EXPIRED; target grant AEGIS-APR-032.
+- **Status at recording:** AEGIS-APR-032 has no remaining applicable use and
+  was never consumed by a merge.
+- **Effective at:** 2026-09-25 07:26:36 UTC, when the replacement head
+  `fd2e27e48fcfe85a5361345ebe70bb424e422abf` was committed after a
+  merge conflict made the original head unusable.
+- **Recorded at / By:** 2026-09-25 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The exact-head condition of AEGIS-APR-032 could no longer be
+  satisfied; the original head was not merged.
+- **Evidence:** [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+  and replacement commit `fd2e27e48fcfe85a5361345ebe70bb424e422abf`.
+
+### AEGIS-APR-034: PR #281 replacement-head gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE when granted; later consumed by
+  AEGIS-APR-035.
+- **Date / Grantor:** 2026-09-25 UTC / Peter Nguyen.
+- **Reason:** Authorize the protected-path exception for the reviewed
+  replacement head after the conflict resolution.
+- **Scope allowed:** The owner's exact reply was "parooved" to the immediately
+  preceding decision message naming [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+  at `fd2e27e48fcfe85a5361345ebe70bb424e422abf`. It authorized the
+  one-time `gate-guard` exception and administrator merge of that head. The
+  exact-head Linux and Windows checks were green; the protected-path
+  `gate-guard` check failed.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered; no SDK
+  session, provider/model call, credentials, VM work or Stage 4B execution.
+- **Evidence:** Direct owner reply quoted above in the Project Aegis
+  conversation on 2026-09-25 UTC to the replacement exact-head decision message;
+  the [PR #281 merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+  identifies the merged head and merge commit.
+- **Expiry / use limit:** One merge of PR #281 at the named replacement head.
+
+### AEGIS-APR-035: Consumption of PR #281 replacement-head exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-034.
+- **Status at recording:** AEGIS-APR-034 has no remaining use.
+- **Effective at:** 2026-09-25 07:43:44 UTC.
+- **Recorded at / By:** 2026-09-25 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The one-time exact-head administrator merge completed.
+- **Evidence:** [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+  merged `fd2e27e48fcfe85a5361345ebe70bb424e422abf` as
+  `ea40ab481ff78267cd5f151c393e946805ba8d01` at the time above.
+
+### AEGIS-APR-036: Stage 4A offline bridge package completed
+
+- **Event:** CONSUMED; target grant AEGIS-APR-031.
+- **Status at recording:** AEGIS-APR-031's one bounded Stage 4A offline
+  implementation is complete and has no remaining use.
+- **Effective at:** 2026-09-25 07:43:44 UTC.
+- **Recorded at / By:** 2026-09-25 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** PR #281 merged the authorized synthetic offline bridge package.
+- **Evidence:** [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+  merged as `ea40ab481ff78267cd5f151c393e946805ba8d01` at the time above.
+  This closes one Stage 4A implementation; it is not Stage 4B host proof.

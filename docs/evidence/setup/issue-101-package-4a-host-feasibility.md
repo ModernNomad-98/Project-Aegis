@@ -1,5 +1,13 @@
 # Issue #101 package 4A host-interface feasibility screen
 
+**2026-09-25 status update:** This page preserves its source-screening
+snapshot and the then-pending statements below. The separate bounded Stage 4A
+offline bridge later merged in [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+as `ea40ab481ff78267cd5f151c393e946805ba8d01` at 07:43:44 UTC;
+[APR-036](../../approvals/APPROVAL_REGISTER.md#aegis-apr-036-stage-4a-offline-bridge-package-completed)
+records completion of that one implementation. The merge does not establish
+real-host callback invocation, decision consumption or token telemetry.
+
 Reviewed 2026-09-24 against the [issue #101 setup plan](../../roadmaps/aegis-setup-routing-plan.md),
 the shipped [offline contract](../../../tools/aegis_setup/README.md), and
 official [Agent software development kit (SDK) hooks](https://code.claude.com/docs/en/agent-sdk/hooks),
@@ -196,6 +204,7 @@ bridge** because it removes the package with unresolved published-license
 attribution while preserving the SDK's declared peer range. This is a
 supply-chain preference, not a claim that the SDK wrapper, bundled CLI and
 older API SDK work together at runtime. A committed lock, package-body safety
-review and separate Stage 4A implementation grant remain pending. The later
+review and separate Stage 4A implementation grant remained pending at this
+2026-09-24 screening point. The later
 host proof must test executable compatibility without assuming it from the
 static archive screen. No package was installed or executed in this review.
