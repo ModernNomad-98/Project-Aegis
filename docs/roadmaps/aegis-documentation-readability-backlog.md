@@ -32,6 +32,9 @@ PR #262 updated three existing forecast, measurement and readability pages.
 This current-route and VM-approval update changes existing pages only; its
 approval register, decision routes, host proposal and this ledger received
 full-page review. The tracked count remains 588.
+The issue #101 package-4A candidate refresh reaccepts its existing proposal
+after an independent full-page review and a separate source check; it adds no
+Markdown file.
 **Zero known pages** remain in the bounded sweep.
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
