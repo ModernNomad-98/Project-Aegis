@@ -2661,7 +2661,9 @@ class SyntheticAuthority:
         intent_event_id: str,
         intent_event_hash: str,
     ) -> None:
-        self.verify_validator_for_intent(capability)
+        # Another instance may recover this exact intent after the local
+        # commit but before this writer marks the shared claim.
+        self.verify_validator_issued(capability)
         self._mark_validator_intent_binding(
             capability, intent_event_id, intent_event_hash
         )
