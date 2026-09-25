@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of this Stage 4B manifest update on 2026-09-25 Coordinated Universal Time
+As of this CP public contract inspection update on 2026-09-25 Coordinated Universal Time
 (UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -11,7 +11,13 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-This updated tree contains **597 tracked Markdown files**: **553
+This candidate tree contains **598 Markdown files**: **554 accepted reader pages**
+and **44 synthetic fixtures**, with zero known pending pages. Independent factual
+and full-page readability reviews accepted the new [CP-WP-003 DynamoDB public
+contract inspection](cp-wp-003-dynamodb-public-contract-inspection.md) after
+corrections to table-incarnation identity, source-head hashes, missing-event
+reconciliation, first-use terms and the packet's completed-versus-future step.
+The previous merged tree contained **597 tracked Markdown files**: **553
 reader pages** with recorded full-checklist acceptance and **44 synthetic
 fixtures** with classification and integrity checks. The new
 [Stage 4B preflight manifest template](aegis-setup-package-4b-preflight-manifest-template.md)
