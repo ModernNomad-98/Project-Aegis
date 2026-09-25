@@ -19,8 +19,9 @@ runs without site-package startup and inherits only the minimum path/OS/temp
 environment values, not provider credentials. The worker
 validates the existing 4,096-byte request and 1,024-byte response contracts.
 Only a recommendation that includes the actual target can pass. Unknown tools,
-IDs and failures explicitly deny. A passed callback remains subject to the
-host's normal permissions and grants no whole-task review completion.
+IDs and failures explicitly deny. A passed callback returns no permission
+decision, so the host's normal permission flow still applies; it grants no
+whole-task review completion.
 
 For a local offline check from the repository root:
 

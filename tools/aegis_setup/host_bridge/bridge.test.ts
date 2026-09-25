@@ -30,12 +30,13 @@ function harness(change: Partial<AuthoritySnapshot> = {}, advise = reply) {
 }
 const agent = { tool_name: 'Agent', tool_input: { subagent_type: 'reviewer' } };
 const skill = { tool_name: 'Skill', tool_input: { skill: 'api' } };
-const permitted = (result: any) => result.hookSpecificOutput.permissionDecision === 'allow';
+const noDecision = (result: any) => Object.keys(result).length === 0;
+const denied = (result: any) => result.hookSpecificOutput?.permissionDecision === 'deny';
 
 test('Agent and model Skill dispatch each recheck authority', async () => {
   const h = harness();
-  assert.equal(permitted(await h.callbacks.preToolUse(agent)), true);
-  assert.equal(permitted(await h.callbacks.preToolUse(skill)), true);
+  assert.equal(noDecision(await h.callbacks.preToolUse(agent)), true);
+  assert.equal(noDecision(await h.callbacks.preToolUse(skill)), true);
   assert.equal(h.calls(), 4);
 });
 
@@ -46,7 +47,7 @@ test('unknown tool, unknown ID, malformed tool input and subagent name deny', as
     { tool_name: 'Agent', tool_input: { subagent_type: '../bad' } },
     { tool_name: 'Agent', tool_input: {} },
     { tool_name: 'Skill', tool_input: { skill: 'unknown' } }]) {
-    assert.equal(permitted(await h.callbacks.preToolUse(input)), false);
+    assert.equal(denied(await h.callbacks.preToolUse(input)), true);
   }
 });
 
@@ -56,7 +57,7 @@ test('direct typed skill can be absent from model allowlist but needs genuine in
   assert.equal((await h.callbacks.userPromptExpansion({ expansion_type: 'slash_command', command_name: 'manual' })).decision, undefined);
   const ordinary = harness({ selected_skills: ['api'] });
   assert.equal((await ordinary.callbacks.userPromptExpansion({ expansion_type: 'slash_command', command_name: 'api' })).decision, undefined);
-  assert.equal(permitted(await h.callbacks.preToolUse({ tool_name: 'Skill', tool_input: { skill: 'manual' } })), false);
+  assert.equal(denied(await h.callbacks.preToolUse({ tool_name: 'Skill', tool_input: { skill: 'manual' } })), true);
   assert.equal((await h.callbacks.userPromptExpansion({ expansion_type: 'slash_command', command_name: 'unknown' })).decision, 'block');
   assert.equal((await h.callbacks.userPromptExpansion({ expansion_type: 'mcp_prompt', command_name: 'manual' })).decision, 'block');
   assert.equal((await harness({ selected_skills: ['manual'] }).callbacks.userPromptExpansion({ expansion_type: 'slash_command', command_name: 'manual' })).decision, 'block');
@@ -65,17 +66,17 @@ test('direct typed skill can be absent from model allowlist but needs genuine in
 test('mandatory and explicit selections cannot be dropped by advice', async () => {
   const h = harness({ selected_agents: ['writer'], selected_skills: ['api'] },
     req => reply(req, ['reviewer'], ['api']));
-  assert.equal(permitted(await h.callbacks.preToolUse(agent)), false);
+  assert.equal(denied(await h.callbacks.preToolUse(agent)), true);
   const missingMandatory = harness({}, req => reply(req, [], ['api']));
-  assert.equal(permitted(await missingMandatory.callbacks.preToolUse(skill)), false);
+  assert.equal(denied(await missingMandatory.callbacks.preToolUse(skill)), true);
 });
 
 test('read-only and ordinary host permissions remain host-owned', async () => {
   const writer = harness({ read_only_required: true }, req => reply(req, ['reviewer', 'writer'], ['api']));
-  assert.equal(permitted(await writer.callbacks.preToolUse({ tool_name: 'Agent', tool_input: { subagent_type: 'writer' } })), false);
+  assert.equal(denied(await writer.callbacks.preToolUse({ tool_name: 'Agent', tool_input: { subagent_type: 'writer' } })), true);
   for (const change of [{ ordinary_permission: 'deny' }, { destination: 'online' },
     { local_only: false }, { fresh: false }]) {
-    assert.equal(permitted(await harness(change).callbacks.preToolUse(agent)), false);
+    assert.equal(denied(await harness(change).callbacks.preToolUse(agent)), true);
   }
 });
 
@@ -86,15 +87,15 @@ test('changed or missing fresh authority between advice and dispatch denies', as
     snapshot: () => ({ ...base, generation: ++generation === 1 ? 'one' : 'two' }),
     advice: req => { adviceCalls++; return reply(req); },
   });
-  assert.equal(permitted(await callbacks.preToolUse(agent)), false);
+  assert.equal(denied(await callbacks.preToolUse(agent)), true);
   assert.equal(generation, 2);
   assert.equal(adviceCalls, 1);
   const reused = { ...base };
   const mutated = createOfflineCallbacks({ snapshot: () => reused,
     advice: req => { reused.policy_version = 'pol-2'; return reply(req); } });
-  assert.equal(permitted(await mutated.preToolUse(agent)), false);
+  assert.equal(denied(await mutated.preToolUse(agent)), true);
   const missing = createOfflineCallbacks({ snapshot: () => { throw Error('missing'); }, advice: reply });
-  assert.equal(permitted(await missing.preToolUse(agent)), false);
+  assert.equal(denied(await missing.preToolUse(agent)), true);
 });
 
 test('malformed, duplicate-key, oversized and contaminated replies deny', async () => {
@@ -102,27 +103,27 @@ test('malformed, duplicate-key, oversized and contaminated replies deny', async 
     () => 'x'.repeat(1025), req => reply(req).replace('"cat-1"', '"stale"'),
     req => JSON.stringify({ ...JSON.parse(reply(req)), agents: ['unknown'] }),
     req => JSON.stringify({ ...JSON.parse(reply(req)), status: 'abstain', agents: [], skills: [] })]) {
-    assert.equal(permitted(await harness({}, advise).callbacks.preToolUse(agent)), false);
+    assert.equal(denied(await harness({}, advise).callbacks.preToolUse(agent)), true);
   }
-  assert.equal(permitted(await harness({ synopsis: 'x'.repeat(4097) }).callbacks.preToolUse(agent)), false);
+  assert.equal(denied(await harness({ synopsis: 'x'.repeat(4097) }).callbacks.preToolUse(agent)), true);
 });
 
 test('worker exit, timeout, output contamination and callback exception deny', async () => {
   const absent = createOfflineCallbacks({ snapshot: () => base, advice: reply, worker: 'absent-worker.py' });
-  assert.equal(permitted(await absent.preToolUse(agent)), false);
+  assert.equal(denied(await absent.preToolUse(agent)), true);
   const error = createOfflineCallbacks({ snapshot: () => base, advice: () => { throw Error('fail'); } });
-  assert.equal(permitted(await error.preToolUse(agent)), false);
+  assert.equal(denied(await error.preToolUse(agent)), true);
   const timeout = createOfflineCallbacks({ snapshot: () => base, advice: reply, timeout_ms: 1 });
-  assert.equal(permitted(await timeout.preToolUse(agent)), false);
+  assert.equal(denied(await timeout.preToolUse(agent)), true);
   const hungAdvice = createOfflineCallbacks({ snapshot: () => base,
     advice: () => new Promise<string>(() => {}), timeout_ms: 10 });
-  assert.equal(permitted(await hungAdvice.preToolUse(agent)), false);
+  assert.equal(denied(await hungAdvice.preToolUse(agent)), true);
   const temp = mkdtempSync(join(tmpdir(), 'aegis-bridge-'));
   try {
     const noisy = join(temp, 'noisy.py');
     writeFileSync(noisy, 'print("allow")\nprint("extra")\n');
     const contaminated = createOfflineCallbacks({ snapshot: () => base, advice: reply, worker: noisy });
-    assert.equal(permitted(await contaminated.preToolUse(agent)), false);
+    assert.equal(denied(await contaminated.preToolUse(agent)), true);
   } finally { rmSync(temp, { recursive: true, force: true }); }
 });
 
@@ -147,7 +148,7 @@ test('worker receives no unrelated inherited environment value', async () => {
     writeFileSync(worker, 'import os\nprint("allow" if "AEGIS_SYNTHETIC_SECRET" not in os.environ else "deny")\n');
     process.env[marker] = 'invented-value';
     const callbacks = createOfflineCallbacks({ snapshot: () => base, advice: reply, worker });
-    assert.equal(permitted(await callbacks.preToolUse(agent)), true);
+    assert.equal(noDecision(await callbacks.preToolUse(agent)), true);
   } finally {
     if (prior === undefined) delete process.env[marker]; else process.env[marker] = prior;
     rmSync(temp, { recursive: true, force: true });

@@ -127,16 +127,15 @@ function directProposal(input: HookInput): Proposal | null {
   return id.test(target) ? { kind: 'skill', target, direct: true } : null;
 }
 
-/** A deny still leaves ordinary host permissions in force. No tool is dispatched here. */
+/** A passing recommendation makes no permission decision; a failure denies. No tool is dispatched here. */
 export function createOfflineCallbacks(facts: HostFacts) {
   return {
     preToolUse: async (input: HookInput): Promise<SyncHookJSONOutput> => {
       const proposal = modelProposal(input);
       const allowed = proposal ? await evaluate(facts, proposal) : false;
-      return { hookSpecificOutput: {
-        hookEventName: 'PreToolUse', permissionDecision: allowed ? 'allow' : 'deny',
-        permissionDecisionReason: allowed ? 'Offline recommendation passed; host permission still required' :
-          'Offline bridge denied assisted dispatch',
+      return allowed ? {} : { hookSpecificOutput: {
+        hookEventName: 'PreToolUse', permissionDecision: 'deny',
+        permissionDecisionReason: 'Offline bridge denied assisted dispatch',
       } };
     },
     userPromptExpansion: async (input: HookInput): Promise<SyncHookJSONOutput> => {
