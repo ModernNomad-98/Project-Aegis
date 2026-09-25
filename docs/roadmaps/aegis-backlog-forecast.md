@@ -51,21 +51,26 @@ The [WP-2B-3 measurement prerequisite packet](ber-wp2b3-measurement-prerequisite
 orders private candidate review, live source and allowance reconciliation,
 selected-host proof, development, holdout freeze and OD-1. The
 [CP-WP-003 authority packet](cp-wp-003-real-authority-decision-packet.md)
-asks only for named source, host and operation candidate research before a
-separate proof grant. The [BER-BKL-009 residual proposal](ber-bkl-009-residual-host-runtime-privacy-cleanup-proposal.md)
+now links the completed [named-candidate research](cp-wp-003-named-candidate-matrix.md)
+and asks for direction on a first read-only contract inspection before any
+separate source or host grant. The [BER-BKL-009 residual proposal](ber-bkl-009-residual-host-runtime-privacy-cleanup-proposal.md)
 scopes later host, runtime, privacy and cleanup decisions. The offline grants
 do not extend to these real phases. [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
 delivered the bounded offline Stage 4A bridge at merge
 `ea40ab481ff78267cd5f151c393e946805ba8d01`; its one-time protected
 guard exception is consumed. It establishes no real SDK host proof or token
-savings. The VM remains paused.
+savings. [PR #291](https://github.com/ModernNomad-98/Project-Aegis/pull/291)
+corrected the offline callback's permission decision after review and green
+checks; real-host permission behavior remains unproved. The VM remains paused.
 
 These packets close no selected implementation row; PR #281 closed the bounded
 Stage 4A offline package. The ten estimated rows remain **71–146 active
 hours**; Stage 4B and the BER-BKL-009 real residual remain unestimated, so the
 selected total has no finite ETA. The
-CP packet's candidate-research range is a separate planning estimate, not
-completed work credit or a revision of CP-WP-003's real-proof range. The dated
+CP packet's former 4–8-hour candidate-research range is now completed
+source-only work, outside the selected subtotal and not CP-WP-003 real proof.
+Its provisional 4–8-hour read-only inspection range remains conditional on
+owner direction and any needed separate grant. The dated
 [five-merge checkpoint](#five-merge-checkpoint--2026-09-25-after-pull-request-284)
 below preserves its #284 counts and PR-head status as historical evidence.
 
