@@ -20,7 +20,8 @@ had each added an evidence note before that merge. Their dated current-reading
 corrections passed two independent full-page reviews in this checkpoint.
 PRs #248 and #249 each added a reader page; both passed full-page review after
 the corrections recorded below and merged through #250. PR #253 added the
-reviewed BER-BKL-009 scope proposal and reaccepted the corrected candidate
+reviewed Behavioral Eval Runner (BER) BKL-009 scope proposal and reaccepted
+the corrected candidate
 summary. PRs #254 and #255 changed existing governance and tracking pages;
 the [five-merge checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-24-after-pull-request-260)
 reconciles their status. PR #257 added the reviewed operator runbook and
@@ -39,6 +40,12 @@ Markdown file.
 This post-#265 checkpoint rechecks the existing forecast, execution metrics and
 this ledger through independent full-page reviews; no page enters the pending
 set and the tracked count remains 588.
+The issue #101 host-path candidate revises five existing reader pages: its
+setup plan, Stage 4A proposal, feasibility evidence, forecast and this ledger.
+Two independent read-only reviews accepted their full pages after terminology,
+forecast and lockfile corrections, and checked their relative links. It adds
+no page; acceptance remains conditional on the candidate's local and GitHub
+checks and merge.
 **Zero known pages** remain in the bounded sweep.
 The fixture files remain test inputs, so prose rewriting would damage their
 positive and negative cases. The #237 bucket split and prior pending counts
@@ -52,9 +59,13 @@ notes. Their acceptance closes that residual, and #249 separately delivered
 the 8–16-hour offline holdout-support item. The **87–178 active-hour** selected
 residual after #250 is historical. The owner's bounded BER-BKL-009 approval,
 effective on #255, left one offline implementation package capped at 16 active
-hours. PR #257 delivered that package. Current selected work has **79–162
-active hours** for the other eleven selected rows and an unestimated later
-BER-BKL-009 residual. The selected total therefore has no finite current estimate.
+hours. PR #257 delivered that package. The later issue #101 host-path choice
+splits its former 8–16-hour combined package-4 row into separately unestimated
+offline Stage 4A and actual-host Stage 4B work. The current
+[forecast](aegis-backlog-forecast.md#material-owner-decision--2026-09-25-issue-101-host-path)
+therefore has **71–146 active hours** for ten unaffected rows, plus those two
+unestimated stages and the later BER-BKL-009 residual. The selected total has
+no finite current estimate.
 Future new or changed pages still need the acceptance check below. The
 [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
 and [delivery control-plane guide](../../tools/aegis_delivery_control/README.md)

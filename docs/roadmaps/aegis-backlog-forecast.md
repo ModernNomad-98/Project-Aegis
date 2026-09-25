@@ -3,31 +3,63 @@
 ## Start here — current reading
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
-to start blocked work. The [five-merge checkpoint after #265](#five-merge-checkpoint--2026-09-25-after-pull-request-265)
-reassesses every selected and optional row. PR #249 delivered the
+to start blocked work. The [owner's issue #101 host-path choice](#material-owner-decision--2026-09-25-issue-101-host-path)
+is the latest scope change; the [five-merge checkpoint after #265](#five-merge-checkpoint--2026-09-25-after-pull-request-265)
+remains the preceding full reassessment. Pull request (PR) #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
 documentation residual. PR #253 added one reviewed reader page; PR #257 added
 two more. PR #260 added one reviewed setup page, making **588 pages**:
 544 accepted readers and 44
 classified fixtures, with zero known pending pages. PR #257 delivered the
 bounded offline integration and consumed APR-023. The owner's 2026-09-24 approval of the
-[bounded BER-BKL-009 synthetic integration](#material-owner-decision--2026-09-24-ber-bkl-009),
+[bounded Behavioral Eval Runner (BER) BKL-009 synthetic integration](#material-owner-decision--2026-09-24-ber-bkl-009),
 made effective by merged PR #255,
 supersedes the old 8–16-hour whole-item estimate and therefore the old
-87–178-hour selected total. The current selected work has **79–162 active
-hours for the other eleven items, plus unestimated BER-BKL-009 host, runtime,
-privacy and cleanup work**. The offline package is delivered. The owner chose
+87–178-hour selected total. After removing the superseded issue #101 package-4
+8–16-hour combined row, current selected work has **71–146 active hours for
+ten unaffected rows**, plus unestimated issue #101 Stages 4A and 4B and
+BER-BKL-009 host, runtime, privacy and cleanup work. The BER offline package
+is delivered. The owner chose
 a new disposable Linux virtual machine with VirtualBox as the R4/R5 Stage A
 candidate. Setup began under APR-028 and reached an Ubuntu login, but repeated
 graphical stalls led the owner to pause it. The VM was last verified powered
 off, with networking disabled and its virtual DVD empty; guest completion
 checks and a Stage A host probe remain undone. No finite new selected or all-options
-total is defensible until that residual is scoped.
+total is defensible until the unestimated residuals are scoped.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
 the [execution measurements](aegis-execution-metrics.md#checkpoint-after-pull-request-265--2026-09-25)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
+
+## Material owner decision — 2026-09-25, issue #101 host path
+
+The owner selected the [recommended separate software development kit
+(SDK) managed Windows
+session](aegis-setup-package-4a-host-preparation-proposal.md#selected-candidate-and-package-review-2026-09-25-utc)
+for an **offline prototype planning direction**. The question expressly said
+that selection did not authorize SDK installation, code, a host session or a
+provider call. Stage 4A is a proposed synthetic callback implementation;
+Stage 4B is the later actual SDK host proof and comparison. The earlier
+8–16-hour whole-package row cannot cover both. Subtracting corresponding
+low and high estimates from the #265 eleven-row subtotal leaves ten unchanged
+rows: `79 − 8 = 71` and `162 − 16 = 146` active hours. This is a scope split, not completed
+work credit. The proposed 12-hour Stage 4A implementation limit is a ceiling,
+not a remaining-work estimate. Separate estimates require a reviewed lockfile,
+Stage 4A design and Stage 4B host execution scope.
+
+| Current selected component | Active-work estimate | Remaining boundary |
+| --- | ---: | --- |
+| Ten unaffected selected rows from the #265 checkpoint | 71–146 h | Existing dependencies and provisional host uncertainty remain. |
+| Issue #101 Stage 4A: offline callback prototype | TBD; proposed implementation ceiling 12 h | Exact dependency lockfile, synthetic authority contract and reviewed implementation grant remain. |
+| Issue #101 Stage 4B: actual host proof and comparison | TBD | Pinned execution scope, callback-consumption proof, telemetry and a separate grant remain. |
+| BER-BKL-009 host, runtime, privacy and cleanup residual | TBD | Its separate scope and authority gates remain. |
+| **Selected total** | **No finite estimate** | Both issue #101 stages and BER residual remain unestimated. |
+
+Optional issue #101 helpers retain their conditional **16–40 active-hour**
+combined range after a successful Stage 4B comparison and separate grants.
+The seven optional rows were last fully reassessed in the dated #265
+checkpoint below. The paused VirtualBox VM remains outside this SDK route.
 
 ## Material owner decision — 2026-09-24, BER-BKL-009
 
@@ -47,7 +79,8 @@ forward as a forecast for the newly split scope.
 | BER-BKL-009 real-host, runtime, privacy and cleanup residual | TBD pending a named host and separate scope |
 | **Selected total** | **No finite estimate yet** |
 
-Both optional Issue #101 helpers would add 16–40 hours if selected; all other
+This table is the state after the BER decision, before the later issue #101
+host-path choice. Both optional Issue #101 helpers would add 16–40 hours if selected; all other
 optional and strategic work remains outside this selected view. This owner
 decision triggered an early forecast update. The full five-merge reassessment
 is recorded below; the dated #250 checkpoint remains historical.

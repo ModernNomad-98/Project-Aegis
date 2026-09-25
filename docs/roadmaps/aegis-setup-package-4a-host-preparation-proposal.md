@@ -9,17 +9,26 @@ dependency installation, provider connection or measured-savings claim.
 Package 4's earlier **8–16 active-hour** whole-item estimate and this
 preparation packet's **1–2 active-hour** estimate are planning ranges, not
 measured work. The [current backlog forecast](aegis-backlog-forecast.md#start-here--current-reading)
-has a separate selected-work view and no finite total because later BER work
-remains unscoped. Active-only time was not instrumented for this packet.
+has a separate selected-work view and no finite total because later Behavioral
+Eval Runner (BER) work and both package-4 stages remain unestimated. Active-only
+time was not instrumented for this packet.
 
-**Candidate surface, not selected host:** Claude Agent SDK for TypeScript.
-The locally available Claude Code command-line interface (CLI) reports
+**Selected planning direction:** a separate Claude Agent software development
+kit (SDK) managed session on the owner's native Windows host, first exercised
+with synthetic offline
+callbacks. The owner's reply was "your recommendation. do not stop for
+decision, i can always come back and ask. follow my rules" to the question
+that recommended this path and explicitly limited the choice to planning.
+The selected session is a prototype target, not a claim that the current
+command-line interface (CLI), editor or another consumer assistant uses its
+callbacks.
+The locally available Claude Code CLI reports
 `2.1.246` on 2026-09-24, but no SDK package version is pinned or installed by
 this packet. SDK behavior does not prove that the CLI, editor or a consumer's
 existing assistant uses the same hook path. The [source review](../evidence/setup/issue-101-package-4a-host-feasibility.md)
 records the documented interface and its limits.
 
-## Candidate refresh for the next owner decision (2026-09-25 UTC)
+## Selected candidate and package review (2026-09-25 UTC)
 
 The earlier CLI observation is historical, not an SDK dependency pin. Public
 [npm package metadata](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk/v/0.3.281)
@@ -33,8 +42,10 @@ states parity with Claude Code 2.1.281. This verifies a candidate package
 identity, not the installed binary, callback behavior, or compatibility with
 the owner's current CLI/editor. The SDK is governed by
 [Anthropic's commercial terms](https://github.com/anthropics/claude-agent-sdk-typescript/blob/main/LICENSE.md),
-not the MIT license of the separate `@anthropic-ai/sdk` API client. Review the
-exact package contents, transitive licenses and lockfile before any install.
+not the MIT license of the separate `@anthropic-ai/sdk` API client. The package
+review below distinguishes verified archives from the dependency tree that
+still needs a committed, reviewed lockfile. No package has been installed or
+executed.
 
 Evidence checked on 2026-09-25 UTC: `npm.cmd view
 '@anthropic-ai/claude-agent-sdk@0.3.281' version engines license
@@ -45,9 +56,8 @@ and `Python 3.14.7` on the candidate Windows host. The npm license field
 says `SEE LICENSE IN README.md`; the linked upstream license supplies the
 commercial-terms text. These checks do not verify downloaded tarball contents.
 
-The owner has one product-path choice before a scoped implementation grant.
-Decision 1 in the list below records that choice; the later questions depend
-on it:
+The owner selected the first path for planning. The alternatives explain its
+cost and limit for readers making the same choice:
 
 | First host path | Benefit | Cost and limitation |
 | --- | --- | --- |
@@ -55,20 +65,55 @@ on it:
 | Current CLI/editor only | Preserves the existing-assistant experience directly. | No complete fail-closed interception path is established; more host research is needed before code or a credible time estimate. |
 | Keep Aegis-only for now | No new dependency, host setup or provider spend. | Optional routing and any savings remain unavailable and unmeasured. |
 
-Choosing a path selects a planning direction, **not** an SDK installation,
-implementation, host session, provider call or release claim. If the SDK path
-is selected, the proposed first profile is the existing native Windows host
+Choosing this path selects a planning direction, **not** an SDK installation,
+implementation, host session, provider call or release claim. The first
+profile is the existing native Windows host
 with Node 24.19.0, npm 11.17.0 via `npm.cmd`, and Python 3.14.7. These tool
 versions were observed locally; other operating systems remain unverified.
+
+The public `0.3.281` SDK and Windows x64 npm archives passed whole-archive
+SHA-512 checks against their registry integrity fields. The Windows archive
+has a 240,767,648-byte `claude.exe` whose SHA-256 is
+`39be063c2512b43347fe7b0ab18c46f1596141701c9c5fc895ddfca9a051067c`;
+it matches the SDK manifest. The Windows archive integrity is
+`sha512-hbnymWj9O31K0VMd/VOpMTZ0CNT3BkwgGGe84zHdAP6MDxmoZvqyS94UEaLQit3xmozCxfkfGns7/WgWH1Q6Sg==`.
+The SDK and Windows package manifests declare no install scripts or ordinary
+`dependencies` entries. The SDK declares peer ranges for `@anthropic-ai/sdk`,
+`@modelcontextprotocol/sdk` and `zod`, plus exact-version platform packages.
+Compatible current peer candidates are `0.128.0`, `1.30.1` and `4.6.5`;
+these are **examples, not an approved resolved tree**. The Model Context
+Protocol (MCP) peer alone
+declares 16 direct dependencies. A generated exact lockfile must fix every
+resolved package and integrity value; separately inspect each resolved
+manifest/archive for license and lifecycle scripts before install.
+The two inspected archives reference Anthropic commercial terms and include a
+large closed-source binary; the candidate peers declare MIT. npm registry
+signatures were present but were not cryptographically verified. The SDK
+manifest's explicit tested-wrapper list ends at `0.3.280`, so metadata does
+not establish compatibility of wrapper `0.3.281` with its bundled CLI. The
+[package evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md)
+records the checks and their limits.
+
+A temporary, **metadata-only** npm lockfile candidate with exact roots SDK
+`0.3.281`, Anthropic API SDK `0.128.0`, MCP SDK `1.30.1` and Zod `4.6.5`
+resolved 110 dependency entries besides the root record, all with integrity
+values. Their exact registry
+manifests declare no `preinstall`, `install` or `postinstall` scripts; no
+package was installed. This candidate includes `@hono/node-server@2.1.1`,
+which requires Node.js 20 or newer, so the candidate's effective minimum is
+20 even though the top-level SDK metadata says 18. The local Node 24.19.0
+meets that constraint. The candidate lock is not yet a committed dependency
+set or a review of 110 package bodies; Stage 4A still needs that review before
+installation.
 
 For review, a possible **separate Stage 4A-offline grant** would cap work at
 12 active implementation hours, 1,200 added handwritten code/test lines and
 $0 external spend. The 12-hour figure is a **ceiling, not an estimate** or
 time already spent.
-If this split scope is selected, the older 8–16-hour whole-package estimate
-above cannot safely be relied on to cover Stage 4B host proof and comparison.
-Reforecast package 4 as separate 4A and 4B work before implementation; 4B
-remains TBD until its host and execution boundary are approved.
+The selected path splits package 4. The older 8–16-hour whole-package estimate
+cannot safely cover Stage 4A plus Stage 4B. The
+[current forecast](aegis-backlog-forecast.md#material-owner-decision--2026-09-25-issue-101-host-path)
+lists both separately; neither has a defensible remaining-work estimate yet.
 The hypothetical grant would permit only synthetic fixtures and these exact
 candidate paths:
 
@@ -95,23 +140,50 @@ manual-only skills, stale facts, malformed/oversized frames, subprocess
 failure/timeout, and no online fallback. A valid advisory result must still
 pass the host's ordinary permissions; it cannot independently grant a tool
 call. The existing 4,096-byte request and 1,024-byte response limits remain.
-The CI workflow must run the new offline tests on the pinned package.
+The continuous integration (CI) workflow must run the new offline tests on
+the pinned package.
 
-This is **not yet an implementation-ready grant**. The owner must first choose
-the host path, and maintainers must inspect the exact SDK/native tarballs,
-dependencies, license terms, integrity and lockfile, then record authority
-sources for eligibility, catalog/policy versions and destinations. A later
-reviewed approval must make the file list, limits and denial behavior
-effective. Actual SDK callback invocation, dispatch consumption and
-main/subagent token evidence remain Stage 4B host proof.
+For offline tests, a trusted synthetic `AuthoritySnapshot` must supply
+current eligible agent and skill IDs and their flags; mandatory and explicit
+selections; genuine direct manual invocation; catalog and policy versions;
+stage; destination and local-only policy; and the ordinary host permission
+decision. The helper may recommend among those IDs but cannot create or
+modify authority. The bridge must bind its decision to the actual proposed
+tool target, recheck a fresh snapshot before each dispatch, and deny on a
+changed or missing fact. A valid recommendation does not complete a whole
+task's mandatory review plan, so tests must include more than one dispatch.
+For Stage 4A these sources are **injected synthetic fixtures**. The real host
+source, refresh timing and consumption of each fact require Stage 4B proof.
+
+The proposed test matrix includes `Agent`, model `Skill` and direct typed
+`/skill` paths, including a direct command absent from the model skill
+allowlist; unknown tools and IDs; manual-only spoofing; mandatory, explicit,
+read-only and ordinary-permission checks; unsafe destination; stale snapshots;
+malformed, duplicate-key and oversized frames; worker exit, timeout and
+contaminated output; callback exceptions; abstention; and no online fallback.
+The SDK docs distinguish `PreToolUse` from `UserPromptExpansion`, and say that
+the latter covers direct typed commands. `canUseTool` alone is insufficient
+because an earlier permission may skip it. Documented timeout blocking does
+not prove every exception path, so the callback must explicitly catch errors
+and return a denial. The proposed lockfile review must precede any
+`npm ci --ignore-scripts` installation; tests must never start `query()` or a
+Claude process.
+
+This is **not yet an implementation-ready grant**. The host path is selected,
+the two primary archives have been inspected, and a temporary dependency
+resolution has been screened; a committed lockfile and package-body review
+remain. A later reviewed approval must make the exact
+file list, limits and denial behavior effective. Actual SDK callback
+invocation, dispatch consumption and main/subagent token evidence remain
+Stage 4B host proof.
 
 ## Owner decisions needed before code
 
-1. Select the exact host surface: an SDK-managed TypeScript session, its
-   package and bundled CLI versions, operating-system profiles, and whether
-   this qualifies as the user's existing coding assistant for issue #101.
-   Record the exact dependency source, license and lockfile strategy. This
-   repository currently has no Node package manifest or lockfile.
+1. **Planning choice resolved:** use a separate SDK-managed TypeScript
+   session on native Windows as the first offline prototype. SDK `0.3.281`
+   bundles CLI `2.1.281`; this does not qualify the owner's current CLI/editor
+   as a verified supported host. The exact transitive lockfile, license set
+   and executable compatibility are still unverified.
 2. Choose the separate implementation grant's exact files, hours, added-line
    cap and zero or bounded external spend. An offline callback test cannot
    establish actual host interception. Any actual SDK session, model-backed
