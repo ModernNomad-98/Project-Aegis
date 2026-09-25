@@ -145,12 +145,19 @@ Verification: <exact commands + actual results>
 
 - No documentation for the installed version can be located and the changelog
   gap is unbridgeable → stop and present options (upgrade, spike, proceed
-  with declared risk) rather than implementing from memory.
+  with declared risk) rather than implementing from memory. Define a version
+  upgrade and a bounded spike, explain why each could resolve the gap, give
+  case-specific benefits and drawbacks and purchase, setup, and upkeep costs
+  or unknowns, then recommend a route and explain why. Do not code past the
+  unresolved gap while waiting for a required decision.
 - The docs reveal the requested approach is deprecated or unsafe in this
   version → surface before implementing, don't silently substitute.
 - The correct implementation requires a version bump → that is a dependency
   change with its own blast radius; get approval via
   `change-classification-gate`/`human-approval-boundary` rather than bundling it.
+  Explain the current and proposed versions, migration and security reasons,
+  benefits and drawbacks, money/time/maintenance costs, and why the recommended
+  version fits this task before asking for any missing authority.
 - Verification commands fail for pre-existing reasons unrelated to the change
   → report the baseline failure; do not "fix" unrelated tests to get green.
 

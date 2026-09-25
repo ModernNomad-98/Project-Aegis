@@ -50,7 +50,13 @@ exact action and impact so the human can decide in one read.
    work; halt only the uncovered risky step.
 4. **For the uncovered action, compose the approval request** (see Output Format): exact action, why it
    is needed, blast radius, reversibility and rollback, options including
-   do-nothing, and a recommendation.
+   do-nothing, and a recommendation. If this approval also asks the human to
+   choose a build or deployment path, first define unfamiliar terms and explain
+   why each viable path is considered, its benefits, drawbacks, and money,
+   setup-time, and upkeep costs (or unknowns). Recommend the path that fits
+   the known goals and constraints, with a reason. Ask for an essential missing
+   fact first if it would change that recommendation. Keep approval of a single
+   prepared action concise; do not invent a build-path comparison for it.
 5. **For the uncovered action, wait for an explicit answer.** Silence, enthusiasm about the overall task,
    or approval of a DIFFERENT step is not approval of this one.
 6. **Record the approval's scope:** one-time (this action only) or durable
@@ -68,6 +74,8 @@ Boundary:      <which risk class this crosses>
 Why needed:    <one sentence>
 Blast radius:  <systems, environments, tenants, users affected>
 Reversibility: <rollback path, or "irreversible: <what is lost>">
+<Only for a build-path choice: define terms; give each viable path's reason,
+ benefits, drawbacks, and money/setup/upkeep costs or unknowns.>
 Options:
   A. <recommended — and why>
   B. <alternative>
@@ -81,6 +89,8 @@ Awaiting explicit approval — halted until answered.
 - [ ] The request names the exact action, not a vague category.
 - [ ] Reversibility stated honestly, including "irreversible" when true.
 - [ ] Options include do-nothing; a recommendation is given.
+- [ ] A build-path choice explains terms, reasons, trade-offs, costs or unknowns,
+      and a context-based recommendation; a simple action approval stays concise.
 - [ ] Approval scope recorded; nothing outside it executed.
 - [ ] Low-risk work was NOT gated (no approval theater).
 
