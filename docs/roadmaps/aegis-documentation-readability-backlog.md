@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of this named-candidate research update on 2026-09-25 Coordinated Universal Time
+As of this Stage 4B manifest update on 2026-09-25 Coordinated Universal Time
 (UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -11,9 +11,14 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-This updated tree contains **596 tracked Markdown files**: **552
+This updated tree contains **597 tracked Markdown files**: **553
 reader pages** with recorded full-checklist acceptance and **44 synthetic
 fixtures** with classification and integrity checks. The new
+[Stage 4B preflight manifest template](aegis-setup-package-4b-preflight-manifest-template.md)
+adds one reviewed reader page after the 596-page named-candidate checkpoint;
+independent technical and readability reviews accepted it after corrections
+to the preflight/post-run split and approval-bound profile digest.
+The earlier
 [CP-WP-003 named-candidate matrix](cp-wp-003-named-candidate-matrix.md)
 adds one reviewed reader page after the 595-page three-packet checkpoint;
 independent factual and readability reviews accepted its source-backed comparison
