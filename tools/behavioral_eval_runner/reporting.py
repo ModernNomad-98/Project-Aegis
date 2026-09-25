@@ -21,6 +21,7 @@ from .enums import (
     AggregateBlocker,
     AggregateVerdict,
     AttemptState,
+    PreflightOutcome,
     ReasonCode,
     RiskClass,
 )
@@ -269,11 +270,34 @@ def build_run_report(
     _enforce_honesty(attempts_list, aggregates_list)
     coverage.validate()
 
+    selected = set(selected_case_uids)
+    preflights = list(preflight_results)
+    preflight_by_case = {result.case_uid: result for result in preflights}
+    for attempt in attempts_list:
+        if attempt.attempt_state is AttemptState.UNRUN:
+            continue
+        if attempt.case_uid not in selected:
+            raise DishonestReportError(
+                f"executed attempt for {attempt.case_uid} is outside the run selection"
+            )
+        preflight = preflight_by_case.get(attempt.case_uid)
+        if (
+            attempt.attempt_state is AttemptState.ERROR
+            and attempt.error_reason_code is ReasonCode.FIXTURE_SETUP_FAILED
+            and preflight is not None
+            and preflight.outcome is PreflightOutcome.FIXTURE_SETUP_FAILED
+        ):
+            continue
+        if preflight is None or preflight.outcome is not PreflightOutcome.RUNNABLE:
+            raise DishonestReportError(
+                f"executed attempt for {attempt.case_uid} has no RUNNABLE preflight"
+            )
+
     # A3: derive coverage from the records and reject any caller mismatch.
     recomputed = compute_coverage(
         authored_units_total=coverage.authored_units_total,
-        selected_case_uids=selected_case_uids,
-        preflight_results=preflight_results,
+        selected_case_uids=selected,
+        preflight_results=preflights,
         attempts=attempts_list,
         aggregates=aggregates_list,
         assertions_selected_total=assertions_selected_total,

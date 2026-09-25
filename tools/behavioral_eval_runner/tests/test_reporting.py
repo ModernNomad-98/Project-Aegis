@@ -17,7 +17,11 @@ from tools.behavioral_eval_runner.models import (
     CoverageMetrics,
     planned_unrun_attempt,
 )
-from tools.behavioral_eval_runner.preflight import PreflightEnvironment, evaluate_case
+from tools.behavioral_eval_runner.preflight import (
+    PreflightEnvironment,
+    evaluate_case,
+    fixture_setup_failure,
+)
 from tools.behavioral_eval_runner.reporting import (
     build_demonstration_report,
     build_run_report,
@@ -175,6 +179,7 @@ class TestHonestDefaults(unittest.TestCase):
 
     def test_earned_pass_accepted(self) -> None:
         uid = make_case_uid(case_id="earned")
+        preflight = evaluate_case(make_case(case_id="earned"), PreflightEnvironment())
         attempts = [
             AttemptRecord(
                 run_id=RUN,
@@ -202,8 +207,8 @@ class TestHonestDefaults(unittest.TestCase):
         )
         coverage = compute_coverage(
             authored_units_total=1,
-            selected_case_uids=[],
-            preflight_results=[],
+            selected_case_uids=[uid],
+            preflight_results=[preflight],
             attempts=attempts,
             aggregates=[aggregate],
             assertions_selected_total=0,
@@ -218,8 +223,135 @@ class TestHonestDefaults(unittest.TestCase):
             attempts=attempts,
             aggregates=[aggregate],
             coverage=coverage,
+            selected_case_uids=[uid],
+            preflight_results=[preflight],
         )
         self.assertEqual(report["aggregates"][0]["aggregate_verdict"], "PASS")
+        self.assertEqual(report["coverage_metrics"]["attempted_units_total"], 1)
+
+    def test_executed_case_outside_selection_rejected(self) -> None:
+        uid = make_case_uid(case_id="unselected-pass")
+        attempts = [
+            AttemptRecord(
+                run_id=RUN,
+                case_uid=uid,
+                repetition_number=i,
+                attempt_state=AttemptState.PASS,
+            )
+            for i in (1, 2)
+        ]
+        aggregate = AggregateRecord(
+            case_uid=uid,
+            aggregate_verdict=AggregateVerdict.PASS,
+            aggregate_blocker=AggregateBlocker.NONE,
+            derived_from_executed_quorum=True,
+            wins=2,
+            attempts_planned=2,
+            attempts_run=2,
+        )
+        excluded = evaluate_case(
+            make_case(case_id="unselected-pass", required_commands=("vite",)),
+            PreflightEnvironment(),
+        )
+        for selected, preflight, message in (
+            ([], [], "outside the run selection"),
+            ([uid], [], "has no RUNNABLE preflight"),
+            ([uid], [excluded], "has no RUNNABLE preflight"),
+        ):
+            with self.subTest(selected=selected, preflight=preflight):
+                coverage = compute_coverage(
+                    authored_units_total=1,
+                    selected_case_uids=selected,
+                    preflight_results=preflight,
+                    attempts=attempts,
+                    aggregates=[aggregate],
+                    assertions_selected_total=0,
+                    assertions_accounted_total=0,
+                    assertions_actually_graded_total=0,
+                )
+                self.assertEqual(coverage.attempted_units_total, 0)
+                with self.assertRaisesRegex(DishonestReportError, message):
+                    build_run_report(
+                        run_id=RUN,
+                        baseline_identity={},
+                        run_provenance={},
+                        input_evidence_manifest_sha256=None,
+                        attempts=attempts,
+                        aggregates=[aggregate],
+                        coverage=coverage,
+                        selected_case_uids=selected,
+                        preflight_results=preflight,
+                    )
+
+    def test_nonverdict_attempt_requires_matching_preflight(self) -> None:
+        case = make_case(case_id="nonverdict")
+        uid = case.case_uid
+        runnable = evaluate_case(case, PreflightEnvironment())
+        excluded = evaluate_case(
+            make_case(case_id="nonverdict", required_commands=("vite",)),
+            PreflightEnvironment(),
+        )
+        setup_failed = fixture_setup_failure(case, "synthetic setup failure")
+        scenarios = (
+            (AttemptState.ERROR, ReasonCode.AMBIGUOUS_ACTIVATION, [], False, 0),
+            (AttemptState.ERROR, ReasonCode.AMBIGUOUS_ACTIVATION, [excluded], False, 0),
+            (AttemptState.JUDGE_ERROR, None, [], False, 0),
+            (AttemptState.JUDGE_ERROR, None, [excluded], False, 0),
+            (AttemptState.ERROR, ReasonCode.AMBIGUOUS_ACTIVATION, [setup_failed], False, 0),
+            (AttemptState.ERROR, ReasonCode.FIXTURE_SETUP_FAILED, [setup_failed], True, 0),
+            (AttemptState.ERROR, ReasonCode.AMBIGUOUS_ACTIVATION, [runnable], True, 1),
+            (AttemptState.JUDGE_ERROR, None, [runnable], True, 1),
+        )
+        for state, reason, preflight, allowed, attempted_total in scenarios:
+            with self.subTest(state=state, reason=reason, preflight=preflight):
+                attempt = AttemptRecord(
+                    run_id=RUN,
+                    case_uid=uid,
+                    repetition_number=1,
+                    attempt_state=state,
+                    error_reason_code=reason,
+                )
+                aggregate = AggregateRecord(
+                    case_uid=uid,
+                    aggregate_verdict=AggregateVerdict.INCONCLUSIVE,
+                    aggregate_blocker=(
+                        AggregateBlocker.ERROR
+                        if state is AttemptState.ERROR
+                        else AggregateBlocker.JUDGE_ERROR
+                    ),
+                    attempts_planned=1,
+                    attempts_run=1,
+                )
+                coverage = compute_coverage(
+                    authored_units_total=1,
+                    selected_case_uids=[uid],
+                    preflight_results=preflight,
+                    attempts=[attempt],
+                    aggregates=[aggregate],
+                    assertions_selected_total=0,
+                    assertions_accounted_total=0,
+                    assertions_actually_graded_total=0,
+                )
+                self.assertEqual(coverage.attempted_units_total, attempted_total)
+                kwargs = dict(
+                    run_id=RUN,
+                    baseline_identity={},
+                    run_provenance={},
+                    input_evidence_manifest_sha256=None,
+                    attempts=[attempt],
+                    aggregates=[aggregate],
+                    coverage=coverage,
+                    selected_case_uids=[uid],
+                    preflight_results=preflight,
+                )
+                if allowed:
+                    self.assertEqual(
+                        build_run_report(**kwargs)["coverage_metrics"]["attempted_units_total"],
+                        attempted_total,
+                    )
+                else:
+                    with self.assertRaisesRegex(DishonestReportError, "preflight"):
+                        build_run_report(**kwargs)
 
     def test_report_is_deterministically_ordered(self) -> None:
         uids = [make_case_uid(case_id=f"case-{i}") for i in range(5)]
