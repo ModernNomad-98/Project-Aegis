@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-wcag-contract-floor-choice",
+      "type": "should_trigger",
+      "prompt": "Our signed customer contract sets WCAG 2.2 AA as the accessibility floor for this web app. We have no audit quote yet. Should the testing harness target WCAG 2.1 AA, 2.2 AA, or 2.2 AAA? Teach me the trade-offs and recommend a target before asking me to choose.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains WCAG version and conformance level in plain language, names the supplied 2.2 AA contractual floor, and does not offer 2.1 AA as a viable way to satisfy it.",
+          "For each viable target, explains why it is considered, its benefit and drawback, coverage gained or missed, audit/remediation money cost or an explicit unknown pending quotes, setup time and continuing upkeep.",
+          "Recommends the least burdensome target that meets the stated obligation unless product needs justify more, explains why and what requirement could change that recommendation, then asks one version-and-level owner decision question.",
+          "Does not imply an automated green scan alone establishes WCAG conformance or removes manual keyboard and screen-reader checks."
+        ]
+      }
+    },
+    {
       "id": "negative-general-walkthrough",
       "type": "should_not_trigger",
       "prompt": "Click through the whole app and report anything broken before the demo.",

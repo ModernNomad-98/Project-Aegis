@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-product-race-remedy-choice",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke flaky-test-detective. The checkout test fails 8 of 50 parallel runs because two close submissions create two orders in product code. We release in two days. The owner asks: fix the race before release, or quarantine the honest test for seven days under our owner/ticket/expiry policy? Explain the choice before asking me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the product-side race and time-limited test quarantine in plain language; states quarantine neither fixes the double-order bug nor proves a release safe.",
+          "Compares the viable paths by why each is considered, benefit, drawback, test coverage and customer risk, plus money, setup time and continuing upkeep or explicitly unknown costs.",
+          "Recommends routing the demonstrated product race for a scoped fix before release, explains why and what missing constraint could change timing, then asks one owner decision question without editing product code.",
+          "Does not offer retries, sleeps, weakened assertions, or deletion as a cure; any quarantine retains its owner, ticket and expiry."
+        ]
+      }
+    },
+    {
       "id": "negative-consistent-failure",
       "type": "should_not_trigger",
       "prompt": "This test fails on every single run since yesterday's merge — debug it.",
