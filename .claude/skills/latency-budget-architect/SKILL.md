@@ -130,7 +130,16 @@ authorize execution.
    review: from headroom (path owner signs), from another hop
    (that owner signs), or the end-to-end target is renegotiated
    (`slo-reliability-architect` loop). Unclaimed spend is how 300ms
-   paths become 700ms paths one PR at a time.
+   paths become 700ms paths one PR at a time. If the owner must choose a
+   claim path, define headroom as reserved time, reallocation as moving
+   a named hop's allowance with its owner's agreement, and renegotiation
+   as changing the user-facing target through the SLO owner. Compare
+   only viable paths against measured latency and the 15% to 25% reserve:
+   why each fits, user and hop effects, delivery time, money and upkeep
+   costs or unknowns, and benefits and drawbacks. Recommend the path that
+   keeps the target and reserve credible, explain why and what evidence
+   could change it, then ask one decision question. Do not silently
+   consume headroom, rewrite another hop, or change the SLO here.
 9. **Deliver** in the Output Format: the budget table whose
    arithmetic closes, timeout/retry derivations, attribution design,
    and the review rule — with per-hop owners named.
@@ -160,6 +169,9 @@ Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
               pre-release check → performance-test-harness>
 Review rule: new dependency on this path claims budget (headroom | reallocation | renegotiate SLO)
+Owner claim choice (only if needed): <terms; viable paths and reasons;
+  user/hop effects, pros/cons, time/money/upkeep or unknowns;
+  recommendation and why; one decision question; owners still sign>
 Reduction work routed: <hop over budget today → owning skill (query-plan-reader | caching-strategy-designer | frontend-perf-engineer | ...)>
 ```
 
@@ -183,6 +195,9 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
 - [ ] Every hop has an owner; hops over budget today have their
       reduction work ROUTED, not absorbed into this design.
 - [ ] The budget-claim review rule is stated.
+- [ ] Any owner-facing claim choice explains terms, effects, costs or
+      unknowns, pros/cons, and a reasoned recommendation before one
+      question; no budget or SLO changes silently.
 
 ## Gotchas
 
