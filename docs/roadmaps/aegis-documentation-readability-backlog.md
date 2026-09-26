@@ -19,13 +19,12 @@ first-use terminology correction. This count and review do not approve its
 implementation, private labels, a host probe or provider use.
 
 This branch adds the [protected-file guard decision packet](gate-guard-friction-decision.md),
-bringing the candidate tree to **603 Markdown files: 558 accepted reader pages,
-one pending reader page and 44 classified synthetic fixtures**. The packet's
-technical review accepted its narrowed four-file BER proposal; independent
-full-page readability and ledger review remain pending. Acceptance would make
-the candidate **559 accepted reader pages plus 44 fixtures, with zero known
-pending pages**. Neither technical review nor merging the packet selects an
-option or creates a standing exception. Its recommended option preserves
+bringing the unmerged candidate tree to **603 Markdown files: 559 accepted reader
+pages and 44 classified synthetic fixtures, with zero known pending pages**.
+Independent technical, full-page readability and ledger review accepted the
+packet and this ledger after corrections to the four-file scope and first-use
+terminology. The packet remains a proposal: neither review nor merging it
+selects an option or creates a standing exception. Its recommended option preserves
 separate owner decisions for all other protected paths and work-package rules.
 
 Merged PR #329 established 601 Markdown files: 557 accepted reader pages and
