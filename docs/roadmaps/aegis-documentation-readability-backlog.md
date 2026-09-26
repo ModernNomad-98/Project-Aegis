@@ -2,8 +2,8 @@
 
 ## Start here — current reading
 
-As of this CP public contract inspection update on 2026-09-25 Coordinated Universal Time
-(UTC), this remains the active
+As of the routing request-binding proposal update on 2026-09-25 Coordinated
+Universal Time (UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -11,9 +11,15 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-This candidate tree contains **598 Markdown files**: **554 accepted reader pages**
-and **44 synthetic fixtures**, with zero known pending pages. Independent factual
-and full-page readability reviews accepted the new [CP-WP-003 DynamoDB public
+This candidate tree contains **599 Markdown files**: **555 accepted reader pages**
+and **44 synthetic fixtures**, with zero known pending pages. An independent
+technical and full-page readability review accepted the new [routing
+request-binding proposal](aegis-setup-routing-request-binding-proposal.md),
+including its choice guidance, exact scope, first-use terms and links. It is a
+proposal only; its new page adds no implementation or host authority. The
+previous merged tree contained **598 Markdown files**: **554 accepted reader
+pages** and **44 synthetic fixtures**. Independent factual
+and full-page readability reviews accepted the [CP-WP-003 DynamoDB public
 contract inspection](cp-wp-003-dynamodb-public-contract-inspection.md) after
 corrections to table-incarnation identity, source-head hashes, missing-event
 reconciliation, first-use terms and the packet's completed-versus-future step.
