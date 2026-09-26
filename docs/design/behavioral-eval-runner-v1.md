@@ -370,6 +370,29 @@ committed). The census is **evidence for the design, not an eval result**.
 | `trigger-evals.json` with `overlaps_with` | 181 (100%) |
 | Structural/parse outliers | **0** (validator guarantees parse) |
 
+> **Corpus state after 2026-09-26 maintenance.** The table above and the outlier list
+> below are the design-time census at `e2f1da0`; they stay as historical evidence. An
+> in-memory run of the shipped census generator over main `4074d49` (after #363), plus the
+> aegis-setup `phrase-without-invocation` case added with this note, reads: **185** shipped
+> skills; **988** `evals.json` behavior cases (should_trigger 784 · should_not_trigger
+> 204 · should_not_do 0); **183** `trigger-evals.json` files with **873** discrimination
+> cases; **1,861** authored single-prompt cases; **0** MANUAL-ONLY positive cases whose prompt
+> neither names nor invokes the skill; **0** author-facing findings and **0**
+> unjudgeable-as-written candidates. Merged PRs
+> [#358](https://github.com/ModernNomad-98/Project-Aegis/pull/358) and
+> [#360](https://github.com/ModernNomad-98/Project-Aegis/pull/360) named the skill in
+> MANUAL-ONLY eval prompts; [#359](https://github.com/ModernNomad-98/Project-Aegis/pull/359)
+> and [#361](https://github.com/ModernNomad-98/Project-Aegis/pull/361) reshaped and named
+> the aegis-setup evals; [#362](https://github.com/ModernNomad-98/Project-Aegis/pull/362)
+> added the 183rd trigger-evals file (ai-closeout-reporter); and
+> [#363](https://github.com/ModernNomad-98/Project-Aegis/pull/363) retyped the two
+> `should_not_do` cases to `should_trigger`, filled the three empty `should_not_trigger`
+> lists and reworded the one unjudgeable-as-written `adr-writer` assertion, so outliers 1
+> and 2 below are now historical. The
+> [committed census](../../artifacts/evidence/behavioral-eval-runner-wp-2b-1-census.json)
+> remains the regenerable machine record (backlog item BER-BKL-008, the machine-generated
+> corpus census); these figures are static inventory, not behavioral results.
+
 **Four distinct quantities (arithmetic + runnability reconciliation).** Earlier drafts
 conflated "counted" with "runnable"; the corrected accounting names four quantities and
 never assumes the last equals the third:

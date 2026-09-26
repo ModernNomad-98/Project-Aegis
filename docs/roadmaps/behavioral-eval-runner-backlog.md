@@ -1215,6 +1215,9 @@ operator controls are evidenced. The 2026-09-23 checkpoint above is historical.
 - **Why it matters:** This phase makes the 1,740 authored single-prompt cases executable
   as designed — honestly: runnable units are the per-run preflight output, never an
   assumed 1,740, and every exclusion carries a reason code and an author-facing finding.
+  The 1,740 figure is the design-time count at `e2f1da0`; the
+  [design §3 corpus-state note](../design/behavioral-eval-runner-v1.md#3-repository--eval-corpus-census-deterministic)
+  records the 2026-09-26 count.
 - **Receives generic breadth deferred by the WP-2B-2 fast track (BER-DEC-007):** generic
   deterministic grader mappings for the complete authored corpus; generic semantic rubric
   mappings; generic corpus judge configuration; generic activation-observer breadth; generic
