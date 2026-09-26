@@ -12,7 +12,7 @@
   "cases": [
     {
       "id": "pipeline-design-wins-here",
-      "prompt": "Design our CI/CD: what runs on PR vs merge vs nightly, how secrets reach deploy jobs, and where production approval sits.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Design our CI/CD: what runs on PR vs merge vs nightly, how secrets reach deploy jobs, and where production approval sits.",
       "expected_skill": "ci-pipeline-architect",
       "should_not_trigger": [
         "qa-automation-architect",
@@ -49,7 +49,7 @@
     },
     {
       "id": "bundle-secret-proof-goes-to-vite-build-qa",
-      "prompt": "Verify our production Vite build doesn't leak any VITE_ secrets into the dist bundle before we wire it as a CI gate.",
+      "prompt": "Explicitly invoke vite-build-qa-engineer. Verify our production Vite build doesn't leak any VITE_ secrets into the dist bundle before we wire it as a CI gate.",
       "expected_skill": "vite-build-qa-engineer",
       "should_not_trigger": [
         "ci-pipeline-architect"

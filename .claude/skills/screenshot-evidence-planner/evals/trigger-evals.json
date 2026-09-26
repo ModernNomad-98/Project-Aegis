@@ -12,7 +12,7 @@
     },
     {
       "id": "capture-session-goes-to-clickthrough",
-      "prompt": "Run through the app and capture the evidence screenshots for this release candidate.",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Run through the app and capture the evidence screenshots for this release candidate.",
       "expected_skill": "clickthrough-test-engineer",
       "should_not_trigger": ["screenshot-evidence-planner"],
       "reason": "Driving the app and capturing is a session; the planner defines what that session must capture."

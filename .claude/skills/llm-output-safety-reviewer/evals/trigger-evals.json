@@ -19,7 +19,7 @@
     },
     {
       "id": "injection-source-goes-to-injection-defender",
-      "prompt": "Stop attackers from manipulating what our model produces by hiding instructions in the documents it reads.",
+      "prompt": "Explicitly invoke prompt-injection-defender. Stop attackers from manipulating what our model produces by hiding instructions in the documents it reads.",
       "expected_skill": "prompt-injection-defender",
       "should_not_trigger": ["llm-output-safety-reviewer"],
       "reason": "Preventing the manipulation of the model is prompt-injection-defender (input side); this skill assumes output may be adversarial and secures the consuming sinks."

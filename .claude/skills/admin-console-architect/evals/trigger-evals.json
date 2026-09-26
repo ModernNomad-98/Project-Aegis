@@ -26,14 +26,14 @@
     },
     {
       "id": "telemetry-goes-to-observability-operator",
-      "prompt": "Instrument the platform and build the operator dashboards: metrics, traces, logs, and health views so ops can SEE what the system is doing.",
+      "prompt": "Explicitly invoke observability-operator. Instrument the platform and build the operator dashboards: metrics, traces, logs, and health views so ops can SEE what the system is doing.",
       "expected_skill": "observability-operator",
       "should_not_trigger": ["admin-console-architect"],
       "reason": "Telemetry and dashboards to SEE system state are observability-operator. The admin console is the ACTION surface; it may embed telemetry, but seeing is not acting."
     },
     {
       "id": "agent-authority-goes-to-agent-authorization-matrix",
-      "prompt": "Define what our AI agents are allowed to do in the SDLC — which can merge, deploy, or change settings, and where a human must approve — the standing authority matrix for agents vs humans.",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Define what our AI agents are allowed to do in the SDLC — which can merge, deploy, or change settings, and where a human must approve — the standing authority matrix for agents vs humans.",
       "expected_skill": "agent-authorization-matrix",
       "should_not_trigger": ["admin-console-architect"],
       "reason": "The standing authority of AI agents (merge/deploy/settings, human-approval gates) is agent-authorization-matrix. This console is for HUMAN operators; an agent must not be handed a human break-glass path."

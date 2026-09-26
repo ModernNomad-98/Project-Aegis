@@ -12,7 +12,7 @@
     },
     {
       "id": "memory-store-goes-to-memory-governance",
-      "prompt": "Audit the agent's persistent memory directory — which remembered facts are stale, what should never have been stored, and what are the write rules going forward?",
+      "prompt": "Explicitly invoke agent-memory-governance. Audit the agent's persistent memory directory — which remembered facts are stale, what should never have been stored, and what are the write rules going forward?",
       "expected_skill": "agent-memory-governance",
       "should_not_trigger": ["chat-backlog-reconciliation"],
       "reason": "Curating a persistent agent-memory store is agent-memory-governance; chat-backlog-reconciliation's subject is conversation history and its output is tracked repo docs."

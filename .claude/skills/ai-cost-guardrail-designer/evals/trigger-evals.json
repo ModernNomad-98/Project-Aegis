@@ -26,21 +26,21 @@
     },
     {
       "id": "alert-implementation-goes-to-observability-operator",
-      "prompt": "Implement the actual burn-rate alert rules and the cost dashboard for our AI spend in Grafana.",
+      "prompt": "Explicitly invoke observability-operator. Implement the actual burn-rate alert rules and the cost dashboard for our AI spend in Grafana.",
       "expected_skill": "observability-operator",
       "should_not_trigger": ["ai-cost-guardrail-designer"],
       "reason": "Hands-on alert/dashboard implementation is observability-operator; this skill specifies what to meter and alert on, and hands the spec over."
     },
     {
       "id": "routing-logic-goes-to-router-architect",
-      "prompt": "Design the model routing and provider fallback logic — which model handles which request and what happens when a provider is down.",
+      "prompt": "Explicitly invoke ai-router-architect. Design the model routing and provider fallback logic — which model handles which request and what happens when a provider is down.",
       "expected_skill": "ai-router-architect",
       "should_not_trigger": ["ai-cost-guardrail-designer"],
       "reason": "Routing/fallback provider logic is ai-router-architect; this skill sets the budget and model-tier intent the router enforces, not the routing implementation."
     },
     {
       "id": "key-custody-goes-to-secrets-identity-hardener",
-      "prompt": "Our LLM provider API key got committed to a public repo. Rotate it, move it out of the client bundle into a secret store, and lock down where it's read from.",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Our LLM provider API key got committed to a public repo. Rotate it, move it out of the client bundle into a secret store, and lock down where it's read from.",
       "expected_skill": "secrets-identity-hardener",
       "should_not_trigger": ["ai-cost-guardrail-designer"],
       "reason": "Key custody, rotation, storage, and client-bundle exposure are secrets-identity-hardener; ai-cost-guardrail-designer composes it and owns only the AI-spend blast radius and per-model invocation restriction of a leaked key, not the custody mechanics."

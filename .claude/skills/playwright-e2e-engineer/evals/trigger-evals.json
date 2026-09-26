@@ -5,14 +5,14 @@
   "cases": [
     {
       "id": "scripted-journey-wins-here",
-      "prompt": "Automate the checkout journey in a real browser as a permanent regression test with traces on failure.",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Automate the checkout journey in a real browser as a permanent regression test with traces on failure.",
       "expected_skill": "playwright-e2e-engineer",
       "should_not_trigger": ["clickthrough-test-engineer", "integration-test-designer"],
       "reason": "A permanent scripted browser test for a critical journey is exactly E2E engineering — not a one-off walkthrough, not a no-browser boundary test."
     },
     {
       "id": "one-off-walkthrough-goes-to-clickthrough",
-      "prompt": "Before the demo tomorrow, click through the whole app once and tell me what's broken.",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Before the demo tomorrow, click through the whole app once and tell me what's broken.",
       "expected_skill": "clickthrough-test-engineer",
       "should_not_trigger": ["playwright-e2e-engineer"],
       "reason": "A one-time interactive walkthrough with observations is clickthrough testing; building permanent specs for it would be the wrong deliverable."

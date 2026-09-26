@@ -5,14 +5,14 @@
   "cases": [
     {
       "id": "explicit-setup",
-      "prompt": "Help me set up Aegis",
+      "prompt": "Explicitly invoke aegis-setup. Help me set up Aegis",
       "expected_skill": "aegis-setup",
       "should_not_trigger": ["project-orchestrator"],
       "reason": "On a host that treats the explicit setup phrase as a deliberate manual invocation (SKILL.md Use When), it routes here and is not lifecycle navigation; the host that cannot establish that invocation is modeled by evals.json phrase-without-invocation."
     },
     {
       "id": "explicit-change",
-      "prompt": "Help me change my Aegis setup",
+      "prompt": "Explicitly invoke aegis-setup. Help me change my Aegis setup",
       "expected_skill": "aegis-setup",
       "should_not_trigger": ["project-orchestrator"],
       "reason": "The explicit change phrase is the deliberate manual invocation for reviewing or changing the saved setup; it is not lifecycle navigation."

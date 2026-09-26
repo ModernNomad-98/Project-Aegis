@@ -12,7 +12,7 @@
     },
     {
       "id": "custody-goes-to-hardener",
-      "prompt": "Our agent's API keys are in a client-visible env var and haven't been rotated in a year — fix the secret handling.",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Our agent's API keys are in a client-visible env var and haven't been rotated in a year — fix the secret handling.",
       "expected_skill": "secrets-identity-hardener",
       "should_not_trigger": ["agent-identity-privilege-reviewer"],
       "reason": "Exposure, storage, and rotation of secret material is credential custody (the manual-only fixer); the identity reviewer decides what identities/scopes should exist."
@@ -26,7 +26,7 @@
     },
     {
       "id": "sdlc-authority-goes-to-authz-matrix",
-      "prompt": "Define what our coding agent may commit, merge, or deploy on its own versus what always needs a named human.",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Define what our coding agent may commit, merge, or deploy on its own versus what always needs a named human.",
       "expected_skill": "agent-authorization-matrix",
       "should_not_trigger": ["agent-identity-privilege-reviewer"],
       "reason": "Standing agent-vs-human authority over SDLC actions (merge/deploy/auto-merge) is the Phase 1.5 governance matrix; ASI03 reviews runtime agent identities and privilege paths in the product system."

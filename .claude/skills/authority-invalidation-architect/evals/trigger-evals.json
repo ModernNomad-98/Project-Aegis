@@ -86,7 +86,7 @@
     },
     {
       "id": "leaked-credential-goes-to-secrets-identity-hardener",
-      "prompt": "We found our service key committed to the repo. Rotate it, move our secrets out of source, and fix which env vars reach the client bundle.",
+      "prompt": "Explicitly invoke secrets-identity-hardener. We found our service key committed to the repo. Rotate it, move our secrets out of source, and fix which env vars reach the client bundle.",
       "expected_skill": "secrets-identity-hardener",
       "should_not_trigger": [
         "authority-invalidation-architect"

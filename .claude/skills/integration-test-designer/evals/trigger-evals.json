@@ -12,14 +12,14 @@
     },
     {
       "id": "isolated-units-go-to-vitest",
-      "prompt": "Test the invoice total calculation and rounding rules as pure functions.",
+      "prompt": "Explicitly invoke vitest-unit-component-engineer. Test the invoice total calculation and rounding rules as pure functions.",
       "expected_skill": "vitest-unit-component-engineer",
       "should_not_trigger": ["integration-test-designer"],
       "reason": "Pure logic with no real boundary belongs at the unit layer; dragging it through a DB wastes cost for no signal."
     },
     {
       "id": "browser-journey-goes-to-playwright",
-      "prompt": "Verify a user can log in, create an invoice in the UI, and see it in the list — full stack in a real browser.",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Verify a user can log in, create an invoice in the UI, and see it in the list — full stack in a real browser.",
       "expected_skill": "playwright-e2e-engineer",
       "should_not_trigger": ["integration-test-designer"],
       "reason": "A full-stack browser journey is E2E; integration explicitly excludes the browser."

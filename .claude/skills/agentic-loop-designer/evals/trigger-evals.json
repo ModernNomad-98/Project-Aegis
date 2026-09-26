@@ -28,7 +28,7 @@
     },
     {
       "id": "broken-state-goes-to-agent-failure-recovery",
-      "prompt": "An agent run died mid-rebase and left the tree conflicted with a half-applied commit — get the working state back without losing work.",
+      "prompt": "Explicitly invoke agent-failure-recovery. An agent run died mid-rebase and left the tree conflicted with a half-applied commit — get the working state back without losing work.",
       "expected_skill": "agent-failure-recovery",
       "should_not_trigger": ["agentic-loop-designer"],
       "reason": "Recovering a broken working state is agent-failure-recovery (manual-only). agentic-loop-designer designs the loop structure — checkpoints, typed failures, resumable state — that such recovery plugs into; it does not perform recovery."
@@ -51,7 +51,7 @@
     },
     {
       "id": "manipulation-review-goes-to-goal-hijack-defender",
-      "prompt": "Review our agent's multi-step runs for manipulation: can a poisoned tool output or injected document substitute the objective or expand the scope mid-loop?",
+      "prompt": "Explicitly invoke agent-goal-hijack-defender. Review our agent's multi-step runs for manipulation: can a poisoned tool output or injected document substitute the objective or expand the scope mid-loop?",
       "expected_skill": "agent-goal-hijack-defender",
       "should_not_trigger": ["agentic-loop-designer"],
       "note": "DESIGN-vs-REVIEW SEAM (mandatory) — this is the attack review of loop/goal manipulation: agent-goal-hijack-defender owns the goal/plan layer, ai-threat-modeler the broader adversarial map. agentic-loop-designer PRODUCES the loop those skills review; it never runs the manipulation audit.",

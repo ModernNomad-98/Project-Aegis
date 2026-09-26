@@ -26,7 +26,7 @@
     },
     {
       "id": "inference-injection-goes-to-injection-defender",
-      "prompt": "A retrieved document contains instructions that hijacked our agent at answer time — stop that.",
+      "prompt": "Explicitly invoke prompt-injection-defender. A retrieved document contains instructions that hijacked our agent at answer time — stop that.",
       "expected_skill": "prompt-injection-defender",
       "should_not_trigger": ["model-poisoning-reviewer"],
       "reason": "Content acting as instructions at inference is prompt-injection-defender (LLM01); this skill covers content being indexed/trained as ground truth (integrity), not the injection vector."

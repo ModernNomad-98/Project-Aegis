@@ -12,7 +12,7 @@
     },
     {
       "id": "standing-authority-goes-to-authorization-matrix",
-      "prompt": "Define which actions our AI agents may take autonomously versus which always need a named human — merging to protected branches, deploys, arming auto-merge.",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Define which actions our AI agents may take autonomously versus which always need a named human — merging to protected branches, deploys, arming auto-merge.",
       "expected_skill": "agent-authorization-matrix",
       "should_not_trigger": ["agent-tool-safety-guard"],
       "reason": "Standing SDLC authority (what an agent may ever do autonomously, who merges) is agent-authorization-matrix; agent-tool-safety-guard scopes the runtime tools of a product agent."

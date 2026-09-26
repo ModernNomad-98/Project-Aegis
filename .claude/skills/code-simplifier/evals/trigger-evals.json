@@ -5,7 +5,7 @@
   "cases": [
     {
       "id": "apply-cleanup-wins-here",
-      "prompt": "Please de-tangle the checkout controller — flatten the nesting and kill the dead branches, behavior identical.",
+      "prompt": "Explicitly invoke code-simplifier. Please de-tangle the checkout controller — flatten the nesting and kill the dead branches, behavior identical.",
       "expected_skill": "code-simplifier",
       "should_not_trigger": ["code-reviewer"],
       "reason": "Explicit request to APPLY behavior-preserving edits to a named target — the side-effecting simplification job."

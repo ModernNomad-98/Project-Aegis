@@ -5,7 +5,7 @@
   "cases": [
     {
       "id": "interactive-walkthrough-wins-here",
-      "prompt": "Drive through every screen of the demo build today and report broken pages with screenshots.",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Drive through every screen of the demo build today and report broken pages with screenshots.",
       "expected_skill": "clickthrough-test-engineer",
       "should_not_trigger": ["playwright-e2e-engineer", "manual-test-case-creator"],
       "reason": "A one-session interactive drive with observations and evidence is a clickthrough — no permanent specs, no reusable case documents requested."

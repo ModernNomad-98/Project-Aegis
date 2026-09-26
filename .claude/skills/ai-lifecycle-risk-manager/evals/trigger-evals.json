@@ -33,7 +33,7 @@
     },
     {
       "id": "eval-execution-goes-to-harness",
-      "prompt": "Build and run the eval suite with safety and grounding thresholds gating our releases.",
+      "prompt": "Explicitly invoke ai-evaluation-harness. Build and run the eval suite with safety and grounding thresholds gating our releases.",
       "expected_skill": "ai-evaluation-harness",
       "should_not_trigger": ["ai-lifecycle-risk-manager"],
       "reason": "Designing/running evals is the manual-only harness; the program only wires its thresholds into MEASURE."

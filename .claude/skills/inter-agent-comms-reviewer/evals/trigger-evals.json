@@ -26,7 +26,7 @@
     },
     {
       "id": "in-context-instructions-go-to-injection-defender",
-      "prompt": "Hidden instructions inside a document our agent read made it change behavior — build the defense for untrusted content in context.",
+      "prompt": "Explicitly invoke prompt-injection-defender. Hidden instructions inside a document our agent read made it change behavior — build the defense for untrusted content in context.",
       "expected_skill": "prompt-injection-defender",
       "should_not_trigger": ["inter-agent-comms-reviewer"],
       "reason": "Content already in the model context is LLM01 injection defense; the comms reviewer secures the transport and receiver handling of peer messages before/as they arrive."

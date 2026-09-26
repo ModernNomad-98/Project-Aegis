@@ -50,7 +50,7 @@
     },
     {
       "id": "pipeline-goes-to-ci-pipeline-architect",
-      "prompt": "Design our CI delivery pipeline end to end — the stage graph, merge-blocking rules, secret governance, and deploy gates.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Design our CI delivery pipeline end to end — the stage graph, merge-blocking rules, secret governance, and deploy gates.",
       "expected_skill": "ci-pipeline-architect",
       "should_not_trigger": ["security-scan-orchestrator"],
       "reason": "Designing the delivery pipeline is ci-pipeline-architect. security-scan-orchestrator produces the scan/report contract that a pipeline's security stage runs; it does not design the pipeline."

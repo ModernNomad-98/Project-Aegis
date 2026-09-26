@@ -26,14 +26,14 @@
     },
     {
       "id": "attacker-redirection-goes-to-goal-hijack",
-      "prompt": "Attackers are redirecting what our agent works on via content it ingests — keep its objective from being altered.",
+      "prompt": "Explicitly invoke agent-goal-hijack-defender. Attackers are redirecting what our agent works on via content it ingests — keep its objective from being altered.",
       "expected_skill": "agent-goal-hijack-defender",
       "should_not_trigger": ["agent-containment-reviewer"],
       "reason": "Adversary-directed objective alteration is ASI01; containment's ASI10 half covers deviation without active attacker control, plus the detection/kill machinery either case needs."
     },
     {
       "id": "alert-implementation-goes-to-observability",
-      "prompt": "Wire up the dashboards and alert rules for our agents' error rates and latency in our monitoring stack.",
+      "prompt": "Explicitly invoke observability-operator. Wire up the dashboards and alert rules for our agents' error rates and latency in our monitoring stack.",
       "expected_skill": "observability-operator",
       "should_not_trigger": ["agent-containment-reviewer"],
       "reason": "Hands-on implementation of alerts/dashboards is the observability operator (manual-only); containment defines WHAT baselines and drift signals must exist and hands the wiring over."

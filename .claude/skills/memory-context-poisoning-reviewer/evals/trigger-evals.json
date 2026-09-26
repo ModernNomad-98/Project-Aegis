@@ -26,21 +26,21 @@
     },
     {
       "id": "in-context-payload-goes-to-injection-defender",
-      "prompt": "A document our agent read this session contained hidden instructions and it followed them immediately — design the defense.",
+      "prompt": "Explicitly invoke prompt-injection-defender. A document our agent read this session contained hidden instructions and it followed them immediately — design the defense.",
       "expected_skill": "prompt-injection-defender",
       "should_not_trigger": ["memory-context-poisoning-reviewer"],
       "reason": "A payload acting within the current context window is LLM01 injection; ASI06 begins when the payload PERSISTS into stored memory and fires in later sessions."
     },
     {
       "id": "dev-agent-memory-goes-to-governance",
-      "prompt": "Define when our coding agent may update its own persistent MEMORY.md files and how remembered repo facts get verified before use.",
+      "prompt": "Explicitly invoke agent-memory-governance. Define when our coding agent may update its own persistent MEMORY.md files and how remembered repo facts get verified before use.",
       "expected_skill": "agent-memory-governance",
       "should_not_trigger": ["memory-context-poisoning-reviewer"],
       "reason": "The development agent's own memory-file write/trust/hygiene discipline is Phase 1.5 operational governance; ASI06 is a security review of a product agent's memory subsystem against attackers."
     },
     {
       "id": "run-level-objective-goes-to-goal-hijack",
-      "prompt": "Mid-run, content our agent read changed what it was trying to accomplish — keep its objective pinned for the rest of the run.",
+      "prompt": "Explicitly invoke agent-goal-hijack-defender. Mid-run, content our agent read changed what it was trying to accomplish — keep its objective pinned for the rest of the run.",
       "expected_skill": "agent-goal-hijack-defender",
       "should_not_trigger": ["memory-context-poisoning-reviewer"],
       "reason": "Run-level goal/plan integrity is ASI01; the memory reviewer owns the persistent store a hijack might write to, not the live run's objective."

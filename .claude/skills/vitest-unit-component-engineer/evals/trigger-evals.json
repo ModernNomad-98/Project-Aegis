@@ -10,7 +10,7 @@
   "cases": [
     {
       "id": "isolated-unit-wins-here",
-      "prompt": "Write Vitest tests for the discount-calculation functions and the PricingBadge component in isolation.",
+      "prompt": "Explicitly invoke vitest-unit-component-engineer. Write Vitest tests for the discount-calculation functions and the PricingBadge component in isolation.",
       "expected_skill": "vitest-unit-component-engineer",
       "should_not_trigger": [
         "integration-test-designer",
@@ -30,7 +30,7 @@
     },
     {
       "id": "browser-journey-goes-to-playwright",
-      "prompt": "Automate the signup-to-first-project journey in a real browser.",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Automate the signup-to-first-project journey in a real browser.",
       "expected_skill": "playwright-e2e-engineer",
       "should_not_trigger": [
         "vitest-unit-component-engineer"

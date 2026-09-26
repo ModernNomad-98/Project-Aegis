@@ -10,7 +10,7 @@
   "cases": [
     {
       "id": "hands-on-wiring-wins-here",
-      "prompt": "Add tracing across the payment path, fix the readiness probe that always returns 200, and wire the new latency dashboard with its alert.",
+      "prompt": "Explicitly invoke observability-operator. Add tracing across the payment path, fix the readiness probe that always returns 200, and wire the new latency dashboard with its alert.",
       "expected_skill": "observability-operator",
       "should_not_trigger": [
         "slo-reliability-architect",

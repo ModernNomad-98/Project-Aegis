@@ -26,7 +26,7 @@
     },
     {
       "id": "alert-config-implementation-goes-to-observability-operator",
-      "prompt": "Here's the approved alerting spec — create the alert rules and dashboards in the monitoring stack and verify they fire.",
+      "prompt": "Explicitly invoke observability-operator. Here's the approved alerting spec — create the alert rules and dashboards in the monitoring stack and verify they fire.",
       "expected_skill": "observability-operator",
       "should_not_trigger": ["security-logging-alerting-architect"],
       "reason": "Editing live alert/dashboard config and verifying telemetry is observability-operator (manual-only). This skill produces the spec being implemented and changes nothing itself."

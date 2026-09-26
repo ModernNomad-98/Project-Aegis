@@ -17,7 +17,7 @@
     },
     {
       "id": "telemetry-implementation-goes-to-observability-operator",
-      "prompt": "Wire up the alerts: page when pipeline job duration exceeds an hour, dashboard the consumer lag, and add a health check for the transform service.",
+      "prompt": "Explicitly invoke observability-operator. Wire up the alerts: page when pipeline job duration exceeds an hour, dashboard the consumer lag, and add a health check for the transform service.",
       "expected_skill": "observability-operator",
       "should_not_trigger": ["data-quality-monitor-designer"],
       "note": "SEAM CASE — job duration, lag, and health checks are SYSTEM signals, and the verbs are implementation (wire, dashboard, add). Even for a check this skill designed, the alert-platform wiring is observability-operator's manual-invocation surface.",

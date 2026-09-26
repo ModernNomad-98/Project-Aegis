@@ -12,7 +12,7 @@
     },
     {
       "id": "gate-design-goes-to-pipeline-architect",
-      "prompt": "Add a release-readiness stage to our pipeline so every production deploy requires these checks automatically.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Add a release-readiness stage to our pipeline so every production deploy requires these checks automatically.",
       "expected_skill": "ci-pipeline-architect",
       "should_not_trigger": ["release-readiness-reviewer"],
       "reason": "Building the standing gate into the pipeline is pipeline architecture; this skill is the per-release procedure that gate invokes."

@@ -19,14 +19,14 @@
     },
     {
       "id": "standing-loop-design-goes-to-standing-approval",
-      "prompt": "Design a standing approval so the agent stops re-asking for every push and PR inside an approved phase, with an opt-out phrase and a reviewer-block path.",
+      "prompt": "Explicitly invoke standing-approval-and-auto-advance. Design a standing approval so the agent stops re-asking for every push and PR inside an approved phase, with an opt-out phrase and a reviewer-block path.",
       "expected_skill": "standing-approval-and-auto-advance",
       "should_not_trigger": ["scoped-approval-register"],
       "reason": "Designing the governed standing-approval policy (named scope, opt-out, phase-advance, reviewer-block) is standing-approval-and-auto-advance; the register's role is only to hold the adopted policy's grant as an entry afterwards."
     },
     {
       "id": "authority-floors-go-to-authorization-matrix",
-      "prompt": "Write the standing rule for this repo: agents may open PRs but never merge to main or arm auto-merge — that's always a named human.",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Write the standing rule for this repo: agents may open PRs but never merge to main or arm auto-merge — that's always a named human.",
       "expected_skill": "agent-authorization-matrix",
       "should_not_trigger": ["scoped-approval-register"],
       "reason": "Deny-by-default authority floors for agent actions are the authorization matrix (standing policy), not a record of one granted approval."

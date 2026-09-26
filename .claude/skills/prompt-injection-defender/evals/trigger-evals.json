@@ -5,7 +5,7 @@
   "cases": [
     {
       "id": "injection-defense-wins-here",
-      "prompt": "Design the layered defense so our agent can't be hijacked by instructions hidden in the documents it reads.",
+      "prompt": "Explicitly invoke prompt-injection-defender. Design the layered defense so our agent can't be hijacked by instructions hidden in the documents it reads.",
       "expected_skill": "prompt-injection-defender",
       "should_not_trigger": ["ai-threat-modeler", "rag-security-architect"],
       "reason": "Designing the injection defense-in-depth is this skill's core case; ai-threat-modeler enumerates the risk, rag-security-architect handles retrieval authorization, not the untrusted-content-in-context invariant."

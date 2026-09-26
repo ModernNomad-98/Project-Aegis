@@ -19,7 +19,7 @@
     },
     {
       "id": "credential-custody-goes-to-secrets-hardener",
-      "prompt": "We have API keys and DB credentials scattered in env vars and one leaked into the client bundle — harden secret custody and rotate.",
+      "prompt": "Explicitly invoke secrets-identity-hardener. We have API keys and DB credentials scattered in env vars and one leaked into the client bundle — harden secret custody and rotate.",
       "expected_skill": "secrets-identity-hardener",
       "should_not_trigger": ["sensitive-disclosure-guard"],
       "reason": "Secret custody, env classification, and rotation is secrets-identity-hardener; this skill composes it but focuses on sensitive data reaching the model/output/logs."

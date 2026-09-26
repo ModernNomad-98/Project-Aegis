@@ -19,7 +19,7 @@
     },
     {
       "id": "pipeline-design-goes-to-ci-pipeline-architect",
-      "prompt": "Design our CI/CD pipeline — stages for lint, build, tests, security, artifact, deploy gates, and which checks block merge.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Design our CI/CD pipeline — stages for lint, build, tests, security, artifact, deploy gates, and which checks block merge.",
       "expected_skill": "ci-pipeline-architect",
       "should_not_trigger": ["context-co-update-ci-gate"],
       "reason": "The delivery pipeline's stage graph and merge-blocking semantics are ci-pipeline-architect; the context gate is one policy check that would be wired INTO such a pipeline."
@@ -33,7 +33,7 @@
     },
     {
       "id": "install-the-workflow-goes-to-pipeline-architect",
-      "prompt": "Here's the approved context-gate spec — now edit .github/workflows/ to add the job and make it a required check.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Here's the approved context-gate spec — now edit .github/workflows/ to add the job and make it a required check.",
       "expected_skill": "ci-pipeline-architect",
       "should_not_trigger": ["context-co-update-ci-gate"],
       "reason": "Editing pipeline definitions and required-check config is ci-pipeline-architect's manual-only territory; the context gate skill produces the spec and stops at the handoff."

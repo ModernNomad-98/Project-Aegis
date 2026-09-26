@@ -27,7 +27,7 @@
     },
     {
       "id": "ci-e2e-goes-to-playwright-e2e-engineer",
-      "prompt": "Build the end-to-end browser tests that run in CI against the preview environment and block a PR if the core flows break.",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Build the end-to-end browser tests that run in CI against the preview environment and block a PR if the core flows break.",
       "expected_skill": "playwright-e2e-engineer",
       "should_not_trigger": ["synthetic-monitoring-architect"],
       "reason": "CI E2E tests on ephemeral preview data gating PRs are playwright-e2e-engineer. Synthetic monitoring is scheduled prod-safe probing of production, not a pre-merge CI gate; the two differ on target (prod vs preview) and safety envelope."
@@ -41,7 +41,7 @@
     },
     {
       "id": "white-box-telemetry-goes-to-observability-operator",
-      "prompt": "Instrument the application with metrics, distributed traces, and structured logs from inside, and wire the dashboards and alerting on those internal signals.",
+      "prompt": "Explicitly invoke observability-operator. Instrument the application with metrics, distributed traces, and structured logs from inside, and wire the dashboards and alerting on those internal signals.",
       "expected_skill": "observability-operator",
       "should_not_trigger": ["synthetic-monitoring-architect"],
       "reason": "Internal white-box instrumentation (metrics/traces/logs from inside the app) is observability-operator. Synthetic monitoring is the external black-box complement that probes from the user's vantage point; the two are paired, not the same."

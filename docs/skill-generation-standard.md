@@ -527,8 +527,17 @@ Legend (three states only):
 Every shipped skill MUST ship `evals/evals.json` (see the canonical template's
 [`.claude/skills/_template/evals/evals.json`](../.claude/skills/_template/evals/evals.json)) describing
 representative trigger prompts and expected behaviors, with at least a happy path, an
-edge case, a should-not-do case, and objective assertions. Skills whose trigger
-description overlaps another skill MUST also ship `evals/trigger-evals.json`.
+edge case, a should-not-do case, and objective assertions. A MANUAL-ONLY skill's
+`should_trigger` cases in `evals/evals.json` MUST name or explicitly invoke that
+skill in the prompt, since a manual-only skill is never auto-selected. Skills whose
+trigger description overlaps another skill MUST also ship `evals/trigger-evals.json`.
+A trigger-evals case whose `expected_skill` is a MANUAL-ONLY skill MUST name that
+skill in its prompt with the strict prefix `Explicitly invoke <skill>. `, because a
+routing test must never model auto-selection of a manual-only skill. This extends,
+and is stricter than, the naming rule the Behavioral Eval Runner's census enforces
+for MANUAL-ONLY positive cases in `evals.json`
+(`tools/behavioral_eval_runner/census.py`); no automated check enforces the
+trigger-evals prefix yet.
 
 **Evals are a repo convention, validated structurally only** (D3 in the
 [decision record](reconciliation/step-0-reconciliation-v4.md)): the validator

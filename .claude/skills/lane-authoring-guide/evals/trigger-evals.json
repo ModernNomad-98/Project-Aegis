@@ -31,7 +31,7 @@
     },
     {
       "id": "tool-instruction-files-go-to-consolidator",
-      "prompt": "Our CLAUDE.md, AGENTS.md, and Cursor rules disagree about branch naming and test commands — align them into one source of truth.",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. Our CLAUDE.md, AGENTS.md, and Cursor rules disagree about branch naming and test commands — align them into one source of truth.",
       "expected_skill": "agent-instruction-consolidator",
       "should_not_trigger": ["lane-authoring-guide"],
       "reason": "Standing tool-instruction alignment across assistants is the consolidator; lane guides are per-effort, per-lane knowledge, not standing instruction files."

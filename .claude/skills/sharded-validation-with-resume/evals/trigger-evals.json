@@ -40,7 +40,7 @@
     },
     {
       "id": "stage-graph-goes-to-pipeline-architect",
-      "prompt": "Overhaul our CI/CD: stage ordering, artifact build-once, deploy gates with named human approvals, and secret handling.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Overhaul our CI/CD: stage ordering, artifact build-once, deploy gates with named human approvals, and secret handling.",
       "expected_skill": "ci-pipeline-architect",
       "should_not_trigger": [
         "sharded-validation-with-resume"
