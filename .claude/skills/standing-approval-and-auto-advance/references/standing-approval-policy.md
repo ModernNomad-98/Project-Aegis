@@ -38,6 +38,25 @@ Everything not named here is not covered.
 
 ## 3. Merge profile (explicit choice)
 
+Explain before asking for adoption: a pull request (PR) proposes a branch's
+changes for review; green checks mean required automated tests passed, not
+that a person approved the merge. A protected branch has repository rules for
+merging. GitHub auto-merge is a setting that queues a merge when conditions
+later pass; selecting a standing profile does not enable that setting.
+
+| Choice | Review time and setup/upkeep | Benefits | Risks and money |
+| --- | --- | --- | --- |
+| Open PR and stop | A person reviews and merges each PR; little policy setup, but recurring review time. | A human sees each change before merge and can catch context missed by tests. | Delivery may wait for reviewer availability. No added software purchase is required by this policy; CI usage or reviewer cost depends on the repo and is unknown until checked. |
+| Merge under an existing explicit grant | First verify and record the grant's scope, limits, and later instructions; maintain those checks for every PR. Less per-PR approval time within that scope. | Approved routine changes can flow sooner. | A mistaken scope match can merge an unwanted change; green tests cannot cover every judgment. CI usage and maintenance effort depend on the repo; check actual pricing and workload rather than promise zero cost. |
+
+Recommend **open PR and stop** when the repository has no applicable merge
+grant or human review is required for this change: it keeps the decision with
+the person who has authority. Where an applicable active grant already covers
+the work and no reviewer or gate block remains, recommend the granted profile
+to reduce repeated mechanical approvals; explain the exact grant and why it
+fits. A protected-file gate exception needs its own decision. An unanswered
+choice creates no new approval.
+
 [ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)
 [ ] opt-in merge under a separate, explicit human decision: <grant ID, source,
     repository, exact action, scope, expiry, later instructions>. This choice
