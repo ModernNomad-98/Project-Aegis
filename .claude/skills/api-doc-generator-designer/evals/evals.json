@@ -71,6 +71,20 @@
           "This skill documents (generates reference for) that contract; it doesn't define it."
         ]
       }
+    },
+    {
+      "id": "edge-toolchain-choice-with-costs",
+      "type": "should_trigger",
+      "prompt": "Our public REST API already has a reviewed OpenAPI schema and our docs build can publish static pages. We have a small maintenance team and no new service budget. Should we generate static reference in that build or use a hosted interactive docs service? Explain the choice and ask us to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains static generation and hosted interactive reference in plain terms, including why each is viable for this OpenAPI API and its case-specific benefits and drawbacks.",
+          "Compares money, setup effort, and ongoing maintenance for both options without inventing a hosted price or treating an unknown price as free.",
+          "Recommends static generation in the existing build for the stated no-new-service-budget context, explains why, and names a need for interactive try-it as a fact that could change the recommendation.",
+          "Asks one clear decision question after the comparison while preserving schema-sourced reference and treating try-it credentials safely."
+        ]
+      }
     }
   ]
 }

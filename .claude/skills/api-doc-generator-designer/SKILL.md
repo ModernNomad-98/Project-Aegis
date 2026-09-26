@@ -92,7 +92,14 @@ is a reference checked against the implementation and generated, not typed.
 6. **Choose the toolchain and slot it in.** The generator (OpenAPI→docs,
    GraphQL doc gen, TypeDoc/Sphinx/etc.), optional try-it/interactive
    console, and how it builds and publishes within the docs pipeline
-   (`docs-as-code-architect`).
+   (`docs-as-code-architect`). When more than one source or toolchain is
+   viable, explain the choice in plain terms before asking: why each fits,
+   its benefits and drawbacks for this API, and money, setup, and ongoing
+   upkeep costs (or what is unknown). Recommend the option supported by the
+   API and pipeline evidence, explain why, and name the fact that would
+   change the recommendation. If that evidence is missing, ask one discovery
+   question first; otherwise ask one clear decision question. A design
+   choice alone does not authorize a paid service, installation or publication.
 7. **Version the reference with the API.** The reference for version X
    matches version X; deprecations flow from the schema into the docs; a
    changelog/diff between versions is generated where possible. Coordinate
@@ -115,6 +122,9 @@ Authored:       quickstart, guides/how-to, overviews, curated examples (→ diat
 Enrichment:     descriptions/examples live IN the schema/docstrings (single-sourced)
 Examples:       request/response validated against schema; auth docs; error catalog from taxonomy
 Toolchain:      generator=<...>; try-it console?; plugs into docs pipeline (docs-as-code-architect)
+Choice, if needed: <plain-language options; why each fits; API-specific pros/cons;
+  money/setup/upkeep costs or unknowns; recommendation + why + what could change it;
+  one clear decision question>
 Versioning:     reference matches API version; deprecations from schema; diff/changelog
 Alignment checks: generated reference + source-to-implementation validation
 Boundaries:     contract → api-event-architect; pipeline → docs-as-code-architect;
@@ -136,6 +146,10 @@ Boundaries:     contract → api-event-architect; pipeline → docs-as-code-arch
 - [ ] Examples are validated against the schema; auth and the error
       catalog are documented (errors from the taxonomy).
 - [ ] The toolchain is chosen and slots into the docs pipeline.
+- [ ] When the user must choose a source or toolchain, the options explain
+      their fit, tradeoffs, and money/setup/upkeep costs or unknowns in plain
+      terms; a contextual recommendation names its reason and uncertainty,
+      followed by one clear question (or one discovery question if needed).
 - [ ] The reference is versioned with the API; deprecations flow from the
       schema.
 - [ ] Contract, pipeline, and corpus-organization concerns are handed to
