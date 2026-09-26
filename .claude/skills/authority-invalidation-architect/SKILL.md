@@ -120,13 +120,26 @@ the differential and verify battery no single-surface skill can see whole.
    instance only → an in-process cache; wrong only in search → the index.
    Where evidence is ambiguous, compose `systematic-debugger`'s
    prediction-testing; this map supplies the hypotheses it ranks.
-4. **State the revocation-latency bound.** Per change type, in writing,
-   with an owner-confirmed number: "removed from a workspace means
-   unreachable on every surface within N seconds." The deny-direction
-   bound is the tightest and is a security parameter, not a tuning knob.
-   This is the sibling of `caching-strategy-designer`'s consistency
-   envelope, applied to authority — without the number, "immediately"
-   silently becomes "at token expiry".
+4. **Help the owner choose and confirm the revocation-latency bound.**
+   Explain that this is the maximum time after a change during which the
+   changed principal could still reach protected data on any existing
+   surface; it is a deny-direction security limit, not a typical refresh
+   time. For each change type, use the actual token lifetime, session
+   design, live channels, caches, signed links, data sensitivity, and
+   operational constraints to present viable numeric bounds. For each
+   option, explain the user's security exposure while old access remains,
+   possible disruption from forced refresh or session termination, the
+   setup and ongoing time and money cost (mark unverified costs unknown),
+   and the pros and cons. Recommend the bound that fits this context and
+   explain why its controls can meet it across every surface; distinguish
+   measured capability from a proposed target. Then ask the owner to
+   confirm a number in writing: "removed from a workspace means unreachable
+   on every surface within N seconds." Do not select a universal default,
+   infer confirmation from silence, or proceed to a finalized propagation
+   design without the owner's choice. The deny-direction bound is the
+   tightest. This is the sibling of `caching-strategy-designer`'s
+   consistency envelope, applied to authority — without the number,
+   "immediately" silently becomes "at token expiry".
 5. **Design propagation per surface — own the unowned, compose the
    owned.** The three surfaces this skill owns outright:
    - **Token/claims staleness.** If authority (role/tenant/plan) is baked
@@ -187,6 +200,10 @@ the differential and verify battery no single-surface skill can see whole.
 
 ## Output Format
 
+If the owner has not confirmed the number, provide the owner choice brief,
+recommendation, and confirmation request only. Use the full design template
+below after confirmation.
+
 ```
 AUTHORITY INVALIDATION DESIGN — <incident / change type>
 Change: <removal|revoke|logout|plan-change|deletion|share-revoke> —
@@ -212,8 +229,13 @@ Handoffs: <secrets-identity-hardener (custody impl) |
 
 ## Validation Checklist
 
+- [ ] Before asking the owner to confirm a number, the choice brief explains
+      the bound, viable context-specific numeric options, security risk and
+      disruption, setup and ongoing time/money cost with unknowns labeled,
+      pros/cons, and a justified recommendation.
 - [ ] The deny-direction revocation-latency bound is stated as a number
-      and owner-confirmed — not "immediately", not implied.
+      and owner-confirmed — not "immediately", not implied; if unconfirmed,
+      the design stops at the choice brief.
 - [ ] Every surface in the inventory is dispositioned — holder, or ruled
       out with evidence; none skipped because "we probably don't cache
       that".
@@ -295,8 +317,8 @@ Handoffs: <secrets-identity-hardener (custody impl) |
   envelope with a revocation-propagation bound); never green-light it
   from here.
 - No owner will confirm a revocation-latency number → present the
-  per-change default menu with consequences and stop; do not invent a
-  deny-direction tolerance on anyone's behalf.
+  context-specific choice brief from step 4 and stop before finalizing
+  the design; do not invent a deny-direction tolerance on anyone's behalf.
 - The evidence shows a live cross-tenant leak (not stale authority of a
   formerly entitled principal) → stop and route the active incident to
   the human incident owner and current approved response runbook. After
