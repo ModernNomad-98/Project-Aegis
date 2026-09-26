@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #330 on 2026-09-26 Coordinated Universal
+As of merged pull request (PR) #331 on 2026-09-26 Coordinated Universal
 Time (UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -11,23 +11,31 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-Merged PR #329 established **601 Markdown files: 557 accepted reader pages
-and 44 classified synthetic fixtures**, with zero known pending pages. PR
-#330 changed existing forecast and measurement pages only; the merged count
-remains 601. This branch proposes the new [BER selected-precheck aggregate
-decision page](ber-precheck-aggregate-validation-proposal.md). Independent
-full-page technical and readability review accepted the proposal and this
-ledger after a first-use terminology correction. This candidate tree has
-**602 Markdown files: 558 accepted reader pages and 44 classified synthetic
-fixtures, with zero known pending pages**. The candidate is not yet merged.
-This count and review do not approve implementation, private labels, a host
-probe or provider use.
+Merged PR #331 established **602 Markdown files: 558 accepted reader pages
+and 44 classified synthetic fixtures**, with zero known pending pages. It added
+the [BER selected-precheck aggregate decision page](ber-precheck-aggregate-validation-proposal.md)
+after independent technical and full-page readability review, including a
+first-use terminology correction. This count and review do not approve its
+implementation, private labels, a host probe or provider use.
+
+This branch adds the [protected-file guard decision packet](gate-guard-friction-decision.md),
+bringing the candidate tree to **603 Markdown files: 558 accepted reader pages,
+one pending reader page and 44 classified synthetic fixtures**. The packet's
+technical review accepted its narrowed four-file BER proposal; independent
+full-page readability and ledger review remain pending. Acceptance would make
+the candidate **559 accepted reader pages plus 44 fixtures, with zero known
+pending pages**. Neither technical review nor merging the packet selects an
+option or creates a standing exception. Its recommended option preserves
+separate owner decisions for all other protected paths and work-package rules.
+
+Merged PR #329 established 601 Markdown files: 557 accepted reader pages and
+44 fixtures. PR #330 changed existing forecast and measurement pages only.
 
 The Stage 4B preflight draft adds one independently reviewed reader page to
 the 600-page #319 tree. Its source pins, canonical Git-byte hashes, three
 host-path choices, unknown preflight facts, no-grant boundary and all relative
 links passed full-page factual and readability review after a correction to
-the hash basis. This candidate has **601 Markdown files: 557 accepted reader
+the hash basis. That reviewed candidate had **601 Markdown files: 557 accepted reader
 pages and 44 classified synthetic fixtures**, with zero known pending pages.
 The draft prepares a later owner decision; it does not prove a host or permit
 a session. The #319 tree contains **600 Markdown files**: **556 accepted reader
