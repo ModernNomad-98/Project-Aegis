@@ -17,6 +17,7 @@ from __future__ import annotations
 from typing import Any, Iterable, Mapping
 
 from . import RUNNER_VERSION, SCHEMA_VERSION
+from .aggregation import AttemptSet, aggregate_case
 from .enums import (
     AggregateBlocker,
     AggregateVerdict,
@@ -26,7 +27,7 @@ from .enums import (
     ReasonCode,
     RiskClass,
 )
-from .errors import DishonestReportError
+from .errors import AggregationError, DishonestReportError
 from .models import (
     AggregateRecord,
     AttemptRecord,
@@ -231,6 +232,57 @@ def _validate_report_records(
             )
 
 
+def _validate_executed_aggregates(
+    attempts: list[AttemptRecord],
+    aggregates: list[AggregateRecord],
+    preflight_results: list[PreflightResult],
+) -> None:
+    """Verify every executed RUNNABLE result against deterministic aggregation."""
+    runnable = {
+        result.case_uid
+        for result in preflight_results
+        if result.outcome is PreflightOutcome.RUNNABLE
+    }
+    by_case: dict[str, list[AttemptRecord]] = {}
+    for attempt in attempts:
+        by_case.setdefault(attempt.case_uid, []).append(attempt)
+
+    fields = (
+        "aggregate_verdict",
+        "aggregate_blocker",
+        "reason_code",
+        "wins",
+        "attempts_run",
+        "execution_degraded",
+        "derived_from_executed_quorum",
+    )
+    for aggregate in aggregates:
+        case_attempts = by_case.get(aggregate.case_uid, [])
+        if aggregate.case_uid not in runnable or not any(
+            attempt.attempt_state is not AttemptState.UNRUN
+            for attempt in case_attempts
+        ):
+            continue
+        attempt_set = AttemptSet(
+            case_attempts[0].run_id, aggregate.case_uid, aggregate.attempts_planned
+        )
+        try:
+            for attempt in case_attempts:
+                attempt_set.add(attempt)
+            expected = aggregate_case(attempt_set)
+        except AggregationError as exc:
+            raise DishonestReportError(
+                f"aggregate {aggregate.case_uid} cannot be derived from its attempts: {exc}"
+            ) from exc
+        for field in fields:
+            if getattr(aggregate, field) != getattr(expected, field):
+                raise DishonestReportError(
+                    f"aggregate {aggregate.case_uid} has {field}="
+                    f"{getattr(aggregate, field)!r}, but its attempts derive "
+                    f"{getattr(expected, field)!r}"
+                )
+
+
 def build_run_report(
     run_id: str,
     baseline_identity: Mapping[str, Any],
@@ -335,6 +387,8 @@ def build_run_report(
             raise DishonestReportError(
                 f"executed attempt for {attempt.case_uid} has no RUNNABLE preflight"
             )
+
+    _validate_executed_aggregates(attempts_list, aggregates_list, preflights)
 
     # A3: derive coverage from the records and reject any caller mismatch.
     recomputed = compute_coverage(
