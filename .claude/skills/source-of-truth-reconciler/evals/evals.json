@@ -53,6 +53,20 @@
           "Implements nothing."
         ]
       }
+    },
+    {
+      "id": "edge-owner-source-conflict-choice",
+      "type": "should_trigger",
+      "prompt": "Our approved-decisions record docs/decisions.md:22 says the free trial is 14 days, but the owner-maintained docs/pricing.md:9 says 30 days. Both files are marked current, neither is designated canonical, neither references the other, there is no precedence policy, and pricing.md was edited last week. Help the owner decide which one governs before anyone updates the signup flow. Don't edit anything.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Quotes both claims with anchors, classifies the conflict as a SHOULD-question, finds that no precedence rule yields a winner, and does not treat the newer edit or either document's confident wording as authority.",
+          "Defines authoritative source and UNRESOLVED in plain language and presents adopting docs/decisions.md, adopting docs/pricing.md, and holding as UNRESOLVED pending the owner, each with why it is viable, pros and cons, and correction effort or explicit unknowns.",
+          "Recommends one option, explains why, names the evidence that would change the recommendation, then asks exactly one owner question.",
+          "Edits neither document nor the signup flow, and states that the owner's answer does not itself authorize follow-up changes, which are proposed as follow-up work."
+        ]
+      }
     }
   ]
 }
