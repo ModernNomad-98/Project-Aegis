@@ -1,0 +1,133 @@
+# BER selected precheck aggregate validation: owner decision proposal
+
+Prepared 2026-09-26 from `ModernNomad-98/Project-Aegis` `origin/main` at
+`b64f2db5b1efb2e6da82a1c1fc5f4cfd20a3f7f4`. **PROPOSAL ONLY.** This page
+does not grant implementation authority, amend the Behavioral Eval Runner (BER)
+decision log, approve private candidate labels, renew a provider allowance, or
+authorize host or live execution. A pull request (PR) is a reviewed source
+change; a protected `gate-guard` is a separate repository check.
+
+## Decision in one read
+
+**Recommendation:** authorize one bounded, synthetic-only report-integrity
+correction. For a selected case whose preflight outcome is
+`PRECHECK_EXCLUDED`, the run report should require its planned attempts to
+remain `UNRUN` and its aggregate to say `INCONCLUSIVE` /
+`PRECHECK_EXCLUDED`, with the same reason as preflight. Reject a missing or
+contradictory aggregate before publishing the report. This prevents an
+excluded case from appearing `NOT_SELECTED` or disappearing from the report's
+excluded-case count. The proposed change touches exactly two existing files:
+
+| Proposed implementation path | Allowed change after a separate grant |
+| --- | --- |
+| `tools/behavioral_eval_runner/reporting.py` | Validate selected `PRECHECK_EXCLUDED` preflight against one complete aggregate and its planned `UNRUN` attempts, including reason-code agreement. Preserve the existing executed-`RUNNABLE` derivation check and the unselected demonstration report. |
+| `tools/behavioral_eval_runner/tests/test_reporting.py` | Add synthetic regression cases for the accepted contradictory report, missing aggregate or attempts, mismatched reason, executed attempt, valid exclusion, and unaffected runnable/unselected reports. Update the existing empty-record preflight-shape test to test preflight shape without treating an incomplete selected report as publishable. |
+
+No schema, authored eval, skill, command-line interface, workflow, dependency,
+provider adapter, evidence writer, other BER file, or control-plane file is in
+this proposal. A test that needs another path or a change to the approved
+report contract stops this package for a reviewed scope decision.
+
+## Evidence and source reconciliation
+
+The [current design](../design/behavioral-eval-runner-v1.md) requires a case
+excluded by preflight to retain `UNRUN` attempts and an `INCONCLUSIVE` /
+`PRECHECK_EXCLUDED` aggregate with a reason and author-facing finding (§5b,
+§10, §13). The [BER backlog](behavioral-eval-runner-backlog.md) governs phase
+status and authorization. Work package 2B-3 remains authorized but incomplete;
+its measured run still depends on approved private labels, a selected and
+proven host, reconciled usage, an exact live source and allowance. PR #315 is
+already merged at the source baseline above; older backlog wording that calls
+it open is a dated checkpoint, not the present Git state.
+
+Current `reporting.py` validates a preflight record's own shape and verifies
+executed `RUNNABLE` aggregates against their attempts. Its aggregate check
+skips a `PRECHECK_EXCLUDED` case. `compute_coverage` takes excluded-case totals
+from aggregates. On the stated baseline, this offline, synthetic Python proof
+completed successfully:
+
+```text
+case: selected; required command unavailable
+preflight: PRECHECK_EXCLUDED / MISSING_PREREQUISITE
+planned attempt: UNRUN / NOT_SELECTED
+aggregate: INCONCLUSIVE / NOT_SELECTED
+build_run_report: accepted
+reported excluded_totals_by_reason: {}
+```
+
+The test used `make_case`, `evaluate_case`, `planned_unrun_attempt`,
+`default_unselected_aggregate`, `compute_coverage`, and `build_run_report` from
+the checked-out BER package. It made no provider call, host probe, private-data
+read or repository write. The result is an **implementation gap** against the
+design's selected-exclusion rule. The existing
+`test_report_rejects_inconsistent_preflight_shapes` deliberately passes empty
+attempt/aggregate lists to test preflight-field validation; it does not prove
+that a complete selected-case report should omit those records. The proposed
+tests should keep that field-validation coverage while making report
+completeness explicit. If independent review finds a legitimate draft-report
+consumer that requires the empty selected-case shape, return to the owner with
+that compatibility finding before changing behavior.
+
+To reproduce from this baseline, run the following in the repository root
+with Python available; the command reads source and prints synthetic values:
+
+```python
+from tools.behavioral_eval_runner.tests.helpers import make_case
+from tools.behavioral_eval_runner.preflight import PreflightEnvironment, evaluate_case
+from tools.behavioral_eval_runner.models import default_unselected_aggregate, planned_unrun_attempt
+from tools.behavioral_eval_runner.reporting import build_run_report, compute_coverage
+from tools.behavioral_eval_runner.enums import ReasonCode
+
+case = make_case(case_id="precheck-gap", required_commands=("unavailable-command",))
+preflight = evaluate_case(case, PreflightEnvironment())
+attempts = [planned_unrun_attempt("synthetic", case.case_uid, 1, ReasonCode.NOT_SELECTED)]
+aggregate = default_unselected_aggregate(case.case_uid, attempts_planned=1)
+coverage = compute_coverage(1, [case.case_uid], [preflight], attempts, [aggregate], 0, 0, 0)
+report = build_run_report("synthetic", {}, {}, None, attempts, [aggregate], coverage,
+                          selected_case_uids=[case.case_uid], preflight_results=[preflight])
+print(preflight.outcome.value, report["aggregates"][0]["aggregate_blocker"],
+      report["coverage_metrics"]["excluded_totals_by_reason"])
+# PRECHECK_EXCLUDED NOT_SELECTED {}
+```
+
+## Proposed authority and limits
+
+The owner would approve **only** the two implementation paths above, one
+focused branch from the exact merge commit of a separately reviewed BER
+decision-log amendment, and synthetic local fixtures. The amendment must
+record the repository, branch/base, exact paths, acceptance tests, budget,
+evidence and stop conditions. This page itself is not that amendment.
+Existing delivery approvals permit commit, push and merge for separately
+authorized work after their required checks; they do not renew a consumed
+one-use work package or waive a protected check.
+
+| Limit | Proposed bound |
+| --- | --- |
+| Active implementation time | Estimate 4–8 active hours; hard ceiling 8 active hours, excluding CI and owner waiting. Stop and rescope before exceeding it. |
+| Added code/test size | At most 300 added lines across the two paths. Stop and rescope before exceeding it. |
+| External spend | USD $0 task-controlled external spend; zero provider/model/metadata calls, dependency installs and live sessions. |
+| Data | Synthetic cases and temporary offline fixtures only; no private candidate, credential, sealed holdout or real evidence bundle. |
+| Delivery | One focused Developer Certificate of Origin (DCO) signed implementation PR, explicit-path staging, independent security/quality review, and exact-head checks before merge. |
+
+Run the focused `python -m unittest tools.behavioral_eval_runner.tests.test_reporting`
+test module and the full
+offline BER regression suite on Windows and the pinned Linux environment.
+Record commands, exit codes, skips, exact head and sanitized review findings.
+`git diff --check`, the two-path diff, and the added-line ceiling are separate
+local checks. A protected `gate-guard` failure needs its own PR-specific,
+exact-head owner review and approval; neither this proposal nor a green test
+suite grants that exception. No live claim follows from an offline pass.
+
+## Options and decision boundary
+
+| Choice | Benefit | Cost or risk |
+| --- | --- | --- |
+| **Authorize the bounded correction (recommended)** | Makes published selected exclusions agree with preflight and prevents a misleading excluded count; limited to deterministic reporting and tests. | Rejects currently accepted contradictory or incomplete selected reports; independent review must check callers and the empty-record test. |
+| Defer | Avoids changing report compatibility now. | The demonstrated contradiction remains accepted and can undercount excluded cases. |
+| Broaden report redesign | Could normalize all selection, preflight and aggregate relationships together. | Requires a new design and larger reviewed scope; adds time without being necessary to close this demonstrated case. |
+
+The decision requested is the first row only, with the stated limits. If
+approved, record an explicit owner decision in a reviewed BER governance
+change before source implementation. Keep the current private-label,
+selected-host, provider-budget, owner-decision-one (OD-1), and later live-suite
+gates unchanged. The owner may defer without changing any existing grant.
