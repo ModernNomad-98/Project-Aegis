@@ -63,7 +63,7 @@
     {
       "id": "edge-owner-dimension-history-choice",
       "type": "should_trigger",
-      "prompt": "Finance wants the revenue mart to answer which plan a customer account was on when each invoice was issued, but support only ever needs the current plan and the account's billing contact email. Our PII rules require erasing contact details on request. We have no estimate of account-dimension volume or storage cost. For the account dimension, explain the history options, recommend one, and ask me.",
+      "prompt": "Finance wants the revenue mart to answer which plan a customer account was on when each invoice was issued, but support only ever needs the current plan and the account's billing contact email. Our PII rules require erasing contact details on request. The tenant key is already carried in all zones and tenant residency is settled. We have no estimate of account-dimension volume or storage cost. For the account dimension, explain the history options, recommend one, and ask me.",
       "expect": {
         "triggers": true,
         "assertions": [

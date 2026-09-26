@@ -56,7 +56,7 @@
     {
       "id": "edge-owner-ssrf-allowlist-choice",
       "type": "should_trigger",
-      "prompt": "Invoked explicitly: security review finding SR-14 names the control - add a destination allowlist to the server-side fetcher that previews customer-supplied webhook URLs, to close server-side request forgery (SSRF). We could hard-code a fixed platform allowlist of our supported integration domains, or let each tenant manage its own allowed hostnames in settings. Some tenants use self-hosted endpoints we cannot list in advance. Nobody has checked whether our egress proxy blocks private IPv6 ranges or DNS rebinding. Explain the options before I pick one.",
+      "prompt": "Explicitly invoke appsec-implementer. Security review finding SR-14 names the control - add a destination allowlist to the server-side fetcher that previews customer-supplied webhook URLs, to close server-side request forgery (SSRF). We could hard-code a fixed platform allowlist of our supported integration domains, or let each tenant manage its own allowed hostnames in settings. Some tenants use self-hosted endpoints we cannot list in advance. Nobody has checked whether our egress proxy blocks private IPv6 ranges or DNS rebinding. Explain the options before I pick one.",
       "expect": {
         "triggers": true,
         "assertions": [

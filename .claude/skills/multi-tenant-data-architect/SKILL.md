@@ -101,13 +101,13 @@ a cross-tenant leak.
     schema per tenant and database per tenant, and explain why the choice
     affects this product. Compare viable options by money (including $0),
     migration/setup time, ongoing operations/maintenance cost, isolation
-    benefits and drawbacks. Recommend one from measured volume, compliance
-    needs and team capacity, with a reason. Resolve routine per-store design
-    choices from evidence without asking the owner. Treat a choice already
-    stated by the owner as settled; explain its implications without re-asking.
-    State why each viable option could fit this case, mark unknown costs as
-    unknown rather than guessing, then ask exactly one owner question; the
-    answer does not authorize migration execution.
+    benefits and drawbacks. State why each viable option could fit this case
+    and mark unknown costs as unknown rather than guessing. Recommend one from
+    measured volume, compliance needs and team capacity, with a reason, then
+    ask exactly one owner question; the answer does not authorize migration
+    execution. Resolve routine per-store design choices from evidence without
+    asking the owner. Treat a choice already stated by the owner as settled;
+    explain its implications without re-asking.
 
 ## Output Format
 
@@ -127,7 +127,8 @@ Migration plan: <expand → backfill → verify → enforce → contract; rollba
 Isolation test matrix (data layer): <store × operation × expected denial>
 Assumptions & open questions: <each with risk-if-wrong / who answers>
 Owner choice brief (only if needed): <terms; why now; options with money,
-  setup/migration/maintenance costs, pros and cons; recommendation and fit>
+  setup/migration/maintenance costs, pros and cons, why each fits; unknowns
+  marked unknown; recommendation and fit; one owner question>
 ```
 
 ## Validation Checklist

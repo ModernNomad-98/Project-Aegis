@@ -55,7 +55,7 @@
     {
       "id": "edge-owner-coverage-gate-choice",
       "type": "should_trigger",
-      "prompt": "Invoked explicitly: simplify normalizeRow in src/import/csv_normalizer.ts. Its tests cover only the happy path; the untested branches handle legacy date formats and empty cells that customers' uploaded files rely on. We don't know how long writing tests for those branches would take. Explain the options before I decide how to proceed.",
+      "prompt": "Explicitly invoke code-simplifier. Simplify normalizeRow in src/import/csv_normalizer.ts. Its tests cover only the happy path; the untested branches handle legacy date formats and empty cells that customers' uploaded files rely on. We don't know how long writing tests for those branches would take. Explain the options before I decide how to proceed.",
       "expect": {
         "triggers": true,
         "assertions": [
