@@ -4,7 +4,8 @@
 document. **Prepared:** 2026-09-26. **Owner:** Peter Nguyen.
 
 Recommend option A: a standing, conditional exception for the existing
-protected-file signal, with fresh verification, independent review and a
+protected-file signal on four named BER reporting/aggregation source and test
+files, with fresh verification, independent review and a
 receipt for every merge. This removes repeated owner questions while retaining
 the existing guard and deliberate administrator merge. The check will still
 be red. If making approved protected PRs green is essential, choose option B
@@ -57,13 +58,16 @@ the underlying code review and verification work.
 
 | Option | Why consider it; benefits | Drawbacks | Setup, money and upkeep |
 | --- | --- | --- | --- |
-| **A. Standing conditional guard-only exception — recommended** | Ends repeated owner exceptions for already authorized work; keeps protected-file detection, independent review and deliberate merge. | The guard stays red; evidence must distinguish an approved protected-path signal from a real failed check. | Estimate 1–3 active hours for approved policy/record/document updates and review; no new service or dependency, $0 new task-controlled spend. Each eligible PR needs a reviewed receipt, roughly 5–15 active minutes beyond existing checks/review; owner wait is removed. |
+| **A. Standing conditional exception for four BER files — recommended** | Ends repeated owner exceptions for authorized reporting/aggregation repairs; keeps protected-file detection, independent review and deliberate merge. | The guard stays red; every other protected path still needs its separate owner decision. Evidence must distinguish an approved signal from a real failed check. | Estimate 1–3 active hours for approved policy/record/document updates and review; no new service or dependency, $0 new task-controlled spend. Each eligible PR needs a reviewed receipt, roughly 5–15 active minutes beyond existing checks/review; owner wait is removed only for eligible changes. |
 | **B. Trusted approval check** | Can represent reviewed, authorized protected changes as green, with mechanically checked evidence. | Adds a security-sensitive service/workflow and new failure modes; approval freshness and trusted identity must be maintained. | Estimate 4–8 active hours for discovery and a bounded design proposal. Implementation is unestimated until repository capabilities and a trust mechanism are selected. App hosting, Actions usage or plan costs are unknown; recurring permission, credential, API and workflow maintenance is required. |
 | **C. Keep a separate owner exception for every PR** | Preserves the present process with no policy change or new machinery; owner sees each protected merge. | Repeated interruption and owner waiting continue; each new head can require a replacement exception. | No implementation or new service cost. Each PR still needs an exact-head decision and receipt, roughly 5–15 active minutes of administration plus unbounded owner wait and the existing checks/review. |
 
 Option A fits the immediate need because the existing process already gathers
-the technical evidence; the repeated step is owner disposition of the same
-intentional signal. It preserves that evidence and the ability to stop a merge.
+the technical evidence for reporting repairs such as #315; the repeated step is
+owner disposition of the same intentional signal. The narrow path scope leaves
+per-PR owner oversight of CI and the machinery protecting merges in place.
+It preserves review evidence and the ability to stop a merge. It will not
+eliminate interruptions for other BER work or changes outside these four files.
 Option B becomes worthwhile if green-only dashboards or stronger mechanical
 enforcement justify its added implementation and operating cost. Neither a
 label alone nor simply ignoring failures provides equivalent review protection.
@@ -73,12 +77,33 @@ label alone nor simply ignoring failures provides equivalent review protection.
 This is proposed grant language for owner review, not an active grant:
 
 > For authorized work in `ModernNomad-98/Project-Aegis`, permit deliberate
-> administrator merge when the sole failed GitHub Actions check is the existing
-> `gate-guard` protected-path condition and every condition below is satisfied.
+> administrator merge when every changed protected path is one of the four
+> eligible BER files listed below, the sole failed GitHub Actions check is the
+> existing `gate-guard` protected-path condition, and every condition below is
+> satisfied.
 > This narrowly supersedes the all-green condition in AEGIS-APR-013/024/039 for
 > that signal only. It does not authorize unrelated implementation, change the
 > protected path set or branch settings, or waive another failed check. Apply
 > until the owner revokes or replaces this standing exception.
+
+The exact eligible paths are:
+
+- `tools/behavioral_eval_runner/reporting.py`
+- `tools/behavioral_eval_runner/aggregation.py`
+- `tools/behavioral_eval_runner/tests/test_reporting.py`
+- `tools/behavioral_eval_runner/tests/test_aggregation.py`
+
+This is an exact allowlist, not the whole BER directory. Ordinary unprotected
+documentation may accompany an eligible repair. A PR also touching any other
+protected file is ineligible as a whole. In particular, workflow/CI files,
+CODEOWNERS, validator, DCO, guard scripts and tests, requirements, parent import
+files, acceptance machinery and all other BER paths retain separate one-time
+owner decisions. Expanding this allowlist requires a new owner decision.
+
+Eligibility also depends on purpose: changes that disable or weaken checking,
+alter merge/review authority, change protected-path policy, or modify the guard
+or approval mechanism require a separate one-time owner decision wherever the
+code is located. Tests cannot be weakened merely to obtain a passing result.
 
 Required conditions for each use:
 
@@ -92,7 +117,10 @@ Required conditions for each use:
    A checkout, fetch, script or infrastructure failure is ineligible.
 4. Independent review explicitly covers the changed protected surfaces and
    finds no unresolved blocker. Record reviewer identity and the reviewed
-   head; an author cannot supply their own independent review.
+   head; an author cannot supply their own independent review. A read-only
+   agent's technical review may satisfy the independent-review evidence but
+   cannot create owner approval. The standing grant must come from the owner;
+   a candidate PR's newly written grant text cannot authorize that same PR.
 5. Immediately before merge, verify the PR still has that head, the review
    and checks still apply, the authority is active, and no reviewer block has
    appeared. A changed head requires fresh applicable checks and review.
@@ -147,14 +175,17 @@ changes need their own reviewed scope before implementation.
 
 ## Owner decision
 
-- **A — adopt the proposed standing conditional exception.** Approve the exact
-  recurring scope above and its documentation/approval-record updates. No CI
+- **A — adopt the proposed standing conditional exception for four BER files.**
+  Approve the exact recurring scope above and its documentation/approval-record updates. No CI
   or repository-setting changes are included.
 - **B — prepare the trusted-check design.** Authorize only its 4–8 active-hour
   discovery/proposal step, with $0 task-controlled spend and read-only platform
   inspection. Keep the current per-PR process until a later implementation and
   activation decision.
 - **C — retain the present per-PR exception process.** No new grant or work.
+
+**One decision:** Choose A (the narrow four-file standing exception), B
+(prepare only the trusted-check design), or C (retain per-PR exceptions).
 
 The selected action affects only the Project Aegis source repository, not
 consumer repositories carrying copied skills. Merging this proposal alone
