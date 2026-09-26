@@ -61,6 +61,20 @@
       }
     },
     {
+      "id": "edge-owner-hero-video-fidelity-choice",
+      "type": "should_trigger",
+      "prompt": "Our landing page's autoplay hero video is 2.8 MB. On our mid-range-phone, throttled-network lab profile, largest-paint is 4.1 s against a 2.5 s budget. Marketing likes the video, but nobody has measured alternatives and we do not know what a video CDN would cost. Should we keep it, shrink it, or drop it? Explain the options and recommend one before asking me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the affected metric (largest-paint on the stated device and network class) and the visible change each path would cause in plain language, and treats this as a product decision it stops for rather than deciding silently.",
+          "Compares preserving the video with a measured optimization (poster image as the largest-paint element, deferred or interaction-gated video load), reducing its weight or fidelity, and removing it, giving each option's reason, estimated metric movement, user benefit or loss, implementation time, money or service cost, and maintenance, with unmeasured metric effects and the CDN cost stated as unknown rather than invented.",
+          "Recommends the path fitting the stated user need and budget, explains why, and names the missing measurement that could change it.",
+          "Asks exactly one product decision question after the comparison; does not raise or edit the budget, notes that any budget exception still needs a recorded review decision, and routes measured verification to performance-test-harness."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-functional-e2e",
       "type": "should_not_trigger",
       "prompt": "Write browser tests for the signup flow — fill the form, submit, assert the welcome screen and the error states.",

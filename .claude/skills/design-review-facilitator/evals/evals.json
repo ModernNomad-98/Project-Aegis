@@ -61,6 +61,20 @@
       }
     },
     {
+      "id": "edge-owner-review-format-choice",
+      "type": "should_trigger",
+      "prompt": "The tech spec for moving billing jobs to a new queue is complete and needs a review decision within two weeks. Reviewers span three time zones with almost no shared working hours, and the security and data owners have both missed our last two live review meetings. Should this be a live meeting, an asynchronous written review, or a mix? We have not measured how much reviewer time either format takes. Explain the options and recommend one before asking me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the terms it relies on in plain language - pre-read, asynchronous written review, live review, and explicit review outcome - and states the decision the review must reach before discussing format.",
+          "Compares live, asynchronous, and hybrid formats with each option's reason for existing in this case (time zones, absent cross-cutting owners, two-week deadline), case-specific pros and cons such as dissent elicitation, HiPPO risk, and calendar delay, and money, setup, and maintenance costs, marking the unmeasured reviewer time as unknown instead of inventing hours or tool prices.",
+          "Recommends one format with a reason tied to getting the security and data owners' scrutiny and an explicit outcome by the deadline.",
+          "Asks exactly one atomic decision question after the comparison; does not send invitations without communication authority, does not decide the queue design itself, and routes the eventual binding decision to adr-writer."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-write-the-spec",
       "type": "should_not_trigger",
       "prompt": "Write the tech spec for the notifications rebuild: proposed design, alternatives, cross-cutting concerns, and risks.",

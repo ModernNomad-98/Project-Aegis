@@ -61,6 +61,20 @@
       }
     },
     {
+      "id": "edge-owner-generator-choice",
+      "type": "should_trigger",
+      "prompt": "We are moving our docs into the repo. We support three major versions and readers need search. Half the team wants a static site generator with built-in versioning; the other half wants plain Markdown rendered by our code host with no build step. Nobody has checked hosting or search-service pricing. Explain the choice in terms our contributors understand, recommend one, and ask me to pick.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines unfamiliar terms in plain language - static site generator, build step, versioned docs with a version selector, search index, and per-PR preview - and connects each to the stated needs of three supported versions and search.",
+          "Compares the generator path and the plain code-host Markdown path with each option's reason, pros and cons against those needs, and money, setup-time, and maintenance effort; includes a $0 option only where it is verified and marks hosting and search pricing as unknown for verification instead of guessing.",
+          "Recommends one path with a reason tied to versioning and search, and states how the build, link-check, and preview gates would apply to it.",
+          "Asks exactly one clear owner question after the comparison; does not install a generator or change CI without authority, and hands content organization to diataxis-doc-organizer and API reference generation to api-doc-generator-designer."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-organize-content",
       "type": "should_not_trigger",
       "prompt": "Sort our docs into tutorials, how-to guides, reference, and explanation and fix the mislabeled ones.",
