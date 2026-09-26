@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-ai-overage-guardrail-choice",
+      "type": "should_trigger",
+      "prompt": "Three months of our AI provider bill, tagged by tenant, show that five Pro tenants drive most of the assistant's token spend, and at full allowance use the Pro price may be underwater. When a Pro tenant crosses its monthly AI budget, should we switch it to a cheaper model, throttle and queue its requests, or hard-stop the assistant until next month? We have not priced the cheaper model or estimated the engineering work for any option. Explain the choices, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the terms in plain language - per-tenant budget, degradation ladder, throttle and queue, hard stop, observe-only rollout, and allowance arbitrage - and ties them to the tenant-tagged bill evidence and the five concentrated tenants rather than an average tenant.",
+          "Compares cheaper-model fallback, throttle and queue, and hard stop with the reason each viable option exists, case-specific pros and cons (margin protection versus tenant-visible quality, latency, and churn risk), and money, setup, and maintenance costs, marking the unpriced cheaper model and unestimated engineering effort as explicit unknowns instead of inventing prices.",
+          "Recommends degradation before hard stops for paying Pro tenants with a reason tied to the churn risk and the measured cost concentration, shipped observe-only first with a per-guardrail disable path.",
+          "Asks exactly one atomic owner decision question after the comparison; ships and enforces nothing, routes any enforcement that degrades a paying tenant's service through human-approval-boundary, and hands the underwater Pro allowance to plan-entitlement-architect instead of silently redesigning the plan."
+        ]
+      }
+    },
+    {
       "id": "negative-plan-semantics",
       "type": "should_not_trigger",
       "prompt": "Decide which features go in Free versus Pro and what the project limit should be on each tier.",

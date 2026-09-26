@@ -106,7 +106,10 @@ vetted cryptographic primitives, it does not invent them.
    define the terms and why the choice matters. Compare viable options by
    money (including $0), setup time, ongoing support/maintenance cost,
    security and usability pros and cons. Recommend the option that fits the
-   resource's sensitivity and audience, with a reason. Decide routine token
+   resource's sensitivity and audience, with a reason. State why each viable
+   option exists, label unknown costs instead of inventing them, then ask
+   exactly one clear owner question; the answer does not authorize shipping
+   the link. Decide routine token
    mechanics from evidence; do not turn them into owner approval requests.
    If the owner already specified no-login links or another choice, treat it
    as settled and explain its implications without asking again.
@@ -154,8 +157,9 @@ Owner choice brief (only if needed): <terms; why now; options with money,
 - [ ] Optional password/OTP gates are rate-limited with brute-force lockout.
 - [ ] Creation, access, gate attempts, and revocation are audited via
       `audit-log-architect`.
-- [ ] Any owner-facing choice is explained with terms, costs, tradeoffs and
-      a reasoned recommendation before the question is asked.
+- [ ] Any owner-facing choice is explained with terms, each option's reason,
+      costs or labeled unknowns, tradeoffs and a reasoned recommendation
+      before exactly one owner question is asked.
 
 ## Security Rules
 

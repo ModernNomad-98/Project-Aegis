@@ -46,6 +46,20 @@
       }
     },
     {
+      "id": "edge-owner-downtime-versus-staged-choice",
+      "type": "should_trigger",
+      "prompt": "We need to change `invoices.amount` from a float to an integer cents column on our live Postgres table. The app deploys rolling, a nightly warehouse extract reads the column, and ops says a Sunday maintenance window with writes paused might be acceptable. We have not measured how long a backfill would take and have no estimate of the extra release work. Should we do the staged migration or take the downtime? Explain both, recommend one, and ask me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains in plain language what a staged migration (expand, migrate, contract across separate releases with old and new shapes both usable) and planned downtime (writes or traffic paused for one coordinated change) mean, and classifies the retype as a mutating change that the rolling-deploy overlap makes unsafe as a one-shot.",
+          "Compares both paths with why each is viable for this store and case-specific pros and cons: the staged path's extra releases, dual-write and backfill work, parity gate, and upkeep versus the downtime path's outage, rollback, and missed-consumer risks including the nightly warehouse extract; states money, setup time, and ongoing maintenance from the known facts and labels the unmeasured backfill duration and release effort as unknowns instead of inventing them.",
+          "Recommends the staged rollout for live traffic with overlapping versions and explains why, stating that downtime is recommendable only if the owner accepts a bounded outage and all consumers and recovery steps are verified.",
+          "Asks exactly one decision question after the comparison; treats the answer as not being execution authority, runs no migration or backfill, routes each stage's migration file to secure-migration-reviewer, and hands backfill or downtime execution design to data-migration-runbook-author."
+        ]
+      }
+    },
+    {
       "id": "should-not-plan-drop-first",
       "type": "should_trigger",
       "prompt": "Just plan the DROP of the old columns first so the schema is clean, and we'll fix whatever code still reads them as errors come in.",

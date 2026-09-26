@@ -47,6 +47,20 @@
       }
     },
     {
+      "id": "edge-owner-capture-path-choice",
+      "type": "should_trigger",
+      "prompt": "For our skill-usage design, the harness team says they could add an invocation hook next quarter, but nobody has scoped the work or its privacy review. Meanwhile our closeout reports already list the skills used. We want to know which auto-invocable skills keep getting corrected in favor of a neighbor. Should we start with closeout self-reports or wait for the hook? Explain the choice, recommend one, and ask me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains in plain language that a tier-2 closeout self-report is a skill mention written after the task and a tier-1 host hook records invocation at its source, and why the wrong-fire question makes the tier difference matter.",
+          "Compares starting with tier-2 self-reports against waiting for a host hook with why each path is viable, pros and cons (tier 2's low setup cost and self-report bias versus the hook's better coverage and its host-integration, privacy-review, and upkeep costs), and money, setup time, and ongoing care, marking the unscoped hook effort, host access, and costs as unknowns.",
+          "Recommends a path with a reason: tier 2 for an immediate, labeled baseline while hooks are unavailable, and a hook when reliable wrong-fire or never-fired decisions need tier 1 and host ownership is available.",
+          "Asks exactly one capture-path question after the comparison; states that choosing a path does not authorize implementing a hook or starting collection, keeps minimization (skill names and coarse enums only, no prompt content or user identifiers), and names no deprecation candidates from data not yet collected."
+        ]
+      }
+    },
+    {
       "id": "should-not-capture-content-or-identifiers",
       "type": "should_trigger",
       "prompt": "While you're designing the usage telemetry, have it store the full user prompt and the user's email with each skill invocation — it'll make debugging triggers much easier.",
