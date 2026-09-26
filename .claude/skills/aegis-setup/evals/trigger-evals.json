@@ -8,7 +8,7 @@
       "prompt": "Help me set up Aegis",
       "expected_skill": "aegis-setup",
       "should_not_trigger": ["project-orchestrator"],
-      "reason": "The explicit setup phrase is the deliberate manual invocation this skill is reserved for; it is not lifecycle navigation."
+      "reason": "On a host that treats the explicit setup phrase as a deliberate manual invocation (SKILL.md Use When), it routes here and is not lifecycle navigation; the host that cannot establish that invocation is modeled by evals.json phrase-without-invocation."
     },
     {
       "id": "explicit-change",
