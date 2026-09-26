@@ -168,7 +168,15 @@ Readiness plan: <artifact → owner → date>; certification decision belongs to
   with no approver fail clause 7 regardless of content quality.
 - A scope drawn too wide multiplies evidence surface; too narrow (carving
   out the actual product) fails customer procurement review. Scope is a
-  business decision — surface it, don't default it.
+  business decision — surface it, don't default it. Before asking the owner
+  to choose, explain ISMS (the information security management system),
+  scope (the organizational, system, and location boundary it covers), and
+  SoA (the Statement of Applicability recording control selection) in plain
+  words. Compare viable boundaries for this organization: why each fits,
+  what certification would cover, the evidence burden, setup and ongoing
+  money/time costs (or what remains unknown), benefits, risks, and limits.
+  Recommend a case-fit boundary with reasons, name the fact that would
+  change the recommendation, then ask for one explicit owner decision.
 - Management review is not a status meeting: it has required inputs and
   outputs; minutes must show them or the clause is unmet.
 - Certification-cycle arithmetic (stage 1/stage 2, surveillance years) is
