@@ -86,6 +86,14 @@ pinned against each other in both directions.
    (superseded/expired, successor named) → redirect for a grace window →
    remove. DELETION is human-approved — this skill plans and recommends;
    it does not delete.
+   Before asking the owner to choose or approve retirement, explain the terms:
+   **keep** retains the doc with a reason and review date; **redirect** marks
+   it superseded and points readers to its successor during a grace window;
+   **remove** deletes it only after the reference sweep, staging, and explicit
+   approval. For each viable option, state why it fits, its benefits and
+   drawbacks, setup work and ongoing maintenance cost (including any money),
+   and how to reverse it. Recommend one option for this doc and explain why;
+   state what the owner is actually authorizing before asking.
 6. **Detect rot AND hoarding.** Flag docs past their review/expiry,
    superseded-but-present, and orphaned; equally, flag "permanent" docs
    with no reason-to-keep (hoarding by default). Push both toward an
@@ -112,6 +120,9 @@ Frontmatter:   per-doc retention fields (mirrors the index; drift = finding)
 Retirements (recommended):
   <doc>: reverse-ref sweep result; disposition (relink/redirect/remove);
          stage=mark→redirect→remove; rollback=<isolated revert or targeted restore>; DELETION = human-approved
+Owner choice: <plain-language keep/redirect/remove terms; reason, pros/cons,
+               setup and maintenance cost, reversibility for each viable option;
+               recommendation and why; exact action needing approval>
 Findings:      rotted (past expiry / superseded-present / orphan); hoarded (permanent, no reason)
 Boundaries:    SKILL retirement → skill-deprecation-planner; product sunset →
                sunset-deprecation-communicator; corpus-by-type → diataxis-doc-organizer
@@ -128,6 +139,9 @@ Boundaries:    SKILL retirement → skill-deprecation-planner; product sunset �
       and until when.
 - [ ] Retirement runs a reverse-reference sweep and stages mark → redirect
       → remove; DELETION is human-approved, not executed here.
+- [ ] Before an owner decision, keep/redirect/remove are explained with
+      reasons, pros and cons, setup/maintenance cost and reversibility; one
+      recommendation explains why and names the exact approval scope.
 - [ ] Both rot (stale/superseded/orphan) and hoarding (permanent without a
       reason) are surfaced.
 - [ ] Rollback is stated per retirement (isolated revert or targeted restore

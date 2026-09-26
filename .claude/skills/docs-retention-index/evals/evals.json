@@ -33,6 +33,20 @@
       }
     },
     {
+      "id": "positive-educate-owner-before-retirement-choice",
+      "type": "should_trigger",
+      "prompt": "Our old incident runbook has a newer replacement, but I do not understand what keeping, redirecting, or removing the old one entails. Help me decide before you ask for approval.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains keep, redirect and remove in plain language, including the successor pointer and grace window where relevant.",
+          "For each viable option, gives the reason it fits, pros and cons, setup and ongoing maintenance cost including any money, and reversibility.",
+          "Recommends an option for this runbook and explains why using the reference sweep and retention evidence.",
+          "States the exact action the owner would authorize; does not delete the runbook without explicit human approval."
+        ]
+      }
+    },
+    {
       "id": "edge-hoarding-permanent-no-reason",
       "type": "should_trigger",
       "prompt": "Let's just mark every document 'permanent — keep forever' so we never lose anything.",
