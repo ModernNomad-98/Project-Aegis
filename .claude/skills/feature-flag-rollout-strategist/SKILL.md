@@ -72,7 +72,24 @@ de-risked into production — not who is entitled to it.
 2. **Design progressive stages.** internal/dogfood → canary or small % →
    cohort expansion → GA. For each stage: the population, the bake time,
    the advance criteria (guardrails green for long enough), and the
-   rollback criteria. No stage advances on vibes.
+   rollback criteria. No stage advances on vibes. If a fixed launch date
+   is shorter than this evidence-backed ramp, ramp pace becomes a
+   release-risk choice the owner makes; teach it before asking. Define
+   *bake time* (how long a stage holds with guardrails green before it
+   advances; it must exceed the metric's detection window), *cohort* (the
+   population a stage exposes: a percentage of users or a named segment),
+   and *guardrail threshold* (the metric value that triggers rollback,
+   step 4). Options: keep the full ramp and move the date; compress the
+   ramp (smaller cohorts, tighter thresholds, staffed on-call cover; bake
+   time never drops below the detection window); or meet the date for
+   internal users or a limited cohort and reach GA later. For each give
+   why it fits, pros and cons, and money, setup, and upkeep cost, or
+   unknown (on-call cover and extra monitoring usually are until priced).
+   Recommend one from blast radius and reversibility (effects a flag-off
+   cannot undo, such as sent messages or written data, weigh against
+   compressing), name the fact that would change it, then ask exactly one
+   owner question. The answer shapes the plan only: it authorizes no flag
+   change, and Stop Conditions still apply.
 3. **Make targeting sticky.** Bucket by a stable identifier so a user
    stays in one variant across sessions and surfaces — flip-flopping is
    both a UX bug and an analytics-invalidating one. Choose low-risk
@@ -116,6 +133,8 @@ Kill switch:  <mechanism>; test procedure and required evidence before ramp; who
 Fail-safe:    flag-service-down default = <safe state> (release → old behavior)
 Interactions: <risky flag combinations; cross-surface consistency; caching>
 Lifecycle:    owner + removal trigger; cleanup = delete flag + dead code path
+Date vs ramp: (only if a fixed date conflicts) terms; options with pros/cons and
+              cost or unknown; recommendation + what would change it; one owner question
 Boundaries:   entitlement → plan-entitlement-architect / authorization-matrix-designer;
               experiment → ab-test-designer; live execution → approval path
 ```
@@ -126,6 +145,9 @@ Boundaries:   entitlement → plan-entitlement-architect / authorization-matrix-
       permission, it's routed out, not designed here.
 - [ ] Stages have explicit populations, bake times, and BOTH advance and
       rollback criteria — no advancing on vibes.
+- [ ] A fixed-date-versus-ramp conflict (if any) was taught with options,
+      costs or unknowns, and a recommendation before exactly one owner
+      question; the answer authorizes no flag change.
 - [ ] Targeting is sticky by a stable id; a user doesn't flip variants
       across sessions/surfaces.
 - [ ] A small guardrail-metric set has rollback thresholds, automatic
