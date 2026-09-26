@@ -61,6 +61,20 @@
       }
     },
     {
+      "id": "edge-owner-live-run-cadence-choice",
+      "type": "should_trigger",
+      "prompt": "For the live skill-session runner design: I have already decided the structural validator stays the required CI check. What I have not decided is whether live runs happen only for changed skills and their named neighbors on each PR, or also as a nightly rotating sample across the corpus. We have not set a monthly model budget and have not verified provider pricing. Explain the choice, recommend one, and ask me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains the terms in plain language - live skill session, independent judge, repeats and quorum, sampling tier, and UNRUN - and why the cadence choice matters for coverage and spend.",
+          "Compares the PR-only changed-skills tier and the PR-plus-nightly-sample option with each option's reason, pros and cons, money (including a $0 path only if one genuinely exists), setup time, and ongoing run and maintenance costs, using the cost formula (cases x repeats x session-plus-judge calls) without inventing per-call prices and marking the missing budget and pricing as unknown.",
+          "Recommends one cadence with a reason tied to the corpus and the unset budget, treats the already-stated required structural validator as settled rather than re-asking it, and resolves routine parameters such as repeat count from evidence without asking the owner.",
+          "Asks exactly one owner decision question after the comparison; builds and runs nothing, keeps the non-claims that a design is not an eval result, and composes ai-cost-guardrail-designer for the spend cap rather than setting budgets silently."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-product-llm-feature-evals",
       "type": "should_not_trigger",
       "prompt": "Build an eval suite for our customer-support LLM bot — jailbreak red-team cases, answer-quality rubric, and regression runs when we change the system prompt.",

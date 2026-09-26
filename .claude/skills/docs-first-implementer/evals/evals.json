@@ -55,6 +55,20 @@
       }
     },
     {
+      "id": "edge-owner-unbridgeable-version-gap-choice",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke docs-first-implementer. Add webhook signature verification using our pinned payments SDK. The verification helper I want is documented only for v1.x; the installed package's README and type definitions do not mention it, and the changelog jumps from 0.3 to 1.0 with only 'breaking changes'. Before writing code, explain my options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Confirms the exact installed version from the lockfile and records the bridging attempts (installed README, types, source, changelog) before declaring the gap unbridgeable; does not implement v1.x syntax from memory.",
+          "Defines a version upgrade, a bounded spike, and proceeding with declared risk in plain language, explains why each could resolve the gap, and gives case-specific benefits and drawbacks plus purchase, setup, and upkeep costs, marking unknown migration effort and pricing as unknowns rather than inventing them; notes the security weight of signature verification when weighing the declared-risk path.",
+          "Recommends one route with a reason, and for an upgrade explains current versus proposed version, migration and security reasons, and routes the bump as its own approval-gated change via change-classification-gate and human-approval-boundary.",
+          "Asks exactly one clear decision question after the explanation and writes no code past the unresolved gap; explicit invocation is not treated as a grant to upgrade dependencies or make other effects."
+        ]
+      }
+    },
+    {
       "id": "should-not-auto-invoke-execution-route",
       "type": "should_not_trigger",
       "prompt": "An agent selected this skill automatically from a general project request; the user has not named it. Start its implementation workflow now.",
