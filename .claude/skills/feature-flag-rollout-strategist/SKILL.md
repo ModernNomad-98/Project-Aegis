@@ -81,15 +81,17 @@ de-risked into production — not who is entitled to it.
    and *guardrail threshold* (the metric value that triggers rollback,
    step 4). Options: keep the full ramp and move the date; compress the
    ramp (smaller cohorts, tighter thresholds, staffed on-call cover; bake
-   time never drops below the detection window); or meet the date for
+   time stays longer than the detection window); or meet the date for
    internal users or a limited cohort and reach GA later. For each give
    why it fits, pros and cons, and money, setup, and upkeep cost, or
    unknown (on-call cover and extra monitoring usually are until priced).
-   Recommend one from blast radius and reversibility (effects a flag-off
-   cannot undo, such as sent messages or written data, weigh against
-   compressing), name the fact that would change it, then ask exactly one
-   owner question. The answer shapes the plan only: it authorizes no flag
-   change, and Stop Conditions still apply.
+   Blast radius and reversibility (effects a flag-off cannot undo, such
+   as sent messages or written data, weigh against compressing) decide
+   the recommendation: if the request omits either, ask only for that one
+   missing fact first and recommend nothing yet. Once both are known,
+   recommend one, name the fact that would change it, then ask exactly
+   one owner question. The answer shapes the plan only: it authorizes no
+   flag change, and Stop Conditions still apply.
 3. **Make targeting sticky.** Bucket by a stable identifier so a user
    stays in one variant across sessions and surfaces — flip-flopping is
    both a UX bug and an analytics-invalidating one. Choose low-risk
@@ -147,7 +149,8 @@ Boundaries:   entitlement → plan-entitlement-architect / authorization-matrix-
       rollback criteria — no advancing on vibes.
 - [ ] A fixed-date-versus-ramp conflict (if any) was taught with options,
       costs or unknowns, and a recommendation before exactly one owner
-      question; the answer authorizes no flag change.
+      question (a missing blast radius or reversibility fact is asked
+      for first, alone); the answer authorizes no flag change.
 - [ ] Targeting is sticky by a stable id; a user doesn't flip variants
       across sessions/surfaces.
 - [ ] A small guardrail-metric set has rollback thresholds, automatic
