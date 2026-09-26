@@ -15,6 +15,7 @@ Approver (named human):          <name, role>
 Review cadence:                  <e.g. annual + on major change/risk-assessment update>
 Risk assessment referenced:      <register id/version — the 6.1.3 trace source>
 Annex A source:                  licensed standard text, edition pinned
+Draft state:                     incomplete while any applicability decision is pending
 ```
 
 ## Row template
@@ -22,8 +23,12 @@ Annex A source:                  licensed standard text, edition pinned
 ```
 | Annex A ref | Control title (as published) | Applicable | Justification | Status | Mechanism / owner | Evidence hook |
 | --- | --- | --- | --- | --- | --- | --- |
-| <id> | <quoted title> | yes/no | <see patterns below> | implemented / partial(<residue>) / planned(<owner,date>) | <compliance-control-foundation CC-id or named artifact> | <→ compliance-evidence-collector> |
+| <id> | <quoted title> | yes/no/pending risk-owner decision | <see patterns below> | implemented / partial(<residue>) / planned(<owner,date>) / not asserted (pending only) | <compliance-control-foundation CC-id or named artifact, or risk owner if pending> | <→ compliance-evidence-collector, or missing decision/evidence if pending> |
 ```
+
+`pending risk-owner decision` is a draft-only state, not an exclusion or
+approved applicability decision. Name the risk owner and missing trace in the
+row and open items; the SoA remains incomplete until the owner decides.
 
 ## Justification patterns
 

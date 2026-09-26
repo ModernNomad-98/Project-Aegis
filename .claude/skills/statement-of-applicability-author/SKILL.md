@@ -59,15 +59,41 @@ never silently rewrites an operating SoA.
 
 1. **Confirm target standard(s) and obtain Annex A.** ISO 27001:2022,
    ISO 42001:2023, or both (two SoAs or one combined document with
-   per-standard columns — org's choice, recorded). Without the licensed
-   Annex A table, stop.
+   per-standard columns — org's choice, recorded). When both apply, explain
+   that a Statement of Applicability (SoA) records each standard's control
+   applicability, reason, and implementation state. Brief the owner before
+   asking for a format choice:
+   - **Two SoAs:** one controlled document per standard. Easier to assign
+     separate reviewers, revisions, and audit evidence; duplicate document
+     setup and ongoing review can take more staff time.
+   - **One combined SoA:** one controlled document with clearly separate
+     per-standard rows/columns and approval history. Shared administration can
+     take less time, but each change needs careful review so one standard's
+     decision is not copied into the other; a large document may be harder to
+     audit. It does not merge the standards' obligations.
+   State that licensed-standard acquisition (if needed), initial row mapping,
+   owner review, and recurring updates consume money or staff time; obtain
+   local prices and effort estimates rather than inventing a fee. Recommend
+   two SoAs when standards have different owners or review cycles, otherwise
+   a combined SoA when one owner can maintain distinct decisions; explain the
+   case fit and ask for the organization's single format decision. Without
+   the licensed Annex A table for each target standard, stop before row authoring.
 2. **Assemble the row skeleton** from the actual Annex A entries using
    [assets/soa-template.md](assets/soa-template.md). Never paraphrase
    control titles — quote them as the standard writes them.
 3. **Decide applicability per control.** Include when a risk-treatment
    decision selects it or an obligation requires it; exclude only with a
    justification that survives an auditor ("no mobile app development" —
-   concrete, verifiable), traced to the risk assessment scope.
+   concrete, verifiable), traced to the risk assessment scope. If relevance is
+   undecided, explain the row's fields (applicability, justification, and
+   implementation status), the relevant risk/obligation and missing evidence.
+   Brief the risk owner on the viable outcomes: include if treatment or an
+   obligation requires it (implementation and evidence cost), exclude if the
+   scoped activity is demonstrably absent (justification and recurring review
+   cost), or defer the row pending risk assessment (blocks SoA completion).
+   Give the benefits, limits, and case-fit recommendation with reasons; do
+   not decide the risk treatment yourself. Ask for one risk-owner decision,
+   then record its trace or leave the item open.
 4. **Justify inclusions by trace.** Each included control cites the risk(s)
    it treats or the obligation demanding it — "best practice" is not a
    justification; that's how SoAs bloat into unauditable checklists.
@@ -89,15 +115,18 @@ never silently rewrites an operating SoA.
 ```
 STATEMENT OF APPLICABILITY — <org>, <ISO/IEC 27001:2022 | ISO/IEC 42001:2023 | both>
 Version <n> | Date | Author | Approver: <named human> | Review cadence: <e.g. annual + on major change>
+Draft state: <incomplete while any applicability decision is pending>
 Source: Annex A of the licensed standard text (edition pinned) — entries quoted, never reconstructed
 Per Annex A entry:
   <Annex A id — title as published>
-    Applicable: yes | no
-    Justification: <risk-treatment trace (risk id) | obligation | concrete exclusion rationale>
-    Status: implemented (<mechanism from compliance-control-foundation>) | partial (<residue>) | planned (<owner, date>)
-    Evidence hook: <→ compliance-evidence-collector>
+    Applicable: yes | no | pending risk-owner decision (draft only)
+    Justification: <risk-treatment trace (risk id) | obligation | concrete exclusion rationale | missing decision and evidence>
+    Status: implemented (<mechanism from compliance-control-foundation>) | partial (<residue>) | planned (<owner, date>) | not asserted (pending only)
+    Evidence hook: <→ compliance-evidence-collector | missing decision/evidence (pending only)>
 Exclusions summary: <count + one-line rationale each>
 Open items: <controls awaiting risk-treatment decisions>
+Owner decision brief (when needed): <plain definitions, options and reasons, costs or unknowns,
+  benefits and drawbacks, recommended fit and why, one format or risk-owner question>
 ```
 
 ## Validation Checklist
@@ -114,6 +143,11 @@ Open items: <controls awaiting risk-treatment decisions>
       rationale — no silent rewrite.
 - [ ] 42001 rows treat Annex A entries as control objectives and controls
       per that standard's own structure, not as 27001 clones.
+- [ ] A format or unresolved-applicability choice has a plain-language brief
+      covering alternatives, costs or unknowns, tradeoffs, and a reasoned
+      recommendation before its single owner/risk-owner question.
+- [ ] Pending applicability appears only in an incomplete draft, identifies
+      the risk owner and missing decision, and cannot be treated as a final SoA.
 
 ## Compliance Precision Rules
 
@@ -159,8 +193,9 @@ Open items: <controls awaiting risk-treatment decisions>
 - Asked to rewrite or replace an operating SoA in place — produce a diff
   proposal for the named approver instead (`human-approval-boundary`).
 - Asked to declare exclusions for controls whose risk relevance is
-  genuinely undecided — surface the open decision to the risk owner; the
-  SoA records decisions, it does not make them.
+  genuinely undecided — give the risk owner the decision brief in step 3 and
+  leave the row open pending their decision; the SoA records decisions, it
+  does not make them.
 - Asked to write an SoA "for SOC 2" — explain SOC 2 has no SoA and hand
   scope questions to `soc2-trust-criteria-mapper`.
 

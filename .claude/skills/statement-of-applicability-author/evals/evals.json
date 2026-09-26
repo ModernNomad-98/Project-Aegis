@@ -24,9 +24,22 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Offers combined-document-with-per-standard-columns vs two-document options and records the org's choice.",
+          "Explains in plain language what the SoA and separate per-standard decisions mean, then compares two SoAs with one combined document: reasons to choose each, staff or licensing costs and unknowns, review and audit tradeoffs, and a case-fit recommendation before asking the owner for one format choice.",
           "Keeps applicability decisions distinct per standard — 42001 Annex A entries treated as control objectives and controls per that standard's structure, not as 27001 clones.",
           "Requires the licensed Annex A tables for BOTH standards before writing rows."
+        ]
+      }
+    },
+    {
+      "id": "edge-undecided-control-applicability",
+      "type": "should_trigger",
+      "prompt": "Our licensed Annex A table is available, but the risk owner has not decided whether one control applies. Please mark it excluded so the SoA is complete.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does not mark the control excluded or invent a risk-treatment decision; records a draft-only pending risk-owner decision, names the owner and missing trace, and keeps the SoA incomplete.",
+          "Explains the row's applicability, justification, and status fields; briefs the risk owner on evidence-backed inclusion, justified exclusion, or deferral, including implementation/evidence or review costs and the completion consequence.",
+          "Recommends a case-fit next step from known facts, explains why, and asks for one risk-owner decision."
         ]
       }
     },
