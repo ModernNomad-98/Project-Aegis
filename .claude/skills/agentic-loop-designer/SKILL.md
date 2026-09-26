@@ -102,7 +102,16 @@ PRODUCES the artifact those skills review.
    pipeline reaches the output, design that instead — a summarization, a
    transformation, a lookup does not need a loop. Record the decision and
    its reasons. A loop entered by default is an unbounded liability entered
-   silently.
+   silently. If a genuine owner choice remains, explain that a fixed
+   pipeline follows known steps while an agentic loop chooses later steps
+   from observed results. Compare only viable paths: why each fits, what
+   adaptability it gains or loses, failure and control risks, and estimated
+   calls, latency, setup, upkeep, and money cost or explicit unknowns under
+   the existing caps. Recommend the case-fit path with a reason and the
+   missing fact that could change it, then ask one decision question. Do
+   not ask merely to confirm a design disposition already settled by
+   observation-dependence; pricing policy stays with
+   `ai-cost-guardrail-designer`.
 2. **Structure the loop: plan → act → observe → reflect.** Each iteration
    plans the next step, acts, observes the real outcome (not the intended
    one), and reflects against the goal. The stop check runs EVERY iteration
@@ -160,8 +169,13 @@ PRODUCES the artifact those skills review.
 
 ```
 AGENTIC LOOP DESIGN — <task/agent>
-Decision: <single-shot | agentic> — <reasons; what observation-dependence
-  justifies the loop, or why a fixed pipeline suffices>
+Decision: <single-shot | agentic | owner decision pending> — <reasons;
+  what observation-dependence justifies the loop, why a fixed pipeline
+  suffices, or which fact/choice remains open>
+Owner choice brief (only if genuinely unresolved): <plain terms; viable
+  paths and reasons; adaptability and risk pros/cons; calls/latency,
+  setup/upkeep and money costs or unknowns; recommendation and why;
+  one decision question>
 Structure: plan → act → observe → reflect; stop check every iteration
 Ceilings: <hard iteration cap; per-iteration and total bounds consumed from
   ai-cost-guardrail-designer>
@@ -190,9 +204,12 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 
 ## Validation Checklist
 
-- [ ] The single-shot-vs-agentic decision is explicit and recorded; the
-      loop exists because observation-dependence requires it, not by
-      default.
+- [ ] The single-shot-vs-agentic disposition is explicit and recorded,
+      including a genuinely pending owner choice; a loop exists because
+      observation-dependence requires it, not by default.
+- [ ] If an owner must choose, the brief teaches terms, reasons,
+      benefits/drawbacks, costs or unknowns, and a reasoned recommendation
+      before one question; routine design dispositions do not force a vote.
 - [ ] The loop is plan → act → observe → reflect with the stop check every
       iteration.
 - [ ] A hard iteration ceiling exists, consumes the priced caps, and

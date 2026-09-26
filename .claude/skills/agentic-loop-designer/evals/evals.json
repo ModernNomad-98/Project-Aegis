@@ -74,6 +74,20 @@
       }
     },
     {
+      "id": "edge-teach-genuine-owner-loop-choice",
+      "type": "should_trigger",
+      "prompt": "We are designing support-ticket intake. Five fixed checks classify most tickets; a small unknown group could go to a person, or a bounded agent could research each case and choose the next step from what it finds. The owner wants help choosing those two paths. We have no measured call volume, latency, or provider price. Do not implement anything.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains a fixed pipeline with human handoff versus an observation-dependent agentic loop in plain language, without treating every ticket as needing a loop.",
+          "Compares why each viable path fits, its adaptability benefit or loss and failure/control risk, and call, latency, setup, upkeep, and money costs or explicit unknowns without inventing a provider price.",
+          "Recommends a case-fit path with reasons and the missing measurement that could change it, then asks one owner decision question.",
+          "Keeps the choice as design only, consumes existing caps, and routes budget policy to ai-cost-guardrail-designer rather than setting prices or making provider calls."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-goal-hijack-review",
       "type": "should_not_trigger",
       "prompt": "Could injected content in a webpage our agent reads mid-run redirect its multi-step plan toward a different goal? Review that.",
