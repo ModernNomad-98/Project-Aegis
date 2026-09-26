@@ -72,12 +72,23 @@ jobs; this one is the product-analytics slice.
 1. **Anchor on the schema.** Take the events/properties/identity model
    from the tracking plan as the target. A missing or fuzzy schema routes
    to `event-schema-architect` before any instrumentation.
-2. **Choose capture location per event.** Server-side for events that
-   must be accurate and tamper-resistant (purchases, state changes,
-   anything billed on) — it survives ad blockers and client failures.
-   Client-side for genuine UI interactions that only the client sees
-   (clicks, views, hovers). State the rule and the reason per event; some
-   events need both a client and a server view, deliberately reconciled.
+2. **Choose capture location per event.** Compare three plain options:
+   client capture sees UI-only actions but can be blocked, dropped on tab
+   close, or repeated on re-render; server capture sees committed state and
+   is more reliable for purchases or billing, but cannot see every UI
+   interaction; both can connect intent to outcome but need a shared event
+   key and a named authoritative count to reconcile duplicates and gaps.
+   For each event, name what each location can actually observe, expected
+   loss/retry behavior, and the source of truth for the reported metric.
+   Estimate ingestion volume and compute cost, setup effort, and ongoing
+   QA/monitoring upkeep for each viable option. Recommend client, server,
+   or both in the event's context, explaining why its visibility and
+   reliability justify those costs; do not call both automatically safer.
+   Mark unknown costs as unknown and verify current prices if a precise
+   spend choice depends on them. If a decisive context fact is missing,
+   ask one discovery question before recommending; if the user must choose,
+   ask one atomic decision question. That choice alone grants no capture
+   or vendor-spend authority.
 3. **Design the capture points and wrapper.** Route all tracking through
    one instrumentation layer/wrapper rather than scattered SDK calls, so
    naming/properties stay consistent and QA has one seam. Prefer
@@ -108,7 +119,8 @@ jobs; this one is the product-analytics slice.
 9. **Name boundaries and deliver.** Schema → `event-schema-architect`;
    system telemetry → `observability-operator`; skill-library usage →
    `skill-usage-instrumenter`. Produce the instrumentation plan in the
-   Output Format.
+   Output Format with a contextual capture recommendation, alternatives,
+   reconciliation rule, and cost/upkeep assumptions.
 
 The client-vs-server decision table, the consent-gating checklist,
 de-dup patterns, and the tracking-QA workflow:
@@ -119,14 +131,23 @@ de-dup patterns, and the tracking-QA workflow:
 ```
 ANALYTICS INSTRUMENTATION PLAN — <product/surface>
 Schema source: event-schema-architect tracking plan (target)
-Per event:     capture=<client|server|both> — reason; capture point; properties set
+Per event:     capture=<client|server|both> — recommended option and context;
+               client/server visibility and loss risks; authoritative metric source;
+               capture point; properties set
 Identity:      anon/user/tenant + session set at capture; identify/alias moment
 Consent/PII:   capture gated on consent; opt-out/DNT honored; sensitive props dropped AT source;
                regional rules
 Reliability:   batching/flush-on-unload; retry; offline; sampling (+ metric impact if any)
-De-dup:        fire-once/idempotency; one authoritative source per event
+De-dup:        fire-once/idempotency; if both capture, shared key + reconciliation;
+               one authoritative count per event
 Tracking QA:   plan test (event fires, right name+typed props, right moment); staging + debug mode;
                regression guard
+Choice costs:  per viable option, ingestion/compute money (estimate or
+               explicit unknown), setup effort and monitoring/QA upkeep;
+               assumptions and why recommendation wins
+Owner decision: when needed, one atomic capture-choice question after the
+               recommendation; if decisive context is missing, one discovery
+               question first
 Boundaries:    schema → event-schema-architect; system telemetry → observability-operator;
                skill usage → skill-usage-instrumenter
 ```
@@ -135,8 +156,16 @@ Boundaries:    schema → event-schema-architect; system telemetry → observabi
 
 - [ ] Instrumentation targets a defined tracking plan; a missing schema
       routes to `event-schema-architect`.
-- [ ] Capture location (client/server/both) is chosen per event with a
-      stated reason; accuracy-critical events are server-side.
+- [ ] Client, server and both were compared in plain terms for relevant
+      visibility, loss/retry risk and authoritative counting; each event has
+      a contextual recommendation. Accuracy-critical events use server
+      authority; both has an explicit reconciliation key and rule.
+- [ ] Viable capture options name ingestion/compute money as an estimate
+      or explicit unknown, setup effort, ongoing monitoring/QA upkeep and
+      the assumptions behind the choice; unknown prices are not invented.
+- [ ] If owner choice is needed, the output asks one atomic decision
+      question after the explanation, or one discovery question first when
+      decisive context is missing; the choice grants no capture or spend.
 - [ ] Tracking runs through one wrapper/layer, not scattered SDK calls.
 - [ ] Identity/session is set at capture and identify/alias fires at the
       right moment (no fire-before-identify).

@@ -53,6 +53,22 @@
           "Any approved skip is visibly reported in the pipeline, never a quiet green."
         ]
       }
+    },
+    {
+      "id": "edge-rollout-strategy-tradeoff",
+      "type": "should_trigger",
+      "prompt": "I'm the owner and unfamiliar with rollout terms. Please use ci-pipeline-architect to design the deployment stage for our stateful checkout service, explain rolling, blue/green, canary and a feature flag, and ask me to choose one. We have high traffic, low spare capacity and need fast rollback, but no infrastructure price quotes. Do not edit pipeline files yet.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Keeps this manual-only invocation in design scope and does not edit or deploy without separate request and authority.",
+          "Explains each viable strategy in plain terms, including initial user exposure, a detection signal and a concrete rollback primitive; states that flags cannot reverse data or schema changes.",
+          "Compares duplicate-capacity or other infrastructure money, setup effort, and continuing monitoring and operating upkeep.",
+          "Recommends a strategy for the stated traffic, rollback and capacity constraints, with assumptions and tradeoffs rather than a universal default.",
+          "Marks exact infrastructure prices as unknown rather than inventing figures; explains what current price or capacity evidence would settle a money-sensitive choice.",
+          "After a contextual recommendation and explanation, asks the owner one atomic strategy decision question, or one discovery question first if a decisive fact is missing; does not bundle deployment approval into the choice."
+        ]
+      }
     }
   ]
 }

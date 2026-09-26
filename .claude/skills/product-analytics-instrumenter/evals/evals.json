@@ -71,6 +71,22 @@
           "This skill instruments USER-behavior analytics, not system telemetry."
         ]
       }
+    },
+    {
+      "id": "edge-contextual-capture-tradeoff",
+      "type": "should_trigger",
+      "prompt": "I'm the product owner and unfamiliar with client versus server tracking. Our existing plan defines a signup click seen only in the browser and account creation confirmed on the server. Explain client, server and both, recommend a capture choice, then ask me to decide. We have a small analytics budget but no ingestion or compute price quotes.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains client visibility of the click and loss/retry risks, versus server authority for committed account creation; neither location alone sees both moments.",
+          "If recommending both, names a shared event or correlation key, an authoritative conversion count, and a rule for reconciling duplicate or unmatched records.",
+          "Compares ingestion and compute cost, implementation/setup effort, and ongoing QA or monitoring upkeep for viable choices.",
+          "Makes a contextual recommendation instead of declaring server or both universally best; preserves the distinction between click intent and completed signup.",
+          "Marks exact ingestion and compute prices as unknown rather than inventing figures; explains what current rates or event volume would settle a money-sensitive choice.",
+          "After a contextual recommendation and explanation, asks the owner one atomic capture decision question, or one discovery question first if a decisive fact is missing; does not bundle capture or spend authority into the choice."
+        ]
+      }
     }
   ]
 }
