@@ -232,6 +232,50 @@ def _validate_report_records(
             )
 
 
+def _validate_selected_exclusions(
+    selected: set[str],
+    preflight_by_case: Mapping[str, PreflightResult],
+    attempts: list[AttemptRecord],
+    aggregates: list[AggregateRecord],
+) -> None:
+    """Require every selected PRECHECK_EXCLUDED case to report that exclusion.
+
+    Its planned attempts must exist and stay UNRUN, and its aggregate must be
+    INCONCLUSIVE / PRECHECK_EXCLUDED with the preflight reason code, so an
+    excluded case can neither appear NOT_SELECTED nor vanish from
+    ``excluded_totals_by_reason``.
+    """
+    aggregate_by_case = {aggregate.case_uid: aggregate for aggregate in aggregates}
+    for case_uid in sorted(selected):
+        preflight = preflight_by_case.get(case_uid)
+        if preflight is None or preflight.outcome is not PreflightOutcome.PRECHECK_EXCLUDED:
+            continue
+        aggregate = aggregate_by_case.get(case_uid)
+        if aggregate is None:
+            raise DishonestReportError(
+                f"selected PRECHECK_EXCLUDED case {case_uid} has no aggregate"
+            )
+        if (
+            aggregate.aggregate_verdict is not AggregateVerdict.INCONCLUSIVE
+            or aggregate.aggregate_blocker is not AggregateBlocker.PRECHECK_EXCLUDED
+            or aggregate.reason_code is not preflight.reason_code
+        ):
+            raise DishonestReportError(
+                f"selected PRECHECK_EXCLUDED case {case_uid} must report "
+                "INCONCLUSIVE / PRECHECK_EXCLUDED with preflight reason "
+                f"{preflight.reason_code.value}"
+            )
+        case_attempts = [a for a in attempts if a.case_uid == case_uid]
+        # Non-UNRUN branch is defence-in-depth behind the executed-attempt check.
+        if not case_attempts or any(
+            a.attempt_state is not AttemptState.UNRUN for a in case_attempts
+        ):
+            raise DishonestReportError(
+                f"selected PRECHECK_EXCLUDED case {case_uid} must keep its "
+                "planned attempts UNRUN"
+            )
+
+
 def _validate_executed_aggregates(
     attempts: list[AttemptRecord],
     aggregates: list[AggregateRecord],
@@ -388,6 +432,9 @@ def build_run_report(
                 f"executed attempt for {attempt.case_uid} has no RUNNABLE preflight"
             )
 
+    _validate_selected_exclusions(
+        selected, preflight_by_case, attempts_list, aggregates_list
+    )
     _validate_executed_aggregates(attempts_list, aggregates_list, preflights)
 
     # A3: derive coverage from the records and reject any caller mismatch.

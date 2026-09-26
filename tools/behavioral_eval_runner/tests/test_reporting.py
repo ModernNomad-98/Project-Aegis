@@ -10,6 +10,7 @@ from tools.behavioral_eval_runner.enums import (
     AggregateBlocker,
     AggregateVerdict,
     AttemptState,
+    PRECHECK_REASON_CODES,
     ReasonCode,
 )
 from tools.behavioral_eval_runner.errors import DishonestReportError, SchemaValidationError
@@ -17,6 +18,7 @@ from tools.behavioral_eval_runner.models import (
     AggregateRecord,
     AttemptRecord,
     CoverageMetrics,
+    default_unselected_aggregate,
     planned_unrun_attempt,
 )
 from tools.behavioral_eval_runner.preflight import (
@@ -328,6 +330,9 @@ class TestHonestDefaults(unittest.TestCase):
                 ),
             ),
         )
+        # Empty attempt/aggregate lists isolate preflight-FIELD validation: the
+        # shape check runs before report-completeness checks, so every forged
+        # row must fail as an inconsistent preflight, not as an incomplete report.
         for row in forged:
             with self.subTest(row=row):
                 coverage = compute_coverage(
@@ -355,14 +360,28 @@ class TestHonestDefaults(unittest.TestCase):
                         preflight_results=[row],
                     )
 
-        for row in (runnable, excluded, setup_failed):
+        excluded_attempts = [
+            planned_unrun_attempt(RUN, uid, 1, excluded.reason_code)
+        ]
+        excluded_aggregate = AggregateRecord(
+            case_uid=uid,
+            aggregate_verdict=AggregateVerdict.INCONCLUSIVE,
+            aggregate_blocker=AggregateBlocker.PRECHECK_EXCLUDED,
+            reason_code=excluded.reason_code,
+            attempts_planned=1,
+        )
+        for row, attempts, aggregates in (
+            (runnable, [], []),
+            (setup_failed, [], []),
+            (excluded, excluded_attempts, [excluded_aggregate]),
+        ):
             with self.subTest(valid=row.outcome):
                 coverage = compute_coverage(
                     authored_units_total=1,
                     selected_case_uids=[uid],
                     preflight_results=[row],
-                    attempts=[],
-                    aggregates=[],
+                    attempts=attempts,
+                    aggregates=aggregates,
                     assertions_selected_total=0,
                     assertions_accounted_total=0,
                     assertions_actually_graded_total=0,
@@ -372,12 +391,39 @@ class TestHonestDefaults(unittest.TestCase):
                     baseline_identity={},
                     run_provenance={},
                     input_evidence_manifest_sha256=None,
-                    attempts=[],
-                    aggregates=[],
+                    attempts=attempts,
+                    aggregates=aggregates,
                     coverage=coverage,
                     selected_case_uids=[uid],
                     preflight_results=[row],
                 )
+
+        # A valid excluded preflight with no attempts or aggregate is an
+        # incomplete selected report and is never publishable.
+        coverage = compute_coverage(
+            authored_units_total=1,
+            selected_case_uids=[uid],
+            preflight_results=[excluded],
+            attempts=[],
+            aggregates=[],
+            assertions_selected_total=0,
+            assertions_accounted_total=0,
+            assertions_actually_graded_total=0,
+        )
+        with self.assertRaisesRegex(
+            DishonestReportError, "selected PRECHECK_EXCLUDED case .* no aggregate"
+        ):
+            build_run_report(
+                run_id=RUN,
+                baseline_identity={},
+                run_provenance={},
+                input_evidence_manifest_sha256=None,
+                attempts=[],
+                aggregates=[],
+                coverage=coverage,
+                selected_case_uids=[uid],
+                preflight_results=[excluded],
+            )
 
     def test_demonstration_report_all_unrun_inconclusive(self) -> None:
         uids = [make_case_uid(case_id=f"case-{i}") for i in range(3)]
@@ -616,6 +662,135 @@ class TestHonestDefaults(unittest.TestCase):
     def test_unfinalized_binding_marked(self) -> None:
         report = build_demonstration_report(RUN, [make_case_uid()], 1741)
         self.assertEqual(report["run_evidence_binding"]["status"], "UNFINALIZED")
+
+
+class TestSelectedPrecheckExclusion(unittest.TestCase):
+    """BER-DEC-014: a selected excluded case must report its exclusion."""
+
+    def setUp(self) -> None:
+        self.case = make_case(case_id="precheck-gap", required_commands=("missing-cmd",))
+        self.uid = self.case.case_uid
+        self.preflight = evaluate_case(self.case, PreflightEnvironment())
+        self.reason = self.preflight.reason_code
+
+    def _aggregate(self, **overrides) -> AggregateRecord:
+        fields = dict(
+            case_uid=self.uid,
+            aggregate_verdict=AggregateVerdict.INCONCLUSIVE,
+            aggregate_blocker=AggregateBlocker.PRECHECK_EXCLUDED,
+            reason_code=self.reason,
+            attempts_planned=1,
+        )
+        fields.update(overrides)
+        return AggregateRecord(**fields)
+
+    def _report(self, attempts, aggregates, selected=True):
+        selection = [self.uid] if selected else []
+        coverage = compute_coverage(
+            authored_units_total=1,
+            selected_case_uids=selection,
+            preflight_results=[self.preflight],
+            attempts=attempts,
+            aggregates=aggregates,
+            assertions_selected_total=0,
+            assertions_accounted_total=0,
+            assertions_actually_graded_total=0,
+        )
+        return build_run_report(
+            run_id=RUN,
+            baseline_identity={},
+            run_provenance={},
+            input_evidence_manifest_sha256=None,
+            attempts=attempts,
+            aggregates=aggregates,
+            coverage=coverage,
+            selected_case_uids=selection,
+            preflight_results=[self.preflight],
+        )
+
+    def _unrun(self, reason=None):
+        return [planned_unrun_attempt(RUN, self.uid, 1, reason or self.reason)]
+
+    def test_not_selected_aggregate_for_excluded_case_rejected(self) -> None:
+        """The previously accepted contradictory report from the proposal."""
+        attempts = self._unrun(ReasonCode.NOT_SELECTED)
+        aggregate = default_unselected_aggregate(self.uid, attempts_planned=1)
+        with self.assertRaisesRegex(
+            DishonestReportError, "INCONCLUSIVE / PRECHECK_EXCLUDED"
+        ):
+            self._report(attempts, [aggregate])
+
+    def test_missing_aggregate_rejected(self) -> None:
+        for attempts, pattern in (
+            ([], "selected PRECHECK_EXCLUDED case .* no aggregate"),
+            # Pins the older record-completeness guard, which fires first here.
+            (self._unrun(), "attempt for case .* has no aggregate"),
+        ):
+            with self.subTest(attempts=len(attempts)):
+                with self.assertRaisesRegex(DishonestReportError, pattern):
+                    self._report(attempts, [])
+
+    def test_missing_planned_attempts_rejected(self) -> None:
+        for aggregate, pattern in (
+            (
+                self._aggregate(attempts_planned=0),
+                "selected PRECHECK_EXCLUDED case .* planned attempts UNRUN",
+            ),
+            # Pins the older record-completeness guard, which fires first here.
+            (self._aggregate(), r"expects planned attempts \[1\]"),
+        ):
+            with self.subTest(attempts_planned=aggregate.attempts_planned):
+                with self.assertRaisesRegex(DishonestReportError, pattern):
+                    self._report([], [aggregate])
+
+    def test_mismatched_reason_code_rejected(self) -> None:
+        other = next(r for r in PRECHECK_REASON_CODES if r is not self.reason)
+        for reason in (other, ReasonCode.NOT_SELECTED, None):
+            with self.subTest(reason=reason):
+                with self.assertRaisesRegex(DishonestReportError, "preflight reason"):
+                    self._report(self._unrun(), [self._aggregate(reason_code=reason)])
+
+    def test_other_blocker_rejected(self) -> None:
+        for blocker in (AggregateBlocker.BUDGET_EXHAUSTED, AggregateBlocker.ERROR):
+            with self.subTest(blocker=blocker):
+                with self.assertRaisesRegex(
+                    DishonestReportError, "INCONCLUSIVE / PRECHECK_EXCLUDED"
+                ):
+                    self._report(
+                        self._unrun(), [self._aggregate(aggregate_blocker=blocker)]
+                    )
+
+    def test_executed_attempt_on_excluded_case_rejected(self) -> None:
+        """Pins the existing executed-attempt guard for an excluded case."""
+        for state, reason in (
+            (AttemptState.ERROR, ReasonCode.FIXTURE_SETUP_FAILED),
+            (AttemptState.JUDGE_ERROR, None),
+        ):
+            with self.subTest(state=state):
+                attempt = AttemptRecord(
+                    RUN, self.uid, 1, state, error_reason_code=reason
+                )
+                with self.assertRaisesRegex(
+                    DishonestReportError, "has no RUNNABLE preflight"
+                ):
+                    self._report([attempt], [self._aggregate(attempts_run=1)])
+
+    def test_valid_exclusion_counts_in_excluded_totals(self) -> None:
+        report = self._report(self._unrun(), [self._aggregate()])
+        self.assertEqual(
+            report["coverage_metrics"]["excluded_totals_by_reason"],
+            {"PRECHECK_EXCLUDED": 1},
+        )
+        self.assertEqual(report["aggregates"][0]["aggregate_blocker"], "PRECHECK_EXCLUDED")
+        self.assertEqual(report["aggregates"][0]["reason_code"], self.reason.value)
+        self.assertEqual(report["attempts"][0]["attempt_state"], "UNRUN")
+
+    def test_unselected_excluded_case_keeps_not_selected_shape(self) -> None:
+        attempts = self._unrun(ReasonCode.NOT_SELECTED)
+        aggregate = default_unselected_aggregate(self.uid, attempts_planned=1)
+        report = self._report(attempts, [aggregate], selected=False)
+        self.assertEqual(report["aggregates"][0]["aggregate_blocker"], "NOT_SELECTED")
+        self.assertEqual(report["coverage_metrics"]["excluded_totals_by_reason"], {})
 
 
 if __name__ == "__main__":  # pragma: no cover
