@@ -1025,3 +1025,267 @@ generic skill guidance that would require asking for the same approval again.
 - **Evidence:** [PR #315](https://github.com/ModernNomad-98/Project-Aegis/pull/315)
   merged `5b78c77535ac76c99c10becb2d437b24867f69f9` as
   `658fa22edbfde2c953f7d21678d08baa79b75052` at the time above.
+
+### AEGIS-APR-046: BER selected-precheck aggregate correction
+
+- **Event:** GRANT.
+- **Status at recording:** Owner approved; ACTIVE only after the separate
+  reviewed governance PR containing BER-DEC-014 and this entry merges.
+- **Date / Grantor:** 2026-09-26 / Peter Nguyen.
+- **Reason:** Make a Behavioral Eval Runner (BER) report reject a selected case
+  that its pre-run check (preflight) excluded (`PRECHECK_EXCLUDED`) unless its
+  planned attempts stay unexecuted (`UNRUN`) and its case-level result
+  (aggregate) records the same exclusion, so an excluded case cannot appear
+  unselected (`NOT_SELECTED`) or vanish from the excluded-case count.
+- **Owner decision:** "Approve fix + #333 opt A (Recommended)", answering a
+  question that described both options. The selected option read: "Approve
+  the bounded fix using the brief's scoped wording, and also approve #333
+  option A, a standing gate-guard allowlist that already covers these two
+  files." The #333 part, which the owner later confirmed as option A as
+  defined, is recorded separately in AEGIS-APR-047.
+- **Scope allowed:** The approved scoped wording was: "I approve the bounded
+  synthetic BER precheck-aggregate correction in merged PR #331's proposal
+  (docs/roadmaps/ber-precheck-aggregate-validation-proposal.md), and only
+  that. Scope: exactly two paths: tools/behavioral_eval_runner/reporting.py
+  and tools/behavioral_eval_runner/tests/test_reporting.py. Limits: at most 8
+  active implementation hours and 300 added code/test lines; $0
+  task-controlled external spend; synthetic local fixtures only; no provider,
+  model or metadata calls, private labels, credentials, host probes,
+  dependency installs or live sessions. Order: this takes effect only after a
+  separate reviewed governance PR merges that appends BER-DEC-014 to the BER
+  decision log and APR-046 to the approval register; that governance PR also
+  updates the backlog lifecycle entry and records the repository, branch and
+  base, exact paths, acceptance tests, budget, evidence and stop conditions.
+  Delivery: one implementation branch created from that governance PR's exact
+  merge commit, with its commit and tree recorded; one DCO-signed
+  implementation PR with exact-path staging, the focused and full offline BER
+  test suites on Windows and pinned Linux, independent security and quality
+  review, and exact-head checks. Use limit: one implementation package;
+  consumed at its merge." (DCO is the Developer Certificate of Origin commit
+  sign-off check.) The [merged proposal](../roadmaps/ber-precheck-aggregate-validation-proposal.md)
+  defines the permitted change at each path. Branch, acceptance tests and
+  evidence handling are recorded in BER-DEC-014 in
+  [the BER governance log](../roadmaps/behavioral-eval-runner-backlog.md#ber-dec-014-bounded-synthetic-selected-precheck-aggregate-correction--owner-approved).
+- **Scope FORBIDDEN:** From the approved wording: "Stop conditions: stop and
+  come back to the owner before exceeding any limit, touching another path,
+  changing the approved report contract, or if review finds a legitimate
+  consumer that depends on the empty selected-case shape. What this does not
+  cover: it does not change private-label, selected-host, provider-budget,
+  OD-1 or later live-suite gates." OD-1 is owner decision 1, the later
+  ratification of a measured judge-calibration result. This grant does not
+  itself waive a failed check; a `gate-guard` result on the implementation PR
+  is governed by AEGIS-APR-047's conditions.
+- **Evidence:** Direct owner answer in the Project Aegis conversation on
+  2026-09-26, quoted above, relayed by the coordinating agent with the exact
+  scoped wording. The proposal merged in
+  [PR #331](https://github.com/ModernNomad-98/Project-Aegis/pull/331) as
+  `1bf35dc88d76a6177b67ecc18fbffcb6f8f849fb`.
+- **Expiry / use limit:** One implementation package; consumed at its merge.
+  No calendar expiry stated.
+
+### AEGIS-APR-047: Standing gate-guard exception for four BER files
+
+- **Event:** GRANT; narrow later condition on AEGIS-APR-013, AEGIS-APR-024 and
+  AEGIS-APR-039 for one signal only.
+- **Status at recording:** ACTIVE from the owner's 2026-09-26 decision,
+  confirmed the same day. Recurring until the owner revokes or replaces it. It changes no CI job,
+  guard pattern, required check or branch setting.
+- **Date / Grantor:** 2026-09-26 / Peter Nguyen.
+- **Reason:** Stop repeated one-time owner exceptions for authorized repairs
+  to four BER reporting/aggregation files while keeping the protected-file
+  guard, independent review and a deliberate administrator merge.
+- **Owner decision:** The same answer quoted in AEGIS-APR-046, "Approve fix +
+  #333 opt A (Recommended)", selected "option A, a standing gate-guard
+  allowlist that already covers these two files". "Allowlist" was the
+  coordinating agent's shorthand. After the coordinator explained that option
+  A is the packet's documented owner exception, not a CI allowlist
+  (`gate-guard` stays failed, a qualifying PR uses a deliberate administrator
+  merge with a receipt, and the seven conditions apply), the owner confirmed
+  on 2026-09-26: "Yes, option A as defined (Recommended)". Option A is defined in the
+  [merged decision packet](../roadmaps/gate-guard-friction-decision.md#option-a-proposed-recurring-scope)
+  as an owner exception, not a workflow allowlist: the `gate-guard` check
+  still fails and is recorded as failed with an authorized disposition.
+- **Scope allowed:** Option A's grant language, now approved: "For authorized
+  work in `ModernNomad-98/Project-Aegis`, permit deliberate administrator
+  merge when every changed protected path is one of the four eligible BER
+  files listed below, the sole failed GitHub Actions check is the existing
+  `gate-guard` protected-path condition, and every condition below is
+  satisfied. This narrowly supersedes the all-green condition in
+  AEGIS-APR-013/024/039 for that signal only. It does not authorize unrelated
+  implementation, change the protected path set or branch settings, or waive
+  another failed check. Apply until the owner revokes or replaces this
+  standing exception." The four eligible paths are
+  `tools/behavioral_eval_runner/reporting.py`,
+  `tools/behavioral_eval_runner/aggregation.py`,
+  `tools/behavioral_eval_runner/tests/test_reporting.py` and
+  `tools/behavioral_eval_runner/tests/test_aggregation.py`. Ordinary
+  unprotected documentation may accompany an eligible repair. Each use must
+  meet the seven conditions in the packet as merged at
+  `f7ac19bf4ee3811db3d25774a7d461ac4c87f8a1` (summarized here; that merged
+  text governs): separate active work authority; passing
+  local checks and Linux `validate-skills` and Windows
+  `windows-offline-checks` on the candidate; a guard log showing only its
+  protected-path match; independent review of the changed protected surfaces
+  with reviewer identity and reviewed head, no unresolved blocker; exact-head
+  recheck immediately before merge; a PR receipt recording the PR, full head,
+  protected paths, review, local and hosted results, this grant and the merge
+  result, describing the guard as failed with an authorized disposition; and
+  a post-merge main check, with no unattended auto-merge.
+- **Scope FORBIDDEN:** From option A: a PR also touching any other protected
+  file is ineligible as a whole; workflow/CI files, CODEOWNERS, the validator,
+  Developer Certificate of Origin (DCO) check, guard scripts and tests,
+  requirements, parent import files, acceptance machinery and all other BER
+  paths keep separate one-time owner decisions. Changes that disable or weaken
+  checking, alter merge/review authority, change protected-path policy, or
+  modify the guard or approval mechanism need a separate one-time decision
+  wherever the code is. Tests cannot be weakened to obtain a pass. A work
+  package rule that explicitly reserves its future guard exception for a
+  separate decision stays in force unless the owner amends it. No provider
+  call, credential access, real-host proof, private input, deployment,
+  evidence deletion or spent implementation grant is authorized. Expanding
+  the four-path list needs a new owner decision.
+- **Evidence:** Direct owner answers in the Project Aegis conversation on
+  2026-09-26: the selection quoted in AEGIS-APR-046 and the confirmation
+  quoted above, both relayed by the coordinating agent. The decision packet
+  merged in [PR #333](https://github.com/ModernNomad-98/Project-Aegis/pull/333)
+  as `f7ac19bf4ee3811db3d25774a7d461ac4c87f8a1`.
+- **Expiry / use limit:** None stated; recurring until owner revocation or
+  replacement. Revocation returns protected merges to per-PR exceptions and
+  cannot undo completed merges.
+
+### AEGIS-APR-048: Standing administrator merge once checks are green
+
+- **Event:** GRANT; restates and conditions AEGIS-APR-013 for the merge
+  mechanism. It creates no authority beyond AEGIS-APR-013's terms.
+- **Status at recording:** ACTIVE from the owner's 2026-09-26 instruction.
+  Recurring until the owner revokes or replaces it.
+- **Date / Grantor:** 2026-09-26 / Peter Nguyen.
+- **Reason:** A governance audit of merged PRs #345–#360 found this
+  instruction existed only in chat, so its authority could not be checked
+  from the repository.
+- **Owner decision:** The owner's exact chat instruction at about 20:15 UTC
+  on 2026-09-26 was: "approve admin merge for all future PR once local and
+  github action checks are green". On 2026-09-26 at about 20:58 UTC the owner
+  approved recording it here as worded: "Approve all five as worded
+  (Recommended)", answering a question that listed AEGIS-APR-048 through
+  AEGIS-APR-052 by number and one-line summary.
+- **Scope allowed:** For separately authorized work in this repository, a
+  deliberate administrator merge of a pull request at its exact reviewed head
+  (`--match-head-commit`) once that head's required GitHub Actions checks are
+  green and local checks pass (see AEGIS-APR-049 for what satisfies the local
+  leg). The first uses were
+  [PR #355](https://github.com/ModernNomad-98/Project-Aegis/pull/355) and
+  [PR #356](https://github.com/ModernNomad-98/Project-Aegis/pull/356), merged
+  at 20:17 UTC the same day.
+- **Scope FORBIDDEN:** It does not waive a failed `gate-guard` or any other red
+  check; AEGIS-APR-039's rule stands, and a protected-path failure is governed
+  only by AEGIS-APR-047 or a one-time owner decision. It does not arm
+  auto-merge, change branch settings, or authorize work that lacks its own
+  grant. It is subject to the review-wait condition in AEGIS-APR-050.
+- **Evidence:** Direct owner instruction and direct owner recording approval
+  in the Project Aegis conversation on 2026-09-26, quoted above, received by
+  the coordinating agent and transcribed here.
+- **Expiry / use limit:** None stated; recurring until owner revocation or
+  replacement.
+
+### AEGIS-APR-049: Exact-head CI satisfies the local-test condition
+
+- **Event:** GRANT; clarification of AEGIS-APR-013 and AEGIS-APR-048.
+- **Status at recording:** ACTIVE from the owner's 2026-09-26 answer.
+  Recurring.
+- **Date / Grantor:** 2026-09-26 / Peter Nguyen.
+- **Reason:** The audit of PRs #345–#360 found that every PR body claimed a
+  local validator run but only the hosted re-run of the same checks on the
+  exact head was verifiable.
+- **Owner decision:** Asked whether a green required-check run on the exact
+  merged head counts as satisfying AEGIS-APR-013's "local tests" leg, the
+  owner answered on 2026-09-26 at about 20:52 UTC: "Yes, CI on exact head
+  suffices (Recommended)". Recording approved as in AEGIS-APR-048.
+- **Scope allowed:** A green run of the required GitHub Actions checks on the
+  exact merged head, which re-runs `scripts/validate-skills.py`, the offline
+  test suites and the Developer Certificate of Origin check, satisfies the
+  local-test leg of AEGIS-APR-013 and AEGIS-APR-048. No per-PR attachment of
+  local output is required. The coordinating agent applied this reading to
+  close the audit's local-test finding for PRs #345–#360, whose bodies claimed
+  local runs that CI re-ran on their exact heads; the owner's answer did not
+  name those PRs. A work grant that names its own local acceptance tests (for
+  example the Windows and pinned-Linux suites in AEGIS-APR-046, or "applicable
+  local checks" in AEGIS-APR-047) still requires those runs.
+- **Scope FORBIDDEN:** It does not excuse a red or missing check, a check run
+  on a different head, or a check whose result was rewritten by a later run.
+  A work grant that names additional local acceptance tests (for example the
+  Windows and pinned-Linux suites in AEGIS-APR-046) keeps that requirement.
+- **Evidence:** Direct owner answer in the Project Aegis conversation on
+  2026-09-26, quoted above.
+- **Expiry / use limit:** None stated; recurring.
+
+### AEGIS-APR-050: Merges wait for the automated Codex review
+
+- **Event:** GRANT; a policy condition on AEGIS-APR-013 and AEGIS-APR-048.
+- **Status at recording:** ACTIVE from the owner's 2026-09-26 answer.
+  Recurring.
+- **Date / Grantor:** 2026-09-26 / Peter Nguyen.
+- **Reason:** The audit of PRs #345–#360 found that the Codex automated
+  reviewer posted findings one to four minutes after six merges (including
+  three P1 findings on PR #349) and that none had been triaged.
+- **Owner decision:** Asked whether merges should wait for Codex, the owner
+  answered on 2026-09-26 at about 20:52 UTC: "Wait for Codex, then triage
+  (Recommended)". Recording approved as in AEGIS-APR-048.
+- **Scope allowed:** Before an administrator merge under AEGIS-APR-013 or
+  AEGIS-APR-048, wait until the Codex review has posted on the pull request,
+  or until Codex is confirmed unavailable for it (for example a usage-limit
+  notice, as on PRs #345–#347). Triage every P1 and P2 finding (Codex's two
+  highest priority levels) before merging: fix it, or record in the pull
+  request why it is not a defect.
+- **Scope FORBIDDEN:** Codex output is not an approval and grants nothing; it
+  cannot replace the independent review a work grant requires. Waiting for
+  Codex does not extend any other deadline or waive any check.
+- **Evidence:** Direct owner answer in the Project Aegis conversation on
+  2026-09-26, quoted above.
+- **Expiry / use limit:** None stated; recurring until owner revocation.
+
+### AEGIS-APR-051: Eval-file maintenance of delivered skills is backlog delivery
+
+- **Event:** GRANT; clarification of AEGIS-APR-039's scope, with retroactive
+  ratification of two merged pull requests.
+- **Status at recording:** ACTIVE from the owner's 2026-09-26 answer.
+  Recurring.
+- **Date / Grantor:** 2026-09-26 / Peter Nguyen.
+- **Reason:** PRs #359 and #361 edited `aegis-setup` eval files that are on
+  AEGIS-APR-007's exact file list. The implementing and reviewing agents
+  classified the edits as maintenance rather than a scope revision, but no
+  owner ruling existed.
+- **Owner decision:** Asked whether to record such a ruling, the owner
+  answered on 2026-09-26 at about 20:52 UTC: "Ratify as maintenance
+  (Recommended)". Recording approved as in AEGIS-APR-048.
+- **Scope allowed:** Edits confined to `evals/*.json` of an already-delivered
+  skill — no change to its `SKILL.md` workflow or authority text and no
+  script change — are backlog delivery under AEGIS-APR-039, even when the
+  file is named in a consumed one-use implementation grant. This ratifies
+  [PR #359](https://github.com/ModernNomad-98/Project-Aegis/pull/359)
+  (`639d22fcbf50e81eebe87032ca56ece108cc3507`) and
+  [PR #361](https://github.com/ModernNomad-98/Project-Aegis/pull/361)
+  (`135eb7f6dfab1627407dafce9dd4da89cc8b3edb`), each of which changed only
+  `.claude/skills/aegis-setup/evals/*.json`.
+- **Scope FORBIDDEN:** Any edit to a delivered skill's `SKILL.md`, scripts,
+  references or state contract keeps the original grant's scope-revision
+  rule. It does not reopen a consumed grant's budget or file list.
+- **Evidence:** Direct owner answer in the Project Aegis conversation on
+  2026-09-26, quoted above.
+- **Expiry / use limit:** None stated; recurring.
+
+### AEGIS-APR-052: Consumption of the package-2 implementation grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-007.
+- **Status at recording:** AEGIS-APR-007 has no remaining use.
+- **Effective at:** 2026-09-23 16:54:58 UTC.
+- **Recorded at / By:** 2026-09-26 / Project Aegis agent, on the owner's
+  recording approval quoted in AEGIS-APR-048.
+- **New authority:** None. Later eval-only maintenance of the delivered skill
+  is covered by AEGIS-APR-051.
+- **Reason:** The one bounded package-2 implementation was delivered.
+- **Evidence:** [PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124)
+  merged as `d598390f4b7bb367ce79dd1276157f91ae36556b` at the time above (Git
+  merge-commit timestamp 2026-09-23 11:54:58 -05:00).
+  [The package-2 review](../evidence/setup/issue-101-package-2-review.md)
+  records that package 2 shipped in PR #124.

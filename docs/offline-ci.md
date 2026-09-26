@@ -15,8 +15,11 @@ inputs; they do not run a live model evaluation.
    green results do not cover the new head.
 3. Read the job logs and retained evidence if a check fails. Fix a test or
    environment failure and rerun the new candidate. A documented protected
-   path guard failure needs its own owner disposition under the
-   [merge policy](reconciliation/auto-merge-policy.md); it is not green.
+   path guard failure needs an owner disposition under the
+   [merge policy](reconciliation/auto-merge-policy.md); it is not green. For
+   four named BER reporting/aggregation files, the owner's standing exception
+   [AEGIS-APR-047](approvals/APPROVAL_REGISTER.md#aegis-apr-047-standing-gate-guard-exception-for-four-ber-files)
+   supplies that disposition when all its conditions are met.
 4. Close out only after independent review and all applicable execution jobs
    have passed. A skipped capability remains unproven.
 

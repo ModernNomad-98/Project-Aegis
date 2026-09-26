@@ -1,6 +1,7 @@
 # Behavioral Eval Runner — Durable Backlog and Phase Register
 
-> **Current reading, checked 2026-09-26 after pull request #315:** This is the
+> **Current reading, checked 2026-09-26 after pull request #315 and the
+> BER-DEC-014 grant:** This is the
 > permanent continuation and decision register for Behavioral Eval Runner
 > maintainers and coding agents. The dated delivery checkpoints below remain
 > historical evidence. Use the current map and owning work-package record
@@ -34,7 +35,7 @@ supersessions in [section 20a of the merged design](../design/behavioral-eval-ru
 | --- | --- | --- |
 | WP-2B-0, 2B-1, 2B-1A, 2B-2 | **DONE** within offline or limited scopes. Outcome B accepted unresolved host limits; the grading stack is non-live. | No measured calibration or live host follows. Read the [phase records](#7-phase-work-package-register--wp-2b-0--wp-2b-7). |
 | WP-2B-1B / BKL-009 | The bounded synthetic offline proof **DELIVERED** in [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) under consumed APR-012 and BER-DEC-011. [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day policy. The further bounded synthetic integration **DELIVERED** in [PR #257](https://github.com/ModernNomad-98/Project-Aegis/pull/257) under BER-DEC-013 and consumed APR-023. BKL-009 remains **PARTIAL**. | Real-host access, encryption, privacy, production runtime binding and cleanup need separate scope. See [BKL-009](#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy). |
-| WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; BER-DEC-012 granted the bounded synthetic offline holdout support delivered in [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249). [PR #313](https://github.com/ModernNomad-98/Project-Aegis/pull/313) delivered offline report/preflight binding and complete holdout confusion matrices and denominators; [PR #315](https://github.com/ModernNomad-98/Project-Aegis/pull/315) delivered executed-aggregate integrity checks. Measured calibration and OD-1 ratification remain unfinished. | Approved labels and private inputs, selected execution source, allowance, live calibration and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate), the [offline scope](ber-wp2b3-holdout-execution-scope.md), and the [implementation review](../evidence/ber-wp2b3-holdout-offline-review.md). |
+| WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; BER-DEC-012 granted the bounded synthetic offline holdout support delivered in [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249). [PR #313](https://github.com/ModernNomad-98/Project-Aegis/pull/313) delivered offline report/preflight binding and complete holdout confusion matrices and denominators; [PR #315](https://github.com/ModernNomad-98/Project-Aegis/pull/315) delivered executed-aggregate integrity checks. BER-DEC-014 authorizes the bounded selected-precheck aggregate correction proposed in PR #331, effective at its governance merge and not yet implemented. Measured calibration and OD-1 ratification remain unfinished. | Approved labels and private inputs, selected execution source, allowance, live calibration and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate), the [offline scope](ber-wp2b3-holdout-execution-scope.md), and the [implementation review](../evidence/ber-wp2b3-holdout-offline-review.md). |
 | R1–R5 | Outcome B accepted their WP-2B-0 dispositions; R2 and R4/R5 technical proofs remain unresolved. | Read the [evidence-gate records](#6-phase-2b-0-evidence-gates--r1r5); selected-host proof is needed before a baseline claim. |
 | WP-2B-4 through 2B-7 | WP-2B-4 is **BLOCKED**; 2B-5, 2B-6 and 2B-7 remain **BACKLOG**. | Each needs its own prerequisites and reviewed authority. |
 
@@ -1053,6 +1054,18 @@ operator controls are evidenced. The 2026-09-23 checkpoint above is historical.
   live execution source, approve private labels, establish provider allowance,
   unseal the holdout or satisfy OD-1. The implementation and its exact-head
   checks are pending review at this branch checkpoint.
+
+  BER-DEC-014 and [APR-046](../approvals/APPROVAL_REGISTER.md#aegis-apr-046-ber-selected-precheck-aggregate-correction),
+  owner-approved on 2026-09-26 and effective when their governance PR merges,
+  authorize one further bounded synthetic increment under this AUTHORIZED
+  record: the selected-precheck aggregate correction proposed in
+  [PR #331 proposal](ber-precheck-aggregate-validation-proposal.md), on
+  `fix/ber-precheck-aggregate-validation` from that governance merge commit,
+  limited to `reporting.py` and `tests/test_reporting.py` under
+  `tools/behavioral_eval_runner/`, 8 active hours, 300 added lines and USD $0.
+  Status: **AUTHORIZED, not started** at this governance checkpoint. It does
+  not change private-label, selected-host, provider-budget, OD-1 or later
+  live-suite gates.
 
   **Historical note (governance rule
   5 — this record is redefined, not deleted):** the former WP-2B-3 NON-LIVE semantic-judge
@@ -3647,6 +3660,85 @@ become effective only on this governance PR's reviewed merge.
   Host access, runtime binding, actual redaction/privacy review and
   marker-gated cleanup need separate owner choices and evidence. Expiration
   never authorizes deletion.
+
+### BER-DEC-014: Bounded synthetic selected-precheck aggregate correction — OWNER APPROVED
+
+**Owner decision:** On 2026-09-26 Peter Nguyen answered "Approve fix + #333
+opt A (Recommended)" to a question describing both options. The selected
+option approved the bounded fix in the merged
+[PR #331 proposal](ber-precheck-aggregate-validation-proposal.md) using the
+coordinator brief's exact scoped wording, transcribed verbatim in
+[APR-046](../approvals/APPROVAL_REGISTER.md#aegis-apr-046-ber-selected-precheck-aggregate-correction),
+and also approved #333 option A, recorded in
+[APR-047](../approvals/APPROVAL_REGISTER.md#aegis-apr-047-standing-gate-guard-exception-for-four-ber-files).
+After being told that option A keeps `gate-guard` failed and requires a
+deliberate administrator merge with a receipt under the packet's seven
+conditions, the owner confirmed: "Yes, option A as defined (Recommended)".
+PR #331 merged as `1bf35dc88d76a6177b67ecc18fbffcb6f8f849fb`. This decision
+and APR-046 become effective only when this reviewed governance PR merges.
+
+- **Governing work package and scope:** One bounded, synthetic-only
+  report-integrity increment under AUTHORIZED WP-2B-3 (§7). For a selected
+  case whose preflight outcome is `PRECHECK_EXCLUDED` (preflight is the check
+  before a case runs; `UNRUN` means a planned attempt did not execute; the
+  aggregate is the case-level result), the run report must
+  require its planned attempts to remain `UNRUN` and its aggregate to be
+  `INCONCLUSIVE` / `PRECHECK_EXCLUDED` with the preflight reason code, and
+  must reject a missing or contradictory aggregate before publishing. Preserve
+  the existing executed-`RUNNABLE` derivation check and the unselected
+  demonstration report. WP-2B-3's status, BER-DEC-008's measured-execution
+  branch, baseline, thresholds and budgets are unchanged.
+- **Repository, branch and base:** `ModernNomad-98/Project-Aegis`;
+  `fix/ber-precheck-aggregate-validation`, created directly from this
+  governance PR's exact merge commit. Record that commit and tree in the
+  implementation PR before code changes; never use a pre-grant branch or a
+  later moving `main`.
+- **Exact implementation paths:** `tools/behavioral_eval_runner/reporting.py`
+  and `tools/behavioral_eval_runner/tests/test_reporting.py` only. The merged
+  proposal defines the permitted change at each path. Recording completion or
+  consumption in this backlog and the register is a later separate reviewed
+  governance change, not an implementation path.
+- **Acceptance tests:** Synthetic regressions for the currently accepted
+  contradictory report (preflight `PRECHECK_EXCLUDED`, aggregate
+  `NOT_SELECTED`), a missing aggregate, missing planned attempts, a
+  mismatched reason code, an executed attempt on an excluded case, a valid
+  exclusion that counts in `excluded_totals_by_reason`, and unchanged
+  runnable and unselected reports. Update
+  `test_report_rejects_inconsistent_preflight_shapes` so it still tests
+  preflight-field validation without treating an incomplete selected report as
+  publishable. Run `python -m unittest tools.behavioral_eval_runner.tests.test_reporting`
+  and the full offline suite `python -m unittest discover -s tools/behavioral_eval_runner/tests -p "test_*.py"`
+  on Windows and the pinned Linux environment, plus `git diff --check`, the
+  two-path diff check and the added-line count.
+- **Budget and units:** At most 8 active implementation hours, excluding CI
+  and owner waiting; at most 300 added code/test lines across the two paths;
+  USD $0 task-controlled external spend; provider, model and metadata calls 0;
+  live sessions 0; dependency installs 0; host probes 0.
+- **Evidence handling:** Synthetic cases and temporary offline fixtures only;
+  no private label, credential, sealed holdout or real evidence bundle. The
+  implementation PR description is the sanitized evidence record: exact head,
+  base merge commit and tree, commands, exit codes, test and skip counts,
+  added-line count, reviewer identity and sanitized findings, and hosted
+  check links. No tracked evidence file is authorized.
+- **Delivery and guard:** One DCO-signed implementation PR with exact-path
+  staging, the focused and full offline suites above, independent security and
+  quality review, and exact-head checks. The owner approved #333 option A in
+  the same answer; a `gate-guard` failure limited to these two paths may be
+  dispositioned under APR-047 when every one of its conditions is met, so this
+  package does not reserve a separate one-time exception: the owner's same
+  answer, whose option A was described as already covering these two files,
+  replaces the merged proposal's sentence requiring a PR-specific guard
+  approval. Any other failed
+  check, or a protected path outside APR-047's four files, still needs its own
+  owner decision.
+- **Stop conditions:** Stop and return to the owner before exceeding any
+  limit, touching another path, changing the approved report contract, or if
+  review finds a legitimate consumer that depends on the empty selected-case
+  shape. Also stop for an unresolved security or evidence-integrity finding.
+- **Use limit and excluded gates:** One implementation package, consumed at
+  its merge. This does not change private-label, selected-host,
+  provider-budget, OD-1 or later live-suite gates, and it grants no measured
+  calibration, holdout execution, WP-2B-4 or deployment.
 
 ## 14. Continuation instructions for a brand-new session
 
