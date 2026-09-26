@@ -43,7 +43,9 @@
           "Surfaces the conflict head-on: the 30-day absolute promise is false while backups live 120 days — no silent design-around.",
           "Presents the honest options: shorten rotation, or amend the promise to state backup aging with restore-time re-deletion, escalating the choice to a human as a policy decision.",
           "Does not claim surgical editing of backups as the fix.",
-          "Designs the live-store erasure to genuinely complete within 30 days regardless of which backup option is chosen."
+          "Designs the live-store erasure to genuinely complete within 30 days regardless of which backup option is chosen.",
+          "For each option, gives the reason it is viable, its benefits and limits, setup and upkeep, and storage, recovery, or policy-notice cost as explicit unknowns without inventing figures, then recommends one path with a concrete reason, or, where neither path's recovery/policy evidence is established, recommends keeping the conflict open with no compliant-closure claim and names the evidence needed.",
+          "Ends with exactly one clear owner question and does not treat the draft, the recommendation, or an amended promise as approved; counsel and policy-owner review stay pending."
         ]
       }
     },
@@ -70,6 +72,22 @@
         "assertions": [
           "Does not invoke pii-lifecycle-designer: pre-model redaction and least-data context assembly at the AI boundary is sensitive-disclosure-guard's pipeline.",
           "The lifecycle designer's classification may feed that pipeline, but nothing here asks for classification, retention, or erasure design."
+        ]
+      }
+    },
+    {
+      "id": "edge-owner-pseudonymize-or-anonymize-choice",
+      "type": "should_trigger",
+      "prompt": "A university research partner wants our product-usage dataset for a churn study. Each row has a hashed user ID (we keep the hash key), ZIP code, birth year, plan tier, and event timestamps. We could share it pseudonymized under a data-sharing agreement, or transform it into something we can call anonymized. No re-identification test has been run, we have no cost estimate, and counsel has not reviewed either route. I own the data-sharing decision. Walk me through the choice and tell me which you'd pick, then design the dataset's lifecycle for whichever I choose.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains in plain language that pseudonymization keeps a linkable key so the extract remains personal data with retention, erasure, and key-custody obligations, while anonymization means re-identification is impracticable under a stated threat model and must be verified, not declared.",
+          "Identifies ZIP code, birth year, and event timestamps as quasi-identifiers whose combination creates re-identification risk, and requires a re-identification check with stated thresholds before any anonymized label.",
+          "Compares sharing pseudonymized data under an agreement with producing a verified anonymized or aggregated extract, giving each option's reason, research utility, re-identification and onward-sharing risk, setup (key custody, generalization, suppression, aggregation floors), recurring controls, and storage, compute, and review cost as explicit unknowns without inventing figures.",
+          "Recommends one path with a concrete reason tied to the study's purpose and the missing evidence, never recommends the anonymized label before the risk check passes, and names the condition that would change the recommendation.",
+          "Ends with exactly one clear owner question; treats counsel review and the data-sharing agreement as pending human decisions and does not claim legal sufficiency, compliance, or approval of either route.",
+          "Does not silently pick for the owner: the lifecycle design for the extract (retention, erasure propagation to the partner, key custody) is framed as conditional on the owner's answer, and pseudonymized data is never exempted from erasure."
         ]
       }
     }
