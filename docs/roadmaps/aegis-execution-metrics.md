@@ -17,9 +17,11 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [catch-up checkpoint after pull request #306](#catch-up-checkpoint-after-pull-request-306--2026-09-25)
-reconsiders every selected and optional row and records four missed five-merge
-windows. The [BER-BKL-009 owner
+The latest [five-merge checkpoint after pull request #308](#five-merge-checkpoint-after-pull-request-308--2026-09-25)
+reconsiders every selected and optional row. The earlier [catch-up checkpoint
+after #306](#catch-up-checkpoint-after-pull-request-306--2026-09-25) records
+four missed five-merge windows without resetting the #303 cadence anchor.
+The [BER-BKL-009 owner
 decision](aegis-backlog-forecast.md#material-owner-decision--2026-09-24-ber-bkl-009)
 supersedes the old whole-item estimate and selected total. PR #257 delivered
 the bounded offline integration; host, runtime, privacy and cleanup work
@@ -49,6 +51,46 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Five-merge checkpoint after pull request #308 — 2026-09-25
+
+The [current full reassessment](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-25-after-pull-request-308)
+uses main `9d6b1c0751013fe4fb56b28166e0857eaa2d80eb`. The five first-parent
+merges after the #303 anchor were #305, #306, #307, #304 and #308. The #306
+catch-up snapshot was inside this five-merge window, not a new cadence anchor.
+The intervals below run from the preceding merge. PR numbers are not merge
+order.
+
+| Merged PR and scope | Exact merge commit | Merged at UTC, 2026-09-25 | Prior-merge wall interval | Published estimate or bound |
+| --- | --- | --- | ---: | --- |
+| [#305](https://github.com/ModernNomad-98/Project-Aegis/pull/305): map issue #101 package-7 readiness | `fb54a3d8eafc71609ad6fb76519f5ee7d8265832` | 17:23:37 | 15m36s from #303 | No separate package ETA established here; package 7 remains 6–12 active hours. |
+| [#306](https://github.com/ModernNomad-98/Project-Aegis/pull/306): reconcile readability count and catch-up forecast | `03f03807270e3527712a3182589218b54289efde` | 17:38:47 | 15m10s | 1–2 active hours for its documentation checkpoint; no measured active split. |
+| [#307](https://github.com/ModernNomad-98/Project-Aegis/pull/307): record forecast cadence catch-up | `aee57e64641e7ff88fc04698f30be3d0004665bc` | 17:50:12 | 11m25s | No separate active estimate verified. |
+| [#304](https://github.com/ModernNomad-98/Project-Aegis/pull/304): repair BER Stage A policy-expiry read path | `e6f13e3376e2b5d7ad85ab6ca097dedde96f5fe2` | 23:30:28 | 5h40m16s | No selected-row closure or measured active split; exact-head guard exception recorded in APR-037/038. |
+| [#308](https://github.com/ModernNomad-98/Project-Aegis/pull/308): record #304 exception consumption | `9d6b1c0751013fe4fb56b28166e0857eaa2d80eb` | 23:42:15 | 11m47s | No separate active estimate verified. |
+
+From the #303 merge at 17:08:01 to #308 at 23:42:15, the observed wall
+interval was **6h34m14s**. Active work, review, CI wait and owner wait were
+not separately instrumented and remain **unavailable**. Parallel work and
+gaps occur within the interval; neither it nor the per-merge spacing measures
+package effort or an active-work delivery rate. No retrospective active
+duration is inferred from the merge timestamps.
+
+The ten selected estimated rows remain **71–146 active hours** after the
+row-by-row dependency review in the forecast. Stage 4B and the BER-BKL-009
+real host, runtime, privacy and cleanup residual remain TBD, so the selected
+and all-options totals are nonfinite. Stage 4A has zero remaining hours in its
+delivered bounded offline package. All seven optional rows keep their prior
+ranges and selection gates. #304's synthetic expiry repair and #308's grant
+record do not complete BKL-009 or establish a host or private-input proof.
+
+The #308 tree has **598 tracked Markdown files**: 554 accepted readers and
+44 classified fixtures, with zero known pending pages in the readability
+ledger. This checkpoint edits two existing pages, subject to review. The
+next five-merge counter starts after #308; the subsequently merged #309 at
+`acb2b6b589585925664cf53f735f509549bbb51c` is the first merge in that
+new window and is outside this snapshot. Revise sooner if an owner decision
+or verified scope change warrants it.
 
 ## Catch-up checkpoint after pull request #306 — 2026-09-25
 

@@ -5,8 +5,9 @@
 This is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. The [owner's issue #101 host-path choice](#material-owner-decision--2026-09-25-issue-101-host-path)
 and the subsequent bounded Stage 4A grant are the latest scope changes. The
-[catch-up checkpoint after #306](#catch-up-checkpoint--2026-09-25-after-pull-request-306)
-is the latest full reassessment; it records the missed five-merge cadence
+[five-merge checkpoint after #308](#five-merge-checkpoint--2026-09-25-after-pull-request-308)
+is the latest full reassessment; the earlier [catch-up checkpoint after
+#306](#catch-up-checkpoint--2026-09-25-after-pull-request-306) records the missed five-merge cadence
 without rewriting the dated #284 snapshot. Pull request (PR) #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
 documentation residual. PR #253 added one reviewed reader page; PR #257 added
@@ -23,7 +24,7 @@ brought that checkpoint to **595 pages: 551 accepted readers and 44 classified
 fixtures**. The later reviewed [CP candidate matrix](cp-wp-003-named-candidate-matrix.md),
 [Stage 4B preflight template](aegis-setup-package-4b-preflight-manifest-template.md)
 and [CP public-contract inspection](cp-wp-003-dynamodb-public-contract-inspection.md)
-bring the current tree through merged PR #306 to **598 pages: 554 accepted
+bring the current tree through merged PR #308 to **598 pages: 554 accepted
 readers and 44 classified fixtures**, with zero known pending pages in the
 [readability ledger](aegis-documentation-readability-backlog.md#start-here--current-reading).
 The packets prepare later owner decisions;
@@ -48,9 +49,72 @@ or all-options
 total is defensible until the unestimated residuals are scoped.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#catch-up-checkpoint-after-pull-request-306--2026-09-25)
+the [execution measurements](aegis-execution-metrics.md#five-merge-checkpoint-after-pull-request-308--2026-09-25)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
+
+## Five-merge checkpoint — 2026-09-25, after pull request #308
+
+This full reassessment uses main at `9d6b1c0751013fe4fb56b28166e0857eaa2d80eb`.
+The five merges after the #303 cadence anchor were #305, #306, #307, #304
+and #308, in first-parent merge order. The #306 catch-up snapshot below was
+an early reassessment inside this window; it did not restart the counter.
+The [exact merge receipts and intervals](aegis-execution-metrics.md#five-merge-checkpoint-after-pull-request-308--2026-09-25)
+span 17:08:01–23:42:15 UTC, **6h34m14s observed wall time**. Concurrent work,
+review, continuous integration (CI) and owner waiting were not separately
+instrumented, so this is not an active-work rate.
+
+The ten estimated selected rows were reconsidered against the
+[BER backlog](behavioral-eval-runner-backlog.md),
+[control-plane backlog](resumable-control-plane-backlog.md),
+[setup plan](aegis-setup-routing-plan.md#package-7-readiness-against-issue-101-acceptance)
+and [approval register](../approvals/APPROVAL_REGISTER.md). Their planning
+subtotal remains **71–146 active hours**:
+
+| Selected remaining outcome | Previous → current active hours | Current dependency and confidence |
+| --- | ---: | --- |
+| WP-2B-3: accepted candidate inputs | 1–4 → 1–4 | Owner inspection of private 160-case labels, guide and exact hashes; low. |
+| WP-2B-3: measured calibration and OD-1 ratification | 4–10 → 4–10 | Approved labels, reviewed live source/allowance, selected-host proof, development and holdout results; low. |
+| R4/R5: selected-host capability proof | 12–24 → 12–24, provisional | VirtualBox VM remains paused; guest checks, exact Stage A scope and separate grant remain; low. |
+| WP-2B-4: limited live suite | 12–24 → 12–24 | Calibration, OD-1, R1/R4/R5 evidence and separate live grant; low. |
+| WP-2B-5: generic corpus | 8–16 → 8–16 | WP-2B-4, curated synthetic fixtures and separate phase grant; low. |
+| WP-2B-6: scheduling and dataset operations | 8–16 → 8–16 | WP-2B-5 plus scheduling, cost, quarantine and dataset authority; low. |
+| WP-2B-7: advisory CI and operator workflow | 4–8 → 4–8 | WP-2B-6 and separate advisory CI/operator grant; low. |
+| CP-WP-003: real authority and execution capability | 8–16 → 8–16, provisional | Atomic authority, independent freshness, containment, evidence and billing proof; low. Public-contract inspection is complete; authenticated selected-source proof is not. |
+| CP-WP-004: one bounded real integration | 8–16 → 8–16 | CP-WP-003 proof, selected operation and separate grant; low. |
+| Issue #101 package 7: release readiness | 6–12 → 6–12 | Stage 4B host proof, approved comparison/selection and exact-release review; low. Aegis-only remains a valid result if no helper qualifies. |
+| **Ten-row planning subtotal** | **71–146 → 71–146** | Active-work planning only; no calendar delivery commitment. |
+| Issue #101 Stage 4B: actual host mechanics proof | TBD → TBD | Exact host profile, permissions, telemetry, provider/cost limits and separate grant remain. |
+| BER-BKL-009: real host, runtime, privacy and cleanup | TBD → TBD | Named host, verified controls, runtime design and separate authority remain. |
+| Documentation readability | 0 known pending → 0 known pending at #308 | 598 tracked Markdown files: 554 accepted readers and 44 classified fixtures. Changed pages still require review. |
+| **Selected total** | **No finite estimate → no finite estimate** | Stage 4B and BER-BKL-009 residuals remain unestimated. |
+
+#305 mapped issue #101 package-7 prerequisites; #306 and #307 reconciled the
+forecast and cadence. #304 repaired a synthetic BER Stage A expiry read path;
+#308 recorded its exact-head protected-guard exception and consumption in
+APR-037/038. The repair closes no real-host or privacy gate, and BKL-009 remains
+PARTIAL. Stage 4A's bounded offline package remains delivered with zero hours
+remaining in that package. None of the five merges provides a Stage 4B session,
+BER host capability proof, private-label acceptance or control-plane real
+authority source.
+
+All seven optional rows were reconsidered. Their selection gates and ranges
+remain as in the #306 table below: issue #101 packages 5/6 at 8–20 hours
+each, BER-BKL-010 at 4–12 hours, BER-BKL-014 at 8–20 hours per host,
+BER-BKL-015 at 8–24 hours per product, and strategic expansion, arbitration
+and future control-plane architecture unbounded. Selecting both helpers
+would add **16–40 hours**, giving an **87–186-hour partial subtotal** that
+still excludes the unestimated Stage 4B, BER residual and helper comparison.
+The selected and all-options totals have no finite estimate. The provisional
+4–8-hour authenticated CP source inspection stays outside the selected
+subtotal pending a candidate and separate grant.
+
+The #308 tree contains **598 tracked Markdown files**, classified by the
+[readability ledger](aegis-documentation-readability-backlog.md) as 554 accepted
+readers and 44 fixtures with zero known pending pages. This checkpoint changes
+existing pages, which need review. Issue #101 remains open at this snapshot;
+the disposable VM remains paused. Restart the five-merge counter after #308,
+or reassess sooner for a material owner decision or verified scope change.
 
 ## Catch-up checkpoint — 2026-09-25, after pull request #306
 
