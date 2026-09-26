@@ -61,6 +61,20 @@
       }
     },
     {
+      "id": "edge-owner-ordering-throughput-choice",
+      "type": "should_trigger",
+      "prompt": "Our internal ledger-events topic uses a single partition so every event is globally ordered. Forecast peak volume next quarter is several times what one partition's consumer keeps up with today, and lag already spikes at month-end. The finance team says 'order matters' but has not said whether that means per account or across all accounts. We have not priced a bigger broker tier. Explain the options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the global-ordering-versus-throughput conflict as a stop-for-human decision and defines the terms in plain language - partition, partition key, ordering scope ('ordered per <key>, unordered across keys'), and consumer lag.",
+          "Compares viable paths - keep one partition with global order, or key by account for per-account ordering with sequence checks and idempotent consumers - giving each option's reason, case-specific ordering, replay, throughput, and failure-handling pros and cons, and money, setup time, and ongoing upkeep, stating the unpriced broker tier as unknown rather than guessing.",
+          "Recommends one path from the flow evidence, explains why it fits the goals, and names the fact that would change it (for example, whether finance needs cross-account order); may ask for that missing deciding fact first instead of the option question.",
+          "Asks exactly one atomic decision question; makes no unscoped 'ordered' claim, does not provision brokers or change live configuration, and hands lag alert wiring to observability-operator."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-partner-webhooks",
       "type": "should_not_trigger",
       "prompt": "Partners need to subscribe to our order events over webhooks — design the delivery contract: envelope schema, signing, retries, and per-tenant subscriptions.",

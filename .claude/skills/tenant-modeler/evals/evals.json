@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-tenant-unit-choice",
+      "type": "should_trigger",
+      "prompt": "Self-serve teams buy our product one workspace at a time, but enterprise buyers want one company account that owns and pays for many workspaces with central admin. Should the tenant be the organization with workspaces under it, or should each workspace stay its own tenant? We have not estimated the migration or maintenance effort of either. Explain the choice, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the terms in plain language - tenant as the unit of data ownership, billing, and administration, organization, workspace, and membership - and shows how the paying, administering, and data-owning units diverge in this case.",
+          "Compares organization-as-tenant with workspaces as sub-units and workspace-as-tenant, giving each path's purpose, case-specific pros and cons, and money, setup, and maintenance costs, marking the unestimated migration and upkeep effort as unknown rather than inventing it.",
+          "Recommends one path with a reason tied to the stated self-serve and enterprise needs, and records assumptions with risk-if-wrong.",
+          "Asks exactly one atomic decision question after the comparison; designs no tables or permissions, treats the choice as not authorizing execution, and hands schema to multi-tenant-data-architect and permissions to authorization-matrix-designer."
+        ]
+      }
+    },
+    {
       "id": "negative-leak-review",
       "type": "should_not_trigger",
       "prompt": "Go through the codebase and check whether one customer's users can see another customer's files or search results.",

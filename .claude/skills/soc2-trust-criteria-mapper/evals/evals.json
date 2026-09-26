@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-confidentiality-category-choice",
+      "type": "should_trigger",
+      "prompt": "We are scoping our first SOC 2 for our document-sharing SaaS. Security is in. Two of our largest customer contracts contain confidentiality clauses about their uploaded documents, and one prospect's questionnaire asks whether Confidentiality is in our report. We have no CPA quote yet and have not inventoried which confidentiality controls already produce evidence. Should Confidentiality be in scope? Explain the choice, recommend one, and ask me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains the terms in plain language - SOC 2 as an AICPA attestation (a CPA's examination and report), Trust Services Criteria categories, Security as the baseline, and the Confidentiality category - and why including or excluding a category matters for this engagement.",
+          "Compares Security-only scope and Security plus Confidentiality, tracing the decision to the named contract clauses and questionnaire, with each option's reason, benefits and drawbacks (procurement fit versus added criteria and window evidence), CPA fees or other direct spend, setup/evidence labor, and ongoing control upkeep, marking fees and timing unknown until a CPA firm quotes or confirms them rather than inventing amounts.",
+          "Recommends one option with the case-specific reason tied to the customer commitments, and records the rationale for inclusion or exclusion.",
+          "Asks exactly one decision question after the comparison; states that the scoping choice does not authorize an engagement or purchase, never uses certification/certified language, hands the evidence window to compliance-evidence-collector and control gaps to compliance-gap-auditor, and leaves the examination to an independent CPA firm."
+        ]
+      }
+    },
+    {
       "id": "negative-iso-isms",
       "type": "should_not_trigger",
       "prompt": "Design our ISO 27001 management system and Statement of Applicability.",

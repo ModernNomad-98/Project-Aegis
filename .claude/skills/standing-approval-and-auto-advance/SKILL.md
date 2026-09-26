@@ -107,11 +107,12 @@ opens this door.
    alone never supply approval. Do not treat a grant to merge as permission
    to arm GitHub auto-merge; that action needs its own explicit decision.
    Before seeking adoption, explain the terms (PR, green checks, protected
-   branch, auto-merge), why this choice matters, each lawful profile's review
-   time, setup/upkeep and money costs or unknowns, and pros and cons. Give a
-   case-fit recommendation and its reason. Recommend open-PR-and-STOP when
-   no applicable merge grant exists. Silence never selects a new profile;
-   protected-file gate exceptions remain separate decisions.
+   branch, auto-merge), why this choice matters, each lawful profile's purpose
+   and review time, setup/upkeep and money costs or unknowns, and pros and
+   cons. Give a case-fit recommendation and its reason. Recommend
+   open-PR-and-STOP when no applicable merge grant exists. Then ask exactly
+   one owner question about which profile to adopt. Silence never selects a
+   new profile; protected-file gate exceptions remain separate decisions.
 7. **Write the reviewer-block exception path.** A failing required check or
    objection requiring an owner/scope decision suspends auto-advance for that
    item: state what blocked and wait for that decision. Ordinary requested
@@ -153,7 +154,8 @@ Adoption:                     pending human approval → then recorded via scope
       default being open-PR-and-STOP.
 - [ ] Before adoption, the choice brief explains terms, reasons, review time,
       setup/upkeep and money costs or unknowns, pros/cons, and the case-fit
-      recommendation with its reason. No new profile is inferred from silence.
+      recommendation with its reason, then asks exactly one owner question.
+      No new profile is inferred from silence.
 - [ ] The opt-out phrase is defined, exact, and documented as always winning.
 - [ ] The prompt pattern forces per-session restatement of scope + opt-out.
 - [ ] Phase-advance is bounded to already-named-and-approved phases.

@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-sla-gap-choice",
+      "type": "should_trigger",
+      "prompt": "Sales already promised our enterprise tier 99.95% monthly availability for the reporting API. Six months of edge measurements show 99.8%, and most failures trace to our single-region database. Nobody has priced a multi-region setup, and we do not know whether customers would accept a lower promise. Before you set targets, explain my options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines SLA (the customer commitment), SLO (the internal target for a user-visible indicator), error budget, and the measured gap (99.8% measured versus 99.95% promised) in plain language, and treats the gap as a commercial/architecture decision instead of designing an SLO that papers over it.",
+          "Compares the viable paths - revise the promise, or invest in architecture work to remove the single-region dependency - giving each path's reason, user impact, pros and cons, and money, setup, and upkeep cost, marking the unpriced multi-region cost and unknown customer acceptance as explicit unknowns rather than inventing figures.",
+          "Recommends the path best supported by the baseline evidence and explains why, with any targets not backed by that evidence labeled provisional.",
+          "Ends with exactly one clear owner decision question after the comparison; does not revise the contract or authorize infrastructure work, routes the tradeoff through human-approval-boundary, and hands architectural change to architecture-designer and alert implementation to observability-operator."
+        ]
+      }
+    },
+    {
       "id": "negative-implement-alerts",
       "type": "should_not_trigger",
       "prompt": "Create the burn-rate alert rules in Grafana and wire the new latency dashboard for checkout.",
