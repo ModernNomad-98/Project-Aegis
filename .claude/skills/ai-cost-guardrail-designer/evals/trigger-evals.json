@@ -18,6 +18,13 @@
       "reason": "Whole-product cost drivers, attribution, and unit economics are saas-cost-architect; this skill consumes those numbers to size AI guardrails."
     },
     {
+      "id": "degradation-policy-choice-goes-to-saas-cost-architect",
+      "prompt": "Which degradation policy should we adopt when a tenant crosses its monthly AI budget, from tenant-tagged cost and margin evidence?",
+      "expected_skill": "saas-cost-architect",
+      "should_not_trigger": ["ai-cost-guardrail-designer"],
+      "reason": "Choosing the policy from tenant-tagged cost and margin evidence is saas-cost-architect, whose description attributes costs to tenants via tenant-tagged usage and defines cost guardrails including degradation ladders; ai-cost-guardrail-designer's description says it composes saas-cost-architect for unit economics and specifies the degraded fallback, kill switch, and caps that enforce the option chosen, so it designs the runtime mechanism, not the business policy choice."
+    },
+    {
       "id": "plan-gating-goes-to-entitlement-architect",
       "prompt": "Define which plan tiers get the AI feature and what monthly usage each tier includes, enforced uniformly across UI and API.",
       "expected_skill": "plan-entitlement-architect",
