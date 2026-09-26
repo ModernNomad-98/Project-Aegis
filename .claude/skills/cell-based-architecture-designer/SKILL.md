@@ -32,6 +32,8 @@ a single cell does should be able to take down another cell.
 - Use when: a shared stack has hit a real ceiling (connection limits,
   regional isolation, per-region residency) that per-component pooling or
   siloing of a single store cannot fix.
+- Use when: someone proposes cells or asks whether cells fit their current
+  problem; run the premise check even if the answer is to reject cells.
 - Do NOT use when: the need is per-COMPONENT isolation of ONE store or
   service for one tenant tier (pooled vs siloed vs bridge) — that is
   `saas-platform-architect`; whole-stack cells are a far heavier hammer.
@@ -42,9 +44,10 @@ a single cell does should be able to take down another cell.
 - Do NOT use when: the blast radius in question is an AGENT's authority or
   failure propagation across an agent network — that is
   `agent-containment-reviewer`; infra cells are not agent blast radius.
-- Do NOT use when: the honest answer is "you don't need cells" — a read
-  replica, per-tenant siloing of the hot store, or a regional deploy
-  addresses the real risk. Recommend the cheaper lever and stop.
+- Do NOT use for a request solely to design a read replica, tenant silo or
+  regional deployment with no cell proposal or whole-stack isolation question;
+  route to that component's owner. When a cell proposal is in scope, this
+  skill may reject it after the premise check.
 
 ## Inputs to Inspect
 
@@ -131,6 +134,8 @@ Premise check: <is blast-radius reduction the dominant lever? evidence /
   cheaper-lever recommendation if not>
 Choice: <viable options, each one's isolation benefit and limit, migration,
   infrastructure cost, setup/delivery and fleet upkeep; recommendation and why>
+Owner decision question: <one plain-language question after trade-offs if the
+  owner must choose among viable options | none if no choice is needed>
 Cell definition: <what one cell contains — compute/data/cache/queue/workers>
 Tenant→cell mapping: <assignment, placement policy, routing-table location>
 Cell-router: <thin resolve-and-forward; no business logic or tenant business data beyond routing identifiers and mapping>
@@ -147,19 +152,17 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       benefit and limit, migration, infrastructure money, setup/delivery and
       fleet upkeep; the recommendation fits the evidenced risk. If a smaller
       lever suffices, the design recommends NOT adopting cells and says why.
-- [ ] A cell is fully self-contained — a tenant is served end to end within
-      one cell, with no runtime dependency on another cell.
-- [ ] Every tenant maps to exactly one cell; the placement policy and the
-      routing-table location are stated.
-- [ ] The cell-router carries no business logic or tenant business data beyond
-      the routing identifier and tenant-to-cell mapping — it
-      cannot become the shared-fate component.
-- [ ] Deployment is per-cell with a halt rule; a bad change cannot reach the
-      whole fleet before a cell's health gate catches it.
-- [ ] Every global/cross-cell concern is enumerated with how it avoids being
-      a single point of shared fate.
-- [ ] Migration/rebalancing is designed as a runbook, explicitly not executed
-      here; production-data moves route through human approval.
+- [ ] If the owner must choose, give the recommendation and trade-offs first,
+      then ask one plain-language decision question; otherwise ask none.
+- [ ] **Only when the premise supports cells:** a cell serves its tenants end
+      to end without runtime dependence on another cell; every tenant maps to
+      exactly one cell with a stated placement and routing-table location.
+- [ ] **Only when the premise supports cells:** the router carries no business
+      logic or tenant business data beyond routing identifiers and mapping;
+      each deployment has a per-cell health gate and fleet halt rule.
+- [ ] **Only when the premise supports cells:** global concerns avoid a single
+      point of shared fate; migration/rebalancing is a designed runbook, not
+      execution, and production-data moves require human approval.
 
 ## Gotchas
 

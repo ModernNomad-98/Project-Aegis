@@ -147,6 +147,8 @@ Per-job execution contract:
 Fairness choice: <compared mechanisms; recommended combination and why;
   queue/worker cost, setup and upkeep; backlog isolation, starvation prevention,
   remaining limit>
+Owner decision question: <one plain-language question after trade-offs if the
+  owner must choose a fairness policy | none if no choice is needed>
 Scheduling:     <scheduler; overlap prevention; missed-run policy; tz/DST> | n/a
 Worker scaling: <pool sizing; scale-on-backlog; graceful drain → finish-or-redeliver>
   (drain/statelessness review → horizontal-scalability-reviewer)
@@ -172,6 +174,9 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       lanes in plain terms, including combinations, isolation, starvation,
       queue/worker expense, setup/upkeep and a contextual recommendation;
       one tenant's flood cannot starve others.
+- [ ] If the owner must choose a fairness policy, present trade-offs and a
+      recommendation before one plain-language decision question; otherwise
+      ask none.
 - [ ] Scheduled jobs have overlap prevention, a missed-run policy, and tz/DST
       correctness — and the same idempotency/retry contract as ad-hoc jobs.
 - [ ] Workers drain gracefully: in-flight work finishes or is safely
