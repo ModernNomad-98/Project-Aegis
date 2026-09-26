@@ -61,6 +61,20 @@
       }
     },
     {
+      "id": "edge-teach-new-versus-amend-choice",
+      "type": "should_trigger",
+      "prompt": "Our accepted ADR says auth-policy cache entries are short-lived but gives no number. We want to add a five-minute bound. Reviewers disagree whether this records the original intent or changes the exposure window. Help the owner choose a new ADR versus a dated amendment; we have no measured review or upkeep cost.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains in plain terms that an amendment clarifies an existing decision while a new ADR preserves the old record and records a changed decision.",
+          "Compares the viable paths by why each might fit, what history it preserves or risks obscuring, and review/setup/upkeep effort plus unknown money cost without invented figures.",
+          "Recommends a case-fit path with a reason and identifies whether prior intent or implementation evidence could change the classification, then asks one owner question.",
+          "Keeps the classification proposed and does not edit the accepted ADR or make the underlying auth architecture decision in this automatic phase."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-author-one-adr",
       "type": "should_not_trigger",
       "prompt": "Write the ADR for our decision to adopt event sourcing: context, the decision, alternatives, consequences, and rollback.",
