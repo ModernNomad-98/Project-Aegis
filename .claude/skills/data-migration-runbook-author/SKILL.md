@@ -224,7 +224,9 @@ Execution posture: THIS DOCUMENT EXECUTES NOTHING — every step is operator-run
   only if the business can tolerate it. For each, state money cost, setup
   time, ongoing upkeep cost (or what is unknown), benefit, risk, and
   limitation. Recommend the safest
-  viable path and why; keep execution stopped until the owner decides.
+  viable path and why, name the fact that would change the recommendation,
+  and ask exactly one owner question; keep execution stopped until the
+  owner decides.
 - Asked to fold the runbook's approval gates into "auto-proceed if
   checks pass" for an agent to run end-to-end → refuse; destructive
   data-move steps stay human-gated per `human-approval-boundary` and

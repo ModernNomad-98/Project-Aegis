@@ -98,7 +98,9 @@ organize the content (that's `diataxis-doc-organizer`) or write it.
     connect each option to the project's needs, compare pros and cons and
     money, setup time, and maintenance effort; include a $0 option only
     when one exists and is verified. Then recommend one with a reason.
-    Mark unknown pricing for verification rather than guessing.
+    Mark unknown pricing for verification rather than guessing. Then ask
+    exactly one owner question; the answer does not authorize an install
+    or CI change.
 
 Generator selection factors, the CI-checks catalog (link/prose/build/
 sample), and the docs-versioning patterns:

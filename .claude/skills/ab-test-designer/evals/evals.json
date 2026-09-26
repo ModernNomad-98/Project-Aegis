@@ -79,7 +79,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Shows from the stated baseline, MDE, significance level, and power that a 2% relative lift cannot be powered within four weeks, and explains minimum detectable effect, statistical power, and why an underpowered non-significant result would be uninformative in plain language.",
+          "Shows from the stated baseline and MDE, with an explicitly stated significance level and power, that a 2% relative lift cannot be powered within four weeks, and explains minimum detectable effect, statistical power, and why an underpowered non-significant result would be uninformative in plain language.",
           "Compares the viable paths - target a larger, practically meaningful effect; run longer over full weekly cycles; or decide by another method than this experiment - giving each path's reason, benefits, drawbacks, and time, money, and upkeep cost, and marks engineering capacity and extension cost as explicit unknowns without inventing figures.",
           "Recommends one feasible path grounded in the traffic and the four-week decision constraint, explains why, and names the fact that would change the recommendation; does not proceed with the underpowered test as requested.",
           "Asks exactly one clear owner choice question after the comparison; treats the answer as a design choice, not authorization to start a run or spend money, and leaves metric definition to funnel-definition-designer and any safety rollout to feature-flag-rollout-strategist."

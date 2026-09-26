@@ -146,8 +146,9 @@ is handed to `adr-writer`.
    define unfamiliar terms and why each option survived. Explain each one's
    pros and cons, verified or estimated money cost, setup and delivery time,
    and continuing upkeep before requesting a choice. A $0 software tier can
-   still consume team time; mark unknown prices instead of guessing. Then
-   ask the owner one clear decision question; do not decide silently.
+   still consume team time; mark unknown prices instead of guessing. End the
+   choice presentation with one clear owner decision question; do not decide
+   silently.
 6. **Decide managed-vs-self-hosted per capability** — the per-capability
    refinement of the pattern choice: default managed; self-hosting requires a
    named reason (cost at proven scale, capability gap, residency) plus the

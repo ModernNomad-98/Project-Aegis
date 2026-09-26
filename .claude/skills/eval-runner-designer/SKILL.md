@@ -119,9 +119,9 @@ intact: this design creates no execution result and never implies otherwise.
    When an open decision requires the owner's choice, first explain each
    technical term in plain language, why the choice matters, each viable
    option's money (including $0), setup time, ongoing run and maintenance
-   costs, pros and cons, and a recommendation tied to the corpus and budget.
-   Resolve routine design parameters from evidence without asking the owner;
-   treat a choice the owner already stated as settled, not an open question.
+   costs, pros and cons, and a recommendation tied to the corpus and budget;
+   then ask exactly one owner question. Resolve routine design parameters
+   from evidence without asking the owner; treat a choice the owner already stated as settled, not an open question.
 
 Execution-semantics tables, the judging decision table, report schema,
 sampling-tier math, and flake-policy parameters:
