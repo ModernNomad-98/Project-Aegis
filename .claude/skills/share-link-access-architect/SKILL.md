@@ -109,8 +109,8 @@ vetted cryptographic primitives, it does not invent them.
    resource's sensitivity and audience, with a reason. State why each viable
    option exists, label unknown costs instead of inventing them, then ask
    exactly one clear owner question; the answer does not authorize shipping
-   the link. Decide routine token
-   mechanics from evidence; do not turn them into owner approval requests.
+   the link. Decide routine token mechanics from evidence; do not turn them
+   into owner approval requests.
    If the owner already specified no-login links or another choice, treat it
    as settled and explain its implications without asking again.
 
@@ -134,7 +134,8 @@ Audit: <creation / access by non-secret link id or keyed fingerprint / gate
   attempts / revocation → audit-log schema; never raw token>
 Open questions / risks: <each with risk-if-wrong / who answers>
 Owner choice brief (only if needed): <terms; why now; options with money,
-  setup/maintenance costs, pros and cons; recommendation and why it fits>
+  setup/maintenance costs, pros and cons, why each exists; unknowns labeled;
+  recommendation and why it fits; one owner question>
 ```
 
 ## Validation Checklist

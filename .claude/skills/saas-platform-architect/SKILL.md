@@ -107,6 +107,8 @@ Tenant flows: onboard and offboard at platform level
 Options considered: <plain-language meaning and reason for A vs B; pros/cons;
   money, setup, delivery-time, upkeep costs; isolation and reversibility>
 Recommendation: <option + why it fits + reversal condition>
+Owner question (only if needed): <one decision question; not implementation
+  approval>
 Rollout plan: <increment → verification → rollback>, order matters
 Assumptions & open questions: <each with risk-if-wrong / who answers>
 ```

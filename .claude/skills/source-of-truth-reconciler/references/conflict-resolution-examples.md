@@ -43,9 +43,11 @@ Repo state: branch absent; PR #87 shows it merged and deleted three weeks ago.
 - Verdict: blocked. Present both claims with anchors, ask the owner which
   governs, and propose recording the answer in a reconciliation note so the
   next agent doesn't re-litigate it.
-- Before asking, teach the choice per Workflow step 5: adopt `testing.md` /
+- Before asking, teach the choice per Workflow step 5: define terms
+  (authoritative source, UNRESOLVED), then compare adopt `testing.md` /
   adopt `quality-policy.md` / hold UNRESOLVED — why each is viable, pros/cons,
-  effort or unknowns, then a recommendation and one question.
+  effort or unknowns, then a recommendation with what evidence would change
+  it, and one question.
 
 ## Anti-pattern gallery
 

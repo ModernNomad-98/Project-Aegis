@@ -38,7 +38,7 @@
         "triggers": true,
         "assertions": [
           "Defines the runtime budget, the tier, and the protection at stake (the behavior the billing-proration tests guard) in plain language, citing the CI-history evidence including the two real catches.",
-          "Compares raising the budget, demoting the billing group to nightly, and adding parallel capacity (whose sharding design belongs to qa-automation-architect) by each path's reason, risk, benefit, and money, setup, and upkeep cost, marking the unpriced CI capacity as uncertain rather than inventing a figure.",
+          "Compares raising the budget (owned by qa-automation-architect / the strategy owner, which sets tier budgets; this skill only escalates it), demoting the billing group to nightly, and adding parallel capacity (whose sharding design belongs to qa-automation-architect) by each path's reason, risk, benefit, and money, setup, and upkeep cost, marking the unpriced CI capacity as uncertain rather than inventing a figure.",
           "Recommends a fit from the CI evidence, weighing catch rate against runtime rather than runtime alone, and explains why.",
           "Asks exactly one decision question after the comparison; does not treat the answer as approval to delete or retire tests, and routes any later deletion through normal review via reviewable-diff-discipline."
         ]
