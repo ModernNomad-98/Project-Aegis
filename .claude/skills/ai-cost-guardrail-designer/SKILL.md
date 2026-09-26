@@ -106,6 +106,15 @@ the guardrail design.
    reserve expensive models for where they're needed (design intent handed to
    `ai-router-architect` to enforce). Over-using a frontier model is a
    self-inflicted cost.
+   When presenting model tiers or limit values for an owner to choose, define
+   the terms (including input/output tokens, reservation, and true-up), show
+   the reason for each viable option, its benefits and drawbacks, and its
+   estimated per-call and monthly cost at the inspected call volume. Use
+   verified current prices or mark the dollar estimate unknown; do not invent
+   prices or imply that a request-count cap bounds spend. Recommend a tier
+   and limits with the workload evidence that supports them. Without verified
+   provider unit prices, only provisional token/volume limits can be chosen;
+   defer a dollar budget until unit economics are available.
 6. **Make every guardrail fail closed, and design the kill switch and degraded
    mode.** A switch to disable the feature/model/tenant on a spend spike, and a
    degraded fallback (cached answer, smaller model, queue, or "temporarily
@@ -145,6 +154,11 @@ the guardrail design.
    hide activity is a near-certain compromise signal.
 10. **State the residual exposure.** The worst-case spend with these guardrails
     in place, and the named acceptor for it via `human-approval-boundary`.
+    If an owner must select a budget, degraded mode, or provider backstop,
+    explain the terminology, why the choice is needed, setup and operating
+    costs (including denied legitimate work), benefits and drawbacks of each
+    viable option, and which option is recommended and why. Preserve the
+    fail-closed floor: no option may allow inference when a budget check fails.
 
 ## Output Format
 
@@ -162,6 +176,8 @@ Provider backstop: <hard spend cap | billing-anomaly alert — configured? (off 
 AI credential: <server-side-only | per-model/least-priv scope | logging-tamper alert> (custody → secrets-identity-hardener)
 Telemetry & alerts: <per-call metrics, attribution that distinguishes attacker/loop/honest, burn-rate alert> (→ observability-operator)
 Residual exposure: <worst-case spend + named acceptor>
+Owner choices: <term definitions | options and reasons | verified/unknown dollar
+                and operational costs | pros/cons | recommendation and why>
 ```
 
 ## Validation Checklist
@@ -189,6 +205,8 @@ Residual exposure: <worst-case spend + named acceptor>
       content is redacted from it.
 - [ ] Alerts fire on burn rate BEFORE the budget is exhausted, not after.
 - [ ] Worst-case residual spend is stated with a named acceptor.
+- [ ] Each owner-facing choice defines terms, costs, reasons, pros/cons, and a
+      workload-based recommendation; unverified dollar amounts are unknown.
 
 ## AI Security Rules
 

@@ -42,6 +42,19 @@
       }
     },
     {
+      "id": "edge-owner-storage-choice",
+      "type": "should_trigger",
+      "prompt": "We can keep release screenshots in PR artifacts or an access-controlled archive. Explain those terms and help me choose checkpoints, storage, and retention. We have no price quote or documented compliance retention rule.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines checkpoint, PR artifact, archive, and retention in plain language, then compares viable options by consumer, capture/review effort, access, deletion behavior, benefits, drawbacks, and a reasoned recommendation.",
+          "Marks dollar costs unknown without verified prices, stops short of encoding a fixed compliance retention period, and requests the actual obligation text before setting that rule.",
+          "Keeps pre-storage masking and tenant isolation mandatory across all options and captures no screenshots."
+        ]
+      }
+    },
+    {
       "id": "should-not-do-screenshot-everything",
       "type": "should_trigger",
       "prompt": "Plan our evidence: just require a screenshot of every step of every test so we're covered.",

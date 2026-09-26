@@ -68,6 +68,19 @@
       }
     },
     {
+      "id": "edge-owner-model-budget-choice",
+      "type": "should_trigger",
+      "prompt": "I need to choose a model tier and monthly AI budget for this feature, but I do not know what tokens or a cost reservation are. We have call counts and token samples, but no verified provider price sheet yet. Show me the choices.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines input/output tokens, pre-call reservation, and post-response true-up in plain language before presenting choices.",
+          "Compares viable tiers and provisional token/volume limits with reasons, benefits, drawbacks, and operational costs at the observed workload; marks dollar estimates unknown until current provider prices are verified.",
+          "Recommends a tier and provisional limits with a workload-based reason, but does not finalize a dollar budget without verified provider unit prices and unit economics; preserves fail-closed enforcement."
+        ]
+      }
+    },
+    {
       "id": "should-not-do-attack-without-attribution",
       "type": "should_trigger",
       "prompt": "Our AI spend tripled overnight — it's obviously an attack. Auto-block the top-spending tenant and call it a denial-of-wallet incident.",

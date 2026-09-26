@@ -45,7 +45,8 @@ captures nothing.
    apply to evidence too (a screenshot of tenant A's data in tenant B's bug
    ticket is a leak).
 4. Storage options actually available (repo, artifact store, ticket system)
-   and their access control.
+   and their access control, storage/transfer cost, retention capabilities,
+   and the effort to mask and retrieve a capture.
 5. Existing conventions worth keeping (partial policies, naming habits).
 
 ## Workflow
@@ -57,6 +58,9 @@ captures nothing.
    one capture that matters; each checkpoint gets an id and a "what must be
    visible" line. Catalog in
    [references/evidence-rules.md](references/evidence-rules.md).
+   If the owner must choose between checkpoint sets, explain what a checkpoint
+   proves, compare capture/review effort and missed-evidence risk for each set,
+   and recommend the smallest set that covers the named obligations.
 2. **Fix the naming convention:** deterministic, sortable, collision-free —
    pattern `<checkpoint-id>--<route/case>--<persona>--<build>--<timestamp>`
    (adjust tokens to the repo), documented with examples and counter-examples.
@@ -70,7 +74,12 @@ captures nothing.
 5. **Set storage, retention, and access:** where evidence lives per class
    (PR artifact vs release record vs compliance archive), retention windows,
    and who can read what (evidence containing tenant data inherits
-   tenant-access restrictions).
+   tenant-access restrictions). Explain these terms to the owner. For each
+   viable storage and retention choice, state why it fits the named consumer,
+   its access and deletion behavior, setup/ongoing cost and review effort,
+   benefits and drawbacks, then recommend one with a reason. Use verified
+   prices or say the dollar cost is unknown; never trade away pre-storage
+   masking or tenant isolation to save money.
 6. **Define linkage:** how checkpoints attach to manual case ids, clickthrough
    reports, PRs, and the closeout evidence bundle (`ai-closeout-reporter`
    consumes this) — an unlinked screenshot is unfindable a month later.
@@ -90,6 +99,8 @@ Masking rules: <always-masked list; method (block-out); enforcement point;
                cross-tenant rule>
 Metadata: <required fields + where recorded (sidecar/report table)>
 Storage & retention: <class → location → retention → access rule>
+Owner choices: <terms | viable options and reasons | verified/unknown dollar
+                and effort costs | pros/cons | recommendation and why>
 Linkage: <checkpoint ↔ case/session/PR/closeout wiring>
 Capture-quality rules: <viewport(s), data stability, framing>
 Adoption: <which producers follow this (manual/clickthrough/playwright) +
@@ -106,6 +117,8 @@ Adoption: <which producers follow this (manual/clickthrough/playwright) +
 - [ ] Metadata fields make every capture attributable to build + persona +
       environment.
 - [ ] Storage, retention, and access defined per evidence class.
+- [ ] Owner-facing checkpoint/storage/retention choices define terms, costs,
+      reasons, pros/cons, and a recommendation without invented prices.
 - [ ] Linkage to cases/sessions/PRs/closeout defined.
 - [ ] No screenshots captured by this skill.
 
