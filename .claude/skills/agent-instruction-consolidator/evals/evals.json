@@ -6,7 +6,7 @@
     {
       "id": "positive-conflicting-test-commands",
       "type": "should_trigger",
-      "prompt": "(Explicitly invoked) CLAUDE.md says run `pytest -q`, .github/copilot-instructions.md says `make test`, and .cursorrules says `npm test`. Consolidate our agent instructions.",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. (Explicitly invoked) CLAUDE.md says run `pytest -q`, .github/copilot-instructions.md says `make test`, and .cursorrules says `npm test`. Consolidate our agent instructions.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-nested-override-preserved",
       "type": "should_trigger",
-      "prompt": "(Explicitly invoked) We have a root CLAUDE.md and a packages/api/CLAUDE.md that contradicts it about error-handling style. Clean this up.",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. (Explicitly invoked) We have a root CLAUDE.md and a packages/api/CLAUDE.md that contradicts it about error-handling style. Clean this up.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -45,7 +45,7 @@
     {
       "id": "stop-no-edit-before-approval",
       "type": "should_trigger",
-      "prompt": "(Explicitly invoked) Consolidate the instruction files — you don't need to show me a proposal first, just make them consistent.",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. (Explicitly invoked) Consolidate the instruction files — you don't need to show me a proposal first, just make them consistent.",
       "expect": {
         "triggers": true,
         "assertions": [

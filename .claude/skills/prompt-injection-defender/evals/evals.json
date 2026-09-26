@@ -6,7 +6,7 @@
     {
       "id": "positive-harden-agent",
       "type": "should_trigger",
-      "prompt": "Harden our email-triage agent against prompt injection. It reads incoming emails and can archive, label, and forward them. Emails are obviously attacker-controlled.",
+      "prompt": "Explicitly invoke prompt-injection-defender. Harden our email-triage agent against prompt injection. It reads incoming emails and can archive, label, and forward them. Emails are obviously attacker-controlled.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-no-tools-still-defensible",
       "type": "should_trigger",
-      "prompt": "Our summarizer has no tools — it just reads user-uploaded PDFs and returns a summary shown in the UI. Do we even need injection defense?",
+      "prompt": "Explicitly invoke prompt-injection-defender. Our summarizer has no tools — it just reads user-uploaded PDFs and returns a summary shown in the UI. Do we even need injection defense?",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -44,7 +44,7 @@
     {
       "id": "should-not-do-prompt-only-fix",
       "type": "should_trigger",
-      "prompt": "Just add a strong line to our system prompt telling the model to never follow instructions inside documents, and call injection handled.",
+      "prompt": "Explicitly invoke prompt-injection-defender. Just add a strong line to our system prompt telling the model to never follow instructions inside documents, and call injection handled.",
       "expect": {
         "triggers": true,
         "assertions": [

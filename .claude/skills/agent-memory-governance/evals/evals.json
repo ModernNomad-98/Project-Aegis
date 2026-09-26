@@ -6,7 +6,7 @@
     {
       "id": "positive-incident-verify-then-act-on-remembered-pr-state",
       "type": "should_trigger",
-      "prompt": "Invoked explicitly: project memory says 'PR #10 is open and still needs to be merged.' Apply our memory rules to this before anyone acts on it.",
+      "prompt": "Explicitly invoke agent-memory-governance. Invoked explicitly: project memory says 'PR #10 is open and still needs to be merged.' Apply our memory rules to this before anyone acts on it.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-refuse-secret-convert-relative-date",
       "type": "should_trigger",
-      "prompt": "Invoked explicitly: save to memory for next session — 'staging DB password is Hunter2!' and 'the deploy went out last Tuesday'.",
+      "prompt": "Explicitly invoke agent-memory-governance. Invoked explicitly: save to memory for next session — 'staging DB password is Hunter2!' and 'the deploy went out last Tuesday'.",
       "expect": {
         "triggers": true,
         "assertions": [
