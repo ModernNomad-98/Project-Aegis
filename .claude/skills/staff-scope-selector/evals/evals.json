@@ -11,10 +11,10 @@
         "triggers": true,
         "assertions": [
           "Defines leverage relative to the staff level (multiplies others / sets direction), not more individual output.",
-          "Surfaces important UNDER-OWNED problems as candidates, not just assigned work.",
-          "Matches candidates to leverage archetypes and the person's strengths, choosing deliberately with a rationale.",
-          "Provides an explicit NOT-doing list and screens against the traps.",
-          "Ensures the chosen scope is visible/attributable and hands past-impact documentation to promotion-packet-writer."
+          "Surfaces important UNDER-OWNED problems as the kind of candidate to look for (the gap between teams, the decision nobody is making), not just assigned work.",
+          "Because the prompt gives no strengths or org problems, asks one atomic discovery question for the missing fact before recommending (any candidate it sketches is matched to a leverage archetype and marked provisional), and states that the NOT-doing list follows the person's choice.",
+          "Names the traps the eventual scope must pass (only-fun, only-firefighting, too-narrow, invisible glue, over-reach).",
+          "Names visibility/attribution as a requirement for the eventual scope and hands past-impact documentation to promotion-packet-writer."
         ]
       }
     },
@@ -27,7 +27,7 @@
         "assertions": [
           "Names firefighting as reactive senior execution, not staff-level leverage.",
           "Redirects toward direction-setting or multiplier work (e.g. fixing the systemic cause of the fires so the team stops firefighting).",
-          "Chooses scope with an explicit rationale and a NOT-doing list to protect focus.",
+          "Recommends a scope with an explicit rationale (or asks the single discovery question) and states that the NOT-doing list, which protects focus, follows the person's choice.",
           "Distinguishes working hard from having leverage."
         ]
       }
@@ -69,6 +69,20 @@
         "assertions": [
           "Does not invoke staff-scope-selector: ranking a given team backlog is prioritization-frame-picker.",
           "This skill selects an individual's high-leverage scope, not a team backlog ordering."
+        ]
+      }
+    },
+    {
+      "id": "edge-owner-scope-choice",
+      "type": "should_trigger",
+      "prompt": "I'm a senior engineer aiming for staff next cycle. I'm strongest at debugging build systems and writing clear design docs. Three candidate scopes: (1) own the flaky CI and slow test infrastructure that blocks about 40 engineers every week, which nobody owns today; (2) rewrite our billing service in Rust, which I'd enjoy but which works fine now; (3) define the cross-team API versioning strategy, which the platform team nominally owns but hasn't touched in a year. My manager hasn't said whether CI work would get any extra headcount. Don't pick for me: lay out the options, recommend one, and let me decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the scope as the person's own choice rather than picking it for them, and defines leverage and non-scope in plain language.",
+          "For each of the three candidates gives why it fits (leverage type, fit with build-system debugging and design-doc strengths, org need), pros and cons, and time and attention, alignment setup, upkeep, and budget or headcount cost, marking the unknown CI headcount as unknown.",
+          "Screens the candidates against the traps: flags the Rust rewrite as only-fun, low-leverage scope and the API versioning strategy as the platform team's owned area that needs alignment first rather than being claimed unilaterally.",
+          "Recommends one candidate, explains why, names the fact that would change it, then asks exactly one atomic decision question, and says a NOT-doing list follows the person's choice."
         ]
       }
     }

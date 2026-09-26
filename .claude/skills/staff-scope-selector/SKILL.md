@@ -71,16 +71,33 @@ documenting impact already delivered.
    too narrow for the level (senior work relabeled), invisible glue
    (valuable but with no attribution path — add visibility or reconsider),
    or over-reach into someone's owned scope (align first).
-5. **Choose deliberately with a rationale.** Pick the scope and state WHY
-   (leverage × fit × org need) — and, as importantly, state what you're
-   NOT doing, so the focus is real. A staff engineer who owns everything
-   owns nothing.
+5. **Choose deliberately with a rationale.** The scope is the person's own
+   career choice, so teach it rather than pick it for them. Define
+   *leverage* (impact that multiplies others or moves the org, beyond one
+   person's output) and *non-scope* (work they will explicitly decline or
+   hand off) in plain language. For each screened candidate give why it
+   fits (leverage × fit × org need), its pros and cons, and its cost in
+   time and attention, alignment setup (manager or owner conversations),
+   ongoing upkeep, and any budget or headcount it needs, or unknown.
+   If level, strengths, or org priorities are missing, ask one atomic
+   discovery question first; otherwise recommend one, say why and what fact
+   would change it, then ask exactly one atomic decision question. Once the
+   person chooses, state WHY and what they're NOT doing, so the focus is
+   real. A staff engineer who owns everything owns nothing. The answer is
+   their preference; it claims no one else's owned area without alignment
+   and commits no budget or headcount.
 6. **Make the scope legible.** Ensure the chosen work is visible and its
    impact will be attributable (the glue-work trap is invisibility). This
    also feeds a future `promotion-packet-writer` case — but that's a
    separate, later job.
-7. **Deliver** the scope selection in the Output Format: the chosen scope,
-   the rationale, the leverage type, the fit, and the explicit non-scope.
+7. **Deliver** the scope selection in the Output Format: the options and
+   recommendation with the one question (or only the discovery question
+   when a decisive fact is missing). An answer to a discovery question
+   supplies a fact, not the decision: the next turn presents the options
+   and recommendation and asks the decision question. Only the answer to
+   that decision question fixes the chosen scope, the rationale, the
+   leverage type, the fit, and the explicit non-scope (until then, mark
+   these as a provisional draft for the recommended candidate).
 
 The staff archetypes, the leverage-vs-busy-ness test, the trap catalog,
 and the scope-rationale format:
@@ -92,9 +109,12 @@ and the scope-rationale format:
 STAFF SCOPE SELECTION — <person/level>
 Level leverage:  what impact means at this level (multiplies others / sets direction)
 Candidates:      important under-owned problems considered
-CHOSEN scope:    <the scope> — leverage type=<multiplier|direction|hard-problem|glue>; fit=<strength>
-Rationale:       leverage × fit × org-need — why this over the others
-NOT doing:       <explicit non-scope, so focus is real>
+Choice:          plain terms; per candidate why/pros/cons, time/alignment/upkeep cost or unknown;
+                 recommendation + what would change it; ONE question — the person decides
+CHOSEN scope:    (after the answer to the decision question; else "provisional: <recommended>")
+                 <the scope> — leverage type=<multiplier|direction|hard-problem|glue>; fit=<strength>
+Rationale:       (after the answer) leverage × fit × org-need — why this over the others
+NOT doing:       (after the answer) <explicit non-scope, so focus is real>
 Trap check:      not only-fun / not only-firefighting / not too-narrow / glue is visible / no over-reach
 Legibility:      how the impact will be visible + attributable
 Boundaries:      rank backlog → prioritization-frame-picker; team roadmap →
@@ -111,7 +131,10 @@ Boundaries:      rank backlog → prioritization-frame-picker; team roadmap →
       strengths.
 - [ ] It's screened against the traps (only-fun, only-firefighting,
       too-narrow, invisible-glue, over-reach).
-- [ ] The choice has an explicit rationale AND an explicit NOT-doing list.
+- [ ] The person makes the choice: terms defined; each option's why,
+      pros/cons and cost-or-unknown; a recommendation plus what would
+      change it; one question; the answer grants no authority. The chosen
+      scope then gets an explicit rationale AND an explicit NOT-doing list.
 - [ ] Invisible/glue scope has a visibility/attribution path or is
       reconsidered.
 - [ ] Backlog-ranking, roadmap-planning, and promotion-documentation are

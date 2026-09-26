@@ -72,6 +72,20 @@
           "This skill would design the UX that surfaces and controls that contract, but the request is the contract itself."
         ]
       }
+    },
+    {
+      "id": "edge-owner-batching-choice",
+      "type": "should_trigger",
+      "prompt": "Our project-management app emails users when someone comments on a task they follow. Active users get about 40 such emails a day and complain about overload, but some say they miss replies that need an answer the same day. Security alerts and payment failures are separate categories. Options for the comment category's default: realtime email per comment; realtime with collapse ('5 new comments on Task X') capped at one email per task per hour; or a daily digest at 9am local time. We don't know our email provider's price at higher volume. Help me choose the default for the comment category; design only.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines realtime, digest, and collapse in plain language.",
+          "For each of the three options gives why it fits the comment category's time-sensitivity (same-day replies vs overload), pros and cons, and money, setup, and upkeep cost, marking the unknown email-provider price as unknown.",
+          "Recommends one option, explains why, names the fact that would change it, then asks exactly one owner question.",
+          "Never puts security alerts or payment failures into a digest because criticality overrides batching, and treats the chosen default as design input that authorizes no message and no live setting."
+        ]
+      }
     }
   ]
 }

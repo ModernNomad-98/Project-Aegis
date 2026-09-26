@@ -85,7 +85,24 @@ a dimension inside a tenant, it does not define or replace the tenant.
 4. **Classify roles.** Split roles into scope-restricted (filtered to granted
    scopes) vs tenant-wide (bypass the scope filter — admin/owner/auditor). This
    exception is load-bearing; name it explicitly and keep the tenant-wide set
-   small and audited.
+   small and audited. When a role's placement is the owner's call (a role
+   that needs cross-scope reads but not the whole tenant), teach it before
+   asking. Define *scope-restricted* (sees only rows in granted scopes) and
+   *tenant-wide* (bypasses the scope filter and sees the whole tenant) in
+   plain language. Compare making the role tenant-wide, keeping it
+   scope-restricted with multi-scope grants, and giving it only an
+   aggregated tenant-wide read with no row-level access: why each fits the
+   role's job, its pros and cons (exposure if the account is misused vs
+   blocked work), and its setup (grant administration, audit), upkeep, and
+   money cost, or unknown. Recommend the least-exposure option that still
+   lets the role do its job, say why and what fact would change it, then
+   ask exactly one owner question. An aggregate-only read is itself an
+   exception to the scope predicate: serve it from a named, audited
+   aggregate path, still bounded by `tenant_id = current_tenant`, with a
+   minimum group size, never by loosening the
+   predicate; and granting every scope counts as tenant-wide. The answer is
+   design input; it grants no one access, and any tenant-wide role stays
+   listed, minimal, and audited.
 5. **Write the composite row-filter predicate.** Every scoped table carries
    the scope key and enforces
    `tenant_id = current_tenant AND (scope_id = ANY(effective_user_scopes) OR
@@ -115,6 +132,11 @@ Scope model: <scope entity → belongs to one tenant; nesting? region→site>
 Per-user scope-grant model: <how users are granted scopes; nested expansion if
   supported; default; revoke>
 Role classification: <scope-restricted roles | tenant-wide (bypass) roles>
+Role choice (per contested role): <plain terms; tenant-wide / multi-scope grants /
+  aggregate-only read — why, pros/cons, setup/upkeep/money or unknown;
+  least-exposure recommendation + what would change it; ONE question; grants no access;
+  if aggregate-only: the named, audited, tenant-bounded aggregate path and its minimum
+  group size>
 Composite predicate (every scoped table): tenant_id = current_tenant AND
   (scope_id = ANY(effective_user_scopes) OR current_user_is_tenant_wide)
 Scoped vs tenant-wide tables: <which carry the scope key; which don't and why>
@@ -139,6 +161,9 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - [ ] Propagation reaches the edge/gateway layer too, not just the app layer.
 - [ ] The migration is expand → backfill → shadow → verify → enforce, with
       rollback conditions and no-return gates per stage; designed, not executed.
+- [ ] Any aggregate-only read is served from a named, audited path bounded
+      by tenant_id with a minimum group size, never by loosening the
+      predicate.
 - [ ] RLS policy SQL correctness is deferred to `rls-policy-auditor`; this
       delivers the axis and predicate shape.
 
