@@ -64,6 +64,16 @@ sends real requests that **spend tokens and money**, this skill is
    feature across quality, schema adherence, safety/refusal, groundedness,
    injection resistance, latency, and cost; set a pass threshold per
    dimension. No feature behavior spec available → Stop Conditions.
+   If a threshold needs the owner's choice (for example a fixed bar now
+   versus a provisional bar set from a first measured baseline run), teach
+   it before asking: define dimension, pass threshold, and baseline in plain
+   language. For each viable option give why it fits the feature, its pros
+   and cons, and its money cost (calls per run = cases × samples × (1
+   feature call + grader calls), times tokens per call, priced only from
+   verified current rates, otherwise unknown), setup time, and upkeep. Safety dimensions stay hard pass/fail in every
+   option. Recommend one, say why and what fact would change it, then ask
+   exactly one owner question. The answer sets the design; it does not
+   authorize a run — step 6 and Stop Conditions still govern execution.
 2. **Build the versioned dataset** using
    [references/eval-harness-design.md](references/eval-harness-design.md):
    representative cases (the real distribution), adversarial/red-team cases

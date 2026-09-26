@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-groundedness-threshold-choice",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke ai-evaluation-harness. For our support-reply drafting feature the safety dimensions are settled, but I have not chosen the groundedness pass bar. Product wants a fixed 90% bar now; others want a provisional bar set from one measured baseline run first. The dataset has 400 cases, there is no baseline yet, and nobody has checked current model pricing. Explain the choice, recommend one, and ask me. Do not run anything.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines dimension, pass threshold, and baseline in plain language and keeps every safety dimension a hard pass/fail gate under either option.",
+          "Compares the fixed 90% bar and the provisional baseline-derived bar with why each fits the feature, pros and cons, setup time, upkeep, and money estimated as calls per run = cases x samples x (1 feature call + grader calls), times tokens per call, marking the unchecked pricing as unknown instead of inventing a dollar figure.",
+          "Recommends one option, explains why, names the fact that would change it, then asks exactly one owner question.",
+          "Runs nothing and states that the threshold choice does not authorize a run; execution stays a human-authorized manual step with cost disclosed first, and no run or score is claimed."
+        ]
+      }
+    },
+    {
       "id": "negative-code-test-pyramid",
       "type": "should_not_trigger",
       "prompt": "Design our code test strategy — which behaviors get unit vs integration vs E2E tests and what runs in each CI tier.",

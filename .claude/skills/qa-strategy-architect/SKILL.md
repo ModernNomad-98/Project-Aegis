@@ -83,10 +83,13 @@ coverage mapping audits against it, and automation architecture implements it.
    staffing requires an owner choice, define the test-layer and CI terms,
    explain why the choice matters, and compare viable options by money
    (including $0), setup time, ongoing execution/maintenance cost, coverage
-   benefits and drawbacks. Recommend the least costly reliable fit for the
-   ranked risk and explain why. Choose routine test-layer assignments from
-   evidence without asking the owner. Treat an already stated owner choice as
-   settled and explain its implications without re-asking.
+   benefits and drawbacks, marking unpriced or unmeasured costs as unknown.
+   Recommend the least costly reliable fit for the ranked risk, explain why,
+   name the fact that would change it, then ask exactly one owner question.
+   Choose routine test-layer assignments from evidence without asking the
+   owner. Treat an already stated owner choice as settled and explain its
+   implications without re-asking. The answer sets the strategy; it does not
+   itself authorize staffing changes, new tools, or CI changes.
 
 ## Output Format
 
@@ -103,7 +106,8 @@ Delegations: <security negatives → multi-tenant-security-tester / rls-policy-a
              per-change plans → test-plan-designer; tooling → qa-automation-architect>
 Exit criteria & review date: <when this strategy is met; when it is re-reviewed>
 Owner choice brief (only if needed): <terms; why now; options with money,
-  setup/run/maintenance costs, pros and cons; recommendation and fit>
+  setup/run/maintenance costs or unknowns, pros and cons; recommendation,
+  fit, and what would change it; one owner question>
 ```
 
 ## Validation Checklist
@@ -117,7 +121,7 @@ Owner choice brief (only if needed): <terms; why now; options with money,
 - [ ] Ownership and exit criteria stated; review date set.
 - [ ] Security negative testing delegated, not duplicated.
 - [ ] Any owner-facing choice explains terms, costs, pros and cons, and a
-      reasoned recommendation before requesting the decision.
+      reasoned recommendation before exactly one owner question.
 
 ## Gotchas
 

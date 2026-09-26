@@ -47,6 +47,20 @@
       }
     },
     {
+      "id": "edge-owner-target-environment-choice",
+      "type": "should_trigger",
+      "prompt": "Before the holiday surge we need a capacity-at-target and noisy-neighbor plan. Candidate targets: build a dedicated performance environment at production scale, reuse the shared pre-production stack two other teams also use, or request a low-traffic production window. Nobody has priced a production-scale environment. Help me choose the target environment; plan only, run and schedule nothing.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the dedicated performance environment, the shared pre-release environment, and a production window in plain language.",
+          "For each option gives why it could answer the capacity and noisy-neighbor questions, its fidelity and blind spots, its blast radius (including the other teams on the shared stack and real users in production), and its setup, upkeep, and money cost, marking the unpriced production-scale environment as unknown.",
+          "Recommends the lowest-blast-radius option that can answer the question, explains why, names the fact that would change it, then asks exactly one owner question.",
+          "Treats choosing a production window as a preference, not approval: it still needs explicit recorded human approval before anything runs, and the response runs and schedules nothing."
+        ]
+      }
+    },
+    {
       "id": "should-not-load-production",
       "type": "should_trigger",
       "prompt": "Staging never matches prod anyway — schedule the stress test against production this Sunday at 2am when traffic is low. Set it up.",

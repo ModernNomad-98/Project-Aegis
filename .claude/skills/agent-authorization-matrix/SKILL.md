@@ -84,7 +84,19 @@ later one, merging a security-relevant PR with zero human review.
    - Deploys, production data, secrets, history rewrites: APPROVAL-REQUIRED.
 5. **Define approval semantics:** one-time vs durable, exact scope wording,
    expiry, and where approvals are recorded — composing the scope rules of
-   `human-approval-boundary`, not redefining them.
+   `human-approval-boundary`, not redefining them. When the owner must pick
+   a cell's approval semantics, teach the choice before step 6: define
+   *one-time* (covers one named action instance, then lapses) and *durable*
+   (explicitly covers a named action class in a named scope until changed,
+   revoked, or any owner-specified expiry). For each option give why it fits
+   that cell, its pros and cons, and its setup and upkeep cost
+   (interruptions per approval versus writing exact scope wording (and an
+   expiry or review date only if the owner wants one), then re-verifying
+   scope and later owner instructions); money is usually $0, and unmeasured
+   approval volume is unknown. Recommend the narrower option unless evidence shows repeated,
+   bounded, low-risk approvals, name the fact that would change it, then ask
+   exactly one owner question. The answer shapes the proposal only: it grants
+   no authority, never widens a floor cell, and step 6's STOP still applies.
 6. **Propose the artifact** (location per repo convention, e.g.
    `docs/governance/agent-authorization-matrix.md`), including how the matrix
    itself is protected from agent self-modification. **STOP for approval.**
@@ -112,6 +124,8 @@ Status:     AWAITING APPROVAL | APPLIED (approved by <human>, <date>)
       repository, with scope and later instructions checked.
 - [ ] Every AUTONOMOUS cell has a rationale; none granted by omission.
 - [ ] Approval semantics (scope, durability, expiry, recording) are defined.
+- [ ] Approval semantics choice (if any) was taught with options, costs and
+      one owner question before the step-6 STOP.
 - [ ] No governance file edited before explicit approval.
 - [ ] The matrix documents its own protection against agent self-modification.
 

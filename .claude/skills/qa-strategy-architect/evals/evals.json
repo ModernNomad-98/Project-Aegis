@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-release-staffing-choice",
+      "type": "should_trigger",
+      "prompt": "Across the product, our top-ranked risks are checkout and refunds, and we have one QA engineer. Should the strategy fund automated end-to-end coverage for those journeys as a standing CI gate now, or rely on manual release checklists with screenshot evidence each release and automate later? Contractor and tooling costs aren't priced. Explain the tradeoff, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the test-layer and CI terms in plain language (end-to-end test, CI gate, manual release checklist) and explains why the choice matters for the ranked checkout and refund risks.",
+          "Compares the standing automated end-to-end CI gate and the manual per-release checklist options by money (including $0), setup time, ongoing execution and maintenance cost, and coverage benefits and drawbacks, marking the unpriced contractor and tooling costs as unknown.",
+          "Recommends the least costly reliable fit for the ranked risk, explains why, names the fact that would change it, then asks exactly one owner question.",
+          "Chooses routine test-layer assignments from evidence without asking, and states that the answer does not itself authorize staffing changes, new tools, or CI changes."
+        ]
+      }
+    },
+    {
       "id": "negative-single-feature-plan",
       "type": "should_not_trigger",
       "prompt": "Write the test plan for the new CSV import feature shipping next sprint.",
