@@ -7,6 +7,9 @@ decision log, approve private candidate labels, renew a provider allowance, or
 authorize host or live execution. A pull request (PR) is a reviewed source
 change; a protected `gate-guard` is a separate repository check.
 
+Here, preflight is the check before a case runs, an aggregate is the case-level
+result, and `UNRUN` means a planned attempt did not execute.
+
 ## Decision in one read
 
 **Recommendation:** authorize one bounded, synthetic-only report-integrity
