@@ -1610,14 +1610,19 @@ class Audit:
 
     # -- provenance (captured ONCE; reused by every output) ------------------
 
-    def _git(self, *args: str) -> str:
+    def _git(self, *args: str, keep_leading: bool = False) -> str:
+        """Run git and return stdout. `keep_leading=True` strips only trailing
+        newlines: `git status --porcelain` lines start with a significant
+        status column (" M path"), and a full strip() would eat the FIRST
+        line's leading space so `ln[3:]` drops that path's first character."""
         try:
-            return subprocess.run(
+            out = subprocess.run(
                 ["git", *args], cwd=self.repo, capture_output=True,
                 text=True, check=True,
-            ).stdout.strip()
+            ).stdout
         except (OSError, subprocess.CalledProcessError):
             return "unknown"
+        return out.rstrip("\r\n") if keep_leading else out.strip()
 
     @staticmethod
     def _engine_sha256() -> str:
@@ -1644,7 +1649,7 @@ class Audit:
         state or hashes (fix v2#5). Must run after discover()."""
         if self._provenance is not None:
             return self._provenance
-        status = self._git("status", "--porcelain")
+        status = self._git("status", "--porcelain", keep_leading=True)
         dirty = (
             [ln[3:].strip() for ln in status.splitlines() if ln.strip()]
             if status not in ("", "unknown") else []

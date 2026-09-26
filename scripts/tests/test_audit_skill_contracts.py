@@ -1273,6 +1273,65 @@ def test_corpus_hash_follows_declared_posix_order() -> None:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def _provenance_with_git(status_stdout: str | None) -> dict:
+    """Hermetic provenance capture: a one-skill temp repo and a mocked
+    subprocess.run. `status_stdout=None` makes every git call fail."""
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-porcelain-"))
+    try:
+        skill = tmp / ".claude" / "skills" / "alpha"
+        skill.mkdir(parents=True)
+        (skill / "SKILL.md").write_text(
+            "---\nname: alpha\ndescription: 'Does nothing.'\n---\n\n# A\n",
+            encoding="utf-8")
+
+        def fake_run(cmd, **kwargs):
+            if status_stdout is None:
+                raise subprocess.CalledProcessError(128, cmd)
+            out = status_stdout if cmd[1:3] == ["status", "--porcelain"] else "deadbeef\n"
+            return subprocess.CompletedProcess(cmd, 0, stdout=out, stderr="")
+
+        a = audit_mod.Audit(tmp)
+        a.discover()
+        with mock.patch.object(audit_mod.subprocess, "run", side_effect=fake_run):
+            return a.capture_provenance()
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_provenance_porcelain_parsing() -> None:
+    """The first porcelain line's leading status space (" M path") is
+    significant: stripping it shifted `ln[3:]` and silently dropped the first
+    dirty path from dirty_paths_in_scanned_surfaces."""
+    expected = [".claude/skills/alpha/SKILL.md",
+                ".claude/skills/beta/evals/evals.json",
+                ".claude/skills/gamma/new.md"]
+    lines = [" M .claude/skills/alpha/SKILL.md",
+             " M .claude/skills/beta/evals/evals.json",
+             "?? .claude/skills/gamma/new.md",
+             " M scripts/x.py"]
+
+    p = _provenance_with_git("\n".join(lines) + "\n")
+    assert p["dirty_paths_in_scanned_surfaces"] == expected, p["dirty_paths_in_scanned_surfaces"]
+    assert p["working_tree_dirty"] is True
+    ok("provenance keeps the FIRST porcelain path when its status column starts with a space")
+
+    p = _provenance_with_git("\r\n".join(lines) + "\r\n")
+    assert p["dirty_paths_in_scanned_surfaces"] == expected, p["dirty_paths_in_scanned_surfaces"]
+    assert p["working_tree_dirty"] is True
+    ok("provenance parses CRLF porcelain output identically")
+
+    p = _provenance_with_git("")
+    assert p["dirty_paths_in_scanned_surfaces"] == [], p["dirty_paths_in_scanned_surfaces"]
+    assert p["working_tree_dirty"] is False
+    ok("empty porcelain output reports a clean tree")
+
+    p = _provenance_with_git(None)
+    assert p["dirty_paths_in_scanned_surfaces"] == [], p["dirty_paths_in_scanned_surfaces"]
+    assert p["working_tree_dirty"] is True, "a git failure must never read as clean"
+    assert p["repo_sha"] == "unknown" and p["branch"] == "unknown"
+    ok("a git failure reports 'unknown' and fails closed as dirty")
+
+
 # --- audited-input containment (Gate 2.5 blocker 2) --------------------------
 
 
@@ -1754,6 +1813,7 @@ def main() -> int:
     test_provenance_snapshot(a)
     test_provenance_content_sensitivity_and_inclusion()
     test_corpus_hash_follows_declared_posix_order()
+    test_provenance_porcelain_parsing()
     test_input_symlink_reference_fails_closed()
     test_input_symlink_skill_dir_fails_closed()
     test_input_containment_accepts_regular_files()

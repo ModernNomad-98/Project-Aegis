@@ -698,6 +698,21 @@
           "Identifies the missing specific authority and manual route for excluded operations while continuing already authorized documentary work; no repeated consent for unchanged granted scope."
         ]
       }
+    },
+    {
+      "id": "edge-owner-build-or-buy-choice",
+      "type": "should_trigger",
+      "prompt": "My docs/project-state.md records the approved requirements brief for my cleaning company's job-scheduling app. Before we go further I keep wondering whether to pay monthly for an off-the-shelf field-service scheduling app, set it up myself in a no-code app builder, or have a custom app built. I don't know what any of them cost. I'm not technical - explain the choices, tell me what you'd pick, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reads docs/project-state.md first and states where the project is in plain language from the latest STATE SNAPSHOT, continuing rather than restarting discovery.",
+          "Treats off-the-shelf app versus no-code builder versus custom build as a user-owned choice, defines the terms in plain language, and explains each viable option's reason, pros, cons, and money, setup, and maintenance costs, marking the unknown subscription, builder, and development prices as uncertain instead of inventing figures.",
+          "Recommends one option with a reason tied to the recorded brief and the user's context, or, if a sound recommendation needs a missing fact, asks one atomic discovery question for that fact first instead.",
+          "Shows the explanation as CHOICE CONTEXT before ONE QUESTION and asks exactly one atomic question — the decision question, or the single discovery question from the fallback — with no hidden second question and no compound question bundling several decisions.",
+          "States that the answer does not authorize signing up, spending, installing, provisioning, or deploying, and writes nothing to docs/project-state.md this turn; recording the choice later needs its own exact preview and applicable approval."
+        ]
+      }
     }
   ]
 }
