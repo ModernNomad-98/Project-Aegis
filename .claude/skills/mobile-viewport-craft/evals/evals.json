@@ -69,7 +69,8 @@
           "Defines the hamburger menu and the bottom tab bar in plain language (and any hybrid it proposes, such as a bottom bar with a More entry), and explains why each pattern it treats as viable fits seven sections used one-handed.",
           "Compares the patterns by what each preserves or loses for this content - the frequent Jobs and Scan destinations one tap away in the thumb zone versus hidden behind a menu - and by accessibility and use effects, including touch-target size and spacing for bar items, safe-area insets so a bottom bar clears the home indicator, and a fixed bar that does not collide with the on-screen keyboard; states money, setup, and upkeep and marks the unestimated rebuild effort as unknown instead of inventing it.",
           "Recommends one pattern with a reason tied to one-handed use and the two high-frequency sections, and names the missing fact that could change it, such as real usage data on how often each section is opened.",
-          "Asks exactly one navigation decision question after the comparison; keeps the binding touch-target and zoom-safety requirements intact rather than offering a violating option, and leaves accessibility verification to accessibility-test-harness."
+          "Asks exactly one navigation decision question after the comparison; keeps the binding touch-target and zoom-safety requirements intact rather than offering a violating option, and leaves accessibility verification to accessibility-test-harness.",
+          "States that the answer sets the design only and does not authorize implementing or shipping the layout."
         ]
       }
     },

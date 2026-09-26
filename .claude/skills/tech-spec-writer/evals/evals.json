@@ -42,7 +42,8 @@
           "Explains unfamiliar terms in plain language and presents only the two evidence-backed viable options, with why each is considered.",
           "Gives case-specific benefits and drawbacks for each option and separates money, setup, and ongoing upkeep costs; labels unverified pricing or other unknowns rather than inventing figures.",
           "Recommends an option with a reason grounded in the stated system and team, and says what new fact would change that recommendation.",
-          "Keeps the owner's choice open and asks them to decide before build; does not treat an unresolved assumption as fact or create an ADR for a decision not yet made."
+          "Keeps the owner's choice open and asks them to decide before build; does not treat an unresolved assumption as fact or create an ADR for a decision not yet made.",
+          "Asks exactly one atomic owner question after the comparison and treats the answer as setting the design only, not as authority to start the build."
         ]
       }
     },

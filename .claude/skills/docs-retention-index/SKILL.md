@@ -93,7 +93,13 @@ pinned against each other in both directions.
    approval. For each viable option, state why it fits, its benefits and
    drawbacks, setup work and ongoing maintenance cost (including any money),
    and how to reverse it. Recommend one option for this doc and explain why;
-   state what the owner is actually authorizing before asking.
+   state what the owner is actually authorizing before asking. Then ask
+   exactly one atomic owner question; the answer sets the retirement plan
+   (including any approved removal stage) only, and this skill still deletes
+   nothing itself. When several documents have open retirement choices, ask
+   only about the most blocking one this turn (for example, the one whose
+   disposition other relinks depend on) and list the others as pending for a
+   later turn.
 6. **Detect rot AND hoarding.** Flag docs past their review/expiry,
    superseded-but-present, and orphaned; equally, flag "permanent" docs
    with no reason-to-keep (hoarding by default). Push both toward an

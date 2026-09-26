@@ -60,7 +60,11 @@ captures nothing.
    [references/evidence-rules.md](references/evidence-rules.md).
    If the owner must choose between checkpoint sets, explain what a checkpoint
    proves, compare capture/review effort and missed-evidence risk for each set,
-   and recommend the smallest set that covers the named obligations.
+   and recommend the smallest set that covers the named obligations, then ask
+   exactly one atomic owner question — unless storage or retention is also
+   undecided, in which case ask only the most blocking of the open choices
+   (the missing retention-obligation text first if referenced but
+   undocumented) and list the others as pending for a later turn.
 2. **Fix the naming convention:** deterministic, sortable, collision-free —
    pattern `<checkpoint-id>--<route/case>--<persona>--<build>--<timestamp>`
    (adjust tokens to the repo), documented with examples and counter-examples.
@@ -74,12 +78,18 @@ captures nothing.
 5. **Set storage, retention, and access:** where evidence lives per class
    (PR artifact vs release record vs compliance archive), retention windows,
    and who can read what (evidence containing tenant data inherits
-   tenant-access restrictions). Explain these terms to the owner. For each
+   tenant-access restrictions). Explain these terms to the owner. If a
+   compliance retention obligation is referenced but undocumented, request
+   the obligation text as the one question before comparing or recommending
+   retention options. Otherwise, for each
    viable storage and retention choice, state why it fits the named consumer,
    its access and deletion behavior, setup/ongoing cost and review effort,
    benefits and drawbacks, then recommend one with a reason. Use verified
    prices or say the dollar cost is unknown; never trade away pre-storage
-   masking or tenant isolation to save money.
+   masking or tenant isolation to save money. Then ask exactly one atomic
+   owner question (only the most blocking open choice, per step 1, when the
+   checkpoint set is also undecided); the answer sets the evidence policy only and does not
+   authorize capturing, storing, or deleting evidence.
 6. **Define linkage:** how checkpoints attach to manual case ids, clickthrough
    reports, PRs, and the closeout evidence bundle (`ai-closeout-reporter`
    consumes this) — an unlinked screenshot is unfindable a month later.

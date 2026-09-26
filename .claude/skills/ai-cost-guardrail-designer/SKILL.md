@@ -114,7 +114,12 @@ the guardrail design.
    prices or imply that a request-count cap bounds spend. Recommend a tier
    and limits with the workload evidence that supports them. Without verified
    provider unit prices, only provisional token/volume limits can be chosen;
-   defer a dollar budget until unit economics are available.
+   defer a dollar budget until unit economics are available. Then ask exactly
+   one atomic owner question; the answer sets the design only and does not
+   authorize enforcing limits or changing provider-account settings. If step
+   10's budget, degraded-mode or backstop choice is also open, ask only the
+   more blocking of the two this turn and list the other as pending for a
+   later turn.
 6. **Make every guardrail fail closed, and design the kill switch and degraded
    mode.** A switch to disable the feature/model/tenant on a spend spike, and a
    degraded fallback (cached answer, smaller model, queue, or "temporarily
@@ -159,6 +164,11 @@ the guardrail design.
     costs (including denied legitimate work), benefits and drawbacks of each
     viable option, and which option is recommended and why. Preserve the
     fail-closed floor: no option may allow inference when a budget check fails.
+    Then ask exactly one atomic owner question; the answer sets the design
+    only and does not authorize enforcing a guardrail or the provider backstop.
+    If step 5's tier-and-limit choice is also open, ask only the more
+    blocking of the two this turn and list the other as pending for a later
+    turn.
 
 ## Output Format
 

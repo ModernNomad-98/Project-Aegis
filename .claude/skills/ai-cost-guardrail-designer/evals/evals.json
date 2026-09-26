@@ -76,7 +76,8 @@
         "assertions": [
           "Defines input/output tokens, pre-call reservation, and post-response true-up in plain language before presenting choices.",
           "Compares viable tiers and provisional token/volume limits with reasons, benefits, drawbacks, and operational costs at the observed workload; marks dollar estimates unknown until current provider prices are verified.",
-          "Recommends a tier and provisional limits with a workload-based reason, but does not finalize a dollar budget without verified provider unit prices and unit economics; preserves fail-closed enforcement."
+          "Recommends a tier and provisional limits with a workload-based reason, but does not finalize a dollar budget without verified provider unit prices and unit economics; preserves fail-closed enforcement.",
+          "Asks exactly one atomic owner question after the comparison and treats the answer as setting the design only, not as authority to enforce limits or change provider-account settings."
         ]
       }
     },

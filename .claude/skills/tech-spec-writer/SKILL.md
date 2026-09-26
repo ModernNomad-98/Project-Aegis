@@ -79,11 +79,17 @@ work; it presents and integrates them into a reviewable design.
 5. **State risks and open questions.** The real risks with mitigations,
    and the open questions blocking or needing a decision — named, with
    owners, not buried. Before asking an owner to choose during the build,
-   explain unfamiliar terms in plain language and show the viable options
-   supported by the evidence. For each, give the reason to consider it,
-   benefits, drawbacks, and money, setup, and upkeep costs (or mark an
-   unknown). Recommend one with a case-specific reason and say what would
-   change that recommendation. Do not invent options or present an
+   check whether the evidence can support a recommendation. If a deciding
+   fact is missing (one without which the evidence cannot favor any option),
+   ask only for that fact this turn. Otherwise, explain unfamiliar terms in
+   plain language and show the viable options supported by the evidence.
+   For each, give the reason to consider it, benefits, drawbacks, and money,
+   setup, and upkeep costs (or mark an unknown). Recommend one with a
+   case-specific reason and say what would change that recommendation,
+   naming any unverified figure that could shift it. Then ask exactly one
+   atomic owner question;
+   the answer sets the design only and does not authorize starting the
+   build. Do not invent options or present an
    unresolved assumption as a fact. Record a binding technical choice in
    an ADR (`adr-writer`) and cite it here.
 6. **Define the review/sign-off path.** Who reviews, what approval means,
