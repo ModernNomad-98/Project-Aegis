@@ -43,6 +43,20 @@ This teaching step never relaxes a manual-only boundary or substitutes
 explanation for evidence or approval.
 Evidence over assumption: verify against the repo and live systems before acting, and treat volatile facts (versions, counts, tool behavior) as verification items, not truths.
 
+**Source-library owner preference: name and time every work item.** In Role A,
+before each agent or delegated subagent starts an item, tell the owner the
+item's name and estimated active-work duration (ETA), and record its start
+timestamp. The coordinator must do this for every delegated item, including
+items a subagent delegates onward; each agent must report its own item at
+completion. At the end, give the finish timestamp, actual measured elapsed
+wall time, and active time only if measured. Compare measured active time with
+the initial active-work ETA; if active time is unavailable, label wall time as
+an imperfect comparison. For unfinished or interrupted items, report time so
+far and remaining ETA separately. Never invent a start time, active-time split,
+or actual duration; mark unavailable measurements explicitly. Keep the
+existing work-package measurement log and five-merge re-estimation rule in
+[the execution measurements](docs/roadmaps/aegis-execution-metrics.md).
+
 **Source-library owner approvals.** For work on `ModernNomad-98/Project-Aegis` in
 Role A, read [the owner approval register](docs/approvals/APPROVAL_REGISTER.md)
 before asking for an approval already granted. Apply the recorded human scope and
