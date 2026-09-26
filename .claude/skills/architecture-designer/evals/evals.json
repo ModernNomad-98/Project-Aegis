@@ -53,6 +53,21 @@
           "Does not implement any restructuring."
         ]
       }
+    },
+    {
+      "id": "edge-owner-export-worker-choice",
+      "type": "should_trigger",
+      "prompt": "Our repo is one API service plus Postgres; there is no worker process today. Customers want large CSV exports that can take several minutes to build. Should export generation run inside the existing API process, or become a separate worker component that picks jobs from a queue? We haven't priced extra hosting. I'm the product owner, not an engineer — explain the choice before asking me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inspects the actual API layout, deploy units, and export-related data access before proposing options, and states anything it could not inspect as an assumption.",
+          "Explains worker, job queue, boundary contract, and data ownership in plain language, and gives each viable option's reason plus case-specific pros and cons across complexity, delivery speed, operability, reversibility, and failure modes such as a long export starving API requests or a job lost on restart.",
+          "Separates money, setup effort, delivery time, and ongoing upkeep per option, uses $0 only where no direct purchase is needed, and labels the unpriced hosting cost as unknown rather than inventing a figure.",
+          "Recommends one option with why it fits this system and team and what would change the recommendation, then asks exactly one clear owner decision question instead of picking silently.",
+          "Keeps its boundary: hands the ADR draft to adr-writer, leaves retry, scheduling, and idempotency semantics to background-job-orchestration-architect, and implements no code."
+        ]
+      }
     }
   ]
 }

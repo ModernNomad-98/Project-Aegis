@@ -71,6 +71,21 @@
           "This skill advises on the style; the concrete design is downstream."
         ]
       }
+    },
+    {
+      "id": "edge-owner-style-choice",
+      "type": "should_trigger",
+      "prompt": "Here is our need: B2B invoicing product, six engineers in one team, one shared on-call rotation, nobody has run Kubernetes or distributed tracing in production. Traffic is steady except month-end, when PDF invoice generation spikes about tenfold for a few hours. Invoices and payments must be strongly consistent. We have no hosting budget set yet. We're weighing a modular monolith, microservices, or a modular monolith with the PDF generation split out as an event-driven worker. I'm not technical — explain the options before asking me to pick.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains modular monolith, microservices, event-driven worker, and the distributed-monolith risk in plain language, and uses the interviewed need rather than re-asking what the prompt already answers.",
+          "Presents only the genuinely relevant candidates with the reason each is considered for THIS case, and gives case-specific pros and cons tied to the six-person team, the untried distributed-systems tooling, the month-end PDF spike, and the invoice/payment consistency need.",
+          "States money, setup, delivery-time, and ongoing operations costs per candidate, notes where a direct $0 still takes staff time, and labels hosting and tooling amounts as estimates or unknowns instead of inventing prices.",
+          "Makes one clear recommendation with the reason it fits and the sensitivity that would change it, without chasing or reflexively rejecting microservices.",
+          "Ends with exactly one clear owner decision question rather than adopting the style silently, and hands the concrete component map and migration to architecture-designer and hosting posture to cloud-architecture-decider."
+        ]
+      }
     }
   ]
 }

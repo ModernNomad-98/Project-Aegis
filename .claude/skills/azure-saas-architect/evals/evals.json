@@ -53,6 +53,21 @@
           "Does not stall the whole design: everything not SKU-dependent is still delivered."
         ]
       }
+    },
+    {
+      "id": "edge-owner-security-suite-choice",
+      "type": "should_trigger",
+      "prompt": "We're on Azure with App Service, Azure SQL, and Storage. A board member told us to turn on Microsoft Sentinel and every Defender for Cloud plan now. We are five engineers with no security operations team and no one assigned to triage alerts. We haven't looked at current pricing. Explain what these are and the realistic options, give me your recommendation, then ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains SIEM/SOAR (Sentinel), posture management (CSPM) versus per-workload protection plans, and Log Analytics ingestion in plain language.",
+          "Compares viable options, such as a CSPM baseline plus Defender plans only for the services this design deploys with Sentinel deferred until a triage practice exists, versus enabling Sentinel and all plans now, giving each option's reason and pros and cons tied to the five-person team with no alert triage.",
+          "Names money, setup time, and ongoing triage effort per option, treats each plan meter and Log Analytics ingestion as cost risks, and lists coverage, tier, and price claims as Verification items instead of inventing figures.",
+          "Recommends one option with why it fits the team's maturity and states the reopen trigger (for example, hiring a detection-and-response owner), then asks exactly one clear owner decision question rather than deciding silently.",
+          "Hands detection-rule and alert design to security-logging-alerting-architect and operating the stack to observability-operator, and does not enable anything in the live subscription."
+        ]
+      }
     }
   ]
 }

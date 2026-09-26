@@ -101,6 +101,7 @@ production.
    and is verified).
    Recommend the least complex option that meets the evidenced ceiling and
    say why; identify costs that still need measurement or current quotes.
+   Then ask the owner one clear decision question; do not decide silently.
 
 ## Output Format
 
