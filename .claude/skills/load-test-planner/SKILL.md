@@ -135,7 +135,18 @@ instrument that runs and measures it.
    parties without explicit human approval recorded per the repo's
    conventions. Extrapolation honesty rides here too: results from
    a half-size environment do not linearly predict full-size
-   behavior — scaling claims carry their assumptions.
+   behavior — scaling claims carry their assumptions. If the owner must
+   choose the target environment, teach it before asking: define a
+   dedicated performance environment, a shared pre-release environment, and
+   a production window in plain language (a shared option that would
+   degrade real tenants is not viable — see Stop Conditions). For each
+   viable option give why
+   it could answer the scenario's question, its fidelity and blind spots,
+   its blast radius, and its setup, upkeep, and money cost (or unknown).
+   Recommend the lowest-blast-radius option that can answer the question,
+   say why and what fact would change it, then ask exactly one owner
+   question. Choosing a production window is a preference, not approval:
+   it still needs explicit recorded human approval before anything runs.
 9. **Hand the plan to the instrument.** Scenarios, models, mixes,
    ramps, and criteria in the Output Format — consumed by
    `performance-test-harness` for execution mechanics, measurement,

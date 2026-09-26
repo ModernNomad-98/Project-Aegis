@@ -101,6 +101,18 @@ lifecycle-stage triggers, instead of an RMF poster on the wall.
    with `incident-response-runbook`, and kill-switch/containment design via
    `agent-containment-reviewer`. A human incident owner follows an approved
    runbook and holds live response authority. Communicate residual risk.
+   If no risk appetite is stated for a risk category and treatments cannot
+   be prioritized without one, teach the choice before asking: define risk
+   appetite (how much residual risk of a kind the org will carry to pursue
+   a goal), residual risk, and the four treatments in plain language.
+   Present the viable appetite stances for that category (for example low:
+   avoid or mitigate before release; moderate: mitigate to measured
+   thresholds and accept a named residual), each with why it fits, pros and
+   cons, and the setup, upkeep, and money cost of the treatments it implies,
+   or unknown. Recommend one, say why and what fact would change it, then
+   ask exactly one owner question. The stated appetite guides prioritization
+   only; accepting any specific residual risk still needs a named human via
+   `human-approval-boundary`.
 6. **Wire lifecycle triggers.** Per stage transition (design→dev,
    dev→deploy, deploy→operate, material change, decommission): which
    function activities re-run, who signs. Decommission gets real steps —

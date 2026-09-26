@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-risk-appetite-choice",
+      "type": "should_trigger",
+      "prompt": "Our AI RMF program covers a customer-facing billing assistant and an internal code assistant. Leadership has never stated a risk appetite for inaccurate AI answers reaching customers, so MANAGE cannot prioritize treatments for that risk category. We have no cost estimate for adding human review of assistant replies. Explain the appetite options for that category, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines risk appetite, residual risk, and the avoid/mitigate/transfer/accept treatments in plain language and ties the missing appetite to MANAGE prioritization for the named risk category.",
+          "Presents viable appetite stances (for example low: avoid or mitigate before release; moderate: mitigate to measured thresholds and accept a named residual), each with why it fits, pros and cons, and the setup, upkeep, and money cost of the treatments it implies, marking the unestimated human-review cost as unknown.",
+          "Recommends one stance, explains why, names the fact that would change it, then asks exactly one owner question.",
+          "States that the chosen appetite guides prioritization only; accepting any specific residual risk still needs a named human via human-approval-boundary."
+        ]
+      }
+    },
+    {
       "id": "negative-single-feature",
       "type": "should_not_trigger",
       "prompt": "Assess the risk tier, oversight level, and disclosure requirements for our new AI meeting-summarizer before launch.",

@@ -102,7 +102,17 @@ not execute them against production.
 4. **Design scheduling.** Frequency per probe (heartbeat frequent, expensive
    journeys less so), and multi-region/multi-vantage-point where "up from one
    region" is not "up." State the tradeoff between frequency (faster
-   detection) and cost/load on production and third parties.
+   detection) and cost/load on production and third parties. When that
+   tradeoff needs the owner's decision (a costly journey probe or a
+   rate-limited third party), teach it before asking: define detection time
+   (how long an outage lasts before N consecutive failures page), probe
+   frequency, and vantage point in plain language. For each viable schedule
+   give why it fits the journey's incident value, its pros and cons, its
+   load on production and third parties, and its money (monitoring-service
+   and third-party charges), setup, and upkeep cost, or unknown. Recommend
+   one, say why and what fact would change it, then ask exactly one owner
+   question. The chosen schedule is design input; it does not authorize
+   running probes against production.
 5. **Design alerting on synthetic failure.** What constitutes failure (N
    consecutive fails, not one flaky run, to avoid paging on a single blip),
    severity, who is paged, and the runbook link. A synthetic alert must
