@@ -96,6 +96,20 @@
           "Surfaces the estimate/commitment conflict for the human decision while continuing non-binding planning."
         ]
       }
+    },
+    {
+      "id": "edge-owner-learning-bet-choice",
+      "type": "should_trigger",
+      "prompt": "We're resetting our roadmap around one outcome: cut first-month churn for small-business customers. The top-ranked idea from our prioritization pass is a guided setup wizard, but nobody knows whether setup friction is actually what drives the churn. Before it goes into a horizon, should we first run a two-week clickable-prototype test with ten churned customers, build the full wizard in Now, or park it as a Later theme? Research incentives aren't priced and the wizard build hasn't been estimated. We're not asking for dates or commitments. Explain the options, recommend one, and ask me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Anchors on the churn outcome and consumes the existing ranking without re-scoring it, and defines Now/Next/Later as non-binding planning horizons and an uncertainty-reducing bet (a cheap test that retires the biggest unknown before more work rests on it) in plain language.",
+          "Compares the prototype-first bet, building the wizard in Now, and parking it as a Later theme with why each path is viable, case-specific pros and cons (learning before committing capacity versus the risk of building on an untested assumption, and the delay of parking it), and money, setup, and maintenance costs, marking the unpriced research incentives and unestimated wizard build as unknown.",
+          "Recommends one path with a reason grounded in sequencing to learn - front-loading the cheap uncertainty-reducer when the churn assumption is untested - and states that assumption as the one whose result would reshape the plan.",
+          "Asks exactly one atomic decision question after the comparison; the answer does not authorize starting the test or the build, no precise date is attached to the low-confidence item, and horizon placement creates no delivery commitment."
+        ]
+      }
     }
   ]
 }

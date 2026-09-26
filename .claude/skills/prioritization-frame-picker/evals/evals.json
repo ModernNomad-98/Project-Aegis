@@ -60,6 +60,20 @@
       }
     },
     {
+      "id": "edge-owner-frame-adoption-choice",
+      "type": "should_trigger",
+      "prompt": "Our product team ranks about 40 backlog items each quarter by gut feel. Most are comparable feature requests, a handful are partner integrations that lose value if they slip past a contract date, and one SOC 2 control fix is mandatory. We have no usage analytics, so any reach figure would be a guess, and adding analytics would need engineering time and a tool we haven't priced. Should the team adopt RICE, WSJF, or a simple value-vs-effort grid as its standing method? Explain the options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Frames the decision first (what is ranked, toward what outcome, input quality, time horizon) and defines RICE, WSJF (cost of delay compared with job size), and value-vs-effort in plain language.",
+          "Compares RICE, WSJF, and value-vs-effort with why each is a viable fit for this backlog, its limits, and case-specific pros and cons - RICE's reach input is a guess without analytics, WSJF captures the partner-integration deadlines, value-vs-effort is fast but time-blind - plus money, setup, and ongoing maintenance costs, marking the unpriced analytics tool and unestimated instrumentation work as unknown rather than inventing figures.",
+          "Recommends one frame with a reason tied to this backlog's input quality and time sensitivity, names that frame's limits, and keeps the mandatory SOC 2 fix in a protected must-do lane outside whichever score is chosen.",
+          "Asks exactly one atomic decision question after the comparison; treats the answer as not authorizing execution (no analytics tool is bought or installed) and hands sequencing over time to roadmap-under-uncertainty-planner."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-sequence-the-roadmap",
       "type": "should_not_trigger",
       "prompt": "The backlog is already ranked. Now lay it out as a roadmap across now/next/later with confidence levels and a re-plan cadence.",

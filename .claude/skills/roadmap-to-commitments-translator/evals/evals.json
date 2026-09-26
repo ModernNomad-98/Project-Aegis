@@ -173,6 +173,20 @@
           "Distinguishes 'unknown - discovery incomplete' (missing) and a known-but-unsecured required dependency (insufficient) from 'none verified' after complete discovery (sufficient)."
         ]
       }
+    },
+    {
+      "id": "edge-owner-over-capacity-choice",
+      "type": "should_trigger",
+      "prompt": "Quarterly commitment review. Stakeholders want the five deliverables in our roadmap's Now horizon committed for Q3. Three sprints of measured velocity, net of support and interrupts with a buffer, cover about three of them; architecture is signed off and the dependencies are secured. The Q3 scope is approved, the technical implementation plan is written, and risks are assessed. Priya Shah, our Head of Engineering, decides what we commit. Before she decides, lay out whether to commit to fewer, bring in a contractor (no rate quoted, onboarding time unknown), or commit to all five at lower confidence. Explain each, recommend one, and give her the one question to answer.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines capacity (measured velocity minus support and interrupt load, with a buffer) and confidence in plain language, and grounds the over-capacity finding in that evidence rather than headcount or aspiration.",
+          "Explains why committing to fewer, adding contractor capacity, and accepting lower confidence are each viable, with the delivery benefit, drawback, and money, time, and ongoing-support cost of each, marking the unquoted contractor rate and unknown onboarding time as uncertain rather than inventing figures.",
+          "Recommends the evidence-supported path with a reason tied to the measured capacity, and does not pad estimates to make all five fit.",
+          "Asks Priya exactly one decision question after the comparison; the advice creates no commitment - Commitment status stays HUMAN DECISION REQUIRED, Committed stays none - awaiting named human decision, any candidate set is non-binding, and the not-committed items are stated with reasons."
+        ]
+      }
     }
   ]
 }
