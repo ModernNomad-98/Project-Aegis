@@ -8,12 +8,13 @@ import re
 from typing import Any, Mapping
 
 
-VERSION = "1"
+VERSION = "2"
 MAX_REQUEST_BYTES = 4096
 MAX_RESPONSE_BYTES = 1024
 MAX_ITEMS = 16
 ID = re.compile(r"[a-z][a-z0-9-]{0,63}\Z")
 VERSION_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}\Z")
+REQUEST_ID = re.compile(r"[0-9a-f]{32}\Z")
 STAGES = frozenset({"discovery", "design", "implementation", "review", "release"})
 
 
@@ -98,6 +99,7 @@ class Offer:
 @dataclass(frozen=True)
 class Request:
     version: str
+    request_id: str
     synopsis: str
     stage: str
     catalog_version: str
@@ -114,11 +116,12 @@ class Request:
 def parse_request(raw: bytes | str | Mapping[str, Any]) -> Request:
     """Validate a minimized host-supplied offer. Raises before adapter use."""
     data = _decode(raw, MAX_REQUEST_BYTES)
-    _keys(data, {"version", "synopsis", "stage", "catalog_version", "policy_version",
+    _keys(data, {"version", "request_id", "synopsis", "stage", "catalog_version", "policy_version",
                  "agents", "skills", "mandatory_agents", "mandatory_skills",
                  "selected_agents", "selected_skills", "invoked_manual_skills"})
     if data["version"] != VERSION:
         raise ContractError("unsupported contract version")
+    request_id = _string(data["request_id"], 32, REQUEST_ID)
     synopsis = _string(data["synopsis"], 512)
     if any(ch in synopsis for ch in "\u0085\u2028\u2029"):
         raise ContractError("synopsis must be one line")
@@ -166,7 +169,7 @@ def parse_request(raw: bytes | str | Mapping[str, Any]) -> Request:
         raise ContractError("manual invocation must be an explicit selection")
     if (set(mandatory_skills) | set(selected_skills)) & manual_ids - set(invoked):
         raise ContractError("manual-only skill lacks invocation")
-    return Request(VERSION, synopsis, stage, catalog_version, policy_version,
+    return Request(VERSION, request_id, synopsis, stage, catalog_version, policy_version,
                    agents, skills, mandatory_agents, mandatory_skills,
                    selected_agents, selected_skills, invoked)
 
@@ -189,11 +192,13 @@ def decide(request: Request, raw: bytes | str | Mapping[str, Any] | None = None,
         return Decision(failure, reason="adapter failure")
     try:
         data = _decode(raw, MAX_RESPONSE_BYTES)  # type: ignore[arg-type]
-        required = {"version", "catalog_version", "policy_version", "status", "agents", "skills"}
+        required = {"version", "request_id", "catalog_version", "policy_version", "status", "agents", "skills"}
         if not required <= set(data) or set(data) - required - {"score"}:
             raise ContractError("unexpected or missing fields")
         if data["version"] != VERSION or data["catalog_version"] != request.catalog_version or data["policy_version"] != request.policy_version:
             raise ContractError("stale or malformed version")
+        if _string(data["request_id"], 32, REQUEST_ID) != request.request_id:
+            raise ContractError("response for another request")
         if data["status"] not in ("recommend", "abstain"):
             raise ContractError("invalid status")
         agents = _ids(data["agents"], {offer.id for offer in request.agents})

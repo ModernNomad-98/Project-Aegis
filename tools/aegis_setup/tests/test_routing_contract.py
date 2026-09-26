@@ -11,7 +11,8 @@ from tools.aegis_setup.routing_contract import (
 
 def request_data():
     return {
-        "version": "1", "synopsis": "Review a bounded API change", "stage": "review",
+        "version": "2", "request_id": "0123456789abcdef0123456789abcdef",
+        "synopsis": "Review a bounded API change", "stage": "review",
         "catalog_version": "cat-1", "policy_version": "pol-1",
         "agents": [{"id": "reviewer", "description": "Reviews code", "read_only": True},
                    {"id": "architect", "description": "Reviews design", "read_only": True}],
@@ -23,7 +24,8 @@ def request_data():
 
 
 def response(**changes):
-    value = {"version": "1", "catalog_version": "cat-1", "policy_version": "pol-1",
+    value = {"version": "2", "request_id": "0123456789abcdef0123456789abcdef",
+             "catalog_version": "cat-1", "policy_version": "pol-1",
              "status": "recommend", "agents": ["reviewer"], "skills": ["api"], "score": None}
     value.update(changes)
     return value
@@ -80,7 +82,7 @@ class RoutingContractTests(unittest.TestCase):
     def test_version_schema_and_bounds(self):
         self.assertEqual(decide(self.request, response(catalog_version="cat-0")).disposition, "invalid")
         self.assertEqual(decide(self.request, response(version=2)).disposition, "invalid")
-        self.assertEqual(decide(self.request, '{"version":"1","version":"1"}').disposition, "invalid")
+        self.assertEqual(decide(self.request, '{"version":"2","version":"2"}').disposition, "invalid")
         self.assertEqual(decide(self.request, response(destination="https://example.invalid")).disposition, "invalid")
         self.assertEqual(decide(self.request, response(score=1.2)).disposition, "invalid")
         self.assertEqual(decide(self.request, b"{" + b" " * 1100 + b"}").disposition, "invalid")
@@ -91,6 +93,36 @@ class RoutingContractTests(unittest.TestCase):
         data["synopsis"] = "token: secret"
         with self.assertRaises(ContractError):
             parse_request(data)
+
+    def test_request_id_is_required_exact_and_unique_per_response(self):
+        for value in (None, "", "A" * 32, "a" * 31, "g" * 32, 7):
+            data = request_data()
+            data["request_id"] = value
+            with self.subTest(value=value), self.assertRaises(ContractError):
+                parse_request(data)
+        for key in ("request_id", "version"):
+            data = request_data()
+            del data[key]
+            with self.assertRaises(ContractError):
+                parse_request(data)
+        for change in ({"request_id": "f" * 32}, {"request_id": "A" * 32},
+                       {"request_id": None}, {"version": "1"}):
+            self.assertEqual(decide(self.request, response(**change)).disposition, "invalid")
+        self.assertEqual(decide(self.request, response(status="abstain", agents=[], skills=[],
+                                                       request_id="f" * 32)).disposition, "invalid")
+        another = request_data()
+        another["synopsis"] = "Review another bounded change"
+        another["request_id"] = "f" * 32
+        self.assertEqual(decide(parse_request(another), response()).disposition, "invalid")
+        self.assertEqual(decide(self.request, response()).disposition, "recommend")
+        with self.assertRaises(ContractError):
+            parse_request({**request_data(), "version": "1"})
+        # Duplicate JSON keys are rejected before request construction.
+        duplicate = json.dumps(request_data()).replace('"request_id":', '"request_id": "f", "request_id":', 1)
+        with self.assertRaises(ContractError):
+            parse_request(duplicate)
+        duplicate_reply = json.dumps(response()).replace('"request_id":', '"request_id": "f", "request_id":', 1)
+        self.assertEqual(decide(self.request, duplicate_reply).disposition, "invalid")
 
     def test_one_line_synopsis_and_utf8_text(self):
         for separator in ("\u0085", "\u2028", "\u2029"):
@@ -144,7 +176,7 @@ class RoutingContractTests(unittest.TestCase):
         self.assertFalse(hasattr(decide(self.request, response()), "dispatch"))
 
     def test_compatibility_facts(self):
-        facts = {"contract_version": "1", "catalog_version": "cat-1", "policy_version": "pol-1",
+        facts = {"contract_version": "2", "catalog_version": "cat-1", "policy_version": "pol-1",
                  "agent_ids": ["reviewer", "architect"], "skill_ids": ["api", "setup"]}
         self.assertEqual(check_compatibility(facts, self.request).status, "compatible")
         self.assertEqual(check_compatibility({**facts, "catalog_version": "cat-2"}, self.request).status, "unsupported")
