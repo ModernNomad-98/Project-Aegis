@@ -45,6 +45,14 @@ while preserving array order and denying changed facts. Its reviewed head
 12 local
 offline tests, the 185-skill validator and the PR's Linux, Windows and
 `gate-guard` checks passed. This remains synthetic-only. The
+[version-2 request-binding change in PR #319](https://github.com/ModernNomad-98/Project-Aegis/pull/319)
+adds a fresh `request_id` per synthetic callback and requires the response to
+echo it, including abstention. Its reviewed head
+`550151dcf286f8ec64480bc91f47e390454417d2` merged as
+`a59c015c01b4035ab1a438533736134f96deac13` on 2026-09-26 at
+02:24:21 UTC with Linux, Windows and `gate-guard` green. The ID binds a
+response to one callback; it grants no dispatch permission. This revision
+also remains synthetic-only. The
 [Stage 4B host-proof decision packet](aegis-setup-package-4b-host-proof-protocol.md)
 sets out a later planning choice. No real SDK session, provider call, host proof
 or package-4 comparison is authorized or completed.
@@ -93,10 +101,10 @@ new authority.
 | --- | --- | --- |
 | Shipped `aegis-setup` skill (package 2) | Show four choices; save only an explicit Aegis-only choice on tested Windows PowerShell; never install or connect a helper | No credential or provider state |
 | Shipped state writer (package 2) | Validate and atomically save one user's Aegis-only selection for one checkout | `selected` record and `unselected` missing status; no helper verification or secret |
-| Shipped offline bridge (package 4A) | On fake SDK callback inputs, combine the shipped Python advice with fresh synthetic host-owned eligibility and policy facts; deny unsafe candidate dispatch. PR #299 requires offer flags and binds snapshots independently of object-key order. | Ephemeral synthetic request/result only; no host or provider authority |
+| Shipped offline bridge (package 4A) | On fake SDK callback inputs, combine the shipped Python advice with fresh synthetic host-owned eligibility and policy facts; deny unsafe candidate dispatch. PR #299 requires offer flags and binds snapshots independently of object-key order. PR #319 binds version-2 advice to a fresh per-callback request ID. | Ephemeral synthetic request/result only; no host or provider authority |
 | Future host proof (package 4B) | On an authorized pinned SDK session, derive real eligible agent/skill identifiers (IDs), then prove callback invocation, decision consumption and complete-task telemetry on synthetic cases; helper comparison needs a later separate proposal and grant | Ephemeral host request/result and measured telemetry; no authority grants |
 | Future eligibility and policy gate | Apply host permissions, explicit choices, manual-only flags, required specialists/reviews and stage rules before dispatch and after advice | Current host and catalog policy, not model output |
-| Shipped offline advisory contract (package 3) | Validate bounded synthetic offers and recommendations or abstentions with typed failures; fake adapter has no host hook or dispatch | In-memory request/result only; no provider configuration or credential |
+| Shipped offline advisory contract (package 3, revised to version 2 in PR #319) | Validate bounded synthetic offers and recommendations or abstentions with typed failures and exact request-ID echo; fake adapter has no host hook or dispatch | In-memory request/result only; no provider configuration or credential |
 | Conditional local/online providers (packages 5/6, after host proof and helper selection) | Compute advice only after a separately approved comparison and selection, host proof and separate integration authority | Future local weights or hosted service; credentials must remain outside chat and tracked state |
 | Future evidence and evaluator (packages 4/7) | Freeze reviewed cases and report paired host workflows, costs, failures and claims | Versioned sanitized protocol/results; any sensitive test input in separately approved private storage |
 
@@ -287,7 +295,7 @@ not just the shipped portion.
 
 | Routing, safety and host criterion | Evidence and remaining proof |
 | --- | --- |
-| Host calls adapter and consumes validated advice, per version | Stage 4A has synthetic callback tests only. Stage 4B needs correlated invocation, host permission/action and telemetry receipts for one pinned SDK profile; CLI/editor support remains unproved. |
+| Host calls adapter and consumes validated advice, per version | Stage 4A and the version-2 request-binding repair have synthetic callback tests only. Stage 4B needs correlated invocation, host permission/action and telemetry receipts for one pinned SDK profile; CLI/editor support remains unproved. |
 | Explicit choices and manual-only restrictions | Package 3 validates offered IDs and explicit invocation; Stage 4A checks synthetic agent/skill facts. Stage 4B must prove actual host enforcement. |
 | Required instructions, approvals, reviews and checks survive advice | Offline contract requires mandatory IDs and has no authority field; real multi-turn host enforcement and final review obligations are missing. |
 | Installed-catalog eligibility and bad-output handling | Package 3 covers synthetic unknown, malformed, stale and timeout cases; Stage 4A covers synthetic fail-closed dispatch. Effective host catalog and fallback are unproved. |
@@ -308,8 +316,10 @@ not just the shipped portion.
 
 The offline Stage 4A candidate now binds each version-2 advice response to a
 fresh callback `request_id`; Python and Node synthetic regression tests reject
-stale replies for Agent, model Skill and direct typed skill paths. This repair
-does not establish a real host hook or advance Stage 4B readiness.
+stale replies for Agent, model Skill and direct typed skill paths. The
+[request-binding review](../evidence/setup/issue-101-routing-request-binding-review.md)
+records the exact synthetic scope. This repair does not establish a real host
+hook or advance Stage 4B readiness.
 
 Package 7 can be scoped only after separately authorized Stage 4B actual-host
 proof and a later approved, predeclared comparison and selection. Packages 5/6
