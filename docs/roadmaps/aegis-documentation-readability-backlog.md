@@ -2,8 +2,8 @@
 
 ## Start here — current reading
 
-As of the routing request-binding proposal update on 2026-09-25 Coordinated
-Universal Time (UTC), this remains the active
+As of the #319 offline routing review on 2026-09-26 Coordinated Universal
+Time (UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -11,8 +11,14 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-This candidate tree contains **599 Markdown files**: **555 accepted reader pages**
-and **44 synthetic fixtures**, with zero known pending pages. An independent
+The #319 tree contains **600 Markdown files**: **556 accepted reader pages**
+and **44 synthetic fixtures**, with zero known pending pages. The new
+[offline routing request-binding review](../evidence/setup/issue-101-routing-request-binding-review.md)
+is one accepted reader page. Its contract, authority boundary, test results,
+merge and check receipts were reviewed for factual accuracy and full-page
+readability; it adds no fixture and proves no real host integration. The
+previous candidate contained **599 Markdown files**: **555 accepted reader
+pages** and **44 synthetic fixtures**. An independent
 technical and full-page readability review accepted the new [routing
 request-binding proposal](aegis-setup-routing-request-binding-proposal.md),
 including its choice guidance, exact scope, first-use terms and links. It is a
