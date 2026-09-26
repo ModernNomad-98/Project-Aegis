@@ -159,7 +159,8 @@ Before asking the team to choose a service or topology, define unfamiliar
 terms and explain why the choice matters for this workload and tenant model.
 Compare practical pros and cons, money, setup time, and ongoing operations;
 recommend an option and explain why. Treat unverified prices as Verification
-items, including any claimed $0 incremental charge.
+items, including any claimed $0 incremental charge. Then ask the owner one
+clear decision question; do not decide silently.
 
 ```
 AZURE SAAS ARCHITECTURE — <product/scope>

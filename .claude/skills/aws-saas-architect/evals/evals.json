@@ -52,6 +52,21 @@
           "States the handoff explicitly instead of silently dropping the provisioning half of the request."
         ]
       }
+    },
+    {
+      "id": "edge-owner-compute-choice",
+      "type": "should_trigger",
+      "prompt": "AWS is decided and our tenancy model is pooled. We need compute for a containerized API and nightly per-tenant report jobs. Our four engineers have run Docker Compose but never Kubernetes. One engineer wants EKS, another says Lambda for everything, and I keep hearing ECS on Fargate. We have not checked current pricing. I'm the owner — teach me the choice and tell me what you'd pick before asking me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains ECS on Fargate, Lambda, and EKS in plain language, including what a container orchestrator is and what operational bill means for this team.",
+          "Gives each option's reason tied to the workload shape (long-running API vs scheduled per-tenant jobs) and the team-maturity input, with practical pros and cons, and requires a named reason plus the accepted operational bill before EKS could be chosen.",
+          "Covers money, setup time, and ongoing operations per option, places every price, quota, and regional-availability claim in Verification items, and does not assert a $0 incremental charge or any figure from memory.",
+          "Recommends one option (or a per-workload split) with why it fits, then asks exactly one clear owner decision question rather than deciding silently.",
+          "Stays in its lane: does not reopen the provider choice (cloud-architecture-decider), keeps pooled-tenancy semantics as an input, leaves IaC diff review to iac-reviewer, and applies nothing to a live AWS estate."
+        ]
+      }
     }
   ]
 }

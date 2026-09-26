@@ -54,6 +54,21 @@
           "Delivers the decision with tradeoffs, lock-in, and exit costs; the service list is handed off to the provider architect skill, not improvised here."
         ]
       }
+    },
+    {
+      "id": "edge-owner-platform-pattern-choice",
+      "type": "should_trigger",
+      "prompt": "Greenfield B2B SaaS: server-rendered web frontend, Postgres, and background jobs. Two engineers, both have deployed to managed platforms but never operated cloud networking. Pooled tenancy is already decided. Our counsel confirmed no data-residency or regulated-data requirement; customers are US-only; we target 99.9% availability. We may get AWS startup credits but the amount and expiry aren't confirmed. Should we use managed platforms for frontend, database, and workers, or go straight to AWS managed services? Explain the options before asking me to choose.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the nine-axis requirements, marking counsel's residency answer as verified and the credits as unconfirmed, and applies hard filters before comparing options.",
+          "Explains hyperscaler, container PaaS, managed SSR host, Postgres-BaaS, managed-vs-self-hosted, and lock-in/exit cost in plain language, and states why each surviving pattern-provider option is viable for this two-engineer team.",
+          "Gives pros and cons per option, including each option's ceiling, exit profile, and the operational surface the team would own, plus money, setup, delivery-time, and upkeep costs, with platform pricing, free tiers, and the credit amount labeled unknown or verification items rather than invented.",
+          "Recommends the least operationally demanding compatible option that meets verified constraints, explains why, names reopen triggers, and then asks exactly one clear owner decision question instead of deciding silently.",
+          "Hands off per the chosen pattern: the decision record to adr-writer, per-tenant cost modeling to saas-cost-architect, and either aws-saas-architect or the tenancy, RLS, and deploy owners, without improvising a service map."
+        ]
+      }
     }
   ]
 }

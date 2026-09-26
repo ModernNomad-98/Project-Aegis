@@ -70,7 +70,8 @@ a system that does not exist.
    explain why each option is viable, and give case-specific pros and cons.
    Separate money, setup effort, delivery time, and ongoing upkeep; use $0
    when there is no direct purchase cost and label uncertain figures. Explain
-   why the recommendation fits this system and team.
+   why the recommendation fits this system and team. Then ask the owner one
+   clear decision question; do not pick the option silently.
 7. **Draft the ADR** for the pivotal decision (context, decision,
    alternatives, consequences) — hand to `adr-writer` for completion with
    rollback plan and review date.

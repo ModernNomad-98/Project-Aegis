@@ -155,6 +155,7 @@ services or assert their availability in a region.
     and cons, and recommend one option with its reason. Include money,
     setup time, and ongoing operations; call out a $0 incremental charge
     only when verified, and put unverified prices in Verification items.
+    Then ask the owner one clear decision question; do not decide silently.
 
 ## Output Format
 

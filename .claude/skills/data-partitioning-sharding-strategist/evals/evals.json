@@ -66,6 +66,21 @@
           "This skill shards what STAYS on the operational store for write/size scale; it does not decide analytical offload."
         ]
       }
+    },
+    {
+      "id": "edge-owner-partition-vs-shard-choice",
+      "type": "should_trigger",
+      "prompt": "Our Postgres activity_events table is 2.5TB and growing about 80GB a month; vacuum and reindex no longer finish inside the maintenance window. Measured write TPS is at roughly half of what the primary has sustained in load tests, reads already go to replicas, and indexes were tuned last quarter. Most queries hit one tenant's recent events. My engineers are split between monthly range partitioning in the same database and sharding by tenant_id across nodes. We have no current quotes for extra nodes. I'm the owner — explain it and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains partitioning, sharding, read replicas, shard key, and vacuum in plain language, and distinguishes the evidenced table-size and maintenance ceiling from a write ceiling that the stated numbers do not yet show.",
+          "Gives each option's reason and pros and cons: in-node monthly range partitioning (single-node transactions kept, cheap retention by dropping partitions, recent partition as hotspot) versus cross-node tenant_id sharding (write distribution, but cross-shard joins, transactions, uniqueness, fan-out, and the hot-tenant limit).",
+          "Compares money, setup and migration time, and ongoing operations, labels node pricing as unknown pending current quotes, and does not invent figures.",
+          "Recommends the least complex option that meets the evidenced ceiling with why, names what to measure to revisit sharding, then asks exactly one clear owner decision question rather than deciding silently.",
+          "Designs any partition migration as a runbook with rollback conditions and no-return gates but does not execute it, routes production data moves through human-approval-boundary, and routes analytical reporting load to operational-vs-analytical-splitter if that is the driver."
+        ]
+      }
     }
   ]
 }
