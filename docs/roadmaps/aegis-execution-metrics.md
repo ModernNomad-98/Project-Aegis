@@ -17,7 +17,7 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [five-merge checkpoint after pull request #324](#five-merge-checkpoint-after-pull-request-324--2026-09-26)
+The latest [five-merge checkpoint after pull request #328](#five-merge-checkpoint-after-pull-request-328--2026-09-26)
 reconsiders every selected and optional row. The earlier [catch-up checkpoint
 after #306](#catch-up-checkpoint-after-pull-request-306--2026-09-25) records
 four missed five-merge windows without resetting the #303 cadence anchor.
@@ -51,6 +51,41 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Five-merge checkpoint after pull request #328 — 2026-09-26
+
+The [full reassessment](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-26-after-pull-request-328)
+uses main `b64f2db5b1efb2e6da82a1c1fc5f4cfd20a3f7f4`. This bounded
+checkpoint started at 05:51:20 UTC with no previous package ETA and a new
+**1–2 active-hour** ETA. At its start the ten bounded selected rows totaled
+**71–146 active hours**, plus unestimated issue #101 Stage 4B and BER-BKL-009
+residuals; there is no finite full selected or all-options total. The five
+first-parent merges after #324 are listed in actual merge order, which differs
+from PR-number order. Each head-run link is the exact-head check receipt.
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head Actions / estimate |
+| --- | --- | --- | ---: | --- |
+| [#326](https://github.com/ModernNomad-98/Project-Aegis/pull/326): revocation-bound skill guidance | `f4262c0e2937825b8ad8dc44dc4e3c44cb262967` | 02:54:47 | 8m03s from #324 | [Linux, Windows and guard passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36212895259); no separate active duration verified. |
+| [#325](https://github.com/ModernNomad-98/Project-Aegis/pull/325): prior five-merge checkpoint | `4a35700ce9c2d1df21b196d41260af68adf5c09c` | 03:01:53 | 7m06s | [Linux, Windows and guard passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36213251449); no separate active duration verified. |
+| [#327](https://github.com/ModernNomad-98/Project-Aegis/pull/327): issue #101 lifecycle reconciliation | `d47b1f16918220e3dad2f6cc5fd1992aeb3d1a6a` | 03:11:10 | 9m17s | [Linux, Windows and guard passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36213768062); no separate active duration verified. |
+| [#315](https://github.com/ModernNomad-98/Project-Aegis/pull/315): BER executed-aggregate integrity | `658fa22edbfde2c953f7d21678d08baa79b75052` | 05:31:33 | 2h20m23s | [Linux/Windows passed; guard failed on two protected BER paths](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36219047092). One-time exact-head APR-044 exception consumed; 1,080 local BER tests passed, 14 skipped. |
+| [#328](https://github.com/ModernNomad-98/Project-Aegis/pull/328): record #315 exception and BER status | `b64f2db5b1efb2e6da82a1c1fc5f4cfd20a3f7f4` | 05:50:58 | 19m25s | [Linux, Windows and guard passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36221775996); no separate active duration verified. |
+
+The #324-to-#328 interval is **3h04m14s observed wall time**. It includes
+concurrent work, review, CI, queue and owner waiting; no active, review, CI
+or waiting split was instrumented. The 2h20m23s spacing before #315 in
+particular is not an estimate of labor on that PR. None of these spacings
+is a throughput rate. #315's [post-merge main run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36221057049)
+passed Linux and Windows checks; the PR-only guard was skipped.
+
+After row-by-row review, the ten estimated selected rows remain **71–146
+active hours**. Issue #101 Stage 4B and BER-BKL-009 real host, runtime,
+privacy and cleanup remain TBD, so selected and all-options totals have no
+finite estimate. All seven optional rows retain their ranges and gates.
+#315 delivered offline source integrity but no measured calibration, private
+input acceptance or selected-host proof. The #328 tree has **600 Markdown
+files**: 556 accepted readers and 44 classified fixtures. Issue #101 remains
+open and the VM paused. Start the next five-merge counter after #328.
 
 ## Five-merge checkpoint after pull request #324 — 2026-09-26
 
