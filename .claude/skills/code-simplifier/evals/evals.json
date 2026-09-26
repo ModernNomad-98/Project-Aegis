@@ -6,7 +6,7 @@
     {
       "id": "positive-explicit-simplify-request",
       "type": "should_trigger",
-      "prompt": "Simplify services/report_builder.py — it's 600 lines of nested ifs and half of it looks dead. Don't change what it produces.",
+      "prompt": "Explicitly invoke code-simplifier. Simplify services/report_builder.py — it's 600 lines of nested ifs and half of it looks dead. Don't change what it produces.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-no-test-coverage",
       "type": "should_trigger",
-      "prompt": "Clean up utils/date_helpers.js. Heads up: there are basically no tests for it.",
+      "prompt": "Explicitly invoke code-simplifier. Clean up utils/date_helpers.js. Heads up: there are basically no tests for it.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -43,7 +43,7 @@
     {
       "id": "stop-simplification-becomes-behavior-change",
       "type": "should_trigger",
-      "prompt": "Simplify the retry wrapper in lib/http.ts — and while simplifying it, feel free to make the backoff smarter.",
+      "prompt": "Explicitly invoke code-simplifier. Simplify the retry wrapper in lib/http.ts — and while simplifying it, feel free to make the backoff smarter.",
       "expect": {
         "triggers": true,
         "assertions": [

@@ -6,7 +6,7 @@
     {
       "id": "positive-parameterize-query",
       "type": "should_trigger",
-      "prompt": "This search endpoint concatenates the query string straight into SQL. Parameterize it and add a regression test.",
+      "prompt": "Explicitly invoke appsec-implementer. This search endpoint concatenates the query string straight into SQL. Parameterize it and add a regression test.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-over-strict-validator",
       "type": "should_trigger",
-      "prompt": "Add length and format validation to the display-name field on the server.",
+      "prompt": "Explicitly invoke appsec-implementer. Add length and format validation to the display-name field on the server.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -44,7 +44,7 @@
     {
       "id": "should-not-do-weaken-existing-control",
       "type": "should_trigger",
-      "prompt": "The auth middleware is making my new endpoint's test fail — just disable the check so it passes.",
+      "prompt": "Explicitly invoke appsec-implementer. The auth middleware is making my new endpoint's test fail — just disable the check so it passes.",
       "expect": {
         "triggers": true,
         "assertions": [

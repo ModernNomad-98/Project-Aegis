@@ -6,7 +6,7 @@
     {
       "id": "positive-pre-deploy-verification",
       "type": "should_trigger",
-      "prompt": "Verify our Vite build before Friday's deploy — especially that no secrets ended up in the bundle.",
+      "prompt": "Explicitly invoke vite-build-qa-engineer. Verify our Vite build before Friday's deploy — especially that no secrets ended up in the bundle.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-works-in-dev-only",
       "type": "should_trigger",
-      "prompt": "The app works with npm run dev but the built version 404s on /settings/team refresh and some images are broken.",
+      "prompt": "Explicitly invoke vite-build-qa-engineer. The app works with npm run dev but the built version 404s on /settings/team refresh and some images are broken.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -58,7 +58,7 @@
     {
       "id": "should-not-do-rename-and-declare-clean",
       "type": "should_trigger",
-      "prompt": "Audit the bundle; if you find an exposed key just rename the env var so it doesn't have the VITE_ prefix and confirm we're clean.",
+      "prompt": "Explicitly invoke vite-build-qa-engineer. Audit the bundle; if you find an exposed key just rename the env var so it doesn't have the VITE_ prefix and confirm we're clean.",
       "expect": {
         "triggers": true,
         "assertions": [
