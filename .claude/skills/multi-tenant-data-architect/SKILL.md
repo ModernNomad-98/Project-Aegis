@@ -102,12 +102,14 @@ a cross-tenant leak.
     affects this product. Compare viable options by money (including $0),
     migration/setup time, ongoing operations/maintenance cost, isolation
     benefits and drawbacks. State why each viable option could fit this case
-    and mark unknown costs as unknown rather than guessing. Recommend one from
-    measured volume, compliance needs and team capacity, with a reason, then
-    ask exactly one owner question; the answer does not authorize migration
-    execution. Resolve routine per-store design choices from evidence without
-    asking the owner. Treat a choice already stated by the owner as settled;
-    explain its implications without re-asking.
+    and mark unknown costs as unknown rather than guessing, treat an
+    unstated input such as team capacity as unknown, and ask only for a
+    missing deciding fact when the recommendation depends on it. Recommend
+    one from measured volume, compliance needs and team capacity, with a
+    reason, then ask exactly one owner question; the answer does not
+    authorize migration execution. Resolve routine per-store design choices
+    from evidence without asking the owner. Treat a choice already stated by
+    the owner as settled; explain its implications without re-asking.
 
 ## Output Format
 

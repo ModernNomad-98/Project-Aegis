@@ -104,8 +104,9 @@ are `streaming-event-architect`.
    Explain why each fits or fails this dimension's queries and retention/
    PII rules. Compare money, setup time, upkeep and unknown data volume;
    recommend type 1 without historical questions, type 2 where dated
-   truth is required, and hybrid only for a clear subset. Ask one history
-   policy question per dimension; do not override PII deletion duties.
+   truth is required, and hybrid only for a clear subset. Ask about one
+   dimension's history policy at a time; do not override PII deletion
+   duties.
 4. **Carry tenant scoping through every zone.** Tenant key mandatory on
    every tenant-owned row in every zone — aggregation may only drop it in
    marts DECLARED cross-tenant (internal-only, access-controlled).
@@ -143,7 +144,9 @@ are `streaming-event-architect`.
     platform care; include a $0 incremental option only when one exists
     and is verified. Recommend the class supported by workload and team
     maturity, explain why, and flag unverified prices instead of inventing
-    them. Then ask exactly one owner question.
+    them. Then ask exactly one owner question; if a step-3 history choice is
+    also open, ask the more blocking one and list the other as pending for a
+    later turn.
 
 Estate-class decision table, zone contract template, modeling and SCD
 guidance, and the partitioning worksheet:

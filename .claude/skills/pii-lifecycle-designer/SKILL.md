@@ -112,17 +112,21 @@ pack's job, and keeping PII out of LLM context is
    public deletion promise is shorter than backup rotation, explain the
    terms plainly: rotation is when old backup copies expire; restore-time
    re-deletion reapplies erasure before restored data is usable. Compare
-   shortening backup rotation to meet the existing promise with proposing
-   a policy amendment that accurately describes backup aging. For each,
-   state why it is viable here, the benefit, privacy and recoverability
-   limits, setup work, ongoing operations, and storage/recovery or
-   policy-notice cost (amounts unknown until measured). Recommend the
-   compliant path supported by recovery and policy evidence, and say why;
-   if neither is proven, keep the conflict open and recommend no
-   compliant-closure claim. An amended
-   promise needs the policy owner and counsel's review and cannot erase
-   an earlier missed promise. Ask the owner one clear decision question,
-   without treating a draft or a proposed option as approval.
+   shortening backup rotation to meet the existing promise (backups
+   already made under the longer rotation need an inventory and a verified
+   whole-generation expiry or deletion, or the conflict stays open until
+   they age out) with proposing a policy amendment that accurately
+   describes backup aging. For each, state why it is viable here, the
+   benefit, privacy and recoverability limits, setup work and time,
+   ongoing operations, and storage/recovery or policy-notice cost (amounts
+   unknown until measured). An amended promise needs the policy owner and
+   counsel's review and cannot erase an earlier missed promise. Recommend
+   the compliant path supported by recovery and policy evidence, and say
+   why; if neither is proven, keep the conflict open, recommend no
+   compliant-closure claim, and ask one factual question for the deciding
+   recovery or policy constraint instead of the decision question.
+   Otherwise ask the owner one clear decision question, without treating a
+   draft or a proposed option as approval.
 6. **Choose anonymization vs pseudonymization deliberately.**
    Pseudonymized data (key exists somewhere) IS personal data — retention
    and erasure still apply; state key custody. Anonymization claims get a
@@ -134,7 +138,7 @@ pack's job, and keeping PII out of LLM context is
    anonymization aims to make re-identification impracticable under the
    stated threat model. For each viable path, state why it is viable
    here, then compare utility, re-identification and sharing risk, key
-   custody or transformation setup, recurring controls, and
+   custody or transformation setup work and time, recurring controls, and
    storage/compute/review cost (unknown until scoped). Recommend the path
    supported by the purpose and evidence, with a reason; never recommend
    the anonymized label before the risk check passes. Ask one owner
@@ -176,7 +180,7 @@ Handoffs:       audit records → audit-log-architect; test data → test-data-a
                 LLM context → sensitive-disclosure-guard; evidence packaging → compliance pack
 Residual risk:  <approximate-erasure stores, vendor gaps, legacy backups — explicit>
 Owner choice:   <only when unresolved: plain terms; viable paths with why each
-                 is viable, benefits, risks, setup/upkeep and money cost or
+                 is viable, benefits, risks, setup time/upkeep and money cost or
                  unknowns; evidenced recommendation and why; one clear
                  question; decision pending>
 ```
@@ -196,9 +200,10 @@ Owner choice:   <only when unresolved: plain terms; viable paths with why each
       backup-edit claims.
 - [ ] A backup-rotation/promise conflict compares shortening rotation and
       amending the promise in plain terms, with the reason for each viable
-      path, benefits, limits, setup, upkeep and money costs or unknowns;
-      gives a reasoned recommendation, asks one owner question, and leaves
-      counsel/policy approval pending.
+      path, benefits, limits, setup time, upkeep and money costs or
+      unknowns; gives a reasoned recommendation, asks one owner question,
+      and leaves counsel/policy approval pending unless a verified approval
+      receipt exists, which it records.
 - [ ] Nothing labeled "anonymized" without the re-identification check;
       pseudonymized data is treated as personal data with key custody
       stated.

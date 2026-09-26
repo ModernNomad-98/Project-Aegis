@@ -41,6 +41,10 @@ biggest line item is fiction with a spreadsheet.
   cost entries, additive rollups, and invoice reconciliation are
   `usage-metering-and-cost-attribution-pipeline-designer`; this skill is the
   economic MODEL those numbers feed, not the extract-transform-load (ETL) pipeline.
+- Do NOT use when: designing runtime AI consumption enforcement (token caps,
+  fail-closed spend kill switch, guardrail telemetry) —
+  `ai-cost-guardrail-designer`; this skill picks the degradation policy from
+  tenant-tagged cost evidence and supplies the unit economics.
 
 ## Inputs to Inspect
 
@@ -94,7 +98,8 @@ authorize execution.
    to entitlements, budget alerts at attribution granularity, degradation
    ladders (cheaper model, throttle, queue) before hard stops, and
    per-tenant kill criteria for pathological cost — each guardrail with an
-   owner and a tenant-visible behavior.
+   owner and a tenant-visible behavior — composing
+   `ai-cost-guardrail-designer` for runtime AI enforcement.
 7. **Plan rollout and rollback**: guardrails ship observe-only first
    (alert, don't block), thresholds tuned on real distribution, then
    enforce — with a per-guardrail disable path as rollback. Enforcement
@@ -195,6 +200,8 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against
   `saas-platform-architect` and `plan-entitlement-architect`
-  (platform/commercial cluster).
+  (platform/commercial cluster),
+  `usage-metering-and-cost-attribution-pipeline-designer`, and
+  `ai-cost-guardrail-designer`.
 - No references/ — the driver, attribution, and guardrail tables above are
   the complete procedure; detail lives in the output artifacts.
