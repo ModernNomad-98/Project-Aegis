@@ -1,7 +1,13 @@
 # Decision proposal: reduce recurring protected-file merge interruptions
 
-**Status:** Proposed; no new authority or CI behavior takes effect from this
-document. **Prepared:** 2026-09-26. **Owner:** Peter Nguyen.
+**Status:** **Option A approved by the owner on 2026-09-26** ("Approve fix +
+#333 opt A (Recommended)", confirmed after clarification as "Yes, option A as
+defined (Recommended)"), recorded as
+[AEGIS-APR-047](../approvals/APPROVAL_REGISTER.md#aegis-apr-047-standing-gate-guard-exception-for-four-ber-files).
+Options B and C were not selected. The register entry, not this page, is the
+authority; the text below is the proposal as reviewed and remains unchanged.
+Option A changes no CI behavior: `gate-guard` still fails on these files and
+each use needs a PR receipt. **Prepared:** 2026-09-26. **Owner:** Peter Nguyen.
 
 Recommend option A: a standing, conditional exception for the existing
 protected-file signal on four named Behavioral Eval Runner (BER) reporting/aggregation source and test

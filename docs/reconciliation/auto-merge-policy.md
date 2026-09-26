@@ -31,6 +31,36 @@ expressly does not waive a future guard failure. Keep the guard and branch
 settings intact. When all checks are green, authorized work may use the
 standing administrator grant without another merge-mechanism request.
 
+**Standing exception, 2026-09-26 (narrows the 2026-09-23 reading above for
+four files):** The owner approved
+[AEGIS-APR-047](../approvals/APPROVAL_REGISTER.md#aegis-apr-047-standing-gate-guard-exception-for-four-ber-files)
+(option A of the [guard decision packet](../roadmaps/gate-guard-friction-decision.md)).
+When every changed protected path is one of four Behavioral Eval Runner files
+(`reporting.py`, `aggregation.py`, `tests/test_reporting.py` and
+`tests/test_aggregation.py` under `tools/behavioral_eval_runner/`) and the
+sole failed check is that `gate-guard` protected-path result, authorized work
+may use a deliberate administrator merge without a new PR-specific exception.
+Every APR-047 condition still applies (a summary; the register entry
+governs): separate active work authority, passing local,
+Linux and Windows checks, a guard log showing only the protected-path match,
+independent review of the protected changes, an exact-head recheck, a PR
+receipt that reports the guard as failed with an authorized disposition, and
+a post-merge main check. Any other protected path or failed check still needs
+its own owner decision. Auto-merge stays unarmed.
+
+**Merge conditions recorded 2026-09-26:** three further owner decisions
+condition the standing administrator merge.
+[AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green)
+restates it: merge at the exact reviewed head once its required checks are
+green, never waiving a red check.
+[AEGIS-APR-049](../approvals/APPROVAL_REGISTER.md#aegis-apr-049-exact-head-ci-satisfies-the-local-test-condition)
+reads a green exact-head run of the required checks as satisfying the
+local-test leg.
+[AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review)
+requires waiting for the Codex automated review to post (or be confirmed
+unavailable) and triaging its P1 and P2 (two highest priority) findings
+before merging.
+
 Verify the reviewed PR revision and both offline verification jobs before merge.
 An intentional protected-file `gate-guard` failure requires explicit review of
 the affected enforcement surfaces. The older recorded grant included a guard

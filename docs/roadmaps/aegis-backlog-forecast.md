@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-**Current reading at the 2026-09-26 checkpoint after #344:** choice-guidance batch B ([PR #334](https://github.com/ModernNomad-98/Project-Aegis/pull/334)) and batch C ([PR #342](https://github.com/ModernNomad-98/Project-Aegis/pull/342), merged 11:30:40 UTC as `32f2787d3dd4732d3a7971924ee6b4a753e06392`) are both delivered, so no part of the original three-batch 3–6-hour estimate remains. The bounded selected planning subtotal is again the ten core rows: **71–146 provisional active hours**. The 72–148-hour figure that [PR #343](https://github.com/ModernNomad-98/Project-Aegis/pull/343) published four seconds after #342 merged is superseded by that delivery. Additional skill-choice guidance and eval maintenance (batches J, O, P, Q and R, plus non-blocking review follow-ups) stays **outside** that subtotal at a provisional **5.5–12 active hours**. Issue #101 Stage 4B host proof and BER-BKL-009 host residuals remain TBD, the VM stays paused, and the #331 BER and #333 gate-guard owner decisions are pending, so the full selected and all-options totals still have **no finite ETA**. See the [five-merge checkpoint after #344](#five-merge-checkpoint--2026-09-26-after-pull-request-344).
+**Current reading at the 2026-09-26 checkpoint after #344:** choice-guidance batch B ([PR #334](https://github.com/ModernNomad-98/Project-Aegis/pull/334)) and batch C ([PR #342](https://github.com/ModernNomad-98/Project-Aegis/pull/342), merged 11:30:40 UTC as `32f2787d3dd4732d3a7971924ee6b4a753e06392`) are both delivered, so no part of the original three-batch 3–6-hour estimate remains. The bounded selected planning subtotal is again the ten core rows: **71–146 provisional active hours**. The 72–148-hour figure that [PR #343](https://github.com/ModernNomad-98/Project-Aegis/pull/343) published four seconds after #342 merged is superseded by that delivery. Additional skill-choice guidance and eval maintenance (batches J, O, P, Q and R, plus non-blocking review follow-ups) stays **outside** that subtotal at a provisional **5.5–12 active hours**. Issue #101 Stage 4B host proof and BER-BKL-009 host residuals remain TBD and the VM stays paused. After this checkpoint the owner approved the bounded #331 BER correction and #333 option A ([material owner decision](#material-owner-decision--2026-09-26-331-ber-correction-and-333-option-a)), adding a provisional 4–8 active hours, so the bounded selected planning subtotal becomes **75–154 provisional active hours**. Neither decision closes a host or calibration gate, so the full selected and all-options totals still have **no finite ETA**. See the [five-merge checkpoint after #344](#five-merge-checkpoint--2026-09-26-after-pull-request-344).
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. The [owner's issue #101 host-path choice](#material-owner-decision--2026-09-25-issue-101-host-path)
@@ -62,6 +62,30 @@ the [documentation estimate audit after #205](#documentation-estimate-audit--202
 the [execution measurements](aegis-execution-metrics.md#five-merge-checkpoint-after-pull-request-344--2026-09-26)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
+
+## Material owner decision — 2026-09-26, #331 BER correction and #333 option A
+
+On 2026-09-26 the owner approved the bounded [PR #331 selected-precheck
+aggregate correction](ber-precheck-aggregate-validation-proposal.md) and
+option A of the [#333 protected-file guard decision packet](gate-guard-friction-decision.md),
+recorded as BER-DEC-014, [AEGIS-APR-046](../approvals/APPROVAL_REGISTER.md#aegis-apr-046-ber-selected-precheck-aggregate-correction)
+and [AEGIS-APR-047](../approvals/APPROVAL_REGISTER.md#aegis-apr-047-standing-gate-guard-exception-for-four-ber-files).
+The correction is authorized once that governance record merges. Its
+proposal estimates 4–8 active hours; the 8-hour and 300-line limits are
+ceilings, not estimates. Option A adds a receipt of roughly 5–15 active
+minutes per eligible protected merge and removes owner waiting for those
+merges only. Neither decision closes a private-input, measured-calibration,
+host or provider gate.
+
+| Planning component | Active hours |
+| --- | ---: |
+| Ten selected rows from the #344 checkpoint | 71–146 hours |
+| Bounded BER selected-precheck aggregate correction | 4–8 hours, not started |
+| **Bounded selected planning subtotal** | **75–154 hours, provisional** |
+| Issue #101 Stage 4B and BER-BKL-009 host residuals | TBD |
+| **Full selected total** | **No finite estimate** |
+
+The dated #344 checkpoint below remains historical.
 
 ## Five-merge checkpoint — 2026-09-26, after pull request #344
 

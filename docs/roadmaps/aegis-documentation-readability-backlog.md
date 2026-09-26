@@ -37,6 +37,20 @@ independent corrected-candidate review **accepted** it against
 tracked Markdown files: 561 accepted reader pages and 44 classified synthetic
 fixtures**, with zero known pending pages.
 
+The governance change recording the owner's 2026-09-26 decisions — the #331
+correction and #333 option A (BER-DEC-014, AEGIS-APR-046 and AEGIS-APR-047),
+and the standing merge conditions, eval-maintenance ruling and package-2
+consumption (AEGIS-APR-048 through AEGIS-APR-052) — changed seven existing
+reader pages and added no Markdown file: the approval register, BER backlog,
+guard decision packet, merge policy, offline CI guide, forecast and this
+ledger. Independent full-page reviews corrected and accepted all seven
+against [Acceptance for each page](#acceptance-for-each-page) after minimal
+edits to owner-confirmation wording, pinned grant conditions, status-code and
+priority-level explanations, links, the forecast's material-decision section
+and this ledger's placement. Acceptance changes no grant, gate or host
+status. The tree remains **605 Markdown files: 561 accepted reader pages and
+44 classified synthetic fixtures**, with zero known pending pages.
+
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
 the [Behavioral Eval Runner (BER) selected-precheck aggregate decision page](ber-precheck-aggregate-validation-proposal.md)
