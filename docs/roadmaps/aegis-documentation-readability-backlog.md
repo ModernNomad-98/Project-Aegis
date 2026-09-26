@@ -2,14 +2,30 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #331 on 2026-09-26 Coordinated Universal
-Time (UTC), this remains the active
+As of merged pull request (PR) #347 (`cd174c2`) on 2026-09-26 Coordinated
+Universal Time (UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
 The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
+
+The merged #347 tree has **604 tracked Markdown files: 559 accepted reader
+pages, 44 classified synthetic fixtures and one known pending reader page**.
+Merged PR #335 added the [Stage 4B synthetic case fixture draft](aegis-setup-package-4b-synthetic-case-fixtures.md)
+without a ledger entry; a forecast checkpoint reconciliation found the gap.
+Despite its name, that page is not one of the 44 classified fixtures: those are
+test-input files under `scripts/`, while this page is a reader-facing
+offline planning draft for issue #101 Stage 4B. It proposes invented inputs and
+expected outcomes for eight cases, all **NOT RUN**, and is not host proof. The
+#335 description reports an independent exact-commit review, but no full-page
+acceptance result against [Acceptance for each page](#acceptance-for-each-page)
+is recorded, so the page stays **pending**. A ledger-side screen, which is not
+an acceptance result, noted first-use terms to check: `SDK`, `VM`, `CLI`,
+`canUseTool`, `APR-031` and `APR-040`. The follow-up is one independent
+full-page review of that page. No other Markdown file was added, removed or
+renamed between #333 and #347.
 
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
@@ -18,8 +34,8 @@ after independent technical and full-page readability review, including a
 first-use terminology correction. This count and review do not approve its
 implementation, private labels, a host probe or provider use.
 
-This branch adds the [protected-file guard decision packet](gate-guard-friction-decision.md),
-bringing the unmerged candidate tree to **603 Markdown files: 559 accepted reader
+Merged PR #333 added the [protected-file guard decision packet](gate-guard-friction-decision.md),
+bringing the merged tree to **603 Markdown files: 559 accepted reader
 pages and 44 classified synthetic fixtures, with zero known pending pages**.
 Independent technical, full-page readability and ledger review accepted the
 packet and this ledger after corrections to the four-file scope and first-use
@@ -388,6 +404,7 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Ledger gap for page merged in PR #335, found after #347, 2026-09-26 | [Stage 4B synthetic case fixture draft](aegis-setup-package-4b-synthetic-case-fixtures.md) and this ledger | One reader page, not a synthetic fixture: an offline planning draft whose eight cases are all NOT RUN and which is not host proof. No full-page acceptance is recorded, so it is **pending**; the named follow-up is one independent full-page review. The #333 tree had 603 pages; the #347 tree has 604: 559 accepted readers, 44 fixtures and one known pending. |
 | BER selected-precheck aggregate decision candidate after merged #330, 2026-09-26 | [Owner decision proposal](ber-precheck-aggregate-validation-proposal.md) and this ledger | One new reader page; synthetic reproduction, two-path proposed implementation, explicit non-grant boundary and local links were accepted in independent full-page technical/readability review after first-use terms were explained. The merged #330 tree has 601 pages: 557 accepted readers and 44 classified fixtures. This reviewed candidate has 602 pages: 558 accepted readers, 44 fixtures and zero known pending. No source implementation or merge is included. |
 | Issue #101 public archive packet merged in PR #271, 2026-09-25 | [Host feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md) and [Stage 4A proposal](aegis-setup-package-4a-host-preparation-proposal.md) | Two existing reader pages were revised for the 110-entry and preferred 107-entry static archive checks. Two independent full-page reviews accepted the corrected pages and their links. Local checks and exact-head GitHub Actions passed before merge. The merged tree stayed at 589 tracked Markdown files: 545 accepted reader pages, 44 classified fixtures and zero known pending. |
 | Current-reading follow-up merged in PR #253 after #252, 2026-09-24 | [BER-BKL-009A historical proposal](ber-bkl-009a-offline-policy-scope-proposal.md) and root `AGENTS.md` | The proposal's current-status banner was corrected from an unmerged #139 claim to its verified merge and partial BKL-009 status; the historical proposal below remains unchanged. The source-library skill-use preference added in #252 received two independent read-only reviews, preserving Role A scope, the manual-only boundary and user authority. Both existing pages retain accepted status. |
