@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import unittest
+from dataclasses import replace
 
 from tools.behavioral_eval_runner.enums import (
     AggregateBlocker,
@@ -126,6 +127,176 @@ class TestCoverageArithmetic(unittest.TestCase):
 
 
 class TestHonestDefaults(unittest.TestCase):
+    def test_duplicate_preflight_cannot_authorize_pass_in_either_order(self) -> None:
+        case = make_case(case_id="duplicate-preflight")
+        uid = case.case_uid
+        runnable = evaluate_case(case, PreflightEnvironment())
+        excluded = evaluate_case(
+            make_case(case_id="duplicate-preflight", required_commands=("vite",)),
+            PreflightEnvironment(),
+        )
+        attempts = [
+            AttemptRecord(
+                run_id=RUN,
+                case_uid=uid,
+                repetition_number=i,
+                attempt_state=AttemptState.PASS,
+            )
+            for i in (1, 2)
+        ]
+        aggregate = AggregateRecord(
+            case_uid=uid,
+            aggregate_verdict=AggregateVerdict.PASS,
+            aggregate_blocker=AggregateBlocker.NONE,
+            derived_from_executed_quorum=True,
+            wins=2,
+            attempts_planned=2,
+            attempts_run=2,
+        )
+        coverage = compute_coverage(
+            authored_units_total=1,
+            selected_case_uids=[uid],
+            preflight_results=[runnable],
+            attempts=attempts,
+            aggregates=[aggregate],
+            assertions_selected_total=0,
+            assertions_accounted_total=0,
+            assertions_actually_graded_total=0,
+        )
+        for rows in ([excluded, runnable], [runnable, excluded]):
+            with self.subTest(order=[row.outcome for row in rows]):
+                with self.assertRaisesRegex(
+                    DishonestReportError, "duplicate preflight result"
+                ):
+                    build_run_report(
+                        run_id=RUN,
+                        baseline_identity={},
+                        run_provenance={},
+                        input_evidence_manifest_sha256=None,
+                        attempts=attempts,
+                        aggregates=[aggregate],
+                        coverage=coverage,
+                        selected_case_uids=[uid],
+                        preflight_results=rows,
+                    )
+
+        forged = replace(
+            runnable,
+            reason_code=ReasonCode.MISSING_FIXTURE,
+            planned_attempt_state=AttemptState.PASS,
+            aggregate_verdict=AggregateVerdict.PASS,
+            aggregate_blocker=AggregateBlocker.NONE,
+        )
+        with self.assertRaisesRegex(
+            DishonestReportError, "inconsistent preflight result"
+        ):
+            build_run_report(
+                run_id=RUN,
+                baseline_identity={},
+                run_provenance={},
+                input_evidence_manifest_sha256=None,
+                attempts=attempts,
+                aggregates=[aggregate],
+                coverage=coverage,
+                selected_case_uids=[uid],
+                preflight_results=[forged],
+            )
+
+    def test_report_rejects_inconsistent_preflight_shapes(self) -> None:
+        case = make_case(case_id="forged-preflight")
+        uid = case.case_uid
+        runnable = evaluate_case(case, PreflightEnvironment())
+        excluded = evaluate_case(
+            make_case(case_id="forged-preflight", required_commands=("vite",)),
+            PreflightEnvironment(),
+        )
+        setup_failed = fixture_setup_failure(case, "synthetic setup failure")
+        forged = (
+            replace(
+                runnable,
+                reason_code=ReasonCode.MISSING_FIXTURE,
+                aggregate_verdict=AggregateVerdict.PASS,
+            ),
+            replace(runnable, planned_attempt_state=AttemptState.PASS),
+            replace(runnable, aggregate_blocker=AggregateBlocker.NONE),
+            replace(runnable, findings=excluded.findings),
+            replace(excluded, reason_code=ReasonCode.NOT_SELECTED),
+            replace(excluded, planned_attempt_state=AttemptState.ERROR),
+            replace(excluded, aggregate_verdict=AggregateVerdict.PASS),
+            replace(excluded, aggregate_blocker=AggregateBlocker.NONE),
+            replace(excluded, findings=()),
+            replace(
+                excluded,
+                findings=(replace(excluded.findings[0], finding_kind=""),),
+            ),
+            replace(excluded, findings=(replace(excluded.findings[0], owner=""),)),
+            replace(excluded, findings=(replace(excluded.findings[0], detail=""),)),
+            replace(setup_failed, reason_code=ReasonCode.MISSING_FIXTURE),
+            replace(setup_failed, planned_attempt_state=AttemptState.UNRUN),
+            replace(setup_failed, aggregate_verdict=AggregateVerdict.PASS),
+            replace(setup_failed, aggregate_blocker=AggregateBlocker.ERROR),
+            replace(setup_failed, findings=()),
+            replace(
+                excluded,
+                findings=(
+                    replace(
+                        excluded.findings[0],
+                        case_uid=make_case_uid(case_id="other"),
+                    ),
+                ),
+            ),
+        )
+        for row in forged:
+            with self.subTest(row=row):
+                coverage = compute_coverage(
+                    authored_units_total=1,
+                    selected_case_uids=[uid],
+                    preflight_results=[row],
+                    attempts=[],
+                    aggregates=[],
+                    assertions_selected_total=0,
+                    assertions_accounted_total=0,
+                    assertions_actually_graded_total=0,
+                )
+                with self.assertRaisesRegex(
+                    DishonestReportError, "inconsistent preflight result"
+                ):
+                    build_run_report(
+                        run_id=RUN,
+                        baseline_identity={},
+                        run_provenance={},
+                        input_evidence_manifest_sha256=None,
+                        attempts=[],
+                        aggregates=[],
+                        coverage=coverage,
+                        selected_case_uids=[uid],
+                        preflight_results=[row],
+                    )
+
+        for row in (runnable, excluded, setup_failed):
+            with self.subTest(valid=row.outcome):
+                coverage = compute_coverage(
+                    authored_units_total=1,
+                    selected_case_uids=[uid],
+                    preflight_results=[row],
+                    attempts=[],
+                    aggregates=[],
+                    assertions_selected_total=0,
+                    assertions_accounted_total=0,
+                    assertions_actually_graded_total=0,
+                )
+                build_run_report(
+                    run_id=RUN,
+                    baseline_identity={},
+                    run_provenance={},
+                    input_evidence_manifest_sha256=None,
+                    attempts=[],
+                    aggregates=[],
+                    coverage=coverage,
+                    selected_case_uids=[uid],
+                    preflight_results=[row],
+                )
+
     def test_demonstration_report_all_unrun_inconclusive(self) -> None:
         uids = [make_case_uid(case_id=f"case-{i}") for i in range(3)]
         report = build_demonstration_report(RUN, uids, 1741)
