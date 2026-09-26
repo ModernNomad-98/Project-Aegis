@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-aims-scope-choice",
+      "type": "should_trigger",
+      "prompt": "We are planning our first ISO 42001 AIMS. Our inventory has a customer support AI assistant and an internal document summarizer; we provide both, and the support assistant is the immediate customer procurement concern. Staff use the summarizer on internal documents. We have not settled the AIMS boundary or obtained an audit quote, and legal has not confirmed any contractual or regulatory scope floor. Should we start with the support assistant and its supporting dependencies or cover both systems? Explain the choice before asking me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains AIMS and scope in plain language, anchors both candidate boundaries in the AI inventory and provider role, and identifies customers, staff, and other potentially affected groups and supporting dependencies.",
+          "Compares a bounded support-assistant scope with a broader two-system scope only as provisional viable options, giving each option's reason, included and excluded systems, people, dependencies, and evidence, benefits, risks, and setup, audit, upkeep, and money costs or explicit unknowns without inventing an audit price.",
+          "Recommends a provisional boundary for the stated procurement goal with a concrete reason and a condition that would change it; flags unverified legal, contractual, dependency, and affected-party coverage as facts to resolve, with legal interpretation sent for human review.",
+          "Asks one atomic owner scope question after the comparison; makes no certification, legal-compliance, or Annex A count claim."
+        ]
+      }
+    },
+    {
       "id": "negative-single-feature-review",
       "type": "should_not_trigger",
       "prompt": "Do a governance and risk review of our new AI email-drafting feature before launch — risk tier, oversight level, disclosure.",
