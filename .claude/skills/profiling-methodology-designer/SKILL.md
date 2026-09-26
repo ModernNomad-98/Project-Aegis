@@ -123,7 +123,18 @@ handoff map names.
 8. **State the production posture.** If production profiling is
    required (symptom absent elsewhere): sampling-only, overhead budget
    stated, scoped window, and explicit human approval BEFORE any
-   attach — this is a Stop Condition, not a footnote.
+   attach — this is a Stop Condition, not a footnote. If the owner must
+   choose a measurement path, define staging fidelity (how closely test
+   load and data match the symptom) and production sampling (bounded,
+   periodic measurements on the live service). Compare improving staging
+   fidelity with requesting a separately authorized scoped production
+   sample: why each could reveal the symptom, attribution benefit and
+   blind spots, live-service and data risks, setup/upkeep effort, and money
+   cost or explicit unknowns. Recommend the path supported by the symptom
+   evidence, explain why and what missing fact could change it, then ask
+   one decision question. A path preference is not approval to attach;
+   production sampling still needs its own exact owner approval before
+   execution. This skill only designs the measurement.
 
 Profiler-class selection table, measurement-conditions checklist,
 narrowing-loop worksheet, and the attribution-report template:
@@ -137,6 +148,9 @@ Symptom (pinned): <surface, metric@percentile, magnitude, conditions>
 Attribution level: cross-service (trace) | on-CPU | off-CPU | allocation — why
 Environment:     <where profilers attach; representativeness statement;
                   production attach: NOT without approval — posture stated>
+Owner choice (if needed): <plain terms; staging fidelity vs scoped production
+  sampling; reasons, benefits/risks, setup/upkeep and money costs or unknowns;
+  recommendation and why; one question; production approval still separate>
 Conditions:      warm/cold policy; load=<source, level>; data=<volume/fixture>;
                  duration/samples; profiler overhead budget=<n%>
 Narrowing loop:  <hypothesis 1..n → discriminating measurement → stop rule;
@@ -168,6 +182,10 @@ Not this skill:  fixes (handed off); standing telemetry (observability-operator)
       nothing itself.
 - [ ] Production profiling, if proposed, is sampling-only, scoped, and
       explicitly approval-gated.
+- [ ] An owner-facing environment choice teaches staging fidelity versus
+      production sampling, costs or unknowns, benefits/risks, and a
+      reasoned recommendation before one question; choosing a path does
+      not authorize production attachment.
 
 ## Gotchas
 
