@@ -169,7 +169,21 @@ access — so it is safe for model invocation.
    DB-native-vs-external-backend decision with the self-monitoring caveat
    named: telemetry in the product's own DB means a DB outage blinds the
    console exactly when it is needed; external synthetic probes are the
-   mitigation.
+   mitigation. If the owner must choose where outage-critical verification
+   lives, explain that DB-native telemetry is stored with the product,
+   while an external backend or probe runs outside that failure domain.
+   Compare a DB-native console plus independent external probes with a
+   separately operated external telemetry backend: why each fits, outage
+   visibility and analytic benefits, blind spots and data/security risks,
+   setup time, ongoing upkeep, and money cost or explicit unknowns.
+   External storage alone does not prove product reachability; that path
+   still needs an independently observed health signal. Recommend
+   the smallest path that independently detects the evidenced outage;
+   explain why and what retention, analysis, or cost evidence could change
+   that call, then ask one owner question. Do not infer that a path choice
+   authorizes backend wiring, production probes, or broader content access;
+   compose `synthetic-monitoring-architect` for probes and
+   `observability-operator` for implementation.
 7. **Design break-glass content reveal and denied-access-as-metric.** Seeing
    metrics is a role; seeing a user's CONTENT is an audited exception with
    five checkable properties: a non-executive operational role + a reason
@@ -200,6 +214,10 @@ Read model: <the server-composed summary call(s); split plan once oversized>
 DB/query-perf panel: <metrics + thresholds; snapshot cron + retention;
   honest limits (sub-tick sampling gap; cumulative stats pairing)>
 Verification panels: <which scans/probes/runs are displayed as posture>
+Outage-verification choice (if owner choice remains): <DB-native plus
+  external probes vs external backend; terms, fit, benefits/blind spots,
+  data/security risks, money/setup/upkeep or unknowns, recommendation and
+  why, one question; implementation separately authorized>
 Break-glass content reveal: <the five properties, in enforcement order>
 Denied-access metrics: <where denials surface in the console>
 Known gaps: <the wired:false list + the known-gaps page>
@@ -229,6 +247,10 @@ Handoffs: <actions → admin-console-architect; backend wiring →
 - [ ] The DB/query-performance panel is present (or its absence is a typed
       known gap), with thresholds, snapshot/retention mechanics, and its
       honest limits stated.
+- [ ] An owner-facing outage-verification choice explains terms, each viable
+      path's fit, benefits, blind spots, risks, costs or unknowns, and a
+      reasoned recommendation before one question; no backend or probe is
+      operated by this design.
 - [ ] Unwired panels are typed `wired: false` with a message; the known-gaps
       page exists.
 - [ ] The IA leads with one health answer; collapsed groups carry escalation
