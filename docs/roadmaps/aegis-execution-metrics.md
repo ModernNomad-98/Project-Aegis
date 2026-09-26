@@ -17,7 +17,7 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [five-merge checkpoint after pull request #319](#five-merge-checkpoint-after-pull-request-319--2026-09-26)
+The latest [five-merge checkpoint after pull request #324](#five-merge-checkpoint-after-pull-request-324--2026-09-26)
 reconsiders every selected and optional row. The earlier [catch-up checkpoint
 after #306](#catch-up-checkpoint-after-pull-request-306--2026-09-25) records
 four missed five-merge windows without resetting the #303 cadence anchor.
@@ -51,6 +51,35 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Five-merge checkpoint after pull request #324 — 2026-09-26
+
+The [current full reassessment](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-26-after-pull-request-324)
+uses main `6f16a99f6deeeae2f6f352f10bce609748ee3017`. The five
+first-parent merges after #319 were #320, #321, #322, #323 and #324. PR
+numbers happen to match merge order in this window; the receipts establish it.
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Published estimate or bound |
+| --- | --- | --- | ---: | --- |
+| [#320](https://github.com/ModernNomad-98/Project-Aegis/pull/320): BKL-009 source inventory | `7a57a67329b13b3f3c1e1aff69f36a1799db9faf` | 02:26:44 | 2m23s from #319 | No separate active duration verified here. |
+| [#321](https://github.com/ModernNomad-98/Project-Aegis/pull/321): agent item timing instructions | `285b444ba1c98632e10f4ad0205a3f1ce326e8fc` | 02:27:09 | 25s | No separate active duration verified here. |
+| [#322](https://github.com/ModernNomad-98/Project-Aegis/pull/322): retention skill choice guidance | `599242963e13dbe6a5974dc2189401383bce697b` | 02:28:02 | 53s | No separate active duration verified here. |
+| [#323](https://github.com/ModernNomad-98/Project-Aegis/pull/323): cost and screenshot skill choice guidance | `ab7b169dc252f22834c099bf03eee006dc61ef2c` | 02:30:18 | 2m16s | No separate active duration verified here. |
+| [#324](https://github.com/ModernNomad-98/Project-Aegis/pull/324): reconcile BER backlog after #313 | `6f16a99f6deeeae2f6f352f10bce609748ee3017` | 02:46:44 | 16m26s | No separate active duration verified here. |
+
+The #319-to-#324 interval is **22m23s observed wall time**, including
+concurrent work, review, CI, queue and owner waiting. Active work and those
+other components were not separately instrumented. Neither total nor
+per-merge spacing measures active labor or throughput.
+
+The ten estimated selected rows remain **71–146 active hours** after
+row-by-row reassessment. Issue #101 Stage 4B and BER-BKL-009 real host,
+runtime, privacy and cleanup remain TBD, so selected and all-options totals
+have no finite estimate. All seven optional rows retain their ranges and
+gates. The #324 tree has **600 Markdown files**: 556 accepted readers and 44
+classified fixtures. #315 is open with no Actions and no completion credit;
+issue #101 is open and the VM remains paused. Start the next five-merge
+counter after #324.
 
 ## Five-merge checkpoint after pull request #319 — 2026-09-26
 
