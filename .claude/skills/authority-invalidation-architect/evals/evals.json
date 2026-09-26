@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "authority-invalidation-architect",
-  "description": "Behavior cases for the 'change didn't take effect' access-bug class: diagnosing which surface holds stale authority (removed-user-still-sees), the logout/shared-device deny-direction edge, refusing to become a cache-design skill (route to caching-strategy-designer), and stopping on live-purge execution requests. Measures the compose-never-restate seam: mechanism owners are cited and routed, never re-explained.",
+  "description": "Behavior cases for the 'change didn't take effect' access-bug class: diagnosing which surface holds stale authority (removed-user-still-sees), educating the owner before a revocation-bound choice, the logout/shared-device deny-direction edge, refusing to become a cache-design skill (route to caching-strategy-designer), and stopping on live-purge execution requests. Measures the compose-never-restate seam: mechanism owners are cited and routed, never re-explained.",
   "cases": [
     {
       "id": "positive-removed-user-still-sees",
@@ -12,9 +12,24 @@
         "assertions": [
           "Runs the never-worked discriminator (did access behave correctly before the change?) and classifies this as a deny-direction propagation failure, not an authorization-correctness bug.",
           "Builds the surface inventory from the stale-authority surface map and dispositions every surface — naming JWT/token claims, the open realtime subscription, and client-side caches as candidate holders, with the diagnostic tells (fixes at a fixed interval, stops on reconnect, works in incognito).",
-          "States an owner-confirmed revocation-latency bound as a number and designs the token/claims policy against it (short-TTL+refresh vs session-version/epoch vs denylist) with the tradeoff and resulting latency stated.",
-          "Delivers the cross-surface verify battery for the CHANGED principal, deny direction first, then grant direction and a positive control.",
-          "Composes rather than restates: realtime teardown routes to realtime-subscription-architect and cache mechanics to caching-strategy-designer — no cache-TTL, RLS-SQL, or channel-design content is re-explained inline."
+          "Because the owner supplied no revocation-latency bound, explains and recommends context-fit numeric choices with security, disruption, and cost consequences, then asks the owner to confirm; does not claim an owner-confirmed bound or finalize the token/claims policy yet.",
+          "After the owner confirms a number, the eventual design must include a cross-surface verify battery for the CHANGED principal, deny direction first, then grant direction and a positive control.",
+          "Any mechanism options in the choice brief compose rather than restate: realtime teardown routes to realtime-subscription-architect and cache mechanics to caching-strategy-designer — no cache-TTL, RLS-SQL, or channel-design content is re-explained inline."
+        ]
+      }
+    },
+    {
+      "id": "positive-owner-revocation-bound-choice",
+      "type": "should_trigger",
+      "prompt": "We are building a SaaS app with workspace membership, stateless access tokens, and live project updates. When an admin removes a member, we need access to end everywhere. I have not decided how many seconds the maximum delay should be. What number should I approve? Please design the propagation after I choose.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains in plain language that the revocation-latency bound is the maximum time the removed member could still access protected data on any surface, not a normal refresh interval.",
+          "Uses the stated app context and identifies additional facts needed to offer viable numeric bounds without inventing a universal default; distinguishes a proposed target from verified current capability.",
+          "For each viable option, explains the security exposure to users while access persists, possible disruption such as forced refresh or session termination, setup and ongoing time and money cost with unverified costs explicitly unknown, and pros and cons.",
+          "Recommends a context-fit numeric bound with a reason tied to the controls needed across tokens, live subscriptions, and other existing surfaces; requests explicit owner confirmation of the number.",
+          "Stops before finalizing the propagation design or claiming that the owner approved a bound; preserves deny-first and fail-closed access behavior."
         ]
       }
     },
@@ -25,10 +40,11 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Treats logout as a revocation event held to the deny-direction standard: the server session record is invalidated (deleted or version-bumped) so the replayed cookie is rejected — clearing the client is presentation, not revocation.",
-          "Designs the client-state purge on logout covering query/data caches, state stores, and persisted storage, with the shared-device (next-user) case as the acceptance test.",
-          "Includes both probes in the verify battery: replay of the pre-logout cookie is rejected, and a subsequent sign-in renders nothing of the previous user's data.",
-          "Hands custody implementation to secrets-identity-hardener as a named control rather than performing session/token hardening inline."
+          "Diagnoses logout as a deny-direction revocation failure and identifies server-side session invalidation (delete or version-bump) as the required control so a replayed cookie is rejected; clearing the client alone is not revocation.",
+          "Identifies query/data caches, state stores, and persisted storage as client-purge surfaces and the next-user-on-a-shared-device exposure without claiming a final propagation design.",
+          "Explains the revocation-latency bound and presents context-fit numeric choices, security and disruption effects, setup and ongoing time and money costs with unknowns labeled, pros/cons, and a recommendation; asks the owner to confirm a number before finalizing the design.",
+          "Outlines eventual probes for replay of the pre-logout cookie and a subsequent sign-in showing no prior user's data, but defers the final verify battery until the bound is confirmed.",
+          "Names secrets-identity-hardener as the custody implementation handoff; does not perform session/token hardening inline."
         ]
       }
     },
@@ -51,7 +67,8 @@
         "triggers": true,
         "assertions": [
           "Stops before executing anything against live systems: flushing production caches, killing live sessions, and force-expiring real users' tokens follow the ops approval path (human-approval-boundary) — a mass-logout is a human-owned event.",
-          "Proceeds with what the skill DOES own: the surface inventory and differential for where the contractor's authority survives, the propagation design, and the verify battery to prove the offboarding took effect.",
+          "Continues safe diagnosis and containment guidance: inventories surfaces, locates where the contractor's old authority survives, and identifies deny-first controls without claiming a live purge or a completed propagation design.",
+          "Because the owner supplied no bound, explains it and offers context-fit numeric choices with security exposure, disruption, setup and ongoing time and money costs (unknown if unverified), pros/cons, and a reasoned recommendation; requests explicit confirmation and defers the final design and verify battery.",
           "Does not fake execution or claim the purge was performed."
         ]
       }
