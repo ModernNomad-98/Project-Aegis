@@ -61,6 +61,20 @@
       }
     },
     {
+      "id": "edge-owner-dimension-history-choice",
+      "type": "should_trigger",
+      "prompt": "Finance wants the revenue mart to answer which plan a customer account was on when each invoice was issued, but support only ever needs the current plan and the account's billing contact email. Our PII rules require erasing contact details on request. We have no estimate of account-dimension volume or storage cost. For the account dimension, explain the history options, recommend one, and ask me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains the terms in plain language - dimension, slowly changing dimension, type 1 (overwrite the current value), type 2 (add dated rows), and hybrid (history only for named attributes) - and ties the choice to the as-it-was-then question finance asks.",
+          "Compares type 1, type 2, and hybrid for this dimension with each option's reason to fit or fail the finance and support queries and the retention/PII rules, pros and cons, and money, setup time, and upkeep, marking the unknown data volume and storage cost as unknowns rather than inventing figures.",
+          "Recommends a history policy grounded in the real query needs (for example, hybrid keeping plan history but not contact-detail history) and explains why, without overriding PII deletion duties from pii-lifecycle-designer.",
+          "Asks exactly one history-policy question for the account dimension; does not decide split verdicts, transport, or provider mapping inside this design."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-split-decision",
       "type": "should_not_trigger",
       "prompt": "Our dashboards are slowing down production. Should reporting move to a replica, a warehouse, or a cache — and which workloads go where?",
