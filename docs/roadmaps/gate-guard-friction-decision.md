@@ -4,7 +4,7 @@
 document. **Prepared:** 2026-09-26. **Owner:** Peter Nguyen.
 
 Recommend option A: a standing, conditional exception for the existing
-protected-file signal on four named BER reporting/aggregation source and test
+protected-file signal on four named Behavioral Eval Runner (BER) reporting/aggregation source and test
 files, with fresh verification, independent review and a
 receipt for every merge. This removes repeated owner questions while retaining
 the existing guard and deliberate administrator merge. The check will still
@@ -59,7 +59,7 @@ the underlying code review and verification work.
 | Option | Why consider it; benefits | Drawbacks | Setup, money and upkeep |
 | --- | --- | --- | --- |
 | **A. Standing conditional exception for four BER files — recommended** | Ends repeated owner exceptions for authorized reporting/aggregation repairs; keeps protected-file detection, independent review and deliberate merge. | The guard stays red; every other protected path still needs its separate owner decision. Evidence must distinguish an approved signal from a real failed check. | Estimate 1–3 active hours for approved policy/record/document updates and review; no new service or dependency, $0 new task-controlled spend. Each eligible PR needs a reviewed receipt, roughly 5–15 active minutes beyond existing checks/review; owner wait is removed only for eligible changes. |
-| **B. Trusted approval check** | Can represent reviewed, authorized protected changes as green, with mechanically checked evidence. | Adds a security-sensitive service/workflow and new failure modes; approval freshness and trusted identity must be maintained. | Estimate 4–8 active hours for discovery and a bounded design proposal. Implementation is unestimated until repository capabilities and a trust mechanism are selected. App hosting, Actions usage or plan costs are unknown; recurring permission, credential, API and workflow maintenance is required. |
+| **B. Trusted approval check** | Can represent reviewed, authorized protected changes as green, with mechanically checked evidence. | Adds a security-sensitive service/workflow and new failure modes; approval freshness and trusted identity must be maintained. | Estimate 4–8 active hours for discovery and a bounded design proposal. Implementation is unestimated until repository capabilities and a trust mechanism are selected. App hosting, Actions usage or plan costs are unknown; recurring permission, credential, application programming interface (API) and workflow maintenance is required. |
 | **C. Keep a separate owner exception for every PR** | Preserves the present process with no policy change or new machinery; owner sees each protected merge. | Repeated interruption and owner waiting continue; each new head can require a replacement exception. | No implementation or new service cost. Each PR still needs an exact-head decision and receipt, roughly 5–15 active minutes of administration plus unbounded owner wait and the existing checks/review. |
 
 Option A fits the immediate need because the existing process already gathers
@@ -96,7 +96,7 @@ The exact eligible paths are:
 This is an exact allowlist, not the whole BER directory. Ordinary unprotected
 documentation may accompany an eligible repair. A PR also touching any other
 protected file is ineligible as a whole. In particular, workflow/CI files,
-CODEOWNERS, validator, DCO, guard scripts and tests, requirements, parent import
+CODEOWNERS, validator, Developer Certificate of Origin (DCO), guard scripts and tests, requirements, parent import
 files, acceptance machinery and all other BER paths retain separate one-time
 owner decisions. Expanding this allowlist requires a new owner decision.
 

@@ -13,7 +13,7 @@ those delivered batches from that plan.
 
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
-the [BER selected-precheck aggregate decision page](ber-precheck-aggregate-validation-proposal.md)
+the [Behavioral Eval Runner (BER) selected-precheck aggregate decision page](ber-precheck-aggregate-validation-proposal.md)
 after independent technical and full-page readability review, including a
 first-use terminology correction. This count and review do not approve its
 implementation, private labels, a host probe or provider use.
