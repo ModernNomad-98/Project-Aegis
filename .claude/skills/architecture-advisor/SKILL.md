@@ -91,8 +91,9 @@ the honest answer is a boring modular monolith.
    as estimates or unknowns rather than inventing prices.
 4. **Make a clear recommendation with reasoning.** One recommended style
    (or hybrid), with the argument for it grounded in the need. Advice that
-   won't commit to a recommendation is just a menu. Then ask the owner one
-   clear decision question; do not adopt the style silently for them.
+   won't commit to a recommendation is just a menu. End the choice
+   presentation with one clear owner decision question; do not adopt the
+   style silently for them.
 5. **State the sensitivity — what would change it.** The conditions under
    which the recommendation flips ("if the team splits into four and
    traffic 10×es, revisit toward services"; "if you need independent

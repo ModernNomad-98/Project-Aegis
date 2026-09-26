@@ -249,8 +249,9 @@ Verification: <before/after latency via performance-test-harness where wired>
 - No staleness tolerance can be stated for a candidate (the owner
   says "it must always be current") → the item is not cacheable as
   scoped; present explained read-path alternatives (query tuning →
-  `query-plan-reader`; materialization → the splitter) instead of
-  inventing a tolerance.
+  `query-plan-reader` (MANUAL-ONLY: recommend the user invoke it
+  explicitly); materialization → the splitter) instead of inventing a
+  tolerance.
 - The design would introduce a NEW cache store whose tenant-isolation
   posture is undecided → pause the store decision and route it to
   `multi-tenant-data-architect`; key design resumes after.
