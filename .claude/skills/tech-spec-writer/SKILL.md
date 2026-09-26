@@ -78,7 +78,14 @@ work; it presents and integrates them into a reviewable design.
    earn their keep — the concerns that bite in production if unplanned.
 5. **State risks and open questions.** The real risks with mitigations,
    and the open questions blocking or needing a decision — named, with
-   owners, not buried.
+   owners, not buried. Before asking an owner to choose during the build,
+   explain unfamiliar terms in plain language and show the viable options
+   supported by the evidence. For each, give the reason to consider it,
+   benefits, drawbacks, and money, setup, and upkeep costs (or mark an
+   unknown). Recommend one with a case-specific reason and say what would
+   change that recommendation. Do not invent options or present an
+   unresolved assumption as a fact. Record a binding technical choice in
+   an ADR (`adr-writer`) and cite it here.
 6. **Define the review/sign-off path.** Who reviews, what approval means,
    and how the spec becomes the agreed design. A spec nobody signs is a
    suggestion.
@@ -119,7 +126,9 @@ Boundaries:        one decision → adr-writer; user-facing → product-spec-wri
       are cited as ADRs, not re-argued.
 - [ ] All cross-cutting concerns are addressed: security/privacy,
       performance, observability, migration/rollout, testing.
-- [ ] Risks have mitigations; open questions have owners.
+- [ ] Risks have mitigations; open questions have owners. Owner-facing
+      choices explain terms, viable options, reasons, pros/cons, costs or
+      unknowns, and a reasoned recommendation before asking.
 - [ ] A review/sign-off path is defined.
 - [ ] Structure, single-decision, and product-spec content are composed
       from their owning skills, not duplicated.

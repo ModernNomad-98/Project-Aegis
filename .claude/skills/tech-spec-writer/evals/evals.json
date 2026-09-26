@@ -33,6 +33,20 @@
       }
     },
     {
+      "id": "edge-owner-choice-brief-before-build",
+      "type": "should_trigger",
+      "prompt": "We're drafting the technical spec for notification delivery. Before build, the owner must choose between a database outbox using our existing Postgres service and a hosted queue; both are viable, but queue pricing and expected throughput have not been verified. The team has two operations engineers. Explain the choice and ask the owner, without deciding for them.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains unfamiliar terms in plain language and presents only the two evidence-backed viable options, with why each is considered.",
+          "Gives case-specific benefits and drawbacks for each option and separates money, setup, and ongoing upkeep costs; labels unverified pricing or other unknowns rather than inventing figures.",
+          "Recommends an option with a reason grounded in the stated system and team, and says what new fact would change that recommendation.",
+          "Keeps the owner's choice open and asks them to decide before build; does not treat an unresolved assumption as fact or create an ADR for a decision not yet made."
+        ]
+      }
+    },
+    {
       "id": "edge-cite-adr-not-reargue",
       "type": "should_trigger",
       "prompt": "The spec keeps re-litigating the datastore choice we already decided. How should we handle that in the doc?",
@@ -41,7 +55,7 @@
         "assertions": [
           "Cites the existing ADR for the datastore decision rather than re-arguing it inline.",
           "Keeps the spec focused on the whole design; individual binding decisions live in ADRs (adr-writer).",
-          "Notes any decision NOT yet made as an open question routed to adr-writer.",
+          "Notes any decision not yet made as an open question for architecture-designer or the human owner; adr-writer records it only after the choice is made.",
           "Avoids bloating the spec with settled debates."
         ]
       }

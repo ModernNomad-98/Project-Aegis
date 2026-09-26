@@ -35,7 +35,11 @@ interfaces; components + how they interact; diagrams>
 - Testing: <strategy, coverage>
 
 ## Risks & open questions
-<risks + mitigations; open questions with owners>
+<risks + mitigations; open questions with owners. Before asking an owner to
+choose, explain terms and evidence-backed viable options, reasons, benefits/
+drawbacks, money/setup/upkeep costs or unknowns, a recommendation with why,
+and what would change it. Do not invent options or treat unresolved assumptions
+as facts. Cite the ADR for any binding technical choice once made.>
 
 ## Review & sign-off
 <reviewers; what approval means>
