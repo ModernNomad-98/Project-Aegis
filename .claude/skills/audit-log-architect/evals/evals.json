@@ -52,6 +52,20 @@
           "Presents both options (destroy with the tenant vs retain de-identified/platform-scoped) with consequences and routes the choice through human-approval-boundary."
         ]
       }
+    },
+    {
+      "id": "edge-owner-tamper-evidence-choice",
+      "type": "should_trigger",
+      "prompt": "An enterprise prospect's draft contract says audit logs 'must be protected against unauthorized modification and retained for one year', and their questionnaire asks if our audit log is tamper-proof. Today audit rows sit in our main Postgres database and the application role has no UPDATE or DELETE permission on that table. We have no pricing yet for immutable storage. Should we add hash-chaining or move audit records to write-once storage? Explain the choice before asking me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains append-only store permissions, tamper-evidence versus tamper-proof, hash-chaining, and write once, read many (WORM) storage in plain language, and does not claim any option makes the log tamper-proof or satisfies the contract without human or legal confirmation.",
+          "Compares keeping restricted permissions alone, adding a verified hash chain, and exporting to WORM storage, giving each option's reason, what tampering it prevents or only detects (including a privileged database administrator), drawbacks, and setup, storage, and upkeep costs; marks storage pricing as an explicit unknown without inventing a price.",
+          "Recommends tamper-evidence proportional to the quoted contract clause with a concrete reason and the condition that would change it, keeping append-only permissions and store-level tamper negative tests regardless of the choice.",
+          "Asks exactly one atomic owner question after the comparison; the answer does not authorize implementing the pipeline in the same pass, and contract interpretation stays with a human reviewer."
+        ]
+      }
     }
   ]
 }
