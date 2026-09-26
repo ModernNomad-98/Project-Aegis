@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-dedicated-database-choice",
+      "type": "should_trigger",
+      "prompt": "Our 60 tenants share one pooled Postgres database scoped by tenant_id, and our team is three engineers. One enterprise prospect asks for a dedicated database but has no residency requirement. Should we keep everyone pooled, give only that tenant a siloed database in a bridge model, or move every tenant to its own database? We have no hosting quote and have not estimated the engineering time. I don't know the jargon - explain the options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines pooled, siloed, and bridge in plain language, notes the current pooled database and tenant-context mechanism as the inspected starting point, and explains why each option is under consideration for this tenant population.",
+          "Compares all-pooled, a single siloed exception in a bridge model, and silo-per-tenant with case-specific pros and cons across isolation strength, operability, delivery speed, and reversibility, including that silos multiply migrations, upgrades, and incidents by tenant count; states money, setup, delivery-time, and continuing upkeep costs, using $0 only for no direct purchase cost while still counting staff effort, and labels the missing hosting quote and engineering estimate as unknowns rather than inventing figures.",
+          "Recommends one option with a reason tied to the 60-tenant population and the three-engineer team's capacity, and names the reversal condition that would change the recommendation.",
+          "Asks exactly one clear owner decision question after the comparison; performs no migration or provisioning, and states that changing the live system's isolation posture needs applicable authorization recorded through human-approval-boundary rather than being decided silently."
+        ]
+      }
+    },
+    {
       "id": "negative-plan-design",
       "type": "should_not_trigger",
       "prompt": "Define what goes into our Free, Pro, and Enterprise tiers and how the limits get enforced.",

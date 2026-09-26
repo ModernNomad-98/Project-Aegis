@@ -85,7 +85,9 @@ multi-tenant" is a slogan, not an architecture.
    Explain case-specific pros/cons and money, setup, delivery-time, and
    continuing upkeep costs before asking; use $0 for no direct purchase cost
    while counting staff effort, and label uncertain amounts. State why the
-   recommendation fits this tenant population and team's capacity.
+   recommendation fits this tenant population and team's capacity. Then ask
+   exactly one clear owner decision question; the answer does not authorize
+   implementation.
 8. **Write the rollout plan**: ordered, individually shippable increments from
    current to target, each with a verification step and a rollback. For
    single-tenant conversions, identity and data scoping move first — never the
@@ -122,8 +124,8 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - [ ] At least two options genuinely compared; recommendation names its
       reversal condition.
 - [ ] Any user-facing build choice explains terms, reasons, pros/cons, and
-      money/time/setup/upkeep costs before asking; recommendation explains fit
-      and uncertain cost figures are labeled.
+      money/time/setup/upkeep costs before asking exactly one owner question;
+      recommendation explains fit and uncertain cost figures are labeled.
 - [ ] Every rollout increment is individually shippable with a verification
       step and a rollback.
 - [ ] No implementation performed — this skill designs; it does not migrate.

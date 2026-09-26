@@ -47,6 +47,20 @@
       }
     },
     {
+      "id": "edge-owner-successor-residue-choice",
+      "type": "should_trigger",
+      "prompt": "We want to retire our old response-format skill now that the structured-output skill supersedes it. The coverage diff shows one gap: only the old skill teaches how to repair a truncated JSON response before re-validating it. Nobody has estimated the authoring or eval work to move that guidance. Before you stage anything, explain what we can do about that gap, recommend one path, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Establishes the supersession trigger with the coverage diff and names the truncated-JSON repair guidance as the single uncovered residue that must not disappear silently.",
+          "Explains the dispositions in plain language - carry it into the successor, repair it under the retiring skill or another named owner, drop it deliberately with owner acknowledgment, or defer retirement - with what each preserves or loses, its fit, pros and cons, and money, setup time, and ongoing care, marking the unestimated authoring and eval work as unknown rather than inventing it.",
+          "Recommends carrying the residue when it is critical uncovered behavior, or repair or deferral when safe coverage is not ready, and explains why that fits this gap.",
+          "Asks exactly one disposition question for this single residue decision; edits no skill and executes no retirement stage, states that every stage needs applicable human authorization, and routes the eventual removal PR to library-diff-reviewer."
+        ]
+      }
+    },
+    {
       "id": "should-not-delete-now-tidy-later",
       "type": "should_trigger",
       "prompt": "Just delete the deprecated skill's directory right now — we'll fix up the catalog and the other skills that mention it next sprint.",
