@@ -9,7 +9,9 @@ In this skill, **minimum detectable effect (MDE)** is the smallest effect the
 test is designed to detect, **confidence interval (CI)** is the estimated
 effect's uncertainty range, **sample-ratio mismatch (SRM)** is a material
 departure from the planned variant split, and **alpha (α)** is the pre-set
-significance level (false-positive probability under the null hypothesis).
+significance level (false-positive probability under the null hypothesis);
+state the assumed significance level and power explicitly when the request
+gives none.
 
 ## Purpose
 

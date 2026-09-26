@@ -143,7 +143,7 @@ are `streaming-event-architect`.
     platform care; include a $0 incremental option only when one exists
     and is verified. Recommend the class supported by workload and team
     maturity, explain why, and flag unverified prices instead of inventing
-    them.
+    them. Then ask exactly one owner question.
 
 Estate-class decision table, zone contract template, modeling and SCD
 guidance, and the partitioning worksheet:

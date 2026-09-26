@@ -31,6 +31,8 @@ a system that does not exist.
   `adr-writer` (this skill hands its ADR draft there).
 - Do NOT use when: judging an existing design without proposing one — delegate
   to the `principal-architecture-reviewer` subagent.
+- Do NOT use when: designing job retry, scheduling, or idempotency semantics —
+  hand those to `background-job-orchestration-architect`.
 
 ## Inputs to Inspect
 
@@ -70,11 +72,13 @@ a system that does not exist.
    explain why each option is viable, and give case-specific pros and cons.
    Separate money, setup effort, delivery time, and ongoing upkeep; use $0
    when there is no direct purchase cost and label uncertain figures. Explain
-   why the recommendation fits this system and team. Then ask the owner one
-   clear decision question; do not pick the option silently.
+   why the recommendation fits this system and team. End the choice
+   presentation with one clear owner decision question; do not pick the
+   option silently.
 7. **Draft the ADR** for the pivotal decision (context, decision,
    alternatives, consequences) — hand to `adr-writer` for completion with
-   rollback plan and review date.
+   rollback plan and review date. Steps 7–8 are drafted for the recommended
+   option and marked pending the owner's answer.
 8. **Write the migration plan:** ordered, individually shippable increments
    from current to target, each with a verification step and a stop point.
    "Big-bang rewrite" is not a migration plan.
