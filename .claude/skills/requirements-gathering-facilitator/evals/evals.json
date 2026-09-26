@@ -62,6 +62,20 @@
       }
     },
     {
+      "id": "edge-owner-reminder-channel-choice",
+      "type": "should_trigger",
+      "prompt": "Still gathering requirements for the physiotherapy clinic app. We've confirmed missed appointments are the main problem, and most patients are over 60 and rarely check email. For appointment reminders the options on the table are text messages through an SMS service, emails, or automated phone calls. I don't know what an SMS or call service would cost. Explain the choices, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces an INTERACTIVE TURN, not the final requirements brief, whose Choice context defines unfamiliar terms (such as an SMS service) in plain language and explains why text messages, email, and automated calls are each being considered for this clinic.",
+          "Gives each option's case-specific pros and cons (reaching over-60 patients who rarely check email, patient annoyance, setup effort) and its money, setup, and maintenance costs, marking the unknown SMS and call-service prices as uncertain instead of inventing figures.",
+          "Recommends one option with a reason tied to reducing missed appointments for these patients, or, if a deciding constraint is missing, asks one atomic question for that constraint first instead.",
+          "Asks exactly one atomic question — the decision question, or the single discovery question from the fallback — and stops; the recommendation does not resolve the choice or authorize building, and the user-owned decision is returned to the orchestrator's visible pending-decision batch with no write or recording claim."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-write-the-spec",
       "type": "should_not_trigger",
       "prompt": "Requirements are settled and signed off. Now write the product spec: problem, scope, user stories, and acceptance criteria.",
