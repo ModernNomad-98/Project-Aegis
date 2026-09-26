@@ -60,6 +60,20 @@
       }
     },
     {
+      "id": "edge-owner-navigation-pattern-choice",
+      "type": "should_trigger",
+      "prompt": "Our field-service web app has seven top-level sections, and technicians mostly use it one-handed on phones while holding equipment. The designer wants a hamburger menu; the product manager wants a bottom tab bar. Two sections, Jobs and Scan, are used many times an hour; the other five are occasional. Nobody has estimated the rebuild effort for either navigation. Explain the small-screen navigation options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the hamburger menu and the bottom tab bar in plain language (and any hybrid it proposes, such as a bottom bar with a More entry), and explains why each pattern it treats as viable fits seven sections used one-handed.",
+          "Compares the patterns by what each preserves or loses for this content - the frequent Jobs and Scan destinations one tap away in the thumb zone versus hidden behind a menu - and by accessibility and use effects, including touch-target size and spacing for bar items, safe-area insets so a bottom bar clears the home indicator, and a fixed bar that does not collide with the on-screen keyboard; states money, setup, and upkeep and marks the unestimated rebuild effort as unknown instead of inventing it.",
+          "Recommends one pattern with a reason tied to one-handed use and the two high-frequency sections, and names the missing fact that could change it, such as real usage data on how often each section is opened.",
+          "Asks exactly one navigation decision question after the comparison; keeps the binding touch-target and zoom-safety requirements intact rather than offering a violating option, and leaves accessibility verification to accessibility-test-harness."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-mobile-performance",
       "type": "should_not_trigger",
       "prompt": "Our mobile bundle is 2.5MB and takes 6 seconds to become interactive on a mid-range Android. Cut the weight and improve the load metrics.",

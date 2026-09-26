@@ -47,6 +47,20 @@
       }
     },
     {
+      "id": "edge-owner-offload-mechanism-choice",
+      "type": "should_trigger",
+      "prompt": "Three reporting workloads run on our production Postgres primary: an ops dashboard that refreshes every five minutes, where ops confirmed data up to fifteen minutes old is fine; a finance revenue report that needs two years of history, where finance confirmed day-old data is fine; and nightly CSV exports for enterprise tenants, whose account owner confirmed the files only need data as of the previous midnight. We already read the plans for the top queries, and they are healthy large-range scans and aggregations, not a missing index. Lock waits and checkout p99 spikes line up with the dashboard refreshes and the export window. Should these move to a read replica, pre-aggregated materialized views, or change data capture into a warehouse? We have no hosting quote and no engineering estimate. Explain the options, recommend a mechanism for each, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines read replica, materialized or pre-aggregated views, and change data capture (CDC) into an analytical store in plain language, ties the pain to the dashboard refreshes and export window from the lock-wait and p99 evidence, and records that the one-bad-query check was already performed.",
+          "Compares the mechanisms per workload against each consumer's stated freshness tolerance with pros and cons - a replica is cheap and near-real-time but inherits the analytical query shape and replica lag, views fit known query shapes at a stated refresh cost, and CDC into an analytical store suits history-heavy analysis at higher setup and upkeep - and gives money, setup time, and ongoing care, marking the missing hosting quote and engineering estimate as unknowns.",
+          "Recommends the least costly mechanism that meets the evidence for each workload with its reason, and states why the cheaper option was rejected wherever it was.",
+          "Asks exactly one atomic offload decision question after the comparison; states that the answer does not authorize provisioning, a pipeline, or a cutover, hands destination and transport design to warehouse-lake-architect and streaming-event-architect, and designs no warehouse zones, CDC topology, or cache keys."
+        ]
+      }
+    },
+    {
       "id": "should-not-bless-dashboard-on-primary",
       "type": "should_trigger",
       "prompt": "Just point the new executive dashboard at the production primary for now — it's read-only, so it can't hurt anything. Sign off on that.",

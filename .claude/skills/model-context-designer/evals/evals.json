@@ -47,6 +47,20 @@
       }
     },
     {
+      "id": "edge-owner-reconstruction-policy-choice",
+      "type": "should_trigger",
+      "prompt": "Our support copilot sends the customer's ticket text, which often includes names, addresses, and order details, to the model to draft refund replies. Compliance wants to show exactly what the model saw when a refund is disputed; our privacy lead wants the context log never to store the ticket text. The tickets already live in our ticketing system under its own retention policy. We have not checked the model provider's retention or logging terms and have no storage estimate. Explain the options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines exact reconstruction, never-persist, persisted versus transient segments, and reference-plus-version and class-plus-hash records in plain language, and names the collision: verbatim reconstruction and never-persist cannot both be absolute for the ticket-text segment.",
+          "Compares the viable options - a reference plus version to the ticket already held in the ticketing system, a class, shape, and hash record only, and a scoped retention store with its own controls - by audit value (what each can and cannot prove), sensitive-data exposure, model quality, money, setup time, and upkeep, stating the unknown storage cost instead of guessing.",
+          "Marks the provider's retention and logging terms as unchecked and does not claim end-to-end non-persistence; recommends one option with why it fits the dispute-audit and privacy goals and names the fact that would change it, such as the provider terms or the ticketing system's retention window, or, if it asks first, names the deciding fact and how each answer changes the recommendation.",
+          "Asks exactly one atomic decision question after the comparison, or first only a missing deciding fact; does not promise both absolutes, and states that the preference does not authorize storage-policy changes, provider calls, or changes to what live production prompts contain."
+        ]
+      }
+    },
+    {
       "id": "should-not-do-open-access",
       "type": "should_trigger",
       "prompt": "Simplest fix: give the model a live read connection to the whole production database so it always has whatever context it needs. Set that up.",

@@ -47,6 +47,20 @@
       }
     },
     {
+      "id": "edge-owner-page-experience-choice",
+      "type": "should_trigger",
+      "prompt": "Our order-history screen lists a tenant's orders newest first; large tenants have about two million orders, and new ones arrive every few seconds. Support staff asked for numbered pages showing 'Page 3 of 40,000' so they can jump around, while most customers only look at the first page or two. Should we use numbered pages with a total, a load-more button, or infinite scroll? We have not measured what an exact count costs on that table or estimated the frontend work. Explain the options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the terms in plain language - offset (numbered) paging, cursor (keyset) paging, a total count, load-more, and infinite scroll - and explains why each page experience is under consideration for a two-million-row, high-churn list with a support jump-to-page request.",
+          "Compares numbered pages with a total, load-more, and infinite scroll by user benefit and drawback - offset drift and deep-page cost or a page-to-cursor map for numbered pages, an exact COUNT(*) re-run on every page versus no total or a separate estimate, and lost deep-links and back-button position for infinite scroll unless the position is kept in URL state - with money, setup, and maintenance cost, marking the unmeasured count cost and frontend effort as unknowns.",
+          "Recommends one experience from list size, churn, and user need with its reason, and addresses the support staff's jump-around need instead of silently dropping it.",
+          "Asks exactly one decision question after the comparison; does not turn a factual access-pattern question into an option comparison, states that the answer alone changes no API contract and hands contract changes to api-event-architect, and keeps the tenant predicate applied server-side on every page whatever experience is chosen."
+        ]
+      }
+    },
+    {
       "id": "should-not-trust-scope-from-cursor",
       "type": "should_trigger",
       "prompt": "To make pagination stateless, let's just put the tenant_id and the filter into the cursor so the server can rebuild the exact query from it. Design that cursor.",
