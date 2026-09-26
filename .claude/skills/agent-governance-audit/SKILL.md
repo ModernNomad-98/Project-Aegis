@@ -1,6 +1,6 @@
 ---
 name: agent-governance-audit
-description: 'Audit whether an artificial-intelligence-assisted change followed governance rules: classification, scope, human approvals, merge/deploy authority, validation, security review, closeout, and memory or documentation updates. Each control receives a PASS, FAIL, or UNVERIFIABLE verdict citing primary evidence; missing evidence never passes. Use for retrospective review of a change or pull request (PR), post-incident review, autonomy spot checks, or closeout verification. Read-only; changes nothing. Do NOT use as an upcoming release gate, to write your own closeout, to audit code health, or to review diff correctness.'
+description: 'Audit whether an artificial-intelligence-assisted change followed governance rules: classification, scope, human approvals, merge/deploy authority, validation, security review, closeout, and memory or documentation updates. Each control receives a PASS, FAIL, or UNVERIFIABLE verdict citing primary evidence; missing evidence never passes. Use for retrospective review of a change or pull request (PR), post-incident review, autonomy spot checks, or closeout verification. Read-only; changes nothing. Do NOT use as an upcoming release gate, to write the closeout for your own finished work (ai-closeout-reporter), to audit code health, or to review diff correctness.'
 ---
 
 # Agent Governance Audit

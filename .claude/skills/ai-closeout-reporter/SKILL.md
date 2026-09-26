@@ -1,6 +1,6 @@
 ---
 name: ai-closeout-reporter
-description: Produce the end-of-task closeout report — what changed, what was intentionally NOT done or was omitted (always a dedicated section, "None" written explicitly when empty), files touched, tests and validation actually run with real results, evidence, risks, skipped checks, and the recommended next action. Use when finishing a task, handing off work, opening or closing a pull request (PR), or when asked what was actually done. Scope reductions must be disclosed, never silent.
+description: Produce the end-of-task closeout report — what changed, what was intentionally NOT done or was omitted (always a dedicated section, "None" written explicitly when empty), files touched, tests and validation actually run with real results, evidence, risks, skipped checks, and the recommended next action. Use when finishing a task, handing off work, opening or closing a pull request (PR), or when asked what was actually done. Scope reductions must be disclosed, never silent. Do NOT use to verify a closeout's claims or audit a finished change's process compliance (agent-governance-audit), design a cross-stage handoff protocol (phased-work-handoff-designer), write a lane's pre-work guide (lane-authoring-guide), reconcile chat-only history against the repo (chat-backlog-reconciliation), assemble a promotion packet (promotion-packet-writer), or set screenshot-evidence policy (screenshot-evidence-planner).
 ---
 
 # Artificial Intelligence (AI) Closeout Reporter
@@ -109,5 +109,8 @@ CLOSEOUT REPORT
   template with all eight sections.
 - `evals/evals.json` — trigger + behavior cases, including mandatory
   scope-reduction disclosure.
-- Trigger is distinct within the pack (terminal reporting), so no
-  trigger-evals file is required.
+- `evals/trigger-evals.json` — discrimination against the neighbours that
+  route toward this skill: `agent-governance-audit`,
+  `phased-work-handoff-designer`, `lane-authoring-guide`,
+  `chat-backlog-reconciliation`, `promotion-packet-writer`, and
+  `screenshot-evidence-planner`.

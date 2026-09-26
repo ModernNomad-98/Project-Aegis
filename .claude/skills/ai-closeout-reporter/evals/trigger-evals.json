@@ -1,0 +1,70 @@
+{
+  "skill": "ai-closeout-reporter",
+  "description": "Trigger discrimination: first-person terminal closeout of one task or PR vs third-party verification of a closeout or a finished change's process (agent-governance-audit), the cross-stage handoff protocol (phased-work-handoff-designer), the pre-work lane guide (lane-authoring-guide), cadence reconciliation of chat-only history (chat-backlog-reconciliation), a career promotion packet (promotion-packet-writer), and screenshot-evidence policy (screenshot-evidence-planner).",
+  "overlaps_with": ["agent-governance-audit", "phased-work-handoff-designer", "lane-authoring-guide", "chat-backlog-reconciliation", "promotion-packet-writer", "screenshot-evidence-planner"],
+  "cases": [
+    {
+      "id": "own-finished-task-wins-here",
+      "prompt": "You've just wrapped up the billing-export task in this session. Write the closeout: what changed, anything you consciously skipped and why, the files touched, and the validation you actually ran.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": ["agent-governance-audit", "phased-work-handoff-designer"],
+      "reason": "A first-person terminal report on one just-finished task, with the mandatory intentionally-not-done section, is the closeout; the governance audit is the later third-party check, the handoff designer carries decisions across stages, and a promotion packet assembles career impact."
+    },
+    {
+      "id": "closeout-verification-goes-to-governance-audit",
+      "prompt": "The agent's closeout for last week's auth PR says every test passed and nothing was skipped. Check those claims against the CI logs and the merged diff.",
+      "expected_skill": "agent-governance-audit",
+      "should_not_trigger": ["ai-closeout-reporter"],
+      "reason": "Verifying a closeout report's claims against the primary record is the governance audit, which treats the closeout as a claim sheet; writing another closeout would not test anything."
+    },
+    {
+      "id": "open-pr-report-wins-here",
+      "prompt": "I'm opening the PR for the search-indexing lane's last unit now. Write the report reviewers will read: what changed, what was intentionally not done, the tests run with their real output, risks, and the recommended next action.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": ["lane-authoring-guide", "phased-work-handoff-designer"],
+      "reason": "Opening a PR at work's end and reporting what one unit actually did is the closeout; the lane guide is authored at work's beginning, and the handoff designer shapes a multi-stage protocol rather than one PR's report."
+    },
+    {
+      "id": "cross-stage-handoff-goes-to-phased-designer",
+      "prompt": "Our data migration runs in four sequenced stages across separate sessions. Design the handoff each stage leaves for the next: a decision-ID register showing which decisions still bind, changed and not-touched file lists, proven-invocation evidence, and deviation flags.",
+      "expected_skill": "phased-work-handoff-designer",
+      "should_not_trigger": ["ai-closeout-reporter"],
+      "reason": "A decision register carried across stages, per-stage not-touched lists, and deviation flags are the cross-stage handoff protocol; the closeout reports a single task or turn."
+    },
+    {
+      "id": "lane-pre-work-guide-goes-to-lane-authoring",
+      "prompt": "We're splitting the API rewrite across three parallel agents. Before the payments lane starts its first endpoint, write its guide: the contracts it relies on, a per-endpoint recipe and checklist, and exactly what it must not touch.",
+      "expected_skill": "lane-authoring-guide",
+      "should_not_trigger": ["ai-closeout-reporter"],
+      "reason": "Pre-work guidance for a parallel lane before its first unit is lane authoring at work's beginning; nothing has been done yet, so there is nothing to close out."
+    },
+    {
+      "id": "chat-only-history-goes-to-reconciliation",
+      "prompt": "We're resuming after a month away. Several decisions and 'done' items exist only in old AI chats. Pull them into a dated repo doc and audit each one against the PRs before we trust any of them.",
+      "expected_skill": "chat-backlog-reconciliation",
+      "should_not_trigger": ["ai-closeout-reporter"],
+      "reason": "Extracting chat-only decisions and auditing each against PR evidence before resuming work is chat backlog reconciliation; the closeout reports one just-finished task, not a corpus of old conversations."
+    },
+    {
+      "id": "promotion-packet-goes-to-promotion-writer",
+      "prompt": "I'm going up for senior engineer next cycle. Turn the last year of work I shipped into a promotion packet mapped to the leveling rubric, with an honest gap analysis.",
+      "expected_skill": "promotion-packet-writer",
+      "should_not_trigger": ["ai-closeout-reporter"],
+      "reason": "Impact already delivered, mapped to a leveling rubric with a sustained pattern and gap analysis, is the promotion packet; a closeout covers one task or PR."
+    },
+    {
+      "id": "screenshot-policy-goes-to-evidence-planner",
+      "prompt": "Before the next release, decide which checkpoints need screenshots, how they are named and masked for PII, and how each capture links to its test case, PR, and closeout report.",
+      "expected_skill": "screenshot-evidence-planner",
+      "should_not_trigger": ["ai-closeout-reporter"],
+      "reason": "Choosing checkpoints, naming, masking, and linkage is the evidence policy; the planner defines what a closeout bundles but does not write the closeout."
+    },
+    {
+      "id": "closeout-bundling-evidence-wins-here",
+      "prompt": "The release test pass is finished and the screenshots are already captured under our naming policy. Write the closeout that attaches them as evidence and lists which checks we skipped and why.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": ["screenshot-evidence-planner"],
+      "reason": "The policy already exists and the work is done; writing the terminal report with an evidence section and a skipped-validation section is the closeout, not evidence-policy design."
+    }
+  ]
+}
