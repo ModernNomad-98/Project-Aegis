@@ -1,6 +1,6 @@
 # Behavioral Eval Runner — Durable Backlog and Phase Register
 
-> **Current reading, checked 2026-09-26 after pull request #313:** This is the
+> **Current reading, checked 2026-09-26 after pull request #315:** This is the
 > permanent continuation and decision register for Behavioral Eval Runner
 > maintainers and coding agents. The dated delivery checkpoints below remain
 > historical evidence. Use the current map and owning work-package record
@@ -34,7 +34,7 @@ supersessions in [section 20a of the merged design](../design/behavioral-eval-ru
 | --- | --- | --- |
 | WP-2B-0, 2B-1, 2B-1A, 2B-2 | **DONE** within offline or limited scopes. Outcome B accepted unresolved host limits; the grading stack is non-live. | No measured calibration or live host follows. Read the [phase records](#7-phase-work-package-register--wp-2b-0--wp-2b-7). |
 | WP-2B-1B / BKL-009 | The bounded synthetic offline proof **DELIVERED** in [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) under consumed APR-012 and BER-DEC-011. [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day policy. The further bounded synthetic integration **DELIVERED** in [PR #257](https://github.com/ModernNomad-98/Project-Aegis/pull/257) under BER-DEC-013 and consumed APR-023. BKL-009 remains **PARTIAL**. | Real-host access, encryption, privacy, production runtime binding and cleanup need separate scope. See [BKL-009](#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy). |
-| WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; BER-DEC-012 granted the bounded synthetic offline holdout support delivered in [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249). [PR #313](https://github.com/ModernNomad-98/Project-Aegis/pull/313) delivered offline report/preflight binding and complete holdout confusion matrices and denominators. Measured calibration and OD-1 ratification remain unfinished. | Approved labels and private inputs, selected execution source, allowance, live calibration and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate), the [offline scope](ber-wp2b3-holdout-execution-scope.md), and the [implementation review](../evidence/ber-wp2b3-holdout-offline-review.md). |
+| WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; BER-DEC-012 granted the bounded synthetic offline holdout support delivered in [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249). [PR #313](https://github.com/ModernNomad-98/Project-Aegis/pull/313) delivered offline report/preflight binding and complete holdout confusion matrices and denominators; [PR #315](https://github.com/ModernNomad-98/Project-Aegis/pull/315) delivered executed-aggregate integrity checks. Measured calibration and OD-1 ratification remain unfinished. | Approved labels and private inputs, selected execution source, allowance, live calibration and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate), the [offline scope](ber-wp2b3-holdout-execution-scope.md), and the [implementation review](../evidence/ber-wp2b3-holdout-offline-review.md). |
 | R1–R5 | Outcome B accepted their WP-2B-0 dispositions; R2 and R4/R5 technical proofs remain unresolved. | Read the [evidence-gate records](#6-phase-2b-0-evidence-gates--r1r5); selected-host proof is needed before a baseline claim. |
 | WP-2B-4 through 2B-7 | WP-2B-4 is **BLOCKED**; 2B-5, 2B-6 and 2B-7 remain **BACKLOG**. | Each needs its own prerequisites and reviewed authority. |
 
@@ -57,10 +57,22 @@ synthetic local BER suite reported 1,078 passed and 14 skipped; exact-head
 GitHub Linux and Windows checks passed. The one-time protected `gate-guard`
 exception was consumed by this merge under
 [APR-041/042](../approvals/APPROVAL_REGISTER.md#aegis-apr-041-pr-313-protected-gate-guard-exception).
-[PR #315](https://github.com/ModernNomad-98/Project-Aegis/pull/315) remains open
-with no reported checks and no delivered change. Neither PR closes live
-calibration, selected-host proof, approved private inputs or BKL-009's
-remaining real-host, privacy, runtime and cleanup work.
+[PR #315](https://github.com/ModernNomad-98/Project-Aegis/pull/315) merged
+tested head `5b78c77535ac76c99c10becb2d437b24867f69f9` as
+`658fa22edbfde2c953f7d21678d08baa79b75052` at 2026-09-26 05:31:33 UTC.
+It verifies executed RUNNABLE aggregates against the deterministic result of
+their attempts, rejecting contradictory verdicts, blockers, reason codes,
+wins, run counts, degradation and quorum claims. Its synthetic local BER suite
+reported 1,080 passed and 14 skipped. Exact-head Linux and Windows checks
+passed in [run 36219047092](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36219047092);
+the protected `gate-guard` failed solely because `reporting.py` and
+`tests/test_reporting.py` changed. The one-time exact-head exception was
+consumed by the merge under
+[APR-044/045](../approvals/APPROVAL_REGISTER.md#aegis-apr-044-pr-315-protected-gate-guard-exception).
+The [main run 36221057049](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36221057049)
+passed Linux and Windows checks; the PR-only guard was skipped. These repairs
+do not close live calibration, selected-host proof, approved private inputs or
+BKL-009's remaining real-host, privacy, runtime and cleanup work.
 
 For the binding start rule, read the [work-package authorization
 protocol](#work-package-authorization-protocol-binding) and the [append-only

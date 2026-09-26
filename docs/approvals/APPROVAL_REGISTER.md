@@ -983,3 +983,45 @@ generic skill guidance that would require asking for the same approval again.
   `a59c015c01b4035ab1a438533736134f96deac13` at the time above.
   [Exact-head Actions](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36211342637)
   passed `validate-skills`, `windows-offline-checks` and `gate-guard`.
+
+### AEGIS-APR-044: PR #315 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-045; no remaining use.
+- **Date / Grantor:** 2026-09-26 UTC / Peter Nguyen.
+- **Reason:** Permit the offline BER aggregate-integrity repair to merge when its
+  two protected reporting paths triggered the guard.
+- **Scope allowed:** The owner's reply was "Approved" following the specific
+  request for a one-time `gate-guard` exception and administrator merge of
+  [PR #315](https://github.com/ModernNomad-98/Project-Aegis/pull/315) at exact
+  head `5b78c77535ac76c99c10becb2d437b24867f69f9`. The request reported
+  1,080 passing local BER tests with 14 expected skips, passing exact-head
+  Linux and Windows Actions in
+  [run 36219047092](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36219047092),
+  and a `gate-guard` failure solely for
+  `tools/behavioral_eval_runner/reporting.py` and
+  `tools/behavioral_eval_runner/tests/test_reporting.py`. The grant covered
+  one administrator merge of that head through that specific guard result.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. This did
+  not change branch protection or authorize a real host, provider call,
+  private input, measured calibration, publication or evidence deletion.
+- **Evidence:** Direct owner reply "Approved" in the Project Aegis
+  conversation, following the owner's question about the recurring
+  `gate-guard` check. It answered the exact-head exception request above;
+  the [PR #315 merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/315)
+  confirms the head, checks and merge. The question about the recurring guard
+  did not expand this one-time exception.
+- **Expiry / use limit:** One merge of PR #315 at the named head; consumed by
+  the merge recorded in AEGIS-APR-045.
+
+### AEGIS-APR-045: Consumption of PR #315 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-044.
+- **Status at recording:** AEGIS-APR-044 has no remaining use.
+- **Effective at:** 2026-09-26 05:31:33 UTC.
+- **Recorded at / By:** 2026-09-26 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The sole exact-head administrator merge completed.
+- **Evidence:** [PR #315](https://github.com/ModernNomad-98/Project-Aegis/pull/315)
+  merged `5b78c77535ac76c99c10becb2d437b24867f69f9` as
+  `658fa22edbfde2c953f7d21678d08baa79b75052` at the time above.
