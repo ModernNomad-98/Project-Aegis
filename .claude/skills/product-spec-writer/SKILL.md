@@ -93,7 +93,15 @@ technical decision to `adr-writer`.
 7. **List dependencies and open questions.** Cross-team, platform, and
    sequencing dependencies; and the open decisions still needed —
    including any technical decision that belongs in an ADR, routed to
-   `adr-writer` by name.
+   `adr-writer` by name. If a product scope or behavior choice remains for
+   the owner, do not turn it into an unexplained question or silently pick
+   a requirement. Define unfamiliar terms; explain why each viable option
+   fits the user's job, its user benefits and drawbacks, and its money,
+   setup, and upkeep costs (or what is unknown). Recommend the option that
+   best fits the evidenced goals and constraints, with a reason and the
+   missing fact that could change it. Ask one decision question at a time;
+   keep that requirement open until the owner answers. An architecture
+   choice stays with `adr-writer`, not the spec.
 8. **Define rollout intent and success.** How it should reach users
    (staged, to whom, gated on what) at the INTENT level, the success
    metrics, and the guardrails. Flag/rollout mechanics are
@@ -122,7 +130,10 @@ Edge/error:      <empty, invalid, forbidden, partial-failure behavior>
 Dependencies:    <cross-team / platform / sequencing>
 Rollout intent:  <staged? to whom? gated on what?>  (mechanics → feature-flag-rollout-strategist)
 Success metrics: <what defines success + guardrails>
-Open questions:  <decisions needed; technical ones → adr-writer>
+Open questions:  <for each owner product choice: terms, viable options and
+                  reasons, user pros/cons, money/setup/upkeep or unknowns,
+                  recommendation and why, one decision question;
+                  technical choices → adr-writer>
 Known / assumed / open separated
 ```
 
@@ -144,6 +155,9 @@ Known / assumed / open separated
       decided inside the spec.
 - [ ] Known, assumed, and open items are clearly separated; the spec
       isn't written over unresolved requirements.
+- [ ] An owner-facing product choice teaches terms, option reasons,
+      benefits/drawbacks, costs or unknowns, and a reasoned recommendation
+      before one question; unanswered choices stay open.
 
 ## Gotchas
 

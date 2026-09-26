@@ -61,6 +61,21 @@
       }
     },
     {
+      "id": "edge-teach-open-product-scope-choice",
+      "type": "should_trigger",
+      "prompt": "The saved-search problem, users, and one-device baseline are agreed. The owner has not decided whether the first release also syncs saved searches across devices. Write the spec and help the owner decide that addition. We have no vendor price quote or upkeep estimate.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Writes the agreed one-device baseline while keeping first-release cross-device scope open instead of silently selecting it or treating all requirements as unclear.",
+          "Defines first-release local-only and cross-device sync in plain terms, explains why each fits the user's job, and compares user benefits and drawbacks.",
+          "States setup and ongoing work plus money costs or explicit unknowns; does not invent a vendor price.",
+          "Recommends a case-fit path with a reason and the missing fact that could change it, then asks one owner decision question.",
+          "Leaves database or sync architecture selection to adr-writer rather than deciding it in the product spec."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-write-an-adr",
       "type": "should_not_trigger",
       "prompt": "We've decided to adopt event sourcing for the ledger. Write the ADR: context, the decision, alternatives we considered, consequences, and the rollback plan.",

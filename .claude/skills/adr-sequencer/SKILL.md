@@ -81,7 +81,15 @@ document-persistence contract; a proposed graph is not evidence of a file edit.
    typo/clarity amendments separately, dated and explicitly authorized before application.
 5. **Draw the new-vs-amend line.** Material change to the decision or its
    consequences → new superseding ADR. Clarification, formatting, a fixed
-   link → amendment with a dated note. State which and why.
+   link → amendment with a dated note. State which and why. When the facts
+   leave a genuine owner choice, explain that an amendment clarifies the
+   existing record while a new ADR preserves it and records a changed
+   decision. Compare only viable paths: why each fits, what history it
+   preserves or risks obscuring, review/setup effort, ongoing upkeep and
+   any money cost or unknowns. Recommend the path that keeps the decision
+   history accurate, explain why and what evidence could change that call,
+   then ask one decision question. Do not treat the answer as authority to
+   edit existing records through this automatic phase.
 6. **Detect contradictions and propose resolutions.** Scan for two current decisions
    that conflict; surface each pair and propose its resolution — usually a new ADR
    that supersedes one or reconciles both — rather than leaving the corpus
@@ -108,7 +116,10 @@ Index:         numbered list — <NNNN | title | date | status | supersedes/supe
 Status plan:   evidenced current statuses; proposed updates and unresolved decisions labeled
 Superseding:   bidirectional links proposed (new names old; old → superseded-by new)
 Append-only:   history preserved; changed decisions = new superseding ADRs, not in-place edits
-New-vs-amend:  <decisions on which changes are new ADRs vs amendments, with reasons>
+New-vs-amend:  <classification and reasons; if owner choice remains: plain
+                terms, viable paths and reasons, history pros/cons, review/
+                setup/upkeep and money cost or unknowns, recommendation and
+                why, one decision question>
 Contradictions:<conflicting pairs surfaced + resolution (superseding/reconciling ADR)>
 Navigation:    grouping/tags; related-ADR links; code/docs → governing ADR
 Authoring:     individual records → adr-writer
@@ -125,6 +136,9 @@ Boundaries:    corpus-by-type → diataxis-doc-organizer; pipeline → docs-as-c
 - [ ] History is append-only — no decided ADR was edited in place to
       change its decision; changes are new superseding records.
 - [ ] The new-ADR-vs-amendment line is applied with stated reasons.
+- [ ] An unresolved owner-facing new-vs-amend choice explains terms,
+      preservation tradeoffs, costs or unknowns, and a recommendation
+      before one question; the automatic phase does not apply file edits.
 - [ ] Contradictions are surfaced with proposed resolutions, not silently decided.
 - [ ] Navigation and governing-ADR pointers are proposed; application claims require separate evidence.
 - [ ] Individual-record authoring is delegated to `adr-writer`, not
