@@ -45,6 +45,9 @@ weakened.
   `release-readiness-reviewer` consumes the gates this skill builds.
 - Do NOT use when: reviewing Terraform/Bicep the pipeline deploys —
   `iac-reviewer`.
+- Do NOT use when: designing one feature's flag targeting, percentage ramp
+  or kill-switch lifecycle — `feature-flag-rollout-strategist`. This skill
+  only decides whether the pipeline needs a flag-gated deployment route.
 
 ## Inputs to Inspect
 
@@ -95,20 +98,37 @@ weakened.
    production-facing environments (named humans per
    `agent-authorization-matrix` posture — merge/deploy authority is never
    the pipeline's own decision), and the deployment strategy per target:
-   rolling (default), blue/green (instant backout), canary (risk-scored
-   releases), flag-gated (decouple deploy from release). Each strategy
-   choice records its rollback primitive — the hook
-   `rollback-runbook-author` builds on.
+   rolling, blue/green, canary, or flag-gated. Compare them in plain
+   terms for each target: rolling gradually replaces instances but may
+   expose all users before a problem is detected; blue/green holds two
+   environments and switches traffic back; canary limits initial exposure
+   and aborts its ramp on measured signals; a flag can disable a released
+   behavior without undoing the deployed artifact. Name the exposure
+   path, detection signal, rollback primitive and time to act for each
+   viable option. Compare infrastructure money (including duplicate
+   capacity), setup effort and ongoing monitoring/operating upkeep.
+   Recommend the strategy that fits the target's risk, traffic, state
+   compatibility and budget; flags do not reverse schema or data changes.
+   A flag can complement the other deployment strategies; detailed flag
+   targeting and ramp rules belong to `feature-flag-rollout-strategist`.
+   Mark unknown
+   costs as unknown and verify current prices if exact spend matters.
+   Ask one discovery question before recommending when a decisive fact is
+   missing; if the user must choose, ask one atomic decision question.
+   Hand the chosen primitive to `rollback-runbook-author` for a rehearsed
+   procedure. No strategy choice grants deployment authority.
 6. **Align branch protection**: required checks list matches the
    merge-blocking stages exactly (a required check that no longer runs stays
    expected or pending and blocks merge until protection is updated),
    stale-review dismissal, and no bypass actors beyond
    the governed list.
-7. **Write or edit the pipeline files** (the side-effecting step): scoped
-   diff per `reviewable-diff-discipline`, pinned action/step versions per
-   `supply-chain-security-reviewer` rules, no check removed or weakened
-   without it being a named, approved change. Never commit secrets or
-   their values into definitions.
+7. **Write or edit pipeline files only when explicitly requested** (the
+   side-effecting step): a design-only request ends with the reviewable
+   design and no pipeline edit. For an authorized edit, use a scoped diff
+   per `reviewable-diff-discipline`, pinned action/step versions per
+   `supply-chain-security-reviewer` rules, and no removed or weakened
+   check without a named approval. Never commit secrets or their values
+   into definitions.
 8. **Validate and hand off**: definitions lint/parse (actionlint or
    equivalent where available), a dry-run or PR run proves the graph
    executes, measured latency per stage is reported against the budget,
@@ -127,8 +147,12 @@ Secret governance: <OpenID Connect (OIDC) roles vs stored secrets;
   missing-secret behavior>
 Caching & artifacts: <cache keys + poisoning posture; artifact retention +
   provenance fields; evidence collection>
-Environments & promotion: <environment → secrets scope → approvers → deployment
-  strategy → rollback primitive>
+Environments & promotion: <environment → secrets scope → approvers →
+  recommended strategy and context → initial exposure/detection → rollback
+  primitive; viable alternatives, infrastructure money (estimate or explicit
+  unknown), setup effort and monitoring/operating upkeep>
+Owner decision: <when needed, one atomic strategy question after recommendation;
+  if decisive context is missing, one discovery question first>
 Branch protection: <required checks (must equal merge-blocking stages),
   bypass list, review rules>
 Files changed: <pipeline definition diffs — or "design only, no files
@@ -154,7 +178,15 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
       pass.
 - [ ] Required checks in branch protection exactly match the
       merge-blocking stage list.
-- [ ] Every deployment strategy records its rollback primitive.
+- [ ] Each target compares viable rolling, blue/green, canary and
+      flag-gated options in plain terms; the recommendation names exposure,
+      detection signal, rollback primitive and state limitations.
+- [ ] Strategy choice records infrastructure money as an estimate or
+      explicit unknown, plus setup effort and ongoing monitoring/operating
+      upkeep; unknown prices are not invented.
+- [ ] If owner choice is needed, the output asks one atomic decision
+      question after the explanation, or one discovery question first when
+      decisive context is missing; no deploy authority is inferred.
 - [ ] Actions/steps are version-pinned; no check was weakened or removed
       without a named approval.
 - [ ] Test-tier internals, supply-chain audit, and release go/no-go were
