@@ -13,6 +13,7 @@
           "Restates the agent-authorization-matrix floor first: protected-branch merge requires an applicable explicit human decision and arming auto-merge remains forbidden to agents by default.",
           "Names the covered loop steps and branch/change-class boundaries explicitly — no elastic 'and similar steps' scope.",
           "Includes all governance elements: required per-session restatement prompt pattern, exact opt-out phrase, phase-advance bound to named+approved phases, reviewer-block path that suspends the loop.",
+          "Before asking for adoption, defines PR, green checks, protected branch, and auto-merge; compares review time, setup/upkeep, money costs or unknowns, benefits and risks of lawful profiles; recommends a case-fit choice and explains why.",
           "Rationale cites the ungoverned-auto-merge incident from agent-authorization-matrix's evals as why these elements are non-optional.",
           "Delivers a DRAFT for human adoption routed to scoped-approval-register — does not enact it."
         ]

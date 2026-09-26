@@ -106,6 +106,12 @@ opens this door.
    apply its actual scope, lifecycle, and later constraints. Green checks
    alone never supply approval. Do not treat a grant to merge as permission
    to arm GitHub auto-merge; that action needs its own explicit decision.
+   Before seeking adoption, explain the terms (PR, green checks, protected
+   branch, auto-merge), why this choice matters, each lawful profile's review
+   time, setup/upkeep and money costs or unknowns, and pros and cons. Give a
+   case-fit recommendation and its reason. Recommend open-PR-and-STOP when
+   no applicable merge grant exists. Silence never selects a new profile;
+   protected-file gate exceptions remain separate decisions.
 7. **Write the reviewer-block exception path.** A failing required check or
    objection requiring an owner/scope decision suspends auto-advance for that
    item: state what blocked and wait for that decision. Ordinary requested
@@ -128,6 +134,8 @@ Phase-advance rule:           <auto-advance only into named+approved phases; exi
 Required prompt pattern:      <the restatement each session must open with>
 Opt-out phrase:               <exact phrase; where it may be said; always wins>
 Merge profile:                open-PR-and-STOP (default) | opt-in: <named profile backed by an applicable human decision>
+Choice brief:                 <plain terms, reason, time/setup/upkeep/money costs or unknowns,
+                              pros/cons, recommendation and why, before adoption>
 Reviewer-block path:          <what suspends the loop; what the loop does when blocked>
 Rationale:                    governance elements are non-optional — cites the ungoverned
                               auto-merge incident (agent-authorization-matrix evals)
@@ -143,6 +151,9 @@ Adoption:                     pending human approval → then recorded via scope
       routine steps" elasticity.
 - [ ] Merge-after-green appears only as an explicit opt-in profile with the
       default being open-PR-and-STOP.
+- [ ] Before adoption, the choice brief explains terms, reasons, review time,
+      setup/upkeep and money costs or unknowns, pros/cons, and the case-fit
+      recommendation with its reason. No new profile is inferred from silence.
 - [ ] The opt-out phrase is defined, exact, and documented as always winning.
 - [ ] The prompt pattern forces per-session restatement of scope + opt-out.
 - [ ] Phase-advance is bounded to already-named-and-approved phases.

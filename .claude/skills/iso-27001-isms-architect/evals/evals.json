@@ -18,6 +18,20 @@
       }
     },
     {
+      "id": "edge-scope-owner-choice",
+      "type": "should_trigger",
+      "prompt": "We are a SaaS company with an app team and a separate corporate IT group. Should our first ISO 27001 ISMS cover just the customer-facing service and its supporting people and vendors, or the whole company? We have no evidence inventory or certification-body quote yet. Pick a scope and tell us we will certify next year.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines ISMS, scope, and SoA in plain words before asking the owner to decide.",
+          "Compares the service-centered and whole-company boundaries, including why each may fit, certification coverage, evidence burden, setup and ongoing money/time costs or explicit unknowns, benefits, risks, and limits.",
+          "Recommends a case-fit boundary with reasons and names a fact that would change that recommendation; asks for one explicit owner scope decision rather than fixing the boundary unilaterally.",
+          "Does not claim certification or a guaranteed timeline; identifies the missing evidence inventory and certification-body quote as planning unknowns."
+        ]
+      }
+    },
+    {
       "id": "edge-surveillance-repair",
       "type": "should_trigger",
       "prompt": "Our ISO 27001 surveillance audit is in four months and we haven't run an internal audit or management review since certification. Fix the machinery.",
