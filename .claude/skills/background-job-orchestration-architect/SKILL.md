@@ -93,11 +93,31 @@ transport belongs to `streaming-event-architect`.
    progress, make each unit idempotent, and record completion so a
    redelivery skips finished work. State the checkpoint granularity.
 4. **Design per-tenant fairness.** One undifferentiated queue lets the
-   largest tenant monopolize workers. Choose a mechanism: per-tenant queues
-   with weighted/round-robin draining, concurrency caps per tenant, or a
-   priority lane for interactive vs bulk work. State how a tenant's flood is
-   bounded so others keep flowing — this is noisy-neighbor defense at the
-   worker layer.
+   largest tenant monopolize workers. Compare these mechanisms in ordinary
+   terms before recommending one; they can be combined:
+   - **Per-tenant queues with weighted or round-robin draining:** keep each
+     tenant's waiting jobs separate and take turns serving them. This isolates
+     queue backlog and makes a flood visible, but requires queue creation,
+     routing, scheduling, cleanup, and monitoring per tenant. Weights can still
+     starve a small tenant unless every active tenant has a minimum share.
+   - **Per-tenant concurrency caps:** limit how many of one tenant's jobs may
+     run at once. This is often the simplest first guard on a shared queue and
+     controls worker and downstream database/API expense. It does not prevent
+     that tenant's waiting jobs from filling a first-in-first-out queue, so
+     pair it with fair dequeueing when queue delay is the problem.
+   - **Priority lanes for interactive and bulk jobs:** reserve prompt service
+     for user-facing work while bulk jobs wait. This protects interactive
+     latency but does not by itself isolate tenants within a lane; an always
+     busy high-priority lane can starve bulk work. Reserve a bulk share or set
+     an aging rule.
+   Recommend from observed tenant skew, job urgency, queue capabilities and
+   downstream limits. Explain the isolation and starvation boundary, direct
+   queue/worker spend (or no new purchase if using the current service), setup
+   and delivery effort, and continuing scheduler/alert upkeep; do not invent
+   prices or claim capacity without measurement. If the user must choose a
+   fairness policy, present the trade-offs and recommendation first, then ask
+   one plain-language question about which jobs must keep moving during a
+   large customer's burst.
 5. **Design scheduling** for recurring jobs: the scheduler, overlap
    prevention (a run must not start if the last is still going, unless
    designed to), missed-run policy (skip / run-once-catch-up / backfill),
@@ -124,8 +144,11 @@ Per-job execution contract:
   <job>: idempotency=<key/guard> retry=<attempts, backoff, retryable-vs-poison>
   visibility-timeout=<bounded runtime + lease, or renewable lease + heartbeat/failure rule> DLQ=<dest, owner, drain SLA, alert>
   resumability=<checkpoint granularity | n/a>
-Fairness:       <per-tenant queues / concurrency caps / priority lanes; how a
-  tenant flood is bounded so others keep flowing>
+Fairness choice: <compared mechanisms; recommended combination and why;
+  queue/worker cost, setup and upkeep; backlog isolation, starvation prevention,
+  remaining limit>
+Owner decision question: <one plain-language question after trade-offs if the
+  owner must choose a fairness policy | none if no choice is needed>
 Scheduling:     <scheduler; overlap prevention; missed-run policy; tz/DST> | n/a
 Worker scaling: <pool sizing; scale-on-backlog; graceful drain → finish-or-redeliver>
   (drain/statelessness review → horizontal-scalability-reviewer)
@@ -147,8 +170,13 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       owner, drain SLA, and fill alert.
 - [ ] Long jobs checkpoint and resume; a crash mid-job does not restart from
       zero or double-apply completed units.
-- [ ] Per-tenant fairness is designed: one tenant's flood is bounded and
-      cannot starve others (not one undifferentiated queue).
+- [ ] Per-tenant fairness compares queue turns, concurrency caps and priority
+      lanes in plain terms, including combinations, isolation, starvation,
+      queue/worker expense, setup/upkeep and a contextual recommendation;
+      one tenant's flood cannot starve others.
+- [ ] If the owner must choose a fairness policy, present trade-offs and a
+      recommendation before one plain-language decision question; otherwise
+      ask none.
 - [ ] Scheduled jobs have overlap prevention, a missed-run policy, and tz/DST
       correctness — and the same idempotency/retry contract as ad-hoc jobs.
 - [ ] Workers drain gracefully: in-flight work finishes or is safely

@@ -26,6 +26,8 @@
         "assertions": [
           "Diagnoses the single undifferentiated queue as the cause and designs per-tenant fairness: per-tenant queues with weighted/round-robin draining, per-tenant concurrency caps, or priority lanes for interactive vs bulk work.",
           "States explicitly how a tenant's flood is bounded so others keep flowing — noisy-neighbor defense at the worker layer.",
+          "Compares tenant queue turns, per-tenant concurrency caps and interactive/bulk priority lanes in plain terms: caps alone do not isolate a shared waiting backlog, priority alone can starve bulk work, and the mechanisms may be combined.",
+          "Recommends a mechanism from the stated tenant burst and job urgency, explaining worker/queue expense, setup and continuing scheduler/alert upkeep without inventing a price; if a user choice remains, asks one plain-language question after those trade-offs.",
           "Adds per-tenant queue-depth as a first-class observability signal with a threshold and owner.",
           "Does not merely add more workers, which scales the starvation rather than removing the unfairness."
         ]
