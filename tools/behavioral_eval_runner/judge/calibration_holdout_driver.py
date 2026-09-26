@@ -233,9 +233,32 @@ def _holdout_summary(
                 if logical in outcomes:
                     raise CalibrationAuthorizationError("duplicate semantic outcome")
                 outcomes[logical] = event["outcome"]
-    counts = {"agreement": 0, "false_pass": 0,
-              "critical_false_pass": 0, "false_fail": 0,
-              "abstain": 0, "judge_error": 0}
+    def empty_counts() -> dict[str, int]:
+        return {"agreement": 0, "false_pass": 0,
+                "critical_false_pass": 0, "false_fail": 0,
+                "abstain": 0, "judge_error": 0}
+
+    def empty_matrix() -> dict[str, dict[str, int]]:
+        return {gold: {observed: 0 for observed in
+                       ("PASS", "FAIL", "ABSTAIN", "JUDGE_ERROR")}
+                for gold in ("PASS", "FAIL")}
+
+    def denominators(group: tuple[Any, ...]) -> dict[str, int]:
+        return {"agreement": len(group),
+                "false_pass": sum(item.candidate_expected_label.value == "FAIL"
+                                  for item in group),
+                "critical_false_pass": sum(
+                    item.candidate_expected_label.value == "FAIL"
+                    and item.risk_class.value == "CRITICAL" for item in group),
+                "false_fail": sum(item.candidate_expected_label.value == "PASS"
+                                  for item in group),
+                "abstain": len(group), "judge_error": len(group)}
+
+    counts = empty_counts()
+    matrix = empty_matrix()
+    adversarial_counts = empty_counts()
+    adversarial_matrix = empty_matrix()
+    adversarial_items = tuple(item for item in items if item.adversarial)
     rows: list[dict[str, str]] = []
     for item in items:
         request_id = calibration_request_id(
@@ -247,20 +270,29 @@ def _holdout_summary(
                 "all 120 holdout outcomes must be terminal before summary"
             )
         gold = item.candidate_expected_label.value
-        if observed == f"VALIDATED_{gold}":
-            counts["agreement"] += 1
-        elif observed == "VALIDATED_PASS":
-            counts["false_pass"] += 1
-            if item.risk_class.value == "CRITICAL":
-                counts["critical_false_pass"] += 1
-        elif observed == "VALIDATED_FAIL":
-            counts["false_fail"] += 1
-        elif observed == "VALIDATED_ABSTAIN":
-            counts["abstain"] += 1
+        if observed in ("VALIDATED_PASS", "VALIDATED_FAIL",
+                        "VALIDATED_ABSTAIN"):
+            observed_label = observed.removeprefix("VALIDATED_")
         elif observed.startswith("JUDGE_ERROR"):
-            counts["judge_error"] += 1
+            observed_label = "JUDGE_ERROR"
         else:
             raise CalibrationAuthorizationError("unknown holdout outcome")
+        matrix[gold][observed_label] += 1
+        if item.adversarial:
+            adversarial_matrix[gold][observed_label] += 1
+        category = (
+            "agreement" if observed_label == gold else
+            "false_pass" if gold == "FAIL" and observed_label == "PASS" else
+            "false_fail" if gold == "PASS" and observed_label == "FAIL" else
+            "abstain" if observed_label == "ABSTAIN" else "judge_error"
+        )
+        counts[category] += 1
+        if item.adversarial:
+            adversarial_counts[category] += 1
+        if category == "false_pass" and item.risk_class.value == "CRITICAL":
+            counts["critical_false_pass"] += 1
+            if item.adversarial:
+                adversarial_counts["critical_false_pass"] += 1
         rows.append({"item_id": item.item_id,
                      "request_id": request_id, "outcome": observed})
     limits = {"agreement": [">=", 114], "false_pass": ["<=", 1],
@@ -273,6 +305,13 @@ def _holdout_summary(
     return {"summary_kind": "wp2b3-sealed-holdout-result-summary",
             "stage": "SEALED_HOLDOUT", "state": "HOLDOUT_COMPLETE",
             "items_total": len(items), "counts": counts,
+            "confusion_matrix": matrix, "denominators": denominators(items),
+            "adversarial_subset": {
+                "items_total": len(adversarial_items),
+                "counts": adversarial_counts,
+                "confusion_matrix": adversarial_matrix,
+                "denominators": denominators(adversarial_items),
+            },
             "pre_registered_thresholds": limits, "thresholds_passed": passed,
             "all_thresholds_passed": all(passed.values()),
             "per_item_outcomes": rows}

@@ -170,6 +170,15 @@ class TestHoldoutDriver(DriverCase):
         self.assertEqual(result["items_total"], 120)
         self.assertEqual(len(result["thresholds_passed"]), 6)
         self.assertTrue(result["all_thresholds_passed"])
+        self.assertEqual(result["confusion_matrix"], {
+            "PASS": {"PASS": 60, "FAIL": 0, "ABSTAIN": 0,
+                     "JUDGE_ERROR": 0},
+            "FAIL": {"PASS": 0, "FAIL": 60, "ABSTAIN": 0,
+                     "JUDGE_ERROR": 0},
+        })
+        self.assertEqual(result["adversarial_subset"]["counts"]["agreement"], 40)
+        self.assertTrue(all(set(row) == {"item_id", "request_id", "outcome"}
+                            for row in result["per_item_outcomes"]))
         self.assertEqual(len(sdk.responses.calls), 120)
         events = ledger._load_verified_chain(canonical_ledger_path(self.verified))
         self.assertEqual(sum(e["event_kind"] == "HOLDOUT_TRANSITION" for e in events), 1)
@@ -210,6 +219,40 @@ class TestHoldoutDriver(DriverCase):
             "agreement": 105, "false_pass": 2, "critical_false_pass": 2,
             "false_fail": 4, "abstain": 7, "judge_error": 2,
         })
+        self.assertEqual(result["confusion_matrix"], {
+            "PASS": {"PASS": 47, "FAIL": 4, "ABSTAIN": 7,
+                     "JUDGE_ERROR": 2},
+            "FAIL": {"PASS": 2, "FAIL": 58, "ABSTAIN": 0,
+                     "JUDGE_ERROR": 0},
+        })
+        self.assertEqual(result["denominators"], {
+            "agreement": 120, "false_pass": 60,
+            "critical_false_pass": 40, "false_fail": 60,
+            "abstain": 120, "judge_error": 120,
+        })
+        subset = result["adversarial_subset"]
+        self.assertEqual(subset["items_total"], 40)
+        self.assertEqual(subset["confusion_matrix"], {
+            "PASS": {"PASS": 15, "FAIL": 2, "ABSTAIN": 2,
+                     "JUDGE_ERROR": 1},
+            "FAIL": {"PASS": 1, "FAIL": 19, "ABSTAIN": 0,
+                     "JUDGE_ERROR": 0},
+        })
+        self.assertEqual(subset["counts"], {
+            "agreement": 34, "false_pass": 1, "critical_false_pass": 1,
+            "false_fail": 2, "abstain": 2, "judge_error": 1,
+        })
+        self.assertEqual(subset["denominators"], {
+            "agreement": 40, "false_pass": 20,
+            "critical_false_pass": 10, "false_fail": 20,
+            "abstain": 40, "judge_error": 40,
+        })
+        self.assertEqual(sum(sum(row.values()) for row in
+                             result["confusion_matrix"].values()),
+                         result["items_total"])
+        self.assertEqual(sum(sum(row.values()) for row in
+                             subset["confusion_matrix"].values()),
+                         subset["items_total"])
         self.assertEqual(set(result["thresholds_passed"].values()), {False})
         self.assertEqual(len(sdk.responses.calls), 120)
         serialized = json.dumps(sdk.responses.calls, default=str)

@@ -21,6 +21,8 @@ from .enums import (
     AggregateBlocker,
     AggregateVerdict,
     AttemptState,
+    PreflightOutcome,
+    PRECHECK_REASON_CODES,
     ReasonCode,
     RiskClass,
 )
@@ -269,11 +271,76 @@ def build_run_report(
     _enforce_honesty(attempts_list, aggregates_list)
     coverage.validate()
 
+    selected = set(selected_case_uids)
+    preflights = list(preflight_results)
+    preflight_by_case: dict[str, PreflightResult] = {}
+    for result in preflights:
+        if result.case_uid in preflight_by_case:
+            raise DishonestReportError(
+                f"duplicate preflight result for {result.case_uid}"
+            )
+        if result.outcome is PreflightOutcome.RUNNABLE:
+            valid = (
+                result.reason_code is None
+                and result.planned_attempt_state is AttemptState.UNRUN
+                and result.aggregate_verdict is None
+                and result.aggregate_blocker is None
+                and not result.findings
+            )
+        elif result.outcome is PreflightOutcome.PRECHECK_EXCLUDED:
+            valid = (
+                any(result.reason_code is reason for reason in PRECHECK_REASON_CODES)
+                and result.planned_attempt_state is AttemptState.UNRUN
+                and result.aggregate_verdict is AggregateVerdict.INCONCLUSIVE
+                and result.aggregate_blocker is AggregateBlocker.PRECHECK_EXCLUDED
+                and bool(result.findings)
+            )
+        elif result.outcome is PreflightOutcome.FIXTURE_SETUP_FAILED:
+            valid = (
+                result.reason_code is ReasonCode.FIXTURE_SETUP_FAILED
+                and result.planned_attempt_state is AttemptState.ERROR
+                and result.aggregate_verdict is None
+                and result.aggregate_blocker is None
+                and bool(result.findings)
+            )
+        else:
+            valid = False
+        if not valid or any(
+            finding.case_uid != result.case_uid
+            or not finding.finding_kind
+            or not finding.owner
+            or not finding.detail
+            for finding in result.findings
+        ):
+            raise DishonestReportError(
+                f"inconsistent preflight result for {result.case_uid}"
+            )
+        preflight_by_case[result.case_uid] = result
+    for attempt in attempts_list:
+        if attempt.attempt_state is AttemptState.UNRUN:
+            continue
+        if attempt.case_uid not in selected:
+            raise DishonestReportError(
+                f"executed attempt for {attempt.case_uid} is outside the run selection"
+            )
+        preflight = preflight_by_case.get(attempt.case_uid)
+        if (
+            attempt.attempt_state is AttemptState.ERROR
+            and attempt.error_reason_code is ReasonCode.FIXTURE_SETUP_FAILED
+            and preflight is not None
+            and preflight.outcome is PreflightOutcome.FIXTURE_SETUP_FAILED
+        ):
+            continue
+        if preflight is None or preflight.outcome is not PreflightOutcome.RUNNABLE:
+            raise DishonestReportError(
+                f"executed attempt for {attempt.case_uid} has no RUNNABLE preflight"
+            )
+
     # A3: derive coverage from the records and reject any caller mismatch.
     recomputed = compute_coverage(
         authored_units_total=coverage.authored_units_total,
-        selected_case_uids=selected_case_uids,
-        preflight_results=preflight_results,
+        selected_case_uids=selected,
+        preflight_results=preflights,
         attempts=attempts_list,
         aggregates=aggregates_list,
         assertions_selected_total=assertions_selected_total,
