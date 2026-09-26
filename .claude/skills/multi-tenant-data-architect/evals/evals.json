@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-dedicated-database-choice",
+      "type": "should_trigger",
+      "prompt": "Our tenant model is settled: the workspace is the tenant. We run 400 workspaces in one pooled Postgres database, and our largest workspace is now 30% of all rows and growing. Their security team asked whether they could have their own database, but no contract or residency clause requires it yet. We have not priced a second database instance or estimated the migration effort. Explain my options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines pooled storage, schema per tenant, and database per tenant in plain language and explains why the choice matters for this product, using the stated 30% row share and the security request that is not yet a contractual or residency requirement.",
+          "Compares staying pooled with enforced tenant scoping, schema per tenant, and a mixed model with a dedicated database for the large workspace, giving each option's reason for fitting this case, isolation benefits and drawbacks (for example, schema per tenant multiplying migrations and making connection routing the control), and money, migration/setup time, and ongoing operations cost, with the unpriced instance and unestimated migration effort marked as unknown rather than invented.",
+          "Recommends one option grounded in the measured volume, the compliance position, and team capacity, and explains why.",
+          "Asks exactly one owner question after the comparison; treats the answer as a design decision only, keeps any migration as a separate scoped task via change-classification-gate, and routes destructive production steps through human-approval-boundary rather than executing or scheduling them."
+        ]
+      }
+    },
+    {
       "id": "negative-leak-audit",
       "type": "should_not_trigger",
       "prompt": "Does our current application leak data between tenants anywhere — API, exports, background jobs?",

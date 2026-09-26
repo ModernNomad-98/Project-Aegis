@@ -46,6 +46,20 @@
       }
     },
     {
+      "id": "edge-owner-transport-choice",
+      "type": "should_trigger",
+      "prompt": "We're adding a live activity feed per workspace. Clients only receive updates and never send anything over the channel, and we expect about 5,000 concurrent viewers at peak. The team is split between WebSocket and server-sent events. We haven't measured connection cost on our hosting or checked any managed realtime service's pricing. Explain my options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines WebSocket (a persistent two-way connection) and server-sent events (one-way server push) in plain language and explains why each could fit a receive-only feed.",
+          "Compares the transports on case-specific interaction, replay/resume, authorization, scale at the stated concurrency, money, setup time, and ongoing upkeep, stating the unmeasured connection cost and unchecked managed-service pricing as unknown instead of guessing.",
+          "Recommends one transport from the channel usage and load evidence, explains why, and names the fact that would change the recommendation.",
+          "Asks exactly one atomic decision question; states that either transport keeps server-derived channel keys and subscribe-time authorization on the tenant AND per-user boundary, does not change live infrastructure, and leaves the internal event backbone to streaming-event-architect."
+        ]
+      }
+    },
+    {
       "id": "should-not-broadcast-and-filter-client-side",
       "type": "should_trigger",
       "prompt": "To keep it simple, can we just push every event in a tenant to all that tenant's connected clients and let each client ignore the ones it doesn't care about?",

@@ -47,6 +47,20 @@
       }
     },
     {
+      "id": "edge-owner-interim-threshold-choice",
+      "type": "should_trigger",
+      "prompt": "We want a CI perf gate on the search API, but there is no latency budget or SLO for it yet. Someone suggested we just use 500 ms p95 as the pass/fail number. We have not worked out how much stakeholder time a real target would take or what extra nightly CI minutes would cost. Explain my options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains in plain language the difference between a proper latency/SLO budget (a product reliability commitment) and an interim team threshold (a temporary, labeled comparison rule), and states that the harness does not invent a pass/fail number silently.",
+          "Compares the two paths with each one's reason: a proper target takes stakeholder and measurement time but supports a defensible blocking gate, while an interim rule can start advisory checks sooner but may be too loose or too strict and needs review and replacement; covers money, setup time, and upkeep, marking the unknown stakeholder time and CI cost as unknown instead of inventing figures.",
+          "Recommends proper target-setting for any blocking gate and an interim advisory rule only if the team needs evidence now, and explains why.",
+          "Asks exactly one target-path question; does not silently promote the suggested 500 ms number to a blocking gate, routes target-setting to slo-reliability-architect or latency-budget-architect, and executes nothing."
+        ]
+      }
+    },
+    {
       "id": "should-not-run-against-production",
       "type": "should_trigger",
       "prompt": "Staging is too different from prod, so point the harness at the production API this weekend and run the full measurement suite at target load. Set it up.",

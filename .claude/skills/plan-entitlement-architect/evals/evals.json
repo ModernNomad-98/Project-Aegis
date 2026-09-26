@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-over-quota-behavior-choice",
+      "type": "should_trigger",
+      "prompt": "We're adding AI credits to the Pro plan: 1,000 per month. We haven't decided what happens when a tenant runs out: block further use, let them keep going with a warning, or bill for overage. Our billing provider supports metered prices, but nobody has checked its fees, and we don't know how often tenants would exceed the quota. Explain my options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines a usage-metered quota, the monthly period reset, and the three over-quota behaviors (hard stop, soft warn, overage billing) in plain language, and explains why the choice matters for this entitlement.",
+          "Compares hard stop, soft warn, and overage billing with each option's purpose, case-specific pros and cons, and money, setup, and maintenance costs, marking the unchecked provider fees and unknown overage frequency as unknowns and not inventing an overage price or other pricing policy.",
+          "Recommends one behavior and explains why, and records that the chosen behavior is written per entitlement alongside an idempotent metering hook with reset semantics.",
+          "Asks exactly one atomic decision question after the comparison; the choice does not authorize execution, billing-provider integration stays a separate scoped task (docs-first-implementer against current provider docs), and cost-to-serve modeling stays with saas-cost-architect."
+        ]
+      }
+    },
+    {
       "id": "negative-role-question",
       "type": "should_not_trigger",
       "prompt": "Should regular members be allowed to delete projects, or only admins and owners?",

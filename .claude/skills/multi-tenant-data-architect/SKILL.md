@@ -105,6 +105,9 @@ a cross-tenant leak.
     needs and team capacity, with a reason. Resolve routine per-store design
     choices from evidence without asking the owner. Treat a choice already
     stated by the owner as settled; explain its implications without re-asking.
+    State why each viable option could fit this case, mark unknown costs as
+    unknown rather than guessing, then ask exactly one owner question; the
+    answer does not authorize migration execution.
 
 ## Output Format
 
@@ -142,8 +145,9 @@ Owner choice brief (only if needed): <terms; why now; options with money,
 - [ ] The isolation test matrix covers every store, not just the primary DB.
 - [ ] No RLS policy SQL authored; enforcement location decided, policy
       authoring deferred to the Phase 4 pack.
-- [ ] Any owner-facing choice explains terms, costs, pros and cons, and a
-      reasoned recommendation before requesting the decision.
+- [ ] Any owner-facing choice explains terms, each option's reason, costs or
+      unknowns, pros and cons, and a reasoned recommendation before one
+      owner question.
 
 ## Tenant Isolation Rules
 
