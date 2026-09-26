@@ -47,6 +47,9 @@ The backlog links below show what remains proposed or blocked.
   host integration, provider connection or dispatch authority.
 - [Issue #101 package-2 scope proposal](roadmaps/aegis-setup-package-2-authorization-proposal.md):
   reviewable Aegis-only conversation and saved-state implementation boundary.
+- [Feature-flag system skill proposal](roadmaps/feature-flag-architect-skill-proposal.md):
+  accepted scope for the new `feature-flag-architect` skill, its boundary with
+  the existing rollout strategist, and a provisional estimate.
 - [Documentation readability backlog](roadmaps/aegis-documentation-readability-backlog.md):
   the plan to explain each component in plain language, define project shorthand,
   and review all repository documentation for human and agent readers.

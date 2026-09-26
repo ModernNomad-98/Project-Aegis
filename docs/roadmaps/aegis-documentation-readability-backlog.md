@@ -51,6 +51,17 @@ and this ledger's placement. Acceptance changes no grant, gate or host
 status. The tree remains **605 Markdown files: 561 accepted reader pages and
 44 classified synthetic fixtures**, with zero known pending pages.
 
+The 2026-09-26 feature-flag skill follow-up adds one reader page, the
+[feature-flag system skill proposal](feature-flag-architect-skill-proposal.md),
+to the 605-page #370 tree (`eadf1fd`). It records the owner-accepted scope for
+a new `feature-flag-architect` skill and a provisional 2.75–5.5 active-hour
+estimate; it builds no skill and grants no authority beyond the standing
+delivery approvals. No independent full-page review has been recorded yet, so
+the page is **pending**; the named follow-up is one independent full-page
+review against [Acceptance for each page](#acceptance-for-each-page). The
+candidate tree has **606 tracked Markdown files: 561 accepted reader pages, 44
+classified synthetic fixtures and one known pending page**.
+
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
 the [Behavioral Eval Runner (BER) selected-precheck aggregate decision page](ber-precheck-aggregate-validation-proposal.md)
@@ -428,6 +439,7 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Feature-flag skill scope proposal after merged #370, 2026-09-26 | [Feature-flag system skill proposal](feature-flag-architect-skill-proposal.md) and this ledger | One new reader page recording the owner-accepted scope for `feature-flag-architect`: one skill rather than two, name, draft descriptions, workflow, hand-offs, auto-invocable posture, owner choice, trigger-eval seams, a separate orchestrator PR, a provisional 2.75–5.5 active-hour estimate and the review path. First-use terms are defined and local links resolve. No full-page acceptance is recorded, so it is **pending**; the named follow-up is one independent full-page review. The #370 tree had 605 pages; this candidate has 606: 561 accepted readers, 44 classified fixtures and one known pending. No skill is built and no grant is added. |
 | Full-page review of skill-contract disposition record, after #360, 2026-09-26 | [Candidate dispositions](../evidence/skill-contract-dispositions-2026-09-26/candidate-dispositions.md) and this ledger | A first independent full-page review returned FIX-FIRST; its minimal edits added the audience, a linked audit engine, first-use definitions for semantic candidate, fingerprint, EVAL-002, STATE-001, P0, architecture decision record (ADR) and continuous integration (CI), corrected the adr-sequencer prior disposition to confirmed-fixed, and linked skill-quality-reviewer check 7. A separate independent corrected-candidate review accepted the page against every acceptance criterion; no disposition changed: five false positives, four drift-same, zero defects, no skill text changed. Links and anchors resolve. The tree has 605 pages: 561 accepted readers, 44 classified fixtures and zero known pending. |
 | Full-page review of page merged in PR #335, after #354, 2026-09-26 | [Stage 4B synthetic case fixture draft](aegis-setup-package-4b-synthetic-case-fixtures.md) and this ledger | A first independent full-page review returned FIX-FIRST; its nine minimal edits added the audience and Stage 4B/4A purpose, first-use expansions for SDK, VM and CLI, glosses for `canUseTool` and `UserPromptExpansion`, register links for APR-031 and APR-040, and the F0n-to-case-0n mapping. A separate independent corrected-candidate review accepted the page against every acceptance criterion; no claim changed: all eight cases remain NOT RUN, nothing is host proof, and no grant, fixture or host statement was altered. Links and anchors resolve. The tree stays at 604 pages: 560 accepted readers, 44 classified fixtures and zero known pending. |
 | Ledger gap for page merged in PR #335, found after #347, 2026-09-26 | [Stage 4B synthetic case fixture draft](aegis-setup-package-4b-synthetic-case-fixtures.md) and this ledger | One reader page, not a synthetic fixture: an offline planning draft whose eight cases are all NOT RUN and which is not host proof. No full-page acceptance is recorded, so it is **pending**; the named follow-up is one independent full-page review. The #333 tree had 603 pages; the #347 tree has 604: 559 accepted readers, 44 fixtures and one known pending. |
