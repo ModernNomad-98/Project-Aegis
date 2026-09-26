@@ -79,9 +79,10 @@ documenting impact already delivered.
    fits (leverage × fit × org need), its pros and cons, and its cost in
    time and attention, alignment setup (manager or owner conversations),
    ongoing upkeep, and any budget or headcount it needs, or unknown.
-   If level, strengths, or org priorities are missing, ask one atomic
-   discovery question first; otherwise recommend one, say why and what fact
-   would change it, then ask exactly one atomic decision question. Once the
+   If level, strengths, or org priorities are missing, ask only for one
+   missing fact per turn, one atomic discovery question at a time, until all
+   three are known; only then recommend one, say why and what fact would
+   change it, then ask exactly one atomic decision question. Once the
    person chooses, state WHY and what they're NOT doing, so the focus is
    real. A staff engineer who owns everything owns nothing. The answer is
    their preference; it claims no one else's owned area without alignment
@@ -93,8 +94,10 @@ documenting impact already delivered.
 7. **Deliver** the scope selection in the Output Format: the options and
    recommendation with the one question (or only the discovery question
    when a decisive fact is missing). An answer to a discovery question
-   supplies a fact, not the decision: the next turn presents the options
-   and recommendation and asks the decision question. Only the answer to
+   supplies a fact, not the decision: while any of level, strengths, or org
+   priorities is still missing, the next turn asks only for the next missing
+   fact; once all three are known, the next turn presents the options and
+   recommendation and asks the decision question. Only the answer to
    that decision question fixes the chosen scope, the rationale, the
    leverage type, the fit, and the explicit non-scope (until then, mark
    these as a provisional draft for the recommended candidate).
@@ -131,6 +134,8 @@ Boundaries:      rank backlog → prioritization-frame-picker; team roadmap →
       strengths.
 - [ ] It's screened against the traps (only-fun, only-firefighting,
       too-narrow, invisible-glue, over-reach).
+- [ ] Discovery asks one missing fact per turn until level, strengths, and
+      org priorities are all known; no recommendation is made before then.
 - [ ] The person makes the choice: terms defined; each option's why,
       pros/cons and cost-or-unknown; a recommendation plus what would
       change it; one question; the answer grants no authority. The chosen

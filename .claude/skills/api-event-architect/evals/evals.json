@@ -66,6 +66,19 @@
           "Frames the answer as standing policy inside the announce, dual-run, sunset header/warnings, enforce sequence, leaves planning each later sunset to sunset-deprecation-communicator, and states that the answer does not by itself authorize a breaking change."
         ]
       }
+    },
+    {
+      "id": "edge-owner-support-window-missing-cadence",
+      "type": "should_trigger",
+      "prompt": "We're writing our first public API versioning and deprecation policy before onboarding partners; no version is being retired yet. We expect about 30 partners in year one, mostly small agencies with slow release cycles plus two large ERP vendors. Help me choose the support window and minimum notice.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Recognizes that the release cadence (how often a new major version ships) is not stated and that the support-window recommendation depends on it.",
+          "Asks exactly one question this turn, for the release cadence only, and does not ask for facts the prompt already gives.",
+          "Makes no support-window or minimum-notice recommendation and asks no owner decision question this turn, and does not assume or invent a cadence."
+        ]
+      }
     }
   ]
 }

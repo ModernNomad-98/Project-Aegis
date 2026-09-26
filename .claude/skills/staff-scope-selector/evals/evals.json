@@ -12,7 +12,7 @@
         "assertions": [
           "Defines leverage relative to the staff level (multiplies others / sets direction), not more individual output.",
           "Surfaces important UNDER-OWNED problems as the kind of candidate to look for (the gap between teams, the decision nobody is making), not just assigned work.",
-          "Because the prompt gives no strengths or org problems, asks one atomic discovery question for the missing fact before recommending (any candidate it sketches is matched to a leverage archetype and marked provisional), and states that the NOT-doing list follows the person's choice.",
+          "Because the prompt gives no strengths or org problems, asks one atomic discovery question for one of the missing facts before recommending (any candidate it sketches is matched to a leverage archetype and marked provisional), and states that the NOT-doing list follows the person's choice.",
           "Names the traps the eventual scope must pass (only-fun, only-firefighting, too-narrow, invisible glue, over-reach).",
           "Names visibility/attribution as a requirement for the eventual scope and hands past-impact documentation to promotion-packet-writer."
         ]

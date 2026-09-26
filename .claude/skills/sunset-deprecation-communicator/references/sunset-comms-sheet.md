@@ -57,9 +57,11 @@ applies them to a specific sunset.
 - Tombstone: an explanatory error/redirect ("this was retired on X; use
   Y") — never a silent 404 or generic 500. Exception: accounts on the
   named grandfathering/extended-support allowlist keep the old surface
-  until their stated term ends; the public sunset date does not move.
+  until their stated expiry, then get the same tombstone; the public
+  sunset date does not move.
 - Monitor stragglers still calling the dead surface; consider one more
-  targeted nudge before hard removal.
+  targeted nudge before hard removal, which waits for the last allowlisted
+  expiry.
 - Keep the migration docs live past the sunset for latecomers.
 
 ## Boundaries (repeat)

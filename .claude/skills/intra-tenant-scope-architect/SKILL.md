@@ -161,6 +161,11 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - [ ] Propagation reaches the edge/gateway layer too, not just the app layer.
 - [ ] The migration is expand → backfill → shadow → verify → enforce, with
       rollback conditions and no-return gates per stage; designed, not executed.
+- [ ] Any owner role choice, whichever option is chosen, defines
+      scope-restricted and tenant-wide; gives each option's why, pros/cons,
+      and setup/upkeep/money cost or unknown; a least-exposure recommendation
+      plus what would change it; one owner question; the answer grants no
+      access.
 - [ ] Any aggregate-only read is served from a named, audited path bounded
       by tenant_id with a minimum group size, never by loosening the
       predicate.

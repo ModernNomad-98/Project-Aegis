@@ -114,12 +114,14 @@ COMMUNICATION and MIGRATION for external users. It is deliberately not
    customer outreach or live header changes, any new contractual or paid
    extended-support term needs the commercial owner's approval, and a
    contractual commitment still follows Stop Conditions.
-7. **Design the post-sunset behavior.** The removal, and a clear
-   tombstone — an explanatory error/redirect pointing to the replacement,
-   never a silent 404 — plus monitoring for stragglers still calling the
-   dead surface. Exception: accounts on the named grandfathering or
-   extended-support allowlist (step 6) keep the old surface until their
-   stated term ends; the public sunset date does not move.
+7. **Design the post-sunset behavior.** For all non-exempt traffic, the
+   removal and a clear tombstone — an explanatory error/redirect pointing
+   to the replacement, never a silent 404 — plus monitoring for stragglers
+   still calling the dead surface. When an exception is chosen, accounts on
+   the named grandfathering or extended-support allowlist (step 6) keep the
+   old surface until their stated expiry, then get the same tombstone; hard
+   removal of the old surface waits for the last expiry, and the public
+   sunset date does not move.
 8. **Name boundaries and deliver.** Standing policy/versioning →
    `api-event-architect`; the notification delivery system →
    `notification-webhook-ux-designer`; a LIBRARY skill's retirement →
@@ -141,11 +143,14 @@ Timeline:      announce <date> → deprecation window <len> → SUNSET <firm dat
 Comms plan:    channels × schedule (announcement, in-app, docs, escalating email,
                targeted outreach; API: Deprecation/Sunset headers + changelog)
 Message content: what / why / when / what-to-do / where-to-get-help
-Grandfathering: exceptions, extended support, escalation path
+Grandfathering: exceptions, extended support, escalation path; if an exception is
+               chosen: allowlist = <named account → expiry date>, each term stated
 Exception choice: plain terms; none / time-boxed extension / extended-support tier — why,
                pros/cons, money/setup/upkeep or unknown; recommendation + what would
                change it; ONE owner question; authorizes no outreach
-Post-sunset:   tombstone (explanatory error/redirect → replacement, NOT silent 404);
+Post-sunset:   non-allowlisted traffic → tombstone (explanatory error/redirect →
+               replacement, NOT silent 404); allowlisted accounts keep the old surface
+               until their expiry, then tombstone; hard removal after the last expiry;
                straggler monitoring
 Boundaries:    policy/versioning → api-event-architect; delivery system →
                notification-webhook-ux-designer; SKILL retirement → skill-deprecation-planner
@@ -169,6 +174,9 @@ Boundaries:    policy/versioning → api-event-architect; delivery system →
       it; one owner question; the answer grants no authority.
 - [ ] Post-sunset leaves an explanatory tombstone, not a silent 404, and
       monitors stragglers.
+- [ ] When an exception is chosen, the plan names each allowlisted account
+      and its expiry, and post-sunset routing keeps those accounts on the
+      old surface until then, tombstoning only non-exempt traffic.
 - [ ] Standing policy, the delivery system, and library-skill retirement
       are handed to their owning skills.
 
