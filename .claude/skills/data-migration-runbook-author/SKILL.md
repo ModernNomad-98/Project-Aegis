@@ -215,9 +215,16 @@ Execution posture: THIS DOCUMENT EXECUTES NOTHING — every step is operator-run
   `schema-evolution-planner`; verification cannot be invented at the
   runbook layer.
 - Restore time exceeds the tolerable outage for the worst-case abort
-  (backup exists but is operationally useless at this size) → halt and
-  surface: the move's risk envelope is a human decision that must be
-  made with that fact on the table.
+  (backup exists but cannot restore service within the approved outage) →
+  halt. Before asking the owner, explain "restore time" (measured time to
+  recover service from backup) and "tolerable outage" (approved maximum
+  service interruption), cite both values and their evidence, and explain
+  why this gap matters. Compare viable choices: defer the move and redesign
+  or rehearse a faster recovery path; or request a longer maintenance window
+  only if the business can tolerate it. For each, state money cost, setup
+  time, ongoing upkeep cost (or what is unknown), benefit, risk, and
+  limitation. Recommend the safest
+  viable path and why; keep execution stopped until the owner decides.
 - Asked to fold the runbook's approval gates into "auto-proceed if
   checks pass" for an agent to run end-to-end → refuse; destructive
   data-move steps stay human-gated per `human-approval-boundary` and
