@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-journey-tier-choice",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. The test plan hands over 14 candidate browser journeys. Our pull-request budget for E2E is 10 minutes, and running all 14 was estimated at about 25 minutes. We haven't checked what extra CI runner minutes would cost. Before you write any specs, explain whether to run everything on each pull request or split a critical smoke tier from a nightly tier, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains a critical-journey smoke tier (few full-browser paths on each pull request) and a broader nightly tier (more paths off the pull-request gate) in plain language, and requires each journey to name the risk that makes E2E necessary.",
+          "Compares the options with each one's reason and pros and cons: the smoke tier gives fast deployment evidence but misses lower-priority paths, while nightly adds coverage at the cost of runner minutes, fixture upkeep, and later feedback; uses the 25-minute estimate against the 10-minute budget and marks runner-minute cost and other unknown money, setup, or upkeep as unknown.",
+          "Recommends the critical paths within the pull-request budget with the remainder nightly, and explains which named risks justify E2E for the smoke set.",
+          "Asks exactly one scope/budget question before writing specs; states that the answer does not expand this manual-only invocation or authorize new product test hooks, and routes breadth coverage to clickthrough-test-engineer or component layers rather than growing the suite."
+        ]
+      }
+    },
+    {
       "id": "negative-no-browser-needed",
       "type": "should_not_trigger",
       "prompt": "Test that the invoicing service persists correct rows and enforces permissions when called directly.",

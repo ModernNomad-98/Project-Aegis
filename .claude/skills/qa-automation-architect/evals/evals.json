@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-owner-ci-runner-capacity-choice",
+      "type": "should_trigger",
+      "prompt": "Our integration and E2E suites take 50 minutes on standard hosted CI runners, far over our 15-minute PR budget. Three ideas are on the table: pay for larger hosted runners, run self-hosted runners in our own cloud account, or shard the suites across more standard runners. None of them has been priced. Explain my options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the unfamiliar terms (hosted runner, self-hosted runner, sharding, runtime budget) in plain language and explains why each viable option could fit this 50-minute versus 15-minute gap.",
+          "Compares the options on case-specific runtime, migration effort, money, setup time, and ongoing upkeep, with benefits and limits for each, stating the unpriced costs as unknown instead of guessing.",
+          "Recommends one option from the existing stack and named deficiencies, explains why it fits, and names the fact that would change the recommendation.",
+          "Asks exactly one atomic decision question after the comparison; does not provision runners or buy tooling, presenting that spend through human-approval-boundary, and does not execute the migration in the same pass."
+        ]
+      }
+    },
+    {
       "id": "negative-what-to-test",
       "type": "should_not_trigger",
       "prompt": "What should we test in the new subscription flow before launch?",
