@@ -26,7 +26,7 @@
     },
     {
       "id": "build-correctness-goes-to-vite-build-qa-engineer",
-      "prompt": "After our chunk-splitting change, the staging build 404s on a lazy chunk and an env-specific import breaks. Verify and fix the build pipeline behavior.",
+      "prompt": "Explicitly invoke vite-build-qa-engineer. After our chunk-splitting change, the staging build 404s on a lazy chunk and an env-specific import breaks. Verify and fix the build pipeline behavior.",
       "expected_skill": "vite-build-qa-engineer",
       "should_not_trigger": ["frontend-perf-engineer"],
       "reason": "Broken chunks and env-specific build failures are build CORRECTNESS QA — vite-build-qa-engineer's scope. The perf engineer reshapes the bundle for speed and composes that skill to keep the reshaped build verified."

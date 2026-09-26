@@ -12,7 +12,7 @@
     },
     {
       "id": "live-session-goes-to-clickthrough",
-      "prompt": "Walk through the billing pages on the current build and report defects with screenshots today.",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Walk through the billing pages on the current build and report defects with screenshots today.",
       "expected_skill": "clickthrough-test-engineer",
       "should_not_trigger": ["manual-test-case-creator"],
       "reason": "Driving the app now and reporting is a clickthrough session, not document authoring."

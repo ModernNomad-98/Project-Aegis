@@ -41,7 +41,7 @@
     },
     {
       "id": "trace-wiring-goes-to-observability-operator",
-      "prompt": "Instrument the request path with spans on every hop and build the dashboard that shows where checkout time goes in production.",
+      "prompt": "Explicitly invoke observability-operator. Instrument the request path with spans on every hop and build the dashboard that shows where checkout time goes in production.",
       "expected_skill": "observability-operator",
       "should_not_trigger": [
         "latency-budget-architect"

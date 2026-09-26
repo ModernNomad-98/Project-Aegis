@@ -5,14 +5,14 @@
   "cases": [
     {
       "id": "goal-plan-integrity-wins-here",
-      "prompt": "Our multi-step agent keeps getting re-tasked by content it encounters mid-run — design the controls that keep its objective fixed to what the user actually asked.",
+      "prompt": "Explicitly invoke agent-goal-hijack-defender. Our multi-step agent keeps getting re-tasked by content it encounters mid-run — design the controls that keep its objective fixed to what the user actually asked.",
       "expected_skill": "agent-goal-hijack-defender",
       "should_not_trigger": ["prompt-injection-defender", "agent-containment-reviewer"],
       "reason": "Keeping the run's objective pinned against mid-run content is ASI01 goal/plan integrity; prompt-injection-defender owns the context-layer vector, and containment owns drift without an attacker."
     },
     {
       "id": "injection-vector-goes-to-defender",
-      "prompt": "Set up trust zones and deterministic action authorization so instructions hidden in documents can't drive our LLM's behavior.",
+      "prompt": "Explicitly invoke prompt-injection-defender. Set up trust zones and deterministic action authorization so instructions hidden in documents can't drive our LLM's behavior.",
       "expected_skill": "prompt-injection-defender",
       "should_not_trigger": ["agent-goal-hijack-defender"],
       "reason": "Trust zones, content/instruction separation, and the deterministic action boundary are LLM01 defense-in-depth; this skill composes that layer and adds goal pinning above it only for multi-step agents."

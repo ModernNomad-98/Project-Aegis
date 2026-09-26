@@ -26,7 +26,7 @@
     },
     {
       "id": "apply-fixes-goes-to-simplifier",
-      "prompt": "Per the analysis, start with the easy one: flatten the nested dispatch in sync/router.ts without changing behavior.",
+      "prompt": "Explicitly invoke code-simplifier. Per the analysis, start with the easy one: flatten the nested dispatch in sync/router.ts without changing behavior.",
       "expected_skill": "code-simplifier",
       "should_not_trigger": ["principal-code-analyst"],
       "reason": "Applying a named behavior-preserving cleanup is the simplifier's side-effecting job; analysis is complete."

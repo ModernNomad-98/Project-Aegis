@@ -41,7 +41,7 @@
     },
     {
       "id": "pipeline-goes-to-ci-pipeline-architect",
-      "prompt": "Design our whole CI pipeline — the stage graph from lint through deploy, merge-blocking semantics, secret governance, and rollback primitives.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Design our whole CI pipeline — the stage graph from lint through deploy, merge-blocking semantics, secret governance, and rollback primitives.",
       "expected_skill": "ci-pipeline-architect",
       "should_not_trigger": ["sast-orchestration-designer"],
       "reason": "Designing the delivery pipeline is ci-pipeline-architect. sast-orchestration-designer produces the SAST stage's contract (placement, merge-blocking, fail-closed rule) that plugs into that pipeline; it does not design the pipeline."

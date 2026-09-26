@@ -10,7 +10,7 @@
   "cases": [
     {
       "id": "build-artifact-qa-wins-here",
-      "prompt": "Run the production build, check the bundle for exposed env values, and make sure the preview build serves deep links correctly.",
+      "prompt": "Explicitly invoke vite-build-qa-engineer. Run the production build, check the bundle for exposed env values, and make sure the preview build serves deep links correctly.",
       "expected_skill": "vite-build-qa-engineer",
       "should_not_trigger": [
         "vitest-unit-component-engineer",
@@ -20,7 +20,7 @@
     },
     {
       "id": "remediation-goes-to-hardener",
-      "prompt": "That database URL is confirmed in the shipped JS — get it out of the client, rotate the credentials, and fix the env layout.",
+      "prompt": "Explicitly invoke secrets-identity-hardener. That database URL is confirmed in the shipped JS — get it out of the client, rotate the credentials, and fix the env layout.",
       "expected_skill": "secrets-identity-hardener",
       "should_not_trigger": [
         "vite-build-qa-engineer"
@@ -29,7 +29,7 @@
     },
     {
       "id": "component-tests-go-to-vitest",
-      "prompt": "Write tests for the settings form validation logic.",
+      "prompt": "Explicitly invoke vitest-unit-component-engineer. Write tests for the settings form validation logic.",
       "expected_skill": "vitest-unit-component-engineer",
       "should_not_trigger": [
         "vite-build-qa-engineer"

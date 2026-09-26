@@ -12,14 +12,14 @@
     },
     {
       "id": "build-the-control-goes-to-implementer",
-      "prompt": "We already decided we need input validation and output encoding on the comment field — go implement it.",
+      "prompt": "Explicitly invoke appsec-implementer. We already decided we need input validation and output encoding on the comment field — go implement it.",
       "expected_skill": "appsec-implementer",
       "should_not_trigger": ["threat-modeler"],
       "reason": "The decision is made; this is implementing a specific control, which is a side-effecting build task."
     },
     {
       "id": "secrets-rotation-goes-to-hardener",
-      "prompt": "Our API keys are hardcoded and never rotate — fix where secrets live and how they load.",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Our API keys are hardcoded and never rotate — fix where secrets live and how they load.",
       "expected_skill": "secrets-identity-hardener",
       "should_not_trigger": ["threat-modeler"],
       "reason": "Concrete secrets/identity hardening work, not a threat enumeration."

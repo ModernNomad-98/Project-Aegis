@@ -5,7 +5,7 @@
   "cases": [
     {
       "id": "eval-harness-wins-here",
-      "prompt": "Create a golden dataset and graders to measure our chatbot's quality, safety, and hallucination rate, and block regressions on model upgrades.",
+      "prompt": "Explicitly invoke ai-evaluation-harness. Create a golden dataset and graders to measure our chatbot's quality, safety, and hallucination rate, and block regressions on model upgrades.",
       "expected_skill": "ai-evaluation-harness",
       "should_not_trigger": ["regression-suite-curator", "qa-automation-architect"],
       "reason": "Evaluating model behavior across quality/safety dimensions with a dataset and graders is this skill; the QA skills curate and structure CODE tests, not model-output evals."
@@ -26,7 +26,7 @@
     },
     {
       "id": "live-monitoring-goes-to-observability-operator",
-      "prompt": "Instrument our production AI endpoint with alerts on error rate, latency, and cost spikes.",
+      "prompt": "Explicitly invoke observability-operator. Instrument our production AI endpoint with alerts on error rate, latency, and cost spikes.",
       "expected_skill": "observability-operator",
       "should_not_trigger": ["ai-evaluation-harness"],
       "reason": "Live production instrumentation and alerting is observability-operator; this skill evaluates behavior pre-merge against a dataset, not live traffic."

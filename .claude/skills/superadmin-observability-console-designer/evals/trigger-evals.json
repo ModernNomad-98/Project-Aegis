@@ -38,7 +38,7 @@
     },
     {
       "id": "wiring-dashboards-goes-to-observability-operator",
-      "prompt": "Instrument our checkout service and wire up dashboards and alert rules in our observability backend so the on-call can see error rates and latency.",
+      "prompt": "Explicitly invoke observability-operator. Instrument our checkout service and wire up dashboards and alert rules in our observability backend so the on-call can see error rates and latency.",
       "expected_skill": "observability-operator",
       "should_not_trigger": ["superadmin-observability-console-designer"],
       "note": "DESIGN-vs-OPERATE SEAM — instrumenting services and creating/editing dashboards and alert rules in a Grafana-class backend is stack OPERATION (manual-only). No in-product cross-tenant console is being designed.",

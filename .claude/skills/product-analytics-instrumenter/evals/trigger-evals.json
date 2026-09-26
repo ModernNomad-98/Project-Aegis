@@ -17,7 +17,7 @@
     },
     {
       "id": "system-telemetry-goes-to-observability-operator",
-      "prompt": "Instrument our services with structured logs, metrics, and traces; wire health checks; and set up alerts and dashboards for on-call engineers.",
+      "prompt": "Explicitly invoke observability-operator. Instrument our services with structured logs, metrics, and traces; wire health checks; and set up alerts and dashboards for on-call engineers.",
       "expected_skill": "observability-operator",
       "should_not_trigger": ["product-analytics-instrumenter", "skill-usage-instrumenter"],
       "note": "SEAM CASE (three-way) — logs/metrics/traces, health checks, and alert/dashboard config are engineer-facing SYSTEM telemetry for operating the stack.",

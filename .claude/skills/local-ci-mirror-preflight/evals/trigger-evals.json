@@ -48,7 +48,7 @@
     },
     {
       "id": "pipeline-changes-go-to-ci-pipeline-architect",
-      "prompt": "Add a security-scan stage to CI and make it a merge-blocking required check.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Add a security-scan stage to CI and make it a merge-blocking required check.",
       "expected_skill": "ci-pipeline-architect",
       "should_not_trigger": [
         "local-ci-mirror-preflight"

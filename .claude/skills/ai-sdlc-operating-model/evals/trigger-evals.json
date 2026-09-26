@@ -12,7 +12,7 @@
     },
     {
       "id": "merge-permission-goes-to-matrix",
-      "prompt": "Decide whether the agent is allowed to merge its own PRs to main once CI is green.",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Decide whether the agent is allowed to merge its own PRs to main once CI is green.",
       "expected_skill": "agent-authorization-matrix",
       "should_not_trigger": ["ai-sdlc-operating-model"],
       "reason": "A standing authority decision for one action class is the matrix's cell, not a lifecycle redesign."
@@ -26,7 +26,7 @@
     },
     {
       "id": "memory-rules-go-to-memory-governance",
-      "prompt": "Set the rules for what our agents may write into persistent project memory and when they must verify it.",
+      "prompt": "Explicitly invoke agent-memory-governance. Set the rules for what our agents may write into persistent project memory and when they must verify it.",
       "expected_skill": "agent-memory-governance",
       "should_not_trigger": ["ai-sdlc-operating-model"],
       "reason": "Memory write/trust/hygiene rules are memory-governance's deliverable; the model only cites them in its learning loop."

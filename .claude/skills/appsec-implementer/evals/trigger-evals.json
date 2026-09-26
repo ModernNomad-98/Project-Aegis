@@ -5,7 +5,7 @@
   "cases": [
     {
       "id": "build-decided-control-here",
-      "prompt": "We agreed the profile endpoint needs an ownership check — add the authorization check and a test proving a wrong-tenant user gets 404.",
+      "prompt": "Explicitly invoke appsec-implementer. We agreed the profile endpoint needs an ownership check — add the authorization check and a test proving a wrong-tenant user gets 404.",
       "expected_skill": "appsec-implementer",
       "should_not_trigger": ["threat-modeler", "security-pr-reviewer"],
       "reason": "A single, already-decided control is being implemented test-first — a side-effecting build task."
@@ -19,7 +19,7 @@
     },
     {
       "id": "secrets-hardening-goes-to-hardener",
-      "prompt": "Move all our hardcoded credentials into a secret manager and set up rotation.",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Move all our hardcoded credentials into a secret manager and set up rotation.",
       "expected_skill": "secrets-identity-hardener",
       "should_not_trigger": ["appsec-implementer"],
       "reason": "Broad secrets/identity hardening across the app, not a single app-layer control."

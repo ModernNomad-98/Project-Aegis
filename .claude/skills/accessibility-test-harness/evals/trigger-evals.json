@@ -12,7 +12,7 @@
     },
     {
       "id": "general-walkthrough-goes-to-clickthrough",
-      "prompt": "Do a full pass over the app clicking every screen and form to find what's broken.",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Do a full pass over the app clicking every screen and form to find what's broken.",
       "expected_skill": "clickthrough-test-engineer",
       "should_not_trigger": ["accessibility-test-harness"],
       "reason": "General breakage hunting across the UI is a clickthrough session; no a11y-specific lens was requested."
@@ -26,7 +26,7 @@
     },
     {
       "id": "journey-automation-goes-to-playwright",
-      "prompt": "Automate the checkout journey in the browser as a regression test.",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Automate the checkout journey in the browser as a regression test.",
       "expected_skill": "playwright-e2e-engineer",
       "should_not_trigger": ["accessibility-test-harness"],
       "reason": "Journey automation is E2E engineering; the harness only injects a11y assertions into that layer by design handoff."

@@ -24,7 +24,7 @@
     },
     {
       "id": "product-feature-evals-go-to-evaluation-harness",
-      "prompt": "We're shipping an LLM-powered summarizer — build the eval plan: golden sets, red-team prompts, quality scoring, and regression runs on prompt changes.",
+      "prompt": "Explicitly invoke ai-evaluation-harness. We're shipping an LLM-powered summarizer — build the eval plan: golden sets, red-team prompts, quality scoring, and regression runs on prompt changes.",
       "expected_skill": "ai-evaluation-harness",
       "should_not_trigger": ["eval-runner-designer"],
       "reason": "Evaluating an AI FEATURE's behavior (quality, safety, regression of a product capability) is ai-evaluation-harness. eval-runner-designer's subject is the skill library's own trigger/behavior evals and their missing runner — not product model behavior."

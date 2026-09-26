@@ -11,7 +11,7 @@
   "cases": [
     {
       "id": "governed-fatigue-layer-wins-here",
-      "prompt": "Stop making me approve every mechanical push and PR inside phases I already approved — set up a documented standing approval with an opt-out and a rule for advancing to the next approved phase.",
+      "prompt": "Explicitly invoke standing-approval-and-auto-advance. Stop making me approve every mechanical push and PR inside phases I already approved — set up a documented standing approval with an opt-out and a rule for advancing to the next approved phase.",
       "expected_skill": "standing-approval-and-auto-advance",
       "should_not_trigger": ["scoped-approval-register", "human-approval-boundary", "agent-authorization-matrix"],
       "reason": "Designing the recurring standing-approval policy (named loop scope, opt-out phrase, phase-advance, reviewer-block) is this skill; it is not one grant to record, not a halt at a boundary, and not the authority-floor matrix itself."
@@ -25,7 +25,7 @@
     },
     {
       "id": "authority-floors-go-to-matrix",
-      "prompt": "Define what the agent may ever do autonomously in this repo versus what always needs a named human — the deny-by-default action matrix.",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Define what the agent may ever do autonomously in this repo versus what always needs a named human — the deny-by-default action matrix.",
       "expected_skill": "agent-authorization-matrix",
       "should_not_trigger": ["standing-approval-and-auto-advance"],
       "reason": "The standing authority floors are the matrix; standing-approval-and-auto-advance operates strictly inside the matrix's agent-allowed region and presumes it exists."

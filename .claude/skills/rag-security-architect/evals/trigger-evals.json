@@ -48,7 +48,7 @@
     },
     {
       "id": "injection-in-context-goes-to-injection-defender",
-      "prompt": "Stop retrieved documents from injecting instructions into our agent once they're in the prompt.",
+      "prompt": "Explicitly invoke prompt-injection-defender. Stop retrieved documents from injecting instructions into our agent once they're in the prompt.",
       "expected_skill": "prompt-injection-defender",
       "should_not_trigger": [
         "rag-security-architect"

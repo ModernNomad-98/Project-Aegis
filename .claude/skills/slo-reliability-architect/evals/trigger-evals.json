@@ -12,7 +12,7 @@
     },
     {
       "id": "wiring-goes-to-operator",
-      "prompt": "Implement the alert rules from the reliability doc and verify the SLI queries return data.",
+      "prompt": "Explicitly invoke observability-operator. Implement the alert rules from the reliability doc and verify the SLI queries return data.",
       "expected_skill": "observability-operator",
       "should_not_trigger": ["slo-reliability-architect"],
       "reason": "Implementing rules and executing verification queries is the operator's manual-only work; the design already exists."

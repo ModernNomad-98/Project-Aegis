@@ -54,7 +54,7 @@
     },
     {
       "id": "codify-authority-goes-to-authorization-matrix",
-      "prompt": "After last week's auto-merge incident, write the standing rule: agents may open PRs, but arming auto-merge and merging to main always require a named human decision.",
+      "prompt": "Explicitly invoke agent-authorization-matrix. After last week's auto-merge incident, write the standing rule: agents may open PRs, but arming auto-merge and merging to main always require a named human decision.",
       "expected_skill": "agent-authorization-matrix",
       "should_not_trigger": ["agent-governance-audit"],
       "reason": "Codifying who holds merge/deploy authority going forward is the authorization matrix; the audit only establishes what happened and feeds that rule."

@@ -26,7 +26,7 @@
     },
     {
       "id": "audit-finding-cleanup-goes-to-simplifier",
-      "prompt": "The audit flagged utils/legacy_export.py as dead-code-heavy. Strip the dead paths out of it, behavior unchanged.",
+      "prompt": "Explicitly invoke code-simplifier. The audit flagged utils/legacy_export.py as dead-code-heavy. Strip the dead paths out of it, behavior unchanged.",
       "expected_skill": "code-simplifier",
       "should_not_trigger": ["full-codebase-auditor"],
       "reason": "Applying a named behavior-preserving cleanup — the audit is read-only and never edits."

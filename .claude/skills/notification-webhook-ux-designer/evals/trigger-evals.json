@@ -33,7 +33,7 @@
     },
     {
       "id": "internal-alerting-goes-to-observability-operator",
-      "prompt": "When our webhook delivery workers back up or error rates spike, page the on-call engineer with severity and a runbook link.",
+      "prompt": "Explicitly invoke observability-operator. When our webhook delivery workers back up or error rates spike, page the on-call engineer with severity and a runbook link.",
       "expected_skill": "observability-operator",
       "should_not_trigger": ["notification-webhook-ux-designer"],
       "reason": "Internal alerts to on-call engineers (severity, owner, runbook, thresholds) are observability-operator / slo-reliability-architect. This skill designs the integrator-facing failing-endpoint notice, not the internal page."

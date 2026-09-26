@@ -26,7 +26,7 @@
     },
     {
       "id": "building-the-control-goes-to-appsec-implementer",
-      "prompt": "Make this permission check fail closed — implement the deny-on-exception behavior with a negative test proving it.",
+      "prompt": "Explicitly invoke appsec-implementer. Make this permission check fail closed — implement the deny-on-exception behavior with a negative test proving it.",
       "expected_skill": "appsec-implementer",
       "should_not_trigger": ["error-handling-security-reviewer"],
       "reason": "Implementing a named, decided control test-first is appsec-implementer (manual-only, side-effecting). This skill produces the finding and the fix direction; it never edits code."

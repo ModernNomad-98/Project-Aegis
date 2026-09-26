@@ -30,14 +30,14 @@
     },
     {
       "id": "routing-goes-to-ai-router-architect",
-      "prompt": "Build the model-routing layer: pick the model per task and cost, fall back when a provider is down, keep the keys server-side, add a kill switch and per-call telemetry.",
+      "prompt": "Explicitly invoke ai-router-architect. Build the model-routing layer: pick the model per task and cost, fall back when a provider is down, keep the keys server-side, add a kill switch and per-call telemetry.",
       "expected_skill": "ai-router-architect",
       "should_not_trigger": ["agent-harness-architect"],
       "reason": "Provider selection, fallback, key custody, and routing telemetry are ai-router-architect (manual-only). The harness governs WHAT the router may reach via its closed registry; it does not design the routing internals."
     },
     {
       "id": "authority-policy-goes-to-agent-authorization-matrix",
-      "prompt": "Write the standing policy for what our coding agents may do on their own — commit, push branches, open PRs — and what always needs a named human, like merging to protected branches or arming auto-merge.",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Write the standing policy for what our coding agents may do on their own — commit, push branches, open PRs — and what always needs a named human, like merging to protected branches or arming auto-merge.",
       "expected_skill": "agent-authorization-matrix",
       "should_not_trigger": ["agent-harness-architect"],
       "reason": "Authoring the human-vs-agent authority matrix is agent-authorization-matrix (manual-only). The harness is how that matrix becomes physics — its authorize rung CALLS the policy; it never defines it."
@@ -60,7 +60,7 @@
     },
     {
       "id": "attack-review-goes-to-security-cluster",
-      "prompt": "Review our agent harness for attacks: can injected content in a retrieved document change its instructions, can a tool be abused beyond its intended scope, and would a compromised agent be contained?",
+      "prompt": "Explicitly invoke prompt-injection-defender. Review our agent harness for attacks: can injected content in a retrieved document change its instructions, can a tool be abused beyond its intended scope, and would a compromised agent be contained?",
       "expected_skill": "prompt-injection-defender",
       "should_not_trigger": ["agent-harness-architect"],
       "note": "DESIGN-vs-REVIEW SEAM (mandatory) — this is the attack review of an existing harness: injection → prompt-injection-defender, tool abuse → agent-tool-safety-guard, containment → agent-containment-reviewer. agent-harness-architect PRODUCES the artifact these skills review; it never runs the attack audit.",

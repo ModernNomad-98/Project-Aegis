@@ -26,14 +26,14 @@
     },
     {
       "id": "merge-authority-goes-to-authorization-matrix",
-      "prompt": "Codify who may merge to main and whether agents may ever arm auto-merge in this repo.",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Codify who may merge to main and whether agents may ever arm auto-merge in this repo.",
       "expected_skill": "agent-authorization-matrix",
       "should_not_trigger": ["merge-is-deploy-governance"],
       "reason": "WHO holds merge/arming authority is the authorization matrix; merge-is-deploy governance composes those floors and adds the pipeline-reality layer (what a merge physically does)."
     },
     {
       "id": "stage-design-goes-to-pipeline-architect",
-      "prompt": "Redesign the pipeline: add a staging environment with promotion gates and a canary strategy so merges stop going straight to production.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Redesign the pipeline: add a staging environment with promotion gates and a canary strategy so merges stop going straight to production.",
       "expected_skill": "ci-pipeline-architect",
       "should_not_trigger": ["merge-is-deploy-governance"],
       "reason": "Changing the pipeline's structure (environments, promotion, canary) is ci-pipeline-architect; merge-is-deploy governance documents and governs the pipeline as it IS."

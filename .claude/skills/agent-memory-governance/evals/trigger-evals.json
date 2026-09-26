@@ -5,14 +5,14 @@
   "cases": [
     {
       "id": "memory-store-audit-wins-here",
-      "prompt": "Go through our project memory files: prune stale entries, check nothing secret got stored, and fix wrong facts.",
+      "prompt": "Explicitly invoke agent-memory-governance. Go through our project memory files: prune stale entries, check nothing secret got stored, and fix wrong facts.",
       "expected_skill": "agent-memory-governance",
       "should_not_trigger": ["source-of-truth-reconciler", "agent-instruction-consolidator"],
       "reason": "Store-wide hygiene with per-entry dispositions is memory governance; no single live conflict is being adjudicated and instruction files are not involved."
     },
     {
       "id": "storability-question-wins-here",
-      "prompt": "Should the agent remember that our PR #14 is still waiting on review, so next session picks it up faster?",
+      "prompt": "Explicitly invoke agent-memory-governance. Should the agent remember that our PR #14 is still waiting on review, so next session picks it up faster?",
       "expected_skill": "agent-memory-governance",
       "should_not_trigger": ["source-of-truth-reconciler"],
       "reason": "Whether a fact belongs in memory (in-flight PR state: no — store the pointer or nothing) is a WRITE-rule question."
@@ -33,7 +33,7 @@
     },
     {
       "id": "instruction-files-go-to-the-consolidator",
-      "prompt": "CLAUDE.md and AGENTS.md give different test commands — align our agent instruction files to one source of truth.",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. CLAUDE.md and AGENTS.md give different test commands — align our agent instruction files to one source of truth.",
       "expected_skill": "agent-instruction-consolidator",
       "should_not_trigger": ["agent-memory-governance"],
       "reason": "Instruction files are a different steering surface with their own consolidation skill; memory files are not instruction files."

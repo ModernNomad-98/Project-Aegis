@@ -12,7 +12,7 @@
     },
     {
       "id": "apply-cleanup-goes-to-simplifier",
-      "prompt": "This module passed review but it's way more convoluted than it needs to be — simplify it without changing behavior.",
+      "prompt": "Explicitly invoke code-simplifier. This module passed review but it's way more convoluted than it needs to be — simplify it without changing behavior.",
       "expected_skill": "code-simplifier",
       "should_not_trigger": ["code-reviewer"],
       "reason": "The ask is to APPLY behavior-preserving edits, which is code-simplifier's side-effecting job, not a findings report."

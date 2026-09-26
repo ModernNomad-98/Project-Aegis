@@ -17,7 +17,7 @@
     },
     {
       "id": "service-telemetry-goes-to-observability-operator",
-      "prompt": "Instrument our backend: request rates, error budgets, trace propagation across services, and paging thresholds.",
+      "prompt": "Explicitly invoke observability-operator. Instrument our backend: request rates, error budgets, trace propagation across services, and paging thresholds.",
       "expected_skill": "observability-operator",
       "should_not_trigger": ["skill-usage-instrumenter"],
       "reason": "Runtime health of a product system (metrics, logs, traces, alerting) is observability-operator. skill-usage-instrumenter measures one thing only: skill invocations in the library — shared vocabulary ('instrument', 'telemetry'), disjoint subjects."

@@ -19,7 +19,7 @@
     },
     {
       "id": "single-defense-goes-to-injection-defender",
-      "prompt": "Design our defense against prompt injection for the doc-summarizer — trust zones, how untrusted content is delimited, and what gates tool calls.",
+      "prompt": "Explicitly invoke prompt-injection-defender. Design our defense against prompt injection for the doc-summarizer — trust zones, how untrusted content is delimited, and what gates tool calls.",
       "expected_skill": "prompt-injection-defender",
       "should_not_trigger": ["ai-threat-modeler"],
       "reason": "Designing the injection defense architecture itself is prompt-injection-defender; the threat modeler enumerates and routes that work, it doesn't do it."
