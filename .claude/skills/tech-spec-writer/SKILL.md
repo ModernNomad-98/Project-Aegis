@@ -83,7 +83,9 @@ work; it presents and integrates them into a reviewable design.
    supported by the evidence. For each, give the reason to consider it,
    benefits, drawbacks, and money, setup, and upkeep costs (or mark an
    unknown). Recommend one with a case-specific reason and say what would
-   change that recommendation. Do not invent options or present an
+   change that recommendation. Then ask exactly one atomic owner question;
+   the answer sets the design only and does not authorize starting the
+   build. Do not invent options or present an
    unresolved assumption as a fact. Record a binding technical choice in
    an ADR (`adr-writer`) and cite it here.
 6. **Define the review/sign-off path.** Who reviews, what approval means,

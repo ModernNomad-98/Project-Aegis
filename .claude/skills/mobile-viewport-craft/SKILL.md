@@ -119,7 +119,9 @@ network performance on mobile are `frontend-perf-engineer`'s.
    fits this content, what it preserves or loses, accessibility and use
    effects, money/setup/upkeep or unknowns, and a recommendation with its
    reason and the missing fact that could change it. Ask one decision
-   question at a time; keep binding accessibility requirements intact.
+   question at a time; keep binding accessibility requirements intact. The
+   answer sets the design only; it does not authorize implementing or
+   shipping the layout.
 
 Breakpoint patterns, the touch-target and safe-area reference, the
 viewport-unit cheat sheet, and wide-table reflow options:

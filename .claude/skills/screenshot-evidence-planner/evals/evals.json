@@ -50,7 +50,8 @@
         "assertions": [
           "Defines checkpoint, PR artifact, archive, and retention in plain language, then compares viable options by consumer, capture/review effort, access, deletion behavior, benefits, drawbacks, and a reasoned recommendation.",
           "Marks dollar costs unknown without verified prices, stops short of encoding a fixed compliance retention period, and requests the actual obligation text before setting that rule.",
-          "Keeps pre-storage masking and tenant isolation mandatory across all options and captures no screenshots."
+          "Keeps pre-storage masking and tenant isolation mandatory across all options and captures no screenshots.",
+          "Asks exactly one atomic owner question (a single decision, or the missing retention-obligation text) rather than bundling checkpoint, storage, and retention choices into one prompt, and treats the answer as setting the evidence policy only, not as authority to capture, store, or delete evidence."
         ]
       }
     },

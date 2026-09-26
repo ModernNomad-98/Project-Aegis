@@ -53,9 +53,11 @@ exact action and impact so the human can decide in one read.
    do-nothing, and a recommendation. If this approval also asks the human to
    choose a build or deployment path, first define unfamiliar terms and explain
    why each viable path is considered, its benefits, drawbacks, and money,
-   setup-time, and upkeep costs (or unknowns). Recommend the path that fits
-   the known goals and constraints, with a reason. Ask for an essential missing
-   fact first if it would change that recommendation. Keep approval of a single
+   setup-time, and upkeep costs (or unknowns). If an essential fact (such as
+   budget or maintenance capacity) would change the recommendation, ask only
+   for that fact first; otherwise recommend the path that fits the known goals
+   and constraints, with a reason, then ask exactly one atomic path question.
+   Keep approval of a single
    prepared action concise; do not invent a build-path comparison for it.
 5. **For the uncovered action, wait for an explicit answer.** Silence, enthusiasm about the overall task,
    or approval of a DIFFERENT step is not approval of this one.
