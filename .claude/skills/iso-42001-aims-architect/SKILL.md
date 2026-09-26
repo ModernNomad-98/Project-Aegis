@@ -76,6 +76,21 @@ accredited body's decision.
    interested parties — including affected individuals/groups, which 42001
    weighs heavily; internal/external issues. Record the org's AI role per
    system: obligations differ by role.
+   When the boundary is not already set by the owner, explain that **AIMS**
+   means the organization's AI management system and **scope** is the set of
+   AI systems, organizational activities and roles, and supporting people and
+   processes that this design covers. Present a bounded first scope (named
+   systems plus their required dependencies) and a broader inventory scope
+   only if both remain viable after checking known obligations and affected-
+   party coverage. For each viable boundary, explain why it fits the stated
+   goal, which systems, roles, affected groups, dependencies, and evidence it
+   includes or leaves outside, its benefits and risks, and its setup, audit,
+   and upkeep time and money costs (or explicitly unknown costs). Do not
+   invent an audit quote or silently exclude a material obligation or
+   affected group. Recommend a boundary with the reason and the fact that
+   would change it, then ask the owner one scope question. If a missing
+   obligation or affected-party fact prevents a defensible comparison, ask
+   for that deciding fact and route legal interpretation to human review.
 2. **Establish leadership artifacts (clause 5).** AI policy, top-management
    commitment, named accountable roles — align with the accountable-owner
    discipline `ai-governance-risk-reviewer` already enforces per feature.
@@ -119,6 +134,7 @@ accredited body's decision.
 ```
 AIMS DESIGN — <org>, ISO/IEC 42001:2023
 Scope: <AI systems in scope + org role per system (developer/provider/user)>
+Scope choice, if owner decision remains: <AIMS/scope terms; viable boundaries and why; coverage and exclusions including affected groups, dependencies and evidence; benefits/risks; setup/audit/upkeep time and money costs or unknowns; recommendation, reason and change condition; one owner question>
 Context: <interested parties incl. affected individuals/groups; issues>
 Clause artifacts:
   5: AI policy, named accountable roles
@@ -138,6 +154,9 @@ Readiness plan: <artifact → owner → date>; certification decision belongs to
 ## Validation Checklist
 
 - [ ] AI system inventory with org role per system anchors the scope.
+- [ ] If the owner must choose scope, the comparison explains terms, viable
+      boundaries, coverage and limits, benefits and risks, cost or unknowns,
+      and a reasoned recommendation before one owner question.
 - [ ] All three assessments designed distinctly: risk (6.1.2), treatment
       (6.1.3 → SoA), impact on individuals/societies (6.1.4) — the impact
       assessment is not folded into org risk.
