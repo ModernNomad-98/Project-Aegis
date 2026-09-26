@@ -5,6 +5,7 @@ from __future__ import annotations
 import unittest
 from dataclasses import replace
 
+from tools.behavioral_eval_runner.aggregation import AttemptSet, aggregate_case
 from tools.behavioral_eval_runner.enums import (
     AggregateBlocker,
     AggregateVerdict,
@@ -127,6 +128,87 @@ class TestCoverageArithmetic(unittest.TestCase):
 
 
 class TestHonestDefaults(unittest.TestCase):
+    def _report_for_runnable_attempts(self, attempts, aggregate):
+        case = make_case(case_id="aggregate-consistency")
+        preflight = evaluate_case(case, PreflightEnvironment())
+        self.assertEqual(case.case_uid, aggregate.case_uid)
+        coverage = compute_coverage(
+            authored_units_total=1,
+            selected_case_uids=[case.case_uid],
+            preflight_results=[preflight],
+            attempts=attempts,
+            aggregates=[aggregate],
+            assertions_selected_total=0,
+            assertions_accounted_total=0,
+            assertions_actually_graded_total=0,
+        )
+        return build_run_report(
+            run_id=RUN,
+            baseline_identity={},
+            run_provenance={},
+            input_evidence_manifest_sha256=None,
+            attempts=attempts,
+            aggregates=[aggregate],
+            coverage=coverage,
+            selected_case_uids=[case.case_uid],
+            preflight_results=[preflight],
+        )
+
+    def test_degraded_pass_must_keep_execution_degraded(self) -> None:
+        uid = make_case(case_id="aggregate-consistency").case_uid
+        attempts = [
+            AttemptRecord(RUN, uid, 1, AttemptState.PASS),
+            AttemptRecord(RUN, uid, 2, AttemptState.PASS),
+            AttemptRecord(
+                RUN,
+                uid,
+                3,
+                AttemptState.ERROR,
+                error_reason_code=ReasonCode.AMBIGUOUS_ACTIVATION,
+            ),
+        ]
+        attempt_set = AttemptSet(RUN, uid, 3)
+        for attempt in attempts:
+            attempt_set.add(attempt)
+        earned = aggregate_case(attempt_set)
+        self.assertTrue(
+            self._report_for_runnable_attempts(attempts, earned)["aggregates"][0][
+                "execution_degraded"
+            ]
+        )
+        with self.assertRaisesRegex(DishonestReportError, "execution_degraded"):
+            self._report_for_runnable_attempts(
+                attempts, replace(earned, execution_degraded=False)
+            )
+
+    def test_error_blocker_cannot_be_replaced_with_budget_blocker(self) -> None:
+        uid = make_case(case_id="aggregate-consistency").case_uid
+        attempts = [
+            AttemptRecord(
+                RUN,
+                uid,
+                1,
+                AttemptState.ERROR,
+                error_reason_code=ReasonCode.AMBIGUOUS_ACTIVATION,
+            ),
+            planned_unrun_attempt(RUN, uid, 2, ReasonCode.NOT_SELECTED),
+            planned_unrun_attempt(RUN, uid, 3, ReasonCode.NOT_SELECTED),
+        ]
+        attempt_set = AttemptSet(RUN, uid, 3)
+        for attempt in attempts:
+            attempt_set.add(attempt)
+        earned = aggregate_case(attempt_set)
+        self.assertEqual(earned.aggregate_blocker, AggregateBlocker.ERROR)
+        self._report_for_runnable_attempts(attempts, earned)
+        forged = replace(
+            earned,
+            aggregate_blocker=AggregateBlocker.BUDGET_EXHAUSTED,
+            reason_code=ReasonCode.BUDGET_CAP,
+            latest_aggregate_blocker=AggregateBlocker.BUDGET_EXHAUSTED,
+        )
+        with self.assertRaisesRegex(DishonestReportError, "aggregate_blocker"):
+            self._report_for_runnable_attempts(attempts, forged)
+
     def test_duplicate_preflight_cannot_authorize_pass_in_either_order(self) -> None:
         case = make_case(case_id="duplicate-preflight")
         uid = case.case_uid
@@ -490,6 +572,7 @@ class TestHonestDefaults(unittest.TestCase):
                         if state is AttemptState.ERROR
                         else AggregateBlocker.JUDGE_ERROR
                     ),
+                    reason_code=reason,
                     attempts_planned=1,
                     attempts_run=1,
                 )
