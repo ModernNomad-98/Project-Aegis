@@ -70,6 +70,20 @@
           "Storage design may implement a deletion mechanism, but the privacy obligations on file CONTENTS are deferred there."
         ]
       }
+    },
+    {
+      "id": "edge-upload-flow-choice-with-costs",
+      "type": "should_trigger",
+      "prompt": "Customers upload attachments up to 1 GB. Proxying them crashes our app servers, while our object store supports per-object signed PUT URLs and post-upload scanning. We have not approved new spending. Explain direct upload versus keeping the proxy, recommend a path, and ask us to choose.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains direct-to-storage and app-proxied uploads in plain terms, with a reason each could fit, plus benefits and drawbacks for the 1 GB and crashing-server context.",
+          "Compares money, setup work, and ongoing upkeep for both paths, marking unknown storage, transfer, scan, or service costs instead of inventing prices.",
+          "Recommends direct upload because the stated store supports scoped URLs and the proxy is failing, and names a required inline byte transformation as a fact that could change that choice.",
+          "Asks one clear decision question without treating the choice as permission to provision or spend; preserves server verification, size/content checks, quarantine, and scan-before-serve."
+        ]
+      }
     }
   ]
 }

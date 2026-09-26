@@ -78,9 +78,15 @@ this owns the storage architecture.
    object storage via a signed URL; the app never touches the bytes) is the
    default for size and cost — it removes the app server from the data path.
    Proxied (through the app) only when the app must inspect/transform every
-   byte inline, accepting the size cap and compute cost. State the choice and
-   why. For direct uploads, the app issues a signed URL and RECORDS the
-   intended object. Before marking it complete, the server checks object
+   byte inline, accepting the size cap and compute cost. Before asking the
+   user to choose, explain both flows in plain terms: why each fits this
+   workload, its benefits and drawbacks, and money, setup, and ongoing
+   upkeep costs or unknowns. Recommend the flow supported by file sizes,
+   inspection needs, and existing infrastructure; explain why and what fact
+   would change it. Ask one discovery question first if a decisive fact is
+   missing; otherwise ask one clear decision question. The choice does
+   not authorize provisioning or spending. For direct uploads, the app
+   issues a signed URL and RECORDS the intended object. Before marking it complete, the server checks object
    existence and expected metadata at storage; it does not trust a client
    success report.
 2. **Scope signed URLs narrowly and briefly.** A signed URL grants exactly
@@ -91,7 +97,9 @@ this owns the storage architecture.
    the tenant + a random id, never a client-supplied path.
 3. **Design storage tenancy.** Shared bucket with a mandatory tenant path
    prefix (`<tenant-id>/<random-object-id>`) or per-tenant buckets, chosen to
-   match the data-tenancy model. The access rule: a signed URL or policy for
+   match the data-tenancy model. Explain any user-facing tenancy choice with
+   the same case-specific tradeoffs, costs, recommendation and single question
+   before selecting it. The access rule: a signed URL or policy for
    tenant A can only ever name objects in A's bucket or under A's prefix,
    according to the chosen model; a client cannot craft a key that escapes
    its tenant. Hand the resulting bucket/RLS policy to
@@ -144,6 +152,9 @@ Retention:      <per class: retention, lifecycle transitions, orphan cleanup,
 Serving:        <CDN + cache-control for public; signed short-lived GET for
   private; per-class public-vs-private decision>
 Cost posture:   <growth per tenant, archive tiering, orphan cost>
+Choice, if needed: <plain-language options; why each fits; case-specific pros/cons;
+  money/setup/upkeep costs or unknowns; recommendation + why + what could change it;
+  one clear decision question>
 Open questions / risks: <each with risk-if-wrong / who answers>
 ```
 
@@ -152,6 +163,10 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - [ ] Upload flow (direct vs proxied) is chosen with a stated reason; direct
       uploads record intent and verify storage existence/metadata before
       completion, without trusting a client success report.
+- [ ] User-facing upload or tenancy choices explain each viable option's fit,
+      tradeoffs, and money/setup/upkeep costs or unknowns in plain terms;
+      give a contextual recommendation and one clear question (or one
+      discovery question when a decisive fact is missing).
 - [ ] Signed URLs grant one verb on one object key with a short expiry and
       size/type constraints — never prefix- or bucket-scoped.
 - [ ] Object keys are server-derived; a client cannot craft a key outside
