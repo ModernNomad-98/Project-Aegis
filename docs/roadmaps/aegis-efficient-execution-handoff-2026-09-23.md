@@ -1,6 +1,6 @@
 # Aegis efficient execution plan and new-chat handoff
 
-> **Current reading, checked 2026-09-25 after pull request #280:** Sections
+> **Current reading, checked 2026-09-26 after pull request #319:** Sections
 > 1–9 below preserve the original handoff, including its then-current first
 > task and estimates. They are historical instructions, not today's execution
 > queue or a new authorization. Read the current routes and dispositions here
@@ -22,14 +22,14 @@ integration (CI) checks are not selected-host proof.
 | First task, BER-BKL-007 in §5 | **DONE** on [PR #104](https://github.com/ModernNomad-98/Project-Aegis/pull/104) merge. The [BER backlog](behavioral-eval-runner-backlog.md) owns its completed status; the old first-task steps remain as historical context. |
 | BER evidence policy | [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day complete-bundle policy. The bounded synthetic proof and integration merged in [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) and [PR #257](https://github.com/ModernNomad-98/Project-Aegis/pull/257); their one-use grants are consumed in APR-022 and APR-027. BKL-009 remains partial: real-host access, encryption, privacy and cleanup need separate proof and scope. |
 | CP work | The synthetic CP-WP-003A increment shipped in [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123). The [CP backlog](resumable-control-plane-backlog.md) still blocks broader CP-WP-003 real-source/host claims and CP-WP-004 integration. |
-| Issue #101 setup | Package 1 planning ([PR #109](https://github.com/ModernNomad-98/Project-Aegis/pull/109)), package 2 Windows Aegis-only selection ([PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124)), and package 3 offline advisory contract ([PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121)) shipped in bounded scopes. [APR-031](../approvals/APPROVAL_REGISTER.md#aegis-apr-031-issue-101-stage-4a-offline-bridge-implementation) grants one bounded synthetic Stage 4A bridge implementation; it is not a real host proof or a 12-hour ETA. Stage 4B host/comparison work needs separate scope and approval. Packages 5/6 remain conditional and package 7 pending. No helper is selected; follow the [setup plan](aegis-setup-routing-plan.md). |
+| Issue #101 setup | Packages 1–3 shipped in [PR #109](https://github.com/ModernNomad-98/Project-Aegis/pull/109), [PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124), and [PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121). The bounded synthetic Stage 4A bridge shipped in [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281), consuming APR-031 as recorded in [APR-036](../approvals/APPROVAL_REGISTER.md#aegis-apr-036-stage-4a-offline-bridge-package-completed). [PR #319](https://github.com/ModernNomad-98/Project-Aegis/pull/319) delivered version-2 offline request binding: reviewed head `550151dcf286f8ec64480bc91f47e390454417d2` merged as `a59c015c01b4035ab1a438533736134f96deac13` on 2026-09-26 at 02:24:21 UTC, with Linux, Windows and `gate-guard` green. This is synthetic-only; Stage 4B actual-host proof and the later helper comparison need separate scope and approval. Packages 5/6 remain conditional, package 7 pending, and no helper is selected. Follow the [setup plan](aegis-setup-routing-plan.md). |
 | BER calibration and host | [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249) delivered bounded synthetic offline holdout support. Private candidate labels, reviewed live execution source and allowance, a proven host, measured calibration and OD-1 remain open. The owner selected a disposable VirtualBox Linux VM and approved assisted setup in APR-028, then paused it after repeated login stalls. The VM was last verified powered off with networking disabled and its virtual DVD empty. No BER Stage A host probe or live phase is authorized. Follow the [BER phase register](behavioral-eval-runner-backlog.md) and [current decision index](aegis-open-decisions-2026-09-23.md). |
 
 Start with the [owner approval register](../approvals/APPROVAL_REGISTER.md)
 for authorization and later lifecycle events, then the owning backlog or
-setup plan above for exact status. The [forecast after #270](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-25-after-pull-request-270)
+setup plan above for exact status. The [current forecast](aegis-backlog-forecast.md#start-here--current-reading)
 estimates **71–146 active hours** for ten selected rows, plus unestimated issue
-#101 Stages 4A and 4B and the BER-BKL-009 host, runtime, privacy and cleanup
+#101 Stage 4B and the BER-BKL-009 host, runtime, privacy and cleanup
 residual. The selected total has no finite estimate. This forecast does not
 grant implementation or provider authority. Review the current branch, head,
 checks and open PRs before choosing a task. Do not restart §5 from this dated

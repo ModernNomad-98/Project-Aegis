@@ -1,6 +1,6 @@
 # Project Aegis — next owner decisions
 
-> **Current reading, checked 2026-09-25 after pull request #280:** The table and
+> **Current reading, checked 2026-09-26 after pull request #319:** The table and
 > sequence under [Original decision packet](#original-decision-packet-after-pr-107)
 > preserve the proposal prepared after #107. They are not today's queue. Use
 > the index below with the [approval register](../approvals/APPROVAL_REGISTER.md),
@@ -30,12 +30,12 @@ repository checks, not a selected-host proof. A source SHA is a commit hash;
 | BER host and R4/R5 | The owner selected a new disposable Linux VM on VirtualBox; [PR #260](https://github.com/ModernNomad-98/Project-Aegis/pull/260) merged its setup proposal. Agent-assisted setup was approved in APR-028, then paused after repeated login stalls. The VM was last verified powered off with networking disabled and an empty virtual DVD drive. The [host decision proposal](ber-selected-host-capability-decision.md) distinguishes generic Linux CI from host evidence. No Stage A probe is authorized or recorded. |
 | CP-WP-003 | [APR-006](../approvals/APPROVAL_REGISTER.md#aegis-apr-006-control-plane-offline-capability-proofs-first-increment) and [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123) delivered the synthetic CP-WP-003A proof. The [CP backlog](resumable-control-plane-backlog.md) still blocks real source authority, independent freshness, containment, evidence and billing claims. The delivered proof grants no real dispatch. |
 | CP-WP-004 | No delivery target is selected. The [CP backlog](resumable-control-plane-backlog.md) requires CP-WP-003 prerequisites and a separately approved integration with exact receipt, rollback and budget terms. |
-| Issue #101 setup and routing | Package 1 planning ([PR #109](https://github.com/ModernNomad-98/Project-Aegis/pull/109)), package 2 Windows Aegis-only setup ([PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124)), and package 3 offline advisory contract ([PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121)) shipped within bounded scopes. [APR-031](../approvals/APPROVAL_REGISTER.md#aegis-apr-031-issue-101-stage-4a-offline-bridge-implementation) grants one bounded synthetic Stage 4A implementation, with a 12-hour ceiling rather than an ETA. Stage 4B real host proof and comparison need separate scope and approval. Packages 5/6 remain conditional, package 7 pending, and no optional helper is selected; follow the [setup plan](aegis-setup-routing-plan.md). |
+| Issue #101 setup and routing | Packages 1–3 shipped in [PR #109](https://github.com/ModernNomad-98/Project-Aegis/pull/109), [PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124), and [PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121). The bounded synthetic Stage 4A bridge shipped in [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281); [APR-036](../approvals/APPROVAL_REGISTER.md#aegis-apr-036-stage-4a-offline-bridge-package-completed) records consumption of APR-031. [PR #319](https://github.com/ModernNomad-98/Project-Aegis/pull/319) shipped the version-2 offline request binding at reviewed head `550151dcf286f8ec64480bc91f47e390454417d2`, merged as `a59c015c01b4035ab1a438533736134f96deac13` on 2026-09-26 at 02:24:21 UTC with Linux, Windows and `gate-guard` green. This remains synthetic-only. Stage 4B real host proof and the later helper comparison need separate scope and approval; packages 5/6 remain conditional, package 7 pending, and no helper is selected. Follow the [setup plan](aegis-setup-routing-plan.md). |
 | Confidential conduct-reporting intake | The [Code of Conduct](../../CODE_OF_CONDUCT.md#enforcement) now states that no confidential route or independent recipient has been published. The original [D59 finding](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) remains an owner decision: provide a usable private contact and alternate recipient before claiming confidential intake. Do not put sensitive incident details in a public issue. |
 
-The [current forecast after #270](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-25-after-pull-request-270)
+The [current forecast](aegis-backlog-forecast.md#start-here--current-reading)
 places ten selected rows at **71–146 active hours**, plus unestimated issue
-#101 Stages 4A and 4B and the BER-BKL-009 host, runtime, privacy and cleanup
+#101 Stage 4B and the BER-BKL-009 host, runtime, privacy and cleanup
 residual. The selected total therefore has no finite estimate. It is a scope
 estimate, not
 permission to start a gated package. The independent gates in the original
