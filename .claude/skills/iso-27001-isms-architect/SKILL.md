@@ -66,7 +66,9 @@ decides that.
    systems, locations), interested parties and requirements, internal/
    external issues — including the climate-relevance determination the
    2024 amendment adds to context analysis. Scope statement is the anchor
-   for the SoA's exclusion justifications.
+   for the SoA's exclusion justifications. When boundaries are a choice,
+   brief the owner using the plain-word definitions and option comparison
+   under Gotchas, then obtain one explicit scope decision before fixing it.
 2. **Establish leadership artifacts (clause 5).** Information security
    policy, top-management commitments, and role/responsibility assignments
    with NAMED humans (auditors and `compliance-gap-auditor` both ask who).
@@ -124,6 +126,9 @@ Readiness plan: <artifact → owner → date>; certification decision belongs to
 ## Validation Checklist
 
 - [ ] Scope statement exists and anchors every SoA exclusion.
+- [ ] Where scope was a choice, the owner received defined terms, viable
+      boundaries with coverage, evidence and cost tradeoffs, a reasoned
+      recommendation and its change condition, then explicitly chose.
 - [ ] All clause 4–10 artifacts designed with named human owners; none
       delegated to "the team".
 - [ ] Risk register + treatment process feed the SoA; the SoA document
