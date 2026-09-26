@@ -79,6 +79,17 @@ with real command output.
    none exists), unexpected inclusions (server-only modules, dev tools,
    giant deps pulled into the entry chunk), sourcemap policy enforced
    (production maps per repo policy: absent, hidden, or uploaded-restricted).
+   If no production policy exists and the owner must choose, explain that a
+   sourcemap maps compiled client code back to source. Compare no maps,
+   hidden maps, and restricted upload: why each fits debugging needs, its
+   diagnostic benefit and source-exposure drawback, setup time, ongoing
+   upkeep, and money cost or explicit unknowns. A hidden map lacks a public
+   reference but is still exposed if its file is deployed publicly;
+   restricted upload needs an approved destination, access, retention and
+   credential plan. Recommend no public maps until a private handling path
+   is evidenced, explain why and what debugging requirement could change
+   it, then ask one owner question. Mark policy pending; a preference alone
+   does not authorize changing build/CI/deploy config or uploading maps.
 6. **Report with evidence** and wire repeatable checks: the secret-grep and
    budget checks as scripts CI can run (placement per the automation
    blueprint). Confirmed secret exposure → stop wiring, hand to
@@ -95,6 +106,9 @@ Bundle cleanliness: <what was searched (values/patterns/files) → findings
                     or "none found by this method">
 Parity checks: <route/asset/deep-link/mode results under preview + base>
 Output inspection: <sizes vs budget, unexpected inclusions, sourcemap policy>
+Sourcemap choice (only if policy absent): <plain terms; viable options and
+  reasons; debugging/source-exposure pros/cons; money/setup/upkeep or
+  unknowns; recommendation and why; one owner question; policy pending>
 Findings: <severity-ranked, each with file/location and redacted fingerprint; no secret bytes>
 CI checks wired: <scripts + placement, or handoff to automation blueprint>
 Handoffs: <confirmed secrets → secrets-identity-hardener (relocate+rotate);
@@ -112,6 +126,10 @@ Handoffs: <confirmed secrets → secrets-identity-hardener (relocate+rotate);
 - [ ] Deep links, assets, and dynamic imports verified under the configured
       `base` via preview.
 - [ ] Sourcemap policy for production verified, not assumed.
+- [ ] If production sourcemap policy is missing, the owner choice explains
+      terms, viable reasons, debugging and exposure tradeoffs, costs or
+      unknowns, and a reasoned recommendation before one question; no
+      config or upload change follows from preference alone.
 - [ ] Size budget compared or baseline recorded.
 - [ ] Secret findings handed to `secrets-identity-hardener`, not "fixed" by
       renaming the variable here.

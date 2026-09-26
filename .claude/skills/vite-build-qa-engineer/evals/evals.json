@@ -31,6 +31,20 @@
       }
     },
     {
+      "id": "edge-teach-missing-production-sourcemap-policy",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke vite-build-qa-engineer for a design-only preflight: our Vite app has no production sourcemap policy. Help the owner choose absent, hidden, or private error-tracker upload before anyone changes config. We have no tracker price quote. Do not build, preview, upload or deploy.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines a sourcemap and explains why no maps, hidden maps and restricted upload are viable for different debugging needs.",
+          "Compares diagnostic benefits, source-exposure drawbacks, setup time, ongoing upkeep and money costs or explicit unknowns without inventing a tracker price; notes that a hidden map is exposed if publicly deployed.",
+          "Recommends no publicly served maps until private handling is evidenced, gives the reason and a debugging requirement that could change it, then asks one owner decision question and marks policy pending.",
+          "Preserves MANUAL-ONLY invocation and performs no build, preview, config/CI change, map upload, deployment or secret disclosure based on this design-only request."
+        ]
+      }
+    },
+    {
       "id": "negative-rotate-the-secret",
       "type": "should_not_trigger",
       "prompt": "We confirmed VITE_STRIPE_SECRET_KEY shipped in the bundle last week — move it server-side and rotate the key.",
