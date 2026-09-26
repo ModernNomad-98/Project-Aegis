@@ -861,3 +861,32 @@ generic skill guidance that would require asking for the same approval again.
 - **Evidence:** [PR #304](https://github.com/ModernNomad-98/Project-Aegis/pull/304)
   merged `df7e5b2bb5b6b3211fada10ead0f8c723874d6d5` as
   `e6f13e3376e2b5d7ad85ab6ca097dedde96f5fe2` at the time above.
+
+### AEGIS-APR-039: Reaffirmation of ongoing backlog delivery approval
+
+- **Event:** GRANT; reaffirmation of AEGIS-APR-013 and AEGIS-APR-024.
+- **Status at recording:** ACTIVE for the ongoing Project Aegis backlog task.
+- **Date / Grantor:** 2026-09-25 / Peter Nguyen.
+- **Reason:** Preserve the owner's standing delivery and persistence direction
+  for the ongoing backlog task without repeated permission requests.
+- **Owner instruction:** "you should be using multi-agent per our rule. Loop
+  through all backlogs and issues until all are resolved. Pre-approve for all
+  commit, push, and merge including admin merges. Do not stop until everything
+  is completed"
+- **Scope allowed:** Continue authorized Project Aegis backlog work with
+  parallel agents and deliver its commits, branch pushes, pull requests and
+  merges, including administrator merges, without repeated delivery approval.
+  Apply the existing local-test and GitHub Actions conditions; verify a
+  published candidate's exact-head checks before merging.
+- **Scope FORBIDDEN:** This delivery grant does not waive a failed protected
+  `gate-guard`, renew a consumed one-use implementation grant, resume the
+  paused virtual machine, or authorize provider calls, private input,
+  real-host proof, deployment or evidence deletion.
+- **Interpretation:** The latest instruction reaffirms delivery authority and
+  persistence; it does not expressly retract the green-check conditions in
+  AEGIS-APR-013/024. Continue other authorized backlog work while a separate
+  decision is pending.
+- **Evidence:** Direct owner message quoted above in the ongoing Project
+  Aegis conversation; prior standing delivery conditions are in
+  AEGIS-APR-013 and AEGIS-APR-024.
+- **Expiry / use limit:** Ongoing backlog task; no one-use limit stated.
