@@ -93,7 +93,15 @@ provisioning or test execution.
    it belongs to `multi-tenant-security-tester` — record these reroutes.
 6. **Define execution & CI placement:** runtime budget, parallelization
    constraints (per-worker DB), which tier runs the suite (usually PR,
-   blocking).
+   blocking). If the owner must choose the real test database environment,
+   define an ephemeral local/CI database (created for a run and discarded)
+   and a shared CI/staging database (reused across runs). Explain why each
+   is viable, its production-fidelity and data-isolation benefits and
+   drawbacks, setup/run/upkeep effort, and money cost or unknowns.
+   Recommend the path fitting the boundary and parallel-run evidence,
+   explain why and what constraint could change it, then ask one decision
+   question. Keep third-party seams faked and design only; this skill does
+   not provision either environment.
 7. **Hand off implementation** with the spec quality bar: each spec names
    setup, action, and observable assertions: response plus relevant persisted
    state for writes, unchanged state for rejected writes, and response plus
@@ -116,6 +124,9 @@ Specs:
          read response + relevant baseline> — negatives <invalid/denied/failure>
 Rerouted items: <specs that belong to unit/E2E/security layers + where sent>
 Environment assumptions: <DB/container/CI services required>
+Owner environment choice (only if needed): <plain terms; ephemeral/local vs
+  shared CI/staging; reasons, fidelity/isolation pros/cons, setup/run/upkeep
+  and money costs or unknowns; recommendation and why; one question>
 CI placement: <tier, runtime budget, parallelization constraints>
 Handoffs: <implementation → engineer executing the suite;
           security matrices → multi-tenant-security-tester>
@@ -138,6 +149,9 @@ Exit criteria: <what "this layer is covered" means for the module>
 - [ ] No browser anywhere in the design; no cross-tenant security matrices
       re-owned from `multi-tenant-security-tester`.
 - [ ] CI placement and runtime budget stated.
+- [ ] Any owner-facing database-environment choice explains terms, viable
+      paths, fidelity/isolation tradeoffs, costs or unknowns, and a
+      reasoned recommendation before one question; nothing is provisioned.
 
 ## Gotchas
 

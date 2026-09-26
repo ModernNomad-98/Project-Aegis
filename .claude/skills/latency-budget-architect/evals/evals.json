@@ -61,6 +61,20 @@
       }
     },
     {
+      "id": "edge-teach-new-hop-budget-claim-choice",
+      "type": "should_trigger",
+      "prompt": "A new fraud check needs 20ms on our 400ms p95 checkout path. Current headroom is 80ms; spending 20ms would leave the 15% reserve floor. Another named hop may have 20ms measured slack if its owner agrees. The product owner also asks whether to renegotiate the journey SLO. Explain the options and recommend a path; engineering effort and dollar costs are unknown. Do not change the live budget.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines headroom, named-hop reallocation, and SLO renegotiation in plain terms; compares only viable paths using the given 400ms target, 80ms reserve, and 20ms claim.",
+          "Explains user and hop effects, benefits and drawbacks, delivery time, money and upkeep costs or explicit unknowns without inventing figures.",
+          "Recommends a case-fit claim path with evidence-based reasons and what measurement could change it, then asks one owner decision question.",
+          "Does not silently consume reserve, alter another hop allocation, or set a new SLO; names path/hop owner signoff and routes target renegotiation to slo-reliability-architect."
+        ]
+      }
+    },
+    {
       "id": "should-not-trigger-slo-definition",
       "type": "should_not_trigger",
       "prompt": "Define SLOs for our top user journeys — pick the SLIs, set targets with error budgets, and design the burn-rate alerting so the right things page.",

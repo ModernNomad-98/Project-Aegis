@@ -42,6 +42,20 @@
       }
     },
     {
+      "id": "edge-teach-test-database-environment-choice",
+      "type": "should_trigger",
+      "prompt": "Our create-project integration suite needs a real Postgres database. We can use an ephemeral local or CI database per run, or a shared staging database. Parallel workers and auth-path fidelity matter. Help the owner choose; no hosting prices or setup estimates have been verified. Design only; do not provision anything.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains ephemeral per-run and shared staging databases in plain terms while keeping the tested database, service, auth, and permission paths real.",
+          "Compares why each is viable, production fidelity and isolation/parallel-run benefits and drawbacks, setup/run/upkeep effort, and money costs or explicit unknowns without inventing prices.",
+          "Recommends a case-fit path with a reason and the constraint that could change it, then asks one owner decision question.",
+          "Produces only an implementable integration-test design; does not provision a database, run tests, or turn the suite into mocked-unit or browser E2E testing."
+        ]
+      }
+    },
+    {
       "id": "should-not-do-security-matrix",
       "type": "should_trigger",
       "prompt": "Design integration tests for the documents service, including proving users from other tenants can never read documents by guessing ids.",
