@@ -2,14 +2,18 @@
 
 ## Start here — current reading
 
-**Current reading at the 2026-09-26 checkpoint after #344:** choice-guidance batch B ([PR #334](https://github.com/ModernNomad-98/Project-Aegis/pull/334)) and batch C ([PR #342](https://github.com/ModernNomad-98/Project-Aegis/pull/342), merged 11:30:40 UTC as `32f2787d3dd4732d3a7971924ee6b4a753e06392`) are both delivered, so no part of the original three-batch 3–6-hour estimate remains. The bounded selected planning subtotal is again the ten core rows: **71–146 provisional active hours**. The 72–148-hour figure that [PR #343](https://github.com/ModernNomad-98/Project-Aegis/pull/343) published four seconds after #342 merged is superseded by that delivery. Additional skill-choice guidance and eval maintenance (batches J, O, P, Q and R, plus non-blocking review follow-ups) stays **outside** that subtotal at a provisional **5.5–12 active hours**. Issue #101 Stage 4B host proof and BER-BKL-009 host residuals remain TBD and the VM stays paused. After this checkpoint the owner approved the bounded #331 BER correction and #333 option A ([material owner decision](#material-owner-decision--2026-09-26-331-ber-correction-and-333-option-a)), adding a provisional 4–8 active hours, so the bounded selected planning subtotal becomes **75–154 provisional active hours**. Neither decision closes a host or calibration gate, so the full selected and all-options totals still have **no finite ETA**. See the [five-merge checkpoint after #344](#five-merge-checkpoint--2026-09-26-after-pull-request-344).
+**Current reading at the 2026-09-26 catch-up checkpoint after #370:** twenty-six PRs merged after #344 without a checkpoint, missing the windows ending #349, #354, #359, #364 and #369. The #344 maintenance subtotal (5.5–12 active hours) is fully delivered by #348–#356, and later merges closed further eval-corpus and review gaps. The owner's 2026-09-26 approval of the bounded #331 BER correction, recorded by #365 ([material owner decision](#material-owner-decision--2026-09-26-331-ber-correction-and-333-option-a)), adds 4–8 active hours, so the bounded selected planning subtotal is **75–154 provisional active hours**; that correction has since been implemented and merged in #374. Outside it, 17 of the 22 skills in the owner-choice teaching backlog are delivered (S1, including the two deferred skills merged in #373, S2 and S3); S4 (#376) and the open R2 wording (#372) are in open PRs, S5 is resolved (one of six needs a step, open as #377, so the backlog is 23 skills with 17 delivered), and the owner-requested feature-flag architecture skill adds a provisional **2.5–5 active hours**. Stage 4B and BER-BKL-009 host residuals remain TBD and the VM paused, so the full selected and all-options totals still have **no finite ETA**. See the [catch-up checkpoint after #370](#five-merge-checkpoint--2026-09-26-after-pull-request-370-catch-up-for-the-windows-ending-349-354-359-364-369).
+
+**Earlier reading at the 2026-09-26 checkpoint after #344:** choice-guidance batch B ([PR #334](https://github.com/ModernNomad-98/Project-Aegis/pull/334)) and batch C ([PR #342](https://github.com/ModernNomad-98/Project-Aegis/pull/342), merged 11:30:40 UTC as `32f2787d3dd4732d3a7971924ee6b4a753e06392`) are both delivered, so no part of the original three-batch 3–6-hour estimate remains. The bounded selected planning subtotal is again the ten core rows: **71–146 provisional active hours**. The 72–148-hour figure that [PR #343](https://github.com/ModernNomad-98/Project-Aegis/pull/343) published four seconds after #342 merged is superseded by that delivery. Additional skill-choice guidance and eval maintenance (batches J, O, P, Q and R, plus non-blocking review follow-ups) stays **outside** that subtotal at a provisional **5.5–12 active hours**. Issue #101 Stage 4B host proof and BER-BKL-009 host residuals remain TBD and the VM stays paused. After this checkpoint the owner approved the bounded #331 BER correction and #333 option A ([material owner decision](#material-owner-decision--2026-09-26-331-ber-correction-and-333-option-a)), adding a provisional 4–8 active hours, so the bounded selected planning subtotal becomes **75–154 provisional active hours**. Neither decision closes a host or calibration gate, so the full selected and all-options totals still have **no finite ETA**. See the [five-merge checkpoint after #344](#five-merge-checkpoint--2026-09-26-after-pull-request-344).
 
 This is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. The [owner's issue #101 host-path choice](#material-owner-decision--2026-09-25-issue-101-host-path)
 and the later bounded Stage 4A and offline routing grants frame the current
 issue #101 scope. The
-[five-merge checkpoint after #344](#five-merge-checkpoint--2026-09-26-after-pull-request-344)
-is the latest full reassessment; the earlier [catch-up checkpoint after
+[catch-up checkpoint after #370](#five-merge-checkpoint--2026-09-26-after-pull-request-370-catch-up-for-the-windows-ending-349-354-359-364-369)
+is the latest full reassessment, after the
+[five-merge checkpoint after #344](#five-merge-checkpoint--2026-09-26-after-pull-request-344);
+the earlier [catch-up checkpoint after
 #306](#catch-up-checkpoint--2026-09-25-after-pull-request-306) records the missed five-merge cadence
 without rewriting the dated #284 snapshot. Pull request (PR) #249 delivered the
 synthetic offline holdout-support item; PR #250 closed the bounded
@@ -59,9 +63,175 @@ or all-options
 total is defensible until the unestimated residuals are scoped.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#five-merge-checkpoint-after-pull-request-344--2026-09-26)
+the [execution measurements](aegis-execution-metrics.md#catch-up-checkpoint-after-pull-request-370--2026-09-26)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
+
+## Five-merge checkpoint — 2026-09-26, after pull request #370 (catch-up for the windows ending #349, #354, #359, #364, #369)
+
+This catch-up reassessment counts first-parent merges on main through #370
+(`eadf1fd3934ca196b70178681dfb07ef7c264020`, merged 22:52:11 UTC) and reads
+the same tree. **Twenty-six PRs merged after #344** with no checkpoint: five
+complete five-merge windows and one further merge. The required cadence was
+missed five times. This is one current assessment, not five backdated ones;
+the dated #344 snapshot, the [material owner decision](#material-owner-decision--2026-09-26-331-ber-correction-and-333-option-a)
+below and every earlier section stay unchanged.
+
+**Cadence anchor.** The rule is one full reassessment after every five merged
+PRs. The #344 checkpoint counted six merges (#339–#344) as one window and
+restarted the counter after #344. An automated Codex review of #352, which
+recorded that checkpoint, correctly noted that this moved the cadence by one
+merge: under a strict count the window after #338 closed at #343, and #344
+belonged to the next window. The strict anchor would place the windows since
+then at #344–#348, #349–#353, #354–#358, #359–#363 and #364–#368, with the
+next closing at the fifth merge after #368. This checkpoint does not move the
+anchor a second time. It keeps the #344 anchor that #352 published, so the
+one-merge shift is recorded here rather than silently absorbed, and it follows
+the [catch-up after #306](#catch-up-checkpoint--2026-09-25-after-pull-request-306)
+rule of not resetting the counter to hide missed windows. On that anchor the
+missed windows end at #349, #354, #359, #364 and #369, in actual merge order
+(#367 merged before #366). #370 is the first merge of the next window. Either
+counting gives five missed windows.
+
+The [merge receipts](aegis-execution-metrics.md#catch-up-checkpoint-after-pull-request-370--2026-09-26)
+give these observed wall times, measured between merge commits:
+
+| Window | Merges in merge order | Observed wall time | Notes |
+| --- | --- | ---: | --- |
+| After #344 | #345, #346, #347, #348, #349 | 32m50s | Three A–F eval batches, batch O and batch R. |
+| After #349 | #350, #351, #352, #353, #354 | 12m05s | Batches P, Q and J, the #344 checkpoint and one ledger entry. |
+| After #354 | #355, #356, #357, #358, #359 | 7h57m30s | Includes a 7h41m48s gap before #355; its cause was not timestamped and is not asserted. Not a throughput measure. |
+| After #359 | #360, #361, #362, #363, #364 | 33m43s | MANUAL-ONLY naming, closeout trigger evals, census fixes and contract dispositions. |
+| After #364 | #365, #367, #366, #368, #369 | 1h45m11s | Governance record, batches S1 and S2, and Codex fixes; includes a 1h31m24s gap before #369. |
+| Open window | #370 | 4s | First merge of the next window. |
+| **#344 to #370** | **26 merges** | **11h01m23s** | Concurrent work, review, CI, queue and owner waiting included. |
+
+Active labor, review, CI and waiting were not measured separately for any
+of these PRs, so no active-hour figure is inferred from the wall times.
+
+**Delivered against the #344 selected table.** The ten core rows are
+unchanged: no merge in these windows closed a private-input,
+measured-calibration, real-host, provider or control-plane gate. The #344
+maintenance items outside the subtotal are all delivered:
+
+| #344 item outside the subtotal | #344 estimate | Delivered by |
+| --- | ---: | --- |
+| Batch J: merge-is-deploy-governance and pii-lifecycle-designer guidance | 1–2 | #353 |
+| Batch O: seven M–R owner-choice evals | 1–2 | #348 |
+| Batches P and Q: twelve S–Z evals plus wording | 2–4 | #350 and #351 |
+| Batch R: source-of-truth-reconciler owner-conflict step | 0.5–1 | #349 |
+| Non-blocking review follow-ups from #345–#347 | 1–3 | #355 (batches L, M, N) and #356 (batches O, P, Q, R) |
+| **Maintenance subtotal** | **5.5–12 → 0 remaining** | Delivered by #348–#356; active time not measured, so the estimate cannot be scored. |
+
+With #345–#347 already credited at #344, the owner-choice audit's A–Z eval
+and guidance batches are delivered and do not count again. Other merges
+closed work that the #344 table did not list: #358, #360 and #361 completed
+the MANUAL-ONLY naming cleanup (12, 43 and six prompts now name their skill,
+so BER's offline census stops excluding them); #359 gave the aegis-setup
+trigger evals the standard `expected_skill` shape, which unblocked the census
+run over the whole corpus; #362 gave ai-closeout-reporter the missing trigger
+evals and named exclusions; #363 cleared the census author-facing eval
+findings; #364 recorded dispositions for nine audit findings (no skill text
+changed); #367 tested the aegis-setup fallback and dated the BER corpus
+counts; and #369 applied the still-valid Codex review findings from
+#348–#355, as [AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review)
+now requires. [AEGIS-APR-051](../approvals/APPROVAL_REGISTER.md#aegis-apr-051-eval-file-maintenance-of-delivered-skills-is-backlog-delivery)
+classifies eval-only edits such as #359 and #361 as backlog delivery. #352
+recorded the #344 checkpoint; #354 and #357 recorded and then accepted the
+Stage 4B fixture page.
+
+**Material owner decision after #344.** On 2026-09-26 the owner approved the
+bounded #331 BER selected-precheck aggregate correction and option A of the
+#333 protected-file guard packet. #365 merged the governance record at
+21:17:29 UTC as `2aed8dd3`: [BER-DEC-014](behavioral-eval-runner-backlog.md#ber-dec-014-bounded-synthetic-selected-precheck-aggregate-correction--owner-approved),
+[AEGIS-APR-046](../approvals/APPROVAL_REGISTER.md#aegis-apr-046-ber-selected-precheck-aggregate-correction)
+and [AEGIS-APR-047](../approvals/APPROVAL_REGISTER.md#aegis-apr-047-standing-gate-guard-exception-for-four-ber-files),
+plus the standing merge conditions [AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green),
+[AEGIS-APR-049](../approvals/APPROVAL_REGISTER.md#aegis-apr-049-exact-head-ci-satisfies-the-local-test-condition)
+and AEGIS-APR-050, the eval-maintenance ruling AEGIS-APR-051 and the
+package-2 consumption record [AEGIS-APR-052](../approvals/APPROVAL_REGISTER.md#aegis-apr-052-consumption-of-the-package-2-implementation-grant).
+The correction was then implemented: [PR #374](https://github.com/ModernNomad-98/Project-Aegis/pull/374)
+merged at 23:24:51 UTC as `7390ae0a` under AEGIS-APR-047, consuming
+AEGIS-APR-046 (its consumption event is pending in the register). Its proposal estimates **4–8 active hours**, and the
+grant's 8-hour and 300-line limits are ceilings, not estimates. Option A adds
+roughly 5–15 active minutes of receipt work per eligible protected merge and
+removes owner waiting for those merges only; it adds no selected row.
+
+| Selected remaining outcome | #344 → current active hours | Current dependency and confidence |
+| --- | ---: | --- |
+| WP-2B-3: accepted candidate inputs | 1–4 → 1–4 | Owner inspection of private 160-case labels, guide and hashes remains; low. |
+| WP-2B-3: measured calibration and OD-1 ratification | 4–10 → 4–10 | Approved labels, live source/allowance, selected-host proof, measured results and owner ratification remain; the #331 correction does not close this gate; low. |
+| R4/R5: selected-host capability proof | 12–24 → 12–24, provisional | The disposable VM remains paused; guest checks, Stage A scope and separate grant remain; low. |
+| WP-2B-4: limited live suite | 12–24 → 12–24 | Calibration, OD-1, R1/R4/R5 evidence and a separate live grant remain; low. |
+| WP-2B-5: generic corpus | 8–16 → 8–16 | WP-2B-4, curated fixtures and separate phase grant remain; low. |
+| WP-2B-6: scheduling and dataset operations | 8–16 → 8–16 | WP-2B-5, scheduling, cost, quarantine and dataset authority remain; low. |
+| WP-2B-7: advisory CI and operator workflow | 4–8 → 4–8 | WP-2B-6 and advisory CI/operator authority remain; low. |
+| CP-WP-003: real authority and execution capability | 8–16 → 8–16, provisional | Atomic authority, freshness, containment, evidence and billing proof remain; authenticated selected-source proof is missing; low. |
+| CP-WP-004: one bounded real integration | 8–16 → 8–16 | CP-WP-003 proof, selected operation and separate grant remain; low. |
+| Issue #101 package 7: release readiness | 6–12 → 6–12 | Stage 4B host proof, comparison/selection and exact-release review remain; all eight synthetic Stage 4B cases are still **NOT RUN**; low. |
+| **Ten-row subtotal** | **71–146 → 71–146** | Existing selected planning rows, provisional. |
+| BER selected-precheck aggregate correction (#331, [AEGIS-APR-046](../approvals/APPROVAL_REGISTER.md#aegis-apr-046-ber-selected-precheck-aggregate-correction)) | New: 4–8 → delivered | Implemented; PR #374 merged; APR-046 consumed (consumption event pending in the register). Active time not measured. |
+| **Bounded selected planning subtotal** | **71–146 → 75–154, provisional** | Ten rows plus the correction. 75–154 stays the planning figure for this checkpoint; the correction's 4–8-hour line is now delivered, so 71–146 remains. |
+| Issue #101 Stage 4B: actual host mechanics proof | TBD → TBD | Host profile, permissions, telemetry, provider/cost limits and separate grant remain. |
+| BER-BKL-009: real host, runtime, privacy and cleanup | TBD → TBD | Named host, verified controls, runtime design and authority remain. |
+| Documentation readability | 1 unclassified page at #344 → changed pages were independently reviewed and re-accepted after a corrected-candidate review; see the readability ledger. 0 known pending pages at #370. | 605 tracked Markdown files: 561 accepted readers and 44 classified fixtures; #364 added the one new page. The "1 unclassified page" reading at #344 is superseded: #354 recorded the Stage 4B fixture page as pending and #357 accepted it. This forecast and the [execution measurements](aegis-execution-metrics.md), changed by #352 and again by this checkpoint, and the [open-decisions index](aegis-open-decisions-2026-09-23.md), changed by this checkpoint, were re-accepted after a corrected-candidate review; see the [readability ledger](aegis-documentation-readability-backlog.md#start-here--current-reading). |
+| **Full selected total** | **No finite estimate → no finite estimate** | Stage 4B and BER residuals remain unestimated. |
+
+**Owner-choice teaching backlog, outside the selected subtotal.** After #356,
+the coordinating session's owner-choice audit, which is not a repository
+record, found 22 skills that still needed owner-choice teaching, grouped in
+four batches at a provisional **8.5–16.5 active hours**: S1 five skills, S2
+six, S3 six and S4 five. Delivered so far are 17: three S1 skills (#366),
+S2 (#368), S3 (#370) and the other two S1 skills, project-orchestrator and
+requirements-gathering-facilitator. Those two were deferred from #366 because
+`scripts/tests/test_validator.py` pinned their eval counts, and [PR #373](https://github.com/ModernNomad-98/Project-Aegis/pull/373)
+delivered them when it merged at 23:32:15 UTC as `4ca04c1e`. S4 (five skills)
+is open as #376 and not delivered, so 5 of the 22 are in open PRs. S5 held six skills classified UNSURE; it resolved on
+2026-09-26, when the owner accepted all six verdicts: 1 of 6 needs a step
+(`feature-flag-rollout-strategist`), open as #377. The backlog is therefore
+23 skills: 17 delivered and 6 in open PRs. No per-batch split of the original
+range exists, so the remainder is provisional and unscored rather than a
+subtracted figure; confidence is low. A separate R2 wording batch (six
+owner-choice steps) is open as #372. None of these lines adds to the bounded
+selected subtotal.
+
+**Owner-requested new skill, outside the selected subtotal.** On 2026-09-26
+the owner asked for a new feature-flag skill to be put in the backlog. The
+skills roadmap already lists it as planned:
+[#27 "Feature Flag Architecture" (P1)](../skills/01-software-architecture-engineering.md)
+and [#65 "Feature Flag Rollout by Tenant" (P1)](../skills/02-saas-platform-architecture.md).
+
+| Backlog item | Provisional active hours | Dependency and confidence |
+| --- | ---: | --- |
+| New skill: feature-flag architecture. The in-app half of feature flags that the shipped `feature-flag-rollout-strategist` (rollout strategy only) does not cover: flag store versus vendor choice, SDK and configuration placement, fail-safe defaults when the flag service is down, tenant/plan/cohort targeting, kill-switch wiring and flag-debt removal hooks. | 2–4, in progress | Scope proposal accepted by the owner on 2026-09-26: one new auto-invocable skill, `feature-flag-architect`, with its boundaries to `feature-flag-rollout-strategist`, `plan-entitlement-architect`, `authorization-matrix-designer` and `ab-test-designer` pinned in the proposal. Delivery under the [skill-generation standard](../skill-generation-standard.md) (SKILL.md, evals, trigger evals and catalog row) and a skill-quality review; low. |
+| `project-orchestrator` routing from its release/QA stage to the rollout strategist, offered as an owner choice ("ship directly or behind a release flag?") | 0.5–1, not started | Follows the new skill; low. |
+| **Feature-flag subtotal (outside the selected subtotal)** | **2.5–5, provisional** | Planning assumption, not a measurement. |
+
+All seven optional rows were reconsidered without a scope or gate change:
+issue #101 packages 5 and 6 **8–20 hours each** after Stage 4B, helper
+selection and separate grants (package 6 also needs provider authority);
+BER-BKL-010 **4–12 hours** after adoption; BER-BKL-014 **8–20 per named host**;
+BER-BKL-015 **8–24 per named product**; strategic skill expansion
+**unbounded**; and multi-judge arbitration/future control-plane architecture
+**unbounded**. Both helpers would add **16–40 hours**, making a **91–194-hour
+partial subtotal** on the 75–154 base that still excludes Stage 4B, BER
+residual and helper comparison. The provisional **4–8-hour** authenticated CP
+source inspection remains outside the selected subtotal. No finite full
+selected or all-options ETA is defensible while those scopes and waits are
+unresolved.
+
+Horizons: **now**, record APR-046's consumption after #374, and finish S4
+and the open R2 wording; **next**, the queued S5
+step for `feature-flag-rollout-strategist` and the private-label, source and
+host prerequisites within their own grants; **later**, the dependent live
+suites and conditional integrations. Confidence in the blocker inventory is
+high; confidence in execution ranges stays low until those proofs exist.
+Issue #101 remains open and the VM paused. At this reading (about 23:33 UTC),
+#371, #372, #375 (trigger seams), #376 (S4), #377 (the S5 feature-flag
+deadline step) and #378 (the `feature-flag-architect` proposal page) are open
+and receive no completion credit. #370, #374 and #373 are the first three
+merges of the next window; reassess after two further merges, or sooner for a material owner
+decision, merged Stage 4B or BER host scope, or verified scope change.
 
 ## Material owner decision — 2026-09-26, #331 BER correction and #333 option A
 
