@@ -41,6 +41,64 @@ production run. This is a static finding, not a claim that every possible
 external caller has been examined. The existing [operator review runbook](../roadmaps/ber-bkl-009-operator-policy-runbook.md)
 covers synthetic inventory and owner review; it contains no deletion command.
 
+## Source-to-runtime decision packet (rechecked at `9b85140d`)
+
+This source recheck identifies the **call sites to choose from**, not an actual
+runtime execution or host. A writer creates bytes; a reader consumes them. An
+evidence *root* is the directory containing one bundle, while a *manifest* is
+the list of files and hashes that a verifier checks. The selected host and root
+remain unknown for the residual work.
+
+| Path and source site | Bytes created or consumed | Boundary for a later scope |
+| --- | --- | --- |
+| [`evidence.py`](../../tools/behavioral_eval_runner/evidence.py), `EvidenceWriter.finalize_input_evidence` / `finalize_final_bundle` | Writes Stage A artifacts and input manifest; then the final report, Stage B artifacts and manifest, and detached marker. `verify_input_evidence`, `verify_final_bundle`, and `verify_local_bundle` read them. | The writer is called by the opt-in `OfflinePolicyWriter`, but the non-test tree has no production instantiation of either writer. Identify a real producer before proposing a binding. |
+| [`evidence_policy.py`](../../tools/behavioral_eval_runner/evidence_policy.py), `OfflinePolicyWriter` / `verify_policy_input` / `verify_policy_bundle` | Writes `policy/stage-a.json` and `policy/stage-b.json` receipts through the underlying writer; reads receipts, manifests, artifacts and marker for policy verification. | Synthetic integration exists. A real producer and each intended consumer must opt into policy-aware verification; a receipt does not attest content or host settings. |
+| [`cli.py`](../../tools/behavioral_eval_runner/cli.py), `verify-evidence` / `build-judge-envelope` | `verify-evidence` calls lower-level hash/bundle readers. The envelope path constructs `JudgeInputGate`, which checks active policy on a policy-claimed Stage A root before reading permitted artifacts; [`judge/envelope.py`](../../tools/behavioral_eval_runner/judge/envelope.py) builds the restricted envelope. | Hash-only CLI success must not be reported as policy acceptance. Future consumers need the same policy-aware gate before semantic use. The envelope command emits metadata only and does not dispatch. |
+| [`budget.py`](../../tools/behavioral_eval_runner/budget.py), `BudgetLedger._append_event` / `_write_checkpoint` | With a `store_path`, writes append-only event lines and a separate terminal checkpoint; `BudgetLedger.load` reads both. | This accounting pair is outside the Stage A/B writer. Decide whether a selected run root contains it and whether it belongs to the complete runtime bundle. |
+| [`materialize.py`](../../tools/behavioral_eval_runner/materialize.py), `materialize` / `_write_under_destination` | Writes materialized fixture files and its record beneath a caller-selected destination; the [`cli.py`](../../tools/behavioral_eval_runner/cli.py) `materialize` command supplies that destination. | A materialization destination is not automatically the evidence root. Map whether and how those source bytes enter a selected run's Stage A manifest. |
+| [`judge/calibration_development_driver.py`](../../tools/behavioral_eval_runner/judge/calibration_development_driver.py), `create_genesis` / `finalize` | At its fixed WP-2B-3 Windows root, writes a run manifest, canonical `runs/wp2b3-development-ledger-v1.jsonl` (through [`calibration_ledger.py`](../../tools/behavioral_eval_runner/judge/calibration_ledger.py)) and `runs/wp2b3-development-result-summary-v1.json`. On reopen, the driver reads the manifest and ledger and checks whether the summary exists. | These are separate calibration ledger/summary writers, not `EvidenceWriter` calls. The hardcoded root does not establish that it is the BER-BKL-009 runtime bundle or that its current host controls are verified. |
+
+**Compatibility boundary.** The published WP-2B-1 evidence family is
+`1.0.0-wp2b1`. Its existing Stage A/B bytes, hashes, detached marker, legacy
+caller behavior and per-artifact `expiration_at` (based on each artifact's own
+creation time) must remain interpretable. The policy receipt adds a separate
+first-evidence **bundle review date**; it does not rewrite old artifacts or turn
+their individual timestamps into a deletion instruction. The [schema
+compatibility policy](../behavioral-eval-runner-schema-compatibility.md) requires
+a versioned reader and separately reviewed derivative if published field meaning
+or accepted bytes change. A narrow opt-in binding has less compatibility work,
+but only covers the paths explicitly attached to it; broad rewiring may cover
+more producers, with greater migration and regression cost. **Recommend mapping
+the actual producers and readers first, then selecting the smallest complete
+binding**, because the non-test writer call gap prevents a justified code scope
+today. Engineering hours remain unestimated until that map and a host exist;
+neither option has an approved external spend.
+
+**Recovery boundary.** The [September 11 recovery record](ber-recovery-2026-09-11/README.md)
+uses GitHub for *source-library continuation and backup*: reviewed source,
+sanitized decisions and public-safe summaries are recoverable from Git history.
+That does not make GitHub a backup for raw Stage A/B bundles, provider output,
+private calibration inputs, local environments, wheel binaries or the local
+recovery ZIP. The [selected policy](../roadmaps/ber-bkl-009-evidence-policy-decision.md)
+keeps raw runtime evidence in an external controlled root and versioned private
+inputs in their separate owner-only repository. A future recovery plan must
+identify the named external store, measured bundle size and run volume, backup
+retention and restore test before quoting storage or upkeep cost. Uploading raw
+bytes to this public repository would expose material whose content has not
+been independently reviewed; it is not proposed here.
+
+**Next owner decisions.** Select the actual producer(s), consumers, execution
+host and exact root; name the host principals and encryption/recovery-key
+custodian; classify each created content class and intended judge/public
+recipient; then approve exact implementation paths, version handling and
+hour/line/spend bounds. A read-only host assessment can test existing controls
+with low change risk but takes operator time. Remediation changes ACL or
+encryption state and needs its own settings, rollback and authority. Deletion
+remains a separate later action after a marker/path/hash dry run and explicit
+owner disposition. Until those choices are made, a static inventory cannot
+establish host safety, privacy clearance, complete runtime coverage or a finite
+remaining ETA.
+
 ## Unresolved connections and decisions
 
 1. **Choose the runtime evidence source and host.** Name the exact creation
