@@ -166,8 +166,9 @@ the guardrail design.
     fail-closed floor: no option may allow inference when a budget check fails.
     Then ask exactly one atomic owner question; the answer sets the design
     only and does not authorize enforcing a guardrail or the provider backstop.
-    If step 5's tier-and-limit choice is also open, ask the more blocking
-    question first and list the other as pending for a later turn.
+    If step 5's tier-and-limit choice is also open, ask only the more
+    blocking of the two this turn and list the other as pending for a later
+    turn.
 
 ## Output Format
 

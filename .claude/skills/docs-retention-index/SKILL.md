@@ -96,7 +96,10 @@ pinned against each other in both directions.
    state what the owner is actually authorizing before asking. Then ask
    exactly one atomic owner question; the answer sets the retirement plan
    (including any approved removal stage) only, and this skill still deletes
-   nothing itself.
+   nothing itself. When several documents have open retirement choices, ask
+   only about the most blocking one this turn (for example, the one whose
+   disposition other relinks depend on) and list the others as pending for a
+   later turn.
 6. **Detect rot AND hoarding.** Flag docs past their review/expiry,
    superseded-but-present, and orphaned; equally, flag "permanent" docs
    with no reason-to-keep (hoarding by default). Push both toward an
