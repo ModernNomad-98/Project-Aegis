@@ -1,5 +1,6 @@
 /** Offline callback candidate. Importing this module cannot start an SDK session. */
 import { spawnSync } from 'node:child_process';
+import { randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import type { SyncHookJSONOutput } from '@anthropic-ai/claude-agent-sdk';
@@ -50,9 +51,9 @@ function bounded<T>(run: () => T | Promise<T>, milliseconds: number): Promise<T>
   });
 }
 
-function requestFrom(snapshot: AuthoritySnapshot): string {
+function requestFrom(snapshot: AuthoritySnapshot, requestId: string): string {
   return JSON.stringify({
-    version: '1', synopsis: snapshot.synopsis, stage: snapshot.stage,
+    version: '2', request_id: requestId, synopsis: snapshot.synopsis, stage: snapshot.stage,
     catalog_version: snapshot.catalog_version, policy_version: snapshot.policy_version,
     agents: snapshot.agents.map(o => ({ id: o.id, description: o.description, read_only: o.read_only })),
     skills: snapshot.skills.map(o => ({ id: o.id, description: o.description, manual_only: o.manual_only })),
@@ -105,7 +106,7 @@ async function evaluate(facts: HostFacts, proposal: Proposal): Promise<boolean> 
     const before = await bounded(() => facts.snapshot(), timeout);
     if (!validAuthority(before, proposal)) return false;
     const binding = canonicalJson(before);
-    const request = requestFrom(before);
+    const request = requestFrom(before, randomBytes(16).toString('hex'));
     if (Buffer.byteLength(request, 'utf8') > 4096) return false;
     const response = await bounded(() => facts.advice(request), timeout);
     if (typeof response !== 'string' || Buffer.byteLength(response, 'utf8') > 1024) return false;

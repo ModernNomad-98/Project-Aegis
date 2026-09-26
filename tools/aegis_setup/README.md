@@ -25,7 +25,8 @@ assignment.
 from tools.aegis_setup import decide, parse_request
 
 request = parse_request({
-    "version": "1", "catalog_version": "cat-1", "policy_version": "pol-1",
+    "version": "2", "request_id": "0123456789abcdef0123456789abcdef",
+    "catalog_version": "cat-1", "policy_version": "pol-1",
     "synopsis": "Review an application programming interface (API) change", "stage": "review",
     "agents": [{"id": "reviewer", "description": "Reviews code", "read_only": True}],
     "skills": [{"id": "api", "description": "API review", "manual_only": False}],
@@ -33,7 +34,8 @@ request = parse_request({
     "selected_agents": [], "selected_skills": [], "invoked_manual_skills": [],
 })
 reply = {
-    "version": "1", "catalog_version": "cat-1", "policy_version": "pol-1",
+    "version": "2", "request_id": "0123456789abcdef0123456789abcdef",
+    "catalog_version": "cat-1", "policy_version": "pol-1",
     "status": "recommend", "agents": ["reviewer"], "skills": ["api"],
 }
 recommended = decide(request, reply)
@@ -62,7 +64,7 @@ JSON means JavaScript Object Notation, a text format for structured data.
 ## Contract details
 
 `parse_request(raw)` accepts a JSON object (or mapping) with contract `version`
-`"1"`, `catalog_version`, `policy_version`, a one-line `synopsis` (1–512
+`"2"`, `request_id`, `catalog_version`, `policy_version`, a one-line `synopsis` (1–512
 characters), `stage` (`discovery`, `design`, `implementation`, `review` or
 `release`), and `agents` and `skills` arrays of at most 16 offered entries each.
 Agent entries have exactly `id`, `description`, `read_only`; skill entries have
@@ -77,14 +79,19 @@ A future host also supplies `mandatory_agents`, `mandatory_skills`,
 lists (up to 16 each). Every ID must be offered. A manual-only skill requires
 both an explicit selection and invocation. The total encoded request is at
 most 4096 UTF-8 (Unicode text encoding) bytes. No other fields are accepted.
+The `request_id` must be exactly 32 lowercase hexadecimal characters. A host
+generates a fresh unpredictable 128-bit value for every callback; a response
+must echo it exactly. Version 1 responses and requests are rejected, including
+by offline adapters that have not migrated. The ID only pairs a response with
+its request; it grants no permission or dispatch authority.
 The synopsis rejects line breaks, common URL (web address) or file-path shapes
 and key/value secret markers; this is a
 minimization check, not a guarantee that human text contains no sensitive
 information. A future host must curate the synopsis before constructing it.
 
 `decide(request, raw)` accepts a JSON response of at most 1024 UTF-8 bytes
-with exactly `version`, `catalog_version`, `policy_version`, `status`, `agents`,
-`skills`, and optional `score`. Versions must match exactly. `status` is
+with exactly `version`, `request_id`, `catalog_version`, `policy_version`, `status`, `agents`,
+`skills`, and optional `score`. Versions and request ID must match exactly. `status` is
 `recommend` or `abstain`; selections are unique subsets of offered IDs. A
 recommendation includes every mandatory and explicit ID. Manual-only skills
 require invocation. `score`, when supplied, is a number between 0 and 1;

@@ -19,7 +19,7 @@ const base: AuthoritySnapshot = {
 };
 const reply = (req: string, agents = ['reviewer'], skills = ['api']) => {
   const parsed = JSON.parse(req);
-  return JSON.stringify({ version: '1', catalog_version: parsed.catalog_version,
+  return JSON.stringify({ version: '2', request_id: parsed.request_id, catalog_version: parsed.catalog_version,
     policy_version: parsed.policy_version, status: 'recommend', agents, skills });
 };
 function harness(change: Partial<AuthoritySnapshot> = {}, advise = reply) {
@@ -38,6 +38,38 @@ test('Agent and model Skill dispatch each recheck authority', async () => {
   assert.equal(noDecision(await h.callbacks.preToolUse(agent)), true);
   assert.equal(noDecision(await h.callbacks.preToolUse(skill)), true);
   assert.equal(h.calls(), 4);
+});
+
+test('each callback gets a fresh 128-bit request ID and stale advice denies every route', async () => {
+  const seen: string[] = [];
+  let stale = '';
+  const callbacks = createOfflineCallbacks({ snapshot: () => ({ ...base, selected_skills: ['api'] }), advice: req => {
+    const parsed = JSON.parse(req);
+    assert.equal(parsed.version, '2');
+    assert.match(parsed.request_id, /^[0-9a-f]{32}$/);
+    seen.push(parsed.request_id);
+    if (!stale) stale = reply(req);
+    return stale;
+  } });
+  assert.equal(noDecision(await callbacks.preToolUse(agent)), true);
+  assert.equal(denied(await callbacks.preToolUse(agent)), true);
+  assert.equal(denied(await callbacks.preToolUse(skill)), true);
+  assert.equal((await callbacks.userPromptExpansion({ expansion_type: 'slash_command', command_name: 'api' })).decision, 'block');
+  assert.equal(new Set(seen).size, 4);
+  const fresh = harness({ selected_skills: ['api'] });
+  assert.equal((await fresh.callbacks.userPromptExpansion({ expansion_type: 'slash_command', command_name: 'api' })).decision, undefined);
+});
+
+test('missing, malformed, duplicate, mismatched and v1 response IDs deny', async () => {
+  const changes = [
+    (req: string) => { const value = JSON.parse(reply(req)); delete value.request_id; return JSON.stringify(value); },
+    (req: string) => JSON.stringify({ ...JSON.parse(reply(req)), request_id: 'A'.repeat(32) }),
+    (req: string) => JSON.stringify({ ...JSON.parse(reply(req)), request_id: 'f'.repeat(32) }),
+    (req: string) => JSON.stringify({ ...JSON.parse(reply(req)), version: '1' }),
+    (req: string) => reply(req).replace('"request_id":', '"request_id":"f","request_id":'),
+    (req: string) => JSON.stringify({ ...JSON.parse(reply(req)), status: 'abstain', agents: [], skills: [], request_id: 'f'.repeat(32) }),
+  ];
+  for (const advice of changes) assert.equal(denied(await harness({}, advice).callbacks.preToolUse(agent)), true);
 });
 
 test('unknown tool, unknown ID, malformed tool input and subagent name deny', async () => {
@@ -94,6 +126,10 @@ test('changed or missing fresh authority between advice and dispatch denies', as
   const mutated = createOfflineCallbacks({ snapshot: () => reused,
     advice: req => { reused.policy_version = 'pol-2'; return reply(req); } });
   assert.equal(denied(await mutated.preToolUse(agent)), true);
+  const permission = { ...base };
+  const revoked = createOfflineCallbacks({ snapshot: () => permission,
+    advice: req => { permission.ordinary_permission = 'deny'; return reply(req); } });
+  assert.equal(denied(await revoked.preToolUse(agent)), true);
   const missing = createOfflineCallbacks({ snapshot: () => { throw Error('missing'); }, advice: reply });
   assert.equal(denied(await missing.preToolUse(agent)), true);
 });
@@ -123,7 +159,7 @@ test('missing offer flags deny when runtime facts bypass the required TypeScript
 });
 
 test('malformed, duplicate-key, oversized and contaminated replies deny', async () => {
-  for (const advise of [() => '{', () => '{"version":"1","version":"1"}',
+  for (const advise of [() => '{', () => '{"version":"2","version":"2"}',
     () => 'x'.repeat(1025), req => reply(req).replace('"cat-1"', '"stale"'),
     req => JSON.stringify({ ...JSON.parse(reply(req)), agents: ['unknown'] }),
     req => JSON.stringify({ ...JSON.parse(reply(req)), status: 'abstain', agents: [], skills: [] })]) {

@@ -18,6 +18,13 @@ snapshot, then sends one bounded frame to a local Python process. The worker
 runs without site-package startup and inherits only the minimum path/OS/temp
 environment values, not provider credentials. The worker
 validates the existing 4,096-byte request and 1,024-byte response contracts.
+For each callback, the bridge creates a fresh 128-bit `request_id` using Node's
+cryptographic random source. The closed version-2 request and response include
+that 32-character lowercase hexadecimal ID, which the Python worker checks
+for an exact echo. Version-1 offline adapters must migrate; there is no v1
+fallback. The ID prevents an earlier callback's response from being reused,
+but is not an authorization token. The request, response and worker frame
+remain limited to 4,096, 1,024 and 6,144 UTF-8 bytes respectively.
 Only a recommendation that includes the actual target can pass. Unknown tools,
 IDs and failures explicitly deny. A passed callback returns no permission
 decision, so the host's normal permission flow still applies; it grants no

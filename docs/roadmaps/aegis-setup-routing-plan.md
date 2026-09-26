@@ -306,6 +306,11 @@ not just the shipped portion.
 | Registration, validation, tests and independent release review | The setup skill is in the [catalog](../skills-catalog.md) and packages 2–4A have offline checks. Package 7 still needs exact-release validation, host/OS support evidence, independent UX/security/authority review, and honest user documentation before a release claim. |
 | BER and control-plane boundaries stay intact | This plan grants neither BER live dispatch nor control-plane real execution. Their separate [BER](behavioral-eval-runner-backlog.md) and [control-plane](resumable-control-plane-backlog.md) gates still apply. |
 
+The offline Stage 4A candidate now binds each version-2 advice response to a
+fresh callback `request_id`; Python and Node synthetic regression tests reject
+stale replies for Agent, model Skill and direct typed skill paths. This repair
+does not establish a real host hook or advance Stage 4B readiness.
+
 Package 7 can be scoped only after separately authorized Stage 4B actual-host
 proof and a later approved, predeclared comparison and selection. Packages 5/6
 remain conditional on that decision. If no helper clears the gate, evaluate
