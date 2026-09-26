@@ -108,13 +108,39 @@ pack's job, and keeping PII out of LLM context is
    rather than being surgically edited — state the rotation window,
    restore-time re-deletion procedure, and say exactly that in the
    user-facing policy. Free-text and embedding stores get their stated
-   strategy (redaction pass; embedding deletion keyed to source doc).
+   strategy (redaction pass; embedding deletion keyed to source doc). If a
+   public deletion promise is shorter than backup rotation, explain the
+   terms plainly: rotation is when old backup copies expire; restore-time
+   re-deletion reapplies erasure before restored data is usable. Compare
+   shortening backup rotation to meet the existing promise with proposing
+   a policy amendment that accurately describes backup aging. For each,
+   state why it is viable here, the benefit, privacy and recoverability
+   limits, setup work, ongoing operations, and storage/recovery or
+   policy-notice cost (amounts unknown until measured). Recommend the
+   compliant path supported by recovery and policy evidence, and say why;
+   if neither is proven, keep the conflict open and recommend no
+   compliant-closure claim. An amended
+   promise needs the policy owner and counsel's review and cannot erase
+   an earlier missed promise. Ask the owner one clear decision question,
+   without treating a draft or a proposed option as approval.
 6. **Choose anonymization vs pseudonymization deliberately.**
    Pseudonymized data (key exists somewhere) IS personal data — retention
    and erasure still apply; state key custody. Anonymization claims get a
    re-identification risk check (quasi-identifier combinations, k-style
    thresholds stated) — most "anonymized" datasets are pseudonymized with
-   optimism. Aggregation floors for published/cross-tenant stats.
+   optimism. Aggregation floors for published/cross-tenant stats. When a
+   real choice remains, explain that pseudonymization keeps a linkable key
+   and the data within the personal-data lifecycle, while verified
+   anonymization aims to make re-identification impracticable under the
+   stated threat model. For each viable path, state why it is viable
+   here, then compare utility, re-identification and sharing risk, key
+   custody or transformation setup, recurring controls, and
+   storage/compute/review cost (unknown until scoped). Recommend the path
+   supported by the purpose and evidence, with a reason; never recommend
+   the anonymized label before the risk check passes. Ask one owner
+   question for the unresolved policy choice; if the backup-promise choice
+   is also open, ask the higher-impact question first and list the other
+   as pending rather than stacking questions.
 7. **Carry residency per store.** Which classes are region-pinned, which
    stores replicate across regions (including backups and vendor
    processing locations), and the conflict list where current
@@ -149,6 +175,10 @@ Standing checks:<new-PII detection; retention-job monitoring; DSR SLA>
 Handoffs:       audit records → audit-log-architect; test data → test-data-architect;
                 LLM context → sensitive-disclosure-guard; evidence packaging → compliance pack
 Residual risk:  <approximate-erasure stores, vendor gaps, legacy backups — explicit>
+Owner choice:   <only when unresolved: plain terms; viable paths with why each
+                 is viable, benefits, risks, setup/upkeep and money cost or
+                 unknowns; evidenced recommendation and why; one clear
+                 question; decision pending>
 ```
 
 ## Validation Checklist
@@ -164,9 +194,18 @@ Residual risk:  <approximate-erasure stores, vendor gaps, legacy backups — exp
 - [ ] The backup stance is honest and appears in user-facing policy terms
       (rotation aging, restore-time re-deletion) — no silent surgical-
       backup-edit claims.
+- [ ] A backup-rotation/promise conflict compares shortening rotation and
+      amending the promise in plain terms, with the reason for each viable
+      path, benefits, limits, setup, upkeep and money costs or unknowns;
+      gives a reasoned recommendation, asks one owner question, and leaves
+      counsel/policy approval pending.
 - [ ] Nothing labeled "anonymized" without the re-identification check;
       pseudonymized data is treated as personal data with key custody
       stated.
+- [ ] An unresolved pseudo-versus-anonymous choice explains both terms,
+      gives the reason for each viable path, compares utility, risk and
+      costs, gives an evidence-based recommendation and one owner
+      question; it never treats a proposed label as approved.
 - [ ] Residency conflicts are listed, not smoothed over.
 - [ ] The residual-risk list exists and is specific.
 

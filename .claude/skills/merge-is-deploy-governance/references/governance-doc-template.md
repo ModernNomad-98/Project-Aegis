@@ -71,12 +71,13 @@ an explicit per-commit plan.
 For a merge commit, inspect its parents before choosing the mainline number;
 do not assume that parent 1 is correct for every history.
 
-## 7. Accepted-risk exposure window
+## 7. Exposure window and acceptance status
 From merge to verified deploy: ≈ <duration> (deploy latency + §3 signal
 latency). During it, <blast radius: which users/tenants/surfaces> are
 exposed to any defect PR validation missed.
-Accepted by <named human> on <date>. Revisit when latency or blast radius
-changes materially.
+Status: pending risk-owner acceptance | accepted by <authorized risk owner>
+on <date>, scope <...>, evidence <...>. Revisit when latency or blast
+radius changes materially.
 ```
 
 Git's official [revert documentation](https://git-scm.com/docs/git-revert)
@@ -103,7 +104,9 @@ a two-dot range excludes. Review the exact set with
 
 The window is not a defect to hide; it is the price of merge==deploy, and
 the governance's honesty test. State it as: duration × blast radius ×
-who accepted. Three healthy responses exist: shrink the duration (faster
-verification signals), shrink the radius (flags, canaries — route to the
-pipeline/release skills), or accept it in writing. The unhealthy response —
-leaving it unstated — is the one this doc forbids.
+who accepted. The healthy responses are accept, reduce, or hold: accept
+it in writing (authorized risk owner, date, scope, evidence); reduce it by
+shrinking the duration (faster verification signals) or the radius (flags,
+canaries — route to the pipeline/release skills); or hold merges that
+touch the exposed surface until the window is evidenced or reduced. The
+unhealthy response — leaving it unstated — is the one this doc forbids.
