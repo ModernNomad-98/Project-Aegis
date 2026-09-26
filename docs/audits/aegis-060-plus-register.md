@@ -35,6 +35,14 @@ merged as `82dfebee7dadb68207bead5cb10fa3c562f21c1e`; the post-merge Actions run
 passed. Its [final correction evidence](../evidence/shared-contracts-closeout-2026-09-12/corrected-verification.md)
 also records the two addressed GitHub findings and corrected manual-skill count.
 
+**Skill-contract disposition follow-up, 2026-09-26:** a fresh audit of main
+`4227b71b7b8ede5d2670a0ca709fa9cfb5afce78` matched 75 of 84 semantic candidates
+to the 2026-09-12 dispositions. The
+[dated disposition record](../evidence/skill-contract-dispositions-2026-09-26/candidate-dispositions.md)
+reviews the other nine: five new false positives and four rewordings where the
+earlier judgment still applies. It finds no skill defect and changes no skill
+text, frozen baseline or unrelated AEGIS item.
+
 ## Historical baseline (superseded where the current disposition says so)
 
 Companion to the frozen AEGIS-001..059 baseline
