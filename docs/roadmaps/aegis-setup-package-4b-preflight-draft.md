@@ -9,7 +9,10 @@ hashing was performed. No provider call, credential use, VM work, host probe,
 helper comparison, deployment or
 deletion is authorized by it. Recheck every source pin against the exact commit
 chosen for a later run. The [proof protocol](aegis-setup-package-4b-host-proof-protocol.md)
-and the template govern the eventual packet.
+and the template govern the eventual packet. The
+[offline synthetic case draft](aegis-setup-package-4b-synthetic-case-fixtures.md)
+provides candidate invented prompts and expected action/receipt rows for all
+eight cases; it is not a frozen manifest or a run result.
 
 ## What is already known
 
