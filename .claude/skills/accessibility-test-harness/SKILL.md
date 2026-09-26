@@ -72,9 +72,10 @@ those remaining checks manually.
    finding cites its criterion. If the owner must choose, explain that a
    version identifies a dated set of criteria and a level (A, AA, or AAA)
    sets how demanding the target is. First show any contractual floor;
-   compare only viable targets against it. Explain why each is viable,
-   which users/checks it covers and misses, and the likely audit/remediation
-   setup and ongoing upkeep. Tooling or audit prices vary; verify quotes
+   compare only viable targets against it. For each target, explain why it
+   is viable, its benefit and drawback, which users/checks it covers and
+   misses, and its likely audit/remediation money cost, setup time, and
+   ongoing upkeep. Label an unknown price explicitly and verify quotes
    when money matters. Recommend the target that meets the obligation and
    product needs with the least unjustified burden, explain why and what
    missing requirement would change it, then ask one version-and-level
@@ -117,8 +118,9 @@ those remaining checks manually.
 ```
 A11Y HARNESS (ACCESSIBILITY TEST HARNESS) — <scope>
 Standard: <Web Content Accessibility Guidelines (WCAG) version/level + obligation source>
-Standard decision, if owner choice: <plain terms; viable targets; coverage,
-  gaps, setup/money/upkeep or unknowns; recommendation + why + what could
+Standard decision, if owner choice: <plain terms and contractual floor;
+  each viable target's reason, benefit, drawback, coverage/gaps,
+  money/setup/upkeep or unknowns; recommendation + why + what could
   change it; one question>
 Scope: <journeys, routes, components>
 Automated tier:
@@ -139,8 +141,10 @@ Handoffs: <wiring → engineer skills; fixes → product/code-reviewer>
 ## Validation Checklist
 
 - [ ] WCAG version/level pinned and every check cites a criterion.
-- [ ] An owner choice of target includes the obligation floor, explained
-      options and costs, a reasoned recommendation, and one decision question.
+- [ ] An owner choice of target defines terms and the obligation floor;
+      compares each viable option's reason, benefit, drawback, coverage and
+      money/setup/upkeep or unknowns; and gives a reasoned recommendation
+      before one decision question.
 - [ ] Automated/manual split is explicit; nothing automation can't judge is
       claimed as automated coverage.
 - [ ] Keyboard checklist covers reach-everything, visible focus, no traps,
