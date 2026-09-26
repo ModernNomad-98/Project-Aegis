@@ -225,7 +225,8 @@ convention, decision D3 — present and well-formed, not "passing").
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the two overlap clusters:
 context/truth (`agent-startup-context-gate`, `source-of-truth-reconciler`) and
 change governance (`change-classification-gate`, `human-approval-boundary`,
-`reviewable-diff-discipline`).
+`reviewable-diff-discipline`). `ai-closeout-reporter` also ships one, pinning
+terminal reporting against the later-phase skills that route toward it.
 
 ### Skills (Phase 1.5 — AI-SDLC governance completion)
 
