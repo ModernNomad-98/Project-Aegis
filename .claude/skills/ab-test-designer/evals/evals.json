@@ -71,6 +71,20 @@
           "An experiment tests a hypothesis; this request is de-risking a change, not measuring a causal effect."
         ]
       }
+    },
+    {
+      "id": "edge-owner-infeasible-test-path-choice",
+      "type": "should_trigger",
+      "prompt": "We want to A/B test a checkout redesign. We get about 1,200 checkout conversions a week on a 3% baseline, want to detect a 2% relative lift, and leadership wants a decision within four weeks. Engineering has not said whether it can support a longer run, and we have no estimate of what a longer run would cost us. Growth wants to launch the test anyway. What should we do? Explain the options before asking me to choose.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Shows from the stated baseline, MDE, significance level, and power that a 2% relative lift cannot be powered within four weeks, and explains minimum detectable effect, statistical power, and why an underpowered non-significant result would be uninformative in plain language.",
+          "Compares the viable paths - target a larger, practically meaningful effect; run longer over full weekly cycles; or decide by another method than this experiment - giving each path's reason, benefits, drawbacks, and time, money, and upkeep cost, and marks engineering capacity and extension cost as explicit unknowns without inventing figures.",
+          "Recommends one feasible path grounded in the traffic and the four-week decision constraint, explains why, and names the fact that would change the recommendation; does not proceed with the underpowered test as requested.",
+          "Asks exactly one clear owner choice question after the comparison; treats the answer as a design choice, not authorization to start a run or spend money, and leaves metric definition to funnel-definition-designer and any safety rollout to feature-flag-rollout-strategist."
+        ]
+      }
     }
   ]
 }

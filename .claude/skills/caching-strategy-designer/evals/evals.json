@@ -71,6 +71,20 @@
           "No data-caching design — envelopes, invalidation, tenant keys — is requested."
         ]
       }
+    },
+    {
+      "id": "edge-owner-read-path-after-cache-rejection",
+      "type": "should_trigger",
+      "prompt": "Our billing page shows each tenant's current credit balance and takes about two seconds to load. Someone proposed caching it, but finance says the balance must always be current because customers top up and spend immediately. The query plan shows a sequential scan that sums every ledger row for the tenant, and reads outnumber writes about fifty to one. What should we do instead of a cache? Explain the choices before asking me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rejects the cache as scoped because no staleness tolerance can be stated, explains why in plain language, and does not invent a TTL or tolerance to make caching fit.",
+          "Defines query tuning and database materialization in plain terms and compares them, giving each option's reason from the stated scan and read/write evidence, user benefit, drawbacks (such as write-path coupling and keeping a maintained balance consistent with the ledger), and money, setup, and maintenance cost, marking unmeasured latency gains as unknowns rather than inventing numbers.",
+          "Recommends one read-path option from the measured access pattern with a concrete reason and the condition that would change it.",
+          "Asks exactly one choice question after the comparison; does not treat the answer as approval to add a store or change the schema, and hands detailed tuning to query-plan-reader and materialization placement to operational-vs-analytical-splitter."
+        ]
+      }
     }
   ]
 }

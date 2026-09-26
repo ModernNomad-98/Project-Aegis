@@ -52,6 +52,20 @@
           "Rejects the 'quietly' requirement: cross-tenant reads must be enumerated and audited, and tenant-visibility promises must be honored."
         ]
       }
+    },
+    {
+      "id": "edge-owner-export-permission-choice",
+      "type": "should_trigger",
+      "prompt": "We're adding 'export all workspace data' - every project, comment, and member email - to our B2B app. Workspace roles today are owner, admin, member, and guest. Some customers want admins to run exports; others worry a departing admin could take everything. We don't know how many customers actually need delegated export. Who should be allowed to export? Explain the options before asking me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the roles, the resource, and the export action as a named verb-resource permission, and explains in plain language why bulk export is sensitive and what least privilege and deny-by-default mean here.",
+          "Compares viable grants - owner only, owner plus admin, and a separately grantable export permission - giving each option's reason, user benefit, security drawback (such as exfiltration by a departing admin), and setup and upkeep cost (UI, access reviews, support load), and marks customer demand as an explicit unknown without inventing adoption numbers.",
+          "Recommends the least-privilege fit with a concrete reason and the condition that would change it, keeps role CAN separate from plan INCLUDES (any paid-tier gating goes to plan-entitlement-architect), and includes negative tests for member, guest, revoked-membership, and cross-tenant export attempts.",
+          "Asks exactly one decision question after the comparison; the answer does not authorize implementing the matrix or silently widening an existing role, and export events are required to be audited with the record schema left to audit-log-architect."
+        ]
+      }
     }
   ]
 }

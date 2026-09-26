@@ -51,6 +51,20 @@
           "Performs only the preserving moves; lists the backoff change under not-done as its own task requiring its own tests and approval."
         ]
       }
+    },
+    {
+      "id": "edge-owner-coverage-gate-choice",
+      "type": "should_trigger",
+      "prompt": "Invoked explicitly: simplify normalizeRow in src/import/csv_normalizer.ts. Its tests cover only the happy path; the untested branches handle legacy date formats and empty cells that customers' uploaded files rely on. We don't know how long writing tests for those branches would take. Explain the options before I decide how to proceed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops at the coverage gate before any edit and explains in plain language what characterization tests are (they pin current behavior, including existing bugs) and what unprotected simplification means.",
+          "Compares adding characterization tests first with accepting unprotected simplification, giving each path's reason, case-specific benefit and risk for the legacy-date and empty-cell branches, test-writing time, ongoing upkeep, and any monetary cost, and marks the test-writing effort as an explicit unknown without inventing an estimate.",
+          "Recommends the safer route with a concrete reason and the condition that would change it.",
+          "Asks exactly one atomic decision question and makes no edit before the answer; the choice does not authorize behavior or contract changes, suspected bugs are reported rather than fixed in-band, and work stays inside the named function."
+        ]
+      }
     }
   ]
 }
