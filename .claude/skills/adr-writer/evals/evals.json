@@ -49,7 +49,7 @@
         "triggers": true,
         "assertions": [
           "Asks for or flags the missing alternatives rather than fabricating a comparison.",
-          "If proceeding, records the honest context (decision by momentum), marks status appropriately, and does not invent rejected options.",
+          "If proceeding, records the honest context (decision by momentum), sets the status to \"proposed\" (not \"accepted\"), and does not invent rejected options.",
           "Still includes the mandatory rollback plan and review date."
         ]
       }

@@ -35,7 +35,7 @@
       "id": "delegated-review-composes-subagent",
       "prompt": "Spin up the release-readiness reviewer agent on this PR and give me its verdict while I keep working.",
       "expected_skill": "release-readiness-reviewer (subagent)",
-      "should_not_trigger": [],
+      "should_not_trigger": ["code-reviewer"],
       "reason": "Delegated, isolated review runs go to the same-named read-only SUBAGENT in .claude/agents/, which composes this skill as its procedure — the full-codebase-auditor namespace pattern; the skill itself is what runs inline."
     }
   ]
