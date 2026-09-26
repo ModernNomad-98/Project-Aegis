@@ -47,6 +47,20 @@
       }
     },
     {
+      "id": "edge-owner-plan-fix-route-choice",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke query-plan-reader. Our per-request open-shipments lookup takes three seconds for large tenants. The EXPLAIN ANALYZE we captured on a staging copy at production volume shows a nested loop where the shipments filter estimates 60 rows but returns 250,000; statistics on that table were last refreshed before a bulk import five months ago, and the predicate is written as `date(created_at) >= $2`. The shipments table takes heavy writes. The team is split between refreshing statistics, rewriting the predicate, and adding a composite index on (tenant_id, status, created_at). We have no estimate of the index's storage or rollout time. Explain the options, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains statistics refresh, query rewrite (making the predicate sargable by removing the function over created_at), and a composite index in plain language, and reads the 60-versus-250,000 estimate divergence and the stale statistics as the diagnostic core before designing any index.",
+          "States why each route would address this plan and its case-specific benefits and drawbacks - statistics refresh as the cheapest fix, the rewrite's preserved semantics, and the index's column-order rationale with the tenant key plus its write-amplification and storage price on the write-hot table - with purchase, implementation, and ongoing costs, labeling the unestimated index storage and rollout time as unknown.",
+          "Recommends one route from the measured plan evidence with its reason, states the expected plan-shape change, and gives the re-verification method: re-plan under the same parameters and representative volume plus a surface-level timing check.",
+          "Asks exactly one decision question after the comparison; states that the recommendation does not authorize the database change, runs no statistics refresh, rewrite, or index migration against a live store, and routes any index migration through the change process and secure-migration-reviewer."
+        ]
+      }
+    },
+    {
       "id": "should-not-index-everything",
       "type": "should_trigger",
       "prompt": "Explicitly invoke query-plan-reader. Just give me indexes on every column this slow query touches — all the WHERE columns, the JOIN keys, the ORDER BY — so we cover every possibility.",

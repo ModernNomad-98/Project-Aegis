@@ -123,7 +123,9 @@ whole split unnecessary (`query-plan-reader`).
    requirement, compare the options' pros and cons, and estimate money,
    setup time, and ongoing care (including $0 incremental spend if verified).
    Recommend the least costly option that meets the evidence and state why;
-   label unknown costs for verification.
+   label unknown costs for verification. Then ask one atomic offload
+   decision at a time; the owner's answer does not authorize provisioning,
+   a pipeline, or a cutover.
 
 Mechanism decision table, freshness-tier definitions, and the workload
 classification worksheet:

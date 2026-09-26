@@ -46,6 +46,20 @@
       }
     },
     {
+      "id": "edge-owner-offline-scope-choice",
+      "type": "should_trigger",
+      "prompt": "Our inspection app is used by technicians in basements and plant rooms with no signal for up to a full shift. Each inspection is filled in by one technician, but the shared site equipment list is edited by technicians and office staff throughout the day. Should we make only reading work offline, let technicians create and edit their own inspections offline, or make everything editable offline, including the shared equipment list? We have not estimated the build effort or the on-device storage for any option. Explain the choices, recommend one, and ask me to decide.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the terms in plain language - read-offline, create and edit offline through a durable write queue with optimistic apply, and a sync conflict - and classifies each operation's conflict risk, separating the single-owner inspections from the shared, co-edited equipment list.",
+          "Compares read-only offline, offline create and edit for a technician's own inspections, and full offline with why each is viable and case-specific pros and cons - more offline write surface means more conflict machinery, and full offline for the shared equipment list is the hardest case and needs an acknowledged conflict policy - with money, setup, and maintenance costs, marking the unestimated build effort and on-device storage as unknowns.",
+          "Recommends one scope with a reason tied to shift-long disconnection and single-owner inspections, or, if it asks first, names the deciding fact and how each answer changes the recommendation; in either case does not offer silent last-write-wins on the shared equipment list as a way to make full offline cheap.",
+          "Asks exactly one atomic scope decision question after the comparison, or only the missing deciding fact if one is needed; states that the choice does not authorize building or running the sync, and hands the offline and rollback UX states to edge-state-ux-designer."
+        ]
+      }
+    },
+    {
       "id": "should-not-silent-last-write-wins",
       "type": "should_trigger",
       "prompt": "Keep it simple: on conflict just take whichever version synced most recently and overwrite the other. Users won't notice.",
