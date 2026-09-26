@@ -11,6 +11,7 @@
         "triggers": true,
         "assertions": [
           "Confirms blast-radius reduction is the dominant lever from the stated shared-fate incidents before designing, rather than assuming cells.",
+          "Compares a read replica, per-tenant silo, regional deployment and cells for this incident: each one's isolation benefit and remaining shared failure, migration and setup work, infrastructure expense and fleet upkeep; recommends cells only if smaller responses cannot contain the evidenced shared fate.",
           "Defines a cell as a self-contained stack subset (compute + data + cache + queue + workers) that serves a subset of tenants end to end.",
           "Designs the tenant→cell mapping with a placement policy and a routing table, plus a THIN cell-router carrying no business logic or per-tenant data.",
           "Plans cell-by-cell deployment with a per-cell health gate and a halt rule so a bad change cannot reach the whole fleet, and enumerates global/cross-cell concerns."
@@ -39,6 +40,7 @@
         "assertions": [
           "Tests the premise and finds blast-radius reduction is NOT the dominant lever — the stated pain is analytical read load.",
           "Recommends the cheaper lever (a read replica / offloading reporting) instead of adopting cells, and explains cells multiply operational cost by cell count.",
+          "Explains why a read replica addresses report read pressure while a tenant silo or region still leaves some shared failure and cells add migration, repeated infrastructure and fleet operations; gives a contextual recommendation before any user choice.",
           "Declines to design a cell partition nobody's actual risk requires, rather than proceeding on the fashion argument."
         ]
       }

@@ -65,10 +65,34 @@ a single cell does should be able to take down another cell.
 ## Workflow
 
 1. **Test the premise before designing anything.** Is blast-radius reduction
-   the DOMINANT lever? If a read replica (read pressure), per-tenant siloing
-   of the hot store (one noisy tenant), or a regional deploy (residency)
-   addresses the actual risk, recommend that instead and STOP. Cells multiply
-   operational cost by cell count; adopting them for fashion is a finding.
+   the DOMINANT lever? Compare the smallest plausible responses to the actual
+   incident or constraint in plain terms:
+   - A **read replica** is another database copy for reads. It can take report
+     traffic off the primary with replication setup and another database bill, but
+     does not isolate writes, bad deployments or the rest of the shared stack.
+   - A **per-tenant silo** gives a hot tenant its own store or service. It can
+     isolate that component's load or data, but leaves shared compute, queues
+     and deployments exposed. It adds tenant-specific routing, migrations,
+     backup, monitoring and ongoing instance cost.
+   - A **regional deployment** places a stack in a selected geography for
+     residency or regional fault isolation. It adds infrastructure, data
+     placement, deployment and support work; tenants within one region may
+     still share failures. Do not promise isolation across regions without
+     checking shared identity, routing and other global dependencies.
+   - **Cells** repeat the compute, primary data, cache, queue and workers for
+     groups of tenants. They contain a cell's incident and permit rollout to
+     one group first, but require tenant migration, a reliable cell router,
+     per-cell capacity slack, deployments, monitoring and on-call across the
+     fleet. Global services can still cause shared failure.
+   Explain the case-specific benefit and limit, any migration and setup, and
+   delivery effort, direct infrastructure spend and continuing fleet upkeep
+   for each viable option; unknown prices stay unknown. Recommend the least
+   complex option that addresses the evidenced risk and say why. If a read
+   replica, per-tenant silo or regional deployment suffices, recommend it and
+   STOP before cell design. If the user must decide among viable options,
+   give the recommendation first and ask one plain-language question about
+   the failure they most need to contain. Adopting cells for fashion is a
+   finding.
 2. **Define the cell.** Name exactly what a cell contains — the self-contained
    stack subset (compute + primary data + cache + queue + workers) — such that
    a tenant is served entirely within one cell. Everything NOT in a cell is a
@@ -98,10 +122,15 @@ a single cell does should be able to take down another cell.
 
 ## Output Format
 
+If the premise fails, give the comparison and recommendation, then stop;
+the cell design fields below are not required.
+
 ```
 CELL ARCHITECTURE DESIGN — <platform>
 Premise check: <is blast-radius reduction the dominant lever? evidence /
   cheaper-lever recommendation if not>
+Choice: <viable options, each one's isolation benefit and limit, migration,
+  infrastructure cost, setup/delivery and fleet upkeep; recommendation and why>
 Cell definition: <what one cell contains — compute/data/cache/queue/workers>
 Tenant→cell mapping: <assignment, placement policy, routing-table location>
 Cell-router: <thin resolve-and-forward; no business logic or tenant business data beyond routing identifiers and mapping>
@@ -114,8 +143,10 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 
 ## Validation Checklist
 
-- [ ] The premise is tested first; if a cheaper lever suffices the design
-      recommends NOT adopting cells and says why.
+- [ ] The premise compares viable isolation options in plain terms, including
+      benefit and limit, migration, infrastructure money, setup/delivery and
+      fleet upkeep; the recommendation fits the evidenced risk. If a smaller
+      lever suffices, the design recommends NOT adopting cells and says why.
 - [ ] A cell is fully self-contained — a tenant is served end to end within
       one cell, with no runtime dependency on another cell.
 - [ ] Every tenant maps to exactly one cell; the placement policy and the
