@@ -17,7 +17,7 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [five-merge checkpoint after pull request #308](#five-merge-checkpoint-after-pull-request-308--2026-09-25)
+The latest [five-merge checkpoint after pull request #314](#five-merge-checkpoint-after-pull-request-314--2026-09-26)
 reconsiders every selected and optional row. The earlier [catch-up checkpoint
 after #306](#catch-up-checkpoint-after-pull-request-306--2026-09-25) records
 four missed five-merge windows without resetting the #303 cadence anchor.
@@ -51,6 +51,48 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Five-merge checkpoint after pull request #314 — 2026-09-26
+
+The [current full reassessment](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-26-after-pull-request-314)
+uses main `0ed98f754e0aa437d07abbbe630e9a1501e27baf`. The five
+first-parent merges after #308 were #309, #310, #311, #312 and #314. The
+intervals below run from the preceding merge; PR numbers alone do not
+establish merge order. UTC dates cross midnight in this window.
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Published estimate or bound |
+| --- | --- | --- | ---: | --- |
+| [#309](https://github.com/ModernNomad-98/Project-Aegis/pull/309): repair occupied setup selection path | `acb2b6b589585925664cf53f735f509549bbb51c` | September 25, 23:48:29 | 6m14s from #308 | No separate package ETA verified; no selected-row closure. |
+| [#310](https://github.com/ModernNomad-98/Project-Aegis/pull/310): propose routing request binding | `b126c7819e041cfa313826bbefb94606d06a4443` | September 26, 00:01:35 | 13m06s | Proposed repair: 6–10 active hours inside a proposed 12-hour cap; separate grant pending. |
+| [#311](https://github.com/ModernNomad-98/Project-Aegis/pull/311): checkpoint through #308 | `0ffe13dae6cd64526194afe2474cc784fa2d6897` | September 26, 00:03:08 | 1m33s | No measured active split. |
+| [#312](https://github.com/ModernNomad-98/Project-Aegis/pull/312): record standing delivery approval | `7894d129928936181cca8201ebf6cb88e006f841` | September 26, 00:15:44 | 12m36s | No separate package ETA verified. |
+| [#314](https://github.com/ModernNomad-98/Project-Aegis/pull/314): improve migration choice guidance | `0ed98f754e0aa437d07abbbe630e9a1501e27baf` | September 26, 00:48:00 | 32m16s | No separate package ETA verified. |
+
+From the #308 merge at 23:42:15 UTC on September 25 to #314 at 00:48:00
+UTC on September 26, observed wall time was **1h05m45s**. Active work,
+review, CI wait and owner wait were not separately instrumented and remain
+**unavailable**. Concurrent work and gaps occur within this interval; neither
+it nor per-merge spacing is an active-work delivery rate. No retrospective
+active duration is inferred.
+
+The ten selected estimated rows remain **71–146 active hours** after the
+row-by-row dependency review in the forecast. Stage 4B and BER-BKL-009
+real host, runtime, privacy and cleanup work remain TBD, so selected and
+all-options totals have no finite estimate. The bounded Stage 4A offline
+bridge is delivered with zero hours remaining in that package. All seven
+optional rows retain their ranges and gates. #310's 6–10-hour proposed routing
+repair, within a proposed 12-hour cap, is conditional on a separate grant
+and outside the selected subtotal. #312 records APR-039 delivery authority;
+it does not grant new live or private access.
+
+The #314 tree has **599 tracked Markdown files**: 555 accepted readers and
+44 classified fixtures, with zero known pending pages in the readability
+ledger. This checkpoint edits two existing pages, subject to review. PR #313
+remains **open** with Linux and Windows passing and the protected `gate-guard`
+failing, so it has no merge or selected-row completion credit here. Issue
+#101 remains open; the disposable VM remains paused. The next five-merge
+counter starts after #314; revise sooner if an owner decision or verified
+scope change warrants it.
 
 ## Five-merge checkpoint after pull request #308 — 2026-09-25
 
