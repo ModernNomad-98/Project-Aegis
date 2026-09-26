@@ -1,0 +1,292 @@
+{
+  "baseline": {
+    "tool": "audit-skill-contracts",
+    "version": "1.13.1",
+    "engine_sha256": "0cd68a7905ee8c563f9695afe40a41ec5199301e9f52438ea03629226ad4ab97",
+    "audited_file_count": 708,
+    "audited_byte_count": 4437179,
+    "corpus_content_hash": "225c53d7dc820319aec8c1136b302e52054b7b962e42f9b703d9fd3a1ec5b4c1",
+    "skill_count": 185,
+    "rule_count": 27,
+    "finding_count": 354,
+    "by_severity": {
+      "P0": 2,
+      "P1": 82,
+      "P2": 0,
+      "info": 270
+    },
+    "by_rule": {
+      "ARTF-001": 9,
+      "ROUTE-002": 270,
+      "SIDE-004": 73,
+      "STATE-001": 2
+    },
+    "mechanical_count": 270,
+    "semantic_review_candidates": 84,
+    "repo_sha": "4227b71b7b8ede5d2670a0ca709fa9cfb5afce78",
+    "scan_source": "git archive of origin/main at repo_sha, extracted to a clean directory (the engine reports repo_sha 'unknown' and working_tree_dirty true there because the archive has no .git)"
+  },
+  "prior_record": "docs/evidence/shared-contracts-closeout-2026-09-12/ (candidate-dispositions.json, remaining-candidates.json)",
+  "matching": {
+    "exact": "rule + owning_skill + normalized evidence. Normalization repairs the double-encoded UTF-8 in remaining-candidates.json, applies NFKC, maps em/en dashes to '-', collapses whitespace and lowercases. Line numbers are excluded because SIDE-004 is always line 0 and ARTF-001 anchors changed in v1.13.1.",
+    "drift": "no exact match, but the same rule + owning_skill + SIDE-004 mutation class already has a disposition; only the quoted first-match snippet changed",
+    "new": "no prior disposition for that rule + owning_skill + class. The engine emits at most one SIDE-004 candidate per class per skill, so a new class is a new candidate even when the skill has other dispositioned classes",
+    "result": {
+      "current_semantic_candidates": 84,
+      "exact": 75,
+      "drift": 4,
+      "new": 5
+    }
+  },
+  "counts": {
+    "false-positive": 5,
+    "drift-same": 4,
+    "confirmed-defect": 0
+  },
+  "candidate_count": 9,
+  "unresolved": 0,
+  "fingerprint_algorithm": "first 12 hex SHA256 of compact UTF-8 JSON [rule,file,reported_line,evidence], ensure_ascii=False (same as 2026-09-12)",
+  "line_number_note": "SIDE-004 reports line 0 (a workflow-level match); matched_skill_line is the reviewer-located raw SKILL.md line of the first match. ARTF-001 lines are raw-file anchors (v1.13.1).",
+  "reviewers": [
+    "read-only disposition review 2026-09-26 (skill-quality-reviewer check 7 applied to every SIDE-004 and ARTF-001 row)"
+  ],
+  "excluded_by_instruction": [
+    "EVAL-002 aegis-setup: fixed by PR #359; not emitted on this scan",
+    "STATE-001 P0 x2: recorded false positives; not reopened"
+  ],
+  "candidates": [
+    {
+      "fingerprint": "0b87c21b6d86",
+      "finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/adr-sequencer/SKILL.md",
+        "line": 0,
+        "owning_skill": "adr-sequencer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [doc-state-write]: 'record while a new ADR' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "adr-sequencer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "match_kind": "drift",
+      "matched_skill_line": 86,
+      "prior_fingerprints": [
+        "a9d93563fb4e"
+      ],
+      "disposition": "drift-same",
+      "rationale": "Matched snippet moved to step 5, which explains the choice between an amendment and a new ADR, then says 'Do not treat the answer as authority to edit existing records through this automatic phase' (lines 91-92). The 2026-09-12 repair (propose, not apply; separate application route) still holds, so the 2026-09-12 confirmed-fixed judgment still applies."
+    },
+    {
+      "fingerprint": "8179caf2679e",
+      "finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/cell-based-architecture-designer/SKILL.md",
+        "line": 0,
+        "owning_skill": "cell-based-architecture-designer",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "cell-based-architecture-designer",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "match_kind": "drift",
+      "matched_skill_line": 80,
+      "prior_fingerprints": [
+        "c738e1a28c9e"
+      ],
+      "disposition": "drift-same",
+      "rationale": "First match is now 'regional deployment', an option in the teaching comparison (line 80), instead of 'deploy'. Workflow step 5 (line 112) still plans cell-by-cell deployment as design output. The earlier judgment, 'Specifies cell provisioning/deployment design', still applies."
+    },
+    {
+      "fingerprint": "0951b16c4fa7",
+      "finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/feature-flag-rollout-strategist/SKILL.md",
+        "line": 0,
+        "owning_skill": "feature-flag-rollout-strategist",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [source-write]: 'stage advances; do not assume a test' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "feature-flag-rollout-strategist",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "match_kind": "new",
+      "matched_skill_line": 84,
+      "prior_fingerprints": [],
+      "disposition": "false-positive",
+      "rationale": "'stage' is a noun (a rollout stage) and 'test' refers to the kill-switch test the plan must evidence; the sentence tells the designer to specify required evidence and not assume a test ran. No write instruction; Stop Conditions refuse live flag flips (line 179)."
+    },
+    {
+      "fingerprint": "dc60e598f336",
+      "finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/human-approval-boundary/SKILL.md",
+        "line": 0,
+        "owning_skill": "human-approval-boundary",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deployment' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "human-approval-boundary",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "match_kind": "new",
+      "matched_skill_line": 54,
+      "prior_fingerprints": [],
+      "disposition": "false-positive",
+      "rationale": "'deployment path' is an option the approval request explains to the human; the skill composes the request and halts the uncovered step. It does not deploy. Same class of match as the 2026-09-12 lifecycle/architecture 'deployment' false positives."
+    },
+    {
+      "fingerprint": "5b506f9ca172",
+      "finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/qa-automation-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "qa-automation-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploys' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "qa-automation-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "match_kind": "new",
+      "matched_skill_line": 89,
+      "prior_fingerprints": [],
+      "disposition": "false-positive",
+      "rationale": "Conditional CI-gate placement rule ('If a merge deploys automatically, any required release gate runs before merge'). Describes pipeline design; the skill produces a blueprint and does not deploy. Its earlier source-write candidate keeps its 2026-09-12 disposition."
+    },
+    {
+      "fingerprint": "9b35b71744cd",
+      "finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/qa-strategy-architect/SKILL.md",
+        "line": 0,
+        "owning_skill": "qa-strategy-architect",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploys' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "qa-strategy-architect",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "match_kind": "new",
+      "matched_skill_line": 78,
+      "prior_fingerprints": [],
+      "disposition": "false-positive",
+      "rationale": "Same conditional gate-placement rule as qa-automation-architect ('If merging automatically deploys, put every required release gate before merge'). Strategy output only; the earlier data-store-write candidate keeps its 2026-09-12 disposition."
+    },
+    {
+      "fingerprint": "6bf4b52a3498",
+      "finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/rls-policy-auditor/SKILL.md",
+        "line": 0,
+        "owning_skill": "rls-policy-auditor",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'INSERT/effective check:** can a row' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "rls-policy-auditor",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "match_kind": "drift",
+      "matched_skill_line": 78,
+      "prior_fingerprints": [
+        "a9e5ad4717f7"
+      ],
+      "disposition": "drift-same",
+      "rationale": "Checklist label changed from 'INSERT/WITH CHECK' to 'INSERT/effective check' (line 78). The row is still an audit question ('can a row be written with another tenant's id') and executes nothing. The earlier judgment, 'SQL negative-test plan and proposed policy findings; not test execution', still applies."
+    },
+    {
+      "fingerprint": "8357583e3c9c",
+      "finding": {
+        "rule": "SIDE-004",
+        "severity": "P1",
+        "file": ".claude/skills/soc2-trust-criteria-mapper/SKILL.md",
+        "line": 0,
+        "owning_skill": "soc2-trust-criteria-mapper",
+        "related_skills": [],
+        "evidence": "auto-invocable skill's Workflow instructs a §5 mutation [spend]: 'purchase' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)",
+        "family": "side-effect",
+        "aegis_map": [
+          "AEGIS-020",
+          "AEGIS-057"
+        ],
+        "remediation_owner": "soc2-trust-criteria-mapper",
+        "confidence": "low",
+        "mechanical": false
+      },
+      "match_kind": "drift",
+      "matched_skill_line": 73,
+      "prior_fingerprints": [
+        "2f9f6c9e19ff"
+      ],
+      "disposition": "drift-same",
+      "rationale": "First match is now 'purchase' in 'A scoping choice does not authorize an engagement or purchase' (line 73), which is a spend prohibition. The earlier 'buy' match (line 79, customer-purchase context) is still present. Neither instructs a spend."
+    },
+    {
+      "fingerprint": "33a665354f7d",
+      "finding": {
+        "rule": "ARTF-001",
+        "severity": "P1",
+        "file": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
+        "line": 105,
+        "owning_skill": "standing-approval-and-auto-advance",
+        "related_skills": [],
+        "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
+        "family": "artifact",
+        "aegis_map": [
+          "AEGIS-056",
+          "AEGIS-049"
+        ],
+        "remediation_owner": "standing-approval-and-auto-advance",
+        "confidence": "medium",
+        "mechanical": false
+      },
+      "match_kind": "new",
+      "matched_skill_line": 105,
+      "prior_fingerprints": [],
+      "disposition": "false-positive",
+      "rationale": "'a durable class of merges' names the duration and scope of a recorded human grant, not artifact persistence. Same sense as the reviewed human-approval-boundary (a7b7309d2c5b) and agent-authorization-matrix (558d50c1550c) false positives. Introduced by d5ba638 (2026-09-23). The skill is already MANUAL-ONLY with disable-model-invocation: true; no text change is proposed."
+    }
+  ]
+}
