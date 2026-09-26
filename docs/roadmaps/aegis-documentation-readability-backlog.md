@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-As of the #319 offline routing review on 2026-09-26 Coordinated Universal
+As of the Stage 4B preflight draft review on 2026-09-26 Coordinated Universal
 Time (UTC), this remains the active
 repository-wide documentation acceptance backlog. The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -11,8 +11,15 @@ The **491-file inventory and the ordered "start with" steps below are the
 original launch plan**, retained to show how this work began. Do not restart
 those delivered batches from that plan.
 
-The #319 tree contains **600 Markdown files**: **556 accepted reader pages**
-and **44 synthetic fixtures**, with zero known pending pages. The new
+The Stage 4B preflight draft adds one independently reviewed reader page to
+the 600-page #319 tree. Its source pins, canonical Git-byte hashes, three
+host-path choices, unknown preflight facts, no-grant boundary and all relative
+links passed full-page factual and readability review after a correction to
+the hash basis. This candidate has **601 Markdown files: 557 accepted reader
+pages and 44 classified synthetic fixtures**, with zero known pending pages.
+The draft prepares a later owner decision; it does not prove a host or permit
+a session. The #319 tree contains **600 Markdown files**: **556 accepted reader
+pages** and **44 synthetic fixtures**, with zero known pending pages. The new
 [offline routing request-binding review](../evidence/setup/issue-101-routing-request-binding-review.md)
 is one accepted reader page. Its contract, authority boundary, test results,
 merge and check receipts were reviewed for factual accuracy and full-page
