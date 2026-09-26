@@ -968,3 +968,18 @@ generic skill guidance that would require asking for the same approval again.
 - **Evidence:** [PR #313](https://github.com/ModernNomad-98/Project-Aegis/pull/313)
   merged `8535727539a3c2afc67583d2fa10476edc0ea04b` as
   `9b85140d03f69ce563dc39c51cd2bf71f3094773` at the time above.
+
+### AEGIS-APR-043: Consumption of issue #101 offline routing grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-040.
+- **Status at recording:** AEGIS-APR-040 has no remaining use.
+- **Effective at:** 2026-09-26 02:24:21 UTC.
+- **Recorded at / By:** 2026-09-26 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The one bounded synthetic offline version-2 request-binding
+  implementation merged after its exact-head checks passed.
+- **Evidence:** [PR #319](https://github.com/ModernNomad-98/Project-Aegis/pull/319)
+  merged exact head `550151dcf286f8ec64480bc91f47e390454417d2` as
+  `a59c015c01b4035ab1a438533736134f96deac13` at the time above.
+  [Exact-head Actions](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36211342637)
+  passed `validate-skills`, `windows-offline-checks` and `gate-guard`.
