@@ -226,7 +226,7 @@ Execution posture: THIS DOCUMENT EXECUTES NOTHING — every step is operator-run
   limitation. Recommend the safest
   viable path and why, name the fact that would change the recommendation,
   and ask exactly one owner question; keep execution stopped until the
-  owner decides.
+  owner decides; the answer does not authorize execution.
 - Asked to fold the runbook's approval gates into "auto-proceed if
   checks pass" for an agent to run end-to-end → refuse; destructive
   data-move steps stay human-gated per `human-approval-boundary` and

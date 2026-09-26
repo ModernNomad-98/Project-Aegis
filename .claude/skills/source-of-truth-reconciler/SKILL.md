@@ -64,13 +64,15 @@ while reconciling is stated with its risk.
    dependent work waits. Compare adopting source A, adopting source B, and
    holding as UNRESOLVED pending the owner: why each is viable, its pros and
    cons, and its correction effort (which sources, records, or behavior would
-   need follow-up change) or explicit unknowns. Recommend one, explain why,
-   name the evidence that would change it, then ask exactly one owner
-   question. Never silently pick a winner; recency and confidence are not
-   authority. The owner's answer settles which source governs — it does not
-   itself authorize editing sources, changing live systems, or other follow-up
-   work. Conflicts touching security, data handling, tenant isolation, or
-   destructive behavior still follow Stop Conditions.
+   need follow-up change) or explicit unknowns. Recommend one when the
+   evidence supports it — holding UNRESOLVED is the recommendation when it
+   does not — explain why, name the evidence that would change it, then ask
+   exactly one owner question. Never silently pick a winner; recency and
+   confidence are not authority. An answer adopting A or B settles which
+   source governs; choosing UNRESOLVED keeps dependent work waiting. No
+   answer itself authorizes editing sources, changing live systems, or other
+   follow-up work. Conflicts touching security, data handling, tenant
+   isolation, or destructive behavior still follow Stop Conditions.
 6. **Surface every assumption** made along the way, each with risk-if-wrong.
 7. **Propose corrections** to the losing stale sources as follow-up work — do
    not silently edit them as a side effect of reconciling.
@@ -86,7 +88,8 @@ Conflicts:
 Assumptions surfaced: <each with risk-if-wrong>
 Stale sources to fix: <file → proposed correction (follow-up, not done here)>
 Blocked: <conflicts with no winner — questions for the human>
-Owner choice (per blocked conflict): <plain terms; adopt A / adopt B / hold
+Owner choice (next blocking conflict only; others stay under Blocked for
+  later turns): <plain terms; adopt A / adopt B / hold
   UNRESOLVED — why viable, pros/cons, correction effort or unknowns;
   recommendation, why, and what evidence would change it; ONE owner question;
   follow-up changes separately authorized>

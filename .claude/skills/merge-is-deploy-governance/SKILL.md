@@ -105,18 +105,21 @@ honor applicable existing user grants without asking for the same grant again.
    missed something. Explain that this is time in production before
    verification, not a pre-deploy gate. Compare (a) the authorized risk
    owner's explicit acceptance of the evidenced current window, (b)
-   reducing it first — stronger PR-time checks, faster verification
-   signals, or a smaller blast radius via flags/canaries, routed to the
-   owning validation and pipeline skills — and (c) holding merges that
-   touch the exposed surface while exposure is unacceptable or unknown.
+   reducing the exposure first — faster verification signals or a smaller
+   blast radius via flags/canaries shorten or narrow the window, and
+   stronger PR-time checks lower the chance a defect reaches it; each
+   routed to the owning validation and pipeline skills — and (c) holding
+   merges that touch the exposed surface while exposure is unacceptable or
+   unknown.
    For each viable path, state why it is viable here, benefits, residual
-   user impact, setup and upkeep, and CI/hosting/engineering money cost or
-   unknowns. Recommend the path justified by the measured window,
+   user impact, setup time and upkeep, and CI/hosting/engineering money
+   cost or unknowns. Recommend the path justified by the measured window,
    validation gaps and blast radius, and explain why; never recommend
    accepting a window whose duration or blast radius is unknown —
    recommend measuring or reducing it, or holding, instead. Ask the risk
    owner one clear decision question. Record acceptance only with who, when,
-   scope and evidence; otherwise mark `pending risk-owner acceptance`.
+   scope and evidence; otherwise mark pending, or record a reduce-first/hold
+   decision with who, when and actions.
    Publishing a draft does not accept risk or authorize an agent to merge,
    change protection or deploy.
 6. **Define the rollback primitive: revert-PR-then-auto-redeploy.** The
@@ -144,10 +147,11 @@ Branch protection (recorded <date>, source: <API|human-dictated>):
                     <required checks, strictness, reviews, who may merge>
                     changes: <named human role> only — never agents; dated diffs here
 Exposure window:    merge → verified deploy ≈ <duration or unknown>;
-                    blast radius <scope or unknown>; status <pending|accepted>
+                    blast radius <scope or unknown>;
+                    status <pending|accepted|reduce-first|hold>
 Owner choice:       <plain terms; accept evidenced window | reduce it (checks/
                     verification/flags) | hold exposed merges; why each is
-                    viable, benefits, residual risk, setup, upkeep, money
+                    viable, benefits, residual risk, setup time, upkeep, money
                     cost or unknowns; recommendation and why; one clear
                     question if pending>
 Acceptance receipt: <only if accepted: authorized risk owner, date, exact
@@ -174,7 +178,7 @@ Gaps routed:        <check gaps, signal gaps, ownership gaps → owning skills/h
       risk owner, date, scope and evidence.
 - [ ] The risk owner gets plain terms, viable accept/reduce/hold paths,
       the reason for each viable path, benefits, residual risks,
-      setup/upkeep and money costs or unknowns, a reasoned recommendation
+      setup time/upkeep and money costs or unknowns, a reasoned recommendation
       and one clear decision question.
 - [ ] Revert mechanics match the repo's merge strategy (squash ⇒ ordinary
       `git revert <sha>`); revert's limits stated and runbook routed.

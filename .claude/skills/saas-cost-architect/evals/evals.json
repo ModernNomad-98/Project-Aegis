@@ -39,8 +39,8 @@
         "assertions": [
           "Defines the terms in plain language - per-tenant budget, degradation ladder, throttle and queue, hard stop, observe-only rollout, and allowance arbitrage - and ties them to the tenant-tagged bill evidence and the five concentrated tenants rather than an average tenant.",
           "Compares cheaper-model fallback, throttle and queue, and hard stop with the reason each viable option exists, case-specific pros and cons (margin protection versus tenant-visible quality, latency, and churn risk), and money, setup, and maintenance costs, marking the unpriced cheaper model and unestimated engineering effort as explicit unknowns instead of inventing prices.",
-          "Recommends degradation before hard stops for paying Pro tenants with a reason tied to the churn risk and the measured cost concentration, shipped observe-only first with a per-guardrail disable path.",
-          "Asks exactly one atomic owner decision question after the comparison; ships and enforces nothing, routes any enforcement that degrades a paying tenant's service through human-approval-boundary, and hands the underwater Pro allowance to plan-entitlement-architect instead of silently redesigning the plan."
+          "Recommends one specific option - cheaper-model fallback or throttle and queue, ahead of a hard stop for paying Pro tenants - with a reason tied to the churn risk and the measured cost concentration, names the fact that would change it, and ships it observe-only first with a per-guardrail disable path; or, if a deciding fact (such as whether the cheaper model's quality is acceptable) is missing, asks only for that fact this turn.",
+          "Asks exactly one atomic question (the missing deciding fact or the owner decision); ships and enforces nothing, hands runtime enforcement design (token caps, fail-closed spend kill switch, guardrail telemetry) to ai-cost-guardrail-designer, routes any enforcement that degrades a paying tenant's service through human-approval-boundary, and hands the underwater Pro allowance to plan-entitlement-architect instead of silently redesigning the plan."
         ]
       }
     },

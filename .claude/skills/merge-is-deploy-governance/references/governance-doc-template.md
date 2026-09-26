@@ -76,8 +76,10 @@ From merge to verified deploy: ≈ <duration> (deploy latency + §3 signal
 latency). During it, <blast radius: which users/tenants/surfaces> are
 exposed to any defect PR validation missed.
 Status: pending risk-owner acceptance | accepted by <authorized risk owner>
-on <date>, scope <...>, evidence <...>. Revisit when latency or blast
-radius changes materially.
+on <date>, scope <...>, evidence <...>. | reduce-first decided by <risk
+owner> on <date>: <mitigations, owners>; window not accepted | hold
+decided by <risk owner> on <date>: merges touching <surface> paused until
+<condition>. Revisit when latency or blast radius changes materially.
 ```
 
 Git's official [revert documentation](https://git-scm.com/docs/git-revert)

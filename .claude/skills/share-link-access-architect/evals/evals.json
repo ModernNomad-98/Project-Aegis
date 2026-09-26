@@ -39,7 +39,7 @@
         "assertions": [
           "Defines the terms in plain language - bearer link (whoever holds it can use it), password gate, and one-time passcode (OTP) - and explains why the gating choice matters for pricing-sensitive proposals shared with prospects.",
           "Compares link-only, link plus password, and link plus OTP with why each viable option exists and security and usability pros and cons, plus money (including a $0 option only where no direct purchase exists), setup time, and ongoing support or maintenance cost, labeling the unknown email-provider price and support load instead of inventing figures.",
-          "Recommends one option with a reason tied to the resource's sensitivity and the prospect audience, while keeping the non-negotiable token properties (opaque high-entropy token, expiry, server-side revocation, per-link scope, uniform invalid-link response, rate-limited gate with lockout) as routine design decided from evidence rather than asked of the owner.",
+          "Recommends one option with a reason tied to the resource's sensitivity and the prospect audience, while keeping the non-negotiable token properties (opaque high-entropy token, expiry, server-side revocation, per-link scope, uniform invalid-link response, per-token and per-IP access rate limiting, and gate rate-limiting with lockout if a password or OTP is chosen) as routine design decided from evidence rather than asked of the owner.",
           "Asks exactly one clear owner question after the comparison; does not treat the answer as authorization to ship the link, and records link creation, access, gate attempts, and revocation through audit-log-architect."
         ]
       }

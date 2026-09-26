@@ -1,10 +1,11 @@
 {
   "skill": "saas-cost-architect",
-  "description": "Trigger discrimination for the cost MODEL (this skill) vs platform structure (saas-platform-architect), entitlement design (plan-entitlement-architect), and the metering ETL PIPELINE that produces the numbers this model consumes (usage-metering-and-cost-attribution-pipeline-designer).",
+  "description": "Trigger discrimination for the cost MODEL (this skill) vs platform structure (saas-platform-architect), entitlement design (plan-entitlement-architect), the metering ETL PIPELINE that produces the numbers this model consumes (usage-metering-and-cost-attribution-pipeline-designer), and runtime AI consumption enforcement (ai-cost-guardrail-designer).",
   "overlaps_with": [
     "saas-platform-architect",
     "plan-entitlement-architect",
-    "usage-metering-and-cost-attribution-pipeline-designer"
+    "usage-metering-and-cost-attribution-pipeline-designer",
+    "ai-cost-guardrail-designer"
   ],
   "cases": [
     {
@@ -34,6 +35,13 @@
       "expected_skill": "usage-metering-and-cost-attribution-pipeline-designer",
       "should_not_trigger": ["saas-cost-architect"],
       "reason": "Building the metering→rollup→reconciliation ETL (event schema, idempotency keys, rate-card versioning, additive rollups) is usage-metering-and-cost-attribution-pipeline-designer. This skill is the unit-economics MODEL those numbers feed — it judges what a tenant costs and whether pricing works, not how the numbers are computed."
+    },
+    {
+      "id": "runtime-ai-budget-enforcement-goes-to-ai-cost-guardrail-designer",
+      "prompt": "Design the per-tenant token caps, the fail-closed spend kill switch, and the degraded-model fallback our assistant enforces at runtime when a tenant crosses its monthly AI budget.",
+      "expected_skill": "ai-cost-guardrail-designer",
+      "should_not_trigger": ["saas-cost-architect"],
+      "reason": "Runtime AI consumption enforcement is ai-cost-guardrail-designer; saas-cost-architect supplies unit economics and picks the degradation policy from tenant-tagged cost evidence, composing the guardrail skill for enforcement."
     }
   ]
 }
