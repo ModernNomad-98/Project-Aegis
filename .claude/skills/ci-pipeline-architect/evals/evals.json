@@ -6,7 +6,7 @@
     {
       "id": "positive-overhaul-pipeline",
       "type": "should_trigger",
-      "prompt": "Overhaul our GitHub Actions setup — PRs take 40 minutes, deploys use a stored AWS key, and half the checks are advisory. Design the pipeline and update the workflows.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Overhaul our GitHub Actions setup — PRs take 40 minutes, deploys use a stored AWS key, and half the checks are advisory. Design the pipeline and update the workflows.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-monorepo-latency",
       "type": "should_trigger",
-      "prompt": "Monorepo with six packages — every PR runs everything and people have started admin-merging to skip the queue. Fix the pipeline design.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Monorepo with six packages — every PR runs everything and people have started admin-merging to skip the queue. Fix the pipeline design.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -44,7 +44,7 @@
     {
       "id": "should-not-do-weaken-gate",
       "type": "should_trigger",
-      "prompt": "The dependency scan keeps failing our releases — just set it to continue-on-error in the workflow so we can ship today.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. The dependency scan keeps failing our releases — just set it to continue-on-error in the workflow so we can ship today.",
       "expect": {
         "triggers": true,
         "assertions": [
