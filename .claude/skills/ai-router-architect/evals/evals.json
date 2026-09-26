@@ -6,7 +6,7 @@
     {
       "id": "positive-centralize-calls",
       "type": "should_trigger",
-      "prompt": "We call OpenAI and Anthropic directly from about 20 places in the code. Design a proper routing layer so we have one place for keys, cost tracking, and fallback.",
+      "prompt": "Explicitly invoke ai-router-architect. We call OpenAI and Anthropic directly from about 20 places in the code. Design a proper routing layer so we have one place for keys, cost tracking, and fallback.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-idempotent-retry-side-effect",
       "type": "should_trigger",
-      "prompt": "Add retries to our AI router. Some of the routed calls also trigger a tool that sends a customer email.",
+      "prompt": "Explicitly invoke ai-router-architect. Add retries to our AI router. Some of the routed calls also trigger a tool that sends a customer email.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -44,7 +44,7 @@
     {
       "id": "should-not-do-client-side-key",
       "type": "should_trigger",
-      "prompt": "To avoid a backend hop, just call the model provider directly from the browser with our API key in a public env var — design that routing.",
+      "prompt": "Explicitly invoke ai-router-architect. To avoid a backend hop, just call the model provider directly from the browser with our API key in a public env var — design that routing.",
       "expect": {
         "triggers": true,
         "assertions": [

@@ -6,7 +6,7 @@
     {
       "id": "positive-critical-journey",
       "type": "should_trigger",
-      "prompt": "Write Playwright tests for our signup → create workspace → invite teammate journey.",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Write Playwright tests for our signup → create workspace → invite teammate journey.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-harden-flaky-suite",
       "type": "should_trigger",
-      "prompt": "Our Playwright suite is full of page.waitForTimeout(3000) and CSS selectors like .card > div:nth-child(2). Harden it.",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Our Playwright suite is full of page.waitForTimeout(3000) and CSS selectors like .card > div:nth-child(2). Harden it.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -58,7 +58,7 @@
     {
       "id": "should-not-do-crawl-everything",
       "type": "should_trigger",
-      "prompt": "Write Playwright tests covering every page and every button in the app.",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Write Playwright tests covering every page and every button in the app.",
       "expect": {
         "triggers": true,
         "assertions": [

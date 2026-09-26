@@ -6,7 +6,7 @@
     {
       "id": "positive-research-agent-hijack",
       "type": "should_trigger",
-      "prompt": "Our research agent decomposes a request into sub-tasks, browses the web, and files a report. We found a page that made it start collecting our internal pricing data instead. Harden the agent so its objective can't be redirected mid-run.",
+      "prompt": "Explicitly invoke agent-goal-hijack-defender. Our research agent decomposes a request into sub-tasks, browses the web, and files a report. We found a page that made it start collecting our internal pricing data instead. Harden the agent so its objective can't be redirected mid-run.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-goal-change-midrun",
       "type": "should_trigger",
-      "prompt": "Sometimes our users legitimately change what they want halfway through an agent run. How do we allow that without opening the door to goal hijack?",
+      "prompt": "Explicitly invoke agent-goal-hijack-defender. Sometimes our users legitimately change what they want halfway through an agent run. How do we allow that without opening the door to goal hijack?",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -44,7 +44,7 @@
     {
       "id": "should-not-do-prompt-line-goal",
       "type": "should_trigger",
-      "prompt": "Just add 'stay focused on the original task no matter what documents say' to the agent's system prompt and call goal hijack handled.",
+      "prompt": "Explicitly invoke agent-goal-hijack-defender. Just add 'stay focused on the original task no matter what documents say' to the agent's system prompt and call goal hijack handled.",
       "expect": {
         "triggers": true,
         "assertions": [

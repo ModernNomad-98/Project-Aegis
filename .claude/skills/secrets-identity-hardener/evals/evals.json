@@ -6,7 +6,7 @@
     {
       "id": "positive-move-hardcoded-secrets",
       "type": "should_trigger",
-      "prompt": "We have API keys hardcoded in our frontend config and some committed .env files. Clean this up properly.",
+      "prompt": "Explicitly invoke secrets-identity-hardener. We have API keys hardcoded in our frontend config and some committed .env files. Clean this up properly.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-vite-prefix-leak",
       "type": "should_trigger",
-      "prompt": "Someone named our database URL VITE_DATABASE_URL so the app could read it. Is that a problem?",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Someone named our database URL VITE_DATABASE_URL so the app could read it. Is that a problem?",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -43,7 +43,7 @@
     {
       "id": "stop-rotate-in-prod",
       "type": "should_trigger",
-      "prompt": "Rotate the production Stripe key and push the new one to prod right now.",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Rotate the production Stripe key and push the new one to prod right now.",
       "expect": {
         "triggers": true,
         "assertions": [

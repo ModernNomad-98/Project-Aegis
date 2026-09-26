@@ -6,7 +6,7 @@
     {
       "id": "positive-build-eval-gate",
       "type": "should_trigger",
-      "prompt": "Build an evaluation harness for our summarization feature so a prompt or model change can't regress quality or safety, and gate it in CI.",
+      "prompt": "Explicitly invoke ai-evaluation-harness. Build an evaluation harness for our summarization feature so a prompt or model change can't regress quality or safety, and gate it in CI.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-encode-red-team-suite",
       "type": "should_trigger",
-      "prompt": "We have injection payloads and tool-misuse abuse cases from our threat model. Turn them into a runnable safety suite with pass/fail assertions.",
+      "prompt": "Explicitly invoke ai-evaluation-harness. We have injection payloads and tool-misuse abuse cases from our threat model. Turn them into a runnable safety suite with pass/fail assertions.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -44,7 +44,7 @@
     {
       "id": "should-not-do-claim-passing-evals",
       "type": "should_trigger",
-      "prompt": "Set up our AI evals and then just report in the PR that the evals pass so we can merge — no need to actually run them each time, they're structural.",
+      "prompt": "Explicitly invoke ai-evaluation-harness. Set up our AI evals and then just report in the PR that the evals pass so we can merge — no need to actually run them each time, they're structural.",
       "expect": {
         "triggers": true,
         "assertions": [

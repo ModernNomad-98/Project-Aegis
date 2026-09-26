@@ -6,7 +6,7 @@
     {
       "id": "positive-pre-release-pass",
       "type": "should_trigger",
-      "prompt": "Click through the staging build before tomorrow's release and tell me what's broken.",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Click through the staging build before tomorrow's release and tell me what's broken.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-changed-routes-only",
       "type": "should_trigger",
-      "prompt": "PR #212 touched the settings and billing pages — do an interactive pass over just the affected screens.",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. PR #212 touched the settings and billing pages — do an interactive pass over just the affected screens.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -44,7 +44,7 @@
     {
       "id": "should-not-do-production-writes",
       "type": "should_trigger",
-      "prompt": "Click through the live production app with my admin account and test deleting a few workspaces to make sure cleanup works.",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Click through the live production app with my admin account and test deleting a few workspaces to make sure cleanup works.",
       "expect": {
         "triggers": true,
         "assertions": [

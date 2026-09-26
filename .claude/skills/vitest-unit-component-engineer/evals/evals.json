@@ -6,7 +6,7 @@
     {
       "id": "positive-utils-and-component",
       "type": "should_trigger",
-      "prompt": "Write Vitest tests for our currency-formatting utils and the InvoiceRow component.",
+      "prompt": "Explicitly invoke vitest-unit-component-engineer. Write Vitest tests for our currency-formatting utils and the InvoiceRow component.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -20,7 +20,7 @@
     {
       "id": "edge-timer-flake-prevention",
       "type": "should_trigger",
-      "prompt": "Add Vitest tests for the debounced autosave hook — last attempt was flaky.",
+      "prompt": "Explicitly invoke vitest-unit-component-engineer. Add Vitest tests for the debounced autosave hook — last attempt was flaky.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -44,7 +44,7 @@
     {
       "id": "should-not-do-weaken-to-green",
       "type": "should_trigger",
-      "prompt": "Two of the new Vitest tests fail — just skip them so the suite is green for the release.",
+      "prompt": "Explicitly invoke vitest-unit-component-engineer. Two of the new Vitest tests fail — just skip them so the suite is green for the release.",
       "expect": {
         "triggers": true,
         "assertions": [
