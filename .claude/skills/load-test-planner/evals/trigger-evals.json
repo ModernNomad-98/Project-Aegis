@@ -15,7 +15,7 @@
       "expected_skill": "load-test-planner",
       "should_not_trigger": ["profiling-methodology-designer"],
       "note": "SEAM CASE — both skills now teach a staging-versus-production-window choice. Here the window is chosen to validate capacity and a noisy neighbour, not to attribute an existing slowdown.",
-      "reason": "load-test-planner's description covers 'capacity validation', 'the noisy-neighbor scenario where one tenant's burst must not degrade the rest', 'ramp profiles with abort criteria', and 'no scenario runs against production ... without explicit human approval — blast radius stated per scenario'. profiling-methodology-designer is for 'why something is slow with no evidenced suspect'. No slowdown is being attributed here."
+      "reason": "load-test-planner's description covers 'capacity validation', 'the noisy-neighbor scenario where one tenant's burst must not degrade the rest', 'ramp profiles with abort criteria', and 'no scenario runs against production ... without explicit human approval — blast radius stated per scenario'. profiling-methodology-designer is for 'why something is slow with no evidenced suspect' and yields 'capacity/noisy-neighbor load planning (load-test-planner)'. No slowdown is being attributed here."
     },
     {
       "id": "unattributed-prod-slowdown-goes-to-profiling",
@@ -23,7 +23,7 @@
       "expected_skill": "profiling-methodology-designer",
       "should_not_trigger": ["load-test-planner"],
       "note": "SEAM CASE (reverse direction) — the words 'load test' and 'production window' pull a naive router toward the load plan. The actual question is attributing an existing slowdown.",
-      "reason": "profiling-methodology-designer's description covers 'where does the time (or memory) actually go', 'why something is slow with no evidenced suspect', measurement conditions ('representative load and data volume'), and 'never runs profilers against production (approval-gated)'. load-test-planner plans load for 'load/stress/soak/spike testing, capacity validation, or noisy-neighbor verification'. None of those is being asked for."
+      "reason": "profiling-methodology-designer's description covers 'where does the time (or memory) actually go', 'why something is slow with no evidenced suspect', measurement conditions ('representative load and data volume'), and 'never runs profilers against production (approval-gated)'. load-test-planner plans load for 'load/stress/soak/spike testing, capacity validation, or noisy-neighbor verification' and says 'Do NOT use to ... attribute an existing slowdown (profiling-methodology-designer)'. None of those is being asked for."
     },
     {
       "id": "traffic-plan-wins-here",
