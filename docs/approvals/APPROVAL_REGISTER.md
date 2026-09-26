@@ -890,3 +890,81 @@ generic skill guidance that would require asking for the same approval again.
   Aegis conversation; prior standing delivery conditions are in
   AEGIS-APR-013 and AEGIS-APR-024.
 - **Expiry / use limit:** Ongoing backlog task; no one-use limit stated.
+
+### AEGIS-APR-040: Issue #101 offline routing request binding revision
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE for one bounded synthetic offline implementation.
+- **Date / Grantor:** 2026-09-26 UTC / Peter Nguyen.
+- **Reason:** Bind each offline routing advice response to its own callback so a
+  response from an earlier synthetic call cannot authorize a later one.
+- **Scope allowed:** The owner's exact reply was "approve all" to the two
+  pending decisions, including the bounded routing version 2 implementation
+  in the [reviewed proposal](../roadmaps/aegis-setup-routing-request-binding-proposal.md)
+  merged in [PR #310](https://github.com/ModernNomad-98/Project-Aegis/pull/310).
+  Use a fresh unpredictable 128-bit request ID for each callback; require a
+  matching 32-character lowercase hexadecimal ID in version 2 requests and
+  responses, including abstentions; reject version 1 without fallback. The
+  exact eight implementation paths are `tools/aegis_setup/routing_contract.py`,
+  `tools/aegis_setup/tests/test_routing_contract.py`,
+  `tools/aegis_setup/README.md`,
+  `tools/aegis_setup/host_bridge/bridge.ts`,
+  `tools/aegis_setup/host_bridge/bridge.test.ts`,
+  `tools/aegis_setup/host_bridge/README.md`,
+  `docs/roadmaps/aegis-setup-routing-plan.md`, and the new
+  `docs/evidence/setup/issue-101-routing-request-binding-review.md`. Limit
+  work to 12 active implementation hours, 500 added handwritten code/test
+  lines and $0 task-controlled external spend. Use invented offline fixtures,
+  focused Python and Node tests, skill validation, independent contract and
+  authority review, and exact-head GitHub Actions before the signed PR merges.
+- **Scope FORBIDDEN:** No SDK `query()`, Claude process, provider call,
+  credential, private data, VM work, dependency change, deployment or real
+  callback invocation. This grant does not authorize Stage 4B host proof or
+  waive a future protected `gate-guard` failure. Stop before exceeding a path
+  or resource bound.
+- **Evidence:** Direct owner reply "approve all" in the Project Aegis
+  conversation on 2026-09-26 UTC to the immediately preceding two-decision
+  summary, whose first decision named the bounded routing version 2 scope in
+  PR #310. The owner's following message reiterated approval of backlog
+  delivery under local-test and GitHub Actions conditions.
+- **Expiry / use limit:** One bounded offline routing version 2 implementation;
+  no calendar expiry stated.
+
+### AEGIS-APR-041: PR #313 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-042; no remaining use.
+- **Date / Grantor:** 2026-09-26 UTC / Peter Nguyen.
+- **Reason:** Permit the independently reviewed BER reporting-integrity repair
+  to merge when its protected source paths triggered the guard.
+- **Scope allowed:** The owner's exact reply was "approve all" to the two
+  pending decisions, whose second decision named the one-time `gate-guard`
+  exception and administrator merge of
+  [PR #313](https://github.com/ModernNomad-98/Project-Aegis/pull/313) at exact
+  head `8535727539a3c2afc67583d2fa10476edc0ea04b`. The request reported
+  1,078 passing local BER tests with 14 expected skips, independent review,
+  passing exact-head Linux and Windows Actions, and a `gate-guard` failure
+  solely for four protected BER paths. This grant covered one administrator
+  merge of that head through that specific guard result.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. This did
+  not change branch protection or authorize real-host access, provider calls,
+  private input, production wiring, publication or evidence deletion.
+- **Evidence:** Direct owner reply "approve all" in the Project Aegis
+  conversation on 2026-09-26 UTC to the immediately preceding two-decision
+  summary. The [PR #313 merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/313)
+  confirms the exact head, passing Linux and Windows checks, failing
+  `gate-guard`, and completed merge.
+- **Expiry / use limit:** One merge of PR #313 at the named head; consumed by
+  the merge recorded in AEGIS-APR-042.
+
+### AEGIS-APR-042: Consumption of PR #313 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-041.
+- **Status at recording:** AEGIS-APR-041 has no remaining use.
+- **Effective at:** 2026-09-26 01:58:24 UTC.
+- **Recorded at / By:** 2026-09-26 / Project Aegis agent.
+- **New authority:** None.
+- **Reason:** The sole exact-head administrator merge completed.
+- **Evidence:** [PR #313](https://github.com/ModernNomad-98/Project-Aegis/pull/313)
+  merged `8535727539a3c2afc67583d2fa10476edc0ea04b` as
+  `9b85140d03f69ce563dc39c51cd2bf71f3094773` at the time above.
