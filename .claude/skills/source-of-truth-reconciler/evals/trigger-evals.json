@@ -1,7 +1,7 @@
 {
   "skill": "source-of-truth-reconciler",
   "description": "Trigger discrimination for the Phase 1 operating-discipline pack, context/truth cluster. Pins reconciliation apart from startup context loading and approval stops.",
-  "overlaps_with": ["agent-startup-context-gate", "human-approval-boundary"],
+  "overlaps_with": ["agent-startup-context-gate", "human-approval-boundary", "rls-policy-auditor"],
   "cases": [
     {
       "id": "conflict-wins-here",
@@ -21,7 +21,7 @@
       "id": "security-conflict-still-triggers-then-routes",
       "prompt": "The RLS doc and the support runbook disagree about service-role access — resolve it.",
       "expected_skill": "source-of-truth-reconciler",
-      "should_not_trigger": [],
+      "should_not_trigger": ["rls-policy-auditor"],
       "reason": "Reconciler triggers to enumerate the conflict, then must route the DECISION to human-approval-boundary per its stop conditions."
     },
     {
