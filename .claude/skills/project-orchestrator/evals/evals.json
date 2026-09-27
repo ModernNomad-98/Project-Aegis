@@ -713,6 +713,37 @@
           "States that the answer does not authorize signing up, spending, installing, provisioning, or deploying, and writes nothing to docs/project-state.md this turn; recording the choice later needs its own exact preview and applicable approval."
         ]
       }
+    },
+    {
+      "id": "edge-stage3-pilot-early-access-routes-feature-flag-architect",
+      "type": "should_trigger",
+      "prompt": "My docs/project-state.md shows Stage 2 fully recorded and the latest STATE SNAPSHOT says we are starting Stage 3 for my invoicing app, which about 60 small businesses will use. The accepted spec says new features get early access for a few pilot customers before everyone else. I'm not technical. What do we design next?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reads docs/project-state.md first and states in plain language that the project is in Stage 3, continuing rather than restarting discovery.",
+          "Treats the spec's pilot early-access requirement as evidence for the Stage 3 flag route and routes to feature-flag-architect by its exact name in backticks, alongside the core Stage 3 chain rather than instead of it.",
+          "Does NOT ask the plain rollout question itself, because the accepted spec already answers it.",
+          "Does NOT ask the flag-store build-or-buy question or pick a flag vendor itself; states that feature-flag-architect asks that owner question on a later turn, one decision per turn.",
+          "Leaves any single change's staged rollout, guardrails and flag removal to feature-flag-rollout-strategist rather than planning a ramp at Stage 3.",
+          "Installs, signs up for, and writes nothing this turn; any record of the route goes through Capability 4's exact preview and applicable approval."
+        ]
+      }
+    },
+    {
+      "id": "edge-stage9-risky-change-routes-rollout-strategist",
+      "type": "should_trigger",
+      "prompt": "My docs/project-state.md says we are at Stage 9, deciding whether to release the new payment-retry change to all 300 customers of my booking app. Nobody has set up any feature flags in the product yet. It changes how customers get charged, so yes, it's risky enough that I want it to reach customers gradually and be able to switch it off fast. I'm not technical. Are we ready to ship it?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reads docs/project-state.md first and states in plain language that the project is in Stage 9, continuing the release decision rather than restarting.",
+          "Keeps the core Stage 9 chain (risk-tiered-validation-selector, sharded-validation-with-resume, release-readiness-reviewer) with the reviewer advising and the owner authorizing.",
+          "Treats the owner's statement as the yes to the Stage 9 question (risky enough to ship behind a flag with a gradual rollout and a kill switch) and does NOT ask that question again.",
+          "Routes to feature-flag-rollout-strategist by its exact name in backticks and, because no flag system exists yet, to feature-flag-architect first, also by its exact name in backticks.",
+          "Does NOT itself plan the ramp stages or pick a flag vendor, and does NOT install, turn on, flip, deploy, or release anything; release stays the owner's authorization through the human gate."
+        ]
+      }
     }
   ]
 }
