@@ -4,7 +4,7 @@ Per-category threat shapes and abuse-case seeds for the owning
 [AI Threat Modeler skill](../SKILL.md). Use during its Workflow step 4.
 Source framework: OWASP Top 10 for LLM Applications (2026, v1.0, published
 2026-08-03), LLM01–LLM10. Anchoring decision: reconciliation doc D6 (made
-against the 2025 edition); re-anchored to 2026 by owner decision 2026-09-26.
+against the 2025 edition); re-anchored to 2026 by owner decision 2026-09-26 (D65).
 The 2026 edition renumbers most categories and renames one; the 2025 ID is
 shown in brackets so older threat models stay traceable.
 

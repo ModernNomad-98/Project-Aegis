@@ -1234,7 +1234,7 @@ D6) moved to
 [Implemented → Skills (Phase 7)](#skills-phase-7--ai-security--llm-systems-pack)
 above. Source: [`docs/skills/09-ai-software-engineering.md`](skills/09-ai-software-engineering.md)
 and the reconciliation doc §3 Phase 7 coverage map (D6).
-Per D6: **LLM04** is extend-existing — the shipped Phase 4
+Per D6: **LLM04** (2026 ID; D6 cited LLM03:2025) is extend-existing — the shipped Phase 4
 `supply-chain-security-reviewer` was extended (scoped diff) to the AI/ML supply
 chain (models, datasets, fine-tuning adapters); **LLM06** DoS/denial-of-wallet
 is baked into `ai-cost-guardrail-designer`; and `ai-evaluation-harness` absorbs
