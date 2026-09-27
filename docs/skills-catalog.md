@@ -134,9 +134,9 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > model, composing the ~12 feed owners rather than restating them (183→184).
 > PR #124 then shipped `aegis-setup` (2026-09-23) under owner grant
 > AEGIS-APR-007 for Issue #101 package 2 — the manual-only four-choice setup
-> conversation that saves an Aegis-only selection on tested single-user
-> Windows PowerShell, with local and online helper integrations still
-> unavailable (184→185).
+> conversation, run only when a person invokes `aegis-setup` by name, that
+> saves an Aegis-only selection on tested single-user Windows PowerShell,
+> with local and online helper integrations still unavailable (184→185).
 > Most recently the owner-requested **D64** build added `feature-flag-architect`
 > to the Phase 3 pack — the feature-flag SYSTEM designed once per product
 > (store choice taught as an owner decision, one internal interface,
