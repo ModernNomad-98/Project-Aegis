@@ -358,7 +358,7 @@ the authorization-vs-entitlement axis ("can this ROLE do X" vs "does this PLAN i
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (all nine sit in one of two overlap clusters). Per
-[historical master prompt, section 6](prompts/claude-skills-master-generation-prompts-v4.md): ASVS-style verification, SSDF-style secure-SDLC, and SLSA-style
+[historical master prompt, section 6](prompts/claude-skills-master-generation-prompts-v4.md): OWASP Application Security Verification Standard (ASVS)-style verification, NIST Secure Software Development Framework (SSDF)-style secure-SDLC, and Supply-chain Levels for Software Artifacts (SLSA)-style
 supply-chain thinking; scanner output is treated as input, not truth; high-severity
 claims require an exploit path or abuse scenario; tenant isolation and object-level
 authorization are mandatory on SaaS paths; every skill produces concrete artifacts and
@@ -457,7 +457,7 @@ All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (all ten sit in one of three overlap clusters). Per
 [historical master prompt, section 8](prompts/claude-skills-master-generation-prompts-v4.md): cloud work starts cloud-neutral (requirements, constraints,
 compliance, latency, regions, availability, cost, operability, risk BEFORE
-service mapping); provider skills stay provider-idiomatic without inventing
+service mapping). The library adds: provider skills stay provider-idiomatic without inventing
 product specifics (SKU/quota/price claims become verification items); release
 skills demand evidence (CI checks on the release commit, artifacts, rollback
 path), not vibes; runbooks meet the stranger-executability bar
@@ -474,9 +474,9 @@ artifact); the remaining Phase 6 expansion backlog stays unbuilt (see below).
 
 | Skill | Source (category doc) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
-| `cloud-architecture-decider` | master §8 (cloud) | yes | Cloud-neutral decision: nine-axis requirements record (verified/assumed per entry), provider-neutral logical architecture, isolation/compliance hard filters BEFORE scoring, managed platforms (frontend hosts, backend as a service, app platforms) compared side by side with hyperscalers, one recommendation + one owner question (never a silent pick), managed-vs-self-hosted per capability with the operational bill, exit costs + reopen triggers; ADR handoff. |
-| `azure-saas-architect` | master §8 (cloud) | yes | Decided-Azure mapping: Entra ID + managed identities + OIDC federation, VNets/Private Link, per-store tenant-isolation mechanism (elastic pools, Cosmos partition keys, Blob prefixes), compute by team maturity, Azure Policy + Defender for Cloud/Sentinel/CASB/ID Protection posture, Bicep/Terraform, tag-keyed cost controls; SKU/limit/price claims → verification items. |
-| `aws-saas-architect` | master §8 (cloud) | yes | Decided-AWS mapping: Organizations/OU + SCPs, IAM roles + OIDC federation, VPC/PrivateLink, per-store tenant-isolation mechanism (Aurora silos, DynamoDB leading keys, S3 prefixes), compute by team maturity, Security Hub (CSPM+threat)/GuardDuty/Inspector/Macie/Detective/Access Analyzer posture, Terraform/CDK, activated cost-allocation tags; quota/type/price claims → verification items. |
+| `cloud-architecture-decider` | [historical master prompt, section 8](prompts/claude-skills-master-generation-prompts-v4.md) (cloud) | yes | Cloud-neutral decision: nine-axis requirements record (verified/assumed per entry), provider-neutral logical architecture, isolation/compliance hard filters BEFORE scoring, managed platforms (frontend hosts, backend as a service, app platforms) compared side by side with hyperscalers, one recommendation + one owner question (never a silent pick), managed-vs-self-hosted per capability with the operational bill, exit costs + reopen triggers; ADR handoff. |
+| `azure-saas-architect` | [historical master prompt, section 8](prompts/claude-skills-master-generation-prompts-v4.md) (cloud) | yes | Decided-Azure mapping: Entra ID + managed identities + OIDC federation, VNets/Private Link, per-store tenant-isolation mechanism (elastic pools, Cosmos partition keys, Blob prefixes), compute by team maturity, Azure Policy + Defender for Cloud/Sentinel/CASB/ID Protection posture, Bicep/Terraform, tag-keyed cost controls; SKU/limit/price claims → verification items. |
+| `aws-saas-architect` | [historical master prompt, section 8](prompts/claude-skills-master-generation-prompts-v4.md) (cloud) | yes | Decided-AWS mapping: Organizations/OU + SCPs, IAM roles + OIDC federation, VPC/PrivateLink, per-store tenant-isolation mechanism (Aurora silos, DynamoDB leading keys, S3 prefixes), compute by team maturity, Security Hub (CSPM+threat)/GuardDuty/Inspector/Macie/Detective/Access Analyzer posture, Terraform/CDK, activated cost-allocation tags; quota/type/price claims → verification items. |
 | `iac-reviewer` | cat 07 #245 (+#257/#258 adjacent) | yes | Review-only IaC audit, blast radius FIRST (replace/delete of stateful resources), public exposure, IAM width deltas, secrets in code AND state, tenant-isolation impact, drift, pinning, cost flags; apply-safety verdict; never applies, never runs plan against live backends. |
 | `ci-pipeline-architect` | cat 07 #238 (+#237/#239/#240) | **no** (manual-only; edits pipeline definitions) | Stage graph with blocking semantics + latency budget, CI secret governance (OIDC over stored keys, fork-PR posture, job→secret map), cache/artifact governance with provenance, environment promotion with named-human gates, branch-protection alignment; composes qa-automation-architect tiers, vite-build-qa-engineer, supply-chain pinning rules. |
 | `release-readiness-reviewer` | cat 07 #241 (+#242) | yes | Evidence-based ship/no-ship gate: every dimension cites a verifiable artifact or is MISSING (CI on the release SHA, artifact provenance, test-signal fit, migration review, rollback path + rehearsal, flags, docs, observability, approvals); unknown = No-Go with the evidence that flips it; the same-named SUBAGENT composes this skill. |
