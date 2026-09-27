@@ -3074,6 +3074,48 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     follow-up PR); LLM10 generated-code review; LLM04 promoted-artifact
     trust and LLM01 cross-modal injection are catalog-only.
 
+- **D66 (2026-09-26) — Renamed `system-prompt-leakage-reviewer` to
+  `hidden-context-exposure-reviewer` and extended it to the full OWASP
+  LLM08:2026 scope (count stays 186).**
+  - **Why.** The OWASP Top 10 for LLM Applications 2026 (re-anchored in D65)
+    replaced 2025's LLM07 System Prompt Leakage with LLM08 Hidden Context
+    Exposure, which covers every non-user-facing input the model sees, not
+    only the system prompt. The skill reviewed only the system-prompt slice,
+    so tool/function schemas, retrieved policy text and gateway-injected
+    developer instructions had no owner. The owner chose on 2026-09-26 to
+    rename and extend the existing skill rather than add a sibling.
+  - **What.** Two axes applied to every hidden source: CONTENTS (no
+    credentials, keys, internal endpoints, or role, refusal or workflow
+    logic whose disclosure aids an attacker) and DEPENDENCE (no
+    authorization, filtering, limit or tool permission relies on hidden
+    context staying secret; enforcement is deterministic and outside the
+    model). The severity scale follows the official LLM08:2026 wording
+    (informational, medium, high, critical). Out of scope, as in the
+    official entry: regulated user or training data
+    (`sensitive-disclosure-guard`); agentic amplifications — persistent
+    memory (`memory-context-poisoning-reviewer`), inter-agent channels
+    (`inter-agent-comms-reviewer`), tool configuration persistence and
+    multi-step agent compromise; and generic application security —
+    client-bundle secrets (`secrets-identity-hardener`, manual-only),
+    server-side log leakage and infrastructure-layer side channels
+    (`threat-modeler`). A live secret in hidden context is a Stop Condition
+    routed to `secrets-identity-hardener` and `incident-response-runbook`.
+  - **Seams.** Trigger-evals pin `prompt-injection-defender`,
+    `sensitive-disclosure-guard`, `rag-security-architect`,
+    `agent-tool-safety-guard`, `secrets-identity-hardener`,
+    `memory-context-poisoning-reviewer`, `model-context-designer` and
+    `inter-agent-comms-reviewer`. `agent-tool-safety-guard`'s description
+    and body now name this skill back for the tool-schema exposure seam.
+    Neighbour references in `ai-threat-modeler`,
+    `prompt-injection-defender`, `sensitive-disclosure-guard` and
+    `ai-evaluation-harness` point to the new name.
+  - **Migration.** The catalog records the former name so copied references
+    can be updated. Historical evidence, audit snapshots and earlier
+    decisions (D6 and the §3 tables) keep the old name as written.
+  - **Registration.** Same family and phase (Phase 7 AI security & LLM systems);
+    README and catalog rows renamed; `SKILL-COUNT` unchanged at 186.
+    Validator: 186 skills, 0 warnings; contract audit shows no new findings.
+
 ## 6. Post-merge corrections
 
 - **2026-09-12 — Current backlog labels reconciled.** At the owner's request,

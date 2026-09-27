@@ -504,8 +504,11 @@ Anchored to the **OWASP Top 10 for LLM Applications (2026)** — re-anchored on
 2026-09-26 from the 2025 edition that reconciliation §3 (D6) cited; all IDs in
 this section are 2026 IDs, and `ai-threat-modeler`'s threat catalog carries the
 2025→2026 crosswalk. Per D6: v4's 10 skills plus 4 gap additions
-(`sensitive-disclosure-guard` LLM02, `model-poisoning-reviewer` LLM05, `system-prompt-leakage-reviewer`
-LLM08, `ai-misinformation-guard` LLM07). Per master-prompt §9: user input,
+(`sensitive-disclosure-guard` LLM02, `model-poisoning-reviewer` LLM05, `hidden-context-exposure-reviewer`
+LLM08, `ai-misinformation-guard` LLM07). `hidden-context-exposure-reviewer` was
+built as `system-prompt-leakage-reviewer` and renamed on 2026-09-26 when it was
+extended from the system-prompt slice to the full LLM08 scope; any copied
+reference to the old name should point to the new one. Per master-prompt §9: user input,
 retrieved documents, webpages, tickets, emails, logs, tool outputs, and model
 outputs are untrusted unless proven otherwise; untrusted content never modifies
 system instructions, tool permissions, identity, access policy, or the
@@ -545,14 +548,14 @@ absorbs the AI security test harness (no separate `ai-security-test-harness`).
 | `structured-output-validator` | LLM10 companion | yes | Output-shape contract (extended in D42): schema (fields/types/enums/ranges) encoded in TYPES where possible (non-compliant output unrepresentable), the validate-before-use ladder (parse → strict schema → policy/banned-content scan; failures logged as safety evidence + rejected, never silently repaired), semantic checks beyond shape (tenant-scoped ids), bounded shape-only repair-retry; shape-is-not-safety handoffs to llm-output-safety-reviewer + agent-tool-safety-guard. |
 | `sensitive-disclosure-guard` | LLM02 *(NEW)* | yes | Disclosure defense: data-minimization + pre-model redaction of secrets/PII/other-tenant data, output-path echo/bleed checks, log redaction at emission, provider retention/training posture; composes tenant-isolation-reviewer + secrets-identity-hardener. |
 | `model-poisoning-reviewer` | LLM05 *(NEW)* | yes | Training/feedback/ingestion integrity: contributor-trust assessment, poisoning paths, feedback-loop Sybil defense, ingestion-as-truth integrity, provenance/holdout controls; acquire-vs-ingest boundary with supply-chain-security-reviewer. |
-| `system-prompt-leakage-reviewer` | LLM08 *(NEW; Hidden Context Exposure, system-prompt slice)* | yes | Two axes: no secrets in the prompt (extract + rotate via secrets-identity-hardener) AND no security dependence on prompt secrecy — **system prompts are NOT security controls**; enforcement is deterministic and lives OUTSIDE the LLM; extraction-is-harmless framing. |
+| `hidden-context-exposure-reviewer` | LLM08 *(NEW; Hidden Context Exposure, full scope)* | yes | Every hidden source — system prompt, developer instructions, retrieved policy text, tool/function schemas, other directives — on two axes: no secrets or attacker-useful logic in hidden context (extract + rotate via secrets-identity-hardener) AND no security dependence on its secrecy — **hidden context is NOT a security control**; enforcement is deterministic and lives OUTSIDE the LLM; LLM08 severity scale; disclosure-is-harmless framing. |
 | `ai-misinformation-guard` | LLM07 *(NEW)* | yes | Anti-misinformation: grounding in retrieved sources (not memory), citation-to-claim verification, calibrated uncertainty/refusal, fact validation before action, package/API hallucination (slopsquatting) checks, overreliance-aware UX; composes rag-security-architect + ai-governance-risk-reviewer. |
 
 Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`. Anchored to the [OWASP Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (v1.0, 2026-08-03), re-anchored from the 2025 edition by owner decision 2026-09-26.
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 7
 clusters: **threat & injection** (`ai-threat-modeler`, `prompt-injection-defender`,
-`system-prompt-leakage-reviewer`, `sensitive-disclosure-guard`), **data &
+`hidden-context-exposure-reviewer`, `sensitive-disclosure-guard`), **data &
 retrieval** (`rag-security-architect`, `model-poisoning-reviewer`), **output &
 agency** (`agent-tool-safety-guard`, `llm-output-safety-reviewer`,
 `structured-output-validator`, `ai-misinformation-guard`), and **AI platform

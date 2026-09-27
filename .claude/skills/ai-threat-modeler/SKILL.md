@@ -96,7 +96,7 @@ re-derived here — it composes `threat-modeler` output for the non-AI half.
    the owning skill that designs/builds it (`prompt-injection-defender`,
    `rag-security-architect`, `agent-tool-safety-guard`,
    `structured-output-validator`, `sensitive-disclosure-guard`,
-   `system-prompt-leakage-reviewer`, `ai-cost-guardrail-designer`,
+   `hidden-context-exposure-reviewer`, `ai-cost-guardrail-designer`,
    `model-poisoning-reviewer`, `ai-misinformation-guard`, or a non-AI skill),
    and the red-team/eval case `ai-evaluation-harness` will encode. Deferred
    risks get a named acceptor via `human-approval-boundary`.
@@ -153,7 +153,7 @@ Accepted/deferred risks: <risk — named acceptor — review date>
   the model (a calendar invite, a README, a scraped page) that the feature
   dutifully retrieves into context. Enumerate sources, not just the chat box.
 - "The system prompt tells it not to" is not a mitigation — instructions are
-  not enforcement. Route such findings to `system-prompt-leakage-reviewer`
+  not enforcement. Route such findings to `hidden-context-exposure-reviewer`
   and deterministic controls.
 - Cost is an asset: an attacker who can make you spend $50k in tokens never
   needs to steal data (LLM06). Model denial-of-wallet paths explicitly.

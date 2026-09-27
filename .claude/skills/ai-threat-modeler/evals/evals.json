@@ -49,7 +49,7 @@
         "triggers": true,
         "assertions": [
           "Refuses to record the system-prompt instruction as a mitigation: instructions are not enforcement, so injection threats remain open findings.",
-          "Routes the findings to deterministic controls owned by prompt-injection-defender (and system-prompt-leakage-reviewer for the prompt-as-control anti-pattern) with proof cases.",
+          "Routes the findings to deterministic controls owned by prompt-injection-defender (and hidden-context-exposure-reviewer for the hidden-context-as-control anti-pattern) with proof cases.",
           "States that accepting the risk as-is would need a named human acceptor via human-approval-boundary rather than silently marking it mitigated."
         ]
       }

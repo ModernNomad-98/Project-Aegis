@@ -79,8 +79,9 @@ Assert the SAFE OUTCOME, verifiably:
   (deterministic pattern + known-canary checks).
 - **Tool misuse:** the out-of-scope tool call was denied at the deterministic
   boundary (`agent-tool-safety-guard`).
-- **Disclosure / prompt leakage:** system prompt / secrets not revealed
-  (`system-prompt-leakage-reviewer` canaries).
+- **Disclosure / hidden-context leakage:** system prompt, developer
+  instructions, retrieved policy text, tool schemas / secrets not revealed
+  (`hidden-context-exposure-reviewer` canaries).
 
 Use synthetic canary tokens: plant a unique marker in authorized test context
 and assert it never appears in output. Never put a real secret or private

@@ -1,7 +1,7 @@
 {
   "skill": "prompt-injection-defender",
   "description": "Trigger discrimination for the Phase 7 threat & injection cluster: injection defense design vs whole-system threat modeling vs prompt-secrecy vs retrieval authz vs tool scope, and against the shipped security-pr-reviewer and the ai-security-red-team-reviewer subagent.",
-  "overlaps_with": ["ai-threat-modeler", "system-prompt-leakage-reviewer", "rag-security-architect", "agent-tool-safety-guard", "security-pr-reviewer", "ai-security-red-team-reviewer (subagent)"],
+  "overlaps_with": ["ai-threat-modeler", "hidden-context-exposure-reviewer", "rag-security-architect", "agent-tool-safety-guard", "security-pr-reviewer", "ai-security-red-team-reviewer (subagent)"],
   "cases": [
     {
       "id": "injection-defense-wins-here",
@@ -20,9 +20,9 @@
     {
       "id": "prompt-secrecy-goes-to-leakage-reviewer",
       "prompt": "Can an attacker extract our system prompt, and are we wrongly relying on it staying secret?",
-      "expected_skill": "system-prompt-leakage-reviewer",
+      "expected_skill": "hidden-context-exposure-reviewer",
       "should_not_trigger": ["prompt-injection-defender"],
-      "reason": "System-prompt extraction and the prompt-as-control anti-pattern are LLM08 (system-prompt-leakage-reviewer); this skill treats the prompt as non-secret and defends the action boundary."
+      "reason": "System-prompt extraction and the prompt-as-control anti-pattern are LLM08 (hidden-context-exposure-reviewer); this skill treats the prompt as non-secret and defends the action boundary."
     },
     {
       "id": "tool-scope-goes-to-tool-safety-guard",

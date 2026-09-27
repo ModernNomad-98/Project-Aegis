@@ -1,6 +1,6 @@
 ---
 name: prompt-injection-defender
-description: MANUAL-ONLY; never auto-invoke. Design the layered defense against prompt injection (OWASP LLM01) for an LLM feature or agent — establish trust zones (trusted rules vs untrusted user input, retrieved docs, webpages, tickets, emails, logs, tool/model outputs), enforce that untrusted content can never change instructions/tool permissions/identity/access policy/execution plan, spec content/instruction separation, gate every side-effecting action behind deterministic authorization outside the model, and define the injection red-team suite that proves it. Covers direct and indirect injection. Use when hardening an AI feature against injection or jailbreaks, or after ai-threat-modeler flags an injection risk. Do NOT use for the whole AI threat model (ai-threat-modeler), retrieval authorization (rag-security-architect), tool-permission design (agent-tool-safety-guard), output rendering/exec (llm-output-safety-reviewer), or prompt-secrecy (system-prompt-leakage-reviewer). Edits code/prompts, so it is manual-only.
+description: MANUAL-ONLY; never auto-invoke. Design the layered defense against prompt injection (OWASP LLM01) for an LLM feature or agent — establish trust zones (trusted rules vs untrusted user input, retrieved docs, webpages, tickets, emails, logs, tool/model outputs), enforce that untrusted content can never change instructions/tool permissions/identity/access policy/execution plan, spec content/instruction separation, gate every side-effecting action behind deterministic authorization outside the model, and define the injection red-team suite that proves it. Covers direct and indirect injection. Use when hardening an AI feature against injection or jailbreaks, or after ai-threat-modeler flags an injection risk. Do NOT use for the whole AI threat model (ai-threat-modeler), retrieval authorization (rag-security-architect), tool-permission design (agent-tool-safety-guard), output rendering/exec (llm-output-safety-reviewer), or hidden context (hidden-context-exposure-reviewer). Edits code/prompts, so it is manual-only.
 disable-model-invocation: true
 ---
 
@@ -37,8 +37,8 @@ and security-relevant.
 - Do NOT use when: the risk is retrieval crossing tenants
   (`rag-security-architect`), tool scope (`agent-tool-safety-guard`), output
   being executed/rendered (`llm-output-safety-reviewer` /
-  `structured-output-validator`), or secrets in the prompt
-  (`system-prompt-leakage-reviewer`).
+  `structured-output-validator`), or secrets in the prompt or other hidden context
+  (`hidden-context-exposure-reviewer`).
 
 ## Inputs to Inspect
 
@@ -134,7 +134,7 @@ Files to change: <prompt assembly, guardrail code, tool wiring>
   webpages, tickets, emails, logs, tool outputs, and prior model outputs are
   untrusted unless explicitly proven otherwise.
 - The system prompt is not a security control (see
-  `system-prompt-leakage-reviewer`): "we told it not to" never counts as the
+  `hidden-context-exposure-reviewer`): "we told it not to" never counts as the
   primary defense. Enforcement is deterministic and lives outside the LLM.
 - Side effects are authorized by code against the real user's permissions,
   approval-gated where irreversible — never by the model's decision.
