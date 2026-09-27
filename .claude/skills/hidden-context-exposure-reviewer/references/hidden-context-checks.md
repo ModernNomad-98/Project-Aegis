@@ -2,13 +2,14 @@
 
 Use this reference with the [Hidden Context Exposure Reviewer](../SKILL.md).
 
-Detail for `hidden-context-exposure-reviewer`. OWASP LLM08:2026 Hidden Context
-Exposure (formerly LLM07:2025 System Prompt Leakage). Doctrine: **hidden
-context is not a security control.** Review every hidden source as if it will
-be public — because it can be extracted, inferred, or reconstructed.
+Detail for `hidden-context-exposure-reviewer`. Open Worldwide Application
+Security Project (OWASP) large language model (LLM) risk LLM08:2026 Hidden
+Context Exposure (formerly LLM07:2025 System Prompt Leakage). Doctrine:
+**hidden context is not a security control.** Review every hidden source as if
+it will be public — because it can be extracted, inferred, or reconstructed.
 
-Scope source: the OWASP GenAI Security Project's LLM08:2026 entry
-(`2026/final/LLM08_HiddenContextExposure.md` in the
+Scope source: the OWASP Generative AI (GenAI) Security Project's LLM08:2026
+entry (`2026/final/LLM08_HiddenContextExposure.md` in the
 `GenAI-Security-Project/GenAI-LLM-Top10` repository, checked 2026-09-26). It
 defines hidden context as the system prompt, developer instructions,
 retrieved policy text, tool and function schemas, and other rules, directives,
@@ -21,9 +22,10 @@ edition text as a verification item when it is revised.
   2026 large language model threat category for hidden context exposure.
 - **Hidden context:** any non-user-facing content the application places in
   the model's context window.
-- **API / MCP / OAuth / IP / PII / RAG:** application programming interface,
-  Model Context Protocol, Open Authorization, Internet Protocol, personally
-  identifiable information, and retrieval-augmented generation.
+- **API / JSON / MCP / OAuth / IP / PII / RAG / URL:** application
+  programming interface, JavaScript Object Notation, Model Context Protocol,
+  Open Authorization, Internet Protocol, personally identifiable information,
+  retrieval-augmented generation, and uniform resource locator.
 - **RBAC / UX:** role-based access control and user experience.
 
 ## Step 0 — inventory
@@ -50,7 +52,8 @@ Flag any of these; they should not be in hidden context.
 - Internal hostnames, service endpoints, database or table names,
   architecture details, IP ranges.
 - Other customers'/tenants' data or regulated data (PII, health, financial)
-  — route to `sensitive-disclosure-guard` (LLM02 owns user data).
+  — route to `sensitive-disclosure-guard` (LLM02 Sensitive Information
+  Disclosure owns user data).
 
 **System prompt and developer instructions**
 
@@ -124,7 +127,7 @@ Wording follows the official OWASP LLM08:2026 severity definitions.
 | Severity | What is in hidden context / how it is relied on |
 |---|---|
 | Informational | no secrets, no security-relevant logic, no reliance on confidentiality |
-| Medium | internal rules, filtering criteria, role descriptions, or workflow logic that meaningfully aids an attacker but does not gate critical decisions (Aegis reading of official Scenario #2: an extracted tool list with parameter schemas, no credential disclosed and no control bypassed, lands here) |
+| Medium | internal rules, filtering criteria, role descriptions, or workflow logic that meaningfully aids an attacker but does not gate critical decisions (Aegis reading of the official LLM08 entry's Scenario #2: an extracted tool list with parameter schemas, no credential disclosed and no control bypassed, lands here) |
 | High | embedded credentials or tokens, or reliance on hidden-context secrecy for authorization or content policy |
 | Critical | disclosure chains to remote code execution, broad data exfiltration, or privilege escalation in a connected system |
 
@@ -165,16 +168,17 @@ best.
 - Injection (input changing behavior) → `prompt-injection-defender`
   (manual-only); pairs with this skill.
 - Regulated user or training data (not the application's control context) →
-  `sensitive-disclosure-guard` (LLM02).
-- Who may retrieve which documents → `rag-security-architect` (LLM09).
+  `sensitive-disclosure-guard` (LLM02 Sensitive Information Disclosure).
+- Who may retrieve which documents → `rag-security-architect` (LLM09 Vector
+  and Embedding Weaknesses).
 - Tool permission matrix, argument validation, approval gates →
-  `agent-tool-safety-guard` (LLM03).
+  `agent-tool-safety-guard` (LLM03 Excessive Agency).
 - Agentic amplifications — persistent memory
   (`memory-context-poisoning-reviewer`), inter-agent channels
   (`inter-agent-comms-reviewer`), tool configuration persistence, and
   multi-step agent compromise (`agent-tool-safety-guard`,
-  `agent-containment-reviewer`) — are covered by the OWASP Agentic Top 10,
-  not LLM08.
+  `agent-containment-reviewer`) — are covered by the OWASP Top 10 for
+  Agentic Applications, not LLM08.
 - Generic application security is out of LLM08 scope: client-bundle secrets
   → `secrets-identity-hardener` (manual-only; invoke explicitly); server-side
   log leakage and infrastructure-layer side channels → `threat-modeler`

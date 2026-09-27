@@ -7,8 +7,9 @@ description: Design or review least-privilege tool and function access for a lar
 
 **Reading key:** A large language model (LLM) agent can request tool calls.
 Open Worldwide Application Security Project (OWASP) code LLM03 (2026 edition;
-LLM06 in 2025) names excessive agency; agentic codes ASI02 and ASI05 refer
-here to tool misuse and tool-enabled code execution. An application programming interface (API) is a
+LLM06 in 2025) names excessive agency; codes ASI02 and ASI05 from the OWASP
+Top 10 for Agentic Applications (2026) refer here to tool misuse and
+tool-enabled code execution. An application programming interface (API) is a
 software call boundary; natural language (NL) is ordinary user text.
 `authz` means authorization, and remote code execution (RCE) means an
 attacker can cause code to run across a trust boundary.
@@ -50,8 +51,8 @@ from `human-approval-boundary`; standing agent authority from
 - Do NOT use when: the question is what tool names, descriptions, and
   parameter schemas reveal if a user extracts them, or whether a rule written
   in a tool description is being relied on as a gate
-  (`hidden-context-exposure-reviewer`, LLM08); that skill routes the
-  enforcement fix back here.
+  (`hidden-context-exposure-reviewer`, LLM08 Hidden Context Exposure); that
+  skill routes the enforcement fix back here.
 
 ## Inputs to Inspect
 
