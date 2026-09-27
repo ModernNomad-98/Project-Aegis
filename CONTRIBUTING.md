@@ -219,8 +219,8 @@ Every PR, from the maintainer or an outside contributor, must answer the
 **Security-relevant surface?** question in the
 [PR template](.github/pull_request_template.md): **No**, or **Yes** with the
 surfaces from the list above that the PR touches. The rest of the template's
-checklist is advisory. A **Yes** on an outside contribution triggers the
-additional security review described above.
+checklist is advisory. An outside contribution that touches any listed
+surface gets the additional security review described above, whatever it answers.
 
 Before opening a PR:
 
