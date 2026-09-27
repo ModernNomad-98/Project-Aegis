@@ -526,7 +526,7 @@ acceptance record, and in `.claude/skills/`, `api-event-architect/SKILL.md`,
 `model-poisoning-reviewer/references/poisoning-controls.md`. The named
 follow-up is one independent full-page re-read of each pending page against
 [Acceptance for each page](#acceptance-for-each-page). A follow-up ledger
-update will record open PR #438 (approval-register lifecycle events) and the
+update will record PR #438 (approval-register lifecycle events), which merged after #439 as `5dbf7bc`, and the
 upcoming audit-baseline re-run. No grant or gate changed.
 
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
