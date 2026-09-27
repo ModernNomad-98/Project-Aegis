@@ -1493,3 +1493,174 @@ generic skill guidance that would require asking for the same approval again.
   `e2f1da0beb6e4aed07044ca3a90e841962bfd590` (PR #77).
 - **Expiry / use limit:** One PR; consumed by its merge, which a later
   lifecycle event records.
+
+### AEGIS-APR-059: Consumption of the live startup-routing test grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-057.
+- **Status at recording:** AEGIS-APR-057 has no remaining use.
+- **Effective at:** 2026-09-27 20:54:39 UTC, when the last of the nine
+  sessions ended; the grant expired "when the run finishes".
+- **Recorded at / By:** 2026-09-27 / Project Aegis agent, under the delivery
+  grants in AEGIS-APR-039 and AEGIS-APR-048.
+- **New authority:** None. Another live run needs a new owner grant.
+- **Reason:** The one approved run finished within its scope.
+- **Evidence:** Nine sessions (eight scored cases and one unscored
+  reference) ran on 2026-09-27 from 20:06:49 to 20:54:39 UTC and used
+  1,444,651 input and 16,725 output tokens in total, far below the
+  20-million-input-token stop. No session was retried and no tenth session
+  ran, no session attempted a write, and the scope in AEGIS-APR-057 was not exceeded. The
+  [live acceptance record](../evidence/startup-routing/2026-09-live-acceptance.md)
+  holds the manifest and token table; [PR #433](https://github.com/ModernNomad-98/Project-Aegis/pull/433)
+  merged it as `9104cff1f676b7aef310ec83c0f0966020ec85d5` on 2026-09-27 at
+  22:58:53 UTC.
+
+### AEGIS-APR-060: Consumption of the audit-baseline overwrite grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-058.
+- **Status at recording:** AEGIS-APR-058 has no remaining use.
+- **Effective at:** 2026-09-27 22:44:15 UTC.
+- **Recorded at / By:** 2026-09-27 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039.
+- **New authority:** None. The later one-time regeneration with engine
+  v1.13.2 is a separate grant, AEGIS-APR-065.
+- **Reason:** The one approved PR merged.
+- **Evidence:** [PR #432](https://github.com/ModernNomad-98/Project-Aegis/pull/432)
+  merged head `d37ae1fc2c792df4631d74a1bd7a66f752c1197c` as
+  `7894567d49d301f82f40cb6445b668581d5799ac` at the time above. It changed
+  the three `artifacts/audits/` baseline files,
+  `docs/audits/skill-contract-audit-baseline.md`,
+  `docs/audits/aegis-060-plus-register.md` and this register, and nothing
+  under `scripts/` or `tools/`. The regenerated report names engine v1.13.1
+  at main commit `656194426e2ea3358fa29fcf19e05f0278d9c270`.
+
+### AEGIS-APR-061: PR #425 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-062; no remaining use.
+  Recorded after the merge.
+- **Date / Grantor:** 2026-09-27 / Peter Nguyen.
+- **Reason:** The owner's 2026-09-27 decision to date the BER README's pinned
+  counts changes `tools/behavioral_eval_runner/README.md`, a protected path
+  outside AEGIS-APR-047's four BER files. That decision said the change
+  needed a one-time, exact-head `gate-guard` exception at merge and did not
+  grant one.
+- **Scope allowed:** One `gate-guard` exception and administrator merge of
+  [PR #425](https://github.com/ModernNomad-98/Project-Aegis/pull/425) at
+  exact head `4c1324a687356af1d11e69e8ae261760f00cbb60`, which changed only
+  `tools/behavioral_eval_runner/README.md`.
+  [Exact-head run 36347344897](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36347344897)
+  passed `validate-skills` and `windows-offline-checks`; `gate-guard` failed
+  on that protected path. An independent review of that head returned SHIP.
+  Codex posted only a usage-limit notice after the head.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
+  not change branch protection or the protected path set, and it did not
+  widen AEGIS-APR-047.
+- **Evidence:** Direct owner answer "Grant for 4c1324a only (Recommended)"
+  to the coordinating agent's multiple-choice question in the Project Aegis
+  conversation on 2026-09-27, relayed by that agent. The
+  [review comment](https://github.com/ModernNomad-98/Project-Aegis/pull/425#issuecomment-5859686774)
+  and the
+  [exception receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/425#issuecomment-5860244524)
+  on PR #425 record the head, checks, review and merge.
+- **Expiry / use limit:** One merge of PR #425 at the named head; consumed
+  by the merge recorded in AEGIS-APR-062.
+
+### AEGIS-APR-062: Consumption of the PR #425 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-061.
+- **Status at recording:** AEGIS-APR-061 has no remaining use.
+- **Effective at:** 2026-09-27 22:04:12 UTC.
+- **Recorded at / By:** 2026-09-27 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039.
+- **New authority:** None.
+- **Reason:** The sole exact-head administrator merge completed.
+- **Evidence:** [PR #425](https://github.com/ModernNomad-98/Project-Aegis/pull/425)
+  merged `4c1324a687356af1d11e69e8ae261760f00cbb60` as
+  `7b8884133fe92da8adae6b929c5440e05c1ed10b` at the time above.
+
+### AEGIS-APR-063: PR #429 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-064; no remaining use.
+  Recorded after the merge.
+- **Date / Grantor:** 2026-09-27 / Peter Nguyen.
+- **Reason:** The owner's 2026-09-27 decision to fix the ROUTE-002
+  false positive changes `scripts/audit-skill-contracts.py` and its test,
+  protected paths outside AEGIS-APR-047's four BER files. That decision said
+  the merge needed a one-time, exact-head `gate-guard` exception and did not
+  grant one.
+- **Scope allowed:** One `gate-guard` exception and administrator merge of
+  [PR #429](https://github.com/ModernNomad-98/Project-Aegis/pull/429) at
+  exact head `13a0682b3e70b9290a6a8c7a25fe291dcec93201`, which changed only
+  `scripts/audit-skill-contracts.py` (engine v1.13.2) and
+  `scripts/tests/test_audit_skill_contracts.py`.
+  [Exact-head run 36350453443](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36350453443)
+  passed `validate-skills` and `windows-offline-checks`; `gate-guard` failed
+  on those protected paths. An independent code review of that head returned
+  SHIP and found that the only audit change was ROUTE-002 going from 233 to
+  232 findings, the known false positive. Codex posted only a usage-limit
+  notice after the head.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
+  not change branch protection or the protected path set, and it did not
+  widen AEGIS-APR-047.
+- **Evidence:** Direct owner answer "Grant for 13a0682 only (Recommended)"
+  to the coordinating agent's multiple-choice question in the Project Aegis
+  conversation on 2026-09-27, relayed by that agent. The
+  [review comment](https://github.com/ModernNomad-98/Project-Aegis/pull/429#issuecomment-5860298094)
+  and the
+  [exception receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/429#issuecomment-5860441506)
+  on PR #429 record the head, checks, review and merge.
+- **Expiry / use limit:** One merge of PR #429 at the named head; consumed
+  by the merge recorded in AEGIS-APR-064.
+
+### AEGIS-APR-064: Consumption of the PR #429 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-063.
+- **Status at recording:** AEGIS-APR-063 has no remaining use.
+- **Effective at:** 2026-09-27 22:31:32 UTC.
+- **Recorded at / By:** 2026-09-27 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039.
+- **New authority:** None.
+- **Reason:** The sole exact-head administrator merge completed.
+- **Evidence:** [PR #429](https://github.com/ModernNomad-98/Project-Aegis/pull/429)
+  merged `13a0682b3e70b9290a6a8c7a25fe291dcec93201` as
+  `169e8be44d80f08938b7728000251dcfce2223bb` at the time above.
+
+### AEGIS-APR-065: Regenerate the audit baselines once more with engine v1.13.2
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE; granted and not yet consumed. A later
+  lifecycle event records its consumption.
+- **Date / Grantor:** 2026-09-27 / Peter Nguyen.
+- **Reason:** The baselines written under AEGIS-APR-058 came from engine
+  v1.13.1 at main commit `656194426e2ea3358fa29fcf19e05f0278d9c270`. Later
+  merges change what the audit reports. The owner's question named three of
+  them: PR #424 (`5711ddf`) and PR #428 (`0cb0777`) extended skills, and PR
+  #429 (`169e8be`) moved the engine to v1.13.2, which removes the ROUTE-002
+  false positive. Other skill changes merged after that commit, including PR
+  #427 (`0030e73`), are also picked up by any main commit that contains all
+  three.
+- **Owner decision:** Asked whether to regenerate the baselines again once
+  those PRs merged, the owner answered "Yes, once after all merge
+  (Recommended)" to the coordinating agent's multiple-choice question in chat
+  on 2026-09-27. All three had merged when
+  this entry was written.
+- **Scope allowed:** One pull request that regenerates, with
+  `scripts/audit-skill-contracts.py` at engine v1.13.2 run unchanged on a
+  clean checkout of a main commit that contains PRs #424, #428 and #429,
+  exactly these files:
+  `artifacts/audits/skill-contract-audit-baseline.json`,
+  `artifacts/audits/corpus-route-graph.json`,
+  `artifacts/audits/corpus-manifest-baseline.json` and the companion
+  `docs/audits/skill-contract-audit-baseline.md` with its provenance preface;
+  adds dated notes and history links, as AEGIS-APR-058 did, to
+  `docs/audits/aegis-060-plus-register.md`.
+- **Scope FORBIDDEN:** No protected path. Nothing under `scripts/` or
+  `tools/` changes. No historical count in the AEGIS-060+ register is
+  rewritten. No further regeneration is covered.
+- **Evidence:** Direct owner answer in the Project Aegis conversation on
+  2026-09-27, quoted above, relayed by the coordinating agent. The
+  baselines it replaces are in git history at
+  `7894567d49d301f82f40cb6445b668581d5799ac` (PR #432).
+- **Expiry / use limit:** One PR; consumed by its merge, which a later
+  lifecycle event records.
