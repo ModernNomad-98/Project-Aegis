@@ -76,7 +76,7 @@
         "triggers": false,
         "assertions": [
           "source-of-truth-reconciler does not activate or take ownership of this request.",
-          "Does not auto-invoke agent-memory-governance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute source-of-truth-reconciler or another skill for it.",
+          "Does not auto-invoke agent-memory-governance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute source-of-truth-reconciler for it.",
           "Treats store-wide memory hygiene with per-entry dispositions as memory governance; no single live source conflict is being adjudicated, so no source-of-truth reconciliation is run."
         ]
       }

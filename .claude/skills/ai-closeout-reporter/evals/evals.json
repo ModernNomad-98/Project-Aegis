@@ -62,7 +62,7 @@
         "triggers": false,
         "assertions": [
           "ai-closeout-reporter does not activate or take ownership of this request.",
-          "Does not auto-invoke reviewable-diff-discipline (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-closeout-reporter or another skill for it.",
+          "Does not auto-invoke reviewable-diff-discipline (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-closeout-reporter for it.",
           "Treats shrinking a drifting change back to its intent while it is still being shaped as diff discipline; does not write a terminal closeout report."
         ]
       }

@@ -102,7 +102,7 @@
         "triggers": false,
         "assertions": [
           "ai-cost-guardrail-designer does not activate or take ownership of this request.",
-          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer or another skill for it.",
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer for it.",
           "Treats writing the burn-rate alert rules and building the Grafana cost dashboard as hands-on observability implementation; any ai-cost-guardrail-designer contribution is limited to the metering and alert spec it hands over."
         ]
       }
@@ -115,7 +115,7 @@
         "triggers": false,
         "assertions": [
           "ai-cost-guardrail-designer does not activate or take ownership of this request.",
-          "Does not auto-invoke ai-router-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer or another skill for it.",
+          "Does not auto-invoke ai-router-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer for it.",
           "Identifies model routing and provider fallback logic as router design; does not produce the routing implementation and at most notes that budget and model-tier intent are inputs the router enforces."
         ]
       }
@@ -128,7 +128,7 @@
         "triggers": false,
         "assertions": [
           "ai-cost-guardrail-designer does not activate or take ownership of this request.",
-          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer or another skill for it.",
+          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer for it.",
           "Treats key custody, rotation, storage, and client-bundle exposure as custody mechanics owned elsewhere; limits any ai-cost-guardrail-designer contribution to the AI-spend blast radius and per-model invocation restriction of the leaked key."
         ]
       }

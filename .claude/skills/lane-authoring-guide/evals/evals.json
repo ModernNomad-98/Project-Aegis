@@ -75,7 +75,7 @@
         "triggers": false,
         "assertions": [
           "lane-authoring-guide does not activate or take ownership of this request.",
-          "Does not auto-invoke agent-instruction-consolidator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute lane-authoring-guide or another skill for it.",
+          "Does not auto-invoke agent-instruction-consolidator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute lane-authoring-guide for it.",
           "Treats alignment of standing assistant instruction files across tools as instruction consolidation; does not author a per-effort, per-lane guide in response."
         ]
       }

@@ -75,7 +75,7 @@
         "triggers": false,
         "assertions": [
           "context-co-update-ci-gate does not activate or take ownership of this request.",
-          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute context-co-update-ci-gate or another skill for it.",
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute context-co-update-ci-gate for it.",
           "Treats the stage graph and merge-blocking semantics of the whole CI/CD pipeline as pipeline architecture; the context co-update gate is at most one policy check wired into that pipeline, not the pipeline design."
         ]
       }

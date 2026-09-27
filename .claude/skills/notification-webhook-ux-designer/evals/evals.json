@@ -95,7 +95,7 @@
         "triggers": false,
         "assertions": [
           "notification-webhook-ux-designer does not activate or take ownership of this request.",
-          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute notification-webhook-ux-designer or another skill for it.",
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute notification-webhook-ux-designer for it.",
           "Treats internal on-call paging (severity, thresholds, runbook link) as internal alerting, not the integrator-facing failing-endpoint notice this skill designs."
         ]
       }

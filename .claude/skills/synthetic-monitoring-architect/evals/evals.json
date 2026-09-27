@@ -93,7 +93,7 @@
         "triggers": false,
         "assertions": [
           "synthetic-monitoring-architect does not activate or take ownership of this request.",
-          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute synthetic-monitoring-architect or another skill for it.",
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute synthetic-monitoring-architect for it.",
           "Distinguishes internal white-box instrumentation (metrics, traces, logs from inside the application) from synthetic monitoring's external black-box probing; does not design synthetic probes as a substitute."
         ]
       }

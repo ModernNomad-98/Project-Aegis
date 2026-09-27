@@ -105,7 +105,7 @@
         "triggers": false,
         "assertions": [
           "merge-is-deploy-governance does not activate or take ownership of this request.",
-          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute merge-is-deploy-governance or another skill for it.",
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute merge-is-deploy-governance for it.",
           "Identifies WHO holds merge and auto-merge arming authority as an authorization-matrix question; merge-is-deploy-governance at most composes those floors with what a merge physically triggers."
         ]
       }
@@ -118,7 +118,7 @@
         "triggers": false,
         "assertions": [
           "merge-is-deploy-governance does not activate or take ownership of this request.",
-          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute merge-is-deploy-governance or another skill for it.",
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute merge-is-deploy-governance for it.",
           "Treats changing pipeline structure (new environments, promotion gates, canary) as pipeline architecture; merge-is-deploy-governance documents and governs the pipeline as it currently is and does not redesign it."
         ]
       }

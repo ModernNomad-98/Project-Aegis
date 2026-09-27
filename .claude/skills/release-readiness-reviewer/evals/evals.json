@@ -61,7 +61,7 @@
         "triggers": false,
         "assertions": [
           "release-readiness-reviewer does not activate or take ownership of this request.",
-          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute release-readiness-reviewer or another skill for it.",
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute release-readiness-reviewer for it.",
           "Treats building a standing release-readiness stage into the deploy pipeline as pipeline architecture; does not produce a per-release ship/no-ship verdict in response."
         ]
       }
@@ -74,7 +74,7 @@
         "triggers": false,
         "assertions": [
           "release-readiness-reviewer does not activate or take ownership of this request.",
-          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute release-readiness-reviewer or another skill for it.",
+          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute release-readiness-reviewer for it.",
           "Treats per-commit local CI mirroring (deriving local equivalents of PR checks, baselining on clean main, classifying failures as ours or main's) as preflight discipline, not a release-readiness verdict."
         ]
       }

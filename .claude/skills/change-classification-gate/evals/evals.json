@@ -62,7 +62,7 @@
         "triggers": false,
         "assertions": [
           "change-classification-gate does not activate or take ownership of this request.",
-          "Does not auto-invoke reviewable-diff-discipline (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute change-classification-gate or another skill for it.",
+          "Does not auto-invoke reviewable-diff-discipline (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute change-classification-gate for it.",
           "Treats trimming an oversized working change and staging only the fix as in-flight change hygiene, not pre-work risk classification; does not emit a change-class routing verdict."
         ]
       }
