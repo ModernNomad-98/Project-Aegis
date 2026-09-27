@@ -35,6 +35,10 @@ tenant semantics get rebuilt; this skill exists so they are built once.
 - Do NOT use when: modeling the business domain broadly — `domain-modeler`
   owns general concept modeling; this skill owns the tenancy axis
   specifically.
+- Do NOT use when: designing the tenancy architecture (control/data plane,
+  pooled vs siloed) — that is `saas-platform-architect`; or a sub-tenant
+  scope axis (site, region, org-unit) — that is
+  `intra-tenant-scope-architect`; this skill defines tenant semantics.
 
 ## Inputs to Inspect
 

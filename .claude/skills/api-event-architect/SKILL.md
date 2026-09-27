@@ -48,6 +48,11 @@ promise explicit before integrations harden around accidents.
   (`event-schema-architect`), notification/webhook UX
   (`notification-webhook-ux-designer`), or the generated reference docs for
   this contract (`api-doc-generator-designer`).
+- Do NOT use when: designing the error-code taxonomy and error envelope —
+  that is `error-taxonomy-designer` (its model rides this contract); or
+  planning user-facing sunset communications — that is
+  `sunset-deprecation-communicator`; this skill sets the standing
+  deprecation policy.
 
 ## Inputs to Inspect
 

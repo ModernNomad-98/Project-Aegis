@@ -38,6 +38,9 @@ the wrong thing confidently.
   `release-readiness-reviewer`.
 - Do NOT use when: asked to EXECUTE a rollback — this skill authors
   documents; execution is a human-gated operation.
+- Do NOT use when: the runbook is for a DATA move (backfill, re-shard,
+  store cutover, tenant move) — that is `data-migration-runbook-author`;
+  this skill owns general release rollbacks.
 
 ## Inputs to Inspect
 

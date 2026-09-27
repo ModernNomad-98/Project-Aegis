@@ -54,6 +54,9 @@ the internal stream feeds it.
   push to CLIENT connections (subscribe-time authz, fan-out,
   reconnect/replay) — that is `realtime-subscription-architect`. This skill
   designs the transport both consume, not what runs on top of it.
+- Do NOT use when: the events are product-analytics measurement events
+  (naming taxonomy, tracking plan) — that is `event-schema-architect`; this
+  skill designs the internal transport.
 
 ## Inputs to Inspect
 

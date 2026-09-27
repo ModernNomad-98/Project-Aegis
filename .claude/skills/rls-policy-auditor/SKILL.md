@@ -44,6 +44,9 @@ negative tests as SQL/session sequences.
 - Do NOT use when: the ask is design-time threat enumeration —
   `threat-modeler`.
 - Do NOT use when: tenant semantics are undefined — `tenant-modeler` first.
+- Do NOT use when: designing the roles × permissions × resources matrix
+  itself — that is `authorization-matrix-designer`; this skill audits and
+  authors the database RLS policies that enforce tenant scope.
 
 ## Inputs to Inspect
 
