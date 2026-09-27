@@ -92,8 +92,8 @@ tool (Claude Code, Codex CLI, or any Agent Skills tool) and Aegis selects and co
 right role for each step. Find the sentence that sounds like you: each door leads to a short
 guided path through the right skills, in the right order. (Auto-selection quality varies by
 tool — Claude Code reads the full skill descriptions; some tools' native selection reads only
-a short description prefix. See [Using Aegis with Codex CLI and other Agent Skills
-tools](#using-aegis-with-codex-cli-and-other-agent-skills-tools).)
+a short description prefix. Dated host caveats (checked 2026-09-26) are in [Using Aegis with
+Codex CLI and other Agent Skills tools](#using-aegis-with-codex-cli-and-other-agent-skills-tools).)
 
 - **"I have an idea, but I'm not a developer."** → [From idea to shipped: the no-experience
   path](#from-idea-to-shipped-the-no-experience-path). One pasted prompt starts it;
@@ -273,17 +273,28 @@ cd Project-Aegis
 `git clone` copies the library to your machine; `cd` puts you in the folder every option
 below starts from. Later, run `git pull` from the same folder to update to the latest skills.
 
+*Host facts below checked 2026-09-26 against the official
+[platforms](https://code.claude.com/docs/en/platforms),
+[quickstart](https://code.claude.com/docs/en/quickstart),
+[VS Code](https://code.claude.com/docs/en/vs-code),
+[JetBrains](https://code.claude.com/docs/en/jetbrains),
+[Desktop](https://code.claude.com/docs/en/desktop),
+[web](https://code.claude.com/docs/en/claude-code-on-the-web) and
+[Cursor skills](https://cursor.com/docs/context/skills) pages; product plans, UI and
+third-party behavior change — the linked official pages win.*
+
 **One engine, many surfaces.** Claude Code is one engine available on several surfaces —
-the terminal, VS Code (and forks like Cursor and Windsurf), JetBrains IDEs, a Desktop app,
-and the web. The skills in `.claude/skills/` load the same way on every local surface, so
-pick whichever matches how you work. The current full list is at
+the terminal, VS Code (and forks like Cursor), JetBrains IDEs, a Desktop app, the web,
+and the Claude mobile app. The skills in `.claude/skills/` load the same way on every
+local surface, so pick whichever matches how you work. The current full list is at
 [https://code.claude.com/docs/en/platforms](https://code.claude.com/docs/en/platforms).
 
 **Option 1 — Claude Code CLI (terminal, any OS, works alongside any editor).**
 
 1. Install Claude Code — follow the install steps on the official docs at
    [https://code.claude.com/docs](https://code.claude.com/docs). It requires a Claude
-   subscription (Pro/Max/Team/Enterprise) or Console API access. (Install commands change
+   subscription (Pro/Max/Team/Enterprise), a Claude Console account, or access through a
+   supported cloud provider. (Install commands change
    over time; the official page is always current, so we link instead of copying them here.)
 2. From the cloned repo folder, run:
 
@@ -314,11 +325,14 @@ pick whichever matches how you work. The current full list is at
 4. Type the same trigger-style prompts as in Option 1 — the extension and the CLI are the
    same Claude Code. Prefer a terminal? Open the integrated terminal
    (`` Ctrl+` `` / `` Cmd+` ``) and run `claude` there instead.
-5. **Using a fork like Cursor or Windsurf?** The steps above are identical — forks install
-   the same Anthropic extension the same way. One distinction, stated plainly: the skills
-   are used by **Claude Code**, not by the fork's own AI. Cursor's native chat/Composer
-   does *not* auto-load `.claude/skills/` — pasting a `SKILL.md` into it works only as a
-   manual procedure, same as Option 6.
+5. **Using a fork like Cursor?** The steps above are the same — Anthropic's docs link a
+   Cursor install, and other forks install the same extension from their Extensions view or
+   the [Open VSX registry](https://open-vsx.org/extension/Anthropic/claude-code). If a fork
+   can't install it, run `claude` in its integrated terminal instead. One distinction,
+   stated plainly: Aegis is built for **Claude Code**, not for the fork's own AI. Cursor's
+   own agent also discovers `.claude/skills/` for compatibility and applies skills it judges
+   relevant, but Aegis's subagents and CI validator are Claude Code features, and this repo
+   has not verified skill selection in Cursor's agent.
 
 **Option 3 — JetBrains IDEs (IntelliJ, PyCharm, WebStorm, Rider…).**
 
@@ -336,17 +350,17 @@ a terminal in the repo folder and type `claude`.
 
 **Option 4 — Claude Code Desktop app (no terminal at all).** The same engine in a graphical
 app — visual diff review, parallel sessions, and not a command line in sight. Install it
-from [https://claude.ai](https://claude.ai) (current platforms listed at
-[https://code.claude.com/docs](https://code.claude.com/docs)), open the cloned
+from [https://claude.com/download](https://claude.com/download) (current platforms listed at
+[https://code.claude.com/docs/en/desktop](https://code.claude.com/docs/en/desktop)), open the cloned
 `Project-Aegis` folder, and type the same prompts as in Option 1. For people who never want
 to see a terminal.
 
 **Option 5 — Claude Code on the Web (zero install).**
-[claude.ai/code](https://claude.ai/code) runs Claude Code on Anthropic's servers against a
-Git repository — point it at your fork of this repo (or any repo you've copied skills
-into) and prompt the same way, with nothing installed; it works from a browser and the iOS
-app. One honest caveat: it works on the cloud copy of the repository, not on the files on
-your machine.
+[claude.ai/code](https://claude.ai/code) runs Claude Code in the cloud (Anthropic-managed by
+default) against a GitHub repository — point it at your fork of this repo (or any repo
+you've copied skills into) and prompt the same way, with nothing installed; it works from a
+browser and the Claude mobile app (iOS and Android). One honest caveat: it works on the
+cloud copy of the repository, not on the files on your machine.
 
 **Option 6 — Claude.ai / the Claude apps (no Claude Code at all).** Without Claude Code you don't get
 automatic `.claude/` discovery — but the skills are just Markdown procedures, so you can
@@ -394,32 +408,54 @@ format if you want to write your own.
 
 Aegis skills use the open Agent Skills format — one `SKILL.md` with YAML frontmatter per
 skill — the same format Claude Code, OpenAI Codex, Cursor, Gemini CLI and other tools
-consume. Two ways in:
+consume (as verified 2026-09-26 against the [Agent Skills client list](https://agentskills.io/home)).
+Two ways in:
 
 - **Out of the box (recommended):** the repo-root [`AGENTS.md`](AGENTS.md) is read
   natively by Codex CLI; Claude Code reads [`CLAUDE.md`](CLAUDE.md), which imports AGENTS.md via `@AGENTS.md` (per the Claude Code memory documentation) — one shared contract, two documented entry points. It points agents into
   `.claude/skills/`, and they select and follow the right `SKILL.md` from there — in
   testing, Codex picked the correct skill and followed its workflow from the pointer
   alone. Verified against codex-cli 0.138.0-alpha.7 on 2026-07-18; tool behavior is a
-  verification item — recheck on new versions.
+  verification item — recheck on new versions. The entry-point facts were rechecked
+  against the official [Codex AGENTS.md](https://developers.openai.com/codex/guides/agents-md)
+  and [Claude Code memory](https://code.claude.com/docs/en/memory) docs on 2026-09-26;
+  re-verification of the skill-selection behavior on a current Codex release is pending.
 - **Optional native mode:** copy the skills to where the other tool discovers them —
-  `cp -r .claude/skills .codex/skills` inside a project, or per-skill copies into
-  `~/.codex/skills/` for a user-level install. Use real copies (no symlinks — they break
-  on Windows). Verified caveats before you choose this path (the first is fixed, kept
+  `cp -r .claude/skills .agents/skills` inside a project, or per-skill copies into
+  `~/.agents/skills/` for a user-level install (the locations in the official
+  [Codex skills docs](https://developers.openai.com/codex/skills), checked 2026-09-26;
+  earlier versions of this README said `.codex/skills`). Use real copies (git symlinks are
+  unreliable on Windows checkouts; Codex itself supports symlinked skill folders, checked
+  2026-09-26). Verified caveats before you choose this path (the first is fixed, kept
   for the record):
   1. ~~Strict-YAML consumers silently drop skills whose descriptions contain an unquoted
      `: `~~ — **fixed by the D50 normalization**: every description is now a
      strict-YAML-valid scalar (single-quoted where needed, parsed values byte-identical),
      so strict consumers parse the full corpus, and the validator hard-fails any future
      skill whose frontmatter a spec-strict parser rejects.
-  2. Descriptions cap at 1024 characters ecosystem-wide.
-  3. Native selection sees only roughly the first 92 characters of each description.
-  4. Codex does not honor `disable-model-invocation` — do **not** copy the manual-only
-     operate-class skills across, and do not rely on their leading "MANUAL-ONLY"
-     description sentinels alone (they reduce auto-invocation risk; they are not
-     enforcement).
+  2. The Agent Skills specification caps descriptions at 1024 characters; hosts add their
+     own listing limits (Claude Code truncates description plus `when_to_use` at 1,536
+     characters; Codex budgets the whole skills list and shortens descriptions first).
+     (Verified against the [Agent Skills specification](https://agentskills.io/specification),
+     [Claude Code skills](https://code.claude.com/docs/en/skills) and
+     [Codex skills](https://developers.openai.com/codex/skills) docs on 2026-09-26;
+     verification item — recheck on new versions.)
+  3. Native selection may see only a short description prefix — roughly the first 92
+     characters in Codex, per an internal measurement recorded as decision
+     [D49](docs/reconciliation/step-0-reconciliation-v4.md) (2026-07-18; not an official
+     figure). Codex's docs confirm only that it shortens descriptions when the skills list
+     exceeds its budget.
+  4. Codex's skills docs do not list `disable-model-invocation`; its documented control is
+     `allow_implicit_invocation: false` in a per-skill `agents/openai.yaml` (verified
+     against the [Codex skills docs](https://developers.openai.com/codex/skills) on
+     2026-09-26; verification item — recheck on new versions). Cursor, by contrast,
+     documents and honors `disable-model-invocation: true` (per the
+     [Cursor skills docs](https://cursor.com/docs/context/skills), checked 2026-09-26).
+     Either way, do **not** copy the manual-only operate-class skills across, and do not
+     rely on their leading "MANUAL-ONLY" description sentinels alone (they reduce
+     auto-invocation risk; they are not enforcement).
 
-  For those reasons, don't commit a `.codex/skills` copy to this repo — a committed copy
+  For those reasons, don't commit a `.agents/skills` copy to this repo — a committed copy
   drifts on every skill edit and bakes in the three live caveats. The copy is per-user
   opt-in only.
 
