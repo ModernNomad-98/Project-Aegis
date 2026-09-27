@@ -45,8 +45,9 @@ text, frozen baseline or unrelated AEGIS item.
 
 **ROUTE-002 disposition, 2026-09-26:** by owner decision, the
 [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md)
-closes the §2 triage. 31 edges into 23 target skills are reciprocated in three
-batch PRs. The remaining ROUTE-002 findings are census data, not defects.
+closes the §2 triage. 31 edges into 23 target skills were reciprocated in three
+merged batch PRs, and #395 also closed one D64 edge. Of the other 236, 235 are
+census data, not defects, and one is an engine false positive.
 
 ## Historical baseline (superseded where the current disposition says so)
 
@@ -203,10 +204,13 @@ their materiality is unconfirmed.
   route-graph and baseline JSON.
   **Dispositioned by owner decision, 2026-09-26.** The
   [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md)
-  triages all 268 edges reported on `0f46808`. Three batch PRs reciprocate
-  31 edges into 23 target skills. One of those 31 also gets a source-side
-  fix; one other edge is an engine false positive. The other 236 are census
-  data, not defects.
+  triages all 268 edges reported on `0f46808`. Three merged batch PRs
+  (#394, #395, #396) reciprocated 31 edges into 23 target skills. One of
+  those 31 also got a source-side fix. #395 also closed one D64 edge, and the
+  owner kept that yield (a dated D64 amendment records it). One other edge is
+  an engine false positive. The other 235 are census data, not defects. A
+  fresh audit of `56ea7e4` reports 234 ROUTE-002 findings, because #393 also
+  closed two census edges.
   No AEGIS ID is assigned.
 - **Orchestrator capability numbering.** `project-orchestrator` presents its
   workflow as Capability 1 → 3 → 2 → 4. The sequence matches the declared

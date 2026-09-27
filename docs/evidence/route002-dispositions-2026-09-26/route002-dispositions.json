@@ -1,7 +1,7 @@
 {
  "record": "ROUTE-002 dispositions",
  "date": "2026-09-26",
- "owner_decision": "Peter, 2026-09-26: reciprocate the 23 high-value ROUTE-002 seams in three batch pull requests (docs/route002-reciprocity-1/2/3), including five hub targets as deliberate exceptions (api-event-architect, architecture-designer, audit-log-architect, code-reviewer, streaming-event-architect), and record every other ROUTE-002 finding as census data. Earlier decision D64: the five one-way findings from feature-flag-architect stay census data.",
+ "owner_decision": "Peter, 2026-09-26: reciprocate the 23 high-value ROUTE-002 seams in three batch pull requests (docs/route002-reciprocity-1/2/3, merged as #394 29c484f, #395 741b29a and #396 cd7af02), including five hub targets as deliberate exceptions (api-event-architect, architecture-designer, audit-log-architect, code-reviewer, streaming-event-architect), and record every other ROUTE-002 finding as census data, except the one engine false positive, whose fix is tracked separately. Earlier decision D64 left the five one-way findings from feature-flag-architect as census data. D64 amendment (2026-09-26): PR #395 added a reciprocal plan-entitlement-architect -> feature-flag-architect yield; the owner kept it, so four D64 findings remain census data.",
  "scan": {
   "repo_sha": "0f46808d865751fac396b52422bd964e6b7c2cf1",
   "scan_source": "git archive of origin/main at repo_sha, extracted to a clean directory (the engine reports repo_sha 'unknown' and working_tree_dirty true there because the archive has no .git)",
@@ -36,14 +36,15 @@
   "census-data": "kept as informational census evidence; not a defect and not scheduled work",
   "reciprocate-in-PR": "the target description gains a yield naming the source in one of the three batch pull requests",
   "engine-false-positive": "the engine matched a substring; no seam exists",
-  "fix-A-side": "the source skill's description is corrected, and the target also gains a yield"
+  "fix-A-side": "the source skill's description is corrected, and the target also gains a yield",
+  "closed-by-batch-PR": "not triaged for reciprocation, but a yield added in a batch pull request closed the edge and the owner kept that yield"
  },
  "batch_branches": [
   "docs/route002-reciprocity-1",
   "docs/route002-reciprocity-2",
   "docs/route002-reciprocity-3"
  ],
- "batch_assignment_note": "batch_branch is read from which target SKILL.md each batch worktree modified when this record was built. null means that batch had not yet edited the target at record time; the coordinator owns the assignment.",
+ "batch_assignment_note": "batch_branch was first read from which target SKILL.md each batch worktree modified, then verified against the merged pull requests #394 (29c484f), #395 (741b29a) and #396 (cd7af02): every listed target's SKILL.md changed in its batch's merge commit. A finding without batch_branch was not reciprocated.",
  "reciprocity_target_skills": [
   "admin-console-architect",
   "adr-writer",
@@ -82,7 +83,8 @@
    "d": 2
   },
   "by_disposition": {
-   "census-data": 236,
+   "census-data": 235,
+   "closed-by-batch-PR": 1,
    "engine-false-positive": 1,
    "fix-A-side": 1,
    "reciprocate-in-PR": 30
@@ -411,7 +413,8 @@
    "bucket": "b-medium",
    "triage_reason": "plausible overlap; defer to optional batch",
    "disposition": "census-data",
-   "rationale": "Plausible overlap but below the owner cut of 23 targets; kept as census data, not scheduled."
+   "rationale": "Plausible overlap but below the owner cut of 23 targets; kept as census data, not scheduled.",
+   "closed_by": "#393 (9b8f5b2), which rewrote cloud-architecture-decider's description to name this source after the record was built; the census-data disposition is unchanged"
   },
   {
    "fingerprint": "902531d00aef",
@@ -468,7 +471,8 @@
    "bucket": "c",
    "triage_reason": "B trigger-evals already name A (overlaps_with/cases); description silent",
    "disposition": "census-data",
-   "rationale": "The target already names the source in its trigger-evals (overlaps_with or cases); the description is deliberately silent."
+   "rationale": "The target already names the source in its trigger-evals (overlaps_with or cases); the description is deliberately silent.",
+   "closed_by": "#393 (9b8f5b2), which rewrote cloud-architecture-decider's description to name this source after the record was built; the census-data disposition is unchanged"
   },
   {
    "fingerprint": "fc23a955e38c",
@@ -1142,8 +1146,10 @@
    "normalized_message": "exclusion toward `plan-entitlement-architect` is not reciprocated (plan-entitlement-architect's description never mentions this skill) - census evidence, no aegis id",
    "bucket": "a",
    "triage_reason": "new since triage base 032e030 (added by D64, PR #383)",
-   "disposition": "census-data",
-   "rationale": "D64 owner decision: feature-flag-architect names this skill to route requests away; the target does not need to name the new skill back. Recorded as census data, not reciprocated."
+   "disposition": "closed-by-batch-PR",
+   "rationale": "D64 amendment (2026-09-26): PR #395 gave plan-entitlement-architect a yield naming feature-flag-architect back, closing this edge; the owner kept it. The other four D64 edges stay census data.",
+   "batch_branch": "docs/route002-reciprocity-2",
+   "closed_by": "#395 (741b29a)"
   },
   {
    "fingerprint": "91c8d94dac30",
@@ -3101,5 +3107,25 @@
    "disposition": "census-data",
    "rationale": "The target already names the source in its trigger-evals (overlaps_with or cases); the description is deliberately silent."
   }
- ]
+ ],
+ "currency_check": {
+  "checked": "2026-09-27",
+  "repo_sha": "56ea7e48a15b0b00cbbe6e0d998b6b3f14c2ee8b",
+  "scan_source": "git archive of origin/main at repo_sha, extracted to a clean directory",
+  "version": "1.13.1",
+  "engine_sha256_scanned_copy": "3e8d24cdf610b2685020d51d9e4f7b743b4cc84d3931f4a559742d09a7a7a3cb",
+  "corpus_content_hash": "e13bfeab0f79d791de975f4dc7743ebfe5d3dfcf241165bee1af50e46635d7bb",
+  "finding_count": 318,
+  "route002_count": 234,
+  "route002_breakdown": {
+   "census-data": 233,
+   "engine-false-positive": 1
+  },
+  "closed_since_scan": {
+   "reciprocate-in-PR and fix-A-side (#394, #395, #396)": 31,
+   "closed-by-batch-PR (#395, D64 amendment)": 1,
+   "census-data closed by #393 (9b8f5b2)": 2
+  },
+  "new_edges": 0
+ }
 }
