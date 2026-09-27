@@ -50,6 +50,14 @@ pull requests (PRs) that deliver the skill will carry their own evidence.
   skill: trigger quality, collision with other skills, duplication versus
   extension, evaluation integrity, section substance, scope discipline and
   invocation posture.
+- **`project-orchestrator`** is the library's beginner entry point. It walks
+  a product through numbered stages; the ones named here are Stage 2 (define
+  the product), Stage 3 (design how it's built), Stage 8 (get it ready to
+  run) and Stage 9 (decide to release).
+- **Use When** and **Stop Conditions** are two of the
+  [required sections](../skill-generation-standard.md#4-required-sections)
+  of every skill's `SKILL.md`: when to use the skill (and when not), and when
+  to stop and hand off to another skill.
 
 ## Decision in one read
 
@@ -64,8 +72,8 @@ separate, smaller PR.
 | --- | --- | --- |
 | New skill `feature-flag-architect` | One auto-invocable design skill; writes nothing, installs nothing | Not built |
 | Strategist wording edit | Reciprocal exclusion, one Use-When bullet, one Stop Condition hand-off, trigger-eval cases | Not built |
-| Orchestrator route | Stage 3 route plus an optional Stage 9 route, in its own PR | Not built |
-| Estimate | 2.75–5.5 active hours across both PRs, provisional | Not measured |
+| Orchestrator route | Stage 3 and Stage 9 routes in their own PR; the owner decided the Stage 9 route on 2026-09-26 (see [Stage 9 route: decided](#stage-9-route-decided)) | Not built |
+| Estimate | 3–5.75 active hours across both PRs, provisional | Not measured |
 
 ## Why a new skill and not an extension
 
@@ -173,11 +181,14 @@ drafts below are one line of strict YAML, single-quoted so an apostrophe can
 be doubled, as elsewhere in the library. Lengths were measured with Python's
 `yaml.safe_load` on the proposal draft; recheck them when building.
 
-**New skill, 990 characters (limit 1,024).** The first 92 or so characters,
-which is all some assistants read when selecting, say what it does.
+**New skill, 1,020 characters (limit 1,024).** The first 92 or so
+characters, which is all some assistants read when selecting, say what it
+does. The last exclusion yields a review of existing flags for cross-tenant
+leaks to `tenant-isolation-reviewer`, matching trigger-eval case 14; room for
+it came from shorter wording elsewhere, with no trigger phrase removed.
 
 ```yaml
-description: 'Design the feature-flag SYSTEM a product runs on — flag store build-vs-buy (an owner choice, taught with costs), SDK and config placement, where flags evaluate (server per request, client, edge, build time), the targeting context (tenant, plan, role, cohort, environment) with tenant-safe caching, the fail-safe mechanism when the flag service is down (code defaults, last-known-good cache, timeouts), kill-switch propagation and who may flip it, a flag-change audit trail, and flag-debt hooks (owner/expiry registry, stale-flag report). Designs; writes nothing. Use when choosing or building a flag service, wiring flags into a codebase, or when flags evaluate inconsistently across surfaces or tenants. Do NOT use for one change''s staged rollout, guardrails or flag removal (feature-flag-rollout-strategist), plan entitlements (plan-entitlement-architect), role permissions (authorization-matrix-designer), experiment design (ab-test-designer), or deploy strategy (ci-pipeline-architect).'
+description: 'Design the feature-flag SYSTEM a product runs on — flag store build-vs-buy (an owner choice), SDK and config placement, where flags evaluate (server, client, edge, build time), targeting context (tenant, plan, role, cohort, environment) with tenant-safe caching, the fail-safe mechanism for a flag-service outage (code defaults, last-known-good cache, timeouts), kill-switch propagation and who may flip it, flag-change audit trail, and flag-debt hooks (owner/expiry registry, stale-flag report). Designs; writes nothing. Use when choosing or building a flag service, wiring flags into code, or when flags evaluate inconsistently across surfaces or tenants. Do NOT use for one change''s staged rollout, guardrails or flag removal (feature-flag-rollout-strategist), plan entitlements (plan-entitlement-architect), role permissions (authorization-matrix-designer), experiment design (ab-test-designer), deploy strategy (ci-pipeline-architect), or reviewing existing flags for cross-tenant leaks (tenant-isolation-reviewer).'
 ```
 
 **Strategist replacement, 943 characters.** ROUTE-002 would report the new
@@ -191,10 +202,13 @@ description: 'Design the ROLLOUT STRATEGY for a change behind a flag — classif
 ```
 
 The strategist also gains one Use-When bullet, one Stop Condition hand-off
-and reverse trigger-eval cases. Check 1 (trigger quality) passed on the draft:
-it names situations and near-misses, and its symptom trigger ("flags evaluate
-inconsistently") follows the `authority-invalidation-architect` pattern of
-matching a bug report as well as a design request.
+and reverse trigger-eval cases. Check 1 (trigger quality) has not been run:
+it is to be run on the built, validated skill, as step 2 of the
+[review path](#estimate-and-review-path). An informal reading of the draft,
+not a check result: it names situations and near-misses, and its symptom
+trigger ("flags evaluate inconsistently") follows the
+`authority-invalidation-architect` pattern of matching a bug report as well
+as a design request.
 
 ## What the skill designs
 
@@ -206,10 +220,14 @@ The workflow has about nine steps:
    output from `tenant-modeler`, `saas-platform-architect` or
    `latency-budget-architect` when it exists. Route flags that really grant
    plan features or permissions to their owners now.
-2. **Flag store: build or buy, an owner choice.** Options: flags in the
-   repository's config (changes need a release), a flag table in the product's
-   own database with an admin screen, a self-hosted open-source flag service,
-   or a hosted vendor. Teach, recommend one and ask exactly one question (see
+2. **Flag store: build or buy, an owner choice only when unsettled.** If the
+   inventory finds a store already adopted, or a recorded store decision,
+   keep it and go on to the reported problem; reopen the choice only on
+   evidence that the current store cannot meet a recorded need. Otherwise,
+   options: flags in the repository's config (changes need a release), a
+   flag table in the product's own database with an admin screen, a
+   self-hosted open-source flag service, or a hosted vendor. Teach,
+   recommend one and ask exactly one question (see
    [Owner choice](#owner-choice)). Vendor names live in the skill's
    `references/` folder, marked volatile, with prices to verify.
 3. **SDK and config placement.** One internal flag interface wraps the chosen
@@ -222,7 +240,8 @@ The workflow has about nine steps:
    sites; changes need a rebuild). State the staleness, latency and flicker
    cost of each and pick one per kind of flag. This is internal mechanics:
    the skill decides and explains; the owner is not asked.
-5. **Targeting context.** Which attributes exist, where each is read from
+5. **Targeting context.** Which attributes exist (tenant, plan, role,
+   cohort, environment, region), where each is read from
    (identity or the tenant record, never the client's own claim), the order
    of precedence (kill switch, then per-tenant override, then rule, then
    default), and cache keys that include the tenant. Plan-based targeting
@@ -289,9 +308,11 @@ Conditions state that execution is refused. Its neighbors (the strategist,
 
 ## Owner choice
 
-### Required: where flags live
+### Required when unsettled: where flags live
 
-Workflow step 2 teaches before it asks. Draft wording:
+Asked only when the inventory finds no adopted store and no recorded store
+decision, or finds evidence that the current store cannot meet a recorded
+need. Workflow step 2 teaches before it asks. Draft wording:
 
 > If the owner must choose where flags live, teach it before asking. In plain
 > language, define: flags in the repository's config (on/off changes need a
@@ -343,7 +364,8 @@ and a permanent Enterprise-plan flag that routes to
 The new skill lists these neighbors as overlaps:
 `feature-flag-rollout-strategist`, `plan-entitlement-architect`,
 `authorization-matrix-designer`, `ab-test-designer`, `ci-pipeline-architect`,
-`saas-platform-architect` and `tenant-isolation-reviewer`. Planned pairs:
+`saas-platform-architect`, `tenant-isolation-reviewer` and
+`caching-strategy-designer`. Planned pairs:
 
 | # | Neighbor | Direction | Prompt sketch | Expected skill |
 | --- | --- | --- | --- | --- |
@@ -351,7 +373,7 @@ The new skill lists these neighbors as overlaps:
 | 2 | Strategist | Reverse | Ramp the billing page from 1% to GA with auto-rollback and a flag deletion date | Strategist |
 | 3 | Strategist | Hard edge (mechanism) | Flag SDK blocks page render for three seconds when the service is down | New skill |
 | 4 | Strategist | Hard edge (value) | Should the checkout flag fall back to old or new checkout when the service is down? | Strategist |
-| 5 | Plan entitlements | Forward | Early access for specific enterprise tenants through per-tenant overrides until GA | New skill |
+| 5 | Plan entitlements | Forward | Design the per-tenant override data model (fields, precedence, tenant-qualified caching) that gives specific enterprise tenants early access until GA | New skill; the strategist should not trigger, because choosing which tenants get access, and in what order, for one ramp is its job |
 | 6 | Plan entitlements | Reverse (hard) | Single sign-on should be permanently part of the Pro plan; a flag turns it on per account today | `plan-entitlement-architect` |
 | 7 | Authorization | Forward | Only on-call engineers can toggle production kill switches, and every toggle is recorded | New skill (uses authorization for role definitions) |
 | 8 | Authorization | Reverse | Which roles can view, edit and export tenant data, deny by default | `authorization-matrix-designer` |
@@ -361,12 +383,16 @@ The new skill lists these neighbors as overlaps:
 | 12 | CI pipeline | Reverse | Add a canary deploy stage with automatic abort and a named-human promotion gate | `ci-pipeline-architect` |
 | 13 | SaaS platform | Reverse | What belongs in the control plane versus the data plane? | `saas-platform-architect` |
 | 14 | Tenant isolation | Reverse | Review existing flag overrides and SDK payloads for cross-tenant leakage | `tenant-isolation-reviewer` |
+| 15 | Caching | Forward | Per-tenant flag overrides cached under the flag name alone show one customer's beta to another; redesign targeting and caching | New skill |
+| 16 | Caching | Reverse | Add a cache in front of the product-catalog endpoint: layer, time-to-live, keys, invalidation | `caching-strategy-designer` |
 
 The strategist's own trigger-evals gain cases 1 and 2 and list the new skill
 as an overlap. Deliberately not pinned: `edge-state-ux-designer` (client
 flicker is handled in the evaluation-placement step, and its triggers do not
-contest flag requests), `caching-strategy-designer` and `audit-log-architect`
-(composition hand-offs, not competing triggers).
+contest flag requests) and `audit-log-architect` (a composition hand-off, not
+a competing trigger). Cases 15 and 16 pin `caching-strategy-designer`: the
+first draft left it unpinned as a composition hand-off, and the owner kept
+the seam on 2026-09-26 (see [Owner decisions](#owner-decisions-2026-09-26)).
 
 ## Orchestrator route: a separate PR
 
@@ -380,30 +406,55 @@ owner's answer to the question below. Not Stage 2, whose exit gate is four
 fixed owner rows; not Stage 8, by which time the code would already need the
 flag interface.
 
-**The one question**, asked only when the spec does not already answer it,
-the product has more than a handful of users or customers, and the Stage 3
-discussion reaches it, after a plain explanation and a recommendation:
+**Two atomic questions, one per turn.** Each is asked only when the spec
+does not already answer it, the product has more than a handful of users or
+customers, and the Stage 3 discussion reaches it, after a plain explanation
+and a recommendation. Staged release and fast shutdown are separate needs: a
+product can want a global off switch without customer groups, or customer
+groups without a minutes-level off switch.
 
-> "When you add a new feature later, do you want to be able to turn it on for
-> a few customers first — and switch it off within minutes without releasing
-> new code — or is turning each feature on for everyone at once good enough?"
+First question:
 
-- "A few first / switch off fast" routes to `feature-flag-architect`, which
-  asks its own store question on a later turn: one decision per turn.
-- "Everyone at once" records the decision with what it was chosen over. No
-  route.
+> "When you add a new feature later, do you want to turn it on for a few
+> customers first, or is turning each feature on for everyone at once good
+> enough?"
 
-The PR changes about 6–10 lines plus one test:
+Queued second question, asked on a later turn only if the first answer is
+"everyone at once":
+
+> "If a new feature misbehaves, do you need to switch it off within minutes
+> without releasing new code, or is shipping a fix through a normal release
+> fast enough?"
+
+- Either established need ("a few first" or "switch off within minutes")
+  routes to `feature-flag-architect`, which asks its own store question on a
+  later turn: one decision per turn.
+- "Everyone at once" followed by "a normal release is fast enough" records
+  the decision with what it was chosen over. No route.
+
+**Stage 9 route, "Decide to release".** At release, the orchestrator asks
+whether the change is risky enough to ship behind a flag, with a gradual
+rollout and a kill switch (a way to switch it off fast). A yes routes to
+`feature-flag-rollout-strategist`, and also to `feature-flag-architect`
+first if the product has no flag system yet.
+
+The PR changes about 10–14 lines plus two tests:
 
 1. A Stage 3 route to `feature-flag-architect` on evidence of a need to
    release to some customers first or switch a feature off without a release.
-2. A recommended Stage 9 route to `feature-flag-rollout-strategist` on
-   evidence of a risky change, which the owner could strike. The orchestrator
-   routes to no flag or rollout skill today.
+2. A Stage 9 route to `feature-flag-rollout-strategist` when the owner
+   says a change is risky enough to ship behind a flag with a gradual
+   rollout and a kill switch, plus `feature-flag-architect` if no flag
+   system exists yet. The orchestrator routes to no flag or rollout skill
+   today. The owner decided this route on 2026-09-26 (see
+   [Stage 9 route: decided](#stage-9-route-decided)).
 3. One test: a Stage 3 project whose spec says "early access for pilot
    customers". The orchestrator routes to `feature-flag-architect` by name,
    asks no store question itself and records nothing without its recording
    gate.
+4. One test: a Stage 9 release of a risky change in a product with no flag
+   system. The orchestrator routes to `feature-flag-architect` and
+   `feature-flag-rollout-strategist` by name.
 
 ## Estimate and review path
 
@@ -413,10 +464,10 @@ reported separately and never converted.
 
 | Work item | Active hours (provisional) |
 | --- | ---: |
-| PR 1: new skill (entry file of about 250–320 lines, a reference sheet, 6–7 behavior tests, 14 trigger-evals, catalog and README rows, skill count 185 to 186, decision-log row) | 2–4 |
+| PR 1: new skill (entry file of about 250–320 lines, a reference sheet, 6–7 behavior tests, 16 trigger-evals, catalog and README rows, skill count 185 to 186, D64 decision-log row) | 2–4 |
 | PR 1 add-on: strategist description, Use-When bullet, Stop Condition hand-off, 2 trigger-evals | 0.25–0.5 |
-| PR 2: orchestrator Stage 3 route, optional Stage 9 route, 1 test | 0.5–1 |
-| **Total** | **2.75–5.5, provisional** |
+| PR 2: orchestrator Stage 3 and Stage 9 routes, 2 tests (the Stage 9 route adds about 15 minutes) | 0.75–1.25 |
+| **Total** | **3–5.75, provisional** |
 
 This work sits **outside** the bounded selected planning subtotal (75–154
 active hours) in the [backlog forecast](aegis-backlog-forecast.md), like other
@@ -439,17 +490,45 @@ skill-maintenance lines, unless the owner selects it into that subtotal.
    protected path that this work does not touch.
 4. `library-diff-reviewer` on the whole PR: CI on the exact head, catalog
    integrity and the decision-log row.
-5. The owner merges, as the accepted proposal states for both PRs.
+5. Merge under the standing grants: an authorized agent may make an
+   administrator merge at the exact reviewed head under
+   [AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green)
+   once that head's required checks are green (which
+   [AEGIS-APR-049](../approvals/APPROVAL_REGISTER.md#aegis-apr-049-exact-head-ci-satisfies-the-local-test-condition)
+   accepts as the local-test leg) and, per
+   [AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review),
+   the Codex review has posted and every P1 and P2 finding is triaged. A red
+   check, including `gate-guard`, still blocks the merge.
 
 **Review path for PR 2:** the validator, a `skill-quality-reviewer` spot
 re-review of `project-orchestrator` (checks 2 and 5), `library-diff-reviewer`,
-then the owner merges.
+then the same conditional merge as PR 1.
 
 **Verify at build time:** the catalog section (proposed: the SaaS
 architecture table beside `plan-entitlement-architect`, with a cross-reference
 in the D12.5 paragraph), the README family row (the family count should stay
-at 23), and the next free decision number (D60 was the highest seen on
-`main`).
+at 23), and the next free decision number (D63 was the highest seen on
+`main` at `eadf1fd`, so D64 is expected; recheck for later rows).
+
+## Stage 9 route: decided
+
+This was an open owner item. On 2026-09-26 the owner decided that PR 2 adds
+the Stage 9 (decide to release) route as well as the Stage 3 route. At
+release, the orchestrator asks whether the change is risky enough to ship
+behind a flag with a gradual rollout and a kill switch; a yes routes to
+`feature-flag-rollout-strategist`, and to `feature-flag-architect` if no
+flag system exists yet. The decision does not change PR 1.
+
+## Owner decisions, 2026-09-26
+
+- PR 1 adds a decision-log row, expected to be D64.
+- The `caching-strategy-designer` seam is kept, as trigger-eval cases 15
+  and 16.
+- The four one-way ROUTE-002 findings toward the hub skills named in review
+  step 3 stay as census data; those hubs are not edited to name the new
+  skill.
+- PR 2 adds the Stage 9 route as well as the Stage 3 route (see
+  [Stage 9 route: decided](#stage-9-route-decided)).
 
 ## What this page does not do
 
