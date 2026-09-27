@@ -1,7 +1,7 @@
 {
   "skill": "cloud-architecture-decider",
-  "description": "Trigger discrimination for the Phase 6 cloud-architecture cluster: cloud-neutral decision vs provider mapping vs IaC review, plus the shipped architecture-designer and saas-platform-architect boundaries.",
-  "overlaps_with": ["azure-saas-architect", "aws-saas-architect", "iac-reviewer", "architecture-designer", "saas-platform-architect"],
+  "description": "Trigger discrimination for the Phase 6 cloud-architecture cluster: cloud-neutral decision (including managed platforms versus hyperscalers) vs provider mapping vs IaC review, plus the shipped architecture-designer, saas-platform-architect, architecture-advisor, and rls-policy-auditor boundaries.",
+  "overlaps_with": ["azure-saas-architect", "aws-saas-architect", "iac-reviewer", "architecture-designer", "saas-platform-architect", "architecture-advisor", "rls-policy-auditor"],
   "cases": [
     {
       "id": "which-cloud-wins-here",
@@ -37,6 +37,20 @@
       "expected_skill": "iac-reviewer",
       "should_not_trigger": ["cloud-architecture-decider"],
       "reason": "A concrete IaC change review is iac-reviewer casework, not a platform decision."
+    },
+    {
+      "id": "managed-platform-vs-hyperscaler-wins-here",
+      "prompt": "For our multi-tenant B2B app, is Vercel plus Supabase good enough, or should we go with Netlify, Render, or straight to AWS? Walk me through the tradeoffs.",
+      "expected_skill": "cloud-architecture-decider",
+      "should_not_trigger": ["saas-platform-architect", "aws-saas-architect", "architecture-advisor"],
+      "reason": "Choosing between managed platforms and a hyperscaler is a platform-tier and provider decision; 'multi-tenant' does not make it a tenancy-structure question, no provider is decided yet for aws-saas-architect to map, and no architecture style is being chosen."
+    },
+    {
+      "id": "decided-platform-rls-goes-to-rls-policy-auditor",
+      "prompt": "We've settled on Supabase. Write and check the row-level-security policies for our tenant tables.",
+      "expected_skill": "rls-policy-auditor",
+      "should_not_trigger": ["cloud-architecture-decider"],
+      "reason": "The platform is already chosen; authoring and auditing tenant-scoped RLS policies belongs to rls-policy-auditor, which the decider routes to after a managed-tier decision."
     }
   ]
 }

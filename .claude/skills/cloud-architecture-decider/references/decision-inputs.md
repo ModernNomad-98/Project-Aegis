@@ -56,6 +56,10 @@ operational control only for a named reason (cost at proven scale, residency or
 a capability gap). Named providers are **current market examples, not
 recommendations** — pricing, free tiers and runtime limits are volatile
 verification items, checked at decision time, never asserted.
+The managed-platform tier (frontend hosts, backend as a service, app
+platforms) has its own category table, trade-off checklist, graduation path
+and owner comparison template in
+[managed-platform-tier.md](managed-platform-tier.md).
 
 | Pattern or service category | You own vs the platform | Example providers | Fits when | Ceiling that forces a change |
 | --- | --- | --- | --- | --- |
