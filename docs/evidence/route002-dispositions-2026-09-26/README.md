@@ -12,7 +12,7 @@ Peter decided on 2026-09-26:
 
 ## Scan and reconciliation
 
-The audit ran on `origin/main` at `0f46808d865751fac396b52422bd964e6b7c2cf1`. The engine is v1.13.1, and the scan used a `git archive` extract. It reports 352 findings, 268 of them ROUTE-002. The triage was made earlier at `032e030` on 263 edges. All 263 are still reported unchanged. The only new edges are the five from `feature-flag-architect` (added by D64, PR #383). They join bucket a as census data.
+The audit ran on `origin/main` at `0f46808d865751fac396b52422bd964e6b7c2cf1`. The engine is v1.13.1, and the scan used a `git archive` extract. It reports 352 findings, 268 of them ROUTE-002. The triage was made earlier at `032e030` on 263 edges. All 263 are still reported unchanged. The only new edges are the five from `feature-flag-architect` (added by D64, PR #383). They join bucket a: four as census data, and one closed by #395 (the D64 amendment above).
 
 | Bucket | Meaning | Edges | Disposition |
 | --- | --- | ---: | --- |

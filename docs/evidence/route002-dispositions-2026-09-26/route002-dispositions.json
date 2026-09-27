@@ -23,7 +23,7 @@
  "triage_input": {
   "made_at": "032e0302a8906048bbbe37a40c195b5162f7fc2e",
   "route002_count_at_triage": 263,
-  "reconciliation": "All 263 triaged edges are still reported on 0f46808 with no change. Five new edges come from feature-flag-architect (D64, PR #383) and are added to bucket a as census data. No edge left the report."
+  "reconciliation": "All 263 triaged edges are still reported on 0f46808 with no change. Five new edges come from feature-flag-architect (D64, PR #383) and are added to bucket a: four as census data and one closed-by-batch-PR (#395, D64 amendment). No edge left the report."
  },
  "buckets": {
   "a": "low routing value (distant neighbour, manual-only side, or hub target)",
