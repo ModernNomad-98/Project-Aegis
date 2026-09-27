@@ -5,14 +5,16 @@ description: 'Review an LLM feature for hidden context exposure (OWASP LLM08:202
 
 # Hidden Context Exposure Reviewer
 
-**Reading key:** LLM08 is the OWASP 2026 Hidden Context Exposure risk
-identifier (2025's LLM07 System Prompt Leakage, broadened to all hidden,
-non-user-facing context). *Hidden context* is anything the application puts in
-the model's context window that end users are not meant to see: the system
-prompt, developer instructions, retrieved policy text, tool and function
-schemas, and other rules or directives. LLM means large language model, RAG is
-retrieval-augmented generation, MCP is the Model Context Protocol, RBAC is
-role-based access control, and UX is user experience.
+**Reading key:** LLM08 is the Open Worldwide Application Security Project
+(OWASP) 2026 Hidden Context Exposure risk identifier (2025's LLM07 System
+Prompt Leakage, broadened to all hidden, non-user-facing context). *Hidden
+context* is anything the application puts in the model's context window that
+end users are not meant to see: the system prompt, developer instructions,
+retrieved policy text, tool and function schemas, and other rules or
+directives. LLM means large language model, RAG is retrieval-augmented
+generation, MCP is the Model Context Protocol, RBAC is role-based access
+control, API is application programming interface, JSON is JavaScript Object
+Notation, and UX is user experience.
 
 ## Purpose
 
@@ -46,18 +48,20 @@ or no security impact, not that it cannot be disclosed.
   (`prompt-injection-defender`, manual-only) — the input side; injection is
   often how hidden context is extracted, but that skill owns the defense.
 - Do NOT use when: the sensitive data is regulated USER or training data in
-  input, context, output, or logs (`sensitive-disclosure-guard`, LLM02).
+  input, context, output, or logs (`sensitive-disclosure-guard`, LLM02
+  Sensitive Information Disclosure).
 - Do NOT use when: the question is which tools an agent may call, argument
   validation, or approval gates (`agent-tool-safety-guard`); this skill only
   asks what a tool schema reveals and whether its text is relied on as a gate.
 - Do NOT use when: the question is which users may retrieve which documents
-  (`rag-security-architect`, LLM09); this skill reviews retrieved policy text
-  once it is placed in hidden context.
+  (`rag-security-architect`, LLM09 Vector and Embedding Weaknesses); this
+  skill reviews retrieved policy text once it is placed in hidden context.
 - Do NOT use when: the exposure is an agentic amplification — persistent
   memory (`memory-context-poisoning-reviewer`), inter-agent channels
   (`inter-agent-comms-reviewer`), tool configuration persistence, or
   multi-step agent compromise (`agent-tool-safety-guard`,
-  `agent-containment-reviewer`; the OWASP Agentic Top 10 owns these).
+  `agent-containment-reviewer`; the OWASP Top 10 for Agentic Applications
+  owns these).
 - Do NOT use when: the concern is generic application security inherited by
   the LLM system — client-bundle secrets (`secrets-identity-hardener`,
   manual-only; invoke explicitly), or server-side log leakage and
@@ -133,10 +137,10 @@ or no security impact, not that it cannot be disclosed.
 5. **Rate severity** on the LLM08 scale: *informational* (no secrets, no
    security-relevant logic, no reliance on confidentiality); *medium*
    (internal rules, filtering criteria, role descriptions, or workflow logic
-   that meaningfully aids an attacker but does not gate critical decisions —
-   an extracted tool list with parameter schemas, with no credential
-   disclosed and no control bypassed, lands here (Aegis reading of the
-   official Scenario #2); *high* (embedded credentials or tokens, or
+   that meaningfully aids an attacker but does not gate critical decisions;
+   Aegis reads the official LLM08 entry's example Scenario #2 — an
+   extracted tool list with parameter schemas, no credential disclosed and
+   no control bypassed — as medium); *high* (embedded credentials or tokens, or
    reliance on hidden-context secrecy for authorization or content
    policy); *critical*
    (disclosure chains to remote code execution, broad data exfiltration, or
