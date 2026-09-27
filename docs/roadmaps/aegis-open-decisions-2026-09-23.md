@@ -75,9 +75,9 @@ at 01:29:38 UTC as `0d05a838`, so no owner choice remains.
 
 ### Decided on 2026-09-27
 
-The owner decided these four items in chat with the Claude Code coordinator
+The owner decided these six items in chat with the Claude Code coordinator
 on 2026-09-27. Only the first has a register entry; where one exists, the
-register entry, not this summary, is the authority. The other three come from
+register entry, not this summary, is the authority. The other five come from
 the owner's chat instructions and grant no implementation by themselves.
 
 | Topic | Decision and what it does not cover |
@@ -86,6 +86,8 @@ the owner's chat instructions and grant no implementation by themselves.
 | Security-surface rule in [CONTRIBUTING](../../CONTRIBUTING.md#external-contributions) | **Outside PRs only.** The additional explicit security review for PRs that touch a security-relevant surface stays a rule for outside contributions. It is not extended to the maintainer's or agents' own PRs, and `CONTRIBUTING.md` is unchanged. |
 | OWASP Top 10 for LLM Applications 2026 remaining gaps (named in [D65](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions), [PR #405](https://github.com/ModernNomad-98/Project-Aegis/pull/405)) | **Extend all three existing skills now; no new skills.** LLM10 Improper Output Handling (review of AI-generated code before it is saved or run) goes to `llm-output-safety-reviewer`; LLM04 Supply Chain (trust in promoted model artifacts) goes to `supply-chain-security-reviewer`; LLM01 Prompt Injection, multimodal part (instructions hidden in images, audio or other non-text input), goes to `prompt-injection-defender`. Each extension is delivered in its own reviewed PR. This decision has no new decision-log number. |
 | Confidential conduct-reporting intake ([Code of Conduct](../../CODE_OF_CONDUCT.md#enforcement), from the [D59 finding](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions)) | **Wait until outside contributors appear.** No private address is published now, and `CODE_OF_CONDUCT.md` stays unchanged. Revisit when the first outside contribution arrives. Until then the project does not claim confidential intake. |
+| Pull request template (`.github/pull_request_template.md`) | **Checklist advisory; security line required.** Completing the checklist stays optional, but every PR must answer the template's "Security-relevant surface? yes/no" line. A separate reviewed PR makes this explicit in `CONTRIBUTING.md` and the template. It does not extend the additional security review, which stays for outside PRs (row above). |
+| Decision-log row for the `aegis-setup` skill (184 to 185 skills, [PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124) under APR-007) | **Add D67, marked retroactive.** The next free number, D67, is added to [§5 of the reconciliation log](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) as an after-the-fact record that gives the real 2026-09-23 date, so every skill-count change has a decision row. A separate reviewed PR adds it. |
 
 ### Still open for the owner
 
@@ -94,7 +96,6 @@ can start. Listing an item here grants nothing.
 
 | Open item | What the owner needs to decide |
 | --- | --- |
-| Pull request template | Whether completing the repository's PR template is mandatory for every PR or advisory. |
 | ROUTE-002 routing reciprocity backlog | Whether and in what order to fix the remaining skill-contract audit findings where one skill excludes another without a matching exclusion back. #362 closed the ai-closeout-reporter case, and the owner kept four one-way hub findings, and a fifth from #383, as census data (see above). Later on 2026-09-26 the owner decided to reciprocate 23 high-value seams (including five hub exceptions) and record the rest as census data; that work is in progress. |
 | Issue #101 Stage 4B host proof | The exact host profile, permissions, telemetry, provider and cost limits, and a separate grant for any real host session. All eight synthetic Stage 4B cases are still NOT RUN. |
 | CP-WP-003 and CP-WP-004 | Real source authority and capability proof for CP-WP-003, then selection of one bounded real integration for CP-WP-004; both need separate reviewed scope and grants. |
