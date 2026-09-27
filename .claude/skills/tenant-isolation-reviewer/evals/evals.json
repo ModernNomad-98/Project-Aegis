@@ -52,6 +52,18 @@
           "Offers the surface checklist and negative-test plan as what WOULD be verified once an artifact is available, without issuing a verdict."
         ]
       }
+    },
+    {
+      "id": "unnamed-tests-win-here-no-auto-multi-tenant-security-tester",
+      "type": "should_not_trigger",
+      "prompt": "Give me an executable negative-test suite that proves tenant A cannot reach tenant B's data through the API, search, and exports.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "tenant-isolation-reviewer does not activate: building an executable negative test suite with fixtures and denial assertions is test implementation, not a review of an existing system with file:line isolation findings.",
+          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute tenant-isolation-reviewer for it."
+        ]
+      }
     }
   ]
 }

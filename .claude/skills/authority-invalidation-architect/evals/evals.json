@@ -72,6 +72,30 @@
           "Does not fake execution or claim the purge was performed."
         ]
       }
+    },
+    {
+      "id": "unnamed-leaked-credential-no-auto-secrets-identity-hardener",
+      "type": "should_not_trigger",
+      "prompt": "We found our service key committed to source control. Rotate it, move our secrets out of source, and fix which env vars reach the client bundle.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "authority-invalidation-architect does not activate: a committed service key needs rotation and custody remediation, not a differential for revoked access that failed to take effect.",
+          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute authority-invalidation-architect for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-generic-unknown-cause-no-auto-systematic-debugger",
+      "type": "should_not_trigger",
+      "prompt": "Our nightly export job intermittently produces wrong totals and nobody knows why. Get to the root cause.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "authority-invalidation-architect does not activate: an intermittent wrong-totals export bug with unknown cause is general root-cause debugging, not an access change that failed to propagate.",
+          "Does not auto-invoke systematic-debugger (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute authority-invalidation-architect for it."
+        ]
+      }
     }
   ]
 }

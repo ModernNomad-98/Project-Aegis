@@ -53,6 +53,18 @@
           "States the residual risk and that accepting a service-account posture needs a named human acceptor via human-approval-boundary."
         ]
       }
+    },
+    {
+      "id": "unnamed-standing-authority-no-auto-agent-authorization-matrix",
+      "type": "should_not_trigger",
+      "prompt": "Define which actions our AI agents may take autonomously versus which always need a named human — merging to protected branches, deploys, arming auto-merge.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "agent-tool-safety-guard does not activate: standing autonomous-versus-human SDLC authority (protected-branch merges, deploys, auto-merge) is not the runtime per-tool permission matrix of a product agent.",
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-tool-safety-guard for it."
+        ]
+      }
     }
   ]
 }

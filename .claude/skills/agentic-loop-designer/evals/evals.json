@@ -98,6 +98,30 @@
           "Routes to agent-goal-hijack-defender (goal/plan integrity against hijack), with ai-threat-modeler for the broader adversarial threat map — the skills that REVIEW what this skill designs."
         ]
       }
+    },
+    {
+      "id": "unnamed-broken-state-no-auto-agent-failure-recovery",
+      "type": "should_not_trigger",
+      "prompt": "An agent run died mid-rebase and left the tree conflicted with a half-applied commit — get the working state back without losing work.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "agentic-loop-designer does not activate: restoring a conflicted working tree and half-applied commit is performing recovery, not designing a loop's shape, bounds, checkpoints or retry rules.",
+          "Does not auto-invoke agent-failure-recovery (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agentic-loop-designer for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-manipulation-review-no-auto-agent-goal-hijack-defender",
+      "type": "should_not_trigger",
+      "prompt": "Review our agent's multi-step runs for manipulation: can a poisoned tool output or injected document substitute the objective or expand the scope mid-loop?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "agentic-loop-designer does not activate: reviewing multi-step runs for objective substitution or scope expansion by poisoned content is attack review, not the design of the loop's honest shape and stopping.",
+          "Does not auto-invoke agent-goal-hijack-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agentic-loop-designer for it."
+        ]
+      }
     }
   ]
 }

@@ -53,6 +53,18 @@
           "States that accepting the risk as-is would need a named human acceptor via human-approval-boundary rather than silently marking it mitigated."
         ]
       }
+    },
+    {
+      "id": "unnamed-single-defense-no-auto-prompt-injection-defender",
+      "type": "should_not_trigger",
+      "prompt": "Design our defense against prompt injection for the doc-summarizer — trust zones, how untrusted content is delimited, and what gates tool calls.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "ai-threat-modeler does not activate: designing one specific defense (trust zones, delimiting untrusted content, tool-call gates) is not an AI threat inventory; the threat modeler enumerates and routes that work rather than doing it.",
+          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-threat-modeler for it."
+        ]
+      }
     }
   ]
 }

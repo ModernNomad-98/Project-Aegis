@@ -53,6 +53,30 @@
           "Notes that accepting the risk anyway requires a named human acceptor with written rationale via human-approval-boundary, not a silent doc note."
         ]
       }
+    },
+    {
+      "id": "unnamed-custody-no-auto-secrets-identity-hardener",
+      "type": "should_not_trigger",
+      "prompt": "Our agent's API keys are in a client-visible env var and haven't been rotated in a year — fix the secret handling.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "agent-identity-privilege-reviewer does not activate: fixing where keys are stored, their client exposure and rotation is custody work, not a review of which agent identities and scopes should exist.",
+          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-identity-privilege-reviewer for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-sdlc-authority-no-auto-agent-authorization-matrix",
+      "type": "should_not_trigger",
+      "prompt": "Define what our coding agent may commit, merge, or deploy on its own versus what always needs a named human.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "agent-identity-privilege-reviewer does not activate: standing agent-versus-human SDLC authority over commit, merge and deploy is governance policy, not ASI03 review of runtime agent identities and privilege paths.",
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-identity-privilege-reviewer for it."
+        ]
+      }
     }
   ]
 }
