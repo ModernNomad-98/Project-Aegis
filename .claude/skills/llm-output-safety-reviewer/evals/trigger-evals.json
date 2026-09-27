@@ -1,7 +1,7 @@
 {
   "skill": "llm-output-safety-reviewer",
-  "description": "Trigger discrimination for the Phase 7 output & agency cluster: output-sink injection/exec review vs schema-shape validation vs the injection source vs tool scope, and against the shipped security-pr-reviewer.",
-  "overlaps_with": ["structured-output-validator", "prompt-injection-defender", "agent-tool-safety-guard", "ai-misinformation-guard", "security-pr-reviewer", "sensitive-disclosure-guard"],
+  "description": "Trigger discrimination for the Phase 7 output & agency cluster: output-sink injection/exec review (including the generated-code commit path) vs schema-shape validation (structured-output-validator), the injection source (prompt-injection-defender), tool scope (agent-tool-safety-guard), factual accuracy (ai-misinformation-guard), sensitive-data leakage (sensitive-disclosure-guard), dependency trust (supply-chain-security-reviewer), one diff's content (code-reviewer, security-pr-reviewer) and AI-assisted lifecycle design (ai-sdlc-operating-model).",
+  "overlaps_with": ["structured-output-validator", "prompt-injection-defender", "agent-tool-safety-guard", "ai-misinformation-guard", "security-pr-reviewer", "sensitive-disclosure-guard", "supply-chain-security-reviewer", "code-reviewer", "ai-sdlc-operating-model"],
   "cases": [
     {
       "id": "output-sink-review-wins-here",
@@ -44,6 +44,41 @@
       "expected_skill": "sensitive-disclosure-guard",
       "should_not_trigger": ["llm-output-safety-reviewer"],
       "reason": "Sensitive data disclosed through model output (echoed PII, secrets, other-tenant data) is sensitive-disclosure-guard (LLM02), which minimizes and redacts what enters context; this skill reviews unsafe HANDLING of output at render/execution sinks, not whether the output leaks sensitive data."
+    },
+    {
+      "id": "generated-code-commit-gate-wins-here",
+      "prompt": "Set up how we handle AI-written code before it lands in the repo: nothing it writes should run until it is sandboxed, scanned and reviewed by a human, and we want to label which commits are AI-generated.",
+      "expected_skill": "llm-output-safety-reviewer",
+      "should_not_trigger": ["code-reviewer", "agent-tool-safety-guard", "supply-chain-security-reviewer"],
+      "reason": "The output-handling controls on the generated-code save/commit/run path (no auto-run, sandbox, static checks, human review gate, provenance) are this skill (LLM10:2026); code-reviewer reviews one actual diff, agent-tool-safety-guard scopes tools, and supply-chain-security-reviewer judges dependencies."
+    },
+    {
+      "id": "code-exec-tool-permission-goes-to-tool-guard",
+      "prompt": "Which of our agents should be allowed to call the code-interpreter tool at all, under whose identity, and which calls need human approval first?",
+      "expected_skill": "agent-tool-safety-guard",
+      "should_not_trigger": ["llm-output-safety-reviewer"],
+      "reason": "Who may call the code-execution TOOL and its approval posture is agent-tool-safety-guard (LLM03 and the tool side of ASI05); this skill owns what happens to generated code and inside the sandbox, not the tool permission matrix."
+    },
+    {
+      "id": "generated-dependency-trust-goes-to-supply-chain",
+      "prompt": "The code our assistant generated added three new npm packages to package.json. Check whether those packages are trustworthy, pinned in the lockfile and not typosquats.",
+      "expected_skill": "supply-chain-security-reviewer",
+      "should_not_trigger": ["llm-output-safety-reviewer"],
+      "reason": "Dependency trust, pinning and typosquat risk are supply-chain-security-reviewer's, even when AI-generated code added the dependency; this skill only requires that such additions are routed there."
+    },
+    {
+      "id": "generated-diff-content-goes-to-code-reviewer",
+      "prompt": "Review this diff our coding assistant produced for correctness and maintainability: git diff main...feature/ai-refactor.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": ["llm-output-safety-reviewer"],
+      "reason": "Reviewing the content of one actual diff is code-reviewer, whoever wrote it; this skill reviews the gate generated code must pass and requires that review, it does not perform it."
+    },
+    {
+      "id": "ai-sdlc-gate-design-goes-to-operating-model",
+      "prompt": "Design our AI-assisted development lifecycle end to end: which stages agents and humans own, where review happens, and who holds merge authority, because agents keep skipping review.",
+      "expected_skill": "ai-sdlc-operating-model",
+      "should_not_trigger": ["llm-output-safety-reviewer"],
+      "reason": "Designing the lifecycle stages and who holds review and merge authority is ai-sdlc-operating-model; this skill checks that a given generated-code path is untrusted until it passes those gates, it does not define the lifecycle."
     }
   ]
 }

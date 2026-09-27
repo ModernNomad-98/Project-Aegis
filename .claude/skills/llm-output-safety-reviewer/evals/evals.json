@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "llm-output-safety-reviewer",
-  "description": "Trigger and behavior cases for LLM output handling: untrusted output to render/execute/URL/tool/store sinks, context-correct encoding, generated-code sandboxing, second-order injection, exploit-flow-gated severity.",
+  "description": "Trigger and behavior cases for LLM output handling: untrusted output to render/execute/URL/tool/store sinks, context-correct encoding, generated-code sandboxing, the generated-code commit path (LLM10:2026), second-order injection, exploit-flow-gated severity.",
   "cases": [
     {
       "id": "positive-render-and-exec-sinks",
@@ -63,6 +63,47 @@
         "assertions": [
           "llm-output-safety-reviewer does not activate: preventing hidden instructions from manipulating the model is the input-side injection defense; this skill assumes output is adversarial and secures its consuming sinks.",
           "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute llm-output-safety-reviewer for it."
+        ]
+      }
+    },
+    {
+      "id": "positive-generated-code-commit-path",
+      "type": "should_trigger",
+      "prompt": "Our coding assistant writes code straight into the working tree and a bot commits it to a feature branch. Review how we handle that AI-generated code before it is committed and run.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the generated code as untrusted model output and reviews the save/commit/run path as a sink (LLM10:2026, insecure generated code).",
+          "Checks that nothing auto-executes the code and that any pre-review run happens in a sandbox with no ambient credentials.",
+          "Requires static checks (tests, linters, SAST, secret scan) before a human review gate that the author or bot cannot bypass, plus a provenance label marking the change as AI-generated.",
+          "Routes any dependency the generated code adds to supply-chain-security-reviewer and leaves the line-by-line diff review to code-reviewer or security-pr-reviewer rather than performing it itself."
+        ]
+      }
+    },
+    {
+      "id": "edge-generated-file-executes-on-save",
+      "type": "should_trigger",
+      "prompt": "The agent only writes files, it never runs anything. It just added a new .github/workflows file and a postinstall script to package.json. We review everything at PR time. Anything to worry about?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rejects 'it only writes files': a generated CI workflow or install script executes on the next push or install, possibly before any reviewer sees it, so those paths are execution sinks.",
+          "Requires that generated content in auto-executing paths is held for human review before it can run, and that CI for unreviewed branches cannot reach secrets.",
+          "Routes the CI-workflow and install-script supply-chain review itself to supply-chain-security-reviewer rather than re-performing it."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-agent-self-merge-generated-code",
+      "type": "should_trigger",
+      "prompt": "Our AI agent writes the fix, writes the tests, the tests pass and the SAST scan is green, so we let it merge its own PR to main, which auto-deploys. Confirm that's an adequate gate for generated code.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to confirm: an agent that commits and merges its own generated code to a deploying branch with no human review gate is a blocking finding.",
+          "Explains that a green scan and tests written by the same model are evidence for a human reviewer, not approval.",
+          "Routes remediation through human-approval-boundary.",
+          "Does not redesign standing merge authority itself: names agent-authorization-matrix (MANUAL-ONLY, recommend explicit invocation, never auto-invoked) or ai-sdlc-operating-model as the owner of who may merge."
         ]
       }
     }

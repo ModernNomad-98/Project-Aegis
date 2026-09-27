@@ -133,7 +133,9 @@ A category is **in scope** when the system has the ingredient it abuses:
 - Model output rendered as HTML (XSS), executed (SQL/shell/code), used as
   tool arguments, written to files/URLs, stored then re-consumed as trusted.
 - Insecure generated code (named in the 2026 scope): assistant-written code
-  shipped at scale without review.
+  shipped at scale without review — reviewed on its save/commit/run path by
+  `llm-output-safety-reviewer` (no auto-run, sandbox, static checks, human
+  review gate, provenance).
 - Seed: "Summary is injected into the admin dashboard unescaped; a crafted
   document makes the model emit a script tag."
 - Owners: `llm-output-safety-reviewer`, `structured-output-validator`.
