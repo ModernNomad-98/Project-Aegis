@@ -25,9 +25,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Diagnoses that 'what is this' is buried below badges/TOC/config and moves the what/why/who to the first screen.",
+          "Locates where the 'what is this' actually appears in the current README, names what pushes it below the first screen (for example badges, a table of contents, or inlined configuration), and moves the what/why/who to the first screen.",
           "Applies the first-screen test: a stranger understands the project in seconds.",
-          "Pushes badges, license, and status below comprehension.",
+          "Places any badges, license, and status below comprehension.",
           "Cuts or links out content that pushed the description off-screen."
         ]
       }

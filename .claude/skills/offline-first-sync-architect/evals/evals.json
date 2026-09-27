@@ -66,7 +66,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Refuses blanket silent last-write-wins for anything but low-stakes single-owner data: it discards the loser's work with no trace — the offline-first data-loss classic.",
+          "Refuses blanket last-write-wins: LWW is acceptable only for low-stakes, single-owner, or naturally-idempotent data, and even there the discard must be acknowledged, never silent; silent LWW discards the loser's work with no trace — the offline-first data-loss classic.",
           "Requires that any discard be acknowledged (surfaced), and recommends field-merge or manual resolution for high-stakes or co-edited records.",
           "Ties the refusal to the skill's non-negotiable: a conflict that silently loses data is a bug, not a strategy (a Stop Condition).",
           "Notes 'users won't notice' is the problem, not the justification — silent loss is worse than a visible conflict prompt."

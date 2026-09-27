@@ -10,7 +10,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Treats the telemetry (volume, ~99% approval, seconds-long decisions) as rubber-stamp evidence: the gate exists on paper and consent fatigue is the exploitation path.",
+          "Treats the telemetry (volume, ~99% approval, seconds-long decisions) as a strong possible consent-fatigue signal and inspects or requests request quality, risk mix, and sampled decisions before judging the gate a rubber stamp; consent fatigue is named as the likely exploitation path.",
           "Routes the flooding cause to gate recalibration (friction concentrated on blast radius via human-approval-boundary / agent-tool-safety-guard) — fewer, richer approvals over many hollow ones.",
           "Requires approval requests to show system-verified facts (actual action, target, blast radius, reversibility, batch contents) with the agent's narrative labeled as a claim.",
           "Adds automation-bias controls (post-approval spot checks, forced-detail cadence, deny-memory) and frames findings at the system, not the operators."

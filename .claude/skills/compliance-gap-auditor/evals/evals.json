@@ -12,7 +12,7 @@
         "assertions": [
           "Runs ONE parameterized audit across both frameworks with pinned editions, not two forked audits.",
           "Files per-requirement verdicts (MET with cited evidence / PARTIAL with residue / GAP / UNVERIFIABLE) and never marks MET on missing evidence.",
-          "Orders remediation blockers-first (risk register, SoA, internal audit, management review, window feasibility) and names the shared-gap dividend from crosswalk-mapped controls.",
+          "Orders remediation blockers-first (any missing mandatory ISO artifacts such as risk register, SoA, internal audit, management review, or SOC 2 window infeasibility found by the audit) and names any shared-gap dividend that the org's crosswalk rows support.",
           "Closes with the readiness-not-opinion disclaimer (CPA examines SOC 2; accredited body certifies ISO)."
         ]
       }

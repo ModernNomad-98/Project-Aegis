@@ -28,7 +28,7 @@
           "Explains in plain language that the revocation-latency bound is the maximum time the removed member could still access protected data on any surface, not a normal refresh interval.",
           "Uses the stated app context and identifies additional facts needed to offer viable numeric bounds without inventing a universal default; distinguishes a proposed target from verified current capability.",
           "For each viable option, explains the security exposure to users while access persists, possible disruption such as forced refresh or session termination, setup and ongoing time and money cost with unverified costs explicitly unknown, and pros and cons.",
-          "Recommends a context-fit numeric bound with a reason tied to the controls needed across tokens, live subscriptions, and other existing surfaces; requests explicit owner confirmation of the number.",
+          "If the access-token lifetime or another deciding fact is missing, asks exactly one discovery question for the most decisive missing fact instead of recommending a number; otherwise recommends a context-fit numeric bound with a reason tied to the controls needed across tokens, live subscriptions, and other existing surfaces and asks the owner to confirm that number as the single question.",
           "Stops before finalizing the propagation design or claiming that the owner approved a bound; preserves deny-first and fail-closed access behavior."
         ]
       }

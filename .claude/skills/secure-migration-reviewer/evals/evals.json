@@ -11,7 +11,7 @@
         "triggers": true,
         "assertions": [
           "Reads both up and down scripts and flags a missing/inadequate rollback path.",
-          "Checks the new tenant table has RLS enabled and a restrictive policy, routing policy-text correctness to rls-policy-auditor.",
+          "Checks the new tenant table has RLS enabled and an effective tenant-scoped policy for the intended app role (RLS with no applicable permissive policy is flagged as a default-deny availability finding), routing policy-text correctness to rls-policy-auditor.",
           "Assesses the GRANT changes for privilege widening and the backfill for correct tenant scope and credentials.",
           "Delivers a go/go-with-changes/no-go verdict, requires negative tests for the tenant/authz-affecting parts, and checks deploy-order and lock risk."
         ]

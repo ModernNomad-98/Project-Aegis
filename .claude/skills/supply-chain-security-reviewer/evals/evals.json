@@ -13,7 +13,7 @@
           "Reads the lockfile for the real dependency set and reviews CI triggers, token scopes, and third-party action pinning.",
           "Flags unpinned actions (mutable tag vs commit SHA) and any untrusted-trigger-to-secret path as findings with a compromise path.",
           "Reviews install/build/postinstall scripts for remote fetches and privileged execution.",
-          "Ranks each HIGH finding with a compromise path to code execution or secret theft and gives concrete remediation (pin SHA, upgrade, remove, split job)."
+          "Ranks each HIGH finding with a compromise path to material impact (such as code execution, secret theft, data exposure or corruption, unauthorized action, or availability loss) plus an exploitability verdict, and gives concrete remediation (pin SHA, upgrade, remove, split job)."
         ]
       }
     },

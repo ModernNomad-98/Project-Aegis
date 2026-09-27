@@ -54,7 +54,7 @@
         "assertions": [
           "Defines detection time (how long an outage lasts before N consecutive failures page), probe frequency, and vantage point in plain language.",
           "Compares both schedules with why each fits the checkout journey's incident value, pros and cons, load on production and on the rate-limited sandbox, and money, setup, and upkeep cost, marking the unknown vendor per-run price as unknown rather than inventing it.",
-          "Recommends one schedule, explains why, names the fact that would change it, then asks exactly one owner question.",
+          "Recommends one schedule, explains why, and names the fact that would change it (such as the sandbox's daily call limit) before asking exactly one owner question; or, if it judges the unstated sandbox limit decisive, asks exactly one discovery question for that limit instead of recommending.",
           "Treats the chosen schedule as design input only; runs no probe and states that the choice does not authorize running probes against production."
         ]
       }
