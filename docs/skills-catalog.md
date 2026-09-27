@@ -548,7 +548,7 @@ absorbs the AI security test harness (no separate `ai-security-test-harness`).
 | `system-prompt-leakage-reviewer` | LLM08 *(NEW; Hidden Context Exposure, system-prompt slice)* | yes | Two axes: no secrets in the prompt (extract + rotate via secrets-identity-hardener) AND no security dependence on prompt secrecy — **system prompts are NOT security controls**; enforcement is deterministic and lives OUTSIDE the LLM; extraction-is-harmless framing. |
 | `ai-misinformation-guard` | LLM07 *(NEW)* | yes | Anti-misinformation: grounding in retrieved sources (not memory), citation-to-claim verification, calibrated uncertainty/refusal, fact validation before action, package/API hallucination (slopsquatting) checks, overreliance-aware UX; composes rag-security-architect + ai-governance-risk-reviewer. |
 
-Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`. OWASP has since published the [Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (2026-08-03); this pack stays anchored to the 2025 edition until the owner decides on re-anchoring.
+Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`. Anchored to the [OWASP Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (v1.0, 2026-08-03), re-anchored from the 2025 edition by owner decision 2026-09-26.
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 7
 clusters: **threat & injection** (`ai-threat-modeler`, `prompt-injection-defender`,

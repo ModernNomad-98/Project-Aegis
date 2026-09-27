@@ -894,7 +894,7 @@ re-deriving them. **LLM04** is extend-existing (the shipped
 | `system-prompt-leakage-reviewer` | (NEW, LLM08 Hidden Context Exposure — system-prompt slice) Two axes: no secrets in the prompt AND no security dependence on prompt secrecy — **system prompts are NOT security controls**; enforcement is deterministic and lives OUTSIDE the LLM; extraction-is-harmless framing. | auto + manual |
 | `ai-misinformation-guard` | (NEW, LLM07) Grounding in retrieved sources (not memory), citation-to-claim verification, calibrated uncertainty/refusal, fact validation before action, package/API hallucination (slopsquatting) checks, overreliance-aware UX. | auto + manual |
 
-Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`. OWASP has since published the [Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (2026-08-03); this pack stays anchored to the 2025 edition until the owner decides on re-anchoring.
+Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`. Anchored to the [OWASP Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (v1.0, 2026-08-03), re-anchored from the 2025 edition by owner decision 2026-09-26.
 
 Phase 7.5 — agentic AI security pack (6 new + 3 extensions). Anchored to the
 OWASP Top 10 for Agentic Applications (2026), ASI01–ASI10, per reconciliation
