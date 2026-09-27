@@ -141,7 +141,7 @@ Handoffs: <rls-policy-auditor for DB-layer negative plan; appsec-implementer for
 - A negative test PASSES only when the forbidden action is denied; a green
   happy-path test is not isolation evidence.
 - Coverage is stated honestly — an untested surface is reported as not-covered,
-  never assumed safe (master-prompt §6: verification evidence required).
+  never assumed safe ([historical master prompt, section 6](../../../docs/prompts/claude-skills-master-generation-prompts-v4.md): verification evidence required).
 - Regression tests for fixed isolation bugs are permanent; removing one needs
   written rationale via `human-approval-boundary`.
 

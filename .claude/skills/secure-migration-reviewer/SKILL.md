@@ -135,7 +135,7 @@ Not reviewed: <areas + why>
 - Backfills that touch tenant data must carry correct tenant scope; a
   service-role backfill that cross-populates tenants is critical.
 - Any tenant-scope or authorization-affecting migration requires negative
-  tests before it is called safe (master-prompt §6).
+  tests before it is called safe ([historical master prompt, section 6](../../../docs/prompts/claude-skills-master-generation-prompts-v4.md)).
 - Production migrations cross `human-approval-boundary`; this skill reviews
   and specifies — it does not run DDL on live systems.
 

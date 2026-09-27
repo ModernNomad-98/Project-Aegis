@@ -171,7 +171,7 @@ Handoffs: <secure-migration-reviewer to gate the migration; multi-tenant-securit
   handling influenced by end users.
 - No RLS finding is suppressed without written rationale via
   `human-approval-boundary`; every audit ships negative tests
-  (master-prompt §6).
+  ([historical master prompt, section 6](../../../docs/prompts/claude-skills-master-generation-prompts-v4.md)).
 
 ## Gotchas
 

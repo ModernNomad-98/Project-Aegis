@@ -115,7 +115,7 @@ Not reviewed: <exclusions + why>
 
 - No diff, no review — never infer a change's security from its description.
 - HIGH/CRITICAL findings require an exploit path or abuse scenario
-  (master-prompt §6); without one, rank medium and mark needs-verification.
+  ([historical master prompt, section 6](../../../docs/prompts/claude-skills-master-generation-prompts-v4.md)); without one, rank medium and mark needs-verification.
 - Tenant isolation and object-level authorization are mandatory review
   dimensions on SaaS data paths, not optional, regardless of the PR's stated
   scope.
