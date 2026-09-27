@@ -134,6 +134,231 @@ current count; it reassesses no estimate. Main after #381 had **606 tracked
 Markdown files: 562 accepted reader pages and 44 classified synthetic
 fixtures**, with zero known pending pages; #371, #381 and this checkpoint add none. #383 added two skill reader pages, `.claude/skills/feature-flag-architect/SKILL.md` and its `references/flag-system-sheet.md`, after a skill-quality review but with no recorded full-page review against [Acceptance for each page](#acceptance-for-each-page), so both are **pending**; the named follow-up is one independent full-page review of both. Main after #383 (`6844ab9`) has **608 tracked Markdown files: 562 accepted reader pages, 44 classified synthetic fixtures and two known pending pages**; #384 (`0f46808`) adds no Markdown file, so main after #384 still has 608. A first independent full-page review of this reconciliation returned FIX-FIRST; its minimal edits recorded #383 and its two pending skill pages, the D64 row and the fifth one-way ROUTE-002 finding as census data, and made an unclear governance reference explicit. A separate corrected-candidate review returned FIX-FIRST only because #384 merged during review; after its minimal edits recorded that merge on all four pages, it **accepted all four pages, including this ledger**, against [Acceptance for each page](#acceptance-for-each-page). No estimate, grant or gate changed.
 
+PR #387 (`dcccb10`), merged on 2026-09-27 UTC, applied the minimal edits from
+a first independent full-page review of #383's two skill pages,
+`.claude/skills/feature-flag-architect/SKILL.md` and its
+`references/flag-system-sheet.md`; that review had returned FIX-FIRST for
+terms not defined at first use. A separate corrected-candidate review then
+returned FIX-FIRST for one sentence: the sheet said it served Workflow steps
+2–9, but its sections serve steps 2, 4 and 6–9. #387's final commit
+(`037f883`) made that correction. A final independent read-only check of both
+pages on main after #387, by a reviewer who wrote neither the pages nor the
+edits, checked every criterion in [Acceptance for each
+page](#acceptance-for-each-page) and **accepted both pages** with no further
+edits: terms are defined at first use, the sheet's step list matches its
+section headings, every named skill and evaluation case exists, and both
+relative links resolve. Main after #387 and #379 (`7947b5e`) has **608 tracked
+Markdown files: 564 accepted reader pages and 44 classified synthetic
+fixtures**, with zero known pending pages; #387 and this update add no
+Markdown file. No skill behavior, grant or gate changed. PR #386 (`39f2a28`)
+merged after #379; it changed one existing reader page, the [project
+history](../HISTORY.md), and adds no Markdown file, so main after #386 still
+has 608 tracked Markdown files; an independent full-page review accepted it
+before merge. An independent full-page review then **accepted this ledger
+change**, including this paragraph and its batch row, against [Acceptance for
+each page](#acceptance-for-each-page).
+
+PRs #388 (`a3ae6cf`), #390 (`fcd525b`), #394 (`29c484f`), #395 (`741b29a`)
+and #396 (`cd7af02`), merged on 2026-09-27 UTC after #386, made targeted
+corrections to 37 already-accepted reader pages: ten skill reference sheets,
+one `SKILL.md` body passage, the README, the skills catalog and 24 `SKILL.md`
+frontmatter descriptions (23 ROUTE-002 target skills and one source skill).
+Their changed passages were reviewed before merge as targeted corrections,
+not full-page reviews. Under the owner's 2026-09-27
+[targeted-edit rule](#remaining-page-review-in-larger-batches), each of
+those edits changed at most 10 lines on its page (added plus deleted lines
+from `git diff --numstat`; the largest was 10, the README in #390) and added
+no section, so the pages kept their earlier full-page acceptance. Later
+merges, recorded in the next paragraph, returned the README, the skills
+catalog and `.claude/skills/human-approval-boundary/SKILL.md` to pending.
+#391 (`7108d64`) changed evaluation JSON (JavaScript Object Notation) files
+only. None adds a Markdown file, so
+main after #396 had **608 tracked Markdown files: 564 accepted reader pages
+and 44 classified synthetic fixtures**, with zero known pending pages. No
+grant or gate changed.
+
+PRs #385 (`867cb82`), #389 (`0fb9c06`), #392 (`e56d863`), #393 (`9b8f5b2`),
+#399 (`c5ff91d`), #400 (`e00df2d`) and #402 (`8bd1d58`), merged on
+2026-09-27 UTC after #396, then #398 (`6c5313a`), #401 (`56ea7e4`) and #407
+(`1ec01bf`), changed 11 already-accepted reader pages and added one. None
+recorded a full-page review. The [targeted-edit
+rule](#remaining-page-review-in-larger-batches) was applied to each page,
+counting added plus deleted lines from `git diff --numstat` between each
+merge's first parent and the merge, and adding together every edit a page
+received since its last full-page acceptance, including the edits in the
+previous paragraph. No edit added a heading to an existing page.
+
+- **Keep full-page acceptance (four pages):**
+  `.claude/skills/api-event-architect/SKILL.md` (#396 and #385, 7 lines),
+  `.claude/skills/file-upload-storage-architect/SKILL.md` (#385, 10),
+  `.claude/skills/cloud-architecture-decider/references/decision-inputs.md`
+  (#393, 4) and
+  `.claude/skills/risk-tiered-validation-selector/references/classifier-rules.md`
+  (#402, 2).
+- **Pending until an independent full-page re-read (eight pages):**
+  [README](../../README.md) (#390, #389, #392 and #393, 111 lines; #392 alone
+  changed 98), [skills catalog](../skills-catalog.md) (#390, #389 and #393,
+  16), [skill generation standard](../skill-generation-standard.md) (#402,
+  15), `.claude/skills/cloud-architecture-decider/SKILL.md` (#393, 198),
+  `.claude/skills/multi-tenant-data-architect/SKILL.md` (#385, 22),
+  `.claude/skills/ci-pipeline-architect/SKILL.md` (#385, 13),
+  `.claude/skills/human-approval-boundary/SKILL.md` (#394 and #385, 11) and
+  the new
+  `.claude/skills/cloud-architecture-decider/references/managed-platform-tier.md`
+  (added by #393 with no full-page review).
+
+#399, #400, #398, #401 and #407 changed evaluation JSON only. #393 is the
+only merge that adds a Markdown file, so main after #407 (`1ec01bf`) has
+**609 tracked Markdown files: 557 accepted reader pages, 44 classified
+synthetic fixtures and eight known pending pages**. The named follow-up is
+one independent full-page re-read of each pending page against [Acceptance
+for each page](#acceptance-for-each-page). No grant or gate changed.
+
+PRs #404 (`b08103e`), #405 (`f2d57b5`) and #406 (`6488eaa`), merged on
+2026-09-27 UTC after #407, changed 30 existing reader pages and added none.
+#404 updated the agent instruction file map, #405 re-anchored the AI-security
+pack to the 2026 OWASP (Open Worldwide Application Security Project) Top 10
+for large language model (LLM) applications, and #406 corrected a README
+option and aligned the cloud decider's category names. None recorded a
+full-page review. The [targeted-edit
+rule](#remaining-page-review-in-larger-batches) was applied as in the
+previous paragraph: added plus deleted lines from `git diff --numstat`
+between each merge's first parent and the merge, added together for every
+edit a page received since its last full-page acceptance. By owner decision
+(2026-09-27), a renamed existing heading is not a new section; #405
+renamed or renumbered existing headings on three pages and added no section.
+
+- **Keep full-page acceptance (18 pages):** in `.claude/skills/`,
+  `agent-tool-safety-guard/SKILL.md` (10) and its
+  `references/tool-permission-matrix.md` (2),
+  `ai-cost-guardrail-designer/SKILL.md` (10) and its
+  `references/cost-guardrail-patterns.md` (4),
+  `ai-misinformation-guard/references/grounding-controls.md` (2),
+  `llm-output-safety-reviewer/SKILL.md` (#396 and #405, 8) and its
+  `references/output-sink-catalog.md` (8),
+  `memory-context-poisoning-reviewer/SKILL.md` (6) and its
+  `references/memory-poisoning-controls.md` (4),
+  `model-poisoning-reviewer/references/poisoning-controls.md` (10),
+  `prompt-injection-defender/references/injection-defense-patterns.md` (3),
+  `rag-security-architect/references/rag-retrieval-authz.md` (6, one renamed
+  heading), `sensitive-disclosure-guard/references/disclosure-controls.md`
+  (2), `skill-quality-reviewer/SKILL.md` (6) and its
+  `references/quality-review-checklist.md` (4),
+  `supply-chain-security-reviewer/references/supply-chain-checklist.md` (#388
+  and #405, 9, one renamed heading), and
+  `system-prompt-leakage-reviewer/SKILL.md` (8) and its
+  `references/prompt-leakage-checks.md` (9). Counts are #405 alone unless
+  another PR is named.
+- **Newly pending until an independent full-page re-read (nine pages):** in
+  `.claude/skills/`,
+  `agent-instruction-consolidator/references/instruction-file-map.md` (#404,
+  19), `ai-misinformation-guard/SKILL.md` (#395 and #405, 12),
+  `ai-threat-modeler/SKILL.md` (#405, 21) and its
+  `references/llm-top10-threat-catalog.md` (#405, 115; its renumbered
+  headings add no section), `model-poisoning-reviewer/SKILL.md` (#394 and
+  #405, 15), `rag-security-architect/SKILL.md` (#405, 14),
+  `supply-chain-security-reviewer/SKILL.md` (#388 and #405, 18) and
+  `cloud-architecture-decider/references/decision-inputs.md` (#393 and #406,
+  12, which moves from the previous paragraph's keep list to pending); and
+  `docs/reconciliation/step-0-reconciliation-v4.md` (#405, 14).
+- **Already pending, with updated totals:** the [README](../../README.md)
+  (165 lines after #405 added 32 and #406 added 22), the [skills
+  catalog](../skills-catalog.md) (66 after #405 added 50) and
+  `.claude/skills/cloud-architecture-decider/SKILL.md` (204 after #406 added
+  6).
+
+Main after #406 (`6488eaa`) therefore had **609 tracked Markdown files: 548
+accepted reader pages, 44 classified synthetic fixtures and 17 known pending
+pages**. No grant or gate changed.
+
+PR #408 (`0533764`), merged on 2026-09-27 UTC after #406, changed two reader
+pages and added none. The [skill generation
+standard](../skill-generation-standard.md), pending since #402, now codifies
+the owner's 2026-09-27 one-missing-fact-per-turn loop in §4, defines
+`when_to_use` in §2, dates the D49 measurement and aligns the §6 census
+wording with `census.py`. A first independent full-page review returned
+FIX-FIRST (three edits plus the optional D49 date); a separate independent
+corrected-candidate review **accepted** it against [Acceptance for each
+page](#acceptance-for-each-page). `.claude/skills/_template/SKILL.md` changed
+its Workflow missing-fact sentence to match standard §4; the same
+corrected-candidate review re-read the whole page and **accepted** it, so the
+template, already accepted, stays accepted. Main after #408 (`0533764`) has
+**609 tracked Markdown files: 549 accepted reader pages, 44 classified
+synthetic fixtures and 16 known pending pages**: the README, the skills
+catalog, `.claude/skills/cloud-architecture-decider/SKILL.md` and its
+`references/decision-inputs.md` and `references/managed-platform-tier.md`,
+`.claude/skills/multi-tenant-data-architect/SKILL.md`,
+`.claude/skills/ci-pipeline-architect/SKILL.md`,
+`.claude/skills/human-approval-boundary/SKILL.md`, and the other eight pages
+newly pending after #404–#406. The named follow-up is one independent
+full-page re-read of each pending page against [Acceptance for each
+page](#acceptance-for-each-page). No grant or gate changed.
+
+PRs #409 (`4416c6d`), #411 (`7693c26`) and #397 (`4a68ace`) merged on
+2026-09-27 UTC after #408, in that order. The [targeted-edit
+rule](#remaining-page-review-in-larger-batches) was applied as above, adding
+together each page's `git diff --numstat` lines since its last full-page
+acceptance.
+
+- **#409** extended the skill for LLM08 (the eighth risk in that OWASP list)
+  to the full OWASP Hidden Context Exposure scope and renamed it from
+  `system-prompt-leakage-reviewer` to `hidden-context-exposure-reviewer`
+  (decision D66). It deleted the old
+  skill's two accepted pages and added
+  `.claude/skills/hidden-context-exposure-reviewer/SKILL.md` and its
+  `references/hidden-context-checks.md`. Its independent review was a skill
+  review whose REVISE verdict asked for two edits, not a full-page review,
+  so both new pages are **pending**.
+  `.claude/skills/agent-tool-safety-guard/SKILL.md` becomes **pending** (17
+  lines: 10 in #405 and 7 in #409). In `.claude/skills/`,
+  `prompt-injection-defender/SKILL.md` (8),
+  `sensitive-disclosure-guard/SKILL.md` (6) and
+  `ai-evaluation-harness/references/eval-harness-design.md` (5) **keep
+  acceptance**. The README (167), the skills catalog (77),
+  `ai-threat-modeler/SKILL.md` (25), its
+  `references/llm-top10-threat-catalog.md` (121) and the step-0
+  reconciliation record (56) were already pending. Main after #409 had **609
+  tracked Markdown files: 546 accepted reader pages, 44 classified synthetic
+  fixtures and 19 known pending pages**.
+- **#411** applied the minimal edits from full-page re-reads of the skills
+  catalog and `.claude/skills/cloud-architecture-decider/SKILL.md`. The first
+  review returned FIX-FIRST; a separate independent corrected-candidate
+  review **accepted** both pages on #411's branch head (`4e643c6`).
+  `cloud-architecture-decider/SKILL.md` on main matches that head, so it is
+  **accepted**. That head did not contain #409, which merged first and
+  changed the catalog by 11 lines (7 added, 4 deleted), so under the rule
+  the catalog on main stays **pending** (11 lines since its accepted
+  candidate). Main after #411 had **609 tracked Markdown files: 547
+  accepted reader pages, 44 classified synthetic fixtures and 18 known
+  pending pages**.
+- **#397** recorded the ROUTE-002 census dispositions. It added the
+  [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md),
+  which is **pending** until a full-page re-read, and a JSON data file.
+  The [AEGIS-060+ register](../audits/aegis-060-plus-register.md) (proposed
+  corpus-audit findings numbered AEGIS-060 and later), previously counted as
+  accepted, becomes **pending** (21 lines). The step-0 reconciliation
+  record's D64 amendment added 8 lines; the record was already pending (64
+  lines after #405, #409 and #397).
+
+Main after #397 (`4a68ace`) therefore has **610 tracked Markdown files: 546
+accepted reader pages, 44 classified synthetic fixtures and 20 known pending
+pages**. The pending pages are the README, the skills catalog and, in
+`.claude/skills/`,
+`cloud-architecture-decider/references/decision-inputs.md` and
+`references/managed-platform-tier.md`, `multi-tenant-data-architect/SKILL.md`,
+`ci-pipeline-architect/SKILL.md`, `human-approval-boundary/SKILL.md`,
+`agent-instruction-consolidator/references/instruction-file-map.md`,
+`ai-misinformation-guard/SKILL.md`, `ai-threat-modeler/SKILL.md` and its
+`references/llm-top10-threat-catalog.md`, `model-poisoning-reviewer/SKILL.md`,
+`rag-security-architect/SKILL.md`, `supply-chain-security-reviewer/SKILL.md`,
+`agent-tool-safety-guard/SKILL.md`, and
+`hidden-context-exposure-reviewer/SKILL.md` and its
+`references/hidden-context-checks.md`; and the step-0 reconciliation record,
+the ROUTE-002 dispositions record and the AEGIS-060+ register. The named
+follow-up is one independent full-page re-read of each pending page against
+[Acceptance for each page](#acceptance-for-each-page). No grant or gate
+changed.
+
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
 the [Behavioral Eval Runner (BER) selected-precheck aggregate decision page](ber-precheck-aggregate-validation-proposal.md)
@@ -477,6 +702,17 @@ acceptance** result only when an independent reader checked all criteria in
 targeted correction or a sorted terminology screen is useful progress, but
 must retain its narrower label until this check is done.
 
+**Targeted edits to accepted pages (owner decision, 2026-09-27).** An
+independently reviewed targeted edit that changes at most 10 lines on an
+already-accepted page and adds no new section keeps that page's full-page
+acceptance. A larger change, meaning more than 10 changed lines on that page
+or any new section, returns the page to **pending** until an independent
+reader re-reads the whole page against [Acceptance for each
+page](#acceptance-for-each-page). This ledger counts changed lines as added
+plus deleted lines from `git diff --numstat`, and adds together the edits a
+page receives before its next full-page re-read. A renamed or renumbered
+existing heading is not a new section.
+
 To reduce repeated integration and hosted-check waits, group roughly 10–20
 related pages in one pull request when their owners and authority boundaries
 are compatible. Give up to three read-only agents disjoint page sets for
@@ -511,6 +747,16 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| ROUTE-002 census dispositions, PR #397, after #411, 2026-09-27 | New [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md) (plus a JSON data file), the [AEGIS-060+ register](../audits/aegis-060-plus-register.md) and the step-0 reconciliation record's D64 amendment | No full-page review was recorded at merge. The new record is **pending** until a full-page re-read. The AEGIS-060+ register becomes **pending** (21 lines). The step-0 reconciliation record gained 8 lines and was already pending (64 since its last acceptance). Main after #397 (`4a68ace`) has 610: 546 accepted readers, 44 classified fixtures and 20 known pending. No grant or gate changed. |
+| Catalog and cloud decider re-read fixes, PR #411, after #409, 2026-09-27 | [Skills catalog](../skills-catalog.md) and `.claude/skills/cloud-architecture-decider/SKILL.md` | Full-page re-reads of both pages: the first review returned FIX-FIRST; after minimal edits a separate independent corrected-candidate review **accepted** both on #411's branch head (`4e643c6`). `cloud-architecture-decider/SKILL.md` on main matches that head and is **accepted**. The head did not contain #409's 11-line catalog edit (7 added, 4 deleted), so the catalog on main stays **pending** under the targeted-edit rule. Main after #411 (`7693c26`) had 609: 547 accepted readers, 44 classified fixtures and 18 known pending. |
+| LLM08 skill extended and renamed, PR #409, after #408, 2026-09-27 | New `.claude/skills/hidden-context-exposure-reviewer/SKILL.md` and `references/hidden-context-checks.md`, replacing the two accepted `system-prompt-leakage-reviewer` pages (D66); nine existing reader pages | The independent review was a skill review whose REVISE verdict asked for two edits, not a full-page review, so both new pages are **pending**. `agent-tool-safety-guard/SKILL.md` becomes **pending** (17 lines with #405). `prompt-injection-defender/SKILL.md` (8), `sensitive-disclosure-guard/SKILL.md` (6) and `ai-evaluation-harness/references/eval-harness-design.md` (5) keep acceptance. The README (167), skills catalog (77), `ai-threat-modeler/SKILL.md` (25), its threat catalog (121) and the step-0 reconciliation record (56) were already pending. Main after #409 (`4416c6d`) had 609: 546 accepted readers, 44 classified fixtures and 19 known pending. |
+| Skill authoring standard, PR #408, after #406, 2026-09-27 | `docs/skill-generation-standard.md` | Codified the owner's 2026-09-27 one-missing-fact-per-turn loop in §4, defined `when_to_use` in §2, dated the D49 measurement and aligned the §6 census wording with `census.py`; §5 unchanged. A first independent full-page review returned FIX-FIRST (three edits plus the optional D49 date); a separate independent corrected-candidate review **accepted** it against Acceptance for each page. |
+| Skill template, PR #408, after #406, 2026-09-27 | `.claude/skills/_template/SKILL.md` | Workflow's missing-fact sentence aligned with standard §4; full-page re-read in the same corrected-candidate review **accepted** it. No Markdown file added; count unchanged. Main after #408 (`0533764`) has 609: 549 accepted readers, 44 classified fixtures and 16 known pending. |
+| Targeted-edit rule applied to PRs #404–#406, after #407, 2026-09-27 | 30 existing reader pages and this ledger: the agent instruction file map in #404; 11 `SKILL.md` pages, 13 reference sheets, the README, the skills catalog and the step-0 reconciliation record in #405; `.claude/skills/cloud-architecture-decider/SKILL.md`, its `references/decision-inputs.md` and the README in #406 | No full-page review was recorded for these merges. Counting added plus deleted lines per page and adding together every edit since the page's last full-page acceptance, 18 pages stay accepted and nine become **pending**: `instruction-file-map.md` (19), `ai-misinformation-guard/SKILL.md` (12), `ai-threat-modeler/SKILL.md` (21), `llm-top10-threat-catalog.md` (115), `model-poisoning-reviewer/SKILL.md` (15), `rag-security-architect/SKILL.md` (14), `supply-chain-security-reviewer/SKILL.md` (18), `docs/reconciliation/step-0-reconciliation-v4.md` (14) and `cloud-architecture-decider/references/decision-inputs.md` (12, previously kept). The README (165), skills catalog (66) and `cloud-architecture-decider/SKILL.md` (204) stay pending. By owner decision (2026-09-27) a renamed existing heading is not a new section; #405 added no section. No Markdown file added: main after #406 (`6488eaa`) had 609: 548 accepted readers, 44 classified fixtures and 17 known pending. No grant or gate changed. |
+| Targeted-edit rule applied to PRs #385, #389, #392, #393, #398–#402 and #407, after #396, 2026-09-27 | 11 existing reader pages, one new page and this ledger: five `SKILL.md` pages in #385, the README and skills catalog in #389, the README in #392, `.claude/skills/cloud-architecture-decider/SKILL.md`, its `references/decision-inputs.md`, the README and skills catalog in #393, which also added `references/managed-platform-tier.md`, and the [skill generation standard](../skill-generation-standard.md) and one reference sheet in #402 | No full-page review was recorded for these merges. Under the owner's 2026-09-27 targeted-edit rule, counting added plus deleted lines per page and adding together every edit since the page's last full-page acceptance, four pages stay accepted and eight are **pending**: the README (111 lines), skills catalog (16), skill generation standard (15), `cloud-architecture-decider/SKILL.md` (198), `multi-tenant-data-architect/SKILL.md` (22), `ci-pipeline-architect/SKILL.md` (13), `human-approval-boundary/SKILL.md` (11) and the new managed-platform sheet. No edit added a heading to an existing page. #398–#401 and #407 changed evaluation JSON only. Main after #407 (`1ec01bf`) has 609: 557 accepted readers, 44 classified fixtures and eight known pending; the named follow-up is one independent full-page re-read of each pending page. No grant or gate changed. |
+| Targeted corrections to accepted pages merged in PRs #388, #390, #394, #395 and #396, after #386, 2026-09-27 | 37 existing reader pages: seven in #388 (six skill reference sheets and `.claude/skills/supply-chain-security-reviewer/SKILL.md`), six in #390 (`README.md`, [skills catalog](../skills-catalog.md) and four reference sheets) and 24 `SKILL.md` pages in #394–#396, and this ledger | #388 marked volatile facts, #390 dated and verified standards and edition anchors, and #394–#396 added one hand-back clause to each of 23 target skills' frontmatter descriptions and corrected one source description (`data-migration-runbook-author`, #396) under the owner's 2026-09-26 ROUTE-002 decision, adding trigger-evaluation cases for seams that lacked one (five trigger-evaluation files). The changed passages were reviewed before merge as targeted corrections, not full-page reviews. Under the owner's 2026-09-27 targeted-edit rule each edit changed at most 10 lines on its page (added plus deleted) and added no section, so the pages kept their earlier full-page acceptance and counts were unchanged; later merges returned the README, the skills catalog and `.claude/skills/human-approval-boundary/SKILL.md` to pending (row above). #391 changed evaluation JSON only. No Markdown file was added: main after #396 had 608: 564 accepted readers, 44 classified fixtures and zero known pending. No grant or gate changed. |
+| Full-page review of construction history skill-count dating, after #383, 2026-09-26 | [Construction history](../HISTORY.md) and this ledger | The library-meta (D13) and OWASP gap-closure (D28) claims now read in the past tense, D63 is dated, and the 2026-09-12 update states the D47 total of 184 and the unfinished calibration (inputs unavailable, OD-1 open, WP-2B-4 blocked) as of that update. It routes readers to the skills catalog, the README's library overview and the BER backlog start-here table. An independent read-only full-page review checked every acceptance criterion and accepted the page with no edits; all 12 relative links and anchors resolve. The page was already accepted, so counts are unchanged. No skill, grant or gate changes. |
+| Final full-page check of pages merged in PR #383, after #387, 2026-09-27 | `.claude/skills/feature-flag-architect/SKILL.md`, `.claude/skills/feature-flag-architect/references/flag-system-sheet.md` and this ledger | Round 1: an independent full-page review returned FIX-FIRST for terms not defined at first use; PR #387 applied its minimal edits (term definitions on both pages). Round 2: a separate corrected-candidate review returned FIX-FIRST for one edit, the sheet's claim to serve Workflow steps 2–9, corrected in #387's final commit `037f883` to steps 2, 4 and 6–9. Round 3: a final independent read-only check of both pages on main after #387 checked every acceptance criterion and **accepted both** with no further edits; the step list matches the sheet's section headings, every named skill, evaluation case and trigger-evaluation discrimination target exists, and both relative links resolve. The #383 tree had 608 pages with two known pending; main after #387, #379 and #386 has 608: 564 accepted readers, 44 classified fixtures and zero known pending. No skill behavior, grant or gate changed. An independent full-page review then **accepted this ledger change**, including this paragraph and its batch row, against [Acceptance for each page](#acceptance-for-each-page). |
 | Ledger gap for pages merged in PR #383, found during the #379 reconciliation, 2026-09-27 | `.claude/skills/feature-flag-architect/SKILL.md`, `.claude/skills/feature-flag-architect/references/flag-system-sheet.md` and this ledger | Two new skill reader pages (the 186th skill's entrypoint and its reference sheet), not synthetic fixtures. #383 recorded a skill-quality and library-diff review but no full-page acceptance, so both are **pending**; the named follow-up is one independent full-page review. The #381 tree had 606 pages; the #383 tree has 608: 562 accepted readers, 44 fixtures and two known pending. |
 | Catch-up forecast checkpoint after #370, 2026-09-26 | [Backlog forecast](aegis-backlog-forecast.md), [execution measurements](aegis-execution-metrics.md), [open-decisions index](aegis-open-decisions-2026-09-23.md) and this ledger | Three changed existing reader pages plus this ledger, no new page: a new catch-up checkpoint section in the forecast and measurements, and dated decided, still-open and owner-requested items in the index. #352 had also changed the forecast and measurements. A first independent full-page review returned FIX-FIRST (stale S5 horizon, inconsistent feature-flag status, batch-count arithmetic, open-PR list); after its minimal edits all three pages are re-accepted after a separate corrected-candidate review against every acceptance criterion. A Codex-driven follow-up revision of all four pages then returned FIX-FIRST and was accepted, with this ledger, by a corrected-candidate review; a 2026-09-27 reconciliation recorded #378, #375, #376, #377, #371, #381, #383 and #384 (see [Start here](#start-here--current-reading)). Links and anchors resolve. Main after #381 had 606 pages: 562 accepted readers, 44 classified fixtures and zero known pending; this checkpoint adds none, and #383's two pending pages have their own row. |
 | Full-page review of feature-flag skill scope proposal, after #370, 2026-09-26 | [Feature-flag system skill proposal](feature-flag-architect-skill-proposal.md) and this ledger | A first independent full-page review returned FIX-FIRST; its minimal edits corrected the highest decision number seen on `main` to D63 and defined `project-orchestrator` stages (2, 3, 8, 9) and the Use When and Stop Conditions skill sections at first use, and a corrected-candidate review accepted the page. Fixes for eight Codex findings on PR #378 then changed it materially: the tenant early-access case names the override data model (strategist should not trigger), the draft description yields cross-tenant leak reviews to `tenant-isolation-reviewer` (1,020 characters; the strategist draft stays 943), the store step is skipped when a store is already adopted, the orchestrator asks staged release and fast shutdown as two queued atomic questions, merges follow AEGIS-APR-048 to 050, and the premature check 1 pass is removed. The owner's 2026-09-26 decisions are recorded: PR 2 adds the Stage 9 route, PR 1 adds a D64 row, the `caching-strategy-designer` seam stays as cases 15 and 16, and the four hub ROUTE-002 findings stay census data. An independent re-review returned FIX-FIRST; its one minimal edit aligned the merge step with AEGIS-APR-050's Codex-unavailable path and defined Codex, P1/P2 and `gate-guard`. A separate independent corrected-candidate review accepted the page against every acceptance criterion. Links and anchors resolve. The candidate has 606 pages: 562 accepted readers, 44 classified fixtures and zero known pending. No skill is built and no grant is added. |
