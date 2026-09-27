@@ -52,6 +52,11 @@ this owns the storage architecture.
   storage access model, and hands policy auditing there.
 - Do NOT use when: the "file" is really structured data that belongs in the
   database, not object storage — say so rather than designing storage for it.
+- Do NOT use when: the risk is instruction injection hidden in file content a
+  model later reads (text or instructions in images, audio, PDF layers,
+  metadata) — that is `prompt-injection-defender` (MANUAL-ONLY: invoke it
+  explicitly); this skill keeps file safety — type checks, malware scanning,
+  quarantine, storage, and serving.
 
 ## Inputs to Inspect
 
