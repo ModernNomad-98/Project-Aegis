@@ -9,8 +9,8 @@ description: Decide cloud platform, deployment pattern, and operational posture,
 as a service; PaaS means platform as a service; SSR means server-side
 rendering; BaaS means backend as a service; ADR means architecture decision
 record; IAM means identity and access management; SaaS means software as a
-service. Define other provider or product abbreviations when they drive a
-decision.
+service; CDN means content delivery network. Define other provider or
+product abbreviations when they drive a decision.
 Here p95 means the 95th percentile; SOC 2 and ISO 27001 are named security
 assurance standards. OS means operating system; DB means database; VM means
 virtual machine; API means application programming interface; SKU means a
@@ -49,7 +49,7 @@ the owner's answer grants no authority to create accounts, pay, or release.
 - Use when: asked which cloud provider a product should run on, or whether
   to stay, migrate, go multi-cloud, or go hybrid.
 - Use when: choosing how much operational surface to own for each workload
-  component (raw VPS/IaaS, container-PaaS, managed-Jamstack/SSR host,
+  component (raw VPS/IaaS, container-PaaS, frontend/SSR host,
   Postgres-BaaS, edge/serverless, or a hyperscaler service) — not just which provider.
 - Use when: a greenfield SaaS needs its cloud/deployment posture decided.
 - Use when: a user names a managed platform or combination (e.g. Vercel plus
@@ -101,8 +101,10 @@ the owner's answer grants no authority to create accounts, pay, or release.
    fact is one whose answer could change the recommendation: compliance,
    regulated data and residency; workload shape (long-running jobs, stateful
    services); team size and what it has operated; expected scale; budget and
-   credits; existing stack. If one is missing, ask exactly one plain-language
-   question for the most decision-changing gap (order in
+   credits; existing stack. A listed fact counts as deciding only when its
+   plausible answers would change the recommendation for THIS case; otherwise
+   record it as assumed, with a reopen trigger, and continue. If one is
+   missing, ask exactly one plain-language question for the most decision-changing gap (order in
    [references/managed-platform-tier.md](references/managed-platform-tier.md#deciding-facts-ask-only-what-is-missing)),
    say briefly why it matters, and wait. Do not ask about facts that would
    not change the outcome, bundle several questions, or present a
@@ -228,7 +230,7 @@ the owner's answer grants no authority to create accounts, pay, or release.
    database, to a hyperscaler piece by piece when needed) and measurable exit
    criteria (bill versus hyperscaler estimate, a contract needing a region,
    certification, or private network the platform lacks, jobs exceeding
-   runtime limits, availability beyond the plan's SLA).
+   runtime limits, availability beyond the plan's service-level agreement (SLA)).
 9. **Hand off**: the decision record to `adr-writer` (with the rollback/
    reversal plan an ADR requires) and per-tenant cost modeling of the chosen
    posture to `saas-cost-architect`. Service mapping depends on the pattern:
@@ -236,8 +238,8 @@ the owner's answer grants no authority to create accounts, pay, or release.
      maps account topology, IAM, network, and service SKUs. (GCP is a
      decide-able hyperscaler here but has no mapping skill yet — a banked
      future item; the decision can still land on GCP.)
-   - **Modern managed-platform tier** (container-PaaS / Jamstack / Postgres-
-     BaaS / edge) → there is no dedicated mapping skill; the platform may
+   - **Modern managed-platform tier** (frontend host / backend as a service /
+     app platform / edge) → there is no dedicated mapping skill; the platform may
      absorb parts of account topology, IAM, network, and patching, so verify
      the remaining responsibilities. The decision record plus
      the concrete provider is usually enough to start. Route the parts that

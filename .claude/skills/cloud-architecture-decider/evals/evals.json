@@ -58,7 +58,7 @@
     {
       "id": "edge-owner-platform-pattern-choice",
       "type": "should_trigger",
-      "prompt": "Greenfield B2B SaaS: server-rendered web frontend, Postgres, and background jobs. Two engineers, both have deployed to managed platforms but never operated cloud networking. Pooled tenancy is already decided. Our counsel confirmed no data-residency or regulated-data requirement; customers are US-only; we target 99.9% availability. We may get AWS startup credits but the amount and expiry aren't confirmed. Should we use managed platforms for frontend, database, and workers, or go straight to AWS managed services? Explain the options before asking me to choose.",
+      "prompt": "Greenfield B2B SaaS: server-rendered web frontend, Postgres, and background jobs. Two engineers, both have deployed to managed platforms but never operated cloud networking. Pooled tenancy is already decided. Our counsel confirmed no data-residency or regulated-data requirement; customers are US-only; we target 99.9% availability. We expect a few hundred customer organizations within two years and have no existing cloud estate. We may get AWS startup credits but the amount and expiry aren't confirmed. Should we use managed platforms for frontend, database, and workers, or go straight to AWS managed services? Explain the options before asking me to choose.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -73,7 +73,7 @@
     {
       "id": "edge-small-team-managed-vs-hyperscaler",
       "type": "should_trigger",
-      "prompt": "We're three engineers building a B2B project-management web app: a server-rendered frontend, a Postgres database, user sign-in, and a nightly report job that runs about 20 minutes. Pooled tenancy with a tenant_id column is decided. Our counsel confirmed no regulated data and no data-residency requirement; all customers are in the US; we target 99.9% availability. None of us has operated cloud networking or Kubernetes, but we've shipped apps on managed hosts. Budget is tight and nobody has checked current platform prices. Some friends say Vercel plus Supabase, others say AWS. Help us decide.",
+      "prompt": "We're three engineers building a B2B project-management web app: a server-rendered frontend, a Postgres database, user sign-in, and a nightly report job that runs about 20 minutes. Pooled tenancy with a tenant_id column is decided. Our counsel confirmed no regulated data and no data-residency requirement; all customers are in the US; we target 99.9% availability. None of us has operated cloud networking or Kubernetes, but we've shipped apps on managed hosts. Budget is tight and nobody has checked current platform prices. Some friends say Vercel plus Supabase, others say AWS. Help us decide. We expect a few hundred customer organizations within two years and have no existing cloud estate.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -81,7 +81,7 @@
           "Defines the terms the options rely on (such as backend as a service, row-level security, egress, and lock-in) in plain language.",
           "Presents a side-by-side comparison that includes at least one managed-platform option (such as a frontend host plus a Postgres backend-as-a-service) and one hyperscaler option (AWS managed services), each with why it fits this three-engineer team, case-specific pros and cons, money, setup and upkeep cost, and exit path, with prices marked unknown or to be verified rather than invented.",
           "Checks the 20-minute nightly job against each candidate's function runtime limits as a verification item and names where the job would run if it does not fit, instead of assuming it fits.",
-          "Notes that with pooled tenancy on a Postgres backend-as-a-service queried directly by the client, row-level security becomes the tenant barrier, and routes it to rls-policy-auditor.",
+          "Notes that with pooled tenancy on a Postgres backend-as-a-service, if the client queries the database directly, row-level security becomes the only tenant barrier, and routes it to rls-policy-auditor.",
           "Recommends one option with a reason tied to the stated facts, names what would change it (such as a contract requiring residency or private networking, or costs at higher scale), and, if the managed option is recommended, states a graduation path and exit criteria.",
           "Ends with exactly one atomic owner question, records no decision before the owner answers, and states that the answer grants no authority to sign up, pay, or deploy."
         ]
@@ -90,7 +90,7 @@
     {
       "id": "edge-regulated-residency-managed-limits",
       "type": "should_trigger",
-      "prompt": "We're a two-person team building a patient-intake SaaS for clinics in Germany. Our counsel confirmed the data is health data, it must be stored and processed only in the EU, and every clinic requires a signed data processing agreement. Pooled tenancy is decided and we target 99.9% availability. We love the developer experience of Vercel plus Supabase. Can we use them, or do we need AWS or Azure?",
+      "prompt": "We're a two-person team building a patient-intake SaaS for clinics in Germany. Our counsel confirmed the data is health data, it must be stored and processed only in the EU, and every clinic requires a signed data processing agreement. Pooled tenancy is decided and we target 99.9% availability. We love the developer experience of Vercel plus Supabase. Can we use them, or do we need AWS or Azure? It is a standard web app with short API calls and no long-running jobs; neither of us has operated cloud infrastructure; we expect under 100 clinics in two years; no existing cloud estate.",
       "expect": {
         "triggers": true,
         "assertions": [
