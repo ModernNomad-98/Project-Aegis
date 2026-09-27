@@ -70,6 +70,32 @@
           "This console ENFORCES that policy at its action surface; it does not author the policy itself."
         ]
       }
+    },
+    {
+      "id": "unnamed-telemetry-no-auto-observability-operator",
+      "type": "should_not_trigger",
+      "prompt": "Instrument the platform and build the operator dashboards: metrics, traces, logs, and health views so ops can SEE what the system is doing.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "admin-console-architect does not activate or take ownership of this request.",
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute admin-console-architect for it.",
+          "Treats metrics, traces, logs, and health views for seeing system state as observability work; the admin console is the operator ACTION surface that may embed telemetry, so it does not design console tiers, impersonation, or break-glass flows in response."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-agent-authority-no-auto-agent-authorization-matrix",
+      "type": "should_not_trigger",
+      "prompt": "Define what our AI agents are allowed to do in the SDLC — which can merge, deploy, or change settings, and where a human must approve — the standing authority matrix for agents vs humans.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "admin-console-architect does not activate or take ownership of this request.",
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute admin-console-architect for it.",
+          "Recognizes the subject as AI-agent standing authority (merge, deploy, settings, human-approval gates), not human operator tiers, and does not route agents onto the console's human break-glass path."
+        ]
+      }
     }
   ]
 }

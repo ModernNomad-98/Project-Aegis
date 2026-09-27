@@ -53,6 +53,19 @@
           "Seeks fresh approval via human-approval-boundary before touching the schema — the original bug-fix approval does not transfer."
         ]
       }
+    },
+    {
+      "id": "unnamed-diff-hygiene-no-auto-reviewable-diff-discipline",
+      "type": "should_not_trigger",
+      "prompt": "My working diff has 30 files but the task was a one-line bug fix — help me trim it and stage just the fix.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "change-classification-gate does not activate or take ownership of this request.",
+          "Does not auto-invoke reviewable-diff-discipline (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute change-classification-gate for it.",
+          "Treats trimming an oversized working change and staging only the fix as in-flight change hygiene, not pre-work risk classification; does not emit a change-class routing verdict."
+        ]
+      }
     }
   ]
 }

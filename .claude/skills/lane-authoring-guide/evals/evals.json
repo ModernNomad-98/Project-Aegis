@@ -66,6 +66,19 @@
           "A stage-END handoff/closeout with deviations and evidence is ai-closeout-reporter territory; the lane guide is authored BEFORE work begins, not after it ends."
         ]
       }
+    },
+    {
+      "id": "unnamed-tool-instruction-files-no-auto-agent-instruction-consolidator",
+      "type": "should_not_trigger",
+      "prompt": "Our Claude Code instructions, the AGENTS file, and our Cursor rules disagree about branch naming and test commands — align them into one source of truth.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "lane-authoring-guide does not activate or take ownership of this request.",
+          "Does not auto-invoke agent-instruction-consolidator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute lane-authoring-guide for it.",
+          "Treats alignment of standing assistant instruction files across tools as instruction consolidation; does not author a per-effort, per-lane guide in response."
+        ]
+      }
     }
   ]
 }

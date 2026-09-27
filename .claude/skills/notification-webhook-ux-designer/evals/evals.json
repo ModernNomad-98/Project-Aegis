@@ -86,6 +86,19 @@
           "Never puts security alerts or payment failures into a digest because criticality overrides batching, and treats the chosen default as design input that authorizes no message and no live setting."
         ]
       }
+    },
+    {
+      "id": "unnamed-internal-alerting-no-auto-observability-operator",
+      "type": "should_not_trigger",
+      "prompt": "When our webhook delivery workers back up or error rates spike, page the on-call engineer with severity and a runbook link.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "notification-webhook-ux-designer does not activate or take ownership of this request.",
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute notification-webhook-ux-designer for it.",
+          "Treats internal on-call paging (severity, thresholds, runbook link) as internal alerting, not the integrator-facing failing-endpoint notice this skill designs."
+        ]
+      }
     }
   ]
 }

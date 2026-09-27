@@ -79,6 +79,19 @@
           "Uses an applicable existing grant without repeat consent where ordinary documentation persistence is actually authorized; excluded operations require the separate manual route."
         ]
       }
+    },
+    {
+      "id": "unnamed-memory-store-no-auto-agent-memory-governance",
+      "type": "should_not_trigger",
+      "prompt": "Audit the agent's persistent memory directory — which remembered facts are stale, what should never have been stored, and what are the write rules going forward?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "chat-backlog-reconciliation does not activate or take ownership of this request.",
+          "Does not auto-invoke agent-memory-governance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute chat-backlog-reconciliation for it.",
+          "Identifies the subject as a persistent agent-memory store rather than conversation history, and does not run a chat-to-backlog reconciliation into tracked docs."
+        ]
+      }
     }
   ]
 }

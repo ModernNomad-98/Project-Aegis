@@ -66,6 +66,19 @@
           "Session-start context verification and loading is agent-startup-context-gate — the READ half; the CI gate enforces the WRITE-BACK half at PR time."
         ]
       }
+    },
+    {
+      "id": "unnamed-pipeline-design-no-auto-ci-pipeline-architect",
+      "type": "should_not_trigger",
+      "prompt": "Design our CI/CD pipeline — stages for lint, build, tests, security, artifact, deploy gates, and which checks block merge.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "context-co-update-ci-gate does not activate or take ownership of this request.",
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute context-co-update-ci-gate for it.",
+          "Treats the stage graph and merge-blocking semantics of the whole CI/CD pipeline as pipeline architecture; the context co-update gate is at most one policy check wired into that pipeline, not the pipeline design."
+        ]
+      }
     }
   ]
 }

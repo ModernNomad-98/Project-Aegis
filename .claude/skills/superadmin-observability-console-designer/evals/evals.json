@@ -71,6 +71,19 @@
           "Routes the acting/support half (support actions on the account) to admin-console-architect's mediated, audited action surface."
         ]
       }
+    },
+    {
+      "id": "unnamed-wiring-dashboards-no-auto-observability-operator",
+      "type": "should_not_trigger",
+      "prompt": "Instrument our checkout service and wire up dashboards and alert rules in our observability backend so the on-call can see error rates and latency.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "superadmin-observability-console-designer does not activate or take ownership of this request.",
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute superadmin-observability-console-designer for it.",
+          "Treats instrumenting the checkout service and creating dashboards and alert rules in the observability backend as stack operation; does not design an in-product superadmin console in response."
+        ]
+      }
     }
   ]
 }

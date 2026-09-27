@@ -67,6 +67,19 @@
           "Delivers the burn-rate paging design that actually catches problems early via fast-burn windows."
         ]
       }
+    },
+    {
+      "id": "unnamed-wiring-no-auto-observability-operator",
+      "type": "should_not_trigger",
+      "prompt": "Implement the alert rules from the reliability doc and verify the SLI queries return data.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "slo-reliability-architect does not activate or take ownership of this request.",
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute slo-reliability-architect for it.",
+          "Recognizes that the reliability design already exists and the ask is implementing alert rules and executing SLI verification queries, which is hands-on operator work rather than SLO design."
+        ]
+      }
     }
   ]
 }

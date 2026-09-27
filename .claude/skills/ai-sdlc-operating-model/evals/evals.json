@@ -52,6 +52,32 @@
           "Standing agent permissions are agent-authorization-matrix's deliverable; the operating model only cites that matrix in its authority column."
         ]
       }
+    },
+    {
+      "id": "unnamed-merge-permission-no-auto-agent-authorization-matrix",
+      "type": "should_not_trigger",
+      "prompt": "Decide whether the agent is allowed to merge its own PRs to main once CI is green.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "ai-sdlc-operating-model does not activate or take ownership of this request.",
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-sdlc-operating-model for it.",
+          "Frames the question as a single standing-authority decision for one action class (agent self-merge to main on green CI), not a redesign of the AI SDLC lifecycle or operating model."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-memory-rules-no-auto-agent-memory-governance",
+      "type": "should_not_trigger",
+      "prompt": "Set the rules for what our agents may write into persistent project memory and when they must verify it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "ai-sdlc-operating-model does not activate or take ownership of this request.",
+          "Does not auto-invoke agent-memory-governance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-sdlc-operating-model for it.",
+          "Treats memory write, trust, and verification rules as the memory-governance deliverable; does not draft an operating-model learning loop in place of those rules."
+        ]
+      }
     }
   ]
 }

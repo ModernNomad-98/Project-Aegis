@@ -53,6 +53,19 @@
           "Offers to run the tests before finalizing the report."
         ]
       }
+    },
+    {
+      "id": "unnamed-diff-outgrew-task-no-auto-reviewable-diff-discipline",
+      "type": "should_not_trigger",
+      "prompt": "This pull request was supposed to be a one-line fix and now it touches 14 files — trim it back to the intent.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "ai-closeout-reporter does not activate or take ownership of this request.",
+          "Does not auto-invoke reviewable-diff-discipline (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-closeout-reporter for it.",
+          "Treats shrinking a drifting change back to its intent while it is still being shaped as diff discipline; does not write a terminal closeout report."
+        ]
+      }
     }
   ]
 }
