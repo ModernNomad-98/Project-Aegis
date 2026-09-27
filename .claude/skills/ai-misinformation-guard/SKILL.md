@@ -1,6 +1,6 @@
 ---
 name: ai-misinformation-guard
-description: Design controls against misinformation and overreliance in a large language model (LLM) feature, the Open Worldwide Application Security Project (OWASP) LLM09 category. Require authoritative grounding, checked citations, calibrated uncertainty and refusal, validation before consequential action, and a user experience that shows limits. Cover invented software packages or application programming interfaces (APIs) and human oversight for high-impact outputs. Compose rag-security-architect for retrieval and ai-governance-risk-reviewer for oversight. Use when confident but wrong output could mislead. Do NOT use for unsafe output handling, output shape, injection, or training-data integrity.
+description: Design controls against misinformation and overreliance in a large language model (LLM) feature, the Open Worldwide Application Security Project (OWASP) LLM09 category. Require authoritative grounding, checked citations, calibrated uncertainty and refusal, validation before consequential action, and a user experience that shows limits. Cover invented software packages or application programming interfaces (APIs) and human oversight for high-impact outputs. Compose rag-security-architect for retrieval and ai-governance-risk-reviewer for oversight. Use when confident but wrong output could mislead. Do NOT use for unsafe output handling, output shape, injection, training-data integrity, or approval-flow automation bias (human-agent-trust-reviewer).
 ---
 
 # AI Misinformation Guard

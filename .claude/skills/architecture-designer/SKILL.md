@@ -1,6 +1,6 @@
 ---
 name: architecture-designer
-description: Design or redesign system structure from an inspection of the current code and architecture. Produce component, dependency, and data-ownership maps, tradeoffs, an architecture decision record (ADR) draft, and an incremental migration plan. Use for structural feature or system decisions. Do NOT use for domain-concept modeling (domain-modeler) or recording an already-made decision (adr-writer).
+description: Design or redesign system structure from an inspection of the current code and architecture. Produce component, dependency, and data-ownership maps, tradeoffs, an architecture decision record (ADR) draft, and an incremental migration plan. Use for structural feature or system decisions. Do NOT use to choose the architecture style (architecture-advisor), design tenancy (saas-platform-architect), model domain concepts (domain-modeler), or record an already-made decision (adr-writer).
 ---
 
 # Architecture Designer

@@ -4,7 +4,8 @@
   "overlaps_with": [
     "multi-tenant-security-tester",
     "secure-migration-reviewer",
-    "tenant-isolation-reviewer"
+    "tenant-isolation-reviewer",
+    "authorization-matrix-designer"
   ],
   "cases": [
     {
@@ -43,6 +44,15 @@
         "rls-policy-auditor"
       ],
       "reason": "Cross-surface leak inspection beyond the database is the isolation reviewer; RLS auditor is database-policy-scoped."
+    },
+    {
+      "id": "roles-matrix-goes-to-authorization-matrix-designer",
+      "prompt": "Before anyone writes database policies, define which roles (owner, admin, member, viewer) may create, edit, delete, or export each resource type in a workspace, with deny-by-default and object-level rules.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": [
+        "rls-policy-auditor"
+      ],
+      "reason": "Designing the roles-by-permissions matrix precedes policy work; rls-policy-auditor audits or authors the database RLS policies that enforce a settled matrix."
     }
   ]
 }

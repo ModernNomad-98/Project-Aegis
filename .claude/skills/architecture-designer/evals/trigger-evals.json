@@ -1,7 +1,7 @@
 {
   "skill": "architecture-designer",
   "description": "Trigger discrimination for the Phase 2 design cluster. Pins structural design apart from concept modeling and decision recording.",
-  "overlaps_with": ["domain-modeler", "adr-writer"],
+  "overlaps_with": ["domain-modeler", "adr-writer", "saas-platform-architect"],
   "cases": [
     {
       "id": "structure-wins-here",
@@ -23,6 +23,13 @@
       "expected_skill": "adr-writer",
       "should_not_trigger": ["architecture-designer"],
       "reason": "No open design question remains; the task is the durable record with rollback and review date."
+    },
+    {
+      "id": "tenancy-design-goes-to-saas-platform-architect",
+      "prompt": "We are opening the product to many customer organizations. Should tenant data and compute be pooled or isolated per component, and which services belong in a shared control plane?",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": ["architecture-designer"],
+      "reason": "The structural question is defined by the tenancy dimension (pool vs silo, control plane); architecture-designer yields tenancy design to saas-platform-architect."
     }
   ]
 }
