@@ -66,6 +66,18 @@
           "Asks exactly one decision question before writing code; the answer grants no authority to change production configuration or policy (human-approval-boundary), and once chosen the work stays test-first with a failing-then-passing negative test, leaves choosing further controls to threat-modeler, and hands verification to security-pr-reviewer."
         ]
       }
+    },
+    {
+      "id": "unnamed-single-control-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Add a parameterized query to fix this one SQL injection.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "appsec-implementer does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its application-security control implementation workflow as an invoked skill.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names appsec-implementer, because the ask is one already-decided app-layer control."
+        ]
+      }
     }
   ]
 }

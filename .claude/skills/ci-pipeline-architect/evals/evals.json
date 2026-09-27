@@ -69,6 +69,19 @@
           "After a contextual recommendation and explanation, asks the owner one atomic strategy decision question, or one discovery question first if a decisive fact is missing; does not bundle deployment approval into the choice."
         ]
       }
+    },
+    {
+      "id": "unnamed-pipeline-changes-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Add a security-scan stage to CI and make it a merge-blocking required check.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "ci-pipeline-architect does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its pipeline stage and required-check design as an invoked skill.",
+          "local-ci-mirror-preflight (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names ci-pipeline-architect, not local-ci-mirror-preflight, because adding a CI stage and a required check changes the pipeline, while a local preflight only reads existing workflows."
+        ]
+      }
     }
   ]
 }

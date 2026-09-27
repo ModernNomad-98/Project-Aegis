@@ -80,6 +80,19 @@
           "Once invoked, honors current applicable user grants without asking for the same authorization again."
         ]
       }
+    },
+    {
+      "id": "unnamed-per-commit-mirror-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Before every commit I want us to run exactly what CI will run, verified against clean main first, and classify any failure as ours or main's. Set that discipline up for this change now.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "local-ci-mirror-preflight does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its per-commit CI mirror with a clean-main baseline as an invoked skill.",
+          "ci-pipeline-architect (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names local-ci-mirror-preflight, not ci-pipeline-architect, because this mirrors existing checks locally and classifies failures per commit without changing the pipeline."
+        ]
+      }
     }
   ]
 }

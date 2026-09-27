@@ -98,6 +98,19 @@
           "Once invoked, honors current applicable user grants without asking for the same authorization again."
         ]
       }
+    },
+    {
+      "id": "unnamed-one-heavy-query-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "The monthly rollup query runs for 8 minutes — here's the execution plan showing a giant sort spilling to disk. Recommend the fix.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "query-plan-reader does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its execution-plan reading workflow as an invoked skill.",
+          "n-plus-one-detector (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names query-plan-reader, not n-plus-one-detector, because it is one heavy statement with its plan in hand and no per-row query pattern."
+        ]
+      }
     }
   ]
 }

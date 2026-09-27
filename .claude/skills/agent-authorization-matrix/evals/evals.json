@@ -93,6 +93,19 @@
           "End-user/tenant roles × permissions belong to authorization-matrix-designer; this skill governs the AI agents building the product, not the product's users."
         ]
       }
+    },
+    {
+      "id": "unnamed-authority-floors-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Define what the agent may ever do autonomously on our project versus what always needs a named human — the deny-by-default action matrix.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "agent-authorization-matrix does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its deny-by-default authority-matrix design as an invoked skill.",
+          "standing-approval-and-auto-advance (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names agent-authorization-matrix, not standing-approval-and-auto-advance, because these are the standing authority floors themselves; standing approvals only operate inside that matrix."
+        ]
+      }
     }
   ]
 }

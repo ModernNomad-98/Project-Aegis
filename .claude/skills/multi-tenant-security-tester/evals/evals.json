@@ -65,6 +65,18 @@
           "Once invoked, honors current applicable user grants without asking for the same authorization again."
         ]
       }
+    },
+    {
+      "id": "unnamed-tests-win-here-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Give me an executable negative-test suite that proves tenant A cannot reach tenant B's data through the API, search, and exports.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "multi-tenant-security-tester does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its cross-tenant negative-test suite workflow as an invoked skill.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names multi-tenant-security-tester, because the ask is a proving test suite with denial assertions, not a code inspection or policy audit."
+        ]
+      }
     }
   ]
 }

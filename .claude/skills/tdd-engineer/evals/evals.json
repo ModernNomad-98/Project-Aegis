@@ -64,6 +64,19 @@
           "Once invoked, honors current applicable user grants without asking for the same authorization again."
         ]
       }
+    },
+    {
+      "id": "unnamed-tests-first-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Implement the proration logic for mid-cycle plan changes — write the failing tests first so we agree on the math before code.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "tdd-engineer does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its red-green-refactor loop as an invoked skill.",
+          "docs-first-implementer, systematic-debugger (also MANUAL-ONLY) do not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names tdd-engineer, not docs-first-implementer or systematic-debugger, because the user asks for failing tests first against a specifiable contract."
+        ]
+      }
     }
   ]
 }

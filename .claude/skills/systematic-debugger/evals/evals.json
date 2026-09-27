@@ -65,6 +65,19 @@
           "Once invoked, honors current applicable user grants without asking for the same authorization again."
         ]
       }
+    },
+    {
+      "id": "unnamed-unknown-cause-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "The nightly sync job hangs maybe once a week and has to be killed manually. No errors, it just stops. Figure it out.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "systematic-debugger does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its reproduce/amplify/isolate debugging loop as an invoked skill.",
+          "tdd-engineer, docs-first-implementer (also MANUAL-ONLY) do not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names systematic-debugger, not tdd-engineer or docs-first-implementer, because the failure is intermittent with an unknown cause, so reproduction and isolation come before any fix or test."
+        ]
+      }
     }
   ]
 }

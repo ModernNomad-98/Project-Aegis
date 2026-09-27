@@ -65,6 +65,18 @@
           "Asks exactly one atomic decision question and makes no edit before the answer; the choice does not authorize behavior or contract changes, suspected bugs are reported rather than fixed in-band, and work stays inside the named function."
         ]
       }
+    },
+    {
+      "id": "unnamed-apply-cleanup-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Please de-tangle the checkout controller — flatten the nesting and kill the dead branches, behavior identical.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "code-simplifier does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its behavior-preserving simplification workflow as an invoked skill.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names code-simplifier, because the user wants behavior-preserving edits applied to a named target."
+        ]
+      }
     }
   ]
 }

@@ -51,6 +51,19 @@
           "Enumerates consumers of the credential before rotating and hands off any provider-console/ops steps with exact instructions rather than faking completion."
         ]
       }
+    },
+    {
+      "id": "unnamed-key-custody-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Our model provider key leaked into the client bundle via a VITE_ variable — move it server-side and rotate it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "secrets-identity-hardener does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its move-and-rotate remediation with a bundle-absence proof as an invoked skill.",
+          "ai-router-architect (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names secrets-identity-hardener, not ai-router-architect, because moving and rotating a leaked key is remediation, not gateway or routing design."
+        ]
+      }
     }
   ]
 }

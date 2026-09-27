@@ -54,6 +54,19 @@
           "Applies edits only after the human approves the concrete proposal, then re-runs the inventory to verify zero conflicts and no lost rules."
         ]
       }
+    },
+    {
+      "id": "unnamed-instruction-files-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Our Claude instructions and our shared agent instructions give different test commands — align our agent instruction files to one source of truth.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "agent-instruction-consolidator does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its instruction-file consolidation workflow as an invoked skill.",
+          "agent-memory-governance (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names agent-instruction-consolidator, not agent-memory-governance, because the conflict is between agent instruction files, which are a different steering surface from memory files."
+        ]
+      }
     }
   ]
 }

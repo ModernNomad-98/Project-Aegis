@@ -84,6 +84,19 @@
           "Once invoked, honors current applicable user grants without asking for the same authorization again."
         ]
       }
+    },
+    {
+      "id": "unnamed-chatty-pattern-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "The order list endpoint issues one query per order to fetch its customer — 300 orders, 300 extra queries. Design the fix.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "n-plus-one-detector does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its N+1 query-count diagnosis as an invoked skill.",
+          "query-plan-reader (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names n-plus-one-detector, not query-plan-reader, because the problem is a query-count explosion at the data-access layer, not one plan's cost structure."
+        ]
+      }
     }
   ]
 }

@@ -95,6 +95,20 @@
           "Recording one granted approval durably is scoped-approval-register; standing-approval-and-auto-advance designs the recurring-loop policy, not individual grant records."
         ]
       }
+    },
+    {
+      "id": "unnamed-governed-fatigue-layer-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Stop making me approve every mechanical push and PR inside phases I already approved — set up a documented standing approval with an opt-out and a rule for advancing to the next approved phase.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "standing-approval-and-auto-advance does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its standing-approval policy design as an invoked skill.",
+          "agent-authorization-matrix (also MANUAL-ONLY) does not activate either.",
+          "Records or activates no standing approval, opt-out phrase or phase-advance rule, and does not treat the request itself as a granted approval.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names standing-approval-and-auto-advance, not agent-authorization-matrix, because the ask is a recurring standing-approval policy with an opt-out and a phase-advance rule, not the authority-floor matrix."
+        ]
+      }
     }
   ]
 }
