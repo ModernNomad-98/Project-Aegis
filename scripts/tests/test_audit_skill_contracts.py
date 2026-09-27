@@ -488,11 +488,75 @@ def test_audit_engine_version_marks_corrected_eval004_semantics() -> None:
     # must not still identify as 1.12.0. The frozen historical baseline is the
     # type-collapsing 1.12.0 engine; a corrected live report has to be
     # distinguishable by VERSION, not only by engine source hash.
-    assert audit_mod.TOOL_VERSION == "1.13.1", (
+    # 1.13.2 adds whole-name skill matching (ROUTE-002 false positive fix).
+    assert audit_mod.TOOL_VERSION == "1.13.2", (
         f"corrected EVAL-004 semantics require a minor bump; got "
         f"{audit_mod.TOOL_VERSION!r}"
     )
-    ok("audit engine reports v1.13.1 for corrected EVAL-004 semantics and raw ARTF-001 anchors")
+    ok("audit engine reports v1.13.2 for corrected EVAL-004 semantics, raw ARTF-001 "
+       "anchors and whole-name skill matching")
+
+
+def test_mentions_skill_name_matches_whole_names_only() -> None:
+    # Owner decision 2026-09-27: a longer skill name must never count as a
+    # mention of a shorter one it contains (`ai-threat-modeler` is not
+    # `threat-modeler`). The exact name still counts at every real boundary.
+    m = audit_mod.mentions_skill_name
+    assert not m("Do not use for ai-threat-modeler work.", "threat-modeler")
+    assert not m("use `ai-threat-modeler`", "threat-modeler")
+    assert not m("threat-modeler-lite", "threat-modeler")
+    assert not m("threat-modeler2", "threat-modeler")
+    assert not m("AI-threat-modeler", "threat-modeler")
+    assert m("threat-modeler owns STRIDE", "threat-modeler"), "name at string start"
+    assert m("Do not use; route to threat-modeler", "threat-modeler"), "name at string end"
+    assert m("route to `threat-modeler` instead", "threat-modeler"), "name in backticks"
+    for punct in ".,;:)!?'\"":
+        assert m(f"(see threat-modeler{punct} later", "threat-modeler"), (
+            f"name followed by {punct!r} must count"
+        )
+    assert m("ai-threat-modeler and threat-modeler differ", "threat-modeler"), (
+        "a separate exact mention still counts next to a longer name"
+    )
+    assert m("ai-threat-modeler", "ai-threat-modeler"), "the longer name itself counts"
+    ok("mentions_skill_name matches whole skill names, not substrings")
+
+
+def test_route002_ignores_longer_name_containing_target() -> None:
+    # End to end: A's exclusion names only `ai-threat-modeler`, so A must NOT
+    # gain a ROUTE-002 finding (or a description edge) toward `threat-modeler`.
+    # An exact exclusion toward `threat-modeler` still fires.
+    def skill_md(name: str, description: str) -> str:
+        return (f"---\nname: {name}\ndescription: {description}\n---\n\n"
+                f"# {name}\n\nBody.\n")
+
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-route002-whole-name-"))
+    try:
+        repo = tmp / "repo"
+        skills = repo / ".claude" / "skills"
+        docs = {
+            "threat-modeler": "Models threats. Do not use for AI features.",
+            "ai-threat-modeler": "Models AI threats. Do not use for plain apps.",
+            "injection-guard": "Guards injection. Do not use for ai-threat-modeler work.",
+            "exact-excluder": "Checks things. Do not use for threat-modeler work.",
+        }
+        for name, desc in docs.items():
+            d = skills / name
+            d.mkdir(parents=True)
+            (d / "SKILL.md").write_text(skill_md(name, desc), encoding="utf-8")
+        a = audit_mod.Audit(repo)
+        a.run()
+        r2 = sorted((f.owning_skill, f.related_skills[0])
+                    for f in a.findings if f.rule == "ROUTE-002")
+        assert ("injection-guard", "threat-modeler") not in r2, (
+            f"`ai-threat-modeler` must not count as `threat-modeler`: {r2}"
+        )
+        assert ("injection-guard", "ai-threat-modeler") in r2, r2
+        assert ("exact-excluder", "threat-modeler") in r2, r2
+        edges = {(e["from"], e["to"]) for e in a.graph["edges"]}
+        assert ("injection-guard", "threat-modeler") not in edges, edges
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    ok("ROUTE-002 does not treat a longer skill name as a mention of a shorter one")
 
 
 def test_artifact_anchor_uses_raw_file_lines() -> None:
@@ -1795,6 +1859,8 @@ def main() -> int:
     test_eval004_ghost_target_still_unknown()
     test_eval004_non_subagent_parenthetical_is_a_skill_name()
     test_audit_engine_version_marks_corrected_eval004_semantics()
+    test_mentions_skill_name_matches_whole_names_only()
+    test_route002_ignores_longer_name_containing_target()
     test_artifact_anchor_uses_raw_file_lines()
     test_eval004_each_machine_surface_is_independently_collected()
     test_eval004_each_machine_surface_resolves_valid_subagent()
