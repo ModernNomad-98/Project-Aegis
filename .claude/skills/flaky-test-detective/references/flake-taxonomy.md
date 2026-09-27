@@ -7,8 +7,8 @@ TZ means time zone, DST daylight saving time, OOM out of memory, and CI
 continuous integration. Verify runner flags against the pinned installed
 version before using a reproduction command.
 The [Vitest migration guide](https://vitest.dev/guide/migration.html)
-documents removed pool options (link is version-specific; verify against the
-installed version); consult the installed version's CLI before
+documents removed pool options. The page is unversioned and changes with
+each Vitest major release, so consult the installed version's CLI before
 using worker flags. The [Playwright test CLI](https://playwright.dev/docs/test-cli)
 documents repeat and worker options.
 
