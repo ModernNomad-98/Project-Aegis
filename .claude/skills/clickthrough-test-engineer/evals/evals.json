@@ -53,6 +53,19 @@
           "Never enters real customer data during the session."
         ]
       }
+    },
+    {
+      "id": "unnamed-one-off-walkthrough-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Before the demo tomorrow, click through the whole app once and tell me what's broken.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "clickthrough-test-engineer does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its interactive walkthrough workflow as an invoked skill.",
+          "playwright-e2e-engineer (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names clickthrough-test-engineer, not playwright-e2e-engineer, because a one-time walkthrough with observations is wanted, not permanent test specs."
+        ]
+      }
     }
   ]
 }

@@ -52,6 +52,19 @@
           "Checks whether the alert guards a data-loss signal — if so, routes the silencing decision through human-approval-boundary with compensating coverage named."
         ]
       }
+    },
+    {
+      "id": "unnamed-live-monitoring-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Instrument our production AI endpoint with alerts on error rate, latency, and cost spikes.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "observability-operator does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its production instrumentation and alerting workflow as an invoked skill.",
+          "ai-evaluation-harness (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names observability-operator, not ai-evaluation-harness, because this is live production telemetry and alerting, not a pre-merge evaluation against a dataset."
+        ]
+      }
     }
   ]
 }

@@ -80,6 +80,19 @@
           "Once invoked, honors current applicable user grants without asking for the same authorization again."
         ]
       }
+    },
+    {
+      "id": "unnamed-library-api-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Wire up file uploads through the storage SDK — multipart, size limits, signed URLs.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "docs-first-implementer does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its version-pinned, docs-first implementation workflow as an invoked skill.",
+          "systematic-debugger (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names docs-first-implementer, not systematic-debugger, because this is feature work against an external SDK surface, where version pinning and reading the docs govern."
+        ]
+      }
     }
   ]
 }

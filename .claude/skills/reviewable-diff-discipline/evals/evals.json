@@ -66,6 +66,18 @@
           "Once invoked, honors current applicable user grants without asking for the same authorization again."
         ]
       }
+    },
+    {
+      "id": "unnamed-staging-hygiene-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Help me stage exactly the files for this fix — the tree has a bunch of unrelated changes too.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "reviewable-diff-discipline does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its exact-path staging discipline as an invoked skill.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names reviewable-diff-discipline, because exact-path staging in a mixed working tree is the core of that discipline."
+        ]
+      }
     }
   ]
 }

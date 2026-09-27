@@ -54,6 +54,18 @@
           "Proceeds with the destructive cleanup only after that explicit approval, and verifies the backup ref exists first."
         ]
       }
+    },
+    {
+      "id": "unnamed-broken-state-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "An agent run died mid-rebase and left the tree conflicted with a half-applied commit — get the working state back without losing work.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "agent-failure-recovery does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its broken-state recovery workflow as an invoked skill.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names agent-failure-recovery, because the ask is recovering a broken working state, not designing the agent loop."
+        ]
+      }
     }
   ]
 }

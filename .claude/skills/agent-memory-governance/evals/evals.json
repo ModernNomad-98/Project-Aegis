@@ -52,6 +52,19 @@
           "A live conflict between docs and code is source-of-truth-reconciler's verdict to make; no persistent memory store is involved."
         ]
       }
+    },
+    {
+      "id": "unnamed-memory-store-audit-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Go through our project memory files: prune stale entries, check nothing sensitive got stored, and fix wrong facts.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "agent-memory-governance does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its store-wide memory audit with per-entry dispositions as an invoked skill.",
+          "agent-instruction-consolidator (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names agent-memory-governance, not agent-instruction-consolidator, because this is store-wide memory hygiene and no instruction files are involved."
+        ]
+      }
     }
   ]
 }

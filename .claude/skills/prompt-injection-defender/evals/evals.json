@@ -53,6 +53,19 @@
           "States residual risk and that accepting a prompt-only posture needs a named human acceptor via human-approval-boundary."
         ]
       }
+    },
+    {
+      "id": "unnamed-injection-vector-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Set up trust zones and deterministic action authorization so instructions hidden in documents can't drive our LLM's behavior.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "prompt-injection-defender does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its trust-zone and deterministic action-boundary design as an invoked skill.",
+          "agent-goal-hijack-defender (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names prompt-injection-defender, not agent-goal-hijack-defender, because trust zones and content/instruction separation are the injection defense layer, not multi-step goal pinning."
+        ]
+      }
     }
   ]
 }

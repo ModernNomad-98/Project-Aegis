@@ -66,6 +66,19 @@
           "Reports the exposure with dist-level evidence and scopes its own claim to what was actually searched."
         ]
       }
+    },
+    {
+      "id": "unnamed-build-artifact-qa-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Run the production build, check the bundle for exposed env values, and make sure the preview build serves deep links correctly.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "vite-build-qa-engineer does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its build, bundle-inspection and preview-parity QA workflow as an invoked skill.",
+          "vitest-unit-component-engineer (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names vite-build-qa-engineer, not vitest-unit-component-engineer, because building, inspecting the bundle and checking preview parity test the build artifact, not app logic."
+        ]
+      }
     }
   ]
 }

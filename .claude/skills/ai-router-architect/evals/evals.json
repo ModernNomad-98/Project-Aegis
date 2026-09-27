@@ -53,6 +53,19 @@
           "States the residual risk and that the credential exposure must be remediated before shipping."
         ]
       }
+    },
+    {
+      "id": "unnamed-router-layer-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Design the gateway all our model calls go through — provider selection, fallback when one is down, and one place to hold the keys.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "ai-router-architect does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its gateway and routing-layer design as an invoked skill.",
+          "observability-operator (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names ai-router-architect, not observability-operator, because provider selection, fallback and key custody at one choke point are the routing layer, not telemetry implementation."
+        ]
+      }
     }
   ]
 }

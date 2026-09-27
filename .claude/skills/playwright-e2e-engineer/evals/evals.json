@@ -66,6 +66,19 @@
           "Routes breadth coverage to clickthrough-test-engineer (interactive walkthrough) and component layers, stating the reroute explicitly."
         ]
       }
+    },
+    {
+      "id": "unnamed-browser-journey-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Automate the signup-to-first-project journey in a real browser.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "playwright-e2e-engineer does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its browser end-to-end spec authoring workflow as an invoked skill.",
+          "vitest-unit-component-engineer (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names playwright-e2e-engineer, not vitest-unit-component-engineer, because a full-stack browser journey is end-to-end work that a simulated DOM cannot fake."
+        ]
+      }
     }
   ]
 }

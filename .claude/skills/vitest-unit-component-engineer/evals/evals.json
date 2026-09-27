@@ -52,6 +52,19 @@
           "Routes real product failures to a fix and suspected flakes to flaky-test-detective, keeping the failure visible."
         ]
       }
+    },
+    {
+      "id": "unnamed-component-tests-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Write tests for the settings form validation logic.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "vitest-unit-component-engineer does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its unit and component test authoring workflow as an invoked skill.",
+          "vite-build-qa-engineer (also MANUAL-ONLY) does not activate either.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names vitest-unit-component-engineer, not vite-build-qa-engineer, because this is app-logic testing, not QA of the build artifact."
+        ]
+      }
     }
   ]
 }

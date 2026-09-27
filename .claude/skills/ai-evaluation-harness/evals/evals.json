@@ -67,6 +67,18 @@
           "Offers a cost-sized CI cadence (PR-to-AI-paths or nightly) instead of a false 'passes' claim."
         ]
       }
+    },
+    {
+      "id": "unnamed-eval-harness-stays-silent",
+      "type": "should_not_trigger",
+      "prompt": "Create a golden dataset and graders to measure our chatbot's quality, safety, and hallucination rate, and block regressions on model upgrades.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "ai-evaluation-harness does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its golden-dataset and grader design workflow as an invoked skill.",
+          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names ai-evaluation-harness, because this evaluates model-output behavior with a dataset and graders, not code tests."
+        ]
+      }
     }
   ]
 }
