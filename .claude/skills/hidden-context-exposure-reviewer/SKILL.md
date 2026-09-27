@@ -134,9 +134,11 @@ or no security impact, not that it cannot be disclosed.
    security-relevant logic, no reliance on confidentiality); *medium*
    (internal rules, filtering criteria, role descriptions, or workflow logic
    that meaningfully aids an attacker but does not gate critical decisions —
-   an extracted tool list with parameter schemas lands here, per the official
-   LLM08 scenario); *high* (embedded credentials or tokens, or reliance on
-   hidden-context secrecy for authorization or content policy); *critical*
+   an extracted tool list with parameter schemas, with no credential
+   disclosed and no control bypassed, lands here (Aegis reading of the
+   official Scenario #2); *high* (embedded credentials or tokens, or
+   reliance on hidden-context secrecy for authorization or content
+   policy); *critical*
    (disclosure chains to remote code execution, broad data exfiltration, or
    privilege escalation in a connected system).
 6. **Assess extraction, then de-emphasize it.** Note how easily each source
@@ -257,5 +259,6 @@ Residual risk: <what remains + named acceptor>
   exposure, retrieved-policy leakage, and developer-instruction exposure.
 - `evals/trigger-evals.json` — discrimination against
   `prompt-injection-defender`, `sensitive-disclosure-guard`,
-  `rag-security-architect`, `agent-tool-safety-guard`, and
-  `secrets-identity-hardener`.
+  `rag-security-architect`, `agent-tool-safety-guard`,
+  `secrets-identity-hardener`, `memory-context-poisoning-reviewer`,
+  `model-context-designer`, and `inter-agent-comms-reviewer`.

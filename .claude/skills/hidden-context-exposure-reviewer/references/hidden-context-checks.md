@@ -124,7 +124,7 @@ Wording follows the official OWASP LLM08:2026 severity definitions.
 | Severity | What is in hidden context / how it is relied on |
 |---|---|
 | Informational | no secrets, no security-relevant logic, no reliance on confidentiality |
-| Medium | internal rules, filtering criteria, role descriptions, or workflow logic that meaningfully aids an attacker but does not gate critical decisions (an extracted tool list with parameter schemas lands here, per the official scenario) |
+| Medium | internal rules, filtering criteria, role descriptions, or workflow logic that meaningfully aids an attacker but does not gate critical decisions (Aegis reading of official Scenario #2: an extracted tool list with parameter schemas, no credential disclosed and no control bypassed, lands here) |
 | High | embedded credentials or tokens, or reliance on hidden-context secrecy for authorization or content policy |
 | Critical | disclosure chains to remote code execution, broad data exfiltration, or privilege escalation in a connected system |
 
