@@ -125,18 +125,19 @@ before D50 exactly that shipped 67 times. The contract:
   value: quoting characters and doubled apostrophes are serialization, not
   content, and do not count toward the limit. The 1024-character maximum is
   the Agent Skills specification's; hosts add their own listing limits on
-  top. Claude Code truncates the combined `description` and `when_to_use`
-  text at 1,536 characters in its skill listing, and Codex caps its initial
-  skills list at about 2% of the context window (8,000 characters when the
-  window is unknown), shortening descriptions first (checked 2026-09-26
-  against the [Agent Skills specification](https://agentskills.io/specification),
+  top. Claude Code truncates the combined `description` and its optional
+  `when_to_use` frontmatter field at 1,536 characters in its skill listing,
+  and Codex caps its initial skills list at about 2% of the context window
+  (8,000 characters when the window is unknown), shortening descriptions
+  first (checked 2026-09-26 against the
+  [Agent Skills specification](https://agentskills.io/specification),
   [Claude Code skills](https://code.claude.com/docs/en/skills) and
   [Codex skills](https://learn.chatgpt.com/docs/build-skills)).
 - **Front-load the capability.** Some consumers' native selection sees only
-  roughly the first ~90 characters of the description (D49 measurement: Codex
-  ≈92). The first clause must say what the skill DOES; qualifiers and "Do NOT
-  use" boundaries come later. *(Authoring guidance — judged in review, not
-  mechanically checked.)*
+  roughly the first ~90 characters of the description (D49 measurement,
+  2026-07-18: Codex ≈92). The first clause must say what the skill DOES;
+  qualifiers and "Do NOT use" boundaries come later. *(Authoring guidance —
+  judged in review, not mechanically checked.)*
 - **Manual-only skills lead with the sentinel.** Every skill with
   `disable-model-invocation: true` carries the exact 32-character sentinel
   `MANUAL-ONLY; never auto-invoke. ` (trailing space included) as the FIRST 32
@@ -203,9 +204,11 @@ benefits and drawbacks, and its costs in money, setup time, and ongoing
 maintenance. Mark unknown or changing costs as such; verify current prices
 when exact prices matter. Recommend one option when the known context supports
 it, explain why it fits the user's goals and constraints, and name what missing
-fact would change the recommendation. If essential context is missing, ask one
-discovery question first rather than inventing a recommendation. Then ask one
-atomic decision question, consistent with the owning skill's interview cadence.
+fact would change the recommendation. If essential context is missing, ask
+only for one missing fact per turn, with no recommendation or decision question
+on that turn, until the deciding facts are known; never invent a recommendation.
+Then ask one atomic decision question, consistent with the owning skill's
+interview cadence.
 Keep factual questions and simple approvals focused; they are not option
 comparisons. A user's choice is not authority for installation, spending,
 provisioning, deployment, or another side effect; section 5 still governs.
@@ -545,10 +548,11 @@ trigger description overlaps another skill MUST also ship `evals/trigger-evals.j
 A trigger-evals case whose `expected_skill` is a MANUAL-ONLY skill MUST name that
 skill in its prompt with the strict prefix `Explicitly invoke <skill>. `, because a
 routing test must never model auto-selection of a manual-only skill. This extends,
-and is stricter than, the naming rule the Behavioral Eval Runner's census enforces
+and is stricter than, the naming rule the Behavioral Eval Runner's census applies
 for MANUAL-ONLY positive cases in `evals.json`
-(`tools/behavioral_eval_runner/census.py`); no automated check enforces the
-trigger-evals prefix yet.
+(`tools/behavioral_eval_runner/census.py`, which excludes a non-naming case as an
+incompatible invocation mode rather than failing it); no automated check enforces
+the trigger-evals prefix yet.
 
 **Evals are a repo convention, validated structurally only** (D3 in the
 [decision record](reconciliation/step-0-reconciliation-v4.md)): the validator
