@@ -54,6 +54,8 @@ exclusion edges (skill A says "use B instead" but B never names A). 31 edges
 into 23 target skills were reciprocated in three merged batch PRs, and #395
 also closed one edge added by reconciliation decision D64. Of the other 236,
 235 are census data, not defects, and one is an engine false positive.
+On 2026-09-27, PR #429 (`169e8be`, engine v1.13.2) fixed that false positive
+by matching whole skill names only.
 
 ## Historical baseline (superseded where the current disposition says so)
 
@@ -235,6 +237,9 @@ their materiality is unconfirmed.
   fresh audit of `56ea7e4` reports 234 ROUTE-002 findings, because #393 also
   closed two census edges; a 2026-09-27 audit of `b553d91` reports 233,
   because #409 closed one more census edge.
+  On 2026-09-27, #429 (`169e8be`) fixed the engine false positive (engine
+  v1.13.2 matches whole skill names only); an audit of `169e8be` reports 232
+  ROUTE-002 findings, all census data.
   No AEGIS ID is assigned.
 - **Orchestrator capability numbering.** `project-orchestrator` presents its
   workflow as Capability 1 → 3 → 2 → 4. The sequence matches the declared
