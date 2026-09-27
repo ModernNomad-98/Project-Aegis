@@ -1453,3 +1453,43 @@ generic skill guidance that would require asking for the same approval again.
   [planning record](../reconciliation/step-0-reconciliation-v4.md).
 - **Expiry / use limit:** One run of at most nine sessions. "Expires when the
   run finishes or 2026-09-30."
+
+### AEGIS-APR-058: Overwrite the skill-contract audit baselines
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE; granted and not yet consumed. A later
+  lifecycle event records its consumption.
+- **Date / Grantor:** 2026-09-27 / Peter Nguyen.
+- **Reason:** The committed audit baselines in `artifacts/audits/` and their
+  companion report were produced on 2026-08-07 by engine v1.12.0 (184 skills,
+  414 findings). Later remediation and the v1.13.x engine corrections left
+  them describing an older corpus. A scoping review found no test, CI
+  (continuous integration) job or eval that reads their contents; the source
+  library role check only tests that the baseline JSON (JavaScript Object
+  Notation) file exists.
+- **Owner decision:** In chat with the Claude Code coordinator on 2026-09-27,
+  after being told the costs (it breaks comparisons with past audits, touches
+  a source-library landmark file, supersedes the earlier "left exactly as it
+  is" promise in the AEGIS-060+ register, and leaves the old numbers only in
+  git history), the owner chose to overwrite the baselines with that day's
+  audit numbers. The decision was relayed by the coordinating agent; no
+  verbatim wording is recorded here.
+- **Scope allowed:** One pull request that regenerates, with
+  `scripts/audit-skill-contracts.py` run unchanged on a clean checkout of
+  main, exactly these files:
+  `artifacts/audits/skill-contract-audit-baseline.json`,
+  `artifacts/audits/corpus-route-graph.json`,
+  `artifacts/audits/corpus-manifest-baseline.json` and the companion
+  `docs/audits/skill-contract-audit-baseline.md` (with a hand-written
+  provenance preface); adds dated notes and history links to
+  `docs/audits/aegis-060-plus-register.md`; and appends this entry.
+- **Scope FORBIDDEN:** No protected path. In particular, nothing under
+  `scripts/` or `tools/` changes, including the three source comments that
+  describe the v1.12.0 baseline; they stay as true statements of history. No
+  historical count in the AEGIS-060+ register is rewritten.
+- **Evidence:** Owner decision in the Project Aegis conversation on
+  2026-09-27, relayed by the coordinating agent. The previous baseline files
+  remain in git history at commit
+  `e2f1da0beb6e4aed07044ca3a90e841962bfd590` (PR #77).
+- **Expiry / use limit:** One PR; consumed by its merge, which a later
+  lifecycle event records.
