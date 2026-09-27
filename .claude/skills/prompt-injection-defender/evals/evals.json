@@ -66,6 +66,60 @@
           "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names prompt-injection-defender, not agent-goal-hijack-defender, because trust zones and content/instruction separation are the injection defense layer, not multi-step goal pinning."
         ]
       }
+    },
+    {
+      "id": "positive-multimodal-support-agent",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke prompt-injection-defender. Our support agent accepts customer screenshots, scanned PDF receipts, and voice notes. We run OCR on images and PDFs and speech-to-text on audio, then the agent can issue refunds and email the customer. Harden it against instructions hidden in those files.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats every modality as untrusted data: OCR and speech-to-text output enters context as labeled untrusted content with provenance, never concatenated into system or developer instructions.",
+          "Names concrete hiding places for this feature, including at least low-contrast or hidden text in images or PDFs and a second speaker or quiet command in audio, and flags content a human viewer would not see.",
+          "Keeps the deterministic action boundary primary: refunds and emails are authorized by code against the calling user's permissions, and no instruction, URL, or spoken approval inside a file can trigger a refund or email on its own.",
+          "States detection limits honestly: OCR or transcript filters are labeled rate-reduction only and do not see everything the model or a human could perceive.",
+          "Designs red-team cases per accepted modality (image, PDF, audio) with expected SAFE outcomes and notes the change set is manual-only."
+        ]
+      }
+    },
+    {
+      "id": "edge-native-vision-no-extraction",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke prompt-injection-defender. We send user-uploaded images straight to a vision model with no OCR step; the same call can create calendar events. Can we just sanitize the images first?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains that raw pixels read natively by the model cannot be sanitized of what the model perceives, so filtering is not the control on this path.",
+          "Recommends privilege separation: a tool-less call reads the image and returns schema-constrained fields to a separate step that holds the calendar tool and never sees the raw image.",
+          "Keeps calendar-event creation behind the deterministic boundary against the calling user's permissions, with image content unable to authorize it.",
+          "Does not claim any image detector closes the class; any detection is labeled rate-reduction only."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-ocr-keyword-filter-only",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke prompt-injection-defender. For image uploads, just OCR them, block any that contain 'ignore previous instructions', and call multimodal injection handled.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to treat an OCR keyword filter as the fix: it misses paraphrases, other languages, hidden or low-contrast text the extractor does not recover, and content the model perceives natively.",
+          "Keeps the filter only as a rate-reduction detection layer and requires the deterministic action boundary and labeled untrusted channel as the controls.",
+          "States residual risk and that accepting a filter-only posture needs a named human acceptor via human-approval-boundary."
+        ]
+      }
+    },
+    {
+      "id": "negative-upload-malware-scanning-boundary",
+      "type": "should_not_trigger",
+      "prompt": "Design the upload pipeline for PDF and image attachments: magic-byte type checks, malware scanning, quarantine until the scan passes, and thumbnail generation off the request path.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "prompt-injection-defender does not activate: byte-level validation, malware scanning, quarantine, and derivative processing of uploads are file-upload-storage-architect's scope, and this skill is MANUAL-ONLY and not named.",
+          "If it mentions injection at all, it notes only that a scanned, clean file can still carry instructions for a model and that prompt-injection-defender would be invoked explicitly for that separate concern."
+        ]
+      }
     }
   ]
 }
