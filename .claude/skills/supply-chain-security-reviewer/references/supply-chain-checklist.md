@@ -24,6 +24,13 @@ tampered with, alongside vulnerability counts.
   agent-to-agent communication.
 - **OS / authn:** operating system and authentication (checking a caller's
   identity).
+- **LLM04:2026:** the supply-chain category of the OWASP Top 10 for large
+  language model (LLM) Applications, 2026 edition (LLM03 in 2025).
+- **SBOM / AI-BOM:** software bill of materials, and its AI counterpart — an
+  inventory of model artifacts with digests, sources, licenses, and
+  base-model lineage.
+- **LoRA:** low-rank adaptation, a small fine-tuning adapter loaded on top
+  of a base model.
 
 ## Reachability triage rubric (for scanner output)
 
@@ -114,6 +121,43 @@ package. Scope: ACQUISITION. Integrity of data you curate or pipelines you run
 
 Boundary: a backdoored/poisoned artifact you DOWNLOADED is this skill; poisoning
 of data you COLLECT or a model you TRAIN is `model-poisoning-reviewer`.
+Promotion of either kind of artifact is the next section.
+
+## Promoted model artifacts (OWASP LLM04:2026)
+
+The 2026 edition names promoted-artifact trust: the model artifact serving
+production is not the one that was reviewed or claimed. Scope: every model
+artifact that moves through a registry — acquired or built in-house — from
+the moment it is registered to the moment production loads it. The
+question is integrity and provenance of the ARTIFACT; whether the pipeline
+you run taught it malicious behavior is `model-poisoning-reviewer`.
+
+Trace one artifact end to end and check each link:
+
+| Link | What to verify | Finding when |
+|---|---|---|
+| Identity | Production loads an immutable content digest; the digest equals the one the promotion approved | Serving references a mutable alias, version name, or `latest`; digests differ with no promotion record |
+| Provenance | A signature or attestation ties the digest to the build job, source revision, base model, and data snapshot; verified at promotion AND at load | Unsigned artifacts; signature checked only at upload; attestation names a different digest |
+| Format | Non-executable format (for example safetensors) or a verified restricted loader | Pickle-based checkpoint promoted to production; loader mode unverified |
+| Adapters | A LoRA adapter records and is pinned to its base-model digest; a merged model has its own digest and signature | Adapter on a base resolved by tag; merged model inherits "trust" from its inputs' signatures |
+| Registry access | Write, overwrite, and promote rights are least-privilege and separate from training rights; registered versions are immutable; promotions are logged | A training job or broad CI token can overwrite a version or move the production alias |
+| Promotion gate | Staging to production requires evaluation and human-approval evidence bound to the digest | Approval recorded against a version name; gate skippable by a direct registry call |
+| Inventory | Model card, license, and an SBOM/AI-BOM entry exist for what ships and match the signed source | License or lineage unknown for a production model |
+
+Notes:
+
+- Verify at load, not only at promotion: a swap between gate and load
+  defeats a gate that only checks at promotion.
+- Signing proves origin, not safety — a signed pickle still executes code,
+  and a signed model can still carry a learned backdoor.
+- Converting an untrusted pickle to safetensors requires loading it; do the
+  conversion in an isolated environment or re-export from a trusted build.
+- Registry infrastructure declared in infrastructure-as-code (bucket
+  policies, identity roles) is reviewed as a diff by `iac-reviewer`; this
+  section states the access the promotion path needs.
+- Whether the gate's evaluation would catch a poisoned behavior is
+  `model-poisoning-reviewer`; running the evaluation is
+  `ai-evaluation-harness` (manual-only).
 
 ## Agentic supply chain (OWASP Agentic ASI04)
 
@@ -153,14 +197,19 @@ action → material impact, which may include code execution, secret theft,
 data exposure or corruption, unauthorized action, or availability loss.
 Reachable runtime exploit,
 install-time script execution, an untrusted-CI-to-secret path, or loading a
-pickle-serialized model from an untrusted source qualifies. A latent
+pickle-serialized model from an untrusted source qualifies, as does a
+production model alias that a non-release identity can re-point. A latent
 unreachable CVE does not — rank it low and say why.
 
 ## Handoffs
 
 - First-party SAST/CodeQL findings → `static-analysis-reviewer`.
 - Integrity of curated training data / feedback loops / RAG ingestion →
-  `model-poisoning-reviewer` (acquire-vs-ingest split).
+  `model-poisoning-reviewer` (acquire-vs-ingest split); learned-behavior
+  poisoning in a promoted model → `model-poisoning-reviewer`
+  (artifact-integrity-vs-learned-behavior split).
+- Registry infrastructure changes in an infrastructure-as-code (IaC) diff →
+  `iac-reviewer`.
 - Live agent/MCP message security (authn, integrity, replay) →
   `inter-agent-comms-reviewer` (install-vs-runtime split, ASI04 vs ASI07).
 - Applying an upgrade/CI change → separate classified, approved change.

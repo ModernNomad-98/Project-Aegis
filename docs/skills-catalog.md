@@ -381,7 +381,7 @@ per-command negative-test plan.
 | `multi-tenant-security-tester` | cat 03 #93/#95 + cat 06 | **no** (manual-only; executes state-changing operations) | Executable cross-tenant/authorization negative suite: two-tenant fixtures, forbidden-action-denied assertions, positive controls, IDOR/list/mass-assignment/exports/jobs, honest coverage. |
 | `rls-policy-auditor` | cat 03 #94/#95/#96/#97/#98/#99/#100/#102 (merged author + negative-test designer) | yes | Per-command RLS audit/authoring: recursion, unsafe SECURITY DEFINER, broad grants, missing tenant scope, service-role leakage, frontend-derived scope; mandatory negative-test plan; delivers policies as a migration, never runs live DDL. |
 | `secrets-identity-hardener` | cat 03 #103/#104/#123/#109 | **no** (manual-only; edits code/config) | Env classification (catches VITE_/NEXT_PUBLIC_ leaks), moves secrets server-side with a client-bundle-absence proof, rotates leaked creds, least-privilege service accounts, session/token flags. |
-| `supply-chain-security-reviewer` | cat 03 #121/#122 | yes | SLSA-style: lockfile-based dependency set, reachability triage of scanner output, install/build-script and CI compromise paths, SHA pinning, compromise-path-gated severity. |
+| `supply-chain-security-reviewer` | cat 03 #121/#122 | yes | SLSA-style: lockfile-based dependency set, reachability triage of scanner output, install/build-script and CI compromise paths, SHA pinning, compromise-path-gated severity; extended to promoted model artifacts (OWASP LLM04:2026): served digest equals approved digest, signature/provenance verified at promotion and load, safe format, adapter-to-base pinning, registry promote access, digest-bound promotion gate, model card/license/AI-BOM (artifact integrity; learned-behavior poisoning stays with `model-poisoning-reviewer`). |
 | `security-pr-reviewer` | cat 03 #114/#111/#112/#113 + cat 08 #277 | yes | Security lens on an ACTUAL diff: authz/object-level/tenant-scope, injection, secrets, SSRF, control-weakening detection; exploit-path-gated findings; no diff, no review. |
 | `secure-migration-reviewer` | cat 03 #126 | yes | Whole-migration deploy safety: RLS/policy gaps, GRANT widening, unsafe defaults, destructive/irreversible ops, tenant-scoped backfills, lock risk, expand→contract deploy order, rollback; delegates policy text to `rls-policy-auditor`. |
 | `static-analysis-reviewer` | cat 03 #121 adjacent + cat 06/08 | yes | Triages SAST/CodeQL/SARIF on first-party code: dedup, confirm-against-code disposition (TP/FP/dup/accepted), five-axis ranking (reachability/exploitability/asset/tenant/business), written suppression policy. |
@@ -532,7 +532,12 @@ Phase 4 `supply-chain-security-reviewer` was extended (scoped diff) to cover the
 AI/ML supply chain — third-party models, datasets, and fine-tuning adapters
 (provenance, revision pinning, unsafe pickle/`torch.load` serialization vs
 safetensors), with an explicit acquire-vs-ingest boundary handing curated-data
-and pipeline integrity to `model-poisoning-reviewer`. **LLM06 (Unbounded
+and pipeline integrity to `model-poisoning-reviewer`. Per the owner decision of
+2026-09-27 closing the D65 LLM04 gap, it also covers the promoted-artifact
+trust the 2026 edition names: registry promotion (staging to production) of
+any model artifact, acquired or built in-house, bound to an immutable, signed
+digest; whether a pipeline you run taught that artifact malicious behavior
+stays with `model-poisoning-reviewer`. **LLM06 (Unbounded
 Consumption)** DoS/denial-of-wallet coverage is baked INTO
 `ai-cost-guardrail-designer`, not a separate skill. `ai-evaluation-harness`
 absorbs the AI security test harness (no separate `ai-security-test-harness`).

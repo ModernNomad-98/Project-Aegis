@@ -72,7 +72,12 @@ A category is **in scope** when the system has the ingredient it abuses:
   adapter, unsafe serialization (pickle), unpinned model revisions, malicious
   AI-framework dependency.
 - Promoted-artifact trust (named in the 2026 scope): the model artifact
-  promoted to production is not the one that was reviewed or claimed.
+  promoted to production is not the one that was reviewed or claimed —
+  a re-pointed registry alias, an unsigned or unverified digest, a
+  pickle-based checkpoint, an adapter on an unpinned base, or promote
+  rights held by a training job. Owned by `supply-chain-security-reviewer`
+  (promoted-model-artifacts section); whether the artifact learned a
+  backdoor from a pipeline you run is LLM05.
 - Seed: "Team pulls a 'community' adapter for a hub model; it carries a
   backdoor trigger phrase."
 - Owner: `supply-chain-security-reviewer` (extended per D6).
