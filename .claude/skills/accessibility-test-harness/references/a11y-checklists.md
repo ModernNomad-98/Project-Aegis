@@ -7,8 +7,9 @@ human judgment, then run the keyboard and screen-reader passes. In this file,
 **E2E** means end-to-end testing, **ARIA** means Accessible Rich Internet
 Applications, **CI** means continuous integration, **SR** means screen reader,
 and **WCAG** means Web Content Accessibility Guidelines. Numbered criteria below
-refer to WCAG. **AT** means assistive technology; **NVDA** (NonVisual Desktop
-Access) and **JAWS** (Job Access With Speech) are screen readers.
+refer to WCAG 2.2; every criterion cited also exists in WCAG 2.1. **AT** means
+assistive technology; **NVDA** (NonVisual Desktop Access) and **JAWS** (Job
+Access With Speech) are screen readers.
 
 ## Automated vs manual split (core table)
 

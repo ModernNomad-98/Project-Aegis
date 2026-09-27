@@ -1,9 +1,10 @@
 # AWS Mapping Reference
 
-Detail file for `aws-saas-architect`. Loaded on demand. Service names are
-stable AWS primitives; anything quota-, instance-type-, price-, or
-region-specific is a verification item against current AWS docs, never
-asserted from here.
+Detail file for `aws-saas-architect`. Loaded on demand. Service names map to
+AWS primitives, but names are also volatile: confirm current service names and
+retirements before a design (verification item). Anything quota-,
+instance-type-, price-, or region-specific is a verification item against
+current AWS docs, never asserted from here.
 
 **Reading key:** AWS means Amazon Web Services. The [parent skill's terms](../SKILL.md)
 define the account, identity, network, compute, and security abbreviations used

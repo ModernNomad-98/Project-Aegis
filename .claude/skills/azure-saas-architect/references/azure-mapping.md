@@ -1,8 +1,10 @@
 # Azure Mapping Reference
 
-Detail file for `azure-saas-architect`. Loaded on demand. Service names are
-stable Azure primitives; anything SKU-, quota-, price-, or region-specific is
-a verification item against current Azure docs, never asserted from here.
+Detail file for `azure-saas-architect`. Loaded on demand. Service names map
+to Azure primitives, but names are also volatile: confirm current service names
+and retirements before a design (verification item). Anything SKU-, quota-,
+price-, or region-specific is a verification item against current Azure docs,
+never asserted from here.
 
 **Reading key:** The [parent skill's terms](../SKILL.md) define the identity,
 network, deployment, and security abbreviations used here. Additional terms:

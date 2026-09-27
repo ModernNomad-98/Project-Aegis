@@ -44,7 +44,8 @@ concrete failure story before designing for it — it usually dissolves into
 per-entity ordering plus an idempotent projection.
 Verify producer retry and in-flight behavior against the selected broker;
 [Kafka producer configuration](https://kafka.apache.org/40/configuration/producer-configs/)
-documents one way batches can reorder when idempotence is disabled.
+documents one way batches can reorder when idempotence is disabled (link is
+version-specific; verify against the installed version).
 
 ## Delivery semantics — the honest table
 
