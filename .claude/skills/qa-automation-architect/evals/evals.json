@@ -75,7 +75,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke qa-automation-architect: diagnosing one specific flaky spec is casework; the architect only sets the flake-management policy.",
-          "Does not auto-invoke flaky-test-detective (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute qa-automation-architect or another skill for it."
+          "Does not auto-invoke flaky-test-detective (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute qa-automation-architect for it."
         ]
       }
     },
@@ -87,7 +87,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke qa-automation-architect: a golden dataset and graders for chatbot quality, safety, and hallucination rate evaluate model behavior; this skill designs code-test automation architecture.",
-          "Does not auto-invoke ai-evaluation-harness (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute qa-automation-architect or another skill for it."
+          "Does not auto-invoke ai-evaluation-harness (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute qa-automation-architect for it."
         ]
       }
     }

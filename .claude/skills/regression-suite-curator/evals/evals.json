@@ -75,7 +75,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke regression-suite-curator: a golden dataset and graders for chatbot quality, safety, and hallucination rate evaluate model behavior; this skill curates code-test regression membership.",
-          "Does not auto-invoke ai-evaluation-harness (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute regression-suite-curator or another skill for it."
+          "Does not auto-invoke ai-evaluation-harness (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute regression-suite-curator for it."
         ]
       }
     }

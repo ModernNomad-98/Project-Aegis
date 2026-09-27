@@ -95,7 +95,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke profiling-methodology-designer: the suspect is already evidenced and singular with plan output in hand, so a profiling methodology would be ceremony.",
-          "Does not auto-invoke query-plan-reader (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute profiling-methodology-designer or another skill for it."
+          "Does not auto-invoke query-plan-reader (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute profiling-methodology-designer for it."
         ]
       }
     },
@@ -107,7 +107,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke profiling-methodology-designer: hundreds of near-identical queries per load is the chatty data-access signature, which needs pattern diagnosis and a batching or eager-load fix rather than time attribution.",
-          "Does not auto-invoke n-plus-one-detector (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute profiling-methodology-designer or another skill for it."
+          "Does not auto-invoke n-plus-one-detector (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute profiling-methodology-designer for it."
         ]
       }
     },
@@ -119,7 +119,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke profiling-methodology-designer: the deliverable is permanent instrumentation and a continuous dashboard, not a bounded attribution investigation with a stop rule.",
-          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute profiling-methodology-designer or another skill for it."
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute profiling-methodology-designer for it."
         ]
       }
     }

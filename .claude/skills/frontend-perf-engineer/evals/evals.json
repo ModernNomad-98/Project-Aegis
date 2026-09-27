@@ -94,7 +94,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke frontend-perf-engineer: a lazy chunk that 404s and a broken env-specific import are build-correctness defects, not bundle speed work.",
-          "Does not auto-invoke vite-build-qa-engineer (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute frontend-perf-engineer or another skill for it."
+          "Does not auto-invoke vite-build-qa-engineer (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute frontend-perf-engineer for it."
         ]
       }
     }

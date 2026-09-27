@@ -75,7 +75,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke accessibility-test-harness: automating a user journey as a regression test is E2E engineering, and no accessibility lens (keyboard, labels, focus, contrast) was requested.",
-          "Does not auto-invoke playwright-e2e-engineer (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute accessibility-test-harness or another skill for it."
+          "Does not auto-invoke playwright-e2e-engineer (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute accessibility-test-harness for it."
         ]
       }
     }

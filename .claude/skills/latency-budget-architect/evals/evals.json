@@ -94,7 +94,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke latency-budget-architect: span instrumentation and a production dashboard are live telemetry implementation, not budget allocation across hops.",
-          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute latency-budget-architect or another skill for it."
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute latency-budget-architect for it."
         ]
       }
     },
@@ -106,7 +106,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke latency-budget-architect: the hop's allowance is already set; getting one over-budget query back under it with the plan in hand is plan-reading work, not budget design.",
-          "Does not auto-invoke query-plan-reader (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute latency-budget-architect or another skill for it."
+          "Does not auto-invoke query-plan-reader (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute latency-budget-architect for it."
         ]
       }
     }

@@ -61,7 +61,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke code-reviewer: the ask is to apply behavior-preserving edits, not to produce a findings report.",
-          "Does not auto-invoke code-simplifier (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute code-reviewer or another skill for it."
+          "Does not auto-invoke code-simplifier (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute code-reviewer for it."
         ]
       }
     }

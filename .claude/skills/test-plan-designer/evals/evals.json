@@ -60,7 +60,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke test-plan-designer: cross-tenant negative tests are delegated out of test plans and appear there only as referenced line items.",
-          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute test-plan-designer or another skill for it."
+          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute test-plan-designer for it."
         ]
       }
     }

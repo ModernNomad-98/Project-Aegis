@@ -61,7 +61,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke principal-code-analyst: the analysis is complete and the ask is to apply a named behavior-preserving cleanup.",
-          "Does not auto-invoke code-simplifier (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute principal-code-analyst or another skill for it."
+          "Does not auto-invoke code-simplifier (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute principal-code-analyst for it."
         ]
       }
     }

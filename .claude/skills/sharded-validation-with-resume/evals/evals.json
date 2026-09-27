@@ -76,7 +76,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke sharded-validation-with-resume: the request is a local pre-commit run with a baseline and failure classification, not a shard architecture.",
-          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume or another skill for it."
+          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume for it."
         ]
       }
     },
@@ -88,7 +88,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke sharded-validation-with-resume: stage ordering, build-once artifacts, and deploy gates are the delivery pipeline's stage graph; shard design covers only one validation stage's internals.",
-          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume or another skill for it."
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume for it."
         ]
       }
     }

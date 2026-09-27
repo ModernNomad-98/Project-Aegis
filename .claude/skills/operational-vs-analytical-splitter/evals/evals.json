@@ -94,7 +94,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke operational-vs-analytical-splitter: one query regressed and its plan is provided, so no operational/analytical workload split is in question.",
-          "Does not auto-invoke query-plan-reader (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute operational-vs-analytical-splitter or another skill for it."
+          "Does not auto-invoke query-plan-reader (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute operational-vs-analytical-splitter for it."
         ]
       }
     }

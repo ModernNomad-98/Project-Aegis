@@ -76,7 +76,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke risk-tiered-validation-selector: the tier is already chosen, and the ask is to execute it locally against a clean-main baseline.",
-          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute risk-tiered-validation-selector or another skill for it."
+          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute risk-tiered-validation-selector for it."
         ]
       }
     }

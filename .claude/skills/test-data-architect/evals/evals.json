@@ -61,7 +61,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke test-data-architect: two-tenant fixtures plus cross-tenant denial assertions form a security negative suite; this skill only keeps general fixture catalogs compatible with it.",
-          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute test-data-architect or another skill for it."
+          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute test-data-architect for it."
         ]
       }
     },
@@ -73,7 +73,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke test-data-architect: one intermittently failing test is flake casework; shared-data design enters only if that diagnosis names it as the cause.",
-          "Does not auto-invoke flaky-test-detective (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute test-data-architect or another skill for it."
+          "Does not auto-invoke flaky-test-detective (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute test-data-architect for it."
         ]
       }
     }
