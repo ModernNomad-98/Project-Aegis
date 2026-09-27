@@ -32,6 +32,10 @@ request-changes, with the blocking findings named.
   — that is `full-codebase-auditor`.
 - Do NOT use when: the ask is a strategic architecture read on a subsystem —
   that is `principal-code-analyst`.
+- Do NOT use when: the review is security-focused — that is
+  `security-pr-reviewer`; this skill gives the general severity-ranked pass.
+- Do NOT use when: the PR changes the skill library — that is
+  `library-diff-reviewer`; this skill reviews product-code diffs.
 - Never review from a description of a change. No diff obtained = no review;
   say so.
 

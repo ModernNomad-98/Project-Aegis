@@ -38,6 +38,9 @@ design — that `product-spec-writer` turns into a specification.
 - Do NOT use when: the conflict is about matters of FACT across
   authoritative sources (which config/doc/number is correct) rather than
   about what to build — that is `source-of-truth-reconciler`.
+- Do NOT use when: running a whole new-product journey — that is
+  `project-orchestrator`, which runs this skill as Stage 1 and stays the
+  conversation owner.
 
 ## Inputs to Inspect
 

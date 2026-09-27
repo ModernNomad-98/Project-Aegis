@@ -49,6 +49,10 @@ technical decision to `adr-writer`.
   delivery, targeting, guardrail auto-rollback) — that is
   `feature-flag-rollout-strategist`; the spec states the rollout INTENT
   and success metrics, not the flag plumbing.
+- Do NOT use when: writing the engineering design doc — that is
+  `tech-spec-writer`; this skill captures the user-facing what and why.
+- Do NOT use when: driving a vague app idea end to end — that is
+  `project-orchestrator`, which invokes this skill when Stage 2 begins.
 
 ## Inputs to Inspect
 

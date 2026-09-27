@@ -33,6 +33,10 @@ a system that does not exist.
   to the `principal-architecture-reviewer` subagent.
 - Do NOT use when: designing job retry, scheduling, or idempotency semantics —
   hand those to `background-job-orchestration-architect`.
+- Do NOT use when: choosing the architecture style — that is
+  `architecture-advisor`; this skill produces the concrete structure.
+- Do NOT use when: designing tenancy — that is `saas-platform-architect`;
+  this skill handles structure with no tenancy dimension.
 
 ## Inputs to Inspect
 

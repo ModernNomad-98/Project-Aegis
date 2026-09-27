@@ -33,6 +33,9 @@ captures nothing.
 - Do NOT use when: the ask is visual-regression pixel-diff tooling — that is
   automation architecture (`qa-automation-architect`) with this policy as
   input.
+- Do NOT use when: running the compliance evidence program — that is
+  `compliance-evidence-collector`; this skill sets the QA evidence policy
+  that program formalizes.
 
 ## Inputs to Inspect
 

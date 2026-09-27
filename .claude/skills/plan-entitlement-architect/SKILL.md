@@ -35,6 +35,11 @@ nobody knows what the Pro plan actually is.
   margins — `saas-cost-architect` (it consumes this skill's matrix).
 - Do NOT use when: deciding pooled-vs-siloed or control-plane structure —
   `saas-platform-architect`.
+- Do NOT use when: designing the flag system itself — that is
+  `feature-flag-architect`; this skill owns "does this plan include X."
+- Do NOT use when: planning one change's flag rollout — that is
+  `feature-flag-rollout-strategist`; release flags stay separate from plan
+  entitlements.
 
 ## Inputs to Inspect
 
