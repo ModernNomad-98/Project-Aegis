@@ -1,2 +1,6 @@
 # Local clone of the owner-only calibration input repository.
 .private-calibration-inputs/
+
+# Python bytecode caches created by running the validators and tests.
+__pycache__/
+*.pyc
