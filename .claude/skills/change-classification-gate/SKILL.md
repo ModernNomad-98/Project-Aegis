@@ -1,6 +1,6 @@
 ---
 name: change-classification-gate
-description: Classify a requested change before starting work — docs-only, UI/style, frontend logic, backend/API, schema/migration, RLS/security, cloud/IaC, AI/agentic behavior, QA/test-only, refactor, bug fix, or release — and map the class to its required validation level and approval path. Locks scope to the approved class and file set; mid-task scope growth forces reclassification. Use when starting any non-trivial change, when a task mixes change types, or when work is drifting beyond what was asked.
+description: Classify a requested change before starting work — docs-only, UI/style, frontend logic, backend/API, schema/migration, RLS/security, cloud/IaC, AI/agentic behavior, QA/test-only, refactor, bug fix, or release — and map the class to its required validation level and approval path. Locks scope to the approved class and file set; mid-task scope growth forces reclassification. Use when starting any non-trivial change, when a task mixes change types, or when work is drifting beyond what was asked. Do NOT use to pick fast vs full validation depth from touched files (risk-tiered-validation-selector).
 ---
 
 # Change Classification Gate
