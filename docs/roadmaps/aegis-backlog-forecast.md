@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-**Current reading at the 2026-09-26 catch-up checkpoint after #370:** twenty-six PRs merged after #344 without a checkpoint, missing the windows ending #349, #354, #359, #364 and #369. The #344 maintenance subtotal (5.5–12 active hours) is fully delivered by #348–#356, and later merges closed further eval-corpus and review gaps. The owner's 2026-09-26 approval of the bounded #331 BER correction, recorded by #365 ([material owner decision](#material-owner-decision--2026-09-26-331-ber-correction-and-333-option-a)), added 4–8 active hours, making the subtotal 75–154 while it was undelivered; #374 has since implemented and merged that correction, so the current bounded selected planning subtotal is **71–146 provisional active hours**. Outside it, the owner-choice teaching backlog is 23 skills after S5 added one step: 17 are delivered (S1, including the two deferred skills merged in #373, S2 and S3) and 6 are in open PRs (S4 as #376 and the S5 step as #377). The R2 wording batch, open at this reading, has since merged as #372, and the owner-requested feature-flag architecture skill adds a provisional **2.5–5 active hours**. #380 and #372 merged after this reading and complete the five-merge window that #370 opened, so the next checkpoint is due. Stage 4B and BER-BKL-009 host residuals remain TBD and the VM paused, so the full selected and all-options totals still have **no finite ETA**. See the [catch-up checkpoint after #370](#five-merge-checkpoint--2026-09-26-after-pull-request-370-catch-up-for-the-windows-ending-349-354-359-364-369).
+**Current reading at the 2026-09-26 catch-up checkpoint after #370:** twenty-six PRs merged after #344 without a checkpoint, missing the windows ending #349, #354, #359, #364 and #369. The #344 maintenance subtotal (5.5–12 active hours) is fully delivered by #348–#356, and later merges closed further eval-corpus and review gaps. The owner's 2026-09-26 approval of the bounded #331 BER correction, recorded by #365 ([material owner decision](#material-owner-decision--2026-09-26-331-ber-correction-and-333-option-a)), added 4–8 active hours, making the subtotal 75–154 while it was undelivered; #374 has since implemented and merged that correction, so the current bounded selected planning subtotal is **71–146 provisional active hours**. Outside it, the owner-choice teaching backlog is 23 skills after S5 added one step: at this reading 17 were delivered (S1, including the two deferred skills merged in #373, S2 and S3) and 6 were in open PRs (S4 as #376 and the S5 step as #377); both have since merged, so all 23 are delivered. The R2 wording batch, open at this reading, has since merged as #372, and the owner-requested feature-flag architecture skill adds a provisional **2.5–5 active hours**. #380 and #372 merged after this reading and complete the five-merge window that #370 opened, so the next checkpoint is due; #382, #378 (the feature-flag proposal page), #375, #376 and #377 merged later still, on 2026-09-27 UTC. Stage 4B and BER-BKL-009 host residuals remain TBD and the VM paused, so the full selected and all-options totals still have **no finite ETA**. See the [catch-up checkpoint after #370](#five-merge-checkpoint--2026-09-26-after-pull-request-370-catch-up-for-the-windows-ending-349-354-359-364-369).
 
 **Earlier reading at the 2026-09-26 checkpoint after #344:** choice-guidance batch B ([PR #334](https://github.com/ModernNomad-98/Project-Aegis/pull/334)) and batch C ([PR #342](https://github.com/ModernNomad-98/Project-Aegis/pull/342), merged 11:30:40 UTC as `32f2787d3dd4732d3a7971924ee6b4a753e06392`) are both delivered, so no part of the original three-batch 3–6-hour estimate remains. The bounded selected planning subtotal is again the ten core rows: **71–146 provisional active hours**. The 72–148-hour figure that [PR #343](https://github.com/ModernNomad-98/Project-Aegis/pull/343) published four seconds after #342 merged is superseded by that delivery. Additional skill-choice guidance and eval maintenance (batches J, O, P, Q and R, plus non-blocking review follow-ups) stays **outside** that subtotal at a provisional **5.5–12 active hours**. Issue #101 Stage 4B host proof and BER-BKL-009 host residuals remain TBD and the VM stays paused. After this checkpoint the owner approved the bounded #331 BER correction and #333 option A ([material owner decision](#material-owner-decision--2026-09-26-331-ber-correction-and-333-option-a)), adding a provisional 4–8 active hours, so the bounded selected planning subtotal becomes **75–154 provisional active hours**. Neither decision closes a host or calibration gate, so the full selected and all-options totals still have **no finite ETA**. See the [five-merge checkpoint after #344](#five-merge-checkpoint--2026-09-26-after-pull-request-344).
 
@@ -186,10 +186,11 @@ S2 (#368), S3 (#370) and the other two S1 skills, project-orchestrator and
 requirements-gathering-facilitator. Those two were deferred from #366 because
 `scripts/tests/test_validator.py` pinned their eval counts, and [PR #373](https://github.com/ModernNomad-98/Project-Aegis/pull/373)
 delivered them when it merged at 23:32:15 UTC as `4ca04c1e`. S4 (five skills)
-is open as #376 and not delivered, so 5 of the 22 are in open PRs. S5 held six skills classified UNSURE; it resolved on
+was open as #376 at this reading, so 5 of the 22 were in open PRs. S5 held six skills classified UNSURE; it resolved on
 2026-09-26, when the owner accepted all six verdicts: 1 of 6 needs a step
-(`feature-flag-rollout-strategist`), open as #377. The backlog is therefore
-23 skills: 17 delivered and 6 in open PRs. No per-batch split of the original
+(`feature-flag-rollout-strategist`), then open as #377. The backlog was
+therefore 23 skills at this reading: 17 delivered and 6 in open PRs; #376
+and #377 have since merged, so all 23 are delivered. No per-batch split of the original
 range exists, so the remainder is provisional and unscored rather than a
 subtracted figure; confidence is low. A separate R2 wording batch (six
 owner-choice steps) was open as #372 at this reading and has since merged;
@@ -243,12 +244,26 @@ as `40c734f0`, and [PR #372](https://github.com/ModernNomad-98/Project-Aegis/pul
 the R2 wording batch (six owner-choice steps that now state one question and
 no authority), merged at 23:54:35 UTC as `2500d35c`. They are the fourth and
 fifth merges of the window that #370 opened, so the next checkpoint is due;
-this record does not reassess them. #376 (S4) and #377 (the S5 step) remain
-open, so the owner-choice counts above are unchanged. #372's review-fix
+this record does not reassess them or the merges below. #372's review-fix
 commit also committed two `scripts/__pycache__` bytecode files by mistake;
 cleanup [PR #382](https://github.com/ModernNomad-98/Project-Aegis/pull/382),
 which `gate-guard` flagged for its protected `scripts/` paths, merged on
-2026-09-27 at 01:29:38 UTC as `0d05a838`. Owner decisions made later on 2026-09-26 are
+2026-09-27 at 01:29:38 UTC as `0d05a838`.
+
+Later on 2026-09-27 (UTC), [PR #378](https://github.com/ModernNomad-98/Project-Aegis/pull/378)
+merged the owner-accepted `feature-flag-architect` scope proposal page at
+01:40:32 UTC as `a2d2b831`; the skill itself is still in progress and the
+orchestrator route not started. [PR #375](https://github.com/ModernNomad-98/Project-Aegis/pull/375)
+(trigger seams) merged at 01:44:00 UTC as `5fbe7cd8`,
+[PR #376](https://github.com/ModernNomad-98/Project-Aegis/pull/376) (S4, five
+skills) at 01:44:03 UTC as `4bed0112` and
+[PR #377](https://github.com/ModernNomad-98/Project-Aegis/pull/377) (the S5
+step for `feature-flag-rollout-strategist`) at 01:44:07 UTC as `5c14ba95`.
+With S4 and the S5 step merged, all 23 owner-choice skills are delivered and
+none is in an open PR; active time was not measured, so the provisional
+8.5–16.5-hour range is not scored. #378 added one accepted reader page, so
+main now has 606 tracked Markdown files: 562 accepted reader pages and 44
+classified fixtures, with zero known pending pages. Owner decisions made later on 2026-09-26 are
 listed in the [open-decisions index](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-26);
 none changes an estimate above.
 
