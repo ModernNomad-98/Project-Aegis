@@ -1,7 +1,7 @@
 {
   "skill": "prompt-injection-defender",
   "description": "Trigger discrimination for the Phase 7 threat & injection cluster: injection defense design vs whole-system threat modeling vs prompt-secrecy vs retrieval authz vs tool scope, and against the shipped security-pr-reviewer and the ai-security-red-team-reviewer subagent.",
-  "overlaps_with": ["ai-threat-modeler", "hidden-context-exposure-reviewer", "rag-security-architect", "agent-tool-safety-guard", "security-pr-reviewer", "ai-security-red-team-reviewer (subagent)"],
+  "overlaps_with": ["ai-threat-modeler", "hidden-context-exposure-reviewer", "rag-security-architect", "agent-tool-safety-guard", "file-upload-storage-architect", "security-pr-reviewer", "ai-security-red-team-reviewer (subagent)"],
   "cases": [
     {
       "id": "injection-defense-wins-here",
@@ -37,6 +37,20 @@
       "expected_skill": "ai-security-red-team-reviewer (subagent)",
       "should_not_trigger": ["prompt-injection-defender"],
       "reason": "Hands-on adversarial probing of a live system is the red-team subagent; this skill designs the defense and the suite, it doesn't execute the attack."
+    },
+    {
+      "id": "multimodal-injection-wins-here",
+      "prompt": "Explicitly invoke prompt-injection-defender. Our assistant reads uploaded screenshots and PDFs; design the defense so hidden text or QR codes in those files can't make it send emails.",
+      "expected_skill": "prompt-injection-defender",
+      "should_not_trigger": ["file-upload-storage-architect", "rag-security-architect"],
+      "reason": "What the content of an image or document can make the model do is multimodal LLM01 injection; file-upload-storage-architect secures accepting and storing the file, not the instructions inside it."
+    },
+    {
+      "id": "upload-scanning-goes-to-file-upload-architect",
+      "prompt": "Uploaded images and PDFs must be type-checked by magic bytes, malware-scanned, and kept non-servable until the scan passes. Design that pipeline.",
+      "expected_skill": "file-upload-storage-architect",
+      "should_not_trigger": ["prompt-injection-defender"],
+      "reason": "Byte-level validation, malware scanning, and quarantine of uploads are file-upload-storage-architect's upload-safety scope; prompt-injection-defender owns only instruction-injection through the content's meaning."
     }
   ]
 }
