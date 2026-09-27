@@ -22,7 +22,7 @@
       "prompt": "Make sure each tool the agent calls executes with the calling user's permissions and validates its arguments first.",
       "expected_skill": "agent-tool-safety-guard",
       "should_not_trigger": ["agent-identity-privilege-reviewer"],
-      "reason": "Binding individual tool calls to the calling user's authority with argument validation is the LLM06/ASI02 tool boundary; the identity reviewer covers the fleet-level identity and delegation model those checks enforce against."
+      "reason": "Binding individual tool calls to the calling user's authority with argument validation is the LLM03/ASI02 tool boundary; the identity reviewer covers the fleet-level identity and delegation model those checks enforce against."
     },
     {
       "id": "sdlc-authority-goes-to-authz-matrix",

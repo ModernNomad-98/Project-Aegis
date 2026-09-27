@@ -39,7 +39,7 @@
         "triggers": true,
         "assertions": [
           "Check 3 identifies substantial duplication: the shipped supply-chain-security-reviewer already owns this exact scope via its ASI04 extension (MCP servers/manifests, tool/skill registries, plugins).",
-          "Recommendation is make-it-an-extension (or reject-as-duplicate if nothing new remains), naming supply-chain-security-reviewer as the base and citing the library's LLM03/ASI04 extension-over-clone precedent.",
+          "Recommendation is make-it-an-extension (or reject-as-duplicate if nothing new remains), naming supply-chain-security-reviewer as the base and citing the library's LLM04/ASI04 extension-over-clone precedent.",
           "Does not soften the finding because the draft is otherwise well-written — well-structured duplication is still duplication."
         ]
       }

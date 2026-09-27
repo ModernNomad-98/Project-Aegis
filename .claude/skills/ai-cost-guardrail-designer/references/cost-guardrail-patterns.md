@@ -1,7 +1,7 @@
 # AI cost & consumption guardrail patterns
 
-Detail for the owning [AI Cost Guardrail Designer](../SKILL.md). OWASP LLM10 (Unbounded Consumption —
-DoS and denial-of-wallet), 2025.
+Detail for the owning [AI Cost Guardrail Designer](../SKILL.md). OWASP LLM06 (Unbounded Consumption —
+DoS and denial-of-wallet), 2026 (LLM10 in 2025).
 
 ## Layered limit catalog
 

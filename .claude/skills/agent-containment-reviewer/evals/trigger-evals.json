@@ -15,7 +15,7 @@
       "prompt": "Add token caps, per-tenant AI budgets, and burn-rate alerts before our LLM bill gets away from us.",
       "expected_skill": "ai-cost-guardrail-designer",
       "should_not_trigger": ["agent-containment-reviewer"],
-      "reason": "Consumption/spend guardrails (LLM10) are the cost designer's; containment composes those budgets into cascade control but owns fault and drift, not the caps themselves."
+      "reason": "Consumption/spend guardrails (LLM06) are the cost designer's; containment composes those budgets into cascade control but owns fault and drift, not the caps themselves."
     },
     {
       "id": "live-incident-goes-to-runbook",
@@ -43,7 +43,7 @@
       "prompt": "Review the sandbox around the Python our agent writes and executes so generated code can't escape or reach secrets.",
       "expected_skill": "llm-output-safety-reviewer",
       "should_not_trigger": ["agent-containment-reviewer"],
-      "reason": "The execution sandbox for agent-generated code is the LLM05/ASI05 output-handling surface; containment bounds failure spread BETWEEN agents, not the code-exec sink inside one."
+      "reason": "The execution sandbox for agent-generated code is the LLM10/ASI05 output-handling surface; containment bounds failure spread BETWEEN agents, not the code-exec sink inside one."
     }
   ]
 }

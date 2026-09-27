@@ -21,7 +21,7 @@
       "expected_skill": "rag-security-architect",
       "should_not_trigger": ["search-architecture-designer"],
       "note": "SEAM CASE (primary, reverse) — embeddings, similarity search, vector-store access control, and injection-via-retrieval are AI retrieval security. This is semantic, not lexical, search.",
-      "reason": "Vector/embedding retrieval and its security (LLM08) are rag-security-architect. search-architecture-designer designs keyword/faceted search; a hybrid defers the vector half there."
+      "reason": "Vector/embedding retrieval and its security (LLM09) are rag-security-architect. search-architecture-designer designs keyword/faceted search; a hybrid defers the vector half there."
     },
     {
       "id": "base-tenancy-goes-to-multi-tenant-data-architect",

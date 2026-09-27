@@ -24,7 +24,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Identifies embedding inversion (LLM08): raw vectors can approximately reconstruct source PII, so exposing them to clients is a disclosure risk.",
+          "Identifies embedding inversion (LLM09): raw vectors can approximately reconstruct source PII, so exposing them to clients is a disclosure risk.",
           "Recommends keeping vectors server-side and weighing the sensitivity of what is embedded.",
           "Notes membership-inference exposure from client-visible similarity scores."
         ]

@@ -29,7 +29,7 @@
       "prompt": "The JSON is valid but the facts inside it are made up — how do we make the model's structured answers accurate and grounded?",
       "expected_skill": "ai-misinformation-guard",
       "should_not_trigger": ["structured-output-validator"],
-      "reason": "Groundedness/accuracy of the content is ai-misinformation-guard (LLM09); this skill validates structure, not truth."
+      "reason": "Groundedness/accuracy of the content is ai-misinformation-guard (LLM07); this skill validates structure, not truth."
     },
     {
       "id": "service-contract-goes-to-api-contract-tester",

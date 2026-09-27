@@ -1,6 +1,6 @@
 {
   "skill": "memory-context-poisoning-reviewer",
-  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: agent memory poisoning (ASI06) vs training-time poisoning (LLM04), retrieval authorization (LLM08), in-context injection (LLM01), and the dev-agent's own memory governance.",
+  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: agent memory poisoning (ASI06) vs training-time poisoning (LLM05), retrieval authorization (LLM09), in-context injection (LLM01), and the dev-agent's own memory governance.",
   "overlaps_with": ["model-poisoning-reviewer", "rag-security-architect", "prompt-injection-defender", "agent-memory-governance", "agent-goal-hijack-defender"],
   "cases": [
     {
@@ -15,14 +15,14 @@
       "prompt": "Assess whether our fine-tuning dataset and RLHF feedback pipeline can be poisoned to change the model's behavior.",
       "expected_skill": "model-poisoning-reviewer",
       "should_not_trigger": ["memory-context-poisoning-reviewer"],
-      "reason": "Training/fine-tuning/feedback integrity is LLM04 (weights-shaping pipelines); ASI06 is the runtime state store the deployed agent reads and writes."
+      "reason": "Training/fine-tuning/feedback integrity is LLM05 (weights-shaping pipelines); ASI06 is the runtime state store the deployed agent reads and writes."
     },
     {
       "id": "retrieval-authz-goes-to-rag-architect",
       "prompt": "Make sure our vector store queries can only ever return documents the calling user and tenant are authorized to see.",
       "expected_skill": "rag-security-architect",
       "should_not_trigger": ["memory-context-poisoning-reviewer"],
-      "reason": "Who-may-retrieve enforcement at query time is LLM08 retrieval authorization; the memory reviewer covers integrity of what gets WRITTEN into the agent's own memory and how it is trusted at recall."
+      "reason": "Who-may-retrieve enforcement at query time is LLM09 retrieval authorization; the memory reviewer covers integrity of what gets WRITTEN into the agent's own memory and how it is trusted at recall."
     },
     {
       "id": "in-context-payload-goes-to-injection-defender",

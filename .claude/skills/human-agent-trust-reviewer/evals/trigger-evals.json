@@ -53,7 +53,7 @@
       "prompt": "Users take our AI's confident answers at face value and act on them without verification — design controls against that overreliance.",
       "expected_skill": "ai-misinformation-guard",
       "should_not_trigger": ["human-agent-trust-reviewer"],
-      "reason": "Overreliance on AI CONTENT (grounding, citations, calibrated uncertainty, UX trust signals) is LLM09; ASI09 covers humans authorizing agent ACTIONS being fatigued or deceived."
+      "reason": "Overreliance on AI CONTENT (grounding, citations, calibrated uncertainty, UX trust signals) is LLM07; ASI09 covers humans authorizing agent ACTIONS being fatigued or deceived."
     },
     {
       "id": "oversight-tiering-goes-to-governance-risk",
@@ -67,7 +67,7 @@
       "prompt": "Build the per-tool permission matrix and decide which tool calls are irreversible enough to need an approval trigger.",
       "expected_skill": "agent-tool-safety-guard",
       "should_not_trigger": ["human-agent-trust-reviewer"],
-      "reason": "Per-tool blast radius and approval triggers are the LLM06/ASI02 tool boundary; the trust reviewer tests the human side of the gates those triggers fire."
+      "reason": "Per-tool blast radius and approval triggers are the LLM03/ASI02 tool boundary; the trust reviewer tests the human side of the gates those triggers fire."
     }
   ]
 }

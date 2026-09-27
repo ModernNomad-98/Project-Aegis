@@ -1,6 +1,6 @@
 ---
 name: llm-output-safety-reviewer
-description: 'Review how an application consumes LLM output for improper output handling (OWASP LLM05) — treat every model output as untrusted data and trace it to each sink: HTML/markdown rendering (XSS), SQL/NoSQL/shell/eval execution (injection, RCE), file paths and URLs (traversal, SSRF), tool/function arguments, and stored-then-re-consumed content (second-order). Verify context-correct encoding/escaping, sandboxing for executed generated code — incl. autonomous generate-and-run loops, sandbox escape, in-sandbox persistence, and natural-language-driven execution (agentic ASI05) — and validate-before-act discipline. Use when model output is rendered, executed, stored, or used to build a command, query, path, or request. Do NOT use for schema-shape validation of structured output (structured-output-validator), upstream injection (prompt-injection-defender), factual correctness (ai-misinformation-guard), tool-permission scope (agent-tool-safety-guard), or leaked sensitive data (sensitive-disclosure-guard).'
+description: 'Review how an application consumes LLM output for improper output handling (OWASP LLM10) — treat every model output as untrusted data and trace it to each sink: HTML/markdown rendering (XSS), SQL/NoSQL/shell/eval execution (injection, RCE), file paths and URLs (traversal, SSRF), tool/function arguments, and stored-then-re-consumed content (second-order). Verify context-correct encoding/escaping, sandboxing for executed generated code — incl. autonomous generate-and-run loops, sandbox escape, in-sandbox persistence, and natural-language-driven execution (agentic ASI05) — and validate-before-act discipline. Use when model output is rendered, executed, stored, or used to build a command, query, path, or request. Do NOT use for schema-shape validation of structured output (structured-output-validator), upstream injection (prompt-injection-defender), factual correctness (ai-misinformation-guard), tool-permission scope (agent-tool-safety-guard), or leaked sensitive data (sensitive-disclosure-guard).'
 ---
 
 # LLM Output Safety Reviewer
@@ -8,8 +8,8 @@ description: 'Review how an application consumes LLM output for improper output 
 ## Purpose
 
 Review whether an application handles model output safely (OWASP large
-language model output-handling category LLM05): the model
-output is untrusted data, and every place it flows — a rendered page, a
+language model output-handling category LLM10 in the 2026 edition, LLM05
+in 2025): the model output is untrusted data, and every place it flows — a rendered page, a
 database query, a shell command, a file path, a URL, a tool argument, or a
 store it will later be read from — is a potential injection or execution sink.
 The review traces output to each sink and verifies context-correct

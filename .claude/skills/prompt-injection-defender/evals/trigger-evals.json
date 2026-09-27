@@ -22,7 +22,7 @@
       "prompt": "Can an attacker extract our system prompt, and are we wrongly relying on it staying secret?",
       "expected_skill": "system-prompt-leakage-reviewer",
       "should_not_trigger": ["prompt-injection-defender"],
-      "reason": "System-prompt extraction and the prompt-as-control anti-pattern are LLM07 (system-prompt-leakage-reviewer); this skill treats the prompt as non-secret and defends the action boundary."
+      "reason": "System-prompt extraction and the prompt-as-control anti-pattern are LLM08 (system-prompt-leakage-reviewer); this skill treats the prompt as non-secret and defends the action boundary."
     },
     {
       "id": "tool-scope-goes-to-tool-safety-guard",

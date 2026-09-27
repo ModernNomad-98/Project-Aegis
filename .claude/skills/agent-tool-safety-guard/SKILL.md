@@ -1,21 +1,21 @@
 ---
 name: agent-tool-safety-guard
-description: Design or review least-privilege tool and function access for a large language model (LLM) agent, containing excessive agency and tool misuse. Covers Open Worldwide Application Security Project (OWASP) identifiers LLM06 (excessive agency), ASI02 (tool misuse), and the tool-enabled ASI05 code-execution slice. Build a per-tool permission matrix, validate arguments before execution, use the calling user's authority, gate high-impact actions behind human approval, and map tool-chain abuse. Code-execution tools need a sandbox and approval. Composes human-approval-boundary and agent-authorization-matrix. Use when an agent can call tools, functions or application programming interfaces (APIs). Do NOT use for injection defense, sandbox design, retrieval authorization, or standing merge/deploy authority.
+description: Design or review least-privilege tool and function access for a large language model (LLM) agent, containing excessive agency and tool misuse. Covers Open Worldwide Application Security Project (OWASP) identifiers LLM03 (excessive agency), ASI02 (tool misuse), and the tool-enabled ASI05 code-execution slice. Build a per-tool permission matrix, validate arguments before execution, use the calling user's authority, gate high-impact actions behind human approval, and map tool-chain abuse. Code-execution tools need a sandbox and approval. Composes human-approval-boundary and agent-authorization-matrix. Use when an agent can call tools, functions or application programming interfaces (APIs). Do NOT use for injection defense, sandbox design, retrieval authorization, or standing merge/deploy authority.
 ---
 
 # Agent Tool Safety Guard
 
 **Reading key:** A large language model (LLM) agent can request tool calls.
-Open Worldwide Application Security Project (OWASP) code LLM06 names
-excessive agency; agentic codes ASI02 and ASI05 refer here to tool misuse and
-tool-enabled code execution. An application programming interface (API) is a
+Open Worldwide Application Security Project (OWASP) code LLM03 (2026 edition;
+LLM06 in 2025) names excessive agency; agentic codes ASI02 and ASI05 refer
+here to tool misuse and tool-enabled code execution. An application programming interface (API) is a
 software call boundary; natural language (NL) is ordinary user text.
 `authz` means authorization, and remote code execution (RCE) means an
 attacker can cause code to run across a trust boundary.
 
 ## Purpose
 
-Contain excessive agency (LLM06): design or review the tool/function surface
+Contain excessive agency (LLM03): design or review the tool/function surface
 of an LLM agent so it can only do what the task needs, with the authority of
 the user it acts for, and cannot cause irreversible harm without a human. The
 deliverable is a per-tool permission matrix (side effects, blast radius,

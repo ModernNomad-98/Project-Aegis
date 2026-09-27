@@ -1,21 +1,21 @@
 ---
 name: ai-misinformation-guard
-description: Design controls against misinformation and overreliance in a large language model (LLM) feature, the Open Worldwide Application Security Project (OWASP) LLM09 category. Require authoritative grounding, checked citations, calibrated uncertainty and refusal, validation before consequential action, and a user experience that shows limits. Cover invented software packages or application programming interfaces (APIs) and human oversight for high-impact outputs. Compose rag-security-architect for retrieval and ai-governance-risk-reviewer for oversight. Use when confident but wrong output could mislead. Do NOT use for unsafe output handling, output shape, injection, training-data integrity, or approval-flow automation bias (human-agent-trust-reviewer).
+description: Design controls against misinformation and overreliance in a large language model (LLM) feature, the Open Worldwide Application Security Project (OWASP) LLM07 category. Require authoritative grounding, checked citations, calibrated uncertainty and refusal, validation before consequential action, and a user experience that shows limits. Cover invented software packages or application programming interfaces (APIs) and human oversight for high-impact outputs. Compose rag-security-architect for retrieval and ai-governance-risk-reviewer for oversight. Use when confident but wrong output could mislead. Do NOT use for unsafe output handling, output shape, injection, training-data integrity, or approval-flow automation bias (human-agent-trust-reviewer).
 ---
 
 # AI Misinformation Guard
 
 **Reading key:** A large language model (LLM) generates responses. Open
-Worldwide Application Security Project (OWASP) identifier LLM09 names
-misinformation risk; retrieval-augmented generation (RAG) supplies documents
-to ground an answer. An application programming interface (API) is a software
+Worldwide Application Security Project (OWASP) identifier LLM07 (2026 edition;
+LLM09 in 2025) names misinformation risk; retrieval-augmented generation
+(RAG) supplies documents to ground an answer. An application programming interface (API) is a software
 call boundary; user experience (UX) is the interface seen by a user;
 cross-site scripting (XSS) is unsafe execution of injected web content.
 
 ## Purpose
 
 Design the controls that keep an LLM feature from confidently producing false
-information that misleads users or drives bad decisions (LLM09). The
+information that misleads users or drives bad decisions (LLM07). The
 deliverable: a grounding strategy (factual claims answered from
 retrieved/authoritative sources, not the model's parametric memory),
 citation verification (cited sources actually support the claim), calibrated

@@ -36,7 +36,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Assessing an acquired third-party model/dataset/adapter is supply-chain-security-reviewer (LLM03, extended); this skill covers data you ingest and pipelines you run, not artifacts you download."
+          "Assessing an acquired third-party model/dataset/adapter is supply-chain-security-reviewer (LLM04, extended); this skill covers data you ingest and pipelines you run, not artifacts you download."
         ]
       }
     },

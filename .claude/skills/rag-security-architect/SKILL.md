@@ -1,15 +1,15 @@
 ---
 name: rag-security-architect
-description: Design or review the security of a RAG retrieval pipeline and vector store (OWASP LLM08) — enforce authorization AT RETRIEVAL TIME so a query returns only documents the calling user and tenant may see, scope every index/namespace by tenant, carry document ACLs into the query filter, and address embedding inversion, membership inference, poisoned documents, and stale permission metadata. Compose tenant-isolation-reviewer and multi-tenant-data-architect for tenant scoping. Use for RAG retrieval or semantic search over access-controlled data. Do NOT use for injection in retrieved content (prompt-injection-defender), training-time poisoning (model-poisoning-reviewer), disclosure in the completion (sensitive-disclosure-guard), or generic tenant-data design (multi-tenant-data-architect).
+description: Design or review the security of a RAG retrieval pipeline and vector store (OWASP LLM09) — enforce authorization AT RETRIEVAL TIME so a query returns only documents the calling user and tenant may see, scope every index/namespace by tenant, carry document ACLs into the query filter, and address embedding inversion, membership inference, poisoned documents, and stale permission metadata. Compose tenant-isolation-reviewer and multi-tenant-data-architect for tenant scoping. Use for RAG retrieval or semantic search over access-controlled data. Do NOT use for injection in retrieved content (prompt-injection-defender), training-time poisoning (model-poisoning-reviewer), disclosure in the completion (sensitive-disclosure-guard), or generic tenant-data design (multi-tenant-data-architect).
 ---
 
 # RAG Security Architect
 
 Terms used below: **RAG** means retrieval-augmented generation; an **ACL** is
 an access control list recording who may access a document. **OWASP** means
-Open Worldwide Application Security Project; **LLM08** is its large-language-model
-risk code used here for vector and embedding weaknesses. **IDOR** means insecure
-direct object reference, and **PII** means personally identifiable information.
+Open Worldwide Application Security Project; **LLM09** is its large-language-model
+risk code (2026 edition; LLM08 in 2025) for vector and embedding
+weaknesses. **IDOR** means insecure direct object reference, and **PII** means personally identifiable information.
 These terms describe risks; they do not
 replace authorization enforced inside the retrieval query.
 
@@ -20,7 +20,7 @@ itself is access-controlled: a query returns only documents the calling user
 and tenant are authorized to see, enforced AT RETRIEVAL TIME in the query,
 never by filtering results after the store already returned them. The output
 covers vector-store tenant scoping, document-level ACL propagation into the
-retrieval filter, and embedding-specific risks (LLM08) — inversion, membership
+retrieval filter, and embedding-specific risks (LLM09) — inversion, membership
 inference, document poisoning, and stale permissions in already-embedded
 content. Tenant-scoping semantics are composed from `tenant-isolation-reviewer`
 and `multi-tenant-data-architect`, not re-invented here.
@@ -80,7 +80,7 @@ and `multi-tenant-data-architect`, not re-invented here.
    can be a query predicate. Decide how ACL metadata changes and deletions
    propagate to the index; stale permissions on indexed content are a leak.
    Re-embed when content changes, not merely because ACL metadata changes.
-5. **Address embedding-specific risks (LLM08):** embedding inversion (raw
+5. **Address embedding-specific risks (LLM09):** embedding inversion (raw
    source recoverable from vectors — don't expose embeddings to clients,
    consider the sensitivity of what's embedded); membership inference; and
    document poisoning (an attacker-planted document engineered to rank for a
@@ -102,7 +102,7 @@ RAG (RETRIEVAL-AUGMENTED GENERATION) SECURITY DESIGN/REVIEW — <system>
 Query trace: <query → embed → search → filter → context> | Authorization point: <retrieval | after retrieval (finding)>
 Vector-store tenant scoping: <namespace/index/filter mechanism + can-it-be-omitted>
 Document access-control-list (ACL) propagation: <metadata stored | how ACL change/delete flows to the index>
-Embedding risks (OWASP LLM08):
+Embedding risks (OWASP LLM09):
   Inversion: <embeddings exposed? sensitivity of embedded data>
   Membership inference: <exposure + mitigation>
   Poisoning: <ingestion trust + ranking abuse> (→ model-poisoning-reviewer)

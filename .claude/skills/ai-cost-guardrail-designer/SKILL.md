@@ -1,14 +1,14 @@
 ---
 name: ai-cost-guardrail-designer
-description: Design cost and consumption guardrails for a large language model (LLM) feature, covering spend and unbounded-consumption abuse (Open Worldwide Application Security Project identifier LLM10). Specify token caps, per-user/tenant/plan budgets, cost-aware rate limits, task-aware model choice, concurrency and queue bounds, agent loop limits, input limits, a fail-closed spend kill switch, degraded fallback, and telemetry. Compose saas-cost-architect for unit economics and observability-operator for metering. Use for budgets, quotas, rate limits, token drain, denial of wallet, or stolen-key model abuse. Do NOT use for whole-product cost models, plan feature gating, alert implementation, or model routing.
+description: Design cost and consumption guardrails for a large language model (LLM) feature, covering spend and unbounded-consumption abuse (Open Worldwide Application Security Project identifier LLM06). Specify token caps, per-user/tenant/plan budgets, cost-aware rate limits, task-aware model choice, concurrency and queue bounds, agent loop limits, input limits, a fail-closed spend kill switch, degraded fallback, and telemetry. Compose saas-cost-architect for unit economics and observability-operator for metering. Use for budgets, quotas, rate limits, token drain, denial of wallet, or stolen-key model abuse. Do NOT use for whole-product cost models, plan feature gating, alert implementation, or model routing.
 ---
 
 # AI Cost Guardrail Designer
 
 **Reading key:** A large language model (LLM) generates responses using
 metered tokens. Open Worldwide Application Security Project (OWASP) code
-LLM10 names unbounded consumption. Common Weakness Enumeration (CWE) item
-636 describes a control that fails open instead of securely denying a call.
+LLM06 (2026 edition; LLM10 in 2025) names unbounded consumption. Common
+Weakness Enumeration (CWE) item 636 describes a control that fails open instead of securely denying a call.
 An application programming interface (API) is a software call boundary;
 continuous integration (CI) runs automated checks. “LLMjacking” means abuse
 of a stolen model-provider credential to consume the owner's allowance.
@@ -18,7 +18,7 @@ before later ones.
 ## Purpose
 
 Design the guardrails that keep an LLM feature from becoming a denial-of-wallet
-or denial-of-service vector (LLM10) and keep its spend attributable and
+or denial-of-service vector (LLM06) and keep its spend attributable and
 bounded. The deliverable is a layered control set: per-request token caps,
 per-user/tenant/plan budgets and rate limits, task-appropriate model
 selection, concurrency/queue bounds, agent loop limits, input-size limits, a
@@ -226,7 +226,7 @@ Owner choices: <term definitions | options and reasons | verified/unknown dollar
 ## AI Security Rules
 
 - Denial-of-wallet is a security risk, not just a finance one: any path where
-  an attacker can cheaply trigger expensive inference is a finding (LLM10).
+  an attacker can cheaply trigger expensive inference is a finding (LLM06).
 - Every guardrail FAILS CLOSED. If a cost/rate/budget check errors, times out,
   or its store is unreachable, DENY the call — never let it through. A
   guardrail that fails open is not a guardrail: an attacker (or a bug) that can

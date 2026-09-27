@@ -2,14 +2,15 @@
 
 Use this reference with the [System Prompt Leakage Reviewer](../SKILL.md).
 
-Detail for `system-prompt-leakage-reviewer`. OWASP LLM07 (System Prompt
-Leakage), 2025. Doctrine: **the system prompt is not a security control.**
+Detail for `system-prompt-leakage-reviewer`. OWASP LLM08 (Hidden Context
+Exposure, formerly LLM07 System Prompt Leakage), 2026. Doctrine: **the system prompt is not a security control.**
 Review it as if it will be public — because it will be.
 
 ## Terms used here
 
-- **OWASP / LLM07:** Open Worldwide Application Security Project and its
-  2025 large language model threat category for system-prompt leakage.
+- **OWASP / LLM08:** Open Worldwide Application Security Project and its
+  2026 large language model threat category for hidden context exposure,
+  which broadens 2025's system-prompt leakage.
 - **API / OAuth / IP / PII:** application programming interface, Open
   Authorization, Internet Protocol, and personally identifiable information.
 - **RBAC / UX:** role-based access control and user experience.

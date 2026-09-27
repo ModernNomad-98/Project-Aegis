@@ -29,7 +29,7 @@
       "prompt": "Make sure the model's answers are grounded and don't state fabricated facts or fake citations to users.",
       "expected_skill": "ai-misinformation-guard",
       "should_not_trigger": ["llm-output-safety-reviewer"],
-      "reason": "Grounding, citations, and hallucination are ai-misinformation-guard (LLM09); this skill is about unsafe HANDLING of output regardless of whether it's true."
+      "reason": "Grounding, citations, and hallucination are ai-misinformation-guard (LLM07); this skill is about unsafe HANDLING of output regardless of whether it's true."
     },
     {
       "id": "generic-diff-goes-to-security-pr-reviewer",

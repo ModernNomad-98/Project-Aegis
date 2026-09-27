@@ -4,7 +4,7 @@ Use these controls with the [memory and context poisoning reviewer](../SKILL.md)
 to trace who may write persistent context and how recalled entries stay inert.
 **ASI06** is the memory and context poisoning category in the Open Worldwide
 Application Security Project (OWASP) Top 10 for Agentic Applications. **TTL**
-means time to live; **RAG** means retrieval-augmented generation; **LLM08** is
+means time to live; **RAG** means retrieval-augmented generation; **LLM09** is
 the OWASP large language model vector and embedding weakness category.
 
 ## 1. Write-path trust rubric
@@ -43,7 +43,7 @@ default and a candidate for purge.
   entries are treated as untrusted input by every reader.
 - Compose `multi-tenant-data-architect` for the store mechanics and
   `tenant-isolation-reviewer` for the surface audit; memory embeddings in a
-  shared vector index inherit ALL the LLM08 scoping requirements.
+  shared vector index inherit ALL the LLM09 scoping requirements.
 
 ## 4. Lifecycle: TTL, purge, rollback
 

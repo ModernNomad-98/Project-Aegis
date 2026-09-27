@@ -4,7 +4,8 @@ Use these patterns with the [prompt injection defender](../SKILL.md) to design
 trust separation, an enforced action boundary, and negative tests. The parent
 skill is **manual-only** because it edits code or prompts; reading this page
 does not invoke it. **OWASP** means Open Worldwide Application Security
-Project; **LLM01** is its 2025 large language model prompt-injection risk code.
+Project; **LLM01** is its 2026 large language model prompt-injection risk code
+(unchanged from 2025; 2026 adds cross-modal image and audio injection).
 **AI** means artificial intelligence, **API** means application programming
 interface, and **PDF** means Portable Document Format.
 

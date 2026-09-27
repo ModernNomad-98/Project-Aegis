@@ -8,7 +8,7 @@
       "prompt": "Make sure our assistant's answers are grounded in real sources and don't state confident falsehoods or fake citations.",
       "expected_skill": "ai-misinformation-guard",
       "should_not_trigger": ["llm-output-safety-reviewer", "structured-output-validator"],
-      "reason": "Truthfulness, grounding, and citations are this skill (LLM09); llm-output-safety-reviewer handles unsafe rendering/execution and structured-output-validator handles shape — both orthogonal to whether the content is true."
+      "reason": "Truthfulness, grounding, and citations are this skill (LLM07); llm-output-safety-reviewer handles unsafe rendering/execution and structured-output-validator handles shape — both orthogonal to whether the content is true."
     },
     {
       "id": "output-handling-goes-to-safety-reviewer",
@@ -29,7 +29,7 @@
       "prompt": "Could attackers poison our training data or feedback loop so the model learns to recommend a scam?",
       "expected_skill": "model-poisoning-reviewer",
       "should_not_trigger": ["ai-misinformation-guard"],
-      "reason": "Corruption of training/feedback data is model-poisoning-reviewer (LLM04); this skill mitigates misinformation at output/answer time regardless of cause."
+      "reason": "Corruption of training/feedback data is model-poisoning-reviewer (LLM05); this skill mitigates misinformation at output/answer time regardless of cause."
     },
     {
       "id": "install-trust-goes-to-supply-chain",

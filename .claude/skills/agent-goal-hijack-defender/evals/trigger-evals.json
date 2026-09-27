@@ -1,6 +1,6 @@
 {
   "skill": "agent-goal-hijack-defender",
-  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: goal/plan integrity (ASI01) vs the injection vector (LLM01), stored-memory corruption (ASI06), attacker-less drift (ASI10), tool scope (LLM06/ASI02), and hands-on probing (subagent).",
+  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: goal/plan integrity (ASI01) vs the injection vector (LLM01), stored-memory corruption (ASI06), attacker-less drift (ASI10), tool scope (LLM03/ASI02), and hands-on probing (subagent).",
   "overlaps_with": ["prompt-injection-defender", "memory-context-poisoning-reviewer", "agent-containment-reviewer", "agent-tool-safety-guard", "ai-security-red-team-reviewer (subagent)"],
   "cases": [
     {
@@ -36,7 +36,7 @@
       "prompt": "Scope which tools our agent may call and validate their arguments so a manipulated step can't do damage.",
       "expected_skill": "agent-tool-safety-guard",
       "should_not_trigger": ["agent-goal-hijack-defender"],
-      "reason": "Per-tool least privilege and argument validation are the action boundary (LLM06/ASI02); goal integrity sits above it and composes it."
+      "reason": "Per-tool least privilege and argument validation are the action boundary (LLM03/ASI02); goal integrity sits above it and composes it."
     },
     {
       "id": "live-probing-goes-to-red-team-subagent",

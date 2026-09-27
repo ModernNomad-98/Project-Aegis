@@ -1,6 +1,6 @@
 ---
 name: model-poisoning-reviewer
-description: Review the integrity of the data and pipelines that shape a model's behavior against data and model poisoning (OWASP LLM04) — training and fine-tuning datasets (provenance, curation, who can contribute), RLHF/feedback loops (can attackers mass-signal bad behavior into the next update), the RAG/embedding INGESTION path (untrusted content indexed as ground truth, poisoned documents crafted to rank for targeted queries), and backdoor/trigger-phrase risk. Produces severity-ranked findings each with a poisoning path (attacker input → corrupted behavior) plus provenance/curation/validation controls. Composes supply-chain-security-reviewer for acquired models/datasets/adapters. Use when you train, fine-tune, collect feedback, or ingest external content into a knowledge base. Do NOT use for retrieval AUTHORIZATION (rag-security-architect), acquiring third-party model artifacts (supply-chain-security-reviewer), injection at inference (prompt-injection-defender), or agent memory (memory-context-poisoning-reviewer).
+description: Review the integrity of the data and pipelines that shape a model's behavior against data and model poisoning (OWASP LLM05) — training and fine-tuning datasets (provenance, curation, who can contribute), RLHF/feedback loops (can attackers mass-signal bad behavior into the next update), the RAG/embedding INGESTION path (untrusted content indexed as ground truth, poisoned documents crafted to rank for targeted queries), and backdoor/trigger-phrase risk. Produces severity-ranked findings each with a poisoning path (attacker input → corrupted behavior) plus provenance/curation/validation controls. Composes supply-chain-security-reviewer for acquired models/datasets/adapters. Use when you train, fine-tune, collect feedback, or ingest external content into a knowledge base. Do NOT use for retrieval AUTHORIZATION (rag-security-architect), acquiring third-party model artifacts (supply-chain-security-reviewer), injection at inference (prompt-injection-defender), or agent memory (memory-context-poisoning-reviewer).
 ---
 
 # Model Poisoning Reviewer
@@ -9,11 +9,12 @@ description: Review the integrity of the data and pipelines that shape a model's
 
 Review whether an attacker can corrupt a model's behavior by poisoning the
 data or feedback that shapes it (OWASP large language model data/model
-poisoning category LLM04). Reinforcement learning from human feedback
+poisoning category LLM05). Reinforcement learning from human feedback
 (RLHF) and retrieval-augmented generation (RAG) are named here before their
 abbreviations below. D6 is the repository's recorded Phase 7 decision
-anchoring its AI security map to the OWASP Top 10 for LLM Applications
-(2025). The scope is the pipelines you run
+anchoring its AI security map to the OWASP Top 10 for LLM Applications,
+now the 2026 edition (LLM05 was LLM04 in 2025; 2026 adds fine-tuning
+subversion to this category). The scope is the pipelines you run
 that influence what the model learns or treats as ground truth: training and
 fine-tuning datasets, RLHF/feedback loops, and the RAG/embedding INGESTION
 path (which turns external content into retrievable "truth"). The output is
@@ -33,7 +34,7 @@ you ingest and the pipelines you run.
 - Use when: reviewing dataset provenance, curation, and validation for a model
   pipeline.
 - Do NOT use when: the concern is WHO can retrieve documents at query time
-  (`rag-security-architect` — LLM08) — this skill is the INGESTION integrity
+  (`rag-security-architect` — LLM09) — this skill is the INGESTION integrity
   half.
 - Do NOT use when: acquiring a third-party base model, dataset, or adapter
   (`supply-chain-security-reviewer`) or defending inference-time injection
@@ -158,7 +159,7 @@ Not applicable: <pipeline absent — reason> | Not reviewed: <+ why>
 ## Stop Conditions
 
 - No training, fine-tuning, feedback, or ingestion pipeline exists (pure
-  prompting over a fixed third-party model) — most of LLM04 is not applicable;
+  prompting over a fixed third-party model) — most of LLM05 is not applicable;
   state that and route any acquired-artifact concern to
   `supply-chain-security-reviewer`.
 - A poisoning path is already exploited (corrupted behavior in production, a

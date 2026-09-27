@@ -8,7 +8,7 @@
       "prompt": "Is it a problem that our security relies on the system prompt staying secret, and that the prompt has our internal endpoints in it?",
       "expected_skill": "system-prompt-leakage-reviewer",
       "should_not_trigger": ["prompt-injection-defender", "sensitive-disclosure-guard"],
-      "reason": "Secrets in the prompt and dependence on prompt secrecy is this skill (LLM07); prompt-injection-defender is the input side and sensitive-disclosure-guard covers user/context data, not the prompt itself."
+      "reason": "Secrets in the prompt and dependence on prompt secrecy is this skill (LLM08); prompt-injection-defender is the input side and sensitive-disclosure-guard covers user/context data, not the prompt itself."
     },
     {
       "id": "injection-goes-to-injection-defender",

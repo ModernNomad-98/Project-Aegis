@@ -3,8 +3,8 @@
 Use this reference with the [RAG security architect](../SKILL.md) to keep
 retrieval inside the caller's authorized tenant and document scope. **RAG**
 means retrieval-augmented generation; **OWASP** means Open Worldwide
-Application Security Project; **LLM08** is its 2025 vector and embedding
-weaknesses category. **ANN** means approximate nearest-neighbor search,
+Application Security Project; **LLM09** is its 2026 vector and embedding
+weaknesses category (LLM08 in 2025). **ANN** means approximate nearest-neighbor search,
 **ACL** means access control list, and **IDOR** means insecure direct object
 reference. These terms do not replace authorization enforced by the store.
 
@@ -58,7 +58,7 @@ best → worst:
 - On re-embedding (model upgrade, re-chunk): carry ACLs forward; don't reset
   to defaults.
 
-## Embedding-specific risks (LLM08)
+## Embedding-specific risks (LLM09)
 
 - **Inversion** — source text can be approximately reconstructed from
   embeddings. Don't expose raw vectors to clients; weigh sensitivity of what

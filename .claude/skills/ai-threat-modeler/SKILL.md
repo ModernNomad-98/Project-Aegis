@@ -20,7 +20,7 @@ Produce a design-time threat model for an AI system — an LLM feature, RAG
 pipeline, or agent — that treats the AI-specific attack surface as
 first-class instead of bolting "prompt injection" onto a web threat model.
 The output inventories AI assets and trust boundaries, enumerates threats per
-boundary anchored to the OWASP LLM Top 10 (2025), writes abuse cases from
+boundary anchored to the OWASP LLM Top 10 (2026), writes abuse cases from
 attacker behavior, ranks risks by concrete exploit path (not vibes), and maps
 each accepted mitigation to the skill that owns building it and the red-team
 or eval case that will prove it holds. The classic web/data surface is NOT
@@ -75,13 +75,16 @@ re-derived here — it composes `threat-modeler` output for the non-AI half.
    execution plan — any place it could is a finding.
 4. **Enumerate threats per boundary** using
    [references/llm-top10-threat-catalog.md](references/llm-top10-threat-catalog.md):
-   map each applicable OWASP LLM Top 10 (2025) category to this system's
+   map each applicable OWASP LLM Top 10 (2026) category to this system's
    concrete shape — injected instructions in retrieved docs (LLM01), tenant
-   data in context (LLM02), poisoned corpus/adapter (LLM03/04), output-sink
-   execution (LLM05), over-broad tools (LLM06), secrets in system prompt
-   (LLM07), cross-tenant vectors (LLM08), fabricated answers driving actions
-   (LLM09), token-drain loops (LLM10). Mark categories not applicable — with
-   the reason — rather than skipping silently.
+   data in context (LLM02), over-broad tools (LLM03), poisoned
+   adapter/corpus (LLM04/05), token-drain loops (LLM06), fabricated answers
+   driving actions (LLM07), secrets in the system prompt or other hidden
+   context (LLM08), cross-tenant vectors (LLM09), output-sink execution
+   (LLM10). The 2026 edition renumbered most categories and renamed LLM08
+   Hidden Context Exposure; the catalog lists each 2025 ID alongside. Mark
+   categories not applicable — with the reason — rather than skipping
+   silently.
 5. **Write abuse cases from attacker behavior.** "Attacker submits a support
    ticket containing instructions that make the summarizer call the refund
    tool" — concrete actor, path, and payoff. At least one abuse case per
@@ -153,7 +156,7 @@ Accepted/deferred risks: <risk — named acceptor — review date>
   not enforcement. Route such findings to `system-prompt-leakage-reviewer`
   and deterministic controls.
 - Cost is an asset: an attacker who can make you spend $50k in tokens never
-  needs to steal data (LLM10). Model denial-of-wallet paths explicitly.
+  needs to steal data (LLM06). Model denial-of-wallet paths explicitly.
 - Agent loops compound: one injected instruction can chain through tools;
   model the CHAIN (tool A's output feeds tool B's arguments), not just
   single calls.
@@ -179,7 +182,7 @@ Accepted/deferred risks: <risk — named acceptor — review date>
 
 - [references/llm-top10-threat-catalog.md](references/llm-top10-threat-catalog.md)
   — per-category threat shapes, abuse-case seeds, and the applicability
-  rubric for OWASP LLM Top 10 (2025).
+  rubric for OWASP LLM Top 10 (2026), with the 2025 IDs alongside.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the threat & injection
   cluster and against `threat-modeler`, `security-pr-reviewer`, and the
