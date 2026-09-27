@@ -328,7 +328,7 @@ design (`domain-modeler`, `architecture-designer`, `adr-writer`), implementation
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (the original nine sit in one of three overlap clusters;
 `feature-flag-architect`, added by D64, carries its own seams). None has
-side effects, so all are model-invocable. Per master-prompt §5: tenant isolation is
+side effects, so all are model-invocable. Per [historical master prompt, section 5](prompts/claude-skills-master-generation-prompts-v4.md): tenant isolation is
 treated as cross-cutting (identity, data, API, storage, logs, analytics, support,
 exports, imports, jobs, search, AI retrieval, billing, flags, audit), every skill
 carries migration + rollback considerations, and the security-related skills require
@@ -400,7 +400,7 @@ tests vs database-policy audit).
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (all sixteen sit in one of four overlap clusters). Per
-master-prompt §7: QA starts from risk; every layer choice picks the cheapest reliable
+[historical master prompt, section 7](prompts/claude-skills-master-generation-prompts-v4.md): QA starts from risk; every layer choice picks the cheapest reliable
 layer; E2E is reserved for critical journeys; manual cases are executable by another
 tester; screenshot evidence carries naming/masking/metadata/storage rules; Playwright
 uses resilient locators and web-first assertions with no arbitrary sleeps; Vite skills
@@ -455,7 +455,7 @@ against the shipped `code-reviewer`, `full-codebase-auditor`, `api-event-archite
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (all ten sit in one of three overlap clusters). Per
-master-prompt §8: cloud work starts cloud-neutral (requirements, constraints,
+[historical master prompt, section 8](prompts/claude-skills-master-generation-prompts-v4.md): cloud work starts cloud-neutral (requirements, constraints,
 compliance, latency, regions, availability, cost, operability, risk BEFORE
 service mapping); provider skills stay provider-idiomatic without inventing
 product specifics (SKU/quota/price claims become verification items); release
@@ -511,7 +511,7 @@ this section are 2026 IDs, and `ai-threat-modeler`'s threat catalog carries the
 LLM08, `ai-misinformation-guard` LLM07). `hidden-context-exposure-reviewer` was
 built as `system-prompt-leakage-reviewer` and renamed on 2026-09-26 when it was
 extended from the system-prompt slice to the full LLM08 scope; any copied
-reference to the old name should point to the new one. Per master-prompt §9: user input,
+reference to the old name should point to the new one. Per [historical master prompt, section 9](prompts/claude-skills-master-generation-prompts-v4.md): user input,
 retrieved documents, webpages, tickets, emails, logs, tool outputs, and model
 outputs are untrusted unless proven otherwise; untrusted content never modifies
 system instructions, tool permissions, identity, access policy, or the
@@ -1222,7 +1222,7 @@ above.**
 ✅ **Implemented** — all 10 first-pass skills moved to
 [Implemented → Skills (Phase 6)](#skills-phase-6--cloud-devops-reliability--release-pack) above.
 Source: [`docs/skills/07-devops-release-reliability.md`](skills/07-devops-release-reliability.md)
-plus master-prompt §8 for the three cloud skills.
+plus [historical master prompt, section 8](prompts/claude-skills-master-generation-prompts-v4.md) for the three cloud skills.
 Reconciliation §3 merge: `rollback-strategy-designer` is merged into
 `rollback-runbook-author` (no separate skill). The Phase 6 **expansion backlog**
 (`cloud-security-baseline-reviewer`, `resilience-architecture-reviewer`,
