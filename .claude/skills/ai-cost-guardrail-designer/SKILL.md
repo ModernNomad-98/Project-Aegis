@@ -159,14 +159,16 @@ the guardrail design.
    hide activity is a near-certain compromise signal.
 10. **State the residual exposure.** The worst-case spend with these guardrails
     in place, and the named acceptor for it via `human-approval-boundary`.
-    If an owner must select a budget, degraded mode, or provider backstop,
-    explain the terminology, why the choice is needed, setup and operating
-    costs (including denied legitimate work), benefits and drawbacks of each
-    viable option, and which option is recommended and why. The degradation
-    POLICY itself — which option the business adopts from tenant-tagged cost
-    and margin evidence — is `saas-cost-architect`'s choice; this skill
-    designs and enforces the mechanism for the option chosen. Preserve the
-    fail-closed floor: no option may allow inference when a budget check fails.
+    If an owner must select a MECHANISM option for the policy the business has
+    chosen — a budget cap level, how the degraded mode behaves, or the
+    provider backstop — explain the terminology, why the choice is needed,
+    setup and operating costs (including denied legitimate work), benefits and
+    drawbacks of each viable option, and which option is recommended and why.
+    When the open question is WHICH degradation policy the business adopts
+    from tenant-tagged cost and margin evidence, hand that choice brief to
+    `saas-cost-architect` and design the mechanism for the option chosen.
+    Preserve the fail-closed floor: no option may allow inference when a
+    budget check fails.
     Then ask exactly one atomic owner question; the answer sets the design
     only and does not authorize enforcing a guardrail or the provider backstop.
     If step 5's tier-and-limit choice is also open, ask only the more
