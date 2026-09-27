@@ -66,7 +66,7 @@
           "Compares duplicate-capacity or other infrastructure money, setup effort, and continuing monitoring and operating upkeep.",
           "Recommends a strategy for the stated traffic, rollback and capacity constraints, with assumptions and tradeoffs rather than a universal default.",
           "Marks exact infrastructure prices as unknown rather than inventing figures; explains what current price or capacity evidence would settle a money-sensitive choice.",
-          "After a contextual recommendation and explanation, asks the owner one atomic strategy decision question, or one discovery question first if a decisive fact is missing; does not bundle deployment approval into the choice."
+          "When all decisive facts are known, after a contextual recommendation and explanation, asks the owner one atomic strategy decision question, or, if a decisive fact is missing, only one discovery question this turn and no recommendation; does not bundle deployment approval into the choice."
         ]
       }
     }

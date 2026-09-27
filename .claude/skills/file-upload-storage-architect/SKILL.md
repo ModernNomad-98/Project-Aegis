@@ -166,8 +166,9 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       completion, without trusting a client success report.
 - [ ] User-facing upload or tenancy choices explain each viable option's fit,
       tradeoffs, and money/setup/upkeep costs or unknowns in plain terms;
-      give a contextual recommendation and one clear question (or one
-      discovery question when a decisive fact is missing).
+      give a contextual recommendation and one clear question; while
+      decisive facts are missing, ask only one discovery question per turn
+      and recommend only once all are known.
 - [ ] Signed URLs grant one verb on one object key with a short expiry and
       size/type constraints — never prefix- or bucket-scoped.
 - [ ] Object keys are server-derived; a client cannot craft a key outside

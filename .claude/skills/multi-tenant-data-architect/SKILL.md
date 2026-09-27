@@ -105,8 +105,9 @@ a cross-tenant leak.
     and mark unknown costs as unknown rather than guessing, treat an
     unstated input such as team capacity as unknown, and ask only for one
     missing deciding fact per turn when the recommendation depends on it,
-    until all such facts are known; only then recommend one from measured volume, compliance needs and team capacity, with a
-    reason, then ask exactly one owner question; the answer does not
+    until all such facts are known; only then recommend one from measured
+    volume, compliance needs and team capacity, with a reason, then ask
+    exactly one owner question; the answer does not
     authorize migration execution. Resolve routine per-store design choices
     from evidence without asking the owner. Treat a choice already stated by
     the owner as settled; explain its implications without re-asking.
