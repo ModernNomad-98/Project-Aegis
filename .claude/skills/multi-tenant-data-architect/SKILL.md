@@ -23,8 +23,9 @@ a cross-tenant leak.
 - Use when: designing storage for a new multi-tenant product or feature.
 - Use when: retrofitting tenant scoping onto existing single-tenant tables
   (the backfill-and-enforce problem).
-- Use when: planning a tenant data migration — pooled→silo for a big tenant,
-  re-shard, region move — or its rollback.
+- Use when: planning a tenant data migration — pooled→silo (moving a big
+  tenant from shared storage to its own dedicated store), re-shard
+  (redistributing data across partitions), region move — or its rollback.
 - Use when: a new store appears (cache, queue, search index, vector store,
   object storage) and needs its tenant-scoping decision.
 - Do NOT use when: what a tenant IS remains undefined — `tenant-modeler`
@@ -34,7 +35,7 @@ a cross-tenant leak.
 - Do NOT use when: writing or auditing row-level security (RLS) policies
   themselves — that is the Aegis Phase 4 security pack's scope (for example
   `rls-policy-auditor`); this skill decides WHERE enforcement lives, not the
-  policy SQL.
+  policy's Structured Query Language (SQL) statements.
 - Do NOT use when: the structural question has no tenancy axis — plain
   `architecture-designer`.
 - Do NOT use when: the pressure is throughput/size distribution of a store —
@@ -64,9 +65,9 @@ a cross-tenant leak.
 
 1. **Read the tenant model first.** Pin which level of the hierarchy is the
    scoping key. Undefined → stop, route to `tenant-modeler`.
-2. **Inventory every store** — primary DB, caches, queues, indexes, vector
-   stores, object storage, analytics sinks. The design covers all of them; a
-   store without a scoping decision is a finding against the design.
+2. **Inventory every store** — primary database (DB), caches, queues, indexes,
+   vector stores, object storage, analytics sinks. The design covers all of
+   them; a store without a scoping decision is a finding against the design.
 3. **Choose the scoping strategy per store** using
    [references/scoping-strategy-tradeoffs.md](references/scoping-strategy-tradeoffs.md):
    pooled (tenant key + enforced scoping), schema-per-tenant,
