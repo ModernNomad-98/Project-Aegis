@@ -60,8 +60,16 @@ also closed one edge added by reconciliation decision D64. Of the other 236,
 Companion to the frozen AEGIS-001..059 baseline
 ([Project-Aegis-VolunteerFlow-Defect-Handoff-AEGIS-001-to-059.md](volunteerflow/Project-Aegis-VolunteerFlow-Defect-Handoff-AEGIS-001-to-059.md))
 and the corpus contract audit (`scripts/audit-skill-contracts.py`; baseline
-run: `docs/audits/skill-contract-audit-baseline.md`, corpus tree
-`08727adf8f3e0f54226fa18639c9a50f2562ed22`, 184 skills).
+run: [`docs/audits/skill-contract-audit-baseline.md` at `e2f1da0`](https://github.com/ModernNomad-98/Project-Aegis/blob/e2f1da0beb6e4aed07044ca3a90e841962bfd590/docs/audits/skill-contract-audit-baseline.md),
+corpus tree `08727adf8f3e0f54226fa18639c9a50f2562ed22`, 184 skills).
+
+**Baseline files regenerated, 2026-09-27.** By owner decision, the baseline
+report and its three `artifacts/audits/` JSON (JavaScript Object Notation)
+files were overwritten with a fresh engine v1.13.1 audit of main (186 skills,
+317 findings). The numbers in sections 1–5 of this register still describe the
+v1.12.0 baseline (184 skills, 414 findings); those files remain in git history
+at commit `e2f1da0beb6e4aed07044ca3a90e841962bfd590` (PR #77), which the links
+here point to. The historical counts below are unchanged.
 
 Rules of this register (from the program's operating rules):
 
@@ -161,6 +169,11 @@ Rules of this register (from the program's operating rules):
   **v1.13.0**: a corrected live report must be distinguishable by version, not
   only by `engine_sha256`. Read any 1.12.0-stamped EVAL-004 row as the old
   namespace-collapsing rule.
+  *Amendment, 2026-09-27:* the promise above to leave every 1.12.0 artifact
+  as it is was superseded by owner decision. The baseline report and its three
+  `artifacts/audits/` JSON files were regenerated with engine v1.13.1; the
+  1.12.0 files remain in git history at commit
+  `e2f1da0beb6e4aed07044ca3a90e841962bfd590`.
 - **Automatic review findings closed (PR #89, reviewed commit `2d769dec87`).**
   The ready-for-review transition triggered an automatic review that raised
   three P2 findings against the correction itself; all three were valid and are
@@ -207,8 +220,8 @@ their materiality is unconfirmed.
   never names A). Many are legitimate (hub skills cannot name every
   excluder), some are the collision failure mode `skill-quality-reviewer`
   calls the corpus's main one. Needs semantic triage against rubric question
-  2 before any ID is assigned. Full edge list: `artifacts/audits/`
-  route-graph and baseline JSON (JavaScript Object Notation) files.
+  2 before any ID is assigned. Full edge list: the
+  [`artifacts/audits/` route-graph and baseline JSON files at `e2f1da0`](https://github.com/ModernNomad-98/Project-Aegis/tree/e2f1da0beb6e4aed07044ca3a90e841962bfd590/artifacts/audits).
   **Dispositioned by owner decision, 2026-09-26.** The
   [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md)
   triages all 268 edges reported on `0f46808`. Three merged batch PRs

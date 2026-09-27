@@ -13,7 +13,7 @@
     {
       "name": "admin-console-architect",
       "manual_only": false,
-      "declares_read_only": false
+      "declares_read_only": true
     },
     {
       "name": "adr-sequencer",
@@ -23,6 +23,11 @@
     {
       "name": "adr-writer",
       "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "aegis-setup",
+      "manual_only": true,
       "declares_read_only": false
     },
     {
@@ -307,7 +312,7 @@
     },
     {
       "name": "docs-first-implementer",
-      "manual_only": false,
+      "manual_only": true,
       "declares_read_only": false
     },
     {
@@ -346,6 +351,11 @@
       "declares_read_only": false
     },
     {
+      "name": "feature-flag-architect",
+      "manual_only": false,
+      "declares_read_only": true
+    },
+    {
       "name": "feature-flag-rollout-strategist",
       "manual_only": false,
       "declares_read_only": false
@@ -357,7 +367,7 @@
     },
     {
       "name": "flaky-test-detective",
-      "manual_only": false,
+      "manual_only": true,
       "declares_read_only": false
     },
     {
@@ -387,6 +397,11 @@
     },
     {
       "name": "gated-deployment-prompt-template",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "hidden-context-exposure-reviewer",
       "manual_only": false,
       "declares_read_only": false
     },
@@ -467,7 +482,7 @@
     },
     {
       "name": "local-ci-mirror-preflight",
-      "manual_only": false,
+      "manual_only": true,
       "declares_read_only": false
     },
     {
@@ -512,12 +527,12 @@
     },
     {
       "name": "multi-tenant-security-tester",
-      "manual_only": false,
+      "manual_only": true,
       "declares_read_only": false
     },
     {
       "name": "n-plus-one-detector",
-      "manual_only": false,
+      "manual_only": true,
       "declares_read_only": false
     },
     {
@@ -627,7 +642,7 @@
     },
     {
       "name": "query-plan-reader",
-      "manual_only": false,
+      "manual_only": true,
       "declares_read_only": false
     },
     {
@@ -662,7 +677,7 @@
     },
     {
       "name": "reviewable-diff-discipline",
-      "manual_only": false,
+      "manual_only": true,
       "declares_read_only": false
     },
     {
@@ -793,7 +808,7 @@
     {
       "name": "source-currency-auditor",
       "manual_only": false,
-      "declares_read_only": true
+      "declares_read_only": false
     },
     {
       "name": "source-of-truth-reconciler",
@@ -851,18 +866,13 @@
       "declares_read_only": false
     },
     {
-      "name": "system-prompt-leakage-reviewer",
-      "manual_only": false,
-      "declares_read_only": false
-    },
-    {
       "name": "systematic-debugger",
-      "manual_only": false,
+      "manual_only": true,
       "declares_read_only": false
     },
     {
       "name": "tdd-engineer",
-      "manual_only": false,
+      "manual_only": true,
       "declares_read_only": false
     },
     {
@@ -978,6 +988,11 @@
       "type": "description-mention"
     },
     {
+      "from": "admin-console-architect",
+      "to": "superadmin-observability-console-designer",
+      "type": "description-mention"
+    },
+    {
       "from": "adr-sequencer",
       "to": "adr-writer",
       "type": "body-route"
@@ -1009,6 +1024,11 @@
     },
     {
       "from": "adr-writer",
+      "to": "adr-sequencer",
+      "type": "description-mention"
+    },
+    {
+      "from": "adr-writer",
       "to": "architecture-designer",
       "type": "body-route"
     },
@@ -1030,6 +1050,11 @@
     {
       "from": "adr-writer",
       "to": "source-of-truth-reconciler",
+      "type": "description-mention"
+    },
+    {
+      "from": "adr-writer",
+      "to": "tech-spec-writer",
       "type": "description-mention"
     },
     {
@@ -1039,12 +1064,17 @@
     },
     {
       "from": "agent-authorization-matrix",
-      "to": "human-approval-boundary",
-      "type": "body-route"
+      "to": "human-agent-trust-reviewer",
+      "type": "description-mention"
     },
     {
       "from": "agent-authorization-matrix",
       "to": "human-approval-boundary",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-authorization-matrix",
+      "to": "standing-approval-and-auto-advance",
       "type": "description-mention"
     },
     {
@@ -1069,33 +1099,8 @@
     },
     {
       "from": "agent-goal-hijack-defender",
-      "to": "agent-containment-reviewer",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-goal-hijack-defender",
-      "to": "agent-tool-safety-guard",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-goal-hijack-defender",
       "to": "ai-evaluation-harness",
       "type": "body-route"
-    },
-    {
-      "from": "agent-goal-hijack-defender",
-      "to": "incident-response-runbook",
-      "type": "body-route"
-    },
-    {
-      "from": "agent-goal-hijack-defender",
-      "to": "incident-response-runbook",
-      "type": "body-route"
-    },
-    {
-      "from": "agent-goal-hijack-defender",
-      "to": "memory-context-poisoning-reviewer",
-      "type": "description-mention"
     },
     {
       "from": "agent-goal-hijack-defender",
@@ -1110,26 +1115,6 @@
     {
       "from": "agent-governance-audit",
       "to": "ai-closeout-reporter",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-governance-audit",
-      "to": "code-reviewer",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-governance-audit",
-      "to": "full-codebase-auditor",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-governance-audit",
-      "to": "release-readiness-reviewer",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-governance-audit",
-      "to": "security-pr-reviewer",
       "type": "description-mention"
     },
     {
@@ -1184,27 +1169,7 @@
     },
     {
       "from": "agent-identity-privilege-reviewer",
-      "to": "agent-authorization-matrix",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-identity-privilege-reviewer",
       "to": "agent-tool-safety-guard",
-      "type": "body-route"
-    },
-    {
-      "from": "agent-identity-privilege-reviewer",
-      "to": "agent-tool-safety-guard",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-identity-privilege-reviewer",
-      "to": "authorization-matrix-designer",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-identity-privilege-reviewer",
-      "to": "incident-response-runbook",
       "type": "body-route"
     },
     {
@@ -1219,18 +1184,8 @@
     },
     {
       "from": "agent-memory-governance",
-      "to": "agent-startup-context-gate",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-memory-governance",
       "to": "source-of-truth-reconciler",
       "type": "body-route"
-    },
-    {
-      "from": "agent-memory-governance",
-      "to": "source-of-truth-reconciler",
-      "type": "description-mention"
     },
     {
       "from": "agent-tool-safety-guard",
@@ -1244,32 +1199,12 @@
     },
     {
       "from": "agent-tool-safety-guard",
+      "to": "hidden-context-exposure-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-tool-safety-guard",
       "to": "human-approval-boundary",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-tool-safety-guard",
-      "to": "incident-response-runbook",
-      "type": "body-route"
-    },
-    {
-      "from": "agent-tool-safety-guard",
-      "to": "incident-response-runbook",
-      "type": "body-route"
-    },
-    {
-      "from": "agent-tool-safety-guard",
-      "to": "llm-output-safety-reviewer",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-tool-safety-guard",
-      "to": "prompt-injection-defender",
-      "type": "description-mention"
-    },
-    {
-      "from": "agent-tool-safety-guard",
-      "to": "rag-security-architect",
       "type": "description-mention"
     },
     {
@@ -1319,12 +1254,42 @@
     },
     {
       "from": "agentic-loop-designer",
+      "to": "error-taxonomy-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "agentic-loop-designer",
       "to": "threat-modeler",
       "type": "description-mention"
     },
     {
-      "from": "ai-cost-guardrail-designer",
-      "to": "ai-router-architect",
+      "from": "ai-closeout-reporter",
+      "to": "agent-governance-audit",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-closeout-reporter",
+      "to": "chat-backlog-reconciliation",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-closeout-reporter",
+      "to": "lane-authoring-guide",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-closeout-reporter",
+      "to": "phased-work-handoff-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-closeout-reporter",
+      "to": "promotion-packet-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-closeout-reporter",
+      "to": "screenshot-evidence-planner",
       "type": "description-mention"
     },
     {
@@ -1334,17 +1299,7 @@
     },
     {
       "from": "ai-cost-guardrail-designer",
-      "to": "incident-response-runbook",
-      "type": "body-route"
-    },
-    {
-      "from": "ai-cost-guardrail-designer",
       "to": "observability-operator",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-cost-guardrail-designer",
-      "to": "plan-entitlement-architect",
       "type": "description-mention"
     },
     {
@@ -1364,27 +1319,7 @@
     },
     {
       "from": "ai-evaluation-harness",
-      "to": "incident-response-runbook",
-      "type": "body-route"
-    },
-    {
-      "from": "ai-evaluation-harness",
-      "to": "observability-operator",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-evaluation-harness",
       "to": "prompt-injection-defender",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-evaluation-harness",
-      "to": "qa-automation-architect",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-evaluation-harness",
-      "to": "regression-suite-curator",
       "type": "description-mention"
     },
     {
@@ -1404,17 +1339,7 @@
     },
     {
       "from": "ai-governance-risk-reviewer",
-      "to": "ai-threat-modeler",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-governance-risk-reviewer",
       "to": "human-approval-boundary",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-governance-risk-reviewer",
-      "to": "threat-modeler",
       "type": "description-mention"
     },
     {
@@ -1444,11 +1369,6 @@
     },
     {
       "from": "ai-lifecycle-risk-manager",
-      "to": "iso-42001-aims-architect",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-lifecycle-risk-manager",
       "to": "threat-modeler",
       "type": "description-mention"
     },
@@ -1459,27 +1379,12 @@
     },
     {
       "from": "ai-misinformation-guard",
-      "to": "llm-output-safety-reviewer",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-misinformation-guard",
-      "to": "model-poisoning-reviewer",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-misinformation-guard",
-      "to": "prompt-injection-defender",
+      "to": "human-agent-trust-reviewer",
       "type": "description-mention"
     },
     {
       "from": "ai-misinformation-guard",
       "to": "rag-security-architect",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-misinformation-guard",
-      "to": "structured-output-validator",
       "type": "description-mention"
     },
     {
@@ -1520,26 +1425,6 @@
     {
       "from": "ai-sdlc-operating-model",
       "to": "agent-memory-governance",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-threat-modeler",
-      "to": "ai-evaluation-harness",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-threat-modeler",
-      "to": "prompt-injection-defender",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-threat-modeler",
-      "to": "rag-security-architect",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-threat-modeler",
-      "to": "security-pr-reviewer",
       "type": "description-mention"
     },
     {
@@ -1633,6 +1518,16 @@
       "type": "description-mention"
     },
     {
+      "from": "api-event-architect",
+      "to": "error-taxonomy-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "api-event-architect",
+      "to": "sunset-deprecation-communicator",
+      "type": "description-mention"
+    },
+    {
       "from": "appsec-implementer",
       "to": "human-approval-boundary",
       "type": "body-route"
@@ -1714,6 +1609,11 @@
     },
     {
       "from": "architecture-designer",
+      "to": "architecture-advisor",
+      "type": "description-mention"
+    },
+    {
+      "from": "architecture-designer",
       "to": "domain-modeler",
       "type": "description-mention"
     },
@@ -1723,6 +1623,11 @@
       "type": "body-route"
     },
     {
+      "from": "architecture-designer",
+      "to": "saas-platform-architect",
+      "type": "description-mention"
+    },
+    {
       "from": "audit-log-architect",
       "to": "api-event-architect",
       "type": "description-mention"
@@ -1730,6 +1635,11 @@
     {
       "from": "audit-log-architect",
       "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "audit-log-architect",
+      "to": "security-logging-alerting-architect",
       "type": "description-mention"
     },
     {
@@ -1809,6 +1719,11 @@
     },
     {
       "from": "authorization-matrix-designer",
+      "to": "rls-policy-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "authorization-matrix-designer",
       "to": "tenant-modeler",
       "type": "body-route"
     },
@@ -1816,11 +1731,6 @@
       "from": "aws-saas-architect",
       "to": "authorization-matrix-designer",
       "type": "body-route"
-    },
-    {
-      "from": "aws-saas-architect",
-      "to": "azure-saas-architect",
-      "type": "description-mention"
     },
     {
       "from": "aws-saas-architect",
@@ -1993,6 +1903,11 @@
       "type": "description-mention"
     },
     {
+      "from": "change-classification-gate",
+      "to": "risk-tiered-validation-selector",
+      "type": "description-mention"
+    },
+    {
       "from": "chat-backlog-reconciliation",
       "to": "agent-memory-governance",
       "type": "description-mention"
@@ -2094,6 +2009,11 @@
     },
     {
       "from": "cloud-architecture-decider",
+      "to": "architecture-advisor",
+      "type": "description-mention"
+    },
+    {
+      "from": "cloud-architecture-decider",
       "to": "architecture-designer",
       "type": "description-mention"
     },
@@ -2101,6 +2021,11 @@
       "from": "cloud-architecture-decider",
       "to": "aws-saas-architect",
       "type": "body-route"
+    },
+    {
+      "from": "cloud-architecture-decider",
+      "to": "aws-saas-architect",
+      "type": "description-mention"
     },
     {
       "from": "cloud-architecture-decider",
@@ -2144,7 +2069,17 @@
     },
     {
       "from": "code-reviewer",
+      "to": "library-diff-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "code-reviewer",
       "to": "principal-code-analyst",
+      "type": "description-mention"
+    },
+    {
+      "from": "code-reviewer",
+      "to": "security-pr-reviewer",
       "type": "description-mention"
     },
     {
@@ -2179,32 +2114,12 @@
     },
     {
       "from": "compliance-control-foundation",
-      "to": "audit-log-architect",
-      "type": "description-mention"
-    },
-    {
-      "from": "compliance-control-foundation",
-      "to": "authorization-matrix-designer",
-      "type": "description-mention"
-    },
-    {
-      "from": "compliance-control-foundation",
       "to": "compliance-gap-auditor",
       "type": "description-mention"
     },
     {
       "from": "compliance-control-foundation",
-      "to": "incident-response-runbook",
-      "type": "description-mention"
-    },
-    {
-      "from": "compliance-control-foundation",
       "to": "multi-framework-crosswalk",
-      "type": "description-mention"
-    },
-    {
-      "from": "compliance-control-foundation",
-      "to": "rls-policy-auditor",
       "type": "description-mention"
     },
     {
@@ -2426,6 +2341,11 @@
       "from": "data-quality-monitor-designer",
       "to": "observability-operator",
       "type": "description-mention"
+    },
+    {
+      "from": "data-quality-monitor-designer",
+      "to": "slo-reliability-architect",
+      "type": "body-route"
     },
     {
       "from": "data-quality-monitor-designer",
@@ -2723,6 +2643,51 @@
       "type": "description-mention"
     },
     {
+      "from": "feature-flag-architect",
+      "to": "ab-test-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "feature-flag-architect",
+      "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "feature-flag-architect",
+      "to": "ci-pipeline-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "feature-flag-architect",
+      "to": "ci-pipeline-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "feature-flag-architect",
+      "to": "ci-pipeline-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "feature-flag-architect",
+      "to": "feature-flag-rollout-strategist",
+      "type": "body-route"
+    },
+    {
+      "from": "feature-flag-architect",
+      "to": "feature-flag-rollout-strategist",
+      "type": "description-mention"
+    },
+    {
+      "from": "feature-flag-architect",
+      "to": "plan-entitlement-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "feature-flag-architect",
+      "to": "tenant-isolation-reviewer",
+      "type": "description-mention"
+    },
+    {
       "from": "feature-flag-rollout-strategist",
       "to": "ab-test-designer",
       "type": "body-route"
@@ -2750,6 +2715,16 @@
     {
       "from": "feature-flag-rollout-strategist",
       "to": "authorization-matrix-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "feature-flag-rollout-strategist",
+      "to": "feature-flag-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "feature-flag-rollout-strategist",
+      "to": "feature-flag-architect",
       "type": "description-mention"
     },
     {
@@ -2973,6 +2948,46 @@
       "type": "description-mention"
     },
     {
+      "from": "hidden-context-exposure-reviewer",
+      "to": "agent-tool-safety-guard",
+      "type": "body-route"
+    },
+    {
+      "from": "hidden-context-exposure-reviewer",
+      "to": "agent-tool-safety-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "hidden-context-exposure-reviewer",
+      "to": "ai-cost-guardrail-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "hidden-context-exposure-reviewer",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "hidden-context-exposure-reviewer",
+      "to": "prompt-injection-defender",
+      "type": "description-mention"
+    },
+    {
+      "from": "hidden-context-exposure-reviewer",
+      "to": "secrets-identity-hardener",
+      "type": "description-mention"
+    },
+    {
+      "from": "hidden-context-exposure-reviewer",
+      "to": "sensitive-disclosure-guard",
+      "type": "body-route"
+    },
+    {
+      "from": "hidden-context-exposure-reviewer",
+      "to": "sensitive-disclosure-guard",
+      "type": "description-mention"
+    },
+    {
       "from": "horizontal-scalability-reviewer",
       "to": "caching-strategy-designer",
       "type": "body-route"
@@ -3000,6 +3015,11 @@
     {
       "from": "horizontal-scalability-reviewer",
       "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "human-agent-trust-reviewer",
+      "to": "agent-authorization-matrix",
       "type": "description-mention"
     },
     {
@@ -3030,6 +3050,21 @@
     {
       "from": "human-agent-trust-reviewer",
       "to": "human-approval-boundary",
+      "type": "description-mention"
+    },
+    {
+      "from": "human-agent-trust-reviewer",
+      "to": "standing-approval-and-auto-advance",
+      "type": "description-mention"
+    },
+    {
+      "from": "human-approval-boundary",
+      "to": "human-agent-trust-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "human-approval-boundary",
+      "to": "scoped-approval-register",
       "type": "description-mention"
     },
     {
@@ -3344,12 +3379,22 @@
     },
     {
       "from": "llm-output-safety-reviewer",
+      "to": "sensitive-disclosure-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "llm-output-safety-reviewer",
       "to": "structured-output-validator",
       "type": "description-mention"
     },
     {
       "from": "load-test-planner",
       "to": "performance-test-harness",
+      "type": "description-mention"
+    },
+    {
+      "from": "load-test-planner",
+      "to": "profiling-methodology-designer",
       "type": "description-mention"
     },
     {
@@ -3524,6 +3569,11 @@
     },
     {
       "from": "model-poisoning-reviewer",
+      "to": "memory-context-poisoning-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "model-poisoning-reviewer",
       "to": "observability-operator",
       "type": "body-route"
     },
@@ -3601,6 +3651,11 @@
       "from": "multi-tenant-security-tester",
       "to": "tenant-isolation-reviewer",
       "type": "description-mention"
+    },
+    {
+      "from": "multi-tenant-security-tester",
+      "to": "tenant-modeler",
+      "type": "body-route"
     },
     {
       "from": "multi-tenant-security-tester",
@@ -3849,6 +3904,16 @@
     },
     {
       "from": "plan-entitlement-architect",
+      "to": "feature-flag-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "plan-entitlement-architect",
+      "to": "feature-flag-rollout-strategist",
+      "type": "description-mention"
+    },
+    {
+      "from": "plan-entitlement-architect",
       "to": "human-approval-boundary",
       "type": "body-route"
     },
@@ -3989,12 +4054,27 @@
     },
     {
       "from": "product-spec-writer",
+      "to": "project-orchestrator",
+      "type": "body-route"
+    },
+    {
+      "from": "product-spec-writer",
+      "to": "project-orchestrator",
+      "type": "description-mention"
+    },
+    {
+      "from": "product-spec-writer",
       "to": "requirements-gathering-facilitator",
       "type": "body-route"
     },
     {
       "from": "product-spec-writer",
       "to": "requirements-gathering-facilitator",
+      "type": "description-mention"
+    },
+    {
+      "from": "product-spec-writer",
+      "to": "tech-spec-writer",
       "type": "description-mention"
     },
     {
@@ -4010,6 +4090,11 @@
     {
       "from": "profiling-methodology-designer",
       "to": "frontend-perf-engineer",
+      "type": "description-mention"
+    },
+    {
+      "from": "profiling-methodology-designer",
+      "to": "load-test-planner",
       "type": "description-mention"
     },
     {
@@ -4119,12 +4204,17 @@
     },
     {
       "from": "project-orchestrator",
-      "to": "local-ci-mirror-preflight",
+      "to": "feature-flag-architect",
       "type": "body-route"
     },
     {
       "from": "project-orchestrator",
-      "to": "multi-tenant-data-architect",
+      "to": "feature-flag-rollout-strategist",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
+      "to": "local-ci-mirror-preflight",
       "type": "body-route"
     },
     {
@@ -4229,6 +4319,11 @@
     },
     {
       "from": "project-orchestrator",
+      "to": "saas-platform-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
       "to": "sharded-validation-with-resume",
       "type": "body-route"
     },
@@ -4284,6 +4379,11 @@
     },
     {
       "from": "prompt-injection-defender",
+      "to": "hidden-context-exposure-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "prompt-injection-defender",
       "to": "incident-response-runbook",
       "type": "body-route"
     },
@@ -4295,11 +4395,6 @@
     {
       "from": "prompt-injection-defender",
       "to": "rag-security-architect",
-      "type": "description-mention"
-    },
-    {
-      "from": "prompt-injection-defender",
-      "to": "system-prompt-leakage-reviewer",
       "type": "description-mention"
     },
     {
@@ -4478,16 +4573,6 @@
       "type": "description-mention"
     },
     {
-      "from": "release-readiness-reviewer",
-      "to": "secure-migration-reviewer",
-      "type": "description-mention"
-    },
-    {
-      "from": "release-readiness-reviewer",
-      "to": "security-pr-reviewer",
-      "type": "description-mention"
-    },
-    {
       "from": "requirements-gathering-facilitator",
       "to": "domain-modeler",
       "type": "description-mention"
@@ -4505,6 +4590,11 @@
     {
       "from": "requirements-gathering-facilitator",
       "to": "product-spec-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "requirements-gathering-facilitator",
+      "to": "project-orchestrator",
       "type": "description-mention"
     },
     {
@@ -4530,6 +4620,11 @@
     {
       "from": "risk-tiered-validation-selector",
       "to": "sharded-validation-with-resume",
+      "type": "description-mention"
+    },
+    {
+      "from": "rls-policy-auditor",
+      "to": "authorization-matrix-designer",
       "type": "description-mention"
     },
     {
@@ -4595,6 +4690,16 @@
     {
       "from": "roadmap-under-uncertainty-planner",
       "to": "product-spec-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "roadmap-under-uncertainty-planner",
+      "to": "roadmap-to-commitments-translator",
+      "type": "description-mention"
+    },
+    {
+      "from": "rollback-runbook-author",
+      "to": "data-migration-runbook-author",
       "type": "description-mention"
     },
     {
@@ -4769,6 +4874,11 @@
     },
     {
       "from": "screenshot-evidence-planner",
+      "to": "compliance-evidence-collector",
+      "type": "description-mention"
+    },
+    {
+      "from": "screenshot-evidence-planner",
       "to": "manual-test-case-creator",
       "type": "description-mention"
     },
@@ -4879,6 +4989,11 @@
     },
     {
       "from": "security-pr-reviewer",
+      "to": "error-handling-security-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-pr-reviewer",
       "to": "secure-migration-reviewer",
       "type": "description-mention"
     },
@@ -4944,6 +5059,11 @@
     },
     {
       "from": "sensitive-disclosure-guard",
+      "to": "hidden-context-exposure-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "sensitive-disclosure-guard",
       "to": "incident-response-runbook",
       "type": "body-route"
     },
@@ -4960,11 +5080,6 @@
     {
       "from": "sensitive-disclosure-guard",
       "to": "secrets-identity-hardener",
-      "type": "description-mention"
-    },
-    {
-      "from": "sensitive-disclosure-guard",
-      "to": "system-prompt-leakage-reviewer",
       "type": "description-mention"
     },
     {
@@ -5080,11 +5195,6 @@
     {
       "from": "skill-usage-instrumenter",
       "to": "skill-quality-reviewer",
-      "type": "body-route"
-    },
-    {
-      "from": "skill-usage-instrumenter",
-      "to": "skill-quality-reviewer",
       "type": "description-mention"
     },
     {
@@ -5194,6 +5304,11 @@
     },
     {
       "from": "source-of-truth-reconciler",
+      "to": "chat-backlog-reconciliation",
+      "type": "description-mention"
+    },
+    {
+      "from": "source-of-truth-reconciler",
       "to": "human-approval-boundary",
       "type": "body-route"
     },
@@ -5254,12 +5369,22 @@
     },
     {
       "from": "static-analysis-reviewer",
+      "to": "sast-orchestration-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "static-analysis-reviewer",
       "to": "secure-migration-reviewer",
       "type": "description-mention"
     },
     {
       "from": "static-analysis-reviewer",
       "to": "security-pr-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "static-analysis-reviewer",
+      "to": "security-scan-orchestrator",
       "type": "description-mention"
     },
     {
@@ -5280,6 +5405,11 @@
     {
       "from": "streaming-event-architect",
       "to": "audit-log-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "streaming-event-architect",
+      "to": "event-schema-architect",
       "type": "description-mention"
     },
     {
@@ -5458,31 +5588,6 @@
       "type": "description-mention"
     },
     {
-      "from": "system-prompt-leakage-reviewer",
-      "to": "agent-tool-safety-guard",
-      "type": "description-mention"
-    },
-    {
-      "from": "system-prompt-leakage-reviewer",
-      "to": "ai-evaluation-harness",
-      "type": "body-route"
-    },
-    {
-      "from": "system-prompt-leakage-reviewer",
-      "to": "prompt-injection-defender",
-      "type": "description-mention"
-    },
-    {
-      "from": "system-prompt-leakage-reviewer",
-      "to": "secrets-identity-hardener",
-      "type": "description-mention"
-    },
-    {
-      "from": "system-prompt-leakage-reviewer",
-      "to": "sensitive-disclosure-guard",
-      "type": "description-mention"
-    },
-    {
       "from": "systematic-debugger",
       "to": "full-codebase-auditor",
       "type": "description-mention"
@@ -5510,6 +5615,11 @@
     {
       "from": "tech-spec-writer",
       "to": "architecture-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "tech-spec-writer",
+      "to": "design-review-facilitator",
       "type": "description-mention"
     },
     {
@@ -5544,12 +5654,22 @@
     },
     {
       "from": "tenant-modeler",
+      "to": "intra-tenant-scope-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "tenant-modeler",
       "to": "multi-tenant-data-architect",
       "type": "body-route"
     },
     {
       "from": "tenant-modeler",
       "to": "multi-tenant-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "tenant-modeler",
+      "to": "saas-platform-architect",
       "type": "description-mention"
     },
     {
@@ -5764,21 +5884,18 @@
     }
   ],
   "unreferenced_skills": [
+    "aegis-setup",
     "authority-invalidation-architect",
     "background-job-orchestration-architect",
     "cell-based-architecture-designer",
     "context-co-update-ci-gate",
     "data-quality-monitor-designer",
-    "design-review-facilitator",
     "docs-first-implementer",
     "file-upload-storage-architect",
     "gated-deployment-prompt-template",
     "horizontal-scalability-reviewer",
     "inter-agent-comms-reviewer",
-    "intra-tenant-scope-architect",
-    "project-orchestrator",
     "reviewable-diff-discipline",
-    "superadmin-observability-console-designer",
     "usage-metering-and-cost-attribution-pipeline-designer"
   ]
 }
