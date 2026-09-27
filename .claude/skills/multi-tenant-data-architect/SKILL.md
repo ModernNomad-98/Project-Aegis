@@ -102,12 +102,13 @@ a cross-tenant leak.
     affects this product. Compare viable options by money (including $0),
     migration/setup time, ongoing operations/maintenance cost, isolation
     benefits and drawbacks. State why each viable option could fit this case
-    and mark unknown costs as unknown rather than guessing, treat an
-    unstated input such as team capacity as unknown, and ask only for one
-    missing deciding fact per turn when the recommendation depends on it,
-    until all such facts are known; only then recommend one from measured
-    volume, compliance needs and team capacity, with a reason, then ask
-    exactly one owner question; the answer does not
+    and mark unknown costs as unknown rather than guessing. The
+    recommendation rests on three deciding facts: measured volume,
+    compliance needs and team capacity. Treat any of them left unstated as
+    unknown, never guess it, and ask only for one missing deciding fact per
+    turn, with no recommendation or decision question on that turn, until
+    all three are known; only then recommend one option with a reason, then
+    ask exactly one owner question; the answer does not
     authorize migration execution. Resolve routine per-store design choices
     from evidence without asking the owner. Treat a choice already stated by
     the owner as settled; explain its implications without re-asking.
@@ -131,7 +132,9 @@ Isolation test matrix (data layer): <store × operation × expected denial>
 Assumptions & open questions: <each with risk-if-wrong / who answers>
 Owner choice brief (only if needed): <terms; why now; options with money,
   setup/migration/maintenance costs, pros and cons, why each fits; unknowns
-  marked unknown; recommendation and fit; one owner question>
+  marked unknown; recommendation and fit once the deciding facts are
+  known; one owner question (the one missing deciding fact, else the
+  decision)>
 ```
 
 ## Validation Checklist
@@ -150,8 +153,10 @@ Owner choice brief (only if needed): <terms; why now; options with money,
 - [ ] No RLS policy SQL authored; enforcement location decided, policy
       authoring deferred to the Phase 4 pack.
 - [ ] Any owner-facing choice explains terms, each option's reason, costs or
-      unknowns, pros and cons, and a reasoned recommendation before one
-      owner question.
+      unknowns, and pros and cons; while a deciding fact (measured volume,
+      compliance needs, team capacity) is missing, the turn asks only for
+      that one fact and makes no recommendation; once all are known, it
+      gives a reasoned recommendation before one owner question.
 
 ## Tenant Isolation Rules
 
