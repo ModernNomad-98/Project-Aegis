@@ -61,7 +61,7 @@
         "triggers": false,
         "assertions": [
           "model-poisoning-reviewer does not activate: retrieved content acting as instructions at answer time is inference-time injection, not training, feedback or ingestion integrity.",
-          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute model-poisoning-reviewer or another skill for it."
+          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute model-poisoning-reviewer for it."
         ]
       }
     }

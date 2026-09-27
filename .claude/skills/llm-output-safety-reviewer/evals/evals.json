@@ -62,7 +62,7 @@
         "triggers": false,
         "assertions": [
           "llm-output-safety-reviewer does not activate: preventing hidden instructions from manipulating the model is the input-side injection defense; this skill assumes output is adversarial and secures its consuming sinks.",
-          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute llm-output-safety-reviewer or another skill for it."
+          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute llm-output-safety-reviewer for it."
         ]
       }
     }

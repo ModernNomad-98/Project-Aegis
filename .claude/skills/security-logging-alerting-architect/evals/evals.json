@@ -81,7 +81,7 @@
         "triggers": false,
         "assertions": [
           "security-logging-alerting-architect does not activate: creating the alert rules and dashboards from an approved spec and verifying they fire is live config implementation; this skill produces the spec and changes nothing itself.",
-          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute security-logging-alerting-architect or another skill for it."
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute security-logging-alerting-architect for it."
         ]
       }
     }

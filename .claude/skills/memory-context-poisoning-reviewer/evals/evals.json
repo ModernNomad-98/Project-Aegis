@@ -62,7 +62,7 @@
         "triggers": false,
         "assertions": [
           "memory-context-poisoning-reviewer does not activate: a payload that acted immediately within the current session's context is in-context injection; ASI06 begins only when a payload persists into stored memory and fires later.",
-          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute memory-context-poisoning-reviewer or another skill for it."
+          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute memory-context-poisoning-reviewer for it."
         ]
       }
     },
@@ -74,7 +74,7 @@
         "triggers": false,
         "assertions": [
           "memory-context-poisoning-reviewer does not activate: governing when a development coding agent may update its own persistent memory files and verify remembered facts is operational agent-memory governance, not an attacker-focused review of a product agent's memory store.",
-          "Does not auto-invoke agent-memory-governance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute memory-context-poisoning-reviewer or another skill for it."
+          "Does not auto-invoke agent-memory-governance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute memory-context-poisoning-reviewer for it."
         ]
       }
     },
@@ -86,7 +86,7 @@
         "triggers": false,
         "assertions": [
           "memory-context-poisoning-reviewer does not activate: keeping a live run's objective pinned after content altered it mid-run is run-level goal integrity, not the persistent memory store a hijack might write to.",
-          "Does not auto-invoke agent-goal-hijack-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute memory-context-poisoning-reviewer or another skill for it."
+          "Does not auto-invoke agent-goal-hijack-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute memory-context-poisoning-reviewer for it."
         ]
       }
     }

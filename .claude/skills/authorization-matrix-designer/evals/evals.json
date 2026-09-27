@@ -75,7 +75,7 @@
         "triggers": false,
         "assertions": [
           "authorization-matrix-designer does not activate: standing authority for a coding agent (commits, pushes, PRs, merges, deploys) is agent SDLC policy, not an end-user roles-by-permissions-by-resources matrix for a multi-tenant SaaS.",
-          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute authorization-matrix-designer or another skill for it."
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute authorization-matrix-designer for it."
         ]
       }
     }

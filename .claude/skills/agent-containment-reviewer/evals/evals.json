@@ -62,7 +62,7 @@
         "triggers": false,
         "assertions": [
           "agent-containment-reviewer does not activate: an attacker deliberately altering the agent's objective through ingested content is ASI01 goal hijack, outside containment's ASI08/ASI10 lane of cascade and drift without active attacker control.",
-          "Does not auto-invoke agent-goal-hijack-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-containment-reviewer or another skill for it."
+          "Does not auto-invoke agent-goal-hijack-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-containment-reviewer for it."
         ]
       }
     },
@@ -74,7 +74,7 @@
         "triggers": false,
         "assertions": [
           "agent-containment-reviewer does not activate: hands-on wiring of dashboards and alert rules in a monitoring stack is implementation work; containment only defines which baselines and drift signals must exist.",
-          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-containment-reviewer or another skill for it."
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-containment-reviewer for it."
         ]
       }
     }

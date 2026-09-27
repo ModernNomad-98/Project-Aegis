@@ -102,7 +102,7 @@
         "triggers": false,
         "assertions": [
           "human-approval-boundary does not activate: writing the standing policy of what a coding agent may do without asking is defining authority; the boundary only checks and enforces it at runtime before a risky action.",
-          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute human-approval-boundary or another skill for it."
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute human-approval-boundary for it."
         ]
       }
     },
@@ -114,7 +114,7 @@
         "triggers": false,
         "assertions": [
           "human-approval-boundary does not activate: designing a recurring documented standing-approval policy with an opt-out and phase-advance rule is policy design, not a halt at one uncovered risky action.",
-          "Does not auto-invoke standing-approval-and-auto-advance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute human-approval-boundary or another skill for it."
+          "Does not auto-invoke standing-approval-and-auto-advance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute human-approval-boundary for it."
         ]
       }
     }

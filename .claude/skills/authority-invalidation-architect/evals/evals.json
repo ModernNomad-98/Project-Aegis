@@ -81,7 +81,7 @@
         "triggers": false,
         "assertions": [
           "authority-invalidation-architect does not activate: a committed service key needs rotation and custody remediation, not a differential for revoked access that failed to take effect.",
-          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute authority-invalidation-architect or another skill for it."
+          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute authority-invalidation-architect for it."
         ]
       }
     },
@@ -93,7 +93,7 @@
         "triggers": false,
         "assertions": [
           "authority-invalidation-architect does not activate: an intermittent wrong-totals export bug with unknown cause is general root-cause debugging, not an access change that failed to propagate.",
-          "Does not auto-invoke systematic-debugger (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute authority-invalidation-architect or another skill for it."
+          "Does not auto-invoke systematic-debugger (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute authority-invalidation-architect for it."
         ]
       }
     }

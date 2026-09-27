@@ -76,7 +76,7 @@
         "triggers": false,
         "assertions": [
           "ai-lifecycle-risk-manager does not activate: building and running an eval suite with release-gating thresholds is evaluation harness work; the AI RMF program only wires those thresholds into MEASURE.",
-          "Does not auto-invoke ai-evaluation-harness (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-lifecycle-risk-manager or another skill for it."
+          "Does not auto-invoke ai-evaluation-harness (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-lifecycle-risk-manager for it."
         ]
       }
     }

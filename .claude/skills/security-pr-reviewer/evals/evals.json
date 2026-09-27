@@ -60,7 +60,7 @@
         "triggers": false,
         "assertions": [
           "security-pr-reviewer does not activate: there is no diff to review; the ask is to implement an already-agreed ownership check and a wrong-tenant 404 test, a side-effecting build task.",
-          "Does not auto-invoke appsec-implementer (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute security-pr-reviewer or another skill for it."
+          "Does not auto-invoke appsec-implementer (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute security-pr-reviewer for it."
         ]
       }
     },
@@ -72,7 +72,7 @@
         "triggers": false,
         "assertions": [
           "security-pr-reviewer does not activate: there is no diff to review; moving hardcoded keys into a manager, classifying client-safe env vars and setting up rotation is broad hardening work.",
-          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute security-pr-reviewer or another skill for it."
+          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute security-pr-reviewer for it."
         ]
       }
     }

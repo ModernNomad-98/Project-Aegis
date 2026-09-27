@@ -125,7 +125,7 @@
         "triggers": false,
         "assertions": [
           "scoped-approval-register does not activate: designing the standing-approval policy itself (opt-out phrase, reviewer-block path) is policy design; the register only holds an adopted policy's grant as an entry afterwards.",
-          "Does not auto-invoke standing-approval-and-auto-advance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute scoped-approval-register or another skill for it."
+          "Does not auto-invoke standing-approval-and-auto-advance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute scoped-approval-register for it."
         ]
       }
     },
@@ -137,7 +137,7 @@
         "triggers": false,
         "assertions": [
           "scoped-approval-register does not activate: a deny-by-default authority floor for agents (open PRs, never merge to main or arm auto-merge) is standing authorization policy, not a record of one granted approval.",
-          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute scoped-approval-register or another skill for it."
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute scoped-approval-register for it."
         ]
       }
     }

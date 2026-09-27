@@ -61,7 +61,7 @@
         "triggers": false,
         "assertions": [
           "agent-governance-audit does not activate: writing a forward-looking standing merge/auto-merge authority rule is not a retrospective PASS/FAIL/UNVERIFIABLE audit of what happened in the incident.",
-          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-governance-audit or another skill for it."
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-governance-audit for it."
         ]
       }
     }

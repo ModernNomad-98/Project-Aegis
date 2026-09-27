@@ -65,7 +65,7 @@
         "triggers": false,
         "assertions": [
           "security-scan-orchestrator does not activate: designing the end-to-end CI delivery pipeline (stage graph, merge-blocking rules, deploy gates) is not running or aggregating a whole-repository security scan.",
-          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute security-scan-orchestrator or another skill for it."
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute security-scan-orchestrator for it."
         ]
       }
     }

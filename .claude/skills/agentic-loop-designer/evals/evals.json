@@ -107,7 +107,7 @@
         "triggers": false,
         "assertions": [
           "agentic-loop-designer does not activate: restoring a conflicted working tree and half-applied commit is performing recovery, not designing a loop's shape, bounds, checkpoints or retry rules.",
-          "Does not auto-invoke agent-failure-recovery (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agentic-loop-designer or another skill for it."
+          "Does not auto-invoke agent-failure-recovery (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agentic-loop-designer for it."
         ]
       }
     },
@@ -119,7 +119,7 @@
         "triggers": false,
         "assertions": [
           "agentic-loop-designer does not activate: reviewing multi-step runs for objective substitution or scope expansion by poisoned content is attack review, not the design of the loop's honest shape and stopping.",
-          "Does not auto-invoke agent-goal-hijack-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agentic-loop-designer or another skill for it."
+          "Does not auto-invoke agent-goal-hijack-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agentic-loop-designer for it."
         ]
       }
     }

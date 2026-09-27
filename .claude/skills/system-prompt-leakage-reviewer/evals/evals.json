@@ -62,7 +62,7 @@
         "triggers": false,
         "assertions": [
           "system-prompt-leakage-reviewer does not activate: stopping untrusted document content from overriding instructions at runtime is injection defense, not a review of the system prompt's contents or of security depending on its secrecy.",
-          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute system-prompt-leakage-reviewer or another skill for it."
+          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute system-prompt-leakage-reviewer for it."
         ]
       }
     },
@@ -74,7 +74,7 @@
         "triggers": false,
         "assertions": [
           "system-prompt-leakage-reviewer does not activate: rotating a leaked key and designing server-side storage and least-privilege service accounts is custody work, not a system-prompt contents or dependence review.",
-          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute system-prompt-leakage-reviewer or another skill for it."
+          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute system-prompt-leakage-reviewer for it."
         ]
       }
     }

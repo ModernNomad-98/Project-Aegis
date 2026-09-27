@@ -67,7 +67,7 @@
         "triggers": false,
         "assertions": [
           "dast-safety-harness-designer does not activate: testing the cross-tenant isolation boundary (IDOR across tenant ids) is tenant-isolation test methodology, not design of the general safe dynamic-testing harness.",
-          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute dast-safety-harness-designer or another skill for it."
+          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute dast-safety-harness-designer for it."
         ]
       }
     }

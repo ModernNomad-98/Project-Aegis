@@ -62,7 +62,7 @@
         "triggers": false,
         "assertions": [
           "inter-agent-comms-reviewer does not activate: hidden instructions in a document already in the model's context are an in-context injection defense problem, not transport or receiver handling of peer agent messages.",
-          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute inter-agent-comms-reviewer or another skill for it."
+          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute inter-agent-comms-reviewer for it."
         ]
       }
     }

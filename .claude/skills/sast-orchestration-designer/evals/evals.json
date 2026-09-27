@@ -65,7 +65,7 @@
         "triggers": false,
         "assertions": [
           "sast-orchestration-designer does not activate: designing the whole CI delivery pipeline (stage graph, merge-blocking semantics, rollback) is broader than the SAST stage contract this skill produces.",
-          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute sast-orchestration-designer or another skill for it."
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute sast-orchestration-designer for it."
         ]
       }
     }

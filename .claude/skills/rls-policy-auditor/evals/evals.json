@@ -60,7 +60,7 @@
         "triggers": false,
         "assertions": [
           "rls-policy-auditor does not activate: negative tests proving API and export endpoints deny cross-tenant access are application-layer isolation testing, not database RLS policy text or DB-layer tests.",
-          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute rls-policy-auditor or another skill for it."
+          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute rls-policy-auditor for it."
         ]
       }
     }

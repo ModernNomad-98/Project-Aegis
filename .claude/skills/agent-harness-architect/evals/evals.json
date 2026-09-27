@@ -80,7 +80,7 @@
         "triggers": false,
         "assertions": [
           "agent-harness-architect does not activate: authoring which SDLC actions agents may take alone versus which need a named human is defining authority policy; the harness only enforces that policy at its authorize rung and never defines it.",
-          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-harness-architect or another skill for it."
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-harness-architect for it."
         ]
       }
     },
@@ -92,7 +92,7 @@
         "triggers": false,
         "assertions": [
           "agent-harness-architect does not activate: attack review of an existing harness (injection, tool abuse, compromise containment) belongs to the agentic-security reviewers; the harness skill designs the operating environment, not its attack review.",
-          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-harness-architect or another skill for it."
+          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-harness-architect for it."
         ]
       }
     }

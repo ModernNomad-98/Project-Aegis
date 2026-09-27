@@ -62,7 +62,7 @@
         "triggers": false,
         "assertions": [
           "human-agent-trust-reviewer does not activate: the prompt asks to define per-action approval semantics and standing-grant rules before any approval-UX review, which is not adversarial review of consent fatigue or deceptive justifications.",
-          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute human-agent-trust-reviewer or another skill for it."
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute human-agent-trust-reviewer for it."
         ]
       }
     },
@@ -74,7 +74,7 @@
         "triggers": false,
         "assertions": [
           "human-agent-trust-reviewer does not activate: the prompt explicitly declines review of the approval flow for manipulation and asks to design a documented standing approval with an opt-out phrase and per-session restatement.",
-          "Does not auto-invoke standing-approval-and-auto-advance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute human-agent-trust-reviewer or another skill for it."
+          "Does not auto-invoke standing-approval-and-auto-advance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute human-agent-trust-reviewer for it."
         ]
       }
     }

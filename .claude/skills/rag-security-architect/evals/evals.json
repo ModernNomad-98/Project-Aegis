@@ -62,7 +62,7 @@
         "triggers": false,
         "assertions": [
           "rag-security-architect does not activate: authoring the executable two-tenant negative test suite is security-test implementation; this skill designs the retrieval authorization controls and only seeds the cases the suite encodes.",
-          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute rag-security-architect or another skill for it."
+          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute rag-security-architect for it."
         ]
       }
     },
@@ -74,7 +74,7 @@
         "triggers": false,
         "assertions": [
           "rag-security-architect does not activate: retrieved documents injecting instructions once they are in the prompt is in-context handling, not retrieval-time authorization of who may retrieve what.",
-          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute rag-security-architect or another skill for it."
+          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute rag-security-architect for it."
         ]
       }
     }
