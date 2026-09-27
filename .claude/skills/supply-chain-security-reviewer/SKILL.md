@@ -23,7 +23,8 @@ artifacts with their digests, sources, licenses, and base-model lineage.
 LoRA is low-rank adaptation, a common small fine-tuning adapter that is
 loaded on top of a base model. A model registry holds versioned model
 artifacts; promotion moves one version between stages, typically staging
-to production.
+to production. RAG is retrieval-augmented generation; TP and FP are true
+and false positive.
 
 ## Purpose
 
@@ -78,6 +79,10 @@ is a finding whether or not a scanner flagged it.
 - Do NOT use when: reviewing application logic in a diff —
   `security-pr-reviewer`.
 - Do NOT use when: modeling feature-level threats — `threat-modeler`.
+- Do NOT use when: deciding go/no-go for a release that ships a model —
+  `release-readiness-reviewer`, which cites this review's digest,
+  signature, and promotion-gate findings as its artifact-provenance
+  evidence.
 
 ## Inputs to Inspect
 
@@ -119,7 +124,8 @@ is a finding whether or not a scanner flagged it.
 
 1. **Establish what actually ships/builds.** Read the lockfile (not just the
    manifest) for the real dependency set; identify direct vs transitive. No
-   manifest/lockfile or pipeline to review → Stop Conditions.
+   manifest/lockfile, pipeline, or model-registry record to review → Stop
+   Conditions.
 2. **Triage scanner output** (if any) by reachability: for each flagged CVE,
    is the vulnerable code path called by this project? Sort into
    true-positive-reachable, true-positive-latent, false-positive, duplicate.
@@ -227,7 +233,8 @@ Not reviewed: <areas + why>
       attestation verified at promotion and load, safe format, adapter-to-
       base pinning, registry write/promote access, a promotion gate bound
       to the digest, and model card/license/AI-BOM; learned-behavior
-      poisoning routed to `model-poisoning-reviewer`.
+      poisoning from a pipeline you run routed to
+      `model-poisoning-reviewer`.
 - [ ] Agentic components (if any — MCP servers/manifests, tool/skill
       registries, plugins, A2A deps) reviewed for source trust, immutable
       pinning, and manifest permission width (ASI04); runtime message
@@ -294,8 +301,9 @@ Not reviewed: <areas + why>
   digest. The swap usually happens between gate and load, not in the model.
 - A signature proves who produced the bytes, not that the bytes are safe:
   a signed pickle checkpoint still executes code on load, and a signed
-  model can still carry a learned backdoor (that half is
-  `model-poisoning-reviewer`'s). Safetensors removes load-time code
+  model can still carry a learned backdoor (for a model trained by a
+  pipeline you run, that half is `model-poisoning-reviewer`'s; for a
+  downloaded one, provenance is this skill's). Safetensors removes load-time code
   execution; it does not remove a backdoor.
 - A LoRA adapter is only as trusted as the base it is applied to: an
   adapter pinned by digest on top of a base referenced by a mutable tag is
@@ -306,7 +314,8 @@ Not reviewed: <areas + why>
 
 ## Stop Conditions
 
-- No manifest, lockfile, or pipeline is available to review → stop; this
+- No manifest, lockfile, pipeline, or model-registry record is available to
+  review → stop; this
   skill does not assess supply chain from a description.
 - A finding indicates an ACTIVE compromise (malicious package already
   installed, secret already exfiltrated via CI) → report immediately with the
@@ -337,4 +346,5 @@ Not reviewed: <areas + why>
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against `static-analysis-reviewer`,
   `security-pr-reviewer`, and `secure-migration-reviewer` (security-review
-  cluster), and the promoted-artifact seam with `model-poisoning-reviewer`.
+  cluster), the promoted-artifact seam with `model-poisoning-reviewer`, and
+  the model-release go/no-go seam with `release-readiness-reviewer`.
