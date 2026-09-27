@@ -7,7 +7,7 @@
 > [current forecast](aegis-backlog-forecast.md#start-here--current-reading),
 > and owning backlogs before
 > acting. This page grants no implementation, host or provider authority.
-> On 2026-09-27 the seven owner decisions under
+> On 2026-09-27 the ten owner decisions under
 > [Decided on 2026-09-27](#decided-on-2026-09-27) were added; the other rows
 > were not re-checked for that update.
 
@@ -75,9 +75,9 @@ at 01:29:38 UTC as `0d05a838`, so no owner choice remains.
 
 ### Decided on 2026-09-27
 
-The owner decided these seven items in chat with the Claude Code coordinator
+The owner decided these ten items in chat with the Claude Code coordinator
 on 2026-09-27. Only the first has a register entry; where one exists, the
-register entry, not this summary, is the authority. The other six are the
+register entry, not this summary, is the authority. The other nine are the
 owner's direct chat instructions; this page records them and is not itself the
 authority.
 
@@ -90,6 +90,9 @@ authority.
 | Pull request template (`.github/pull_request_template.md`) | **Checklist advisory; security line required.** Completing the checklist stays optional, but every PR must tick Yes or No under the template's "Security-relevant surface?" heading. A separate reviewed PR makes this explicit in `CONTRIBUTING.md` and the template. It does not extend the additional security review, which stays for outside PRs (row above). |
 | Decision-log row for the `aegis-setup` skill (184 to 185 skills, [PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124) under [APR-007](../approvals/APPROVAL_REGISTER.md#aegis-apr-007-issue-101-conversational-setup-aegis-only-completion)) | **Add D67, marked retroactive.** The next free number, D67, is added to [§5 of the reconciliation log](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) as an after-the-fact record that records PR #124's actual merge date, 2026-09-23, so every skill-count change has a decision row. A separate reviewed PR adds it. |
 | Behavioral Eval Runner (BER) README pinned counts (`tools/behavioral_eval_runner/README.md`, 882 behavior and 858 trigger cases) | **Add a date and a pointer to the current counts.** A fresh check found the counts accurate: `census.py` still pins them for its baseline check, and the README already says later revisions may differ. The owner still chose to add a date and a pointer for clarity. The file is on a protected path, so the change needs its own reviewed PR and a one-time, exact-head gate-guard exception from the owner at merge; this choice does not itself grant that exception. |
+| ROUTE-002 audit-engine false positive (`scripts/audit-skill-contracts.py`) | **Fix now in a separate PR.** The contract-audit script matches skill names as substrings, so it read `ai-threat-modeler` as a mention of `threat-modeler` and reported a routing-reciprocity (ROUTE-002) finding that does not exist. The fix switches to whole-name matching and adds a regression test. `scripts/` is a protected path, so merging that PR needs a one-time, exact-head gate-guard exception from the owner; this row grants no exception. Once the fix merges and the false finding disappears, a follow-up updates the ROUTE-002 record. |
+| Audit baselines in `artifacts/audits/` (`skill-contract-audit-baseline.json`, `corpus-route-graph.json`, `corpus-manifest-baseline.json`, and the companion `docs/audits/skill-contract-audit-baseline.md`; last set on 2026-08-07 by [PR #77](https://github.com/ModernNomad-98/Project-Aegis/pull/77), commit `e2f1da0`) | **Overwrite with today's numbers.** The owner chose this after being told that it breaks comparisons with past audits and touches a source-library landmark file. Workspace-role checks only test that the landmark file exists, so they are unaffected. The old baseline stays in git history at `e2f1da0`, and the protected-path comments in `scripts/` stay unchanged. The implementing PR records the grant as the next free AEGIS-APR entry in the [approval register](../approvals/APPROVAL_REGISTER.md); this row is not that grant. |
+| README reference tables ([Skills (shipped)](../../README.md#skills-shipped)) | **Add one glossary.** A single glossary goes before the "Skills (shipped)" tables and is linked from their introduction. The table rows themselves are not expanded. A separate reviewed PR makes the change. |
 
 ### Still open for the owner
 
