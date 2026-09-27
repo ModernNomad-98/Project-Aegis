@@ -153,7 +153,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke project-orchestrator: configuring which Aegis helpers to use is not a product idea or a lifecycle stage question, so there is no stage to detect or route.",
-          "Does not auto-invoke aegis-setup (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute project-orchestrator for it.",
+          "Does not auto-invoke, run or read aegis-setup (MANUAL-ONLY); says plainly that setup is the manual-only aegis-setup skill and tells the user to start it by typing `/aegis-setup`, and does not silently substitute project-orchestrator for it.",
           "Does not start the requirements interview, create or edit docs/project-state.md, or write any setup state."
         ]
       }
@@ -755,6 +755,19 @@
           "Treats the owner's statement as the yes to the Stage 9 question (risky enough to ship behind a flag with a gradual rollout and a kill switch) and does NOT ask that question again.",
           "Routes to feature-flag-rollout-strategist by its exact name in backticks and, because no flag system exists yet, to feature-flag-architect first, also by its exact name in backticks.",
           "Does NOT itself plan the ramp stages or pick a flag vendor, and does NOT install, turn on, flip, deploy, or release anything; release stays the owner's authorization through the human gate."
+        ]
+      }
+    },
+    {
+      "id": "regression-setup-request-names-manual-aegis-setup",
+      "type": "should_trigger",
+      "prompt": "I'm not a developer and I have an idea for an app to book cleaning jobs. Help me set up Aegis.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "First recognises 'Help me set up Aegis' as a request to set up Aegis itself, not a product stage, and says plainly that setup is the manual-only `aegis-setup` skill.",
+          "Tells the user to start it by typing `/aegis-setup`; it does NOT run, read or auto-invoke aegis-setup, and writes no setup state.",
+          "Does NOT start product discovery (no requirements question, no `requirements-gathering-facilitator` invocation, no docs/project-state.md proposal) before offering `/aegis-setup`; it may offer to continue with the product idea afterwards."
         ]
       }
     }
