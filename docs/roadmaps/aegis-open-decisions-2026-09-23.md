@@ -60,7 +60,7 @@ requires a record, that record is still to be written.
 | Topic | Decision and what it does not cover |
 | --- | --- |
 | `scripts/audit-skill-contracts.py` dirty-path defect | **Resolved, no owner choice remains.** The contract-audit script's handling of dirty (uncommitted) paths was fixed in [PR #373](https://github.com/ModernNomad-98/Project-Aegis/pull/373), merged at 23:32:15 UTC as `4ca04c1e` with the owner-approved protected-path PR; `gate-guard` failed on its protected paths, as the one-time owner exception anticipated. |
-| `project-orchestrator` feature-flag route | **Yes:** route from Stage 9 ("Decide to release") to the rollout strategist as an owner choice ("ship directly or behind a release flag?"). The routing change was not started at this reading; it is now in open [PR #384](https://github.com/ModernNomad-98/Project-Aegis/pull/384). |
+| `project-orchestrator` feature-flag route | **Yes:** route from Stage 9 ("Decide to release") to the rollout strategist as an owner choice ("ship directly or behind a release flag?"). The routing change was not started at this reading; [PR #384](https://github.com/ModernNomad-98/Project-Aegis/pull/384) delivered it, with the accepted Stage 3 route, on 2026-09-27 at 04:25:58 UTC (`0f46808d`). |
 | D64 decision-log row | **Required:** a D64 row must be added to the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions). No D64 row existed at this reading; [PR #383](https://github.com/ModernNomad-98/Project-Aegis/pull/383) added it on 2026-09-27 at 03:43:01 UTC (`6844ab9f`). |
 | Caching seam | **Kept** as currently written. |
 | Four one-way ROUTE-002 hub findings | **Stay census data:** these four routing-reciprocity findings are recorded, not fixed. Other ROUTE-002 findings stay in the open row below. #383 as merged records a fifth one-way finding, toward `tenant-isolation-reviewer`, which the owner also confirmed on 2026-09-26 stays census data (decision log D64). |
@@ -80,7 +80,7 @@ can start. Listing an item here grants nothing.
 | Security-surface rule in [CONTRIBUTING](../../CONTRIBUTING.md#external-contributions) for maintainer PRs | The guide requires an additional explicit security review when an external PR touches a security-relevant surface. The owner needs to decide whether, and in what form, that rule also applies to the maintainer's and agents' own PRs. |
 | Pull request template | Whether completing the repository's PR template is mandatory for every PR or advisory. |
 | Confidential conduct-reporting intake | Provide a usable private contact and an alternate recipient before the project claims confidential intake ([D59 finding](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions)). The [Code of Conduct](../../CODE_OF_CONDUCT.md#enforcement) still says neither has been published. |
-| ROUTE-002 routing reciprocity backlog | Whether and in what order to fix the remaining skill-contract audit findings where one skill excludes another without a matching exclusion back. #362 closed the ai-closeout-reporter case, and the owner kept four one-way hub findings as census data (see above). |
+| ROUTE-002 routing reciprocity backlog | Whether and in what order to fix the remaining skill-contract audit findings where one skill excludes another without a matching exclusion back. #362 closed the ai-closeout-reporter case, and the owner kept four one-way hub findings, and a fifth from #383, as census data (see above). Later on 2026-09-26 the owner decided to reciprocate 23 high-value seams (including five hub exceptions) and record the rest as census data; that work is in progress. |
 | Issue #101 Stage 4B host proof | The exact host profile, permissions, telemetry, provider and cost limits, and a separate grant for any real host session. All eight synthetic Stage 4B cases are still NOT RUN. |
 | CP-WP-003 and CP-WP-004 | Real source authority and capability proof for CP-WP-003, then selection of one bounded real integration for CP-WP-004; both need separate reviewed scope and grants. |
 | Private BER candidate labels | Semantic review and exact-byte approval of the 160 pending private candidates; this index does not inspect them. |
@@ -118,7 +118,8 @@ not authorize its implementation.
   on 2026-09-27 at 01:40:32 UTC (`a2d2b831`); the skill was then in progress and merged as [PR #383](https://github.com/ModernNomad-98/Project-Aegis/pull/383) on 2026-09-27 at 03:43:01 UTC (`6844ab9f`). Later
   on 2026-09-26 the owner
   approved the orchestrator route at Stage 9 ("Decide to release"); see
-  [Decided on 2026-09-26](#decided-on-2026-09-26).
+  [Decided on 2026-09-26](#decided-on-2026-09-26). Both routes merged as
+  [PR #384](https://github.com/ModernNomad-98/Project-Aegis/pull/384) on 2026-09-27 at 04:25:58 UTC (`0f46808d`).
 
 The [current forecast](aegis-backlog-forecast.md#start-here--current-reading)
 places the bounded selected subtotal at **71–146 active hours**: the ten
