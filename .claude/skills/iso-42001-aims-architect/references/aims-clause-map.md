@@ -6,9 +6,10 @@ Structure verified from the standard's own TOC (preview PDF, first edition
 6.1.4 / 8.4; Annex A normative ("Reference control objectives and
 controls"); Annex B normative guidance; Annex C/D informative. Finer wording
 = verification items against the licensed text. **Annex A counts are never
-stated** — public sources conflict. Edition status verified 2026-09-26 against
-the [ISO/IEC 42001:2023 catalogue page](https://www.iso.org/standard/42001):
-edition 1, stage 60.60 (published); no amendment or newer edition listed.
+stated** — public sources conflict. Edition status verified 2026-09-26 from
+the ISO catalogue listings (search results; iso.org blocked direct fetch) for
+[ISO/IEC 42001:2023](https://www.iso.org/standard/42001): edition 1, stage
+60.60 (published); no amendment or newer edition listed.
 
 **Reading key:** AIMS is an artificial intelligence management system; AI is
 artificial intelligence. ISO is the International Organization for

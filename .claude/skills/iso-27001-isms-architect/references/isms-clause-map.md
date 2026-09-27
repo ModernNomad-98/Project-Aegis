@@ -2,10 +2,12 @@
 
 Clause structure verified from the standard's own TOC (preview PDF, third
 edition 2022-10). Finer wording claims are verification items against the
-licensed text. Edition and amendment status verified 2026-09-26 against the
-ISO catalogue pages for [ISO/IEC 27001:2022](https://www.iso.org/standard/27001)
-and [Amd 1:2024](https://www.iso.org/standard/88435.html): both at stage 60.60
-(published); no newer edition listed.
+licensed text. Edition and amendment status verified 2026-09-26 from the ISO
+catalogue listings (search results; iso.org blocked direct fetch) for
+[ISO/IEC 27001:2022](https://www.iso.org/standard/27001) and
+[Amd 1:2024](https://www.iso.org/standard/88435.html): 27001:2022 at stage
+60.60 (published); Amendment 1 (Amd 1:2024) published February 2024; no newer
+edition listed.
 
 **Reading key:** ISO is the International Organization for Standardization;
 IEC is the International Electrotechnical Commission; ISMS is an information

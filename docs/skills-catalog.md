@@ -541,7 +541,7 @@ absorbs the AI security test harness (no separate `ai-security-test-harness`).
 | `system-prompt-leakage-reviewer` | LLM07 *(NEW)* | yes | Two axes: no secrets in the prompt (extract + rotate via secrets-identity-hardener) AND no security dependence on prompt secrecy — **system prompts are NOT security controls**; enforcement is deterministic and lives OUTSIDE the LLM; extraction-is-harmless framing. |
 | `ai-misinformation-guard` | LLM09 *(NEW)* | yes | Anti-misinformation: grounding in retrieved sources (not memory), citation-to-claim verification, calibrated uncertainty/refusal, fact validation before action, package/API hallucination (slopsquatting) checks, overreliance-aware UX; composes rag-security-architect + ai-governance-risk-reviewer. |
 
-Edition anchors last checked 2026-09-26; tracked by `framework-edition-tracker`. OWASP has since published the [Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (2026-08-03); this pack stays anchored to the 2025 edition until the owner decides on re-anchoring.
+Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`. OWASP has since published the [Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (2026-08-03); this pack stays anchored to the 2025 edition until the owner decides on re-anchoring.
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 7
 clusters: **threat & injection** (`ai-threat-modeler`, `prompt-injection-defender`,
@@ -600,7 +600,7 @@ registries, plugin packages, A2A dependencies — install-vs-runtime seam with
 | `agent-containment-reviewer` | ASI08 + ASI10 (merged) | yes | One containment review: cascade half (blast-radius isolation, bounded upstream trust, circuit breakers, checkpoints/rollback, retry-storm/fan-out limits) + rogue half (drift baselines, agent inventory/lifecycle, kill switches that SEVER AUTHORITY — credentials revoked, not processes killed); composes `ai-cost-guardrail-designer` + `incident-response-runbook`. |
 | `human-agent-trust-reviewer` | ASI09 | yes | Adversarial review of the approval layer: consent fatigue (rate/latency signals), self-reported summaries vs system-verified facts, bundling/salami-slicing, urgency manipulation, automation-bias controls; counterpart to `human-approval-boundary` (that skill places the gates; this attacks their resilience). |
 
-Edition anchors last checked 2026-09-26; tracked by `framework-edition-tracker`.
+Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`.
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for all six as one
 **agentic cluster**: internal discrimination (goal hijack vs memory poisoning
@@ -692,7 +692,7 @@ Stop Conditions), so **all nine are model-invocable**.
 | `soc2-trust-criteria-mapper` | Framework projection | yes | ATTESTATION-not-certification scoping: system boundary, commitment-driven category selection (Security baseline + optional four), Type 1 vs Type 2 with window feasibility, subservice-organization carve-outs; Type definitions flagged CPA-firm-sourced — verify against the AICPA guide. |
 | `multi-framework-crosswalk` | Cross-cutting | yes | One row per control → 27001 Annex A + SOC 2 TSC + 42001 Annex A (+ AI RMF function); edition-pinned, text-in-hand cells only, FULL/PARTIAL(residue) honesty, explicit joint sets; the 60–80% overlap cited only as flagged industry estimate. |
 | `compliance-gap-auditor` | Cross-cutting | yes | ONE parameterized audit vs chosen framework(s): MET/PARTIAL/GAP/UNVERIFIABLE per requirement from cited evidence (missing evidence is never MET), blockers-first remediation order, shared-gap dividend; readiness assessment, never an audit opinion. |
-| `ai-lifecycle-risk-manager` | Cross-cutting | yes | NIST AI RMF GOVERN/MAP/MEASURE/MANAGE operationalized per lifecycle stage with owners, triggers, and a register; voluntary + under-revision flags encoded (NIST status checked 2026-09-26; see [`ai-rmf-function-map.md`](../.claude/skills/ai-lifecycle-risk-manager/references/ai-rmf-function-map.md)); composes feature reviews, threat models, evals, incident machinery; companion to the AIMS — never presented as certifiable. |
+| `ai-lifecycle-risk-manager` | Cross-cutting | yes | NIST AI RMF GOVERN/MAP/MEASURE/MANAGE operationalized per lifecycle stage with owners, triggers, and a register; voluntary + under-revision flags encoded (NIST page checked 2026-09-26; reference sheet [`ai-rmf-function-map.md`](../.claude/skills/ai-lifecycle-risk-manager/references/ai-rmf-function-map.md) dated 2026-09-24); composes feature reviews, threat models, evals, incident machinery; companion to the AIMS — never presented as certifiable. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for all nine as
 one **compliance cluster**: internal discrimination (foundation vs evidence
@@ -987,7 +987,7 @@ Both ship both eval files; both edit nothing → **model-invocable**.
 | `security-logging-alerting-architect` | reconciliation §3 Phase 8 backlog (D8) | yes | Designs the security-event DETECTION and ALERTING layer (closes OWASP A09:2025): the detection coverage map (which security events must be logged, with detectable fields), alert-vs-ticket rules with baseline-justified thresholds + bounded noise control, and response wiring (owner, severity, escalation, runbook link) with coverage tests and an honest blind-spot register. ≠ `audit-log-architect` (records, never detects/alerts), `observability-operator` (implements the alert config), `slo-reliability-architect` (reliability paging), `incident-response-runbook` (the playbook AFTER the alert). |
 | `error-handling-security-reviewer` | reconciliation §3 Phase 8 backlog (D8) | yes | Reviews error/exception handling through the security lens (closes OWASP A10:2025): fail-closed defaults, error-path authorization, exception-driven logic bypass, leak-free error responses — file:line findings with concrete failure scenarios and a fail-closed matrix; recommends fixes, never applies them. ≠ `security-pr-reviewer` (broad diff gate), `appsec-implementer` (builds the fix), `static-analysis-reviewer` (judges scanner output), `error-taxonomy-designer` (the error MODEL vs the security of its handling). |
 
-Edition anchors last checked 2026-09-26; tracked by `framework-edition-tracker`.
+Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`.
 
 ### Skills (D31 — SaaS architecture depth, D12.11 strong cluster)
 
@@ -1245,7 +1245,7 @@ D7) moved to
 [Implemented → Skills (Phase 7.5)](#skills-phase-75--agentic-ai-security-pack)
 above. Source: the reconciliation doc §3 Phase 7.5 coverage map (D7),
 anchored to the OWASP Top 10 for Agentic Applications (2026), ASI01–ASI10.
-Edition anchors last checked 2026-09-26; tracked by `framework-edition-tracker`.
+Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`.
 Per D7: **ASI08 + ASI10 merged** into `agent-containment-reviewer`;
 **ASI02/ASI05** extend Phase 7 `agent-tool-safety-guard` and
 `llm-output-safety-reviewer` (scoped diffs); **ASI04** extends Phase 4
