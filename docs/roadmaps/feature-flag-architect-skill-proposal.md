@@ -497,8 +497,11 @@ skill-maintenance lines, unless the owner selects it into that subtotal.
    [AEGIS-APR-049](../approvals/APPROVAL_REGISTER.md#aegis-apr-049-exact-head-ci-satisfies-the-local-test-condition)
    accepts as the local-test leg) and, per
    [AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review),
-   the Codex review has posted and every P1 and P2 finding is triaged. A red
-   check, including `gate-guard`, still blocks the merge.
+   the automated Codex review has posted (or Codex is confirmed unavailable,
+   for example by a usage-limit notice) and every P1 and P2 finding (Codex's
+   two highest priority levels) is fixed or recorded in the PR as not a
+   defect. A red check, including the protected-file guard check
+   `gate-guard`, still blocks the merge.
 
 **Review path for PR 2:** the validator, a `skill-quality-reviewer` spot
 re-review of `project-orchestrator` (checks 2 and 5), `library-diff-reviewer`,
