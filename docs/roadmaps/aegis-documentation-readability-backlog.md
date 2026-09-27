@@ -77,14 +77,21 @@ merged PR #374 (`7390ae0`) and the consumption of its one-package grant
 (AEGIS-APR-053, consuming AEGIS-APR-046), plus the owner's protected-path grant
 and one-time guard exception for merged PR #373 and their consumption
 (AEGIS-APR-054 through AEGIS-APR-056), changes three existing reader pages and
-adds no Markdown file: the approval register, BER backlog and this ledger. No
-independent full-page review is recorded yet, so those three pages are
-**pending re-acceptance** against [Acceptance for each
-page](#acceptance-for-each-page); the named follow-up is one independent
-read-only full-page review of each changed page. This change alters no grant,
-gate or host status. With the feature-flag proposal page above, the tree stands
-at **606 Markdown files: 559 accepted reader pages, 44 classified synthetic
-fixtures and three known pending pages** until that review accepts them.
+adds no Markdown file: the approval register, BER backlog and this ledger. A
+first independent read-only full-page review returned FIX-FIRST. Its minimal
+edits attributed the pinned eval ids and expanded Pacific Daylight Time (PDT)
+in AEGIS-APR-054, corrected the timing sentence in AEGIS-APR-055, disclosed the
+corrected `gate-guard` log citation in AEGIS-APR-053, split the BER backlog's
+start-here paragraph, stated that planned `UNRUN` attempts can still count
+under `NOT_SELECTED`, named the automated Codex review and APR-050 at first
+use, pinned the WP-2B-3 record's effective governance merge `2aed8dd` and
+receipt-correction wording, and tightened this paragraph's follow-up wording.
+A separate independent corrected-candidate review **accepted** all three pages
+against [Acceptance for each page](#acceptance-for-each-page). Acceptance
+changes no grant, gate or host status. With the feature-flag proposal page
+above, merged in PR #378 (`a2d2b83`), the tree stands at **606 tracked
+Markdown files: 562 accepted reader pages and 44 classified synthetic
+fixtures**, with zero known pending pages.
 
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
