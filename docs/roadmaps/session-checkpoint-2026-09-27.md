@@ -19,9 +19,9 @@ does not repeat.
 
 | Item | Value at pause |
 | --- | --- |
-| `main` head | `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` (merge of PR #438) |
+| `main` head | `3c51fb2f6f4a22c6120b38d2a7e9f0074b6bf69c` (merge of PR #441) |
 | Shipped skills | 186 |
-| Skill-contract audit | 316 findings, 232 of them ROUTE-002, with audit engine v1.13.2 (from PR #441) |
+| Skill-contract audit | 316 findings, 232 of them ROUTE-002, with audit engine v1.13.2 (regenerated in PR #441) |
 
 All times and dates are Coordinated Universal Time (UTC).
 
@@ -64,8 +64,8 @@ The merge commit is the `main` commit that each PR created.
 | [#437](https://github.com/ModernNomad-98/Project-Aegis/pull/437) | `96cf65acd80bd68a43edeba59fce70991e84004e` | Cited the live startup-routing run in the README |
 | [#438](https://github.com/ModernNomad-98/Project-Aegis/pull/438) | `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` | Recorded grant lifecycle events and three more owner decisions |
 | [#439](https://github.com/ModernNomad-98/Project-Aegis/pull/439) | `d2d9b05e948c82b32cc34200d64d48ce0afd0347` | Closed D65's open gaps and fixed first-use terms in the log |
-| [#440](https://github.com/ModernNomad-98/Project-Aegis/pull/440) | PENDING | Records #420–#439 in the readability ledger |
-| [#441](https://github.com/ModernNomad-98/Project-Aegis/pull/441) | PENDING | Regenerates the audit baselines with engine v1.13.2 (APR-065) |
+| [#440](https://github.com/ModernNomad-98/Project-Aegis/pull/440) | `adf54d98ef3454efb5cdf8dd9266fc71f9031c57` | Recorded #420–#439 in the readability ledger |
+| [#441](https://github.com/ModernNomad-98/Project-Aegis/pull/441) | `3c51fb2f6f4a22c6120b38d2a7e9f0074b6bf69c` | Regenerated the audit baselines with engine v1.13.2 (APR-065) |
 
 A search for PRs merged on 2026-09-27 also returns #371–#396, #398–#402 and
 #404–#408. They merged earlier the same day and are not part of this list.
@@ -82,14 +82,15 @@ Those records hold the scope and authority; this page does not restate them.
 
 ## Open items at the pause
 
-1. **Record APR-065 consumption.** After PR #441 merges, add the next register
-   entry recording that the APR-065 grant was used.
+1. **APR-065 consumption.** Done in the PR that adds this page:
+   [APR-066](../approvals/APPROVAL_REGISTER.md#aegis-apr-066-consumption-of-the-engine-v1132-baseline-regeneration-grant)
+   records that PR #441 used the grant.
 2. **Readability ledger.** PR #440 left these pages pending a full-page
    re-read: the approval register, the open-decisions index, the PR template,
    the skills catalog, the AEGIS-060+ register, the audit baseline report, the
    live-acceptance record, the `api-event-architect` skill page,
    `llm-top10-threat-catalog.md` and `poisoning-controls.md`. The next ledger
-   update must also record #438, #441 and the PR that adds this page.
+   update must record #438, #441 and the PR that adds this page.
 3. **Owner questions from the ledger review.** Peter has not answered these:
    - Do edits made before the 10-line rule existed count toward it for the
      `project-orchestrator` skill page?
@@ -112,8 +113,8 @@ Those records hold the scope and authority; this page does not restate them.
 
 1. Read this page, then do the workspace role check in `AGENTS.md`, then read
    the [approval register](../approvals/APPROVAL_REGISTER.md).
-2. Check live state with `git fetch` and `gh`: the `main` head, open PRs, and
-   whether #440 and #441 merged.
+2. Check live state with `git fetch` and `gh`: the `main` head and the open
+   PRs, including the PR that adds this page.
 3. Follow these process rules:
    - An independent reviewer checks each PR. A separate check confirms any
      fixes.

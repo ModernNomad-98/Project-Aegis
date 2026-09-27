@@ -1664,3 +1664,24 @@ generic skill guidance that would require asking for the same approval again.
   `7894567d49d301f82f40cb6445b668581d5799ac` (PR #432).
 - **Expiry / use limit:** One PR; consumed by its merge, which a later
   lifecycle event records.
+
+### AEGIS-APR-066: Consumption of the engine v1.13.2 baseline regeneration grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-065.
+- **Status at recording:** AEGIS-APR-065 has no remaining use.
+- **Effective at:** 2026-09-27 23:45:02 UTC.
+- **Recorded at / By:** 2026-09-27 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039.
+- **New authority:** None. Any further regeneration needs a new grant.
+- **Reason:** The one approved PR merged.
+- **Evidence:** [PR #441](https://github.com/ModernNomad-98/Project-Aegis/pull/441)
+  merged head `d864597108658985a115fdee39e500454409056a` as
+  `3c51fb2f6f4a22c6120b38d2a7e9f0074b6bf69c` at the time above. It changed
+  exactly the five allowed paths: the three `artifacts/audits/` baseline
+  files, `docs/audits/skill-contract-audit-baseline.md` and
+  `docs/audits/aegis-060-plus-register.md`. It changed no protected path and
+  nothing under `scripts/` or `tools/`. The regenerated report names engine
+  v1.13.2 at main commit `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` and
+  records 316 findings, 232 of them ROUTE-002. The
+  [independent review](https://github.com/ModernNomad-98/Project-Aegis/pull/441#issuecomment-5860898839)
+  of that head reproduced the regeneration and returned SHIP.
