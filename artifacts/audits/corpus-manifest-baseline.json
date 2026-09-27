@@ -1,19 +1,19 @@
 {
   "tool": "audit-skill-contracts",
-  "version": "1.13.1",
-  "engine_sha256": "3f19d6731bea4301951da53cffc23bf3189398d01b5d2895ebd729afc7aa1c70",
-  "repo_sha": "656194426e2ea3358fa29fcf19e05f0278d9c270",
-  "branch": "chore/regenerate-audit-baselines-2026-09-27",
+  "version": "1.13.2",
+  "engine_sha256": "8622bac7f2e7d91fcadb7ff728a5418d67f75132d05705e886feaa09c91c7934",
+  "repo_sha": "5dbf7bc9e958d932bd0c5b093ebecfe61be41840",
+  "branch": "chore/regenerate-audit-baselines-v1132",
   "working_tree_dirty": false,
   "dirty_paths_in_scanned_surfaces": [],
-  "audited_file_count": 714,
-  "audited_byte_count": 4683677,
-  "corpus_content_hash": "0dfcc934a7c98517e93f90d21ba74f59cf065a611b6be6a874eb5a3fa2395393",
+  "audited_file_count": 715,
+  "audited_byte_count": 4735807,
+  "corpus_content_hash": "a14f70c96c3b3ac4268d0b644dbb7c7b81b6d40e3665baba3ddcde119146b73b",
   "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
   "auxiliary_inputs": {
     "skills_catalog": {
       "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-      "sha256": "35a7dc96fd51ffedc1116713012c227085c5e040382395bf293157168533523c"
+      "sha256": "42ba05192c49db68c152ed6101fedbacb40c48fdb30e611cca811be54f523c80"
     },
     "agent_names_enumerated": {
       "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -858,7 +858,7 @@
       "name": "code-reviewer",
       "skill_md": ".claude/skills/code-reviewer/SKILL.md",
       "family": "Skills (Phase 2 \u2014 core architecture & engineering pack)",
-      "description_chars": 791,
+      "description_chars": 883,
       "references": [
         ".claude/skills/code-reviewer/references/severity-rubric.md"
       ],
@@ -1706,14 +1706,14 @@
       "name": "llm-output-safety-reviewer",
       "skill_md": ".claude/skills/llm-output-safety-reviewer/SKILL.md",
       "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
-      "description_chars": 1008,
+      "description_chars": 1018,
       "references": [
         ".claude/skills/llm-output-safety-reviewer/references/output-sink-catalog.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 5,
-      "trigger_cases": 6,
+      "eval_cases": 8,
+      "trigger_cases": 11,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
@@ -2227,7 +2227,7 @@
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 53,
+      "eval_cases": 54,
       "trigger_cases": 5,
       "manual_only": false,
       "declares_read_only": false,
@@ -2257,14 +2257,15 @@
       "name": "prompt-injection-defender",
       "skill_md": ".claude/skills/prompt-injection-defender/SKILL.md",
       "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
-      "description_chars": 1022,
+      "description_chars": 1021,
       "references": [
-        ".claude/skills/prompt-injection-defender/references/injection-defense-patterns.md"
+        ".claude/skills/prompt-injection-defender/references/injection-defense-patterns.md",
+        ".claude/skills/prompt-injection-defender/references/multimodal-injection-patterns.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 5,
-      "trigger_cases": 5,
+      "eval_cases": 9,
+      "trigger_cases": 7,
       "manual_only": true,
       "declares_read_only": false,
       "approval_related": true,
@@ -3069,14 +3070,14 @@
       "name": "supply-chain-security-reviewer",
       "skill_md": ".claude/skills/supply-chain-security-reviewer/SKILL.md",
       "family": "Skills (Phase 4 \u2014 security, RLS & supply-chain pack)",
-      "description_chars": 999,
+      "description_chars": 1013,
       "references": [
         ".claude/skills/supply-chain-security-reviewer/references/supply-chain-checklist.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 4,
-      "trigger_cases": 4,
+      "eval_cases": 8,
+      "trigger_cases": 7,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,

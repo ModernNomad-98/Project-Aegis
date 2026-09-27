@@ -1,20 +1,20 @@
 {
   "summary": {
     "tool": "audit-skill-contracts",
-    "version": "1.13.1",
-    "engine_sha256": "3f19d6731bea4301951da53cffc23bf3189398d01b5d2895ebd729afc7aa1c70",
-    "repo_sha": "656194426e2ea3358fa29fcf19e05f0278d9c270",
-    "branch": "chore/regenerate-audit-baselines-2026-09-27",
+    "version": "1.13.2",
+    "engine_sha256": "8622bac7f2e7d91fcadb7ff728a5418d67f75132d05705e886feaa09c91c7934",
+    "repo_sha": "5dbf7bc9e958d932bd0c5b093ebecfe61be41840",
+    "branch": "chore/regenerate-audit-baselines-v1132",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
-    "audited_file_count": 714,
-    "audited_byte_count": 4683677,
-    "corpus_content_hash": "0dfcc934a7c98517e93f90d21ba74f59cf065a611b6be6a874eb5a3fa2395393",
+    "audited_file_count": 715,
+    "audited_byte_count": 4735807,
+    "corpus_content_hash": "a14f70c96c3b3ac4268d0b644dbb7c7b81b6d40e3665baba3ddcde119146b73b",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
         "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-        "sha256": "35a7dc96fd51ffedc1116713012c227085c5e040382395bf293157168533523c"
+        "sha256": "42ba05192c49db68c152ed6101fedbacb40c48fdb30e611cca811be54f523c80"
       },
       "agent_names_enumerated": {
         "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -40,20 +40,20 @@
     },
     "skill_count": 186,
     "rule_count": 27,
-    "finding_count": 317,
+    "finding_count": 316,
     "by_severity": {
       "P0": 2,
       "P1": 82,
       "P2": 0,
-      "info": 233
+      "info": 232
     },
     "by_rule": {
       "ARTF-001": 9,
-      "ROUTE-002": 233,
+      "ROUTE-002": 232,
       "SIDE-004": 73,
       "STATE-001": 2
     },
-    "mechanical_count": 233,
+    "mechanical_count": 232,
     "semantic_review_candidates": 84
   },
   "rule_inventory": [
@@ -329,7 +329,7 @@
       "negative_fixture": "clean-skill",
       "aegis_map": [],
       "limits": "many one-directional exclusions are correct (hub skills cannot name every excluder); CENSUS data, maps to NO AEGIS id",
-      "hit_count": 233
+      "hit_count": 232
     },
     {
       "id": "ROUTE-003",
@@ -3920,22 +3920,6 @@
     {
       "rule": "ROUTE-002",
       "severity": "info",
-      "file": ".claude/skills/prompt-injection-defender/SKILL.md",
-      "line": 0,
-      "owning_skill": "prompt-injection-defender",
-      "related_skills": [
-        "threat-modeler"
-      ],
-      "evidence": "exclusion toward `threat-modeler` is not reciprocated (threat-modeler's description never mentions this skill) \u2014 census evidence, no AEGIS id",
-      "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "prompt-injection-defender",
-      "confidence": "low",
-      "mechanical": true
-    },
-    {
-      "rule": "ROUTE-002",
-      "severity": "info",
       "file": ".claude/skills/qa-automation-architect/SKILL.md",
       "line": 0,
       "owning_skill": "qa-automation-architect",
@@ -5905,6 +5889,7 @@
       "verified": 14
     },
     "code-reviewer": {
+      "committed": 2,
       "deployed": 1,
       "proposed": 1
     },
@@ -6082,6 +6067,10 @@
     "library-diff-reviewer": {
       "accepted": 1
     },
+    "llm-output-safety-reviewer": {
+      "committed": 4,
+      "verified": 1
+    },
     "local-ci-mirror-preflight": {
       "committed": 2
     },
@@ -6180,6 +6169,9 @@
     },
     "promotion-packet-writer": {
       "ready": 3
+    },
+    "prompt-injection-defender": {
+      "accepted": 2
     },
     "qa-strategy-architect": {
       "deployed": 1
@@ -6350,7 +6342,7 @@
     "supply-chain-security-reviewer": {
       "accepted": 4,
       "committed": 2,
-      "verified": 1
+      "verified": 8
     },
     "synthetic-monitoring-architect": {
       "complete": 1,
