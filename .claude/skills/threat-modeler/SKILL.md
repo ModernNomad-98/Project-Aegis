@@ -138,7 +138,7 @@ Not modeled: <explicitly out-of-scope areas + why>
 - Threats are never deleted from the model without written rationale;
   "unlikely" is a ranking, not a removal.
 - Tenant isolation and object-level authorization are mandatory analysis
-  rows on every SaaS data path (master-prompt §6), even when the requester
+  rows on every SaaS data path ([historical master prompt, section 6](../../../docs/prompts/claude-skills-master-generation-prompts-v4.md)), even when the requester
   did not ask about tenancy.
 - Absence of a mitigation in scope is recorded as accepted risk requiring
   human sign-off, never silently normalized.

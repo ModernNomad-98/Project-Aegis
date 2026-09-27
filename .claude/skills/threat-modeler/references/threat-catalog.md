@@ -56,7 +56,9 @@ a threat row (or an explicit "not applicable, because…").
   (hand to `supply-chain-security-reviewer`) Are prod credentials reachable
   from PR-triggered CI?
 
-## SaaS mandatory rows (master-prompt §6)
+## SaaS mandatory rows
+
+Source: [historical master prompt, section 6](../../../../docs/prompts/claude-skills-master-generation-prompts-v4.md).
 
 For every data-access boundary, always enumerate:
 1. **Tenant isolation** — cross-tenant read/write reachable here?

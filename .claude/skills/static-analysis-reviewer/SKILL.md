@@ -127,7 +127,7 @@ Not triaged: <findings/areas not reached + why>
 
 ## Security Rules
 
-- Scanner output is input, not truth (master-prompt §6): every finding is
+- Scanner output is input, not truth ([historical master prompt, section 6](../../../docs/prompts/claude-skills-master-generation-prompts-v4.md)): every finding is
   confirmed or refuted against the real code before it gets a disposition.
 - No finding is suppressed without a written, auditable rationale — "false
   positive" alone is not a rationale; the code fact that refutes it is.

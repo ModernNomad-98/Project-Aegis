@@ -358,7 +358,7 @@ the authorization-vs-entitlement axis ("can this ROLE do X" vs "does this PLAN i
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (all nine sit in one of two overlap clusters). Per
-master-prompt §6: ASVS-style verification, SSDF-style secure-SDLC, and SLSA-style
+[historical master prompt, section 6](prompts/claude-skills-master-generation-prompts-v4.md): ASVS-style verification, SSDF-style secure-SDLC, and SLSA-style
 supply-chain thinking; scanner output is treated as input, not truth; high-severity
 claims require an exploit path or abuse scenario; tenant isolation and object-level
 authorization are mandatory on SaaS paths; every skill produces concrete artifacts and
