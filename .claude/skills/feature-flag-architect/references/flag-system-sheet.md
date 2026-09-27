@@ -1,7 +1,7 @@
 # Flag system sheet
 
 Lookup material for the [feature-flag-architect](../SKILL.md) skill, read
-on demand from its Workflow steps 2–9. Nothing here authorizes signing up,
+on demand from its Workflow steps 2, 4 and 6–9. Nothing here authorizes signing up,
 paying, adding an SDK (software development kit: the client library a flag
 service ships), or changing a live system. **TTL** (time to live) is how
 long a cached value is kept before it is refreshed; **UI** means user
