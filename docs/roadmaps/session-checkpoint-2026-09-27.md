@@ -13,7 +13,10 @@ The Behavioral Eval Runner (BER) is the repository's behavioral test tool.
 Control-plane work packages (CP-WP) are tracked in the
 [control-plane backlog](resumable-control-plane-backlog.md). ROUTE-002 is the
 audit rule that flags a routing exclusion one skill states but the other skill
-does not repeat.
+does not repeat. Codex is the automated GitHub code reviewer. OWASP is the
+Open Worldwide Application Security Project; LLM08 is a risk in its Top 10 for
+Large Language Model (LLM) applications. D-numbered decisions such as D65 and
+D67 are in the [step-0 reconciliation log](../reconciliation/step-0-reconciliation-v4.md).
 
 ## Where things stand
 
@@ -67,8 +70,9 @@ The merge commit is the `main` commit that each PR created.
 | [#440](https://github.com/ModernNomad-98/Project-Aegis/pull/440) | `adf54d98ef3454efb5cdf8dd9266fc71f9031c57` | Recorded #420–#439 in the readability ledger |
 | [#441](https://github.com/ModernNomad-98/Project-Aegis/pull/441) | `3c51fb2f6f4a22c6120b38d2a7e9f0074b6bf69c` | Regenerated the audit baselines with engine v1.13.2 (APR-065) |
 
-A search for PRs merged on 2026-09-27 also returns #371–#396, #398–#402 and
-#404–#408. They merged earlier the same day and are not part of this list.
+A search for PRs merged on 2026-09-27 also returns #371, #375–#379,
+#381–#396, #398–#402 and #404–#408. They merged earlier the same day and are
+not part of this list.
 
 ## Owner decisions made on 2026-09-27
 
@@ -105,7 +109,7 @@ Those records hold the scope and authority; this page does not restate them.
    - The BER census baseline stays pinned at 184 skills by design
      (`EXPECTED_PINNED_BASELINE` in `tools/behavioral_eval_runner/census.py`).
      It is a historical baseline, not the current count.
-5. **Still waiting on the owner:** the Stage 4B actual-host proof, the private
+5. **Still waiting on the owner** (see [Still open for the owner](aegis-open-decisions-2026-09-23.md#still-open-for-the-owner)): the Stage 4B actual-host proof, the private
    BER labels, CP-WP-003 and CP-WP-004, and the paused VirtualBox virtual
    machine.
 
@@ -118,12 +122,20 @@ Those records hold the scope and authority; this page does not restate them.
 3. Follow these process rules:
    - An independent reviewer checks each PR. A separate check confirms any
      fixes.
-   - Merge only when the checks on the exact head commit are green and Codex
-     has reviewed it, or Codex posted a usage-limit notice after that head.
-   - Merge as administrator with `--match-head-commit`.
+   - Merge only when the checks on the exact head commit are green; Codex
+     has reviewed that head, or posted a usage-limit notice after it; and
+     every Codex finding on that head has a fix or a reasoned reply.
+   - Merge with `gh pr merge <number> --merge --admin --match-head-commit <head SHA>`.
+   - Sign off every commit with `git commit -s`, because CI checks the
+     Developer Certificate of Origin (DCO). Stage files by exact path only.
+   - Make each change in its own worktree, branched from a fresh `origin/main`.
    - A PR that changes a protected path needs a one-time owner exception for
      its exact head.
    - Reviewers post their verdicts as PR comments.
-   - Keep to the ledger's 10-line rule for each page.
+   - Follow the 10-line rule in the
+     [readability ledger](aegis-documentation-readability-backlog.md): a
+     reviewed targeted edit of at most 10 changed lines on a page, counted
+     since its last full-page acceptance, keeps acceptance; a larger change
+     needs a full-page re-read.
    - Every PR description answers the security line.
    - Use PowerShell for `git` when Bash `git` hangs.
