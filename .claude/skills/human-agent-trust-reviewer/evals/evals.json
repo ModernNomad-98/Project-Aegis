@@ -53,6 +53,30 @@
           "States the residual risk and requires a named human acceptor via human-approval-boundary if the team proceeds anyway."
         ]
       }
+    },
+    {
+      "id": "unnamed-define-approval-semantics-no-auto-agent-authorization-matrix",
+      "type": "should_not_trigger",
+      "prompt": "Approvals for our agent's actions feel like a formality. Before anyone reviews the approval UX, define what counts as approval per action: which deploys, releases, production-data changes, and history rewrites need their own human decision, and whether a scoped standing grant can ever stand in for one.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "human-agent-trust-reviewer does not activate: the prompt asks to define per-action approval semantics and standing-grant rules before any approval-UX review, which is not adversarial review of consent fatigue or deceptive justifications.",
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute human-agent-trust-reviewer or another skill for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-build-standing-approval-policy-no-auto-standing-approval-and-auto-advance",
+      "type": "should_not_trigger",
+      "prompt": "Approvals feel like a formality because I confirm the same 'push the branch?' and 'open the PR?' prompts all day inside phases I already approved. Don't review the approval flow for manipulation; design the documented standing approval for those named steps, with an opt-out phrase and per-session restatement.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "human-agent-trust-reviewer does not activate: the prompt explicitly declines review of the approval flow for manipulation and asks to design a documented standing approval with an opt-out phrase and per-session restatement.",
+          "Does not auto-invoke standing-approval-and-auto-advance (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute human-agent-trust-reviewer or another skill for it."
+        ]
+      }
     }
   ]
 }

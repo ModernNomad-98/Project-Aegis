@@ -52,6 +52,30 @@
           "Does not delete or suppress low-ranked threats; records them with what would confirm a higher rank."
         ]
       }
+    },
+    {
+      "id": "unnamed-build-the-control-no-auto-appsec-implementer",
+      "type": "should_not_trigger",
+      "prompt": "We already decided we need input validation and output encoding on the comment field — go implement it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "threat-modeler does not activate: the controls are already decided and the ask is to implement input validation and output encoding, a side-effecting build task rather than threat enumeration.",
+          "Does not auto-invoke appsec-implementer (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute threat-modeler or another skill for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-secrets-rotation-no-auto-secrets-identity-hardener",
+      "type": "should_not_trigger",
+      "prompt": "Our API keys are hardcoded and never rotate — fix where secrets live and how they load.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "threat-modeler does not activate: fixing where hardcoded keys live, how they load and how they rotate is concrete hardening work, not a pre-implementation threat model.",
+          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute threat-modeler or another skill for it."
+        ]
+      }
     }
   ]
 }

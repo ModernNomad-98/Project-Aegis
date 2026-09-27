@@ -72,6 +72,18 @@
           "This skill designs detection and alerting ON TOP of such records — recording is not detecting."
         ]
       }
+    },
+    {
+      "id": "unnamed-alert-config-implementation-no-auto-observability-operator",
+      "type": "should_not_trigger",
+      "prompt": "Here's the approved alerting spec — create the alert rules and dashboards in the monitoring stack and verify they fire.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "security-logging-alerting-architect does not activate: creating the alert rules and dashboards from an approved spec and verifying they fire is live config implementation; this skill produces the spec and changes nothing itself.",
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute security-logging-alerting-architect or another skill for it."
+        ]
+      }
     }
   ]
 }

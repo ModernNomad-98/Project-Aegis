@@ -71,6 +71,30 @@
           "Routes injection paths to prompt-injection-defender and tool misuse / excessive agency to agent-tool-safety-guard (with agent-containment-reviewer for cascade/rogue containment) — the skills that REVIEW what this skill designs."
         ]
       }
+    },
+    {
+      "id": "unnamed-authority-policy-no-auto-agent-authorization-matrix",
+      "type": "should_not_trigger",
+      "prompt": "Write the standing policy for what our coding agents may do on their own — commit, push branches, open PRs — and what always needs a named human, like merging to protected branches or arming auto-merge.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "agent-harness-architect does not activate: authoring which SDLC actions agents may take alone versus which need a named human is defining authority policy; the harness only enforces that policy at its authorize rung and never defines it.",
+          "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-harness-architect or another skill for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-attack-review-no-auto-prompt-injection-defender",
+      "type": "should_not_trigger",
+      "prompt": "Review our agent harness for attacks: can injected content in a retrieved document change its instructions, can a tool be abused beyond its intended scope, and would a compromised agent be contained?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "agent-harness-architect does not activate: attack review of an existing harness (injection, tool abuse, compromise containment) belongs to the agentic-security reviewers; the harness skill designs the operating environment, not its attack review.",
+          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute agent-harness-architect or another skill for it."
+        ]
+      }
     }
   ]
 }

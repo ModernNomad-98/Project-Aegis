@@ -53,6 +53,18 @@
           "Notes cross-tenant/cross-user exposure risk if such logs are ever broadened or exported."
         ]
       }
+    },
+    {
+      "id": "unnamed-credential-custody-no-auto-secrets-identity-hardener",
+      "type": "should_not_trigger",
+      "prompt": "We have API keys and DB credentials scattered in env vars and one leaked into the client bundle — harden secret custody and rotate.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "sensitive-disclosure-guard does not activate: scattered env-var keys and a key leaked into the client bundle need custody hardening and rotation, not a pre-model redaction or LLM output-leak review.",
+          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute sensitive-disclosure-guard or another skill for it."
+        ]
+      }
     }
   ]
 }

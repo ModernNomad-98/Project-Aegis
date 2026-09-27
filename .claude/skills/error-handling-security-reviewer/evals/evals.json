@@ -72,6 +72,18 @@
           "This skill reads the actual code through the error-path lens; it is not the judge of another tool's findings."
         ]
       }
+    },
+    {
+      "id": "unnamed-building-the-control-no-auto-appsec-implementer",
+      "type": "should_not_trigger",
+      "prompt": "Make this permission check fail closed — implement the deny-on-exception behavior with a negative test proving it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "error-handling-security-reviewer does not activate: implementing an already-decided deny-on-exception control with a negative test is a side-effecting build task; this reviewer only produces findings and fix direction and never edits code.",
+          "Does not auto-invoke appsec-implementer (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute error-handling-security-reviewer or another skill for it."
+        ]
+      }
     }
   ]
 }

@@ -56,6 +56,18 @@
           "Routes to static-analysis-reviewer — this skill designs HOW SAST runs; it does not decide what the findings mean."
         ]
       }
+    },
+    {
+      "id": "unnamed-pipeline-no-auto-ci-pipeline-architect",
+      "type": "should_not_trigger",
+      "prompt": "Design our whole CI pipeline — the stage graph from lint through deploy, merge-blocking semantics, and rollback primitives.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "sast-orchestration-designer does not activate: designing the whole CI delivery pipeline (stage graph, merge-blocking semantics, rollback) is broader than the SAST stage contract this skill produces.",
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute sast-orchestration-designer or another skill for it."
+        ]
+      }
     }
   ]
 }

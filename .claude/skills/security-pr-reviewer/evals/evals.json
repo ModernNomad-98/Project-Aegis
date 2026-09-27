@@ -51,6 +51,30 @@
           "Suggests threat-modeler for design-time analysis and offers to review once an actual diff exists."
         ]
       }
+    },
+    {
+      "id": "unnamed-build-decided-control-here-no-auto-appsec-implementer",
+      "type": "should_not_trigger",
+      "prompt": "We agreed the profile endpoint needs an ownership check — add the authorization check and a test proving a wrong-tenant user gets 404.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "security-pr-reviewer does not activate: there is no diff to review; the ask is to implement an already-agreed ownership check and a wrong-tenant 404 test, a side-effecting build task.",
+          "Does not auto-invoke appsec-implementer (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute security-pr-reviewer or another skill for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-secrets-hardening-no-auto-secrets-identity-hardener",
+      "type": "should_not_trigger",
+      "prompt": "Move our hardcoded credentials into a secret manager, classify which env vars are safe for the client, and set up rotation.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "security-pr-reviewer does not activate: there is no diff to review; moving hardcoded keys into a manager, classifying client-safe env vars and setting up rotation is broad hardening work.",
+          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute security-pr-reviewer or another skill for it."
+        ]
+      }
     }
   ]
 }

@@ -52,6 +52,18 @@
           "Notes remediation of any resulting corruption (retrain/purge/rollback) is a classified, approved step via human-approval-boundary."
         ]
       }
+    },
+    {
+      "id": "unnamed-inference-injection-no-auto-prompt-injection-defender",
+      "type": "should_not_trigger",
+      "prompt": "A retrieved document contains instructions that hijacked our agent at answer time — stop that.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "model-poisoning-reviewer does not activate: retrieved content acting as instructions at answer time is inference-time injection, not training, feedback or ingestion integrity.",
+          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute model-poisoning-reviewer or another skill for it."
+        ]
+      }
     }
   ]
 }

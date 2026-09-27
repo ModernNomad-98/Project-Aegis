@@ -53,6 +53,18 @@
           "Keeps the mTLS layer as necessary-but-insufficient and states the residual risk if the team accepts instruction-trusting anyway (named acceptor via human-approval-boundary)."
         ]
       }
+    },
+    {
+      "id": "unnamed-in-context-instructions-no-auto-prompt-injection-defender",
+      "type": "should_not_trigger",
+      "prompt": "Hidden instructions inside a document our agent read made it change behavior — build the defense for untrusted content in context.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "inter-agent-comms-reviewer does not activate: hidden instructions in a document already in the model's context are an in-context injection defense problem, not transport or receiver handling of peer agent messages.",
+          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute inter-agent-comms-reviewer or another skill for it."
+        ]
+      }
     }
   ]
 }
