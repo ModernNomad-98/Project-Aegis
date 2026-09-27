@@ -74,17 +74,17 @@ synthetic fixtures**, with zero known pending pages.
 
 The governance change recording delivery of the BER-DEC-014 correction in
 merged PR #374 (`7390ae0`) and the consumption of its one-package grant
-(AEGIS-APR-053, consuming AEGIS-APR-046), plus the owner's protected-path
-grant and one-time guard exception for merged PR #373 and their consumption
-(AEGIS-APR-054 through AEGIS-APR-056), changes three existing reader pages
-and adds no Markdown file: the approval register, BER backlog and this ledger.
-No independent full-page review is recorded yet, so those three pages are
-**pending re-acceptance** against
-[Acceptance for each page](#acceptance-for-each-page); the named follow-up is
-one independent read-only review of the changed passages. This change alters
-no grant, gate or host status. With the feature-flag proposal page above, the tree stands at **606 Markdown
-files: 559 accepted reader pages, 44 classified synthetic fixtures and three
-known pending pages** until that review accepts them.
+(AEGIS-APR-053, consuming AEGIS-APR-046), plus the owner's protected-path grant
+and one-time guard exception for merged PR #373 and their consumption
+(AEGIS-APR-054 through AEGIS-APR-056), changes three existing reader pages and
+adds no Markdown file: the approval register, BER backlog and this ledger. No
+independent full-page review is recorded yet, so those three pages are
+**pending re-acceptance** against [Acceptance for each
+page](#acceptance-for-each-page); the named follow-up is one independent
+read-only full-page review of each changed page. This change alters no grant,
+gate or host status. With the feature-flag proposal page above, the tree stands
+at **606 Markdown files: 559 accepted reader pages, 44 classified synthetic
+fixtures and three known pending pages** until that review accepts them.
 
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added

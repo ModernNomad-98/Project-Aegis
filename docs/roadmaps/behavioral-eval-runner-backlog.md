@@ -72,17 +72,24 @@ consumed by the merge under
 [APR-044/045](../approvals/APPROVAL_REGISTER.md#aegis-apr-044-pr-315-protected-gate-guard-exception).
 The [main run 36221057049](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36221057049)
 passed Linux and Windows checks; the PR-only guard was skipped.
+
 [PR #374](https://github.com/ModernNomad-98/Project-Aegis/pull/374) merged
 tested head `6f5d2744a6a0d1f6313af28c682be0ef954055e3` as
 `7390ae0ac388a7c64ab87a5026fbfa2727113857` at 2026-09-26 23:24:51 UTC,
 delivering the BER-DEC-014 correction. A report now rejects a selected case
-that preflight excluded (`PRECHECK_EXCLUDED`) unless all its planned attempts
-stay `UNRUN` and its aggregate is `INCONCLUSIVE` / `PRECHECK_EXCLUDED` with the
-preflight reason code, so an excluded case can no longer appear as
-`NOT_SELECTED` or drop out of `excluded_totals_by_reason`. It changed only
-`reporting.py` and `tests/test_reporting.py` (227 added lines) on a branch
-cut from governance merge `2aed8dd377e821148b74e077f7c58f4edba6c01e`.
-Independent security and quality reviews passed, and the Codex review
+that preflight excluded (`PRECHECK_EXCLUDED`) unless it has planned attempts,
+all of them stay `UNRUN`, and its aggregate is `INCONCLUSIVE` /
+`PRECHECK_EXCLUDED` with the preflight reason code. Such a case's aggregate can
+no longer claim `NOT_SELECTED`, and the case can no longer drop out of
+`excluded_totals_by_reason`. Its planned `UNRUN` attempts are still not
+required to carry the preflight reason, so they can still count under
+`NOT_SELECTED` in `unrun_totals_by_reason`; tightening that would change the
+approved report contract and needs a new owner decision. It changed only
+`reporting.py` and `tests/test_reporting.py` (227 added lines) on a branch cut
+from governance merge `2aed8dd377e821148b74e077f7c58f4edba6c01e`. Independent
+security and quality reviews passed, and the automated Codex pull-request
+review required by
+[APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review)
 completed with no findings. Exact-head Linux (full offline BER suite: 1,088
 tests) and Windows checks passed in
 [run 36278386968](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36278386968);
@@ -1076,9 +1083,9 @@ operator controls are evidenced. The 2026-09-23 checkpoint above is historical.
   checks are pending review at this branch checkpoint.
 
   BER-DEC-014 and [APR-046](../approvals/APPROVAL_REGISTER.md#aegis-apr-046-ber-selected-precheck-aggregate-correction),
-  owner-approved on 2026-09-26 and effective when their governance PR merges,
-  authorize one further bounded synthetic increment under this AUTHORIZED
-  record: the selected-precheck aggregate correction proposed in
+  owner-approved on 2026-09-26 and effective at their governance merge `2aed8dd`
+  (PR #365), authorize one further bounded synthetic increment under this
+  AUTHORIZED record: the selected-precheck aggregate correction proposed in
   [PR #331 proposal](ber-precheck-aggregate-validation-proposal.md), on
   `fix/ber-precheck-aggregate-validation` from that governance merge commit,
   limited to `reporting.py` and `tests/test_reporting.py` under
@@ -1089,11 +1096,12 @@ operator controls are evidenced. The 2026-09-23 checkpoint above is historical.
   from a branch cut at governance merge
   `2aed8dd377e821148b74e077f7c58f4edba6c01e` (tree
   `e0c8f2986fd60a559475bbbe89a93f5c0aa16dac`). It changed exactly the two
-  paths above with 227 added lines; its PR body is the sanitized evidence
-  record. Independent security and quality reviews passed; exact-head Linux
-  `validate-skills` (1,088 BER tests) and `windows-offline-checks` passed;
-  `gate-guard` failed on the two paths only and was dispositioned under
-  APR-047; the Codex review found nothing. The one-package APR-046 grant is
+  paths above with 227 added lines; its PR body, with the receipt correction
+  comment posted after the merge, is the sanitized evidence record. Independent
+  security and quality reviews passed; exact-head Linux `validate-skills` (1,088
+  BER tests) and `windows-offline-checks` passed; `gate-guard` failed on the two
+  paths only and was dispositioned under APR-047; the automated Codex review
+  found no issues. The one-package APR-046 grant is
   consumed ([APR-053](../approvals/APPROVAL_REGISTER.md#aegis-apr-053-consumption-of-the-selected-precheck-correction-grant)).
   WP-2B-3 stays AUTHORIZED, not DONE. It does
   not change private-label, selected-host, provider-budget, OD-1 or later
