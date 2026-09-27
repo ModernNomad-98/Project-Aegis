@@ -60,10 +60,10 @@ requires a record, that record is still to be written.
 | Topic | Decision and what it does not cover |
 | --- | --- |
 | `scripts/audit-skill-contracts.py` dirty-path defect | **Resolved, no owner choice remains.** The contract-audit script's handling of dirty (uncommitted) paths was fixed in [PR #373](https://github.com/ModernNomad-98/Project-Aegis/pull/373), merged at 23:32:15 UTC as `4ca04c1e` with the owner-approved protected-path PR; `gate-guard` failed on its protected paths, as the one-time owner exception anticipated. |
-| `project-orchestrator` feature-flag route | **Yes:** route from Stage 9 ("Decide to release") to the rollout strategist as an owner choice ("ship directly or behind a release flag?"). The routing change is not started. |
-| D64 decision-log row | **Required:** a D64 row must be added to the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions). No D64 row exists yet. |
+| `project-orchestrator` feature-flag route | **Yes:** route from Stage 9 ("Decide to release") to the rollout strategist as an owner choice ("ship directly or behind a release flag?"). The routing change was not started at this reading; it is now in open [PR #384](https://github.com/ModernNomad-98/Project-Aegis/pull/384). |
+| D64 decision-log row | **Required:** a D64 row must be added to the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions). No D64 row existed at this reading; [PR #383](https://github.com/ModernNomad-98/Project-Aegis/pull/383) added it on 2026-09-27 at 03:43:01 UTC (`6844ab9f`). |
 | Caching seam | **Kept** as currently written. |
-| Four one-way ROUTE-002 hub findings | **Stay census data:** these four routing-reciprocity findings are recorded, not fixed. Other ROUTE-002 findings stay in the open row below. |
+| Four one-way ROUTE-002 hub findings | **Stay census data:** these four routing-reciprocity findings are recorded, not fixed. Other ROUTE-002 findings stay in the open row below. #383 as merged records a fifth one-way finding, toward `tenant-isolation-reviewer`, which the owner also confirmed on 2026-09-26 stays census data (decision log D64). |
 
 [PR #382](https://github.com/ModernNomad-98/Project-Aegis/pull/382) removed the two `scripts/__pycache__`
 bytecode files that #372 committed by mistake and ignores bytecode caches.
@@ -115,7 +115,7 @@ not authorize its implementation.
   reciprocal description edit to `feature-flag-rollout-strategist`, and a
   separate `project-orchestrator` Stage-3 route) and said to build now. The
   proposal page merged as [PR #378](https://github.com/ModernNomad-98/Project-Aegis/pull/378)
-  on 2026-09-27 at 01:40:32 UTC (`a2d2b831`); the skill is in progress. Later
+  on 2026-09-27 at 01:40:32 UTC (`a2d2b831`); the skill was then in progress and merged as [PR #383](https://github.com/ModernNomad-98/Project-Aegis/pull/383) on 2026-09-27 at 03:43:01 UTC (`6844ab9f`). Later
   on 2026-09-26 the owner
   approved the orchestrator route at Stage 9 ("Decide to release"); see
   [Decided on 2026-09-26](#decided-on-2026-09-26).
