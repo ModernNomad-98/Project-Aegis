@@ -120,7 +120,10 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > banked capability, the ORCHESTRATION layer that RUNS and AGGREGATES security
 > scans while yielding finding TRIAGE to the judgment skills (179→182); **D45**
 > then extended `cloud-architecture-decider` with the full deployment
-> abstraction ladder (rung × provider × posture; no count change). The
+> abstraction ladder (rung × provider × posture; no count change); PR #393
+> later replaced that ladder with compatible deployment patterns, comparing
+> managed platforms side by side with hyperscalers and scoring pattern ×
+> provider × posture (no count change). The
 > **D46** build shipped `authority-invalidation-architect` — the
 > symptom-triggered owner of the "change didn't take effect" access-bug class
 > (a removed user still sees data, a revoked role still works, logout doesn't
@@ -501,7 +504,7 @@ namespace pattern).
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (all fourteen sit in one of four overlap clusters).
 Anchored to the **OWASP Top 10 for LLM Applications (2026)** — re-anchored on
-2026-09-26 from the 2025 edition that reconciliation §3 (D6) cited; all IDs in
+2026-09-26 (decision D65) from the 2025 edition that reconciliation §3 (D6) cited; all IDs in
 this section are 2026 IDs, and `ai-threat-modeler`'s threat catalog carries the
 2025→2026 crosswalk. Per D6: v4's 10 skills plus 4 gap additions
 (`sensitive-disclosure-guard` LLM02, `model-poisoning-reviewer` LLM05, `system-prompt-leakage-reviewer`
@@ -881,7 +884,7 @@ facilitation/design skills that edit nothing → **model-invocable**.
 | `product-spec-writer` | reconciliation §3 D12.5 | yes | The PRODUCT spec: problem/job, goals and explicit non-goals, scenarios, functional requirements with TESTABLE acceptance criteria, edge/error behavior, rollout intent + success metrics, open questions. Pinned ≠ `adr-writer` (a product spec is not an architecture decision record); routes technical decisions there. |
 | `roadmap-under-uncertainty-planner` | reconciliation §3 D12.5 | yes | Plans nonbinding Now/Next/Later horizons using confidence, dependencies and learning goals. Readiness and horizon movement neither create nor cancel human commitments; composes `roadmap-to-commitments-translator` for evidenced commitment decisions. |
 | `prioritization-frame-picker` | reconciliation §3 D12.5 | yes | Picks the RIGHT prioritization frame (RICE/WSJF/value-effort/Kano/MoSCoW) instead of defaulting, marks input reliability, refuses false rigor (buckets + a sensitivity check), and pulls must-dos out of the value formula. Ranks; sequencing over time is `roadmap-under-uncertainty-planner`'s. |
-| `feature-flag-rollout-strategist` | reconciliation §3 D12.5 | yes | The ROLLOUT strategy: flag classified by purpose, progressive stages with advance/rollback criteria, sticky targeting, guardrails + a tested kill switch, a fail-safe default, flag-debt removal. Pinned ≠ `plan-entitlement-architect`/`authorization-matrix-designer` (entitlement/permission) and ≠ `ab-test-designer` (experiment). |
+| `feature-flag-rollout-strategist` | reconciliation §3 D12.5 | yes | The ROLLOUT strategy: flag classified by purpose, progressive stages with advance/rollback criteria, sticky targeting, guardrails + a tested kill switch, a fail-safe default, flag-debt removal. Pinned ≠ `feature-flag-architect` (the flag system itself), ≠ `plan-entitlement-architect`/`authorization-matrix-designer` (entitlement/permission) and ≠ `ab-test-designer` (experiment). |
 | `sunset-deprecation-communicator` | reconciliation §3 D12.5 | yes | Sunsetting a PRODUCT feature/API to users: rationale, impact, migration path, a firm timeline, an escalating multi-channel comms plan, grandfathering, and a tombstone (not a silent 404). Pinned ≠ `skill-deprecation-planner` (retiring a library SKILL) and ≠ `api-event-architect` (standing deprecation policy). |
 
 ### Skills (D12.6 — growth / analytics engineering pack)
@@ -1236,7 +1239,7 @@ above. Source: [`docs/skills/09-ai-software-engineering.md`](skills/09-ai-softwa
 and the reconciliation doc §3 Phase 7 coverage map (D6).
 Per D6: **LLM04** (2026 ID; D6 cited LLM03:2025) is extend-existing — the shipped Phase 4
 `supply-chain-security-reviewer` was extended (scoped diff) to the AI/ML supply
-chain (models, datasets, fine-tuning adapters); **LLM06** DoS/denial-of-wallet
+chain (models, datasets, fine-tuning adapters); **LLM06** (2026 ID; D6 cited LLM10:2025) DoS/denial-of-wallet
 is baked into `ai-cost-guardrail-designer`; and `ai-evaluation-harness` absorbs
 the AI security test harness (no separate `ai-security-test-harness`). The
 Phase 7 **expansion backlog** (`ai-provider-adapter-designer`,

@@ -9,8 +9,9 @@ description: Decide cloud platform, deployment pattern, and operational posture,
 as a service; PaaS means platform as a service; SSR means server-side
 rendering; BaaS means backend as a service; ADR means architecture decision
 record; IAM means identity and access management; SaaS means software as a
-service; CDN means content delivery network. Define other provider or
-product abbreviations when they drive a decision.
+service; CDN means content delivery network; IaC means infrastructure as code;
+CI/CD means continuous integration and continuous delivery. Define other
+provider or product abbreviations when they drive a decision.
 Here p95 means the 95th percentile; SOC 2 and ISO 27001 are named security
 assurance standards. OS means operating system; DB means database; VM means
 virtual machine; API means application programming interface; SKU means a
@@ -236,8 +237,8 @@ the owner's answer grants no authority to create accounts, pay, or release.
    posture to `saas-cost-architect`. Service mapping depends on the pattern:
    - **Hyperscaler option** → `aws-saas-architect` or `azure-saas-architect`
      maps account topology, IAM, network, and service SKUs. (GCP is a
-     decide-able hyperscaler here but has no mapping skill yet — a banked
-     future item; the decision can still land on GCP.)
+     decide-able hyperscaler here but has no mapping skill yet — a backlog
+     item; the decision can still land on GCP.)
    - **Modern managed-platform tier** (frontend host / backend as a service /
      app platform / edge) → there is no dedicated mapping skill; the platform may
      absorb parts of account topology, IAM, network, and patching, so verify
@@ -290,7 +291,7 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
       verified (with source) or assumed — no silent guesses on compliance,
       residency, or availability.
 - [ ] Logical architecture contains zero provider product names.
-- [ ] Concrete provider/platform brand names appear only in the abstraction-
+- [ ] Concrete provider/platform brand names appear only in the deployment-
       pattern explanation and the options/scoring output, as current examples —
       never in the logical architecture, which stays capability-language.
 - [ ] Tenant isolation and compliance produced explicit hard filters before
