@@ -1,6 +1,6 @@
 ---
 name: llm-output-safety-reviewer
-description: 'Review how an application consumes LLM output for improper output handling (OWASP LLM10) — treat every model output as untrusted data and trace it to each sink: HTML/markdown rendering (XSS), SQL/shell/eval execution (injection, RCE), file paths and URLs (traversal, SSRF), tool arguments, stored-then-reused output (second-order), and AI-generated code before it is saved, committed or run (no auto-run, sandbox, static checks, human review gate, provenance label). Verify context-correct encoding, sandboxing incl. autonomous generate-and-run loops and sandbox escape/persistence (agentic ASI05), and validate-before-act discipline. Use when model output is rendered, executed, stored, committed, or used to build a command, query, path, or request. Do NOT use for output shape (structured-output-validator), upstream injection (prompt-injection-defender), factual correctness (ai-misinformation-guard), tool-permission scope (agent-tool-safety-guard), or leaked sensitive data (sensitive-disclosure-guard).'
+description: 'Review how an application consumes LLM output for improper output handling (OWASP LLM10) — treat model output as untrusted and trace it to each sink: HTML/markdown rendering (XSS), SQL/shell/eval execution (injection, RCE), file paths and URLs (traversal, SSRF), tool arguments, stored-then-reused output (second-order), and AI-generated code before it is saved, committed or run (no auto-run, sandbox, checks, human review gate, provenance). Verify context-correct encoding, sandboxing incl. autonomous generate-and-run loops and sandbox escape/persistence (agentic ASI05), and validate-before-act discipline. Use when model output is rendered, executed, stored, committed, or used to build a command, query, path, or request. Do NOT use for output shape (structured-output-validator), upstream injection (prompt-injection-defender), factual correctness (ai-misinformation-guard), tool-permission scope (agent-tool-safety-guard), one diff''s bugs (code-reviewer), or leaked sensitive data (sensitive-disclosure-guard).'
 ---
 
 # LLM Output Safety Reviewer
@@ -19,6 +19,20 @@ The review traces output to each sink and verifies context-correct
 encoding/escaping, sandboxing for executed generated code, and
 validate-before-act discipline, producing severity-ranked findings each with
 the flow from model output to impact.
+
+**Reading key:** OWASP is the Open Worldwide Application Security Project;
+LLM means large language model, and LLM10:2026 means category LLM10 in the
+2026 edition of its LLM Top 10. AI means artificial intelligence. HTML is
+HyperText Markup Language; JSX is JavaScript XML; JS is JavaScript; SQL is
+Structured Query Language; URL is uniform resource locator; HTTP is
+Hypertext Transfer Protocol; I/O means input/output; PII is personally
+identifiable information; CSP is Content Security Policy; SAST is static
+application security testing; CI is continuous integration; NL means natural
+language; and `venv` is a Python virtual environment. XSS is cross-site
+scripting, RCE is remote code execution, SSRF is server-side request
+forgery, and ASI05 is the agentic framework's unexpected-code-execution
+category. The [sink catalog](references/output-sink-catalog.md) carries the
+per-sink detail.
 
 ## Use When
 
@@ -247,4 +261,5 @@ Not reviewed: <areas + why>
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the output & agency
   cluster and against `security-pr-reviewer`, `structured-output-validator`,
-  `agent-tool-safety-guard` and `supply-chain-security-reviewer`.
+  `agent-tool-safety-guard`, `supply-chain-security-reviewer`,
+  `code-reviewer` and `ai-sdlc-operating-model`.

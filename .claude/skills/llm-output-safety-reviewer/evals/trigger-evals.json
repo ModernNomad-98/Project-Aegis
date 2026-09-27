@@ -1,6 +1,6 @@
 {
   "skill": "llm-output-safety-reviewer",
-  "description": "Trigger discrimination for the Phase 7 output & agency cluster: output-sink injection/exec review vs schema-shape validation vs the injection source vs tool scope, and against the shipped security-pr-reviewer.",
+  "description": "Trigger discrimination for the Phase 7 output & agency cluster: output-sink injection/exec review (including the generated-code commit path) vs schema-shape validation (structured-output-validator), the injection source (prompt-injection-defender), tool scope (agent-tool-safety-guard), factual accuracy (ai-misinformation-guard), sensitive-data leakage (sensitive-disclosure-guard), dependency trust (supply-chain-security-reviewer), one diff's content (code-reviewer, security-pr-reviewer) and AI-assisted lifecycle design (ai-sdlc-operating-model).",
   "overlaps_with": ["structured-output-validator", "prompt-injection-defender", "agent-tool-safety-guard", "ai-misinformation-guard", "security-pr-reviewer", "sensitive-disclosure-guard", "supply-chain-security-reviewer", "code-reviewer", "ai-sdlc-operating-model"],
   "cases": [
     {

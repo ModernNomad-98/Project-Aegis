@@ -12,7 +12,10 @@ Structured Query Language; NoSQL refers to non-relational databases; ORM is
 object-relational mapper; OS is operating system; RCE is remote code
 execution; SSRF is server-side request forgery; VM is virtual machine; and
 CPU is central processing unit. SAST is static application security
-testing; CI is continuous integration. NL means natural language; `venv` means a
+testing; CI is continuous integration; PR is pull request; AI is
+artificial intelligence; UI is user interface; DNS is the Domain Name
+System, and A/AAAA are its IPv4/IPv6 address records; LLM10:2026 means
+category LLM10 in the 2026 edition. NL means natural language; `venv` means a
 Python virtual environment; CRLF means carriage-return/line-feed. ASI05 is
 the agentic framework's unexpected-code-execution category, recorded with LLM10
 in the [source mapping](../../../../docs/reconciliation/step-0-reconciliation-v4.md).
@@ -87,7 +90,9 @@ the CONTROLS on that path, not the code itself:
   directly. Watch for files that execute on save or on the next routine
   action: git hooks, CI workflow files, package `postinstall`/build scripts,
   editor task and file-watcher configs, and migration files picked up on
-  boot. Generated content in those paths is an execution sink.
+  boot. Generated content in those paths is an execution sink. A CI run
+  triggered by an unreviewed generated change must not reach secrets or
+  deploy credentials.
 - **Sandbox before any pre-review run.** Running generated code to "see if it
   works" before review uses the execution-sink sandbox above: no ambient
   credentials, no production data, network denied or allowlisted.
