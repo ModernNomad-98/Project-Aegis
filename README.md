@@ -60,7 +60,7 @@ reports follow [SECURITY.md](SECURITY.md). The
 ## The roles Aegis can play
 
 Under the hood, Aegis is a library of skills organized into discipline families — the marked
-totals in the intro below are the authoritative counts. In
+totals in [What's in the library](#whats-in-the-library) are the authoritative counts. In
 practical terms, Aegis can make your coding agent act as:
 
 | Aegis can act as… | What that means for you | Example skills |
@@ -69,16 +69,16 @@ practical terms, Aegis can make your coding agent act as:
 | **a principal software architect** | Designs how the whole system fits together and where each new piece belongs. | `architecture-designer`, `architecture-advisor` |
 | **a domain-driven design facilitator** | Turns how your business actually works into a clear model the software is built around. | `domain-modeler` |
 | **a staff or principal software engineer** | Writes the code the disciplined way — tests first, small reviewable changes, honest review. | `tdd-engineer`, `code-reviewer` |
-| **a SaaS platform and multi-tenancy architect** | Designs how many customers share one system without ever seeing each other's data. | `saas-platform-architect`, `tenant-isolation-reviewer` |
-| **an application security and RLS specialist** | Hardens the app and locks down exactly who can read which rows in the database. | `rls-policy-auditor`, `security-pr-reviewer` |
-| **a QA automation and Playwright engineer** | Builds automated tests that click through your app like a real user and catch breakage before customers do. | `playwright-e2e-engineer`, `qa-automation-architect` |
+| **a software-as-a-service (SaaS) platform and multi-tenancy architect** | Designs how many customers share one system without ever seeing each other's data. | `saas-platform-architect`, `tenant-isolation-reviewer` |
+| **an application security and row-level security (RLS) specialist** | Hardens the app and locks down exactly who can read which rows in the database. | `rls-policy-auditor`, `security-pr-reviewer` |
+| **a quality assurance (QA) automation and Playwright engineer** | Builds automated tests that click through your app like a real user and catch breakage before customers do. | `playwright-e2e-engineer`, `qa-automation-architect` |
 | **a cloud, DevOps and reliability architect** | Decides where and how it runs in production — and keeps it up. | `cloud-architecture-decider`, `slo-reliability-architect` |
 | **an AI security and agentic-red-team architect** | Attacks your own AI features before an outsider does — prompt injection, data leaks, runaway agents. | `ai-threat-modeler`, `prompt-injection-defender` |
 | **an AI agent operating-environment architect** | Designs how your AI agent runs safely — what it's allowed to do, what it can see, and when it stops — so it can't overreach, leak data, or run away. | `agent-harness-architect`, `model-context-designer`, `agentic-loop-designer` |
 | **an ISO 27001, ISO 42001 and SOC 2 readiness advisor** | Gets you audit-ready for the security and AI-governance certifications enterprise customers ask for. | `iso-27001-isms-architect`, `soc2-trust-criteria-mapper` |
 | **a product discovery and specification facilitator** | Interviews you to turn a vague idea into clear written requirements and a spec. | `requirements-gathering-facilitator`, `product-spec-writer` |
 | **a product analytics and experimentation architect** | Decides what to measure and runs honest A/B tests, so decisions rest on evidence, not guesses. | `product-analytics-instrumenter`, `ab-test-designer` |
-| **a technical writer and documentation engineer** | Writes the docs — READMEs, guides, API references — and keeps them from drifting out of date. | `readme-craftsman`, `docs-as-code-architect` |
+| **a technical writer and documentation engineer** | Writes the docs — READMEs, guides, application programming interface (API) references — and keeps them from drifting out of date. | `readme-craftsman`, `docs-as-code-architect` |
 | **a staff+ technical leadership advisor** | Brings the senior-engineer judgment call: what's worth building, how to scope it, when to say no. | `staff-scope-selector`, `tech-spec-writer` |
 | **a full-codebase auditor** | Reads an entire codebase and reports its real health, risks, and technical debt. | `full-codebase-auditor`, `principal-code-analyst` |
 | **a senior production troubleshooter** | When something breaks, drives from symptom to root cause instead of guessing. | `systematic-debugger`, `incident-response-runbook` |
@@ -173,7 +173,7 @@ for how to get it running first). This one message is the whole on-ramp:
 > never move to coding until the earlier stage is confirmed."
 
 You don't have to name a skill: `project-orchestrator` picks this up automatically, works out
-where your project is, and drives the rest. That automatic selection is model-driven behavior enabled by the repo's startup instructions (`CLAUDE.md` for Claude Code, `AGENTS.md` for Codex) — verified by a live acceptance test, not a mechanical guarantee.
+where your project is, and drives the rest. That automatic selection is model-driven behavior enabled by the repo's startup instructions (`CLAUDE.md` for Claude Code, `AGENTS.md` for Codex) — verified by a live acceptance test on 2026-07-30 against the startup files from decision D61 in the [planning record](docs/reconciliation/step-0-reconciliation-v4.md) ([test record](docs/audits/volunteerflow/Project-Aegis-VolunteerFlow-Defect-Handoff-AEGIS-001-to-059.md)), not a mechanical guarantee.
 
 **What it actually feels like.** A short, real exchange — not the whole interview, just enough to
 show the shape of it:
@@ -235,7 +235,7 @@ their cost, time, and risk so you can judge:
 | Whether a completed job can be reopened | Retry and failure behavior when something goes wrong |
 | Who can see what | How access control is implemented and enforced |
 | How customers are notified | Caching, performance, and reliability targets |
-| Your pricing tiers | The CI pipeline and how each change is validated |
+| Your pricing tiers | The continuous integration (CI) pipeline and how each change is validated |
 | Whether to accept a known risk | Infrastructure layout and AI rate limits |
 | The final authorization to deploy | The test strategy and what it covers |
 
@@ -303,10 +303,14 @@ local surface, so pick whichever matches how you work. The current full list is 
    ```
 
 3. That's the whole setup. Claude Code auto-discovers everything under `.claude/` — every
-   skill and subagent loads automatically. There is no registration step.
-4. **How you invoke a skill** — skills are trigger-invoked, not slash-commanded. You invoke
-   one by *describing a task that matches its trigger*, or by *naming it*. Two literal
-   prompts to type at the Claude Code prompt:
+   skill and subagent is discovered automatically. There is no registration step.
+4. **How you invoke a skill** — describe a task that matches its trigger, or name it. A
+   manual-only skill (`disable-model-invocation: true`) is the exception: Claude Code loads it
+   only when you type `/skill-name` (for example `/aegis-setup`) and blocks Claude from loading
+   it on its own (checked 2026-09-27 against
+   [Claude Code skills](https://code.claude.com/docs/en/skills)). This repo's startup
+   instructions also allow a manual-only skill only when you name it, so typing `/skill-name`
+   is the reliable way. Two literal prompts to type at the Claude Code prompt:
    - "I want to build a new feature but the requirements are vague — use the
      requirements-gathering-facilitator skill to run discovery with me."
    - "Review this diff for tenant-isolation problems." (no skill named — the matching skill
@@ -374,7 +378,8 @@ relevant, so you don't have to invoke them. You still don't get Claude Code's re
 subagents, the repo-wide startup routing in `CLAUDE.md`/`AGENTS.md`, or the CI validator. The
 Claude apps help page doesn't document the `disable-model-invocation` field, so only the
 description sentinel is known to apply; don't upload manual-only (`MANUAL-ONLY`) skills unless
-you accept that. As a lighter fallback, paste a `SKILL.md` into project instructions or the
+you accept that Claude may use them automatically. As a lighter fallback, paste a `SKILL.md`
+into project instructions or the
 conversation (checked 2026-09-26 against
 [Using Skills in Claude](https://support.claude.com/en/articles/12512180-using-skills-in-claude)).
 
@@ -437,7 +442,7 @@ Two ways in:
   2026-09-26). Verified caveats before you choose this path (the first is fixed, kept
   for the record):
   1. ~~Strict-YAML consumers silently drop skills whose descriptions contain an unquoted
-     `: `~~ — **fixed by the D50 normalization**: every description is now a
+     `: `~~ — **fixed by the D50 normalization** (decision 50 in the [planning record](docs/reconciliation/step-0-reconciliation-v4.md)): every description is now a
      strict-YAML-valid scalar (single-quoted where needed, parsed values byte-identical),
      so strict consumers parse the full corpus, and the validator hard-fails any future
      skill whose frontmatter a spec-strict parser rejects.
@@ -467,7 +472,9 @@ Two ways in:
   drifts on every skill edit and bakes in the three live caveats. The copy is per-user
   opt-in only.
 
-**Your first session — from a vague idea.** If you're not a developer and you have an idea but
+#### Your first session
+
+**From a vague idea.** If you're not a developer and you have an idea but
 no idea what to do first, name the front door: `project-orchestrator`. It works out where your
 project is, asks you one plain-language business question at a time, routes each step to the
 right skill for you (no skill name needed), keeps a human as the approval gate on anything
@@ -522,7 +529,7 @@ entry in the reconciliation doc.
 ## Map of the system
 
 - **Skills** ([`.claude/skills/`](.claude/skills/)) — the shipped procedures, organized
-  into discipline families (authoritative counts: the marked intro below), fronted by
+  into discipline families (authoritative counts: the marked totals in [What's in the library](#whats-in-the-library)), fronted by
   `project-orchestrator`, the beginner-facing router that walks a non-developer through
   them from idea to shipped. See **[What's in the
   library](#whats-in-the-library)** below for the roster (each family, its purpose, and
@@ -547,7 +554,7 @@ entry in the reconciliation doc.
 
 **Skill roles at a glance.** The <!-- SKILL-COUNT -->186<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch), fronted by one beginner-facing orchestrator. This is the scannable map of what
-*kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below.
+*kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
 **Start here — `project-orchestrator` (the front door).** If you're a non-developer with an
 idea and no idea what to do first, this is the one skill to name. It isn't one of those families — it's
@@ -555,7 +562,7 @@ the navigator *above* them all: it works out which stage your project is in, rou
 the right skill below (you never need its name), turns every technical choice into a
 plain-language business question, records each dated decision in a `docs/project-state.md`, and
 keeps a human as the approval gate on anything irreversible. See
-*[Your first session](#getting-started)* for the opening prompt.
+*[Your first session](#your-first-session)* for the opening prompt.
 
 1. **Operating discipline** *(Phase 1, 8)* — the always-on rules that keep AI-assisted work
    honest: classify before acting, verify against evidence, keep diffs small, halt for
@@ -614,8 +621,8 @@ keeps a human as the approval gate on anything irreversible. See
     `n-plus-one-detector`, `load-test-planner`.
 14. **Product, PM & growth** *(D24, 15)* — turning product intent into shippable, measured work:
     requirements elicitation feeding specs, then prioritization, flag-gated rollout, and
-    analytics instrumentation — see *Your first session* in
-    [Getting started](#getting-started) for the entry-point walkthrough.
+    analytics instrumentation — see
+    [Your first session](#your-first-session) for the entry-point walkthrough.
     *e.g.* `requirements-gathering-facilitator`, `product-spec-writer`,
     `prioritization-frame-picker`, `feature-flag-rollout-strategist`, `event-schema-architect`,
     `ab-test-designer`.
@@ -639,7 +646,7 @@ keeps a human as the approval gate on anything irreversible. See
     `background-job-orchestration-architect`, `admin-console-architect`,
     `superadmin-observability-console-designer`.
 19. **SaaS architecture depth — low-priority set** *(D32, 4)* — the scale-stage partitioning
-    surfaces: cell-based architecture, OLTP sharding, a below-tenant scope axis, and guest
+    surfaces: cell-based architecture, online transaction processing (OLTP) database sharding, a below-tenant scope axis, and guest
     share-link access. *e.g.* `cell-based-architecture-designer`,
     `data-partitioning-sharding-strategist`, `intra-tenant-scope-architect`,
     `share-link-access-architect`.
@@ -1174,6 +1181,7 @@ D32 (below):
 | `synthetic-monitoring-architect` | Black-box PRODUCTION monitoring: scheduled prod-safe probes/journeys + dependency/heartbeat, a hard no-mutate/no-fixture-leak safety contract, synthetic SLIs + alerting. DESIGNS probes, does not run them against prod. ≠ `performance-test-harness`/`load-test-planner` (pre-release), `playwright-e2e-engineer` (CI E2E), `slo-reliability-architect` (targets), `observability-operator` (white-box). | auto + manual |
 | `offline-first-sync-architect` | The client OFFLINE data layer: durable idempotent write queue, optimistic apply + rollback, version-based conflict detection + eyes-open resolution (refuses silent data loss), background sync, reconciliation integrity. ≠ `edge-state-ux-designer` (UX states), `caching-strategy-designer` (server cache), `realtime-subscription-architect` (live online push, in-batch). | auto + manual |
 | `admin-console-architect` | The internal ops/support/superadmin CONSOLE: least-privilege tiers, audited-by-construction cross-tenant access (reads too), bounded/marked/time-boxed impersonation, break-glass elevation, gated control-plane actions. ≠ `authorization-matrix-designer` (the policy it ENFORCES), `observability-operator` (telemetry vs action), `agent-authorization-matrix` (AI-agent vs human), `incident-response-runbook` (the playbook it serves). | auto + manual |
+| `superadmin-observability-console-designer` | (D47, joins family 18) The cross-tenant superadmin monitoring console DESIGN — the surface operators use to SEE platform health (signups, database health, security posture, cost, incidents): layered panels with one health answer first, a deny-by-default cross-tenant read-security model with audited break-glass content reveal, and honest gaps for unwired panels; every panel names its feed owner. ≠ `admin-console-architect` (the acting surface), `observability-operator` (operates telemetry backends). Designs; edits nothing. | auto + manual |
 
 D32 — SaaS architecture depth (D12.11 LOW-PRIORITY set): the 4 deferred
 Build-B candidates, completing the D12.11 pack (all 14 candidates now
@@ -1222,6 +1230,13 @@ model-invocable:
 |---|---|---|
 | `authority-invalidation-architect` | Diagnoses and designs the fix when an authority change fails to take effect — a removed user still sees data, a revoked role still works, logout doesn't end the session, a plan change shows the old tier, a deleted item stays visible. CHANGE → PROPAGATE → VERIFY: classify the change (deny direction first; access that NEVER worked routes to the correctness owners), inventory the eleven surfaces where old authority survives (server sessions, JWT/token claims, client stores/data caches, server/CDN caches, DB session context, realtime subscriptions, share links, entitlements, search indexes, signed URLs), locate the holder by its diagnostic tell ("works in incognito" → client copy; "fixes at a fixed interval" → token TTL), state an owner-confirmed revocation-latency bound, design invalidation per surface — owning token policy (short-TTL+refresh / session-version / denylist), server-session invalidation, and client purge (incl. the shared-device next-user leak) while composing `caching-strategy-designer`, `realtime-subscription-architect`, `plan-entitlement-architect`, `share-link-access-architect`, `rls-policy-auditor` — and verify with the deny-direction-first battery for the CHANGED principal. ≠ cache design, permission-matrix authoring, RLS auditing, generic debugging. | auto + manual |
 
+Optional Aegis setup (PR #124, family 23): manual-only; a setup phrase may show the four
+choices, but nothing is saved until a person invokes `aegis-setup` by name:
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `aegis-setup` | The four-choice setup conversation (Aegis only, a local helper, an online helper, help choosing) and an Aegis-only saved selection for one user and one checkout, tested on single-user Windows PowerShell. Local and online helpers remain unavailable; it connects no provider, measures no token saving, and does not replace `project-orchestrator`. | **manual only** |
+
 ## Authoring a new skill
 
 1. Read [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md).
@@ -1234,7 +1249,8 @@ model-invocable:
 
 Side-effecting skills (writes, network, deploy, spend) MUST set `disable-model-invocation: true`
 and document the irreversible step under **Stop Conditions** (the standard's §5 rule — its
-approved documentation/state exception and separate, explicitly activated TALI exception
+approved documentation/state exception and separate, explicitly activated Task-Authorized
+Local Implementation (TALI) exception
 are defined in the [current standard](docs/skill-generation-standard.md)).
 
 ## Validation
@@ -1275,7 +1291,7 @@ uses Python 3.14 and provides these jobs:
 
 | Check | What it does |
 | --- | --- |
-| `validate-skills` | Required Ubuntu check: CI-helper tests, validator self-tests and skill validation, contract-audit self-tests, BER self-check and regression suite, PowerShell Core acceptance, and PR-only DCO. |
+| `validate-skills` | Required Ubuntu check: CI-helper tests, validator self-tests and skill validation, contract-audit self-tests, BER self-check and regression suite, PowerShell Core acceptance, and a PR-only Developer Certificate of Origin (DCO) sign-off check. |
 | `windows-offline-checks` | Additional Windows coverage: the Python checks plus native Windows PowerShell and PowerShell Core acceptance. This job is not registered as a required branch-protection check. |
 | `gate-guard` | Required PR-only check: deliberately fails when protected validation, workflow, runtime, test or dependency paths change, so those changes receive explicit review. |
 
@@ -1324,10 +1340,14 @@ docs/
 
 scripts/
   validate-skills.py
+  audit-skill-contracts.py # skill contract audit
+  check_dco.py             # DCO sign-off check
   ci/  tests/              # offline CI, validator and contract-audit checks
   acceptance/             # deterministic PowerShell acceptance checks
 
 tools/
+  aegis_delivery_control/  # offline synthetic delivery control-plane kernel
+  aegis_setup/             # offline setup routing contract (maintainers)
   behavioral_eval_runner/  # offline core, grading and gated calibration controls
 
 requirements.txt           # pinned structural-validator dependency
