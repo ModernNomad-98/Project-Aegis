@@ -22,6 +22,13 @@ visible, never discovered later by surprise.
   note; closeout is terminal.
 - Do NOT use when: shaping a commit or staged diff — that is
   `reviewable-diff-discipline` (its parked items feed this report).
+- Do NOT use when: verifying a closeout's claims (`agent-governance-audit`),
+  designing a cross-stage handoff (`phased-work-handoff-designer`), writing a
+  lane's pre-work guide (`lane-authoring-guide`), or reconciling chat-only
+  history against the repo (`chat-backlog-reconciliation`).
+- Do NOT use when: assembling a promotion packet (`promotion-packet-writer`)
+  or setting screenshot-evidence policy (`screenshot-evidence-planner`);
+  this skill reports one finished task.
 
 ## Inputs to Inspect
 

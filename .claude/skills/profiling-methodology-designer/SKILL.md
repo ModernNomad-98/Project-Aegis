@@ -51,6 +51,9 @@ handoff map names.
 - Do NOT use when: building the MEASUREMENT harness that gates releases
   — `performance-test-harness` owns pass/fail measurement; this skill
   begins where its red result needs explaining.
+- Do NOT use when: planning the workload, tenant mix, or noisy-neighbor
+  scenarios for load/stress/soak testing — that is `load-test-planner`;
+  this skill attributes where time or memory goes.
 
 ## Inputs to Inspect
 

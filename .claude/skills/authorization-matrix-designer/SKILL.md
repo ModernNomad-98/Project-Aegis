@@ -48,6 +48,9 @@ accumulation of `if (user.isAdmin)` checks discovered later by a pen test.
   (`intra-tenant-scope-architect`, a filter a role carries, not a
   permission); or anyone-with-the-link bearer access for NON-members
   (`share-link-access-architect`, a capability, not member RBAC).
+- Do NOT use when: auditing or authoring the database's row-level-security
+  policies — that is `rls-policy-auditor`; this skill designs the
+  roles × permissions matrix those policies must enforce.
 
 ## Inputs to Inspect
 
