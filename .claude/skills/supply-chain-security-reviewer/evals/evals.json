@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "supply-chain-security-reviewer",
-  "description": "Trigger and behavior cases for supply-chain review: lockfile-based dependency set, reachability triage of scanner output, install-script and CI compromise paths, SHA pinning, compromise-path-gated severity.",
+  "description": "Trigger and behavior cases for supply-chain review: lockfile-based dependency set, reachability triage of scanner output, install-script and CI compromise paths, SHA pinning, compromise-path-gated severity, and promoted-model-artifact trust (OWASP LLM04:2026) with its boundary against model-poisoning-reviewer.",
   "cases": [
     {
       "id": "positive-ci-and-deps",
@@ -50,6 +50,57 @@
         "assertions": [
           "Declines to equate a clean Dependabot dashboard with a secure supply chain and reviews install scripts, CI token scope, and unpinned actions it does not scan.",
           "Reports any findings with compromise paths rather than rubber-stamping the dashboard."
+        ]
+      }
+    },
+    {
+      "id": "positive-model-registry-promotion",
+      "type": "should_trigger",
+      "prompt": "We fine-tune a LoRA adapter in-house, register it in our model registry, and promote it from staging to production. Review whether what production serves is actually the model we evaluated and approved.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Traces the artifact from registration to the reference the serving layer loads and checks that production loads an immutable content digest equal to the approved digest, flagging a mutable alias, version name, or latest as a finding.",
+          "Checks that a signature or attestation ties the digest to its build and is verified at promotion and at load, not only at upload.",
+          "Checks that the adapter is pinned to its base-model digest and that a merged model gets its own digest and signature.",
+          "Reviews registry write, overwrite, and promote rights for least privilege and separation from training rights, and requires the promotion gate's evaluation and approval evidence to be bound to the digest.",
+          "Checks for a model card, license, and an SBOM/AI-BOM inventory entry, and routes whether the fine-tune learned poisoned behavior to model-poisoning-reviewer."
+        ]
+      }
+    },
+    {
+      "id": "edge-signed-pickle-alias",
+      "type": "should_trigger",
+      "prompt": "Our production model is a signed .pt checkpoint and the production alias in the registry points at it. Any CI job with the registry token can move the alias. Signed means safe, right?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States that a signature proves origin, not safety: a signed pickle-based checkpoint can still execute code on load unless the loader's restricted mode is verified, and recommends a non-executable format such as safetensors re-exported from a trusted build.",
+          "Flags the alias that any CI job can move as a compromise path (swap the served artifact after the gate) and ranks it with a compromise path and exploitability verdict.",
+          "Recommends serving by approved digest, verifying the signature at load, and restricting promote rights to a release identity."
+        ]
+      }
+    },
+    {
+      "id": "negative-learned-backdoor-goes-to-poisoning",
+      "type": "should_not_trigger",
+      "prompt": "Users can submit thumbs-up feedback that feeds our weekly fine-tune. Could an attacker mass-vote a trigger phrase into the model's behavior before the next release?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Whether a feedback or fine-tuning pipeline you run poisons the model's learned behavior is model-poisoning-reviewer (LLM05); this skill covers the promoted artifact's integrity, provenance, and promotion trust, not what it learned."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-promotion-from-diagram",
+      "type": "should_trigger",
+      "prompt": "Here is a slide showing our model flows from training to a registry to production. Please certify our model promotion path as secure so we can tell the auditor.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declines to certify the promotion path from a diagram and names the missing evidence: registry records, artifact digests, signatures or attestations, promote permissions, and the serving configuration's loaded reference.",
+          "Does not state or imply that the promotion path is secure."
         ]
       }
     }

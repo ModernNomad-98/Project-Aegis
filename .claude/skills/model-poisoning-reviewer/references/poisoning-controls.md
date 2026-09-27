@@ -85,6 +85,10 @@ The high rows are the primary poisoning surface; controls scale with risk.
   data curation, feedback loops, RAG ingestion integrity.
 - **supply-chain-security-reviewer (LLM04, extended per D6):** artifacts you
   ACQUIRE — third-party base models, downloaded datasets, fine-tuning adapters,
-  their provenance and unsafe serialization.
+  their provenance and unsafe serialization — and promoted-artifact trust
+  for any model artifact moving through a registry, including ones you
+  train: digest identity, signing, registry access, and the promotion gate.
+  Whether a pipeline you run taught that artifact malicious behavior stays
+  here.
 
 State the boundary in the review; route acquired-artifact concerns across it.

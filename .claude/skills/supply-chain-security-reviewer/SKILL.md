@@ -1,6 +1,6 @@
 ---
 name: supply-chain-security-reviewer
-description: 'Review software supply-chain risk with SLSA-style provenance thinking — dependencies (CVEs triaged by reachability, not presence), lockfile integrity/pinning, transitive/typosquat/confusion risk, install and build scripts, CI/CD workflows (untrusted PR triggers, secret exposure, token scopes, unpinned Actions), artifact provenance, and postinstall/hook execution. Extends to the AI/ML (LLM04: models, datasets, fine-tuning adapters) and agentic (ASI04: MCP servers/manifests, tool/skill registries, plugins, A2A dependencies) supply chains. Findings carry a compromise path, exploitability verdict, and remediation (pin, upgrade, remove, isolate). Use when reviewing dependencies, lockfiles, CI workflows, a build pipeline, a dependency bump, or an acquired model/dataset/adapter/MCP server for supply-chain risk. Do NOT use to triage SAST/CodeQL findings in first-party code (static-analysis-reviewer), review app logic in a diff (security-pr-reviewer), or model feature threats (threat-modeler).'
+description: 'Review software supply-chain risk with SLSA-style provenance thinking — dependencies (CVEs triaged by reachability, not presence), lockfile integrity/pinning, transitive/typosquat/confusion risk, install and build scripts, CI/CD workflows (untrusted PR triggers, secret exposure, token scopes, unpinned Actions), artifact provenance, and postinstall/hook execution. Extends to the AI/ML (LLM04: models, datasets, adapters, registry promotion) and agentic (ASI04: MCP servers/manifests, tool/skill registries, plugins, A2A dependencies) supply chains. Findings carry a compromise path, exploitability verdict, and remediation (pin, upgrade, remove, isolate). Use when reviewing dependencies, lockfiles, CI workflows, a build pipeline, a dependency bump, an acquired model/dataset/adapter/MCP server, or a model-registry promotion. Do NOT use to triage SAST/CodeQL findings in first-party code (static-analysis-reviewer), review app logic in a diff (security-pr-reviewer), or model feature threats (threat-modeler).'
 ---
 
 # Supply-Chain Security Reviewer
@@ -17,7 +17,14 @@ learning; MCP is Model Context Protocol; A2A is the Agent2Agent protocol.
 OWASP is the Open Worldwide Application Security Project: LLM04 (2026
 edition; LLM03 in 2025) is the supply-chain category of its Top 10 for
 large language model (LLM) Applications, and ASI04 and ASI07 are
-identifiers in its Agentic Top 10 (2026).
+identifiers in its Agentic Top 10 (2026). An SBOM is a software bill of
+materials; an AI-BOM is its AI counterpart, an inventory of model
+artifacts with their digests, sources, licenses, and base-model lineage.
+LoRA is low-rank adaptation, a common small fine-tuning adapter that is
+loaded on top of a base model. A model registry holds versioned model
+artifacts; promotion moves one version between stages, typically staging
+to production. RAG is retrieval-augmented generation; TP and FP are true
+and false positive.
 
 ## Purpose
 
@@ -46,6 +53,13 @@ is a finding whether or not a scanner flagged it.
 - Use when: acquiring an AI/ML artifact — a third-party base model, a
   downloaded dataset, or a fine-tuning adapter — and its provenance, format
   safety, and pinning need a supply-chain review (OWASP LLM04).
+- Use when: a model artifact — acquired or built in-house: weights, a LoRA
+  adapter, a merged fine-tune — is promoted through a model registry, and
+  the question is whether the artifact that serves production is the one
+  that was reviewed: digest pinning, signature and provenance verification,
+  safe format, model card and license, registry write/promote access, the
+  promotion gate, and an SBOM/AI-BOM inventory (the promoted-artifact trust
+  named in LLM04:2026).
 - Use when: adopting or updating agentic components (OWASP Agentic ASI04) —
   MCP servers and their manifests, tool/skill registry entries, plugin
   packages, or agent-to-agent dependencies — and their source, requested
@@ -54,12 +68,21 @@ is a finding whether or not a scanner flagged it.
   is the split).
 - Do NOT use when: reviewing the integrity of training data YOU collect or
   pipelines YOU run (feedback loops, RAG ingestion) — that is
-  `model-poisoning-reviewer` (acquire-vs-ingest is the split).
+  `model-poisoning-reviewer` (acquire-vs-ingest is the split). For a
+  promoted model, this skill proves the promoted bytes are the reviewed,
+  signed bytes; whether the training or fine-tuning pipeline you run
+  taught those bytes malicious behavior (a backdoor, a trigger phrase) is
+  `model-poisoning-reviewer` (artifact-integrity-vs-learned-behavior is
+  the split).
 - Do NOT use when: triaging SAST/CodeQL findings in FIRST-PARTY code — that is
   `static-analysis-reviewer` (dependency-vs-own-code is the split).
 - Do NOT use when: reviewing application logic in a diff —
   `security-pr-reviewer`.
 - Do NOT use when: modeling feature-level threats — `threat-modeler`.
+- Do NOT use when: deciding go/no-go for a release that ships a model —
+  `release-readiness-reviewer`, which cites this review's digest,
+  signature, and promotion-gate findings as its artifact-provenance
+  evidence.
 
 ## Inputs to Inspect
 
@@ -84,18 +107,25 @@ is a finding whether or not a scanner flagged it.
    pinning (a mutable tag/`latest` is not pinned), serialization format
    (unsafe pickle or unrestricted `torch.load` can execute code on load;
    prefer safetensors or a verified restricted loading mode), and
-   license/provenance. Acquisition only — integrity of data you curate or
-   pipelines you run is `model-poisoning-reviewer`.
+   license/provenance. Promotion of any model artifact is item 9; integrity
+   of data you curate or pipelines you run is `model-poisoning-reviewer`.
 8. Agentic components if any (ASI04): MCP server packages and their
    manifests (which tools/permissions they declare), tool/skill registry
    entries, plugin packages, and A2A dependency declarations — source and
    maintainer, version pinning, and what the manifest asks to access.
+9. Model registry and promotion path if any (LLM04:2026 promoted-artifact
+   trust): the registry and its stages, who can write, overwrite, or
+   promote, promotion records, artifact digests and signatures or
+   attestations, the evaluation or approval evidence each promotion cites,
+   model cards and licenses, the SBOM/AI-BOM if one exists, and the exact
+   reference the serving layer loads (digest, version, or mutable alias).
 
 ## Workflow
 
 1. **Establish what actually ships/builds.** Read the lockfile (not just the
    manifest) for the real dependency set; identify direct vs transitive. No
-   manifest/lockfile or pipeline to review → Stop Conditions.
+   manifest/lockfile, pipeline, or model-registry record to review → Stop
+   Conditions.
 2. **Triage scanner output** (if any) by reachability: for each flagged CVE,
    is the vulnerable code path called by this project? Sort into
    true-positive-reachable, true-positive-latent, false-positive, duplicate.
@@ -130,15 +160,39 @@ is a finding whether or not a scanner flagged it.
    treat manifest changes on update like dependency-code changes. An MCP
    server is code that answers your agent's tool calls — live message
    security is `inter-agent-comms-reviewer` (ASI07).
-7. **Rank findings** with a compromise path and exploitability verdict.
+7. **Review promoted-model-artifact trust (LLM04:2026)** when a registry or
+   promotion path exists, using the promoted-artifacts section of
+   [references/supply-chain-checklist.md](references/supply-chain-checklist.md).
+   Trace one artifact from build or download to what production loads:
+   (a) identity — production loads an immutable content digest, not a
+   mutable alias or `latest`, and that digest equals the one the
+   promotion approved; (b) provenance — a signature or attestation ties
+   the digest to the build job, source revision, base model, and data
+   snapshot, verified at promotion AND at load; (c) format — the promoted
+   file uses a non-executable format such as safetensors, or the loader's
+   restricted mode is verified (step 6); (d) LoRA adapters and merged
+   models — the adapter is pinned to its base-model digest, and a merged
+   model is a new artifact with its own digest and signature; (e) registry
+   access — who can write, overwrite, or promote is least-privilege and
+   separate from who trains, versions are immutable once registered, and
+   promotions are logged; (f) promotion gate — staging to production
+   requires evaluation and human-approval evidence bound to the digest,
+   not to a version name; (g) inventory — model card, license, and an
+   SBOM/AI-BOM entry exist for what ships. Judge that the gate exists and
+   is bound to the artifact; whether its evaluation would catch a poisoned
+   behavior is `model-poisoning-reviewer`'s.
+8. **Rank findings** with a compromise path and exploitability verdict.
    High severity REQUIRES a path from the weakness to material impact such
    as code execution, secret theft, data exposure or corruption,
    unauthorized action, or availability loss. A reachable exploit or a
    plausible install-time execution can qualify; a latent unreachable CVE
    does not.
-8. **Remediate concretely:** pin (to SHA/version+hash), upgrade (state the
+9. **Remediate concretely:** pin (to SHA/version+hash), upgrade (state the
    safe version), remove, or isolate (least-privilege token, split trusted/
-   untrusted jobs). Note accepted risk only with written rationale.
+   untrusted jobs). For model artifacts: serve by approved digest, verify
+   the signature at load, re-export to a safe format from a trusted build
+   (converting an untrusted pickle means loading it), and restrict promote
+   rights. Note accepted risk only with written rationale.
 
 ## Output Format
 
@@ -154,6 +208,7 @@ Findings (severity-ranked):
 Install/build execution: <scripts that run + risk>
 CI/CD posture: <triggers, token scope, action pinning, secret exposure>
 Provenance: <lockfile pinned? integrity hashes? signing/attestation? SLSA frame>
+Model promotion: <served digest = approved digest? signature verified at promote/load? format; registry write/promote access; gate bound to digest? model card/license; AI-BOM>
 Accepted risk: <finding — written rationale>
 Not reviewed: <areas + why>
 ```
@@ -173,6 +228,13 @@ Not reviewed: <areas + why>
 - [ ] AI/ML artifacts (if any) reviewed for revision pinning, safe
       serialization (safetensors vs pickle/`torch.load`), source, and license;
       curated-data/pipeline integrity routed to `model-poisoning-reviewer`.
+- [ ] Promoted model artifacts (if a registry exists) traced from build or
+      download to the served reference: digest identity, signature or
+      attestation verified at promotion and load, safe format, adapter-to-
+      base pinning, registry write/promote access, a promotion gate bound
+      to the digest, and model card/license/AI-BOM; learned-behavior
+      poisoning from a pipeline you run routed to
+      `model-poisoning-reviewer`.
 - [ ] Agentic components (if any — MCP servers/manifests, tool/skill
       registries, plugins, A2A deps) reviewed for source trust, immutable
       pinning, and manifest permission width (ASI04); runtime message
@@ -192,6 +254,10 @@ Not reviewed: <areas + why>
 - `pull_request_target`/privileged workflows that check out and run untrusted
   PR code while secrets are available are treated as critical unless proven
   isolated.
+- A model reaches production only by immutable digest, with verified
+  signature or provenance and approval evidence bound to that digest; a
+  production alias that anyone with registry write access can move is a
+  finding, not a promotion process.
 - Findings are not suppressed without written rationale via
   `human-approval-boundary`; upgrades that only relocate risk are labeled, not
   claimed as fixes.
@@ -229,14 +295,39 @@ Not reviewed: <areas + why>
   server that can silently update is an unpinned dependency with agency
   (ASI04). The spoofed-result handling at runtime is
   `inter-agent-comms-reviewer`'s.
+- An evaluation that passed "model v7" proves nothing about production if
+  "v7" is a name that can be re-pointed: bind the eval result and the
+  approval to the content digest, then check the serving layer loads that
+  digest. The swap usually happens between gate and load, not in the model.
+- A signature proves who produced the bytes, not that the bytes are safe:
+  a signed pickle checkpoint still executes code on load, and a signed
+  model can still carry a learned backdoor (for a model trained by a
+  pipeline you run, that half is `model-poisoning-reviewer`'s; for a
+  downloaded one, provenance is this skill's). Safetensors removes load-time code
+  execution; it does not remove a backdoor.
+- A LoRA adapter is only as trusted as the base it is applied to: an
+  adapter pinned by digest on top of a base referenced by a mutable tag is
+  unpinned. A merged model is a new artifact — the inputs' signatures do
+  not carry over to it.
+- A model card and license are claims by the publisher, not provenance;
+  verify them against the signed source and record them in the AI-BOM.
 
 ## Stop Conditions
 
-- No manifest, lockfile, or pipeline is available to review → stop; this
+- No manifest, lockfile, pipeline, or model-registry record is available to
+  review → stop; this
   skill does not assess supply chain from a description.
 - A finding indicates an ACTIVE compromise (malicious package already
   installed, secret already exfiltrated via CI) → report immediately with the
   path; containment/rotation is the human's call (`human-approval-boundary`).
+  This includes a production model whose loaded digest differs from the
+  approved digest with no promotion record: report it as a possible
+  artifact swap; rollback is the human's call.
+- A promotion review is asked for but the registry records, digests, or
+  serving configuration are not available → stop and name what is
+  missing; this skill does not certify a promotion path from a diagram.
+- The question is whether the model LEARNED malicious behavior from data
+  or feedback you run → hand to `model-poisoning-reviewer`.
 - Remediation requires applying a dependency upgrade or editing CI on a live
   repo with breaking potential → propose the change; applying it is a
   separate, classified, approved step (not done from this review skill).
@@ -248,9 +339,12 @@ Not reviewed: <areas + why>
 - [references/supply-chain-checklist.md](references/supply-chain-checklist.md)
   — the CI/CD compromise-path catalog, reachability-triage rubric, pinning
   and provenance checks, dependency-confusion/typosquat detection notes,
-  the AI/ML supply-chain section (LLM04), and the agentic supply-chain
-  section (ASI04: MCP servers/manifests, registries, plugins, A2A deps).
+  the AI/ML supply-chain section (LLM04), the promoted-model-artifacts
+  section (LLM04:2026: registry, signing, promotion gate, AI-BOM), and the
+  agentic supply-chain section (ASI04: MCP servers/manifests, registries,
+  plugins, A2A deps).
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against `static-analysis-reviewer`,
   `security-pr-reviewer`, and `secure-migration-reviewer` (security-review
-  cluster).
+  cluster), the promoted-artifact seam with `model-poisoning-reviewer`, and
+  the model-release go/no-go seam with `release-readiness-reviewer`.

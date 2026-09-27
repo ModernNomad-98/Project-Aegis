@@ -1,7 +1,7 @@
 {
   "skill": "supply-chain-security-reviewer",
-  "description": "Trigger discrimination for the Phase 4 security-review cluster. Pins supply-chain (dependency/build/CI) review apart from first-party SAST triage, diff review, and migration review. Includes discrimination against the shipped code-reviewer.",
-  "overlaps_with": ["static-analysis-reviewer", "security-pr-reviewer", "secure-migration-reviewer", "code-reviewer"],
+  "description": "Trigger discrimination for the Phase 4 security-review cluster. Pins supply-chain (dependency/build/CI) review apart from first-party SAST triage, diff review, and migration review. Includes discrimination against the shipped code-reviewer and the promoted-model-artifact seam with model-poisoning-reviewer.",
+  "overlaps_with": ["static-analysis-reviewer", "security-pr-reviewer", "secure-migration-reviewer", "code-reviewer", "model-poisoning-reviewer", "release-readiness-reviewer"],
   "cases": [
     {
       "id": "supply-chain-wins-here",
@@ -30,6 +30,27 @@
       "expected_skill": "secure-migration-reviewer",
       "should_not_trigger": ["supply-chain-security-reviewer"],
       "reason": "Migration safety, not dependency/build supply chain."
+    },
+    {
+      "id": "promoted-model-artifact-wins-here",
+      "prompt": "Before we promote our fine-tuned model from staging to production in the registry, check that the served weights match the evaluated digest, are signed, use safetensors, and that only the release role can promote.",
+      "expected_skill": "supply-chain-security-reviewer",
+      "should_not_trigger": ["model-poisoning-reviewer"],
+      "reason": "Promoted-artifact trust (OWASP LLM04:2026): digest identity, signature, format, registry access, and promotion gate. The artifact's integrity is this skill; whether training taught it malicious behavior is model-poisoning-reviewer."
+    },
+    {
+      "id": "learned-backdoor-goes-to-model-poisoning",
+      "prompt": "Could poisoned samples in our fine-tuning dataset have planted a trigger-phrase backdoor in the model we are about to promote?",
+      "expected_skill": "model-poisoning-reviewer",
+      "should_not_trigger": ["supply-chain-security-reviewer"],
+      "reason": "Whether a pipeline you run taught the model malicious behavior is data and model poisoning (LLM05), not the promoted artifact's provenance or integrity."
+    },
+    {
+      "id": "model-release-go-no-go-goes-to-release-readiness",
+      "prompt": "Is v7 of our fine-tuned model safe to ship to production tomorrow? Give us a go/no-go.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": ["supply-chain-security-reviewer"],
+      "reason": "A release go/no-go on evidence is release-readiness-reviewer; this skill supplies the promoted-artifact evidence it cites."
     }
   ]
 }
