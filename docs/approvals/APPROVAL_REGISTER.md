@@ -1555,9 +1555,9 @@ generic skill guidance that would require asking for the same approval again.
 - **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
   not change branch protection or the protected path set, and it did not
   widen AEGIS-APR-047.
-- **Evidence:** Owner decision in the Project Aegis conversation on
-  2026-09-27, relayed by the coordinating agent; no verbatim wording is
-  recorded here. The
+- **Evidence:** Direct owner answer "Grant for 4c1324a only (Recommended)"
+  to the coordinating agent's multiple-choice question in the Project Aegis
+  conversation on 2026-09-27, relayed by that agent. The
   [review comment](https://github.com/ModernNomad-98/Project-Aegis/pull/425#issuecomment-5859686774)
   and the
   [exception receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/425#issuecomment-5860244524)
@@ -1603,9 +1603,9 @@ generic skill guidance that would require asking for the same approval again.
 - **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
   not change branch protection or the protected path set, and it did not
   widen AEGIS-APR-047.
-- **Evidence:** Owner decision in the Project Aegis conversation on
-  2026-09-27, relayed by the coordinating agent; no verbatim wording is
-  recorded here. The
+- **Evidence:** Direct owner answer "Grant for 13a0682 only (Recommended)"
+  to the coordinating agent's multiple-choice question in the Project Aegis
+  conversation on 2026-09-27, relayed by that agent. The
   [review comment](https://github.com/ModernNomad-98/Project-Aegis/pull/429#issuecomment-5860298094)
   and the
   [exception receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/429#issuecomment-5860441506)
@@ -1638,8 +1638,9 @@ generic skill guidance that would require asking for the same approval again.
   (`0cb0777`) extended skills, and PR #429 (`169e8be`) moved the engine to
   v1.13.2, which removes the ROUTE-002 false positive.
 - **Owner decision:** Asked whether to regenerate the baselines again once
-  those PRs merged, the owner answered "Yes, once after all merge" in chat
-  with the Claude Code coordinator on 2026-09-27. All three had merged when
+  those PRs merged, the owner answered "Yes, once after all merge
+  (Recommended)" to the coordinating agent's multiple-choice question in chat
+  on 2026-09-27. All three had merged when
   this entry was written.
 - **Scope allowed:** One pull request that regenerates, with
   `scripts/audit-skill-contracts.py` at engine v1.13.2 run unchanged on a
