@@ -3005,6 +3005,61 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   OD-1 remains OPEN and WP-2B-4 remains BLOCKED. Offline regression CI does not
   complete WP-2B-7's future behavioral advisory integration.
 
+- **D64 (2026-09-26) — Built `feature-flag-architect` (185→186), the
+  feature-flag SYSTEM a product runs on, designed once per product.**
+  - **Why.** The owner requested a feature-flag architecture skill on
+    2026-09-26. Roadmap item cat 01 #27 ("Feature Flag Architecture", P1)
+    and the system half of cat 02 #65 had no owner:
+    `feature-flag-rollout-strategist` plans how ONE change is de-risked on
+    whatever flag system exists, and nothing designed that system — the
+    flag store, how code reaches it, where flags evaluate, what happens when
+    the flag service is unreachable, how a kill switch propagates, who may
+    flip it, and how flag changes are audited.
+  - **What.** Inventory first (entitlement or permission "flags" routed
+    out); the flag store build-vs-buy taught as an owner choice — terms,
+    each viable option's fit, capabilities, pros, cons and money / setup /
+    upkeep cost (unknown where unverified), one recommendation with the fact
+    that would change it, exactly one atomic question, and the answer
+    authorizes no sign-up, payment or SDK change; one internal flag
+    interface with server/client key separation; evaluation placement per
+    flag class; a targeting model with server-side sources of truth,
+    precedence, shared stable-ID bucketing and tenant-qualified cache keys;
+    the fail-safe MECHANISM (code defaults, last-known-good cache,
+    non-blocking timeout, cold start that serves the code default and emits
+    a metric); a kill-switch reach bound and flip authority; the flag-change
+    audit event; flag-debt hooks (registry with owner, type, expiry and safe
+    value; stale-flag report).
+  - **The hard seam — system vs one rollout.** The strategist keeps each
+    change's ramp, guardrails, removal and each flag's safe VALUE; this
+    skill designs the mechanism that falls back to that value. The
+    strategist's body now routes flag-system requests here and consumes
+    tenant-qualified caching, change authority and the reach bound from this
+    skill (its description names the new neighbour). Further seams pinned in
+    trigger-evals: `plan-entitlement-architect`,
+    `authorization-matrix-designer`, `ab-test-designer`,
+    `ci-pipeline-architect` (manual-only), `saas-platform-architect`,
+    `tenant-isolation-reviewer`, `caching-strategy-designer`,
+    `authority-invalidation-architect` and `frontend-perf-engineer`. Owner
+    decisions of 2026-09-26: the flag-value caching seam with
+    `caching-strategy-designer` stays as designed, and the four one-way
+    ROUTE-002 hub findings (toward `plan-entitlement-architect`,
+    `authorization-matrix-designer`, `ab-test-designer` and
+    `ci-pipeline-architect`) stay census data rather than being
+    reciprocated. The accepted description's yield to
+    `tenant-isolation-reviewer` adds a fifth one-way ROUTE-002 info finding
+    (contract audit 347 → 352 on the rebased main); the owner confirmed it is
+    likewise left as census data.
+  - **Posture.** Design only — installs, signs up for, pays for and flips
+    nothing → model-invocable. Live changes route through
+    `human-approval-boundary`.
+  - **Registration.** Joins the Phase 3 SaaS & tenant isolation pack
+    (family 4, 9→10; FAMILY-COUNT stays 23). Catalog Phase 3 row and history
+    paragraph, README Phase 3 row, family line and D-table row; README
+    `SKILL-COUNT` 185→186.
+  - Validator: **186 skills**; description under the 1024-character cap. To
+    be checked by `skill-quality-reviewer` and `library-diff-reviewer` for
+    the system-vs-rollout seam.
+
 ## 6. Post-merge corrections
 
 - **2026-09-12 — Current backlog labels reconciled.** At the owner's request,

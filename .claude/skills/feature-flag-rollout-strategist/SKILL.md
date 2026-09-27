@@ -1,6 +1,6 @@
 ---
 name: feature-flag-rollout-strategist
-description: 'Design the ROLLOUT STRATEGY for a change behind a flag — classify the flag by purpose (release, ops/kill-switch, experiment, permission — release flags stay separate from permanent entitlements), plan progressive delivery (internal → canary/% → cohorts → GA), define sticky targeting, set guardrail metrics with auto-rollback criteria and a pre-ramp kill-switch test gate, choose the fail-safe default when the flag service is down, and manage the lifecycle so release flags are removed after GA (flag debt). Owns HOW a change is de-risked — NOT the entitlement/permission model: WHO a plan or role includes is plan-entitlement-architect / authorization-matrix-designer, and an experiment''s DESIGN/readout is ab-test-designer. Use when planning a staged rollout, a canary or percentage ramp, a kill switch, or flag cleanup. Do NOT use to model plan/feature entitlements (plan-entitlement-architect), role permissions (authorization-matrix-designer), or design/analyze an A/B test (ab-test-designer).'
+description: 'Design the ROLLOUT STRATEGY for a change behind a flag — classify the flag by purpose (release, ops/kill-switch, experiment, permission — release flags stay separate from permanent entitlements), plan progressive delivery (internal → canary/% → cohorts → GA), define sticky targeting, set guardrail metrics with auto-rollback criteria and a pre-ramp kill-switch test gate, choose the fail-safe default when the flag service is down, and manage the lifecycle so release flags are removed after GA (flag debt). Owns HOW one change is de-risked, on whatever flag system exists. Use when planning a staged rollout, a canary or percentage ramp, a kill switch, or flag cleanup. Do NOT use to design the flag system itself — store, SDK, evaluation, change audit (feature-flag-architect) — model plan/feature entitlements (plan-entitlement-architect), role permissions (authorization-matrix-designer), or design/analyze an A/B test (ab-test-designer).'
 ---
 
 # Feature Flag Rollout Strategist
@@ -43,6 +43,9 @@ de-risked into production — not who is entitled to it.
   experiment's hypothesis, sample size, or reading the result — that is
   `ab-test-designer`; this skill can carry the flag it runs on, but not
   the experiment design.
+- Do NOT use when: designing the flag system itself — store, SDK/interface,
+  evaluation placement, fallback mechanism, propagation, change audit →
+  `feature-flag-architect`.
 
 ## Inputs to Inspect
 
@@ -107,7 +110,10 @@ de-risked into production — not who is entitled to it.
    open into unfinished code is an outage waiting for a network blip.
 6. **Map interactions and consistency.** Combinatorial states when
    multiple flags overlap, consistency of a user's experience across
-   pages/devices, and caching of flag values. Flag the risky combinations.
+   pages/devices, and how this change relies on the flag system's
+   tenant-qualified caching of flag values (consumed from
+   `feature-flag-architect`, not redesigned here). Flag the risky
+   combinations.
 7. **Plan the lifecycle (flag debt).** Every release flag gets an owner
    and a removal trigger (post-GA + soak). The cleanup — delete the flag
    AND the dead code path — is part of THIS plan, not a someday ticket.
@@ -131,14 +137,15 @@ Stages:       internal → canary/% → cohorts → GA
   per stage:  population, bake time, ADVANCE criteria (guardrails green), ROLLBACK criteria
 Targeting:    sticky by <stable id>; first segments; exclusions
 Guardrails:   <small metric set> each with rollback threshold; automatic where possible
-Kill switch:  <mechanism>; test procedure and required evidence before ramp; who can trigger; how fast
+Kill switch:  <mechanism>; test procedure and required evidence before ramp; change authority
+              and reach bound consumed from feature-flag-architect's flag system design
 Fail-safe:    flag-service-down default = <safe state> (release → old behavior)
 Interactions: <risky flag combinations; cross-surface consistency; caching>
 Lifecycle:    owner + removal trigger; cleanup = delete flag + dead code path
 Date vs ramp: (only if a fixed date conflicts) terms; options with pros/cons and
               cost or unknown; recommendation + what would change it; one owner question
 Boundaries:   entitlement → plan-entitlement-architect / authorization-matrix-designer;
-              experiment → ab-test-designer; live execution → approval path
+              experiment → ab-test-designer; live execution → approval path; flag system → feature-flag-architect
 ```
 
 ## Validation Checklist
@@ -204,6 +211,11 @@ Boundaries:   entitlement → plan-entitlement-architect / authorization-matrix-
 - Asked to actually flip flags / execute the rollout on live production →
   decline execution; this skill designs the strategy, and live changes
   follow the repo's human-approval path.
+- The request is the flag system rather than one change's rollout —
+  choosing the flag store, the SDK or internal interface, where flags
+  evaluate, the fallback mechanism, kill-switch propagation or the
+  flag-change audit → route to `feature-flag-architect`; this skill still
+  picks each flag's safe value for its rollout.
 
 ## Supporting Files
 
@@ -214,5 +226,7 @@ Boundaries:   entitlement → plan-entitlement-architect / authorization-matrix-
   guardrails, the sticky-bucketing fix, and the flag-vs-entitlement
   refusal.
 - `evals/trigger-evals.json` — discrimination against `plan-entitlement-architect`
-  and `authorization-matrix-designer` (the entitlement/permission seams)
-  and `ab-test-designer` (the experiment seam).
+  and `authorization-matrix-designer` (the entitlement/permission seams),
+  `ab-test-designer` (the experiment seam), and `feature-flag-architect`
+  (the flag system vs one rollout, including the fail-safe value vs
+  mechanism seam) — four neighbours.

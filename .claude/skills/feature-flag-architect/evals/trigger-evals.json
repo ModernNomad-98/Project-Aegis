@@ -1,0 +1,170 @@
+{
+  "skill": "feature-flag-architect",
+  "description": "Trigger discrimination for designing the flag SYSTEM once per product (this skill: store choice, interface, evaluation placement, targeting model, fail-safe mechanism, kill-switch propagation, change audit, debt hooks) vs one change's rollout on that system (feature-flag-rollout-strategist), permanent plan entitlements (plan-entitlement-architect), role permissions (authorization-matrix-designer), experiment design (ab-test-designer), deploy strategy and pipeline gates (ci-pipeline-architect, manual-only), control-plane structure (saas-platform-architect), cross-tenant leakage review (tenant-isolation-reviewer), general cache design (caching-strategy-designer), revoked access still honored (authority-invalidation-architect), and general page performance (frontend-perf-engineer). The hardest seam: the strategist picks each flag's safe VALUE; this skill designs the MECHANISM that falls back to it.",
+  "overlaps_with": [
+    "feature-flag-rollout-strategist",
+    "plan-entitlement-architect",
+    "authorization-matrix-designer",
+    "ab-test-designer",
+    "ci-pipeline-architect",
+    "saas-platform-architect",
+    "tenant-isolation-reviewer",
+    "caching-strategy-designer",
+    "authority-invalidation-architect",
+    "frontend-perf-engineer"
+  ],
+  "cases": [
+    {
+      "id": "flag-system-design-wins-here",
+      "prompt": "Decide whether we build our own flag table or buy a flag service, where flags get evaluated, and what happens when the flag service is unreachable.",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": ["feature-flag-rollout-strategist"],
+      "note": "SEAM CASE (primary, forward) — store choice, evaluation placement and outage behavior are properties of the flag system, decided once per product.",
+      "reason": "feature-flag-architect owns the system design; the strategist plans rollouts that run on whatever system exists."
+    },
+    {
+      "id": "single-change-ramp-goes-to-strategist",
+      "prompt": "Plan the ramp for the new billing page from 1% to GA with auto-rollback and a date to delete the flag.",
+      "expected_skill": "feature-flag-rollout-strategist",
+      "should_not_trigger": ["feature-flag-architect"],
+      "note": "SEAM CASE (primary, reverse) — stages, auto-rollback and removal date for one change are a rollout plan.",
+      "reason": "feature-flag-rollout-strategist owns how one change is de-risked; nothing here asks about the flag system."
+    },
+    {
+      "id": "fail-safe-mechanism-stays-here",
+      "prompt": "Our flag SDK blocks page render for three seconds whenever the flag service is down. Fix the design.",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": ["feature-flag-rollout-strategist", "frontend-perf-engineer"],
+      "note": "HARD EDGE (mechanism) — the missing timeout, last-known-good cache and bootstrap are the fallback MECHANISM, which this skill designs for every flag.",
+      "reason": "The strategist picks each flag's safe value; this skill designs the mechanism that falls back to it. A render-blocking SDK is a mechanism defect, not a general page-performance problem: the slowdown exists only because the flag call waits on the network."
+    },
+    {
+      "id": "bundle-size-lcp-goes-to-frontend-perf",
+      "prompt": "Largest contentful paint is 4 s because of a 900 KB JavaScript bundle; fix it",
+      "expected_skill": "frontend-perf-engineer",
+      "should_not_trigger": ["feature-flag-architect"],
+      "note": "SEAM CASE (reverse) — a page-performance problem caused by bundle size, with no flag involved.",
+      "reason": "frontend-perf-engineer owns render performance, bundle size and Core Web Vitals; this skill only fixes render blocking caused by flag evaluation."
+    },
+    {
+      "id": "fail-safe-value-goes-to-strategist",
+      "prompt": "If the flag service is unreachable, should the new checkout flag fall back to the old checkout or the new one?",
+      "expected_skill": "feature-flag-rollout-strategist",
+      "should_not_trigger": ["feature-flag-architect"],
+      "note": "HARD EDGE (value, reverse) — choosing the safe value for one flag is part of that change's rollout plan.",
+      "reason": "The strategist picks each flag's safe value (usually the old behavior for a release flag); this skill only guarantees the system reaches it."
+    },
+    {
+      "id": "per-tenant-early-access-model-stays-here",
+      "prompt": "Design our flag system's per-tenant override model so specific enterprise tenants can get early access until GA",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": ["plan-entitlement-architect", "feature-flag-rollout-strategist"],
+      "note": "SEAM CASE (forward) — the per-tenant override data model (its precedence, server-side source of truth and tenant-qualified caching) is part of the flag system's targeting model, not a plan entitlement and not one ramp.",
+      "reason": "Early access that ends at GA is temporary exposure, which the flag targeting model carries; nothing is permanently included in a plan. Choosing WHICH tenants get early access and in what order for one ramp is feature-flag-rollout-strategist's job; the override data model every such ramp uses is this skill's."
+    },
+    {
+      "id": "permanent-plan-feature-goes-to-plan-entitlement",
+      "prompt": "SSO should be permanently included in the Pro plan; right now a flag turns it on per account.",
+      "expected_skill": "plan-entitlement-architect",
+      "should_not_trigger": ["feature-flag-architect"],
+      "note": "SEAM CASE (reverse, hard) — a permanent plan inclusion currently faked with a flag belongs in the entitlement model.",
+      "reason": "plan-entitlement-architect owns what a plan includes; a flag standing in for an entitlement drifts from billing and must be moved out, not redesigned as a flag."
+    },
+    {
+      "id": "flip-authority-in-flag-system-stays-here",
+      "prompt": "Design the flag system so only on-call engineers can toggle production kill switches and every toggle is recorded.",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": ["authorization-matrix-designer"],
+      "note": "SEAM CASE (forward) — kill-switch authority per environment and the flag-change audit event are part of the flag system; the role definitions themselves are composed from authorization-matrix-designer.",
+      "reason": "The request is to design the flag system's control and audit path; this skill consumes the role definitions rather than authoring the whole permission matrix."
+    },
+    {
+      "id": "role-matrix-goes-to-authorization",
+      "prompt": "Define which roles can view, edit and export tenant data, deny-by-default.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": ["feature-flag-architect"],
+      "note": "SEAM CASE (reverse) — a roles × permissions matrix with no flag in sight.",
+      "reason": "authorization-matrix-designer owns role and permission design."
+    },
+    {
+      "id": "unified-bucketing-stays-here",
+      "prompt": "Our experiments and our feature flags use two SDKs that bucket users differently; unify evaluation so assignment is consistent.",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": ["ab-test-designer"],
+      "note": "SEAM CASE (forward) — one shared bucketing function across flags and experiments is evaluation mechanics of the flag system.",
+      "reason": "This skill guarantees consistent assignment; ab-test-designer owns an experiment's hypothesis, sizing and readout, none of which is asked."
+    },
+    {
+      "id": "experiment-sizing-goes-to-ab-test",
+      "prompt": "How many users do we need for the onboarding test to detect a 2% lift, and how long should it run?",
+      "expected_skill": "ab-test-designer",
+      "should_not_trigger": ["feature-flag-architect"],
+      "note": "SEAM CASE (reverse) — sample size and duration are experiment design.",
+      "reason": "ab-test-designer owns power and duration; the flag system is irrelevant to the question."
+    },
+    {
+      "id": "build-time-vs-runtime-flags-stays-here",
+      "prompt": "For our static marketing site plus app, should flags be baked in at build time or fetched at runtime?",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": ["ci-pipeline-architect"],
+      "note": "SEAM CASE (forward) — evaluation placement (build time vs runtime) is a flag-system decision, even though build time touches the pipeline.",
+      "reason": "Where flags evaluate is this skill's step; the pipeline stage graph is not being designed."
+    },
+    {
+      "id": "canary-deploy-stage-goes-to-ci-pipeline",
+      "prompt": "Add a canary deploy stage with automatic abort and a named-human promotion gate to our pipeline.",
+      "expected_skill": "ci-pipeline-architect",
+      "should_not_trigger": ["feature-flag-architect"],
+      "note": "SEAM CASE (reverse) — deploy strategy and promotion gates are pipeline design; ci-pipeline-architect is manual-only, so the user invokes it by name.",
+      "reason": "ci-pipeline-architect owns deploy strategies and pipeline gates; a canary DEPLOY is not a flag."
+    },
+    {
+      "id": "control-plane-split-goes-to-saas-platform",
+      "prompt": "What belongs in the control plane versus the data plane for our multi-tenant app?",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": ["feature-flag-architect"],
+      "note": "SEAM CASE (reverse) — platform structure, where feature flags are at most one listed capability.",
+      "reason": "saas-platform-architect owns the control-plane/data-plane split and the capability inventory; this skill designs the flag system once it is placed."
+    },
+    {
+      "id": "flag-leak-review-goes-to-tenant-isolation",
+      "prompt": "Review our existing flag overrides and SDK payloads for cross-tenant leakage.",
+      "expected_skill": "tenant-isolation-reviewer",
+      "should_not_trigger": ["feature-flag-architect"],
+      "note": "SEAM CASE (reverse) — a leakage REVIEW of a real system, with flags as one surface.",
+      "reason": "tenant-isolation-reviewer reviews real systems for cross-tenant leakage across every surface; this skill designs, it does not audit."
+    },
+    {
+      "id": "flag-override-cache-key-stays-here",
+      "prompt": "Some customers see beta features that were only switched on for a different customer until a few minutes pass. Our per-tenant flag overrides are cached in memory under the flag name. Redesign how our flag system targets and caches those overrides.",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": ["caching-strategy-designer"],
+      "note": "SEAM CASE (proposal case 15; forward) — the cache in question holds evaluated flag values, and the fix is the targeting model's tenant-qualified key and precedence, which this skill owns.",
+      "reason": "Flag-value caching and keying are part of the flag system's targeting design; caching-strategy-designer owns general cache layers, not the flag evaluation model."
+    },
+    {
+      "id": "general-cache-design-goes-to-caching-strategy",
+      "prompt": "Add a cache in front of our product-catalog endpoint: choose the layer, the TTLs, the key scheme and how invalidation works.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": ["feature-flag-architect"],
+      "note": "SEAM CASE (reverse) — a general cache for an application endpoint with no flag involved.",
+      "reason": "caching-strategy-designer owns cache layer, TTL, key and invalidation design; this skill only caches evaluated flag values."
+    },
+    {
+      "id": "kill-switch-propagation-stays-here",
+      "prompt": "We flipped the kill switch off but some instances kept serving the feature for ten minutes; design how flag changes reach every instance.",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": ["authority-invalidation-architect"],
+      "note": "SEAM CASE (forward) — a slow kill switch is flag-change propagation: streaming or polling and a stated reach bound, which this skill designs.",
+      "reason": "The stale value is a flag value, not a revoked grant of access; how flag changes reach every instance is the flag system's kill-switch propagation step."
+    },
+    {
+      "id": "stale-plan-after-downgrade-goes-to-authority-invalidation",
+      "prompt": "A customer downgraded from Enterprise yesterday but can still use audit export; find where the old plan is still held.",
+      "expected_skill": "authority-invalidation-architect",
+      "should_not_trigger": ["feature-flag-architect"],
+      "note": "SEAM CASE (reverse) — a plan downgrade that did not take effect is an access change still honored from a stale copy of authority.",
+      "reason": "authority-invalidation-architect owns making revoked roles, memberships and plan changes take effect everywhere authority is held; no flag is involved."
+    }
+  ]
+}

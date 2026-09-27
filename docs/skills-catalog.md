@@ -56,7 +56,7 @@ and the **category backlogs** under [`docs/skills/`](skills/). `scripts/validate
 checks that every *implemented* skill is listed here and in `README.md`.
 
 <details>
-<summary>Delivery status and construction history through D47 (expand)</summary>
+<summary>Delivery status and construction history through D64 (expand)</summary>
 
 > **Status:** Phase 0 (foundation), Phase 1 (the 8-skill operating-discipline pack,
 > decision D4), Phase 1.5 (the 4-skill AI-SDLC governance completion, roadmap
@@ -125,13 +125,20 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > symptom-triggered owner of the "change didn't take effect" access-bug class
 > (a removed user still sees data, a revoked role still works, logout doesn't
 > end the session), composing the per-surface mechanism owners rather than
-> restating them (182→183). Most recently the **D47** build shipped
+> restating them (182→183). The **D47** build then shipped
 > `superadmin-observability-console-designer` — the cross-tenant superadmin
 > MONITORING/observability console DESIGN owner, closing the three-way
 > pointer hole (`admin-console-architect` punts telemetry →
 > `observability-operator` operates backends → nobody designed the console):
 > the layered panel IA with restraint plus the cross-tenant READ-security
 > model, composing the ~12 feed owners rather than restating them (183→184).
+> Most recently the owner-requested **D64** build added `feature-flag-architect`
+> to the Phase 3 pack — the feature-flag SYSTEM designed once per product
+> (store choice taught as an owner decision, one internal interface,
+> evaluation placement, tenant-safe targeting, the fail-safe mechanism,
+> kill-switch propagation, change audit, flag-debt hooks), pinned against
+> `feature-flag-rollout-strategist`, which keeps each change's rollout and
+> each flag's safe value (185→186).
 > `_template` remains a reference template ignored by the validator.
 > The phase register below retains completed phases as labeled history. Only
 > entries explicitly described as remaining or conditional are unbuilt work.
@@ -311,7 +318,8 @@ design (`domain-modeler`, `architecture-designer`, `adr-writer`), implementation
 ### Skills (Phase 3 — SaaS & tenant isolation pack)
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
-`evals/trigger-evals.json` (all nine sit in one of three overlap clusters). None has
+`evals/trigger-evals.json` (the original nine sit in one of three overlap clusters;
+`feature-flag-architect`, added by D64, carries its own seams). None has
 side effects, so all are model-invocable. Per master-prompt §5: tenant isolation is
 treated as cross-cutting (identity, data, API, storage, logs, analytics, support,
 exports, imports, jobs, search, AI retrieval, billing, flags, audit), every skill
@@ -326,6 +334,7 @@ negative tests.
 | `multi-tenant-data-architect` | cat 02 #74/#77/#78 + cat 04 | yes | Per-store scoping decisions (incl. caches/search/vector stores), server-derived tenant-context propagation contract, ownership map, expand→contract migration with verification + rollback. |
 | `authorization-matrix-designer` | cat 02 #59 | yes | Deny-by-default roles × permissions × resources matrix, object-level rules (anti-IDOR), enforcement-point map, brokered support access, negative-test plan, additive role migration. |
 | `plan-entitlement-architect` | cat 02 #60/#64 | yes | Plan × entitlement matrix with one resolution point, uniform enforcement everywhere, metering hooks, plan-transition table (no silent data loss on downgrade), grandfathering + rollback. |
+| `feature-flag-architect` | cat 01 #27 + cat 02 #65 (the system half) | yes | The flag SYSTEM, designed once per product: flag store build-vs-buy taught as an owner choice (terms, costs, one question; the answer authorizes nothing), one internal flag interface, evaluation placement per flag class, targeting context with server-side sources of truth and tenant-qualified caching, the fail-safe MECHANISM (code defaults, last-known-good cache, non-blocking timeout, cold start), kill-switch propagation bound and flip authority, the flag-change audit event, flag-debt hooks. Designs; writes nothing. Pinned ≠ `feature-flag-rollout-strategist` (one change's rollout and each flag's safe VALUE), ≠ `plan-entitlement-architect`, `authorization-matrix-designer`, `ab-test-designer`, `ci-pipeline-architect`, `saas-platform-architect`, `tenant-isolation-reviewer`, `caching-strategy-designer`, `authority-invalidation-architect`, `frontend-perf-engineer`. |
 | `audit-log-architect` | cat 02 #70 | yes | Audit event taxonomy + versioned record schema, append-only integrity, explicit write-failure policy per category, retention/redaction, tenant-scoped access, negative tests. |
 | `saas-cost-architect` | cat 02 #89 | yes | Bill-grounded cost drivers, attribution-or-admission per driver, distribution-based unit economics vs revenue, exposure math, guardrails with observe-first rollout + rollback. |
 | `api-event-architect` | cat 04 (API/event contracts) | yes | Credential-derived tenant context, idempotency, per-tenant/plan rate limits, versioning + deprecation with dual-run, tenant-scoped signed webhooks, contract migration + rollback. |
