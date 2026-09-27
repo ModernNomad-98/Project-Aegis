@@ -38,6 +38,9 @@ the flow from model output to impact.
   (`prompt-injection-defender`), factual accuracy
   (`ai-misinformation-guard`), or how broad the tools are
   (`agent-tool-safety-guard`).
+- Do NOT use when: the concern is sensitive data (secrets, PII, other-tenant
+  data) leaking into or out of the model — that is
+  `sensitive-disclosure-guard`; this skill reviews output execution sinks.
 
 ## Inputs to Inspect
 

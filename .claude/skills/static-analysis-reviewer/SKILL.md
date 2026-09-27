@@ -39,6 +39,10 @@ the true-positive and false-positive dispositions defined in Workflow step 3.
   `secure-migration-reviewer`.
 - Do NOT use when: the ask is design-time threat enumeration —
   `threat-modeler`.
+- Do NOT use when: designing or running the scans themselves — that is
+  `sast-orchestration-designer` (how SAST runs) or
+  `security-scan-orchestrator` (whole-repo scan and aggregation); this
+  skill triages the findings they produce.
 
 ## Inputs to Inspect
 

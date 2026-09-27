@@ -42,6 +42,9 @@ work; it presents and integrates them into a reviewable design.
 - Do NOT use when: the task is DECIDING the system structure itself
   (component/dependency map, tradeoffs) — that is `architecture-designer`;
   the tech spec presents and consumes that, it doesn't re-derive it.
+- Do NOT use when: running the design review itself (reviewers, discussion,
+  explicit outcome) — that is `design-review-facilitator`; this skill writes
+  the design doc that review examines.
 
 ## Inputs to Inspect
 

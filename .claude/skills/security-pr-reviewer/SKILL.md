@@ -32,6 +32,10 @@ checked whether or not the PR description mentions them.
   question — `secure-migration-reviewer`.
 - Do NOT use when: the input is SAST/CodeQL/SARIF output to triage —
   `static-analysis-reviewer`.
+- Do NOT use when: the review covers only error/exception paths (fail-closed
+  defaults, error-path authorization, leak-free errors) — that is
+  `error-handling-security-reviewer`; this skill is the broad diff security
+  review.
 - Never security-review from a description of a change: no diff, no review.
 
 ## Inputs to Inspect

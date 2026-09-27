@@ -42,6 +42,9 @@ access — a grep-able stdout stream is not an audit trail.
   app logs) — different retention, different audience, different guarantees.
 - Do NOT use when: deciding who is ALLOWED to act — that is
   `authorization-matrix-designer`; this skill records what they did.
+- Do NOT use when: designing security detection and alerting (what must
+  fire, thresholds, owners) — that is `security-logging-alerting-architect`;
+  this skill designs the audit record, which never detects or alerts.
 
 ## Inputs to Inspect
 

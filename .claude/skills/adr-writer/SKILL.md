@@ -32,6 +32,9 @@ date silently becomes permanent.
 - Do NOT use when: sources disagree about what was decided — run
   `source-of-truth-reconciler` first; an ADR must not launder a contested
   claim into official history.
+- Do NOT use when: the artifact is a full design doc covering a whole
+  change — that is `tech-spec-writer` (which may embed several ADRs); this
+  skill records one decision.
 - Do NOT use for trivial choices with no architectural consequence — an ADR
   per linting rule buries the decisions that matter.
 
