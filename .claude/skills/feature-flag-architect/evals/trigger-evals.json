@@ -139,7 +139,7 @@
       "prompt": "Some customers see beta features that were only switched on for a different customer until a few minutes pass. Our per-tenant flag overrides are cached in memory under the flag name. Redesign how our flag system targets and caches those overrides.",
       "expected_skill": "feature-flag-architect",
       "should_not_trigger": ["caching-strategy-designer"],
-      "note": "SEAM CASE (added in the build beyond the proposal's 14; forward) — the cache in question holds evaluated flag values, and the fix is the targeting model's tenant-qualified key and precedence, which this skill owns.",
+      "note": "SEAM CASE (proposal case 15; forward) — the cache in question holds evaluated flag values, and the fix is the targeting model's tenant-qualified key and precedence, which this skill owns.",
       "reason": "Flag-value caching and keying are part of the flag system's targeting design; caching-strategy-designer owns general cache layers, not the flag evaluation model."
     },
     {

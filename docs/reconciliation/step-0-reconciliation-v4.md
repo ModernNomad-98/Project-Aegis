@@ -3042,7 +3042,13 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     `authority-invalidation-architect` and `frontend-perf-engineer`. Owner
     decisions of 2026-09-26: the flag-value caching seam with
     `caching-strategy-designer` stays as designed, and the four one-way
-    ROUTE-002 hub findings stay census data rather than being reciprocated.
+    ROUTE-002 hub findings (toward `plan-entitlement-architect`,
+    `authorization-matrix-designer`, `ab-test-designer` and
+    `ci-pipeline-architect`) stay census data rather than being
+    reciprocated. The accepted description's yield to
+    `tenant-isolation-reviewer` adds a fifth one-way ROUTE-002 info finding
+    (contract audit 347 → 352 on the rebased main); the owner confirmed it is
+    likewise left as census data.
   - **Posture.** Design only — installs, signs up for, pays for and flips
     nothing → model-invocable. Live changes route through
     `human-approval-boundary`.

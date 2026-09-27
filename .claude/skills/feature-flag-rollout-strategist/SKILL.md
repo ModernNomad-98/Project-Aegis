@@ -145,7 +145,7 @@ Lifecycle:    owner + removal trigger; cleanup = delete flag + dead code path
 Date vs ramp: (only if a fixed date conflicts) terms; options with pros/cons and
               cost or unknown; recommendation + what would change it; one owner question
 Boundaries:   entitlement → plan-entitlement-architect / authorization-matrix-designer;
-              experiment → ab-test-designer; live execution → approval path
+              experiment → ab-test-designer; live execution → approval path; flag system → feature-flag-architect
 ```
 
 ## Validation Checklist
