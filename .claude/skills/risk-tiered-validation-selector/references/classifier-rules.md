@@ -30,7 +30,7 @@ itself); edits to the rules are themselves forced-full changes.
 scripts/**                  # repo automation
 package-lock.json  pnpm-lock.yaml  *.lockb   # dependency reality
 CLAUDE.md  AGENTS.md  .cursor/**             # agent instruction files
-.claude/skills/**  .codex/**                 # skill and agent configuration
+.claude/skills/**  .codex/**  .agents/**     # skill and agent configuration; Codex skills live in .agents/skills (checked 2026-09-26 against https://learn.chatgpt.com/docs/build-skills)
 validation-rules.*          # this artifact itself
 
 # overrides — never-docs-only (disqualify docs-only; classify per rules)
