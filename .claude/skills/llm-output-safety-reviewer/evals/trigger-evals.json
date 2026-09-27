@@ -1,7 +1,7 @@
 {
   "skill": "llm-output-safety-reviewer",
   "description": "Trigger discrimination for the Phase 7 output & agency cluster: output-sink injection/exec review vs schema-shape validation vs the injection source vs tool scope, and against the shipped security-pr-reviewer.",
-  "overlaps_with": ["structured-output-validator", "prompt-injection-defender", "agent-tool-safety-guard", "ai-misinformation-guard", "security-pr-reviewer"],
+  "overlaps_with": ["structured-output-validator", "prompt-injection-defender", "agent-tool-safety-guard", "ai-misinformation-guard", "security-pr-reviewer", "sensitive-disclosure-guard"],
   "cases": [
     {
       "id": "output-sink-review-wins-here",
@@ -37,6 +37,13 @@
       "expected_skill": "security-pr-reviewer",
       "should_not_trigger": ["llm-output-safety-reviewer"],
       "reason": "A broad multi-surface diff review is security-pr-reviewer; this skill is the focused output-handling lens invoked for the AI-output sink specifically."
+    },
+    {
+      "id": "sensitive-leak-goes-to-disclosure-guard",
+      "prompt": "Our support chatbot sometimes echoes a customer's card number and another user's email back in its answers. Stop sensitive data from reaching the model and leaking out in its responses.",
+      "expected_skill": "sensitive-disclosure-guard",
+      "should_not_trigger": ["llm-output-safety-reviewer"],
+      "reason": "Sensitive data disclosed through model output (echoed PII, secrets, other-tenant data) is sensitive-disclosure-guard (LLM02), which minimizes and redacts what enters context; this skill reviews unsafe HANDLING of output at render/execution sinks, not whether the output leaks sensitive data."
     }
   ]
 }

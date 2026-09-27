@@ -1,6 +1,6 @@
 ---
 name: adr-writer
-description: Write an Architecture Decision Record for a significant technical choice — context, the decision itself, alternatives genuinely considered, consequences (good and bad), operational impact, a rollback/reversal plan, and a review date. Use when a decision has just been made and needs durable recording, when asked to "write an ADR" or "document why we chose X", or when architecture-designer hands over an ADR draft for completion. Also use to record a rejected option or a superseded decision. Do NOT use to MAKE the decision — open design questions go to architecture-designer; contested facts go to source-of-truth-reconciler first.
+description: Write an Architecture Decision Record for a significant technical choice — context, the decision itself, alternatives genuinely considered, consequences (good and bad), operational impact, a rollback/reversal plan, and a review date. Use when a decision has just been made and needs durable recording, when asked to "write an ADR" or "document why we chose X", or when architecture-designer hands over an ADR draft for completion. Also use to record a rejected option or a superseded decision. Do NOT use for a full design doc (tech-spec-writer) or curating the ADR log — numbering, status, supersede links (adr-sequencer), or to MAKE the decision — open design questions go to architecture-designer; contested facts go to source-of-truth-reconciler first.
 ---
 
 # ADR Writer

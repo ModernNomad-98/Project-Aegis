@@ -1,6 +1,6 @@
 ---
 name: api-event-architect
-description: Design external application programming interface (API) and event contracts for multi-tenant software as a service (SaaS). Tenant context comes from credentials by default; an explicitly authorized partner or aggregator may select only tenants allowed by its credential. Define routes, versioning, idempotency, rate limits, and signed tenant-scoped webhook delivery. Produce contract conventions, event schemas, delivery policy, and migration plan. Use for public API or webhook design and partner contract changes. Do NOT use for internal audit trails (audit-log-architect), internal service structure (architecture-designer), or permission design (authorization-matrix-designer).
+description: Design external application programming interface (API) and event contracts for multi-tenant software as a service (SaaS). Tenant context comes from credentials by default; an explicitly authorized partner or aggregator may select only tenants allowed by its credential. Define routes, versioning, idempotency, rate limits, and signed tenant-scoped webhook delivery. Produce contract conventions, event schemas, delivery policy, and migration plan. Use for public API or webhook design and partner contract changes. Do NOT use for internal audit trails (audit-log-architect), internal service structure (architecture-designer), permission design (authorization-matrix-designer), the error-code taxonomy (error-taxonomy-designer), or user-facing sunset comms (sunset-deprecation-communicator).
 ---
 
 # API & Event Architect

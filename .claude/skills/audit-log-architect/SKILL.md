@@ -1,6 +1,6 @@
 ---
 name: audit-log-architect
-description: Design a durable, tenant-scoped audit log system with an event taxonomy, record schema, append-only integrity, write-failure policy, retention, redaction, scoped reads, and negative tests. Include rollout and safe rollback for a live system. Use for audit logging and compliance trails such as System and Organization Controls 2 (SOC 2), International Organization for Standardization/International Electrotechnical Commission (ISO/IEC) 27001, or customer contracts. Do NOT use for external event contracts (api-event-architect), observability, or permission design (authorization-matrix-designer).
+description: Design a durable, tenant-scoped audit log system with an event taxonomy, record schema, append-only integrity, write-failure policy, retention, redaction, scoped reads, and negative tests. Include rollout and safe rollback for a live system. Use for audit logging and compliance trails such as System and Organization Controls 2 (SOC 2), International Organization for Standardization/International Electrotechnical Commission (ISO/IEC) 27001, or customer contracts. Do NOT use for external event contracts (api-event-architect), observability, security detection and alerting (security-logging-alerting-architect), or permission design (authorization-matrix-designer).
 ---
 
 # Audit Log Architect
