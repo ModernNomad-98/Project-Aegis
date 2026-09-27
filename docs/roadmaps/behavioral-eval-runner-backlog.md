@@ -1,7 +1,7 @@
 # Behavioral Eval Runner — Durable Backlog and Phase Register
 
-> **Current reading, checked 2026-09-26 after pull request #315 and the
-> BER-DEC-014 grant:** This is the
+> **Current reading, checked 2026-09-26 after pull request #374 delivered
+> the BER-DEC-014 correction:** This is the
 > permanent continuation and decision register for Behavioral Eval Runner
 > maintainers and coding agents. The dated delivery checkpoints below remain
 > historical evidence. Use the current map and owning work-package record
@@ -35,7 +35,7 @@ supersessions in [section 20a of the merged design](../design/behavioral-eval-ru
 | --- | --- | --- |
 | WP-2B-0, 2B-1, 2B-1A, 2B-2 | **DONE** within offline or limited scopes. Outcome B accepted unresolved host limits; the grading stack is non-live. | No measured calibration or live host follows. Read the [phase records](#7-phase-work-package-register--wp-2b-0--wp-2b-7). |
 | WP-2B-1B / BKL-009 | The bounded synthetic offline proof **DELIVERED** in [PR #139](https://github.com/ModernNomad-98/Project-Aegis/pull/139) under consumed APR-012 and BER-DEC-011. [APR-009](../approvals/APPROVAL_REGISTER.md#aegis-apr-009-behavioral-eval-runner-evidence-policy-selection) selected the 30-day policy. The further bounded synthetic integration **DELIVERED** in [PR #257](https://github.com/ModernNomad-98/Project-Aegis/pull/257) under BER-DEC-013 and consumed APR-023. BKL-009 remains **PARTIAL**. | Real-host access, encryption, privacy, production runtime binding and cleanup need separate scope. See [BKL-009](#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy). |
-| WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; BER-DEC-012 granted the bounded synthetic offline holdout support delivered in [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249). [PR #313](https://github.com/ModernNomad-98/Project-Aegis/pull/313) delivered offline report/preflight binding and complete holdout confusion matrices and denominators; [PR #315](https://github.com/ModernNomad-98/Project-Aegis/pull/315) delivered executed-aggregate integrity checks. BER-DEC-014 authorizes the bounded selected-precheck aggregate correction proposed in PR #331, effective at its governance merge and not yet implemented. Measured calibration and OD-1 ratification remain unfinished. | Approved labels and private inputs, selected execution source, allowance, live calibration and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate), the [offline scope](ber-wp2b3-holdout-execution-scope.md), and the [implementation review](../evidence/ber-wp2b3-holdout-offline-review.md). |
+| WP-2B-3 / OD-1 | **AUTHORIZED** under BER-DEC-008; BER-DEC-012 granted the bounded synthetic offline holdout support delivered in [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249). [PR #313](https://github.com/ModernNomad-98/Project-Aegis/pull/313) delivered offline report/preflight binding and complete holdout confusion matrices and denominators; [PR #315](https://github.com/ModernNomad-98/Project-Aegis/pull/315) delivered executed-aggregate integrity checks. [PR #374](https://github.com/ModernNomad-98/Project-Aegis/pull/374) **DELIVERED** the bounded selected-precheck aggregate correction that BER-DEC-014 authorized, consuming its one-package APR-046 grant (APR-053). Measured calibration and OD-1 ratification remain unfinished. | Approved labels and private inputs, selected execution source, allowance, live calibration and host proof remain gates. See [WP-2B-3](#wp-2b-3--measured-judge-calibration-and-od-1-ratification-gate), the [offline scope](ber-wp2b3-holdout-execution-scope.md), and the [implementation review](../evidence/ber-wp2b3-holdout-offline-review.md). |
 | R1–R5 | Outcome B accepted their WP-2B-0 dispositions; R2 and R4/R5 technical proofs remain unresolved. | Read the [evidence-gate records](#6-phase-2b-0-evidence-gates--r1r5); selected-host proof is needed before a baseline claim. |
 | WP-2B-4 through 2B-7 | WP-2B-4 is **BLOCKED**; 2B-5, 2B-6 and 2B-7 remain **BACKLOG**. | Each needs its own prerequisites and reviewed authority. |
 
@@ -71,6 +71,33 @@ the protected `gate-guard` failed solely because `reporting.py` and
 consumed by the merge under
 [APR-044/045](../approvals/APPROVAL_REGISTER.md#aegis-apr-044-pr-315-protected-gate-guard-exception).
 The [main run 36221057049](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36221057049)
+passed Linux and Windows checks; the PR-only guard was skipped.
+
+[PR #374](https://github.com/ModernNomad-98/Project-Aegis/pull/374) merged
+tested head `6f5d2744a6a0d1f6313af28c682be0ef954055e3` as
+`7390ae0ac388a7c64ab87a5026fbfa2727113857` at 2026-09-26 23:24:51 UTC,
+delivering the BER-DEC-014 correction. A report now rejects a selected case
+that preflight excluded (`PRECHECK_EXCLUDED`) unless it has planned attempts,
+all of them stay `UNRUN`, and its aggregate is `INCONCLUSIVE` /
+`PRECHECK_EXCLUDED` with the preflight reason code. Such a case's aggregate can
+no longer claim `NOT_SELECTED`, and the case can no longer drop out of
+`excluded_totals_by_reason`. Its planned `UNRUN` attempts are still not
+required to carry the preflight reason, so they can still count under
+`NOT_SELECTED` in `unrun_totals_by_reason`; tightening that would change the
+approved report contract and needs a new owner decision. It changed only
+`reporting.py` and `tests/test_reporting.py` (227 added lines) on a branch cut
+from governance merge `2aed8dd377e821148b74e077f7c58f4edba6c01e`. Independent
+security and quality reviews passed, and the automated Codex pull-request
+review required by
+[APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review)
+completed with no findings. Exact-head Linux (full offline BER suite: 1,088
+tests) and Windows checks passed in
+[run 36278386968](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36278386968);
+`gate-guard` failed solely on those two paths and was dispositioned under the
+standing [APR-047](../approvals/APPROVAL_REGISTER.md#aegis-apr-047-standing-gate-guard-exception-for-four-ber-files)
+exception, its first use. The merge consumed the one-package grant under
+[APR-053](../approvals/APPROVAL_REGISTER.md#aegis-apr-053-consumption-of-the-selected-precheck-correction-grant).
+The [main run 36279366010](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36279366010)
 passed Linux and Windows checks; the PR-only guard was skipped. These repairs
 do not close live calibration, selected-host proof, approved private inputs or
 BKL-009's remaining real-host, privacy, runtime and cleanup work.
@@ -1056,14 +1083,27 @@ operator controls are evidenced. The 2026-09-23 checkpoint above is historical.
   checks are pending review at this branch checkpoint.
 
   BER-DEC-014 and [APR-046](../approvals/APPROVAL_REGISTER.md#aegis-apr-046-ber-selected-precheck-aggregate-correction),
-  owner-approved on 2026-09-26 and effective when their governance PR merges,
-  authorize one further bounded synthetic increment under this AUTHORIZED
-  record: the selected-precheck aggregate correction proposed in
+  owner-approved on 2026-09-26 and effective at their governance merge `2aed8dd`
+  (PR #365), authorize one further bounded synthetic increment under this
+  AUTHORIZED record: the selected-precheck aggregate correction proposed in
   [PR #331 proposal](ber-precheck-aggregate-validation-proposal.md), on
   `fix/ber-precheck-aggregate-validation` from that governance merge commit,
   limited to `reporting.py` and `tests/test_reporting.py` under
   `tools/behavioral_eval_runner/`, 8 active hours, 300 added lines and USD $0.
-  Status: **AUTHORIZED, not started** at this governance checkpoint. It does
+  Status: **DELIVERED.** [PR #374](https://github.com/ModernNomad-98/Project-Aegis/pull/374)
+  merged exact head `6f5d2744a6a0d1f6313af28c682be0ef954055e3` as
+  `7390ae0ac388a7c64ab87a5026fbfa2727113857` at 2026-09-26 23:24:51 UTC,
+  from a branch cut at governance merge
+  `2aed8dd377e821148b74e077f7c58f4edba6c01e` (tree
+  `e0c8f2986fd60a559475bbbe89a93f5c0aa16dac`). It changed exactly the two
+  paths above with 227 added lines; its PR body, with the receipt correction
+  comment posted after the merge, is the sanitized evidence record. Independent
+  security and quality reviews passed; exact-head Linux `validate-skills` (1,088
+  BER tests) and `windows-offline-checks` passed; `gate-guard` failed on the two
+  paths only and was dispositioned under APR-047; the automated Codex review
+  found no issues. The one-package APR-046 grant is
+  consumed ([APR-053](../approvals/APPROVAL_REGISTER.md#aegis-apr-053-consumption-of-the-selected-precheck-correction-grant)).
+  WP-2B-3 stays AUTHORIZED, not DONE. It does
   not change private-label, selected-host, provider-budget, OD-1 or later
   live-suite gates.
 

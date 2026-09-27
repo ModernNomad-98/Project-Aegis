@@ -1289,3 +1289,131 @@ generic skill guidance that would require asking for the same approval again.
   merge-commit timestamp 2026-09-23 11:54:58 -05:00).
   [The package-2 review](../evidence/setup/issue-101-package-2-review.md)
   records that package 2 shipped in PR #124.
+
+### AEGIS-APR-053: Consumption of the selected-precheck correction grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-046.
+- **Status at recording:** AEGIS-APR-046 has no remaining use.
+- **Effective at:** 2026-09-26 23:24:51 UTC.
+- **Recorded at / By:** 2026-09-26 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039.
+- **New authority:** None. This merge was the first use of AEGIS-APR-047; that
+  standing exception stays ACTIVE.
+- **Reason:** The one bounded implementation package merged, which was
+  AEGIS-APR-046's stated use limit.
+- **Evidence:**
+  [PR #374](https://github.com/ModernNomad-98/Project-Aegis/pull/374) merged
+  exact head `6f5d2744a6a0d1f6313af28c682be0ef954055e3` by deliberate
+  administrator merge as `7390ae0ac388a7c64ab87a5026fbfa2727113857` at the
+  time above. Its branch `fix/ber-precheck-aggregate-validation` was cut from
+  the governance merge commit `2aed8dd377e821148b74e077f7c58f4edba6c01e` (tree
+  `e0c8f2986fd60a559475bbbe89a93f5c0aa16dac`) and changed exactly
+  `tools/behavioral_eval_runner/reporting.py` and
+  `tools/behavioral_eval_runner/tests/test_reporting.py`, with 227 added and 5
+  deleted lines. The PR body's receipt records independent security and
+  quality reviews that passed, the quality review re-verifying the committed
+  head, and a Codex review that completed with no findings (AEGIS-APR-050).
+  The receipt's original `gate-guard` log citation (job 108487562791, run
+  36279161962) was wrong; a correction comment on the PR at 23:43:47 UTC,
+  after the merge, replaced it with exact-head job 108505418068 in the run
+  below.
+  [Exact-head Actions](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36278386968)
+  passed Linux `validate-skills` (full offline BER suite: 1,088 tests, 5
+  skipped) and `windows-offline-checks`; `gate-guard` failed, and its log
+  lists only the two paths above, dispositioned under AEGIS-APR-047. The
+  [post-merge main run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36279366010)
+  passed Linux and Windows checks; the PR-only guard was skipped.
+
+### AEGIS-APR-054: PR #373 protected-path validator and audit fix
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-056; no remaining use.
+- **Date / Grantor:** 2026-09-26 / Peter Nguyen.
+- **Reason:** Two protected `scripts/` files blocked reviewed work. A
+  validator test pinned project-orchestrator at exactly 49 eval cases and
+  requirements-gathering-facilitator at exactly 12, which blocked every
+  reviewed eval addition. The skill-contract audit stripped the leading space
+  of the first `git status --porcelain` line, so the first dirty path was
+  silently dropped from its report.
+- **Owner decision:** At about 14:27 Pacific Daylight Time (PDT; 21:27 UTC)
+  the owner answered "Approve both, one PR (Recommended)", approving one
+  bounded PR that changes `scripts/tests/test_validator.py` (the pinned 49/12
+  counts become floors) and `scripts/audit-skill-contracts.py` (keep the
+  leading space of the first porcelain line), plus the two eval cases deferred
+  for the pins. At about 15:03 PDT (22:03 UTC) the owner answered "Yes, add
+  the test to this PR", widening the same PR to a fifth file holding a
+  hermetic regression test. After Codex's P2 finding at 23:06 UTC, the two new
+  eval ids were also added to that test file's existing exactly-once id lists.
+  The owner's answers did not name that detail; it stays within the approved
+  file, and the owner's exception in AEGIS-APR-055 approved merging the exact
+  head that contains it.
+- **Scope allowed:** One pull request changing exactly these five paths:
+  `scripts/tests/test_validator.py`, `scripts/audit-skill-contracts.py`,
+  `scripts/tests/test_audit_skill_contracts.py`,
+  `.claude/skills/project-orchestrator/evals/evals.json` and
+  `.claude/skills/requirements-gathering-facilitator/evals/evals.json`,
+  for the changes described above.
+- **Scope FORBIDDEN:** No other path or behavior change is covered. This
+  grant does not itself waive a failed `gate-guard`; the exception for this
+  PR's exact head is recorded separately in AEGIS-APR-055. It changes no
+  guard pattern, required check or branch setting.
+- **Evidence:** Direct owner answers in the Project Aegis conversation on
+  2026-09-26, quoted above, relayed by the coordinating agent.
+  [PR #373](https://github.com/ModernNomad-98/Project-Aegis/pull/373)
+  records the change.
+- **Expiry / use limit:** One PR; consumed by the merge recorded in
+  AEGIS-APR-056.
+
+### AEGIS-APR-055: PR #373 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-056; no remaining use.
+- **Date / Grantor:** 2026-09-26 / Peter Nguyen.
+- **Reason:** Permit the AEGIS-APR-054 fix to merge when its three protected
+  `scripts/` paths triggered the guard. They are outside AEGIS-APR-047's four
+  BER files, so a one-time owner decision was required.
+- **Scope allowed:** The owner answered "Approve exception for 86e45ad" to the
+  request for a one-time `gate-guard` exception and administrator merge of
+  [PR #373](https://github.com/ModernNomad-98/Project-Aegis/pull/373) at exact
+  head `86e45adbef5c407f5926bc329ba848ef806669a2`. The coordinator gave the
+  time as about 16:33 PDT, but the PR receipt quoting the answer was posted at
+  23:32:12 UTC (16:32:12 PDT), so the answer came no later than that, three
+  seconds before the merge. The request reported that
+  [exact-head run 36279392000](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36279392000)
+  passed `validate-skills` and `windows-offline-checks`, and that `gate-guard`
+  failed with a log matching only `scripts/audit-skill-contracts.py`,
+  `scripts/tests/test_audit_skill_contracts.py` and
+  `scripts/tests/test_validator.py`. An independent code and security review
+  passed; per the PR receipt it reviewed an earlier diff, and the fifth-file
+  test and pinned ids were added afterwards at the reviewer's and Codex's
+  requests. Codex raised one P2 finding (its second-highest priority level),
+  which was fixed at this head, and its re-review of `86e45ad` found no major
+  issues. The grant covered one administrator merge of that head through that
+  guard result.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. This
+  did not change branch protection or the protected path set, and it did not
+  widen AEGIS-APR-047.
+- **Evidence:** Direct owner answer in the Project Aegis conversation on
+  2026-09-26, quoted above, relayed by the coordinating agent; the
+  exception receipt comment on PR #373 records the head, checks, review and
+  merge.
+- **Expiry / use limit:** One merge of PR #373 at the named head; consumed by
+  the merge recorded in AEGIS-APR-056.
+
+### AEGIS-APR-056: Consumption of PR #373 grants
+
+- **Event:** CONSUMED; target grants AEGIS-APR-054 and AEGIS-APR-055.
+- **Status at recording:** AEGIS-APR-054 and AEGIS-APR-055 have no remaining
+  use.
+- **Effective at:** 2026-09-26 23:32:15 UTC.
+- **Recorded at / By:** 2026-09-26 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039.
+- **New authority:** None.
+- **Reason:** The sole exact-head administrator merge of the one approved PR
+  completed.
+- **Evidence:** [PR #373](https://github.com/ModernNomad-98/Project-Aegis/pull/373)
+  merged `86e45adbef5c407f5926bc329ba848ef806669a2` as
+  `4ca04c1effce1de10ec221f4756698bb33d1ae77` at the time above, changing
+  exactly the five AEGIS-APR-054 paths. The
+  [post-merge main run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36279755880)
+  passed Linux and Windows checks; the PR-only guard was skipped.
