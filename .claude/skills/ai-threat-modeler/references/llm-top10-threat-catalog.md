@@ -6,7 +6,8 @@ Source framework: OWASP Top 10 for LLM Applications (2026, v1.0, published
 2026-08-03), LLM01–LLM10. Anchoring decision: reconciliation doc D6 (made
 against the 2025 edition); re-anchored to 2026 by owner decision 2026-09-26 (D65).
 The 2026 edition renumbers most categories and renames one; the 2025 ID is
-shown in brackets so older threat models stay traceable.
+shown in the rubric's "Was (2025)" column so older threat models stay
+traceable.
 
 **Reading key:** OWASP is the Open Worldwide Application Security Project;
 LLM means large language model, and LLM01–LLM10 are the framework's numbered
@@ -15,8 +16,9 @@ augmented generation; PII means personally identifiable information; and RLHF
 means reinforcement learning from human feedback. HTML is HyperText Markup
 Language, XSS is cross-site scripting, SQL is Structured Query Language, API
 is application programming interface, ACL is access control list, and URL is
-uniform resource locator. D6 is the Phase 7 framework choice recorded in the
-[source reconciliation](../../../../docs/reconciliation/step-0-reconciliation-v4.md).
+uniform resource locator. D6 is the Phase 7 (AI-security skill pack)
+framework choice and D65 its 2026 re-anchoring decision, both recorded in
+the [source reconciliation](../../../../docs/reconciliation/step-0-reconciliation-v4.md).
 
 ## Applicability rubric
 
@@ -27,7 +29,7 @@ A category is **in scope** when the system has the ingredient it abuses:
 | LLM01 Prompt Injection | LLM01 | any untrusted content reaching model context, including images and audio |
 | LLM02 Sensitive Information Disclosure | LLM02 | sensitive data in context, training, or logs |
 | LLM03 Excessive Agency | LLM06 | tools, plugins, or autonomous actions |
-| LLM04 Supply Chain | LLM03 | third-party models, datasets, adapters, AI deps, promoted model artifacts |
+| LLM04 Supply Chain | LLM03 | third-party models, datasets, adapters, AI dependencies, promoted model artifacts |
 | LLM05 Data and Model Poisoning | LLM04 | training/fine-tuning/embedding pipeline you run or consume |
 | LLM06 Unbounded Consumption | LLM10 | anyone can trigger inference you pay for |
 | LLM07 Misinformation | LLM09 | users or systems acting on generated claims |

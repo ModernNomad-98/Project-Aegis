@@ -33,13 +33,17 @@ high-impact outputs to human oversight.
 - Use when: designing grounding, citations, uncertainty signaling, or
   fact-validation for an AI feature.
 - Use when: an AI feature recommends code dependencies, APIs, or commands
-  (package/slop-squatting hallucination risk).
+  (package hallucination risk: an attacker can register a package name the
+  model invents, called slopsquatting).
 - Do NOT use when: the concern is unsafe HANDLING of output (XSS/exec) —
   `llm-output-safety-reviewer`; or output SHAPE — `structured-output-validator`
   (this skill is about whether the content is TRUE, not well-formed or safe to
   render).
 - Do NOT use when: the concern is injection (`prompt-injection-defender`) or
   training-data integrity (`model-poisoning-reviewer`).
+- Do NOT use when: the concern is automation bias in an agent's approval
+  flow (humans rubber-stamping agent actions) — `human-agent-trust-reviewer`;
+  this skill covers overreliance on AI-generated content.
 
 ## Inputs to Inspect
 
@@ -150,9 +154,10 @@ Residual risk: <what remains + named acceptor>
 - Package hallucination is exploitable at scale: models repeatedly invent the
   same plausible package names; attackers pre-register them. Verify against the
   registry.
-- Not a shape or safety problem: valid JSON (structured-output-validator) that
-  renders safely (llm-output-safety-reviewer) can still be entirely false —
-  truth is a separate axis.
+- Not a shape or safety problem: valid JavaScript Object Notation (JSON)
+  (structured-output-validator) that renders safely
+  (llm-output-safety-reviewer) can still be entirely false — truth is a
+  separate axis.
 - Don't over-apply to creative tasks: a brainstorming or fiction feature
   doesn't need citations; scope grounding to consequential factual claims.
 
@@ -163,8 +168,8 @@ Residual risk: <what remains + named acceptor>
 - A high-impact feature (medical/legal/financial/safety advice) ships ungrounded
   confident answers — flag as blocking and route oversight tiering to
   `ai-governance-risk-reviewer` / `human-approval-boundary`.
-- The concern is output handling, output shape, injection, or training-data
-  integrity — hand to the owning skill.
+- The concern is output handling, output shape, injection, training-data
+  integrity, or approval-flow automation bias — hand to the owning skill.
 - A hallucination is already causing harm in production (a fabricated fact
   acted on, a hallucinated package installed) — route to the human incident
   owner and approved response runbook. The `incident-response-runbook` skill

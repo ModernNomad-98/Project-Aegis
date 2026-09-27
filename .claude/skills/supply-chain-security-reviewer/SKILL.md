@@ -6,10 +6,18 @@ description: 'Review software supply-chain risk with SLSA-style provenance think
 # Supply-Chain Security Reviewer
 
 **Reading key:** SLSA is Supply-chain Levels for Software Artifacts, a
-provenance framework; CVE is Common Vulnerabilities and Exposures; CI/CD is
-continuous integration and delivery; MCP is Model Context Protocol; A2A is
-agent-to-agent communication. LLM04 (2026 edition; LLM03 in 2025) and ASI04 are OWASP AI risk
-identifiers.
+provenance framework. CVE is Common Vulnerabilities and Exposures, the
+public vulnerability ID system; CVSS is the Common Vulnerability Scoring
+System behind scanner severities; OSV is Open Source Vulnerabilities, a
+vulnerability database. CI/CD is continuous integration and continuous
+delivery; a PR is a pull request; SHA (Secure Hash Algorithm) names a
+commit's immutable hash; SAST is static application security testing
+(CodeQL is one such tool). AI/ML is artificial intelligence and machine
+learning; MCP is Model Context Protocol; A2A is the Agent2Agent protocol.
+OWASP is the Open Worldwide Application Security Project: LLM04 (2026
+edition; LLM03 in 2025) is the supply-chain category of its Top 10 for
+large language model (LLM) Applications, and ASI04 and ASI07 are
+identifiers in its Agentic Top 10 (2026).
 
 ## Purpose
 
@@ -173,8 +181,10 @@ Not reviewed: <areas + why>
 
 ## Security Rules
 
-- Scanner output is input, not truth (master-prompt §6): a CVE is triaged by
-  reachability and exploitability before it gets a severity.
+- Scanner output is input, not truth
+  ([historical master prompt, section 6](../../../docs/prompts/claude-skills-master-generation-prompts-v4.md)):
+  a CVE is triaged by reachability and exploitability before it gets a
+  severity.
 - High-severity claims require a compromise path to material impact;
   "a CVE exists" without a reachable/exploitable path is not high.
 - Unpinned third-party CI actions (mutable tags) are a finding — pin to a
@@ -205,10 +215,10 @@ Not reviewed: <areas + why>
 - Unsafe model deserialization can execute code: `pickle.load` and
   `torch.load(..., weights_only=False)` can run arbitrary code from an
   untrusted checkpoint. Recent PyTorch releases default to a restricted
-  `weights_only=True` loader (verification item: confirm against the
-  installed version); verify the installed version, mode, and any
-  allowlisted globals. Prefer safetensors where suitable and never treat an
-  untrusted artifact as safe solely from its `.bin`/`.pt`/`.ckpt` suffix.
+  `weights_only=True` loader (a verification item): confirm the installed
+  version, mode, and any allowlisted globals. Prefer safetensors where
+  suitable and never treat an untrusted artifact as safe solely from its
+  `.bin`/`.pt`/`.ckpt` suffix.
   See [PyTorch's loading guidance](https://docs.pytorch.org/docs/stable/generated/torch.load.html).
 - A model/dataset pinned to a mutable hub tag or `latest` is not pinned — the
   remote can change under you; pin to an immutable revision/commit/digest.

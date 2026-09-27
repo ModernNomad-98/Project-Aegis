@@ -112,11 +112,11 @@ System map: <model calls, context sources, retrieval, tools, output sinks>
 Assets: <AI assets incl. prompts, stores, credentials, budget>
 Trust boundaries: <each untrusted source → component entry point>
 Threats (per boundary, OWASP LLM Top 10 anchored):
-  [LLM0X] <threat in this system's concrete shape>
+  [LLMxx] <threat in this system's concrete shape>
     Abuse case: <actor → path → payoff>
     Exploit path: <capability → impact> | Severity: <H/M/L + why>
     Mitigation: <control> → Owner: <skill> → Proof: <red-team/eval case>
-Not applicable: <LLM0X — reason>
+Not applicable: <LLMxx — reason>
 Classic-surface handoff: <items owned by threat-modeler / other skills>
 Accepted/deferred risks: <risk — named acceptor — review date>
 ```
