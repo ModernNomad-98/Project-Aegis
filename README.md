@@ -75,7 +75,7 @@ practical terms, Aegis can make your coding agent act as:
 | **a cloud, DevOps (development and operations) and reliability architect** | Decides where and how it runs in production — and keeps it up. | `cloud-architecture-decider`, `slo-reliability-architect` |
 | **an AI security and agentic-red-team architect** | Attacks your own AI features before an outsider does — prompt injection, data leaks, runaway agents. | `ai-threat-modeler`, `prompt-injection-defender` |
 | **an AI agent operating-environment architect** | Designs how your AI agent runs safely — what it's allowed to do, what it can see, and when it stops — so it can't overreach, leak data, or run away. | `agent-harness-architect`, `model-context-designer`, `agentic-loop-designer` |
-| **an ISO 27001, ISO 42001 and SOC 2 readiness advisor** | Gets you audit-ready for what enterprise customers ask for: International Organization for Standardization (ISO) certification for security (27001) and AI governance (42001), and a System and Organization Controls 2 (SOC 2) attestation report. | `iso-27001-isms-architect`, `soc2-trust-criteria-mapper` |
+| **a security and AI-governance audit-readiness advisor** | Gets you audit-ready for what enterprise customers ask for: International Organization for Standardization (ISO) certification for security (27001) and AI governance (42001), and a System and Organization Controls 2 (SOC 2) attestation report. | `iso-27001-isms-architect`, `soc2-trust-criteria-mapper` |
 | **a product discovery and specification facilitator** | Interviews you to turn a vague idea into clear written requirements and a spec. | `requirements-gathering-facilitator`, `product-spec-writer` |
 | **a product analytics and experimentation architect** | Decides what to measure and runs honest A/B tests, so decisions rest on evidence, not guesses. | `product-analytics-instrumenter`, `ab-test-designer` |
 | **a technical writer and documentation engineer** | Writes the docs — READMEs, guides, application programming interface (API) references — and keeps them from drifting out of date. | `readme-craftsman`, `docs-as-code-architect` |
@@ -616,7 +616,7 @@ keeps a human as the approval gate on anything irreversible. See
     `merge-is-deploy-governance`.
 13. **Data + performance engineering & load validation** *(D23, 15)* — the data plane and its
     speed: schema evolution, streaming, data quality, warehouse/lake, PII; profiling, query
-    plans, N+1 queries (one query per item instead of one batched query), caching, latency; plus perf/load test harnesses. *e.g.*
+    plans, N+1 queries (one query per item instead of one batched query), caching, latency; plus performance/load test harnesses. *e.g.*
     `schema-evolution-planner`, `pii-lifecycle-designer`, `query-plan-reader`,
     `n-plus-one-detector`, `load-test-planner`.
 14. **Product, PM & growth** *(D24, 15)* — turning product intent into shippable, measured work:
