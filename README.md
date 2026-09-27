@@ -819,7 +819,7 @@ merged into `rollback-runbook-author` per reconciliation §3):
 
 | Skill | What it does | Invocation |
 |---|---|---|
-| `cloud-architecture-decider` | Cloud-neutral platform decision: nine-axis requirements record, provider-neutral logical architecture, isolation/compliance hard filters before scoring, managed-vs-self-hosted with the operational bill, exit costs and reopen triggers. | auto + manual |
+| `cloud-architecture-decider` | Cloud-neutral platform decision: nine-axis requirements record, provider-neutral logical architecture, isolation/compliance hard filters before scoring, managed platforms compared side by side with hyperscalers, one recommendation and one owner question, managed-vs-self-hosted with the operational bill, exit costs and reopen triggers. | auto + manual |
 | `azure-saas-architect` | Maps a decided logical architecture to provider-idiomatic Azure: Entra ID/managed identities/OIDC, VNets + Private Link, per-store tenant isolation, compute by team maturity, Azure Policy/Defender posture, Bicep/Terraform, tag-keyed cost controls; SKU/limit/price claims become verification items. | auto + manual |
 | `aws-saas-architect` | Maps a decided logical architecture to provider-idiomatic AWS: Organizations/SCPs, IAM roles + OIDC, VPC/PrivateLink, per-store tenant isolation, compute by team maturity, Security Hub/GuardDuty posture, Terraform/CDK, cost-allocation tags; quota/type/price claims become verification items. | auto + manual |
 | `iac-reviewer` | Review-only IaC audit with blast radius first: destructive replaces, public exposure, IAM width deltas, secrets in code and state, tenant-isolation impact, drift, pinning, cost flags; never applies or runs plan against live backends. | auto + manual |

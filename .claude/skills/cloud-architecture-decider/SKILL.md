@@ -1,6 +1,6 @@
 ---
 name: cloud-architecture-decider
-description: Decide cloud platform, deployment pattern, and operational posture cloud-neutrally — gather requirements FIRST (compliance/residency, latency/regions, availability, cost, team maturity, existing estate), shape the provider-neutral logical architecture, THEN compare compatible infrastructure, managed application, data, and function options by operational burden and verified constraints, select providers, and decide per-capability managed-vs-self-hosted posture — with tradeoffs, exit costs, and an ADR handoff. A hyperscaler is a provider catalog, not automatically the highest abstraction. Ties to isolation, cost, and ops maturity, never fashion. Use when asked which cloud, provider, or platform tier to use, whether to migrate, managed-vs-self-hosted, or single-vs-multi-cloud. Do NOT use to MAP a decided provider to services (aws-/azure-saas-architect), system structure (architecture-designer), tenancy (saas-platform-architect), or IaC review (iac-reviewer).
+description: Decide cloud platform, deployment pattern, and operational posture, teaching the choice, never picking silently — ask only for missing deciding facts, one per turn; shape a provider-neutral logical architecture; THEN compare managed platforms (frontend hosts like Vercel, Netlify, Cloudflare Pages; backend-as-a-service like Supabase, Firebase; app platforms like Render, Railway, Fly.io) side by side with hyperscalers (AWS, Azure, GCP), giving case-specific pros/cons, money/setup/upkeep costs or unknowns, and lock-in; recommend one with the reason and what would change it, then ask one owner question. Use when asked which cloud, host, or platform tier, Vercel plus Supabase vs AWS, managed-vs-self-hosted, whether to migrate or graduate, or single-vs-multi-cloud. Do NOT use to map a decided provider (aws-saas-architect, azure-saas-architect), architecture style (architecture-advisor), system structure (architecture-designer), tenancy (saas-platform-architect), or IaC review (iac-reviewer).
 ---
 
 # Cloud Architecture Decider
@@ -16,6 +16,10 @@ assurance standards. OS means operating system; DB means database; VM means
 virtual machine; API means application programming interface; SKU means a
 provider's product or pricing unit; RLS means row-level security; k8s means
 Kubernetes. AWS is Amazon Web Services and GCP is Google Cloud Platform.
+A **managed platform** runs servers, scaling, patching and deploys for the
+team (frontend hosts, BaaS, app platforms); a **hyperscaler** is a very large
+general cloud where the team chooses and governs each service. **Egress** is
+data sent out of a provider, often billed; **lock-in** is the cost of leaving.
 
 ## Purpose
 
@@ -33,6 +37,12 @@ input `aws-saas-architect` or `azure-saas-architect` maps; for the modern
 managed-platform tier the platform absorbs most of that mapping, so the decision
 record plus the concrete provider is often enough to start. The decision record
 is handed to `adr-writer`.
+Managed platforms (frontend and edge hosts, backend as a service, app
+platforms) are first-class options beside the hyperscalers, never an
+afterthought. The skill teaches the choice: it compares the viable options
+side by side for the user's case, recommends one with the reason and what
+would change it, and asks one owner question. It never picks silently, and
+the owner's answer grants no authority to create accounts, pay, or release.
 
 ## Use When
 
@@ -42,6 +52,9 @@ is handed to `adr-writer`.
   component (raw VPS/IaaS, container-PaaS, managed-Jamstack/SSR host,
   Postgres-BaaS, edge/serverless, or a hyperscaler service) — not just which provider.
 - Use when: a greenfield SaaS needs its cloud/deployment posture decided.
+- Use when: a user names a managed platform or combination (e.g. Vercel plus
+  Supabase, Netlify, Firebase, Render) and asks whether it fits, how it
+  compares with AWS, Azure, or GCP, or when to graduate from it.
 - Use when: deciding managed-vs-self-hosted per capability (database, queue,
   search, k8s vs PaaS) — on any provider.
 - Use when: an existing cloud bill, compliance obligation, or team-capacity
@@ -50,6 +63,10 @@ is handed to `adr-writer`.
   to concrete services — `azure-saas-architect` / `aws-saas-architect`.
 - Do NOT use when: designing component boundaries and data ownership —
   `architecture-designer` (its output is an input here).
+- Do NOT use when: choosing the architecture style (monolith, microservices,
+  event-driven, serverless as a paradigm) — `architecture-advisor`.
+- Do NOT use when: the platform is already chosen and the task is writing or
+  auditing its row-level-security policies — `rls-policy-auditor`.
 - Do NOT use when: deciding pooled/siloed tenancy or control-plane/data-plane
   structure — `saas-platform-architect` (its isolation decisions constrain
   the cloud decision, not vice versa).
@@ -79,23 +96,35 @@ is handed to `adr-writer`.
 
 ## Workflow
 
-1. **Write the requirements-and-constraints record** across nine axes:
+1. **Ask only for missing deciding facts, one per turn.** First take every
+   fact the prompt, repository, and prior decisions already give. A deciding
+   fact is one whose answer could change the recommendation: compliance,
+   regulated data and residency; workload shape (long-running jobs, stateful
+   services); team size and what it has operated; expected scale; budget and
+   credits; existing stack. If one is missing, ask exactly one plain-language
+   question for the most decision-changing gap (order in
+   [references/managed-platform-tier.md](references/managed-platform-tier.md#deciding-facts-ask-only-what-is-missing)),
+   say briefly why it matters, and wait. Do not ask about facts that would
+   not change the outcome, bundle several questions, or present a
+   recommendation that depends on the missing fact.
+2. **Write the requirements-and-constraints record** across nine axes:
    compliance/residency, latency/regions, availability target, cost
    envelope, operational maturity, existing estate, integration gravity
    (what the product must talk to), scale trajectory, and exit-cost
-   tolerance. Mark each entry verified (with source) or assumed. Missing
-   answers on compliance, residency, or availability are Stop Conditions,
-   not guesses. These axes drive pattern selection in step 4:
-   operational maturity and workload shape set how much ops the team should
-   own; residency and compliance can rule out a pattern; cost sets the model.
-2. **Shape the provider-neutral logical architecture**: identity boundary,
+   tolerance. Mark each entry verified (with source) or assumed. Compliance,
+   residency, or availability answers that stay unverifiable after step 1's
+   question are Stop Conditions, not guesses. These axes drive pattern
+   selection in step 5: operational maturity and workload shape set how
+   much ops the team should own; residency and compliance can rule out a
+   pattern; cost sets the model.
+3. **Shape the provider-neutral logical architecture**: identity boundary,
    network zones, data stores by kind (relational/object/cache/search),
    compute shape (long-running services, jobs, functions), messaging needs,
    observability requirements — in capability language ("managed relational
    DB with per-tenant isolation option"), never product names. Concrete
-   providers and platform brands are deferred to steps 4–5; nothing here
+   providers and platform brands are deferred to steps 5–6; nothing here
    names a product.
-3. **Derive hard filters from tenant isolation and compliance**: which
+4. **Derive hard filters from tenant isolation and compliance**: which
    deployment models the tenancy design permits (a database-per-tenant silo
    needs cheap DB instances or schema automation; residency needs the right
    regions), and which providers/regions satisfy the compliance set. Filters
@@ -103,22 +132,38 @@ is handed to `adr-writer`.
    heavy compliance set can rule the modern managed-platform tier out and
    require a hyperscaler option; a stateful long-running service rules out a
    pure edge runtime) — before scoring starts.
-4. **Compare compatible deployment patterns** — decide how much operational
+5. **Compare compatible deployment patterns** — decide how much operational
    surface the team should own for each component before naming a provider.
-   These options overlap and are not a single low-to-high ladder:
-   - **IaaS / VPS** — you run the OS, patching, and runtime (hyperscaler VMs;
-     e.g. DigitalOcean Droplets, Linode). Most control, most ops.
-   - **Container PaaS** — "just deploy my app + DB," the platform runs the
-     host and scaling (e.g. Render, Railway, Fly.io).
-   - **Managed Jamstack / SSR host** — frontend + serverless functions, the
+   These options overlap and are not a single low-to-high ladder. The
+   **managed-platform tier** is first-class; consider it for every product,
+   not only when the user names it:
+   - **Frontend / edge hosting** — frontend + short serverless functions, the
      platform owns build/CDN/deploy (e.g. Vercel, Netlify, Cloudflare Pages).
-   - **Managed data / Postgres-BaaS** — managed DB plus auth and storage
-     (e.g. Supabase, Neon).
+   - **Backend as a service** — managed database plus sign-in and storage:
+     Postgres-based (e.g. Supabase; Neon for managed Postgres) or
+     document-store heritage (e.g. Firebase).
+   - **App platform / container PaaS** — "just run my app, workers, and DB,"
+     the platform runs hosts and scaling (e.g. Render, Railway, Fly.io,
+     Heroku).
    - **Edge / serverless functions** — global, per-invocation compute (e.g.
-     Cloudflare Workers, Fly.io).
+     Cloudflare Workers).
+   Beside it, the **hyperscaler and self-run tiers**:
    - **Hyperscaler managed services** — a broad catalog for deep compliance,
      scale, and integration (AWS, Azure, GCP); operational burden varies by
      service and configuration.
+   - **IaaS / VPS** — you run the OS, patching, and runtime (hyperscaler VMs;
+     e.g. DigitalOcean Droplets, Linode). Most control, most ops.
+   For the managed tier, check its real trade-offs for THIS case before
+   recommending it: lock-in and migration path, cost curve at 10x and 100x,
+   compliance and residency on the affordable plan, multi-tenant isolation
+   (pooled Postgres RLS is the only tenant barrier when clients query the
+   database directly), background-job and long-running compute limits,
+   egress, networking needs, and vendor maturity — checklist and category
+   table in
+   [references/managed-platform-tier.md](references/managed-platform-tier.md).
+   It usually fits a small team shipping a standard web app with Postgres and
+   sign-in; strict residency, regulated data, private networking, or heavy
+   long-running compute are what most often push toward a hyperscaler.
    Prefer a compatible option with the **least operational burden** that meets
    verified constraints. A frontend host, managed data service and serverless
    functions can be combined; each needs its own fit check. Choose more
@@ -131,7 +176,7 @@ is handed to `adr-writer`.
    each category, not the decision**: their pricing, free-tier limits, and
    runtime constraints are VOLATILE verification items, never asserted from
    memory (the same rule the skill applies to hyperscaler SKUs and regions).
-5. **Score the surviving options** against the record across **deployment
+6. **Score the surviving options** against the record across **deployment
    pattern × provider × deployment posture** (single provider, multi-cloud,
    hybrid, stay-as-is) — not provider × posture alone. Score cost (the cost
    model of the pattern: per-invocation vs per-VM vs bandwidth/egress, marginal
@@ -142,21 +187,33 @@ is handed to `adr-writer`.
    Multi-cloud gets scored for its real costs (duplicated expertise,
    lowest-common-denominator services) — it must earn its place, not be a
    default hedge.
-   When a provider, deployment pattern, or posture is a user-facing choice,
-   define unfamiliar terms and why each option survived. Explain each one's
-   pros and cons, verified or estimated money cost, setup and delivery time,
-   and continuing upkeep before requesting a choice. A $0 software tier can
-   still consume team time; mark unknown prices instead of guessing. End the
-   choice presentation with one clear owner decision question; do not decide
-   silently.
-6. **Decide managed-vs-self-hosted per capability** — the per-capability
+   **Teach the choice; never pick silently.** When a provider, pattern, or
+   posture is the owner's choice, present it in this order:
+   - **Terms** — define every unfamiliar term in plain language.
+   - **Side-by-side comparison** — one row per viable option; when both
+     survive the filters, include at least the strongest managed-platform
+     option and the strongest hyperscaler option. For each: why it fits this
+     case, pros and cons specific to this case (not generic brochure
+     points), money cost (verified, estimated, or unknown — never invented),
+     setup and delivery time, continuing upkeep, and the exit path. A $0
+     tier can still consume team time.
+   - **Recommendation** — one option, the case-specific reason it fits, and
+     what fact or event would change it. If the options land within noise,
+     say so and name the tie-breaking fact instead of manufacturing a winner.
+   - **One atomic owner question** — exactly one decision per turn, never a
+     bundle.
+   The answer records a preference only. It grants no authority to create
+   accounts, pay, provision, or release anything; those stay with the human
+   approval path. Template in
+   [references/managed-platform-tier.md](references/managed-platform-tier.md#presentation-template).
+7. **Decide managed-vs-self-hosted per capability** — the per-capability
    refinement of the pattern choice: default managed; self-hosting requires a
    named reason (cost at proven scale, capability gap, residency) plus the
    operational bill (patching, backup, on-call) the team accepts. Record each
    as capability → posture → reason. Managed application and data platforms
    settle more of this by default; it bites most on IaaS and mixed hyperscaler
    stacks, where each capability is a separate managed-or-not call.
-7. **Name the tradeoffs and exit costs honestly**: what the decision gives
+8. **Name the tradeoffs and exit costs honestly**: what the decision gives
    up, which services create lock-in and what leaving would cost, and the
    trigger conditions that would reopen the decision (price change, region
    gap, acquisition, compliance change, outgrowing the pattern). Each pattern
@@ -165,8 +222,14 @@ is handed to `adr-writer`.
    ceiling (pricing, runtime limits, a capability gap) that forces a change in
    the selected pattern; name that ceiling and the migration it would trigger
    rather
-   than meeting it in production.
-8. **Hand off**: the decision record to `adr-writer` (with the rollback/
+   than meeting it in production. When the managed tier is chosen, state the
+   hybrid graduation path (keep portable seams — standard Postgres, the
+   backend in a container, standard sign-in — and move workers, then the
+   database, to a hyperscaler piece by piece when needed) and measurable exit
+   criteria (bill versus hyperscaler estimate, a contract needing a region,
+   certification, or private network the platform lacks, jobs exceeding
+   runtime limits, availability beyond the plan's SLA).
+9. **Hand off**: the decision record to `adr-writer` (with the rollback/
    reversal plan an ADR requires) and per-tenant cost modeling of the chosen
    posture to `saas-cost-architect`. Service mapping depends on the pattern:
    - **Hyperscaler option** → `aws-saas-architect` or `azure-saas-architect`
@@ -198,11 +261,20 @@ Deployment patterns: <compatible pattern for each component + why; options
 Options scored: <plain-language meaning + why each pattern × provider × posture
   is considered; pros/cons; money, setup, delivery-time and upkeep costs;
   operational fit / integration / regions / exit cost — rationale per axis>
-Decision: <patterns + providers + deployment posture — why this fits best>
+Owner comparison: <side-by-side table of viable options — managed-platform
+  and hyperscaler rows when both survive; why it fits, case-specific
+  pros/cons, money (verified/estimate/unknown), setup, upkeep, exit path>
+Recommendation: <one option + case-specific reason; would change if <fact>;
+  main rejected alternative and why>
+Owner question: <exactly one atomic question; the answer is a preference,
+  not approval to create accounts, pay, or release>
+Decision: <recorded only after the owner answers — patterns + providers +
+  deployment posture and why this fits best>
 Managed vs self-hosted: <capability → posture → named reason → operational
   bill accepted>
 Tradeoffs & exit costs: <what is given up; lock-in services; cost to leave;
-  reopen triggers incl. outgrowing the pattern>
+  reopen triggers incl. outgrowing the pattern; for the managed tier, the
+  graduation path and measurable exit criteria>
 Handoffs: <adr-writer record; hyperscaler → aws-/azure-saas-architect mapping,
   OR modern tier → saas-platform-architect/tenant-modeler/multi-tenant-data-
   architect + rls-policy-auditor + merge-is-deploy-governance;
@@ -230,6 +302,19 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - [ ] Before a user-facing build choice, terms, reasons, pros/cons, and
       money/time/setup/upkeep costs are clear; current prices and free tiers
       are verified or labeled unknown, and the recommendation explains fit.
+- [ ] The managed-platform tier was considered as a first-class option; when
+      it and a hyperscaler both survived the filters, both appear side by side
+      with case-specific pros/cons and costs or unknowns.
+- [ ] Managed-tier trade-offs were checked for this case: lock-in and
+      migration path, cost curve, compliance/residency on the affordable plan,
+      tenant isolation (RLS), job and runtime limits, egress, vendor maturity.
+- [ ] Only missing deciding facts were asked, one per turn; no recommendation
+      rested on a missing deciding fact.
+- [ ] One recommendation with its reason and what would change it, then
+      exactly one atomic owner question; nothing was picked silently, and the
+      answer was not treated as approval to create accounts, pay, or release.
+- [ ] Vendor names are marked as examples to verify at decision time; no
+      price or limit was stated from memory.
 - [ ] Multi-cloud, if chosen, carries its duplicated-expertise and
       lowest-common-denominator costs in writing; if rejected, the rejection
       is recorded.
@@ -248,12 +333,21 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
   a more operationally demanding option for a named reason; "everyone uses
   AWS" is fashion, not a requirement.
 - The named platforms (Vercel, Netlify, Cloudflare, Render, Railway, Fly,
-  Supabase, Neon, …) are current market examples of each pattern, not
-  endorsements; their free tiers, pricing, and runtime limits move
+  Heroku, Supabase, Firebase, Neon, …) are current market examples of each
+  pattern, not endorsements; their free tiers, pricing, and runtime limits move
   quarterly — verify them at decision time, never assert from memory (the
   same discipline the skill applies to hyperscaler SKUs and regions). Note
   engine heritage precisely when it drives a decision (a Postgres-BaaS is not
   interchangeable with a MySQL/Vitess-heritage platform).
+- The opposite trap, managed-by-default: a free or cheap tier can hide a
+  cost cliff (bandwidth, invocations, seats), a runtime limit that breaks
+  background jobs, or a compliance feature available only on a higher plan.
+  Check those before recommending the tier, and when the browser queries the
+  database directly, treat RLS as the only tenant barrier and route it to
+  `rls-policy-auditor`.
+- The silent-pick trap: naming a winner without the comparison, or asking
+  "which do you prefer?" without a recommendation, both leave the owner
+  unable to judge. Compare, recommend with the reason, then ask one question.
 - Committed-spend contracts and startup credits decide more real cloud
   choices than architecture does — surface them in the cost axis instead of
   letting them operate invisibly.
@@ -283,6 +377,17 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - The scored options land within noise of each other → present the tie with
   the tie-breaking question (usually exit cost or team maturity) to the
   human instead of manufacturing a winner.
+- A fact that decides the recommendation is missing (compliance or
+  residency, workload shape, team experience, scale, budget, existing
+  stack) → ask only for that fact, one question per turn, then continue; do
+  not recommend on a guess.
+- Asked to sign up for, create accounts on, pay for, provision, or deploy to
+  any platform (e.g. "sign me up for Vercel and Supabase and deploy") →
+  refuse the execution and explain why: this skill decides and writes
+  nothing, and an owner's choice is not approval. Offer the comparison or
+  decision record, and route the live action to `human-approval-boundary`
+  (and `merge-is-deploy-governance` when merges auto-deploy). Never ask for
+  payment details or credentials.
 - The decision would trigger a migration of a live production estate →
   decision record only; migration planning is separate, approval-gated work.
 
@@ -291,7 +396,14 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - `references/decision-inputs.md` — the nine-axis requirements record
   template, the deployment patterns with current example providers,
   the hard-filter derivation table, and the scoring rubric.
+- `references/managed-platform-tier.md` — managed-platform category table
+  with volatile example vendors, the trade-off checklist (lock-in, cost
+  curve, compliance, RLS isolation, job limits, egress, vendor maturity),
+  hybrid graduation and exit criteria, deciding-fact order, and the owner
+  comparison template.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the cloud cluster
   (`azure-saas-architect`, `aws-saas-architect`, `iac-reviewer`) and against
-  shipped `architecture-designer` / `saas-platform-architect`.
+  shipped `architecture-designer` / `saas-platform-architect` /
+  `architecture-advisor` / `rls-policy-auditor`, including a managed-platform
+  prompt pinned here.
