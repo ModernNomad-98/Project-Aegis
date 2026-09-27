@@ -76,6 +76,16 @@ link above points to its last copy, at commit
 that its five EVAL-004 rows are rejected false positives; its measurements
 are unchanged from `e2f1da0`. The historical counts below are unchanged.
 
+**Baseline files regenerated again, 2026-09-27.** Under AEGIS-APR-065, the
+same four files were regenerated with engine v1.13.2 from main
+`5dbf7bc9e958d932bd0c5b093ebecfe61be41840` (186 skills, 316 findings, of
+which 232 are ROUTE-002). The v1.13.1 files described in the paragraph above
+remain in git history at
+[`7894567`](https://github.com/ModernNomad-98/Project-Aegis/tree/7894567d49d301f82f40cb6445b668581d5799ac/artifacts/audits)
+(PR #432's merge; report:
+[`docs/audits/skill-contract-audit-baseline.md` at `7894567`](https://github.com/ModernNomad-98/Project-Aegis/blob/7894567d49d301f82f40cb6445b668581d5799ac/docs/audits/skill-contract-audit-baseline.md)).
+The historical counts below are unchanged.
+
 Rules of this register (from the program's operating rules):
 
 - AEGIS-001..059 are never renumbered, merged, or reused. New IDs start at
@@ -178,7 +188,10 @@ Rules of this register (from the program's operating rules):
   as it is was superseded by owner decision. The baseline report and its three
   `artifacts/audits/` JSON files were regenerated with engine v1.13.1; the
   1.12.0 files remain in git history at commit
-  `e2f1da0beb6e4aed07044ca3a90e841962bfd590`.
+  `e2f1da0beb6e4aed07044ca3a90e841962bfd590`. A later 2026-09-27
+  regeneration under AEGIS-APR-065 used engine v1.13.2; the v1.13.1 files
+  remain in git history at commit
+  `7894567d49d301f82f40cb6445b668581d5799ac` (PR #432).
 - **Automatic review findings closed (PR #89, reviewed commit `2d769dec87`).**
   The ready-for-review transition triggered an automatic review that raised
   three P2 findings against the correction itself; all three were valid and are

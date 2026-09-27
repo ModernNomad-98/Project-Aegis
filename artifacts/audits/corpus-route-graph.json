@@ -1258,11 +1258,6 @@
       "type": "body-route"
     },
     {
-      "from": "agentic-loop-designer",
-      "to": "threat-modeler",
-      "type": "description-mention"
-    },
-    {
       "from": "ai-closeout-reporter",
       "to": "agent-governance-audit",
       "type": "description-mention"
@@ -1323,11 +1318,6 @@
       "type": "description-mention"
     },
     {
-      "from": "ai-evaluation-harness",
-      "to": "threat-modeler",
-      "type": "description-mention"
-    },
-    {
       "from": "ai-governance-risk-reviewer",
       "to": "agent-governance-audit",
       "type": "description-mention"
@@ -1366,11 +1356,6 @@
       "from": "ai-lifecycle-risk-manager",
       "to": "iso-42001-aims-architect",
       "type": "body-route"
-    },
-    {
-      "from": "ai-lifecycle-risk-manager",
-      "to": "threat-modeler",
-      "type": "description-mention"
     },
     {
       "from": "ai-misinformation-guard",
@@ -2070,6 +2055,11 @@
     {
       "from": "code-reviewer",
       "to": "library-diff-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "code-reviewer",
+      "to": "llm-output-safety-reviewer",
       "type": "description-mention"
     },
     {
@@ -3374,6 +3364,11 @@
     },
     {
       "from": "llm-output-safety-reviewer",
+      "to": "code-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "llm-output-safety-reviewer",
       "to": "prompt-injection-defender",
       "type": "description-mention"
     },
@@ -4379,6 +4374,11 @@
     },
     {
       "from": "prompt-injection-defender",
+      "to": "file-upload-storage-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "prompt-injection-defender",
       "to": "hidden-context-exposure-reviewer",
       "type": "description-mention"
     },
@@ -4395,11 +4395,6 @@
     {
       "from": "prompt-injection-defender",
       "to": "rag-security-architect",
-      "type": "description-mention"
-    },
-    {
-      "from": "prompt-injection-defender",
-      "to": "threat-modeler",
       "type": "description-mention"
     },
     {
@@ -5534,6 +5529,11 @@
     },
     {
       "from": "supply-chain-security-reviewer",
+      "to": "model-poisoning-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "supply-chain-security-reviewer",
       "to": "security-pr-reviewer",
       "type": "description-mention"
     },
@@ -5891,7 +5891,6 @@
     "context-co-update-ci-gate",
     "data-quality-monitor-designer",
     "docs-first-implementer",
-    "file-upload-storage-architect",
     "gated-deployment-prompt-template",
     "horizontal-scalability-reviewer",
     "inter-agent-comms-reviewer",

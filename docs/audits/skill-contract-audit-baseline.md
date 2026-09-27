@@ -1,19 +1,20 @@
 # Skill-contract audit — baseline report
 
-> **Regenerated 2026-09-27 by owner decision** from origin/main
-> `656194426e2ea3358fa29fcf19e05f0278d9c270` with engine v1.13.1 (checkout
+> **Regenerated 2026-09-27 under AEGIS-APR-065** from origin/main
+> `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` with engine v1.13.2 (checkout
 > with core.autocrlf=false, so the corpus hash is over LF bytes). The previous
-> v1.12.0 baseline (184 skills, 414 findings) is in git history at
-> `e2f1da0beb6e4aed07044ca3a90e841962bfd590` (PR #77). The engine sentence
-> below, "freezes the state of the corpus BEFORE remediation", is fixed
-> template text; this report records the corpus after remediation. Structural
-> findings are not behavioral proof.
+> v1.13.1 baseline (186 skills, 317 findings, from
+> `656194426e2ea3358fa29fcf19e05f0278d9c270`, PR #432 under AEGIS-APR-058) is
+> in git history at `7894567d49d301f82f40cb6445b668581d5799ac` (#432's merge).
+> The engine sentence below, "freezes the state of the corpus BEFORE
+> remediation", is fixed template text; this report records the corpus after
+> remediation. Structural findings are not behavioral proof.
 
-- Tool: `audit-skill-contracts` v1.13.1 (engine sha256 `3f19d6731bea4301…`)
-- Repo SHA: `656194426e2ea3358fa29fcf19e05f0278d9c270` (branch `chore/regenerate-audit-baselines-2026-09-27`; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `0dfcc934a7c98517e93f90d21ba74f59cf065a611b6be6a874eb5a3fa2395393` (714 files, 4683677 bytes)
+- Tool: `audit-skill-contracts` v1.13.2 (engine sha256 `8622bac7f2e7d91f…`)
+- Repo SHA: `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` (branch `chore/regenerate-audit-baselines-v1132`; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `a14f70c96c3b3ac4268d0b644dbb7c7b81b6d40e3665baba3ddcde119146b73b` (715 files, 4735807 bytes)
 - Skills scanned: **186**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
-- Findings: **317** (233 mechanical, 84 semantic-review candidates)
+- Findings: **316** (232 mechanical, 84 semantic-review candidates)
 
 A baseline finding is EXPECTED here: this report freezes the state of
 the corpus BEFORE remediation. A finding below is not a tool failure,
@@ -35,12 +36,12 @@ mechanically proven defects.
 | P0 | 2 |
 | P1 | 82 |
 | P2 | 0 |
-| info | 233 |
+| info | 232 |
 
 | Rule | Count |
 |---|---:|
 | ARTF-001 | 9 |
-| ROUTE-002 | 233 |
+| ROUTE-002 | 232 |
 | SIDE-004 | 73 |
 | STATE-001 | 2 |
 
@@ -133,7 +134,7 @@ mechanically proven defects.
 
 ## P2/info findings (summarized; full detail in the JSON report)
 
-- **ROUTE-002** × 233 — e.g. `.claude/skills/ab-test-designer/SKILL.md`: exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this
+- **ROUTE-002** × 232 — e.g. `.claude/skills/ab-test-designer/SKILL.md`: exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this
 
 ## Vocabulary census (non-zero skills)
 
@@ -179,7 +180,7 @@ mechanically proven defects.
 - `ci-pipeline-architect`: accepted×1, committed×1, deployed×1, estimated×1, released×1
 - `clickthrough-test-engineer`: deployed×2, planned×3, proposed×1
 - `cloud-architecture-decider`: accepted×1, committed×4, complete×1, durable×3, estimated×3, verified×14
-- `code-reviewer`: deployed×1, proposed×1
+- `code-reviewer`: committed×2, deployed×1, proposed×1
 - `code-simplifier`: accepted×1, planned×1, verified×1
 - `command-gateway-architect`: accepted×1, committed×1, complete×1, verified×2
 - `compliance-control-foundation`: proposed×1, ready×1, verified×11
@@ -223,6 +224,7 @@ mechanically proven defects.
 - `lane-authoring-guide`: verified×4
 - `latency-budget-architect`: estimated×1
 - `library-diff-reviewer`: accepted×1
+- `llm-output-safety-reviewer`: committed×4, verified×1
 - `local-ci-mirror-preflight`: committed×2
 - `manual-test-case-creator`: ready×1
 - `memory-context-poisoning-reviewer`: targeted×1
@@ -247,6 +249,7 @@ mechanically proven defects.
 - `profiling-methodology-designer`: complete×1, proposed×1, targeted×1
 - `project-orchestrator`: accepted×22, approved scope×4, commit-able×9, committed×2, complete×42, deployed×1, proposed×11, ready×3, verified×3
 - `promotion-packet-writer`: ready×3
+- `prompt-injection-defender`: accepted×2
 - `qa-strategy-architect`: deployed×1
 - `query-plan-reader`: estimated×1, planned×1, proposed×1, sequenced×2, verified×2
 - `readme-craftsman`: complete×1, verified×3
@@ -284,7 +287,7 @@ mechanically proven defects.
 - `structured-output-validator`: verified×1
 - `sunset-deprecation-communicator`: ready×1, targeted×7
 - `superadmin-observability-console-designer`: complete×2, verified×5
-- `supply-chain-security-reviewer`: accepted×4, committed×2, verified×1
+- `supply-chain-security-reviewer`: accepted×4, committed×2, verified×8
 - `synthetic-monitoring-architect`: complete×1, verified×2
 - `tech-spec-writer`: proposed×6
 - `tenant-isolation-reviewer`: accepted×2, targeted×1, verified×1
