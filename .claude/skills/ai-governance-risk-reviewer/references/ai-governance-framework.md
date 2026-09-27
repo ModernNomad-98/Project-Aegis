@@ -6,8 +6,10 @@ companion method is the National Institute of Standards and Technology (NIST)
 Artificial Intelligence Risk Management Framework (AI RMF) 1.0, with its
 GOVERN/MAP/MEASURE/MANAGE functions. The tier rubric below is an internal
 impact heuristic, not a European Union (EU) AI Act classification. Actual
-obligations depend on the [current regulation](https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng),
-the system's use and role, and legal review. **PII** means personally identifiable
+obligations depend on [Regulation (EU) 2024/1689](https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng)
+(check the [consolidated text](https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng)
+and application dates; it has been amended since adoption), the system's use
+and role, and legal review. **PII** means personally identifiable
 information; **HITL** and **HOTL** mean human-in-the-loop and human-on-the-loop
 oversight, respectively. This is a mapping scaffold, NOT legal advice — flag
 items for counsel.

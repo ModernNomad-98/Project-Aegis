@@ -2,7 +2,10 @@
 
 Verified on AICPA pages: five categories; TSC issued by the Assurance
 Services Executive Committee (2017 TSC with revised Points of Focus 2022);
-SOC 2 is an examination/attestation. CPA-firm-sourced (verify against the
+SOC 2 is an examination/attestation. Categories, issuer, and edition
+verified 2026-09-26 against the
+[AICPA 2017 TSC (Revised Points of Focus 2022) page](https://www.aicpa-cima.com/resources/download/2017-trust-services-criteria-with-revised-points-of-focus-2022);
+no newer TSC revision was listed there. CPA-firm-sourced (verify against the
 AICPA guide before citing): Type 1/Type 2 definitions; Security as the
 required common-criteria baseline.
 

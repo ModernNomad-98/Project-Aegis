@@ -855,6 +855,8 @@ re-deriving them. **LLM03** is extend-existing (the shipped
 | `system-prompt-leakage-reviewer` | (NEW, LLM07) Two axes: no secrets in the prompt AND no security dependence on prompt secrecy — **system prompts are NOT security controls**; enforcement is deterministic and lives OUTSIDE the LLM; extraction-is-harmless framing. | auto + manual |
 | `ai-misinformation-guard` | (NEW, LLM09) Grounding in retrieved sources (not memory), citation-to-claim verification, calibrated uncertainty/refusal, fact validation before action, package/API hallucination (slopsquatting) checks, overreliance-aware UX. | auto + manual |
 
+Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`. OWASP has since published the [Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (2026-08-03); this pack stays anchored to the 2025 edition until the owner decides on re-anchoring.
+
 Phase 7.5 — agentic AI security pack (6 new + 3 extensions). Anchored to the
 OWASP Top 10 for Agentic Applications (2026), ASI01–ASI10, per reconciliation
 §3 (D7). The Agentic Top 10 **extends** the LLM Top 10: agent systems inherit
@@ -876,6 +878,8 @@ loops, ephemeral sandboxes, NL-to-execution paths);
 | `inter-agent-comms-reviewer` | (ASI07) A2A/MCP message security: per-edge mutual authn, end-to-end integrity, replay bounds, confidentiality, topology allowlists, spoofed results; authenticated ≠ trusted — peer messages never re-task or assert authority. | auto + manual |
 | `agent-containment-reviewer` | (ASI08+ASI10 merged) Cascade half: blast-radius isolation, bounded upstream trust, circuit breakers, checkpoints/rollback, retry-storm limits. Rogue half: drift baselines, agent inventory/lifecycle, kill switches that SEVER AUTHORITY (credentials revoked, not processes killed); composes `ai-cost-guardrail-designer` + `incident-response-runbook`. | auto + manual |
 | `human-agent-trust-reviewer` | (ASI09) Adversarial review of the approval layer: consent fatigue (rate/latency signals), self-reported summaries vs system-verified facts, bundling, urgency manipulation, automation-bias controls; counterpart to `human-approval-boundary`. | auto + manual |
+
+Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`.
 
 D42 — CONSTRAIN/CURATE design pack (3 new + 1 extension). Makes the
 doctrine's D41 inward-facing pillars real: the DESIGN skills for the AI's own
@@ -914,7 +918,9 @@ Rules section:
 | `soc2-trust-criteria-mapper` | SOC 2 scoping as ATTESTATION (never certification): system boundary, commitment-driven TSC category selection (Security baseline + optional four), Type 1 vs Type 2 with window feasibility, subservice carve-outs; Type definitions flagged CPA-firm-sourced. | auto + manual |
 | `multi-framework-crosswalk` | One control → 27001 Annex A + SOC 2 TSC + 42001 Annex A (+ AI RMF function): edition-pinned, text-in-hand cells only, FULL/PARTIAL(residue) honesty, explicit joint sets — the do-the-work-once engine. | auto + manual |
 | `compliance-gap-auditor` | ONE parameterized gap audit vs chosen framework(s): MET/PARTIAL/GAP/UNVERIFIABLE per requirement from cited evidence (missing evidence is never MET), blockers-first remediation order; readiness assessment, never an audit opinion. | auto + manual |
-| `ai-lifecycle-risk-manager` | NIST AI RMF GOVERN/MAP/MEASURE/MANAGE operationalized across the AI lifecycle with owners, triggers, and a risk register; voluntary and under revision — never a certification target; companion to `iso-42001-aims-architect`. | auto + manual |
+| `ai-lifecycle-risk-manager` | NIST AI RMF GOVERN/MAP/MEASURE/MANAGE operationalized across the AI lifecycle with owners, triggers, and a risk register; voluntary and under revision per NIST (NIST page checked 2026-09-26; reference sheet [`ai-rmf-function-map.md`](.claude/skills/ai-lifecycle-risk-manager/references/ai-rmf-function-map.md) dated 2026-09-24) — never a certification target; companion to `iso-42001-aims-architect`. | auto + manual |
+
+Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`.
 
 D13 — library meta / self-application (D18 + D22): the library applies its
 own discipline to itself, end to end. All five are pure review/design
@@ -1096,6 +1102,8 @@ the D8 rubric). Both edit nothing:
 |---|---|---|
 | `security-logging-alerting-architect` | The security-event DETECTION/ALERTING design (closes A09:2025): detection coverage map (which events must be logged, with detectable fields), alert-vs-ticket rules with baseline-justified thresholds + bounded noise control, response wiring (owner, severity, escalation, runbook link), coverage tests, honest blind spots. ≠ `audit-log-architect` (records, never detects/alerts), `observability-operator` (implements alert config), `slo-reliability-architect` (reliability paging), `incident-response-runbook` (the playbook AFTER). | auto + manual |
 | `error-handling-security-reviewer` | The error/exception-path security REVIEW (closes A10:2025): fail-closed defaults, error-path authorization, exception-driven bypass, leak-free error responses — file:line findings, a fail-closed matrix, missing-negative-test list; recommends fixes, never applies them. ≠ `security-pr-reviewer` (broad diff gate), `appsec-implementer` (builds the fix), `static-analysis-reviewer` (scanner triage), `error-taxonomy-designer` (the error MODEL). | auto + manual |
+
+Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`.
 
 D31 — SaaS architecture depth (D12.11 STRONG cluster): 10 net-new
 architecture-depth surfaces for a multi-tenant SaaS, surfaced by a
