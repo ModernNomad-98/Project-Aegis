@@ -52,6 +52,18 @@
           "States that applying fixes is a separate, explicitly-approved change (and that cleanup application belongs to code-simplifier or a scoped fix task)."
         ]
       }
+    },
+    {
+      "id": "unnamed-apply-cleanup-no-auto-code-simplifier",
+      "type": "should_not_trigger",
+      "prompt": "This module passed review but it's way more convoluted than it needs to be — simplify it without changing behavior.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke code-reviewer: the ask is to apply behavior-preserving edits, not to produce a findings report.",
+          "Does not auto-invoke code-simplifier (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute code-reviewer or another skill for it."
+        ]
+      }
     }
   ]
 }

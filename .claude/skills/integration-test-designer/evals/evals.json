@@ -67,6 +67,18 @@
           "Records the reroute in the output rather than silently dropping it."
         ]
       }
+    },
+    {
+      "id": "unnamed-browser-journey-no-auto-playwright-e2e-engineer",
+      "type": "should_not_trigger",
+      "prompt": "Verify a user can log in, create an invoice in the UI, and see it in the list — full stack in a real browser.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke integration-test-designer: a full-stack journey in a real browser is the E2E layer, which integration testing explicitly excludes.",
+          "Does not auto-invoke playwright-e2e-engineer (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute integration-test-designer or another skill for it."
+        ]
+      }
     }
   ]
 }

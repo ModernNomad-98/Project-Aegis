@@ -85,6 +85,18 @@
           "Asks exactly one choice question after the comparison; does not treat the answer as approval to add a store or change the schema, recommends the user explicitly invoke query-plan-reader for detailed tuning, and hands materialization placement to operational-vs-analytical-splitter."
         ]
       }
+    },
+    {
+      "id": "unnamed-chatty-pattern-no-auto-n-plus-one-detector",
+      "type": "should_not_trigger",
+      "prompt": "The dashboard fires ~350 queries per load. Rather than untangle the ORM, we want to cache the assembled dashboard response — design the cache.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke caching-strategy-designer to design the cache: roughly 350 queries per load is a chatty data-access pattern, and pattern repair precedes cache design.",
+          "Does not auto-invoke n-plus-one-detector (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute caching-strategy-designer or another skill for it."
+        ]
+      }
     }
   ]
 }

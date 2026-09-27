@@ -66,6 +66,30 @@
           "States the handoff explicitly."
         ]
       }
+    },
+    {
+      "id": "unnamed-one-flaky-test-no-auto-flaky-test-detective",
+      "type": "should_not_trigger",
+      "prompt": "This one checkout spec fails every fifth CI run — figure out why and fix it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke qa-automation-architect: diagnosing one specific flaky spec is casework; the architect only sets the flake-management policy.",
+          "Does not auto-invoke flaky-test-detective (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute qa-automation-architect or another skill for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-eval-harness-no-auto-ai-evaluation-harness",
+      "type": "should_not_trigger",
+      "prompt": "Create a golden dataset and graders to measure our chatbot's quality, safety, and hallucination rate, and block regressions on model upgrades.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke qa-automation-architect: a golden dataset and graders for chatbot quality, safety, and hallucination rate evaluate model behavior; this skill designs code-test automation architecture.",
+          "Does not auto-invoke ai-evaluation-harness (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute qa-automation-architect or another skill for it."
+        ]
+      }
     }
   ]
 }

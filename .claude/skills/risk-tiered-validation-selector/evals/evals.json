@@ -67,6 +67,18 @@
           "Approval paths and scope lock are change-classification-gate; the selector only routes validation cost (tier), not authority."
         ]
       }
+    },
+    {
+      "id": "unnamed-running-the-tier-no-auto-local-ci-mirror-preflight",
+      "type": "should_not_trigger",
+      "prompt": "The change is full-tier — now actually run everything CI would run, locally, verified against clean main first, before I commit.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke risk-tiered-validation-selector: the tier is already chosen, and the ask is to execute it locally against a clean-main baseline.",
+          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute risk-tiered-validation-selector or another skill for it."
+        ]
+      }
     }
   ]
 }

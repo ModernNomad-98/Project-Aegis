@@ -86,6 +86,42 @@
           "Attributing time in a failing system measures the failure, not performance — the profiling skill's own stop condition routes this away."
         ]
       }
+    },
+    {
+      "id": "unnamed-evidenced-query-no-auto-query-plan-reader",
+      "type": "should_not_trigger",
+      "prompt": "We already know it's this one report query — here's its EXPLAIN ANALYZE output. Tell us what's wrong and how to fix it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke profiling-methodology-designer: the suspect is already evidenced and singular with plan output in hand, so a profiling methodology would be ceremony.",
+          "Does not auto-invoke query-plan-reader (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute profiling-methodology-designer or another skill for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-query-count-explosion-no-auto-n-plus-one-detector",
+      "type": "should_not_trigger",
+      "prompt": "The dashboard page fires about 600 nearly identical queries per load according to the query log. Diagnose and design the fix.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke profiling-methodology-designer: hundreds of near-identical queries per load is the chatty data-access signature, which needs pattern diagnosis and a batching or eager-load fix rather than time attribution.",
+          "Does not auto-invoke n-plus-one-detector (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute profiling-methodology-designer or another skill for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-standing-telemetry-no-auto-observability-operator",
+      "type": "should_not_trigger",
+      "prompt": "Instrument the checkout service with latency histograms and traces, and build the dashboard so we can watch performance continuously.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke profiling-methodology-designer: the deliverable is permanent instrumentation and a continuous dashboard, not a bounded attribution investigation with a stop rule.",
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute profiling-methodology-designer or another skill for it."
+        ]
+      }
     }
   ]
 }

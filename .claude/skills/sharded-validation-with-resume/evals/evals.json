@@ -67,6 +67,30 @@
           "Intermittent-failure diagnosis is flaky-test-detective; the shard runner neither retries-until-green nor resumes around flakes."
         ]
       }
+    },
+    {
+      "id": "unnamed-pre-commit-run-no-auto-local-ci-mirror-preflight",
+      "type": "should_not_trigger",
+      "prompt": "Before I commit, run everything CI will run locally — baseline against clean main first and classify any failures.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke sharded-validation-with-resume: the request is a local pre-commit run with a baseline and failure classification, not a shard architecture.",
+          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume or another skill for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-stage-graph-no-auto-ci-pipeline-architect",
+      "type": "should_not_trigger",
+      "prompt": "Overhaul our CI/CD: stage ordering, artifact build-once, and deploy gates with named human approvals.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke sharded-validation-with-resume: stage ordering, build-once artifacts, and deploy gates are the delivery pipeline's stage graph; shard design covers only one validation stage's internals.",
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume or another skill for it."
+        ]
+      }
     }
   ]
 }

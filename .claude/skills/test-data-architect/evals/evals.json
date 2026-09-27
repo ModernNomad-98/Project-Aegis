@@ -52,6 +52,30 @@
           "Designs read-only baseline + per-test created mutation targets with worker namespacing instead, explaining the failure class being prevented."
         ]
       }
+    },
+    {
+      "id": "unnamed-security-fixture-suites-no-auto-multi-tenant-security-tester",
+      "type": "should_not_trigger",
+      "prompt": "Build the two-tenant fixture suite that proves cross-tenant reads are denied on every endpoint.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke test-data-architect: two-tenant fixtures plus cross-tenant denial assertions form a security negative suite; this skill only keeps general fixture catalogs compatible with it.",
+          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute test-data-architect or another skill for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-data-flake-case-no-auto-flaky-test-detective",
+      "type": "should_not_trigger",
+      "prompt": "One integration test fails intermittently with a unique-constraint violation — diagnose it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke test-data-architect: one intermittently failing test is flake casework; shared-data design enters only if that diagnosis names it as the cause.",
+          "Does not auto-invoke flaky-test-detective (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute test-data-architect or another skill for it."
+        ]
+      }
     }
   ]
 }

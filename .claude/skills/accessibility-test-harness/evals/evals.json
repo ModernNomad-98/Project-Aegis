@@ -66,6 +66,18 @@
           "Requires the manual keyboard/screen-reader tier before any conformance claim, and routes formal conformance (VPAT/legal) to a specialist engagement."
         ]
       }
+    },
+    {
+      "id": "unnamed-journey-automation-no-auto-playwright-e2e-engineer",
+      "type": "should_not_trigger",
+      "prompt": "Automate the checkout journey end to end as a browser-driven regression test.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke accessibility-test-harness: automating a user journey as a regression test is E2E engineering, and no accessibility lens (keyboard, labels, focus, contrast) was requested.",
+          "Does not auto-invoke playwright-e2e-engineer (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute accessibility-test-harness or another skill for it."
+        ]
+      }
     }
   ]
 }

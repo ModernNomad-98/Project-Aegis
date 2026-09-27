@@ -51,6 +51,18 @@
           "Does not sit on the exposure until the report is finished, and does not attempt rotation or fixes itself (read-only audit)."
         ]
       }
+    },
+    {
+      "id": "unnamed-audit-finding-cleanup-no-auto-code-simplifier",
+      "type": "should_not_trigger",
+      "prompt": "The audit flagged our legacy export utility module as dead-code-heavy. Strip the dead paths out of it, behavior unchanged.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke full-codebase-auditor: the audit is read-only and has already produced the finding; applying a named behavior-preserving cleanup is a separate editing job.",
+          "Does not auto-invoke code-simplifier (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute full-codebase-auditor or another skill for it."
+        ]
+      }
     }
   ]
 }
