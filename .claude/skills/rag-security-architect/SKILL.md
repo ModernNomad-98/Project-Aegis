@@ -135,8 +135,8 @@ Not reviewed: <areas + why>
 - The vector store is tenant-scoped by a mechanism that cannot be omitted by
   a forgotten filter; shared indexes require a mandatory, tested predicate.
 - Retrieved content remains untrusted as INSTRUCTIONS even when authorized as
-  DATA — retrieval authz does not make document content safe to obey
-  (`prompt-injection-defender` owns that half).
+  DATA — retrieval authorization does not make document content safe to
+  obey (`prompt-injection-defender` owns that half).
 - Deletion and permission changes must reach the index; an index is a
   copy of the data and inherits its access rules.
 

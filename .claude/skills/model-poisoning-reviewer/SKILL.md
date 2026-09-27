@@ -8,21 +8,22 @@ description: Review the integrity of the data and pipelines that shape a model's
 ## Purpose
 
 Review whether an attacker can corrupt a model's behavior by poisoning the
-data or feedback that shapes it (OWASP large language model data/model
-poisoning category LLM05). Reinforcement learning from human feedback
-(RLHF) and retrieval-augmented generation (RAG) are named here before their
+data or feedback that shapes it (Open Worldwide Application Security
+Project (OWASP) large language model (LLM) data/model poisoning category
+LLM05). Reinforcement learning from human feedback (RLHF) and
+retrieval-augmented generation (RAG) are named here before their
 abbreviations below. D6 is the repository's recorded Phase 7 decision
-anchoring its AI security map to the OWASP Top 10 for LLM Applications,
-now the 2026 edition (LLM05 was LLM04 in 2025; 2026 adds fine-tuning
-subversion to this category). The scope is the pipelines you run
-that influence what the model learns or treats as ground truth: training and
-fine-tuning datasets, RLHF/feedback loops, and the RAG/embedding INGESTION
-path (which turns external content into retrievable "truth"). The output is
-severity-ranked findings, each with a concrete poisoning path (attacker input
-→ corrupted behavior) and the provenance, curation, and validation controls
-that close it. Acquisition of third-party models/datasets/adapters is
-`supply-chain-security-reviewer`'s (extended per D6); this skill owns the data
-you ingest and the pipelines you run.
+anchoring its AI security map to the OWASP Top 10 for LLM Applications;
+decision D65 (2026-09-26) moved that anchor to the 2026 edition (LLM05 was
+LLM04 in 2025; 2026 adds fine-tuning subversion to this category). The scope
+is the pipelines you run that influence what the model learns or treats as
+ground truth: training and fine-tuning datasets, RLHF/feedback loops, and the
+RAG/embedding INGESTION path (which turns external content into retrievable
+"truth"). The output is severity-ranked findings, each with a concrete
+poisoning path (attacker input → corrupted behavior) and the provenance,
+curation, and validation controls that close it. Acquisition of third-party
+models/datasets/adapters is `supply-chain-security-reviewer`'s (extended per
+D6); this skill owns the data you ingest and the pipelines you run.
 
 ## Use When
 
@@ -39,6 +40,9 @@ you ingest and the pipelines you run.
 - Do NOT use when: acquiring a third-party base model, dataset, or adapter
   (`supply-chain-security-reviewer`) or defending inference-time injection
   (`prompt-injection-defender`).
+- Do NOT use when: the concern is an agent's own persistent memory or stored
+  context across sessions (`memory-context-poisoning-reviewer`, OWASP Agentic
+  ASI06) — this skill covers training-time and ingestion integrity.
 
 ## Inputs to Inspect
 
@@ -72,10 +76,11 @@ you ingest and the pipelines you run.
 4. **Review training/fine-tuning integrity.** Provenance of every source,
    curation/review before use, label integrity (label-flip attacks), and a
    holdout/canary evaluation that would CATCH a behavior shift before it ships.
-5. **Review feedback loops.** Can an attacker mass-signal (Sybil thumbs-up on
-   bad answers, coordinated corrections) to steer the next update? Require
-   rate/identity controls on feedback, human review before feedback becomes
-   training data, and anomaly detection on feedback distributions.
+5. **Review feedback loops.** Can an attacker mass-signal (Sybil thumbs-up —
+   many fake accounts voting — on bad answers, coordinated corrections) to
+   steer the next update? Require rate/identity controls on feedback, human
+   review before feedback becomes training data, and anomaly detection on
+   feedback distributions.
 6. **Review ingestion integrity.** External content indexed as ground truth is
    a poisoning vector: an attacker plants a document engineered to rank for a
    target query (steering answers) or to carry an injection payload (hand the
@@ -146,7 +151,8 @@ Not applicable: <pipeline absent — reason> | Not reviewed: <+ why>
   accuracy won't reveal it; adversarial-trigger evaluation might.
 - Ingestion-as-truth: RAG indexing of open web/user content means an attacker
   who gets a document indexed can steer answers for a target query — this is
-  poisoning (integrity), separate from retrieval authz (rag-security-architect).
+  poisoning (integrity), separate from retrieval authorization
+  (rag-security-architect).
 - Label-flip attacks: poisoning the LABELS (not just inputs) in
   crowd/user-sourced training data is easy to miss without label-integrity
   review.
@@ -167,8 +173,8 @@ Not applicable: <pipeline absent — reason> | Not reviewed: <+ why>
   human incident owner using the current approved runbook. The
   `incident-response-runbook` skill may author or update that runbook; it does
   not run the incident. Containment and rollback are human decisions.
-- The concern is retrieval authorization, third-party artifact acquisition, or
-  inference-time injection — hand to the owning skill.
+- The concern is retrieval authorization, third-party artifact acquisition,
+  inference-time injection, or agent memory — hand to the owning skill.
 - Remediation requires retraining, purging data, or rolling back a model —
   propose it; execution is a classified, approved step
   (`human-approval-boundary`).
