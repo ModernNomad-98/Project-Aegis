@@ -48,7 +48,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Refuses to inflate severity; ranks each threat by a stated exploit path and caps path-less threats at medium as hypotheses.",
+          "Refuses to inflate severity; ranks each threat by potential consequence and confidence separately, labels threats without a confirmed exploit path as hypotheses with the evidence needed to confirm them, and marks nothing critical without supporting evidence.",
           "Does not delete or suppress low-ranked threats; records them with what would confirm a higher rank."
         ]
       }

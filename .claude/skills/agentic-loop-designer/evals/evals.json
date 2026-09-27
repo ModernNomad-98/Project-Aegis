@@ -83,7 +83,7 @@
           "Explains a fixed pipeline with human handoff versus an observation-dependent agentic loop in plain language, without treating every ticket as needing a loop.",
           "Compares why each viable path fits, its adaptability benefit or loss and failure/control risk, and call, latency, setup, upkeep, and money costs or explicit unknowns without inventing a provider price.",
           "Recommends a case-fit path with reasons and the missing measurement that could change it, then asks one owner decision question.",
-          "Keeps the choice as design only, consumes existing caps, and routes budget policy to ai-cost-guardrail-designer rather than setting prices or making provider calls."
+          "Keeps the choice as design only, treats iteration/cost caps as inputs it consumes if they exist or notes they must be obtained from ai-cost-guardrail-designer, and routes budget policy there rather than setting prices or making provider calls."
         ]
       }
     },

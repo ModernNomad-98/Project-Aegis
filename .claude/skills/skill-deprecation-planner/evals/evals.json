@@ -25,7 +25,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Uses the absorbed trigger: names the base skill and the extension diff that carries the surviving content before any retirement staging.",
+          "Uses the absorbed trigger: identifies the base skill and the extension diff that will carry the surviving content (from the review verdict or repo, or by asking for them when absent) and blocks retirement staging until that diff exists.",
           "Treats the make-it-an-extension verdict as the trigger evidence, citing it rather than re-litigating the quality judgment.",
           "Plans the seam cleanup: the base skill's description/trigger-evals absorb or re-route any discrimination cases that referenced the retiring skill.",
           "Keeps the extension diff and the retirement as separately reviewable steps rather than one entangled change."

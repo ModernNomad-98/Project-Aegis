@@ -24,7 +24,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Explains in plain language what the SoA and separate per-standard decisions mean, then compares two SoAs with one combined document: reasons to choose each, staff or licensing costs and unknowns, review and audit tradeoffs, and a case-fit recommendation before asking the owner for one format choice.",
+          "Explains in plain language what the SoA and separate per-standard decisions mean, compares two SoAs with one combined document (reasons, staff or licensing costs and unknowns, review and audit tradeoffs), and, because the prompt does not say whether the two standards share one owner and review cycle, asks exactly one discovery question for that fact and makes no firm format recommendation this turn.",
           "Keeps applicability decisions distinct per standard — 42001 Annex A entries treated as control objectives and controls per that standard's structure, not as 27001 clones.",
           "Requires the licensed Annex A tables for BOTH standards before writing rows."
         ]

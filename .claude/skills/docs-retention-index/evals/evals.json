@@ -41,9 +41,9 @@
         "assertions": [
           "Explains keep, redirect and remove in plain language, including the successor pointer and grace window where relevant.",
           "For each viable option, gives the reason it fits, pros and cons, setup and ongoing maintenance cost including any money, and reversibility.",
-          "Recommends an option for this runbook and explains why using the reference sweep and retention evidence.",
-          "States the exact action the owner would authorize; does not delete the runbook without explicit human approval.",
-          "Asks exactly one atomic owner question after the comparison; the answer sets the retirement plan only and the skill deletes nothing itself."
+          "Recommends an option for this runbook grounded in the reference sweep and retention evidence it can actually inspect; if the runbook or its inbound references cannot be identified, instead asks one discovery question (such as which file the old runbook is or what still links to it) before recommending, and does not invent sweep results.",
+          "When it recommends, states the exact action the owner would authorize; on either path, does not delete the runbook without explicit human approval.",
+          "Asks exactly one atomic question after the comparison (the discovery question or the owner decision); an owner answer sets the retirement plan only and the skill deletes nothing itself."
         ]
       }
     },

@@ -68,7 +68,7 @@
         "triggers": true,
         "assertions": [
           "Refuses the read-only-is-harmless premise: OLAP-shaped scans compete for IO, locks, and connections on the primary regardless of being reads.",
-          "Requires the workload to be classified and its freshness tolerance stated, then offers the cheapest adequate mechanism instead.",
+          "Requires the workload to be classified and its freshness tolerance obtained from the dashboard's owner (asked, not assumed), and does not commit to an offload mechanism on an assumed tolerance; it may name candidate mechanisms only as conditional on that tolerance and the interference evidence.",
           "If a temporary exception is granted anyway, requires it to be a recorded human decision with an expiry and the stop-doing enforcement to prevent quiet permanence.",
           "Does not sign off as requested."
         ]
