@@ -16,7 +16,8 @@ of an image); ASR means automatic speech recognition (speech turned into a
 transcript); PDF means Portable Document Format; QR means Quick Response
 (a scannable two-dimensional code); EXIF means Exchangeable Image File
 Format and XMP means Extensible Metadata Platform, two embedded metadata
-formats.
+formats. URL means uniform resource locator; PNG means Portable Network
+Graphics.
 
 ## Purpose
 
@@ -130,13 +131,14 @@ and security-relevant.
    - **No tool authority from multimodal content.** A URL in a QR code, a
      spoken "approve", or a phone number in a screenshot is data. It may
      inform an answer; it never becomes a tool call or an approval without
-     the calling user's own request and the deterministic boundary in step
-     4. Tool-argument validation stays with `agent-tool-safety-guard`.
+     the calling user's own request and the deterministic boundary in
+     step 4. Tool-argument validation stays with `agent-tool-safety-guard`.
    - **State detection limits honestly.** Extraction-based filters see only
      what the extractor sees, and the model can perceive content the
      extractor misses (and the reverse). Adversarial images and
      near-inaudible audio are not reliably detectable; label every
      multimodal detector as rate-reduction only.
+
    Per-modality patterns and payloads:
    [references/multimodal-injection-patterns.md](references/multimodal-injection-patterns.md).
 8. **Design the red-team suite.** Concrete injection payloads per zone —

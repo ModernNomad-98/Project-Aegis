@@ -16,7 +16,7 @@ Exchangeable Image File Format and **XMP** means Extensible Metadata
 Platform, two embedded metadata formats; **URL** means uniform resource
 locator; **UI** means user interface.
 
-## Seam with neighbouring skills
+## Seam with neighboring skills
 
 | Question | Owner |
 |---|---|
@@ -34,7 +34,7 @@ reviews are complementary; neither replaces the other.
 
 | Modality | Hiding places | What reads it |
 |---|---|---|
-| Image | Visible text in a screenshot or photo; low-contrast, tiny, or edge-of-frame text; text overlaid on busy backgrounds; QR codes; adversarially perturbed pixels | Vision model directly; OCR |
+| Image | Visible text in a screenshot or photo; low-contrast, tiny, or edge-of-frame text; text overlaid on busy backgrounds; QR codes; adversarially perturbed pixels | Vision model directly; OCR; QR or barcode decoder |
 | Audio | Spoken instructions in a voice note or meeting recording; speech mixed under music or noise; near-inaudible or high-frequency commands; synthetic voice impersonating the user | Audio model directly; ASR transcript |
 | Document | Hidden text layers, white-on-white or zero-size text, off-page objects, comments and annotations, form fields, embedded files, text behind images | Document parser; OCR of rendered pages; vision model on page images |
 | Video | A single frame carrying text, subtitle or caption tracks, the audio track | Frame sampler plus vision; ASR; caption parser |
@@ -50,9 +50,9 @@ the model or extractor reads but a human reviewer does not notice.
 
 1. Extract with a named tool (OCR, ASR, PDF text or layer extraction,
    caption parser, metadata reader).
-2. Normalize: collapse invisible and zero-width characters, and flag
+2. Normalize: strip or flag invisible and zero-width characters, and flag
    content not visible in the rendered view (hidden layers, off-page text,
-   near-background colour, metadata).
+   near-background color, metadata).
 3. Label: wrap the output as untrusted data in the demarcated channel with
    provenance, for example
    `<untrusted_media source="upload-123.pdf" modality="document" extractor="pdf-text">…</untrusted_media>`.
@@ -101,7 +101,7 @@ actor.
 - Adversarial perturbations and near-inaudible audio are not reliably
   detected by current filters; treat none as closing the class.
 - A mismatch between the human-visible render and the extracted text (a
-  hidden layer, text the same colour as the background) is a useful
+  hidden layer, text the same color as the background) is a useful
   signal. Log and flag it; do not treat its absence as proof of safety.
 - Label every multimodal detector as rate-reduction; the action boundary
   remains the control that holds.
