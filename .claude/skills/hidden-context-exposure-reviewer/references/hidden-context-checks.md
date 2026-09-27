@@ -22,10 +22,10 @@ edition text as a verification item when it is revised.
   2026 large language model threat category for hidden context exposure.
 - **Hidden context:** any non-user-facing content the application places in
   the model's context window.
-- **API / JSON / MCP / OAuth / IP / PII / RAG:** application programming
-  interface, JavaScript Object Notation, Model Context Protocol, Open
-  Authorization, Internet Protocol, personally identifiable information, and
-  retrieval-augmented generation.
+- **API / JSON / MCP / OAuth / IP / PII / RAG / URL:** application
+  programming interface, JavaScript Object Notation, Model Context Protocol,
+  Open Authorization, Internet Protocol, personally identifiable information,
+  retrieval-augmented generation, and uniform resource locator.
 - **RBAC / UX:** role-based access control and user experience.
 
 ## Step 0 — inventory
@@ -177,8 +177,8 @@ best.
   (`memory-context-poisoning-reviewer`), inter-agent channels
   (`inter-agent-comms-reviewer`), tool configuration persistence, and
   multi-step agent compromise (`agent-tool-safety-guard`,
-  `agent-containment-reviewer`) — are covered by the OWASP Agentic Top 10,
-  not LLM08.
+  `agent-containment-reviewer`) — are covered by the OWASP Top 10 for
+  Agentic Applications, not LLM08.
 - Generic application security is out of LLM08 scope: client-bundle secrets
   → `secrets-identity-hardener` (manual-only; invoke explicitly); server-side
   log leakage and infrastructure-layer side channels → `threat-modeler`

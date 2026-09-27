@@ -14,7 +14,7 @@ retrieved policy text, tool and function schemas, and other rules or
 directives. LLM means large language model, RAG is retrieval-augmented
 generation, MCP is the Model Context Protocol, RBAC is role-based access
 control, API is application programming interface, JSON is JavaScript Object
-Notation, and UX is user experience.
+Notation, URL is uniform resource locator, and UX is user experience.
 
 ## Purpose
 
@@ -140,11 +140,10 @@ or no security impact, not that it cannot be disclosed.
    that meaningfully aids an attacker but does not gate critical decisions;
    Aegis reads the official LLM08 entry's example Scenario #2 — an
    extracted tool list with parameter schemas, no credential disclosed and
-   no control bypassed — as medium); *high* (embedded credentials or tokens, or
-   reliance on hidden-context secrecy for authorization or content
-   policy); *critical*
-   (disclosure chains to remote code execution, broad data exfiltration, or
-   privilege escalation in a connected system).
+   no control bypassed — as medium); *high* (embedded credentials or
+   tokens, or reliance on hidden-context secrecy for authorization or
+   content policy); *critical* (disclosure chains to remote code execution,
+   broad data exfiltration, or privilege escalation in a connected system).
 6. **Assess extraction, then de-emphasize it.** Note how easily each source
    leaks (it will, including by inference from tool behavior), but frame the
    fix as removing what MATTERS if it leaks — never as making hidden context
