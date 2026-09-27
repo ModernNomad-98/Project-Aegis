@@ -166,8 +166,10 @@ Not reviewed: <areas + why>
 - The tenant-isolation model itself is undefined — get `tenant-modeler` /
   `multi-tenant-data-architect` output first; retrieval scoping needs a tenant
   definition to enforce.
-- A review finds an active cross-tenant leak in production — route to
-  `incident-response-runbook`; containment is a human decision.
+- A review finds an active cross-tenant leak in production — report it to
+  the human incident owner, who follows the approved response runbook;
+  containment is a human decision. The `incident-response-runbook` skill
+  only authors procedures.
 - The real issue is injected instructions, corpus poisoning at training time,
   or completion-side disclosure — hand to the owning skill.
 
