@@ -168,7 +168,7 @@ best.
 - Injection (input changing behavior) → `prompt-injection-defender`
   (manual-only); pairs with this skill.
 - Regulated user or training data (not the application's control context) →
-  `sensitive-disclosure-guard` (LLM02).
+  `sensitive-disclosure-guard` (LLM02 Sensitive Information Disclosure).
 - Who may retrieve which documents → `rag-security-architect` (LLM09 Vector
   and Embedding Weaknesses).
 - Tool permission matrix, argument validation, approval gates →
