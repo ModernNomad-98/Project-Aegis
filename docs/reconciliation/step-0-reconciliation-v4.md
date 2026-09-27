@@ -19,8 +19,13 @@ of the [300-skill roadmap](../300-repeatable-software-saas-skills-roadmap.md);
 ROUTE-002 is the skill contract audit finding for a one-way exclusion, where one
 skill routes work away to a neighbour that never names it back; BER means the
 Behavioral Eval Runner; WP means work package, the governing delivery unit in
-the [BER backlog](../roadmaps/behavioral-eval-runner-backlog.md); and OD-1 is
-owner decision 1 in that backlog.
+the [BER backlog](../roadmaps/behavioral-eval-runner-backlog.md); OD-1 to OD-3
+are owner decisions 1 to 3 in that backlog; AEGIS-APR-007 and similar IDs name
+grants in the [owner approval register](../approvals/APPROVAL_REGISTER.md); and
+AEGIS-060 is a contract audit finding ID from the
+[AEGIS-060+ register](../audits/aegis-060-plus-register.md). "family N" is the
+Nth skill family in the README roster. There is no D40 entry; D41 and D42 use
+"D40" for a read-only discovery that was never recorded as its own decision.
 
 **Prepared:** 2026-07-06
 **Repo:** `nguyenpv1980-wq/Claude-Skills`
@@ -2989,6 +2994,7 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     `scripts/tests/`, so **`gate-guard` is RED by design** and the merge is a human admin
     merge (the D43/D50/D55/D60 precedent); `validate-skills` must be green. Auto-merge
     left unarmed (this repo's PR-no-merge policy).
+
 ---
 
 - **D62 (2026-09-11) — Keep recovery continuation in GitHub.** Following the
@@ -3071,7 +3077,7 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     `human-approval-boundary`.
   - **Registration.** Joins the Phase 3 SaaS & tenant isolation pack
     (family 4, 9→10; FAMILY-COUNT stays 23). Catalog Phase 3 row and history
-    paragraph, README Phase 3 row, family line and D-table row; README
+    paragraph, README Phase 3 row, family line and decision-table row; README
     `SKILL-COUNT` 185→186.
   - Validator: **186 skills**; description under the 1024-character cap. To
     be checked by `skill-quality-reviewer` and `library-diff-reviewer` for
@@ -3162,6 +3168,17 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
 
 ## 6. Post-merge corrections
 
+- **2026-09-27 — D65 amendment: open gaps closed.** All four gaps D65
+  listed now have an owning skill (2026 IDs). LLM08, hidden context beyond
+  the system prompt: D66, PR #409 (`4416c6d`). LLM01, injection hidden in
+  images, audio or other non-text input: PR #427 (`0030e73`) extended
+  `prompt-injection-defender`. LLM10, review of AI-generated code: PR #424
+  (`5711ddf`) extended `llm-output-safety-reviewer`. LLM04, trust in the model
+  artifact promoted to production: PR #428 (`0cb0777`) extended
+  `supply-chain-security-reviewer`. No skill was added; the count stays 186.
+  D65's text above is unchanged. See the
+  [OWASP LLM threat catalog](../../.claude/skills/ai-threat-modeler/references/llm-top10-threat-catalog.md).
+
 - **2026-09-26 — D64 amendment.** PR #395 (`741b29a`) added a reciprocal
   `plan-entitlement-architect` → `feature-flag-architect` yield. The owner
   kept it on 2026-09-26, so four (not five) one-way D64 ROUTE-002 findings
@@ -3172,8 +3189,8 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
 
 - **2026-09-12 — Current backlog labels reconciled.** At the owner's request,
   corrected stale completion labels against merged PRs #83/#85/#87/#89 and the
-  shipped skill directories. BER-BKL-001/-004/-006/-008 are complete for their
-  scoped offline deliverables; real-host gates and OD-1/OD-2/OD-3 remain open.
+  shipped skill directories. Backlog items BER-BKL-001/-004/-006/-008 are
+  complete for their scoped offline deliverables; real-host gates and OD-1/OD-2/OD-3 remain open.
   D12.2/.4/.5/.6/.7 and `docs-retention-index` are implemented. The older
   AEGIS-060 candidate on the calibration branch is explicitly superseded by
   merged main's rejection. Partial schema/policy work remains visible. See the
