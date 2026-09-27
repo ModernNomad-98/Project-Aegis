@@ -60,7 +60,7 @@ also closed one edge added by reconciliation decision D64. Of the other 236,
 Companion to the frozen AEGIS-001..059 baseline
 ([Project-Aegis-VolunteerFlow-Defect-Handoff-AEGIS-001-to-059.md](volunteerflow/Project-Aegis-VolunteerFlow-Defect-Handoff-AEGIS-001-to-059.md))
 and the corpus contract audit (`scripts/audit-skill-contracts.py`; baseline
-run: [`docs/audits/skill-contract-audit-baseline.md` at `e2f1da0`](https://github.com/ModernNomad-98/Project-Aegis/blob/e2f1da0beb6e4aed07044ca3a90e841962bfd590/docs/audits/skill-contract-audit-baseline.md),
+run: [`docs/audits/skill-contract-audit-baseline.md` at `6561944`](https://github.com/ModernNomad-98/Project-Aegis/blob/656194426e2ea3358fa29fcf19e05f0278d9c270/docs/audits/skill-contract-audit-baseline.md),
 corpus tree `08727adf8f3e0f54226fa18639c9a50f2562ed22`, 184 skills).
 
 **Baseline files regenerated, 2026-09-27.** By owner decision, the baseline
@@ -68,8 +68,11 @@ report and its three `artifacts/audits/` JSON (JavaScript Object Notation)
 files were overwritten with a fresh engine v1.13.1 audit of main (186 skills,
 317 findings). The numbers in sections 1–5 of this register still describe the
 v1.12.0 baseline (184 skills, 414 findings); those files remain in git history
-at commit `e2f1da0beb6e4aed07044ca3a90e841962bfd590` (PR #77), which the links
-here point to. The historical counts below are unchanged.
+at commit `e2f1da0beb6e4aed07044ca3a90e841962bfd590` (PR #77). The report
+link above points to its last copy, at commit
+`656194426e2ea3358fa29fcf19e05f0278d9c270`, which adds the 2026-09-23 note
+that its five EVAL-004 rows are rejected false positives; its measurements
+are unchanged from `e2f1da0`. The historical counts below are unchanged.
 
 Rules of this register (from the program's operating rules):
 

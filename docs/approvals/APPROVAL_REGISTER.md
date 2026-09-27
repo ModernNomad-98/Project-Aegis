@@ -1468,8 +1468,9 @@ generic skill guidance that would require asking for the same approval again.
   library role check only tests that the baseline JSON (JavaScript Object
   Notation) file exists.
 - **Owner decision:** In chat with the Claude Code coordinator on 2026-09-27,
-  after being told the costs (the earlier "left exactly as it is" promise in
-  the AEGIS-060+ register is superseded, and the old numbers survive only in
+  after being told the costs (it breaks comparisons with past audits, touches
+  a source-library landmark file, supersedes the earlier "left exactly as it
+  is" promise in the AEGIS-060+ register, and leaves the old numbers only in
   git history), the owner chose to overwrite the baselines with that day's
   audit numbers. The decision was relayed by the coordinating agent; no
   verbatim wording is recorded here.
