@@ -173,7 +173,7 @@ for how to get it running first). This one message is the whole on-ramp:
 > never move to coding until the earlier stage is confirmed."
 
 You don't have to name a skill: `project-orchestrator` picks this up automatically, works out
-where your project is, and drives the rest. That automatic selection is model-driven behavior enabled by the repo's startup instructions (`CLAUDE.md` for Claude Code, `AGENTS.md` for Codex) — verified by a live acceptance test on 2026-07-30 against the startup files from decision D61 in the [planning record](docs/reconciliation/step-0-reconciliation-v4.md) ([test record](docs/audits/volunteerflow/Project-Aegis-VolunteerFlow-Defect-Handoff-AEGIS-001-to-059.md)), not a mechanical guarantee.
+where your project is, and drives the rest. That automatic selection is model-driven behavior enabled by the repo's startup instructions (`CLAUDE.md` for Claude Code, `AGENTS.md` for Codex) — for Claude Code, most recently checked by a [live acceptance run on 2026-09-27](docs/evidence/startup-routing/2026-09-live-acceptance.md) (8 of 8 scored cases passed, one run each, against the startup files at commit `da2636d`), not a mechanical guarantee. Codex routing through `AGENTS.md` was not part of that run. An earlier live test ran on 2026-07-30 against the startup files from decision D61 in the [planning record](docs/reconciliation/step-0-reconciliation-v4.md) ([test record](docs/audits/volunteerflow/Project-Aegis-VolunteerFlow-Defect-Handoff-AEGIS-001-to-059.md)).
 
 **What it actually feels like.** A short, real exchange — not the whole interview, just enough to
 show the shape of it:
