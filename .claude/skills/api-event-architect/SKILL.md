@@ -101,8 +101,9 @@ promise explicit before integrations harden around accidents.
    and cons (partner trust vs how many versions run at once), and its money
    (hosting and support for concurrent versions), setup, and upkeep cost, or
    unknown. If the partner profile or release cadence is missing, ask only
-   for that fact first; otherwise recommend one, say why and what fact
-   would change it, then ask exactly one owner question. Each later sunset is planned within this
+   for one missing fact per turn until both are known; only then recommend
+   one, say why and what fact would change it, then ask exactly one owner
+   question. Each later sunset is planned within this
    policy by `sunset-deprecation-communicator`. The answer sets policy only;
    it does not by itself authorize a breaking change (see Stop Conditions).
 6. **Build the event taxonomy and schemas** using

@@ -113,8 +113,9 @@ weakened.
    targeting and ramp rules belong to `feature-flag-rollout-strategist`.
    Mark unknown
    costs as unknown and verify current prices if exact spend matters.
-   Ask one discovery question before recommending when a decisive fact is
-   missing; if the user must choose, ask one atomic decision question.
+   If decisive facts are missing, ask only for one missing fact per turn
+   until all are known; only then recommend, and if the user must choose,
+   ask one atomic decision question.
    Hand the chosen primitive to `rollback-runbook-author` for a rehearsed
    procedure. No strategy choice grants deployment authority.
 6. **Align branch protection**: required checks list matches the
@@ -152,7 +153,8 @@ Environments & promotion: <environment → secrets scope → approvers →
   primitive; viable alternatives, infrastructure money (estimate or explicit
   unknown), setup effort and monitoring/operating upkeep>
 Owner decision: <when needed, one atomic strategy question after recommendation;
-  if decisive context is missing, one discovery question first>
+  while decisive facts are missing, only one discovery question per turn and
+  no recommendation>
 Branch protection: <required checks (must equal merge-blocking stages),
   bypass list, review rules>
 Files changed: <pipeline definition diffs — or "design only, no files
@@ -185,8 +187,9 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
       explicit unknown, plus setup effort and ongoing monitoring/operating
       upkeep; unknown prices are not invented.
 - [ ] If owner choice is needed, the output asks one atomic decision
-      question after the explanation, or one discovery question first when
-      decisive context is missing; no deploy authority is inferred.
+      question after the explanation; while decisive facts are missing it
+      asks only one discovery question per turn and makes no recommendation
+      until all are known; no deploy authority is inferred.
 - [ ] Actions/steps are version-pinned; no check was weakened or removed
       without a named approval.
 - [ ] Test-tier internals, supply-chain audit, and release go/no-go were

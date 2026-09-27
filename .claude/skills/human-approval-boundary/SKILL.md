@@ -55,7 +55,8 @@ exact action and impact so the human can decide in one read.
    why each viable path is considered, its benefits, drawbacks, and money,
    setup-time, and upkeep costs (or unknowns). If an essential fact (such as
    budget or maintenance capacity) would change the recommendation, ask only
-   for that fact first; otherwise recommend the path that fits the known goals
+   for one missing essential fact per turn until all are known; only then
+   recommend the path that fits the known goals
    and constraints, with a reason, then ask exactly one atomic path question.
    Keep approval of a single
    prepared action concise; do not invent a build-path comparison for it.
@@ -91,8 +92,10 @@ Awaiting explicit approval — halted until answered.
 - [ ] The request names the exact action, not a vague category.
 - [ ] Reversibility stated honestly, including "irreversible" when true.
 - [ ] Options include do-nothing; a recommendation is given.
-- [ ] A build-path choice explains terms, reasons, trade-offs, costs or unknowns,
-      and a context-based recommendation; a simple action approval stays concise.
+- [ ] A build-path choice explains terms, reasons, trade-offs, costs or unknowns;
+      while an essential fact is missing it asks only for one such fact per turn
+      and gives no path recommendation, and once all are known it gives a
+      context-based recommendation; a simple action approval stays concise.
 - [ ] Approval scope recorded; nothing outside it executed.
 - [ ] Low-risk work was NOT gated (no approval theater).
 
