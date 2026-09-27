@@ -1,8 +1,15 @@
 # Flag system sheet
 
-Lookup material for `feature-flag-architect`. Read on demand from the
-Workflow. Nothing here authorizes signing up, paying, adding an SDK, or
-changing a live system.
+Lookup material for the [feature-flag-architect](../SKILL.md) skill, read
+on demand from its Workflow steps 2, 4 and 6–9. Nothing here authorizes signing up,
+paying, adding an SDK (software development kit: the client library a flag
+service ships), or changing a live system. **TTL** (time to live) is how
+long a cached value is kept before it is refreshed; **UI** means user
+interface. **Edge** means servers at the network edge, close to the user,
+rather than your application servers. **First paint** is the moment a
+browser first draws the page. **Data residency** is a requirement that data
+stay in a named country or region. A **break-glass** change is an audited
+emergency action taken outside the normal approval path.
 
 **Volatility notice.** Flag products, open-source projects and their prices
 change often. This sheet names categories, not products, on purpose. Verify
