@@ -63,7 +63,7 @@
         "triggers": true,
         "assertions": [
           "Records the nine-axis requirements, marking counsel's residency answer as verified and the credits as unconfirmed, and applies hard filters before comparing options.",
-          "Explains hyperscaler, container PaaS, managed SSR host, Postgres-BaaS, managed-vs-self-hosted, and lock-in/exit cost in plain language, and states why each surviving pattern-provider option is viable for this two-engineer team.",
+          "Explains hyperscaler, app platform (PaaS), frontend/SSR host, Postgres-BaaS, managed-vs-self-hosted, and lock-in/exit cost in plain language, and states why each surviving pattern-provider option is viable for this two-engineer team.",
           "Gives pros and cons per option, including each option's ceiling, exit profile, and the operational surface the team would own, plus money, setup, delivery-time, and upkeep costs, with platform pricing, free tiers, and the credit amount labeled unknown or verification items rather than invented.",
           "Recommends the least operationally demanding compatible option that meets verified constraints, explains why, names reopen triggers, and then asks exactly one clear owner decision question instead of deciding silently.",
           "Hands off per the chosen pattern: the decision record to adr-writer, per-tenant cost modeling to saas-cost-architect, and either aws-saas-architect or the tenancy, RLS, and deploy owners, without improvising a service map."

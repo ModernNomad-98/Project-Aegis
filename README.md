@@ -362,13 +362,20 @@ you've copied skills into) and prompt the same way, with nothing installed; it w
 browser and the Claude mobile app (iOS and Android). One honest caveat: it works on the
 cloud copy of the repository, not on the files on your machine.
 
-**Option 6 — Claude.ai / the Claude apps (no Claude Code at all).** Without Claude Code you don't get
-automatic `.claude/` discovery — but the skills are just Markdown procedures, so you can
-still use them. Open the `SKILL.md` you want (from GitHub or a local clone) and paste its
-content into your project's custom instructions / project knowledge, or reference the pattern
-directly in the conversation. This gives you the procedure and its discipline; it does
-**not** give you the automatic trigger selection, the read-only subagents, or the CI
-validator — those are Claude Code features.
+**Option 6 — Claude.ai / the Claude apps (no Claude Code).** The Claude apps don't read your
+repo's `.claude/` folder, but they can use Aegis skills you upload. Zip one skill folder (for
+example `.claude/skills/tdd-engineer/`, with `SKILL.md` inside) and upload it under
+**Customize > Skills** (**+**, then **Create skill**, then **Upload a skill**). Code execution
+must be on: on Free, Pro and Max, turn on **Code execution and file creation** under
+**Settings > Capabilities**; on Team and Enterprise, an owner turns on code execution and
+**Skills** under **Organization settings > Plugins & skills**. With that on, Claude uses
+uploaded skills automatically when they're relevant, so you don't have to invoke them (checked
+2026-09-26 against [Using Skills in Claude](https://support.claude.com/en/articles/12512180-using-skills-in-claude)).
+You still don't get Claude Code's read-only subagents, the repo-wide startup routing in
+`CLAUDE.md`/`AGENTS.md`, or the CI validator. Manual-only (`MANUAL-ONLY`) skills rely on a
+Claude Code frontmatter field, so don't upload them unless you're willing to rely on the
+description sentinel alone. As a lighter fallback, paste a `SKILL.md` into project
+instructions or the conversation.
 
 #### Using the skills in your own project
 
