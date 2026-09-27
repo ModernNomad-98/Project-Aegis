@@ -72,10 +72,10 @@ practical terms, Aegis can make your coding agent act as:
 | **a software-as-a-service (SaaS) platform and multi-tenancy architect** | Designs how many customers share one system without ever seeing each other's data. | `saas-platform-architect`, `tenant-isolation-reviewer` |
 | **an application security and row-level security (RLS) specialist** | Hardens the app and locks down exactly who can read which rows in the database. | `rls-policy-auditor`, `security-pr-reviewer` |
 | **a quality assurance (QA) automation and Playwright engineer** | Builds automated tests that click through your app like a real user and catch breakage before customers do. | `playwright-e2e-engineer`, `qa-automation-architect` |
-| **a cloud, DevOps and reliability architect** | Decides where and how it runs in production — and keeps it up. | `cloud-architecture-decider`, `slo-reliability-architect` |
+| **a cloud, DevOps (development and operations) and reliability architect** | Decides where and how it runs in production — and keeps it up. | `cloud-architecture-decider`, `slo-reliability-architect` |
 | **an AI security and agentic-red-team architect** | Attacks your own AI features before an outsider does — prompt injection, data leaks, runaway agents. | `ai-threat-modeler`, `prompt-injection-defender` |
 | **an AI agent operating-environment architect** | Designs how your AI agent runs safely — what it's allowed to do, what it can see, and when it stops — so it can't overreach, leak data, or run away. | `agent-harness-architect`, `model-context-designer`, `agentic-loop-designer` |
-| **an ISO 27001, ISO 42001 and SOC 2 readiness advisor** | Gets you audit-ready for the security and AI-governance certifications enterprise customers ask for. | `iso-27001-isms-architect`, `soc2-trust-criteria-mapper` |
+| **an ISO 27001, ISO 42001 and SOC 2 readiness advisor** | Gets you audit-ready for what enterprise customers ask for: International Organization for Standardization (ISO) certification for security (27001) and AI governance (42001), and a System and Organization Controls 2 (SOC 2) attestation report. | `iso-27001-isms-architect`, `soc2-trust-criteria-mapper` |
 | **a product discovery and specification facilitator** | Interviews you to turn a vague idea into clear written requirements and a spec. | `requirements-gathering-facilitator`, `product-spec-writer` |
 | **a product analytics and experimentation architect** | Decides what to measure and runs honest A/B tests, so decisions rest on evidence, not guesses. | `product-analytics-instrumenter`, `ab-test-designer` |
 | **a technical writer and documentation engineer** | Writes the docs — READMEs, guides, application programming interface (API) references — and keeps them from drifting out of date. | `readme-craftsman`, `docs-as-code-architect` |
@@ -88,7 +88,7 @@ practical terms, Aegis can make your coding agent act as:
 ### Start here: pick your path
 
 You never have to pick from the list above yourself — describe your situation to your agent
-tool (Claude Code, Codex CLI, or any Agent Skills tool) and Aegis selects and coordinates the
+tool (Claude Code, OpenAI's Codex command-line interface (Codex CLI), or any Agent Skills tool) and Aegis selects and coordinates the
 right role for each step. Find the sentence that sounds like you: each door leads to a short
 guided path through the right skills, in the right order. (Auto-selection quality varies by
 tool — Claude Code reads the full skill descriptions; some tools' native selection reads only
@@ -280,16 +280,16 @@ below starts from. Later, run `git pull` from the same folder to update to the l
 [JetBrains](https://code.claude.com/docs/en/jetbrains),
 [Desktop](https://code.claude.com/docs/en/desktop),
 [web](https://code.claude.com/docs/en/claude-code-on-the-web) and
-[Cursor skills](https://cursor.com/docs/context/skills) pages; product plans, UI and
+[Cursor skills](https://cursor.com/docs/context/skills) pages; product plans, user interfaces and
 third-party behavior change — the linked official pages win.*
 
 **One engine, many surfaces.** Claude Code is one engine available on several surfaces —
-the terminal, VS Code (and forks like Cursor), JetBrains IDEs, a Desktop app, the web,
+the terminal, VS Code (and forks like Cursor), JetBrains integrated development environments (IDEs), a Desktop app, the web,
 and the Claude mobile app. The skills in `.claude/skills/` load the same way on every
 local surface, so pick whichever matches how you work. The current full list is at
 [https://code.claude.com/docs/en/platforms](https://code.claude.com/docs/en/platforms).
 
-**Option 1 — Claude Code CLI (terminal, any OS, works alongside any editor).**
+**Option 1 — Claude Code CLI (terminal, any operating system, works alongside any editor).**
 
 1. Install Claude Code — follow the install steps on the official docs at
    [https://code.claude.com/docs](https://code.claude.com/docs). It requires a Claude
@@ -419,7 +419,7 @@ format if you want to write your own.
 
 #### Using Aegis with Codex CLI and other Agent Skills tools
 
-Aegis skills use the open Agent Skills format — one `SKILL.md` with YAML frontmatter per
+Aegis skills use the open Agent Skills format — one `SKILL.md` with frontmatter (a short settings block written in YAML, a plain-text data format) per
 skill — the same format Claude Code, OpenAI Codex, Cursor, Gemini CLI and other tools
 consume (as verified 2026-09-26 against the [Agent Skills client list](https://agentskills.io/home)).
 Two ways in:
@@ -616,7 +616,7 @@ keeps a human as the approval gate on anything irreversible. See
     `merge-is-deploy-governance`.
 13. **Data + performance engineering & load validation** *(D23, 15)* — the data plane and its
     speed: schema evolution, streaming, data quality, warehouse/lake, PII; profiling, query
-    plans, N+1, caching, latency; plus perf/load test harnesses. *e.g.*
+    plans, N+1 queries (one query per item instead of one batched query), caching, latency; plus perf/load test harnesses. *e.g.*
     `schema-evolution-planner`, `pii-lifecycle-designer`, `query-plan-reader`,
     `n-plus-one-detector`, `load-test-planner`.
 14. **Product, PM & growth** *(D24, 15)* — turning product intent into shippable, measured work:
@@ -724,6 +724,7 @@ follow the singular entry.
 | Term | Meaning |
 |---|---|
 | A02, A04, A09, A10 | category numbers in the OWASP Top 10:2025 web-application list; A09 is Security Logging and Alerting Failures, A10 is Mishandling of Exceptional Conditions |
+| a11y | accessibility (a, then 11 letters, then y) |
 | A2A | Agent2Agent, an open protocol for agent-to-agent communication |
 | ACL | access control list |
 | AEGIS-APR-nnn | an entry in the [owner approval register](docs/approvals/APPROVAL_REGISTER.md) |
@@ -732,7 +733,7 @@ follow the singular entry.
 | Amd | amendment (as in ISO/IEC 27001 Amd 1:2024) |
 | ASI01–ASI10 | risk numbers in the OWASP Top 10 for Agentic Applications (2026) |
 | authn / authz | authentication / authorization |
-| cat NN #n | category and item number in the [300-skill roadmap](docs/300-repeatable-software-saas-skills-roadmap.md) |
+| cat NN #n, roadmap #n | category and item number in the [300-skill roadmap](docs/300-repeatable-software-saas-skills-roadmap.md) |
 | CDC | change data capture |
 | CDK | AWS Cloud Development Kit |
 | CDN | content delivery network |
@@ -745,13 +746,14 @@ follow the singular entry.
 | DoS | denial of service |
 | ETA | estimated time of arrival (expected completion time) |
 | EU | European Union (as in the EU AI Act) |
+| exfil | exfiltration (data taken out without authorization) |
 | HiPPO | highest-paid person's opinion |
 | IA | information architecture |
 | IAM | identity and access management |
+| IC (in `incident-response-runbook`) | incident commander; elsewhere IC means individual contributor |
 | ID | identifier |
 | IDOR | insecure direct object reference |
 | ISMS | information security management system (ISO/IEC 27001) |
-| ISO | International Organization for Standardization |
 | JWT | JSON Web Token |
 | LLM01–LLM10 | risk numbers in the OWASP Top 10 for LLM Applications (2026) |
 | MCP | Model Context Protocol |
@@ -761,6 +763,8 @@ follow the singular entry.
 | OIDC | OpenID Connect |
 | OTP | one-time password |
 | P0, P1, P2 | priority levels; P0 is the highest |
+| perf | performance |
+| prod | production |
 | RBAC | role-based access control |
 | RCE | remote code execution |
 | RFC | request for comments (a written design proposal) |
@@ -776,7 +780,6 @@ follow the singular entry.
 | SLSA | Supply-chain Levels for Software Artifacts |
 | SOA | service-oriented architecture |
 | SoA | Statement of Applicability (ISO/IEC 27001 and 42001) |
-| SOC 2 | System and Organization Controls 2, an AICPA attestation report |
 | SQL | Structured Query Language |
 | SRM | sample ratio mismatch |
 | SSE | server-sent events |
