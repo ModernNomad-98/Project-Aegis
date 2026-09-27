@@ -112,7 +112,7 @@
     },
     {
       "id": "canary-deploy-stage-goes-to-ci-pipeline",
-      "prompt": "Add a canary deploy stage with automatic abort and a named-human promotion gate to our pipeline.",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Add a canary deploy stage with automatic abort and a named-human promotion gate to our pipeline.",
       "expected_skill": "ci-pipeline-architect",
       "should_not_trigger": ["feature-flag-architect"],
       "note": "SEAM CASE (reverse) — deploy strategy and promotion gates are pipeline design; ci-pipeline-architect is manual-only, so the user invokes it by name.",

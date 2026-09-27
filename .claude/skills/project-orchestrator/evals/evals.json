@@ -146,6 +146,19 @@
       }
     },
     {
+      "id": "should-not-trigger-unnamed-aegis-setup-phrase",
+      "type": "should_not_trigger",
+      "prompt": "Help me set up Aegis",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke project-orchestrator: configuring which Aegis helpers to use is not a product idea or a lifecycle stage question, so there is no stage to detect or route.",
+          "Does not auto-invoke aegis-setup (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute project-orchestrator for it.",
+          "Does not start the requirements interview, create or edit docs/project-state.md, or write any setup state."
+        ]
+      }
+    },
+    {
       "id": "edge-stage2-simple-mvp-all-planning-na",
       "type": "should_trigger",
       "prompt": "I run a small maintenance business and jobs keep getting missed. I want one simple app to log a job, assign someone, and mark it done. That's the whole idea - nothing else competing, no deadline, just help me get it built.",

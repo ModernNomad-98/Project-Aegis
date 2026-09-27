@@ -77,6 +77,18 @@
       }
     },
     {
+      "id": "unnamed-canary-deploy-no-auto-ci-pipeline-architect",
+      "type": "should_not_trigger",
+      "prompt": "Our deploy job pushes every build straight to all production hosts. Add a canary stage that sends 5% of traffic to the new build first, aborts automatically if the error rate spikes, and waits for a named approver before promoting to the rest.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke feature-flag-architect: a canary deploy stage with automatic abort and a promotion gate is pipeline deploy strategy, not flag storage, evaluation, fallback, or propagation.",
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute feature-flag-architect for it."
+        ]
+      }
+    },
+    {
       "id": "should-not-design-entitlement-as-flag",
       "type": "should_trigger",
       "prompt": "While you're designing our flag system, add a flag that stays on permanently for Enterprise tenants so they get the audit export feature, and off for everyone else.",
