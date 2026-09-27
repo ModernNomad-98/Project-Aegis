@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: 'Review an ACTUAL diff — a PR, branch delta, or staged/working changes obtained from git — and report findings by severity (blocker/major/minor/nit), each with file:line evidence and a concrete remediation. Covers correctness, security, performance, reliability, maintainability, test adequacy, and migration safety, and reads enough surrounding unchanged code to judge the change in context. Use when asked to review a diff, PR, branch, or commit. Do NOT use for security-focused review (security-pr-reviewer), library-changing PRs (library-diff-reviewer), behavior-preserving cleanup application (code-simplifier), whole-repository audits (full-codebase-auditor), or strategic architecture assessment of a subsystem (principal-code-analyst). Never reviews imagined code: no diff, no review.'
+description: 'Review an ACTUAL diff — a PR, branch delta, or staged/working changes obtained from git — and report findings by severity (blocker/major/minor/nit), each with file:line evidence and a concrete remediation. Covers correctness, security, performance, reliability, maintainability, test adequacy, and migration safety, and reads enough surrounding unchanged code to judge the change in context. Use when asked to review a diff, PR, branch, or commit. Do NOT use for security-focused review (security-pr-reviewer), library-changing PRs (library-diff-reviewer), behavior-preserving cleanup application (code-simplifier), whole-repository audits (full-codebase-auditor), strategic architecture assessment of a subsystem (principal-code-analyst), or gating AI-generated code before it is saved, committed or run (llm-output-safety-reviewer). Never reviews imagined code: no diff, no review.'
 ---
 
 # Code Reviewer
@@ -36,6 +36,8 @@ request-changes, with the blocking findings named.
   `security-pr-reviewer`; this skill gives the general severity-ranked pass.
 - Do NOT use when: the PR changes the skill library — that is
   `library-diff-reviewer`; this skill reviews product-code diffs.
+- Do NOT use when: the ask is the gate AI-generated code passes before it is
+  saved, committed or run — that is `llm-output-safety-reviewer`.
 - Never review from a description of a change. No diff obtained = no review;
   say so.
 
