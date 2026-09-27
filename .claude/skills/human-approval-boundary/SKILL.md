@@ -28,6 +28,10 @@ exact action and impact so the human can decide in one read.
   files, reading anything) — approval theater erodes the boundary's meaning.
 - Do NOT use when: deciding what validation a change needs — that is
   `change-classification-gate` (it routes here when needed).
+- Do NOT use when: persisting or citing a grant record — that is
+  `scoped-approval-register`; this skill decides whether approval is needed.
+- Do NOT use when: stress-testing approval flows for rubber-stamping — that
+  is `human-agent-trust-reviewer`; this skill places the gates.
 
 ## Inputs to Inspect
 

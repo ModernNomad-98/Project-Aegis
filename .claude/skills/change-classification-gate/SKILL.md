@@ -32,6 +32,9 @@ layer between a request and the discipline the request deserves.
   the stop sign).
 - Do NOT use when: shaping an in-progress diff — that is
   `reviewable-diff-discipline`.
+- Do NOT use when: picking fast vs full validation depth from the touched
+  files — that is `risk-tiered-validation-selector`; this gate sets the
+  approval path and scope lock.
 
 ## Inputs to Inspect
 

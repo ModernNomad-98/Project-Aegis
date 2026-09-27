@@ -47,6 +47,9 @@ does not grant anyone real production access.
 - Do NOT use when: the task is the incident response PLAYBOOK (the steps taken
   during an incident) — that is `incident-response-runbook`; the console's
   tools SERVE that playbook, but the runbook is separate.
+- Do NOT use when: the console is a read-only health view — that is
+  `superadmin-observability-console-designer`; this skill designs the
+  ACTION surface.
 
 ## Inputs to Inspect
 

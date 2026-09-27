@@ -26,6 +26,9 @@ while reconciling is stated with its risk.
   `human-approval-boundary`.
 - Do NOT use when: starting a task and loading context — that is
   `agent-startup-context-gate` (it may HAND OFF here when it finds a conflict).
+- Do NOT use when: sweeping chat-only decisions into repo docs on a cadence
+  — that is `chat-backlog-reconciliation`; this skill resolves a live
+  conflict between sources.
 
 ## Inputs to Inspect
 
