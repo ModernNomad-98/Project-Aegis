@@ -14,7 +14,7 @@ execution; SSRF is server-side request forgery; VM is virtual machine; and
 CPU is central processing unit. SAST is static application security
 testing; CI is continuous integration; PR is pull request; AI is
 artificial intelligence; UI is user interface; DNS is the Domain Name
-System, and A/AAAA are its IPv4/IPv6 address records; LLM10:2026 means
+System, and A/AAAA are its Internet Protocol version 4 and 6 (IPv4/IPv6) address records; LLM10:2026 means
 category LLM10 in the 2026 edition. NL means natural language; `venv` means a
 Python virtual environment; CRLF means carriage-return/line-feed. ASI05 is
 the agentic framework's unexpected-code-execution category, recorded with LLM10

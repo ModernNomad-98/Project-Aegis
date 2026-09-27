@@ -23,7 +23,7 @@ the flow from model output to impact.
 **Reading key:** OWASP is the Open Worldwide Application Security Project;
 LLM means large language model, and LLM10:2026 means category LLM10 in the
 2026 edition of its LLM Top 10. AI means artificial intelligence. HTML is
-HyperText Markup Language; JSX is JavaScript XML; JS is JavaScript; SQL is
+HyperText Markup Language; JSX is JavaScript XML; JS is JavaScript; JSON is JavaScript Object Notation; SQL is
 Structured Query Language; URL is uniform resource locator; HTTP is
 Hypertext Transfer Protocol; I/O means input/output; PII is personally
 identifiable information; CSP is Content Security Policy; SAST is static
