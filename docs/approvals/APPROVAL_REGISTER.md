@@ -1507,8 +1507,8 @@ generic skill guidance that would require asking for the same approval again.
 - **Evidence:** Nine sessions (eight scored cases and one unscored
   reference) ran on 2026-09-27 from 20:06:49 to 20:54:39 UTC and used
   1,444,651 input and 16,725 output tokens in total, far below the
-  20-million-input-token stop. No retry or tenth session ran, no session
-  attempted a write, and the scope in AEGIS-APR-057 was not exceeded. The
+  20-million-input-token stop. No session was retried and no tenth session
+  ran, no session attempted a write, and the scope in AEGIS-APR-057 was not exceeded. The
   [live acceptance record](../evidence/startup-routing/2026-09-live-acceptance.md)
   holds the manifest and token table; [PR #433](https://github.com/ModernNomad-98/Project-Aegis/pull/433)
   merged it as `9104cff1f676b7aef310ec83c0f0966020ec85d5` on 2026-09-27 at
@@ -1633,10 +1633,13 @@ generic skill guidance that would require asking for the same approval again.
   lifecycle event records its consumption.
 - **Date / Grantor:** 2026-09-27 / Peter Nguyen.
 - **Reason:** The baselines written under AEGIS-APR-058 came from engine
-  v1.13.1 at main commit `656194426e2ea3358fa29fcf19e05f0278d9c270`. Three
-  later merges change what the audit reports: PR #424 (`5711ddf`) and PR #428
-  (`0cb0777`) extended skills, and PR #429 (`169e8be`) moved the engine to
-  v1.13.2, which removes the ROUTE-002 false positive.
+  v1.13.1 at main commit `656194426e2ea3358fa29fcf19e05f0278d9c270`. Later
+  merges change what the audit reports. The owner's question named three of
+  them: PR #424 (`5711ddf`) and PR #428 (`0cb0777`) extended skills, and PR
+  #429 (`169e8be`) moved the engine to v1.13.2, which removes the ROUTE-002
+  false positive. Other skill changes merged after that commit, including PR
+  #427 (`0030e73`), are also picked up by any main commit that contains all
+  three.
 - **Owner decision:** Asked whether to regenerate the baselines again once
   those PRs merged, the owner answered "Yes, once after all merge
   (Recommended)" to the coordinating agent's multiple-choice question in chat
@@ -1650,9 +1653,8 @@ generic skill guidance that would require asking for the same approval again.
   `artifacts/audits/corpus-route-graph.json`,
   `artifacts/audits/corpus-manifest-baseline.json` and the companion
   `docs/audits/skill-contract-audit-baseline.md` with its provenance preface;
-  adds dated notes, as AEGIS-APR-058 did, to
-  `docs/audits/aegis-060-plus-register.md`; and appends the consumption event
-  to this register.
+  adds dated notes and history links, as AEGIS-APR-058 did, to
+  `docs/audits/aegis-060-plus-register.md`.
 - **Scope FORBIDDEN:** No protected path. Nothing under `scripts/` or
   `tools/` changes. No historical count in the AEGIS-060+ register is
   rewritten. No further regeneration is covered.
