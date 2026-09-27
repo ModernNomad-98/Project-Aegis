@@ -11,7 +11,8 @@ XSS is cross-site scripting; URL is uniform resource locator; SQL is
 Structured Query Language; NoSQL refers to non-relational databases; ORM is
 object-relational mapper; OS is operating system; RCE is remote code
 execution; SSRF is server-side request forgery; VM is virtual machine; and
-CPU is central processing unit. NL means natural language; `venv` means a
+CPU is central processing unit. SAST is static application security
+testing; CI is continuous integration. NL means natural language; `venv` means a
 Python virtual environment; CRLF means carriage-return/line-feed. ASI05 is
 the agentic framework's unexpected-code-execution category, recorded with LLM10
 in the [source mapping](../../../../docs/reconciliation/step-0-reconciliation-v4.md).
@@ -74,6 +75,47 @@ control:
 - **The tool-side row** (approval posture, identity, side-effect class of the
   execution TOOL) lives with `agent-tool-safety-guard`; this file owns what
   happens inside the sandbox.
+
+## Generated-code commit path (LLM10:2026 extension)
+
+The 2026 LLM10 entry names insecure generated code: assistant-written code
+shipped at scale without review. Code a model writes is model output, and
+saving, committing, merging or running it is a sink. This rubric reviews
+the CONTROLS on that path, not the code itself:
+
+- **No automatic execution.** Nothing `eval`s, imports or runs a suggestion
+  directly. Watch for files that execute on save or on the next routine
+  action: git hooks, CI workflow files, package `postinstall`/build scripts,
+  editor task and file-watcher configs, and migration files picked up on
+  boot. Generated content in those paths is an execution sink.
+- **Sandbox before any pre-review run.** Running generated code to "see if it
+  works" before review uses the execution-sink sandbox above: no ambient
+  credentials, no production data, network denied or allowlisted.
+- **Static checks before the human gate.** Tests, linters, SAST and a secret
+  scan run on the change before review — as evidence for the reviewer, not
+  as approval. Tests written by the same model as the code do not
+  independently verify it.
+- **Human review gate before commit or merge.** A named human reviews the
+  change and the author (human or agent) cannot approve or merge its own
+  generated change. An agent that can commit AND merge to a deploying
+  branch is a blocking finding (route through `human-approval-boundary`).
+- **Provenance label.** The change records that it is AI-generated (a
+  commit trailer, PR label or metadata field) so the gate keys to it; check
+  that squash merges and copy-paste paths keep it.
+- **Dependency additions routed.** Any new or changed dependency is a
+  supply-chain event: trust and pinning go to
+  `supply-chain-security-reviewer`; a package name that may not exist goes
+  to `ai-misinformation-guard` (package hallucination).
+
+| Question | Owner |
+|---|---|
+| Is generated code treated as untrusted on its way to save/commit/run? | this skill |
+| Is the sandbox that runs it sound? | this skill (execution sinks) |
+| Which agent may call the code-execution TOOL, with what approval? | `agent-tool-safety-guard` |
+| Is this specific diff correct and secure? | `code-reviewer`, `security-pr-reviewer` |
+| Which scanner findings are real? | `static-analysis-reviewer` |
+| Is an added dependency trustworthy and pinned? | `supply-chain-security-reviewer` |
+| Does a suggested package exist at all? | `ai-misinformation-guard` |
 
 ## URL / path / request sinks
 
