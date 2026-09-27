@@ -123,7 +123,15 @@ before D50 exactly that shipped 67 times. The contract:
   folding behavior.
 - **Parsed value under 1024 characters.** The validator measures the PARSED
   value: quoting characters and doubled apostrophes are serialization, not
-  content, and do not count toward the limit.
+  content, and do not count toward the limit. The 1024-character maximum is
+  the Agent Skills specification's; hosts add their own listing limits on
+  top. Claude Code truncates the combined `description` and `when_to_use`
+  text at 1,536 characters in its skill listing, and Codex caps its initial
+  skills list at about 2% of the context window (8,000 characters when the
+  window is unknown), shortening descriptions first (checked 2026-09-26
+  against the [Agent Skills specification](https://agentskills.io/specification),
+  [Claude Code skills](https://code.claude.com/docs/en/skills) and
+  [Codex skills](https://learn.chatgpt.com/docs/build-skills)).
 - **Front-load the capability.** Some consumers' native selection sees only
   roughly the first ~90 characters of the description (D49 measurement: Codex
   ≈92). The first clause must say what the skill DOES; qualifiers and "Do NOT
@@ -134,7 +142,10 @@ before D50 exactly that shipped 67 times. The contract:
   `MANUAL-ONLY; never auto-invoke. ` (trailing space included) as the FIRST 32
   characters of the parsed description. Consumers that ignore the field still
   surface the description front, so that position is the only
-  guaranteed-visible safety signal.
+  guaranteed-visible safety signal. Codex, for example, does not document
+  `disable-model-invocation`; its own switch is `allow_implicit_invocation:
+  false` under `policy` in the skill's `agents/openai.yaml` (checked
+  2026-09-26 against [Codex skills](https://learn.chatgpt.com/docs/build-skills)).
 
 The checks in `scripts/validate-skills.py` (strict-parse, parsed-value length,
 sentinel position — each proven able to fail before shipping) are the
