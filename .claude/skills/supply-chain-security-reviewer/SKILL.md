@@ -181,8 +181,10 @@ Not reviewed: <areas + why>
 
 ## Security Rules
 
-- Scanner output is input, not truth (master-prompt §6): a CVE is triaged by
-  reachability and exploitability before it gets a severity.
+- Scanner output is input, not truth
+  ([historical master prompt, section 6](../../../docs/prompts/claude-skills-master-generation-prompts-v4.md)):
+  a CVE is triaged by reachability and exploitability before it gets a
+  severity.
 - High-severity claims require a compromise path to material impact;
   "a CVE exists" without a reachable/exploitable path is not high.
 - Unpinned third-party CI actions (mutable tags) are a finding — pin to a
