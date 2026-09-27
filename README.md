@@ -714,6 +714,88 @@ the time; retained for provenance):
 - `docs/roadmaps/product-agnostic-skill-and-agent-roadmap.md`
 - `docs/150-claude-skills-roadmap.md` (superseded by the original 300-skill roadmap — per the D12 standing rule a 300+ target backlog, not a cap)
 
+## Terms used in the reference tables
+
+The phase, subagent, and skill tables below use many abbreviations. This list
+defines each one not already spelled out earlier on this page, for example in
+[What's in the library](#whats-in-the-library). Plurals such as SLIs or URLs
+follow the singular entry.
+
+| Term | Meaning |
+|---|---|
+| A02, A04, A09, A10 | category numbers in the OWASP Top 10:2025 web-application list; A09 is Security Logging and Alerting Failures, A10 is Mishandling of Exceptional Conditions |
+| A2A | Agent2Agent, an open protocol for agent-to-agent communication |
+| ACL | access control list |
+| AEGIS-APR-nnn | an entry in the [owner approval register](docs/approvals/APPROVAL_REGISTER.md) |
+| AICPA | American Institute of Certified Public Accountants |
+| AIMS | AI management system (ISO/IEC 42001) |
+| Amd | amendment (as in ISO/IEC 27001 Amd 1:2024) |
+| ASI01–ASI10 | risk numbers in the OWASP Top 10 for Agentic Applications (2026) |
+| authn / authz | authentication / authorization |
+| cat NN #n | category and item number in the [300-skill roadmap](docs/300-repeatable-software-saas-skills-roadmap.md) |
+| CDC | change data capture |
+| CDK | AWS Cloud Development Kit |
+| CDN | content delivery network |
+| CIs (in `ab-test-designer`) | confidence intervals; everywhere else CI means continuous integration |
+| CPA | certified public accountant |
+| CPU | central processing unit |
+| DB | database |
+| DLQ | dead-letter queue |
+| DOM | Document Object Model |
+| DoS | denial of service |
+| ETA | estimated time of arrival (expected completion time) |
+| EU | European Union (as in the EU AI Act) |
+| HiPPO | highest-paid person's opinion |
+| IA | information architecture |
+| IAM | identity and access management |
+| ID | identifier |
+| IDOR | insecure direct object reference |
+| ISMS | information security management system (ISO/IEC 27001) |
+| ISO | International Organization for Standardization |
+| JWT | JSON Web Token |
+| LLM01–LLM10 | risk numbers in the OWASP Top 10 for LLM Applications (2026) |
+| MCP | Model Context Protocol |
+| MDE | minimum detectable effect |
+| MoSCoW | Must have, Should have, Could have, Won't have |
+| NL | natural language |
+| OIDC | OpenID Connect |
+| OTP | one-time password |
+| P0, P1, P2 | priority levels; P0 is the highest |
+| RBAC | role-based access control |
+| RCE | remote code execution |
+| RFC | request for comments (a written design proposal) |
+| RICE | Reach, Impact, Confidence, Effort |
+| SARIF | Static Analysis Results Interchange Format |
+| SCA | software composition analysis |
+| SCD | slowly changing dimension |
+| SCP | service control policy (AWS Organizations) |
+| SHA | Secure Hash Algorithm; SHA pinning fixes a dependency to one exact commit hash |
+| SKU | stock-keeping unit (a provider's product or pricing tier) |
+| SLA | service level agreement |
+| SLI | service level indicator |
+| SLSA | Supply-chain Levels for Software Artifacts |
+| SOA | service-oriented architecture |
+| SoA | Statement of Applicability (ISO/IEC 27001 and 42001) |
+| SOC 2 | System and Organization Controls 2, an AICPA attestation report |
+| SQL | Structured Query Language |
+| SRM | sample ratio mismatch |
+| SSE | server-sent events |
+| SSR | server-side rendering |
+| SSRF | server-side request forgery |
+| STRIDE | Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege |
+| TP / FP | true positive / false positive |
+| TSC | Trust Services Criteria (SOC 2) |
+| TTL | time to live |
+| URL | uniform resource locator (a web address) |
+| UX | user experience |
+| VNet | virtual network (Azure) |
+| VPC | virtual private cloud |
+| WCAG | Web Content Accessibility Guidelines |
+| WS | WebSocket |
+| WSJF | weighted shortest job first |
+| XSS | cross-site scripting |
+| ≠ | "is distinct from": names the neighboring skill that owns the other side of a boundary |
+
 ## Reconciled phase plan (historical v4)
 
 The v4 phase structure was canonical for the earlier construction plan. See
@@ -768,6 +850,9 @@ read-only by default. Each maps to a v4 orchestrator role (see reconciliation §
 | `release-readiness-reviewer` | CI/build/test evidence, migrations, rollback, go/no-go. |
 
 ## Skills (shipped)
+
+Abbreviations in these tables are defined in
+[Terms used in the reference tables](#terms-used-in-the-reference-tables).
 
 **Start here — the beginner's front door** (D38; full detail:
 [`docs/skills-catalog.md`](docs/skills-catalog.md)):
