@@ -1,6 +1,6 @@
 ---
 name: memory-context-poisoning-reviewer
-description: Review an agent's persistent memory and stored context for poisoning (OWASP Agentic ASI06) — can untrusted content write into long-term memory (auto-summarized conversations, "remember this" injections, tool outputs persisted as facts), does a poisoned entry survive sessions and get trusted as ground truth later, and can memory bleed across tenants/users/sessions. Verifies validation-before-write, per-entry provenance, tenant/user/session scoping, TTL, purge with rollback, and recalled memory treated as data, never instructions. Distinct from model-poisoning-reviewer (LLM04, training-time) and rag-security-architect (LLM08, retrieval authz); this owns the agent's own state store. Use when an agent persists memory, context, facts, or preferences across sessions. Do NOT use for training/feedback integrity (model-poisoning-reviewer), who-may-retrieve authz (rag-security-architect), in-context injection (prompt-injection-defender), or a dev-agent's own memory files (agent-memory-governance).
+description: Review an agent's persistent memory and stored context for poisoning (OWASP Agentic ASI06) — can untrusted content write into long-term memory (auto-summarized conversations, "remember this" injections, tool outputs persisted as facts), does a poisoned entry survive sessions and get trusted as ground truth later, and can memory bleed across tenants/users/sessions. Verifies validation-before-write, per-entry provenance, tenant/user/session scoping, TTL, purge with rollback, and recalled memory treated as data, never instructions. Distinct from model-poisoning-reviewer (LLM05, training-time) and rag-security-architect (LLM09, retrieval authz); this owns the agent's own state store. Use when an agent persists memory, context, facts, or preferences across sessions. Do NOT use for training/feedback integrity (model-poisoning-reviewer), who-may-retrieve authz (rag-security-architect), in-context injection (prompt-injection-defender), or a dev-agent's own memory files (agent-memory-governance).
 ---
 
 # Memory & Context Poisoning Reviewer
@@ -19,8 +19,8 @@ severity-ranked findings each with a poisoning path (attacker input → stored
 entry → later corrupted behavior) and the write-validation, provenance,
 scoping, time-to-live (TTL), and purge/rollback controls that close it.
 Training-time corruption is `model-poisoning-reviewer` (OWASP model data
-poisoning category LLM04); retrieval authorization is
-`rag-security-architect` (OWASP vector/embedding weakness category LLM08).
+poisoning category LLM05); retrieval authorization is
+`rag-security-architect` (OWASP vector/embedding weakness category LLM09).
 Retrieval-augmented generation (RAG) indexes and authorization (authz) belong
 to that retrieval review; this skill owns the agent's own state.
 

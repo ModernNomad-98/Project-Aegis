@@ -1,6 +1,6 @@
 # Grounding & anti-misinformation controls
 
-Detail for the owning [AI Misinformation Guard](../SKILL.md). OWASP LLM09 (Misinformation), 2025.
+Detail for the owning [AI Misinformation Guard](../SKILL.md). OWASP LLM07 (Misinformation), 2026 (LLM09 in 2025).
 Truth is a separate axis from shape (`structured-output-validator`) and safety
 (`llm-output-safety-reviewer`).
 

@@ -1,17 +1,19 @@
 ---
 name: system-prompt-leakage-reviewer
-description: 'Review an LLM feature for system-prompt leakage (OWASP LLM07) on two axes — (1) CONTENTS: the system prompt must contain no secrets, API keys, credentials, connection strings, internal URLs/architecture, or access rules whose disclosure causes harm; and (2) DEPENDENCE: the system must not RELY on the prompt staying secret for security, because prompts are extractable and are NOT a security control. Enforcement of authz, filtering, and limits must be deterministic and live OUTSIDE the model. Produces findings for secrets-in-prompt (extract and route to secrets-identity-hardener) and for prompt-as-control anti-patterns (route enforcement to the owning skill). Use when reviewing a system prompt, or when security depends on prompt confidentiality. Do NOT use for injection defense (prompt-injection-defender), sensitive data in user/context/output (sensitive-disclosure-guard), or tool scope (agent-tool-safety-guard).'
+description: 'Review an LLM feature for system-prompt leakage (OWASP LLM08 hidden context exposure, system-prompt slice) on two axes — (1) CONTENTS: the system prompt must contain no secrets, API keys, credentials, connection strings, internal URLs/architecture, or access rules whose disclosure causes harm; and (2) DEPENDENCE: the system must not RELY on the prompt staying secret for security, because prompts are extractable and are NOT a security control. Enforcement of authz, filtering, and limits must be deterministic and live OUTSIDE the model. Produces findings for secrets-in-prompt (extract and route to secrets-identity-hardener) and for prompt-as-control anti-patterns (route enforcement to the owning skill). Use when reviewing a system prompt, or when security depends on prompt confidentiality. Do NOT use for injection defense (prompt-injection-defender), sensitive data in user/context/output (sensitive-disclosure-guard), or tool scope (agent-tool-safety-guard).'
 ---
 
 # System Prompt Leakage Reviewer
 
-**Reading key:** LLM07 is the OWASP system-prompt-leakage risk identifier;
+**Reading key:** LLM08 is the OWASP 2026 hidden-context-exposure risk
+identifier (2025's LLM07 System Prompt Leakage, broadened to all hidden
+context; this skill covers its system-prompt slice);
 LLM means large language model, RBAC is role-based access control, and UX is
 user experience.
 
 ## Purpose
 
-Review an LLM feature for the two failure modes behind LLM07. First, the
+Review an LLM feature for the two failure modes behind LLM08. First, the
 system prompt's CONTENTS: it must carry no secrets, credentials, keys,
 connection strings, internal URLs/architecture details, or access rules whose
 leak causes harm — because system prompts are extractable and should be assumed

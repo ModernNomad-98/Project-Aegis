@@ -1,6 +1,6 @@
 ---
 name: skill-quality-reviewer
-description: 'Review ONE library skill''s quality — the judgment layer above scripts/validate-skills.py. Runs the mechanical validator first (structure/lengths/registration/name collisions are its job — never re-checked), judges what it cannot: description trigger-oriented ("use when <situation>") vs merely descriptive; trigger collision with shipped skills, colliders NAMED (the main failure mode across the full shipped skill corpus); duplication better shipped as an EXTENSION (the LLM03/ASI04 pattern); evals that test real boundaries vs hollow filler; section substance (Stop Conditions that actually refuse); scope (one job); invocation posture (per the standard''s §5 side-effect rule). Per-check PASS/CONCERN/FAIL with evidence; verdict ship/revise/reject/make-it-an-extension. Use when a skill is drafted, revised, or quality-audited. Do NOT use for a change''s process compliance (agent-governance-audit), product code (code-reviewer, full-codebase-auditor), or a whole skill-adding PR (library-diff-reviewer).'
+description: 'Review ONE library skill''s quality — the judgment layer above scripts/validate-skills.py. Runs the mechanical validator first (structure/lengths/registration/name collisions are its job — never re-checked), judges what it cannot: description trigger-oriented ("use when <situation>") vs merely descriptive; trigger collision with shipped skills, colliders NAMED (the main failure mode across the full shipped skill corpus); duplication better shipped as an EXTENSION (the LLM04/ASI04 pattern); evals that test real boundaries vs hollow filler; section substance (Stop Conditions that actually refuse); scope (one job); invocation posture (per the standard''s §5 side-effect rule). Per-check PASS/CONCERN/FAIL with evidence; verdict ship/revise/reject/make-it-an-extension. Use when a skill is drafted, revised, or quality-audited. Do NOT use for a change''s process compliance (agent-governance-audit), product code (code-reviewer, full-codebase-auditor), or a whole skill-adding PR (library-diff-reviewer).'
 ---
 
 # Skill Quality Reviewer
@@ -85,7 +85,7 @@ skill.
 4. **Check 3 — duplication / extension.** Does the skill substantially restate
    a shipped skill's job? When the genuinely new content would fit as a
    scoped additive diff to an existing skill, recommend make-it-an-extension
-   and name the base — the library's precedent: LLM03 and ASI04 both landed
+   and name the base — the library's precedent: LLM04 and ASI04 both landed
    as extensions of `supply-chain-security-reviewer`, not as clone skills.
 5. **Check 4 — eval integrity.** Do `evals/evals.json` cases test the
    BOUNDARY: a real happy path, a genuine edge (not a happy path with an
@@ -165,7 +165,7 @@ Not inspected: <what this review did not read, and why>
   with no situation. The working test: from this description alone, would a
   model know when this skill WINS a request and when it must YIELD?
 - Overlap hides across phases: the confusable neighbor is often in a
-  different pack (agent authority vs end-user RBAC; LLM04 vs ASI06
+  different pack (agent authority vs end-user RBAC; LLM05 vs ASI06
   poisoning; evidence-policy vs manual-QA evidence). Same-cluster-only
   sweeps miss exactly these.
 - Hollow evals look full: assertions that restate the Workflow verbatim, a

@@ -2,7 +2,7 @@
 
 Use this reference with the [Sensitive Disclosure Guard](../SKILL.md).
 OWASP LLM02 (Sensitive Information
-Disclosure), 2025. Three leak surfaces: INTO the model, BACK from the model,
+Disclosure), 2026 (same ID as 2025). Three leak surfaces: INTO the model, BACK from the model,
 RECORDED about the call.
 
 ## Data-minimization rubric (do this first)

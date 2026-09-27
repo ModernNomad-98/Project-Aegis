@@ -3060,6 +3060,20 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     be checked by `skill-quality-reviewer` and `library-diff-reviewer` for
     the system-vs-rollout seam.
 
+- **D65 (2026-09-26) — Re-anchored the Phase 7 AI-security pack to the OWASP
+  Top 10 for LLM Applications 2026 (v1.0, 2026-08-03).**
+  - **Why.** Owner decision 2026-09-26; supersedes D6's edition anchor (2025)
+    only — D6's skill set and extend-existing choices stand.
+  - **What.** All current LLM IDs renumbered (01→01, 02→02, 03→04, 04→05,
+    05→10, 06→03, 07→08 renamed Hidden Context Exposure, 08→09, 09→07,
+    10→06); skill pages carry the 2025 ID in brackets; crosswalk in
+    `ai-threat-modeler/references/llm-top10-threat-catalog.md`. D6's table
+    above keeps its 2025 IDs as the historical record.
+  - **Open gaps (owner call).** LLM08 wider hidden context beyond the system
+    prompt (owner decided 2026-09-26 to extend and rename the skill —
+    follow-up PR); LLM10 generated-code review; LLM04 promoted-artifact
+    trust and LLM01 cross-modal injection are catalog-only.
+
 ## 6. Post-merge corrections
 
 - **2026-09-12 — Current backlog labels reconciled.** At the owner's request,

@@ -24,7 +24,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Treats the runaway loop as a denial-of-wallet risk (LLM10) and imposes hard caps on iterations, tool calls, and recursion depth.",
+          "Treats the runaway loop as a denial-of-wallet risk (LLM06) and imposes hard caps on iterations, tool calls, and recursion depth.",
           "Bounds retries with backoff and a circuit breaker to avoid amplification.",
           "Adds a kill switch and routes an active spike to incident-response-runbook before redesign."
         ]

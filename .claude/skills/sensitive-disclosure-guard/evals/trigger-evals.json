@@ -15,7 +15,7 @@
       "prompt": "Ensure a user only retrieves vector-store documents their tenant and role are authorized to access.",
       "expected_skill": "rag-security-architect",
       "should_not_trigger": ["sensitive-disclosure-guard"],
-      "reason": "Who can retrieve which documents is rag-security-architect (LLM08); this skill redacts/minimizes sensitive data regardless of retrieval permission."
+      "reason": "Who can retrieve which documents is rag-security-architect (LLM09); this skill redacts/minimizes sensitive data regardless of retrieval permission."
     },
     {
       "id": "credential-custody-goes-to-secrets-hardener",
@@ -29,7 +29,7 @@
       "prompt": "Our system prompt contains an internal API key so the model can call our API — can an attacker extract it?",
       "expected_skill": "system-prompt-leakage-reviewer",
       "should_not_trigger": ["sensitive-disclosure-guard"],
-      "reason": "Secrets in the system prompt and their extraction is system-prompt-leakage-reviewer (LLM07); this skill covers sensitive data in the user/context/output/log flow, not the prompt itself."
+      "reason": "Secrets in the system prompt and their extraction is system-prompt-leakage-reviewer (LLM08); this skill covers sensitive data in the user/context/output/log flow, not the prompt itself."
     },
     {
       "id": "tenant-surface-audit-goes-to-isolation-reviewer",

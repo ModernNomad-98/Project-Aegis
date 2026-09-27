@@ -85,7 +85,7 @@ below a "moderate" in a reachable parser.
 - Releases signed/attested (Sigstore/provenance) where the ecosystem supports
   it? Frame maturity with SLSA levels (source→build→provenance→hardened).
 
-## AI/ML supply chain (OWASP LLM03)
+## AI/ML supply chain (OWASP LLM04)
 
 Acquired AI artifacts are dependencies too — third-party base models,
 downloaded datasets, and fine-tuning adapters. Review them like any untrusted

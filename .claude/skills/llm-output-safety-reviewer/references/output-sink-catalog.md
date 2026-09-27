@@ -1,11 +1,11 @@
 # LLM output sink catalog
 
-Detail for [llm-output-safety-reviewer](../SKILL.md). OWASP LLM05 (Improper Output
-Handling), 2025. Model output is untrusted; each sink below re-asks "what if
+Detail for [llm-output-safety-reviewer](../SKILL.md). OWASP LLM10 (Improper Output
+Handling), 2026 (LLM05 in 2025). Model output is untrusted; each sink below re-asks "what if
 this is adversarial?".
 
 **Reading key:** LLM means large language model; OWASP is the Open Worldwide
-Application Security Project, and LLM05 is its numbered improper-output-
+Application Security Project, and LLM10 is its numbered improper-output-
 handling category. HTML is HyperText Markup Language; JSX is JavaScript XML;
 XSS is cross-site scripting; URL is uniform resource locator; SQL is
 Structured Query Language; NoSQL refers to non-relational databases; ORM is
@@ -13,7 +13,7 @@ object-relational mapper; OS is operating system; RCE is remote code
 execution; SSRF is server-side request forgery; VM is virtual machine; and
 CPU is central processing unit. NL means natural language; `venv` means a
 Python virtual environment; CRLF means carriage-return/line-feed. ASI05 is
-the agentic framework's unexpected-code-execution category, recorded with LLM05
+the agentic framework's unexpected-code-execution category, recorded with LLM10
 in the [source mapping](../../../../docs/reconciliation/step-0-reconciliation-v4.md).
 The [parent review workflow](../SKILL.md) owns the verdict and routing.
 

@@ -1,6 +1,6 @@
 ---
 name: supply-chain-security-reviewer
-description: 'Review software supply-chain risk with SLSA-style provenance thinking — dependencies (CVEs triaged by reachability, not presence), lockfile integrity/pinning, transitive/typosquat/confusion risk, install and build scripts, CI/CD workflows (untrusted PR triggers, secret exposure, token scopes, unpinned Actions), artifact provenance, and postinstall/hook execution. Extends to the AI/ML (LLM03: models, datasets, fine-tuning adapters) and agentic (ASI04: MCP servers/manifests, tool/skill registries, plugins, A2A dependencies) supply chains. Findings carry a compromise path, exploitability verdict, and remediation (pin, upgrade, remove, isolate). Use when reviewing dependencies, lockfiles, CI workflows, a build pipeline, a dependency bump, or an acquired model/dataset/adapter/MCP server for supply-chain risk. Do NOT use to triage SAST/CodeQL findings in first-party code (static-analysis-reviewer), review app logic in a diff (security-pr-reviewer), or model feature threats (threat-modeler).'
+description: 'Review software supply-chain risk with SLSA-style provenance thinking — dependencies (CVEs triaged by reachability, not presence), lockfile integrity/pinning, transitive/typosquat/confusion risk, install and build scripts, CI/CD workflows (untrusted PR triggers, secret exposure, token scopes, unpinned Actions), artifact provenance, and postinstall/hook execution. Extends to the AI/ML (LLM04: models, datasets, fine-tuning adapters) and agentic (ASI04: MCP servers/manifests, tool/skill registries, plugins, A2A dependencies) supply chains. Findings carry a compromise path, exploitability verdict, and remediation (pin, upgrade, remove, isolate). Use when reviewing dependencies, lockfiles, CI workflows, a build pipeline, a dependency bump, or an acquired model/dataset/adapter/MCP server for supply-chain risk. Do NOT use to triage SAST/CodeQL findings in first-party code (static-analysis-reviewer), review app logic in a diff (security-pr-reviewer), or model feature threats (threat-modeler).'
 ---
 
 # Supply-Chain Security Reviewer
@@ -8,7 +8,8 @@ description: 'Review software supply-chain risk with SLSA-style provenance think
 **Reading key:** SLSA is Supply-chain Levels for Software Artifacts, a
 provenance framework; CVE is Common Vulnerabilities and Exposures; CI/CD is
 continuous integration and delivery; MCP is Model Context Protocol; A2A is
-agent-to-agent communication. LLM03 and ASI04 are OWASP AI risk identifiers.
+agent-to-agent communication. LLM04 (2026 edition; LLM03 in 2025) and ASI04 are OWASP AI risk
+identifiers.
 
 ## Purpose
 
@@ -36,7 +37,7 @@ is a finding whether or not a scanner flagged it.
   that needs triage into what actually matters.
 - Use when: acquiring an AI/ML artifact — a third-party base model, a
   downloaded dataset, or a fine-tuning adapter — and its provenance, format
-  safety, and pinning need a supply-chain review (OWASP LLM03).
+  safety, and pinning need a supply-chain review (OWASP LLM04).
 - Use when: adopting or updating agentic components (OWASP Agentic ASI04) —
   MCP servers and their manifests, tool/skill registry entries, plugin
   packages, or agent-to-agent dependencies — and their source, requested
@@ -70,7 +71,7 @@ is a finding whether or not a scanner flagged it.
    maintainer changes, typosquat/confusion candidates, direct vs transitive.
 6. Artifact/provenance signals: are builds reproducible, signed, attested;
    are vendored binaries checked in without provenance.
-7. AI/ML artifacts if any (LLM03): third-party base models, downloaded
+7. AI/ML artifacts if any (LLM04): third-party base models, downloaded
    datasets, and fine-tuning adapters — their source/registry, revision
    pinning (a mutable tag/`latest` is not pinned), serialization format
    (unsafe pickle or unrestricted `torch.load` can execute code on load;
@@ -106,7 +107,7 @@ is a finding whether or not a scanner flagged it.
 6. **Check integrity and provenance:** lockfile committed and pinned; hashes/
    integrity present; vendored artifacts have a documented source; releases
    signed/attested where the ecosystem supports it (SLSA levels as a frame).
-   For **AI/ML artifacts (LLM03)** — third-party models, datasets, adapters —
+   For **AI/ML artifacts (LLM04)** — third-party models, datasets, adapters —
    see [references/supply-chain-checklist.md](references/supply-chain-checklist.md):
    pin to an immutable revision/digest (not a mutable tag or `latest`), prefer
    safetensors over unrestricted pickle loading; check the actual `torch.load`
@@ -237,7 +238,7 @@ Not reviewed: <areas + why>
 - [references/supply-chain-checklist.md](references/supply-chain-checklist.md)
   — the CI/CD compromise-path catalog, reachability-triage rubric, pinning
   and provenance checks, dependency-confusion/typosquat detection notes,
-  the AI/ML supply-chain section (LLM03), and the agentic supply-chain
+  the AI/ML supply-chain section (LLM04), and the agentic supply-chain
   section (ASI04: MCP servers/manifests, registries, plugins, A2A deps).
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against `static-analysis-reviewer`,

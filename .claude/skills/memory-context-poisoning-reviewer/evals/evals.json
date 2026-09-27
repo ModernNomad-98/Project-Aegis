@@ -37,7 +37,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Feedback loops that shape the next model update are training-time integrity (LLM04) — model-poisoning-reviewer; this skill owns runtime stored context and memory, not weights."
+          "Feedback loops that shape the next model update are training-time integrity (LLM05) — model-poisoning-reviewer; this skill owns runtime stored context and memory, not weights."
         ]
       }
     },

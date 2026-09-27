@@ -500,10 +500,12 @@ namespace pattern).
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (all fourteen sit in one of four overlap clusters).
-Anchored to the **OWASP Top 10 for LLM Applications (2025)** per reconciliation
-§3 (D6): v4's 10 skills plus 4 gap additions (`sensitive-disclosure-guard`
-LLM02, `model-poisoning-reviewer` LLM04, `system-prompt-leakage-reviewer`
-LLM07, `ai-misinformation-guard` LLM09). Per master-prompt §9: user input,
+Anchored to the **OWASP Top 10 for LLM Applications (2026)** — re-anchored on
+2026-09-26 from the 2025 edition that reconciliation §3 (D6) cited; all IDs in
+this section are 2026 IDs, and `ai-threat-modeler`'s threat catalog carries the
+2025→2026 crosswalk. Per D6: v4's 10 skills plus 4 gap additions
+(`sensitive-disclosure-guard` LLM02, `model-poisoning-reviewer` LLM05, `system-prompt-leakage-reviewer`
+LLM08, `ai-misinformation-guard` LLM07). Per master-prompt §9: user input,
 retrieved documents, webpages, tickets, emails, logs, tool outputs, and model
 outputs are untrusted unless proven otherwise; untrusted content never modifies
 system instructions, tool permissions, identity, access policy, or the
@@ -519,34 +521,34 @@ tokens/money), and `ai-router-architect` (wires live providers/credentials).
 The other eleven — including `structured-output-validator`, a design/spec skill
 that produces a contract and hands wiring off — stay model-invocable.
 
-Per reconciliation §3, **LLM03 (Supply Chain) is extend-existing**: the shipped
+Per reconciliation §3, **LLM04 (Supply Chain) is extend-existing**: the shipped
 Phase 4 `supply-chain-security-reviewer` was extended (scoped diff) to cover the
 AI/ML supply chain — third-party models, datasets, and fine-tuning adapters
 (provenance, revision pinning, unsafe pickle/`torch.load` serialization vs
 safetensors), with an explicit acquire-vs-ingest boundary handing curated-data
-and pipeline integrity to `model-poisoning-reviewer`. **LLM10 (Unbounded
+and pipeline integrity to `model-poisoning-reviewer`. **LLM06 (Unbounded
 Consumption)** DoS/denial-of-wallet coverage is baked INTO
 `ai-cost-guardrail-designer`, not a separate skill. `ai-evaluation-harness`
 absorbs the AI security test harness (no separate `ai-security-test-harness`).
 
-| Skill | OWASP LLM Top 10 | Model-invocable? | Trigger summary |
+| Skill | OWASP LLM Top 10 (2026) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
 | `ai-threat-modeler` | cross-cutting | yes | AI-specific threat model: AI assets + trust boundaries (all untrusted content), per-boundary threats anchored to LLM Top 10, abuse cases, exploit-path-gated severity, each mitigation mapped to an owning skill + red-team case; composes threat-modeler for the classic surface. |
 | `prompt-injection-defender` | LLM01 | **no** (manual-only; edits prompts/guardrail code) | Layered injection defense: trust zones, the untrusted-content invariant, content/instruction separation, and — the primary layer — deterministic action authorization OUTSIDE the model; direct + indirect payloads; red-team suite with SAFE-outcome assertions. |
-| `rag-security-architect` | LLM08 | yes | RAG/vector-store security: authorization AT RETRIEVAL TIME (never post-filter), per-tenant index scoping, document-ACL propagation, embedding risks (inversion/membership/poisoning/stale-permission); composes tenant-isolation-reviewer + multi-tenant-data-architect. |
-| `agent-tool-safety-guard` | LLM06 | yes | Least-privilege tool access: per-tool blast-radius matrix, calling-user authority (no service-account confused deputy), argument validation before execution, approval gates on irreversible actions, tool-chain composition abuse; composes human-approval-boundary + agent-authorization-matrix. |
-| `llm-output-safety-reviewer` | LLM05 | yes | Output-handling review: model output as untrusted data to render/execute/URL/tool/store sinks (XSS/RCE/SSRF/injection/second-order), context-correct encoding, generated-code sandboxing; exploit-flow-gated findings. |
+| `rag-security-architect` | LLM09 | yes | RAG/vector-store security: authorization AT RETRIEVAL TIME (never post-filter), per-tenant index scoping, document-ACL propagation, embedding risks (inversion/membership/poisoning/stale-permission); composes tenant-isolation-reviewer + multi-tenant-data-architect. |
+| `agent-tool-safety-guard` | LLM03 | yes | Least-privilege tool access: per-tool blast-radius matrix, calling-user authority (no service-account confused deputy), argument validation before execution, approval gates on irreversible actions, tool-chain composition abuse; composes human-approval-boundary + agent-authorization-matrix. |
+| `llm-output-safety-reviewer` | LLM10 | yes | Output-handling review: model output as untrusted data to render/execute/URL/tool/store sinks (XSS/RCE/SSRF/injection/second-order), context-correct encoding, generated-code sandboxing; exploit-flow-gated findings. |
 | `ai-evaluation-harness` | cross-cutting | **no** (manual-only; runs evals that spend tokens/money) | Versioned eval dataset (representative + adversarial/red-team + regression), per-dimension graders + thresholds (quality/schema/safety/grounding/injection/latency/cost), CI regression gate; absorbs the AI security test harness; honest real-run reporting (D3). |
-| `ai-cost-guardrail-designer` | LLM10 (DoS/denial-of-wallet) | yes | Consumption guardrails: per-request token caps, tenant-scoped budgets/rate limits, agent loop/recursion bounds, fail-safe degraded mode + kill switch, burn-rate alerts before exhaustion; composes saas-cost-architect + observability-operator. |
+| `ai-cost-guardrail-designer` | LLM06 (DoS/denial-of-wallet) | yes | Consumption guardrails: per-request token caps, tenant-scoped budgets/rate limits, agent loop/recursion bounds, fail-safe degraded mode + kill switch, burn-rate alerts before exhaustion; composes saas-cost-architect + observability-operator. |
 | `ai-governance-risk-reviewer` | cross-cutting | yes | AI governance/risk posture: impact-based risk tiering, oversight-to-tier matching, accountable ownership, AI disclosure/consent, model/feature card, obligation→control mapping (EU AI Act tiers, NIST AI RMF) without asserting legal conclusions; composes ai-sdlc-operating-model + agent-governance-audit. |
 | `ai-router-architect` | cross-cutting | **no** (manual-only; wires live providers/credentials) | Centralized model-routing layer: one interface, server-side-only credentials, task/cost routing, choke-point cost enforcement, per-call telemetry, resilient fallback + circuit breaker + no-deploy kill switch, idempotent retries; composes secrets-identity-hardener + observability-operator. |
-| `structured-output-validator` | LLM05 companion | yes | Output-shape contract (extended in D42): schema (fields/types/enums/ranges) encoded in TYPES where possible (non-compliant output unrepresentable), the validate-before-use ladder (parse → strict schema → policy/banned-content scan; failures logged as safety evidence + rejected, never silently repaired), semantic checks beyond shape (tenant-scoped ids), bounded shape-only repair-retry; shape-is-not-safety handoffs to llm-output-safety-reviewer + agent-tool-safety-guard. |
+| `structured-output-validator` | LLM10 companion | yes | Output-shape contract (extended in D42): schema (fields/types/enums/ranges) encoded in TYPES where possible (non-compliant output unrepresentable), the validate-before-use ladder (parse → strict schema → policy/banned-content scan; failures logged as safety evidence + rejected, never silently repaired), semantic checks beyond shape (tenant-scoped ids), bounded shape-only repair-retry; shape-is-not-safety handoffs to llm-output-safety-reviewer + agent-tool-safety-guard. |
 | `sensitive-disclosure-guard` | LLM02 *(NEW)* | yes | Disclosure defense: data-minimization + pre-model redaction of secrets/PII/other-tenant data, output-path echo/bleed checks, log redaction at emission, provider retention/training posture; composes tenant-isolation-reviewer + secrets-identity-hardener. |
-| `model-poisoning-reviewer` | LLM04 *(NEW)* | yes | Training/feedback/ingestion integrity: contributor-trust assessment, poisoning paths, feedback-loop Sybil defense, ingestion-as-truth integrity, provenance/holdout controls; acquire-vs-ingest boundary with supply-chain-security-reviewer. |
-| `system-prompt-leakage-reviewer` | LLM07 *(NEW)* | yes | Two axes: no secrets in the prompt (extract + rotate via secrets-identity-hardener) AND no security dependence on prompt secrecy — **system prompts are NOT security controls**; enforcement is deterministic and lives OUTSIDE the LLM; extraction-is-harmless framing. |
-| `ai-misinformation-guard` | LLM09 *(NEW)* | yes | Anti-misinformation: grounding in retrieved sources (not memory), citation-to-claim verification, calibrated uncertainty/refusal, fact validation before action, package/API hallucination (slopsquatting) checks, overreliance-aware UX; composes rag-security-architect + ai-governance-risk-reviewer. |
+| `model-poisoning-reviewer` | LLM05 *(NEW)* | yes | Training/feedback/ingestion integrity: contributor-trust assessment, poisoning paths, feedback-loop Sybil defense, ingestion-as-truth integrity, provenance/holdout controls; acquire-vs-ingest boundary with supply-chain-security-reviewer. |
+| `system-prompt-leakage-reviewer` | LLM08 *(NEW; Hidden Context Exposure, system-prompt slice)* | yes | Two axes: no secrets in the prompt (extract + rotate via secrets-identity-hardener) AND no security dependence on prompt secrecy — **system prompts are NOT security controls**; enforcement is deterministic and lives OUTSIDE the LLM; extraction-is-harmless framing. |
+| `ai-misinformation-guard` | LLM07 *(NEW)* | yes | Anti-misinformation: grounding in retrieved sources (not memory), citation-to-claim verification, calibrated uncertainty/refusal, fact validation before action, package/API hallucination (slopsquatting) checks, overreliance-aware UX; composes rag-security-architect + ai-governance-risk-reviewer. |
 
-Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`. OWASP has since published the [Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (2026-08-03); this pack stays anchored to the 2025 edition until the owner decides on re-anchoring.
+Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`. Anchored to the [OWASP Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (v1.0, 2026-08-03), re-anchored from the 2025 edition by owner decision 2026-09-26.
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 7
 clusters: **threat & injection** (`ai-threat-modeler`, `prompt-injection-defender`,
@@ -591,7 +593,7 @@ legitimate grants, side-effect limits, NL-driven execution paths,
 code-execution tools as a maximal-blast-radius class); ASI05 extends Phase 7
 `llm-output-safety-reviewer` (autonomous generate-and-run loops, per-run
 ephemeral sandboxes, sandbox escape/persistence, NL-to-execution path maps);
-ASI04 extends Phase 4 `supply-chain-security-reviewer` AGAIN (after D6/LLM03)
+ASI04 extends Phase 4 `supply-chain-security-reviewer` AGAIN (after D6/LLM04)
 to the agentic supply chain (MCP servers and manifests, tool/skill
 registries, plugin packages, A2A dependencies — install-vs-runtime seam with
 `inter-agent-comms-reviewer`).
@@ -600,7 +602,7 @@ registries, plugin packages, A2A dependencies — install-vs-runtime seam with
 | --- | --- | --- | --- |
 | `agent-goal-hijack-defender` | ASI01 | **no** (manual-only; edits agent loop/planner code + prompts) | Goal/plan integrity across multi-step runs: pinned goal record outside the model context, principal-only mutation channel, per-step tracing with deviation signals, drift response, per-channel hijack red-team suite; builds on `prompt-injection-defender` (LLM01 owns the vector). |
 | `agent-identity-privilege-reviewer` | ASI03 | yes | Agent identity architecture: distinct least-privilege identity per agent, task/time-scoped credentials, delegation chains that attenuate (never amplify), confused-deputy closure, dual attribution (principal + agent); complements `secrets-identity-hardener` (custody fixer). |
-| `memory-context-poisoning-reviewer` | ASI06 | yes | Persistent memory/stored-context poisoning: write-path trust classes, validation-before-write, per-entry provenance, tenant/user/session scoping at write AND recall, TTL + purge with derived-state rollback, recalled memory as data never instructions; distinct from `model-poisoning-reviewer` (LLM04) and `rag-security-architect` (LLM08). |
+| `memory-context-poisoning-reviewer` | ASI06 | yes | Persistent memory/stored-context poisoning: write-path trust classes, validation-before-write, per-entry provenance, tenant/user/session scoping at write AND recall, TTL + purge with derived-state rollback, recalled memory as data never instructions; distinct from `model-poisoning-reviewer` (LLM05) and `rag-security-architect` (LLM09). |
 | `inter-agent-comms-reviewer` | ASI07 | yes | A2A/MCP message security: per-edge mutual authn, end-to-end integrity, replay bounds, confidentiality, topology allowlists, spoofed-result handling; enforces authenticated ≠ trusted — peer messages never re-task, change permissions, or assert approvals. |
 | `agent-containment-reviewer` | ASI08 + ASI10 (merged) | yes | One containment review: cascade half (blast-radius isolation, bounded upstream trust, circuit breakers, checkpoints/rollback, retry-storm/fan-out limits) + rogue half (drift baselines, agent inventory/lifecycle, kill switches that SEVER AUTHORITY — credentials revoked, not processes killed); composes `ai-cost-guardrail-designer` + `incident-response-runbook`. |
 | `human-agent-trust-reviewer` | ASI09 | yes | Adversarial review of the approval layer: consent fatigue (rate/latency signals), self-reported summaries vs system-verified facts, bundling/salami-slicing, urgency manipulation, automation-bias controls; counterpart to `human-approval-boundary` (that skill places the gates; this attacks their resilience). |
@@ -611,8 +613,8 @@ Trigger-overlap coverage (`evals/trigger-evals.json`) ships for all six as one
 **agentic cluster**: internal discrimination (goal hijack vs memory poisoning
 vs drift/containment vs identity vs comms vs approval-trust) plus cross-phase
 discrimination against the shipped `prompt-injection-defender` (LLM01 vs
-ASI01), `model-poisoning-reviewer` (LLM04 vs ASI06), `rag-security-architect`
-(LLM08 vs ASI06), `agent-tool-safety-guard`, `llm-output-safety-reviewer`,
+ASI01), `model-poisoning-reviewer` (LLM05 vs ASI06), `rag-security-architect`
+(LLM09 vs ASI06), `agent-tool-safety-guard`, `llm-output-safety-reviewer`,
 `agent-authorization-matrix`, `human-approval-boundary`,
 `secrets-identity-hardener`, `agent-memory-governance`,
 `authorization-matrix-designer`, `api-event-architect`,
@@ -732,7 +734,7 @@ SKILL-vs-DOC seam pinned in trigger-evals.
 
 | Skill | Source (D13) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
-| `skill-quality-reviewer` | reconciliation §3 D13 — highest-leverage candidate, pulled first per the D13 standing rule (D18) | yes | The judgment layer above the mechanical validator: validator-first gate, then the seven checks it cannot script — trigger quality (trigger-oriented vs merely descriptive), trigger collision against the FULL shipped corpus (colliders NAMED), duplication/extension (LLM03/ASI04 precedent), eval integrity (boundary cases vs hollow filler), section substance (Stop Conditions that actually refuse), scope discipline, invocation posture. Per-check PASS/CONCERN/FAIL with quoted evidence → ship / revise / reject / make-it-an-extension. |
+| `skill-quality-reviewer` | reconciliation §3 D13 — highest-leverage candidate, pulled first per the D13 standing rule (D18) | yes | The judgment layer above the mechanical validator: validator-first gate, then the seven checks it cannot script — trigger quality (trigger-oriented vs merely descriptive), trigger collision against the FULL shipped corpus (colliders NAMED), duplication/extension (LLM04/ASI04 precedent), eval integrity (boundary cases vs hollow filler), section substance (Stop Conditions that actually refuse), scope discipline, invocation posture. Per-check PASS/CONCERN/FAIL with quoted evidence → ship / revise / reject / make-it-an-extension. |
 | `library-diff-reviewer` | reconciliation §3 D13 (D22) — the PR-level counterpart whose seam was pinned at D18 | yes | Reviews a whole library-changing PR end-to-end: fresh validator evidence pinned to the PR head, registration consistency (placement, post-merge voice, banked-candidate graduation, count arithmetic at EVERY site), collision sweep against the shipped corpus AND in-batch siblings, diff coherence (nothing smuggled in), per-skill quality via `skill-quality-reviewer` as the inner loop. One approve/request-changes verdict; performs no platform action. |
 | `eval-runner-designer` | reconciliation §3 D13 (D22) — closes the design gap D3 left open ("there is no eval runner yet") | yes | Designs how the eval corpus would actually EXECUTE: per-case-type semantics (fresh isolated session; refusal cases fire AND refuse), pairwise discrimination scoring, deterministic-vs-LLM-judge assertion routing with `JUDGE_ERROR` honesty, UNRUN-default reporting, cost/sampling tiers, flake policy (repeats + quorum + visible quarantine), advisory-first CI. Design/spec only — never claims a runner exists or that evals pass. |
 | `skill-usage-instrumenter` | reconciliation §3 D13 (D22) — usage telemetry design: invoked vs unused, wrong-fire evidence | yes | Designs the library's usage-evidence layer: invocation signals (auto vs explicit, coarse enums only — never prompt content or user identifiers), wrong-fire/correction events, computed never-fired lists over a stated window, evidence tiers (host-recorded vs self-reported), thresholds that name an action AND consumer, and the rare-but-critical exemption so low usage alone never condemns a safety-net skill. Adds no hooks; edits nothing. |
@@ -1232,9 +1234,9 @@ D6) moved to
 [Implemented → Skills (Phase 7)](#skills-phase-7--ai-security--llm-systems-pack)
 above. Source: [`docs/skills/09-ai-software-engineering.md`](skills/09-ai-software-engineering.md)
 and the reconciliation doc §3 Phase 7 coverage map (D6).
-Per D6: **LLM03** is extend-existing — the shipped Phase 4
+Per D6: **LLM04** (2026 ID; D6 cited LLM03:2025) is extend-existing — the shipped Phase 4
 `supply-chain-security-reviewer` was extended (scoped diff) to the AI/ML supply
-chain (models, datasets, fine-tuning adapters); **LLM10** DoS/denial-of-wallet
+chain (models, datasets, fine-tuning adapters); **LLM06** DoS/denial-of-wallet
 is baked into `ai-cost-guardrail-designer`; and `ai-evaluation-harness` absorbs
 the AI security test harness (no separate `ai-security-test-harness`). The
 Phase 7 **expansion backlog** (`ai-provider-adapter-designer`,
@@ -1254,7 +1256,7 @@ Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracke
 Per D7: **ASI08 + ASI10 merged** into `agent-containment-reviewer`;
 **ASI02/ASI05** extend Phase 7 `agent-tool-safety-guard` and
 `llm-output-safety-reviewer` (scoped diffs); **ASI04** extends Phase 4
-`supply-chain-security-reviewer` again after the D6/LLM03 extension. The
+`supply-chain-security-reviewer` again after the D6/LLM04 extension. The
 Compliance & Governance batch (D9) is implemented below.
 
 ### Compliance & Governance batch (D9)

@@ -2,10 +2,10 @@
 
 Use these controls with the [model poisoning reviewer](../SKILL.md) to assess
 the integrity of behavior-shaping data and pipelines. The Open Worldwide
-Application Security Project (OWASP) calls this **LLM04**, Data and Model
-Poisoning, in its 2025 large language model (LLM) risks. **RLHF** means
+Application Security Project (OWASP) calls this **LLM05**, Data and Model
+Poisoning, in its 2026 large language model (LLM) risks (LLM04 in 2025). **RLHF** means
 reinforcement learning from human feedback; **RAG** means retrieval-augmented
-generation. **LLM03** names the acquired-artifact supply-chain category;
+generation. **LLM04** names the acquired-artifact supply-chain category (LLM03 in 2025);
 **[D6](../../../../docs/reconciliation/step-0-reconciliation-v4.md)** is the
 project's recorded reconciliation decision extending that review. Scope here
 is pipelines YOU run. Acquired artifacts →
@@ -81,9 +81,9 @@ The high rows are the primary poisoning surface; controls scale with risk.
 
 ## Boundary with supply-chain-security-reviewer
 
-- **This skill (LLM04):** data you INGEST and pipelines you RUN — training
+- **This skill (LLM05):** data you INGEST and pipelines you RUN — training
   data curation, feedback loops, RAG ingestion integrity.
-- **supply-chain-security-reviewer (LLM03, extended per D6):** artifacts you
+- **supply-chain-security-reviewer (LLM04, extended per D6):** artifacts you
   ACQUIRE — third-party base models, downloaded datasets, fine-tuning adapters,
   their provenance and unsafe serialization.
 

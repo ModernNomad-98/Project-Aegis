@@ -1,6 +1,6 @@
 # Agent tool permission matrix & abuse catalog
 
-Detail for the owning [Agent Tool Safety Guard](../SKILL.md). OWASP LLM06 (Excessive Agency), 2025;
+Detail for the owning [Agent Tool Safety Guard](../SKILL.md). OWASP LLM03 (Excessive Agency), 2026 (LLM06 in 2025);
 extended for the OWASP Agentic Top 10 (2026): ASI02 (Tool Misuse and
 Exploitation) and the tool-side slice of ASI05 (Unexpected Code Execution).
 
