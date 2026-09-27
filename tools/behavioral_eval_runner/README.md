@@ -80,8 +80,11 @@ live assistant or sends a request to a model provider:
 | `verify-evidence` | Bundles below required `--root`; optional `--stage` selects input, final, or both reports. Final verification also checks the linked input bundle. | Prints integrity results for the supplied evidence; it does not execute cases. |
 
 The optional `--verify-baseline` flag checks one pinned historical census (882
-behavioral cases and 858 trigger cases). A later revision may legitimately
-have different counts. Run each command with `--help` for required file shapes
+behavioral cases and 858 trigger cases), counted from commit `e2f1da0` and set on
+2026-08-13 in commit `72e74af`. A later revision may legitimately have different
+counts. For current counts, run the `census` example above with the full commit
+identifier you need and read `behavior_cases` and `discrimination_cases` (trigger
+cases) under `totals`. Run each command with `--help` for required file shapes
 and options.
 
 ## What each part does
