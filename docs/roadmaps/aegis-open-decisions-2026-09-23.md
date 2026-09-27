@@ -53,6 +53,23 @@ and the package-2 consumption record [AEGIS-APR-052](../approvals/APPROVAL_REGIS
 | Protected-file guard options ([PR #333](https://github.com/ModernNomad-98/Project-Aegis/pull/333) packet) | Option A approved as [AEGIS-APR-047](../approvals/APPROVAL_REGISTER.md#aegis-apr-047-standing-gate-guard-exception-for-four-ber-files): a standing, conditional owner exception for four named BER reporting/aggregation files. The `gate-guard` check still fails and each use needs a receipt, independent review and exact-head checks. Options B and C were not selected; every other protected path keeps a one-time owner decision. |
 | Six UNSURE owner-choice skills (group S5) | **Resolved 2026-09-26:** the owner accepted all six verdicts. `feature-flag-rollout-strategist` NEEDS an owner-choice step and eval case, `edge-owner-deadline-ramp-pace-choice`: when a launch date conflicts with the evidence-backed ramp, compare moving the date, compressing the ramp or launching to a limited cohort. It is queued as a small batch. The other five do not need one: `data-quality-monitor-designer` (actions follow the blast-radius ranking, the service-level agreement is a consumer fact, and promise gaps belong to `slo-reliability-architect`); `cross-team-dependency-negotiator` (prioritization is escalated to shared management); `admin-console-architect` (consent and scope are policy input owned by `authorization-matrix-designer`); `funnel-definition-designer` (attribution follows the stated decision); and `agent-instruction-consolidator` (a rule plus simple approval). The owner-choice backlog is now 23 skills; S1, S2 and S3 merged in #366, #368, #370 and #373, and S4 (#376) and the new step (#377) remain. |
 
+Later on 2026-09-26 the owner also settled the items below. They come from
+the owner's chat instructions and have no register entry yet; where a row
+requires a record, that record is still to be written.
+
+| Topic | Decision and what it does not cover |
+| --- | --- |
+| `scripts/audit-skill-contracts.py` dirty-path defect | **Resolved, no owner choice remains.** The contract-audit script's handling of dirty (uncommitted) paths was fixed in [PR #373](https://github.com/ModernNomad-98/Project-Aegis/pull/373), merged at 23:32:15 UTC as `4ca04c1e` with the owner-approved protected-path PR; `gate-guard` failed on its protected paths, as the one-time owner exception anticipated. |
+| `project-orchestrator` feature-flag route | **Yes:** route from Stage 9 ("Decide to release") to the rollout strategist as an owner choice ("ship directly or behind a release flag?"). The routing change is not started. |
+| D64 decision-log row | **Required:** a D64 row must be added to the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions). No D64 row exists yet. |
+| Caching seam | **Kept** as currently written. |
+| Four one-way ROUTE-002 hub findings | **Stay census data:** these four routing-reciprocity findings are recorded, not fixed. Other ROUTE-002 findings stay in the open row below. |
+
+[PR #382](https://github.com/ModernNomad-98/Project-Aegis/pull/382) removed the two `scripts/__pycache__`
+bytecode files that #372 committed by mistake and ignores bytecode caches.
+`gate-guard` flagged its protected `scripts/` paths; it merged on 2026-09-27
+at 01:29:38 UTC as `0d05a838`, so no owner choice remains.
+
 ### Still open for the owner
 
 Each item below needs an owner choice or read before work that depends on it
@@ -62,8 +79,8 @@ can start. Listing an item here grants nothing.
 | --- | --- |
 | Security-surface rule in [CONTRIBUTING](../../CONTRIBUTING.md#external-contributions) for maintainer PRs | The guide requires an additional explicit security review when an external PR touches a security-relevant surface. The owner needs to decide whether, and in what form, that rule also applies to the maintainer's and agents' own PRs. |
 | Pull request template | Whether completing the repository's PR template is mandatory for every PR or advisory. |
-| `scripts/audit-skill-contracts.py` dirty-path defect | A reported defect in how the contract-audit script handles dirty (uncommitted) paths. The fix merged as [PR #373](https://github.com/ModernNomad-98/Project-Aegis/pull/373) at 23:32:15 UTC as `4ca04c1e`, with the owner-approved protected-path PR; `gate-guard` failed on its protected paths, as the one-time owner exception anticipated. |
-| ROUTE-002 routing reciprocity backlog | Whether and in what order to fix the remaining skill-contract audit findings where one skill excludes another without a matching exclusion back. #362 closed the ai-closeout-reporter case. |
+| Confidential conduct-reporting intake | Provide a usable private contact and an alternate recipient before the project claims confidential intake ([D59 finding](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions)). The [Code of Conduct](../../CODE_OF_CONDUCT.md#enforcement) still says neither has been published. |
+| ROUTE-002 routing reciprocity backlog | Whether and in what order to fix the remaining skill-contract audit findings where one skill excludes another without a matching exclusion back. #362 closed the ai-closeout-reporter case, and the owner kept four one-way hub findings as census data (see above). |
 | Issue #101 Stage 4B host proof | The exact host profile, permissions, telemetry, provider and cost limits, and a separate grant for any real host session. All eight synthetic Stage 4B cases are still NOT RUN. |
 | CP-WP-003 and CP-WP-004 | Real source authority and capability proof for CP-WP-003, then selection of one bounded real integration for CP-WP-004; both need separate reviewed scope and grants. |
 | Private BER candidate labels | Semantic review and exact-byte approval of the 160 pending private candidates; this index does not inspect them. |
@@ -97,11 +114,14 @@ not authorize its implementation.
   scope proposal (one new auto-invocable skill `feature-flag-architect`, a
   reciprocal description edit to `feature-flag-rollout-strategist`, and a
   separate `project-orchestrator` Stage-3 route) and said to build now; the
-  proposal page and the skill are in progress.
+  proposal page and the skill are in progress. Later that day the owner
+  approved the orchestrator route at Stage 9 ("Decide to release"); see
+  [Decided on 2026-09-26](#decided-on-2026-09-26).
 
 The [current forecast](aegis-backlog-forecast.md#start-here--current-reading)
-places ten selected rows at **71–146 active hours** plus the newly authorized
-4–8-hour #331 correction, a **75–154-hour** bounded selected subtotal, plus
+places the bounded selected subtotal at **71–146 active hours**: the ten
+selected rows. The 4–8-hour #331 correction made it 75–154 while undelivered;
+#374 delivered it. Beyond that subtotal are the
 unestimated issue #101 Stage 4B and the BER-BKL-009 host, runtime, privacy
 and cleanup residual. The selected total therefore has no finite estimate. It is a scope
 estimate, not

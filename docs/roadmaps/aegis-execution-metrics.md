@@ -2,7 +2,7 @@
 
 ## Start here — current measurements
 
-**Current measurements at the catch-up checkpoint after #370:** twenty-six PRs merged after #344 with no checkpoint. The missed windows ending #349, #354, #359, #364 and #369 took **32m50s**, **12m05s**, **7h57m30s**, **33m43s** and **1h45m11s observed wall time**; the third includes an unexplained 7h41m48s gap and is not a throughput measure. #370 and #374 (the #331 correction, merged 23:24:51 UTC) open the next window, followed by #373 at 23:32:15 UTC. No active, review, CI or waiting split was measured. The #344 maintenance subtotal (5.5–12 active hours) is fully delivered by #348–#356, but its accuracy cannot be scored without active time. The owner-approved #331 correction adds a provisional **4–8 active hours**, making the bounded selected subtotal **75–154 provisional active hours**. Outside it, 17 of the 22 owner-choice skills are delivered (S1, S2 and S3, including the two deferred S1 skills merged in #373), with 5 more in open PRs, and the owner-requested feature-flag skill adds a provisional **2.5–5**. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded.
+**Current measurements at the catch-up checkpoint after #370:** twenty-six PRs merged after #344 with no checkpoint. The missed windows ending #349, #354, #359, #364 and #369 took **32m50s**, **12m05s**, **7h57m30s**, **33m43s** and **1h45m11s observed wall time**; the third includes an unexplained 7h41m48s gap and is not a throughput measure. #370 and #374 (the #331 correction, merged 23:24:51 UTC) open the next window, followed by #373 at 23:32:15 UTC. No active, review, CI or waiting split was measured. The #344 maintenance subtotal (5.5–12 active hours) is fully delivered by #348–#356, but its accuracy cannot be scored without active time. The owner-approved #331 correction added a provisional **4–8 active hours**, making the bounded selected subtotal 75–154 while it was undelivered; #374 delivered it, so the current bounded selected subtotal is **71–146 provisional active hours**. Outside it, the owner-choice backlog is 23 skills after S5 added one step (the original audit counted 22): 17 are delivered (S1, S2 and S3, including the two deferred S1 skills merged in #373) and 6 are in open PRs (S4 as #376 and the S5 step as #377). The owner-requested feature-flag skill adds a provisional **2.5–5**. #380 and #372 merged after this reading and complete the window, so the next checkpoint is due. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded.
 
 **Earlier measurements at the checkpoint after #344:** the #333-to-#338 window took **1h20m20s observed wall time** and the #338-to-#344 window **3h11m14s observed wall time**; the second includes an owner-requested pause and is not a throughput measure. No active, review, CI or waiting split was measured. Choice-guidance batch C merged in [PR #342](https://github.com/ModernNomad-98/Project-Aegis/pull/342), so the bounded selected subtotal is again the ten core rows, **71–146 provisional active hours**; the 72–148-hour figure published by #343 is superseded by that delivery. Additional skill-choice maintenance sits outside it at a provisional **5.5–12 active hours**. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded. #345, #346 and #347 open the next five-merge window.
 
@@ -66,8 +66,9 @@ reads the same tree. This bounded checkpoint started at 21:02:28 UTC, first
 drafted through #362 and then extended through #370, with no prior item ETA
 and a new **1–2 active-hour** ETA. At its start the published bounded
 selected subtotal was **71–146 active hours** (#352); the owner-approved #331
-correction, recorded by #365, adds 4–8, giving **75–154 provisional active
-hours**. Issue #101 Stage 4B and BER-BKL-009 residuals are unestimated, so
+correction, recorded by #365, added 4–8, giving 75–154 provisional active
+hours while it was undelivered; #374 delivered it, so the current bounded
+selected subtotal is again **71–146 provisional active hours**. Issue #101 Stage 4B and BER-BKL-009 residuals are unestimated, so
 neither the full selected nor all-options backlog has a finite ETA.
 
 **Cadence.** Twenty-six PRs merged after #344 without a checkpoint. This
@@ -162,6 +163,12 @@ per-merge spacing is not labor on that PR or a throughput rate. #374 (the
 `4ca04c1e`. They are the second and third merges of the next window, so the
 next checkpoint is due after two further merges. At this reading (about 23:33
 UTC), #371, #372, #375, #376, #377 and #378 are open and receive no credit.
+After this reading, #380 (MANUAL-ONLY trigger-eval naming) merged at
+23:50:52 UTC as `40c734f0` and #372 (the R2 wording) at 23:54:35 UTC as
+`2500d35c`. They are the fourth and fifth merges, so that checkpoint is now
+due; this record does not measure them. #372 also committed two bytecode
+files by mistake; cleanup PR #382 merged on 2026-09-27 at 01:29:38 UTC
+as `0d05a838`.
 
 **ETA accuracy.** The #344 checkpoint estimated the maintenance items
 outside the subtotal at **5.5–12 active hours**; #348, #349, #350, #351,
@@ -173,16 +180,18 @@ of observed wall time from its recorded start to its merge, including review
 and CI.
 
 The ten existing selected rows remain **71–146 active hours**, provisional.
-The newly authorized #331 correction adds a provisional **4–8 active hours**,
-so the bounded selected planning subtotal is **75–154**; the correction was
-implemented in #374, merged after #370, with active time not
-measured. Outside that subtotal, the 22-skill owner-choice teaching backlog
-(originally a provisional **8.5–16.5 active hours**; S1 five skills, S2 six,
+The newly authorized #331 correction added a provisional **4–8 active hours**,
+making the subtotal 75–154 while it was undelivered; it was implemented in
+#374, merged after #370, with active time not measured, so the current
+bounded selected planning subtotal is **71–146**. Outside that subtotal,
+the owner-choice teaching backlog, 22 skills in the original audit (a
+provisional **8.5–16.5 active hours**; S1 five skills, S2 six,
 S3 six, S4 five) has 17 delivered: three S1 skills (#366), S2 (#368), S3
-(#370) and the two deferred S1 skills (#373). S4 is in open PR #376, so 5
-are in open PRs; the open R2 wording is #372. There is no
+(#370) and the two deferred S1 skills (#373). S4 is in open PR #376; the R2
+wording, open as #372 at this reading, merged afterwards. There is no
 per-batch split to subtract. S5 was resolved on 2026-09-26: one of the six
-needs a step, open as #377, so the backlog is 23 skills with 17 delivered.
+needs a step, open as #377, so the backlog is 23 skills with 17 delivered
+and 6 in open PRs.
 The owner-requested feature-flag architecture skill and its orchestrator
 routing add a provisional **2.5–5 active hours**; the owner accepted the
 skill's scope on 2026-09-26 and the skill is in progress, while the

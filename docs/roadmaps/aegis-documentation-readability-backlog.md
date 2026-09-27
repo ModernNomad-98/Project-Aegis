@@ -111,6 +111,23 @@ tracked Markdown files: 561 accepted reader pages and 44 classified synthetic
 fixtures**, with zero known pending pages; #364 added the only new page and
 this checkpoint adds none.
 
+That record covered only three pages, but the checkpoint also changed this
+ledger, whose own revision had no recorded review. An automated Codex review
+of that candidate also found a delivered estimate still counted as remaining
+work, a resolved row in the open owner queue, a missing open owner decision
+and mismatched owner-choice counts. The follow-up revision changes all four
+pages again to fix those findings and record merges and owner decisions made
+later on 2026-09-26. A first independent full-page review of
+the follow-up returned FIX-FIRST: PR #382, described as open, had merged.
+Its minimal edits recorded that merge on the three roadmap pages and removed
+#382 from the open owner queue. A separate corrected-candidate review
+asked for one more wording edit, so 22 skills reads only as the original
+audit count, and then **accepted all four pages, including this ledger**,
+against [Acceptance for each page](#acceptance-for-each-page). No estimate,
+grant or gate changed. The tree still has **605 tracked Markdown files: 561
+accepted reader pages and 44 classified synthetic fixtures**, with zero
+known pending pages.
+
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
 the [Behavioral Eval Runner (BER) selected-precheck aggregate decision page](ber-precheck-aggregate-validation-proposal.md)
