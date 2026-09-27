@@ -1417,3 +1417,39 @@ generic skill guidance that would require asking for the same approval again.
   exactly the five AEGIS-APR-054 paths. The
   [post-merge main run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36279755880)
   passed Linux and Windows checks; the PR-only guard was skipped.
+
+### AEGIS-APR-057: Live startup-routing acceptance test re-run
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE; granted and not yet consumed. A later
+  lifecycle event records its consumption or expiry.
+- **Date / Grantor:** 2026-09-27 / Peter Nguyen.
+- **Reason:** The README says automatic skill selection was "verified by a
+  live acceptance test on 2026-07-30 against the startup files from decision
+  D61". That evidence predates later startup-file changes: seven commits
+  after 2026-07-30 changed `CLAUDE.md` or `AGENTS.md`, the latest on
+  2026-09-25. The claim needs a fresh live run against the current files.
+- **Owner decision:** In chat with the Claude Code coordinator on 2026-09-27,
+  the owner first chose three runs per case, then chose "Approve, 1 run per
+  case". The later one-run choice is the grant; the three-run choice was
+  replaced before any run started.
+- **Scope allowed:** A one-time grant, as worded: "Live startup-routing
+  acceptance test re-run: up to 9 headless Claude Code 2.1.283 sessions on
+  claude-opus-5-5 (8 scored cases x 1 run + 1 unscored reference), in new
+  scratch folders built from Project-Aegis at
+  da2636d049db25a4fc367c025e44636c9de66e6d; tool writes denied in tested
+  sessions; stop at 20M input tokens." Committing the redacted evidence
+  file is allowed under the existing delivery grants (AEGIS-APR-039 and
+  AEGIS-APR-048).
+- **Scope FORBIDDEN:** As worded: "Excluded: VirtualBox VM, Stage 4B host
+  proof, SDK query(), host bridge/hooks, installs, deployment, private
+  data, claims about token savings or host enforcement." No other
+  restriction was stated.
+- **Evidence:** Direct owner answers in the Project Aegis conversation on
+  2026-09-27, quoted above, relayed by the coordinating agent. The README
+  claim is in the README section
+  [From idea to shipped](../../README.md#from-idea-to-shipped-the-no-experience-path)
+  and cites decision D61 in the
+  [planning record](../reconciliation/step-0-reconciliation-v4.md).
+- **Expiry / use limit:** One run of at most nine sessions. "Expires when the
+  run finishes or 2026-09-30."

@@ -7,6 +7,9 @@
 > [current forecast](aegis-backlog-forecast.md#start-here--current-reading),
 > and owning backlogs before
 > acting. This page grants no implementation, host or provider authority.
+> On 2026-09-27 the seven owner decisions under
+> [Decided on 2026-09-27](#decided-on-2026-09-27) were added; the other rows
+> were not re-checked for that update.
 
 ## Current disposition
 
@@ -31,7 +34,7 @@ repository checks, not a selected-host proof. A source SHA is a commit hash;
 | CP-WP-003 | [APR-006](../approvals/APPROVAL_REGISTER.md#aegis-apr-006-control-plane-offline-capability-proofs-first-increment) and [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123) delivered the synthetic CP-WP-003A proof. The [CP backlog](resumable-control-plane-backlog.md) still blocks real source authority, independent freshness, containment, evidence and billing claims. The delivered proof grants no real dispatch. |
 | CP-WP-004 | No delivery target is selected. The [CP backlog](resumable-control-plane-backlog.md) requires CP-WP-003 prerequisites and a separately approved integration with exact receipt, rollback and budget terms. |
 | Issue #101 setup and routing | Packages 1–3 shipped in [PR #109](https://github.com/ModernNomad-98/Project-Aegis/pull/109), [PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124), and [PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121). The bounded synthetic Stage 4A bridge shipped in [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281); [APR-036](../approvals/APPROVAL_REGISTER.md#aegis-apr-036-stage-4a-offline-bridge-package-completed) records consumption of APR-031. [PR #319](https://github.com/ModernNomad-98/Project-Aegis/pull/319) shipped the version-2 offline request binding at reviewed head `550151dcf286f8ec64480bc91f47e390454417d2`, merged as `a59c015c01b4035ab1a438533736134f96deac13` on 2026-09-26 at 02:24:21 UTC with Linux, Windows and `gate-guard` green. This remains synthetic-only. Stage 4B real host proof and the later helper comparison need separate scope and approval; packages 5/6 remain conditional, package 7 pending, and no helper is selected. Follow the [setup plan](aegis-setup-routing-plan.md). |
-| Confidential conduct-reporting intake | The [Code of Conduct](../../CODE_OF_CONDUCT.md#enforcement) now states that no confidential route or independent recipient has been published. The original [D59 finding](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) remains an owner decision: provide a usable private contact and alternate recipient before claiming confidential intake. Do not put sensitive incident details in a public issue. |
+| Confidential conduct-reporting intake | The [Code of Conduct](../../CODE_OF_CONDUCT.md#enforcement) states that no confidential route or independent recipient has been published. On 2026-09-27 the owner chose to wait on the [D59 finding](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) until outside contributors appear (see [Decided on 2026-09-27](#decided-on-2026-09-27)). Until a private contact and alternate recipient exist, the project must not claim confidential intake. Do not put sensitive incident details in a public issue. |
 
 ### Decided on 2026-09-26
 
@@ -70,6 +73,24 @@ bytecode files that #372 committed by mistake and ignores bytecode caches.
 `gate-guard` flagged its protected `scripts/` paths; it merged on 2026-09-27
 at 01:29:38 UTC as `0d05a838`, so no owner choice remains.
 
+### Decided on 2026-09-27
+
+The owner decided these seven items in chat with the Claude Code coordinator
+on 2026-09-27. Only the first has a register entry; where one exists, the
+register entry, not this summary, is the authority. The other six are the
+owner's direct chat instructions; this page records them and is not itself the
+authority.
+
+| Topic | Decision and what it does not cover |
+| --- | --- |
+| Live startup-routing acceptance test | **Re-run now.** The README's claim that routing was "verified by a live acceptance test on 2026-07-30" rests on the startup files from decision D61, which later commits changed. The owner first chose three runs per case, then chose one run per case: up to nine headless Claude Code 2.1.283 sessions on `claude-opus-5-5` (eight scored cases plus one unscored reference) in new scratch folders built from `da2636d0`, with tool writes denied and a 20-million-input-token stop. Recorded as [AEGIS-APR-057](../approvals/APPROVAL_REGISTER.md#aegis-apr-057-live-startup-routing-acceptance-test-re-run), a one-time grant that expires when the run finishes or on 2026-09-30. It excludes the VirtualBox virtual machine (VM), Stage 4B host proof, the software development kit (SDK) `query()` call, the host bridge or hooks, installs, deployment, private data, and claims about token savings or host enforcement. The run had not started at this recording. |
+| Security-surface rule in [CONTRIBUTING](../../CONTRIBUTING.md#external-contributions) | **Outside PRs only.** The additional explicit security review for PRs that touch a security-relevant surface stays a rule for outside contributions. It is not extended to the maintainer's or agents' own PRs, and `CONTRIBUTING.md` is unchanged. |
+| Open Worldwide Application Security Project (OWASP) Top 10 for Large Language Model (LLM) Applications 2026 remaining gaps (named in [D65](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions), [PR #405](https://github.com/ModernNomad-98/Project-Aegis/pull/405)) | **Extend all three existing skills now; no new skills.** LLM10 Improper Output Handling (review of AI-generated code before it is saved or run) goes to `llm-output-safety-reviewer`; LLM04 Supply Chain (trust in promoted model artifacts) goes to `supply-chain-security-reviewer`; LLM01 Prompt Injection, multimodal part (instructions hidden in images, audio or other non-text input), goes to `prompt-injection-defender`. Each extension is delivered in its own reviewed PR. This decision has no new decision-log number. |
+| Confidential conduct-reporting intake ([Code of Conduct](../../CODE_OF_CONDUCT.md#enforcement), from the [D59 finding](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions)) | **Wait until outside contributors appear.** No private address is published now, and `CODE_OF_CONDUCT.md` stays unchanged. Revisit when the first outside contribution arrives. Until then the project does not claim confidential intake. |
+| Pull request template (`.github/pull_request_template.md`) | **Checklist advisory; security line required.** Completing the checklist stays optional, but every PR must tick Yes or No under the template's "Security-relevant surface?" heading. A separate reviewed PR makes this explicit in `CONTRIBUTING.md` and the template. It does not extend the additional security review, which stays for outside PRs (row above). |
+| Decision-log row for the `aegis-setup` skill (184 to 185 skills, [PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124) under [APR-007](../approvals/APPROVAL_REGISTER.md#aegis-apr-007-issue-101-conversational-setup-aegis-only-completion)) | **Add D67, marked retroactive.** The next free number, D67, is added to [§5 of the reconciliation log](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) as an after-the-fact record that records PR #124's actual merge date, 2026-09-23, so every skill-count change has a decision row. A separate reviewed PR adds it. |
+| Behavioral Eval Runner (BER) README pinned counts (`tools/behavioral_eval_runner/README.md`, 882 behavior and 858 trigger cases) | **Add a date and a pointer to the current counts.** A fresh check found the counts accurate: `census.py` still pins them for its baseline check, and the README already says later revisions may differ. The owner still chose to add a date and a pointer for clarity. The file is on a protected path, so the change needs its own reviewed PR and a one-time, exact-head gate-guard exception from the owner at merge; this choice does not itself grant that exception. |
+
 ### Still open for the owner
 
 Each item below needs an owner choice or read before work that depends on it
@@ -77,9 +98,6 @@ can start. Listing an item here grants nothing.
 
 | Open item | What the owner needs to decide |
 | --- | --- |
-| Security-surface rule in [CONTRIBUTING](../../CONTRIBUTING.md#external-contributions) for maintainer PRs | The guide requires an additional explicit security review when an external PR touches a security-relevant surface. The owner needs to decide whether, and in what form, that rule also applies to the maintainer's and agents' own PRs. |
-| Pull request template | Whether completing the repository's PR template is mandatory for every PR or advisory. |
-| Confidential conduct-reporting intake | Provide a usable private contact and an alternate recipient before the project claims confidential intake ([D59 finding](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions)). The [Code of Conduct](../../CODE_OF_CONDUCT.md#enforcement) still says neither has been published. |
 | ROUTE-002 routing reciprocity backlog | Whether and in what order to fix the remaining skill-contract audit findings where one skill excludes another without a matching exclusion back. #362 closed the ai-closeout-reporter case, and the owner kept four one-way hub findings, and a fifth from #383, as census data (see above). Later on 2026-09-26 the owner decided to reciprocate 23 high-value seams (including five hub exceptions) and record the rest as census data; that work is in progress. |
 | Issue #101 Stage 4B host proof | The exact host profile, permissions, telemetry, provider and cost limits, and a separate grant for any real host session. All eight synthetic Stage 4B cases are still NOT RUN. |
 | CP-WP-003 and CP-WP-004 | Real source authority and capability proof for CP-WP-003, then selection of one bounded real integration for CP-WP-004; both need separate reviewed scope and grants. |
