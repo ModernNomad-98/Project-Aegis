@@ -95,7 +95,10 @@ TOOL_NAME = "audit-skill-contracts"
 # prose, which is what produced the AEGIS-060 false positives; a corrected live
 # report must be distinguishable from that engine by VERSION, not only by
 # engine_sha256. Frozen baselines that record 1.12.0 stay as they are.
-TOOL_VERSION = "1.13.1"
+# 1.13.2 — description mentions and the ROUTE-002 exclusion tail match WHOLE
+# skill names. Substring matching counted `ai-threat-modeler` as a mention of
+# `threat-modeler` (owner decision 2026-09-27).
+TOOL_VERSION = "1.13.2"
 
 
 class InputContainmentError(Exception):
@@ -487,6 +490,20 @@ DURABILITY_LEVEL = re.compile(
 )
 
 BACKTICKED_KEBAB = re.compile(r"`([a-z0-9]+(?:-[a-z0-9]+)+)`")
+
+
+def mentions_skill_name(text: str, name: str) -> bool:
+    """True when `text` names the skill `name` as a WHOLE kebab name.
+
+    A plain substring test lets `ai-threat-modeler` count as a mention of
+    `threat-modeler`. A match must not be preceded or followed by a letter,
+    digit or hyphen, so a longer skill name never counts as a shorter one.
+    Backticks, spaces, punctuation and the string edges are valid boundaries.
+    """
+    return re.search(
+        rf"(?<![A-Za-z0-9-]){re.escape(name)}(?![A-Za-z0-9-])", text
+    ) is not None
+
 # Backticked kebab tokens that are legitimately NOT skill names on routing
 # surfaces (curated from the live corpus; extend deliberately, never casually).
 NON_SKILL_TOKENS = {
@@ -1089,9 +1106,10 @@ class Audit:
                         f"description references `{tok}`, which is not a skill on disk",
                         "route", ["AEGIS-053"], s.name, "medium", True,
                     ))
-            # unbackticked mentions still route (descriptions cite names bare)
+            # unbackticked mentions still route (descriptions cite names bare);
+            # whole-name only, so `ai-threat-modeler` is not `threat-modeler`
             for other in names:
-                if other != s.name and other in s.description:
+                if other != s.name and mentions_skill_name(s.description, other):
                     mentioned.add(other)
             desc_mentions[s.name] = mentioned - {s.name}
             for tgt in sorted(desc_mentions[s.name]):
@@ -1125,7 +1143,9 @@ class Audit:
             if cut < 0:
                 continue
             tail = desc[cut:]
-            for tgt in sorted(n for n in desc_mentions[s.name] if n in tail):
+            for tgt in sorted(
+                n for n in desc_mentions[s.name] if mentions_skill_name(tail, n)
+            ):
                 if s.name not in desc_mentions.get(tgt, set()):
                     self.findings.append(Finding(
                         "ROUTE-002", "info", s.rel(), 0, s.name,
