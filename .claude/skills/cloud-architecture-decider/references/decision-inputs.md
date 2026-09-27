@@ -64,7 +64,7 @@ and owner comparison template in
 | Pattern or service category | You own vs the platform | Example providers | Fits when | Ceiling that forces a change |
 | --- | --- | --- | --- | --- |
 | IaaS / VPS | You: OS, patching, runtime. Platform: hardware. | Hyperscaler VMs, DigitalOcean Droplets, Linode | Full control; custom kernels/daemons; lift-and-shift | Ops burden exceeds team capacity |
-| Container PaaS | You: the container. Platform: host, scaling, deploy. | Render, Railway, Fly.io | "Just deploy my app + DB"; long-running services | Pricing/scale limits; a service the platform lacks |
+| App platform / container PaaS | You: the container. Platform: host, scaling, deploy. | Render, Railway, Fly.io | "Just deploy my app + DB"; long-running services | Pricing/scale limits; a service the platform lacks |
 | Frontend / SSR host | You: frontend + functions. Platform: build, CDN, deploy. | Vercel, Netlify, Cloudflare Pages | Static/SSR frontend + serverless API; push-to-deploy | Long-running/stateful backend that won't fit functions |
 | Managed data / Postgres-BaaS | You: schema + policies. Platform: managed database; verify identity, file storage and backup features for the chosen service. | Supabase, Neon | Managed relational database; combine other services only after capability checks | Extreme scale/tuning; an engine the BaaS doesn't offer |
 | Edge / serverless functions | You: function code. Platform: global runtime, per-call scaling. | Cloudflare Workers, Fly.io | Global low-latency; bursty/event compute; stateless | Stateful/long-running work; runtime/time limits |
