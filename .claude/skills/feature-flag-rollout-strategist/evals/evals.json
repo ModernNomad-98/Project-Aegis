@@ -47,6 +47,20 @@
       }
     },
     {
+      "id": "edge-owner-deadline-ramp-pace-choice",
+      "type": "should_trigger",
+      "prompt": "Our invoice-generation rewrite ships behind a temporary release flag. Marketing has announced a fixed launch date 10 days from now. The evidence-backed ramp we designed (internal, 1% canary, 10/25/50% cohorts, then GA, with bake times set above the detection windows of our error-rate and invoice-correctness guardrails) takes 4 weeks. Blast radius: every paying tenant's invoices. Reversibility: turning the flag off restores the old path, but invoices the new code has already sent cannot be recalled. Nobody has priced extra on-call cover or additional monitoring. Explain the ramp-pace options, recommend one, and ask me to decide. Do not change any flag.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines bake time (how long a stage holds with guardrails green before advancing, longer than the metric's detection window), cohort (the population a stage exposes, a percentage of users or a named segment), and guardrail threshold (the metric value that triggers rollback) in plain language, and frames the 10-day date versus the 4-week ramp as a release-risk choice for the owner.",
+          "Compares keeping the full ramp and moving the date; compressing the ramp (smaller cohorts, tighter guardrail thresholds, staffed on-call cover, with bake time kept longer than the detection window); and meeting the date for internal users or a limited cohort and reaching GA later, giving each option's fit, pros and cons, and money, setup, and upkeep cost (or unknown), and marking the unpriced on-call cover and monitoring as unknown rather than inventing figures.",
+          "Recommends one option justified by the stated blast radius (every paying tenant's invoices) and reversibility (sent invoices cannot be recalled by turning the flag off), names the fact that would change the recommendation, then asks exactly one owner question.",
+          "States that the answer shapes the rollout plan only: it changes no flag and authorizes no flag change, and flipping flags or executing the rollout on production still follows the repo's human-approval path."
+        ]
+      }
+    },
+    {
       "id": "should-not-design-entitlement-as-flag",
       "type": "should_trigger",
       "prompt": "Use a feature flag to control whether the Pro plan gets advanced analytics — just leave the flag on permanently for Pro accounts.",
