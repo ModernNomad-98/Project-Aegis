@@ -54,7 +54,9 @@ When this skill asks the user to choose among viable build options, first
 define unfamiliar terms; explain each relevant option's reason, money/setup/
 maintenance costs (or uncertainty), and case-specific pros and cons; recommend
 one with a reason tied to the user's context; then ask one atomic question.
-If a sound recommendation needs a missing fact, ask for that fact first.
+If a sound recommendation needs missing facts, ask only for one missing fact
+per turn, with no recommendation or decision question on that turn, until the
+deciding facts are known; never invent a recommendation.
 Factual discovery and simple execution approval do not need an option menu.
 
 ## Output Format
