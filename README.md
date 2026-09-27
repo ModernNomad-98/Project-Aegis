@@ -285,8 +285,8 @@ third-party behavior change — the linked official pages win.*
 
 **One engine, many surfaces.** Claude Code is one engine available on several surfaces —
 the terminal, VS Code (and forks like Cursor), JetBrains IDEs, a Desktop app, the web,
-and the Claude mobile app. The skills in `.claude/skills/` load the same way on every local surface, so
-pick whichever matches how you work. The current full list is at
+and the Claude mobile app. The skills in `.claude/skills/` load the same way on every
+local surface, so pick whichever matches how you work. The current full list is at
 [https://code.claude.com/docs/en/platforms](https://code.claude.com/docs/en/platforms).
 
 **Option 1 — Claude Code CLI (terminal, any OS, works alongside any editor).**
@@ -359,8 +359,8 @@ to see a terminal.
 [claude.ai/code](https://claude.ai/code) runs Claude Code in the cloud (Anthropic-managed by
 default) against a GitHub repository — point it at your fork of this repo (or any repo
 you've copied skills into) and prompt the same way, with nothing installed; it works from a
-browser and the Claude mobile app (iOS and Android). One honest caveat: it works on the cloud copy of the repository, not on the files on
-your machine.
+browser and the Claude mobile app (iOS and Android). One honest caveat: it works on the
+cloud copy of the repository, not on the files on your machine.
 
 **Option 6 — Claude.ai / the Claude apps (no Claude Code at all).** Without Claude Code you don't get
 automatic `.claude/` discovery — but the skills are just Markdown procedures, so you can
@@ -424,8 +424,9 @@ Two ways in:
   `cp -r .claude/skills .agents/skills` inside a project, or per-skill copies into
   `~/.agents/skills/` for a user-level install (the locations in the official
   [Codex skills docs](https://developers.openai.com/codex/skills), checked 2026-09-26;
-  earlier versions of this README said `.codex/skills`). Use real copies (no symlinks — they break
-  on Windows). Verified caveats before you choose this path (the first is fixed, kept
+  earlier versions of this README said `.codex/skills`). Use real copies (git symlinks are
+  unreliable on Windows checkouts; Codex itself supports symlinked skill folders, checked
+  2026-09-26). Verified caveats before you choose this path (the first is fixed, kept
   for the record):
   1. ~~Strict-YAML consumers silently drop skills whose descriptions contain an unquoted
      `: `~~ — **fixed by the D50 normalization**: every description is now a
@@ -440,16 +441,19 @@ Two ways in:
      [Codex skills](https://developers.openai.com/codex/skills) docs on 2026-09-26;
      verification item — recheck on new versions.)
   3. Native selection may see only a short description prefix — roughly the first 92
-     characters in Codex, per the internal [D49](docs/reconciliation/step-0-reconciliation-v4.md)
-     measurement (2026-07-18; not an official figure). Codex's docs confirm only that it
-     shortens descriptions when the skills list exceeds its budget.
+     characters in Codex, per an internal measurement recorded as decision
+     [D49](docs/reconciliation/step-0-reconciliation-v4.md) (2026-07-18; not an official
+     figure). Codex's docs confirm only that it shortens descriptions when the skills list
+     exceeds its budget.
   4. Codex's skills docs do not list `disable-model-invocation`; its documented control is
      `allow_implicit_invocation: false` in a per-skill `agents/openai.yaml` (verified
      against the [Codex skills docs](https://developers.openai.com/codex/skills) on
-     2026-09-26; verification item — recheck on new versions). Do **not** copy the
-     manual-only operate-class skills across, and do not rely on their leading
-     "MANUAL-ONLY" description sentinels alone (they reduce auto-invocation risk; they
-     are not enforcement).
+     2026-09-26; verification item — recheck on new versions). Cursor, by contrast,
+     documents and honors `disable-model-invocation: true` (per the
+     [Cursor skills docs](https://cursor.com/docs/context/skills), checked 2026-09-26).
+     Either way, do **not** copy the manual-only operate-class skills across, and do not
+     rely on their leading "MANUAL-ONLY" description sentinels alone (they reduce
+     auto-invocation risk; they are not enforcement).
 
   For those reasons, don't commit a `.agents/skills` copy to this repo — a committed copy
   drifts on every skill edit and bakes in the three live caveats. The copy is per-user
