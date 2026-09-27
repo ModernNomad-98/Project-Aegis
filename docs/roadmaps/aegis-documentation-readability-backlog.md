@@ -2,11 +2,11 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #416 (`da2636d`) on 2026-09-27 Coordinated
+As of merged pull request (PR) #439 (`d2d9b05`) on 2026-09-27 Coordinated
 Universal Time (UTC), this remains the active
 repository-wide documentation acceptance backlog. The latest count is in the
-paragraph for main after #416 (`da2636d`): 610 tracked Markdown files, 560
-accepted reader pages, 44 classified synthetic fixtures and six known pending
+paragraph for main after #439 (`d2d9b05`): 612 tracked Markdown files, 558
+accepted reader pages, 44 classified synthetic fixtures and ten known pending
 pages; the paragraphs between are dated history, oldest first. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -436,7 +436,7 @@ every other changed page as above, adding together each page's
   `secure-migration-reviewer/SKILL.md` (2), `threat-modeler/SKILL.md` (2)
   and `threat-modeler/references/threat-catalog.md` (4).
 
-Main after #416 (`da2636d`) therefore has **610 tracked Markdown files: 560
+Main after #416 (`da2636d`) therefore had **610 tracked Markdown files: 560
 accepted reader pages, 44 classified synthetic fixtures and six known pending
 pages**. The pending pages are, in `.claude/skills/`,
 `agent-tool-safety-guard/SKILL.md`, `hidden-context-exposure-reviewer/SKILL.md`
@@ -445,6 +445,89 @@ and `llm-output-safety-reviewer/SKILL.md`; and the step-0 reconciliation
 record. The named follow-up is one independent full-page re-read of each
 pending page against [Acceptance for each page](#acceptance-for-each-page). No
 grant or gate changed.
+
+PRs #420 (`dfb0cac`), #421 (`4b205a7`), #423 (`6561944`), #425 (`7b88841`),
+#422 (`5d91fa5`), #427 (`0030e73`), #431 (`dfbcf0f`), #429 (`169e8be`), #432
+(`7894567`), #426 (`a06f815`), #428 (`0cb0777`), #433 (`9104cff`), #424
+(`5711ddf`), #436 (`862dd90`), #430 (`6712ebb`), #435 (`a96b902`), #437
+(`96cf65a`), #434 (`b7dc060`) and #439 (`d2d9b05`) merged on 2026-09-27 UTC
+after #416, in that order. #427 added
+`.claude/skills/prompt-injection-defender/references/multimodal-injection-patterns.md`
+and #433 added the
+[live startup-routing acceptance record](../evidence/startup-routing/2026-09-live-acceptance.md);
+no Markdown file was removed or renamed. #429 changed audit scripts and tests
+only. The three `artifacts/audits/` JSON baselines regenerated in #432 and the
+evaluation JSON changed in #424, #427, #428 and #435 are not Markdown and are
+not counted; no synthetic fixture changed. The verdicts below are the
+independent review comments posted on each PR, and every page accepted below is
+identical on main to the head its reviewer accepted. Line counts are
+`git diff --numstat` from each merge's first parent, added together since the
+page's last full-page acceptance.
+
+- **Accepted after full-page reviews (14 pages).** #422:
+  `.claude/skills/agent-tool-safety-guard/SKILL.md`,
+  `hidden-context-exposure-reviewer/SKILL.md` and its
+  `references/hidden-context-checks.md`, accepted on `379c588`. #427:
+  `prompt-injection-defender/SKILL.md` and the new
+  `references/multimodal-injection-patterns.md`, accepted on `633304b`. #426:
+  this ledger, accepted on `6fb5811`. #428:
+  `supply-chain-security-reviewer/SKILL.md`, accepted on `3787f74`, and its
+  `references/supply-chain-checklist.md`, accepted on `9c9a669` and unchanged
+  after. #424: `llm-output-safety-reviewer/SKILL.md` and its
+  `references/output-sink-catalog.md`, accepted on `af328b5`. #430: the
+  [README](../../README.md), accepted on `b6b4b4e`; the reviewer's check of
+  `102dd7b` pre-cleared acceptance if the next diff held exactly two named
+  one-line edits, and `git diff 102dd7b b6b4b4e` is exactly those edits. #434:
+  `file-upload-storage-architect/SKILL.md` (18 lines with #385), accepted on
+  `3c44f4a`, and `agent-tool-safety-guard/references/tool-permission-matrix.md`
+  (20 with #405), accepted on `356932a`. #439: the step-0 reconciliation
+  record, accepted on `97c8682`, after #423 had added its 27-line D67 entry.
+- **Keep acceptance under the targeted-edit rule (7 pages).** The README (2
+  since #430, from #437), `code-reviewer/SKILL.md` (10: 6 in #394 and #419, 4
+  in #424), `prompt-injection-defender/references/injection-defense-patterns.md`
+  (6: 3 in #405, 3 in #427), `project-orchestrator/SKILL.md` (#435, 1), the
+  [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md)
+  (#436, 2), [CONTRIBUTING](../../CONTRIBUTING.md) (#421, 7) and the
+  [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
+  (#425, 7). #420, #421 and #423 have no posted review verdict; as for #385
+  above, the rule is applied to their line counts. #435's reviewer noted that
+  53 earlier lines on `project-orchestrator/SKILL.md` (#248, #261 and #384)
+  predate the rule; this ledger does not count pre-rule edits.
+- **Newly pending (8 pages).** Their reviews checked the changed passages, not
+  the whole page: the [approval register](../approvals/APPROVAL_REGISTER.md)
+  (76: 36 in #420, 40 in #432), the
+  [open-decisions index](aegis-open-decisions-2026-09-23.md) (35: 26 in #420,
+  9 in #431), `.github/pull_request_template.md` (#421, 12), the
+  [skills catalog](../skills-catalog.md) (15 since #413: 2 each in #423, #427
+  and #424, 9 in #428), `ai-threat-modeler/references/llm-top10-threat-catalog.md`
+  (18 since #415: 7 in #427, 7 in #428, 4 in #424),
+  `model-poisoning-reviewer/references/poisoning-controls.md` (16: 10 in #405,
+  6 in #428), the [AEGIS-060+ register](../audits/aegis-060-plus-register.md)
+  (29 since #416: 24 in #432, 5 in #436) and the
+  [skill-contract audit baseline report](../audits/skill-contract-audit-baseline.md)
+  (#432, 253). #432 regenerated that report with the audit script; this ledger
+  has no separate class for generated reports, so it is counted as a reader
+  page, and #432's review reproduced its content but was not a full-page
+  readability review.
+- **New and pending:** the live startup-routing acceptance record (#433, 283
+  lines). Its review and re-review (SHIP on `339ac90`, which matches main)
+  checked the evidence and grant scope but gave no full-page verdict against
+  [Acceptance for each page](#acceptance-for-each-page).
+- **Still pending:** `.claude/skills/api-event-architect/SKILL.md` (12),
+  unchanged since #417.
+
+Main after #439 (`d2d9b05`) therefore has **612 tracked Markdown files: 558
+accepted reader pages, 44 classified synthetic fixtures and ten known pending
+pages**. The pending pages are the approval register, the open-decisions
+index, `.github/pull_request_template.md`, the skills catalog, the AEGIS-060+
+register, the skill-contract audit baseline report, the live startup-routing
+acceptance record, and in `.claude/skills/`, `api-event-architect/SKILL.md`,
+`ai-threat-modeler/references/llm-top10-threat-catalog.md` and
+`model-poisoning-reviewer/references/poisoning-controls.md`. The named
+follow-up is one independent full-page re-read of each pending page against
+[Acceptance for each page](#acceptance-for-each-page). A follow-up ledger
+update will record PR #438 (approval-register lifecycle events), which merged after #439 as `5dbf7bc`, and the
+upcoming audit-baseline re-run. No grant or gate changed.
 
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
@@ -834,6 +917,16 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Reconciliation log D65 closure, PR #439, after #434, 2026-09-27 | `docs/reconciliation/step-0-reconciliation-v4.md` | An independent full-page re-read **accepted** the log on `97c8682`, which matches main; it had been pending since #405, and #423 had added 27 lines. Main after #439 (`d2d9b05`) has 612: 558 accepted readers, 44 classified fixtures and ten known pending. No grant or gate changed. |
+| Upload and tool-matrix fixes, PR #434, after #437, 2026-09-27 | `file-upload-storage-architect/SKILL.md` and `agent-tool-safety-guard/references/tool-permission-matrix.md` | Past 10 lines (18 and 20), so both needed full-page re-reads; independent reviews **accepted** the skill on `3c44f4a` and the matrix on `356932a`, both matching main. |
+| README glossary and routing citation, PRs #430 and #437, after #436, 2026-09-27 | [README](../../README.md) | #430: after two FIX-FIRST rounds the reviewer pre-cleared acceptance for two named one-line edits, and `b6b4b4e` contains exactly those, so the README is **accepted** on `b6b4b4e`. #437 (SHIP) changed 2 lines; it **keeps acceptance**. |
+| Orchestrator setup pointer, PR #435, and ROUTE-002 recount, PR #436, 2026-09-27 | `project-orchestrator/SKILL.md`; ROUTE-002 dispositions record and AEGIS-060+ register | SHIP reviews. The orchestrator (1) and dispositions record (2) keep acceptance; the AEGIS-060+ register becomes **pending** (29 with #432). |
+| Output-safety, promoted-model and multimodal-injection skills, PRs #424, #428 and #427, 2026-09-27 | Three `SKILL.md` pages, four reference sheets (one new), `code-reviewer/SKILL.md`, the threat catalog and the skills catalog | Full-page reviews **accepted** both `llm-output-safety-reviewer` pages (`af328b5`), both `supply-chain-security-reviewer` pages (`3787f74`, checklist `9c9a669`) and both `prompt-injection-defender` pages including the new multimodal sheet (`633304b`). `code-reviewer` (10) and `injection-defense-patterns.md` (6) keep acceptance; the skills catalog (15), `llm-top10-threat-catalog.md` (18) and `poisoning-controls.md` (16) become **pending**. |
+| Live startup-routing record, PR #433, after #428, 2026-09-27 | New [live startup-routing acceptance record](../evidence/startup-routing/2026-09-live-acceptance.md) | Evidence and grant-scope review SHIP on `339ac90`, which matches main; no full-page verdict, so the new page is **pending**. |
+| Ledger catch-up, PR #426, after #432, 2026-09-27 | This ledger | A corrected-candidate full-page re-read **accepted** it on `6fb5811`, which matches the ledger on main before this update. |
+| Audit baselines regenerated, PR #432, and ROUTE-002 engine fix, PR #429, 2026-09-27 | Approval register, AEGIS-060+ register and the generated [audit baseline report](../audits/skill-contract-audit-baseline.md) | #429 changed scripts only. #432's review reproduced the regenerated files but was not a full-page review: the approval register (76 with #420), the AEGIS-060+ register (24) and the report (253) become **pending**. The three JSON baselines are not Markdown. |
+| Owner decisions, contribution rules, D67 and BER guide, PRs #420, #421, #423, #425 and #431, after #416, 2026-09-27 | Approval register, open-decisions index, `CONTRIBUTING.md`, `.github/pull_request_template.md`, README, skills catalog, step-0 log and Behavioral Eval Runner guide | Only #425 (SHIP) and #431 (SHIP) posted review verdicts. `CONTRIBUTING.md` (7) and the BER guide (7) keep acceptance; the open-decisions index (35) and pull request template (12) become **pending**. The README, catalog, register and log are counted in the rows above. |
+| Hidden-context and tool-guard re-read fixes, PR #422, after #425, 2026-09-27 | `hidden-context-exposure-reviewer/SKILL.md` and `references/hidden-context-checks.md`; `agent-tool-safety-guard/SKILL.md` | A corrected-candidate full-page re-read **accepted** all three pending pages on `379c588`, which matches main. |
 | ROUTE-002 record and register re-read fixes, PR #416, after #415, 2026-09-27 | [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md) and [AEGIS-060+ register](../audits/aegis-060-plus-register.md) | Minimal edits from a full-page re-read (FIX-FIRST); a separate independent corrected-candidate review **accepted** both on `a548dcb`, which matches main. Main after #416 (`da2636d`) has 610: 560 accepted readers, 44 classified fixtures and six known pending. No grant or gate changed. |
 | OWASP security page re-read fixes, PR #415, after #413, 2026-09-27 | In `.claude/skills/`: `ai-threat-modeler/SKILL.md` and its `references/llm-top10-threat-catalog.md`, `rag-security-architect/SKILL.md`, `ai-misinformation-guard/SKILL.md`, `model-poisoning-reviewer/SKILL.md` and `supply-chain-security-reviewer/SKILL.md` | Minimal edits from full-page re-reads (FIX-FIRST); separate independent corrected-candidate full-page reviews **accepted** all six on `79cee79`, which matches main. |
 | Master-prompt citation fix, PR #413, after #403, 2026-09-27 | [Skills catalog](../skills-catalog.md) and seven skill pages: six `SKILL.md` pages (2 lines each) and `threat-modeler/references/threat-catalog.md` (4) | The catalog (20 lines) received an independent full-page re-read on `2ceea06`, which matches main, and is **accepted**. The seven skill pages keep acceptance under the targeted-edit rule; the largest totals, 8 lines, are `security-pr-reviewer` and `static-analysis-reviewer` with #395 and #417. |
