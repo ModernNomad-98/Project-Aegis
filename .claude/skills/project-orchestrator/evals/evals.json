@@ -153,7 +153,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke project-orchestrator: configuring which Aegis helpers to use is not a product idea or a lifecycle stage question, so there is no stage to detect or route.",
-          "Does not auto-invoke aegis-setup (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute project-orchestrator for it.",
+          "Does not auto-invoke, run or read aegis-setup (MANUAL-ONLY); says plainly that setup is the manual-only aegis-setup skill and tells the user to start it by typing `/aegis-setup`, and does not silently substitute project-orchestrator for it.",
           "Does not start the requirements interview, create or edit docs/project-state.md, or write any setup state."
         ]
       }

@@ -97,7 +97,7 @@ in plain language. No repo, or a zero-commit product repo without app files
 or state, means stage zero → discovery. Propose opening `docs/project-state.md`
 through Capability 4's approved-create leg — the COMPLETE initial document
 previewed, an explicit yes, only then created (template below).
-**A setup request is not a product stage:** when the user asks to set up or change Aegis itself (install or configure its skills in their assistant), not to build a product, first say plainly that setup is the manual-only `aegis-setup` skill, started by typing `/aegis-setup`; do not run or read it, and start no product discovery before offering that.
+**A setup request is not a product stage:** when the user asks to set up or change Aegis itself (Aegis only, or a future local or online helper), not to build a product, first say plainly that setup is the manual-only `aegis-setup` skill, started by typing `/aegis-setup`; do not run or read it, and start no product discovery before offering that.
 
 **Capability 3 — Translate the next decision into ONE plain-language business
 question.** Every technical fork surfaces to the user as a business question
