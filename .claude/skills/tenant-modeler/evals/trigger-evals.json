@@ -1,7 +1,7 @@
 {
   "skill": "tenant-modeler",
   "description": "Trigger discrimination for the Phase 3 tenant cluster. Pins tenant semantics apart from isolation review and data-layer design.",
-  "overlaps_with": ["tenant-isolation-reviewer", "multi-tenant-data-architect"],
+  "overlaps_with": ["tenant-isolation-reviewer", "multi-tenant-data-architect", "saas-platform-architect"],
   "cases": [
     {
       "id": "semantics-win-here",
@@ -23,6 +23,13 @@
       "expected_skill": "multi-tenant-data-architect",
       "should_not_trigger": ["tenant-modeler", "tenant-isolation-reviewer"],
       "reason": "Scoping strategy and tenant-context propagation are data-layer design, downstream of settled tenant semantics."
+    },
+    {
+      "id": "tenancy-architecture-goes-to-saas-platform-architect",
+      "prompt": "Our tenant is the workspace and membership rules are already signed off. Now decide which components run pooled versus siloed per tenant and what belongs in the control plane versus the data plane as we convert the single-tenant app.",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": ["tenant-modeler"],
+      "reason": "Tenant semantics are settled; pooled/siloed deployment and the control-plane split are tenancy architecture, which tenant-modeler yields to saas-platform-architect."
     }
   ]
 }
