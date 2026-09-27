@@ -78,7 +78,9 @@ Why needed:    <one sentence>
 Blast radius:  <systems, environments, tenants, users affected>
 Reversibility: <rollback path, or "irreversible: <what is lost>">
 <Only for a build-path choice: define terms; give each viable path's reason,
- benefits, drawbacks, and money/setup/upkeep costs or unknowns.>
+ benefits, drawbacks, and money/setup/upkeep costs or unknowns. While an
+ essential fact is missing, this turn asks only for that one fact, with no
+ recommendation or path question; list Options once all are known.>
 Options:
   A. <recommended — and why>
   B. <alternative>
@@ -91,7 +93,8 @@ Awaiting explicit approval — halted until answered.
 - [ ] The halt happened BEFORE the risky action, not as a post-hoc confession.
 - [ ] The request names the exact action, not a vague category.
 - [ ] Reversibility stated honestly, including "irreversible" when true.
-- [ ] Options include do-nothing; a recommendation is given.
+- [ ] Options include do-nothing; a recommendation is given (for a build-path
+      choice, only once every essential fact is known).
 - [ ] A build-path choice explains terms, reasons, trade-offs, costs or unknowns;
       while an essential fact is missing it asks only for one such fact per turn
       and gives no path recommendation, and once all are known it gives a

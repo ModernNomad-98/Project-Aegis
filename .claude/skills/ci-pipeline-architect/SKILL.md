@@ -8,10 +8,11 @@ disable-model-invocation: true
 
 Terms used below: **CI/CD** means continuous integration and continuous
 delivery (or deployment); **E2E** means end-to-end testing; **OIDC** means
-OpenID Connect; **PR** means pull request; **SAST** means static application
-security testing; and **YAML** is the human-readable configuration format
-used by many pipeline definitions. These expansions do not change this
-skill's manual-only invocation or its approval requirements for pipeline edits.
+OpenID Connect; **PR** means pull request; **QA** means quality assurance;
+**SAST** means static application security testing; and **YAML** is the
+human-readable configuration format used by many pipeline definitions. These
+expansions do not change this skill's manual-only invocation or its approval
+requirements for pipeline edits.
 
 ## Purpose
 
@@ -111,8 +112,8 @@ weakened.
    compatibility and budget; flags do not reverse schema or data changes.
    A flag can complement the other deployment strategies; detailed flag
    targeting and ramp rules belong to `feature-flag-rollout-strategist`.
-   Mark unknown
-   costs as unknown and verify current prices if exact spend matters.
+   Mark unknown costs as unknown and verify current prices if exact spend
+   matters.
    If decisive facts are missing, ask only for one missing fact per turn
    until all are known; only then recommend, and if the user must choose,
    ask one atomic decision question.
