@@ -1,8 +1,32 @@
 {
   "skill": "human-agent-trust-reviewer",
-  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: approval-layer exploitation (ASI09) vs gate placement, retrospective governance audit, content overreliance, and oversight tiering.",
-  "overlaps_with": ["human-approval-boundary", "agent-governance-audit", "ai-misinformation-guard", "ai-governance-risk-reviewer", "agent-tool-safety-guard"],
+  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: approval-layer exploitation (ASI09) vs gate placement, retrospective governance audit, content overreliance, oversight tiering, defining what counts as approval (agent-authorization-matrix), and designing the governed standing-approval layer (standing-approval-and-auto-advance).",
+  "overlaps_with": ["human-approval-boundary", "agent-governance-audit", "ai-misinformation-guard", "ai-governance-risk-reviewer", "agent-tool-safety-guard", "agent-authorization-matrix", "standing-approval-and-auto-advance"],
   "cases": [
+    {
+      "id": "attack-the-merge-approval-flow-wins-here-over-authority-skills",
+      "prompt": "Our agent's merge approvals follow the policy on paper, but reviewers now approve dozens a day within seconds, and the agent's summaries always make the change sound routine. Attack the approval flow: where do fatigue, polished justifications, or bundled steps let a dangerous merge slip through?",
+      "expected_skill": "human-agent-trust-reviewer",
+      "should_not_trigger": ["agent-authorization-matrix", "standing-approval-and-auto-advance"],
+      "note": "SEAM CASE — merge approvals and approval fatigue sound like authority design or the approval-fatigue policy. The policy is taken as given here; the ask is an adversarial review of whether the approval flow holds up.",
+      "reason": "human-agent-trust-reviewer's description covers 'consent fatigue (approval floods that train rubber-stamping; rate/latency as the signals)', 'deceptive, over-polished justifications making a dangerous action look routine', and 'dangerous steps bundled in innocuous batches'. It 'attacks their resilience'. agent-authorization-matrix is invoked 'to design or revise agent authority', and the authority is not being changed; it yields 'attacking approval-flow resilience (human-agent-trust-reviewer)'. standing-approval-and-auto-advance says 'Do not use to ... stress-test approval experience (human-agent-trust-reviewer)'."
+    },
+    {
+      "id": "define-approval-semantics-goes-to-agent-authorization-matrix",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Approvals for our agent's actions feel like a formality. Before anyone reviews the approval UX, define what counts as approval per action: which deploys, releases, production-data changes, and history rewrites need their own human decision, and whether a scoped standing grant can ever stand in for one.",
+      "expected_skill": "agent-authorization-matrix",
+      "should_not_trigger": ["human-agent-trust-reviewer"],
+      "note": "SEAM CASE (reverse direction) — 'approvals feel like a formality' is the trust reviewer's own trigger phrase. The ask is to define approval semantics, not to attack the approval flow.",
+      "reason": "The explicit invocation names agent-authorization-matrix because it is MANUAL-ONLY and must never be auto-selected. What this case pins is the description-level discrimination. agent-authorization-matrix's description says 'Deploys, releases, production data, secrets, and history rewrites require their own decisions' and that a protected-branch merge 'may be a still-active, scoped standing grant'; it is invoked 'to design or revise agent authority'. human-agent-trust-reviewer ('Use when ... approvals feel like a formality') attacks the gates' resilience and says 'Do NOT use to ... define approval semantics (agent-authorization-matrix)'."
+    },
+    {
+      "id": "build-standing-approval-policy-goes-to-standing-approval",
+      "prompt": "Explicitly invoke standing-approval-and-auto-advance. Approvals feel like a formality because I confirm the same 'push the branch?' and 'open the PR?' prompts all day inside phases I already approved. Don't review the approval flow for manipulation; design the documented standing approval for those named steps, with an opt-out phrase and per-session restatement.",
+      "expected_skill": "standing-approval-and-auto-advance",
+      "should_not_trigger": ["human-agent-trust-reviewer"],
+      "note": "SEAM CASE (reverse direction, standing-approval side) — 'approvals feel like a formality' is the trust reviewer's own trigger phrase. The ask is to build the governed fatigue-reduction policy, not to attack the approval flow.",
+      "reason": "The explicit invocation names standing-approval-and-auto-advance because it is MANUAL-ONLY and must never be auto-selected. What this case pins is the description-level discrimination. standing-approval-and-auto-advance's description covers 'documented standing approval for named delivery steps, phase advance only through already-approved phases, per-session restatement, an opt-out phrase', says 'Use when repetitive mechanical approvals erode real gates', and yields 'stress-test approval experience (human-agent-trust-reviewer)'. human-agent-trust-reviewer says 'Do NOT use to ... design standing approvals (standing-approval-and-auto-advance)'; it attacks an existing approval flow's resilience, and the prompt explicitly declines that review."
+    },
     {
       "id": "approval-exploitation-wins-here",
       "prompt": "Review whether our agent's approval prompts could be rubber-stamped or gamed — the operators mostly just read the agent's own explanation and click approve.",

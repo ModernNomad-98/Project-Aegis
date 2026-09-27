@@ -1,11 +1,27 @@
 {
   "skill": "agent-authorization-matrix",
-  "description": "Trigger discrimination: standing agent-authority policy vs the runtime approval halt (human-approval-boundary), vs end-user RBAC design (authorization-matrix-designer), vs the lifecycle umbrella (ai-sdlc-operating-model).",
-  "overlaps_with": ["human-approval-boundary", "authorization-matrix-designer", "ai-sdlc-operating-model"],
+  "description": "Trigger discrimination: standing agent-authority policy vs the runtime approval halt (human-approval-boundary), vs end-user RBAC design (authorization-matrix-designer), vs the lifecycle umbrella (ai-sdlc-operating-model), vs the governed approval-fatigue layer inside existing authority (standing-approval-and-auto-advance), vs adversarial review of approval-flow resilience (human-agent-trust-reviewer).",
+  "overlaps_with": ["human-approval-boundary", "authorization-matrix-designer", "ai-sdlc-operating-model", "standing-approval-and-auto-advance", "human-agent-trust-reviewer"],
   "cases": [
     {
+      "id": "merge-cell-approval-semantics-wins-here-over-standing-approval",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Our approvals for agent merges have turned into rubber stamps: people say yes to anything with green checks. For the merge-to-main action, decide what actually counts as approval. Can a scoped standing grant satisfy it, can green CI ever satisfy it, and is arming auto-merge a separate action?",
+      "expected_skill": "agent-authorization-matrix",
+      "should_not_trigger": ["standing-approval-and-auto-advance", "human-agent-trust-reviewer"],
+      "note": "SEAM CASE — at description level, the 'rubber-stamp' wording belongs to human-agent-trust-reviewer, and complaints about approvals pull toward the approval-fatigue layer. The ask is neither: it is the approval semantics of one authority cell, not a policy for reducing repeat prompts or an attack review of the approval flow.",
+      "reason": "The explicit invocation names agent-authorization-matrix because it is MANUAL-ONLY and must never be auto-selected. What this case pins is the description-level discrimination. agent-authorization-matrix's description says 'Protected-branch merge requires an explicit human decision, which may be a still-active, scoped standing grant; green checks alone are never approval' and 'Arming auto-merge is forbidden to agents by default and is a separate action from merging'. It is invoked 'to design or revise agent authority'. Both descriptions now yield reciprocally: agent-authorization-matrix says 'Do not use for ... standing approval of repetitive steps (standing-approval-and-auto-advance), or attacking approval-flow resilience (human-agent-trust-reviewer)', standing-approval-and-auto-advance says 'Do not use to ... define authority floors (agent-authorization-matrix)', and human-agent-trust-reviewer says 'Do NOT use to ... define approval semantics (agent-authorization-matrix)'. human-agent-trust-reviewer ('approval floods that train rubber-stamping', 'Use when ... approvals feel like a formality') stress-tests the approval layer's attack resilience and does not define what counts as approval."
+    },
+    {
+      "id": "repetitive-mechanical-approvals-go-to-standing-approval",
+      "prompt": "Explicitly invoke standing-approval-and-auto-advance. I'm rubber-stamping dozens of identical 'push the feature branch?' and 'open the PR?' prompts every session, inside phases I already approved, and it's making me careless on the approvals that matter. Set up a documented standing approval for those named steps, with an opt-out phrase and a per-session restatement. What the agent is allowed to do stays exactly as it is.",
+      "expected_skill": "standing-approval-and-auto-advance",
+      "should_not_trigger": ["agent-authorization-matrix", "human-agent-trust-reviewer"],
+      "note": "SEAM CASE (reverse direction) — the approval vocabulary looks like authority design. The prompt keeps the authority unchanged and asks only for the governed fatigue-reduction layer inside it.",
+      "reason": "The explicit invocation names standing-approval-and-auto-advance because it is MANUAL-ONLY and must never be auto-selected. What this case pins is the description-level discrimination. standing-approval-and-auto-advance's description covers 'documented standing approval for named delivery steps, phase advance only through already-approved phases, per-session restatement, an opt-out phrase' and says 'Use when repetitive mechanical approvals erode real gates'. agent-authorization-matrix is invoked 'to design or revise agent authority', and the prompt explicitly leaves authority unchanged; its description yields 'standing approval of repetitive steps (standing-approval-and-auto-advance)'. The 'rubber-stamping' wording echoes human-agent-trust-reviewer's 'approval floods that train rubber-stamping'. But the ask is to build the governed policy, not to attack an existing approval flow, and standing-approval-and-auto-advance says 'Do not use to ... stress-test approval experience (human-agent-trust-reviewer)'."
+    },
+    {
       "id": "standing-authority-definition-wins-here",
-      "prompt": "Write the policy for what our coding agent may do without asking: commits, pushes, opening PRs, merging, deploying.",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Write the policy for what our coding agent may do without asking: commits, pushes, opening PRs, merging, deploying.",
       "expected_skill": "agent-authorization-matrix",
       "should_not_trigger": ["human-approval-boundary", "authorization-matrix-designer"],
       "reason": "Defining standing agent authority is the matrix; the boundary only enforces it at runtime, and end-user RBAC is a different skill entirely."
@@ -19,7 +35,7 @@
     },
     {
       "id": "post-incident-authority-fix-wins-here",
-      "prompt": "Yesterday a PR merged to main with no human review because auto-merge had been armed in an earlier agent session. Codify the rule so this cannot recur.",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Yesterday a PR merged to main with no human review because auto-merge had been armed in an earlier agent session. Codify the rule so this cannot recur.",
       "expected_skill": "agent-authorization-matrix",
       "should_not_trigger": ["human-approval-boundary", "agent-governance-audit"],
       "reason": "Codifying corrected standing authority after an autonomy incident is matrix work; auditing what happened would be agent-governance-audit, and no risky action is imminent."

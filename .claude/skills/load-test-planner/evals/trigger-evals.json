@@ -1,13 +1,30 @@
 {
   "skill": "load-test-planner",
-  "description": "Trigger discrimination: the traffic/scenario PLAN (this skill) vs the measuring instrument (performance-test-harness, the sibling), target setting (slo-reliability-architect), test-data generation (test-data-architect), and overall QA strategy (qa-strategy-architect).",
+  "description": "Trigger discrimination: the traffic/scenario PLAN (this skill) vs the measuring instrument (performance-test-harness, the sibling), target setting (slo-reliability-architect), test-data generation (test-data-architect), overall QA strategy (qa-strategy-architect), and attributing an existing slowdown (profiling-methodology-designer).",
   "overlaps_with": [
     "performance-test-harness",
     "slo-reliability-architect",
     "test-data-architect",
-    "qa-strategy-architect"
+    "qa-strategy-architect",
+    "profiling-methodology-designer"
   ],
   "cases": [
+    {
+      "id": "noisy-neighbor-capacity-window-wins-here-over-profiling",
+      "prompt": "Before Black Friday we need to know whether the shared cluster holds when our biggest tenant bursts. Should we run that in staging or in a low-traffic production window, and what are the ramp and the abort point?",
+      "expected_skill": "load-test-planner",
+      "should_not_trigger": ["profiling-methodology-designer"],
+      "note": "SEAM CASE — both skills now teach a staging-versus-production-window choice. Here the window is chosen to validate capacity and a noisy neighbour, not to attribute an existing slowdown.",
+      "reason": "load-test-planner's description covers 'capacity validation', 'the noisy-neighbor scenario where one tenant's burst must not degrade the rest', 'ramp profiles with abort criteria', and 'no scenario runs against production ... without explicit human approval — blast radius stated per scenario'. profiling-methodology-designer is for 'why something is slow with no evidenced suspect' and yields 'capacity/noisy-neighbor load planning (load-test-planner)'. No slowdown is being attributed here."
+    },
+    {
+      "id": "unattributed-prod-slowdown-goes-to-profiling",
+      "prompt": "Search p99 roughly doubled after last week's release. Our staging load test looked fine, but production is slow. Before anyone schedules another load test, design how we find where the time actually goes, and whether we measure in staging or in a production window.",
+      "expected_skill": "profiling-methodology-designer",
+      "should_not_trigger": ["load-test-planner"],
+      "note": "SEAM CASE (reverse direction) — the words 'load test' and 'production window' pull a naive router toward the load plan. The actual question is attributing an existing slowdown.",
+      "reason": "profiling-methodology-designer's description covers 'where does the time (or memory) actually go', 'why something is slow with no evidenced suspect', measurement conditions ('representative load and data volume'), and 'never runs profilers against production (approval-gated)'. load-test-planner plans load for 'load/stress/soak/spike testing, capacity validation, or noisy-neighbor verification' and says 'Do NOT use to ... attribute an existing slowdown (profiling-methodology-designer)'. None of those is being asked for."
+    },
     {
       "id": "traffic-plan-wins-here",
       "prompt": "Plan the load for our pre-release validation: realistic endpoint mix with the right write share, our two whale tenants plus the long tail, a soak overnight, and a spike scenario for launch morning — with abort criteria.",

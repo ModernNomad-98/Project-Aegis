@@ -1,14 +1,31 @@
 {
   "skill": "profiling-methodology-designer",
-  "description": "Trigger discrimination: unattributed time/memory investigation design (this skill) vs functional root-cause (systematic-debugger), an evidenced single query (query-plan-reader), chatty data access (n-plus-one-detector), standing telemetry (observability-operator), and pass/fail measurement (performance-test-harness).",
+  "description": "Trigger discrimination: unattributed time/memory investigation design (this skill) vs functional root-cause (systematic-debugger), an evidenced single query (query-plan-reader), chatty data access (n-plus-one-detector), standing telemetry (observability-operator), pass/fail measurement (performance-test-harness), and forward-looking capacity/noisy-neighbor load planning (load-test-planner).",
   "overlaps_with": [
     "systematic-debugger",
     "query-plan-reader",
     "n-plus-one-detector",
     "observability-operator",
-    "performance-test-harness"
+    "performance-test-harness",
+    "load-test-planner"
   ],
   "cases": [
+    {
+      "id": "prod-only-slowdown-attribution-wins-here-over-load-plan",
+      "prompt": "Our nightly reconciliation got 40% slower after the ORM upgrade, but only in production; staging runs are flat. Nobody knows whether it's the queries, GC, or waiting on the file store. Do we reproduce it under load in staging or capture during a production window, and how do we narrow it down?",
+      "expected_skill": "profiling-methodology-designer",
+      "should_not_trigger": ["load-test-planner"],
+      "note": "SEAM CASE — 'reproduce under load' and 'production window' echo the load plan's staging-versus-production choice. Here the choice serves attributing a slowdown, not validating capacity.",
+      "reason": "profiling-methodology-designer's description covers 'why something is slow with no evidenced suspect', profiler classes including 'off-CPU/blocking-IO', measurement conditions ('warm vs cold, representative load and data volume'), 'the hypothesis-driven narrowing loop', and 'never runs profilers against production (approval-gated)'. load-test-planner is for 'capacity validation, or noisy-neighbor verification'. Neither is requested. The descriptions yield reciprocally: load-test-planner says 'Do NOT use to ... attribute an existing slowdown (profiling-methodology-designer)'."
+    },
+    {
+      "id": "per-tenant-noisy-neighbor-proof-goes-to-load-test-planner",
+      "prompt": "Next month we onboard a tenant ten times bigger than anyone else. Design the test that proves the other tenants' latency doesn't suffer when that tenant runs its month-end import, with production-shaped data volumes and a stated blast radius.",
+      "expected_skill": "load-test-planner",
+      "should_not_trigger": ["profiling-methodology-designer"],
+      "note": "SEAM CASE (reverse direction) — 'latency doesn't suffer' reads like a performance investigation. Nothing is slow yet, though. The ask is a forward-looking noisy-neighbour load scenario.",
+      "reason": "load-test-planner's description covers 'the noisy-neighbor scenario where one tenant's burst must not degrade the rest, judged per-tenant, not aggregate', 'data volumes seeded to production shape and skew', and 'blast radius stated per scenario'. profiling-methodology-designer answers 'where does the time (or memory) actually go' for an existing slowdown, and there is none here. Its description yields 'capacity/noisy-neighbor load planning (load-test-planner)'."
+    },
     {
       "id": "unattributed-investigation-wins-here",
       "prompt": "Everything about the export job feels slow but nobody can say whether it's the queries, the transformation code, or writing the output — design how we find out where the time goes.",
@@ -51,7 +68,7 @@
     },
     {
       "id": "standing-telemetry-goes-to-observability-operator",
-      "prompt": "Instrument the checkout service with latency histograms and traces, and build the dashboard so we can watch performance continuously.",
+      "prompt": "Explicitly invoke observability-operator. Instrument the checkout service with latency histograms and traces, and build the dashboard so we can watch performance continuously.",
       "expected_skill": "observability-operator",
       "should_not_trigger": [
         "profiling-methodology-designer"
