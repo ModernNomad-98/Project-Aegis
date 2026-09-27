@@ -3133,6 +3133,33 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     README and catalog rows renamed; `SKILL-COUNT` unchanged at 186.
     Validator: 186 skills, 0 warnings; contract audit shows no new findings.
 
+- **D67 (2026-09-27, retroactive record of 2026-09-23) — Added the manual-only
+  `aegis-setup` skill (184 → 185).**
+  - **Record type.** This is an after-the-fact record. The owner decided on
+    2026-09-27 to add it so every skill-count change has a decision row. The
+    decision itself was made and delivered on 2026-09-23.
+  - **What shipped.** [PR #124](https://github.com/ModernNomad-98/Project-Aegis/pull/124)
+    merged at 2026-09-23T16:54:59Z as
+    `d598390f4b7bb367ce79dd1276157f91ae36556b`, under owner grant AEGIS-APR-007
+    (Issue #101 package 2), which AEGIS-APR-052 records as consumed. It added
+    `aegis-setup`: a manual-only, four-choice setup conversation, run only
+    when a person invokes it by name, and an Aegis-only saved selection on
+    tested single-user Windows PowerShell. Local and online helpers remain
+    unavailable, and a saved choice grants no provider authority. Family 23;
+    the library went from 184 to 185 skills.
+  - **Why no row existed.** The delivery was authorized and tracked in the
+    [owner approval register](../approvals/APPROVAL_REGISTER.md), not in this
+    log, and no decision row was written then. PR #389 later added the README row
+    and catalog sentence, citing PR #124 and AEGIS-APR-007 instead of a
+    decision number.
+  - **Numbering.** D67 is the next free number. It is out of time order by
+    design: D64 (185 → 186) comes after this change in the skill count but
+    has a lower number. Existing numbers are not changed.
+  - **What this does NOT change.** No skill, file list or count changes (the
+    library stays at 186). AEGIS-APR-007 stays consumed and gains no new use.
+    D64, D65 and D66 are not edited or renumbered. README and catalog now cite
+    D67 alongside PR #124 and AEGIS-APR-007.
+
 ## 6. Post-merge corrections
 
 - **2026-09-26 — D64 amendment.** PR #395 (`741b29a`) added a reciprocal
