@@ -91,7 +91,20 @@ promise explicit before integrations harden around accidents.
    (field removal/retyping, semantics changes — additive is non-breaking by
    contract), how versions are expressed, support window per version, and
    the deprecation sequence: announce → dual-run → sunset header/warnings →
-   enforce, with minimum notice stated.
+   enforce, with minimum notice stated. When no standing window and notice
+   policy is set, teach the choice before asking, because the support
+   window and minimum notice are a standing commitment to every partner. Define *support window* (how long a version keeps working
+   after its successor ships), *minimum notice* (the shortest time from a
+   deprecation announcement to enforcement), and *dual-run* (both versions
+   live at once) in plain language. For each viable window-and-notice
+   pairing give why it fits the partner base and release cadence, its pros
+   and cons (partner trust vs how many versions run at once), and its money
+   (hosting and support for concurrent versions), setup, and upkeep cost, or
+   unknown. If the partner profile or release cadence is missing, ask only
+   for that fact first; otherwise recommend one, say why and what fact
+   would change it, then ask exactly one owner question. Each later sunset is planned within this
+   policy by `sunset-deprecation-communicator`. The answer sets policy only;
+   it does not by itself authorize a breaking change (see Stop Conditions).
 6. **Build the event taxonomy and schemas** using
    [references/api-event-contract-conventions.md](references/api-event-contract-conventions.md):
    versioned envelope (event id, type, occurred-at, tenant id,
@@ -126,6 +139,9 @@ Rate limits: <per-credential / per-tenant / plan-derived tiers; headers; 429
   behavior>
 Versioning & deprecation policy: <breaking definition; version expression;
   support window; announce → dual-run → sunset sequence with minimum notice>
+Policy choice: <plain terms; window + notice pairings — why, pros/cons,
+  hosting/support/upkeep cost or unknown; recommendation + what would change
+  it; ONE owner question; authorizes no breaking change>
 Event taxonomy: <event type — semantics — payload (thin/full + why)>
 Envelope schema: <fields, versioned>
 Webhook delivery policy: <subscription scoping; delivery semantics; retry
@@ -146,6 +162,9 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
       entitlement matrix where plan-derived.
 - [ ] "Breaking" is defined; deprecation has a minimum-notice number and a
       dual-run window, not just an announcement.
+- [ ] An owner window-and-notice choice has terms defined; each option's
+      why, pros/cons and cost-or-unknown; a recommendation plus what would
+      change it; one owner question; the answer grants no authority.
 - [ ] Webhook subscriptions are tenant-scoped; delivery semantics
       (at-least-once, retry schedule, ordering honesty) are documented.
 - [ ] Webhooks are signed with rotatable secrets and timestamped against

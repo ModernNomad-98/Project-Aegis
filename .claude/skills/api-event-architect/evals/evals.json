@@ -52,6 +52,33 @@
           "Establishes the deprecation sequence (announce, dual-run with both fields, warn, enforce) and routes the change through human-approval-boundary with the affected-consumer count."
         ]
       }
+    },
+    {
+      "id": "edge-owner-support-window-choice",
+      "type": "should_trigger",
+      "prompt": "We're writing our first public API versioning and deprecation policy before onboarding partners; no version is being retired yet. We ship a new major version about once a year. We expect about 30 partners in year one, mostly small agencies with slow release cycles plus two large ERP vendors. Candidate standing policies: 6 months of support after a successor ships with 3 months minimum notice; 12 months with 6 months notice; or 24 months with 12 months notice. We don't know what running two versions at once costs us in hosting. Help me choose the support window and minimum notice.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines support window, minimum notice, and dual-run in plain language.",
+          "For each of the three pairings gives why it fits a yearly major-version cadence and slow-moving partners, pros and cons (partner trust vs how many versions run at once), and money, setup, and upkeep cost, marking the unknown concurrent-version hosting cost as unknown.",
+          "Recommends one pairing, explains why, names the fact that would change it, then asks exactly one owner question.",
+          "Frames the answer as standing policy inside the announce, dual-run, sunset header/warnings, enforce sequence, leaves planning each later sunset to sunset-deprecation-communicator, and states that the answer does not by itself authorize a breaking change."
+        ]
+      }
+    },
+    {
+      "id": "edge-owner-support-window-missing-cadence",
+      "type": "should_trigger",
+      "prompt": "We're writing our first public API versioning and deprecation policy before onboarding partners; no version is being retired yet. We expect about 30 partners in year one, mostly small agencies with slow release cycles plus two large ERP vendors. Help me choose the support window and minimum notice.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Recognizes that the release cadence (how often a new major version ships) is not stated and that the support-window recommendation depends on it.",
+          "Asks exactly one question this turn, for the release cadence only, and does not ask for facts the prompt already gives.",
+          "Makes no support-window or minimum-notice recommendation and asks no owner decision question this turn, and does not assume or invent a cadence."
+        ]
+      }
     }
   ]
 }

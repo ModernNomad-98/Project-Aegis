@@ -36,7 +36,7 @@ owner decision and communicate the new date consistently.
 | Deprecation start | Docs marked deprecated; API warnings/headers | Discouraged; migrate now |
 | Mid-window reminders | Email, in-app, targeted outreach to heavy users | Date approaching; how to migrate |
 | Final notice (e.g. T-2wk, T-2d) | Email, in-app banner | Firm date; help channel |
-| Sunset day | Tombstone response; status/changelog | Retired on X; use Y |
+| Sunset day | Tombstone response (except named allowlisted grandfathered/extended-support accounts); status/changelog | Retired on X; use Y |
 
 Every message: what / why / when / what-to-do / where-to-get-help.
 
@@ -55,9 +55,13 @@ applies them to a specific sunset.
 ## Post-sunset behavior
 
 - Tombstone: an explanatory error/redirect ("this was retired on X; use
-  Y") — never a silent 404 or generic 500.
+  Y") — never a silent 404 or generic 500. Exception: accounts on the
+  named grandfathering/extended-support allowlist keep the old surface
+  until their stated expiry, then get the same tombstone; the public
+  sunset date does not move.
 - Monitor stragglers still calling the dead surface; consider one more
-  targeted nudge before hard removal.
+  targeted nudge before hard removal, which waits for the last allowlisted
+  expiry.
 - Keep the migration docs live past the sunset for latecomers.
 
 ## Boundaries (repeat)

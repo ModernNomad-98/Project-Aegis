@@ -81,7 +81,19 @@ skill designs the UX on top of it.
    collapse/dedup ("3 people reacted" as one item, not three), frequency
    caps, and quiet hours honoring the user's timezone. This is the
    difference between a notification system people keep on and one they
-   mute entirely.
+   mute entirely. When a category's default batching is the owner's call,
+   teach it before asking. Define *realtime* (each event notifies as it
+   happens), *digest* (events are gathered into one summary on a cadence),
+   and *collapse* (related events merge into one item) in plain language.
+   For each viable default — realtime, realtime with collapse and a
+   frequency cap, or a periodic digest — give why it fits the category's
+   time-sensitivity, its pros and cons (missed urgency vs muted channel),
+   and its money (per-message email/push provider charges), setup, and
+   upkeep cost, or unknown. Recommend one, say why and what fact would
+   change it, then ask exactly one owner question. Criticality overrides
+   batching: security and time-critical transactional notices (e.g. a
+   payment failure) never go to a digest. The chosen
+   default is design input; it authorizes no message and no live setting.
 4. **Design read-state and the center.** Seen vs read vs acted-on,
    mark-all-read, dismissal, badge/count semantics, and cross-device
    sync so reading on one device clears the badge on another.
@@ -137,6 +149,8 @@ Channels:      <in-app | email | push | sms> per event category
 Preferences:   granularity=<per-category × per-channel>; defaults per category
                (transactional/security = non-optional, labeled)
 Noise control: batching=<realtime|digest cadence>; collapse/dedup rules; freq caps; quiet hours (tz)
+Batching choice: plain terms; realtime / collapse+cap / digest — why, pros/cons, provider/
+               setup/upkeep cost or unknown; recommendation + what would change it; ONE question
 Read-state:    seen/read/dismiss; badges; cross-device sync
 Opt-out:       per-category, immediate, one-click where required; consent recorded
 == Developer webhooks (UX over api-event-architect's contract) ==
@@ -157,6 +171,9 @@ Boundaries:    delivery contract → api-event-architect; state rendering →
       in one center, effective immediately.
 - [ ] Noise control exists: batching/digest, collapse/dedup, frequency
       caps, and timezone-aware quiet hours.
+- [ ] An owner batching choice has terms defined; each option's why,
+      pros/cons and cost-or-unknown; a recommendation plus what would change
+      it; one owner question; the answer grants no authority.
 - [ ] Read-state (seen/read/dismiss), badges, and cross-device sync are
       designed.
 - [ ] Opt-out honors per-category immediately and one-click where

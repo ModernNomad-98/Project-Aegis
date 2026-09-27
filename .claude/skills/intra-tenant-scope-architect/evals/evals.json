@@ -66,6 +66,20 @@
           "A scope is a propagated row-FILTER dimension, not a permission; the same role can be held by two users with different scopes."
         ]
       }
+    },
+    {
+      "id": "edge-owner-role-classification-choice",
+      "type": "should_trigger",
+      "prompt": "We're adding a store axis inside each tenant of our retail SaaS: a tenant has about 60 stores, store managers see only their store, and tenant owners and admins are tenant-wide. Open question: finance analysts compare sales across all stores every month, never edit anything, and today see the whole tenant. Options: make finance analysts tenant-wide, give them multi-store grants to every store, or give them only an aggregated tenant-wide sales report with no row-level access. We don't know how many finance analysts a typical tenant has. Help the owner decide how to classify this role; design only, and change no schema or grants.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines scope-restricted and tenant-wide in plain language.",
+          "Compares tenant-wide, multi-store grants, and an aggregate-only report, each with why it fits the monthly cross-store comparison, pros and cons (exposure if the account is misused vs blocked work), and setup, upkeep, and money cost, marking the unknown analyst count as unknown.",
+          "Recommends the least-exposure option that still lets finance analysts do their job, explains why, names the fact that would change it, then asks exactly one owner question.",
+          "Treats the aggregate-only report as an exception served from a named, audited aggregate path bounded by tenant_id with a minimum group size (never by loosening the scope predicate), counts multi-store grants to every store as tenant-wide, keeps the tenant-wide set named, minimal, and audited, and states that the answer is design input that grants no one access; changes no schema or grants."
+        ]
+      }
     }
   ]
 }
