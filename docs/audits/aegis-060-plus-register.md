@@ -43,6 +43,11 @@ reviews the other nine: five new false positives and four rewordings where the
 earlier judgment still applies. It finds no skill defect and changes no skill
 text, frozen baseline or unrelated AEGIS item.
 
+**ROUTE-002 disposition, 2026-09-26:** by owner decision, the
+[ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md)
+closes the §2 triage. 31 edges into 23 target skills are reciprocated in three
+batch PRs. The remaining ROUTE-002 findings are census data, not defects.
+
 ## Historical baseline (superseded where the current disposition says so)
 
 Companion to the frozen AEGIS-001..059 baseline
@@ -196,6 +201,12 @@ their materiality is unconfirmed.
   calls the corpus's main one. Needs semantic triage against rubric question
   2 before any ID is assigned. Full edge list: `artifacts/audits/`
   route-graph and baseline JSON.
+  **Dispositioned by owner decision, 2026-09-26.** The
+  [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md)
+  triages all 268 edges reported on `0f46808`. Three batch PRs reciprocate
+  31 edges into 23 target skills. One edge gets a source-side fix and one
+  is an engine false positive. The other 236 are census data, not defects.
+  No AEGIS ID is assigned.
 - **Orchestrator capability numbering.** `project-orchestrator` presents its
   workflow as Capability 1 → 3 → 2 → 4. The sequence matches the declared
   loop (detect → translate → route → record); only the numbering is
@@ -213,7 +224,7 @@ their materiality is unconfirmed.
 | ARTF-001 | 10 | `project-orchestrator`, `human-approval-boundary`, `scoped-approval-register`, `agent-authorization-matrix`, `audit-log-architect`, `agent-containment-reviewer`, `agent-memory-governance`, `offline-first-sync-architect`, `operational-vs-analytical-splitter`, `streaming-event-architect` | AEGIS-056, AEGIS-049 | Corroborates corpus-wide: "durable" claims never name a durability level (semantic-review candidates, not asserted defects) |
 | EVAL-004 | 5 | five trigger-evals files (typed `(subagent)` targets) | **AEGIS-060 — REJECTED, false positive** | Baseline count, frozen. All five were **false positives** from EVAL-004 v1.12.0 collapsing the skill and subagent namespaces. The rule now resolves each target in the namespace its syntax declares; with the corpus byte-identical to baseline, live EVAL-004 = 0. The authored files were never defective — see AEGIS-060 above |
 | SIDE-004 | 82 | Workflow sections of 64 auto-invocable skills — §5 mutation-class candidates (source/test/config writes, VCS, install, network, deploy/provision, data-store writes, doc/state writes) | AEGIS-020, AEGIS-057 | Semantic-review candidates corroborating the §5 posture gap corpus-wide — queued for review, not asserted defects |
-| ROUTE-002 | 311 | corpus-wide exclusion edges | none yet | Systemic observation §2; triage pending |
+| ROUTE-002 | 311 | corpus-wide exclusion edges | none yet | Systemic observation §2; dispositioned by owner decision 2026-09-26 ([record](../evidence/route002-dispositions-2026-09-26/README.md)) |
 
 Rules that fired zero times on the live corpus (SIDE-001..003, APPR-001,
 APPR-003, STATE-001..004, VOCAB-003, PARITY-001..002, EVAL-001..003,
@@ -258,3 +269,6 @@ The planned PR 2..11 sequence stands. Three adjustments:
 ROUTE-002 triage (311 edges) is NOT assigned to a numbered batch yet;
 recommend triaging it inside PR 5 (shared vocabulary) discovery, splitting a
 dedicated batch only if the confirmed subset is large.
+*Superseded 2026-09-26:* the triage ran as its own record, the
+[ROUTE-002 dispositions](../evidence/route002-dispositions-2026-09-26/README.md),
+with three dedicated reciprocity batches.
