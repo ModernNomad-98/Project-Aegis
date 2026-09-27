@@ -10,9 +10,10 @@ the trade-offs to check, the graduation path and a presentation template.
 **Reading key:** a **managed platform** is a service that runs servers,
 scaling, patching and deploys for you, so the team ships code instead of
 operating infrastructure. A **hyperscaler** is a very large general cloud
-provider with hundreds of services (AWS, Azure, GCP), where the team chooses
-and governs each service. **BaaS** (backend as a service) bundles a database,
-sign-in, file storage and often serverless functions behind one account.
+provider with hundreds of services (AWS, Azure, Google Cloud (GCP)), where the
+team chooses and governs each service. **BaaS** (backend as a service) bundles
+a database, sign-in, file storage and often serverless functions behind one
+account.
 **PaaS** (platform as a service) runs your own application code or container
 without you managing servers. **Egress** is data sent out of a provider,
 often billed per gigabyte. **Lock-in** is the cost and effort of leaving a
@@ -30,15 +31,16 @@ Every vendor name, price, free-tier limit and runtime limit below is
 decision time.** Never quote a price or limit from memory; mark it unknown
 until checked against the provider's current documentation.
 
-This follows the skill's existing house style (its D45 decision): a durable
-**category** carries the decision and brands appear only as "e.g." examples
-inside it, the same treatment given to hyperscaler SKUs and regions. Some
-Aegis sheets name no vendor at all (the feature-flag system sheet compares
-"hosted flag vendor" as one category, because vendor choice there is a
-downstream detail). This skill names examples because users ask by brand
-("Vercel plus Supabase, or AWS?"), and mapping a named brand to its category
-is part of answering them. Brands never appear in the logical architecture,
-and a future update swaps the example list without touching the logic.
+This follows the skill's existing house style (Aegis library decision 45,
+D45): a durable **category** carries the decision and brands appear only as
+"e.g." examples inside it, the same treatment given to hyperscaler SKUs
+(specific service or instance types) and regions. Some Aegis sheets name no
+vendor at all (the feature-flag system sheet compares "hosted flag vendor" as
+one category, because vendor choice there is a downstream detail). This skill
+names examples because users ask by brand ("Vercel plus Supabase, or AWS?"),
+and mapping a named brand to its category is part of answering them. Brands
+never appear in the logical architecture, and a future update swaps the
+example list without touching the logic.
 
 ## Category comparison
 
@@ -105,9 +107,11 @@ in this order, because earlier facts can eliminate whole categories:
 
 ## Presentation template
 
-Use this shape when the owner must choose. Include every option that survived
-the hard filters; when both survive, include at least the strongest managed
-platform option and the strongest hyperscaler option.
+Use this shape when the owner must choose, and only once every deciding fact
+above is known; a turn that asks for a missing fact carries no recommendation.
+Include every option that survived the hard filters; when both survive,
+include at least the strongest managed platform option and the strongest
+hyperscaler option.
 
 ```
 TERMS: <plain definitions of the terms the options use>

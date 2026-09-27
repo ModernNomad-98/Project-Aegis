@@ -31,9 +31,10 @@ a cross-tenant leak.
   first; scoping an undefined boundary produces confident nonsense.
 - Do NOT use when: auditing an existing system for cross-tenant leakage —
   `tenant-isolation-reviewer`.
-- Do NOT use when: writing or auditing RLS policies themselves — that is the
-  Phase 4 security pack's scope; this skill decides WHERE enforcement lives,
-  not the policy SQL.
+- Do NOT use when: writing or auditing row-level security (RLS) policies
+  themselves — that is the Aegis Phase 4 security pack's scope (for example
+  `rls-policy-auditor`); this skill decides WHERE enforcement lives, not the
+  policy SQL.
 - Do NOT use when: the structural question has no tenancy axis — plain
   `architecture-designer`.
 - Do NOT use when: the pressure is throughput/size distribution of a store —
@@ -48,7 +49,7 @@ a cross-tenant leak.
 1. The tenant model (tenant-modeler output): tenant definition, hierarchy,
    the level isolation is enforced at, lifecycle states with data postures.
 2. Current stores and schemas: tables, indexes, existing tenant keys or their
-   absence, ORMs/query layers in use.
+   absence, object-relational mappers (ORMs)/query layers in use.
 3. Where tenant context currently lives in a request (session, token claim,
    middleware) and how queries are built (query builder, raw SQL, ORM
    default scopes).
@@ -95,7 +96,8 @@ a cross-tenant leak.
    the contract step).
 9. **Emit the data-layer isolation test matrix**: per store × operation,
    the negative expectation (tenant A's context cannot read/write tenant B's
-   rows/objects/entries), handed to `tenant-isolation-reviewer` and QA.
+   rows/objects/entries), handed to `tenant-isolation-reviewer` and quality
+   assurance (QA).
 10. **Explain owner-facing choices before asking.** When scale, residency or
     isolation needs an owner decision, define terms such as pooled storage,
     schema per tenant and database per tenant, and explain why the choice
