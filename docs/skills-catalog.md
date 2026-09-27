@@ -135,7 +135,7 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > `observability-operator` operates backends → nobody designed the console):
 > the layered panel IA with restraint plus the cross-tenant READ-security
 > model, composing the ~12 feed owners rather than restating them (183→184).
-> PR #124 then shipped `aegis-setup` (2026-09-23) under owner grant
+> PR #124 then shipped `aegis-setup` (2026-09-23, recorded retroactively as **D67**) under owner grant
 > AEGIS-APR-007 for Issue #101 package 2 — the manual-only four-choice setup
 > conversation, run only when a person invokes `aegis-setup` by name, that
 > saves an Aegis-only selection on tested single-user Windows PowerShell,
