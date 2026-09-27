@@ -9,7 +9,8 @@
 > acting. This page grants no implementation, host or provider authority.
 > On 2026-09-27 the thirteen owner decisions under
 > [Decided on 2026-09-27](#decided-on-2026-09-27) were added; the other rows
-> were not re-checked for that update.
+> were not re-checked for that update. To resume the session paused that day,
+> start with the [2026-09-27 session checkpoint](session-checkpoint-2026-09-27.md).
 
 ## Current disposition
 
