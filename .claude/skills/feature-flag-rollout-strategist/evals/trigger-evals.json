@@ -4,7 +4,8 @@
   "overlaps_with": [
     "plan-entitlement-architect",
     "authorization-matrix-designer",
-    "ab-test-designer"
+    "ab-test-designer",
+    "feature-flag-architect"
   ],
   "cases": [
     {
@@ -38,6 +39,14 @@
       "should_not_trigger": ["feature-flag-rollout-strategist"],
       "note": "SEAM CASE (cross-pack, D12.6) — hypothesis, sample size, and significance readout are experiment design. The flag may host the experiment, but the statistics belong to ab-test-designer.",
       "reason": "ab-test-designer owns experiment design and analysis. This skill carries the rollout mechanics of the flag, not the experiment's validity."
+    },
+    {
+      "id": "flag-system-design-goes-to-feature-flag-architect",
+      "prompt": "Decide whether we build our own flag table or buy a flag service, where flags get evaluated, and what happens when the flag service is unreachable.",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": ["feature-flag-rollout-strategist"],
+      "note": "SEAM CASE (reverse, system vs one rollout) — store choice, evaluation placement and outage behavior are properties of the flag SYSTEM, designed once per product. This skill plans one change's rollout on whatever system exists.",
+      "reason": "feature-flag-architect owns the flag system design, including the fallback MECHANISM; this skill still picks each flag's safe value when it plans that flag's rollout."
     }
   ]
 }
