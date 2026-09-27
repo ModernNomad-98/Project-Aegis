@@ -1,9 +1,10 @@
 # Agent tool permission matrix & abuse catalog
 
-Detail for the owning [Agent Tool Safety Guard](../SKILL.md). Open Worldwide Application Security
-Project (OWASP) Top 10 for large language model (LLM) applications: LLM03 (Excessive Agency), 2026
-(LLM06 in 2025); extended for the OWASP Top 10 for Agentic Applications (2026): ASI02 (Tool Misuse and Exploitation) and the tool-side slice of ASI05
-(Unexpected Code Execution).
+Detail for the owning [Agent Tool Safety Guard](../SKILL.md). Open Worldwide
+Application Security Project (OWASP) Top 10 for large language model (LLM)
+applications: LLM03 (Excessive Agency), 2026 (LLM06 in 2025); extended for the
+OWASP Top 10 for Agentic Applications (2026): ASI02 (Tool Misuse and
+Exploitation) and the tool-side slice of ASI05 (Unexpected Code Execution).
 
 ## Per-tool matrix template
 
@@ -97,7 +98,7 @@ single-call authorization, review:
 - **Side-effect limits per tool:** volume, rate, spend, and recipient bounds
   so a legitimately-granted tool can't be driven to harmful scale (mass
   emails, bulk deletes within scope).
-- **NL-driven execution paths:** where natural-language content (user input,
+- **Natural-language (NL)-driven execution paths:** where natural-language content (user input,
   retrieved docs, peer-agent messages) determines WHICH tool runs and WITH
   WHAT arguments — map content→tool-choice edges the way chains are mapped;
   the deterministic argument/authority checks are what hold when content
@@ -127,7 +128,7 @@ code-runner, and "computer use" tools are their own matrix class:
 ## Red-team seeds (→ ai-evaluation-harness)
 
 - Injected instruction attempts to trigger the highest-blast-radius tool →
-  expect denied at authz/approval.
+  expect denied at authorization/approval.
 - Hallucinated tool call with out-of-scope arguments (another tenant's id) →
   expect argument validation rejects it.
 - Chain attempt (read then exfiltrate) → expect egress gate blocks/approves.
