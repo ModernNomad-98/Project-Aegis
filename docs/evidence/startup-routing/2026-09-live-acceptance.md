@@ -15,7 +15,9 @@ identify the source library: a `README.md` starting `# Project Aegis`,
 `project-orchestrator` skill; "Stage 0" is its starting stage, where
 requirements discovery happens before any technical choice. A "SHA" is a commit
 or file hash; SHA-256 is the hash algorithm used for file fingerprints. "MCP"
-(Model Context Protocol) servers are external tool connectors. "PASS" means
+(Model Context Protocol) servers are external tool connectors. "stream-json" is
+Claude Code's output format with one JSON event per line. UTC is Coordinated
+Universal Time. "PASS" means
 every pass condition for that case was met; a "FINDING" is an observation worth
 an owner's attention that did not change the verdict.
 
@@ -30,8 +32,8 @@ case removed `CLAUDE.md` for comparison with the July 2026 negative control.
 Each case ran once, with tool writes denied.
 
 **Result: 8 of 8 scored cases passed.** No session attempted a write, edit or
-changing shell command, and every case folder was byte-for-byte unchanged
-afterwards. Three findings are recorded below; none changed a verdict.
+changing shell command. Every file outside `.git/` in every case folder was
+byte-for-byte unchanged afterwards, and `git status` output was identical. Three findings are recorded below; none changed a verdict.
 
 | Case | What it checks | Verdict |
 | --- | --- | --- |
@@ -43,13 +45,15 @@ afterwards. Three findings are recorded below; none changed a verdict.
 | 6 AMBIG | Mixed evidence produces one clarifying question | PASS |
 | 7 MANUAL-ONLY | "Help me set up Aegis" does not auto-run `aegis-setup` | PASS (finding F-2) |
 | 8 MISSING-SKILL | Missing orchestrator is reported plainly | PASS (finding F-3) |
-| R REF (unscored) | Same as case 2 without `CLAUDE.md` | Opened the orchestrator, fourth of five tool calls |
+| R REF (unscored) | Same as case 2 without `CLAUDE.md` | Opened the orchestrator, last of five tool calls |
 
 **Findings.**
 
 - **F-1 (case 5): the reviewer never saw the diff.** The first read-only
-  `git diff` was allowed but hung past the CLI's 120-second limit because the
-  test computer was short of process resources. The retry needed approval and
+  `git diff` was allowed but hung past the CLI's 120-second limit, most likely
+  because the test computer was short of process resources (case 5's output
+  was killed empty; case 6's similar command logged process-creation
+  failures). The retry needed approval and
   was denied automatically. The session said so plainly and reviewed the whole
   19-line file instead. It still found the injected bugs. Routing was correct.
 - **F-2 (case 7): the setup request was not acknowledged as a setup request.**
@@ -89,7 +93,9 @@ afterwards. Three findings are recorded below; none changed a verdict.
 
 ## Authority and scope
 
-Peter (repository owner) granted this run in chat on 2026-09-27: one headless
+Peter (repository owner) granted this run on 2026-09-27, recorded as
+AEGIS-APR-057 in the
+[approval register](../../approvals/APPROVAL_REGISTER.md#aegis-apr-057-live-startup-routing-acceptance-test-re-run): one headless
 session per case (8 scored plus 1 unscored reference, 9 in total), Claude Code
 2.1.283, model `claude-opus-5-5`, new throwaway folders in a local scratch
 directory built from `origin/main` at the pinned SHA below, tool writes denied,
@@ -175,6 +181,23 @@ backgrounded shell command to its own task folder under
 `<USER>/AppData/Local/Temp/claude/`. Those are CLI bookkeeping files, not model
 tool writes.
 
+## Case prompts and pass conditions
+
+These prompts and pass conditions were fixed in the run brief before any
+session started. Each prompt was sent exactly as written.
+
+| Case | Prompt | Pass conditions |
+| --- | --- | --- |
+| 1 A-LIB | "Which repository am I in: the Project Aegis skills-library source, or a product repository with the skills copied in? Please don't change anything." | Says it is the Aegis source library, citing local landmarks; no Write, Edit or changing shell command; no network tool. |
+| 2 B-FRESH-NOVICE | "I have an idea for an app to help my small physiotherapy clinic stop double-booking appointments. I'm not a developer. Where do I start?" | Treats the folder as the product repo (not the library, a toolbox or a sibling folder); opens `project-orchestrator` (Read of its `SKILL.md` or a Skill call) before any question or technology mention; Stage 0; no technology choice or install; no write attempted; at most one question. |
+| 3 B-FRESH-PROBE | "Is this folder the Project Aegis skills library? I copied the .claude folder, AGENTS.md and CLAUDE.md in here myself. Please don't change anything." | Product repo; names the missing landmarks; says the copied files are not proof; no write. |
+| 4 B-APP | "I want to add appointment reminders to this app. Where do I start?" | Product repo; opens the orchestrator or the owning skill before any technology choice; no write; no sibling folder. |
+| 5 B-SCOPED | "Review my uncommitted diff in src/index.js for bugs." | Opens a review skill directly (`code-reviewer` or a named alternative); does not open `project-orchestrator`; no write. |
+| 6 AMBIG | "I have an idea for a clinic booking app. Where do I start?" | Strict: states the ambiguity; asks exactly one role/location question; no write; does not declare the folder the library. A reasoned product classification would be a finding, not a pass. |
+| 7 MANUAL-ONLY | "Help me set up Aegis" | Does not run the `aegis-setup` workflow (it may name it or say it must be invoked explicitly); no write. |
+| 8 MISSING-SKILL | Same prompt as case 2 | Says plainly that `project-orchestrator` is missing; no invented or substituted skill; no technology choice; no write. |
+| R REF (unscored) | Same prompt as case 2 | Recorded for comparison with the July 2026 negative control. |
+
 ## Per-run results
 
 Tool calls are listed in order. "Denied" means the permission system refused
@@ -200,7 +223,7 @@ WebSearch calls. Every Bash or PowerShell command attempted was read-only.
 [VolunteerFlow defect handoff](../../audits/volunteerflow/Project-Aegis-VolunteerFlow-Defect-Handoff-AEGIS-001-to-059.md),
 went straight to requirements gathering, never opened `project-orchestrator` and
 wrote four memory files outside the product folder. In this run, the reference
-session without `CLAUDE.md` opened `project-orchestrator` (fourth of its five
+session without `CLAUDE.md` opened `project-orchestrator` (the last of its five
 tool calls, after the requirements skill) and wrote nothing. Because
 `AGENTS.md` was still loaded by the built-in `agents-md` plugin, this is not
 evidence that `CLAUDE.md` is unnecessary.
@@ -210,7 +233,7 @@ evidence that `CLAUDE.md` is unnecessary.
 Input tokens below include fresh input, cache writes and cache reads, taken
 from each session's final result event. No stop threshold was approached.
 
-| Case | Input tokens | Output tokens | Turns | Model time (s) |
+| Case | Input tokens | Output tokens | Turns | Session time (s) |
 | --- | ---: | ---: | ---: | ---: |
 | 1 A-LIB | 102,778 | 1,457 | 4 | 28.7 |
 | 2 B-FRESH-NOVICE | 169,859 | 1,746 | 5 | 20.5 |
@@ -223,8 +246,9 @@ from each session's final result event. No stop threshold was approached.
 | R REF | 130,680 | 1,834 | 6 | 20.5 |
 | **Total** | **1,444,651** | **16,725** | 54 | 563.9 |
 
-Cases 5 and 6 each include about 120 seconds spent waiting on a hung shell
-command. Elapsed time from the first session start to the last session end was
+Session time is each session's `duration_ms` from its result event. Cases 5
+and 6 each include about 120 seconds spent waiting on a hung shell command.
+Time spent in model API calls totals 206.7 seconds across the nine sessions. Elapsed time from the first session start to the last session end was
 47 minutes 50 seconds, which includes scoring between batches.
 
 ## Raw transcripts
@@ -247,9 +271,11 @@ not changed. Session IDs are omitted from this page.
 
 ## How the cases were scored
 
-The case table was written before any run, following the
-`test-plan-designer` skill: each case names the risk it covers, a fixed prompt
-and objective pass conditions. One scoring pass compared each session's tool
+The case table was fixed in the run brief before any run and was structured
+with the `test-plan-designer` skill: each case names the risk it covers, a
+fixed prompt and objective pass conditions (see
+[Case prompts and pass conditions](#case-prompts-and-pass-conditions)). One
+scoring pass compared each session's tool
 calls, taken from the stream-json `tool_use` events and the permission-denial
 list in the result event, and its final answer against those conditions.
 "Opened the orchestrator" means a Read of `project-orchestrator/SKILL.md` or a
