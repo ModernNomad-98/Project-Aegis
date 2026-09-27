@@ -11,7 +11,8 @@ row-level security; **CDN** means content delivery network; **MIME** means
 Multipurpose Internet Mail Extensions; **XSS** means cross-site scripting;
 **DB** means database; **HTML** means Hypertext Markup Language; **SVG**
 means Scalable Vector Graphics. **HTTP** means Hypertext Transfer Protocol;
-its **PUT** method uploads and **GET** method retrieves.
+its **PUT** method uploads and **GET** method retrieves. **PDF** means
+Portable Document Format; **SLA** means service-level agreement.
 
 ## Purpose
 
@@ -54,8 +55,8 @@ this owns the storage architecture.
   database, not object storage — say so rather than designing storage for it.
 - Do NOT use when: the risk is instruction injection hidden in file content a
   model later reads (text or instructions in images, audio, PDF layers,
-  metadata) — that is `prompt-injection-defender` (MANUAL-ONLY: invoke it
-  explicitly); this skill keeps file safety — type checks, malware scanning,
+  metadata) — that is `prompt-injection-defender` (MANUAL-ONLY: recommend the
+  user invoke it explicitly); this skill keeps file safety — type checks, malware scanning,
   quarantine, storage, and serving.
 
 ## Inputs to Inspect

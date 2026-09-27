@@ -1,8 +1,8 @@
 # Agent tool permission matrix & abuse catalog
 
 Detail for the owning [Agent Tool Safety Guard](../SKILL.md). Open Worldwide Application Security
-Project (OWASP) LLM03 (Excessive Agency), 2026 (LLM06 in 2025); extended for the OWASP Top 10 for
-Agentic Applications (2026): ASI02 (Tool Misuse and Exploitation) and the tool-side slice of ASI05
+Project (OWASP) Top 10 for large language model (LLM) applications: LLM03 (Excessive Agency), 2026
+(LLM06 in 2025); extended for the OWASP Top 10 for Agentic Applications (2026): ASI02 (Tool Misuse and Exploitation) and the tool-side slice of ASI05
 (Unexpected Code Execution).
 
 ## Per-tool matrix template
@@ -25,8 +25,8 @@ Agentic Applications (2026): ASI02 (Tool Misuse and Exploitation) and the tool-s
 - **Cross-tenant / global** — can touch other tenants or platform state; must
   run as the caller and be gated. A tool with global blast radius on a service
   account is a top finding.
-- **External** — sends email, calls third-party APIs, moves money, publishes.
-  Irreversible in practice; approval-gate.
+- **External** — sends email, calls third-party application programming
+  interfaces (APIs), moves money, publishes. Irreversible in practice; approval-gate.
 
 ## Least-privilege challenges
 
@@ -56,7 +56,7 @@ cannot perform directly? If yes, the identity model is broken.
   (compose `structured-output-validator`).
 - Ids are tenant-scoped and ownership-checked, not trusted from model text.
 - Enumerated actions come from an allowlist; free-text that becomes a command,
-  path, URL, or query is validated/escaped.
+  path, web address (URL), or query is validated/escaped.
 - Quantities/amounts bounded (max rows, max spend, max recipients).
 
 ## Tool-chain composition abuse catalog
@@ -92,7 +92,7 @@ which tool inputs, and place validation/approval at the harmful edges.
 
 **ASI02 — misuse of legitimate grants.** The attack needs no new tools: a
 manipulated agent abuses exactly what the matrix already allows. Beyond
-single-call authz, review:
+single-call authorization, review:
 
 - **Side-effect limits per tool:** volume, rate, spend, and recipient bounds
   so a legitimately-granted tool can't be driven to harmful scale (mass
