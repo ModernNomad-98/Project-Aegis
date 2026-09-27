@@ -2,7 +2,9 @@
 
 ## Start here — current measurements
 
-**Current measurements at the checkpoint after #344:** the #333-to-#338 window took **1h20m20s observed wall time** and the #338-to-#344 window **3h11m14s observed wall time**; the second includes an owner-requested pause and is not a throughput measure. No active, review, CI or waiting split was measured. Choice-guidance batch C merged in [PR #342](https://github.com/ModernNomad-98/Project-Aegis/pull/342), so the bounded selected subtotal is again the ten core rows, **71–146 provisional active hours**; the 72–148-hour figure published by #343 is superseded by that delivery. Additional skill-choice maintenance sits outside it at a provisional **5.5–12 active hours**. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded. #345, #346 and #347 open the next five-merge window.
+**Current measurements at the catch-up checkpoint after #370:** twenty-six PRs merged after #344 with no checkpoint. The missed windows ending #349, #354, #359, #364 and #369 took **32m50s**, **12m05s**, **7h57m30s**, **33m43s** and **1h45m11s observed wall time**; the third includes an unexplained 7h41m48s gap and is not a throughput measure. #370 and #374 (the #331 correction, merged 23:24:51 UTC) open the next window, followed by #373 at 23:32:15 UTC. No active, review, CI or waiting split was measured. The #344 maintenance subtotal (5.5–12 active hours) is fully delivered by #348–#356, but its accuracy cannot be scored without active time. The owner-approved #331 correction added a provisional **4–8 active hours**, making the bounded selected subtotal 75–154 while it was undelivered; #374 delivered it, so the current bounded selected subtotal is **71–146 provisional active hours**. Outside it, the owner-choice backlog is 23 skills after S5 added one step (the original audit counted 22): at this reading 17 were delivered (S1, S2 and S3, including the two deferred S1 skills merged in #373) and 6 were in open PRs (S4 as #376 and the S5 step as #377); both have since merged, so all 23 are delivered. The owner-requested feature-flag skill adds a provisional **2.5–5**. #380 and #372 merged after this reading and complete the window, so the next checkpoint is due; #382, #378 (the feature-flag proposal page), #375, #376, #377, #371 (the AI cost guardrail seam), #381 (the APR-046 consumption record), #383 (the `feature-flag-architect` skill, adding two pending reader pages) and #384 (the `project-orchestrator` Stage 3 and Stage 9 feature-flag routes, no new page) merged later still, on 2026-09-27 UTC, so both feature-flag items are delivered. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded.
+
+**Earlier measurements at the checkpoint after #344:** the #333-to-#338 window took **1h20m20s observed wall time** and the #338-to-#344 window **3h11m14s observed wall time**; the second includes an owner-requested pause and is not a throughput measure. No active, review, CI or waiting split was measured. Choice-guidance batch C merged in [PR #342](https://github.com/ModernNomad-98/Project-Aegis/pull/342), so the bounded selected subtotal is again the ten core rows, **71–146 provisional active hours**; the 72–148-hour figure published by #343 is superseded by that delivery. Additional skill-choice maintenance sits outside it at a provisional **5.5–12 active hours**. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded. #345, #346 and #347 open the next five-merge window.
 
 This page is for maintainers and coding agents tracking Project Aegis work.
 **ETA** means estimated time to complete a work item; **PR** means pull
@@ -19,8 +21,10 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [five-merge checkpoint after pull request #344](#five-merge-checkpoint-after-pull-request-344--2026-09-26)
-reconsiders every selected and optional row. The earlier [catch-up checkpoint
+The latest [catch-up checkpoint after pull request #370](#catch-up-checkpoint-after-pull-request-370--2026-09-26)
+reconsiders every selected and optional row, after the
+[five-merge checkpoint after #344](#five-merge-checkpoint-after-pull-request-344--2026-09-26).
+The earlier [catch-up checkpoint
 after #306](#catch-up-checkpoint-after-pull-request-306--2026-09-25) records
 four missed five-merge windows without resetting the #303 cadence anchor.
 The [BER-BKL-009 owner
@@ -53,6 +57,160 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Catch-up checkpoint after pull request #370 — 2026-09-26
+
+The [full reassessment](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-26-after-pull-request-370-catch-up-for-the-windows-ending-349-354-359-364-369)
+counts main through #370 `eadf1fd3934ca196b70178681dfb07ef7c264020` and
+reads the same tree. This bounded checkpoint started at 21:02:28 UTC, first
+drafted through #362 and then extended through #370, with no prior item ETA
+and a new **1–2 active-hour** ETA. At its start the published bounded
+selected subtotal was **71–146 active hours** (#352); the owner-approved #331
+correction, recorded by #365, added 4–8, giving 75–154 provisional active
+hours while it was undelivered; #374 delivered it, so the current bounded
+selected subtotal is again **71–146 provisional active hours**. Issue #101 Stage 4B and BER-BKL-009 residuals are unestimated, so
+neither the full selected nor all-options backlog has a finite ETA.
+
+**Cadence.** Twenty-six PRs merged after #344 without a checkpoint. This
+record keeps the #344 anchor that #352 published. A Codex review of #352
+noted that counting six merges in #352's second window moved the strict
+cadence by one merge (the strict windows would end at #343, #348, #353, #358,
+#363 and #368); keeping the published anchor records that shift instead of
+moving the anchor again. Either counting gives five missed windows.
+
+Merges are listed in actual merge order. Each linked Actions run used that
+PR's exact head, and all three named jobs (Linux `validate-skills`, Windows
+`windows-offline-checks` and `gate-guard`) passed. "Open to merge" is the
+observed time from PR creation to merge; it includes review, CI, queue and
+waiting and is not active labor. Batch letters follow the owner's batch plan.
+
+**Window 1: the five first-parent merges after #344.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head Actions / estimate |
+| --- | --- | --- | ---: | --- |
+| [#345](https://github.com/ModernNomad-98/Project-Aegis/pull/345): owner-choice evals, six architecture and cloud skills (batch L) | `25355767731bc0a36d062e3b8f1e413c0fcdfa2b` | 11:50:53 | 5s from #344 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36239014740); open to merge 20m48s; active time not measured. |
+| [#346](https://github.com/ModernNomad-98/Project-Aegis/pull/346): owner-choice evals, six A–F skills (batch M) | `3732b244f0ecef7fdc37c3387d1e0ab8a5026df6` | 11:50:57 | 4s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36239018407); open to merge 20m48s; active time not measured. |
+| [#347](https://github.com/ModernNomad-98/Project-Aegis/pull/347): owner-choice evals, six A–F skills (batch N) | `cd174c2e6029088496f3f4c094fced8b458d1241` | 11:51:01 | 4s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36239023275); open to merge 20m46s; active time not measured. |
+| [#348](https://github.com/ModernNomad-98/Project-Aegis/pull/348): owner-choice evals, seven M–R skills (batch O) | `e86d3feeb46ae4a9d87fd770dad40bf9fb2f67c6` | 12:23:34 | 32m33s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36241477492); open to merge 5m39s; active time not measured. |
+| [#349](https://github.com/ModernNomad-98/Project-Aegis/pull/349): source-of-truth-reconciler owner-conflict step (batch R) | `a45387bd55ea839a1078f85929e23bb32e6143ae` | 12:23:38 | 4s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36241483166); open to merge 5m36s; active time not measured. |
+
+The #344-to-#349 interval is **32m50s observed wall time**.
+
+**Window 2: the five first-parent merges after #349.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head Actions / estimate |
+| --- | --- | --- | ---: | --- |
+| [#350](https://github.com/ModernNomad-98/Project-Aegis/pull/350): owner-choice evals, six S–Z skills (batch P) | `866fe1942d32ce790d1d69c2f4f271aed30379e8` | 12:23:42 | 4s from #349 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36241487757); open to merge 5m35s; active time not measured. |
+| [#351](https://github.com/ModernNomad-98/Project-Aegis/pull/351): owner-choice evals, six S–Z skills (batch Q) | `50495c2adca13aa1f6bf6b2e70a401707b274856` | 12:23:46 | 4s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36241490858); open to merge 5m35s; active time not measured. |
+| [#352](https://github.com/ModernNomad-98/Project-Aegis/pull/352): prior five-merge checkpoint after #344 | `9b1e33145917cb0b609545f699218eea322e4aa2` | 12:23:50 | 4s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36241494484); open to merge 5m35s; 1–2 h ETA, 31m30s observed from its 11:52:20 start to merge; active time not measured. |
+| [#353](https://github.com/ModernNomad-98/Project-Aegis/pull/353): merge-is-deploy-governance and pii-lifecycle-designer guidance (batch J) | `e5dc819007470a1dfd6b994d3d7378884f42b6bf` | 12:30:02 | 6m12s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36241718327); open to merge 7m29s; active time not measured. |
+| [#354](https://github.com/ModernNomad-98/Project-Aegis/pull/354): ledger records the Stage 4B fixture page as pending | `186c1f5a1ab2d1a7bd224670fa4be0a1d893cbae` | 12:35:43 | 5m41s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36242118665); open to merge 5m32s; active time not measured. |
+
+The #349-to-#354 interval is **12m05s observed wall time**.
+
+**Window 3: the five first-parent merges after #354.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head Actions / estimate |
+| --- | --- | --- | ---: | --- |
+| [#355](https://github.com/ModernNomad-98/Project-Aegis/pull/355): review follow-ups from batches L, M and N | `aac4a2023180586069041b69318403ee67804a33` | 20:17:31 | 7h41m48s from #354 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36242935517); open to merge 7h31m58s; active time not measured. |
+| [#356](https://github.com/ModernNomad-98/Project-Aegis/pull/356): review follow-ups from batches O, P, Q and R | `4e5f8b2eae60dfffd4429bddece97ac264a30fd6` | 20:17:35 | 4s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36242939411); open to merge 7h31m58s; active time not measured. |
+| [#357](https://github.com/ModernNomad-98/Project-Aegis/pull/357): Stage 4B fixture page accepted after readability review | `ae8c07c0e6a43db5273295da4bcbeefa77cd35f0` | 20:33:06 | 15m31s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36269599838); open to merge 8m43s; active time not measured. |
+| [#358](https://github.com/ModernNomad-98/Project-Aegis/pull/358): skill named in 12 older MANUAL-ONLY eval prompts | `42ceb4ae8983b9477c534ee070c6f2a3dcc19d6f` | 20:33:09 | 3s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36269601267); open to merge 7m49s; active time not measured. |
+| [#359](https://github.com/ModernNomad-98/Project-Aegis/pull/359): aegis-setup trigger evals in the standard shape (census unblocked) | `639d22fcbf50e81eebe87032ca56ece108cc3507` | 20:33:13 | 4s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36269637246); open to merge 4m57s; active time not measured. |
+
+The #354-to-#359 interval is **7h57m30s observed wall time**. It is **not a
+throughput measure**: the 7h41m48s spacing before #355 is not timestamped on
+GitHub, and its cause is not asserted here. #355 and #356 stayed open for
+most of that gap.
+
+**Window 4: the five first-parent merges after #359.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head Actions / estimate |
+| --- | --- | --- | ---: | --- |
+| [#360](https://github.com/ModernNomad-98/Project-Aegis/pull/360): skill named in 43 more MANUAL-ONLY eval prompts | `4227b71b7b8ede5d2670a0ca709fa9cfb5afce78` | 20:36:01 | 2m48s from #359 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36269824144); open to merge 4m33s; active time not measured. |
+| [#361](https://github.com/ModernNomad-98/Project-Aegis/pull/361): aegis-setup named in its six setup eval prompts | `135eb7f6dfab1627407dafce9dd4da89cc8b3edb` | 20:46:41 | 10m40s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36270409274); open to merge 4m57s; active time not measured. |
+| [#362](https://github.com/ModernNomad-98/Project-Aegis/pull/362): ai-closeout-reporter trigger evals and named exclusions | `89c9503da35afa42a27216d4884618c4fc7bfcef` | 20:59:59 | 13m18s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36271123667); open to merge 5m31s; active time not measured. |
+| [#363](https://github.com/ModernNomad-98/Project-Aegis/pull/363): census author-facing eval findings cleared | `0d5ad47e7573ffe457a75295938a1a2121832f38` | 21:04:52 | 4m53s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36271420251); open to merge 4m45s; active time not measured. |
+| [#364](https://github.com/ModernNomad-98/Project-Aegis/pull/364): dispositions for nine audit findings (one new reader page) | `4074d497947c9abdd4f3479ccb61fa52899d1993` | 21:06:56 | 2m04s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36271560043); open to merge 4m33s; active time not measured. |
+
+The #359-to-#364 interval is **33m43s observed wall time**.
+
+**Window 5: the five first-parent merges after #364, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head Actions / estimate |
+| --- | --- | --- | ---: | --- |
+| [#365](https://github.com/ModernNomad-98/Project-Aegis/pull/365): governance record for the owner's 2026-09-26 decisions (BER-DEC-014, APR-046 to APR-052) | `2aed8dd377e821148b74e077f7c58f4edba6c01e` | 21:17:29 | 10m33s from #364 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36272059570); open to merge 14m02s; active time not measured. |
+| [#367](https://github.com/ModernNomad-98/Project-Aegis/pull/367): aegis-setup fallback eval and dated BER corpus counts | `a4c65b2ec75cfb2d036bb0438866a346c3ba7f09` | 21:17:33 | 4s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36272116819); open to merge 5m23s; active time not measured. |
+| [#366](https://github.com/ModernNomad-98/Project-Aegis/pull/366): owner-choice teaching, three planning skills (batch S1) | `a19098ad0a3ee2fdba7301d7082143f153a7a7e7` | 21:20:24 | 2m51s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36272259589); open to merge 10m30s; active time not measured. |
+| [#368](https://github.com/ModernNomad-98/Project-Aegis/pull/368): owner-choice teaching, six data/UX skills (batch S2) | `e47491d8c7c3719e1e4fd32c71d5e80f317f19e8` | 21:20:43 | 19s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36272319491); open to merge 5m04s; active time not measured. |
+| [#369](https://github.com/ModernNomad-98/Project-Aegis/pull/369): still-valid Codex review findings from #348–#355 applied | `0c6be6f50848ea9754e8db86d81f8a34785d0f55` | 22:52:07 | 1h31m24s | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36272393886); open to merge 1h35m09s; active time not measured. |
+
+The #364-to-#369 interval is **1h45m11s observed wall time**, including the
+1h31m24s spacing before #369, whose cause is not asserted.
+
+**Open window: the first merge after #369.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head Actions / estimate |
+| --- | --- | --- | ---: | --- |
+| [#370](https://github.com/ModernNomad-98/Project-Aegis/pull/370): owner-choice teaching, six governance and QA skills (batch S3) | `eadf1fd3934ca196b70178681dfb07ef7c264020` | 22:52:11 | 4s from #369 | [Passed](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36272503385); open to merge 1h33m20s; active time not measured. |
+
+#344 to #370 is **11h01m23s observed wall time**. Every post-merge main run
+for #345 through #370 passed; for example, #370's [post-merge main run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36277660704).
+No active/review/CI/wait split was measured for any of these PRs, and
+per-merge spacing is not labor on that PR or a throughput rate. #374 (the
+#331 correction) merged at 23:24:51 UTC as `7390ae0a`, after #370, and
+#373 (script fixes plus the two deferred S1 skills) merged at 23:32:15 UTC as
+`4ca04c1e`. They are the second and third merges of the next window, so the
+next checkpoint is due after two further merges. At this reading (about 23:33
+UTC), #371, #372, #375, #376, #377 and #378 are open and receive no credit.
+After this reading, #380 (MANUAL-ONLY trigger-eval naming) merged at
+23:50:52 UTC as `40c734f0` and #372 (the R2 wording) at 23:54:35 UTC as
+`2500d35c`. They are the fourth and fifth merges, so that checkpoint is now
+due; this record does not measure them. #372 also committed two bytecode
+files by mistake; cleanup PR #382 merged on 2026-09-27 at 01:29:38 UTC
+as `0d05a838`. Later that day (UTC), #378 (the `feature-flag-architect`
+scope proposal page) merged at 01:40:32 UTC as `a2d2b831`, #375 (trigger
+seams) at 01:44:00 UTC as `5fbe7cd8`, #376 (S4) at 01:44:03 UTC as
+`4bed0112`, #377 (the S5 step) at 01:44:07 UTC as `5c14ba95`, #371
+(the AI cost guardrail seam) at 03:25:04 UTC as `da08b0f6`, #381 (the
+APR-046 consumption record) at 03:31:29 UTC as `032e0302`, #383 (the
+`feature-flag-architect` skill) at 03:43:01 UTC as `6844ab9f` and #384 (the
+`project-orchestrator` flag routes) at 04:25:58 UTC as `0f46808d`; this record
+does not measure them either.
+
+**ETA accuracy.** The #344 checkpoint estimated the maintenance items
+outside the subtotal at **5.5–12 active hours**; #348, #349, #350, #351,
+#353, #355 and #356 delivered all of them. The first of those PRs opened at
+12:17:55 UTC and the last merged at 20:17:35 UTC, 7h59m40s of observed wall
+time that includes the unexplained gap, so the estimate cannot be scored
+without active time. #352's own **1–2 active-hour** ETA compares with 31m30s
+of observed wall time from its recorded start to its merge, including review
+and CI.
+
+The ten existing selected rows remain **71–146 active hours**, provisional.
+The newly authorized #331 correction added a provisional **4–8 active hours**,
+making the subtotal 75–154 while it was undelivered; it was implemented in
+#374, merged after #370, with active time not measured, so the current
+bounded selected planning subtotal is **71–146**. Outside that subtotal,
+the owner-choice teaching backlog, 22 skills in the original audit (a
+provisional **8.5–16.5 active hours**; S1 five skills, S2 six,
+S3 six, S4 five) has 17 delivered: three S1 skills (#366), S2 (#368), S3
+(#370) and the two deferred S1 skills (#373). At this reading S4 was in
+open PR #376; the R2 wording, open as #372 at this reading, merged
+afterwards. There is no per-batch split to subtract. S5 was resolved on
+2026-09-26: one of the six needs a step, then open as #377, so the backlog
+was 23 skills with 17 delivered and 6 in open PRs. #376 and #377 have since
+merged, so all 23 are delivered.
+The owner-requested feature-flag architecture skill and its orchestrator
+routing add a provisional **2.5–5 active hours**; the owner accepted the
+skill's scope on 2026-09-26, #378 merged the scope proposal page afterwards
+and the skill was then in progress (since merged as #383), while the orchestrator routing was not started (since merged as #384). Stage 4B and
+BER-BKL-009 real host, runtime, privacy and cleanup remain TBD. All seven
+optional rows retain their ranges and gates. The #370 tree has **605
+Markdown files**: 561 accepted readers and 44 classified fixtures; #354 and
+#357 closed the #335 ledger gap and #364 added one accepted page. #378 has
+since added one accepted page and #383 two pending skill pages, so main now has **608**:
+562 accepted readers, 44 classified fixtures and two known pending pages. Issue #101 remains open and the VM paused.
 
 ## Five-merge checkpoint after pull request #344 — 2026-09-26
 
