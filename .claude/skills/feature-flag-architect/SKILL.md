@@ -11,7 +11,13 @@ library a flag service ships for your code to call. **Evaluation** is the
 moment a flag's value is worked out for one request or user. A **kill
 switch** is a long-lived flag that turns a feature off fast. **CI** means
 continuous integration; **GA** means general availability; **TTL** means
-time to live; **SSR** means server-side rendering.
+time to live; **SSR** means server-side rendering; **SSO** means single
+sign-on; **ADR** means architecture decision record; **UI** means user
+interface. **Edge** evaluation runs on servers at the network edge, close
+to the user (for example a content delivery network), rather than on your
+application servers. **First paint** is the moment a browser first draws
+the page. A **break-glass** path is an audited emergency route that lets a
+named person act when the normal approver is unavailable.
 
 ## Purpose
 
