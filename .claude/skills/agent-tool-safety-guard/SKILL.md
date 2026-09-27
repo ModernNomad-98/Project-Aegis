@@ -1,6 +1,6 @@
 ---
 name: agent-tool-safety-guard
-description: Design or review least-privilege tool and function access for a large language model (LLM) agent, containing excessive agency and tool misuse. Covers Open Worldwide Application Security Project (OWASP) identifiers LLM03 (excessive agency), ASI02 (tool misuse), and the tool-enabled ASI05 code-execution slice. Build a per-tool permission matrix, validate arguments before execution, use the calling user's authority, gate high-impact actions behind human approval, and map tool-chain abuse. Code-execution tools need a sandbox and approval. Composes human-approval-boundary and agent-authorization-matrix. Use when an agent can call tools, functions or application programming interfaces (APIs). Do NOT use for injection defense, sandbox design, retrieval authorization, or standing merge/deploy authority.
+description: Design or review least-privilege tool and function access for a large language model (LLM) agent, containing excessive agency and tool misuse. Covers Open Worldwide Application Security Project (OWASP) identifiers LLM03 (excessive agency), ASI02 (tool misuse), and the tool-enabled ASI05 code-execution slice. Build a per-tool permission matrix, validate arguments before execution, use the calling user's authority, gate high-impact actions behind human approval, and map tool-chain abuse. Code-execution tools need a sandbox and approval. Composes human-approval-boundary and agent-authorization-matrix. Use when an agent can call tools, functions or application programming interfaces (APIs). Do NOT use for injection defense, sandbox design, retrieval authorization, what tool schemas reveal to users (hidden-context-exposure-reviewer), or standing merge/deploy authority.
 ---
 
 # Agent Tool Safety Guard
@@ -47,6 +47,11 @@ from `human-approval-boundary`; standing agent authority from
   (`llm-output-safety-reviewer` for the exec/sandbox surface), retrieves
   documents (`rag-security-architect`), or the question is agent-vs-human
   merge/deploy authority (`agent-authorization-matrix`).
+- Do NOT use when: the question is what tool names, descriptions, and
+  parameter schemas reveal if a user extracts them, or whether a rule written
+  in a tool description is being relied on as a gate
+  (`hidden-context-exposure-reviewer`, LLM08); that skill routes the
+  enforcement fix back here.
 
 ## Inputs to Inspect
 

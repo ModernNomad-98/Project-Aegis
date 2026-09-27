@@ -1,6 +1,6 @@
 ---
 name: sensitive-disclosure-guard
-description: Prevent an LLM feature from disclosing sensitive information (OWASP LLM02) — audit and design the data-minimization and redaction pipeline so secrets, credentials, PII, and other-tenant data are stripped BEFORE they enter model context, prompts, or logs; assemble context with least-data (only the fields the task needs, not whole records); check the output path for leaks (the model echoing sensitive input, cross-conversation/cache bleed); and confirm provider data-handling posture (retention, training-on-inputs). Composes tenant-isolation-reviewer for the tenant surface and secrets-identity-hardener for credential custody. Use when an AI feature touches PII/secrets/tenant data, or to design a pre-model redaction pipeline. Do NOT use for retrieval authorization (rag-security-architect), output execution sinks (llm-output-safety-reviewer), system-prompt secrets (system-prompt-leakage-reviewer), or governance sign-off (ai-governance-risk-reviewer).
+description: Prevent an LLM feature from disclosing sensitive information (OWASP LLM02) — audit and design the data-minimization and redaction pipeline so secrets, credentials, PII, and other-tenant data are stripped BEFORE they enter model context, prompts, or logs; assemble context with least-data (only the fields the task needs, not whole records); check the output path for leaks (the model echoing sensitive input, cross-conversation/cache bleed); and confirm provider data-handling posture (retention, training-on-inputs). Composes tenant-isolation-reviewer for the tenant surface and secrets-identity-hardener for credential custody. Use when an AI feature touches PII/secrets/tenant data, or to design a pre-model redaction pipeline. Do NOT use for retrieval authorization (rag-security-architect), output execution sinks (llm-output-safety-reviewer), hidden-context secrets (hidden-context-exposure-reviewer), or governance sign-off (ai-governance-risk-reviewer).
 ---
 
 # Sensitive Disclosure Guard
@@ -28,8 +28,8 @@ scoping is composed from `tenant-isolation-reviewer` and credential custody from
 - Do NOT use when: the concern is WHO can retrieve WHICH documents
   (`rag-security-architect`) or an execution/render sink
   (`llm-output-safety-reviewer`).
-- Do NOT use when: the secret lives in the system prompt
-  (`system-prompt-leakage-reviewer`) or the ask is governance/consent sign-off
+- Do NOT use when: the secret lives in the system prompt or other hidden context
+  (`hidden-context-exposure-reviewer`) or the ask is governance/consent sign-off
   (`ai-governance-risk-reviewer`).
 
 ## Inputs to Inspect

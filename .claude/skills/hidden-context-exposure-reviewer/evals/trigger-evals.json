@@ -1,0 +1,117 @@
+{
+  "skill": "hidden-context-exposure-reviewer",
+  "description": "Trigger discrimination for the Phase 7 threat & injection cluster: hidden-context contents and secrecy-dependence (system prompt, developer instructions, retrieved policy text, tool/function schemas) vs injection defense vs user-data disclosure vs retrieval authorization vs tool-permission design vs credential custody vs persistent-memory poisoning vs context-assembly design vs inter-agent channels.",
+  "overlaps_with": [
+    "prompt-injection-defender",
+    "sensitive-disclosure-guard",
+    "rag-security-architect",
+    "agent-tool-safety-guard",
+    "secrets-identity-hardener",
+    "memory-context-poisoning-reviewer",
+    "model-context-designer",
+    "inter-agent-comms-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "hidden-context-wins-here",
+      "prompt": "Is it a problem that our security relies on the system prompt staying secret, and that the prompt has our internal endpoints in it?",
+      "expected_skill": "hidden-context-exposure-reviewer",
+      "should_not_trigger": [
+        "prompt-injection-defender",
+        "sensitive-disclosure-guard"
+      ],
+      "reason": "Secrets in the prompt and dependence on prompt secrecy is this skill (LLM08); prompt-injection-defender is the input side and sensitive-disclosure-guard covers user/context data, not the application's hidden context."
+    },
+    {
+      "id": "tool-schema-exposure-wins-here",
+      "prompt": "A user got our agent to print its full tool list and parameter schemas, including an admin-only export tool and a description that says the caller must be a developer. What did that expose and what should change?",
+      "expected_skill": "hidden-context-exposure-reviewer",
+      "should_not_trigger": [
+        "agent-tool-safety-guard"
+      ],
+      "reason": "Disclosure of tool schemas and reliance on a role rule written in a tool description is hidden context exposure (LLM08); agent-tool-safety-guard designs the permission matrix and would receive the routed enforcement fix, but does not own what the schema reveals."
+    },
+    {
+      "id": "retrieved-policy-leak-wins-here",
+      "prompt": "Our assistant loads our internal escalation policy from the knowledge base into its instructions, and users can get it to recite the thresholds. Is that a leak we need to fix?",
+      "expected_skill": "hidden-context-exposure-reviewer",
+      "should_not_trigger": [
+        "rag-security-architect",
+        "sensitive-disclosure-guard"
+      ],
+      "reason": "Retrieved policy text placed in hidden context and echoed back is LLM08; rag-security-architect owns who may retrieve which documents and sensitive-disclosure-guard owns regulated user data, neither the application's own control text."
+    },
+    {
+      "id": "retrieval-authz-goes-to-rag-security",
+      "prompt": "Make sure a user's RAG search only returns documents their tenant and role are allowed to read, with ACLs applied in the vector query.",
+      "expected_skill": "rag-security-architect",
+      "should_not_trigger": [
+        "hidden-context-exposure-reviewer"
+      ],
+      "reason": "Authorization at retrieval time over access-controlled documents is rag-security-architect (LLM09); this skill reviews hidden policy text once it is in context, not document access control."
+    },
+    {
+      "id": "tool-permissions-go-to-tool-safety-guard",
+      "prompt": "Design least-privilege permissions for our agent's tools: which tools each role may call, argument validation, and approval before refunds.",
+      "expected_skill": "agent-tool-safety-guard",
+      "should_not_trigger": [
+        "hidden-context-exposure-reviewer"
+      ],
+      "reason": "Per-tool permission matrices, argument validation, and approval gates are agent-tool-safety-guard (LLM03); this skill only asks what tool schemas reveal and whether their text is relied on as a gate."
+    },
+    {
+      "id": "injection-goes-to-injection-defender",
+      "prompt": "Explicitly invoke prompt-injection-defender. Stop untrusted document content from overriding our agent's instructions at runtime.",
+      "expected_skill": "prompt-injection-defender",
+      "should_not_trigger": [
+        "hidden-context-exposure-reviewer"
+      ],
+      "reason": "Preventing untrusted content from changing behavior is prompt-injection-defender (manual-only); this skill reviews hidden context's contents and whether security wrongly depends on its secrecy."
+    },
+    {
+      "id": "user-data-disclosure-goes-to-disclosure-guard",
+      "prompt": "Make sure the model doesn't leak PII or another user's data in its responses.",
+      "expected_skill": "sensitive-disclosure-guard",
+      "should_not_trigger": [
+        "hidden-context-exposure-reviewer"
+      ],
+      "reason": "Sensitive user/context/output data leakage is sensitive-disclosure-guard (LLM02); LLM08 excludes user and training data and covers the application's hidden control context."
+    },
+    {
+      "id": "credential-custody-goes-to-secrets-hardener",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Rotate the leaked key and set up proper server-side secret storage and least-privilege service accounts.",
+      "expected_skill": "secrets-identity-hardener",
+      "should_not_trigger": [
+        "hidden-context-exposure-reviewer"
+      ],
+      "reason": "The custody/rotation mechanics are secrets-identity-hardener; this skill finds the secret in hidden context and routes it there, but doesn't own secret storage design."
+    },
+    {
+      "id": "memory-poisoning-goes-to-memory-reviewer",
+      "prompt": "Our agent auto-saves conversation summaries to long-term memory and a poisoned note keeps resurfacing across sessions.",
+      "expected_skill": "memory-context-poisoning-reviewer",
+      "should_not_trigger": [
+        "hidden-context-exposure-reviewer"
+      ],
+      "reason": "Persistent memory is an agentic amplification that LLM08 explicitly excludes; memory-context-poisoning-reviewer owns memory write, provenance, and recall controls. This skill reviews what hidden context contains and whether security relies on its secrecy."
+    },
+    {
+      "id": "context-assembly-design-goes-to-model-context-designer",
+      "prompt": "Design which fields and segments our context assembler includes under caps and closed schemas.",
+      "expected_skill": "model-context-designer",
+      "should_not_trigger": [
+        "hidden-context-exposure-reviewer"
+      ],
+      "reason": "Choosing what enters the context window, under size caps and closed schemas, is model-context-designer's design work; this skill reviews the assembled hidden context for secrets and secrecy-dependence after the design exists."
+    },
+    {
+      "id": "inter-agent-channel-goes-to-comms-reviewer",
+      "prompt": "Our planner agent passes instructions to worker agents over a message bus; review whether a compromised worker can forge or tamper with those messages.",
+      "expected_skill": "inter-agent-comms-reviewer",
+      "should_not_trigger": [
+        "hidden-context-exposure-reviewer"
+      ],
+      "reason": "Authenticity and integrity of messages between agents is inter-agent-comms-reviewer; inter-agent channels are an agentic amplification outside LLM08 scope."
+    }
+  ]
+}

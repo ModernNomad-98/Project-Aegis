@@ -1,7 +1,7 @@
 {
   "skill": "ai-threat-modeler",
   "description": "Trigger discrimination for the Phase 7 threat & injection cluster: whole-AI-system threat modeling vs single-defense design vs prompt-secrecy review vs disclosure controls, and against the shipped threat-modeler, security-pr-reviewer, and the ai-security-red-team-reviewer subagent.",
-  "overlaps_with": ["threat-modeler", "prompt-injection-defender", "system-prompt-leakage-reviewer", "sensitive-disclosure-guard", "security-pr-reviewer", "ai-security-red-team-reviewer (subagent)"],
+  "overlaps_with": ["threat-modeler", "prompt-injection-defender", "hidden-context-exposure-reviewer", "sensitive-disclosure-guard", "security-pr-reviewer", "ai-security-red-team-reviewer (subagent)"],
   "cases": [
     {
       "id": "whole-ai-system-model-wins-here",

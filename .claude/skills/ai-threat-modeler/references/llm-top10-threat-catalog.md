@@ -107,9 +107,9 @@ A category is **in scope** when the system has the ingredient it abuses:
   security posture that depends on hidden context staying secret.
 - Seed: "Prompt contains the internal API key so the model 'can call the
   API'; one extraction prompt later the key is public."
-- Owner: `system-prompt-leakage-reviewer` (system-prompt slice; wider hidden
-  context such as retrieved policy text and tool schemas is only partly
-  covered — record the residue).
+- Owner: `hidden-context-exposure-reviewer` (full LLM08 scope: system
+  prompt, developer instructions, retrieved policy text, tool/function
+  schemas, and other hidden directives).
 
 ### LLM09 — Vector and Embedding Weaknesses
 - Cross-tenant retrieval from a shared index, missing document-level ACLs at

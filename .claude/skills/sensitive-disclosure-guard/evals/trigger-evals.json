@@ -1,7 +1,7 @@
 {
   "skill": "sensitive-disclosure-guard",
   "description": "Trigger discrimination for the Phase 7 threat & injection cluster: sensitive-data disclosure/redaction vs retrieval authorization vs credential custody vs tenant surface audit, and against the shipped secrets-identity-hardener and tenant-isolation-reviewer.",
-  "overlaps_with": ["rag-security-architect", "secrets-identity-hardener", "tenant-isolation-reviewer", "system-prompt-leakage-reviewer", "ai-governance-risk-reviewer"],
+  "overlaps_with": ["rag-security-architect", "secrets-identity-hardener", "tenant-isolation-reviewer", "hidden-context-exposure-reviewer", "ai-governance-risk-reviewer"],
   "cases": [
     {
       "id": "disclosure-redaction-wins-here",
@@ -27,9 +27,9 @@
     {
       "id": "prompt-secret-goes-to-leakage-reviewer",
       "prompt": "Our system prompt contains an internal API key so the model can call our API — can an attacker extract it?",
-      "expected_skill": "system-prompt-leakage-reviewer",
+      "expected_skill": "hidden-context-exposure-reviewer",
       "should_not_trigger": ["sensitive-disclosure-guard"],
-      "reason": "Secrets in the system prompt and their extraction is system-prompt-leakage-reviewer (LLM08); this skill covers sensitive data in the user/context/output/log flow, not the prompt itself."
+      "reason": "Secrets in the system prompt and their extraction is hidden-context-exposure-reviewer (LLM08); this skill covers sensitive data in the user/context/output/log flow, not the prompt itself."
     },
     {
       "id": "tenant-surface-audit-goes-to-isolation-reviewer",

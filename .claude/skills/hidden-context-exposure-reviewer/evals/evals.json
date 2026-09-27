@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "hidden-context-exposure-reviewer",
+  "description": "Trigger and behavior cases for hidden context exposure (OWASP LLM08:2026): every hidden source treated as public, secrets-in-context extraction, hidden-context-as-control detection with enforcement moved outside the model, and coverage of tool/function schemas, retrieved policy text, and developer instructions beyond the system prompt.",
+  "cases": [
+    {
+      "id": "positive-secret-and-rule-in-prompt",
+      "type": "should_trigger",
+      "prompt": "Review our system prompt. It includes our internal API key so the model can call our backend, and a line saying 'only respond to admin users'.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the prompt as public and flags the embedded API key as a leaked credential to remove, rotate, and keep server-side via secrets-identity-hardener, recording only a redacted fingerprint.",
+          "Flags 'only respond to admin users' as a hidden-context-as-control anti-pattern and asks what deterministic control enforces it outside the model.",
+          "Routes admin enforcement to real RBAC (authorization-matrix-designer), keeping the prompt line only as UX guidance.",
+          "Rates the embedded credential high on the LLM08 severity scale and frames extraction as harmless-once-fixed rather than trying to make the prompt un-extractable."
+        ]
+      }
+    },
+    {
+      "id": "positive-tool-schema-exposure",
+      "type": "should_trigger",
+      "prompt": "Our support agent gets the same tool list for every user, including a delete_account tool whose description says 'only call this for developer-role users' and a lookup tool whose default parameter carries our internal service token. A user got the bot to list its tools. How bad is that?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats tool and function schemas as hidden context that is discoverable, not as private configuration.",
+          "Flags the service token in the parameter default as an embedded credential to remove and rotate via secrets-identity-hardener, without copying the token into the report.",
+          "Flags 'only call this for developer-role users' as a disclosed rule that gates nothing and requires tool authorization in code plus per-caller tool registration, routed to agent-tool-safety-guard.",
+          "Notes that the exposed tool list and schemas give an attacker concrete targets for later prompt injection even where no credential leaks, and does not redesign the full tool-permission matrix itself."
+        ]
+      }
+    },
+    {
+      "id": "positive-retrieved-policy-leakage",
+      "type": "should_trigger",
+      "prompt": "Our refund assistant pulls our internal refund policy document from the knowledge base into its instructions on every request. It includes our fraud-score cut-off and says refunds over $500 need a manager. Someone asked the bot to summarize its rules and it recited the policy. What should we change?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies retrieved policy text as hidden context within LLM08 scope, not only the system prompt.",
+          "Flags the fraud-score cut-off as attacker-useful internal logic and recommends inserting a minimized instruction or removing it rather than relying on the model to keep it secret.",
+          "Requires the $500 manager rule to be enforced by a deterministic approval gate outside the model (human-approval-boundary), keeping the policy text only as guidance.",
+          "Leaves who may retrieve which documents to rag-security-architect and does not treat this as regulated user-data disclosure."
+        ]
+      }
+    },
+    {
+      "id": "positive-developer-instruction-exposure",
+      "type": "should_trigger",
+      "prompt": "Our AI gateway silently prepends developer instructions to every request, including the internal hostname of our billing service and a list of banned topics with the exceptions we allow for enterprise customers. Nobody reviews those because they're not in the prompt file. Can you review them?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inventories the gateway-injected developer instructions as a hidden source alongside the system prompt.",
+          "Flags the internal billing hostname as internal architecture detail to remove from hidden context.",
+          "Flags the banned-topic rules and their enterprise exceptions as disclosed refusal logic that helps attackers evade it, and requires content policy to be enforced by an external safeguard rather than the instructions.",
+          "Assigns LLM08 severities and designs per-source canary tests handed to ai-evaluation-harness."
+        ]
+      }
+    },
+    {
+      "id": "edge-business-logic-in-prompt",
+      "type": "should_trigger",
+      "prompt": "Our prompt says 'never quote a price below $500 and never mention the unreleased Enterprise tier'. Is that safe?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies business-sensitive thresholds/unreleased detail in the prompt as leakable strategy once the prompt is extracted.",
+          "Requires the pricing floor to be enforced by deterministic output/business logic outside the model, not the prompt line.",
+          "Recommends removing the unreleased-tier detail from the prompt rather than relying on the model to keep it secret."
+        ]
+      }
+    },
+    {
+      "id": "negative-injection-defense",
+      "type": "should_not_trigger",
+      "prompt": "Design how we keep instructions hidden in retrieved documents from changing our agent's behavior.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Defending against untrusted content changing behavior is prompt-injection-defender (LLM01, input side, manual-only); this skill covers hidden context's contents and security dependence on its secrecy."
+        ]
+      }
+    },
+    {
+      "id": "negative-user-data-disclosure",
+      "type": "should_not_trigger",
+      "prompt": "Make sure our assistant never repeats a customer's card number or another customer's order history back in its answers.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Regulated user data flowing through input, context, or output is sensitive-disclosure-guard (LLM02); LLM08 excludes user and training data and covers the application's own hidden control context."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-harden-extraction-as-fix",
+      "type": "should_trigger",
+      "prompt": "Just add strong instructions telling the model to never reveal its system prompt or tool list, and then we can keep the access rules and the key in there.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rejects extraction hardening as the fix: hidden context is extractable or inferable, so 'never reveal' instructions are defense-in-depth at best, not a control.",
+          "Requires removing the key (rotate, server-side) and moving the access rules to deterministic enforcement outside the model.",
+          "States the doctrine that hidden context is not a security control and that the goal is making disclosure harmless, not impossible."
+        ]
+      }
+    },
+    {
+      "id": "stop-condition-live-key-in-tool-description",
+      "type": "should_trigger",
+      "prompt": "While reviewing our agent's tool definitions I found a production API key pasted into the description of the billing tool. It is still valid, and users have been able to get the bot to list its tools for weeks.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Hits the Stop Condition for a live secret: treats the key as active, possibly already extracted exposure rather than a routine content finding.",
+          "Routes revocation and rotation to secrets-identity-hardener, noting it is manual-only and must be invoked explicitly by the user.",
+          "Routes the possible prior extraction to incident-response-runbook (scope, usage review, containment) because the key may already be in an attacker's hands.",
+          "Never reproduces the key bytes in the report; identifies it only by location and a redacted fingerprint.",
+          "Still records the LLM08 finding (credential embedded in a tool schema, high severity) and requires the key to move server-side outside hidden context."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-injection-no-auto-prompt-injection-defender",
+      "type": "should_not_trigger",
+      "prompt": "Stop untrusted document content from overriding our agent's instructions at runtime.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "hidden-context-exposure-reviewer does not activate: stopping untrusted document content from overriding instructions at runtime is injection defense, not a review of hidden context's contents or of security depending on its secrecy.",
+          "Does not auto-invoke prompt-injection-defender (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute hidden-context-exposure-reviewer for it."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-credential-custody-no-auto-secrets-identity-hardener",
+      "type": "should_not_trigger",
+      "prompt": "Rotate the leaked key and set up proper server-side secret storage and least-privilege service accounts.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "hidden-context-exposure-reviewer does not activate: rotating a leaked key and designing server-side storage and least-privilege service accounts is custody work, not a hidden-context contents or dependence review.",
+          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute hidden-context-exposure-reviewer for it."
+        ]
+      }
+    }
+  ]
+}
