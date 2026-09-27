@@ -741,7 +741,7 @@
           "Keeps the core Stage 9 chain (risk-tiered-validation-selector, sharded-validation-with-resume, release-readiness-reviewer) with the reviewer advising and the owner authorizing.",
           "Treats the owner's statement as the yes to the Stage 9 question (risky enough to ship behind a flag with a gradual rollout and a kill switch) and does NOT ask that question again.",
           "Routes to feature-flag-rollout-strategist by its exact name in backticks and, because no flag system exists yet, to feature-flag-architect first, also by its exact name in backticks.",
-          "Does NOT itself plan the ramp stages or pick a flag vendor, and does NOT turn on, flip, deploy, or release anything; release stays the owner's authorization through the human gate."
+          "Does NOT itself plan the ramp stages or pick a flag vendor, and does NOT install, turn on, flip, deploy, or release anything; release stays the owner's authorization through the human gate."
         ]
       }
     }

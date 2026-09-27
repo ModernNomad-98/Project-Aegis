@@ -237,7 +237,7 @@ here.
 - **Stage 3 — Design how it's built.** → `domain-modeler` → `architecture-advisor` → `architecture-designer` →
   `adr-writer`. *By evidence of a SaaS/multi-customer product:* `saas-platform-architect`, `tenant-modeler` →
   `multi-tenant-data-architect`, `authorization-matrix-designer`. *By evidence of a need to turn a feature on for a few customers first, or switch it off within minutes without a release:* `feature-flag-architect`, which asks its own flag-store question on a later turn.
-  The evidence is the spec's rollout intent. When the spec is silent and the product has more than a handful of customers, ask two atomic questions, one per turn, each after a plain explanation and a recommendation: first, turn a new feature on for a few customers first, or for everyone at once? Queued, only if "everyone at once": switch a misbehaving feature off within minutes without releasing code, or is a normal release fast enough? Either need routes; "everyone at once" plus "a normal release" is recorded with what it was chosen over, no route. One change's staged rollout stays with `feature-flag-rollout-strategist`.
+  The evidence is the spec's rollout intent. When the spec is silent and the product has more than a handful of users or customers, ask two atomic questions, one per turn, each after a plain explanation and a recommendation: first, turn a new feature on for a few customers first, or for everyone at once? Queued, only if "everyone at once": switch a misbehaving feature off within minutes without releasing code, or is a normal release fast enough? Either need routes; "everyone at once" plus "a normal release" is recorded with what it was chosen over, no route. One change's staged rollout stays with `feature-flag-rollout-strategist`.
 - **Stage 4 — Make it safe.** *Only by evidence:* `threat-modeler` / `ai-threat-modeler`;
   `tenant-isolation-reviewer`, `share-link-access-architect`,
   `file-upload-storage-architect`, `prompt-injection-defender` *(manual-only)*,
@@ -278,7 +278,7 @@ here.
   re-derive or copy its decision model here; for several reviewers and plain-language skill explanations, use the [guided release path](../../../docs/paths/release-with-agents.md).
 - **Stage 9 — Decide to release.** → `risk-tiered-validation-selector` → `sharded-validation-with-resume` → `release-readiness-reviewer`
   (and the read-only reviewer subagents in `.claude/agents/` when available and relevant); the reviewer advises and the owner authorizes; Aegis's control plane is synthetic only.
-  *At release, ONE plain question:* is this change risky enough to ship behind a flag, with a gradual rollout and a kill switch (a fast off switch)? A yes routes to `feature-flag-rollout-strategist`, preceded by `feature-flag-architect` when no flag system exists yet.
+  *At release, unless the owner has already answered it, ONE plain question:* is this change risky enough to ship behind a flag, with a gradual rollout and a kill switch (a fast off switch)? A yes routes to `feature-flag-rollout-strategist`, preceded by `feature-flag-architect` when no flag system exists yet.
 
 **The manual-only routing invariant.** Before routing to ANY skill, check its
 invocation posture. A **manual-only** target (`disable-model-invocation: true`;
