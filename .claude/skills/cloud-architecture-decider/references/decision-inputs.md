@@ -64,8 +64,8 @@ and owner comparison template in
 | Pattern or service category | You own vs the platform | Example providers | Fits when | Ceiling that forces a change |
 | --- | --- | --- | --- | --- |
 | IaaS / VPS | You: OS, patching, runtime. Platform: hardware. | Hyperscaler VMs, DigitalOcean Droplets, Linode | Full control; custom kernels/daemons; lift-and-shift | Ops burden exceeds team capacity |
-| Container PaaS | You: the container. Platform: host, scaling, deploy. | Render, Railway, Fly.io | "Just deploy my app + DB"; long-running services | Pricing/scale limits; a service the platform lacks |
-| Managed Jamstack / SSR host | You: frontend + functions. Platform: build, CDN, deploy. | Vercel, Netlify, Cloudflare Pages | Static/SSR frontend + serverless API; push-to-deploy | Long-running/stateful backend that won't fit functions |
+| App platform / container PaaS | You: the container. Platform: host, scaling, deploy. | Render, Railway, Fly.io | "Just deploy my app + DB"; long-running services | Pricing/scale limits; a service the platform lacks |
+| Frontend / SSR host | You: frontend + functions. Platform: build, CDN, deploy. | Vercel, Netlify, Cloudflare Pages | Static/SSR frontend + serverless API; push-to-deploy | Long-running/stateful backend that won't fit functions |
 | Managed data / Postgres-BaaS | You: schema + policies. Platform: managed database; verify identity, file storage and backup features for the chosen service. | Supabase, Neon | Managed relational database; combine other services only after capability checks | Extreme scale/tuning; an engine the BaaS doesn't offer |
 | Edge / serverless functions | You: function code. Platform: global runtime, per-call scaling. | Cloudflare Workers, Fly.io | Global low-latency; bursty/event compute; stateless | Stateful/long-running work; runtime/time limits |
 | Hyperscaler managed services | You: select and govern each service. Platform: service-specific operations. | AWS, Azure, GCP | Deep compliance/scale/integration; broad service needs | Service-specific cost, limits or operational burden |
@@ -77,10 +77,10 @@ Notes:
   do not treat different managed databases as interchangeable when engine
   behavior drives the design.
 - **Patterns are not mutually exclusive per system.** A common modern shape is a
-  Jamstack/SSR host for the frontend + a Postgres-BaaS for data + edge functions
+  frontend/SSR host for the frontend + a Postgres-BaaS for data + edge functions
   for global paths — score each surface on its own pattern.
 - **Cost model differs by pattern:** per-invocation (edge/serverless),
-  per-VM/per-container (IaaS/PaaS), or bandwidth/egress (Jamstack/CDN) — a
+  per-VM/per-container (IaaS/PaaS), or bandwidth/egress (frontend host/CDN) — a
   workload cheap on one pattern can be punitive on another.
 
 Durable decision axes (these age slowly; brands do not): operational abstraction · ops

@@ -92,7 +92,7 @@ the owner's answer grants no authority to create accounts, pay, or release.
 8. Workload shape per service: static/SSR, long-running/stateful, or bursty/
    event-driven — this rules out some patterns (a stateful long-running
    process does not fit a pure edge runtime; a static frontend + API fits a
-   managed-Jamstack host), so inspect it before choosing a pattern.
+   frontend/SSR host), so inspect it before choosing a pattern.
 
 ## Workflow
 
@@ -103,8 +103,8 @@ the owner's answer grants no authority to create accounts, pay, or release.
    services); team size and what it has operated; expected scale; budget and
    credits; existing stack. A listed fact counts as deciding only when its
    plausible answers would change the recommendation for THIS case; otherwise
-   record it as assumed, with a reopen trigger, and continue. If one is
-   missing, ask exactly one plain-language question for the most decision-changing gap (order in
+   record it as assumed, with a reopen trigger, and continue. If a deciding
+   fact is missing, ask exactly one plain-language question for the most decision-changing gap (order in
    [references/managed-platform-tier.md](references/managed-platform-tier.md#deciding-facts-ask-only-what-is-missing)),
    say briefly why it matters, and wait. Do not ask about facts that would
    not change the outcome, bundle several questions, or present a
