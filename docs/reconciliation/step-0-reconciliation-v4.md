@@ -3118,6 +3118,14 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
 
 ## 6. Post-merge corrections
 
+- **2026-09-26 — D64 amendment.** PR #395 (`741b29a`) added a reciprocal
+  `plan-entitlement-architect` → `feature-flag-architect` yield. The owner
+  kept it on 2026-09-26, so four (not five) one-way D64 ROUTE-002 findings
+  remain census data: toward `authorization-matrix-designer`,
+  `ab-test-designer`, `ci-pipeline-architect` and `tenant-isolation-reviewer`.
+  D64's text above is unchanged. See the
+  [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md).
+
 - **2026-09-12 — Current backlog labels reconciled.** At the owner's request,
   corrected stale completion labels against merged PRs #83/#85/#87/#89 and the
   shipped skill directories. BER-BKL-001/-004/-006/-008 are complete for their
