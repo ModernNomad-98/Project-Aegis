@@ -204,8 +204,9 @@ their materiality is unconfirmed.
   **Dispositioned by owner decision, 2026-09-26.** The
   [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md)
   triages all 268 edges reported on `0f46808`. Three batch PRs reciprocate
-  31 edges into 23 target skills. One edge gets a source-side fix and one
-  is an engine false positive. The other 236 are census data, not defects.
+  31 edges into 23 target skills. One of those 31 also gets a source-side
+  fix; one other edge is an engine false positive. The other 236 are census
+  data, not defects.
   No AEGIS ID is assigned.
 - **Orchestrator capability numbering.** `project-orchestrator` presents its
   workflow as Capability 1 → 3 → 2 → 4. The sequence matches the declared

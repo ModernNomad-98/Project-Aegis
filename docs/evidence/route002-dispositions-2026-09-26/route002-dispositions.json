@@ -1,7 +1,7 @@
 {
  "record": "ROUTE-002 dispositions",
  "date": "2026-09-26",
- "owner_decision": "Peter, 2026-09-26: reciprocate the 23 high-value ROUTE-002 seams in three batch pull requests (docs/route002-reciprocity-1/2/3) and record every other ROUTE-002 finding as census data. Earlier decision D64: the five one-way findings from feature-flag-architect stay census data.",
+ "owner_decision": "Peter, 2026-09-26: reciprocate the 23 high-value ROUTE-002 seams in three batch pull requests (docs/route002-reciprocity-1/2/3), including five hub targets as deliberate exceptions (api-event-architect, architecture-designer, audit-log-architect, code-reviewer, streaming-event-architect), and record every other ROUTE-002 finding as census data. Earlier decision D64: the five one-way findings from feature-flag-architect stay census data.",
  "scan": {
   "repo_sha": "0f46808d865751fac396b52422bd964e6b7c2cf1",
   "scan_source": "git archive of origin/main at repo_sha, extracted to a clean directory (the engine reports repo_sha 'unknown' and working_tree_dirty true there because the archive has no .git)",
