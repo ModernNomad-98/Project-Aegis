@@ -85,6 +85,18 @@
           "No performance metric, budget, bundle, or rendering-path work is requested."
         ]
       }
+    },
+    {
+      "id": "unnamed-build-correctness-no-auto-vite-build-qa-engineer",
+      "type": "should_not_trigger",
+      "prompt": "After our chunk-splitting change, the staging build 404s on a lazy chunk and an env-specific import breaks. Verify and fix the build pipeline behavior.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke frontend-perf-engineer: a lazy chunk that 404s and a broken env-specific import are build-correctness defects, not bundle speed work.",
+          "Does not auto-invoke vite-build-qa-engineer (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute frontend-perf-engineer for it."
+        ]
+      }
     }
   ]
 }

@@ -51,6 +51,18 @@
           "States the handoff explicitly rather than silently dropping the second half of the ask."
         ]
       }
+    },
+    {
+      "id": "unnamed-security-suite-no-auto-multi-tenant-security-tester",
+      "type": "should_not_trigger",
+      "prompt": "Plan and specify the cross-tenant negative tests proving tenant A can't read tenant B's invoices.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke test-plan-designer: cross-tenant negative tests are delegated out of test plans and appear there only as referenced line items.",
+          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute test-plan-designer for it."
+        ]
+      }
     }
   ]
 }

@@ -53,6 +53,18 @@
           "Documents the conflict explicitly in the output."
         ]
       }
+    },
+    {
+      "id": "unnamed-authz-no-auto-multi-tenant-security-tester",
+      "type": "should_not_trigger",
+      "prompt": "Prove wrong-tenant callers get denied on every orders endpoint.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke api-contract-test-designer: proving WHICH callers are denied is the authorization negative suite; contract tests only verify the shape of denial responses.",
+          "Does not auto-invoke multi-tenant-security-tester (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute api-contract-test-designer for it."
+        ]
+      }
     }
   ]
 }

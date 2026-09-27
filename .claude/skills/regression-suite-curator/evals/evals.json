@@ -66,6 +66,18 @@
           "Explains that never-failing guards may be preventing the exact class of change they test, and offers evidence-based alternatives (demotion of genuinely duplicate coverage, sharding via qa-automation-architect)."
         ]
       }
+    },
+    {
+      "id": "unnamed-eval-harness-no-auto-ai-evaluation-harness",
+      "type": "should_not_trigger",
+      "prompt": "Create a golden dataset and graders to measure our chatbot's quality, safety, and hallucination rate, and block regressions on model upgrades.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke regression-suite-curator: a golden dataset and graders for chatbot quality, safety, and hallucination rate evaluate model behavior; this skill curates code-test regression membership.",
+          "Does not auto-invoke ai-evaluation-harness (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute regression-suite-curator for it."
+        ]
+      }
     }
   ]
 }
