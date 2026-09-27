@@ -42,6 +42,10 @@ TIME; it consumes the ranking of WHAT to do from
 - Do NOT use when: the task is one feature's flag-gated rollout plan
   (progressive %s, guardrails) — that is `feature-flag-rollout-strategist`;
   a roadmap sequences features, it doesn't roll one out.
+- Do NOT use when: converting the roadmap into binding delivery commitments
+  or assessing commitment readiness — that is
+  `roadmap-to-commitments-translator`; this skill keeps the roadmap
+  honestly uncertain.
 
 ## Inputs to Inspect
 

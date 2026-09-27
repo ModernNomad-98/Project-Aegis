@@ -29,7 +29,8 @@ not this skill.
 - Do NOT use when: the ask is to *find* issues without editing — that is
   `code-reviewer`.
 - Do NOT use when: the simplification would move module boundaries or change
-  public contracts — that is architecture work with its own approval path.
+  public contracts — that is architecture work (`architecture-designer`)
+  with its own approval path.
 - Do NOT use when: behavior is wrong — fix bugs first (`systematic-debugger`
   / `tdd-engineer`); simplifying broken code preserves the bug more legibly.
 - This skill is **manual-only** (`disable-model-invocation: true`): it edits
