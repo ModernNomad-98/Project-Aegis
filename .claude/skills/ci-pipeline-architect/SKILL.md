@@ -113,8 +113,9 @@ weakened.
    targeting and ramp rules belong to `feature-flag-rollout-strategist`.
    Mark unknown
    costs as unknown and verify current prices if exact spend matters.
-   Ask one discovery question before recommending when a decisive fact is
-   missing; if the user must choose, ask one atomic decision question.
+   If decisive facts are missing, ask only for one missing fact per turn
+   until all are known; only then recommend, and if the user must choose,
+   ask one atomic decision question.
    Hand the chosen primitive to `rollback-runbook-author` for a rehearsed
    procedure. No strategy choice grants deployment authority.
 6. **Align branch protection**: required checks list matches the

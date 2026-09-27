@@ -87,7 +87,7 @@
         "triggers": true,
         "assertions": [
           "For the build-path choice, defines unfamiliar terms, explains why each viable option is considered, and compares benefits, drawbacks, money, setup time, and upkeep costs or unknowns.",
-          "Requests any essential missing constraint that would change the recommendation and gives a reasoned provisional recommendation when the known facts allow one.",
+          "Requests only one essential missing constraint that would change the recommendation this turn (any other stays for a later turn) and gives a reasoned recommendation only when the known facts allow one.",
           "For the prepared action, gives a concise exact-action approval request with blast radius and reversibility, without inventing a hosting comparison.",
           "For the build-path choice, asks exactly one atomic question (the essential missing constraint that would change the recommendation, or the path decision itself) rather than bundling several decisions into one prompt.",
           "Neither deployment proceeds before the applicable approval."

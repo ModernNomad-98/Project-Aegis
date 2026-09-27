@@ -55,7 +55,8 @@ exact action and impact so the human can decide in one read.
    why each viable path is considered, its benefits, drawbacks, and money,
    setup-time, and upkeep costs (or unknowns). If an essential fact (such as
    budget or maintenance capacity) would change the recommendation, ask only
-   for that fact first; otherwise recommend the path that fits the known goals
+   for one missing essential fact per turn until all are known; only then
+   recommend the path that fits the known goals
    and constraints, with a reason, then ask exactly one atomic path question.
    Keep approval of a single
    prepared action concise; do not invent a build-path comparison for it.

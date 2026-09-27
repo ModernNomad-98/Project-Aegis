@@ -83,8 +83,9 @@ this owns the storage architecture.
    workload, its benefits and drawbacks, and money, setup, and ongoing
    upkeep costs or unknowns. Recommend the flow supported by file sizes,
    inspection needs, and existing infrastructure; explain why and what fact
-   would change it. Ask one discovery question first if a decisive fact is
-   missing; otherwise ask one clear decision question. The choice does
+   would change it. If decisive facts are missing, ask only for one missing
+   fact per turn until all are known; only then recommend and ask one clear
+   decision question. The choice does
    not authorize provisioning or spending. For direct uploads, the app
    issues a signed URL and RECORDS the intended object. Before marking it complete, the server checks object
    existence and expected metadata at storage; it does not trust a client
