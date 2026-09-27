@@ -94,9 +94,10 @@ package. Scope: ACQUISITION. Integrity of data you curate or pipelines you run
 
 - **Serialization / format (code execution on unsafe load):** `pickle.load`,
   `torch.load(..., weights_only=False)`, and Python-code custom layers can
-  execute arbitrary code from an untrusted artifact. Current PyTorch defaults
-  to restricted `weights_only=True`; verify the installed version, loading
-  mode, and allowlisted globals. File suffixes such as `.bin`/`.pt`/`.ckpt`
+  execute arbitrary code from an untrusted artifact. Recent PyTorch releases
+  default to restricted `weights_only=True` (verification item: confirm the
+  default against the installed version); verify the loading mode and
+  allowlisted globals. File suffixes such as `.bin`/`.pt`/`.ckpt`
   do not prove the mode. Prefer **safetensors** where suitable; do not treat
   scanning alone as proof that untrusted pickle can be loaded safely.
 - **Pinning:** pin models/datasets to an immutable revision (commit hash /

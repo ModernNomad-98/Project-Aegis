@@ -203,8 +203,9 @@ Not reviewed: <areas + why>
   release — review the upgrade target, don't just accept "latest".
 - Unsafe model deserialization can execute code: `pickle.load` and
   `torch.load(..., weights_only=False)` can run arbitrary code from an
-  untrusted checkpoint. Current PyTorch defaults to a restricted
-  `weights_only=True` loader; verify the installed version, mode, and any
+  untrusted checkpoint. Recent PyTorch releases default to a restricted
+  `weights_only=True` loader (verification item: confirm against the
+  installed version); verify the installed version, mode, and any
   allowlisted globals. Prefer safetensors where suitable and never treat an
   untrusted artifact as safe solely from its `.bin`/`.pt`/`.ckpt` suffix.
   See [PyTorch's loading guidance](https://docs.pytorch.org/docs/stable/generated/torch.load.html).
