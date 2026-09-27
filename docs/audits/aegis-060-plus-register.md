@@ -1,20 +1,24 @@
 # AEGIS-060+ register — proposed new findings, dedup map, and batch notes
 
-> **Current reading, checked 2026-09-23:** The AEGIS-060 rejection and typed
+> **Current reading, checked 2026-09-23:** This register is for maintainers
+> tracking contract-audit findings numbered AEGIS-060 and later (AEGIS-001..059
+> are the frozen earlier defect IDs). The AEGIS-060 rejection and typed
 > skill/subagent correction below remain the disposition of that candidate.
 > Sections 3–5 preserve the original 184-skill baseline's dedup map, coverage,
 > and planned remediation sequence. Phrases there such as "current main" and
-> "planned PR" refer to that baseline, not today's source tree. For current
-> skill contracts, inspect the [skills catalog](../skills-catalog.md) and
+> "planned PR" (pull request) refer to that baseline, not today's source
+> tree. For current skill contracts, inspect the
+> [skills catalog](../skills-catalog.md) and
 > [source files](../../.claude/skills/); do not schedule work solely from the
 > historical rows.
 
 **Current disposition, reconciled 2026-09-12:** AEGIS-060 is a **REJECTED
 CANDIDATE / FALSE POSITIVE; ID RETIRED AND NEVER REUSED**. Merged
 [PR #89](https://github.com/ModernNomad-98/Project-Aegis/pull/89), commit
-`000352f55b71f0c3e897a482d279d34bfaa3d66b`, corrected EVAL-004's collapse of
-skill and subagent namespaces. The `(subagent)` annotations are valid typed
-targets; do not schedule their removal as unfinished fixture work.
+`000352f55b71f0c3e897a482d279d34bfaa3d66b`, corrected contract-audit rule
+EVAL-004's collapse of skill and subagent namespaces. The `(subagent)`
+annotations are valid typed targets; do not schedule their removal as
+unfinished fixture work.
 
 PR #89's audit-engine and regression-test corrections are integrated into
 the calibration branch by merge `c7a92d208a8aec7295afa3e3188dce03a8331d0b`.
@@ -45,9 +49,11 @@ text, frozen baseline or unrelated AEGIS item.
 
 **ROUTE-002 disposition, 2026-09-26:** by owner decision, the
 [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md)
-closes the §2 triage. 31 edges into 23 target skills were reciprocated in three
-merged batch PRs, and #395 also closed one D64 edge. Of the other 236, 235 are
-census data, not defects, and one is an engine false positive.
+closes the §2 triage of ROUTE-002, the audit rule that reports one-way
+exclusion edges (skill A says "use B instead" but B never names A). 31 edges
+into 23 target skills were reciprocated in three merged batch PRs, and #395
+also closed one edge added by reconciliation decision D64. Of the other 236,
+235 are census data, not defects, and one is an engine false positive.
 
 ## Historical baseline (superseded where the current disposition says so)
 
@@ -72,9 +78,9 @@ Rules of this register (from the program's operating rules):
 
 ### AEGIS-060 (REJECTED CANDIDATE) — trigger-eval subagent annotations are valid typed-target syntax, not defects
 
-- **Classification / severity / status:** Candidate fixture-hygiene defect /
-  P2 / **REJECTED CANDIDATE — FALSE POSITIVE CAUSED BY EVAL-004 TYPE COLLAPSE;
-  ID RETIRED AND NEVER REUSED**
+- **Classification / severity / status:** Candidate fixture-hygiene defect / P2
+  (severity level; P0 is most severe) / **REJECTED CANDIDATE — FALSE POSITIVE
+  CAUSED BY EVAL-004 TYPE COLLAPSE; ID RETIRED AND NEVER REUSED**
 - **What the candidate claimed (superseded):** that five trigger-eval files
   wrote neighbor identifiers as `"<name> (subagent)"` — "prose annotation
   inside the name field" — so a machine consumer could not resolve them
@@ -177,7 +183,8 @@ Rules of this register (from the program's operating rules):
      unknown target (P1) rather than a special malformed class. The parity test
      covers bare, `(subagent)`, `(agent)`, `(subagent )`, `(reviewer)`,
      `(sub agent)`, `()`, a leading-marker string, and padded forms, asserting
-     kind, complete name, and annotation. The BER runtime is unchanged.
+     kind, complete name, and annotation. The Behavioral Eval Runner (BER)
+     runtime is unchanged.
 - **Negative regression retained:** the `thin-contract` fixture still proves
   EVAL-004 can fire — `ghost-neighbor` as an unknown target (P1) and
   `clean-skill (subagent)` as a **kind mismatch** (P2, because only the
@@ -201,7 +208,7 @@ their materiality is unconfirmed.
   excluder), some are the collision failure mode `skill-quality-reviewer`
   calls the corpus's main one. Needs semantic triage against rubric question
   2 before any ID is assigned. Full edge list: `artifacts/audits/`
-  route-graph and baseline JSON.
+  route-graph and baseline JSON (JavaScript Object Notation) files.
   **Dispositioned by owner decision, 2026-09-26.** The
   [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md)
   triages all 268 edges reported on `0f46808`. Three merged batch PRs
@@ -210,7 +217,8 @@ their materiality is unconfirmed.
   owner kept that yield (a dated D64 amendment records it). One other edge is
   an engine false positive. The other 235 are census data, not defects. A
   fresh audit of `56ea7e4` reports 234 ROUTE-002 findings, because #393 also
-  closed two census edges.
+  closed two census edges; a 2026-09-27 audit of `b553d91` reports 233,
+  because #409 closed one more census edge.
   No AEGIS ID is assigned.
 - **Orchestrator capability numbering.** `project-orchestrator` presents its
   workflow as Capability 1 → 3 → 2 → 4. The sequence matches the declared
@@ -223,12 +231,12 @@ their materiality is unconfirmed.
 | Audit rule | Count | Surfaces | Maps to | Effect on the existing ID |
 |---|---:|---|---|---|
 | APPR-002 | 1 | `project-orchestrator/references/project-state-template.md:140` — worked example grants `Scope allowed: Build the v1 scope` at brief-approval time | AEGIS-003, AEGIS-008 | **Root cause upgraded to repository-verified**: the template's own example teaches requirements-approval→build-authorization laundering |
-| STATE-005 | 2 | same template: `## MVP scope (approved)` narrative sections (template + worked example) with no supersession mechanics | AEGIS-002, AEGIS-006 | Confirms the post-D54 residue: append-only contract coexists with narrative sections that cannot be updated append-only |
+| STATE-005 | 2 | same template: `## MVP scope (approved)` narrative sections (template + worked example) with no supersession mechanics | AEGIS-002, AEGIS-006 | Confirms the residue left after reconciliation decision D54: append-only contract coexists with narrative sections that cannot be updated append-only |
 | ROUTE-003 | 1 | `project-orchestrator/SKILL.md` Stage-2 route (spec → prioritization → commitments; planner absent) | AEGIS-035, AEGIS-045 | **Root cause confirmed on current main** exactly as the handoff recorded |
 | VOCAB-002 | 4 | `roadmap-under-uncertainty-planner` description, body ×2, reference sheet — "committed/planned/exploratory", "Now (committed)" | AEGIS-044, AEGIS-039 | **Root cause confirmed on current main**: committed-as-horizon vs commitments-skill's reserved meaning |
 | ARTF-001 | 10 | `project-orchestrator`, `human-approval-boundary`, `scoped-approval-register`, `agent-authorization-matrix`, `audit-log-architect`, `agent-containment-reviewer`, `agent-memory-governance`, `offline-first-sync-architect`, `operational-vs-analytical-splitter`, `streaming-event-architect` | AEGIS-056, AEGIS-049 | Corroborates corpus-wide: "durable" claims never name a durability level (semantic-review candidates, not asserted defects) |
 | EVAL-004 | 5 | five trigger-evals files (typed `(subagent)` targets) | **AEGIS-060 — REJECTED, false positive** | Baseline count, frozen. All five were **false positives** from EVAL-004 v1.12.0 collapsing the skill and subagent namespaces. The rule now resolves each target in the namespace its syntax declares; with the corpus byte-identical to baseline, live EVAL-004 = 0. The authored files were never defective — see AEGIS-060 above |
-| SIDE-004 | 82 | Workflow sections of 64 auto-invocable skills — §5 mutation-class candidates (source/test/config writes, VCS, install, network, deploy/provision, data-store writes, doc/state writes) | AEGIS-020, AEGIS-057 | Semantic-review candidates corroborating the §5 posture gap corpus-wide — queued for review, not asserted defects |
+| SIDE-004 | 82 | Workflow sections of 64 auto-invocable skills — skill-generation-standard §5 mutation-class candidates (source/test/config writes, version control (VCS), install, network, deploy/provision, data-store writes, doc/state writes) | AEGIS-020, AEGIS-057 | Semantic-review candidates corroborating the §5 posture gap corpus-wide — queued for review, not asserted defects |
 | ROUTE-002 | 311 | corpus-wide exclusion edges | none yet | Systemic observation §2; dispositioned by owner decision 2026-09-26 ([record](../evidence/route002-dispositions-2026-09-26/README.md)) |
 
 Rules that fired zero times on the live corpus (SIDE-001..003, APPR-001,
