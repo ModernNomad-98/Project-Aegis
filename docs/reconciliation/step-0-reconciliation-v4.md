@@ -275,6 +275,10 @@ into `ai-evaluation-harness`, `ai-feature-kill-switch-designer`) → Phase 7 exp
 
 #### OWASP LLM Top 10 (2025) coverage map
 
+> **Historical edition.** D65 (2026-09-26) re-anchored Phase 7 to the OWASP Top
+> 10 for LLM Applications 2026; this table keeps the 2025 IDs as written. See D65
+> in [§5](#5-recorded-decisions).
+
 Phase 7 is anchored to the **OWASP Top 10 for LLM Applications (2025)**, LLM01:2025–LLM10:2025.
 Source: <https://genai.owasp.org/llm-top-10/> (verified 2026-07-06). This banks the coverage
 target now; the skills themselves are still built at Phase 7, not before.
