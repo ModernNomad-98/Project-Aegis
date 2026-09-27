@@ -1,6 +1,6 @@
 # Step 0 Reconciliation (v4 canonical)
 
-> **Historical scope — current reading, 2026-09-23.** "Canonical" below names
+> **Historical scope — current reading, 2026-09-27.** "Canonical" below names
 > the July 2026 choice between two *then-current* generation plans for the
 > former `nguyenpv1980-wq/Claude-Skills` repository. It does not make the old
 > prompts a current Project Aegis work order. Preserve the numbered decisions
@@ -8,6 +8,19 @@
 > current work, first use [AGENTS.md](../../AGENTS.md) to identify the workspace
 > role, then the [skills catalog](../skills-catalog.md) and
 > [skill authoring standard](../skill-generation-standard.md).
+
+**How to read this log.** It is still appended as new decisions are made.
+Decisions are numbered D1, D2 and so on, oldest first, in
+[§5](#5-recorded-decisions). [§6](#6-post-merge-corrections) lists post-merge
+corrections newest first; check §6 before relying on a decision. Shorthand used
+in the entries: `cat 01 #27` means item 27 in category 01 ([Software
+Architecture & Engineering](../skills/01-software-architecture-engineering.md))
+of the [300-skill roadmap](../300-repeatable-software-saas-skills-roadmap.md);
+ROUTE-002 is the skill contract audit finding for a one-way exclusion, where one
+skill routes work away to a neighbour that never names it back; BER means the
+Behavioral Eval Runner; WP means work package, the governing delivery unit in
+the [BER backlog](../roadmaps/behavioral-eval-runner-backlog.md); and OD-1 is
+owner decision 1 in that backlog.
 
 **Prepared:** 2026-07-06
 **Repo:** `nguyenpv1980-wq/Claude-Skills`
@@ -261,6 +274,10 @@ Execution-plan extras (`ai-provider-adapter-designer`, `prompt-contract-designer
 into `ai-evaluation-harness`, `ai-feature-kill-switch-designer`) → Phase 7 expansion backlog.
 
 #### OWASP LLM Top 10 (2025) coverage map
+
+> **Historical edition.** D65 (2026-09-26) re-anchored Phase 7 to the OWASP Top
+> 10 for LLM Applications 2026; this table keeps the 2025 IDs as written. See D65
+> in [§5](#5-recorded-decisions).
 
 Phase 7 is anchored to the **OWASP Top 10 for LLM Applications (2025)**, LLM01:2025–LLM10:2025.
 Source: <https://genai.owasp.org/llm-top-10/> (verified 2026-07-06). This banks the coverage
