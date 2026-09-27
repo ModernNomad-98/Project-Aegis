@@ -215,6 +215,13 @@ MANUAL-ONLY sentinel), its **Security Rules**, or its **Stop Conditions**.
 The mechanically enforced [protected-file guard](docs/offline-ci.md) covers
 validation and execution-control paths; its list is not the full security-review scope.
 
+Every PR, from the maintainer or an outside contributor, must answer the
+**Security-relevant surface?** question in the
+[PR template](.github/pull_request_template.md): **No**, or **Yes** with the
+surfaces from the list above that the PR touches. The rest of the template's
+checklist is advisory. A **Yes** on an outside contribution triggers the
+additional security review described above.
+
 Before opening a PR:
 
 - The validator and self-tests must be green — `python scripts/validate-skills.py`

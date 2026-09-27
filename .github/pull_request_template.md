@@ -4,6 +4,9 @@
 
 ## Checklist
 
+This checklist is advisory: tick what applies and say why if you skip an item.
+The security question below is required.
+
 - [ ] `python scripts/tests/test_validator.py` passes locally
 - [ ] `python scripts/validate-skills.py` passes locally (skill count reconciles, exit 0)
 - [ ] [Offline continuous integration (CI) coverage and limits](https://github.com/ModernNomad-98/Project-Aegis/blob/main/docs/offline-ci.md) reviewed; both Ubuntu
@@ -14,10 +17,11 @@
 - [ ] Commits carry a Developer Certificate of Origin (DCO) sign-off
       (`git commit -s`)
 
-## Security-relevant surface?
+## Security-relevant surface? (required)
 
-Does this pull request (PR) touch a security-relevant surface (see
-[CONTRIBUTING → External contributions](https://github.com/ModernNomad-98/Project-Aegis/blob/main/CONTRIBUTING.md#external-contributions))?
+Answer this on every pull request (PR). Does this PR touch a security-relevant
+surface, as listed in
+[CONTRIBUTING → External contributions](https://github.com/ModernNomad-98/Project-Aegis/blob/main/CONTRIBUTING.md#external-contributions)?
 
-- [ ] Yes — please flag it for security review
+- [ ] Yes — surface(s) touched: <!-- for example `scripts/`, `.github/`, `AGENTS.md` -->
 - [ ] No
