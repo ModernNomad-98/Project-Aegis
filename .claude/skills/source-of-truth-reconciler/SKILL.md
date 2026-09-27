@@ -1,6 +1,6 @@
 ---
 name: source-of-truth-reconciler
-description: Resolve conflicts between current user instructions, repo docs, code, tests, PR history, and older chat or memory context before acting on any of them. Use when two sources disagree (a doc says X, the code does Y), when instructions reference repo state that no longer exists, when planning docs overlap or contradict, or when remembered context conflicts with what the repo actually contains. Produces a precedence-ordered reconciliation with cited evidence (file:line) and surfaces every assumption explicitly — never silently picks a side and never silently obeys a stale instruction.
+description: Resolve conflicts between current user instructions, repo docs, code, tests, PR history, and older chat or memory context before acting on any of them. Use when two sources disagree (a doc says X, the code does Y), when instructions reference repo state that no longer exists, when planning docs overlap or contradict, or when remembered context conflicts with what the repo actually contains. Produces a precedence-ordered reconciliation with cited evidence (file:line) and surfaces every assumption explicitly — never silently picks a side and never silently obeys a stale instruction. Do NOT use for the cadenced sweep of chat-only decisions into repo docs (chat-backlog-reconciliation).
 ---
 
 # Source-of-Truth Reconciler

@@ -4,7 +4,8 @@
   "overlaps_with": [
     "adr-writer",
     "requirements-gathering-facilitator",
-    "feature-flag-rollout-strategist"
+    "feature-flag-rollout-strategist",
+    "project-orchestrator"
   ],
   "cases": [
     {
@@ -38,6 +39,14 @@
       "should_not_trigger": ["product-spec-writer"],
       "note": "SEAM CASE (within pack) — progressive %s, guardrail auto-rollback, targeting, and a kill switch are rollout mechanics. The spec states rollout INTENT and success only.",
       "reason": "feature-flag-rollout-strategist owns the flag-gated delivery plan. The product spec names the rollout intent and success metrics, not the flag plumbing."
+    },
+    {
+      "id": "vague-idea-end-to-end-goes-to-project-orchestrator",
+      "prompt": "I only have a rough app idea and no technical background. Walk me through everything from here to a shipped product, one step at a time.",
+      "expected_skill": "project-orchestrator",
+      "should_not_trigger": ["product-spec-writer"],
+      "note": "SEAM CASE (reciprocated yield) — a vague idea with no settled requirements and a request for the whole journey is the orchestrator's front door. It routes to product-spec-writer at the spec stage; it is not a spec request.",
+      "reason": "project-orchestrator drives a vague app idea end to end and routes to the owning stage skill. product-spec-writer needs understood requirements and writes one feature spec; it does not run the lifecycle."
     }
   ]
 }
