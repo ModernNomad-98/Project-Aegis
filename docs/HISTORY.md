@@ -57,8 +57,8 @@ exist and produce auditor-grade evidence on top. The **library-meta pack (D13)**
 the library on itself — `skill-quality-reviewer` (D18) as the judgment layer atop the
 mechanical validator, and D22's four remaining skills (`library-diff-reviewer`,
 `eval-runner-designer`, `skill-usage-instrumenter`, `skill-deprecation-planner`) — so the
-library now reviews its own additions and PRs, designs how its evals run, measures which
-skills actually fire, and can retire a skill as deliberately as it ships one.
+library could then review its own additions and PRs, design how its evals run, measure which
+skills actually fire, and retire a skill as deliberately as it ships one.
 
 A run of **D12 craft packs** followed. The **operational workflow patterns pack** (D12.8, D21)
 shipped the 10 evidence-extracted skills that are the concrete, invocable rules of the
@@ -76,7 +76,7 @@ source-currency pack**.
 
 The **OWASP web-app gap-closure pair** (D28) closed the last two zero-coverage categories from
 the D8 OWASP Top 10:2025 audit — `security-logging-alerting-architect` (A09) and
-`error-handling-security-reviewer` (A10) — so all 10 web-app categories now have an owning
+`error-handling-security-reviewer` (A10) — so all 10 web-app categories then had an owning
 skill. The **SaaS architecture-depth pack** (D12.11) then completed in two builds: the
 10-skill **strong cluster** (D31) and the 4-skill **low-priority set** (D32), resolving all 14
 candidates and bringing the library to **175 skills**.
@@ -132,10 +132,14 @@ PR #88 integrated and delivered the reviewed calibration-engineering fixes;
 PR #90 reconciled shared skill contracts;
 PR #91 added permanent Linux/Windows offline CI. PR #93 preserved the owner's
 recurring read-only-agent and administrator-merge grants in the repository.
-D63 reconciles current documentation with those deliveries.
+D63 reconciled the documentation of that date with those deliveries.
 
-The [changelog](../CHANGELOG.md) links each delivery and its evidence. Skill
-count remains at the D47 total. Measured calibration is unfinished: original
-calibration inputs remain unavailable, OD-1 remains open and WP-2B-4 remains
-blocked. The [documentation index](README.md) points returning contributors to
+The [changelog](../CHANGELOG.md) links each delivery and its evidence. At this
+update the skill count was still the D47 total of 184; skills added later are
+listed in the [skills catalog](skills-catalog.md), and the README's
+[library overview](../README.md#whats-in-the-library) carries the current total.
+At this update measured calibration was unfinished: original
+calibration inputs were unavailable, OD-1 was open and WP-2B-4 was blocked.
+The [BER backlog](roadmaps/behavioral-eval-runner-backlog.md#start-here-status-and-routes)
+records their current status. The [documentation index](README.md) points returning contributors to
 current setup and the remaining work, without treating old plans as new tasks.
