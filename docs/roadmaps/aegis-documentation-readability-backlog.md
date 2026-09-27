@@ -2,9 +2,12 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #347 (`cd174c2`) on 2026-09-26 Coordinated
+As of merged pull request (PR) #416 (`da2636d`) on 2026-09-27 Coordinated
 Universal Time (UTC), this remains the active
-repository-wide documentation acceptance backlog. The two component guides,
+repository-wide documentation acceptance backlog. The latest count is in the
+paragraph for main after #416 (`da2636d`): 610 tracked Markdown files, 560
+accepted reader pages, 44 classified synthetic fixtures and six known pending
+pages; the paragraphs between are dated history, oldest first. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
 The **491-file inventory and the ordered "start with" steps below are the
@@ -38,7 +41,8 @@ tracked Markdown files: 561 accepted reader pages and 44 classified synthetic
 fixtures**, with zero known pending pages.
 
 The governance change recording the owner's 2026-09-26 decisions — the #331
-correction and #333 option A (BER-DEC-014, AEGIS-APR-046 and AEGIS-APR-047),
+correction and #333 option A (Behavioral Eval Runner (BER) decision
+BER-DEC-014 and approval-register entries AEGIS-APR-046 and AEGIS-APR-047),
 and the standing merge conditions, eval-maintenance ruling and package-2
 consumption (AEGIS-APR-048 through AEGIS-APR-052) — changed seven existing
 reader pages and added no Markdown file: the approval register, BER backlog,
@@ -62,8 +66,9 @@ not D60) and defined `project-orchestrator` stages and the Use When and Stop
 Conditions sections at first use, and a corrected-candidate review accepted
 it. Fixes for eight Codex review findings on PR #378 and the owner's
 2026-09-26 decisions (Stage 9 route added, D64 row, the
-`caching-strategy-designer` seam kept, hub ROUTE-002 findings kept as census
-data) then changed the page materially. An independent re-review of the
+`caching-strategy-designer` seam kept, hub ROUTE-002 findings (the
+skill-contract audit rule that flags a skill handing work to a neighbour that
+never hands back) kept as census data) then changed the page materially. An independent re-review of the
 revised page returned FIX-FIRST; its one minimal edit aligned the merge step
 with AEGIS-APR-050 (Codex confirmed unavailable) and defined Codex, P1/P2
 and `gate-guard` at first use. A separate independent corrected-candidate
@@ -100,7 +105,8 @@ the [execution measurements](aegis-execution-metrics.md) and the
 changed the forecast and measurement pages without a recorded full-page
 review; the AEGIS-APR-046 to AEGIS-APR-052 governance change above later accepted the forecast but not the
 measurement page. A first independent full-page review returned FIX-FIRST;
-its minimal edits removed a stale S5 owner-read horizon, aligned the
+its minimal edits removed a stale owner-read horizon for S5 (the owner-choice
+batch of six skills classified UNSURE), aligned the
 feature-flag skill's status (scope accepted, skill in progress, routing not
 started) across all three pages, reconciled the owner-choice batch counts and
 dated the open-PR list. After those edits all three pages are **re-accepted
@@ -208,7 +214,7 @@ previous paragraph. No edit added a heading to an existing page.
   (added by #393 with no full-page review).
 
 #399, #400, #398, #401 and #407 changed evaluation JSON only. #393 is the
-only merge that adds a Markdown file, so main after #407 (`1ec01bf`) has
+only merge that adds a Markdown file, so main after #407 (`1ec01bf`) had
 **609 tracked Markdown files: 557 accepted reader pages, 44 classified
 synthetic fixtures and eight known pending pages**. The named follow-up is
 one independent full-page re-read of each pending page against [Acceptance
@@ -340,7 +346,7 @@ acceptance.
   record's D64 amendment added 8 lines; the record was already pending (64
   lines after #405, #409 and #397).
 
-Main after #397 (`4a68ace`) therefore has **610 tracked Markdown files: 546
+Main after #397 (`4a68ace`) therefore had **610 tracked Markdown files: 546
 accepted reader pages, 44 classified synthetic fixtures and 20 known pending
 pages**. The pending pages are the README, the skills catalog and, in
 `.claude/skills/`,
@@ -362,7 +368,7 @@ changed.
 PRs #410 (`b553d91`), #412 (`2219ac8`) and #414 (`3a1e9da`), then #419
 (`9033e7c`), #417 (`dcec7f2`) and #418 (`02f054c`), then #413 (`fa1e344`),
 #415 (`f4defa2`) and #416 (`da2636d`) merged on 2026-09-27 UTC after #397,
-in that order; #403 (`f42e3f0`), which recorded the merges above, merged
+in that order; #403 (`f42e3f0`), which recorded #409, #411 and #397, merged
 between #418 and #413. None adds, removes or renames a Markdown file. Five of
 them applied the minimal edits from full-page re-reads of pending pages; a
 page counts as accepted only when a separate independent corrected-candidate
@@ -394,9 +400,11 @@ every other changed page as above, adding together each page's
   added a "How to read this log" paragraph, updated the banner date and added
   a historical-edition note (19 lines), but its review covered only those
   passages, not the whole page (83 lines since its last acceptance).
-- **Hand-back bullets, #417–#419 (27 `SKILL.md` pages, 2–7 lines each).**
-  Each added a Use When bullet mirroring the description's hand-back clause
-  from #394–#396; independent reviews returned SHIP (approve to merge), not
+- **Hand-back bullets, #417–#419 (27 `SKILL.md` pages, 3–7 lines each).**
+  #419 and #417 each added a Use When bullet mirroring the description's
+  hand-back clause from #394–#396; #418 made Use When mirror neighbours
+  already named in six descriptions (for `code-simplifier`, by editing an
+  existing bullet); independent reviews returned SHIP (approve to merge), not
   full-page reviews. In `.claude/skills/`, 25 pages **keep acceptance**:
   `admin-console-architect` (#395 and #419, 5), `adr-writer` (#396 and #417,
   5), `ai-closeout-reporter` (#418, 7), `architecture-designer` (#395 and
@@ -567,7 +575,7 @@ covers #279, #280, #282, #283 and #284. GitHub merge receipts span **40m31s
 observed wall time**, including review, checks and waiting, so they do not
 measure an active-work rate. Ten selected ranges remain **71–146 active hours**;
 at that #284 checkpoint, issue #101 Stages 4A/4B and the BER host, runtime,
-privacy and cleanup residual had no reliable ETA. The selected total had no
+privacy and cleanup residual had no reliable estimated time of arrival (ETA). The selected total had no
 finite estimate. Stage 4A's approved 12-hour limit was a ceiling, not a
 remaining estimate. [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
 was then open at `0bb51c19bd42261a5604fb25762069ce7867141b` with Linux
@@ -829,7 +837,7 @@ documentation range. No provider call or live retry was authorized.
 | ROUTE-002 record and register re-read fixes, PR #416, after #415, 2026-09-27 | [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md) and [AEGIS-060+ register](../audits/aegis-060-plus-register.md) | Minimal edits from a full-page re-read (FIX-FIRST); a separate independent corrected-candidate review **accepted** both on `a548dcb`, which matches main. Main after #416 (`da2636d`) has 610: 560 accepted readers, 44 classified fixtures and six known pending. No grant or gate changed. |
 | OWASP security page re-read fixes, PR #415, after #413, 2026-09-27 | In `.claude/skills/`: `ai-threat-modeler/SKILL.md` and its `references/llm-top10-threat-catalog.md`, `rag-security-architect/SKILL.md`, `ai-misinformation-guard/SKILL.md`, `model-poisoning-reviewer/SKILL.md` and `supply-chain-security-reviewer/SKILL.md` | Minimal edits from full-page re-reads (FIX-FIRST); separate independent corrected-candidate full-page reviews **accepted** all six on `79cee79`, which matches main. |
 | Master-prompt citation fix, PR #413, after #403, 2026-09-27 | [Skills catalog](../skills-catalog.md) and seven skill pages: six `SKILL.md` pages (2 lines each) and `threat-modeler/references/threat-catalog.md` (4) | The catalog (20 lines) received an independent full-page re-read on `2ceea06`, which matches main, and is **accepted**. The seven skill pages keep acceptance under the targeted-edit rule; the largest totals, 8 lines, are `security-pr-reviewer` and `static-analysis-reviewer` with #395 and #417. |
-| Use When hand-back bullets, PRs #419, #417 and #418, after #414, 2026-09-27 | 27 `SKILL.md` pages (10, 11 and 6), 2–7 lines each | Independent reviews returned SHIP, not full-page reviews. Under the targeted-edit rule 25 pages keep acceptance (largest 8); `api-event-architect/SKILL.md` (12 with #385 and #396) and `llm-output-safety-reviewer/SKILL.md` (11 with #396 and #405) become **pending**. `human-approval-boundary/SKILL.md` keeps its #410 acceptance (4 lines since). |
+| Use When hand-back bullets, PRs #419, #417 and #418, after #414, 2026-09-27 | 27 `SKILL.md` pages (10, 11 and 6), 3–7 lines each | Independent reviews returned SHIP, not full-page reviews. Under the targeted-edit rule 25 pages keep acceptance (largest 8); `api-event-architect/SKILL.md` (12 with #385 and #396) and `llm-output-safety-reviewer/SKILL.md` (11 with #396 and #405) become **pending**. `human-approval-boundary/SKILL.md` keeps its #410 acceptance (4 lines since). |
 | Instruction map, decision inputs and log re-read fixes, PR #414, after #412, 2026-09-27 | `instruction-file-map.md`, `cloud-architecture-decider/references/decision-inputs.md` and `docs/reconciliation/step-0-reconciliation-v4.md` | Full-page corrected-candidate reviews **accepted** the map and decision inputs on `bd3219f`, which matches main for both. The log's review covered only its banner, new "How to read this log" paragraph and historical-edition note, so it stays **pending** (83 lines since its last acceptance). |
 | README re-read fixes, PR #412, after #410, 2026-09-27 | [README](../../README.md) | Minimal edits from a full-page re-read; a separate independent corrected-candidate review **accepted** it on `ecbd860`, which matches main. |
 | Four-page re-read fixes, PR #410, after #397, 2026-09-27 | In `.claude/skills/`: `multi-tenant-data-architect/SKILL.md`, `ci-pipeline-architect/SKILL.md`, `human-approval-boundary/SKILL.md` and `cloud-architecture-decider/references/managed-platform-tier.md` | Minimal edits from full-page re-reads; separate independent corrected-candidate reviews **accepted** all four on `a56c60d`, which matches main. |
