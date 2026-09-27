@@ -52,6 +52,32 @@
           "Documents the blocking items and ship-with-awareness risks so the override decision is made on the record, not on a laundered checklist."
         ]
       }
+    },
+    {
+      "id": "unnamed-gate-design-no-auto-ci-pipeline-architect",
+      "type": "should_not_trigger",
+      "prompt": "Add a release-readiness stage to our pipeline so every production deploy requires these checks automatically.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "release-readiness-reviewer does not activate or take ownership of this request.",
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute release-readiness-reviewer or another skill for it.",
+          "Treats building a standing release-readiness stage into the deploy pipeline as pipeline architecture; does not produce a per-release ship/no-ship verdict in response."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-per-commit-mirror-no-auto-local-ci-mirror-preflight",
+      "type": "should_not_trigger",
+      "prompt": "Before every commit I want us to run exactly what CI will run, verified against clean main first, and classify any failure as ours or main's. Set that discipline up for this change now.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "release-readiness-reviewer does not activate or take ownership of this request.",
+          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute release-readiness-reviewer or another skill for it.",
+          "Treats per-commit local CI mirroring (deriving local equivalents of PR checks, baselining on clean main, classifying failures as ours or main's) as preflight discipline, not a release-readiness verdict."
+        ]
+      }
     }
   ]
 }

@@ -93,6 +93,45 @@
           "Still bounds exposure immediately with fail-closed limits and the kill switch without mislabeling intent, and routes a confirmed incident to incident-response-runbook."
         ]
       }
+    },
+    {
+      "id": "unnamed-alert-implementation-no-auto-observability-operator",
+      "type": "should_not_trigger",
+      "prompt": "Implement the actual burn-rate alert rules and the cost dashboard for our AI spend in Grafana.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "ai-cost-guardrail-designer does not activate or take ownership of this request.",
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer or another skill for it.",
+          "Treats writing the burn-rate alert rules and building the Grafana cost dashboard as hands-on observability implementation; any ai-cost-guardrail-designer contribution is limited to the metering and alert spec it hands over."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-routing-logic-no-auto-ai-router-architect",
+      "type": "should_not_trigger",
+      "prompt": "Design the model routing and provider fallback logic — which model handles which request and what happens when a provider is down.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "ai-cost-guardrail-designer does not activate or take ownership of this request.",
+          "Does not auto-invoke ai-router-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer or another skill for it.",
+          "Identifies model routing and provider fallback logic as router design; does not produce the routing implementation and at most notes that budget and model-tier intent are inputs the router enforces."
+        ]
+      }
+    },
+    {
+      "id": "unnamed-key-custody-no-auto-secrets-identity-hardener",
+      "type": "should_not_trigger",
+      "prompt": "Our LLM provider API key got committed to a public repo. Rotate it, move it out of the client bundle into a secret store, and lock down where it's read from.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "ai-cost-guardrail-designer does not activate or take ownership of this request.",
+          "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer or another skill for it.",
+          "Treats key custody, rotation, storage, and client-bundle exposure as custody mechanics owned elsewhere; limits any ai-cost-guardrail-designer contribution to the AI-spend blast radius and per-model invocation restriction of the leaked key."
+        ]
+      }
     }
   ]
 }

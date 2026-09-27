@@ -84,6 +84,19 @@
           "Synthetic monitoring is scheduled prod-safe probing of production after ship, not pre-merge CI gating."
         ]
       }
+    },
+    {
+      "id": "unnamed-white-box-telemetry-no-auto-observability-operator",
+      "type": "should_not_trigger",
+      "prompt": "Instrument the application with metrics, distributed traces, and structured logs from inside, and wire the dashboards and alerting on those internal signals.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "synthetic-monitoring-architect does not activate or take ownership of this request.",
+          "Does not auto-invoke observability-operator (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute synthetic-monitoring-architect or another skill for it.",
+          "Distinguishes internal white-box instrumentation (metrics, traces, logs from inside the application) from synthetic monitoring's external black-box probing; does not design synthetic probes as a substitute."
+        ]
+      }
     }
   ]
 }
