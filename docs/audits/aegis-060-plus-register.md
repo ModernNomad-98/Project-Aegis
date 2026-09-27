@@ -6,8 +6,9 @@
 > skill/subagent correction below remain the disposition of that candidate.
 > Sections 3–5 preserve the original 184-skill baseline's dedup map, coverage,
 > and planned remediation sequence. Phrases there such as "current main" and
-> "planned PR" refer to that baseline, not today's source tree. For current
-> skill contracts, inspect the [skills catalog](../skills-catalog.md) and
+> "planned PR" (pull request) refer to that baseline, not today's source
+> tree. For current skill contracts, inspect the
+> [skills catalog](../skills-catalog.md) and
 > [source files](../../.claude/skills/); do not schedule work solely from the
 > historical rows.
 
@@ -207,7 +208,7 @@ their materiality is unconfirmed.
   excluder), some are the collision failure mode `skill-quality-reviewer`
   calls the corpus's main one. Needs semantic triage against rubric question
   2 before any ID is assigned. Full edge list: `artifacts/audits/`
-  route-graph and baseline JSON.
+  route-graph and baseline JSON (JavaScript Object Notation) files.
   **Dispositioned by owner decision, 2026-09-26.** The
   [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md)
   triages all 268 edges reported on `0f46808`. Three merged batch PRs
@@ -216,7 +217,8 @@ their materiality is unconfirmed.
   owner kept that yield (a dated D64 amendment records it). One other edge is
   an engine false positive. The other 235 are census data, not defects. A
   fresh audit of `56ea7e4` reports 234 ROUTE-002 findings, because #393 also
-  closed two census edges.
+  closed two census edges; a 2026-09-27 audit of `b553d91` reports 233,
+  because #409 closed one more census edge.
   No AEGIS ID is assigned.
 - **Orchestrator capability numbering.** `project-orchestrator` presents its
   workflow as Capability 1 → 3 → 2 → 4. The sequence matches the declared
@@ -234,7 +236,7 @@ their materiality is unconfirmed.
 | VOCAB-002 | 4 | `roadmap-under-uncertainty-planner` description, body ×2, reference sheet — "committed/planned/exploratory", "Now (committed)" | AEGIS-044, AEGIS-039 | **Root cause confirmed on current main**: committed-as-horizon vs commitments-skill's reserved meaning |
 | ARTF-001 | 10 | `project-orchestrator`, `human-approval-boundary`, `scoped-approval-register`, `agent-authorization-matrix`, `audit-log-architect`, `agent-containment-reviewer`, `agent-memory-governance`, `offline-first-sync-architect`, `operational-vs-analytical-splitter`, `streaming-event-architect` | AEGIS-056, AEGIS-049 | Corroborates corpus-wide: "durable" claims never name a durability level (semantic-review candidates, not asserted defects) |
 | EVAL-004 | 5 | five trigger-evals files (typed `(subagent)` targets) | **AEGIS-060 — REJECTED, false positive** | Baseline count, frozen. All five were **false positives** from EVAL-004 v1.12.0 collapsing the skill and subagent namespaces. The rule now resolves each target in the namespace its syntax declares; with the corpus byte-identical to baseline, live EVAL-004 = 0. The authored files were never defective — see AEGIS-060 above |
-| SIDE-004 | 82 | Workflow sections of 64 auto-invocable skills — skill-generation-standard §5 mutation-class candidates (source/test/config writes, VCS, install, network, deploy/provision, data-store writes, doc/state writes) | AEGIS-020, AEGIS-057 | Semantic-review candidates corroborating the §5 posture gap corpus-wide — queued for review, not asserted defects |
+| SIDE-004 | 82 | Workflow sections of 64 auto-invocable skills — skill-generation-standard §5 mutation-class candidates (source/test/config writes, version control (VCS), install, network, deploy/provision, data-store writes, doc/state writes) | AEGIS-020, AEGIS-057 | Semantic-review candidates corroborating the §5 posture gap corpus-wide — queued for review, not asserted defects |
 | ROUTE-002 | 311 | corpus-wide exclusion edges | none yet | Systemic observation §2; dispositioned by owner decision 2026-09-26 ([record](../evidence/route002-dispositions-2026-09-26/README.md)) |
 
 Rules that fired zero times on the live corpus (SIDE-001..003, APPR-001,
