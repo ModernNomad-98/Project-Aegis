@@ -2,12 +2,12 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #439 (`d2d9b05`) on 2026-09-27 Coordinated
+As of merged pull request (PR) #442 (`7b3fbca`) on 2026-09-28 Coordinated
 Universal Time (UTC), this remains the active
 repository-wide documentation acceptance backlog. The latest count is in the
-paragraph for main after #439 (`d2d9b05`): 612 tracked Markdown files, 558
-accepted reader pages, 44 classified synthetic fixtures and ten known pending
-pages; the paragraphs between are dated history, oldest first. The two component guides,
+paragraph for main after #442 (`7b3fbca`): 613 tracked Markdown files, 558
+accepted reader pages, one generated report, 44 classified synthetic fixtures
+and ten known pending pages; the paragraphs between are dated history, oldest first. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
 The **491-file inventory and the ordered "start with" steps below are the
@@ -489,10 +489,15 @@ page's last full-page acceptance.
   [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md)
   (#436, 2), [CONTRIBUTING](../../CONTRIBUTING.md) (#421, 7) and the
   [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
-  (#425, 7). #420, #421 and #423 have no posted review verdict; as for #385
-  above, the rule is applied to their line counts. #435's reviewer noted that
+  (#425, 7). #420, #421 and #423 had no posted review verdict. A targeted
+  read-only review on `7b3fbca`, requested on 2026-09-28, passed
+  `CONTRIBUTING.md` (#421, 7 lines, its only change since its #238 full-page
+  acceptance), so it keeps acceptance. #423's README row (2 lines) and step-0
+  log entry (27 lines) are covered by the later full-page acceptances in #430
+  (`b6b4b4e`) and #439 (`97c8682`), not by this rule. #435's reviewer noted that
   53 earlier lines on `project-orchestrator/SKILL.md` (#248, #261 and #384)
-  predate the rule; this ledger does not count pre-rule edits.
+  predate the rule. This ledger did not then count pre-rule edits; the owner
+  decided on 2026-09-28 that they do count (see the update after #442 below).
 - **Newly pending (8 pages).** Their reviews checked the changed passages, not
   the whole page: the [approval register](../approvals/APPROVAL_REGISTER.md)
   (76: 36 in #420, 40 in #432), the
@@ -528,6 +533,88 @@ follow-up is one independent full-page re-read of each pending page against
 [Acceptance for each page](#acceptance-for-each-page). A follow-up ledger
 update will record PR #438 (approval-register lifecycle events), which merged after #439 as `5dbf7bc`, and the
 upcoming audit-baseline re-run. No grant or gate changed.
+
+PRs #438 (`5dbf7bc`), #440 (`adf54d9`) and #441 (`3c51fb2`) merged on
+2026-09-27 UTC after #439, and #442 (`7b3fbca`) merged at 00:04 UTC on
+2026-09-28, in that order. #442 added the
+[session checkpoint page](session-checkpoint-2026-09-27.md); no Markdown file
+was removed or renamed. The three `artifacts/audits/` JSON baselines
+regenerated in #441 are not Markdown and are not counted; no synthetic fixture
+changed. Line counts are `git diff --numstat` from each merge's first parent,
+added together since the page's last full-page acceptance, as above. The
+owner made three decisions on 2026-09-28, in chat with the coordinating
+agent: edits merged before the 10-line rule count toward it, a small edit
+keeps acceptance only if it was reviewed, and generated reports are their own
+class (see [Remaining-page review in larger
+batches](#remaining-page-review-in-larger-batches)).
+
+- **Accepted after full-page reviews (2 pages).** #440: this ledger (101
+  lines since #426). Its review on `4891b66` returned FIX-FIRST for one named
+  edit and pre-cleared acceptance if the next diff was exactly that edit;
+  `git diff 4891b66 f9e5325` is that one-line edit, so the ledger is
+  **accepted** on `f9e5325`, which matches it on main before this update.
+  #442: the new [session checkpoint page](session-checkpoint-2026-09-27.md)
+  (141 lines), **accepted** after a full-page read on `63387ef`, which
+  matches main.
+- **Still pending, with more changed lines (3 pages).** The
+  [approval register](../approvals/APPROVAL_REGISTER.md) (268: 76 before, 171
+  in #438, 21 in #442), the
+  [open-decisions index](aegis-open-decisions-2026-09-23.md) (68: 35 before,
+  30 in #438, 3 in #442) and the
+  [AEGIS-060+ register](../audits/aegis-060-plus-register.md) (44: 29 before,
+  15 in #441). #441's SHIP review checked the register note, but was not a
+  full-page readability review.
+- **Moved to the generated-report class (1 page).** The
+  [skill-contract audit baseline report](../audits/skill-contract-audit-baseline.md)
+  leaves the pending set. #441's SHIP review reproduced it from the script
+  with engine v1.13.2, which is the check this class needs after each
+  regeneration; the reproduced file differed only in the hand-written preface
+  and the branch name, and that review read the preface and found it accurate. Its status is **generated report, format review pending**
+  until an independent review of the script's output format is recorded.
+- **Newly pending under the first 2026-09-28 decision (1 page).**
+  `.claude/skills/project-orchestrator/SKILL.md` has 50 changed lines since
+  its last recorded acceptance in commit `181de4e` (the batch after #223): 14
+  in #248, 18 in #261, 17 in #384 and 1 in #435. #435's reviewer counted 53
+  before #435 because it added #384's two commits separately. The page is
+  **pending** until an independent full-page re-read. This update applies the
+  decision only to this page, which #435's reviewer named. Other accepted
+  pages also had pre-rule edits since their last full-page acceptance: for
+  example, `tenant-modeler/SKILL.md`, accepted in the batch after #229, then
+  gained 16 lines in #261, 2 in #395 and 4 in #417 (22). A sweep of every
+  accepted page for pre-rule edits is a named follow-up, and the counts below
+  hold only until it is done.
+- **Keeps acceptance after a targeted review under the second 2026-09-28
+  decision (1 page).** #420, #421 and #423 had no posted review verdict. A
+  targeted read-only review on `7b3fbca` passed
+  [CONTRIBUTING](../../CONTRIBUTING.md) (#421, 7 lines, its only change since
+  its #238 full-page acceptance), so it keeps acceptance. The other pages
+  those PRs changed were already pending or were later accepted after a
+  full-page review (the README in #430, the step-0 log in #439).
+- **Still pending, unchanged (6 pages).** `.github/pull_request_template.md`,
+  the [skills catalog](../skills-catalog.md), the
+  [live startup-routing acceptance record](../evidence/startup-routing/2026-09-live-acceptance.md),
+  and in `.claude/skills/`, `api-event-architect/SKILL.md`,
+  `ai-threat-modeler/references/llm-top10-threat-catalog.md` and
+  `model-poisoning-reviewer/references/poisoning-controls.md`.
+
+Main after #442 (`7b3fbca`) therefore has **613 tracked Markdown files: 558
+accepted reader pages, one generated report, 44 classified synthetic fixtures
+and ten known pending pages**. The 613 is `git ls-files '*.md'` on a checkout
+of `7b3fbca`. Accepted readers go 558 − 1 (the orchestrator) + 1 (the
+checkpoint page) = 558, and pending goes 10 + 1 (the orchestrator) − 1 (the
+report) = 10. The pending pages are the approval register, the
+open-decisions index, `.github/pull_request_template.md`, the skills catalog,
+the AEGIS-060+ register, the live startup-routing acceptance record, and in
+`.claude/skills/`, `project-orchestrator/SKILL.md`,
+`api-event-architect/SKILL.md`,
+`ai-threat-modeler/references/llm-top10-threat-catalog.md` and
+`model-poisoning-reviewer/references/poisoning-controls.md`. This update
+changes this ledger by more than 10 lines, so it needs its own independent
+full-page re-read. The named follow-up is one independent full-page re-read
+of each pending page against
+[Acceptance for each page](#acceptance-for-each-page), and one review of the
+audit report's output format, and the pre-rule sweep named above, which is
+expected to move more accepted pages to pending. No grant or gate changed.
 
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
@@ -883,6 +970,23 @@ plus deleted lines from `git diff --numstat`, and adds together the edits a
 page receives before its next full-page re-read. A renamed or renumbered
 existing heading is not a new section.
 
+**Two refinements (owner decisions, 2026-09-28).** Edits merged before the
+2026-09-27 rule count toward the 10 lines, added together since the page's
+last full-page acceptance. A small edit keeps acceptance only if an
+independent reviewer checked it; an unreviewed edit, however small, needs a
+targeted review before the page counts as accepted.
+
+**Generated reports (owner decision, 2026-09-28).** A generated report is a
+Markdown file written by a script, such as the
+[skill-contract audit baseline report](../audits/skill-contract-audit-baseline.md),
+which `scripts/audit-skill-contracts.py` produces. It is its own class, not a
+reader page. Each regeneration is verified by reproducing the file from the
+script, not by a full-page re-read. Its readability is judged once, on the
+script's output format, and readability fixes go in the generator, not in
+the file. Text written by hand into the file, such as the audit report's
+regeneration preface, is not script output, so reproduction cannot verify
+it; each change to it needs an independent review, as for any small edit.
+
 To reduce repeated integration and hosted-check waits, group roughly 10–20
 related pages in one pull request when their owners and authority boundaries
 are compatible. Give up to three read-only agents disjoint page sets for
@@ -917,6 +1021,9 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Session checkpoint, PR #442, after #441, 2026-09-28 | New [session checkpoint page](session-checkpoint-2026-09-27.md); approval register and open-decisions index | After a REVISE review and its four named edits, a corrected-candidate check **accepted** the new page on `63387ef`, which matches main. The approval register (21) and open-decisions index (3) stay **pending**. Under the owner's 2026-09-28 decisions, `project-orchestrator/SKILL.md` (50 lines, counting pre-rule edits) becomes **pending**, `CONTRIBUTING.md` keeps acceptance after a targeted review, and the audit baseline report moves to the generated-report class. Main after #442 (`7b3fbca`) has 613: 558 accepted readers, one generated report, 44 classified fixtures and ten known pending. No grant or gate changed. |
+| Audit baselines regenerated with engine v1.13.2, PR #441, after #440, 2026-09-27 | AEGIS-060+ register and the generated [audit baseline report](../audits/skill-contract-audit-baseline.md) | SHIP review on `d864597` reproduced the regenerated files; it was not a full-page review. The register (44 with earlier edits) stays **pending**. Under the owner's 2026-09-28 decision the report is a generated report: the reproduction verifies it, and its output format awaits one review. The three JSON baselines are not Markdown. |
+| Ledger for #420–#439, PR #440, and register lifecycle events, PR #438, after #439, 2026-09-27 | This ledger; approval register and open-decisions index | The ledger's review pre-cleared acceptance for one named edit, and `f9e5325` is exactly that edit, so the ledger is **accepted** on `f9e5325`. #438 added 171 lines to the approval register and 30 to the open-decisions index; both stay **pending**. |
 | Reconciliation log D65 closure, PR #439, after #434, 2026-09-27 | `docs/reconciliation/step-0-reconciliation-v4.md` | An independent full-page re-read **accepted** the log on `97c8682`, which matches main; it had been pending since #405, and #423 had added 27 lines. Main after #439 (`d2d9b05`) has 612: 558 accepted readers, 44 classified fixtures and ten known pending. No grant or gate changed. |
 | Upload and tool-matrix fixes, PR #434, after #437, 2026-09-27 | `file-upload-storage-architect/SKILL.md` and `agent-tool-safety-guard/references/tool-permission-matrix.md` | Past 10 lines (18 and 20), so both needed full-page re-reads; independent reviews **accepted** the skill on `3c44f4a` and the matrix on `356932a`, both matching main. |
 | README glossary and routing citation, PRs #430 and #437, after #436, 2026-09-27 | [README](../../README.md) | #430: after two FIX-FIRST rounds the reviewer pre-cleared acceptance for two named one-line edits, and `b6b4b4e` contains exactly those, so the README is **accepted** on `b6b4b4e`. #437 (SHIP) changed 2 lines; it **keeps acceptance**. |
