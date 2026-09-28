@@ -3166,6 +3166,61 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     D64, D65 and D66 are not edited or renumbered. README and catalog now cite
     D67 alongside PR #124 and AEGIS-APR-007.
 
+- **D68 (2026-09-28) — Approved the quality assurance (QA) Tier 1 build
+  batch: three new skills, one extension and one drop (186 → 189 when
+  delivered).**
+  - **Why.** The owner, Peter Nguyen, decided on 2026-09-28 in chat with the
+    Claude Code coordinator, answering "Build it as recommended
+    (Recommended)" to the
+    [QA Tier 1 scope proposal](https://github.com/ModernNomad-98/Project-Aegis/pull/492) (PR #492 at head `930493c`). It settles
+    the five remaining D10 Tier 1 candidates.
+  - **What.**
+    - **Build `test-tenant-provisioner`** (catalog #198), manual-only: it
+      writes test tenants and users to a named non-production environment.
+    - **Build `ci-failure-classifier`** (#214 + #215), auto-invocable: it
+      reads only the logs and reports it is given, and fetches, reruns and
+      edits nothing.
+    - **Build `acceptance-criteria-reviewer`** (#226), renamed from
+      `acceptance-criteria-tester` and narrowed to #226; auto-invocable,
+      read-only review. The #227 definition-of-done gate stays with
+      `release-readiness-reviewer`, `ai-closeout-reporter` and
+      `agent-governance-audit`.
+    - **Merge `negative-path-test-mapper`** (#192) into `test-plan-designer`
+      as an extension (a per-surface negative-path matrix); the skill stays
+      auto-invocable.
+    - **Drop `regression-first-bug-fixer`** (#190): `tdd-engineer` already
+      owns it, with `systematic-debugger` and `regression-suite-curator` as
+      neighbours.
+    - **Census.** The eight predicted one-way ROUTE-002 findings (toward
+      `tenant-modeler`, `secrets-identity-hardener`, `flaky-test-detective`,
+      `sharded-validation-with-resume`, `ci-pipeline-architect`,
+      `requirements-gathering-facilitator`, `manual-test-case-creator` and
+      `release-readiness-reviewer`) stay census data, following D64. They
+      are predicted from draft descriptions, not measured; the build pull
+      requests compare the contract audit before and after.
+  - **D10 correction.** D10's Tier 1 note that `tdd-engineer` "owns new
+    behavior, not bug reproduction" was wrong from the start. `tdd-engineer`
+    shipped with the bug-fix trigger in `07049814` (the Phase 2 pack,
+    2026-07-06), the day before D10: its description already said "when
+    fixing a bug that should get a regression test proving the fix". D10's
+    text above is unchanged; this entry is the correction.
+  - **Authority.** This decision grants delivery of exactly this batch under
+    the standing delivery approval
+    [AEGIS-APR-039](../approvals/APPROVAL_REGISTER.md#aegis-apr-039-reaffirmation-of-ongoing-backlog-delivery-approval)
+    and the standing merge conditions
+    [AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green),
+    [AEGIS-APR-049](../approvals/APPROVAL_REGISTER.md#aegis-apr-049-exact-head-ci-satisfies-the-local-test-condition)
+    and
+    [AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review),
+    and nothing more. It does not waive `gate-guard`, authorize a change to
+    `scripts/audit-skill-contracts.py` or its frozen baseline, or permit any
+    environment write, provider call or deployment. Changing the set, for
+    example building all five or letting `ci-failure-classifier` fetch logs
+    itself, needs a new owner decision.
+  - **Status at recording.** Nothing is built; the library stays at 186
+    skills. Catalog rows, README counts, eval files and the D10 table rows
+    for #190 and #227 land with the build pull requests.
+
 ## 6. Post-merge corrections
 
 - **2026-09-27 — D65 amendment: open gaps closed.** All four gaps D65

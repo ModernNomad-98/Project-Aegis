@@ -14,7 +14,7 @@
 > not re-checked. To resume the session paused on 2026-09-27,
 > start with the [2026-09-27 session checkpoint](session-checkpoint-2026-09-27.md).
 > On 2026-09-28 the three owner decisions under
-> [Decided on 2026-09-28](#decided-on-2026-09-28) were added; eighteen later
+> [Decided on 2026-09-28](#decided-on-2026-09-28) were added; nineteen later
 > decisions from the same day were added to that section.
 
 ## Current disposition
@@ -126,7 +126,7 @@ readability ledger itself.
 | Small edits to an accepted page | **A small edit keeps a page's acceptance only if an independent reviewer checked it;** an unreviewed edit, however small, needs a targeted review first. The unreviewed targeted edits in #420, #421 and #423 were reviewed on 2026-09-28: `CONTRIBUTING.md` passed, and the other affected pages were already pending or covered by later full-page acceptances. |
 | Generated reports | **Generated reports get their own ledger class.** A generated report is verified by reproducing it from its generator. Its readability is judged once, on the generator's output format, and it is not re-read after each regeneration; readability fixes go in the generator. As a result, `docs/audits/skill-contract-audit-baseline.md` moves to that class. |
 
-Later on 2026-09-28 the owner decided the eighteen items below in the same
+Later on 2026-09-28 the owner decided the nineteen items below in the same
 conversation, each by choosing an option from one of the coordinator's
 multiple-choice questions; the chosen option's label is quoted in each row.
 Dependabot is GitHub's automated dependency-update bot, and a software
@@ -155,6 +155,7 @@ decisions only and grant no authority beyond what they record.
 | Spelling out "AI" | **Spell it out everywhere.** The owner chose "Spell it out everywhere": every reader page that uses the abbreviation AI spells it out as "artificial intelligence (AI)" at its first use in the body. **Status:** [PR #486](https://github.com/ModernNomad-98/Project-Aegis/pull/486) (one line on each of 63 pages) is open, not merged, at this recording. |
 | `local-ci-mirror-preflight` in the stage-gate map | **Add it to the map.** The owner chose "Add it to the map (Recommended)": the stage-gate map in `ai-sdlc-operating-model` (`references/stage-gate-map.md`) lists the manual-only `local-ci-mirror-preflight` skill, which runs the repository's continuous integration (CI) checks locally before a push, in its Validate row. This matches what `project-orchestrator` Stage 6 already says. **Delivered:** [PR #484](https://github.com/ModernNomad-98/Project-Aegis/pull/484) merged on 2026-09-28 as `eb92948`. |
 | Manual-only label wording | **Use the short form everywhere.** The owner chose "Use the short form everywhere (Recommended)": the longer label *(manual-only — the routing invariant applies)* in `project-orchestrator` Stages 7 and 8 becomes *(manual-only)*, matching Stage 6. The manual-only routing rule itself is unchanged. **Delivered:** [PR #484](https://github.com/ModernNomad-98/Project-Aegis/pull/484) merged on 2026-09-28 as `eb92948`. |
+| QA Tier 1 skill batch ([PR #492](https://github.com/ModernNomad-98/Project-Aegis/pull/492) proposal) | **Build it as recommended.** The owner chose "Build it as recommended (Recommended)": build `test-tenant-provisioner` (manual-only), `ci-failure-classifier` (auto-invocable, reads only the logs it is given) and `acceptance-criteria-reviewer` (renamed from `acceptance-criteria-tester` and narrowed to catalog item #226); merge `negative-path-test-mapper` into `test-plan-designer` as an extension; drop `regression-first-bug-fixer`, which `tdd-engineer` covers; and keep the eight predicted one-way ROUTE-002 findings as census data, as in D64. The library would go from 186 to 189 skills. Recorded as D68 in the [reconciliation log](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions), which also corrects D10's note on `tdd-engineer`. It grants delivery of exactly this batch under the standing delivery approvals and nothing more. **Status:** nothing is built at this recording. |
 
 ### Still open for the owner
 
