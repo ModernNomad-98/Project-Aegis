@@ -66,6 +66,19 @@
           "Uses an applicable existing grant without repeat consent where ordinary documentation persistence is actually authorized; excluded operations require the separate manual route."
         ]
       }
+    },
+    {
+      "id": "edge-certainty-labels-on-uncited-claims",
+      "type": "should_trigger",
+      "prompt": "Write the ADR: we accepted Postgres row-level security for tenant isolation (decision in the 2026-09-20 architecture review notes). I think the old app-layer filter caused last quarter's leak, and I believe RLS adds about 5% query latency, but nobody measured it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Status carries a certainty label, e.g. 'accepted (confirmed)', citing the review notes as evidence.",
+          "The leak-cause and latency claims are labelled inferred or 'unverified — recommend confirming', not stated as fact.",
+          "Does not build or edit an ADR index with a status column; that stays with adr-sequencer."
+        ]
+      }
     }
   ]
 }

@@ -74,6 +74,14 @@ from PR history, not in an imagined team.
    `agent-failure-recovery`; conflicting sources to `source-of-truth-reconciler`;
    unclear security impact to `human-approval-boundary`. Parallel-session
    hazards (shared worktrees, stale memory) get explicit rules.
+   - When several AI tools work the repo, record the multi-tool topology as
+     an explicit option, chosen from observed practice: per-tool spokes
+     (thin tool entry files into a shared docs tree, with a platform-role
+     table) or hub-and-spoke (one authoritative rulebook; per-tool files
+     MUST point back and MUST NOT conflict). Add the collision rule: one
+     tool edits a given surface per phase. Detail:
+     [references/stage-gate-map.md](references/stage-gate-map.md); aligning
+     the files themselves is `agent-instruction-consolidator` (manual).
 6. **Define the learning loop:** closeouts feed memory under
    `agent-memory-governance` rules; `agent-governance-audit` spot-checks
    compliance on a stated cadence; audit findings feed model revisions.
@@ -92,6 +100,7 @@ Grounding:    <N PRs + docs inspected, with identifiers>
 Stages:       <stage → entry, exit gate, authority, enforcing skill, evidence>
 Authority:    <summary; merge/deploy defer to agent-authorization-matrix or gap>
 Failure paths:<failure class → route>
+Topology:     <per-tool spokes | hub-and-spoke | single tool; collision rule>
 Learning loop:<memory rules ref, audit cadence>
 Gaps:         <gap → severity → observed evidence → closing control>
 Adoption:     <ordered steps, one gap-cluster at a time>
@@ -109,6 +118,8 @@ Review date:  <date>
 - [ ] Gap list cites observed evidence (PR numbers, incidents), not vibes.
 - [ ] Adoption plan is incremental with a review date.
 - [ ] Model grounded in inspected practice, not an imagined team.
+- [ ] Multi-tool repos name their topology and the one-tool-per-surface-
+      per-phase collision rule.
 
 ## Gotchas
 

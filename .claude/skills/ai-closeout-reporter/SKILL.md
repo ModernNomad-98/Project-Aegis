@@ -53,8 +53,21 @@ visible, never discovered later by surprise.
 5. Record validation with the actual commands and their actual results —
    failures verbatim. Anything the change class expected but that was NOT run
    goes under "Skipped validation" with the reason.
-6. State risks and known gaps.
-7. Recommend the next action.
+   - When verification spans several surfaces (endpoints, pages, roles,
+     tenants), report a per-surface pass/fail table AND a negative-path table
+     (what must be refused or fail, and whether it did).
+   - Decompose skips: every skipped check or skipped-test count broken down
+     by reason, never a bare total.
+   - When a local preflight ran (`local-ci-mirror-preflight`), include its
+     evidence block in section 4 as recorded, not paraphrased.
+6. State risks and known gaps. Write an unqualified "complete" / "verified
+   complete" only after every recorded gap is closed; otherwise qualify the
+   claim and name the open gaps.
+7. Recommend the next action. When a phase is finished, add a
+   completion-baseline anchor: "<work> is complete; do not treat as pending",
+   pinned to immutable evidence (merged PR number, merge commit SHA,
+   applied-migration identifier) so later sessions do not re-open or redo it.
+   Anchor only merged or applied facts, never open-PR state.
 8. Run the Validation Checklist, then deliver the report as the final message
    (or as a file if asked), following
    [assets/closeout-template.md](assets/closeout-template.md).
@@ -69,11 +82,12 @@ CLOSEOUT REPORT
 1. Summary — what changed and why
 2. Intentionally not done / omitted — REQUIRED ALWAYS; "None." must be explicit
 3. Files touched — exact paths, from git
-4. Tests & validation run — command → actual result (failures verbatim)
+4. Tests & validation run — command → actual result (failures verbatim);
+   per-surface + negative-path tables; preflight evidence block if one ran
 5. Evidence — outputs, links, screenshots, PR
 6. Risks & known gaps
 7. Skipped validation — what wasn't run, and why
-8. Next actions / handoff
+8. Next actions / handoff — incl. completion-baseline anchor when a phase ends
 ```
 
 ## Validation Checklist
@@ -87,6 +101,11 @@ CLOSEOUT REPORT
 - [ ] Failures and skips reported verbatim, not smoothed over.
 - [ ] No claim exceeds the evidence (e.g., "evals present and well-formed" is
       not "evals pass").
+- [ ] Multi-surface work has per-surface pass/fail and negative-path tables;
+      skips are decomposed by reason.
+- [ ] "Complete" is unqualified only when no recorded gap remains open.
+- [ ] Any completion-baseline anchor cites merged/applied evidence (PR, SHA,
+      migration), not in-flight state.
 
 ## Gotchas
 
@@ -99,6 +118,10 @@ CLOSEOUT REPORT
   without running them, and failures summarized into vagueness.
 - A closeout listing 40 files "for completeness" hides the 3 that matter —
   be exact but curated, and point to the PR/diff for the full list.
+- "12 skipped" hides whether 11 were environment-gated and 1 was the check
+  that mattered; only a per-reason breakdown shows it.
+- Finished work with no pinned evidence invites a later session to re-open
+  or re-implement it; the anchor is the report's defense against that.
 
 ## Stop Conditions
 

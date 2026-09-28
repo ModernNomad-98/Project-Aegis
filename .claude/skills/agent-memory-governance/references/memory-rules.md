@@ -23,6 +23,11 @@ the owning skill.
 7. Update only when a confirmed fact CHANGES. Corrections replace the stale
    text and note the change (`was X until 2026-07-06, now Y per <evidence>`);
    never append a contradiction beneath the old claim.
+8. Completion-baseline anchors are the durable form of "done". Pin finished
+   work as `<work> is complete; do not treat as pending — PR #<n> merged,
+   <merge SHA>, migration <id> applied, <YYYY-MM-DD>` so later sessions do
+   not re-open or redo it. Merged and applied are immutable, unlike "PR #10
+   is open"; an anchor without that evidence fails WRITE 1 and 2.
 
 ## TRUST rules (before acting on memory)
 
@@ -34,6 +39,7 @@ Memory is a lead, not truth. Before any action premised on remembered state:
 | Branch exists / current branch | `git branch -a`, `git branch --show-current` |
 | What merged to main / repo baseline | `git log --oneline -20 origin/main`, validator output |
 | File / flag / command still exists | direct check before recommending it |
+| Completion anchor ("X complete, PR #n, SHA") | `gh pr view <n> --json state,mergeCommit`; `git merge-base --is-ancestor <sha> origin/main` |
 | Auto-merge / protection posture | `gh pr view <n> --json autoMergeRequest`, repo settings |
 
 On divergence: live state wins, act on it, queue the memory correction. If the

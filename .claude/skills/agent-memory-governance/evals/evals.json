@@ -65,6 +65,20 @@
           "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names agent-memory-governance, not agent-instruction-consolidator, because this is store-wide memory hygiene and no instruction files are involved."
         ]
       }
+    },
+    {
+      "id": "positive-completion-baseline-anchor-with-immutable-evidence",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke agent-memory-governance. Invoked explicitly: Phase 3 billing work is done. Record it in memory so future sessions stop re-opening it — it was PR #212, and I think the migration ran.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Proposes a completion-baseline anchor ('Phase 3 billing is complete; do not treat as pending') pinned to immutable evidence: merged PR number, merge commit SHA and applied-migration identifier, with an absolute date.",
+          "Verifies the PR is merged and its SHA is on the main branch with live gh/git output before proposing the entry.",
+          "Does not record the migration as applied on 'I think'; marks it unverified or verifies it first.",
+          "Stops for approval before editing any memory file."
+        ]
+      }
     }
   ]
 }

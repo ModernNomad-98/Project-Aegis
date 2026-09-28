@@ -30,6 +30,22 @@ along the way routes to `agent-instruction-consolidator` (manual).
 - **human** — the decision itself is human; the agent may prepare everything
   up to the decision point and must stop there.
 
+## Multi-tool topologies (documented options)
+
+Choose from observed practice and record the choice in the model; neither is
+the default.
+
+| Topology | Shape | Holds when |
+|---|---|---|
+| Per-tool spokes | Thin entry file per tool (`AGENTS.md`, `CLAUDE.md`, …) pointing into a shared `docs/` tree; a platform-role table states which tool reads which entry file and its role; a file-ownership table marks tool-specific, shared, generated (never edit) and append-only files | each tool needs its own entry file and the shared tree is the real source |
+| Hub-and-spoke | One authoritative rulebook; per-tool pointer files MUST point back to it and MUST NOT contain conflicting rules | many tools, one rule set to keep consistent |
+
+**Collision rule.** When two tools can edit the same surface — for example
+a two-way-sync platform editor and a coding agent on the same frontend — only
+one tool edits that surface per phase. Record which tool owns which surface
+in the plan/approve row. Drift between the files routes to
+`agent-instruction-consolidator` (manual).
+
 ## Adoption sequencing notes
 
 1. Adopt the merge-authority row first — it is where the worst incidents live
