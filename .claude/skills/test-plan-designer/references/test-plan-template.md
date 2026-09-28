@@ -8,13 +8,26 @@ For each risk, walk this list and keep what applies:
 
 - **Happy path:** the documented success behavior, once, at the cheapest layer.
 - **Negative paths:** unauthorized, invalid input, expired, missing, duplicate,
-  conflicting, out-of-order.
+  conflicting, out-of-order — walked per surface in the
+  [negative-path matrix](#negative-path-matrix).
 - **Boundaries:** empty, one, many, max size, date/timezone edges, precision.
 - **State transitions:** create→edit→delete cycles, idempotent retries,
   concurrent modification where plausible.
 - **Failure handling:** dependency down/slow/erroring — what the user sees.
 - **Data visibility:** who can see the result; cross-tenant/roles → delegate
   to `multi-tenant-security-tester` line items.
+
+## Negative-path matrix
+
+One row per surface the change touches, one column per negative class. Each
+cell names a plan item, says "Not applicable:" with a reason, or delegates.
+A blank cell is a plan defect. When the requester narrows scope, the
+skipped classes go on the out-of-scope list by name.
+
+| Surface | Unauthorized | Invalid | Expired | Missing | Duplicate | Conflicting | Out-of-order |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `POST /invites` | `T-inv-01` signed out; cross-tenant → `multi-tenant-security-tester` | `T-inv-02` malformed email | `T-inv-03` expired session | `T-inv-04` no role given | `T-inv-05` same invite twice | `T-inv-06` invitee already a member | Not applicable: one synchronous call |
+| Billing webhook | `T-wh-01` bad signature | `T-wh-02` malformed payload | `T-wh-03` timestamp outside replay window | `T-wh-04` unknown customer | `T-wh-05` redelivered event processed once | `T-wh-06` event for a cancelled plan | `T-wh-07` `updated` before `created` |
 
 ## Plan item quality bar
 
