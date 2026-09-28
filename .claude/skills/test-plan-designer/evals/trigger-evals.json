@@ -1,11 +1,12 @@
 {
   "skill": "test-plan-designer",
-  "description": "Trigger discrimination for the Phase 5 strategy/plan/coverage cluster: one-change plan vs product strategy vs coverage audit vs automation tooling, plus discrimination against the shipped multi-tenant-security-tester for security-suite asks.",
+  "description": "Trigger discrimination for the Phase 5 strategy/plan/coverage cluster: one-change plan vs product strategy vs coverage audit vs automation tooling, plus discrimination against the shipped multi-tenant-security-tester for security-suite asks, and against integration-test-designer and test-coverage-mapper for negative-path mapping.",
   "overlaps_with": [
     "qa-strategy-architect",
     "test-coverage-mapper",
     "qa-automation-architect",
-    "multi-tenant-security-tester"
+    "multi-tenant-security-tester",
+    "integration-test-designer"
   ],
   "cases": [
     {
@@ -44,6 +45,26 @@
         "test-plan-designer"
       ],
       "reason": "Cross-tenant/authorization negative suites are owned by the shipped multi-tenant-security-tester; test plans reference its output as line items."
+    },
+    {
+      "id": "map-negative-paths-api-change-wins-here",
+      "prompt": "Map every negative path for this API change: the new POST /invites endpoint and the billing webhook handler.",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "multi-tenant-security-tester",
+        "integration-test-designer"
+      ],
+      "reason": "Walking the seven negative-path classes per touched surface for one change is the plan's negative-path matrix; cross-tenant cells are delegated line items, and integration-test-designer designs the boundary suites the plan hands off to."
+    },
+    {
+      "id": "map-negative-paths-feature-wins-here",
+      "prompt": "Map negative paths for this feature: bulk invoice export. What unauthorized, expired, duplicate and out-of-order cases should we plan for?",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "integration-test-designer",
+        "test-coverage-mapper"
+      ],
+      "reason": "Planning which negative cases a feature needs, before tests exist, is the per-change plan; it is neither an integration-suite design nor an audit of existing coverage."
     }
   ]
 }

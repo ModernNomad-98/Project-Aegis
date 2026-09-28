@@ -1,12 +1,12 @@
 ---
 name: test-plan-designer
-description: Design the concrete test plan for ONE feature, change, or release — the requirement/risk being verified, in-scope and out-of-scope items, the test-layer split for THIS change (what is automated at which layer, what is manual), test data needs, environment assumptions, entry/exit criteria, named artifacts, and CI placement. Every planned test traces to a requirement or risk; the plan is executable by someone who didn't write it. Use when asked to write a test plan for a feature/release/bugfix, to decide what testing a specific change needs before it ships, or to turn acceptance criteria into a verification plan. Do NOT use for the product-wide QA strategy (qa-strategy-architect), for auditing existing coverage (test-coverage-mapper), for writing the manual case steps themselves (manual-test-case-creator), or for implementing the tests (the engineer skills).
+description: 'Design the concrete test plan for ONE feature, change, or release — the requirement/risk being verified, in-scope and out-of-scope items, the test-layer split for THIS change (what is automated at which layer, what is manual), a negative-path matrix per surface (unauthorized, invalid, expired, missing, duplicate, conflicting, out-of-order), test data needs, environment assumptions, entry/exit criteria, named artifacts, and CI placement. Every planned test traces to a requirement or risk. Use when asked to write a test plan for a feature/release/bugfix, to decide what testing a specific change needs before it ships, or to turn acceptance criteria into a verification plan. Do NOT use for the product-wide QA strategy (qa-strategy-architect), auditing existing coverage (test-coverage-mapper), checking criteria are testable (acceptance-criteria-reviewer), writing manual case steps (manual-test-case-creator), or implementing tests (the engineer skills).'
 ---
 
 # Test Plan Designer
 
 **Reading key:** QA is quality assurance; PR is pull request; RLS is
-row-level security; CI is continuous integration. Severity 1 and 2 below
+row-level security; CI is continuous integration; E2E is end-to-end; API is application programming interface; UI is user interface. Severity 1 and 2 below
 mean the project's two highest incident/defect levels; use the project's
 actual severity policy when it differs.
 
@@ -17,6 +17,8 @@ will be verified, at which layer, with what data, in which environment, and
 what "done testing" means. The plan instantiates the product QA strategy
 (`qa-strategy-architect` output) for one change — it names the tests to build
 and hands each group to the right engineer skill; it does not implement them.
+Every planned test traces to a requirement or risk, and the plan is
+executable by someone who didn't write it.
 
 ## Use When
 
@@ -31,7 +33,7 @@ and hands each group to the right engineer skill; it does not implement them.
 - Do NOT use when: the ask is to write the step-by-step manual cases — the
   plan names WHICH manual cases exist; `manual-test-case-creator` writes them.
 - Do NOT use when: the ask is to implement tests — hand off to
-  `vitest-unit-component-engineer` or `playwright-e2e-engineer` where they
+  `vitest-unit-component-engineer` *(manual-only)* or `playwright-e2e-engineer` *(manual-only)* where they
   fit. `integration-test-designer` and `api-contract-test-designer` design
   boundary and contract specifications; name the implementing engineer for
   those plans according to the repository's toolchain.
@@ -57,10 +59,17 @@ and hands each group to the right engineer skill; it does not implement them.
 2. **Derive test items from risks, not from the UI tree.** For each risk:
    the behaviors to prove (happy path, negative path, boundary), per the
    catalog in [references/test-plan-template.md](references/test-plan-template.md).
+   Then fill the **negative-path matrix**: one row per surface the change
+   touches (endpoint, form, job, webhook), one column per class —
+   unauthorized, invalid, expired, missing, duplicate, conflicting,
+   out-of-order. Each cell is a planned item, "not applicable because …",
+   or a delegation to `multi-tenant-security-tester` *(manual-only)* (cross-tenant, wrong
+   role, privilege escalation). A narrowed scope ("just the happy path")
+   lists the skipped classes as out of scope; no cell is left blank.
 3. **Assign each item the cheapest reliable layer** (strategy rules): unit /
    integration / contract / E2E / manual. The automation-vs-manual split is
    explicit. Cross-tenant and authorization negatives are delegated to the
-   shipped `multi-tenant-security-tester`, referenced as plan line items.
+   shipped `multi-tenant-security-tester` *(manual-only)*, referenced as plan line items.
 4. **Specify data and environment per item:** which fixtures/personas
    (delegate design gaps to `test-data-architect`), which environment, and
    any masking needs for evidence.
@@ -82,6 +91,9 @@ In scope / out of scope: <items + rationale for exclusions>
 Test items:
   <id> — <behavior to prove> — layer <unit|integration|contract|e2e|manual>
        — data <fixture/persona> — env <assumption> — expected <objective result>
+Negative-path matrix: <one row per touched surface × unauthorized | invalid |
+  expired | missing | duplicate | conflicting | out-of-order; each cell
+  <item id> | not applicable: <reason> | → multi-tenant-security-tester>
 Automation/manual split: <explicit summary + why per manual item>
 Security negatives: <delegated items → multi-tenant-security-tester / rls-policy-auditor>
 Entry criteria: <objective preconditions>
@@ -95,7 +107,10 @@ Handoffs: <plan group → engineer skill; open questions>
 
 - [ ] Every test item traces to a named requirement or risk.
 - [ ] Out-of-scope list exists with rationale (empty scope-cuts are silent lies).
+- [ ] Every touched surface has all seven negative-path classes answered:
+      a planned item, "not applicable" with a reason, or a delegation.
 - [ ] Each item has layer, data, environment, and an objective expected result.
+- [ ] A tester who did not write the plan can run every item.
 - [ ] Automation/manual split is explicit; each manual item says why manual.
 - [ ] Entry and exit criteria are objective (a stranger could adjudicate them).
 - [ ] Artifacts named; screenshot checkpoints listed where UI is affected.
@@ -132,7 +147,8 @@ Handoffs: <plan group → engineer skill; open questions>
 
 - [references/test-plan-template.md](references/test-plan-template.md) —
   the full plan template, behavior catalog (happy/negative/boundary
-  prompts), and exit-criteria examples.
+  prompts), negative-path matrix example, and exit-criteria examples.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the strategy/plan/coverage
-  cluster and against `multi-tenant-security-tester` for security-test asks.
+  cluster, against `multi-tenant-security-tester` for security-test asks, and
+  against `integration-test-designer` for negative-path mapping.

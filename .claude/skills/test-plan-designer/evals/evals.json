@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "test-plan-designer",
-  "description": "Trigger and behavior cases for per-change test planning: risk-traced items, explicit layer split, objective exit criteria, named artifacts and CI placement.",
+  "description": "Trigger and behavior cases for per-change test planning: risk-traced items, a per-surface negative-path matrix, explicit layer split, objective exit criteria, named artifacts and CI placement.",
   "cases": [
     {
       "id": "positive-feature-plan",
@@ -26,6 +26,31 @@
         "assertions": [
           "Flags the acceptance criteria as untestable and proposes measurable replacements (e.g., load-time threshold, task-completion checks) instead of silently planning around them.",
           "Keeps an out-of-scope list with rationale."
+        ]
+      }
+    },
+    {
+      "id": "negative-path-matrix-per-surface",
+      "type": "should_trigger",
+      "prompt": "Plan the testing for this change: it adds a POST /invites endpoint and a billing webhook handler. Map every negative path we need.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces a negative-path matrix with one row per touched surface (the invite endpoint and the webhook) and a column for each of the seven classes: unauthorized, invalid, expired, missing, duplicate, conflicting, out-of-order.",
+          "Every cell in both rows is answered: a planned item with layer and expected result, 'not applicable' with a stated reason, or a delegation; no class is silently skipped.",
+          "Delegates the cross-tenant invite cell to multi-tenant-security-tester as a referenced line item instead of specifying cross-tenant test steps itself."
+        ]
+      }
+    },
+    {
+      "id": "edge-happy-path-only-lists-skipped-negatives",
+      "type": "should_trigger",
+      "prompt": "Write a quick test plan for the new CSV export button. Just the happy path, we're short on time.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "May narrow the plan to the happy path, but lists each skipped negative-path class by name in the out-of-scope section with the rationale, rather than omitting them silently.",
+          "Does not present the narrowed plan as complete negative-path coverage."
         ]
       }
     },
