@@ -467,7 +467,8 @@ tests vs database-policy audit).
 ### Skills (Phase 5 — QA, E2E, manual QA & evidence pack)
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
-`evals/trigger-evals.json` (all sixteen sit in one of four overlap clusters). Per
+`evals/trigger-evals.json` (the original sixteen sit in one of four overlap clusters;
+`acceptance-criteria-reviewer`, added by D68, carries its own seams). Per
 [historical master prompt, section 7](prompts/claude-skills-master-generation-prompts-v4.md): QA starts from risk; every layer choice picks the cheapest reliable
 layer; E2E is reserved for critical journeys; manual cases are executable by another
 tester; screenshot evidence carries naming/masking/metadata/storage rules; Playwright
@@ -483,10 +484,14 @@ and `flaky-test-detective` (applies a test-layer fix and verifies stability).
 **Pulled forward from the QA backlog** (in addition to the 13 canonical Phase 5 skills):
 `integration-test-designer` (roadmap #184), `api-contract-test-designer` (roadmap #185),
 and `accessibility-test-harness` (roadmap #204) — each with mandatory trigger-eval
-discrimination against its nearest neighbors. Per reconciliation §3, `acceptance-criteria-tester`,
-`e2e-test-architect`, and `qa-closeout-reporter` stay in the expansion backlog
+discrimination against its nearest neighbors. Per reconciliation §3, `e2e-test-architect`
+and `qa-closeout-reporter` stay in the expansion backlog
 (`qa-closeout-reporter` overlaps the shipped `ai-closeout-reporter` +
 `screenshot-evidence-planner`, whose evidence bundle the closeout consumes).
+The backlog's `acceptance-criteria-tester` (#226 + #227) was built by owner decision
+D68 (2026-09-28) narrowed to #226 and renamed `acceptance-criteria-reviewer`, because it
+reviews criteria and runs no tests; the #227 definition-of-done check stays covered by
+`release-readiness-reviewer`, with `ai-closeout-reporter` and `agent-governance-audit`.
 
 | Skill | Source (category doc) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
@@ -506,6 +511,7 @@ discrimination against its nearest neighbors. Per reconciliation §3, `acceptanc
 | `integration-test-designer` | cat 06 **#184 (pulled forward)** | yes | The layer BETWEEN unit and E2E: real service/command/DB/auth/permission boundaries, named faked seams with rationale, real-path auth minting, persisted-state assertions, no browser; security matrices deferred to `multi-tenant-security-tester`. |
 | `api-contract-test-designer` | cat 06 **#185 (pulled forward)** | yes | Contract VERIFICATION (not design): provider/consumer roles, request/response schema + error-envelope validation, additive-vs-breaking CI gate, version coverage, fake-fidelity re-validation; contract design stays with `api-event-architect`. |
 | `accessibility-test-harness` | cat 06 **#204 (pulled forward)** + cat 05 #173 | yes | WCAG-pinned a11y harness: automated scans (component/E2E/CI, baseline+ratchet) AND manual keyboard/focus/contrast/screen-reader checklists; explicit about what automation cannot judge. |
+| `acceptance-criteria-reviewer` | cat 06 #226 (D68; #227 stays with `release-readiness-reviewer`) | yes | Reviews EXISTING acceptance criteria in a spec, ticket or story: per-criterion TESTABLE / NEEDS-REWRITE / UNTESTABLE verdict (observable outcome, pass/fail threshold, evidence), vague words flagged with suggested rewrites for the author to accept, missing negative/boundary/permission cases listed as gaps (never invented as requirements), one owner question per unclear or contradictory item. Edits nothing; hands checked criteria to `test-plan-designer`. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 5 clusters:
 **strategy/plan/coverage** (`qa-strategy-architect`, `test-plan-designer`,
@@ -1282,10 +1288,11 @@ QA backlog (`integration-test-designer` #184, `api-contract-test-designer` #185,
 [Implemented → Skills (Phase 5)](#skills-phase-5--qa-e2e-manual-qa--evidence-pack) above.
 Source: [`docs/skills/06-qa-test-engineering.md`](skills/06-qa-test-engineering.md),
 [`05-frontend-ux-engineering.md`](skills/05-frontend-ux-engineering.md).
-Per reconciliation §3, the Phase 5 **expansion backlog** (`acceptance-criteria-tester`,
-`e2e-test-architect`, `qa-closeout-reporter` — the latter overlaps the shipped
+Per reconciliation §3, the Phase 5 **expansion backlog** (`e2e-test-architect`,
+`qa-closeout-reporter` — the latter overlaps the shipped
 `ai-closeout-reporter` + `screenshot-evidence-planner` — plus the remaining cat-06 rows)
-remains backlog, built in Phase 8 batches — **except the Tier 1 headline pair
+remains backlog, built in Phase 8 batches (`acceptance-criteria-tester` left it when D68
+built it as `acceptance-criteria-reviewer`, narrowed to #226) — **except the Tier 1 headline pair
 `performance-test-harness` + `load-test-planner` (#205/#206), ✅ built by D23
 (2026-07-07) as two skills and moved to
 [Implemented → Skills (D10 Tier 1)](#skills-d10-tier-1--performanceload-validation)

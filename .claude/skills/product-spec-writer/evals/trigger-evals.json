@@ -5,7 +5,8 @@
     "adr-writer",
     "requirements-gathering-facilitator",
     "feature-flag-rollout-strategist",
-    "project-orchestrator"
+    "project-orchestrator",
+    "acceptance-criteria-reviewer"
   ],
   "cases": [
     {
@@ -47,6 +48,14 @@
       "should_not_trigger": ["product-spec-writer"],
       "note": "SEAM CASE (reciprocated yield) — a vague idea with no settled requirements and a request for the whole journey is the orchestrator's front door. It routes to product-spec-writer at the spec stage; it is not a spec request.",
       "reason": "project-orchestrator drives a vague app idea end to end and routes to the owning stage skill. product-spec-writer needs understood requirements and writes one feature spec; it does not run the lifecycle."
+    },
+    {
+      "id": "review-existing-criteria-goes-to-acceptance-criteria-reviewer",
+      "prompt": "This ticket came from another team with its acceptance criteria already written. Before we build it, tell me which criteria can't be verified as written and why.",
+      "expected_skill": "acceptance-criteria-reviewer",
+      "should_not_trigger": ["product-spec-writer"],
+      "note": "SEAM CASE (reciprocated yield, D68) — the criteria already exist and the ask is a per-criterion verdict, not a new spec.",
+      "reason": "acceptance-criteria-reviewer reviews criteria written elsewhere and edits nothing; product-spec-writer writes a spec and its criteria from understood requirements."
     }
   ]
 }

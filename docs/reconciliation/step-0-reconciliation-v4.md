@@ -209,12 +209,14 @@ only: no skills created, no phases renumbered, validator targets unchanged.
 | #185 Contract Test Design | `api-contract-test-designer` (Phase 5, pulled forward) |
 | #186 RLS Test Harness Design | `multi-tenant-security-tester` + `rls-policy-auditor` (Phase 4) — RLS testing lives cross-phase |
 | #187 E2E Journey Design | `playwright-e2e-engineer` (Phase 5) |
+| #190 Regression-First Bug Fixing | `tdd-engineer` (Phase 2), with `systematic-debugger` (Phase 2) and `regression-suite-curator` (Phase 5) as neighbors — candidate dropped by D68 (2026-09-28) |
 | #196 Test Data Isolation / #197 Seed Fixture Governance | `test-data-architect` (Phase 5) |
 | #204 Accessibility Test Harness | `accessibility-test-harness` (Phase 5, pulled forward) |
 | #209 Flake Detection / #210 Flake Quarantine Governance | `flaky-test-detective` (Phase 5) |
 | #221 Manual QA Script Authoring | `manual-test-case-creator` (Phase 5) |
 | #222 Clickthrough Testing Protocol | `clickthrough-test-engineer` (Phase 5) |
 | #223 Screenshot Evidence Capture | `screenshot-evidence-planner` (Phase 5) |
+| #227 Definition of Done Review | `release-readiness-reviewer` (Phase 6), with `ai-closeout-reporter` (Phase 1) and `agent-governance-audit` (Phase 1.5) — split from `acceptance-criteria-tester` by D68 (2026-09-28) |
 
 **Tier 1 — build first when the QA expansion runs** (uncovered roadmap P0s plus the
 performance/load headline):
@@ -222,11 +224,11 @@ performance/load headline):
 | Candidate *(all: candidate — not built)* | Roadmap ref (cat 06) | Note |
 |---|---|---|
 | `performance-test-harness` + `load-test-planner` — **✅ both built (D23, 2026-07-07)** | #205 (P1) + #206 (P2) | **Headline gap — now closed:** load/render/query/API/edge-function/background-job performance measurement plus realistic traffic/tenant/data-volume load planning — the largest uncovered risk for a multi-tenant SaaS (noisy neighbors, per-tenant degradation). Built as TWO skills per the D23 pre-generation plan table (instrument vs traffic plan — the sibling seam is pinned in both trigger-evals). Pre-release counterpart to Phase 6 `slo-reliability-architect` (targets/alerting); the designs-vs-measures seam against D12.3 is pinned from both sides. |
-| `regression-first-bug-fixer` | #190 (P0) | Failing test that reproduces the bug BEFORE the fix. `regression-suite-curator` cites #190 but owns suite membership, not the fix workflow; `tdd-engineer` owns new behavior, not bug reproduction. |
+| `regression-first-bug-fixer` — **dropped (D68, 2026-09-28)**: covered by `tdd-engineer` (see Already covered above; D68 corrects this row's note) | #190 (P0) | Failing test that reproduces the bug BEFORE the fix. `regression-suite-curator` cites #190 but owns suite membership, not the fix workflow; `tdd-engineer` owns new behavior, not bug reproduction. |
 | `negative-path-test-mapper` | #192 (P0) | Systematic unauthorized/invalid/expired/missing/duplicated/conflicting/out-of-order enumeration per surface. `test-plan-designer`/`test-coverage-mapper` cite #192 as a source but own planning/audit; security negatives stay with Phase 4 `multi-tenant-security-tester`. |
 | `test-tenant-provisioner` | #198 (P0) | Repeatable test tenants/users for auth, RLS, integration, and E2E runs. `test-data-architect` (source range #196–#199) owns the data catalog; provisioning the tenants/users themselves is unowned. (broadened per report P12: test-row marker convention with never-mutate-unmarked rule, validate-only vs apply modes, env-var-name-only credentials, backup-gated capability grants with inline rollback, prod-safe static lint of QA automation) |
 | `ci-failure-classifier` | #214 + #215 (merged; both P0) | ONE skill: hidden runtime-marker scan (console errors, unhandled rejections, skipped tests, auth failures) + failure classification (product bug / test bug / missing secret / timeout-only / infra / skipped runtime). `flaky-test-detective` owns intermittence root-cause; this owns the every-run CI verdict. (per report P14: duration as first-class evidence; TIMEOUT_FAILURE as a distinct class never conflated with regressions; resume-don't-rerun after timeout-only interruptions; no masking real failures by raising timeouts) |
-| `acceptance-criteria-tester` | #226 + #227 (merged; both P0) | Testability/completeness/ambiguity review of acceptance criteria + definition-of-done check. **Already deferred once** (execution-plan extra → this backlog, note above); the deferral stands — it builds in this tier, not before. |
+| `acceptance-criteria-tester` — **built as `acceptance-criteria-reviewer`, narrowed to #226 (D68, 2026-09-28)**; #227 is covered (see Already covered above) | #226 + #227 (merged; both P0) | Testability/completeness/ambiguity review of acceptance criteria + definition-of-done check. **Already deferred once** (execution-plan extra → this backlog, note above); the deferral stands — it builds in this tier, not before. |
 
 **Tier 2 — second wave** (roadmap P1 hardening, plus #203 promoted because UI drift is
 otherwise invisible to the shipped suite):

@@ -1,0 +1,87 @@
+{
+  "skill": "acceptance-criteria-reviewer",
+  "description": "Trigger discrimination for reviewing existing acceptance criteria (D68, catalog item #226) against the neighbors named in its description and the D68 scope proposal: writing the spec (product-spec-writer), eliciting unclear requirements (requirements-gathering-facilitator), turning checked criteria into a test plan (test-plan-designer), writing manual cases (manual-test-case-creator), and the definition-of-done evidence gate (#227, release-readiness-reviewer).",
+  "overlaps_with": [
+    "product-spec-writer",
+    "requirements-gathering-facilitator",
+    "test-plan-designer",
+    "manual-test-case-creator",
+    "release-readiness-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "review-existing-criteria-wins-here",
+      "prompt": "This story came over from the partner team. Before we pull it into the sprint, are its acceptance criteria testable and complete? 'Search works for all users. Results are relevant. It should be fast.'",
+      "expected_skill": "acceptance-criteria-reviewer",
+      "should_not_trigger": [
+        "product-spec-writer",
+        "test-plan-designer"
+      ],
+      "reason": "Criteria written elsewhere need a per-criterion testability review; nothing is being written from scratch and no plan is requested yet."
+    },
+    {
+      "id": "write-spec-goes-to-spec-writer",
+      "prompt": "Requirements for bulk export are agreed. Write the feature spec with goals, non-goals and testable acceptance criteria.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": [
+        "acceptance-criteria-reviewer"
+      ],
+      "reason": "Writing a spec and its criteria is product-spec-writer; this skill reviews criteria that already exist."
+    },
+    {
+      "id": "review-before-plan-wins-here",
+      "prompt": "QA is about to plan testing for the checkout story. First tell me which of its acceptance criteria can't be verified as written and why.",
+      "expected_skill": "acceptance-criteria-reviewer",
+      "should_not_trigger": [
+        "test-plan-designer"
+      ],
+      "reason": "Checking that criteria are verifiable precedes planning; the ask is a verdict per criterion, not layers, data and exit criteria."
+    },
+    {
+      "id": "plan-goes-to-test-plan-designer",
+      "prompt": "The acceptance criteria for the checkout story are reviewed and clean. Plan what we test, at which layer, with what data, and when testing is done.",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "acceptance-criteria-reviewer"
+      ],
+      "reason": "Turning checked criteria into a verification plan is test-plan-designer; the review is already done."
+    },
+    {
+      "id": "unclear-requirement-goes-to-facilitator",
+      "prompt": "Stakeholders can't agree what 'team workspaces' should even do, and the ticket's criteria contradict each other everywhere. Help us work out what we actually need.",
+      "expected_skill": "requirements-gathering-facilitator",
+      "should_not_trigger": [
+        "acceptance-criteria-reviewer"
+      ],
+      "reason": "When the requirement itself is contested, elicitation comes first; reviewing criteria for an undecided requirement only polishes a guess."
+    },
+    {
+      "id": "manual-cases-go-to-creator",
+      "prompt": "Write step-by-step manual test cases for the password-reset story from its acceptance criteria, with test data and expected results per step.",
+      "expected_skill": "manual-test-case-creator",
+      "should_not_trigger": [
+        "acceptance-criteria-reviewer"
+      ],
+      "reason": "Executable manual cases are manual-test-case-creator's output; this skill only judges whether the criteria can be verified."
+    },
+    {
+      "id": "story-done-goes-to-release-gate",
+      "prompt": "Is the password-reset story done? Tests pass, CI is green on the release candidate and the docs are updated. Can we ship it?",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "acceptance-criteria-reviewer"
+      ],
+      "reason": "The definition-of-done evidence gate (catalog item #227) stays with release-readiness-reviewer under D68; this skill never decides whether work is done."
+    },
+    {
+      "id": "vague-words-in-ticket-wins-here",
+      "prompt": "Our ticket says the dashboard must be 'user-friendly' and 'load quickly'. Flag anything vague in the acceptance criteria and suggest measurable wording for the PM to accept.",
+      "expected_skill": "acceptance-criteria-reviewer",
+      "should_not_trigger": [
+        "product-spec-writer",
+        "manual-test-case-creator"
+      ],
+      "reason": "Flagging vague criteria with suggested rewrites for the author is this skill's core review; no new spec or cases are requested."
+    }
+  ]
+}
