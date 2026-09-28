@@ -1,0 +1,37 @@
+# Line-ending policy: every text file is stored and checked out with LF, on
+# every platform and regardless of core.autocrlf. Byte-level hashes (the skill
+# contract audit corpus hash, BER frozen artifacts and manifests) are computed
+# over on-disk bytes, so a CRLF checkout would otherwise produce different
+# hashes and a "dirty" working tree on Windows.
+* text=auto eol=lf
+
+# PowerShell scripts stay LF: Windows PowerShell 5.1 and pwsh both accept LF.
+*.ps1 text eol=lf
+
+# Windows batch files must keep CRLF (none are tracked today).
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary formats: never convert, never diff as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tgz binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.docx binary
+*.xlsx binary
+*.pptx binary
+
+# Frozen evidence directories carry their own nested .gitattributes that mark
+# recorded logs and JSON as -text so their pinned SHA-256 values keep matching
+# (docs/evidence/offline-ci-2026-09-12/, docs/evidence/shared-contracts-closeout-2026-09-12/logs/).
+# Nested files take precedence over this one; do not remove them.
