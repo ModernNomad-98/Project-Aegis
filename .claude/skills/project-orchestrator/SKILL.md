@@ -204,7 +204,7 @@ here.
   - **Order when several apply** (skip any `n/a` owner without invoking it):
     `prioritization-frame-picker` → `roadmap-under-uncertainty-planner` →
     `roadmap-to-commitments-translator` (readiness mode).
-  - **Worked classifications** (each asserted by an eval): bounded MVP + deadline
+  - **Worked classifications** (each asserted by an eval, a behavior test case in `evals/evals.json`): bounded MVP + deadline
     → only commitment readiness; competing capabilities, no deadline → prioritization
     (+ roadmap if sequencing); all three signals → all in order; bounded MVP, none → `n/a`.
 
@@ -298,7 +298,7 @@ large language model (LLM) feature earns `prompt-injection-defender`; a purely i
 tool earns none of the tenancy skills).
 
 **The human gate (composed, never relaxed).** Before anything irreversible — a
-migration, a deploy, an auth/permission change, a deletion, a merge, a public
+migration, a deploy, an authentication/authorization (auth) or permission change, a deletion, a merge, a public
 release — route through `human-approval-boundary` (the runtime halt),
 `change-classification-gate` (which rigor + approval path the slice needs), and
 `agent-authorization-matrix` (the standing floor: merge to a protected branch is
