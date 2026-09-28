@@ -5,7 +5,8 @@
     "iac-reviewer",
     "vite-build-qa-engineer",
     "local-ci-mirror-preflight",
-    "feature-flag-architect"
+    "feature-flag-architect",
+    "release-readiness-reviewer"
   ],
   "cases": [
     {
@@ -82,6 +83,15 @@
         "environment-parity-reviewer"
       ],
       "reason": "The flag system's defaults policy and outage behavior are designed by feature-flag-architect; the parity reviewer only reports that a flag default differs between environments."
+    },
+    {
+      "id": "ship-decision-goes-to-release-readiness",
+      "prompt": "We're about to promote release 4.2 to production. Is it safe to ship? Check CI on the release commit, the migration review, the rollback plan and the approvals.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "environment-parity-reviewer"
+      ],
+      "reason": "SEAM CASE: 'before promoting to production' is shared wording, but a ship or no-ship verdict across CI evidence, migrations, rollback and approvals is release-readiness-reviewer; the parity reviewer only lists how environments differ."
     }
   ]
 }

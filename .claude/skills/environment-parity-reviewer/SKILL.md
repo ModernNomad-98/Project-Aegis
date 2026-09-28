@@ -79,6 +79,10 @@ in as an output.
   reports that a flag's default differs between environments.
 - Do NOT use when: deciding what test data each environment should hold —
   that is `test-data-architect`.
+- Do NOT use when: the ask is whether a release may ship (ship or no-ship
+  on CI evidence, migrations, rollback path and approvals) — that is
+  `release-readiness-reviewer`. This skill's findings can be one piece of
+  evidence that gate reads.
 
 ## Inputs to Inspect
 
@@ -125,7 +129,7 @@ in as an output.
    missing) and non-secret values; feature-flag defaults; database engine,
    version and extensions; third-party sandbox versus live modes; auth
    callback addresses and allowed origins; build mode; region; time zone
-   and locale; data shape (volume, seed versus real data, tenants
+   and locale; data shape (volume, sample versus real records, tenants
    present). A secret variable's cell shows `set` or `missing`, never the
    value.
 3. **Classify every difference.**
@@ -299,5 +303,6 @@ with its reason before the one question.
   cases.
 - `evals/trigger-evals.json` — discrimination against `iac-reviewer`
   ("our Terraform drifted"), `vite-build-qa-engineer` ("works in dev, not
-  in build"), `local-ci-mirror-preflight` ("passes locally, fails in CI")
-  and `feature-flag-architect`.
+  in build"), `local-ci-mirror-preflight` ("passes locally, fails in CI"),
+  `feature-flag-architect` and `release-readiness-reviewer` ("is it safe to
+  ship?").
