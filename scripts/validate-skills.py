@@ -45,7 +45,9 @@ Repo-level checks:
     reviewer agents strict-parse, their `name` matches the filename stem, their
     `tools` grant stays inside the read-only set {Read, Grep, Glob} (any
     widening is a privilege escalation, not a preference), and `model`, when
-    present, is one the runtime recognises.
+    present, is one the runtime recognises. Every frontmatter key must be in
+    an allow-list; `hooks`, `mcpServers` and `permissionMode` (commands,
+    processes, wider permissions) are named as forbidden.
   * guided-path link resolution (decision D55 — check_docs_paths_links, HARD):
     every SKILL.md link in docs/paths/ and every docs/paths link in the README
     resolves on disk, and a `[`foo`](.../bar/SKILL.md)` label matches its
@@ -629,6 +631,25 @@ def _rel(path: Path) -> str:
 # error rather than a warning: it is the one security-relevant check in D55.
 AGENT_ALLOWED_TOOLS = {"Read", "Grep", "Glob"}
 AGENT_ALLOWED_MODELS = {"opus", "sonnet", "haiku"}
+# Frontmatter keys a project agent may carry (allow-list, decision D55 as
+# extended by code-health finding P2-3). Checked against the Claude Code
+# subagent field table (code.claude.com/docs/en/sub-agents, 2026-09-28): every
+# key here only describes, narrows or bounds the agent. Any key outside the
+# set is an error, so a field Claude Code adds later is reviewed before an
+# agent file can use it.
+AGENT_ALLOWED_KEYS = {
+    "name", "description", "tools", "model",
+    "disallowedTools", "maxTurns", "effort", "color",
+}
+# Keys that Claude Code honours in `.claude/agents/` but ignores in plugin
+# agents "for security reasons" (same page). Each one executes or widens
+# authority when the agent starts, so each gets a specific error.
+AGENT_FORBIDDEN_KEYS = {
+    "hooks": "runs shell commands on the agent's lifecycle events",
+    "mcpServers": "can start an MCP server process from an inline definition",
+    "permissionMode": "can switch the agent to bypassPermissions or another "
+                      "wider permission mode",
+}
 
 
 def check_agents_schema(rep: Report, agents_dir: Path | None = None) -> None:
@@ -641,7 +662,10 @@ def check_agents_schema(rep: Report, agents_dir: Path | None = None) -> None:
       * declare `tools` (the field is `tools`, NOT `allowed-tools`) within the
         read-only set — a Write/Edit/Bash/`*` grant turns a reviewer into an
         actor, which is a privilege escalation, not a config preference;
-      * name a recognised `model` when it names one at all.
+      * name a recognised `model` when it names one at all;
+      * carry no key outside AGENT_ALLOWED_KEYS — in particular no `hooks`,
+        `mcpServers` or `permissionMode`, which execute commands, start
+        processes or widen permissions (code-health finding P2-3).
     """
     agents_dir = AGENTS_DIR if agents_dir is None else agents_dir
     if not agents_dir.is_dir():
@@ -655,6 +679,19 @@ def check_agents_schema(rep: Report, agents_dir: Path | None = None) -> None:
         fm = check_frontmatter_strict_yaml(fm_text, ctx, rep)
         if fm is None:
             continue
+
+        for key in sorted(map(str, fm)):
+            if key in AGENT_FORBIDDEN_KEYS:
+                rep.error(
+                    f"[{ctx}] forbidden frontmatter key `{key}`: it "
+                    f"{AGENT_FORBIDDEN_KEYS[key]}; reviewer agents read and report"
+                )
+            elif key not in AGENT_ALLOWED_KEYS:
+                rep.error(
+                    f"[{ctx}] frontmatter key `{key}` is not in the agent "
+                    f"allow-list {sorted(AGENT_ALLOWED_KEYS)}; review what it "
+                    "does before adding it there"
+                )
 
         if fm.get("name") != path.stem:
             rep.error(

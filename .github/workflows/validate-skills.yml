@@ -271,7 +271,10 @@ jobs:
           # package __init__ (tools.py, yaml.py, unittest.py, sitecustomize.py,
           # conftest.py, yaml/__init__.py, ...) is protected too. Matching is
           # case-insensitive because Windows and macOS checkouts fold case.
-          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
+          # .claude/agents/ is protected because Claude Code honours `hooks`,
+          # `mcpServers` and `permissionMode` in project agent files, so an
+          # agent file can run commands or widen permissions (finding P2-3).
+          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|\.claude/agents/|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
           shopt -s nocasematch
           gate_files=()
           echo "Files changed in this PR:"

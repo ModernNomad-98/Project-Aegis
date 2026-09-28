@@ -126,6 +126,12 @@ shadow the standard library or PyYAML and turn a failing check green. Every
 script and `pip` call in the workflow also runs with `python -P`, which keeps
 the script directory off the import path; `-I` is not used because it also
 ignores the `PYTHONIOENCODING` and `PYTHONDONTWRITEBYTECODE` settings.
+The guard also protects `.claude/agents/`. Claude Code honours `hooks`,
+`mcpServers` and `permissionMode` in a project agent file, so an agent file can
+run shell commands, start a process or skip permission prompts. The skill
+validator separately rejects any agent frontmatter key outside a short
+allow-list (`name`, `description`, `tools`, `model`, `disallowedTools`,
+`maxTurns`, `effort`, `color`) and names those three keys as forbidden.
 The source repository's [owner grant](approvals/APPROVAL_REGISTER.md) permits
 authorized agents to perform administrator merges without repeat consent; see
 the [current merge policy](reconciliation/auto-merge-policy.md). Documentation

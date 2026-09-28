@@ -329,6 +329,33 @@ def test_agents_schema():
     validator.check_agents_schema(rep, agents / "bad-model")
     expect_error(rep, "is not one of", "an unrecognised model is rejected")
 
+    # Code-health P2-3: keys Claude Code honours in `.claude/agents/` that run
+    # commands, start processes or widen permissions. One fixture per key.
+    for fixture, key in (
+        ("forbidden-hooks", "hooks"),
+        ("forbidden-mcpservers", "mcpServers"),
+        ("forbidden-permissionmode", "permissionMode"),
+    ):
+        rep = validator.Report()
+        validator.check_agents_schema(rep, agents / fixture)
+        expect_error(
+            rep,
+            f"forbidden frontmatter key `{key}`",
+            f"an agent declaring `{key}` is rejected",
+        )
+
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "unknown-key")
+    expect_error(
+        rep,
+        "is not in the agent allow-list",
+        "an agent key outside the allow-list (`initialPrompt`) is rejected",
+    )
+
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "allowed-optional-keys")
+    expect_clean(rep, "an agent using every allow-listed optional key is accepted")
+
     rep = validator.Report()
     validator.check_agents_schema(rep, agents / "no-such-directory")
     expect_clean(rep, "a missing agents directory degrades quietly")
