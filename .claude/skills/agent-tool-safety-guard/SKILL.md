@@ -1,6 +1,6 @@
 ---
 name: agent-tool-safety-guard
-description: Design or review least-privilege tool and function access for a large language model (LLM) agent, containing excessive agency and tool misuse. Covers Open Worldwide Application Security Project (OWASP) identifiers LLM03 (excessive agency), ASI02 (tool misuse), and the tool-enabled ASI05 code-execution slice. Build a per-tool permission matrix, validate arguments before execution, use the calling user's authority, gate high-impact actions behind human approval, and map tool-chain abuse. Code-execution tools need a sandbox and approval. Composes human-approval-boundary and agent-authorization-matrix. Use when an agent can call tools, functions or application programming interfaces (APIs). Do NOT use for injection defense, sandbox design, retrieval authorization, what tool schemas reveal to users (hidden-context-exposure-reviewer), or standing merge/deploy authority.
+description: Design or review least-privilege tool and function access for a large language model (LLM) agent, containing excessive agency and tool misuse. Covers Open Worldwide Application Security Project (OWASP) identifiers LLM03 (excessive agency), ASI02 (tool misuse), and the tool-enabled ASI05 code-execution slice. Build a per-tool permission matrix, validate arguments before execution, use the calling user's authority, gate high-impact actions behind human approval, and map tool-chain abuse. Code-execution tools need a sandbox and approval. Composes human-approval-boundary and agent-authorization-matrix; ai-human-in-the-loop-designer designs the product review workflow behind an approval gate. Use when an agent can call tools, functions or application programming interfaces (APIs). Do NOT use for injection defense, sandbox design, retrieval authorization, what tool schemas reveal to users (hidden-context-exposure-reviewer), or standing merge/deploy authority.
 ---
 
 # Agent Tool Safety Guard
@@ -53,6 +53,9 @@ from `human-approval-boundary`; standing agent authority from
   in a tool description is being relied on as a gate
   (`hidden-context-exposure-reviewer`, LLM08 Hidden Context Exposure); that
   skill routes the enforcement fix back here.
+- Do NOT use when: the tool gate is set and the ask is the review workflow
+  behind it, or the AI output needing review is not a tool call (a drafted
+  reply, a suggested field value) — that is `ai-human-in-the-loop-designer`.
 
 ## Inputs to Inspect
 
@@ -94,10 +97,13 @@ from `human-approval-boundary`; standing agent authority from
    to the tool (compose `structured-output-validator`).
 5. **Gate high-impact actions.** Irreversible, destructive, costly, or
    cross-boundary actions require human approval via `human-approval-boundary`;
-   define the trigger per tool. Standing "agent may never do X autonomously"
-   rules come from `agent-authorization-matrix`. Code-execution tools default
-   to sandbox-required plus approval (per-tool side-effect limits set here;
-   the sandbox itself per `llm-output-safety-reviewer`, ASI05).
+   define the trigger per tool. The product review workflow those approvals
+   run through (pending proposal, queue, approve/edit/reject, who may review,
+   audit) is designed by `ai-human-in-the-loop-designer`. Standing "agent
+   may never do X autonomously" rules come from `agent-authorization-matrix`.
+   Code-execution tools default to sandbox-required plus approval (per-tool
+   side-effect limits set here; the sandbox itself per
+   `llm-output-safety-reviewer`, ASI05).
 6. **Map tool-chain composition abuse** using
    [references/tool-permission-matrix.md](references/tool-permission-matrix.md):
    where one tool's (untrusted) output becomes another tool's arguments, a

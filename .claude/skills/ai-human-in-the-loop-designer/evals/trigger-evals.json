@@ -1,0 +1,106 @@
+{
+  "skill": "ai-human-in-the-loop-designer",
+  "description": "Trigger discrimination for designing how an AI feature's output becomes product state (D70, #285/#286 with #287) against the neighbors named in its description and the Phase 7 batch proposal: the coding assistant's own approvals (human-approval-boundary), what agents building the product may do (agent-authorization-matrix, manual-only), per-tool permission scope (agent-tool-safety-guard), the oversight level a risk tier needs (ai-governance-risk-reviewer), and adversarial review of an approval flow (human-agent-trust-reviewer).",
+  "overlaps_with": [
+    "human-approval-boundary",
+    "agent-authorization-matrix",
+    "agent-tool-safety-guard",
+    "ai-governance-risk-reviewer",
+    "human-agent-trust-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "product-review-workflow-wins-here",
+      "prompt": "Our AI drafts changes to customer records. Design the approval step so a person reviews, edits or rejects each change before it is saved.",
+      "expected_skill": "ai-human-in-the-loop-designer",
+      "should_not_trigger": [
+        "human-approval-boundary",
+        "agent-tool-safety-guard"
+      ],
+      "reason": "The product's review workflow for AI output is this skill; human-approval-boundary governs the coding assistant's own risky steps, and agent-tool-safety-guard scopes tools rather than designing the review."
+    },
+    {
+      "id": "coding-assistant-approval-goes-to-human-approval-boundary",
+      "prompt": "Before I run this migration that renames the billing columns in production, check whether I already have approval or need to ask the owner.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "ai-human-in-the-loop-designer"
+      ],
+      "reason": "An imminent risky step by the coding assistant is human-approval-boundary; no product AI feature's workflow is being designed."
+    },
+    {
+      "id": "autonomy-classification-wins-here",
+      "prompt": "Which things should our AI scheduling assistant be allowed to do by itself, which need the user to confirm, and which should it never do?",
+      "expected_skill": "ai-human-in-the-loop-designer",
+      "should_not_trigger": [
+        "agent-authorization-matrix",
+        "ai-governance-risk-reviewer"
+      ],
+      "reason": "Sorting a product AI feature's actions into AUTONOMOUS, CONFIRM and FORBIDDEN is this skill's first step; agent-authorization-matrix covers agents building the product, and ai-governance-risk-reviewer sets the tier rather than classifying each action."
+    },
+    {
+      "id": "building-agent-authority-goes-to-agent-authorization-matrix",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Define what our coding agents may merge, deploy or change in this repository without asking a person first.",
+      "expected_skill": "agent-authorization-matrix",
+      "should_not_trigger": [
+        "ai-human-in-the-loop-designer"
+      ],
+      "reason": "Standing authority for the agents building the product is agent-authorization-matrix (manual-only, named explicitly); this skill designs a product AI feature's path to product state."
+    },
+    {
+      "id": "tool-scope-goes-to-agent-tool-safety-guard",
+      "prompt": "Our support agent can call issue_refund and close_account. Scope each tool to least privilege, run it as the calling user and validate its arguments.",
+      "expected_skill": "agent-tool-safety-guard",
+      "should_not_trigger": [
+        "ai-human-in-the-loop-designer"
+      ],
+      "reason": "Per-tool permission scope, identity and argument validation are agent-tool-safety-guard; the review workflow an approval-gated call then goes through is this skill."
+    },
+    {
+      "id": "review-queue-behind-tool-gate-wins-here",
+      "prompt": "Our agent's issue_refund tool is already marked as needing approval. Design the queue support leads use: what they see, approve or edit or reject, expiry, and the audit trail.",
+      "expected_skill": "ai-human-in-the-loop-designer",
+      "should_not_trigger": [
+        "agent-tool-safety-guard"
+      ],
+      "reason": "The tool gate exists; designing the review queue and decisions behind it is this skill, not tool permission scope."
+    },
+    {
+      "id": "oversight-level-goes-to-ai-governance-risk-reviewer",
+      "prompt": "Our AI credit-limit advisor affects customers' finances. What risk tier is it, and does it need human in the loop or is human on the loop enough?",
+      "expected_skill": "ai-governance-risk-reviewer",
+      "should_not_trigger": [
+        "ai-human-in-the-loop-designer"
+      ],
+      "reason": "Setting the risk tier and the oversight level it requires is ai-governance-risk-reviewer; this skill consumes that decision and designs the workflow."
+    },
+    {
+      "id": "advisory-only-pattern-wins-here",
+      "prompt": "The risk review says our AI invoice-coding feature must stay advisory-only. Design how its suggestions reach users without the AI writing anything.",
+      "expected_skill": "ai-human-in-the-loop-designer",
+      "should_not_trigger": [
+        "ai-governance-risk-reviewer"
+      ],
+      "reason": "The oversight level is decided; designing the advisory-only pattern that delivers it is this skill."
+    },
+    {
+      "id": "approval-attack-goes-to-human-agent-trust-reviewer",
+      "prompt": "Approvers click yes on almost every agent request within seconds. Attack our approval screen for consent fatigue, misleading summaries and bundled dangerous steps.",
+      "expected_skill": "human-agent-trust-reviewer",
+      "should_not_trigger": [
+        "ai-human-in-the-loop-designer"
+      ],
+      "reason": "Adversarially reviewing an existing approval flow is human-agent-trust-reviewer; this skill designs the flow and hands it there for attack review."
+    },
+    {
+      "id": "stale-proposal-design-wins-here",
+      "prompt": "AI-suggested edits to a contract record sometimes get approved after someone else has already changed the record. How should the review flow handle that?",
+      "expected_skill": "ai-human-in-the-loop-designer",
+      "should_not_trigger": [
+        "human-agent-trust-reviewer",
+        "human-approval-boundary"
+      ],
+      "reason": "Proposal staleness and base-version checks before commit are part of the review workflow this skill designs; nothing here is an attack review or the coding assistant's own approval."
+    }
+  ]
+}

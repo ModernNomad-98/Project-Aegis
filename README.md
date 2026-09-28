@@ -593,7 +593,7 @@ keeps a human as the approval gate on anything irreversible. See
    choice, Azure/AWS mapping, IaC review, CI pipelines, release readiness, rollback,
    observability, SLOs, incidents. *e.g.* `cloud-architecture-decider`, `iac-reviewer`,
    `release-readiness-reviewer`, `rollback-runbook-author`, `slo-reliability-architect`.
-8. **AI security & LLM systems** *(Phase 7, 14)* — securing LLM features against the OWASP LLM
+8. **AI security & LLM systems** *(Phase 7, 15)* — securing LLM features against the OWASP LLM
    Top 10: injection, RAG/tool safety, output handling, evals, cost guardrails, disclosure,
    routing. *e.g.* `ai-threat-modeler`, `prompt-injection-defender`, `rag-security-architect`,
    `ai-evaluation-harness`, `ai-cost-guardrail-designer`.
@@ -978,7 +978,8 @@ merged into `rollback-runbook-author` per reconciliation §3):
 | `database-backup-verifier` | (D71, #253) Proves per store that a usable backup exists: read-only evidence mode checks exists, non-empty, current against the RPO (recovery point objective), retained, encrypted and off-account copy; drill mode restores only into a new non-production scratch target after approval of the exact plan with its estimated cost, checks row-count and checksum parity and restore time against the RTO (recovery time objective), then deletes the copy; flags database dumps in the repository history; credentials by variable name. | **manual only** |
 
 Phase 7 — AI security & LLM systems pack (14 = v4's 10 + 4 OWASP LLM Top 10 gap
-additions, D6). Anchored to the OWASP Top 10 for LLM Applications (2026),
+additions, D6; plus `ai-human-in-the-loop-designer` built from the expansion
+backlog under D70). Anchored to the OWASP Top 10 for LLM Applications (2026),
 re-anchored on 2026-09-26 from the 2025 edition D6 cited; IDs below are 2026
 IDs (the renumbering crosswalk is in `ai-threat-modeler`'s threat catalog). These
 skills **compose** the shipped tenant/security/cost/governance packs rather than
@@ -1003,6 +1004,7 @@ re-deriving them. **LLM04** is extend-existing (the shipped
 | `model-poisoning-reviewer` | (NEW, LLM05) Training/feedback/ingestion integrity: contributor-trust assessment, poisoning paths, feedback-loop Sybil defense, ingestion-as-truth integrity, provenance/holdout controls; acquire-vs-ingest boundary with `supply-chain-security-reviewer`. | auto + manual |
 | `hidden-context-exposure-reviewer` | (NEW, LLM08 Hidden Context Exposure — full scope) Every hidden source the model sees — system prompt, developer instructions, retrieved policy text, tool/function schemas, other directives — reviewed on two axes: no secrets or attacker-useful logic in hidden context AND no security dependence on its secrecy — **hidden context is NOT a security control**; enforcement is deterministic and lives OUTSIDE the LLM; LLM08 severity scale; disclosure-is-harmless framing. | auto + manual |
 | `ai-misinformation-guard` | (NEW, LLM07) Grounding in retrieved sources (not memory), citation-to-claim verification, calibrated uncertainty/refusal, fact validation before action, package/API hallucination (slopsquatting) checks, overreliance-aware UX. | auto + manual |
+| `ai-human-in-the-loop-designer` | (D70, #285/#286 with #287) Designs how an AI feature's output becomes product state: every AI-originated action sorted AUTONOMOUS / CONFIRM / FORBIDDEN by risk tier, advisory-only by default; for CONFIRM, a pending proposal that is not yet state, a reviewer queue showing the exact change and its sources, approve/edit/reject/expiry, no self-approval, commit through the normal write path, an audit record per decision, consent-fatigue budgets and human-on-the-loop controls. Designs only. | auto + manual |
 
 Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`. Anchored to the [OWASP Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (v1.0, 2026-08-03), re-anchored from the 2025 edition by owner decision 2026-09-26.
 

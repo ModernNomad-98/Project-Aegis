@@ -595,7 +595,8 @@ namespace pattern).
 ### Skills (Phase 7 — AI security & LLM systems pack)
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
-`evals/trigger-evals.json` (all fourteen sit in one of four overlap clusters).
+`evals/trigger-evals.json` (the original fourteen sit in one of four overlap clusters;
+`ai-human-in-the-loop-designer`, added by D70, carries its own seams).
 Anchored to the **OWASP Top 10 for LLM Applications (2026)** — re-anchored on
 2026-09-26 (decision D65) from the 2025 edition that reconciliation §3 (D6) cited; all IDs in
 this section are 2026 IDs, and `ai-threat-modeler`'s threat catalog carries the
@@ -619,6 +620,8 @@ prompts/guardrail code), `ai-evaluation-harness` (runs evals that spend
 tokens/money), and `ai-router-architect` (wires live providers/credentials).
 The other eleven — including `structured-output-validator`, a design/spec skill
 that produces a contract and hands wiring off — stay model-invocable.
+`ai-human-in-the-loop-designer`, built from the expansion backlog by owner
+decision D70 (2026-09-28), designs only and is also model-invocable.
 
 Per reconciliation §3, **LLM04 (Supply Chain) is extend-existing**: the shipped
 Phase 4 `supply-chain-security-reviewer` was extended (scoped diff) to cover the
@@ -651,6 +654,7 @@ absorbs the AI security test harness (no separate `ai-security-test-harness`).
 | `model-poisoning-reviewer` | LLM05 *(NEW)* | yes | Training/feedback/ingestion integrity: contributor-trust assessment, poisoning paths, feedback-loop Sybil defense, ingestion-as-truth integrity, provenance/holdout controls; acquire-vs-ingest boundary with supply-chain-security-reviewer. |
 | `hidden-context-exposure-reviewer` | LLM08 *(NEW; Hidden Context Exposure, full scope)* | yes | Every hidden source — system prompt, developer instructions, retrieved policy text, tool/function schemas, other directives — on two axes: no secrets or attacker-useful logic in hidden context (extract + rotate via secrets-identity-hardener) AND no security dependence on its secrecy — **hidden context is NOT a security control**; enforcement is deterministic and lives OUTSIDE the LLM; LLM08 severity scale; disclosure-is-harmless framing. |
 | `ai-misinformation-guard` | LLM07 *(NEW)* | yes | Anti-misinformation: grounding in retrieved sources (not memory), citation-to-claim verification, calibrated uncertainty/refusal, fact validation before action, package/API hallucination (slopsquatting) checks, overreliance-aware UX; composes rag-security-architect + ai-governance-risk-reviewer. |
+| `ai-human-in-the-loop-designer` | cross-cutting (D70; cat 09 #285 + #286, with #287 folded in) | yes | How an AI feature's output becomes product state: each AI-originated write or action sorted AUTONOMOUS / CONFIRM / FORBIDDEN by risk tier, advisory-only by default (AI proposes, a person commits); for CONFIRM, a pending proposal that is not yet state, a reviewer queue showing the exact change and its sources, approve/edit/reject/expiry with stale-proposal checks, who may review (no self-approval), commit through the normal write path re-authorized as the reviewer, an audit record per decision, consent-fatigue budgets and human-on-the-loop controls for AUTONOMOUS actions. Designs only; tier from ai-governance-risk-reviewer, tool scope from agent-tool-safety-guard, attack review by human-agent-trust-reviewer. |
 
 Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`. Anchored to the [OWASP Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (v1.0, 2026-08-03), re-anchored from the 2025 edition by owner decision 2026-09-26.
 
@@ -1352,10 +1356,13 @@ chain (models, datasets, fine-tuning adapters); **LLM06** (2026 ID; D6 cited LLM
 is baked into `ai-cost-guardrail-designer`; and `ai-evaluation-harness` absorbs
 the AI security test harness (no separate `ai-security-test-harness`). The
 Phase 7 **expansion backlog** (`ai-provider-adapter-designer`,
-`prompt-contract-designer`, `ai-human-in-the-loop-designer`,
-`ai-autonomy-boundary-designer`, `ai-feature-kill-switch-designer` — whose
-agentic slice is now covered by `agent-containment-reviewer`) remains
-backlog, built in Phase 8 batches. Phase 7.5 (agentic AI security, D7) is
+`prompt-contract-designer`) remains backlog, built in Phase 8 batches.
+Owner decision D70 (2026-09-28) built `ai-human-in-the-loop-designer`
+(#285 with #286) and folded `ai-autonomy-boundary-designer` (#287) into it
+as its first workflow step; it dropped `ai-feature-kill-switch-designer`
+(#299) as already covered by `ai-router-architect`, with
+`ai-cost-guardrail-designer`, `agent-containment-reviewer` (its agentic
+slice) and the feature-flag pair. Phase 7.5 (agentic AI security, D7) is
 implemented below; the Compliance & Governance batch (D9) follows it.
 
 ### Phase 7.5 — Agentic AI security (P1)

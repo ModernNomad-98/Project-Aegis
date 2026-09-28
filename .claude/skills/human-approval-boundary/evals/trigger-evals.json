@@ -3,7 +3,8 @@
   "description": "Trigger discrimination for the Phase 1 operating-discipline pack, change-governance cluster: the approval stop vs the classification router vs diff hygiene.",
   "overlaps_with": [
     "change-classification-gate",
-    "reviewable-diff-discipline"
+    "reviewable-diff-discipline",
+    "ai-human-in-the-loop-designer"
   ],
   "cases": [
     {
@@ -41,6 +42,16 @@
         "change-classification-gate"
       ],
       "reason": "Ambiguity where one reading is destructive — stop-when-unclear belongs to the boundary."
+    },
+    {
+      "id": "product-ai-review-workflow-goes-to-ai-human-in-the-loop-designer",
+      "prompt": "Our product's AI assistant proposes refunds for support tickets. Design the approval flow so a support lead reviews, edits or rejects each refund before it is issued.",
+      "expected_skill": "ai-human-in-the-loop-designer",
+      "should_not_trigger": [
+        "human-approval-boundary"
+      ],
+      "note": "SEAM CASE (reciprocated yield, D70) — 'approval' here is a product feature's review workflow for its users, not the coding assistant's own stop before a risky step.",
+      "reason": "ai-human-in-the-loop-designer designs how a product AI feature's output is reviewed before it becomes state; human-approval-boundary governs the coding assistant's own risky actions."
     }
   ]
 }

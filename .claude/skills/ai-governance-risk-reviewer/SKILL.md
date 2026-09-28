@@ -1,6 +1,6 @@
 ---
 name: ai-governance-risk-reviewer
-description: "Review the governance and risk posture of an artificial intelligence (AI) feature: classify impact, assign a human owner, match human oversight to risk, check disclosure, consent, data use, retention, and a feature card, then map applicable European Union (EU) AI Act obligations and voluntary National Institute of Standards and Technology (NIST) AI Risk Management Framework (RMF) functions to controls. Composes ai-sdlc-operating-model, agent-governance-audit, and human-approval-boundary. Use for feature risk or policy review. Do NOT use for one change's process audit, technical threat modeling, or the software development lifecycle (SDLC) design."
+description: "Review the governance and risk posture of an artificial intelligence (AI) feature: classify impact, assign a human owner, match human oversight to risk, check disclosure, consent, data use, retention, and a feature card, then map applicable European Union (EU) AI Act obligations and voluntary National Institute of Standards and Technology (NIST) AI Risk Management Framework (RMF) functions to controls. Composes ai-sdlc-operating-model, agent-governance-audit, and human-approval-boundary. Use for feature risk or policy review. Do NOT use for one change's process audit, technical threat modeling, the software development lifecycle (SDLC) design, or the review workflow that delivers the chosen oversight (ai-human-in-the-loop-designer)."
 ---
 
 # AI Governance & Risk Reviewer
@@ -40,6 +40,9 @@ governance pack rather than restating it.
   — `agent-governance-audit` (evidence-based per-control audit).
 - Do NOT use when: enumerating technical threats (`ai-threat-modeler`) or
   defining the human+agent SDLC lifecycle (`ai-sdlc-operating-model`).
+- Do NOT use when: the oversight level is set and the ask is the workflow
+  that delivers it — which actions need confirmation, the review queue, and
+  approve, edit and reject — that is `ai-human-in-the-loop-designer`.
 
 ## Inputs to Inspect
 

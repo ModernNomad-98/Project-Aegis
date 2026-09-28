@@ -1,6 +1,6 @@
 ---
 name: human-approval-boundary
-description: Check current task instructions, prior conversation grants and the owner approval register before a risky action. Proceed within an active scoped grant; obtain a new explicit human approval only when the action is not covered or its security impact is unclear. Covers schema changes or destructive migrations, RLS or security policy, production data, secrets, deployments or releases, billing, git history rewrites and broad multi-file refactors. Use when a task approaches one of these boundaries or ambiguity would change what gets built. Produces a precise approval request and halts only for the uncovered action. Does not gate low-risk docs-only work. Do NOT use to persist or cite grant records (scoped-approval-register) or to stress-test approval flows for rubber-stamping (human-agent-trust-reviewer).
+description: Check current task instructions, prior conversation grants and the owner approval register before a risky action. Proceed within an active scoped grant; obtain a new explicit human approval only when the action is not covered or its security impact is unclear. Covers schema changes or destructive migrations, RLS or security policy, production data, secrets, deployments or releases, billing, git history rewrites and broad multi-file refactors. Use when a task approaches one of these boundaries or ambiguity would change what gets built. Produces a precise approval request and halts only for the uncovered action. Does not gate low-risk docs-only work. Do NOT use to persist or cite grant records (scoped-approval-register), to stress-test approval flows for rubber-stamping (human-agent-trust-reviewer), or to design a product AI feature's review workflow (ai-human-in-the-loop-designer).
 ---
 
 # Human Approval Boundary
@@ -32,6 +32,10 @@ exact action and impact so the human can decide in one read.
   `scoped-approval-register`; this skill decides whether approval is needed.
 - Do NOT use when: stress-testing approval flows for rubber-stamping — that
   is `human-agent-trust-reviewer`; this skill places the gates.
+- Do NOT use when: designing how a product's artificial intelligence (AI)
+  feature has its output reviewed, edited and approved by the product's
+  users before it becomes state — that is `ai-human-in-the-loop-designer`;
+  this skill governs the coding assistant's own risky steps.
 
 ## Inputs to Inspect
 
