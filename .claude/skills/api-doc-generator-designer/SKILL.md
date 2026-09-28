@@ -5,8 +5,9 @@ description: Design generated application programming interface (API) reference 
 
 # API Doc Generator Designer
 
-Here, **CI** means continuous integration, **SDK** means software development
-kit, and **SoT** means source of truth.
+Here, **API** means application programming interface, **CI** means
+continuous integration, **PR** means pull request, **SDK** means software
+development kit, and **SoT** means source of truth.
 
 ## Purpose
 

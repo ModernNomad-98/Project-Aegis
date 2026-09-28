@@ -5,6 +5,10 @@ description: Curate WHAT belongs in the regression suite and at which tier — p
 
 # Regression Suite Curator
 
+**Reading key:** PR means pull request; CI means continuous integration; QA
+means quality assurance; CODEOWNERS is a repository file that names the owners
+of paths.
+
 ## Purpose
 
 Keep the regression suite worth its runtime: every test in it earns its
@@ -21,14 +25,15 @@ the team applies between curation passes.
   tests should gate a release.
 - Use when: the suite is slow/bloated and needs trimming against a runtime
   budget without losing protection.
-- Use when: formalizing bug-fix→regression-test promotion (roadmap #190
-  regression-first thinking) or smoke-tier membership criteria.
+- Use when: formalizing bug-fix→regression-test promotion (the
+  regression-first bug-fixing practice, catalog item 190; historical planning
+  context, not a current gate) or smoke-tier membership criteria.
 - Use when: the quarantine list has become permanent storage — entries
   without owner/ticket/expiry.
 - Use when: after an incident, ensuring the incident's regression tests are
   promoted to the right tier.
 - Do NOT use when: a test fails intermittently and needs diagnosis —
-  `flaky-test-detective` (its case reports are curation INPUT).
+  `flaky-test-detective` *(manual-only)* (its case reports are curation INPUT).
 - Do NOT use when: designing CI mechanics, sharding, retry policy —
   `qa-automation-architect` (it sets tier budgets; this skill fills tiers).
 - Do NOT use when: mapping what tests cover requirements —
@@ -81,14 +86,14 @@ that answer as approval to delete tests or weaken a security regression.
    never sufficient cause on its own.
 5. **Enforce the quarantine registry:** every quarantined test has owner +
    ticket + expiry; expired entries get a decision NOW (diagnose via
-   `flaky-test-detective`, fix, or retire with rationale) — quarantine is a
+   `flaky-test-detective` *(manual-only)*, fix, or retire with rationale) — quarantine is a
    queue, not a destination.
 6. **Fit tiers to budgets:** with the automation blueprint's budgets,
    assign/demote until tiers fit — by evidence (catch-rate per runtime),
    not alphabetically; record what moved and why.
 7. **Publish the decision list + standing rules**, route implementation
    (test writing → engineer skills; deletions → normal review via
-   `reviewable-diff-discipline`), and set the next curation cadence.
+   `reviewable-diff-discipline` *(manual-only)*), and set the next curation cadence.
 
 ## Output Format
 
@@ -140,7 +145,7 @@ Next curation: <cadence/trigger>
 - Quarantine-with-expiry silently becomes quarantine-forever the first time
   an expiry passes unenforced — the registry check is the enforcement.
 - A curation pass that lands as one giant deletion PR is unreviewable —
-  batch retirements small, per `reviewable-diff-discipline`.
+  batch retirements small, per `reviewable-diff-discipline` *(manual-only)*.
 
 ## Stop Conditions
 

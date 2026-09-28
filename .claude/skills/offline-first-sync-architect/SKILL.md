@@ -5,6 +5,11 @@ description: 'Design the client offline data layer for a multi-tenant SaaS: dura
 
 # Offline-First Sync Architect
 
+**Reading key:** CRDT means conflict-free replicated data type, a data
+structure whose copies merge automatically; LWW means last-write-wins; SSE
+means server-sent events; authz means authorization; TTL means time to live,
+the expiry limit for a cached value; ack means acknowledgement.
+
 ## Purpose
 
 Offline-first is easy to demo and hard to get right: the demo shows an edit
@@ -44,7 +49,7 @@ a bug, not a strategy — this skill refuses it.
   (WebSocket/SSE channels, presence, subscribe-time authz) — that is
   `realtime-subscription-architect`; realtime is the online-delivery
   counterpart and can be the transport this engine syncs over, but it is a
-  distinct concern (the in-batch seam, pinned both ways).
+  distinct concern (both skills' evals test this boundary from their own side).
 
 ## Inputs to Inspect
 
@@ -226,6 +231,6 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - `evals/trigger-evals.json` — discrimination against `edge-state-ux-designer`
   (UX states vs sync engine), `caching-strategy-designer` (server cache vs
   client offline store), and `realtime-subscription-architect` (live online
-  push vs offline sync — the in-batch seam, pinned both ways).
+  push vs offline sync — a boundary both skills' evals test).
 - No `references/` — the queue/optimistic/conflict/reconciliation procedure
   above is complete; detail lives in the produced artifacts.

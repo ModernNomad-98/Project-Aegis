@@ -5,13 +5,20 @@ description: 'When the platform auto-deploys every merge to mainline, author sta
 
 # Merge-Is-Deploy Governance
 
+**Reading key:** PR means pull request; CI means continuous integration; API
+means application programming interface; PaaS means platform as a service, a
+host that builds and runs an app for you; GitOps means deployment by a
+controller that keeps an environment in sync with a Git branch; `<sha>` is a
+commit's identifying hash.
+
 ## Purpose
 
 Stop pretending there is a deploy step when there isn't one. On platforms
 that auto-deploy every merge to mainline, "we'll validate before deploying"
 is a fiction — the merge IS the deploy, and any validation that runs after
-it runs in production's timeline. The evidence pattern (Repo B's rulebook
-documents merge-is-deploy explicitly, records the branch-protection
+it runs in production's timeline. The evidence pattern (the rulebook of "Repo B", an anonymized source
+repository studied while this library was built, documents merge-is-deploy
+explicitly, records the branch-protection
 configuration in-repo, and defines revert-based rollback) is standing
 governance that aligns the paperwork with the physics: PR-time validation
 becomes the authoritative pre-production gate, post-merge checks are
@@ -38,10 +45,10 @@ owner or marked pending, instead of an unnoticed one.
   skill fixes the rollback PRIMITIVE (revert-PR-then-auto-redeploy) that
   the runbook elaborates.
 - Do NOT use when: deciding WHO may merge or arm auto-merge — that is
-  `agent-authorization-matrix`; this skill composes its floors and adds the
+  `agent-authorization-matrix` *(manual-only)*; this skill composes its floors and adds the
   pipeline-reality layer.
 - Do NOT use when: designing CI stages, artifact flow, or deploy strategies
-  — that is `ci-pipeline-architect`.
+  — that is `ci-pipeline-architect` *(manual-only)*.
 
 ## Inputs to Inspect
 
@@ -228,7 +235,7 @@ Gaps routed:        <check gaps, signal gaps, ownership gaps → owning skills/h
   misgoverns the real one.
 - The platform deploys from something OTHER than mainline merges (release
   tags, manual promote) → this skill's premise fails; say so and route to
-  `ci-pipeline-architect`/`release-readiness-reviewer` territory instead
+  `ci-pipeline-architect` *(manual-only)* or `release-readiness-reviewer` territory instead
   of forcing the pattern.
 
 ## Supporting Files

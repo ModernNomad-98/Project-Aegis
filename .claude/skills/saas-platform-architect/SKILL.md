@@ -5,6 +5,10 @@ description: Design the end-to-end structure of a multi-tenant SaaS platform —
 
 # SaaS Platform Architect
 
+**Reading key:** SaaS means software as a service; IdP means identity
+provider, the service that authenticates users; CI means continuous
+integration; UI means user interface.
+
 ## Purpose
 
 Produce a platform architecture for a multi-tenant SaaS that is reachable from

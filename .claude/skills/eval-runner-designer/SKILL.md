@@ -40,7 +40,7 @@ intact: this design creates no execution result and never implies otherwise.
   skill designs how cases EXECUTE; it takes their content as given.
 - Do NOT use when: designing evals for an AI product feature — regression
   suites, red-team cases, or quality metrics for an LLM system — that is
-  `ai-evaluation-harness`. This skill's subject is the library's own
+  `ai-evaluation-harness` *(manual-only)*. This skill's subject is the library's own
   skill-trigger and skill-behavior evals.
 - Do NOT use when: designing product test automation (unit/integration/E2E
   strategy, CI test pyramids) — that is `qa-automation-architect`.

@@ -35,8 +35,9 @@ never ships in that state.
 - Use when: a latency budget (`latency-budget-architect`) or split
   verdict (`operational-vs-analytical-splitter`) prescribes "cache" and
   the actual design now needs doing.
-- Do NOT use when: the read path is chatty (N+1, per-row lookups) —
-  `n-plus-one-detector` fixes the pattern FIRST; caching a storm hides
+- Do NOT use when: the read path is chatty (N+1 queries: one list query
+  followed by one query per row, or other per-row lookups) —
+  `n-plus-one-detector` *(manual-only)* fixes the pattern FIRST; caching a storm hides
   it and every miss replays it.
 - Do NOT use when: deciding the tenant-isolation posture of a NEW cache
   STORE (shared cluster vs per-tenant separation) —
@@ -91,7 +92,7 @@ staleness questions and any approval to add a store remain separate.
    that fail the interrogation: write-heavy data (invalidations exceed
    hits), unbounded key spaces (cache becomes a leak), zero staleness
    tolerance (see the authorization rule in Safety Rules), or a chatty
-   pattern in disguise (→ `n-plus-one-detector` first).
+   pattern in disguise (→ `n-plus-one-detector` *(manual-only)* first).
 2. **State the consistency envelope per item.** In writing, in the
    design: "served up to N seconds stale under normal operation, up to
    M during invalidation failure; never stale for <listed operations>".
@@ -139,7 +140,7 @@ staleness questions and any approval to add a store remain separate.
 8. **Plan the measurement.** Hit ratio target per cache (and what a
    LOW ratio triggers — removal is a valid outcome; an unhit cache is
    pure risk), staleness-incident tracking, memory/eviction telemetry
-   — wiring via `observability-operator`; latency effect verified
+   — wiring via `observability-operator` *(manual-only)*; latency effect verified
    through `performance-test-harness` gates where they exist.
 9. **Deliver the design** in the Output Format, one card per cached
    item — the envelope, layer, keys, invalidation, stampede, failure,
@@ -244,7 +245,7 @@ Verification: <before/after latency via performance-test-harness where wired>
   optimization → stop; apply the Safety Rule — explicit human approval
   with a revocation-propagation bound, or the answer is no.
 - Asked to cache to hide a chatty pattern ("cache the page, it does
-  400 queries") → refuse; route to `n-plus-one-detector` first, then
+  400 queries") → refuse; route to `n-plus-one-detector` *(manual-only)* first, then
   revisit surviving candidates.
 - No staleness tolerance can be stated for a candidate (the owner
   says "it must always be current") → the item is not cacheable as
