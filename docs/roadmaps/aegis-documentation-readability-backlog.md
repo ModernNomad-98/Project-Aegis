@@ -2,12 +2,13 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #442 (`7b3fbca`) on 2026-09-28 Coordinated
+As of merged pull request (PR) #454 (`5bd21fb`) on 2026-09-28 Coordinated
 Universal Time (UTC), this remains the active
 repository-wide documentation acceptance backlog. The latest count is in the
-paragraph for main after #442 (`7b3fbca`): 613 tracked Markdown files, 558
+paragraph for main after #454 (`5bd21fb`): 613 tracked Markdown files, 567
 accepted reader pages, one generated report, 44 classified synthetic fixtures
-and ten known pending pages; the paragraphs between are dated history, oldest first. The two component guides,
+and one known pending page; the paragraphs between are dated history, oldest
+first. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
 The **491-file inventory and the ordered "start with" steps below are the
@@ -616,6 +617,99 @@ of each pending page against
 audit report's output format, and the pre-rule sweep named above, which is
 expected to move more accepted pages to pending. No grant or gate changed.
 
+PRs #450 (`bb3b117`, 08:55 UTC), #445 (`8c52960`), #446 (`7005cda`), #447
+(`484d104`), #448 (`2bcbfe6`), #449 (`bb7ed71`), #451 (`0d4b093`) (all
+09:03 UTC), #443 (`e251c51`, 09:07 UTC), #452 (`419ad23`, 09:11 UTC) and
+#454 (`5bd21fb`, 09:17 UTC) merged on 2026-09-28 after #442, in that order.
+No Markdown file was added, removed or renamed. #443 changed only
+`.github/workflows/validate-skills.yml` (4 lines), which is not Markdown and
+is not counted; no synthetic fixture changed. Line counts are
+`git diff --numstat` from each merge's first parent, added plus deleted, as
+above. Each review below is posted on its PR, and each accepted head matches
+the page on main after #454: `git diff <head> 5bd21fb` is empty for that page,
+except the approval register, explained below, and the orchestrator page,
+which differs from its accepted head `469d6cb` only by the 8 lines #454
+reviewed and matches #454's head `6118210`. Codex posted only usage-limit
+notices on these PRs, so no Codex review exists for any of these heads.
+
+- **Accepted after full-page reviews (9 pages, all pending before).**
+  - #445 (`api-event-architect/SKILL.md` 8,
+    `ai-threat-modeler/references/llm-top10-threat-catalog.md` 12 and
+    `model-poisoning-reviewer/references/poisoning-controls.md` 10, all in
+    `.claude/skills/`): a full-page review of each page on `c5571a7` accepted
+    the first two and asked for one edit to the third. A corrected-candidate
+    re-read confirmed that edit and **accepted** all three on `07d002a`.
+  - #447: the [open-decisions index](aegis-open-decisions-2026-09-23.md) (55)
+    and `.github/pull_request_template.md` (8). A full-page read of both on
+    `7fc2fd6` accepted the template and returned FIX-FIRST on the index with
+    four named edits (E1–E4). A corrected-candidate check found exactly those
+    edits and **accepted** both on `420f823`.
+  - #449: the [AEGIS-060+ register](../audits/aegis-060-plus-register.md) (30)
+    and the
+    [live startup-routing acceptance record](../evidence/startup-routing/2026-09-live-acceptance.md)
+    (11). A review of each page against
+    [Acceptance for each page](#acceptance-for-each-page) on `5037d6a`
+    accepted the record and returned FIX-FIRST on the register with two
+    edits. A re-review found exactly those edits and **accepted** the
+    register on `04af9d9`; the record did not change after `5037d6a`.
+  - #451: the [skills catalog](../skills-catalog.md) (90). A full-page review
+    on `39a86e2` returned FIX-FIRST with four edits. A corrected-candidate
+    re-read, which scanned all 1,442 lines again, **accepted** it on
+    `2e15b23`.
+  - #452 and #454: `.claude/skills/project-orchestrator/SKILL.md`. #452 (40)
+    glossed abbreviations; a full-page review on `90849c1` returned FIX-FIRST
+    with two edits, and a re-review **accepted** the page on `469d6cb`. #454
+    then added the Stage 6 manual-only markers (8: 4 added, 4 deleted). Its
+    SHIP review on `6118210` checked those lines and confirmed the page was
+    unchanged since `469d6cb`; the reviewer counted 4, but this ledger counts
+    added plus deleted, so 8. That is a reviewed edit under 10 lines, so the
+    page **keeps acceptance**, with 8 lines since `469d6cb`.
+- **Accepted again (1 page, already counted as accepted).** #446: this ledger
+  (121 since `f9e5325`). A full-page re-read on `7a5b534` returned FIX-FIRST
+  and pre-cleared acceptance for exactly its edits F1a, F1b, F2a and F2b;
+  `git diff 7a5b534 47c78cb` is exactly those, so the ledger is **accepted**
+  on `47c78cb`. The same PR carries the targeted review that kept
+  [CONTRIBUTING](../../CONTRIBUTING.md) accepted.
+- **Generated report, preface reviewed (1 page, class unchanged).** #449 also
+  changed the hand-written preface of the
+  [skill-contract audit baseline report](../audits/skill-contract-audit-baseline.md)
+  (12). As the [generated-report rule](#remaining-page-review-in-larger-batches)
+  requires for hand-written text, the review on `5037d6a` read that preface
+  and accepted it. It also found the body byte-identical to main and
+  reproduced it from the generator. The page stays a **generated report,
+  format review pending**. The reviewer named two generator follow-ups: the
+  fixed "BEFORE remediation" text that the preface has to contradict, and
+  unexplained codes (P0/P1, CENSUS, §5, SEMANTIC-REVIEW CANDIDATE). Both are
+  fixes for the generator's template, not the file.
+- **Still pending, with new lines (1 page).** The
+  [approval register](../approvals/APPROVAL_REGISTER.md). #448 added a
+  reading aid (81). A full-page review of the whole register (1,763 lines)
+  on `3b9d74e` returned FIX-FIRST with three edits, and corrected-candidate
+  re-reads accepted `b04872c` and `2ee1050`. That full-page read covers the
+  268 lines counted before. But #450 (92, the AEGIS-APR-067 to APR-070
+  lifecycle events, which grant nothing) merged first, and `2ee1050` does not
+  contain it: `git diff 2ee1050 5bd21fb` on the register is exactly #450's 92
+  added lines. #450's SHIP review on `de428bf` checked each event's facts and
+  format, and the re-read on `2ee1050` confirmed that the reading aid's terms
+  cover the four events. Neither was a full-page readability read of the
+  merged page, and 92 is past 10, so the register stays **pending**, with 92
+  lines since its full-page acceptance.
+
+Main after #454 (`5bd21fb`) therefore has **613 tracked Markdown files: 567
+accepted reader pages, one generated report, 44 classified synthetic fixtures
+and one known pending page**. The 613 is `git ls-files '*.md'` on a checkout
+of `5bd21fb`, unchanged since #442. Accepted readers go 558 + 9 = 567, and
+pending goes 10 − 9 = 1; 567 + 1 + 44 + 1 = 613. The pending page is the
+approval register. This update changes this ledger by more than 10 lines, so
+it needs its own independent full-page re-read. The sweep of every accepted
+page for pre-rule edits, which the owner ordered on 2026-09-28, is in
+progress separately; its results come in a later ledger update and are
+expected to move accepted pages to pending, so these counts hold only until
+then. PRs merged after #454, such as #453 (AEGIS-APR-071 to APR-073 in the
+approval register) and #455 (D15 enrichment deltas to four shipped skills),
+are not counted here; a later ledger update records them. No grant or gate
+changed.
+
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
 the [Behavioral Eval Runner (BER) selected-precheck aggregate decision page](ber-precheck-aggregate-validation-proposal.md)
@@ -1021,6 +1115,15 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Orchestrator Stage 6 markers, PR #454, after #452, 2026-09-28 | `project-orchestrator/SKILL.md` | 8 lines (+4/−4) after the #452 acceptance on `469d6cb`. The SHIP review on `6118210` checked them, so the page **keeps acceptance** (8 since `469d6cb`). Main after #454 (`5bd21fb`) has 613: 567 accepted readers, one generated report, 44 classified fixtures and one known pending. No grant or gate changed. |
+| Orchestrator glosses, PR #452, after #443, 2026-09-28 | `project-orchestrator/SKILL.md` | 40 lines. A full-page review on `90849c1` returned FIX-FIRST with two edits; a re-review **accepted** the page on `469d6cb`. It had been pending since #442 (50 lines, counting pre-rule edits). |
+| Setup-node action bump, PR #443, after #451, 2026-09-28 | None | Changed only `.github/workflows/validate-skills.yml` (4 lines), which is not Markdown. |
+| Skills catalog glossary, PR #451, after #449, 2026-09-28 | [Skills catalog](../skills-catalog.md) | 90 lines. A full-page review on `39a86e2` returned FIX-FIRST with four edits; a corrected-candidate re-read **accepted** it on `2e15b23`, which matches main. |
+| Audit and evidence readability, PR #449, after #448, 2026-09-28 | AEGIS-060+ register, live startup-routing acceptance record and the audit report preface | Register (30) **accepted** on `04af9d9` after a FIX-FIRST on `5037d6a`; record (11) **accepted** on `5037d6a`, unchanged since. The report's hand-written preface (12) was reviewed and accepted on `5037d6a`; the report stays a generated report, format review pending. |
+| Register reading aid and closeout events, PRs #450 and #448, after #447, 2026-09-28 | [Approval register](../approvals/APPROVAL_REGISTER.md) | #448 (81): a full-page review on `3b9d74e`, then corrected-candidate re-reads, accepted the reading aid on `2ee1050`. #450 (92, APR-067 to APR-070) merged first and is not in `2ee1050`; its SHIP review was not a full-page readability read. 92 lines since the full-page acceptance, so the register stays **pending**. |
+| Open decisions and PR template fixes, PR #447, after #446, 2026-09-28 | [Open-decisions index](aegis-open-decisions-2026-09-23.md) and `.github/pull_request_template.md` | Index (55) and template (8): a full-page read on `7fc2fd6` accepted the template and returned FIX-FIRST on the index; a corrected-candidate check **accepted** both on `420f823`, which matches main. |
+| Ledger for #438–#442, PR #446, after #445, 2026-09-28 | This ledger | 121 lines. A full-page re-read on `7a5b534` pre-cleared four named edits; `47c78cb` is exactly those, so the ledger is **accepted** on `47c78cb`. |
+| Re-read fixes to three skill pages, PR #445, after #450, 2026-09-28 | `api-event-architect/SKILL.md`, `llm-top10-threat-catalog.md` and `poisoning-controls.md` | 8, 12 and 10 lines. A full-page review on `c5571a7` accepted two and asked one edit on the third; a corrected-candidate re-read **accepted** all three on `07d002a`, which matches main. |
 | Session checkpoint, PR #442, after #441, 2026-09-28 | New [session checkpoint page](session-checkpoint-2026-09-27.md); approval register and open-decisions index | After a REVISE review and its four named edits, a corrected-candidate check **accepted** the new page on `63387ef`, which matches main. The approval register (21) and open-decisions index (3) stay **pending**. Under the owner's 2026-09-28 decisions, `project-orchestrator/SKILL.md` (50 lines, counting pre-rule edits) becomes **pending**, `CONTRIBUTING.md` keeps acceptance after a targeted review, and the audit baseline report moves to the generated-report class. Main after #442 (`7b3fbca`) has 613: 558 accepted readers, one generated report, 44 classified fixtures and ten known pending. No grant or gate changed. |
 | Audit baselines regenerated with engine v1.13.2, PR #441, after #440, 2026-09-27 | AEGIS-060+ register and the generated [audit baseline report](../audits/skill-contract-audit-baseline.md) | SHIP review on `d864597` reproduced the regenerated files; it was not a full-page review. The register (44 with earlier edits) stays **pending**. Under the owner's 2026-09-28 decision the report is a generated report: the reproduction verifies it, and its output format awaits one review. The three JSON baselines are not Markdown. |
 | Ledger for #420–#439, PR #440, and register lifecycle events, PR #438, after #439, 2026-09-27 | This ledger; approval register and open-decisions index | The ledger's review pre-cleared acceptance for one named edit, and `f9e5325` is exactly that edit, so the ledger is **accepted** on `f9e5325`. #438 added 171 lines to the approval register and 30 to the open-decisions index; both stay **pending**. |
