@@ -145,6 +145,19 @@ from tools.aegis_delivery_control.tests._trusted_readiness_store import (
 )
 
 
+from tools.aegis_delivery_control.tests import _owner_private_fixtures
+
+
+def setUpModule() -> None:
+    # Temporary trusted roots and fixture files must be owner-private, as
+    # production requires. See the helper.
+    _owner_private_fixtures.enter()
+
+
+def tearDownModule() -> None:
+    _owner_private_fixtures.restore()
+
+
 def BudgetSettlementRequest(*args, **kwargs):
     kwargs.setdefault("repository_id", "repo-1")
     kwargs.setdefault("run_id", "run-1")

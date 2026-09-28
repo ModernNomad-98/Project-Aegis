@@ -33,15 +33,15 @@ from tools.aegis_delivery_control.storage import (
     SQLiteStateStore,
     default_state_root,
 )
-from tools.aegis_delivery_control.tests import _owner_private_umask
+from tools.aegis_delivery_control.tests import _owner_private_fixtures
 
 
 def setUpModule() -> None:
-    _owner_private_umask.enter()
+    _owner_private_fixtures.enter()
 
 
 def tearDownModule() -> None:
-    _owner_private_umask.restore()
+    _owner_private_fixtures.restore()
 
 
 class PlatformContractTests(unittest.TestCase):

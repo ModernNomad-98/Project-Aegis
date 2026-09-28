@@ -20,6 +20,19 @@ from tools.aegis_delivery_control.evidence import (
 )
 
 
+from tools.aegis_delivery_control.tests import _owner_private_fixtures
+
+
+def setUpModule() -> None:
+    # Temporary trusted roots and fixture files must be owner-private, as
+    # production requires. See the helper.
+    _owner_private_fixtures.enter()
+
+
+def tearDownModule() -> None:
+    _owner_private_fixtures.restore()
+
+
 class CapabilityProofTests(unittest.TestCase):
     def test_manual_and_controller_race_one_source_token(self) -> None:
         source = SyntheticClaimSource("token-1", expires_at=100)

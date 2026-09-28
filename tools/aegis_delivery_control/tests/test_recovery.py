@@ -29,6 +29,19 @@ from tools.aegis_delivery_control.tests._trusted_readiness_store import (
 )
 
 
+from tools.aegis_delivery_control.tests import _owner_private_fixtures
+
+
+def setUpModule() -> None:
+    # Temporary trusted roots and fixture files must be owner-private, as
+    # production requires. See the helper.
+    _owner_private_fixtures.enter()
+
+
+def tearDownModule() -> None:
+    _owner_private_fixtures.restore()
+
+
 def PlanAcceptanceRequest(*args, **kwargs):
     """Build a newly accepted synthetic plan with explicit immutable pins."""
     check_ids = kwargs.get("check_ids", args[11] if len(args) > 11 else ())
