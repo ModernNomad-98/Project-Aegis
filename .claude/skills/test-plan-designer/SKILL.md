@@ -6,7 +6,7 @@ description: 'Design the concrete test plan for ONE feature, change, or release 
 # Test Plan Designer
 
 **Reading key:** QA is quality assurance; PR is pull request; RLS is
-row-level security; CI is continuous integration; E2E is end-to-end. Severity 1 and 2 below
+row-level security; CI is continuous integration; E2E is end-to-end; API is application programming interface; UI is user interface. Severity 1 and 2 below
 mean the project's two highest incident/defect levels; use the project's
 actual severity policy when it differs.
 

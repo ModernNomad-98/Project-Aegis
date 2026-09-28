@@ -19,7 +19,7 @@ For each risk, walk this list and keep what applies:
 
 ## Negative-path matrix
 
-One row per surface the change touches, one column per negative class. Each
+One row per surface the change touches (an application programming interface (API) endpoint, form, job or webhook), one column per negative class. Each
 cell names a plan item by its test ID (such as `T-inv-01`), says "Not applicable:" with a reason, or delegates.
 A blank cell is a plan defect. When the requester narrows scope, the
 skipped classes go on the out-of-scope list by name.
@@ -65,7 +65,7 @@ of those layers, with `accessibility-test-harness` owning their criteria.
 | pure logic/validation | unit | `vitest-unit-component-engineer` |
 | service/command through the database + auth | integration | `integration-test-designer` |
 | application programming interface (API)/webhook shape & compatibility | contract | `api-contract-test-designer` |
-| critical journey in real UI | E2E | `playwright-e2e-engineer` |
+| critical journey in the real user interface (UI) | E2E | `playwright-e2e-engineer` |
 | visual/user experience (UX) judgment | manual | `manual-test-case-creator` + evidence plan |
 | keyboard/focus/contrast/screen reader | integration, E2E, or manual | `accessibility-test-harness` |
 
