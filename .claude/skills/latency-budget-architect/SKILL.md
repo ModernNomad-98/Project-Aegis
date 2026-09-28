@@ -16,7 +16,8 @@ end-to-end latency target into per-hop budgets: an explicit allocation
 of milliseconds per component, tail-composition math done honestly,
 timeouts and retry policies derived from the budgets they must respect,
 headroom held in reserve, and an attribution method so a violated
-budget names its hop. The target itself comes from the user-journey SLO
+budget names its hop. The target itself comes from the user-journey
+service level objective (SLO)
 (`slo-reliability-architect`) — this skill engineers the spend plan
 that makes the target achievable by design rather than by hope.
 
@@ -43,10 +44,10 @@ that makes the target achievable by design rather than by hope.
   latency measurement, baselines, and regression gates are
   `performance-test-harness`; budgets become its thresholds.
 - Do NOT use when: the work is implementing trace instrumentation or
-  dashboards — `observability-operator` wires what this design
+  dashboards — `observability-operator` *(manual-only)* wires what this design
   requires.
 - Do NOT use when: a specific hop needs its time reduced — that is
-  the owning skill's job (`query-plan-reader` for a query,
+  the owning skill's job (`query-plan-reader` *(manual-only)* for a query,
   `caching-strategy-designer` for a cache, `frontend-perf-engineer`
   for the browser share); this skill decides how much time the hop
   MAY spend, not how it gets there.
@@ -55,10 +56,11 @@ that makes the target achievable by design rather than by hope.
 
 1. The end-to-end target and its provenance: the SLO catalog entry
    (`slo-reliability-architect` output), contract clause, or product
-   requirement — with its percentile (a p50 budget and a p99 budget
+   requirement — with its percentile (pXX is the latency that XX% of
+   requests stay within, so p99 covers all but the slowest 1%; a p50 budget and a p99 budget
    are different documents; know which is being allocated).
 2. The request path, as it actually is: every hop a request traverses
-   — edge/CDN, gateway, auth, services, databases/caches, queues,
+   — edge/content delivery network (CDN), gateway, auth, services, databases/caches, queues,
    third parties — from trace data where it exists, architecture docs
    where it doesn't (and mark the doc-only hops as unverified).
 3. Current per-hop reality: measured per-hop latency distributions
@@ -99,7 +101,7 @@ authorize execution.
 3. **Allocate the budget per hop.** Start from measured reality
    (input 3), assign each hop a number, and include the overhead rows
    folklore omits: serialization/deserialization, connection
-   establishment (cold pools, TLS), queue wait under load, and ONE
+   establishment (cold pools, Transport Layer Security (TLS) handshakes), queue wait under load, and ONE
    retry of the most-likely-to-retry hop. The sum of allocations plus
    headroom equals the target — arithmetic that must visibly close.
 4. **Hold headroom explicitly.** 15–25% of the target stays
@@ -123,14 +125,14 @@ authorize execution.
 7. **Design violation attribution.** Per-hop spans with the budget
    annotated (trace attribute or naming convention), so "the p95
    regressed" decomposes into "hop X exceeded its 40ms by 60ms" —
-   wiring via `observability-operator`; pre-release verification of
+   wiring via `observability-operator` *(manual-only)*; pre-release verification of
    budgets via `performance-test-harness` gates where they exist.
 8. **Install the budget-claim review rule.** A new dependency, new
    hop, or new work on a budgeted path claims budget in the design
    review: from headroom (path owner signs), from another hop
    (that owner signs), or the end-to-end target is renegotiated
    (`slo-reliability-architect` loop). Unclaimed spend is how 300ms
-   paths become 700ms paths one PR at a time. If the owner must choose a
+   paths become 700ms paths one pull request (PR) at a time. If the owner must choose a
    claim path, define headroom as reserved time, reallocation as moving
    a named hop's allowance with its owner's agreement, and renegotiation
    as changing the user-facing target through the SLO owner. Compare
@@ -250,10 +252,10 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
   cannot be arithmetic'd into existence.
 - Per-hop measurements don't exist and the path map is doc-only →
   deliver only a provisional budget marked as such, with the tracing
-  gap named as the first work item (via `observability-operator`);
+  gap named as the first work item (via `observability-operator` *(manual-only)*);
   refuse to present a doc-derived budget as engineering truth.
 - A third-party dependency's latency distribution is outside the
-  budget and cannot be bounded (no SLA, observed tail beyond the
+  budget and cannot be bounded (no service level agreement (SLA), observed tail beyond the
   whole target) → surface the structural conflict for a human
   decision (remove from path, make async, accept the miss rate) —
   do not bury an unbudgetable hop inside a closing table.

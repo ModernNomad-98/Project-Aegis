@@ -6,7 +6,8 @@ description: Map a DECIDED logical architecture onto provider-idiomatic Azure fo
 # Azure SaaS Architect
 
 **Reading key:** API means application programming interface; DB means
-database. The service map below uses current product names as choices to
+database; SaaS means software as a service. The last paragraph of Purpose
+defines the other abbreviations used here, such as IaC, CI/CD and SKU. The service map below uses current product names as choices to
 verify, not as fixed quota or price claims.
 
 ## Purpose
@@ -108,7 +109,7 @@ to evaluate; they do not verify a current Azure offering, limit or price.
    consumer-side tenant scoping stated.
 7. **Wire observability and secrets**: Application Insights + Azure Monitor
    + Log Analytics with tenant-tagged telemetry (design detail per
-   `observability-operator` / `slo-reliability-architect`), Key Vault per
+   `observability-operator` *(manual-only)* / `slo-reliability-architect`), Key Vault per
    environment for secrets/keys/certs with rotation posture, diagnostic
    settings shipped to Log Analytics by default.
 8. **Set the CI/CD and security posture**: deployment via GitHub Actions or
@@ -127,7 +128,7 @@ to evaluate; they do not verify a current Azure offering, limit or price.
      Sentinel without a triage practice is shelfware (a maturity call,
      like AKS). Detection-rule/alert design belongs to
      `security-logging-alerting-architect`; operating the stack to
-     `observability-operator`.
+     `observability-operator` *(manual-only)*.
    - Defender for Cloud Apps (CASB) + Entra ID Protection + Conditional
      Access (risk-based sign-on on the step-2 identity plane):
      name-and-place for enterprise estates — these govern
@@ -139,7 +140,7 @@ to evaluate; they do not verify a current Azure offering, limit or price.
    The mapper NAMES and PLACES these services and ties them to isolation,
    cost, and maturity; deep threat modeling belongs to `threat-modeler` /
    `ai-threat-modeler`. Pipeline design itself belongs to
-   `ci-pipeline-architect`.
+   `ci-pipeline-architect` *(manual-only)*.
 9. **Declare the IaC strategy**: Bicep (Azure-native) or Terraform (mixed
    estates) — one primary tool, state/environment layout, module
    conventions; review discipline per `iac-reviewer`.

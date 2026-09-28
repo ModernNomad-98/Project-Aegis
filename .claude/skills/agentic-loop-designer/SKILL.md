@@ -35,7 +35,7 @@ empty set: an empty result is a legitimate stop, never forced into
 fabricated output; and (5) a plan → act → observe → reflect structure with
 the stop check run every iteration. This skill DESIGNS the loop; the
 security review of loop manipulation — hijacked goals, adversarial threat
-paths — belongs to `agent-goal-hijack-defender` and `ai-threat-modeler`. It
+paths — belongs to `agent-goal-hijack-defender` *(manual-only)* and `ai-threat-modeler`. It
 PRODUCES the artifact those skills review.
 
 ## Use When
@@ -54,7 +54,7 @@ PRODUCES the artifact those skills review.
   changes no live system.
 - Do NOT use when: the job is the ATTACK REVIEW of the loop — can injected
   content redirect the agent's goal or plan — that is
-  `agent-goal-hijack-defender`, with `ai-threat-modeler` for the broader
+  `agent-goal-hijack-defender` *(manual-only)*, with `ai-threat-modeler` for the broader
   adversarial threat map. This skill DESIGNS the loop; the security review
   of it belongs to those skills.
 - Do NOT use when: the question is the BUDGET — token caps, spend limits,
@@ -63,7 +63,7 @@ PRODUCES the artifact those skills review.
   semantics and stopping, not its price.
 - Do NOT use when: a run has already broken the working state (dirty tree,
   interrupted operation, partial commit) — recovery is
-  `agent-failure-recovery`; this skill designs the loop structure
+  `agent-failure-recovery` *(manual-only)*; this skill designs the loop structure
   (checkpoints, typed failures, resumable state) that recovery plugs into.
 - Do NOT use when: the subject is the operating environment's gating —
   mediation point, pre-flight ladder, registry, instruction custody — that
@@ -151,7 +151,7 @@ PRODUCES the artifact those skills review.
    terminal state.
 6. **Design the checkpoint/resume sockets.** Persist enough state per
    iteration that a broken run can be diagnosed and resumed —
-   `agent-failure-recovery` handles the recovery; this design gives it
+   `agent-failure-recovery` *(manual-only)* handles the recovery; this design gives it
    something to recover.
 7. **Prove the stops can fire.** Design the tests: the ceiling actually
    halts a run; a policy rejection and an evidenced permanent failure are
@@ -282,7 +282,7 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - Wiring the designed loop into a live agent → implementation under the
   repo's approval path; this skill designs, it does not deploy.
 - The real concern is goal hijack, adversarial manipulation, or the threat
-  map → hand to `agent-goal-hijack-defender` / `ai-threat-modeler` and
+  map → hand to `agent-goal-hijack-defender` *(manual-only)* / `ai-threat-modeler` and
   stop.
 
 ## Supporting Files

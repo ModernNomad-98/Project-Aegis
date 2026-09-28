@@ -40,7 +40,7 @@ vetted cryptographic primitives, it does not invent them.
   impersonation/support access — that is `authorization-matrix-designer`;
   member RBAC (identity → role → permission) is a different model from a
   bearer link, and a member "shared-with" grant is RBAC, not a public link.
-- Do NOT use when: the credential is a MACHINE one — API keys, webhook
+- Do NOT use when: the credential is a MACHINE one — application programming interface (API) keys, webhook
   signing, partner secrets — that is `api-event-architect`.
 - Do NOT use when: the "guest" is really a member with a lightweight role —
   route to `authorization-matrix-designer`; a guest here holds a link, not an
@@ -94,7 +94,7 @@ vetted cryptographic primitives, it does not invent them.
    boundary: the link exposes exactly the shared resource and nothing else — no
    navigation to sibling records, no tenant-wide reads. A link that widens
    beyond its resource is the bug this skill exists to prevent.
-   Treat the bearer link as a secret in URL handling: suppress it from
+   Treat the bearer link as a secret in web address (URL) handling: suppress it from
    request logs and analytics, prevent referrer leakage, and avoid exposing
    it in page assets or third-party navigation.
 7. **Specify the audit contract.** Record link creation (who, resource, scope,
@@ -143,7 +143,7 @@ Owner choice brief (only if needed): <terms; why now; options with money,
 - [ ] Tokens are opaque and high-entropy — enumeration is infeasible, not
       merely inconvenient; no sequential/derivable ids.
 - [ ] Every link has an expiry and can be revoked, and revocation is checked
-      server-side on every use (not just a hidden UI button).
+      server-side on every use (not just a hidden user interface (UI) button).
 - [ ] Scope is bound per link to one resource + one permission, stored
       server-side behind a verifier/fingerprint; a view link cannot be
       escalated to edit.

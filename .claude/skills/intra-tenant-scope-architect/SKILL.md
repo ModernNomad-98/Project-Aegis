@@ -42,7 +42,7 @@ a dimension inside a tenant, it does not define or replace the tenant.
   that is `multi-tenant-data-architect`; this skill adds a subordinate axis and
   presupposes that layer.
 - Do NOT use when: designing roles × permissions × resources — what a role CAN
-  do, object-level authz — that is `authorization-matrix-designer`; a scope is
+  do, object-level authorization (authz) — that is `authorization-matrix-designer`; a scope is
   a propagated ROW-FILTER dimension, not a permission. The same role can be
   held by two users with different scopes.
 - Do NOT use when: the "scope" is really an ad-hoc share of one record with a
@@ -76,7 +76,7 @@ a dimension inside a tenant, it does not define or replace the tenant.
    relationship to the tenant (a scope belongs to exactly one tenant), and
    whether scopes nest (region → site). If nesting is supported, expand a
    granted parent to its authorized descendants server-side before building
-   the effective scope predicate; do not assume a region ID directly matches
+   the effective scope predicate; do not assume a region identifier (ID) directly matches
    site rows.
 3. **Design the per-user scope-grant model.** A user is granted one or more
    scope values within their tenant; state how a new user gets a default scope

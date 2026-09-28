@@ -64,7 +64,8 @@ organize the content (that's `diataxis-doc-organizer`) or write it.
 
 1. **Locate docs in the repo and choose the format.** Docs live beside the
    code they describe so they change in the same PR — the core docs-as-
-   code move. Pick a format (Markdown/MDX, reStructuredText, AsciiDoc) and
+   code move. Pick a format (Markdown, MDX — Markdown that can embed interactive
+   components — reStructuredText (rST), AsciiDoc) and
    a static-site generator matched to needs (versioning, API docs, search,
    i18n), not fashion. State why.
 2. **Design the build/preview/deploy pipeline.** Local preview for
@@ -87,7 +88,7 @@ organize the content (that's `diataxis-doc-organizer`) or write it.
    published docs match what's shipped. Single-source version numbers and
    commands rather than hardcoding them across pages.
 7. **Provide search and navigation infra.** Client-side or hosted search,
-   generated nav, and stable URLs (redirects on moves so links don't rot).
+   generated navigation, and stable web addresses (URLs) (redirects on moves so links don't rot).
 8. **Define the docs contribution workflow.** How outside/inside
    contributors edit docs (edit-on-this-page, preview, checks) — the
    MECHANICS; the human-facing guide content is `contribution-guide-author`'s.
