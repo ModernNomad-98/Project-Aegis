@@ -20,7 +20,7 @@ provider change cannot silently regress behavior. The harness pairs a
 versioned dataset (representative + adversarial/red-team + regression cases)
 with per-dimension graders (task quality, schema adherence, safety/refusal,
 groundedness, injection resistance, latency, cost), explicit thresholds, and a
-CI gate. It **absorbs the AI security test harness** (reconciliation §3): the
+CI gate. It **absorbs the AI security test harness** (no separate skill exists for it): the
 red-team suites produced by `ai-threat-modeler`, `prompt-injection-defender`,
 `agent-tool-safety-guard`, and the `ai-security-red-team-reviewer` subagent are
 encoded here as first-class safety dimensions. Because executing the suite
@@ -40,7 +40,7 @@ sends real requests that **spend tokens and money**, this skill is
   (`qa-automation-architect`) or curating which regression tests belong
   (`regression-suite-curator`) — those are code tests, this is model behavior.
 - Do NOT use when: producing the threat model (`ai-threat-modeler`) or
-  monitoring live production traffic (`observability-operator`).
+  monitoring live production traffic (`observability-operator` *(manual-only)*).
 
 ## Inputs to Inspect
 
@@ -48,7 +48,7 @@ sends real requests that **spend tokens and money**, this skill is
    refusal/safety policy, the output contract (schema from
    `structured-output-validator`).
 2. Red-team material to encode: threat-model abuse cases, injection payloads,
-   tool-misuse attempts, disclosure probes — from the Phase 7 design skills.
+   tool-misuse attempts, disclosure probes — from the AI security design skills.
 3. Existing evals/datasets, any production failure cases worth freezing as
    regressions, and known-good reference outputs.
 4. The change surface the gate protects: which prompt/model/retrieval/provider
@@ -81,7 +81,8 @@ sends real requests that **spend tokens and money**, this skill is
    regression cases (every past failure frozen). Version it; each case has an
    id, inputs, and expected behavior/assertion.
 3. **Choose graders per dimension.** Prefer deterministic graders (schema
-   validation, string/JSON assertions, tool-call-was-denied checks) over
+   validation, string or JavaScript Object Notation (JSON) assertions,
+   tool-call-was-denied checks) over
    LLM-as-judge; where a judge is needed, pin its model and calibrate it, and
    record that judges are themselves fallible. Safety graders assert the SAFE
    outcome (refused, denied at the action boundary, no secret emitted).
@@ -110,7 +111,7 @@ AI EVAL HARNESS — <feature>  (manual-only; runs spend tokens/$)
 Dimensions & thresholds: <quality|schema|safety/refusal|grounding|injection|latency|cost — pass bar each>
 Dataset (versioned <vN>): representative <n> | adversarial <n> | regression <n>
 Graders: <dimension → grader type (deterministic / reference / judge) + limits>
-Security suites encoded: <injection|jailbreak|exfil|tool-misuse|disclosure — source skill>
+Security suites encoded: <injection|jailbreak|exfiltration|tool-misuse|disclosure — source skill>
 CI gate: <trigger, blocking thresholds, diff report, cost cadence>
 Run report (if executed): <per-dimension score vs baseline | regressions | tokens/$ spent>
 Not run / deferred: <what and why>
@@ -169,7 +170,8 @@ Not run / deferred: <what and why>
 - Running the suite would spend real tokens/money: this skill is manual-only —
   the run is a human-authorized step, and cost is disclosed first.
 - The red-team material hasn't been designed yet — get it from
-  `ai-threat-modeler` / `prompt-injection-defender` / `agent-tool-safety-guard`;
+  `ai-threat-modeler` / `prompt-injection-defender` *(manual-only)* /
+  `agent-tool-safety-guard`;
   this harness runs suites, it doesn't invent the threat model.
 - A run reveals an active safety regression already shipped to production —
   route to the human incident owner and approved response runbook. The
