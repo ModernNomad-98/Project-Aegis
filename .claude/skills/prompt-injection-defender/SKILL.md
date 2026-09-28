@@ -49,7 +49,7 @@ and security-relevant.
 - Use when: the feature accepts images, screenshots, scanned or uploaded
   documents, voice or audio, video, or files whose metadata reaches the
   model, and instructions hidden in that content must not steer it.
-- Do NOT use when: enumerating the whole AI threat surface —
+- Do NOT use when: enumerating the whole artificial intelligence (AI) threat surface —
   `ai-threat-modeler`.
 - Do NOT use when: the risk is retrieval crossing tenants
   (`rag-security-architect`), tool scope (`agent-tool-safety-guard`), output

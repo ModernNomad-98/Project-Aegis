@@ -90,7 +90,7 @@ recipe never exceeds it.
 
 ## Worked boundary example (three lanes)
 
-| Surface | Lane A (backend read handlers) | Lane B (frontend) | Lane C (AI routing) |
+| Surface | Lane A (backend read handlers) | Lane B (frontend) | Lane C (artificial intelligence (AI) routing) |
 | --- | --- | --- | --- |
 | `src/api/read/**` | §1 owns | §6 must-not | §6 must-not |
 | `src/app/routes/**` | §6 must-not | §1 owns | §6 must-not |

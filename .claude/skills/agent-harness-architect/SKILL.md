@@ -14,7 +14,7 @@ remain separate decisions.
 
 An agent's authority is a property of its environment, not of its obedience.
 This skill designs that environment — the harness: the governed runtime every
-model call and tool call of an AI agent passes through. The deliverable is a
+model call and tool call of an artificial intelligence (AI) agent passes through. The deliverable is a
 harness design with six load-bearing parts: (1) ONE server-side mediation
 point no model or tool call can go around; (2) caller identity verified from
 credentials — never from anything the model or client supplies in a payload —

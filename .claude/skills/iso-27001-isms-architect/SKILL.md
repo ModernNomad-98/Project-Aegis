@@ -34,7 +34,7 @@ decides that.
   or repaired.
 - Do NOT use when: writing the per-control applicability document — that is
   `statement-of-applicability-author` (this skill mandates and consumes it).
-- Do NOT use when: the target is the AI management system
+- Do NOT use when: the target is the artificial intelligence (AI) management system
   (`iso-42001-aims-architect`), a System and Organization Controls 2 (SOC 2) attestation
   (`soc2-trust-criteria-mapper`), or a where-do-we-stand assessment
   (`compliance-gap-auditor`).

@@ -51,7 +51,7 @@ The merge commit is the `main` commit that each PR created.
 | [#421](https://github.com/ModernNomad-98/Project-Aegis/pull/421) | `4b205a7a56b6ba3cfa56f13e7e7d70d0c7d36944` | Required the security line on every PR; kept the checklist advisory |
 | [#422](https://github.com/ModernNomad-98/Project-Aegis/pull/422) | `5d91fa5c1b3b7d0f0e0335c362e9cacf99d03cf5` | Re-read fixes to `hidden-context-exposure-reviewer` and `agent-tool-safety-guard` |
 | [#423](https://github.com/ModernNomad-98/Project-Aegis/pull/423) | `656194426e2ea3358fa29fcf19e05f0278d9c270` | Added D67, the after-the-fact decision record for `aegis-setup` |
-| [#424](https://github.com/ModernNomad-98/Project-Aegis/pull/424) | `5711ddfc875a1866485c8feceac83490b656fa6c` | Extended `llm-output-safety-reviewer` to AI-generated code |
+| [#424](https://github.com/ModernNomad-98/Project-Aegis/pull/424) | `5711ddfc875a1866485c8feceac83490b656fa6c` | Extended `llm-output-safety-reviewer` to artificial intelligence (AI)-generated code |
 | [#425](https://github.com/ModernNomad-98/Project-Aegis/pull/425) | `7b8884133fe92da8adae6b929c5440e05c1ed10b` | Dated the BER README's pinned census counts |
 | [#426](https://github.com/ModernNomad-98/Project-Aegis/pull/426) | `a06f815b602705f2ca75bad3ccea520c24fa429e` | Recorded #410 and #412–#419 in the readability ledger |
 | [#427](https://github.com/ModernNomad-98/Project-Aegis/pull/427) | `0030e73f3616c46be3393813ea403c262d96a823` | Extended `prompt-injection-defender` to multimodal injection |

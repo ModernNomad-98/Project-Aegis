@@ -40,7 +40,7 @@ person runs that skill by name; it is never invoked automatically.
 ## Use When
 
 - Use when: adding token caps, budgets, quotas, rate limits, or concurrency
-  limits to an AI feature.
+  limits to an artificial intelligence (AI) feature.
 - Use when: defending against unbounded consumption — token-drain,
   denial-of-wallet (attacker makes you spend), context stuffing, agent
   loops, retry storms.

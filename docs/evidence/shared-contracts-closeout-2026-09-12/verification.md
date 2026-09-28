@@ -91,7 +91,7 @@ distinct bounded slices using Aegis library, contract and QA review workflows:
   bypasses were repaired and covered by negative cases, including the last empty
   ATX-heading case.
 
-These are local AI reviews. They do not satisfy GitHub's required approving review
+These are local artificial intelligence (AI) reviews. They do not satisfy GitHub's required approving review
 and do not measure model trigger accuracy. Authored skill evals are fixtures, not
 executed live-model evaluations. Neither measured calibration nor human labels,
 holdout execution, OD-1 or WP-2B-4 is completed by these checks.

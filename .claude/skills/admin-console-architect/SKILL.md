@@ -41,7 +41,7 @@ does not grant anyone real production access.
   traces, logs to SEE system state — that is `observability-operator`; this
   console is the ACTION surface (telemetry may be embedded, but seeing is not
   acting).
-- Do NOT use when: the authority in question is an AI AGENT's (what an agent
+- Do NOT use when: the authority in question is an artificial intelligence (AI) AGENT's (what an agent
   may merge/deploy/do) — that is `agent-authorization-matrix`; this console is
   for HUMAN operators.
 - Do NOT use when: the task is the incident response PLAYBOOK (the steps taken

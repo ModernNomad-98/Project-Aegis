@@ -14,7 +14,7 @@ permission to use credentials or call a provider.
 
 ## Purpose
 
-Design the single layer every model call flows through, so the AI system has
+Design the single layer every model call flows through, so the artificial intelligence (AI) system has
 one place to enforce credential custody, model selection, cost controls,
 telemetry, and failure handling — instead of scattered SDK calls each doing
 their own thing. The deliverable: an internal routing interface in front of

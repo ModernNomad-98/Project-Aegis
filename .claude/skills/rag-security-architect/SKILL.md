@@ -29,7 +29,7 @@ and `multi-tenant-data-architect`, not re-invented here.
 
 - Use when: building or reviewing a RAG pipeline, vector database, embedding
   index, or semantic search over access-controlled or multi-tenant data.
-- Use when: adding retrieval to an AI feature and retrieved documents have
+- Use when: adding retrieval to an artificial intelligence (AI) feature and retrieved documents have
   per-user or per-tenant access rules.
 - Use when: a vector store is shared across tenants and you need to prove one
   tenant's queries cannot surface another tenant's documents.

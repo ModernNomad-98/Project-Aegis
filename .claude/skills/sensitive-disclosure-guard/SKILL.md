@@ -19,7 +19,7 @@ scoping is composed from `tenant-isolation-reviewer` and credential custody from
 
 ## Use When
 
-- Use when: an AI feature's context, prompt, output, or logs can contain PII,
+- Use when: an artificial intelligence (AI) feature's context, prompt, output, or logs can contain PII,
   secrets, credentials, financial/health data, or other-tenant data.
 - Use when: designing a redaction / data-minimization pipeline in front of
   model calls.

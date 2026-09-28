@@ -1,6 +1,6 @@
 # AI router / model-gateway design
 
-Detail for the owning [AI Router Architect](../SKILL.md). Manual-only: wires live providers and
+Detail for the owning [Artificial Intelligence (AI) Router Architect](../SKILL.md). Manual-only: wires live providers and
 credentials.
 
 ## Why centralize

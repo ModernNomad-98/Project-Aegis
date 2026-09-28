@@ -223,7 +223,7 @@ for each page](#acceptance-for-each-page). No grant or gate changed.
 
 PRs #404 (`b08103e`), #405 (`f2d57b5`) and #406 (`6488eaa`), merged on
 2026-09-27 UTC after #407, changed 30 existing reader pages and added none.
-#404 updated the agent instruction file map, #405 re-anchored the AI-security
+#404 updated the agent instruction file map, #405 re-anchored the artificial intelligence (AI) security
 pack to the 2026 OWASP (Open Worldwide Application Security Project) Top 10
 for large language model (LLM) applications, and #406 corrected a README
 option and aligned the cloud decider's category names. None recorded a

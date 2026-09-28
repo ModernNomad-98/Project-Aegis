@@ -35,7 +35,7 @@ Their requirements establish:
 | Holdout | 120 distinct cases; 6 candidate PASS and 6 candidate FAIL per control |
 | Critical failures | At least 40 holdout candidate FAIL cases with substantively justified CRITICAL risk |
 | Adversarial coverage | At least 40 holdout injection/role-confusion cases, including at least 20 candidate PASS and 20 candidate FAIL; report each attack kind and risk overlap |
-| Candidate status | Every case starts PENDING with a rationale; AI suggestions are not human-approved labels |
+| Candidate status | Every case starts PENDING with a rationale; artificial intelligence (AI) suggestions are not human-approved labels |
 
 Counts alone are insufficient. The earlier review rejected development-derived
 holdout templates, ambiguous conduct and inflated risk classifications. Preserve

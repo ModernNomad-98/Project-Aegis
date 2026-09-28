@@ -183,7 +183,7 @@ Authority relationships (binding):
   defined there; this backlog records work status against it, never a competing definition.
 - This backlog is **authoritative for continuation and deferred work**: what remains, which
   phase owns it, what evidence and approval each item needs, and what may not begin yet.
-- **Conversation memory is not an authoritative source.** No chat transcript, AI session
+- **Conversation memory is not an authoritative source.** No chat transcript, artificial intelligence (AI) session
   memory, or assistant recollection carries design or authorization authority.
 - **Temporary review exports are evidence history, not the continuation record.** Local
   export directories used during the PR #78 review cycle document how findings were reached;

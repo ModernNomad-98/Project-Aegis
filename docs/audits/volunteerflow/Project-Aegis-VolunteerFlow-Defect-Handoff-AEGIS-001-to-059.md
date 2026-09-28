@@ -666,7 +666,7 @@ They are **not** counted as skipped because:
 - **Observed behavior and evidence:** The referenced stage-gate map described the inner engineering lifecycle, not outer product stages 1–9. E-12.
 - **Expected behavior:** Outer stages have authoritative entry, exit, artifact, approval, and owner rules.
 - **Failed control:** Lifecycle documentation and gate authority.
-- **Likely owner:** `project-orchestrator` references and AI SDLC operating model.
+- **Likely owner:** `project-orchestrator` references and artificial intelligence (AI) SDLC operating model.
 - **Root cause:** **UNVERIFIED — the absence was observed in inspected surfaces, but the full repository may contain adjacent lifecycle material.**
 - **Required improvement:** Create one canonical outer lifecycle map.
 - **Positive regression:** Stage 2 exit can be evaluated from repository evidence alone.

@@ -13,7 +13,7 @@ and insufficient evidence.
 
 ## Purpose
 
-Answer, with evidence, whether one AI-assisted change followed the discipline
+Answer, with evidence, whether one artificial intelligence (AI)-assisted change followed the discipline
 it was supposed to — not whether the code is good (that is review), and not
 what the author says happened (that is the closeout), but what the primary
 record proves happened. The report gives each governance control a PASS, FAIL,

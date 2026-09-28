@@ -9,7 +9,7 @@ description: 'Review ONE library skill''s quality — the judgment layer above s
 
 Give one skill — newly drafted or already shipped — the review the mechanical
 validator cannot perform. `scripts/validate-skills.py` proves a skill is
-structurally VALID; this skill judges whether it is GOOD: whether an AI
+structurally VALID; this skill judges whether it is GOOD: whether an artificial intelligence (AI)
 matching a user request against the full shipped corpus of descriptions
 would pick it at the right moment and yield at the wrong one, whether it
 earns a place in the library instead of duplicating one, and whether its

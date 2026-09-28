@@ -23,7 +23,7 @@ not a finding.
 
 - Use when: asked "is our tenant isolation sound?" — before an enterprise or
   regulated-customer onboarding, a security questionnaire, or a pen test.
-- Use when: a new tenant-facing surface ships — export, import, search, AI
+- Use when: a new tenant-facing surface ships — export, import, search, artificial intelligence (AI)
   retrieval/chat, support console, analytics dashboard, webhook feed.
 - Use when: after a cross-tenant incident or near-miss, to find the siblings
   of the known hole.

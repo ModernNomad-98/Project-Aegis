@@ -27,7 +27,7 @@ language were preserved. Manual-only skill invocation flags were retained.
 | `.claude/skills/caching-strategy-designer/SKILL.md` | Corrected and accepted: defined HTTP, CDN, DB, TTL and API; retained tenant key and authorization-cache boundaries. |
 | `.claude/skills/cell-based-architecture-designer/SKILL.md` | Corrected and accepted: router may carry the tenant-to-cell mapping needed to route, but not tenant business data or logic. |
 | `.claude/skills/change-classification-gate/SKILL.md` | Corrected and accepted: defined change classes and recognized a still-active in-scope human approval before asking again. |
-| `.claude/skills/chat-backlog-reconciliation/SKILL.md` | Corrected and accepted: defined AI, PR, ADR and SHA; kept the evidence ceiling and no-secrets rule. |
+| `.claude/skills/chat-backlog-reconciliation/SKILL.md` | Corrected and accepted: defined artificial intelligence (AI), PR, ADR and SHA; kept the evidence ceiling and no-secrets rule. |
 | `.claude/skills/ci-pipeline-architect/SKILL.md` | Corrected and accepted: a renamed required check can stay expected or pending and block merge; protection names must be synchronized in a reviewed change. Manual-only flag remains. |
 | `.claude/skills/clickthrough-test-engineer/SKILL.md` | Corrected and accepted: defined UI, URL, PR and accessibility shorthand; live-app action still requires explicit invocation. |
 | `.claude/skills/cloud-architecture-decider/SKILL.md` | Corrected and accepted: replaced a false single abstraction ladder with per-component compatible patterns and verified operational fit; terms and ownership limits explained. Its reference and one evaluation assertion were updated for consistency. |

@@ -144,7 +144,7 @@ access — so it is safe for model invocation.
    `security-logging-alerting-architect`'s detections; verification panels
    display `synthetic-monitoring-architect`'s probe results; cost panels
    display the `usage-metering-and-cost-attribution-pipeline-designer` ETL's
-   rollups plus `ai-cost-guardrail-designer`'s AI-spend telemetry; growth
+   rollups plus `ai-cost-guardrail-designer`'s artificial intelligence (AI) spend telemetry; growth
    panels display `product-analytics-instrumenter`'s events; the incident
    panel serves `incident-response-runbook`'s playbook. Type every panel
    `{feed-owner, read-scope, wired?}`: a panel with no data source ships as

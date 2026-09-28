@@ -11,7 +11,7 @@
 
 **Prepared for:** `nguyenpv1980-wq/Claude-Skills`  
 **Prepared on:** 2026-07-06  
-**Scope:** Prior chat requirements for `AI Skills Development List` and `Claude Skills Development`, the uploaded v3 knowledge base and prompt, the current `Claude-Skills` repo, the (now merged) PR #1, and current public guidance for Claude Code Skills, Agent Skills, QA automation, SaaS architecture, security, AI security, and supply-chain risk.
+**Scope:** Prior chat requirements for `AI Skills Development List` and `Claude Skills Development`, the uploaded v3 knowledge base and prompt, the current `Claude-Skills` repo, the (now merged) PR #1, and current public guidance for Claude Code Skills, Agent Skills, QA automation, SaaS architecture, security, artificial intelligence (AI) security, and supply-chain risk.
 
 > **Reconciliation note (2026-07-06):** PR #1 has since been **merged** into `main`
 > (`5f6f404`). Statements below written as if PR #1 were still open are corrected in place;

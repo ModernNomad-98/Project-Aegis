@@ -32,7 +32,7 @@ The strongest reusable skill system should make Claude behave like a disciplined
 - explicit tradeoffs,
 - tenant isolation by default,
 - security and privacy by design,
-- AI tool safety by default,
+- artificial intelligence (AI) tool safety by default,
 - QA evidence before release,
 - senior troubleshooting based on reproduction and evidence,
 - whole-codebase audits based on inventory before findings.

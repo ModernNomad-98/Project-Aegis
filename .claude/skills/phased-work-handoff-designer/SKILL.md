@@ -35,7 +35,7 @@ itself (`ai-sdlc-operating-model`).
   changed, tests run, next step) — that is `ai-closeout-reporter`; this
   designs the CROSS-STAGE carry-forward.
 - Do NOT use when: the task is defining the end-to-end SDLC operating model
-  — the stages, authority holders, and gates for AI-assisted work — that is
+  — the stages, authority holders, and gates for artificial intelligence (AI)-assisted work — that is
   `ai-sdlc-operating-model`; this designs the handoff artifact within it.
 - Do NOT use when: the task is a pre-work guide for PARALLEL lanes at the
   start of work — that is `lane-authoring-guide`; this is for SEQUENTIAL

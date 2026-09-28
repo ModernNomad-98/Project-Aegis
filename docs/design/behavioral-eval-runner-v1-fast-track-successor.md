@@ -177,7 +177,7 @@ model/provider dispatch and no actual judge/provider call is authorized. No meas
 calibration result may be claimed.**
 
 **Implementation-session activity is distinct from runner dispatch.** WP-2B-2 will be
-implemented in an AI-assisted session (e.g., Claude Code). Model calls made by that
+implemented in an artificial intelligence (AI)-assisted session (e.g., Claude Code). Model calls made by that
 implementation session — or by read-only review agents — to author or inspect code and docs
 are implementation-session activity: they are not Behavioral Eval Runner dispatches, they
 are not counted against the runner's 0-dispatch budget, they must be disclosed separately

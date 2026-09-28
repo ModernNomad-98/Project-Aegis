@@ -13,7 +13,7 @@ Project (OWASP) large language model (LLM) data/model poisoning category
 LLM05). Reinforcement learning from human feedback (RLHF) and
 retrieval-augmented generation (RAG) are named here before their
 abbreviations below. D6 is the repository's recorded Phase 7 decision
-anchoring its AI security map to the OWASP Top 10 for LLM Applications;
+anchoring its artificial intelligence (AI) security map to the OWASP Top 10 for LLM Applications;
 decision D65 (2026-09-26) moved that anchor to the 2026 edition (LLM05 was
 LLM04 in 2025; 2026 adds fine-tuning subversion to this category). The scope
 is the pipelines you run that influence what the model learns or treats as
