@@ -1,7 +1,8 @@
 # Live startup-routing acceptance run, 2026-09-27
 
 This page records one live acceptance run of the Project Aegis startup-routing
-instructions (`AGENTS.md`, `CLAUDE.md` and `.claude/skills/`). It is a dated
+instructions (`AGENTS.md`, `CLAUDE.md` and `.claude/skills/`). It is for maintainers
+checking whether those instructions route new sessions correctly. It is a dated
 record, not a standing guarantee. It does not change the README or any skill.
 
 **Reading key.** Claude Code is Anthropic's command-line coding assistant; the
@@ -16,7 +17,7 @@ identify the source library: a `README.md` starting `# Project Aegis`,
 requirements discovery happens before any technical choice. A "SHA" is a commit
 or file hash; SHA-256 is the hash algorithm used for file fingerprints. "MCP"
 (Model Context Protocol) servers are external tool connectors. "stream-json" is
-Claude Code's output format with one JSON event per line. UTC is Coordinated
+Claude Code's output format with one JSON (JavaScript Object Notation) event per line. UTC is Coordinated
 Universal Time. "PASS" means
 every pass condition for that case was met; a "FINDING" is an observation worth
 an owner's attention that did not change the verdict.
@@ -87,7 +88,9 @@ byte-for-byte unchanged afterwards, and `git status` output was identical. Three
   shell commands were denied for that reason; the sessions fell back to
   file-reading tools each time.
 - Out of scope, as granted: the VirtualBox virtual machine, the Stage 4B host
-  proof, the software development kit (SDK) `query()` path, host bridges and
+  proof (a later stage of the issue #101 setup work that would test the
+  setup-routing callback in a real host session and still needs separate owner
+  approval), the software development kit (SDK) `query()` path, host bridges and
   hooks, installs, deployment and private data. This page makes no claim about
   token savings or host-level enforcement.
 
@@ -248,7 +251,7 @@ from each session's final result event. No stop threshold was approached.
 
 Session time is each session's `duration_ms` from its result event. Cases 5
 and 6 each include about 120 seconds spent waiting on a hung shell command.
-Time spent in model API calls totals 206.7 seconds across the nine sessions. Elapsed time from the first session start to the last session end was
+Time spent in model API (application programming interface) calls totals 206.7 seconds across the nine sessions. Elapsed time from the first session start to the last session end was
 47 minutes 50 seconds, which includes scoring between batches.
 
 ## Raw transcripts
