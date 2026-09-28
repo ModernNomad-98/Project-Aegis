@@ -1,6 +1,6 @@
 {
   "skill": "data-migration-runbook-author",
-  "description": "Trigger discrimination: the operator-executable DATA-move runbook (this skill) vs the change sequence (schema-evolution-planner), DDL safety review (secure-migration-reviewer), general release rollback (rollback-runbook-author), and the reusable gated-op prompt template (gated-deployment-prompt-template).",
+  "description": "Trigger discrimination: the operator-executable DATA-move runbook (this skill) vs the change sequence (schema-evolution-planner), DDL safety review (secure-migration-reviewer), general release rollback (rollback-runbook-author), and the reusable gated-op prompt template (gated-deployment-prompt-template). Three cases pin the schema-migration deploy seam: a one-off deploy stays here against the template and the safety review, and a migration's rollback plan alone goes to rollback-runbook-author.",
   "overlaps_with": [
     "schema-evolution-planner",
     "secure-migration-reviewer",
@@ -44,6 +44,30 @@
       "expected_skill": "gated-deployment-prompt-template",
       "should_not_trigger": ["data-migration-runbook-author"],
       "reason": "A RECURRING operation needing a placeholder-driven prompt template with per-run reporting is the template skill's form. A one-off move gets this skill's full runbook; the two compose when a rehearsed runbook graduates into a monthly template."
+    },
+    {
+      "id": "one-off-migration-deploy-not-a-template",
+      "prompt": "Write the runbook to apply migration 0042 to production next Tuesday: confirm we are on the right database first, back up, apply, verify the schema and smoke-test the app.",
+      "expected_skill": "data-migration-runbook-author",
+      "should_not_trigger": ["gated-deployment-prompt-template"],
+      "note": "SEAM CASE — one-off deploy vs recurring template. 'Template our monthly migration prompt' would go to gated-deployment-prompt-template; one named migration applied once gets this skill's runbook.",
+      "reason": "A single named migration applied to a named environment is a one-off runbook. There is no recurring operation and no placeholder template to build."
+    },
+    {
+      "id": "migration-deploy-runbook-not-a-safety-review",
+      "prompt": "Migration 0042 already passed its safety review. Now write the operator steps to deploy it to production, with the target check, smoke checks and where the approvals go.",
+      "expected_skill": "data-migration-runbook-author",
+      "should_not_trigger": ["secure-migration-reviewer"],
+      "note": "SEAM CASE — runbook vs review. 'Is this migration safe?' would go to secure-migration-reviewer; here the review verdict exists and is a prerequisite the runbook cites.",
+      "reason": "The ask is the operator procedure for applying reviewed DDL, not a judgment of the DDL's locks, destructive operations or RLS gaps."
+    },
+    {
+      "id": "migration-rollback-plan-goes-to-rollback-runbook-author",
+      "prompt": "Write the rollback plan for migration 0042.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": ["data-migration-runbook-author"],
+      "note": "SEAM CASE — rollback-runbook-author's description triggers on a rollback plan for a migration, and this skill's per-stage rollback wording sits beside it. The deploy runbook cites that plan in its rollback section; it does not author it.",
+      "reason": "Only the rollback plan is requested: no target confirmation, apply, verification or smoke steps. That is rollback-runbook-author's scope."
     }
   ]
 }
