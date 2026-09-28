@@ -258,8 +258,8 @@ here.
   `ai-closeout-reporter`. Route to them via that map; do not re-derive the gates.
 - **Stage 7 — Prove it works.** → `qa-strategy-architect` →
   `test-plan-designer`. *By evidence:* `integration-test-designer`,
-  `api-contract-test-designer`, `playwright-e2e-engineer` *(manual-only — the
-  routing invariant applies)*, `manual-test-case-creator`,
+  `api-contract-test-designer`, `playwright-e2e-engineer` *(manual-only)*,
+  `manual-test-case-creator`,
   `accessibility-test-harness`, `performance-test-harness`.
 - **Stage 8 — Get it ready to run.** Start with `cloud-architecture-decider`,
   then follow its ACTUAL outcome: **AWS** (Amazon Web Services) → `aws-saas-architect`; **Azure** →
@@ -271,9 +271,9 @@ here.
   human's direction (never invent a mapper, never silently reroute to
   AWS/Azure), continuing below once directed. Then `iac-reviewer` ONLY when
   an actual IaC or config-as-code artifact exists, and unconditionally:
-  `ci-pipeline-architect` *(manual-only — the routing invariant applies)* →
-  `slo-reliability-architect` → `observability-operator` *(manual-only — the
-  routing invariant applies)* → `rollback-runbook-author` →
+  `ci-pipeline-architect` *(manual-only)* →
+  `slo-reliability-architect` → `observability-operator` *(manual-only)*
+  → `rollback-runbook-author` →
   `incident-response-runbook`. *If merge == deploy on the platform:*
   `merge-is-deploy-governance`. Route FROM the decider's result; never
   re-derive or copy its decision model here; for several reviewers and plain-language skill explanations, use the [guided release path](../../../docs/paths/release-with-agents.md).
