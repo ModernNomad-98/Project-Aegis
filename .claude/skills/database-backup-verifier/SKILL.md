@@ -311,6 +311,6 @@ Handoffs: <resilience-architecture-reviewer | data-migration-runbook-author | se
   manual-only silence.
 - `evals/trigger-evals.json` — discrimination against
   `data-migration-runbook-author`, `compliance-evidence-collector`,
-  `rollback-runbook-author`, `pii-lifecycle-designer`,
-  `slo-reliability-architect` and the planned
-  resilience-architecture-reviewer.
+  `rollback-runbook-author`, `pii-lifecycle-designer` and
+  `slo-reliability-architect`. The seam with the planned
+  resilience-architecture-reviewer is pinned once that skill exists.
