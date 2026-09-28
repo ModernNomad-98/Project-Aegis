@@ -98,7 +98,8 @@ authorize execution.
    avoid presenting the whole thing as a dated contract. State the
    assumptions the plan rests on so a changed assumption visibly changes
    the plan.
-   Readiness assessment needs no delivery approval. `COMMIT-ABLE` is evidence
+   Readiness assessment needs no delivery approval. `COMMIT-ABLE` (`roadmap-to-commitments-translator`'s label for enough
+   evidence to support a commitment decision) is evidence
    for a human decision, not a promise; cite an actual named human decision
    before reporting an item as committed. Do not invent or silently cancel
    an existing commitment when moving an item between horizons.
@@ -176,7 +177,7 @@ Boundaries:    ranking → prioritization-frame-picker; one spec → product-spe
 
 ## Stop Conditions
 
-- The task is actually to RANK/score the backlog (choose RICE vs
+- The task is actually to RANK/score the backlog (choose RICE — reach, impact, confidence and effort scoring — vs
   value/effort, apply it) → route to `prioritization-frame-picker`; this
   skill sequences an already-prioritized set.
 - The task is one feature's spec or one feature's rollout → route to

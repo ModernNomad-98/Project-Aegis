@@ -5,6 +5,12 @@ description: Author the Statement of Applicability — the ISO-mandatory documen
 
 # Statement of Applicability Author
 
+**Reading key:** ISO is the International Organization for Standardization and
+IEC the International Electrotechnical Commission. SOC 2 means System and
+Organization Controls 2, an attestation report defined by the American Institute
+of Certified Public Accountants (AICPA). ISMS is an information security
+management system; AIMS is an artificial intelligence (AI) management system.
+
 ## Purpose
 
 Produce the Statement of Applicability (SoA) — the document ISO
