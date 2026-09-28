@@ -2,7 +2,7 @@
 
 *This path names who acts and in what order — each skill owns its own how.*
 
-**Who this is for:** you want to add an AI feature — a chatbot, an assistant, an agent,
+**Who this is for:** you want to add an artificial intelligence (AI) feature — a chatbot, an assistant, an agent,
 anything that calls a model — without opening a security hole. The threats here are
 different from classic app security (a model can be talked into things a database cannot),
 so the order matters: map the threats first, design the guardrails second, prove they hold
