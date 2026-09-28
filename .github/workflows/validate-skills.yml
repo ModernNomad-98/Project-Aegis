@@ -29,10 +29,11 @@ permissions:
 # root) is not put first on sys.path and a module a pull request adds beside
 # a gate script cannot shadow the standard library or PyYAML and rewrite the
 # exit status. -P rather than -I: -I also implies -E, which would drop the
-# PYTHONIOENCODING and PYTHONDONTWRITEBYTECODE settings below. The two
-# `-m tools.behavioral_eval_runner` and `-m unittest` commands need the
-# checkout root on sys.path and cannot take -P; gate-guard protects every
-# root-level importable name instead.
+# PYTHONIOENCODING and PYTHONDONTWRITEBYTECODE settings below. The
+# `-m tools.behavioral_eval_runner` command and the `-m unittest` suite runs
+# (BER, setup routing contract, delivery control) need the checkout root on
+# sys.path and cannot take -P; gate-guard protects every root-level
+# importable name instead.
 env:
   PYTHONDONTWRITEBYTECODE: '1'
   PYTHONIOENCODING: utf-8
@@ -115,6 +116,15 @@ jobs:
 
       - name: Run complete offline BER suite
         run: python -P scripts/ci/record-check.py ber -- python -m unittest discover -s tools/behavioral_eval_runner/tests -p 'test_*.py' -v
+
+      # Setup routing contract and delivery-control kernel (code-health P2-1).
+      # Like the BER suite, `-m unittest` needs the checkout root on sys.path
+      # to import `tools.*`, so these runs cannot take -P.
+      - name: Run setup routing-contract tests
+        run: python -P scripts/ci/record-check.py setup-tests -- python -m unittest discover -s tools/aegis_setup/tests -p 'test_*.py' -v
+
+      - name: Run delivery-control tests
+        run: python -P scripts/ci/record-check.py delivery-control -- python -m unittest discover -s tools/aegis_delivery_control/tests -p 'test_*.py' -v
 
       - name: Run Scenario A acceptance in PowerShell Core
         run: python -P scripts/ci/record-check.py acceptance-core -- pwsh -NoProfile -File scripts/acceptance/Test-ScenarioAEvidence.ps1
@@ -213,6 +223,12 @@ jobs:
 
       - name: Run complete offline BER suite
         run: python -P scripts/ci/record-check.py ber -- python -m unittest discover -s tools/behavioral_eval_runner/tests -p 'test_*.py' -v
+
+      - name: Run setup routing-contract tests
+        run: python -P scripts/ci/record-check.py setup-tests -- python -m unittest discover -s tools/aegis_setup/tests -p 'test_*.py' -v
+
+      - name: Run delivery-control tests
+        run: python -P scripts/ci/record-check.py delivery-control -- python -m unittest discover -s tools/aegis_delivery_control/tests -p 'test_*.py' -v
 
       # Sequential calls in the same checkout; each harness launches its own
       # current host. Both editions are tested, with no shell fallback.

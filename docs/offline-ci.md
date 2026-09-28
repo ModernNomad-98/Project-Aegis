@@ -29,8 +29,8 @@ check names stay `validate-skills` and `gate-guard`; branch protection is unchan
 
 | Job | Coverage | Merge role | Timeout |
 | --- | --- | --- | --- |
-| `validate-skills` on Ubuntu | CI recorder/guard regressions, validator and audit self-tests, skill validation, BER self-check and full suite, PowerShell Core Scenario A acceptance, pull-request-only Developer Certificate of Origin (DCO) check | Existing required check | 15 minutes |
-| `windows-offline-checks` on Windows | Recorder regressions, validator and audit self-tests, skill validation, BER self-check and full suite, sequential PowerShell Desktop 5.1 and Core acceptance | Additional visible coverage; not registered as required | 20 minutes |
+| `validate-skills` on Ubuntu | CI recorder/guard regressions, validator and audit self-tests, skill validation, BER self-check and full suite, setup routing-contract and delivery-control suites, PowerShell Core Scenario A acceptance, pull-request-only Developer Certificate of Origin (DCO) check | Existing required check | 15 minutes |
+| `windows-offline-checks` on Windows | Recorder regressions, validator and audit self-tests, skill validation, BER self-check and full suite, setup routing-contract and delivery-control suites, sequential PowerShell Desktop 5.1 and Core acceptance | Additional visible coverage; not registered as required | 20 minutes |
 | `gate-guard` on Ubuntu | Detect changes to the merge gate and its enforcement surfaces | Existing required check; PR only | 5 minutes |
 
 The two verification jobs run independently, without cross-platform fail-fast,
@@ -195,6 +195,7 @@ root. For example:
 python -P scripts/ci/record-check.py environment -- python -P scripts/ci/check-environment.py
 python -P scripts/ci/record-check.py ci-tests -- python -P scripts/tests/test_offline_ci.py
 python -P scripts/ci/record-check.py ber -- python -m unittest discover -s tools/behavioral_eval_runner/tests -p test_*.py -v
+python -P scripts/ci/record-check.py delivery-control -- python -m unittest discover -s tools/aegis_delivery_control/tests -p test_*.py -v
 ```
 
 Use `powershell -NoProfile -ExecutionPolicy Bypass -File
