@@ -5,6 +5,10 @@ description: 'Manage a CORPUS of Architecture Decision Records over time — the
 
 # ADR Sequencer
 
+**Reading key:** ADR means Architecture Decision Record, a short dated
+document recording one significant technical decision; PR means pull request;
+CI means continuous integration.
+
 ## Purpose
 
 A single ADR is a decision written down; a hundred ADRs with no

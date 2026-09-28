@@ -40,7 +40,7 @@ tool in the performance pack — one query, its plan, its verdict.
 - Use when: a query regressed after a data-volume change, statistics
   drift, or an upgrade, and the old/new plans need diffing.
 - Do NOT use when: the problem is MANY small queries per request —
-  query-count explosion is `n-plus-one-detector`; each individual query
+  query-count explosion is `n-plus-one-detector` *(manual-only)*; each individual query
   there is usually fine.
 - Do NOT use when: nothing has attributed the slowness to a query yet —
   "the app is slow" goes to `profiling-methodology-designer`; this

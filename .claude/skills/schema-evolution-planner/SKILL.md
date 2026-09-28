@@ -5,6 +5,11 @@ description: Plan how a live store's schema changes without breaking deployed re
 
 # Schema Evolution Planner
 
+**Reading key:** DDL means data definition language, the statements that
+create or alter tables and columns; ORM means object-relational mapper, a
+library that maps code objects to tables; RLS means row-level security; CDC
+means change data capture, which streams row changes to other systems.
+
 ## Purpose
 
 A schema change on a live system is a distributed-systems problem disguised
