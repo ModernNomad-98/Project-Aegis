@@ -78,6 +78,20 @@
           "Treats memory write, trust, and verification rules as the memory-governance deliverable; does not draft an operating-model learning loop in place of those rules."
         ]
       }
+    },
+    {
+      "id": "edge-multi-tool-topology-and-surface-collision",
+      "type": "should_trigger",
+      "prompt": "We use a coding agent plus a visual app builder that syncs both ways with our repo, and each tool has its own instruction file. Define our AI-assisted SDLC operating model — last week both tools edited the same frontend page in one phase and clobbered each other.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the multi-tool topology as an explicit option chosen from observed practice: per-tool spokes with a platform-role table, or hub-and-spoke where per-tool files point back to one rulebook and must not conflict.",
+          "Adds the collision rule: one tool edits a given surface per phase, with surface ownership recorded in the plan/approve stage.",
+          "Cites the clobbered-page incident as observed evidence in the gap list.",
+          "Routes aligning the instruction files themselves to agent-instruction-consolidator (manual) instead of rewriting them."
+        ]
+      }
     }
   ]
 }

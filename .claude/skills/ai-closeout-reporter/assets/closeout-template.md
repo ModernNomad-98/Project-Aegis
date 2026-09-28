@@ -32,6 +32,19 @@ what matters; link the PR/diff for the exhaustive list when it is long.
 | --- | --- |
 | `<command>` | `<actual output summary — failures verbatim>` |
 
+<!-- When verification spans several surfaces, add both tables. -->
+
+| Surface | Result (pass/fail) | Evidence |
+| --- | --- | --- |
+| `<endpoint / page / role / tenant>` | `<pass/fail>` | `<output or link>` |
+
+| Negative path (must be refused or fail) | Observed | Evidence |
+| --- | --- | --- |
+| `<e.g. other tenant's record read>` | `<refused / NOT refused>` | `<output>` |
+
+<!-- If a local preflight ran (local-ci-mirror-preflight), paste its evidence
+     block here as recorded. -->
+
 ## 5. Evidence
 
 Outputs, links, screenshots, PR URL, CI runs — whatever lets a human verify
@@ -44,9 +57,17 @@ What could bite later; what is fragile; what depends on unverified assumptions.
 ## 7. Skipped validation
 
 What the change class expected but was not run, and why. "Nothing skipped." is
-an acceptable entry; absence of the section is not.
+an acceptable entry; absence of the section is not. Break skipped counts down
+by reason (for example environment-gated, by design, blocked), never a bare
+total.
 
 ## 8. Next actions / handoff
 
 The recommended next step, and anything the next person needs to know to pick
-this up cold.
+this up cold. Write "verified complete" without qualification only when no
+recorded gap remains open.
+
+<!-- When a phase is finished, add a completion-baseline anchor:
+     "<work> is complete; do not treat as pending" — PR #<n>, merge commit
+     <sha>, applied migration <id> where one applies. Merged or applied facts
+     only; never open-PR state. -->

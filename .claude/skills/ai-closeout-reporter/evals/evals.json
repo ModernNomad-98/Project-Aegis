@@ -66,6 +66,21 @@
           "Treats shrinking a drifting change back to its intent while it is still being shaped as diff discipline; does not write a terminal closeout report."
         ]
       }
+    },
+    {
+      "id": "edge-multi-surface-open-gap-no-unqualified-complete",
+      "type": "should_trigger",
+      "prompt": "Close out the tenant-isolation hardening. We verified 4 API endpoints; 3 passed and the export endpoint still returns another tenant's rows. The suite reported 12 skipped tests. A local CI preflight ran before commit. Say it's verified complete.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reports a per-surface pass/fail table covering all 4 endpoints and a negative-path table showing the cross-tenant read on the export endpoint was NOT refused.",
+          "Does not write an unqualified 'verified complete' while the export-endpoint gap is open; qualifies the claim and names the gap.",
+          "Breaks the 12 skipped tests down by reason, or states the breakdown is unknown and lists it under skipped validation; never a bare total.",
+          "Includes the preflight's evidence block in the validation section as recorded, not paraphrased.",
+          "Adds no completion-baseline anchor, because the work is not complete."
+        ]
+      }
     }
   ]
 }

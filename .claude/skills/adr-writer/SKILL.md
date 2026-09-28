@@ -81,6 +81,11 @@ not execute those changes or broaden a grant.
    and a specific date to re-examine the decision against its assumptions.
    Include predecessor links in the draft; propose any old-file back-link
    change for its separately authorized route rather than editing it here.
+   Attach a certainty label to the status and to load-bearing claims:
+   confirmed (cited evidence) | inferred | unknown — e.g. `accepted
+   (confirmed)`. An uncited operational claim reads "unverified — recommend
+   confirming", never as fact. The status-column index itself belongs to
+   `adr-sequencer`.
 9. **Cross-check:** could a new team member reconstruct the decision's logic
    from this document alone, without hallway context?
 
@@ -92,6 +97,7 @@ report separately whether authorized persistence actually occurred:
 ```
 # ADR-NNNN: <title, imperative>
 Status: proposed | accepted | rejected | deprecated | superseded by ADR-MMMM
+        (confirmed | inferred | unknown)
 Date: <decision date>   Review by: <specific date>
 ## Context          <forces and problem, solution-free>
 ## Decision         <"We will …">
@@ -111,6 +117,8 @@ Date: <decision date>   Review by: <specific date>
 - [ ] Rollback plan has trigger conditions AND steps; impractical reversal is
       explained, never blank.
 - [ ] Review date is a specific date, not "later".
+- [ ] Status and load-bearing claims carry a certainty label; no uncited
+      operational claim is stated as confirmed.
 - [ ] The draft links to its predecessor and proposes the reverse link; old-file changes require separate application evidence.
 
 ## Gotchas

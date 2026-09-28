@@ -6,7 +6,7 @@
 
 # ADR-NNNN: <Short imperative title, e.g. "Use Postgres row-level security for tenant isolation">
 
-Status: proposed <!-- use repository vocabulary: proposed | accepted | rejected | deprecated | superseded by ADR-MMMM -->
+Status: proposed (<confirmed | inferred | unknown>) <!-- use repository vocabulary: proposed | accepted | rejected | deprecated | superseded by ADR-MMMM; add a certainty label: (confirmed) with cited evidence | (inferred) | (unknown) -->
 Date: YYYY-MM-DD
 Review by: YYYY-MM-DD <!-- specific date to re-check the assumptions below -->
 
@@ -15,7 +15,8 @@ Review by: YYYY-MM-DD <!-- specific date to re-check the assumptions below -->
 <!-- The forces, constraints, and problem AS THEY STOOD at decision time.
      Write it solution-free: a reader should finish this section not yet
      knowing what was chosen. Include the honest drivers — deadlines, team
-     skills, existing momentum — not just the technical ones. -->
+     skills, existing momentum — not just the technical ones. Mark any
+     uncited operational claim "unverified — recommend confirming". -->
 
 ## Decision
 
