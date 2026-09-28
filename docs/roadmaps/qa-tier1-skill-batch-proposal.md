@@ -5,7 +5,7 @@
 > decision-log row was created or changed by the pull request that adds it.
 
 Prepared 2026-09-28 from `ModernNomad-98/Project-Aegis` `origin/main` at
-`ebf210c6`, where the validator reported 186 valid skills.
+`ebf210c6`, where `python -B scripts/validate-skills.py` reported 186 valid skills.
 
 This page is for the owner, who decides whether and how to build the five
 remaining quality assurance (QA) Tier 1 candidates, and for the maintainers
@@ -87,8 +87,8 @@ returning.
 membership, not the fix workflow, and that `tdd-engineer` "owns new behavior,
 not bug reproduction".
 
-**What the shipped skills already do.** The D10 note on `tdd-engineer` is out
-of date:
+**What the shipped skills already do.** The D10 note on `tdd-engineer` never matched the shipped skill, which has
+named the bug-fix trigger since it shipped on 2026-07-06, the day before D10:
 
 - [`tdd-engineer`](../../.claude/skills/tdd-engineer/SKILL.md) (manual-only)
   lists "Use when: fixing a bug — the reproduction becomes the regression
@@ -117,7 +117,7 @@ fail check 2 (trigger collision) of
 
 **Recommendation: DROP.** Record #190 in the "Already covered" table of the
 D10 backlog as owned by `tdd-engineer`, with `systematic-debugger` and
-`regression-suite-curator` as the neighbors above, and correct the stale D10
+`regression-suite-curator` as the neighbors above, and correct the inaccurate D10
 note in the same decision row.
 
 - **Manual-only:** not applicable; nothing is built. The owning skills are
@@ -196,8 +196,8 @@ description: 'Design the concrete test plan for ONE feature, change, or release 
 ```
 
 To make room, the sentence "the plan is executable by someone who didn't
-write it" moves from the description into the skill body, where the same rule
-already appears as the plan-item quality bar.
+write it" moves from the description into the skill body, and is added to its validation checklist as "a tester who did not write the
+plan can run every item".
 
 **ROUTE-002 edits:** none new from the matrix. The exclusion toward
 `acceptance-criteria-reviewer` is reciprocated by that skill's own description.
@@ -254,6 +254,7 @@ proving they still match** is not:
 | The two-tenant security fixtures' required shape | `multi-tenant-security-tester` |
 | What a tenant is and its product lifecycle | `tenant-modeler` |
 | Where the test credentials live and how they rotate | `secrets-identity-hardener` |
+| Browser auth-state files and Playwright fixtures that log those accounts in | `playwright-e2e-engineer` |
 | Whether the RLS policies those accounts exercise are correct | `rls-policy-auditor` |
 
 Merging into `test-data-architect` was considered and rejected: the apply mode
@@ -263,7 +264,8 @@ question.
 
 **Recommendation: BUILD, manual-only.** Validate-only is the default mode;
 apply mode needs a named non-production environment and explicit human
-approval. Stop Conditions refuse production, refuse to change or delete an
+approval. Its Stop Conditions (the `SKILL.md` section that says when the skill must
+halt and hand back) refuse production, refuse to change or delete an
 unmarked row, refuse to print or store a credential value, and stop when no
 persona catalog exists (hand off to `test-data-architect` first).
 
@@ -300,11 +302,12 @@ it for manual-only skills; trigger-eval cases use the prefix
 - Behavior: the static lint flags a test config whose base URL resolves to the
   production host.
 - Trigger: about 8 cases against `test-data-architect`,
-  `multi-tenant-security-tester` and `tenant-modeler`, in both directions.
+  `multi-tenant-security-tester`, `tenant-modeler` and `playwright-e2e-engineer`, in both directions.
 
 **Estimate:** 3–5 active hours. It is the largest item because of the two
 modes, the marker rule, the lint and the refusal cases. The pull request that
-builds it will likely answer "Yes" to the security-relevant-surface question,
+builds it will likely answer "Yes" to the required "Security-relevant surface?"
+question in the [pull request template](../../.github/pull_request_template.md),
 because it handles credentials and environment writes.
 
 ## Candidate 4: `ci-failure-classifier` (#214 + #215)
@@ -374,7 +377,7 @@ description: 'Classify a CI run''s failures and hidden problems from its logs an
 | `systematic-debugger` | 710 | Reciprocate; room exists |
 | `flaky-test-detective` | 1,012 | Leave one-way (census); no room |
 | `sharded-validation-with-resume` | 1,009 | Leave one-way (census); no room |
-| `ci-pipeline-architect` | 1,016 | Leave one-way (census); already a hub under D64 |
+| `ci-pipeline-architect` | 1,016 | Leave one-way (census); D64 already kept this hub's incoming findings as census data |
 
 **Eval plan.**
 
@@ -511,20 +514,24 @@ steps in
 
 **Total estimate:** 9.75–17.25 active hours, provisional, including 1.5–3
 hours of batch overhead (registration, decision row, reciprocity edits,
-contract-audit comparison and reviews). No project-orchestrator route is
-proposed; confirm at build time that no stage needs one.
+contract-audit comparison and reviews). No `project-orchestrator` route (a numbered stage in the skill that runs an
+end-to-end build and names the skill each stage calls) is proposed; confirm
+at build time that no stage needs one.
 
 **Review path per pull request**, as in the feature-flag precedent:
 `python -B scripts/validate-skills.py`; `skill-quality-reviewer` checks 1–7
 on each new or extended skill in a fresh session; a ROUTE-002 before-and-after
 comparison with `scripts/audit-skill-contracts.py` (a protected script that
 this work does not change, and whose frozen baseline is not regenerated);
-`library-diff-reviewer` on the whole pull request; then a merge under the
-standing conditions of
-[AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green),
+`library-diff-reviewer` on the whole pull request; then a merge under the standing conditions of these owner approval-register
+entries:
+[AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green)
+(administrator merge once all checks are green),
 [AEGIS-APR-049](../approvals/APPROVAL_REGISTER.md#aegis-apr-049-exact-head-ci-satisfies-the-local-test-condition)
-and
-[AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review).
+(CI on the exact reviewed head satisfies the local-test condition) and
+[AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review)
+(merges wait for the automated Codex review bot, or its confirmed
+unavailability).
 
 **Decision number:** the build would be recorded as **D68**. D67 was the
 highest decision number in the reconciliation log at `ebf210c6`, and no other
@@ -568,7 +575,9 @@ evaluation, catalog row, README count or decision-log row, and it edits no
 shipped skill. An owner "build it" answer would be a new instruction to record;
 delivery would then rely on the standing delivery approval in
 [AEGIS-APR-039](../approvals/APPROVAL_REGISTER.md#aegis-apr-039-reaffirmation-of-ongoing-backlog-delivery-approval)
-and its conditions. Nothing here waives a protected `gate-guard` check,
+(the owner's reaffirmed approval for ongoing backlog delivery)
+and its conditions. Nothing here waives the `gate-guard` check (the CI job that fails when a pull
+request changes a protected file),
 authorizes a change to `scripts/audit-skill-contracts.py` or its frozen
 baseline, or permits any environment write, provider call or deployment.
 
