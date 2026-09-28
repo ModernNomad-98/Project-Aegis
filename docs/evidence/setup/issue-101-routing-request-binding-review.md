@@ -3,7 +3,14 @@
 This record covers the bounded version-2 synthetic routing change proposed in
 [the request-binding proposal](../../roadmaps/aegis-setup-routing-request-binding-proposal.md).
 It is an implementation review input, not evidence of a real host integration.
-Here, **SDK** means software development kit, the host's application
+Here, **PR** means pull request, **VM** means virtual machine, **UTC** means
+Coordinated Universal Time, **ID** means identifier, and an **APR** is a
+numbered grant or lifecycle entry in the owner approval register.
+`gate-guard` is the continuous integration job that flags protected-file
+changes for manual review. **Stage 4B** is the separately gated real-host
+proof stage in the
+[host-proof protocol](../../roadmaps/aegis-setup-package-4b-host-proof-protocol.md).
+**SDK** means software development kit, the host's application
 interface; **Agent** means the host's agent-dispatch route; and **Skill** means
 a named instruction/tool capability selected by the host. The bridge handles
 Agent, model Skill and direct typed-skill dispatch, but the host keeps the
@@ -38,7 +45,7 @@ python -B scripts/validate-skills.py
 ```
 
 Results: **12 Python tests passed**, **14 Node tests passed**, and **185 skills
-validated with zero warnings**. The Python suite covers v2 acceptance,
+validated with zero warnings**. The Python suite covers version-2 acceptance,
 malformed, missing and duplicate IDs, stale responses, version 1 rejection
 and mismatched abstention. The Node suite covers
 fresh IDs for repeated identical callbacks, stale advice rejection across
