@@ -3172,7 +3172,7 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   - **Why.** The owner, Peter Nguyen, decided on 2026-09-28 in chat with the
     Claude Code coordinator, answering "Build it as recommended
     (Recommended)" to the
-    [QA Tier 1 scope proposal](https://github.com/ModernNomad-98/Project-Aegis/pull/492) (PR #492 at head `930493c`). It settles
+    [QA Tier 1 scope proposal](../roadmaps/qa-tier1-skill-batch-proposal.md) (PR #492 at head `930493c`). It settles
     the five remaining D10 Tier 1 candidates.
   - **What.**
     - **Build `test-tenant-provisioner`** (catalog #198), manual-only: it
@@ -3190,7 +3190,7 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
       auto-invocable.
     - **Drop `regression-first-bug-fixer`** (#190): `tdd-engineer` already
       owns it, with `systematic-debugger` and `regression-suite-curator` as
-      neighbours.
+      neighbors.
     - **Census.** The eight predicted one-way ROUTE-002 findings (toward
       `tenant-modeler`, `secrets-identity-hardener`, `flaky-test-detective`,
       `sharded-validation-with-resume`, `ci-pipeline-architect`,
@@ -3204,8 +3204,8 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     2026-07-06), the day before D10: its description already said "when
     fixing a bug that should get a regression test proving the fix". D10's
     text above is unchanged; this entry is the correction.
-  - **Authority.** This decision grants delivery of exactly this batch under
-    the standing delivery approval
+  - **Authority.** This decision authorizes exactly this batch. Its delivery
+    relies on the standing delivery approval
     [AEGIS-APR-039](../approvals/APPROVAL_REGISTER.md#aegis-apr-039-reaffirmation-of-ongoing-backlog-delivery-approval)
     and the standing merge conditions
     [AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green),
