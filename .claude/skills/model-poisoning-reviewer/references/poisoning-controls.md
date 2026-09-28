@@ -31,14 +31,14 @@ The high rows are the primary poisoning surface; controls scale with risk.
   targeted misbehavior / backdoor.
 - Label flipping: corrupting labels in crowd/user-sourced data.
 - Controls: source provenance + audit trail; curation/review before use;
-  label-integrity checks; outlier/poison detection; a holdout/canary + 
+  label-integrity checks; outlier/poison detection; a holdout/canary +
   adversarial-trigger evaluation that would catch a behavior shift BEFORE
   shipping (aggregate accuracy won't).
 
 ### Feedback loops (RLHF / thumbs / corrections)
 - Sybil (many fake identities) or coordinated signaling: a group mass-upvotes
   bad answers or submits coordinated "corrections" to steer the next update
-  (e.g. promote a scam web address, or URL (uniform resource locator)).
+  (for example, to promote a scam web address).
 - Controls: identity + rate limits on feedback; anomaly detection on feedback
   distributions; HUMAN REVIEW before feedback becomes training data; never
   auto-train on raw open feedback.
