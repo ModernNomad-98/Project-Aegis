@@ -494,7 +494,12 @@ def test_markdown_glossary_and_whole_examples(a) -> None:
         "report must not claim it freezes the corpus before remediation")
     for term in ("**Repo SHA:**", "**SHA-256 / sha256:**", "**JSON report:**",
                  "**Severity:**", "[severity/confidence/kind]",
-                 "**maps: AEGIS-0NN:**", "**§5:**"):
+                 "**maps: AEGIS-0NN:**", "**§5:**",
+                 "(CENSUS)", "(STRUCTURAL)", "NOT-COMMIT-ABLE",
+                 "auto-invocable", "hexadecimal", "semantic-candidate",
+                 "**Rule-table tags:**", "**auto-invocable:**",
+                 "**Stage-2 / NOT-COMMIT-ABLE (ROUTE-003):**",
+                 "**SIDE-004 `[class]`:**", "`scripts/validate-skills.py`"):
         assert term in md, f"glossary term missing: {term}"
     for r in audit_mod.RULES:
         row = f"\n| {r['id']} | {r['severity']} | {r['classification']} | "
@@ -519,12 +524,13 @@ def test_audit_engine_version_marks_corrected_eval004_semantics() -> None:
     # type-collapsing 1.12.0 engine; a corrected live report has to be
     # distinguishable by VERSION, not only by engine source hash.
     # 1.13.2 adds whole-name skill matching (ROUTE-002 false positive fix).
-    assert audit_mod.TOOL_VERSION == "1.13.3", (
+    # 1.13.3 changes only the Markdown report format; 1.13.4 extends its key.
+    assert audit_mod.TOOL_VERSION == "1.13.4", (
         f"corrected EVAL-004 semantics require a minor bump; got "
         f"{audit_mod.TOOL_VERSION!r}"
     )
-    ok("audit engine reports v1.13.3 for corrected EVAL-004 semantics, raw ARTF-001 "
-       "anchors and whole-name skill matching")
+    ok("audit engine reports v1.13.4 for corrected EVAL-004 semantics, raw ARTF-001 "
+       "anchors, whole-name skill matching and the extended report key")
 
 
 def test_mentions_skill_name_matches_whole_names_only() -> None:
