@@ -35,7 +35,8 @@ the entry governs.
 - **PR** is a GitHub pull request; **issue #nnn** is a GitHub issue. The
   **head** or **exact head** is the specific latest commit of a pull request
   that was checked and approved; a 40-character hexadecimal value is a Git
-  commit ID (SHA), often shortened to 7 characters.
+  object ID (SHA), a commit unless the entry calls it a tree, often shortened
+  to 7 characters.
 - **CI** (continuous integration) is the GitHub Actions jobs in
   `.github/workflows/validate-skills.yml`: `validate-skills` (the Linux run),
   `windows-offline-checks` (the Windows run) and `gate-guard`. On pull
@@ -47,8 +48,9 @@ the entry governs.
   pull request changes a protected path: the merge gate or a surface that
   enforces it, such as workflow files, `CODEOWNERS`, the validator, the DCO
   script, CI scripts and tests, or `tools/behavioral_eval_runner/`. A
-  **gate-guard exception** is a one-time owner decision to merge one exact
-  head despite that failure. An **administrator merge** uses repository
+  **gate-guard exception** is an owner decision to merge despite that
+  failure: usually one-time for one exact head, except the standing
+  four-file exception in AEGIS-APR-047. An **administrator merge** uses repository
   administrator rights to merge past branch-protection requirements.
 - **Codex** is an automated pull-request reviewer; **P1** and **P2** are its
   two highest finding priority levels. **SHIP** is an independent reviewer's
@@ -90,7 +92,8 @@ the entry governs.
   virtual machine, **SDK** software development kit, **CLI** command-line
   interface, **UTC** Coordinated Universal Time, **PDT** Pacific Daylight
   Time, **GiB** gibibyte, **ISO** a disc-image file, **SHA-256** a file
-  checksum, **JSON** JavaScript Object Notation.
+  checksum, **JSON** JavaScript Object Notation, **eval** evaluation (a
+  skill's test cases in its `evals/*.json` files).
 
 ## Grants and lifecycle events
 
