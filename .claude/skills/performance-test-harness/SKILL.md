@@ -7,7 +7,11 @@ description: Design the harness that MEASURES performance as release evidence �
 
 Reading key: D12.3 names the roadmap's performance-design group;
 service-level objective (SLO) names an agreed service target; continuous
-integration (CI) runs automated checks on proposed and merged changes.
+integration (CI) runs automated checks on proposed and merged changes; a
+pull request (PR) proposes one change; end-to-end (E2E) tests drive a whole
+user journey; p50, p95 and p99 are the 50th, 95th and 99th percentile
+values; central processing unit (CPU) means a machine's processor; and
+personally identifiable information (PII) can identify a person.
 
 ## Purpose
 
@@ -39,7 +43,7 @@ the traffic it drives comes from `load-test-planner` scenarios.
   pre-release assertions.
 - Do NOT use when: designing the system to BE fast — caching, query
   tuning, budgets, frontend optimization are the D12.3 pack
-  (`caching-strategy-designer`, `query-plan-reader`,
+  (`caching-strategy-designer`, `query-plan-reader` *(manual-only)*,
   `latency-budget-architect`, `frontend-perf-engineer`); this skill
   measures what they built.
 - Do NOT use when: planning the traffic itself — workload models,
@@ -50,7 +54,7 @@ the traffic it drives comes from `load-test-planner` scenarios.
   the harness raises the flag, the methodology finds the culprit.
 - Do NOT use when: designing production SLO monitoring/alerting —
   that is `slo-reliability-architect` (targets/alerts) and
-  `observability-operator` (wiring); this harness is PRE-release
+  `observability-operator` *(manual-only)* (wiring); this harness is PRE-release
   validation.
 - Do NOT use when: architecting the functional test suites (unit/
   integration/E2E structure, runners, fixtures) —
@@ -86,7 +90,7 @@ the traffic it drives comes from `load-test-planner` scenarios.
 1. **Choose the measured set.** Per surface class, the specific
    measurements: endpoints (latency p50/p95/p99, error rate,
    throughput at target load), queries (timing at representative
-   volume — plan-shape checks live with `query-plan-reader`),
+   volume — plan-shape checks live with `query-plan-reader` *(manual-only)*),
    frontend (the loading/interactivity/stability trio on the device
    class `frontend-perf-engineer` defined), jobs/functions (duration,
    queue wait). Every measurement names its owner and the decision it
@@ -201,7 +205,7 @@ Execution posture: dedicated environments; production/shared-infra touches
 
 ## Gotchas
 
-- The noise-ban paradox: gates tighter than the environment's noise
+- The noise-band paradox: gates tighter than the environment's noise
   band fail randomly, get muted, and then miss real regressions —
   the band is measured first, the gate set outside it. A flaky perf
   gate is worse than none.

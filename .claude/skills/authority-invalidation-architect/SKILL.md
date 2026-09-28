@@ -7,9 +7,11 @@ description: 'Diagnose access changes that failed to take effect: revoked roles 
 
 Here, **JWT** means JSON Web Token, **TTL** means time to live, **HTTP**
 means Hypertext Transfer Protocol, **CDN** means content delivery network,
-**RLS** means row-level security, **UI** means user interface, and **URL**
-means uniform resource locator. React Query, SWR, and Apollo below are names
-of client data-cache tools.
+**RLS** means row-level security, **UI** means user interface, **URL** means
+uniform resource locator, **API** means application programming interface,
+**SQL** means Structured Query Language, **DB** means database, **UX** means
+user experience, and **authz** is short for authorization. React Query, SWR,
+and Apollo below are names of client data-cache tools.
 
 ## Purpose
 
@@ -65,7 +67,7 @@ the differential and verify battery no single-surface skill can see whole.
 - Do NOT use when: a credential leaked and needs rotation or custody fixes
   — `secrets-identity-hardener` (manual-only).
 - Do NOT use when: an unknown-cause failure has no authority-change shape —
-  `systematic-debugger` is the generic method; this skill is the domain
+  `systematic-debugger` *(manual-only)* is the generic method; this skill is the domain
   differential for this symptom family and composes that method's evidence
   discipline where the holder is ambiguous.
 
@@ -192,7 +194,7 @@ the differential and verify battery no single-surface skill can see whole.
    revoked-membership negative tests are the design-time DB/API subset of
    this battery; this step extends them across every live surface.
 7. **Hand off implementation.** Deliver named controls: session/token
-   custody changes → `secrets-identity-hardener`; cache, channel, plan,
+   custody changes → `secrets-identity-hardener` *(manual-only)*; cache, channel, plan,
    link, and index changes → their owners' outputs; anything touching
    live production state follows the ops approval path. This skill
    designs and specifies verification — it executes nothing against live

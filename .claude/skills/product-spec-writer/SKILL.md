@@ -52,7 +52,7 @@ technical decision to `adr-writer`.
 - Do NOT use when: writing the engineering design doc — that is
   `tech-spec-writer`; this skill captures the user-facing what and why.
 - Do NOT use when: driving a vague app idea end to end — that is
-  `project-orchestrator`, which invokes this skill when Stage 2 begins.
+  `project-orchestrator`, which invokes this skill when its Stage 2 (define the product) begins.
 
 ## Inputs to Inspect
 
@@ -195,7 +195,7 @@ Known / assumed / open separated
 - Requirements are still unclear or contested → route back to
   `requirements-gathering-facilitator`; do not write a spec that invents
   agreement.
-- The request is the flag/rollout mechanics (progressive %s, targeting,
+- The request is the flag/rollout mechanics (progressive percentage steps, targeting,
   guardrail auto-rollback, kill switch) → route to
   `feature-flag-rollout-strategist`; the spec states rollout intent and
   success only.

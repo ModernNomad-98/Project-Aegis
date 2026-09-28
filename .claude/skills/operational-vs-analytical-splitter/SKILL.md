@@ -8,7 +8,9 @@ description: 'Decide which workloads must leave the operational (transactional) 
 Reading key: online transaction processing (OLTP) serves short operational
 reads and writes; online analytical processing (OLAP) serves broad scans and
 aggregations; change data capture (CDC) streams source changes; business
-intelligence (BI) is reporting and analysis.
+intelligence (BI) is reporting and analysis; p99 is the 99th-percentile
+latency; IO means input/output (disk and network transfer); and an
+application programming interface (API) is a service's request interface.
 
 ## Purpose
 
@@ -38,7 +40,7 @@ whole split unnecessary (`query-plan-reader`).
 - Use when: an incident review shows a reporting query caused
   transactional degradation and a standing boundary is needed.
 - Do NOT use when: ONE query is slow and fixable — read its plan first
-  (`query-plan-reader`); a missing index does not justify a warehouse.
+  (`query-plan-reader` *(manual-only)*); a missing index does not justify a warehouse.
 - Do NOT use when: the split is decided and the analytical destination
   needs designing — zones, modeling, formats are
   `warehouse-lake-architect`.
@@ -84,7 +86,7 @@ whole split unnecessary (`query-plan-reader`).
    with evidence (lock waits, IO saturation windows, correlated p99).
    A split justified by vibes moves work without moving the problem.
    If the evidence points at ONE fixable query, stop — route to
-   `query-plan-reader` and re-evaluate after the fix.
+   `query-plan-reader` *(manual-only)* and re-evaluate after the fix.
 3. **Record freshness tolerance per consumer.** For each analytical
    consumer: the staleness it can actually accept, in seconds/minutes/
    hours, with the owner's sign-off. "Real-time" claims get interrogated
@@ -198,7 +200,7 @@ Escape checked:  <the one-bad-query check was performed; result>
 ## Stop Conditions
 
 - The evidence shows the pain is ONE query with a broken plan → stop the
-  split; route to `query-plan-reader`; re-evaluate only if pain persists
+  split; route to `query-plan-reader` *(manual-only)*; re-evaluate only if pain persists
   after the fix. Do not prescribe architecture where an index suffices.
 - No freshness tolerance can be obtained for a consumer (owner unknown or
   unwilling to commit) → hold that workload's verdict; a mechanism chosen
