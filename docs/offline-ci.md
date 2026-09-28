@@ -29,14 +29,39 @@ check names stay `validate-skills` and `gate-guard`; branch protection is unchan
 
 | Job | Coverage | Merge role | Timeout |
 | --- | --- | --- | --- |
-| `validate-skills` on Ubuntu | CI recorder/guard regressions, validator and audit self-tests, skill validation, BER self-check and full suite, setup routing-contract and delivery-control suites, PowerShell Core Scenario A acceptance, pull-request-only Developer Certificate of Origin (DCO) check | Existing required check | 15 minutes |
-| `windows-offline-checks` on Windows | Recorder regressions, validator and audit self-tests, skill validation, BER self-check and full suite, setup routing-contract and delivery-control suites, sequential PowerShell Desktop 5.1 and Core acceptance | Additional visible coverage; not registered as required | 20 minutes |
+| `validate-skills` on Ubuntu | CI recorder/guard regressions, validator and audit self-tests, skill validation, BER self-check and full suite, PowerShell Core Scenario A acceptance, pull-request-only Developer Certificate of Origin (DCO) check | Existing required check | 15 minutes |
+| `windows-offline-checks` on Windows | Recorder regressions, validator and audit self-tests, skill validation, BER self-check and full suite, sequential PowerShell Desktop 5.1 and Core acceptance | Additional visible coverage; not registered as required | 20 minutes |
 | `gate-guard` on Ubuntu | Detect changes to the merge gate and its enforcement surfaces | Existing required check; PR only | 5 minutes |
+| `tools-tests-linux` on Ubuntu | Host-bridge Node callback tests, setup routing-contract suite, delivery-control suite | Isolated from the gates; not registered as required | 15 minutes |
+| `tools-tests-windows` on Windows | The same three suites | Isolated from the gates; not registered as required | 20 minutes |
 
 The two verification jobs run independently, without cross-platform fail-fast,
 automatic retries, quarantine or `continue-on-error`. A delivery closeout waits
 for both verification jobs. A post-merge run detects regressions on `main`; it
 cannot retroactively prevent a merge.
+
+### Gate isolation
+
+The two verification jobs execute only repository code that `gate-guard`
+protects (see [Protected files](#protected-files)), plus pinned actions and
+pinned dependencies. Pull request (PR) files outside that set are read only as
+data, for example skills checked by the validator. Test code that a pull
+request can change without tripping `gate-guard` runs in the separate
+`tools-tests-linux` and `tools-tests-windows` jobs instead. That covers the
+host-bridge Node tests, `tools/aegis_setup/tests` and
+`tools/aegis_delivery_control/tests`. A step in a gate job could write to
+`$GITHUB_ENV` or `$GITHUB_PATH`, or rewrite a gate script before it runs, and
+make a failing gate pass. A separate job shares no runner, environment file,
+`PATH` or checkout with the gates, so this code cannot reach them.
+
+The tools jobs use a read-only token, reference no secrets and do not persist
+checkout credentials. `scripts/tests/test_offline_ci.py` checks this layout: a
+gate job that runs Node, runs a tools suite or executes a repository path
+outside the `gate-guard` pattern fails the CI self-tests.
+
+Whether the tools jobs become required status checks is a separate
+branch-protection decision for the owner. Until then they are visible
+coverage, and a delivery closeout waits for them like the Windows job.
 
 ## Dependencies and environment
 

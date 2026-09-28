@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 import shlex
 import shutil
@@ -302,6 +303,85 @@ class ImportPathIsolationTests(unittest.TestCase):
         result = self.run_shadowed_validator(command)
         self.assertIn("FAILED:", result.stdout, result.stdout + result.stderr)
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+
+class GateJobIsolationTests(unittest.TestCase):
+    """Gate jobs run only gate-guarded repository code; tools suites run apart.
+
+    A step in a gate job can write $GITHUB_ENV or $GITHUB_PATH, or rewrite a
+    gate script before it runs, so any pull-request-controlled code outside
+    the gate-guard set must run in a separate job.
+    """
+
+    GATE_JOBS = ("validate-skills", "windows-offline-checks")
+    TOOLS_JOBS = ("tools-tests-linux", "tools-tests-windows")
+    TOOLS_LABELS = ("setup-bridge", "setup-tests", "delivery-control")
+
+    @classmethod
+    def setUpClass(cls):
+        cls.workflow = load_workflow()
+        guard = next(step["run"] for step in cls.workflow["jobs"]["gate-guard"]["steps"]
+                     if "gate_pattern=" in step.get("run", ""))
+        cls.gate_pattern = re.compile(re.search(r"gate_pattern='([^']+)'", guard).group(1),
+                                      re.IGNORECASE)
+
+    def repo_paths(self, job_name):
+        """Yield every repository path or module a job's steps execute or read."""
+        for step in self.workflow["jobs"][job_name]["steps"]:
+            if "working-directory" in step:
+                yield step.get("name", ""), step["working-directory"].rstrip("/") + "/"
+            for line in step.get("run", "").splitlines():
+                words = shlex.split(line, comments=True, posix=True)
+                for index, word in enumerate(words):
+                    if index and words[index - 1] == "-m" and "." in word:
+                        yield step.get("name", ""), word.replace(".", "/") + "/"
+                    elif index and words[index - 1] == "-r":
+                        yield step.get("name", ""), word
+                    elif ("/" in word and "$" not in word and "://" not in word
+                          and not word.startswith(("-", "origin/"))):
+                        yield step.get("name", ""), word
+
+    def test_gate_jobs_run_only_gate_guarded_repository_paths(self):
+        for job_name in self.GATE_JOBS:
+            paths = list(self.repo_paths(job_name))
+            self.assertGreaterEqual(len(paths), 10, job_name)
+            for step_name, path in paths:
+                with self.subTest(job=job_name, step=step_name, path=path):
+                    self.assertRegex(path, self.gate_pattern)
+
+    def test_gate_jobs_run_no_node_or_tools_suites(self):
+        for job_name in self.GATE_JOBS:
+            job = self.workflow["jobs"][job_name]
+            self.assertNotIn("needs", job)
+            for step in job["steps"]:
+                with self.subTest(job=job_name, step=step.get("name", step.get("uses"))):
+                    self.assertNotIn("setup-node", step.get("uses", ""))
+                    words = set(shlex.split(step.get("run", ""), comments=True))
+                    self.assertFalse(words & {"node", "npm", "npx"}, words)
+                    text = step.get("run", "") + step.get("working-directory", "")
+                    for path in ("tools/aegis_setup", "tools/aegis_delivery_control"):
+                        self.assertNotIn(path, text)
+
+    def test_tools_jobs_run_every_suite_with_read_only_access(self):
+        for job_name in self.TOOLS_JOBS:
+            job = self.workflow["jobs"][job_name]
+            with self.subTest(job=job_name):
+                self.assertEqual({"contents": "read"}, job["permissions"])
+                self.assertNotIn("needs", job)
+                self.assertNotIn("secrets.", json.dumps(job))
+                checkout = next(s for s in job["steps"]
+                                if s.get("uses", "").startswith("actions/checkout@"))
+                self.assertEqual("false", checkout["with"]["persist-credentials"])
+                labels = [shlex.split(s["run"])[3] for s in job["steps"]
+                          if "record-check.py" in s.get("run", "")]
+                self.assertEqual(list(self.TOOLS_LABELS), labels)
+
+    def test_gate_jobs_do_not_depend_on_tools_jobs(self):
+        for job_name, job in self.workflow["jobs"].items():
+            needs = job.get("needs", [])
+            needs = [needs] if isinstance(needs, str) else needs
+            with self.subTest(job=job_name):
+                self.assertFalse(set(needs) & set(self.TOOLS_JOBS))
 
 
 if __name__ == "__main__":
