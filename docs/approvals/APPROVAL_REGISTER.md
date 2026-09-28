@@ -2060,3 +2060,53 @@ the entry governs.
   the same file. The regenerated report names engine v1.13.3 at the frozen
   commit `5dbf7bc9e958d932bd0c5b093ebecfe61be41840`. Its findings are
   unchanged from the v1.13.2 baseline: 316 in total, 232 of them ROUTE-002.
+
+### AEGIS-APR-077: PR #475 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-078; no remaining use.
+  Recorded after the merge.
+- **Date / Grantor:** 2026-09-28 / Peter Nguyen.
+- **Reason:** [PR #475](https://github.com/ModernNomad-98/Project-Aegis/pull/475)
+  applies six readability edits to `tools/behavioral_eval_runner/README.md`
+  from the owner-ordered pre-rule readability sweep. That file is a protected
+  path outside AEGIS-APR-047's four BER files, so `gate-guard` fails, and
+  merging needs a one-time owner exception for the exact head.
+- **Scope allowed:** One `gate-guard` exception and administrator merge of
+  PR #475 at exact head `acdcdad4563bc74e8dfd78c473678cc9a0b39c0b`, which
+  changed only `tools/behavioral_eval_runner/README.md`.
+  [Exact-head run 36442330809](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36442330809)
+  passed `validate-skills` and `windows-offline-checks`, each running the
+  complete offline BER suite (1088 tests, OK); `gate-guard` failed only on
+  `tools/behavioral_eval_runner/README.md`. An
+  [independent corrected-candidate review](https://github.com/ModernNomad-98/Project-Aegis/pull/475#issuecomment-5873052127)
+  of that head returned ACCEPT and found the diff is exactly the six
+  required edits. Codex posted only usage-limit notices after the head
+  commit (15:16:05 UTC): at 15:16:35, 15:16:48 and 15:21:27 UTC on
+  2026-09-28.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
+  not change branch protection or the protected path set, and it did not
+  widen AEGIS-APR-047.
+- **Evidence:** Direct owner answers "Prepare it (Recommended)" (to prepare
+  the PR) and "Approve for acdcdad only (Recommended)" (the exception) to the
+  coordinating agent's multiple-choice questions in the Project Aegis
+  conversation (Claude Code session) on 2026-09-28, relayed by that agent.
+  The
+  [exception receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/475#issuecomment-5873259254)
+  on PR #475 records the head, checks, review and merge.
+- **Expiry / use limit:** One merge of PR #475 at the named head; consumed
+  by the merge recorded in AEGIS-APR-078.
+
+### AEGIS-APR-078: Consumption of the PR #475 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-077.
+- **Status at recording:** AEGIS-APR-077 has no remaining use.
+- **Effective at:** 2026-09-28 15:31:48 UTC.
+- **Recorded at / By:** 2026-09-28 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039.
+- **New authority:** None. A later change to a protected path needs its own
+  exception.
+- **Reason:** The sole exact-head administrator merge completed.
+- **Evidence:** [PR #475](https://github.com/ModernNomad-98/Project-Aegis/pull/475)
+  merged `acdcdad4563bc74e8dfd78c473678cc9a0b39c0b` as
+  `59b2fb7cbc5dbc27ff33a1d2bf59792d5e865ccc` at the time above.
