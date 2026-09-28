@@ -1,13 +1,14 @@
 ---
 name: code-reviewer
-description: 'Review an ACTUAL diff — a PR, branch delta, or staged/working changes obtained from git — and report findings by severity (blocker/major/minor/nit), each with file:line evidence and a concrete remediation. Covers correctness, security, performance, reliability, maintainability, test adequacy, and migration safety, and reads enough surrounding unchanged code to judge the change in context. Use when asked to review a diff, PR, branch, or commit. Do NOT use for security-focused review (security-pr-reviewer), skill-library PRs (library-diff-reviewer), behavior-preserving cleanup application (code-simplifier), whole-repository audits (full-codebase-auditor), strategic architecture assessment of a subsystem (principal-code-analyst), or gating AI-generated code before it is saved, committed or run (llm-output-safety-reviewer). Never reviews imagined code: no diff, no review.'
+description: 'Review an ACTUAL diff — a PR, branch delta, or staged/working changes obtained from git — and report findings by severity (blocker/major/minor/nit), each with file:line evidence and a concrete remediation. Covers correctness, security, performance, reliability, maintainability, test adequacy, migration safety, and agent-typical faults: scope beyond the stated intent, drift from recorded architecture decisions, tests weakened or skipped to pass. Use when asked to review a diff, PR, branch, or commit. Do NOT use for security-focused review (security-pr-reviewer), skill-library PRs (library-diff-reviewer), behavior-preserving cleanup application (code-simplifier), whole-repository audits (full-codebase-auditor), strategic architecture assessment of a subsystem (principal-code-analyst), or gating AI-generated code before it is saved, committed or run (llm-output-safety-reviewer). Never reviews imagined code: no diff, no review.'
 ---
 
 # Code Reviewer
 
 **Reading key:** PR means pull request, a proposed code change; CI means
 continuous integration; RLS means row-level security; authz means
-authorization; I/O means input and output.
+authorization; I/O means input and output; ADR means architecture decision
+record, a written record of a design decision and its rules.
 An N+1 query pattern means one list query triggers an additional database
 query for each returned item.
 
@@ -26,6 +27,8 @@ request-changes, with the blocking findings named.
   the current staged/working diff.
 - Use when: a change is about to merge and needs a correctness/security/test
   pass with severity-ranked output.
+- Use when: a coding agent wrote the change; the same review also checks
+  for tests weakened to pass and drift from recorded ADRs.
 - Do NOT use when: the request is to *apply* simplifications — that is
   `code-simplifier` (side-effecting, manual-only).
 - Do NOT use when: the scope is the whole repository's health, not one change
@@ -52,6 +55,8 @@ request-changes, with the blocking findings named.
 4. The tests touched or conspicuously not touched by the change.
 5. Migrations, schema, config, CI, and dependency changes riding along —
    the risky lines often hide outside `src/`.
+6. The repository's ADRs and documented layering rules that cover the
+   changed code; note "none found" rather than assuming there are none.
 
 ## Workflow
 
@@ -71,9 +76,15 @@ request-changes, with the blocking findings named.
    moved onto hot paths, unbounded growth.
 6. **Fourth pass — tests & migrations:** do tests pin the new behavior and
    its edges (would they fail if the change were reverted?); are migrations
-   forward-safe, rollback-considered, and deploy-order-safe?
+   forward-safe, rollback-considered, and deploy-order-safe? Then check for
+   **weakened validation**: tests deleted or skipped, assertions loosened,
+   timeouts or retries raised, or CI steps removed in the same diff. Each is
+   at least MAJOR, naming the test or step, unless the stated intent explains
+   it (for example, a test deleted together with the feature it covered).
 7. **Fifth pass — maintainability:** naming, duplication, dead code,
-   convention drift — reported as minor/nit unless it hides a defect.
+   convention drift — reported as minor/nit unless it hides a defect. Drift
+   from a recorded ADR or documented layering rule is MAJOR and cites the ADR
+   or rule; without a recorded decision, convention drift stays minor/nit.
 8. **Write findings** with severity, anchor, failure scenario, remediation.
    Uncertain claims are marked "needs verification", not asserted.
 9. **Deliver the verdict** with blockers listed; note what was NOT reviewed
@@ -91,6 +102,7 @@ Findings (by severity):
   [MINOR]   ...
   [NIT]     ...
 Tests: <adequate | gaps: which behaviors are unpinned>
+Validation integrity: <intact | weakened: which tests, assertions or CI steps>
 Migrations/config/deps: <safe | findings>
 Not reviewed: <exclusions + why>
 Positive notes: <what the change does well — optional but earned>
@@ -103,6 +115,10 @@ Positive notes: <what the change does well — optional but earned>
 - [ ] Severity reflects impact, not annoyance — style nits are never majors.
 - [ ] Callers/callees of changed code were read, not just the hunks.
 - [ ] Test adequacy judged by "would the tests catch a revert?".
+- [ ] Deleted, skipped or loosened tests and removed CI steps were checked;
+      each one the intent does not explain is at least MAJOR.
+- [ ] Recorded ADRs and layering rules were read; drift from them is MAJOR
+      and cites the ADR.
 - [ ] Migration/dependency/CI changes in the diff got explicit attention.
 - [ ] Verdict states which findings block; unverified suspicions labeled.
 
@@ -140,4 +156,7 @@ Positive notes: <what the change does well — optional but earned>
   definitions with boundary examples, and the per-pass checklists in full.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against `code-simplifier`,
-  `principal-code-analyst`, and `full-codebase-auditor` (review/audit cluster).
+  `principal-code-analyst`, and `full-codebase-auditor` (review/audit
+  cluster), and against `security-pr-reviewer`, `test-coverage-mapper`,
+  `llm-output-safety-reviewer` and `agent-governance-audit` for reviews of
+  agent-written changes.
