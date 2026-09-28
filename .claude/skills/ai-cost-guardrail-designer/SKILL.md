@@ -13,7 +13,8 @@ An application programming interface (API) is a software call boundary;
 continuous integration (CI) runs automated checks. “LLMjacking” means abuse
 of a stolen model-provider credential to consume the owner's allowance.
 First in, first out (FIFO) is a queue order that serves earlier arrivals
-before later ones.
+before later ones. Denial of wallet means forcing the owner to pay for
+excessive model use; denial of service means making the feature unavailable.
 
 ## Purpose
 
@@ -32,7 +33,9 @@ economics come from `saas-cost-architect` and the metering implementation from
 `observability-operator`; key-custody mechanics defer to
 `secrets-identity-hardener` and the general fail-closed discipline to
 `error-handling-security-reviewer`. This skill composes all four and focuses on
-the guardrail design.
+the guardrail design. `observability-operator`, `secrets-identity-hardener`
+and `ai-router-architect` are manual-only: this skill names the handoff, and a
+person runs that skill by name; it is never invoked automatically.
 
 ## Use When
 
@@ -252,7 +255,8 @@ Owner choices: <term definitions | options and reasons | verified/unknown dollar
 - Tenant isolation applies to capacity and budget: one tenant (or attacker)
   must not be able to consume another tenant's quota or starve the platform.
 - Public/unauthenticated inference endpoints are the highest-risk surface —
-  they need the tightest per-IP/per-session caps and a kill switch.
+  they need the tightest per-Internet Protocol (IP) address and per-session
+  caps and a kill switch.
 
 ## Gotchas
 
