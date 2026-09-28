@@ -468,7 +468,8 @@ tests vs database-policy audit).
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (the original sixteen sit in one of four overlap clusters;
-`acceptance-criteria-reviewer`, added by D68, carries its own seams). Per
+`acceptance-criteria-reviewer` and `test-tenant-provisioner`, added by D68, carry their
+own seams). Per
 [historical master prompt, section 7](prompts/claude-skills-master-generation-prompts-v4.md): QA starts from risk; every layer choice picks the cheapest reliable
 layer; E2E is reserved for critical journeys; manual cases are executable by another
 tester; screenshot evidence carries naming/masking/metadata/storage rules; Playwright
@@ -480,6 +481,8 @@ proves stability. Five skills have side effects and are **manual-only**
 browser), `clickthrough-test-engineer` (drives a live app), `vitest-unit-component-engineer`
 (writes test files, runs suites), `vite-build-qa-engineer` (runs builds/preview),
 and `flaky-test-detective` (applies a test-layer fix and verifies stability).
+D68 added a sixth manual-only skill, `test-tenant-provisioner` (writes marked
+test accounts to a named non-production environment).
 
 **Pulled forward from the QA backlog** (in addition to the 13 canonical Phase 5 skills):
 `integration-test-designer` (roadmap #184), `api-contract-test-designer` (roadmap #185),
@@ -512,6 +515,7 @@ reviews criteria and runs no tests; the #227 definition-of-done check stays cove
 | `api-contract-test-designer` | cat 06 **#185 (pulled forward)** | yes | Contract VERIFICATION (not design): provider/consumer roles, request/response schema + error-envelope validation, additive-vs-breaking CI gate, version coverage, fake-fidelity re-validation; contract design stays with `api-event-architect`. |
 | `accessibility-test-harness` | cat 06 **#204 (pulled forward)** + cat 05 #173 | yes | WCAG-pinned a11y harness: automated scans (component/E2E/CI, baseline+ratchet) AND manual keyboard/focus/contrast/screen-reader checklists; explicit about what automation cannot judge. |
 | `acceptance-criteria-reviewer` | cat 06 #226 (D68; #227 stays with `release-readiness-reviewer`) | yes | Reviews EXISTING acceptance criteria in a spec, ticket or story: per-criterion TESTABLE / NEEDS-REWRITE / UNTESTABLE verdict (observable outcome, pass/fail threshold, evidence), vague words flagged with suggested rewrites for the author to accept, missing negative/boundary/permission cases listed as gaps (never invented as requirements), one owner question per unclear or contradictory item. Edits nothing; hands checked criteria to `test-plan-designer`. |
+| `test-tenant-provisioner` | cat 06 #198 (D10 Tier 1, built by D68) | **no** (manual-only; writes test accounts to an environment) | Makes the persona catalog's test tenants, users, roles and memberships exist in a named NON-PRODUCTION environment: validate-only drift report by default (missing/drifted/orphaned/blocked), apply creates or repairs only marked rows after plan approval, never touches unmarked rows, credentials by environment-variable name only, backup-gated capability grants with inline rollback, static production-reach lint. Pinned ≠ `test-data-architect` (designs the catalog), `multi-tenant-security-tester`, `tenant-modeler`, `playwright-e2e-engineer`, `secrets-identity-hardener`. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 5 clusters:
 **strategy/plan/coverage** (`qa-strategy-architect`, `test-plan-designer`,
@@ -1292,7 +1296,8 @@ Per reconciliation §3, the Phase 5 **expansion backlog** (`e2e-test-architect`,
 `qa-closeout-reporter` — the latter overlaps the shipped
 `ai-closeout-reporter` + `screenshot-evidence-planner` — plus the remaining cat-06 rows)
 remains backlog, built in Phase 8 batches (`acceptance-criteria-tester` left it when D68
-built it as `acceptance-criteria-reviewer`, narrowed to #226) — **except the Tier 1 headline pair
+built it as `acceptance-criteria-reviewer`, narrowed to #226, and #198 left it as
+`test-tenant-provisioner`) — **except the Tier 1 headline pair
 `performance-test-harness` + `load-test-planner` (#205/#206), ✅ built by D23
 (2026-07-07) as two skills and moved to
 [Implemented → Skills (D10 Tier 1)](#skills-d10-tier-1--performanceload-validation)

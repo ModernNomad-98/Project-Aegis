@@ -1,6 +1,6 @@
 ---
 name: multi-tenant-security-tester
-description: "MANUAL-ONLY; never auto-invoke. Design and specify an executable negative-test suite that PROVES tenant isolation and object-level authorization hold — cross-tenant reads/writes, IDOR by-id enumeration, privilege escalation, wrong-role and wrong-tenant access, and service-role/background-job bypasses — with a per-surface test matrix, seeded two-tenant fixtures, and pass = the forbidden action is denied. Use when asked to write or plan tenant-isolation / authorization security tests, to turn isolation-review or threat-model findings into regression tests, or to add a cross-tenant negative suite before a security-sensitive launch. Do NOT use to FIND leaks by inspection (tenant-isolation-reviewer), define tenant semantics (tenant-modeler), audit RLS policy text (rls-policy-auditor), or review a diff (security-pr-reviewer)."
+description: "MANUAL-ONLY; never auto-invoke. Design and specify an executable negative-test suite that PROVES tenant isolation and object-level authorization hold — cross-tenant reads/writes, IDOR by-id enumeration, privilege escalation, wrong-role and wrong-tenant access, and service-role/background-job bypasses — with a per-surface test matrix, seeded two-tenant fixtures, and pass = the forbidden action is denied. Use when asked to write or plan tenant-isolation / authorization security tests, to turn isolation-review or threat-model findings into regression tests, or to add a cross-tenant negative suite before a security-sensitive launch. Do NOT use to FIND leaks by inspection (tenant-isolation-reviewer), define tenant semantics (tenant-modeler), audit RLS policy text (rls-policy-auditor), review a diff (security-pr-reviewer), or create the fixture accounts in an environment (test-tenant-provisioner)."
 disable-model-invocation: true
 ---
 
@@ -37,6 +37,9 @@ happy path proves nothing about isolation and is treated as absent.
   (which itself produces an RLS negative-test plan; this skill covers the
   application/API and cross-surface layers).
 - Do NOT use when: reviewing a diff — `security-pr-reviewer`.
+- Do NOT use when: the seeded accounts must be created or repaired in a real
+  environment — `test-tenant-provisioner` *(manual-only)* (this skill specifies the fixture's
+  required shape; that skill makes the marked accounts exist).
 
 ## Inputs to Inspect
 

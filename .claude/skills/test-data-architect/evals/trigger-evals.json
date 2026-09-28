@@ -5,7 +5,8 @@
     "multi-tenant-data-architect",
     "multi-tenant-security-tester",
     "qa-automation-architect",
-    "flaky-test-detective"
+    "flaky-test-detective",
+    "test-tenant-provisioner"
   ],
   "cases": [
     {
@@ -44,6 +45,15 @@
         "test-data-architect"
       ],
       "reason": "A specific intermittent failure is flake casework (which may then cite shared-data design as the cause and hand systemic fixes here)."
+    },
+    {
+      "id": "account-provisioning-goes-to-provisioner",
+      "prompt": "Explicitly invoke test-tenant-provisioner. Create the catalog's missing test tenants and users in staging and repair the drifted roles.",
+      "expected_skill": "test-tenant-provisioner",
+      "should_not_trigger": [
+        "test-data-architect"
+      ],
+      "reason": "This skill designs the catalog; creating and repairing the accounts in a real environment is the manual-only provisioner's job (D68)."
     }
   ]
 }

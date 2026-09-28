@@ -1,6 +1,6 @@
 ---
 name: test-data-architect
-description: Design the test-data strategy across all test layers — deterministic seed/fixture/factory design (personas, tenants, roles, stable ids), per-layer data sources (inline builders for unit, seeded DB for integration, API-created fixtures for E2E), parallel-run isolation (worker-scoped namespacing, no shared mutable records), PII-safe synthetic data (never production copies without an approved anonymization path), cleanup/TTL and traceability rules, and seed evolution coupled to schema changes. Use when asked to design fixtures/seeds/factories, fix tests fighting over shared data, decide how E2E/integration suites get their data, replace production-data copies in tests, or make test data deterministic and parallel-safe. Produces the design; suite wiring goes to the engineer skills. Do NOT use to design the tenant data model itself (multi-tenant-data-architect), build cross-tenant SECURITY test suites (multi-tenant-security-tester), or design automation structure (qa-automation-architect).
+description: Design the test-data strategy across all test layers — deterministic seed/fixture/factory design (personas, tenants, roles, stable ids), per-layer data sources (inline builders for unit, seeded DB for integration, API-created fixtures for E2E), parallel-run isolation (worker-scoped namespacing, no shared mutable records), PII-safe synthetic data (never production copies without an approved anonymization path), cleanup/TTL and traceability rules, and seed evolution coupled to schema changes. Use when asked to design fixtures/seeds/factories, fix tests fighting over shared data, decide how E2E/integration suites get their data, or replace production-data copies in tests. Produces the design; suite wiring goes to the engineer skills. Do NOT use to design the tenant data model (multi-tenant-data-architect), build cross-tenant SECURITY test suites (multi-tenant-security-tester), create accounts in an environment (test-tenant-provisioner), or design automation structure (qa-automation-architect).
 ---
 
 # Test Data Architect
@@ -37,6 +37,9 @@ failure by design.
   `multi-tenant-security-tester` (its two-tenant A/B fixture recipe is
   authoritative for those suites; this skill keeps general fixtures
   compatible with it, not competing).
+- Do NOT use when: creating, repairing or checking the catalog's test
+  accounts in a real environment — `test-tenant-provisioner` *(manual-only)*,
+  which consumes this skill's persona catalog.
 - Do NOT use when: structuring the automation framework/CI —
   `qa-automation-architect` (it decides where fixtures LIVE; this skill
   decides what they ARE).
