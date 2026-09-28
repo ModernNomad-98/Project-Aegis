@@ -1,6 +1,6 @@
 {
   "skill": "ai-router-architect",
-  "description": "Trigger discrimination for the Phase 7 AI-platform-ops cluster: model-routing/gateway layer vs cost policy vs telemetry implementation vs credential custody vs output schema, and against the shipped observability-operator and secrets-identity-hardener.",
+  "description": "Trigger discrimination for the Phase 7 AI-platform-ops cluster: model-routing/gateway layer vs cost policy vs telemetry implementation vs credential custody vs output schema, and against the shipped observability-operator and secrets-identity-hardener, and against agent-harness-architect (agent registry) and structured-output-validator (output shape) for provider adapters and the capability matrix.",
   "overlaps_with": ["ai-cost-guardrail-designer", "observability-operator", "secrets-identity-hardener", "structured-output-validator", "agent-harness-architect"],
   "cases": [
     {

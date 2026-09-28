@@ -12,7 +12,7 @@ Personally identifiable information (PII) can identify a person. A provider
 adapter translates one provider's requests, responses, tool calls, streaming
 chunks and errors to and from the router's internal interface. A capability
 matrix records which features each model supports, such as tool calling,
-structured output, context size and image input. This
+structured output, context size and image input. The client bundle is the code shipped to users' browsers. A circuit breaker stops calls to a failing provider for a while; backoff with jitter waits a growing, slightly random time between retries; an idempotency key lets a repeated call be recognized so its effect happens only once. This
 manual-only skill designs routing and live-provider wiring; it does not grant
 permission to use credentials or call a provider.
 
@@ -55,12 +55,12 @@ rather than redoing their work.
 2. Provider/model inventory: which providers and models, their pricing tiers,
    rate limits, and failure modes.
 3. Credential handling: where API keys live now — a key in the client bundle
-   or a public env var is a top finding (compose `secrets-identity-hardener`
+   or a public environment variable is a top finding (compose `secrets-identity-hardener`
    *(manual-only)*).
 4. Cost/rate policy: the budgets, caps, and model-tier intent from
    `ai-cost-guardrail-designer` this layer must enforce.
 5. Telemetry needs: the per-call metrics contract from
-   `observability-operator` / `saas-cost-architect` (attribution).
+   `observability-operator` *(manual-only)* / `saas-cost-architect` (attribution).
 6. Resilience requirements: acceptable degraded behavior when a provider is
    down or rate-limited; idempotency needs for retried calls.
 7. Provider formats and capabilities: each provider's request, tool-call,
@@ -73,7 +73,7 @@ rather than redoing their work.
    Scattered direct SDK calls are the anti-pattern this fixes. No call sites/
    provider design to inspect → Stop Conditions.
 2. **Lock credential custody.** All provider keys server-side only, injected
-   at runtime, never in the client bundle or a `VITE_`/`NEXT_PUBLIC_` var.
+   at runtime, never in the client bundle or a public `VITE_`/`NEXT_PUBLIC_` variable.
    Verify with a client-bundle-absence check (compose
    `secrets-identity-hardener` *(manual-only)*). Per-provider key rotation path.
 3. **Define the adapter contract and capability matrix.** Give each provider
@@ -187,7 +187,7 @@ Residual risk: <what remains + named acceptor>
   make it runtime config.
 - Centralizing is the point, but a god-object router that also does prompt
   construction, output parsing, and business logic becomes unmaintainable —
-  keep it to routing/custody/telemetry/resilience; compose the rest.
+  keep it to routing, provider adapters, custody, telemetry and resilience; compose the rest.
 
 ## Stop Conditions
 
@@ -196,7 +196,7 @@ Residual risk: <what remains + named acceptor>
 - The layer wires live providers/credentials: this skill is manual-only —
   propose the design/diff; applying it is a classified, approved step
   (`human-approval-boundary`).
-- A provider key is found in the client bundle or a public var — flag as a
+- A provider key is found in the client bundle or a public variable — flag as a
   blocking finding and route rotation through `secrets-identity-hardener`
   *(manual-only)*.
 - The ask is really the cost policy, telemetry implementation, output schema,

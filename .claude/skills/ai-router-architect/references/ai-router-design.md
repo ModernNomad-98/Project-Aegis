@@ -8,8 +8,8 @@ credentials.
 Scattered direct SDK calls each reimplement (badly) key handling, retries,
 cost tracking, and logging — and each is a place to leak a key or skip a
 budget check. One router gives a single choke point for custody, cost,
-telemetry, and kill-switch. Keep it focused: routing, credential custody,
-telemetry, resilience. Prompt construction, output parsing, and business
+telemetry, and kill-switch. Keep it focused: routing, provider adapters,
+credential custody, telemetry, resilience. Prompt construction, output parsing, and business
 logic stay OUT (compose the owning skills) or the router becomes a god object.
 
 ## Credential custody patterns
