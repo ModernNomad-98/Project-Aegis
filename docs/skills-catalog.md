@@ -468,7 +468,8 @@ tests vs database-policy audit).
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (the original sixteen sit in one of four overlap clusters;
-`acceptance-criteria-reviewer`, added by D68, carries its own seams). Per
+`acceptance-criteria-reviewer` and `test-tenant-provisioner`, added by D68, carry their
+own seams). Per
 [historical master prompt, section 7](prompts/claude-skills-master-generation-prompts-v4.md): QA starts from risk; every layer choice picks the cheapest reliable
 layer; E2E is reserved for critical journeys; manual cases are executable by another
 tester; screenshot evidence carries naming/masking/metadata/storage rules; Playwright
@@ -509,12 +510,12 @@ reviews criteria and runs no tests; the #227 definition-of-done check stays cove
 | `vite-build-qa-engineer` | cat 05 #178 + cat 06 #217 | **no** (manual-only; runs builds/preview) | Build-artifact QA: `VITE_` env classification, dist-level secret value+pattern proof, build/preview parity (base, deep links, modes), bundle budgets + sourcemap policy; exposures → `secrets-identity-hardener`. |
 | `flaky-test-detective` | cat 06 #209/#210 | **no** (manual-only; executes state-changing operations) | Classify → reproduce with counts → fix ONE cause → prove stability with repeated runs; no retries/sleeps/weakened assertions; product races routed as product bugs; quarantine with owner/ticket/expiry. |
 | `test-data-architect` | cat 06 #196–#199 | yes | Persona/baseline catalog (read-only), per-layer data sources, determinism, worker-scoped parallel isolation, synthetic-only PII posture, structural cleanup + traceability, schema-coupled seed evolution. |
-| `test-tenant-provisioner` | cat 06 #198 (D10 Tier 1, built by D68) | **no** (manual-only; writes test accounts to an environment) | Makes the persona catalog's test tenants, users, roles and memberships exist in a named NON-PRODUCTION environment: validate-only drift report by default (missing/drifted/orphaned/blocked), apply creates or repairs only marked rows after plan approval, never touches unmarked rows, credentials by environment-variable name only, backup-gated capability grants with inline rollback, static production-reach lint. Pinned ≠ `test-data-architect` (designs the catalog), `multi-tenant-security-tester`, `tenant-modeler`, `playwright-e2e-engineer`, `secrets-identity-hardener`. |
 | `regression-suite-curator` | cat 06 #190/#210 | yes | Evidence-based promote/retain/demote/retire with written rationale (never silent deletion), protected security regressions (human-approval to retire), enforced quarantine registry, tier-budget fit. |
 | `integration-test-designer` | cat 06 **#184 (pulled forward)** | yes | The layer BETWEEN unit and E2E: real service/command/DB/auth/permission boundaries, named faked seams with rationale, real-path auth minting, persisted-state assertions, no browser; security matrices deferred to `multi-tenant-security-tester`. |
 | `api-contract-test-designer` | cat 06 **#185 (pulled forward)** | yes | Contract VERIFICATION (not design): provider/consumer roles, request/response schema + error-envelope validation, additive-vs-breaking CI gate, version coverage, fake-fidelity re-validation; contract design stays with `api-event-architect`. |
 | `accessibility-test-harness` | cat 06 **#204 (pulled forward)** + cat 05 #173 | yes | WCAG-pinned a11y harness: automated scans (component/E2E/CI, baseline+ratchet) AND manual keyboard/focus/contrast/screen-reader checklists; explicit about what automation cannot judge. |
 | `acceptance-criteria-reviewer` | cat 06 #226 (D68; #227 stays with `release-readiness-reviewer`) | yes | Reviews EXISTING acceptance criteria in a spec, ticket or story: per-criterion TESTABLE / NEEDS-REWRITE / UNTESTABLE verdict (observable outcome, pass/fail threshold, evidence), vague words flagged with suggested rewrites for the author to accept, missing negative/boundary/permission cases listed as gaps (never invented as requirements), one owner question per unclear or contradictory item. Edits nothing; hands checked criteria to `test-plan-designer`. |
+| `test-tenant-provisioner` | cat 06 #198 (D10 Tier 1, built by D68) | **no** (manual-only; writes test accounts to an environment) | Makes the persona catalog's test tenants, users, roles and memberships exist in a named NON-PRODUCTION environment: validate-only drift report by default (missing/drifted/orphaned/blocked), apply creates or repairs only marked rows after plan approval, never touches unmarked rows, credentials by environment-variable name only, backup-gated capability grants with inline rollback, static production-reach lint. Pinned ≠ `test-data-architect` (designs the catalog), `multi-tenant-security-tester`, `tenant-modeler`, `playwright-e2e-engineer`, `secrets-identity-hardener`. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 5 clusters:
 **strategy/plan/coverage** (`qa-strategy-architect`, `test-plan-designer`,
@@ -1295,7 +1296,8 @@ Per reconciliation §3, the Phase 5 **expansion backlog** (`e2e-test-architect`,
 `qa-closeout-reporter` — the latter overlaps the shipped
 `ai-closeout-reporter` + `screenshot-evidence-planner` — plus the remaining cat-06 rows)
 remains backlog, built in Phase 8 batches (`acceptance-criteria-tester` left it when D68
-built it as `acceptance-criteria-reviewer`, narrowed to #226) — **except the Tier 1 headline pair
+built it as `acceptance-criteria-reviewer`, narrowed to #226, and #198 left it as
+`test-tenant-provisioner`) — **except the Tier 1 headline pair
 `performance-test-harness` + `load-test-planner` (#205/#206), ✅ built by D23
 (2026-07-07) as two skills and moved to
 [Implemented → Skills (D10 Tier 1)](#skills-d10-tier-1--performanceload-validation)
