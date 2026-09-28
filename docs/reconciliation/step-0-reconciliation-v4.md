@@ -3305,8 +3305,8 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     [Phase 6 reliability batch proposal](../roadmaps/phase6-reliability-skill-batch-proposal.md)
     (PR #496) provisionally claimed D70. Decision numbers follow the order
     in which the owner makes decisions, so this Phase 7 decision, made
-    first, takes D70. The Phase 6 batch takes the next free number when the
-    owner decides it.
+    first, takes D70. The Phase 6 batch, decided later the same day, takes
+    the next free number, D71.
   - **What.**
     - **Build `ai-human-in-the-loop-designer`** (#285, with #286),
       auto-invocable (the assistant may choose it without a person naming
@@ -3364,6 +3364,80 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     land first. Catalog rows, README counts, eval files and the Phase 7
     backlog note recording #287 and #299 as covered land with the build
     pull requests.
+
+- **D71 (2026-09-28) — Approved the Phase 6 cloud, DevOps and reliability
+  build batch: four new skills and one extension, with the backup verifier
+  built first (four more skills when delivered).**
+  - **Why.** The owner, Peter Nguyen, decided on 2026-09-28 in chat with the
+    Claude Code coordinator, answering "Build all, backup verifier first
+    (Recommended)" to the
+    [Phase 6 reliability skill batch proposal](../roadmaps/phase6-reliability-skill-batch-proposal.md)
+    (PR #496, merged as `76b399b`). It settles the five Phase 6 expansion
+    candidates (two execution-plan extras, #244 with #246, #253 and #254).
+  - **Numbering.** The proposal provisionally claimed D70. Decision numbers
+    follow the order in which the owner makes decisions, and the Phase 7
+    decision was made first and took D70, so this decision takes D71.
+  - **What.**
+    - **Build `database-backup-verifier`** (#253) first, because #253 and
+      #254 are P0 (must-have) in category 07. It is manual-only (a person
+      must name it), because it calls provider interfaces and restores data.
+      Evidence mode, the default, runs read-only listings. Drill mode
+      restores only into a named, isolated, non-production target after a
+      human approval that states the drill's cost, and never over an
+      existing database.
+    - **Build `cloud-security-baseline-reviewer`**, auto-invocable (the
+      assistant may choose it without a person naming it). It reads only the
+      exported settings, scanner findings, infrastructure-as-code files and
+      screenshots it is given, calls no cloud interface and changes nothing.
+    - **Build `resilience-architecture-reviewer`**, auto-invocable and
+      review-only: timeouts, retries, single points of failure, failover,
+      disaster recovery targets and a fault-injection plan for a person to
+      run. It runs no fault injection itself.
+    - **Build `environment-parity-reviewer`** (#244, with #246 folded in),
+      auto-invocable and the lowest priority in the batch. It compares
+      environments and drafts the required-configuration manifest and
+      startup validation, reading variable names and non-secret values only.
+    - **Merge #254** (`migration-deployment-runbook`) into
+      `data-migration-runbook-author` as an extension: a schema-migration
+      deploy runbook shape, target confirmation before any write, and
+      post-apply smoke checks. The skill stays auto-invocable.
+    - **Census.** The ten predicted one-way ROUTE-002 findings (defined in
+      D69) stay census data: recorded in the contract audit, not fixed. They
+      run from the baseline reviewer toward `azure-saas-architect`,
+      `secrets-identity-hardener` and `compliance-gap-auditor`; from the
+      resilience reviewer toward `slo-reliability-architect`,
+      `latency-budget-architect` and `rollback-runbook-author`; from the
+      parity reviewer toward `secrets-identity-hardener`; from the backup
+      verifier toward `data-migration-runbook-author` and
+      `pii-lifecycle-designer`; and from the extended
+      `data-migration-runbook-author` toward
+      `gated-deployment-prompt-template`. Seven have little or no
+      description room left (963 to 1,021 characters of 1,024); the two
+      toward `secrets-identity-hardener` follow D64, because it is a widely
+      used security hub; and the proposal leaves the one toward
+      `pii-lifecycle-designer` one-way without a separate reason. They are
+      predicted from draft descriptions, not measured; the build pull
+      requests compare the contract audit before and after.
+  - **Authority.** This decision authorizes exactly this batch. Its delivery
+    relies on the standing delivery approval
+    [AEGIS-APR-039](../approvals/APPROVAL_REGISTER.md#aegis-apr-039-reaffirmation-of-ongoing-backlog-delivery-approval)
+    and the standing merge conditions
+    [AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green),
+    [AEGIS-APR-049](../approvals/APPROVAL_REGISTER.md#aegis-apr-049-exact-head-ci-satisfies-the-local-test-condition)
+    and
+    [AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review),
+    and nothing more. It does not waive `gate-guard`, authorize a change to
+    `scripts/audit-skill-contracts.py` or its frozen baseline, or permit any
+    environment write, provider call, cloud call, restore or deployment.
+    Building `database-backup-verifier` authorizes no restore drill: each
+    drill still needs its own human approval that states its cost. Changing
+    the set, for example letting `cloud-security-baseline-reviewer` call
+    cloud interfaces itself, needs a new owner decision.
+  - **Status at recording.** Nothing is built; `main` at `d932d2c` has 188
+    skills. The batch adds four skills: 191 → 195 if the D68, D69 and D70
+    builds land first. Catalog rows, README counts, eval files and the
+    catalog note recording #254 as merged land with the build pull
+    requests.
 
 ## 6. Post-merge corrections
 
