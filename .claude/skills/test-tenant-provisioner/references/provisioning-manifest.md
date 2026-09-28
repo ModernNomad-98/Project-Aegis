@@ -75,7 +75,7 @@ own orphans.
 
 ## 4. Capability grants: backup first, rollback beside
 
-A capability grant is any change to what a principal may do: a role, a
+A capability grant is any change to what a principal (a user, service account or other identity) may do: a role, a
 permission row, an elevated flag, a support or impersonation capability.
 
 For each grant, the plan shows three lines together:
@@ -108,6 +108,6 @@ Flag, with file and line:
 - A seed or provisioning script without an environment guard that refuses
   production.
 
-The lint compares declared values. It does not resolve DNS or call hosts
+The lint compares declared values. It does not look up host names in the Domain Name System (DNS) or call hosts
 unless that network access is separately authorized; when a host is an
 alias whose target is unknown, report it as UNRESOLVED rather than clean.

@@ -38,7 +38,7 @@ happy path proves nothing about isolation and is treated as absent.
   application/API and cross-surface layers).
 - Do NOT use when: reviewing a diff — `security-pr-reviewer`.
 - Do NOT use when: the seeded accounts must be created or repaired in a real
-  environment — `test-tenant-provisioner` (this skill specifies the fixture's
+  environment — `test-tenant-provisioner` *(manual-only)* (this skill specifies the fixture's
   required shape; that skill makes the marked accounts exist).
 
 ## Inputs to Inspect

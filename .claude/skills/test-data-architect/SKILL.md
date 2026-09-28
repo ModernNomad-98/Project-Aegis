@@ -38,8 +38,8 @@ failure by design.
   authoritative for those suites; this skill keeps general fixtures
   compatible with it, not competing).
 - Do NOT use when: creating, repairing or checking the catalog's test
-  accounts in a real environment — `test-tenant-provisioner` (manual-only;
-  it consumes this skill's persona catalog).
+  accounts in a real environment — `test-tenant-provisioner` *(manual-only)*,
+  which consumes this skill's persona catalog.
 - Do NOT use when: structuring the automation framework/CI —
   `qa-automation-architect` (it decides where fixtures LIVE; this skill
   decides what they ARE).

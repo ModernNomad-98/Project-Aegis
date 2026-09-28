@@ -13,7 +13,8 @@ customer account in a multi-tenant product. A **persona** is a named test
 user with a fixed tenant and role (for example "tenant A owner"). The
 **persona catalog** is the written list of test tenants, personas, roles and
 their stable identifiers. A **test marker** is a field or tag on a row that
-says "this row was created for testing by this tool".
+says "this row was created for testing by this tool". A **slug** is a
+tenant's short, unique text name, often used in its web address.
 
 ## Purpose
 
@@ -47,15 +48,18 @@ broadened by D10).
   that is `test-data-architect`. This skill consumes its catalog; it never
   invents personas.
 - Do NOT use when: the ask is to write cross-tenant or authorization negative
-  TESTS — `multi-tenant-security-tester` owns the two-tenant fixture's
+  TESTS — `multi-tenant-security-tester` *(manual-only)* owns the two-tenant
+  fixture's
   required shape and the denial assertions; this skill only makes those
   accounts exist.
 - Do NOT use when: the question is what a tenant IS, or how real customer
   tenants are provisioned in the product — `tenant-modeler`.
 - Do NOT use when: credentials must be stored, issued or rotated —
-  `secrets-identity-hardener`. This skill refers to them by variable name only.
+  `secrets-identity-hardener` *(manual-only)*. This skill refers to them by
+  variable name only.
 - Do NOT use when: the work is browser auth-state files or Playwright
-  fixtures that log these accounts in — `playwright-e2e-engineer`.
+  fixtures that log these accounts in — `playwright-e2e-engineer`
+  *(manual-only)*.
 - Do NOT use when: the question is whether the RLS policies the accounts
   exercise are correct — `rls-policy-auditor`.
 - Do NOT use when: the target is production, or a real customer tenant, for
@@ -102,8 +106,10 @@ before proceeding.
 1. **Confirm the catalog.** Load the persona catalog. If none exists, or it
    names personas without stable identifiers, stop and hand off to
    `test-data-architect`. Never invent a persona, role or tenant.
-2. **Pin the environment.** Record the target environment's name, hosts and
-   database or project identifier. Compare each against the declared
+2. **Pin the environment.** Record the target environment's name, hosts,
+   database or project identifier, and data origin (an environment restored
+   from a production backup holds real customer rows, which stay untouched).
+   Compare each against the declared
    production list. Classify it NON-PRODUCTION only when every identifier is
    positively different from production; anything unknown or shared is
    treated as production and the run stops.
@@ -117,7 +123,8 @@ before proceeding.
    (marked row with a wrong role, membership, tenant or grant); ORPHANED
    (marked row not in the catalog); BLOCKED (an UNMARKED row that collides
    with a catalog identity, such as the same email or tenant slug). Change
-   nothing. If no read path exists, say so and mark the state UNVERIFIED.
+   nothing. If no read path exists, say so and mark the state UNVERIFIED;
+   apply mode is then refused (see Stop Conditions).
 5. **Run the production-reach lint (static, read-only).** Scan test
    configuration for any base URL, host, connection setting or default value
    that matches a declared production host or identifier, and for
@@ -137,7 +144,8 @@ before proceeding.
    listed as untouched with the reason. Deleting ORPHANED marked rows is
    included only when the human asks for it. Wait for approval of this exact
    plan; a changed plan needs fresh approval.
-8. **Apply, idempotently, marked rows only.** Create missing rows with the
+8. **Apply to marked rows only, idempotently (running it again changes
+   nothing more).** Create missing rows with the
    marker set at creation. Repair drifted rows only when the marker is
    present. Take each backup before its grant; if the backup fails, skip that
    grant and report it. Never change or delete an unmarked row. Refer to
@@ -159,7 +167,7 @@ ask only for that one fact first. A chosen option is not approval to write.
 ```
 TEST TENANT PROVISIONING REPORT — <environment name>
 Mode: validate-only | apply (plan approved: <quote + time>)
-Environment evidence: <hosts / project id> vs production <list> → NON-PRODUCTION
+Environment evidence: <hosts / project id / data origin> vs production <list> → NON-PRODUCTION
 Catalog: <source path + version>; manifest rows: <n tenants, n users, n memberships, n grants>
 Marker convention: <field = value format>
 Drift table:
@@ -233,19 +241,23 @@ Handoffs: <test-data-architect | multi-tenant-security-tester | secrets-identity
 - A write, Git/network operation, database command or test side effect exceeds
   the applicable human grant: stop that operation and obtain the missing scope.
   Existing authorized operations do not need the same permission again.
-
 - The target is production, a real customer tenant, or an environment whose
   identifiers cannot be proven different from production → refuse the write
-  and report why; do not offer a workaround.
+  and report why; do not offer a workaround. Synthetic accounts for
+  production monitoring probes are designed by
+  `synthetic-monitoring-architect`, not provisioned here.
 - No persona catalog exists, or it lacks stable identifiers → stop and hand
   off to `test-data-architect`.
+- The current state cannot be read (UNVERIFIED) → deliver the validate-only
+  report and refuse apply mode until a read path exists; without a read, the
+  marker on a row cannot be checked.
 - Apply mode would change or delete an UNMARKED row → do not touch it; report
   it as BLOCKED and ask the human how the collision should be resolved.
 - A capability grant's backup cannot be taken, or its rollback step cannot be
   written → skip that grant and report it; never grant without both.
 - A credential value would be printed, stored or committed, or is missing →
   stop and report the variable name; custody goes to
-  `secrets-identity-hardener`.
+  `secrets-identity-hardener` *(manual-only)*.
 - The production-reach lint finds a hit → report it; do not apply against an
   environment whose test configuration can reach production until a human
   decides.
@@ -261,7 +273,8 @@ Handoffs: <test-data-architect | multi-tenant-security-tester | secrets-identity
   rules.
 - `evals/evals.json` — behavior cases: validate-only drift report, apply with
   backup and rollback, production refusal, unmarked-row block, missing
-  catalog, lint hit, credential refusal, and manual-only silence.
+  catalog, UNVERIFIED state refusal, lint hit, credential refusal, and
+  manual-only silence.
 - `evals/trigger-evals.json` — discrimination against `test-data-architect`,
   `multi-tenant-security-tester`, `tenant-modeler`, `playwright-e2e-engineer`
   and `secrets-identity-hardener`.
