@@ -70,7 +70,8 @@ reviews.
    client-assembled strings vs the model holding a live connection to a data
    source (open access — the anti-pattern).
 3. What downstream persists: prompt logs, traces, conversation stores — and
-   whether secrets/PII currently land in any of them.
+   whether secrets or personally identifiable information (PII) currently
+   land in any of them.
 4. The spend caps in force (`ai-cost-guardrail-designer` output if present):
    the budget the content design must fit inside.
 5. The retrieval layer's authorization posture (`rag-security-architect`
@@ -139,7 +140,7 @@ changes or provider calls.
    absent from every persisted store. A verifier that cannot fail is theater
    with an exit code.
 9. **Deliver the design** in the Output Format, seams cited: poisoning
-   review, session-start gate, cost policy, retrieval authz, disclosure
+   review, session-start gate, cost policy, retrieval authorization (authz), disclosure
    mechanics — composed, never restated.
 
 ## Output Format
@@ -220,7 +221,7 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   precisely so helpfulness doesn't reverse them.
 - Schema-valid is not trust: a closed schema bounds shape and class, it does
   not make retrieved content's INSTRUCTIONS safe — injected instructions in
-  admitted content are `prompt-injection-defender`'s lane; say so, don't
+  admitted content are the lane of `prompt-injection-defender` *(manual-only)*; say so, don't
   solve it here.
 
 ## Stop Conditions
