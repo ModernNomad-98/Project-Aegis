@@ -149,9 +149,12 @@ class ProtectedFileGuardTests(unittest.TestCase):
     def test_project_agent_files_require_manual_merge(self):
         # Claude Code honours `hooks`, `mcpServers` and `permissionMode` in
         # project agent files, so adding or editing one is a gate change.
+        # Every .claude/agents/ up to the repository root is loaded, so nested
+        # directories count too.
         for path in (".claude/agents/secure-saas-reviewer.md", ".claude/agents/new-agent.md",
                      ".claude/agents/nested/agent.md", ".Claude/Agents/new-agent.md",
-                     ".CLAUDE/AGENTS/NEW-AGENT.MD"):
+                     ".CLAUDE/AGENTS/NEW-AGENT.MD", "docs/.claude/agents/example.md",
+                     "a/b/.claude/agents/deep/agent.md", "docs/.Claude/Agents/agent.md"):
             with self.subTest(path=path):
                 result = self.run_guard([path])
                 self.assertEqual(1, result.returncode, result.stdout + result.stderr)
@@ -161,7 +164,8 @@ class ProtectedFileGuardTests(unittest.TestCase):
         result = self.run_guard(["README.md", "docs/notes.md", ".claude/skills/example/SKILL.md",
                                  "docs/example.py", ".claude/skills/example/scripts/helper.py",
                                  "tools/aegis_setup/helper.py", "artifacts/scripts/yaml.py",
-                                 ".claude/agents-notes.md", "docs/.claude/agents/example.md"])
+                                 ".claude/agents-notes.md", "docs/claude/agents/example.md",
+                                 "docs/xclaude/agents/example.md"])
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_renaming_a_protected_file_outside_the_set_is_still_guarded(self):

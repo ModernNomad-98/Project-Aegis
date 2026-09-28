@@ -352,6 +352,49 @@ def test_agents_schema():
         "an agent key outside the allow-list (`initialPrompt`) is rejected",
     )
 
+    # Claude Code searches `.claude/agents/` recursively, so the check does too.
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "nested-forbidden")
+    expect_error(
+        rep,
+        "review/nested-hooks-agent.md] forbidden frontmatter key `hooks`",
+        "an agent one directory below the agents root is still checked",
+    )
+
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "duplicate-key")
+    expect_error(
+        rep,
+        "duplicate frontmatter key `tools`",
+        "an agent repeating `tools` (Bash, then Read) is rejected",
+    )
+
+    # Every `.claude/agents/` from the working directory up to the repository
+    # root is loaded, so any agent file outside the root tree is flagged.
+    candidates = [
+        ".claude/agents/root-agent.md", ".claude/agents/review/nested-agent.md",
+        "docs/.claude/agents/example.md", "a/b/.claude/agents/deep/x.md",
+        ".Claude/Agents/case-variant.md", ".claude/agents-notes.md",
+        "docs/.claude/agents/notes.txt", ".claude/skills/example/SKILL.md",
+    ]
+    misplaced = validator.misplaced_agent_files(candidates)
+    assert misplaced == [
+        ".Claude/Agents/case-variant.md", "a/b/.claude/agents/deep/x.md",
+        "docs/.claude/agents/example.md",
+    ], misplaced
+    PASSES.append("nested and case-variant .claude/agents files are flagged")
+    print("  PASS  nested and case-variant .claude/agents files are flagged")
+
+    for model in ("fable", "inherit"):
+        with tempfile.TemporaryDirectory(prefix="aegis-agent-model-") as tmp:
+            agent = Path(tmp) / "model-agent.md"
+            agent.write_text(
+                "---\nname: model-agent\ndescription: SYNTHETIC.\n"
+                f"tools: Read\nmodel: {model}\n---\n", encoding="utf-8")
+            rep = validator.Report()
+            validator.check_agents_schema(rep, Path(tmp))
+            expect_clean(rep, f"the documented `{model}` model alias is accepted")
+
     rep = validator.Report()
     validator.check_agents_schema(rep, agents / "allowed-optional-keys")
     expect_clean(rep, "an agent using every allow-listed optional key is accepted")

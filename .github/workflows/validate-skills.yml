@@ -274,7 +274,9 @@ jobs:
           # .claude/agents/ is protected because Claude Code honours `hooks`,
           # `mcpServers` and `permissionMode` in project agent files, so an
           # agent file can run commands or widen permissions (finding P2-3).
-          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|\.claude/agents/|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
+          # Claude Code loads every .claude/agents/ from the working directory
+          # up to the repository root, so nested copies are protected too.
+          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|(.*/)?\.claude/agents/|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
           shopt -s nocasematch
           gate_files=()
           echo "Files changed in this PR:"

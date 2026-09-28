@@ -126,12 +126,18 @@ shadow the standard library or PyYAML and turn a failing check green. Every
 script and `pip` call in the workflow also runs with `python -P`, which keeps
 the script directory off the import path; `-I` is not used because it also
 ignores the `PYTHONIOENCODING` and `PYTHONDONTWRITEBYTECODE` settings.
-The guard also protects `.claude/agents/`. Claude Code honours `hooks`,
-`mcpServers` and `permissionMode` in a project agent file, so an agent file can
-run shell commands, start a process or skip permission prompts. The skill
-validator separately rejects any agent frontmatter key outside a short
-allow-list (`name`, `description`, `tools`, `model`, `disallowedTools`,
-`maxTurns`, `effort`, `color`) and names those three keys as forbidden.
+The guard also protects any `.claude/agents/` directory, recursively, at the
+root or nested anywhere in the repository (for example `docs/.claude/agents/`).
+Claude Code honours `hooks`, `mcpServers` and `permissionMode` in a project
+agent file, searches `.claude/agents/` recursively, and loads every
+`.claude/agents/` from the working directory up to the repository root. So an
+agent file anywhere on that path can run shell commands, start a process or
+skip permission prompts. The skill validator separately checks every agent file
+under the root `.claude/agents/`, recursively, and rejects any frontmatter key
+outside a short allow-list (`name`, `description`, `tools`, `model`,
+`disallowedTools`, `maxTurns`, `effort`, `color`), any repeated key, and any
+tracked agent file outside the root directory. It names `hooks`, `mcpServers`
+and `permissionMode` as forbidden.
 The source repository's [owner grant](approvals/APPROVAL_REGISTER.md) permits
 authorized agents to perform administrator merges without repeat consent; see
 the [current merge policy](reconciliation/auto-merge-policy.md). Documentation

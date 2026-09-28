@@ -81,7 +81,9 @@ that way by using plain asserts rather than a test framework (decision D55).
 from __future__ import annotations
 
 import json
+import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -630,7 +632,9 @@ def _rel(path: Path) -> str:
 # The reviewer agents are read-only personas by contract, so ANY widening is an
 # error rather than a warning: it is the one security-relevant check in D55.
 AGENT_ALLOWED_TOOLS = {"Read", "Grep", "Glob"}
-AGENT_ALLOWED_MODELS = {"opus", "sonnet", "haiku"}
+# `fable` and `inherit` are documented aliases; full model IDs stay out
+# because pinned IDs go stale and the aliases cover the need.
+AGENT_ALLOWED_MODELS = {"opus", "sonnet", "haiku", "fable", "inherit"}
 # Frontmatter keys a project agent may carry (allow-list, decision D55 as
 # extended by code-health finding P2-3). Checked against the Claude Code
 # subagent field table (code.claude.com/docs/en/sub-agents, 2026-09-28): every
@@ -652,6 +656,82 @@ AGENT_FORBIDDEN_KEYS = {
 }
 
 
+# Claude Code searches `.claude/agents/` recursively and loads every
+# `.claude/agents/` between the working directory and the repository root, so
+# an agent file in a nested directory (docs/.claude/agents/) is live for anyone
+# who starts a session there. Matched case-insensitively for Windows/macOS.
+AGENT_PATH_SEGMENT = re.compile(r"(^|/)\.claude/agents/", re.IGNORECASE)
+_WALK_PRUNE = {".git", ".worktrees", "node_modules"}
+
+
+def _walk_md(root: Path, prune: set[str] = frozenset()) -> list[Path]:
+    """Every *.md under `root`, recursively, never following symlinked dirs."""
+    found = []
+    for current, dirs, files in os.walk(root, followlinks=False):
+        dirs[:] = sorted(d for d in dirs if d not in prune)
+        found.extend(Path(current) / f for f in sorted(files) if f.lower().endswith(".md"))
+    return found
+
+
+def _repo_candidate_paths() -> list[str]:
+    """Repo-relative POSIX paths of every tracked file.
+
+    Tracked only: untracked local worktrees and scratch copies under the
+    checkout are not what a pull request ships. Falls back to a filesystem walk (pruning .git, .worktrees, node_modules)
+    when git is unavailable, so the check never silently sees nothing.
+    """
+    try:
+        out = subprocess.run(
+            ["git", "ls-files", "-z", "--cached"],
+            cwd=REPO_ROOT, capture_output=True, check=True,
+        ).stdout
+        return [p for p in out.decode("utf-8", "surrogateescape").split("\0") if p]
+    except (OSError, subprocess.CalledProcessError):
+        return [p.relative_to(REPO_ROOT).as_posix() for p in _walk_md(REPO_ROOT, _WALK_PRUNE)]
+
+
+def misplaced_agent_files(paths: list[str]) -> list[str]:
+    """Agent definitions outside the one root `.claude/agents/` directory.
+
+    Any `*.md` under a `.claude/agents/` segment that does not start exactly
+    with `.claude/agents/` (a nested directory, or a case variant of the root)
+    is loaded by Claude Code in some session but would escape the checks below.
+    """
+    return sorted(
+        p for p in paths
+        if p.lower().endswith(".md") and AGENT_PATH_SEGMENT.search(p)
+        and not p.startswith(".claude/agents/")
+    )
+
+
+def duplicate_mapping_keys(fm_text: str) -> list[str]:
+    """Keys repeated inside any one YAML mapping of the frontmatter.
+
+    PyYAML keeps the LAST value of a repeated key, while another reader may
+    keep the first, so `tools: Bash` then `tools: Read` could validate as
+    read-only yet run with Bash. Merge keys (`<<`) are not counted.
+    """
+    dupes: list[str] = []
+    try:
+        root = yaml.compose(fm_text, Loader=yaml.SafeLoader)
+    except yaml.YAMLError:
+        return dupes  # the strict parse reports it
+    stack = [root] if root is not None else []
+    while stack:
+        node = stack.pop()
+        if isinstance(node, yaml.MappingNode):
+            seen = set()
+            for key, value in node.value:
+                if isinstance(key, yaml.ScalarNode) and key.value != "<<":
+                    if key.value in seen:
+                        dupes.append(key.value)
+                    seen.add(key.value)
+                stack.extend((key, value))
+        elif isinstance(node, yaml.SequenceNode):
+            stack.extend(node.value)
+    return sorted(set(dupes))
+
+
 def check_agents_schema(rep: Report, agents_dir: Path | None = None) -> None:
     """Decision D55 (HARD): validate the `.claude/agents/*.md` frontmatter.
 
@@ -663,14 +743,26 @@ def check_agents_schema(rep: Report, agents_dir: Path | None = None) -> None:
         read-only set — a Write/Edit/Bash/`*` grant turns a reviewer into an
         actor, which is a privilege escalation, not a config preference;
       * name a recognised `model` when it names one at all;
+      * repeat no key inside any mapping;
+      * live in the root `.claude/agents/` tree — searched recursively, as
+        Claude Code does — and nowhere else (checked when `agents_dir` is
+        None, i.e. against the real repository);
       * carry no key outside AGENT_ALLOWED_KEYS — in particular no `hooks`,
         `mcpServers` or `permissionMode`, which execute commands, start
         processes or widen permissions (code-health finding P2-3).
     """
-    agents_dir = AGENTS_DIR if agents_dir is None else agents_dir
+    if agents_dir is None:
+        agents_dir = AGENTS_DIR
+        for misplaced in misplaced_agent_files(_repo_candidate_paths()):
+            rep.error(
+                f"[{misplaced}] agent file outside the root `.claude/agents/` "
+                "directory: Claude Code loads every `.claude/agents/` from the "
+                "working directory up to the repository root, so a nested one "
+                "is live yet unvalidated — move it or delete it"
+            )
     if not agents_dir.is_dir():
         return
-    for path in sorted(agents_dir.glob("*.md")):
+    for path in _walk_md(agents_dir):
         ctx = _rel(path)
         fm_text, _ = split_frontmatter(path.read_text(encoding="utf-8"))
         if fm_text is None:
@@ -679,6 +771,12 @@ def check_agents_schema(rep: Report, agents_dir: Path | None = None) -> None:
         fm = check_frontmatter_strict_yaml(fm_text, ctx, rep)
         if fm is None:
             continue
+        for key in duplicate_mapping_keys(fm_text):
+            rep.error(
+                f"[{ctx}] duplicate frontmatter key `{key}`: YAML readers "
+                "disagree on which value wins, so the checked value may not "
+                "be the one that runs"
+            )
 
         for key in sorted(map(str, fm)):
             if key in AGENT_FORBIDDEN_KEYS:
