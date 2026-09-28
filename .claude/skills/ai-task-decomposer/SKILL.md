@@ -120,8 +120,8 @@ item #266 (AI Task Decomposition).
    a provisional change class and name its known risks (data loss,
    compatibility, performance, security, tenant isolation). Flag every task
    that will cross a human-approval boundary (schema or destructive
-   migration, security or access policy, production data, secrets,
-   deployment, billing) for `human-approval-boundary`. The class stays
+   migration, security or access policy, production data, secrets, a
+   production release, billing) for `human-approval-boundary`. The class stays
    provisional: `change-classification-gate` confirms it when the task starts.
 8. **Order the tasks.** Record each task's dependencies and put them in an
    order where every task can be merged on its own. Put spikes and owner
