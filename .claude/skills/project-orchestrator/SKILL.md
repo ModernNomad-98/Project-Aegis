@@ -254,7 +254,7 @@ here.
   the enforcers to invoke — `agent-startup-context-gate`,
   `change-classification-gate`, `docs-first-implementer` *(manual-only)*,
   `tdd-engineer` *(manual-only)*, `reviewable-diff-discipline` *(manual-only)*,
-  `code-reviewer`, `security-pr-reviewer`, `local-ci-mirror-preflight` *(manual-only)*,
+  `local-ci-mirror-preflight` *(manual-only)*, `code-reviewer`, `security-pr-reviewer`,
   `ai-closeout-reporter`. Route to them via that map; do not re-derive the gates.
 - **Stage 7 — Prove it works.** → `qa-strategy-architect` →
   `test-plan-designer`. *By evidence:* `integration-test-designer`,
@@ -301,7 +301,7 @@ tool earns none of the tenancy skills).
 migration, a deploy, an authentication/authorization (auth) or permission change, a deletion, a merge, a public
 release — route through `human-approval-boundary` (the runtime halt),
 `change-classification-gate` (which rigor + approval path the slice needs), and
-`agent-authorization-matrix` (the standing floor: merge to a protected branch is
+`agent-authorization-matrix` *(manual-only)* (the standing floor: merge to a protected branch is
 a named human's decision; agents never arm auto-merge). Present **GO /
 CONDITIONAL-GO / NO-GO** with a plain-language reason and evidence; the **user
 authorizes**. This skill is model-invocable so it fires on the cold vague
