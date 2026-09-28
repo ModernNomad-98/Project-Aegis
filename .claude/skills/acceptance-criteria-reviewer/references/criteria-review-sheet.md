@@ -28,7 +28,7 @@ Verdict rules:
 | fast, quick, responsive, performant | no threshold | "<operation> completes within `<? ms>` at `<percentile>` for `<data size>`" |
 | works, functions, handles, supports | no observable outcome | "given `<state>`, when `<action>`, then `<visible result>`" |
 | user-friendly, intuitive, easy, clean | subjective | "a first-time `<role>` completes `<task>` in `<? steps / ? minutes>` without help" or a named usability check |
-| secure, safe, protected | no attacker or rule named | "a `<role>` without `<permission>` receives `<error / 404>` and no data" |
+| secure, safe, protected | no attacker or rule named | "a `<role>` without `<permission>` receives `<error / 404 not found>` and no data" |
 | appropriate, correct, proper, valid | rule not stated | name the rule or reference where it is written |
 | as expected, same as today, as before | expectation not written down | quote or link the expected behavior |
 | etc., and so on, all relevant | open-ended list | enumerate the items or ask which are in scope |
@@ -59,7 +59,7 @@ name it to invoke it.
 
 **NEEDS-REWRITE.** AC3 "The export should load fast."
 Missing threshold and evidence. Suggested rewrite (author to accept): "Given
-a workspace with `<? rows>`, when an owner requests a CSV export, then the
+a workspace with `<? rows>`, when an owner requests a CSV (comma-separated values) export, then the
 file download starts within `<? s>` at the 95th percentile, measured by
 `<test or metric>`." Question: what size and time does the owner commit to?
 

@@ -10,6 +10,9 @@ to count as done. A user story is a short "as a <role>, I want <goal>"
 statement of a need; a ticket is a work item in a tracker. Quality assurance
 (QA) checks behavior against the criteria. Given/when/then is a common
 criterion shape: a starting state, an action, and the expected result.
+A tenant is one customer organization whose data the product keeps apart
+from other customers' data; a sprint is a fixed team planning period,
+often two weeks.
 
 ## Purpose
 
@@ -86,7 +89,7 @@ the definition-of-done check (#227) stays with `release-readiness-reviewer`.
    "user-friendly", "intuitive", "secure", "appropriate", "etc." and "as
    expected" have no threshold. For each, propose a concrete rewrite built
    only from facts in the inputs; where the threshold is unknown, leave a
-   visible placeholder (`<p95 under ? ms>`) and ask the owner, never pick a
+   visible placeholder (`<under ? ms for 95% of requests>`) and ask the owner, never pick a
    number. The vague-word catalog and rewrite patterns are in
    [references/criteria-review-sheet.md](references/criteria-review-sheet.md).
 4. **Assign one verdict per criterion.**
@@ -206,7 +209,11 @@ recommendation with its reason before the one question.
   verdict on those items and ask the owner one question; do not choose.
 - Criteria contradict the observed behavior of existing code → route to
   `source-of-truth-reconciler` before reviewing against either.
-- Asked whether the story is done, merged-ready or ready to release → out of
+- Most criteria are UNTESTABLE for the same missing product decision, or
+  the requirement itself turns out to be undecided or contested → stop the
+  per-criterion review and hand off to `requirements-gathering-facilitator`;
+  reviewing criteria for an undecided requirement only polishes a guess.
+- Asked whether the story is done, ready to merge or ready to release → out of
   scope; hand off to `release-readiness-reviewer`.
 
 ## Supporting Files

@@ -1,6 +1,6 @@
 ---
 name: product-spec-writer
-description: 'Write a product specification for a feature — the problem and the user/job it serves, goals and explicit non-goals, scenarios and key flows, functional requirements with TESTABLE acceptance criteria, edge-case behavior, dependencies, rollout intent and success metrics, and open questions. Captures WHAT to build and WHY from the user''s perspective, at a level engineering and design can act on. Use when requirements are understood and need to become a spec, when writing a PRD/feature spec, or when engineering asks "what exactly are we building?". Do NOT use to record a technical/architecture decision and its alternatives (adr-writer), elicit still-unclear requirements (requirements-gathering-facilitator), plan flag-gated rollout mechanics (feature-flag-rollout-strategist), write the engineering design doc (tech-spec-writer), or drive a vague app idea end to end (project-orchestrator).'
+description: 'Write a product specification for a feature — the problem and the user/job it serves, goals and explicit non-goals, scenarios and key flows, functional requirements with TESTABLE acceptance criteria, edge-case behavior, dependencies, rollout intent and success metrics, and open questions. Captures WHAT to build and WHY from the user''s perspective, at a level engineering and design can act on. Use when requirements are understood and need to become a spec, when writing a PRD/feature spec, or when engineering asks "what exactly are we building?". Do NOT use to record a technical/architecture decision and its alternatives (adr-writer), elicit still-unclear requirements (requirements-gathering-facilitator), review criteria written elsewhere (acceptance-criteria-reviewer), plan flag-gated rollout mechanics (feature-flag-rollout-strategist), write the engineering design doc (tech-spec-writer), or drive a vague app idea end to end (project-orchestrator).'
 ---
 
 # Product Spec Writer
@@ -45,6 +45,9 @@ technical decision to `adr-writer`.
 - Do NOT use when: requirements are still unclear, contradictory, or
   solution-first — go back to `requirements-gathering-facilitator`; a
   spec written on sand is confident fiction.
+- Do NOT use when: acceptance criteria already exist and the ask is whether
+  they can be verified — that is `acceptance-criteria-reviewer`, which
+  reviews and edits nothing.
 - Do NOT use when: the task is the flag/rollout MECHANICS (progressive
   delivery, targeting, guardrail auto-rollback) — that is
   `feature-flag-rollout-strategist`; the spec states the rollout INTENT
