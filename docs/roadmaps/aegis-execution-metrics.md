@@ -2,9 +2,9 @@
 
 ## Start here — current measurements
 
-**Current measurements at the catch-up checkpoint after #370:** twenty-six PRs merged after #344 with no checkpoint. The missed windows ending #349, #354, #359, #364 and #369 took **32m50s**, **12m05s**, **7h57m30s**, **33m43s** and **1h45m11s observed wall time**; the third includes an unexplained 7h41m48s gap and is not a throughput measure. #370 and #374 (the #331 correction, merged 23:24:51 UTC) open the next window, followed by #373 at 23:32:15 UTC. No active, review, CI or waiting split was measured. The #344 maintenance subtotal (5.5–12 active hours) is fully delivered by #348–#356, but its accuracy cannot be scored without active time. The owner-approved #331 correction added a provisional **4–8 active hours**, making the bounded selected subtotal 75–154 while it was undelivered; #374 delivered it, so the current bounded selected subtotal is **71–146 provisional active hours**. Outside it, the owner-choice backlog is 23 skills after S5 added one step (the original audit counted 22): at this reading 17 were delivered (S1, S2 and S3, including the two deferred S1 skills merged in #373) and 6 were in open PRs (S4 as #376 and the S5 step as #377); both have since merged, so all 23 are delivered. The owner-requested feature-flag skill adds a provisional **2.5–5**. #380 and #372 merged after this reading and complete the window, so the next checkpoint is due; #382, #378 (the feature-flag proposal page), #375, #376, #377, #371 (the AI cost guardrail seam), #381 (the APR-046 consumption record), #383 (the `feature-flag-architect` skill, adding two pending reader pages) and #384 (the `project-orchestrator` Stage 3 and Stage 9 feature-flag routes, no new page) merged later still, on 2026-09-27 UTC, so both feature-flag items are delivered. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded.
+**Current measurements at the catch-up checkpoint after #454:** eighty-two PRs merged after #370 with no full reassessment, missing sixteen five-merge windows (those ending #372 through #451). From #369 to #454 is **34h25m40s observed wall time** across 83 merges; windows ranged from **18s** to **9h30m52s**, and the longest two (6h10m42s and 9h30m52s) include long unexplained or pause-related gaps and are not throughput measures. No active, review, CI or waiting split was measured. The owner-choice teaching backlog (8.5–16.5 active hours) and the feature-flag items (2.5–5) are delivered, but their accuracy cannot be scored without active time. The bounded selected subtotal stays **71–146 provisional active hours**; near-term work outside it is a provisional **5.25–14 active hours** of agent estimates plus two unestimated items. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded.
 
-**Earlier measurements at the checkpoint after #344:** the #333-to-#338 window took **1h20m20s observed wall time** and the #338-to-#344 window **3h11m14s observed wall time**; the second includes an owner-requested pause and is not a throughput measure. No active, review, CI or waiting split was measured. Choice-guidance batch C merged in [PR #342](https://github.com/ModernNomad-98/Project-Aegis/pull/342), so the bounded selected subtotal is again the ten core rows, **71–146 provisional active hours**; the 72–148-hour figure published by #343 is superseded by that delivery. Additional skill-choice maintenance sits outside it at a provisional **5.5–12 active hours**. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded. #345, #346 and #347 open the next five-merge window.
+**Earlier measurements at the catch-up checkpoint after #370:** twenty-six PRs merged after #344 with no checkpoint. The missed windows ending #349, #354, #359, #364 and #369 took **32m50s**, **12m05s**, **7h57m30s**, **33m43s** and **1h45m11s observed wall time**; the third includes an unexplained 7h41m48s gap and is not a throughput measure. #370 and #374 (the #331 correction, merged 23:24:51 UTC) open the next window, followed by #373 at 23:32:15 UTC. No active, review, CI or waiting split was measured. The #344 maintenance subtotal (5.5–12 active hours) is fully delivered by #348–#356, but its accuracy cannot be scored without active time. The owner-approved #331 correction added a provisional **4–8 active hours**, making the bounded selected subtotal 75–154 while it was undelivered; #374 delivered it, so the current bounded selected subtotal is **71–146 provisional active hours**. Outside it, the owner-choice backlog is 23 skills after S5 added one step (the original audit counted 22): at this reading 17 were delivered (S1, S2 and S3, including the two deferred S1 skills merged in #373) and 6 were in open PRs (S4 as #376 and the S5 step as #377); both have since merged, so all 23 are delivered. The owner-requested feature-flag skill adds a provisional **2.5–5**. #380 and #372 merged after this reading and complete the window, so the next checkpoint is due; #382, #378 (the feature-flag proposal page), #375, #376, #377, #371 (the AI cost guardrail seam), #381 (the APR-046 consumption record), #383 (the `feature-flag-architect` skill, adding two pending reader pages) and #384 (the `project-orchestrator` Stage 3 and Stage 9 feature-flag routes, no new page) merged later still, on 2026-09-27 UTC, so both feature-flag items are delivered. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded.
 
 This page is for maintainers and coding agents tracking Project Aegis work.
 **ETA** means estimated time to complete a work item; **PR** means pull
@@ -21,9 +21,9 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [catch-up checkpoint after pull request #370](#catch-up-checkpoint-after-pull-request-370--2026-09-26)
+The latest [catch-up checkpoint after pull request #454](#catch-up-checkpoint-after-pull-request-454--2026-09-28)
 reconsiders every selected and optional row, after the
-[five-merge checkpoint after #344](#five-merge-checkpoint-after-pull-request-344--2026-09-26).
+[catch-up checkpoint after #370](#catch-up-checkpoint-after-pull-request-370--2026-09-26).
 The earlier [catch-up checkpoint
 after #306](#catch-up-checkpoint-after-pull-request-306--2026-09-25) records
 four missed five-merge windows without resetting the #303 cadence anchor.
@@ -57,6 +57,284 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Catch-up checkpoint after pull request #454 — 2026-09-28
+
+The [full reassessment](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-28-after-pull-request-454-catch-up-for-16-missed-windows)
+counts main through #454 `5bd21fbd88e08e9eda89d252a008d804b90a4644` and
+reads the same tree. This bounded checkpoint started at 09:10:02 UTC on
+2026-09-28, first drafted through #443 and then extended through #452 and
+#454, which merged while it was drafted. It had no previously published item
+ETA; its new ETA is **1–3 active hours**, an agent estimate from the
+coordinating session's 2026-09-28 backlog inventory. At its start the
+published bounded selected subtotal was **71–146 active hours** (#379), and
+it stays **71–146 provisional active hours**. Issue #101 Stage 4B and
+BER-BKL-009 residuals are unestimated, so neither the full selected nor the
+all-options backlog has a finite ETA.
+
+**Cadence.** Eighty-two PRs merged after #370 without a full reassessment.
+This record keeps the #344 anchor that #352 published and #379 kept, so the
+sixteen missed windows end at #372, #377, #387, #391, #389, #402, #405, #397,
+#417, #416, #422, #426, #430, #438, #445 and #451, in actual merge order.
+#379, which merged the #370 checkpoint in the fourth window, closed none of
+them. #443, #452 and #454 open the next window.
+
+Merges are listed in actual merge order. Each linked Actions run used that
+PR's exact final head; it ran Linux `validate-skills`, Windows
+`windows-offline-checks` and `gate-guard`. Five PRs merged with `gate-guard`
+failed on protected paths, each under an owner exception named in its row.
+"Open to merge" is the observed time from PR creation to merge; it includes
+review, CI, queue and waiting and is not active labor. Terms in the scope
+column are defined in the [forecast section](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-28-after-pull-request-454-catch-up-for-16-missed-windows);
+in addition, a Dependabot PR is an automated dependency-update PR, and an
+AEGIS-APR number is an [approval-register](../approvals/APPROVAL_REGISTER.md)
+entry.
+
+**Window 1: the five first-parent merges after #369, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#370](https://github.com/ModernNomad-98/Project-Aegis/pull/370): owner-choice teaching, six governance and QA skills (batch S3); receipt in the checkpoint after #370 | `eadf1fd3934ca196b70178681dfb07ef7c264020` | 2026-09-26 22:52:11 | 4s from #369 | Recorded in the checkpoint after #370. |
+| [#374](https://github.com/ModernNomad-98/Project-Aegis/pull/374): BER selected-precheck aggregate correction (#331 proposal, AEGIS-APR-046) | `7390ae0ac388a7c64ab87a5026fbfa2727113857` | 2026-09-26 23:24:51 | 32m40s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36278386968): Linux and Windows passed; `gate-guard` failed on protected BER files, under the standing AEGIS-APR-047 exception; open to merge 18m35s; active time not measured. |
+| [#373](https://github.com/ModernNomad-98/Project-Aegis/pull/373): validator pinned-count floors, audit dirty-path fix and the two deferred S1 skills | `4ca04c1effce1de10ec221f4756698bb33d1ae77` | 2026-09-26 23:32:15 | 7m24s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36279392000): Linux and Windows passed; `gate-guard` failed; one-time exception AEGIS-APR-055, consumed (AEGIS-APR-056); open to merge 31m43s; active time not measured. |
+| [#380](https://github.com/ModernNomad-98/Project-Aegis/pull/380): skill named in MANUAL-ONLY trigger-eval prompts | `40c734f08b350b1c7f47a69aa1acd28e98d4114f` | 2026-09-26 23:50:52 | 18m37s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36280324176): Linux and Windows passed; `gate-guard` passed; open to merge 7m30s; active time not measured. |
+| [#372](https://github.com/ModernNomad-98/Project-Aegis/pull/372): R2 wording: one question and no authority in six owner-choice steps | `2500d35c5a21f7a637e184056e1ac83049f93760` | 2026-09-26 23:54:35 | 3m43s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36280476892): Linux and Windows passed; `gate-guard` passed; open to merge 1h00m17s; active time not measured. |
+
+The #369-to-#372 interval is **1h02m28s observed wall time**.
+
+**Window 2: the five first-parent merges after #372, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#382](https://github.com/ModernNomad-98/Project-Aegis/pull/382): committed bytecode caches removed and ignored | `0d05a838fd8d9e4e57443dfec93be14413b74596` | 2026-09-27 01:29:38 | 1h35m03s from #372 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36285241046): Linux and Windows passed; `gate-guard` passed; open to merge 9m04s; active time not measured. |
+| [#378](https://github.com/ModernNomad-98/Project-Aegis/pull/378): accepted `feature-flag-architect` scope proposal page | `a2d2b8310dbf90a7969d59cbb4ed51ab03b1f7ea` | 2026-09-27 01:40:32 | 10m54s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36285937729): Linux and Windows passed; `gate-guard` passed; open to merge 2h15m20s; active time not measured. |
+| [#375](https://github.com/ModernNomad-98/Project-Aegis/pull/375): load-test/profiling and authority-matrix/standing-approval seams pinned | `5fbe7cd8eb4b904f57caab389bb33da13a9ccda9` | 2026-09-27 01:44:00 | 3m28s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36280877446): Linux and Windows passed; `gate-guard` passed; open to merge 2h37m36s; active time not measured. |
+| [#376](https://github.com/ModernNomad-98/Project-Aegis/pull/376): owner-choice teaching, five product and tenancy skills (batch S4) | `4bed0112535ce785bda5103580476de891851230` | 2026-09-27 01:44:03 | 3s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36280924830): Linux and Windows passed; `gate-guard` passed; open to merge 2h37m30s; active time not measured. |
+| [#377](https://github.com/ModernNomad-98/Project-Aegis/pull/377): deadline-versus-ramp owner choice in `feature-flag-rollout-strategist` (S5) | `5c14ba957ec1d8b4f4acfd56816beb9964f0f8be` | 2026-09-27 01:44:07 | 4s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36280706976): Linux and Windows passed; `gate-guard` passed; open to merge 2h19m04s; active time not measured. |
+
+The #372-to-#377 interval is **1h49m32s observed wall time**.
+
+**Window 3: the five first-parent merges after #377, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#371](https://github.com/ModernNomad-98/Project-Aegis/pull/371): cost policy-versus-mechanism seam between two cost skills | `da08b0f6b361328577fb521bec6afbe96e4f1ff5` | 2026-09-27 03:25:04 | 1h40m57s from #377 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36286470111): Linux and Windows passed; `gate-guard` passed; open to merge 4h32m41s; active time not measured. |
+| [#381](https://github.com/ModernNomad-98/Project-Aegis/pull/381): #374 and #373 delivery and grant consumption recorded (AEGIS-APR-053 to 056) | `032e0302a8906048bbbe37a40c195b5162f7fc2e` | 2026-09-27 03:31:29 | 6m25s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36291334700): Linux and Windows passed; `gate-guard` passed; open to merge 3h47m44s; active time not measured. |
+| [#383](https://github.com/ModernNomad-98/Project-Aegis/pull/383): new `feature-flag-architect` skill (185 to 186 skills) | `6844ab9f514063043644a89eca8b733ea8045c77` | 2026-09-27 03:43:01 | 11m32s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36291671571): Linux and Windows passed; `gate-guard` passed; open to merge 1h55m25s; active time not measured. |
+| [#384](https://github.com/ModernNomad-98/Project-Aegis/pull/384): `project-orchestrator` routes to the feature-flag skills | `0f46808d865751fac396b52422bd964e6b7c2cf1` | 2026-09-27 04:25:58 | 42m57s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36293160226): Linux and Windows passed; `gate-guard` passed; open to merge 41m50s; active time not measured. |
+| [#387](https://github.com/ModernNomad-98/Project-Aegis/pull/387): first-use terms defined on the feature-flag-architect pages | `dcccb1069f2e4b6df1bbb1359e7b02c4ab78803f` | 2026-09-27 05:24:41 | 58m43s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36296747909): Linux and Windows passed; `gate-guard` passed; open to merge 46m18s; active time not measured. |
+
+The #377-to-#387 interval is **3h40m34s observed wall time**.
+
+**Window 4: the five first-parent merges after #387, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#379](https://github.com/ModernNomad-98/Project-Aegis/pull/379): prior catch-up checkpoint after #370 | `7947b5ec5492ed05f215e3ba655d8ea3750e76a9` | 2026-09-27 05:25:28 | 47s from #387 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36296740938): Linux and Windows passed; `gate-guard` passed; open to merge 5h47m23s; active time not measured. |
+| [#386](https://github.com/ModernNomad-98/Project-Aegis/pull/386): stale present-tense claims dated in the project history | `39f2a28c9323184b1d10eaa238084125bd66b707` | 2026-09-27 05:31:54 | 6m26s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36293455566): Linux and Windows passed; `gate-guard` passed; open to merge 1h23m11s; active time not measured. |
+| [#388](https://github.com/ModernNomad-98/Project-Aegis/pull/388): volatile facts marked in six skill reference sheets | `a3ae6cf4ab1857d56a70bc9e9d60f1079c38b643` | 2026-09-27 05:39:45 | 7m51s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36296844257): Linux and Windows passed; `gate-guard` passed; open to merge 1h00m35s; active time not measured. |
+| [#390](https://github.com/ModernNomad-98/Project-Aegis/pull/390): standards and edition anchors dated and verified | `fcd525beba3e28143d6d1476bc57a521ade7c6be` | 2026-09-27 05:39:52 | 7s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36296990663): Linux and Windows passed; `gate-guard` passed; open to merge 48m17s; active time not measured. |
+| [#391](https://github.com/ModernNomad-98/Project-Aegis/pull/391): eval assertions that contradicted their skills fixed | `7108d6453bac4c28534b6fa6b07cb14fbad8ed79` | 2026-09-27 05:39:58 | 6s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36297191894): Linux and Windows passed; `gate-guard` passed; open to merge 46m15s; active time not measured. |
+
+The #387-to-#391 interval is **15m17s observed wall time**.
+
+**Window 5: the five first-parent merges after #391, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#394](https://github.com/ModernNomad-98/Project-Aegis/pull/394): routing seams reciprocated (batch 1) | `29c484f387ad3a53f8a1a80661df429f408287c5` | 2026-09-27 05:42:35 | 2m37s from #391 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36297657439): Linux and Windows passed; `gate-guard` passed; open to merge 25m01s; active time not measured. |
+| [#395](https://github.com/ModernNomad-98/Project-Aegis/pull/395): routing seams reciprocated (batch 2) | `741b29a35a88fd1d903189371df72fddb3bfcc03` | 2026-09-27 05:42:42 | 7s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36297515398): Linux and Windows passed; `gate-guard` passed; open to merge 25m01s; active time not measured. |
+| [#396](https://github.com/ModernNomad-98/Project-Aegis/pull/396): routing seams reciprocated (batch 3) | `cd7af022b92bd0c1fd3ec1cf202f9c559747395f` | 2026-09-27 05:42:47 | 5s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36297492085): Linux and Windows passed; `gate-guard` passed; open to merge 25m00s; active time not measured. |
+| [#385](https://github.com/ModernNomad-98/Project-Aegis/pull/385): five skills ask for one missing deciding fact per turn | `867cb829cd6cc742de0d43f88ca502cc89b85bce` | 2026-09-27 06:30:32 | 47m45s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36297248620): Linux and Windows passed; `gate-guard` passed; open to merge 2h36m24s; active time not measured. |
+| [#389](https://github.com/ModernNomad-98/Project-Aegis/pull/389): `aegis-setup` addition recorded in the build history | `0fb9c06030b449f6f105e9a2572f67108f7fd0c6` | 2026-09-27 06:30:40 | 8s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36297034460): Linux and Windows passed; `gate-guard` passed; open to merge 1h44m57s; active time not measured. |
+
+The #391-to-#389 interval is **50m42s observed wall time**.
+
+**Window 6: the five first-parent merges after #389, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#392](https://github.com/ModernNomad-98/Project-Aegis/pull/392): README host and tool facts verified and dated | `e56d863fe8aaf73f08150c32d07b7eea9e7bb8c8` | 2026-09-27 06:30:48 | 8s from #389 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36297531408): Linux and Windows passed; `gate-guard` passed; open to merge 1h13m40s; active time not measured. |
+| [#393](https://github.com/ModernNomad-98/Project-Aegis/pull/393): `cloud-architecture-decider` compares managed platforms with hyperscalers | `9b8f5b21134f78aa5fa76982e534e26cff307e91` | 2026-09-27 06:30:56 | 8s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36297714037): Linux and Windows passed; `gate-guard` passed; open to merge 1h13m30s; active time not measured. |
+| [#399](https://github.com/ModernNomad-98/Project-Aegis/pull/399): stay-silent tests for manual-only skills (batch 1) | `c5ff91d7e4de56aeae336459b84e1ab01d2741b0` | 2026-09-27 06:31:03 | 7s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36297789720): Linux and Windows passed; `gate-guard` passed; open to merge 1h12m48s; active time not measured. |
+| [#400](https://github.com/ModernNomad-98/Project-Aegis/pull/400): stay-silent tests for manual-only skills (batch 2) | `e00df2dbc1eb59dadbad6b35480c957ce17be3de` | 2026-09-27 06:31:11 | 8s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36297793177): Linux and Windows passed; `gate-guard` passed; open to merge 1h12m44s; active time not measured. |
+| [#402](https://github.com/ModernNomad-98/Project-Aegis/pull/402): host listing limits and Codex invocation control cited in the standard | `8bd1d583a366306029ef5755dbbb3cbca9a1c295` | 2026-09-27 06:31:19 | 8s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36297620884): Linux and Windows passed; `gate-guard` passed; open to merge 56m19s; active time not measured. |
+
+The #389-to-#402 interval is **39s observed wall time**.
+
+**Window 7: the five first-parent merges after #402, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#398](https://github.com/ModernNomad-98/Project-Aegis/pull/398): stay-silent tests for manual-only skills (batch 0) | `6c5313a75b6e0a10bb98550f301654834cb40c04` | 2026-09-27 08:53:18 | 2h21m59s from #402 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36297949531): Linux and Windows passed; `gate-guard` passed; open to merge 3h35m10s; active time not measured. |
+| [#401](https://github.com/ModernNomad-98/Project-Aegis/pull/401): stay-silent tests for manual-only skills (batch 3) | `56ea7e48a15b0b00cbbe6e0d998b6b3f14c2ee8b` | 2026-09-27 08:53:23 | 5s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36300410001): Linux and Windows passed; `gate-guard` passed; open to merge 3h34m29s; active time not measured. |
+| [#407](https://github.com/ModernNomad-98/Project-Aegis/pull/407): remaining MANUAL-ONLY naming and silence-test gaps closed | `1ec01bfb7fd57608ac365516c9fb812ebd7f6f33` | 2026-09-27 08:59:26 | 6m03s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36300653239): Linux and Windows passed; `gate-guard` passed; open to merge 2h21m48s; active time not measured. |
+| [#404](https://github.com/ModernNomad-98/Project-Aegis/pull/404): agent instruction file map updated for current host locations | `b08103e2c55d28c66a1ef5ce7bd17e1fa467e70c` | 2026-09-27 09:17:05 | 17m39s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36307681248): Linux and Windows passed; `gate-guard` passed; open to merge 3h28m54s; active time not measured. |
+| [#405](https://github.com/ModernNomad-98/Project-Aegis/pull/405): AI-security pack re-anchored to the OWASP LLM Top 10 2026 | `f2d57b5130bead4ad9b01c499838c3ff3594354d` | 2026-09-27 09:17:12 | 7s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36308099286): Linux and Windows passed; `gate-guard` passed; open to merge 3h26m26s; active time not measured. |
+
+The #402-to-#405 interval is **2h45m53s observed wall time**.
+
+**Window 8: the five first-parent merges after #405, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#406](https://github.com/ModernNomad-98/Project-Aegis/pull/406): README Claude-apps option corrected; cloud-decider category names aligned | `6488eaa0bc71758ed2b2b0b2621feb3eb9ae1755` | 2026-09-27 09:17:19 | 7s from #405 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36308027359): Linux and Windows passed; `gate-guard` passed; open to merge 2h42m11s; active time not measured. |
+| [#408](https://github.com/ModernNomad-98/Project-Aegis/pull/408): one-missing-fact-per-turn loop codified in standard section 4 | `053376404c919b46cd9ce73cb5e9bf9ec5ae46b0` | 2026-09-27 09:25:16 | 7m57s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36309049898): Linux and Windows passed; `gate-guard` passed; open to merge 4m55s; active time not measured. |
+| [#409](https://github.com/ModernNomad-98/Project-Aegis/pull/409): LLM08 skill extended and renamed `hidden-context-exposure-reviewer` | `4416c6d96d7701f449758223ad2d1240fe773207` | 2026-09-27 09:42:16 | 17m00s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36309445627): Linux and Windows passed; `gate-guard` passed; open to merge 17m38s; active time not measured. |
+| [#411](https://github.com/ModernNomad-98/Project-Aegis/pull/411): re-read fixes: skills catalog and `cloud-architecture-decider` | `7693c26d120f29ec1cfd0c761c45315b4cd5515d` | 2026-09-27 09:43:14 | 58s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36309612063): Linux and Windows passed; `gate-guard` passed; open to merge 12m27s; active time not measured. |
+| [#397](https://github.com/ModernNomad-98/Project-Aegis/pull/397): ROUTE-002 routing-note dispositions recorded | `4a68acef7d7d0bfc4d60755c81c544fc88923e0f` | 2026-09-27 09:48:49 | 5m35s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36309441811): Linux and Windows passed; `gate-guard` passed; open to merge 4h30m52s; active time not measured. |
+
+The #405-to-#397 interval is **31m37s observed wall time**.
+
+**Window 9: the five first-parent merges after #397, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#410](https://github.com/ModernNomad-98/Project-Aegis/pull/410): re-read fixes: four skill pages | `b553d91d064370c18227d837ea4d31bca204b0a3` | 2026-09-27 10:05:41 | 16m52s from #397 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36310949205): Linux and Windows passed; `gate-guard` passed; open to merge 37m40s; active time not measured. |
+| [#412](https://github.com/ModernNomad-98/Project-Aegis/pull/412): re-read fixes: README | `2219ac81937d2a533bc32451edc8a9709fc53bfa` | 2026-09-27 10:13:45 | 8m04s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36311503797): Linux and Windows passed; `gate-guard` passed; open to merge 41m57s; active time not measured. |
+| [#414](https://github.com/ModernNomad-98/Project-Aegis/pull/414): re-read fixes: instruction map, decision inputs and reconciliation log | `3a1e9da434dc1fe91811e56c8fb8bf9c80e247dd` | 2026-09-27 10:15:57 | 2m12s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36311275631): Linux and Windows passed; `gate-guard` passed; open to merge 13m14s; active time not measured. |
+| [#419](https://github.com/ModernNomad-98/Project-Aegis/pull/419): description hand-backs mirrored in Use When (batch A) | `9033e7c70327420cdc3d4196f3b97ce7a9e880da` | 2026-09-27 15:59:24 | 5h43m27s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36312102184): Linux and Windows passed; `gate-guard` passed; open to merge 5h41m08s; active time not measured. |
+| [#417](https://github.com/ModernNomad-98/Project-Aegis/pull/417): description hand-backs mirrored in Use When (batch B) | `dcec7f22292e9cd45e5f7507e5ee7cfaddf832c2` | 2026-09-27 15:59:31 | 7s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36312010894): Linux and Windows passed; `gate-guard` passed; open to merge 5h42m59s; active time not measured. |
+
+The #397-to-#417 interval is **6h10m42s observed wall time**.
+
+**Window 10: the five first-parent merges after #417, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#418](https://github.com/ModernNomad-98/Project-Aegis/pull/418): description hand-backs mirrored in Use When (batch C) | `02f054c0816d0a244063ae03aeb5ebd06fca5339` | 2026-09-27 15:59:37 | 6s from #417 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36312081636): Linux and Windows passed; `gate-guard` passed; open to merge 5h41m45s; active time not measured. |
+| [#403](https://github.com/ModernNomad-98/Project-Aegis/pull/403): ledger: final acceptance of the feature-flag-architect pages | `f42e3f0f6469d7c1d4cc3fabb5c208383efdc01d` | 2026-09-27 19:16:23 | 3h16m46s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36313872929): Linux and Windows passed; `gate-guard` passed; open to merge 13h37m33s; active time not measured. |
+| [#413](https://github.com/ModernNomad-98/Project-Aegis/pull/413): master-prompt section citation corrected | `fa1e34444ce834e6b40ea612a070a93adff32c8b` | 2026-09-27 19:16:29 | 6s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36313864693): Linux and Windows passed; `gate-guard` passed; open to merge 9h17m58s; active time not measured. |
+| [#415](https://github.com/ModernNomad-98/Project-Aegis/pull/415): re-read fixes: OWASP security pages | `f4defa2c156d4e8e416461084156b1a65038e43d` | 2026-09-27 19:16:34 | 5s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36313734072): Linux and Windows passed; `gate-guard` passed; open to merge 9h12m33s; active time not measured. |
+| [#416](https://github.com/ModernNomad-98/Project-Aegis/pull/416): re-read fixes: ROUTE-002 record and the AEGIS-060+ register | `da2636d049db25a4fc367c025e44636c9de66e6d` | 2026-09-27 19:16:39 | 5s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36313813842): Linux and Windows passed; `gate-guard` passed; open to merge 9h06m20s; active time not measured. |
+
+The #417-to-#416 interval is **3h17m08s observed wall time**.
+
+**Window 11: the five first-parent merges after #416, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#420](https://github.com/ModernNomad-98/Project-Aegis/pull/420): 2026-09-27 owner decisions recorded (live routing test grant, security-review scope) | `dfb0cac85a3e486955afae94b672a607958cf286` | 2026-09-27 20:32:42 | 1h16m03s from #416 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36346020780): Linux and Windows passed; `gate-guard` passed; open to merge 1h00m17s; active time not measured. |
+| [#421](https://github.com/ModernNomad-98/Project-Aegis/pull/421): security line required on every PR; checklist stays advisory | `4b205a7a56b6ba3cfa56f13e7e7d70d0c7d36944` | 2026-09-27 20:32:47 | 5s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36346113496): Linux and Windows passed; `gate-guard` passed; open to merge 53m51s; active time not measured. |
+| [#423](https://github.com/ModernNomad-98/Project-Aegis/pull/423): D67, the retroactive decision row for `aegis-setup` | `656194426e2ea3358fa29fcf19e05f0278d9c270` | 2026-09-27 20:36:57 | 4m10s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36346371783): Linux and Windows passed; `gate-guard` passed; open to merge 37m05s; active time not measured. |
+| [#425](https://github.com/ModernNomad-98/Project-Aegis/pull/425): BER README pinned census counts dated | `7b8884133fe92da8adae6b929c5440e05c1ed10b` | 2026-09-27 22:04:12 | 1h27m15s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36347344897): Linux and Windows passed; `gate-guard` failed; one-time exception AEGIS-APR-061, consumed (AEGIS-APR-062); open to merge 1h48m57s; active time not measured. |
+| [#422](https://github.com/ModernNomad-98/Project-Aegis/pull/422): re-read fixes: `hidden-context-exposure-reviewer` and `agent-tool-safety-guard` | `5d91fa5c1b3b7d0f0e0335c362e9cacf99d03cf5` | 2026-09-27 22:10:26 | 6m14s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36349703783): Linux and Windows passed; `gate-guard` passed; open to merge 2h11m16s; active time not measured. |
+
+The #416-to-#422 interval is **2h53m47s observed wall time**.
+
+**Window 12: the five first-parent merges after #422, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#427](https://github.com/ModernNomad-98/Project-Aegis/pull/427): `prompt-injection-defender` extended to multimodal injection | `0030e73f3616c46be3393813ea403c262d96a823` | 2026-09-27 22:28:27 | 18m01s from #422 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36354611090): Linux and Windows passed; `gate-guard` passed; open to merge 2h00m33s; active time not measured. |
+| [#431](https://github.com/ModernNomad-98/Project-Aegis/pull/431): three more 2026-09-27 owner decisions recorded | `dfbcf0f4b8e0b52516c90cb9d2c7ec5d16335ba0` | 2026-09-27 22:28:30 | 3s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36350943005): Linux and Windows passed; `gate-guard` passed; open to merge 1h14m38s; active time not measured. |
+| [#429](https://github.com/ModernNomad-98/Project-Aegis/pull/429): ROUTE-002 audit rule matches whole skill names (engine v1.13.2) | `169e8be44d80f08938b7728000251dcfce2223bb` | 2026-09-27 22:31:32 | 3m02s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36350453443): Linux and Windows passed; `gate-guard` failed; one-time exception AEGIS-APR-063, consumed (AEGIS-APR-064); open to merge 1h25m28s; active time not measured. |
+| [#432](https://github.com/ModernNomad-98/Project-Aegis/pull/432): audit baselines regenerated (engine v1.13.1, AEGIS-APR-058) | `7894567d49d301f82f40cb6445b668581d5799ac` | 2026-09-27 22:44:15 | 12m43s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36355625909): Linux and Windows passed; `gate-guard` passed; open to merge 1h22m39s; active time not measured. |
+| [#426](https://github.com/ModernNomad-98/Project-Aegis/pull/426): ledger: #410 and #412 to #419 recorded | `a06f815b602705f2ca75bad3ccea520c24fa429e` | 2026-09-27 22:53:00 | 8m45s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36355570127): Linux and Windows passed; `gate-guard` passed; open to merge 2h34m20s; active time not measured. |
+
+The #422-to-#426 interval is **42m34s observed wall time**.
+
+**Window 13: the five first-parent merges after #426, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#428](https://github.com/ModernNomad-98/Project-Aegis/pull/428): `supply-chain-security-reviewer` extended to promoted model artifacts | `0cb07776923d1899002b2cb4624c742652bde8ed` | 2026-09-27 22:56:34 | 3m34s from #426 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36356076888): Linux and Windows passed; `gate-guard` passed; open to merge 2h01m54s; active time not measured. |
+| [#433](https://github.com/ModernNomad-98/Project-Aegis/pull/433): 2026-09-27 live startup-routing acceptance run recorded | `9104cff1f676b7aef310ec83c0f0966020ec85d5` | 2026-09-27 22:58:53 | 2m19s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36355842783): Linux and Windows passed; `gate-guard` passed; open to merge 1h08m43s; active time not measured. |
+| [#424](https://github.com/ModernNomad-98/Project-Aegis/pull/424): `llm-output-safety-reviewer` extended to AI-generated code | `5711ddfc875a1866485c8feceac83490b656fa6c` | 2026-09-27 23:01:20 | 2m27s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36356087921): Linux and Windows passed; `gate-guard` passed; open to merge 2h48m36s; active time not measured. |
+| [#436](https://github.com/ModernNomad-98/Project-Aegis/pull/436): engine v1.13.2 removal of the ROUTE-002 false positive recorded | `862dd90853806d7f0a4d1bf51158c8d1fb1679c8` | 2026-09-27 23:01:24 | 4s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36356411882): Linux and Windows passed; `gate-guard` passed; open to merge 15m30s; active time not measured. |
+| [#430](https://github.com/ModernNomad-98/Project-Aegis/pull/430): glossary for the README reference tables | `6712ebbc73897dc93fa47cdcfaca95efbef0f74a` | 2026-09-27 23:06:34 | 5m10s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36357055874): Linux and Windows passed; `gate-guard` passed; open to merge 1h55m00s; active time not measured. |
+
+The #426-to-#430 interval is **13m34s observed wall time**.
+
+**Window 14: the five first-parent merges after #430, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#435](https://github.com/ModernNomad-98/Project-Aegis/pull/435): orchestrator points setup requests to `/aegis-setup` | `a96b902e90478af4951137559b7c28df8da77745` | 2026-09-27 23:11:02 | 4m28s from #430 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36357412229): Linux and Windows passed; `gate-guard` passed; open to merge 27m31s; active time not measured. |
+| [#437](https://github.com/ModernNomad-98/Project-Aegis/pull/437): README cites the 2026-09-27 live routing run | `96cf65acd80bd68a43edeba59fce70991e84004e` | 2026-09-27 23:15:57 | 4m55s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36357648668): Linux and Windows passed; `gate-guard` passed; open to merge 8m05s; active time not measured. |
+| [#434](https://github.com/ModernNomad-98/Project-Aegis/pull/434): file-content injection routed to `prompt-injection-defender`; agentic list name aligned | `b7dc0601b03643d947b91de785cfc21ff2f01432` | 2026-09-27 23:17:15 | 1m18s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36357624036): Linux and Windows passed; `gate-guard` passed; open to merge 54m20s; active time not measured. |
+| [#439](https://github.com/ModernNomad-98/Project-Aegis/pull/439): D65 open gaps closed; log first-use terms fixed | `d2d9b05e948c82b32cc34200d64d48ce0afd0347` | 2026-09-27 23:21:04 | 3m49s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36357965540): Linux and Windows passed; `gate-guard` passed; open to merge 7m36s; active time not measured. |
+| [#438](https://github.com/ModernNomad-98/Project-Aegis/pull/438): 2026-09-27 grant lifecycle events and three more owner decisions recorded | `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` | 2026-09-27 23:32:29 | 11m25s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36358732711): Linux and Windows passed; `gate-guard` passed; open to merge 20m01s; active time not measured. |
+
+The #430-to-#438 interval is **25m55s observed wall time**.
+
+**Window 15: the five first-parent merges after #438, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#440](https://github.com/ModernNomad-98/Project-Aegis/pull/440): ledger: #420 to #439 recorded | `adf54d98ef3454efb5cdf8dd9266fc71f9031c57` | 2026-09-27 23:44:58 | 12m29s from #438 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36359455810): Linux and Windows passed; `gate-guard` passed; open to merge 12m55s; active time not measured. |
+| [#441](https://github.com/ModernNomad-98/Project-Aegis/pull/441): audit baselines regenerated with engine v1.13.2 (AEGIS-APR-065) | `3c51fb2f6f4a22c6120b38d2a7e9f0074b6bf69c` | 2026-09-27 23:45:02 | 4s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36359251043): Linux and Windows passed; `gate-guard` passed; open to merge 8m53s; active time not measured. |
+| [#442](https://github.com/ModernNomad-98/Project-Aegis/pull/442): 2026-09-27 session checkpoint page | `7b3fbca293719256e21312c0dbcc24b41e2212d5` | 2026-09-28 00:04:56 | 19m54s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36360529944): Linux and Windows passed; `gate-guard` passed; open to merge 16m10s; active time not measured. |
+| [#450](https://github.com/ModernNomad-98/Project-Aegis/pull/450): closeout events for four spent approval grants (AEGIS-APR-067 to 070) | `bb3b117d34955f665553c3b75130e4c4144d758a` | 2026-09-28 08:55:41 | 8h50m45s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36399460557): Linux and Windows passed; `gate-guard` passed; open to merge 8m26s; active time not measured. |
+| [#445](https://github.com/ModernNomad-98/Project-Aegis/pull/445): re-read fixes: three skill pages | `8c52960b16493577af813f602d8d02281140bb96` | 2026-09-28 09:03:21 | 7m40s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36399492840): Linux and Windows passed; `gate-guard` passed; open to merge 23m33s; active time not measured. |
+
+The #438-to-#445 interval is **9h30m52s observed wall time**.
+
+**Window 16: the five first-parent merges after #445, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#446](https://github.com/ModernNomad-98/Project-Aegis/pull/446): ledger: #438 to #442 and the owner's 2026-09-28 rules | `7005cdacdce225cb1318196a31a22a7dbb734022` | 2026-09-28 09:03:24 | 3s from #445 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36400225856): Linux and Windows passed; `gate-guard` passed; open to merge 23m10s; active time not measured. |
+| [#447](https://github.com/ModernNomad-98/Project-Aegis/pull/447): re-read fixes to open decisions and PR template; 2026-09-28 owner decisions | `484d10476eca116f117258c0f96245a97ba3eaca` | 2026-09-28 09:03:28 | 4s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36399726448): Linux and Windows passed; `gate-guard` passed; open to merge 20m43s; active time not measured. |
+| [#448](https://github.com/ModernNomad-98/Project-Aegis/pull/448): reading aid for the owner approval register | `2bcbfe6358903081faca9da9e06cea37826344e0` | 2026-09-28 09:03:32 | 4s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36400235851): Linux and Windows passed; `gate-guard` passed; open to merge 20m29s; active time not measured. |
+| [#449](https://github.com/ModernNomad-98/Project-Aegis/pull/449): audit register, baseline preface and routing evidence clarified | `bb7ed711bd566e106b91ac986b97774b1a5e16c6` | 2026-09-28 09:03:35 | 3s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36399972619): Linux and Windows passed; `gate-guard` passed; open to merge 16m20s; active time not measured. |
+| [#451](https://github.com/ModernNomad-98/Project-Aegis/pull/451): grouped abbreviation glossary in the skills catalog | `0d4b093fdd36bafa8367eab2e68d318e31c58a72` | 2026-09-28 09:03:39 | 4s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36400043937): Linux and Windows passed; `gate-guard` passed; open to merge 15m41s; active time not measured. |
+
+The #445-to-#451 interval is **18s observed wall time**.
+
+**Open window: the three merges after #451, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#443](https://github.com/ModernNomad-98/Project-Aegis/pull/443): Dependabot: `actions/setup-node` 4.4.0 to 7.0.0 | `e251c5146f627ec31b7d2f750f0dbabe0bca7ede` | 2026-09-28 09:07:40 | 4m01s from #451 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36382534007): Linux and Windows passed; `gate-guard` failed; one-time owner exception, its register record pending in open PR #453; open to merge 3h32m47s; active time not measured. |
+| [#452](https://github.com/ModernNomad-98/Project-Aegis/pull/452): `project-orchestrator` abbreviations expanded at first use | `419ad2313a60cd39b33dbb572115f42bec6fa870` | 2026-09-28 09:11:48 | 4m08s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36401452757): Linux and Windows passed; `gate-guard` passed; open to merge 22m45s; active time not measured. |
+| [#454](https://github.com/ModernNomad-98/Project-Aegis/pull/454): Stage 6 manual-only markers in `project-orchestrator` | `5bd21fbd88e08e9eda89d252a008d804b90a4644` | 2026-09-28 09:17:47 | 5m59s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36402171155): Linux and Windows passed; `gate-guard` passed; open to merge 3m53s; active time not measured. |
+
+#369 to #454 is **34h25m40s observed wall time** across 83 merges, #370
+included. The large spacings were 1h35m03s before #382, 1h40m57s before
+#371, 2h21m59s before #398, 5h43m27s before #419, 3h16m46s before #403,
+1h16m03s before #420, 1h27m15s before #425 and 8h50m45s before #450. The last
+spans the owner-requested session pause that #442 recorded; GitHub has no
+timestamp for the other causes, and none is asserted here. The post-merge
+main `validate-skills` runs for the nine merges from #450 through #452
+passed, for example #452's [post-merge main run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36401950016);
+#454's [post-merge run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36402583446)
+was in progress at this reading. Earlier post-merge runs were not re-checked
+for this record. No active/review/CI/wait split was measured for any of
+these PRs, and per-merge spacing is not labor on that PR or a throughput
+rate. At this reading (about 09:25 UTC), [PR #453](https://github.com/ModernNomad-98/Project-Aegis/pull/453)
+(the #443 exception record and the AEGIS-APR-073 generator grant) and
+[PR #455](https://github.com/ModernNomad-98/Project-Aegis/pull/455) (the D15
+enrichment deltas) are open and receive no credit. After this reading,
+#453 merged at 09:22:42 UTC as `4226d293a965fe595be4a6f941bd074f6db942a9`,
+open to merge 12m19s, with Linux, Windows and `gate-guard` passing; it is
+the fourth merge of the open window, and this record does not measure it.
+
+**ETA accuracy.** The #370 checkpoint's own **1–2 active-hour** ETA
+compares with **8h23m00s** of observed wall time from its recorded start at
+21:02:28 UTC on 2026-09-26 to #379's merge at 05:25:28 UTC on 2026-09-27;
+that span includes its extension through #384, review, CI and waiting, so it
+does not score the estimate. The owner-choice teaching backlog (8.5–16.5
+active hours) and the feature-flag subtotal (2.5–5) are delivered, but
+without active time neither can be scored. The OWASP refresh, the audit
+baseline regenerations, the live startup-routing run, the eval and routing
+integrity work, the source-currency work and the Stage 6 markers were never
+estimated, so they have no accuracy measure; they are recorded as
+unforecast delivery.
+
+The ten selected rows remain **71–146 active hours**, provisional; no merge
+in these windows closed a private-input, measured-calibration, real-host,
+provider or control-plane gate. Outside that subtotal, the near-term work
+the owner approved or that is in flight totals a provisional **5.25–14
+active hours** of agent estimates, plus the unestimated readability sweep
+and v1.13.3 generator change; the owner-parked items and the 106–220-hour
+skill-expansion candidates are listed in the forecast. Stage 4B and
+BER-BKL-009 real host, runtime, privacy and cleanup remain TBD, and all seven
+optional rows keep their ranges and gates. Main has **613 tracked Markdown
+files**; the readability ledger's latest count, after #442, is 558 accepted
+reader pages, one generated report, 44 classified fixtures and ten known
+pending pages, and later re-read fixes are not yet recorded there. Issue
+#101 remains open and the VM paused.
 
 ## Catch-up checkpoint after pull request #370 — 2026-09-26
 
