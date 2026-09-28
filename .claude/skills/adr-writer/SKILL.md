@@ -7,8 +7,9 @@ description: Write an Architecture Decision Record for a significant technical c
 
 ## Purpose
 
-Produce a decision record that lets a future reader — including a future
-agent — understand why the system is the way it is, what was rejected and
+Produce an Architecture Decision Record (ADR) — a short record of one
+significant technical decision — that lets a future reader, including a
+future agent, understand why the system is the way it is, what was rejected and
 why, what it costs to operate, and exactly how to back out if the decision's
 assumptions fail. The rollback/reversal plan and the review date are
 mandatory: a decision with no reversal path is a bet, and one with no review
@@ -52,7 +53,9 @@ date silently becomes permanent.
 ## Workflow
 
 Draft in the conversation first. Persist an ordinary non-executable ADR only
-under the standard's approved-document exception: show exact path/content,
+under the approved-documentation exception in the
+[skill-generation standard](../../../docs/skill-generation-standard.md#5-least-privilege--side-effects):
+show exact path/content,
 honor an applicable existing current-session grant or obtain missing approval,
 create/append without overwriting history, then verify the write. Security or
 governance policy, agent instructions and existing-file amendments/backlinks require
@@ -81,11 +84,12 @@ not execute those changes or broaden a grant.
    and a specific date to re-examine the decision against its assumptions.
    Include predecessor links in the draft; propose any old-file back-link
    change for its separately authorized route rather than editing it here.
-   Attach a certainty label to the status and to load-bearing claims:
-   confirmed (cited evidence) | inferred | unknown — e.g. `accepted
-   (confirmed)`. An uncited operational claim reads "unverified — recommend
-   confirming", never as fact. The status-column index itself belongs to
-   `adr-sequencer`.
+   Label the status, and every claim the decision depends on, with one
+   certainty level: confirmed (backed by cited evidence), inferred (reasoned
+   from evidence but not shown directly) or unknown — for example,
+   `accepted (confirmed)`. Write an uncited operational claim as "unverified —
+   recommend confirming", never as fact. The ADR index that lists every
+   record's status belongs to `adr-sequencer`.
 9. **Cross-check:** could a new team member reconstruct the decision's logic
    from this document alone, without hallway context?
 
