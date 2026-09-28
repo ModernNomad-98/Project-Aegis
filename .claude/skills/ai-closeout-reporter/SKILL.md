@@ -7,7 +7,7 @@ description: 'Produce the end-of-task closeout report — what changed, what was
 
 **Reading key:** PR is pull request; CI is continuous integration, the
 automated build-and-test run; SHA is Secure Hash Algorithm, and a commit SHA
-names one exact commit.
+names one exact commit. The head is the latest commit on the branch being reported. A diff is the set of line changes the work made. An exit code is the number a command returns; 0 means success. A migration is a recorded database schema change. Evals are evaluation cases, the test prompts a skill is checked against.
 
 ## Purpose
 
@@ -24,13 +24,13 @@ visible, never discovered later by surprise.
 - Use when: handing work off, opening a pull request (PR) for review, or closing one out.
 - Use when: asked "what did you actually do?" about completed work.
 - Do NOT use when: giving a mid-task progress update — that is a lighter status
-  note; closeout is terminal.
+  note; closeout comes only at the end.
 - Do NOT use when: shaping a commit or staged diff — that is
   `reviewable-diff-discipline` *(manual-only)* (its parked items feed this report).
 - Do NOT use when: verifying a closeout's claims (`agent-governance-audit`),
   designing a cross-stage handoff (`phased-work-handoff-designer`), writing a
   lane's pre-work guide (`lane-authoring-guide`), or reconciling chat-only
-  history against the repo (`chat-backlog-reconciliation`).
+  history against the repository (`chat-backlog-reconciliation`).
 - Do NOT use when: assembling a promotion packet (`promotion-packet-writer`)
   or setting screenshot-evidence policy (`screenshot-evidence-planner`);
   this skill reports one finished task.
@@ -56,14 +56,14 @@ visible, never discovered later by surprise.
    its reason — including quiet downgrades (asked for 10, delivered 6).
 4. List files touched from git output, not from memory.
 5. Record validation with the actual commands and their actual results —
-   failures verbatim. Anything the change class expected but that was NOT run
+   failures verbatim. Anything this kind of change normally requires that was NOT run
    goes under "Skipped validation" with the reason.
    - When verification spans several surfaces (endpoints, pages, roles,
      tenants), report a per-surface pass/fail table AND a negative-path table
      (what must be refused or fail, and whether it did).
    - Decompose skips: every skipped check or skipped-test count broken down
      by reason, never a bare total.
-   - When a local preflight ran (`local-ci-mirror-preflight` *(manual-only)*),
+   - When a local preflight ran (a local copy of the CI checks, from `local-ci-mirror-preflight` *(manual-only)*),
      include its evidence block in section 4 as recorded, not paraphrased.
 6. Build the per-deliverable trace in section 5: one row per deliverable from
    step 1, naming the request item, the files that serve it, the check that
@@ -136,7 +136,7 @@ CLOSEOUT REPORT
   without running them, and failures summarized into vagueness.
 - A closeout listing 40 files "for completeness" hides the 3 that matter —
   be exact but curated, and point to the PR/diff for the full list.
-- "12 skipped" hides whether 11 were environment-gated and 1 was the check
+- "12 skipped" hides whether 11 could not run in this environment and 1 was the check
   that mattered; only a per-reason breakdown shows it.
 - Separate lists of files, checks and evidence do not show which test proves
   which requested item, or which commit a green run came from; the trace row

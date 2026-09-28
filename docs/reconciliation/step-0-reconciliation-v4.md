@@ -90,7 +90,7 @@ architecture; the architecture skills are **moved to Phase 2**.
 | 3 | `change-classification-gate` | #264 | absorbs execution-plan `phase-locked-execution` (#263) scope-lock behavior |
 | 4 | `human-approval-boundary` | #265 | new canonical name (v4); also carries the "stop when unclear" half of #270 |
 | 5 | `reviewable-diff-discipline` | #271 | absorbs execution-plan `exact-file-staging` intent (#272) |
-| 6 | `ai-closeout-reporter` | #274 (+ #267, #273) | same intent both tracks; #267 Prompt-to-Diff Traceability and #273 AI Work Evidence Pack merged into ai-closeout-reporter (D69, 2026-09-28) as its per-deliverable trace |
+| 6 | `ai-closeout-reporter` | #274 (+ #267, #273) | same intent both tracks; #267 Prompt-to-Diff Traceability and #273 AI Work Evidence Pack merged into `ai-closeout-reporter` (D69, 2026-09-28) as its per-deliverable trace |
 | 7 | `agent-failure-recovery` | #275 | v4 addition |
 | 8 | `agent-instruction-consolidator` | #276 | #276 Agent Instruction Consolidation |
 

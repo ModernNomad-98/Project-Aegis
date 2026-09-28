@@ -1,7 +1,7 @@
 {
   "skill": "ai-closeout-reporter",
-  "description": "Trigger discrimination: first-person terminal closeout of one task or PR vs third-party verification of a closeout or a finished change's process (agent-governance-audit), the cross-stage handoff protocol (phased-work-handoff-designer), the pre-work lane guide (lane-authoring-guide), cadence reconciliation of chat-only history (chat-backlog-reconciliation), a career promotion packet (promotion-packet-writer), and screenshot-evidence policy (screenshot-evidence-planner). Two cases pin 'show which test proves each change' to this skill's per-deliverable trace.",
-  "overlaps_with": ["agent-governance-audit", "phased-work-handoff-designer", "lane-authoring-guide", "chat-backlog-reconciliation", "promotion-packet-writer", "screenshot-evidence-planner"],
+  "description": "Trigger discrimination: first-person terminal closeout of one task or PR vs third-party verification of a closeout or a finished change's process (agent-governance-audit), the cross-stage handoff protocol (phased-work-handoff-designer), the pre-work lane guide (lane-authoring-guide), cadence reconciliation of chat-only history (chat-backlog-reconciliation), a career promotion packet (promotion-packet-writer), and screenshot-evidence policy (screenshot-evidence-planner). Two cases pin 'show which test proves each change' to this skill's per-deliverable trace, and one sends a merge go/no-go on head CI to release-readiness-reviewer.",
+  "overlaps_with": ["agent-governance-audit", "phased-work-handoff-designer", "lane-authoring-guide", "chat-backlog-reconciliation", "promotion-packet-writer", "screenshot-evidence-planner", "release-readiness-reviewer"],
   "cases": [
     {
       "id": "own-finished-task-wins-here",
@@ -79,6 +79,13 @@
       "expected_skill": "ai-closeout-reporter",
       "should_not_trigger": ["phased-work-handoff-designer"],
       "reason": "A per-deliverable trace for one finished pull request is part of that task's closeout; the handoff designer shapes what each stage of a multi-stage effort carries to the next, not one pull request's evidence."
+    },
+    {
+      "id": "merge-readiness-check-goes-to-release-readiness",
+      "prompt": "Is this PR ready to merge? Check that CI passed on the head commit and tell me go or no-go.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": ["ai-closeout-reporter"],
+      "reason": "Deciding go or no-go for a merge from the head's CI evidence is the release-readiness gate; the closeout reports one's own finished work and its trace, and does not decide whether it ships."
     }
   ]
 }
