@@ -54,8 +54,10 @@ the entry governs.
   four-file exception in AEGIS-APR-047. An **administrator merge** uses repository
   administrator rights to merge past branch-protection requirements.
 - **Codex** is an automated pull-request reviewer; **P1** and **P2** are its
-  two highest finding priority levels. **SHIP** is an independent reviewer's
-  verdict that a head is ready to merge.
+  two highest finding priority levels. In AEGIS-APR-073, **P0**, **P1**,
+  **P2** and **info** are instead the skill-contract audit report's four
+  finding severity levels, P0 the most severe. **SHIP** is an independent
+  reviewer's verdict that a head is ready to merge.
 - **BER** is the Behavioral Eval Runner under `tools/behavioral_eval_runner/`,
   planned in [the BER backlog](../roadmaps/behavioral-eval-runner-backlog.md).
   There, **BER-BKL-nnn** is a BER backlog item, **BER-DEC-nnn** an entry in
@@ -72,8 +74,11 @@ the entry governs.
   capability probe and Stage B the later bounded tool-path proof, as defined
   in [the selected-host capability decision](../roadmaps/ber-selected-host-capability-decision.md).
 - **CP-WP-nnn** is a control-plane work package in
-  [the resumable control-plane backlog](../roadmaps/resumable-control-plane-backlog.md).
-  Its numbered test cases are **T** (a state transition, T01–T28), **C** (a
+  [the resumable control-plane backlog](../roadmaps/resumable-control-plane-backlog.md);
+  a letter suffix, as in CP-WP-003A, names one increment of that package.
+  The backlog marks packages DONE (delivered, with the required evidence and
+  owner disposition recorded) or BLOCKED (entry conditions or authority
+  absent). Its numbered test cases are **T** (a state transition, T01–T28), **C** (a
   crash boundary, C01–C09) and **F** (a finding-specific negative acceptance
   family, F01–F21, where F04 is split into separate F04a and F04b rows, so
   there are 22 F rows), each defined in
@@ -1844,8 +1849,9 @@ the entry governs.
 
 - **Event:** EXPIRED; target grant AEGIS-APR-024.
 - **Status at recording:** AEGIS-APR-024 has no remaining applicable use.
-- **Effective at:** The end of the 2026-09-24 Project Aegis conversation
-  session in which it was granted. The exact end time is not recorded; the
+- **Effective at:** The end of the Project Aegis conversation session in
+  which it was granted on 2026-09-24; that date is the grant's, not the
+  session's end. The exact end time is not recorded; the
   owner confirmed on 2026-09-28 that the session has ended.
 - **Recorded at / By:** 2026-09-28 / Project Aegis agent, on the owner's
   2026-09-28 chat decision described in AEGIS-APR-067.
