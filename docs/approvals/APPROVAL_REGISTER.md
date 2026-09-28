@@ -1685,3 +1685,95 @@ generic skill guidance that would require asking for the same approval again.
   records 316 findings, 232 of them ROUTE-002. The
   [independent review](https://github.com/ModernNomad-98/Project-Aegis/pull/441#issuecomment-5860898839)
   of that head reproduced the regeneration and returned SHIP.
+
+### AEGIS-APR-067: Consumption of the CP-WP-002 kernel grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-004.
+- **Status at recording:** AEGIS-APR-004 has no remaining use.
+- **Effective at:** 2026-09-23 10:10:29 UTC.
+- **Recorded at / By:** 2026-09-28 / Project Aegis agent. The owner decided
+  in chat on 2026-09-28, answering the coordinating agent's question, to
+  record this closeout; the coordinator relayed the decision, not its exact
+  wording.
+- **New authority:** None. This event records a past delivery and grants
+  nothing. Any later control-plane package, including wiring the
+  delivery-control suite into CI, needs its own grant.
+- **Reason:** The CP-WP-002 implementation package that AEGIS-APR-004 applied
+  to was delivered, so the grant's stated use is spent. This missed
+  consumption is recorded after the fact, as AEGIS-APR-052 did for
+  AEGIS-APR-007.
+- **Evidence:** [PR #99](https://github.com/ModernNomad-98/Project-Aegis/pull/99)
+  merged head `8dfe237280f8837c6254e456767e405d44fbd148` as
+  `be552fb778ec50fd0cbe82eff9f1022235ec11d8` at the time above (Git
+  merge-commit timestamp 2026-09-23 05:10:28 -05:00). It changed 20 paths:
+  the `tools/aegis_delivery_control/` package and tests,
+  `docs/roadmaps/resumable-control-plane-backlog.md`,
+  `docs/evidence/control-plane/cp-wp-002-codex-handoff.md`, `README.md` and
+  `docs/README.md`. [The control-plane backlog](../roadmaps/resumable-control-plane-backlog.md)
+  marks CP-WP-002 DONE under AEGIS-APR-004 through PR #99, with all 28 T,
+  9 C and 22 F rows covered.
+
+### AEGIS-APR-068: Consumption of the CP-WP-003A capability-proof grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-006.
+- **Status at recording:** AEGIS-APR-006 has no remaining use.
+- **Effective at:** 2026-09-23 16:49:28 UTC.
+- **Recorded at / By:** 2026-09-28 / Project Aegis agent, on the owner's
+  2026-09-28 chat decision described in AEGIS-APR-067.
+- **New authority:** None. This event records a past delivery and grants
+  nothing. CP-WP-003 beyond this first increment, CP-WP-004 and any real
+  dispatch stay blocked and need their own grants.
+- **Reason:** The one bounded CP-WP-003A implementation package was
+  delivered, which was AEGIS-APR-006's stated use limit.
+- **Evidence:** [PR #123](https://github.com/ModernNomad-98/Project-Aegis/pull/123)
+  merged head `d097d25cc65ebbd86cf5d5c132d772111bca690d` as
+  `c965595c3c388c94f15174d45fc3d2fa8fd073b4` at the time above (Git
+  merge-commit timestamp 2026-09-23 11:49:28 -05:00). Its head descends from
+  the grant's merge commit `1af342712d27d5e6ea482b3f451106b4dccaf125`. It
+  changed 10 paths, all on AEGIS-APR-006's exact file list, with 557 added
+  and 4 deleted lines. [The CP-WP-003A review](../evidence/control-plane/cp-wp-003a-review.md)
+  records CP-WP-003A as DONE through PR #123, and
+  [the control-plane backlog](../roadmaps/resumable-control-plane-backlog.md)
+  keeps CP-WP-003 BLOCKED.
+
+### AEGIS-APR-069: Consumption of the issue #101 package-3 grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-008.
+- **Status at recording:** AEGIS-APR-008 has no remaining use.
+- **Effective at:** 2026-09-23 16:42:21 UTC.
+- **Recorded at / By:** 2026-09-28 / Project Aegis agent, on the owner's
+  2026-09-28 chat decision described in AEGIS-APR-067.
+- **New authority:** None. This event records a past delivery and grants
+  nothing. The later version-2 revision had its own grant, AEGIS-APR-040,
+  already consumed by AEGIS-APR-043.
+- **Reason:** The one bounded package-3 implementation was delivered, which
+  was AEGIS-APR-008's stated use limit.
+- **Evidence:** [PR #121](https://github.com/ModernNomad-98/Project-Aegis/pull/121)
+  merged head `d1f7adcb240fd863ef59c57953e50b2626f5d4b1` as
+  `34241baf5fd1911f3d7d07915adc3bacd272d4b2` at the time above (Git
+  merge-commit timestamp 2026-09-23 11:42:21 -05:00). Its head descends from
+  the grant's merge commit `1af342712d27d5e6ea482b3f451106b4dccaf125`. It
+  changed exactly the seven paths on AEGIS-APR-008's file list, with 496
+  added and 4 deleted lines. [The package-3 review](../evidence/setup/issue-101-package-3-review.md)
+  records that package 3 shipped in PR #121, and
+  [the setup routing plan](../roadmaps/aegis-setup-routing-plan.md) marks it
+  delivered.
+
+### AEGIS-APR-070: Expiry of the 2026-09-24 session delivery grant
+
+- **Event:** EXPIRED; target grant AEGIS-APR-024.
+- **Status at recording:** AEGIS-APR-024 has no remaining applicable use.
+- **Effective at:** The end of the 2026-09-24 Project Aegis conversation
+  session in which it was granted. The exact end time is not recorded; the
+  owner confirmed on 2026-09-28 that the session has ended.
+- **Recorded at / By:** 2026-09-28 / Project Aegis agent, on the owner's
+  2026-09-28 chat decision described in AEGIS-APR-067.
+- **New authority:** None. This event grants nothing and removes nothing
+  beyond AEGIS-APR-024 itself. It does not change AEGIS-APR-013,
+  AEGIS-APR-039, AEGIS-APR-047 or AEGIS-APR-048, which are separate grants
+  with their own terms.
+- **Reason:** AEGIS-APR-024 was limited to "Work in this conversation session
+  only" and "is not a standing all-work grant for later sessions". That
+  session has ended.
+- **Evidence:** The expiry wording in AEGIS-APR-024, quoted above, and the
+  owner's 2026-09-28 decision.
