@@ -16,7 +16,7 @@ whale tenant's burst, the thousand small tenants' baseline, and whether
 one degrades the other), the data volumes that make query behavior
 real, the test type matched to the question being asked, ramp profiles
 with abort criteria, and pass/fail owned by the people who own the
-numbers. It is the traffic half of the D10 measurement pair: this
+numbers. It is the traffic half of the library's load-and-performance measurement pair: this
 skill plans WHAT load runs; `performance-test-harness` is the
 instrument that runs and measures it.
 
@@ -34,7 +34,7 @@ instrument that runs and measures it.
   no tenant dimension, empty database) and the plan needs rebuilding
   on evidence.
 - Do NOT use when: building the measurement instrument — baselines,
-  regression detection, CI gates, and report formats are
+  regression detection, continuous integration (CI) gates, and report formats are
   `performance-test-harness`; this plan is its input.
 - Do NOT use when: setting the TARGETS load is judged against — user
   journey promises and error budgets are `slo-reliability-architect`;
@@ -42,7 +42,7 @@ instrument that runs and measures it.
   their numbers as pass/fail.
 - Do NOT use when: the load reveals a problem and the fix needs
   designing — attribution is `profiling-methodology-designer`;
-  fixes belong to the D12.3 layer skills.
+  fixes belong to the library's performance-engineering skills for the affected layer.
 - Do NOT use when: designing the test DATA itself (fixtures,
   factories, personally identifiable information (PII)-safe synthesis) — `test-data-architect` owns data
   generation conventions; this plan states the volumes and shapes it
@@ -69,12 +69,12 @@ instrument that runs and measures it.
    growth trajectory — the volumes the test environment must be
    seeded to (via `test-data-architect` conventions) for queries to
    behave truthfully.
-4. The numbers that judge the test: SLO targets, latency budgets,
+4. The numbers that judge the test: service-level objective (SLO) targets, latency budgets,
    maximum error-rate bounds — from their owners; plus the capacity question
    being asked (target load, growth multiple).
 5. The candidate target environment(s) and their blast radius: what
    the load can touch (dedicated perf environment, staging), what it
-   must not (production, live third-party APIs, shared infrastructure
+   must not (production, live third-party application programming interfaces (APIs), shared infrastructure
    whose other tenants are real) — stated per scenario.
 6. Third-party dependencies on the tested paths: rate agreements,
    sandbox availability, or the stub-with-shaped-latency fallback
@@ -100,7 +100,7 @@ instrument that runs and measures it.
 3. **Design the tenant mix.** Concurrent tenants in the observed
    size distribution — explicitly including: the whale tenant at its
    real share, the long tail of small tenants, and per-tenant
-   metrics as first-class outputs (aggregate p95 hides a single
+   metrics as first-class outputs (aggregate 95th-percentile latency, p95, hides a single
    tenant's collapse — the harness measures per-tenant because this
    plan demands it).
 4. **Write the noisy-neighbor scenario explicitly.** One tenant

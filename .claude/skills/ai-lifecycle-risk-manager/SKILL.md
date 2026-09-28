@@ -35,7 +35,7 @@ lifecycle-stage triggers, instead of an RMF poster on the wall.
 - Use when: AI risk practice exists in pieces (feature reviews, threat
   models, evals) and needs an org-level program with lifecycle triggers
   and owners.
-- Use when: pairing a 42001 effort with its underlying risk method, or a
+- Use when: pairing an ISO/IEC 42001 effort with its underlying risk method, or a
   customer/regulator asks how the org manages AI risk end-to-end.
 - Do NOT use when: reviewing ONE AI feature's risk tier, oversight, and
   disclosure — `ai-governance-risk-reviewer` (this program aggregates
@@ -45,7 +45,7 @@ lifecycle-stage triggers, instead of an RMF poster on the wall.
   management-system clauses).
 - Do NOT use when: enumerating a specific feature's technical threats
   (`ai-threat-modeler`) or running the evals themselves
-  (`ai-evaluation-harness`).
+  (`ai-evaluation-harness` *(manual-only)*).
 
 ## Inputs to Inspect
 
@@ -77,7 +77,7 @@ lifecycle-stage triggers, instead of an RMF poster on the wall.
    (named owners per system and for the program), risk appetite, policies,
    escalation paths, and the workforce/culture pieces — mapped to what
    exists: `ai-sdlc-operating-model` (stage authority),
-   `agent-authorization-matrix` (standing agent authority),
+   `agent-authorization-matrix` *(manual-only)* (standing agent authority),
    `ai-governance-risk-reviewer`'s accountable-owner discipline. GOVERN
    items recur inside every other function; that's the "infused
    throughout" property, not a section to complete once.
@@ -87,12 +87,12 @@ lifecycle-stage triggers, instead of an RMF poster on the wall.
    feature intake via `ai-governance-risk-reviewer` (tier, affected
    parties), technical surface via `ai-threat-modeler`, third-party/model
    provenance via `supply-chain-security-reviewer`. Output: the AI risk
-   register rows (shared with the AIMS 6.1.2 register when present).
+   register rows (shared with the AIMS risk register kept under ISO/IEC 42001 clause 6.1.2, when present).
 4. **Operationalize MEASURE.** For each mapped risk: how it is analyzed,
-   assessed, and tracked over time — `ai-evaluation-harness` (quality/
+   assessed, and tracked over time — `ai-evaluation-harness` *(manual-only)* (quality/
    safety/grounding/injection thresholds and regression gates),
    red-team cadence, drift/behavior monitoring in operation
-   (`observability-operator` mechanics), with trackable metrics and
+   (`observability-operator` *(manual-only)* mechanics), with trackable metrics and
    review dates. Unmeasurable risks are named as such, not silently
    dropped.
 5. **Operationalize MANAGE.** Prioritization against risk appetite,
@@ -116,7 +116,7 @@ lifecycle-stage triggers, instead of an RMF poster on the wall.
 6. **Wire lifecycle triggers.** Per stage transition (design→dev,
    dev→deploy, deploy→operate, material change, decommission): which
    function activities re-run, who signs. Decommission gets real steps —
-   model retirement, data/memory disposition (`agent-memory-governance`
+   model retirement, data/memory disposition (`agent-memory-governance` *(manual-only)*
    hygiene), dependent-system checks.
 7. **Emit the profile and register the controls.** The org's RMF profile
    (functions → practices → owners → triggers), program-level controls
@@ -163,7 +163,7 @@ Unmeasurable/open risks: <named honestly>
 
 - The NIST AI RMF is **voluntary** — released 2023-01-26; "The Core is
   composed of four functions: govern, map, measure, and manage," with
-  GOVERN cross-cutting (verified on NIST/AIRC pages). It is a risk
+  GOVERN cross-cutting (verified on NIST and NIST AI Resource Center (AIRC) pages). It is a risk
   method, **not a certification target** — no org "passes" or "is
   certified against" the AI RMF, and this skill's outputs never imply it.
 - NIST notes AI RMF 1.0 is **under revision** — record a current-version

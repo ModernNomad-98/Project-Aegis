@@ -29,7 +29,7 @@ tests" are real intermittent product bugs wearing a test's name.
 - Use when: a quarantined test's expiry arrives and it needs diagnosis or
   release.
 - Do NOT use when: the test fails EVERY run — that's a plain failure:
-  product bug → `systematic-debugger`; test bug → fix at its layer's
+  product bug → `systematic-debugger` *(manual-only)*; test bug → fix at its layer's
   engineer skill.
 - Do NOT use when: setting suite-wide retry/quarantine POLICY — 
   `qa-automation-architect`; this skill works individual cases under that
@@ -79,7 +79,7 @@ the operation and obtain it before proceeding.
    `systematic-debugger` discipline — one change per attempt).
 4. **Triage: test bug or product bug?** If the race lives in product code,
    the flake is a FINDING about production behavior — route the product fix
-   (`systematic-debugger`/owner) and keep the test; do not "harden" the test
+   (`systematic-debugger` *(manual-only)*/owner) and keep the test; do not "harden" the test
    into hiding a real race.
    If timing or remedy requires a user choice, explain the viable paths and
    why each applies. Define unfamiliar terms such as a product-side race

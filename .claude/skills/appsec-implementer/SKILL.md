@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # AppSec Implementer
 
-Here, **API** means application programming interface, **ORM** means
+Here, **AppSec** means application security, **API** means application programming interface, **ORM** means
 object-relational mapper, **UX** means user experience, and **authz** means
 authorization. The `§` symbol denotes a section.
 
@@ -33,8 +33,8 @@ what to build and it does not opportunistically refactor.
   `threat-modeler` first; implementing undecided controls is guessing.
 - Do NOT use when: reviewing a diff for security — `security-pr-reviewer`.
 - Do NOT use when: the work is broad secrets/identity hardening across the
-  app — `secrets-identity-hardener`.
-- Do NOT use when: the control is a database RLS policy — author/audit via
+  app — `secrets-identity-hardener` *(manual-only)*.
+- Do NOT use when: the control is a database row-level security (RLS) policy — author/audit via
   `rls-policy-auditor`.
 - Do NOT use when: the ask is a sweeping "make the app secure" — that is not
   one control; decompose it via `threat-modeler` first.
@@ -52,7 +52,7 @@ what to build and it does not opportunistically refactor.
 4. The test suite and its runner: where security/negative tests live and how
    they run, so the new test fits the project's conventions.
 5. Framework/library versions (via lockfile) for the security API being used
-   — behavior differs across versions; consult `docs-first-implementer`
+   — behavior differs across versions; consult `docs-first-implementer` *(manual-only)*
    discipline rather than assuming an API exists.
 
 ## Workflow
@@ -79,7 +79,7 @@ what to build and it does not opportunistically refactor.
    relevant suite to confirm no regression. Record exact commands + output.
 6. **Add positive-path coverage** if the control could over-block (a
    validator that rejects legitimate input is a new bug).
-7. **Stage exactly the intended files** (`reviewable-diff-discipline`);
+7. **Stage exactly the intended files** (`reviewable-diff-discipline` *(manual-only)*);
    verify the staged set equals the control's footprint — no drive-by changes.
 8. **Report** the control, the before/after test evidence, the files touched,
    residual risk, and any follow-up the control does NOT cover, so a reviewer
@@ -115,7 +115,7 @@ Handoff: security-pr-reviewer to verify the diff.
 - [ ] The same test passes after the change; full relevant suite still green;
       real commands and output recorded.
 - [ ] The control sits at a server-side/authoritative boundary, not only the
-      client or UI.
+      client or user interface (UI).
 - [ ] Existing project security utilities reused; no hand-rolled crypto or
       duplicate validation layer.
 - [ ] Staged set equals the control footprint; no unrelated refactors.
@@ -143,7 +143,7 @@ Handoff: security-pr-reviewer to verify the diff.
   wrong thing — the vulnerability wasn't reproduced; fix the test before the code.
 - Over-strict validators become availability bugs: a regex that rejects valid
   emails/names/unicode is a new defect — add positive cases.
-- Encoding at the wrong layer (escaping in the DB instead of at render, or
+- Encoding at the wrong layer (escaping in the database instead of at render, or
   double-encoding) neutralizes the control or corrupts data.
 - Security "fixes" that touch many files invite rubber-stamping and hide the
   one line that matters — keep the diff to the control.
@@ -177,7 +177,7 @@ Handoff: security-pr-reviewer to verify the diff.
 
 - [references/control-implementation-patterns.md](references/control-implementation-patterns.md)
   — per-control implementation checklists (validation, encoding, authz,
-  session, file handling, SSRF/redirect) and the negative-test shape for each.
+  session, file handling, server-side request forgery (SSRF)/redirect) and the negative-test shape for each.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against `threat-modeler`,
   `secrets-identity-hardener`, and `security-pr-reviewer`.

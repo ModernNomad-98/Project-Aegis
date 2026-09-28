@@ -7,16 +7,16 @@ description: Design ISO/IEC 27001:2022 certification readiness — the ISMS unde
 
 ## Purpose
 
-Design the Information Security Management System that ISO/IEC 27001:2022
+Design the Information Security Management System (ISMS) that ISO/IEC 27001:2022 (the joint International Organization for Standardization and International Electrotechnical Commission standard)
 certification audits examine: the clause 4–10 machinery (scope and context,
 leadership, risk-driven planning, support, operation, performance
 evaluation, improvement) wrapped around Annex A control selection. The
-D9 is the roadmap's design premise that existing skills can route control
-work. Shipped Phase 3/4 skill guidance does not establish that an organization
+library's planning decision 9 (D9, the compliance and governance batch) assumes that existing skills can route control
+work. Shipped skill guidance from the library's build phases 3 and 4 does not establish that an organization
 has implemented, operated, or evidenced any Annex A control. Verify each
 actual mechanism, owner, status, and evidence before treating it as existing.
 The management-system work includes the risk register and treatment process,
-Statement of Applicability via `statement-of-applicability-author`,
+Statement of Applicability (SoA) via `statement-of-applicability-author`,
 internal audit program, management review cadence, documented information
 discipline plus the evidence plumbing via `compliance-evidence-collector`.
 This skill produces the ISMS design and certification-readiness plan; it
@@ -35,7 +35,7 @@ decides that.
 - Do NOT use when: writing the per-control applicability document — that is
   `statement-of-applicability-author` (this skill mandates and consumes it).
 - Do NOT use when: the target is the AI management system
-  (`iso-42001-aims-architect`), a SOC 2 attestation
+  (`iso-42001-aims-architect`), a System and Organization Controls 2 (SOC 2) attestation
   (`soc2-trust-criteria-mapper`), or a where-do-we-stand assessment
   (`compliance-gap-auditor`).
 - Do NOT use when: implementing a technical control — route to the owning
@@ -43,7 +43,7 @@ decides that.
 
 ## Inputs to Inspect
 
-1. The licensed ISO/IEC 27001:2022 text (and Amd 1:2024) — clause wording
+1. The licensed ISO/IEC 27001:2022 text (and Amendment 1:2024, written Amd 1:2024) — clause wording
    and the Annex A table; without it, design proceeds on verified structure
    only (clauses 4–10, four Annex A themes) with every finer claim flagged
    for verification.
@@ -148,14 +148,14 @@ Readiness plan: <artifact → owner → date>; certification decision belongs to
 - ISO/IEC 27001:2022 is a **certifiable** management-system standard
   (third edition, 2022-10; clauses 4–10; Annex A normative, "Information
   security controls reference" — structure verified from the standard's
-  own table of contents). SOC 2 is an AICPA **attestation** — never conflate.
+  own table of contents). SOC 2 is an American Institute of Certified Public Accountants (AICPA) **attestation** — never conflate.
 - Annex A four themes are verified; the **93 = 37/8/14/34 theme counts are
   secondary-sourced — verify against the licensed Annex A table before
   citing**, and prefer not citing counts at all.
 - **Amd 1:2024** ("Climate action changes") existence/title is verified
   from the ISO catalog; the exact inserted 4.1/4.2 sentences are from
   secondary summaries — verify before quoting.
-- NIS2-driven market demand for 27001 is positioning, not a standards
+- Market demand for 27001 driven by NIS2 (the European Union's second Network and Information Security Directive) is positioning, not a standards
   claim — keep it out of ISMS artifacts.
 - Output is readiness design; "certified"/"will pass" claims are never
   made — the accredited certification body decides.
