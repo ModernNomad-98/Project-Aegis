@@ -1,9 +1,16 @@
 ---
 name: model-context-designer
-description: 'Design what enters and leaves a model context window: assemble vetted inputs server-side under caps and closed schemas, minimize sensitive data, separate controlled-store persistence from transient segments, verify provider retention before claiming end-to-end non-persistence, make reconstruction limits explicit, and document exclusions. Distinct from agent-startup-context-gate (session start), ai-cost-guardrail-designer (cost), and rag-security-architect (retrieval authorization). Use when designing prompt/context assembly or deciding what an agent may see. Poisoning attack review belongs to memory-context-poisoning-reviewer.'
+description: 'Design what enters and leaves a model context window: assemble vetted inputs server-side under caps and closed schemas, minimize sensitive data, separate controlled-store persistence from transient segments, verify provider retention before claiming end-to-end non-persistence, make reconstruction limits explicit, and document exclusions. Also design the prompt contract for each call: a versioned, owned instruction, its declared inputs, a pointer to the output contract, when the model must decline, and which prompt changes need an evaluation rerun. Distinct from agent-startup-context-gate (session start), ai-cost-guardrail-designer (cost), rag-security-architect (retrieval authorization), agent-harness-architect (call gating), and structured-output-validator (output schema). Use when designing prompt/context assembly, writing or changing a prompt contract, or deciding what an agent may see. Poisoning attack review belongs to memory-context-poisoning-reviewer.'
 ---
 
 # Model Context Designer
+
+**Reading key:** the context window is the text a model receives on one
+call; a segment is one named part of it (instructions, user input, history,
+retrieved content, tool output, memory); a prompt contract is the versioned,
+owned record of one call's instruction and what it promises; an evaluation
+rerun is running the feature's evaluation suite again before a prompt change
+ships.
 
 ## Purpose
 
@@ -21,7 +28,10 @@ persisted-vs-transient split explicit per segment; (5)
 reconstructibility — what the model saw on any past call can be established
 afterward; and (6) designed exclusions — what is deliberately NOT in the
 window, documented with reasons, so absence is a decision rather than an
-accident. This skill DESIGNS the curated context; the security review of
+accident. It also writes the prompt contract for each call: the
+instruction's version and owner, its declared inputs, a pointer to its output
+contract, when the model must decline, and which prompt changes need an
+evaluation rerun. This skill DESIGNS the curated context; the security review of
 context and memory for poisoning belongs to
 `memory-context-poisoning-reviewer` — it PRODUCES the artifact that skill
 reviews.
@@ -37,6 +47,10 @@ reviews.
   and prompt logs, and the persisted-vs-transient question has no answer.
 - Use when: nobody can say afterward what the model saw for a given call, or
   what was left out of the window and why.
+- Use when: writing or changing a prompt contract — a feature's instruction
+  has no version or owner, no declared inputs, no pointer to its output
+  contract, no decline conditions, or no rule for which edits need an
+  evaluation rerun.
 - Auto-invocable: a pure design skill — it produces a context specification
   and changes no live system or data flow.
 - Do NOT use when: the job is the ATTACK REVIEW of context or memory — can
@@ -59,7 +73,15 @@ reviews.
   skill decides the context diet those controls apply to.
 - Do NOT use when: the question is gating the CALL — identity, authority,
   budget rungs — that is `agent-harness-architect`; the harness gates the
-  call, this skill curates what rides in it.
+  call, this skill curates what rides in it. The harness also keeps an
+  agent's instructions as server-side versioned artifacts; an agent's prompt
+  contract points to that version instead of restating custody.
+- Do NOT use when: the ask is the output schema itself or its
+  validate-before-use ladder — that is `structured-output-validator`; the
+  prompt contract points to that contract, never restates it.
+- Do NOT use when: the ask is running the regression gate on a prompt
+  change — that is `ai-evaluation-harness` *(manual-only)*; the contract's
+  change policy says WHEN a rerun is needed, that skill runs it.
 
 ## Inputs to Inspect
 
@@ -139,9 +161,22 @@ changes or provider calls.
    absent from an assembled context; a transient segment is demonstrably
    absent from every persisted store. A verifier that cannot fail is theater
    with an exit code.
-9. **Deliver the design** in the Output Format, seams cited: poisoning
+9. **Write the prompt contract.** One record per model call, using
+   [references/prompt-contract-template.md](references/prompt-contract-template.md):
+   the instruction's identifier, version and owner; its declared inputs (the
+   segments from step 1); a pointer to the output contract
+   `structured-output-validator` owns, never a restated schema; the
+   conditions under which the model must decline, each with its expected
+   decline response; and a change policy that marks each kind of prompt
+   edit as needing an evaluation rerun or not. An edit that changes the
+   output contract, the declared inputs or the decline conditions always
+   needs a rerun, which runs under `ai-evaluation-harness` *(manual-only)*.
+   A contract with no decline conditions is incomplete: add them rather than
+   leave refusal to chance. For an agent, the version points to the
+   instruction artifact `agent-harness-architect` keeps.
+10. **Deliver the design** in the Output Format, seams cited: poisoning
    review, session-start gate, cost policy, retrieval authorization (authz), disclosure
-   mechanics — composed, never restated.
+   mechanics, output schema, evaluation rerun — composed, never restated.
 
 ## Output Format
 
@@ -165,11 +200,18 @@ Reconstructibility: <per segment: content | reference+version | class+hash;
 Exclusions (designed): <what is NOT in the window — each with reason>
 Failure proofs: <over-cap, schema-reject, exclusion-absence,
   transient-not-persisted — the test for each>
+Prompt contract: <instruction id — version — owner>
+  Declared inputs: <segment names from Segments above>
+  Output contract: <pointer to the structured-output-validator contract>
+  Decline when: <condition → expected decline response>
+  Change policy: <edit kind → evaluation rerun needed | not needed, and why>
 Handoffs: poisoning attack review → memory-context-poisoning-reviewer;
   session-start context → agent-startup-context-gate; spend caps →
   ai-cost-guardrail-designer; retrieval authz → rag-security-architect;
-  redaction/echo mechanics → sensitive-disclosure-guard; call gating →
-  agent-harness-architect
+  redaction/echo mechanics → sensitive-disclosure-guard; call gating and
+  agent instruction custody → agent-harness-architect; output schema →
+  structured-output-validator; evaluation rerun → ai-evaluation-harness
+  (manual-only)
 Open questions / risks: <each with risk-if-wrong / who answers>
 ```
 
@@ -194,6 +236,9 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       absent (or present) by accident.
 - [ ] Every cap, schema, exclusion, and transient guarantee has a designed
       proof it can fail.
+- [ ] Every model call has a prompt contract with a version and an owner,
+      declared inputs, an output-contract pointer, decline conditions, and a
+      change policy saying which edits need an evaluation rerun.
 - [ ] The yields are stated: poisoning review →
       memory-context-poisoning-reviewer; neighboring lanes cited, not
       restated.
@@ -213,6 +258,9 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - Reconstructibility promised as "we log the full prompt" contradicts the
   transient channel the moment a secret rides along — the honest design
   records class+hash for transient segments and says so.
+- "Just a wording tweak" is how an untested prompt ships: small edits move
+  refusals and output fields. The change policy decides whether a rerun is
+  needed, not the editor's confidence.
 - History is a segment too: unbounded conversation history is the cap
   violation everyone forgets, and yesterday's unvetted content re-enters
   today's window through it.
@@ -249,14 +297,19 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 
 - `evals/evals.json` — behavior cases: the ad-hoc context-stuffing design,
   the secrets-in-prompt-logs split, the reconstruction-vs-never-persist
-  edge, the open-access refusal, and the poisoning-review
-  should-not-trigger.
+  edge, the open-access refusal, the prompt-contract version bump that
+  needs an evaluation rerun, the missing decline conditions, and the
+  poisoning-review should-not-trigger.
 - `evals/trigger-evals.json` — discrimination against
   `agent-startup-context-gate` (session-start vs per-call runtime),
   `ai-cost-guardrail-designer` (cap price vs content),
   `rag-security-architect` (retrieval authz vs curation),
   `sensitive-disclosure-guard` (redaction mechanics),
-  `agent-harness-architect` (in-batch: call gating vs context content), and
-  the design-vs-review seam against `memory-context-poisoning-reviewer`.
-- No `references/` — the context contract above is the complete procedure;
-  detail lives in the produced design artifact.
+  `agent-harness-architect` (in-batch: call gating vs context content, and
+  agent instruction custody), `structured-output-validator` (output schema
+  vs prompt contract), `ai-evaluation-harness` *(manual-only)* (running the
+  rerun vs deciding when one is needed), and the design-vs-review seam
+  against `memory-context-poisoning-reviewer`.
+- [references/prompt-contract-template.md](references/prompt-contract-template.md)
+  — the prompt contract record, its change-policy table, and a filled
+  example.
