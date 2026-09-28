@@ -5,7 +5,8 @@
 > decision-log row was created or changed by the pull request that adds it.
 
 Prepared 2026-09-28 from `ModernNomad-98/Project-Aegis` `origin/main` at
-`5f581a3b`, where the validator reported 186 valid skills.
+`5f581a3b`, where `python -B scripts/validate-skills.py` reported 186 valid
+skills.
 
 This page is for the owner, who decides whether and how to build the five
 remaining category 08 candidates, and for the maintainers and reviewers who
@@ -16,8 +17,8 @@ records scope, boundaries and an estimate, and builds nothing.
 
 ## Terms used on this page
 
-- **AI-SDLC** means the artificial-intelligence-assisted software development
-  lifecycle: how people and AI agents plan, build, check, review, merge and
+- **AI-SDLC** means the artificial intelligence (AI)-assisted software
+  development lifecycle (SDLC): how people and AI agents plan, build, check, review, merge and
   close software work together.
 - **Category 08** is the
   [AI-era SDLC and agent operating discipline list](../skills/08-ai-era-sdlc-agent-ops.md)
@@ -103,7 +104,10 @@ does the split itself:
   Stage 6 says "Build it, one slice at a time", but nothing names who cuts
   the slices.
 - [`lane-authoring-guide`](../../.claude/skills/lane-authoring-guide/SKILL.md)
-  writes the guide for a parallel lane **after** the work is split.
+  writes the pre-work guide for each parallel lane and triggers on "splitting
+  an effort across parallel agents/lanes"; the boundary is parallel lanes
+  (that skill) versus an ordered sequence of pull-request-sized tasks (this
+  one).
 - [`phased-work-handoff-designer`](../../.claude/skills/phased-work-handoff-designer/SKILL.md)
   carries decisions and evidence **between** stages that already exist.
 - [`tech-spec-writer`](../../.claude/skills/tech-spec-writer/SKILL.md) writes
@@ -111,7 +115,7 @@ does the split itself:
   turns a team roadmap into delivery promises. Neither produces agent-sized
   tasks.
 - [`reviewable-diff-discipline`](../../.claude/skills/reviewable-diff-discipline/SKILL.md)
-  (manual-only) keeps each diff to one intent **while implementing**; it
+  *(manual-only)* keeps each diff to one intent **while implementing**; it
   cannot help if the task handed to the agent was already too big.
 
 | Boundary | Owner |
@@ -119,9 +123,10 @@ does the split itself:
 | Splitting a goal or spec into ordered, PR-sized tasks with done criteria and risks | `ai-task-decomposer` (new) |
 | The risk class, validation floor and scope lock of one task | `change-classification-gate` |
 | The technical design the tasks implement | `tech-spec-writer` |
+| Product requirements and their user-facing acceptance criteria | `product-spec-writer` |
 | The pre-work guide for one parallel lane | `lane-authoring-guide` |
 | Carrying decisions and evidence between stages | `phased-work-handoff-designer` |
-| Keeping one diff to one intent while coding | `reviewable-diff-discipline` |
+| Keeping one diff to one intent while coding | `reviewable-diff-discipline` *(manual-only)* |
 | Approval for a task that crosses a risky boundary | `human-approval-boundary` |
 | Team delivery commitments from a roadmap | `roadmap-to-commitments-translator` |
 
@@ -130,8 +135,8 @@ skill is a gate that runs at the start of every non-trivial change, and adding
 planning output to it would slow every small change and blur "what class is
 this?" with "how should this be cut up?".
 
-If the `acceptance-criteria-reviewer` proposed in #492 is built, the two meet
-at "acceptance criteria": the decomposer writes a done criterion per task; the
+The `acceptance-criteria-reviewer` approved under D68 and being built in open
+#499 meets this skill at "acceptance criteria": the decomposer writes a done criterion per task; the
 reviewer checks criteria someone else already wrote. Recheck that boundary at
 build time.
 
@@ -139,9 +144,11 @@ build time.
 the other AI-SDLC skills (`ai-sdlc-operating-model`, `ai-closeout-reporter`).
 It reads the goal, specification and repository, and returns a plan. It
 starts no task, creates no ticket and edits no file, so section 5 of the
-standard keeps it auto-invocable. Stop Conditions: no goal or spec to split
+standard keeps it auto-invocable. Its Stop Conditions (the `SKILL.md` section
+that says when the skill must halt and hand back): no goal or spec to split
 (ask one question); a task that cannot get an observable done criterion
-(becomes an owner question or a time-boxed spike task, never a guess); a
+(becomes an owner question or a time-boxed spike task (a short investigation
+whose only output is an answer), never a guess); a
 request to start implementing (hand off; the plan is the output).
 
 **Pre-generation plan row** (required by
@@ -162,7 +169,7 @@ description: 'Break a broad goal, epic or approved spec into small, ordered task
 
 | Excluded neighbor | Current length | Expected edit |
 | --- | ---: | --- |
-| `change-classification-gate` | 600 | Reciprocate: append "or to split a broad goal into reviewable tasks (ai-task-decomposer)" to its Do NOT clause (668 characters after) |
+| `change-classification-gate` | 600 | Reciprocate: append "or to split a broad goal into reviewable tasks (ai-task-decomposer)" to its Do NOT clause (669 characters after) |
 | `tech-spec-writer` | 975 | Leave one-way (census); little room |
 | `lane-authoring-guide` | 1,016 | Leave one-way (census); no room |
 | `phased-work-handoff-designer` | 996 | Leave one-way (census); no room |
@@ -180,8 +187,8 @@ the new skill is reachable only by its description. Owner question 3 below.
   choice" becomes five to seven ordered tasks, each with one intent, a done
   criterion naming its evidence, a provisional class, and the schema task
   flagged for `human-approval-boundary`.
-- Behavior: one task that touches the database schema, the API and the user
-  interface at once is split again, not accepted as one PR.
+- Behavior: one task that touches the database schema, the application
+  programming interface (API) and the user interface at once is split again, not accepted as one PR.
 - Behavior, edge: the goal contains an unknown ("support single sign-on,
   provider to be decided"); the plan adds a time-boxed spike task and an owner
   question, not an invented provider.
@@ -191,8 +198,10 @@ the new skill is reachable only by its description. Owner question 3 below.
   hands off to `change-classification-gate` instead of padding a plan.
 - Trigger: about 8 cases in both directions against
   `change-classification-gate` ("what class is this change?"),
-  `tech-spec-writer` ("write the design doc"), `lane-authoring-guide` ("brief
-  three parallel agents") and `phased-work-handoff-designer`.
+  `tech-spec-writer` ("write the design doc"), `lane-authoring-guide` ("split
+  this effort across three parallel agents" goes there; "break this epic into
+  PR-sized tasks for one agent" stays here), `product-spec-writer` ("write
+  acceptance criteria for this feature") and `phased-work-handoff-designer`.
 
 **Estimate:** 2.5–4 active hours, including the stage-map wiring.
 
@@ -400,9 +409,10 @@ owner, and one skill already strings them together:
 - `project-orchestrator` Stage 6 hands each slice to that inner lifecycle.
 - The steps map one to one: inspect is `agent-startup-context-gate`; plan is
   `change-classification-gate` and, if built, `ai-task-decomposer`;
-  implement is `reviewable-diff-discipline`, `docs-first-implementer` and
-  `tdd-engineer` (all manual-only); validate is the change-class floor and
-  `local-ci-mirror-preflight` (manual-only); explain and handoff are
+  implement is `reviewable-diff-discipline` *(manual-only)*,
+  `docs-first-implementer` *(manual-only)* and `tdd-engineer` *(manual-only)*;
+  validate is the change-class floor and `local-ci-mirror-preflight`
+  *(manual-only)*; explain and handoff are
   `ai-closeout-reporter` and `phased-work-handoff-designer`.
 
 | Boundary | Owner today |
@@ -410,7 +420,7 @@ owner, and one skill already strings them together:
 | The whole human-and-agent lifecycle and who holds authority at each stage | `ai-sdlc-operating-model` |
 | Inspect: repository identity and governing context | `agent-startup-context-gate` |
 | Plan: class, scope lock and (if built) task split | `change-classification-gate`, `ai-task-decomposer` |
-| Implement: one-intent diffs, version-correct APIs, test-first | `reviewable-diff-discipline`, `docs-first-implementer`, `tdd-engineer` |
+| Implement: one-intent diffs, version-correct APIs, test-first | `reviewable-diff-discipline` *(manual-only)*, `docs-first-implementer` *(manual-only)*, `tdd-engineer` *(manual-only)* |
 | Stop for approval | `human-approval-boundary` |
 | Explain and hand off | `ai-closeout-reporter`, `phased-work-handoff-designer` |
 
@@ -435,8 +445,9 @@ Phase 1.5 backlog paragraph.
 **Recommended set:** build `ai-task-decomposer`; extend `ai-closeout-reporter`
 with the per-deliverable trace (covering #267 and #273); extend
 `code-reviewer` with the weakened-validation and architecture-drift checks
-(covering #277); drop #278 as covered. The library would go from 186 to 187
-skills.
+(covering #277); drop #278 as covered. The batch adds one skill: 186 to 187
+at `5f581a3b`, or 189 to 190 if the three D68 QA Tier 1 skills (open #499,
+#500 and #502) land first.
 
 **Suggested pull requests**, so each has one reviewable seam:
 
@@ -464,25 +475,30 @@ checks 1–7 on each new or extended skill in a fresh session; a ROUTE-002
 before-and-after comparison with `scripts/audit-skill-contracts.py` (a
 protected script that this work does not change, and whose frozen baseline is
 not regenerated); `library-diff-reviewer` on the whole pull request; then a
-merge under the standing conditions of
-[AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green),
+merge under the standing conditions of these owner approval-register entries:
+[AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green)
+(administrator merge once all checks are green),
 [AEGIS-APR-049](../approvals/APPROVAL_REGISTER.md#aegis-apr-049-exact-head-ci-satisfies-the-local-test-condition)
-and
-[AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review).
+(CI on the exact reviewed head satisfies the local-test condition) and
+[AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review)
+(merges wait for the automated Codex review bot, or its confirmed
+unavailability).
 
 **Decision number:** the build would be recorded as **D69**. D67 is the
-highest decision number in the reconciliation log at `5f581a3b`, and the
-still-open #492 claims **D68** for the QA Tier 1 batch. Other batch
-proposals prepared in parallel (for example the Phase 6 reliability batch)
-take the numbers after D69. Numbers go to builds in the order they land, so
-if #492 is dropped or this batch is built first, this batch takes the lowest
-free number instead. Recheck at build time.
+highest decision number in the reconciliation log at `5f581a3b`. D68 is the
+owner's decision to build the QA Tier 1 batch proposed in #492, recorded in
+open pull request #493. Other batch proposals prepared in parallel (for
+example the Phase 6 reliability batch in #496, which claims D70) take the
+numbers after D69. Numbers go to decisions in the order they are recorded, so
+if another decision is recorded first, this batch takes the lowest free number
+instead. Recheck at build time.
 
 **Expected ROUTE-002 census after the batch:** four new one-way findings,
 from `ai-task-decomposer` toward `tech-spec-writer`, `lane-authoring-guide`,
 `phased-work-handoff-designer` and `roadmap-to-commitments-translator`.
-Following the D64 owner decision, these would stay as census data rather than
-trigger rewrites of full descriptions.
+D64 kept one-way ROUTE-002 findings toward widely used skills as census data.
+Following it, these would stay as census data too, because the four neighbors
+have only 8 to 49 characters of room under the 1,024 limit.
 
 ## What the owner must answer
 
@@ -498,7 +514,8 @@ option.
    if the owner wants the name to cover human-only teams too.
 3. **Stage-map wiring.** Add `ai-task-decomposer` to the "Plan / approve" row
    of the `ai-sdlc-operating-model` stage-gate map and to `project-orchestrator`
-   Stage 5? *Recommended: yes*, so the front door routes to it. It edits two
+   Stage 5? *Recommended: yes*, so the `project-orchestrator` and
+   `ai-sdlc-operating-model` routes reach it. It edits two
    shipped skill bodies but no description.
 4. **Census findings.** Accept the four one-way ROUTE-002 findings listed
    above as census data? *Recommended: yes*, matching D64.
@@ -514,7 +531,9 @@ evaluation, catalog row, README count or decision-log row, and it edits no
 shipped skill. An owner "build it" answer would be a new instruction to record;
 delivery would then rely on the standing delivery approval in
 [AEGIS-APR-039](../approvals/APPROVAL_REGISTER.md#aegis-apr-039-reaffirmation-of-ongoing-backlog-delivery-approval)
-and its conditions. Nothing here waives a protected `gate-guard` check,
+(the owner's reaffirmed approval for ongoing backlog delivery) and its
+conditions. Nothing here waives the `gate-guard` check (the CI job that fails
+when a pull request changes a protected file),
 authorizes a change to `scripts/audit-skill-contracts.py` or its frozen
 baseline, or permits any environment write, provider call or deployment.
 
