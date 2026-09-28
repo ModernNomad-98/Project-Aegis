@@ -13,7 +13,7 @@ The read-only screen covered sorted reference Markdown files 141–156 under
 `warehouse-lake-architect/references/estate-decision-sheet.md`. Five of the
 sixteen pages needed a correction:
 
-- [System-prompt leakage checks](../../../.claude/skills/system-prompt-leakage-reviewer/references/prompt-leakage-checks.md)
+- [System-prompt leakage checks](../../../.claude/skills/hidden-context-exposure-reviewer/references/hidden-context-checks.md) (since renamed to hidden-context exposure checks)
 - [Tenant lifecycle catalog](../../../.claude/skills/tenant-modeler/references/tenant-lifecycle-catalog.md)
 - [Threat catalog](../../../.claude/skills/threat-modeler/references/threat-catalog.md)
 - [Superadmin observability read-security reference](../../../.claude/skills/superadmin-observability-console-designer/references/panel-taxonomy-and-read-security.md)
