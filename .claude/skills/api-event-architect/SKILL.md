@@ -5,8 +5,12 @@ description: Design external application programming interface (API) and event c
 
 # API & Event Architect
 
-Here, **UX** means user experience, **SSRF** means server-side request
-forgery, and **HMAC** means hash-based message authentication code. In a
+Here, **API** means application programming interface, **SaaS** means
+software as a service, **UX** means user experience, **URL** means uniform
+resource locator, **SSRF** means server-side request forgery, and **HMAC**
+means hash-based message authentication code. **404**, **403** and **429**
+are standard HTTP (Hypertext Transfer Protocol) status codes: 404 means
+"not found", 403 means "forbidden" and 429 means "too many requests". In a
 delivery policy, **N** is a chosen retry count, not a fixed default.
 
 ## Purpose
