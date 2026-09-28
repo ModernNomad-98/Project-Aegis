@@ -33,12 +33,13 @@ the actual instructions and trigger.
 | Label | Meaning in this catalog |
 | --- | --- |
 | `D4`, `D12.4`, and similar | Decision or pack IDs in the [reconciliation record](reconciliation/step-0-reconciliation-v4.md); history and grouping labels, not skill names. |
+| `v4` | Version 4 of the historical generation plan: the master generation prompts and the Step 0 reconciliation record whose phase structure and reviewer roles this catalog follows. A history label, not current authority. |
 | `#262` and similar | Numbered candidates in a linked `docs/skills/` category roadmap. Check the linked source for status; the number alone does not mean it shipped. |
 | `cat 08`, `Phase 5` | Category roadmap number and delivery phase. A phase can contain shipped first-pass skills and remaining expansion work. |
 | `P0`, `P1`, `P2` | [Priority tiers](#priority-definitions), not permission levels. Exception: in the D12.8 table, `P2`–`P13` are pattern numbers from the linked workflow extraction report. |
 | `Model-invocable?`, `MANUAL-ONLY` | Whether the host may select the skill or a human must explicitly invoke it; see the [skill standard](skill-generation-standard.md). |
 | `evals`, `trigger-evals` | Structural test-case files; their presence does not prove live behavior passed. See [validation](#evals--validation-note). |
-| `LLM01`–`LLM10`, `ASI01`–`ASI10`, `A09:2025`, `A10:2025` | Numbered risk categories in the OWASP Top 10 lists for LLM applications, agentic applications and web applications. The edition is stated in the surrounding section or after the colon in the code. |
+| `LLM01`–`LLM10`, `ASI01`–`ASI10`, `A01`–`A10` (for example `A09:2025`) | Numbered risk categories in the OWASP Top 10 lists for LLM applications, agentic applications and web applications. The edition is stated in the surrounding section or after the colon in the code. |
 
 Abbreviations used on this page, grouped by area:
 
@@ -49,7 +50,7 @@ Abbreviations used on this page, grouped by area:
   identifier; **QA** = quality assurance; **E2E** = end to end; **UI** / **UX**
   = user interface / user experience; **IA** = information architecture;
   **a11y** = accessibility; **PM** = product management or a product manager;
-  **IC** = individual contributor in the staff+ IC pack, but incident
+  **IC** = individual contributor (staff+ = staff level and above) in the staff+ IC pack, but incident
   commander in `incident-response-runbook`; **ADR** = architecture decision
   record; **RFC** = request for comments (a written design proposal);
   **HiPPO** = highest-paid person's opinion; **ETA** = estimated time of
@@ -60,13 +61,13 @@ Abbreviations used on this page, grouped by area:
   changes a schema); **RLS** = row-level security; **OLTP** = online
   transaction processing; **CDC** = change data capture; **ETL** = extract,
   transform, load; **DLQ** = dead-letter queue; **SCD** = slowly changing
-  dimension; **TTL** = time to live; **JWT** = JSON Web Token; **OTP** =
+  dimension; **TTL** = time to live; **JWT** = JSON (JavaScript Object Notation) Web Token; **OTP** =
   one-time password; **WS** / **SSE** = WebSocket / server-sent events;
   **SSR** = server-side rendering; **CDN** = content delivery network; **LB** =
   load balancer; **LWW** = last writer wins; **CRDT** = conflict-free
   replicated data type; **DOM** = Document Object Model; **CPU** = central
   processing unit; **SOA** = service-oriented architecture (not **SoA**,
-  below); **vh**, **dvh**, **svh**, **lvh** = CSS viewport-height units
+  below); **vh**, **dvh**, **svh**, **lvh** = CSS (Cascading Style Sheets) viewport-height units
   (viewport, dynamic, small, large); **N+1** = a data-access pattern that
   makes one extra query per item in a list.
 - **Security and AI:** **LLM** = large language model; **RAG** =
@@ -102,12 +103,15 @@ Abbreviations used on this page, grouped by area:
   (ISO 27001) / AI management system (ISO 42001); **SoA** = Statement of
   Applicability; **TSC** = Trust Services Criteria; **Amd** = amendment.
 
-**AWS** = Amazon Web Services. Other cloud terms in the Azure and AWS rows (for
+**AWS** = Amazon Web Services; **SKU** = stock-keeping unit (a specific product
+or pricing tier). Other cloud terms in the Azure and AWS rows (for
 example Entra ID, VNets, OU, SCPs, VPC, PrivateLink, S3, CDK, GuardDuty, CSPM,
-CASB, SKU) are provider product names or standard cloud-security terms; the
+CASB) are provider product names or standard cloud-security terms; the
 linked skills explain them. Short forms such as repo, config, env, prod,
-infra, perf and deps mean repository, configuration, environment, production,
-infrastructure, performance and dependencies. Follow the linked source
+infra, perf, deps, creds, ops, org, async, dedup and w/ mean repository,
+configuration, environment, production, infrastructure, performance,
+dependencies, credentials, operations, organization, asynchronous,
+de-duplication and with. Follow the linked source
 sections for the exact framework version or control set used by a catalog
 entry.
 
