@@ -1,17 +1,19 @@
 # Behavioral Eval Runner
 
-The **Behavioral Eval Runner** is Project Aegis's evaluation harness. It helps
+The **Behavioral Eval Runner (BER)** is Project Aegis's evaluation harness. It helps
 maintainers find out whether an Aegis skill or agent behaves as intended on a
 test case. The skills library tells an assistant how to work; this runner
 inventories test cases, prepares reproducible inputs, grades recorded behavior,
 and reports coverage and uncertainty. It is maintainer infrastructure, not an
 application feature installed with the skills.
 
-**Current state:** General runner and Scenario A grading commands operate on
+**Current state:** General runner and Scenario A grading commands (Scenario A
+is the first control family in the design; see
+[Terms and limits](#terms-and-limits)) operate on
 offline or recorded synthetic data. They do not start a live assistant or
 send a model request. A separate gated calibration development driver exists,
 and the synthetic offline holdout-support increment was delivered in
-[PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249).
+[pull request (PR) #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249).
 Measured calibration has not started: replacement labels still need owner
 review. No live Scenario A or general corpus run is available. The
 [active backlog](../../docs/roadmaps/behavioral-eval-runner-backlog.md) records
@@ -116,13 +118,15 @@ interface (API) for synthetic fixtures and local callers**. Use
 explicit `ClassificationDecision` with a versioned access-policy reference
 and a content-specific decision reference. The ordinary `EvidenceWriter`
 keeps its legacy serialization for unbound bundles; it must not complete an
-already policy-bound Stage A bundle through implicit metadata defaults.
+already policy-bound Stage A (hash-verified input) bundle through implicit
+metadata defaults.
 `OfflinePolicyWriter.finalize_input` requires at least one explicitly classified
 input and stamps its first evidence time from the writer's Coordinated Universal
 Time (UTC) clock; callers
 cannot supply a creation timestamp. `finalize_final` requires an explicit
 classification decision for the report and each other final artifact.
-`verify_policy_bundle` checks the existing Stage A/B hashes and detached
+`verify_policy_bundle` checks the existing Stage A input and Stage B
+final-report hashes and detached
 marker, then the content-bound decisions and one deadline: first writer-stamped
 creation time plus 30 consecutive 24-hour periods. At that deadline the
 checker refuses an active-bundle acceptance claim and preserves all files for
@@ -138,7 +142,8 @@ silently treated as an ordinary legacy bundle.
 `evidence_policy_preflight.evaluate_synthetic_host_facts` accepts a
 `SyntheticHostFacts` record supplied by the caller. It does not query the
 operating system. The proposed root must be a matching, normalized absolute
-POSIX or Windows drive path supplied by the caller; relative, ambiguous or
+Portable Operating System Interface (POSIX) or Windows drive path supplied
+by the caller; relative, ambiguous or
 volume-root paths stop. Missing, false, contradictory or malformed assertions
 about that exact path, ownership, access-control list (ACL), inheritance,
 encryption or recovery-key custody return `STOP` with sanitized reason codes.
