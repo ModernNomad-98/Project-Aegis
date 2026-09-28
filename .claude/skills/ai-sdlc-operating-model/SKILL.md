@@ -15,7 +15,9 @@ defines a team process, not a new grant of agent authority.
 Turn ad-hoc human+agent collaboration into one named, auditable contract: which
 stages software work moves through, who holds authority at each stage, what gate
 must pass before the next stage, and which execution-discipline skill enforces
-it. This is the umbrella over the Phase 1 pack — it COMPOSES those skills into a
+it. This is the umbrella over the Phase 1 pack (the library's eight
+operating-discipline skills, such as `change-classification-gate` and
+`human-approval-boundary`) — it COMPOSES those skills into a
 lifecycle (each stage cites its enforcing skill) rather than restating their
 procedures, and it is grounded in how work in the repo actually flows, observed
 from PR history, not in an imagined team.
@@ -32,7 +34,8 @@ from PR history, not in an imagined team.
 - Use when: writing or overhauling an AI-SDLC / agent-workflow policy document.
 - Do NOT use when: one stage needs enforcing in-flight — startup belongs to
   `agent-startup-context-gate`, scope to `change-classification-gate`, risky
-  actions to `human-approval-boundary`, diffs to `reviewable-diff-discipline`,
+  actions to `human-approval-boundary`, diffs to
+  `reviewable-diff-discipline` *(manual-only)*,
   closeout to `ai-closeout-reporter`.
 - Do NOT use when: the question is what an agent MAY do without approval —
   that standing policy is `agent-authorization-matrix` (this model cites it).
@@ -71,7 +74,8 @@ from PR history, not in an imagined team.
    through `agent-authorization-matrix`; if no matrix exists, record the gap
    and the interim rule (agents open PRs and stop — a human merges).
 5. **Define failure and escalation paths:** broken mid-task state routes to
-   `agent-failure-recovery`; conflicting sources to `source-of-truth-reconciler`;
+   `agent-failure-recovery` *(manual-only; hand it to the user by name)*;
+   conflicting sources to `source-of-truth-reconciler`;
    unclear security impact to `human-approval-boundary`. Parallel-session
    hazards (shared worktrees, stale memory) get explicit rules.
    - When several AI tools work the repo, record the multi-tool topology as
@@ -79,9 +83,10 @@ from PR history, not in an imagined team.
      (thin tool entry files into a shared docs tree, with a platform-role
      table) or hub-and-spoke (one authoritative rulebook; per-tool files
      MUST point back and MUST NOT conflict). Add the collision rule: one
-     tool edits a given surface per phase. Detail:
+     tool edits a given surface (a page, component or file set) per phase
+     (one approved chunk of work). Detail:
      [references/stage-gate-map.md](references/stage-gate-map.md); aligning
-     the files themselves is `agent-instruction-consolidator` (manual).
+     the files themselves is `agent-instruction-consolidator` *(manual-only)*.
 6. **Define the learning loop:** closeouts feed memory under
    `agent-memory-governance` rules; `agent-governance-audit` spot-checks
    compliance on a stated cadence; audit findings feed model revisions.

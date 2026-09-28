@@ -1,6 +1,12 @@
 # Stage-Gate Map — default composition table
 
-The default lifecycle for the owning [AI SDLC Operating Model](../SKILL.md).
+The default lifecycle for the owning [AI SDLC Operating Model](../SKILL.md):
+how artificial intelligence (AI) agents and humans move a change through the
+software development lifecycle (SDLC). Read it when drafting or adapting a
+team's operating model. A pull request (PR) proposes a repository change;
+continuous integration (CI) runs automated checks. Skills marked
+*(manual-only)* run only when a person names them; hand them to the user,
+never invoke them automatically.
 Every row composes an
 existing skill by name; the model document cites this table and adapts rows to
 the repo — it never copies skill procedures into itself.
@@ -11,16 +17,16 @@ the repo — it never copies skill procedures into itself.
 | Reconcile | sources conflict (any stage may route here) | one resolved truth, assumptions surfaced | agent | `source-of-truth-reconciler` | reconciliation report with citations |
 | Classify | context verified | change class + validation floor + approval path declared; scope locked | agent | `change-classification-gate` | declared class + file-set scope |
 | Plan / approve | class known | boundaries identified; approvals obtained for boundary-crossing steps | human decides; agent requests | `human-approval-boundary` + `agent-authorization-matrix` | approval records with scope wording |
-| Implement | scope + approvals in place | diff matches declared intent; only intended files staged | agent | `reviewable-diff-discipline` (with `docs-first-implementer`, `tdd-engineer` as the work demands) | scoped diff; commit trail |
-| Validate | diff complete | change-class validation floor met with real outputs | agent | class floor from `change-classification-gate`; Phase 5 QA skills as applicable | command outputs, CI runs |
+| Implement | scope + approvals in place | diff matches declared intent; only intended files staged | agent | `reviewable-diff-discipline` *(manual-only)* (with `docs-first-implementer` *(manual-only)*, `tdd-engineer` *(manual-only)* as the work demands) | scoped diff; commit trail |
+| Validate | diff complete | change-class validation floor met with real outputs | agent | class floor from `change-classification-gate`; quality assurance (QA) testing skills (catalog Phase 5) as applicable | command outputs, CI runs |
 | Review | validation green | human/agent review recorded; security lens where class requires | human (agent may pre-review) | `code-reviewer` / `security-pr-reviewer` | review record on the PR |
 | Merge | review + checks green | merge by the authority holder under the applicable matrix and current approval register; absent a scoped grant, obtain the named human decision | human, or agent within a recorded merge grant | `agent-authorization-matrix` | merge event traceable to the authority and approval record |
 | Close | merged (or work stopped) | closeout delivered incl. intentionally-not-done | agent | `ai-closeout-reporter` | closeout report |
-| Learn | closeout delivered | memory updated per write rules; periodic compliance spot-check scheduled | agent proposes; human approves memory/policy edits | `agent-memory-governance`, `agent-governance-audit` | governed memory entries; audit reports |
+| Learn | closeout delivered | memory updated per write rules; periodic compliance spot-check scheduled | agent proposes; human approves memory/policy edits | `agent-memory-governance` *(manual-only)*, `agent-governance-audit` | governed memory entries; audit reports |
 
-Failure at any stage routes to `agent-failure-recovery` (broken tree/branch
+Failure at any stage routes to `agent-failure-recovery` *(manual-only)* (broken tree/branch
 state) or back to Reconcile (conflicting truths). Instruction-file drift found
-along the way routes to `agent-instruction-consolidator` (manual).
+along the way routes to `agent-instruction-consolidator` *(manual-only)*.
 
 ## Authority levels
 
@@ -42,9 +48,9 @@ the default.
 
 **Collision rule.** When two tools can edit the same surface — for example
 a two-way-sync platform editor and a coding agent on the same frontend — only
-one tool edits that surface per phase. Record which tool owns which surface
+one tool edits that surface per phase (one approved chunk of work). Record which tool owns which surface
 in the plan/approve row. Drift between the files routes to
-`agent-instruction-consolidator` (manual).
+`agent-instruction-consolidator` *(manual-only)*.
 
 ## Adoption sequencing notes
 
