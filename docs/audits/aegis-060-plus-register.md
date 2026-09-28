@@ -17,7 +17,9 @@ CANDIDATE / FALSE POSITIVE; ID RETIRED AND NEVER REUSED**. Merged
 [PR #89](https://github.com/ModernNomad-98/Project-Aegis/pull/89), commit
 `000352f55b71f0c3e897a482d279d34bfaa3d66b`, corrected contract-audit rule
 EVAL-004 (which checks that each target named in a skill's trigger-eval file
-exists), which had merged the separate skill and subagent namespaces. The `(subagent)`
+exists), which had merged the separate skill and subagent namespaces. A
+trigger-eval file is a skill's test file listing prompts that should or should
+not trigger it. The `(subagent)`
 annotations are valid typed targets; do not schedule their removal as
 unfinished fixture work.
 
@@ -72,8 +74,11 @@ files were overwritten with a fresh engine v1.13.1 audit of main (186 skills,
 317 findings). The numbers in sections 1–5 of this register still describe the
 184-skill baselines, not today's files: section 1 uses the v1.12.0 baseline
 (414 findings), while the section 3 table and its fixture note keep the first
-v1.3.0 baseline from PR #75 (commit `469d4e5`, 416 findings), whose APPR-002,
-ROUTE-003 and STATE-005 rows do not appear in the v1.12.0 report. The v1.12.0
+v1.3.0 baseline from PR #75 (commit `469d4e5`, 416 findings), whose APPR-002
+(a build scope granted at requirements approval), ROUTE-003 (a Stage-2 route
+that reaches the commitments skill without a readiness guard) and STATE-005
+(an "approved" narrative section inside an append-only file) rows do not
+appear in the v1.12.0 report. The v1.12.0
 files remain in git history
 at commit `e2f1da0beb6e4aed07044ca3a90e841962bfd590` (PR #77). The report
 link above points to its last copy, at commit
@@ -110,8 +115,7 @@ Rules of this register (from the program's operating rules):
 - **Classification / severity / status:** Candidate fixture-hygiene defect / P2
   (severity level; P0 is most severe) / **REJECTED CANDIDATE — FALSE POSITIVE
   CAUSED BY EVAL-004 TYPE COLLAPSE; ID RETIRED AND NEVER REUSED**
-- **What the candidate claimed (superseded):** that five trigger-eval files (test files listing prompts that should or
-  should not trigger a skill)
+- **What the candidate claimed (superseded):** that five trigger-eval files
   wrote neighbor identifiers as `"<name> (subagent)"` — "prose annotation
   inside the name field" — so a machine consumer could not resolve them
   against disk:
