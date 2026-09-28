@@ -929,8 +929,11 @@ PRs #475 (`59b2fb7`) and #476 (`8f3d369`) (both 15:31 UTC), #480
 #485 added one Markdown file, the
 [2026-09-28 session checkpoint](session-checkpoint-2026-09-28.md);
 no file was removed or renamed, and no non-Markdown file or synthetic fixture
-changed. Line counts are `git diff --numstat`, added plus deleted. Each review
-cited below is posted on its PR. For every page counted as accepted,
+changed. Line counts are `git diff --numstat`, added plus deleted. Each
+accepting review cited below is posted on its PR. Three first re-reads that
+only asked for edits were not posted: the register's R1 and R2, the host
+pages' C1 to V7 and `ai-evaluation-harness`'s E1 to E5. The accepting
+comments cite them. For every page counted as accepted,
 `git diff <accepted head> ebf210c` on that page is empty or holds only lines
 from another reviewed PR in this range, and stays within the rule. Codex
 posted only usage-limit notices on these PRs, so no Codex review exists for
@@ -942,7 +945,8 @@ any of these heads.
   page's accepted version, `git diff --numstat <acceptance> <now>`, not the
   sum of every edit; the [rule section](#remaining-page-review-in-larger-batches)
   now says so. Under the old summed count, #486's first review found four
-  pages past 10: `code-reviewer/SKILL.md` (14),
+  more pages past 10 besides `ai-evaluation-harness`:
+  `code-reviewer/SKILL.md` (14),
   `skill-quality-reviewer/SKILL.md` (14),
   `ai-cost-guardrail-designer/references/cost-guardrail-patterns.md` (13) and
   `iso-42001-aims-architect/references/aims-clause-map.md` (13). Their net
@@ -1011,8 +1015,8 @@ any of these heads.
   Pending to accepted.
 - The [2026-09-28 session checkpoint](session-checkpoint-2026-09-28.md)
   (#485, new, 177): a full-page review on `7d33df0` returned FIX-FIRST with
-  four edits; fix checks on `692b221` and `04d2ce8` **accepted** it. New
-  accepted page.
+  four edits; a fix check on `692b221` asked for one more two-line fix, and
+  the fix check on `04d2ce8` **accepted** it. New accepted page.
 
 **Small edits.**
 
