@@ -128,9 +128,20 @@ from tools.aegis_delivery_control.storage import (
     SQLiteStateStore as ProductionSQLiteStateStore,
     raise_at,
 )
+from tools.aegis_delivery_control.tests import _owner_private_umask
 from tools.aegis_delivery_control.tests._legacy_schema import (
     strip_t28_foundation_schema,
 )
+
+
+def setUpModule() -> None:
+    # Rollback copies, replacement files and stopped-report parents built
+    # below must be owner-private, as production requires. See the helper.
+    _owner_private_umask.enter()
+
+
+def tearDownModule() -> None:
+    _owner_private_umask.restore()
 
 
 def BudgetSettlementRequest(*args, **kwargs):
