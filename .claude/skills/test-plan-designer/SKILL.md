@@ -6,7 +6,7 @@ description: 'Design the concrete test plan for ONE feature, change, or release 
 # Test Plan Designer
 
 **Reading key:** QA is quality assurance; PR is pull request; RLS is
-row-level security; CI is continuous integration. Severity 1 and 2 below
+row-level security; CI is continuous integration; E2E is end-to-end. Severity 1 and 2 below
 mean the project's two highest incident/defect levels; use the project's
 actual severity policy when it differs.
 
@@ -33,7 +33,7 @@ executable by someone who didn't write it.
 - Do NOT use when: the ask is to write the step-by-step manual cases — the
   plan names WHICH manual cases exist; `manual-test-case-creator` writes them.
 - Do NOT use when: the ask is to implement tests — hand off to
-  `vitest-unit-component-engineer` or `playwright-e2e-engineer` where they
+  `vitest-unit-component-engineer` *(manual-only)* or `playwright-e2e-engineer` *(manual-only)* where they
   fit. `integration-test-designer` and `api-contract-test-designer` design
   boundary and contract specifications; name the implementing engineer for
   those plans according to the repository's toolchain.
@@ -63,13 +63,13 @@ executable by someone who didn't write it.
    touches (endpoint, form, job, webhook), one column per class —
    unauthorized, invalid, expired, missing, duplicate, conflicting,
    out-of-order. Each cell is a planned item, "not applicable because …",
-   or a delegation to `multi-tenant-security-tester` (cross-tenant, wrong
+   or a delegation to `multi-tenant-security-tester` *(manual-only)* (cross-tenant, wrong
    role, privilege escalation). A narrowed scope ("just the happy path")
    lists the skipped classes as out of scope; no cell is left blank.
 3. **Assign each item the cheapest reliable layer** (strategy rules): unit /
    integration / contract / E2E / manual. The automation-vs-manual split is
    explicit. Cross-tenant and authorization negatives are delegated to the
-   shipped `multi-tenant-security-tester`, referenced as plan line items.
+   shipped `multi-tenant-security-tester` *(manual-only)*, referenced as plan line items.
 4. **Specify data and environment per item:** which fixtures/personas
    (delegate design gaps to `test-data-architect`), which environment, and
    any masking needs for evidence.
@@ -93,7 +93,7 @@ Test items:
        — data <fixture/persona> — env <assumption> — expected <objective result>
 Negative-path matrix: <one row per touched surface × unauthorized | invalid |
   expired | missing | duplicate | conflicting | out-of-order; each cell
-  <item id> | n/a: <reason> | → multi-tenant-security-tester>
+  <item id> | not applicable: <reason> | → multi-tenant-security-tester>
 Automation/manual split: <explicit summary + why per manual item>
 Security negatives: <delegated items → multi-tenant-security-tester / rls-policy-auditor>
 Entry criteria: <objective preconditions>

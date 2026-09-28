@@ -1,6 +1,6 @@
 {
   "skill": "test-plan-designer",
-  "description": "Trigger discrimination for the Phase 5 strategy/plan/coverage cluster: one-change plan vs product strategy vs coverage audit vs automation tooling, plus discrimination against the shipped multi-tenant-security-tester for security-suite asks.",
+  "description": "Trigger discrimination for the Phase 5 strategy/plan/coverage cluster: one-change plan vs product strategy vs coverage audit vs automation tooling, plus discrimination against the shipped multi-tenant-security-tester for security-suite asks, and against integration-test-designer and test-coverage-mapper for negative-path mapping.",
   "overlaps_with": [
     "qa-strategy-architect",
     "test-coverage-mapper",
