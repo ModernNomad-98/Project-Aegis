@@ -9,10 +9,11 @@ selection of the [30-day complete-bundle policy](../approvals/APPROVAL_REGISTER.
 It expressly requires a separate reviewed implementation grant.
 
 **Decision update, 2026-09-24:** The owner answered "Approve this bounded
-scope" to this proposal. The separate [BER-DEC-013](behavioral-eval-runner-backlog.md#ber-dec-013-bounded-synthetic-evidence-policy-integration--owner-approved)
-and [APR-023](../approvals/APPROVAL_REGISTER.md#aegis-apr-023-bounded-synthetic-evidence-policy-integration)
-amendment governs the implementation and becomes effective only when its
-reviewed governance PR merges. This proposal remains a scope record, not the
+scope" to this proposal. BER decision-log entry [BER-DEC-013](behavioral-eval-runner-backlog.md#ber-dec-013-bounded-synthetic-evidence-policy-integration--owner-approved)
+and approval-register entry [APR-023](../approvals/APPROVAL_REGISTER.md#aegis-apr-023-bounded-synthetic-evidence-policy-integration)
+govern the implementation. They took effect when governance pull request (PR) [#255](https://github.com/ModernNomad-98/Project-Aegis/pull/255)
+merged; PR #257 then delivered it, and [APR-027](../approvals/APPROVAL_REGISTER.md#aegis-apr-027-consumption-of-synthetic-policy-integration-grant)
+records the grant as consumed. This proposal remains a scope record, not the
 authorization itself.
 
 ## Current boundary and proposed increment

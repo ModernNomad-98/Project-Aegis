@@ -45,9 +45,10 @@ actually hold against a manipulative or manipulated agent.
   CONTENT/answers (`ai-misinformation-guard`), or assigning oversight
   levels to risk tiers (`ai-governance-risk-reviewer`).
 - Do NOT use when: defining what an approval authorizes and agents' authority
-  floors (`agent-authorization-matrix`) or designing standing approval for
-  repetitive steps (`standing-approval-and-auto-advance`); this skill
-  stress-tests whether the approval experience resists exploitation.
+  floors (`agent-authorization-matrix` *(manual-only)*) or designing standing
+  approval for repetitive steps (`standing-approval-and-auto-advance`
+  *(manual-only)*); this skill stress-tests whether the approval experience
+  resists exploitation.
 
 ## Inputs to Inspect
 

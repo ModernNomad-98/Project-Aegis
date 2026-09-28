@@ -102,7 +102,7 @@ governance pack rather than restating it.
 
 ```
 AI GOVERNANCE & RISK REVIEW — <feature>
-Risk tier: <minimal|limited|high|unacceptable> — <impact/reversibility/autonomy/data/rights rationale>
+Risk tier (internal band): <minimal|elevated|high impact|potentially prohibited> — <impact/reversibility/autonomy/data/rights rationale>
 Oversight model: <advisory | HITL | HOTL> — matches tier? <yes/gap>
 Accountable owner: <named human> | Escalation: <path> (→ incident-response-runbook)
 Transparency/consent: <AI disclosure | limitations disclosed | lawful basis>

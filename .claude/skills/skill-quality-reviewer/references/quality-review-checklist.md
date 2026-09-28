@@ -80,7 +80,7 @@ Scoring:
 
 Sweep the WHOLE corpus, not the skill's own cluster: the confusable neighbor
 is often cross-phase (agent authority vs end-user RBAC;
-`model-poisoning-reviewer` LLM05 vs `memory-context-poisoning-reviewer`
+`model-poisoning-reviewer` LLM05 (2026 ID; LLM04 in 2025) vs `memory-context-poisoning-reviewer`
 ASI06; evidence policy vs closeout reporting).
 
 Also judge near-miss NAMES here: the validator blocks exact duplicates and
@@ -95,7 +95,7 @@ shipped skill confuses invocation and is a CONCERN/FAIL by closeness.
 - Substantial duplication = a stranger reading both would say they do the
   same job for the same trigger, differing in wording or one input.
 - The library's precedent for the fix: **extension over clone** — LLM04
-  (AI/ML supply chain) and ASI04 (agentic supply chain: MCP servers,
+  (artificial intelligence and machine learning supply chain; 2026 ID, LLM03 in 2025) and ASI04 (agentic supply chain: MCP servers,
   tool/skill registries, plugins) both landed as scoped additive diffs to
   `supply-chain-security-reviewer`, not as new skills.
 - Recommend make-it-an-extension when: the genuinely new content is a
