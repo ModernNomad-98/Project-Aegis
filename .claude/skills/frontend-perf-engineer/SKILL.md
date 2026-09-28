@@ -48,7 +48,7 @@ about prescribing it.
   the budget values, the harness owns how measurement runs.
 - Do NOT use when: the build output is functionally broken (wrong
   chunks, missing assets, env-specific build failures) —
-  `vite-build-qa-engineer` owns build correctness QA; this skill
+  `vite-build-qa-engineer` *(manual-only)* owns build correctness QA; this skill
   changes bundle SHAPE for speed, and composes that skill to keep the
   reshaped build verified.
 - Do NOT use when: designing shared HTTP/data caching for API
@@ -56,7 +56,7 @@ about prescribing it.
   is the browser asset path (immutable hashed assets, service-worker
   strategies).
 - Do NOT use when: writing functional browser tests —
-  `playwright-e2e-engineer`.
+  `playwright-e2e-engineer` *(manual-only)*.
 
 ## Inputs to Inspect
 
@@ -263,8 +263,8 @@ Routed out: <API-side share → latency-budget-architect table; harness mechanic
   still needs the recorded review described above.
 - Asked to also implement the harness runs, edit CI pipelines, or
   restructure the build system in the same pass → hand those slices
-  to `performance-test-harness`, `ci-pipeline-architect`, and
-  `vite-build-qa-engineer` respectively; this design composes them.
+  to `performance-test-harness`, `ci-pipeline-architect` *(manual-only)*, and
+  `vite-build-qa-engineer` *(manual-only)* respectively; this design composes them.
 
 ## Supporting Files
 

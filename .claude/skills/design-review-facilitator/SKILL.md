@@ -6,7 +6,8 @@ description: Facilitate a technical DESIGN REVIEW — prepare it (circulate the 
 # Design Review Facilitator
 
 Terms: **RFC** means request for comments; **PR** means pull request;
-**HiPPO** means highest-paid person's opinion.
+**HiPPO** means highest-paid person's opinion; **ADR** means architecture
+decision record.
 
 ## Purpose
 

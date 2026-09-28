@@ -31,14 +31,14 @@ negative cases, and CI placement.
 - Use when: a module's auth/permission enforcement must be tested through the
   real middleware/guard path (functional correctness of the check).
 - Do NOT use when: the subject is pure logic or an isolated component —
-  `vitest-unit-component-engineer`.
+  `vitest-unit-component-engineer` *(manual-only)*.
 - Do NOT use when: the ask is a user journey through the real UI —
-  `playwright-e2e-engineer`.
+  `playwright-e2e-engineer` *(manual-only)*.
 - Do NOT use when: the ask is schema/shape/version compatibility of an API or
   webhook — `api-contract-test-designer` (contract ≠ flow).
 - Do NOT use when: the ask is PROVING tenant isolation or authorization as a
   security property (cross-tenant matrices, IDOR enumeration, escalation) —
-  the shipped `multi-tenant-security-tester` owns that negative suite; this
+  the shipped `multi-tenant-security-tester` *(manual-only)* owns that negative suite; this
   skill covers functional boundary behavior and defers security matrices to it.
 
 ## Inputs to Inspect
@@ -90,7 +90,7 @@ provisioning or test execution.
    faked seams (provider timeout/error surfaced correctly).
 5. **Keep the layer honest:** if a spec needs a browser, it moved to E2E; if
    it mocks the DB, it moved to unit; if it enumerates cross-tenant access,
-   it belongs to `multi-tenant-security-tester` — record these reroutes.
+   it belongs to `multi-tenant-security-tester` *(manual-only)* — record these reroutes.
 6. **Define execution & CI placement:** runtime budget, parallelization
    constraints (per-worker DB), which tier runs the suite (usually PR,
    blocking). If the owner must choose the real test database environment,
@@ -181,7 +181,7 @@ Exit criteria: <what "this layer is covered" means for the module>
   surface it as a separate classified change.
 - Tenant semantics/authorization matrix undefined while permission behavior
   is in scope → functional checks proceed, but security-matrix design halts
-  and routes to `multi-tenant-security-tester` / `tenant-modeler`.
+  and routes to `multi-tenant-security-tester` *(manual-only)* / `tenant-modeler`.
 - Asked to also implement and run the suite → implementation is a separate
   side-effecting step; hand off with the specs.
 

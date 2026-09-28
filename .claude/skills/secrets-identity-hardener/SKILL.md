@@ -6,6 +6,11 @@ disable-model-invocation: true
 
 # Secrets & Identity Hardener
 
+Terms: **CI** means continuous integration and **CI/CD** continuous
+integration and continuous delivery; **IaC** means infrastructure as code;
+**KMS** means key management service; **RLS** means row-level security; and
+**authz** is short for authorization.
+
 ## Purpose
 
 Move an application from "secrets are wherever they landed" to a defensible
@@ -29,7 +34,7 @@ changes through human approval.
 - Use when: session/token handling needs tightening (expiry, refresh,
   storage flags, revocation).
 - Do NOT use when: the task is one specific app-layer control (validation,
-  encoding, an authz check) — that is `appsec-implementer`.
+  encoding, an authz check) — that is `appsec-implementer` *(manual-only)*.
 - Do NOT use when: the concern is database service-role/RLS leakage — that is
   `rls-policy-auditor`.
 - Do NOT use when: you are enumerating threats or deciding what to protect —
@@ -159,7 +164,7 @@ Handoff: security-pr-reviewer to verify; ops to complete rotations if pending.
 - A secret is exposed in a way that is actively exploitable in production →
   report immediately; containment/rotation priority is the human's call.
 - The task expands into database service-role/RLS scope → hand to
-  `rls-policy-auditor`; into a single app control → `appsec-implementer`.
+  `rls-policy-auditor`; into a single app control → `appsec-implementer` *(manual-only)*.
 
 ## Supporting Files
 

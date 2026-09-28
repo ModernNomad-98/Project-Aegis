@@ -5,6 +5,11 @@ description: Build the cost model for a multi-tenant SaaS — enumerate cost dri
 
 # SaaS Cost Architect
 
+Reading key: software as a service (SaaS) is software sold as a hosted
+subscription; artificial intelligence (AI) here means model-backed product
+features; an application programming interface (API) is a service's request
+interface.
+
 ## Purpose
 
 Produce a cost model that connects the bill to the tenants and plans that

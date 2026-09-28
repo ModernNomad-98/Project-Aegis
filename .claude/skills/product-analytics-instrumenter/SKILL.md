@@ -42,7 +42,7 @@ jobs; this one is the product-analytics slice.
   that tracking matches the plan.
 - Do NOT use when: the task is SYSTEM telemetry for engineers — service
   logs, metrics, traces, health checks, alerting — that is
-  `observability-operator` (operating the observability stack, not
+  `observability-operator` *(manual-only)* (operating the observability stack, not
   product behavior).
 - Do NOT use when: the task is measuring which SKILLS in THIS library
   fire in practice — that is `skill-usage-instrumenter` (the library's
@@ -117,7 +117,7 @@ jobs; this one is the product-analytics slice.
    debug/verification mode and in staging. A regression guard so a schema
    change or refactor that breaks tracking fails loudly, not silently.
 9. **Name boundaries and deliver.** Schema → `event-schema-architect`;
-   system telemetry → `observability-operator`; skill-library usage →
+   system telemetry → `observability-operator` *(manual-only)*; skill-library usage →
    `skill-usage-instrumenter`. Produce the instrumentation plan in the
    Output Format with a contextual capture recommendation, alternatives,
    reconciliation rule, and cost/upkeep assumptions.
@@ -211,7 +211,7 @@ Boundaries:    schema → event-schema-architect; system telemetry → observabi
 ## Stop Conditions
 
 - The task is SYSTEM telemetry — service logs, metrics, traces, health
-  checks, alert/dashboard config → route to `observability-operator`.
+  checks, alert/dashboard config → route to `observability-operator` *(manual-only)*.
 - The task is measuring which LIBRARY SKILLS fire in practice → route to
   `skill-usage-instrumenter` (a different object under strict
   minimization).
