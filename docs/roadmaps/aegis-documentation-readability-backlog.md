@@ -627,7 +627,9 @@ is not counted; no synthetic fixture changed. Line counts are
 `git diff --numstat` from each merge's first parent, added plus deleted, as
 above. Each review below is posted on its PR, and each accepted head matches
 the page on main after #454: `git diff <head> 5bd21fb` is empty for that page,
-except the approval register, explained below. Codex posted only usage-limit
+except the approval register, explained below, and the orchestrator page,
+which differs from its accepted head `469d6cb` only by the 8 lines #454
+reviewed and matches #454's head `6118210`. Codex posted only usage-limit
 notices on these PRs, so no Codex review exists for any of these heads.
 
 - **Accepted after full-page reviews (9 pages, all pending before).**
@@ -671,7 +673,8 @@ notices on these PRs, so no Codex review exists for any of these heads.
 - **Generated report, preface reviewed (1 page, class unchanged).** #449 also
   changed the hand-written preface of the
   [skill-contract audit baseline report](../audits/skill-contract-audit-baseline.md)
-  (12). As the F2a rule requires, the review on `5037d6a` read that preface
+  (12). As the [generated-report rule](#remaining-page-review-in-larger-batches)
+  requires for hand-written text, the review on `5037d6a` read that preface
   and accepted it. It also found the body byte-identical to main and
   reproduced it from the generator. The page stays a **generated report,
   format review pending**. The reviewer named two generator follow-ups: the
@@ -702,9 +705,10 @@ it needs its own independent full-page re-read. The sweep of every accepted
 page for pre-rule edits, which the owner ordered on 2026-09-28, is in
 progress separately; its results come in a later ledger update and are
 expected to move accepted pages to pending, so these counts hold only until
-then. Two PRs are open, not merged, and not counted: #453 (AEGIS-APR-071 to
-APR-073 in the approval register) and #455 (D15 enrichment deltas to four
-shipped skills). No grant or gate changed.
+then. PRs merged after #454, such as #453 (AEGIS-APR-071 to APR-073 in the
+approval register) and #455 (D15 enrichment deltas to four shipped skills),
+are not counted here; a later ledger update records them. No grant or gate
+changed.
 
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
