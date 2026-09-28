@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import shlex
 import shutil
 import subprocess
 import sys
@@ -16,6 +17,24 @@ import yaml
 REPO = Path(__file__).resolve().parents[2]
 RECORDER = REPO / "scripts/ci/record-check.py"
 WORKFLOW = REPO / ".github/workflows/validate-skills.yml"
+VALIDATOR = REPO / "scripts/validate-skills.py"
+# The only module runs that need the checkout root on sys.path; gate-guard
+# protects every root-level importable name in their place.
+ROOT_PATH_MODULES = {"tools.behavioral_eval_runner", "unittest"}
+# A module placed beside a gate script: it loads the real module of the same
+# name, then forces the interpreter to exit 0 whatever the script returns.
+SHADOW_MODULE = """import atexit, importlib, os, sys
+_here = os.path.dirname(os.path.abspath(__file__))
+sys.path[:] = [p for p in sys.path if os.path.abspath(p or ".") != _here]
+del sys.modules[__name__]
+sys.modules[__name__] = importlib.import_module(__name__)
+atexit.register(lambda: os._exit(0))
+"""
+
+
+def load_workflow():
+    # BaseLoader preserves GitHub's literal `on` key instead of YAML 1.1 bools.
+    return yaml.load(WORKFLOW.read_text(encoding="utf-8"), Loader=yaml.BaseLoader)
 
 
 class RecorderTests(unittest.TestCase):
@@ -63,8 +82,7 @@ class RecorderTests(unittest.TestCase):
 class ProtectedFileGuardTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # BaseLoader preserves GitHub's literal `on` key instead of YAML 1.1 bools.
-        workflow = yaml.load(WORKFLOW.read_text(encoding="utf-8"), Loader=yaml.BaseLoader)
+        workflow = load_workflow()
         cls.guard = next(step["run"] for step in workflow["jobs"]["gate-guard"]["steps"]
                          if "gate_pattern=" in step.get("run", ""))
 
@@ -114,8 +132,24 @@ class ProtectedFileGuardTests(unittest.TestCase):
                 self.assertEqual(1, result.returncode, result.stdout + result.stderr)
                 self.assertIn("requires manual review and merge", result.stdout)
 
+    def test_import_path_shadowing_locations_require_manual_merge(self):
+        # scripts/ is first on sys.path for `python scripts/<gate>.py`; the
+        # checkout root is first for the `python -m` gate commands.
+        for path in ("scripts/yaml.py", "scripts/json.py", "scripts/new_helper.py",
+                     "Scripts/yaml.py", "yaml.py", "unittest.py", "openai.py",
+                     "sitecustomize.py", "usercustomize.py", "conftest.py", "YAML.PY",
+                     "shadow.pth", "yaml.pyc", "yaml.pyw", "yaml.pyd",
+                     "yaml.cpython-314-x86_64-linux-gnu.so", "yaml/__init__.py",
+                     "unittest/__init__.pyc"):
+            with self.subTest(path=path):
+                result = self.run_guard([path])
+                self.assertEqual(1, result.returncode, result.stdout + result.stderr)
+                self.assertIn("requires manual review and merge", result.stdout)
+
     def test_ordinary_skill_and_document_changes_pass(self):
-        result = self.run_guard(["README.md", "docs/notes.md", ".claude/skills/example/SKILL.md"])
+        result = self.run_guard(["README.md", "docs/notes.md", ".claude/skills/example/SKILL.md",
+                                 "docs/example.py", ".claude/skills/example/scripts/helper.py",
+                                 "tools/aegis_setup/helper.py", "artifacts/scripts/yaml.py"])
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_renaming_a_protected_file_outside_the_set_is_still_guarded(self):
@@ -127,6 +161,69 @@ class ProtectedFileGuardTests(unittest.TestCase):
         result = self.run_guard([".github/workflows/\u2603\ncheck.yml"])
         self.assertEqual(1, result.returncode, result.stdout + result.stderr)
         self.assertIn("requires manual review and merge", result.stdout)
+
+
+class ImportPathIsolationTests(unittest.TestCase):
+    """A module a pull request adds cannot rewrite a gate script's exit status."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.workflow = load_workflow()
+
+    def python_calls(self):
+        for job_name, job in self.workflow["jobs"].items():
+            for step in job["steps"]:
+                for line in step.get("run", "").splitlines():
+                    words = shlex.split(line, comments=True)
+                    for index, word in enumerate(words):
+                        if word == "python":
+                            yield job_name, step.get("name", ""), words[index + 1:]
+
+    def test_every_gate_python_call_keeps_the_script_directory_off_sys_path(self):
+        calls = list(self.python_calls())
+        self.assertGreaterEqual(len(calls), 30)
+        for job_name, step_name, args in calls:
+            with self.subTest(job=job_name, step=step_name, args=args[:3]):
+                if args[:1] == ["-m"] and args[1:2] and args[1] in ROOT_PATH_MODULES:
+                    continue
+                self.assertEqual("-P", args[0] if args else None)
+
+    def validator_command(self, job_name):
+        step = next(s for s in self.workflow["jobs"][job_name]["steps"]
+                    if s.get("name") == "Run skill validator")
+        words = shlex.split(step["run"])
+        command = words[words.index("--") + 1:]
+        self.assertEqual(["python", "-P", "scripts/validate-skills.py"], command)
+        return [sys.executable, *command[1:]]
+
+    def run_shadowed_validator(self, command):
+        with tempfile.TemporaryDirectory(prefix="aegis-ci-shadow-") as temporary:
+            root = Path(temporary)
+            (root / "scripts").mkdir()
+            shutil.copyfile(VALIDATOR, root / "scripts/validate-skills.py")
+            (root / "scripts/yaml.py").write_text(SHADOW_MODULE, encoding="utf-8")
+            skill = root / ".claude/skills/broken-skill"
+            skill.mkdir(parents=True)
+            (skill / "SKILL.md").write_text(
+                "---\nname: not-the-directory-name\ndescription: Deliberately broken fixture.\n---\n\n# Broken\n",
+                encoding="utf-8")
+            env = dict(os.environ)
+            env.pop("PYTHONSAFEPATH", None)
+            return subprocess.run(command, cwd=root, env=env, capture_output=True, text=True)
+
+    def test_shadow_module_cannot_turn_a_failing_validator_green(self):
+        for job_name in ("validate-skills", "windows-offline-checks"):
+            with self.subTest(job=job_name):
+                result = self.run_shadowed_validator(self.validator_command(job_name))
+                self.assertIn("FAILED:", result.stdout, result.stdout + result.stderr)
+                self.assertEqual(1, result.returncode, result.stdout + result.stderr)
+
+    def test_fixture_is_a_real_bypass_without_isolation(self):
+        # Proves the shadow above is live: without -P the same failing run exits 0.
+        command = [arg for arg in self.validator_command("validate-skills") if arg != "-P"]
+        result = self.run_shadowed_validator(command)
+        self.assertIn("FAILED:", result.stdout, result.stdout + result.stderr)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
 
 if __name__ == "__main__":

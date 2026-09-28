@@ -710,13 +710,16 @@ def test_eval004_parser_parity_with_merged_runtime() -> None:
         ok("EVAL-004: runtime parity skipped (BER runtime not present)")
         return
     # Imported as a PACKAGE (it uses relative imports). This import lives in the
-    # test only — the audit engine itself never imports runtime code.
-    sys.path.insert(0, str(REAL_REPO / "tools"))
+    # test only — the audit engine itself never imports runtime code. The
+    # checkout root goes on sys.path, not tools/: every root-level importable
+    # name is gate-guard protected, while an unprotected tools/<name>.py could
+    # otherwise shadow a module imported during this window.
+    sys.path.insert(0, str(REAL_REPO))
     try:
         import importlib
-        rt = importlib.import_module("behavioral_eval_runner.models")
+        rt = importlib.import_module("tools.behavioral_eval_runner.models")
     finally:
-        sys.path.remove(str(REAL_REPO / "tools"))
+        sys.path.remove(str(REAL_REPO))
     # The audit engine must stay STANDALONE: assert against its SOURCE, not its
     # namespace. A real `import behavioral_eval_runner...` binds a module
     # object, so a value-scan would miss exactly the regression this guards.
