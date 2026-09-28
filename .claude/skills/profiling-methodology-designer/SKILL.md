@@ -40,13 +40,13 @@ handoff map names.
   attribution) to find which hop consumes an end-to-end budget.
 - Do NOT use when: the defect is functional (wrong output, crash,
   intermittent error) — evidence-driven root-cause of BEHAVIOR is
-  `systematic-debugger`; this skill owns resource/time attribution.
+  `systematic-debugger` *(manual-only)*; this skill owns resource/time attribution.
 - Do NOT use when: the suspect is already evidenced — one slow query
-  goes straight to `query-plan-reader`; a request issuing hundreds of
-  queries goes to `n-plus-one-detector`; browser-side slowness goes to
+  goes straight to `query-plan-reader` *(manual-only)*; a request issuing
+  hundreds of queries goes to `n-plus-one-detector` *(manual-only)*; browser-side slowness goes to
   `frontend-perf-engineer`. Profiling first would be ceremony.
 - Do NOT use when: designing continuous production telemetry (metrics,
-  dashboards, alerts) — `observability-operator` implements standing
+  dashboards, alerts) — `observability-operator` *(manual-only)* implements standing
   instrumentation; profiling here is a targeted, bounded investigation.
 - Do NOT use when: building the MEASUREMENT harness that gates releases
   — `performance-test-harness` owns pass/fail measurement; this skill
@@ -87,7 +87,7 @@ handoff map names.
 2. **Choose the attribution level first, profiler second.**
    Cross-service: distributed trace decomposition (which hop).
    Single service: CPU sampling (where on-CPU time goes) vs off-CPU
-   analysis (where waiting happens — locks, IO, pool exhaustion) vs
+   analysis (where waiting happens — locks, I/O, pool exhaustion) vs
    allocation profiling (what churns memory). Wrong-level profiling is
    the classic waste: a CPU flame graph of a service that is 90%
    waiting attributes the wrong 10%.
@@ -113,8 +113,8 @@ handoff map names.
    profiling (before/after under identical conditions) is the default
    comparison method.
 6. **Map the handoffs.** The attribution verdict routes: dominant query
-   → `query-plan-reader`; query-count explosion →
-   `n-plus-one-detector`; browser/frontend share →
+   → `query-plan-reader` *(manual-only)*; query-count explosion →
+   `n-plus-one-detector` *(manual-only)*; browser/frontend share →
    `frontend-perf-engineer`; a hop blowing its budget →
    `latency-budget-architect`'s attribution + the owning service; cache
    candidates → `caching-strategy-designer`; systemic capacity →
@@ -229,11 +229,12 @@ Not this skill:  fixes (handed off); standing telemetry (observability-operator)
   production capture is denied → halt with the honest statement: the
   investigation is blocked on either reproduction fidelity or an
   approved capture; do not attribute from vibes.
-- Evidence already names the suspect (one query, N+1 pattern, a
+- Evidence already names the suspect (one query, an N+1 pattern — one
+  query plus one more query per returned row — a
   frontend bundle) → skip methodology ceremony and route directly to
   the owning skill; profiling exists for the unattributed case.
 - The "performance problem" is functional under load (errors,
-  timeouts producing retries) → route to `systematic-debugger` /
+  timeouts producing retries) → route to `systematic-debugger` *(manual-only)* /
   the reliability surfaces; attributing time in a failing system
   measures the failure, not the performance.
 - Attribution requires reading production data content (not shapes/

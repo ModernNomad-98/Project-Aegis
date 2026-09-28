@@ -5,6 +5,9 @@ description: 'Design the human-facing UX around outbound notifications and webho
 
 # Notification & Webhook UX Designer
 
+**Reading key:** UX means user experience; SMS (Short Message Service) means
+mobile text messaging.
+
 ## Purpose
 
 Two outbound channels, one recurring failure: the product either says
@@ -44,7 +47,7 @@ skill designs the UX on top of it.
   preference page's error toast) — that is `edge-state-ux-designer`.
 - Do NOT use when: the "notifications" are internal system alerts to
   on-call engineers (severity, runbook, threshold) — that is
-  `observability-operator` / `slo-reliability-architect`, not product UX.
+  `observability-operator` *(manual-only)* / `slo-reliability-architect`, not product UX.
 
 ## Inputs to Inspect
 
@@ -133,7 +136,7 @@ skill designs the UX on top of it.
 10. **Name the boundaries and deliver.** Delivery contract →
     `api-event-architect`; generic state rendering of these screens →
     `edge-state-ux-designer`; internal on-call alerting →
-    `observability-operator`. Produce the two sub-specs in the Output
+    `observability-operator` *(manual-only)*. Produce the two sub-specs in the Output
     Format.
 
 Channel/default matrix, digest-vs-realtime decision guide, and the
@@ -223,7 +226,7 @@ Boundaries:    delivery contract → api-event-architect; state rendering →
 - The request is generic empty/loading/error state rendering for these
   screens → route to `edge-state-ux-designer`.
 - The "notifications" are internal alerts to on-call engineers (severity,
-  runbook, thresholds) → route to `observability-operator` /
+  runbook, thresholds) → route to `observability-operator` *(manual-only)* /
   `slo-reliability-architect`.
 - A proposed opt-out design would suppress security or legally-required
   notices, or a marketing message would be sent without consent → halt

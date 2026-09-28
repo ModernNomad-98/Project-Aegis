@@ -5,6 +5,10 @@ description: Help a staff+ IC (or one aspiring) choose the highest-leverage SCOP
 
 # Staff Scope Selector
 
+**Reading key:** an individual contributor (IC) is an engineer who does not
+manage people; staff+ means staff level or above (staff, principal and higher
+technical levels).
+
 ## Purpose
 
 The step from senior to staff+ is the step from "execute what's assigned"

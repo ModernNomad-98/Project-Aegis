@@ -6,6 +6,10 @@ disable-model-invocation: true
 
 # Standing Approval & Auto-Advance
 
+**Reading key:** a pull request (PR) proposes a branch's changes for review;
+continuous integration (CI) runs the repository's automated checks on each
+push.
+
 ## Purpose
 
 Codify what does NOT need re-approval — safely. Approval fatigue is a real
@@ -16,8 +20,8 @@ that don't. This skill designs the governed inverse of
 delivery loop within named scope, an auto-advance rule for already-approved
 phases, and the control surfaces (restated approval, opt-out phrase,
 reviewer-block path) that keep the human in command of the loop they are no
-longer asked to bless step-by-step. Both source repos in the extraction
-evidence ran this pattern in production; the difference between it and an
+longer asked to bless step-by-step. Both source repositories this skill's
+pattern was extracted from ran it in production; the difference between it and an
 autonomy incident is precisely the governance elements this skill refuses to
 omit.
 
@@ -39,7 +43,7 @@ opens this door.
   `scoped-approval-register`; the adopted standing approval itself is
   recorded there as an entry, with scope allowed and forbidden.
 - Do NOT use when: defining which actions agents may EVER take (the
-  deny-by-default floors) — that is `agent-authorization-matrix`. This skill
+  deny-by-default floors) — that is `agent-authorization-matrix` *(manual-only)*. This skill
   does not grant authority by itself. An applicable, explicit human decision
   recorded for the repository may satisfy an approval-required matrix cell;
   this design cannot silently move the floor.
@@ -195,7 +199,7 @@ Adoption:                     pending human approval → then recorded via scope
   this skill was invoked, or to make merge-after-green the default → refuse,
   cite the matrix and the incident. If a separate active owner grant is cited,
   verify its repository, action, limits, and later instructions before use.
-- No `agent-authorization-matrix` (or equivalent authority policy) exists →
+- No `agent-authorization-matrix` *(manual-only)* (or equivalent authority policy) exists →
   stop; the floors must exist before the fatigue layer that presumes them.
   Offer to route there first.
 - The phase plan has no named, individually-approved phases → phase-advance

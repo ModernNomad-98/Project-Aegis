@@ -5,6 +5,11 @@ description: Plan the safe retirement of a library skill — the lifecycle end. 
 
 # Skill Deprecation Planner
 
+**Reading key:** a pull request (PR) proposes a repository change for review;
+continuous integration (CI) runs automated checks; PM means product
+management; `<squash-sha>` is the commit hash (SHA) of the single squashed
+removal commit.
+
 ## Purpose
 
 Let the library shrink as deliberately as it grows. Skills are added under a
@@ -207,7 +212,7 @@ Not planned:  <what this plan deliberately leaves out, and why>
 - Asked to edit historical decision-log entries to reflect the removal →
   refuse; the log is append-only. New entry, old entries untouched.
 - The supersession coverage diff leaves residue nobody will own → halt the
-  plan at stage 0 and surface the residue; a retirement that silently
+  plan before stage 1 (mark) and surface the residue; a retirement that silently
   drops covered ground is a scope decision for a human, not a planner
   default.
 - An inbound reference cannot be dispositioned (a neighbor's whole

@@ -11,7 +11,9 @@ Terms used below: **WCAG** means Web Content Accessibility Guidelines;
 for accessibility of information and communication technology; **ADA** means
 Americans with Disabilities Act; **ARIA** means Accessible Rich Internet
 Applications; **SR** means screen reader; **AT** means assistive technology;
-and **VPAT** means Voluntary Product Accessibility Template. These names
+**VPAT** means Voluntary Product Accessibility Template; **W3C** means
+World Wide Web Consortium; **PR** means pull request; **ESC** is the Escape
+key; and **UI** and **UX** mean user interface and user experience. These names
 identify standards, tools, or artifacts; the target obligation and level still
 come from the product's requirements in the workflow below.
 
@@ -37,7 +39,7 @@ those remaining checks manually.
 - Use when: a design system or form framework needs per-component a11y
   acceptance checks.
 - Do NOT use when: the ask is a general UI walkthrough for breakage —
-  `clickthrough-test-engineer` (this harness is the a11y-specialized pass).
+  `clickthrough-test-engineer` *(manual-only)* (this harness is the a11y-specialized pass).
 - Do NOT use when: writing general manual test cases —
   `manual-test-case-creator` (a11y checklist items follow ITS
   stranger-executable format but live here).
@@ -110,7 +112,7 @@ those remaining checks manually.
    on a11y-relevant changes; wire ownership.
 7. **Hand off execution:** scan wiring lands via the engineer skills
    (manual-only where they run browsers/builds); manual passes to testers /
-   `clickthrough-test-engineer` sessions; fixes to product owners — this
+   `clickthrough-test-engineer` *(manual-only)* sessions; fixes to product owners — this
    skill re-verifies after.
 
 ## Output Format

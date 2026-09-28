@@ -5,6 +5,9 @@ description: Design the numbered retention index governing every workflow/proces
 
 # Docs Retention Index
 
+**Reading key:** frontmatter is the metadata block at the top of a Markdown
+file; API means application programming interface.
+
 ## Purpose
 
 Workflow and process docs accumulate in two failure modes at once: rot

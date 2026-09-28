@@ -12,7 +12,9 @@ An **error budget** is the allowed amount of failed or slow experience implied
 by an SLO over its window. Infrastructure signals and components such as
 central processing unit (CPU) load, Domain Name System (DNS), content
 delivery network (CDN), and garbage collection (GC) help diagnosis but do
-not replace journey SLIs.
+not replace journey SLIs. The 99th-percentile (p99) latency is the time within
+which 99 percent of requests complete, and API means application programming
+interface.
 
 ## Purpose
 
@@ -46,7 +48,7 @@ a target, a budget, and a page.
   commercial decision with achievable numbers; it does not own the
   contract.
 - Do NOT use when: diagnosing an active reliability problem —
-  `systematic-debugger`.
+  `systematic-debugger` *(manual-only)*.
 
 ## Inputs to Inspect
 
@@ -57,7 +59,7 @@ a target, a budget, and a page.
    availability/latency distributions, incident history — targets set
    without baseline data are aspirations, labeled as such.
 3. The architecture and dependency chains (`architecture-designer` /
-   provider-architect outputs): what each journey traverses, shared
+   cloud-provider architecture outputs): what each journey traverses, shared
    dependencies, single points of failure.
 4. Current alert inventory and its noise profile (what pages today, what
    on-call ignores).
@@ -99,7 +101,7 @@ question. A choice does not revise a contract or authorize infrastructure work.
    diagnostic context. Every page maps to a budget threat; every
    cause-alert that pages today is explicitly demoted or defended in the
    spec. Alert spec fields: SLI, burn threshold + window, severity,
-   owner, runbook link placeholder — handed to `observability-operator`
+   owner, runbook link placeholder — handed to `observability-operator` *(manual-only)*
    to implement and to `incident-response-runbook` for the procedures.
 5. **Analyze failure modes against targets**: per journey, walk the
    dependency chain — shared dependencies whose failure burns multiple
@@ -189,7 +191,7 @@ Promise choice (if needed): <explained paths, costs/unknowns, pros/cons, recomme
 
 - No baseline data exists and none can be gathered (new product) →
   provisional targets only, labeled, with instrumentation-first ordering
-  (`observability-operator`) and a mandatory review date; refuse to
+  (`observability-operator` *(manual-only)*) and a mandatory review date; refuse to
   present aspirations as commitments.
 - The commercially promised SLA exceeds what the architecture can
   plausibly deliver → surface the gap to the human as a commercial/
