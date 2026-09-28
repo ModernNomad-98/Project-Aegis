@@ -2,12 +2,12 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #474 (`2be0a77`) on 2026-09-28 Coordinated
+As of merged pull request (PR) #488 (`ebf210c`) on 2026-09-28 Coordinated
 Universal Time (UTC), this remains the active
 repository-wide documentation acceptance backlog. The latest count is in the
-paragraph for main after #474 (`2be0a77`): 613 tracked Markdown files, 565
+paragraph for main after #488 (`ebf210c`): 614 tracked Markdown files, 569
 accepted reader pages, one generated report, 44 classified synthetic fixtures
-and three known pending pages; the paragraphs between are dated history,
+and zero known pending pages; the paragraphs between are dated history,
 oldest first. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -920,6 +920,144 @@ and `.claude/skills/adr-writer/SKILL.md`. This update changes this ledger by
 more than 10 lines, so it needs its own independent full-page re-read. No
 grant or gate changed.
 
+PRs #475 (`59b2fb7`) and #476 (`8f3d369`) (both 15:31 UTC), #480
+(`19d26a9`), #478 (`3ac0c2f`), #477 (`6d2b2f6`) and #481 (`6567fba`) (all
+16:21), #479 (`5d0fa76`, 16:28), #482 (`7c8dbf6`, 16:29), #483 (`ecd1e59`,
+16:30), #484 (`eb92948`, 16:42), #487 (`5792955`) and #485 (`149d5ac`) (both
+16:52), #486 (`2a411fd`, 17:08) and #488 (`ebf210c`, 17:23 UTC) merged on
+2026-09-28 after #474, in that order. #477 was the previous ledger update.
+#485 added one Markdown file, the
+[2026-09-28 session checkpoint](session-checkpoint-2026-09-28.md);
+no file was removed or renamed, and no non-Markdown file or synthetic fixture
+changed. Line counts are `git diff --numstat`, added plus deleted. Each
+accepting review cited below is posted on its PR. Three first re-reads that
+only asked for edits were not posted: the register's R1 and R2, the host
+pages' C1 to V7 and `ai-evaluation-harness`'s E1 to E5. The accepting
+comments cite them. For every page counted as accepted,
+`git diff <accepted head> ebf210c` on that page is empty or holds only lines
+from another reviewed PR in this range, and stays within the rule. Codex
+posted only usage-limit notices on these PRs, so no Codex review exists for
+any of these heads.
+
+**Two owner decisions (2026-09-28).**
+
+- **Net difference.** The 10-line rule counts the net difference since the
+  page's accepted version, `git diff --numstat <acceptance> <now>`, not the
+  sum of every edit; the [rule section](#remaining-page-review-in-larger-batches)
+  now says so. Under the old summed count, #486's first review found four
+  more pages past 10 besides `ai-evaluation-harness`:
+  `code-reviewer/SKILL.md` (14),
+  `skill-quality-reviewer/SKILL.md` (14),
+  `ai-cost-guardrail-designer/references/cost-guardrail-patterns.md` (13) and
+  `iso-42001-aims-architect/references/aims-clause-map.md` (13). Their net
+  counts are 8, 8, 7 and 7, so they keep acceptance.
+- **"Spell it out everywhere".** "AI" is spelled out as artificial
+  intelligence (AI) at its first body use on every page. #486 delivered this
+  on 64 pages, one line each (128). Its review returned FIX-FIRST on
+  `8459ac7` for one missed line in the
+  [add-AI-safely path](../paths/add-ai-safely.md), then **ACCEPT** on
+  `2f28cc7`. This update checked the net count of all 64 pages since each
+  page's acceptance. Only `.claude/skills/ai-evaluation-harness/SKILL.md`
+  went past 10: 10 from #370 since its acceptance at `80fbdbb` (#210), plus
+  2, so 12; #488 fixed it (below). Every other page is at 10 or fewer. The
+  highest are the
+  [efficient execution handoff](aegis-efficient-execution-handoff-2026-09-23.md)
+  at exactly 10, and four pages at 8:
+  `ai-governance-risk-reviewer/references/ai-governance-framework.md`,
+  `sensitive-disclosure-guard/SKILL.md`, `code-reviewer/SKILL.md` and
+  `skill-quality-reviewer/SKILL.md`. The forecast, the measurements page and
+  this ledger are at 2 since their acceptances below.
+
+**Pages accepted in this range.**
+
+- The [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
+  (#475, 17): the six batch 4 edits, held back until the owner granted a
+  one-time `gate-guard` exception for head `acdcdad` only (AEGIS-APR-077; its
+  consumption is AEGIS-APR-078, both recorded by #479). A corrected-candidate
+  reviewer rebuilt the head from the batch 4 re-read, re-read the page in
+  full and posted **ACCEPT** on `acdcdad`. Pending to accepted.
+- The [approval register](../approvals/APPROVAL_REGISTER.md). A full-page
+  re-read of the register on main `8f3d369` found two reading-aid edits, R1
+  and R2, which #481 applied (7); the corrected-candidate check **accepted**
+  the register on `98eb638`, resting on that read. #479 then appended
+  AEGIS-APR-077 and APR-078 (51; REVISE on `21cc486`, SHIP on `b7570af`).
+  That is 51 net since `98eb638`, past 10, so a separate full-page re-read of
+  the whole register on `2a411fd` returned **ACCEPT** with no edit
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/479#issuecomment-5874887988)).
+  Pending to accepted.
+- `.claude/skills/adr-writer/SKILL.md` (#482, 20): three edits, R1 to R3,
+  and a full-page re-read at the head, **ACCEPT** on `f275356`. Pending to
+  accepted.
+- The [BER selected host capability decision](ber-selected-host-capability-decision.md)
+  (49) and the
+  [VirtualBox Stage A setup proposal](ber-virtualbox-stage-a-setup-proposal.md)
+  (39), #476: a first full-page re-read asked for 14 edits (C1 to C7 and V1
+  to V7), and a corrected-candidate full-page re-read **accepted** both on
+  `5f08b3e`. This settles the sweep's open item on their weak acceptance
+  record. Both were already counted as accepted.
+- `.claude/skills/project-orchestrator/SKILL.md` (#484, 14; 20 net since
+  `469d6cb`): a full-page re-read on `2f5858c` returned FIX-FIRST with two
+  edits, and the corrected-candidate review **accepted** it on `ad927f7`.
+  `ai-sdlc-operating-model/references/stage-gate-map.md` (6 net since
+  `6306232`): its changed rows, read in context, were **accepted** on
+  `ad927f7`. Both were already counted as accepted.
+- The [backlog forecast](aegis-backlog-forecast.md) (172) and
+  [execution measurements](aegis-execution-metrics.md) (128), #478: a
+  full-page review on `07435c2` returned FIX-FIRST (F1 to F6, M1 and M2), and
+  the re-review **accepted** both on `cf86dab`.
+- This ledger (#477, 243): a full-page read on `4384548` returned FIX-FIRST
+  (E1 to E3), and the corrected-candidate check **accepted** it on `66521f4`.
+- `.claude/skills/ai-evaluation-harness/SKILL.md` (#488, 14): a full-page
+  re-read on `2a411fd` asked for five edits, E1 to E5, which #488 applied with
+  one optional edit; a corrected-candidate full-page review **accepted** it
+  on `e225c2f`
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/488#issuecomment-5875073652)).
+  Pending to accepted.
+- The [2026-09-28 session checkpoint](session-checkpoint-2026-09-28.md)
+  (#485, new, 177): a full-page review on `7d33df0` returned FIX-FIRST with
+  four edits; a fix check on `692b221` asked for one more two-line fix, and
+  the fix check on `04d2ce8` **accepted** it. New accepted page.
+
+**Small edits.**
+
+- All 51 pages the sweep kept with 1 to 10 changed lines now have a recorded
+  review. Three read-only targeted reviews on `2be0a77` found that 4 pages
+  already had an independent verdict on the PR that changed them, 35 passed
+  a targeted review, 11 needed FIX-FIRST edits and `adr-writer/SKILL.md` had
+  gone past 10 (above). Those reviews are working files of the coordinating
+  session, not repository pages. #480 applied ten of the FIX-FIRST edits and
+  one optional edit to 11 pages (46); its independent review passed all 11 on
+  `9c918ed`, each at 10 or fewer net since acceptance, with
+  `ai-governance-risk-reviewer/SKILL.md` exactly at 10. The eleventh
+  FIX-FIRST edit, to `code-reviewer`'s description, waited for the owner and
+  merged in #482 (2), whose reviewer passed it on `f275356`. The 50 pages
+  other than `adr-writer/SKILL.md` keep acceptance.
+- #483 (12): one line each on `skill-quality-reviewer/SKILL.md`,
+  `frontend-perf-engineer/SKILL.md`, `library-diff-reviewer/SKILL.md`,
+  `slo-reliability-architect/SKILL.md`, the README and the skills catalog.
+  Its review passed all six on `44c4834`, each at 10 or fewer net, so they
+  keep acceptance.
+- The [open-decisions index](aegis-open-decisions-2026-09-23.md) (#487, 10):
+  exactly 10 net since its acceptance on `08f99eb` (#460). A targeted review
+  **accepted** it on `44550cd`, so it keeps acceptance at the limit; any
+  further edit needs a full-page re-read.
+
+**Still open.** No reader page is pending. The
+[skill-contract audit baseline report](../audits/skill-contract-audit-baseline.md)
+stays a **generated report, format review pending**: its one-time review of
+the output format has still not been done.
+
+Main after #488 (`ebf210c`) therefore has **614 tracked Markdown files: 569
+accepted reader pages, one generated report, 44 classified synthetic fixtures
+and zero known pending pages**. The 614 is `git ls-files '*.md'` on a
+checkout of `ebf210c`: 613 + 1 (#485's checkpoint). Accepted readers go
+565 + 3 (the Behavioral Eval Runner guide, the approval register and
+`adr-writer/SKILL.md`) + 1 (the new checkpoint) − 1 (#486 took
+`ai-evaluation-harness/SKILL.md` past 10) + 1 (#488 accepted it again) = 569.
+Pending goes 3 − 3 + 1 − 1 = 0, and 569 + 0 + 1 + 44 = 614. This update
+changes this ledger by more than 10 lines, so it needs its own independent
+full-page re-read. No grant or gate changed.
+
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
 the [Behavioral Eval Runner (BER) selected-precheck aggregate decision page](ber-precheck-aggregate-validation-proposal.md)
@@ -1280,6 +1418,14 @@ last full-page acceptance. A small edit keeps acceptance only if an
 independent reviewer checked it; an unreviewed edit, however small, needs a
 targeted review before the page counts as accepted.
 
+**Net difference (owner decision, 2026-09-28).** The 10 lines are the net
+difference between the page's accepted version and now: `git diff --numstat
+<acceptance> <now>` on that page, added plus deleted. They are not the sum of
+every edit since acceptance, so an edit that rewrites a line already changed
+since acceptance adds nothing new. Edits made before the 2026-09-27 rule still
+count. This replaces the adding together described in the two paragraphs
+above; entries in this ledger made before this decision used the summed count.
+
 **Generated reports (owner decision, 2026-09-28).** A generated report is a
 Markdown file written by a script, such as the
 [skill-contract audit baseline report](../audits/skill-contract-audit-baseline.md),
@@ -1337,6 +1483,14 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| `ai-evaluation-harness` re-read fixes, PR #488, after #486, 2026-09-28 | `.claude/skills/ai-evaluation-harness/SKILL.md` | 14 lines. A full-page re-read on `2a411fd` asked for E1 to E5; a corrected-candidate full-page review **accepted** it on `e225c2f`, which matches main. Main after #488 (`ebf210c`) has 614: 569 accepted readers, one generated report, 44 classified fixtures and zero known pending. |
+| "AI" spelled out at first body use, PR #486, after #485, 2026-09-28 | 64 existing reader pages, one line each | Owner decision "Spell it out everywhere". FIX-FIRST on `8459ac7` (one missed line), then **ACCEPT** on `2f28cc7`. By net count only `.claude/skills/ai-evaluation-harness/SKILL.md` went past 10 (12), which #488 then fixed. The others are at 10 or fewer and keep acceptance. |
+| Session checkpoint and open decisions, PRs #487 and #485, after #484, 2026-09-28 | [Open-decisions index](aegis-open-decisions-2026-09-23.md) and the new [2026-09-28 session checkpoint](session-checkpoint-2026-09-28.md) | The index is exactly 10 net since `08f99eb`; a targeted review **accepted** it on `44550cd`. The checkpoint (177, new) got FIX-FIRST on `7d33df0` and was **accepted** on `04d2ce8`. |
+| Orchestrator labels and stage-gate map, PR #484, after #483, 2026-09-28 | `project-orchestrator/SKILL.md` and `ai-sdlc-operating-model/references/stage-gate-map.md` | 14 and 6. A full-page re-read of the orchestrator on `2f5858c` returned FIX-FIRST; the corrected-candidate review **accepted** both on `ad927f7`, which matches main. |
+| ADR writer re-read and reviewer follow-ups, PRs #482 and #483, after #479, 2026-09-28 | `adr-writer/SKILL.md`, `code-reviewer/SKILL.md` and six pages in #483 | `adr-writer` (20) got a full-page re-read and **ACCEPT** on `f275356`, so it is accepted again. The `code-reviewer` description edit (2) and #483's six one-line edits passed targeted reviews on `f275356` and `44c4834`; each page is at 10 or fewer net. |
+| Approval register reading aid and APR-077/078, PRs #481 and #479, after #477, 2026-09-28 | [Approval register](../approvals/APPROVAL_REGISTER.md) | #481 (7) applied R1 and R2 from a full-page re-read on `8f3d369`, **accepted** on `98eb638`. #479 appended 51 (SHIP on `b7570af`), and a full-page re-read on `2a411fd` returned **ACCEPT**, so the register is accepted again. |
+| Small-edit fixes, forecast checkpoint and ledger, PRs #480, #478 and #477, after #476, 2026-09-28 | 11 small-edit pages, the [backlog forecast](aegis-backlog-forecast.md), the [execution measurements](aegis-execution-metrics.md) and this ledger | #480 (46) passed on `9c918ed`; all 51 small-edit pages now have a recorded review. The forecast and measurements were **accepted** on `cf86dab`, and this ledger on `66521f4`. |
+| BER guide and host pages, PRs #475 and #476, after #474, 2026-09-28 | [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md), [BER selected host capability decision](ber-selected-host-capability-decision.md) and [VirtualBox Stage A setup proposal](ber-virtualbox-stage-a-setup-proposal.md) | The guide (17) was **accepted** on `acdcdad` under the one-time `gate-guard` exception AEGIS-APR-077, so it is accepted again. Full-page re-reads **accepted** both host pages on `5f08b3e`, which settles their weak acceptance record. |
 | Pre-rule sweep batch fixes, PRs #466 to #474, after #465, 2026-09-28 | 83 changed pages in nine batches, 14 accepted with no edit, and the [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md) | The owner-ordered sweep returned 103 of 558 accepted pages to pending on `5bd21fb`. Corrected-candidate reviewers **accepted** every changed page on its merged head: #466 `dac42f3`, #471 `67f577e`, #473 `8c6750a`, #467 `eb3ec53`, #474 `14ecd0c`, #472 `6ba6e1a`, #470 `2a86058`, #469 `61ca130` and #468 `54034fa`. 14 pages passed the first full-page read with no edit; all 14 are named as accepted on GitHub, seven of them in comments posted on #469 and #470 after #474 merged. The guide's six edits were held back for a protected-path exception, so it stays **pending**. With #456, #459 and #462, 102 of the 103 are accepted again. Main after #474 (`2be0a77`) has 613: 565 accepted readers, one generated report, 44 classified fixtures and three known pending. No grant or gate changed. |
 | Register APR-074 to APR-076, PR #465, after #457, 2026-09-28 | [Approval register](../approvals/APPROVAL_REGISTER.md) | 78 lines appended; SHIP on `ab430ad` after one REVISE edit. It checked facts and format, not the whole page, so the register stays **pending** with 78 since `e6d0f6a`. |
 | Forecast and measurement checkpoint, PR #457, after #460, 2026-09-28 | [Backlog forecast](aegis-backlog-forecast.md) and [execution measurements](aegis-execution-metrics.md) | 238 and 285 lines. A full-page review on `86d891e` returned FIX-FIRST (F1 to F7, M1 to M3); a corrected-candidate check **accepted** both on `676bc3d`, which matches main. |
