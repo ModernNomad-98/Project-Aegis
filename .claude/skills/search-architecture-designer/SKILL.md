@@ -5,6 +5,11 @@ description: Design search/discovery for a multi-tenant SaaS — in-database ful
 
 # Search Architecture Designer
 
+**Reading key:** SaaS means software as a service; AI means artificial
+intelligence; retrieval-augmented generation (RAG) feeds retrieved documents to
+a language model; DB means database; GIN (generalized inverted index) is the
+PostgreSQL index type used for full-text search.
+
 ## Purpose
 
 Search is where a multi-tenant SaaS quietly leaks and disappoints: a query
@@ -114,7 +119,7 @@ skill; a preference does not authorize provisioning or implementation.
    sort/tiebreak the cursor rides.
 6. **Address operations.** Index size and growth per tenant, reindex cost,
    the freshness/lag and error signals to monitor (wiring to
-   `observability-operator`), and the failure mode when the search engine is
+   `observability-operator` *(manual-only)*), and the failure mode when the search engine is
    down (degrade to DB query, or a clear error — never silently return empty
    and imply "no results").
 7. **Deliver** the engine decision, indexing + freshness plan, ranking model,

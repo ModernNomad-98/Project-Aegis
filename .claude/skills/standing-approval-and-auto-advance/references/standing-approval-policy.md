@@ -2,7 +2,9 @@
 
 Companion to the [Standing Approval and Auto Advance](../SKILL.md). The template below is what
 the skill instantiates for a repo; every `<placeholder>` is filled by the
-adopting HUMAN, not by an agent.
+adopting HUMAN, not by an agent. PR means pull request (a proposed branch change
+awaiting review), CI means continuous integration (automated checks run on each
+push), and `APR-<NNN>` is the adopted policy's approval-register entry number.
 
 ## Policy template
 

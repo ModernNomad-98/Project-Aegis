@@ -8,7 +8,8 @@ description: Define the product- or repo-level QA strategy — a risk inventory 
 **Reading key:** Quality assurance (QA) is the testing discipline;
 end-to-end (E2E) tests exercise a whole user journey; continuous
 integration (CI) runs automated checks; a pull request (PR) proposes a
-repository change; a database (DB) stores application data.
+repository change; a database (DB) stores application data; UI means user interface and UX means
+user experience.
 
 ## Purpose
 
@@ -64,7 +65,7 @@ coverage mapping audits against it, and automation architecture implements it.
 3. **Declare the layer split explicitly** — automation vs manual is a named
    decision per risk area, never an accident. Security negative testing
    (cross-tenant, authorization) is delegated to the shipped
-   `multi-tenant-security-tester` and `rls-policy-auditor`, not re-owned here.
+   `multi-tenant-security-tester` *(manual-only)* and `rls-policy-auditor`, not re-owned here.
 4. **Define environments and data posture per layer:** what runs against
    in-memory fakes, what needs a seeded database, what needs a deployed
    environment; where test data comes from (delegate design to
@@ -74,7 +75,7 @@ coverage mapping audits against it, and automation architecture implements it.
    must exist, and what "green" means for docs-only vs schema vs UI changes.
 6. **Place the CI gates:** which layers run on PR, on merge, nightly; what is
    allowed to be non-blocking and why; flake policy pointer
-   (`flaky-test-detective` owns diagnosis, `regression-suite-curator` owns
+   (`flaky-test-detective` *(manual-only)* owns diagnosis, `regression-suite-curator` owns
    suite membership). If merging automatically deploys, put every required
    release gate before merge; use post-merge checks to verify deployment.
 7. **Name ownership and exit criteria:** who owns each layer, who fixes red,
