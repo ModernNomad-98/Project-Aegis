@@ -43,7 +43,8 @@ de-risked into production — not who is entitled to it.
   experiment's hypothesis, sample size, or reading the result — that is
   `ab-test-designer`; this skill can carry the flag it runs on, but not
   the experiment design.
-- Do NOT use when: designing the flag system itself — store, SDK/interface,
+- Do NOT use when: designing the flag system itself — store, software
+  development kit (SDK)/interface,
   evaluation placement, fallback mechanism, propagation, change audit →
   `feature-flag-architect`.
 
@@ -207,7 +208,7 @@ Boundaries:   entitlement → plan-entitlement-architect / authorization-matrix-
   rollout, not the statistics.
 - No trustworthy guardrail metric exists to gate/rollback on → surface
   that the rollout would be blind and get the metric wired
-  (`observability-operator`) before ramping beyond a tiny canary.
+  (`observability-operator` *(manual-only)*) before ramping beyond a tiny canary.
 - Asked to actually flip flags / execute the rollout on live production →
   decline execution; this skill designs the strategy, and live changes
   follow the repo's human-approval path.

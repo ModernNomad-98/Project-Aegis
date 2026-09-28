@@ -24,7 +24,7 @@ of the endpoint it rides on belong to `api-event-architect`.
 ## Use When
 
 - Use when: designing pagination for a new list/collection endpoint or
-  its UI, or choosing between cursor and offset paging.
+  its user interface (UI), or choosing between cursor and offset paging.
 - Use when: a list skips, repeats, or reorders rows as underlying data
   changes (the classic offset-drift bug), or deep pagination is slow.
 - Use when: adding "load more", infinite scroll, or numbered pages and
@@ -35,7 +35,8 @@ of the endpoint it rides on belong to `api-event-architect`.
   routes, versioning/deprecation, envelopes, rate limits — that is
   `api-event-architect`; this skill designs the pagination inside it.
 - Do NOT use when: one specific query is slow and needs plan analysis
-  (index/sargability) — that is `query-plan-reader`; this skill decides
+  (index use and sargability, meaning whether a filter can use an index) —
+  that is `query-plan-reader` *(manual-only)*; this skill decides
   the pagination model, then hands the keyset query to it if needed.
 - Do NOT use when: the question is whether to cache list responses —
   that is `caching-strategy-designer` (a paginated list's cache key
@@ -71,8 +72,9 @@ pattern discovery and authorization for contract changes separate.
    acceptable ONLY for small, low-churn, human-browsed lists where
    random page access matters and drift is tolerable — state that
    ceiling. Default to cursor (keyset) paging for anything large,
-   high-churn, or deep: it avoids offset-shift drift and can seek near
-   O(page size), but mutable sort keys and deletes still need a snapshot or
+   high-churn, or deep: it avoids offset-shift drift and its cost per page
+   stays roughly proportional to the page size rather than the page depth,
+   but mutable sort keys and deletes still need a snapshot or
    explicit stability policy.
    Record why, per surface.
 2. **Define the total ordering.** Keyset paging requires a strict, total
@@ -89,7 +91,7 @@ pattern discovery and authorization for contract changes separate.
    be a tiebreaker if its visibility is acceptable; otherwise use a suitable
    surrogate. Verify the fingerprint against the current query and reject a
    changed sort/filter. Never trust tenant scope from the cursor or expose a
-   raw SQL offset.
+   raw Structured Query Language (SQL) offset.
 4. **Bind tenant/permission scope into the query, not the cursor.** The
    authorization predicate is applied server-side on every page from
    trusted context (session/token), never trusted from cursor contents.
@@ -109,7 +111,7 @@ pattern discovery and authorization for contract changes separate.
    invalid — reset to first page, state this), when a cursor points at a
    now-deleted row (resume from the next row in order), and empty/first/
    last pages.
-8. **Pick the surface pattern.** Map the model to UX: "load more"/
+8. **Pick the surface pattern.** Map the model to the user experience: "load more"/
    infinite scroll pairs naturally with cursors; numbered pages imply
    offsets or a page→cursor map and random access (call out the cost);
    pick per surface and state the tradeoff. Note deep-link/back-button

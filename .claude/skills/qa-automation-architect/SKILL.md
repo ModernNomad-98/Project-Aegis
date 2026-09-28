@@ -31,9 +31,10 @@ engineer skills.
 - Use when: wiring suites into CI — tiers, sharding, retries, caching.
 - Do NOT use when: deciding WHAT should be tested — `qa-strategy-architect`
   (product) or `test-plan-designer` (per change).
-- Do NOT use when: implementing tests — `vitest-unit-component-engineer`,
-  `playwright-e2e-engineer`, etc.
+- Do NOT use when: implementing tests — `vitest-unit-component-engineer`
+  *(manual-only)*, `playwright-e2e-engineer` *(manual-only)*, etc.
 - Do NOT use when: diagnosing a specific flaky test — `flaky-test-detective`
+  *(manual-only)*
   (this skill sets the flake POLICY; the detective works cases).
 - Do NOT use when: designing test data itself — `test-data-architect`
   (this skill defines where fixtures LIVE, that skill defines what they ARE).
@@ -84,7 +85,7 @@ does not authorize purchases or migration execution.
    conventions from `screenshot-evidence-planner` plug in.
 6. **Place suites in CI:** PR / merge / nightly tiers with runtime budgets,
    sharding plan, cache strategy, retry policy (retries mask flakes —
-   bounded, logged, and always fed to `flaky-test-detective`), and the
+   bounded, logged, and always fed to `flaky-test-detective` *(manual-only)*), and the
    quarantine mechanism governed by `regression-suite-curator`. If a merge
    deploys automatically, any required release gate runs before merge;
    post-merge checks verify the deployment rather than decide whether to
@@ -130,7 +131,7 @@ Handoffs: <test implementation → engineer skills; data design → test-data-ar
 
 ## Gotchas
 
-- Tool churn is expensive: replacing a working runner for marginal DX gains
+- Tool churn is expensive: replacing a working runner for marginal developer-experience gains
   costs more than it returns — bias to incumbent tools unless a deficiency is
   named.
 - Unbounded CI retries convert flakes into invisible product risk; retries

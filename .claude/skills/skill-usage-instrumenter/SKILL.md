@@ -31,7 +31,7 @@ it changes no skill, adds no hook, and collects nothing itself.
   explicitly named (a trigger-description failure smell), which fire and get
   corrected by the user (wrong-fire).
 - Do NOT use when: designing telemetry for a product or system — metrics,
-  logs, traces, alerting for services — that is `observability-operator`.
+  logs, traces, alerting for services — that is `observability-operator` *(manual-only)*.
   This skill's subject is the library measuring ITSELF.
 - Do NOT use when: judging whether a skill's definition is well-designed —
   that is `skill-quality-reviewer`; usage signal is the empirical complement
@@ -107,7 +107,8 @@ it changes no skill, adds no hook, and collects nothing itself.
 5. **Set thresholds that convert counts into actions.**
    - An auto-invocable skill fires only when explicitly named, never auto →
      possible trigger-description failure → re-review by
-     `skill-quality-reviewer` (check 1/2). Explicit-only/manual-only skills
+     `skill-quality-reviewer` (its Check 1, trigger quality, and Check 2,
+     trigger overlap). Explicit-only/manual-only skills
      are expected to behave this way and are exempt from this inference.
    - Repeated wrong-fires against the same neighbor → collision evidence →
      discriminating trigger-evals + description fix on both sides.

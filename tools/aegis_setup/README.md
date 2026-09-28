@@ -5,11 +5,14 @@ helper might suggest agents and skills for a task. It validates a small offer
 and a proposed selection entirely offline. Use it to inspect the contract and
 exercise synthetic cases; it is not the conversational setup skill that product
 users invoke. The [issue #101 setup plan](../../docs/roadmaps/aegis-setup-routing-plan.md)
-calls this delivered offline contract **package 3**. Host integration and
-real-world helper evaluation belong to later package 4 work.
+calls this delivered offline contract **package 3**. The separate
+[offline host bridge candidate](host_bridge/README.md) is Stage 4A, the
+owner-approved offline preparation step for package 4: it exercises a
+candidate host callback with invented host facts and dispatches nothing. Real
+host integration and real-world helper evaluation remain later package 4 work.
 
-It has no host hook, provider, network client, credential, write operation or
-dispatch function. A valid recommendation is still only advice. The future
+The Python package has no host hook, provider, network client, credential,
+write operation or dispatch function. A valid recommendation is still only advice. The future
 host must independently establish eligibility, explicit invocation, mandatory
 reviews, permissions and final dispatch authority.
 
