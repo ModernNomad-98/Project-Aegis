@@ -1,6 +1,6 @@
 ## What & why
 
-<!-- What does this change do, and why? -->
+<!-- This template becomes the description of every pull request, from the maintainer or an outside contributor. What does this change do, and why? -->
 
 ## Checklist
 
@@ -10,9 +10,9 @@ The security question below is required.
 - [ ] `python scripts/tests/test_validator.py` passes locally
 - [ ] `python scripts/validate-skills.py` passes locally (skill count reconciles, exit 0)
 - [ ] [Offline continuous integration (CI) coverage and limits](https://github.com/ModernNomad-98/Project-Aegis/blob/main/docs/offline-ci.md) reviewed; both Ubuntu
-      and Windows verification jobs checked before delivery closeout
-- [ ] Registration checklist followed if any skills were added, renamed, or removed
-- [ ] Current skill totals use governed README markers; dated historical counts
+      and Windows verification jobs checked before you report the work as done
+- [ ] If any skills were added, renamed, or removed, every registration surface in step 3 of [How to add a skill](https://github.com/ModernNomad-98/Project-Aegis/blob/main/CONTRIBUTING.md#how-to-add-a-skill) is updated
+- [ ] Current skill totals in the README sit inside the validator-checked count markers (`SKILL-COUNT`, `FAMILY-COUNT`); dated historical counts
       are clearly identified as evidence from their recorded revision
 - [ ] Commits carry a Developer Certificate of Origin (DCO) sign-off
       (`git commit -s`)
