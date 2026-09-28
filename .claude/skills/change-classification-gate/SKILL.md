@@ -1,6 +1,6 @@
 ---
 name: change-classification-gate
-description: Classify a requested change before starting work — docs-only, UI/style, frontend logic, backend/API, schema/migration, RLS/security, cloud/IaC, AI/agentic behavior, QA/test-only, refactor, bug fix, or release — and map the class to its required validation level and approval path. Locks scope to the approved class and file set; mid-task scope growth forces reclassification. Use when starting any non-trivial change, when a task mixes change types, or when work is drifting beyond what was asked. Do NOT use to pick fast vs full validation depth from touched files (risk-tiered-validation-selector).
+description: Classify a requested change before starting work — docs-only, UI/style, frontend logic, backend/API, schema/migration, RLS/security, cloud/IaC, AI/agentic behavior, QA/test-only, refactor, bug fix, or release — and map the class to its required validation level and approval path. Locks scope to the approved class and file set; mid-task scope growth forces reclassification. Use when starting any non-trivial change, when a task mixes change types, or when work is drifting beyond what was asked. Do NOT use to pick fast vs full validation depth from touched files (risk-tiered-validation-selector), or to split a broad goal into reviewable tasks (ai-task-decomposer).
 ---
 
 # Change Classification Gate
@@ -35,6 +35,10 @@ layer between a request and the discipline the request deserves.
 - Do NOT use when: picking fast vs full validation depth from the touched
   files — that is `risk-tiered-validation-selector`; this gate sets the
   approval path and scope lock.
+- Do NOT use when: the request is too big for one reviewable change and
+  needs splitting into ordered, pull-request-sized tasks first — that is
+  `ai-task-decomposer`, which plans the tasks; this gate then classifies each
+  one as it starts.
 
 ## Inputs to Inspect
 

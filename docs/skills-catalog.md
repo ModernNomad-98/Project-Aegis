@@ -314,9 +314,9 @@ terminal reporting against the later-phase skills that route toward it.
 ### Skills (Phase 1.5 — AI-SDLC governance completion)
 
 Completes the category-08 governance layer Phase 1 started (roadmap
-#261/#268/#279/#280). These four COMPOSE the Phase 1 skills — each stage or
+#261/#268/#279/#280, plus #266 under D69). These COMPOSE the Phase 1 skills — each stage or
 control cites its enforcing skill by name, never restating its procedure. All
-ship `evals/evals.json` **and** `evals/trigger-evals.json` (the four overlap
+ship `evals/evals.json` **and** `evals/trigger-evals.json` (the original four overlap
 each other and the Phase 1 pack). Two edit behavior-steering artifacts and are
 **manual-only** (`disable-model-invocation: true`): `agent-authorization-matrix`
 (governance artifacts) and `agent-memory-governance` (memory files).
@@ -327,6 +327,7 @@ each other and the Phase 1 pack). Two edit behavior-steering artifacts and are
 | `agent-authorization-matrix` | #268 | **no** (manual-only; edits governance artifacts) | Deny-by-default action × context matrix of standing agent authority — merge to protected branches requires a named human always, auto-merge arming forbidden to agents (armed state re-checked after every push), approval scope/expiry semantics; proposal-first. |
 | `agent-memory-governance` | #279 | **no** (manual-only; edits memory files) | Memory WRITE/TRUST/HYGIENE rules: confirmed durable facts with provenance and absolute dates, never secrets; remembered repo/PR state verified against live git/gh before acting; per-entry disposition-approved cleanups. |
 | `agent-governance-audit` | #280 | yes | Per-control PASS/FAIL/UNVERIFIABLE compliance audit of one AI-assisted change from primary evidence (PR timeline incl. who armed auto-merge, commits, CI runs); closeout claims cross-checked, never trusted; missing evidence is never a PASS. |
+| `ai-task-decomposer` | #266 (D69) | yes | Splits a broad goal, epic or approved spec into ordered, PR-sized tasks, each with one intent, an observable done criterion and the evidence that proves it, likely files or layers, a provisional change class, risks, dependencies and human-approval flags; oversized tasks split again; unknowns become spike tasks or owner questions. Plans only; hands each task to `change-classification-gate` when work starts. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for all four: the
 governance cluster discriminates internally (umbrella vs matrix vs memory vs
@@ -335,7 +336,11 @@ audit) and against the Phase 1 pack (`human-approval-boundary`,
 `agent-instruction-consolidator`, `ai-closeout-reporter`,
 `change-classification-gate`), Phase 2's `code-reviewer` and
 `full-codebase-auditor`, and Phase 3's `authorization-matrix-designer`
-(agent authority vs end-user RBAC).
+(agent authority vs end-user RBAC). `ai-task-decomposer`, added by owner decision D69
+(2026-09-28), ships its own trigger evals against `change-classification-gate`,
+`tech-spec-writer`, `lane-authoring-guide` (parallel lanes versus one ordered sequence of
+PR-sized tasks), `product-spec-writer`, `phased-work-handoff-designer` and
+`roadmap-to-commitments-translator`.
 
 ### Skills (D38 — beginner-facing lifecycle orchestrator / library front door)
 
@@ -1254,9 +1259,14 @@ Source: [`docs/skills/08-ai-era-sdlc-agent-ops.md`](skills/08-ai-era-sdlc-agent-
 [Implemented → Skills (Phase 1.5)](#skills-phase-15--ai-sdlc-governance-completion)
 above, completing the category-08 governance layer Phase 1 started.
 Source: [`docs/skills/08-ai-era-sdlc-agent-ops.md`](skills/08-ai-era-sdlc-agent-ops.md).
-The remaining cat-08 items (#266 AI Task Decomposition, #267 Prompt-to-Diff
-Traceability, #273 AI Work Evidence Pack, #277 AI Code Review Protocol, #278 AI
-Pair Engineering Protocol) remain backlog, built in Phase 8 batches.
+Owner decision D69 (2026-09-28) resolved the remaining cat-08 items: #266 AI Task
+Decomposition is built as `ai-task-decomposer` (listed in the Phase 1.5 table above);
+#267 Prompt-to-Diff Traceability and #273 AI Work Evidence Pack merge into an
+`ai-closeout-reporter` extension; #277 AI Code Review Protocol merges into a
+`code-reviewer` extension; and #278 AI Pair Engineering Protocol is dropped as covered by
+`ai-sdlc-operating-model` and the skills its stage map names. The two extensions land in
+their own pull requests; see the
+[AI-SDLC batch proposal](roadmaps/ai-sdlc-skill-batch-proposal.md).
 
 ### Phase 2 — Core architecture & engineering (P0)
 ✅ **Implemented** — all 10 first-pass skills moved to

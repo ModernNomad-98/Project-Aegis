@@ -245,7 +245,7 @@ here.
   `structured-output-validator`, `ai-cost-guardrail-designer`. For AI agent
   runtimes: `agent-harness-architect`, `model-context-designer`, conditional
   `agentic-loop-designer` — follow [AI path](../../../docs/paths/add-ai-safely.md).
-- **Stage 5 — Plan the work.** → `tech-spec-writer` →
+- **Stage 5 — Plan the work.** → `tech-spec-writer` → `ai-task-decomposer` →
   `phased-work-handoff-designer` → `change-classification-gate` →
   `human-approval-boundary`.
 - **Stage 6 — Build it, one slice at a time.** Hand each slice to

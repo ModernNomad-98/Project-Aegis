@@ -3,7 +3,8 @@
   "description": "Trigger discrimination for the Phase 1 operating-discipline pack, change-governance cluster: classification (route) vs approval (stop sign) vs diff discipline (edit hygiene).",
   "overlaps_with": [
     "human-approval-boundary",
-    "reviewable-diff-discipline"
+    "reviewable-diff-discipline",
+    "ai-task-decomposer"
   ],
   "cases": [
     {
@@ -41,6 +42,14 @@
         "human-approval-boundary"
       ],
       "reason": "Determining the approval path is the gate's job; the boundary fires only when a risky step is actually imminent."
+    },
+    {
+      "id": "split-broad-goal-goes-to-decomposer",
+      "prompt": "Adding team invitations is way too big for one PR. Before anyone starts, break it into small ordered tasks the agent can do one at a time.",
+      "expected_skill": "ai-task-decomposer",
+      "should_not_trigger": ["change-classification-gate"],
+      "note": "SEAM CASE (reciprocated yield, D69) — the goal must be split into PR-sized tasks before any one change is classified.",
+      "reason": "ai-task-decomposer plans ordered, PR-sized tasks from a goal too big for one change and edits nothing; change-classification-gate classifies each task as it starts."
     }
   ]
 }
