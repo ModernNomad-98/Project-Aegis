@@ -45,7 +45,7 @@ permissions:
 # (the checkout root) before PATH, so a root git.exe or python.exe added by a
 # pull request would run in place of the real tool when record-check.py
 # starts a command. NoDefaultCurrentDirectoryInExePath turns that search off;
-# gate-guard also protects root-level executables and scripts.
+# gate-guard also protects root-level executables, scripts and DLLs.
 env:
   NoDefaultCurrentDirectoryInExePath: '1'
   PYTHONDONTWRITEBYTECODE: '1'
@@ -364,8 +364,9 @@ jobs:
           # -m commands, so any root-level module, extension, .pth file or
           # package __init__ (tools.py, yaml.py, unittest.py, sitecustomize.py,
           # conftest.py, yaml/__init__.py, ...) is protected too, as is any
-          # root-level executable or script (git.exe, python.cmd, ...), which
-          # Windows would otherwise find in the working directory. Matching is
+          # root-level executable, script or DLL (git.exe, python.cmd,
+          # version.dll, ...), which Windows could otherwise find in the working
+          # directory. Matching is
           # case-insensitive because Windows and macOS checkouts fold case.
           # .claude/agents/ is protected because Claude Code honours `hooks`,
           # `mcpServers` and `permissionMode` in project agent files, so an
@@ -385,7 +386,7 @@ jobs:
           # copies, so every depth is protected, and the commands, hooks and
           # plugin directory entries match with or without a trailing slash
           # so a symlink standing in for the directory is protected too.
-          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|(.*/)?\.claude/((agents|commands|hooks)(/|$)|settings(\.local)?\.json$)|(.*/)?\.claude$|(.*/)?\.claude-plugin(/|$)|(.*/)?\.mcp\.json$|(.*/)?\.gitattributes$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth|exe|com|bat|cmd|ps1)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
+          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|(.*/)?\.claude/((agents|commands|hooks)(/|$)|settings(\.local)?\.json$)|(.*/)?\.claude$|(.*/)?\.claude-plugin(/|$)|(.*/)?\.mcp\.json$|(.*/)?\.gitattributes$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth|exe|com|bat|cmd|ps1|dll)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
           shopt -s nocasematch
           gate_files=()
           echo "Files changed in this PR:"

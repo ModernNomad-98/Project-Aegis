@@ -2,6 +2,7 @@
 """Regression checks for evidence exit codes and the actual protected-file guard."""
 from __future__ import annotations
 
+import copy
 import json
 import os
 import re
@@ -175,7 +176,7 @@ class ProtectedFileGuardTests(unittest.TestCase):
         # Windows CreateProcess can resolve `git` or `python` from the checkout
         # root, the recorder's working directory.
         for path in ("git.exe", "python.exe", "PWSH.EXE", "powershell.com", "git.bat",
-                     "python.cmd", "profile.ps1"):
+                     "python.cmd", "profile.ps1", "version.dll"):
             with self.subTest(path=path):
                 result = self.run_guard([path])
                 self.assertEqual(1, result.returncode, result.stdout + result.stderr)
@@ -394,46 +395,144 @@ class GateJobIsolationTests(unittest.TestCase):
             with self.subTest(job=job_name):
                 self.assertFalse(set(needs) & set(self.TOOLS_JOBS))
 
-    def test_gate_jobs_use_only_pinned_remote_actions(self):
-        # A local `uses: ./path` action would run checkout code in the gate.
-        for job_name in self.GATE_JOBS:
-            for step in self.workflow["jobs"][job_name]["steps"]:
-                if "uses" in step:
-                    with self.subTest(job=job_name, uses=step["uses"]):
-                        self.assertRegex(step["uses"], r"^[\w.-]+/[\w.-]+@[0-9a-f]{40}$")
-
-    # Variables that make an interpreter, shell or tool load code from a
-    # chosen location. None has a place in a gate job.
+    # Environment variables that make an interpreter, shell or tool load code
+    # or configuration from a chosen location. None belongs in a gate job.
     LOADER_VARIABLES = {
         "PATH", "PYTHONPATH", "PYTHONHOME", "PYTHONSTARTUP", "PYTHONUSERBASE",
         "PYTHONPLATLIBDIR", "PYTHONEXECUTABLE", "NODE_OPTIONS", "NODE_PATH",
-        "PSMODULEPATH", "GIT_EXEC_PATH", "GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM",
-        "BASH_ENV", "ENV", "LD_PRELOAD", "LD_LIBRARY_PATH",
+        "PSMODULEPATH", "BASH_ENV", "ENV", "LD_PRELOAD", "LD_LIBRARY_PATH",
+        "GIT_EXEC_PATH", "GIT_DIR", "GIT_WORK_TREE", "GIT_TEMPLATE_DIR",
     }
+    # Any GIT_CONFIG* variable (COUNT, KEY_n, VALUE_n, GLOBAL, SYSTEM,
+    # NOSYSTEM, PARAMETERS) can inject git configuration such as
+    # core.fsmonitor, which `git status` in the recorder would execute.
+    LOADER_VARIABLE_PREFIXES = ("GIT_CONFIG",)
+    GATE_SHELLS = {"bash", "pwsh", "powershell"}
 
-    def gate_settings(self):
-        """Yield (where, key, value) for every env and `with` value gate steps see."""
-        for key, value in self.workflow.get("env", {}).items():
-            yield "workflow env", key, value
+    def gate_violations(self, workflow):
+        """Return every gate-isolation violation in a parsed workflow.
+
+        Covers: action pins, step and job-default shells, job-default working
+        directories, loader or git-config variables, and env or `with` values
+        that climb (`..`) or name an unguarded path.
+        """
+        found = []
+
+        def check_value(where, value):
+            if "${{" in value:
+                return
+            if ".." in value:
+                found.append(f"{where}: value climbs with '..': {value!r}")
+            elif ("/" in value or "\\" in value) and not self.gate_pattern.search(
+                    value.replace("\\", "/")):
+                found.append(f"{where}: value names an unguarded path: {value!r}")
+
+        def check_env(where, env):
+            for key, value in (env or {}).items():
+                upper = key.upper()
+                if upper in self.LOADER_VARIABLES or upper.startswith(self.LOADER_VARIABLE_PREFIXES):
+                    found.append(f"{where}: loader variable {key}")
+                check_value(f"{where} {key}", value)
+
+        check_env("workflow env", workflow.get("env"))
         for job_name in self.GATE_JOBS:
-            job = self.workflow["jobs"][job_name]
-            for key, value in job.get("env", {}).items():
-                yield f"{job_name} env", key, value
+            job = workflow["jobs"][job_name]
+            check_env(f"{job_name} env", job.get("env"))
+            defaults = (job.get("defaults") or {}).get("run") or {}
+            if defaults.get("shell", "bash") not in self.GATE_SHELLS:
+                found.append(f"{job_name}: default shell {defaults['shell']!r}")
+            if "working-directory" in defaults:
+                found.append(
+                    f"{job_name}: default working-directory {defaults['working-directory']!r}")
             for step in job["steps"]:
                 where = f"{job_name}/{step.get('name', step.get('uses'))}"
-                for section in ("env", "with"):
-                    for key, value in step.get(section, {}).items():
-                        yield f"{where} {section}", key, value
+                if "uses" in step and not re.fullmatch(
+                        r"[\w.-]+/[\w.-]+@[0-9a-f]{40}", step["uses"]):
+                    found.append(f"{where}: action is local or not SHA-pinned: {step['uses']!r}")
+                if "shell" in step and step["shell"] not in self.GATE_SHELLS:
+                    found.append(f"{where}: custom shell {step['shell']!r}")
+                if ".." in step.get("working-directory", ""):
+                    found.append(f"{where}: working-directory climbs with '..'")
+                check_env(f"{where} env", step.get("env"))
+                for key, value in (step.get("with") or {}).items():
+                    check_value(f"{where} with {key}", value)
+        return found
 
-    def test_gate_environment_sets_no_loader_variable_or_unguarded_path(self):
-        settings = list(self.gate_settings())
-        self.assertGreaterEqual(len(settings), 10)
-        for where, key, value in settings:
-            with self.subTest(where=where, key=key):
-                if where.endswith("env"):
-                    self.assertNotIn(key.upper(), self.LOADER_VARIABLES)
-                if "${{" not in value and ("/" in value or "\\" in value):
-                    self.assertRegex(value.replace("\\", "/"), self.gate_pattern)
+    def mutated(self, change):
+        workflow = copy.deepcopy(self.workflow)
+        change(workflow)
+        return self.gate_violations(workflow)
+
+    def first_step(self, workflow, job_name="validate-skills", name="Run skill validator"):
+        return next(s for s in workflow["jobs"][job_name]["steps"] if s.get("name") == name)
+
+    def assert_mutation_caught(self, change, fragment):
+        violations = self.mutated(change)
+        self.assertTrue(any(fragment in v for v in violations), violations)
+
+    def test_current_workflow_has_no_gate_violations(self):
+        self.assertEqual([], self.gate_violations(self.workflow))
+
+    def test_mutation_local_or_unpinned_action_is_caught(self):
+        for uses in ("./tools/aegis_setup/action", "docker://alpine", "actions/checkout@v4"):
+            with self.subTest(uses=uses):
+                self.assert_mutation_caught(
+                    lambda w: w["jobs"]["validate-skills"]["steps"].append({"uses": uses}),
+                    "not SHA-pinned")
+
+    def test_mutation_custom_shell_is_caught(self):
+        for job_name in self.GATE_JOBS:
+            with self.subTest(job=job_name, where="step"):
+                self.assert_mutation_caught(
+                    lambda w: w["jobs"][job_name]["steps"][-1].__setitem__(
+                        "shell", "python tools/aegis_setup/evil.py {0}"),
+                    "custom shell")
+            with self.subTest(job=job_name, where="job default"):
+                self.assert_mutation_caught(
+                    lambda w: w["jobs"][job_name]["defaults"]["run"].__setitem__(
+                        "shell", "bash --rcfile tools/aegis_setup/rc -i {0}"),
+                    "default shell")
+            with self.subTest(job=job_name, where="job default directory"):
+                self.assert_mutation_caught(
+                    lambda w: w["jobs"][job_name]["defaults"]["run"].__setitem__(
+                        "working-directory", "tools"),
+                    "default working-directory")
+
+    def test_mutation_loader_and_git_config_variables_are_caught(self):
+        keys = ("PYTHONPATH", "Path", "GIT_CONFIG_COUNT", "GIT_CONFIG_KEY_0",
+                "GIT_CONFIG_VALUE_0", "GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM",
+                "GIT_CONFIG_NOSYSTEM", "GIT_CONFIG_PARAMETERS", "GIT_DIR",
+                "GIT_WORK_TREE", "GIT_TEMPLATE_DIR")
+        scopes = {
+            "workflow": lambda w: w.setdefault("env", {}),
+            "job": lambda w: w["jobs"]["windows-offline-checks"].setdefault("env", {}),
+            "step": lambda w: self.first_step(w).setdefault("env", {}),
+        }
+        for key in keys:
+            for scope, env_of in scopes.items():
+                with self.subTest(key=key, scope=scope):
+                    self.assert_mutation_caught(
+                        lambda w: env_of(w).__setitem__(key, "1"), f"loader variable {key}")
+
+    def test_mutation_climbing_or_unguarded_value_is_caught(self):
+        cases = (
+            ("env", "HOOK", "scripts/../tools/aegis_setup/evil.sh", "climbs"),
+            ("with", "path", "scripts/../tools", "climbs"),
+            ("env", "HOOK", "tools/aegis_setup/evil.sh", "unguarded path"),
+            ("with", "path", "tools\\aegis_setup", "unguarded path"),
+        )
+        for section, key, value, fragment in cases:
+            with self.subTest(section=section, value=value):
+                self.assert_mutation_caught(
+                    lambda w: self.first_step(w).setdefault(section, {}).__setitem__(key, value),
+                    fragment)
+
+    def test_gate_pattern_protects_root_dll(self):
+        # Belt and braces: the exe-search variable governs programs, not DLLs.
+        for path in ("version.dll", "Git.DLL"):
+            with self.subTest(path=path):
+                self.assertRegex(path, self.gate_pattern)
+        self.assertNotRegex("tools/aegis_setup/helper.dll", self.gate_pattern)
 
     def test_workflow_disables_windows_current_directory_executable_search(self):
         self.assertEqual("1", self.workflow["env"]["NoDefaultCurrentDirectoryInExePath"])

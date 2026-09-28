@@ -60,9 +60,24 @@ CI self-tests fail when a gate job does any of these:
 
 - runs Node or a tools suite;
 - names a repository path outside the `gate-guard` pattern in a command,
-  `working-directory`, `-m` module, `-r` file, `env` value or action input;
-- uses a local or unpinned action;
-- sets a variable that redirects code loading, such as `PYTHONPATH` or `PATH`.
+  `working-directory`, `-m` module, `-r` file, `env` value or action input, or
+  puts `..` in an `env` value or action input;
+- uses a local, Docker or tag-pinned action instead of one pinned to a commit
+  SHA;
+- runs a step, or sets a job default, with a shell other than `bash`, `pwsh`
+  or `powershell`, or sets a job-default `working-directory`;
+- sets, in the workflow, job or step `env`, one of the listed variables that
+  point a tool at other code or configuration:
+  - interpreter and loader paths: `PATH`, `PYTHONPATH`, `PYTHONHOME`,
+    `PYTHONSTARTUP`, `PYTHONUSERBASE`, `PYTHONPLATLIBDIR`, `PYTHONEXECUTABLE`,
+    `NODE_OPTIONS`, `NODE_PATH`, `PSMODULEPATH`, `BASH_ENV`, `ENV`,
+    `LD_PRELOAD` and `LD_LIBRARY_PATH`;
+  - Git: `GIT_EXEC_PATH`, `GIT_DIR`, `GIT_WORK_TREE`, `GIT_TEMPLATE_DIR` and
+    every `GIT_CONFIG*` variable. These can inject configuration such as
+    `core.fsmonitor`, which the recorder's `git status` would run.
+
+  Names are matched case-insensitively. Other variables are not denied by
+  name, but their values are still checked as paths.
 
 The tests read the workflow text. They cannot see what a protected script does
 internally; `gate-guard` covers that by requiring review of every protected
@@ -71,8 +86,8 @@ change.
 On Windows, `CreateProcess` looks for a program such as `git` or `python` in
 the current directory before `PATH`. The recorder runs from the checkout root,
 so the workflow sets `NoDefaultCurrentDirectoryInExePath=1` to turn that search
-off, and `gate-guard` also protects root-level `.exe`, `.com`, `.bat`, `.cmd`
-and `.ps1` files. A Windows-only self-test proves that a root `git.exe` runs
+off, and `gate-guard` also protects root-level `.exe`, `.com`, `.bat`, `.cmd`,
+`.ps1` and `.dll` files. A Windows-only self-test proves that a root `git.exe` runs
 without the variable and does not run with it.
 
 Whether the tools jobs become required status checks is a separate
@@ -161,7 +176,7 @@ its parent import paths `tools.py` and `tools/__init__.py`, and both root requir
 files. Changes to these paths require explicit review and deliberate merge.
 The guard also protects all of `scripts/`, every root-level Python module,
 extension, `.pth` file or package `__init__`, and every root-level `.exe`, `.com`,
-`.bat`, `.cmd` or `.ps1` file, matched case-insensitively. Those
+`.bat`, `.cmd`, `.ps1` or `.dll` file, matched case-insensitively. Those
 are the directories Python puts first on the import path when the workflow runs
 `python scripts/<name>.py` or `python -m <module>`, so a new file there could
 shadow the standard library or PyYAML and turn a failing check green. Every
