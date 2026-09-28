@@ -6,6 +6,11 @@ disable-model-invocation: true
 
 # Playwright E2E Engineer
 
+**Reading key:** E2E means end-to-end; UI means user interface; API means
+application programming interface; CI means continuous integration; PR means
+pull request; CSS means Cascading Style Sheets. This manual-only skill writes
+spec files and drives a browser.
+
 ## Purpose
 
 Implement the small, stable set of browser tests that prove business-critical
@@ -25,15 +30,15 @@ failure artifacts wiring, and the real run output.
 - Use when: a test plan hands over its E2E items (each with a named reason a
   cheaper layer was insufficient).
 - Do NOT use when: the behavior needs no browser — `integration-test-designer`
-  (real boundaries) or `vitest-unit-component-engineer` (isolated).
+  (real boundaries) or `vitest-unit-component-engineer` *(manual-only)* (isolated).
 - Do NOT use when: the ask is a one-off interactive walkthrough with
-  observations — `clickthrough-test-engineer`; this skill builds the
+  observations — `clickthrough-test-engineer` *(manual-only)*; this skill builds the
   PERMANENT scripted suite.
 - Do NOT use when: the ask is keyboard/contrast/screen-reader verification —
   `accessibility-test-harness` (it may inject axe into E2E, but owns that
   design).
 - Do NOT use when: diagnosing why an existing test flakes —
-  `flaky-test-detective` first; this skill implements the proven fix.
+  `flaky-test-detective` *(manual-only)* first; this skill implements the proven fix.
 
 ## Inputs to Inspect
 
@@ -49,13 +54,13 @@ failure artifacts wiring, and the real run output.
 5. The UI's accessibility surface: are there roles/labels to locate by?
    (Locator quality depends on it; gaps also feed `accessibility-test-harness`.)
 6. Installed Playwright version (lockfile) — API and best-practice drift is
-   real; compose `docs-first-implementer` when uncertain.
+   real; compose `docs-first-implementer` *(manual-only)* when uncertain.
 
 ## Workflow
 
 1. **Confirm the journey list is small and critical.** Each spec = one
    user-meaningful journey with a named risk. Reject UI-tree crawling —
-   route breadth to `clickthrough-test-engineer` or component layers.
+   route breadth to `clickthrough-test-engineer` *(manual-only)* or component layers.
    If scope needs an owner decision, explain a critical-journey smoke tier
    (few full-browser paths on each PR) versus a broader nightly tier (more
    paths off the PR gate). The smoke tier gives fast deployment evidence but
@@ -86,7 +91,7 @@ failure artifacts wiring, and the real run output.
    release evidence).
 7. **Run the suite and report honestly:** exact command, per-spec results,
    runtime, retry count (a pass-on-retry is reported as such and routed to
-   `flaky-test-detective`, not celebrated).
+   `flaky-test-detective` *(manual-only)*, not celebrated).
 8. **Place in CI** per the automation blueprint: required critical-journey
    smoke runs on the pull request before merge when it is a deployment gate.
    On auto-deploy-on-merge platforms, post-merge smoke is verification of
@@ -152,7 +157,7 @@ Handoffs: <flakes → flaky-test-detective; semantics gaps → accessibility-tes
 - Required test hooks (API seeding, test-only routes) don't exist and would
   require product changes → surface as a separate classified change.
 - A journey fails against the real app (product bug, not spec bug) → report
-  the failure with trace; the fix is `systematic-debugger`/product work, not
+  the failure with trace; the fix is `systematic-debugger` *(manual-only)*/product work, not
   spec weakening.
 
 ## Supporting Files

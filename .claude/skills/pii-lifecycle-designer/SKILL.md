@@ -8,7 +8,12 @@ description: Design the end-to-end lifecycle for personal data across the WHOLE 
 Reading key: personally identifiable information (PII) is data that can
 identify a person; a data subject request (DSR) asks for access or erasure;
 time to live (TTL) is an expiry period; and service-level agreement (SLA)
-names a tracked completion target. Pseudonymized matching tokens can still
+names a tracked completion target. A customer relationship management (CRM)
+system stores customer contacts; a large language model (LLM) is the model
+behind an artificial intelligence (AI) feature; an application programming
+interface (API) is a software call boundary; JavaScript Object Notation
+(JSON) is a structured data format; machine learning (ML) features are
+model inputs derived from data. Pseudonymized matching tokens can still
 be personal data.
 
 ## Purpose

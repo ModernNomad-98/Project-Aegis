@@ -5,6 +5,10 @@ description: Turn pricing plans into enforceable entitlements — map plan × fe
 
 # Plan Entitlement Architect
 
+**Reading key:** UI means user interface; API means application programming
+interface; AI means artificial intelligence; GB means gigabyte. Dunning is
+the reminder-and-retry process that follows a failed payment.
+
 ## Purpose
 
 Produce an entitlement system where "what does this tenant get" has exactly
@@ -183,7 +187,7 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
   overage pricing) → present options with consequences; do not invent
   pricing policy.
 - Asked to implement billing-provider integration in the same pass →
-  separate, scoped task (`docs-first-implementer` against the provider's
+  separate, scoped task (`docs-first-implementer` *(manual-only)* against the provider's
   current API docs).
 
 ## Supporting Files

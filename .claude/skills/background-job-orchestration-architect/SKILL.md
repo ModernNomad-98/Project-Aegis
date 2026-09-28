@@ -129,7 +129,7 @@ transport belongs to `streaming-event-architect`.
    (statelessness/drain review composes `horizontal-scalability-reviewer`).
 7. **Wire observability.** Backlog depth, job age, retry rate, DLQ size, and
    per-tenant queue depth as first-class signals with alert thresholds and
-   owners (wiring handed to `observability-operator`). Note that CAPACITY
+   owners (wiring handed to `observability-operator` *(manual-only)*). Note that CAPACITY
    validation — does this survive peak load — is measured by
    `performance-test-harness` / `load-test-planner`, not asserted here.
 8. **Deliver** the job catalog, execution contract, and fairness/scaling
@@ -149,7 +149,7 @@ Fairness choice: <compared mechanisms; recommended combination and why;
   remaining limit>
 Owner decision question: <one plain-language question after trade-offs if the
   owner must choose a fairness policy | none if no choice is needed>
-Scheduling:     <scheduler; overlap prevention; missed-run policy; tz/DST> | n/a
+Scheduling:     <scheduler; overlap prevention; missed-run policy; timezone/DST> | n/a
 Worker scaling: <pool sizing; scale-on-backlog; graceful drain → finish-or-redeliver>
   (drain/statelessness review → horizontal-scalability-reviewer)
 Observability:  <backlog depth, job age, retry rate, DLQ size, per-tenant depth
@@ -177,7 +177,7 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - [ ] If the owner must choose a fairness policy, present trade-offs and a
       recommendation before one plain-language decision question; otherwise
       ask none.
-- [ ] Scheduled jobs have overlap prevention, a missed-run policy, and tz/DST
+- [ ] Scheduled jobs have overlap prevention, a missed-run policy, and timezone/DST
       correctness — and the same idempotency/retry contract as ad-hoc jobs.
 - [ ] Workers drain gracefully: in-flight work finishes or is safely
       redelivered on deploy/scale-in.
@@ -191,7 +191,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   a design.
 - A visibility timeout shorter than the job's real runtime double-runs every
   slow job — the queue redelivers it while the first worker is still going.
-- Retrying a poison job (bad input, permanent 4xx) forever burns workers and
+- Retrying a poison job (bad input, a permanent 4xx client-error response)
+  forever burns workers and
   looks like a load problem; classify poison and DLQ it fast.
 - A DLQ nobody drains is a silent data-loss queue; ownership and an alert are
   what make it a safety net rather than a grave.

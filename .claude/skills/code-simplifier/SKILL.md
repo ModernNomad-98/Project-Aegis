@@ -31,8 +31,8 @@ not this skill.
 - Do NOT use when: the simplification would move module boundaries or change
   public contracts — that is architecture work (`architecture-designer`)
   with its own approval path.
-- Do NOT use when: behavior is wrong — fix bugs first (`systematic-debugger`
-  / `tdd-engineer`); simplifying broken code preserves the bug more legibly.
+- Do NOT use when: behavior is wrong — fix bugs first (`systematic-debugger` *(manual-only)*
+  / `tdd-engineer` *(manual-only)*); simplifying broken code preserves the bug more legibly.
 - This skill is **manual-only** (`disable-model-invocation: true`): it edits
   working code, so the human names the target and pulls the trigger — it
   never fires opportunistically mid-task.
