@@ -818,13 +818,13 @@ under `.claude/skills/`.
     `architecture-advisor`, `data-migration-runbook-author`,
     `data-partitioning-sharding-strategist` and `prioritization-frame-picker`
     (batch 8); and `accessibility-test-harness/references/a11y-checklists.md`
-    (batch 9). The verdicts are in the reviewers' batch verdict records, which
-    are working files, not PR comments. Seven are also named as accepted on
-    GitHub: `architecture-designer` in #466's description, and the batch 4, 5,
-    6 and 9 pages in the corrected-candidate comments on #467, #474, #472 and
-    #468. #469's description says only that its "six ACCEPT pages" were left
-    untouched, and no PR names the governance template, so for those seven the
-    only named record is the working file.
+    (batch 9). The full verdicts are in the reviewers' batch verdict records,
+    which are working files, not PR comments. All 14 are also named as
+    accepted on GitHub: `architecture-designer` in #466's description; the
+    batch 4, 5, 6 and 9 pages in the corrected-candidate comments on #467,
+    #474, #472 and #468; and, in comments posted after #474 merged, the six
+    batch 8 pages on #469 and the governance template on #470, each read on
+    `072a1b0`.
 - **Still pending (1 of the 103).** The
   [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
   (148 lines since its last full-page acceptance). Its batch 4 re-read
@@ -847,9 +847,9 @@ under `.claude/skills/`.
     and its `references/memory-rules.md` (8), and
     `adr-writer/assets/adr-template.md` (7: 2 in #236 and 5 in #455).
   - **Newly pending (1 page).** `adr-writer/SKILL.md` has 13 changed lines
-    since its acceptance in the batch after #236 (`39361ba`): 2 in #396, 3 in
-    #417 and 8 in #455. #455's reviewer counted 8 against main, but this
-    ledger adds the edits since the last full-page acceptance, so the page is
+    since its acceptance in the full-page batch after #234, merged as #236
+    (`39361ba`): 2 in #396, 3 in #417 and 8 in #455. #455's reviewer counted 8
+    against main, but this ledger adds the edits since the last full-page acceptance, so the page is
     past 10 and **pending**.
 - **Other pages.**
   - The [approval register](../approvals/APPROVAL_REGISTER.md) stays
@@ -1337,7 +1337,7 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
-| Pre-rule sweep batch fixes, PRs #466 to #474, after #465, 2026-09-28 | 83 changed pages in nine batches, 14 accepted with no edit, and the [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md) | The owner-ordered sweep returned 103 of 558 accepted pages to pending on `5bd21fb`. Corrected-candidate reviewers **accepted** every changed page on its merged head: #466 `dac42f3`, #471 `67f577e`, #473 `8c6750a`, #467 `eb3ec53`, #474 `14ecd0c`, #472 `6ba6e1a`, #470 `2a86058`, #469 `61ca130` and #468 `54034fa`. 14 pages passed the first full-page read with no edit; seven of those verdicts are named only in the reviewers' working files. The guide's six edits were held back for a protected-path exception, so it stays **pending**. With #456, #459 and #462, 102 of the 103 are accepted again. Main after #474 (`2be0a77`) has 613: 565 accepted readers, one generated report, 44 classified fixtures and three known pending. No grant or gate changed. |
+| Pre-rule sweep batch fixes, PRs #466 to #474, after #465, 2026-09-28 | 83 changed pages in nine batches, 14 accepted with no edit, and the [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md) | The owner-ordered sweep returned 103 of 558 accepted pages to pending on `5bd21fb`. Corrected-candidate reviewers **accepted** every changed page on its merged head: #466 `dac42f3`, #471 `67f577e`, #473 `8c6750a`, #467 `eb3ec53`, #474 `14ecd0c`, #472 `6ba6e1a`, #470 `2a86058`, #469 `61ca130` and #468 `54034fa`. 14 pages passed the first full-page read with no edit; all 14 are named as accepted on GitHub, seven of them in comments posted on #469 and #470 after #474 merged. The guide's six edits were held back for a protected-path exception, so it stays **pending**. With #456, #459 and #462, 102 of the 103 are accepted again. Main after #474 (`2be0a77`) has 613: 565 accepted readers, one generated report, 44 classified fixtures and three known pending. No grant or gate changed. |
 | Register APR-074 to APR-076, PR #465, after #457, 2026-09-28 | [Approval register](../approvals/APPROVAL_REGISTER.md) | 78 lines appended; SHIP on `ab430ad` after one REVISE edit. It checked facts and format, not the whole page, so the register stays **pending** with 78 since `e6d0f6a`. |
 | Forecast and measurement checkpoint, PR #457, after #460, 2026-09-28 | [Backlog forecast](aegis-backlog-forecast.md) and [execution measurements](aegis-execution-metrics.md) | 238 and 285 lines. A full-page review on `86d891e` returned FIX-FIRST (F1 to F7, M1 to M3); a corrected-candidate check **accepted** both on `676bc3d`, which matches main. |
 | Later owner decisions, PR #460, after #464, 2026-09-28 | [Open-decisions index](aegis-open-decisions-2026-09-23.md) | 27 lines. A full-page re-read on `36be74b` returned FIX-FIRST; after targeted checks of two fix commits, a one-line check **accepted** it on `08f99eb`, which matches main. |
