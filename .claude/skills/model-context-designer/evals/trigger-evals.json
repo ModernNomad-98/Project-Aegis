@@ -62,8 +62,8 @@
       "id": "prompt-contract-wins-here",
       "prompt": "Write a prompt contract for our summarizer: the instruction's version and owner, its declared inputs, a pointer to its output schema, when it must decline, and which prompt edits need an evaluation rerun.",
       "expected_skill": "model-context-designer",
-      "should_not_trigger": ["structured-output-validator", "ai-evaluation-harness", "agent-harness-architect"],
-      "note": "SEAM CASE (D70 extension) — the prompt contract record ties the parts together and points to their owners. The output schema is only referenced, no evaluation is run, and no agent harness is being wired.",
+      "should_not_trigger": ["structured-output-validator", "ai-evaluation-harness", "agent-harness-architect", "prompt-injection-defender"],
+      "note": "SEAM CASE (D70 extension) — the prompt contract record ties the parts together and points to their owners. The output schema is only referenced, no evaluation is run, no agent harness is being wired, and no injection defense is asked for.",
       "reason": "Writing the versioned, owned prompt contract with declared inputs, decline conditions and a change policy is model-context-designer. structured-output-validator owns the schema it points to; ai-evaluation-harness runs the reruns it calls for."
     },
     {
