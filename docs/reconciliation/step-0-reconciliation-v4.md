@@ -3223,6 +3223,148 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     skills. Catalog rows, README counts, eval files and the D10 table rows
     for #190 and #227 land with the build pull requests.
 
+- **D69 (2026-09-28) — Approved the AI-assisted software development
+  lifecycle (AI-SDLC) build batch: one new skill, two extensions and one
+  drop (189 → 190 when delivered).**
+  - **Why.** The owner, Peter Nguyen, decided on 2026-09-28 in chat with the
+    Claude Code coordinator, answering "Build it as recommended
+    (Recommended)" to the
+    [AI-SDLC skill batch proposal](../roadmaps/ai-sdlc-skill-batch-proposal.md)
+    (PR #494, merged as `4ee2115`). AI-SDLC is how people and artificial
+    intelligence (AI) agents plan, build, check, review, merge and close
+    software work together. The decision settles the five remaining
+    category 08 candidates (#266, #267, #273, #277 and #278).
+  - **What.**
+    - **Build `ai-task-decomposer`** (#266), auto-invocable: the assistant
+      may choose it without a person naming it, because it only reads and
+      plans. It splits a broad goal or approved spec into ordered tasks that
+      each fit one pull request, with one intent, an observable done
+      criterion, risks and any approval boundary; it starts no work and
+      edits nothing. `change-classification-gate`'s description gains a
+      reciprocal exclusion naming the new skill.
+    - **Wire it into the stage maps.** Add `ai-task-decomposer` to the
+      "Plan / approve" row of the `ai-sdlc-operating-model` stage-gate map
+      and to `project-orchestrator` Stage 5 ("Plan the work"), between
+      `tech-spec-writer` and `phased-work-handoff-designer`. These are body
+      edits; neither skill's description changes.
+    - **Extend `ai-closeout-reporter`** (#267 + #273) with a
+      per-deliverable trace: one row per requested item naming the files
+      that serve it, the check that proves it and the evidence, with each
+      evidence item tied to its commit SHA or CI run. The skill stays
+      auto-invocable.
+    - **Extend `code-reviewer`** (#277) with a weakened-validation check
+      (tests deleted, skipped or loosened to make a change pass) and a check
+      for drift from recorded architecture decisions, both at least MAJOR.
+      The skill stays auto-invocable.
+    - **Drop #278** (AI Pair Engineering Protocol):
+      `ai-sdlc-operating-model` and the skills its stage-gate map names
+      already cover each step.
+    - **Census.** A one-way ROUTE-002 finding is a contract-audit note that
+      a skill's description excludes a neighbor ("Do NOT use for …
+      (neighbor)") whose own description does not name it back. The four
+      predicted findings, from `ai-task-decomposer` toward
+      `tech-spec-writer`, `lane-authoring-guide`,
+      `phased-work-handoff-designer` and
+      `roadmap-to-commitments-translator`, stay census data: recorded in the
+      audit, not fixed. The reason is description room, not D64's reason
+      that hub skills cannot name every skill pointing at them: those four
+      descriptions have only 8 to 49 characters left under the
+      1,024-character limit. The findings are predicted from the draft
+      description, not measured; the build pull request compares the
+      contract audit before and after.
+  - **Authority.** This decision authorizes exactly this batch. Its delivery
+    relies on the standing delivery approval
+    [AEGIS-APR-039](../approvals/APPROVAL_REGISTER.md#aegis-apr-039-reaffirmation-of-ongoing-backlog-delivery-approval)
+    and the standing merge conditions
+    [AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green),
+    [AEGIS-APR-049](../approvals/APPROVAL_REGISTER.md#aegis-apr-049-exact-head-ci-satisfies-the-local-test-condition)
+    and
+    [AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review),
+    and nothing more. It does not waive `gate-guard`, authorize a change to
+    `scripts/audit-skill-contracts.py` or its frozen baseline, or permit any
+    environment write, provider call or deployment. Changing the set, for
+    example building all five candidates as separate skills, needs a new
+    owner decision.
+  - **Status at recording.** Nothing is built. `main` at `76b399b` has 187
+    skills: D68's `acceptance-criteria-reviewer` has landed, and its other
+    two skills are in open PRs #500 and #502. Once those land the library
+    has 189 skills, and this batch makes it 190. Catalog rows, README
+    counts, eval files and the catalog note recording #278 as covered land
+    with the build pull requests.
+
+- **D70 (2026-09-28) — Approved the Phase 7 artificial intelligence (AI)
+  engineering build batch: one new skill, two extensions, one candidate
+  folded into the new skill and one drop (one more skill when delivered).**
+  - **Why.** The owner, Peter Nguyen, decided on 2026-09-28 in chat with the
+    Claude Code coordinator, answering "Build it as recommended
+    (Recommended)" to the
+    [Phase 7 AI engineering skill batch proposal](../roadmaps/phase7-ai-engineering-skill-batch-proposal.md)
+    (PR #495, merged as `e77403c`). It settles the five Phase 7 expansion
+    candidates (#282, #283, #285 with #286, #287 and #299).
+  - **Numbering.** The
+    [Phase 6 reliability batch proposal](../roadmaps/phase6-reliability-skill-batch-proposal.md)
+    (PR #496) provisionally claimed D70. Decision numbers follow the order
+    in which the owner makes decisions, so this Phase 7 decision, made
+    first, takes D70. The Phase 6 batch takes the next free number when the
+    owner decides it.
+  - **What.**
+    - **Build `ai-human-in-the-loop-designer`** (#285, with #286),
+      auto-invocable (the assistant may choose it without a person naming
+      it) and design-only. It designs how an AI feature's output becomes
+      product state, by default advisory-only (the AI proposes and a person
+      commits), with a review workflow: a pending proposal, a reviewer queue
+      showing the exact change, approve, edit, reject and expiry, no
+      self-approval, commit through the normal write path, and an audit
+      record. #287 is folded in as its first step: each AI action is sorted
+      into automatic, confirm or forbidden by risk tier.
+      `human-approval-boundary`, `agent-tool-safety-guard` and
+      `ai-governance-risk-reviewer` gain reciprocal exclusions naming it.
+    - **Extend `ai-router-architect`** (#282) with per-provider adapters, a
+      capability matrix that routing and fallback must consult, and adapter
+      conformance tests. To fit the 1,024-character limit, two description
+      sentences move into the body, which already says both: the one naming
+      `secrets-identity-hardener` and `observability-operator` as composed
+      skills, and the one explaining why the skill is manual-only. The
+      router stays manual-only (a person must name it).
+    - **Extend `model-context-designer`** (#283) with a versioned
+      prompt-contract record for each model call: the instruction's version
+      and owner, declared inputs, a pointer to the output contract, when the
+      model must decline, and which prompt changes need an evaluation rerun.
+      Its description adds `agent-harness-architect` to its "Distinct from"
+      list, which clears an existing one-way ROUTE-002 finding. It stays
+      auto-invocable.
+    - **Drop #299** (AI feature kill switch): already covered by
+      `ai-router-architect`'s kill-switch step, with
+      `ai-cost-guardrail-designer`, `agent-containment-reviewer` and the
+      feature-flag pair.
+    - **Census.** The two predicted one-way ROUTE-002 findings (defined in
+      D69), from `ai-human-in-the-loop-designer` toward
+      `human-agent-trust-reviewer` and `agent-authorization-matrix`, stay
+      census data: recorded in the contract audit, not fixed.
+      `human-agent-trust-reviewer`'s description has no room (1,018 of
+      1,024 characters), and `agent-authorization-matrix` is a manual-only
+      governance skill that other governance work depends on. They are
+      predicted from the draft description, not measured; the build pull
+      request compares the contract audit before and after.
+  - **Authority.** This decision authorizes exactly this batch. Its delivery
+    relies on the standing delivery approval
+    [AEGIS-APR-039](../approvals/APPROVAL_REGISTER.md#aegis-apr-039-reaffirmation-of-ongoing-backlog-delivery-approval)
+    and the standing merge conditions
+    [AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green),
+    [AEGIS-APR-049](../approvals/APPROVAL_REGISTER.md#aegis-apr-049-exact-head-ci-satisfies-the-local-test-condition)
+    and
+    [AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review),
+    and nothing more. It does not waive `gate-guard`, authorize a change to
+    `scripts/audit-skill-contracts.py` or its frozen baseline, or permit any
+    environment write, provider call or deployment. Changing the set, for
+    example building all five candidates as separate skills or making
+    `ai-router-architect` auto-invocable, needs a new owner decision.
+  - **Status at recording.** Nothing is built; `main` at `76b399b` has 187
+    skills. The batch adds one skill: 190 → 191 if the D68 and D69 builds
+    land first. Catalog rows, README counts, eval files and the Phase 7
+    backlog note recording #287 and #299 as covered land with the build
+    pull requests.
+
 ## 6. Post-merge corrections
 
 - **2026-09-27 — D65 amendment: open gaps closed.** All four gaps D65
