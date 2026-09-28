@@ -6,7 +6,8 @@ disable-model-invocation: true
 
 # Agent Authorization Matrix
 
-**Reading key:** A pull request (PR) proposes a repository change;
+**Reading key:** AI means artificial intelligence. A pull request (PR) proposes
+a repository change;
 continuous integration (CI) runs automated checks; a command-line interface
 (CLI) is a terminal tool. This skill writes an authority policy and is
 manual-only; it does not grant permission to merge or deploy.
@@ -170,4 +171,7 @@ Status:     AWAITING APPROVAL | APPLIED (approved by <human>, <date>)
 - `evals/evals.json` — behavior cases, including the auto-merge incident
   (positive: open PR and stop; negative: never merge on own authority).
 - `evals/trigger-evals.json` — discrimination against `human-approval-boundary`,
-  `authorization-matrix-designer`, and the Phase 1.5 siblings.
+  `authorization-matrix-designer`, and the neighboring agent-governance skills
+  `ai-sdlc-operating-model`, `agent-governance-audit`,
+  `standing-approval-and-auto-advance` and
+  `human-agent-trust-reviewer`.

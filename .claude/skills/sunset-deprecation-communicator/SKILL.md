@@ -13,7 +13,7 @@ follow their own applicable authorization.
 
 Killing a feature is easy; killing it without burning the users who
 depend on it is the actual work. The failure modes are familiar: a
-silent removal that greets integrators with a 404 on Monday morning, a
+silent removal that greets integrators with a 404 (not found) error on Monday morning, a
 "deprecated" banner nobody reads followed by a sunset with no migration
 path, or a public API version pulled on a date that was mentioned once in
 a changelog. This skill plans the humane sunset: the rationale users will

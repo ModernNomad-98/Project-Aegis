@@ -75,7 +75,7 @@ work; it presents and integrates them into a reviewable design.
    decisions get recorded as ADRs (`adr-writer`) and cited, not re-argued
    inline.
 4. **Design the cross-cutting concerns.** Security and privacy
-   (authz, data handling, PII), performance (budgets, hot paths),
+   (authorization, data handling, PII), performance (budgets, hot paths),
    observability (what's logged/metered), migration and rollout
    (staged? reversible?), and testing strategy. These are where specs
    earn their keep — the concerns that bite in production if unplanned.

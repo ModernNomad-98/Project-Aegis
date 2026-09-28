@@ -21,6 +21,23 @@ boundary; `F` identifies a finding-specific negative acceptance family. The
 delivery and required evidence were recorded; `BLOCKED` means entry conditions
 or authority are absent. Neither status grants the next package automatically.
 
+Other shorthand in the dated checkpoints: `CP-D01`–`CP-D10` are the design's
+numbered decisions ([design section 3](../design/resumable-control-plane-v1.md#3-names-alternatives-and-decision-register));
+Role A is the Project Aegis source-library workspace role defined in
+[AGENTS.md](../../AGENTS.md); `R-STOP-01` to `R-STOP-03` are the three stop-review
+findings listed in section 5.3, in list order; and a `YES/YES/YES` row status
+means implemented, tested and independently accepted, while `UNVERIFIED` in a
+position means that part is not yet established. In budget accounting, R is the
+reserved amount, A the authoritative actual usage and W the declared worst-case
+liability ([design section 5.4](../design/resumable-control-plane-v1.md#54-durable-budget-settlement)).
+Technical abbreviations: API (application programming interface), CLI
+(command-line interface), QA (quality assurance), OS (operating system), POSIX
+(Portable Operating System Interface, the Unix-style system standard), ACL
+(access control list), MAC (message authentication code), UTC (Coordinated
+Universal Time), URI (uniform resource identifier), JSON (JavaScript Object
+Notation), SHA (a Git commit hash) and WAL/SHM (SQLite write-ahead-log and
+shared-memory sidecar files).
+
 **Current status, 2026-09-25:** the repository contains an offline, synthetic
 state and recovery kernel and an offline negative capability proof. Merged
 [PR #294](https://github.com/ModernNomad-98/Project-Aegis/pull/294) repaired two
@@ -1372,7 +1389,7 @@ because it executes a route. Prior independent implementation reviews for each
 promoted tranche ended `APPROVE` with no remaining BLOCKER or MAJOR finding.
 
 The resulting inventory has implementation surfaces for 28/28 transitions,
-9/9 crash boundaries and 22/22 acceptance-family rows. Stage 24 below raises
+9/9 crash boundaries and 22/22 acceptance-family rows. Section 5.30 below raises
 verifying and independently accepted transition coverage to 27/28; acceptance-
 family coverage remains 18/22. The next ordered gaps are T25/F19 before/after-
 handoff and contradiction matrices, F02 proof-bound disposition coverage, F03
@@ -1559,7 +1576,7 @@ The final exact-head architecture, security and QA reviews accepted the accumula
 offline kernel after the F16 denial-event and T09 recovery corrections. Windows and
 pinned Linux each passed the complete 543-test control-plane suite; Linux had three
 expected platform skips. BER's 987-test offline suite (14 expected skips), the
-skill validator, contract-audit self-tests, BER self-check, and Scenario A Desktop
+skill validator, contract-audit self-tests, BER self-check, and [Scenario A](../acceptance/scenario-a-runbook.md) Desktop
 acceptance were green locally. The DCO-signed head
 `8dfe237280f8837c6254e456767e405d44fbd148` passed `gate-guard`,
 `validate-skills`, and `windows-offline-checks` in hosted run `35846882128`.
