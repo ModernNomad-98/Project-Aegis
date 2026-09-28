@@ -4,7 +4,8 @@ Use all eight headings in this order. Replace the guidance and angle-bracket
 placeholders with the report's actual content; do not copy those instructions
 into the final report. Every section appears in every report. If nothing was
 intentionally omitted, write exactly "None." in section 2. Section 2 is never
-optional. **PR** means pull request; **CI** means continuous integration.
+optional. **PR** means pull request; **CI** means continuous integration;
+**URL** means web address; **SHA** (Secure Hash Algorithm) is a commit's unique ID.
 
 ---
 

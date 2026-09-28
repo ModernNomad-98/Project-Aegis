@@ -16,12 +16,12 @@ visible, never discovered later by surprise.
 ## Use When
 
 - Use when: finishing a task or a phase of work.
-- Use when: handing work off, opening a PR for review, or closing one out.
+- Use when: handing work off, opening a pull request (PR) for review, or closing one out.
 - Use when: asked "what did you actually do?" about completed work.
 - Do NOT use when: giving a mid-task progress update — that is a lighter status
   note; closeout is terminal.
 - Do NOT use when: shaping a commit or staged diff — that is
-  `reviewable-diff-discipline` (its parked items feed this report).
+  `reviewable-diff-discipline` *(manual-only)* (its parked items feed this report).
 - Do NOT use when: verifying a closeout's claims (`agent-governance-audit`),
   designing a cross-stage handoff (`phased-work-handoff-designer`), writing a
   lane's pre-work guide (`lane-authoring-guide`), or reconciling chat-only
@@ -58,7 +58,7 @@ visible, never discovered later by surprise.
      (what must be refused or fail, and whether it did).
    - Decompose skips: every skipped check or skipped-test count broken down
      by reason, never a bare total.
-   - When a local preflight ran (`local-ci-mirror-preflight`), include its
+   - When a local preflight ran (`local-ci-mirror-preflight`, manual-only), include its
      evidence block in section 4 as recorded, not paraphrased.
 6. State risks and known gaps. Write an unqualified "complete" / "verified
    complete" only after every recorded gap is closed; otherwise qualify the
