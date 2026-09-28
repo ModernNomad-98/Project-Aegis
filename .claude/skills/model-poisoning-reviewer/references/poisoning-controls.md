@@ -36,15 +36,17 @@ The high rows are the primary poisoning surface; controls scale with risk.
   shipping (aggregate accuracy won't).
 
 ### Feedback loops (RLHF / thumbs / corrections)
-- Sybil/coordinated signaling: a group mass-upvotes bad answers or submits
-  coordinated "corrections" to steer the next update (e.g. promote a scam URL).
+- Sybil (many fake identities) or coordinated signaling: a group mass-upvotes
+  bad answers or submits coordinated "corrections" to steer the next update
+  (e.g. promote a scam web address, or URL (uniform resource locator)).
 - Controls: identity + rate limits on feedback; anomaly detection on feedback
   distributions; HUMAN REVIEW before feedback becomes training data; never
   auto-train on raw open feedback.
 
 ### Ingestion → retrieval-as-truth
 - Poisoned document: attacker plants content engineered to rank for a target
-  query, steering answers (integrity) — separate from retrieval authz.
+  query, steering answers (integrity) — separate from retrieval
+  authorization.
 - Injection payload in a document: hand the "content acts as instructions"
   half to `prompt-injection-defender`; the "content is treated as ground
   truth" half is here.
