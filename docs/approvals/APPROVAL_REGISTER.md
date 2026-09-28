@@ -1858,3 +1858,121 @@ the entry governs.
   session has ended.
 - **Evidence:** The expiry wording in AEGIS-APR-024, quoted above, and the
   owner's 2026-09-28 decision.
+
+### AEGIS-APR-071: PR #443 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-072; no remaining use.
+  Recorded after the merge.
+- **Date / Grantor:** 2026-09-28 / Peter Nguyen.
+- **Reason:** [PR #443](https://github.com/ModernNomad-98/Project-Aegis/pull/443)
+  is a Dependabot pull request (GitHub's automated dependency-update bot)
+  that bumps the `actions/setup-node` action from v4.4.0 to v7.0.0. It
+  changes only `.github/workflows/validate-skills.yml`, a protected workflow
+  path outside AEGIS-APR-047's four BER files, so `gate-guard` fails and a
+  one-time owner exception is required. The workflow names the action by a
+  commit SHA (a "SHA pin"); the new pin
+  `820762786026740c76f36085b0efc47a31fe5020` is the commit of the upstream
+  `v7.0.0` tag, replacing `49933ea5288caeca8642d1e84afbd3f7d6820020`
+  (`v4.4.0`) in both places the workflow uses the action.
+- **Scope allowed:** One `gate-guard` exception and administrator merge of
+  PR #443 at exact head `7d138eec55bb45bbfa8426960c6ab2efe3f512c8`, which
+  changed only `.github/workflows/validate-skills.yml`.
+  [Exact-head run 36382534007](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36382534007)
+  passed `validate-skills` and `windows-offline-checks`; `gate-guard` failed
+  on that protected path. An independent read-only review of that head,
+  covering supply-chain risk (whether the new pin is the genuine upstream
+  release) and release readiness (whether it is safe to merge), recommended
+  merge; it was reported to the owner in the conversation and, after the
+  merge, posted on the PR in the
+  [review and exception receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/443#issuecomment-5866908461).
+  Codex posted only a
+  [usage-limit notice](https://github.com/ModernNomad-98/Project-Aegis/pull/443#issuecomment-5866555248)
+  at 2026-09-28 08:46:29 UTC, after the head commit (05:34:52 UTC).
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
+  not change branch protection or the protected path set, and it did not
+  widen AEGIS-APR-047.
+- **Evidence:** Direct owner answer "Approve one-time exception
+  (Recommended)" to the coordinating agent's multiple-choice question on a
+  one-time `gate-guard` exception for PR #443 at head `7d138ee`, and the
+  later answer "Yes, like #429 (Recommended)" choosing to record it after
+  the merge, as AEGIS-APR-063 was. Both were given in the Project Aegis
+  conversation on 2026-09-28 and relayed by that agent.
+- **Expiry / use limit:** One merge of PR #443 at the named head; consumed
+  by the merge recorded in AEGIS-APR-072.
+
+### AEGIS-APR-072: Consumption of the PR #443 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-071.
+- **Status at recording:** AEGIS-APR-071 has no remaining use.
+- **Effective at:** 2026-09-28 09:07:40 UTC.
+- **Recorded at / By:** 2026-09-28 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039.
+- **New authority:** None. A later Dependabot or other workflow change needs
+  its own exception.
+- **Reason:** The sole exact-head administrator merge completed.
+- **Evidence:** [PR #443](https://github.com/ModernNomad-98/Project-Aegis/pull/443)
+  merged `7d138eec55bb45bbfa8426960c6ab2efe3f512c8` as
+  `e251c5146f627ec31b7d2f750f0dbabe0bca7ede` at the time above.
+
+### AEGIS-APR-073: Make the audit baseline report readable on its own (engine v1.13.3)
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE; granted and not yet consumed. A later
+  lifecycle event records its consumption.
+- **Date / Grantor:** 2026-09-28 / Peter Nguyen.
+- **Reason:** The generated report `docs/audits/skill-contract-audit-baseline.md`
+  uses shorthand it never explains (for example Repo SHA, sha256, JSON,
+  P0/P1/P2/info, the `[severity/confidence/kind]` bracket, "maps: AEGIS-0NN",
+  "§5" and the rule codes). Its ROUTE-002 example is cut off mid-sentence by
+  a fixed 120-character slice in `to_markdown()`, the audit engine's function
+  that writes the report. A fixed sentence still says the report "freezes the
+  state of the corpus BEFORE remediation", which has not been true since the
+  baselines were regenerated after remediation under AEGIS-APR-058, and again
+  under AEGIS-APR-065.
+  Readability fixes to a generated report belong in its generator, the
+  protected file `scripts/audit-skill-contracts.py`.
+- **Owner decision:** The owner answered "Approve as described
+  (Recommended)" to the coordinating agent's multiple-choice question in the
+  Project Aegis conversation on 2026-09-28, which proposed the terms below.
+- **Scope allowed:** One pull request that changes exactly these paths:
+  - `scripts/audit-skill-contracts.py`: output format only. `TOOL_VERSION`
+    (the engine version constant) goes from 1.13.2 to 1.13.3; `to_markdown()`
+    adds a "How to read this report" glossary with a table of rules generated
+    from `RULES` (the engine's rule inventory); the ROUTE-002 example is shown
+    whole instead of cut at 120 characters; and the stale sentence that says
+    the report "freezes the state of the corpus BEFORE remediation" is
+    reworded.
+  - `scripts/tests/test_audit_skill_contracts.py`: the pinned engine version
+    and one new test of the report format.
+  - `artifacts/audits/skill-contract-audit-baseline.json` and
+    `artifacts/audits/corpus-manifest-baseline.json`: the engine version,
+    `engine_sha256` (the engine file's SHA-256 checksum) and the run's
+    `branch` value only. The v1.13.3 engine scans a clean checkout
+    (`core.autocrlf=false`) of `5dbf7bc9e958d932bd0c5b093ebecfe61be41840`,
+    the commit the v1.13.2 baseline scanned, so `repo_sha` and the corpus
+    stay the same.
+  - `artifacts/audits/corpus-route-graph.json`, only if regeneration changes
+    it.
+  - `docs/audits/skill-contract-audit-baseline.md`: regenerated, with its
+    hand-written preface carried forward.
+  - `docs/audits/aegis-060-plus-register.md`: one dated note.
+- **Scope FORBIDDEN:** No change to finding logic, rules, severities, the
+  route graph, manifest semantics or provenance logic. No new command-line option
+  or input. No other regeneration. The `findings`, `rule_inventory`,
+  `vocabulary_census` and `corpus_content_hash` fields of the regenerated
+  JSON must be identical to the v1.13.2 baseline. This grant does not waive
+  `gate-guard`: merging the PR needs a separate one-time owner exception for
+  its exact head, recorded as its own entry.
+- **Evidence:** Direct owner answer in the Project Aegis conversation on
+  2026-09-28, quoted above, relayed by the coordinating agent. The scan
+  target comes from the owner's later answer "Frozen commit 5dbf7bc
+  (Recommended)" to the coordinating agent's multiple-choice question in the
+  same conversation on 2026-09-28, after the
+  [register review](https://github.com/ModernNomad-98/Project-Aegis/pull/453#issuecomment-5866957640)
+  found that the grant did not name one. The v1.13.2
+  baselines it replaces are in git history at
+  `3c51fb2f6f4a22c6120b38d2a7e9f0074b6bf69c` (PR #441, recorded in
+  AEGIS-APR-066).
+- **Expiry / use limit:** One PR; consumed by its merge, which a later
+  lifecycle event records.
