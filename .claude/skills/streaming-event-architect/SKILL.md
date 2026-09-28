@@ -5,8 +5,10 @@ description: Design the INTERNAL event/streaming data backbone between services 
 
 # Streaming Event Architect
 
-**Terms:** CDC means change data capture, DLQ dead-letter queue, and SLA
-service-level agreement.
+**Terms:** CDC means change data capture, DLQ dead-letter queue, SLA
+service-level agreement, DDL data definition language (statements that create
+or alter tables), authz authorization, and ack acknowledgement. A poison
+message is one that fails on every retry and must be set aside.
 
 ## Purpose
 
@@ -137,8 +139,9 @@ implementation.
    `schema-evolution-planner` when the upstream table evolves).
 9. **Address backpressure and lag.** Lag as a first-class signal per
    consumer group (alert threshold and owner — wiring via
-   `observability-operator`), producer behavior when downstream is slow
-   (buffer/block/shed, stated), and scaling rules for consumers.
+   `observability-operator`, a manual-only skill a person runs by name), producer
+   behavior when downstream is slow (buffer/block/shed, stated), and scaling
+   rules for consumers.
 10. **Deliver the design** in the Output Format, with per-flow guarantees
     and every handoff named.
 
