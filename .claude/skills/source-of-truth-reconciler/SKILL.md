@@ -5,6 +5,12 @@ description: Resolve conflicts between current user instructions, repo docs, cod
 
 # Source-of-Truth Reconciler
 
+**Reading key:** A pull request (PR) proposes a repository change; an
+application programming interface (API) is how programs call a service. A
+*canonical* doc is one the repository officially designates as the
+authority on its topic. A *normative* decision settles what should be true
+(intent or policy), as opposed to describing what currently is.
+
 ## Purpose
 
 Turn "the sources disagree" into a recorded, evidence-backed decision. This
@@ -143,5 +149,5 @@ Owner choice (next blocking conflict only; others stay under Blocked for
 - [references/conflict-resolution-examples.md](references/conflict-resolution-examples.md) —
   worked examples: doc-vs-code, stale-branch instruction, dueling canonical docs.
 - `evals/evals.json` — trigger + behavior cases.
-- `evals/trigger-evals.json` — discrimination against `agent-startup-context-gate`
-  and `human-approval-boundary`.
+- `evals/trigger-evals.json` — discrimination against `agent-startup-context-gate`,
+  `human-approval-boundary`, and `rls-policy-auditor`.
