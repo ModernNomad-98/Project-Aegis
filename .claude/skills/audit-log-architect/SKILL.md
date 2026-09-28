@@ -9,7 +9,10 @@ Here, **ISO/IEC 27001** is the information-security management standard of
 the International Organization for Standardization and International
 Electrotechnical Commission. **PII** means personally identifiable
 information, **IP** means Internet Protocol, **ORM** means object-relational
-mapper, **DB** means database, and **WORM** means write once, read many.
+mapper, **DB** means database, **API** means application programming
+interface, and **WORM** means write once, read many. **SOC 2** means System
+and Organization Controls 2, an independent auditor's report on a service
+organization's controls.
 **HIPAA** means the United States Health Insurance Portability and
 Accountability Act; whether it applies depends on the actual system and data.
 

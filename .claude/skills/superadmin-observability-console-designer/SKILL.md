@@ -7,7 +7,9 @@ description: 'Design the superadmin monitoring console for a multi-tenant SaaS â
 
 **Reading key:** IA is information architecture; DB is database; RLS is
 row-level security; ETL is extract, transform, load; OLTP is online transaction
-processing; APM is application performance monitoring. CORS means cross-origin
+processing; APM is application performance monitoring; SLO is service-level
+objective; API is application programming interface; UI is user interface;
+QA is quality assurance. CORS means cross-origin
 resource sharing and is explained at the admin-endpoint boundary below.
 
 ## Purpose
@@ -183,7 +185,7 @@ access â€” so it is safe for model invocation.
    that call, then ask one owner question. Do not infer that a path choice
    authorizes backend wiring, production probes, or broader content access;
    compose `synthetic-monitoring-architect` for probes and
-   `observability-operator` for implementation.
+   `observability-operator` *(manual-only)* for implementation.
 7. **Design break-glass content reveal and denied-access-as-metric.** Seeing
    metrics is a role; seeing a user's CONTENT is an audited exception with
    five checkable properties: a non-executive operational role + a reason

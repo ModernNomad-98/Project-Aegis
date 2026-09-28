@@ -8,7 +8,9 @@ disable-model-invocation: true
 
 **Reading key:** QA is quality assurance; SPA is single-page application;
 MPA is multi-page application; env means environment; CI is continuous
-integration; E2E is end-to-end.
+integration; E2E is end-to-end; API is application programming interface;
+URL is a web address (uniform resource locator); JS, CSS and HTML are
+JavaScript, Cascading Style Sheets and HyperText Markup Language files.
 
 ## Purpose
 
@@ -34,7 +36,8 @@ with real command output.
   `secrets-identity-hardener` (manual-only); this skill detects and proves,
   then hands off.
 - Do NOT use when: testing app logic/components — 
-  `vitest-unit-component-engineer`; or journeys — `playwright-e2e-engineer`.
+  `vitest-unit-component-engineer` *(manual-only)*; or journeys —
+  `playwright-e2e-engineer` *(manual-only)*.
 - Do NOT use when: designing the whole automation/CI architecture —
   `qa-automation-architect`.
 
@@ -93,7 +96,7 @@ with real command output.
 6. **Report with evidence** and wire repeatable checks: the secret-grep and
    budget checks as scripts CI can run (placement per the automation
    blueprint). Confirmed secret exposure → stop wiring, hand to
-   `secrets-identity-hardener` for relocation + rotation.
+   `secrets-identity-hardener` *(manual-only)* for relocation + rotation.
 
 ## Output Format
 
@@ -141,7 +144,7 @@ Handoffs: <confirmed secrets → secrets-identity-hardener (relocate+rotate);
   if "only staging" and verify the actual artifact.
 - A leaked secret found in `dist/` means the value is COMPROMISED wherever
   that artifact went — removal alone is not remediation; rotation is
-  (`secrets-identity-hardener` owns it).
+  (`secrets-identity-hardener` *(manual-only)* owns it).
 - Sourcemaps ship your source: production map policy is a security decision,
   verified per deploy target.
 
@@ -163,15 +166,15 @@ Handoffs: <confirmed secrets → secrets-identity-hardener (relocate+rotate);
 ## Stop Conditions
 
 - The build fails for app-code reasons → report the failure output; fixing
-  app code is a separate change (`systematic-debugger` / owner), not silent
+  app code is a separate change (`systematic-debugger` *(manual-only)* / owner), not silent
   patching here.
 - A confirmed secret is in a bundle that already shipped → escalate
-  immediately (rotation urgency) via `secrets-identity-hardener` /
+  immediately (rotation urgency) via `secrets-identity-hardener` *(manual-only)* /
   `human-approval-boundary`; do not sit on it until the report is polished.
 - The deploy mode/env source can't be determined → verifying the wrong mode
   produces false assurance; ask before claiming the artifact is clean.
 - Asked to also restructure env handling across the codebase → that is
-  `secrets-identity-hardener` scope; hand off.
+  `secrets-identity-hardener` *(manual-only)* scope; hand off.
 
 ## Supporting Files
 

@@ -6,9 +6,13 @@ description: 'Scope a SOC 2 engagement — an AICPA ATTESTATION (a CPA''s examin
 # SOC 2 Trust Criteria Mapper
 
 **Terms:** AICPA is the American Institute of Certified Public Accountants;
+SOC 2 (System and Organization Controls 2) is an AICPA report on a service
+organization's controls; ISO is the International Organization for
+Standardization;
 CPA is certified public accountant; TSC are the Trust Services Criteria; ASEC
 is the AICPA Assurance Services Executive Committee; SLA is service-level
-agreement; DPA is data processing agreement.
+agreement; DPA is data processing agreement; NDA is non-disclosure
+agreement; SoA is the ISO 27001 Statement of Applicability.
 
 ## Purpose
 
@@ -21,8 +25,11 @@ engagement is Type 1 (control design as of a specified date) or Type 2
 "certifies" — and the report's scope is driven by what the org has
 committed to customers, not by collecting categories. Criteria then map
 onto existing mechanisms via `compliance-control-foundation` and
-`multi-framework-crosswalk` (the D9 premise: for an org with the shipped
-Phase 3/4 packs, much of the Security category exists — the work is
+`multi-framework-crosswalk` (the premise of D9, the library's Compliance &
+Governance batch decision that shipped this compliance pack: for an org with
+the shipped Phase 3 (software-as-a-service and tenant isolation) and Phase 4
+(security, row-level security and supply-chain) packs, much of the Security
+category exists — the work is
 mapping, the system description, and the evidence window). Window
 evidence design hands to `compliance-evidence-collector`.
 
@@ -85,7 +92,7 @@ purchase.
    demand it: Availability (SLAs/uptime commitments —
    `slo-reliability-architect` mechanisms), Confidentiality (NDAs,
    confidential-data commitments — `tenant-isolation-reviewer`,
-   `secrets-identity-hardener`), Processing Integrity (processing
+   `secrets-identity-hardener` *(manual-only)*), Processing Integrity (processing
    completeness/accuracy commitments), Privacy (personal-information
    commitments — `sensitive-disclosure-guard` surface). Record WHY each
    category is in or out; "more categories looks better" is an
