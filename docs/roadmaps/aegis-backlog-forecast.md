@@ -2,11 +2,11 @@
 
 ## Start here — current reading
 
-**Current reading at the 2026-09-28 catch-up checkpoint after #474:** twenty-one PRs merged after #454, missing four five-merge windows (those ending #455, #458, #465 and #471). No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The D15 enrichment deltas (#455), the audit-report generator at engine v1.13.3 (#461, with register entries AEGIS-APR-071 to AEGIS-APR-076 from #453 and #465) and the checkpoint after #454 (#457) are delivered, so near-term work outside the subtotal falls from 5.25–14 to a provisional **1–3.5 active hours** of agent estimates. The owner-ordered readability sweep found 103 accepted pages past the 10-line rule; the coordinating session reports 102 of them resolved by re-read fixes in #456, #459, #462, #463 and #466 to #474, and the Behavioral Eval Runner (BER) README waits in open #475 for a protected-path exception. The owner's later 2026-09-28 decisions are in the [open-decisions index](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28) (#460); the next backlog pick is still deferred. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the virtual machine (VM) paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #474](#five-merge-checkpoint--2026-09-28-after-pull-request-474-catch-up-for-4-missed-windows).
+**Current reading at the 2026-09-28 catch-up checkpoint after #474:** twenty-one PRs merged after #454, missing four five-merge windows (those ending #455, #458, #465 and #471). No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The D15 enrichment deltas (#455; D15 is a recorded decision to improve four shipped skills), the audit-report generator at engine v1.13.3 (#461, with register entries AEGIS-APR-071 to AEGIS-APR-076 from #453 and #465) and the checkpoint after #454 (#457) are delivered, so near-term work outside the subtotal falls from 5.25–14 to a provisional **1–3.5 active hours** of agent estimates. The owner-ordered readability sweep found 103 accepted pages past the 10-line rule; the coordinating session reports 102 of them accepted again after independent full-page re-reads (88 with fixes in #456, #459, #462 and #466 to #474, and 14 unchanged), and the Behavioral Eval Runner (BER) README waits in open #475 for a protected-path exception. The owner's later 2026-09-28 decisions are in the [open-decisions index](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28) (#460); the next backlog pick is still deferred. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the virtual machine (VM) paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #474](#five-merge-checkpoint--2026-09-28-after-pull-request-474-catch-up-for-4-missed-windows).
 
 **Earlier reading at the 2026-09-28 catch-up checkpoint after #454:** eighty-two PRs merged after #370 without a full reassessment, missing sixteen five-merge windows (those ending #372 through #451). No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The owner-choice teaching backlog (8.5–16.5 active hours) and the feature-flag items (2.5–5) are delivered and now count 0. Much other work merged without a forecast row: the Open Worldwide Application Security Project (OWASP) Top 10 for Large Language Model (LLM) Applications 2026 security refresh, eval and routing integrity, audit baselines, source currency and readability. Near-term work the owner approved or that is in flight adds a provisional **5.25–14 active hours** of agent estimates outside the subtotal, plus the unestimated readability sweep and audit-report generator change; 106–220 agent-estimated hours of unselected skill-expansion candidates are listed for the first time. On 2026-09-28 the owner deferred choosing the next backlog item. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the VM paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #454](#five-merge-checkpoint--2026-09-28-after-pull-request-454-catch-up-for-16-missed-windows).
 
-This is a rolling **active-work estimate**, not a calendar promise or permission
+This page is for maintainers and coding agents planning Project Aegis work. It is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. The [owner's issue #101 host-path choice](#material-owner-decision--2026-09-25-issue-101-host-path)
 and the later bounded Stage 4A and offline routing grants frame the current
 issue #101 scope. The
@@ -90,7 +90,11 @@ and its README is a protected path; the pre-rule sweep is the owner-ordered
 re-check of accepted pages for edits made before the 10-line rule of the
 [readability ledger](aegis-documentation-readability-backlog.md); and an
 "agent estimate" is a range an agent compiled for the coordinating session,
-which nobody has measured.
+which nobody has measured. In the tables, WP-2B-3 to WP-2B-7 are BER work
+packages (WP) and OD-1 is BER owner decision 1, both in the
+[runner backlog](behavioral-eval-runner-backlog.md); CP-WP-003 and CP-WP-004
+are control-plane work packages in the
+[control-plane backlog](resumable-control-plane-backlog.md).
 
 **Cadence anchor.** This record keeps the #344 anchor that #352 published
 and the #370 and #454 checkpoints kept. The window #443 opened closed with
@@ -99,8 +103,9 @@ order (PR numbers do not give merge order). #472, #473, #470 and #474 open
 the next window. [PR #457](https://github.com/ModernNomad-98/Project-Aegis/pull/457) merged the #454 checkpoint in
 the third of these windows; it reassessed only through #454, so it closed no
 window. The four missed windows therefore end at #455, #458, #465 and #471.
-The owner decisions that #460 recorded had already been reported in the #454
-checkpoint, so they add no separate material-decision miss. The sweep's
+Except the owner's standing chat instruction on commits, pushes and merges,
+the owner decisions that #460 recorded had already been reported in the #454
+checkpoint; none changes scope, so they add no separate material-decision miss. The sweep's
 final count of 103 pages, which #460 recorded five seconds before #457
 merged, did change the readability scope, and no forecast update followed
 until this record.
@@ -128,8 +133,8 @@ PRs, so no active-hour figure is inferred from the wall times.
 | --- | --- | --- |
 | D15 enrichment deltas for four shipped skills (owner approval 2026-09-28) | #455 | The 2–4-hour near-term row reaches 0. It changed existing skills, so the library stays at 186. |
 | Audit-report generator at engine v1.13.3 and its approval records | #453, #461, #465 | The generator row and the 0.25–1-hour row for landing #453 reach 0. #453 recorded AEGIS-APR-071 to AEGIS-APR-073. #461 merged under a one-time `gate-guard` exception; #465 recorded it as AEGIS-APR-074, its consumption as AEGIS-APR-075 and the consumption of the AEGIS-APR-073 grant as AEGIS-APR-076. |
-| Pre-rule readability sweep: full-page re-read fixes | #456, #459, #462, #463, #466, #467, #468, #469, #470, #471, #472, #473, #474 | Resolves 102 of the sweep's 103 pages, as the coordinating session reports; see the readability row. |
-| Readability ledger and register re-read fixes | #458, #464 | #458 recorded #443 to #454 in the ledger; #464 applied re-read fixes to the approval register's reading aid. |
+| Pre-rule readability sweep: full-page re-read fixes | #456, #459, #462, #466, #467, #468, #469, #470, #471, #472, #473, #474 | With 14 pages accepted unchanged, resolves 102 of the sweep's 103 pages, as the coordinating session reports; #462 also covers a page that #455 changed. See the readability row. |
+| Readability ledger and follow-up re-read fixes | #458, #463, #464 | #458 recorded #443 to #454 in the ledger; #463 fixed the two `ai-sdlc-operating-model` pages that #455 took past the 10-line rule; #464 applied re-read fixes to the approval register's reading aid. |
 | Governance records: the #454 checkpoint and the later 2026-09-28 owner decisions | #457, #460 | Records only. #457 delivers its own 1–3-hour row. |
 
 **Rows that reached 0 remaining.** Active time was not measured for any of
