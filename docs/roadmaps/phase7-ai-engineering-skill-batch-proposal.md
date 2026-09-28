@@ -5,7 +5,7 @@
 > decision-log row was created or changed by the pull request that adds it.
 
 Prepared 2026-09-28 from `ModernNomad-98/Project-Aegis` `origin/main` at
-`80d9dfe7`, where the validator reported 186 valid skills.
+`80d9dfe7`, where `python -B scripts/validate-skills.py` reported 186 valid skills.
 
 This page is for the owner, who decides whether and how to build the five
 remaining Phase 7 artificial intelligence (AI) engineering candidates, and for
@@ -47,7 +47,7 @@ records scope, boundaries and an estimate, and builds nothing.
 - **ROUTE-002** is a census finding from `scripts/audit-skill-contracts.py`:
   skill A's description says "Do NOT use for X (skill B)", but skill B's
   description never names A. It is information, not a failure; widely used
-  "hub" skills cannot name every skill that points at them.
+  "hub" skills cannot name every skill that points at them. A **reciprocity edit** adds skill A's name to skill B's description so that the finding clears.
 - **Active hours** count only hands-on agent work, excluding review waits,
   continuous integration (CI) queue time and time waiting for the owner. They
   are agent estimates, not measurements.
@@ -55,7 +55,7 @@ records scope, boundaries and an estimate, and builds nothing.
 ## Decision in one read
 
 The five candidates are not five equal gaps. Since they were listed in the
-original execution plan, the library shipped `ai-router-architect`,
+[original execution plan](../prompts/senior-principal-claude-skills-execution-plan.md#phase-7--ai-software-engineering-and-ai-security), the library shipped `ai-router-architect`,
 `model-context-designer`, `agent-harness-architect`,
 `agent-containment-reviewer` and the feature-flag pair, which absorbed most of
 them. One real gap remains: nothing designs how a person reviews an AI
@@ -80,7 +80,7 @@ candidates do not become new skills.
 Roadmap row numbers refer to
 [category 09 of the skills roadmap](../skills/09-ai-software-engineering.md).
 Rows #282, #283, #285, #286 and #287 are priority P0 (highest) there; #299 is
-P1.
+P1, one level lower.
 
 ## Candidate 1: `ai-provider-adapter-designer` (#282)
 
@@ -94,11 +94,11 @@ provider does not ripple through the code.
 **What the shipped skills already do.**
 
 - [`ai-router-architect`](../../.claude/skills/ai-router-architect/SKILL.md)
-  (manual-only, because it wires live providers and credentials) already
+  *(manual-only)*, because it wires live providers and credentials, already
   designs "one internal interface in front of every provider/model". Its
   workflow step 1 consolidates scattered calls into that interface, and its
   "Use when" list includes "adding a new provider/model". It also owns
-  fallback order, circuit breakers and the kill switch.
+  fallback order, circuit breakers (which stop calls to a failing provider for a while) and the kill switch.
 - [`agent-harness-architect`](../../.claude/skills/agent-harness-architect/SKILL.md)
   keeps a closed, versioned tool and provider registry for agents, so an
   unknown capability fails instead of being improvised.
@@ -122,7 +122,7 @@ with the router on "adding a provider", check 2 (trigger collision) of
 | The agent's closed tool and provider registry | `agent-harness-architect` |
 | The output schema the product accepts | `structured-output-validator` |
 | Budgets and rate limits the router enforces | `ai-cost-guardrail-designer` |
-| Key custody and rotation | `secrets-identity-hardener` |
+| Key custody and rotation | `secrets-identity-hardener` *(manual-only)* |
 
 **Recommendation: MERGE** into `ai-router-architect` as an extension:
 
@@ -145,7 +145,7 @@ room, the sentence naming `secrets-identity-hardener` and
 `observability-operator` as composed skills moves to the body, where both are
 already named, and the explanatory "Because it wires live
 providers/credentials, it is manual-only" sentence moves to the body, which
-already says it; the required sentinel stays first.
+already says it; the required opening text `MANUAL-ONLY; never auto-invoke.` stays first.
 
 ```yaml
 description: 'MANUAL-ONLY; never auto-invoke. Design the centralized model-routing layer all AI calls flow through: one internal interface in front of every provider/model; per-provider adapters mapping requests, responses, tool calls, streaming and errors onto it so no provider-specific type leaks past it; a capability matrix so routing and fallback never pick a model lacking a needed feature; adapter conformance tests. Credentials stay server-side; routing picks the model by task/cost/availability; per-call telemetry; budgets/rate limits from ai-cost-guardrail-designer enforced at the choke point; retries/backoff, fallback, degraded responses and a kill switch. Use when building or refactoring the AI provider/routing/gateway layer, adding or swapping a provider, or centralizing scattered model calls. Do NOT use for the cost policy (ai-cost-guardrail-designer), telemetry implementation (observability-operator), output schema (structured-output-validator), or prompt/injection design (prompt-injection-defender).'
@@ -185,7 +185,7 @@ change.
 owner:
 
 - [`model-context-designer`](../../.claude/skills/model-context-designer/SKILL.md)
-  designs what enters the context window, with closed input schemas per
+  designs what enters the context window (the text the model receives on one call), with closed input schemas per
   segment, caps, exclusions and reconstruction of what the model saw. That is
   the "input schema" part.
 - `structured-output-validator` owns the output schema and the
@@ -198,10 +198,10 @@ owner:
   requires calibrated uncertainty and the ability to decline: part of
   "refusal behavior".
 - [`ai-evaluation-harness`](../../.claude/skills/ai-evaluation-harness/SKILL.md)
-  (manual-only) runs the before-and-after regression gate when a prompt
+  *(manual-only)* runs the before-and-after regression gate when a prompt
   changes.
 - [`prompt-injection-defender`](../../.claude/skills/prompt-injection-defender/SKILL.md)
-  (manual-only) owns what untrusted content may never change in a prompt.
+  *(manual-only)* owns what untrusted content may never change in a prompt.
 
 **The real gap is small.** Nobody writes the single record that ties these
 parts together for a non-agent feature: the instruction's version and owner,
@@ -235,20 +235,22 @@ prompt/context assembly".
 **Manual-only:** no. `model-context-designer` designs and writes nothing; the
 extension keeps it auto-invocable.
 
-**Draft replacement description for `model-context-designer`**, 932
+**Draft replacement description for `model-context-designer`**, 972
 characters measured with `yaml.safe_load`. Every existing phrase stays; the
-prompt contract sentence, one "Use when" phrase and one "Distinct from"
-neighbor are added.
+prompt contract sentence, one "Use when" phrase and two "Distinct from"
+neighbors are added.
 
 ```yaml
-description: 'Design what enters and leaves a model context window: assemble vetted inputs server-side under caps and closed schemas, minimize sensitive data, separate controlled-store persistence from transient segments, verify provider retention before claiming end-to-end non-persistence, make reconstruction limits explicit, and document exclusions. Also write the prompt contract for each call: a versioned, owned instruction, its declared inputs, a pointer to the output contract, when the model must decline, and which prompt changes need an evaluation rerun. Distinct from agent-startup-context-gate (session start), ai-cost-guardrail-designer (cost), rag-security-architect (retrieval authorization), and structured-output-validator (output schema). Use when designing prompt/context assembly, writing or changing a prompt contract, or deciding what an agent may see. Poisoning attack review belongs to memory-context-poisoning-reviewer.'
+description: 'Design what enters and leaves a model context window: assemble vetted inputs server-side under caps and closed schemas, minimize sensitive data, separate controlled-store persistence from transient segments, verify provider retention before claiming end-to-end non-persistence, make reconstruction limits explicit, and document exclusions. Also design the prompt contract for each call: a versioned, owned instruction, its declared inputs, a pointer to the output contract, when the model must decline, and which prompt changes need an evaluation rerun. Distinct from agent-startup-context-gate (session start), ai-cost-guardrail-designer (cost), rag-security-architect (retrieval authorization), agent-harness-architect (call gating), and structured-output-validator (output schema). Use when designing prompt/context assembly, writing or changing a prompt contract, or deciding what an agent may see. Poisoning attack review belongs to memory-context-poisoning-reviewer.'
 ```
 
 **ROUTE-002 edits:** none. The description uses "Distinct from", not a "Do
 NOT use" clause, so the census rule does not read it. Optional: add "prompt
 contract (model-context-designer)" to `structured-output-validator`'s
 exclusions (901 characters today; room exists) so routing is clear in both
-directions.
+directions. Naming `agent-harness-architect` in the "Distinct from" list
+also clears an existing one-way ROUTE-002 finding: that skill's "Do NOT
+use" clause already names `model-context-designer`.
 
 **Eval plan.**
 
@@ -282,7 +284,7 @@ the product's review workflow for AI output:
   deployments, history rewrites) and produces an approval request to the
   owner. It does not design a product feature.
 - [`agent-authorization-matrix`](../../.claude/skills/agent-authorization-matrix/SKILL.md)
-  (manual-only) sets what **agents building the product** may do, and says
+  *(manual-only)* sets what **agents building the product** may do, and says
   outright that it "governs the AGENTS building the product, not the
   product's users".
 - [`agent-tool-safety-guard`](../../.claude/skills/agent-tool-safety-guard/SKILL.md)
@@ -292,7 +294,7 @@ the product's review workflow for AI output:
   approval workflow itself has no owner.
 - [`ai-governance-risk-reviewer`](../../.claude/skills/ai-governance-risk-reviewer/SKILL.md)
   decides the oversight **level** a feature's risk tier needs (advisory-only,
-  human in the loop, human on the loop), not the workflow that delivers it.
+  human in the loop, or human on the loop, where a person monitors and can step in), not the workflow that delivers it.
 - [`human-agent-trust-reviewer`](../../.claude/skills/human-agent-trust-reviewer/SKILL.md)
   **attacks** an existing approval layer for rubber-stamping and misleading
   summaries; it reviews a workflow, it does not design one.
@@ -303,8 +305,8 @@ the product's review workflow for AI output:
 | --- | --- |
 | The oversight level a feature's risk tier requires | `ai-governance-risk-reviewer` |
 | Which AI actions are automatic, need confirmation, or are forbidden; the review workflow for confirmed ones | `ai-human-in-the-loop-designer` (new) |
-| Per-tool permissions and blast radius for a product agent | `agent-tool-safety-guard` |
-| Attacking the approval flow for consent fatigue and deceptive summaries | `human-agent-trust-reviewer` |
+| Per-tool permissions and blast radius (how much damage one misused tool can do) for a product agent | `agent-tool-safety-guard` |
+| Attacking the approval flow for consent fatigue (approvers who stop reading because requests come too often) and deceptive summaries | `human-agent-trust-reviewer` |
 | The coding assistant's own approvals | `human-approval-boundary` |
 | What agents building the product may do | `agent-authorization-matrix` |
 | The single write path the approved change commits through | `command-gateway-architect` |
@@ -316,12 +318,11 @@ classification, an extracted field written to a record), and that skill's
 job is permission scope, not workflow design.
 
 **Recommendation: BUILD, auto-invocable.** It designs and writes nothing.
-Stop Conditions refuse an AI proposal approved by the same identity that
+Its Stop Conditions (the `SKILL.md` section that says when the skill must halt and hand back) refuse an AI proposal approved by the same identity that
 triggered it, refuse to mark an action AUTONOMOUS without a risk tier that
 allows it (hand off to `ai-governance-risk-reviewer` when none exists), and
 refuse a commit path that skips the product's normal authorization. The
-build pull request will likely answer "Yes" to the security-relevant-surface
-question, because it designs who may approve writes.
+build pull request will likely answer "Yes" to the required "Security-relevant surface?" question in the [pull request template](../../.github/pull_request_template.md), because it designs who may approve writes.
 
 **Draft description**, 1,007 characters measured with `yaml.safe_load`:
 
@@ -475,29 +476,21 @@ steps in
 
 **Total estimate:** 6.5–11.25 active hours, provisional, including 1.5–2.5
 hours of batch overhead (registration, decision row, reciprocity edits,
-contract-audit comparison and reviews). No project-orchestrator route is
-proposed; confirm at build time that no stage needs one.
+contract-audit comparison and reviews). No `project-orchestrator` route (a numbered stage in the skill that runs an end-to-end build and names the skill each stage calls) is proposed; confirm at build time that no stage needs one.
 
 **Review path per pull request**, as in the feature-flag precedent:
 `python -B scripts/validate-skills.py`; `skill-quality-reviewer` checks 1–7
 on each new or extended skill in a fresh session; a ROUTE-002 before-and-after
 comparison with `scripts/audit-skill-contracts.py` (a protected script that
 this work does not change, and whose frozen baseline is not regenerated);
-`library-diff-reviewer` on the whole pull request; then a merge under the
-standing conditions of
-[AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green),
-[AEGIS-APR-049](../approvals/APPROVAL_REGISTER.md#aegis-apr-049-exact-head-ci-satisfies-the-local-test-condition)
-and
-[AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review).
+`library-diff-reviewer` on the whole pull request; then a merge under the standing conditions of these owner approval-register entries: [AEGIS-APR-048](../approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green) (administrator merge once all checks are green), [AEGIS-APR-049](../approvals/APPROVAL_REGISTER.md#aegis-apr-049-exact-head-ci-satisfies-the-local-test-condition) (CI on the exact reviewed head satisfies the local-test condition) and [AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review) (merges wait for the automated Codex review bot, or its confirmed unavailability).
 
 **Decision number:** the build would be recorded under the next free
-D-number at decision time. D67 was the highest decision number in the
-reconciliation log at `80d9dfe7`, but other open proposals, including the QA
-Tier 1 proposal in pull request #492, may claim D68 and later numbers first.
+D-number at decision time. D67 was the highest decision number in the reconciliation log at `80d9dfe7`. Open pull requests already claim the next three: D68 (#493, the QA Tier 1 build decision), D69 (#494, the AI software-development-lifecycle proposal) and D70 (#496, the Phase 6 proposal). If those land first, this build takes D71. The real number is the lowest free one when the build lands.
 
 **Expected ROUTE-002 census after the batch:** two new one-way findings would
 remain, toward `human-agent-trust-reviewer` and `agent-authorization-matrix`.
-Following the D64 owner decision, these would stay as census data rather than
+Following the D64 owner decision (the feature-flag build, which kept one-way ROUTE-002 findings toward widely used skills as census data), these would stay as census data rather than
 trigger rewrites of a full description or a governance skill.
 
 ## What the owner must answer
@@ -531,8 +524,8 @@ This page grants no authority and builds nothing. It creates no skill,
 evaluation, catalog row, README count or decision-log row, and it edits no
 shipped skill. An owner "build it" answer would be a new instruction to record;
 delivery would then rely on the standing delivery approval in
-[AEGIS-APR-039](../approvals/APPROVAL_REGISTER.md#aegis-apr-039-reaffirmation-of-ongoing-backlog-delivery-approval)
-and its conditions. Nothing here waives a protected `gate-guard` check,
+[AEGIS-APR-039](../approvals/APPROVAL_REGISTER.md#aegis-apr-039-reaffirmation-of-ongoing-backlog-delivery-approval) (the owner's reaffirmed approval for ongoing backlog delivery)
+and its conditions. Nothing here waives the `gate-guard` check (the CI job that fails when a pull request changes a protected file),
 authorizes a change to `scripts/audit-skill-contracts.py` or its frozen
 baseline, or permits any environment write, provider call or deployment.
 
