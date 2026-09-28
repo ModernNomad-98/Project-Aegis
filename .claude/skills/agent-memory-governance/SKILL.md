@@ -74,8 +74,10 @@ already-merged PR, the other pushing work against the wrong PR entirely.
      PRs' content) — store the pointer, not a drifting copy.
    - Completion-baseline anchors ARE durable: "<work> is complete; do not
      treat as pending", pinned to immutable evidence (merged PR number, merge
-     commit SHA, applied-migration identifier) with an absolute date. Without
-     that evidence it is a claim, not an anchor.
+     commit SHA — its Secure Hash Algorithm identifier — and applied-migration
+     identifier) with an absolute date. Without that evidence it is a claim,
+     not an anchor. An anchor is still a lead: run its TRUST check (merged,
+     on main, not since reverted) before it stops any work.
 2. **Establish or confirm the TRUST rules:**
    - Memory is a lead, not truth. Before acting on any remembered repo, PR,
      branch, merge, or deploy state: verify against live `git`/`gh` output.

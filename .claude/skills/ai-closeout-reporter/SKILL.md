@@ -65,7 +65,8 @@ visible, never discovered later by surprise.
    claim and name the open gaps.
 7. Recommend the next action. When a phase is finished, add a
    completion-baseline anchor: "<work> is complete; do not treat as pending",
-   pinned to immutable evidence (merged PR number, merge commit SHA,
+   pinned to immutable evidence (merged PR number, merge commit SHA — the
+   Secure Hash Algorithm identifier of the merge commit — and
    applied-migration identifier) so later sessions do not re-open or redo it.
    Anchor only merged or applied facts, never open-PR state.
 8. Run the Validation Checklist, then deliver the report as the final message

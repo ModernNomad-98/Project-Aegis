@@ -26,8 +26,10 @@ the owning skill.
 8. Completion-baseline anchors are the durable form of "done". Pin finished
    work as `<work> is complete; do not treat as pending — PR #<n> merged,
    <merge SHA>, migration <id> applied, <YYYY-MM-DD>` so later sessions do
-   not re-open or redo it. Merged and applied are immutable, unlike "PR #10
-   is open"; an anchor without that evidence fails WRITE 1 and 2.
+   not re-open or redo it; the merge SHA (Secure Hash Algorithm) is the hash
+   that identifies the merge commit. Merged and applied are immutable, unlike
+   "PR #10 is open"; an anchor without that evidence fails WRITE 1 and 2. An
+   anchor is still a lead: its TRUST check runs before it stops any work.
 
 ## TRUST rules (before acting on memory)
 
@@ -39,7 +41,7 @@ Memory is a lead, not truth. Before any action premised on remembered state:
 | Branch exists / current branch | `git branch -a`, `git branch --show-current` |
 | What merged to main / repo baseline | `git log --oneline -20 origin/main`, validator output |
 | File / flag / command still exists | direct check before recommending it |
-| Completion anchor ("X complete, PR #n, SHA") | `gh pr view <n> --json state,mergeCommit`; `git merge-base --is-ancestor <sha> origin/main` |
+| Completion anchor ("X complete, PR #n, SHA") | `gh pr view <n> --json state,mergeCommit`; `git merge-base --is-ancestor <sha> origin/main`; not since reverted: `git log --oneline -i origin/main --grep="<sha>" --grep="revert.*#<n>"` returns nothing; each cited migration id shown as applied by the migration tool's read-only status |
 | Auto-merge / protection posture | `gh pr view <n> --json autoMergeRequest`, repo settings |
 
 On divergence: live state wins, act on it, queue the memory correction. If the
