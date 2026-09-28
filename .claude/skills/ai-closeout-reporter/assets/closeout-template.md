@@ -5,7 +5,7 @@ placeholders with the report's actual content; do not copy those instructions
 into the final report. Every section appears in every report. If nothing was
 intentionally omitted, write exactly "None." in section 2. Section 2 is never
 optional. **PR** means pull request; **CI** means continuous integration;
-**URL** means web address; **SHA** (Secure Hash Algorithm) is a commit's unique ID.
+**URL** means web address; **SHA** (Secure Hash Algorithm) is a commit's unique ID; the **head** is the latest commit on the branch; a **diff** is the set of line changes; an **exit code** is the number a command returns, 0 meaning success; a **migration** is a recorded database schema change.
 
 ---
 
@@ -43,13 +43,25 @@ what matters; link the PR/diff for the exhaustive list when it is long.
 | --- | --- | --- |
 | `<e.g. other tenant's record read>` | `<refused / NOT refused>` | `<output>` |
 
-<!-- If a local preflight ran (local-ci-mirror-preflight), paste its evidence
+<!-- If a local preflight ran (a local copy of the CI checks, from local-ci-mirror-preflight *(manual-only)*), paste its evidence
      block here as recorded. -->
 
 ## 5. Evidence
 
-Outputs, links, screenshots, PR URL, CI runs — whatever lets a human verify
-without rerunning everything.
+One trace row per deliverable from the original request. Each evidence item
+names its provenance: the command and its exit code, or the CI run link, on
+the exact head commit SHA. A CI run on an older commit is not evidence for the
+head. Migration proof and known skips are rows, not prose. A deliverable with
+no check that proves it reads "not verified" and also appears in section 7.
+
+| Request item | Files | Check that proves it | Evidence (commit SHA, command and exit code, or CI run) |
+| --- | --- | --- | --- |
+| `<deliverable from the request>` | `<paths>` | `<command or check>` | `<sha>: <command> exit 0`, or `<CI run link> on <sha>` |
+| `<migration applied>` | `<migration file>` | `<migration proof>` | `<applied migration id> on <sha>` |
+| `<deliverable with no proving check>` | `<paths>` | not verified | `<reason; see section 7>` |
+
+Then any other outputs, links, screenshots and the PR URL — whatever lets a
+human verify without rerunning everything.
 
 ## 6. Risks & known gaps
 
@@ -57,9 +69,9 @@ What could bite later; what is fragile; what depends on unverified assumptions.
 
 ## 7. Skipped validation
 
-What the change class expected but was not run, and why. "Nothing skipped." is
+What this kind of change normally requires but was not run, and why. "Nothing skipped." is
 an acceptable entry; absence of the section is not. Break skipped counts down
-by reason (for example environment-gated, by design, blocked), never a bare
+by reason (for example could not run in this environment, skipped by design, blocked), never a bare
 total.
 
 ## 8. Next actions / handoff
