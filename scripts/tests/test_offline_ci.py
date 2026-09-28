@@ -449,8 +449,10 @@ class GateJobIsolationTests(unittest.TestCase):
             shutil.copyfile(stand_in, Path(temporary) / "git.exe")
 
             def run_git(search_current_directory):
-                env = dict(os.environ)
-                env.pop("NoDefaultCurrentDirectoryInExePath", None)
+                # Windows environment keys are case-insensitive and os.environ
+                # upper-cases them, so drop the variable under any spelling.
+                env = {key: value for key, value in os.environ.items()
+                       if key.upper() != "NODEFAULTCURRENTDIRECTORYINEXEPATH"}
                 if not search_current_directory:
                     env["NoDefaultCurrentDirectoryInExePath"] = (
                         self.workflow["env"]["NoDefaultCurrentDirectoryInExePath"])
