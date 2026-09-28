@@ -11,7 +11,7 @@ This page is for the owner, who decides whether and how to build the five
 remaining Phase 6 expansion candidates, and for the maintainers and reviewers
 who would build them. It follows the
 [feature-flag skill proposal](feature-flag-architect-skill-proposal.md) and the
-quality assurance (QA) Tier 1 batch proposal in open pull request #492: it
+quality assurance (QA) Tier 1 batch proposal in pull request #492 (merged as `e0f1d244`): it
 records scope, boundaries and an estimate, and builds nothing.
 
 ## Terms used on this page
@@ -41,7 +41,7 @@ records scope, boundaries and an estimate, and builds nothing.
   [reconciliation log, section 3](../reconciliation/step-0-reconciliation-v4.md#phase-6--cloud-devops-reliability--release-p1).
   A **D-number** (for example D70) is a numbered entry in that log's
   [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions).
-- A **skill** is a folder under `.claude/skills/` whose `SKILL.md` tells an AI
+- A **skill** is a folder under `.claude/skills/` whose `SKILL.md` tells an artificial intelligence (AI)
   assistant how to do one job. Its **description** is the text the assistant
   reads when choosing a skill; the library caps it at 1,024 characters.
 - A **manual-only** skill carries `disable-model-invocation: true`, so the
@@ -57,7 +57,10 @@ records scope, boundaries and an estimate, and builds nothing.
 - **ROUTE-002** is a census finding from `scripts/audit-skill-contracts.py`:
   skill A's description says "Do NOT use for X (skill B)", but skill B's
   description never names A. It is information, not a failure; widely used
-  "hub" skills cannot name every skill that points at them.
+  "hub" skills cannot name every skill that points at them. To
+  **reciprocate** is to add the reverse "Do NOT use" pointer to B's
+  description; to **leave it one-way (census)** is to keep the finding as
+  recorded census data and edit nothing.
 - **Active hours** count only hands-on agent work, excluding review waits, CI
   queue time and time waiting for the owner. They are agent estimates, not
   measurements.
@@ -89,7 +92,8 @@ Roadmap row numbers refer to
 Two candidates have no numbered row there; they come from the execution
 plan's Phase 6 list and the
 [product-agnostic roadmap](product-agnostic-skill-and-agent-roadmap.md),
-both priority P1 (high-value follow-on work).
+both priority P1 (high-value follow-on work). In category 07, #253 and #254
+are P0 (must-have) and #244 and #246 are P1.
 
 ## Candidate 1: `cloud-security-baseline-reviewer`
 
@@ -115,7 +119,7 @@ reviews the configured estate control by control:
   diffs and existing IaC, blast radius first. Settings made in a web console,
   and managed-platform project settings, never appear in IaC.
 - [`secrets-identity-hardener`](../../.claude/skills/secrets-identity-hardener/SKILL.md)
-  (manual-only) moves and rotates application secrets; it does not review
+  *(manual-only)* moves and rotates application secrets; it does not review
   account-level identity such as owner access or multi-factor sign-in.
 - [`security-logging-alerting-architect`](../../.claude/skills/security-logging-alerting-architect/SKILL.md)
   designs detection rules; it does not check that audit logging is switched on
@@ -146,7 +150,8 @@ posture-scanner findings, IaC and screenshots the user supplies, and reports.
 It calls no cloud interface and changes nothing, so section 5 of the standard
 keeps it auto-invocable. Per-provider reference files (AWS, Azure, GCP,
 Vercel, Supabase) list the baseline controls; provider-specific claims become
-verification items, never recalled facts. Stop Conditions refuse to mark a
+verification items, never recalled facts. Stop Conditions (the `SKILL.md` section that lists
+when the skill must halt or refuse) refuse to mark a
 control MET without evidence, refuse to print a secret value found in an
 export, and refuse to apply a fix.
 
@@ -184,6 +189,13 @@ description: 'Review the CONFIGURED security baseline of a cloud account, subscr
 - Trigger: about 10 cases in both directions against `iac-reviewer` ("review
   this Terraform"), `aws-saas-architect` ("design our AWS security"),
   `compliance-gap-auditor` ("are we SOC 2 ready?") and `security-scan-orchestrator`.
+  Because both provider architects also review an existing architecture and
+  `iac-reviewer` investigates drift against runtime state, the set includes
+  one case in each direction for those seams: "review our existing AWS
+  account's security settings" goes to this skill, "review our existing AWS
+  architecture" goes to `aws-saas-architect` (and the Azure equivalent to
+  `azure-saas-architect`), and "our Terraform and the console disagree" goes
+  to `iac-reviewer`.
 
 **Estimate:** 3–5 active hours, driven by the five per-provider reference
 files.
@@ -218,9 +230,9 @@ the whole review, and DR is unowned:
   checks that failures deny access rather than allow it (a security lens).
 - [`background-job-orchestration-architect`](../../.claude/skills/background-job-orchestration-architect/SKILL.md)
   owns job retries and dead-letter queues.
-- A text search of all 186 skills finds RTO and RPO only in
-  `data-migration-runbook-author` (as a restore-time gate) and
-  `design-review-facilitator`; no skill designs or reviews DR.
+- A text search of all 186 skills finds no use of RTO or RPO;
+  `data-migration-runbook-author` has only a restore-time gate (restore time
+  against the tolerable outage), and no skill designs or reviews DR.
 
 | Boundary | Owner |
 | --- | --- |
@@ -234,8 +246,9 @@ the whole review, and DR is unowned:
 | Rollback steps; incident procedures | `rollback-runbook-author`; `incident-response-runbook` |
 
 **Recommendation: BUILD, auto-invocable.** It reviews designs, code and
-configuration it can read, and reports. It runs no fault injection; a game-day
-plan is a document for a person to run. Stop Conditions refuse to call a
+configuration it can read, and reports. It runs no fault injection (deliberately breaking a
+component to test recovery); a game-day plan (a scheduled, supervised failure
+drill) is a document for a person to run. Stop Conditions refuse to call a
 failover "tested" without a dated drill record, and stop when no RTO or RPO
 exists (ask the owner, explaining both terms, rather than inventing them).
 
@@ -335,8 +348,10 @@ fits as a scoped addition. The extension:
 **Manual-only:** no. The skill authors documents only and runs nothing.
 
 **Draft replacement description for `data-migration-runbook-author`**, 1,021
-characters measured with `yaml.safe_load`. Every existing trigger and excluded
-neighbor stays; it adds the deploy shape, target confirmation, smoke checks
+characters measured with `yaml.safe_load`. Both excluded neighbors stay. To fit, it drops the trigger phrase "or to
+make a data move operator-safe" and the detail "(counts, checksums, sampled
+equality)", so the build must show the existing trigger evals still pass. It
+adds the deploy shape, target confirmation, smoke checks
 and an exclusion toward `gated-deployment-prompt-template`. "Destructive steps
 are human-run" moves from the description into the body, where the same rule
 already appears in Stop Conditions.
@@ -358,7 +373,10 @@ census.
   environment; the runbook stops at step 1.
 - Trigger: two cases pinning a one-off migration deploy to this skill against
   `gated-deployment-prompt-template` ("template our monthly migration
-  prompt") and `secure-migration-reviewer` ("is this migration safe?").
+  prompt") and `secure-migration-reviewer` ("is this migration safe?"), plus one case
+  pinning "write the rollback plan for migration 0042" to
+  `rollback-runbook-author`, whose description triggers on a rollback plan for
+  a migration and whose seam the new per-stage rollback wording sits beside.
 
 **Estimate:** 1–2 active hours.
 
@@ -379,10 +397,10 @@ layer:
   estate (#245), not differences between environments, and not settings held
   outside IaC.
 - [`vite-build-qa-engineer`](../../.claude/skills/vite-build-qa-engineer/SKILL.md)
-  (manual-only) checks build versus preview parity for one front-end build
+  *(manual-only)* checks build versus preview parity for one front-end build
   tool.
 - [`local-ci-mirror-preflight`](../../.claude/skills/local-ci-mirror-preflight/SKILL.md)
-  (manual-only) mirrors CI checks locally before a push.
+  *(manual-only)* mirrors CI checks locally before a push.
 - `secrets-identity-hardener` classifies variables as public or server-only;
   [`feature-flag-architect`](../../.claude/skills/feature-flag-architect/SKILL.md)
   designs the flag system.
@@ -480,11 +498,13 @@ provider interfaces and restores data, which would force that review skill to
 become manual-only and lose automatic routing.
 
 **Recommendation: BUILD, manual-only.** Evidence mode (the default) runs
-read-only listings of backups and their metadata. Drill mode restores only
-into a named, isolated, non-production target after explicit human approval,
+read-only listings of backups and their metadata. Drill mode restores only into a named, isolated, non-production target after explicit human approval
+that names the drill's cost (a restore spends money on a scratch instance and
+its storage, as well as writing data),
 compares row counts and checksums with the source snapshot, measures restore
 time and removes the scratch copy. Stop Conditions refuse to restore over any
-existing database, refuse production as a restore target, refuse to print or
+existing database, refuse production as a restore target, refuse to start a drill whose
+estimated cost the approval did not state, refuse to print or
 store a credential value, and stop when no RTO or RPO is recorded (hand off to
 `resilience-architecture-reviewer`). "Outside unsafe commit paths" becomes a
 local, read-only check that no database dump sits in the repository or its
@@ -525,7 +545,8 @@ it for manual-only skills; trigger-eval cases use the prefix
   directions.
 
 **Estimate:** 3–5 active hours. The pull request that builds it will likely
-answer "Yes" to the security-relevant-surface question, because it handles
+answer "Yes" to the "Security-relevant surface?" question in the
+[pull request template](../../.github/pull_request_template.md), because it handles
 credentials and restores data.
 
 ## Batch summary
@@ -540,8 +561,13 @@ name. The library would go from 186 to 190 skills.
 
 1. `resilience-architecture-reviewer`, the `data-migration-runbook-author`
    extension, the `horizontal-scalability-reviewer` reciprocity edit, the
-   catalog note recording #254 as merged, and the decision row.
-2. `database-backup-verifier` (manual-only), which completes the
+   catalog note recording #254 as merged, the decision row, and a build step
+   that repoints the disaster-recovery half of the "uptime/DR commitments"
+   route in
+   [`soc2-trust-criteria-mapper`'s scoping map](../../.claude/skills/soc2-trust-criteria-mapper/references/tsc-scoping-map.md)
+   from `slo-reliability-architect`, which does not do DR, to
+   `resilience-architecture-reviewer`.
+2. `database-backup-verifier` *(manual-only)*, which completes the
    resilience-backup pair.
 3. `cloud-security-baseline-reviewer` and `environment-parity-reviewer`
    together, so the one combined `iac-reviewer` rewrite names both, with the
@@ -549,6 +575,10 @@ name. The library would go from 186 to 190 skills.
    `vite-build-qa-engineer` and `local-ci-mirror-preflight` reciprocity edits.
    If the owner defers `environment-parity-reviewer`, this pull request
    carries only the baseline reviewer.
+
+Because #253 and #254 are P0 in category 07, the owner may instead build
+`database-backup-verifier` first. That is an ordering choice, not a scope
+change: it moves pull request 2 ahead of pull request 1.
 
 Each new skill needs its catalog row (the
 [skills catalog](../skills-catalog.md) Phase 6 section), the README counts
@@ -558,7 +588,8 @@ steps in [How to add a skill](../../CONTRIBUTING.md#how-to-add-a-skill).
 **Total estimate:** 14.5–24 active hours, provisional, including 2–3.5 hours
 of batch overhead (registration, decision row, reciprocity edits,
 contract-audit comparison and reviews). Deferring `environment-parity-reviewer`
-gives 12–20. No project-orchestrator route is proposed; confirm at build time
+gives 12–20. No route in `project-orchestrator`
+(the skill that sequences a project's stages) is proposed; confirm at build time
 whether its release stage should name `resilience-architecture-reviewer`.
 
 **Review path per pull request**, as in the feature-flag and QA precedents:
@@ -575,11 +606,10 @@ and
 
 **Decision number:** the build would be recorded as **D70**, provisionally.
 D67 is the highest decision number in the reconciliation log at `80d9dfe7`.
-Open pull request #492 (the QA Tier 1 proposal) claims D68, and the AI
-software-development-lifecycle batch proposal being prepared in parallel
-(`docs/roadmaps/ai-sdlc-skill-batch-proposal.md`, not yet on `main`) claims
-D69. A Phase 7 batch proposal, also being prepared in parallel, claims only
-"the next free number". Numbers go to builds in the order they land, so the
+Open pull request #493 records D68 for the owner's QA Tier 1 build
+decision, and open pull request #494 (the AI software-development-lifecycle
+batch proposal) claims D69. Open pull request #495 (the Phase 7 batch
+proposal) claims only "the next free number". Numbers go to builds in the order they land, so the
 real number is the lowest free one when this batch is built; D70 assumes the
 QA and AI software-development-lifecycle batches land first. Recheck at build
 time.
@@ -632,7 +662,8 @@ evaluation, catalog row, README count or decision-log row, and it edits no
 shipped skill. An owner "build it" answer would be a new instruction to record;
 delivery would then rely on the standing delivery approval in
 [AEGIS-APR-039](../approvals/APPROVAL_REGISTER.md#aegis-apr-039-reaffirmation-of-ongoing-backlog-delivery-approval)
-and its conditions. Nothing here waives a protected `gate-guard` check,
+and its conditions. Nothing here waives a protected `gate-guard` check (the required CI job
+that blocks unapproved changes to the merge gate's own files),
 authorizes a change to `scripts/audit-skill-contracts.py` or its frozen
 baseline, or permits any cloud call, restore, environment write or deployment.
 
