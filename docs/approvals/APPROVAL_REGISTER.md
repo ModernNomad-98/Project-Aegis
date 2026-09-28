@@ -16,6 +16,82 @@ This record preserves the owner's decisions; it does not create them or change
 GitHub settings. Project-specific direct owner grants take precedence over
 generic skill guidance that would require asking for the same approval again.
 
+## How to read this register
+
+Read this page before asking the owner for an approval, or when you need to
+cite the authority for an action. It is written for maintainers and coding
+agents working on this repository. The terms below are reading aids only;
+they do not change any entry's scope. Where an entry and this list differ,
+the entry governs.
+
+- **AEGIS-APR-nnn** is an entry ID; some entries shorten it to **APR-nnn**.
+  Event types are GRANT, POLICY DECISION (selects a policy target, grants no
+  work), CONSUMED (a limited grant was used up) and EXPIRED (a grant lapsed
+  unused). Some GRANT entries clarify, condition or reaffirm an earlier grant
+  and name it on their Event line. "Status at recording" is the status when
+  the entry was written; later events can change it. A one-use grant can be
+  used up even before a later event records that; check its use limit and
+  linked delivery record.
+- **PR** is a GitHub pull request; **issue #nnn** is a GitHub issue. The
+  **head** or **exact head** is the specific latest commit of a pull request
+  that was checked and approved; a 40-character hexadecimal value is a Git
+  commit ID (SHA), often shortened to 7 characters.
+- **CI** (continuous integration) is the GitHub Actions jobs in
+  `.github/workflows/validate-skills.yml`: `validate-skills` (the Linux run),
+  `windows-offline-checks` (the Windows run) and `gate-guard`. On pull
+  requests, `validate-skills` and `gate-guard` are the required checks;
+  `gate-guard` runs on pull requests only. The **DCO** (Developer
+  Certificate of Origin) sign-off check is a pull-request step inside
+  `validate-skills` that requires every commit to be signed off.
+- **gate-guard**, also called the **protected-file guard**, fails whenever a
+  pull request changes a protected path: the merge gate or a surface that
+  enforces it, such as workflow files, `CODEOWNERS`, the validator, the DCO
+  script, CI scripts and tests, or `tools/behavioral_eval_runner/`. A
+  **gate-guard exception** is a one-time owner decision to merge one exact
+  head despite that failure. An **administrator merge** uses repository
+  administrator rights to merge past branch-protection requirements.
+- **Codex** is an automated pull-request reviewer; **P1** and **P2** are its
+  two highest finding priority levels. **SHIP** is an independent reviewer's
+  verdict that a head is ready to merge.
+- **BER** is the Behavioral Eval Runner under `tools/behavioral_eval_runner/`,
+  planned in [the BER backlog](../roadmaps/behavioral-eval-runner-backlog.md).
+  There, **BER-BKL-nnn** is a BER backlog item, **BER-DEC-nnn** an entry in
+  the append-only BER decision log, **WP-…** or "work package …" a BER work
+  package, **OD-1** owner decision 1, and **R4** and **R5** two of the five
+  capability-evidence gates R1–R5 (R4 is operating-system/host isolation and
+  per-tool-path confinement; R5 is execution-profile observability and
+  isolation).
+- **Stage A / Stage B** has two BER senses; read the entry's context. For the
+  evidence bundle (APR-009, APR-037), Stage A binds the pre-judge input
+  evidence and Stage B binds the final report, as defined in
+  [the evidence-policy decision](../roadmaps/ber-bkl-009-evidence-policy-decision.md).
+  For **R4/R5** host proof (APR-028), Stage A is the offline, non-model host
+  capability probe and Stage B the later bounded tool-path proof, as defined
+  in [the selected-host capability decision](../roadmaps/ber-selected-host-capability-decision.md).
+- **CP-WP-nnn** is a control-plane work package in
+  [the resumable control-plane backlog](../roadmaps/resumable-control-plane-backlog.md).
+  Its numbered test cases are **T** (a state transition, T01–T28), **C** (a
+  crash boundary, C01–C09) and **F** (a finding-specific negative acceptance
+  family, F01–F21), each defined in
+  [the control-plane design](../design/resumable-control-plane-v1.md).
+- **Package 2, package 3, Stage 4A and Stage 4B** are successive parts of the
+  issue #101 setup and routing plan in
+  [the routing plan](../roadmaps/aegis-setup-routing-plan.md). Stage 4A is
+  the offline bridge; Stage 4B is the real host proof and is not granted by
+  any Stage 4A entry.
+- **ROUTE-002** is a skill-contract audit rule that reports one skill
+  excluding another when the other skill does not return the exclusion. The
+  audit **engine** (for example v1.13.2) is
+  `scripts/audit-skill-contracts.py`. The **AEGIS-060+ register** is
+  [the contract-audit findings register](../audits/aegis-060-plus-register.md).
+  **D61** is a numbered decision in
+  [the planning record](../reconciliation/step-0-reconciliation-v4.md).
+- Other abbreviations: **ID** identifier, **OS** operating system, **VM**
+  virtual machine, **SDK** software development kit, **CLI** command-line
+  interface, **UTC** Coordinated Universal Time, **PDT** Pacific Daylight
+  Time, **GiB** gibibyte, **ISO** a disc-image file, **SHA-256** a file
+  checksum, **JSON** JavaScript Object Notation.
+
 ## Grants and lifecycle events
 
 ### AEGIS-APR-001: Read-only agents
