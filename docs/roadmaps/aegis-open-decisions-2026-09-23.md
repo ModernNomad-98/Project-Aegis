@@ -14,7 +14,7 @@
 > not re-checked. To resume the session paused on 2026-09-27,
 > start with the [2026-09-27 session checkpoint](session-checkpoint-2026-09-27.md).
 > On 2026-09-28 the three owner decisions under
-> [Decided on 2026-09-28](#decided-on-2026-09-28) were added; twelve later
+> [Decided on 2026-09-28](#decided-on-2026-09-28) were added; eighteen later
 > decisions from the same day were added to that section.
 
 ## Current disposition
@@ -126,7 +126,7 @@ readability ledger itself.
 | Small edits to an accepted page | **A small edit keeps a page's acceptance only if an independent reviewer checked it;** an unreviewed edit, however small, needs a targeted review first. The unreviewed targeted edits in #420, #421 and #423 were reviewed on 2026-09-28: `CONTRIBUTING.md` passed, and the other affected pages were already pending or covered by later full-page acceptances. |
 | Generated reports | **Generated reports get their own ledger class.** A generated report is verified by reproducing it from its generator. Its readability is judged once, on the generator's output format, and it is not re-read after each regeneration; readability fixes go in the generator. As a result, `docs/audits/skill-contract-audit-baseline.md` moves to that class. |
 
-Later on 2026-09-28 the owner decided the twelve items below in the same
+Later on 2026-09-28 the owner decided the eighteen items below in the same
 conversation, each by choosing an option from one of the coordinator's
 multiple-choice questions; the chosen option's label is quoted in each row.
 Dependabot is GitHub's automated dependency-update bot, and a software
@@ -149,6 +149,12 @@ decisions only and grant no authority beyond what they record.
 | `UNRUN`-reason follow-up to #374 | **Skip for now.** The owner chose "Skip for now (Recommended)". No work on how BER reports the reason a case was not run is scheduled. |
 | Which backlog item to unblock first | **Deferred.** The owner answered "skip for now"; no backlog item is selected, and every gate under [Still open for the owner](#still-open-for-the-owner) stays open. |
 | Standing chat instruction on commits, pushes and merges | The owner wrote, verbatim: "all commits, push, and merges are pre-approved as long as they passed local tests and green on github actions". It does not waive a failed `gate-guard` check, which still needs a one-time exact-head exception or a standing register exception; it does not replace the independent-review loop; and it does not override the rule that merges wait for the automated Codex review ([AEGIS-APR-050](../approvals/APPROVAL_REGISTER.md#aegis-apr-050-merges-wait-for-the-automated-codex-review)). It has no register entry at this recording; whether it should become one is for the owner. |
+| Manual-only markers across the library | **Mark real handoffs only.** The owner chose "Mark real handoffs only (Recommended)". A manual-only skill runs only when the user names it. The *(manual-only)* marker goes wherever a page sends the reader or an agent to such a skill: in running text, "Do NOT use" lines and Stop Conditions. Bare mentions in templates, checklists and eval lists are not marked. **Delivered:** the readability sweep fix PRs [#466](https://github.com/ModernNomad-98/Project-Aegis/pull/466) to [#474](https://github.com/ModernNomad-98/Project-Aegis/pull/474) applied this rule; they merged on 2026-09-28 between 15:00 and 15:10 UTC. |
+| BER README readability edits (`tools/behavioral_eval_runner/README.md`) | **Prepare it, then a one-time `gate-guard` exception at exact head `acdcdad` only.** The owner chose "Prepare it (Recommended)", then "Approve for acdcdad only (Recommended)" for the exception, which covers no other PR or head. **Delivered:** [PR #475](https://github.com/ModernNomad-98/Project-Aegis/pull/475) merged on 2026-09-28 at 15:31:48 UTC as `59b2fb7`; recorded as [AEGIS-APR-077](../approvals/APPROVAL_REGISTER.md#aegis-apr-077-pr-475-protected-gate-guard-exception) and its consumption [AEGIS-APR-078](../approvals/APPROVAL_REGISTER.md#aegis-apr-078-consumption-of-the-pr-475-exception) by [PR #479](https://github.com/ModernNomad-98/Project-Aegis/pull/479). |
+| `code-reviewer` description routing | **Apply it.** The owner chose "Apply it (Recommended)": the `code-reviewer` description now sends "skill-library PRs" to `library-diff-reviewer`, replacing "library-changing PRs" to match that skill's own trigger. **Delivered:** [PR #482](https://github.com/ModernNomad-98/Project-Aegis/pull/482) merged on 2026-09-28 at 16:29:04 UTC as `7c8dbf6`. |
+| Spelling out "AI" | **Spell it out everywhere.** The owner chose "Spell it out everywhere": every reader page that uses the abbreviation AI spells it out as "artificial intelligence (AI)" at its first use in the body. **Status:** [PR #486](https://github.com/ModernNomad-98/Project-Aegis/pull/486) (one line on each of 63 pages) is open, not merged, at this recording. |
+| `local-ci-mirror-preflight` in the stage-gate map | **Add it to the map.** The owner chose "Add it to the map (Recommended)": the stage-gate map in `ai-sdlc-operating-model` (`references/stage-gate-map.md`) lists the manual-only `local-ci-mirror-preflight` skill, which runs the repository's continuous integration (CI) checks locally before a push, in its Validate row. This matches what `project-orchestrator` Stage 6 already says. **Status:** [PR #484](https://github.com/ModernNomad-98/Project-Aegis/pull/484) is open, not merged, at this recording. |
+| Manual-only label wording | **Use the short form everywhere.** The owner chose "Use the short form everywhere (Recommended)": the longer label *(manual-only — the routing invariant applies)* in `project-orchestrator` Stages 7 and 8 becomes *(manual-only)*, matching Stage 6. The manual-only routing rule itself is unchanged. **Status:** [PR #484](https://github.com/ModernNomad-98/Project-Aegis/pull/484), the same PR as the row above, is open, not merged, at this recording. |
 
 ### Still open for the owner
 
