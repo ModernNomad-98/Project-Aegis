@@ -542,7 +542,8 @@ against the shipped `code-reviewer`, `full-codebase-auditor`, `api-event-archite
 ### Skills (Phase 6 — cloud, DevOps, reliability & release pack)
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
-`evals/trigger-evals.json` (all ten sit in one of three overlap clusters). Per
+`evals/trigger-evals.json` (the original ten sit in one of three overlap clusters;
+`database-backup-verifier`, added by D71, carries its own seams). Per
 [historical master prompt, section 8](prompts/claude-skills-master-generation-prompts-v4.md): cloud work starts cloud-neutral (requirements, constraints,
 compliance, latency, regions, availability, cost, operability, risk BEFORE
 service mapping). The library adds: provider skills stay provider-idiomatic without inventing
@@ -555,10 +556,13 @@ effects and are **manual-only** (`disable-model-invocation: true`):
 `ci-pipeline-architect` (edits pipeline definitions — behavior-steering,
 secret-adjacent files that execute on push) and `observability-operator`
 (edits live alert/dashboard config, executes operational queries).
+D71 added a third manual-only skill, `database-backup-verifier` (calls provider
+interfaces and restores backups into a scratch target).
 
 Per reconciliation §3, the execution-plan `rollback-strategy-designer` is
 **merged into `rollback-runbook-author`** (strategy + runbook are one
-artifact); the remaining Phase 6 expansion backlog stays unbuilt (see below).
+artifact); the remaining Phase 6 expansion backlog stays unbuilt (see below),
+except `database-backup-verifier` (roadmap #253), built by D71.
 
 | Skill | Source (category doc) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
@@ -572,6 +576,7 @@ artifact); the remaining Phase 6 expansion backlog stays unbuilt (see below).
 | `observability-operator` | cat 07 #246/#247/#248/#252 | **no** (manual-only; edits live alert/dashboard config, runs operational queries) | Hands-on instrumentation (structured, correlated, redacted-at-emission), truthful health checks with timeouts, alerts with severity/owner/runbook-link/justified-threshold, query-verified claims, silences only with owner+expiry; implements slo-reliability-architect's design. |
 | `slo-reliability-architect` | cat 07 #251 (+#247 design side) | yes | Journey-derived SLOs: symptom-based SLIs with measurement points + blind spots, targets with error budgets in user units, burn-rate paging with cause-alert demotions, failure-mode analysis, budget policy with consequences + decider, per-tenant/noisy-neighbor views. |
 | `incident-response-runbook` | cat 07 #249 (+#250) | yes | One-minute severity ladder (ambiguity classifies up), IC/comms/ops roles with small-org collapse rule, triage to decision points, containment by REFERENCE to the rollback artifact, tenant-aware comms with legal gate on exposure, during-incident evidence capture, blameless postmortem where every finding lands (regression-suite-curator, observability-operator, runbook fix, architecture, or owned accepted risk). |
+| `database-backup-verifier` | cat 07 #253 (Phase 6 expansion backlog, built by D71) | **no** (manual-only; calls provider interfaces and restores data) | Proves per store that a usable backup exists instead of trusting "backups enabled": read-only evidence mode gives VERIFIED / GAP / UNVERIFIED on seven checks (exists, non-empty, current against the RPO, retained, encrypted, off-account copy, restore-tested), each with its evidence origin; drill mode restores only into a new or empty, proven non-production scratch target after approval of the exact plan with its estimated cost stated, measures restore time against the RTO, checks row-count and checksum parity against the backup's source, and deletes the copy; never restores into production or over an existing database; UNVERIFIED evidence blocks a drill; flags dump files in the repository history by path and commit; credentials by environment-variable name only. Pinned ≠ `data-migration-runbook-author`, `compliance-evidence-collector`, `rollback-runbook-author`, `pii-lifecycle-designer`, `slo-reliability-architect` and the planned resilience-architecture-reviewer. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the three Phase 6
 clusters: **cloud-architecture** (`cloud-architecture-decider`,
@@ -1326,7 +1331,9 @@ Reconciliation §3 merge: `rollback-strategy-designer` is merged into
 `rollback-runbook-author` (no separate skill). The Phase 6 **expansion backlog**
 (`cloud-security-baseline-reviewer`, `resilience-architecture-reviewer`,
 `migration-deployment-runbook`, `environment-parity-reviewer`,
-`database-backup-verifier`) remains backlog, built in Phase 8 batches.
+`database-backup-verifier`) remains backlog, built in Phase 8 batches, except
+`database-backup-verifier` (#253), which D71 built and moved to
+[Implemented → Skills (Phase 6)](#skills-phase-6--cloud-devops-reliability--release-pack) above.
 
 > Note: `release-readiness-reviewer` and `full-codebase-auditor` exist as **subagents**
 > (review lens) and also as **skills** (procedure) — `full-codebase-auditor` skill shipped

@@ -1,0 +1,96 @@
+{
+  "skill": "database-backup-verifier",
+  "description": "Trigger discrimination for database backup verification (D71): proving that real backups exist, are current and restore, versus setting recovery objectives and disaster-recovery design (the planned resilience-architecture-reviewer), writing the data-move runbook that needs the backup (data-migration-runbook-author), scheduling periodic audit evidence (compliance-evidence-collector), writing release rollback steps (rollback-runbook-author), personal-data retention in backups (pii-lifecycle-designer), and service level objectives (slo-reliability-architect).",
+  "overlaps_with": [
+    "data-migration-runbook-author",
+    "compliance-evidence-collector",
+    "rollback-runbook-author",
+    "pii-lifecycle-designer",
+    "slo-reliability-architect",
+    "resilience-architecture-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "backup-evidence-vs-rpo-wins-here",
+      "prompt": "Explicitly invoke database-backup-verifier. Our recovery point objective is 15 minutes. Check whether the point-in-time recovery window on the orders database is actually keeping up, and whether we have a copy in another account.",
+      "expected_skill": "database-backup-verifier",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer",
+        "slo-reliability-architect"
+      ],
+      "reason": "Checking real backups against an objective that already exists is verification; setting the objective or reviewing the recovery design is not."
+    },
+    {
+      "id": "pre-migration-backup-proof-wins-here",
+      "prompt": "Explicitly invoke database-backup-verifier. Before Saturday's tenant re-shard, prove the customers database backup restores: drill it into a new sandbox instance and measure how long it takes.",
+      "expected_skill": "database-backup-verifier",
+      "should_not_trigger": [
+        "data-migration-runbook-author"
+      ],
+      "reason": "Producing the verified-backup evidence is this skill's job; the runbook author consumes that evidence as a precondition."
+    },
+    {
+      "id": "run-restore-test-now-wins-here",
+      "prompt": "Explicitly invoke database-backup-verifier. The auditors want proof of a backup restore test this quarter. Run one on the billing database into a scratch instance and give me the record.",
+      "expected_skill": "database-backup-verifier",
+      "should_not_trigger": [
+        "compliance-evidence-collector"
+      ],
+      "reason": "Running the restore drill and recording its result is this skill; the evidence collector schedules and files evidence but never runs a restore."
+    },
+    {
+      "id": "restore-points-exist-wins-here",
+      "prompt": "Explicitly invoke database-backup-verifier. Our rollback runbook says 'restore from the pre-release snapshot'. Check that snapshot actually exists, is non-empty and is encrypted.",
+      "expected_skill": "database-backup-verifier",
+      "should_not_trigger": [
+        "rollback-runbook-author"
+      ],
+      "reason": "Verifying that the restore point the runbook relies on is real is evidence work; writing the rollback steps is the runbook author's."
+    },
+    {
+      "id": "migration-runbook-goes-to-runbook-author",
+      "prompt": "Write the operator runbook for moving tenant data from the old cluster to the new one, with batching, verification queries and abort criteria.",
+      "expected_skill": "data-migration-runbook-author",
+      "should_not_trigger": [
+        "database-backup-verifier"
+      ],
+      "reason": "Authoring the data-move runbook belongs to data-migration-runbook-author; this skill only supplies the backup evidence its preconditions require."
+    },
+    {
+      "id": "evidence-schedule-goes-to-collector",
+      "prompt": "Build our SOC 2 evidence calendar: which artifacts we collect for backups, access reviews and change management, how often, and who owns each.",
+      "expected_skill": "compliance-evidence-collector",
+      "should_not_trigger": [
+        "database-backup-verifier"
+      ],
+      "reason": "Scheduling recurring compliance evidence is the collector's job; this skill produces one backup verification when explicitly invoked."
+    },
+    {
+      "id": "release-rollback-goes-to-rollback-author",
+      "prompt": "Write the rollback plan for tomorrow's release: when we roll back versus fix forward, the steps per layer and who decides.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": [
+        "database-backup-verifier"
+      ],
+      "reason": "Rollback strategy and steps belong to rollback-runbook-author; this skill never writes rollback steps."
+    },
+    {
+      "id": "backup-retention-of-personal-data-goes-to-pii",
+      "prompt": "How long may we keep customer personal data in our database backups, and how does a deletion request reach data that is already in a backup?",
+      "expected_skill": "pii-lifecycle-designer",
+      "should_not_trigger": [
+        "database-backup-verifier"
+      ],
+      "reason": "Designing retention and deletion rules for personal data in backups is pii-lifecycle-designer's; this skill only checks retention against a requirement that already exists."
+    },
+    {
+      "id": "slo-targets-go-to-slo-architect",
+      "prompt": "Set availability targets and error budgets for our checkout service, and decide which burn rates should page someone.",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": [
+        "database-backup-verifier"
+      ],
+      "reason": "Service level objectives and paging belong to slo-reliability-architect; backup verification neither sets targets nor alerts."
+    }
+  ]
+}

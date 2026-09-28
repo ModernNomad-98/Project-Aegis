@@ -269,6 +269,10 @@ Execution-plan extras (`cloud-security-baseline-reviewer`, `resilience-architect
 `rollback-strategy-designer`→merged into `rollback-runbook-author`, `migration-deployment-runbook`,
 `environment-parity-reviewer`, `database-backup-verifier`) → Phase 6 expansion backlog.
 
+`database-backup-verifier` (category 07 #253, P0) — **✅ built (D71, 2026-09-28)**, manual-only:
+read-only backup evidence by default, and restore drills only into a named non-production scratch
+target after approval of the exact plan with its estimated cost; it left the expansion backlog.
+
 ### Phase 7 — AI security & LLM systems (P1)
 **Canonical = 14 — v4's 10 + 4 OWASP-gap additions (D6):** `ai-threat-modeler`,
 `prompt-injection-defender`, `rag-security-architect`, `agent-tool-safety-guard`,
