@@ -6,7 +6,12 @@ original design decisions. For present behavior, start with the
 scope and authority, use the [active backlog](../roadmaps/behavioral-eval-runner-backlog.md).
 Within this design, `OS` means operating system, `MCP` means Model Context
 Protocol, `CI` means continuous integration, `SDK` means software development
-kit, and `RC` means release candidate. Use the section headings to find the
+kit, `RC` means release candidate, `API` means application programming
+interface, `JSON` means JavaScript Object Notation, `URL` means a web
+address, `ACL` means access-control list, `DCO` means Developer Certificate of
+Origin (the commit sign-off check), and `SHA` names a Git commit or tree hash
+(from Secure Hash Algorithm; SHA-256 is its 256-bit form). `gate-guard` is the
+CI job that flags protected-file changes for manual review. Use the section headings to find the
 execution model, evidence contract, phases, and decision history; the dated
 status note below explains which design text has since been superseded.
 
@@ -17,6 +22,10 @@ status note below explains which design text has since been superseded.
 > Owner decision 1 (OD-1) is the later measured-calibration ratification gate.
 > The 2026-09-12 pointer and **Status** line below are historical design-time
 > statements: “nothing here is built” is not today's implementation status.
+> Likewise, corpus counts (for example 184 skills, 1,741 units and “roughly
+> twenty” manual-only skills), directory notes and quoted repository wording
+> in the body describe design baseline `e2f1da0` (2026-08-07); §3 dates the
+> 2026-09-26 recount.
 > Offline WP-2B-1 and WP-2B-2 and scoped PR #88 engineering shipped; BER-DEC-008
 > authorized WP-2B-3, but measured calibration and OD-1 remain unfinished.
 > WP-2B-4 remains blocked. Use the [active backlog](../roadmaps/behavioral-eval-runner-backlog.md)
@@ -80,7 +89,7 @@ executed against live agent behavior, and how the first canonical behavioral sui
 (Scenario A) *would* run. It follows the owning skill's Output Format, Validation
 Checklist, and Stop Conditions. Per decision **D3** (recorded in
 [`docs/skill-generation-standard.md` §6](../skill-generation-standard.md) and in the
-generation standard's own words: *"There is no eval runner yet — do not claim evals
+generation standard's own words at design baseline `e2f1da0`: *"There is no eval runner yet — do not claim evals
 'pass,' only that they are present and well-formed"*), the eval convention is validated
 **structurally only**. This design does not change that convention; it specifies the
 runner that could, once built and run, close the execution half of the gap.
@@ -1050,7 +1059,7 @@ Graded by code, no model in the loop:
   the content-agnostic** mechanical-harness oracles on live output: **0 commits** in the
   disposable repo (`Test-ZeroCommitCount` fail-closed logic), **untracked-only**
   `project-state.md`, **append-only** immutable rows (the `Test-AppendOnly` prefix
-  property), and **no forbidden `SS-003`**. The harness's **fixture-pinned digest checks**
+  property), and **no forbidden `SS-003`** (a third stage-snapshot record; Scenario A must stop at `SS-002`). The harness's **fixture-pinned digest checks**
   (`Test-ManifestStep` / `Test-SpecArtifact`, which compare SHA-256 pins of the FIXED
   checked-in fixture sequence) are **not applied to arbitrary live agent output** — a live
   agent's valid wording will never hash to the fixture's pins; live-run hashing is
@@ -1945,7 +1954,7 @@ tools/behavioral-eval-runner/
   Tier-1 activation events? does it distinguish invocation modes? what isolation boundary
   can it provide, §15? deny-by-default on unknown). **Claude Code / Claude Agent SDK is
   the first supported adapter** (§20 D7) because that is the repository's reference surface
-  (`docs/skill-generation-standard.md`: "Claude Code is the reference surface"). The adapter
+  (`docs/skill-generation-standard.md` at design baseline `e2f1da0`: "Claude Code is the reference surface"; the current standard says "reference host"). The adapter
   boundary keeps Aegis from being permanently tied to one vendor **without pretending
   cross-provider parity exists** — a second adapter is added only when a real host
   demonstrably satisfies the same activation-observation contract (§6). No parity is claimed
