@@ -64,7 +64,8 @@ assertions loosened (exact value to "truthy", fewer fields checked, wider
 tolerance); snapshots regenerated without a reason; timeouts or retry counts
 raised; CI steps, linters or coverage gates removed or made non-blocking.
 Deleting a test together with the feature it covered is not a finding when
-the stated intent says so.
+the stated intent says so. A removed or disabled security scan is also a
+security finding; recommend `security-pr-reviewer` for that part.
 
 **Architecture decisions:** the ADRs and layering rules that cover the
 changed files; calls that skip a required layer; a dependency direction the

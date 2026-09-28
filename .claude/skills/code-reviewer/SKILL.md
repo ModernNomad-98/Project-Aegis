@@ -83,8 +83,9 @@ request-changes, with the blocking findings named.
    it (for example, a test deleted together with the feature it covered).
 7. **Fifth pass — maintainability:** naming, duplication, dead code,
    convention drift — reported as minor/nit unless it hides a defect. Drift
-   from a recorded ADR or documented layering rule is MAJOR and cites the ADR
-   or rule; without a recorded decision, convention drift stays minor/nit.
+   from an accepted ADR or a layering rule in the repository's docs is MAJOR
+   and cites the ADR or rule; with no such decision on file, convention drift
+   stays minor/nit.
 8. **Write findings** with severity, anchor, failure scenario, remediation.
    Uncertain claims are marked "needs verification", not asserted.
 9. **Deliver the verdict** with blockers listed; note what was NOT reviewed
