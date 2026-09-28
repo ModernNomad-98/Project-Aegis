@@ -2,8 +2,8 @@
 
 Supporting reference for `database-backup-verifier`. Terms follow the skill's
 Reading key: RPO is the recovery point objective, RTO the recovery time
-objective, PITR point-in-time recovery, KMS a key management service, and
-API an application programming interface.
+objective, PITR point-in-time recovery, and API an application programming
+interface.
 
 Provider behavior (snapshot types, PITR windows, what happens to automated
 backups when an instance is deleted, cross-account copy support, restore

@@ -1,12 +1,14 @@
 {
   "skill": "database-backup-verifier",
-  "description": "Trigger discrimination for database backup verification (D71): proving that real backups exist, are current and restore, versus writing the data-move runbook that needs the backup (data-migration-runbook-author), scheduling periodic audit evidence (compliance-evidence-collector), writing release rollback steps (rollback-runbook-author), personal-data retention in backups (pii-lifecycle-designer), and service level objectives (slo-reliability-architect). The seam with the planned resilience-architecture-reviewer (recovery objectives and disaster-recovery design) is pinned when that skill is on disk, because a routing case may only name skills that exist.",
+  "description": "Trigger discrimination for database backup verification (D71): proving that real backups exist, are current and restore, versus writing the data-move runbook that needs the backup (data-migration-runbook-author), scheduling periodic audit evidence (compliance-evidence-collector), writing release rollback steps (rollback-runbook-author), personal-data retention in backups (pii-lifecycle-designer), service level objectives (slo-reliability-architect), recurring gated-operation templates (gated-deployment-prompt-template) and live production recovery (incident-response-runbook). The seam with the planned resilience-architecture-reviewer (recovery objectives and disaster-recovery design) is pinned when that skill is on disk, because a routing case may only name skills that exist.",
   "overlaps_with": [
     "data-migration-runbook-author",
     "compliance-evidence-collector",
     "rollback-runbook-author",
     "pii-lifecycle-designer",
-    "slo-reliability-architect"
+    "slo-reliability-architect",
+    "gated-deployment-prompt-template",
+    "incident-response-runbook"
   ],
   "cases": [
     {
@@ -89,6 +91,24 @@
         "database-backup-verifier"
       ],
       "reason": "Service level objectives and paging belong to slo-reliability-architect; backup verification neither sets targets nor alerts."
+    },
+    {
+      "id": "gated-template-goes-to-template-author",
+      "prompt": "Write the reusable operator prompt template for our monthly production backfills, with a verified-backup gate before each run and a per-run report.",
+      "expected_skill": "gated-deployment-prompt-template",
+      "should_not_trigger": [
+        "database-backup-verifier"
+      ],
+      "reason": "A reusable template for a recurring gated operation is the template author's; this skill produces the backup evidence one run of that gate needs."
+    },
+    {
+      "id": "production-outage-goes-to-incident-response",
+      "prompt": "The production orders database is corrupted and checkout is down. Who does what right now, and how do we get service back?",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": [
+        "database-backup-verifier"
+      ],
+      "reason": "Recovering production during an outage is an incident; this skill never restores into production and only verifies backups outside an incident."
     }
   ]
 }

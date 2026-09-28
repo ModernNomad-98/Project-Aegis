@@ -24,10 +24,12 @@ only for the drill), checks it, and deletes it. **Parity** means the
 restored copy matches the backup's source: same row counts per table and the
 same **checksums** (a short fingerprint computed from the data, so two
 copies with equal checksums hold equal data). **API** is application
-programming interface. **KMS** is a key management service that holds the
-encryption keys. A **dump file** is a database export written to a file
-(for example a `.sql`, `.dump` or `.bak` file). **UNVERIFIED** means the
-evidence needed for a verdict could not be read, so no verdict is given.
+programming interface. **SLO** is a service level objective (a reliability
+target). A **dump file** is a database export written to a file (for
+example a `.sql`, `.dump` or `.bak` file). Each check gets one verdict:
+**VERIFIED** (the evidence was read and meets the requirement), **GAP** (the
+evidence was read and does not meet it) or **UNVERIFIED** (the evidence
+needed for a verdict could not be read, so no verdict is given).
 The planned Phase 6 skill resilience-architecture-reviewer sets RTO, RPO and
 DR design; if it is not in this copy of the library, say so and ask the
 owner for the recorded objectives instead.
@@ -156,7 +158,9 @@ before proceeding.
    must be proven empty; restoring over any existing database is refused.
    Record the data origin: the restored copy is production data (backup
    identifier, source store, backup time), so it inherits the source's
-   access limits and handling rules for as long as it exists.
+   access limits and handling rules for as long as it exists, and the
+   scratch target must sit in an account and region where that data is
+   allowed to be kept.
 7. **Present the drill plan and obtain approval.** State the backup to
    restore, the scratch target, the estimated cost (instance, storage and
    any cross-region or cross-account transfer, for the expected duration,
@@ -172,7 +176,8 @@ before proceeding.
    the attempt created.
 9. **Check parity.** Compare row counts per table and checksums of agreed
    tables or columns with the backup's source at the backup's time (not
-   with the live store, which has moved on since). Report each mismatch by
+   with the live store, which has moved on since, and never by running
+   queries against production). Report each mismatch by
    table; show counts and checksums, never row contents.
 10. **Delete the scratch copy and prove it.** Remove the scratch instance
     and its storage, then list again to show it is gone. The drill is not
@@ -221,7 +226,8 @@ Handoffs: <resilience-architecture-reviewer | data-migration-runbook-author | se
 - [ ] A drill ran only after an explicit request and approval of the exact
       plan, and that approval stated the estimated cost.
 - [ ] The scratch target was proven non-production and new or empty; no
-      restore went over an existing database or into production.
+      restore went over an existing database or into production, and its
+      account and region are allowed to hold the restored data.
 - [ ] Parity compared counts and checksums with the backup's source, and no
       row contents were shown.
 - [ ] The scratch copy's deletion is shown by a listing.
@@ -311,6 +317,7 @@ Handoffs: <resilience-architecture-reviewer | data-migration-runbook-author | se
   manual-only silence.
 - `evals/trigger-evals.json` — discrimination against
   `data-migration-runbook-author`, `compliance-evidence-collector`,
-  `rollback-runbook-author`, `pii-lifecycle-designer` and
-  `slo-reliability-architect`. The seam with the planned
+  `rollback-runbook-author`, `pii-lifecycle-designer`,
+  `slo-reliability-architect`, `gated-deployment-prompt-template` and
+  `incident-response-runbook`. The seam with the planned
   resilience-architecture-reviewer is pinned once that skill exists.
