@@ -252,10 +252,10 @@ here.
   `ai-sdlc-operating-model`'s **inner lifecycle** (context → classify → plan →
   implement → validate → review → merge → close). Its `stage-gate-map.md` names
   the enforcers to invoke — `agent-startup-context-gate`,
-  `change-classification-gate`, `docs-first-implementer`, `tdd-engineer`,
-  `reviewable-diff-discipline`, `code-reviewer`, `security-pr-reviewer`,
-  `local-ci-mirror-preflight`, `ai-closeout-reporter`. Route to them via that
-  map; do not re-derive the gates.
+  `change-classification-gate`, `docs-first-implementer` *(manual-only)*,
+  `tdd-engineer` *(manual-only)*, `reviewable-diff-discipline` *(manual-only)*,
+  `code-reviewer`, `security-pr-reviewer`, `local-ci-mirror-preflight` *(manual-only)*,
+  `ai-closeout-reporter`. Route to them via that map; do not re-derive the gates.
 - **Stage 7 — Prove it works.** → `qa-strategy-architect` →
   `test-plan-designer`. *By evidence:* `integration-test-designer`,
   `api-contract-test-designer`, `playwright-e2e-engineer` *(manual-only — the
