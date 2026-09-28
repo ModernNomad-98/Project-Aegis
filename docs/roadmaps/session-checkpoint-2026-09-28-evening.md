@@ -18,34 +18,38 @@ Continuous integration (CI) is the automated check run on each PR; GitHub
 Actions runs it. `gate-guard` is the CI check that fails when a PR changes a
 protected path, such as the workflow files or the validator. Codex is the
 automated GitHub code reviewer. Quality assurance (QA) Tier 1 is the first
-batch of testing skills from the roadmap. The AI-SDLC batch covers skills for
-the artificial intelligence (AI)-assisted software development lifecycle
-(SDLC). The "tools test suites" are the Python tests under
+batch of testing skills from the roadmap. The artificial intelligence
+(AI)-assisted software development lifecycle (SDLC) batch, the AI-SDLC batch,
+covers skills for that lifecycle. The "tools test suites" are the Python tests under
 `tools/aegis_setup/tests` and `tools/aegis_delivery_control/tests`. The
 code-health audit of 2026-09-28 numbered its findings by priority: P1 is
 high, P2 is medium. A manual-only skill runs only when the user names it.
 LF is the Unix line ending; `umask` is the Unix setting that decides the
-default permissions of new files.
+default permissions of new files. A PR's head is its latest commit. To
+rebase a PR is to replay its commits onto the current `main`. Frontmatter is
+the settings block at the top of a skill or agent file.
 
 ## Where things stand
 
 | Item | Value at recording |
 | --- | --- |
 | Recorded at | 2026-09-28 22:30 Coordinated Universal Time (UTC) |
-| `main` head | `76b399b11e8068ca26171dbd6d715f161757f35e` (merge of PR #496) |
-| Shipped skills | 187: PR #499 added `acceptance-criteria-reviewer` |
+| Updated at | 2026-09-28 23:10 UTC, after #498, #500 and #508 merged and the owner decided D69 to D71 |
+| `main` head | `d932d2cd7a82e0a5f6af8a1aa423e4db4f7dd29f` (merge of PR #508) |
+| Shipped skills | 188: PR #499 added `acceptance-criteria-reviewer` (187) and PR #500 added `test-tenant-provisioner` (188) |
 | Skill-contract audit | 316 findings, 232 of them informational ROUTE-002 routing notes; report format from audit engine v1.13.4 (PR #503), findings unchanged |
-| Open PRs | Six: #498, #500, #502, #505, #507 and #508. See [Open PRs at recording](#open-prs-at-recording). |
+| Open PRs | Nine besides this page's PR #509: #502, #505, #507, #510, #511, #512, #513, #514 and #515. See [Open PRs at recording](#open-prs-at-recording). |
 
 All times and dates are UTC.
 
 ## Merged since the morning checkpoint
 
-The merge commit is the `main` commit that each PR created. Sixteen PRs merged
+The merge commit is the `main` commit that each PR created. Nineteen PRs merged
 after #485, listed below in merge order (from
 `git log --first-parent`). PR #487, which recorded the morning's later owner
 decisions, merged just before #485 and is not repeated here. Of the numbers
-#486 to #506, the four not listed (#498, #500, #502 and #505) are still open.
+#486 to #508, #487 is covered above and the three not listed (#502, #505 and
+#507) are still open.
 
 | PR | Merge commit | What it did |
 | --- | --- | --- |
@@ -65,28 +69,37 @@ decisions, merged just before #485 and is not repeated here. Of the numbers
 | [#503](https://github.com/ModernNomad-98/Project-Aegis/pull/503) | `c14338d254bde3fd7fb9b8060033299cde5d5197` | Extended the audit report key (engine v1.13.4, APR-079); merged under a one-time `gate-guard` exception |
 | [#499](https://github.com/ModernNomad-98/Project-Aegis/pull/499) | `f0c4b24294514e12790e559a98806d3d9b56b28e` | Added the `acceptance-criteria-reviewer` skill under D68 (186 to 187) |
 | [#496](https://github.com/ModernNomad-98/Project-Aegis/pull/496) | `76b399b11e8068ca26171dbd6d715f161757f35e` | Proposed the scope of the Phase 6 reliability skill batch |
+| [#498](https://github.com/ModernNomad-98/Project-Aegis/pull/498) | `04fb8aa54e965c41fe7c02260745708ccb26575c` | Added a per-surface negative-path matrix to `test-plan-designer` (D68 extension); merged at head `2be50520` |
+| [#500](https://github.com/ModernNomad-98/Project-Aegis/pull/500) | `53f3cf2f86d112f29e8b8130047b33156154737a` | Added the manual-only `test-tenant-provisioner` skill under D68 (187 to 188); merged at head `f8122455` |
+| [#508](https://github.com/ModernNomad-98/Project-Aegis/pull/508) | `d932d2cd7a82e0a5f6af8a1aa423e4db4f7dd29f` | Recorded the #501 exception as APR-080 and APR-081, and applied approval register re-read edits E1 to E4; merged at head `3ccac339` |
 
 ## Owner decisions made on 2026-09-28 after the morning checkpoint
 
 The owner made these decisions in chat by choosing an option from the
 coordinator's multiple-choice questions. The quoted text is his exact answer.
-Only D68 has its own permanent record so far (PR #493); the others live in
-chat and in the PR descriptions named below.
+Only D68 has its own permanent record so far (PR #493). Open PR #510 records
+D69, D70 and D71. The others live in chat and in the PR descriptions named
+below.
 
 | Topic | Exact chat answer | Where it stands |
 | --- | --- | --- |
-| Build the QA Tier 1 skill batch as proposed in PR #492 | "Build it as recommended (Recommended)" | Recorded as D68 (#493). Delivers three new skills and one extension (186 to 189). `acceptance-criteria-reviewer` merged (#499); the other three are open as #498, #500 and #502. |
+| Build the QA Tier 1 skill batch as proposed in PR #492 | "Build it as recommended (Recommended)" | Recorded as D68 (#493). Delivers three new skills and one extension (186 to 189). `acceptance-criteria-reviewer` (#499), the `test-plan-designer` extension (#498) and `test-tenant-provisioner` (#500) merged; `ci-failure-classifier` is open as #502. |
 | Commit, push and open the PR for audit engine v1.13.4 | "Commit, push, open PR (Recommended)" | Merged as #503 |
 | The tools test suites never ran in CI (finding P2-1) | "Fix and add to CI (Recommended)" | Open as #507 |
 | Add a root `.gitattributes` (finding P2-7) | "Add it (Recommended)" | Merged as #504 |
 | Agent files can run commands (finding P2-3) | "Validator + gate both (Recommended)" | Open as #505 |
 | Merge PR #492 | "Merge #492 at 930493c5 (Recommended)" | Merged at that head |
-| One-time `gate-guard` exception for PR #501 | "Approve exception, merge (Recommended)" | Merged; open PR #508 records it as APR-080 and APR-081 |
+| One-time `gate-guard` exception for PR #501 | "Approve exception, merge (Recommended)" | Merged; #508, since merged, records it as APR-080 and APR-081 |
 | A JavaScript test (`node --test`) ran unguarded, PR-controlled code inside a required gate job (the second P1 finding) | "Separate CI job (Recommended)" | Open as #507, which moves it into its own tools jobs |
 | The #505 agent-frontmatter allow-list | "Keep it as is (Recommended)" | #505 keeps its eight allowed keys |
 | Merge seven ready PRs | "Merge all seven (Recommended)" | Merged: #493, #490, #497, #494, #495, #506 and #504 |
 | One-time `gate-guard` exception for PR #503 | "Approve exception, merge (Recommended)" | Merged at head `52269aab`; not yet in the approval register |
-| Delivery-control tests fail on the Windows CI runner because each file's owner is not the current user | "Fix the test fixtures (Recommended)" | Not yet delivered at recording. The Windows tools job in #507 fails until it is. |
+| Delivery-control tests fail on the Windows CI runner because each file's owner is not the current user | "Fix the test fixtures (Recommended)" | Open as the tests-only PR #512 (head `a5274ba`). The Windows tools job in #507 fails until it merges. |
+| Build the AI-SDLC skill batch as proposed in PR #494 | "Build it as recommended (Recommended)" | D69. Open PR #510 records it. Builds open: the `ai-closeout-reporter` per-deliverable trace (#511) and the `code-reviewer` checks (#515). |
+| Build the Phase 7 AI engineering skill batch as proposed in PR #495 | "Build it as recommended (Recommended)" | D70. Open PR #510 records it. Build open: the `ai-router-architect` extension (#513). |
+| Build the Phase 6 reliability skill batch as proposed in PR #496 | "Build all, backup verifier first (Recommended)" | D71. Open PR #510 records it; builds in progress. |
+| Record the #503 exception in the approval register | "Confirm, record it (Recommended)" | Not yet delivered at the update; no register PR was open. |
+| Guard more Claude Code configuration files than #505 covers | "Do it as proposed (Recommended)" | Not yet delivered at the update. |
 
 **Standing instruction.** The owner also said: "I already pre-approved all
 admin merges for PRs as long as local tests and Github Actions are green. Do
@@ -98,41 +111,33 @@ exception.
 ## Open PRs at recording
 
 Codex was out of quota all day. Every Codex request today got a usage-limit
-notice instead of a review. "Blocked" and "conflict" are GitHub's merge states.
+notice instead of a review. This table was brought up to date at the 23:10 UTC
+update.
 
 | PR | Head | What it does | State at recording |
 | --- | --- | --- | --- |
-| [#498](https://github.com/ModernNomad-98/Project-Aegis/pull/498) | `2be5052023e6c53c150138fd937209e13b55458a` | Adds a per-surface negative-path matrix to `test-plan-designer` (D68 extension) | Rebased onto `main` at 22:09. The independent check said SHIP on the earlier head `e9cce7d`; the new head needs a check and green CI. Blocked. |
-| [#500](https://github.com/ModernNomad-98/Project-Aegis/pull/500) | `f8122455baa9aed2f110696d0d701312b6825585` | Adds the manual-only `test-tenant-provisioner` skill (D68) | Rebased and renumbered to 187 to 188 after #499. The independent check said SHIP on the earlier head `77319f8`; the new head needs a check and green CI. Blocked. |
-| [#502](https://github.com/ModernNomad-98/Project-Aegis/pull/502) | `08f550263d21c5d7de19b86bb84f910b22435198` | Adds the `ci-failure-classifier` skill (D68) | Independent check said SHIP on this head. Now in conflict with `main` after #499; needs a rebase, then a check of the new head. |
+| [#502](https://github.com/ModernNomad-98/Project-Aegis/pull/502) | `288e9cd3e07a03e598f0e423f8461e1a403f99eb` | Adds the `ci-failure-classifier` skill (D68) | Rebased onto `main` and renumbered to 188 to 189 (its title still says 186 to 187). CI green. The independent check said SHIP on the earlier head `08f5502`; the new head needs a check. |
 | [#505](https://github.com/ModernNomad-98/Project-Aegis/pull/505) | `ccb28a21ea7b2e13ac9e366ae87056c58c04d79e` | Forbids command-running keys in agent frontmatter and adds `.claude/agents` to `gate-guard` (P2-3) | Revised after a REVISE review; the revision needs its check. `gate-guard` fails by design; merging needs a one-time exact-head exception. |
-| [#507](https://github.com/ModernNomad-98/Project-Aegis/pull/507) | `892a93d35b5dab3f5c9c8aec0bc7917f02694a5c` | Runs the tools test suites in separate CI jobs, outside the gates (P2-1 and the second P1) | The security review said SHIP on the earlier head `b9b0d29`. Two newer commits stop the Windows gate jobs from running programs found in the repository root; the new head needs a check. Its Windows tools job still fails until the fixture fix lands. `gate-guard` fails by design and needs a one-time exact-head exception. |
-| [#508](https://github.com/ModernNomad-98/Project-Aegis/pull/508) | `3ccac3390a86fca08eee4e26a23dc1cc5a9d1fd0` | Records the #501 exception as APR-080 and APR-081, and applies approval register re-read edits E1 to E4 | CI green; waiting for its independent review. |
-
-A new worktree, `record-d69`, appeared at recording. It suggests a D69 record
-PR is being prepared; check `gh pr list` for it.
+| [#507](https://github.com/ModernNomad-98/Project-Aegis/pull/507) | `3f9c8f1b5c96958866971a1090857d0e63087163` | Runs the tools test suites in separate CI jobs, outside the gates (P2-1 and the second P1) | The security review said SHIP on the earlier head `b9b0d29`. Newer commits `892a93d` and `3f9c8f1` stop the Windows gate jobs from running programs found in the repository root (the executable-search fix). A last hardening round is in progress; the final head needs a check. `tools-tests-linux` passes; `tools-tests-windows` fails until #512 merges. `gate-guard` fails by design and needs a one-time exact-head exception. |
+| [#510](https://github.com/ModernNomad-98/Project-Aegis/pull/510) | `93f6e940fb58001a3c60b3532e0eb29d8e821d0f` | Records D69, D70 and D71 in the reconciliation log and the open-decisions page | CI green; waiting for its independent review. |
+| [#511](https://github.com/ModernNomad-98/Project-Aegis/pull/511) | `81b4234c1f87a4bd4cc2fdaa437ac36ffa091d76` | Adds a per-deliverable trace to `ai-closeout-reporter` (D69; folds in backlog candidates #267 and #273) | CI green; waiting for its independent review. |
+| [#512](https://github.com/ModernNomad-98/Project-Aegis/pull/512) | `a5274ba682b343582d61e3ada9633a6b5d776e1a` | Tests only: makes the delivery-control Windows fixtures owned by the current user | CI green; waiting for its independent review. Unblocks the Windows tools job in #507. |
+| [#513](https://github.com/ModernNomad-98/Project-Aegis/pull/513) | `232e4d4d64c88469aa5874d4cd89fb5601fc6c6b` | Extends `ai-router-architect` with per-provider adapters, a capability matrix and conformance tests (D70; folds in backlog candidate #282) | CI green; waiting for its independent review. |
+| [#514](https://github.com/ModernNomad-98/Project-Aegis/pull/514) | `5b0e59b635cf5368d54e12c3f055620f9ad657ef` | Records #489 to #508 in the readability ledger | CI green; waiting for its independent review. |
+| [#515](https://github.com/ModernNomad-98/Project-Aegis/pull/515) | `1b4638f5f99cdde5fda2ed39a887a918b6487829` | Adds weakened-validation and architecture decision record (ADR) drift checks to `code-reviewer` (D69; folds in backlog candidate #277) | CI green; waiting for its independent review. |
 
 ## Decisions still waiting on the owner
 
-1. **Build approvals for three batch proposals.** Each proposal is merged and
-   builds nothing until the owner decides:
-   [AI-SDLC](ai-sdlc-skill-batch-proposal.md) (#494),
-   [Phase 7 AI engineering](phase7-ai-engineering-skill-batch-proposal.md)
-   (#495) and
-   [Phase 6 reliability](phase6-reliability-skill-batch-proposal.md) (#496).
-2. **Code-health findings P2-2, P2-4 and P2-6.** P2-2 is that the CI
+1. **Code-health findings P2-2, P2-4 and P2-6.** P2-2 is that the CI
    requirements pin direct packages but not the packages they pull in. P2-4
    and P2-6 are described in the code-health audit report in chat; they are
    not yet written down in the repository.
-3. **Extra configuration guards.** Whether to guard more Claude Code
-   configuration locations and keys than #505 covers. The #505 review found
-   that Claude Code loads agent settings from more places than the PR checks.
-4. **Required checks.** Whether to make the new tools jobs from #507
+2. **Required checks.** Whether to make the new tools jobs from #507
    required checks in branch protection. They are not required today.
-5. **Leftover-journal handling.** How to handle leftover journal files. The
+3. **Leftover-journal handling.** How to handle leftover journal files. The
    question was raised in chat; its details are not yet written down in the
    repository.
-6. **Carried over from the morning** (see
+4. **Carried over from the morning** (see
    [Still open for the owner](aegis-open-decisions-2026-09-23.md#still-open-for-the-owner)):
    the issue #101 Stage 4B proof on a real host, the semantic review of the
    private Behavioral Eval Runner (BER) candidate labels, CP-WP-003 and
@@ -141,24 +146,26 @@ PR is being prepared; check `gh pr list` for it.
 
 ## Next steps
 
-1. Re-check the new heads of #498 and #500. Merge each one when its CI is
-   green and the check says SHIP.
-2. Deliver the Windows test-fixture fix the owner chose, so the Windows tools
-   job in #507 passes. Then re-check #507 and merge it with its one-time
+1. Review #512 and merge it when green. Then re-check #507 at its final head
+   and merge it with its one-time exact-head `gate-guard` exception.
+2. Check #502 at its new head `288e9cd`, correct its title to 188 to 189, and
+   merge it when green.
+3. Finish the #505 revision check. Merge it after #507 with its one-time
    exact-head `gate-guard` exception.
-3. Rebase #502 onto `main`, renumber its skill count, check the new head and
-   merge when green.
-4. Finish the #505 revision check. Merge it after #507 with its one-time
-   exact-head `gate-guard` exception.
-5. Get the independent review of #508 and merge it when green.
-6. Record the #503 exception (head `52269aab`) in the approval register, in
-   the same way #508 records #501. Also record the #505 and #507 exceptions
-   once they are used.
-7. Record today's later chat decisions, from the table above, in
-   [Decided on 2026-09-28](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28).
-8. Update the readability ledger for #489 onward, including this page, and
-   run the next backlog forecast checkpoint.
-9. Ask the owner the pending decisions above, one at a time.
+4. Review #510 (D69, D70 and D71) and merge it when green.
+5. Build the D69, D70 and D71 batches (Phase 6: backup verifier first).
+   Review and merge each build, starting with #511, #513 and #515.
+6. Record the #503 exception (head `52269aab`) in the approval register, as
+   the owner confirmed, in the same way #508 records #501. Also record the
+   #505 and #507 exceptions once they are used.
+7. Build the extra configuration-file guards the owner approved.
+8. Record today's other later chat decisions, from the table above, in
+   [Decided on 2026-09-28](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28)
+   (#510 adds D69, D70 and D71 there).
+9. Review and merge the readability ledger update (#514). Then record the
+   later merges, including this page, and run the next backlog forecast
+   checkpoint.
+10. Ask the owner the pending decisions above, one at a time.
 
 ## How to resume
 
