@@ -6,13 +6,16 @@ description: 'Review acceptance criteria that already exist, in a spec, ticket o
 # Acceptance Criteria Reviewer
 
 **Reading key:** Acceptance criteria are the conditions a feature must meet
-to count as done. A user story is a short "as a <role>, I want <goal>"
+to count as done. A spec (specification) is a written description of what a
+feature must do. A user story is a short "as a <role>, I want <goal>"
 statement of a need; a ticket is a work item in a tracker. Quality assurance
 (QA) checks behavior against the criteria. Given/when/then is a common
 criterion shape: a starting state, an action, and the expected result.
 A tenant is one customer organization whose data the product keeps apart
 from other customers' data; a sprint is a fixed team planning period,
-often two weeks.
+often two weeks. The definition of done is a team's agreed list of
+conditions that finished work must meet. Latency is the time a request
+takes, and ms means milliseconds.
 
 ## Purpose
 
@@ -20,10 +23,10 @@ Criteria that cannot be checked are the cheapest defect to fix and the most
 expensive to find late: a tester plans around "should load fast", an
 engineer builds to a different reading of "works", and the disagreement
 surfaces at release. This skill reads acceptance criteria someone else
-wrote, in a spec, ticket or user story, and returns a per-criterion verdict
-(TESTABLE, NEEDS-REWRITE or UNTESTABLE) with the reason, the missing
-observable outcome, threshold or evidence, and a suggested rewrite the author
-may accept. It lists the negative, boundary and permission cases the set
+wrote, in a spec, ticket or user story. It returns one verdict per criterion:
+TESTABLE, NEEDS-REWRITE or UNTESTABLE. Each verdict gives the reason, the
+missing observable outcome, threshold or evidence, and a suggested rewrite
+the author may accept. It lists the negative, boundary and permission cases the set
 does not cover as gaps for the owner to decide, and asks one question where
 intent is unclear. It reads and reports only: it never edits the source
 document, never invents a requirement, and never decides whether work is

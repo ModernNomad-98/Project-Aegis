@@ -14,22 +14,27 @@ user with a fixed tenant and role (for example "tenant A owner"). The
 **persona catalog** is the written list of test tenants, personas, roles and
 their stable identifiers. A **test marker** is a field or tag on a row that
 says "this row was created for testing by this tool". A **slug** is a
-tenant's short, unique text name, often used in its web address.
+tenant's short, unique text name, often used in its web address. Auth is
+authentication, the sign-in check. **Drift** is any difference between the
+catalog and what the environment actually holds. A **capability grant**
+gives a user a role, permission or elevated flag. A **lint** is a static
+check that reads files without running them. Playwright is a browser test
+tool.
 
 ## Purpose
 
 Make the test accounts that auth, RLS, integration and E2E runs depend on
 actually exist, in a named non-production environment, exactly as the persona
 catalog describes them, and prove they still match. The deliverable is a
-provisioning report: a drift table (missing, drifted, orphaned, blocked)
-from a read-only validation, and, only when a human explicitly asks for apply
-mode and approves the exact plan, a record of the marked rows created or
-repaired, each capability grant's backup reference and rollback step, and a
-re-validation showing what still differs. It also reports a static lint of
+provisioning report. It always holds a drift table (missing, drifted,
+orphaned, blocked) from a read-only validation. Only when a human explicitly
+asks for apply mode and approves the exact plan does it also record the
+marked rows created or repaired, each capability grant's backup reference
+and rollback step, and a re-validation showing what still differs. It also reports a static lint of
 test configuration that could point automation at production. Hand-made test
 accounts drift silently; this skill replaces them with one repeatable,
 checkable procedure. Built under owner decision D68 (roadmap row #198, as
-broadened by D10).
+broadened by owner decision D10).
 
 ## Use When
 
@@ -49,9 +54,8 @@ broadened by D10).
   invents personas.
 - Do NOT use when: the ask is to write cross-tenant or authorization negative
   TESTS — `multi-tenant-security-tester` *(manual-only)* owns the two-tenant
-  fixture's
-  required shape and the denial assertions; this skill only makes those
-  accounts exist.
+  fixture's required shape and the denial assertions; this skill only makes
+  those accounts exist.
 - Do NOT use when: the question is what a tenant IS, or how real customer
   tenants are provisioned in the product — `tenant-modeler`.
 - Do NOT use when: credentials must be stored, issued or rotated —

@@ -1,6 +1,9 @@
 # Acceptance criteria review sheet
 
 Detail for `acceptance-criteria-reviewer`. Read on demand from the workflow.
+Terms such as tenant follow that skill's reading key. Criterion ids such as
+AC1 mean acceptance criterion 1. In the rewrite patterns, ms means
+milliseconds and s means seconds.
 
 ## 1. The three-part testability check
 
