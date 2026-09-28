@@ -40,7 +40,7 @@ a target, a budget, and a page.
 - Use when: a multi-tenant product needs per-tenant reliability visibility
   (noisy neighbors, enterprise-tier commitments).
 - Do NOT use when: implementing the resulting alerts, dashboards, or
-  instrumentation — `observability-operator` (manual-only) executes this
+  instrumentation — `observability-operator` *(manual-only)* executes this
   design.
 - Do NOT use when: writing what on-call DOES when paged —
   `incident-response-runbook`.

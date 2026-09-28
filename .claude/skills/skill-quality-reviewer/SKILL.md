@@ -165,7 +165,7 @@ Not inspected: <what this review did not read, and why>
   with no situation. The working test: from this description alone, would a
   model know when this skill WINS a request and when it must YIELD?
 - Overlap hides across phases: the confusable neighbor is often in a
-  different pack (agent authority vs end-user RBAC; LLM05 model vs ASI06 memory
+  different pack (agent authority vs end-user RBAC; LLM05 model (LLM04 in 2025) vs ASI06 memory
   poisoning; evidence-policy vs manual-QA evidence). Same-cluster-only
   sweeps miss exactly these.
 - Hollow evals look full: assertions that restate the Workflow verbatim, a

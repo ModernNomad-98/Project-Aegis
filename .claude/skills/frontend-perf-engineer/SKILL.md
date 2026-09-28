@@ -195,7 +195,7 @@ Routed out: <API-side share → latency-budget-architect table; harness mechanic
 - [ ] The budget design names numbers, device class, and CI gate placement;
       the dependency budget-claim rule is stated.
 - [ ] Measurement is routed to the harness; build verification to
-      vite-build-qa-engineer.
+      `vite-build-qa-engineer`.
 - [ ] User-facing font, fidelity, or budget choices explain viable options,
       effects and costs, a reasoned recommendation, and one question each.
 
