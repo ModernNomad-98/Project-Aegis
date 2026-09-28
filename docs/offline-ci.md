@@ -55,9 +55,25 @@ make a failing gate pass. A separate job shares no runner, environment file,
 `PATH` or checkout with the gates, so this code cannot reach them.
 
 The tools jobs use a read-only token, reference no secrets and do not persist
-checkout credentials. `scripts/tests/test_offline_ci.py` checks this layout: a
-gate job that runs Node, runs a tools suite or executes a repository path
-outside the `gate-guard` pattern fails the CI self-tests.
+checkout credentials. `scripts/tests/test_offline_ci.py` checks this layout. The
+CI self-tests fail when a gate job does any of these:
+
+- runs Node or a tools suite;
+- names a repository path outside the `gate-guard` pattern in a command,
+  `working-directory`, `-m` module, `-r` file, `env` value or action input;
+- uses a local or unpinned action;
+- sets a variable that redirects code loading, such as `PYTHONPATH` or `PATH`.
+
+The tests read the workflow text. They cannot see what a protected script does
+internally; `gate-guard` covers that by requiring review of every protected
+change.
+
+On Windows, `CreateProcess` looks for a program such as `git` or `python` in
+the current directory before `PATH`. The recorder runs from the checkout root,
+so the workflow sets `NoDefaultCurrentDirectoryInExePath=1` to turn that search
+off, and `gate-guard` also protects root-level `.exe`, `.com`, `.bat`, `.cmd`
+and `.ps1` files. A Windows-only self-test proves that a root `git.exe` runs
+without the variable and does not run with it.
 
 Whether the tools jobs become required status checks is a separate
 branch-protection decision for the owner. Until then they are visible
@@ -143,8 +159,9 @@ new checks' dependencies: `scripts/ci/`, the contract-audit script, all acceptan
 scripts and fixtures, the entire BER package (runtime, tests, schemas and fixtures),
 its parent import paths `tools.py` and `tools/__init__.py`, and both root requirements
 files. Changes to these paths require explicit review and deliberate merge.
-The guard also protects all of `scripts/` and every root-level Python module,
-extension, `.pth` file or package `__init__`, matched case-insensitively. Those
+The guard also protects all of `scripts/`, every root-level Python module,
+extension, `.pth` file or package `__init__`, and every root-level `.exe`, `.com`,
+`.bat`, `.cmd` or `.ps1` file, matched case-insensitively. Those
 are the directories Python puts first on the import path when the workflow runs
 `python scripts/<name>.py` or `python -m <module>`, so a new file there could
 shadow the standard library or PyYAML and turn a failing check green. Every

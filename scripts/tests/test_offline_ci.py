@@ -171,6 +171,16 @@ class ProtectedFileGuardTests(unittest.TestCase):
                 self.assertEqual(1, result.returncode, result.stdout + result.stderr)
                 self.assertIn("requires manual review and merge", result.stdout)
 
+    def test_root_executables_require_manual_merge(self):
+        # Windows CreateProcess can resolve `git` or `python` from the checkout
+        # root, the recorder's working directory.
+        for path in ("git.exe", "python.exe", "PWSH.EXE", "powershell.com", "git.bat",
+                     "python.cmd", "profile.ps1"):
+            with self.subTest(path=path):
+                result = self.run_guard([path])
+                self.assertEqual(1, result.returncode, result.stdout + result.stderr)
+                self.assertIn("requires manual review and merge", result.stdout)
+
     def test_symlinked_claude_entries_require_manual_merge(self):
         # A nested `.claude` or `.claude/agents` symlink can point at a payload
         # directory whose own paths never contain `.claude/agents/`.
@@ -224,7 +234,8 @@ class ProtectedFileGuardTests(unittest.TestCase):
                                  "docs/gitattributes.md", ".gitattributes.md", "x.gitattributes",
                                  "x.mcp.json", "docs/mcp.json", ".mcp.json.example",
                                  ".claude/commands-notes.md", "docs/claude/settings.json",
-                                 ".claude/skills/example/hooks.md", "CLAUDE.md", "AGENTS.md"])
+                                 ".claude/skills/example/hooks.md", "CLAUDE.md", "AGENTS.md",
+                                 "docs/tool.exe", "tools/aegis_setup/run.ps1"])
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_renaming_a_protected_file_outside_the_set_is_still_guarded(self):
@@ -382,6 +393,79 @@ class GateJobIsolationTests(unittest.TestCase):
             needs = [needs] if isinstance(needs, str) else needs
             with self.subTest(job=job_name):
                 self.assertFalse(set(needs) & set(self.TOOLS_JOBS))
+
+    def test_gate_jobs_use_only_pinned_remote_actions(self):
+        # A local `uses: ./path` action would run checkout code in the gate.
+        for job_name in self.GATE_JOBS:
+            for step in self.workflow["jobs"][job_name]["steps"]:
+                if "uses" in step:
+                    with self.subTest(job=job_name, uses=step["uses"]):
+                        self.assertRegex(step["uses"], r"^[\w.-]+/[\w.-]+@[0-9a-f]{40}$")
+
+    # Variables that make an interpreter, shell or tool load code from a
+    # chosen location. None has a place in a gate job.
+    LOADER_VARIABLES = {
+        "PATH", "PYTHONPATH", "PYTHONHOME", "PYTHONSTARTUP", "PYTHONUSERBASE",
+        "PYTHONPLATLIBDIR", "PYTHONEXECUTABLE", "NODE_OPTIONS", "NODE_PATH",
+        "PSMODULEPATH", "GIT_EXEC_PATH", "GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM",
+        "BASH_ENV", "ENV", "LD_PRELOAD", "LD_LIBRARY_PATH",
+    }
+
+    def gate_settings(self):
+        """Yield (where, key, value) for every env and `with` value gate steps see."""
+        for key, value in self.workflow.get("env", {}).items():
+            yield "workflow env", key, value
+        for job_name in self.GATE_JOBS:
+            job = self.workflow["jobs"][job_name]
+            for key, value in job.get("env", {}).items():
+                yield f"{job_name} env", key, value
+            for step in job["steps"]:
+                where = f"{job_name}/{step.get('name', step.get('uses'))}"
+                for section in ("env", "with"):
+                    for key, value in step.get(section, {}).items():
+                        yield f"{where} {section}", key, value
+
+    def test_gate_environment_sets_no_loader_variable_or_unguarded_path(self):
+        settings = list(self.gate_settings())
+        self.assertGreaterEqual(len(settings), 10)
+        for where, key, value in settings:
+            with self.subTest(where=where, key=key):
+                if where.endswith("env"):
+                    self.assertNotIn(key.upper(), self.LOADER_VARIABLES)
+                if "${{" not in value and ("/" in value or "\\" in value):
+                    self.assertRegex(value.replace("\\", "/"), self.gate_pattern)
+
+    def test_workflow_disables_windows_current_directory_executable_search(self):
+        self.assertEqual("1", self.workflow["env"]["NoDefaultCurrentDirectoryInExePath"])
+
+    @unittest.skipUnless(sys.platform == "win32", "Windows executable search order")
+    def test_root_executable_cannot_replace_git_under_the_workflow_env(self):
+        # CreateProcess searches the PARENT's current directory. The recorder
+        # runs from the checkout root and starts `git`, so a stand-in git.exe
+        # there (a copy of hostname.exe) must not run when the workflow's
+        # variable is set. The parent below mimics the recorder.
+        stand_in = Path(os.environ["SystemRoot"]) / "System32" / "hostname.exe"
+        with tempfile.TemporaryDirectory(prefix="aegis-ci-exe-") as temporary:
+            shutil.copyfile(stand_in, Path(temporary) / "git.exe")
+
+            def run_git(search_current_directory):
+                env = dict(os.environ)
+                env.pop("NoDefaultCurrentDirectoryInExePath", None)
+                if not search_current_directory:
+                    env["NoDefaultCurrentDirectoryInExePath"] = (
+                        self.workflow["env"]["NoDefaultCurrentDirectoryInExePath"])
+                parent = ("import subprocess; "
+                          "r = subprocess.run(['git', '--version'], capture_output=True, text=True); "
+                          "print(r.stdout.strip())")
+                return subprocess.run([sys.executable, "-c", parent], cwd=temporary, env=env,
+                                      capture_output=True, text=True, timeout=60)
+
+            protected = run_git(search_current_directory=False)
+            self.assertEqual(0, protected.returncode, protected.stderr)
+            self.assertTrue(protected.stdout.startswith("git version"), protected.stdout)
+            # Proves the stand-in is live: without the variable, it runs instead.
+            exposed = run_git(search_current_directory=True)
+            self.assertFalse(exposed.stdout.startswith("git version"), exposed.stdout)
 
 
 if __name__ == "__main__":

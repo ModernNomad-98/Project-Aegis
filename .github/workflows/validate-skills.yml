@@ -40,7 +40,14 @@ permissions:
 # which share no runner, environment file, PATH or checkout with the gates.
 # A step in a gate job can write $GITHUB_ENV or $GITHUB_PATH, or rewrite a
 # gate script before it runs, so unguarded code must never run there.
+#
+# Windows executable lookup. CreateProcess searches the working directory
+# (the checkout root) before PATH, so a root git.exe or python.exe added by a
+# pull request would run in place of the real tool when record-check.py
+# starts a command. NoDefaultCurrentDirectoryInExePath turns that search off;
+# gate-guard also protects root-level executables and scripts.
 env:
+  NoDefaultCurrentDirectoryInExePath: '1'
   PYTHONDONTWRITEBYTECODE: '1'
   PYTHONIOENCODING: utf-8
   AEGIS_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -356,7 +363,9 @@ jobs:
           # shadow an import. The checkout root is first on sys.path for the
           # -m commands, so any root-level module, extension, .pth file or
           # package __init__ (tools.py, yaml.py, unittest.py, sitecustomize.py,
-          # conftest.py, yaml/__init__.py, ...) is protected too. Matching is
+          # conftest.py, yaml/__init__.py, ...) is protected too, as is any
+          # root-level executable or script (git.exe, python.cmd, ...), which
+          # Windows would otherwise find in the working directory. Matching is
           # case-insensitive because Windows and macOS checkouts fold case.
           # .claude/agents/ is protected because Claude Code honours `hooks`,
           # `mcpServers` and `permissionMode` in project agent files, so an
@@ -376,7 +385,7 @@ jobs:
           # copies, so every depth is protected, and the commands, hooks and
           # plugin directory entries match with or without a trailing slash
           # so a symlink standing in for the directory is protected too.
-          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|(.*/)?\.claude/((agents|commands|hooks)(/|$)|settings(\.local)?\.json$)|(.*/)?\.claude$|(.*/)?\.claude-plugin(/|$)|(.*/)?\.mcp\.json$|(.*/)?\.gitattributes$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
+          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|(.*/)?\.claude/((agents|commands|hooks)(/|$)|settings(\.local)?\.json$)|(.*/)?\.claude$|(.*/)?\.claude-plugin(/|$)|(.*/)?\.mcp\.json$|(.*/)?\.gitattributes$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth|exe|com|bat|cmd|ps1)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
           shopt -s nocasematch
           gate_files=()
           echo "Files changed in this PR:"
