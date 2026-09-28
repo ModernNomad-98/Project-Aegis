@@ -4,29 +4,73 @@
 > skill-contract audit, for maintainers checking which skill texts the audit
 > script flags for review. Everything below this note is script output.
 >
-> **Regenerated 2026-09-27 under AEGIS-APR-065** (an owner grant in the
-> [approval register](../approvals/APPROVAL_REGISTER.md)) from origin/main
-> `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` with engine v1.13.2 (checkout
+> **Regenerated 2026-09-28 under AEGIS-APR-073** (an owner grant in the
+> [approval register](../approvals/APPROVAL_REGISTER.md)) with engine v1.13.3,
+> which changes only the report's format, over the same corpus as the
+> v1.13.2 baseline: `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` (checkout
 > with core.autocrlf=false, so the corpus hash is over LF (line feed, Unix-style
-> line ending) bytes). The previous
-> v1.13.1 baseline (186 skills, 317 findings, from
-> `656194426e2ea3358fa29fcf19e05f0278d9c270`, pull request (PR) #432 under the earlier grant AEGIS-APR-058) is
-> in git history at `7894567d49d301f82f40cb6445b668581d5799ac` (#432's merge).
-> The engine sentence below, "freezes the state of the corpus BEFORE
-> remediation", is fixed template text; this report records the corpus after
-> remediation. Structural findings are not behavioral proof.
+> line ending) bytes). Findings, rule inventory, vocabulary census and corpus
+> hash are identical to that baseline. The previous v1.13.2 baseline
+> (186 skills, 316 findings, pull request (PR) #441 under the earlier grant
+> AEGIS-APR-065) is in git history at
+> `3c51fb2f6f4a22c6120b38d2a7e9f0074b6bf69c` (#441's merge).
+> Structural findings are not behavioral proof.
 
-- Tool: `audit-skill-contracts` v1.13.2 (engine sha256 `8622bac7f2e7d91f…`)
-- Repo SHA: `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` (branch `chore/regenerate-audit-baselines-v1132`; working tree dirty: false; dirty scanned surfaces: none)
+- Tool: `audit-skill-contracts` v1.13.3 (engine sha256 `d85ff51e58d6d123…`)
+- Repo SHA: `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` (branch `chore/audit-engine-v1133-report-format`; working tree dirty: false; dirty scanned surfaces: none)
 - Corpus content hash: `a14f70c96c3b3ac4268d0b644dbb7c7b81b6d40e3665baba3ddcde119146b73b` (715 files, 4735807 bytes)
 - Skills scanned: **186**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **316** (232 mechanical, 84 semantic-review candidates)
 
-A baseline finding is EXPECTED here: this report freezes the state of
-the corpus BEFORE remediation. A finding below is not a tool failure,
-structural findings are not behavioral proof, and rows marked
+Findings are EXPECTED here: this report records the corpus as it is
+at the Repo SHA above, after whatever remediation that commit already
+contains. A finding below is open work or census data, not a tool
+failure; structural findings are not behavioral proof, and rows marked
 SEMANTIC-REVIEW CANDIDATE are readings for a reviewer skill — never
 mechanically proven defects.
+
+## How to read this report
+
+- **SHA-256 / sha256:** a fingerprint of some bytes; any change to the bytes changes it. `engine sha256` fingerprints this audit script (first 16 hex characters shown).
+- **Repo SHA:** the Git commit ID of the checkout that was scanned.
+- **Corpus content hash:** one SHA-256 over every audited skill file, so two reports with the same hash scanned the same bytes.
+- **JSON report:** the machine-readable output of the same run (`--json`; JSON is JavaScript Object Notation). It holds every finding in full plus the complete rule inventory.
+- **Severity:** P0 is the most serious, then P1, then P2; `info` is census data to look at, not a defect.
+- **`[severity/confidence/kind]`:** after each finding's rule code. Confidence (high, medium or low) is how sure the rule is of its reading. Kind is `mechanical` (a text check that is true or false) or `SEMANTIC-REVIEW CANDIDATE` (a person must judge it).
+- **owner:** the skill whose files should change to resolve the finding.
+- **maps: AEGIS-0NN:** the numbered defect this finding relates to (AEGIS-001 to AEGIS-059 in `docs/audits/volunteerflow/`, later ones in `docs/audits/aegis-060-plus-register.md`); `—` means none.
+- **§5:** section 5, "Least privilege & side effects", of `docs/skill-generation-standard.md`.
+- **`term×N`** (vocabulary census): the skill uses that word N times.
+
+| Rule | Default severity | Kind | What it flags | Findings |
+|---|---|---|---|---:|
+| SIDE-001 | P1 | mechanical | read-only-declared skill instructs artifact writes | 0 |
+| SIDE-002 | P0 | mechanical | read-only-declared skill mentions scratch/temp/memory writes | 0 |
+| SIDE-003 | P0 | mechanical | read-only-declared skill grants write-capable tools | 0 |
+| SIDE-004 | P1 | semantic-candidate | auto-invocable skill's Workflow instructs a §5 mutation class without cover | 73 |
+| APPR-001 | P1 | mechanical | bare generic status value with no approval class | 0 |
+| APPR-002 | P0 | semantic-candidate | scope grant authorizing BUILD from a requirements-stage approval | 0 |
+| APPR-003 | P1 | mechanical | approval record with allowed scope but no forbidden scope | 0 |
+| STATE-001 | P0 | semantic-candidate | append-only-declared file carries mutable placeholders | 2 |
+| STATE-002 | P0 | mechanical | append-only-declared file instructs overwrite/rewrite/truncate | 0 |
+| STATE-003 | P0 | mechanical | middle insertion described inside an append-only contract | 0 |
+| STATE-004 | P0 | semantic-candidate | exact-operation claim with unbound placeholders in command fences | 0 |
+| STATE-005 | P1 | semantic-candidate | narrative approved-state section inside an append-only contract | 0 |
+| ARTF-001 | P1 | semantic-candidate | durability claim without a durability level | 9 |
+| ROUTE-001 | P1 | mechanical | routing reference to a name that is not on disk | 0 |
+| ROUTE-002 | info | mechanical | exclusion toward a neighbor that never reciprocates (CENSUS) | 232 |
+| ROUTE-003 | P1 | mechanical | a Stage-2 route reaches the commitments skill without a readiness/NOT-COMMIT-ABLE guard ON THAT ROUTE, or the roadmap owner is not independently classified | 0 |
+| VOCAB-002 | P1 | semantic-candidate | committed used as a roadmap horizon label | 0 |
+| VOCAB-003 | P0 | semantic-candidate | approved scope described as a commitment | 0 |
+| PARITY-001 | P2 | mechanical | Validation Checklist with no checkable items | 0 |
+| PARITY-002 | P2 | mechanical | Output Format too thin to verify against | 0 |
+| EVAL-001 | P2 | mechanical | no negative discrimination case anywhere in the skill's evals (STRUCTURAL) | 0 |
+| EVAL-002 | P2 | mechanical | eval case unjudgeable as written (per schema) | 0 |
+| EVAL-003 | P1 | semantic-candidate | approval/state-related skill with no refusal or boundary case | 0 |
+| EVAL-004 | P1 | mechanical | trigger-eval target does not resolve in the namespace its syntax declares | 0 |
+| REF-001 | P1 | mechanical | markdown link target missing on disk | 0 |
+| REF-002 | info | semantic-candidate | absolute user-machine path in shipped content | 0 |
+| REF-003 | P1 | mechanical | bare references/ file mention missing on disk | 0 |
 
 ## Coverage (what was and was not reviewed)
 
@@ -140,7 +184,7 @@ mechanically proven defects.
 
 ## P2/info findings (summarized; full detail in the JSON report)
 
-- **ROUTE-002** × 232 — e.g. `.claude/skills/ab-test-designer/SKILL.md`: exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this
+- **ROUTE-002** × 232 — e.g. `.claude/skills/ab-test-designer/SKILL.md`: exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this skill) — census evidence, no AEGIS id
 
 ## Vocabulary census (non-zero skills)
 

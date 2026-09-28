@@ -97,6 +97,16 @@ remain in git history at
 [`docs/audits/skill-contract-audit-baseline.md` at `7894567`](https://github.com/ModernNomad-98/Project-Aegis/blob/7894567d49d301f82f40cb6445b668581d5799ac/docs/audits/skill-contract-audit-baseline.md)).
 The historical counts below are unchanged.
 
+**Report format updated, 2026-09-28.** Under AEGIS-APR-073, engine v1.13.3
+rescanned the same commit `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` and
+changed only the report's format: a "How to read this report" key, the
+ROUTE-002 example shown whole, and a corrected sentence that had said the
+report froze the corpus before remediation. The findings (316), rule
+inventory, vocabulary census and corpus hash are identical to v1.13.2, whose
+files remain in git history at
+[`3c51fb2`](https://github.com/ModernNomad-98/Project-Aegis/tree/3c51fb2f6f4a22c6120b38d2a7e9f0074b6bf69c/artifacts/audits)
+(PR #441's merge). The historical counts below are unchanged.
+
 Rules of this register (from the program's operating rules):
 
 - AEGIS-001..059 are never renumbered, merged, or reused. New IDs start at

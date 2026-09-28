@@ -483,17 +483,47 @@ def test_eval004_non_subagent_parenthetical_is_a_skill_name() -> None:
                 expect=["P1", "P1"])
 
 
+def test_markdown_glossary_and_whole_examples(a) -> None:
+    # Output FORMAT only (1.13.3): the report explains its own shorthand, the
+    # rule table is generated from RULES, and P2/info examples are not cut.
+    md = a.to_markdown()
+    assert "## How to read this report" in md, "report must carry its glossary"
+    assert md.index("## How to read this report") < md.index("## Coverage"), (
+        "glossary must precede the first use of the shorthand it explains")
+    assert "BEFORE remediation" not in md, (
+        "report must not claim it freezes the corpus before remediation")
+    for term in ("**Repo SHA:**", "**SHA-256 / sha256:**", "**JSON report:**",
+                 "**Severity:**", "[severity/confidence/kind]",
+                 "**maps: AEGIS-0NN:**", "**§5:**"):
+        assert term in md, f"glossary term missing: {term}"
+    for r in audit_mod.RULES:
+        row = f"\n| {r['id']} | {r['severity']} | {r['classification']} | "
+        assert row in md, f"rule table row missing for {r['id']}"
+    detailed = [f for f in a.findings
+                if f.severity in ("P0", "P1") or not f.mechanical]
+    firsts: dict = {}
+    for f in a.findings:
+        if f not in detailed:
+            firsts.setdefault(f.rule, f)
+    assert firsts, "fixture must produce at least one P2/info finding"
+    for rule, f in firsts.items():
+        assert f"`{f.file}`: {f.evidence.rstrip()}" in md, (
+            f"{rule} example must be printed whole, not sliced")
+    ok(f"markdown report carries a generated glossary ({len(audit_mod.RULES)} "
+       f"rules) and prints {len(firsts)} P2/info example(s) whole")
+
+
 def test_audit_engine_version_marks_corrected_eval004_semantics() -> None:
     # Codex 3797458777 — EVAL-004's observable semantics changed, so the engine
     # must not still identify as 1.12.0. The frozen historical baseline is the
     # type-collapsing 1.12.0 engine; a corrected live report has to be
     # distinguishable by VERSION, not only by engine source hash.
     # 1.13.2 adds whole-name skill matching (ROUTE-002 false positive fix).
-    assert audit_mod.TOOL_VERSION == "1.13.2", (
+    assert audit_mod.TOOL_VERSION == "1.13.3", (
         f"corrected EVAL-004 semantics require a minor bump; got "
         f"{audit_mod.TOOL_VERSION!r}"
     )
-    ok("audit engine reports v1.13.2 for corrected EVAL-004 semantics, raw ARTF-001 "
+    ok("audit engine reports v1.13.3 for corrected EVAL-004 semantics, raw ARTF-001 "
        "anchors and whole-name skill matching")
 
 
@@ -1847,6 +1877,7 @@ def main() -> int:
     test_every_rule_has_own_positive_and_negative(a)
     test_route_rules(a)
     test_route002_is_unmapped_census(a)
+    test_markdown_glossary_and_whole_examples(a)
     test_side004_fixture_classes(a)
     test_side004_real_corpus_targets()
     test_side004_approval_elsewhere_never_suppresses()
