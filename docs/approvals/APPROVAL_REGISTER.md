@@ -62,7 +62,9 @@ the entry governs.
   planned in [the BER backlog](../roadmaps/behavioral-eval-runner-backlog.md).
   There, **BER-BKL-nnn** is a BER backlog item, **BER-DEC-nnn** an entry in
   the append-only BER decision log, **WP-…** or "work package …" a BER work
-  package, **OD-1** owner decision 1, and **R4** and **R5** two of the five
+  package (except "control-plane work package 003A" in AEGIS-APR-006, which
+  is CP-WP-003A below), **OD-1** owner decision 1, and **R4** and **R5** two
+  of the five
   capability-evidence gates R1–R5 (R4 is operating-system/host isolation and
   per-tool-path confinement; R5 is execution-profile observability and
   isolation).
@@ -96,7 +98,8 @@ the entry governs.
   **D61** is a numbered decision in
   [the planning record](../reconciliation/step-0-reconciliation-v4.md).
 - Other abbreviations: **ID** identifier, **OS** operating system, **VM**
-  virtual machine, **SDK** software development kit, **CLI** command-line
+  virtual machine, **CPU** central processing unit (processor), **SDK**
+  software development kit, **CLI** command-line
   interface, **UTC** Coordinated Universal Time, **PDT** Pacific Daylight
   Time, **GiB** gibibyte, **ISO** a disc-image file, **SHA-256** a file
   checksum, **JSON** JavaScript Object Notation, **eval** evaluation (a
