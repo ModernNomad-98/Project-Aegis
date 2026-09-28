@@ -98,7 +98,13 @@ TOOL_NAME = "audit-skill-contracts"
 # 1.13.2 — description mentions and the ROUTE-002 exclusion tail match WHOLE
 # skill names. Substring matching counted `ai-threat-modeler` as a mention of
 # `threat-modeler` (owner decision 2026-09-27).
-TOOL_VERSION = "1.13.2"
+# 1.13.3 — Markdown report FORMAT only: a generated "How to read this report"
+# glossary (terms + every rule from RULES) and the P2/info example is printed
+# whole instead of being cut at 120 characters; the fixed sentence that said
+# the report "freezes the state of the corpus BEFORE remediation" is reworded
+# (baselines are regenerated after remediation). Findings, census, inventory,
+# graph and manifest content are unchanged (owner decision 2026-09-28).
+TOOL_VERSION = "1.13.3"
 
 
 class InputContainmentError(Exception):
@@ -1807,12 +1813,14 @@ class Audit:
             f"({s['mechanical_count']} mechanical, "
             f"{s['semantic_review_candidates']} semantic-review candidates)",
             "",
-            "A baseline finding is EXPECTED here: this report freezes the state of",
-            "the corpus BEFORE remediation. A finding below is not a tool failure,",
-            "structural findings are not behavioral proof, and rows marked",
+            "Findings are EXPECTED here: this report records the corpus as it is",
+            "at the Repo SHA above, after whatever remediation that commit already",
+            "contains. A finding below is open work or census data, not a tool",
+            "failure; structural findings are not behavioral proof, and rows marked",
             "SEMANTIC-REVIEW CANDIDATE are readings for a reviewer skill — never",
             "mechanically proven defects.",
             "",
+            *self._markdown_glossary(s),
             "## Coverage (what was and was not reviewed)",
             "",
             f"- **Mechanically scanned:** all {s['skill_count']} shipped skills' "
@@ -1865,7 +1873,7 @@ class Audit:
         for rule, hits in sorted(by_rule.items()):
             lines.append(
                 f"- **{rule}** × {len(hits)} — e.g. `{hits[0].file}`: "
-                f"{hits[0].evidence[:120].rstrip()}"
+                f"{hits[0].evidence.rstrip()}"
             )
         lines += ["", "## Vocabulary census (non-zero skills)", ""]
         for name, counts in sorted(self.census.items()):
@@ -1873,6 +1881,52 @@ class Audit:
             lines.append(f"- `{name}`: {pretty}")
         lines.append("")
         return "\n".join(lines)
+
+    @staticmethod
+    def _markdown_glossary(s: dict) -> list[str]:
+        """Plain-language key for the report's shorthand. The rule table is
+        generated from RULES, so a new rule is explained without editing this
+        text. Output format only: it reads the summary and RULES, never the
+        corpus, and changes no finding."""
+        by_rule = s["by_rule"]
+        lines = [
+            "## How to read this report",
+            "",
+            "- **SHA-256 / sha256:** a fingerprint of some bytes; any change to "
+            "the bytes changes it. `engine sha256` fingerprints this audit "
+            "script (first 16 hex characters shown).",
+            "- **Repo SHA:** the Git commit ID of the checkout that was scanned.",
+            "- **Corpus content hash:** one SHA-256 over every audited skill "
+            "file, so two reports with the same hash scanned the same bytes.",
+            "- **JSON report:** the machine-readable output of the same run "
+            "(`--json`; JSON is JavaScript Object Notation). It holds every "
+            "finding in full plus the complete rule inventory.",
+            "- **Severity:** P0 is the most serious, then P1, then P2; `info` "
+            "is census data to look at, not a defect.",
+            "- **`[severity/confidence/kind]`:** after each finding's rule code. "
+            "Confidence (high, medium or low) is how sure the rule is of its "
+            "reading. Kind is `mechanical` (a text check that is true or false) "
+            "or `SEMANTIC-REVIEW CANDIDATE` (a person must judge it).",
+            "- **owner:** the skill whose files should change to resolve the "
+            "finding.",
+            "- **maps: AEGIS-0NN:** the numbered defect this finding relates to "
+            "(AEGIS-001 to AEGIS-059 in `docs/audits/volunteerflow/`, later "
+            "ones in `docs/audits/aegis-060-plus-register.md`); `—` means none.",
+            "- **§5:** section 5, \"Least privilege & side effects\", of "
+            "`docs/skill-generation-standard.md`.",
+            "- **`term×N`** (vocabulary census): the skill uses that word N times.",
+            "",
+            "| Rule | Default severity | Kind | What it flags | Findings |",
+            "|---|---|---|---|---:|",
+        ]
+        for r in RULES:
+            purpose = r["purpose"].replace("|", "\\|")
+            lines.append(
+                f"| {r['id']} | {r['severity']} | {r['classification']} | "
+                f"{purpose} | {by_rule.get(r['id'], 0)} |"
+            )
+        lines.append("")
+        return lines
 
     def manifest(self) -> dict:
         families = self.catalog_families()
