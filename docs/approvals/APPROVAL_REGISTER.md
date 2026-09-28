@@ -1883,8 +1883,10 @@ the entry governs.
   on that protected path. An independent read-only review of that head,
   covering supply-chain risk (whether the new pin is the genuine upstream
   release) and release readiness (whether it is safe to merge), recommended
-  merge; it was reported to the owner in the conversation, not posted on the
-  PR. Codex posted only a
+  merge; it was reported to the owner in the conversation and, after the
+  merge, posted on the PR in the
+  [review and exception receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/443#issuecomment-5866908461).
+  Codex posted only a
   [usage-limit notice](https://github.com/ModernNomad-98/Project-Aegis/pull/443#issuecomment-5866555248)
   at 2026-09-28 08:46:29 UTC, after the head commit (05:34:52 UTC).
 - **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
@@ -1926,7 +1928,8 @@ the entry governs.
   a fixed 120-character slice in `to_markdown()`, the audit engine's function
   that writes the report. A fixed sentence still says the report "freezes the
   state of the corpus BEFORE remediation", which has not been true since the
-  baselines were regenerated under AEGIS-APR-058 and AEGIS-APR-065.
+  baselines were regenerated after remediation under AEGIS-APR-058, and again
+  under AEGIS-APR-065.
   Readability fixes to a generated report belong in its generator, the
   protected file `scripts/audit-skill-contracts.py`.
 - **Owner decision:** The owner answered "Approve as described
@@ -1943,22 +1946,31 @@ the entry governs.
   - `scripts/tests/test_audit_skill_contracts.py`: the pinned engine version
     and one new test of the report format.
   - `artifacts/audits/skill-contract-audit-baseline.json` and
-    `artifacts/audits/corpus-manifest-baseline.json`: the engine version and
-    `engine_sha256` (the engine file's SHA-256 checksum) only.
+    `artifacts/audits/corpus-manifest-baseline.json`: the engine version,
+    `engine_sha256` (the engine file's SHA-256 checksum) and the run's
+    `branch` value only. The v1.13.3 engine scans a clean checkout
+    (`core.autocrlf=false`) of `5dbf7bc9e958d932bd0c5b093ebecfe61be41840`,
+    the commit the v1.13.2 baseline scanned, so `repo_sha` and the corpus
+    stay the same.
   - `artifacts/audits/corpus-route-graph.json`, only if regeneration changes
     it.
   - `docs/audits/skill-contract-audit-baseline.md`: regenerated, with its
     hand-written preface carried forward.
   - `docs/audits/aegis-060-plus-register.md`: one dated note.
 - **Scope FORBIDDEN:** No change to finding logic, rules, severities, the
-  route graph, manifest semantics or provenance. No new command-line option
+  route graph, manifest semantics or provenance logic. No new command-line option
   or input. No other regeneration. The `findings`, `rule_inventory`,
   `vocabulary_census` and `corpus_content_hash` fields of the regenerated
   JSON must be identical to the v1.13.2 baseline. This grant does not waive
   `gate-guard`: merging the PR needs a separate one-time owner exception for
   its exact head, recorded as its own entry.
 - **Evidence:** Direct owner answer in the Project Aegis conversation on
-  2026-09-28, quoted above, relayed by the coordinating agent. The v1.13.2
+  2026-09-28, quoted above, relayed by the coordinating agent. The scan
+  target comes from the owner's later answer "Frozen commit 5dbf7bc
+  (Recommended)" to the coordinating agent's multiple-choice question in the
+  same conversation on 2026-09-28, after the
+  [register review](https://github.com/ModernNomad-98/Project-Aegis/pull/453#issuecomment-5866957640)
+  found that the grant did not name one. The v1.13.2
   baselines it replaces are in git history at
   `3c51fb2f6f4a22c6120b38d2a7e9f0074b6bf69c` (PR #441, recorded in
   AEGIS-APR-066).
