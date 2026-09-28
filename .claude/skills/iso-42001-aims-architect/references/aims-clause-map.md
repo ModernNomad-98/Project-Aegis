@@ -1,7 +1,7 @@
 # AIMS Clause Map — ISO/IEC 42001:2023
 
 Structure verified from the standard's own TOC (preview PDF, first edition
-2023-12, ISO/IEC JTC 1/SC 42): harmonized clauses 4–10; AI risk assessment
+2023-12, ISO/IEC JTC 1/SC 42): harmonized clauses 4–10; artificial intelligence (AI) risk assessment
 6.1.2 / 8.2; AI risk treatment 6.1.3 / 8.3; AI system impact assessment
 6.1.4 / 8.4; Annex A normative ("Reference control objectives and
 controls"); Annex B normative guidance; Annex C/D informative. Finer wording

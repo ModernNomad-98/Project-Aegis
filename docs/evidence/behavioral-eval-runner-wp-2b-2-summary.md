@@ -180,7 +180,7 @@ run the runner suite.
 - network use: none except the read-only Git/GitHub operations required to clone, verify
   authorization state, push, and open the PR.
 
-Implementation-session AI activity (distinct from runner dispatch, per BER-DEC-007): the
+Implementation-session artificial intelligence (AI) activity (distinct from runner dispatch, per BER-DEC-007): the
 authoring Claude Code session plus **4 bounded read-only review agents** (three finding
 lenses — Scenario A semantics/A–Q completeness, injection resistance/fail-closed
 behavior, schema-integration/scope compliance — and one refutation/consolidation

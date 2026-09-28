@@ -1,6 +1,6 @@
 # AI RMF Function Map
 
-Follow the owning [AI Lifecycle Risk Manager skill](../SKILL.md).
+Follow the owning [Artificial Intelligence (AI) Lifecycle Risk Manager skill](../SKILL.md).
 Verified against the [NIST AI RMF page](https://www.nist.gov/itl/ai-risk-management-framework)
 on 2026-09-24: AI RMF 1.0 released 2023-01-26, voluntary;
 Core = four functions (govern, map, measure, manage); GOVERN is

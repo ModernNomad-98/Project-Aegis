@@ -30,7 +30,7 @@ reviews.
 
 - Use when: designing or overhauling how a prompt/context is assembled for a
   model call — which segments, from where, in what order, under what caps.
-- Use when: deciding what data an AI feature or agent may see — the model
+- Use when: deciding what data an artificial intelligence (AI) feature or agent may see — the model
   currently gets a whole record, table, or document dump because scoping was
   never designed.
 - Use when: secrets, personal data, or raw payloads are landing in prompts

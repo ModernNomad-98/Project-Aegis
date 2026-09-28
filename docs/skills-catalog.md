@@ -1,6 +1,6 @@
 # Project Aegis — Skills & Agents Catalog
 
-This reference helps **developers and AI coding agents** find shipped Aegis
+This reference helps **developers and artificial intelligence (AI) coding agents** find shipped Aegis
 skills and read-only review agents, then distinguish them from planned work.
 Use [Implemented](#implemented) for shipped entries and
 [Backlog by phase](#backlog-by-phase-reconciled) for work that remains. A row

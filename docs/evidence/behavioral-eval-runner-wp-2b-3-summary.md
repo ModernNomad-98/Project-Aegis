@@ -343,7 +343,7 @@ flip at Stage A2). Full report in the external evidence root.
 - sealed-holdout judgments executed: **0 of 120** (NOT OPENED)
 - package-registry access (disclosed; not a provider call): PyPI metadata + wheel
   download for the authorized `openai==3.0.0` install into the isolated venv
-- implementation-session AI activity (authoring Claude session + bounded read-only
+- implementation-session artificial intelligence (AI) activity (authoring Claude session + bounded read-only
   review agents) is implementation-session activity per the standing BER terms — it is
   not Behavioral Eval Runner dispatch and constitutes no calibration evidence.
 

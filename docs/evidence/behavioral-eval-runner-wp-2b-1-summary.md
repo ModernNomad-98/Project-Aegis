@@ -513,7 +513,7 @@ Grading Stack,"** authorized by **BER-DEC-007** (backlog §13). WP-2B-3 itself i
 as the **Measured Judge Calibration and OD-1 Ratification Gate** — BLOCKED and not
 authorized by BER-DEC-007. The WP-2B-2 authorization is **non-live** (zero runner-generated,
 grading-stack-generated, or test-harness-generated model/provider dispatch and zero
-actual judge/provider calls; implementation-session AI activity is separately disclosed
+actual judge/provider calls; implementation-session artificial intelligence (AI) activity is separately disclosed
 and is not runner dispatch) and becomes effective only
 after its governance PR is reviewed and manually merged. It does **not** ratify OD-1, does
 **not** perform measured judge calibration, and does **not** authorize WP-2B-3

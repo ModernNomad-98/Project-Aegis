@@ -16,7 +16,7 @@ it does not conduct live incident response.
 
 ## Purpose
 
-Produce a design-time threat model for an AI system — an LLM feature, RAG
+Produce a design-time threat model for an artificial intelligence (AI) system — an LLM feature, RAG
 pipeline, or agent — that treats the AI-specific attack surface as
 first-class instead of bolting "prompt injection" onto a web threat model.
 The output inventories AI assets and trust boundaries, enumerates threats per

@@ -1,6 +1,6 @@
 # AI governance & risk framework
 
-Use this [AI Governance Risk Reviewer](../SKILL.md) reference to tier a feature's risk, set
+Use this [Artificial Intelligence (AI) Governance Risk Reviewer](../SKILL.md) reference to tier a feature's risk, set
 human oversight, and map applicable obligations to actual controls. The
 companion method is the National Institute of Standards and Technology (NIST)
 Artificial Intelligence Risk Management Framework (AI RMF) 1.0, with its

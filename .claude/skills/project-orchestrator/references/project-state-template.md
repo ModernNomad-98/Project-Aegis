@@ -59,7 +59,7 @@ missing authority. A delayed register transcription does not invalidate a direct
    Decision log, Approvals, Deviations — are append-only. Never edit, delete,
    reorder, or silently replace a past row. A correction is a NEW dated entry
    that references and supersedes the old one, which stays unedited above — the
-   Zero Trust AI Engineering Discipline applied to the build journey.
+   Zero Trust AI Engineering Discipline (AI means artificial intelligence) applied to the build journey.
    For approvals, a superseding event names the old and new grants; revoking
    the successor never restores the predecessor. Legacy ACTIVE fields record
    initial states and never replace full lifecycle checks.

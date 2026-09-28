@@ -9,7 +9,7 @@ description: 'Author the pre-work, evidence-cited guide a parallel agent lane ne
 
 Give each parallel lane its knowledge before its work starts. When an effort
 splits across parallel agents — backend read handlers in one lane, frontend
-in another, AI routing in a third — each implementing agent either receives
+in another, artificial intelligence (AI) routing in a third — each implementing agent either receives
 distilled, verified knowledge of its lane, or spends its first hours
 re-deriving that knowledge from source (differently from its neighbors, and
 sometimes wrongly). The evidence pattern (Repo B of the extraction report ran

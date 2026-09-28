@@ -29,7 +29,7 @@ authorization), which own the harm-prevention half.
 
 - Use when: a model returns JSON or other structured data that application
   code parses and acts on.
-- Use when: defining an enforceable output contract for an AI feature so
+- Use when: defining an enforceable output contract for an artificial intelligence (AI) feature so
   malformed/unexpected responses can't crash or mislead downstream logic.
 - Use when: the model output becomes function/tool arguments and the shape
   must be guaranteed before dispatch.

@@ -41,7 +41,7 @@ observed baseline. Commit to measured available capacity, not the best case.
 |---|---|
 | "Improve onboarding" | "Ship the new onboarding flow, weeks 6–8" |
 | "Reduce checkout friction" | "Launch one-page checkout to 50%, weeks 4–6" |
-| "Explore AI assist" | (stays directional — not committable) |
+| "Explore artificial intelligence (AI) assist" | (stays directional — not committable) |
 
 Propose a concrete, verifiable deliverable with an honest range. Call it a
 commitment only after the named human approval in final commitment mode.

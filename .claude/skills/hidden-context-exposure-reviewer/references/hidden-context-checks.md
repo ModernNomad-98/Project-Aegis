@@ -8,7 +8,7 @@ Context Exposure (formerly LLM07:2025 System Prompt Leakage). Doctrine:
 **hidden context is not a security control.** Review every hidden source as if
 it will be public — because it can be extracted, inferred, or reconstructed.
 
-Scope source: the OWASP Generative AI (GenAI) Security Project's LLM08:2026
+Scope source: the OWASP Generative AI (generative artificial intelligence, GenAI) Security Project's LLM08:2026
 entry (`2026/final/LLM08_HiddenContextExposure.md` in the
 `GenAI-Security-Project/GenAI-LLM-Top10` repository, checked 2026-09-26). It
 defines hidden context as the system prompt, developer instructions,

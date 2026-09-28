@@ -1,6 +1,6 @@
 # Grounding & anti-misinformation controls
 
-Detail for the owning [AI Misinformation Guard](../SKILL.md). It covers category LLM07, Misinformation, in the OWASP (Open Worldwide Application Security Project) Top 10 for Large Language Model (LLM) Applications 2026 (LLM09 in 2025).
+Detail for the owning [Artificial Intelligence (AI) Misinformation Guard](../SKILL.md). It covers category LLM07, Misinformation, in the OWASP (Open Worldwide Application Security Project) Top 10 for Large Language Model (LLM) Applications 2026 (LLM09 in 2025).
 Truth is a separate axis from shape (`structured-output-validator`) and safety
 (`llm-output-safety-reviewer`).
 

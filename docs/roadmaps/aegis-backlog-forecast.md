@@ -241,7 +241,7 @@ skill: work sits in non-binding horizons (now, next, later) with a
 confidence label, and no range is a delivery date or promise.
 
 Terms used in this section: Open Worldwide Application Security Project
-(OWASP) and large language model (LLM) name the security list the AI-security
+(OWASP) and large language model (LLM) name the security list the artificial intelligence (AI) security
 skills follow; `gate-guard` is the continuous integration (CI) check that fails
 when a PR changes a protected file path; ROUTE-002 is the audit rule that
 flags a skill routing to another skill that does not route back; a D-number

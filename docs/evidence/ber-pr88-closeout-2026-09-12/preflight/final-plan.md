@@ -60,7 +60,7 @@ OD-1 remain separately recorded WP-2B-3 work. No provider calls are part of this
 - All 12 review threads remain unresolved on GitHub. Their exact IDs are mapped to
   fixes and regressions in the correction branch's phase01 review record. Recheck
   each disposition after integration before resolving its thread.
-- Main's branch protection requires one approving review; none exists. Local AI
+- Main's branch protection requires one approving review; none exists. Local artificial intelligence (AI)
   reviews do not satisfy GitHub's approving-review requirement. Administrator
   capability was observed, but no bypass or protection change is assumed authorized.
 - The only workflow runs validator tests, skill validation, and PR DCO checks. It

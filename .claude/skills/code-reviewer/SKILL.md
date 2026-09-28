@@ -36,7 +36,7 @@ request-changes, with the blocking findings named.
   `security-pr-reviewer`; this skill gives the general severity-ranked pass.
 - Do NOT use when: the PR changes the skill library — that is
   `library-diff-reviewer`; this skill reviews product-code diffs.
-- Do NOT use when: the ask is the gate AI-generated code passes before it is
+- Do NOT use when: the ask is the gate artificial intelligence (AI)-generated code passes before it is
   saved, committed or run — that is `llm-output-safety-reviewer`.
 - Never review from a description of a change. No diff obtained = no review;
   say so.

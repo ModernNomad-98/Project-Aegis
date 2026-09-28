@@ -1,7 +1,7 @@
 # Trademarks
 
 The names **"Project Aegis"** and **"Zero Trust AI Engineering Discipline"**
-(shortened **"Zet-AI Engineering"**) identify this canonical repository and the
+(shortened **"Zet-AI Engineering"**; AI means artificial intelligence) identify this canonical repository and the
 work of its maintainer. They are not licensed for reuse as the name of another
 project.
 

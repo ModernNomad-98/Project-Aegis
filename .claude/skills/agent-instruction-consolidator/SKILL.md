@@ -12,7 +12,7 @@ agree; changing those files requires the separate approved edit step.
 
 ## Purpose
 
-Make every AI tool in the repo read the same truth. This skill inventories all
+Make every artificial intelligence (AI) tool in the repo read the same truth. This skill inventories all
 agent-instruction files, extracts and compares their rules, exposes conflicts
 and drift, and consolidates to a designated canonical source with thin
 per-tool pointers — proving with a before/after rule inventory that no rule

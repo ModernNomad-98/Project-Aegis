@@ -189,7 +189,7 @@ current version 4, or v4, standard; the validator enforces all nine):
 9. **Supporting Files** — the `references/`, `assets/`, `scripts/`, and `evals/` files the
    skill relies on (progressive disclosure), or "None" if the skill is self-contained.
 
-Security, SaaS, AI-security, and tool-use skills may add optional sections such as
+Security, SaaS, artificial intelligence (AI) security, and tool-use skills may add optional sections such as
 **Safety Rules**, **Security Rules**, **Tenant Isolation Rules**, **AI Security Rules**,
 or **Tool Permission Rules**. Sections may contain subsections; the nine top-level
 headers must all be present.

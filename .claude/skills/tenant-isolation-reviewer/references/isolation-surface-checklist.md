@@ -23,7 +23,7 @@ fifteen surfaces; none may be silently skipped.
 | 9 | Imports | Imported rows forced to the importing tenant; no tenant column honored from file content | CSV with a tenant_id column that the loader trusts |
 | 10 | Background jobs | Jobs carry explicit tenant context; fan-out iterates tenants with per-tenant scope | Nightly job queries all tenants, writes results to the wrong one on error |
 | 11 | Search | Index entries carry tenant key; queries filtered at the engine, not post-filtered in app code | Shared index queried by keyword only; ranking leaks other tenants' titles |
-| 12 | AI retrieval | Embedding/vector stores partitioned or filtered by tenant; retrieval runs under the requesting tenant's scope; prompts never mix tenants' documents | RAG corpus built tenant-blind; model happily quotes tenant B to tenant A |
+| 12 | Artificial intelligence (AI) retrieval | Embedding/vector stores partitioned or filtered by tenant; retrieval runs under the requesting tenant's scope; prompts never mix tenants' documents | RAG corpus built tenant-blind; model happily quotes tenant B to tenant A |
 | 13 | Billing | Usage events attributed to the right tenant; invoices/portal scoped | Metering aggregation keyed by user id where users span tenants |
 | 14 | Feature flags | Tenant-targeted flags cannot be toggled or read cross-tenant; flag payloads carry no other tenant's config | Flag evaluation endpoint returns the full targeting rule list including other tenants' names |
 | 15 | Audit | Audit events carry tenant id; tenant-facing audit views scoped; audit reads are themselves audited for staff | Tenant admin's audit page paginates the global audit table |

@@ -45,7 +45,7 @@ happy path proves nothing about isolation and is treated as absent.
    output) — the suite tests THESE definitions. Undefined → Stop Conditions.
 2. Findings/abuse cases to regress: `tenant-isolation-reviewer` findings,
    `threat-modeler` abuse cases, incident write-ups.
-3. The surfaces to cover: API routes, exports/imports, search, AI retrieval,
+3. The surfaces to cover: API routes, exports/imports, search, artificial intelligence (AI) retrieval,
    background jobs, webhooks, support tooling — and how each authenticates.
 4. The test stack: runner, HTTP/client test harness, fixture/seed mechanism,
    how auth tokens for distinct tenants/roles are minted in tests.

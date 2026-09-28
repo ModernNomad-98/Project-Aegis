@@ -12,7 +12,7 @@
 
 Prepared: 2026-07-06
 Repository: `nguyenpv1980-wq/Claude-Skills`
-Role lens: Senior Principal Claude / AI Architect
+Role lens: Senior Principal Claude / Artificial Intelligence (AI) Architect
 
 ## 1. Scope and source audit
 

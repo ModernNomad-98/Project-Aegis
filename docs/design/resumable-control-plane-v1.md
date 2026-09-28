@@ -169,7 +169,7 @@ Projector/reporting consume verified state; no reverse authority edge exists.
 | B1 operator -> authority | Authentic human consent versus text claiming approval |
 | B2 definitions -> engine | Repository/item/policy identity and required gates |
 | B3 engine -> durable owner | Ordered atomic intent/accounting and history |
-| B4 engine -> worker/adapter | Narrow capabilities; AI worker is untrusted |
+| B4 engine -> worker/adapter | Narrow capabilities; artificial intelligence (AI) worker is untrusted |
 | B5 observations -> verification | Receipts/evidence versus established completion |
 | B6 checkpoint -> recovery | Provenance, completeness and exclusive ownership |
 

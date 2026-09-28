@@ -27,7 +27,7 @@ high-impact outputs to human oversight.
 
 ## Use When
 
-- Use when: an AI feature makes factual claims, gives advice, or produces
+- Use when: an artificial intelligence (AI) feature makes factual claims, gives advice, or produces
   output that users or systems act on, and wrong-but-confident output would
   cause harm.
 - Use when: designing grounding, citations, uncertainty signaling, or

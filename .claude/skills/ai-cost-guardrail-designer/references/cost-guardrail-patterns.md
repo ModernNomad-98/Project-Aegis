@@ -1,6 +1,6 @@
 # AI cost & consumption guardrail patterns
 
-Detail for the owning [AI Cost Guardrail Designer](../SKILL.md). It covers
+Detail for the owning [Artificial Intelligence (AI) Cost Guardrail Designer](../SKILL.md). It covers
 category LLM06, Unbounded Consumption — denial of service (DoS) and
 denial-of-wallet — in the OWASP (Open Worldwide Application Security
 Project) Top 10 for Large Language Model (LLM) Applications 2026 (LLM10 in

@@ -14,7 +14,7 @@ the page alone grants no execution authority.
 
 ## Purpose
 
-Give an AI feature a repeatable, versioned evaluation harness so quality and
+Give an artificial intelligence (AI) feature a repeatable, versioned evaluation harness so quality and
 safety are measured, not asserted — and so a prompt, model, retrieval, or
 provider change cannot silently regress behavior. The harness pairs a
 versioned dataset (representative + adversarial/red-team + regression cases)

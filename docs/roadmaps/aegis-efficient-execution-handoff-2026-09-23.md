@@ -217,7 +217,7 @@ all 160 cases. Use the surviving validator, rubrics and review findings:
 - Forty development and 120 distinct holdout cases; required label, critical-risk
   and adversarial distributions are specified in the replacement plan.
 - All candidate labels start PENDING with rationales. Peter approves final labels
-  and exact bytes; AI suggestions are not human-approved gold labels.
+  and exact bytes; artificial intelligence (AI) suggestions are not human-approved gold labels.
 - Screen duplicates, cross-split similarity, schema/composition, judge-envelope
   leakage and size bounds. Preserve semantic independence, not just counts.
 - Reconcile the owner's GitHub-backup direction with old external-only storage
