@@ -1,10 +1,16 @@
 # Skill-contract audit — baseline report
 
-> **Regenerated 2026-09-27 under AEGIS-APR-065** from origin/main
+> **What this page is.** The machine-generated summary of the latest
+> skill-contract audit, for maintainers checking which skill texts the audit
+> script flags for review. Everything below this note is script output.
+>
+> **Regenerated 2026-09-27 under AEGIS-APR-065** (an owner grant in the
+> [approval register](../approvals/APPROVAL_REGISTER.md)) from origin/main
 > `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` with engine v1.13.2 (checkout
-> with core.autocrlf=false, so the corpus hash is over LF bytes). The previous
+> with core.autocrlf=false, so the corpus hash is over LF (line feed, Unix-style
+> line ending) bytes). The previous
 > v1.13.1 baseline (186 skills, 317 findings, from
-> `656194426e2ea3358fa29fcf19e05f0278d9c270`, PR #432 under AEGIS-APR-058) is
+> `656194426e2ea3358fa29fcf19e05f0278d9c270`, pull request (PR) #432 under the earlier grant AEGIS-APR-058) is
 > in git history at `7894567d49d301f82f40cb6445b668581d5799ac` (#432's merge).
 > The engine sentence below, "freezes the state of the corpus BEFORE
 > remediation", is fixed template text; this report records the corpus after

@@ -4,7 +4,7 @@
 > tracking contract-audit findings numbered AEGIS-060 and later (AEGIS-001..059
 > are the frozen earlier defect IDs). The AEGIS-060 rejection and typed
 > skill/subagent correction below remain the disposition of that candidate.
-> Sections 3–5 preserve the original 184-skill baseline's dedup map, coverage,
+> Sections 3–5 preserve the original 184-skill baseline's deduplication (dedup) map, coverage,
 > and planned remediation sequence. Phrases there such as "current main" and
 > "planned PR" (pull request) refer to that baseline, not today's source
 > tree. For current skill contracts, inspect the
@@ -16,7 +16,8 @@
 CANDIDATE / FALSE POSITIVE; ID RETIRED AND NEVER REUSED**. Merged
 [PR #89](https://github.com/ModernNomad-98/Project-Aegis/pull/89), commit
 `000352f55b71f0c3e897a482d279d34bfaa3d66b`, corrected contract-audit rule
-EVAL-004's collapse of skill and subagent namespaces. The `(subagent)`
+EVAL-004 (which checks that each target named in a skill's trigger-eval file
+exists), which had merged the separate skill and subagent namespaces. The `(subagent)`
 annotations are valid typed targets; do not schedule their removal as
 unfinished fixture work.
 
@@ -69,14 +70,19 @@ corpus tree `08727adf8f3e0f54226fa18639c9a50f2562ed22`, 184 skills).
 report and its three `artifacts/audits/` JSON (JavaScript Object Notation)
 files were overwritten with a fresh engine v1.13.1 audit of main (186 skills,
 317 findings). The numbers in sections 1–5 of this register still describe the
-v1.12.0 baseline (184 skills, 414 findings); those files remain in git history
+184-skill baselines, not today's files: section 1 uses the v1.12.0 baseline
+(414 findings), while the section 3 table and its fixture note keep the first
+v1.3.0 baseline from PR #75 (commit `469d4e5`, 416 findings), whose APPR-002,
+ROUTE-003 and STATE-005 rows do not appear in the v1.12.0 report. The v1.12.0
+files remain in git history
 at commit `e2f1da0beb6e4aed07044ca3a90e841962bfd590` (PR #77). The report
 link above points to its last copy, at commit
 `656194426e2ea3358fa29fcf19e05f0278d9c270`, which adds the 2026-09-23 note
 that its five EVAL-004 rows are rejected false positives; its measurements
 are unchanged from `e2f1da0`. The historical counts below are unchanged.
 
-**Baseline files regenerated again, 2026-09-27.** Under AEGIS-APR-065, the
+**Baseline files regenerated again, 2026-09-27.** Under AEGIS-APR-065, an owner grant in the
+[approval register](../approvals/APPROVAL_REGISTER.md), the
 same four files were regenerated with engine v1.13.2 from main
 `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` (186 skills, 316 findings, of
 which 232 are ROUTE-002). The v1.13.1 files described in the paragraph above
@@ -104,7 +110,8 @@ Rules of this register (from the program's operating rules):
 - **Classification / severity / status:** Candidate fixture-hygiene defect / P2
   (severity level; P0 is most severe) / **REJECTED CANDIDATE — FALSE POSITIVE
   CAUSED BY EVAL-004 TYPE COLLAPSE; ID RETIRED AND NEVER REUSED**
-- **What the candidate claimed (superseded):** that five trigger-eval files
+- **What the candidate claimed (superseded):** that five trigger-eval files (test files listing prompts that should or
+  should not trigger a skill)
   wrote neighbor identifiers as `"<name> (subagent)"` — "prose annotation
   inside the name field" — so a machine consumer could not resolve them
   against disk:
@@ -168,10 +175,13 @@ Rules of this register (from the program's operating rules):
   the rule while the corpus is byte-identical to base (corpus content hash
   `9443a936961bb15a…` matches the pre-change measurement exactly). Total
   findings 414 → 409; the five removals are exactly the five false EVAL-004
-  rows. Every other rule count is unchanged (ARTF-001 10, ROUTE-002 311,
-  SIDE-004 82, STATE-001 2, VOCAB-002 4; P0 2, P1 96, info 311). Route graph
+  rows. Every other rule count is unchanged (ARTF-001, a durability claim with no
+  named durability level, 10; ROUTE-002 311; SIDE-004, a side-effect
+  instruction in a skill that may run automatically, 82; STATE-001, an
+  editable placeholder in an append-only file, 2; VOCAB-002, "committed" used
+  as a roadmap horizon label, 4; P0 2, P1 96, info 311). Route graph
   **byte-identical** — re-measured under v1.13.0 rather than carried over:
-  sha256 `6c844eb6c35e1b40…`, 184 nodes / 968 edges, topology and bytes both
+  SHA-256 (Secure Hash Algorithm 256) fingerprint `6c844eb6c35e1b40…`, 184 nodes / 968 edges, topology and bytes both
   unchanged (the route graph carries no tool-version provenance). Validator:
   184 skills valid, 0 warnings. Audit self-tests: **69** assertions pass (57 on
   the uncorrected engine, then +9 typed-target regressions, then +3 closing the
@@ -265,7 +275,7 @@ their materiality is unconfirmed.
 | Audit rule | Count | Surfaces | Maps to | Effect on the existing ID |
 |---|---:|---|---|---|
 | APPR-002 | 1 | `project-orchestrator/references/project-state-template.md:140` — worked example grants `Scope allowed: Build the v1 scope` at brief-approval time | AEGIS-003, AEGIS-008 | **Root cause upgraded to repository-verified**: the template's own example teaches requirements-approval→build-authorization laundering |
-| STATE-005 | 2 | same template: `## MVP scope (approved)` narrative sections (template + worked example) with no supersession mechanics | AEGIS-002, AEGIS-006 | Confirms the residue left after reconciliation decision D54: append-only contract coexists with narrative sections that cannot be updated append-only |
+| STATE-005 | 2 | same template: `## MVP scope (approved)` (minimum viable product) narrative sections (template + worked example) with no supersession mechanics | AEGIS-002, AEGIS-006 | Confirms the residue left after reconciliation decision D54: append-only contract coexists with narrative sections that cannot be updated append-only |
 | ROUTE-003 | 1 | `project-orchestrator/SKILL.md` Stage-2 route (spec → prioritization → commitments; planner absent) | AEGIS-035, AEGIS-045 | **Root cause confirmed on current main** exactly as the handoff recorded |
 | VOCAB-002 | 4 | `roadmap-under-uncertainty-planner` description, body ×2, reference sheet — "committed/planned/exploratory", "Now (committed)" | AEGIS-044, AEGIS-039 | **Root cause confirmed on current main**: committed-as-horizon vs commitments-skill's reserved meaning |
 | ARTF-001 | 10 | `project-orchestrator`, `human-approval-boundary`, `scoped-approval-register`, `agent-authorization-matrix`, `audit-log-architect`, `agent-containment-reviewer`, `agent-memory-governance`, `offline-first-sync-architect`, `operational-vs-analytical-splitter`, `streaming-event-architect` | AEGIS-056, AEGIS-049 | Corroborates corpus-wide: "durable" claims never name a durability level (semantic-review candidates, not asserted defects) |
