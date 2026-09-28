@@ -17,6 +17,11 @@ does not repeat. Codex is the automated GitHub code reviewer. `gate-guard` is
 the continuous integration (CI) check that fails when a PR changes a protected
 path. Artificial intelligence (AI) is spelled out here because a decision below
 is about that abbreviation. A virtual machine (VM) is a simulated computer.
+A manual-only skill runs only when the user names it; the *(manual-only)*
+marker flags it where a page hands off to it. Dependabot is GitHub's automated
+dependency-update bot. D15 is a 2026-07-07 decision in the
+[reconciliation log](../reconciliation/step-0-reconciliation-v4.md) that
+recorded enrichments for four skills.
 
 ## Where things stand
 
@@ -25,7 +30,7 @@ is about that abbreviation. A virtual machine (VM) is a simulated computer.
 | `main` head | `ecd1e59e80d95dab483b14b14a9c448edb94e9a3` (merge of PR #483) |
 | Shipped skills | 186 |
 | Skill-contract audit | 316 findings, 232 of them ROUTE-002; report format from audit engine v1.13.3 (PR #461), findings unchanged |
-| Open PRs | [#484](https://github.com/ModernNomad-98/Project-Aegis/pull/484) at head `2f5858c`: shortens the `project-orchestrator` manual-only labels and adds `local-ci-mirror-preflight` to the stage-gate map. Not merged. |
+| Open PRs | [#484](https://github.com/ModernNomad-98/Project-Aegis/pull/484) at head `2f5858c`: shortens the `project-orchestrator` manual-only labels and adds `local-ci-mirror-preflight` to the stage-gate map; [#486](https://github.com/ModernNomad-98/Project-Aegis/pull/486) at head `8459ac7`: spells out "artificial intelligence (AI)" at first use. Both open at recording. |
 
 All times and dates are Coordinated Universal Time (UTC).
 
@@ -86,24 +91,24 @@ the owner decided.
 
 Most decisions are recorded in
 [Decided on 2026-09-28](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28)
-(PR #460) and in register entries
+(PRs #447 and #460) and in register entries
 [APR-067](../approvals/APPROVAL_REGISTER.md#aegis-apr-067-consumption-of-the-cp-wp-002-kernel-grant)
 through
 [APR-078](../approvals/APPROVAL_REGISTER.md#aegis-apr-078-consumption-of-the-pr-475-exception).
 Those records hold the scope and authority; this page does not restate them.
 
 The owner made these later decisions in chat by choosing an option from the
-coordinator's multiple-choice questions. None of them was in the
-open-decisions index at this recording; a later update should add them there.
+coordinator's multiple-choice questions. None of them was recorded in the
+open-decisions index at this recording; a separate PR is adding them.
 
 | Topic | Chosen option | Status |
 | --- | --- | --- |
-| Spell out "AI" as "artificial intelligence (AI)" at first use, across the library | "Spell it out everywhere" | Not started on `main`; no PR open at this recording |
+| Spell out "AI" as "artificial intelligence (AI)" at first use, across the library | "Spell it out everywhere" | Open at recording as PR #486 (head `8459ac7`) |
 | Add `local-ci-mirror-preflight` to the stage-gate map | "Add it to the map (Recommended)" | In PR #484 |
 | Use the short *(manual-only)* marker everywhere | "Use the short form everywhere (Recommended)" | In PR #484 |
 | `code-reviewer` description: send skill-library PRs to `library-diff-reviewer` | "Apply it (Recommended)" | Delivered by PR #482 |
-| One-time `gate-guard` exception for the BER README (PR #475) | "Approve for acdcdad only (Recommended)" | Recorded as APR-077 and APR-078 |
-| Which skill mentions get a *(manual-only)* marker | "Mark real handoffs only" | Applied in #480 and #483; checklist mentions get no marker |
+| BER README readability edits (PR #475) and their one-time `gate-guard` exception at head `acdcdad` | "Prepare it (Recommended)", then "Approve for acdcdad only (Recommended)" | Merged; recorded as APR-077 and APR-078 |
+| Which skill mentions get a *(manual-only)* marker | "Mark real handoffs only (Recommended)": mark a manual-only skill wherever a page tells the reader or agent to go to it or hand off to it (running text, "Do NOT use" lines and Stop Conditions); skip bare mentions in templates, checklists and eval lists | Applied in #480 and #483 |
 
 ## Open items at recording
 
@@ -122,16 +127,23 @@ open-decisions index at this recording; a later update should add them there.
    generated-reports decision, it is judged once on the generator's format.
 5. **Still waiting on the owner** (see
    [Still open for the owner](aegis-open-decisions-2026-09-23.md#still-open-for-the-owner)):
-   the Stage 4B actual-host proof, the private BER labels (WP-2B-3),
+   the issue #101 Stage 4B proof on a real host, the semantic review of the
+   private BER candidate labels,
    CP-WP-003 and CP-WP-004, and the paused VirtualBox VM. The choice of
    which backlog item to unblock first is deferred.
+6. **Open-decisions index.** The six later decisions above are not yet
+   recorded in
+   [Decided on 2026-09-28](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28)
+   at this recording; a separate PR is adding them. The "Spell it out
+   everywhere" work is open at recording as PR #486 (head `8459ac7`, in
+   review), and PR #484 is open at recording, in its final check.
 
 ## How to resume
 
 1. Read this page, then do the workspace role check in `AGENTS.md`, then read
    the [approval register](../approvals/APPROVAL_REGISTER.md).
 2. Check live state with `git fetch` and `gh`: the `main` head and the open
-   PRs, including #484 and the PR that adds this page.
+   PRs, including #484, #486 and the PR that adds this page.
 3. Follow these process rules:
    - An independent reviewer checks each PR. A separate check confirms any
      fixes.
