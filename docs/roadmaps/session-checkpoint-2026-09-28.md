@@ -99,7 +99,7 @@ Those records hold the scope and authority; this page does not restate them.
 
 The owner made these later decisions in chat by choosing an option from the
 coordinator's multiple-choice questions. None of them was recorded in the
-open-decisions index at this recording; a separate PR is adding them.
+open-decisions index at this recording; PR #487 is adding them.
 
 | Topic | Chosen option | Status |
 | --- | --- | --- |
@@ -134,7 +134,7 @@ open-decisions index at this recording; a separate PR is adding them.
 6. **Open-decisions index.** The six later decisions above are not yet
    recorded in
    [Decided on 2026-09-28](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28)
-   at this recording; a separate PR is adding them. The "Spell it out
+   at this recording; PR #487 is adding them. The "Spell it out
    everywhere" work is open at recording as PR #486 (head `8459ac7`, in
    review), and PR #484 is open at recording, in its final check.
 
