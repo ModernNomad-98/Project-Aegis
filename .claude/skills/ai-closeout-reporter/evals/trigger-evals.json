@@ -1,6 +1,6 @@
 {
   "skill": "ai-closeout-reporter",
-  "description": "Trigger discrimination: first-person terminal closeout of one task or PR vs third-party verification of a closeout or a finished change's process (agent-governance-audit), the cross-stage handoff protocol (phased-work-handoff-designer), the pre-work lane guide (lane-authoring-guide), cadence reconciliation of chat-only history (chat-backlog-reconciliation), a career promotion packet (promotion-packet-writer), and screenshot-evidence policy (screenshot-evidence-planner).",
+  "description": "Trigger discrimination: first-person terminal closeout of one task or PR vs third-party verification of a closeout or a finished change's process (agent-governance-audit), the cross-stage handoff protocol (phased-work-handoff-designer), the pre-work lane guide (lane-authoring-guide), cadence reconciliation of chat-only history (chat-backlog-reconciliation), a career promotion packet (promotion-packet-writer), and screenshot-evidence policy (screenshot-evidence-planner). Two cases pin 'show which test proves each change' to this skill's per-deliverable trace.",
   "overlaps_with": ["agent-governance-audit", "phased-work-handoff-designer", "lane-authoring-guide", "chat-backlog-reconciliation", "promotion-packet-writer", "screenshot-evidence-planner"],
   "cases": [
     {
@@ -65,6 +65,20 @@
       "expected_skill": "ai-closeout-reporter",
       "should_not_trigger": ["screenshot-evidence-planner"],
       "reason": "The policy already exists and the work is done; writing the terminal report with an evidence section and a skipped-validation section is the closeout, not evidence-policy design."
+    },
+    {
+      "id": "show-which-test-proves-each-change-wins-here",
+      "prompt": "I just finished the three changes you asked for in this session. In the closeout, show which test proves each change, with the commit SHA and the CI run it passed on.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": ["agent-governance-audit"],
+      "reason": "Linking each requested change to the files, check and evidence that prove it, in a first-person report on just-finished work, is the closeout's per-deliverable trace; the governance audit later verifies such a trace against primary records and does not write it."
+    },
+    {
+      "id": "trace-for-finished-pr-not-cross-stage-handoff",
+      "prompt": "The pull request for the search reindex is ready. Before I hand it to the reviewer, show which test proves each change: one row per requested item with its files, the check and the head commit SHA.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": ["phased-work-handoff-designer"],
+      "reason": "A per-deliverable trace for one finished pull request is part of that task's closeout; the handoff designer shapes what each stage of a multi-stage effort carries to the next, not one pull request's evidence."
     }
   ]
 }

@@ -48,8 +48,20 @@ what matters; link the PR/diff for the exhaustive list when it is long.
 
 ## 5. Evidence
 
-Outputs, links, screenshots, PR URL, CI runs — whatever lets a human verify
-without rerunning everything.
+One trace row per deliverable from the original request. Each evidence item
+names its provenance: the command and its exit code, or the CI run link, on
+the exact head commit SHA. A CI run on an older commit is not evidence for the
+head. Migration proof and known skips are rows, not prose. A deliverable with
+no check that proves it reads "not verified" and also appears in section 7.
+
+| Request item | Files | Check that proves it | Evidence (commit SHA, command and exit code, or CI run) |
+| --- | --- | --- | --- |
+| `<deliverable from the request>` | `<paths>` | `<command or check>` | `<sha>: <command> exit 0`, or `<CI run link> on <sha>` |
+| `<migration applied>` | `<migration file>` | `<migration proof>` | `<applied migration id> on <sha>` |
+| `<deliverable with no proving check>` | `<paths>` | not verified | `<reason; see section 7>` |
+
+Then any other outputs, links, screenshots and the PR URL — whatever lets a
+human verify without rerunning everything.
 
 ## 6. Risks & known gaps
 

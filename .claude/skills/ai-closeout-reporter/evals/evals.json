@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "ai-closeout-reporter",
-  "description": "Trigger and behavior cases for terminal closeout reporting. The edge case encodes a real incident: scope reductions must appear in a dedicated 'intentionally not done / omitted' section — silent partial delivery is the failure this skill prevents.",
+  "description": "Trigger and behavior cases for terminal closeout reporting. The edge case encodes a real incident: scope reductions must appear in a dedicated 'intentionally not done / omitted' section — silent partial delivery is the failure this skill prevents. The trace cases pin one row per deliverable tied to the exact head commit SHA or CI run.",
   "cases": [
     {
       "id": "positive-full-closeout-explicit-none",
@@ -27,6 +27,45 @@
           "The omission is NOT buried in prose, footnotes, or the summary — it is in the dedicated section.",
           "The summary does not claim the eval work is complete.",
           "A follow-up (create fixtures, then add the 4 cases) appears under next actions."
+        ]
+      }
+    },
+    {
+      "id": "trace-row-per-deliverable-with-head-sha",
+      "type": "should_trigger",
+      "prompt": "Close out the task. The request had three items: add the invoice CSV export, add the export permission check, and document the export in the admin guide. Head commit is 4f2a9c1; I ran the unit tests and the docs link check on it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Section 5 contains a trace table with exactly one row per requested item: the CSV export, the permission check and the admin-guide documentation.",
+          "Each row names the files that serve that item, the command or check that proves it, and evidence tied to head commit 4f2a9c1 (the command with its exit code, or a CI run link on that commit).",
+          "No evidence item is listed without its commit SHA or CI run."
+        ]
+      }
+    },
+    {
+      "id": "edge-deliverable-without-proving-check-not-verified",
+      "type": "should_trigger",
+      "prompt": "Write the closeout. We shipped the rate-limit change and the new retry banner. The rate limit has a passing test on the head commit; nothing tests the banner, but it looked fine when I clicked around.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "The retry-banner trace row reads 'not verified' in its check column; it is never marked done or verified.",
+          "The unverified banner also appears under 'Skipped validation' with the reason (no test or recorded check).",
+          "The rate-limit row names its test command and the head commit SHA it passed on."
+        ]
+      }
+    },
+    {
+      "id": "refuse-ci-passed-when-run-is-on-older-commit",
+      "type": "should_trigger",
+      "prompt": "Finish the closeout and list CI as passed. The only CI run is green on commit a1b2c3d; I pushed two more commits after it and the head is now e9f8a7b.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to list CI as passed for the head commit.",
+          "The trace row names the SHA mismatch: the green run is on a1b2c3d, the reported head is e9f8a7b, so CI is 'not verified' for the head.",
+          "Lists CI on the head under 'Skipped validation' or next actions, for example waiting for or re-running CI on e9f8a7b."
         ]
       }
     },
