@@ -14,13 +14,20 @@ Operating system (OS) means the selected host platform; `BER-DEC` identifies
 an entry in the runner decision log. Stage A is the proposed offline host
 probe without model or provider calls.
 
-> **Current reading, checked 2026-09-24:** The owner selected a **new disposable
-> Linux virtual machine under their control** as the Stage A candidate and
-> chose VirtualBox for its setup plan. APR-028 approved agent-assisted
-> provisioning; VirtualBox 7.2.20 is installed and the named VM booted the
-> verified Ubuntu installer. Guest installation and final configuration remain
-> unverified, and no selected-host capability proof is recorded. See the
-> [VirtualBox setup proposal](ber-virtualbox-stage-a-setup-proposal.md).
+> **Current reading, checked 2026-09-28:** The owner selected a **new disposable
+> Linux virtual machine (VM) under their control** as the Stage A candidate and
+> chose VirtualBox for its setup plan.
+> [APR-028](../approvals/APPROVAL_REGISTER.md#aegis-apr-028-agent-assisted-disposable-virtualbox-vm-setup)
+> (owner approval record 28 in the approval register) approved agent-assisted
+> provisioning. VirtualBox 7.2.20 was installed and setup reached an Ubuntu
+> login with a non-administrator `aegisprobe` account, but repeated graphical
+> login stalls led the owner to **pause** the setup. The VM was last verified
+> powered off with networking disabled. Whether and when to resume it is an
+> open owner decision; the ongoing delivery grant (APR-039) does not resume
+> it. Final guest configuration remains unverified, and no selected-host
+> capability proof is recorded. See the
+> [VirtualBox setup proposal](ber-virtualbox-stage-a-setup-proposal.md) and the
+> [open-decision index](aegis-open-decisions-2026-09-23.md).
 > This page remains a proposal; even its offline Stage A probe needs a separate
 > grant. Use the [BER backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes)
 > for current work-package and evidence-gate status.
@@ -28,7 +35,8 @@ probe without model or provider calls.
 Prepared 2026-09-23 from public `main` at
 `75d1e6e662ed48f0ec9f6b04c4c52e6f39ead319`. **Decision proposal only.**
 The [BER backlog](behavioral-eval-runner-backlog.md) records the WP-2B-0
-R4/R5 *dispositions* as DONE under accepted Outcome B, with effective
+R4/R5 *dispositions* as DONE under accepted Outcome B (the owner's acceptance of WP-2B-0 with host limits
+unresolved), with effective
 confinement and profile isolation INCOMPLETE/BLOCKED. This proposal does not
 reopen WP-2B-0 or change those historical statuses. Later-phase live
 eligibility remains blocked until new host evidence is reviewed. The
@@ -53,18 +61,19 @@ has been demonstrated. These limits are recorded in
 [`process_control.py`](../../tools/behavioral_eval_runner/process_control.py),
 and the R4/R5 backlog entries. The owner chose a new disposable Linux virtual
 machine as the candidate. At this proposal's original checkpoint, none had
-been identified or provisioned; APR-028 later authorized setup and the named
-VM booted its verified Ubuntu installer. Guest installation remains unverified.
+been identified or provisioned; APR-028 later authorized setup, which reached
+an Ubuntu login before the owner paused it. Final guest configuration remains
+unverified.
 
 | Candidate | Useful next evidence | Current limit / decision |
 | --- | --- | --- |
 | Existing Windows host | Reproduce known negative path/process result, inspect profile surface and prove denial paths without network/model dispatch | Cannot claim baseline while mid-write prevention and post-leader reaping are unproven; a Windows fix needs a separately reviewed native/host mechanism and exact tests |
-| Owner-selected disposable POSIX host | Reproduce POSIX writer/process negative tests and inspect a clean execution profile on the actual chosen host | The named VM booted its Ubuntu installer; completed guest identity, isolation, permissions, secret custody and probe authority remain unverified or pending. Generic Linux CI has run but selected-host proof remains absent. |
+| Owner-selected disposable POSIX host | Reproduce POSIX writer/process negative tests and inspect a clean execution profile on the actual chosen host | Setup of the named VM is paused after reaching an Ubuntu login; completed guest identity, isolation, permissions, secret custody and probe authority remain unverified or pending. Generic Linux CI has run but selected-host proof remains absent. |
 
 **Chosen candidate direction:** a new disposable Linux virtual machine under
-the owner's control, with VirtualBox as the planned platform. Its identity,
-configuration and creation have begun under APR-028; guest verification and
-probe authority remain pending. This is a path to testing the implemented mechanisms,
+the owner's control, with VirtualBox as the planned platform. Its creation began
+under APR-028 and is now paused by the owner; guest verification and probe
+authority remain pending. This is a path to testing the implemented mechanisms,
 not a claim that Linux already meets R4/R5. Do not substitute an arbitrary CI
 runner for the selected deployment host.
 
@@ -114,7 +123,7 @@ and isolated profile into each run's baseline identity.
 
 The Stage B probe is still not WP-2B-4's live scenario suite and does not
 approve calibration labels, renewed WP-2B-3 spending, BER evidence policy, or
-CP execution. Each has its own authority and prerequisite. No approval of a
+control-plane execution. Each has its own authority and prerequisite. No approval of a
 model-driven call is requested by this document.
 
 ## Source-only Stage A test plan — prepared 2026-09-24
@@ -191,10 +200,12 @@ separate model-driven Stage B authorization and proof.
 1. The owner selected a new disposable Linux virtual machine under their
    control as the Stage A candidate in the Project Aegis conversation on
    2026-09-24 and chose VirtualBox for the setup plan. APR-028 separately
-   authorized agent-assisted provisioning, and the named VM booted its verified
-   Ubuntu installer. Finish and verify the guest OS/version, account,
-   isolation boundary, permitted scratch root and allowed tools. This setup
-   grant does not authorize a BER host probe or access to private inputs.
+   authorized agent-assisted provisioning; the owner paused that setup after
+   repeated graphical login stalls. Decide whether and when to resume it; the
+   ongoing delivery grant (APR-039) does not resume it. If resumed, finish and
+   verify the guest OS/version, account, isolation boundary, permitted scratch
+   root and allowed tools. This setup grant does not authorize a BER host probe
+   or access to private inputs.
 2. After selection, review a BER-DEC Stage A grant with exact commands,
    source pin, root, evidence handling, time ceiling and stop conditions.
    The current proposal does not authorize even a read-only host probe on a

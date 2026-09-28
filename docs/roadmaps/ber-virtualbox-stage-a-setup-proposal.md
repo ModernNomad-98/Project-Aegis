@@ -1,19 +1,32 @@
 # BER R4/R5 Stage A: disposable VirtualBox host proposal
 
-> **Current reading, checked 2026-09-24.** The owner chose a new disposable
+> **Current reading, checked 2026-09-28.** This page is for the owner and the
+> host reviewer. It records how the proposed Linux test host for the
+> Behavioral Eval Runner (BER, the repository's evaluation tool) was chosen
+> and set up. R4 and R5 are two BER evidence gates: R4 is operating-system
+> isolation and per-tool-path confinement; R5 is execution-profile
+> observability and isolation. Stage A is the proposed offline host probe
+> without model or provider calls. The owner chose a new disposable
 > Linux virtual machine (VM) under their control and selected VirtualBox.
 > [APR-028](../approvals/APPROVAL_REGISTER.md#aegis-apr-028-agent-assisted-disposable-virtualbox-vm-setup)
-> separately approved agent-assisted setup. VirtualBox 7.2.20 was already
-> installed and verified when provisioning began; the Ubuntu 24.04.5.1 ISO
-> was downloaded and verified, and the configured VM booted to its installer.
-> Guest installation and final offline configuration are not yet verified.
-> No BER Stage A host probe is authorized. The [capability decision](ber-selected-host-capability-decision.md)
-> remains the authority and test-plan source.
+> (owner approval record 28 in the approval register) separately approved
+> agent-assisted setup. VirtualBox 7.2.20 was already installed and verified
+> when provisioning began; the Ubuntu 24.04.5.1 installer disc image (ISO
+> file) was downloaded and verified, and setup reached an Ubuntu login with
+> the non-administrator `aegisprobe` account. Repeated graphical login stalls
+> then led the owner to **pause** the setup; the VM was last verified powered
+> off with networking disabled and its virtual disc drive empty. Whether and
+> when to resume it is an open owner decision in the
+> [open-decision index](aegis-open-decisions-2026-09-23.md); the ongoing
+> delivery grant (APR-039) does not resume it. Final offline configuration is
+> not verified. No BER Stage A host probe is authorized. The
+> [capability decision](ber-selected-host-capability-decision.md) is the
+> Stage A test-plan source; it is a proposal and grants nothing.
 
 ## Why this host
 
 Stage A would run existing **offline synthetic** checks on one named Linux
-host. This can test POSIX path and process behavior that the current Windows
+host. This can test POSIX (Unix-like operating-system interface) path and process behavior that the current Windows
 host cannot prove. A VM is an isolated computer simulated on the Windows host;
 "disposable" means this one can be removed after its evidence is retained.
 Passing Stage A would be a capability observation, not a production isolation
@@ -21,7 +34,7 @@ claim, permission for provider calls, or a BER baseline result.
 
 | Choice | Reason and advantage | Cost and disadvantage |
 | --- | --- | --- |
-| VirtualBox base package on Windows, **selected** | Local VM under the owner's control; versioned command-line control supports repeatable setup. The base package uses GPLv3. | Public installer download and setup time; Windows administrator approval may be needed for its drivers. The Windows hypervisor is active on the checked host, and Oracle warns VirtualBox may run substantially slower with Hyper-V. Do not change Windows security or hypervisor settings merely to speed it up. |
+| VirtualBox base package on Windows, **selected** | Local VM under the owner's control; versioned command-line control supports repeatable setup. The base package uses the GNU General Public License version 3 (GPLv3). | Public installer download and setup time; Windows administrator approval may be needed for its drivers. The Windows hypervisor is active on the checked host, and Oracle warns VirtualBox may run substantially slower with Hyper-V. Do not change Windows security or hypervisor settings merely to speed it up. |
 | Hyper-V, considered earlier | Built into Windows Professional; no separate platform download. | The owner selected VirtualBox instead. Enabling Hyper-V requires administrator access and can interfere with VirtualBox. |
 | Cloud VM | Avoids local installation. | Adds account, access, possible recurring charges and a different host boundary; no cloud spend or credential access is approved. |
 
@@ -48,7 +61,7 @@ Version and license terms should be rechecked immediately before downloading.
 The version-pinned public downloads originally proposed before APR-028 are
 below. The owner-approved setup encountered VirtualBox 7.2.20 already
 installed, so no 7.2.18 download or downgrade was performed. The existing
-7.2.20 Windows installer matched Oracle's [published SHA-256 list](https://download.virtualbox.org/virtualbox/7.2.20/SHA256SUMS)
+7.2.20 Windows installer matched Oracle's [published SHA-256 (Secure Hash Algorithm, 256-bit) checksum list](https://download.virtualbox.org/virtualbox/7.2.20/SHA256SUMS)
 at `a81777d2b36380ce042a29e9c554cf032eb46a793f62e3cc82e7411e535c2c26`,
 and the installed `VBoxManage` reported `7.2.20r175154` with a valid Oracle
 signature. The proposed Ubuntu ISO and its checksum remained unchanged.
@@ -140,7 +153,8 @@ and APR-028 before using any step below.
    file server bound only to Windows `127.0.0.1`, then fetch from the guest
    through VirtualBox NAT's default `10.0.2.2` host-loopback address. Verify
    the archive checksum in Ubuntu, stop the file server, and keep the source
-   under the `aegisprobe` scratch root. This method needs no Guest Additions,
+   under the `aegisprobe` scratch root. This method needs no Guest Additions (VirtualBox's optional in-guest
+   integration software),
    shared host mount or private Git credential. Oracle documents the NAT
    [host-loopback mapping](https://docs.oracle.com/en/virtualization/virtualbox/7.2/user/networkingdetails.html).
    If that mapping is unavailable, stop and review a different transfer
@@ -158,13 +172,14 @@ and APR-028 before using any step below.
 
 1. **Provisioning decision:** APR-028 authorizes one agent-assisted disposable
    VM setup with owner-controlled passwords and the boundaries above. The
+   owner has paused that setup; resuming it is a separate owner decision. The
    verified installed VirtualBox version is 7.2.20, and the Ubuntu ISO is
    24.04.5.1. Source transfer in step 4 is **not** granted; skip it and disable
    networking after guest setup. Any later source transfer must pin its exact
    signed commit, archive boundary, method and evidence handling separately.
    No deletion or Windows security-setting change follows from APR-028.
 2. **Stage A decision:** After the VM exists and its facts are verified, review
-   and merge a BER-DEC grant pinning this host/account/scratch root, signed
+   and merge a BER-DEC grant (an entry in the BER decision log) pinning this host/account/scratch root, signed
    source, exact commands from the [source-only test plan](ber-selected-host-capability-decision.md#source-only-stage-a-test-plan--prepared-2026-09-24),
    allowed synthetic fixtures, evidence handling and stop conditions. A
    provisioning grant does not authorize that probe.
