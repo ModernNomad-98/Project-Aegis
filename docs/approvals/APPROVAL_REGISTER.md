@@ -2125,9 +2125,9 @@ the entry governs.
   [generated-report rule](../roadmaps/aegis-documentation-readability-backlog.md#remaining-page-review-in-larger-batches),
   the generated report `docs/audits/skill-contract-audit-baseline.md` gets
   one output-format review. That review of the v1.13.3 report returned
-  FIX-FIRST, and every fix belongs in the generator,
-  `scripts/audit-skill-contracts.py`. The findings file is in the
-  coordinating session's scratchpad, not in the repository. In summary: the
+  FIX-FIRST (fix before acceptance), and every fix belongs in the generator,
+  `scripts/audit-skill-contracts.py`. That review was not published, so
+  its required findings are recorded here in full: the
   report uses three names for one kind of finding; it does not spell out
   "hex"; it never explains CENSUS, STRUCTURAL, Stage-2, NOT-COMMIT-ABLE,
   auto-invocable or the SIDE-004 side-effect classes; its Coverage section
@@ -2153,8 +2153,9 @@ the entry governs.
     version, the stale comment, and checks that the glossary explains the
     terms above.
   - `artifacts/audits/skill-contract-audit-baseline.json` and
-    `artifacts/audits/corpus-manifest-baseline.json`: the engine version and
-    `engine_sha256` (the engine file's SHA-256 checksum) only.
+    `artifacts/audits/corpus-manifest-baseline.json`: the engine version,
+    `engine_sha256` (the engine file's SHA-256 checksum) and, if it differs,
+    the run's `branch` value only.
   - `artifacts/audits/corpus-route-graph.json`, only if regeneration changes
     it.
   - `docs/audits/skill-contract-audit-baseline.md`: regenerated, with its
