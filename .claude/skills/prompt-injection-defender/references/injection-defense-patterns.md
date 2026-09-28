@@ -82,7 +82,7 @@ boundary):
   stored in memory/history that fires on a future turn.
 - **Delimiter escape:** untrusted content containing your closing tag to break
   out of its block.
-- **Multimodal:** instructions in image text, QR codes, audio, hidden
+- **Multimodal:** instructions in image text, Quick Response (QR) codes, audio, hidden
   document layers, video frames, or metadata — per-modality cases in
   [multimodal-injection-patterns.md](multimodal-injection-patterns.md).
 

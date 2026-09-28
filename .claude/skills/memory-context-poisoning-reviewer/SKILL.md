@@ -19,8 +19,8 @@ severity-ranked findings each with a poisoning path (attacker input → stored
 entry → later corrupted behavior) and the write-validation, provenance,
 scoping, time-to-live (TTL), and purge/rollback controls that close it.
 Training-time corruption is `model-poisoning-reviewer` (OWASP model data
-poisoning category LLM05); retrieval authorization is
-`rag-security-architect` (OWASP vector/embedding weakness category LLM09).
+poisoning category LLM05, LLM04 in 2025); retrieval authorization is
+`rag-security-architect` (OWASP vector/embedding weakness category LLM09, LLM08 in 2025; IDs follow the 2026 edition).
 Retrieval-augmented generation (RAG) indexes and authorization (authz) belong
 to that retrieval review; this skill owns the agent's own state.
 

@@ -85,7 +85,7 @@ skill.
 4. **Check 3 — duplication / extension.** Does the skill substantially restate
    a shipped skill's job? When the genuinely new content would fit as a
    scoped additive diff to an existing skill, recommend make-it-an-extension
-   and name the base — the library's precedent: LLM04 and ASI04 both landed
+   and name the base — the library's precedent: LLM04 (large language model supply-chain risk; 2026 ID, LLM03 in 2025) and ASI04 (agentic supply-chain risk) both landed
    as extensions of `supply-chain-security-reviewer`, not as clone skills.
 5. **Check 4 — eval integrity.** Do `evals/evals.json` cases test the
    BOUNDARY: a real happy path, a genuine edge (not a happy path with an
@@ -165,7 +165,7 @@ Not inspected: <what this review did not read, and why>
   with no situation. The working test: from this description alone, would a
   model know when this skill WINS a request and when it must YIELD?
 - Overlap hides across phases: the confusable neighbor is often in a
-  different pack (agent authority vs end-user RBAC; LLM05 vs ASI06
+  different pack (agent authority vs end-user RBAC; LLM05 model vs ASI06 memory
   poisoning; evidence-policy vs manual-QA evidence). Same-cluster-only
   sweeps miss exactly these.
 - Hollow evals look full: assertions that restate the Workflow verbatim, a

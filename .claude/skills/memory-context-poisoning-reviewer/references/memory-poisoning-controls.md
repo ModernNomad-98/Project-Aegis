@@ -5,7 +5,7 @@ to trace who may write persistent context and how recalled entries stay inert.
 **ASI06** is the memory and context poisoning category in the Open Worldwide
 Application Security Project (OWASP) Top 10 for Agentic Applications. **TTL**
 means time to live; **RAG** means retrieval-augmented generation; **LLM09** is
-the OWASP large language model vector and embedding weakness category.
+the OWASP large language model vector and embedding weakness category (2026 edition; LLM08 in 2025).
 
 ## 1. Write-path trust rubric
 

@@ -28,7 +28,8 @@ Draft state:                     incomplete while any applicability decision is 
 
 `pending risk-owner decision` is a draft-only state, not an exclusion or
 approved applicability decision. Name the risk owner and missing trace in the
-row and open items; the SoA remains incomplete until the owner decides.
+row and open items; the Statement of Applicability remains incomplete until
+the owner decides.
 
 ## Justification patterns
 
