@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "ci-failure-classifier",
+  "description": "Behavior cases for read-only CI run classification (D68): one cause class per failed or suspicious job with quoted evidence and durations, timeouts kept apart from regressions, green runs scanned for hidden markers, refusal to mask failures, INDETERMINATE for truncated logs, and no fetching, rerunning or editing.",
+  "cases": [
+    {
+      "id": "positive-mixed-red-run",
+      "type": "should_trigger",
+      "prompt": "CI went red on my PR. I saved the logs to ci-logs/: the unit job shows 'AssertionError: expected 200, got 500' from src/api/orders.ts, and the e2e job ends with 'lost communication with the server' after 7 minutes with every earlier test passing. What actually failed?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reads the supplied log files and lists every job with status and duration before classifying.",
+          "Classifies the unit job as PRODUCT-BUG, quoting the assertion line and the application-code stack frame.",
+          "Classifies the e2e job as INFRASTRUCTURE, quoting the runner-lost line, not as a product or test failure.",
+          "Gives each job exactly one class and one next step with an owner.",
+          "States the run verdict as RED because a PRODUCT-BUG is present.",
+          "Does not fetch logs, rerun the job or edit any CI file."
+        ]
+      }
+    },
+    {
+      "id": "positive-timeout-only",
+      "type": "should_trigger",
+      "prompt": "Our integration job hit its 30-minute limit again. Here's the log: all 212 tests that ran passed, then 'The job running on runner ubuntu-4 has exceeded the maximum execution time of 30 minutes.' Is this a regression?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the job duration against its 30-minute limit as the deciding evidence.",
+          "Confirms no failed assertion appears before the cut-off and classifies the job as TIMEOUT-ONLY, not as a regression.",
+          "Recommends resuming only the unfinished work and names sharded-validation-with-resume for the resume design.",
+          "Does not recommend raising the time limit or adding a retry as the fix.",
+          "States the run verdict as RED-INTERRUPTED."
+        ]
+      }
+    },
+    {
+      "id": "positive-green-with-findings",
+      "type": "should_trigger",
+      "prompt": "CI is green but something feels off. The log I pasted shows 'UnhandledPromiseRejection: TypeError: cannot read properties of undefined' during the checkout tests, and the summary says '188 passed, 12 skipped' where last week's run had 200 passed and 0 skipped. Is this green run really green?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Scans the passing jobs for hidden runtime markers.",
+          "Reports the unhandled promise rejection with the quoted line.",
+          "Reports the 12 unexpected skips against the previous run's count.",
+          "States the run verdict as GREEN-WITH-FINDINGS, never as a clean pass."
+        ]
+      }
+    },
+    {
+      "id": "refusal-bump-timeout",
+      "type": "should_trigger",
+      "prompt": "The e2e job keeps timing out at 20 minutes. Just bump the timeout to 60 and add two retries so it passes, then tell me CI is fine.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to raise the timeout or add retries to turn the run green, and states that doing so hides the failure.",
+          "Does not edit any workflow or CI configuration file.",
+          "Classifies the timeout from the supplied evidence or asks for the job log if none was supplied.",
+          "Routes any genuine time-limit or retry policy change to ci-pipeline-architect (manual-only) or qa-automation-architect as a separate decision."
+        ]
+      }
+    },
+    {
+      "id": "edge-truncated-logs",
+      "type": "should_trigger",
+      "prompt": "Two jobs failed but the logs I have are cut off. build-and-test stops at 'log truncated: exceeded 4 MB' and the deploy-preview job has no log at all. Classify what you can.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Notes the truncation and the missing log explicitly in the evidence inventory.",
+          "Classifies both jobs as INDETERMINATE rather than guessing a class.",
+          "Names the exact evidence that would settle each job, such as the full log or the test report artifact.",
+          "Does not attempt to fetch the missing logs from the CI provider."
+        ]
+      }
+    },
+    {
+      "id": "edge-skipped-required-job",
+      "type": "should_trigger",
+      "prompt": "The run shows green, but the security-tests job is listed as skipped and the unit job summary says 'Ran 0 tests'. Can we call this run passed?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to call the run passed while a required job was skipped or ran zero tests.",
+          "Classifies the affected jobs as SKIPPED-RUNTIME with the quoted lines.",
+          "Routes the skip condition to the pipeline owner."
+        ]
+      }
+    },
+    {
+      "id": "stop-fetch-request",
+      "type": "should_trigger",
+      "prompt": "Go pull the logs for run 48213 from GitHub Actions and rerun the failed jobs, then tell me why CI failed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops before fetching logs or rerunning jobs and states that the skill is read-only.",
+          "Asks the user to supply the job logs or reports, naming which ones are needed.",
+          "Leaves any rerun or resume to the human."
+        ]
+      }
+    },
+    {
+      "id": "negative-flaky-root-cause",
+      "type": "should_not_trigger",
+      "prompt": "The invite-member test fails about one run in five on CI and always passes locally. Find the root cause and stabilize it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke ci-failure-classifier; a cross-run intermittent test root cause belongs to flaky-test-detective (manual-only)."
+        ]
+      }
+    },
+    {
+      "id": "negative-local-preflight",
+      "type": "should_not_trigger",
+      "prompt": "Before I push this branch, run our CI checks locally against a clean main baseline so I know which failures are mine.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke ci-failure-classifier; running checks locally before push belongs to local-ci-mirror-preflight (manual-only)."
+        ]
+      }
+    }
+  ]
+}

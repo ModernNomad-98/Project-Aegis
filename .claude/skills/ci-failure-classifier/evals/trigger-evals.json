@@ -1,0 +1,107 @@
+{
+  "skill": "ci-failure-classifier",
+  "description": "Trigger discrimination for read-only classification of an existing CI run (D68) against cross-run flake casework (flaky-test-detective), product-bug root cause (systematic-debugger), pre-push local mirroring (local-ci-mirror-preflight), shard resume design (sharded-validation-with-resume) and pipeline design (ci-pipeline-architect).",
+  "overlaps_with": [
+    "flaky-test-detective",
+    "systematic-debugger",
+    "local-ci-mirror-preflight",
+    "sharded-validation-with-resume",
+    "ci-pipeline-architect"
+  ],
+  "cases": [
+    {
+      "id": "red-run-why-wins-here",
+      "prompt": "CI is red on main with three failed jobs and I have the logs saved locally. Which failures are real bugs and which are the runner?",
+      "expected_skill": "ci-failure-classifier",
+      "should_not_trigger": [
+        "systematic-debugger",
+        "local-ci-mirror-preflight"
+      ],
+      "reason": "Giving each failed job of an existing run one cause class from its logs is this skill's core job."
+    },
+    {
+      "id": "suspicious-green-wins-here",
+      "prompt": "Our CI passed but finished in 3 minutes instead of the usual 25. Here is the log. Is this green run hiding something?",
+      "expected_skill": "ci-failure-classifier",
+      "should_not_trigger": [
+        "flaky-test-detective",
+        "sharded-validation-with-resume"
+      ],
+      "reason": "Scanning a green run for hidden skips and duration anomalies is the green-run half of this skill."
+    },
+    {
+      "id": "timeout-vs-failure-wins-here",
+      "prompt": "The e2e job stopped at its 45-minute limit. From this log, did it time out or did something actually fail?",
+      "expected_skill": "ci-failure-classifier",
+      "should_not_trigger": [
+        "sharded-validation-with-resume",
+        "ci-pipeline-architect"
+      ],
+      "reason": "Telling a timeout-only interruption apart from a failure in one run is classification; resume design and time-limit changes are neighbors."
+    },
+    {
+      "id": "missing-secret-wins-here",
+      "prompt": "The deploy-preview job failed with 'Input required and not supplied: token'. Is that our code or a CI setup problem?",
+      "expected_skill": "ci-failure-classifier",
+      "should_not_trigger": [
+        "ci-pipeline-architect",
+        "systematic-debugger"
+      ],
+      "reason": "Classifying one failure as a missing secret or configuration value is this skill; changing secret governance is ci-pipeline-architect."
+    },
+    {
+      "id": "intermittent-goes-to-flaky-detective",
+      "prompt": "Explicitly invoke flaky-test-detective. The invite-member test fails about one run in five on CI and passes on retry. Find the root cause and stabilize it.",
+      "expected_skill": "flaky-test-detective",
+      "should_not_trigger": [
+        "ci-failure-classifier"
+      ],
+      "reason": "Root-causing one intermittent test across many runs is flake casework, not classification of one run."
+    },
+    {
+      "id": "product-root-cause-goes-to-debugger",
+      "prompt": "Explicitly invoke systematic-debugger. We already know the orders endpoint returns 500 since yesterday's merge; drive it to the root cause.",
+      "expected_skill": "systematic-debugger",
+      "should_not_trigger": [
+        "ci-failure-classifier"
+      ],
+      "reason": "The class is already known to be a product bug; finding its root cause is debugging."
+    },
+    {
+      "id": "before-push-goes-to-preflight",
+      "prompt": "Explicitly invoke local-ci-mirror-preflight. Before I push, run the CI checks locally against a clean main baseline and tell me which failures are mine.",
+      "expected_skill": "local-ci-mirror-preflight",
+      "should_not_trigger": [
+        "ci-failure-classifier"
+      ],
+      "reason": "Running checks locally before push and classifying by origin is the preflight; this skill reads a run that already happened."
+    },
+    {
+      "id": "resume-design-goes-to-sharded",
+      "prompt": "Our full validation keeps timing out and restarting from scratch. Design shards and a resume mechanism so only unfinished work reruns.",
+      "expected_skill": "sharded-validation-with-resume",
+      "should_not_trigger": [
+        "ci-failure-classifier"
+      ],
+      "reason": "Designing shard maps and resume semantics is sharded-validation-with-resume; this skill only identifies a timeout-only interruption."
+    },
+    {
+      "id": "pipeline-change-goes-to-architect",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Add a nightly stage, raise the e2e time limit, and move our deploy secrets to OIDC.",
+      "expected_skill": "ci-pipeline-architect",
+      "should_not_trigger": [
+        "ci-failure-classifier"
+      ],
+      "reason": "Editing stages, time limits and secret handling is pipeline design; this skill never changes CI."
+    },
+    {
+      "id": "retry-policy-goes-to-automation-architect",
+      "prompt": "Define our suite-wide retry and quarantine policy for CI tests.",
+      "expected_skill": "qa-automation-architect",
+      "should_not_trigger": [
+        "ci-failure-classifier"
+      ],
+      "reason": "Suite-wide retry and flake policy is automation architecture; this skill refuses retries as a fix for one run."
+    }
+  ]
+}
