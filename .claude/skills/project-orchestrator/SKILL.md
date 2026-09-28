@@ -44,7 +44,7 @@ skill fills** (`ai-sdlc-operating-model` disclaims in-flight navigation).
   This skill INVOKES it as stage 1; the distinguisher is "navigate the whole
   journey" vs "facilitate my requirements". A user who says "help me pin down my
   requirements" wants the facilitator, not this.
-- Do NOT use to **author the AI-SDLC policy** for a team adopting agents — that
+- Do NOT use to **author the artificial-intelligence-assisted software development lifecycle (AI-SDLC) policy** for a team adopting agents — that
   map for a technical team is `ai-sdlc-operating-model`. This drives ONE
   beginner's ONE project through it.
 - Do NOT use to **write the spec** once requirements are known
@@ -58,7 +58,7 @@ skill fills** (`ai-sdlc-operating-model` disclaims in-flight navigation).
 1. **`docs/project-state.md` in the user's product repo, FIRST** (if present) —
    the current stage and next recommended action (read from the LATEST dated
    STATE SNAPSHOT entry — the file is append-only, so the newest snapshot IS
-   the current state), the approved brief + MVP scope, decision log, and open
+   the current state), the approved brief + minimum viable product (MVP) scope, decision log, and open
    questions. This file is the map coordinate; read it before anything else.
    If absent, infer stage from the repo; absence alone is not stage zero.
 2. **The user's repo, to corroborate the state file — and its ROLE.** This is
@@ -69,11 +69,11 @@ skill fills** (`ai-sdlc-operating-model` disclaims in-flight navigation).
    AGENTS.md or CLAUDE.md do not prove source role. If genuinely ambiguous,
    ask one role/location question and write nothing. Read product files
    that reveal stage: a spec doc, a domain/architecture doc or
-   ADRs, application source, migrations, tests, CI, deploy/IaC. No state file and
+   architecture decision records (ADRs), application source, migrations, tests, continuous integration (CI), deploy/infrastructure-as-code (IaC). No state file and
    no repo = discovery. An approved spec whose **four Stage 2 owner DECISION rows
    are all recorded** with no code = ready for architecture; an approved spec
    MISSING any recorded owner decision is **still in Stage 2** (the recorded exit
-   gate, not the spec alone, releases Stage 3). Code but no tests/CI = QA/release
+   gate, not the spec alone, releases Stage 3). Code but no tests/CI = quality assurance (QA)/release
    prep. A state-file claim that contradicts the repo is a conflict to surface.
 3. **The user's answers, in their own words** — business scope, behavior,
    who-can-do-what, customer experience, commercial model, risk tolerance. Never
@@ -94,7 +94,7 @@ mutable header field to trust or update) — then inspect the repo (input 2).
 Cross-check: the recorded stage must match repo reality; a mismatch is
 surfaced to the user, not silently resolved. Output a one-line "you are here"
 in plain language. No repo, or a zero-commit product repo without app files
-or state, means stage zero → discovery. Propose opening `docs/project-state.md`
+or state, means stage zero (nothing started yet) → discovery, which is Stage 1 below. Propose opening `docs/project-state.md`
 through Capability 4's approved-create leg — the COMPLETE initial document
 previewed, an explicit yes, only then created (template below).
 **A setup request is not a product stage:** when the user asks to set up or change Aegis itself (Aegis only, or a future local or online helper), not to build a product, first say plainly that setup is the manual-only `aegis-setup` skill, started by typing `/aegis-setup`; do not run or read it, and start no product discovery before offering that.
@@ -106,9 +106,9 @@ about cost, time, risk, behavior, or customer experience. The RULE:
 > The user answers BUSINESS questions ONLY — scope, behavior, who-can-do-what,
 > customer experience, commercial model, risk acceptance, release
 > authorization. The user NEVER decides internal engineering mechanics
-> (pooled-vs-siloed tenancy, queue retry semantics, RLS structure, cache-key
+> (pooled-vs-siloed tenancy, queue retry semantics, row-level security (RLS) structure, cache-key
 > design, CI shard topology, IaC layout, token-based AI rate limits,
-> test-locator strategy, SLO measurement). The orchestrator DECIDES those via
+> test-locator strategy, service-level objective (SLO) measurement). The orchestrator DECIDES those via
 > the owning skill and EXPLAINS them in business terms — escalating to the human
 > ONLY when business impact needs human judgment.
 
@@ -154,7 +154,7 @@ here.
   independently answerable information or decision target; run the test "could the user answer one
   requested part while another remains unanswered?" — if yes the candidate is compound, so split it,
   keep ONLY the highest-value first target this turn, and hold every other target INTERNAL for a later
-  turn (recording-and-authority §3). No secondary answer request may appear elsewhere in the turn — no
+  turn (recording-and-authority §1, step 1). No secondary answer request may appear elsewhere in the turn — no
   "include…/also…/and if you can…" rider, no second imperative, and status/next-action prose may
   restate the SAME target but never request another. Display the ONE atomic question and STOP — never a
   question-bank dump, a numbered questionnaire, several open or "answer-any" questions, or a compound
@@ -164,10 +164,10 @@ here.
   feeds FACTS to the brief, while each user-owned scope/behaviour/privacy/workflow/product decision
   joins the VISIBLE pending batch (recording-and-authority §1 — no per-answer write); the final brief
   appears only once no spec-blocking question remains. **Recorded Stage 1 lags the analysis**
-  (AR-A-008/AR-A-010): with the analysis done but nothing recorded, say exactly "The Stage 1 analysis
+  (Scenario A acceptance-review findings AR-A-008/AR-A-010 in [the Scenario A runbook](../../../docs/acceptance/scenario-a-runbook.md)): with the analysis done but nothing recorded, say exactly "The Stage 1 analysis
   is complete, but the recorded project stage remains Stage 1 until the approved records are written
   and confirmed" — do not invoke product-spec-writer, say the project is in Stage 2, or claim the
-  Stage 2 snapshot; preview the pending decisions (exact `PS-*` entries, next IDs from the current
+  Stage 2 snapshot; preview the pending decisions (exact `PS-*` decision-log entries such as `PS-001`, next identifiers (IDs) from the current
   state) with the brief as ONE batch under ONE approval, never claiming the Decision log stays empty;
   the recorded stage advances only after that batch and the next STATE SNAPSHOT are recorded and
   confirmed (a proposed row is not a recorded row).
@@ -176,7 +176,7 @@ here.
   below, independently by evidence** — exactly ONE per turn (a read-only judgement
   that invokes NO skill; it shows in WHAT HAPPENS NEXT as a classification
   decision, not an invocation). Never classify, predict, imply, or hedge a LATER
-  owner's result — "likely applicable", "probably n/a", "most likely not",
+  owner's result — "likely applicable", "probably n/a" (n/a = not applicable), "most likely not",
   "expected n/a" are all forbidden previews of a verdict: each stays
   `unclassified` until its own turn, classified only AFTER the
   current owner's result is recorded — so prose, the STAGE-2 OWNERS ledger, NEXT
@@ -229,14 +229,14 @@ here.
   4 runs — preview the exact DECISION entry, take the user's explicit yes to that
   exact path and content, append, and confirm it landed. Only then is the owner
   recorded. `product-spec-writer` runs `pending`, then `complete-awaiting-record`,
-  then `complete-recorded` (reached only after the user's OWN acceptance of the spec — anchored to the accepted artifact by path + SHA-256 — is itself a recorded decision per the template; approving a row's wording is not accepting the spec's content); each conditional owner runs `unclassified`, `pending`,
+  then `complete-recorded` (reached only after the user's OWN acceptance of the spec — anchored to the accepted artifact by path + SHA-256 hash (a fingerprint of the file's exact contents) — is itself a recorded decision per the template; approving a row's wording is not accepting the spec's content); each conditional owner runs `unclassified`, `pending`,
   its `*-awaiting-record` result, then `*-recorded`. `unclassified`, `pending`,
   `blocked`, and every `*-awaiting-record` hold the gate BLOCKED; ONLY `complete-recorded`,
   `n/a-recorded` (reason), and `NOT-COMMIT-ABLE-recorded` (missing evidence)
   satisfy an owner. All four must be `*-recorded` before Stage 3 is proposed —
   never while a result awaits its append, never on a silent skip.
 - **Stage 3 — Design how it's built.** → `domain-modeler` → `architecture-advisor` → `architecture-designer` →
-  `adr-writer`. *By evidence of a SaaS/multi-customer product:* `saas-platform-architect`, `tenant-modeler` →
+  `adr-writer`. *By evidence of a software-as-a-service (SaaS)/multi-customer product:* `saas-platform-architect`, `tenant-modeler` →
   `multi-tenant-data-architect`, `authorization-matrix-designer`. *By evidence of a need to turn a feature on for a few customers first, or switch it off within minutes without a release:* `feature-flag-architect`, which asks its own flag-store question on a later turn.
   The evidence is the spec's rollout intent. When the spec is silent and the product has more than a handful of users or customers, ask two atomic questions, one per turn, each after a plain explanation and a recommendation: first, turn a new feature on for a few customers first, or for everyone at once? Queued, only if "everyone at once": switch a misbehaving feature off within minutes without releasing code, or is a normal release fast enough? Either need routes; "everyone at once" plus "a normal release" is recorded with what it was chosen over, no route. One change's staged rollout stays with `feature-flag-rollout-strategist`.
 - **Stage 4 — Make it safe.** *Only by evidence:* `threat-modeler` / `ai-threat-modeler`;
@@ -262,11 +262,11 @@ here.
   routing invariant applies)*, `manual-test-case-creator`,
   `accessibility-test-harness`, `performance-test-harness`.
 - **Stage 8 — Get it ready to run.** Start with `cloud-architecture-decider`,
-  then follow its ACTUAL outcome: **AWS** → `aws-saas-architect`; **Azure** →
-  `azure-saas-architect`; **modern managed tier** (container-PaaS, managed
-  Jamstack/SSR, Postgres-BaaS, edge-serverless) → follow the tenancy, RLS,
+  then follow its ACTUAL outcome: **AWS** (Amazon Web Services) → `aws-saas-architect`; **Azure** →
+  `azure-saas-architect`; **modern managed tier** (container platform-as-a-service (PaaS), managed
+  Jamstack/server-side rendering (SSR), Postgres backend-as-a-service (BaaS), edge-serverless) → follow the tenancy, RLS,
   cost, and deployment handoffs the decider itself names — no dedicated
-  mapper exists by design; **GCP** → state plainly that no dedicated GCP
+  mapper exists by design; **GCP** (Google Cloud Platform) → state plainly that no dedicated GCP
   mapping skill exists yet and PAUSE the provider-mapping hop for the
   human's direction (never invent a mapper, never silently reroute to
   AWS/Azure), continuing below once directed. Then `iac-reviewer` ONLY when
@@ -294,7 +294,7 @@ ignore the posture field have only this text and the sentinel to hold the line.
 architecture-depth family, the AI/agentic-security packs, and the analytics
 skills are CONDITIONAL — invoke a skill only when the project's actual features
 call for it (a file-upload feature earns `file-upload-storage-architect`; an
-LLM feature earns `prompt-injection-defender`; a purely internal single-tenant
+large language model (LLM) feature earns `prompt-injection-defender`; a purely internal single-tenant
 tool earns none of the tenancy skills).
 
 **The human gate (composed, never relaxed).** Before anything irreversible — a
