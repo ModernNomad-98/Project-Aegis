@@ -1,9 +1,9 @@
 {
   "tool": "audit-skill-contracts",
-  "version": "1.13.3",
-  "engine_sha256": "d85ff51e58d6d12360709992a5a45179b2e1868011d85d9116022e4770afd669",
+  "version": "1.13.4",
+  "engine_sha256": "e64b7430488c5f47c31faf1abcfa5f46aae876f3362ed8e0de105e988ff10153",
   "repo_sha": "5dbf7bc9e958d932bd0c5b093ebecfe61be41840",
-  "branch": "chore/audit-engine-v1133-report-format",
+  "branch": "chore/audit-engine-v1134-report-format",
   "working_tree_dirty": false,
   "dirty_paths_in_scanned_surfaces": [],
   "audited_file_count": 715,

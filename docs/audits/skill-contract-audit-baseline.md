@@ -4,20 +4,20 @@
 > skill-contract audit, for maintainers checking which skill texts the audit
 > script flags for review. Everything below this note is script output.
 >
-> **Regenerated 2026-09-28 under AEGIS-APR-073** (an owner grant in the
-> [approval register](../approvals/APPROVAL_REGISTER.md)) with engine v1.13.3,
+> **Regenerated 2026-09-28 under AEGIS-APR-079** (an owner grant in the
+> [approval register](../approvals/APPROVAL_REGISTER.md)) with engine v1.13.4,
 > which changes only the report's format, over the same corpus as the
-> v1.13.2 baseline: `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` (checkout
+> v1.13.3 baseline: `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` (checkout
 > with core.autocrlf=false, so the corpus hash is over LF (line feed, Unix-style
 > line ending) bytes). Findings, rule inventory, vocabulary census and corpus
-> hash are identical to that baseline. The previous v1.13.2 baseline
-> (186 skills, 316 findings, pull request (PR) #441 under the earlier grant
-> AEGIS-APR-065) is in git history at
-> `3c51fb2f6f4a22c6120b38d2a7e9f0074b6bf69c` (#441's merge).
+> hash are identical to that baseline. The previous v1.13.3 baseline
+> (186 skills, 316 findings, pull request (PR) #461 under the earlier grant
+> AEGIS-APR-073) is in git history at
+> `dc3c767dc91d936cc8cc70589137ca33e6f44b7c` (#461's merge).
 > Structural findings are not behavioral proof.
 
-- Tool: `audit-skill-contracts` v1.13.3 (engine sha256 `d85ff51e58d6d123…`)
-- Repo SHA: `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` (branch `chore/audit-engine-v1133-report-format`; working tree dirty: false; dirty scanned surfaces: none)
+- Tool: `audit-skill-contracts` v1.13.4 (engine sha256 `e64b7430488c5f47…`)
+- Repo SHA: `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` (branch `chore/audit-engine-v1134-report-format`; working tree dirty: false; dirty scanned surfaces: none)
 - Corpus content hash: `a14f70c96c3b3ac4268d0b644dbb7c7b81b6d40e3665baba3ddcde119146b73b` (715 files, 4735807 bytes)
 - Skills scanned: **186**; rules implemented: **27** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **316** (232 mechanical, 84 semantic-review candidates)
@@ -31,15 +31,19 @@ mechanically proven defects.
 
 ## How to read this report
 
-- **SHA-256 / sha256:** a fingerprint of some bytes; any change to the bytes changes it. `engine sha256` fingerprints this audit script (first 16 hex characters shown).
+- **SHA-256 / sha256:** a fingerprint of some bytes; any change to the bytes changes it. `engine sha256` fingerprints this audit script (first 16 hexadecimal, or hex, characters shown).
 - **Repo SHA:** the Git commit ID of the checkout that was scanned.
 - **Corpus content hash:** one SHA-256 over every audited skill file, so two reports with the same hash scanned the same bytes.
 - **JSON report:** the machine-readable output of the same run (`--json`; JSON is JavaScript Object Notation). It holds every finding in full plus the complete rule inventory.
 - **Severity:** P0 is the most serious, then P1, then P2; `info` is census data to look at, not a defect.
-- **`[severity/confidence/kind]`:** after each finding's rule code. Confidence (high, medium or low) is how sure the rule is of its reading. Kind is `mechanical` (a text check that is true or false) or `SEMANTIC-REVIEW CANDIDATE` (a person must judge it).
+- **`[severity/confidence/kind]`:** after each finding's rule code. Confidence (high, medium or low) is how sure the rule is of its reading. Kind is `mechanical` (a text check that is true or false) or `SEMANTIC-REVIEW CANDIDATE` (a person must judge it). The rule table and the Coverage section call the same kind `semantic-candidate`, and the summary counts them as semantic-review candidates.
 - **owner:** the skill whose files should change to resolve the finding.
 - **maps: AEGIS-0NN:** the numbered defect this finding relates to (AEGIS-001 to AEGIS-059 in `docs/audits/volunteerflow/`, later ones in `docs/audits/aegis-060-plus-register.md`); `—` means none.
 - **§5:** section 5, "Least privilege & side effects", of `docs/skill-generation-standard.md`.
+- **Rule-table tags:** `(CENSUS)` marks a rule whose hits are `info` census data, not defects; `(STRUCTURAL)` means the rule checks only that something is present, not that it works.
+- **Stage-2 / NOT-COMMIT-ABLE (ROUTE-003):** Stage 2 is project-orchestrator's "Define the product" stage. NOT COMMIT-ABLE is the readiness result recorded there, and by roadmap-to-commitments-translator, when the evidence a delivery commitment needs is missing.
+- **auto-invocable:** a skill the model may start on its own, that is, one whose description does not begin MANUAL-ONLY.
+- **SIDE-004 `[class]`:** the §5 side-effect class the matched text looks like: `source-write` (code, test or configuration edits), `doc-state-write` (writing a document or state file), `data-store-write` (writing to a database or live state), `deploy-provision` (deploying or creating infrastructure), `spend` (spending money), `vcs-mutation` (changing Git history or the working tree), `install` (installing packages or tools) or `network` (sending requests). The quoted text after the colon is the matched excerpt.
 - **`term×N`** (vocabulary census): the skill uses that word N times.
 
 | Rule | Default severity | Kind | What it flags | Findings |
@@ -75,8 +79,8 @@ mechanically proven defects.
 ## Coverage (what was and was not reviewed)
 
 - **Mechanically scanned:** all 186 shipped skills' SKILL.md + references + eval JSONs (this report).
-- **Enumerated only (NOT content-audited):** reviewer agents (`.claude/agents/`) and guided-path docs (`docs/paths/`) — their FILENAMES feed name resolution and the manifest; their content is the validator's surface.
-- **Auxiliary input (content read, NOT in the corpus hash):** `docs/skills-catalog.md` supplies the manifest `family` field. It, and the agent/guided-path filenames, are recorded separately under provenance `auxiliary_inputs`; the corpus content hash covers the skill corpus only. All input surfaces are containment-checked fail-closed before any read (no symlink/junction/repo-escape).
+- **Enumerated only (NOT content-audited):** reviewer agents (`.claude/agents/`) and guided-path docs (`docs/paths/`) — their FILENAMES feed name resolution and the manifest; their content is left to `scripts/validate-skills.py`, which checks agent frontmatter and guided-path links.
+- **Auxiliary input (content read, NOT in the corpus hash):** `docs/skills-catalog.md` supplies the manifest `family` field. It, and the agent/guided-path filenames, are recorded separately under provenance `auxiliary_inputs`; the corpus content hash covers the skill corpus only. All input surfaces are containment-checked fail-closed before any read: a link or path that leads outside the repository stops the run.
 - **Semantically reviewed:** none by this tool — semantic candidates are queued for the named reviewer skills, not executed here.
 - **Behavioral evals:** UNRUN. No eval case is executed or reported as passing by this tool.
 - **Rules whose own limits admit use-vs-mention or contextual ambiguity** (STATE-001, VOCAB-002/003, EVAL-003, SIDE-004, APPR-002, STATE-004/005, ARTF-001, REF-002) are classified semantic-candidate: their findings are review-queue entries a reviewer confirms, never mechanically proven defects.

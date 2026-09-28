@@ -107,6 +107,18 @@ files remain in git history at
 [`3c51fb2`](https://github.com/ModernNomad-98/Project-Aegis/tree/3c51fb2f6f4a22c6120b38d2a7e9f0074b6bf69c/artifacts/audits)
 (PR #441's merge). The historical counts below are unchanged.
 
+**Report key extended, 2026-09-28.** Under AEGIS-APR-079, engine v1.13.4
+rescanned the same commit `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` and
+changed only the report's format: the "How to read this report" key now
+explains the rule-table tags (CENSUS, STRUCTURAL), Stage 2 and NOT
+COMMIT-ABLE, auto-invocable, the SIDE-004 side-effect classes and the other
+names used for semantic-review candidates, and spells out "hexadecimal";
+the Coverage section now names `scripts/validate-skills.py`. The findings
+(316), rule inventory, vocabulary census and corpus hash are identical to
+v1.13.3, whose files remain in git history at
+[`dc3c767`](https://github.com/ModernNomad-98/Project-Aegis/tree/dc3c767dc91d936cc8cc70589137ca33e6f44b7c/artifacts/audits)
+(PR #461's merge). The historical counts below are unchanged.
+
 Rules of this register (from the program's operating rules):
 
 - AEGIS-001..059 are never renumbered, merged, or reused. New IDs start at
