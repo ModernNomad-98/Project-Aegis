@@ -568,14 +568,21 @@ batches](#remaining-page-review-in-larger-batches)).
   [skill-contract audit baseline report](../audits/skill-contract-audit-baseline.md)
   leaves the pending set. #441's SHIP review reproduced it from the script
   with engine v1.13.2, which is the check this class needs after each
-  regeneration. Its status is **generated report, format review pending**
+  regeneration; the reproduced file differed only in the hand-written preface
+  and the branch name, and that review read the preface and found it accurate. Its status is **generated report, format review pending**
   until an independent review of the script's output format is recorded.
 - **Newly pending under the first 2026-09-28 decision (1 page).**
   `.claude/skills/project-orchestrator/SKILL.md` has 50 changed lines since
   its last recorded acceptance in commit `181de4e` (the batch after #223): 14
   in #248, 18 in #261, 17 in #384 and 1 in #435. #435's reviewer counted 53
   before #435 because it added #384's two commits separately. The page is
-  **pending** until an independent full-page re-read.
+  **pending** until an independent full-page re-read. This update applies the
+  decision only to this page, which #435's reviewer named. Other accepted
+  pages also had pre-rule edits since their last full-page acceptance: for
+  example, `tenant-modeler/SKILL.md`, accepted in the batch after #229, then
+  gained 16 lines in #261, 2 in #395 and 4 in #417 (22). A sweep of every
+  accepted page for pre-rule edits is a named follow-up, and the counts below
+  hold only until it is done.
 - **Keeps acceptance after a targeted review under the second 2026-09-28
   decision (1 page).** #420, #421 and #423 had no posted review verdict. A
   targeted read-only review on `7b3fbca` passed
@@ -606,7 +613,8 @@ changes this ledger by more than 10 lines, so it needs its own independent
 full-page re-read. The named follow-up is one independent full-page re-read
 of each pending page against
 [Acceptance for each page](#acceptance-for-each-page), and one review of the
-audit report's output format. No grant or gate changed.
+audit report's output format, and the pre-rule sweep named above, which is
+expected to move more accepted pages to pending. No grant or gate changed.
 
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
@@ -975,7 +983,9 @@ which `scripts/audit-skill-contracts.py` produces. It is its own class, not a
 reader page. Each regeneration is verified by reproducing the file from the
 script, not by a full-page re-read. Its readability is judged once, on the
 script's output format, and readability fixes go in the generator, not in
-the file.
+the file. Text written by hand into the file, such as the audit report's
+regeneration preface, is not script output, so reproduction cannot verify
+it; each change to it needs an independent review, as for any small edit.
 
 To reduce repeated integration and hosted-check waits, group roughly 10–20
 related pages in one pull request when their owners and authority boundaries
