@@ -2,9 +2,9 @@
 
 ## Start here — current measurements
 
-**Current measurements at the catch-up checkpoint after #454:** eighty-two PRs merged after #370 with no full reassessment, missing sixteen five-merge windows (those ending #372 through #451). From #369 to #454 is **34h25m40s observed wall time** across 83 merges; windows ranged from **18s** to **9h30m52s**, and the longest two (6h10m42s and 9h30m52s) include long unexplained or pause-related gaps and are not throughput measures. No active, review, CI or waiting split was measured. The owner-choice teaching backlog (8.5–16.5 active hours) and the feature-flag items (2.5–5) are delivered, but their accuracy cannot be scored without active time. The bounded selected subtotal stays **71–146 provisional active hours**; near-term work outside it is a provisional **5.25–14 active hours** of agent estimates plus two unestimated items. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD), so the full selected and all-options ETA stays unbounded.
+**Current measurements at the catch-up checkpoint after #474:** twenty-one PRs merged after #454 with no reassessment, missing four five-merge windows (those ending #455, #458, #465 and #471). From #454 to #474 is **5h51m33s observed wall time** across 21 merges; the complete windows ranged from **11m35s** to **5h09m53s**, and the longest includes a 5h09m35s gap before #466 and is not a throughput measure. No active, review, CI or waiting split was measured. The D15 skill-enrichment deltas (#455, from recorded decision D15; 2–4 active hours), the v1.13.3 generator change (not estimated), landing #453 (0.25–1) and the checkpoint after #454 (1–3) are delivered; only that checkpoint has a recorded start, and its 34m53s of wall time cannot score an active-hour range. The bounded selected subtotal stays **71–146 provisional active hours**; near-term work outside it is a provisional **1–3.5 active hours** of agent estimates. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD), so the full selected and all-options ETA stays unbounded.
 
-**Earlier measurements at the catch-up checkpoint after #370:** twenty-six PRs merged after #344 with no checkpoint. The missed windows ending #349, #354, #359, #364 and #369 took **32m50s**, **12m05s**, **7h57m30s**, **33m43s** and **1h45m11s observed wall time**; the third includes an unexplained 7h41m48s gap and is not a throughput measure. #370 and #374 (the #331 correction, merged 23:24:51 UTC) open the next window, followed by #373 at 23:32:15 UTC. No active, review, CI or waiting split was measured. The #344 maintenance subtotal (5.5–12 active hours) is fully delivered by #348–#356, but its accuracy cannot be scored without active time. The owner-approved #331 correction added a provisional **4–8 active hours**, making the bounded selected subtotal 75–154 while it was undelivered; #374 delivered it, so the current bounded selected subtotal is **71–146 provisional active hours**. Outside it, the owner-choice backlog is 23 skills after S5 added one step (the original audit counted 22): at this reading 17 were delivered (S1, S2 and S3, including the two deferred S1 skills merged in #373) and 6 were in open PRs (S4 as #376 and the S5 step as #377); both have since merged, so all 23 are delivered. The owner-requested feature-flag skill adds a provisional **2.5–5**. #380 and #372 merged after this reading and complete the window, so the next checkpoint is due; #382, #378 (the feature-flag proposal page), #375, #376, #377, #371 (the AI cost guardrail seam), #381 (the APR-046 consumption record), #383 (the `feature-flag-architect` skill, adding two pending reader pages) and #384 (the `project-orchestrator` Stage 3 and Stage 9 feature-flag routes, no new page) merged later still, on 2026-09-27 UTC, so both feature-flag items are delivered. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded.
+**Earlier measurements at the catch-up checkpoint after #454:** eighty-two PRs merged after #370 with no full reassessment, missing sixteen five-merge windows (those ending #372 through #451). From #369 to #454 is **34h25m40s observed wall time** across 83 merges; windows ranged from **18s** to **9h30m52s**, and the longest two (6h10m42s and 9h30m52s) include long unexplained or pause-related gaps and are not throughput measures. No active, review, CI or waiting split was measured. The owner-choice teaching backlog (8.5–16.5 active hours) and the feature-flag items (2.5–5) are delivered, but their accuracy cannot be scored without active time. The bounded selected subtotal stays **71–146 provisional active hours**; near-term work outside it is a provisional **5.25–14 active hours** of agent estimates plus two unestimated items. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD), so the full selected and all-options ETA stays unbounded.
 
 This page is for maintainers and coding agents tracking Project Aegis work.
 **ETA** means estimated time to complete a work item; **PR** means pull
@@ -21,9 +21,9 @@ grant and later lifecycle events. The shorter `BKL-009` in older entries
 means the same runner backlog item as `BER-BKL-009`, the evidence-policy
 work; it is not a separate package.
 
-The latest [catch-up checkpoint after pull request #454](#catch-up-checkpoint-after-pull-request-454--2026-09-28)
+The latest [catch-up checkpoint after pull request #474](#catch-up-checkpoint-after-pull-request-474--2026-09-28)
 reconsiders every selected and optional row, after the
-[catch-up checkpoint after #370](#catch-up-checkpoint-after-pull-request-370--2026-09-26).
+[catch-up checkpoint after #454](#catch-up-checkpoint-after-pull-request-454--2026-09-28).
 The earlier [catch-up checkpoint
 after #306](#catch-up-checkpoint-after-pull-request-306--2026-09-25) records
 four missed five-merge windows without resetting the #303 cadence anchor.
@@ -57,6 +57,126 @@ and the total in the [backlog forecast](aegis-backlog-forecast.md) from these
 measurements and the corresponding PR records. Record the five merge commits,
 scope changes and uncertainty. A material owner decision also triggers an
 earlier forecast update.
+
+## Catch-up checkpoint after pull request #474 — 2026-09-28
+
+The [full reassessment](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-28-after-pull-request-474-catch-up-for-4-missed-windows)
+counts main through #474 `2be0a77f59a21fad9cd478e83113fb89105703d1` and
+reads the same tree. This bounded checkpoint started at 15:14:01 UTC on
+2026-09-28. It had no previously published item ETA; its new ETA is
+**0.5–1.5 active hours**, an agent estimate. At its start the published
+bounded selected subtotal was **71–146 active hours** (#457), and it stays
+**71–146 provisional active hours**. Issue #101 Stage 4B and BER-BKL-009
+residuals are unestimated, so neither the full selected nor the all-options
+backlog has a finite ETA.
+
+**Cadence.** Twenty-one PRs merged after #454 without a reassessment. This
+record keeps the #344 anchor that #352 published and #379 and #457 kept, so
+the four missed windows end at #455, #458, #465 and #471, in actual merge
+order. #457, which merged the #454 checkpoint in the third window, closed
+none of them. #472, #473, #470 and #474 open the next window.
+
+Merges are listed in actual merge order. Each linked Actions run used that
+PR's exact final head; it ran Linux `validate-skills`, Windows
+`windows-offline-checks` and `gate-guard` (the check that fails when a PR changes a protected path). One PR, #461, merged with
+`gate-guard` failed on protected paths, under the owner exception named in
+its row. "Open to merge" is the observed time from PR creation to merge; it
+includes review, CI, queue and waiting and is not active labor. Terms in the
+scope column are defined in the [forecast section](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-28-after-pull-request-474-catch-up-for-4-missed-windows);
+in addition, a sweep batch is one group of pages the pre-rule readability
+sweep re-read together, and its file count is the files that PR changed.
+
+**Window 1: the five first-parent merges after #451, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#443](https://github.com/ModernNomad-98/Project-Aegis/pull/443): Dependabot: `actions/setup-node` 4.4.0 to 7.0.0; receipt in the checkpoint after #454 | `e251c5146f627ec31b7d2f750f0dbabe0bca7ede` | 2026-09-28 09:07:40 | 4m01s from #451 | Recorded in the checkpoint after #454. |
+| [#452](https://github.com/ModernNomad-98/Project-Aegis/pull/452): `project-orchestrator` abbreviations expanded at first use; receipt in the checkpoint after #454 | `419ad2313a60cd39b33dbb572115f42bec6fa870` | 2026-09-28 09:11:48 | 4m08s | Recorded in the checkpoint after #454. |
+| [#454](https://github.com/ModernNomad-98/Project-Aegis/pull/454): Stage 6 manual-only markers in `project-orchestrator`; receipt in the checkpoint after #454 | `5bd21fbd88e08e9eda89d252a008d804b90a4644` | 2026-09-28 09:17:47 | 5m59s | Recorded in the checkpoint after #454. |
+| [#453](https://github.com/ModernNomad-98/Project-Aegis/pull/453): #443 exception, its consumption and the v1.13.3 generator grant recorded (AEGIS-APR-071 to 073) | `4226d293a965fe595be4a6f941bd074f6db942a9` | 2026-09-28 09:22:42 | 4m55s from #454 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36402404885): Linux and Windows passed; `gate-guard` passed; open to merge 12m19s; active time not measured. |
+| [#455](https://github.com/ModernNomad-98/Project-Aegis/pull/455): D15 enrichment deltas applied to four shipped skills | `c789f582bd608ad8cb6fb9636dde1563f5cdad90` | 2026-09-28 09:27:06 | 4m24s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36403030003): Linux and Windows passed; `gate-guard` passed; open to merge 12m47s; active time not measured. |
+
+The #451-to-#455 interval is **23m27s observed wall time**.
+
+**Window 2: the five first-parent merges after #455, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#456](https://github.com/ModernNomad-98/Project-Aegis/pull/456): sweep re-read fixes: `tenant-modeler` and `source-of-truth-reconciler` | `072a1b0a8c160d904d5e2072fb02491c17d14152` | 2026-09-28 09:29:40 | 2m34s from #455 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36403411525): Linux and Windows passed; `gate-guard` passed; open to merge 4m07s; active time not measured. |
+| [#459](https://github.com/ModernNomad-98/Project-Aegis/pull/459): sweep re-read fixes: `ai-cost-guardrail-designer` and `streaming-event-architect` | `da4336273ab44c124439fff82c6c94e70def1db1` | 2026-09-28 09:32:10 | 2m30s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36403505139): Linux and Windows passed; `gate-guard` passed; open to merge 5m45s; active time not measured. |
+| [#461](https://github.com/ModernNomad-98/Project-Aegis/pull/461): audit report made readable on its own (engine v1.13.3, AEGIS-APR-073) | `dc3c767dc91d936cc8cc70589137ca33e6f44b7c` | 2026-09-28 09:36:56 | 4m46s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36403836890): Linux and Windows passed; `gate-guard` failed; one-time exception AEGIS-APR-074, consumed (AEGIS-APR-075); open to merge 7m27s; active time not measured. |
+| [#462](https://github.com/ModernNomad-98/Project-Aegis/pull/462): re-read fixes: `ai-closeout-reporter` pages | `ad5c0538d122e68a47b65c98879c3efc21f171ad` | 2026-09-28 09:37:01 | 5s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36404095012): Linux and Windows passed; `gate-guard` passed; open to merge 5m11s; active time not measured. |
+| [#458](https://github.com/ModernNomad-98/Project-Aegis/pull/458): ledger: #443 to #454 recorded | `ec8cf3e0939bec23802673967b0eda9aca6b732c` | 2026-09-28 09:38:41 | 1m40s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36404203105): Linux and Windows passed; `gate-guard` passed; open to merge 12m30s; active time not measured. |
+
+The #455-to-#458 interval is **11m35s observed wall time**.
+
+**Window 3: the five first-parent merges after #458, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#463](https://github.com/ModernNomad-98/Project-Aegis/pull/463): re-read fixes: `ai-sdlc-operating-model` pages | `2f61f9707d3ca58a3dedd6cbb05eebdd23fbe0f4` | 2026-09-28 09:38:44 | 3s from #458 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36404247010): Linux and Windows passed; `gate-guard` passed; open to merge 5m29s; active time not measured. |
+| [#464](https://github.com/ModernNomad-98/Project-Aegis/pull/464): re-read fixes: approval register reading aid | `c857e56ff34592e678c35447cb1a5531bbb5f397` | 2026-09-28 09:39:15 | 31s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36404416994): Linux and Windows passed; `gate-guard` passed; open to merge 4m22s; active time not measured. |
+| [#460](https://github.com/ModernNomad-98/Project-Aegis/pull/460): later 2026-09-28 owner decisions recorded in the open-decisions index | `61763d8f2ccf66c58a6467eecb4ba3a1ba3a2e00` | 2026-09-28 09:44:50 | 5m35s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36404988604): Linux and Windows passed; `gate-guard` passed; open to merge 15m25s; active time not measured. |
+| [#457](https://github.com/ModernNomad-98/Project-Aegis/pull/457): prior catch-up checkpoint after #454 | `4920686388138c295d4172ebcae31646dbe5916b` | 2026-09-28 09:44:55 | 5s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36404850136): Linux and Windows passed; `gate-guard` passed; open to merge 19m09s; active time not measured. |
+| [#465](https://github.com/ModernNomad-98/Project-Aegis/pull/465): #461 exception and grant consumption recorded (AEGIS-APR-074 to 076) | `5bff21d53eac39571c239caa421ace6e0ddbc634` | 2026-09-28 09:50:25 | 5m30s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36405570093): Linux and Windows passed; `gate-guard` passed; open to merge 10m02s; active time not measured. |
+
+The #458-to-#465 interval is **11m44s observed wall time**.
+
+**Window 4: the five first-parent merges after #465, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#466](https://github.com/ModernNomad-98/Project-Aegis/pull/466): readability sweep batch 1 (2 files) | `adea71e0c1a6a0c3f9f23cfb55098665ed16f196` | 2026-09-28 15:00:00 | 5h09m35s from #465 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36406127742): Linux and Windows passed; `gate-guard` passed; open to merge 5h08m37s; active time not measured. |
+| [#467](https://github.com/ModernNomad-98/Project-Aegis/pull/467): readability sweep batch 4 (9 files) | `164bea8dd621dd3023c8caf1f398791d1cdac0d8` | 2026-09-28 15:00:05 | 5s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36406209304): Linux and Windows passed; `gate-guard` passed; open to merge 5h07m54s; active time not measured. |
+| [#468](https://github.com/ModernNomad-98/Project-Aegis/pull/468): readability sweep batch 9 (12 files) | `45b6118cbc3d76eea064fa4a203261956d326d1e` | 2026-09-28 15:00:09 | 4s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36406232074): Linux and Windows passed; `gate-guard` passed; open to merge 5h07m45s; active time not measured. |
+| [#469](https://github.com/ModernNomad-98/Project-Aegis/pull/469): readability sweep batch 8 (6 files) | `29435b3cfced222ef3dc28574bbb0b374fec43f0` | 2026-09-28 15:00:14 | 5s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36406333322): Linux and Windows passed; `gate-guard` passed; open to merge 5h06m50s; active time not measured. |
+| [#471](https://github.com/ModernNomad-98/Project-Aegis/pull/471): readability sweep batch 2 (7 files) | `4b448403b4ecddcc4e3152bfadce39da9e1faca5` | 2026-09-28 15:00:18 | 4s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36406366344): Linux and Windows passed; `gate-guard` passed; open to merge 5h06m35s; active time not measured. |
+
+The #465-to-#471 interval is **5h09m53s observed wall time**.
+
+**Open window: the four merges after #471, in merge order.**
+
+| Merged PR and scope | Exact merge commit | Merged at UTC | Prior-merge wall interval | Exact-head checks / estimate |
+| --- | --- | --- | ---: | --- |
+| [#472](https://github.com/ModernNomad-98/Project-Aegis/pull/472): readability sweep batch 6 (13 files) | `f31d665616bde8bef6d3446b7758d34182ab9842` | 2026-09-28 15:00:22 | 4s from #471 | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36406395668): Linux and Windows passed; `gate-guard` passed; open to merge 5h06m21s; active time not measured. |
+| [#473](https://github.com/ModernNomad-98/Project-Aegis/pull/473): readability sweep batch 3 (11 files) | `08470871f1f9ea0560253481263e6353dfa71895` | 2026-09-28 15:00:26 | 4s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36406412171): Linux and Windows passed; `gate-guard` passed; open to merge 5h06m16s; active time not measured. |
+| [#470](https://github.com/ModernNomad-98/Project-Aegis/pull/470): readability sweep batch 7 (13 files) | `d9bc77400c51e3a29b3f4fee268c3bdf4fc0ff52` | 2026-09-28 15:09:16 | 8m50s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36406348870): Linux and Windows passed; `gate-guard` passed; open to merge 5h15m42s; active time not measured. |
+| [#474](https://github.com/ModernNomad-98/Project-Aegis/pull/474): readability sweep batch 5 (10 files) | `2be0a77f59a21fad9cd478e83113fb89105703d1` | 2026-09-28 15:09:20 | 4s | [Run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36406525138): Linux and Windows passed; `gate-guard` passed; open to merge 5h14m05s; active time not measured. |
+
+#454 to #474 is **5h51m33s observed wall time** across 21 merges. The one
+large spacing was 5h09m35s before #466; the nine sweep batch PRs were each
+open for more than five hours before merging within 9m20s of one another.
+GitHub has no timestamp for the cause, and none is asserted here. The
+post-merge main `validate-skills` runs for all 21 merges passed, for example
+#474's [post-merge main run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36441428426). No
+active/review/CI/wait split was measured for any of these PRs, and per-merge
+spacing is not labor on that PR or a throughput rate. At this reading,
+[PR #475](https://github.com/ModernNomad-98/Project-Aegis/pull/475) (the BER README readability edits) is open with
+`gate-guard` failed and receives no credit.
+
+**ETA accuracy.** The #454 checkpoint's own **1–3 active-hour** ETA compares
+with **34m53s** of observed wall time from its recorded start at 09:10:02
+UTC to #457's merge at 09:44:55 UTC on 2026-09-28. Active time was not
+measured, so this does not score the estimate, but the whole wall span fell
+below the range's lower bound; this checkpoint's range is set lower for
+that reason. The D15 deltas (2–4 active hours) and landing #453 (0.25–1)
+are delivered, but without active time neither can be scored; the v1.13.3
+generator change and the sweep fixes had no single-item estimate, so they
+have no accuracy measure.
+
+The ten selected rows remain **71–146 active hours**, provisional; no merge
+in these windows closed a private-input, measured-calibration, real-host,
+provider or control-plane gate. Outside that subtotal, the near-term work
+the owner approved or that is in flight totals a provisional **1–3.5 active
+hours** of agent estimates: 0.5–2 to finish the readability sweep and
+0.5–1.5 for this checkpoint. The owner-parked items, the seven optional rows
+and the 106–220-hour agent-estimated skill-expansion candidates are
+unchanged. Stage 4B and BER-BKL-009 real host, runtime, privacy and cleanup
+remain TBD. Main has **613 tracked Markdown files**; the readability
+ledger's latest count, after #454, is 567 accepted reader pages, one
+generated report, 44 classified fixtures and one known pending page, and it
+does not yet record the sweep's 103 pages. Issue #101 remains open and the
+VM paused.
 
 ## Catch-up checkpoint after pull request #454 — 2026-09-28
 

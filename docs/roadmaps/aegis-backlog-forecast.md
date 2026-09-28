@@ -2,17 +2,17 @@
 
 ## Start here — current reading
 
-**Current reading at the 2026-09-28 catch-up checkpoint after #454:** eighty-two PRs merged after #370 without a full reassessment, missing sixteen five-merge windows (those ending #372 through #451). No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The owner-choice teaching backlog (8.5–16.5 active hours) and the feature-flag items (2.5–5) are delivered and now count 0. Much other work merged without a forecast row: the Open Worldwide Application Security Project (OWASP) Top 10 for Large Language Model (LLM) Applications 2026 security refresh, eval and routing integrity, audit baselines, source currency and readability. Near-term work the owner approved or that is in flight adds a provisional **5.25–14 active hours** of agent estimates outside the subtotal, plus the unestimated readability sweep and audit-report generator change; 106–220 agent-estimated hours of unselected skill-expansion candidates are listed for the first time. On 2026-09-28 the owner deferred choosing the next backlog item. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the VM paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #454](#five-merge-checkpoint--2026-09-28-after-pull-request-454-catch-up-for-16-missed-windows).
+**Current reading at the 2026-09-28 catch-up checkpoint after #474:** twenty-one PRs merged after #454, missing four five-merge windows (those ending #455, #458, #465 and #471). No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The D15 enrichment deltas (#455; D15 is a recorded decision to improve four shipped skills), the audit-report generator at engine v1.13.3 (#461, with register entries AEGIS-APR-071 to AEGIS-APR-076 from #453 and #465) and the checkpoint after #454 (#457) are delivered, so near-term work outside the subtotal falls from 5.25–14 to a provisional **1–3.5 active hours** of agent estimates. The owner-ordered readability sweep found 103 accepted pages past the 10-line rule; the coordinating session reports 102 of them accepted again after independent full-page re-reads (88 with fixes in #456, #459, #462 and #466 to #474, and 14 unchanged), and the Behavioral Eval Runner (BER) README waits in open #475 for a protected-path exception. The owner's later 2026-09-28 decisions are in the [open-decisions index](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28) (#460); the next backlog pick is still deferred. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the virtual machine (VM) paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #474](#five-merge-checkpoint--2026-09-28-after-pull-request-474-catch-up-for-4-missed-windows).
 
-**Earlier reading at the 2026-09-26 catch-up checkpoint after #370:** twenty-six PRs merged after #344 without a checkpoint, missing the windows ending #349, #354, #359, #364 and #369. The #344 maintenance subtotal (5.5–12 active hours) is fully delivered by #348–#356, and later merges closed further eval-corpus and review gaps. The owner's 2026-09-26 approval of the bounded #331 BER correction, recorded by #365 ([material owner decision](#material-owner-decision--2026-09-26-331-ber-correction-and-333-option-a)), added 4–8 active hours, making the subtotal 75–154 while it was undelivered; #374 has since implemented and merged that correction, so the current bounded selected planning subtotal is **71–146 provisional active hours**. Outside it, the owner-choice teaching backlog is 23 skills after S5 added one step: at this reading 17 were delivered (S1, including the two deferred skills merged in #373, S2 and S3) and 6 were in open PRs (S4 as #376 and the S5 step as #377); both have since merged, so all 23 are delivered. The R2 wording batch, open at this reading, has since merged as #372, and the owner-requested feature-flag architecture skill adds a provisional **2.5–5 active hours**. #380 and #372 merged after this reading and complete the five-merge window that #370 opened, so the next checkpoint is due; #382, #378 (the feature-flag proposal page), #375, #376, #377, #371 (the AI cost guardrail seam), #381 (the APR-046 consumption record), #383 (the `feature-flag-architect` skill, adding two pending reader pages) and #384 (the `project-orchestrator` Stage 3 and Stage 9 feature-flag routes, no new page) merged later still, on 2026-09-27 UTC, so both feature-flag items are delivered. Stage 4B and BER-BKL-009 host residuals remain TBD and the VM paused, so the full selected and all-options totals still have **no finite ETA**. See the [catch-up checkpoint after #370](#five-merge-checkpoint--2026-09-26-after-pull-request-370-catch-up-for-the-windows-ending-349-354-359-364-369).
+**Earlier reading at the 2026-09-28 catch-up checkpoint after #454:** eighty-two PRs merged after #370 without a full reassessment, missing sixteen five-merge windows (those ending #372 through #451). No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The owner-choice teaching backlog (8.5–16.5 active hours) and the feature-flag items (2.5–5) are delivered and now count 0. Much other work merged without a forecast row: the Open Worldwide Application Security Project (OWASP) Top 10 for Large Language Model (LLM) Applications 2026 security refresh, eval and routing integrity, audit baselines, source currency and readability. Near-term work the owner approved or that is in flight adds a provisional **5.25–14 active hours** of agent estimates outside the subtotal, plus the unestimated readability sweep and audit-report generator change; 106–220 agent-estimated hours of unselected skill-expansion candidates are listed for the first time. On 2026-09-28 the owner deferred choosing the next backlog item. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the VM paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #454](#five-merge-checkpoint--2026-09-28-after-pull-request-454-catch-up-for-16-missed-windows).
 
-This is a rolling **active-work estimate**, not a calendar promise or permission
+This page is for maintainers and coding agents planning Project Aegis work. It is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. The [owner's issue #101 host-path choice](#material-owner-decision--2026-09-25-issue-101-host-path)
 and the later bounded Stage 4A and offline routing grants frame the current
 issue #101 scope. The
-[catch-up checkpoint after #454](#five-merge-checkpoint--2026-09-28-after-pull-request-454-catch-up-for-16-missed-windows)
+[catch-up checkpoint after #474](#five-merge-checkpoint--2026-09-28-after-pull-request-474-catch-up-for-4-missed-windows)
 is the latest full reassessment, after the
-[catch-up checkpoint after #370](#five-merge-checkpoint--2026-09-26-after-pull-request-370-catch-up-for-the-windows-ending-349-354-359-364-369);
+[catch-up checkpoint after #454](#five-merge-checkpoint--2026-09-28-after-pull-request-454-catch-up-for-16-missed-windows);
 the earlier [catch-up checkpoint after
 #306](#catch-up-checkpoint--2026-09-25-after-pull-request-306) records the missed five-merge cadence
 without rewriting the dated #284 snapshot. Pull request (PR) #249 delivered the
@@ -63,9 +63,169 @@ or all-options
 total is defensible until the unestimated residuals are scoped.
 Confidential conduct intake remains a separate owner decision. Also check
 the [documentation estimate audit after #205](#documentation-estimate-audit--2026-09-23-after-pull-request-205),
-the [execution measurements](aegis-execution-metrics.md#catch-up-checkpoint-after-pull-request-454--2026-09-28)
+the [execution measurements](aegis-execution-metrics.md#catch-up-checkpoint-after-pull-request-474--2026-09-28)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
+
+## Five-merge checkpoint — 2026-09-28, after pull request #474 (catch-up for 4 missed windows)
+
+This catch-up reassessment counts first-parent merges on main through #474
+(`2be0a77f59a21fad9cd478e83113fb89105703d1`, merged 2026-09-28 at 15:09:20
+UTC) and reads the same tree. **Twenty-one PRs merged after #454**, the last
+merge the [checkpoint after #454](#five-merge-checkpoint--2026-09-28-after-pull-request-454-catch-up-for-16-missed-windows)
+read. They finish the window #443 opened, fill three more five-merge windows
+and start the next one, so the required cadence was missed four times. This
+is one current assessment, not four backdated ones; the dated #454 section
+and every earlier section stay unchanged. It follows the
+[roadmap-under-uncertainty-planner](../../.claude/skills/roadmap-under-uncertainty-planner/SKILL.md)
+skill: work sits in non-binding horizons (now, next, later) with a
+confidence label, and no range is a delivery date or promise.
+
+Terms used in this section: `gate-guard` is the continuous integration (CI)
+check that fails when a PR changes a protected file path; an AEGIS-APR
+number is an entry in the [approval register](../approvals/APPROVAL_REGISTER.md);
+D15 is a row in the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions)
+log; the Behavioral Eval Runner (BER) is the repository's evaluation tool,
+and its README is a protected path; the pre-rule sweep is the owner-ordered
+re-check of accepted pages for edits made before the 10-line rule of the
+[readability ledger](aegis-documentation-readability-backlog.md); and an
+"agent estimate" is a range an agent compiled for the coordinating session,
+which nobody has measured. In the tables, WP-2B-3 to WP-2B-7 are BER work
+packages (WP) and OD-1 is BER owner decision 1, both in the
+[runner backlog](behavioral-eval-runner-backlog.md); CP-WP-003 and CP-WP-004
+are control-plane work packages in the
+[control-plane backlog](resumable-control-plane-backlog.md).
+
+**Cadence anchor.** This record keeps the #344 anchor that #352 published
+and the #370 and #454 checkpoints kept. The window #443 opened closed with
+#455; the later complete windows end at #458, #465 and #471, in actual merge
+order (PR numbers do not give merge order). #472, #473, #470 and #474 open
+the next window. [PR #457](https://github.com/ModernNomad-98/Project-Aegis/pull/457) merged the #454 checkpoint in
+the third of these windows; it reassessed only through #454, so it closed no
+window. The four missed windows therefore end at #455, #458, #465 and #471.
+Except the owner's standing chat instruction on commits, pushes and merges,
+the owner decisions that #460 recorded had already been reported in the #454
+checkpoint; none changes scope, so they add no separate material-decision miss. The sweep's
+final count of 103 pages, which #460 recorded five seconds before #457
+merged, did change the readability scope, and no forecast update followed
+until this record.
+
+The [merge receipts](aegis-execution-metrics.md#catch-up-checkpoint-after-pull-request-474--2026-09-28)
+give these observed wall times, measured between merge commits:
+
+| Window | Merges in merge order | Observed wall time | Notes |
+| --- | --- | ---: | --- |
+| After #451 | #443, #452, #454, #453, #455 | 23m27s | The first three were listed at the #454 checkpoint. |
+| After #455 | #456, #459, #461, #462, #458 | 11m35s | |
+| After #458 | #463, #464, #460, #457, #465 | 11m44s | #457 is the #454 checkpoint. |
+| After #465 | #466, #467, #468, #469, #471 | 5h09m53s | Includes a 5h09m35s gap before #466. Not a throughput measure. |
+| Open window | #472, #473, #470, #474 | 9m02s | First four merges of the next window. |
+| **#454 to #474** | **21 merges** | **5h51m33s** | Concurrent work, review, CI, queue and owner waiting included. |
+
+The cause of the 5h09m35s gap was not timestamped and is not asserted. Active
+labor, review, CI and waiting were not measured separately for any of these
+PRs, so no active-hour figure is inferred from the wall times.
+
+**Delivered since #454, grouped by outcome.** Each of the 21 merges after
+#454 appears once. The last column says what the group did to this forecast.
+
+| Outcome | Merged PRs | Effect on the forecast |
+| --- | --- | --- |
+| D15 enrichment deltas for four shipped skills (owner approval 2026-09-28) | #455 | The 2–4-hour near-term row reaches 0. It changed existing skills, so the library stays at 186. |
+| Audit-report generator at engine v1.13.3 and its approval records | #453, #461, #465 | The generator row and the 0.25–1-hour row for landing #453 reach 0. #453 recorded AEGIS-APR-071 to AEGIS-APR-073. #461 merged under a one-time `gate-guard` exception; #465 recorded it as AEGIS-APR-074, its consumption as AEGIS-APR-075 and the consumption of the AEGIS-APR-073 grant as AEGIS-APR-076. |
+| Pre-rule readability sweep: full-page re-read fixes | #456, #459, #462, #466, #467, #468, #469, #470, #471, #472, #473, #474 | With 14 pages accepted unchanged, resolves 102 of the sweep's 103 pages, as the coordinating session reports; #462 also covers a page that #455 changed. See the readability row. |
+| Readability ledger and follow-up re-read fixes | #458, #463, #464 | #458 recorded #443 to #454 in the ledger; #463 fixed the two `ai-sdlc-operating-model` pages that #455 took past the 10-line rule; #464 applied re-read fixes to the approval register's reading aid. |
+| Governance records: the #454 checkpoint and the later 2026-09-28 owner decisions | #457, #460 | Records only. #457 delivers its own 1–3-hour row. |
+
+**Rows that reached 0 remaining.** Active time was not measured for any of
+them, so no estimate can be scored.
+
+| Item | Earlier estimate | Now | Delivered by |
+| --- | ---: | ---: | --- |
+| D15 enrichment deltas | 2–4, agent estimate | 0 | #455 |
+| Audit-report generator v1.13.3, output format only | Not estimated | 0 | #461; #465 recorded its exception and grant consumption |
+| Land open PR #453 (the #443 exception record and the v1.13.3 grant) | 0.25–1, agent estimate | 0 | #453 |
+| The catch-up checkpoint after #454 | 1–3, agent estimate | 0 | #457 |
+
+**Selected rows.** None of the 21 merges closed a private-input,
+measured-calibration, real-host, provider or control-plane gate, so every
+selected row keeps its range. No row below starts until the owner selects it
+and any separate grant it needs is merged.
+
+| Selected remaining outcome | #454 → current active hours | Current dependency and confidence |
+| --- | ---: | --- |
+| WP-2B-3: accepted candidate inputs | 1–4 → 1–4 | Owner review of the 160 private candidate labels, guide and hashes; the first gate for all later BER work; low. |
+| WP-2B-3: measured calibration and OD-1 ratification | 4–10 → 4–10 | Approved labels, exact reviewed execution source, reconciled allowance with an explicit cap, selected-host proof, measured result and owner ratification; low. |
+| R4/R5: selected-host capability proof | 12–24 → 12–24, provisional | The disposable VM stays paused; guest checks, Stage A scope and a separate grant remain; low. |
+| WP-2B-4: limited live suite | 12–24 → 12–24 | Calibration, OD-1, R1/R4/R5 evidence and a separate live grant; low. |
+| WP-2B-5: generic corpus | 8–16 → 8–16 | WP-2B-4, curated fixtures and a separate grant; low. |
+| WP-2B-6: scheduling and dataset operations | 8–16 → 8–16 | WP-2B-5 and scheduling, cost, quarantine and dataset authority; low. |
+| WP-2B-7: advisory CI and operator workflow | 4–8 → 4–8 | WP-2B-6 and advisory CI/operator authority; low. |
+| CP-WP-003: real authority and execution capability | 8–16 → 8–16, provisional | Authenticated read-only inspection of one selected source (4–8, outside this subtotal) and host and evidence choices come first; low. |
+| CP-WP-004: one bounded real integration | 8–16 → 8–16 | CP-WP-003 proof, a selected operation and a separate grant; low. |
+| Issue #101 package 7: release readiness | 6–12 → 6–12 | Stage 4B host proof, the helper comparison or an Aegis-only choice, and exact-release review; all eight synthetic Stage 4B cases are still **NOT RUN**; low. |
+| **Bounded selected planning subtotal** | **71–146 → 71–146, provisional** | The ten rows only. |
+| Issue #101 Stage 4B: actual host mechanics proof | TBD → TBD | Host profile, permissions, telemetry, provider and cost limits and a separate grant. |
+| BER-BKL-009: real host, runtime, privacy and cleanup | TBD → TBD | A named host, verified controls, runtime design and authority. |
+| Documentation readability | Pre-rule sweep re-counting at #454 → 103 found, 1 left open | Main still has **613 tracked Markdown files**. The [readability ledger](aegis-documentation-readability-backlog.md#start-here--current-reading)'s latest count, after #454, is 567 accepted reader pages, one generated report, 44 classified fixtures and one known pending page. Against the 558 pages the ledger accepted after #442, the sweep found 103 past the 10-line rule, and #460 recorded that count. The coordinating session reports that the sweep PRs above resolved 102 of them, each by an independent full-page re-read followed by its required fixes or an unchanged acceptance; the ledger has not yet recorded them page by page, and a separate ledger update is in progress. The remaining page, the BER README (`tools/behavioral_eval_runner/README.md`), is a protected path: its fixes are in open [PR #475](https://github.com/ModernNomad-98/Project-Aegis/pull/475), whose `gate-guard` check fails, so its merge needs a one-time exact-head exception from the owner. #457 and this checkpoint each change more than 10 lines of this forecast and the [execution measurements](aegis-execution-metrics.md), so both pages need an independent full-page re-read; the ledger records their status. |
+| **Full selected total** | **No finite estimate → no finite estimate** | Stage 4B and BER residuals remain unestimated. |
+
+**Outside the selected subtotal: near-term work the owner approved or that
+is in flight.** These ranges are agent estimates.
+
+| Item | Earlier → current active hours | Dependency, status and confidence |
+| --- | ---: | --- |
+| Readability: finish the pre-rule sweep | 2–6 for the known pending pages, sweep TBD → 0.5–2 | Landing #475 once the owner grants its exception, the ledger's page-by-page record of the sweep, and the re-reads of this forecast and the execution measurements; medium. |
+| This catch-up checkpoint | New → 0.5–1.5 | In progress in this PR. Set lower than #457's 1–3 because this record covers 21 merges rather than 82; medium. |
+| **Near-term outside subtotal** | **5.25–14 → 1–3.5, agent estimates** | No unestimated item remains in it. Not a commitment. |
+
+**Parked by the owner.** Unchanged since #454: the planned `UNRUN`
+tightening that #374 left (1–3 hours, agent estimate) stays skipped, and
+confidential conduct-reporting intake (D59, 1–2 hours, agent estimate) waits
+for outside contributors.
+
+**Optional and unselected scope.** Unchanged since #454. All seven optional
+rows keep their ranges and gates, both helpers would still make an
+**87–186-hour partial subtotal** on the 71–146 base, and the provisional
+**4–8-hour** authenticated CP source inspection stays outside the selected
+subtotal. The **106–220** agent-estimated hours of skill-expansion
+candidates listed at the #454 checkpoint are unchanged; none is selected or
+started.
+
+**Owner decisions since #454.** The later 2026-09-28 decisions are recorded
+in the [open-decisions index](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28)
+by #460, and the grants they created in the
+[approval register](../approvals/APPROVAL_REGISTER.md) by #453 and #465;
+this record cites them and does not restate them. Two further owner choices
+appear only in the sweep PR descriptions and in open #475, not yet in the
+index: marking only real hand-offs to manual-only skills ("Mark real
+handoffs only"), and "Prepare it" for the BER README edits. Neither changes
+an estimate.
+
+**Horizons at this reading.** **Now** (owner-approved, in flight): #475 once
+its exception is granted, the ledger's record of the sweep, the re-reads of
+this forecast and the execution measurements, and this checkpoint. **Next**
+(waits for the owner's pick, still deferred): the three items that unblock
+the most selected hours, all owner-gated: the private BER label review,
+which gates all BER rows; resuming the paused VM for the R4/R5 host proof;
+and a Stage 4B host path for issue #101. Each needs its own grant.
+**Later**: the dependent BER live suites, CP-WP-003/004, issue #101 packages
+5 to 7, the optional rows and skill expansion.
+
+**Capacity and assumptions.** In 21 merges and 5h51m33s of observed wall
+time since #454, no selected row moved again: the work finished the
+near-term items the owner approved on 2026-09-28 and nearly all of the
+readability sweep. The selected rows wait on owner inputs and grants, not on
+agent capacity, so more merges alone will not shorten them. The plan
+assumes the owner keeps selecting work row by row and that no gated row
+starts without a merged grant. Confidence in the blocker inventory is high;
+confidence in every execution range stays low until the label, host and
+source proofs exist.
+
+**Re-plan.** Issue #101 remains open and the VM paused. #472, #473, #470 and
+#474 are the first four merges of the next window; reassess after one
+further merge, or sooner for a material owner decision, a merged Stage 4B or
+BER host scope, the owner's backlog pick, or a verified scope change.
 
 ## Five-merge checkpoint — 2026-09-28, after pull request #454 (catch-up for 16 missed windows)
 
