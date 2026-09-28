@@ -135,9 +135,14 @@ agent file anywhere on that path can run shell commands, start a process or
 skip permission prompts. The skill validator separately checks every agent file
 under the root `.claude/agents/`, recursively, and rejects any frontmatter key
 outside a short allow-list (`name`, `description`, `tools`, `model`,
-`disallowedTools`, `maxTurns`, `effort`, `color`), any repeated key, and any
-tracked agent file outside the root directory. It names `hooks`, `mcpServers`
-and `permissionMode` as forbidden.
+`disallowedTools`, `maxTurns`, `effort`, `color`), any repeated key, any YAML
+anchor, alias or merge key (`<<`), and any tracked agent file outside the root
+directory. It names `hooks`, `mcpServers` and `permissionMode` as forbidden.
+A tracked entry named `.claude` or `.claude/agents` anywhere in the repository,
+such as a git symlink, is protected by the guard and rejected by the validator,
+because it could point an agent lookup at a directory with any name. The
+validator lists tracked files with `git ls-files`; when git is unavailable it
+falls back to a filesystem walk, which also sees untracked files.
 The source repository's [owner grant](approvals/APPROVAL_REGISTER.md) permits
 authorized agents to perform administrator merges without repeat consent; see
 the [current merge policy](reconciliation/auto-merge-policy.md). Documentation

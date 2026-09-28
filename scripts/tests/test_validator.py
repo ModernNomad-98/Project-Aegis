@@ -369,6 +369,17 @@ def test_agents_schema():
         "an agent repeating `tools` (Bash, then Read) is rejected",
     )
 
+    # PyYAML resolves merge keys and aliases; a reader without that support
+    # sees different keys, so agent frontmatter must be written out flat.
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "merge-key")
+    expect_error(rep, "YAML merge key <<", "an agent whose `tools` arrives via `<<` is rejected")
+
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "yaml-alias")
+    expect_error(rep, "YAML anchor &agent_name", "an agent using a YAML anchor is rejected")
+    expect_error(rep, "YAML alias *agent_name", "an agent using a YAML alias is rejected")
+
     # Every `.claude/agents/` from the working directory up to the repository
     # root is loaded, so any agent file outside the root tree is flagged.
     candidates = [
@@ -376,10 +387,15 @@ def test_agents_schema():
         "docs/.claude/agents/example.md", "a/b/.claude/agents/deep/x.md",
         ".Claude/Agents/case-variant.md", ".claude/agents-notes.md",
         "docs/.claude/agents/notes.txt", ".claude/skills/example/SKILL.md",
+        # Tracked entries NAMED `.claude` or `.claude/agents` (a git symlink,
+        # mode 120000) can redirect the lookup, whatever their extension.
+        "docs/.claude", "docs/.claude/agents", "docs/.Claude", "docs/my.claude",
+        ".claude/agentsX/y.md",
     ]
     misplaced = validator.misplaced_agent_files(candidates)
     assert misplaced == [
         ".Claude/Agents/case-variant.md", "a/b/.claude/agents/deep/x.md",
+        "docs/.Claude", "docs/.claude", "docs/.claude/agents",
         "docs/.claude/agents/example.md",
     ], misplaced
     PASSES.append("nested and case-variant .claude/agents files are flagged")

@@ -661,6 +661,10 @@ AGENT_FORBIDDEN_KEYS = {
 # an agent file in a nested directory (docs/.claude/agents/) is live for anyone
 # who starts a session there. Matched case-insensitively for Windows/macOS.
 AGENT_PATH_SEGMENT = re.compile(r"(^|/)\.claude/agents/", re.IGNORECASE)
+# A tracked ENTRY named `.claude` or `.claude/agents` (a git symlink, mode
+# 120000, or a plain file) can point a nested `.claude/agents/` at a directory
+# with any name, so no changed path would contain `.claude/agents/`.
+AGENT_DIR_ENTRY = re.compile(r"(^|/)\.claude(/agents)?$", re.IGNORECASE)
 _WALK_PRUNE = {".git", ".worktrees", "node_modules"}
 
 
@@ -674,11 +678,14 @@ def _walk_md(root: Path, prune: set[str] = frozenset()) -> list[Path]:
 
 
 def _repo_candidate_paths() -> list[str]:
-    """Repo-relative POSIX paths of every tracked file.
+    """Repo-relative POSIX paths of every tracked entry (files and symlinks).
 
     Tracked only: untracked local worktrees and scratch copies under the
-    checkout are not what a pull request ships. Falls back to a filesystem walk (pruning .git, .worktrees, node_modules)
-    when git is unavailable, so the check never silently sees nothing.
+    checkout are not what a pull request ships. When git is unavailable it
+    falls back to a filesystem walk (pruning .git, .worktrees, node_modules)
+    that also sees untracked files, so the check never silently sees nothing.
+    The walk reports files and symlinked directories, and does not descend
+    into the latter.
     """
     try:
         out = subprocess.run(
@@ -687,7 +694,14 @@ def _repo_candidate_paths() -> list[str]:
         ).stdout
         return [p for p in out.decode("utf-8", "surrogateescape").split("\0") if p]
     except (OSError, subprocess.CalledProcessError):
-        return [p.relative_to(REPO_ROOT).as_posix() for p in _walk_md(REPO_ROOT, _WALK_PRUNE)]
+        found = []
+        for current, dirs, files in os.walk(REPO_ROOT, followlinks=False):
+            here = Path(current)
+            dirs[:] = sorted(d for d in dirs if d not in _WALK_PRUNE)
+            links = [d for d in dirs if (here / d).is_symlink()]
+            for entry in sorted(files) + links:
+                found.append((here / entry).relative_to(REPO_ROOT).as_posix())
+        return found
 
 
 def misplaced_agent_files(paths: list[str]) -> list[str]:
@@ -696,12 +710,49 @@ def misplaced_agent_files(paths: list[str]) -> list[str]:
     Any `*.md` under a `.claude/agents/` segment that does not start exactly
     with `.claude/agents/` (a nested directory, or a case variant of the root)
     is loaded by Claude Code in some session but would escape the checks below.
+    So is any tracked entry named `.claude` or `.claude/agents` itself,
+    whatever its extension: that is a symlink (or a file standing in for a
+    directory) that could redirect a `.claude/agents/` lookup elsewhere.
     """
     return sorted(
         p for p in paths
-        if p.lower().endswith(".md") and AGENT_PATH_SEGMENT.search(p)
-        and not p.startswith(".claude/agents/")
+        if (
+            (p.lower().endswith(".md") and AGENT_PATH_SEGMENT.search(p)
+             and not p.startswith(".claude/agents/"))
+            or AGENT_DIR_ENTRY.search(p)
+        )
     )
+
+
+def yaml_indirection(fm_text: str) -> list[str]:
+    """Anchors (`&x`), aliases (`*x`) and merge keys (`<<`) in the frontmatter.
+
+    PyYAML resolves `<<: {tools: Read}` into a real `tools` key, but a YAML
+    1.2 reader without merge-key support sees no `tools` at all, and an agent
+    with no `tools` inherits every tool. Agent frontmatter is a handful of
+    flat keys, so any indirection is rejected rather than interpreted.
+    """
+    found: set[str] = set()
+    try:
+        for token in yaml.scan(fm_text, Loader=yaml.SafeLoader):
+            if isinstance(token, yaml.AnchorToken):
+                found.add(f"anchor &{token.value}")
+            elif isinstance(token, yaml.AliasToken):
+                found.add(f"alias *{token.value}")
+        root = yaml.compose(fm_text, Loader=yaml.SafeLoader)
+    except yaml.YAMLError:
+        return []  # the strict parse reports it
+    stack = [root] if root is not None else []
+    while stack:
+        node = stack.pop()
+        if isinstance(node, yaml.MappingNode):
+            for key, value in node.value:
+                if isinstance(key, yaml.ScalarNode) and key.value == "<<":
+                    found.add("merge key <<")
+                stack.extend((key, value))
+        elif isinstance(node, yaml.SequenceNode):
+            stack.extend(node.value)
+    return sorted(found)
 
 
 def duplicate_mapping_keys(fm_text: str) -> list[str]:
@@ -756,8 +807,9 @@ def check_agents_schema(rep: Report, agents_dir: Path | None = None) -> None:
         for misplaced in misplaced_agent_files(_repo_candidate_paths()):
             rep.error(
                 f"[{misplaced}] agent file outside the root `.claude/agents/` "
-                "directory: Claude Code loads every `.claude/agents/` from the "
-                "working directory up to the repository root, so a nested one "
+                "directory, or a tracked `.claude` / `.claude/agents` entry "
+                "(symlink or file): Claude Code loads every `.claude/agents/` "
+                "from the working directory up to the repository root, so it "
                 "is live yet unvalidated — move it or delete it"
             )
     if not agents_dir.is_dir():
@@ -776,6 +828,12 @@ def check_agents_schema(rep: Report, agents_dir: Path | None = None) -> None:
                 f"[{ctx}] duplicate frontmatter key `{key}`: YAML readers "
                 "disagree on which value wins, so the checked value may not "
                 "be the one that runs"
+            )
+        for item in yaml_indirection(fm_text):
+            rep.error(
+                f"[{ctx}] YAML {item} in agent frontmatter: readers without "
+                "merge-key or alias support see different keys (an agent with "
+                "no `tools` inherits every tool), so write each key out flat"
             )
 
         for key in sorted(map(str, fm)):

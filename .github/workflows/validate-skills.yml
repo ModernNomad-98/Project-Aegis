@@ -275,8 +275,10 @@ jobs:
           # `mcpServers` and `permissionMode` in project agent files, so an
           # agent file can run commands or widen permissions (finding P2-3).
           # Claude Code loads every .claude/agents/ from the working directory
-          # up to the repository root, so nested copies are protected too.
-          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|(.*/)?\.claude/agents/|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
+          # up to the repository root, so nested copies are protected too. An
+          # entry named `.claude` or `.claude/agents` itself (a git symlink, for
+          # example) could redirect that lookup, so it is protected as well.
+          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|(.*/)?\.claude/agents(/|$)|(.*/)?\.claude$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
           shopt -s nocasematch
           gate_files=()
           echo "Files changed in this PR:"
