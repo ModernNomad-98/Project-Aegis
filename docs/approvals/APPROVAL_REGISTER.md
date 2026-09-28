@@ -2069,7 +2069,8 @@ the entry governs.
 - **Date / Grantor:** 2026-09-28 / Peter Nguyen.
 - **Reason:** [PR #475](https://github.com/ModernNomad-98/Project-Aegis/pull/475)
   applies six readability edits to `tools/behavioral_eval_runner/README.md`
-  from the owner-ordered pre-rule readability sweep. That file is a protected
+  from the owner-ordered re-check of documentation pages edited before the
+  current readability rule. That file is a protected
   path outside AEGIS-APR-047's four BER files, so `gate-guard` fails, and
   merging needs a one-time owner exception for the exact head.
 - **Scope allowed:** One `gate-guard` exception and administrator merge of
@@ -2079,9 +2080,10 @@ the entry governs.
   passed `validate-skills` and `windows-offline-checks`, each running the
   complete offline BER suite (1088 tests, OK); `gate-guard` failed only on
   `tools/behavioral_eval_runner/README.md`. An
-  [independent corrected-candidate review](https://github.com/ModernNomad-98/Project-Aegis/pull/475#issuecomment-5873052127)
-  of that head returned ACCEPT and found the diff is exactly the six
-  required edits. Codex posted only usage-limit notices after the head
+  [independent review](https://github.com/ModernNomad-98/Project-Aegis/pull/475#issuecomment-5873052127)
+  of that head returned ACCEPT, meaning ready to merge, and found the diff
+  is exactly the six required edits. Codex posted only usage-limit notices
+  after the head
   commit (15:16:05 UTC): at 15:16:35, 15:16:48 and 15:21:27 UTC on
   2026-09-28.
 - **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
@@ -2091,8 +2093,7 @@ the entry governs.
   the PR) and "Approve for acdcdad only (Recommended)" (the exception) to the
   coordinating agent's multiple-choice questions in the Project Aegis
   conversation (Claude Code session) on 2026-09-28, relayed by that agent.
-  The
-  [exception receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/475#issuecomment-5873259254)
+  The [exception receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/475#issuecomment-5873259254)
   on PR #475 records the head, checks, review and merge.
 - **Expiry / use limit:** One merge of PR #475 at the named head; consumed
   by the merge recorded in AEGIS-APR-078.
