@@ -6,7 +6,14 @@ description: Define the tenant model for a SaaS product — what a tenant IS (or
 # Tenant Modeler
 
 **Reading key:** SSO means single sign-on, where an identity provider signs
-a user in across applications.
+a user in across applications. A user interface (UI) is the screens and
+text users see. The *control plane* is the shared layer that manages
+tenants (signup, billing, configuration); the *data plane* serves each
+tenant's own data. *Pooled* resources are shared by many tenants; *siloed*
+resources are dedicated to one. A *seat pool* is a purchased number of user
+licences shared across a tenant. *Domain capture* routes users with a
+company's verified email domain into that company's tenant. A *tombstone*
+is a placeholder left where deleted content was.
 
 ## Purpose
 
@@ -174,5 +181,5 @@ Handoffs: multi-tenant-data-architect (schema), authorization-matrix-designer
   guest, service account), and the invitation state machine.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against
-  `tenant-isolation-reviewer` and `multi-tenant-data-architect` (tenant
-  cluster).
+  `tenant-isolation-reviewer`, `multi-tenant-data-architect`, and
+  `saas-platform-architect` (tenant cluster).
