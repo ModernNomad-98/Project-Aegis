@@ -24,6 +24,15 @@ on:
 permissions:
   contents: read
 
+# Import-path isolation. Every script run and every `python -m pip` call
+# runs with -P, so the script's own directory (or, for -m, the checkout
+# root) is not put first on sys.path and a module a pull request adds beside
+# a gate script cannot shadow the standard library or PyYAML and rewrite the
+# exit status. -P rather than -I: -I also implies -E, which would drop the
+# PYTHONIOENCODING and PYTHONDONTWRITEBYTECODE settings below. The two
+# `-m tools.behavioral_eval_runner` and `-m unittest` commands need the
+# checkout root on sys.path and cannot take -P; gate-guard protects every
+# root-level importable name instead.
 env:
   PYTHONDONTWRITEBYTECODE: '1'
   PYTHONIOENCODING: utf-8
@@ -69,46 +78,46 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Run offline bridge callback tests
-        run: python scripts/ci/record-check.py setup-bridge -- node --test tools/aegis_setup/host_bridge/bridge.test.ts
+        run: python -P scripts/ci/record-check.py setup-bridge -- node --test tools/aegis_setup/host_bridge/bridge.test.ts
 
       # PyYAML powers the spec-strict frontmatter parse (decision D50); the
       # validator fails closed without it. Pinned exactly in requirements.txt
       # (decision D55) so CI is reproducible and dependabot has a file to bump.
       - name: Install pinned offline-check dependencies
-        run: python -m pip install --quiet -r requirements-ci.txt
+        run: python -P -m pip install --quiet -r requirements-ci.txt
 
       - name: Record resolved dependency versions
-        run: python scripts/ci/record-check.py dependencies -- python -m pip freeze
+        run: python -P scripts/ci/record-check.py dependencies -- python -P -m pip freeze
 
       - name: Verify SDK coverage and record host capabilities
-        run: python scripts/ci/record-check.py environment -- python scripts/ci/check-environment.py
+        run: python -P scripts/ci/record-check.py environment -- python -P scripts/ci/check-environment.py
 
       - name: Check CI evidence and protected-path handling
-        run: python scripts/ci/record-check.py ci-tests -- python scripts/tests/test_offline_ci.py
+        run: python -P scripts/ci/record-check.py ci-tests -- python -P scripts/tests/test_offline_ci.py
 
       # Who validates the validator (decision D55). The gate's own hard checks
       # are exercised against good/bad fixtures BEFORE it is trusted to judge
       # the library, so a refactor cannot silently disarm one.
       - name: Run validator self-tests
-        run: python scripts/ci/record-check.py validator-tests -- python scripts/tests/test_validator.py
+        run: python -P scripts/ci/record-check.py validator-tests -- python -P scripts/tests/test_validator.py
 
       # The default bash shell runs with `-eo pipefail`, so a nonzero exit
       # from the validator fails this job.
       - name: Run skill validator
-        run: python scripts/ci/record-check.py skills -- python scripts/validate-skills.py
+        run: python -P scripts/ci/record-check.py skills -- python -P scripts/validate-skills.py
 
       # Audit candidates remain advisory; these tests check the audit's behavior.
       - name: Run contract-audit self-tests
-        run: python scripts/ci/record-check.py contract-audit-tests -- python scripts/tests/test_audit_skill_contracts.py
+        run: python -P scripts/ci/record-check.py contract-audit-tests -- python -P scripts/tests/test_audit_skill_contracts.py
 
       - name: Run BER self-check
-        run: python scripts/ci/record-check.py ber-self-check -- python -m tools.behavioral_eval_runner self-check
+        run: python -P scripts/ci/record-check.py ber-self-check -- python -m tools.behavioral_eval_runner self-check
 
       - name: Run complete offline BER suite
-        run: python scripts/ci/record-check.py ber -- python -m unittest discover -s tools/behavioral_eval_runner/tests -p 'test_*.py' -v
+        run: python -P scripts/ci/record-check.py ber -- python -m unittest discover -s tools/behavioral_eval_runner/tests -p 'test_*.py' -v
 
       - name: Run Scenario A acceptance in PowerShell Core
-        run: python scripts/ci/record-check.py acceptance-core -- pwsh -NoProfile -File scripts/acceptance/Test-ScenarioAEvidence.ps1
+        run: python -P scripts/ci/record-check.py acceptance-core -- pwsh -NoProfile -File scripts/acceptance/Test-ScenarioAEvidence.ps1
 
       # DCO enforcement (decision D60). Lives INSIDE this already-required job
       # rather than in a job of its own, so the contract is enforced the moment
@@ -132,7 +141,7 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           git fetch origin "$BASE_REF" --quiet
-          python scripts/check_dco.py --range "origin/${BASE_REF}..${HEAD_SHA}"
+          python -P scripts/check_dco.py --range "origin/${BASE_REF}..${HEAD_SHA}"
 
       - name: Retain offline-check evidence
         if: always()
@@ -175,35 +184,35 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Run offline bridge callback tests
-        run: python scripts/ci/record-check.py setup-bridge -- node --test tools/aegis_setup/host_bridge/bridge.test.ts
+        run: python -P scripts/ci/record-check.py setup-bridge -- node --test tools/aegis_setup/host_bridge/bridge.test.ts
 
       # One native command per step preserves its exit status in PowerShell.
       - name: Install pinned offline-check dependencies
-        run: python -m pip install --quiet -r requirements-ci.txt
+        run: python -P -m pip install --quiet -r requirements-ci.txt
 
       - name: Record resolved dependency versions
-        run: python scripts/ci/record-check.py dependencies -- python -m pip freeze
+        run: python -P scripts/ci/record-check.py dependencies -- python -P -m pip freeze
 
       - name: Verify SDK coverage and record host capabilities
-        run: python scripts/ci/record-check.py environment -- python scripts/ci/check-environment.py
+        run: python -P scripts/ci/record-check.py environment -- python -P scripts/ci/check-environment.py
 
       - name: Check CI evidence handling
-        run: python scripts/ci/record-check.py ci-tests -- python scripts/tests/test_offline_ci.py
+        run: python -P scripts/ci/record-check.py ci-tests -- python -P scripts/tests/test_offline_ci.py
 
       - name: Run validator self-tests
-        run: python scripts/ci/record-check.py validator-tests -- python scripts/tests/test_validator.py
+        run: python -P scripts/ci/record-check.py validator-tests -- python -P scripts/tests/test_validator.py
 
       - name: Run skill validator
-        run: python scripts/ci/record-check.py skills -- python scripts/validate-skills.py
+        run: python -P scripts/ci/record-check.py skills -- python -P scripts/validate-skills.py
 
       - name: Run contract-audit self-tests
-        run: python scripts/ci/record-check.py contract-audit-tests -- python scripts/tests/test_audit_skill_contracts.py
+        run: python -P scripts/ci/record-check.py contract-audit-tests -- python -P scripts/tests/test_audit_skill_contracts.py
 
       - name: Run BER self-check
-        run: python scripts/ci/record-check.py ber-self-check -- python -m tools.behavioral_eval_runner self-check
+        run: python -P scripts/ci/record-check.py ber-self-check -- python -m tools.behavioral_eval_runner self-check
 
       - name: Run complete offline BER suite
-        run: python scripts/ci/record-check.py ber -- python -m unittest discover -s tools/behavioral_eval_runner/tests -p 'test_*.py' -v
+        run: python -P scripts/ci/record-check.py ber -- python -m unittest discover -s tools/behavioral_eval_runner/tests -p 'test_*.py' -v
 
       # Sequential calls in the same checkout; each harness launches its own
       # current host. Both editions are tested, with no shell fallback.
@@ -211,10 +220,10 @@ jobs:
         # A Python intermediate launched from pwsh inherits Core's PSModulePath,
         # which can hide Desktop's Get-FileHash. Start this recorder in Desktop.
         shell: powershell
-        run: python scripts/ci/record-check.py acceptance-desktop -- powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance/Test-ScenarioAEvidence.ps1
+        run: python -P scripts/ci/record-check.py acceptance-desktop -- powershell -NoProfile -ExecutionPolicy Bypass -File scripts/acceptance/Test-ScenarioAEvidence.ps1
 
       - name: Run Scenario A acceptance in PowerShell Core
-        run: python scripts/ci/record-check.py acceptance-core -- pwsh -NoProfile -File scripts/acceptance/Test-ScenarioAEvidence.ps1
+        run: python -P scripts/ci/record-check.py acceptance-core -- pwsh -NoProfile -File scripts/acceptance/Test-ScenarioAEvidence.ps1
 
       - name: Retain offline-check evidence
         if: always()
@@ -255,7 +264,15 @@ jobs:
           # Keep old paths on renames and parse NUL records so unusual names
           # cannot bypass a prefix check through Git's display quoting.
           git diff --no-renames --name-only -z "origin/${BASE_REF}...HEAD" > "$RUNNER_TEMP/aegis-changed-files"
-          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|scripts/validate-skills\.py$|scripts/check_dco\.py$|scripts/tests/|scripts/ci/|scripts/audit-skill-contracts\.py$|scripts/acceptance/|tools\.py$|tools/__init__\.py$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
+          # All of scripts/ is protected: `python scripts/<gate>.py` puts
+          # scripts/ first on sys.path, so a new sibling module there could
+          # shadow an import. The checkout root is first on sys.path for the
+          # -m commands, so any root-level module, extension, .pth file or
+          # package __init__ (tools.py, yaml.py, unittest.py, sitecustomize.py,
+          # conftest.py, yaml/__init__.py, ...) is protected too. Matching is
+          # case-insensitive because Windows and macOS checkouts fold case.
+          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
+          shopt -s nocasematch
           gate_files=()
           echo "Files changed in this PR:"
           while IFS= read -r -d '' path; do

@@ -118,6 +118,14 @@ new checks' dependencies: `scripts/ci/`, the contract-audit script, all acceptan
 scripts and fixtures, the entire BER package (runtime, tests, schemas and fixtures),
 its parent import paths `tools.py` and `tools/__init__.py`, and both root requirements
 files. Changes to these paths require explicit review and deliberate merge.
+The guard also protects all of `scripts/` and every root-level Python module,
+extension, `.pth` file or package `__init__`, matched case-insensitively. Those
+are the directories Python puts first on the import path when the workflow runs
+`python scripts/<name>.py` or `python -m <module>`, so a new file there could
+shadow the standard library or PyYAML and turn a failing check green. Every
+script and `pip` call in the workflow also runs with `python -P`, which keeps
+the script directory off the import path; `-I` is not used because it also
+ignores the `PYTHONIOENCODING` and `PYTHONDONTWRITEBYTECODE` settings.
 The source repository's [owner grant](approvals/APPROVAL_REGISTER.md) permits
 authorized agents to perform administrator merges without repeat consent; see
 the [current merge policy](reconciliation/auto-merge-policy.md). Documentation
@@ -142,9 +150,9 @@ Run the commands shown in `.github/workflows/validate-skills.yml` from the repos
 root. For example:
 
 ```text
-python scripts/ci/record-check.py environment -- python scripts/ci/check-environment.py
-python scripts/ci/record-check.py ci-tests -- python scripts/tests/test_offline_ci.py
-python scripts/ci/record-check.py ber -- python -m unittest discover -s tools/behavioral_eval_runner/tests -p test_*.py -v
+python -P scripts/ci/record-check.py environment -- python -P scripts/ci/check-environment.py
+python -P scripts/ci/record-check.py ci-tests -- python -P scripts/tests/test_offline_ci.py
+python -P scripts/ci/record-check.py ber -- python -m unittest discover -s tools/behavioral_eval_runner/tests -p test_*.py -v
 ```
 
 Use `powershell -NoProfile -ExecutionPolicy Bypass -File
