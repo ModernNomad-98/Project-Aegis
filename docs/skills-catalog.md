@@ -480,6 +480,8 @@ proves stability. Five skills have side effects and are **manual-only**
 browser), `clickthrough-test-engineer` (drives a live app), `vitest-unit-component-engineer`
 (writes test files, runs suites), `vite-build-qa-engineer` (runs builds/preview),
 and `flaky-test-detective` (applies a test-layer fix and verifies stability).
+D68 added a sixth manual-only skill, `test-tenant-provisioner` (writes marked
+test accounts to a named non-production environment).
 
 **Pulled forward from the QA backlog** (in addition to the 13 canonical Phase 5 skills):
 `integration-test-designer` (roadmap #184), `api-contract-test-designer` (roadmap #185),
@@ -507,6 +509,7 @@ reviews criteria and runs no tests; the #227 definition-of-done check stays cove
 | `vite-build-qa-engineer` | cat 05 #178 + cat 06 #217 | **no** (manual-only; runs builds/preview) | Build-artifact QA: `VITE_` env classification, dist-level secret value+pattern proof, build/preview parity (base, deep links, modes), bundle budgets + sourcemap policy; exposures → `secrets-identity-hardener`. |
 | `flaky-test-detective` | cat 06 #209/#210 | **no** (manual-only; executes state-changing operations) | Classify → reproduce with counts → fix ONE cause → prove stability with repeated runs; no retries/sleeps/weakened assertions; product races routed as product bugs; quarantine with owner/ticket/expiry. |
 | `test-data-architect` | cat 06 #196–#199 | yes | Persona/baseline catalog (read-only), per-layer data sources, determinism, worker-scoped parallel isolation, synthetic-only PII posture, structural cleanup + traceability, schema-coupled seed evolution. |
+| `test-tenant-provisioner` | cat 06 #198 (D10 Tier 1, built by D68) | **no** (manual-only; writes test accounts to an environment) | Makes the persona catalog's test tenants, users, roles and memberships exist in a named NON-PRODUCTION environment: validate-only drift report by default (missing/drifted/orphaned/blocked), apply creates or repairs only marked rows after plan approval, never touches unmarked rows, credentials by environment-variable name only, backup-gated capability grants with inline rollback, static production-reach lint. Pinned ≠ `test-data-architect` (designs the catalog), `multi-tenant-security-tester`, `tenant-modeler`, `playwright-e2e-engineer`, `secrets-identity-hardener`. |
 | `regression-suite-curator` | cat 06 #190/#210 | yes | Evidence-based promote/retain/demote/retire with written rationale (never silent deletion), protected security regressions (human-approval to retire), enforced quarantine registry, tier-budget fit. |
 | `integration-test-designer` | cat 06 **#184 (pulled forward)** | yes | The layer BETWEEN unit and E2E: real service/command/DB/auth/permission boundaries, named faked seams with rationale, real-path auth minting, persisted-state assertions, no browser; security matrices deferred to `multi-tenant-security-tester`. |
 | `api-contract-test-designer` | cat 06 **#185 (pulled forward)** | yes | Contract VERIFICATION (not design): provider/consumer roles, request/response schema + error-envelope validation, additive-vs-breaking CI gate, version coverage, fake-fidelity re-validation; contract design stays with `api-event-architect`. |

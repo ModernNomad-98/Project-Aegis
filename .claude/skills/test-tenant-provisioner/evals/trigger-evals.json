@@ -1,0 +1,87 @@
+{
+  "skill": "test-tenant-provisioner",
+  "description": "Trigger discrimination for test tenant and user provisioning (D68): making catalog accounts exist and proving they match, versus designing the catalog (test-data-architect), writing cross-tenant negative tests (multi-tenant-security-tester), defining the tenant model (tenant-modeler), browser auth-state fixtures (playwright-e2e-engineer), and credential custody (secrets-identity-hardener).",
+  "overlaps_with": [
+    "test-data-architect",
+    "multi-tenant-security-tester",
+    "tenant-modeler",
+    "playwright-e2e-engineer",
+    "secrets-identity-hardener"
+  ],
+  "cases": [
+    {
+      "id": "validate-drift-wins-here",
+      "prompt": "Explicitly invoke test-tenant-provisioner. Compare the test tenants and users in staging with our persona catalog and report anything missing or drifted, without changing anything.",
+      "expected_skill": "test-tenant-provisioner",
+      "should_not_trigger": [
+        "test-data-architect",
+        "tenant-modeler"
+      ],
+      "reason": "Checking real accounts in an environment against an existing catalog is provisioning verification, not catalog design or tenant modeling."
+    },
+    {
+      "id": "apply-missing-accounts-wins-here",
+      "prompt": "Explicitly invoke test-tenant-provisioner. Create the two-tenant A/B accounts the security suite needs in our QA environment, marked as test rows.",
+      "expected_skill": "test-tenant-provisioner",
+      "should_not_trigger": [
+        "multi-tenant-security-tester",
+        "test-data-architect"
+      ],
+      "reason": "Making the fixture accounts exist in an environment is provisioning; the security tester owns the fixture's required shape and the denial tests, not the account writes."
+    },
+    {
+      "id": "stale-login-account-wins-here",
+      "prompt": "Explicitly invoke test-tenant-provisioner. The E2E login for the tenant-b admin persona fails in staging because the account's role was changed by hand. Repair the account.",
+      "expected_skill": "test-tenant-provisioner",
+      "should_not_trigger": [
+        "playwright-e2e-engineer"
+      ],
+      "reason": "The defect is the environment account, not the spec or its auth-state file; repairing a marked account is this skill's job."
+    },
+    {
+      "id": "catalog-design-goes-to-test-data-architect",
+      "prompt": "Design the persona catalog for our tests: owner, admin and member per tenant, stable ids, and which suites create their own data.",
+      "expected_skill": "test-data-architect",
+      "should_not_trigger": [
+        "test-tenant-provisioner"
+      ],
+      "reason": "Deciding which personas and tenants exist is design; the provisioner consumes the catalog and never invents it."
+    },
+    {
+      "id": "negative-suite-goes-to-security-tester",
+      "prompt": "Explicitly invoke multi-tenant-security-tester. Write the negative tests proving tenant A's users cannot read tenant B's invoices through the API.",
+      "expected_skill": "multi-tenant-security-tester",
+      "should_not_trigger": [
+        "test-tenant-provisioner"
+      ],
+      "reason": "Denial assertions and the suite are the security tester's; the provisioner only makes the accounts exist."
+    },
+    {
+      "id": "tenant-definition-goes-to-modeler",
+      "prompt": "Define what a tenant is in our product and how real customer tenants are created, suspended and deleted.",
+      "expected_skill": "tenant-modeler",
+      "should_not_trigger": [
+        "test-tenant-provisioner"
+      ],
+      "reason": "The product tenant model and real customer provisioning lifecycle are tenant-modeler's; this skill only handles marked test accounts in non-production environments."
+    },
+    {
+      "id": "auth-state-fixtures-go-to-playwright",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Add a storageState setup project that logs in each persona once and reuses the session across specs.",
+      "expected_skill": "playwright-e2e-engineer",
+      "should_not_trigger": [
+        "test-tenant-provisioner"
+      ],
+      "reason": "Browser auth-state files and Playwright fixtures that log accounts in are the E2E engineer's; the accounts themselves are provisioned here."
+    },
+    {
+      "id": "credential-rotation-goes-to-secrets-hardener",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Move our test persona passwords into the secret manager and rotate them every 30 days.",
+      "expected_skill": "secrets-identity-hardener",
+      "should_not_trigger": [
+        "test-tenant-provisioner"
+      ],
+      "reason": "Credential custody and rotation belong to secrets-identity-hardener; the provisioner references credentials by variable name only."
+    }
+  ]
+}

@@ -4,7 +4,8 @@
   "overlaps_with": [
     "tenant-isolation-reviewer",
     "rls-policy-auditor",
-    "tenant-modeler"
+    "tenant-modeler",
+    "test-tenant-provisioner"
   ],
   "cases": [
     {
@@ -43,6 +44,15 @@
         "multi-tenant-security-tester"
       ],
       "reason": "No defined boundary exists to test against; semantics must be modeled first."
+    },
+    {
+      "id": "fixture-accounts-go-to-provisioner",
+      "prompt": "Explicitly invoke test-tenant-provisioner. Our A/B security fixture accounts are missing in the QA environment; create them as marked test rows.",
+      "expected_skill": "test-tenant-provisioner",
+      "should_not_trigger": [
+        "multi-tenant-security-tester"
+      ],
+      "reason": "This skill specifies the two-tenant fixture and writes the denial tests; making the accounts exist in an environment is the provisioner's job (D68)."
     }
   ]
 }
