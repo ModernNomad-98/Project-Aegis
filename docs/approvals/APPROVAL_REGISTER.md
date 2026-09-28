@@ -27,8 +27,9 @@ the entry governs.
 - **AEGIS-APR-nnn** is an entry ID; some entries shorten it to **APR-nnn**.
   Event types are GRANT, POLICY DECISION (selects a policy target, grants no
   work), CONSUMED (a limited grant was used up) and EXPIRED (a grant's time,
-  session or other limit ended, whether or not it was used). Some GRANT entries clarify, condition or reaffirm an earlier grant
-  and name it on their Event line. "Status at recording" is the status when
+  session or other limit ended, whether or not it was used). Some GRANT
+  entries clarify, condition or reaffirm an earlier grant and name it on
+  their Event line. "Status at recording" is the status when
   the entry was written; later events can change it. A one-use grant can be
   used up even before a later event records that; check its use limit and
   linked delivery record.
