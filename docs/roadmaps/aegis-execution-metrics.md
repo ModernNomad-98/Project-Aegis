@@ -2,7 +2,7 @@
 
 ## Start here — current measurements
 
-**Current measurements at the catch-up checkpoint after #454:** eighty-two PRs merged after #370 with no full reassessment, missing sixteen five-merge windows (those ending #372 through #451). From #369 to #454 is **34h25m40s observed wall time** across 83 merges; windows ranged from **18s** to **9h30m52s**, and the longest two (6h10m42s and 9h30m52s) include long unexplained or pause-related gaps and are not throughput measures. No active, review, CI or waiting split was measured. The owner-choice teaching backlog (8.5–16.5 active hours) and the feature-flag items (2.5–5) are delivered, but their accuracy cannot be scored without active time. The bounded selected subtotal stays **71–146 provisional active hours**; near-term work outside it is a provisional **5.25–14 active hours** of agent estimates plus two unestimated items. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded.
+**Current measurements at the catch-up checkpoint after #454:** eighty-two PRs merged after #370 with no full reassessment, missing sixteen five-merge windows (those ending #372 through #451). From #369 to #454 is **34h25m40s observed wall time** across 83 merges; windows ranged from **18s** to **9h30m52s**, and the longest two (6h10m42s and 9h30m52s) include long unexplained or pause-related gaps and are not throughput measures. No active, review, CI or waiting split was measured. The owner-choice teaching backlog (8.5–16.5 active hours) and the feature-flag items (2.5–5) are delivered, but their accuracy cannot be scored without active time. The bounded selected subtotal stays **71–146 provisional active hours**; near-term work outside it is a provisional **5.25–14 active hours** of agent estimates plus two unestimated items. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD), so the full selected and all-options ETA stays unbounded.
 
 **Earlier measurements at the catch-up checkpoint after #370:** twenty-six PRs merged after #344 with no checkpoint. The missed windows ending #349, #354, #359, #364 and #369 took **32m50s**, **12m05s**, **7h57m30s**, **33m43s** and **1h45m11s observed wall time**; the third includes an unexplained 7h41m48s gap and is not a throughput measure. #370 and #374 (the #331 correction, merged 23:24:51 UTC) open the next window, followed by #373 at 23:32:15 UTC. No active, review, CI or waiting split was measured. The #344 maintenance subtotal (5.5–12 active hours) is fully delivered by #348–#356, but its accuracy cannot be scored without active time. The owner-approved #331 correction added a provisional **4–8 active hours**, making the bounded selected subtotal 75–154 while it was undelivered; #374 delivered it, so the current bounded selected subtotal is **71–146 provisional active hours**. Outside it, the owner-choice backlog is 23 skills after S5 added one step (the original audit counted 22): at this reading 17 were delivered (S1, S2 and S3, including the two deferred S1 skills merged in #373) and 6 were in open PRs (S4 as #376 and the S5 step as #377); both have since merged, so all 23 are delivered. The owner-requested feature-flag skill adds a provisional **2.5–5**. #380 and #372 merged after this reading and complete the window, so the next checkpoint is due; #382, #378 (the feature-flag proposal page), #375, #376, #377, #371 (the AI cost guardrail seam), #381 (the APR-046 consumption record), #383 (the `feature-flag-architect` skill, adding two pending reader pages) and #384 (the `project-orchestrator` Stage 3 and Stage 9 feature-flag routes, no new page) merged later still, on 2026-09-27 UTC, so both feature-flag items are delivered. Stage 4B and BER-BKL-009 host residuals remain TBD, so the full selected and all-options ETA stays unbounded.
 
@@ -302,13 +302,12 @@ passed, for example #452's [post-merge main run](https://github.com/ModernNomad-
 was in progress at this reading. Earlier post-merge runs were not re-checked
 for this record. No active/review/CI/wait split was measured for any of
 these PRs, and per-merge spacing is not labor on that PR or a throughput
-rate. At this reading (about 09:25 UTC), [PR #453](https://github.com/ModernNomad-98/Project-Aegis/pull/453)
+rate. At this reading of main through #454 (09:17:47 UTC), [PR #453](https://github.com/ModernNomad-98/Project-Aegis/pull/453)
 (the #443 exception record and the AEGIS-APR-073 generator grant) and
 [PR #455](https://github.com/ModernNomad-98/Project-Aegis/pull/455) (the D15
 enrichment deltas) are open and receive no credit. After this reading,
 #453 merged at 09:22:42 UTC as `4226d293a965fe595be4a6f941bd074f6db942a9`,
-open to merge 12m19s, with Linux, Windows and `gate-guard` passing; it is
-the fourth merge of the open window, and this record does not measure it.
+open to merge 12m19s, with Linux, Windows and `gate-guard` passing; it is the fourth merge of the open window. #455 merged at 09:27:06 UTC as `c789f582bd608ad8cb6fb9636dde1563f5cdad90`, open to merge 12m47s, with all three checks passing; it is the fifth, so the next checkpoint is due. This record does not measure either merge.
 
 **ETA accuracy.** The #370 checkpoint's own **1–2 active-hour** ETA
 compares with **8h23m00s** of observed wall time from its recorded start at
@@ -327,7 +326,7 @@ in these windows closed a private-input, measured-calibration, real-host,
 provider or control-plane gate. Outside that subtotal, the near-term work
 the owner approved or that is in flight totals a provisional **5.25–14
 active hours** of agent estimates, plus the unestimated readability sweep
-and v1.13.3 generator change; the owner-parked items and the 106–220-hour
+and v1.13.3 generator change; the owner-parked items and the 106–220-hour agent-estimated
 skill-expansion candidates are listed in the forecast. Stage 4B and
 BER-BKL-009 real host, runtime, privacy and cleanup remain TBD, and all seven
 optional rows keep their ranges and gates. Main has **613 tracked Markdown

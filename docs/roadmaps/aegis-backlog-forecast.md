@@ -2,7 +2,7 @@
 
 ## Start here — current reading
 
-**Current reading at the 2026-09-28 catch-up checkpoint after #454:** eighty-two PRs merged after #370 without a full reassessment, missing sixteen five-merge windows (those ending #372 through #451). No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The owner-choice teaching backlog (8.5–16.5 active hours) and the feature-flag items (2.5–5) are delivered and now count 0. Much other work merged without a forecast row: the OWASP Top 10 for LLM Applications 2026 security refresh, eval and routing integrity, audit baselines, source currency and readability. Near-term work the owner approved or that is in flight adds a provisional **5.25–14 active hours** of agent estimates outside the subtotal, plus the unestimated readability sweep and audit-report generator change; 106–220 hours of unselected skill-expansion candidates are listed for the first time. On 2026-09-28 the owner deferred choosing the next backlog item. Stage 4B and BER-BKL-009 host residuals remain TBD and the VM paused, so the full selected and all-options totals still have **no finite ETA**. See the [catch-up checkpoint after #454](#five-merge-checkpoint--2026-09-28-after-pull-request-454-catch-up-for-16-missed-windows).
+**Current reading at the 2026-09-28 catch-up checkpoint after #454:** eighty-two PRs merged after #370 without a full reassessment, missing sixteen five-merge windows (those ending #372 through #451). No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The owner-choice teaching backlog (8.5–16.5 active hours) and the feature-flag items (2.5–5) are delivered and now count 0. Much other work merged without a forecast row: the Open Worldwide Application Security Project (OWASP) Top 10 for Large Language Model (LLM) Applications 2026 security refresh, eval and routing integrity, audit baselines, source currency and readability. Near-term work the owner approved or that is in flight adds a provisional **5.25–14 active hours** of agent estimates outside the subtotal, plus the unestimated readability sweep and audit-report generator change; 106–220 agent-estimated hours of unselected skill-expansion candidates are listed for the first time. On 2026-09-28 the owner deferred choosing the next backlog item. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the VM paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #454](#five-merge-checkpoint--2026-09-28-after-pull-request-454-catch-up-for-16-missed-windows).
 
 **Earlier reading at the 2026-09-26 catch-up checkpoint after #370:** twenty-six PRs merged after #344 without a checkpoint, missing the windows ending #349, #354, #359, #364 and #369. The #344 maintenance subtotal (5.5–12 active hours) is fully delivered by #348–#356, and later merges closed further eval-corpus and review gaps. The owner's 2026-09-26 approval of the bounded #331 BER correction, recorded by #365 ([material owner decision](#material-owner-decision--2026-09-26-331-ber-correction-and-333-option-a)), added 4–8 active hours, making the subtotal 75–154 while it was undelivered; #374 has since implemented and merged that correction, so the current bounded selected planning subtotal is **71–146 provisional active hours**. Outside it, the owner-choice teaching backlog is 23 skills after S5 added one step: at this reading 17 were delivered (S1, including the two deferred skills merged in #373, S2 and S3) and 6 were in open PRs (S4 as #376 and the S5 step as #377); both have since merged, so all 23 are delivered. The R2 wording batch, open at this reading, has since merged as #372, and the owner-requested feature-flag architecture skill adds a provisional **2.5–5 active hours**. #380 and #372 merged after this reading and complete the five-merge window that #370 opened, so the next checkpoint is due; #382, #378 (the feature-flag proposal page), #375, #376, #377, #371 (the AI cost guardrail seam), #381 (the APR-046 consumption record), #383 (the `feature-flag-architect` skill, adding two pending reader pages) and #384 (the `project-orchestrator` Stage 3 and Stage 9 feature-flag routes, no new page) merged later still, on 2026-09-27 UTC, so both feature-flag items are delivered. Stage 4B and BER-BKL-009 host residuals remain TBD and the VM paused, so the full selected and all-options totals still have **no finite ETA**. See the [catch-up checkpoint after #370](#five-merge-checkpoint--2026-09-26-after-pull-request-370-catch-up-for-the-windows-ending-349-354-359-364-369).
 
@@ -82,7 +82,7 @@ confidence label, and no range is a delivery date or promise.
 
 Terms used in this section: Open Worldwide Application Security Project
 (OWASP) and large language model (LLM) name the security list the AI-security
-skills follow; `gate-guard` is the continuous-integration check that fails
+skills follow; `gate-guard` is the continuous integration (CI) check that fails
 when a PR changes a protected file path; ROUTE-002 is the audit rule that
 flags a skill routing to another skill that does not route back; a D-number
 such as D15 or D67 is a row in the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions)
@@ -155,9 +155,9 @@ them, so no estimate can be scored.
 
 | Item | Earlier estimate | Now | Delivered by |
 | --- | ---: | ---: | --- |
-| Owner-choice teaching backlog (23 skills: S1 to S5) and the R2 wording batch | 8.5–16.5, provisional | 0 | #366, #368 and #370 before this reading; #373, #376, #377 and #372 after it |
+| Owner-choice teaching backlog (23 skills: S1 to S5) and the R2 wording batch | 8.5–16.5, provisional | 0 | #366, #368 and #370 before the #370 reading; #373, #376, #377 and #372 after it |
 | Feature-flag subtotal: the `feature-flag-architect` skill and the `project-orchestrator` routes | 2.5–5, provisional | 0 | #383 and #384; #387 and #403 finished its reader pages |
-| BER selected-precheck aggregate correction | 4–8 (already delivered at #370) | 0 | #374; #381 recorded its consumption as AEGIS-APR-053 |
+| BER selected-precheck aggregate correction | 4–8 (credited as delivered by the #370 checkpoint) | 0 | #374; #381 recorded its consumption as AEGIS-APR-053 |
 | Dependabot #443 | 0.25–1, agent estimate | 0 | #443 |
 | `project-orchestrator` Stage 6 manual-only markers | Not estimated | 0 | #454 |
 | Open PR #452 (part of the 1–3-hour in-flight agent estimate below) | Inside that range | 0 | #452 |
@@ -254,6 +254,7 @@ unless a PR is named, the repository does not record them yet:
   AEGIS-APR-073, is pending in #453.
 - **D15 enrichment deltas approved** and being applied in #455.
 - **Full readability pre-rule sweep ordered.**
+- **Certainty labels kept to `adr-writer` only**; they are not adopted as a library-wide writing rule. No estimate changes.
 - **Stage 6 manual-only markers approved**, and delivered by #454.
 - **Backlog pick deferred**, and the #374 `UNRUN` tightening skipped for
   now.
@@ -292,9 +293,7 @@ and AEGIS-APR-072, and grants the v1.13.3 generator change as
 [AEGIS-APR-073](../approvals/APPROVAL_REGISTER.md#aegis-apr-073-make-the-audit-baseline-report-readable-on-its-own-engine-v1133).
 So the 0.25–1-hour in-flight row is delivered, and the generator change is
 authorized but not started; its merge still needs its own exact-head
-`gate-guard` exception. #453 is the fourth merge of the window that #443
-opened, so the next merge closes that window and makes the next checkpoint
-due. This record does not reassess it.
+`gate-guard` exception. #453 is the fourth merge of the window that #443 opened. [PR #455](https://github.com/ModernNomad-98/Project-Aegis/pull/455), the D15 deltas, then merged at 09:27:06 UTC as `c789f582`, with Linux, Windows and `gate-guard` passing. It is the fifth merge, so that window is closed and the next checkpoint is due. This record does not reassess either merge.
 
 ## Five-merge checkpoint — 2026-09-26, after pull request #370 (catch-up for the windows ending #349, #354, #359, #364, #369)
 
