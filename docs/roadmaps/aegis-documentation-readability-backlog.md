@@ -2,13 +2,13 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #454 (`5bd21fb`) on 2026-09-28 Coordinated
+As of merged pull request (PR) #474 (`2be0a77`) on 2026-09-28 Coordinated
 Universal Time (UTC), this remains the active
 repository-wide documentation acceptance backlog. The latest count is in the
-paragraph for main after #454 (`5bd21fb`): 613 tracked Markdown files, 567
+paragraph for main after #474 (`2be0a77`): 613 tracked Markdown files, 565
 accepted reader pages, one generated report, 44 classified synthetic fixtures
-and one known pending page; the paragraphs between are dated history, oldest
-first. The two component guides,
+and three known pending pages; the paragraphs between are dated history,
+oldest first. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
 The **491-file inventory and the ordered "start with" steps below are the
@@ -710,6 +710,216 @@ approval register) and #455 (D15 enrichment deltas to four shipped skills),
 are not counted here; a later ledger update records them. No grant or gate
 changed.
 
+PRs #453 (`4226d29`, 09:22 UTC), #455 (`c789f58`, 09:27), #456 (`072a1b0`,
+09:29), #459 (`da43362`, 09:32), #461 (`dc3c767`, 09:36), #462 (`ad5c053`),
+#458 (`ec8cf3e`) and #463 (`2f61f97`) (09:37 to 09:38), #464 (`c857e56`,
+09:39), #460 (`61763d8`) and #457 (`4920686`) (both 09:44), #465 (`5bff21d`,
+09:50), #466 (`adea71e`), #467 (`164bea8`), #468 (`45b6118`), #469
+(`29435b3`), #471 (`4b44840`), #472 (`f31d665`) and #473 (`0847087`) (all
+15:00 UTC), and #470 (`d9bc774`) and #474 (`2be0a77`) (both 15:09 UTC) merged
+on 2026-09-28 after #454, in that order. No Markdown file was added, removed
+or renamed. The evaluation JSON files in #455 and the audit script, its test
+and two JSON baselines in #461 are not Markdown and are not counted; no
+synthetic fixture changed. Line counts are `git diff --numstat` from each
+merge's first parent, added plus deleted, as above. Each review cited below is
+posted on its PR unless this update says otherwise, and for every page counted
+as accepted, `git diff <accepted head> 2be0a77` on that page is empty. Codex
+posted only usage-limit notices on these PRs, so no Codex review exists for
+any of these heads.
+
+**The pre-rule sweep.** The sweep the owner ordered on 2026-09-28 took the 558
+pages this ledger counted as accepted after #442 and, for each, added up every
+edit since its last full-page acceptance, including edits made before the
+2026-09-27 rule. On main after #454 (`5bd21fb`) it kept **455** pages and
+returned **103** to pending: 84 `SKILL.md` pages, 5 skill references or
+assets, 5 roadmap pages, 4 evidence pages and 5 others. The nine pages
+accepted in #445 to #452 had just had full-page reviews and were outside its
+scope. Independent reviewers then re-read the 103 pages in full: five in
+separate PRs, and 98 in nine batches read on `072a1b0` or `da43362`. The
+per-page inventory is a working file of the
+coordinating session, not a repository page, so this update records the
+results page by page. `SKILL.md` pages are named by their skill directory
+under `.claude/skills/`.
+
+- **Accepted again after full-page re-reads (102 of the 103).**
+  - Re-read and fixed on their own before the batches: #456,
+    `tenant-modeler` (13) and `source-of-truth-reconciler` (10), **accepted**
+    on `620b245`; #459, `ai-cost-guardrail-designer` (10) and
+    `streaming-event-architect` (11), **accepted** on `378089f`; and #462,
+    `ai-closeout-reporter` (see the D15 item below).
+  - Fixed in the nine batch PRs (83 pages). In each, a corrected-candidate
+    reviewer rebuilt the head by applying the batch's required edits to the
+    merge base, found it byte-identical, and re-read each changed page in full
+    at the head. Each posted **ACCEPT** for every changed page on the head
+    that merged. Batch 1, #466 on `dac42f3`: the
+    [Behavioral Eval Runner design](../design/behavioral-eval-runner-v1.md)
+    and the
+    [routing request-binding review](../evidence/setup/issue-101-routing-request-binding-review.md).
+    Batch 2, #471 on `67f577e`: the
+    [resumable control-plane backlog](resumable-control-plane-backlog.md),
+    `agent-authorization-matrix`, `roadmap-under-uncertainty-planner`,
+    `statement-of-applicability-author`, `sunset-deprecation-communicator`,
+    `synthetic-monitoring-architect` and `tech-spec-writer`. Batch 3, #473 on
+    `8c6750a`: the
+    [CP-WP-003 authority packet](cp-wp-003-real-authority-decision-packet.md),
+    `authority-invalidation-architect`, `design-review-facilitator`,
+    `frontend-perf-engineer`, `integration-test-designer`,
+    `operational-vs-analytical-splitter`, `performance-test-harness`,
+    `product-analytics-instrumenter`, `product-spec-writer`,
+    `saas-cost-architect` and `secrets-identity-hardener`. Batch 4, #467 on
+    `eb3ec53`: `audit-log-architect`, `background-job-orchestration-architect`,
+    `code-simplifier`, `pii-lifecycle-designer`, `plan-entitlement-architect`,
+    `playwright-e2e-engineer`, `soc2-trust-criteria-mapper`,
+    `superadmin-observability-console-designer` and `vite-build-qa-engineer`.
+    Batch 5, #474 on `14ecd0c`: the [setup route](aegis-setup-routing-plan.md),
+    the
+    [BER-BKL-009 static source inventory](../evidence/ber-bkl-009-static-source-inventory.md),
+    `ai-lifecycle-risk-manager`, `appsec-implementer`, `aws-saas-architect`,
+    `docs-first-implementer`, `flaky-test-detective`,
+    `iso-27001-isms-architect`, `load-test-planner` and
+    `mobile-viewport-craft`. Batch 6, #472 on `6ba6e1a`: the
+    [host feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md),
+    the
+    [BER-BKL-009 policy integration review](../evidence/ber-bkl-009-policy-integration-review.md),
+    the [host bridge guide](../../tools/aegis_setup/host_bridge/README.md),
+    `aegis-setup/references/state-contract.md`, `agentic-loop-designer`,
+    `azure-saas-architect`, `docs-as-code-architect`,
+    `intra-tenant-scope-architect`, `latency-budget-architect`,
+    `realtime-subscription-architect`, `roadmap-to-commitments-translator`,
+    `screenshot-evidence-planner` and `share-link-access-architect`. Batch 7,
+    #470 on `2a86058`: the
+    [Stage 4B decision packet](aegis-setup-package-4b-host-proof-protocol.md),
+    the [CP-WP-003 named-candidate matrix](cp-wp-003-named-candidate-matrix.md),
+    `adr-sequencer`, `api-doc-generator-designer`,
+    `caching-strategy-designer`, `eval-runner-designer`,
+    `iso-42001-aims-architect`, `merge-is-deploy-governance`,
+    `offline-first-sync-architect`, `query-plan-reader`,
+    `regression-suite-curator`, `saas-platform-architect` and
+    `schema-evolution-planner`. Batch 8, #469 on `61ca130`: the
+    [setup tool guide](../../tools/aegis_setup/README.md),
+    `feature-flag-rollout-strategist`, `model-context-designer`,
+    `pagination-cursor-designer`, `qa-automation-architect` and
+    `skill-usage-instrumenter`. Batch 9, #468 on `54034fa`:
+    [AGENTS.md](../../AGENTS.md), `accessibility-test-harness`,
+    `docs-retention-index`, `notification-webhook-ux-designer`,
+    `profiling-methodology-designer`, `qa-strategy-architect`,
+    `search-architecture-designer`, `skill-deprecation-planner`,
+    `slo-reliability-architect`, `staff-scope-selector`, and
+    `standing-approval-and-auto-advance` with its
+    `references/standing-approval-policy.md`.
+  - **Accepted on the first full-page read, with no edit (14 pages),** read
+    on `072a1b0` or `da43362` and unchanged since: `architecture-designer`
+    (batch 1); `requirements-gathering-facilitator` and
+    `cell-based-architecture-designer` (batch 4);
+    `warehouse-lake-architect` and `authorization-matrix-designer` (batch 5);
+    `aegis-setup` (batch 6);
+    `merge-is-deploy-governance/references/governance-doc-template.md`
+    (batch 7); `ab-test-designer` with its `references/ab-test-sheet.md`,
+    `architecture-advisor`, `data-migration-runbook-author`,
+    `data-partitioning-sharding-strategist` and `prioritization-frame-picker`
+    (batch 8); and `accessibility-test-harness/references/a11y-checklists.md`
+    (batch 9). The verdicts are in the reviewers' batch verdict records, which
+    are working files, not PR comments. Seven are also named as accepted on
+    GitHub: `architecture-designer` in #466's description, and the batch 4, 5,
+    6 and 9 pages in the corrected-candidate comments on #467, #474, #472 and
+    #468. #469's description says only that its "six ACCEPT pages" were left
+    untouched, and no PR names the governance template, so for those seven the
+    only named record is the working file.
+- **Still pending (1 of the 103).** The
+  [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md)
+  (148 lines since its last full-page acceptance). Its batch 4 re-read
+  returned FIX-FIRST with six edits, which were held back: the path is
+  protected by the `gate-guard` check, so the edits need a separate owner
+  exception. The page stays **pending**.
+- **The D15 enrichment deltas (#455).** #455 applied decision D15 of the
+  [step-0 reconciliation log](../reconciliation/step-0-reconciliation-v4.md)
+  to eight reader pages in four skills. Its SHIP review on `16bb924` checked
+  every changed line and listed the per-page counts.
+  - **Accepted again after full-page re-reads (4 pages).**
+    `ai-closeout-reporter/SKILL.md` (32, after 16 counted by the sweep) and
+    its `assets/closeout-template.md` (25) got 6 and 3 lines of fixes in
+    #462, and a corrected-candidate re-read of both in full **accepted** them
+    on `e569a3c`. `ai-sdlc-operating-model/SKILL.md` (11) and its
+    `references/stage-gate-map.md` (16, with a new section) got 15 and 22 in
+    #463, and its reviewer re-read both in full and **accepted** them on
+    `6306232`.
+  - **Keep acceptance (3 pages).** `agent-memory-governance/SKILL.md` (8)
+    and its `references/memory-rules.md` (8), and
+    `adr-writer/assets/adr-template.md` (7: 2 in #236 and 5 in #455).
+  - **Newly pending (1 page).** `adr-writer/SKILL.md` has 13 changed lines
+    since its acceptance in the batch after #236 (`39361ba`): 2 in #396, 3 in
+    #417 and 8 in #455. #455's reviewer counted 8 against main, but this
+    ledger adds the edits since the last full-page acceptance, so the page is
+    past 10 and **pending**.
+- **Other pages.**
+  - The [approval register](../approvals/APPROVAL_REGISTER.md) stays
+    **pending**. #453 appended AEGIS-APR-071 to APR-073 (118; SHIP on
+    `5be36b3`). #464 applied three reading-aid edits (18) from a full-page
+    re-read of the register on `4226d29`, which already held #450's and
+    #453's entries. That FIX-FIRST read is described in #464's description
+    but was not posted as a review comment; the posted corrected-candidate
+    review **accepted** the edits on `e6d0f6a` and re-read the reading-aid
+    section and AEGIS-APR-070 in context. Even counting `e6d0f6a` as a
+    full-page acceptance, #465 then appended AEGIS-APR-074 to APR-076 (78;
+    SHIP on `ab430ad`, which checked facts and format, not the whole page),
+    and `git diff e6d0f6a 2be0a77` on the register is exactly those 78 added
+    lines. That is past 10, so the page stays pending.
+  - The [open-decisions index](aegis-open-decisions-2026-09-23.md) (#460,
+    27): a full-page re-read on `36be74b` returned FIX-FIRST, two targeted
+    checks followed on `4f474ae` and `a4ac928`, and a one-line check
+    **accepted** it on `08f99eb`, which matches main.
+  - The [backlog forecast](aegis-backlog-forecast.md) (238) and
+    [execution measurements](aegis-execution-metrics.md) (285), #457: a
+    full-page review on `86d891e` returned FIX-FIRST with edits F1 to F7 and
+    M1 to M3; a corrected-candidate check **accepted** both on `676bc3d`,
+    which matches main.
+  - This ledger (#458, 109): **accepted** on `9cdfdf8`, which is exactly the
+    three edits pre-cleared by the full-page re-read on `5978b33`.
+  - The [AEGIS-060+ register](../audits/aegis-060-plus-register.md) (#461,
+    10, a dated paragraph with no new heading): #461's SHIP review on
+    `ae719e6` listed the paragraph within AEGIS-APR-073's allowed files and
+    verified each fact it states: the same frozen commit `5dbf7bc`, 316
+    findings, identical rule inventory, vocabulary census and corpus hash, and
+    `3c51fb2` as #441's merge. With 10 lines since `04af9d9`, at the limit and
+    reviewed, it **keeps acceptance**.
+  - The
+    [skill-contract audit baseline report](../audits/skill-contract-audit-baseline.md)
+    (#461, 76) is a generated report. #461's SHIP review reproduced its body
+    byte for byte from engine v1.13.3 on the frozen commit, read the
+    hand-written preface and found its history correct. The review also
+    checked the new "How to read this report" key and named three small
+    format follow-ups. This ledger does not treat that as the one-time review
+    of the output format, so the page stays a **generated report, format
+    review pending**.
+  - `project-orchestrator/SKILL.md` did not change after #454 and **keeps
+    acceptance** (8 since `469d6cb`). #463's reviewer noted that its Stage 6
+    says the stage-gate map names `local-ci-mirror-preflight`, which the map
+    does not; that is a named follow-up, not a readability failure.
+- **Open items from the sweep.** Two accepted pages rest on a weak record:
+  the [BER selected host capability decision](ber-selected-host-capability-decision.md)
+  counts as accepted only if #264's "decision routes" review covered it
+  (otherwise 145 lines since #210), and the
+  [VirtualBox Stage A setup proposal](ber-virtualbox-stage-a-setup-proposal.md)
+  only if it is #264's "host proposal" (otherwise 57 since it was added in
+  #260). A check of #264's review would settle both. Also, 51 pages the sweep
+  kept had 1 to 10 changed lines (274 in all), and the sweep did not check
+  whether each edit was reviewed; under the second 2026-09-28 refinement an
+  unreviewed edit needs a targeted review. `adr-writer/SKILL.md` was one of
+  them and is now pending by count. The other 50 stay counted as accepted
+  until that check.
+
+Main after #474 (`2be0a77`) therefore has **613 tracked Markdown files: 565
+accepted reader pages, one generated report, 44 classified synthetic fixtures
+and three known pending pages**. The 613 is `git ls-files '*.md'` on a
+checkout of `2be0a77`, unchanged since #442. Accepted readers go 567 − 103
+(sweep) + 102 (accepted again) − 1 (`adr-writer/SKILL.md`) = 565. The three
+D15 pages that went past 10 and were accepted again within this range change
+neither count. Pending goes 1 + 103 − 102 + 1 = 3, and 565 + 3 + 1 + 44 = 613.
+The pending pages are the approval register, the Behavioral Eval Runner guide
+and `.claude/skills/adr-writer/SKILL.md`. This update changes this ledger by
+more than 10 lines, so it needs its own independent full-page re-read. No
+grant or gate changed.
+
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
 the [Behavioral Eval Runner (BER) selected-precheck aggregate decision page](ber-precheck-aggregate-validation-proposal.md)
@@ -1081,6 +1291,18 @@ the file. Text written by hand into the file, such as the audit report's
 regeneration preface, is not script output, so reproduction cannot verify
 it; each change to it needs an independent review, as for any small edit.
 
+**Manual-only markers (owner decision, 2026-09-28): "Mark real handoffs
+only".** A manual-only skill sets `disable-model-invocation: true` in its
+frontmatter, so it runs only when a person names it. A page marks such a
+skill *(manual-only)* where it sends work to it: in running text, a "Do NOT
+use" route or a Stop Condition. A bare mention needs no marker: a line in an
+output-format template, a validation checklist item, a Supporting Files or
+evaluation list, a source listed under Inputs, or a citation or contrast
+that sends no work there. The owner gave this rule in chat with the
+coordinating agent during the 2026-09-28 sweep, and its batch reviewers
+applied it; required edits that would have marked a bare mention were
+skipped.
+
 To reduce repeated integration and hosted-check waits, group roughly 10–20
 related pages in one pull request when their owners and authority boundaries
 are compatible. Give up to three read-only agents disjoint page sets for
@@ -1115,6 +1337,19 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Pre-rule sweep batch fixes, PRs #466 to #474, after #465, 2026-09-28 | 83 changed pages in nine batches, 14 accepted with no edit, and the [Behavioral Eval Runner guide](../../tools/behavioral_eval_runner/README.md) | The owner-ordered sweep returned 103 of 558 accepted pages to pending on `5bd21fb`. Corrected-candidate reviewers **accepted** every changed page on its merged head: #466 `dac42f3`, #471 `67f577e`, #473 `8c6750a`, #467 `eb3ec53`, #474 `14ecd0c`, #472 `6ba6e1a`, #470 `2a86058`, #469 `61ca130` and #468 `54034fa`. 14 pages passed the first full-page read with no edit; seven of those verdicts are named only in the reviewers' working files. The guide's six edits were held back for a protected-path exception, so it stays **pending**. With #456, #459 and #462, 102 of the 103 are accepted again. Main after #474 (`2be0a77`) has 613: 565 accepted readers, one generated report, 44 classified fixtures and three known pending. No grant or gate changed. |
+| Register APR-074 to APR-076, PR #465, after #457, 2026-09-28 | [Approval register](../approvals/APPROVAL_REGISTER.md) | 78 lines appended; SHIP on `ab430ad` after one REVISE edit. It checked facts and format, not the whole page, so the register stays **pending** with 78 since `e6d0f6a`. |
+| Forecast and measurement checkpoint, PR #457, after #460, 2026-09-28 | [Backlog forecast](aegis-backlog-forecast.md) and [execution measurements](aegis-execution-metrics.md) | 238 and 285 lines. A full-page review on `86d891e` returned FIX-FIRST (F1 to F7, M1 to M3); a corrected-candidate check **accepted** both on `676bc3d`, which matches main. |
+| Later owner decisions, PR #460, after #464, 2026-09-28 | [Open-decisions index](aegis-open-decisions-2026-09-23.md) | 27 lines. A full-page re-read on `36be74b` returned FIX-FIRST; after targeted checks of two fix commits, a one-line check **accepted** it on `08f99eb`, which matches main. |
+| Register reading-aid fixes, PR #464, after #463, 2026-09-28 | [Approval register](../approvals/APPROVAL_REGISTER.md) | 18 lines from a full-page re-read on `4226d29` that #464's description reports but no comment posts. A corrected-candidate review **accepted** the edits on `e6d0f6a`. #465 later added 78, so the register stays **pending**. |
+| Re-read fixes, PR #463, after #458, 2026-09-28 | `ai-sdlc-operating-model/SKILL.md` and `references/stage-gate-map.md` | 15 and 22 lines, after #455's 11 and 16. A corrected-candidate reviewer re-read both in full and **accepted** them on `6306232`, which matches main. |
+| Ledger for #443 to #454, PR #458, after #462, 2026-09-28 | This ledger | 109 lines. A full-page re-read on `5978b33` pre-cleared three edits; `9cdfdf8` is exactly those, so the ledger is **accepted** on `9cdfdf8`. |
+| Re-read fixes, PR #462, after #461, 2026-09-28 | `ai-closeout-reporter/SKILL.md` and `assets/closeout-template.md` | 6 and 3 lines, after #455's 32 and 25. A corrected-candidate re-read of both in full **accepted** them on `e569a3c`, which matches main. |
+| Audit report format, engine v1.13.3, PR #461, after #459, 2026-09-28 | [AEGIS-060+ register](../audits/aegis-060-plus-register.md) and the generated [audit baseline report](../audits/skill-contract-audit-baseline.md) | Register note (10): the SHIP review on `ae719e6` verified its facts, so the register **keeps acceptance** (10 since `04af9d9`). Report (76): reproduced byte for byte and its preface reviewed; it stays a generated report, format review pending. The script, test and JSON baselines are not Markdown. |
+| Re-read fixes, PR #459, after #456, 2026-09-28 | `ai-cost-guardrail-designer/SKILL.md` and `streaming-event-architect/SKILL.md` | 10 and 11 lines. A corrected-candidate full-page re-read **accepted** both on `378089f`, which matches main. Both were sweep pages. |
+| Re-read fixes, PR #456, after #455, 2026-09-28 | `tenant-modeler/SKILL.md` and `source-of-truth-reconciler/SKILL.md` | 13 and 10 lines. A corrected-candidate full-page review **accepted** both on `620b245`, which matches main. Both were sweep pages. |
+| D15 enrichment deltas, PR #455, after #453, 2026-09-28 | Eight pages in `ai-closeout-reporter`, `ai-sdlc-operating-model`, `adr-writer` and `agent-memory-governance` | SHIP on `16bb924`. Four pages went past 10 and were accepted again in #462 and #463. `agent-memory-governance/SKILL.md` (8), `references/memory-rules.md` (8) and `adr-writer/assets/adr-template.md` (7 in all) **keep acceptance**. `adr-writer/SKILL.md` (13: 5 before and 8 here) becomes **pending**. The evaluation JSON is not Markdown. |
+| Register APR-071 to APR-073, PR #453, after #454, 2026-09-28 | [Approval register](../approvals/APPROVAL_REGISTER.md) | 118 lines appended; SHIP on `5be36b3` after one REVISE. Not a full-page read; the register stays **pending**. |
 | Orchestrator Stage 6 markers, PR #454, after #452, 2026-09-28 | `project-orchestrator/SKILL.md` | 8 lines (+4/−4) after the #452 acceptance on `469d6cb`. The SHIP review on `6118210` checked them, so the page **keeps acceptance** (8 since `469d6cb`). Main after #454 (`5bd21fb`) has 613: 567 accepted readers, one generated report, 44 classified fixtures and one known pending. No grant or gate changed. |
 | Orchestrator glosses, PR #452, after #443, 2026-09-28 | `project-orchestrator/SKILL.md` | 40 lines. A full-page review on `90849c1` returned FIX-FIRST with two edits; a re-review **accepted** the page on `469d6cb`. It had been pending since #442 (50 lines, counting pre-rule edits). |
 | Setup-node action bump, PR #443, after #451, 2026-09-28 | None | Changed only `.github/workflows/validate-skills.yml` (4 lines), which is not Markdown. |
