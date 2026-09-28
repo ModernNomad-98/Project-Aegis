@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "acceptance-criteria-reviewer",
+  "description": "Behavior cases for reviewing existing acceptance criteria (D68, catalog item #226): mixed per-criterion verdicts with a measurable rewrite, missing negative and permission classes reported as gaps rather than invented requirements, the read-only refusal to edit the source ticket, contradicting criteria answered with one owner question, and routing away from spec writing, test planning and the definition-of-done gate.",
+  "cases": [
+    {
+      "id": "mixed-verdicts-happy-path",
+      "type": "should_trigger",
+      "prompt": "Here's the ticket for the CSV export story. Can QA actually test these acceptance criteria? AC1: Given an owner, when they click Export, then a CSV with one row per invoice downloads. AC2: The CSV includes invoice id, date, amount and status columns. AC3: The export should load fast. AC4: A member (non-owner) does not see the Export button. AC5: Exported amounts match the invoice screen to the cent.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Quotes each of the five criteria verbatim with an id and gives each exactly one verdict.",
+          "Marks AC3 NEEDS-REWRITE because 'fast' has no threshold, and suggests a given/when/then rewrite whose time and size values are left as visible placeholders for the owner rather than invented numbers.",
+          "Marks AC1, AC2, AC4 and AC5 TESTABLE and names the evidence that would prove each (for example a test asserting the file contents or the button's absence).",
+          "Does not edit the ticket and states that every rewrite is a suggestion for the author."
+        ]
+      }
+    },
+    {
+      "id": "missing-classes-reported-as-gaps",
+      "type": "should_trigger",
+      "prompt": "Review these criteria for the team-invite story before sprint planning: 1) An owner can invite a teammate by email. 2) The invitee receives an email with a join link. 3) Clicking the link and setting a password adds them to the workspace.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Lists gaps for the uncovered classes, including at least an expired or reused invite link (negative), inviting an address that is already a member (duplicate), and a non-owner or other-tenant user attempting to invite (permission).",
+          "Presents each gap with one question for the owner and does not write the missing criteria as if they were agreed requirements.",
+          "Flags criterion 1 as needing a threshold or evidence (what observable result proves the invite was created) rather than passing it unexamined."
+        ]
+      }
+    },
+    {
+      "id": "refuses-to-edit-ticket",
+      "type": "should_trigger",
+      "prompt": "The acceptance criteria on PROJ-412 are sloppy ('works on mobile', 'user-friendly error messages'). Just fix the criteria in the ticket for me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does not edit, overwrite or claim to have updated the ticket; states that the source is unchanged.",
+          "Returns suggested rewrites for 'works on mobile' and 'user-friendly error messages' for the author to accept, with any unknown values (devices, viewport sizes, message rules) left as visible placeholders or owner questions.",
+          "Explains that the author or owner applies the accepted rewrites."
+        ]
+      }
+    },
+    {
+      "id": "contradiction-gets-one-question",
+      "type": "should_trigger",
+      "prompt": "Check these criteria: AC1 Only workspace owners can delete a project. AC2 Admins can delete archived projects. AC3 Deleted projects are recoverable for 30 days.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies that AC1 and AC2 conflict on whether admins may delete projects.",
+          "Asks the owner one question naming both statements instead of choosing which criterion wins.",
+          "Does not assign a TESTABLE verdict to the conflicting pair as written; AC3 is reviewed on its own merits."
+        ]
+      }
+    },
+    {
+      "id": "no-criteria-stops",
+      "type": "should_trigger",
+      "prompt": "Review the acceptance criteria for our new onboarding checklist feature.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops and asks for the criteria or their source because none were supplied.",
+          "Does not invent criteria from the feature name; if none exist, points to product-spec-writer (or requirements-gathering-facilitator if the requirement is unclear)."
+        ]
+      }
+    },
+    {
+      "id": "write-spec-goes-elsewhere",
+      "type": "should_not_trigger",
+      "prompt": "We agreed on the problem for bulk invoice export. Write the product spec with testable acceptance criteria.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; writing a spec and its criteria belongs to product-spec-writer."
+        ]
+      }
+    },
+    {
+      "id": "test-plan-goes-elsewhere",
+      "type": "should_not_trigger",
+      "prompt": "These acceptance criteria are already reviewed and testable. Turn them into a test plan with layers, data and exit criteria.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; planning verification from checked criteria belongs to test-plan-designer."
+        ]
+      }
+    },
+    {
+      "id": "done-gate-goes-elsewhere",
+      "type": "should_not_trigger",
+      "prompt": "Is the export story done? CI is green, the migration was reviewed, docs are updated. Can we mark it done and ship Friday?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; the definition-of-done and release evidence gate belongs to release-readiness-reviewer."
+        ]
+      }
+    }
+  ]
+}
