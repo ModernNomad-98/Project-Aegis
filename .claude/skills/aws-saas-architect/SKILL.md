@@ -7,13 +7,13 @@ description: Map a decided logical architecture onto Amazon Web Services (AWS) f
 
 ## Purpose
 
-Produce an AWS service architecture for a multi-tenant SaaS that a team can
+Produce an Amazon Web Services (AWS) service architecture for a multi-tenant software-as-a-service (SaaS) product that a team can
 build and operate: account topology, per-capability service selections with
 rationale, tenant-isolation strategy per data store, identity and network
 topology, security posture, infrastructure as code (IaC) strategy, and cost
 controls. The discipline
 is provider-idiomatic-without-invention: use AWS primitives the way AWS
-documents them — IAM-first isolation, multi-account boundaries, tag-based
+documents them — Identity and Access Management (IAM)-first isolation, multi-account boundaries, tag-based
 attribution — and leave instance types, quotas, regional availability, and
 prices as verification items against current AWS docs, never asserted from
 memory.
@@ -107,7 +107,7 @@ services or assert their availability in a region.
    for fan-out, EventBridge for event routing/integration — with tenant
    context carried in messages and consumer-side tenant scoping stated.
 7. **Wire observability and secrets**: CloudWatch logs/metrics/alarms with
-   tenant-tagged telemetry (design detail per `observability-operator` /
+   tenant-tagged telemetry (design detail per `observability-operator` *(manual-only)* /
    `slo-reliability-architect`), X-Ray tracing, CloudTrail on in every
    account shipped to a log-archive account, Secrets Manager + KMS with
    rotation posture and key policies scoped per workload.
@@ -129,14 +129,14 @@ services or assert their availability in a region.
      from broader Security Hub (threat correlation) — packaging/naming are
      verification items. Where findings feed an external SOC/SIEM, Amazon
      Security Lake (OCSF) is the first-class export path; Verified
-     Permissions is the managed fine-grained-authz option at the app layer
+     Permissions is the managed fine-grained authorization option at the application layer
      (the matrix itself belongs to `authorization-matrix-designer`).
    The mapper NAMES and PLACES these services and ties them to isolation,
    cost, and maturity; deep threat modeling belongs to `threat-modeler` /
    `ai-threat-modeler`; detection-rule design to
    `security-logging-alerting-architect`; operating the SIEM to
-   `observability-operator`. Pipeline design itself belongs to
-   `ci-pipeline-architect`.
+   `observability-operator` *(manual-only)*. Pipeline design itself belongs to
+   `ci-pipeline-architect` *(manual-only)*.
 9. **Declare the IaC strategy**: Terraform (mixed estates, most common),
    CDK (TypeScript-native teams), or CloudFormation — one primary tool,
    state/environment layout, module conventions; review discipline per
@@ -145,7 +145,7 @@ services or assert their availability in a region.
     Cost Explorer views keyed on the tagging standard (activate cost
     allocation tags), tenant-attributable usage feeding
     `saas-cost-architect`, and the top 3 cost risks of the chosen design
-    named (NAT/egress, per-tenant DB floors, CloudWatch ingestion).
+    named (NAT/egress, per-tenant database cost floors, CloudWatch ingestion).
 11. **Emit verification items**: every claim that depends on a quota,
     instance type, regional availability, or price is listed as "verify
     against current AWS docs".
@@ -204,7 +204,7 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - IAM condition-key tenancy (leading-key/tag conditions) is powerful but
   subtle: one wildcard or missing condition silently pools tenants — pair
   every IAM-enforced isolation claim with a negative test
-  (`multi-tenant-security-tester`).
+  (`multi-tenant-security-tester` *(manual-only)*).
 - NAT gateway data processing is a classic surprise bill in
   private-subnet-everything designs; route AWS service traffic over VPC
   endpoints and say which traffic still pays NAT.

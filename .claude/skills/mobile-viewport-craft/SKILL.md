@@ -20,7 +20,7 @@ validate input. `a11y` abbreviates accessibility.
 The desktop layout "works on mobile" until a real thumb hits it: taps
 land on the wrong control because targets are 24px and crammed together,
 a full-height panel is cut off because `100vh` includes the space the
-browser's URL bar will later reclaim, the bottom action button sits
+browser's address bar (uniform resource locator, or URL, bar) will later reclaim, the bottom action button sits
 under the home indicator, and a hover-only menu simply never opens
 because touch has no hover. This skill produces the viewport craft for a
 web surface — a content-driven breakpoint strategy, touch-target sizing,
@@ -33,7 +33,7 @@ network performance on mobile are `frontend-perf-engineer`'s.
 ## Use When
 
 - Use when: designing responsive layout or a mobile breakpoint strategy,
-  or making a desktop-first UI work on phones/tablets.
+  or making a desktop-first user interface (UI) work on phones/tablets.
 - Use when: designing touch interactions — target sizing, thumb reach,
   gestures — or replacing hover-only affordances for touch.
 - Use when: a UI overflows horizontally, mis-sizes tap targets, or hides
@@ -42,9 +42,9 @@ network performance on mobile are `frontend-perf-engineer`'s.
 - Use when: designing form input behavior on mobile — keyboard types,
   focus-zoom, the focused field hidden behind the on-screen keyboard.
 - Use when: reflowing wide content (tables, dashboards) onto small
-  screens, or supporting orientation and OS text-scaling.
+  screens, or supporting orientation and operating-system (OS) text-scaling.
 - Do NOT use when: the task is mobile PERFORMANCE — bundle weight, image
-  payload, JS execution cost on low-end devices — that is
+  payload, JavaScript (JS) execution cost on low-end devices — that is
   `frontend-perf-engineer`; this skill owns layout/touch, not kilobytes.
 - Do NOT use when: the task is the view's empty/loading/error STATES —
   that is `edge-state-ux-designer`; those states still need mobile craft,

@@ -32,17 +32,17 @@ uncertainty is stated as a first-class output, not papered over.
 - Do NOT use when: the change is pure project-internal logic touching no
   external API — normal implementation discipline suffices.
 - Do NOT use when: the task is diagnosis of an unknown-cause failure — that
-  is `systematic-debugger` (which may hand off here once the fix touches a
+  is `systematic-debugger` *(manual-only)* (which may hand off here once the fix touches a
   library API).
 - Do NOT use when: the human asked for test-first development explicitly —
-  run `tdd-engineer` as the outer loop; this skill governs the docs step
+  run `tdd-engineer` *(manual-only)* as the outer loop; this skill governs the docs step
   inside it.
 
 ## Inputs to Inspect
 
 1. Version manifests: `package.json` + lockfile, `requirements.txt`/
    `pyproject.toml`/`poetry.lock`, `go.mod`, `*.csproj`, `Gemfile.lock` —
-   the LOCKED version, not the semver range.
+   the LOCKED version, not the semantic-versioning (semver) range.
 2. The documentation matching that version: versioned official docs, the
    installed package's own `README`/`docs/` in `node_modules` or site-packages,
    changelog/migration guides between the docs' version and the installed one.

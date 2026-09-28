@@ -5,7 +5,7 @@ For maintainers planning the next package, start with the [current delivery
 boundary](#component-map-shipped-seams-and-future-work), the [agreed local
 comparison](#agreed-first-local-comparison-for-package-4), and the
 [evaluation protocol](#predeclared-evaluation-protocol-for-package-4). Product
-users invoke the manual [`aegis-setup`](../../.claude/skills/aegis-setup/SKILL.md)
+users invoke the [`aegis-setup`](../../.claude/skills/aegis-setup/SKILL.md) *(manual-only)*
 skill for the four-choice conversation; this plan grants no execution authority.
 
 Package 1 delivered design and candidate screening. Package 2 delivered a
@@ -17,7 +17,7 @@ Later packages need their own bounded scope and authority. The
 [Behavioral Eval Runner (BER)](behavioral-eval-runner-backlog.md) and
 [delivery control](resumable-control-plane-backlog.md) registers remain separate.
 The [package-2 authorization proposal](aegis-setup-package-2-authorization-proposal.md)
-defines the implementation scope approved in AEGIS-APR-007; the proposal alone
+defines the implementation scope approved in owner approval record [AEGIS-APR-007](../approvals/APPROVAL_REGISTER.md#aegis-apr-007-issue-101-conversational-setup-aegis-only-completion); the proposal alone
 does not grant runtime authority.
 
 Package 3's approved offline advisory contract is implemented in
@@ -32,9 +32,9 @@ Windows as the **offline package 4A prototype direction**. The
 and [source-based feasibility check](../evidence/setup/issue-101-package-4a-host-feasibility.md)
 define the offline boundary. The owner subsequently approved bounded synthetic
 Stage 4A implementation under [APR-031](../approvals/APPROVAL_REGISTER.md#aegis-apr-031-issue-101-stage-4a-offline-bridge-implementation).
-The [Stage 4A offline bridge in PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+The [Stage 4A offline bridge in pull request (PR) #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
 merged as `ea40ab481ff78267cd5f151c393e946805ba8d01` on
-2026-09-25 at 07:43:44 UTC. [APR-036](../approvals/APPROVAL_REGISTER.md#aegis-apr-036-stage-4a-offline-bridge-package-completed)
+2026-09-25 at 07:43:44 Coordinated Universal Time (UTC). [APR-036](../approvals/APPROVAL_REGISTER.md#aegis-apr-036-stage-4a-offline-bridge-package-completed)
 records completion of APR-031's one bounded package. Merged
 [PR #299](https://github.com/ModernNomad-98/Project-Aegis/pull/299)
 requires explicit agent `read_only` and skill `manual_only` flags in synthetic
@@ -44,13 +44,13 @@ while preserving array order and denying changed facts. Its reviewed head
 `97b9d68804f32f049286e9d09cac4597afa6beea` on 2026-09-25 at 09:58 UTC;
 12 local
 offline tests, the 185-skill validator and the PR's Linux, Windows and
-`gate-guard` checks passed. This remains synthetic-only. The
+`gate-guard` (required merge-gate job) checks passed. This remains synthetic-only. The
 [version-2 request-binding change in PR #319](https://github.com/ModernNomad-98/Project-Aegis/pull/319)
 adds a fresh `request_id` per synthetic callback and requires the response to
 echo it, including abstention. Its reviewed head
 `550151dcf286f8ec64480bc91f47e390454417d2` merged as
 `a59c015c01b4035ab1a438533736134f96deac13` on 2026-09-26 at
-02:24:21 UTC with Linux, Windows and `gate-guard` green. The ID binds a
+02:24:21 UTC with Linux, Windows and `gate-guard` green. The request identifier (ID) binds a
 response to one callback; it grants no dispatch permission. This revision
 also remains synthetic-only. The
 [Stage 4B host-proof decision packet](aegis-setup-package-4b-host-proof-protocol.md)
@@ -311,7 +311,7 @@ not just the shipped portion.
 | Whole-task quality, safety, latency, memory, tokens and total cost | Measures are specified above. No paired complete-task traces, cached/uncached accounting or measured cost exists. |
 | Provider-specific threshold calibration | No model has been run or calibrated on suitable development data; a score is not proof. |
 | Savings and billing claims | No measured saving exists. Future reports must distinguish assistant tokens, provider charges and fixed subscription billing. |
-| Registration, validation, tests and independent release review | The setup skill is in the [catalog](../skills-catalog.md) and packages 2–4A have offline checks. Package 7 still needs exact-release validation, host/OS support evidence, independent UX/security/authority review, and honest user documentation before a release claim. |
+| Registration, validation, tests and independent release review | The setup skill is in the [catalog](../skills-catalog.md) and packages 2–4A have offline checks. Package 7 still needs exact-release validation, host and operating system (OS) support evidence, independent UX/security/authority review, and honest user documentation before a release claim. |
 | BER and control-plane boundaries stay intact | This plan grants neither BER live dispatch nor control-plane real execution. Their separate [BER](behavioral-eval-runner-backlog.md) and [control-plane](resumable-control-plane-backlog.md) gates still apply. |
 
 The offline Stage 4A candidate now binds each version-2 advice response to a
