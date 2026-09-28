@@ -1,6 +1,6 @@
 ---
 name: systematic-debugger
-description: "MANUAL-ONLY; never auto-invoke. Drive an unknown-cause bug to its root cause through the fixed sequence reproduce → reduce → isolate → fix one thing → verify → prevent, with evidence at every step and no shotgun fixes. Use when something fails and the cause is not yet known — an intermittent failure, a regression since a release, wrong output with no obvious source, an error only in one environment. Ranks hypotheses and proves or disproves them instead of guessing; changes exactly one thing per fix attempt; never calls a symptom a root cause without evidence. Do NOT use when the cause is already isolated (implement the fix with tdd-engineer) or for whole-repo health assessment (full-codebase-auditor)."
+description: "MANUAL-ONLY; never auto-invoke. Drive an unknown-cause bug to its root cause through the fixed sequence reproduce → reduce → isolate → fix one thing → verify → prevent, with evidence at every step and no shotgun fixes. Use when something fails and the cause is not yet known — an intermittent failure, a regression since a release, wrong output with no obvious source, an error only in one environment. Ranks hypotheses and proves or disproves them instead of guessing; changes exactly one thing per fix attempt; never calls a symptom a root cause without evidence. Do NOT use when the cause is already isolated (implement the fix with tdd-engineer), for whole-repo health assessment (full-codebase-auditor), or to classify a CI run's failures by cause (ci-failure-classifier)."
 disable-model-invocation: true
 ---
 
@@ -29,6 +29,9 @@ check — not "it works now."
   that is `full-codebase-auditor` or `principal-code-analyst`.
 - Do NOT use when: the "bug" is a disagreement between docs and code about
   intended behavior — `source-of-truth-reconciler` decides what's intended.
+- Do NOT use when: the question is which jobs in a CI run failed and why, by
+  cause class — `ci-failure-classifier` classifies first; it hands a
+  `PRODUCT-BUG` with an unknown cause back here.
 
 ## Inputs to Inspect
 

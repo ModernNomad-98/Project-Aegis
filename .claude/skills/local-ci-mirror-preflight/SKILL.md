@@ -1,6 +1,6 @@
 ---
 name: local-ci-mirror-preflight
-description: "MANUAL-ONLY; never auto-invoke. Explicitly invoke to mirror the repository's CI locally before commit or push. Read PR-triggered workflow checks, derive and run their local equivalents, and verify clean mainline in a separate Git worktree. Classify failures as PR-caused, pre-existing on main, CI infrastructure, or locally indeterminate; report inherited failures without absorbing them. Includes a declared docs-only path and evidence for closeout. Runs only repository-declared checks. Not the release ship/no-ship gate (release-readiness-reviewer), validation-depth selector (risk-tiered-validation-selector), shard/resume designer (sharded-validation-with-resume), or pipeline designer (ci-pipeline-architect)."
+description: "MANUAL-ONLY; never auto-invoke. Explicitly invoke to mirror the repository's CI locally before commit or push. Read PR-triggered workflow checks, derive and run their local equivalents, and verify clean mainline in a separate Git worktree. Classify failures as PR-caused, pre-existing on main, CI infrastructure, or locally indeterminate; report inherited failures without absorbing them. Includes a declared docs-only path and evidence for closeout. Runs only repository-declared checks. Not the release ship/no-ship gate (release-readiness-reviewer), validation-depth selector (risk-tiered-validation-selector), shard/resume designer (sharded-validation-with-resume), pipeline designer (ci-pipeline-architect), or classifier of a finished CI run's failures (ci-failure-classifier)."
 disable-model-invocation: true
 ---
 
@@ -38,6 +38,9 @@ whose fault it is — with a fixed four-class taxonomy instead of vibes.
   preflight INVOKES the shard runner locally rather than reinventing it.
 - Do NOT use when: adding/changing CI stages or required checks — that is
   `ci-pipeline-architect`.
+- Do NOT use when: a remote CI run already happened and the question is why
+  it is red, or whether a green run hides problems — that is
+  `ci-failure-classifier` (read-only, by cause type).
 
 ## Inputs to Inspect
 

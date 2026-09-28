@@ -132,7 +132,7 @@ checks that every *implemented* skill is listed here and in `README.md`.
 > Phase 3 (the 9-skill SaaS & tenant isolation pack), Phase 4 (the 9-skill
 > security, RLS & supply-chain pack), Phase 5 (the 16-skill QA, E2E, manual QA
 > & evidence pack — the 13 canonical skills plus 3 pulled forward from the QA
-> backlog, roadmap #184/#185/#204), and Phase 6 (the 10-skill cloud, DevOps,
+> backlog, roadmap #184/#185/#204; D68 later added three more), and Phase 6 (the 10-skill cloud, DevOps,
 > reliability & release pack), Phase 7 (the 14-skill AI security &
 > LLM systems pack — v4's 10 plus 4 OWASP LLM Top 10 gap additions, D6),
 > Phase 7.5 (the 6-skill agentic AI security pack plus 3 extensions of
@@ -467,9 +467,8 @@ tests vs database-policy audit).
 ### Skills (Phase 5 — QA, E2E, manual QA & evidence pack)
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
-`evals/trigger-evals.json` (the original sixteen sit in one of four overlap clusters;
-`acceptance-criteria-reviewer` and `test-tenant-provisioner`, added by D68, carry their
-own seams). Per
+`evals/trigger-evals.json` (the sixteen pre-D68 skills sit in one of four overlap clusters;
+each D68 addition names its own pinned neighbours below). Per
 [historical master prompt, section 7](prompts/claude-skills-master-generation-prompts-v4.md): QA starts from risk; every layer choice picks the cheapest reliable
 layer; E2E is reserved for critical journeys; manual cases are executable by another
 tester; screenshot evidence carries naming/masking/metadata/storage rules; Playwright
@@ -496,6 +495,11 @@ D68 (2026-09-28) narrowed to #226 and renamed `acceptance-criteria-reviewer`, be
 reviews criteria and runs no tests; the #227 definition-of-done check stays covered by
 `release-readiness-reviewer`, with `ai-closeout-reporter` and `agent-governance-audit`.
 
+**Added by D68** (QA Tier 1 batch, 2026-09-28): `ci-failure-classifier` (roadmap #214 +
+#215), auto-invocable because it only reads logs it is given. It ships both eval files and
+is pinned against `flaky-test-detective`, `systematic-debugger`,
+`local-ci-mirror-preflight`, `sharded-validation-with-resume` and `ci-pipeline-architect`.
+
 | Skill | Source (category doc) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
 | `qa-strategy-architect` | cat 06 #181/#182 | yes | Product-level QA strategy: ranked risk inventory → cheapest-reliable-layer decisions, explicit automation/manual split, evidence per change class, CI gates, ownership; delegates security negatives. |
@@ -516,6 +520,7 @@ reviews criteria and runs no tests; the #227 definition-of-done check stays cove
 | `accessibility-test-harness` | cat 06 **#204 (pulled forward)** + cat 05 #173 | yes | WCAG-pinned a11y harness: automated scans (component/E2E/CI, baseline+ratchet) AND manual keyboard/focus/contrast/screen-reader checklists; explicit about what automation cannot judge. |
 | `acceptance-criteria-reviewer` | cat 06 #226 (D68; #227 stays with `release-readiness-reviewer`) | yes | Reviews EXISTING acceptance criteria in a spec, ticket or story: per-criterion TESTABLE / NEEDS-REWRITE / UNTESTABLE verdict (observable outcome, pass/fail threshold, evidence), vague words flagged with suggested rewrites for the author to accept, missing negative/boundary/permission cases listed as gaps (never invented as requirements), one owner question per unclear or contradictory item. Edits nothing; hands checked criteria to `test-plan-designer`. |
 | `test-tenant-provisioner` | cat 06 #198 (D10 Tier 1, built by D68) | **no** (manual-only; writes test accounts to an environment) | Makes the persona catalog's test tenants, users, roles and memberships exist in a named NON-PRODUCTION environment: validate-only drift report by default (missing/drifted/orphaned/blocked), apply creates or repairs only marked rows after plan approval, never touches unmarked rows, credentials by environment-variable name only, backup-gated capability grants with inline rollback, static production-reach lint. Pinned ≠ `test-data-architect` (designs the catalog), `multi-tenant-security-tester`, `tenant-modeler`, `playwright-e2e-engineer`, `secrets-identity-hardener`. |
+| `ci-failure-classifier` | cat 06 **#214 + #215 (D68)** | yes (read-only) | Classifies a finished CI run from logs supplied or on disk: exactly one cause class per failed or suspicious job with quoted lines and durations, timeouts never conflated with regressions, green runs scanned for hidden markers; fetches, reruns and edits nothing; refuses to raise timeouts or add retries to mask failures. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 5 clusters:
 **strategy/plan/coverage** (`qa-strategy-architect`, `test-plan-designer`,
