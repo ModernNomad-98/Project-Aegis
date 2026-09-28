@@ -26,8 +26,8 @@ the entry governs.
 
 - **AEGIS-APR-nnn** is an entry ID; some entries shorten it to **APR-nnn**.
   Event types are GRANT, POLICY DECISION (selects a policy target, grants no
-  work), CONSUMED (a limited grant was used up) and EXPIRED (a grant lapsed
-  unused). Some GRANT entries clarify, condition or reaffirm an earlier grant
+  work), CONSUMED (a limited grant was used up) and EXPIRED (a grant's time,
+  session or other limit ended, whether or not it was used). Some GRANT entries clarify, condition or reaffirm an earlier grant
   and name it on their Event line. "Status at recording" is the status when
   the entry was written; later events can change it. A one-use grant can be
   used up even before a later event records that; check its use limit and
@@ -74,7 +74,8 @@ the entry governs.
   [the resumable control-plane backlog](../roadmaps/resumable-control-plane-backlog.md).
   Its numbered test cases are **T** (a state transition, T01–T28), **C** (a
   crash boundary, C01–C09) and **F** (a finding-specific negative acceptance
-  family, F01–F21), each defined in
+  family, F01–F21, where F04 is split into separate F04a and F04b rows, so
+  there are 22 F rows), each defined in
   [the control-plane design](../design/resumable-control-plane-v1.md).
 - **Package 2, package 3, Stage 4A and Stage 4B** are successive parts of the
   issue #101 setup and routing plan in
