@@ -16,7 +16,7 @@ goes to the right owner (product fix, test fix, secret owner, resume, runner
 owner) instead of a blind rerun that burns time and hides the real cause. The
 skill reads and reports only. It fetches nothing, reruns nothing, retries
 nothing and edits nothing. Built under owner decision **D68** (2026-09-28),
-from QA roadmap rows #214 and #215 as merged by D10.
+from quality assurance (QA) roadmap rows #214 and #215 as merged by D10.
 
 ## Use When
 
@@ -36,10 +36,10 @@ from QA roadmap rows #214 and #215 as merged by D10.
   cause is needed — that is `systematic-debugger` *(manual-only)*.
 - Do NOT use when: the work has not been pushed yet and the checks should run
   locally first — that is `local-ci-mirror-preflight` *(manual-only)*, which
-  classifies by origin (PR-caused versus already failing on main), not by
+  classifies by origin (caused by the pull request versus already failing on main), not by
   cause type.
-- Do NOT use when: designing how an interrupted run resumes only unfinished
-  shards — that is `sharded-validation-with-resume`; this skill only tells a
+- Do NOT use when: designing how an interrupted run resumes only its unfinished
+  shards (slices of the suite that run as separate jobs) — that is `sharded-validation-with-resume`; this skill only tells a
   timeout-only interruption apart from a failure and hands it over.
 - Do NOT use when: changing stages, retries, time limits, required checks or
   CI secret handling — that is `ci-pipeline-architect` *(manual-only)*; suite
@@ -88,7 +88,7 @@ from QA roadmap rows #214 and #215 as merged by D10.
       product code ran (for example an empty token, "variable not set",
       401/403 from a service the job must reach with its own credential).
    2. `INFRASTRUCTURE` — the runner, network, registry, package mirror or
-      provider failed (runner lost, disk full, image pull failure, DNS
+      provider failed (runner lost, disk full, image pull failure, domain name system (DNS)
       failure, rate limit, service container never became healthy), with no
       evidence that product or test code caused it.
    3. `TIMEOUT-ONLY` — the job hit its time limit, the evidence shows no
@@ -251,7 +251,9 @@ Rules).
   per-class log signatures, the ordering rule with worked tie-breaks,
   hidden-marker patterns for green runs, and duration heuristics.
 - `evals/evals.json` — behavior cases: mixed red run, timeout-only, green with
-  findings, refusal to raise a timeout, truncated logs, and a fetch request.
+  findings, refusal to raise a timeout, truncated logs, a skipped required job, a
+  fetch request, a missing-secret cascade, and a log with an injected instruction
+  and an exposed token.
 - `evals/trigger-evals.json` — discrimination against `flaky-test-detective`,
   `systematic-debugger`, `local-ci-mirror-preflight`,
   `sharded-validation-with-resume` and `ci-pipeline-architect`.
