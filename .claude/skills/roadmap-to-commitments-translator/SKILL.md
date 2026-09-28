@@ -68,8 +68,8 @@ creates a commitment; the separate named-human approval record still governs.
 **Two modes — state which one you are in.** Before the steps below, decide the
 mode, because the lifecycle uses this skill in two different places:
 
-- **Readiness assessment** (used at product-definition time, e.g. a
-  beginner's Stage 2). Decide whether a delivery commitment is even
+- **Readiness assessment** (used at product-definition time, e.g. Stage 2,
+  "Define the product", of the guided beginner lifecycle). Decide whether a delivery commitment is even
   supportable YET. Readiness is judged on TECHNICAL evidence ONLY; a human
   commitment decision is NOT readiness evidence, and its absence never forces
   readiness to `NOT COMMIT-ABLE`. Before producing any commitment, inspect
@@ -78,7 +78,7 @@ mode, because the lifecycle uses this skill in two different places:
   applies; architecture or design evidence; technical planning and meaningful
   dependency discovery; measured throughput or another defensible capacity
   basis; completed dependency discovery (secured where a real dependency
-  exists — `verified-none` is sufficient); and risk/uncertainty evidence. When
+  exists — `none verified` after completed discovery is sufficient); and risk/uncertainty evidence. When
   material evidence is missing, the result is **`NOT COMMIT-ABLE`**, and it
   names every material missing-evidence category, what evidence should come
   next, the earliest lifecycle point to reassess, and any stakeholder date as

@@ -54,7 +54,7 @@ question is server-to-server event flow it belongs to
   apply, and conflict resolution — that is `offline-first-sync-architect`;
   this skill is live push while the client is ONLINE (the two compose: the
   realtime channel is a common online transport for the sync engine).
-- Do NOT use when: the subject is the UX of notifications/toasts/in-app
+- Do NOT use when: the subject is the user experience (UX) of notifications/toasts/in-app
   inbox — that is `notification-webhook-ux-designer`; this owns transport,
   not presentation.
 
@@ -109,7 +109,7 @@ skill; a preference does not authorize live infrastructure changes.
    and make every fan-out filter honor it — never broadcast a tenant-wide
    stream and filter on the client.
 4. **Design fan-out.** How an event reaches every entitled connection across
-   nodes: a shared pub/sub or presence backbone that any node can publish to
+   nodes: a shared publish/subscribe (pub/sub) or presence backbone that any node can publish to
    and every node subscribes to for its local connections. State the source
    (consume the internal backbone; do not re-invent it) and the delivery
    filter that applies the leak boundary at the edge.

@@ -25,7 +25,7 @@ captures nothing.
 - Use when: manual cases, clickthrough sessions, or Playwright failure
   artifacts need one shared evidence convention.
 - Do NOT use when: someone must capture screenshots NOW in a session —
-  `clickthrough-test-engineer` (it follows this policy).
+  `clickthrough-test-engineer` *(manual-only)* (it follows this policy).
 - Do NOT use when: writing the manual cases that reference checkpoints —
   `manual-test-case-creator`.
 - Do NOT use when: producing the closeout report that bundles evidence —
@@ -34,16 +34,17 @@ captures nothing.
   automation architecture (`qa-automation-architect`) with this policy as
   input.
 - Do NOT use when: running the compliance evidence program — that is
-  `compliance-evidence-collector`; this skill sets the QA evidence policy
+  `compliance-evidence-collector`; this skill sets the quality assurance (QA) evidence policy
   that program formalizes.
 
 ## Inputs to Inspect
 
-1. What evidence consumers need: release gates, PR review, compliance/audit
+1. What evidence consumers need: release gates, pull request (PR) review, compliance/audit
    obligations, customer commitments — evidence without a consumer is cost.
 2. The capture producers in play: manual passes, clickthrough sessions,
    Playwright failure artifacts — and what they can technically emit.
-3. Sensitivity reality: what data appears on screens (PII, tokens, tenant
+3. Sensitivity reality: what data appears on screens (personally identifiable information
+   (PII), tokens, tenant
    names, financials) and any redaction obligations; tenant-isolation rules
    apply to evidence too (a screenshot of tenant A's data in tenant B's bug
    ticket is a leak).
@@ -97,7 +98,7 @@ captures nothing.
    reports, PRs, and the closeout evidence bundle (`ai-closeout-reporter`
    consumes this) — an unlinked screenshot is unfindable a month later.
 7. **Set capture-quality rules** so evidence is judgeable: deterministic
-   viewport(s), stable/seeded data, full relevant state in frame, UI chrome
+   viewport(s), stable/seeded data, full relevant state in frame, user interface (UI) chrome
    included where context matters.
 
 ## Output Format
@@ -170,7 +171,7 @@ Adoption: <which producers follow this (manual/clickthrough/playwright) +
   conflict via `human-approval-boundary` rather than quietly weakening
   masking.
 - Asked to also capture the evidence now → hand to
-  `clickthrough-test-engineer` / the executing pass.
+  `clickthrough-test-engineer` *(manual-only)* / the executing pass.
 
 ## Supporting Files
 

@@ -2,10 +2,13 @@
 
 ## Scope and source
 
-This record covers one opt-in, offline, synthetic-only implementation under
+This record is for maintainers checking what Behavioral Eval Runner (BER)
+backlog item BER-BKL-009 (the evidence retention, access, encryption,
+redaction and deletion policy) has delivered. It covers one opt-in, offline,
+synthetic-only implementation under BER backlog decision
 [BER-DEC-013](../roadmaps/behavioral-eval-runner-backlog.md#ber-dec-013-bounded-synthetic-evidence-policy-integration--owner-approved)
-and [APR-023](../approvals/APPROVAL_REGISTER.md#aegis-apr-023-bounded-synthetic-evidence-policy-integration).
-The reviewed governance [PR #255](https://github.com/ModernNomad-98/Project-Aegis/pull/255)
+and owner approval-register entry [AEGIS-APR-023](../approvals/APPROVAL_REGISTER.md#aegis-apr-023-bounded-synthetic-evidence-policy-integration).
+The reviewed governance pull request (PR) [#255](https://github.com/ModernNomad-98/Project-Aegis/pull/255)
 merged on 2026-09-24 at
 `0318b1ecde3ebf5f34bb32f8793efc37b574af39`; its tree is
 `d35f4a6af25e4d5dd29641e0fa271bf782b1e7df`. The implementation branch
@@ -14,9 +17,10 @@ The tested code-and-runbook revision is the signed commit
 `f0ef7bfae43a3f486288d0678efa5eae6b03e3b1` (tree
 `081404ef88a6e507c8ce0c4e464797d20131655c`). The signed evidence-only
 follow-up is PR #257 head `7176009113fa208a1b2e816d90d7f929805e93ae`.
-It merged on 2026-09-24 at 22:04:09 UTC as
+It merged on 2026-09-24 at 22:04:09 Coordinated Universal Time (UTC) as
 `53351b3fac3d75cbbc23341cc96dbeadc1e116ee` under the owner's one-time
-protected-guard exception, recorded in APR-025 and consumed by APR-026.
+protected-guard exception, recorded in approval-register entry AEGIS-APR-025 and consumed by
+AEGIS-APR-026.
 The grant caps work at 16 active implementation hours, 1,500 added code/test
 lines and $0 task-controlled external spend. The implementation package is
 complete; selected-host and production-policy gates remain open.
@@ -38,7 +42,7 @@ published schema or accepted-byte change is a stop for a new owner decision.
 | Tested code-and-runbook revision | Signed `f0ef7bfae43a3f486288d0678efa5eae6b03e3b1`, tree `081404ef88a6e507c8ce0c4e464797d20131655c`; signed evidence-only PR head `7176009113fa208a1b2e816d90d7f929805e93ae` |
 | Changed paths compared with exact grant base | Ten named paths including this review; no tracked out-of-scope path |
 | Added code/test lines | 404 added, 4 removed; under 1,500 added-line cap |
-| Active implementation time and external spend | Exact active/review/CI split unavailable; implementation and tests completed between 18:59:41 and 19:19:43 UTC with parallel agents and a 20m02s elapsed interval. No provider, host or private-data operation; $0 task-controlled external spend. |
+| Active implementation time and external spend | Exact active/review/continuous integration (CI) split unavailable; implementation and tests completed between 18:59:41 and 19:19:43 UTC with parallel agents and a 20m02s elapsed interval. No provider, host or private-data operation; $0 task-controlled external spend. |
 | Focused policy, evidence and synthetic-preflight tests | `python -B -m unittest tools.behavioral_eval_runner.tests.test_evidence_policy tools.behavioral_eval_runner.tests.test_evidence tools.behavioral_eval_runner.tests.test_evidence_policy_preflight -q`: 66 tests, 2 expected platform skips, exit 0 |
 | Full offline Behavioral Eval Runner suite | Repository-owner context: `python -B -m unittest discover -s tools/behavioral_eval_runner/tests -p 'test_*.py' -q`: 1,062 tests, 14 expected skips, exit 0, 289.533s. A prior sandbox-user run had 12 environment errors from Git dubious ownership and synthetic process-kill restrictions; the owner-context rerun is the acceptance result. |
 | Skill validator and whitespace/path checks | `python scripts/validate-skills.py`: 185 valid skills, zero warnings; `git diff --check` and staged diff check clean; exact ten-path list checked. |
@@ -57,7 +61,7 @@ hash chain, without removing evidence; and synthetic host-fact preflight says
 `STOP` for missing or contradictory facts and `SIMULATION_ONLY` for any
 passing supplied facts. A passing synthetic result is no selected-host proof.
 Hash agreement cannot establish authenticity against a coordinated rewrite
-of every bundle file; BER-BKL-010 retains that separate owner decision.
+of every bundle file; backlog item BER-BKL-010 retains that separate owner decision.
 
 ## Residual gates
 

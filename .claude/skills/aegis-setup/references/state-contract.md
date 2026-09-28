@@ -5,7 +5,8 @@ Use this with the [Aegis Setup skill](../SKILL.md) for its exact local-state for
 Support is limited to a single-user Windows PowerShell 5.1 host and one local
 checkout. `selection.ps1` obtains the user-local application data directory
 from Windows and writes under `ProjectAegis\setup\v1`. Project and state paths
-must use ordinary absolute local drive spellings (`C:\...` or `C:/...`). UNC,
+must use ordinary absolute local drive spellings (`C:\...` or `C:/...`). Universal Naming Convention (UNC) network
+paths,
 device-namespace, drive-relative and rooted-relative spellings are rejected;
 the state directory cannot be the drive root. The script rejects paths with
 reparse redirects and state inside the checkout. The project key is lowercase

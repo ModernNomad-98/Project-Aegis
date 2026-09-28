@@ -1,10 +1,16 @@
 # Issue #101 package 4A host-interface feasibility screen
 
+This page is for maintainers of the issue #101 setup router. It records
+whether a Claude Code host could run the router's check before a skill or
+agent is dispatched. In that plan, package (Stage) 4A is the offline bridge
+tested only with synthetic inputs, and package 4B is the later, separately
+gated proof on a real host.
+
 **2026-09-25 status update:** This page preserves its source-screening
 snapshot and the then-pending statements below. The separate bounded Stage 4A
-offline bridge later merged in [PR #281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
-as `ea40ab481ff78267cd5f151c393e946805ba8d01` at 07:43:44 UTC;
-[APR-036](../../approvals/APPROVAL_REGISTER.md#aegis-apr-036-stage-4a-offline-bridge-package-completed)
+offline bridge later merged in pull request (PR) [#281](https://github.com/ModernNomad-98/Project-Aegis/pull/281)
+as `ea40ab481ff78267cd5f151c393e946805ba8d01` at 07:43:44 Coordinated Universal Time (UTC);
+owner approval-register entry [AEGIS-APR-036](../../approvals/APPROVAL_REGISTER.md#aegis-apr-036-stage-4a-offline-bridge-package-completed)
 records completion of that one implementation. The merge does not establish
 real-host callback invocation, decision consumption or token telemetry.
 
@@ -44,7 +50,8 @@ its manifest identifies bundled Claude Code `2.1.281`, which differs from the
 locally observed CLI `2.1.246`.
 
 Public npm metadata and archives were inspected without install or execution.
-The SDK archive matched registry SHA-512 integrity
+The SDK archive matched registry SHA-512 integrity (SHA-512 and SHA-256
+are Secure Hash Algorithm digests)
 `sha512-JTbluTKmY3wKQPIXzeCTvz/K0FElTuQU5Y7ueLgUOBrHcks8cHlGugEgIRezffhc13WzBAqYtaY15tJ+Bfunzg==`.
 The Windows x64 `0.3.281` archive matched
 `sha512-hbnymWj9O31K0VMd/VOpMTZ0CNT3BkwgGGe84zHdAP6MDxmoZvqyS94UEaLQit3xmozCxfkfGns7/WgWH1Q6Sg==`.
@@ -73,7 +80,7 @@ trust boundary.
 
 In a temporary directory, `npm.cmd install --package-lock-only
 --ignore-scripts --no-audit --no-fund --save-exact` generated a version-3
-candidate lock with SDK `0.3.281`, Anthropic API SDK `0.128.0`, MCP SDK
+candidate lock with SDK `0.3.281`, Anthropic application programming interface (API) SDK `0.128.0`, MCP SDK
 `1.30.1` and Zod `4.6.5` as exact roots. It resolved 110 dependency entries
 besides the root record, including eight optional platform binaries; all 110
 dependency entries have integrity and license fields. SHA-256 of this
