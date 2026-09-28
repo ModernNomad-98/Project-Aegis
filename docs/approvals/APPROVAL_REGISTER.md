@@ -2114,3 +2114,76 @@ the entry governs.
 - **Evidence:** [PR #475](https://github.com/ModernNomad-98/Project-Aegis/pull/475)
   merged `acdcdad4563bc74e8dfd78c473678cc9a0b39c0b` as
   `59b2fb7cbc5dbc27ff33a1d2bf59792d5e865ccc` at the time above.
+
+### AEGIS-APR-079: Second format-only change to the audit report (engine v1.13.4)
+
+- **Event:** GRANT.
+- **Status at recording:** ACTIVE; granted and not yet consumed. A later
+  lifecycle event records its consumption.
+- **Date / Grantor:** 2026-09-28 / Peter Nguyen.
+- **Reason:** Under the owner's
+  [generated-report rule](../roadmaps/aegis-documentation-readability-backlog.md#remaining-page-review-in-larger-batches),
+  the generated report `docs/audits/skill-contract-audit-baseline.md` gets
+  one output-format review. That review of the v1.13.3 report returned
+  FIX-FIRST, and every fix belongs in the generator,
+  `scripts/audit-skill-contracts.py`. The findings file is in the
+  coordinating session's scratchpad, not in the repository. In summary: the
+  report uses three names for one kind of finding; it does not spell out
+  "hex"; it never explains CENSUS, STRUCTURAL, Stage-2, NOT-COMMIT-ABLE,
+  auto-invocable or the SIDE-004 side-effect classes; its Coverage section
+  says "the validator's surface" instead of naming
+  `scripts/validate-skills.py`; and a comment in the test file is stale.
+  AEGIS-APR-073, the grant for the first format-only change, was consumed
+  by the PR #461 merge (AEGIS-APR-076), so this change needs a new grant.
+- **Owner decision:** The owner answered "Approve (Recommended)" to the
+  coordinating agent's question in the Project Aegis conversation (Claude
+  Code session) on 2026-09-28. The question proposed "a second format-only
+  change (engine 1.13.3 → 1.13.4) on the same terms as last time: same
+  frozen commit 5dbf7bc, findings must stay identical, grant recorded
+  first, then one PR, with a one-time guard exception asked at merge". The
+  terms below follow AEGIS-APR-073, the precedent, with the version and
+  fixes updated.
+- **Scope allowed:** One pull request that changes exactly these paths:
+  - `scripts/audit-skill-contracts.py`: output format only. `TOOL_VERSION`
+    (the engine version constant) goes from 1.13.3 to 1.13.4, and only the
+    wording of `_markdown_glossary()` (the function that writes the report's
+    "How to read this report" glossary) and of the Coverage section in
+    `to_markdown()` (the function that writes the report) changes.
+  - `scripts/tests/test_audit_skill_contracts.py`: the pinned engine
+    version, the stale comment, and checks that the glossary explains the
+    terms above.
+  - `artifacts/audits/skill-contract-audit-baseline.json` and
+    `artifacts/audits/corpus-manifest-baseline.json`: the engine version and
+    `engine_sha256` (the engine file's SHA-256 checksum) only.
+  - `artifacts/audits/corpus-route-graph.json`, only if regeneration changes
+    it.
+  - `docs/audits/skill-contract-audit-baseline.md`: regenerated, with its
+    hand-written preface carried forward and its version and grant
+    references updated.
+  - `docs/audits/aegis-060-plus-register.md`: one dated note.
+
+  The v1.13.4 engine scans a clean checkout (`core.autocrlf=false`) of
+  `5dbf7bc9e958d932bd0c5b093ebecfe61be41840`, the same frozen commit the
+  v1.13.3 baseline scanned, on a branch named
+  `chore/audit-engine-v1134-report-format`. The `findings`,
+  `rule_inventory`, `vocabulary_census` and `corpus_content_hash` fields of
+  the regenerated JSON must be identical to the v1.13.3 baseline merged in
+  PR #461 as `dc3c767dc91d936cc8cc70589137ca33e6f44b7c`. The only allowed
+  JSON differences are the engine version, `engine_sha256` and, if it
+  differs, the run's `branch` value.
+- **Scope FORBIDDEN:** No change to finding logic, rules, rule purpose or
+  classification text, severities, the route graph, manifest semantics or
+  provenance logic. No new command-line option or input. No other
+  regeneration. This grant does not waive `gate-guard`: merging the PR
+  needs a separate one-time owner exception for its exact head, recorded as
+  its own entry.
+- **Evidence:** Direct owner answer in the Project Aegis conversation on
+  2026-09-28, quoted above, relayed by the coordinating agent. Precedent:
+  AEGIS-APR-073 granted the first format-only change on these terms, and
+  AEGIS-APR-076 records its consumption by
+  [PR #461](https://github.com/ModernNomad-98/Project-Aegis/pull/461), which
+  merged head `ae719e69b3927e6ff14b2e173e1d3e0466211a5f` as
+  `dc3c767dc91d936cc8cc70589137ca33e6f44b7c`. That merge holds the v1.13.3
+  baselines this grant's PR replaces.
+- **Expiry / use limit:** One PR; consumed by its merge, which a later
+  lifecycle event records.
