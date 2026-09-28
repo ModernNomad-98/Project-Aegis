@@ -7,7 +7,7 @@ description: Review a whole library-changing PR end-to-end — skill-adding, ski
 
 ## Purpose
 
-Give a library-changing PR the review its pieces cannot give themselves. The
+Give a skill-library PR the review its pieces cannot give themselves. The
 mechanical validator proves each skill is structurally valid;
 `skill-quality-reviewer` judges whether ONE skill is good; neither answers
 the PR-level question: does this change integrate correctly into the library
