@@ -4,6 +4,7 @@ import os
 import io
 import json
 import sqlite3
+import stat
 import subprocess
 import sys
 import tempfile
@@ -32,9 +33,44 @@ from tools.aegis_delivery_control.storage import (
     SQLiteStateStore,
     default_state_root,
 )
+from tools.aegis_delivery_control.tests import _owner_private_umask
+
+
+def setUpModule() -> None:
+    _owner_private_umask.enter()
+
+
+def tearDownModule() -> None:
+    _owner_private_umask.restore()
 
 
 class PlatformContractTests(unittest.TestCase):
+    @unittest.skipUnless(os.name == "posix", "POSIX mode bits")
+    def test_production_creates_owner_private_state_under_permissive_umask(self) -> None:
+        # The module runs under an owner-private umask for its fixtures. This
+        # test restores a permissive one so it proves production sets its own
+        # modes rather than inheriting the fixture umask.
+        previous = os.umask(0o022)
+        try:
+            with tempfile.TemporaryDirectory() as temporary_directory:
+                root = Path(temporary_directory)
+                database = root / "state.sqlite3"
+                SQLiteStateStore(
+                    database,
+                    ExpectedFreshnessOracle("repo-1", "x", {}),
+                    "repo-1",
+                )
+                effects = root / "effects.sqlite3"
+                SyntheticExecutionAdapter(effects)
+                for path in (database, root / "writer.lock", effects):
+                    with self.subTest(path=path.name):
+                        self.assertTrue(path.is_file())
+                        self.assertEqual(
+                            stat.S_IMODE(path.stat().st_mode) & 0o077, 0
+                        )
+        finally:
+            os.umask(previous)
+
     def test_offline_owned_path_probe_denies_swap_and_hardlink(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
