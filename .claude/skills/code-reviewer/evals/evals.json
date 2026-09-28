@@ -81,12 +81,12 @@
     {
       "id": "adr-drift-ui-calls-database",
       "type": "should_trigger",
-      "prompt": "Review this branch: the agent added a 'recent orders' widget, and OrdersWidget.tsx now imports the database client and queries the orders table directly. docs/adr/0007-service-layer.md says user interface code must go through the service layer.",
+      "prompt": "Review this branch: the agent added a 'recent orders' widget, and OrdersWidget.tsx now imports the database client and queries the orders table directly. docs/adr/0007-service-layer.md, status accepted, says user interface code must go through the service layer.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Reads the cited ADR and reports a MAJOR architecture-drift finding that cites docs/adr/0007-service-layer.md and the file:line in OrdersWidget.tsx where the direct query happens.",
-          "Does not downgrade the drift to a minor or nit convention comment, because a recorded decision exists.",
+          "Does not downgrade the drift to a minor or nit convention comment, because an accepted decision exists.",
           "Remediation routes the query through the service layer (or asks for the ADR to be superseded first); it does not rewrite the code silently."
         ]
       }

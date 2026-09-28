@@ -8,7 +8,9 @@ description: 'Review an ACTUAL diff — a PR, branch delta, or staged/working ch
 **Reading key:** PR means pull request, a proposed code change; CI means
 continuous integration; RLS means row-level security; authz means
 authorization; I/O means input and output; ADR means architecture decision
-record, a written record of a design decision and its rules.
+record, a written record of a design decision and its rules; a layering rule
+says which parts of the code may call which, for example that user interface
+code must go through a service layer.
 An N+1 query pattern means one list query triggers an additional database
 query for each returned item.
 
@@ -28,7 +30,7 @@ request-changes, with the blocking findings named.
 - Use when: a change is about to merge and needs a correctness/security/test
   pass with severity-ranked output.
 - Use when: a coding agent wrote the change; the same review also checks
-  for tests weakened to pass and drift from recorded ADRs.
+  for tests weakened to pass and drift from accepted ADRs.
 - Do NOT use when: the request is to *apply* simplifications — that is
   `code-simplifier` (side-effecting, manual-only).
 - Do NOT use when: the scope is the whole repository's health, not one change
@@ -118,8 +120,8 @@ Positive notes: <what the change does well — optional but earned>
 - [ ] Test adequacy judged by "would the tests catch a revert?".
 - [ ] Deleted, skipped or loosened tests and removed CI steps were checked;
       each one the intent does not explain is at least MAJOR.
-- [ ] Recorded ADRs and layering rules were read; drift from them is MAJOR
-      and cites the ADR.
+- [ ] Accepted ADRs and layering rules were read; drift from them is MAJOR
+      and cites the ADR or rule.
 - [ ] Migration/dependency/CI changes in the diff got explicit attention.
 - [ ] Verdict states which findings block; unverified suspicions labeled.
 

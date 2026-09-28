@@ -19,9 +19,10 @@ integration, and ADR architecture decision record.
 Escalation rules: a MINOR in security-adjacent code escalates one level.
 Weakened validation (tests deleted or skipped, assertions loosened, timeouts
 or retries raised, CI steps removed) is at least MAJOR unless the stated
-intent explains it. Drift from a recorded ADR or documented layering rule is
-MAJOR and cites the ADR; convention drift with no recorded decision stays
-MINOR or NIT.
+intent explains it. Drift from an accepted ADR or a documented layering rule
+(a rule on which parts of the code may call which) is MAJOR and cites the
+ADR or rule; convention drift with no such decision on file stays MINOR or
+NIT.
 A pattern repeated across the diff is one finding at the pattern's severity,
 listing occurrences — not N duplicate findings.
 
