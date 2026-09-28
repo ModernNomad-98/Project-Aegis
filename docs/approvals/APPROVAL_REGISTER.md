@@ -1993,7 +1993,7 @@ the entry governs.
   head, and did not grant one.
 - **Scope allowed:** One `gate-guard` exception and administrator merge of
   PR #461 at exact head `ae719e69b3927e6ff14b2e173e1d3e0466211a5f`, which
-  changed only the six paths AEGIS-APR-073 allows.
+  changed only six of the paths AEGIS-APR-073 allows.
   [Exact-head run 36403836890](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36403836890)
   passed `validate-skills` and `windows-offline-checks`; `gate-guard` failed
   only on `scripts/audit-skill-contracts.py` and
@@ -2009,8 +2009,8 @@ the entry governs.
   not change branch protection or the protected path set, and it did not
   widen AEGIS-APR-047.
 - **Evidence:** Direct owner answer "Approve for ae719e6 only (Recommended)"
-  to the coordinating agent's multiple-choice question in the Claude Code
-  session on 2026-09-28, relayed by that agent. The
+  to the coordinating agent's multiple-choice question in the Project Aegis
+  conversation (Claude Code session) on 2026-09-28, relayed by that agent. The
   [exception receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/461#issuecomment-5867334304)
   on PR #461 records the head, checks, review and merge.
 - **Expiry / use limit:** One merge of PR #461 at the named head; consumed
