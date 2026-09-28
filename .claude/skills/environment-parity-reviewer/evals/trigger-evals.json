@@ -1,0 +1,87 @@
+{
+  "skill": "environment-parity-reviewer",
+  "description": "Trigger discrimination for environment parity review (D71, #244 with #246): comparing environments with each other and specifying startup configuration validation, versus IaC diffs and IaC-to-runtime drift (iac-reviewer), Vite build and preview parity for one app (vite-build-qa-engineer), running CI checks locally (local-ci-mirror-preflight), and the flag system's defaults policy (feature-flag-architect).",
+  "overlaps_with": [
+    "iac-reviewer",
+    "vite-build-qa-engineer",
+    "local-ci-mirror-preflight",
+    "feature-flag-architect"
+  ],
+  "cases": [
+    {
+      "id": "staging-vs-production-behavior-wins-here",
+      "prompt": "Checkout works in staging but fails in production with a webhook signature error. Compare the two environments' config and tell me what's different.",
+      "expected_skill": "environment-parity-reviewer",
+      "should_not_trigger": [
+        "iac-reviewer",
+        "local-ci-mirror-preflight"
+      ],
+      "reason": "A behavior difference between two deployed environments, explained by comparing their settings, is the parity review; no IaC diff is under review and no CI check is being mirrored."
+    },
+    {
+      "id": "startup-config-validation-wins-here",
+      "prompt": "Our app keeps booting with a missing API URL and only fails when a user hits that page. List every setting it needs per environment and specify checks that stop it from starting when one is missing or malformed.",
+      "expected_skill": "environment-parity-reviewer",
+      "should_not_trigger": [
+        "feature-flag-architect",
+        "iac-reviewer"
+      ],
+      "reason": "The required-configuration manifest and the fail-fast startup validation specification (#246) are this skill's outputs; nothing here is about the flag system or infrastructure code."
+    },
+    {
+      "id": "terraform-drift-goes-to-iac-reviewer",
+      "prompt": "Our Terraform drifted: the plan wants to recreate the production database because someone changed its size in the console. Is this safe to apply?",
+      "expected_skill": "iac-reviewer",
+      "should_not_trigger": [
+        "environment-parity-reviewer"
+      ],
+      "reason": "IaC-to-runtime drift and whether an IaC plan is safe to apply belong to iac-reviewer; the parity reviewer compares environments with each other, not IaC with the running estate."
+    },
+    {
+      "id": "staging-prod-module-diff-is-still-parity",
+      "prompt": "Staging and production are both defined in Terraform, but production is on Postgres 14 and staging on 16, and only staging has the pgvector extension. Which of these differences are intended, and which will bite us on promotion?",
+      "expected_skill": "environment-parity-reviewer",
+      "should_not_trigger": [
+        "iac-reviewer"
+      ],
+      "reason": "SEAM CASE: the evidence lives in IaC, but the question is whether two environments differ on purpose, which is parity classification (INTENDED, ACCIDENTAL, UNKNOWN), not the safety of an IaC change."
+    },
+    {
+      "id": "works-in-dev-not-in-build-goes-to-vite",
+      "prompt": "Explicitly invoke vite-build-qa-engineer. The page works in dev but not in the build: import.meta.env values are undefined after vite build and preview.",
+      "expected_skill": "vite-build-qa-engineer",
+      "should_not_trigger": [
+        "environment-parity-reviewer"
+      ],
+      "reason": "Dev-server versus built output for one Vite app, checked by running the build and preview, is vite-build-qa-engineer; parity review compares deployed environments' settings and runs nothing."
+    },
+    {
+      "id": "passes-locally-fails-in-ci-goes-to-mirror",
+      "prompt": "Explicitly invoke local-ci-mirror-preflight. It passes locally, fails in CI on the lint and test jobs; mirror the CI checks here and tell me whether the failure is mine or already on main.",
+      "expected_skill": "local-ci-mirror-preflight",
+      "should_not_trigger": [
+        "environment-parity-reviewer"
+      ],
+      "reason": "Running the repository's CI checks locally and classifying a failure as PR-caused or pre-existing is the preflight; parity review compares environment configuration and runs no checks."
+    },
+    {
+      "id": "ci-runtime-version-differs-is-parity",
+      "prompt": "CI runs Node 18 and production runs Node 20, and the time zone is UTC in CI but America/New_York on the servers. List every difference like this across local, CI, staging and production and say which ones matter.",
+      "expected_skill": "environment-parity-reviewer",
+      "should_not_trigger": [
+        "local-ci-mirror-preflight",
+        "vite-build-qa-engineer"
+      ],
+      "reason": "SEAM CASE: CI is one column of the parity matrix here; the ask is a cross-environment inventory of runtime and time-zone differences, not running CI checks locally or checking a Vite build."
+    },
+    {
+      "id": "flag-defaults-policy-goes-to-flag-architect",
+      "prompt": "Design how our feature-flag service sets defaults per environment and what the app does when the flag service is down.",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": [
+        "environment-parity-reviewer"
+      ],
+      "reason": "The flag system's defaults policy and outage behavior are designed by feature-flag-architect; the parity reviewer only reports that a flag default differs between environments."
+    }
+  ]
+}

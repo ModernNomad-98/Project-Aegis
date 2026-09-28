@@ -5,7 +5,8 @@
     "release-readiness-reviewer",
     "risk-tiered-validation-selector",
     "sharded-validation-with-resume",
-    "ci-pipeline-architect"
+    "ci-pipeline-architect",
+    "environment-parity-reviewer"
   ],
   "cases": [
     {
@@ -54,6 +55,16 @@
         "local-ci-mirror-preflight"
       ],
       "reason": "Adding/altering CI stages and required checks is pipeline design (manual-only ci-pipeline-architect); the preflight only READS workflow definitions to mirror them."
+    },
+    {
+      "id": "env-config-inventory-goes-to-parity-reviewer",
+      "prompt": "Why does CI use Node 18 while production runs Node 20, and what else differs between local, CI, staging and production? List the differences and which ones matter.",
+      "expected_skill": "environment-parity-reviewer",
+      "should_not_trigger": [
+        "local-ci-mirror-preflight"
+      ],
+      "note": "SEAM CASE (reciprocated yield, D71) — an inventory of configuration differences, not a run of the CI checks.",
+      "reason": "A cross-environment inventory of runtime and configuration differences is environment-parity-reviewer; the preflight runs the repository's checks locally and classifies their failures."
     }
   ]
 }

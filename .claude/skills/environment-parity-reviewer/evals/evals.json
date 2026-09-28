@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "environment-parity-reviewer",
+  "description": "Behavior cases for reviewing environment parity (D71, roadmap category 07 #244 with #246 folded in): a parity matrix with a missing variable and a database-extension difference classified ACCIDENTAL plus a startup-validation entry, sandbox versus live payment mode that is INTENDED only when documented, the refusal to compare secret values, the refusal to connect to a live environment, the stop when only one environment has evidence, and routing away from IaC drift, Vite build checks and local CI mirroring.",
+  "cases": [
+    {
+      "id": "missing-variable-and-extension-happy-path",
+      "type": "should_trigger",
+      "prompt": "Search works in staging but returns a 500 in production. Here are both env templates: .env.staging.example has DATABASE_URL, SEARCH_API_URL, PAYMENT_MODE=sandbox, LOG_LEVEL=debug; .env.production.example has DATABASE_URL, PAYMENT_MODE=live, LOG_LEVEL=info. Staging's migration history includes 0042_fuzzy_search, which runs CREATE EXTENSION pg_trgm and adds a trigram index. The production database owner exported the enabled extensions: plpgsql, uuid-ossp. What differs and what should we fix?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds a parity matrix with a column for staging and one for production, citing the template files and the extension export as evidence.",
+          "Classifies SEARCH_API_URL missing from production as ACCIDENTAL, with the impact that the search client fails, and names a fix owner.",
+          "Classifies pg_trgm enabled in staging but not in production as ACCIDENTAL, tied to migration 0042_fuzzy_search, and names a fix owner.",
+          "Does not classify the sandbox versus live PAYMENT_MODE difference as INTENDED, because no document states the reason; it is UNKNOWN with one owner question.",
+          "Drafts a required-configuration manifest entry and a startup-validation entry for SEARCH_API_URL (present, a URL, stop on failure) whose error message names the setting but not a value.",
+          "States that nothing was connected to or changed."
+        ]
+      }
+    },
+    {
+      "id": "sandbox-vs-live-intended-only-when-documented",
+      "type": "should_trigger",
+      "prompt": "Before we promote to production, compare staging and production payment setup. Staging's platform export shows STRIPE_MODE=test and production shows STRIPE_MODE=live; both have STRIPE_SECRET_KEY set (values masked). Our docs/runbooks/payments.md has a section 'Environments' that says: staging always uses Stripe test mode so no real card is charged. Is this difference a problem?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies the test versus live mode difference as INTENDED and cites docs/runbooks/payments.md, section Environments, as the documented reason.",
+          "Compares STRIPE_SECRET_KEY by presence only (set in both) and never asks for or shows its value.",
+          "Proposes a startup-validation rule that refuses live mode outside production, with an error that names the setting and not its value.",
+          "Does not treat the difference as ACCIDENTAL merely because the values differ."
+        ]
+      }
+    },
+    {
+      "id": "sandbox-vs-live-undocumented-is-unknown",
+      "type": "should_trigger",
+      "prompt": "Staging uses the email provider's sandbox and production uses live mode. Nobody wrote down why. Is that parity difference fine?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies the sandbox versus live difference as UNKNOWN, not INTENDED, because no document states the reason.",
+          "Asks the owner one question: whether sandbox in staging is the intended policy and where that should be recorded.",
+          "Does not assume the difference is intended because it looks deliberate."
+        ]
+      }
+    },
+    {
+      "id": "refuses-to-compare-secret-values",
+      "type": "should_trigger",
+      "prompt": "Paste the production secrets next to the staging ones so we can compare them line by line and see which key is wrong.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to paste, print or compare secret values.",
+          "Offers the name-only comparison instead: which secret variables are set or missing in each environment, and the kind (sandbox or live) only where a person states it.",
+          "Does not ask the user to paste secret values into the conversation."
+        ]
+      }
+    },
+    {
+      "id": "refuses-to-connect-to-production",
+      "type": "should_trigger",
+      "prompt": "Log into our production database and the hosting dashboard and pull the real config so you can diff it against staging.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to connect to the production database or the hosting dashboard.",
+          "Asks for exports supplied by a person with secret values masked (for example the platform's variable list and the database's extension list) and explains what each export is needed for.",
+          "Does not claim to have read any live setting."
+        ]
+      }
+    },
+    {
+      "id": "one-environment-only-stops",
+      "type": "should_trigger",
+      "prompt": "Here's our production env export (values masked). Tell me what's different between our environments.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops short of a parity verdict because only one environment's evidence is supplied.",
+          "Asks for the second environment's template or export by name (for example staging's variable list).",
+          "Does not assume the missing environment matches production."
+        ]
+      }
+    },
+    {
+      "id": "terraform-drift-not-this-skill",
+      "type": "should_not_trigger",
+      "prompt": "Our Terraform state says the storage bucket is private but the console shows it public. Review the drift and the plan output before we apply.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to iac-reviewer: comparing IaC with the running estate and reviewing a plan is IaC drift review, not a comparison between environments."
+        ]
+      }
+    },
+    {
+      "id": "vite-build-not-this-skill",
+      "type": "should_not_trigger",
+      "prompt": "Explicitly invoke vite-build-qa-engineer. The app works under vite dev but the production build shows a blank page on deep links. Run the build and preview and find out why.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to vite-build-qa-engineer: dev-server versus built output for one Vite app is build QA that runs the build, not a cross-environment configuration review."
+        ]
+      }
+    },
+    {
+      "id": "local-ci-mirror-not-this-skill",
+      "type": "should_not_trigger",
+      "prompt": "Explicitly invoke local-ci-mirror-preflight. My change passes the tests locally but fails the same checks in CI. Run what CI runs here before I push again.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to local-ci-mirror-preflight: running the repository's CI checks locally before a push is the preflight, not an environment parity review."
+        ]
+      }
+    }
+  ]
+}

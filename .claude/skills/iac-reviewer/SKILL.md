@@ -46,6 +46,10 @@ trivial diff.
   here.
 - Do NOT use when: designing or editing CI/CD pipelines —
   `ci-pipeline-architect` (even though pipelines often run IaC).
+- Do NOT use when: the question is how environments differ from each other
+  (runtime or database versions, variables, provider modes between staging
+  and production) — that is `environment-parity-reviewer`; this skill owns
+  IaC diffs and IaC-to-runtime drift.
 - Do NOT use when: the request is to APPLY the change — applying is a
   human-gated operation outside this skill.
 

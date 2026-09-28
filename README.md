@@ -552,7 +552,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->194<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->195<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch), fronted by one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -589,9 +589,9 @@ keeps a human as the approval gate on anything irreversible. See
    strategy, test plans, coverage mapping, Playwright/unit/build QA, flake control, test data,
    evidence policy, and CI run failure classification (added by D68). *e.g.* `qa-strategy-architect`, `test-coverage-mapper`,
    `playwright-e2e-engineer`, `flaky-test-detective`, `screenshot-evidence-planner`.
-7. **Cloud, DevOps, reliability & release** *(Phase 6, 13)* — running it in production: cloud
+7. **Cloud, DevOps, reliability & release** *(Phase 6, 14)* — running it in production: cloud
    choice, Azure/AWS mapping, IaC review, cloud security baseline review, CI pipelines, release
-   readiness, rollback, observability, SLOs, incidents, failure and disaster-recovery review. *e.g.*
+   readiness, rollback, observability, SLOs, incidents, failure and disaster-recovery review, environment parity. *e.g.*
    `cloud-architecture-decider`, `iac-reviewer`,
    `release-readiness-reviewer`, `rollback-runbook-author`, `slo-reliability-architect`.
 8. **AI security & LLM systems** *(Phase 7, 15)* — securing LLM features against the OWASP LLM
@@ -979,6 +979,7 @@ merged into `rollback-runbook-author` per reconciliation §3; expansion builds u
 | `database-backup-verifier` | (D71, #253) Proves per store that a usable backup exists: read-only evidence mode checks exists, non-empty, current against the RPO (recovery point objective), retained, encrypted and off-account copy; drill mode restores only into a new non-production scratch target after approval of the exact plan with its estimated cost, checks row-count and checksum parity and restore time against the RTO (recovery time objective), then deletes the copy; flags database dumps in the repository history; credentials by variable name. | **manual only** |
 | `resilience-architecture-reviewer` | (D71) Reviews how a system survives failure: per-dependency timeouts, retry budgets, circuit breakers, bulkheads and graceful degradation; single points of failure and zone/region redundancy; failover tested only with a dated drill record; disaster-recovery (DR) fit of the backup design against recovery time and recovery point objectives (RTO/RPO); a game-day plan for a person to run. Runs no fault injection; backup evidence goes to `database-backup-verifier`. | auto + manual |
 | `cloud-security-baseline-reviewer` | (D71, Phase 6 expansion) Reviews a CONFIGURED cloud account, subscription or managed platform project (AWS, Azure, Google Cloud, Vercel, Supabase) against a named baseline, control by control: MET / GAP / UNVERIFIED from cited evidence the user exports; missing evidence is never MET. Reads only what it is given, calls no cloud interface, never prints a secret value, changes nothing. | auto + manual |
+| `environment-parity-reviewer` | (D71, #244 + #246) Parity matrix across local, CI, preview, staging and production: runtime and dependency versions, variable names and non-secret values, flag defaults, database version and extensions, sandbox versus live provider modes, auth callbacks, build mode, region, time zone, data shape. Each difference INTENDED (documented), ACCIDENTAL or UNKNOWN with evidence and a fix owner; drafts the required-configuration manifest and fail-fast startup validation. Never reads secret values; connects to nothing. | auto + manual |
 
 Phase 7 — AI security & LLM systems pack (14 = v4's 10 + 4 OWASP LLM Top 10 gap
 additions, D6; plus `ai-human-in-the-loop-designer` built from the expansion
