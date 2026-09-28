@@ -58,6 +58,8 @@ the entry governs.
   **P2** and **info** are instead the skill-contract audit report's four
   finding severity levels, P0 the most severe. **SHIP** is an independent
   reviewer's verdict that a head is ready to merge.
+- **Claude Code** is Anthropic's command-line coding agent. A **headless**
+  Claude Code session runs without a person typing into it.
 - **BER** is the Behavioral Eval Runner under `tools/behavioral_eval_runner/`,
   planned in [the BER backlog](../roadmaps/behavioral-eval-runner-backlog.md).
   There, **BER-BKL-nnn** is a BER backlog item, **BER-DEC-nnn** an entry in
@@ -1958,7 +1960,8 @@ the entry governs.
     `artifacts/audits/corpus-manifest-baseline.json`: the engine version,
     `engine_sha256` (the engine file's SHA-256 checksum) and the run's
     `branch` value only. The v1.13.3 engine scans a clean checkout
-    (`core.autocrlf=false`) of `5dbf7bc9e958d932bd0c5b093ebecfe61be41840`,
+    (`core.autocrlf=false`, the Git setting that leaves line endings
+    unconverted) of `5dbf7bc9e958d932bd0c5b093ebecfe61be41840`,
     the commit the v1.13.2 baseline scanned, so `repo_sha` and the corpus
     stay the same.
   - `artifacts/audits/corpus-route-graph.json`, only if regeneration changes
@@ -2081,7 +2084,7 @@ the entry governs.
   changed only `tools/behavioral_eval_runner/README.md`.
   [Exact-head run 36442330809](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36442330809)
   passed `validate-skills` and `windows-offline-checks`, each running the
-  complete offline BER suite (1088 tests, OK); `gate-guard` failed only on
+  complete offline BER suite (1,088 tests, result OK); `gate-guard` failed only on
   `tools/behavioral_eval_runner/README.md`. An
   [independent review](https://github.com/ModernNomad-98/Project-Aegis/pull/475#issuecomment-5873052127)
   of that head returned ACCEPT, meaning ready to merge, and found the diff
@@ -2127,12 +2130,12 @@ the entry governs.
   one output-format review. That review of the v1.13.3 report returned
   FIX-FIRST (fix before acceptance), and every fix belongs in the generator,
   `scripts/audit-skill-contracts.py`. That review was not published, so
-  its required findings are recorded here in full: the
-  report uses three names for one kind of finding; it does not spell out
-  "hex"; it never explains CENSUS, STRUCTURAL, Stage-2, NOT-COMMIT-ABLE,
-  auto-invocable or the SIDE-004 side-effect classes; its Coverage section
-  says "the validator's surface" instead of naming
-  `scripts/validate-skills.py`; and a comment in the test file is stale.
+  its required findings are recorded here in full. The report uses three
+  names for one kind of finding. It does not spell out "hex"
+  (hexadecimal). It never explains CENSUS, STRUCTURAL, Stage-2,
+  NOT-COMMIT-ABLE, auto-invocable or the SIDE-004 side-effect classes. Its
+  Coverage section says "the validator's surface" instead of naming
+  `scripts/validate-skills.py`. A comment in the test file is stale.
   AEGIS-APR-073, the grant for the first format-only change, was consumed
   by the PR #461 merge (AEGIS-APR-076), so this change needs a new grant.
 - **Owner decision:** The owner answered "Approve (Recommended)" to the
@@ -2188,3 +2191,56 @@ the entry governs.
   baselines this grant's PR replaces.
 - **Expiry / use limit:** One PR; consumed by its merge, which a later
   lifecycle event records.
+
+### AEGIS-APR-080: PR #501 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-081; no remaining use.
+  Recorded after the merge.
+- **Date / Grantor:** 2026-09-28 / Peter Nguyen.
+- **Reason:** [PR #501](https://github.com/ModernNomad-98/Project-Aegis/pull/501)
+  stops new modules from shadowing imports in the gate checks. It changes
+  `.github/workflows/validate-skills.yml` and two test files under
+  `scripts/tests/`, protected paths outside AEGIS-APR-047's four BER files,
+  so `gate-guard` fails, and merging needs a one-time owner exception for
+  the exact head.
+- **Scope allowed:** One `gate-guard` exception and administrator merge of
+  PR #501 at exact head `9ca82d53f351c696813e242577401789a5cdca78`, which
+  changed only `.github/workflows/validate-skills.yml`, `docs/offline-ci.md`,
+  `scripts/tests/test_audit_skill_contracts.py` and
+  `scripts/tests/test_offline_ci.py`.
+  [Exact-head run 36468780089](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36468780089)
+  passed `validate-skills` and `windows-offline-checks`; `gate-guard` failed
+  only on `.github/workflows/validate-skills.yml`,
+  `scripts/tests/test_audit_skill_contracts.py` and
+  `scripts/tests/test_offline_ci.py`. An
+  [independent security review](https://github.com/ModernNomad-98/Project-Aegis/pull/501#issuecomment-5878003536)
+  of that head returned SHIP. Codex posted only usage-limit notices after
+  the head commit (18:52:45 UTC): at 18:56:58 and 18:57:20 UTC on
+  2026-09-28, so it was confirmed unavailable under AEGIS-APR-050.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
+  not change branch protection or the protected path set, and it did not
+  widen AEGIS-APR-047.
+- **Evidence:** Direct owner answer "Approve exception, merge (Recommended)"
+  to the coordinating agent's multiple-choice question in the Project Aegis
+  conversation (Claude Code session) on 2026-09-28, relayed by that agent.
+  The [security review](https://github.com/ModernNomad-98/Project-Aegis/pull/501#issuecomment-5878003536)
+  on PR #501 records the head and verdict. No separate exception receipt
+  was posted on the PR; this entry and AEGIS-APR-081 record the checks and
+  merge.
+- **Expiry / use limit:** One merge of PR #501 at the named head; consumed
+  by the merge recorded in AEGIS-APR-081.
+
+### AEGIS-APR-081: Consumption of the PR #501 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-080.
+- **Status at recording:** AEGIS-APR-080 has no remaining use.
+- **Effective at:** 2026-09-28 20:59:19 UTC.
+- **Recorded at / By:** 2026-09-28 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039.
+- **New authority:** None. A later change to a protected path needs its own
+  exception.
+- **Reason:** The sole exact-head administrator merge completed.
+- **Evidence:** [PR #501](https://github.com/ModernNomad-98/Project-Aegis/pull/501)
+  merged `9ca82d53f351c696813e242577401789a5cdca78` as
+  `c17a567185d4c7f75036c444d07ee6990905317d` at the time above.
