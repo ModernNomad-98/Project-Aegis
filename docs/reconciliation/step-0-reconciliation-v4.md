@@ -3303,10 +3303,10 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     candidates (#282, #283, #285 with #286, #287 and #299).
   - **Numbering.** The
     [Phase 6 reliability batch proposal](../roadmaps/phase6-reliability-skill-batch-proposal.md)
-    (PR #496) provisionally claimed D70. Decision numbers follow the order
-    in which the owner makes decisions, so this Phase 7 decision, made
-    first, takes D70. The Phase 6 batch, decided later the same day, takes
-    the next free number, D71.
+    (PR #496) provisionally claimed D70. Each decision takes the next free
+    number when it is recorded, which is not always time order (see D67).
+    The owner decided this Phase 7 batch first and it is recorded first, so
+    it takes D70; the Phase 6 batch, decided later the same day, takes D71.
   - **What.**
     - **Build `ai-human-in-the-loop-designer`** (#285, with #286),
       auto-invocable (the assistant may choose it without a person naming
@@ -3330,8 +3330,11 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
       prompt-contract record for each model call: the instruction's version
       and owner, declared inputs, a pointer to the output contract, when the
       model must decline, and which prompt changes need an evaluation rerun.
-      Its description adds `agent-harness-architect` to its "Distinct from"
-      list, which clears an existing one-way ROUTE-002 finding. It stays
+      Its description adds `agent-harness-architect` and
+      `structured-output-validator` to its "Distinct from" list; naming
+      `agent-harness-architect` clears an existing one-way ROUTE-002
+      finding. The proposal also offers an optional reverse exclusion in
+      `structured-output-validator` naming the prompt contract. It stays
       auto-invocable.
     - **Drop #299** (AI feature kill switch): already covered by
       `ai-router-architect`'s kill-switch step, with
@@ -3374,9 +3377,9 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     [Phase 6 reliability skill batch proposal](../roadmaps/phase6-reliability-skill-batch-proposal.md)
     (PR #496, merged as `76b399b`). It settles the five Phase 6 expansion
     candidates (two execution-plan extras, #244 with #246, #253 and #254).
-  - **Numbering.** The proposal provisionally claimed D70. Decision numbers
-    follow the order in which the owner makes decisions, and the Phase 7
-    decision was made first and took D70, so this decision takes D71.
+  - **Numbering.** The proposal provisionally claimed D70. Each decision
+    takes the next free number when it is recorded; the Phase 7 decision,
+    made and recorded first, took D70, so this decision takes D71.
   - **What.**
     - **Build `database-backup-verifier`** (#253) first, because #253 and
       #254 are P0 (must-have) in category 07. It is manual-only (a person
@@ -3401,6 +3404,15 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
       `data-migration-runbook-author` as an extension: a schema-migration
       deploy runbook shape, target confirmation before any write, and
       post-apply smoke checks. The skill stays auto-invocable.
+    - **Edits to other shipped skills.** Reciprocal exclusions naming the
+      new skills are added to `aws-saas-architect`,
+      `security-logging-alerting-architect`,
+      `horizontal-scalability-reviewer`, `vite-build-qa-engineer` and
+      `local-ci-mirror-preflight`, and to `iac-reviewer` in one combined
+      rewrite naming both the baseline and parity reviewers. The
+      disaster-recovery half of the "uptime/DR commitments" route in
+      `soc2-trust-criteria-mapper`'s scoping map moves from
+      `slo-reliability-architect` to `resilience-architecture-reviewer`.
     - **Census.** The ten predicted one-way ROUTE-002 findings (defined in
       D69) stay census data: recorded in the contract audit, not fixed. They
       run from the baseline reviewer toward `azure-saas-architect`,
