@@ -250,7 +250,7 @@ and the repository-working-tree scope clarification — are integrated into the 
 validation preflight (g), the action × context validation rows, the evidence closeout (j), and
 the deterministic sequence below.
 
-- Default to read-only. A skill that only reads and reports needs no allowed-tools widening.
+- Default to read-only. A skill that only reads and reports needs no allowed-tools widening. *(Since #528, 2026-09-29, `allowed-tools` is forbidden in every shipped skill; see §2. No skill widens tool access through frontmatter.)*
 - Any write/network/deploy/spend behavior requires the repository's standard manual-only marker
   (`disable-model-invocation: true`) AND an explicit Stop Conditions entry describing the irreversible
   step — EXCEPT under the currently approved bounded exceptions defined below. These are the
