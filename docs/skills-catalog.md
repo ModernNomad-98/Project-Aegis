@@ -1355,9 +1355,10 @@ Per D6: **LLM04** (2026 ID; D6 cited LLM03:2025) is extend-existing — the ship
 chain (models, datasets, fine-tuning adapters); **LLM06** (2026 ID; D6 cited LLM10:2025) DoS/denial-of-wallet
 is baked into `ai-cost-guardrail-designer`; and `ai-evaluation-harness` absorbs
 the AI security test harness (no separate `ai-security-test-harness`). The
-Phase 7 **expansion backlog** (`ai-provider-adapter-designer`,
-`prompt-contract-designer`) remains backlog, built in Phase 8 batches.
-Owner decision D70 (2026-09-28) built `ai-human-in-the-loop-designer`
+Phase 7 **expansion backlog** is settled by owner decision D70 (2026-09-28):
+`ai-provider-adapter-designer` (#282) merged into `ai-router-architect` and
+`prompt-contract-designer` (#283) into `model-context-designer` as
+extensions; D70 built `ai-human-in-the-loop-designer`
 (#285 with #286) and folded `ai-autonomy-boundary-designer` (#287) into it
 as its first workflow step; it dropped `ai-feature-kill-switch-designer`
 (#299) as already covered by `ai-router-architect`, with
