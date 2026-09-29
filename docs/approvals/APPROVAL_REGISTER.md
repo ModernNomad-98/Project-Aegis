@@ -2460,7 +2460,7 @@ the entry governs.
   `build_run_report` accepted on `main` at
   `76b399b11e8068ca26171dbd6d715f161757f35e`; neither path changed between
   that commit and this governance PR's base,
-  `019d441bfbe941f804ce1cc4cbc16b973370c619`.
+  `7bbd4f05306ab52b0cece585e616d396ad1462c9`.
 - **Expiry / use limit:** One implementation package; consumed at its merge,
   which a later lifecycle event records. No calendar expiry stated.
 
@@ -2470,7 +2470,7 @@ the entry governs.
 - **Status at recording:** Owner approved; ACTIVE only after the reviewed
   governance PR containing this entry merges.
 - **Date / Grantor:** 2026-09-28 / Peter Nguyen; limits and delivery
-  conditions added by his 2026-09-29 answer.
+  conditions added by his 2026-09-29 (UTC) answer.
 - **Reason:** Code-health finding P2-6 concerns the delivery-control engine
   in `tools/aegis_delivery_control/`. A guard is a named precondition, such
   as `no_fence` or `budget_available`, that the control-plane design requires
@@ -2551,7 +2551,7 @@ the entry governs.
   implementation PR with exact-path staging, the delivery-control test suite
   run on Windows and in the pinned Linux environment, independent review,
   and exact-head checks. At the base of this governance PR,
-  `019d441bfbe941f804ce1cc4cbc16b973370c619`, the `gate-guard` protected
+  `7bbd4f05306ab52b0cece585e616d396ad1462c9`, the `gate-guard` protected
   pattern in `.github/workflows/validate-skills.yml` does not match
   `tools/aegis_delivery_control/` or any path listed above, so no
   `gate-guard` exception is needed. If the pattern changes before delivery
@@ -2568,7 +2568,14 @@ the entry governs.
   "Confirm, record it (Recommended)". The investigation traced all 56
   production calls on `main` at
   `76b399b11e8068ca26171dbd6d715f161757f35e`, traced every T03 guard to its
-  inline check and sampled T27 and T28. `tools/aegis_delivery_control/` did
-  not change between that commit and this governance PR's base.
+  inline check and sampled T27 and T28. Between that commit and this
+  governance PR's base, `tools/aegis_delivery_control/` changed only in test
+  modules outside this grant's paths (PR #512 changed
+  `tests/_owner_private_fixtures.py`, `tests/_owner_private_umask.py`,
+  `tests/windows_owner_diagnostic.py`, `tests/test_capabilities.py`,
+  `tests/test_dispatch.py`, `tests/test_platform.py`, `tests/test_recovery.py`,
+  `tests/test_shared_authority_claims.py` and `tests/test_storage.py`);
+  `engine.py`, `dispatch.py`, `storage.py`, `README.md` and
+  `tests/test_engine.py` did not change.
 - **Expiry / use limit:** One maintenance package; consumed at its merge,
   which a later lifecycle event records. No calendar expiry stated.
