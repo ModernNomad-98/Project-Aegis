@@ -3812,9 +3812,10 @@ become effective only when this reviewed governance PR merges.
   `76b399b11e8068ca26171dbd6d715f161757f35e`, `build_run_report` re-derives
   only the aggregates of `RUNNABLE` cases with an executed attempt, plus the
   selected-`PRECHECK_EXCLUDED` shape checked since PR #374. It trusts every
-  other aggregate, so it published six contradictory synthetic shapes: a
-  ready but unrun case claiming a preflight exclusion, a case outside the run
-  claiming `BUDGET_EXHAUSTED`, a setup failure relabelled as budget
+  other aggregate, so it accepted six contradictory synthetic shapes of four
+  kinds: a ready but unrun case claiming a preflight exclusion, and a case
+  outside the run claiming `BUDGET_EXHAUSTED` (two shapes each, one with its
+  attempt's reason forged to match), a setup failure relabelled as budget
   exhaustion, and a selected case claiming `NOT_SELECTED`. No verdict can be
   changed, and `build_run_report` has no production caller yet.
 - **Governing work package and scope:** One bounded, synthetic-only

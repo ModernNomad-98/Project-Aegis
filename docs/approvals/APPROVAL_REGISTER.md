@@ -2460,7 +2460,7 @@ the entry governs.
   `build_run_report` accepted on `main` at
   `76b399b11e8068ca26171dbd6d715f161757f35e`; neither path changed between
   that commit and this governance PR's base,
-  `2672b16b21ffa0ba147cc416815832f79b1c34ed`.
+  `019d441bfbe941f804ce1cc4cbc16b973370c619`.
 - **Expiry / use limit:** One implementation package; consumed at its merge,
   which a later lifecycle event records. No calendar expiry stated.
 
@@ -2469,7 +2469,8 @@ the entry governs.
 - **Event:** GRANT.
 - **Status at recording:** Owner approved; ACTIVE only after the reviewed
   governance PR containing this entry merges.
-- **Date / Grantor:** 2026-09-28 / Peter Nguyen.
+- **Date / Grantor:** 2026-09-28 / Peter Nguyen; limits and delivery
+  conditions added by his 2026-09-29 answer.
 - **Reason:** Code-health finding P2-6 concerns the delivery-control engine
   in `tools/aegis_delivery_control/`. A guard is a named precondition, such
   as `no_fence` or `budget_available`, that the control-plane design requires
@@ -2494,11 +2495,18 @@ the entry governs.
   table. It did not select option (a): making each caller compute
   `satisfied_guards` from the checks that actually ran (evidence-computed
   guards). The coordinator relayed and attests the answer; the scope below
-  is the coordinator's statement of the selected option.
+  is the coordinator's statement of the selected option. On 2026-09-29, before
+  this entry merged, the owner answered a follow-up question about limits and
+  delivery conditions with "Add caps + conditions (Recommended)". The option
+  he chose read: "Cap at 12 active hours and 800 added lines (mostly the
+  traceability test table), $0, one package; same delivery conditions as the
+  P2-4 grant; stop and come back if a guard has no inline check." The
+  coordinator relayed and attests that answer too.
 - **Scope allowed:** One maintenance package, named "CP-WP-002 maintenance:
   P2-6 guard documentation and traceability tests", with no runtime
   behaviour change:
-  - `tools/aegis_delivery_control/engine.py`: docstrings only, stating that
+  - `tools/aegis_delivery_control/engine.py`: docstrings (the in-code
+    documentation strings) only, stating that
     the transition guard list is advisory, a declarative catalog mirrored by
     authoritative inline checks in `storage.py`, and that the state-pair,
     event-variant and terminal-state checks are the engine's live controls.
@@ -2512,8 +2520,9 @@ the entry governs.
     module, `tools/aegis_delivery_control/tests/test_guard_traceability.py`,
     holding:
     - one test pinning current behaviour: every production `authorize` call
-      passes `TRANSITIONS[tid].required_guards`, with the T09 variant as the
-      one listed exception, so a partial guard set cannot appear without a
+      passes `TRANSITIONS[tid].required_guards`, with the T09
+      pause-request variant, which adds `effect_bound`, as the one listed
+      exception, so a partial guard set cannot appear without a
       test and documentation change;
     - a traceability test table mapping each of the 69 transition-guard
       pairs to a named test that proves the inline denial when that guard
@@ -2521,26 +2530,43 @@ the entry governs.
     - new negative tests filling any gap the table finds, for example
       `budget_available`.
 
-  The investigation estimated about 1 to 1.5 active days. Recording delivery
+  Limits, from the owner's 2026-09-29 answer: at most 12 active
+  implementation hours, excluding CI and owner waiting; at most 800 added
+  lines across the listed paths, mostly the traceability test table; USD $0
+  external spend; one package. The investigation estimated about 1 to 1.5
+  active days. Recording delivery
   and consumption in the control-plane backlog and this register is a later
   separate reviewed governance change. Option (a), evidence-computed guards,
   becomes an entry criterion for CP-WP-003.
 - **Scope FORBIDDEN:** No runtime behaviour change: no change to `storage.py`,
   to the engine's decisions, or to any other runtime path. If a traceability
   gap shows a guard with no inline enforcement, adding a check would change
-  runtime behaviour, so stop and return to the owner. Option (a) is not
-  granted. No CP-WP-003 or CP-WP-004 work, real authority or real dispatch
-  is authorized. None additionally stated.
-- **Delivery and guard:** At the base of this governance PR,
-  `2672b16b21ffa0ba147cc416815832f79b1c34ed`, the `gate-guard` protected
+  runtime behaviour, so stop and return to the owner, as the owner's
+  2026-09-29 answer also requires. Also stop and return before exceeding
+  any limit above. Option (a) is not granted. No CP-WP-003 or CP-WP-004
+  work, real authority or real dispatch is authorized. None additionally
+  stated.
+- **Delivery and guard:** The owner's 2026-09-29 answer applies the same
+  delivery conditions as the P2-4 grant, AEGIS-APR-085: one DCO-signed
+  implementation PR with exact-path staging, the delivery-control test suite
+  run on Windows and in the pinned Linux environment, independent review,
+  and exact-head checks. At the base of this governance PR,
+  `019d441bfbe941f804ce1cc4cbc16b973370c619`, the `gate-guard` protected
   pattern in `.github/workflows/validate-skills.yml` does not match
   `tools/aegis_delivery_control/` or any path listed above, so no
   `gate-guard` exception is needed. If the pattern changes before delivery
   and a listed path becomes protected, that failure needs its own owner
   decision.
-- **Evidence:** Direct owner answer in the Project Aegis conversation on
-  2026-09-28, quoted above, relayed and attested by the coordinating agent.
-  The investigation traced all 56 production calls on `main` at
+- **Evidence:** Direct owner answers in the Project Aegis conversation on
+  2026-09-28 and 2026-09-29, quoted above, relayed and attested by the
+  coordinating agent. On 2026-09-29 the coordinator also asked the owner
+  directly: "You chose 'Add caps + conditions (Recommended)' for the P2-6
+  grant: cap 12 active hours and 800 added lines, $0, one package; the same
+  delivery conditions as the P2-4 grant (sign-off, exact-file staging,
+  independent review, Windows + Linux test runs, exact-head checks); stop and
+  come back if a guard has no inline check. Confirm?" The owner answered
+  "Confirm, record it (Recommended)". The investigation traced all 56
+  production calls on `main` at
   `76b399b11e8068ca26171dbd6d715f161757f35e`, traced every T03 guard to its
   inline check and sampled T27 and T28. `tools/aegis_delivery_control/` did
   not change between that commit and this governance PR's base.
