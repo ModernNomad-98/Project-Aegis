@@ -12,7 +12,7 @@ them.
 
 ```
 PROMPT CONTRACT — <instruction id>
-Version: <semantic or sequential version> (previous: <version or "none">)
+Version: <version number, for example 1.2.0 or 4> (previous: <version or "none">)
 Owner: <named person or team who approves edits>
 Call site: <feature / endpoint / job that makes the call>
 Declared inputs: <segment names from the context design — nothing else
@@ -37,7 +37,7 @@ reads, the edit needs a rerun.
 
 | Edit kind | Evaluation rerun | Why |
 | --- | --- | --- |
-| Output field added, renamed, removed or retyped | Needed; also update the output contract with `structured-output-validator` | Downstream parsers and graders depend on the shape. |
+| Output field added, renamed, removed or retyped | Needed; also update the output contract with `structured-output-validator` | Downstream parsers and graders (the automated checks that score an evaluation run) depend on the shape. |
 | Declared input added, removed or re-sourced | Needed | The model sees different content, so answers can change. |
 | Decline condition added, removed or reworded | Needed | Refusal behavior is part of what the contract promises. |
 | Instruction wording that changes task, tone or priority | Needed | Small wording edits routinely move outputs and refusals. |

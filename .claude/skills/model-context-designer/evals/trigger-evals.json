@@ -1,6 +1,6 @@
 {
   "skill": "model-context-designer",
-  "description": "Trigger discrimination for runtime per-call context curation (this skill) vs session-start context loading (agent-startup-context-gate), spend caps (ai-cost-guardrail-designer), retrieval authorization (rag-security-architect), redaction mechanics (sensitive-disclosure-guard), the in-batch call-gating and agent instruction custody seam (agent-harness-architect), the output schema a prompt contract points to (structured-output-validator), running an evaluation rerun (ai-evaluation-harness, manual-only), and the DESIGN-vs-REVIEW seam against memory-context-poisoning-reviewer.",
+  "description": "Trigger discrimination for runtime per-call context curation (this skill) vs session-start context loading (agent-startup-context-gate), spend caps (ai-cost-guardrail-designer), retrieval authorization (rag-security-architect), redaction mechanics (sensitive-disclosure-guard), the in-batch call-gating and agent instruction custody seam (agent-harness-architect), the output schema a prompt contract points to (structured-output-validator), running an evaluation rerun (ai-evaluation-harness, manual-only), injection defense (prompt-injection-defender, manual-only), and the DESIGN-vs-REVIEW seam against memory-context-poisoning-reviewer.",
   "overlaps_with": [
     "agent-startup-context-gate",
     "ai-cost-guardrail-designer",
@@ -9,6 +9,7 @@
     "agent-harness-architect",
     "structured-output-validator",
     "ai-evaluation-harness",
+    "prompt-injection-defender",
     "memory-context-poisoning-reviewer"
   ],
   "cases": [

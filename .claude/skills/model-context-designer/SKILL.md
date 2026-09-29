@@ -308,7 +308,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   `agent-harness-architect` (in-batch: call gating vs context content, and
   agent instruction custody), `structured-output-validator` (output schema
   vs prompt contract), `ai-evaluation-harness` *(manual-only)* (running the
-  rerun vs deciding when one is needed), and the design-vs-review seam
+  rerun vs deciding when one is needed), `prompt-injection-defender` *(manual-only)*
+  (injection defense vs a prompt contract), and the design-vs-review seam
   against `memory-context-poisoning-reviewer`.
 - [references/prompt-contract-template.md](references/prompt-contract-template.md)
   — the prompt contract record, its change-policy table, and a filled
