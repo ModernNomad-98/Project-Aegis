@@ -121,17 +121,23 @@ repository root:
 CUSTOM_COMPILE_COMMAND="python -m piptools compile --generate-hashes --strip-extras --output-file=requirements-ci.txt requirements-ci.in" python -m piptools compile --generate-hashes --strip-extras --output-file=requirements-ci.txt requirements-ci.in
 ```
 
-`CUSTOM_COMPILE_COMMAND` keeps the lock header stable; Dependabot reads that
-header to re-run the same compile. `requirements-ci.in` pins `colorama` on every
+`CUSTOM_COMPILE_COMMAND` keeps the lock header stable and records the intended
+compile options. Dependabot is expected to regenerate the lock with those
+options, including `--generate-hashes`; confirm this on its first pull request
+rather than assuming it. `requirements-ci.in` pins `colorama` on every
 platform because `tqdm` needs it only on Windows, so a lock compiled on Linux,
-as Dependabot's is, still installs on `windows-latest`. Dependabot opens one
-grouped Python pull request a week, and one grouped pull request for the host
-bridge's npm packages. The lock is a protected path, so each Python bump needs
-the owner's exact-head merge exception.
+as Dependabot's is, still installs on `windows-latest`.
+
+Dependabot opens one grouped Python pull request a week for everything except
+`openai`, which gets its own pull request so an SDK release, which also needs the
+`AUTHORIZED_SDK_*` constants updated, cannot block the other bumps. It also opens
+one grouped pull request a week for the host bridge's npm packages. The lock is
+a protected path, so each Python bump needs the owner's exact-head merge
+exception.
 
 On Windows, installing `openai` into a virtual environment under a deep
 directory can fail with `OSError: [Errno 2]` because some of its files exceed
-the 260-character path limit. Use a short path such as `C:envegis`, or
+the 260-character path limit. Use a short path such as `C:\venv\aegis`, or
 enable long paths in Windows.
 
 The environment precheck imports `openai`, `httpx2` and `yaml`, verifies the SDK's
