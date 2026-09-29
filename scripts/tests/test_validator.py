@@ -329,6 +329,114 @@ def test_agents_schema():
     validator.check_agents_schema(rep, agents / "bad-model")
     expect_error(rep, "is not one of", "an unrecognised model is rejected")
 
+    # Code-health P2-3: keys Claude Code honours in `.claude/agents/` that run
+    # commands, start processes or widen permissions. One fixture per key.
+    for fixture, key in (
+        ("forbidden-hooks", "hooks"),
+        ("forbidden-mcpservers", "mcpServers"),
+        ("forbidden-permissionmode", "permissionMode"),
+    ):
+        rep = validator.Report()
+        validator.check_agents_schema(rep, agents / fixture)
+        expect_error(
+            rep,
+            f"forbidden frontmatter key `{key}`",
+            f"an agent declaring `{key}` is rejected",
+        )
+
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "unknown-key")
+    expect_error(
+        rep,
+        "is not in the agent allow-list",
+        "an agent key outside the allow-list (`initialPrompt`) is rejected",
+    )
+
+    # Claude Code searches `.claude/agents/` recursively, so the check does too.
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "nested-forbidden")
+    expect_error(
+        rep,
+        "review/nested-hooks-agent.md] forbidden frontmatter key `hooks`",
+        "an agent one directory below the agents root is still checked",
+    )
+
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "duplicate-key")
+    expect_error(
+        rep,
+        "duplicate frontmatter key `tools`",
+        "an agent repeating `tools` (Bash, then Read) is rejected",
+    )
+
+    # PyYAML resolves merge keys and aliases; a reader without that support
+    # sees different keys, so agent frontmatter must be written out flat.
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "merge-key")
+    expect_error(rep, "YAML merge key <<", "an agent whose `tools` arrives via `<<` is rejected")
+
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "yaml-alias")
+    expect_error(rep, "YAML anchor &agent_name", "an agent using a YAML anchor is rejected")
+    expect_error(rep, "YAML alias *agent_name", "an agent using a YAML alias is rejected")
+
+    # PyYAML treats any key tagged tag:yaml.org,2002:merge as a merge key,
+    # whatever its text, so tags are rejected outright.
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "merge-tag")
+    expect_error(rep, "YAML merge key 'foo' (merge-tagged)",
+                 "an agent whose `!!merge foo:` key merges in `tools` is rejected")
+    expect_error(rep, "YAML tag !!merge", "an agent using a `!!merge` tag is rejected")
+
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "merge-tag-flow")
+    expect_error(rep, "YAML merge key 'bar' (merge-tagged)",
+                 "a flow-mapping agent with a verbatim merge-tagged key is rejected")
+    expect_error(rep, "YAML tag tag:yaml.org,2002:merge",
+                 "an agent using a verbatim `!<tag:yaml.org,2002:merge>` tag is rejected")
+
+    found = validator.yaml_indirection("%YAML 1.1\n---\nname: x\n")
+    assert "directive %YAML" in found, found
+    found = validator.yaml_indirection("name: !!str x\n")
+    assert "tag !!str" in found, found
+    PASSES.append("YAML directives and any explicit tag are rejected")
+    print("  PASS  YAML directives and any explicit tag are rejected")
+
+    # Every `.claude/agents/` from the working directory up to the repository
+    # root is loaded, so any agent file outside the root tree is flagged.
+    candidates = [
+        ".claude/agents/root-agent.md", ".claude/agents/review/nested-agent.md",
+        "docs/.claude/agents/example.md", "a/b/.claude/agents/deep/x.md",
+        ".Claude/Agents/case-variant.md", ".claude/agents-notes.md",
+        "docs/.claude/agents/notes.txt", ".claude/skills/example/SKILL.md",
+        # Tracked entries NAMED `.claude` or `.claude/agents` (a git symlink,
+        # mode 120000) can redirect the lookup, whatever their extension.
+        "docs/.claude", "docs/.claude/agents", "docs/.Claude", "docs/my.claude",
+        ".claude/agentsX/y.md",
+    ]
+    misplaced = validator.misplaced_agent_files(candidates)
+    assert misplaced == [
+        ".Claude/Agents/case-variant.md", "a/b/.claude/agents/deep/x.md",
+        "docs/.Claude", "docs/.claude", "docs/.claude/agents",
+        "docs/.claude/agents/example.md",
+    ], misplaced
+    PASSES.append("nested and case-variant .claude/agents files are flagged")
+    print("  PASS  nested and case-variant .claude/agents files are flagged")
+
+    for model in ("fable", "inherit"):
+        with tempfile.TemporaryDirectory(prefix="aegis-agent-model-") as tmp:
+            agent = Path(tmp) / "model-agent.md"
+            agent.write_text(
+                "---\nname: model-agent\ndescription: SYNTHETIC.\n"
+                f"tools: Read\nmodel: {model}\n---\n", encoding="utf-8")
+            rep = validator.Report()
+            validator.check_agents_schema(rep, Path(tmp))
+            expect_clean(rep, f"the documented `{model}` model alias is accepted")
+
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "allowed-optional-keys")
+    expect_clean(rep, "an agent using every allow-listed optional key is accepted")
+
     rep = validator.Report()
     validator.check_agents_schema(rep, agents / "no-such-directory")
     expect_clean(rep, "a missing agents directory degrades quietly")

@@ -45,7 +45,9 @@ Repo-level checks:
     reviewer agents strict-parse, their `name` matches the filename stem, their
     `tools` grant stays inside the read-only set {Read, Grep, Glob} (any
     widening is a privilege escalation, not a preference), and `model`, when
-    present, is one the runtime recognises.
+    present, is one the runtime recognises. Every frontmatter key must be in
+    an allow-list; `hooks`, `mcpServers` and `permissionMode` (commands,
+    processes, wider permissions) are named as forbidden.
   * guided-path link resolution (decision D55 — check_docs_paths_links, HARD):
     every SKILL.md link in docs/paths/ and every docs/paths link in the README
     resolves on disk, and a `[`foo`](.../bar/SKILL.md)` label matches its
@@ -79,7 +81,9 @@ that way by using plain asserts rather than a test framework (decision D55).
 from __future__ import annotations
 
 import json
+import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -628,7 +632,166 @@ def _rel(path: Path) -> str:
 # The reviewer agents are read-only personas by contract, so ANY widening is an
 # error rather than a warning: it is the one security-relevant check in D55.
 AGENT_ALLOWED_TOOLS = {"Read", "Grep", "Glob"}
-AGENT_ALLOWED_MODELS = {"opus", "sonnet", "haiku"}
+# `fable` and `inherit` are documented aliases; full model IDs stay out
+# because pinned IDs go stale and the aliases cover the need.
+AGENT_ALLOWED_MODELS = {"opus", "sonnet", "haiku", "fable", "inherit"}
+# Frontmatter keys a project agent may carry (allow-list, decision D55 as
+# extended by code-health finding P2-3). Checked against the Claude Code
+# subagent field table (code.claude.com/docs/en/sub-agents, 2026-09-28): every
+# key here only describes, narrows or bounds the agent. Any key outside the
+# set is an error, so a field Claude Code adds later is reviewed before an
+# agent file can use it.
+AGENT_ALLOWED_KEYS = {
+    "name", "description", "tools", "model",
+    "disallowedTools", "maxTurns", "effort", "color",
+}
+# Keys that Claude Code honours in `.claude/agents/` but ignores in plugin
+# agents "for security reasons" (same page). Each one executes or widens
+# authority when the agent starts, so each gets a specific error.
+AGENT_FORBIDDEN_KEYS = {
+    "hooks": "runs shell commands on the agent's lifecycle events",
+    "mcpServers": "can start an MCP server process from an inline definition",
+    "permissionMode": "can switch the agent to bypassPermissions or another "
+                      "wider permission mode",
+}
+
+
+# Claude Code searches `.claude/agents/` recursively and loads every
+# `.claude/agents/` between the working directory and the repository root, so
+# an agent file in a nested directory (docs/.claude/agents/) is live for anyone
+# who starts a session there. Matched case-insensitively for Windows/macOS.
+AGENT_PATH_SEGMENT = re.compile(r"(^|/)\.claude/agents/", re.IGNORECASE)
+# A tracked ENTRY named `.claude` or `.claude/agents` (a git symlink, mode
+# 120000, or a plain file) can point a nested `.claude/agents/` at a directory
+# with any name, so no changed path would contain `.claude/agents/`.
+AGENT_DIR_ENTRY = re.compile(r"(^|/)\.claude(/agents)?$", re.IGNORECASE)
+_WALK_PRUNE = {".git", ".worktrees", "node_modules"}
+
+
+def _walk_md(root: Path, prune: set[str] = frozenset()) -> list[Path]:
+    """Every *.md under `root`, recursively, never following symlinked dirs."""
+    found = []
+    for current, dirs, files in os.walk(root, followlinks=False):
+        dirs[:] = sorted(d for d in dirs if d not in prune)
+        found.extend(Path(current) / f for f in sorted(files) if f.lower().endswith(".md"))
+    return found
+
+
+def _repo_candidate_paths() -> list[str]:
+    """Repo-relative POSIX paths of every tracked entry (files and symlinks).
+
+    Tracked only: untracked local worktrees and scratch copies under the
+    checkout are not what a pull request ships. When git is unavailable it
+    falls back to a filesystem walk (pruning .git, .worktrees, node_modules)
+    that also sees untracked files, so the check never silently sees nothing.
+    The walk reports files and symlinked directories, and does not descend
+    into the latter.
+    """
+    try:
+        out = subprocess.run(
+            ["git", "ls-files", "-z", "--cached"],
+            cwd=REPO_ROOT, capture_output=True, check=True,
+        ).stdout
+        return [p for p in out.decode("utf-8", "surrogateescape").split("\0") if p]
+    except (OSError, subprocess.CalledProcessError):
+        found = []
+        for current, dirs, files in os.walk(REPO_ROOT, followlinks=False):
+            here = Path(current)
+            dirs[:] = sorted(d for d in dirs if d not in _WALK_PRUNE)
+            links = [d for d in dirs if (here / d).is_symlink()]
+            for entry in sorted(files) + links:
+                found.append((here / entry).relative_to(REPO_ROOT).as_posix())
+        return found
+
+
+def misplaced_agent_files(paths: list[str]) -> list[str]:
+    """Agent definitions outside the one root `.claude/agents/` directory.
+
+    Any `*.md` under a `.claude/agents/` segment that does not start exactly
+    with `.claude/agents/` (a nested directory, or a case variant of the root)
+    is loaded by Claude Code in some session but would escape the checks below.
+    So is any tracked entry named `.claude` or `.claude/agents` itself,
+    whatever its extension: that is a symlink (or a file standing in for a
+    directory) that could redirect a `.claude/agents/` lookup elsewhere.
+    """
+    return sorted(
+        p for p in paths
+        if (
+            (p.lower().endswith(".md") and AGENT_PATH_SEGMENT.search(p)
+             and not p.startswith(".claude/agents/"))
+            or AGENT_DIR_ENTRY.search(p)
+        )
+    )
+
+
+def yaml_indirection(fm_text: str) -> list[str]:
+    """Anchors, aliases, tags, directives and merge keys in the frontmatter.
+
+    PyYAML resolves `<<: {tools: Read}` into a real `tools` key, but a YAML
+    1.2 reader without merge-key support sees no `tools` at all, and an agent
+    with no `tools` inherits every tool. PyYAML also treats ANY key tagged
+    `tag:yaml.org,2002:merge` (`!!merge foo:`, `!<tag:yaml.org,2002:merge>`)
+    as a merge key. Agent frontmatter is a handful of flat keys, so every
+    anchor, alias, tag, directive and merge key is rejected, not interpreted.
+    """
+    found: set[str] = set()
+    try:
+        for token in yaml.scan(fm_text, Loader=yaml.SafeLoader):
+            if isinstance(token, yaml.AnchorToken):
+                found.add(f"anchor &{token.value}")
+            elif isinstance(token, yaml.AliasToken):
+                found.add(f"alias *{token.value}")
+            elif isinstance(token, yaml.TagToken):
+                # `!!merge foo:` or `!<tag:yaml.org,2002:merge>` makes any key a
+                # merge key; no agent needs an explicit tag, so reject them all.
+                handle, suffix = token.value
+                found.add(f"tag {handle or ''}{suffix}")
+            elif isinstance(token, yaml.DirectiveToken):
+                found.add(f"directive %{token.name}")
+        root = yaml.compose(fm_text, Loader=yaml.SafeLoader)
+    except yaml.YAMLError:
+        return []  # the strict parse reports it
+    stack = [root] if root is not None else []
+    while stack:
+        node = stack.pop()
+        if isinstance(node, yaml.MappingNode):
+            for key, value in node.value:
+                if isinstance(key, yaml.ScalarNode) and key.value == "<<":
+                    found.add("merge key <<")
+                elif key.tag == "tag:yaml.org,2002:merge":
+                    found.add(f"merge key {key.value!r} (merge-tagged)")
+                stack.extend((key, value))
+        elif isinstance(node, yaml.SequenceNode):
+            stack.extend(node.value)
+    return sorted(found)
+
+
+def duplicate_mapping_keys(fm_text: str) -> list[str]:
+    """Keys repeated inside any one YAML mapping of the frontmatter.
+
+    PyYAML keeps the LAST value of a repeated key, while another reader may
+    keep the first, so `tools: Bash` then `tools: Read` could validate as
+    read-only yet run with Bash. Merge keys (`<<`) are not counted.
+    """
+    dupes: list[str] = []
+    try:
+        root = yaml.compose(fm_text, Loader=yaml.SafeLoader)
+    except yaml.YAMLError:
+        return dupes  # the strict parse reports it
+    stack = [root] if root is not None else []
+    while stack:
+        node = stack.pop()
+        if isinstance(node, yaml.MappingNode):
+            seen = set()
+            for key, value in node.value:
+                if isinstance(key, yaml.ScalarNode) and key.value != "<<":
+                    if key.value in seen:
+                        dupes.append(key.value)
+                    seen.add(key.value)
+                stack.extend((key, value))
+        elif isinstance(node, yaml.SequenceNode):
+            stack.extend(node.value)
+    return sorted(set(dupes))
 
 
 def check_agents_schema(rep: Report, agents_dir: Path | None = None) -> None:
@@ -641,12 +804,28 @@ def check_agents_schema(rep: Report, agents_dir: Path | None = None) -> None:
       * declare `tools` (the field is `tools`, NOT `allowed-tools`) within the
         read-only set — a Write/Edit/Bash/`*` grant turns a reviewer into an
         actor, which is a privilege escalation, not a config preference;
-      * name a recognised `model` when it names one at all.
+      * name a recognised `model` when it names one at all;
+      * repeat no key inside any mapping;
+      * live in the root `.claude/agents/` tree — searched recursively, as
+        Claude Code does — and nowhere else (checked when `agents_dir` is
+        None, i.e. against the real repository);
+      * carry no key outside AGENT_ALLOWED_KEYS — in particular no `hooks`,
+        `mcpServers` or `permissionMode`, which execute commands, start
+        processes or widen permissions (code-health finding P2-3).
     """
-    agents_dir = AGENTS_DIR if agents_dir is None else agents_dir
+    if agents_dir is None:
+        agents_dir = AGENTS_DIR
+        for misplaced in misplaced_agent_files(_repo_candidate_paths()):
+            rep.error(
+                f"[{misplaced}] agent file outside the root `.claude/agents/` "
+                "directory, or a tracked `.claude` / `.claude/agents` entry "
+                "(symlink or file): Claude Code loads every `.claude/agents/` "
+                "from the working directory up to the repository root, so it "
+                "is live yet unvalidated — move it or delete it"
+            )
     if not agents_dir.is_dir():
         return
-    for path in sorted(agents_dir.glob("*.md")):
+    for path in _walk_md(agents_dir):
         ctx = _rel(path)
         fm_text, _ = split_frontmatter(path.read_text(encoding="utf-8"))
         if fm_text is None:
@@ -655,6 +834,31 @@ def check_agents_schema(rep: Report, agents_dir: Path | None = None) -> None:
         fm = check_frontmatter_strict_yaml(fm_text, ctx, rep)
         if fm is None:
             continue
+        for key in duplicate_mapping_keys(fm_text):
+            rep.error(
+                f"[{ctx}] duplicate frontmatter key `{key}`: YAML readers "
+                "disagree on which value wins, so the checked value may not "
+                "be the one that runs"
+            )
+        for item in yaml_indirection(fm_text):
+            rep.error(
+                f"[{ctx}] YAML {item} in agent frontmatter: readers without "
+                "merge-key or alias support see different keys (an agent with "
+                "no `tools` inherits every tool), so write each key out flat"
+            )
+
+        for key in sorted(map(str, fm)):
+            if key in AGENT_FORBIDDEN_KEYS:
+                rep.error(
+                    f"[{ctx}] forbidden frontmatter key `{key}`: it "
+                    f"{AGENT_FORBIDDEN_KEYS[key]}; reviewer agents read and report"
+                )
+            elif key not in AGENT_ALLOWED_KEYS:
+                rep.error(
+                    f"[{ctx}] frontmatter key `{key}` is not in the agent "
+                    f"allow-list {sorted(AGENT_ALLOWED_KEYS)}; review what it "
+                    "does before adding it there"
+                )
 
         if fm.get("name") != path.stem:
             rep.error(

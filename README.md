@@ -1384,7 +1384,7 @@ uses Python 3.14 and provides these jobs:
 | --- | --- |
 | `validate-skills` | Required Ubuntu check: CI-helper tests, validator self-tests and skill validation, contract-audit self-tests, BER self-check and regression suite, PowerShell Core acceptance, and a PR-only Developer Certificate of Origin (DCO) sign-off check. |
 | `windows-offline-checks` | Additional Windows coverage: the Python checks plus native Windows PowerShell and PowerShell Core acceptance. This job is not registered as a required branch-protection check. |
-| `gate-guard` | Required PR-only check: deliberately fails when protected validation, workflow, runtime, test or dependency paths change, so those changes receive explicit review. |
+| `gate-guard` | Required PR-only check: deliberately fails when protected validation, workflow, agent-definition, runtime, test or dependency paths change, so those changes receive explicit review. |
 
 Notes:
 

@@ -207,8 +207,10 @@ receive an additional explicit security review. Outside contributions are never
 self-merged.
 
 Those **security-relevant surfaces** include `scripts/`, `.github/`, `AGENTS.md`,
-the Behavioral Eval Runner and approval/evidence tooling under `tools/`, pinned
-dependency files, the [owner approval register](docs/approvals/APPROVAL_REGISTER.md),
+agent definitions in any `.claude/agents/` directory (root or nested,
+recursively), the Behavioral Eval Runner and approval/evidence tooling under
+`tools/`, pinned dependency files, the
+[owner approval register](docs/approvals/APPROVAL_REGISTER.md),
 [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) §5, and
 any skill's frontmatter invocation posture (`disable-model-invocation` or the
 MANUAL-ONLY sentinel), its **Security Rules**, or its **Stop Conditions**.

@@ -86,7 +86,9 @@ class ProtectedFileGuardTests(unittest.TestCase):
         cls.guard = next(step["run"] for step in workflow["jobs"]["gate-guard"]["steps"]
                          if "gate_pattern=" in step.get("run", ""))
 
-    def run_guard(self, paths, *, rename=False):
+    def run_guard(self, paths, *, rename=False, links=()):
+        """`links` holds (path, target) pairs committed as git symlinks
+        (mode 120000) through the index, so no real symlink is needed."""
         with tempfile.TemporaryDirectory(prefix="aegis-ci-guard-") as temporary:
             root = Path(temporary)
             repo = root / "repo"
@@ -114,6 +116,11 @@ class ProtectedFileGuardTests(unittest.TestCase):
                     file.parent.mkdir(parents=True, exist_ok=True)
                     file.write_text("changed fixture\n", encoding="utf-8")
             git("add", ".")
+            for link, target in links:
+                blob = subprocess.run(["git", "hash-object", "-w", "--stdin"], cwd=repo, check=True,
+                                      input=target.encode("utf-8"), capture_output=True).stdout
+                git("update-index", "--add", "--cacheinfo",
+                    f"120000,{blob.decode('ascii').strip()},{link}")
             git("commit", "--quiet", "-m", "fixture change")
             return subprocess.run(["bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", self.guard],
                                   cwd=repo, env=dict(os.environ, BASE_REF="fixture-base", RUNNER_TEMP=str(root)),
@@ -146,10 +153,37 @@ class ProtectedFileGuardTests(unittest.TestCase):
                 self.assertEqual(1, result.returncode, result.stdout + result.stderr)
                 self.assertIn("requires manual review and merge", result.stdout)
 
+    def test_project_agent_files_require_manual_merge(self):
+        # Claude Code honours `hooks`, `mcpServers` and `permissionMode` in
+        # project agent files, so adding or editing one is a gate change.
+        # Every .claude/agents/ up to the repository root is loaded, so nested
+        # directories count too.
+        for path in (".claude/agents/secure-saas-reviewer.md", ".claude/agents/new-agent.md",
+                     ".claude/agents/nested/agent.md", ".Claude/Agents/new-agent.md",
+                     ".CLAUDE/AGENTS/NEW-AGENT.MD", "docs/.claude/agents/example.md",
+                     "a/b/.claude/agents/deep/agent.md", "docs/.Claude/Agents/agent.md"):
+            with self.subTest(path=path):
+                result = self.run_guard([path])
+                self.assertEqual(1, result.returncode, result.stdout + result.stderr)
+                self.assertIn("requires manual review and merge", result.stdout)
+
+    def test_symlinked_claude_entries_require_manual_merge(self):
+        # A nested `.claude` or `.claude/agents` symlink can point at a payload
+        # directory whose own paths never contain `.claude/agents/`.
+        for link in ("docs/.claude", "docs/.Claude", "docs/.claude/agents", ".claude"):
+            with self.subTest(link=link):
+                result = self.run_guard(["payload/agents/evil.md"], links=[(link, "../payload")])
+                self.assertEqual(1, result.returncode, result.stdout + result.stderr)
+                self.assertIn("requires manual review and merge", result.stdout)
+                self.assertIn(link, result.stdout.split("Gate files touched:")[-1])
+
     def test_ordinary_skill_and_document_changes_pass(self):
         result = self.run_guard(["README.md", "docs/notes.md", ".claude/skills/example/SKILL.md",
                                  "docs/example.py", ".claude/skills/example/scripts/helper.py",
-                                 "tools/aegis_setup/helper.py", "artifacts/scripts/yaml.py"])
+                                 "tools/aegis_setup/helper.py", "artifacts/scripts/yaml.py",
+                                 ".claude/agents-notes.md", "docs/claude/agents/example.md",
+                                 "docs/xclaude/agents/example.md", "docs/my.claude",
+                                 ".claude/agentsX/example.md"])
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_renaming_a_protected_file_outside_the_set_is_still_guarded(self):
