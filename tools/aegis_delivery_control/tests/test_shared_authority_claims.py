@@ -11,6 +11,17 @@ from tools.aegis_delivery_control.authority import (
     SyntheticAuthority, SyntheticGrant, SyntheticValidatorGrant,
 )
 from tools.aegis_delivery_control.contracts import DispatchDenied
+from tools.aegis_delivery_control.tests import _owner_private_fixtures
+
+
+def setUpModule() -> None:
+    # Temporary trusted roots and fixture files must be owner-private, as
+    # production requires. See the helper.
+    _owner_private_fixtures.enter()
+
+
+def tearDownModule() -> None:
+    _owner_private_fixtures.restore()
 
 
 class SharedAuthorityClaimTests(unittest.TestCase):
