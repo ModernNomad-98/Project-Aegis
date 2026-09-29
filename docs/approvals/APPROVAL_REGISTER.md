@@ -2460,7 +2460,7 @@ the entry governs.
   `build_run_report` accepted on `main` at
   `76b399b11e8068ca26171dbd6d715f161757f35e`; neither path changed between
   that commit and this governance PR's base,
-  `d4bcef1382c94ca1a0325203f959902e73dd374e`.
+  `2672b16b21ffa0ba147cc416815832f79b1c34ed`.
 - **Expiry / use limit:** One implementation package; consumed at its merge,
   which a later lifecycle event records. No calendar expiry stated.
 
@@ -2532,7 +2532,7 @@ the entry governs.
   granted. No CP-WP-003 or CP-WP-004 work, real authority or real dispatch
   is authorized. None additionally stated.
 - **Delivery and guard:** At the base of this governance PR,
-  `d4bcef1382c94ca1a0325203f959902e73dd374e`, the `gate-guard` protected
+  `2672b16b21ffa0ba147cc416815832f79b1c34ed`, the `gate-guard` protected
   pattern in `.github/workflows/validate-skills.yml` does not match
   `tools/aegis_delivery_control/` or any path listed above, so no
   `gate-guard` exception is needed. If the pattern changes before delivery
