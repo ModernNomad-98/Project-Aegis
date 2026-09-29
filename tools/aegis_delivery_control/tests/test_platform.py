@@ -1000,6 +1000,38 @@ class CheckedConnectionCommitTests(unittest.TestCase):
                 connection.close()
             self.assertEqual(self._rows(path), [])
 
+    def test_pre_commit_check_ignores_live_rollback_journal(self) -> None:
+        # While a transaction is open SQLite owns a live rollback journal.
+        # On an elevated Windows host its owner is the token default owner,
+        # not the user, so the sidecar check must wait until the commit has
+        # removed it; only the database leaf is checked before committing.
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            path, connection = self._open(Path(temporary_directory))
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                connection.execute("INSERT INTO facts VALUES ('durable')")
+                capability = connection._owned_path_capability
+                original = capability.check_sidecars
+                calls = []
+
+                def journal_owned_by_default_owner() -> None:
+                    calls.append(connection.in_transaction)
+                    if connection.in_transaction:
+                        raise PathCapabilityUnavailable(
+                            "managed path is not owned by this principal"
+                        )
+                    original()
+
+                with patch.object(
+                    capability, "check_sidecars",
+                    side_effect=journal_owned_by_default_owner,
+                ):
+                    connection.commit()
+                self.assertEqual(calls, [False])
+            finally:
+                connection.close()
+            self.assertEqual(self._rows(path), [("durable",)])
+
     def test_commit_reports_committed_write_when_path_changes_after(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             path, connection = self._open(Path(temporary_directory))

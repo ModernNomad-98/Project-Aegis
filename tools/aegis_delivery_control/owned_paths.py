@@ -895,8 +895,13 @@ class CheckedSQLiteConnection(sqlite3.Connection):
 
     def commit(self) -> None:
         self._committed_integrity_error = None
-        # Refuse to commit into a swapped or unsafe path.
-        self._check_owned_path()
+        # Refuse to commit into a swapped database leaf. The sidecar check
+        # waits until after the commit: while the transaction is open SQLite
+        # holds a live rollback journal that it created itself, and on an
+        # elevated Windows host that journal is owned by the token default
+        # owner, not the user.
+        if self._owned_path_capability is not None:
+            self._owned_path_capability.assert_current()
         super().commit()
         try:
             self._check_owned_path()
