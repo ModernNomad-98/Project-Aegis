@@ -66,3 +66,16 @@ and evidence recorder work together. These checks did not start an SDK
 session or provider call. Linux and Windows GitHub Actions remain the merge
 gate for this branch, and the protected workflow change may require a
 separate exact-head gate-guard exception.
+
+## Lock re-review on 2026-09-29
+
+The committed lock now pins Claude Agent SDK `0.3.283` instead of `0.3.281`.
+The other three roots are unchanged, and the owner chose on 2026-09-29 to keep
+the API SDK at `0.94.0`. The lock still has 107 non-root entries. Compared
+with the previous lock, only the wrapper and its eight native packages
+changed, and no package was added or removed. `standardwebhooks` is still
+absent. The
+[re-review of the archives](issue-101-package-4a-host-feasibility.md#re-review-on-2026-09-29-agent-sdk-03283-with-api-sdk-0940-kept)
+records the new archive checks and native binary hashes. Installation still
+uses `npm ci --ignore-scripts --no-audit --no-fund`. The boundary above is
+unchanged.

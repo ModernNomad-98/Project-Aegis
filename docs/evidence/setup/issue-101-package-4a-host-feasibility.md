@@ -215,3 +215,50 @@ review and separate Stage 4A implementation grant remained pending at this
 2026-09-24 screening point. The later
 host proof must test executable compatibility without assuming it from the
 static archive screen. No package was installed or executed in this review.
+
+## Re-review on 2026-09-29: Agent SDK 0.3.283 with API SDK 0.94.0 kept
+
+This dated note adds to the record above and does not change it. Dependabot
+PR #536 proposed Agent SDK `0.3.283` and API SDK `0.128.0`. On 2026-09-29 the
+owner, Peter Nguyen, chose to keep the API SDK at `0.94.0`, because `0.95.0`
+and later versions bring back `standardwebhooks`, whose published license is
+still unresolved (see above). The replacement change bumps only the Agent SDK
+wrapper and its eight native packages. `.github/dependabot.yml` now ignores
+`@anthropic-ai/sdk` versions `>=0.95.0` for the host bridge.
+
+The regenerated lock (SHA-256
+`89776caba8ec1faae9afcb135d2485aefeb1f7fd0bcc5976878f6ff7ddb07d9d`)
+still has 107 entries. An entry-by-entry comparison with the lock on `main`
+found no added or removed entry. It found nine changed entries: the wrapper
+and its eight native packages, each `0.3.281` to `0.3.283` with a new
+`resolved` URL and integrity value. `standardwebhooks`, `@stablelib/base64`
+and `fast-sha256` are absent. The API SDK stays at `0.94.0`. All 107 entries
+have a registry `sha512` integrity value, and none is marked with an install
+script.
+
+The nine `0.3.283` archives were downloaded from the npm registry with
+`npm pack --ignore-scripts`. Each whole-archive SHA-512 matched its lock
+integrity value, and each embedded name and version matched the lock. None
+declares a `scripts` entry. Each points to Anthropic's license in its
+`LICENSE.md`. The wrapper still declares no ordinary dependency, and its peer
+range for the API SDK is still `>=0.93.0`. Each native binary's size and
+SHA-256 matched the wrapper's `manifest.json` (bundled CLI `2.1.283`). No
+binary was executed.
+
+| `@anthropic-ai/claude-agent-sdk-` suffix, all `0.3.283` | Binary bytes | SHA-256 |
+| --- | ---: | --- |
+| `darwin-arm64` | 225,036,032 | `d8cb1e5c79684cc12a8bfc813e3a2073406921b6245744b3009be3ab5651d21e` |
+| `darwin-x64` | 233,458,384 | `c896d2aee12ff4d95861033d9730d3d22dc19e4f32779134d3399ef3dfb0e77a` |
+| `linux-arm64` | 240,902,136 | `346d294f0103d6fc0de11ac953579b5c62dfa90698a4cfc486b6f927c615e697` |
+| `linux-arm64-musl` | 233,256,768 | `7e607db312a84ed8d7e17c34be93accad5f79366c5a043758ba8de95fdb5d070` |
+| `linux-x64` | 241,556,664 | `1859583ce32920595c61ef868bee52e1b1594f7486db209935e01f1e5e804ae2` |
+| `linux-x64-musl` | 235,311,192 | `bed45d96869935e0fa4674d5099fd3e724162d5234b601771e7418beb699c5a8` |
+| `win32-arm64` | 232,505,504 | `1d0aaa255e3b9ba304840f260f4993b98f10516d3aa5b7d60ecd3392cca34df4` |
+| `win32-x64` | 244,960,928 | `9dbe16dafed59da5cdabbfe11ad0335738c753fad794989b47f9446accd6de3a` |
+
+As with `0.3.281`, the manifest's `testedWrapperVersions` list ends at
+`0.3.281`, not `0.3.283`. These archive checks therefore do not show that
+this wrapper, its bundled CLI and API SDK `0.94.0` work together at runtime.
+The offline bridge only type-imports the wrapper, and that import is erased,
+so the offline tests do not run the SDK body. Runtime compatibility is still
+a check for the separately authorized Stage 4B host proof.

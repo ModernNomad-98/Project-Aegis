@@ -48,3 +48,7 @@ updates:
     groups:
       host-bridge:
         patterns: ["*"]
+    ignore:
+      # Owner decision 2026-09-29: keep 0.94.0; 0.95.0+ adds standardwebhooks (license unresolved), see docs/evidence/setup/issue-101-package-4a-host-feasibility.md
+      - dependency-name: "@anthropic-ai/sdk"
+        versions: [">=0.95.0"]
