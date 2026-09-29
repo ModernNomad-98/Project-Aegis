@@ -197,6 +197,27 @@ class SharedAuthorityClaimTests(unittest.TestCase):
         with self.assertRaisesRegex(PathCapabilityUnavailable, "owner-private"):
             SyntheticAuthority(self.key, self.path)
 
+    def test_claim_store_path_failure_keeps_unavailable_denial(self) -> None:
+        effect = SyntheticGrant("effect-grant", "repo", "effect", "attempt", "scope")
+        validator = SyntheticValidatorGrant(
+            "validator-grant", "repo", "effect", "revision", "check",
+            "input", "attempt", "scope", "containment",
+        )
+        self.first.register(effect)
+        self.first.register_validator(validator)
+        effect_capability = self.first.claim_or_recover(*effect.__dict__.values())
+        validator_capability = self.first.claim_or_recover_validator(
+            *validator.__dict__.values()
+        )
+        with patch.object(
+            self.first, "_validator_claim_connection",
+            side_effect=PathCapabilityUnavailable("owned claim store swapped"),
+        ):
+            with self.assertRaisesRegex(DispatchDenied, "state is unavailable"):
+                self.first.verify_for_intent(effect_capability)
+            with self.assertRaisesRegex(DispatchDenied, "state is unavailable"):
+                self.first.verify_validator_for_intent(validator_capability)
+
     def test_without_shared_store_uses_in_memory_claim_state(self) -> None:
         authority = SyntheticAuthority(self.key)
         grant = SyntheticGrant("grant", "repo", "effect", "attempt", "scope")

@@ -1029,6 +1029,39 @@ class CheckedConnectionCommitTests(unittest.TestCase):
                 connection.close()
             self.assertEqual(self._rows(path), [("durable",)])
 
+    def test_committed_signal_survives_production_rollback_pattern(self) -> None:
+        # Production call sites do: try: commit() except BaseException:
+        # rollback(); raise. The rollback must not replace the typed signal.
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            path, connection = self._open(Path(temporary_directory))
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                connection.execute("INSERT INTO facts VALUES ('durable')")
+                capability = connection._owned_path_capability
+                original = capability.assert_current
+
+                def fail_after_commit() -> None:
+                    if not connection.in_transaction:
+                        raise PathCapabilityUnavailable("owned path swapped")
+                    original()
+
+                with patch.object(
+                    capability, "assert_current", side_effect=fail_after_commit
+                ):
+                    with self.assertRaises(
+                        owned_paths.OwnedPathChangedAfterCommit
+                    ):
+                        try:
+                            connection.commit()
+                        except BaseException:
+                            connection.rollback()
+                            raise
+                # The signal is delivered once; a later rollback is ordinary.
+                connection.rollback()
+            finally:
+                connection.close()
+            self.assertEqual(self._rows(path), [("durable",)])
+
 
 if __name__ == "__main__":
     unittest.main()

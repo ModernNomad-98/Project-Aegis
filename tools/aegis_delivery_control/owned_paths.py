@@ -880,6 +880,11 @@ class CheckedPathCapability:
 
 class CheckedSQLiteConnection(sqlite3.Connection):
     _owned_path_capability: CheckedPathCapability | None = None
+    # Set when a commit became durable but the post-commit path check
+    # failed. The next rollback() with no open transaction re-raises it, so
+    # the usual "except BaseException: rollback(); raise" call-site pattern
+    # still delivers the typed signal instead of a fresh path error.
+    _committed_integrity_error: "OwnedPathChangedAfterCommit | None" = None
 
     def _check_owned_path(self) -> None:
         if self._owned_path_capability is not None:
@@ -887,17 +892,25 @@ class CheckedSQLiteConnection(sqlite3.Connection):
             self._owned_path_capability.check_sidecars()
 
     def commit(self) -> None:
+        self._committed_integrity_error = None
         # Refuse to commit into a swapped or unsafe path.
         self._check_owned_path()
         super().commit()
         try:
             self._check_owned_path()
         except PathCapabilityUnavailable as error:
-            raise OwnedPathChangedAfterCommit(
+            committed = OwnedPathChangedAfterCommit(
                 f"transaction committed, but owned path integrity was lost: {error}"
-            ) from error
+            )
+            self._committed_integrity_error = committed
+            raise committed from error
 
     def rollback(self) -> None:
+        committed = self._committed_integrity_error
+        self._committed_integrity_error = None
+        if committed is not None and not self.in_transaction:
+            # Nothing to roll back: the write is durable. Keep the signal.
+            raise committed
         super().rollback()
         self._check_owned_path()
 

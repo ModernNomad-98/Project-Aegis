@@ -1079,6 +1079,12 @@ class SQLiteStateStore:
             raise StorageIntegrityError("state database belongs to another repository")
 
     def _connect(self) -> sqlite3.Connection:
+        if self._path_identity is None:
+            # Only a read_only_verifier() instance has no pinned identity; it
+            # verifies on connections its reader supplies and never opens one.
+            raise StorageIntegrityError(
+                "verifier-only state store cannot open a connection"
+            )
         connection = connect_checked(
             self._database_path,
             expected=self._path_identity,
@@ -35424,6 +35430,8 @@ class SQLiteStateStore:
                     raise StorageIntegrityError(
                         "event body is not valid JSON"
                     ) from error
+                if not isinstance(body, dict):
+                    raise StorageIntegrityError("event body is not a JSON object")
                 if self._event_hash(body) != row["event_hash"]:
                     raise StorageIntegrityError("event body hash mismatch")
                 bindings = {
@@ -44931,12 +44939,6 @@ class SQLiteStateReader:
                 True, False, "TERMINAL_LIFECYCLE_CANNOT_REOPEN",
             )
         except (
-            # Corrupt stored JSON (for example a list where an object belongs)
-            # surfaces as AttributeError; the T22 report must stay typed and
-            # fail closed. The verifier itself is fully built by
-            # SQLiteStateStore.read_only_verifier, so this no longer hides a
-            # partially initialised verifier.
-            AttributeError,
             DispatchDenied,
             IndexError,
             KeyError,

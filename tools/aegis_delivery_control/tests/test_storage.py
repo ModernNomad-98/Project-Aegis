@@ -27395,6 +27395,50 @@ class SQLiteStateStoreTests(unittest.TestCase):
         self.assertIs(reader._verifier._classification_authority, self.authority)
         self.assertFalse(reader._verifier.is_canonical)
 
+    def test_p3_17_verifier_only_store_refuses_to_connect(self) -> None:
+        verifier = ProductionSQLiteStateStore.read_only_verifier(
+            self.database_path, self.oracle, "repo-1", self.authority
+        )
+        with self.assertRaisesRegex(StorageIntegrityError, "verifier-only"):
+            verifier._connect()
+
+    def test_p3_17_verifier_programming_error_is_not_masked(self) -> None:
+        # An AttributeError is a coding mistake, not a local integrity
+        # finding; it must surface instead of degrading to UNVERIFIED.
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        catalog_head, run_heads = self.store.load_verified(
+            "repo-1", authority=self.authority
+        )
+        coordinator = SyntheticReadCoordinator(
+            SQLiteStateReader(
+                self.database_path,
+                CompleteFreshnessOracle(catalog_head, run_heads),
+                "repo-1",
+                self.authority,
+            ),
+            TransitionEngine(),
+        )
+        request = TerminalRestartRequest(
+            "terminal-restart-1", "repo-1", "run-1", LifecycleState.STOPPED,
+        )
+        with patch.object(
+            ProductionSQLiteStateStore, "_verify_projections",
+            side_effect=AttributeError("verifier field is missing"),
+        ):
+            with self.assertRaisesRegex(
+                AttributeError, "verifier field is missing"
+            ):
+                coordinator.report_terminal_restart(request)
+
     def test_t22_denies_restart_for_completed_and_failed_final(self) -> None:
         request, attestation = self._prepare_finalization()
         completed = self.store._finalize_operation(

@@ -14,6 +14,7 @@ from enum import Enum
 from pathlib import Path
 
 from .owned_paths import (
+    PathCapabilityUnavailable,
     PathIdentity,
     connect_checked,
     nearest_existing_trusted_root,
@@ -2218,7 +2219,7 @@ class SyntheticAuthority:
             if row["state"] != "CLAIMED":
                 raise DispatchDenied("synthetic capability already committed an intent")
             connection.commit()
-        except (sqlite3.Error, OSError) as exc:
+        except (sqlite3.Error, OSError, PathCapabilityUnavailable) as exc:
             if connection is not None:
                 connection.rollback()
             raise DispatchDenied("durable source claim state is unavailable") from exc
@@ -2366,7 +2367,7 @@ class SyntheticAuthority:
             ):
                 raise DispatchDenied("source claim is not bound to the durable intent")
             connection.commit()
-        except (sqlite3.Error, OSError) as exc:
+        except (sqlite3.Error, OSError, PathCapabilityUnavailable) as exc:
             if connection is not None:
                 connection.rollback()
             raise DispatchDenied("durable source claim state is unavailable") from exc
