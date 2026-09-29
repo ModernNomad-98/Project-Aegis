@@ -26,7 +26,7 @@ Each check gets exactly one verdict:
 | Exists | Snapshot or backup list for the store; dump-file listing in the storage bucket (a cloud file store) that holds backups | At least one backup of this exact store is listed | Backups belong to a different or deleted instance |
 | Non-empty | Size of the newest backup; size history | Size is above zero and within a plausible range of recent backups and the store's size | Zero-byte file; size suddenly far smaller than usual |
 | Current | Newest backup time, or end of the PITR window, and the check time | Age at check time is below the RPO | Newest backup older than the RPO; PITR window stopped advancing |
-| Retained | Oldest kept backup; retention setting; automatic deletion rules on that bucket | Oldest kept backup meets the retention requirement | Retention shorter than required; lifecycle rule deletes early |
+| Retained | Oldest kept backup; retention setting; automatic deletion rules on that bucket | Oldest kept backup meets the retention requirement | Retention shorter than required; automatic deletion rules delete it early |
 | Encrypted | Encryption flag and key reference on the backup and its copies | Encryption on, key named, and the key is enabled and usable | Unencrypted copy; key disabled or scheduled for deletion |
 | Off-account copy | Copies in another account, project or subscription (and region) | A current copy exists outside the store's own account | All copies live in the same account as the store |
 | Restore-tested | Last drill record: date, backup used, measured time, parity result | A drill succeeded within the agreed interval and its time is inside the RTO | Never tested; last test too old; measured time above the RTO |
