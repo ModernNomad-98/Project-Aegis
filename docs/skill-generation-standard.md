@@ -30,7 +30,9 @@ Here, **frontmatter** is the short metadata block at the top of `SKILL.md`;
 the format used for evaluation-case files. **Evals** are example prompts with
 expected behavior; the validator checks their structure, not their outcomes.
 **CI** means continuous integration, the repository's automated checks on a
-pull request (PR). The `§` symbol means "section." **D49** records the
+pull request (PR). Section 5's action table also names **API** (application
+programming interface) and **MCP** (Model Context Protocol) calls. The `§`
+symbol means "section." **D49** records the
 Codex/Agent Skills portability discovery; **D50** records strict-YAML
 enforcement. These are dated IDs in the
 [decision record](reconciliation/step-0-reconciliation-v4.md), not separate
@@ -92,13 +94,13 @@ This example does not create or authorize a shipped skill.
 
 | Field | Required | Rule |
 | --- | --- | --- |
-| `name` | yes | Must exactly equal the containing directory name. This is the repo convention that keeps invocation, filesystem, and catalog in sync. Lowercase kebab-case. |
+| `name` | yes | Must exactly equal the containing directory name. This is the repo convention that keeps invocation, filesystem, and catalog in sync. Lowercase kebab-case (words joined by hyphens). |
 | `description` | yes | Specific and **trigger-oriented** — say *when* to use the skill and *what it does*, in terms a model can match against a user request. Under **1024 characters**, measured on the parsed value (see the Portability contract below). Avoid vague verbs ("helps with", "handles"). |
 | `disable-model-invocation` | conditional | Set to `true` for any skill that performs **side effects** (writes files outside scratch, calls networks, mutates external state, spends money, deploys). Such skills must be invoked explicitly by a human, never auto-triggered by the model — and their description must lead with the exact `MANUAL-ONLY; never auto-invoke. ` sentinel (see the Portability contract below). **Bounded documentary exception:** the governing definition is Exception 1 in §5 below. It permits authorized ordinary documentation create/append, immutable transcription of evidenced human approvals and lifecycle facts, and refresh of exactly six named project-state projection sections. Honor applicable existing authorization; obtain missing authority before writing. All excluded files and operations remain manual-only. **Second bounded exception (TALI, mirrors §5):** §5 also recognizes Task-Authorized Local Implementation — a separately classified, separately activated execution route whose mutations are confined to ordinary approved source/test files. It is behavior-based, names no skill as permanently eligible, and grants no existing shipped skill any authority merely by this policy's adoption; a side-effecting skill still needs `disable-model-invocation: true` unless a specific route is classified and activated under §5. |
 | `license` | optional | License name or reference for the skill. |
 | `compatibility` | optional | Short note on the environments the skill targets. |
 | `metadata` | optional | A map of extra descriptive fields (for example owner or version). Claude Code reads only top-level keys, so nothing under it changes behavior. |
-| `hooks`, `allowed-tools`, `shell` | **forbidden** | `hooks` registers shell commands that keep running after the skill is invoked; `allowed-tools` pre-approves tools even where workspace trust would not (untrusted folders, `-p` runs), however narrow the list; `shell` selects the shell for injected commands. Shipped skills are instructions only, so the validator rejects all three. |
+| `hooks`, `allowed-tools`, `shell` | **forbidden** | `hooks` registers shell commands that keep running after the skill is invoked; `allowed-tools` pre-approves tools even where workspace trust would not (untrusted folders, non-interactive `-p` runs), however narrow the list; `shell` selects the shell for injected commands. Shipped skills are instructions only, so the validator rejects all three. |
 
 These six fields are the whole allow-list: `scripts/validate-skills.py` rejects any other frontmatter key, a repeated key, YAML anchors, aliases, tags, directives or merge keys, and a `---` anywhere inside the frontmatter. It also rejects `!`-prefixed shell injection (an inline `` !`command` `` or a fence opened with `!`) in any markdown file of the skill folder, `_template` included.
 
@@ -110,7 +112,7 @@ These six fields are the whole allow-list: `scripts/validate-skills.py` rejects 
 ### Portability contract
 
 Aegis skills are consumed by more tools than Claude Code — the open Agent Skills
-format is read by Codex CLI, Cursor, Gemini CLI and others. Those consumers
+format is read by Codex CLI (command-line interface), Cursor, Gemini CLI and others. Those consumers
 may use strict YAML parsers, which reject malformed metadata rather than
 guessing what it meant, and may select skills from the description alone.
 [D49](reconciliation/step-0-reconciliation-v4.md) recorded the host-portability
@@ -131,7 +133,9 @@ before D50 exactly that shipped 67 times. The contract:
   content, and do not count toward the limit. The 1024-character maximum is
   the Agent Skills specification's; hosts add their own listing limits on
   top. Claude Code truncates the combined `description` and its optional
-  `when_to_use` frontmatter field at 1,536 characters in its skill listing,
+  `when_to_use` frontmatter field (a Claude Code field that the §2
+  allow-list does not permit in Aegis skills) at 1,536 characters in its
+  skill listing,
   and Codex caps its initial skills list at about 2% of the context window
   (8,000 characters when the window is unknown), shortening descriptions
   first (checked 2026-09-26 against the
@@ -194,7 +198,7 @@ current version 4, or v4, standard; the validator enforces all nine):
 9. **Supporting Files** — the `references/`, `assets/`, `scripts/`, and `evals/` files the
    skill relies on (progressive disclosure), or "None" if the skill is self-contained.
 
-Security, SaaS, artificial intelligence (AI) security, and tool-use skills may add optional sections such as
+Security, software as a service (SaaS), artificial intelligence (AI) security, and tool-use skills may add optional sections such as
 **Safety Rules**, **Security Rules**, **Tenant Isolation Rules**, **AI Security Rules**,
 or **Tool Permission Rules**. Sections may contain subsections; the nine top-level
 headers must all be present.
