@@ -17,12 +17,15 @@ this skill connects to nothing.
 
 ## Published baselines to name
 
-- Supabase's production checklist and Security Advisor checks (name the
+- Supabase's production checklist and Security Advisor checks (the dashboard's built-in configuration checker; name the
   date they were read).
 - A team's own baseline, named and versioned in the repository.
 - Otherwise: the Aegis minimum baseline below, labelled as such.
 
 ## Aegis minimum baseline, by control family
+
+Data access (RLS and the schemas the web API exposes) is a Supabase-only
+family; report it after encryption and public storage.
 
 | Family | Control | Evidence the user supplies | GAP signal |
 | --- | --- | --- | --- |

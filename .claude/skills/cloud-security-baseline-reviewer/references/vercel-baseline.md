@@ -31,7 +31,7 @@ The user supplies every screen or listing; this skill runs nothing.
 | Network | Preview deployments are protected from the public | Deployment Protection settings screen | previews public while they reach real data |
 | Network | Forked pull requests cannot reach secrets | Git integration settings screen | fork builds receive environment variables |
 | Encryption | Custom domains served over HTTPS only | Domains screen | certificate errors or HTTP-only domains |
-| Audit logging | Team audit log or log drains retained, where the plan allows | Audit log or log drain settings screen | none (name the plan if unavailable) |
+| Audit logging | Team audit log or log drains (feeds that copy logs to another service) retained, where the plan allows | Audit log or log drain settings screen | none (name the plan if unavailable) |
 | Guardrails | Access tokens scoped and expiring | Account tokens screen | full-scope tokens without expiry; unknown owners |
 | Posture | Firewall or bot protection rules reviewed, where the plan allows | Firewall settings screen | none on a public login or signup route |
 | Incident readiness | A named owner can roll back and rotate keys; runbook exists | The runbook path | no owner; no runbook (hand to `incident-response-runbook`) |

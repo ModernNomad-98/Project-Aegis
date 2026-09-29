@@ -125,6 +125,22 @@
       ],
       "note": "SEAM CASE (report vs fix) — secrets-identity-hardener is manual-only, so the positive prompt names it. This skill only reports the exposed key by name.",
       "reason": "Moving and rotating an application secret changes code and credentials; that is secrets-identity-hardener, which a person invokes by name. This skill reads evidence and changes nothing."
+    },
+    {
+      "id": "posture-scanner-findings-win-here",
+      "prompt": "We ran Prowler against our AWS production account last night. Here is its findings export. Map it to the CIS AWS Foundations Benchmark and tell us, control by control, what is met and what is missing.",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": ["security-scan-orchestrator"],
+      "note": "SEAM CASE (scanner output vs running scanners) — the scanner already ran against the account; the ask is one verdict per baseline control, not running or aggregating repository scanners.",
+      "reason": "Mapping supplied posture-scanner findings for a configured account to a named baseline is this skill; security-scan-orchestrator runs and aggregates repository scanners."
+    },
+    {
+      "id": "logging-switched-on-wins-here",
+      "prompt": "Is audit logging actually switched on in every region of our AWS account? Here is the describe-trails and get-trail-status output.",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": ["security-logging-alerting-architect"],
+      "note": "SEAM CASE (control in place vs detection design) — mirrors the reciprocal case in security-logging-alerting-architect's trigger evals.",
+      "reason": "Checking that a configured logging control is in place across the scope is this skill; security-logging-alerting-architect designs what the logs must detect and alert on."
     }
   ]
 }

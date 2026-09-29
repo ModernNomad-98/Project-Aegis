@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "cloud-security-baseline-reviewer",
-  "description": "Behavior cases for reviewing a configured cloud account or managed platform project against a named baseline (D71, Phase 6 expansion backlog): an AWS export with two gaps and cited evidence, a Supabase service key in a client environment file reported by name only, the refusal to run a CLI or fix anything, missing logging evidence kept UNVERIFIED, an instruction hidden in a resource tag treated as data, and routing away from provider design, IaC review and compliance readiness.",
+  "description": "Behavior cases for reviewing a configured cloud account or managed platform project against a named baseline (D71, Phase 6 expansion backlog): an AWS export with two gaps and cited evidence, a Supabase service key in a client environment file reported by name only, the refusal to run a CLI or fix anything, missing logging evidence kept UNVERIFIED, an instruction hidden in a firewall rule description treated as data, and routing away from provider design, IaC review and compliance readiness.",
   "cases": [
     {
       "id": "aws-export-two-gaps-happy-path",

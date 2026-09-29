@@ -28,7 +28,7 @@ widening permissions.
 | --- | --- | --- | --- |
 | Identity | Root user has MFA and no access keys | `aws iam get-account-summary` (`AccountMFAEnabled`, `AccountAccessKeysPresent`) | MFA 0, or keys present |
 | Identity | People sign in through SSO or MFA-protected users; no unused or old user keys | IAM credential report (CSV) the user downloads | user with console access and no MFA; key unused for months or never rotated |
-| Identity | No wildcard administrator policy on workloads | `aws iam list-policies --scope Local` plus the policy documents in question | `"Action": "*"` with `"Resource": "*"` outside a break-glass role |
+| Identity | No wildcard administrator policy on workloads | `aws iam list-policies --scope Local` plus the policy documents in question | `"Action": "*"` with `"Resource": "*"` outside a break-glass role (an emergency-only administrator role) |
 | Network | No administration port open to the internet | `aws ec2 describe-security-groups` | `0.0.0.0/0` or `::/0` on port 22, 3389 or a database port |
 | Secrets | Secrets live in a secret store with rotation where supported | `aws secretsmanager list-secrets` (names and rotation flags only; never `get-secret-value`) | secret in plain environment variables, IaC or an S3 object; rotation off |
 | Encryption | Account-level S3 Block Public Access on | `aws s3control get-public-access-block --account-id <id>` | any flag false without a recorded reason |
