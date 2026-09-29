@@ -552,7 +552,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->189<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->190<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch), fronted by one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -568,8 +568,9 @@ keeps a human as the approval gate on anything irreversible. See
    honest: classify before acting, verify against evidence, keep diffs small, halt for
    approval, close out honestly. *e.g.* `change-classification-gate`, `human-approval-boundary`,
    `reviewable-diff-discipline`, `ai-closeout-reporter`.
-2. **AI-SDLC governance** *(Phase 1.5, 4)* — the human+agent lifecycle contract: named stages
-   and gates, standing agent authority, memory governance, after-the-fact process audit.
+2. **AI-SDLC governance** *(Phase 1.5, 5)* — the human+agent lifecycle contract: named stages
+   and gates, standing agent authority, memory governance, task planning, after-the-fact
+   process audit.
    *e.g.* `ai-sdlc-operating-model`, `agent-authorization-matrix`, `agent-memory-governance`,
    `agent-governance-audit`.
 3. **Core architecture & engineering** *(Phase 2, 10)* — modeling and building systems well:
@@ -878,8 +879,9 @@ Phase 1 — AI engineering operating-discipline pack, under `.claude/skills/<nam
 | `agent-failure-recovery` | Preserve-first recovery from broken git/tree state; destructive cleanup only with backup + explicit approval. | **manual only** |
 | `agent-instruction-consolidator` | Aligns CLAUDE.md / AGENTS.md / Cursor / Copilot instruction files to one canonical source with rule-preservation proof. | **manual only** |
 
-Phase 1.5 — AI-SDLC governance completion (roadmap #261/#268/#279/#280; completes the
-category-08 layer Phase 1 started — composes the Phase 1 skills, never restates them):
+Phase 1.5 — AI-SDLC governance completion (roadmap #261/#268/#279/#280, plus #266 under
+D69; completes the category-08 layer Phase 1 started — composes the Phase 1 skills, never
+restates them):
 
 | Skill | What it does | Invocation |
 |---|---|---|
@@ -887,6 +889,7 @@ category-08 layer Phase 1 started — composes the Phase 1 skills, never restate
 | `agent-authorization-matrix` | Deny-by-default action × context matrix of standing agent authority — merge to protected branches requires a named human always; auto-merge arming is forbidden to agents (armed state re-checked after every push); approval scope/expiry semantics; proposal-first. | **manual only** |
 | `agent-memory-governance` | Persistent-memory WRITE/TRUST/HYGIENE rules: confirmed durable facts with provenance and absolute dates, never secrets; remembered repo/PR state verified against live git/gh before acting; disposition-approved cleanups. | **manual only** |
 | `agent-governance-audit` | Audits one AI-assisted change's process compliance from primary evidence (PR timeline incl. who armed auto-merge, commits, CI runs): per-control PASS/FAIL/UNVERIFIABLE verdicts; closeout claims cross-checked; missing evidence is never a PASS. | auto + manual |
+| `ai-task-decomposer` | (D69, #266) Splits a broad goal, epic or approved spec into ordered, PR-sized tasks: one intent each, an observable done criterion with its evidence, likely files or layers, a provisional change class, risks, dependencies and approval flags; unknowns become spikes or owner questions. Plans only; starts nothing and edits nothing. | auto + manual |
 
 Phase 2 — core architecture & engineering pack:
 

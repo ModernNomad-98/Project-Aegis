@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "ai-task-decomposer",
+  "description": "Behavior cases for splitting a broad goal into ordered, pull-request-sized tasks (D69, category 08 roadmap item #266): the team-invitations happy path with per-task done criteria, evidence, provisional classes and an approval flag on the schema task; a schema-API-UI task split again; an unknown single sign-on provider turned into a spike and an owner question; the refusal to start implementing; a goal that is already one small change handed to change-classification-gate; and routing away from classification, design, parallel lanes and product specs.",
+  "cases": [
+    {
+      "id": "team-invitations-happy-path",
+      "type": "should_trigger",
+      "prompt": "We need to add team invitations: an owner invites a teammate by email, the invite expires after a while, and the owner picks the teammate's role. It's too big for one PR. Break it into tasks an agent can do one at a time.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns roughly five to seven ordered tasks, each with one intent that could be reviewed and merged as one pull request on its own.",
+          "Gives every task an observable acceptance criterion and names the evidence that will prove it (for example a named test, migration output or screenshot).",
+          "Gives every task a provisional change class, its known risks and its dependencies.",
+          "Flags the task that adds the invitations table or migration for human-approval-boundary.",
+          "Leaves the invitation expiry length as an owner question or visible placeholder instead of picking a number.",
+          "States that no task was started and no file was edited."
+        ]
+      }
+    },
+    {
+      "id": "mixed-layer-task-split-again",
+      "type": "should_trigger",
+      "prompt": "Here's my draft plan for the billing-address feature. Task 1: add the address columns, the new API endpoint and the settings form. Task 2: write the docs. Is this plan OK for an agent?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies that task 1 mixes the database schema, the API and the user interface and would not be reviewable as one pull request.",
+          "Splits task 1 into separate ordered tasks (schema change first, then the API, then the form), each with its own done criterion and evidence.",
+          "Flags the schema task for human-approval-boundary and keeps it separate from unrelated work."
+        ]
+      }
+    },
+    {
+      "id": "unknown-provider-becomes-spike",
+      "type": "should_trigger",
+      "prompt": "Plan the work to support single sign-on for enterprise customers. Provider to be decided. Give me PR-sized tasks.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Adds a time-boxed spike task whose output is an answer (for example a provider comparison), placed before the tasks it unblocks.",
+          "Raises the provider choice as an owner question and does not choose or assume a specific single sign-on provider or protocol as if decided.",
+          "Plans only tasks that do not depend on the undecided provider, or marks the dependent ones as blocked by the spike or question."
+        ]
+      }
+    },
+    {
+      "id": "refuses-to-start-task-one",
+      "type": "should_trigger",
+      "prompt": "Break the CSV export epic into tasks and then go ahead and start on task 1 in the repo.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns the task plan and stops; does not edit a file, create a branch or claim to have started task 1.",
+          "Explains that implementation starts separately, with the first task going to change-classification-gate under the normal gates."
+        ]
+      }
+    },
+    {
+      "id": "already-one-small-change",
+      "type": "should_trigger",
+      "prompt": "Break this into PR-sized tasks for the agent: fix the typo in the password-reset email subject line.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Says the goal already fits one small, reviewable change and does not produce a padded multi-task plan.",
+          "Hands off to change-classification-gate for the class and scope of that single change."
+        ]
+      }
+    },
+    {
+      "id": "classify-one-change-goes-elsewhere",
+      "type": "should_not_trigger",
+      "prompt": "I'm about to change the rate limit on the login endpoint. What change class is this and what validation does it need?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; classifying one change and setting its validation floor belongs to change-classification-gate."
+        ]
+      }
+    },
+    {
+      "id": "parallel-lanes-go-elsewhere",
+      "type": "should_not_trigger",
+      "prompt": "We're running three agents in parallel on the reporting rebuild. Write each lane's pre-work guide with its boundaries and what it must not touch.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; splitting work across parallel agent lanes and writing their guides belongs to lane-authoring-guide."
+        ]
+      }
+    },
+    {
+      "id": "design-doc-goes-elsewhere",
+      "type": "should_not_trigger",
+      "prompt": "Write the design doc for moving our notifications to a queue: architecture, data model, alternatives and rollout.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; writing the technical design belongs to tech-spec-writer."
+        ]
+      }
+    }
+  ]
+}

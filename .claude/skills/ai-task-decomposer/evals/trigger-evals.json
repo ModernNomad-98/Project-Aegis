@@ -1,0 +1,109 @@
+{
+  "skill": "ai-task-decomposer",
+  "description": "Trigger discrimination for splitting a broad goal into ordered, pull-request-sized tasks (D69, category 08 roadmap item #266) against the neighbors named in its description and the D69 scope proposal: classifying one change (change-classification-gate), writing the design (tech-spec-writer), parallel lanes versus one ordered sequence (lane-authoring-guide), writing product acceptance criteria (product-spec-writer), carrying evidence between stages (phased-work-handoff-designer), and team delivery commitments (roadmap-to-commitments-translator).",
+  "overlaps_with": [
+    "change-classification-gate",
+    "tech-spec-writer",
+    "lane-authoring-guide",
+    "product-spec-writer",
+    "phased-work-handoff-designer",
+    "roadmap-to-commitments-translator",
+    "acceptance-criteria-reviewer",
+    "reviewable-diff-discipline"
+  ],
+  "cases": [
+    {
+      "id": "epic-into-pr-sized-tasks-wins-here",
+      "prompt": "Break this epic into PR-sized tasks for one agent to do in order: customers can export their invoices as CSV or PDF, filtered by date range.",
+      "expected_skill": "ai-task-decomposer",
+      "should_not_trigger": [
+        "lane-authoring-guide",
+        "change-classification-gate"
+      ],
+      "reason": "One agent, one ordered sequence of pull-request-sized tasks from a goal too big for one change; no parallel lanes and no single change to classify."
+    },
+    {
+      "id": "parallel-agents-goes-to-lane-guide",
+      "prompt": "Split this effort across three parallel agents and write what each lane owns and must not touch.",
+      "expected_skill": "lane-authoring-guide",
+      "should_not_trigger": [
+        "ai-task-decomposer"
+      ],
+      "note": "SEAM CASE (D69) — parallel lanes belong to lane-authoring-guide; an ordered sequence of PR-sized tasks belongs to ai-task-decomposer.",
+      "reason": "Parallel lanes with mutually exclusive boundaries and pre-work guides are lane-authoring-guide's job, not an ordered task sequence."
+    },
+    {
+      "id": "what-class-goes-to-gate",
+      "prompt": "What class is this change and what validation does it need? I'm adding a nullable column to the orders table.",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "ai-task-decomposer"
+      ],
+      "reason": "One change that already fits one PR needs a class, validation floor and scope lock; there is nothing to split."
+    },
+    {
+      "id": "sprawling-diffs-wins-here",
+      "prompt": "Every time I hand the agent 'build the admin dashboard' it comes back with a 60-file diff. How should I cut the work up before handing it over?",
+      "expected_skill": "ai-task-decomposer",
+      "should_not_trigger": [
+        "change-classification-gate",
+        "tech-spec-writer"
+      ],
+      "reason": "The task handed to the agent is too big; the fix is an ordered plan of small tasks before work starts, not classifying one change or writing a design."
+    },
+    {
+      "id": "write-design-goes-to-tech-spec",
+      "prompt": "Write the design doc for the new search service: architecture, data model, APIs and alternatives considered.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "ai-task-decomposer"
+      ],
+      "reason": "Writing the technical design is tech-spec-writer; the decomposer only splits an agreed design into tasks."
+    },
+    {
+      "id": "feature-acceptance-criteria-goes-to-product-spec",
+      "prompt": "Write acceptance criteria for this feature: team members can leave comments on invoices.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": [
+        "ai-task-decomposer"
+      ],
+      "reason": "User-facing acceptance criteria for a feature belong to the product spec; the decomposer writes one done criterion per planned task, not the feature's criteria."
+    },
+    {
+      "id": "stage-handoff-goes-to-phased-designer",
+      "prompt": "Our migration runs in four stages across different sessions. Design how each stage hands its decisions and evidence to the next so nothing gets re-decided.",
+      "expected_skill": "phased-work-handoff-designer",
+      "should_not_trigger": [
+        "ai-task-decomposer"
+      ],
+      "reason": "The stages already exist; the ask is how decisions and evidence carry between them, not how to split the work."
+    },
+    {
+      "id": "roadmap-commitments-goes-to-translator",
+      "prompt": "Turn our Q3 roadmap into what the team can actually commit to, with date ranges and what we are not promising.",
+      "expected_skill": "roadmap-to-commitments-translator",
+      "should_not_trigger": [
+        "ai-task-decomposer"
+      ],
+      "reason": "Team delivery promises from a roadmap, grounded in capacity, are roadmap-to-commitments-translator's job, not agent-sized tasks."
+    },
+    {
+      "id": "review-existing-criteria-goes-to-reviewer",
+      "prompt": "The invoice-export story already has acceptance criteria from the product team. Tell me which of them can't be verified as written.",
+      "expected_skill": "acceptance-criteria-reviewer",
+      "should_not_trigger": [
+        "ai-task-decomposer"
+      ],
+      "reason": "Criteria written elsewhere need a per-criterion testability review; the decomposer writes one done criterion per task it plans and does not review a story's criteria."
+    },
+    {
+      "id": "trim-inflight-diff-goes-to-diff-discipline",
+      "prompt": "Explicitly invoke reviewable-diff-discipline. My working diff for the invite API has picked up unrelated refactors; trim it back and stage only the files for the API change.",
+      "expected_skill": "reviewable-diff-discipline",
+      "should_not_trigger": [
+        "ai-task-decomposer"
+      ],
+      "reason": "Keeping an in-progress diff to one intent while coding is reviewable-diff-discipline (manual-only, named here); the decomposer plans tasks before work starts and edits nothing."
+    }
+  ]
+}
