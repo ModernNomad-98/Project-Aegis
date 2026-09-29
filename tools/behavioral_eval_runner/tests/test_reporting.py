@@ -792,6 +792,154 @@ class TestSelectedPrecheckExclusion(unittest.TestCase):
         self.assertEqual(report["aggregates"][0]["aggregate_blocker"], "NOT_SELECTED")
         self.assertEqual(report["coverage_metrics"]["excluded_totals_by_reason"], {})
 
+    def test_not_selected_attempts_on_selected_exclusion_still_accepted(self) -> None:
+        """Pins the approved contract: attempts need not carry the preflight reason."""
+        report = self._report(self._unrun(ReasonCode.NOT_SELECTED), [self._aggregate()])
+        self.assertEqual(
+            report["coverage_metrics"]["excluded_totals_by_reason"],
+            {"PRECHECK_EXCLUDED": 1},
+        )
+
+
+class TestNonExecutedAggregateProvenance(unittest.TestCase):
+    """P2-4: an aggregate with no executed attempt is derived, never trusted."""
+
+    def setUp(self) -> None:
+        self.case = make_case(case_id="non-executed")
+        self.uid = self.case.case_uid
+        self.runnable = evaluate_case(self.case, PreflightEnvironment())
+        self.excluded = evaluate_case(
+            make_case(case_id="non-executed", required_commands=("vite",)),
+            PreflightEnvironment(),
+        )
+        self.setup_failed = fixture_setup_failure(self.case, "synthetic setup failure")
+
+    def _report(self, selected, preflight, attempts, aggregate):
+        selection = [self.uid] if selected else []
+        coverage = compute_coverage(
+            authored_units_total=1,
+            selected_case_uids=selection,
+            preflight_results=preflight,
+            attempts=attempts,
+            aggregates=[aggregate],
+            assertions_selected_total=0,
+            assertions_accounted_total=0,
+            assertions_actually_graded_total=0,
+        )
+        return build_run_report(
+            run_id=RUN,
+            baseline_identity={},
+            run_provenance={},
+            input_evidence_manifest_sha256=None,
+            attempts=attempts,
+            aggregates=[aggregate],
+            coverage=coverage,
+            selected_case_uids=selection,
+            preflight_results=preflight,
+        )
+
+    def _inconclusive(self, blocker, reason, attempts_planned=1, attempts_run=0):
+        return AggregateRecord(
+            case_uid=self.uid,
+            aggregate_verdict=AggregateVerdict.INCONCLUSIVE,
+            aggregate_blocker=blocker,
+            reason_code=reason,
+            attempts_planned=attempts_planned,
+            attempts_run=attempts_run,
+        )
+
+    def test_runnable_case_cannot_claim_precheck_exclusion(self) -> None:
+        """The audit reproduction: runnable=1 excluded={'PRECHECK_EXCLUDED': 1}."""
+        forged = self._inconclusive(
+            AggregateBlocker.PRECHECK_EXCLUDED, ReasonCode.MISSING_PREREQUISITE
+        )
+        # Forging the UNRUN attempt reason too must not make it consistent.
+        for reason in (ReasonCode.BUDGET_CAP, ReasonCode.MISSING_PREREQUISITE):
+            with self.subTest(attempt_reason=reason):
+                attempts = [planned_unrun_attempt(RUN, self.uid, 1, reason)]
+                with self.assertRaises(DishonestReportError):
+                    self._report(True, [self.runnable], attempts, forged)
+
+    def test_unselected_case_cannot_claim_budget_exhaustion(self) -> None:
+        forged = self._inconclusive(
+            AggregateBlocker.BUDGET_EXHAUSTED, ReasonCode.BUDGET_CAP
+        )
+        for reason in (ReasonCode.NOT_SELECTED, ReasonCode.BUDGET_CAP):
+            for preflight in ([], [self.excluded]):
+                with self.subTest(attempt_reason=reason, preflight=len(preflight)):
+                    attempts = [planned_unrun_attempt(RUN, self.uid, 1, reason)]
+                    with self.assertRaises(DishonestReportError):
+                        self._report(False, preflight, attempts, forged)
+        with self.assertRaises(DishonestReportError):
+            self._report(
+                False,
+                [],
+                [],
+                self._inconclusive(
+                    AggregateBlocker.BUDGET_EXHAUSTED,
+                    ReasonCode.BUDGET_CAP,
+                    attempts_planned=0,
+                ),
+            )
+
+    def test_fixture_setup_failure_cannot_become_budget_exhaustion(self) -> None:
+        attempts = [
+            AttemptRecord(
+                RUN,
+                self.uid,
+                1,
+                AttemptState.ERROR,
+                error_reason_code=ReasonCode.FIXTURE_SETUP_FAILED,
+            )
+        ]
+        forged = self._inconclusive(
+            AggregateBlocker.BUDGET_EXHAUSTED, ReasonCode.BUDGET_CAP, attempts_run=1
+        )
+        with self.assertRaisesRegex(DishonestReportError, "aggregate_blocker"):
+            self._report(True, [self.setup_failed], attempts, forged)
+        honest = self._inconclusive(
+            AggregateBlocker.ERROR, ReasonCode.FIXTURE_SETUP_FAILED, attempts_run=1
+        )
+        report = self._report(True, [self.setup_failed], attempts, honest)
+        self.assertEqual(report["coverage_metrics"]["excluded_totals_by_reason"], {})
+
+    def test_selected_runnable_unrun_blocker_must_match_attempts(self) -> None:
+        attempts = [planned_unrun_attempt(RUN, self.uid, 1, ReasonCode.BUDGET_CAP)]
+        with self.assertRaisesRegex(DishonestReportError, "aggregate_blocker"):
+            self._report(
+                True,
+                [self.runnable],
+                attempts,
+                default_unselected_aggregate(self.uid, attempts_planned=1),
+            )
+        report = self._report(
+            True,
+            [self.runnable],
+            attempts,
+            self._inconclusive(AggregateBlocker.BUDGET_EXHAUSTED, ReasonCode.BUDGET_CAP),
+        )
+        self.assertEqual(
+            report["coverage_metrics"]["excluded_totals_by_reason"],
+            {"BUDGET_EXHAUSTED": 1},
+        )
+
+    def test_honest_unselected_case_accepted(self) -> None:
+        for planned in (0, 1):
+            with self.subTest(attempts_planned=planned):
+                attempts = [
+                    planned_unrun_attempt(RUN, self.uid, rep, ReasonCode.NOT_SELECTED)
+                    for rep in range(1, planned + 1)
+                ]
+                report = self._report(
+                    False,
+                    [],
+                    attempts,
+                    default_unselected_aggregate(self.uid, attempts_planned=planned),
+                )
+                self.assertEqual(
+                    report["aggregates"][0]["aggregate_blocker"], "NOT_SELECTED"
+                )
+
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()

@@ -280,13 +280,18 @@ def _validate_executed_aggregates(
     attempts: list[AttemptRecord],
     aggregates: list[AggregateRecord],
     preflight_results: list[PreflightResult],
+    selected: set[str],
 ) -> None:
-    """Verify every executed RUNNABLE result against deterministic aggregation."""
-    runnable = {
-        result.case_uid
-        for result in preflight_results
-        if result.outcome is PreflightOutcome.RUNNABLE
-    }
+    """Verify EVERY aggregate against the records it must be derived from.
+
+    Executed or not, no aggregate is taken on trust (P2-4): an aggregate with
+    planned attempts is re-derived through ``aggregate_case``; one with none
+    must be the unselected default; a selected PRECHECK_EXCLUDED case must
+    equal its exclusion shape (its attempts may still carry NOT_SELECTED).
+    A PRECHECK_EXCLUDED blocker needs a selected PRECHECK_EXCLUDED preflight,
+    and an unselected case must report NOT_SELECTED.
+    """
+    preflight_by_case = {result.case_uid: result for result in preflight_results}
     by_case: dict[str, list[AttemptRecord]] = {}
     for attempt in attempts:
         by_case.setdefault(attempt.case_uid, []).append(attempt)
@@ -301,23 +306,54 @@ def _validate_executed_aggregates(
         "derived_from_executed_quorum",
     )
     for aggregate in aggregates:
-        case_attempts = by_case.get(aggregate.case_uid, [])
-        if aggregate.case_uid not in runnable or not any(
-            attempt.attempt_state is not AttemptState.UNRUN
-            for attempt in case_attempts
-        ):
-            continue
-        attempt_set = AttemptSet(
-            case_attempts[0].run_id, aggregate.case_uid, aggregate.attempts_planned
+        case_uid = aggregate.case_uid
+        case_attempts = by_case.get(case_uid, [])
+        preflight = preflight_by_case.get(case_uid)
+        selected_exclusion = (
+            case_uid in selected
+            and preflight is not None
+            and preflight.outcome is PreflightOutcome.PRECHECK_EXCLUDED
         )
-        try:
-            for attempt in case_attempts:
-                attempt_set.add(attempt)
-            expected = aggregate_case(attempt_set)
-        except AggregationError as exc:
+        if (
+            aggregate.aggregate_blocker is AggregateBlocker.PRECHECK_EXCLUDED
+            and not selected_exclusion
+        ):
             raise DishonestReportError(
-                f"aggregate {aggregate.case_uid} cannot be derived from its attempts: {exc}"
-            ) from exc
+                f"aggregate {case_uid} claims PRECHECK_EXCLUDED but the case is "
+                "not a selected case that preflight excluded"
+            )
+        if (
+            case_uid not in selected
+            and aggregate.aggregate_blocker is not AggregateBlocker.NOT_SELECTED
+        ):
+            raise DishonestReportError(
+                f"unselected case {case_uid} must report NOT_SELECTED, not "
+                f"{aggregate.aggregate_blocker.value}"
+            )
+        if selected_exclusion:
+            expected = AggregateRecord(
+                case_uid=case_uid,
+                aggregate_verdict=AggregateVerdict.INCONCLUSIVE,
+                aggregate_blocker=AggregateBlocker.PRECHECK_EXCLUDED,
+                reason_code=preflight.reason_code,
+                attempts_planned=aggregate.attempts_planned,
+            )
+        elif aggregate.attempts_planned == 0:
+            expected = default_unselected_aggregate(case_uid)
+        else:
+            attempt_set = AttemptSet(
+                case_attempts[0].run_id if case_attempts else "",
+                case_uid,
+                aggregate.attempts_planned,
+            )
+            try:
+                for attempt in case_attempts:
+                    attempt_set.add(attempt)
+                expected = aggregate_case(attempt_set)
+            except AggregationError as exc:
+                raise DishonestReportError(
+                    f"aggregate {case_uid} cannot be derived from its attempts: {exc}"
+                ) from exc
         for field in fields:
             if getattr(aggregate, field) != getattr(expected, field):
                 raise DishonestReportError(
@@ -435,7 +471,9 @@ def build_run_report(
     _validate_selected_exclusions(
         selected, preflight_by_case, attempts_list, aggregates_list
     )
-    _validate_executed_aggregates(attempts_list, aggregates_list, preflights)
+    _validate_executed_aggregates(
+        attempts_list, aggregates_list, preflights, selected
+    )
 
     # A3: derive coverage from the records and reject any caller mismatch.
     recomputed = compute_coverage(
