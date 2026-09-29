@@ -50,7 +50,7 @@ class ExpectedFreshnessOracle:
 
 def _load_expected_vector(path: Path) -> tuple[str, str, dict[str, str]]:
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
+        value = json.loads(path.read_text(encoding="utf-8-sig"))
     except (OSError, json.JSONDecodeError) as error:
         raise ValueError("expected vector must be readable JSON") from error
     if not isinstance(value, dict) or set(value) != {
@@ -82,7 +82,7 @@ def _load_expected_vector(path: Path) -> tuple[str, str, dict[str, str]]:
 
 def _load_authority(path: Path) -> SyntheticAuthority:
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
+        value = json.loads(path.read_text(encoding="utf-8-sig"))
     except (OSError, json.JSONDecodeError) as error:
         raise ValueError("authority key file must be readable JSON") from error
     if not isinstance(value, dict) or set(value) != {
@@ -242,7 +242,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         catalog_head, run_heads = store.load_verified(
             arguments.repository_id, authority=authority
         )
-    except (DispatchDenied, StorageIntegrityError, ValueError, sqlite3.Error) as error:
+    except (
+        DispatchDenied, StorageIntegrityError, ValueError, sqlite3.Error, OSError,
+    ) as error:
         print(f"verification failed: {error}", file=sys.stderr)
         return 3
     print(

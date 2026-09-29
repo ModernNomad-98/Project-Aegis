@@ -26344,6 +26344,39 @@ class SQLiteStateStoreTests(unittest.TestCase):
                 ):
                     SQLiteStateStore(path, self.oracle, "repo-1")
 
+    def test_p3_12_schema_check_rejects_quoted_literal_case_drift(self) -> None:
+        # The canonical form ignores keyword case and whitespace but must keep
+        # quoted literals exactly: CHECK ('SETTLED') and ('settled') differ.
+        self._prepared_validator_execution()
+        path = self.database_path.parent / "schema-literal-case.sqlite3"
+        shutil.copy2(self.database_path, path)
+        connection = sqlite3.connect(path)
+        try:
+            original = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' "
+                "AND name = 'validator_intents'"
+            ).fetchone()[0]
+            changed = original.replace("'SETTLED'", "'settled'", 1)
+            self.assertNotEqual(changed, original)
+            schema_version = connection.execute(
+                "PRAGMA schema_version"
+            ).fetchone()[0]
+            connection.execute("PRAGMA writable_schema = ON")
+            connection.execute(
+                "UPDATE sqlite_master SET sql = ? WHERE type = 'table' "
+                "AND name = 'validator_intents'",
+                (changed,),
+            )
+            connection.execute(f"PRAGMA schema_version = {schema_version + 1}")
+            connection.execute("PRAGMA writable_schema = OFF")
+            connection.commit()
+        finally:
+            connection.close()
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "schema is missing or incompatible"
+        ):
+            SQLiteStateStore(path, self.oracle, "repo-1")
+
     def test_f20_validator_intent_schema_rejects_partial_index_drift(self) -> None:
         self._prepared_validator_execution()
         path = self.database_path.parent / "schema-index.sqlite3"
@@ -27345,6 +27378,66 @@ class SQLiteStateStoreTests(unittest.TestCase):
         )
         self.assertFalse(hasattr(reader, "table_counts"))
         self.assertFalse(hasattr(reader, "accept_plan"))
+
+    def test_p3_17_read_only_verifier_has_every_store_field(self) -> None:
+        # The T22 verifier is built without opening, locking or migrating the
+        # store, but it must still carry every field a real store has, so a
+        # verifier method cannot hit a missing attribute.
+        fresh = ProductionSQLiteStateStore(
+            Path(self.temporary_directory.name) / "fields" / "state.sqlite3",
+            self.oracle, "repo-1",
+        )
+        reader = SQLiteStateReader(
+            self.database_path, self.oracle, "repo-1", self.authority
+        )
+        self.assertIs(type(reader._verifier), ProductionSQLiteStateStore)
+        self.assertEqual(set(vars(reader._verifier)), set(vars(fresh)))
+        self.assertIs(reader._verifier._classification_authority, self.authority)
+        self.assertFalse(reader._verifier.is_canonical)
+
+    def test_p3_17_verifier_only_store_refuses_to_connect(self) -> None:
+        verifier = ProductionSQLiteStateStore.read_only_verifier(
+            self.database_path, self.oracle, "repo-1", self.authority
+        )
+        with self.assertRaisesRegex(StorageIntegrityError, "verifier-only"):
+            verifier._connect()
+
+    def test_p3_17_verifier_programming_error_is_not_masked(self) -> None:
+        # An AttributeError is a coding mistake, not a local integrity
+        # finding; it must surface instead of degrading to UNVERIFIED.
+        plan = self.store.accept_plan(
+            PlanAcceptanceRequest(
+                "plan-1", "plan-command-1", "plan-event-1", "repo-1",
+                "run-1", "item-1", "effect-1", "revision-1",
+                "descriptor-digest", "scope-1", "budget-policy-digest",
+                ("check-1",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        catalog_head, run_heads = self.store.load_verified(
+            "repo-1", authority=self.authority
+        )
+        coordinator = SyntheticReadCoordinator(
+            SQLiteStateReader(
+                self.database_path,
+                CompleteFreshnessOracle(catalog_head, run_heads),
+                "repo-1",
+                self.authority,
+            ),
+            TransitionEngine(),
+        )
+        request = TerminalRestartRequest(
+            "terminal-restart-1", "repo-1", "run-1", LifecycleState.STOPPED,
+        )
+        with patch.object(
+            ProductionSQLiteStateStore, "_verify_projections",
+            side_effect=AttributeError("verifier field is missing"),
+        ):
+            with self.assertRaisesRegex(
+                AttributeError, "verifier field is missing"
+            ):
+                coordinator.report_terminal_restart(request)
 
     def test_t22_denies_restart_for_completed_and_failed_final(self) -> None:
         request, attestation = self._prepare_finalization()

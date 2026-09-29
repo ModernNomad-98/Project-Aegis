@@ -36,7 +36,7 @@ from .contracts import (
     parse_validator_containment_spec,
     validator_containment_digest,
 )
-from .storage import default_state_root
+from .storage import canonical_schema_sql, default_state_root
 from .owned_paths import (
     connect_checked,
     nearest_existing_trusted_root,
@@ -673,12 +673,6 @@ class SyntheticValidatorAdapter:
         with closing(self._connect()) as connection:
             self._migrate_ledger(connection, failure_hook=migration_failure_hook)
 
-    @staticmethod
-    def _canonical_schema(sql: str) -> str:
-        return "".join(sql.upper().split()).replace(
-            "IFNOTEXISTS", ""
-        ).rstrip(";")
-
     @classmethod
     def _migrate_ledger(cls, connection: sqlite3.Connection, *, failure_hook=None) -> None:
         connection.execute("BEGIN IMMEDIATE")
@@ -773,8 +767,8 @@ class SyntheticValidatorAdapter:
                 int(connection.execute("PRAGMA user_version").fetchone()[0]) != 1
                 or set(rows) != expected_tables
                 or any(
-                    cls._canonical_schema(rows[name])
-                    != cls._canonical_schema(expected_sql[name])
+                    canonical_schema_sql(rows[name])
+                    != canonical_schema_sql(expected_sql[name])
                     for name in expected_tables
                 )
                 or [tuple(row) for row in metadata]

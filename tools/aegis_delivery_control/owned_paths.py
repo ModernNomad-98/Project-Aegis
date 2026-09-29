@@ -34,6 +34,14 @@ class PathCapabilityUnavailable(StorageIntegrityError):
     """The host cannot prove the required owned-path guarantee."""
 
 
+class OwnedPathChangedAfterCommit(PathCapabilityUnavailable):
+    """The write is durable, but the owned path changed during the commit.
+
+    Callers must not treat this as a failed write or retry it: the
+    transaction committed before the change was detected.
+    """
+
+
 @dataclass(frozen=True)
 class PathIdentity:
     platform: str
@@ -872,6 +880,13 @@ class CheckedPathCapability:
 
 class CheckedSQLiteConnection(sqlite3.Connection):
     _owned_path_capability: CheckedPathCapability | None = None
+    # Set when a commit became durable but the post-commit path check
+    # failed. It is kept until close(): rollback() with no open transaction
+    # re-raises it, and close() raises it if its own path check fails, so the
+    # call-site patterns "except BaseException: rollback(); raise", "with
+    # closing(...)" and "finally: close()" all deliver the typed signal
+    # instead of a fresh path error.
+    _committed_integrity_error: "OwnedPathChangedAfterCommit | None" = None
 
     def _check_owned_path(self) -> None:
         if self._owned_path_capability is not None:
@@ -879,21 +894,50 @@ class CheckedSQLiteConnection(sqlite3.Connection):
             self._owned_path_capability.check_sidecars()
 
     def commit(self) -> None:
+        self._committed_integrity_error = None
+        # Refuse to commit into a swapped database leaf. The sidecar check
+        # waits until after the commit: while the transaction is open SQLite
+        # holds a live rollback journal that it created itself, and on an
+        # elevated Windows host that journal is owned by the token default
+        # owner, not the user.
+        if self._owned_path_capability is not None:
+            self._owned_path_capability.assert_current()
         super().commit()
-        self._check_owned_path()
+        try:
+            self._check_owned_path()
+        except PathCapabilityUnavailable as error:
+            committed = OwnedPathChangedAfterCommit(
+                f"transaction committed, but owned path integrity was lost: {error}"
+            )
+            self._committed_integrity_error = committed
+            raise committed from error
 
     def rollback(self) -> None:
+        committed = self._committed_integrity_error
+        if committed is not None and not self.in_transaction:
+            # Nothing to roll back: the write is durable. Keep the signal.
+            raise committed
+        self._committed_integrity_error = None
         super().rollback()
         self._check_owned_path()
 
     def close(self) -> None:
         capability = self._owned_path_capability
+        committed = self._committed_integrity_error
         try:
             super().close()
             if capability is not None:
-                capability.assert_current()
-                capability.check_sidecars()
+                try:
+                    capability.assert_current()
+                    capability.check_sidecars()
+                except PathCapabilityUnavailable as error:
+                    if committed is not None:
+                        # The write is durable; report that, not a plain
+                        # path failure.
+                        raise committed from error
+                    raise
         finally:
+            self._committed_integrity_error = None
             if capability is not None:
                 capability.close()
                 self._owned_path_capability = None

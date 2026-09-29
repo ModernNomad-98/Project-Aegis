@@ -19,8 +19,15 @@ from tools.aegis_delivery_control.adapters import (
     SyntheticExecutionAdapter,
     SyntheticValidatorAdapter,
 )
+from tools.aegis_delivery_control.authority import SyntheticAuthority
 from tools.aegis_delivery_control.contracts import DispatchDenied
-from tools.aegis_delivery_control.cli import ExpectedFreshnessOracle, _status, main
+from tools.aegis_delivery_control.cli import (
+    ExpectedFreshnessOracle,
+    _load_authority,
+    _load_expected_vector,
+    _status,
+    main,
+)
 from tools.aegis_delivery_control.owned_paths import (
     CheckedPathCapability,
     PathCapabilityUnavailable,
@@ -883,6 +890,285 @@ class WindowsAclPrincipalTests(unittest.TestCase):
             self._verify(
                 user, self.PRIVATE.format(user=user) + "(A;OICI;FA;;;BU)", os_anchor=True
             )
+
+
+class CliInputFileTests(unittest.TestCase):
+    """P3-15 and P3-19: CLI input files and OS errors on the verify path."""
+
+    def _write(self, root: Path, name: str, value: object, *, bom: bool) -> Path:
+        path = root / name
+        text = json.dumps(value)
+        path.write_bytes(("﻿" + text if bom else text).encode("utf-8"))
+        return path
+
+    def test_expected_vector_accepts_utf8_bom(self) -> None:
+        # Windows PowerShell 5.1 Out-File writes a UTF-8 byte-order mark.
+        vector = {
+            "repository_id": "repo-1",
+            "catalog_head": "catalog-1",
+            "run_heads": {"run-1": "head-1"},
+        }
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            for bom in (False, True):
+                with self.subTest(bom=bom):
+                    path = self._write(root, f"vector-{bom}.json", vector, bom=bom)
+                    self.assertEqual(
+                        _load_expected_vector(path),
+                        ("repo-1", "catalog-1", {"run-1": "head-1"}),
+                    )
+
+    def test_authority_key_file_accepts_utf8_bom(self) -> None:
+        key = {"synthetic_issuer_key_hex": "ab" * 32}
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            for bom in (False, True):
+                with self.subTest(bom=bom):
+                    path = self._write(root, f"key-{bom}.json", key, bom=bom)
+                    self.assertEqual(
+                        _load_authority(path).issuer_fingerprint,
+                        SyntheticAuthority(bytes.fromhex("ab" * 32)).issuer_fingerprint,
+                    )
+
+    def test_verify_reports_os_error_as_exit_code_three(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            database = root / "state.sqlite3"
+            database.write_bytes(b"")
+            vector = self._write(
+                root, "vector.json",
+                {"repository_id": "repo-1", "catalog_head": "c", "run_heads": {}},
+                bom=False,
+            )
+            key = self._write(
+                root, "key.json", {"synthetic_issuer_key_hex": "ab" * 32},
+                bom=False,
+            )
+            stderr = io.StringIO()
+            with patch(
+                "tools.aegis_delivery_control.cli._database_path",
+                return_value=database,
+            ), patch(
+                "tools.aegis_delivery_control.cli.SQLiteStateStore.open_canonical",
+                side_effect=OSError("synthetic disk error"),
+            ), redirect_stderr(stderr):
+                result = main([
+                    "--repository-id", "repo-1", "verify",
+                    "--expected-vector", str(vector),
+                    "--authority-key-file", str(key),
+                ])
+            self.assertEqual(result, 3)
+            self.assertIn("verification failed: synthetic disk error", stderr.getvalue())
+
+
+class CheckedConnectionCommitTests(unittest.TestCase):
+    """P3-18: the owned path is checked before and after a commit."""
+
+    def _open(self, root: Path) -> tuple[Path, owned_paths.CheckedSQLiteConnection]:
+        path = root / "owned.sqlite3"
+        identity = prepare_owned_file(path, create=True, trusted_root=root)
+        connection = connect_checked(path, expected=identity, trusted_root=root)
+        connection.execute("CREATE TABLE facts (value TEXT NOT NULL)")
+        return path, connection
+
+    @staticmethod
+    def _rows(path: Path) -> list[tuple[str]]:
+        with closing(sqlite3.connect(path)) as reader:
+            return reader.execute("SELECT value FROM facts").fetchall()
+
+    def test_commit_refuses_to_write_when_owned_path_changed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            path, connection = self._open(Path(temporary_directory))
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                connection.execute("INSERT INTO facts VALUES ('pending')")
+                capability = connection._owned_path_capability
+                with patch.object(
+                    capability, "assert_current",
+                    side_effect=PathCapabilityUnavailable("owned path swapped"),
+                ):
+                    with self.assertRaisesRegex(
+                        PathCapabilityUnavailable, "owned path swapped"
+                    ) as raised:
+                        connection.commit()
+                self.assertNotIsInstance(
+                    raised.exception, owned_paths.OwnedPathChangedAfterCommit
+                )
+                self.assertTrue(connection.in_transaction)
+                connection.rollback()
+            finally:
+                connection.close()
+            self.assertEqual(self._rows(path), [])
+
+    def test_pre_commit_check_ignores_live_rollback_journal(self) -> None:
+        # While a transaction is open SQLite owns a live rollback journal.
+        # On an elevated Windows host its owner is the token default owner,
+        # not the user, so the sidecar check must wait until the commit has
+        # removed it; only the database leaf is checked before committing.
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            path, connection = self._open(Path(temporary_directory))
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                connection.execute("INSERT INTO facts VALUES ('durable')")
+                capability = connection._owned_path_capability
+                original = capability.check_sidecars
+                calls = []
+
+                def journal_owned_by_default_owner() -> None:
+                    calls.append(connection.in_transaction)
+                    if connection.in_transaction:
+                        raise PathCapabilityUnavailable(
+                            "managed path is not owned by this principal"
+                        )
+                    original()
+
+                with patch.object(
+                    capability, "check_sidecars",
+                    side_effect=journal_owned_by_default_owner,
+                ):
+                    connection.commit()
+                self.assertEqual(calls, [False])
+            finally:
+                connection.close()
+            self.assertEqual(self._rows(path), [("durable",)])
+
+    def test_commit_reports_committed_write_when_path_changes_after(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            path, connection = self._open(Path(temporary_directory))
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                connection.execute("INSERT INTO facts VALUES ('durable')")
+                capability = connection._owned_path_capability
+                original = capability.assert_current
+                calls = []
+
+                def fail_after_commit() -> None:
+                    calls.append(connection.in_transaction)
+                    if not connection.in_transaction:
+                        raise PathCapabilityUnavailable("owned path swapped")
+                    original()
+
+                with patch.object(
+                    capability, "assert_current", side_effect=fail_after_commit
+                ):
+                    with self.assertRaisesRegex(
+                        owned_paths.OwnedPathChangedAfterCommit, "committed"
+                    ) as raised:
+                        connection.commit()
+                self.assertIsInstance(raised.exception, PathCapabilityUnavailable)
+                self.assertEqual(calls, [True, False])
+            finally:
+                connection.close()
+            self.assertEqual(self._rows(path), [("durable",)])
+
+    def test_committed_signal_survives_production_rollback_pattern(self) -> None:
+        # Production call sites do: try: commit() except BaseException:
+        # rollback(); raise. The rollback must not replace the typed signal.
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            path, connection = self._open(Path(temporary_directory))
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                connection.execute("INSERT INTO facts VALUES ('durable')")
+                capability = connection._owned_path_capability
+                original = capability.assert_current
+
+                def fail_after_commit() -> None:
+                    if not connection.in_transaction:
+                        raise PathCapabilityUnavailable("owned path swapped")
+                    original()
+
+                with patch.object(
+                    capability, "assert_current", side_effect=fail_after_commit
+                ):
+                    with self.assertRaises(
+                        owned_paths.OwnedPathChangedAfterCommit
+                    ):
+                        try:
+                            connection.commit()
+                        except BaseException:
+                            connection.rollback()
+                            raise
+                # The marker is kept until close(): a later rollback with no
+                # open transaction still reports the durable write.
+                with self.assertRaises(owned_paths.OwnedPathChangedAfterCommit):
+                    connection.rollback()
+            finally:
+                connection.close()
+            self.assertEqual(self._rows(path), [("durable",)])
+
+    def _persistent_swap(self, connection):
+        """Swap the path during commit and keep it swapped through close()."""
+        capability = connection._owned_path_capability
+        original = capability.assert_current
+        state = {"armed": False, "swapped": False}
+
+        def check() -> None:
+            if state["swapped"] or (state["armed"] and not connection.in_transaction):
+                state["swapped"] = True
+                raise PathCapabilityUnavailable("owned path swapped")
+            original()
+
+        return state, patch.object(capability, "assert_current", side_effect=check)
+
+    def test_committed_signal_survives_closing_pattern(self) -> None:
+        # storage.py and adapters.py: with closing(connect()) as connection.
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            path, connection = self._open(Path(temporary_directory))
+            state, swap = self._persistent_swap(connection)
+            with swap:
+                with self.assertRaises(
+                    owned_paths.OwnedPathChangedAfterCommit
+                ) as raised:
+                    with closing(connection) as active:
+                        active.execute("BEGIN IMMEDIATE")
+                        active.execute("INSERT INTO facts VALUES ('durable')")
+                        state["armed"] = True
+                        try:
+                            active.commit()
+                        except BaseException:
+                            active.rollback()
+                            raise
+            self.assertTrue(state["swapped"])
+            self.assertIsInstance(raised.exception.__cause__, PathCapabilityUnavailable)
+            self.assertIsNone(connection._owned_path_capability)
+            self.assertEqual(self._rows(path), [("durable",)])
+
+    def test_committed_signal_survives_finally_close_pattern(self) -> None:
+        # authority.py: try: ... commit() except: rollback(); raise
+        # finally: connection.close().
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            path, connection = self._open(Path(temporary_directory))
+            state, swap = self._persistent_swap(connection)
+            with swap:
+                with self.assertRaises(owned_paths.OwnedPathChangedAfterCommit):
+                    try:
+                        connection.execute("BEGIN IMMEDIATE")
+                        connection.execute("INSERT INTO facts VALUES ('durable')")
+                        state["armed"] = True
+                        connection.commit()
+                    except BaseException:
+                        connection.rollback()
+                        raise
+                    finally:
+                        connection.close()
+            self.assertTrue(state["swapped"])
+            self.assertIsNone(connection._owned_path_capability)
+            self.assertEqual(self._rows(path), [("durable",)])
+
+    def test_close_without_lost_commit_still_reports_plain_path_error(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            _, connection = self._open(Path(temporary_directory))
+            capability = connection._owned_path_capability
+            with patch.object(
+                capability, "assert_current",
+                side_effect=PathCapabilityUnavailable("owned path swapped"),
+            ):
+                with self.assertRaises(PathCapabilityUnavailable) as raised:
+                    connection.close()
+            self.assertNotIsInstance(
+                raised.exception, owned_paths.OwnedPathChangedAfterCommit
+            )
+            self.assertIsNone(connection._owned_path_capability)
 
 
 if __name__ == "__main__":
