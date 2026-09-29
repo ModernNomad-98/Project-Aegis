@@ -642,7 +642,7 @@ class HashLockTests(unittest.TestCase):
         pin = next(line for line in text.splitlines() if line.startswith("pyyaml=="))
         self.assertEqual(pin.split("==", 1)[1].strip(), self.pins["pyyaml"][0])
 
-    def test_both_jobs_install_only_the_hash_locked_set(self):
+    def test_both_gate_jobs_install_only_the_hash_locked_set(self):
         workflow = load_workflow()
         for job_name in ("validate-skills", "windows-offline-checks"):
             with self.subTest(job=job_name):
@@ -652,6 +652,15 @@ class HashLockTests(unittest.TestCase):
                 self.assertIn("python -P -m pip check", runs)
                 self.assertGreater(runs.index("python -P -m pip check"),
                                    runs.index(shlex.join(LOCKED_INSTALL)))
+
+    def test_every_pip_install_in_any_job_is_the_hash_locked_one(self):
+        # A tools job that later gains a pip install must use the same lock.
+        for job_name, job in load_workflow()["jobs"].items():
+            for step in job.get("steps", []):
+                for line in step.get("run", "").splitlines():
+                    if "pip" in line and "install" in line:
+                        with self.subTest(job=job_name, step=step.get("name", "")):
+                            self.assertEqual(LOCKED_INSTALL, shlex.split(line))
 
     def test_parser_rejects_an_unhashed_or_unexpected_line(self):
         with self.assertRaises(ValueError):
