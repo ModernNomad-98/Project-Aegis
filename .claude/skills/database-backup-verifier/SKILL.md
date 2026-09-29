@@ -30,7 +30,7 @@ example a `.sql`, `.dump` or `.bak` file). Each check gets one verdict:
 **VERIFIED** (the evidence was read and meets the requirement), **GAP** (the
 evidence was read and does not meet it) or **UNVERIFIED** (the evidence
 needed for a verdict could not be read, so no verdict is given).
-The Phase 6 skill `resilience-architecture-reviewer` sets RTO, RPO and
+The Phase 6 skill `resilience-architecture-reviewer` reviews RTO, RPO and
 DR design; if it is not in this copy of the library, say so and ask the
 owner for the recorded objectives instead.
 
