@@ -2,7 +2,9 @@
 
 Detail for `ci-failure-classifier`. Read on demand when a job's class is not
 obvious. The signatures below are examples, not an exhaustive list; the rule
-is always "quote the line that decided it".
+is always "quote the line that decided it". Terms such as job, runner and
+step, and the 401 and 403 status codes, follow the skill's reading key. A
+locator is the query a test uses to find a page element. MB means megabytes.
 
 ## Ordering rule
 

@@ -5,18 +5,26 @@ description: 'Classify a CI run''s failures and hidden problems from its logs an
 
 # CI Failure Classifier
 
+**Reading key:** A continuous integration (CI) run is made of jobs. Each job
+runs on a runner (the machine that executes it) and is made of steps (single
+commands). A matrix runs copies of one job with different values, such as
+operating system or version. In HTTP (Hypertext Transfer Protocol), status
+401 means the request was not authenticated and 403 means it was refused.
+JUnit XML (Extensible Markup Language) and JSON (JavaScript Object Notation)
+are common test-report formats.
+
 ## Purpose
 
-Answer two questions about a continuous integration (CI) run that already
-happened: **why is this run red**, and **is this green run really green?**
-Given the run's logs and reports, give every failed or suspicious job exactly
-one cause class backed by quoted log lines and job durations, and scan passing
-jobs for problems the green result hides. The value is routing: the next step
-goes to the right owner (product fix, test fix, secret owner, resume, runner
-owner) instead of a blind rerun that burns time and hides the real cause. The
-skill reads and reports only. It fetches nothing, reruns nothing, retries
-nothing and edits nothing. Built under owner decision **D68** (2026-09-28),
-from quality assurance (QA) roadmap rows #214 and #215 as merged by D10.
+Answer two questions about a CI run that already happened: **why is this
+run red**, and **is this green run really green?** Given the run's logs and
+reports, give every failed or suspicious job exactly one cause class, backed
+by quoted log lines and job durations. Also scan passing jobs for problems
+the green result hides. The value is routing. The next step goes to the
+right owner (product fix, test fix, secret owner, resume, runner owner). A
+blind rerun would burn time and hide the real cause. The skill reads and
+reports only. It fetches nothing, reruns nothing, retries nothing and edits
+nothing. It was built under owner decision **D68** (2026-09-28), from quality
+assurance (QA) roadmap rows #214 and #215 as merged by owner decision D10.
 
 ## Use When
 
