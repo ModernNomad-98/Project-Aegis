@@ -95,7 +95,12 @@ This example does not create or authorize a shipped skill.
 | `name` | yes | Must exactly equal the containing directory name. This is the repo convention that keeps invocation, filesystem, and catalog in sync. Lowercase kebab-case. |
 | `description` | yes | Specific and **trigger-oriented** — say *when* to use the skill and *what it does*, in terms a model can match against a user request. Under **1024 characters**, measured on the parsed value (see the Portability contract below). Avoid vague verbs ("helps with", "handles"). |
 | `disable-model-invocation` | conditional | Set to `true` for any skill that performs **side effects** (writes files outside scratch, calls networks, mutates external state, spends money, deploys). Such skills must be invoked explicitly by a human, never auto-triggered by the model — and their description must lead with the exact `MANUAL-ONLY; never auto-invoke. ` sentinel (see the Portability contract below). **Bounded documentary exception:** the governing definition is Exception 1 in §5 below. It permits authorized ordinary documentation create/append, immutable transcription of evidenced human approvals and lifecycle facts, and refresh of exactly six named project-state projection sections. Honor applicable existing authorization; obtain missing authority before writing. All excluded files and operations remain manual-only. **Second bounded exception (TALI, mirrors §5):** §5 also recognizes Task-Authorized Local Implementation — a separately classified, separately activated execution route whose mutations are confined to ordinary approved source/test files. It is behavior-based, names no skill as permanently eligible, and grants no existing shipped skill any authority merely by this policy's adoption; a side-effecting skill still needs `disable-model-invocation: true` unless a specific route is classified and activated under §5. |
-| `allowed-tools` | optional | If present, must be a **narrow** list. Broad grants (`*`, `all`, `Bash` alone with no scoping) are forbidden — they defeat least-privilege. Omit the field to inherit the session default rather than widening it. |
+| `license` | optional | License name or reference for the skill. |
+| `compatibility` | optional | Short note on the environments the skill targets. |
+| `metadata` | optional | A map of extra descriptive fields (for example owner or version). Claude Code reads only top-level keys, so nothing under it changes behavior. |
+| `hooks`, `allowed-tools`, `shell` | **forbidden** | `hooks` registers shell commands that keep running after the skill is invoked; `allowed-tools` pre-approves tools even where workspace trust would not (untrusted folders, `-p` runs), however narrow the list; `shell` selects the shell for injected commands. Shipped skills are instructions only, so the validator rejects all three. |
+
+These six fields are the whole allow-list: `scripts/validate-skills.py` rejects any other frontmatter key, a repeated key, YAML anchors, aliases, tags, directives or merge keys, and a `---` anywhere inside the frontmatter. It also rejects `!`-prefixed shell injection (an inline `` !`command` `` or a fence opened with `!`) in any markdown file of the skill folder, `_template` included.
 
 ### Description guidance
 
@@ -581,6 +586,6 @@ when to build which.
 - [ ] `SKILL.md` < 500 lines; detail pushed to `references/`.
 - [ ] All nine required sections present and in order.
 - [ ] `evals/evals.json` present and well-formed; `trigger-evals.json` if trigger overlaps.
-- [ ] No broad `allowed-tools`; `disable-model-invocation: true` if it has side effects (the §5 rule — its two bounded exceptions are the approved documentation/state write, which stays auto-invocable, and TALI, a separately classified and separately activated execution route that grants no shipped skill authority by default).
+- [ ] No `hooks`, `allowed-tools` or `shell` frontmatter and no `!` shell injection; `disable-model-invocation: true` if it has side effects (the §5 rule — its two bounded exceptions are the approved documentation/state write, which stays auto-invocable, and TALI, a separately classified and separately activated execution route that grants no shipped skill authority by default).
 - [ ] Listed in [`docs/skills-catalog.md`](skills-catalog.md) and `README.md`.
 - [ ] `scripts/validate-skills.py` passes.

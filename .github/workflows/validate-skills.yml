@@ -278,7 +278,18 @@ jobs:
           # up to the repository root, so nested copies are protected too. An
           # entry named `.claude` or `.claude/agents` itself (a git symlink, for
           # example) could redirect that lookup, so it is protected as well.
-          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|(.*/)?\.claude/agents(/|$)|(.*/)?\.claude$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
+          # Claude Code and Git configuration is protected too (follow-up to
+          # P2-3): .claude/settings*.json can define hooks, credential helpers
+          # and permissions; .mcp.json starts MCP server processes (without a
+          # prompt in -p and SDK runs); .claude/commands/ carries skill-style
+          # frontmatter the validator does not check; .claude/hooks/ holds
+          # scripts those hooks call; .claude-plugin/ bundles hooks and MCP
+          # servers; .gitattributes can hide diffs and change the bytes that
+          # evidence hashes cover. Claude Code and Git both read nested
+          # copies, so every depth is protected, and the commands, hooks and
+          # plugin directory entries match with or without a trailing slash
+          # so a symlink standing in for the directory is protected too.
+          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|(.*/)?\.claude/((agents|commands|hooks)(/|$)|settings(\.local)?\.json$)|(.*/)?\.claude$|(.*/)?\.claude-plugin(/|$)|(.*/)?\.mcp\.json$|(.*/)?\.gitattributes$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
           shopt -s nocasematch
           gate_files=()
           echo "Files changed in this PR:"
