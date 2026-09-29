@@ -2801,3 +2801,66 @@ the entry governs.
   UTC on 2026-09-29, so it was confirmed unavailable under AEGIS-APR-050.
   The [post-merge main run](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36598341550)
   passed.
+
+### AEGIS-APR-096: PR #543 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-097; no remaining use.
+  Recorded after the merge.
+- **Date / Grantor:** 2026-09-29 / Peter Nguyen.
+- **Reason:** [PR #543](https://github.com/ModernNomad-98/Project-Aegis/pull/543)
+  adds `.github/dependabot.yml` (and `.yaml`) to the paths `gate-guard`
+  protects, carrying out the owner's 2026-09-29 decision "Protect it
+  (Recommended)". It adds one alternative to `gate_pattern` and removes none.
+  It changes `.github/workflows/validate-skills.yml` and
+  `scripts/tests/test_offline_ci.py`, protected paths outside
+  AEGIS-APR-047's four BER files, so `gate-guard` fails, and merging needs a
+  one-time owner exception for the exact head.
+- **Scope allowed:** One `gate-guard` exception and administrator merge of
+  PR #543 at exact head `8fce63f6fb162617869a574b347f9cd37a94ecc1`, which
+  changed only `.github/workflows/validate-skills.yml`, `docs/offline-ci.md`
+  and `scripts/tests/test_offline_ci.py`.
+  [Exact-head run 36625345752](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36625345752)
+  passed `validate-skills`, `windows-offline-checks`, `tools-tests-linux`
+  and `tools-tests-windows`; `gate-guard` failed only on
+  `.github/workflows/validate-skills.yml` and
+  `scripts/tests/test_offline_ci.py`. The
+  [independent review](https://github.com/ModernNomad-98/Project-Aegis/pull/543#issuecomment-5899042081)
+  of the exact head returned SHIP. Codex posted only a usage-limit notice
+  after the head commit (20:17:25 UTC): at 20:17:51 UTC on 2026-09-29, so it
+  was confirmed unavailable under AEGIS-APR-050.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
+  not change branch protection, it removed no path from the protected path
+  set, and it did not widen AEGIS-APR-047.
+- **Evidence:** Direct owner answer "Approve exception, merge (Recommended)"
+  in the Project Aegis conversation (Claude Code session) on 2026-09-29,
+  before the merge, to the coordinating agent's question "PR #543 adds
+  .github/dependabot.yml (and .yaml) to gate-guard's protected paths, as you
+  decided. It's ready to merge. … gate-guard: red, as expected. It flags
+  exactly .github/workflows/validate-skills.yml and
+  scripts/tests/test_offline_ci.py. No register grant covers these two
+  paths, so merging needs your one-time exception for this exact commit.
+  Head: 8fce63f6fb162617869a574b347f9cd37a94ecc1. Approve the exception and
+  merge?", relayed by that agent. The selected option read: "I merge #543 at
+  exactly 8fce63f6 (the merge fails if the head moves) and record the
+  exception in the approval register afterwards." The
+  [merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/543#issuecomment-5899449010)
+  on PR #543 records the grant, head, flagged paths, review, checks and
+  merge.
+- **Expiry / use limit:** One merge of PR #543 at the named head; consumed
+  by the merge recorded in AEGIS-APR-097.
+
+### AEGIS-APR-097: Consumption of the PR #543 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-096.
+- **Status at recording:** AEGIS-APR-096 has no remaining use.
+- **Effective at:** 2026-09-29 21:36:59 UTC.
+- **Recorded at / By:** 2026-09-29 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039.
+- **New authority:** None. A later change to a protected path needs its own
+  exception.
+- **Reason:** The sole exact-head administrator merge completed.
+- **Evidence:** [PR #543](https://github.com/ModernNomad-98/Project-Aegis/pull/543)
+  merged `8fce63f6fb162617869a574b347f9cd37a94ecc1` as
+  `74411bc59072400a7eb7452c96a6061413c4065d` at the time above, with the
+  merge pinned to that head.
