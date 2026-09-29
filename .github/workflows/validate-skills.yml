@@ -316,6 +316,12 @@ jobs:
       - name: Run setup routing-contract tests
         run: python -P scripts/ci/record-check.py setup-tests -- python -m unittest discover -s tools/aegis_setup/tests -p 'test_*.py' -v
 
+      # Records the token user, default owner, elevation and temp-root owners
+      # that the owner-private delivery-control fixtures depend on (#512).
+      # Read-only; exits 0. `-m` needs the checkout root, so no -P.
+      - name: Record Windows ownership diagnostic
+        run: python -P scripts/ci/record-check.py delivery-control-diagnostic -- python -m tools.aegis_delivery_control.tests.windows_owner_diagnostic
+
       - name: Run delivery-control tests
         run: python -P scripts/ci/record-check.py delivery-control -- python -m unittest discover -s tools/aegis_delivery_control/tests -p 'test_*.py' -v
 

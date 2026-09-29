@@ -22,7 +22,9 @@ WORKFLOW = REPO / ".github/workflows/validate-skills.yml"
 VALIDATOR = REPO / "scripts/validate-skills.py"
 # The only module runs that need the checkout root on sys.path; gate-guard
 # protects every root-level importable name in their place.
-ROOT_PATH_MODULES = {"tools.behavioral_eval_runner", "unittest"}
+# The diagnostic runs only in the isolated tools-tests-windows job.
+ROOT_PATH_MODULES = {"tools.behavioral_eval_runner", "unittest",
+                     "tools.aegis_delivery_control.tests.windows_owner_diagnostic"}
 # A module placed beside a gate script: it loads the real module of the same
 # name, then forces the interpreter to exit 0 whatever the script returns.
 SHADOW_MODULE = """import atexit, importlib, os, sys
@@ -327,7 +329,11 @@ class GateJobIsolationTests(unittest.TestCase):
 
     GATE_JOBS = ("validate-skills", "windows-offline-checks")
     TOOLS_JOBS = ("tools-tests-linux", "tools-tests-windows")
-    TOOLS_LABELS = ("setup-bridge", "setup-tests", "delivery-control")
+    TOOLS_LABELS = {
+        "tools-tests-linux": ["setup-bridge", "setup-tests", "delivery-control"],
+        "tools-tests-windows": ["setup-bridge", "setup-tests",
+                                "delivery-control-diagnostic", "delivery-control"],
+    }
 
     @classmethod
     def setUpClass(cls):
@@ -386,7 +392,7 @@ class GateJobIsolationTests(unittest.TestCase):
                 self.assertEqual("false", checkout["with"]["persist-credentials"])
                 labels = [shlex.split(s["run"])[3] for s in job["steps"]
                           if "record-check.py" in s.get("run", "")]
-                self.assertEqual(list(self.TOOLS_LABELS), labels)
+                self.assertEqual(self.TOOLS_LABELS[job_name], labels)
 
     def test_gate_jobs_do_not_depend_on_tools_jobs(self):
         for job_name, job in self.workflow["jobs"].items():
