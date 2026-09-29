@@ -552,7 +552,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->190<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->191<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch), fronted by one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -589,7 +589,7 @@ keeps a human as the approval gate on anything irreversible. See
    strategy, test plans, coverage mapping, Playwright/unit/build QA, flake control, test data,
    evidence policy, and CI run failure classification (added by D68). *e.g.* `qa-strategy-architect`, `test-coverage-mapper`,
    `playwright-e2e-engineer`, `flaky-test-detective`, `screenshot-evidence-planner`.
-7. **Cloud, DevOps, reliability & release** *(Phase 6, 10)* — running it in production: cloud
+7. **Cloud, DevOps, reliability & release** *(Phase 6, 11)* — running it in production: cloud
    choice, Azure/AWS mapping, IaC review, CI pipelines, release readiness, rollback,
    observability, SLOs, incidents. *e.g.* `cloud-architecture-decider`, `iac-reviewer`,
    `release-readiness-reviewer`, `rollback-runbook-author`, `slo-reliability-architect`.
@@ -975,6 +975,7 @@ merged into `rollback-runbook-author` per reconciliation §3):
 | `observability-operator` | Hands-on observability: structured redacted instrumentation, truthful health checks, alerts with severity/owner/runbook-link/justified threshold, query-verified claims, silences only with owner+expiry. | **manual only** |
 | `slo-reliability-architect` | Journey-derived SLOs: symptom-based SLIs with measurement points, error budgets in user units, burn-rate paging with cause-alert demotion, budget policy with consequences, per-tenant reliability views. | auto + manual |
 | `incident-response-runbook` | Incident machinery: one-minute severity ladder, IC/comms/ops roles, triage to decision points, containment invoking the rollback artifact by reference, tenant-aware comms, blameless postmortem where every finding lands as a test/alert/fix or owned risk. | auto + manual |
+| `database-backup-verifier` | (D71, #253) Proves per store that a usable backup exists: read-only evidence mode checks exists, non-empty, current against the RPO (recovery point objective), retained, encrypted and off-account copy; drill mode restores only into a new non-production scratch target after approval of the exact plan with its estimated cost, checks row-count and checksum parity and restore time against the RTO (recovery time objective), then deletes the copy; flags database dumps in the repository history; credentials by variable name. | **manual only** |
 
 Phase 7 — AI security & LLM systems pack (14 = v4's 10 + 4 OWASP LLM Top 10 gap
 additions, D6). Anchored to the OWASP Top 10 for LLM Applications (2026),

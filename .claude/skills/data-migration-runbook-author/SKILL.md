@@ -82,7 +82,8 @@ re-derives neither.
    verdict, and a VERIFIED backup (not "backups are enabled" — evidence
    of a recent successful backup/restore test appropriate to the move's
    blast radius). Absent any of the three, the runbook is not writable
-   yet; say which is missing.
+   yet; say which is missing. `database-backup-verifier` *(manual-only)*
+   produces that backup evidence when a person invokes it.
 2. **Write the preconditions section.** Concrete gates with commands'
    PURPOSE and expected output: backup evidence check, dry-run on a
    sampled/staging keyspace with its expected parity result, disk/
