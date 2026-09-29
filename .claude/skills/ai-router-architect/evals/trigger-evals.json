@@ -1,7 +1,7 @@
 {
   "skill": "ai-router-architect",
-  "description": "Trigger discrimination for the Phase 7 AI-platform-ops cluster: model-routing/gateway layer vs cost policy vs telemetry implementation vs credential custody vs output schema, and against the shipped observability-operator and secrets-identity-hardener.",
-  "overlaps_with": ["ai-cost-guardrail-designer", "observability-operator", "secrets-identity-hardener", "structured-output-validator"],
+  "description": "Trigger discrimination for the Phase 7 AI-platform-ops cluster: model-routing/gateway layer vs cost policy vs telemetry implementation vs credential custody vs output schema, and against the shipped observability-operator and secrets-identity-hardener, and against agent-harness-architect (agent registry) and structured-output-validator (output shape) for provider adapters and the capability matrix.",
+  "overlaps_with": ["ai-cost-guardrail-designer", "observability-operator", "secrets-identity-hardener", "structured-output-validator", "agent-harness-architect"],
   "cases": [
     {
       "id": "router-layer-wins-here",
@@ -37,6 +37,33 @@
       "expected_skill": "structured-output-validator",
       "should_not_trigger": ["ai-router-architect"],
       "reason": "Output shape/schema validation is structured-output-validator; the router moves requests/responses but doesn't own the output contract."
+    },
+    {
+      "id": "provider-adapter-goes-to-router-not-harness",
+      "prompt": "Explicitly invoke ai-router-architect. We are swapping one model provider for another. Design the adapter that maps its tool calls, streaming and errors onto our internal model interface, plus the conformance tests it must pass.",
+      "expected_skill": "ai-router-architect",
+      "should_not_trigger": [
+        "agent-harness-architect"
+      ],
+      "reason": "Per-provider adapters, the capability matrix and adapter conformance tests are this skill's extension (D70); agent-harness-architect keeps the agent's closed tool and provider registry, not the provider-to-interface mapping."
+    },
+    {
+      "id": "agent-registry-goes-to-harness",
+      "prompt": "Design the closed, versioned tool and provider registry our agent runtime checks, so an unknown capability fails instead of being improvised.",
+      "expected_skill": "agent-harness-architect",
+      "should_not_trigger": [
+        "ai-router-architect"
+      ],
+      "reason": "The agent's closed tool/provider registry and fail-on-unknown rule belong to agent-harness-architect; the router maps providers onto its interface but does not own the agent registry."
+    },
+    {
+      "id": "capability-matrix-goes-to-router-not-output-validator",
+      "prompt": "Explicitly invoke ai-router-architect. Our fallback model cannot produce structured output. Make sure routing and fallback never send a structured-output task to a model that lacks that feature.",
+      "expected_skill": "ai-router-architect",
+      "should_not_trigger": [
+        "structured-output-validator"
+      ],
+      "reason": "Which model may receive a task, checked against a capability matrix, is routing and fallback design in this skill; structured-output-validator owns the output schema, not model selection."
     }
   ]
 }

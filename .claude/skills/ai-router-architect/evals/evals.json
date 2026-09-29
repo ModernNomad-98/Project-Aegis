@@ -66,6 +66,46 @@
           "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names ai-router-architect, not observability-operator, because provider selection, fallback and key custody at one choke point are the routing layer, not telemetry implementation."
         ]
       }
+    },
+    {
+      "id": "adapter-second-provider-tool-call-streaming",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke ai-router-architect. We route everything through one internal interface on OpenAI today and are adding Anthropic as a second provider. Their tool-call formats and streaming chunk shapes differ. Design how the second provider plugs in.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs one adapter per provider that maps requests, responses, tool calls, streaming chunks and errors onto the single internal interface.",
+          "States that no provider-specific type crosses the interface, so calling code imports no provider software development kit (SDK) type.",
+          "Adds the new provider's models to the capability matrix and requires both adapters to pass one shared conformance suite (round trip, tool call, streaming order and end, each error class) before serving traffic.",
+          "Keeps credentials server-side and hands the change over as a proposed design or diff because the skill is manual-only."
+        ]
+      }
+    },
+    {
+      "id": "capability-matrix-blocks-unsafe-fallback",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke ai-router-architect. Our primary model returns structured JSON for invoice extraction. When it is down we fall back to a cheaper model that has no structured-output support. Design the fallback.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Consults the capability matrix and blocks the fallback model for the structured-output task instead of letting it silently return unusable output.",
+          "Names a defined degraded response (for example queue for retry or a clear unavailable result) when no qualifying model is available.",
+          "Surfaces the fallback decision in telemetry and leaves the output schema itself to structured-output-validator."
+        ]
+      }
+    },
+    {
+      "id": "provider-errors-mapped-before-retry",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke ai-router-architect. Each provider returns different error codes for rate limits, overload and content refusals, and our retry logic checks raw provider codes. Fix the design.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Maps each provider's error codes to the router's own error classes inside the adapter, before any retry decision.",
+          "Retries only transient classes (rate limit, overload) with bounded backoff and never retries a content refusal as if it were transient.",
+          "Adds each error class to the adapter conformance suite."
+        ]
+      }
     }
   ]
 }
