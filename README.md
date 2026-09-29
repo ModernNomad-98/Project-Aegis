@@ -407,7 +407,7 @@ cp -r .claude/skills/tdd-engineer /path/to/your-repo/.claude/skills/
 
 `cp -r` is the same copy on Mac and Linux (`-r` means "include everything inside the folder").
 
-Copied skills contain instructions only: no hooks, no `allowed-tools` pre-approvals, no `!` shell injection and no plugin or MCP files. The source repository's validator enforces this on every shipped skill, so copying one never adds code that runs when the skill is invoked.
+Copied skills add nothing that runs automatically: no hooks, no `allowed-tools` pre-approvals, no `!` shell injection and no plugin or Model Context Protocol (MCP) server files. The source repository's validator enforces this on every shipped skill, so invoking a copied skill never runs code by itself. One skill also carries scripts: the manual-only `aegis-setup` includes PowerShell scripts, which the assistant can run only through its ordinary command tool, under your normal permission checks.
 
 **Copying the startup files does not make your repo the Project Aegis source.**
 Copying `.claude/skills`, `CLAUDE.md`, and `AGENTS.md` into your own repo is the supported consumer installation, and those copied files stay *tools inside your product repository*.
@@ -839,6 +839,7 @@ For current shipped skills, use the [catalog](docs/skills-catalog.md).
 | D47 | Superadmin observability console design (1 = `superadmin-observability-console-designer`, joins family 18), 183→184. The cross-tenant MONITORING/observability console DESIGN owner — closes the three-way pointer hole (`admin-console-architect` explicitly punts "dashboards/metrics/traces/logs to SEE system state" → `observability-operator` operates Grafana-class backends (manual-only, designs no console) → `slo-reliability-architect` only decides what pages; nobody designed the console). Owns: layered panel IA with restraint (one health answer first, drill-down groups, escalation badges); the cross-tenant READ-security model (dedicated deny-all-RLS platform-admin registry with grant provenance, NO self-service grant, three-layer server-side re-check off one SECURITY-DEFINER membership function, read-only-by-default with privileged-write-only telemetry, denied-access-as-metric, break-glass CONTENT reveal with five checkable properties, two caller lanes with narrowing-only destructive filters); the server-shaped read model; honest-gap typing (`wired: false` + a known-gaps page); the DB/query-perf panel spec (the most commonly missing panel, honest limits stated); posture-as-verification-results + the DB self-monitoring caveat. Hard seam: **compose, never restate** — every panel names its feed owner (~12 cited: `slo-reliability-architect`, `audit-log-architect`, `security-logging-alerting-architect`, `synthetic-monitoring-architect`, `usage-metering-and-cost-attribution-pipeline-designer`, `ai-cost-guardrail-designer`, `product-analytics-instrumenter`, `incident-response-runbook`, `authorization-matrix-designer`, + the RLS/tenancy verification cluster). Three seams pinned: SEEING-vs-ACTING (`admin-console-architect` owns actions/impersonation/break-glass ELEVATION; this skill's break-glass is the narrower CONTENT reveal in the read path — complementary, not duplicative), DESIGN-vs-OPERATE (`observability-operator`), CONSOLE-vs-FEED (the owners above). Grounded in a read-only discovery mining three production implementations that independently converged on the read-security core; product-agnostic. | P1 | ✅ shipped (D47) |
 | D67 (PR #124, APR-007) | Optional Aegis setup (1 = `aegis-setup`, family 23), 184→185. Issue #101 package 2, delivered 2026-09-23 under owner grant AEGIS-APR-007 (consumed per AEGIS-APR-052); decision row D67 added retroactively on 2026-09-27. The manual-only four-choice setup conversation, run only when a person explicitly invokes `aegis-setup` by name (a setup phrase alone may show the four choices in ordinary conversation, but nothing is saved until that named invocation), plus an Aegis-only saved selection — a versioned user-local record keyed to one validated checkout — on tested single-user Windows PowerShell. Local and online helper integrations remain unavailable; other operating systems may show the conversation but claim no saved-state support, and a saved choice grants no provider authority. No install, credential, provider/model call, host routing hook, or measured token-saving claim. | — | ✅ shipped (PR #124) |
 | D64 | Feature-flag system design (1 = `feature-flag-architect`, joins family 4 / the Phase 3 SaaS & tenant isolation pack), 185→186. The owner-requested (2026-09-26) system half of roadmap cat 01 #27 + cat 02 #65: the flag store build-vs-buy taught as an owner choice (terms, per-option fit and costs, one question; the answer authorizes nothing), one internal flag interface, evaluation placement per flag class, a targeting model with server-side sources of truth and tenant-qualified caching, the fail-safe MECHANISM (code defaults, last-known-good cache, non-blocking timeout, cold start with a metric), kill-switch propagation bound and flip authority, the flag-change audit event, and flag-debt hooks. Hard seam: **system vs one rollout** — `feature-flag-rollout-strategist` keeps each change's ramp, guardrails, removal and each flag's safe VALUE, and now consumes the system from this skill (pinned both ways). Further seams pinned in trigger-evals: `plan-entitlement-architect`, `authorization-matrix-designer`, `ab-test-designer`, `ci-pipeline-architect` (manual-only), `saas-platform-architect`, `tenant-isolation-reviewer`, `caching-strategy-designer`, `authority-invalidation-architect`, `frontend-perf-engineer`. Designs; writes nothing. | P1 | ✅ shipped (D64) |
+| D68–D71 | Expansion builds (9 skills), 186→195: QA Tier 1 (D68: `acceptance-criteria-reviewer`, `test-tenant-provisioner`, `ci-failure-classifier`, family 6), task planning (D69: `ai-task-decomposer`, family 2), AI human-in-the-loop design (D70: `ai-human-in-the-loop-designer`, family 8) and the Phase 6 expansion (D71: `database-backup-verifier`, `resilience-architecture-reviewer`, `cloud-security-baseline-reviewer`, `environment-parity-reviewer`, family 7). The phase rows above keep their original counts; current family counts are in [What's in the library](#whats-in-the-library). | — | ✅ shipped (D68–D71) |
 | 8 | Backlog expansion in ≤20-skill validated batches | P2 | backlog |
 
 ## Subagents (read-only reviewers)
@@ -1087,8 +1088,8 @@ entry gate; `library-diff-reviewer` composes `skill-quality-reviewer` as
 its single-skill inner loop (the seam pinned at D18, now owned from both
 sides); `skill-usage-instrumenter` produces the evidence package
 `skill-deprecation-planner` consumes; `docs-retention-index` (the
-DOC-lifecycle twin, D12.4) stays banked with the SKILL-vs-DOC seam pinned
-in trigger-evals:
+DOC-lifecycle twin, D12.4) was banked at the time and has since shipped in
+D25, with the SKILL-vs-DOC seam pinned in trigger-evals:
 
 | Skill | What it does | Invocation |
 |---|---|---|
@@ -1371,11 +1372,15 @@ Run from the repo root:
 python scripts/validate-skills.py
 ```
 
-Checks: `name` matches directory; `description` present and < 1024 chars; no broad
-`allowed-tools`; `SKILL.md` < 500 lines; all required sections present; `evals/evals.json`
+Checks: `name` matches directory; `description` present and < 1024 chars; only allowed
+frontmatter keys, with no `allowed-tools`, `hooks` or `shell` and no `!` shell injection;
+`SKILL.md` < 500 lines; all required sections present in order; `evals/evals.json`
 exists and parses (structural validation, not execution of skill evals); `evals/trigger-evals.json` parses when
-present; catalog integrity (every on-disk skill is listed in the catalog and README);
-bundled-name collision and duplicate-name checks.
+present; catalog integrity (every on-disk skill is listed in the catalog and README) and
+matching README skill and family counts; bundled-name collision and duplicate-name checks;
+read-only subagent definitions; no plugin, hook, MCP or settings files inside skill folders;
+and workflow actions pinned to full commit SHAs. The docstring at the top of
+`scripts/validate-skills.py` lists every check.
 
 Behavior: `_template` is ignored. When `_template` is the only skill directory, the validator
 prints a "no skills found" status and exits `0`. Exit `0` = clean (warnings allowed); non-zero
@@ -1396,6 +1401,7 @@ uses Python 3.14 and provides these jobs:
 | --- | --- |
 | `validate-skills` | Required Ubuntu check: CI-helper tests, validator self-tests and skill validation, contract-audit self-tests, BER self-check and regression suite, PowerShell Core acceptance, and a PR-only Developer Certificate of Origin (DCO) sign-off check. |
 | `windows-offline-checks` | Additional Windows coverage: the Python checks plus native Windows PowerShell and PowerShell Core acceptance. This job is not registered as a required branch-protection check. |
+| `tools-tests-linux`, `tools-tests-windows` | Tools test suites (setup host-bridge callback tests on Node.js 24, setup routing-contract tests and delivery-control tests) on separate Ubuntu and Windows runners, isolated from the gate jobs because a pull request can change this test code without tripping `gate-guard`. These jobs are not registered as required branch-protection checks. |
 | `gate-guard` | Required PR-only check: deliberately fails when protected validation, workflow, agent-definition, Claude Code or Git configuration, runtime, test or dependency paths change, so those changes receive explicit review. |
 
 Notes:
@@ -1405,11 +1411,11 @@ Notes:
   weaken the guard to make it green. The [CI guide](docs/offline-ci.md) describes
   the full protected surface, commands, platform skips and evidence limits.
 - Dependencies are pinned in `requirements.txt` and hash-locked in `requirements-ci.txt`
-  (compiled from `requirements-ci.in`); an SDK
+  (compiled from `requirements-ci.in`); a software development kit (SDK)
   precheck prevents silently skipping transport tests. Tests use mocks and local
   fixtures. Installing dependencies requires package downloads.
-- `actions/checkout`, `actions/setup-python` and `actions/upload-artifact` are
-  pinned to full commit SHAs. Command logs and environment evidence are retained
+- `actions/checkout`, `actions/setup-python`, `actions/setup-node` and
+  `actions/upload-artifact` are pinned to full commit SHAs. Command logs and environment evidence are retained
   as artifacts for 14 days, including on failures.
 - Merge follows human authority. The source repository owner's
   [standing grants](docs/approvals/APPROVAL_REGISTER.md) permit agents to perform
