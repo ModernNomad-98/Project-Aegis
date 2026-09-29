@@ -401,7 +401,10 @@ jobs:
           # copies, so every depth is protected, and the commands, hooks and
           # plugin directory entries match with or without a trailing slash
           # so a symlink standing in for the directory is protected too.
-          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|(.*/)?\.claude/((agents|commands|hooks)(/|$)|settings(\.local)?\.json$)|(.*/)?\.claude$|(.*/)?\.claude-plugin(/|$)|(.*/)?\.mcp\.json$|(.*/)?\.gitattributes$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth|exe|com|bat|cmd|ps1|dll)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
+          # .github/dependabot.yml (or .yaml) is supply-chain policy: its
+          # ignore rules and groups decide which dependency bumps are ever
+          # proposed (owner decision 2026-09-29).
+          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|\.github/dependabot\.ya?ml$|(.*/)?\.claude/((agents|commands|hooks)(/|$)|settings(\.local)?\.json$)|(.*/)?\.claude$|(.*/)?\.claude-plugin(/|$)|(.*/)?\.mcp\.json$|(.*/)?\.gitattributes$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth|exe|com|bat|cmd|ps1|dll)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
           shopt -s nocasematch
           gate_files=()
           echo "Files changed in this PR:"
