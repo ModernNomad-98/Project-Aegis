@@ -339,7 +339,7 @@ audit) and against the Phase 1 pack (`human-approval-boundary`,
 (agent authority vs end-user RBAC). `ai-task-decomposer`, added by owner decision D69
 (2026-09-28), ships its own trigger evals against `change-classification-gate`,
 `tech-spec-writer`, `lane-authoring-guide` (parallel lanes versus one ordered sequence of
-PR-sized tasks), `product-spec-writer`, `phased-work-handoff-designer` and
+PR-sized tasks), `product-spec-writer`, `acceptance-criteria-reviewer`, `reviewable-diff-discipline`, `phased-work-handoff-designer` and
 `roadmap-to-commitments-translator`.
 
 ### Skills (D38 — beginner-facing lifecycle orchestrator / library front door)
@@ -1261,12 +1261,11 @@ above, completing the category-08 governance layer Phase 1 started.
 Source: [`docs/skills/08-ai-era-sdlc-agent-ops.md`](skills/08-ai-era-sdlc-agent-ops.md).
 Owner decision D69 (2026-09-28) resolved the remaining cat-08 items: #266 AI Task
 Decomposition is built as `ai-task-decomposer` (listed in the Phase 1.5 table above);
-#267 Prompt-to-Diff Traceability and #273 AI Work Evidence Pack merge into an
-`ai-closeout-reporter` extension; #277 AI Code Review Protocol merges into a
-`code-reviewer` extension; and #278 AI Pair Engineering Protocol is dropped as covered by
-`ai-sdlc-operating-model` and the skills its stage map names. The two extensions land in
-their own pull requests; see the
-[AI-SDLC batch proposal](roadmaps/ai-sdlc-skill-batch-proposal.md).
+#267 Prompt-to-Diff Traceability and #273 AI Work Evidence Pack merged into
+`ai-closeout-reporter` as its per-deliverable trace (PR #511); #277 AI Code Review
+Protocol merged into `code-reviewer` (PR #515); and #278 AI Pair Engineering Protocol is
+dropped as covered by `ai-sdlc-operating-model` and the skills its stage map names. See
+the [AI-SDLC batch proposal](roadmaps/ai-sdlc-skill-batch-proposal.md).
 
 ### Phase 2 — Core architecture & engineering (P0)
 ✅ **Implemented** — all 10 first-pass skills moved to

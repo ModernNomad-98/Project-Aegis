@@ -16,7 +16,10 @@ spike is a short, time-boxed investigation whose only output is an answer, not
 shipped code. A human-approval boundary is a step, such as a schema change or
 a deployment, that needs a person's explicit approval before an agent does it.
 UI means user interface; CI means continuous integration, the automated checks
-run on each PR.
+run on each PR. A schema is the structure of the database's tables; a
+migration is a script that changes it. A feature flag is a switch that turns
+code on or off without a new release. A tenant is one customer organization
+whose data the product keeps apart from other customers' data.
 
 ## Purpose
 
@@ -45,7 +48,7 @@ item #266 (AI Task Decomposition).
 - Use when: someone asks "how should we cut this up?", "what are the PR-sized
   steps?" or "what order should the agent do this in?".
 - Do NOT use when: the work is already one small change and the question is
-  its risk class, validation floor or scope lock — that is
+  its risk class, minimum required checks or locked file scope — that is
   `change-classification-gate`. This skill hands each planned task to that
   gate; it does not replace it.
 - Do NOT use when: the technical design itself is not written or not agreed —
@@ -126,7 +129,8 @@ item #266 (AI Task Decomposition).
 8. **Order the tasks.** Record each task's dependencies and put them in an
    order where every task can be merged on its own. Put spikes and owner
    questions before the tasks they unblock, and risky or irreversible steps
-   (expand-before-contract migrations, flag removal) where they can be
+   (adding a new database structure before removing the old one, or removing
+   a feature flag) where they can be
    reverted.
 9. **List the owner questions.** Rank them, blocking questions first, with
    the tasks each one unblocks. If a question is a product or build choice,

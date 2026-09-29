@@ -1,7 +1,7 @@
 # Task plan template
 
 The plan template and size rules for the owning
-[AI Task Decomposer](../SKILL.md). A pull request (PR) proposes one
+[AI Task Decomposer](../SKILL.md); AI means artificial intelligence. A pull request (PR) proposes one
 repository change for review; an application programming interface (API) is
 the interface other code calls; UI means user interface. A spike is a short,
 time-boxed investigation whose only output is an answer. A feature flag is a
@@ -41,9 +41,9 @@ as hard to review as one oversized one.
 
 Flag a task for `human-approval-boundary` when it will: change the schema or
 run a destructive migration; change row-level security, access or other
-security policy; touch production data; add, rotate or move secrets; deploy
-or release; change billing; rewrite git history; or refactor broadly across
-many files. The flag is a planning note; the approval itself is requested
+security policy; touch production data; add, rotate or move secrets; ship a
+production release; or change billing. These match the list in the skill's
+workflow step 7. The flag is a planning note; the approval itself is requested
 when the task starts.
 
 ## Template
@@ -82,11 +82,11 @@ expires, and the owner picks the teammate's role."
 ```
 T1 Add the invitations table (additive migration)
    Done when:  migration applies and rolls back cleanly on a copy of the schema
-   Evidence:   migration up/down output; schema diff
+   Evidence:   output of applying and rolling back the migration; schema diff
    Class:      schema/migration — Approval: schema change → human-approval-boundary
 T2 Create-invitation API with role choice (owner only)
-   Done when:  owner gets 201 with an invite record; member gets 403
-   Evidence:   API tests for owner, member and other-tenant caller
+   Done when:  owner gets 201 (created) with an invite record; member gets 403 (forbidden)
+   Evidence:   API tests for the owner, a member and a caller from another customer account
    Class:      backend/API — Depends on: T1
 T3 Send the invitation email with a signed, expiring link
    Done when:  a test inbox receives one email whose link expires at the set time
