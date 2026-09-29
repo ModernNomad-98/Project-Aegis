@@ -40,13 +40,17 @@ own proven practice, including failures it absorbed during its own construction.
    requesting consent already granted. AEGIS-APR-002 permits administrator merges
    of authorized work without repeated case-by-case approval. Verify the reviewed
    revision and CI results before merging. The current default is that all
-   GitHub Actions checks pass. If `gate-guard` fails solely because a PR changes
-   a protected file, an independent review and a separate, PR-specific owner
-   exception are required before an administrator merge; the standing grant
-   alone does not waive the newer all-green instruction. Entries
+   GitHub Actions checks pass. `gate-guard` is the CI check that fails when a PR
+   changes a protected file. If it fails for that reason alone, an independent
+   review and an owner exception are required before an administrator merge;
+   AEGIS-APR-002 alone does not waive the newer all-green instruction. The
+   exception is normally separate and PR-specific: entries
    [AEGIS-APR-005](docs/approvals/APPROVAL_REGISTER.md#aegis-apr-005-pr-104-protected-file-guard-exception)
    and [AEGIS-APR-010](docs/approvals/APPROVAL_REGISTER.md#aegis-apr-010-pr-119-protected-file-guard-exception)
-   show exceptions limited to those PRs. Never weaken the guard to make it green.
+   show exceptions limited to those PRs. The one standing exception,
+   [AEGIS-APR-047](docs/approvals/APPROVAL_REGISTER.md#aegis-apr-047-standing-gate-guard-exception-for-four-ber-files),
+   covers only four named Behavioral Eval Runner (BER) files and applies only
+   when all its conditions are met. Never weaken the guard to make it green.
    *Why:* the owner controls merge authority, including standing delegation. This
    source-specific grant overrides generic skill defaults here and does not transfer
    with copied skills. See the [merge policy](docs/reconciliation/auto-merge-policy.md).
@@ -61,7 +65,7 @@ own proven practice, including failures it absorbed during its own construction.
 5. **Verify state before acting.** Reconcile memory and assumptions against live git/PR
    reality before making any change; never act on remembered state alone.
    *Why:* sessions acting on stale memory is a documented incident here — a path that exists
-   is not proof it is the right repo, and a remembered SHA is not the current one.
+   is not proof it is the right repo, and a remembered commit hash is not the current one.
 
 6. **Full closeouts with honest gaps.** Every task ends with what was done **and** an
    explicit *"intentionally not done"* section (write "None" when empty). An unqualified
@@ -167,7 +171,8 @@ new pages and edits now; they do not imply every older page has passed review.
 
    **The same list runs in reverse:** when renaming or retiring a skill, also grep
    `docs/paths/` and the README picker for the old name — `skill-deprecation-planner`'s
-   reverse-link sweep includes `docs/paths/` as a named member.
+   reverse-link sweep, a full-text search of the repository for the skill's name,
+   also reaches `docs/paths/`.
 4. Run `python scripts/validate-skills.py` and confirm it reports the new count with exit 0
    before opening a PR (rule 8).
 
