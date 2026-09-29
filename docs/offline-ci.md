@@ -157,13 +157,17 @@ protected too.
 The skill validator separately keeps shipped skills free of executable
 configuration. A skill's frontmatter may only use `name`, `description`,
 `disable-model-invocation`, `license`, `compatibility` and `metadata`, with no
-repeated key and no YAML anchor, alias, tag, directive or merge key; it names `hooks`, `allowed-tools` and `shell` as forbidden. No
-markdown file in a skill folder may contain `!`-prefixed shell injection (an
-inline `` !`command` `` or a fenced block opened with ` ```! `). Over tracked
-paths only, so untracked local worktrees are ignored, it also rejects a
+repeated key, no YAML anchor, alias, tag, directive or merge key, and no
+`---` inside the block; it names `hooks`, `allowed-tools` and `shell` as
+forbidden. No markdown file in a skill folder may contain `!`-prefixed shell
+injection (an inline `` !`command` ``, or a fence of three or more backticks or
+tildes followed by `!` anywhere on a line). These two checks also run on
+`_template`, which Claude Code loads and consumers copy. Over tracked paths
+only, so untracked local worktrees are ignored, it also rejects a
 `.claude-plugin/`, nested `.claude/`, `hooks/`, `.mcp.json` or `.lsp.json`
-inside a skill folder; any `.claude/skills/` tree other than the root one; and
-any tracked `.mcp.json` or `.claude/settings*.json` anywhere in the repository.
+inside a skill folder; any `.claude/skills/` tree other than the root one; any
+tracked `.mcp.json` or `.claude/settings*.json` anywhere in the repository; and
+any tracked symlink under `.claude/skills/`.
 The source repository's [owner grant](approvals/APPROVAL_REGISTER.md) permits
 authorized agents to perform administrator merges without repeat consent; see
 the [current merge policy](reconciliation/auto-merge-policy.md). Documentation

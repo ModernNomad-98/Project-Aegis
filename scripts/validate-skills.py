@@ -27,12 +27,15 @@ Checks performed per skill (see docs/skill-generation-standard.md):
     Code itself would auto-invoke a skill whose text forbids it.
   * every frontmatter key is in an allow-list (name, description,
     disable-model-invocation, license, compatibility, metadata), no key is
-    repeated, and `hooks`, `allowed-tools` and `shell` are named as forbidden:
+    repeated, no YAML anchor/alias/tag/directive/merge key or `---` appears in
+    the block, and `hooks`, `allowed-tools` and `shell` are named as forbidden:
     they run commands or pre-approve tools when the skill is invoked, and
     workspace trust does not gate `allowed-tools`.
   * no `!`-prefixed shell injection (an inline !`cmd`, or a fenced block
     opened with ```!) in ANY *.md file of the skill folder: Claude Code runs
     those commands before the skill text reaches the model.
+    These two checks also run on `_template`, which Claude Code loads and
+    consumers copy.
   * SKILL.md body is < 500 lines.
   * all nine required sections present (v4 standard): Purpose, Use When,
     Inputs to Inspect, Workflow, Output Format, Validation Checklist, Gotchas,
@@ -64,6 +67,7 @@ Repo-level checks:
         skill trees, but this validator would never check them);
       - no `.mcp.json` or `.claude/settings.json` / `settings.local.json` at
         any depth (the source library ships no settings or MCP servers).
+      - no tracked symlink under `.claude/skills/` (it hides its target).
   * guided-path link resolution (decision D55 — check_docs_paths_links, HARD):
     every SKILL.md link in docs/paths/ and every docs/paths link in the README
     resolves on disk, and a `[`foo`](.../bar/SKILL.md)` label matches its
@@ -84,7 +88,9 @@ Repo-level checks:
     names, the roles table) are checked at WARNING level only, since they are
     human-curated and deliberately not 1:1 with the skill set.
 
-The `_template` directory is ALWAYS ignored (it is a template, not a shipped skill).
+The `_template` directory is exempt from the per-skill structure checks (it is a
+template, not a shipped skill), but Claude Code still loads it and consumers copy
+it, so its frontmatter-security checks and shell-injection scan always run.
 When `_template` is the only skill directory, the script prints "no skills found"
 and exits 0.
 
@@ -175,12 +181,13 @@ SKILL_FORBIDDEN_KEYS = {
 }
 # Dynamic context injection: Claude Code runs `!`-prefixed commands before the
 # skill content is sent to the model. The inline form counts at the start of a
-# line or after whitespace (`KEY=!`x`` stays literal); a fenced block counts
-# when its opening fence is followed by `!`. Matched over the raw file,
-# fences included, because the substitution runs over the raw file too.
+# line or after whitespace (`KEY=!`x`` stays literal). A fence of three or more
+# backticks or tildes followed by `!` counts ANYWHERE on a line, so blockquote
+# (`> ```!`), list (`- ```!`) and longer fences are caught too. Matched over
+# the raw file, fences included, because the substitution runs over it too.
 SKILL_SHELL_INJECTION_RES = (
     re.compile(r"(?m)(?:^|(?<=\s))!`"),
-    re.compile(r"(?m)^[ \t]*(?:```|~~~)[ \t]*!"),
+    re.compile(r"(?m)(?:`{3,}|~{3,})[ \t]*!"),
 )
 
 
@@ -373,6 +380,91 @@ def discover_skills() -> list[Path]:
     return out
 
 
+def check_skill_frontmatter_security(fm_text: str, fm: dict, name_ctx: str,
+                                     rep: Report) -> None:
+    """Frontmatter rules that keep a skill instructions-only (V1).
+
+    No `---` inside the block (Claude Code ends the frontmatter at the first
+    `---` it sees, even mid-line, so the two parsers could disagree about where
+    it stops), no repeated key, no YAML anchor, alias, tag, directive or merge
+    key, nothing that runs commands or pre-approves tools, and nothing outside
+    the allow-list. Case variants (`Hooks`) fail as "not in the allow-list".
+    """
+    if "---" in fm_text:
+        rep.error(
+            f"[{name_ctx}] `---` inside the frontmatter: Claude Code ends the "
+            "frontmatter at the first `---`, so it and this validator could read "
+            "different keys; reword it"
+        )
+    for key in duplicate_mapping_keys(fm_text):
+        rep.error(
+            f"[{name_ctx}] duplicate frontmatter key `{key}`: YAML readers "
+            "disagree on which value wins, so the checked value may not be "
+            "the one that runs"
+        )
+    # Same indirection ban as agent frontmatter: a merge key or merge-tagged
+    # key (`!!merge hooks:`) can hide a forbidden key from one reader and
+    # hand it to another.
+    for item in yaml_indirection(fm_text):
+        rep.error(
+            f"[{name_ctx}] YAML {item} in skill frontmatter: readers without "
+            "merge-key, alias or tag support see different keys, so write "
+            "each key out flat"
+        )
+    for key in sorted(map(str, fm)):
+        if key in SKILL_FORBIDDEN_KEYS:
+            rep.error(
+                f"[{name_ctx}] forbidden skill frontmatter key `{key}`: it "
+                f"{SKILL_FORBIDDEN_KEYS[key]}; shipped skills are instructions only"
+            )
+        elif key not in SKILL_ALLOWED_KEYS:
+            rep.error(
+                f"[{name_ctx}] skill frontmatter key `{key}` is not in the "
+                f"allow-list {sorted(SKILL_ALLOWED_KEYS)}; review what it does "
+                "before adding it there"
+            )
+
+
+def check_skill_shell_injection(skill_dir: Path, name_ctx: str, rep: Report) -> None:
+    """`!` shell injection (V2) in SKILL.md and every other markdown file the
+    skill can load (references, assets)."""
+    for md in _walk_md(skill_dir):
+        md_text = md.read_text(encoding="utf-8")
+        for pattern in SKILL_SHELL_INJECTION_RES:
+            hit = pattern.search(md_text)
+            if hit:
+                line_no = md_text.count("\n", 0, hit.start()) + 1
+                rep.error(
+                    f"[{name_ctx}] {md.relative_to(skill_dir).as_posix()}:{line_no}: "
+                    "`!`-prefixed command injection runs a shell command when "
+                    "the skill is invoked; write it as prose or escape it"
+                )
+                break
+
+
+def check_ignored_skill_security(rep: Report, skills_dir: Path | None = None) -> None:
+    """V1 and V2 for the directories exempt from the structure checks.
+
+    `_template` is not a shipped skill, but Claude Code loads it like one and
+    consumers copy it with the rest of `.claude/skills/`, so a `hooks:` key or
+    an injected command there would run just the same.
+    """
+    skills_dir = SKILLS_DIR if skills_dir is None else skills_dir
+    for name in sorted(IGNORED_DIRS):
+        skill_dir = skills_dir / name
+        skill_md = skill_dir / "SKILL.md"
+        if not skill_md.is_file():
+            continue
+        fm_text, _ = split_frontmatter(skill_md.read_text(encoding="utf-8"))
+        if fm_text is None:
+            rep.error(f"[{name}] SKILL.md has no parseable frontmatter block")
+            continue
+        fm = check_frontmatter_strict_yaml(fm_text, name, rep)
+        if fm is not None:
+            check_skill_frontmatter_security(fm_text, fm, name, rep)
+        check_skill_shell_injection(skill_dir, name, rep)
+
+
 def validate_skill(skill_dir: Path, rep: Report) -> str | None:
     """Validate one skill directory. Returns the skill name (for collision checks)."""
     name_ctx = skill_dir.name
@@ -424,51 +516,8 @@ def validate_skill(skill_dir: Path, rep: Report) -> str | None:
         )
     check_manual_only_sentinel(name_ctx, fm, desc, rep)
 
-    # Frontmatter key allow-list: no repeated key, nothing that runs commands
-    # or pre-approves tools, and nothing unreviewed. Case variants (`Hooks`)
-    # fail as "not in the allow-list".
-    for key in duplicate_mapping_keys(fm_text):
-        rep.error(
-            f"[{name_ctx}] duplicate frontmatter key `{key}`: YAML readers "
-            "disagree on which value wins, so the checked value may not be "
-            "the one that runs"
-        )
-    # Same indirection ban as agent frontmatter: a merge key or merge-tagged
-    # key (`!!merge hooks:`) can hide a forbidden key from one reader and
-    # hand it to another.
-    for item in yaml_indirection(fm_text):
-        rep.error(
-            f"[{name_ctx}] YAML {item} in skill frontmatter: readers without "
-            "merge-key, alias or tag support see different keys, so write "
-            "each key out flat"
-        )
-    for key in sorted(map(str, fm)):
-        if key in SKILL_FORBIDDEN_KEYS:
-            rep.error(
-                f"[{name_ctx}] forbidden skill frontmatter key `{key}`: it "
-                f"{SKILL_FORBIDDEN_KEYS[key]}; shipped skills are instructions only"
-            )
-        elif key not in SKILL_ALLOWED_KEYS:
-            rep.error(
-                f"[{name_ctx}] skill frontmatter key `{key}` is not in the "
-                f"allow-list {sorted(SKILL_ALLOWED_KEYS)}; review what it does "
-                "before adding it there"
-            )
-
-    # `!` shell injection, in SKILL.md and every other markdown file the
-    # skill can load (references, assets).
-    for md in _walk_md(skill_dir):
-        md_text = md.read_text(encoding="utf-8")
-        for pattern in SKILL_SHELL_INJECTION_RES:
-            hit = pattern.search(md_text)
-            if hit:
-                line_no = md_text.count("\n", 0, hit.start()) + 1
-                rep.error(
-                    f"[{name_ctx}] {md.relative_to(skill_dir).as_posix()}:{line_no}: "
-                    "`!`-prefixed command injection runs a shell command when "
-                    "the skill is invoked; write it as prose or escape it"
-                )
-                break
+    check_skill_frontmatter_security(fm_text, fm, name_ctx, rep)
+    check_skill_shell_injection(skill_dir, name_ctx, rep)
 
     # side-effect skills should disable model invocation (advisory)
     dmi = str(fm.get("disable-model-invocation", "")).lower()
@@ -995,6 +1044,9 @@ SKILL_DIR_FORBIDDEN = re.compile(
 # Claude Code loads `.claude/skills/` from the working directory and every
 # parent up to the repository root, so a nested tree is live yet unvalidated.
 SKILL_PATH_SEGMENT = re.compile(r"(^|/)\.claude/skills(/|$)", re.IGNORECASE)
+# A tracked symlink under the root skills tree (a skill folder or any file in
+# one) hides its target from the path checks above.
+SKILL_ROOT_PREFIX = re.compile(r"^\.claude/skills(/|$)", re.IGNORECASE)
 # Settings can define hooks, credential helpers and permissions; `.mcp.json`
 # starts server processes, without a prompt in -p and SDK runs.
 FORBIDDEN_CONFIG_FILES = re.compile(
@@ -1021,7 +1073,41 @@ def forbidden_config_files(paths: list[str]) -> list[str]:
     return sorted(p for p in paths if FORBIDDEN_CONFIG_FILES.search(p))
 
 
-def check_config_surfaces(rep: Report, paths: list[str] | None = None) -> None:
+def _tracked_symlinks() -> list[str]:
+    """Repo-relative paths of tracked symlinks (git mode 120000).
+
+    Falls back to a filesystem walk (pruning .git, .worktrees, node_modules)
+    when git is unavailable, so the check never silently sees nothing.
+    """
+    try:
+        out = subprocess.run(
+            ["git", "ls-files", "-s", "-z"],
+            cwd=REPO_ROOT, capture_output=True, check=True,
+        ).stdout
+        found = []
+        for record in out.decode("utf-8", "surrogateescape").split("\0"):
+            meta, _, path = record.partition("\t")
+            if path and meta.startswith("120000 "):
+                found.append(path)
+        return found
+    except (OSError, subprocess.CalledProcessError):
+        found = []
+        for current, dirs, files in os.walk(REPO_ROOT, followlinks=False):
+            here = Path(current)
+            dirs[:] = sorted(d for d in dirs if d not in _WALK_PRUNE)
+            for entry in sorted(files) + dirs:
+                if (here / entry).is_symlink():
+                    found.append((here / entry).relative_to(REPO_ROOT).as_posix())
+        return found
+
+
+def skill_symlinks(symlinks: list[str]) -> list[str]:
+    """Tracked symlinks anywhere under the root `.claude/skills/` tree."""
+    return sorted(p for p in symlinks if SKILL_ROOT_PREFIX.search(p))
+
+
+def check_config_surfaces(rep: Report, paths: list[str] | None = None,
+                          symlinks: list[str] | None = None) -> None:
     """Configuration that would execute or widen authority, over TRACKED paths.
 
     Tracked only (via `_repo_candidate_paths`): untracked local worktrees under
@@ -1029,6 +1115,13 @@ def check_config_surfaces(rep: Report, paths: list[str] | None = None) -> None:
     not what a pull request ships.
     """
     paths = _repo_candidate_paths() if paths is None else paths
+    symlinks = _tracked_symlinks() if symlinks is None else symlinks
+    for p in skill_symlinks(symlinks):
+        rep.error(
+            f"[{p}] symlink under `.claude/skills/`: the path checks here cannot "
+            "see what it points at, and a copied symlink resolves differently "
+            "in every repository; replace it with a real file or delete it"
+        )
     for p in skill_dir_violations(paths):
         rep.error(
             f"[{p}] plugin, hook, settings or server file inside a skill "
@@ -1221,10 +1314,14 @@ def main() -> int:
 
     rep = Report()
     skills = discover_skills()
+    # `_template` skips the structure checks but not V1/V2 (see docstring).
+    check_ignored_skill_security(rep)              # HARD
 
     if not skills:
         print("no skills found (only _template present or skills dir empty) - nothing to validate")
-        return 0
+        for e in rep.errors:
+            print(f"ERROR {e}")
+        return 1 if rep.errors else 0
 
     print(f"Validating {len(skills)} skill(s) under .claude/skills/ ...\n")
 

@@ -16,13 +16,13 @@ description: 'TEMPLATE ONLY — not a real skill and never invoked. Copy this di
 #   permanently eligible, and NO existing skill receives TALI authority by default — a
 #   side-effecting skill still needs disable-model-invocation: true unless a specific
 #   route is classified and activated under §5. This template activates neither.
-# allowed-tools: Read, Grep, Glob  # optional & narrow only; omit to inherit defaults
 ---
 
 # _template (reference skill)
 
 > **This is a template, not a shipped skill.** It lives at `.claude/skills/_template/`
-> and is deliberately ignored by `scripts/validate-skills.py`. Do not invoke it.
+> and is exempt from the structure checks in `scripts/validate-skills.py`, though its
+> frontmatter and shell-injection checks still apply. Do not invoke it.
 > To create a skill: copy this directory, rename it, and fill in every section below.
 > Full rules: [docs/skill-generation-standard.md](../../../docs/skill-generation-standard.md).
 

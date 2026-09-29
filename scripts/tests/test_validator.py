@@ -38,7 +38,9 @@ IMPORT WRINKLE
 """
 from __future__ import annotations
 
+import contextlib
 import importlib.util
+import io
 import json
 import re
 import shutil
@@ -529,6 +531,11 @@ def test_skill_frontmatter_allow_list():
         "YAML tag !!merge in skill frontmatter",
         "a merge-tagged key in skill frontmatter is rejected",
     )
+    expect_error(
+        _validate_variant("metadata:\n  note: 'before --- after'"),
+        "`---` inside the frontmatter",
+        "a `---` inside skill frontmatter (where Claude Code would end it) is rejected",
+    )
     expect_clean(
         _validate_variant(
             "disable-model-invocation: true\nlicense: MIT\n"
@@ -558,6 +565,13 @@ def test_skill_shell_injection():
         "`!`-prefixed command injection",
         "an indented ~~~ ! fenced injection block is rejected",
     )
+    for fence, label in (("> ```!", "a blockquoted"), ("- ```!", "a list-item"),
+                         ("````!", "a four-backtick"), ("> - ~~~~ !", "a nested tilde")):
+        expect_error(
+            _validate_variant(body_append=f"\n{fence}\ngit status\n```\n"),
+            "`!`-prefixed command injection",
+            f"{label} fence opened with `!` is rejected",
+        )
     expect_error(
         _validate_variant(extra_files={"references/extra.md": "Context:\n!`cat .env`\n"}),
         "references/extra.md:2: `!`-prefixed command injection",
@@ -568,6 +582,32 @@ def test_skill_shell_injection():
                                       "```bash\necho '!'\n```\n"),
         "`!` after a non-space character, and prose exclamation marks, are accepted",
     )
+
+
+def test_template_security_checks():
+    """`_template` skips the structure checks but not the V1/V2 security checks."""
+    rep = validator.Report()
+    validator.check_ignored_skill_security(rep)
+    expect_clean(rep, "the real _template passes the frontmatter and injection checks")
+
+    real = validator.SKILLS_DIR / "_template"
+    for extra, body, needle, label in (
+        ("hooks:\n  Stop: []", "", "forbidden skill frontmatter key `hooks`",
+         "a `hooks:` key in _template is rejected"),
+        ("", "\n```!\ngit status\n```\n", "`!`-prefixed command injection",
+         "a ```! fence in _template is rejected"),
+    ):
+        with tempfile.TemporaryDirectory(prefix="aegis-template-variant-") as tmp:
+            skills = Path(tmp)
+            shutil.copytree(real, skills / "_template")
+            md = skills / "_template" / "SKILL.md"
+            head, sep, rest = md.read_text(encoding="utf-8").partition("\n---\n")
+            if extra:
+                head = head + "\n" + extra
+            md.write_text(head + sep + rest + body, encoding="utf-8")
+            rep = validator.Report()
+            validator.check_ignored_skill_security(rep, skills)
+            expect_error(rep, needle, label)
 
 
 def test_config_surface_paths():
@@ -624,9 +664,44 @@ def test_config_surface_paths():
     expect_error(rep, "ships no Claude Code settings or MCP servers",
                  "check_config_surfaces reports a tracked .mcp.json")
 
+    got = validator.skill_symlinks([".claude/skills/x", ".claude/skills/x/references/r.md",
+                                    ".Claude/Skills/y", ".claude/skillsx", "docs/link"])
+    assert got == sorted([".claude/skills/x", ".claude/skills/x/references/r.md",
+                          ".Claude/Skills/y"]), got
+    PASSES.append("skill_symlinks: tracked symlinks under .claude/skills only")
+    print("  PASS  skill_symlinks finds tracked symlinks under .claude/skills only")
+    rep = validator.Report()
+    validator.check_config_surfaces(rep, paths=[], symlinks=[".claude/skills/x"])
+    expect_error(rep, "symlink under `.claude/skills/`",
+                 "check_config_surfaces reports a tracked symlink under .claude/skills")
+
     rep = validator.Report()
     validator.check_config_surfaces(rep)
     expect_clean(rep, "the real repository's tracked paths carry no forbidden config surface")
+
+    # Wiring: main() must run the check. A faked tracked .mcp.json makes the
+    # whole validator exit non-zero, so deleting the call cannot pass.
+    # The _template security scan is recorded the same way.
+    original = validator._repo_candidate_paths
+    original_template_check = validator.check_ignored_skill_security
+    real_paths = original()
+    template_calls = []
+    validator._repo_candidate_paths = lambda: real_paths + [".mcp.json"]
+    validator.check_ignored_skill_security = (
+        lambda rep, *a: (template_calls.append(1), original_template_check(rep, *a))
+    )
+    try:
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            code = validator.main()
+    finally:
+        validator._repo_candidate_paths = original
+        validator.check_ignored_skill_security = original_template_check
+    assert template_calls, "main() must run the _template security checks"
+    assert code != 0 and "ships no Claude Code settings or MCP servers" in out.getvalue(), (
+        f"main() must fail on a tracked .mcp.json (exit {code})"
+    )
+    PASSES.append("main() exits non-zero on a faked tracked .mcp.json")
+    print("  PASS  main() exits non-zero on a faked tracked .mcp.json (check is wired in)")
 
 
 def _materialize_paths_tree(dst_root: Path) -> Path:
@@ -1436,6 +1511,7 @@ TESTS = [
     test_agents_schema,
     test_skill_frontmatter_allow_list,
     test_skill_shell_injection,
+    test_template_security_checks,
     test_config_surface_paths,
     test_docs_paths_links,
     test_no_nested_fixture_skill_or_agent_dirs,
