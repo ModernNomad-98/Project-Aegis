@@ -10,7 +10,7 @@ language; RLS means row-level security; PR means pull request; p99 means the
 99th percentile; GC means garbage collection; CLI means command-line
 interface. A fingerprint is a read-only query result that proves which
 database a session is connected to; a smoke check is a quick test that the
-application still works after a change. This skill writes an operator
+application still works after a change. A schema-migration rollout (the schema-migration deploy shape) applies reviewed DDL once to a named environment, with no batching. This skill writes an operator
 runbook; it does not execute a move or a deploy.
 
 ## Purpose
@@ -105,9 +105,12 @@ re-derives neither.
 
 1. **Make target confirmation step 1 of every runbook.** Before any write,
    the operator runs a read-only fingerprint (database name, host, and a
-   sentinel row) and compares it with the EXPECTED values from the target's
-   identity input. Any mismatch, or an expected value that is missing,
-   stops the run at step 1; nothing later in the runbook may execute. When the plan's own
+   sentinel row) through the same connection the writes will use, and
+   compares it with the EXPECTED values from the target's identity input.
+   Any mismatch, a query that fails or returns no row, or an expected
+   value that is missing stops the run at step 1; nothing later in the
+   runbook may execute. If the session or connection changes before a
+   later write, step 1 runs again first. When the plan's own
    fingerprint does not match the named environment, stop authoring at this
    step and send the mismatch back to the plan's owner.
 2. **Confirm the prerequisites or stop, and pick the shape.** Approved
@@ -216,15 +219,18 @@ Execution posture: THIS DOCUMENT EXECUTES NOTHING — every step is operator-run
 ## Validation Checklist
 
 - [ ] Step 1 is target confirmation: a read-only fingerprint with its
-      EXPECTED values, run before any write; a mismatch stops the run.
+      EXPECTED values, run through the connection that will write, before
+      any write; a mismatch, a failed or empty query, or a missing
+      expected value stops the run.
 - [ ] All three prerequisites cited with evidence (plan, safety review,
       verified backup) — none assumed.
 - [ ] Every step has a verification with an EXPECTED output; no
       verify-free destructive steps exist.
 - [ ] Post-apply smoke checks exist, each with an EXPECTED output and an
       abort pointer on failure.
-- [ ] Batching states rationale and the tuning signal; resume is
-      idempotent from the stored marker.
+- [ ] For a data move, batching states rationale and the tuning signal,
+      and resume is idempotent from the stored marker; for a rollout, the
+      apply step states its expected lock time.
 - [ ] Abort criteria are numeric, per stage, and land in a NAMED safe
       halt state — never "stop and assess".
 - [ ] Rollback exists per stage; the no-return point is flagged with its
@@ -262,7 +268,6 @@ Execution posture: THIS DOCUMENT EXECUTES NOTHING — every step is operator-run
   rehearsal requirement (staging execution of THIS runbook) is a
   precondition gate, mirroring `rollback-runbook-author`'s rehearsal
   discipline.
-
 - The right migration against the wrong database: a staging connection
   string left in a production shell, or the reverse. Only a fingerprint
   checked against an expected value written down in advance catches it; a

@@ -16,8 +16,10 @@ the run by the plan or the environment's owner:
 Fingerprint:  database name = <expected>; host = <expected>;
               sentinel row <table>.<key> = <expected value only this environment holds>
 Run as:       read-only query from the session that will do the writes
+Re-run:       before the next write if the session or connection changes
 EXPECTED:     all three match exactly
 ON MISMATCH:  stop; nothing below runs; record what was seen in the log
+FAIL CLOSED:  a failed or empty query, or a missing expected value, is a mismatch
 ```
 
 An expected value copied from the session being checked proves nothing:
@@ -29,9 +31,9 @@ it must come from outside that session.
 Batch key:     <monotonic id | date partition | tenant bucket>
 Batch size:    <n rows> — rationale: <rows × width vs lock/undo/redo budget;
                target batch duration ≤ <s> so locks/transactions stay short>
-Throttle:      <sleep ms | rate> tuned by: <replication lag > <t> ⇒ back off;
+Throttle:      <sleep in milliseconds | rate> tuned by: <replication lag > <t> ⇒ back off;
                primary p99 > <t> ⇒ pause>
-Concurrency:   1 unless partition-disjoint proof: <proof or "n/a">
+Concurrency:   1 unless partition-disjoint proof: <proof or "not applicable">
 Progress:      marker=<last completed batch key> stored in <OUTSIDE the moving data>
 Resume:        idempotent because <keyed upsert | range replace> — re-running
                the marker batch is harmless
@@ -128,14 +130,14 @@ Step 1 target confirmation (above) precedes section 0 in every runbook.
 ```
 MIGRATION DEPLOY RUNBOOK — <migration id> to <environment> vN <date>
 1 TARGET CONFIRMATION … EXPECTED <fingerprint values> ON MISMATCH <stop>
-2 PREREQUISITES  review=<secure-migration-reviewer verdict> backup=<evidence + restore-time bound>
+2 PREREQUISITES  migration=<approved migration ref> review=<secure-migration-reviewer verdict> backup=<evidence + restore-time bound>
 3 [APPROVAL REQUIRED] apply <migration id> … EXPECTED <tool reports applied; lock time ≤ <s>>
                                               ON FAIL <abort: stop; do not re-run blind>
-4 SCHEMA VERIFICATION … EXPECTED <migration recorded as applied; tables/columns/indexes as reviewed>
-5 SMOKE CHECKS (patterns above) … EXPECTED <each check's result> ON FAIL <rollback ref>
+4 SCHEMA VERIFICATION … EXPECTED <migration recorded as applied; tables/columns/indexes as reviewed> ON FAIL <abort: stop; do not re-run blind>
+5 SMOKE CHECKS (patterns above) … EXPECTED <each check's result> ON FAIL <abort: stop, record the halt state, then use 6>
 6 ROLLBACK REFERENCE  <the migration's rollback plan from rollback-runbook-author>
 7 EXECUTION LOG and CLOSEOUT RECORD (as above)
-POSTURE: this document executes nothing; operators run steps.
+POSTURE: this document executes nothing; operators run steps; [APPROVAL REQUIRED] steps proceed only with the marked human approval recorded.
 ```
 
 ## Execution-log discipline
