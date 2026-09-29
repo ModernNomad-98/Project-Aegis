@@ -562,7 +562,8 @@ interfaces and restores backups into a scratch target).
 Per reconciliation §3, the execution-plan `rollback-strategy-designer` is
 **merged into `rollback-runbook-author`** (strategy + runbook are one
 artifact); the remaining Phase 6 expansion backlog stays unbuilt (see below),
-except `database-backup-verifier` (roadmap #253), built by D71.
+except `database-backup-verifier` (roadmap #253) and
+`resilience-architecture-reviewer`, both built by D71.
 
 | Skill | Source (category doc) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
@@ -576,7 +577,8 @@ except `database-backup-verifier` (roadmap #253), built by D71.
 | `observability-operator` | cat 07 #246/#247/#248/#252 | **no** (manual-only; edits live alert/dashboard config, runs operational queries) | Hands-on instrumentation (structured, correlated, redacted-at-emission), truthful health checks with timeouts, alerts with severity/owner/runbook-link/justified-threshold, query-verified claims, silences only with owner+expiry; implements slo-reliability-architect's design. |
 | `slo-reliability-architect` | cat 07 #251 (+#247 design side) | yes | Journey-derived SLOs: symptom-based SLIs with measurement points + blind spots, targets with error budgets in user units, burn-rate paging with cause-alert demotions, failure-mode analysis, budget policy with consequences + decider, per-tenant/noisy-neighbor views. |
 | `incident-response-runbook` | cat 07 #249 (+#250) | yes | One-minute severity ladder (ambiguity classifies up), IC/comms/ops roles with small-org collapse rule, triage to decision points, containment by REFERENCE to the rollback artifact, tenant-aware comms with legal gate on exposure, during-incident evidence capture, blameless postmortem where every finding lands (regression-suite-curator, observability-operator, runbook fix, architecture, or owned accepted risk). |
-| `database-backup-verifier` | cat 07 #253 (Phase 6 expansion backlog, built by D71) | **no** (manual-only; calls provider interfaces and restores data) | Proves per store that a usable backup exists instead of trusting "backups enabled": read-only evidence mode gives VERIFIED / GAP / UNVERIFIED on seven checks (exists, non-empty, current against the RPO, retained, encrypted, off-account copy, restore-tested), each with its evidence origin; drill mode restores only into a new or empty, proven non-production scratch target after approval of the exact plan with its estimated cost stated, measures restore time against the RTO, checks row-count and checksum parity against the backup's source, and deletes the copy; never restores into production or over an existing database; UNVERIFIED evidence blocks a drill; flags dump files in the repository history by path and commit; credentials by environment-variable name only. Pinned ≠ `data-migration-runbook-author`, `compliance-evidence-collector`, `rollback-runbook-author`, `pii-lifecycle-designer`, `slo-reliability-architect`, `gated-deployment-prompt-template` and `incident-response-runbook`; the seam with the planned resilience-architecture-reviewer is pinned once that skill exists. |
+| `database-backup-verifier` | cat 07 #253 (Phase 6 expansion backlog, built by D71) | **no** (manual-only; calls provider interfaces and restores data) | Proves per store that a usable backup exists instead of trusting "backups enabled": read-only evidence mode gives VERIFIED / GAP / UNVERIFIED on seven checks (exists, non-empty, current against the RPO, retained, encrypted, off-account copy, restore-tested), each with its evidence origin; drill mode restores only into a new or empty, proven non-production scratch target after approval of the exact plan with its estimated cost stated, measures restore time against the RTO, checks row-count and checksum parity against the backup's source, and deletes the copy; never restores into production or over an existing database; UNVERIFIED evidence blocks a drill; flags dump files in the repository history by path and commit; credentials by environment-variable name only. Pinned ≠ `data-migration-runbook-author`, `compliance-evidence-collector`, `rollback-runbook-author`, `pii-lifecycle-designer`, `slo-reliability-architect`, `gated-deployment-prompt-template`, `incident-response-runbook` and `resilience-architecture-reviewer`. |
+| `resilience-architecture-reviewer` | execution-plan Phase 6 extra + product-agnostic roadmap (D71; D30 pull-forward note) | yes | Reviews how a system survives failure, review only: per dependency (slow, down, errors, wrong data) timeouts, retry budgets with backoff, circuit breakers, bulkheads and graceful degradation; single points of failure and zone/region redundancy; failover called TESTED only with a dated drill record; disaster-recovery (DR) fit of the backup and replication design against the recovery time and recovery point objectives (RTO/RPO), never invented (one owner question when missing); a game-day plan for a person to run. Runs no fault injection; backup existence and restore evidence goes to `database-backup-verifier` *(manual-only)*. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the three Phase 6
 clusters: **cloud-architecture** (`cloud-architecture-decider`,
@@ -1336,7 +1338,8 @@ Reconciliation §3 merge: `rollback-strategy-designer` is merged into
 (`cloud-security-baseline-reviewer`, `resilience-architecture-reviewer`,
 `migration-deployment-runbook`, `environment-parity-reviewer`,
 `database-backup-verifier`) remains backlog, built in Phase 8 batches, except
-`database-backup-verifier` (#253), which D71 built and moved to
+`database-backup-verifier` (#253) and `resilience-architecture-reviewer`, which
+D71 built and moved to
 [Implemented → Skills (Phase 6)](#skills-phase-6--cloud-devops-reliability--release-pack) above.
 
 > Note: `release-readiness-reviewer` and `full-codebase-auditor` exist as **subagents**

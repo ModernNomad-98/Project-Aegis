@@ -5,7 +5,8 @@
     "slo-reliability-architect",
     "latency-budget-architect",
     "caching-strategy-designer",
-    "data-partitioning-sharding-strategist"
+    "data-partitioning-sharding-strategist",
+    "resilience-architecture-reviewer"
   ],
   "cases": [
     {
@@ -45,6 +46,16 @@
       "should_not_trigger": ["horizontal-scalability-reviewer"],
       "note": "SEAM CASE — data-tier write-scale sharding (shard key, partitioning, resharding) vs app-tier scale-out readiness (statelessness, run-once singletons, connection ceilings).",
       "reason": "Distributing the DATA tier for write/size scale (shard key, range/hash partitioning, hot-key resharding) is data-partitioning-sharding-strategist. This reviewer judges whether the APP tier tolerates many churning instances; it flags a write-bound datastore and hands the sharding design over."
+    },
+    {
+      "id": "zone-failure-goes-to-resilience-architecture-reviewer",
+      "prompt": "We already run four API instances behind the load balancer. What happens if the whole availability zone they sit in goes down, and does our database failover actually work?",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "horizontal-scalability-reviewer"
+      ],
+      "note": "SEAM CASE (reciprocated yield, D71) — surviving the loss of a zone and a tested failover path vs running many instances correctly.",
+      "reason": "How the system survives losing a zone, and whether failover works, is resilience-architecture-reviewer. This reviewer judges whether many instances run correctly; the instances already exist and scale-out is not the question."
     }
   ]
 }

@@ -23,7 +23,7 @@ above when citing criteria or report-type claims.
 | Category | Include when the org has committed to… | Existing mechanisms to map (via compliance-control-foundation) |
 | --- | --- | --- |
 | Security (common criteria) | baseline for the engagement | Phase 3/4 packs: authz matrix, RLS audit + negative tests, tenant isolation, secrets custody, change mgmt, audit log, supply chain, incident response |
-| Availability | SLAs, uptime/DR commitments | `slo-reliability-architect` targets + error budgets, `incident-response-runbook`, `rollback-runbook-author`, backup posture |
+| Availability | SLAs, uptime/DR commitments | uptime: `slo-reliability-architect` targets + error budgets; DR: `resilience-architecture-reviewer` recovery time and recovery point targets, failover and DR fit; `incident-response-runbook`, `rollback-runbook-author`, backup posture |
 | Processing Integrity | complete/accurate/timely processing (billing, transactions, pipelines) | input validation boundaries, idempotency (`api-event-architect`), job monitoring (`observability-operator`), reconciliation controls (often net-new) |
 | Confidentiality | NDA/confidential-data commitments, tenant-data confidentiality | `tenant-isolation-reviewer` surfaces, `secrets-identity-hardener`, retention/disposal rules |
 | Privacy | personal-information lifecycle commitments (notice, choice, access, disposal) | `sensitive-disclosure-guard` surface, data-retention posture; substantial net-new likely; legal review hook |

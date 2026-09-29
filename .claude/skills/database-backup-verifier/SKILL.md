@@ -30,7 +30,7 @@ example a `.sql`, `.dump` or `.bak` file). Each check gets one verdict:
 **VERIFIED** (the evidence was read and meets the requirement), **GAP** (the
 evidence was read and does not meet it) or **UNVERIFIED** (the evidence
 needed for a verdict could not be read, so no verdict is given).
-The planned Phase 6 skill resilience-architecture-reviewer sets RTO, RPO and
+The Phase 6 skill `resilience-architecture-reviewer` reviews RTO, RPO and
 DR design; if it is not in this copy of the library, say so and ask the
 owner for the recorded objectives instead.
 
@@ -63,7 +63,7 @@ owner decision D71 (roadmap row #253), from candidate 5 of the
 - Use when: someone needs to know whether a database dump was ever committed
   to the repository.
 - Do NOT use when: the RTO, RPO or DR design itself must be set or reviewed
-  — that is resilience-architecture-reviewer (planned; see the Reading key).
+  — that is `resilience-architecture-reviewer` (see the Reading key).
   This skill checks real backups against objectives that already exist.
 - Do NOT use when: the ask is the migration or data-move runbook —
   `data-migration-runbook-author`. It consumes this skill's evidence.
@@ -122,7 +122,7 @@ before proceeding.
 1. **Pin the scope and objectives.** List the stores in scope and, for
    each, its RPO, RTO, retention and encryption requirement. If any store
    has no recorded RPO or RTO, stop and hand the gap to
-   resilience-architecture-reviewer; never invent an objective.
+   `resilience-architecture-reviewer`; never invent an objective.
 2. **Read the evidence (evidence mode, the default, read-only).** Run only
    listing and describe operations, using the credential named by its
    variable. Record the origin of every piece of evidence: the command or
@@ -292,7 +292,7 @@ Handoffs: <resilience-architecture-reviewer | data-migration-runbook-author | se
   the applicable human grant: stop that operation and obtain the missing scope.
   Existing authorized operations do not need the same permission again.
 - A store in scope has no recorded RPO or RTO → stop before judging it and
-  hand the gap to resilience-architecture-reviewer (or, if that skill is not
+  hand the gap to `resilience-architecture-reviewer` (or, if that skill is not
   in this copy of the library, ask the owner for the objectives).
 - The restore target is production, or its identifiers cannot be proven
   different from production → refuse the restore and report why; do not
@@ -334,6 +334,5 @@ Handoffs: <resilience-architecture-reviewer | data-migration-runbook-author | se
 - `evals/trigger-evals.json` — discrimination against
   `data-migration-runbook-author`, `compliance-evidence-collector`,
   `rollback-runbook-author`, `pii-lifecycle-designer`,
-  `slo-reliability-architect`, `gated-deployment-prompt-template` and
-  `incident-response-runbook`. The seam with the planned
-  resilience-architecture-reviewer is pinned once that skill exists.
+  `slo-reliability-architect`, `gated-deployment-prompt-template`,
+  `incident-response-runbook` and `resilience-architecture-reviewer`.

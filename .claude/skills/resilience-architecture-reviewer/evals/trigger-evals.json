@@ -1,0 +1,123 @@
+{
+  "skill": "resilience-architecture-reviewer",
+  "description": "Trigger discrimination for reviewing how a system survives failure (D71, Phase 6 expansion backlog) against the neighbors named in its description and the Phase 6 batch proposal: setting reliability targets (slo-reliability-architect), scale-out readiness (horizontal-scalability-reviewer), deriving timeouts from a latency budget (latency-budget-architect), writing the failover or incident playbook (incident-response-runbook), writing rollback steps (rollback-runbook-author), and proving that real backups exist and restore (database-backup-verifier, manual-only).",
+  "overlaps_with": [
+    "slo-reliability-architect",
+    "horizontal-scalability-reviewer",
+    "latency-budget-architect",
+    "incident-response-runbook",
+    "rollback-runbook-author",
+    "database-backup-verifier"
+  ],
+  "cases": [
+    {
+      "id": "dependency-failure-review-wins-here",
+      "prompt": "What happens to checkout if the payment provider goes down or gets slow? We call it inline from the order service.",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "slo-reliability-architect",
+        "latency-budget-architect"
+      ],
+      "reason": "The ask is how one dependency's failure is contained (timeout, circuit breaker, degradation) and what users see; no target is being set and no latency budget is being split."
+    },
+    {
+      "id": "region-failover-review-wins-here",
+      "prompt": "Review our plan to fail over from us-east-1 to us-west-2 if the region goes down. Will it actually work, and can we meet a 4-hour RTO?",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "incident-response-runbook",
+        "rollback-runbook-author"
+      ],
+      "note": "SEAM CASE — reviewing whether a failover design works and fits the RTO vs writing the responder's playbook or a release rollback.",
+      "reason": "Judging a failover design and its fit to a recovery target is this reviewer; the responder's step-by-step playbook is incident-response-runbook and release rollback steps are rollback-runbook-author."
+    },
+    {
+      "id": "backup-design-vs-rpo-wins-here",
+      "prompt": "We promise at most 15 minutes of data loss. Is a nightly database snapshot enough, or do we need point-in-time recovery?",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "slo-reliability-architect",
+        "database-backup-verifier"
+      ],
+      "note": "SEAM CASE — whether the backup DESIGN can meet the RPO is this skill; proving real backups restore is the manual-only database-backup-verifier, which a person invokes by name.",
+      "reason": "Comparing the backup and replication design with the recovery point objective is DR fit review; no reliability target is being set."
+    },
+    {
+      "id": "uptime-target-goes-to-slo",
+      "prompt": "What should our uptime target be for the dashboard, and how big should the error budget be?",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer"
+      ],
+      "note": "SEAM CASE — setting the target vs checking whether the design survives failures without breaking it.",
+      "reason": "Choosing reliability targets and error budgets is slo-reliability-architect; this reviewer reads those targets and does not set them."
+    },
+    {
+      "id": "three-instances-goes-to-horizontal",
+      "prompt": "Can we run three instances of the web app behind the load balancer? I'm worried about sessions and the cron job running three times.",
+      "expected_skill": "horizontal-scalability-reviewer",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer"
+      ],
+      "reason": "Running many instances (statelessness, run-once jobs, sticky sessions) is scale-out readiness, not failure containment or recovery."
+    },
+    {
+      "id": "timeout-values-go-to-latency-budget",
+      "prompt": "Our search page must answer within 800 ms at the 99th percentile. Split that across the gateway, search service and index, and tell me what timeout and retry values each hop should use.",
+      "expected_skill": "latency-budget-architect",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer"
+      ],
+      "note": "SEAM CASE — deriving timeout values from a latency budget vs flagging a missing or unbounded timeout during a failure review.",
+      "reason": "Deriving per-hop timeouts and retries from an end-to-end latency target is latency-budget-architect; this reviewer flags missing containment and hands the value over."
+    },
+    {
+      "id": "failover-playbook-goes-to-incident-runbook",
+      "prompt": "Write the failover playbook: who declares the incident, the exact steps to promote the standby database, and the customer status-page messages.",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer"
+      ],
+      "note": "SEAM CASE — the responder's playbook vs the review of whether failover works.",
+      "reason": "Authoring the playbook a responder executes, with roles and comms, is incident-response-runbook; this skill reviews the failover design and writes only a game-day plan."
+    },
+    {
+      "id": "release-rollback-goes-to-rollback-author",
+      "prompt": "Tomorrow's release changes the orders table. Write the rollback plan if the deploy goes bad, step by step.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer"
+      ],
+      "reason": "Rollback steps for a specific release are rollback-runbook-author; nothing here asks how the system survives a dependency, zone or region failure."
+    },
+    {
+      "id": "game-day-plan-wins-here",
+      "prompt": "We've never tested what happens when Redis disappears. Plan a game day to find out safely, without breaking production.",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "incident-response-runbook",
+        "slo-reliability-architect"
+      ],
+      "reason": "A fault-injection or game-day plan (hypothesis, limits, abort criteria, owner) to prove a failure path is part of this review; nothing is being run and no playbook or target is requested."
+    },
+    {
+      "id": "burn-rate-alerts-go-to-slo",
+      "prompt": "Our pager goes off for every CPU spike. Redesign alerting so we only page when users are actually hurt.",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer"
+      ],
+      "reason": "Deciding what pages and moving cause alerts to tickets is slo-reliability-architect's alerting design, not a failure-containment review."
+    },
+    {
+      "id": "prove-backups-restore-goes-to-backup-verifier",
+      "prompt": "Explicitly invoke database-backup-verifier. Our RPO is 15 minutes. List the actual snapshots for the orders database, check the newest is recent enough, and do a restore drill into the scratch test database.",
+      "expected_skill": "database-backup-verifier",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer"
+      ],
+      "note": "SEAM CASE (D71) — evidence that real backups exist and restore vs whether the backup design can meet the RPO. database-backup-verifier is manual-only, so the prompt names it.",
+      "reason": "Listing real snapshots and running a restore drill is database-backup-verifier; this reviewer checks the design against the RPO and never lists or restores backups."
+    }
+  ]
+}

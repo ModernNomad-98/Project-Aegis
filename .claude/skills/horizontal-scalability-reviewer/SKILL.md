@@ -1,6 +1,6 @@
 ---
 name: horizontal-scalability-reviewer
-description: 'Review whether a system can scale OUT (add nodes) rather than only up — a can-it-scale-horizontally lens: statelessness / session and in-memory-state externalization, connection pooling and connection-count ceilings, sticky-session and in-process-singleton / local-cache / local-cron / local-filesystem smells, autoscaling + load-balancer + health-check config, and graceful shutdown/draining so scale-in does not drop work. Produces a scale-out readiness verdict with component/file findings ranked by blast radius and a remediation order. Use when reviewing readiness to run multiple instances or autoscale, when adding a second node breaks things, or when "it works on one box" must become many. Do NOT use to SET reliability targets (slo-reliability-architect), allocate a LATENCY budget (latency-budget-architect), or design the CACHE (caching-strategy-designer) — this reviews scale-out readiness and defers those.'
+description: 'Review whether a system can scale OUT (add nodes) rather than only up — a can-it-scale-horizontally lens: statelessness / session and in-memory-state externalization, connection pooling and connection-count ceilings, sticky-session and in-process-singleton / local-cache / local-cron / local-filesystem smells, autoscaling + load-balancer + health-check config, and graceful shutdown/draining so scale-in does not drop work. Produces a scale-out readiness verdict with component/file findings ranked by blast radius and a remediation order. Use when reviewing readiness to run multiple instances or autoscale, when adding a second node breaks things, or when "it works on one box" must become many. Do NOT use to SET reliability targets (slo-reliability-architect), allocate a LATENCY budget (latency-budget-architect), review failure containment, failover or disaster recovery (resilience-architecture-reviewer), or design the CACHE (caching-strategy-designer) — this reviews scale-out readiness and defers those.'
 ---
 
 # Horizontal Scalability Reviewer
@@ -41,6 +41,10 @@ findings may point to.
   scale-out gaps that threaten those targets, but it does not define them.
 - Do NOT use when: the task is to allocate an end-to-end LATENCY budget
   across hops — that is `latency-budget-architect`.
+- Do NOT use when: the question is what happens when a dependency, zone or
+  region FAILS, or whether failover and disaster recovery work — that is
+  `resilience-architecture-reviewer`; this review asks whether many
+  instances run correctly, not how the system survives losing some.
 - Do NOT use when: the task is to DESIGN caching (what to cache, TTLs,
   invalidation) — that is `caching-strategy-designer`; this review flags a
   node-LOCAL cache as a scale-out smell and hands the redesign over.

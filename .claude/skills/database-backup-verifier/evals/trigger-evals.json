@@ -1,6 +1,6 @@
 {
   "skill": "database-backup-verifier",
-  "description": "Trigger discrimination for database backup verification (D71): proving that real backups exist, are current and restore, versus writing the data-move runbook that needs the backup (data-migration-runbook-author), scheduling periodic audit evidence (compliance-evidence-collector), writing release rollback steps (rollback-runbook-author), personal-data retention in backups (pii-lifecycle-designer), service level objectives (slo-reliability-architect), recurring gated-operation templates (gated-deployment-prompt-template) and live production recovery (incident-response-runbook). The seam with the planned resilience-architecture-reviewer (recovery objectives and disaster-recovery design) is pinned when that skill is on disk, because a routing case may only name skills that exist.",
+  "description": "Trigger discrimination for database backup verification (D71): proving that real backups exist, are current and restore, versus writing the data-move runbook that needs the backup (data-migration-runbook-author), scheduling periodic audit evidence (compliance-evidence-collector), writing release rollback steps (rollback-runbook-author), personal-data retention in backups (pii-lifecycle-designer), service level objectives (slo-reliability-architect), recurring gated-operation templates (gated-deployment-prompt-template), live production recovery (incident-response-runbook) and setting or reviewing recovery objectives and disaster-recovery design (resilience-architecture-reviewer).",
   "overlaps_with": [
     "data-migration-runbook-author",
     "compliance-evidence-collector",
@@ -8,7 +8,8 @@
     "pii-lifecycle-designer",
     "slo-reliability-architect",
     "gated-deployment-prompt-template",
-    "incident-response-runbook"
+    "incident-response-runbook",
+    "resilience-architecture-reviewer"
   ],
   "cases": [
     {
@@ -109,6 +110,26 @@
         "database-backup-verifier"
       ],
       "reason": "Recovering production during an outage is an incident; this skill never restores into production and only verifies backups outside an incident."
+    },
+    {
+      "id": "real-backups-restore-wins-here",
+      "prompt": "Explicitly invoke database-backup-verifier. Our DR design says we can lose at most 15 minutes of orders data. Check that the actual snapshots and point-in-time recovery window meet that, and restore last night's backup into the scratch-restore test database to prove it works.",
+      "expected_skill": "database-backup-verifier",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer"
+      ],
+      "note": "SEAM CASE (D71) — proving real backups exist and restore vs reviewing whether the recovery design can meet the objectives.",
+      "reason": "The objectives already exist and the ask is evidence from the real backups plus a restore drill; that is verification. resilience-architecture-reviewer reviews the design and never lists or restores backups."
+    },
+    {
+      "id": "dr-design-review-goes-to-resilience-reviewer",
+      "prompt": "We have no recovery targets yet. Review our disaster recovery design: a primary database in one region, a read replica in another and nightly exports. What should our recovery time and data-loss targets be checked against, and can this design meet them?",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "database-backup-verifier"
+      ],
+      "note": "SEAM CASE (D71) — the recovery design and its fit to RTO and RPO vs evidence that real backups restore.",
+      "reason": "Reviewing the DR design and its fit to recovery objectives is resilience-architecture-reviewer; this skill needs recorded objectives first and only checks the real backups against them."
     }
   ]
 }
