@@ -2,7 +2,10 @@
 
 Detail for `ai-human-in-the-loop-designer`. Read on demand from the
 workflow. AI means artificial intelligence; a proposal is an AI output held
-as a suggestion that is not yet product state.
+as a suggestion that is not yet product state. AUTONOMOUS means the AI acts
+alone while a person watches; CONFIRM means a person approves first;
+FORBIDDEN means never. A tenant is one customer organization whose data the
+product keeps apart; blast radius is how much harm one wrong action can do.
 
 ## 1. Classification rubric
 
@@ -13,7 +16,8 @@ action through the normal user interface). Move it only with a reason.
 | --- | --- | --- |
 | Could a person perform this action today with their own permissions? | continue | FORBIDDEN (the AI cannot gain an action nobody has) |
 | Is it irreversible (money moved, message sent to someone outside the product, data destroyed)? | CONFIRM at most; FORBIDDEN if one reviewer cannot judge it | continue |
-| Does it reach beyond one record or one user (whole tenant, many customers, another tenant)? | FORBIDDEN, or CONFIRM with a second reviewer if the tier allows | continue |
+| Does it touch another tenant's data? | FORBIDDEN | continue |
+| Does it reach beyond one record or one user (a whole tenant or many customers)? | FORBIDDEN, or CONFIRM with a second reviewer if the tier allows | continue |
 | Does the risk tier allow autonomy for this action? | AUTONOMOUS is possible | CONFIRM or ADVISORY-ONLY |
 | Do the watch-and-undo controls exist (monitoring, sampling, undo window, pause thresholds)? | AUTONOMOUS | CONFIRM until they exist |
 

@@ -74,7 +74,7 @@ governance pack rather than restating it.
    action) → human-on-the-loop (human monitors, can intervene). Verify the
    feature's actual oversight matches its tier; a high-impact autonomous
    feature with no human gate is a blocking gap (compose
-   `human-approval-boundary` for the gate design).
+   `ai-human-in-the-loop-designer` for the gate design).
 3. **Assign accountability.** A named human owner accountable for outcomes,
    not a team abstraction. Escalation path defined and tied to
    `incident-response-runbook`.

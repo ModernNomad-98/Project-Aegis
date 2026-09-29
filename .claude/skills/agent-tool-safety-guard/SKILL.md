@@ -53,9 +53,8 @@ from `human-approval-boundary`; standing agent authority from
   in a tool description is being relied on as a gate
   (`hidden-context-exposure-reviewer`, LLM08 Hidden Context Exposure); that
   skill routes the enforcement fix back here.
-- Do NOT use when: the tool gate is set and the ask is the review workflow
-  behind it, or the AI output needing review is not a tool call (a drafted
-  reply, a suggested field value) — that is `ai-human-in-the-loop-designer`.
+- Do NOT use when: the ask is the review workflow behind a tool gate, or AI
+  output that is not a tool call — that is `ai-human-in-the-loop-designer`.
 
 ## Inputs to Inspect
 
@@ -96,14 +95,13 @@ from `human-approval-boundary`; standing agent authority from
    ids) BEFORE the side effect runs — the model's output is untrusted input
    to the tool (compose `structured-output-validator`).
 5. **Gate high-impact actions.** Irreversible, destructive, costly, or
-   cross-boundary actions require human approval via `human-approval-boundary`;
-   define the trigger per tool. The product review workflow those approvals
-   run through (pending proposal, queue, approve/edit/reject, who may review,
-   audit) is designed by `ai-human-in-the-loop-designer`. Standing "agent
-   may never do X autonomously" rules come from `agent-authorization-matrix`.
-   Code-execution tools default to sandbox-required plus approval (per-tool
-   side-effect limits set here; the sandbox itself per
-   `llm-output-safety-reviewer`, ASI05).
+   cross-boundary actions require human approval; define the trigger per tool.
+   A product agent's approvals run through the review workflow designed by
+   `ai-human-in-the-loop-designer`; a coding agent's own risky steps stop at
+   `human-approval-boundary`. Standing "agent may never do X autonomously"
+   rules come from `agent-authorization-matrix`. Code-execution tools default
+   to sandbox-required plus approval (per-tool side-effect limits set here;
+   the sandbox itself per `llm-output-safety-reviewer`, ASI05).
 6. **Map tool-chain composition abuse** using
    [references/tool-permission-matrix.md](references/tool-permission-matrix.md):
    where one tool's (untrusted) output becomes another tool's arguments, a

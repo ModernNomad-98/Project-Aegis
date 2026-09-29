@@ -18,7 +18,9 @@ review gave the feature. Blast radius is how much harm one wrong action can
 do (one record, one customer, one tenant, everyone). A tenant is one
 customer organization whose data the product keeps apart from other
 customers' data. Consent fatigue is what happens when reviewers are asked so
-often that they approve without reading.
+often that they approve without reading. A service account is a login used
+by software rather than a person. A kill switch turns a feature off at once
+without a new release.
 
 ## Purpose
 

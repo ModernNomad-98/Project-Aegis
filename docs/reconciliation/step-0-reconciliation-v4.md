@@ -292,7 +292,7 @@ into `ai-evaluation-harness`, `ai-feature-kill-switch-designer`) → Phase 7 exp
 | #285 AI Human-in-the-Loop Design | built as `ai-human-in-the-loop-designer` (Phase 7) by D70 (2026-09-28) |
 | #286 AI Advisory-Only Pattern | merged into `ai-human-in-the-loop-designer` (its advisory-only default) by D70 (2026-09-28) |
 | #287 AI Autonomy Boundary Design | candidate `ai-autonomy-boundary-designer` merged into `ai-human-in-the-loop-designer` as its first workflow step (AUTONOMOUS / CONFIRM / FORBIDDEN) by D70 (2026-09-28) |
-| #299 AI Feature Kill Switch | candidate `ai-feature-kill-switch-designer` dropped by D70 (2026-09-28): covered by `ai-router-architect` (workflow step 7), with `ai-cost-guardrail-designer` (spend switch), `agent-containment-reviewer` (agent and fleet switches), `feature-flag-architect` and `feature-flag-rollout-strategist` |
+| #299 AI Feature Kill Switch | candidate `ai-feature-kill-switch-designer` dropped by D70 (2026-09-28): covered by `ai-router-architect` (workflow step 8), with `ai-cost-guardrail-designer` (spend switch), `agent-containment-reviewer` (agent and fleet switches), `feature-flag-architect` and `feature-flag-rollout-strategist` |
 
 #### OWASP LLM Top 10 (2025) coverage map
 
