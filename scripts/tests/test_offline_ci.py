@@ -86,7 +86,8 @@ class ProtectedFileGuardTests(unittest.TestCase):
         cls.guard = next(step["run"] for step in workflow["jobs"]["gate-guard"]["steps"]
                          if "gate_pattern=" in step.get("run", ""))
 
-    def run_guard(self, paths, *, rename=False, links=()):
+    def run_guard(self, paths, *, rename=False, links=(),
+                  rename_from=".github/workflows/previous.yml", rename_to="docs/previous.yml"):
         """`links` holds (path, target) pairs committed as git symlinks
         (mode 120000) through the index, so no real symlink is needed."""
         with tempfile.TemporaryDirectory(prefix="aegis-ci-guard-") as temporary:
@@ -100,22 +101,24 @@ class ProtectedFileGuardTests(unittest.TestCase):
             git("init", "--quiet")
             (repo / "README.md").write_text("fixture\n", encoding="utf-8")
             if rename:
-                old = repo / ".github/workflows/previous.yml"
-                old.parent.mkdir(parents=True)
+                old = repo / rename_from
+                old.parent.mkdir(parents=True, exist_ok=True)
                 old.write_text("protected fixture\n", encoding="utf-8")
-            git("add", ".")
+            # --force: a user-level excludes file must not hide a fixture path
+            # (Claude Code adds **/.claude/settings.local.json to one).
+            git("add", "--force", ".")
             git("commit", "--quiet", "-m", "fixture base")
             git("branch", "fixture-base")
             git("remote", "add", "origin", str(repo))
             if rename:
-                (repo / "docs").mkdir()
-                git("mv", ".github/workflows/previous.yml", "docs/previous.yml")
+                (repo / rename_to).parent.mkdir(parents=True, exist_ok=True)
+                git("mv", rename_from, rename_to)
             else:
                 for path in paths:
                     file = repo / path
                     file.parent.mkdir(parents=True, exist_ok=True)
                     file.write_text("changed fixture\n", encoding="utf-8")
-            git("add", ".")
+            git("add", "--force", ".")
             for link, target in links:
                 blob = subprocess.run(["git", "hash-object", "-w", "--stdin"], cwd=repo, check=True,
                                       input=target.encode("utf-8"), capture_output=True).stdout
@@ -177,19 +180,60 @@ class ProtectedFileGuardTests(unittest.TestCase):
                 self.assertIn("requires manual review and merge", result.stdout)
                 self.assertIn(link, result.stdout.split("Gate files touched:")[-1])
 
+    def test_symlinked_config_directories_require_manual_merge(self):
+        # A commands, hooks or plugin directory entry that is itself a symlink
+        # has no trailing slash in the diff, yet redirects what Claude Code loads.
+        for link in ("docs/.claude/commands", ".claude/hooks", "docs/.claude-plugin",
+                     ".claude/skills/x/.claude-plugin"):
+            with self.subTest(link=link):
+                result = self.run_guard(["payload/plugin.json"], links=[(link, "../payload")])
+                self.assertEqual(1, result.returncode, result.stdout + result.stderr)
+                self.assertIn(link, result.stdout.split("Gate files touched:")[-1])
+
+    def test_claude_code_and_git_config_files_require_manual_merge(self):
+        # Settings can define hooks, credential helpers and permissions;
+        # .mcp.json starts server processes; commands carry skill-style
+        # frontmatter; hooks/ holds hook scripts; .claude-plugin/ bundles hooks
+        # and MCP servers; .gitattributes can hide diffs and change evidence
+        # bytes. Claude Code and Git read nested copies, so every depth counts.
+        for path in (".gitattributes", "docs/evidence/offline-ci-2026-09-12/.gitattributes",
+                     "a/b/.GitAttributes", ".claude/settings.json", ".claude/settings.local.json",
+                     ".Claude/Settings.JSON", "docs/.claude/settings.json",
+                     "docs/.claude/settings.local.json", ".mcp.json", "docs/.mcp.json", ".MCP.JSON",
+                     ".claude/commands/deploy.md", "docs/.claude/commands/deploy.md",
+                     ".Claude/Commands/x.md", ".claude/hooks/check.sh", "a/.claude/hooks/check.sh",
+                     ".claude-plugin/plugin.json", "docs/.claude-plugin/plugin.json",
+                     "docs/.claude/commands", "docs/.claude/hooks", "a/.claude-plugin",
+                     ".claude/skills/x/.claude-plugin/plugin.json", ".claude/skills/x/.mcp.json"):
+            with self.subTest(path=path):
+                result = self.run_guard([path])
+                self.assertEqual(1, result.returncode, result.stdout + result.stderr)
+                self.assertIn("requires manual review and merge", result.stdout)
+
     def test_ordinary_skill_and_document_changes_pass(self):
         result = self.run_guard(["README.md", "docs/notes.md", ".claude/skills/example/SKILL.md",
                                  "docs/example.py", ".claude/skills/example/scripts/helper.py",
                                  "tools/aegis_setup/helper.py", "artifacts/scripts/yaml.py",
                                  ".claude/agents-notes.md", "docs/claude/agents/example.md",
                                  "docs/xclaude/agents/example.md", "docs/my.claude",
-                                 ".claude/agentsX/example.md"])
+                                 ".claude/agentsX/example.md",
+                                 # Near-misses of the Claude Code and Git config rules.
+                                 ".claude/skills/example/references/settings.json",
+                                 ".claude/settings.json.bak", ".claude/settings.jsonc",
+                                 "docs/gitattributes.md", ".gitattributes.md", "x.gitattributes",
+                                 "x.mcp.json", "docs/mcp.json", ".mcp.json.example",
+                                 ".claude/commands-notes.md", "docs/claude/settings.json",
+                                 ".claude/skills/example/hooks.md", "CLAUDE.md", "AGENTS.md"])
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_renaming_a_protected_file_outside_the_set_is_still_guarded(self):
-        result = self.run_guard([], rename=True)
-        self.assertEqual(1, result.returncode, result.stdout + result.stderr)
-        self.assertIn("requires manual review and merge", result.stdout)
+        for old, new in ((".github/workflows/previous.yml", "docs/previous.yml"),
+                         (".gitattributes", "docs/old-gitattributes.txt"),
+                         (".claude/settings.json", "docs/old-settings.json")):
+            with self.subTest(old=old):
+                result = self.run_guard([], rename=True, rename_from=old, rename_to=new)
+                self.assertEqual(1, result.returncode, result.stdout + result.stderr)
+                self.assertIn("requires manual review and merge", result.stdout)
 
     def test_unicode_and_newline_names_cannot_bypass_the_guard(self):
         result = self.run_guard([".github/workflows/\u2603\ncheck.yml"])

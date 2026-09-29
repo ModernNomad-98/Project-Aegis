@@ -407,6 +407,8 @@ cp -r .claude/skills/tdd-engineer /path/to/your-repo/.claude/skills/
 
 `cp -r` is the same copy on Mac and Linux (`-r` means "include everything inside the folder").
 
+Copied skills contain instructions only: no hooks, no `allowed-tools` pre-approvals, no `!` shell injection and no plugin or MCP files. The source repository's validator enforces this on every shipped skill, so copying one never adds code that runs when the skill is invoked.
+
 **Copying the startup files does not make your repo the Project Aegis source.**
 Copying `.claude/skills`, `CLAUDE.md`, and `AGENTS.md` into your own repo is the supported consumer installation, and those copied files stay *tools inside your product repository*.
 They do NOT convert it into the Project Aegis source repository — the copied root instructions are role-aware and say so.
@@ -1390,7 +1392,7 @@ uses Python 3.14 and provides these jobs:
 | --- | --- |
 | `validate-skills` | Required Ubuntu check: CI-helper tests, validator self-tests and skill validation, contract-audit self-tests, BER self-check and regression suite, PowerShell Core acceptance, and a PR-only Developer Certificate of Origin (DCO) sign-off check. |
 | `windows-offline-checks` | Additional Windows coverage: the Python checks plus native Windows PowerShell and PowerShell Core acceptance. This job is not registered as a required branch-protection check. |
-| `gate-guard` | Required PR-only check: deliberately fails when protected validation, workflow, agent-definition, runtime, test or dependency paths change, so those changes receive explicit review. |
+| `gate-guard` | Required PR-only check: deliberately fails when protected validation, workflow, agent-definition, Claude Code or Git configuration, runtime, test or dependency paths change, so those changes receive explicit review. |
 
 Notes:
 
@@ -1459,7 +1461,7 @@ CHANGELOG.md               # dated deliveries, not release tags
 - Start with standards, templates, eval convention, and validators (Phase 0).
 - Every skill needs `SKILL.md` with clear frontmatter, concise workflow, output format,
   validation checklist, gotchas, stop conditions, and `evals/evals.json`.
-- Avoid broad `allowed-tools`; use `disable-model-invocation: true` for side-effect workflows, subject to the narrowly defined exceptions in the [standard's §5](docs/skill-generation-standard.md).
+- Do not use `allowed-tools`, `hooks` or `shell` frontmatter or `!` shell injection (the validator rejects them); use `disable-model-invocation: true` for side-effect workflows, subject to the narrowly defined exceptions in the [standard's §5](docs/skill-generation-standard.md).
 - Use read-only exploration first for audits, architecture, code, security, and QA review.
 - Treat security, tenant isolation, QA evidence, and verification as first-class requirements.
 - Keep product-specific skills out of this reusable foundation.

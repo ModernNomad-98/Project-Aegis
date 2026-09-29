@@ -25,7 +25,14 @@ Checks performed per skill (see docs/skill-generation-standard.md):
     check is BIDIRECTIONAL (D50 follow-up per PR #59 review): a description
     that LEADS with the sentinel but lacks the field also fails — Claude
     Code itself would auto-invoke a skill whose text forbids it.
-  * no BROAD `allowed-tools` grant (e.g. "*", "all", bare "Bash").
+  * every frontmatter key is in an allow-list (name, description,
+    disable-model-invocation, license, compatibility, metadata), no key is
+    repeated, and `hooks`, `allowed-tools` and `shell` are named as forbidden:
+    they run commands or pre-approve tools when the skill is invoked, and
+    workspace trust does not gate `allowed-tools`.
+  * no `!`-prefixed shell injection (an inline !`cmd`, or a fenced block
+    opened with ```!) in ANY *.md file of the skill folder: Claude Code runs
+    those commands before the skill text reaches the model.
   * SKILL.md body is < 500 lines.
   * all nine required sections present (v4 standard): Purpose, Use When,
     Inputs to Inspect, Workflow, Output Format, Validation Checklist, Gotchas,
@@ -48,6 +55,15 @@ Repo-level checks:
     present, is one the runtime recognises. Every frontmatter key must be in
     an allow-list; `hooks`, `mcpServers` and `permissionMode` (commands,
     processes, wider permissions) are named as forbidden.
+  * Claude Code and MCP configuration (check_config_surfaces, HARD, over
+    TRACKED paths only, so untracked local worktrees are ignored):
+      - no plugin manifest, nested `.claude/`, `hooks/`, `.mcp.json` or
+        `.lsp.json` inside a skill folder (it would load as a plugin, hook or
+        server in every repository that copies the skill);
+      - no `.claude/skills/` tree except the root one (Claude Code loads nested
+        skill trees, but this validator would never check them);
+      - no `.mcp.json` or `.claude/settings.json` / `settings.local.json` at
+        any depth (the source library ships no settings or MCP servers).
   * guided-path link resolution (decision D55 — check_docs_paths_links, HARD):
     every SKILL.md link in docs/paths/ and every docs/paths link in the README
     resolves on disk, and a `[`foo`](.../bar/SKILL.md)` label matches its
@@ -139,8 +155,33 @@ RESERVED_BUNDLED_NAMES = {
     "security-review",
 }
 
-# allowed-tools values that count as "broad" and are rejected.
-BROAD_TOOL_TOKENS = {"*", "all", "any", "bash"}
+# Skill frontmatter keys a shipped skill may carry (allow-list). Checked
+# against the Claude Code skill field table (code.claude.com/docs/en/skills,
+# 2026-09-28) and the portable Agent Skills set. Every other key is an error,
+# so a field Claude Code adds later is reviewed before a skill can use it.
+SKILL_ALLOWED_KEYS = {
+    "name", "description", "disable-model-invocation",
+    "license", "compatibility", "metadata",
+}
+# Keys that run commands or widen authority when the skill is invoked. Each
+# gets a specific error. `allowed-tools` is banned outright (owner decision,
+# 2026-09-28): it pre-approves tools even in an untrusted folder or a -p run.
+SKILL_FORBIDDEN_KEYS = {
+    "hooks": "registers shell-command hooks that keep running for the rest "
+             "of the session once the skill is invoked",
+    "allowed-tools": "pre-approves tools for the invoking turn, and workspace "
+                     "trust does not gate it",
+    "shell": "selects the shell that runs the skill's injected commands",
+}
+# Dynamic context injection: Claude Code runs `!`-prefixed commands before the
+# skill content is sent to the model. The inline form counts at the start of a
+# line or after whitespace (`KEY=!`x`` stays literal); a fenced block counts
+# when its opening fence is followed by `!`. Matched over the raw file,
+# fences included, because the substitution runs over the raw file too.
+SKILL_SHELL_INJECTION_RES = (
+    re.compile(r"(?m)(?:^|(?<=\s))!`"),
+    re.compile(r"(?m)^[ \t]*(?:```|~~~)[ \t]*!"),
+)
 
 
 # --- frontmatter parsing (decision D50: spec-strict) ------------------------
@@ -383,16 +424,51 @@ def validate_skill(skill_dir: Path, rep: Report) -> str | None:
         )
     check_manual_only_sentinel(name_ctx, fm, desc, rep)
 
-    # allowed-tools must not be broad
-    tools = fm.get("allowed-tools")
-    if tools is not None:
-        tool_list = tools if isinstance(tools, list) else [tools]
-        for t in tool_list:
-            if str(t).strip().lower() in BROAD_TOOL_TOKENS:
+    # Frontmatter key allow-list: no repeated key, nothing that runs commands
+    # or pre-approves tools, and nothing unreviewed. Case variants (`Hooks`)
+    # fail as "not in the allow-list".
+    for key in duplicate_mapping_keys(fm_text):
+        rep.error(
+            f"[{name_ctx}] duplicate frontmatter key `{key}`: YAML readers "
+            "disagree on which value wins, so the checked value may not be "
+            "the one that runs"
+        )
+    # Same indirection ban as agent frontmatter: a merge key or merge-tagged
+    # key (`!!merge hooks:`) can hide a forbidden key from one reader and
+    # hand it to another.
+    for item in yaml_indirection(fm_text):
+        rep.error(
+            f"[{name_ctx}] YAML {item} in skill frontmatter: readers without "
+            "merge-key, alias or tag support see different keys, so write "
+            "each key out flat"
+        )
+    for key in sorted(map(str, fm)):
+        if key in SKILL_FORBIDDEN_KEYS:
+            rep.error(
+                f"[{name_ctx}] forbidden skill frontmatter key `{key}`: it "
+                f"{SKILL_FORBIDDEN_KEYS[key]}; shipped skills are instructions only"
+            )
+        elif key not in SKILL_ALLOWED_KEYS:
+            rep.error(
+                f"[{name_ctx}] skill frontmatter key `{key}` is not in the "
+                f"allow-list {sorted(SKILL_ALLOWED_KEYS)}; review what it does "
+                "before adding it there"
+            )
+
+    # `!` shell injection, in SKILL.md and every other markdown file the
+    # skill can load (references, assets).
+    for md in _walk_md(skill_dir):
+        md_text = md.read_text(encoding="utf-8")
+        for pattern in SKILL_SHELL_INJECTION_RES:
+            hit = pattern.search(md_text)
+            if hit:
+                line_no = md_text.count("\n", 0, hit.start()) + 1
                 rep.error(
-                    f"[{name_ctx}] broad allowed-tools grant '{t}' is forbidden; "
-                    f"scope it narrowly or omit the field"
+                    f"[{name_ctx}] {md.relative_to(skill_dir).as_posix()}:{line_no}: "
+                    "`!`-prefixed command injection runs a shell command when "
+                    "the skill is invoked; write it as prose or escape it"
                 )
+                break
 
     # side-effect skills should disable model invocation (advisory)
     dmi = str(fm.get("disable-model-invocation", "")).lower()
@@ -904,6 +980,76 @@ PATH_SKILL_LINK = re.compile(
 README_PATH_DOC_LINK = re.compile(r"\[[^\]]*\]\((docs/paths/[A-Za-z0-9._-]+\.md)\)")
 
 
+# Claude Code and MCP configuration surfaces (follow-up to finding P2-3). All
+# three are matched case-insensitively for Windows and macOS checkouts, and
+# `(/|$)` also catches an entry that is itself a symlink to a directory.
+#
+# Inside a skill folder: a `.claude-plugin/` makes the folder load as a plugin
+# that can bundle hooks and MCP servers; a nested `.claude/`, a `hooks/`
+# directory, `.mcp.json` or `.lsp.json` would travel with every copy.
+SKILL_DIR_FORBIDDEN = re.compile(
+    r"^\.claude/skills/[^/]+/(?:.*/)?"
+    r"(?:(?:\.claude-plugin|\.claude|hooks)(?:/|$)|\.mcp\.json$|\.lsp\.json$)",
+    re.IGNORECASE,
+)
+# Claude Code loads `.claude/skills/` from the working directory and every
+# parent up to the repository root, so a nested tree is live yet unvalidated.
+SKILL_PATH_SEGMENT = re.compile(r"(^|/)\.claude/skills(/|$)", re.IGNORECASE)
+# Settings can define hooks, credential helpers and permissions; `.mcp.json`
+# starts server processes, without a prompt in -p and SDK runs.
+FORBIDDEN_CONFIG_FILES = re.compile(
+    r"(^|/)(\.mcp\.json|\.claude/settings(\.local)?\.json)$", re.IGNORECASE
+)
+
+
+def skill_dir_violations(paths: list[str]) -> list[str]:
+    """Plugin, hook, settings or server files inside a root skill folder."""
+    return sorted(p for p in paths if SKILL_DIR_FORBIDDEN.search(p))
+
+
+def nested_skill_files(paths: list[str]) -> list[str]:
+    """Paths in a `.claude/skills/` tree other than the root one (including
+    a case variant of the root, which is a different tree on Linux)."""
+    return sorted(
+        p for p in paths
+        if SKILL_PATH_SEGMENT.search(p) and not p.startswith(".claude/skills/")
+    )
+
+
+def forbidden_config_files(paths: list[str]) -> list[str]:
+    """Claude Code settings files and MCP server configs at any depth."""
+    return sorted(p for p in paths if FORBIDDEN_CONFIG_FILES.search(p))
+
+
+def check_config_surfaces(rep: Report, paths: list[str] | None = None) -> None:
+    """Configuration that would execute or widen authority, over TRACKED paths.
+
+    Tracked only (via `_repo_candidate_paths`): untracked local worktrees under
+    `.worktrees/` carry whole nested `.claude/skills/` trees by design and are
+    not what a pull request ships.
+    """
+    paths = _repo_candidate_paths() if paths is None else paths
+    for p in skill_dir_violations(paths):
+        rep.error(
+            f"[{p}] plugin, hook, settings or server file inside a skill "
+            "folder: it would load as a plugin, hook or MCP server in every "
+            "repository that copies the skill; delete it"
+        )
+    for p in nested_skill_files(paths):
+        rep.error(
+            f"[{p}] skill file outside the root `.claude/skills/` directory: "
+            "Claude Code loads every `.claude/skills/` from the working "
+            "directory up to the repository root, so a nested one is live yet "
+            "unvalidated; move it or delete it"
+        )
+    for p in forbidden_config_files(paths):
+        rep.error(
+            f"[{p}] Claude Code settings or MCP server file: the source library "
+            "ships no Claude Code settings or MCP servers; adding one is an "
+            "owner decision that also changes this rule"
+        )
+
+
 def check_docs_paths_links(
     rep: Report, paths_dir: Path | None = None, readme: Path | None = None
 ) -> None:
@@ -1092,6 +1238,7 @@ def main() -> int:
 
     # Repo surfaces outside .claude/skills/ (decision D55).
     check_agents_schema(rep)                       # HARD
+    check_config_surfaces(rep)                     # HARD
     check_docs_paths_links(rep)                    # HARD
     check_workflows_sha_pinned(rep)                # HARD
     check_claude_bridge(rep)                       # HARD  (decision D61)

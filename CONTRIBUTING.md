@@ -208,7 +208,10 @@ self-merged.
 
 Those **security-relevant surfaces** include `scripts/`, `.github/`, `AGENTS.md`,
 agent definitions in any `.claude/agents/` directory (root or nested,
-recursively), the Behavioral Eval Runner and approval/evidence tooling under
+recursively), Claude Code and Git configuration at any depth
+(`.claude/settings.json`, `.claude/settings.local.json`, `.mcp.json`,
+`.claude/commands/`, `.claude/hooks/`, `.claude-plugin/` and `.gitattributes`),
+the Behavioral Eval Runner and approval/evidence tooling under
 `tools/`, pinned dependency files, the
 [owner approval register](docs/approvals/APPROVAL_REGISTER.md),
 [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) §5, and
