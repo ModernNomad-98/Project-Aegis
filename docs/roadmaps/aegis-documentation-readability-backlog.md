@@ -1450,9 +1450,10 @@ per PR in parentheses, and net since the page's last accepted head for the
   ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/521#issuecomment-5882300536)).
   The later checks on `8ccc5ee` and `f5a6dab` kept both accepted.
 - `iac-reviewer/SKILL.md` (#521, 30): after the rebase it was 11 net since
-  `93f6162`, so it got a full-page re-read on `8ccc5ee` (FIX-FIRST,
+  `93f6162`, so it got a full-page re-read on `8ccc5ee` (FIX-FIRST with
+  three named edits, I1 to I3,
   [comment](https://github.com/ModernNomad-98/Project-Aegis/pull/521#issuecomment-5885328158)).
-  A re-read confined to those three edits **accepted** it on `f5a6dab`
+  A re-read confined to I1 to I3 **accepted** it on `f5a6dab`
   ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/521#issuecomment-5893664512)),
   its new acceptance point.
 - This ledger (#534, 162): FIX-FIRST on `4149221`, then **ACCEPT** on
@@ -1465,9 +1466,12 @@ per PR in parentheses, and net since the page's last accepted head for the
   `vite-build-qa-engineer/SKILL.md` (#521, 6; 6 net since `eb3ec53`): #521's
   reviews measured both and passed the edits.
 - `.claude/skills/_template/SKILL.md` (#528, 4; 4 net since #408's
-  `0533764`): #528's corrected-candidate security review on `1e1cc70`
-  checked the removed `allowed-tools` comment line
-  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/528#issuecomment-5883096195)).
+  `0533764`): two edits in `1e1cc70`, the removed `allowed-tools` comment
+  line and a reworded validator-exemption note. #528's corrected-candidate
+  security review on `1e1cc70` checked the first by name
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/528#issuecomment-5883096195)),
+  and a targeted review on `8dc3b00` passed both
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/538#issuecomment-5897153529)).
 
 **Newly pending.** The [skill generation
 standard](../skill-generation-standard.md) (#528, 9): with #486's 2 it is 11
