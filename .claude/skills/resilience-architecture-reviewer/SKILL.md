@@ -25,7 +25,10 @@ pool of connections or workers so its failure cannot use up everyone
 else's; graceful degradation keeps the core journey working with a reduced
 feature when a dependency is down. Fault injection is deliberately breaking
 a component to see how the system responds; a game day is a scheduled,
-supervised failure drill run by people. A tenant is one customer
+supervised failure drill run by people. A drill's blast radius is how much
+of the product it can affect, and its steady state is the normal value of
+the signal it watches. Point-in-time recovery restores a database to any
+chosen moment, not only to the last snapshot. A tenant is one customer
 organization whose data the product keeps apart from other customers' data.
 
 ## Purpose
@@ -124,9 +127,9 @@ the Phase 6 expansion backlog, following the
 3. **Walk each dependency through four failure scenarios:** slow, down,
    returning errors, and returning wrong or partial data. For each, check
    the containment in place: a timeout and its value, retries with backoff
-   and jitter inside a retry budget (and only for safe-to-repeat
-   operations), a circuit breaker, a bulkhead, and a graceful-degradation
-   path. Name what the user sees. The per-scenario checklist is in
+   and jitter (a random spread so retries do not arrive together) inside a
+   retry budget (and only for safe-to-repeat operations), a circuit
+   breaker, a bulkhead, and a graceful-degradation path. Name what the user sees. The per-scenario checklist is in
    [references/resilience-review-sheet.md](references/resilience-review-sheet.md).
 4. **Find single points of failure.** For each component on a critical
    journey, ask what stops if it alone fails: one database instance, one
@@ -231,9 +234,9 @@ Not done: no fault injected, no failover triggered, no backup listed or
   drops encryption is at least High.
 - A DR region that breaks a stated data-residency promise is a finding for
   the owner and legal review, not a configuration choice to make here.
-- A failover or break-glass path that grants broader access than normal
-  operation is reported; access policy design goes to
-  `authorization-matrix-designer`.
+- A failover or break-glass path (an emergency route around normal access
+  controls) that grants broader access than normal operation is reported;
+  access policy design goes to `authorization-matrix-designer`.
 
 ## Gotchas
 

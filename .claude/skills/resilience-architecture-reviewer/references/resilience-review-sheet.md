@@ -52,7 +52,7 @@ and the dated evidence it works.
 1. What detects the failure, and how long does detection take?
 2. Who or what decides to switch, and how long does that decision take?
 3. How is traffic moved (health-check routing, DNS change with its TTL,
-   connection-string change, promoted replica)?
+   connection-string change, or a replica promoted to be the new primary)?
 4. How much data is lost to replication lag at the moment of failure?
 5. Can both copies accept writes during the switch? If so, how are
    conflicting writes found and resolved?
@@ -77,7 +77,8 @@ Realistic recovery time = detection + decision + restore or promote
 FIT for RTO when realistic recovery time <= RTO
 ```
 
-Example: RPO 15 minutes, daily snapshots, no point-in-time recovery.
+Example: RPO 15 minutes, daily snapshots, no point-in-time recovery
+(restoring to any chosen moment, not only to a snapshot).
 Worst-case loss is about 24 hours, so the design does not fit (GAP). The
 fix options are point-in-time recovery or continuous replication; whether
 the snapshots exist and restore is evidence for `database-backup-verifier`
