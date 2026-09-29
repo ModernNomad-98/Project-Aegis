@@ -2273,9 +2273,10 @@ the entry governs.
   `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` and got byte-identical files.
   It returned FIX-FIRST (fix before acceptance) for one missing
   documentation edit: the dated note in
-  `docs/audits/aegis-060-plus-register.md`. A
-  [corrected-candidate check](https://github.com/ModernNomad-98/Project-Aegis/pull/503#issuecomment-5878694559)
-  of the exact head returned ACCEPT, meaning ready to merge. It found that
+  `docs/audits/aegis-060-plus-register.md`. The exact head then had a
+  [corrected-candidate check](https://github.com/ModernNomad-98/Project-Aegis/pull/503#issuecomment-5878694559),
+  a re-check of the head after that fix. It returned ACCEPT, meaning ready
+  to merge. It found that
   the head adds only that note and that every other file is unchanged from
   the reproduced head. Codex posted only usage-limit notices after the head
   commit (21:00:22 UTC): at 21:01:56 and 21:12:26 UTC on 2026-09-28, so it
