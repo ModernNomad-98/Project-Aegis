@@ -2,12 +2,12 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #508 (`d932d2c`) on 2026-09-28 Coordinated
+As of merged pull request (PR) #515 (`2672b16`) on 2026-09-29 Coordinated
 Universal Time (UTC), this remains the active
 repository-wide documentation acceptance backlog. The latest count is in the
-paragraph for main after #508 (`d932d2c`): 622 tracked Markdown files, 568
+paragraph for main after #515 (`2672b16`): 625 tracked Markdown files, 572
 accepted reader pages, one generated report, 44 classified synthetic fixtures
-and nine known pending pages; the paragraphs between are dated history,
+and eight known pending pages; the paragraphs between are dated history,
 oldest first. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -1125,7 +1125,8 @@ no Codex review exists for any of these heads.
   [comment](https://github.com/ModernNomad-98/Project-Aegis/pull/491#issuecomment-5875748510)).
   That review checked facts and format, not the whole page, and the register
   went to 74 net since `2a411fd`, so it became **pending**. A full-page
-  re-read then returned FIX-FIRST with edits E1 to E4. That read was not
+  re-read of the register as #491 left it then returned FIX-FIRST with
+  edits E1 to E4. That read was not
   posted; #508's description records it and counts from `e6d0f6a`, an
   earlier baseline, which is also past 10. #508 applied E1 to E4 and appended
   AEGIS-APR-080 and APR-081 (72). Its independent review checked the edits
@@ -1155,13 +1156,14 @@ no Codex review exists for any of these heads.
 
 - The [step-0 reconciliation log](../reconciliation/step-0-reconciliation-v4.md)
   (#493, 55: the entry for owner decision D68; #499, 6: two rows in decision
-  D10's table and two Tier 1 cells; #498, 2: one Tier 1 cell): 65 net since
+  D10's table and two Tier 1 cells; #498, 2: one Tier 1 cell; and, before
+  this range, #486, 2: the "AI" spell-out): 65 net since
   its acceptance on `97c8682` (#439). The reviews checked those passages,
   but none re-read the whole log, so it is **pending**.
 - The [skills catalog](../skills-catalog.md) (#499, 19; #500, 9): 28 net
   since `2e15b23` (#451). **Pending.**
 - The [README](../../README.md) (#499, 7; #500, 5): 12 net since `b6b4b4e`
-  (#430), 4 of them from earlier reviewed edits. #500's reviewer read its
+  (#430); it was 4 net before this range. #500's reviewer read its
   README and catalog rows for registration only. **Pending.**
 - The [offline CI guide](../offline-ci.md) (#501, 14): 14 net since its
   acceptance in #365 (`2aed8dd`). #501's security review passed the diff on
@@ -1214,6 +1216,69 @@ register) + 1 (#508 accepted the register again) = 568. Pending goes
 0 + 6 + 4 (the new skill pages) − 1 = 9, and 568 + 9 + 1 + 44 = 622. This
 update changes this ledger by more than 10 lines, so it needs its own
 independent full-page re-read. No grant or gate changed.
+
+PRs #502 (`d4bcef1`, 23:15 UTC), #510 (`722134f`) and #509 (`853c64f`)
+(both 23:35), #511 (`ec5fd12`, 23:51) and #516 (`7300ef6`, 23:58) merged on
+2026-09-28 after #508, and #520 (`3d5e004`, 00:11 UTC) and #515 (`2672b16`,
+00:55 UTC) on 2026-09-29, in that order. Three Markdown files were added:
+the [2026-09-28 evening session checkpoint](session-checkpoint-2026-09-28-evening.md)
+(#509) and `.claude/skills/ci-failure-classifier/SKILL.md` with its
+`references/classification-guide.md` (#502). No file was removed or renamed,
+and no synthetic fixture changed. Counts and review links follow the rules
+of the paragraph above, now against `2672b16`; Codex again posted only
+usage-limit notices.
+
+- **Accepted.** The evening checkpoint (#509, new, 182): FIX-FIRST on
+  `9850f94`, then **ACCEPT** on `e46eba9`
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/509#issuecomment-5880661059)).
+  `ai-closeout-reporter/SKILL.md` (53) and its `assets/closeout-template.md`
+  (24), #511: a full-page re-read on `81b4234` returned REVISE (A1 to A6,
+  B1 to B4), and the corrected-candidate check **accepted** both on `cce2b45`
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/511#issuecomment-5880897371)).
+  The four new #499 and #500 skill pages, pending above, got readability
+  fixes in #520 (15, 3, 24 and 10), and a corrected-candidate check
+  **accepted** all four on `b0e149e`
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/520#issuecomment-5881095898)).
+  Pending to accepted. `code-reviewer/SKILL.md` (32) and its
+  `references/severity-rubric.md` (25), #515: a full-page re-read on
+  `1b4638f` returned REVISE, and the check on `67abe28` **accepted** both
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/515#issuecomment-5881126385)).
+  For each of these pages, `git diff <accepted head> 2672b16` is empty.
+- **Keep acceptance.** The [open-decisions index](aegis-open-decisions-2026-09-23.md)
+  (#510, 7): 7 net since `b6e82e4`, and #510's corrected-candidate check
+  kept it **accepted** on `beb3420`
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/510#issuecomment-5880650124)).
+  `local-ci-mirror-preflight/SKILL.md` and `systematic-debugger/SKILL.md`
+  (#502, 5 each): neither changed between its full-page acceptance and #502,
+  so each is 5 net, and #502's review checked both edits; its rebase check
+  passed them unchanged on `288e9cd`
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/502#issuecomment-5880413437)).
+- **Newly pending.** `.claude/skills/ci-failure-classifier/SKILL.md` (259) and
+  its `references/classification-guide.md` (82), new in #502: REVISE on
+  `ef9b4fb`, SHIP on `08f5502` and a rebase SHIP on `288e9cd` were
+  skill-quality reviews with no full-page verdict, so both are **pending**,
+  as the #499 and #500 pages were. The
+  [approval register](../approvals/APPROVAL_REGISTER.md) (#516, 91): its
+  review **accepted** the appended AEGIS-APR-082 to APR-084 on `24423e6`
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/516#issuecomment-5880915260))
+  but checked facts and format, not the whole page. That is 91 net since
+  `3ccac33`, so the register is **pending** again.
+- **Still pending, with new counts.** The step-0 reconciliation log (#510,
+  228: the D69 to D71 entries; #511, 2) is 295 net since `97c8682`. The
+  skills catalog (#502, 13; #515, 2) is 37 net since `2e15b23`. The README
+  (#502, 7) is 15 net since `b6b4b4e`. The offline CI guide and the
+  AEGIS-060+ register did not change.
+
+Main after #515 (`2672b16`) therefore has **625 tracked Markdown files: 572
+accepted reader pages, one generated report, 44 classified synthetic fixtures
+and eight known pending pages**. The 625 is `git ls-files '*.md'` on a
+checkout of `2672b16`: 622 + 1 (#509's checkpoint) + 2 (#502). Accepted
+readers go 568 + 1 (the checkpoint) + 4 (#520) − 1 (the approval register)
+= 572. Pending goes 9 + 2 (#502) + 1 (the register) − 4 (#520) = 8: the
+step-0 log, skills catalog, README, offline CI guide, AEGIS-060+ register,
+approval register and the two `ci-failure-classifier` pages. 572 + 8 + 1 +
+44 = 625. This update changes this ledger by more than 10 lines, so it needs
+its own independent full-page re-read. No grant or gate changed.
 
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
@@ -1640,10 +1705,11 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| CI failure classifier, D69 to D71, evening checkpoint, closeout trace, register APR-082 to 084, D68 page fixes and code-reviewer checks, PRs #502, #510, #509, #511, #516, #520 and #515, after #508, 2026-09-28 to 2026-09-29 | New `ci-failure-classifier/SKILL.md` and `references/classification-guide.md`, the new [evening session checkpoint](session-checkpoint-2026-09-28-evening.md), `ai-closeout-reporter/SKILL.md` and its template, the four #499 and #500 skill pages, `code-reviewer/SKILL.md` and `references/severity-rubric.md`, the [open-decisions index](aegis-open-decisions-2026-09-23.md), the [approval register](../approvals/APPROVAL_REGISTER.md), two #502 neighbour skills, README, skills catalog and step-0 log | The checkpoint (182) was **accepted** on `e46eba9`; `ai-closeout-reporter` (53 and 24) on `cce2b45`; the four #499 and #500 pages on `b0e149e` (pending to accepted); `code-reviewer` (32 and 25) on `67abe28`. The index (7 net) and the two neighbours (5 each) keep acceptance. Both new `ci-failure-classifier` pages (skill-quality reviews only) and the register (91 since `3ccac33`) are **pending**. Main after #515 (`2672b16`) has 625: 572 accepted readers, one generated report, 44 classified fixtures and eight known pending. |
 | Test-plan negative paths, test-tenant provisioner and register APR-080/081, PRs #498, #500 and #508, after #496, 2026-09-28 | `test-plan-designer/SKILL.md` and `references/test-plan-template.md`, new `test-tenant-provisioner/SKILL.md` and `references/provisioning-manifest.md`, `test-data-architect/SKILL.md`, `multi-tenant-security-tester/SKILL.md`, README, skills catalog, step-0 reconciliation log and the [approval register](../approvals/APPROVAL_REGISTER.md) | The test-plan pages (28 and 39) were re-read in full and **accepted** on `e9cce7d`. #500's skill review (SHIP on `77319f8`) gave no full-page verdict, so both new pages are **pending**; the two neighbours (5 and 9 net) keep acceptance. #508 applied re-read edits E1 to E4 and **accepted** the register on `3ccac33`. Main after #508 (`d932d2c`) has 622: 568 accepted readers, one generated report, 44 classified fixtures and nine known pending. |
-| Acceptance-criteria reviewer skill, report key and Phase 6 proposal, PRs #503, #499 and #496, after #504, 2026-09-28 | New `acceptance-criteria-reviewer/SKILL.md` and `references/criteria-review-sheet.md`, `product-spec-writer/SKILL.md`, README, skills catalog, step-0 reconciliation log, [AEGIS-060+ register](../audits/aegis-060-plus-register.md), generated [audit baseline report](../audits/skill-contract-audit-baseline.md) and the new [Phase 6 reliability skill batch proposal](phase6-reliability-skill-batch-proposal.md) | The Phase 6 proposal (687) was **accepted** on `d34cdb8`. #499's skill review (SHIP on `0100c2e`) gave no full-page verdict, so both new skill pages are **pending**; `product-spec-writer` (5 net) keeps acceptance, and the README, skills catalog and log go past 10 and become **pending**. The register note takes the AEGIS-060+ register to 22 net: **pending**. The report's format review is done (ACCEPT on `52269aa`). |
+| Acceptance-criteria reviewer skill, report key and Phase 6 proposal, PRs #503, #499 and #496, after #504, 2026-09-28 | New `acceptance-criteria-reviewer/SKILL.md` and `references/criteria-review-sheet.md`, `product-spec-writer/SKILL.md`, README, skills catalog, step-0 reconciliation log, [AEGIS-060+ register](../audits/aegis-060-plus-register.md), generated [audit baseline report](../audits/skill-contract-audit-baseline.md) and the new [Phase 6 reliability skill batch proposal](phase6-reliability-skill-batch-proposal.md) | The Phase 6 proposal (687) was **accepted** on `d34cdb8`. #499's skill review (SHIP on `0100c2e`) gave no full-page verdict, so both new skill pages are **pending**; `product-spec-writer` (5 net) keeps acceptance, and the README and skills catalog go past 10 and become **pending**; the log stays **pending**. The register note takes the AEGIS-060+ register to 22 net: **pending**. The report's format review is done (ACCEPT on `52269aa`). |
 | Forecast checkpoint and three skill batch proposals, PRs #497, #494 and #495, after #490, 2026-09-28; #504 and #506 changed no Markdown | [Backlog forecast](aegis-backlog-forecast.md), [execution measurements](aegis-execution-metrics.md), the new [AI-SDLC](ai-sdlc-skill-batch-proposal.md) and [Phase 7](phase7-ai-engineering-skill-batch-proposal.md) skill batch proposals | Forecast (198) and measurements (132): FIX-FIRST on `23a1a7c`, **accepted** on `826f40b`. The proposals (554 and 548) got FIX-FIRST first reads and were **accepted** on `a87e2c9` and `6d51c8d`. |
-| Link fix, register APR-079, QA Tier 1 proposal, gate-guard fix, D68 and ledger, PRs #489, #491, #492, #501, #493 and #490, after #488, 2026-09-28 | Final 16 references review record, [approval register](../approvals/APPROVAL_REGISTER.md), new [QA Tier 1 skill batch proposal](qa-tier1-skill-batch-proposal.md), [offline CI guide](../offline-ci.md), [open-decisions index](aegis-open-decisions-2026-09-23.md), step-0 reconciliation log and this ledger | The review record (2) keeps acceptance after a PASS on `10147d4`. The register (74 since `2a411fd`; SHIP on `351f5de`) became **pending** until #508 (row above). The QA Tier 1 proposal (597) was **accepted** on `930493c`. The offline CI guide (14) is **pending**. The index (16 net) was **accepted** on `b6e82e4`, and this ledger on `49f4804`. |
+| Link fix, register APR-079, QA Tier 1 proposal, gate-guard fix, D68 and ledger, PRs #489, #491, #492, #501, #493 and #490, after #488, 2026-09-28 | Final 16 references review record, [approval register](../approvals/APPROVAL_REGISTER.md), new [QA Tier 1 skill batch proposal](qa-tier1-skill-batch-proposal.md), [offline CI guide](../offline-ci.md), [open-decisions index](aegis-open-decisions-2026-09-23.md), step-0 reconciliation log and this ledger | The review record (2) keeps acceptance after a PASS on `10147d4`. The register (74 since `2a411fd`; SHIP on `351f5de`) became **pending** until #508 (row above). The QA Tier 1 proposal (597) was **accepted** on `930493c`. The offline CI guide (14) and the step-0 log (55, the D68 entry) are **pending**. The index (16 net) was **accepted** on `b6e82e4`, and this ledger on `49f4804`. |
 | `ai-evaluation-harness` re-read fixes, PR #488, after #486, 2026-09-28 | `.claude/skills/ai-evaluation-harness/SKILL.md` | 14 lines. A full-page re-read on `2a411fd` asked for E1 to E5; a corrected-candidate full-page review **accepted** it on `e225c2f`, which matches main. Main after #488 (`ebf210c`) has 614: 569 accepted readers, one generated report, 44 classified fixtures and zero known pending. |
 | "AI" spelled out at first body use, PR #486, after #485, 2026-09-28 | 64 existing reader pages, one line each | Owner decision "Spell it out everywhere". FIX-FIRST on `8459ac7` (one missed line), then **ACCEPT** on `2f28cc7`. By net count only `.claude/skills/ai-evaluation-harness/SKILL.md` went past 10 (12), which #488 then fixed. The others are at 10 or fewer and keep acceptance. |
 | Session checkpoint and open decisions, PRs #487 and #485, after #484, 2026-09-28 | [Open-decisions index](aegis-open-decisions-2026-09-23.md) and the new [2026-09-28 session checkpoint](session-checkpoint-2026-09-28.md) | The index is exactly 10 net since `08f99eb`; a targeted review **accepted** it on `44550cd`. The checkpoint (177, new) got FIX-FIRST on `7d33df0` and was **accepted** on `04d2ce8`. |
