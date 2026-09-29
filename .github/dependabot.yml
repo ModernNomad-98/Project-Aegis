@@ -10,10 +10,11 @@
 # applying it. Pins without a bumper rot; a bumper without pins has nothing to
 # do. The two ship together or not at all.
 #
-# Actions and Python dependency pins are reviewed through pull requests.
+# Actions, Python and host-bridge npm pins are reviewed through pull requests.
 # A bump touching .github/workflows/** or CI requirements trips the
-# gate-guard job and therefore needs a human admin merge. That friction is
-# correct: a bot editing the merge gate should not be able to merge itself.
+# gate-guard job and therefore needs a human admin merge (a per-PR exact-head
+# exception). That friction is correct: a bot editing the merge gate should
+# not be able to merge itself. Grouping keeps it to one Python PR a week.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -21,9 +22,29 @@ updates:
     schedule:
       interval: weekly
 
-  # Reads requirements.txt and requirements-ci.txt at the repo root, so the
-  # validator and optional offline SDK pins both receive reviewed updates.
+  # requirements-ci.in is the pip-compile input and requirements-ci.txt its
+  # hash lock; Dependabot re-runs pip-compile with the header's options, so
+  # a bump rewrites the pins and their --hash lines together. requirements.txt
+  # (the validator-only pyyaml pin) is read too. One grouped PR a week covers
+  # direct and transitive bumps; openai arrives as its own PR.
   - package-ecosystem: pip
     directory: /
     schedule:
       interval: weekly
+    groups:
+      # openai stays out of the group: an SDK release also needs the
+      # AUTHORIZED_SDK_* constants updated, and must not block other bumps.
+      python-ci-lock:
+        patterns: ["*"]
+        exclude-patterns: ["openai"]
+
+  # Host-bridge offline test dependencies. npm ci already enforces the
+  # lockfile's sha512 integrity values; this entry adds reviewed bumps.
+  - package-ecosystem: npm
+    directory: /tools/aegis_setup/host_bridge
+    schedule:
+      interval: weekly
+    versioning-strategy: increase
+    groups:
+      host-bridge:
+        patterns: ["*"]

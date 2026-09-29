@@ -2,6 +2,7 @@
 """Regression checks for evidence exit codes and the actual protected-file guard."""
 from __future__ import annotations
 
+import ast
 import copy
 import json
 import os
@@ -573,6 +574,99 @@ class GateJobIsolationTests(unittest.TestCase):
             # Proves the stand-in is live: without the variable, it runs instead.
             exposed = run_git(search_current_directory=True)
             self.assertFalse(exposed.stdout.startswith("git version"), exposed.stdout)
+
+
+LOCK = REPO / "requirements-ci.txt"
+TRANSPORT = REPO / "tools/behavioral_eval_runner/judge/calibration_transport.py"
+LOCKED_INSTALL = ["python", "-P", "-m", "pip", "install", "--quiet", "--require-hashes",
+                  "--only-binary", ":all:", "--no-deps", "-r", "requirements-ci.txt"]
+
+
+def parse_lock(text):
+    """Map each pinned name to (version, hashes) from a pip-compile hash lock."""
+    pins, current = {}, None
+    for line in text.splitlines():
+        stripped = line.strip().rstrip("\\").strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped.startswith("--hash="):
+            if current is None:
+                raise ValueError(f"hash without a requirement: {line!r}")
+            current[1].add(stripped.split(":", 1)[1])
+        elif "==" in stripped and not line[:1].isspace():
+            name, version = stripped.split("==", 1)
+            current = (version.strip(), set())
+            pins[name.strip().lower()] = current
+        else:
+            raise ValueError(f"unexpected lock line: {line!r}")
+    return pins
+
+
+def transport_constants():
+    # Parsed, not imported: the test must not load runner code to check a pin.
+    values = {}
+    for node in ast.parse(TRANSPORT.read_text(encoding="utf-8")).body:
+        if isinstance(node, ast.Assign) and len(node.targets) == 1 \
+                and isinstance(node.targets[0], ast.Name) \
+                and node.targets[0].id.startswith("AUTHORIZED_SDK_"):
+            values[node.targets[0].id] = ast.literal_eval(node.value)
+    return values
+
+
+class HashLockTests(unittest.TestCase):
+    """requirements-ci.txt is a complete hash lock that enforces the authorized SDK."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.pins = parse_lock(LOCK.read_text(encoding="utf-8"))
+        cls.sdk = transport_constants()
+
+    def test_every_locked_requirement_is_exact_and_hashed(self):
+        self.assertGreaterEqual(len(self.pins), 10)
+        for name, (version, hashes) in self.pins.items():
+            with self.subTest(package=name):
+                self.assertRegex(version, r"^[0-9][0-9A-Za-z.+!-]*$")
+                self.assertTrue(hashes, f"{name} has no --hash line")
+                for digest in hashes:
+                    self.assertRegex(digest, r"^[0-9a-f]{64}$")
+
+    def test_locked_openai_hashes_are_exactly_the_authorized_sdk_files(self):
+        self.assertEqual("openai", self.sdk["AUTHORIZED_SDK_NAME"])
+        version, hashes = self.pins[self.sdk["AUTHORIZED_SDK_NAME"]]
+        self.assertEqual(self.sdk["AUTHORIZED_SDK_VERSION"], version)
+        self.assertEqual({self.sdk["AUTHORIZED_SDK_WHEEL_SHA256"],
+                          self.sdk["AUTHORIZED_SDK_SDIST_SHA256"]}, hashes)
+
+    def test_validator_pin_is_carried_into_the_lock(self):
+        text = (REPO / "requirements.txt").read_text(encoding="utf-8")
+        pin = next(line for line in text.splitlines() if line.startswith("pyyaml=="))
+        self.assertEqual(pin.split("==", 1)[1].strip(), self.pins["pyyaml"][0])
+
+    def test_both_gate_jobs_install_only_the_hash_locked_set(self):
+        workflow = load_workflow()
+        for job_name in ("validate-skills", "windows-offline-checks"):
+            with self.subTest(job=job_name):
+                runs = [step.get("run", "") for step in workflow["jobs"][job_name]["steps"]]
+                installs = [shlex.split(run) for run in runs if "pip install" in run]
+                self.assertEqual([LOCKED_INSTALL], installs)
+                self.assertIn("python -P -m pip check", runs)
+                self.assertGreater(runs.index("python -P -m pip check"),
+                                   runs.index(shlex.join(LOCKED_INSTALL)))
+
+    def test_every_pip_install_in_any_job_is_the_hash_locked_one(self):
+        # A tools job that later gains a pip install must use the same lock.
+        for job_name, job in load_workflow()["jobs"].items():
+            for step in job.get("steps", []):
+                for line in step.get("run", "").splitlines():
+                    if "pip" in line and "install" in line:
+                        with self.subTest(job=job_name, step=step.get("name", "")):
+                            self.assertEqual(LOCKED_INSTALL, shlex.split(line))
+
+    def test_parser_rejects_an_unhashed_or_unexpected_line(self):
+        with self.assertRaises(ValueError):
+            parse_lock("--hash=sha256:" + "0" * 64 + "\n")
+        with self.assertRaises(ValueError):
+            parse_lock("openai>=3\n")
 
 
 if __name__ == "__main__":
