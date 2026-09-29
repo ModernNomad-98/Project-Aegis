@@ -2,12 +2,12 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #531 (`8dc3b00`) on 2026-09-29 Coordinated
+As of merged pull request (PR) #542 (`22a6b7a`) on 2026-09-29 Coordinated
 Universal Time (UTC), this remains the active
 repository-wide documentation acceptance backlog. The latest count is in the
-paragraph for main after #531 (`8dc3b00`): 653 tracked Markdown files, 585
+paragraph for main after #542 (`22a6b7a`): 653 tracked Markdown files, 583
 accepted reader pages, one generated report, 55 classified synthetic fixtures
-and twelve known pending pages; the paragraphs between are dated history,
+and fourteen known pending pages; the paragraphs between are dated history,
 oldest first. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
@@ -1497,6 +1497,68 @@ standard. 585 + 12 + 1 + 55 = 653. This update changes this ledger by more
 than 10 lines, so it needs its own independent full-page re-read. No grant
 or gate changed.
 
+PRs #537 (`43d8b6b`, 18:11 UTC), #539 (`2bb44db`, 19:43), #540 (`0ca4a83`,
+20:10), #541 (`32a62f0`, 20:10), #538 (`f4c3cec`, 20:54) and #542
+(`22a6b7a`, 20:54 UTC) merged on 2026-09-29 after #531, in that order. None
+added, removed or renamed a Markdown file. Counts follow the rules above,
+now against `22a6b7a`: per PR in parentheses, and net since the page's last
+accepted head for the 10-line rule. Codex again posted only usage-limit
+notices.
+
+**Full-page re-reads done and accepted in this range.** For each page below,
+`git diff <accepted head> 22a6b7a` on it is empty.
+
+- The [skill generation standard](../skill-generation-standard.md) (#541,
+  16): a full-page re-read **accepted** it on `5e4cdd4`
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/541#issuecomment-5897799994)),
+  so it moves from pending to accepted.
+- This ledger (#538, 73): FIX-FIRST on `602c8bd`, then **ACCEPT** on
+  `51860f3`
+  ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/538#issuecomment-5897922136)).
+
+**Small reviewed edits that keep acceptance.**
+`library-diff-reviewer/SKILL.md` (#542, 2; 4 net since #33's `700aa1d`,
+with #483's 2): #542's review read the one changed line
+([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/542#issuecomment-5897928657)).
+
+**Newly pending.** Each needs a full-page re-read.
+
+- The [delivery control-plane guide](../../tools/aegis_delivery_control/README.md)
+  (#539, 15): 15 net since #196 (`437e73a`), its last change before #539.
+  #539's code review checked the corrected row's facts, not the whole page.
+- The [host feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md)
+  (#540, 47; 47 net since `6ba6e1a`) and the
+  [Stage 4A offline review](../evidence/setup/issue-101-package-4a-offline-review.md)
+  (#540, 13; 13 net since #281's `ea40ab4`): each gained a new dated
+  section. #540's supply-chain review checked the appended facts, not the
+  whole pages.
+
+**Still pending, with new counts.** The approval register (#537, 221) is
+405 net since `a890669`, and the BER backlog (#537, 42) is 149 net since
+#381's `032e030`. No review verdict was posted on #537. The other nine
+pending pages did not change.
+
+**This update's own edits.** Under owner decisions of 2026-09-29, the
+[targeted-edit rule](#remaining-page-review-in-larger-batches) now says a
+small edit's review must cover every changed line and may be any kind of
+independent review, and §5 of the skill generation standard gains a dated
+note that `allowed-tools` has been forbidden in every shipped skill since
+#528 (2 net since `5e4cdd4`). That note needs this update's independent
+review to name or read it before the standard keeps acceptance.
+
+Main after #542 (`22a6b7a`) therefore has **653 tracked Markdown files: 583
+accepted reader pages, one generated report, 55 classified synthetic
+fixtures and fourteen known pending pages**. The 653 is `git ls-files
+'*.md'` on a checkout of `22a6b7a`, unchanged from `8dc3b00`. Accepted
+readers go 585 + 1 (the skill generation standard) − 3 (the control-plane
+guide and the two evidence pages) = 583. Pending goes 12 − 1 + 3 = 14: the
+step-0 log, skills catalog, README, offline CI guide, AEGIS-060+ register,
+approval register, CONTRIBUTING, BER backlog, control-plane backlog, the
+two `database-backup-verifier` pages, the control-plane guide and the two
+evidence pages. 583 + 14 + 1 + 55 = 653. This update changes this ledger by
+more than 10 lines, so it needs its own independent full-page re-read. No
+grant or gate changed.
+
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
 the [Behavioral Eval Runner (BER) selected-precheck aggregate decision page](ber-precheck-aggregate-validation-proposal.md)
@@ -1855,7 +1917,10 @@ existing heading is not a new section.
 2026-09-27 rule count toward the 10 lines, added together since the page's
 last full-page acceptance. A small edit keeps acceptance only if an
 independent reviewer checked it; an unreviewed edit, however small, needs a
-targeted review before the page counts as accepted.
+targeted review before the page counts as accepted. Either review must cover
+every changed line, by naming or reading it, and any kind of independent
+review counts, such as a readability, security or fact review (owner
+decision, 2026-09-29).
 
 **Net difference (owner decision, 2026-09-28).** The 10 lines are the net
 difference between the page's accepted version and now: `git diff --numstat
@@ -1922,6 +1987,7 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Register exceptions, guard traceability, host-bridge SDK pin, standard re-read, ledger and reviewer description, PRs #537, #539, #540, #541, #538 and #542, after #531, 2026-09-29, and this update's two owner-decided edits | The [approval register](../approvals/APPROVAL_REGISTER.md), [BER backlog](behavioral-eval-runner-backlog.md), [delivery control-plane guide](../../tools/aegis_delivery_control/README.md), [host feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md), [Stage 4A offline review](../evidence/setup/issue-101-package-4a-offline-review.md), [skill generation standard](../skill-generation-standard.md), `library-diff-reviewer/SKILL.md` and this ledger | The standard was **accepted** on `5e4cdd4` (pending to accepted) and this ledger on `51860f3`; `library-diff-reviewer` (4 net) keeps acceptance. The control-plane guide (15) and both evidence pages (47 and 13, each with a new section) become **pending**; the register (405) and BER backlog (149) stay pending. Main after #542 (`22a6b7a`) has 653: 583 accepted readers, one generated report, 55 classified fixtures and fourteen known pending. |
 | Config-surface guards, isolated tools tests, environment parity reviewer, hash-locked CI dependencies and ledger, PRs #528, #507, #521, #524 and #534, after #525, 2026-09-29; #535 and #531 changed no Markdown | New `environment-parity-reviewer/SKILL.md` and `references/parity-matrix-sheet.md`, `iac-reviewer/SKILL.md`, two manual-only neighbour skills, `.claude/skills/_template/SKILL.md`, the [skill generation standard](../skill-generation-standard.md), [CONTRIBUTING](../../CONTRIBUTING.md), README, [offline CI guide](../offline-ci.md), skills catalog, step-0 reconciliation log and this ledger | Both new pages were **accepted** on `7f98950`; `iac-reviewer` (11 net) was re-read and **accepted** on `f5a6dab`; this ledger was **accepted** on `7b51c88`. `local-ci-mirror-preflight` (9), `vite-build-qa-engineer` (6) and the template (4) keep acceptance. The skill generation standard (11 net since #408) becomes **pending**. Main after #531 (`8dc3b00`) has 653: 585 accepted readers, one generated report, 55 classified fixtures and twelve known pending. |
 | Cloud security baseline reviewer and owner grants for code-health findings P2-4 and P2-6, PRs #526 and #525, after #533, 2026-09-29 | New `cloud-security-baseline-reviewer/SKILL.md` and five baseline references, three neighbour skills, the [approval register](../approvals/APPROVAL_REGISTER.md), the [BER backlog](behavioral-eval-runner-backlog.md) and the [resumable control-plane backlog](resumable-control-plane-backlog.md) | All six new pages were **accepted** on `65bacc7`; `aws-saas-architect`, `iac-reviewer` and `security-logging-alerting-architect` (6, 7 and 6 net) keep acceptance. #525's fact-and-format reviews leave the register (184 since `a890669`), BER backlog (113) and control-plane backlog (16) **pending** full-page re-reads. Main after #525 (`a103990`) has 651: 584 accepted readers, one generated report, 55 classified fixtures and eleven known pending. |
 | Backup verifier, human-in-the-loop (HITL) designer, CI classifier fixes, runbook extension, resilience reviewer and register re-read, PRs #523, #518, #529, #532, #527, #522 and #533, after #514, 2026-09-29; #530 changed no Markdown | New `database-backup-verifier`, `ai-human-in-the-loop-designer` and `resilience-architecture-reviewer` pages, `ai-governance-risk-reviewer/SKILL.md`, both `ci-failure-classifier` pages, both `data-migration-runbook-author` pages, the [approval register](../approvals/APPROVAL_REGISTER.md) and small neighbour edits | **Accepted:** the HITL pages and `ai-governance-risk-reviewer` on `288d993`; the classifier pages on `63597a0` (pending to accepted); the runbook pages on `ba190cc`; the resilience pages on `d75cd58` (pre-cleared; the merged head adds only the two named lines); the register on `a890669` (pending to accepted, until #525). `human-approval-boundary` and `agent-tool-safety-guard` keep acceptance at exactly 10. **Pending:** `database-backup-verifier/SKILL.md` (13 net since `d3dcb62`, full-page re-read owed) and its checks sheet (an unreviewed 2-line edit, targeted review owed). |
