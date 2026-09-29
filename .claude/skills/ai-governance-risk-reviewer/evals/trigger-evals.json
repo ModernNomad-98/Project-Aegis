@@ -1,7 +1,7 @@
 {
   "skill": "ai-governance-risk-reviewer",
   "description": "Trigger discrimination for the Phase 7 AI-platform-ops cluster: AI feature governance/risk posture vs one-change process audit vs SDLC lifecycle vs technical threat modeling, and against the shipped agent-governance-audit and ai-sdlc-operating-model.",
-  "overlaps_with": ["agent-governance-audit", "ai-sdlc-operating-model", "ai-threat-modeler", "human-approval-boundary"],
+  "overlaps_with": ["agent-governance-audit", "ai-sdlc-operating-model", "ai-threat-modeler", "human-approval-boundary", "ai-human-in-the-loop-designer"],
   "cases": [
     {
       "id": "governance-posture-wins-here",
@@ -30,6 +30,14 @@
       "expected_skill": "ai-threat-modeler",
       "should_not_trigger": ["ai-governance-risk-reviewer"],
       "reason": "Technical threat enumeration is ai-threat-modeler; this skill covers organizational governance/risk (tier, oversight, accountability, obligations), not attack vectors."
+    },
+    {
+      "id": "oversight-workflow-goes-to-ai-human-in-the-loop-designer",
+      "prompt": "The risk review already put our AI claims assistant at human in the loop. Design the workflow: which of its actions need confirmation, the review queue, and how reviewers approve, edit or reject.",
+      "expected_skill": "ai-human-in-the-loop-designer",
+      "should_not_trigger": ["ai-governance-risk-reviewer"],
+      "note": "SEAM CASE (reciprocated yield, D70) — the oversight level is decided; the ask is the workflow that delivers it.",
+      "reason": "This skill sets the risk tier and oversight level; ai-human-in-the-loop-designer designs the classification and review workflow that deliver it."
     }
   ]
 }
