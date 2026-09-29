@@ -18,8 +18,6 @@ from tools.aegis_delivery_control.contracts import DispatchDenied
 from tools.aegis_delivery_control.evidence import (
     canonical_bytes, verify_synthetic_evidence, write_new_evidence,
 )
-
-
 from tools.aegis_delivery_control.tests import _owner_private_fixtures
 
 

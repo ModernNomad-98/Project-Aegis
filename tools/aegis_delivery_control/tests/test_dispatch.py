@@ -84,6 +84,7 @@ from tools.aegis_delivery_control.dispatch import (
 )
 from tools.aegis_delivery_control.engine import TransitionEngine
 from tools.aegis_delivery_control.storage import raise_at
+from tools.aegis_delivery_control.tests import _owner_private_fixtures
 from tools.aegis_delivery_control.tests._legacy_schema import (
     strip_t28_foundation_schema,
 )
@@ -143,9 +144,6 @@ class SyntheticValidationCoordinator(ProductionSyntheticValidationCoordinator):
 from tools.aegis_delivery_control.tests._trusted_readiness_store import (
     SQLiteStateStore,
 )
-
-
-from tools.aegis_delivery_control.tests import _owner_private_fixtures
 
 
 def setUpModule() -> None:

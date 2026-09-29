@@ -11,8 +11,6 @@ from tools.aegis_delivery_control.authority import (
     SyntheticAuthority, SyntheticGrant, SyntheticValidatorGrant,
 )
 from tools.aegis_delivery_control.contracts import DispatchDenied
-
-
 from tools.aegis_delivery_control.tests import _owner_private_fixtures
 
 

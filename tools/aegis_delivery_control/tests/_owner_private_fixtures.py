@@ -35,8 +35,10 @@ directory must be owned by the token user, or it raises with the SIDs it saw.
 
 from __future__ import annotations
 
+import contextlib
 import os
 import tempfile
+from typing import Iterator
 
 OWNER_PRIVATE_UMASK = 0o077
 
@@ -182,7 +184,35 @@ if os.name == "nt":
         owner_record = (ctypes.c_void_p * 1)(_first_pointer(user))
         _set_default_owner(owner_record)  # type: ignore[arg-type]
         _saved_owners.append(saved_owner)
-        _verify_fresh_temporary_directory_owner()
+        try:
+            _verify_fresh_temporary_directory_owner()
+        except BaseException:
+            # A failing setUpModule never reaches tearDownModule, so undo the
+            # token change here rather than leave it for later modules.
+            _set_default_owner(_saved_owners.pop())  # type: ignore[arg-type]
+            raise
+
+    @contextlib.contextmanager
+    def original_default_owner() -> Iterator[None]:
+        """Temporarily put back the default owner saved by the first :func:`enter`.
+
+        Guard tests use this to create production state under the process's
+        real default owner (``BUILTIN\\Administrators`` on an elevated runner),
+        so they prove production sets its own owner explicitly instead of
+        inheriting the fixture default.
+        """
+        if not _saved_owners:
+            raise RuntimeError("original_default_owner() needs an active enter()")
+        token = _open_token(_TOKEN_QUERY)
+        try:
+            current = _token_information(token, _TOKEN_OWNER)
+        finally:
+            _kernel32.CloseHandle(token)
+        _set_default_owner(_saved_owners[0])  # type: ignore[arg-type]
+        try:
+            yield
+        finally:
+            _set_default_owner(current)  # type: ignore[arg-type]
 
     def _restore_windows() -> None:
         if _saved_owners:

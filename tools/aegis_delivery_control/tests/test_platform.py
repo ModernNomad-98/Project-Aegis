@@ -71,6 +71,50 @@ class PlatformContractTests(unittest.TestCase):
         finally:
             os.umask(previous)
 
+    @unittest.skipUnless(sys.platform == "win32", "Windows token default owner")
+    def test_production_sets_explicit_owner_under_token_default_owner(self) -> None:
+        # The module runs with the token's default owner set to the token
+        # user for its fixtures. This test puts the process's original
+        # default owner back while production creates state, so it proves
+        # production sets O:<user> itself. It only discriminates where the
+        # original default owner is someone else, such as an elevated
+        # runner with User Account Control off (BUILTIN\Administrators).
+        fixtures = _owner_private_fixtures
+        user = fixtures.token_user_sid()
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            with fixtures.original_default_owner():
+                probe = Path(tempfile.mkdtemp(dir=root))
+                probe_owner = fixtures.path_owner_sid(probe)
+                probe.rmdir()
+                if probe_owner == user:
+                    self.skipTest(
+                        "default owner already equals the token user; "
+                        "not discriminating on this host"
+                    )
+                database = root / "state.sqlite3"
+                SQLiteStateStore(
+                    database,
+                    ExpectedFreshnessOracle("repo-1", "x", {}),
+                    "repo-1",
+                )
+                effects = root / "effects.sqlite3"
+                SyntheticExecutionAdapter(effects)
+                managed_leaf = root / "managed" / "nested" / "leaf.sqlite3"
+                prepare_owned_file(managed_leaf, create=True, trusted_root=root)
+            created = [
+                database,
+                root / "writer.lock",
+                effects,
+                root / "managed",
+                root / "managed" / "nested",
+                managed_leaf,
+            ]
+            for path in created:
+                with self.subTest(path=path.relative_to(root).as_posix()):
+                    self.assertTrue(path.exists())
+                    self.assertEqual(fixtures.path_owner_sid(path), user)
+
     def test_offline_owned_path_probe_denies_swap_and_hardlink(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

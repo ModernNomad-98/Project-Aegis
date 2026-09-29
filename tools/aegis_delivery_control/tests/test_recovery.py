@@ -24,12 +24,10 @@ from tools.aegis_delivery_control.contracts import (
     PlanAcceptanceRequest as PlanAcceptanceContract,
 )
 from tools.aegis_delivery_control.storage import default_state_root
+from tools.aegis_delivery_control.tests import _owner_private_fixtures
 from tools.aegis_delivery_control.tests._trusted_readiness_store import (
     SQLiteStateStore,
 )
-
-
-from tools.aegis_delivery_control.tests import _owner_private_fixtures
 
 
 def setUpModule() -> None:
