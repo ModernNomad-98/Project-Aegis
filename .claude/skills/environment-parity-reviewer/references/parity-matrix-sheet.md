@@ -4,6 +4,15 @@ Reference for `environment-parity-reviewer`. Read it while building the
 parity matrix (Workflow step 2), classifying differences (step 3) and
 drafting the manifest and startup validation (steps 5 and 6).
 
+Terms used below: a frozen install uses exactly the versions in the
+lockfile and fails if the lockfile is out of date. Source maps link built
+code back to its source; minification shrinks built code by removing
+spaces and shortening names. Flag targeting is the rule that decides who
+sees a flag turned on. Data residency is a legal or contract rule about
+where data may be stored. A cookie domain is the set of web addresses a
+browser sends a sign-in cookie to. A trigram index is a database index
+for fuzzy text search, provided by the `pg_trgm` extension.
+
 ## 1. Parity dimensions
 
 Check every row. Where a dimension does not apply (no database, no
@@ -11,7 +20,7 @@ third-party provider), say so in the report instead of dropping the row.
 
 | Dimension | Where to look (repository or supplied export) | What to compare | Typical failure when it differs |
 | --- | --- | --- | --- |
-| Language runtime | `.nvmrc`, `.python-version`, `.tool-versions`, `engines` field, container base image, CI setup step | Major and minor version | A syntax or library feature exists in one runtime and not the other |
+| Language runtime | `.nvmrc`, `.python-version`, `.tool-versions`, the `engines` field in `package.json`, container base image, CI setup step | Major and minor version | A syntax or library feature exists in one runtime and not the other |
 | Dependency versions | Lockfile committed? Same lockfile used by CI and the deploy build? | Lockfile presence and install mode (frozen or not) | A floating dependency resolves to a newer, breaking release in one place |
 | Environment-variable names | `.env.example` and per-environment templates, platform variable export (values masked), the code's config reads | Present or missing per environment | Missing variable: crash or silent fallback to a default |
 | Non-secret values | Same sources; only values that are not secrets (base URLs, modes, region codes, log levels) | Exact value and shape (scheme, trailing slash, casing) | Wrong host, mixed `http`/`https`, a region name where a code is expected |

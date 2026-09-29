@@ -6,7 +6,7 @@
     {
       "id": "missing-variable-and-extension-happy-path",
       "type": "should_trigger",
-      "prompt": "Search works in staging but returns a 500 in production. Here are both env templates: .env.staging.example has DATABASE_URL, SEARCH_API_URL, PAYMENT_MODE=sandbox, LOG_LEVEL=debug; .env.production.example has DATABASE_URL, PAYMENT_MODE=live, LOG_LEVEL=info. Staging's migration history includes 0042_fuzzy_search, which runs CREATE EXTENSION pg_trgm and adds a trigram index. The production database owner exported the enabled extensions: plpgsql, uuid-ossp. What differs and what should we fix?",
+      "prompt": "Search works in staging but returns a 500 in production. Here are both env templates: .env.staging.example has DATABASE_URL, SEARCH_API_URL, PAYMENT_MODE=sandbox, LOG_LEVEL=debug; .env.production.example has DATABASE_URL, PAYMENT_MODE=live, LOG_LEVEL=info. Staging's migration history includes 0042_fuzzy_search, which runs CREATE EXTENSION pg_trgm and adds a trigram index. The production database owner exported the enabled extensions: plpgsql, uuid-ossp. The search client reads SEARCH_API_URL at startup with no default. What differs and what should we fix?",
       "expect": {
         "triggers": true,
         "assertions": [

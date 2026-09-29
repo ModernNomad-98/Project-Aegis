@@ -6,7 +6,8 @@
     "vite-build-qa-engineer",
     "local-ci-mirror-preflight",
     "feature-flag-architect",
-    "release-readiness-reviewer"
+    "release-readiness-reviewer",
+    "ci-failure-classifier"
   ],
   "cases": [
     {
@@ -92,6 +93,15 @@
         "environment-parity-reviewer"
       ],
       "reason": "SEAM CASE: 'before promoting to production' is shared wording, but a ship or no-ship verdict across CI evidence, migrations, rollback and approvals is release-readiness-reviewer; the parity reviewer only lists how environments differ."
+    },
+    {
+      "id": "red-ci-missing-variable-goes-to-classifier",
+      "prompt": "CI is red on this run and the log shows a missing-variable error in the integration job. Why did it fail?",
+      "expected_skill": "ci-failure-classifier",
+      "should_not_trigger": [
+        "environment-parity-reviewer"
+      ],
+      "reason": "SEAM CASE: classifying one finished CI run's failure (missing secret or config, product bug, infrastructure) from its logs is ci-failure-classifier; the parity reviewer compares settings across environments."
     }
   ]
 }

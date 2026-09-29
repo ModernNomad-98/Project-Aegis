@@ -21,7 +21,12 @@ code change. A lockfile pins the exact dependency versions a build uses.
 Startup validation is a check the app runs as it starts that stops it with
 a clear error when a required setting is missing or malformed ("fail
 fast"). A tenant is one customer organization whose data the product keeps
-apart from other customers' data.
+apart from other customers' data. A database extension is an add-on a
+database loads for extra features, such as `pg_trgm` for fuzzy text
+search; collation is the rule a database uses to sort and compare text.
+An allowed origin is a website address the app accepts browser requests
+from. A readiness check is an address the hosting platform polls to learn
+whether the app can take traffic.
 
 ## Purpose
 
@@ -90,11 +95,12 @@ in as an output.
    about. Default to the path a change travels: local → CI → preview →
    staging → production.
 2. Environment templates and per-environment config files in the
-   repository (`.env.example`, `.env.staging.example`, config maps,
-   platform settings files), read for variable NAMES and non-secret
-   values. Never open a real `.env` file with secret values; if only one
-   exists, read its names and stop reading at the first secret-looking
-   value.
+   repository (`.env.example`, `.env.staging.example`, container
+   platform settings such as Kubernetes config maps, hosting platform
+   settings files), read for variable NAMES and non-secret values.
+   Never open a real `.env` file that holds secret values. If no
+   template exists, ask the person for that file's variable names or an
+   export with the values masked.
 3. Runtime and dependency pins: language runtime version files
    (`.nvmrc`, `.python-version`, `.tool-versions`), lockfiles, container
    files (`Dockerfile`, base-image tags), and CI workflow files for the
@@ -257,8 +263,8 @@ with its reason before the one question.
   relies on an extension enabled only in staging fails in production at
   the worst time. Check the extension list, not only the engine version.
 - Time zone and locale differences surface as off-by-one-day bugs in
-  reports and billing. CI often runs in UTC while a developer machine does
-  not.
+  reports and billing. CI often runs in Coordinated Universal Time (UTC)
+  while a developer machine does not.
 - Preview deployments frequently share a staging database or a single
   auth callback allow-list; both are parity problems that only appear
   under parallel previews.
