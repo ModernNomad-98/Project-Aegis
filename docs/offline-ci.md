@@ -211,7 +211,10 @@ new checks' dependencies: `scripts/ci/`, the contract-audit script, all acceptan
 scripts and fixtures, the entire BER package (runtime, tests, schemas and fixtures),
 its parent import paths `tools.py` and `tools/__init__.py`, and both root requirements
 files. The lock's input, `requirements-ci.in`, is not protected: editing it
-changes nothing in CI until the protected lock is regenerated. Changes to these
+changes nothing in CI until the protected lock is regenerated. The guard also
+protects the Dependabot configuration, `.github/dependabot.yml` (or `.yaml`),
+because its ignore rules and groups decide which dependency bumps are ever
+proposed (owner decision, 2026-09-29). Changes to these
 paths require explicit review and deliberate merge.
 The guard also protects all of `scripts/`, every root-level Python module,
 extension, `.pth` file or package `__init__`, and every root-level `.exe`, `.com`,

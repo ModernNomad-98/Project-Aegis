@@ -141,7 +141,8 @@ class ProtectedFileGuardTests(unittest.TestCase):
                      "scripts/acceptance/scenario-a-fixture/manifest.json", "tools.py", "tools/__init__.py",
                      "tools/behavioral_eval_runner/tests/fixture.py",
                      "tools/behavioral_eval_runner/schemas/fixture.json",
-                     "tools/behavioral_eval_runner/graders/fixture.py", "requirements.txt", "requirements-ci.txt"):
+                     "tools/behavioral_eval_runner/graders/fixture.py", "requirements.txt", "requirements-ci.txt",
+                     ".github/dependabot.yml", ".github/dependabot.yaml", ".GitHub/Dependabot.YML"):
             with self.subTest(path=path):
                 result = self.run_guard([path])
                 self.assertEqual(1, result.returncode, result.stdout + result.stderr)
@@ -239,7 +240,11 @@ class ProtectedFileGuardTests(unittest.TestCase):
                                  "x.mcp.json", "docs/mcp.json", ".mcp.json.example",
                                  ".claude/commands-notes.md", "docs/claude/settings.json",
                                  ".claude/skills/example/hooks.md", "CLAUDE.md", "AGENTS.md",
-                                 "docs/tool.exe", "tools/aegis_setup/run.ps1"])
+                                 "docs/tool.exe", "tools/aegis_setup/run.ps1",
+                                 # Near-misses of the Dependabot configuration rule.
+                                 ".github/dependabot.yml.bak", "docs/dependabot.yml",
+                                 "docs/.github/dependabot.yml", ".github/dependabot.md",
+                                 ".github/pull_request_template.md"])
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_renaming_a_protected_file_outside_the_set_is_still_guarded(self):
