@@ -1,0 +1,17 @@
+# Hand-edited input for the hash-locked CI dependency set (decision D55).
+# Edit this file, never requirements-ci.txt, then regenerate the lock:
+#
+#   CUSTOM_COMPILE_COMMAND="python -m piptools compile --generate-hashes --strip-extras --output-file=requirements-ci.txt requirements-ci.in" \
+#     python -m piptools compile --generate-hashes --strip-extras --output-file=requirements-ci.txt requirements-ci.in
+#
+# docs/offline-ci.md has the full procedure. The skill validator still needs
+# only PyYAML from requirements.txt.
+-r requirements.txt
+# Must agree with calibration_transport.AUTHORIZED_SDK_VERSION; the lock's
+# openai hashes must equal AUTHORIZED_SDK_WHEEL_SHA256 and
+# AUTHORIZED_SDK_SDIST_SHA256 (checked by scripts/tests/test_offline_ci.py).
+# Tests use fake transports and synthetic credentials, never a real provider call.
+openai==3.0.0
+# tqdm needs colorama on Windows only. Pin it on every platform so a lock
+# compiled on Linux (for example by Dependabot) still installs on windows-latest.
+colorama

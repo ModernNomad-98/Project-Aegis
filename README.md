@@ -1403,7 +1403,8 @@ Notes:
 - A protected-path `gate-guard` failure is an intentional review signal; do not
   weaken the guard to make it green. The [CI guide](docs/offline-ci.md) describes
   the full protected surface, commands, platform skips and evidence limits.
-- Dependencies are pinned in `requirements-ci.txt` and `requirements.txt`; an SDK
+- Dependencies are pinned in `requirements.txt` and hash-locked in `requirements-ci.txt`
+  (compiled from `requirements-ci.in`); an SDK
   precheck prevents silently skipping transport tests. Tests use mocks and local
   fixtures. Installing dependencies requires package downloads.
 - `actions/checkout`, `actions/setup-python` and `actions/upload-artifact` are
@@ -1453,7 +1454,8 @@ tools/
   behavioral_eval_runner/  # offline core, grading and gated calibration controls
 
 requirements.txt           # pinned structural-validator dependency
-requirements-ci.txt        # pinned full CI dependencies
+requirements-ci.in         # hand-edited input for the CI lock
+requirements-ci.txt        # hash-locked full CI dependencies (generated)
 CHANGELOG.md               # dated deliveries, not release tags
 ```
 

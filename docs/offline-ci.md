@@ -98,10 +98,41 @@ coverage, and a delivery closeout waits for them like the Windows job.
 
 Both verification jobs use Python 3.14 and full Git history. Some BER fixtures
 verify historical authorization commits, so a shallow checkout is insufficient.
-`requirements-ci.txt` includes the pinned validator dependency and the pinned
-OpenAI software development kit (SDK) used by mocked transport tests. The
-validator's ordinary runtime dependency remains separately available in
-`requirements.txt`.
+`requirements-ci.txt` is a complete hash lock. It pins the validator dependency,
+the OpenAI software development kit (SDK) used by mocked transport tests, and
+every transitive dependency, each with the SHA-256 hash of every published file
+for that version. Both jobs install it with
+`pip install --require-hashes --only-binary :all: --no-deps -r requirements-ci.txt`
+and then run `pip check`: a file whose hash is not in the lock fails the install,
+no source distribution is built, and nothing outside the lock is resolved. The
+lock's `openai` hashes must equal `AUTHORIZED_SDK_WHEEL_SHA256` and
+`AUTHORIZED_SDK_SDIST_SHA256` in `calibration_transport.py`;
+`scripts/tests/test_offline_ci.py` checks this, so an SDK bump must update the
+constants and the lock together. The validator's ordinary runtime dependency
+remains separately available in `requirements.txt`.
+
+### Updating the lock
+
+Edit `requirements-ci.in`, never `requirements-ci.txt` by hand. Then, in a Python
+3.14 environment with `pip-tools` installed, regenerate the lock from the
+repository root:
+
+```text
+CUSTOM_COMPILE_COMMAND="python -m piptools compile --generate-hashes --strip-extras --output-file=requirements-ci.txt requirements-ci.in" python -m piptools compile --generate-hashes --strip-extras --output-file=requirements-ci.txt requirements-ci.in
+```
+
+`CUSTOM_COMPILE_COMMAND` keeps the lock header stable; Dependabot reads that
+header to re-run the same compile. `requirements-ci.in` pins `colorama` on every
+platform because `tqdm` needs it only on Windows, so a lock compiled on Linux,
+as Dependabot's is, still installs on `windows-latest`. Dependabot opens one
+grouped Python pull request a week, and one grouped pull request for the host
+bridge's npm packages. The lock is a protected path, so each Python bump needs
+the owner's exact-head merge exception.
+
+On Windows, installing `openai` into a virtual environment under a deep
+directory can fail with `OSError: [Errno 2]` because some of its files exceed
+the 260-character path limit. Use a short path such as `C:envegis`, or
+enable long paths in Windows.
 
 The environment precheck imports `openai`, `httpx2` and `yaml`, verifies the SDK's
 existing authorized version, and requires the reviewed Python minor. A missing
@@ -173,7 +204,9 @@ the guard retains its original protected paths and includes the
 new checks' dependencies: `scripts/ci/`, the contract-audit script, all acceptance
 scripts and fixtures, the entire BER package (runtime, tests, schemas and fixtures),
 its parent import paths `tools.py` and `tools/__init__.py`, and both root requirements
-files. Changes to these paths require explicit review and deliberate merge.
+files. The lock's input, `requirements-ci.in`, is not protected: editing it
+changes nothing in CI until the protected lock is regenerated. Changes to these
+paths require explicit review and deliberate merge.
 The guard also protects all of `scripts/`, every root-level Python module,
 extension, `.pth` file or package `__init__`, and every root-level `.exe`, `.com`,
 `.bat`, `.cmd`, `.ps1` or `.dll` file, matched case-insensitively. Those
@@ -239,8 +272,9 @@ Windows explicitly skips them while running the recorder tests.
 
 ## Local reproduction
 
-Use an isolated Python 3.14 environment and install
-`python -m pip install -r requirements-ci.txt`. Set `AEGIS_CI_EVIDENCE_DIR` to a new
+Use an isolated Python 3.14 environment and install the lock the way CI does:
+`python -m pip install --require-hashes --only-binary :all: --no-deps -r requirements-ci.txt`,
+then `python -m pip check`. Set `AEGIS_CI_EVIDENCE_DIR` to a new
 empty directory for each local attempt; otherwise the recorder defaults to
 `aegis-ci` inside `RUNNER_TEMP` or the system temporary directory. Use the same
 environment's `python` for the recorder and child command.

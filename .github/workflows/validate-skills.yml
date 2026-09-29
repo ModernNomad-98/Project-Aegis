@@ -86,8 +86,14 @@ jobs:
       # PyYAML powers the spec-strict frontmatter parse (decision D50); the
       # validator fails closed without it. Pinned exactly in requirements.txt
       # (decision D55) so CI is reproducible and dependabot has a file to bump.
-      - name: Install pinned offline-check dependencies
-        run: python -P -m pip install --quiet -r requirements-ci.txt
+      # requirements-ci.txt is a complete hash lock compiled from
+      # requirements-ci.in: every file is hash-checked, no sdist is built, and
+      # nothing outside the lock is resolved (docs/offline-ci.md).
+      - name: Install hash-locked offline-check dependencies
+        run: 'python -P -m pip install --quiet --require-hashes --only-binary :all: --no-deps -r requirements-ci.txt'
+
+      - name: Verify the locked dependency set is complete
+        run: python -P -m pip check
 
       - name: Record resolved dependency versions
         run: python -P scripts/ci/record-check.py dependencies -- python -P -m pip freeze
@@ -179,8 +185,11 @@ jobs:
           python-version: '3.14'
 
       # One native command per step preserves its exit status in PowerShell.
-      - name: Install pinned offline-check dependencies
-        run: python -P -m pip install --quiet -r requirements-ci.txt
+      - name: Install hash-locked offline-check dependencies
+        run: 'python -P -m pip install --quiet --require-hashes --only-binary :all: --no-deps -r requirements-ci.txt'
+
+      - name: Verify the locked dependency set is complete
+        run: python -P -m pip check
 
       - name: Record resolved dependency versions
         run: python -P scripts/ci/record-check.py dependencies -- python -P -m pip freeze
