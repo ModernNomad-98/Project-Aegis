@@ -221,6 +221,10 @@ if sys.platform == "win32":
         ctypes.c_void_p, ctypes.POINTER(ctypes.c_wchar_p)
     ]
     _advapi32.ConvertSidToStringSidW.restype = wintypes.BOOL
+    _advapi32.ConvertStringSidToSidW.argtypes = [
+        wintypes.LPCWSTR, ctypes.POINTER(ctypes.c_void_p)
+    ]
+    _advapi32.ConvertStringSidToSidW.restype = wintypes.BOOL
     _advapi32.GetNamedSecurityInfoW.argtypes = [
         wintypes.LPWSTR, ctypes.c_int, wintypes.DWORD,
         ctypes.POINTER(ctypes.c_void_p), ctypes.c_void_p, ctypes.c_void_p,
@@ -460,6 +464,37 @@ def _windows_rights_are_read_only(rights: str) -> bool:
     return mask & write_or_delete == 0
 
 
+# Principals a managed path's DACL may grant, as canonical SID strings:
+# OWNER RIGHTS (SDDL "OW"), LocalSystem ("SY") and BUILTIN\Administrators
+# ("BA"). The current token user is added at check time.
+_WINDOWS_MANAGED_ACL_PRINCIPALS = frozenset({"S-1-3-4", "S-1-5-18", "S-1-5-32-544"})
+
+
+def _windows_canonical_sid(trustee: str) -> str:
+    """Resolve an SDDL ACE trustee to its canonical ``S-1-...`` string.
+
+    SDDL rendering replaces well-known SIDs with aliases (for example the
+    machine's built-in Administrator account, RID 500, becomes ``LA``), so
+    trustees are compared by SID value, never by their SDDL spelling. A
+    trustee that does not resolve to a SID is refused.
+    """
+    sid = ctypes.c_void_p()
+    if not trustee or not _advapi32.ConvertStringSidToSidW(trustee, ctypes.byref(sid)):
+        raise PathCapabilityUnavailable("managed path DACL names an unresolvable principal")
+    try:
+        text = ctypes.c_wchar_p()
+        if not _advapi32.ConvertSidToStringSidW(sid, ctypes.byref(text)):
+            raise PathCapabilityUnavailable(
+                "managed path DACL names an unresolvable principal"
+            )
+        try:
+            return str(text.value)
+        finally:
+            _kernel32.LocalFree(text)
+    finally:
+        _kernel32.LocalFree(sid)
+
+
 def _verify_windows_acl_values(
     owner: str,
     dacl: str,
@@ -473,9 +508,7 @@ def _verify_windows_acl_values(
     if "D:NO_ACCESS_CONTROL" in dacl:
         raise PathCapabilityUnavailable("owned path has an unprotected DACL")
     if managed or os_anchor:
-        allowed = {
-            current, "OW", "SY", "BA", "S-1-5-18", "S-1-5-32-544"
-        }
+        allowed = _WINDOWS_MANAGED_ACL_PRINCIPALS | {current}
         aces = re.findall(r"\(([^)]*)\)", dacl)
         if not aces:
             raise PathCapabilityUnavailable("managed path DACL is empty")
@@ -487,7 +520,7 @@ def _verify_windows_acl_values(
                 continue
             if fields[0] != "A":
                 raise PathCapabilityUnavailable("managed path DACL has an unsupported ACE")
-            if fields[5] not in allowed and not (
+            if _windows_canonical_sid(fields[5]) not in allowed and not (
                 os_anchor and _windows_rights_are_read_only(fields[2])
             ):
                 raise PathCapabilityUnavailable("managed path DACL grants an unexpected principal")

@@ -777,5 +777,113 @@ class PlatformContractTests(unittest.TestCase):
                 self.assertTrue(lock_path.exists())
 
 
+def _windows_local_rid500_sid() -> str:
+    """Return this machine's built-in Administrator SID (RID 500).
+
+    Derived independently of ``owned_paths``: look up the machine account
+    domain SID by computer name and append RID 500.
+    """
+    import ctypes
+    from ctypes import wintypes
+
+    advapi32 = ctypes.WinDLL("advapi32", use_last_error=True)
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    sid = ctypes.create_string_buffer(68)
+    sid_size = wintypes.DWORD(len(sid))
+    domain = ctypes.create_unicode_buffer(256)
+    domain_size = wintypes.DWORD(len(domain))
+    use = wintypes.DWORD()
+    if not advapi32.LookupAccountNameW(
+        None, os.environ["COMPUTERNAME"], sid, ctypes.byref(sid_size),
+        domain, ctypes.byref(domain_size), ctypes.byref(use),
+    ):
+        raise OSError(ctypes.get_last_error(), "LookupAccountNameW failed")
+    text = ctypes.c_wchar_p()
+    advapi32.ConvertSidToStringSidW.argtypes = [
+        ctypes.c_void_p, ctypes.POINTER(ctypes.c_wchar_p)
+    ]
+    if not advapi32.ConvertSidToStringSidW(sid, ctypes.byref(text)):
+        raise OSError(ctypes.get_last_error(), "ConvertSidToStringSidW failed")
+    try:
+        return f"{text.value}-500"
+    finally:
+        kernel32.LocalFree.argtypes = [ctypes.c_void_p]
+        kernel32.LocalFree(text)
+
+
+@unittest.skipUnless(sys.platform == "win32", "Windows DACL contract")
+class WindowsAclPrincipalTests(unittest.TestCase):
+    """The managed-path DACL check compares ACE trustees by SID value.
+
+    SDDL rendering spells well-known SIDs as aliases. The machine's built-in
+    Administrator account (RID 500), which GitHub's hosted Windows runner
+    uses, is rendered ``LA``, so a text comparison refused production's own
+    ``(A;OICI;FA;;;<user>)`` entry.
+    """
+
+    PRIVATE = "D:P(A;OICI;FA;;;{user})(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)"
+
+    def _verify(self, user: str, dacl: str, *, os_anchor: bool = False) -> None:
+        with patch.object(owned_paths, "_windows_current_sid", return_value=user):
+            owned_paths._verify_windows_acl_values(
+                user, dacl, managed=not os_anchor, os_anchor=os_anchor
+            )
+
+    def test_rid500_user_rendered_as_la_alias_is_accepted(self) -> None:
+        user = _windows_local_rid500_sid()
+        for spelling in ("LA", user):
+            with self.subTest(spelling=spelling):
+                self._verify(user, self.PRIVATE.format(user=spelling))
+
+    def test_allowed_principals_match_in_alias_and_full_forms(self) -> None:
+        user = _windows_local_rid500_sid()
+        self._verify(
+            user,
+            f"D:P(A;;FA;;;{user})(A;;FA;;;OW)(A;;FA;;;S-1-3-4)"
+            "(A;;FA;;;SY)(A;;FA;;;S-1-5-18)(A;;FA;;;BA)(A;;FA;;;S-1-5-32-544)",
+        )
+
+    def test_unexpected_principal_is_still_refused(self) -> None:
+        user = _windows_local_rid500_sid()
+        for extra in ("BU", "AU", "WD", "S-1-5-32-545", "S-1-1-0", "CO", "LG"):
+            with self.subTest(principal=extra):
+                with self.assertRaisesRegex(
+                    PathCapabilityUnavailable, "unexpected principal"
+                ):
+                    self._verify(
+                        user,
+                        self.PRIVATE.format(user=user) + f"(A;OICI;FA;;;{extra})",
+                    )
+
+    def test_la_is_refused_when_the_user_is_someone_else(self) -> None:
+        other = "S-1-5-21-1-2-3-1001"
+        with self.assertRaisesRegex(PathCapabilityUnavailable, "unexpected principal"):
+            self._verify(other, self.PRIVATE.format(user=other) + "(A;;FA;;;LA)")
+
+    def test_unresolvable_trustee_is_refused(self) -> None:
+        user = _windows_local_rid500_sid()
+        for bogus in ("NOT-A-SID", "S-1-", "ZZ", ""):
+            for os_anchor in (False, True):
+                with self.subTest(trustee=bogus, os_anchor=os_anchor):
+                    with self.assertRaisesRegex(
+                        PathCapabilityUnavailable, "unresolvable principal"
+                    ):
+                        self._verify(
+                            user,
+                            self.PRIVATE.format(user=user) + f"(A;;FR;;;{bogus})",
+                            os_anchor=os_anchor,
+                        )
+
+    def test_os_anchor_still_allows_read_only_other_principals(self) -> None:
+        user = _windows_local_rid500_sid()
+        self._verify(
+            user, self.PRIVATE.format(user=user) + "(A;OICI;FR;;;BU)", os_anchor=True
+        )
+        with self.assertRaisesRegex(PathCapabilityUnavailable, "unexpected principal"):
+            self._verify(
+                user, self.PRIVATE.format(user=user) + "(A;OICI;FA;;;BU)", os_anchor=True
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
