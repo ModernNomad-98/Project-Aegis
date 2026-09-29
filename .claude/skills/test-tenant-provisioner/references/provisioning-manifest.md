@@ -2,13 +2,16 @@
 
 Detail for [`test-tenant-provisioner`](../SKILL.md). Read on demand. RLS is
 row-level security; E2E is end-to-end; CI is continuous integration; API is
-application programming interface.
+application programming interface. Terms such as tenant, persona, test
+marker, slug, drift and capability grant are defined in the skill's reading
+key.
 
 ## 1. Desired-state manifest
 
 The manifest is derived from the persona catalog that `test-data-architect`
 produces. It never adds a persona the catalog does not name. Keep it in the
-repository next to the catalog so a reviewer can diff it.
+repository next to the catalog so a reviewer can diff it. In the example,
+`ttp` is short for test tenant provisioner and `e2e` is the suite name.
 
 ```yaml
 environment: staging-eu          # the named non-production target
@@ -42,7 +45,8 @@ Rules:
 - One row per catalog identity. Stable ids come from the catalog, not from the
   environment's generated primary keys.
 - Emails and domains use reserved test domains (`example.test`,
-  `example.com` subaddresses or the product's documented test domain).
+  `example.com` subaddresses such as `qa+owner@example.com`, or the
+  product's documented test domain).
 - `credential_env` holds the variable NAME. The manifest, report and logs
   never hold a value.
 
