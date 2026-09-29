@@ -29,11 +29,25 @@ permissions:
 # root) is not put first on sys.path and a module a pull request adds beside
 # a gate script cannot shadow the standard library or PyYAML and rewrite the
 # exit status. -P rather than -I: -I also implies -E, which would drop the
-# PYTHONIOENCODING and PYTHONDONTWRITEBYTECODE settings below. The two
+# PYTHONIOENCODING and PYTHONDONTWRITEBYTECODE settings below. The
 # `-m tools.behavioral_eval_runner` and `-m unittest` commands need the
-# checkout root on sys.path and cannot take -P; gate-guard protects every
-# root-level importable name instead.
+# checkout root on sys.path and cannot take -P; in the gate jobs, gate-guard
+# protects every root-level importable name instead.
+#
+# Gate isolation. The two gate jobs run only code gate-guard protects (plus
+# pinned actions and dependencies). Test code a pull request can change
+# without tripping gate-guard runs in the separate tools-tests jobs below,
+# which share no runner, environment file, PATH or checkout with the gates.
+# A step in a gate job can write $GITHUB_ENV or $GITHUB_PATH, or rewrite a
+# gate script before it runs, so unguarded code must never run there.
+#
+# Windows executable lookup. CreateProcess searches the working directory
+# (the checkout root) before PATH, so a root git.exe or python.exe added by a
+# pull request would run in place of the real tool when record-check.py
+# starts a command. NoDefaultCurrentDirectoryInExePath turns that search off;
+# gate-guard also protects root-level executables, scripts and DLLs.
 env:
+  NoDefaultCurrentDirectoryInExePath: '1'
   PYTHONDONTWRITEBYTECODE: '1'
   PYTHONIOENCODING: utf-8
   AEGIS_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -68,17 +82,6 @@ jobs:
           # line moves only by a deliberate reviewed pull request, which is
           # the point of pinning it.
           python-version: '3.14'
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
-        with:
-          node-version: '24'
-
-      - name: Install pinned offline bridge dependencies without scripts
-        working-directory: tools/aegis_setup/host_bridge
-        run: npm ci --ignore-scripts --no-audit --no-fund
-
-      - name: Run offline bridge callback tests
-        run: python -P scripts/ci/record-check.py setup-bridge -- node --test tools/aegis_setup/host_bridge/bridge.test.ts
 
       # PyYAML powers the spec-strict frontmatter parse (decision D50); the
       # validator fails closed without it. Pinned exactly in requirements.txt
@@ -175,17 +178,6 @@ jobs:
         with:
           python-version: '3.14'
 
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
-        with:
-          node-version: '24'
-
-      - name: Install pinned offline bridge dependencies without scripts
-        working-directory: tools/aegis_setup/host_bridge
-        run: npm ci --ignore-scripts --no-audit --no-fund
-
-      - name: Run offline bridge callback tests
-        run: python -P scripts/ci/record-check.py setup-bridge -- node --test tools/aegis_setup/host_bridge/bridge.test.ts
-
       # One native command per step preserves its exit status in PowerShell.
       - name: Install pinned offline-check dependencies
         run: python -P -m pip install --quiet -r requirements-ci.txt
@@ -234,6 +226,114 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
+  # Tools test suites, isolated from the gate jobs (owner decision,
+  # 2026-09-28). These suites are pull-request-controlled code outside the
+  # gate-guard set, so they run on their own runners: nothing they write to
+  # $GITHUB_ENV, $GITHUB_PATH or the checkout can reach a gate. Read-only
+  # token, no secrets, and no credentials persisted in the checkout. Whether
+  # these jobs become required status checks is a branch-protection decision.
+  tools-tests-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Keep synthetic fixture storage outside the checkout
+        run: printf 'TMPDIR=%s\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: '3.14'
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
+        with:
+          node-version: '24'
+
+      - name: Install pinned offline bridge dependencies without scripts
+        working-directory: tools/aegis_setup/host_bridge
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run offline bridge callback tests
+        run: python -P scripts/ci/record-check.py setup-bridge -- node --test tools/aegis_setup/host_bridge/bridge.test.ts
+
+      # `-m unittest` needs the checkout root on sys.path to import
+      # `tools.*`, so these runs cannot take -P.
+      - name: Run setup routing-contract tests
+        run: python -P scripts/ci/record-check.py setup-tests -- python -m unittest discover -s tools/aegis_setup/tests -p 'test_*.py' -v
+
+      - name: Run delivery-control tests
+        run: python -P scripts/ci/record-check.py delivery-control -- python -m unittest discover -s tools/aegis_delivery_control/tests -p 'test_*.py' -v
+
+      - name: Retain tools-test evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: tools-tests-linux-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/aegis-ci/
+          retention-days: 14
+          if-no-files-found: warn
+
+  tools-tests-windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Keep synthetic fixture storage outside the checkout
+        run: |
+          $fixtureTemp = (Get-Item -LiteralPath $env:RUNNER_TEMP).FullName
+          @("TEMP=$fixtureTemp", "TMP=$fixtureTemp") | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: '3.14'
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
+        with:
+          node-version: '24'
+
+      - name: Install pinned offline bridge dependencies without scripts
+        working-directory: tools/aegis_setup/host_bridge
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run offline bridge callback tests
+        run: python -P scripts/ci/record-check.py setup-bridge -- node --test tools/aegis_setup/host_bridge/bridge.test.ts
+
+      - name: Run setup routing-contract tests
+        run: python -P scripts/ci/record-check.py setup-tests -- python -m unittest discover -s tools/aegis_setup/tests -p 'test_*.py' -v
+
+      # Records the token user, default owner, elevation and temp-root owners
+      # that the owner-private delivery-control fixtures depend on (#512).
+      # Read-only; exits 0. `-m` needs the checkout root, so no -P.
+      - name: Record Windows ownership diagnostic
+        run: python -P scripts/ci/record-check.py delivery-control-diagnostic -- python -m tools.aegis_delivery_control.tests.windows_owner_diagnostic
+
+      - name: Run delivery-control tests
+        run: python -P scripts/ci/record-check.py delivery-control -- python -m unittest discover -s tools/aegis_delivery_control/tests -p 'test_*.py' -v
+
+      - name: Retain tools-test evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: tools-tests-windows-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/aegis-ci/
+          retention-days: 14
+          if-no-files-found: warn
+
   gate-guard:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -269,7 +369,10 @@ jobs:
           # shadow an import. The checkout root is first on sys.path for the
           # -m commands, so any root-level module, extension, .pth file or
           # package __init__ (tools.py, yaml.py, unittest.py, sitecustomize.py,
-          # conftest.py, yaml/__init__.py, ...) is protected too. Matching is
+          # conftest.py, yaml/__init__.py, ...) is protected too, as is any
+          # root-level executable, script or DLL (git.exe, python.cmd,
+          # version.dll, ...), which Windows could otherwise find in the working
+          # directory. Matching is
           # case-insensitive because Windows and macOS checkouts fold case.
           # .claude/agents/ is protected because Claude Code honours `hooks`,
           # `mcpServers` and `permissionMode` in project agent files, so an
@@ -289,7 +392,7 @@ jobs:
           # copies, so every depth is protected, and the commands, hooks and
           # plugin directory entries match with or without a trailing slash
           # so a symlink standing in for the directory is protected too.
-          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|(.*/)?\.claude/((agents|commands|hooks)(/|$)|settings(\.local)?\.json$)|(.*/)?\.claude$|(.*/)?\.claude-plugin(/|$)|(.*/)?\.mcp\.json$|(.*/)?\.gitattributes$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
+          gate_pattern='^(\.github/workflows/|\.github/CODEOWNERS$|(.*/)?\.claude/((agents|commands|hooks)(/|$)|settings(\.local)?\.json$)|(.*/)?\.claude$|(.*/)?\.claude-plugin(/|$)|(.*/)?\.mcp\.json$|(.*/)?\.gitattributes$|scripts/|[^/]+\.(py|pyc|pyw|pyd|so|pth|exe|com|bat|cmd|ps1|dll)$|[^/]+/__init__\.[^/]+$|tools/behavioral_eval_runner/|requirements(-ci)?\.txt$)'
           shopt -s nocasematch
           gate_files=()
           echo "Files changed in this PR:"

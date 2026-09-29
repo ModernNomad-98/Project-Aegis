@@ -32,11 +32,67 @@ check names stay `validate-skills` and `gate-guard`; branch protection is unchan
 | `validate-skills` on Ubuntu | CI recorder/guard regressions, validator and audit self-tests, skill validation, BER self-check and full suite, PowerShell Core Scenario A acceptance, pull-request-only Developer Certificate of Origin (DCO) check | Existing required check | 15 minutes |
 | `windows-offline-checks` on Windows | Recorder regressions, validator and audit self-tests, skill validation, BER self-check and full suite, sequential PowerShell Desktop 5.1 and Core acceptance | Additional visible coverage; not registered as required | 20 minutes |
 | `gate-guard` on Ubuntu | Detect changes to the merge gate and its enforcement surfaces | Existing required check; PR only | 5 minutes |
+| `tools-tests-linux` on Ubuntu | Host-bridge Node callback tests, setup routing-contract suite, delivery-control suite | Isolated from the gates; not registered as required | 15 minutes |
+| `tools-tests-windows` on Windows | The same three suites, plus a read-only ownership diagnostic (token user, default owner, elevation, temp-root owners) recorded before the delivery-control suite | Isolated from the gates; not registered as required | 20 minutes |
 
 The two verification jobs run independently, without cross-platform fail-fast,
 automatic retries, quarantine or `continue-on-error`. A delivery closeout waits
 for both verification jobs. A post-merge run detects regressions on `main`; it
 cannot retroactively prevent a merge.
+
+### Gate isolation
+
+The two verification jobs execute only repository code that `gate-guard`
+protects (see [Protected files](#protected-files)), plus pinned actions and
+pinned dependencies. Pull request (PR) files outside that set are read only as
+data, for example skills checked by the validator. Test code that a pull
+request can change without tripping `gate-guard` runs in the separate
+`tools-tests-linux` and `tools-tests-windows` jobs instead. That covers the
+host-bridge Node tests, `tools/aegis_setup/tests` and
+`tools/aegis_delivery_control/tests`. A step in a gate job could write to
+`$GITHUB_ENV` or `$GITHUB_PATH`, or rewrite a gate script before it runs, and
+make a failing gate pass. A separate job shares no runner, environment file,
+`PATH` or checkout with the gates, so this code cannot reach them.
+
+The tools jobs use a read-only token, reference no secrets and do not persist
+checkout credentials. `scripts/tests/test_offline_ci.py` checks this layout. The
+CI self-tests fail when a gate job does any of these:
+
+- runs Node or a tools suite;
+- names a repository path outside the `gate-guard` pattern in a command,
+  `working-directory`, `-m` module, `-r` file, `env` value or action input, or
+  puts `..` in an `env` value or action input;
+- uses a local, Docker or tag-pinned action instead of one pinned to a commit
+  SHA;
+- runs a step, or sets a job default, with a shell other than `bash`, `pwsh`
+  or `powershell`, or sets a job-default `working-directory`;
+- sets, in the workflow, job or step `env`, one of the listed variables that
+  point a tool at other code or configuration:
+  - interpreter and loader paths: `PATH`, `PYTHONPATH`, `PYTHONHOME`,
+    `PYTHONSTARTUP`, `PYTHONUSERBASE`, `PYTHONPLATLIBDIR`, `PYTHONEXECUTABLE`,
+    `NODE_OPTIONS`, `NODE_PATH`, `PSMODULEPATH`, `BASH_ENV`, `ENV`,
+    `LD_PRELOAD` and `LD_LIBRARY_PATH`;
+  - Git: `GIT_EXEC_PATH`, `GIT_DIR`, `GIT_WORK_TREE`, `GIT_TEMPLATE_DIR` and
+    every `GIT_CONFIG*` variable. These can inject configuration such as
+    `core.fsmonitor`, which the recorder's `git status` would run.
+
+  Names are matched case-insensitively. Other variables are not denied by
+  name, but their values are still checked as paths.
+
+The tests read the workflow text. They cannot see what a protected script does
+internally; `gate-guard` covers that by requiring review of every protected
+change.
+
+On Windows, `CreateProcess` looks for a program such as `git` or `python` in
+the current directory before `PATH`. The recorder runs from the checkout root,
+so the workflow sets `NoDefaultCurrentDirectoryInExePath=1` to turn that search
+off, and `gate-guard` also protects root-level `.exe`, `.com`, `.bat`, `.cmd`,
+`.ps1` and `.dll` files. A Windows-only self-test proves that a root `git.exe` runs
+without the variable and does not run with it.
+
+Whether the tools jobs become required status checks is a separate
+branch-protection decision for the owner. Until then they are visible
+coverage, and a delivery closeout waits for them like the Windows job.
 
 ## Dependencies and environment
 
@@ -118,8 +174,9 @@ new checks' dependencies: `scripts/ci/`, the contract-audit script, all acceptan
 scripts and fixtures, the entire BER package (runtime, tests, schemas and fixtures),
 its parent import paths `tools.py` and `tools/__init__.py`, and both root requirements
 files. Changes to these paths require explicit review and deliberate merge.
-The guard also protects all of `scripts/` and every root-level Python module,
-extension, `.pth` file or package `__init__`, matched case-insensitively. Those
+The guard also protects all of `scripts/`, every root-level Python module,
+extension, `.pth` file or package `__init__`, and every root-level `.exe`, `.com`,
+`.bat`, `.cmd`, `.ps1` or `.dll` file, matched case-insensitively. Those
 are the directories Python puts first on the import path when the workflow runs
 `python scripts/<name>.py` or `python -m <module>`, so a new file there could
 shadow the standard library or PyYAML and turn a failing check green. Every
@@ -195,6 +252,7 @@ root. For example:
 python -P scripts/ci/record-check.py environment -- python -P scripts/ci/check-environment.py
 python -P scripts/ci/record-check.py ci-tests -- python -P scripts/tests/test_offline_ci.py
 python -P scripts/ci/record-check.py ber -- python -m unittest discover -s tools/behavioral_eval_runner/tests -p test_*.py -v
+python -P scripts/ci/record-check.py delivery-control -- python -m unittest discover -s tools/aegis_delivery_control/tests -p test_*.py -v
 ```
 
 Use `powershell -NoProfile -ExecutionPolicy Bypass -File
