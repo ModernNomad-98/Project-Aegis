@@ -881,9 +881,11 @@ class CheckedPathCapability:
 class CheckedSQLiteConnection(sqlite3.Connection):
     _owned_path_capability: CheckedPathCapability | None = None
     # Set when a commit became durable but the post-commit path check
-    # failed. The next rollback() with no open transaction re-raises it, so
-    # the usual "except BaseException: rollback(); raise" call-site pattern
-    # still delivers the typed signal instead of a fresh path error.
+    # failed. It is kept until close(): rollback() with no open transaction
+    # re-raises it, and close() raises it if its own path check fails, so the
+    # call-site patterns "except BaseException: rollback(); raise", "with
+    # closing(...)" and "finally: close()" all deliver the typed signal
+    # instead of a fresh path error.
     _committed_integrity_error: "OwnedPathChangedAfterCommit | None" = None
 
     def _check_owned_path(self) -> None:
@@ -907,21 +909,30 @@ class CheckedSQLiteConnection(sqlite3.Connection):
 
     def rollback(self) -> None:
         committed = self._committed_integrity_error
-        self._committed_integrity_error = None
         if committed is not None and not self.in_transaction:
             # Nothing to roll back: the write is durable. Keep the signal.
             raise committed
+        self._committed_integrity_error = None
         super().rollback()
         self._check_owned_path()
 
     def close(self) -> None:
         capability = self._owned_path_capability
+        committed = self._committed_integrity_error
         try:
             super().close()
             if capability is not None:
-                capability.assert_current()
-                capability.check_sidecars()
+                try:
+                    capability.assert_current()
+                    capability.check_sidecars()
+                except PathCapabilityUnavailable as error:
+                    if committed is not None:
+                        # The write is durable; report that, not a plain
+                        # path failure.
+                        raise committed from error
+                    raise
         finally:
+            self._committed_integrity_error = None
             if capability is not None:
                 capability.close()
                 self._owned_path_capability = None

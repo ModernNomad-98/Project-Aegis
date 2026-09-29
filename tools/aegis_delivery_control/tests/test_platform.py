@@ -1056,11 +1056,87 @@ class CheckedConnectionCommitTests(unittest.TestCase):
                         except BaseException:
                             connection.rollback()
                             raise
-                # The signal is delivered once; a later rollback is ordinary.
-                connection.rollback()
+                # The marker is kept until close(): a later rollback with no
+                # open transaction still reports the durable write.
+                with self.assertRaises(owned_paths.OwnedPathChangedAfterCommit):
+                    connection.rollback()
             finally:
                 connection.close()
             self.assertEqual(self._rows(path), [("durable",)])
+
+    def _persistent_swap(self, connection):
+        """Swap the path during commit and keep it swapped through close()."""
+        capability = connection._owned_path_capability
+        original = capability.assert_current
+        state = {"armed": False, "swapped": False}
+
+        def check() -> None:
+            if state["swapped"] or (state["armed"] and not connection.in_transaction):
+                state["swapped"] = True
+                raise PathCapabilityUnavailable("owned path swapped")
+            original()
+
+        return state, patch.object(capability, "assert_current", side_effect=check)
+
+    def test_committed_signal_survives_closing_pattern(self) -> None:
+        # storage.py and adapters.py: with closing(connect()) as connection.
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            path, connection = self._open(Path(temporary_directory))
+            state, swap = self._persistent_swap(connection)
+            with swap:
+                with self.assertRaises(
+                    owned_paths.OwnedPathChangedAfterCommit
+                ) as raised:
+                    with closing(connection) as active:
+                        active.execute("BEGIN IMMEDIATE")
+                        active.execute("INSERT INTO facts VALUES ('durable')")
+                        state["armed"] = True
+                        try:
+                            active.commit()
+                        except BaseException:
+                            active.rollback()
+                            raise
+            self.assertTrue(state["swapped"])
+            self.assertIsInstance(raised.exception.__cause__, PathCapabilityUnavailable)
+            self.assertIsNone(connection._owned_path_capability)
+            self.assertEqual(self._rows(path), [("durable",)])
+
+    def test_committed_signal_survives_finally_close_pattern(self) -> None:
+        # authority.py: try: ... commit() except: rollback(); raise
+        # finally: connection.close().
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            path, connection = self._open(Path(temporary_directory))
+            state, swap = self._persistent_swap(connection)
+            with swap:
+                with self.assertRaises(owned_paths.OwnedPathChangedAfterCommit):
+                    try:
+                        connection.execute("BEGIN IMMEDIATE")
+                        connection.execute("INSERT INTO facts VALUES ('durable')")
+                        state["armed"] = True
+                        connection.commit()
+                    except BaseException:
+                        connection.rollback()
+                        raise
+                    finally:
+                        connection.close()
+            self.assertTrue(state["swapped"])
+            self.assertIsNone(connection._owned_path_capability)
+            self.assertEqual(self._rows(path), [("durable",)])
+
+    def test_close_without_lost_commit_still_reports_plain_path_error(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            _, connection = self._open(Path(temporary_directory))
+            capability = connection._owned_path_capability
+            with patch.object(
+                capability, "assert_current",
+                side_effect=PathCapabilityUnavailable("owned path swapped"),
+            ):
+                with self.assertRaises(PathCapabilityUnavailable) as raised:
+                    connection.close()
+            self.assertNotIsInstance(
+                raised.exception, owned_paths.OwnedPathChangedAfterCommit
+            )
+            self.assertIsNone(connection._owned_path_capability)
 
 
 if __name__ == "__main__":
