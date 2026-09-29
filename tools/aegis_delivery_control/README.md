@@ -60,6 +60,19 @@ Design identifiers such as `T03` (transition 03, dispatch intent) and `T27`
 [design transition table](../../docs/design/resumable-control-plane-v1.md);
 they are not commands a user should type.
 
+Each transition row also lists guards: named preconditions such as
+`no_fence` or `budget_available` that the design requires before the
+transition commits. In `engine.py` that list is an advisory catalog. The
+engine denies an unknown transition, a disallowed state pair or event variant,
+and any change to a terminal state, but every production caller reports the
+full guard list as satisfied, so the engine's guard comparison never denies a
+production call. The checks that decide whether a guard holds are inline in
+`storage.py` and the authority and contract checks it calls; they raise inside
+the same database transaction that would record the event.
+[`tests/test_guard_traceability.py`](tests/test_guard_traceability.py) pins
+that calling pattern and maps each transition-guard pair to its inline check
+and to a test that is denied when the guard fails.
+
 ## What the package files do
 
 **Reading key:** SQLite is the embedded database engine that stores local
@@ -70,7 +83,7 @@ authority or prove the source is fresh.
 | File | Responsibility |
 | --- | --- |
 | `contracts.py` | Define typed operation, event, permission, budget and result records; reject malformed or ambiguous inputs. |
-| `engine.py` | Apply allowed state transitions, fences, validation results, pauses, stops and recovery rules. |
+| `engine.py` | Hold the transition table and deny a transition, state pair or event variant it does not list. Its guard lists are an advisory catalog; `storage.py` enforces them. |
 | `storage.py` | Keep an append-only event chain and transactionally owned projections in a repository-scoped SQLite database. |
 | `authority.py` | Verify and redeem synthetic issuer permissions; a local permission is not a real external approval. |
 | `adapters.py` | Provide the synthetic execution and validator targets with separate durable receipt ledgers. There are no real adapters. |
