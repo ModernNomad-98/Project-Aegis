@@ -10,9 +10,10 @@ inputs; they do not run a live model evaluation.
 
 1. Run the [local checks](#local-reproduction) on the changed revision and
    record the command, result and any skip.
-2. Open a pull request (PR) and wait for the Linux, Windows and protected-file
-   guard jobs on its exact head revision. A later push starts new checks; older
-   green results do not cover the new head.
+2. Open a pull request (PR) and wait for all five jobs in the table below
+   (the Linux and Windows verification jobs, the two tools-test jobs and the
+   protected-file guard) on its exact head revision. A later push starts new
+   checks; older green results do not cover the new head.
 3. Read the job logs and retained evidence if a check fails. Fix a test or
    environment failure and rerun the new candidate. A documented protected
    path guard failure needs an owner disposition under the
@@ -44,7 +45,7 @@ cannot retroactively prevent a merge.
 
 The two verification jobs execute only repository code that `gate-guard`
 protects (see [Protected files](#protected-files)), plus pinned actions and
-pinned dependencies. Pull request (PR) files outside that set are read only as
+pinned dependencies. PR files outside that set are read only as
 data, for example skills checked by the validator. Test code that a pull
 request can change without tripping `gate-guard` runs in the separate
 `tools-tests-linux` and `tools-tests-windows` jobs instead. That covers the
@@ -63,7 +64,7 @@ CI self-tests fail when a gate job does any of these:
   `working-directory`, `-m` module, `-r` file, `env` value or action input, or
   puts `..` in an `env` value or action input;
 - uses a local, Docker or tag-pinned action instead of one pinned to a commit
-  SHA;
+  SHA (the commit's full 40-character hash);
 - runs a step, or sets a job default, with a shell other than `bash`, `pwsh`
   or `powershell`, or sets a job-default `working-directory`;
 - sets, in the workflow, job or step `env`, one of the listed variables that
@@ -106,7 +107,8 @@ for that version. Both jobs install it with
 and then run `pip check`: a file whose hash is not in the lock fails the install,
 no source distribution is built, and nothing outside the lock is resolved. The
 lock's `openai` hashes must equal `AUTHORIZED_SDK_WHEEL_SHA256` and
-`AUTHORIZED_SDK_SDIST_SHA256` in `calibration_transport.py`;
+`AUTHORIZED_SDK_SDIST_SHA256` in
+`tools/behavioral_eval_runner/judge/calibration_transport.py`;
 `scripts/tests/test_offline_ci.py` checks this, so an SDK bump must update the
 constants and the lock together. The validator's ordinary runtime dependency
 remains separately available in `requirements.txt`.
@@ -131,9 +133,10 @@ as Dependabot's is, still installs on `windows-latest`.
 Dependabot opens one grouped Python pull request a week for everything except
 `openai`, which gets its own pull request so an SDK release, which also needs the
 `AUTHORIZED_SDK_*` constants updated, cannot block the other bumps. It also opens
-one grouped pull request a week for the host bridge's npm packages. The lock is
-a protected path, so each Python bump needs the owner's exact-head merge
-exception.
+one grouped pull request a week for the host bridge's npm packages, and weekly
+pull requests for the pinned GitHub Actions. The lock and the workflow are
+protected paths, so each Python or Actions bump needs the owner's exact-head
+merge exception.
 
 On Windows, installing `openai` into a virtual environment under a deep
 directory can fail with `OSError: [Errno 2]` because some of its files exceed
@@ -184,15 +187,16 @@ Full test output retains skip reasons. Capability differences can change skip
 counts: the precheck records both Portable Operating System Interface (POSIX)
 no-follow materialization and atomic
 evidence-write capabilities rather than assuming either from the OS name.
-Windows may lack symlink privileges or distinct 8.3 aliases; Linux acceptance
-does not execute Windows file-lock behavior. Hosted results must be reported as
-actually observed, not as a fixed expected count.
+Windows may lack symlink privileges or distinct short (8.3) file-name
+aliases; Linux acceptance does not execute Windows file-lock behavior. Hosted
+results must be reported as actually observed, not as a fixed expected count.
 
 The [delivery record](evidence/offline-ci-2026-09-12/DELIVERY.md) links the merged
 implementation and successful post-merge run. The retained
-[verification evidence](evidence/offline-ci-2026-09-12/README.md) includes 19
-successful recorded commands (nine Ubuntu, ten Windows), their raw logs and
-environment metadata. These are command records, not a count of individual tests.
+[hosted verification evidence](evidence/offline-ci-2026-09-12/HOSTED.md)
+includes 19 successful recorded commands (nine Ubuntu, ten Windows), their
+raw logs and environment metadata. These are command records, not a count of
+individual tests.
 
 ## Reading a failure
 
@@ -224,7 +228,11 @@ are the directories Python puts first on the import path when the workflow runs
 shadow the standard library or PyYAML and turn a failing check green. Every
 script and `pip` call in the workflow also runs with `python -P`, which keeps
 the script directory off the import path; `-I` is not used because it also
-ignores the `PYTHONIOENCODING` and `PYTHONDONTWRITEBYTECODE` settings.
+ignores the `PYTHONIOENCODING` and `PYTHONDONTWRITEBYTECODE` settings. The
+`python -m` runs of `tools.behavioral_eval_runner`, `unittest` and the
+Windows tools job's ownership diagnostic need the checkout root on the import
+path, so they cannot use `-P`; in the gate jobs, the guard's root-level
+protection covers them instead.
 The guard also protects any `.claude/agents/` directory, recursively, at the
 root or nested anywhere in the repository (for example `docs/.claude/agents/`).
 Claude Code honours `hooks`, `mcpServers` and `permissionMode` in a project
@@ -246,9 +254,9 @@ falls back to a filesystem walk, which also sees untracked files.
 The guard also protects Claude Code and Git configuration at any depth,
 matched case-insensitively: `.claude/settings.json` and
 `.claude/settings.local.json` (hooks, credential helpers, permissions),
-`.mcp.json` (starts MCP server processes, without a prompt in `-p` and SDK
-runs), `.claude/commands/` (skill-style frontmatter the validator does not
-check), `.claude/hooks/` (scripts that hooks call), `.claude-plugin/` (bundles
+`.mcp.json` (starts Model Context Protocol (MCP) server processes, without a
+prompt in `-p` and SDK runs), `.claude/commands/` (skill-style frontmatter the
+validator does not check), `.claude/hooks/` (scripts that hooks call), `.claude-plugin/` (bundles
 hooks and MCP servers) and `.gitattributes` (can hide diffs and change the
 bytes that evidence hashes cover). The commands, hooks and plugin entries match
 with or without a trailing slash, so a symlink standing in for the directory is
@@ -267,9 +275,16 @@ only, so untracked local worktrees are ignored, it also rejects a
 inside a skill folder; any `.claude/skills/` tree other than the root one; any
 tracked `.mcp.json` or `.claude/settings*.json` anywhere in the repository; and
 any tracked symlink under `.claude/skills/`.
-The source repository's [owner grant](approvals/APPROVAL_REGISTER.md) permits
-authorized agents to perform administrator merges without repeat consent; see
-the [current merge policy](reconciliation/auto-merge-policy.md). Documentation
+The source repository's
+[owner grant](approvals/APPROVAL_REGISTER.md#aegis-apr-002-administrator-merges)
+permits authorized agents to perform administrator merges without repeat
+consent, subject to the owner's later condition that local tests and GitHub
+Actions checks are green
+([AEGIS-APR-013](approvals/APPROVAL_REGISTER.md#aegis-apr-013-later-condition-on-standing-administrator-merges),
+[AEGIS-APR-048](approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green));
+it does not by itself
+waive a protected-path guard failure. See the
+[current merge policy](reconciliation/auto-merge-policy.md). Documentation
 inside protected paths also triggers the guard.
 
 The guard reads null-byte (NUL) delimited paths and disables rename detection
