@@ -229,9 +229,10 @@ shadow the standard library or PyYAML and turn a failing check green. Every
 script and `pip` call in the workflow also runs with `python -P`, which keeps
 the script directory off the import path; `-I` is not used because it also
 ignores the `PYTHONIOENCODING` and `PYTHONDONTWRITEBYTECODE` settings. The
-`python -m tools.behavioral_eval_runner` and `python -m unittest` runs need
-the checkout root on the import path, so they cannot use `-P`; the guard's
-root-level protection covers them instead.
+`python -m` runs of `tools.behavioral_eval_runner`, `unittest` and the
+Windows tools job's ownership diagnostic need the checkout root on the import
+path, so they cannot use `-P`; in the gate jobs, the guard's root-level
+protection covers them instead.
 The guard also protects any `.claude/agents/` directory, recursively, at the
 root or nested anywhere in the repository (for example `docs/.claude/agents/`).
 Claude Code honours `hooks`, `mcpServers` and `permissionMode` in a project
@@ -277,7 +278,11 @@ any tracked symlink under `.claude/skills/`.
 The source repository's
 [owner grant](approvals/APPROVAL_REGISTER.md#aegis-apr-002-administrator-merges)
 permits authorized agents to perform administrator merges without repeat
-consent, subject to the owner's later merge conditions; it does not by itself
+consent, subject to the owner's later condition that local tests and GitHub
+Actions checks are green
+([AEGIS-APR-013](approvals/APPROVAL_REGISTER.md#aegis-apr-013-later-condition-on-standing-administrator-merges),
+[AEGIS-APR-048](approvals/APPROVAL_REGISTER.md#aegis-apr-048-standing-administrator-merge-once-checks-are-green));
+it does not by itself
 waive a protected-path guard failure. See the
 [current merge policy](reconciliation/auto-merge-policy.md). Documentation
 inside protected paths also triggers the guard.
