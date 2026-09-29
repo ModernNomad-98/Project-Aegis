@@ -23,10 +23,10 @@ Each check gets exactly one verdict:
 
 | Check | Evidence to read (read-only) | VERIFIED when | Common GAP |
 | --- | --- | --- | --- |
-| Exists | Snapshot or backup list for the store; dump-file listing in the backup bucket | At least one backup of this exact store is listed | Backups belong to a different or deleted instance |
+| Exists | Snapshot or backup list for the store; dump-file listing in the storage bucket (a cloud file store) that holds backups | At least one backup of this exact store is listed | Backups belong to a different or deleted instance |
 | Non-empty | Size of the newest backup; size history | Size is above zero and within a plausible range of recent backups and the store's size | Zero-byte file; size suddenly far smaller than usual |
 | Current | Newest backup time, or end of the PITR window, and the check time | Age at check time is below the RPO | Newest backup older than the RPO; PITR window stopped advancing |
-| Retained | Oldest kept backup; retention setting; lifecycle rules on the backup bucket | Oldest kept backup meets the retention requirement | Retention shorter than required; lifecycle rule deletes early |
+| Retained | Oldest kept backup; retention setting; automatic deletion rules on that bucket | Oldest kept backup meets the retention requirement | Retention shorter than required; lifecycle rule deletes early |
 | Encrypted | Encryption flag and key reference on the backup and its copies | Encryption on, key named, and the key is enabled and usable | Unencrypted copy; key disabled or scheduled for deletion |
 | Off-account copy | Copies in another account, project or subscription (and region) | A current copy exists outside the store's own account | All copies live in the same account as the store |
 | Restore-tested | Last drill record: date, backup used, measured time, parity result | A drill succeeded within the agreed interval and its time is inside the RTO | Never tested; last test too old; measured time above the RTO |
@@ -50,7 +50,8 @@ Scratch target: <account / project> / <region> / <new instance name>
   Non-production evidence: <identifiers compared with the production list>
   Exists already? <no | yes, proven empty by <evidence>>
 Data origin: production copy of <store> at <backup time>
-Access to scratch copy: <named people or roles only>
+Data class: <for example personal or payment data>; allowed in this account and region: <evidence>
+Access to scratch copy: <named people or roles only>; public internet access: none
 Estimated cost: <amount> <currency> for about <duration>
   Basis: <instance class × hours, storage size × duration, transfer size, source of prices and date>
 Restore credential: <VAR_NAME> (value never printed)
@@ -71,9 +72,12 @@ never with the live store.
 
 - **Row counts:** count rows per table in the restored copy. The reference
   counts come from a count taken at backup time, the backup's own metadata,
-  or a second restore of the same backup. Say which.
-- **Checksums:** compute an ordered aggregate hash per table or per agreed
-  column set (for example a hash over primary keys and an updated-at column)
+  or a second restore of the same backup. Say which. A second restore proves
+  only that the restore can be repeated, not that it matches the source;
+  report it that way.
+- **Checksums:** compute one checksum per table or per agreed column set,
+  over the rows in a fixed order (for example a checksum over the primary
+  keys and an updated-at column)
   on the restored copy, and compare with the same computation on the
   reference. Use the same query on both sides and show it.
 - **Scope:** for very large stores, agree a sample (named tables, key
@@ -92,7 +96,7 @@ never print or open the file's contents into the conversation.
 - History: list every path ever added with those patterns, for example with
   `git log --all --diff-filter=A --name-only` filtered by pattern, and
   record the first commit that added each one.
-- Large binary blobs in history can also be dumps; list their paths and
+- Large binary files in history can also be dumps; list their paths and
   sizes for a human to check.
 - A hit is reported, not removed. Removing it from history is a history
   rewrite, a destructive operation outside this skill. If the file may hold
@@ -101,8 +105,10 @@ never print or open the file's contents into the conversation.
 
 ## 5. After the drill
 
-- Delete the scratch instance and its storage, then list them again and show
-  that they are gone.
+- Delete the scratch instance and its storage without a final snapshot, and
+  delete any snapshot, automated backup or export it created. List the
+  instances, snapshots and backups in the scratch account again and show
+  that none remain.
 - Record the measured restore time with the data size at the time; a later,
   larger store needs a new drill.
 - If deletion fails or cannot be confirmed, stop, report the open copy of

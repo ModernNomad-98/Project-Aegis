@@ -138,7 +138,8 @@ before proceeding.
    - **Current:** the newest usable backup, or the end of the PITR window,
      is younger than the RPO at the time of the check.
    - **Retained:** the oldest kept backup meets the retention requirement.
-   - **Encrypted:** encryption is on, with the key reference named.
+   - **Encrypted:** encryption is on, with the key reference (the name or
+     identifier of the encryption key) named.
    - **Off-account copy:** a copy exists outside the store's own account.
    - **Restore-tested:** a restore drill of this store succeeded within the
      agreed interval, with its measured time inside the RTO.
@@ -156,8 +157,11 @@ before proceeding.
    non-production only on positive evidence; anything unknown or shared is
    treated as production and the drill stops. It must not exist yet, or
    must be proven empty; restoring over any existing database is refused.
-   Record the data origin: the restored copy is production data (backup
-   identifier, source store, backup time), so it inherits the source's
+   It must not be reachable from the public internet, and only the people
+   or roles named in the plan may connect to it.
+   Record the data origin and class: the restored copy is production data
+   (backup identifier, source store, backup time, and its data class, such
+   as personal or payment data), so it inherits the source's
    access limits and handling rules for as long as it exists, and the
    scratch target must sit in an account and region where that data is
    allowed to be kept.
@@ -180,8 +184,10 @@ before proceeding.
    queries against production). Report each mismatch by
    table; show counts and checksums, never row contents.
 10. **Delete the scratch copy and prove it.** Remove the scratch instance
-    and its storage, then list again to show it is gone. The drill is not
-    done until the deletion is shown.
+    and its storage without a final snapshot, and delete any snapshot,
+    automated backup or export it created. Then list the instances,
+    snapshots and backups in the scratch account again to show that none
+    remain. The drill is not done until the deletion is shown.
 11. **Report** in the Output Format, including what was not done and why.
 
 When the drill method is a real choice (for example a provider's snapshot
@@ -204,10 +210,10 @@ Per store:
           each: VERIFIED (<evidence>) | GAP (<what is missing>) | UNVERIFIED (<why not readable>)
 Drill record (drill mode only):
   Backup <id> of <store> taken <time> → scratch target <account/region/name>, proven non-production by <evidence>
-  Data origin: production copy from <store> at <time>; access limited to <who>
+  Data origin: production copy from <store> at <time>, data class <class>; access limited to <who>; not reachable from the public internet
   Restore time: <measured> vs RTO <y> → within | exceeds
   Parity: <n tables> row counts <match | mismatch list>; checksums <match | mismatch list>
-  Scratch deleted: <time>, confirmed by listing <evidence>; actual cost <if known>
+  Scratch deleted: <time>; instance, storage, snapshots and backups confirmed gone by listing <evidence>; actual cost <if known>
 Repository dump check: <path — commit — size> | none found (<scope searched>)
 Credentials: referenced by variable name only — <VAR_NAME list>
 Not done: <UNVERIFIED items, drills not requested or refused, and why>
@@ -230,7 +236,8 @@ Handoffs: <resilience-architecture-reviewer | data-migration-runbook-author | se
       account and region are allowed to hold the restored data.
 - [ ] Parity compared counts and checksums with the backup's source, and no
       row contents were shown.
-- [ ] The scratch copy's deletion is shown by a listing.
+- [ ] The scratch copy's deletion, including any final snapshot, automated
+      backup or export it created, is shown by a listing.
 - [ ] Dump files are reported by path and commit only; no contents printed.
 - [ ] No credential value appears anywhere; only variable names.
 - [ ] Any drill-method choice explained terms, costs, pros and cons, and a
@@ -262,6 +269,11 @@ Handoffs: <resilience-architecture-reviewer | data-migration-runbook-author | se
 - Backups kept only in the store's own account are lost with that account.
   Deleting an instance can also delete its automated backups on some
   providers; treat each provider's behavior as a verification item.
+- Deleting the scratch instance can leave production data behind: some
+  providers take a final snapshot on deletion by default, or keep the
+  instance's automated backups after it is gone. Delete without a final
+  snapshot, list the snapshots and backups too, and treat each provider's
+  default as a verification item.
 - A backup encrypted with a key that was disabled or deleted cannot be
   restored. Name the key and check that it is still usable.
 - Parity against the live store always "fails", because the live store kept
@@ -288,6 +300,10 @@ Handoffs: <resilience-architecture-reviewer | data-migration-runbook-author | se
   for `incident-response-runbook`.
 - The restore would go over any existing database → refuse; restores go only
   into a new or proven-empty scratch target.
+- The scratch target would be reachable from the public internet or by
+  anyone not named in the plan, its account or region is not allowed to
+  hold the source's data, or the data's class is unknown → do not start the
+  drill; report which condition failed.
 - The drill approval does not state the drill's estimated cost, or the
   expected cost rises above the approved estimate → do not start or continue
   the drill; present the cost and obtain approval again.
@@ -313,8 +329,8 @@ Handoffs: <resilience-architecture-reviewer | data-migration-runbook-author | se
 - `evals/evals.json` — behavior cases: stale backup against the RPO, drill
   with parity and deletion, production refusal, restore-over-existing
   refusal, cost-unstated refusal, zero-byte backup, dump file in history,
-  missing objectives, UNVERIFIED evidence, credential refusal, and
-  manual-only silence.
+  missing objectives, UNVERIFIED evidence, cost overrun, changed plan,
+  unconfirmed deletion, credential refusal, and manual-only silence.
 - `evals/trigger-evals.json` — discrimination against
   `data-migration-runbook-author`, `compliance-evidence-collector`,
   `rollback-runbook-author`, `pii-lifecycle-designer`,
