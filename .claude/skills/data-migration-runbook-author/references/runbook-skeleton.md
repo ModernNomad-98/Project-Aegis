@@ -7,15 +7,33 @@ The owning [data migration runbook skill](../SKILL.md) defines the
 document-only scope and the authorization needed to execute a live run.
 Here, **p99** means the 99th-percentile response time on the primary path.
 
+## Target confirmation (step 1 of every runbook)
+
+A read-only fingerprint, compared with expected values written down BEFORE
+the run by the plan or the environment's owner:
+
+```
+Fingerprint:  database name = <expected>; host = <expected>;
+              sentinel row <table>.<key> = <expected value only this environment holds>
+Run as:       read-only query from the session that will do the writes
+Re-run:       before the next write if the session or connection changes
+EXPECTED:     all three match exactly
+ON MISMATCH:  stop; nothing below runs; record what was seen in the log
+FAIL CLOSED:  a failed or empty query, or a missing expected value, is a mismatch
+```
+
+An expected value copied from the session being checked proves nothing:
+it must come from outside that session.
+
 ## Batching-rationale worksheet
 
 ```
 Batch key:     <monotonic id | date partition | tenant bucket>
 Batch size:    <n rows> — rationale: <rows × width vs lock/undo/redo budget;
                target batch duration ≤ <s> so locks/transactions stay short>
-Throttle:      <sleep ms | rate> tuned by: <replication lag > <t> ⇒ back off;
+Throttle:      <sleep in milliseconds | rate> tuned by: <replication lag > <t> ⇒ back off;
                primary p99 > <t> ⇒ pause>
-Concurrency:   1 unless partition-disjoint proof: <proof or "n/a">
+Concurrency:   1 unless partition-disjoint proof: <proof or "not applicable">
 Progress:      marker=<last completed batch key> stored in <OUTSIDE the moving data>
 Resume:        idempotent because <keyed upsert | range replace> — re-running
                the marker batch is harmless
@@ -61,6 +79,19 @@ Never in the abort path: dropping the new schema/store, disabling
 dual-writes before reads are back on the old path, or "clean up" deletes
 without their own reviewed step.
 
+## Smoke-check patterns (after apply or read switch)
+
+- **Known record renders:** a named record that touches the changed
+  tables is read through the application — EXPECTED: the stated fields,
+  no error.
+- **Write path works:** one reversible test write through the application
+  on a marked test entity — EXPECTED: success, and the row has the new
+  shape.
+- **Error rate:** the serving path's error rate for <n> minutes after the
+  change — EXPECTED: at or below the pre-change baseline.
+
+A failed smoke check points to an abort row, never to "watch and see".
+
 ## Runbook skeleton
 
 ```
@@ -86,8 +117,27 @@ DATA MIGRATION RUNBOOK — <move> vN <date>
   zero-reader evidence <ref>; after this, rollback = restore-grade event
 5 EXECUTION LOG (fill during run)
   <timestamp> <step> <batch range> <verification output> <deviation + reason>
+6 CLOSEOUT RECORD
+  fingerprint seen, backup evidence used, end state, smoke-check results, residuals
 POSTURE: this document executes nothing; operators run steps; [APPROVAL
 REQUIRED] steps proceed only with the marked human approval recorded.
+```
+
+Step 1 target confirmation (above) precedes section 0 in every runbook.
+
+## Schema-migration deploy skeleton
+
+```
+MIGRATION DEPLOY RUNBOOK — <migration id> to <environment> vN <date>
+1 TARGET CONFIRMATION … EXPECTED <fingerprint values> ON MISMATCH <stop>
+2 PREREQUISITES  migration=<approved migration ref> review=<secure-migration-reviewer verdict> backup=<evidence + restore-time bound>
+3 [APPROVAL REQUIRED] apply <migration id> … EXPECTED <tool reports applied; lock time ≤ <s>>
+                                              ON FAIL <abort: stop; do not re-run blind>
+4 SCHEMA VERIFICATION … EXPECTED <migration recorded as applied; tables/columns/indexes as reviewed> ON FAIL <abort: stop; do not re-run blind>
+5 SMOKE CHECKS (patterns above) … EXPECTED <each check's result> ON FAIL <abort: stop, record the halt state, then use 6>
+6 ROLLBACK REFERENCE  <the migration's rollback plan from rollback-runbook-author>
+7 EXECUTION LOG and CLOSEOUT RECORD (as above)
+POSTURE: this document executes nothing; operators run steps; [APPROVAL REQUIRED] steps proceed only with the marked human approval recorded.
 ```
 
 ## Execution-log discipline

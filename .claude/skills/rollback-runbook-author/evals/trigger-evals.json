@@ -1,7 +1,7 @@
 {
   "skill": "rollback-runbook-author",
-  "description": "Trigger discrimination for the Phase 6 delivery cluster: rollback authoring vs the release gate vs pipeline design, against shipped secure-migration-reviewer, and the mid-incident boundary with incident-response-runbook.",
-  "overlaps_with": ["release-readiness-reviewer", "ci-pipeline-architect", "secure-migration-reviewer", "incident-response-runbook"],
+  "description": "Trigger discrimination for the Phase 6 delivery cluster: rollback authoring vs the release gate vs pipeline design, against shipped secure-migration-reviewer, the mid-incident boundary with incident-response-runbook, and a migration's rollback plan vs the migration deploy runbook (data-migration-runbook-author).",
+  "overlaps_with": ["release-readiness-reviewer", "ci-pipeline-architect", "secure-migration-reviewer", "incident-response-runbook", "data-migration-runbook-author"],
   "cases": [
     {
       "id": "rollback-authoring-wins-here",
@@ -30,6 +30,14 @@
       "expected_skill": "incident-response-runbook",
       "should_not_trigger": ["rollback-runbook-author"],
       "reason": "The incident playbook (severity ladder, roles, comms) is incident-response-runbook; it INVOKES rollback runbooks as one containment action rather than authoring them."
+    },
+    {
+      "id": "migration-rollback-plan-stays-here",
+      "prompt": "Write the rollback plan for migration 0042.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": ["data-migration-runbook-author"],
+      "note": "SEAM CASE, mirrored in data-migration-runbook-author's trigger evals: the migration deploy runbook cites this plan in its rollback section but does not author it.",
+      "reason": "Only the rollback plan for one migration is requested, which this skill's description names directly. No target confirmation, apply, verification or smoke steps are asked for."
     }
   ]
 }

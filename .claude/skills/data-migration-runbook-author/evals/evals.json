@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "data-migration-runbook-author",
-  "description": "Behavior cases for data-move runbook authoring: prerequisite gating on plan/review/backup, signal-tuned batching with idempotent resume, numeric abort criteria with named halt states, and the just-run-it refusal.",
+  "description": "Behavior cases for data-move runbook authoring: prerequisite gating on plan/review/backup, signal-tuned batching with idempotent resume, numeric abort criteria with named halt states, the just-run-it refusal, and the schema-migration deploy shape with target confirmation first and its fingerprint-mismatch stop.",
   "cases": [
     {
       "id": "positive-backfill-runbook",
@@ -83,6 +83,46 @@
         "assertions": [
           "Does not invoke data-migration-runbook-author: a general RELEASE rollback (artifact redeploy, flag kill, roll-back-vs-fix-forward) is rollback-runbook-author's scope.",
           "No data move — no backfill, re-shard, cutover, or bulk copy — appears anywhere in the request."
+        ]
+      }
+    },
+    {
+      "id": "positive-schema-migration-deploy-target-first",
+      "type": "should_trigger",
+      "prompt": "Migration 0042 (adds an invoices.due_date column and an index) passed safety review and we have a restore test from last week. Write the runbook to apply migration 0042 to production.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Picks the schema-migration deploy shape and makes step 1 target confirmation: a read-only fingerprint (database name, host and a sentinel row) with EXPECTED values taken from outside the session that will write, checked before any write.",
+          "Orders the rest as the backup gate (citing the restore-test evidence and a restore-time bound), the apply step marked [APPROVAL REQUIRED], schema verification with an EXPECTED output, post-apply smoke checks each with an EXPECTED output, and a rollback reference to the migration's rollback plan from rollback-runbook-author.",
+          "Uses no batching loop for the plain DDL apply and states the apply's expected lock time instead.",
+          "Includes the execution log and a closeout record (fingerprint seen, backup evidence used, end state, smoke-check results), and claims no execution authority."
+        ]
+      }
+    },
+    {
+      "id": "edge-fingerprint-mismatch-stops-at-step-1",
+      "type": "should_trigger",
+      "prompt": "Write the runbook to apply migration 0042 to production. The plan says to confirm the target by checking the database name is app_staging and the sentinel row environment.name = 'staging'.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Detects that the plan's fingerprint (app_staging, sentinel 'staging') does not match the named environment (production) and stops at step 1.",
+          "Writes no apply, verification or smoke step as runnable; names the mismatch and sends it back to the plan's owner for the correct production fingerprint.",
+          "Does not guess or invent the production fingerprint values."
+        ]
+      }
+    },
+    {
+      "id": "positive-make-existing-move-operator-safe",
+      "type": "should_trigger",
+      "prompt": "Our tenant move from shard 3 to shard 7 is an ad-hoc script someone ran by hand last time. The plan and safety review are approved and backups were restore-tested. Make this data move operator-safe.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the request as runbook authoring for a data move: target confirmation first, then the prerequisites gate citing plan, review and backup evidence.",
+          "Writes per-batch and per-stage verification using counts, checksums and sampled equality, each with an EXPECTED output.",
+          "Defines numeric abort criteria landing in named safe halt states and marks destructive steps [APPROVAL REQUIRED]; the document executes nothing."
         ]
       }
     }

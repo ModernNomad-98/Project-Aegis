@@ -266,7 +266,7 @@ otherwise invisible to the shipped suite):
 `iac-reviewer`, `ci-pipeline-architect`, `release-readiness-reviewer`, `rollback-runbook-author`,
 `observability-operator`, `slo-reliability-architect`, `incident-response-runbook`.
 Execution-plan extras (`cloud-security-baseline-reviewer`, `resilience-architecture-reviewer`,
-`rollback-strategy-designer`→merged into `rollback-runbook-author`, `migration-deployment-runbook`,
+`rollback-strategy-designer`→merged into `rollback-runbook-author`, `migration-deployment-runbook` (#254)→merged into `data-migration-runbook-author` (D71, 2026-09-28; no separate skill),
 `environment-parity-reviewer`, `database-backup-verifier`) → Phase 6 expansion backlog.
 
 `database-backup-verifier` (category 07 #253, P0) — **✅ built (D71, 2026-09-28)**, manual-only:
