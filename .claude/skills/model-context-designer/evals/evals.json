@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "model-context-designer",
-  "description": "Behavior cases for per-call context-window curation: server-side assembly under hard caps, closed input schemas, secret/PII minimization with an explicit persisted-vs-transient split, honest reconstructibility, designed exclusions, failure proofs, and the design-not-review seam.",
+  "description": "Behavior cases for per-call context-window curation: server-side assembly under hard caps, closed input schemas, secret/PII minimization with an explicit persisted-vs-transient split, honest reconstructibility, designed exclusions, failure proofs, the prompt contract record (version, owner, decline conditions, change policy), and the design-not-review seam.",
   "cases": [
     {
       "id": "positive-ad-hoc-context-stuffing",
@@ -71,6 +71,34 @@
           "Explains the supply-chain principle: an unverified input is an unverified output, and open access admits unbounded unverified input.",
           "Presents the curated alternative: named segments, closed schemas, caps, and designed exclusions serving the same need.",
           "Escalates rather than complies if the open-access requirement survives."
+        ]
+      }
+    },
+    {
+      "id": "positive-prompt-contract-version-bump",
+      "type": "should_trigger",
+      "prompt": "Our ticket summarizer's prompt is moving from version 3 to version 4, and the new version renames the output field issue to problem. Nobody wrote down who owns the prompt or what it promises. Write the prompt contract and tell me what has to happen before version 4 ships.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Writes a prompt contract record: instruction identifier, version 4 with the previous version, a named owner, the declared input segments, a pointer to the output contract, decline conditions, and a change policy.",
+          "Classifies the rename as an edit that needs an evaluation rerun before version 4 ships, and does not treat it as a wording tweak.",
+          "Hands the output-schema change to structured-output-validator and points the contract at that contract instead of restating the schema.",
+          "Says the rerun itself runs under ai-evaluation-harness (manual-only) and does not claim to have run it."
+        ]
+      }
+    },
+    {
+      "id": "edge-prompt-contract-missing-decline-conditions",
+      "type": "should_trigger",
+      "prompt": "Here is our draft prompt contract for the refund-reply drafter: id refund-drafter, version 2, owner the payments team, inputs are the ticket text and the order record, output follows the refund-reply schema. Is it complete?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Flags the contract as incomplete because it lists no decline conditions and no change policy.",
+          "Adds concrete decline conditions, each with an expected decline response (for example a missing or schema-failing order record, or a request outside refund replies), rather than leaving refusal to chance.",
+          "Adds a change policy that marks which edits need an evaluation rerun, including any change to inputs, output fields or decline conditions.",
+          "Checks the declared inputs against the context design: the whole order record is minimized to the fields the reply needs, and sensitive values follow the persisted-versus-transient split."
         ]
       }
     },

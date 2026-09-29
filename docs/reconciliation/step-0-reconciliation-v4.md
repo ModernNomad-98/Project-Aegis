@@ -276,7 +276,8 @@ Execution-plan extras (`cloud-security-baseline-reviewer`, `resilience-architect
 `ai-governance-risk-reviewer`, `ai-router-architect`, `structured-output-validator`,
 `sensitive-disclosure-guard` *(NEW)*, `model-poisoning-reviewer` *(NEW)*,
 `system-prompt-leakage-reviewer` *(NEW)*, `ai-misinformation-guard` *(NEW)*.
-Execution-plan extras (`ai-provider-adapter-designer`→merged into `ai-router-architect` (D70, 2026-09-28), `prompt-contract-designer`,
+Execution-plan extras (`ai-provider-adapter-designer`→merged into `ai-router-architect` (D70, 2026-09-28), `prompt-contract-designer` (#283)→merged into
+`model-context-designer` as its prompt contract record (D70, 2026-09-28),
 `ai-human-in-the-loop-designer`, `ai-autonomy-boundary-designer`, `ai-security-test-harness`→merged
 into `ai-evaluation-harness`, `ai-feature-kill-switch-designer`) → Phase 7 expansion backlog.
 

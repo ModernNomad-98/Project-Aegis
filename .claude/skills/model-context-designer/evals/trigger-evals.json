@@ -1,12 +1,15 @@
 {
   "skill": "model-context-designer",
-  "description": "Trigger discrimination for runtime per-call context curation (this skill) vs session-start context loading (agent-startup-context-gate), spend caps (ai-cost-guardrail-designer), retrieval authorization (rag-security-architect), redaction mechanics (sensitive-disclosure-guard), the in-batch call-gating seam (agent-harness-architect), and the DESIGN-vs-REVIEW seam against memory-context-poisoning-reviewer.",
+  "description": "Trigger discrimination for runtime per-call context curation (this skill) vs session-start context loading (agent-startup-context-gate), spend caps (ai-cost-guardrail-designer), retrieval authorization (rag-security-architect), redaction mechanics (sensitive-disclosure-guard), the in-batch call-gating and agent instruction custody seam (agent-harness-architect), the output schema a prompt contract points to (structured-output-validator), running an evaluation rerun (ai-evaluation-harness, manual-only), injection defense (prompt-injection-defender, manual-only), and the DESIGN-vs-REVIEW seam against memory-context-poisoning-reviewer.",
   "overlaps_with": [
     "agent-startup-context-gate",
     "ai-cost-guardrail-designer",
     "rag-security-architect",
     "sensitive-disclosure-guard",
     "agent-harness-architect",
+    "structured-output-validator",
+    "ai-evaluation-harness",
+    "prompt-injection-defender",
     "memory-context-poisoning-reviewer"
   ],
   "cases": [
@@ -55,6 +58,46 @@
       "should_not_trigger": ["model-context-designer"],
       "note": "IN-BATCH SEAM (pinned both ways) — the harness gates the CALL; this skill curates the CONTENT that rides in it. Nothing here asks what fills the window.",
       "reason": "Mediation, the pre-flight ladder, registry, and audit are agent-harness-architect. model-context-designer owns what enters and leaves the window of a call the harness has already gated."
+    },
+    {
+      "id": "prompt-contract-wins-here",
+      "prompt": "Write a prompt contract for our summarizer: the instruction's version and owner, its declared inputs, a pointer to its output schema, when it must decline, and which prompt edits need an evaluation rerun.",
+      "expected_skill": "model-context-designer",
+      "should_not_trigger": ["structured-output-validator", "ai-evaluation-harness", "agent-harness-architect", "prompt-injection-defender"],
+      "note": "SEAM CASE (D70 extension) — the prompt contract record ties the parts together and points to their owners. The output schema is only referenced, no evaluation is run, no agent harness is being wired, and no injection defense is asked for.",
+      "reason": "Writing the versioned, owned prompt contract with declared inputs, decline conditions and a change policy is model-context-designer. structured-output-validator owns the schema it points to; ai-evaluation-harness runs the reruns it calls for."
+    },
+    {
+      "id": "prompt-change-contract-wins-here",
+      "prompt": "We are editing our classifier prompt to add a new category. Update the prompt contract: bump the version, say whether this edit needs an evaluation rerun, and add a decline condition for inputs that fit no category.",
+      "expected_skill": "model-context-designer",
+      "should_not_trigger": ["structured-output-validator", "ai-evaluation-harness"],
+      "note": "SEAM CASE (D70 extension) — deciding WHETHER a prompt change needs a rerun is the contract's change policy; running it is not requested.",
+      "reason": "The version bump, change-policy classification and decline conditions are the prompt contract. The rerun it requires is then run under ai-evaluation-harness (manual-only)."
+    },
+    {
+      "id": "output-schema-goes-to-structured-output-validator",
+      "prompt": "Define the JSON output schema for our summarizer with field types, enums and ranges, and validate every response before our code uses it, rejecting failures instead of repairing them silently.",
+      "expected_skill": "structured-output-validator",
+      "should_not_trigger": ["model-context-designer"],
+      "note": "SEAM CASE (D70 extension) — the output contract and validate-before-use ladder. The prompt contract only points to it.",
+      "reason": "The output schema and its validation are structured-output-validator. model-context-designer's prompt contract references that contract by pointer and never restates it."
+    },
+    {
+      "id": "running-the-rerun-goes-to-ai-evaluation-harness",
+      "prompt": "Explicitly invoke ai-evaluation-harness. Our summarizer prompt changed from version 3 to 4; run the regression suite with the quality and refusal graders and block the release if it regresses.",
+      "expected_skill": "ai-evaluation-harness",
+      "should_not_trigger": ["model-context-designer"],
+      "note": "SEAM CASE (D70 extension) — RUNNING the evaluation gate on a prompt change. The prompt contract only says when a rerun is needed.",
+      "reason": "Datasets, graders, thresholds and the regression gate are ai-evaluation-harness (manual-only, because runs spend tokens). model-context-designer's change policy decides that a rerun is needed, not how it runs."
+    },
+    {
+      "id": "agent-instruction-custody-goes-to-agent-harness-architect",
+      "prompt": "Our agent's system instructions are pasted into client code. Move them to server-side versioned artifacts that no user can override, and record which instruction version served each call.",
+      "expected_skill": "agent-harness-architect",
+      "should_not_trigger": ["model-context-designer"],
+      "note": "SEAM CASE (D70 extension) — custody of an agent's instructions and the per-call served version belong to the harness. An agent's prompt contract points to that version.",
+      "reason": "Instructions as server-side versioned artifacts with the serving version recorded per call are agent-harness-architect. model-context-designer writes the contract that references the version, not the custody mechanism."
     },
     {
       "id": "poisoning-review-goes-to-memory-context-poisoning-reviewer",
