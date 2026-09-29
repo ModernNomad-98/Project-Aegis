@@ -1917,7 +1917,7 @@ existing heading is not a new section.
 2026-09-27 rule count toward the 10 lines, added together since the page's
 last full-page acceptance. A small edit keeps acceptance only if an
 independent reviewer checked it; an unreviewed edit, however small, needs a
-targeted review before the page counts as accepted. That review must cover
+targeted review before the page counts as accepted. Either review must cover
 every changed line, by naming or reading it, and any kind of independent
 review counts, such as a readability, security or fact review (owner
 decision, 2026-09-29).
