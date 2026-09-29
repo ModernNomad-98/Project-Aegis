@@ -2335,3 +2335,63 @@ the entry governs.
   `e64b7430488c5f47c31faf1abcfa5f46aae876f3362ed8e0de105e988ff10153`. Its
   findings are unchanged from the v1.13.3 baseline: 316 in total, 232 of
   them ROUTE-002.
+
+### AEGIS-APR-087: PR #505 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by AEGIS-APR-088; no remaining use.
+  Recorded after the merge.
+- **Date / Grantor:** 2026-09-29 / Peter Nguyen.
+- **Reason:** [PR #505](https://github.com/ModernNomad-98/Project-Aegis/pull/505)
+  makes the validator reject agent files whose frontmatter can run commands
+  or widen permissions, and adds `.claude/agents` paths to the paths
+  `gate-guard` protects. It changes `.github/workflows/validate-skills.yml`,
+  `scripts/validate-skills.py` and test files under `scripts/tests/`,
+  protected paths outside AEGIS-APR-047's four BER files, so `gate-guard`
+  fails, and merging needs a one-time owner exception for the exact head.
+- **Scope allowed:** One `gate-guard` exception and administrator merge of
+  PR #505 at exact head `ebda783f8edc3c29bc9da076dbde0eb596d21b9f`, which
+  changed only `.github/workflows/validate-skills.yml`, `CONTRIBUTING.md`,
+  `README.md`, `docs/offline-ci.md`, `scripts/validate-skills.py`,
+  `scripts/tests/test_offline_ci.py`, `scripts/tests/test_validator.py` and
+  11 new fixture files under `scripts/tests/fixtures/agents/`.
+  [Exact-head run 36506163908](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36506163908)
+  passed `validate-skills` and `windows-offline-checks`; `gate-guard` failed
+  only on `.github/workflows/validate-skills.yml`,
+  `scripts/validate-skills.py`, `scripts/tests/test_offline_ci.py`,
+  `scripts/tests/test_validator.py` and the 11 fixture files. Independent
+  security reviews of three earlier heads returned REVISE:
+  [`9ec3cb1150fda27f758ef413800e5966b87505ef`](https://github.com/ModernNomad-98/Project-Aegis/pull/505#issuecomment-5878774628),
+  [`ccb28a21ea7b2e13ac9e366ae87056c58c04d79e`](https://github.com/ModernNomad-98/Project-Aegis/pull/505#issuecomment-5880081301)
+  and
+  [`89f851586df3179edc6374864757060f511f55d5`](https://github.com/ModernNomad-98/Project-Aegis/pull/505#issuecomment-5880986085).
+  The [security re-review](https://github.com/ModernNomad-98/Project-Aegis/pull/505#issuecomment-5881821301)
+  of the exact head returned SHIP. Codex posted only usage-limit notices
+  after the head commit (01:04:30 UTC): at 01:05:30 and 01:21:53 UTC on
+  2026-09-29, so it was confirmed unavailable under AEGIS-APR-050.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
+  not change branch protection, it removed no path from the protected path
+  set, and it did not widen AEGIS-APR-047.
+- **Evidence:** Direct owner answer "Approve exception, merge (Recommended)"
+  to the coordinating agent's multiple-choice question in the Project Aegis
+  conversation (Claude Code session) on 2026-09-29, relayed by that agent.
+  The [security re-review](https://github.com/ModernNomad-98/Project-Aegis/pull/505#issuecomment-5881821301)
+  on PR #505 records the head, checks and verdict. No separate exception
+  receipt was posted on the PR; this entry and AEGIS-APR-088 record the
+  checks and merge.
+- **Expiry / use limit:** One merge of PR #505 at the named head; consumed
+  by the merge recorded in AEGIS-APR-088.
+
+### AEGIS-APR-088: Consumption of the PR #505 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-087.
+- **Status at recording:** AEGIS-APR-087 has no remaining use.
+- **Effective at:** 2026-09-29 01:36:07 UTC.
+- **Recorded at / By:** 2026-09-29 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039.
+- **New authority:** None. A later change to a protected path needs its own
+  exception.
+- **Reason:** The sole exact-head administrator merge completed.
+- **Evidence:** [PR #505](https://github.com/ModernNomad-98/Project-Aegis/pull/505)
+  merged `ebda783f8edc3c29bc9da076dbde0eb596d21b9f` as
+  `9f501f3dba4cf39980663bcd7d6d3c359b10715f` at the time above.
