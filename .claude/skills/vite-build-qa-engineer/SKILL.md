@@ -1,6 +1,6 @@
 ---
 name: vite-build-qa-engineer
-description: MANUAL-ONLY; never auto-invoke. QA the Vite build itself — run the production build and check the client bundle for known secret exposure by named, redacted checks (audit configured env prefixes, inspect dist output without printing secret values, check define/import.meta.env usage), verify build/preview parity, output size and sourcemap policy, assets and SPA fallback routing. Use when asked to verify a Vite build before deploy, audit exposed env vars or bundle contents for secret exposure, debug works-in-dev-but-not-in-build issues, or gate builds in CI with output checks. RUNS builds and preview servers. Do NOT use for moving secrets server-side and rotating leaked credentials (secrets-identity-hardener), unit/component testing (vitest-unit-component-engineer), E2E journeys (playwright-e2e-engineer), or CI pipeline design (qa-automation-architect).
+description: MANUAL-ONLY; never auto-invoke. QA the Vite build itself — run the production build and check the client bundle for known secret exposure by named, redacted checks (audit configured env prefixes, inspect dist output without printing secret values, check define/import.meta.env usage), verify build/preview parity, output size and sourcemap policy, assets and SPA fallback routing. Use when asked to verify a Vite build before deploy, audit exposed env vars or bundle contents for secret exposure, debug works-in-dev-but-not-in-build issues, or gate builds in CI with output checks. RUNS builds and preview servers. Do NOT use for moving secrets server-side and rotating leaked credentials (secrets-identity-hardener), unit/component testing (vitest-unit-component-engineer), E2E journeys (playwright-e2e-engineer), CI pipeline design (qa-automation-architect), or config differences between deployed environments (environment-parity-reviewer).
 disable-model-invocation: true
 ---
 
@@ -40,6 +40,10 @@ with real command output.
   `playwright-e2e-engineer` *(manual-only)*.
 - Do NOT use when: designing the whole automation/CI architecture —
   `qa-automation-architect`.
+- Do NOT use when: comparing configuration across deployed environments
+  (staging versus production variables, provider modes, database versions)
+  — that is `environment-parity-reviewer`, which reads settings and runs no
+  build.
 
 ## Inputs to Inspect
 

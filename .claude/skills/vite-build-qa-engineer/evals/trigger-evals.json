@@ -5,7 +5,8 @@
     "vitest-unit-component-engineer",
     "flaky-test-detective",
     "test-data-architect",
-    "secrets-identity-hardener"
+    "secrets-identity-hardener",
+    "environment-parity-reviewer"
   ],
   "cases": [
     {
@@ -44,6 +45,16 @@
         "vite-build-qa-engineer"
       ],
       "reason": "Intermittent test-step failures are flake diagnosis; build QA handles deterministic build/bundle verification."
+    },
+    {
+      "id": "deployed-env-config-goes-to-parity-reviewer",
+      "prompt": "The built app works on our staging host but not on production: sign-in redirects fail and the API base URL looks different. Compare the two environments' settings and tell me what differs.",
+      "expected_skill": "environment-parity-reviewer",
+      "should_not_trigger": [
+        "vite-build-qa-engineer"
+      ],
+      "note": "SEAM CASE (reciprocated yield, D71) — the same build behaves differently on two deployed environments.",
+      "reason": "A difference between deployed environments' settings (callback addresses, base URLs, variables) is environment-parity-reviewer; build QA runs the build and checks one artifact."
     }
   ]
 }

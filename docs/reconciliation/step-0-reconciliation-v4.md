@@ -277,6 +277,12 @@ timeouts, graceful degradation).
 read-only backup evidence by default, and restore drills only into a named non-production scratch
 target after approval of the exact plan with its estimated cost; it left the expansion backlog.
 
+`environment-parity-reviewer` — **✅ built (D71, 2026-09-28)**, auto-invocable: category 07
+#244 Environment Parity Review, with #246 Runtime Configuration Validation folded in as its
+required-configuration manifest and startup validation specification. Runtime health checks
+(#247) stay with `observability-operator` and `slo-reliability-architect`; IaC-to-runtime
+drift (#245) stays with `iac-reviewer`.
+
 ### Phase 7 — AI security & LLM systems (P1)
 **Canonical = 14 — v4's 10 + 4 OWASP-gap additions (D6):** `ai-threat-modeler`,
 `prompt-injection-defender`, `rag-security-architect`, `agent-tool-safety-guard`,
