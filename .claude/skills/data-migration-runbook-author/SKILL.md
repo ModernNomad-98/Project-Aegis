@@ -111,21 +111,24 @@ re-derives neither.
    fingerprint does not match the named environment, stop authoring at this
    step and send the mismatch back to the plan's owner.
 2. **Confirm the prerequisites or stop, and pick the shape.** Approved
-   plan (for a single deploy, the approved migration and its named target
+   plan (for a single rollout, the approved migration and its named target
    environment), safety-review verdict, and a VERIFIED backup (not "backups are
    enabled" — evidence of a recent successful backup/restore test
    appropriate to the move's blast radius). Absent any of the three, the
-   runbook is not writable yet; say which is missing. Then pick the shape:
-   a **data move** (the batched stages below) or a **schema-migration
-   deploy** (target confirmation, backup gate, apply, schema verification,
-   smoke checks, rollback reference; no batching loop).
+   runbook is not writable yet; say which is missing.
+   `database-backup-verifier` *(manual-only)* produces that backup
+   evidence when a person invokes it. Then pick the shape: a **data
+   move** (batched, as in steps 4 to 8) or a **schema-migration
+   rollout**, the one-off DDL shape from Use When (target confirmation,
+   backup gate, apply, schema verification, smoke checks, rollback
+   reference; no batching loop).
 3. **Write the preconditions section.** Concrete gates with commands'
    PURPOSE and expected output: backup evidence check, dry-run on a
    sampled/staging keyspace with its expected parity result, disk/
    headroom checks, replication-lag baseline, and the announced window
    with its stakeholders. Each gate is pass/fail — an operator can
    answer "did it pass?" without judgment calls.
-4. **Design the batching** (data moves only; a deploy states the apply
+4. **Design the batching** (data moves only; a rollout states the apply
    command's expected lock time instead). Batch key and size with the
    RATIONALE (rows × row-width vs lock/undo budget), throttle (sleep or rate)
    with the signal that tunes it (replication lag threshold, p99 on the
@@ -138,7 +141,7 @@ re-derives neither.
    checksum over normalized columns) and its EXPECTED output shape.
    Per stage: the full-keyspace parity gate from the plan, plus a
    business-level sample (N known entities compared field-by-field).
-   For a deploy: the schema verification (the migration is recorded as
+   For a rollout: the schema verification (the migration is recorded as
    applied, and the changed tables, columns and indexes exist as the
    reviewed DDL says). Every verification states what PASS looks like — a
    query without an expected result is not verification.
@@ -162,7 +165,7 @@ re-derives neither.
    stated); post-read-switch rollback switches reads back (condition:
    dual-writes still on); the no-return point — old path
    decommissioned/contracted — is FLAGGED as requiring explicit human
-   sign-off, with the plan's zero-reader evidence cited. A deploy cites
+   sign-off, with the plan's zero-reader evidence cited. A rollout cites
    its migration's rollback plan from `rollback-runbook-author` rather than
    inventing one.
 9. **Mark every human gate.** Steps that are destructive, irreversible,
