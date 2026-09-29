@@ -136,7 +136,8 @@ skip permission prompts. The skill validator separately checks every agent file
 under the root `.claude/agents/`, recursively, and rejects any frontmatter key
 outside a short allow-list (`name`, `description`, `tools`, `model`,
 `disallowedTools`, `maxTurns`, `effort`, `color`), any repeated key, any YAML
-anchor, alias or merge key (`<<`), and any tracked agent file outside the root
+anchor, alias, tag (such as `!!merge`), directive or merge key (`<<` or any
+merge-tagged key), and any tracked agent file outside the root
 directory. It names `hooks`, `mcpServers` and `permissionMode` as forbidden.
 A tracked entry named `.claude` or `.claude/agents` anywhere in the repository,
 such as a git symlink, is protected by the guard and rejected by the validator,

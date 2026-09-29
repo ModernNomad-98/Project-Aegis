@@ -725,12 +725,14 @@ def misplaced_agent_files(paths: list[str]) -> list[str]:
 
 
 def yaml_indirection(fm_text: str) -> list[str]:
-    """Anchors (`&x`), aliases (`*x`) and merge keys (`<<`) in the frontmatter.
+    """Anchors, aliases, tags, directives and merge keys in the frontmatter.
 
     PyYAML resolves `<<: {tools: Read}` into a real `tools` key, but a YAML
     1.2 reader without merge-key support sees no `tools` at all, and an agent
-    with no `tools` inherits every tool. Agent frontmatter is a handful of
-    flat keys, so any indirection is rejected rather than interpreted.
+    with no `tools` inherits every tool. PyYAML also treats ANY key tagged
+    `tag:yaml.org,2002:merge` (`!!merge foo:`, `!<tag:yaml.org,2002:merge>`)
+    as a merge key. Agent frontmatter is a handful of flat keys, so every
+    anchor, alias, tag, directive and merge key is rejected, not interpreted.
     """
     found: set[str] = set()
     try:
@@ -739,6 +741,13 @@ def yaml_indirection(fm_text: str) -> list[str]:
                 found.add(f"anchor &{token.value}")
             elif isinstance(token, yaml.AliasToken):
                 found.add(f"alias *{token.value}")
+            elif isinstance(token, yaml.TagToken):
+                # `!!merge foo:` or `!<tag:yaml.org,2002:merge>` makes any key a
+                # merge key; no agent needs an explicit tag, so reject them all.
+                handle, suffix = token.value
+                found.add(f"tag {handle or ''}{suffix}")
+            elif isinstance(token, yaml.DirectiveToken):
+                found.add(f"directive %{token.name}")
         root = yaml.compose(fm_text, Loader=yaml.SafeLoader)
     except yaml.YAMLError:
         return []  # the strict parse reports it
@@ -749,6 +758,8 @@ def yaml_indirection(fm_text: str) -> list[str]:
             for key, value in node.value:
                 if isinstance(key, yaml.ScalarNode) and key.value == "<<":
                     found.add("merge key <<")
+                elif key.tag == "tag:yaml.org,2002:merge":
+                    found.add(f"merge key {key.value!r} (merge-tagged)")
                 stack.extend((key, value))
         elif isinstance(node, yaml.SequenceNode):
             stack.extend(node.value)

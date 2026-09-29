@@ -380,6 +380,28 @@ def test_agents_schema():
     expect_error(rep, "YAML anchor &agent_name", "an agent using a YAML anchor is rejected")
     expect_error(rep, "YAML alias *agent_name", "an agent using a YAML alias is rejected")
 
+    # PyYAML treats any key tagged tag:yaml.org,2002:merge as a merge key,
+    # whatever its text, so tags are rejected outright.
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "merge-tag")
+    expect_error(rep, "YAML merge key 'foo' (merge-tagged)",
+                 "an agent whose `!!merge foo:` key merges in `tools` is rejected")
+    expect_error(rep, "YAML tag !!merge", "an agent using a `!!merge` tag is rejected")
+
+    rep = validator.Report()
+    validator.check_agents_schema(rep, agents / "merge-tag-flow")
+    expect_error(rep, "YAML merge key 'bar' (merge-tagged)",
+                 "a flow-mapping agent with a verbatim merge-tagged key is rejected")
+    expect_error(rep, "YAML tag tag:yaml.org,2002:merge",
+                 "an agent using a verbatim `!<tag:yaml.org,2002:merge>` tag is rejected")
+
+    found = validator.yaml_indirection("%YAML 1.1\n---\nname: x\n")
+    assert "directive %YAML" in found, found
+    found = validator.yaml_indirection("name: !!str x\n")
+    assert "tag !!str" in found, found
+    PASSES.append("YAML directives and any explicit tag are rejected")
+    print("  PASS  YAML directives and any explicit tag are rejected")
+
     # Every `.claude/agents/` from the working directory up to the repository
     # root is loaded, so any agent file outside the root tree is flagged.
     candidates = [
