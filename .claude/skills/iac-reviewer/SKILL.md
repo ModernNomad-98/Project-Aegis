@@ -10,7 +10,14 @@ Development Kit; **PR** means pull request; **IAM** means identity and
 access management; **RBAC** means role-based access control; **DDL** means
 data definition language; **DML** means data manipulation language;
 **CI/CD** means continuous integration and continuous delivery; **DB**
-means database.
+means database; **ADR** means architecture decision record. **State** is
+the file an IaC tool keeps to match its code to real cloud resources, and
+the **backend** is where that file is stored. A **plan** (Bicep calls it
+**what-if**) is the tool's preview of what applying the change would do.
+**Blast radius** is everything a change can destroy, replace or expose. A
+**CIDR** range is a block of network addresses; `0.0.0.0/0` means the
+whole internet. **Ingress** is traffic coming in; **egress** is traffic
+going out.
 
 ## Purpose
 
@@ -150,10 +157,13 @@ Not reviewed: <what this review could not see (state, runtime, modules)>
 
 ## Gotchas
 
-- Resource renames without a state move (`moved` blocks / state mv) read
-  as delete+create — the most common accidental-destroy pattern in review.
-- for_each/count key changes reindex collections: the diff looks like an
-  addition but the plan destroys and recreates siblings.
+- Resource renames without a state move (a `moved` block or
+  `terraform state mv`, which tells the tool the resource was renamed, not
+  replaced) read as delete+create — the most common accidental-destroy
+  pattern in review.
+- `for_each`/`count` (which create several copies of one resource) key
+  changes reindex collections: the diff looks like an addition but the plan
+  destroys and recreates siblings.
 - "Temporary" 0.0.0.0/0 rules and public-access flags ship far more often
   than they are removed; treat every widening as permanent unless the diff
   contains its own expiry mechanism.
@@ -189,5 +199,7 @@ Not reviewed: <what this review could not see (state, runtime, modules)>
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the cloud cluster
   (`cloud-architecture-decider`, `azure-saas-architect`,
-  `aws-saas-architect`) and against shipped `secure-migration-reviewer` /
-  `supply-chain-security-reviewer` / `security-pr-reviewer`.
+  `aws-saas-architect`), against shipped `secure-migration-reviewer` /
+  `supply-chain-security-reviewer` / `security-pr-reviewer`, and the D71
+  seams with `cloud-security-baseline-reviewer` and
+  `environment-parity-reviewer`.
