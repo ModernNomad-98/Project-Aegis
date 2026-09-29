@@ -2344,7 +2344,7 @@ the entry governs.
   Recorded after the merge.
 - **Date / Grantor:** 2026-09-29 / Peter Nguyen.
 - **Reason:** [PR #505](https://github.com/ModernNomad-98/Project-Aegis/pull/505)
-  makes the validator reject agent files whose frontmatter can run commands
+  makes the validator reject agent files whose frontmatter (the settings block at the top of the file) can run commands
   or widen permissions, and adds `.claude/agents` paths to the paths
   `gate-guard` protects. It changes `.github/workflows/validate-skills.yml`,
   `scripts/validate-skills.py` and test files under `scripts/tests/`,
@@ -2361,7 +2361,7 @@ the entry governs.
   only on `.github/workflows/validate-skills.yml`,
   `scripts/validate-skills.py`, `scripts/tests/test_offline_ci.py`,
   `scripts/tests/test_validator.py` and the 11 fixture files. Independent
-  security reviews of three earlier heads returned REVISE:
+  security reviews of three earlier heads returned REVISE (changes needed before merge):
   [`9ec3cb1150fda27f758ef413800e5966b87505ef`](https://github.com/ModernNomad-98/Project-Aegis/pull/505#issuecomment-5878774628),
   [`ccb28a21ea7b2e13ac9e366ae87056c58c04d79e`](https://github.com/ModernNomad-98/Project-Aegis/pull/505#issuecomment-5880081301)
   and
