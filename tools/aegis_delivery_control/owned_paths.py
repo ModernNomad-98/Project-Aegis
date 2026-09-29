@@ -34,6 +34,14 @@ class PathCapabilityUnavailable(StorageIntegrityError):
     """The host cannot prove the required owned-path guarantee."""
 
 
+class OwnedPathChangedAfterCommit(PathCapabilityUnavailable):
+    """The write is durable, but the owned path changed during the commit.
+
+    Callers must not treat this as a failed write or retry it: the
+    transaction committed before the change was detected.
+    """
+
+
 @dataclass(frozen=True)
 class PathIdentity:
     platform: str
@@ -879,8 +887,15 @@ class CheckedSQLiteConnection(sqlite3.Connection):
             self._owned_path_capability.check_sidecars()
 
     def commit(self) -> None:
-        super().commit()
+        # Refuse to commit into a swapped or unsafe path.
         self._check_owned_path()
+        super().commit()
+        try:
+            self._check_owned_path()
+        except PathCapabilityUnavailable as error:
+            raise OwnedPathChangedAfterCommit(
+                f"transaction committed, but owned path integrity was lost: {error}"
+            ) from error
 
     def rollback(self) -> None:
         super().rollback()

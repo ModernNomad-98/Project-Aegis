@@ -1,6 +1,7 @@
 """Offline shared-ledger regression checks for synthetic authority claims."""
 
 from contextlib import closing
+import os
 from pathlib import Path
 import sqlite3
 import tempfile
@@ -11,6 +12,9 @@ from tools.aegis_delivery_control.authority import (
     SyntheticAuthority, SyntheticGrant, SyntheticValidatorGrant,
 )
 from tools.aegis_delivery_control.contracts import DispatchDenied
+from tools.aegis_delivery_control.owned_paths import (
+    CheckedSQLiteConnection, PathCapabilityUnavailable,
+)
 from tools.aegis_delivery_control.tests import _owner_private_fixtures
 
 
@@ -174,6 +178,24 @@ class SharedAuthorityClaimTests(unittest.TestCase):
                 self.first.verify_for_intent(effect_capability)
             with self.assertRaisesRegex(DispatchDenied, "state is unavailable"):
                 self.first.verify_validator_for_intent(validator_capability)
+
+    def test_claim_store_uses_checked_owned_connection(self) -> None:
+        # P3-14: the claim store gets the same owned-path and durability
+        # checks as every other ledger.
+        with closing(self.first._validator_claim_connection()) as connection:
+            self.assertIsInstance(connection, CheckedSQLiteConnection)
+            self.assertEqual(
+                connection.execute("PRAGMA synchronous").fetchone()[0], 2
+            )
+            self.assertEqual(
+                connection.execute("PRAGMA journal_mode").fetchone()[0], "delete"
+            )
+
+    @unittest.skipUnless(os.name == "posix", "POSIX mode bits")
+    def test_group_writable_claim_store_is_rejected(self) -> None:
+        os.chmod(self.path, 0o660)
+        with self.assertRaisesRegex(PathCapabilityUnavailable, "owner-private"):
+            SyntheticAuthority(self.key, self.path)
 
     def test_without_shared_store_uses_in_memory_claim_state(self) -> None:
         authority = SyntheticAuthority(self.key)

@@ -13,6 +13,12 @@ from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 
+from .owned_paths import (
+    PathIdentity,
+    connect_checked,
+    nearest_existing_trusted_root,
+    prepare_owned_file,
+)
 from .contracts import (
     ActiveValidationPauseRequest,
     AuthorizeSafeSameEffectRetryRequest,
@@ -550,14 +556,39 @@ class SyntheticAuthority:
         self._effect_commit_bindings: dict[str, tuple[str, str]] = {}
         self._validator_commit_bindings: dict[str, tuple[str, str]] = {}
         self._validator_claim_store_path = validator_claim_store_path
+        self._validator_claim_store_root: Path | None = None
+        self._validator_claim_store_identity: PathIdentity | None = None
         if validator_claim_store_path is not None:
+            # Same owned-path, sidecar and durability checks as every other
+            # ledger: pin the file identity once, then verify it per connection.
+            self._validator_claim_store_root = nearest_existing_trusted_root(
+                validator_claim_store_path.parent
+            )
+            existed = (
+                validator_claim_store_path.exists()
+                or validator_claim_store_path.is_symlink()
+            )
+            self._validator_claim_store_identity = prepare_owned_file(
+                validator_claim_store_path,
+                create=not existed,
+                trusted_root=self._validator_claim_store_root,
+            )
             self._initialize_validator_claim_store()
 
     def _validator_claim_connection(self) -> sqlite3.Connection:
-        if self._validator_claim_store_path is None:
+        if (
+            self._validator_claim_store_path is None
+            or self._validator_claim_store_identity is None
+        ):
             raise DispatchDenied("durable validator claim store is unavailable")
-        connection = sqlite3.connect(self._validator_claim_store_path)
+        connection = connect_checked(
+            self._validator_claim_store_path,
+            expected=self._validator_claim_store_identity,
+            trusted_root=self._validator_claim_store_root,
+        )
         connection.row_factory = sqlite3.Row
+        connection.execute("PRAGMA journal_mode = DELETE")
+        connection.execute("PRAGMA synchronous = FULL")
         return connection
 
     def _initialize_validator_claim_store(self) -> None:

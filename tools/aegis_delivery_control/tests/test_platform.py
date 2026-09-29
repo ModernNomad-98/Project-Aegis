@@ -19,8 +19,15 @@ from tools.aegis_delivery_control.adapters import (
     SyntheticExecutionAdapter,
     SyntheticValidatorAdapter,
 )
+from tools.aegis_delivery_control.authority import SyntheticAuthority
 from tools.aegis_delivery_control.contracts import DispatchDenied
-from tools.aegis_delivery_control.cli import ExpectedFreshnessOracle, _status, main
+from tools.aegis_delivery_control.cli import (
+    ExpectedFreshnessOracle,
+    _load_authority,
+    _load_expected_vector,
+    _status,
+    main,
+)
 from tools.aegis_delivery_control.owned_paths import (
     CheckedPathCapability,
     PathCapabilityUnavailable,
@@ -883,6 +890,144 @@ class WindowsAclPrincipalTests(unittest.TestCase):
             self._verify(
                 user, self.PRIVATE.format(user=user) + "(A;OICI;FA;;;BU)", os_anchor=True
             )
+
+
+class CliInputFileTests(unittest.TestCase):
+    """P3-15 and P3-19: CLI input files and OS errors on the verify path."""
+
+    def _write(self, root: Path, name: str, value: object, *, bom: bool) -> Path:
+        path = root / name
+        text = json.dumps(value)
+        path.write_bytes(("﻿" + text if bom else text).encode("utf-8"))
+        return path
+
+    def test_expected_vector_accepts_utf8_bom(self) -> None:
+        # Windows PowerShell 5.1 Out-File writes a UTF-8 byte-order mark.
+        vector = {
+            "repository_id": "repo-1",
+            "catalog_head": "catalog-1",
+            "run_heads": {"run-1": "head-1"},
+        }
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            for bom in (False, True):
+                with self.subTest(bom=bom):
+                    path = self._write(root, f"vector-{bom}.json", vector, bom=bom)
+                    self.assertEqual(
+                        _load_expected_vector(path),
+                        ("repo-1", "catalog-1", {"run-1": "head-1"}),
+                    )
+
+    def test_authority_key_file_accepts_utf8_bom(self) -> None:
+        key = {"synthetic_issuer_key_hex": "ab" * 32}
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            for bom in (False, True):
+                with self.subTest(bom=bom):
+                    path = self._write(root, f"key-{bom}.json", key, bom=bom)
+                    self.assertEqual(
+                        _load_authority(path).issuer_fingerprint,
+                        SyntheticAuthority(bytes.fromhex("ab" * 32)).issuer_fingerprint,
+                    )
+
+    def test_verify_reports_os_error_as_exit_code_three(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            database = root / "state.sqlite3"
+            database.write_bytes(b"")
+            vector = self._write(
+                root, "vector.json",
+                {"repository_id": "repo-1", "catalog_head": "c", "run_heads": {}},
+                bom=False,
+            )
+            key = self._write(
+                root, "key.json", {"synthetic_issuer_key_hex": "ab" * 32},
+                bom=False,
+            )
+            stderr = io.StringIO()
+            with patch(
+                "tools.aegis_delivery_control.cli._database_path",
+                return_value=database,
+            ), patch(
+                "tools.aegis_delivery_control.cli.SQLiteStateStore.open_canonical",
+                side_effect=OSError("synthetic disk error"),
+            ), redirect_stderr(stderr):
+                result = main([
+                    "--repository-id", "repo-1", "verify",
+                    "--expected-vector", str(vector),
+                    "--authority-key-file", str(key),
+                ])
+            self.assertEqual(result, 3)
+            self.assertIn("verification failed: synthetic disk error", stderr.getvalue())
+
+
+class CheckedConnectionCommitTests(unittest.TestCase):
+    """P3-18: the owned path is checked before and after a commit."""
+
+    def _open(self, root: Path) -> tuple[Path, owned_paths.CheckedSQLiteConnection]:
+        path = root / "owned.sqlite3"
+        identity = prepare_owned_file(path, create=True, trusted_root=root)
+        connection = connect_checked(path, expected=identity, trusted_root=root)
+        connection.execute("CREATE TABLE facts (value TEXT NOT NULL)")
+        return path, connection
+
+    @staticmethod
+    def _rows(path: Path) -> list[tuple[str]]:
+        with closing(sqlite3.connect(path)) as reader:
+            return reader.execute("SELECT value FROM facts").fetchall()
+
+    def test_commit_refuses_to_write_when_owned_path_changed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            path, connection = self._open(Path(temporary_directory))
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                connection.execute("INSERT INTO facts VALUES ('pending')")
+                capability = connection._owned_path_capability
+                with patch.object(
+                    capability, "assert_current",
+                    side_effect=PathCapabilityUnavailable("owned path swapped"),
+                ):
+                    with self.assertRaisesRegex(
+                        PathCapabilityUnavailable, "owned path swapped"
+                    ) as raised:
+                        connection.commit()
+                self.assertNotIsInstance(
+                    raised.exception, owned_paths.OwnedPathChangedAfterCommit
+                )
+                self.assertTrue(connection.in_transaction)
+                connection.rollback()
+            finally:
+                connection.close()
+            self.assertEqual(self._rows(path), [])
+
+    def test_commit_reports_committed_write_when_path_changes_after(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            path, connection = self._open(Path(temporary_directory))
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                connection.execute("INSERT INTO facts VALUES ('durable')")
+                capability = connection._owned_path_capability
+                original = capability.assert_current
+                calls = []
+
+                def fail_after_commit() -> None:
+                    calls.append(connection.in_transaction)
+                    if not connection.in_transaction:
+                        raise PathCapabilityUnavailable("owned path swapped")
+                    original()
+
+                with patch.object(
+                    capability, "assert_current", side_effect=fail_after_commit
+                ):
+                    with self.assertRaisesRegex(
+                        owned_paths.OwnedPathChangedAfterCommit, "committed"
+                    ) as raised:
+                        connection.commit()
+                self.assertIsInstance(raised.exception, PathCapabilityUnavailable)
+                self.assertEqual(calls, [True, False])
+            finally:
+                connection.close()
+            self.assertEqual(self._rows(path), [("durable",)])
 
 
 if __name__ == "__main__":

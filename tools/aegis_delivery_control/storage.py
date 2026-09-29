@@ -888,6 +888,45 @@ class RepositoryWriterLock:
                 self._path_capability = None
 
 
+
+def canonical_schema_sql(sql: str) -> str:
+    """Canonicalize stored schema SQL for integrity comparison.
+
+    Code outside quotes is upper-cased with all whitespace removed, and
+    ``IF NOT EXISTS`` and a trailing ``;`` are dropped. Quoted text (single-
+    quoted literals and double-quoted names) is kept byte for byte, so a CHECK
+    constraint on ``'pausing'`` never matches one on ``'PAUSING'``.
+    """
+    parts: list[str] = []
+    index = 0
+    length = len(sql)
+    while index < length:
+        quote = sql[index]
+        if quote in "'\"":
+            end = index + 1
+            while True:
+                end = sql.find(quote, end)
+                if end == -1:
+                    end = length
+                    break
+                if end + 1 < length and sql[end + 1] == quote:
+                    end += 2
+                    continue
+                end += 1
+                break
+            parts.append(sql[index:end])
+            index = end
+            continue
+        end = index
+        while end < length and sql[end] not in "'\"":
+            end += 1
+        parts.append(
+            "".join(sql[index:end].upper().split()).replace("IFNOTEXISTS", "")
+        )
+        index = end
+    return "".join(parts).rstrip(";")
+
+
 class SQLiteStateStore:
     """Own authoritative local state without providing a real execution path."""
 
@@ -899,6 +938,7 @@ class SQLiteStateStore:
         *,
         utc_now: Callable[[], datetime] | None = None,
         _canonical_trusted_root: Path | None = None,
+        _verifier_only: bool = False,
     ) -> None:
         if not repository_id.strip():
             raise ValueError("repository_id must be non-empty")
@@ -907,6 +947,16 @@ class SQLiteStateStore:
         self._repository_id = repository_id
         self._utc_now = utc_now or (lambda: datetime.now(timezone.utc))
         self._classification_authority: SyntheticAuthority | None = None
+        if _verifier_only:
+            # Pure verification helper for SQLiteStateReader: it verifies on a
+            # connection the reader supplies, so it never locks, opens,
+            # creates or migrates the database and holds no path capability.
+            self._is_canonical = False
+            self._trusted_root: Path | None = None
+            self._os_known_root = False
+            self._writer_lock_identity: PathIdentity | None = None
+            self._path_identity: PathIdentity | None = None
+            return
         self._is_canonical = _canonical_trusted_root is not None
         self._trusted_root = (
             _canonical_trusted_root
@@ -933,6 +983,21 @@ class SQLiteStateStore:
             with closing(self._connect()) as connection:
                 self._create_schema(connection)
                 self._bind_repository(connection)
+
+    @classmethod
+    def read_only_verifier(
+        cls,
+        database_path: Path,
+        freshness_oracle: FreshnessOracle,
+        repository_id: str,
+        authority: SyntheticAuthority,
+    ) -> "SQLiteStateStore":
+        """Build a verifier that runs only on caller-supplied connections."""
+        verifier = cls(
+            database_path, freshness_oracle, repository_id, _verifier_only=True
+        )
+        verifier._classification_authority = authority
+        return verifier
 
     @classmethod
     def open_canonical(
@@ -2302,10 +2367,7 @@ class SQLiteStateStore:
                     table_name = str(row["name"])
                     if table_name not in foundation_tables:
                         continue
-                    canonical_sql = "".join(str(row["sql"]).upper().split())
-                    canonical_sql = canonical_sql.replace(
-                        "IFNOTEXISTS", ""
-                    ).rstrip(";")
+                    canonical_sql = canonical_schema_sql(str(row["sql"]))
                     actual_schema_hashes[table_name] = hashlib.sha256(
                         canonical_sql.encode("utf-8")
                     ).hexdigest()
@@ -2894,9 +2956,9 @@ class SQLiteStateStore:
             ).fetchone()
             table_sql = (
                 "" if table_sql_row is None
-                else "".join(str(table_sql_row["sql"]).upper().split())
+                else canonical_schema_sql(str(table_sql_row["sql"]))
             )
-            expected_table_sql = "".join(
+            expected_table_sql = canonical_schema_sql(
                 """
                 CREATE TABLE validator_intents (
                     validator_intent_id TEXT PRIMARY KEY,
@@ -2929,7 +2991,7 @@ class SQLiteStateStore:
                     containment_capability_json TEXT,
                     UNIQUE (repository_id, run_id, check_id, validator_attempt_id)
                 )
-                """.upper().split()
+                """
             )
             if table_sql != expected_table_sql:
                 raise StorageIntegrityError(
@@ -2967,12 +3029,11 @@ class SQLiteStateStore:
                 "SELECT sql FROM sqlite_master WHERE type = 'index' AND "
                 "name = 'uq_validator_intents_recovery_id'"
             ).fetchone()
-            if recovery_index_sql is None or "".join(
-                str(recovery_index_sql["sql"]).upper().split()
-            ) != "".join(
+            if recovery_index_sql is None or canonical_schema_sql(
+                str(recovery_index_sql["sql"])
+            ) != canonical_schema_sql(
                 "CREATE UNIQUE INDEX uq_validator_intents_recovery_id ON "
                 "validator_intents(recovery_id) WHERE recovery_id IS NOT NULL"
-                .upper().split()
             ):
                 raise StorageIntegrityError(
                     "validator containment schema is missing or incompatible"
@@ -3260,10 +3321,6 @@ class SQLiteStateStore:
             )
         """
 
-        def canonical_schema(sql: str) -> str:
-            return "".join(sql.upper().split()).replace(
-                "IFNOTEXISTS", ""
-            ).rstrip(";")
 
         if manage_transaction:
             connection.execute("BEGIN IMMEDIATE")
@@ -3307,8 +3364,8 @@ class SQLiteStateStore:
                     "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?",
                     (table_name,),
                 ).fetchone()
-            if existing is None or canonical_schema(str(existing["sql"])) != (
-                canonical_schema(table_sql)
+            if existing is None or canonical_schema_sql(str(existing["sql"])) != (
+                canonical_schema_sql(table_sql)
             ):
                 raise StorageIntegrityError(
                     "proof-free disposition schema is missing or incompatible"
@@ -3397,10 +3454,6 @@ class SQLiteStateStore:
             """,
         }
 
-        def canonical(sql: str) -> str:
-            return "".join(sql.upper().split()).replace(
-                "IFNOTEXISTS", ""
-            ).rstrip(";")
 
         if manage_transaction:
             connection.execute("BEGIN IMMEDIATE")
@@ -3454,7 +3507,7 @@ class SQLiteStateStore:
                     )
                 }
             if set(existing) != set(table_sql) or any(
-                canonical(existing[name]) != canonical(sql)
+                canonical_schema_sql(existing[name]) != canonical_schema_sql(sql)
                 for name, sql in table_sql.items()
             ):
                 raise StorageIntegrityError(
@@ -3562,9 +3615,6 @@ class SQLiteStateStore:
                 )
             """,
         }
-        canonical = lambda sql: "".join(sql.upper().split()).replace(
-            "IFNOTEXISTS", ""
-        ).rstrip(";")
         if manage_transaction:
             connection.execute("BEGIN IMMEDIATE")
         try:
@@ -3613,7 +3663,7 @@ class SQLiteStateStore:
                     )
                 }
             if set(existing) != set(table_sql) or any(
-                canonical(existing[name]) != canonical(sql)
+                canonical_schema_sql(existing[name]) != canonical_schema_sql(sql)
                 for name, sql in table_sql.items()
             ):
                 raise StorageIntegrityError(
@@ -3919,10 +3969,6 @@ class SQLiteStateStore:
             )
         """
 
-        def canonical(sql: str) -> str:
-            return "".join(sql.upper().split()).replace(
-                "IFNOTEXISTS", ""
-            ).rstrip(";")
 
         if manage_transaction:
             connection.execute("BEGIN IMMEDIATE")
@@ -3938,7 +3984,7 @@ class SQLiteStateStore:
             ).fetchone()
             if version == 10:
                 if existing is not None and (
-                    canonical(str(existing["sql"])) != canonical(table_sql)
+                    canonical_schema_sql(str(existing["sql"])) != canonical_schema_sql(table_sql)
                     or connection.execute(
                         "SELECT COUNT(*) FROM validation_application_denials"
                     ).fetchone()[0]
@@ -3960,7 +4006,7 @@ class SQLiteStateStore:
                 ).fetchone()
             if (
                 existing is None
-                or canonical(str(existing["sql"])) != canonical(table_sql)
+                or canonical_schema_sql(str(existing["sql"])) != canonical_schema_sql(table_sql)
                 or int(connection.execute("PRAGMA user_version").fetchone()[0])
                 != 11
             ):
@@ -4843,10 +4889,6 @@ class SQLiteStateStore:
             )
         """
 
-        def canonical_schema(sql: str) -> str:
-            return "".join(sql.upper().split()).replace(
-                "IFNOTEXISTS", ""
-            ).rstrip(";")
 
         if manage_transaction:
             connection.execute("BEGIN IMMEDIATE")
@@ -4886,8 +4928,8 @@ class SQLiteStateStore:
                     "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?",
                     (table_name,),
                 ).fetchone()
-            if existing is None or canonical_schema(str(existing["sql"])) != (
-                canonical_schema(table_sql)
+            if existing is None or canonical_schema_sql(str(existing["sql"])) != (
+                canonical_schema_sql(table_sql)
             ):
                 raise StorageIntegrityError(
                     "verified-receipt action schema is missing or incompatible"
@@ -5087,10 +5129,6 @@ class SQLiteStateStore:
             """,
         }
 
-        def canonical_schema(sql: str) -> str:
-            return "".join(sql.upper().split()).replace(
-                "IFNOTEXISTS", ""
-            ).rstrip(";")
 
         if manage_transaction:
             connection.execute("BEGIN IMMEDIATE")
@@ -5443,7 +5481,7 @@ class SQLiteStateStore:
                     if str(row["name"]) in table_sql
                 }
             if set(existing) != set(table_sql) or any(
-                canonical_schema(existing[name]) != canonical_schema(sql)
+                canonical_schema_sql(existing[name]) != canonical_schema_sql(sql)
                 for name, sql in table_sql.items()
             ):
                 raise StorageIntegrityError(
@@ -5564,10 +5602,6 @@ class SQLiteStateStore:
                 for sql in table_sql.values():
                     connection.execute(sql)
 
-            def canonical_schema(sql: str) -> str:
-                return "".join(sql.upper().split()).replace(
-                    "IFNOTEXISTS", ""
-                ).rstrip(";")
 
             expected_foreign_keys = {
                 "uncertainty_instances": {
@@ -5642,8 +5676,8 @@ class SQLiteStateStore:
                 if (
                     actual_columns != columns
                     or schema_row is None
-                    or canonical_schema(str(schema_row["sql"]))
-                    != canonical_schema(table_sql[table_name])
+                    or canonical_schema_sql(str(schema_row["sql"]))
+                    != canonical_schema_sql(table_sql[table_name])
                     or actual_foreign_keys != expected_foreign_keys[table_name]
                     or actual_unique_indexes
                     != expected_unique_indexes[table_name]
@@ -6627,10 +6661,6 @@ class SQLiteStateStore:
                 "name = 'uq_validator_intents_recovery_id'"
             ).fetchone()[0]
 
-            def canonical_schema(sql: str) -> str:
-                return "".join(sql.upper().split()).replace(
-                    "IFNOTEXISTS", ""
-                ).rstrip(";")
 
             if (
                 recovery_columns != expected_recovery_columns
@@ -6639,10 +6669,10 @@ class SQLiteStateStore:
                 or not bool(recovery_index["unique"])
                 or not bool(recovery_index["partial"])
                 or recovery_index_columns != ("recovery_id",)
-                or canonical_schema(actual_recovery_table_sql)
-                != canonical_schema(recovery_table_sql)
-                or canonical_schema(actual_recovery_index_sql)
-                != canonical_schema(recovery_index_sql)
+                or canonical_schema_sql(actual_recovery_table_sql)
+                != canonical_schema_sql(recovery_table_sql)
+                or canonical_schema_sql(actual_recovery_index_sql)
+                != canonical_schema_sql(recovery_index_sql)
             ):
                 raise StorageIntegrityError(
                     "validation recovery schema is incompatible"
@@ -6719,10 +6749,6 @@ class SQLiteStateStore:
     def _migrate_terminal_validation_schema(
         connection: sqlite3.Connection,
     ) -> None:
-        def canonical_schema(sql: str) -> str:
-            return "".join(sql.upper().split()).replace(
-                "IFNOTEXISTS", ""
-            ).rstrip(";")
 
         table_name = "terminal_validation_settlements"
         target_sql = SQLiteStateStore._terminal_validation_table_sql(
@@ -6766,10 +6792,10 @@ class SQLiteStateStore:
                 "terminal validation schema is incompatible"
             )
         actual_sql = str(actual_row["sql"])
-        actual_canonical = canonical_schema(actual_sql)
-        target_canonical = canonical_schema(target_sql)
+        actual_canonical = canonical_schema_sql(actual_sql)
+        target_canonical = canonical_schema_sql(target_sql)
         legacy_canonicals = {
-            canonical_schema(legacy_sql) for legacy_sql in legacy_sqls
+            canonical_schema_sql(legacy_sql) for legacy_sql in legacy_sqls
         }
         if actual_canonical not in {target_canonical, *legacy_canonicals}:
             raise StorageIntegrityError(
@@ -6830,7 +6856,7 @@ class SQLiteStateStore:
                 ("cessation_id", "validator_cessations", "cessation_id"),
             }
             if (
-                canonical_schema(str(migrated_sql)) != target_canonical
+                canonical_schema_sql(str(migrated_sql)) != target_canonical
                 or migrated_foreign_keys != expected_foreign_keys
                 or connection.execute(
                     "PRAGMA foreign_key_check(terminal_validation_settlements)"
@@ -44672,13 +44698,9 @@ class SQLiteStateReader:
             )
         except PathCapabilityUnavailable:
             self._path_identity = None
-        verifier = object.__new__(SQLiteStateStore)
-        verifier._database_path = database_path
-        verifier._freshness_oracle = freshness_oracle
-        verifier._repository_id = repository_id
-        verifier._classification_authority = authority
-        verifier._utc_now = lambda: datetime.now(timezone.utc)
-        self._verifier = verifier
+        self._verifier = SQLiteStateStore.read_only_verifier(
+            database_path, freshness_oracle, repository_id, authority
+        )
 
     def _connect_read_only(self) -> sqlite3.Connection:
         if self._path_identity is None:
@@ -44909,6 +44931,11 @@ class SQLiteStateReader:
                 True, False, "TERMINAL_LIFECYCLE_CANNOT_REOPEN",
             )
         except (
+            # Corrupt stored JSON (for example a list where an object belongs)
+            # surfaces as AttributeError; the T22 report must stay typed and
+            # fail closed. The verifier itself is fully built by
+            # SQLiteStateStore.read_only_verifier, so this no longer hides a
+            # partially initialised verifier.
             AttributeError,
             DispatchDenied,
             IndexError,
