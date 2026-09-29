@@ -1,7 +1,7 @@
 {
   "skill": "code-reviewer",
-  "description": "Trigger discrimination for the Phase 2 review/audit cluster. Pins single-diff review apart from cleanup application, strategic analysis, and whole-repo audit.",
-  "overlaps_with": ["code-simplifier", "principal-code-analyst", "full-codebase-auditor"],
+  "description": "Trigger discrimination for the Phase 2 review/audit cluster. Pins single-diff review apart from cleanup application, strategic analysis, and whole-repo audit, and pins reviews of agent-written diffs (weakened tests, architecture drift) apart from security review, coverage audit, the pre-commit output gate, and process audit.",
+  "overlaps_with": ["code-simplifier", "principal-code-analyst", "full-codebase-auditor", "security-pr-reviewer", "test-coverage-mapper", "llm-output-safety-reviewer", "agent-governance-audit"],
   "cases": [
     {
       "id": "diff-review-wins-here",
@@ -30,6 +30,34 @@
       "expected_skill": "principal-code-analyst",
       "should_not_trigger": ["code-reviewer", "full-codebase-auditor"],
       "reason": "A subsystem-scoped strategic analysis connecting code to architecture/cost/risk — deeper than a diff, narrower than a repo audit."
+    },
+    {
+      "id": "agent-pr-review-wins-here",
+      "prompt": "Review this agent-written PR before I merge it. I want to know if it did anything besides what it claims.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": ["llm-output-safety-reviewer", "agent-governance-audit"],
+      "reason": "An existing PR diff judged against its stated intent, including scope creep, weakened tests and architecture drift, is the general diff review. The output-safety gate runs before AI-generated code is saved, committed or run, and the governance audit checks process, not diff correctness."
+    },
+    {
+      "id": "weakened-tests-in-diff-wins-here",
+      "prompt": "The agent's branch went green, but I see it touched a lot of test files. Review the diff and tell me if it weakened or skipped tests to get there.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": ["test-coverage-mapper", "agent-governance-audit"],
+      "reason": "Weakened or skipped tests inside one diff are a fourth-pass validation-integrity finding. test-coverage-mapper maps what the existing suite covers across the codebase, not what one change did to it."
+    },
+    {
+      "id": "security-review-of-agent-pr-goes-to-security",
+      "prompt": "Security-review the agent's PR: it rewrote the login rate limiter and the session cookie settings.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": ["code-reviewer"],
+      "reason": "The ask is a security-focused review of the diff, which security-pr-reviewer owns; code-reviewer's description hands security-focused review to it."
+    },
+    {
+      "id": "coverage-audit-goes-to-mapper",
+      "prompt": "After all these agent PRs, what do our tests actually cover now? Rank the riskiest untested paths.",
+      "expected_skill": "test-coverage-mapper",
+      "should_not_trigger": ["code-reviewer"],
+      "reason": "No single diff is under review; mapping existing tests to surfaces and ranking gaps is test-coverage-mapper's audit."
     }
   ]
 }

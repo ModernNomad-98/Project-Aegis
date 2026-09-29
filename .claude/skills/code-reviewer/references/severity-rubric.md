@@ -4,18 +4,25 @@ Supporting detail for `code-reviewer`. Read on demand.
 
 The owning [code review skill](../SKILL.md) defines the verdict process.
 Authz means authorization, authn authentication, SSRF server-side request
-forgery, and N+1 one query per item after an initial query.
+forgery, N+1 one query per item after an initial query, CI continuous
+integration, and ADR architecture decision record.
 
 ## Severity definitions
 
 | Severity | Definition | Boundary examples |
 | --- | --- | --- |
 | **BLOCKER** | Merging causes incorrect behavior, data loss/corruption, a security hole, or an unrecoverable operational state on a plausible path. | Missing authz on a new endpoint; migration drops a column still read by deployed code; unhandled rejection crashes the worker loop. |
-| **MAJOR** | A real defect or serious risk, but on an edge path, recoverable, or currently unreachable — will bite later if not now. | Race on concurrent update of the same row; retry without idempotency on a payment call; N+1 that's fine at 10 rows and fatal at 10k. |
+| **MAJOR** | A real defect or serious risk, but on an edge path, recoverable, or currently unreachable — will bite later if not now. | Race on concurrent update of the same row; retry without idempotency on a payment call; N+1 that's fine at 10 rows and fatal at 10k; failing tests marked skipped so the change goes green; a user interface component querying the database directly against an ADR that requires the service layer. |
 | **MINOR** | Worth fixing, does not threaten correctness or safety. | Missing test for an error branch; misleading function name; duplicated constant. |
 | **NIT** | Style/preference; the author may reasonably decline. | Ordering of imports; comment phrasing; `map` vs loop taste. |
 
 Escalation rules: a MINOR in security-adjacent code escalates one level.
+Weakened validation (tests deleted or skipped, assertions loosened, timeouts
+or retries raised, CI steps removed) is at least MAJOR unless the stated
+intent explains it. Drift from an accepted ADR or a documented layering rule
+(a rule on which parts of the code may call which) is MAJOR and cites the
+ADR or rule; convention drift with no such decision on file stays MINOR or
+NIT.
 A pattern repeated across the diff is one finding at the pattern's severity,
 listing occurrences — not N duplicate findings.
 
@@ -51,6 +58,20 @@ allocations; caches without eviction or with cross-tenant keys.
 change were undone? New error paths exercised, not just happy paths;
 assertions on behavior rather than snapshots-of-everything; fixtures that
 don't encode the bug being fixed.
+
+**Validation integrity:** tests deleted, skipped, marked as expected to
+fail, or narrowed with a focus marker such as `.only` so the rest never run;
+assertions loosened (exact value to "truthy", fewer fields checked, wider
+tolerance); snapshots regenerated without a reason; timeouts or retry counts
+raised; CI steps, linters or coverage gates removed or made non-blocking.
+Deleting a test together with the feature it covered is not a finding when
+the stated intent says so. A removed or disabled security scan is also a
+security finding; recommend `security-pr-reviewer` for that part.
+
+**Architecture decisions:** the ADRs and layering rules that cover the
+changed files; calls that skip a required layer; a dependency direction the
+ADR forbids; a pattern the ADR superseded. Cite the ADR and the line that
+breaks it.
 
 **Migrations:** forward-only safety while old code still runs (add-then-use,
 never rename-in-place); rollback statement or explicit "irreversible because";

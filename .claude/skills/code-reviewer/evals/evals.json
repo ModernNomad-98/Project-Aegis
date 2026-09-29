@@ -64,6 +64,45 @@
           "Does not auto-invoke code-simplifier (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute code-reviewer for it."
         ]
       }
+    },
+    {
+      "id": "weakened-validation-skipped-tests",
+      "type": "should_trigger",
+      "prompt": "Review PR #311 from our coding agent. It fixes the rounding bug in invoice totals; the description says only that. The diff also adds it.skip to 'applies tiered discount' and 'rounds tax per line' in invoice.test.ts.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reports a MAJOR (or higher) weakened-validation finding that names both skipped tests with file:line, because the stated intent does not explain skipping them.",
+          "Explains the failure scenario: the skipped tests may be the ones the rounding change breaks, so a green CI run no longer proves the discount and tax paths still work; remediation is to unskip them and fix the code or state the reason in the intent.",
+          "The output contains a line 'Validation integrity: weakened: ...' listing the two skipped tests, and the verdict is request-changes."
+        ]
+      }
+    },
+    {
+      "id": "adr-drift-ui-calls-database",
+      "type": "should_trigger",
+      "prompt": "Review this branch: the agent added a 'recent orders' widget, and OrdersWidget.tsx now imports the database client and queries the orders table directly. docs/adr/0007-service-layer.md, status accepted, says user interface code must go through the service layer.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reads the cited ADR and reports a MAJOR architecture-drift finding that cites docs/adr/0007-service-layer.md and the file:line in OrdersWidget.tsx where the direct query happens.",
+          "Does not downgrade the drift to a minor or nit convention comment, because an accepted decision exists.",
+          "Remediation routes the query through the service layer (or asks for the ADR to be superseded first); it does not rewrite the code silently."
+        ]
+      }
+    },
+    {
+      "id": "edge-test-deleted-with-feature",
+      "type": "should_trigger",
+      "prompt": "Review PR #318. Its description says: 'Remove the legacy CSV export feature and its tests; the new export replaced it in March.' The diff deletes csvExport.ts and csvExport.test.ts and the menu entry.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Does NOT report a weakened-validation finding for the deleted test, because the stated intent explains it: the test was deleted together with the feature it covered.",
+          "Still checks for leftovers (callers, routes or docs that still reference the removed export) and reports those with file:line if found.",
+          "The output shows 'Validation integrity: intact'."
+        ]
+      }
     }
   ]
 }
