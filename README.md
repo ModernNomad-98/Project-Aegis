@@ -1382,7 +1382,7 @@ read-only subagent definitions; no plugin, hook, MCP or settings files inside sk
 and workflow actions pinned to full commit SHAs. The docstring at the top of
 `scripts/validate-skills.py` lists every check.
 
-Behavior: `_template` is ignored. When `_template` is the only skill directory, the validator
+Behavior: `_template` is exempt from the per-skill structure checks, but its frontmatter-security and `!` shell-injection checks still run. When `_template` is the only skill directory, the validator
 prints a "no skills found" status and exits `0`. Exit `0` = clean (warnings allowed); non-zero
 = at least one error. Run it before every commit that touches `.claude/skills/`.
 
@@ -1402,7 +1402,7 @@ uses Python 3.14 and provides these jobs:
 | `validate-skills` | Required Ubuntu check: CI-helper tests, validator self-tests and skill validation, contract-audit self-tests, BER self-check and regression suite, PowerShell Core acceptance, and a PR-only Developer Certificate of Origin (DCO) sign-off check. |
 | `windows-offline-checks` | Additional Windows coverage: the Python checks plus native Windows PowerShell and PowerShell Core acceptance. This job is not registered as a required branch-protection check. |
 | `tools-tests-linux`, `tools-tests-windows` | Tools test suites (setup host-bridge callback tests on Node.js 24, setup routing-contract tests and delivery-control tests) on separate Ubuntu and Windows runners, isolated from the gate jobs because a pull request can change this test code without tripping `gate-guard`. These jobs are not registered as required branch-protection checks. |
-| `gate-guard` | Required PR-only check: deliberately fails when protected validation, workflow, agent-definition, Claude Code or Git configuration, runtime, test or dependency paths change, so those changes receive explicit review. |
+| `gate-guard` | Required PR-only check: deliberately fails when protected validation, workflow, agent-definition, Claude Code or Git configuration, runtime, test or dependency paths change (including the Dependabot configuration, `.github/dependabot.yml`), so those changes receive explicit review. |
 
 Notes:
 
@@ -1411,7 +1411,7 @@ Notes:
   weaken the guard to make it green. The [CI guide](docs/offline-ci.md) describes
   the full protected surface, commands, platform skips and evidence limits.
 - Dependencies are pinned in `requirements.txt` and hash-locked in `requirements-ci.txt`
-  (compiled from `requirements-ci.in`); a software development kit (SDK)
+  (compiled from `requirements-ci.in`); an OpenAI software development kit (SDK)
   precheck prevents silently skipping transport tests. Tests use mocks and local
   fixtures. Installing dependencies requires package downloads.
 - `actions/checkout`, `actions/setup-python`, `actions/setup-node` and
@@ -1431,7 +1431,7 @@ Notes:
   agents/                 # real read-only reviewer subagents
     <agent-name>.md
   skills/
-    _template/            # reference template (ignored by validator)
+    _template/            # reference template (exempt from structure checks)
     <skill-name>/
       SKILL.md
       references/
@@ -1443,10 +1443,13 @@ Notes:
 docs/
   README.md                # current documentation and continuation index
   approvals/  design/  evidence/  reconciliation/  research/
-  prompts/  roadmaps/  skills/
+  prompts/  roadmaps/  skills/  paths/  audits/  acceptance/  assets/
   offline-ci.md
   skill-generation-standard.md
   skills-catalog.md
+
+artifacts/
+  audits/  evidence/     # skill-contract audit baseline and retained evidence
 
 scripts/
   validate-skills.py
