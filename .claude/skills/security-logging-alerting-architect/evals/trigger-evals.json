@@ -5,7 +5,8 @@
     "audit-log-architect",
     "observability-operator",
     "slo-reliability-architect",
-    "incident-response-runbook"
+    "incident-response-runbook",
+    "cloud-security-baseline-reviewer"
   ],
   "cases": [
     {
@@ -45,6 +46,14 @@
       "should_not_trigger": ["security-logging-alerting-architect"],
       "note": "SEAM CASE — this skill designs what FIRES the alert and links each alert to a runbook; authoring the runbook itself is incident-response-runbook.",
       "reason": "The reactive procedure AFTER an alert is incident-response-runbook. This skill is the upstream detection/alerting design that fires it."
+    },
+    {
+      "id": "logging-switched-on-goes-to-baseline-reviewer",
+      "prompt": "Is audit logging actually turned on in every region of our AWS account? Here is the describe-trails and get-trail-status output.",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": ["security-logging-alerting-architect"],
+      "note": "SEAM CASE (reciprocated yield, D71) — the ask is whether a configured control is in place, not what must be detected or alerted on.",
+      "reason": "cloud-security-baseline-reviewer checks that audit logging is configured across the account from exports; security-logging-alerting-architect designs detection and alerting on top of the logs."
     }
   ]
 }

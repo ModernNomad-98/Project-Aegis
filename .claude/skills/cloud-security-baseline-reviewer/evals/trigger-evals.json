@@ -1,0 +1,146 @@
+{
+  "skill": "cloud-security-baseline-reviewer",
+  "description": "Trigger discrimination for reviewing a configured cloud account, subscription or managed platform project against a named baseline (D71) against the neighbors named in its description and the Phase 6 batch proposal: IaC diffs and IaC-to-runtime drift (iac-reviewer), designing or reviewing a decided provider's architecture (aws-saas-architect, azure-saas-architect), compliance-framework readiness (compliance-gap-auditor), repository scanning (security-scan-orchestrator), detection design (security-logging-alerting-architect) and secret rotation (secrets-identity-hardener, manual-only, so its positive case names it). Includes one case in each direction for the existing-architecture and drift seams the proposal names.",
+  "overlaps_with": [
+    "iac-reviewer",
+    "aws-saas-architect",
+    "azure-saas-architect",
+    "compliance-gap-auditor",
+    "security-scan-orchestrator",
+    "security-logging-alerting-architect",
+    "secrets-identity-hardener"
+  ],
+  "cases": [
+    {
+      "id": "existing-aws-account-settings-wins-here",
+      "prompt": "Review our existing AWS account's security settings. I've attached the IAM credential report, the CloudTrail trail list and the S3 public-access settings we exported.",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": [
+        "aws-saas-architect",
+        "iac-reviewer"
+      ],
+      "note": "SEAM CASE (existing account vs existing architecture) — the input is exported settings of a configured account, not an architecture.",
+      "reason": "A control-by-control review of what an account is configured to do, from supplied exports, is this skill; the AWS architect designs or reviews an architecture."
+    },
+    {
+      "id": "existing-aws-architecture-goes-to-aws-architect",
+      "prompt": "Review our existing AWS architecture: we run ECS behind an ALB with Aurora per tenant tier. Is the account and service layout right for a multi-tenant SaaS?",
+      "expected_skill": "aws-saas-architect",
+      "should_not_trigger": [
+        "cloud-security-baseline-reviewer"
+      ],
+      "note": "SEAM CASE (existing architecture) — the ask is whether the service and account design fits, not whether configured controls meet a baseline.",
+      "reason": "aws-saas-architect reviews an existing AWS architecture against SaaS isolation, cost and operability; this skill checks configured settings against a named baseline."
+    },
+    {
+      "id": "design-aws-security-goes-to-aws-architect",
+      "prompt": "We just picked AWS. Design our AWS security: organization layout, guardrail policies, and which posture and threat services to turn on.",
+      "expected_skill": "aws-saas-architect",
+      "should_not_trigger": [
+        "cloud-security-baseline-reviewer"
+      ],
+      "reason": "Designing posture for a decided provider is the provider architect; nothing is configured yet to review."
+    },
+    {
+      "id": "existing-azure-architecture-goes-to-azure-architect",
+      "prompt": "Review our existing Azure architecture — landing zone, subscriptions per environment, App Service with Azure SQL elastic pools. Does it hold up for tenant isolation?",
+      "expected_skill": "azure-saas-architect",
+      "should_not_trigger": [
+        "cloud-security-baseline-reviewer"
+      ],
+      "note": "SEAM CASE (existing architecture, Azure) — the proposal pins the Azure equivalent of the AWS seam.",
+      "reason": "Reviewing an Azure architecture design is azure-saas-architect; this skill reviews exported subscription settings control by control."
+    },
+    {
+      "id": "azure-subscription-exports-win-here",
+      "prompt": "Here are az role assignment, az storage account list and az security pricing list exports from our production subscription. Check them against the CIS Azure benchmark and tell me what's missing.",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": [
+        "azure-saas-architect",
+        "compliance-gap-auditor"
+      ],
+      "reason": "Configured-subscription exports checked against a named technical baseline are this skill; nothing is being designed and no compliance framework is in question."
+    },
+    {
+      "id": "terraform-review-goes-to-iac-reviewer",
+      "prompt": "Review this Terraform plan before we apply it — it replaces the S3 bucket policy and adds a security group rule.",
+      "expected_skill": "iac-reviewer",
+      "should_not_trigger": [
+        "cloud-security-baseline-reviewer"
+      ],
+      "reason": "An IaC diff or plan before apply is iac-reviewer, blast radius first; this skill reviews what is configured, and reads IaC only as supporting evidence."
+    },
+    {
+      "id": "iac-console-drift-goes-to-iac-reviewer",
+      "prompt": "Our Terraform and the AWS console disagree — someone changed the security groups by hand. Work out what drifted from the code.",
+      "expected_skill": "iac-reviewer",
+      "should_not_trigger": [
+        "cloud-security-baseline-reviewer"
+      ],
+      "note": "SEAM CASE (drift) — the ask is the difference between IaC and runtime state, which iac-reviewer owns.",
+      "reason": "IaC-to-runtime drift investigation is iac-reviewer; this skill judges configured settings against a baseline, not against the code."
+    },
+    {
+      "id": "console-changes-baseline-wins-here",
+      "prompt": "We don't use Terraform; everything in our GCP project was clicked together in the console. I've pasted the firewall rules, the project IAM policy and the bucket IAM. Is it secure enough to launch?",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": [
+        "iac-reviewer"
+      ],
+      "reason": "There is no IaC to review; configured console settings checked against a baseline are this skill."
+    },
+    {
+      "id": "soc2-readiness-goes-to-compliance-gap-auditor",
+      "prompt": "Are we SOC 2 ready? Tell me where we stand against the trust services criteria before we book the auditor.",
+      "expected_skill": "compliance-gap-auditor",
+      "should_not_trigger": [
+        "cloud-security-baseline-reviewer"
+      ],
+      "reason": "Readiness against a compliance framework is compliance-gap-auditor; a technical cloud baseline is at most one input to it."
+    },
+    {
+      "id": "repo-scan-goes-to-security-scan-orchestrator",
+      "prompt": "Run the full security scan suite on our repository, including the IaC config scanners, and give me one aggregated report.",
+      "expected_skill": "security-scan-orchestrator",
+      "should_not_trigger": [
+        "cloud-security-baseline-reviewer"
+      ],
+      "reason": "Running and aggregating repository scanners is security-scan-orchestrator; this skill reads cloud account settings the user supplies and runs nothing."
+    },
+    {
+      "id": "detection-design-goes-to-security-logging-alerting-architect",
+      "prompt": "Which security events should raise alerts in our AWS setup, and who should be paged for each?",
+      "expected_skill": "security-logging-alerting-architect",
+      "should_not_trigger": [
+        "cloud-security-baseline-reviewer"
+      ],
+      "reason": "Designing detection and alerting is security-logging-alerting-architect; this skill only checks that audit logging is switched on across the account."
+    },
+    {
+      "id": "leaked-key-rotation-goes-to-secrets-identity-hardener",
+      "prompt": "Explicitly invoke secrets-identity-hardener. The baseline review found our Supabase service key under NEXT_PUBLIC_ in the front-end env file. Move it to server-only configuration and rotate it.",
+      "expected_skill": "secrets-identity-hardener",
+      "should_not_trigger": [
+        "cloud-security-baseline-reviewer"
+      ],
+      "note": "SEAM CASE (report vs fix) — secrets-identity-hardener is manual-only, so the positive prompt names it. This skill only reports the exposed key by name.",
+      "reason": "Moving and rotating an application secret changes code and credentials; that is secrets-identity-hardener, which a person invokes by name. This skill reads evidence and changes nothing."
+    },
+    {
+      "id": "posture-scanner-findings-win-here",
+      "prompt": "We ran Prowler against our AWS production account last night. Here is its findings export. Map it to the CIS AWS Foundations Benchmark and tell us, control by control, what is met and what is missing.",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": ["security-scan-orchestrator"],
+      "note": "SEAM CASE (scanner output vs running scanners) — the scanner already ran against the account; the ask is one verdict per baseline control, not running or aggregating repository scanners.",
+      "reason": "Mapping supplied posture-scanner findings for a configured account to a named baseline is this skill; security-scan-orchestrator runs and aggregates repository scanners."
+    },
+    {
+      "id": "logging-switched-on-wins-here",
+      "prompt": "Is audit logging actually switched on in every region of our AWS account? Here is the describe-trails and get-trail-status output.",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": ["security-logging-alerting-architect"],
+      "note": "SEAM CASE (control in place vs detection design) — mirrors the reciprocal case in security-logging-alerting-architect's trigger evals.",
+      "reason": "Checking that a configured logging control is in place across the scope is this skill; security-logging-alerting-architect designs what the logs must detect and alert on."
+    }
+  ]
+}

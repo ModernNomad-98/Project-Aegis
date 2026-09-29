@@ -1,6 +1,6 @@
 ---
 name: aws-saas-architect
-description: Map a decided logical architecture onto Amazon Web Services (AWS) for multi-tenant software as a service (SaaS). Design account, identity, network, data isolation, compute, messaging, observability, security, infrastructure-as-code, and cost choices tied to team maturity. Treat quotas, regional availability, instance types, and prices as current-documentation verification items. Use for AWS architecture and account layout. Do NOT use to choose the provider (cloud-architecture-decider), define tenancy semantics (saas-platform-architect), or review infrastructure-as-code changes (iac-reviewer).
+description: Map a decided logical architecture onto Amazon Web Services (AWS) for multi-tenant software as a service (SaaS). Design account, identity, network, data isolation, compute, messaging, observability, security, infrastructure-as-code, and cost choices tied to team maturity. Treat quotas, regional availability, instance types, and prices as current-documentation verification items. Use for AWS architecture and account layout. Do NOT use to choose the provider (cloud-architecture-decider), define tenancy semantics (saas-platform-architect), review infrastructure-as-code changes (iac-reviewer), or review a configured cloud account against a security baseline (cloud-security-baseline-reviewer).
 ---
 
 # AWS SaaS Architect
@@ -55,6 +55,10 @@ services or assert their availability in a region.
   `tenant-modeler` / `saas-platform-architect` (their outputs are inputs
   here).
 - Do NOT use when: reviewing a Terraform/CDK change — `iac-reviewer`.
+- Do NOT use when: checking how an existing account is actually configured,
+  control by control, from exported settings or posture-scanner findings —
+  that is `cloud-security-baseline-reviewer`. This skill reviews the
+  architecture, not the configured account.
 
 ## Inputs to Inspect
 

@@ -158,8 +158,9 @@ work and tracks gaps as Phase 8 backlog items; it creates no skills and changes 
   is opened.
 - **A02 residue:** application/platform configuration — security headers, CORS, XML-parser
   hardening (XXE-class), default accounts, cloud posture — has no Phase 4 owner. Cloud
-  posture is owed to Phase 6 (`iac-reviewer`, plus `cloud-security-baseline-reviewer` in the
-  Phase 6 expansion backlog); the app-config slice remains open residue.
+  posture is owed to Phase 6 (`iac-reviewer`, plus `cloud-security-baseline-reviewer`, built
+  by D71 on 2026-09-28 from the Phase 6 expansion backlog); the app-config slice remains
+  open residue.
 - **A04 residue:** encryption-in-transit/at-rest design and algorithm/library review are
   unowned; coverage today is custody of keys/credentials plus SAST-finding triage only.
 - **A09/A10 gaps: CLOSED (D28, 2026-07-08).** Both categories now have an owning skill,
@@ -265,7 +266,7 @@ otherwise invisible to the shipped suite):
 **Canonical = v4's 10:** `cloud-architecture-decider`, `azure-saas-architect`, `aws-saas-architect`,
 `iac-reviewer`, `ci-pipeline-architect`, `release-readiness-reviewer`, `rollback-runbook-author`,
 `observability-operator`, `slo-reliability-architect`, `incident-response-runbook`.
-Execution-plan extras (`cloud-security-baseline-reviewer`, `resilience-architecture-reviewer`,
+Execution-plan extras (`cloud-security-baseline-reviewer` — **✅ built (D71, 2026-09-28)**, `resilience-architecture-reviewer`,
 `rollback-strategy-designer`→merged into `rollback-runbook-author`, `migration-deployment-runbook` (#254)→merged into `data-migration-runbook-author` (D71, 2026-09-28; no separate skill),
 `environment-parity-reviewer`, `database-backup-verifier`) → Phase 6 expansion backlog.
 `resilience-architecture-reviewer` — **built (D71, 2026-09-28)**, auto-invocable, review
