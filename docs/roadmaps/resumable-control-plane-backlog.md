@@ -261,7 +261,7 @@ permission for runtime work.
 | ID / purpose | Status / entry criteria | Proposed evidence / stop point |
 | --- | --- | --- |
 | CP-WP-002 — Offline state and recovery kernel | DONE under AEGIS-APR-004: [PR #99](https://github.com/ModernNomad-98/Project-Aegis/pull/99) merged 2026-09-23 at `be552fb778ec50fd0cbe82eff9f1022235ec11d8`; standard-library SQLite rollback journal with `synchronous=FULL`; process-crash claims only; injected complete-vector freshness; versioned absolute budget settlements; synthetic-only authority/adapters | All 28/28 T, 9/9 C and 22/22 F rows have tested, independently accepted coverage. Final exact-head architecture/security/QA review, Windows and pinned Linux 543-test suites, and all three hosted jobs passed on head `8dfe237280f8837c6254e456767e405d44fbd148`. No real authority, external integration, provider call, release or deployment follows from this package |
-| CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
+| CP-WP-003 — Authority, evidence and execution capability contracts | BLOCKED: separate scope/approval, source-atomic approval claims/redemption including manual consumers, independent monotonic anchor or complete reconciliation, verified containment/fencing, evidence and bounded-liability accounting, and evidence-computed transition guards (P2-6 option (a); see AEGIS-APR-086) | Negative authority/race/rollback/path/process/receipt/billing probes; unavailable guarantees deny real dispatch; no live deployment/provider call without separately named grant |
 | CP-WP-004 — One bounded delivery integration | BLOCKED: chosen integration, owner authority, idempotency/receipt/rollback semantics, source/evidence/budget pins and proven CP-WP-003 prerequisites | Exact-operation evidence and reviewed outcome; no automatic promotion to broad delivery or BER execution |
 | CP-FUT-001 — Distributed ownership or hosted service | BLOCKED: demonstrated need and separate architecture/security/cost approval | Distributed fencing/failover/identity design and capability proof; local locks/checkpoints never satisfy it |
 
@@ -275,6 +275,20 @@ receipt/liability probes are recorded in the
 **BLOCKED**: no real source, independent anchor/current-source ledger, selected
 host containment, evidence policy, or billing authority has been selected and
 verified. CP-WP-004 and any real dispatch remain blocked separately.
+
+On 2026-09-28 the owner approved one CP-WP-002 maintenance package,
+"CP-WP-002 maintenance: P2-6 guard documentation and traceability tests",
+recorded as
+[AEGIS-APR-086](../approvals/APPROVAL_REGISTER.md#aegis-apr-086-cp-wp-002-maintenance-for-p2-6-guard-documentation-and-tests)
+and effective when its governance PR merges. A guard is a named precondition
+a transition requires. The engine's guard list is advisory: every production
+call passes exactly the required set, and the inline checks in `storage.py`
+enforce the guards. The package documents that, pins the current calling
+contract with one test, and adds a traceability test table mapping each of
+the 69 transition-guard pairs to a named negative test, with no runtime
+behaviour change. Status: **AUTHORIZED, not yet delivered.** Making the
+engine enforce guards computed from the checks that actually ran (option (a))
+is now an entry criterion for CP-WP-003.
 
 No later package is authorized by this register or by CP-WP-001 acceptance. BER
 integration, if requested, additionally follows BER's current phase/evidence gates.

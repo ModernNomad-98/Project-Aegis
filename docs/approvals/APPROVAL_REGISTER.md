@@ -2396,3 +2396,187 @@ the entry governs.
 - **Evidence:** [PR #505](https://github.com/ModernNomad-98/Project-Aegis/pull/505)
   merged `ebda783f8edc3c29bc9da076dbde0eb596d21b9f` as
   `9f501f3dba4cf39980663bcd7d6d3c359b10715f` at the time above.
+
+### AEGIS-APR-085: BER non-executed-aggregate correction
+
+- **Event:** GRANT.
+- **Status at recording:** Owner approved; ACTIVE only after the reviewed
+  governance PR containing BER-DEC-015 and this entry merges.
+- **Date / Grantor:** 2026-09-28 / Peter Nguyen.
+- **Reason:** Code-health finding P2-4 (a priority-2 finding from the
+  coordinator's 2026-09-28 code-health review) showed that the Behavioral
+  Eval Runner (BER) report builder, `build_run_report`, re-derives a case's
+  aggregate (its case-level result) only when the case was `RUNNABLE` and
+  had an executed attempt, or was selected and excluded by preflight (the
+  check before a case runs). Every other aggregate is trusted, so a report
+  could publish a wrong reason for a case that never ran, for example a
+  ready case "excluded by preflight" or an unselected case "out of budget".
+  No verdict can change, and the builder has no production caller yet.
+  AEGIS-APR-046, which covered these two paths once, was consumed by PR #374
+  (AEGIS-APR-053), and the BER backlog requires a new owner decision to
+  tighten the report contract, so this repair needs a new grant.
+- **Owner decision:** "Approve the bounded fix (Recommended)", answering the
+  coordinating agent's question in the Project Aegis conversation (Claude
+  Code session) on 2026-09-28 about whether to approve the bounded synthetic
+  BER correction whose recommended approval wording is quoted below. The
+  coordinator relayed and attests the answer. The owner did not select the
+  optional second tightening ("a selected case may never report
+  `NOT_SELECTED`"), which the investigation recommended against for now.
+- **Scope allowed:** The approved wording was: "I approve the bounded
+  synthetic BER non-executed-aggregate correction (code-health finding
+  P2-4), and only that. Scope: exactly two paths,
+  `tools/behavioral_eval_runner/reporting.py` and
+  `tools/behavioral_eval_runner/tests/test_reporting.py`. It may tighten the
+  report contract in exactly these ways: a PRECHECK_EXCLUDED aggregate is
+  accepted only for a selected case that preflight excluded; an unselected
+  case must report NOT_SELECTED; every other aggregate must equal its
+  re-derivation from its attempts. The selected-exclusion shape (attempts may
+  carry NOT_SELECTED) is unchanged. Limits: at most 3 active implementation
+  hours and 250 added code/test lines; $0 external spend; synthetic local
+  fixtures only; no provider, model or network calls, credentials, host
+  probes, dependency installs or live sessions. Order: takes effect after a
+  reviewed governance PR appends BER-DEC-015 and the matching APR entry.
+  Delivery: one DCO-signed PR from that governance merge commit, exact-path
+  staging, focused and full offline BER suites on Windows and pinned Linux,
+  independent security and quality review, exact-head checks; `gate-guard`
+  dispositioned under AEGIS-APR-047. Use limit: one package, consumed at
+  merge." `PRECHECK_EXCLUDED` means preflight excluded the case, and
+  `NOT_SELECTED` means the case was not in the run. The branch, acceptance
+  tests, evidence handling and stop conditions are recorded in BER-DEC-015 in
+  [the BER governance log](../roadmaps/behavioral-eval-runner-backlog.md#ber-dec-015-bounded-synthetic-non-executed-aggregate-correction--owner-approved).
+  AEGIS-APR-047 already lists both paths, so a `gate-guard` failure limited
+  to them may be dispositioned under its conditions, with this grant as the
+  separate active work authority its first condition requires.
+- **Scope FORBIDDEN:** Any path other than the two above; any report-contract
+  change beyond the three stated rules, including the excluded-case attempt
+  contract and the unapproved second tightening; provider, model or network
+  calls, credentials, host probes, dependency installs, live sessions, real
+  evidence or private inputs. It does not change private-label,
+  selected-host, provider-budget, OD-1 or later live-suite gates, and it
+  waives no failed check other than a `gate-guard` failure that
+  AEGIS-APR-047 covers.
+- **Evidence:** Direct owner answer in the Project Aegis conversation on
+  2026-09-28, quoted above, relayed and attested by the coordinating agent.
+  The investigation reproduced six contradictory synthetic shapes that
+  `build_run_report` accepted on `main` at
+  `76b399b11e8068ca26171dbd6d715f161757f35e`; neither path changed between
+  that commit and this governance PR's base,
+  `7bbd4f05306ab52b0cece585e616d396ad1462c9`.
+- **Expiry / use limit:** One implementation package; consumed at its merge,
+  which a later lifecycle event records. No calendar expiry stated.
+
+### AEGIS-APR-086: CP-WP-002 maintenance for P2-6 guard documentation and tests
+
+- **Event:** GRANT.
+- **Status at recording:** Owner approved; ACTIVE only after the reviewed
+  governance PR containing this entry merges.
+- **Date / Grantor:** 2026-09-28 / Peter Nguyen; limits and delivery
+  conditions added by his 2026-09-29 (UTC) answer.
+- **Reason:** Code-health finding P2-6 concerns the delivery-control engine
+  in `tools/aegis_delivery_control/`. A guard is a named precondition, such
+  as `no_fence` or `budget_available`, that the control-plane design requires
+  before a state transition commits; a transition-guard pair is one guard
+  listed for one transition (28 transitions, 48 distinct guards, 69 pairs).
+  `TransitionEngine.authorize` denies a call whose `satisfied_guards` lack a
+  required guard, but every one of the 56 production calls passes exactly
+  the guard set the engine requires, so that step can never deny. The real
+  protection is inline checks in `storage.py` that raise inside the same
+  database transaction. The engine's guard step is therefore advisory (it
+  documents the guard catalog but enforces nothing), while its docstring
+  suggests a second, independent check. A refactor that deleted an inline
+  check would be caught only by that check's own negative test, and some
+  guards, possibly `budget_available`, may have none. AEGIS-APR-004, the
+  CP-WP-002 kernel grant, was consumed (AEGIS-APR-067), and no active grant
+  covers edits to `tools/aegis_delivery_control/`.
+- **Owner decision:** "Document + traceability tests (Recommended)",
+  answering the coordinating agent's question in the Project Aegis
+  conversation (Claude Code session) on 2026-09-28. The option selected the
+  investigation's option (b), documenting the guard list as advisory and
+  pinning current behaviour, together with (b+), the traceability test
+  table. It did not select option (a): making each caller compute
+  `satisfied_guards` from the checks that actually ran (evidence-computed
+  guards). The coordinator relayed and attests the answer; the scope below
+  is the coordinator's statement of the selected option. On 2026-09-29, before
+  this entry merged, the owner answered a follow-up question about limits and
+  delivery conditions with "Add caps + conditions (Recommended)". The option
+  he chose read: "Cap at 12 active hours and 800 added lines (mostly the
+  traceability test table), $0, one package; same delivery conditions as the
+  P2-4 grant; stop and come back if a guard has no inline check." The
+  coordinator relayed and attests that answer too.
+- **Scope allowed:** One maintenance package, named "CP-WP-002 maintenance:
+  P2-6 guard documentation and traceability tests", with no runtime
+  behaviour change:
+  - `tools/aegis_delivery_control/engine.py`: docstrings (the in-code
+    documentation strings) only, stating that
+    the transition guard list is advisory, a declarative catalog mirrored by
+    authoritative inline checks in `storage.py`, and that the state-pair,
+    event-variant and terminal-state checks are the engine's live controls.
+  - `tools/aegis_delivery_control/README.md`: the same explanation.
+  - `tools/aegis_delivery_control/dispatch.py`: annotate, or remove, the
+    three pre-checks that hard-code the current state (T03 `PLANNED ->
+    RUNNING`, T10 from `RUNNING`, and T27 `VALIDATING -> VALIDATING`; about
+    lines 675, 804 and 919 at the base below), only if the change is
+    behaviour-neutral. Otherwise leave them unchanged.
+  - `tools/aegis_delivery_control/tests/test_engine.py` and one new test
+    module, `tools/aegis_delivery_control/tests/test_guard_traceability.py`,
+    holding:
+    - one test pinning current behaviour: every production `authorize` call
+      passes `TRANSITIONS[tid].required_guards`, with the T09
+      pause-request variant, which adds `effect_bound`, as the one listed
+      exception, so a partial guard set cannot appear without a
+      test and documentation change;
+    - a traceability test table mapping each of the 69 transition-guard
+      pairs to a named test that proves the inline denial when that guard
+      fails;
+    - new negative tests filling any gap the table finds, for example
+      `budget_available`.
+
+  Limits, from the owner's 2026-09-29 answer: at most 12 active
+  implementation hours, excluding CI and owner waiting; at most 800 added
+  lines across the listed paths, mostly the traceability test table; USD $0
+  external spend; one package. The investigation estimated about 1 to 1.5
+  active days. Recording delivery
+  and consumption in the control-plane backlog and this register is a later
+  separate reviewed governance change. Option (a), evidence-computed guards,
+  becomes an entry criterion for CP-WP-003.
+- **Scope FORBIDDEN:** No runtime behaviour change: no change to `storage.py`,
+  to the engine's decisions, or to any other runtime path. If a traceability
+  gap shows a guard with no inline enforcement, adding a check would change
+  runtime behaviour, so stop and return to the owner, as the owner's
+  2026-09-29 answer also requires. Also stop and return before exceeding
+  any limit above. Option (a) is not granted. No CP-WP-003 or CP-WP-004
+  work, real authority or real dispatch is authorized. None additionally
+  stated.
+- **Delivery and guard:** The owner's 2026-09-29 answer applies the same
+  delivery conditions as the P2-4 grant, AEGIS-APR-085: one DCO-signed
+  implementation PR with exact-path staging, the delivery-control test suite
+  run on Windows and in the pinned Linux environment, independent review,
+  and exact-head checks. At the base of this governance PR,
+  `7bbd4f05306ab52b0cece585e616d396ad1462c9`, the `gate-guard` protected
+  pattern in `.github/workflows/validate-skills.yml` does not match
+  `tools/aegis_delivery_control/` or any path listed above, so no
+  `gate-guard` exception is needed. If the pattern changes before delivery
+  and a listed path becomes protected, that failure needs its own owner
+  decision.
+- **Evidence:** Direct owner answers in the Project Aegis conversation on
+  2026-09-28 and 2026-09-29, quoted above, relayed and attested by the
+  coordinating agent. On 2026-09-29 the coordinator also asked the owner
+  directly: "You chose 'Add caps + conditions (Recommended)' for the P2-6
+  grant: cap 12 active hours and 800 added lines, $0, one package; the same
+  delivery conditions as the P2-4 grant (sign-off, exact-file staging,
+  independent review, Windows + Linux test runs, exact-head checks); stop and
+  come back if a guard has no inline check. Confirm?" The owner answered
+  "Confirm, record it (Recommended)". The investigation traced all 56
+  production calls on `main` at
+  `76b399b11e8068ca26171dbd6d715f161757f35e`, traced every T03 guard to its
+  inline check and sampled T27 and T28. Between that commit and this
+  governance PR's base, `tools/aegis_delivery_control/` changed only in test
+  modules outside this grant's paths (PR #512 changed
+  `tests/_owner_private_fixtures.py`, `tests/_owner_private_umask.py`,
+  `tests/windows_owner_diagnostic.py`, `tests/test_capabilities.py`,
+  `tests/test_dispatch.py`, `tests/test_platform.py`, `tests/test_recovery.py`,
+  `tests/test_shared_authority_claims.py` and `tests/test_storage.py`);
+  `engine.py`, `dispatch.py`, `storage.py`, `README.md` and
+  `tests/test_engine.py` did not change.
+- **Expiry / use limit:** One maintenance package; consumed at its merge,
+  which a later lifecycle event records. No calendar expiry stated.
