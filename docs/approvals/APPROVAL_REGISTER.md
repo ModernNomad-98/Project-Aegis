@@ -2273,9 +2273,10 @@ the entry governs.
   `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` and got byte-identical files.
   It returned FIX-FIRST (fix before acceptance) for one missing
   documentation edit: the dated note in
-  `docs/audits/aegis-060-plus-register.md`. A
-  [corrected-candidate check](https://github.com/ModernNomad-98/Project-Aegis/pull/503#issuecomment-5878694559)
-  of the exact head returned ACCEPT, meaning ready to merge. It found that
+  `docs/audits/aegis-060-plus-register.md`. The exact head then had a
+  [corrected-candidate check](https://github.com/ModernNomad-98/Project-Aegis/pull/503#issuecomment-5878694559),
+  a re-check of the head after that fix. It returned ACCEPT, meaning ready
+  to merge. It found that
   the head adds only that note and that every other file is unchanged from
   the reproduced head. Codex posted only usage-limit notices after the head
   commit (21:00:22 UTC): at 21:01:56 and 21:12:26 UTC on 2026-09-28, so it
@@ -2343,7 +2344,7 @@ the entry governs.
   Recorded after the merge.
 - **Date / Grantor:** 2026-09-29 / Peter Nguyen.
 - **Reason:** [PR #505](https://github.com/ModernNomad-98/Project-Aegis/pull/505)
-  makes the validator reject agent files whose frontmatter can run commands
+  makes the validator reject agent files whose frontmatter (the settings block at the top of the file) can run commands
   or widen permissions, and adds `.claude/agents` paths to the paths
   `gate-guard` protects. It changes `.github/workflows/validate-skills.yml`,
   `scripts/validate-skills.py` and test files under `scripts/tests/`,
@@ -2360,7 +2361,7 @@ the entry governs.
   only on `.github/workflows/validate-skills.yml`,
   `scripts/validate-skills.py`, `scripts/tests/test_offline_ci.py`,
   `scripts/tests/test_validator.py` and the 11 fixture files. Independent
-  security reviews of three earlier heads returned REVISE:
+  security reviews of three earlier heads returned REVISE (changes needed before merge):
   [`9ec3cb1150fda27f758ef413800e5966b87505ef`](https://github.com/ModernNomad-98/Project-Aegis/pull/505#issuecomment-5878774628),
   [`ccb28a21ea7b2e13ac9e366ae87056c58c04d79e`](https://github.com/ModernNomad-98/Project-Aegis/pull/505#issuecomment-5880081301)
   and
