@@ -32,6 +32,7 @@ from tools.aegis_delivery_control.contracts import (
     ValidationApplicationRequest,
 )
 from tools.aegis_delivery_control.engine import TRANSITIONS
+from tools.aegis_delivery_control.tests import _owner_private_fixtures
 from tools.aegis_delivery_control.tests import test_storage as storage_tests
 
 PACKAGE = Path(__file__).resolve().parents[1]
@@ -41,6 +42,16 @@ P = "test_platform.PlatformContractTests."
 G = "test_guard_traceability.GuardGapTests."
 OPERATOR = "authority.verify_operator_issued(capability)"
 ISSUED = ("authority.py", "verify_operator_issued", "synthetic operator capability was not issued here")
+
+
+def setUpModule() -> None:
+    # The gap tests reuse the storage fixtures, which must be owner-private
+    # as production requires. See the helper.
+    _owner_private_fixtures.enter()
+
+
+def tearDownModule() -> None:
+    _owner_private_fixtures.restore()
 
 
 def _one(module: str, function: str, marker: str):
