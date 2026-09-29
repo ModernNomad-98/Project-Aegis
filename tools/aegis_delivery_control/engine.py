@@ -1,4 +1,20 @@
-"""Deterministic, deny-by-default lifecycle transition authority."""
+"""Deterministic, deny-by-default lifecycle transition table.
+
+The engine's live controls are the transition table itself: an unknown
+transition, a current or resulting state outside the registered pair, an
+unregistered event variant, or a change to a terminal state is denied.
+
+Each transition's ``required_guards`` is an advisory catalog of the
+preconditions the control-plane design names for it, such as ``no_fence`` or
+``budget_available``. The engine does not evaluate them. Every production
+caller in ``storage.py`` and ``dispatch.py`` passes the transition's full
+catalog as satisfied, so the guard comparison in ``authorize`` never denies a
+production call. The authoritative checks are inline: ``storage.py``, and the
+authority and contract checks it calls, raise inside the same database
+transaction that would record the event. ``tests/test_guard_traceability.py``
+pins that calling pattern and maps every transition-guard pair to its inline
+check and a test that proves the denial.
+"""
 
 from __future__ import annotations
 
@@ -17,6 +33,14 @@ NONTERMINAL_STATES = ALL_STATES - TERMINAL_STATES
 
 @dataclass(frozen=True)
 class TransitionSpec:
+    """One registered transition row.
+
+    ``allowed_from``, ``allowed_to`` and ``event_variants`` are enforced by
+    ``TransitionEngine.authorize``. ``required_guards`` and the per-variant
+    guard sets are an advisory catalog mirrored by inline checks in
+    ``storage.py``; see the module docstring.
+    """
+
     transition_id: str
     event_kind: str
     allowed_from: FrozenSet[LifecycleState | None]
@@ -71,7 +95,12 @@ TRANSITIONS: Mapping[str, TransitionSpec] = {
 
 
 class TransitionEngine:
-    """Authorize only explicitly registered state/event pairs and guards."""
+    """Authorize only explicitly registered state and event pairs.
+
+    The guard comparison is a declarative cross-check, not an independent
+    enforcement layer: production callers pass the full guard catalog, and the
+    inline checks in ``storage.py`` decide whether a guard holds.
+    """
 
     def authorize(
         self,
@@ -82,6 +111,14 @@ class TransitionEngine:
         *,
         event_kind: str | None = None,
     ) -> TransitionSpec:
+        """Return the spec, or raise ``DispatchDenied`` for a disallowed row.
+
+        Denies an unknown transition, a disallowed current or resulting state,
+        an unregistered event variant, a guard missing from
+        ``satisfied_guards``, or a terminal state change. Callers pass the full
+        guard catalog, so the guard step documents rather than enforces; the
+        inline checks in ``storage.py`` are authoritative.
+        """
         spec = TRANSITIONS.get(transition_id)
         if spec is None:
             raise DispatchDenied(f"unknown transition: {transition_id}")
