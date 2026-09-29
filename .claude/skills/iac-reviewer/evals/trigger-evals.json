@@ -1,7 +1,7 @@
 {
   "skill": "iac-reviewer",
   "description": "Trigger discrimination for the Phase 6 cloud-architecture cluster: IaC change review vs cloud design skills, and against the shipped secure-migration-reviewer, security-pr-reviewer, and supply-chain-security-reviewer.",
-  "overlaps_with": ["cloud-architecture-decider", "azure-saas-architect", "aws-saas-architect", "secure-migration-reviewer", "security-pr-reviewer", "supply-chain-security-reviewer"],
+  "overlaps_with": ["cloud-architecture-decider", "azure-saas-architect", "aws-saas-architect", "secure-migration-reviewer", "security-pr-reviewer", "supply-chain-security-reviewer", "cloud-security-baseline-reviewer"],
   "cases": [
     {
       "id": "iac-diff-wins-here",
@@ -37,6 +37,14 @@
       "expected_skill": "azure-saas-architect",
       "should_not_trigger": ["iac-reviewer"],
       "reason": "Designing the target architecture is the provider architect; iac-reviewer reviews changes against that design after it exists."
+    },
+    {
+      "id": "console-only-baseline-goes-to-baseline-reviewer",
+      "prompt": "We have no Terraform; our Supabase and Vercel projects were set up by hand in the dashboards. Here are the settings screens and the env var list. Is the setup secure enough to launch?",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": ["iac-reviewer"],
+      "note": "SEAM CASE (reciprocated yield, D71) — no IaC exists; the ask is a baseline review of configured platform settings. Drift between IaC and runtime stays with iac-reviewer.",
+      "reason": "cloud-security-baseline-reviewer reviews configured account and platform settings from supplied evidence; iac-reviewer reviews IaC changes, existing IaC and IaC-to-runtime drift."
     }
   ]
 }

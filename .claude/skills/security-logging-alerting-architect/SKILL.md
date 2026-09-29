@@ -1,6 +1,6 @@
 ---
 name: security-logging-alerting-architect
-description: 'Design the security-event detection and alerting layer — DETECTION coverage (what must be logged: authn failures/anomalies, access-control denials, privilege/config changes, injection/abuse signals, sensitive-data access), ALERTING rules (alert vs ticket, thresholds justified against baselines, correlation, noise control), and response WIRING (every alert has an owner, severity, escalation, runbook link). Addresses the detection and alerting portion of OWASP Top 10:2025 A09 (Security Logging and Alerting Failures). Use when designing security monitoring/detection/alerting or asking "would we notice this attack?". Do NOT use for the audit RECORD (audit-log-architect — records, never detects/alerts), system/perf telemetry or alert-config edits (observability-operator), reliability SLOs/paging (slo-reliability-architect), or the playbook AFTER an alert (incident-response-runbook — this designs what fires it).'
+description: 'Design the security-event detection and alerting layer — DETECTION coverage (what must be logged: authn failures/anomalies, access-control denials, privilege/config changes, injection/abuse signals, sensitive-data access), ALERTING rules (alert vs ticket, thresholds justified against baselines, correlation, noise control), and response WIRING (every alert has an owner, severity, escalation, runbook link). Addresses the detection and alerting portion of OWASP Top 10:2025 A09 (Security Logging and Alerting Failures). Use when designing security monitoring/detection/alerting or asking "would we notice this attack?". Do NOT use for the audit RECORD (audit-log-architect — records, never detects/alerts), system/perf telemetry or alert-config edits (observability-operator), reliability SLOs/paging (slo-reliability-architect), checking audit logging is on in an account (cloud-security-baseline-reviewer), or the playbook AFTER an alert (incident-response-runbook — this designs what fires it).'
 ---
 
 # Security Logging & Alerting Architect
@@ -42,6 +42,10 @@ configuration — implementation is handed to the operating skills.
 - Do NOT use when: defining reliability SLOs/SLIs, error budgets, or what
   pages for reliability — `slo-reliability-architect`; security alerting
   fires on attacker behavior, not on error-budget burn.
+- Do NOT use when: the ask is whether audit logging is actually switched on
+  in every account and region — that is `cloud-security-baseline-reviewer`,
+  which checks configured settings; this skill designs what the logs must
+  detect and alert on.
 - Do NOT use when: writing what responders DO once paged —
   `incident-response-runbook` authors the reactive playbook; this skill
   designs the detection and alerting that FIRES it, and every alert in the

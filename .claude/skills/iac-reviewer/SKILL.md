@@ -1,6 +1,6 @@
 ---
 name: iac-reviewer
-description: 'Review infrastructure-as-code changes (Terraform, Bicep, CloudFormation, CDK, Pulumi) for deploy safety and security posture — destructive operations hiding in innocent diffs (replace/delete of stateful resources), state/backend safety, public exposure, over-broad IAM/RBAC widening, missing encryption, secrets in code or captured in state, tenant-isolation impact, drift from documented architecture, module pinning, and tagging/cost impact. Review-only: severity-ranked findings with file:line evidence and proposed corrections — never runs apply, never executes plan against live backends; provided plan output is input. Use when asked to review an IaC PR or diff, check whether an infra change is safe to apply, audit IaC for misconfiguration, or investigate drift. Do NOT use for database migrations (secure-migration-reviewer), cloud design (azure-saas-architect / aws-saas-architect), pipeline design (ci-pipeline-architect), or applying changes.'
+description: 'Review infrastructure-as-code changes (Terraform, Bicep, CloudFormation, CDK, Pulumi) for deploy safety and security posture — destructive operations hiding in innocent diffs (replace/delete of stateful resources), state/backend safety, public exposure, over-broad IAM/RBAC widening, missing encryption, secrets in code or captured in state, tenant-isolation impact, drift from documented architecture, module pinning, and tagging/cost impact. Review-only: severity-ranked findings with file:line evidence and proposed corrections; never applies or runs plan against live backends; provided plan output is input. Use when asked to review an IaC PR or diff, check whether an infra change is safe to apply, audit IaC for misconfiguration, or investigate drift. Do NOT use for database migrations (secure-migration-reviewer), cloud design (azure-saas-architect / aws-saas-architect), account security baselines (cloud-security-baseline-reviewer), pipeline design (ci-pipeline-architect), or applying changes.'
 ---
 
 # IaC Reviewer
@@ -39,6 +39,11 @@ trivial diff.
   this skill owns the infrastructure the database runs on).
 - Do NOT use when: designing the architecture the IaC should express —
   `azure-saas-architect` / `aws-saas-architect` / `cloud-architecture-decider`.
+- Do NOT use when: the settings were made in a console or a managed platform
+  with no IaC, and the ask is whether the configured account meets a
+  security baseline — that is `cloud-security-baseline-reviewer`, which
+  reads exported settings. Drift between IaC and the running account stays
+  here.
 - Do NOT use when: designing or editing CI/CD pipelines —
   `ci-pipeline-architect` (even though pipelines often run IaC).
 - Do NOT use when: the request is to APPLY the change — applying is a

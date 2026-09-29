@@ -1,7 +1,7 @@
 {
   "skill": "aws-saas-architect",
   "description": "Trigger discrimination for the Phase 6 cloud-architecture cluster: AWS mapping vs the cloud decision vs Azure vs IaC review, plus the shipped architecture-designer boundary.",
-  "overlaps_with": ["cloud-architecture-decider", "azure-saas-architect", "iac-reviewer", "architecture-designer"],
+  "overlaps_with": ["cloud-architecture-decider", "azure-saas-architect", "iac-reviewer", "architecture-designer", "cloud-security-baseline-reviewer"],
   "cases": [
     {
       "id": "aws-mapping-wins-here",
@@ -30,6 +30,14 @@
       "expected_skill": "architecture-designer",
       "should_not_trigger": ["aws-saas-architect"],
       "reason": "Component boundaries and data ownership are provider-neutral system architecture — the input the AWS architect maps, not a service-selection question."
+    },
+    {
+      "id": "configured-account-settings-goes-to-baseline-reviewer",
+      "prompt": "Review our existing AWS account's security settings. Attached are the IAM credential report, the CloudTrail trail list and the S3 public-access export.",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": ["aws-saas-architect"],
+      "note": "SEAM CASE (reciprocated yield, D71) — the input is exported settings of a configured account, not an architecture to design or review.",
+      "reason": "cloud-security-baseline-reviewer checks configured settings control by control against a named baseline and changes nothing; aws-saas-architect designs or reviews the AWS architecture."
     }
   ]
 }

@@ -590,8 +590,8 @@ keeps a human as the approval gate on anything irreversible. See
    evidence policy, and CI run failure classification (added by D68). *e.g.* `qa-strategy-architect`, `test-coverage-mapper`,
    `playwright-e2e-engineer`, `flaky-test-detective`, `screenshot-evidence-planner`.
 7. **Cloud, DevOps, reliability & release** *(Phase 6, 12)* — running it in production: cloud
-   choice, Azure/AWS mapping, IaC review, CI pipelines, release readiness, rollback,
-   observability, SLOs, incidents, failure and disaster-recovery review. *e.g.*
+   choice, Azure/AWS mapping, IaC review, cloud security baseline review, CI pipelines, release
+   readiness, rollback, observability, SLOs, incidents, failure and disaster-recovery review. *e.g.*
    `cloud-architecture-decider`, `iac-reviewer`,
    `release-readiness-reviewer`, `rollback-runbook-author`, `slo-reliability-architect`.
 8. **AI security & LLM systems** *(Phase 7, 15)* — securing LLM features against the OWASP LLM
@@ -978,6 +978,7 @@ merged into `rollback-runbook-author` per reconciliation §3; expansion builds u
 | `incident-response-runbook` | Incident machinery: one-minute severity ladder, IC/comms/ops roles, triage to decision points, containment invoking the rollback artifact by reference, tenant-aware comms, blameless postmortem where every finding lands as a test/alert/fix or owned risk. | auto + manual |
 | `database-backup-verifier` | (D71, #253) Proves per store that a usable backup exists: read-only evidence mode checks exists, non-empty, current against the RPO (recovery point objective), retained, encrypted and off-account copy; drill mode restores only into a new non-production scratch target after approval of the exact plan with its estimated cost, checks row-count and checksum parity and restore time against the RTO (recovery time objective), then deletes the copy; flags database dumps in the repository history; credentials by variable name. | **manual only** |
 | `resilience-architecture-reviewer` | (D71) Reviews how a system survives failure: per-dependency timeouts, retry budgets, circuit breakers, bulkheads and graceful degradation; single points of failure and zone/region redundancy; failover tested only with a dated drill record; disaster-recovery (DR) fit of the backup design against recovery time and recovery point objectives (RTO/RPO); a game-day plan for a person to run. Runs no fault injection; backup evidence goes to `database-backup-verifier`. | auto + manual |
+| `cloud-security-baseline-reviewer` | (D71, Phase 6 expansion) Reviews a CONFIGURED cloud account, subscription or managed platform project (AWS, Azure, Google Cloud, Vercel, Supabase) against a named baseline, control by control: MET / GAP / UNVERIFIED from cited evidence the user exports; missing evidence is never MET. Reads only what it is given, calls no cloud interface, never prints a secret value, changes nothing. | auto + manual |
 
 Phase 7 — AI security & LLM systems pack (14 = v4's 10 + 4 OWASP LLM Top 10 gap
 additions, D6; plus `ai-human-in-the-loop-designer` built from the expansion
