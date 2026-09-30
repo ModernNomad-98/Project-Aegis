@@ -13,8 +13,13 @@
 Decisions are numbered D1, D2 and so on, oldest first, in
 [§5](#5-recorded-decisions). [§6](#6-post-merge-corrections) lists post-merge
 corrections newest first; check §6 before relying on a decision. Shorthand used
-in the entries: `cat 01 #27` means item 27 in category 01 ([Software
-Architecture & Engineering](../skills/01-software-architecture-engineering.md))
+throughout is expanded here: artificial intelligence (AI), continuous
+integration (CI), Developer Certificate of Origin (DCO), end-to-end (E2E),
+large language model (LLM), Open Worldwide Application Security Project
+(OWASP), pull request (PR), quality assurance (QA), and row-level security
+(RLS). Entry-specific shorthand: `cat 01 #27` means item 27 in category 01
+([Software Architecture &
+Engineering](../skills/01-software-architecture-engineering.md))
 of the [300-skill roadmap](../300-repeatable-software-saas-skills-roadmap.md);
 ROUTE-002 is the skill contract audit finding for a one-way exclusion, where one
 skill routes work away to a neighbour that never names it back; BER means the
