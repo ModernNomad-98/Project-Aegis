@@ -40,6 +40,7 @@ the actual instructions and trigger.
 | `Model-invocable?`, `MANUAL-ONLY` | Whether the host may select the skill or a human must explicitly invoke it; see the [skill standard](skill-generation-standard.md). |
 | `evals`, `trigger-evals` | Structural test-case files; their presence does not prove live behavior passed. See [validation](#evals--validation-note). |
 | `LLM01`–`LLM10`, `ASI01`–`ASI10`, `A01`–`A10` (for example `A09:2025`) | Numbered risk categories in the OWASP Top 10 lists for LLM applications, agentic applications and web applications. The edition is stated in the surrounding section or after the colon in the code. |
+| `Pinned ≠`, `≠` | **Not the same as.** A disambiguation note marking a thing this entry must not be confused with — another skill (usually one whose trigger-evals discriminate it), or a concept it is distinct from, such as `theater ≠ coverage` or `authenticated ≠ trusted`. It is not a ranking, a replacement, or a "use instead" recommendation; look for `Composes` or `Feeds` when one skill genuinely depends on another. |
 
 Abbreviations used on this page, grouped by area:
 
@@ -88,7 +89,9 @@ Abbreviations used on this page, grouped by area:
   OpenID Connect; **WCAG** = Web Content Accessibility Guidelines. **ASVS**,
   **SSDF** and **SLSA** are spelled out where they first appear.
 - **Reliability and measurement:** **SLO** / **SLI** / **SLA** = service level
-  objective / indicator / agreement; **MDE** = minimum detectable effect;
+  objective / indicator / agreement; **RTO** / **RPO** = recovery time
+  objective / recovery point objective (how long recovery may take, and how
+  much recent data may be lost); **MDE** = minimum detectable effect;
   **CIs** = confidence intervals in the `ab-test-designer` entry, not
   continuous integration; **SRM** = sample ratio mismatch. **RICE** (reach,
   impact, confidence, effort), **WSJF** (weighted shortest job first), Kano and
@@ -1215,7 +1218,7 @@ the change?"*. Design/diagnosis only, edits nothing and executes no purges
 
 | Skill | Source (D46) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
-| `authority-invalidation-architect` | reconciliation §5 D46 (stale-authority discovery, independently verified twice) | yes | The "change didn't take effect" access-bug class: a removed user still sees data, a revoked role still works, logout doesn't end the session, a plan change shows the old tier, a deleted item stays visible. CHANGE → PROPAGATE → VERIFY: classify the change (deny direction first), inventory the eleven surfaces where old authority survives (server sessions, JWT/token claims, client stores/data caches, server/CDN caches, DB session context, realtime subscriptions, share links, entitlements, search indexes, signed URLs), locate the holder by its diagnostic tell ("works in incognito" → client copy; "fixes at a fixed interval" → token TTL), state an owner-confirmed revocation-latency bound, design invalidation per surface (owned: token policy, server-session invalidation, client purge; composed: the mechanism owners), and verify with the deny-direction-first battery for the CHANGED principal. ≠ `caching-strategy-designer` (designing a cache), `authorization-matrix-designer` (the matrix; never-worked access), `rls-policy-auditor` (policy SQL), `realtime-subscription-architect` (cross-tenant channel leaks), `systematic-debugger` (no authority-change shape). |
+| `authority-invalidation-architect` | reconciliation §5 D46 (stale-authority discovery, independently verified twice) | yes | The "change didn't take effect" access-bug class: a removed user still sees data, a revoked role still works, logout doesn't end the session, a plan change shows the old tier, a deleted item stays visible. CHANGE → PROPAGATE → VERIFY: classify the change (deny direction first), inventory the eleven surfaces where old authority survives (server sessions, JWT/token claims, client stores/data caches, server/CDN caches, in-process/distributed server caches, DB session context, realtime subscriptions, share links, entitlements, search indexes, signed URLs), locate the holder by its diagnostic tell ("works in incognito" → client copy; "fixes at a fixed interval" → token TTL), state an owner-confirmed revocation-latency bound, design invalidation per surface (owned: token policy, server-session invalidation, client purge; composed: the mechanism owners), and verify with the deny-direction-first battery for the CHANGED principal. ≠ `caching-strategy-designer` (designing a cache), `authorization-matrix-designer` (the matrix; never-worked access), `rls-policy-auditor` (policy SQL), `realtime-subscription-architect` (cross-tenant channel leaks), `systematic-debugger` (no authority-change shape). |
 
 ### Skills (D47 — Superadmin observability console design)
 
