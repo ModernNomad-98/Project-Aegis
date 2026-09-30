@@ -7,7 +7,11 @@ the active repository-wide documentation acceptance backlog. The latest count
 is in the paragraph for main after #561 (`410b90aa`): 653 tracked Markdown
 files, 584 accepted reader pages, one generated report, 55 classified
 synthetic fixtures and thirteen known pending pages; the paragraphs between are
-dated history, oldest first, and no dated snapshot is rewritten.
+dated history, oldest first, and no dated snapshot is rewritten. The
+**skill-eval round recorded below** supersedes the totals without rewriting the
+history: it adds two pending pages, giving **655** tracked Markdown files and
+**15** pending, with the accepted, generated and synthetic-fixture counts
+unchanged.
 
 **This round's determination: no acceptance was conferred, and two erroneous
 ones were corrected.** The round was
@@ -116,6 +120,33 @@ D-number to cite for it. Because no decision entry adjudicates the rule, this
 round had to settle the register's status from the rule text plus the ledger's
 own dated history, which is exactly where the earlier erroneous acceptance
 came from.
+
+## Ledger update for the skill-eval rounds — 2026-09-30
+
+This round adds Markdown and changes no skill, no eval file and no script. Two
+PRs carry it: the
+[skill-eval behavioral test procedure](../skill-eval-behavioral-test-procedure.md)
+(PR #564, 198 added lines) and the
+[skill-eval harness authorization request](skill-eval-harness-authorization-request.md).
+
+Both are **new tracked pages, and both are pending**. Neither has had an
+independent full-page re-read against [Acceptance for each
+page](#acceptance-for-each-page), and the [targeted-edit
+rule](#remaining-page-review-in-larger-batches) *retains* an acceptance rather
+than conferring one, so a new page starts pending and stays pending until
+someone reads it whole. The procedure page is *about* the eval-claim boundary,
+which does not make it reviewed; the request page is a proposal, and a proposal
+is not an acceptance.
+
+The inventory therefore moves from 653 to **655** tracked Markdown files, and
+the pending set from 13 to **15**. Accepted readers stay **584**, the generated
+report stays **1**, and the classified synthetic fixtures stay **55**. The
+arithmetic closes: 584 + 1 + 55 + 15 = 655.
+
+This round changes this ledger by more than 10 lines, so the ledger itself
+**stays pending** and still owes its own independent full-page re-read. No
+grant and no gate changed: the two PRs add a procedure that starts nothing and
+a request that authorizes nothing, and neither touches a protected path.
 
 The two component guides,
 root guide and documentation index have received bounded readability work;
