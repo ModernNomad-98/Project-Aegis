@@ -1508,7 +1508,7 @@ authorization decisions in §13 remain unchanged.
   `JUDGE_ERROR`)
 - **Phase:** 2B-1
 - **Priority:** IMPORTANT
-- **Status:** DONE - a standalone 2026-09-23 sweep found no noncanonical
+- **Status:** DONE — a standalone 2026-09-23 sweep found no noncanonical
   serialized runner/schema spelling. The residual `JUDGE-ERROR` prose in the root
   README, skills catalog and `eval-runner-designer` skill/reference/eval was
   normalized to the canonical `JUDGE_ERROR`; the two examples in this backlog
