@@ -9,8 +9,8 @@ files, 584 accepted reader pages, one generated report, 55 classified
 synthetic fixtures and thirteen known pending pages; the paragraphs between are
 dated history, oldest first, and no dated snapshot is rewritten. The
 **skill-eval round recorded below** supersedes those totals without rewriting
-the history: it adds two new pending pages, giving **655** tracked Markdown
-files and **15** pending, with the accepted, generated and
+the history: it adds three new pending pages, giving **656** tracked Markdown
+files and **16** pending, with the accepted, generated and
 synthetic-fixture counts unchanged.
 
 **This round's determination: no acceptance was conferred, and two erroneous
@@ -159,6 +159,25 @@ This round changes this ledger by more than 10 lines, so the ledger itself
 **stays pending** and still owes its own independent full-page re-read. No
 grant and no gate changed: the procedure page starts nothing, the request page
 authorizes nothing, and neither touches a protected path.
+
+### Ledger update for the skill-eval run record — 2026-09-30
+
+A later PR this round adds one more page, the
+[skill-eval run record](../evidence/skill-eval-run-2026-09-30.md), which
+records three executed eval cases, their independent grading, and two findings
+plus one **withdrawn** non-finding. It is **pending**: no independent full-page
+re-read, and the targeted-edit rule retains rather than confers, so a new page
+starts pending.
+
+It exists because an independent reviewer of #567 twice found that the run's
+findings had **no committed artifact** — first as an unsupported claim, then as
+*"still attestation-only"* — until this page committed them, which is why the
+page is not optional.
+
+The inventory therefore moves from 655 to **656** tracked Markdown files, and
+the pending set from 15 to **16**. Accepted readers stay **584**, the generated
+report stays **1**, and the classified synthetic fixtures stay **55**. The
+arithmetic closes: 584 + 1 + 55 + 16 = 656.
 
 The two component guides,
 root guide and documentation index have received bounded readability work;
