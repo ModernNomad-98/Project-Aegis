@@ -2608,13 +2608,14 @@ the entry governs.
 > note, since the note is the thing being added:
 >
 > > **Entry hash convention.** The entry text runs from its `### AEGIS-APR-NNN`
-> > heading through the **end of the last line that opens a field** — a line
-> > beginning `- **` — with no trailing newline, and **excluding any appended
-> > `>` note**. (That closing line is the field's label line, not the end of
-> > the field; some fields wrap onto continuation lines, which are excluded.)
+> > heading through the **last non-blank line that is not part of an appended
+> > `>` note** — every field body included, so a wrapped field's continuation
+> > lines count as part of it — with no trailing newline. (Cutting instead at
+> > the last line that opens a field, `- **`, would drop continuation lines
+> > that most entries carry, so it is not the convention.)
 >
-> Under that convention APR-086's entry is **7,444 bytes** and hashes to
-> **`890ee778303e43a75481cbad35a1733c634162b072df0ac906c526d913512011`**, and it
+> Under that convention APR-086's entry is **7,512 bytes** and hashes to
+> **`b0bff36194f1048b4aaee0aac36acf11a3b51bc1b1c506549556692c6c215f55`**, and it
 > does so at `2bb44db2` (this grant's delivery), at `e0c9a000` (the certified
 > commit), at `99556551`, and here. A span that instead runs to the next
 > heading now includes this note and will not match — that is the growth, not
