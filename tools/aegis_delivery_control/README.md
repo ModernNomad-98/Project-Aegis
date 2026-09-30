@@ -139,8 +139,9 @@ python -m tools.aegis_delivery_control --repository-id example-project verify --
 
 Verification denies a missing database, mismatched identity or head, malformed
 input, unsafe path, or unavailable source fact. A state file's own contents
-cannot prove its freshness. The command reads only; it does not repair or
-advance a run.
+cannot prove its freshness. The command changes no run's lifecycle state; it
+does not repair or advance a run, though opening the state file may apply a
+pending schema migration.
 
 ## Storage and current guarantees
 
