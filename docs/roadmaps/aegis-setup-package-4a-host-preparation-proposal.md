@@ -83,7 +83,7 @@ The SDK and Windows package manifests declare no install scripts or ordinary
 The first peer examples were `0.128.0`, `1.30.1` and `4.6.5`;
 these were **examples, not an approved resolved tree**. The Model Context
 Protocol (MCP) peer alone
-declares 16 direct dependencies. A generated exact lockfile must fix every
+declares 17 direct dependencies. A generated exact lockfile must fix every
 resolved package and integrity value; separately inspect each resolved
 manifest/archive for license and lifecycle scripts before install.
 The two inspected archives reference Anthropic commercial terms and include a
