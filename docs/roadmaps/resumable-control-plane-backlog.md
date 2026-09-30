@@ -67,6 +67,9 @@ passed 564 tests and skill validation found 185 valid skills; the PR's Linux,
 Windows and `gate-guard` checks and the post-merge main Actions run passed.
 This is still not a live delivery integration. A green synthetic check does not
 authorize a real provider call, deployment, source claim, or evidence operation.
+This **Current status, 2026-09-25** snapshot is dated history and is preserved as
+such; the [current package ledger](#5-separate-work-packages-current-status)
+records each later disposition.
 
 | Work package | Delivered or pending | Where to verify it |
 | --- | --- | --- |
@@ -141,7 +144,7 @@ Do not silently delete/relabel history; later dispositions cite evidence and sco
 | Forbidden | Auto-merge/force-push/history rewrite; other PR/issues/releases/tags/deployments/settings; runtime/code/schema/policy/dependency/CI/BER/database/credential/holdout/provider actions |
 | Non-goals | Offline kernel, physical extraction/wrappers, actual execution/containment, distribution, dashboard, BER advancement |
 | Completion | Three-file bounded diff, local validation, independent re-reviews of all findings, evidence-backed resolution of all original/new threads, fresh exact-head Codex review with no blocking finding and all exact-head CI successful; merge only the verified reviewed head under the 2026-09-13 approval; auto-merge disabled |
-| Next owner decision | Decide whether to authorize a separately scoped CP-WP-002; it remains BLOCKED and there is no automatic advancement |
+| Next owner decision | Decide whether to authorize a separately scoped CP-WP-002; it remains BLOCKED and there is no automatic advancement. (Row preserved as written; the separately gated CP-WP-002 it asks about is the one [AEGIS-APR-004](../approvals/APPROVAL_REGISTER.md#aegis-apr-004-cp-wp-002-offline-kernel-implementation) authorized and is DONE — see [section 5](#5-separate-work-packages-current-status).) |
 
 ### 2.1 Required evidence handling
 

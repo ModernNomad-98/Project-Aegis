@@ -124,9 +124,12 @@ Single source of truth for what skills and subagents exist, what is planned, and
 differ. The backlog below is derived from the **reconciled phase lists**
 ([`docs/reconciliation/step-0-reconciliation-v4.md`](reconciliation/step-0-reconciliation-v4.md) §3)
 and the **category backlogs** under [`docs/skills/`](skills/). `scripts/validate-skills.py`
-checks that every *implemented* skill is listed here and in `README.md`. At this
-revision, it discovers **195 implemented skills**; the validator-checked README
-roster groups them into **23 discipline families**.
+checks that every *implemented* skill is listed here and in `README.md`. The
+validator derives the implemented-skill and discipline-family counts and checks
+them against the marked pair in the README's
+[What's in the library](../README.md#whats-in-the-library) section, which is the
+only surface that states them; this page states no live count of its own, so it
+cannot drift.
 
 <details>
 <summary>Delivery status and construction history through D64 (expand)</summary>
