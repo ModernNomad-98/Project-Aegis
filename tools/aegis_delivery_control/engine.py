@@ -9,9 +9,8 @@ preconditions the control-plane design names for it, such as ``no_fence`` or
 ``budget_available``. The engine does not evaluate them. Every production
 caller in ``storage.py`` and ``dispatch.py`` passes the transition's full
 catalog as satisfied, so the guard comparison in ``authorize`` never denies a
-production call. The authoritative checks are inline: ``storage.py``, and the
-authority and contract checks it calls, raise inside the same database
-transaction that would record the event. ``tests/test_guard_traceability.py``
+production call. The authoritative checks are inline in ``storage.py`` and the
+authority and contract checks it calls. ``tests/test_guard_traceability.py``
 pins that calling pattern and maps every transition-guard pair to its inline
 check and a test that proves the denial.
 """
