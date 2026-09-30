@@ -1648,7 +1648,7 @@ PR #554 (`e0c9a000`, 2026-09-30) changed only the
 [approval register](../approvals/APPROVAL_REGISTER.md), +4/−2. Its independent
 review accepted the corrected reading aid and verified that all 98 immutable
 entries were byte-identical (normalized SHA-256
-`c80d02f5987747728a1eb28573d6c577039ad8bf67d2c52591a`). The register is
+`c80d02f5987747728a1eb28573e822250e80973d6c577039ad8bf67d2c52591a`). The register is
 therefore **accepted** on `e0c9a000`; it is the only page that moved to
 accepted in this round.
 
