@@ -40,9 +40,11 @@ the entry governs.
   to 7 characters.
 - **CI** (continuous integration) is the GitHub Actions jobs in
   `.github/workflows/validate-skills.yml`: `validate-skills` (the Linux run),
-  `windows-offline-checks` (the Windows run) and `gate-guard`. On pull
+  `windows-offline-checks` (the Windows run), `tools-tests-linux` and
+  `tools-tests-windows` (the two tools-test runs) and `gate-guard`. On pull
   requests, `validate-skills` and `gate-guard` are the required checks;
-  `gate-guard` runs on pull requests only. The **DCO** (Developer
+  `gate-guard` runs on pull requests only, and the other three jobs are
+  visible coverage that is not registered as required. The **DCO** (Developer
   Certificate of Origin) sign-off check is a pull-request step inside
   `validate-skills` that requires every commit to be signed off.
 - **gate-guard**, also called the **protected-file guard**, fails whenever a
