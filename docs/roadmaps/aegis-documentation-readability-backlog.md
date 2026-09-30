@@ -7,7 +7,11 @@ the active repository-wide documentation acceptance backlog. The latest count
 is in the paragraph for main after #561 (`410b90aa`): 653 tracked Markdown
 files, 584 accepted reader pages, one generated report, 55 classified
 synthetic fixtures and thirteen known pending pages; the paragraphs between are
-dated history, oldest first, and no dated snapshot is rewritten.
+dated history, oldest first, and no dated snapshot is rewritten. The
+**skill-eval round recorded below** supersedes those totals without rewriting
+the history: it adds two new pending pages, giving **655** tracked Markdown
+files and **15** pending, with the accepted, generated and
+synthetic-fixture counts unchanged.
 
 **This round's determination: no acceptance was conferred, and two erroneous
 ones were corrected.** The round was
@@ -116,6 +120,45 @@ D-number to cite for it. Because no decision entry adjudicates the rule, this
 round had to settle the register's status from the rule text plus the ledger's
 own dated history, which is exactly where the earlier erroneous acceptance
 came from.
+
+### Ledger update for the skill-eval rounds — 2026-09-30
+
+This round adds Markdown and changes no skill, no eval file and no script. The
+[skill-eval behavioral test procedure](../skill-eval-behavioral-test-procedure.md)
+merged in PR #564 (198 added lines, merge commit `6a37c8d8`), and the
+[skill-eval harness authorization request](skill-eval-harness-authorization-request.md)
+is registered here.
+
+The procedure page is a **new tracked page and is pending**. It has had no
+independent full-page re-read against [Acceptance for each
+page](#acceptance-for-each-page), and the [targeted-edit
+rule](#remaining-page-review-in-larger-batches) *retains* an acceptance rather
+than conferring one, so a new page starts pending and stays pending until
+someone reads it whole. Its independent review on PR #564 returned
+SHIP-WITH-NITS against a factual-accuracy standard and found no blocker, but it
+reviewed the page's claims, not its readability against this list, so it does
+not confer acceptance. A later PR (#566, merge commit `3d3a0868`) corrected one
+false sentence in the pending
+[delivery control-plane guide](../../tools/aegis_delivery_control/README.md);
+that page also **stays pending**.
+
+**This PR adds the second new page**, the
+[skill-eval harness authorization request](skill-eval-harness-authorization-request.md)
+registered above, and it is pending on the same reasoning. **A ledger that
+counts a new page must count its own**, so the round's own page is included in
+the totals below — an earlier draft of this section omitted it and stated 654,
+which was wrong.
+
+The inventory therefore moves from 653 to **655** tracked Markdown files, and
+the pending set from 13 to **15**. Accepted readers stay **584**, the generated
+report stays **1**, and the classified synthetic fixtures stay **55**. The
+arithmetic closes: 584 + 1 + 55 + 15 = 655, which is `git ls-tree -r
+--name-only` filtered to `.md` at this PR's head.
+
+This round changes this ledger by more than 10 lines, so the ledger itself
+**stays pending** and still owes its own independent full-page re-read. No
+grant and no gate changed: the procedure page starts nothing, the request page
+authorizes nothing, and neither touches a protected path.
 
 The two component guides,
 root guide and documentation index have received bounded readability work;
