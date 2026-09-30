@@ -2890,9 +2890,12 @@ the entry governs.
   #537) and changed exactly `tools/aegis_delivery_control/engine.py` (+39/−2),
   `tools/aegis_delivery_control/README.md` (+14/−1) and the new
   `tools/aegis_delivery_control/tests/test_guard_traceability.py` (+681),
-  with 734 added and 3 deleted lines: inside AEGIS-APR-086's 800-added-line
-  and 12-active-hour caps and one-package limit, and with no change to
-  `storage.py`, `dispatch.py`, `test_engine.py` or any other runtime path.
+  with 734 added and 3 deleted lines: inside AEGIS-APR-086's
+  800-added-line cap and its one-package limit, both demonstrated directly by
+  the line counts and the three changed paths. The grant's 12-active-hour cap
+  is recorded as the implementer's attestation; it is not independently
+  verifiable from the repository or GitHub. The delivery changed no
+  `storage.py`, `dispatch.py`, `test_engine.py` or other runtime path.
   An
   [independent review](https://github.com/ModernNomad-98/Project-Aegis/pull/539#issuecomment-5897366819)
   of the exact head returned SHIP with no blocking findings; the reviewer

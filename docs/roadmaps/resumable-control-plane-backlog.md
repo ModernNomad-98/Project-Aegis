@@ -296,8 +296,11 @@ merged at exact head `df1906534fb8d696a1e15837b8fb115fc12a3d0e` as
 `tools/aegis_delivery_control/engine.py` (+39/−2),
 `tools/aegis_delivery_control/README.md` (+14/−1) and the new
 `tools/aegis_delivery_control/tests/test_guard_traceability.py` (+681): 734
-added and 3 deleted lines, inside the grant's 800-added-line and
-12-active-hour caps. `engine.py`'s parsed code structure is unchanged once
+added and 3 deleted lines, inside the grant's 800-added-line cap and its
+one-package limit, both demonstrated directly by the line counts and the
+three changed paths. The grant's 12-active-hour cap is recorded as the
+implementer's attestation and is not independently verifiable from the
+repository. `engine.py`'s parsed code structure is unchanged once
 its docstrings are removed, so the package is behaviour-neutral:
 `storage.py`, `dispatch.py`, `test_engine.py` and every other runtime path
 are untouched. An independent review of the exact head returned SHIP
