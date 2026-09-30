@@ -2,13 +2,12 @@
 
 ## Start here — current reading
 
-As of merged pull request (PR) #542 (`22a6b7a`) on 2026-09-29 Coordinated
-Universal Time (UTC), this remains the active
-repository-wide documentation acceptance backlog. The latest count is in the
-paragraph for main after #542 (`22a6b7a`): 653 tracked Markdown files, 583
-accepted reader pages, one generated report, 55 classified synthetic fixtures
-and fourteen known pending pages; the paragraphs between are dated history,
-oldest first. The two component guides,
+As of merged pull request (PR) #554 (`e0c9a000`) on 2026-09-30 Coordinated
+Universal Time (UTC), this remains the active repository-wide documentation
+acceptance backlog. The latest count is in the paragraph for main after #554
+(`e0c9a000`): 653 tracked Markdown files, 586 accepted reader pages, one
+generated report, 55 classified synthetic fixtures and eleven known pending
+pages; the paragraphs between are dated history, oldest first. The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
 The **491-file inventory and the ordered "start with" steps below are the
@@ -1645,6 +1644,49 @@ evidence pages. 586 + 11 + 1 + 55 = 653. This ledger round changes the ledger
 by more than 10 lines, so the ledger needs its own independent full-page
 re-read. No grant or gate changed.
 
+PR #554 (`e0c9a000`, 2026-09-30) changed only the
+[approval register](../approvals/APPROVAL_REGISTER.md), +4/−2. Its independent
+review accepted the corrected reading aid and verified that all 98 immutable
+entries were byte-identical (normalized SHA-256
+`c80d02f5987747728a1eb28573e822250e80973d6c577039ad8bf67d2c52591a`). The register is
+therefore **accepted** on `e0c9a000`; it is the only page that moved to
+accepted in this round.
+
+The prior current-reading pointer to #542 was stale: its dated snapshot
+records 583 accepted and fourteen pending, whereas the later, dated #550
+snapshot records 586 accepted and eleven pending. The #550 snapshot's
+statement that every listed re-read page had an empty diff through `8ed228ee`
+was also too broad: `git diff --numstat 434c6835 8ed228ee -- CONTRIBUTING.md`
+is +5/−3. The #550 status prose listed eleven pages but did not include this
+ledger, although that snapshot says the ledger's more-than-10-line update
+needed an independent full-page re-read. Thus its written arithmetic,
+586 + 11 + 1 + 55 = 653, closed only by omitting the ledger: its literal
+statuses were 586 + 12 + 1 + 55 = 654, and a disjoint post-#550 partition
+would have required 585 accepted readers. This round corrects the live
+classification without rewriting either dated snapshot.
+
+Main after #554 (`e0c9a000`) therefore has **653 tracked Markdown files: 586
+accepted reader pages, one generated report, 55 classified synthetic fixtures
+and eleven known pending pages**. `git ls-files '*.md'` gives 653; the 55
+classified fixtures are the 56 Markdown files under `scripts/` other than
+their fixture index, and the generated report is
+[the skill-contract audit baseline](../audits/skill-contract-audit-baseline.md).
+The classifications reconcile as 586 + 1 + 55 + 11 = 653. The pending pages
+are the [step-0 reconciliation log](../reconciliation/step-0-reconciliation-v4.md),
+the [skills catalog](../skills-catalog.md), the
+[AEGIS-060+ register](../audits/aegis-060-plus-register.md), the
+[BER backlog](behavioral-eval-runner-backlog.md), the
+[resumable control-plane backlog](resumable-control-plane-backlog.md), both
+[database-backup-verifier pages](../../.claude/skills/database-backup-verifier/SKILL.md)
+and [their checks sheet](../../.claude/skills/database-backup-verifier/references/backup-verification-checks.md),
+the
+[delivery control-plane guide](../../tools/aegis_delivery_control/README.md),
+the [host-feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md),
+the [Stage 4A offline review](../evidence/setup/issue-101-package-4a-offline-review.md)
+and this ledger. This ledger update changes more than 10 lines, so the ledger
+returns to **pending** until an independent full-page re-read records
+acceptance. No grant or gate changed.
+
 Merged PR #331 established **602 Markdown files: 558 accepted reader pages
 and 44 classified synthetic fixtures**, with zero known pending pages. It added
 the [Behavioral Eval Runner (BER) selected-precheck aggregate decision page](ber-precheck-aggregate-validation-proposal.md)
@@ -2073,6 +2115,7 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
+| Approval-register reading aid and live-ledger reconciliation, PR #554, 2026-09-30 | The [approval register](../approvals/APPROVAL_REGISTER.md) and this ledger | The register's +4/−2 reading-aid correction was independently **accepted** on `e0c9a000`; the 98 immutable entries remained byte-identical. This round corrects the stale #542 current pointer, the omitted-ledger pending set, the classification arithmetic and the overbroad #550 empty-diff claim. Main after #554 has 653: 586 accepted readers, one generated report, 55 classified fixtures and eleven pending. This ledger changes by more than 10 lines and is **pending** an independent full-page re-read. |
 | Guard coverage, README and guide re-reads, ledger and standard clarifications, register entries, CONTRIBUTING wording and control-plane delivery, PRs #543, #545, #544, #546, #547, #548, #549 and #550, after #542, 2026-09-29 to 2026-09-30 | [README](../../README.md), [CONTRIBUTING](../../CONTRIBUTING.md), the [offline CI guide](../offline-ci.md), [skill generation standard](../skill-generation-standard.md), [approval register](../approvals/APPROVAL_REGISTER.md), [resumable control-plane backlog](resumable-control-plane-backlog.md) and this ledger | README, CONTRIBUTING and the offline CI guide were **accepted** on `1c2d6f03`, `434c6835` and `640f87b9`; #549's 8-line CONTRIBUTING edit and #544's 2-line standard edit keep acceptance. The register (519) and control-plane backlog (51) stay **pending**. Main after #550 (`8ed228ee`) has 653: 586 accepted readers, one generated report, 55 classified fixtures and eleven known pending. This ledger changes by more than 10 lines and needs an independent full-page re-read. |
 | Register exceptions, guard traceability, host-bridge SDK pin, standard re-read, ledger and reviewer description, PRs #537, #539, #540, #541, #538 and #542, after #531, 2026-09-29, and this update's two owner-decided edits | The [approval register](../approvals/APPROVAL_REGISTER.md), [BER backlog](behavioral-eval-runner-backlog.md), [delivery control-plane guide](../../tools/aegis_delivery_control/README.md), [host feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md), [Stage 4A offline review](../evidence/setup/issue-101-package-4a-offline-review.md), [skill generation standard](../skill-generation-standard.md), `library-diff-reviewer/SKILL.md` and this ledger | The standard was **accepted** on `5e4cdd4` (pending to accepted) and this ledger on `51860f3`; `library-diff-reviewer` (4 net) keeps acceptance. The control-plane guide (15) and both evidence pages (47 and 13, each with a new section) become **pending**; the register (405) and BER backlog (149) stay pending. Main after #542 (`22a6b7a`) has 653: 583 accepted readers, one generated report, 55 classified fixtures and fourteen known pending. |
 | Config-surface guards, isolated tools tests, environment parity reviewer, hash-locked CI dependencies and ledger, PRs #528, #507, #521, #524 and #534, after #525, 2026-09-29; #535 and #531 changed no Markdown | New `environment-parity-reviewer/SKILL.md` and `references/parity-matrix-sheet.md`, `iac-reviewer/SKILL.md`, two manual-only neighbour skills, `.claude/skills/_template/SKILL.md`, the [skill generation standard](../skill-generation-standard.md), [CONTRIBUTING](../../CONTRIBUTING.md), README, [offline CI guide](../offline-ci.md), skills catalog, step-0 reconciliation log and this ledger | Both new pages were **accepted** on `7f98950`; `iac-reviewer` (11 net) was re-read and **accepted** on `f5a6dab`; this ledger was **accepted** on `7b51c88`. `local-ci-mirror-preflight` (9), `vite-build-qa-engineer` (6) and the template (4) keep acceptance. The skill generation standard (11 net since #408) becomes **pending**. Main after #531 (`8dc3b00`) has 653: 585 accepted readers, one generated report, 55 classified fixtures and twelve known pending. |
