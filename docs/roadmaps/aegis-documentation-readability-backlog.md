@@ -1596,9 +1596,9 @@ usage-limit notices on every PR.
   **SHIP** on `5715f07f`
   ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/549#issuecomment-5901365257)).
 - #550 changed the [approval register](../approvals/APPROVAL_REGISTER.md)
-  (+48/−0) and the
+  (+51/−0) and the
   [resumable control-plane backlog](resumable-control-plane-backlog.md)
-  (+33/−1): REVISE on `2269a5f4`, then **ACCEPT** on `e04cc961`
+  (+36/−1): REVISE on `2269a5f4`, then **ACCEPT** on `e04cc961`
   ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/550#issuecomment-5901479210)).
 
 **Full-page re-reads done and accepted in this range.** For each page below,
@@ -1629,7 +1629,7 @@ so it needs its own independent full-page re-read against
 `a890669`. The
 [resumable control-plane backlog](resumable-control-plane-backlog.md) is 51
 net since its last full-page acceptance at `67f577e`; #550 changed it by
-34 lines. #546 and #550 reviewed their changed facts and format, not either
+37 lines. #546 and #550 reviewed their changed facts and format, not either
 whole page. The other nine pending pages did not change. Each needs a
 full-page re-read.
 
