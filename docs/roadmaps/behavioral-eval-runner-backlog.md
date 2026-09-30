@@ -1098,6 +1098,11 @@ operator controls are evidenced. The 2026-09-23 checkpoint above is historical.
   unseal the holdout or satisfy OD-1. The implementation and its exact-head
   checks are pending review at this branch checkpoint.
 
+  **Delivered by [PR #249](https://github.com/ModernNomad-98/Project-Aegis/pull/249)
+  (`fa37c0e5`), 2026-09-24.** The pending items above describe the
+  pre-merge candidate state at this checkpoint and are preserved as such; the
+  route table above records the delivered outcome.
+
   BER-DEC-014 and [APR-046](../approvals/APPROVAL_REGISTER.md#aegis-apr-046-ber-selected-precheck-aggregate-correction),
   owner-approved on 2026-09-26 and effective at their governance merge `2aed8dd`
   (PR #365), authorize one further bounded synthetic increment under this
