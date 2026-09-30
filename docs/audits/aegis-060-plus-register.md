@@ -135,7 +135,8 @@ Rules of this register (from the program's operating rules):
 ### AEGIS-060 (REJECTED CANDIDATE) — trigger-eval subagent annotations are valid typed-target syntax, not defects
 
 - **Classification / severity / status:** Candidate fixture-hygiene defect / P2
-  (severity level; P0 is most severe) / **REJECTED CANDIDATE — FALSE POSITIVE
+  (severity level; the report orders P0, P1, P2, then info from most to least
+  severe) / **REJECTED CANDIDATE — FALSE POSITIVE
   CAUSED BY EVAL-004 TYPE COLLAPSE; ID RETIRED AND NEVER REUSED**
 - **What the candidate claimed (superseded):** that five trigger-eval files
   wrote neighbor identifiers as `"<name> (subagent)"` — "prose annotation
