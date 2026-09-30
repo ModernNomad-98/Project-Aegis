@@ -2864,3 +2864,51 @@ the entry governs.
   merged `8fce63f6fb162617869a574b347f9cd37a94ecc1` as
   `74411bc59072400a7eb7452c96a6061413c4065d` at the time above, with the
   merge pinned to that head.
+
+### AEGIS-APR-098: Consumption of the CP-WP-002 P2-6 maintenance grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-086.
+- **Status at recording:** AEGIS-APR-086 has no remaining use.
+- **Effective at:** 2026-09-29 19:43:17 UTC.
+- **Recorded at / By:** 2026-09-29 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039. AEGIS-APR-086 requires recording its delivery and
+  consumption in the control-plane backlog and this register as a later
+  separate reviewed governance change; this entry and the accompanying
+  backlog update are that change.
+- **New authority:** None. AEGIS-APR-086's option (a), evidence-computed
+  guards, remains ungranted and is an entry criterion for CP-WP-003, not
+  authorization. No CP-WP-003 or CP-WP-004 work, real authority or real
+  dispatch follows from this consumption.
+- **Reason:** The one bounded maintenance package, "CP-WP-002 maintenance:
+  P2-6 guard documentation and traceability tests", merged, which was
+  AEGIS-APR-086's stated use limit.
+- **Evidence:** [PR #539](https://github.com/ModernNomad-98/Project-Aegis/pull/539)
+  merged exact head `df1906534fb8d696a1e15837b8fb115fc12a3d0e` by
+  administrator merge as `2bb44db234fa8f98c8e84110528eabb982ce79f7` at the
+  time above. Its branch `fix/p2-6-guard-traceability` was cut from the
+  governance merge commit `43d8b6be70bab21b76080bea5afb702f148ba755` (PR
+  #537) and changed exactly `tools/aegis_delivery_control/engine.py` (+39/−2),
+  `tools/aegis_delivery_control/README.md` (+14/−1) and the new
+  `tools/aegis_delivery_control/tests/test_guard_traceability.py` (+681),
+  with 734 added and 3 deleted lines: inside AEGIS-APR-086's 800-added-line
+  and 12-active-hour caps and one-package limit, and with no change to
+  `storage.py`, `dispatch.py`, `test_engine.py` or any other runtime path.
+  An
+  [independent review](https://github.com/ModernNomad-98/Project-Aegis/pull/539#issuecomment-5897366819)
+  of the exact head returned SHIP with no blocking findings; the reviewer
+  confirmed `engine.py`'s parsed code structure is identical to the base once
+  docstrings are removed, so the change is behaviour-neutral.
+  [Exact-head run 36619296295](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36619296295)
+  passed all five checks: `gate-guard`, `validate-skills`,
+  `windows-offline-checks`, `tools-tests-linux` and `tools-tests-windows`;
+  no `gate-guard` exception was needed, because
+  `tools/aegis_delivery_control/` is not a protected path. Codex posted only
+  usage-limit notices after the head commit (19:26:40 UTC): at 19:38:05 and
+  19:42:04 UTC on 2026-09-29, so it was confirmed unavailable under
+  AEGIS-APR-050. The two non-blocking review findings were recorded rather
+  than fixed: the T03 slot-test tightening is a test-only follow-up that
+  AEGIS-APR-086's delivery conditions did not authorize changing after the
+  fact, and the unreachable
+  `receipt accounting transition is not permitted` branch in `storage.py`
+  is recorded in the control-plane backlog as a note for CP-WP-003, because
+  removing it would be a runtime change that AEGIS-APR-086 forbids.
