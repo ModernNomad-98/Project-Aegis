@@ -5,11 +5,12 @@
 As of `410b90aa` on 2026-09-30 Coordinated Universal Time (UTC), this remains
 the active repository-wide documentation acceptance backlog. The latest count
 is in the paragraph for main after #561 (`410b90aa`): 653 tracked Markdown
-files, 585 accepted reader pages, one generated report, 55 classified
-synthetic fixtures and twelve known pending pages; the paragraphs between are
+files, 584 accepted reader pages, one generated report, 55 classified
+synthetic fixtures and thirteen known pending pages; the paragraphs between are
 dated history, oldest first, and no dated snapshot is rewritten.
 
-**This round's determination: no acceptance was conferred.** The round was
+**This round's determination: no acceptance was conferred, and two erroneous
+ones were corrected.** The round was
 instructed to "record the accepted transitions" for the pages below. Under the
 [targeted-edit rule](#remaining-page-review-in-larger-batches), the 10-line
 exemption keeps acceptance only for a page that is **already accepted**; it
@@ -20,48 +21,80 @@ still pending (or moved back to pending), not accepted. Changed-line counts
 are added plus deleted lines from `git diff --numstat`.
 
 - [approval register](../approvals/APPROVAL_REGISTER.md): 525 net since its
-  last acceptance at `a890669`. PR #554 changed it by 4+2=6 lines. Its
-  independent review certified append-only immutability and the corrected
-  reading aid (98 entries byte-identical, normalized SHA-256
+  last full-page acceptance at `a890669` (PR #533). Its review on #533
+  **accepted** it on `a890669` ([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/533#issuecomment-5882995051)),
+  but PR #525 then made it pending again, and the #550 round recorded it as
+  pending with 519 net. PR #554 changed it by 4+2=6 lines; its independent
+  review certified append-only immutability and the corrected reading aid (98
+  entries byte-identical, normalized SHA-256
   `c80d02f5987747728a1eb28573e822250e80973d6c577039ad8bf67d2c52591a`), not the
-  whole page. **Stays pending**, still owing the full-page re-read it was
-  already owed.
+  whole page. **Moves to pending.** The #554 paragraph below recorded this page
+  as accepted on the strength of a **targeted** review. That was wrong: under
+  [Targeted edits to accepted
+  pages](#remaining-page-review-in-larger-batches), a targeted review cannot
+  confer full-page acceptance on a page that is already pending, and this page
+  was pending. `git diff --numstat a890669 410b90aa -- docs/approvals/APPROVAL_REGISTER.md`
+  is still `523 2`.
 - [backlog forecast](aegis-backlog-forecast.md): 88 net since its last
-  acceptance at `826f40b` (PR #497, 2026-09-28). PR #555 changed it by 86+2=88
-  lines and added a catch-up section; no review verdict was posted and none of
-  its six commits appears anywhere in this ledger. **Moves to pending** — a
-  page the ledger currently records as accepted no longer meets the criterion,
-  and the pending list below now records it.
+  acceptance at `826f40b` (PR #497, 2026-09-28), which was a full-page
+  corrected-candidate acceptance. PR #555 changed it by 86+2=88 lines and added
+  a catch-up section. #555's retrospective review, posted 2026-09-30 after the
+  merge, records an independent **ACCEPT** bound to `c199e57`, the merged head,
+  and independently reproduced the bounded-window count of 62. That review
+  satisfies the rule for a small edit — but 88 lines is
+  not small. The exemption's **second sentence** applies instead: "A larger
+  change, meaning more than 10 changed lines on that page or any new section,
+  returns the page to **pending** until an independent reader re-reads the whole
+  page." The page has had no full-page re-read since `826f40b`, so it **moves to
+  pending**.
 - [BER backlog](behavioral-eval-runner-backlog.md): 151 net since `032e030`.
-  PR #557 changed it by 1+1=2 lines. The pull request calls itself a full-page
-  re-read, but its own body says it made one non-substantive punctuation
-  correction, and the independent reviewer the rule requires was not posted.
-  **Stays pending.**
+  PR #557 changed it by 1+1=2 lines. #557's retrospective review records an
+  independent **SHIP** bound to `665b2829`, the merged head. The edit is within
+  10 lines, but the exemption is a *retention* rule for accepted pages and this
+  page is pending, so it has no acceptance to retain. **Stays pending.**
 - [step-0 reconciliation log](../reconciliation/step-0-reconciliation-v4.md):
-  343 net since `97c8682`. PR #558 changed it by 7+2=9 lines and says it
-  performed the re-read, but the rule requires a read-only review from someone
-  who did not write the page, and no such reviewer was posted. A pull request
-  cannot certify its own acceptance. **Stays pending.**
+  343 net since `97c8682`. PR #558 changed it by 7+2=9 lines. #558's
+  retrospective review records an independent **ACCEPT** bound to its merged
+  head. As with the BER backlog, the edit is within 10 lines and the review is
+  real, but the page is pending, so the exemption gives it nothing. **Stays
+  pending.**
 - [AEGIS-060+ register](../audits/aegis-060-plus-register.md): 25 net since
-  `04af9d9`. PR #559 changed it by 2+1=3 lines and added one severity gloss; it
-  posted no review verdict. **Stays pending.**
+  `04af9d9`. PR #559 changed it by 2+1=3 lines and added one severity gloss.
+  #559's retrospective review records an independent **SHIP** bound to its
+  merged head. **Stays pending**, for the same reason: the exemption retains, it
+  does not confer.
 - [skills catalog](../skills-catalog.md): 108 net since `2e15b23`. PR #560
-  changed it by 6+4=10 lines. The pull request says it performed the pending
-  full-page re-read, but it posted no independent reviewer, and the page owed a
-  full read, not a targeted-edit exemption. **Stays pending.**
+  changed it by 6+4=10 lines, sitting exactly on the boundary. #560's
+  retrospective review records an independent **SHIP** bound to `1b9e7049`, the
+  merged head, and verified the roster exhaustively in both directions
+  (195/196/0/0, 7/7 subagents); it also named an honest limitation, that it did
+  not read all 1,492 lines for prose-level readability. The page was pending and
+  owed a full read, so the exemption cannot confer acceptance. **Stays
+  pending.**
 - `.claude/skills/scoped-approval-register/SKILL.md`: 10 net since its last
-  change at `61f2a464`. PR #561 added 10+0=10 lines and its review certified the
-  eval cases and the added guidance, not the whole page. This ledger has no
-  recorded status for the page, so this round changes no classification for it.
-  The named follow-up is to record its status and give it the full-page re-read
-  the rule requires.
+  change at `61f2a464`. PR #561 is the only one of these merges whose reviews
+  were posted at review time rather than retrospectively: an independent quality
+  **SHIP** at the current head `41c7a649` and a security **SHIP** on the earlier
+  head, each covering the eval cases and the added guidance rather than the
+  whole page. This ledger records no status for the page and the page is not in
+  its pending set, so this round changes no classification for it. The named
+  follow-up is to record its status and give it the full-page re-read the rule
+  requires.
 
-The pending count therefore rises by one rather than falling: the forecast
-joins the set. Twelve pages remain pending, and none of the seven merges
-produced an earned acceptance. This round changes this ledger by more than 10
-lines, so the ledger itself returns to **pending** and needs its own
+Three pages therefore change classification, all away from acceptance: the
+forecast and the register both return to pending under the "larger change"
+sentence, and the register additionally corrects an erroneous acceptance
+recorded by the #554 round. Eight pages were already pending and stay pending
+even though four of them now have a recorded independent review. Accepted falls
+586 → 584 and pending rises 11 → 13. This round changes this ledger by more
+than 10 lines, so the ledger itself returns to **pending** and needs its own
 independent full-page re-read against [Acceptance for each
 page](#acceptance-for-each-page).
+
+The register's move matters beyond its own row: it corrects a prior round of
+this ledger that recorded a targeted review as a full-page acceptance. That is
+the same class of error this round was briefed to avoid, and it was introduced
+by an earlier merged PR, not by the pages it recorded.
 
 Two authorities outside this ledger confirm the determination rather than
 weakening it. [CONTRIBUTING](../../CONTRIBUTING.md), in **Write documentation
@@ -69,14 +102,18 @@ for a new reader** rule 6, states that the pull request must "name the pages
 reviewed and any pages still waiting for the repository-wide readability
 sweep" and "Ask an independent reviewer to describe the component's purpose
 and normal use from the documentation alone, then correct any gap they find":
-PRs #555, #557, #558, #559 and #560 named no independent reviewer, so by the
-contributor-facing rule as well as this ledger's rule no page of theirs can
-have passed. And the 10-line rule carries no decision number: it rests on
-dated owner decisions (2026-09-27, refined 2026-09-28 and 2026-09-29),
-recorded here and in the [open-decisions
+PRs #555, #557, #558, #559 and #560 each now carry an independent review, so
+they satisfy that contributor-facing instruction for their changed lines.
+What they do not supply is a full-page re-read of a page that was already
+pending, which is why their pages stay pending. And the 10-line rule carries
+no decision number: it rests on dated owner decisions (2026-09-27, refined
+2026-09-28 and 2026-09-29), recorded here and in the [open-decisions
 index](aegis-open-decisions-2026-09-23.md); the step-0 reconciliation record
 names this backlog nowhere and its highest decision is D71, so there is no
-D-number to cite for it.
+D-number to cite for it. Because no decision entry adjudicates the rule, this
+round had to settle the register's status from the rule text plus the ledger's
+own dated history, which is exactly where the earlier erroneous acceptance
+came from.
 
 The two component guides,
 root guide and documentation index have received bounded readability work;
@@ -1762,46 +1799,50 @@ PRs #555 (`9e88a581`), #557 (`41764593`), #558 (`4012161e`), #559
 (`52f1b9a2`), #560 (`d9314437`) and #561 (`410b90aa`) merged on 2026-09-30
 UTC after #554, in that order, and #556 (`afe703a4`) merged between #554 and
 #555. None added, removed or renamed a Markdown file, so the tracked total is
-unchanged at 653. None of these merges recorded an independent full-page
-acceptance. #555 changed the [backlog forecast](aegis-backlog-forecast.md) by
-86 added and 2 deleted lines (88), adding a catch-up checkpoint section; no
-review verdict was posted, and no commit in this range appears anywhere in
-this ledger. #557 changed the [BER
+unchanged at 653. Each merge carries an independent review, and #561's was
+posted at review time rather than retrospectively. None of them recorded an
+independent **full-page** review of the whole page against every criterion, so
+none confers acceptance. #555 changed the [backlog
+forecast](aegis-backlog-forecast.md) by 86 added and 2 deleted lines (88),
+adding a catch-up checkpoint section; its retrospective review is an **ACCEPT**
+bound to `c199e57`. #557 changed the [BER
 backlog](behavioral-eval-runner-backlog.md) by 1 added and 1 deleted line (2),
-calling itself a full-page re-read but describing its only edit as a lone
-punctuation correction. #558 changed the [step-0 reconciliation
-log](../reconciliation/step-0-reconciliation-v4.md) by 7 added and 2 deleted
-lines (9), and #559 changed the [AEGIS-060+
-register](../audits/aegis-060-plus-register.md) by 2 added and 1 deleted line
-(3); both say they performed a re-read, and neither posted the independent
-reviewer the rule requires. #560 changed the [skills
-catalog](../skills-catalog.md) by 6 added and 4 deleted lines (10), claiming
-the pending full-page re-read, and #561 changed
-`.claude/skills/scoped-approval-register/SKILL.md` by 10 added lines; the
-#561 review certified the eval cases and the added guidance, not the whole
-page. Under [Targeted edits to accepted
-pages](#remaining-page-review-in-larger-batches), the 10-line exemption does
-nothing for a page that is currently pending and already owes a full re-read,
-and `git diff <acceptance> <now>` is empty for none of these heads, so no page
-keeps acceptance and no pending page gains it. The [approval
-register](../approvals/APPROVAL_REGISTER.md) was independently accepted on
-`e0c9a000` for PR #554's 4+2=6-line reading-aid correction, which certified
-append-only immutability and the corrected aid rather than a full page, so its
-status is unchanged. Every page above was therefore already pending except the
-forecast, which moves to **pending**: it is 88 net since `826f40b`, its last
-recorded acceptance, and PR #555's 88 changed lines exceed 10. This update
-changes no dated snapshot; the #554 paragraph above remains as recorded.
+with a retrospective **SHIP** bound to `665b2829`. #558 changed the [step-0
+reconciliation log](../reconciliation/step-0-reconciliation-v4.md) by 7 added
+and 2 deleted lines (9) with a retrospective **ACCEPT**, and #559 changed the
+[AEGIS-060+ register](../audits/aegis-060-plus-register.md) by 2 added and 1
+deleted line (3) with a retrospective **SHIP**. #560 changed the [skills
+catalog](../skills-catalog.md) by 6 added and 4 deleted lines (10), with a
+retrospective **SHIP** bound to `1b9e7049`, and #561 changed
+`.claude/skills/scoped-approval-register/SKILL.md` by 10 added lines with a
+quality **SHIP** at `41c7a649` and a security **SHIP**. Under [Targeted edits
+to accepted pages](#remaining-page-review-in-larger-batches), a review of a
+small edit covers the changed lines, which is what these reviews did; the
+exemption retains an existing acceptance and cannot confer one, so no pending
+page gains acceptance. A review is not discounted for declining to assert a
+standard the rule never imposes: the ledger says "any kind of independent
+review counts", such as a readability, security or fact review. The [approval
+register](../approvals/APPROVAL_REGISTER.md) is then the one page that must
+**lose** an acceptance: the #554 paragraph above recorded it as accepted on
+`e0c9a000` for a 4+2=6-line targeted reading-aid correction, but the register
+was pending, and a targeted review cannot confer full-page acceptance. It was
+already pending at #550 (519 net since `a890669`) and is still 525 net, so it
+returns to pending. The forecast likewise returns to pending under the
+exemption's second sentence: 88 changed lines exceed 10, and its last full-page
+acceptance is `826f40b`. The remaining pages were pending and stay pending. No
+dated snapshot is rewritten; the #554 paragraph above stands as recorded, with
+its register classification corrected in the live reading rather than in place.
 
-Main after #561 (`410b90aa`) therefore has **653 tracked Markdown files: 585
+Main after #561 (`410b90aa`) therefore has **653 tracked Markdown files: 584
 accepted reader pages, one generated report, 55 classified synthetic fixtures
-and twelve known pending pages**. The 653 is `git ls-files '*.md'` at
+and thirteen known pending pages**. The 653 is `git ls-files '*.md'` at
 `410b90aa`; 56 Markdown files sit under `scripts/`, and the 55 classified
 fixtures are those 56 less their fixture index
 (`scripts/tests/fixtures/README.md`). The generated report is [the
 skill-contract audit baseline](../audits/skill-contract-audit-baseline.md).
-The classification moves one page, the forecast, from accepted to pending, so
-accepted readers go 586 − 1 = 585 and pending goes 11 + 1 = 12. The twelve
-pending pages are the [approval
+Two pages move from accepted to pending — the forecast and the approval
+register — so accepted readers go 586 − 2 = 584 and pending goes 11 + 2 = 13.
+The thirteen pending pages are the [approval
 register](../approvals/APPROVAL_REGISTER.md) (525 net since `a890669`), the
 [backlog forecast](aegis-backlog-forecast.md) (88 net since `826f40b`), the
 [BER backlog](behavioral-eval-runner-backlog.md) (151 net since `032e030`),
@@ -1825,7 +1866,7 @@ number. The [open-decisions
 index](aegis-open-decisions-2026-09-23.md) and the
 `aegis-backlog-forecast.md` link references in this paragraph are not separate
 pending pages, so the list is not double counting. The arithmetic closes:
-585 + 1 + 55 + 12 = 653. This
+584 + 1 + 55 + 13 = 653. This
 ledger changes by more than 10 lines, so it returns to **pending** until an
 independent full-page re-read records acceptance. No grant or gate changed.
 
@@ -2257,7 +2298,7 @@ documentation range. No provider call or live retry was authorized.
 
 | Batch | Tracked pages | Progress and remaining review |
 | --- | --- | --- |
-| Targeted-edit round over PRs #555, #557, #558, #559, #560 and #561, after #554, 2026-09-30 | The [backlog forecast](aegis-backlog-forecast.md), [BER backlog](behavioral-eval-runner-backlog.md), [step-0 reconciliation log](../reconciliation/step-0-reconciliation-v4.md), [AEGIS-060+ register](../audits/aegis-060-plus-register.md), [skills catalog](../skills-catalog.md), `.claude/skills/scoped-approval-register/SKILL.md` and this ledger; the [approval register](../approvals/APPROVAL_REGISTER.md) was #554's page | **No acceptance was conferred.** The round was instructed to record accepted transitions; under the targeted-edit rule the 10-line exemption keeps acceptance only for a page that is **already accepted**, so it gives these pending pages nothing. Changed lines (`git diff --numstat`, added plus deleted): forecast 88 (#555, plus a new section), BER backlog 2 (#557), step-0 log 9 (#558), AEGIS-060+ register 3 (#559), skills catalog 10 (#560), `scoped-approval-register/SKILL.md` 10 (#561). #557, #558 and #560 say they performed a full-page re-read, but the rule's read-only reviewer from someone other than the author was not posted on any of them; #559 posted no verdict. No page's `git diff <acceptance> <now>` is empty. The forecast **moves to pending** (88 net since `826f40b`); the rest stay pending. #554's register acceptance is unchanged, certifying immutability and the reading aid, not a full page. Main after #561 (`410b90aa`) has 653: 585 accepted readers, one generated report, 55 classified fixtures and twelve pending. 585 + 1 + 55 + 12 = 653. This ledger changes by more than 10 lines and is **pending** an independent full-page re-read. |
+| Targeted-edit round over PRs #555, #557, #558, #559, #560 and #561, after #554, 2026-09-30 | The [backlog forecast](aegis-backlog-forecast.md), [BER backlog](behavioral-eval-runner-backlog.md), [step-0 reconciliation log](../reconciliation/step-0-reconciliation-v4.md), [AEGIS-060+ register](../audits/aegis-060-plus-register.md), [skills catalog](../skills-catalog.md), `.claude/skills/scoped-approval-register/SKILL.md`, the [approval register](../approvals/APPROVAL_REGISTER.md) and this ledger | **No acceptance was conferred, and two erroneous acceptances were corrected.** Each merge carries an independent review (#561's posted at review time, the rest retrospectively on 2026-09-30), but none is a full-page re-read against every criterion. Changed lines (`git diff --numstat`, added plus deleted): forecast 88 (#555, plus a new section), BER backlog 2 (#557), step-0 log 9 (#558), AEGIS-060+ register 3 (#559), skills catalog 10 (#560), `scoped-approval-register/SKILL.md` 10 (#561). The 10-line exemption **retains** an acceptance and cannot confer one, so the five pending pages gain nothing; a review is not discounted for declining a standard the rule never imposes. Two pages **move to pending**: the forecast (88 lines, past 10, so the exemption's second sentence applies) and the **approval register**, whose `accepted` line came from a prior merged PR recording a 6-line targeted review as a full-page acceptance while the page was pending (525 net since `a890669`). Main after #561 (`410b90aa`) has 653: 584 accepted readers, one generated report, 55 classified fixtures and thirteen pending. 584 + 1 + 55 + 13 = 653. This ledger changes by more than 10 lines and is **pending** an independent full-page re-read. |
 | Approval-register reading aid and live-ledger reconciliation, PR #554, 2026-09-30 | The [approval register](../approvals/APPROVAL_REGISTER.md) and this ledger | The register's +4/−2 reading-aid correction was independently **accepted** on `e0c9a000`; the 98 immutable entries remained byte-identical. This round corrects the stale #542 current pointer, the omitted-ledger pending set, the classification arithmetic and the overbroad #550 empty-diff claim. Main after #554 has 653: 586 accepted readers, one generated report, 55 classified fixtures and eleven pending. This ledger changes by more than 10 lines and is **pending** an independent full-page re-read. |
 | Guard coverage, README and guide re-reads, ledger and standard clarifications, register entries, CONTRIBUTING wording and control-plane delivery, PRs #543, #545, #544, #546, #547, #548, #549 and #550, after #542, 2026-09-29 to 2026-09-30 | [README](../../README.md), [CONTRIBUTING](../../CONTRIBUTING.md), the [offline CI guide](../offline-ci.md), [skill generation standard](../skill-generation-standard.md), [approval register](../approvals/APPROVAL_REGISTER.md), [resumable control-plane backlog](resumable-control-plane-backlog.md) and this ledger | README, CONTRIBUTING and the offline CI guide were **accepted** on `1c2d6f03`, `434c6835` and `640f87b9`; #549's 8-line CONTRIBUTING edit and #544's 2-line standard edit keep acceptance. The register (519) and control-plane backlog (51) stay **pending**. Main after #550 (`8ed228ee`) has 653: 586 accepted readers, one generated report, 55 classified fixtures and eleven known pending. This ledger changes by more than 10 lines and needs an independent full-page re-read. |
 | Register exceptions, guard traceability, host-bridge SDK pin, standard re-read, ledger and reviewer description, PRs #537, #539, #540, #541, #538 and #542, after #531, 2026-09-29, and this update's two owner-decided edits | The [approval register](../approvals/APPROVAL_REGISTER.md), [BER backlog](behavioral-eval-runner-backlog.md), [delivery control-plane guide](../../tools/aegis_delivery_control/README.md), [host feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md), [Stage 4A offline review](../evidence/setup/issue-101-package-4a-offline-review.md), [skill generation standard](../skill-generation-standard.md), `library-diff-reviewer/SKILL.md` and this ledger | The standard was **accepted** on `5e4cdd4` (pending to accepted) and this ledger on `51860f3`; `library-diff-reviewer` (4 net) keeps acceptance. The control-plane guide (15) and both evidence pages (47 and 13, each with a new section) become **pending**; the register (405) and BER backlog (149) stay pending. Main after #542 (`22a6b7a`) has 653: 583 accepted readers, one generated report, 55 classified fixtures and fourteen known pending. |
