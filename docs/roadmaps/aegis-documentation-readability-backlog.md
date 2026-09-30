@@ -11,7 +11,10 @@ dated history, oldest first, and no dated snapshot is rewritten. The
 **skill-eval round recorded below** supersedes those totals without rewriting
 the history: it adds three new pending pages, giving **656** tracked Markdown
 files and **16** pending, with the accepted, generated and
-synthetic-fixture counts unchanged.
+synthetic-fixture counts unchanged. (A later merge, PR #577, adds one further
+tracked page — `docs/evidence/session-continuation-2026-09-30.md` — so the tip
+count is now **657**; that page joins the pending set, and this sentence is left
+as the dated snapshot it is.)
 
 **This round's determination: no acceptance was conferred, and two erroneous
 ones were corrected.** The round was
