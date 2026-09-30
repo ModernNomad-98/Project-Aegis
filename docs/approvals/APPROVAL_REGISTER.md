@@ -2583,6 +2583,27 @@ the entry governs.
 - **Expiry / use limit:** One maintenance package; consumed at its merge,
   which a later lifecycle event records. No calendar expiry stated.
 
+> **Correction — 2026-09-30, AEGIS-APR-099.** The `Reason` above states that
+> the real protection is inline checks in `storage.py` "that raise inside the
+> same database transaction". That is **false** for at least one path:
+> `storage.py`'s `_record_effect_observation` calls `request.validate()` and
+> `authority.verify_source_control_evidence(...)` **before** `BEGIN
+> IMMEDIATE`, and the ordering is identical at this grant's own delivery
+> commit `2bb44db2`, so the sentence was false when written. It was **not**
+> one of the three statements this grant's `Scope allowed` required, and
+> AEGIS-APR-099 deleted it from the two delivered files. Read the `Reason`
+> above with this note.
+>
+> **On the recorded certification.** This grant's own entry is left
+> **byte-unchanged**; only additions were made, and no entry text anywhere was
+> edited. The certification recorded in the readability ledger, however, is a
+> **hash over the byte range `### AEGIS-APR-001` through the last byte before
+> `### AEGIS-APR-099`**, and this note is inserted **inside** that range, so
+> that range no longer hashes to `c80d02f5…`. That is expected growth on an
+> append-only register, **not** a tamper signal: re-verify by comparing
+> **entry bytes**, not the range hash. APR-086's own entry is 7,514 bytes and
+> hashes to `588919ce…` at both the certified commit and here.
+
 ### AEGIS-APR-089: PR #528 protected gate-guard exception
 
 - **Event:** GRANT.
