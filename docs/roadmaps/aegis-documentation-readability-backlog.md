@@ -63,6 +63,21 @@ lines, so the ledger itself returns to **pending** and needs its own
 independent full-page re-read against [Acceptance for each
 page](#acceptance-for-each-page).
 
+Two authorities outside this ledger confirm the determination rather than
+weakening it. [CONTRIBUTING](../../CONTRIBUTING.md), in **Write documentation
+for a new reader** rule 6, states that the pull request must "name the pages
+reviewed and any pages still waiting for the repository-wide readability
+sweep" and "Ask an independent reviewer to describe the component's purpose
+and normal use from the documentation alone, then correct any gap they find":
+PRs #555, #557, #558, #559 and #560 named no independent reviewer, so by the
+contributor-facing rule as well as this ledger's rule no page of theirs can
+have passed. And the 10-line rule carries no decision number: it rests on
+dated owner decisions (2026-09-27, refined 2026-09-28 and 2026-09-29),
+recorded here and in the [open-decisions
+index](aegis-open-decisions-2026-09-23.md); the step-0 reconciliation record
+names this backlog nowhere and its highest decision is D71, so there is no
+D-number to cite for it.
+
 The two component guides,
 root guide and documentation index have received bounded readability work;
 the [delivery batches](#documentation-batches) identify what was checked.
