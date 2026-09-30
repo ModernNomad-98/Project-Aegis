@@ -67,8 +67,7 @@ engine denies an unknown transition, a disallowed state pair or event variant,
 and any change to a terminal state, but every production caller reports the
 full guard list as satisfied, so the engine's guard comparison never denies a
 production call. The checks that decide whether a guard holds are inline in
-`storage.py` and the authority and contract checks it calls; they raise inside
-the same database transaction that would record the event.
+`storage.py` and the authority and contract checks it calls.
 [`tests/test_guard_traceability.py`](tests/test_guard_traceability.py) pins
 that calling pattern and maps each transition-guard pair to its inline check
 and to a test that is denied when the guard fails.

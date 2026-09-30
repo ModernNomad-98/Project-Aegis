@@ -2917,3 +2917,71 @@ the entry governs.
   `receipt accounting transition is not permitted` branch in `storage.py`
   is recorded in the control-plane backlog as a note for CP-WP-003, because
   removing it would be a runtime change that AEGIS-APR-086 forbids.
+
+### AEGIS-APR-099: Correction of an un-required clause in the AEGIS-APR-086 guard documentation
+
+- **Event:** GRANT; a bounded correction, not a reopening of AEGIS-APR-086.
+- **Status at recording:** ACTIVE from the owner's 2026-09-30 answer.
+- **Date / Grantor:** 2026-09-30 / Peter Nguyen.
+- **Reason:** AEGIS-APR-086 froze guard documentation in
+  `tools/aegis_delivery_control/engine.py` and
+  `tools/aegis_delivery_control/README.md`, and AEGIS-APR-098 records it
+  consumed. An audit of every owner grant that freezes documentation wording
+  found that its **`Scope allowed` requires exactly three statements**: that
+  the transition guard list is advisory; that it is a declarative catalog
+  mirrored by authoritative inline checks in `storage.py`; and that the
+  state-pair, event-variant and terminal-state checks are the engine's live
+  controls. The delivered text added a **fourth, un-required clause** —
+  that those checks "raise inside the same database transaction that would
+  record the event". That clause is **false**:
+  `storage.py`'s `_record_effect_observation` calls `request.validate()` and
+  `authority.verify_source_control_evidence(...)` **before** `BEGIN
+  IMMEDIATE`, and the ordering is identical at AEGIS-APR-086's own delivery
+  commit `2bb44db2`, so the clause was false when written. It is not a
+  stated limitation of the synthetic kernel: the package does contain
+  transactional raises; this method's deny path is simply not one.
+  No owner-approved source states the transaction relationship — the design
+  document contains no match — so there was nothing to point readers at
+  instead. Because the frozen clause is not among the three required
+  statements, deleting it **restores** the grant's own intent rather than
+  contradicting owner-approved wording, which is why this is a correction and
+  not a revocation.
+- **Owner decision:** Asked on 2026-09-30 whether to correct the clause, the
+  owner selected the option: "Grant the narrow correction scoped to the EXTRA
+  clause only — delete the un-required false clause in `engine.py` and
+  `README.md`, leaving all three required statements byte-identical, and
+  correct the Register's Reason premise."
+- **Scope allowed:** Exactly two prose deletions, no others:
+  - `tools/aegis_delivery_control/engine.py`: remove the clause "raise inside
+    the same database transaction that would record the event" from the module
+    docstring, leaving the inline-check statement and the sentence that
+    follows it intact.
+  - `tools/aegis_delivery_control/README.md`: remove the same clause from the
+    guard explanation, leaving the inline-check statement and the link to
+    `tests/test_guard_traceability.py` intact.
+  - Append this entry. The Reason premise in AEGIS-APR-086 is corrected **by
+    this entry**, not by editing AEGIS-APR-086, whose entry is immutable
+    under the register's own preamble.
+  The three statements AEGIS-APR-086 actually required are unchanged byte for
+  byte.
+- **Scope FORBIDDEN:** No runtime behaviour change of any kind: no change to
+  `storage.py`, to the engine's decisions, to any other runtime path, or to
+  any non-docstring code. No edit to AEGIS-APR-086's own entry. No edit to
+  AEGIS-APR-086's other delivery paths (`dispatch.py`, `test_engine.py`,
+  `test_guard_traceability.py`) — the traceability table that pins the guard
+  pairs is not to be altered, because it pins verified behaviour. No change to
+  any other wording in the two files. No provider call, credential, real-host
+  proof, real dispatch, CP-WP-003 or CP-WP-004 work, or spent-grant renewal.
+- **Evidence:** The owner's 2026-09-30 answer, quoted above, in the Project
+  Aegis conversation. The false clause was located by a multiline-aware search
+  over tracked files, which found **three** locations where a line-oriented
+  search found one: `tools/aegis_delivery_control/engine.py`,
+  `tools/aegis_delivery_control/README.md` and this register's AEGIS-APR-086
+  Reason. Behaviour neutrality is demonstrated the same way AEGIS-APR-086's own
+  delivery demonstrated it: `ast.dump` of the module with docstrings stripped
+  is identical before and after the change, so the parsed code structure is
+  unchanged. The focused suites `test_guard_traceability` and `test_engine`
+  pass (27 tests, OK), and `scripts/validate-skills.py` reports 195 valid with
+  0 warnings.
+- **Expiry / use limit:** One package; consumed at its merge, which a later
+  lifecycle event records. No calendar expiry stated.
