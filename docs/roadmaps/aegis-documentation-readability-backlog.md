@@ -1862,9 +1862,10 @@ the [delivery control-plane
 guide](../../tools/aegis_delivery_control/README.md), the [host-feasibility
 evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md), the
 [Stage 4A offline
-review](../evidence/setup/issue-101-package-4a-offline-review.md), and this
-ledger, which as in the #554 snapshot is named here but excluded from the
-number. The [open-decisions
+review](../evidence/setup/issue-101-package-4a-offline-review.md) and this
+ledger — thirteen entries in all, and this ledger is counted in that number.
+As at #554, whose `11` likewise counted the ledger, the list is the pending
+set itself. The [open-decisions
 index](aegis-open-decisions-2026-09-23.md) and the
 `aegis-backlog-forecast.md` link references in this paragraph are not separate
 pending pages, so the list is not double counting. The arithmetic closes:
