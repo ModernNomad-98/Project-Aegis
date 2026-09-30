@@ -63,8 +63,10 @@ declares an install script or ordinary `dependencies` entry. The SDK declares ex
 `0.3.281` platform packages and peer ranges for `@anthropic-ai/sdk >=0.93.0`,
 `@modelcontextprotocol/sdk ^1.29.0`, and `zod ^4.0.0`. Compatible registry
 examples `0.128.0`, `1.30.1`, and `4.6.5` do not fix the actual transitive
-tree; the Model Context Protocol (MCP) peer alone declares 16 direct
-dependencies. Both inspected
+tree; the Model Context Protocol (MCP) peer alone declares 17 direct
+dependencies (the lockfile committed at `tools/aegis_setup/host_bridge/package-lock.json`
+pins `@modelcontextprotocol/sdk` at `1.30.1` and lists 17 `dependencies`).
+Both inspected
 archives point to Anthropic commercial terms; the three peer examples declare
 MIT. Registry signatures were observed but not cryptographically validated.
 The manifest's explicit tested-wrapper list ends at `0.3.280`. No exact
