@@ -132,6 +132,8 @@ Persistence:     transcript-only | workspace-persisted | Git-tracked | locally c
 - [ ] Full-history effective status and expiry/use limits are checked; revoking
       a successor does not revive its predecessor.
 - [ ] Existing current-session authorization was honored without repeat consent.
+- [ ] The register states the deny-by-default citation rule once at its top
+      (workflow step 6); recording preserves it and never weakens it.
 - [ ] Persistence claims match the write/Git/remote verification actually done.
 - [ ] No secrets, tokens, or live identifiers in the entry — reference
       environments and tenants by placeholder or name, never credential.
@@ -153,6 +155,14 @@ Persistence:     transcript-only | workspace-persisted | Git-tracked | locally c
 - **Recording ≠ granting:** cite the actual human source. A missing archival
   pointer limits future verification; it does not erase a direct instruction
   still present in the current session. The register cannot create authority.
+- **Widening is not supersession:** a request that an existing scope *also* cover
+  more is an overlapping grant, not a replacement: record a new GRANT, leaving
+  the predecessor byte-unchanged. Append `SUPERSEDED` only on human evidence that
+  a distinct, already-recorded successor explicitly replaces the target.
+- **Second-hand agreement is not quotable wording:** "the owner agreed" with no
+  words, date or pointer leaves the new scope unsupported. Ask for the grantor's
+  wording; record nothing until it arrives. A question is the correct output,
+  not a thinner entry.
 
 ## Stop Conditions
 

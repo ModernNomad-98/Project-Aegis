@@ -44,14 +44,31 @@
       }
     },
     {
-      "id": "edge-supersede-not-rewrite",
+      "id": "edge-widen-without-words-asks-not-writes",
       "type": "should_trigger",
-      "prompt": "The staging-only approval APR-013 should now also cover the demo environment — the owner just agreed. Update the register.",
+      "prompt": "The staging-only approval APR-013 should now also cover the demo environment. The owner just agreed to it.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Writes a NEW entry for the widened scope citing the new grant, and appends a SUPERSEDED lifecycle event naming APR-013 and the new grant ID, leaving every old field unchanged.",
-          "Does not edit APR-013's scope in place — append-only history is what makes the register auditable."
+          "Does not write, and does not present as a record, an entry for the widened scope: the approval arrives second-hand with no grantor wording, date or pointer, so there is nothing citable to record.",
+          "Asks for the grantor's exact words or a retrievable pointer to them, and treats that scoped question as the output rather than an entry.",
+          "Does not edit APR-013's scope in place: register entries are immutable and append-only, so no old field is rewritten.",
+          "States the mechanism it will use once the wording arrives - a new GRANT entry for the widened scope, leaving APR-013 byte-unchanged.",
+          "Does not append SUPERSEDED for a mere widening: under the register reference, overlap alone is not supersession, and nothing yet shows APR-013 is replaced."
+        ]
+      }
+    },
+    {
+      "id": "edge-widen-with-evidence-appends-not-edits",
+      "type": "should_trigger",
+      "prompt": "In the PR thread the owner wrote: 'APR-013 is replaced - staging and demo now run under one approval.' The comment is at https://github.com/ModernNomad-98/Project-Aegis/pull/42#issuecomment-999. Record it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Quotes the owner's exact wording as the new grant's Scope allowed, with no paraphrase widening or narrowing.",
+          "Writes a NEW grant entry for the staging-and-demo scope with a fresh ID distinct from APR-013.",
+          "Appends a SUPERSEDED lifecycle event naming target APR-013 and the new grant as successor, citing the human evidence and its retrievable pointer.",
+          "Leaves every field of APR-013 byte-unchanged - append-only history is what makes the register auditable."
         ]
       }
     },
