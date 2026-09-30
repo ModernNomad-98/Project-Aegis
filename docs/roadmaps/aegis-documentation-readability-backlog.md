@@ -32,7 +32,10 @@ are added plus deleted lines from `git diff --numstat`.
   review certified append-only immutability and the corrected reading aid (98
   entries byte-identical, normalized SHA-256
   `c80d02f5987747728a1eb28573e822250e80973d6c577039ad8bf67d2c52591a`), not the
-  whole page. **Moves to pending.** The #554 paragraph below recorded this page
+  whole page. **That range hash is since superseded** — PR #569 and PR #571
+  appended inside the certified range, so it no longer reproduces; the register
+  carries the re-verification convention under `AEGIS-APR-086`.
+  **Moves to pending.** The #554 paragraph below recorded this page
   as accepted on the strength of a **targeted** review. That was wrong: under
   [Targeted edits to accepted
   pages](#remaining-page-review-in-larger-batches), a targeted review cannot
@@ -1822,7 +1825,13 @@ review accepted the corrected reading aid and verified that all 98 immutable
 entries were byte-identical (normalized SHA-256
 `c80d02f5987747728a1eb28573e822250e80973d6c577039ad8bf67d2c52591a`). The register is
 therefore **accepted** on `e0c9a000`; it is the only page that moved to
-accepted in this round.
+accepted in this round. **That range hash is now superseded:** PR #569 and
+PR #571 appended inside that span, so it no longer reproduces. The span is
+`### AEGIS-APR-001` **to end of file at `e0c9a000`** (169,099 bytes, trailing
+newline stripped) — **not** "up to APR-099", which did not exist at that
+commit. This is expected growth on an append-only register, not a tamper
+signal; the register itself carries the re-verification convention (see its
+note under `AEGIS-APR-086`).
 
 The prior current-reading pointer to #542 was stale: its dated snapshot
 records 583 accepted and fourteen pending, whereas the later, dated #550

@@ -2594,15 +2594,32 @@ the entry governs.
 > AEGIS-APR-099 deleted it from the two delivered files. Read the `Reason`
 > above with this note.
 >
-> **On the recorded certification.** This grant's own entry is left
+> **On the recorded certification.** This grant's own entry text is left
 > **byte-unchanged**; only additions were made, and no entry text anywhere was
-> edited. The certification recorded in the readability ledger, however, is a
-> **hash over the byte range `### AEGIS-APR-001` through the last byte before
-> `### AEGIS-APR-099`**, and this note is inserted **inside** that range, so
-> that range no longer hashes to `c80d02f5…`. That is expected growth on an
-> append-only register, **not** a tamper signal: re-verify by comparing
-> **entry bytes**, not the range hash. APR-086's own entry is 7,514 bytes and
-> hashes to `588919ce…` at both the certified commit and here.
+> edited. The certification recorded in the readability ledger hashes the
+> register text **from `### AEGIS-APR-001` to the end of the file at that
+> commit**, with the trailing newline stripped — verified: that span at
+> `e0c9a000` is 169,099 bytes and yields `c80d02f5…` exactly. (Note it is
+> **not** "up to `### AEGIS-APR-099`": APR-099 did not exist at `e0c9a000`,
+> which held 98 entries ending at APR-098.) Because later commits appended
+> inside that span, it no longer reproduces, which is expected growth on an
+> append-only register and **not** a tamper signal. To re-verify, compare
+> **entry text**, using an explicit convention — a span that ends before this
+> note, since the note is the thing being added:
+>
+> > **Entry hash convention.** The entry text runs from its `### AEGIS-APR-NNN`
+> > heading through the **last non-blank line that is not part of an appended
+> > `>` note** — every field body included, so a wrapped field's continuation
+> > lines count as part of it — with no trailing newline. (Cutting instead at
+> > the last line that opens a field, `- **`, would drop continuation lines
+> > that most entries carry, so it is not the convention.)
+>
+> Under that convention APR-086's entry is **7,512 bytes** and hashes to
+> **`b0bff36194f1048b4aaee0aac36acf11a3b51bc1b1c506549556692c6c215f55`**, and it
+> does so at `2bb44db2` (this grant's delivery), at `e0c9a000` (the certified
+> commit), at `99556551`, and here. A span that instead runs to the next
+> heading now includes this note and will not match — that is the growth, not
+> a defect.
 
 ### AEGIS-APR-089: PR #528 protected gate-guard exception
 
