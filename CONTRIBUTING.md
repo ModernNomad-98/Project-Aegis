@@ -49,8 +49,9 @@ own proven practice, including failures it absorbed during its own construction.
    and [AEGIS-APR-010](docs/approvals/APPROVAL_REGISTER.md#aegis-apr-010-pr-119-protected-file-guard-exception)
    show exceptions limited to those PRs. The one standing exception,
    [AEGIS-APR-047](docs/approvals/APPROVAL_REGISTER.md#aegis-apr-047-standing-gate-guard-exception-for-four-ber-files),
-   covers only four named Behavioral Eval Runner (BER) files and applies only
-   when all its conditions are met. Never weaken the guard to make it green.
+   covers only PRs whose changed protected paths are all among four named
+   Behavioral Eval Runner (BER) files and applies only when all its conditions
+   are met. Never weaken the guard to make it green.
    *Why:* the owner controls merge authority, including standing delegation. This
    source-specific grant overrides generic skill defaults here and does not transfer
    with copied skills. See the [merge policy](docs/reconciliation/auto-merge-policy.md).
@@ -216,7 +217,8 @@ agent definitions in any `.claude/agents/` directory (root or nested,
 recursively), Claude Code and Git configuration at any depth
 (`.claude/settings.json`, `.claude/settings.local.json`, `.mcp.json`,
 `.claude/commands/`, `.claude/hooks/`, `.claude-plugin/` and `.gitattributes`),
-the Behavioral Eval Runner and approval/evidence tooling under
+every path the protected-file guard matches, the Behavioral Eval Runner and
+approval/evidence tooling under
 `tools/`, pinned dependency files, the
 [owner approval register](docs/approvals/APPROVAL_REGISTER.md),
 [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) §5, and
