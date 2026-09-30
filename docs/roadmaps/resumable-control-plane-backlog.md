@@ -38,7 +38,9 @@ Universal Time), URI (uniform resource identifier), JSON (JavaScript Object
 Notation), SHA (a Git commit hash) and WAL/SHM (SQLite write-ahead-log and
 shared-memory sidecar files).
 
-**Current status, 2026-09-25:** the repository contains an offline, synthetic
+**Current status, 2026-09-25:** (this is a dated label, not the current state; the
+[current package ledger](#5-separate-work-packages-current-status) records later
+dispositions) the repository contains an offline, synthetic
 state and recovery kernel and an offline negative capability proof. Merged
 [PR #294](https://github.com/ModernNomad-98/Project-Aegis/pull/294) repaired two
 shared SQLite database (a local transactional file store) claim defects:
@@ -403,7 +405,8 @@ and every mutation verifies raw event-chain integrity before trusting projection
 Unrelated item/effect work remains eligible after a fully settled final failure.
 The package suite passed 81 tests locally. Independent QA and security rereviews
 accepted C05 with no remaining implementation finding; CI wiring remains the
-documented, separately authorized follow-up below. C09
+documented, separately authorized follow-up below (2026-09-30: since discharged —
+the suite now runs in repository CI). C09
 now
 includes injected failure after settlement/slot writes before commit and after
 commit before acknowledgement: the former rolls back fully and retries to one
@@ -420,7 +423,13 @@ durability and any real authority/execution capability remain unavailable, not
 inferred from these process-level tests.
 The delivery-control suite is not yet wired into repository CI; AEGIS-APR-004
 does not authorize workflow changes, so CI gating remains a declared follow-up
-rather than a silent scope expansion.
+rather than a silent scope expansion. **(Correction, 2026-09-30: the first clause
+is no longer true. The delivery-control suite *is* wired into repository CI —
+`.github/workflows/validate-skills.yml` runs it through
+`scripts/ci/record-check.py delivery-control` on every pull request and every push
+to `main`, plus a Windows owner diagnostic. The sentence is preserved as written
+because it was accurate when written; the wiring landed under its own separate
+authorization, so AEGIS-APR-004's limit on workflow changes was not exceeded.)**
 
 ### 5.3 Paused CP-WP-002 checkpoint — 2026-09-21
 
