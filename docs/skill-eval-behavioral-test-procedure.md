@@ -132,6 +132,35 @@ For every violated assertion, decide **whose fault it is**:
 Attribution is the finding. A case that only a disobedient agent can pass is a
 **skill or case defect**, even though the obedient agent "failed" it.
 
+**A transcript does not always settle this call, and this step must not pretend
+that it does.** Step 5 already allows `indeterminate` for assertions the
+transcript cannot settle, and the same limit applies here: the **case's own
+framing** can decide whether a failure was the agent's fault or the case's. Two
+signals that a violation is **not** the agent's fault, worth checking before
+writing "agent defect":
+
+- **The case's premise may not hold.** If the prompt asserts something about the
+  register, dataset or system that is false *for the fixture the case depends
+  on*, an obedient agent can behave correctly and still fail. Check the premise
+  against the material the case actually supplies — a skill may ship its own
+  fixture, in which case the real repository is **not** the reference.
+- **The prompt's voice may hide whether wording is quotable.** The skill's rule
+  is that **second-hand agreement is not quotable wording** — "the owner agreed"
+  with no words, date or pointer leaves a new scope unsupported. So a
+  first-person prompt ("I just approved it") supplies text that **can** be
+  quoted, while a bare third-person one ("the owner approved it") usually does
+  not, and may need the wording asked for. The same refusal is an **agent**
+  defect under the first and a **case** defect under the second. Judge the
+  prompt's voice, and check whether it carries words, a date or a pointer.
+
+When either signal is present, report the attribution as **provisional**, say
+which premise you could not settle, and leave the assertion's status open. A
+wrong attribution is worse than an open one: it sends the maintainer to fix the
+wrong artifact. This is not hypothetical — the first recorded run produced
+exactly this ambiguity, and its own author made a false finding by checking a
+case's premise against the wrong file. Both are recorded in the
+[first run record](evidence/skill-eval-run-2026-09-30.md).
+
 ### 7. Record the evidence
 
 Record: the pinned revision, the skill, the case `id`s, the prompts used
