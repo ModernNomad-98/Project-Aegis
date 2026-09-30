@@ -121,7 +121,9 @@ Single source of truth for what skills and subagents exist, what is planned, and
 differ. The backlog below is derived from the **reconciled phase lists**
 ([`docs/reconciliation/step-0-reconciliation-v4.md`](reconciliation/step-0-reconciliation-v4.md) §3)
 and the **category backlogs** under [`docs/skills/`](skills/). `scripts/validate-skills.py`
-checks that every *implemented* skill is listed here and in `README.md`.
+checks that every *implemented* skill is listed here and in `README.md`. At this
+revision, it discovers **195 implemented skills**; the validator-checked README
+roster groups them into **23 discipline families**.
 
 <details>
 <summary>Delivery status and construction history through D64 (expand)</summary>
@@ -329,9 +331,9 @@ each other and the Phase 1 pack). Two edit behavior-steering artifacts and are
 | `agent-governance-audit` | #280 | yes | Per-control PASS/FAIL/UNVERIFIABLE compliance audit of one AI-assisted change from primary evidence (PR timeline incl. who armed auto-merge, commits, CI runs); closeout claims cross-checked, never trusted; missing evidence is never a PASS. |
 | `ai-task-decomposer` | #266 (D69) | yes | Splits a broad goal, epic or approved spec into ordered, PR-sized tasks, each with one intent, an observable done criterion and the evidence that proves it, likely files or layers, a provisional change class, risks, dependencies and human-approval flags; oversized tasks split again; unknowns become spike tasks or owner questions. Plans only; hands each task to `change-classification-gate` when work starts. |
 
-Trigger-overlap coverage (`evals/trigger-evals.json`) ships for all four: the
-governance cluster discriminates internally (umbrella vs matrix vs memory vs
-audit) and against the Phase 1 pack (`human-approval-boundary`,
+Trigger-overlap coverage (`evals/trigger-evals.json`) ships for all five. The
+original four discriminate internally (umbrella vs matrix vs memory vs audit)
+and against the Phase 1 pack (`human-approval-boundary`,
 `source-of-truth-reconciler`, `agent-startup-context-gate`,
 `agent-instruction-consolidator`, `ai-closeout-reporter`,
 `change-classification-gate`), Phase 2's `code-reviewer` and
