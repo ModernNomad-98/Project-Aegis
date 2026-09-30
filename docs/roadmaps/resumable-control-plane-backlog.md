@@ -286,9 +286,44 @@ call passes exactly the required set, and the inline checks in `storage.py`
 enforce the guards. The package documents that, pins the current calling
 contract with one test, and adds a traceability test table mapping each of
 the 69 transition-guard pairs to a named negative test, with no runtime
-behaviour change. Status: **AUTHORIZED, not yet delivered.** Making the
+behaviour change. Status: **DONE, delivered 2026-09-29.** Making the
 engine enforce guards computed from the checks that actually ran (option (a))
 is now an entry criterion for CP-WP-003.
+
+**Delivered 2026-09-29.** [PR #539](https://github.com/ModernNomad-98/Project-Aegis/pull/539)
+merged at exact head `df1906534fb8d696a1e15837b8fb115fc12a3d0e` as
+`2bb44db234fa8f98c8e84110528eabb982ce79f7`. It changed
+`tools/aegis_delivery_control/engine.py` (+39/−2),
+`tools/aegis_delivery_control/README.md` (+14/−1) and the new
+`tools/aegis_delivery_control/tests/test_guard_traceability.py` (+681): 734
+added and 3 deleted lines, inside the grant's 800-added-line cap and its
+one-package limit, both demonstrated directly by the line counts and the
+three changed paths. The grant's 12-active-hour cap is recorded as the
+implementer's attestation and is not independently verifiable from the
+repository. `engine.py`'s parsed code structure is unchanged once
+its docstrings are removed, so the package is behaviour-neutral:
+`storage.py`, `dispatch.py`, `test_engine.py` and every other runtime path
+are untouched. An independent review of the exact head returned SHIP
+([comment](https://github.com/ModernNomad-98/Project-Aegis/pull/539#issuecomment-5897366819));
+all five checks passed
+([run 36619296295](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36619296295))
+and no `gate-guard` exception was needed, because
+`tools/aegis_delivery_control/` is not a protected path. AEGIS-APR-086 is
+recorded as consumed by AEGIS-APR-098, which is the separate reviewed
+governance change the grant required. Option (a), evidence-computed guards,
+remains an entry criterion for CP-WP-003 and is not authorized.
+
+**Note for CP-WP-003 (not authorized work).** The #539 reviewer recorded two
+non-blocking findings. First, in
+`tools/aegis_delivery_control/tests/test_guard_traceability.py` around lines
+293–296, `test_t03_occupied_slot_denies_other_run_intent` is denied by the
+durable-state check, not by the slot check, so the `commit_intent` slot site
+is traced but never exercised; the fix is to assert that run-2's readiness
+blockers include `OPERATION_SLOT_OCCUPIED`. Second, the
+`receipt accounting transition is not permitted` branch in `storage.py`
+appears unreachable. Removing or reworking it would change runtime
+behaviour, which AEGIS-APR-086 forbids, so it is carried here as a CP-WP-003
+input rather than acted on.
 
 No later package is authorized by this register or by CP-WP-001 acceptance. BER
 integration, if requested, additionally follows BER's current phase/evidence gates.
