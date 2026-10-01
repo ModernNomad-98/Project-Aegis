@@ -243,7 +243,11 @@ Before opening a PR:
 - Sign off every commit under the [Developer Certificate of
   Origin](https://developercertificate.org): `git commit -s` adds the
   `Signed-off-by:` line. There is **no CLA** — Apache-2.0 §5 already governs the
-  license of inbound contributions. CI enforces DCO; fix a missing sign-off with
+  license of inbound contributions. CI enforces DCO, except for two machine
+  authors that cannot sign off — `dependabot[bot]` and `github-actions[bot]`
+  (decision D60 in [the reconciliation
+  record](docs/reconciliation/step-0-reconciliation-v4.md); the exemption is
+  not an authentication boundary). Fix a missing sign-off with
   `git commit --amend -s` or `git rebase --signoff`.
 
 Pull requests from forks run CI with read-only tokens by default.
