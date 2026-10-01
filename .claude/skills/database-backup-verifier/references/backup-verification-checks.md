@@ -57,7 +57,7 @@ Estimated cost: <amount> <currency> for about <duration>
 Restore credential: <VAR_NAME> (value never printed)
 Timing: from restore request to first successful connection
 Parity checks: row counts for <tables>; checksums for <tables or columns>
-Deletion: delete instance and storage by <deadline>; confirm by listing
+Deletion: delete instance and storage by <deadline>; confirm by listing the drill-created resources, and no others
 Stop if: cost rises above the estimate, the target is not empty, or deletion cannot be confirmed
 ```
 
@@ -106,9 +106,11 @@ never print or open the file's contents into the conversation.
 ## 5. After the drill
 
 - Delete the scratch instance and its storage without a final snapshot, and
-  delete any snapshot, automated backup or export it created. List the
-  instances, snapshots and backups in the scratch account again and show
-  that none remain.
+  delete any snapshot, automated backup or export the drill created. The
+  deletion and its proof both cover the drill's own resources only. List
+  them again and show that none remain; in a shared account, never delete
+  and never treat as a failure a resource the drill did not create. The
+  drill is not done until its own resources are shown gone.
 - Record the measured restore time with the data size at the time; a later,
   larger store needs a new drill.
 - If deletion fails or cannot be confirmed, stop, report the open copy of
