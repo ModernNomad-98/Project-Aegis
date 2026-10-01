@@ -52,10 +52,11 @@ text, frozen baseline or unrelated AEGIS item.
 
 **ROUTE-002 disposition, 2026-09-26:** by owner decision, the
 [ROUTE-002 dispositions record](../evidence/route002-dispositions-2026-09-26/README.md)
-closes the §2 triage of ROUTE-002, the audit rule that reports one-way
+closes the §2 (section 2, below) triage of ROUTE-002, the audit rule that reports one-way
 exclusion edges (skill A says "use B instead" but B never names A). 31 edges
 into 23 target skills were reciprocated in three merged batch PRs, and #395
-also closed one edge added by reconciliation decision D64. Of the other 236,
+also closed one edge added by reconciliation decision D64 (a decision recorded
+in the step-0 reconciliation log). Of the other 236,
 235 are census data, not defects, and one is an engine false positive.
 On 2026-09-27, PR #429 (`169e8be`, engine v1.13.2) fixed that false positive
 by matching whole skill names only.
@@ -86,7 +87,8 @@ link above points to its last copy, at commit
 that its five EVAL-004 rows are rejected false positives; its measurements
 are unchanged from `e2f1da0`. The historical counts below are unchanged.
 
-**Baseline files regenerated again, 2026-09-27.** Under AEGIS-APR-065, an owner grant in the
+**Baseline files regenerated again, 2026-09-27.** Under AEGIS-APR-065 (one of the
+approval register's `AEGIS-APR-NNN` entry IDs), an owner grant in the
 [approval register](../approvals/APPROVAL_REGISTER.md), the
 same four files were regenerated with engine v1.13.2 from main
 `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` (186 skills, 316 findings, of
@@ -110,7 +112,8 @@ files remain in git history at
 **Report key extended, 2026-09-28.** Under AEGIS-APR-079, engine v1.13.4
 rescanned the same commit `5dbf7bc9e958d932bd0c5b093ebecfe61be41840` and
 changed only the report's format: the "How to read this report" key now
-explains the rule-table tags (CENSUS, STRUCTURAL), Stage 2 and NOT
+explains the rule-table tags (CENSUS, "census data, not defects"; STRUCTURAL,
+"presence-only checks"), Stage 2 and NOT
 COMMIT-ABLE, auto-invocable, the SIDE-004 side-effect classes and the other
 names used for semantic-review candidates, and spells out "hexadecimal";
 the Coverage section now names `scripts/validate-skills.py`. The findings
@@ -209,11 +212,12 @@ Rules of this register (from the program's operating rules):
   as a roadmap horizon label, 4; P0 2, P1 96, info 311). Route graph
   **byte-identical** — re-measured under v1.13.0 rather than carried over:
   SHA-256 (Secure Hash Algorithm 256) fingerprint `6c844eb6c35e1b40…`, 184 nodes / 968 edges, topology and bytes both
-  unchanged (the route graph carries no tool-version provenance). Validator:
-  184 skills valid, 0 warnings. Audit self-tests: **69** assertions pass (57 on
-  the uncorrected engine, then +9 typed-target regressions, then +3 closing the
-  automatic review findings below). Validator gate self-tests: 91 assertions
-  pass.
+  unchanged (the route graph carries no tool-version provenance). The three
+  figures that follow are measured at PR #89's merge `000352f5`, not today:
+  validator 184 skills valid, 0 warnings; audit self-tests **62** assertions
+  pass (50 on the uncorrected engine, then +9 typed-target regressions, then +3
+  closing the automatic review findings below); validator gate self-tests 91
+  assertions pass. Re-run any of the three for its current value.
 - **Corrected engine version — `1.13.0`.** The type-collapsing engine that
   produced the AEGIS-060 false positives remains historically identified as
   **v1.12.0**, and every frozen artifact recording 1.12.0 is left exactly as it
@@ -301,7 +305,7 @@ their materiality is unconfirmed.
 
 | Audit rule | Count | Surfaces | Maps to | Effect on the existing ID |
 |---|---:|---|---|---|
-| APPR-002 | 1 | `project-orchestrator/references/project-state-template.md:140` — worked example grants `Scope allowed: Build the v1 scope` at brief-approval time | AEGIS-003, AEGIS-008 | **Root cause upgraded to repository-verified**: the template's own example teaches requirements-approval→build-authorization laundering |
+| APPR-002 | 1 | `project-orchestrator/references/project-state-template.md:140` (184-skill baseline line number; the A-001 row) — worked example grants `Scope allowed: Build the v1 scope` at brief-approval time | AEGIS-003, AEGIS-008 | **Root cause upgraded to repository-verified**: the template's own example teaches requirements-approval→build-authorization laundering |
 | STATE-005 | 2 | same template: `## MVP scope (approved)` (minimum viable product) narrative sections (template + worked example) with no supersession mechanics | AEGIS-002, AEGIS-006 | Confirms the residue left after reconciliation decision D54: append-only contract coexists with narrative sections that cannot be updated append-only |
 | ROUTE-003 | 1 | `project-orchestrator/SKILL.md` Stage-2 route (spec → prioritization → commitments; planner absent) | AEGIS-035, AEGIS-045 | **Root cause confirmed on current main** exactly as the handoff recorded |
 | VOCAB-002 | 4 | `roadmap-under-uncertainty-planner` description, body ×2, reference sheet — "committed/planned/exploratory", "Now (committed)" | AEGIS-044, AEGIS-039 | **Root cause confirmed on current main**: committed-as-horizon vs commitments-skill's reserved meaning |
@@ -313,8 +317,8 @@ their materiality is unconfirmed.
 Rules that fired zero times on the live corpus (SIDE-001..003, APPR-001,
 APPR-003, STATE-001..004, VOCAB-003, PARITY-001..002, EVAL-001..003,
 ROUTE-001, REF-001..003) are each proven ABLE to fire by fixture
-(`scripts/tests/test_audit_skill_contracts.py`, 54 assertions): a zero is a
-scanned zero, not an unscanned one.
+(`scripts/tests/test_audit_skill_contracts.py`, 48 assertions at this baseline
+`469d4e5`): a zero is a scanned zero, not an unscanned one.
 
 ## 4. Semantic-review coverage record
 
@@ -334,7 +338,11 @@ scanned zero, not an unscanned one.
 
 ## 5. Remediation-batch adjustments recommended by this baseline
 
-The planned PR 2..11 sequence stands. Three adjustments:
+The planned PR 2..11 sequence stands — those are the baseline's own
+remediation-batch numbers, not GitHub PR numbers (PR 2 is not otherwise
+described here; PR 3 = approval taxonomy, PR 4 = event model / append safety,
+PR 5 = shared vocabulary, PR 6 = legibility, PR 9 = roadmap ↔ commitments,
+PR 11 = behavioral-eval pilot). Three adjustments:
 
 1. **PR 3 vs PR 4 both touch `project-state-template.md`.** Keep the
    boundary: PR 3 (approval taxonomy) corrects the Approvals-section worked
