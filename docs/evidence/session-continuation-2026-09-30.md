@@ -64,6 +64,19 @@ the skill's twelve cases were **not run** and stay `UNRUN`. Two findings
 survived; a third was **withdrawn** because its premise was checked against the
 wrong file.
 
+**Correction (added 2026-09-30, after this record was written): the outcome line
+above is not a score, and its figures are unreproduced.** "1/4, 4/5, 3/3" are
+three **per-case observations**, each from one unrepeated session — not a
+rate, and not reproducible. The evidence page's new
+[Reproducibility status](skill-eval-run-2026-09-30.md#reproducibility-status)
+records why: no model, provider or prompt configuration was captured, the
+transcripts were not committed, and the tested revision's `SKILL.md` was
+**changed afterwards** (#585), so the tested configuration no longer exists on
+`main`. A later, equally unrecorded re-run observed 4/4 twice on the unmodified
+skill and 2/4 and 3/4 on the edited one, so the figure above is **not
+corroborated** and must not be cited as a score. The run's per-case finding is
+unaffected: it rests on the case text, and #585 acted on it.
+
 **Then:** the rest of the session was spent working the documentation
 readability backlog. **10 of the 13 pending pages** have had an independent
 full-page review. **Three have NOT**, and are the immediate backlog:
@@ -257,3 +270,29 @@ already declared correct.
   recorded in the previous handoff (an anchor-resolution CI check, and a
   catalog count guard). Both would live under `scripts/` and need an owner
   exception.
+
+---
+
+## 8. Corrections appended to the record above
+
+**Dated corrections, added after the handoff.** This section is append-only; the
+sections above are left as written. It follows the same convention as the
+correction recorded under section 2.
+
+**The run's outcome figures are unreproduced, not a score.** Section 2's outcome
+line ("3 cases in 3 fresh sessions — 1/4, 4/5, 3/3") and section 4.4's
+"1-of-4 result" both report **per-case observations**, each from a single
+unrepeated session. Neither is a rate, and neither can be reproduced: the
+[evidence page](skill-eval-run-2026-09-30.md#reproducibility-status) now records
+that the run names **no model, no provider and no prompt configuration**, that
+its **transcripts are not committed**, and that the tested revision's `SKILL.md`
+was **mutated after the run** (#585). A later, equally unrecorded re-run saw 4/4
+twice on the unmodified skill and 2/4 and 3/4 on the edited one, so the original
+figure is **uncorroborated** and must not be used as a score.
+
+**What is unaffected.** The run reported a skill defect (its Finding 1), and
+#585 acted on it by adding the missing rule; that claim rests on the case's own
+text, not on the count. Section 4.4's first item asked for exactly that
+`SKILL.md` change, so it is answered. What remains is the **preventive** fix:
+requiring the execution configuration to be recorded, now in
+[step 7 of the procedure](../skill-eval-behavioral-test-procedure.md#7-record-the-evidence).

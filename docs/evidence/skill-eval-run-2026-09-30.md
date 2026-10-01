@@ -181,6 +181,48 @@ Recorded because a run's method is part of its evidence:
   (reproduced above) and for the transcripts themselves; **the transcripts are a
   known gap**, stated here rather than glossed.
 
+## Reproducibility status
+
+**Added 2026-09-30, after the run was recorded.** This section is an annotation.
+The dated text above is left exactly as written, and nothing here changes a
+figure in it. It records what a review established about that figure's status.
+
+- **No execution configuration is recorded.** This page names no model, no
+  provider and no prompt or decoding settings for the tested agents or the
+  grader, so the environment that produced the numbers cannot be reconstructed.
+- **The transcripts are not committed.** The record says so itself, under Method
+  deviations.
+- **The `1 of 4` figure therefore cannot be re-derived from this page.** No
+  reader can reproduce it from the text.
+- **A later re-run did not corroborate it.** That re-run was equally unrecorded,
+  and it observed **4/4 twice on the unmodified skill** and **2/4 and 3/4 on the
+  edited skill**. It is not independent evidence either, because it fails the
+  same recording requirement; but it does mean the original figure is
+  **uncorroborated**.
+- **The score is not reproducible even in principle.** The revision this run
+  names is `c97c060d`, but the skill's `SKILL.md` was changed **after** that
+  revision (merge `5c806348`, PR
+  [#585](https://github.com/ModernNomad-98/Project-Aegis/pull/585)), adding the
+  positive companion to the refusal rule that Finding 1 below describes as
+  missing. The blob at
+  `c97c060d:.claude/skills/scoped-approval-register/SKILL.md` is `dc68fd1f`;
+  the same path at `origin/main` is `ef9b32df`. A later reader cannot re-run the
+  tested configuration, because it no longer exists on `main`. The skill's
+  `evals/evals.json` is **byte-identical** between the tested revision and
+  `origin/main` (`acee80dd` at both), so the case set is intact: it is the
+  instruction set under test that moved.
+
+**Therefore** the `1 of 4` figure is **UNREPRODUCED**. It is **not corroborated**
+and **must not be cited as a score** — not for the skill, not for the case,
+and not for the library.
+
+**What still stands.** The **per-case finding** does not depend on the figure.
+Finding 1 — that the skill lacked the positive companion to its refusal rule
+— rests on the case's own text and on the skill text at `c97c060d`, both
+quoted above, and an independent maintainer acted on it in #585. The finding
+survived; the number did not. This section deliberately states **no pass rate**,
+because a rate is the claim this record's own boundary forbids.
+
 ## Provenance
 
 Run on 2026-09-30 against `c97c060d`. The cases are the skill's own authored

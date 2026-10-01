@@ -167,6 +167,33 @@ Record: the pinned revision, the skill, the case `id`s, the prompts used
 verbatim, the transcript, the per-assertion verdicts with their transcript
 lines, the attribution, and any change proposed. Cite where the record lives.
 
+**Also record the execution configuration. This is not optional.** A figure
+without it cannot be checked, because nothing identifies what produced it:
+
+| Field | Why it is required |
+| --- | --- |
+| **Agent and host identity** | which agent kind ran it, and whether a chat host or the offline BER drove the session |
+| **Model name and version** | a per-case figure is a claim about *a model on a skill*; with no model recorded it is a claim about nothing |
+| **Decoding parameters** | temperature, top-p, seed and reasoning effort, **where the host lets you set them** |
+| **Date and pinned revision** | the revision alone is not enough, because the skill can change after the run |
+
+**Where a session was driven in a chat host and no model is recoverable, say so
+explicitly** — never silently omit the field — **and mark the run's
+figures unreproducible.** A figure with no model attached is not evidence of a
+rate.
+
+**This page currently mandates an artifact it has no tooling to produce
+reproducibly.** It "authorizes no session, no provider call and no spend", and
+the shipped adapter "denies every session spawn"; so the host is a human or a
+chat agent whose model and decode settings this procedure cannot capture from the
+repository. Until that changes, expect step 7 to be only **partly** satisfiable,
+and state which parts held. That partial answer is the honest output — not a
+filled-in form.
+
+**A figure derived from a single unrepeated session is not evidence of a rate.**
+One run of one case is one observation. Report it as an observation, or do not
+report it; never as a rate, and never as a score for the skill.
+
 A new record under [evidence](evidence/README.md) is a **new tracked page**.
 Under the [readability backlog](roadmaps/aegis-documentation-readability-backlog.md)
 it joins the pending set and the stated totals move with it. Record that rather
