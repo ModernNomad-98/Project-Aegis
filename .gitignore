@@ -4,3 +4,9 @@
 # Python bytecode caches created by running the validators and tests.
 __pycache__/
 *.pyc
+
+# Reserved local scratch path for the resumable control plane. Recommended in
+# later authorized work by docs/design/resumable-control-plane-v1.md; the other
+# two patterns it recommends are already covered above by `__pycache__/` and
+# `*.pyc`.
+/.aegis-control-plane/
