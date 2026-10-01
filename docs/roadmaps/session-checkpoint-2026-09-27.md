@@ -139,3 +139,11 @@ Those records hold the scope and authority; this page does not restate them.
      needs a full-page re-read.
    - Every PR description answers the security line.
    - Use PowerShell for `git` when Bash `git` hangs.
+
+> **Later clarification — 2026-10-01.** Nothing above is changed. The
+> sign-off rule under [How to resume](#how-to-resume) has an unnamed
+> exception. The check requires a `Signed-off-by:` trailer on every
+> commit in the pull request's range, except two machine authors that
+> cannot sign off — `dependabot[bot]` and `github-actions[bot]` — per
+> [D60](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions).
+> That exemption is deliberately **not an authentication boundary**.

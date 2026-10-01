@@ -175,3 +175,12 @@ open-decisions index at this recording; PR #487 is adding them.
      needs a full-page re-read.
    - Every PR description answers the security line.
    - Use PowerShell for `git` when Bash `git` hangs.
+
+> **Later clarification — 2026-10-01.** The sign-off rule under [How to
+> resume](#how-to-resume) above names no exception. The check requires a
+> `Signed-off-by:` trailer on every commit in the pull request's range,
+> except two machine authors that cannot sign off — `dependabot[bot]` and
+> `github-actions[bot]` — as decision
+> [D60](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions),
+> which records that the exemption is deliberately **not an authentication
+> boundary**. The rule above is left as written.
