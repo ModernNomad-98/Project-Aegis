@@ -168,7 +168,10 @@ Persistence:     transcript-only | workspace-persisted | Git-tracked | locally c
 
 - Asked to record an approval that was never actually granted (no quotable
   wording, no evidence) — refuse: the register preserves real grants; it
-  does not manufacture them. This includes backdating entries "so the audit
+  does not manufacture them. This is the negative form of the rule: wording
+  the requester has *already quoted verbatim, with its source*, is sufficient
+  to record — do not refuse a grant merely because the grantor is not
+  present to restate it. This includes backdating entries "so the audit
   passes."
 - The grant's wording is too ambiguous to scope and the grantor is
   unavailable — record nothing yet; a scoped question back to the grantor is

@@ -185,9 +185,12 @@ before proceeding.
    table; show counts and checksums, never row contents.
 10. **Delete the scratch copy and prove it.** Remove the scratch instance
     and its storage without a final snapshot, and delete any snapshot,
-    automated backup or export it created. Then list the instances,
-    snapshots and backups in the scratch account again to show that none
-    remain. The drill is not done until the deletion is shown.
+    automated backup or export **this drill created**. Then list what the
+    drill created in the scratch target to show that none of it remains.
+    Both the deletion and its proof are scoped to drill-created resources:
+    if the target is not a dedicated account, never remove — and never
+    treat as a failure — pre-existing or unrelated resources there. The
+    drill is not done until the deletion of its own resources is shown.
 11. **Report** in the Output Format, including what was not done and why.
 
 When the drill method is a real choice (for example a provider's snapshot
