@@ -3063,3 +3063,75 @@ the entry governs.
   0 warnings.
 - **Expiry / use limit:** One package; consumed at its merge, which a later
   lifecycle event records. No calendar expiry stated.
+### AEGIS-APR-100: Standing commit, push and merge pre-approval
+
+- **Event:** GRANT; a new grant. It does not renew, widen or supersede
+  AEGIS-APR-024, and it changes no other grant.
+- **Status at recording:** ACTIVE. The owner settled the standing question on
+  2026-09-30 by directing that this authority be recorded as **standing** and
+  **forward-only**.
+- **Date / Grantor:** 2026-09-28 / Peter Nguyen. That is the date the owner's
+  words were first written into this repository (commit `36be74b5`); the
+  2026-09-30 direction only records them.
+- **Reason:** The instruction existed only in chat. The open-decisions row that
+  preserves it states at that recording that it "has no register entry", and
+  eleven pages reference or cite it (a search for its wording and its known
+  paraphrases; several state it as an operative rule), so the authority behind
+  this repository's commits, pushes and merges could not be checked from the
+  repository. Recording it closes the gap that earlier produced AEGIS-APR-048
+  and AEGIS-APR-050.
+- **Scope allowed:** The owner's exact instruction, quoted verbatim as recorded
+  in this repository, is: "all commits, push, and merges are pre-approved as
+  long as they passed local tests and green on github actions". It covers
+  commits, pushes and merges for separately authorized Project Aegis
+  source-library work when applicable local tests and GitHub Actions checks are
+  green. For a new head, local checks precede commit/push; exact-head Actions
+  are checked after publication and before merge, because they cannot run on
+  that head before push.
+
+  Relationship to existing grants, all of which remain in force and unchanged:
+  AEGIS-APR-002 and AEGIS-APR-013 (administrator merges, the latter with the
+  green-check condition) and AEGIS-APR-048 (standing administrator merge once
+  checks are green). This entry restates their green condition for commits,
+  pushes and merges and adds no authority beyond it. AEGIS-APR-049 (a green
+  exact-head required-check run satisfies the local-test leg) and
+  AEGIS-APR-050 (merges wait for the Codex review, or for Codex to be confirmed
+  unavailable) continue to apply. AEGIS-APR-047 remains the only standing
+  `gate-guard` exception, and AEGIS-APR-039's delivery rule stands.
+
+  It is a **new grant**, not a renewal or widening of AEGIS-APR-024: that entry
+  quoted a different instruction ("I pre-approve all commit,push, merge from the
+  work in this session ...") and was EXPIRED because it was session-scoped and
+  "is not a standing all-work grant for later sessions", whereas this
+  instruction names no session and the owner has now recorded it as standing.
+
+  **Forward-only.** This grant does not retroactively cover merges made before
+  it was recorded. It is not needed for them: each was independently reviewed
+  and merged at its exact reviewed head under the then-applicable standing
+  grants.
+- **Scope FORBIDDEN:** This delivery grant does not start or enlarge a work
+  package, waive a failed local test or GitHub Actions check, waive a protected
+  `gate-guard` (a protected-path failure still needs a one-time exact-head owner
+  exception, or the standing AEGIS-APR-047 exception where all its conditions
+  hold), waive the independent-review requirement, alter branch protection, arm
+  auto-merge, or authorize provider, host, private-data, deployment or release
+  work. A separate applicable work grant is still needed. It is a grant about
+  delivery mechanics, not a grant of work.
+- **Evidence:** The instruction is recorded verbatim in
+  `docs/roadmaps/aegis-open-decisions-2026-09-23.md` under "Decided on
+  2026-09-28", in the row "Standing chat instruction on commits, pushes and
+  merges", written by Peter Nguyen in commit `36be74b5` ("docs: record later
+  2026-09-28 owner decisions in the open-decisions index",
+  2026-09-28 02:29:04 -0700) and retrievable with
+  `git show origin/main:docs/roadmaps/aegis-open-decisions-2026-09-23.md`. The
+  owner's 2026-09-30 direction to record it as a standing, forward-only new
+  entry is the answer to decision 1 in
+  `docs/evidence/session-continuation-2026-09-30-evening.md`, which is on
+  `main` as of commit `1955c222` (PR #586). That page's section 4 records the
+  owner's choice in the words "Standing, forward-only", and its section 6
+  rule row cross-references the same choice; its section 6 heading calls the
+  section TEMPORARY, so this entry relies on section 4, not section 6.
+- **Expiry / use limit:** None stated. It survives this session; the owner
+  recorded it as standing on 2026-09-30. It may be revoked or superseded by a
+  later lifecycle event, which must be appended rather than applied by editing
+  this entry.
