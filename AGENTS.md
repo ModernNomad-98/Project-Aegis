@@ -43,6 +43,18 @@ This teaching step never relaxes a manual-only boundary or substitutes
 explanation for evidence or approval.
 Evidence over assumption: verify against the repo and live systems before acting, and treat volatile facts (versions, counts, tool behavior) as verification items, not truths.
 
+**Audit your own state; assume nothing about your own work.** This applies to every agent — coordinator or subagent — working in this repository. Prior-turn output is evidence of the past, not of the present. Re-observe state before relying on it, and verify your own claims before stating them. No claim is exempt because it is your own: the record you are most confident in is the one to re-check.
+
+- **Re-observe state in the current turn.** Never assert that a ref, branch, file, count, or tree cleanliness still holds because it held earlier. Re-run the command.
+- **Cite a claim or label it unverified.** Every factual assertion carries the command and its observed output, or an explicit "unverified assumption". State membership and quantities are claims like any other.
+- **Read set membership from the artifact that defines the set**, never from a listing that merely mentions the same names.
+- **Count with a command**, never by reading a diff, log, or summary — especially a truncated one.
+- **Exists is not valid.** A preserved or generated artifact must be proven consumable: `git apply --check` (`-3` when its base has moved), a read-back after a write, a resolution after `--verify`.
+- **Resolve indirection before trusting it.** Confirm a named remote, path, or ref actually exists and is live (`git remote -v`, `Test-Path`, `--verify`) rather than assuming the name implies the thing.
+- **Audit against external artifacts, not by re-reading your own reasoning.** Self-review reuses the assumption that is wrong; only the artifact breaks the loop.
+
+A rule written down is not a behavior change: it holds only if it is executed as commands at the moment of reporting, not recalled as an intention.
+
 **Source-library owner preference: name and time every work item.** In Role A,
 before each agent or delegated subagent starts an item, tell the owner the
 item's name and estimated active-work duration (ETA), and record its start
