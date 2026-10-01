@@ -201,7 +201,9 @@ Gap audit (D10, 2026-07-07) of roadmap category 06
 items #181–#230) against the **16 shipped Phase 5 skills** — the 13 canonical above plus
 `integration-test-designer` (#184), `api-contract-test-designer` (#185), and
 `accessibility-test-harness` (#204), pulled forward at ship time. Uncovered items land in
-three build tiers; **every entry is (candidate — not built)**. This prioritizes the backlog
+three build tiers; **every entry started as (candidate — not built)**, and each row now
+carries its own built / merged / dropped marker once a later decision delivers it (D23,
+D68). This prioritizes the backlog
 only: no skills created, no phases renumbered, validator targets unchanged.
 
 **Already covered — mapped once, not re-listed as candidates:**
@@ -227,13 +229,13 @@ only: no skills created, no phases renumbered, validator targets unchanged.
 **Tier 1 — build first when the QA expansion runs** (uncovered roadmap P0s plus the
 performance/load headline):
 
-| Candidate *(all: candidate — not built)* | Roadmap ref (cat 06) | Note |
+| Candidate *(started as candidate — not built; per-row status below)* | Roadmap ref (cat 06) | Note |
 |---|---|---|
 | `performance-test-harness` + `load-test-planner` — **✅ both built (D23, 2026-07-07)** | #205 (P1) + #206 (P2) | **Headline gap — now closed:** load/render/query/API/edge-function/background-job performance measurement plus realistic traffic/tenant/data-volume load planning — the largest uncovered risk for a multi-tenant SaaS (noisy neighbors, per-tenant degradation). Built as TWO skills per the D23 pre-generation plan table (instrument vs traffic plan — the sibling seam is pinned in both trigger-evals). Pre-release counterpart to Phase 6 `slo-reliability-architect` (targets/alerting); the designs-vs-measures seam against D12.3 is pinned from both sides. |
 | `regression-first-bug-fixer` — **dropped (D68, 2026-09-28)**: covered by `tdd-engineer` (see Already covered above; D68 corrects this row's note) | #190 (P0) | Failing test that reproduces the bug BEFORE the fix. `regression-suite-curator` cites #190 but owns suite membership, not the fix workflow; `tdd-engineer` owns new behavior, not bug reproduction. |
 | `negative-path-test-mapper` — **merged into `test-plan-designer` (D68, 2026-09-28)**; no separate skill | #192 (P0) | Now a per-surface negative-path matrix in `test-plan-designer` workflow step 2, its output and its checklist. Original scope: systematic unauthorized/invalid/expired/missing/duplicated/conflicting/out-of-order enumeration per surface. `test-plan-designer`/`test-coverage-mapper` cite #192 as a source but own planning/audit; security negatives stay with Phase 4 `multi-tenant-security-tester`. |
-| `test-tenant-provisioner` | #198 (P0) | Repeatable test tenants/users for auth, RLS, integration, and E2E runs. `test-data-architect` (source range #196–#199) owns the data catalog; provisioning the tenants/users themselves is unowned. (broadened per report P12: test-row marker convention with never-mutate-unmarked rule, validate-only vs apply modes, env-var-name-only credentials, backup-gated capability grants with inline rollback, prod-safe static lint of QA automation) |
-| `ci-failure-classifier` | #214 + #215 (merged; both P0) | ONE skill: hidden runtime-marker scan (console errors, unhandled rejections, skipped tests, auth failures) + failure classification (product bug / test bug / missing secret / timeout-only / infra / skipped runtime). `flaky-test-detective` owns intermittence root-cause; this owns the every-run CI verdict. (per report P14: duration as first-class evidence; TIMEOUT_FAILURE as a distinct class never conflated with regressions; resume-don't-rerun after timeout-only interruptions; no masking real failures by raising timeouts) |
+| `test-tenant-provisioner` — **✅ built (D68, 2026-09-28)** | #198 (P0) | Repeatable test tenants/users for auth, RLS, integration, and E2E runs. `test-data-architect` (source range #196–#199) owns the data catalog; provisioning the tenants/users themselves is unowned. (broadened per report P12: test-row marker convention with never-mutate-unmarked rule, validate-only vs apply modes, env-var-name-only credentials, backup-gated capability grants with inline rollback, prod-safe static lint of QA automation) |
+| `ci-failure-classifier` — **✅ built (D68, 2026-09-28)** | #214 + #215 (merged; both P0) | ONE skill: hidden runtime-marker scan (console errors, unhandled rejections, skipped tests, auth failures) + failure classification (product bug / test bug / missing secret / timeout-only / infra / skipped runtime). `flaky-test-detective` owns intermittence root-cause; this owns the every-run CI verdict. (per report P14: duration as first-class evidence; TIMEOUT_FAILURE as a distinct class never conflated with regressions; resume-don't-rerun after timeout-only interruptions; no masking real failures by raising timeouts) |
 | `acceptance-criteria-tester` — **built as `acceptance-criteria-reviewer`, narrowed to #226 (D68, 2026-09-28)**; #227 is covered (see Already covered above) | #226 + #227 (merged; both P0) | Testability/completeness/ambiguity review of acceptance criteria + definition-of-done check. **Already deferred once** (execution-plan extra → this backlog, note above); the deferral stands — it builds in this tier, not before. |
 
 **Tier 2 — second wave** (roadmap P1 hardening, plus #203 promoted because UI drift is
@@ -1519,6 +1521,26 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   Doc-only: no skill file, validator, or CI config touched — the
   `secure-saas-reviewer` subagent grammar fix is the sole non-doc,
   non-skill file. Validator: 175 skills, exit 0.
+  - **Correction (appended, no rewrite of the D34 record; verified
+    2026-09-30 against `origin/main` at `2184b54f`).** The inbound doctype
+    links named above were correct at `2058b216`'s parent (`72bdf2c3`:
+    README **120**, **184**, **453**; CONTRIBUTING **3**, all pointing at
+    `docs/ZERO_TRUST_ENGINEERING_DISCIPLINE.md`), but none of those numbers
+    resolves to the doctrine link today. The current inbound links are
+    README **53**, **150**, **549** and **1106**, and CONTRIBUTING **14**
+    (plus CONTRIBUTING **168**, a later addition). The two "Zero Trust"
+    occurrences the entry says were deliberately NOT renamed are now README
+    **119** ("## The discipline behind it: Zero Trust AI Engineering
+    Discipline") and this page's own D34 passage at **1481-1483** (its "Zero
+    Trust security motto" / "classic network Zero Trust" wording; the motto
+    it mirrors is stated in the D16 entry at page **1040**/**1043**);
+    README:121's "Zero Trust security principle" wording no longer exists on
+    `main`. README:701's "Auto-merge is enabled per-phase …" and README:151
+    are likewise both gone: the current statement is README **1423**
+    ("Auto-merge is not armed."), and no line contains the old phrase.
+    CONTRIBUTING rule 3 ("merge under human authority; do not arm auto-merge") is still
+    rule 3, now at CONTRIBUTING **38**; CONTRIBUTING **168** is an unrelated later
+    addition (the 3f zero-trust bullet).
 
 - **D35 (2026-07-10) — Getting Started rewrite: real step-by-step onboarding
   + first-session entry point relocated (doc-only; README.md + this entry;
@@ -1728,6 +1750,26 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     plain-language stages present; (4) the you-decide-vs-Aegis-decides split present; (5) all
     16 verbatim roles present (each ×1); (6) `## Start here (canonical reading order)` (line
     562) still intact and NOT collided with.
+  - **Correction (appended, no rewrite of the D39 record; verified 2026-09-30 against
+    `origin/main` at `2184b54f`).** All three line numbers in the checklist above are
+    stale — **113 commits** touched the README after D39 landed (D51 retitled the
+    last heading; D56, D57 and a run of README re-reads reflowed the page). Each
+    target is confirmed
+    present and the heading order is unchanged, so only the numbers drift: `## From
+    idea to shipped: the no-experience path` is now README line **152** (was 165);
+    `## How to use this` is now **250** (was 261); and the fourth heading was
+    retitled by D51 to `## Canonical reading order (for maintainers)` in the same
+    position, then retitled again and moved by later README passes — it is now
+    `## Maintainer reading routes` at line **676** (the phrase "canonical
+    reading order" no longer appears anywhere on `main`, in the README or in
+    this page's live text — only in the two preserved D39/D51 passages above).
+    D39's stated facts are
+    unaffected (the section still sits above `## How to use this`, and the
+    maintainer-facing section is still later in the file). Where the target is a
+    heading, prefer the stable anchor over the brittle number: the links
+    [From idea to shipped](../../README.md#from-idea-to-shipped-the-no-experience-path)
+    and [Maintainer reading routes](../../README.md#maintainer-reading-routes) resolve
+    by slug and survive reflow.
   - Validator: 176 skills, exit 0.
 
 - **D41 (2026-07-15) — Doctrine extended with its inward-facing half: CONSTRAIN + CURATE
@@ -2314,6 +2356,12 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     (skill-quality-reviewer/references/quality-review-checklist.md:169);
     allowed/forbidden approved-write eval cases added. Sources:
     post-merge automated review of PR #62 + the in-session census.
+    *(Re-checked 2026-09-30: all three line numbers in this sentence have
+    moved — the README authoring rule is now :1354, the README principles
+    bullet is now :1479, and the standard's §8 checklist row is now :593;
+    the checklist's posture-table row is now :175 and its text was reworded
+    to "Exception 1". The surfaces and the §5 pointer they carry are
+    unchanged; the numbers above are kept as the D52/D53-time values.)*
 
 - **D53 (2026-07-19) — Posture-rule alignment (docs + skill-EDIT; count
   stays 184).**
@@ -2347,6 +2395,62 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     D52 moves to D55.
   - Validator: **184 skills, exit 0**; evals JSON parses (7 cases); no
     `scripts/` or `.github/` files touched — normal merge.
+  - **Correction (appended, no rewrite of the D53 record; every citation
+    re-verified 2026-09-30 against `origin/main` at `2184b54f`).** The
+    Verified-compliant citations above are stale: each cited line number was
+    correct when D53 landed at `dd26dab1`, and each target still exists, but
+    none of the numbers resolves to the intended text now (the standard was
+    rewritten for TALI v3.2.3 in 2026-08-02 and re-read in 2026-09-29; the
+    template was reflowed by D54, D56 and #528). Verified target by target:
+    - **`:128`** — was the standard §5 rule's `... requires
+      `disable-model-invocation: true` ... with ONE narrow exception, next.`
+      That phrase no longer exists anywhere in the repo: the D53-era §5
+      bullet is now standard lines **254-258**, and §5's approved-write
+      exception is now **EXCEPTION 1** at standard lines **272-300** (with
+      EXCEPTION 2 / TALI at **302**). What line 128 holds today is unrelated
+      portability text (`simply does not exist there.`).
+    - **`:141-142`** — was the exception's exclusion list (`or other
+      irreversible action. Those remain manual-only and require
+      `disable-model-invocation: true`.`). That is now standard lines
+      **294-300**; lines 141-142 now carry host listing limits (Claude Code
+      1,536 characters; Codex ~2% of the window) inside the Portability
+      contract.
+    - **`:39`** — the standard's frontmatter row is still a frontmatter row
+      in the same table with the same meaning, but it is now line **99**
+      (the table grew: §2 now spans lines 91-106). Line 39 now ends
+      "invocation commands." Line 99 also carries the current form of the
+      exception the row points at (Exception 1, plus the TALI mirror).
+    - **`_template` `:4-15`** — the comment block still exists and still
+      starts at **line 4**, but it grew from 12 lines to 15, so the intended
+      span is now **:4-18**.
+    - **`_template` `:59`** — was the Validation Checklist's approved-write
+      gate ("Any side-effecting step was gated behind explicit human
+      confirmation..."). That gate now lives in the checklist item at
+      **:77-82**. Line 59 is now inside the build-choice paragraph
+      (`deciding facts are known; never invent a recommendation.`); the
+      Validation Checklist now begins at :70.
+    - **`_template` `:76-80`** — was the same rule restated in **Stop
+      Conditions** ("Before a documentation/project-state append under the
+      standard-§5 approved-write exception..."). It is now a substantially
+      longer Stop Conditions entry at **:99-111**; the template's Validation
+      Checklist item ":76" is now "No **Stop Conditions** were silently
+      bypassed." Lines 76-80 no longer contain the cited text.
+    - **checklist `:147` / `:168`** — the checklist grew by six lines between
+      D53 and now, so both shifted by **+6**, not the two the review
+      estimated: the Stop Conditions entry ending `irreversible step here
+      (standard §5).` is now **:153-154** (D53-era :147-148), and the Check 7
+      posture table's first body row — D53's :168 — is now **:174** (:175 is
+      the Exception 1 row the D52 block above cites as :169 at its own
+      date). Line 168 today is unrelated Check 6 prose (`grep) is a CONCERN
+      the other direction — fold it into its natural parent.`).
+    - **Unchanged and still exact:** `skill-quality-reviewer/SKILL.md`
+      **:107** (still the "§5 Exception 1 for bounded documentary writes"
+      sentence). The README's authoring rule and principles bullet that D52
+      and this D53 block cite are no longer at README :1166/:1250 — they are
+      now README **:1354** and README **:1479** (both still carry the §5
+      pointer, now naming two exceptions), and the checklist's posture-table
+      row is now **:175**. D52's follow-up `standard:177` is now **:593**
+      (the §8 checklist row).
 
 - **D54 (2026-07-19) — Orchestrator correctness (skill-EDIT + docs;
   count stays 184).**
@@ -2545,6 +2649,24 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     active; self-tests **38/38**. `scripts/validate-skills.py` and
     `.github/workflows/validate-skills.yml` ARE touched — `gate-guard` **red by
     design, human admin merge required**.
+  - **Correction (appended, no rewrite of the D55 record; verified
+    2026-09-30 against `origin/main` at `2184b54f`).** The RESIDUAL note
+    above is preserved as provenance, and the item-8 heuristic claim it rests
+    on no longer describes `main`:
+    - The live/historical collision it cites no longer exists in that shape.
+      README:111's bare "Under the hood, Aegis is a library of 184 skills
+      organized into 22 discipline families" line was replaced by README
+      **62** ("Under the hood, Aegis is a library of skills organized into
+      discipline families — the marked totals in …"), i.e. countless, so
+      there is nothing left for the heuristic to distinguish there.
+    - README:76's "175 skills" is gone from the README entirely; the historical
+      counts now live in `docs/HISTORY.md` (**82** "175 skills", **117** "184
+      skills"), moved there by D57.
+    - The one governed `SKILL-COUNT`/`FAMILY-COUNT` marker pair is now README
+      **557** (not :523), and it reads **195** skills in **23** families.
+    - So the RESIDUAL's two options were both effectively taken later: the
+      duplicate live count was reworded countless (D56), and the marker pair
+      that remains is the single governed one.
 
 - **D56 (2026-07-20) — Multi-agent identity: the README framed for the open
   Agent Skills ecosystem, Claude Code as the reference surface (docs-only;
@@ -2619,7 +2741,14 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     (`.search`), so a second pair leaves one silently ungoverned; exactly one
     governed pair restored. Extended the census fixes to `standard:3` and
     `catalog:93` (identity-class mentions outside the original scope). Source:
-    post-build review against the combined prompt.
+    post-build review against the combined prompt. *(Correction appended
+    2026-09-30: the `catalog:93` target — the "Skills vs. Agents" table's
+    "A reusable *procedure* … Claude loads and executes" row — has since been
+    reworded to "…the agent loads and executes" and moved by the catalog's
+    2026-09-30 surface edit; it is now `docs/skills-catalog.md:249`. The
+    `standard:3` target is the standard's opening sentence, still line 3 but
+    rewritten for the open Agent Skills format by D49/D56-era edits. Cited
+    line numbers are preserved as provenance; the fixes they name are intact.)*
 
 - **D57 (2026-07-20) — About restructure: the construction history
   relocated to `docs/HISTORY.md`; the README leads with what-it-is and the
@@ -2666,6 +2795,21 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   - Validator: **184 skills, exit 0, 0 warnings**; self-tests **38/38**. `git
     diff --check` clean; private-name sweep clean on all new and moved-intro
     prose. No `scripts/` or `.github/` files touched — normal merge.
+  - **Correction (appended, no rewrite of the D57 record; verified
+    2026-09-30 against `origin/main` at `2184b54f`).** Every figure in this
+    entry was re-derived and all still hold: the `sha256
+    b8c16a347fc22b1a187dd4942f664961f327279163753bb1bf8fe9743fcb18ce`
+    byte-identity proof is reproducible (README lines 31-86 at `abecf4e5^`
+    and `docs/HISTORY.md` lines 8-63 at `abecf4e5` both hash to exactly that
+    value, 5795 bytes, CRLF-joined), the picker did rise from line 139 to
+    line 88 at this commit, and the D43 marker pair did sit at README :485.
+    Only the *current* numbers have moved since: the picker is now README
+    **88-118** ("### Start here: pick your path" at :88), the single governed
+    marker pair is now README **557**, and the README carries **26** headings,
+    not the 22 recorded then — so "all 8 internal README anchors" is a
+    D57-time statement, not a current count (the README now has **12**
+    distinct same-page anchor targets, all resolving; the D57-era "22
+    headings" figure no longer matches either).
   - **Companion owner actions (outside the repo).** The GitHub "About"
     description and topics are set by the owner to the agreed plain-language
     text, so the repo's own front matter now matches this framing. **Next:
@@ -3236,6 +3380,23 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     2026-07-06), the day before D10: its description already said "when
     fixing a bug that should get a regression test proving the fix". D10's
     text above is unchanged; this entry is the correction.
+    - **The Tier 1 row's Note is itself contradictory and is corrected here
+      (verified 2026-09-30 against `git ls-tree -r --name-only origin/main --
+      .claude/skills`).** `regression-first-bug-fixer` does **not** exist on
+      `main` and D68 dropped it, so the row's "**dropped (D68, 2026-09-28)**"
+      marker is TRUE and its trailing Note clause — "`tdd-engineer` owns new
+      behavior, not bug reproduction" — is the stale D10 wording this entry
+      refutes. Read the row as dropped-covered, not as "built": the skill was
+      never built, and the work belongs to `tdd-engineer` (whose bug-fix
+      trigger has been in its description since `07049814`, 2026-07-06).
+      The row's Note is dated D10 text and is left in place as provenance.
+    - **Delivery status of the rest of the batch (verified 2026-09-30).**
+      D68's `acceptance-criteria-reviewer` (`89eec69c`),
+      `test-tenant-provisioner` (`ebc9225d`), `ci-failure-classifier`
+      (`18e8a280`), the `negative-path-test-mapper` → `test-plan-designer`
+      extension (`09aa09b7`) and the `regression-first-bug-fixer` drop are all
+      on `main`, so the D10 Tier 1 table rows above carry their
+      built/merged/dropped markers.
   - **Authority.** This decision authorizes exactly this batch. Its delivery
     relies on the standing delivery approval
     [AEGIS-APR-039](../approvals/APPROVAL_REGISTER.md#aegis-apr-039-reaffirmation-of-ongoing-backlog-delivery-approval)
@@ -3482,6 +3643,58 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     requests.
 
 ## 6. Post-merge corrections
+
+- **2026-09-30 — Line-number citations in §5 re-verified; the stale ones are
+  re-pointed.** A full-page audit checked every `path:NNN` / "line NNN"
+  citation in this log against `origin/main` at `2184b54f`. The decisions and
+  their corrections are append-only, so the dated entries are **not**
+  rewritten: each affected entry gained an inline appended correction, listed
+  here newest-first per the §6 convention.
+  - **D53 — the `Verified-compliant` block (5 of its citation groups stale).**
+    `docs/skill-generation-standard.md:128` and `:141-142` and the
+    `_template/SKILL.md:59`/`:76-80` targets no longer exist as cited; the
+    standard's §5 was rewritten for TALI v3.2.3 and the template was reflowed
+    by D54, D56 and #528. D52's `standard:177` also moved (now `:593`). See
+    the D53 entry.
+  - **D39 — the "Six grep confirmations" block (all three numbers stale).**
+    The two README headings it quotes are now lines 152 and 250, and the third
+    heading was retitled twice (now `## Maintainer reading routes`, line 676),
+    so `## Start here (canonical reading order)` no longer exists in the README (the phrase survives only in the preserved D39/D51 passages and in this correction's own text).
+    Heading targets now carry slug anchors so they survive reflow. See the D39
+    entry.
+  - **D68 — a self-contradicting D10 row Note corrected.** The D10 Tier 1
+    `regression-first-bug-fixer` row reads both "dropped (D68)" and "owned by
+    `tdd-engineer` … not bug reproduction"; the drop is TRUE
+    (`git ls-tree -r --name-only origin/main -- .claude/skills` has no such
+    directory) and the trailing Note is the stale D10 wording D68 refutes.
+    The row's Note is dated text and stays as provenance. See the D68 entry.
+  - **D10 — Tier 1 table header made accurate.** The header claimed every
+    entry is "candidate — not built" while three rows already carried
+    built/dropped markers and two carried none. The header now states the
+    rows carry their own per-row status, and the two unmarked rows
+    (`test-tenant-provisioner`, `ci-failure-classifier`) are marked **built
+    (D68)**.
+  - **D56 / D55 — census and residual citations.** D56's `catalog:93` target
+    moved to `docs/skills-catalog.md:249`; D55's RESIDUAL note is preserved but
+    the items it names have since been resolved on `main` (the duplicate live
+    count was reworded countless, and the surviving marker pair is now README
+    :557 reading 195/23).
+  - **D34 — inbound links and the auto-merge line.** README:120/184/453,
+    CONTRIBUTING:3, README:121, README:701 and README:151 are all stale; the
+    current lines are recorded in the D34 entry.
+  - **Sweep result.** Every `path:NNN` and "line NNN" citation in the page was
+    checked individually, with wrapped lines flattened first so a citation split
+    across a line break still counts. No instance count is stated here: the forms
+    overlap (a `README.md:1166` also reads as a `README:NNN`), so any single
+    number would depend on an arbitrary rule. What is verifiable is the list of
+    sites below. The stale groups were refuted and re-pointed — 5 in D53's own
+    block plus D52's adjacent `standard:177`, 3 in D39, 2 in D34, D68's D10 row
+    Note, D56's `catalog:93`, and D55's RESIDUAL figures. No exact/stale tally is
+    stated here either, for the same reason as the total above. What follows are
+    those sites, including the
+    README:1166/:1250 pair at the D52/D53-time date they were written and the
+    `:523`/`:111`/`:76`/`:485` historical notes kept as provenance; the rest
+    are D57-time figures that still reproduce (the byte-hash, 139→88, :485).
 
 - **2026-09-27 — D65 amendment: open gaps closed.** All four gaps D65
   listed now have an owning skill (2026 IDs). LLM08, hidden context beyond
