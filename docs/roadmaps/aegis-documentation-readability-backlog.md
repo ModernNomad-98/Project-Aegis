@@ -78,7 +78,8 @@ are added plus deleted lines from `git diff --numstat`.
   retrospective review records an independent **SHIP** bound to `1b9e7049`, the
   merged head, and verified the roster exhaustively in both directions
   (195/196/0/0, 7/7 subagents); it also named an honest limitation, that it did
-  not read all 1,492 lines for prose-level readability. The page was pending and
+  not read all 1,492 lines at `1b9e7049` for prose-level readability (1,495
+  lines after #572). The page was pending and
   owed a full read, so the exemption cannot confer acceptance. **Stays
   pending.**
 - `.claude/skills/scoped-approval-register/SKILL.md`: 10 net since its last
