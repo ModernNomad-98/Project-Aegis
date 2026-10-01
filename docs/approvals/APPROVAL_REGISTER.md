@@ -33,7 +33,9 @@ the entry governs.
   the entry was written; later events can change it. A one-use grant can be
   used up even before a later event records that; check its use limit and
   linked delivery record.
-- **PR** is a GitHub pull request; **issue #nnn** is a GitHub issue. The
+- **PR** is a GitHub pull request; **issue #nnn** is a GitHub issue. A bare
+  **#nnn** does not say which: `#333`, for example, is PR #333, and only the
+  word before it tells the two apart. The
   **head** or **exact head** is the specific latest commit of a pull request
   that was checked and approved; a 40-character hexadecimal value is a Git
   object ID (SHA), a commit unless the entry calls it a tree, often shortened
@@ -50,7 +52,11 @@ the entry governs.
 - **gate-guard**, also called the **protected-file guard**, fails whenever a
   pull request changes a protected path: the merge gate or a surface that
   enforces it, such as workflow files, `CODEOWNERS`, the validator, the DCO
-  script, CI scripts and tests, or `tools/behavioral_eval_runner/`. A
+  script, CI scripts and tests, or `tools/behavioral_eval_runner/`. The
+  paths it matches are the **protected-path pattern**, the shell variable
+  `gate_pattern` in `.github/workflows/validate-skills.yml`; [the offline CI
+  guide](../offline-ci.md) instead calls it the `gate-guard` pattern, and
+  AEGIS-APR-096 is the one entry that calls it `gate_pattern`. A
   **gate-guard exception** is an owner decision to merge despite that
   failure: usually one-time for one exact head, except the standing
   four-file exception in AEGIS-APR-047. An **administrator merge** uses repository
@@ -58,8 +64,11 @@ the entry governs.
 - **Codex** is an automated pull-request reviewer; **P1** and **P2** are its
   two highest finding priority levels. In AEGIS-APR-073, **P0**, **P1**,
   **P2** and **info** are instead the skill-contract audit report's four
-  finding severity levels, P0 the most severe. **SHIP** is an independent
-  reviewer's verdict that a head is ready to merge.
+  finding severity levels, P0 the most severe. An independent reviewer's
+  verdict on a head is one of four: **SHIP** means ready to merge,
+  **ACCEPT** means accepted, ready to merge, **REVISE** means changes are
+  needed before merge, and **FIX-FIRST** means fix a named finding before
+  acceptance.
 - **Claude Code** is Anthropic's command-line coding agent. A **headless**
   Claude Code session runs without a person typing into it.
 - **BER** is the Behavioral Eval Runner under `tools/behavioral_eval_runner/`,
@@ -101,6 +110,19 @@ the entry governs.
   [the contract-audit findings register](../audits/aegis-060-plus-register.md).
   **D61** is a numbered decision in
   [the planning record](../reconciliation/step-0-reconciliation-v4.md).
+- Six coded identifiers, used in AEGIS-APR-079 and defined only by the audit
+  engine's own glossary in the report `docs/audits/skill-contract-audit-baseline.md`
+  (written by `_markdown_glossary()` in `scripts/audit-skill-contracts.py`):
+  **CENSUS** marks a rule whose hits are `info` census data, not defects;
+  **STRUCTURAL** marks a rule that checks only that something is present, not
+  that it works; **Stage-2** is `project-orchestrator`'s "Define the product"
+  stage; **NOT-COMMIT-ABLE** is the commitment-readiness result recorded when
+  the evidence a delivery commitment needs is missing;
+  **auto-invocable** describes a skill the model may start on its own, one
+  whose description does not begin MANUAL-ONLY; and **SIDE-004** is the rule
+  that flags an auto-invocable skill's Workflow instructing a side effect,
+  its `[class]` being one of the section 5 mutation classes named in
+  [the skill-generation standard](../skill-generation-standard.md#5-least-privilege--side-effects).
 - Other abbreviations: **ID** identifier, **OS** operating system, **VM**
   virtual machine, **CPU** central processing unit (processor), **SDK**
   software development kit, **CLI** command-line
@@ -108,6 +130,12 @@ the entry governs.
   Time, **GiB** gibibyte, **ISO** a disc-image file, **SHA-256** a file
   checksum, **JSON** JavaScript Object Notation, **eval** evaluation (a
   skill's test cases in its `evals/*.json` files).
+- **A correction note governs.** Where an entry carries a trailing note block
+  (`>` lines, as AEGIS-APR-086 does), read the entry body with that note: the
+  note records what is now known or was later changed, and it governs over
+  the body it corrects — it is part of the entry, so the rule above still
+  holds. Some entry bodies therefore state a premise a reader should not rely
+  on until the note at their end has been read.
 
 ## Grants and lifecycle events
 
@@ -226,6 +254,14 @@ the entry governs.
   before use.
 - **Expiry / use limit:** PR #104 only; one merge at most. No calendar expiry
   stated.
+
+> **Consumption — 2026-09-23, appended 2026-09-30.** The one-use exception
+> above was used: PR #104's exact head `cc713da3a1f280c5a7e5add2495e1f76bbae3fcf`
+> merged as `c83a0601d9b7945ad407b6fa81bd2563ab501475` at 2026-09-23 15:39:26
+> UTC, a single-parent commit on `main`, so the head itself is not in `main`'s
+> history. The grant has no remaining use; a later protected-path merge needs
+> its own exception. `CONTRIBUTING.md` still cites this entry as the canonical
+> example of a PR-limited exception, which it is — of a spent one.
 
 ### AEGIS-APR-006: Control-plane offline capability proofs, first increment
 
@@ -1245,6 +1281,10 @@ the entry governs.
 - **Expiry / use limit:** None stated; recurring until owner revocation or
   replacement. Revocation returns protected merges to per-PR exceptions and
   cannot undo completed merges.
+
+> **Appended note — 2026-09-30.** The `#333` in the owner's quoted answer is
+> **PR #333**, not an issue; its merge is recorded in this entry, above. The
+> preamble's bare-`#nnn` line gives the general rule.
 
 ### AEGIS-APR-048: Standing administrator merge once checks are green
 
