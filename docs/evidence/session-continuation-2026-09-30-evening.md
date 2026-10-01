@@ -102,12 +102,15 @@ targeted-edit exemption **retains** an acceptance and **cannot confer** one.
 
 | # | Decision | Owner answer | Status |
 | --- | --- | --- | --- |
-| 1 | Record the standing commit/push/merge instruction as a register entry | **"Record it as a new entry"** | **OWED** — draft it with the owner's verbatim words and bring it for approval before it lands |
+| 1 | Record the standing commit/push/merge instruction as a register entry | **"Record it as a new entry"**, and, asked the question the wording cannot settle, the owner chose **"Standing, forward-only"**: the authority **survives this session** and does **not** retroactively cover earlier merges (each of those was independently reviewed and merged at its exact reviewed head). | **DELIVERED** — recorded as `AEGIS-APR-100` (PR #587), a new grant rather than a renewal of the expired `AEGIS-APR-024` |
 | 2 | Standing `scripts/` guard for catalog counts | **"No new guard"** | Done — no action |
 | 3 | `scoped-approval-register` positive rule | **"Authorize the one-sentence edit"** | Applied on `docs/authorized-skill-clarifications` (`b99ead4c`); **PR still to open** |
 | 4 | `database-backup-verifier` deletion scope | **"Authorize the clarifying edit"** | Applied on the same branch |
 
-**Decision 1 needs care.** `AEGIS-APR-024` ("Session-scoped commit, push and
+**Decision 1 needs care.** **The instruction's own date is 2026-09-28, not
+2026-09-30** — its row sits under "Decided on 2026-09-28" and was committed in
+`36be74b5` (2026-09-28 02:29:04 -0700); the 2026-09-30 direction only records it. An
+earlier draft of this record carried the wrong date. `AEGIS-APR-024` ("Session-scoped commit, push and
 merge approval", 2026-09-24) recorded a similar instruction and was **EXPIRED**
 by a later lifecycle entry — it was explicitly *"not a standing all-work grant
 for later sessions"*. The open-decisions page says the current instruction has
@@ -153,7 +156,7 @@ recorded earlier.
 | **One question at a time** | Ask ONE question, wait for the answer, with the recommendation **first** among the choices and the reasoning given. |
 | **Audit the recommendation first** | Before presenting options, **audit the recommendation** against the repository record. Several recommendations changed materially after auditing (e.g. the trailer convention, the catalog guard). |
 | **Do not stop for decisions** | Record the decision, keep clearing everything that needs no new authority, and continue. |
-| **Pre-approved commit / push / merge** | "all commits, push, and merges are pre-approved as long as they passed local tests and green on github actions". Does **not** waive a failed `gate-guard`, the independent-review requirement, or any work grant; does not change branch protection. |
+| **Pre-approved commit / push / merge** (now recorded as `AEGIS-APR-100`, standing, forward-only) | "all commits, push, and merges are pre-approved as long as they passed local tests and green on github actions". Does **not** waive a failed `gate-guard`, the independent-review requirement, or any work grant; does not change branch protection. |
 | **PR cap** | At most **3** open PRs of any kind. |
 | **Merge method** | `gh pr merge N --admin --squash --match-head-commit <exact-reviewed-sha>`. **Never arm auto-merge.** |
 | **Merge requires** | Green checks on the exact head **and** a posted independent review record naming the **current** head or its tree. A force-push **invalidates** a head-bound review. |
