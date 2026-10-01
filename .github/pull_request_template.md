@@ -14,6 +14,13 @@ The security question below is required.
 - [ ] If any skills were added, renamed, or removed, every registration surface in step 3 of [How to add a skill](https://github.com/ModernNomad-98/Project-Aegis/blob/main/CONTRIBUTING.md#how-to-add-a-skill) is updated
 - [ ] Current skill totals in the README sit inside the validator-checked count markers (`SKILL-COUNT`, `FAMILY-COUNT`); dated historical counts
       are clearly identified as evidence from their recorded revision
+- [ ] **Aegis skills identified and used.** Per `AGENTS.md`, every coding agent and delegated
+      subagent must find and read the matching Aegis skill before any source-library task
+      (task management, troubleshooting, design, implementation, review, investigation,
+      delivery, documentation), then use its workflow. Name below every skill used and what
+      each contributed. If no skill fit, say so briefly — that is a valid answer, and an
+      unanswered item is not:
+      <!-- e.g. `code-reviewer` reviewed the diff; `ai-closeout-reporter` shaped the summary -->
 - [ ] Commits carry a Developer Certificate of Origin (DCO) sign-off
       (`git commit -s`)
 
