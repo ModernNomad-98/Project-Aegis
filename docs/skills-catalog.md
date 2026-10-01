@@ -127,8 +127,8 @@ and the **category backlogs** under [`docs/skills/`](skills/). `scripts/validate
 checks that every *implemented* skill is listed here and in `README.md`. The
 validator derives the implemented-skill and discipline-family counts and checks
 them against the marked pair in the README's
-[What's in the library](../README.md#whats-in-the-library) section, which is the
-only surface that states them; this page states no live count of its own, so it
+[What's in the library](../README.md#whats-in-the-library) section, which holds the
+only machine-checked live counts; this page states no live count of its own, so it
 cannot drift.
 
 <details>
@@ -212,7 +212,8 @@ cannot drift.
 > the layered panel IA with restraint plus the cross-tenant READ-security
 > model, composing the ~12 feed owners rather than restating them (183→184).
 > PR #124 then shipped `aegis-setup` (2026-09-23, recorded retroactively as **D67**) under owner grant
-> AEGIS-APR-007 for Issue #101 package 2 — the manual-only four-choice setup
+> **AEGIS-APR-007** (an entry ID in the [owner approval register](approvals/APPROVAL_REGISTER.md))
+> for Issue #101 package 2 — the manual-only four-choice setup
 > conversation, run only when a person invokes `aegis-setup` by name, that
 > saves an Aegis-only selection on tested single-user Windows PowerShell,
 > with local and online helper integrations still unavailable (184→185).
@@ -248,7 +249,7 @@ not transfer with copied skills to another repository.
 | --- | --- | --- |
 | What it is | A reusable *procedure* — an ordered workflow the agent loads and executes. | A read-only *reviewer persona* spawned to judge a delimited task in its own context. |
 | Invocation | Triggers on its `description`, or explicitly by name. | Delegated to via the Agent tool. |
-| Tools | Inherits session tools; narrows via `allowed-tools`. | Declares its own tools; **read-only by default** (decision D2). |
+| Tools | Inherits session tools; every shipped skill is instructions only, and `allowed-tools` is [forbidden](skill-generation-standard.md) in all of them. | Declares its own `tools`; **read-only by default** (decision D2). |
 | Best for | Repeatable transformations/generation with a defined output + evals. | Focused review/audit passes that benefit from isolation and a specialized lens. |
 | Rule of thumb | If it *does* something and produces an artifact → skill. | If it *judges* something and returns findings → agent. |
 
@@ -569,10 +570,12 @@ interfaces and restores backups into a scratch target).
 
 Per reconciliation §3, the execution-plan `rollback-strategy-designer` is
 **merged into `rollback-runbook-author`** (strategy + runbook are one
-artifact); the remaining Phase 6 expansion backlog stays unbuilt (see below),
-except `database-backup-verifier` (roadmap #253),
-`resilience-architecture-reviewer`, `cloud-security-baseline-reviewer` and
-`environment-parity-reviewer` (roadmap #244 with #246 folded in), all built by D71.
+artifact) and `migration-deployment-runbook` (#254) is **merged into
+`data-migration-runbook-author`** as an extension (D71, 2026-09-28; no
+separate skill); the Phase 6 expansion backlog (see below) is now fully built by D71:
+`database-backup-verifier` (roadmap #253), and `resilience-architecture-reviewer`,
+`cloud-security-baseline-reviewer` and `environment-parity-reviewer` (roadmap #244
+with #246 folded in).
 
 | Skill | Source (category doc) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
@@ -1345,13 +1348,14 @@ above.**
 Source: [`docs/skills/07-devops-release-reliability.md`](skills/07-devops-release-reliability.md)
 plus [historical master prompt, section 8](prompts/claude-skills-master-generation-prompts-v4.md) for the three cloud skills.
 Reconciliation §3 merge: `rollback-strategy-designer` is merged into
-`rollback-runbook-author` (no separate skill). The Phase 6 **expansion backlog**
+`rollback-runbook-author` (no separate skill), and `migration-deployment-runbook`
+(#254) is merged into `data-migration-runbook-author` as an extension (D71,
+2026-09-28; no separate skill). The Phase 6 **expansion backlog**
 (`cloud-security-baseline-reviewer`, `resilience-architecture-reviewer`,
-`migration-deployment-runbook`, `environment-parity-reviewer`,
-`database-backup-verifier`) remains backlog, built in Phase 8 batches, except
-`database-backup-verifier` (#253), `resilience-architecture-reviewer`,
-`cloud-security-baseline-reviewer` and `environment-parity-reviewer` (#244, with
-#246 folded in), which D71 built and moved to
+`environment-parity-reviewer`, `database-backup-verifier`) is now fully built:
+D71 built all four -- `database-backup-verifier` (#253), and
+`resilience-architecture-reviewer`, `cloud-security-baseline-reviewer` and
+`environment-parity-reviewer` (#244, with #246 folded in) -- and moved them to
 [Implemented → Skills (Phase 6)](#skills-phase-6--cloud-devops-reliability--release-pack) above.
 
 > Note: `release-readiness-reviewer` and `full-codebase-auditor` exist as **subagents**
@@ -1485,7 +1489,9 @@ is a 300+ target backlog, and skills ship on demand and framework coverage, not 
 
 Every implemented skill must ship `evals/evals.json` (and `evals/trigger-evals.json` when its
 trigger overlaps another skill). The [offline runner core and non-live Scenario A
-grading stack](roadmaps/behavioral-eval-runner-backlog.md) are implemented
+grading stack](roadmaps/behavioral-eval-runner-backlog.md) — Scenario A being the clean
+"simple minimum viable product" acceptance flow through the beginner front door, defined
+in the [Scenario A runbook](acceptance/scenario-a-runbook.md) — are implemented
 (Behavioral Eval Runner work packages WP-2B-1 and WP-2B-2); D3's original "no runner yet" statement is historical.
 Measured calibration and live corpus execution remain unfinished. Authored eval
 definitions and structural validation are not evidence that those evals passed
