@@ -56,15 +56,22 @@ only §3 later), the `:304` citation of
 
 **2.3 The readability ledger has NOT been updated with this session's
 dispositions.** It still records pages as pending that have since been fixed,
-and it still says the delivery control-plane guide is `FIX-FIRST → fixed (1 of 3)`
-**without naming the finding or the fix** — an attestation, not an artifact.
-A ledger-dispositions PR is owed.
+and it records the delivery control-plane guide as **`pending`** ("that page also
+**stays pending**"), listed under "Newly pending ... needs a full-page re-read").
+Note the distinction: the *morning* record `session-continuation-2026-09-30.md`
+says `FIX-FIRST → fixed (1 of 3)` **without naming the finding or the fix** — an
+attestation, not an artifact; the *ledger* instead keeps the page pending. Either way
+the ledger still needs the dispositions recorded. A ledger-dispositions PR is owed.
 
-**2.4 Eight backlog-sweep findings remain open** (see §5).
+**2.4 Seven backlog-sweep findings remain open** (see §5).
 
 ## 3. READABILITY BACKLOG — the ledger's pending set
 
-The ledger's own pending set at `09011d0c` was **thirteen pages**. Status now:
+The ledger's **current** pending set at `09011d0c` is **16 pages** -- that is the
+figure in its own `Start here` block (`656` tracked Markdown, **16** pending). The
+**thirteen-page** enumeration further down that page is the **#561 snapshot**, which
+the `Start here` block explicitly supersedes; it is a dated list, not the current
+one. Both are reproduced below so the difference is visible. Status now:
 
 | Page | Reviewed? | Verdict |
 | --- | --- | --- |
@@ -75,7 +82,7 @@ The ledger's own pending set at `09011d0c` was **thirteen pages**. Status now:
 | `docs/skills-catalog.md` | yes | FIX-FIRST → **fixed in #584** |
 | `docs/audits/aegis-060-plus-register.md` | yes | **FIX-FIRST — NOT YET FIXED** |
 | `docs/roadmaps/resumable-control-plane-backlog.md` | partial | CP-WP-002 pointer fixed (#578/#579); **no full-page review** |
-| `tools/aegis_delivery_control/README.md` | yes | **ACCEPT** (7/7) |
+| `tools/aegis_delivery_control/README.md` | yes | an independent review returned **ACCEPT (7/7)** -- but the **ledger still records it as `pending`** ("that page also **stays pending**", listed under "Newly pending ... needs a full-page re-read"). A review's verdict does not change the ledger's status; only a ledger update can. |
 | `.claude/skills/database-backup-verifier/SKILL.md` | partial | defect **fixed** (authorized, decision 4) |
 | `.claude/skills/database-backup-verifier/references/backup-verification-checks.md` | **no** | — |
 | `docs/evidence/setup/issue-101-package-4a-host-feasibility.md` | **no** | — |
@@ -114,7 +121,7 @@ wired into CI" claim; #486 and #457 "open, not merged"; the stale "Current
 status, 2026-09-25" label; the ledger's 656 figure; the forecast's 656; the
 sweep "in progress" status; the stale "checked 2026-09-26" banner.
 
-**Still open (8):**
+**Still open (7):**
 
 1. Four open-decisions rows say *"nothing is built at this recording"* for the
    QA-Tier-1, AI-SDLC, Phase 7 and Phase 6 skill batches. Their proposed skills
@@ -129,8 +136,9 @@ sweep "in progress" status; the stale "checked 2026-09-26" banner.
 6. The "Still open for the owner" block needs a re-check-and-restamp (361 commits
    had passed at the sweep's measurement).
 7. `scoped-approval-register`'s owed status/re-read in the ledger.
-8. The catalog nit: "the only surface that states them" was tightened in #584 to
-   "the only machine-checked live counts" — **done**; re-verify if touching it.
+8. ~~The catalog nit: "the only surface that states them"~~ — **CLOSED in #584**
+   (it now reads "the only machine-checked live counts"). Not an open item; kept here so
+   the numbering reconciles.
 
 ## 6. TEMPORARY / OWNER RULES IN FORCE
 
