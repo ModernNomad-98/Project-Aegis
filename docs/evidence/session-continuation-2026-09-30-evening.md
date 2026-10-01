@@ -39,10 +39,11 @@ treat every number here as a verification item, not a fact.
 
 ## 2. OPEN WORK — uncommitted or unopened at handoff
 
-**2.1 A branch is pushed with NO pull request.**
-`docs/authorized-skill-clarifications` at `b99ead4c` is on the remote and has
-**no PR**. It carries two owner-authorized clarifications (decisions 3 and 4
-below). **First action on resume: open the PR, review it, merge it.**
+**2.1 RESOLVED before handoff — kept because it is the class of thing a handoff must not omit.**
+`docs/authorized-skill-clarifications` at `b99ead4c` was pushed with **no PR**.
+That was caught during the handoff and fixed: it became **PR #585**, reviewed and
+**merged** at 2026-10-01T03:43:19Z. It carried the two owner-authorized
+clarifications (decisions 3 and 4 below). **Nothing to do here on resume.**
 Diff: `.claude/skills/scoped-approval-register/SKILL.md` (+4/-1) and
 `.claude/skills/database-backup-verifier/SKILL.md` (+3/-2 after reformatting).
 
@@ -71,7 +72,8 @@ The ledger's **current** pending set at `09011d0c` is **16 pages** -- that is th
 figure in its own `Start here` block (`656` tracked Markdown, **16** pending). The
 **thirteen-page** enumeration further down that page is the **#561 snapshot**, which
 the `Start here` block explicitly supersedes; it is a dated list, not the current
-one. Both are reproduced below so the difference is visible. Status now:
+one. Both **counts** are given below so the difference is visible; the two sets are
+not reproduced in full -- read them in the ledger. Status now:
 
 | Page | Reviewed? | Verdict |
 | --- | --- | --- |
@@ -199,7 +201,7 @@ recorded earlier.
    pending, and what the delivery guide's earlier "fixed" actually was.
 5. **Review the two remaining evidence pages** and the `database-backup-verifier`
    checks sheet.
-6. **Work the eight open sweep findings** in §5.
+6. **Work the seven open sweep findings** in §5.
 7. **Give the ledger its own full-page re-read** and the catalog its full-page
    acceptance read — both are still owed and neither is satisfied by a
    claim-targeted review.
