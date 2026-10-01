@@ -152,9 +152,9 @@ The full doctrine:
 ## From idea to shipped: the no-experience path
 
 You do not need to be a developer to use this. You do not need to know a single skill name, or
-what "RLS" or "CI" or "architecture" means. If you have a real problem and the patience to
-answer questions about your own business, Aegis supplies the engineering discipline to take you
-from that idea to a working, shipped product.
+what "RLS" or continuous integration (CI) or "architecture" means. If you have a real problem and
+the patience to answer questions about your own business, Aegis supplies the engineering
+discipline to take you from that idea to a working, shipped product.
 
 **The deal, stated plainly.** You bring the business truth — the problem, how your business
 actually works, who's involved, what "done" looks like, and the decisions only you can make.
@@ -1399,7 +1399,7 @@ uses Python 3.14 and provides these jobs:
 
 | Check | What it does |
 | --- | --- |
-| `validate-skills` | Required Ubuntu check: CI-helper tests, validator self-tests and skill validation, contract-audit self-tests, BER self-check and regression suite, PowerShell Core acceptance, and a PR-only Developer Certificate of Origin (DCO) sign-off check. |
+| `validate-skills` | Required Ubuntu check: CI-helper tests, validator self-tests and skill validation, contract-audit self-tests, BER self-check and regression suite, PowerShell Core acceptance, and a PR-only Developer Certificate of Origin (DCO) sign-off check. Every commit in the pull request's range must carry a `Signed-off-by:` trailer, except two exempt machine authors that cannot sign off — `dependabot[bot]` and `github-actions[bot]`; [D60](docs/reconciliation/step-0-reconciliation-v4.md) records the exemption and that it is deliberately **not an authentication boundary**. |
 | `windows-offline-checks` | Additional Windows coverage: the Python checks plus native Windows PowerShell and PowerShell Core acceptance. This job is not registered as a required branch-protection check. |
 | `tools-tests-linux`, `tools-tests-windows` | Tools test suites (setup host-bridge callback tests on Node.js 24, setup routing-contract tests and delivery-control tests) on separate Ubuntu and Windows runners, isolated from the gate jobs because a pull request can change this test code without tripping `gate-guard`. These jobs are not registered as required branch-protection checks. |
 | `gate-guard` | Required PR-only check: deliberately fails when protected validation, workflow, agent-definition, Claude Code or Git configuration, runtime, test or dependency paths change (including the Dependabot configuration, `.github/dependabot.yml`), so those changes receive explicit review. |
