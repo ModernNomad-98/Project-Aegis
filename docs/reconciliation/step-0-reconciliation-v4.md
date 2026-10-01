@@ -2814,7 +2814,16 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     description and topics are set by the owner to the agreed plain-language
     text, so the repo's own front matter now matches this framing. **Next:
     D58 — the open-source readiness pack — is planned, pending the license
-    decision.**
+    decision.** _Appended 2026-09-30, verified against `origin/main` at `5c806348`: D58 is no
+    longer pending: the pack is delivered. All eleven files in its scope are on `main` —
+    `LICENSE` (Apache License 2.0), `NOTICE`, `TRADEMARKS.md`, `SECURITY.md`,
+    `CODE_OF_CONDUCT.md`, `.github/CODEOWNERS`, `.github/pull_request_template.md`, the
+    `CONTRIBUTING.md` "External contributions" section, the two `README.md` touches (the
+    "License & contributing" section and the `ModernNomad-98` clone URL), the
+    `auto-merge-policy.md` header annotation and the D58 entry itself. They landed in
+    `e18830f8` (PR #70) and `gh api repos/ModernNomad-98/Project-Aegis` reports the licence as
+    `Apache-2.0`. The D58 wording above is left as written; the owner-only settings it listed
+    are tracked in its own owner-action ledger below._
 
 - **D58 (2026-07-21) — Open-source readiness pack: an Apache-2.0 license,
   trademark and security policies, code-owner review, a code of conduct, and a
@@ -2942,9 +2951,23 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     vulnerabilities, not conduct, and its reports land in front of repository
     maintainers under a security workflow — the wrong venue for a complaint that may
     be *about* a maintainer.
+    - **Disposition, appended 2026-09-30.** The owner decided this on 2026-09-27: wait until
+      outside contributors appear. No private address is published now, `CODE_OF_CONDUCT.md`
+      stays unchanged, and the project does not claim confidential intake until a private
+      contact and an alternate recipient exist. It is recorded in the [open-decisions
+      index](../roadmaps/aegis-open-decisions-2026-09-23.md#decided-on-2026-09-27), which names
+      the D59 finding as its source, and restated in that page's current disposition table.
+      This bullet's own heading reads "owner decision pending" as of its D59 recording; the
+      decision has since been made, and no file changed.
   - **Owner-action ledger, updated.** Of the five owner-only settings D58 listed:
     - **Private Vulnerability Reporting — CONFIRMED ACTIVE** by the owner. Removed from
-      pending; the `SECURITY.md` flow is live.
+      pending; the `SECURITY.md` flow is live. **Re-verified 2026-09-30:** `gh api
+      repos/ModernNomad-98/Project-Aegis/private-vulnerability-reporting` returns
+      `{"enabled":true}`. The other four settings are owner-side or deferred and cannot be
+      confirmed from this repository; the CODEOWNERS review requirement has not flipped, as its
+      recorded trigger (the first external pull request or added collaborator) has not fired —
+      `git log --format='%an' origin/main` lists only the owner's own identities,
+      `dependabot[bot]` and `Codex`.
     - **"Require review from Code Owners" — deliberately deferred, with a trigger.**
       During the solo phase `.github/CODEOWNERS` names the only committer, so the gate
       would block the maintainer on the maintainer's own pull requests and buy nothing.
@@ -3114,7 +3137,14 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     on-branch, but its **first live execution cannot be observed until this merges** —
     the event does not exist before then. After merging, check the Actions tab for a
     `validate-skills` run triggered by the `push` to `main`: the `validate-skills` job
-    green, `gate-guard` skipped.
+    green, `gate-guard` skipped. **Discharged, appended 2026-09-30.** The "cannot be observed
+    until this merges" sub-claim resolved the moment D60 merged: the first push-triggered run
+    is [run 29886415700](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/29886415700),
+    on `main` at `c4990b15` (D60's own merge, PR #72) on 2026-07-22 at 02:40:02 UTC, and it
+    shows exactly what this follow-up predicted: `validate-skills` **success**, `gate-guard`
+    **skipped**. Every later push run behaves the same, for example [run
+    36805748030](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/36805748030) on
+    2026-10-01. Nothing further is owed on this row.
 
 - **D61 (2026-07-28) — Claude Code startup bridge: a root `CLAUDE.md` that imports the
   shared `AGENTS.md` contract and adds Claude-Code-specific startup routing, plus a HARD

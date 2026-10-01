@@ -92,6 +92,19 @@ are added plus deleted lines from `git diff --numstat`.
   follow-up is to record its status and give it the full-page re-read the rule
   requires.
 
+  **Correction (appended 2026-09-30, verified against `origin/main` at `5c806348`).** Two
+  items this paragraph leaves open are settled here. **The figure:** "10 net since
+  `61f2a464`" was the state at `41c7a649`; PR #585 has since changed the page by 4+1=5 more
+  lines, so `git diff --numstat 61f2a464 origin/main --
+  .claude/skills/scoped-approval-register/SKILL.md` now reads `14 1`. The owed follow-up is
+  now recorded: the page's status is **no recorded full-page acceptance**. Both reviews named
+  above were targeted — the eval cases and the added guidance — so neither read the
+  whole page, and under the rule above a targeted review confers nothing. Whether the page
+  belongs in the pending set is deliberately not asserted here: this ledger's totals count a
+  tracked reader page as accepted unless it is pending, and changing that bucket would restate
+  dated totals that still owe their own full-page re-read. The independent full-page re-read
+  the rule requires remains **owed and not performed**.
+
 Two pages therefore change classification, both away from acceptance: the
 forecast returns to pending under the "larger change" sentence, and the
 register returns to pending while additionally correcting an erroneous
@@ -185,6 +198,15 @@ The inventory therefore moves from 655 to **656** tracked Markdown files, and
 the pending set from 15 to **16**. Accepted readers stay **584**, the generated
 report stays **1**, and the classified synthetic fixtures stay **55**. The
 arithmetic closes: 584 + 1 + 55 + 16 = 656.
+
+**Re-check and restamp, 2026-09-30.** The tip figures above were re-derived at `origin/main`
+`5c806348`: `git ls-tree -r --name-only origin/main` filtered to `*.md` returns **657**
+tracked Markdown files, matching the PR #577 annotation above exactly, and no page has been
+added since. PR #577's added page is already recorded in the current-reading note at the top of
+this ledger and already joins the pending set, so it needs no further edit. What does stay open is
+recorded here rather than fixed: **this ledger is itself still pending and still owes its
+own independent full-page re-read.** That is an owed independent review, not a text fix, so
+it is deliberately left undone rather than faked; this restamp confers no acceptance.
 
 The two component guides,
 root guide and documentation index have received bounded readability work;
