@@ -19,7 +19,8 @@ later human ratification of a measured judge-calibration result. R1–R5 name
 the five capability-evidence gates. Continuous integration (CI) checks source;
 its Linux run is not proof on a selected host. `NON-LIVE` means recorded or
 synthetic input only; `NON_BASELINE` means a result cannot qualify for the
-measured baseline. POSIX names a Unix-like operating-system interface.
+measured baseline. POSIX names a Unix-like operating-system interface. A holdout is
+the reserved evaluation set kept sealed from the work it measures.
 Later technical terms: **MCP** means Model Context Protocol; **OS** means
 operating system; **DCO** means Developer Certificate of Origin, the commit
 sign-off check; **SDK** means software development kit; **API** means
@@ -769,6 +770,12 @@ the sole owner of actual advisory CI integration).
   - **Verification result:** PASS
   - **Repository-safe summary SHA-256:**
     `a18b18899272a96826fa6d1bb4af1908782c3fb03bd591afefdd83bd21816374`
+    (the 2026-08-11 value, preserved as recorded; the file gained its dated
+    reading banners in [PR #184](https://github.com/ModernNomad-98/Project-Aegis/pull/184)
+    and [PR #210](https://github.com/ModernNomad-98/Project-Aegis/pull/210), so
+    it no longer reproduces and the file's current SHA-256 is
+    `8851dc018d9730249cdc985f4e77f2052aaff10056b577aca5d2439d44a92475`.
+    The manifest and detached-finalization values below still reproduce.)
   - **Evidence manifest SHA-256:**
     `f304b889477a4c72f55c1462c9079f02efa9ede87d7cc5c3376d542376dd3969`
   - **Detached finalization marker SHA-256:**
@@ -842,8 +849,9 @@ the sole owner of actual advisory CI integration).
   host/provider enforcement or containment.
 - **Owner decision required:** WP-2B-1 authorization was recorded by
   BER-DEC-006. Final schema-shape acceptance (BER-BKL-007) was fulfilled by
-  Peter Nguyen's PR #104 decision on 2026-09-23. OD-3 risk-class
-  ratification remains open for its later promotion gate. No later phase is
+  Peter Nguyen's PR #104 decision on 2026-09-23. OD-3, the risk-class ratification
+  decision of the owner-decision register (§9 of this file), remains open for its
+  later promotion gate. No later phase is
   authorized by these earlier decisions.
 - **Explicit non-goals:** No semantic judging in production; no Scenario A live suite; no
   generic corpus execution; no CI integration; no relaxation of any 2B-0 evidence
@@ -1057,7 +1065,7 @@ operator controls are evidenced. The 2026-09-23 checkpoint above is historical.
   [`docs/evidence/behavioral-eval-runner-wp-2b-2-summary.md`](../evidence/behavioral-eval-runner-wp-2b-2-summary.md)
   (post-merge closeout record appended, §10).
 - **Supersedes / superseded by:** Absorbs (supersedes) only the former WP-2B-3 NON-LIVE
-  semantic-judge scaffold scope; WP-2B-3 itself continues as the redefined, BLOCKED
+  semantic-judge scaffold scope; WP-2B-3 itself continues as the redefined
   Measured Judge Calibration and OD-1 Ratification Gate, which owns measured calibration
   and OD-1 ratification ahead of WP-2B-4.
 
@@ -1436,7 +1444,9 @@ not execute the behavioral advisory lane or complete this work package.
   remain required and independent; the runner runtime provably never edits workflows,
   CODEOWNERS, the validator, or gate scripts; the §17 promotion criteria are DECIDED,
   binding prerequisites that the 2B-7 implementation team may not reopen; OD-2's numeric
-  minimum coverage threshold and the final durable human promotion approval remain
+  minimum coverage threshold (OD-2 is the minimum promotion coverage threshold decision
+  of the owner-decision register, §9 of this file) and the final durable human promotion
+  approval remain
   pending; meeting the criteria does not itself authorize promotion — WP-2B-7 implements
   advisory CI only, and a separate later owner decision is still required to promote the
   lane; nothing in this phase activates blocking CI.
@@ -1883,7 +1893,8 @@ authorization decisions in §13 remain unchanged.
   implementation, cleanup and any changed reader or retention rule need
   their applicable separate scope and approval.
 - **Explicit non-goals:** No cryptographic signing or immutable external store (that is
-  BER-BKL-010 / OD-4); no committing of raw transcripts.
+  BER-BKL-010; OD-4, the evidence-authenticity decision of the owner-decision register
+  §9 of this file, is the separate later choice); no committing of raw transcripts.
 - **Related design sections:** §13 (evidence-bundle contract; access/retention/
   redaction), §15 (preserve-on-failure), §20 D6.
 - **Completion evidence:** Merged policy + evidence-writer PR(s); the owner's recorded
@@ -1900,7 +1911,11 @@ The [sanitized integration review](../evidence/ber-bkl-009-policy-integration-re
 records the exact candidate, tests, independent review and remaining gates.
 This checkpoint describes a candidate until its implementation PR passes its
 own exact-head checks and merges; it does not assert host attestation,
-production driver binding, publication clearance or cleanup authority.
+production driver binding, publication clearance or cleanup authority. The
+candidate state above is preserved as written; the implementation PR merged
+subsequently, and the record's status at this ID already names it: **delivered
+by [PR #257](https://github.com/ModernNomad-98/Project-Aegis/pull/257)
+(`53351b3fac3d75cbbc23341cc96dbeadc1e116ee`), 2026-09-24.**
 
 ### BER-BKL-010 — Evidence signing or immutable external storage beyond SHA-256
 
@@ -2135,7 +2150,7 @@ superseded by the later authorization note and §14.
   produces any baseline-eligible semantic verdict (design §8, §17a). The design invents
   no numbers; so does this backlog. Tracked by: R2, BER-BKL-005, WP-2B-0, WP-2B-2 (non-live
   scaffold), and WP-2B-3 (the Measured Judge Calibration and OD-1 Ratification Gate,
-  BLOCKED).
+  AUTHORIZED by BER-DEC-008).
   **Post-2B-0 status (2026-08-11): OPEN — not completed during 2B-0.** The design's
   during-2B-0 timing requirement above is preserved as written, not rewritten; it was
   not met because the BER-DEC-005 model-dispatch envelope denied the calibration calls
@@ -2370,6 +2385,35 @@ tests and review keep proving its absence. **Supersedes / superseded by:** none.
 - **Explicit non-goals:** No "pass" language for present-and-well-formed evals, in any
   artifact, ever.
 - **Related design sections:** §2, §13, §24.
+
+**Worked example — one selected case that preflight excludes.** This is the
+smallest run that exercises the rule end to end, using the repository's own
+`tools/behavioral_eval_runner` records (a selected case is one the run chose to
+evaluate; preflight is the check before a case runs; an aggregate is the
+case-level result; `UNRUN` means a planned attempt did not execute):
+
+```text
+Case A ("ok")        preflight: RUNNABLE              aggregate: derived
+Case B ("excluded")  preflight: PRECHECK_EXCLUDED     aggregate: INCONCLUSIVE / PRECHECK_EXCLUDED
+```
+
+- Authored units: 10. Selected: 2, so `selected_coverage` = 2/10 = **0.2**.
+- Preflight accounted: 2. Runnable: 1 (Case B was excluded), so
+  `runnable_coverage` = 1/2 = **0.5**.
+- No attempt executed, so attempted units = 0 and `execution_coverage` = **0** —
+  the report cannot claim a graded result.
+- Case A's aggregate is not carried by the coverage computation this example shows. It is re-derived from
+  its own `UNRUN` attempt with `aggregate_case()`, which returns
+  `INCONCLUSIVE` / `BUDGET_EXHAUSTED`; a caller-supplied `PASS` claiming
+  `attempts_run=1` is rejected with "claims attempts_run=1 but 0 of its
+  attempts actually executed".
+- Case B's exclusion is not lost: `excluded_totals_by_reason` counts
+  `PRECHECK_EXCLUDED`, and its planned attempt stays `UNRUN` under
+  `unrun_totals_by_reason`.
+
+This example is drawn from the merged regression tests in
+[`tools/behavioral_eval_runner/tests/test_reporting.py`](../../tools/behavioral_eval_runner/tests/test_reporting.py);
+the numbers above are the values those tests assert.
 
 ### BER-PROH-009 — Replace or weaken the structural validator
 
