@@ -10,3 +10,10 @@ __pycache__/
 # two patterns it recommends are already covered above by `__pycache__/` and
 # `*.pyc`.
 /.aegis-control-plane/
+
+# Git worktrees live inside the checkout (CONTRIBUTING.md: "Use isolated
+# worktrees for separate changes"). They are checkouts of code already tracked
+# here, so nothing under them is unique source. Without this rule, one
+# reflexive `git add -A` stages the whole .worktrees tree and embeds a nested
+# repository as a broken gitlink.
+/.worktrees/
