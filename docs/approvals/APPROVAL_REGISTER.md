@@ -48,7 +48,11 @@ the entry governs.
   `gate-guard` runs on pull requests only, and the other three jobs are
   visible coverage that is not registered as required. The **DCO** (Developer
   Certificate of Origin) sign-off check is a pull-request step inside
-  `validate-skills` that requires every commit to be signed off.
+  `validate-skills` that requires every commit to be signed off, except two
+  exempt machine authors — `dependabot[bot]` and `github-actions[bot]` — that
+  cannot sign off; [D60](../reconciliation/step-0-reconciliation-v4.md)
+  records the exemption and that it is deliberately **not an authentication
+  boundary**.
 - **gate-guard**, also called the **protected-file guard**, fails whenever a
   pull request changes a protected path: the merge gate or a surface that
   enforces it, such as workflow files, `CODEOWNERS`, the validator, the DCO
