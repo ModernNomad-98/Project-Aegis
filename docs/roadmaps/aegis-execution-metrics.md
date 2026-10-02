@@ -589,6 +589,15 @@ reader pages, one generated report, 44 classified fixtures and ten known
 pending pages, and later re-read fixes are not yet recorded there. Issue
 #101 remains open and the VM paused.
 
+> **Later clarification — 2026-10-01.** These are the dated #442 figures and are
+> annotated, not rewritten. The tracked-Markdown count is now **658**, measured
+> as `git ls-files '*.md'` at `1920d8b5` — the same command that produced the
+> `613`. The readability ledger's own current reading has moved past
+> `558 / 44 / ten`: it dates its latest count to #561 (`410b90aa`), carries a
+> #577 tip of 657, and PR #615 records the accepted count as at most **575** and
+> the pending set as at least **26**. Nothing above is changed. This is a dated
+> snapshot, so it is annotated rather than rewritten.
+
 ## Catch-up checkpoint after pull request #370 — 2026-09-26
 
 The [full reassessment](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-26-after-pull-request-370-catch-up-for-the-windows-ending-349-354-359-364-369)
