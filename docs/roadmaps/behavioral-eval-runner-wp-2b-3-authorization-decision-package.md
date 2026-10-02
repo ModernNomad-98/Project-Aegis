@@ -12,6 +12,15 @@
 
 **Historical decision preparation and owner-response record follows.**
 
+> **Reader pointer — added 2026-10-01, for orientation only.** The reader purpose and
+> the exact decisions a future WP-2B-3 authorization must record are stated in the
+> paragraph after the dated status block below, not in the historical narrative above.
+> **OD-1** is owner decision 1 — the later human ratification of the measured
+> judge-calibration result; the [runner backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes)
+> defines it in its opening section, and in this package the term first appears in the
+> dated 2026-09-10 status block below, which reads it in that sense. No sentence above
+> is changed.
+
 **Status (reconciled 2026-09-10):** OWNER-APPROVED DECISION RECORD (2026-08-14).
 BER-DEC-008 is effective through the manual merge of
 [#87](https://github.com/ModernNomad-98/Project-Aegis/pull/87), commit

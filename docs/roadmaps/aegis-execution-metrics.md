@@ -2,6 +2,16 @@
 
 ## Start here — current measurements
 
+> **Reader key — added 2026-10-01.** These blocks are dated measurements, newest
+> first; the date says how each figure was obtained, not whether it governs now.
+> The **current** reading below is live and load-bearing: its 71–146 provisional
+> active hours stand, and only the earlier readings are history. **ETA** means
+> estimated time to complete a work item; **PR** means pull request; **CI** means
+> continuous integration; **UTC** means Coordinated Universal Time. **D68** is the
+> recorded 2026-09-28 decision approving the quality assurance (QA) Tier 1 build
+> batch, in the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions);
+> the fuller term key is in the purpose paragraph below; that paragraph is left as written.
+
 **Current measurements at the catch-up checkpoint after #491:** sixteen PRs merged after #474 with no reassessment, missing three five-merge windows (those ending #475, #481 and #487); this record covers the window ending #491. From #474 to #491 is **3h01m52s observed wall time** across 16 merges; the complete windows ranged from **30m44s** to **1h18m44s**. No active, review, CI or waiting split was measured. The readability sweep (0.5–2 active hours), the checkpoint after #474 (0.5–1.5) and the engine v1.13.4 grant record (0.25–0.75) are delivered; only the checkpoint has a recorded start, and its 1h07m19s of wall time cannot score an active-hour range. The bounded selected subtotal stays **71–146 provisional active hours**; near-term work outside it is a provisional **11.25–21.75 active hours** of agent estimates, 9.75–17.25 of them for the quality assurance (QA) Tier 1 skill batch the owner approved (recorded decision D68, in open #493). Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD), so the full selected and all-options ETA stays unbounded.
 
 **Earlier measurements at the catch-up checkpoint after #474:** twenty-one PRs merged after #454 with no reassessment, missing four five-merge windows (those ending #455, #458, #465 and #471). From #454 to #474 is **5h51m33s observed wall time** across 21 merges; the complete windows ranged from **11m35s** to **5h09m53s**, and the longest includes a 5h09m35s gap before #466 and is not a throughput measure. No active, review, CI or waiting split was measured. The D15 skill-enrichment deltas (#455, from recorded decision D15; 2–4 active hours), the v1.13.3 generator change (not estimated), landing #453 (0.25–1) and the checkpoint after #454 (1–3) are delivered; only that checkpoint has a recorded start, and its 34m53s of wall time cannot score an active-hour range. The bounded selected subtotal stays **71–146 provisional active hours**; near-term work outside it is a provisional **1–3.5 active hours** of agent estimates. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD), so the full selected and all-options ETA stays unbounded.
