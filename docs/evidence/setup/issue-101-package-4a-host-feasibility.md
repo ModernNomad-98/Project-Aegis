@@ -1,10 +1,12 @@
 # Issue #101 package 4A host-interface feasibility screen
 
-This page is for maintainers of the issue #101 setup router. It records
-whether a Claude Code host could run the router's check before a skill or
-agent is dispatched. In that plan, package (Stage) 4A is the offline bridge
-tested only with synthetic inputs, and package 4B is the later, separately
-gated proof on a real host.
+This page is for maintainers of the issue #101 setup router. Issue #101 is the
+owner's backlog item for a conversational Aegis setup flow that picks how
+workloads are assigned to eligible agents and how their skills are selected.
+This page records whether a Claude Code host could run the router's check
+before a skill or agent is dispatched. In that plan, package (Stage) 4A is the
+offline bridge tested only with synthetic inputs, and package 4B is the later,
+separately gated proof on a real host.
 
 **2026-09-25 status update:** This page preserves its source-screening
 snapshot and the then-pending statements below. The separate bounded Stage 4A

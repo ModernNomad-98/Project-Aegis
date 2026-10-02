@@ -1,8 +1,11 @@
 # Issue #101 Stage 4A offline bridge review
 
-This page is for maintainers of the issue #101 setup router. Stage 4A is the
-offline bridge stage of that plan, tested only with invented inputs; Stage 4B
-is the later, separately approved real-host proof. The page records the
+This page is for maintainers of the issue #101 setup router. Issue #101 is the
+owner's backlog item for a conversational Aegis setup flow that picks how
+workloads are assigned to eligible agents and how their skills are selected.
+Stage 4A is the offline bridge stage of that plan, tested only with invented
+inputs; Stage 4B is the later, separately approved real-host proof. The page
+records the
 dependency assessment and the synthetic offline test evidence for the
 [AEGIS-APR-031](../../approvals/APPROVAL_REGISTER.md#aegis-apr-031-issue-101-stage-4a-offline-bridge-implementation)
 owner grant. It is not a deployed host integration and not a measured
