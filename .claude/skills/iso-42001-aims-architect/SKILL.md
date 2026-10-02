@@ -136,8 +136,8 @@ directly.
    maps to `supply-chain-security-reviewer`'s AI/ML surface plus vendor
    management.
 6. **Select Annex A control objectives via the foundation.** Use the two
-   AI security packs above — the AI lifecycle governance pack and the AI
-   security and large language model systems pack — to
+   packs named above — the AI software development lifecycle governance
+   pack and the AI security and large language model systems pack — to
    find candidate routes; map only verified operated
    mechanisms with evidence to objectives. Missing or unverified mechanisms
    get owners and verification actions. Counts and identifiers come only from the
