@@ -71,9 +71,12 @@ document-persistence contract; a proposed graph is not evidence of a file edit.
    and current status in a single index/log — the navigable front page of
    the decision history. Propose missing numbers and statuses; label any
    unresolved human decision instead of inventing acceptance.
-2. **Propose the status lifecycle mapping.** Each ADR is proposed, accepted,
-   rejected, deprecated, or superseded — never ambiguous. A superseded ADR
-   stays in the record (it's history) with its status and a pointer to
+2. **Propose the status lifecycle mapping.** Each ADR is proposed (drafted and
+   awaiting a decision), accepted (the record of what the team currently does),
+   rejected (considered and declined, kept as history), deprecated (no longer
+   recommended, with no direct replacement) or superseded (replaced by a
+   specific newer ADR) — never ambiguous. A superseded ADR stays in the record
+   (it's history) with its status and a pointer to
    its successor; it is not deleted.
 3. **Propose the superseding graph both ways.** When a new decision replaces
    an old one, the NEW ADR names what it supersedes, and the proposed OLD ADR update is
