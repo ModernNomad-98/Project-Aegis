@@ -16,7 +16,10 @@ Turn ad-hoc human+agent collaboration into one named, auditable contract: which
 stages software work moves through, who holds authority at each stage, what gate
 must pass before the next stage, and which execution-discipline skill enforces
 it. This is the umbrella over the Phase 1 pack (the library's eight
-operating-discipline skills, such as `change-classification-gate` and
+operating-discipline skills listed under "Skills (Phase 1 —
+operating-discipline pack)" in
+[`docs/skills-catalog.md`](../../../docs/skills-catalog.md#skills-phase-1--operating-discipline-pack),
+such as `change-classification-gate` and
 `human-approval-boundary`) — it COMPOSES those skills into a
 lifecycle (each stage cites its enforcing skill) rather than restating their
 procedures, and it is grounded in how work in the repo actually flows, observed

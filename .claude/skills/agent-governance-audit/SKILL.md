@@ -49,7 +49,10 @@ matrix more than paperwork.
 ## Inputs to Inspect
 
 1. The governing policy in force WHEN the change happened: operating model,
-   `agent-authorization-matrix`, change-class validation floors, repo standard.
+   `agent-authorization-matrix`, the change-class validation floors (the
+   per-class validation minimums set by `change-classification-gate`, e.g.
+   `schema-migration` needs a migration plan, rollback and data-loss note),
+   repo standard.
    If none existed, the audit baseline is the repo's shipped discipline-skill
    contracts — and the report says so.
 2. The PR's primary record: `gh pr view <n> --json author,reviews,mergedBy,

@@ -47,11 +47,15 @@ confidently building in the wrong place or against stale context.
    that the current path is the task's intended workspace using available
    independent signals, such as a matching remote and project landmarks in an
    established repository. For Project Aegis source-library work, require the
-   four source-package landmarks in `AGENTS.md`; copied startup files alone
-   do not establish source-library role. Classify as consumer/product when
-   task and local evidence support it; otherwise ask one role question. A fresh
-   Stage 0 product repository can have zero commits, no remote, no application
-   files and no `docs/project-state.md`. Use the task-named current workspace
+   four source-package landmarks named in `AGENTS.md` — a `README.md` whose
+   top identifies the repository as `# Project Aegis`, `docs/skills-catalog.md`,
+   `scripts/validate-skills.py`, and the
+   `artifacts/audits/skill-contract-audit-baseline.json` baseline — copied
+   startup files alone do not establish source-library role. Classify as
+   consumer/product when task and local evidence support it; otherwise ask one
+   role question. A fresh Stage 0 (nothing started yet) product repository can
+   have zero commits, no remote, no application files and no
+   `docs/project-state.md`. Use the task-named current workspace
    and its instructions to classify it as the product repository. "The path
    exists" alone is zero signals.
 2. **On genuine identity ambiguity or contradiction, stop.** A missing target,
@@ -108,10 +112,11 @@ Verdict: PROCEED | HALTED — <question for the human>
 
 - **A path that exists is not the right path.** In an established-repository
   task, an empty directory with no matching project evidence is ambiguous;
-  do not scaffold it. A task that names a fresh Stage 0 product repository
-  with copied startup instructions is different: absent commits, remote and
-  application files can be its expected state. Work in that current workspace
-  after reading its instructions and confirming the intended role.
+  do not scaffold it. A task that names a fresh Stage 0 (nothing started yet)
+  product repository with copied startup instructions is different: absent
+  commits, remote and application files can be its expected state. Work in
+  that current workspace after reading its instructions and confirming the
+  intended role.
 - Multiple clones or worktrees of the same repo can coexist on one machine; the
   remote matches in all of them, so also check branch and recent commits.
 - Windows paths differ by case and spacing; near-miss directory names look right

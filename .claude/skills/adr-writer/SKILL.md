@@ -20,7 +20,8 @@ date silently becomes permanent.
 - Use when: a significant technical decision was just made or a specific
   option was formally proposed for decision and needs a clearly proposed
   record — framework choice, boundary placement,
-  datastore, build-vs-buy, deprecation.
+  datastore, build-vs-buy, deprecation. The five status values are defined at
+  Workflow step 8.
 - Use when: `architecture-designer` hands over an ADR draft to complete.
 - Use when: an old decision is being superseded or reversed — that gets its
   own ADR linking both directions.
@@ -79,9 +80,12 @@ not execute those changes or broaden a grant.
    trigger reversal, the steps to back out, what data or contracts make
    reversal hard, and the point of no return if one exists. "N/A" is not
    acceptable; "reversal is impractical after X because Y" is.
-8. **Set status and review date:** use the repository's lifecycle vocabulary
-   (proposed, accepted, rejected, deprecated or superseded where supported)
-   and a specific date to re-examine the decision against its assumptions.
+8. **Set status and review date:** use the repository's lifecycle vocabulary —
+   proposed (drafted, awaiting a decision), accepted (the current decision),
+   rejected (considered and declined, kept as history), deprecated (no longer
+   recommended, no direct replacement) or superseded (replaced by a specific
+   newer ADR, where supported) — and a specific date to re-examine the
+   decision against its assumptions.
    Include predecessor links in the draft; propose any old-file back-link
    change for its separately authorized route rather than editing it here.
    Label the status, and every claim the decision depends on, with one

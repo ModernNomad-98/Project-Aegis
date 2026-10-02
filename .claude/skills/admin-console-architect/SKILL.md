@@ -8,7 +8,8 @@ description: 'Design the internal ops/support/superadmin CONSOLE for a multi-ten
 ## Purpose
 
 The internal admin console is the most powerful and least-scrutinized surface
-in a SaaS: it reaches across every tenant, it can impersonate any user, and
+in a software-as-a-service (SaaS) product: it reaches across every tenant, it
+can impersonate any user, and
 it is usually built fast, for "just us," with none of the controls the
 customer-facing app has. That is exactly where the breach and the insider-
 misuse incident come from. This skill designs that surface deliberately:
@@ -120,7 +121,8 @@ does not grant anyone real production access.
    shows what it will change), reversible or backed-up-first, and audited.
    Data-repair that mutates customer data is the highest-risk button — gate
    it like impersonation.
-6. **Design tenant-isolation-safe UX.** An operator viewing tenant A must not
+6. **Design tenant-isolation-safe UX** (user experience — the screens and
+   flows the operator uses). An operator viewing tenant A must not
    accidentally act on tenant B; the current tenant context is explicit and
    confirmed on write. Cross-tenant list/search views that rank tenants are
    themselves sensitive and access-controlled. Operator error is a threat
