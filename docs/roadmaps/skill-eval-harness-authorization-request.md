@@ -100,6 +100,13 @@ enough to be honest.
 > run measures no coverage, and the wider 1,268 have not been run. Nothing above
 > is changed. This records a fact; it grants nothing and alters no authorization.
 
+> **Later clarification — 2026-10-01.** "The wider 1,268 have not been run" above
+> is imprecise: the three cases that did run sit inside that 1,268, so the
+> unexecuted remainder is **1,265**. The paragraph's point is unaffected — 1,265
+> cases remain unrun, the run measures no coverage, and those three observations
+> are not a result for any skill. Nothing above is changed. This records a fact;
+> it grants nothing and alters no authorization.
+
 ## Proposed next decision
 
 Choose **one** of the two options below. Both are deliberately narrow: **one
