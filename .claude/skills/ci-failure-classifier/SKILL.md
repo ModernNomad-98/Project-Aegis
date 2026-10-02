@@ -23,8 +23,11 @@ the green result hides. The value is routing. The next step goes to the
 right owner (product fix, test fix, secret owner, resume, runner owner). A
 blind rerun would burn time and hide the real cause. The skill reads and
 reports only. It fetches nothing, reruns nothing, retries nothing and edits
-nothing. It was built under owner decision **D68** (2026-09-28), from quality
-assurance (QA) roadmap rows #214 and #215 as merged by owner decision D10.
+nothing.
+
+*Provenance (history, not operative definitions):* built under owner decision
+**D68** (2026-09-28) from quality assurance (QA) roadmap rows **#214** and
+**#215**, as merged by owner decision **D10**.
 
 ## Use When
 

@@ -15,8 +15,11 @@ YAML is the configuration file format used by many CI workflows.
 Make context freshness mechanical instead of aspirational. Every repo with a
 context map, architecture notes, or living status docs has the same failure:
 code changes merge, the map doesn't move, and three months later the map
-describes a system that no longer exists — drift. The evidence pattern (Repo
-A of the extraction report) closes the loop with CI: a workflow fails any PR
+describes a system that no longer exists — drift. An anonymized source
+repository called Repo A in the [workflow extraction
+report](../../../docs/research/aegis-workflow-extraction-report.md) (a
+historical label for one of two compared repositories, not a checkout to
+access) closes the loop with CI: a workflow fails any PR
 that touches important paths without also updating the context map or its
 notes directory, paired with an update protocol so the forced updates are
 honest rather than ritual. This skill designs both halves: the gate and the

@@ -25,13 +25,17 @@ arriving through time instead of through a query, and its victims cannot
 name the mechanism — which copy, of the many the platform minted for them,
 is the one still alive. This skill owns the lifecycle CHANGE → PROPAGATE →
 VERIFY: classify the change and its direction, inventory every place old
-authority survives, locate the holder, design the invalidation or forced
+authority survives, locate the holder with a differential — the before/after
+comparison against a fresh session that shows which surface still holds old
+authority (Workflow step 3) — design the invalidation or forced
 refresh per surface against a stated revocation-latency bound (deny
 direction first), and prove the change took effect with a cross-surface
-verify battery. The per-surface mechanism owners are composed, never
-restated; this skill contributes the surfaces nothing else owns —
-token-claims staleness, server-session versioning, client-state purge — and
-the differential and verify battery no single-surface skill can see whole.
+verify battery: the per-surface before/after probe set for the actually
+changed principal (Workflow step 6). The per-surface mechanism owners are
+composed, never restated; this skill contributes the surfaces nothing else
+owns — token-claims staleness, server-session versioning, client-state purge
+— and the differential and verify battery no single-surface skill can see
+whole.
 
 ## Use When
 

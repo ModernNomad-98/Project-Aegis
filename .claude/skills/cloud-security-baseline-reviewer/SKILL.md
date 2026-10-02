@@ -36,10 +36,14 @@ named baseline. Every control gets MET, GAP or UNVERIFIED with the evidence
 line that decided it, and every GAP names its fix owner. It reads only what
 it is given: it calls no cloud API, runs no CLI, holds no credentials and
 changes nothing, so it stays auto-invocable. Missing evidence is never MET.
-Built under owner decision D71 (2026-09-28) from the Phase 6 expansion
-backlog; it is the cloud-posture owner the Open Worldwide Application
-Security Project (OWASP) Top 10 map in the reconciliation log assigned to
-Phase 6.
+
+*Provenance (history, not the baseline this skill applies):* built under
+owner decision **D71** (2026-09-28) from the **Phase 6 expansion backlog** —
+the delivery phase that added cloud, DevOps, reliability and release skills —
+and it is the cloud-posture owner the Open Worldwide Application Security
+Project (OWASP) Top 10 map in the [reconciliation
+log](../../../docs/reconciliation/step-0-reconciliation-v4.md) assigned to
+that phase.
 
 ## Use When
 
