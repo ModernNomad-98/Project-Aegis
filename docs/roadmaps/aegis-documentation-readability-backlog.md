@@ -249,6 +249,66 @@ restatement confers no acceptance. Itself an edit to a page that is already pend
 this ledger **pending** its own independent full-page re-read against [Acceptance for each
 page](#acceptance-for-each-page).
 
+### Acceptance audit of the 2026-10-01 provenance relabels — 2026-10-01
+
+**Determination: nine accepted skill pages have silently lost their full-page
+acceptance and are recorded here as pending.** The [targeted-edit
+rule](#remaining-page-review-in-larger-batches) keeps an acceptance only for a
+change of at most 10 net lines on the page that adds no section, measured from
+that page's accepted version to now. Four merges relabelled provenance and
+expanded shorthand across skill pages only — **#601** (`ed5f8ae6`), **#602**
+(`253aa338`), **#604** (`c03f77f9`) and **#607** (`cc697914`) — and **#486**
+(`8459ac73`) contributed two more lines to one of the nine. Each added no `##`
+section to any page, so only the line limb is in play. A single merge alone
+took each page past the threshold: decomposing every page into the commits it
+received since acceptance returns one commit whose own change is already over
+10 lines — 31, 26, 18, 15, 14, 14, 12, 12 and 11 — so no cumulation is needed
+and none is claimed. `iso-27001-isms-architect` is the only page with a second
+contributor, the two #486 lines inside its 17, and it too crosses on its
+relabel commit alone. No commit after `cc697914` touches any of them, so each
+page's accepted version still stands:
+
+| Page | Accepted at | Net changed lines | `--numstat` |
+| --- | --- | ---: | --- |
+| `performance-test-harness/SKILL.md` | `8c6750a` (batch 3, #473) | 31 | `21 10` |
+| `iso-42001-aims-architect/SKILL.md` | `2a86058` (batch 7, #470) | 26 | `17 9` |
+| `qa-strategy-architect/SKILL.md` | `54034fa` (batch 9, #468) | 18 | `12 6` |
+| `iso-27001-isms-architect/SKILL.md` | `14ecd0c` (batch 5, #474) | 17 | `11 6` |
+| `merge-is-deploy-governance/SKILL.md` | `2a86058` (batch 7, #470) | 14 | `10 4` |
+| `authority-invalidation-architect/SKILL.md` | `8c6750a` (batch 3, #473) | 14 | `9 5` |
+| `adr-sequencer/SKILL.md` | `2a86058` (batch 7, #470) | 12 | `8 4` |
+| `risk-tiered-validation-selector/SKILL.md` | `5e0e9ad7` (#224 batch) | 12 | `10 2` |
+| `resilience-architecture-reviewer/SKILL.md` | `d75cd58` (#522) | 11 | `8 3` |
+
+Each row is `git diff --numstat <accepted-at> refs/remotes/origin/main --
+.claude/skills/<name>/SKILL.md`, added plus deleted. Each row uses the latest
+revision at which that page is recorded accepted, so every figure is a **lower
+bound**: an earlier acceptance can only enlarge the count. The deleted line is
+load-bearing on five rows — `merge-is-deploy-governance`, `authority-
+invalidation-architect`, `adr-sequencer`, `risk-tiered-validation-selector` and
+`resilience-architecture-reviewer` would not reach 10 on added lines alone, and
+the first and fourth sit at exactly 10 added. The rule names added plus deleted,
+so the sum is the measure and the choice is not arbitrary.
+
+Each page is recorded as accepted at the revision cited: seven in the
+"(102 of the 103)" list above; `risk-tiered-validation-selector` through the
+#224 acceptance batch (`5e0e9ad7`), which the ledger counts as gaining twenty
+pages without naming each; and `resilience-architecture-reviewer` in its own
+#522 row. No later reading restated any of the nine. The totals therefore
+overstate accepted readers by nine: at most **575** against the recorded 584.
+The dated arithmetic `584 + 1 + 55 + 16 = 656` is left exactly as the snapshot
+it is and is **not** rewritten. The pending set rises from the provable floor
+the 2026-10-01 restatement establishes — 17, not the earlier recorded 16 — to
+at least **26**. The exact pending count stays not derivable from a command,
+for the reason recorded above.
+
+Each of the nine needs one independent full-page re-read against [Acceptance
+for each page](#acceptance-for-each-page). The relabels that pushed them over
+were reader-only: they changed no rule, heading, frontmatter `description:` or
+line-count limit. This note is itself an edit to a page that is already
+pending, so it confers no acceptance and leaves this ledger **pending** its own
+independent full-page re-read.
+
 ### Ledger update for the skill-eval rounds — 2026-09-30
 
 This round adds Markdown and changes no skill, no eval file and no script. The
