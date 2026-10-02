@@ -38,6 +38,14 @@ entries in the [BER decision log](behavioral-eval-runner-backlog.md).
 > Nothing above is changed, and no finding of that run is restated here.
 > This records a fact; it grants nothing and alters no authorization.
 
+> **Later clarification — 2026-10-01.** The caveat this blockquote said step 6
+> only "is known to need" **has since been committed**: the
+> [procedure](../skill-eval-behavioral-test-procedure.md)'s step 6 now carries
+> it, added in PR #570 (`a7ac614b`). The claim "**disclosed in PR #564's
+> review record**" is therefore superseded — the caveat is no longer only a
+> review disclosure but the procedure page's own text. Nothing above is
+> changed. This records a fact; it grants nothing and alters no authorization.
+
 ## The gap this asks about
 
 A skill's evals are validated **structurally only**. The validator proves
