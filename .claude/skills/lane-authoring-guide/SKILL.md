@@ -5,6 +5,10 @@ description: 'Author the pre-work, evidence-cited guide a parallel agent lane ne
 
 # Lane Authoring Guide
 
+**Reading key:** PR means pull request, a proposed change and its review
+thread; SHA means secure hash algorithm, used here for the commit hash that
+identifies one exact revision of the code a citation points at.
+
 ## Purpose
 
 Give each parallel lane its knowledge before its work starts. When an effort
@@ -12,12 +16,16 @@ splits across parallel agents — backend read handlers in one lane, frontend
 in another, artificial intelligence (AI) routing in a third — each implementing agent either receives
 distilled, verified knowledge of its lane, or spends its first hours
 re-deriving that knowledge from source (differently from its neighbors, and
-sometimes wrongly). The evidence pattern (Repo B of the extraction report ran
+sometimes wrongly). An evidence-cited guide per lane is planner-to-implementer
+transfer at work's BEGINNING: it covers lifecycle, contracts, recipe,
+checklist, and — critically — the explicit boundary of what this lane must NOT
+touch. The negative boundary is what makes parallelism safe.
+
+*Provenance (history, not operative definitions):* the pattern is calibrated
+on an anonymized source repository called "Repo B" in the [workflow extraction
+report](../../../docs/research/aegis-workflow-extraction-report.md), which ran
 three parallel lanes, each with a pre-work authoring guide plus an
-implementation contract) is planner-to-implementer transfer at work's
-BEGINNING: an evidence-cited guide per lane covering lifecycle, contracts,
-recipe, checklist, and — critically — the explicit boundary of what this lane
-must NOT touch. The negative boundary is what makes parallelism safe.
+implementation contract.
 
 ## Use When
 
@@ -139,7 +147,7 @@ Evidence:         every load-bearing claim cited or labeled unverified
   guides must cite the single contract doc.
 - **Guide rot across stages:** a guide written for stage 1 silently wrong
   by stage 3. Re-verify citations when a new stage starts, or mark the
-  guide's valid-as-of baseline (date + SHA).
+  guide's valid-as-of baseline (date + SHA of the guide's own last edit).
 - **Swallowing the closeout's job:** the guide is pre-work; recording what
   a stage actually did, deviations included, is the closeout/handoff at
   work's end — keep the two documents distinct.

@@ -6,17 +6,28 @@ disable-model-invocation: true
 
 # Local CI Mirror Preflight
 
+**Reading key:** CI means continuous integration, the repository's automated
+checks on a pull request (PR); PR means pull request; SHA means secure hash
+algorithm, used here for the commit hash that identifies one exact revision;
+docs-only means a change that touches documentation and no code path.
+
 ## Purpose
 
 Never learn from CI what you could have learned at your desk — and never
 blame your diff for main's breakage. This skill is the per-commit VERIFY
-discipline from the extraction evidence (both source repos enforce it): CI
-workflow definitions are the source of truth for what a PR must pass, so
-before committing, derive the closest local equivalent of every PR-triggered
-check, run the same set on clean mainline FIRST (the baseline), then on your
+discipline: CI workflow definitions are the source of truth for what a PR
+must pass, so before committing, derive the closest local equivalent of every
+PR-triggered check, run the same set on clean mainline FIRST (the baseline),
+then on your
 work, and classify every failure by cause. The output is a preflight record
 good enough to paste into the closeout: what ran, how long, what failed, and
 whose fault it is — with a fixed four-class taxonomy instead of vibes.
+
+*Provenance (history, not operative definitions):* the discipline is
+calibrated on the two anonymized source repositories compared in the [workflow
+extraction report](../../../docs/research/aegis-workflow-extraction-report.md)
+(called "Repo A" and "Repo B" there); both enforce the per-commit verify
+discipline this skill applies.
 
 ## Use When
 

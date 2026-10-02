@@ -10,11 +10,11 @@ description: Design ISO/IEC 27001:2022 certification readiness — the ISMS unde
 Design the Information Security Management System (ISMS) that ISO/IEC 27001:2022 (the joint International Organization for Standardization and International Electrotechnical Commission standard)
 certification audits examine: the clause 4–10 machinery (scope and context,
 leadership, risk-driven planning, support, operation, performance
-evaluation, improvement) wrapped around Annex A control selection. The
-library's planning decision 9 (D9, the compliance and governance batch) assumes that existing skills can route control
-work. Shipped skill guidance from the library's build phases 3 and 4 does not establish that an organization
-has implemented, operated, or evidenced any Annex A control. Verify each
-actual mechanism, owner, status, and evidence before treating it as existing.
+evaluation, improvement) wrapped around Annex A control selection. Shipped
+skill guidance provides design routes for control work; it does not establish
+that an organization has implemented, operated, or evidenced any Annex A
+control. Verify each actual mechanism, owner, status, and evidence before
+treating it as existing.
 The management-system work includes the risk register and treatment process,
 Statement of Applicability (SoA) via `statement-of-applicability-author`,
 internal audit program, management review cadence, documented information
@@ -22,6 +22,11 @@ discipline plus the evidence plumbing via `compliance-evidence-collector`.
 This skill produces the ISMS design and certification-readiness plan; it
 never asserts the org is certified — an accredited certification body
 decides that.
+
+*Provenance (history, not operative definitions):* the shipped design routes
+are premised on the library's planning decision **D9** (the compliance and
+governance batch), which assumes existing skills can route control work; the
+guidance was written during the library's build phases **3** and **4**.
 
 ## Use When
 
