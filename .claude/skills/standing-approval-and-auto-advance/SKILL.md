@@ -20,10 +20,18 @@ that don't. This skill designs the governed inverse of
 delivery loop within named scope, an auto-advance rule for already-approved
 phases, and the control surfaces (restated approval, opt-out phrase,
 reviewer-block path) that keep the human in command of the loop they are no
-longer asked to bless step-by-step. Both source repositories this skill's
-pattern was extracted from ran it in production; the difference between it and an
-autonomy incident is precisely the governance elements this skill refuses to
-omit.
+longer asked to bless step-by-step.
+
+*Provenance (history, not the requirements this skill states):* the pattern is
+calibrated on the two anonymized source repositories compared in the
+[workflow extraction
+report](../../../docs/research/aegis-workflow-extraction-report.md) — a
+standing approval, a phase-advance rule and a reviewer-block path in one
+("Repo A" there), an autonomous-merge default rule in the other ("Repo B"
+there). Those labels name repositories in that report, not checkouts or files
+to access. The difference between this design and an autonomy incident is
+precisely the governance elements above — this skill's own requirements, which
+it refuses to omit.
 
 **Why manual-only:** this skill authors standing authority — it thins future
 human gates. A model auto-invoking the skill that widens its own autonomy is
