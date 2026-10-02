@@ -90,6 +90,16 @@ So this is not a request to relax the runner's gates. It is a request to decide
 **whether to build the execution path the gates reserve**, at a scope small
 enough to be honest.
 
+> **Later clarification — 2026-10-01.** The claim that none of the 1,268 cases
+> "**has ever been executed**" is superseded: three of the twelve
+> `scoped-approval-register` cases **did** run, each in a separate fresh agent
+> and graded by an independent agent, recorded in
+> [the skill-eval run of 2026-09-30](../evidence/skill-eval-run-2026-09-30.md)
+> (PR #568). What remains true is the point this paragraph is making: the gap is
+> still overwhelmingly unexecuted — nine of those twelve cases are `UNRUN`, the
+> run measures no coverage, and the wider 1,268 have not been run. Nothing above
+> is changed. This records a fact; it grants nothing and alters no authorization.
+
 ## Proposed next decision
 
 Choose **one** of the two options below. Both are deliberately narrow: **one
