@@ -14,8 +14,11 @@ Secure Hash Algorithm; a recorded SHA identifies the exact source revision.
 Move truth out of chat and prove it against the repo. AI-assisted work
 generates decisions, bug reports, and backlog items inside conversations that
 expire — and future sessions then act on half-remembered versions of them.
-This skill runs the two-step discipline observed in both source repos of the
-extraction evidence: (1) EXTRACT chat-only items into a dated repo document,
+This skill runs the two-step discipline observed in both anonymized source
+repositories of the [workflow extraction
+report](../../../docs/research/aegis-workflow-extraction-report.md) (`Repo A`
+and `Repo B`, labels for two separate repositories, not checkouts to
+access): (1) EXTRACT chat-only items into a dated repo document,
 (2) AUDIT each item against PR/commit/source evidence, classifying it
 completed / partial / active / not-active / unknown — because a chat that
 says "done" proves nothing. The deliverable enforces the standing rule: the
@@ -84,8 +87,13 @@ tracked repo doc, not chat history, is the working record from now on.
    proof the ceiling is `unknown`.
 4. **Draft the dated reconciliation doc** (one per sweep, dated filename)
    with the extraction table, verdicts and citations. Show exact path/content;
-   create/append under the standard's documentary exception using an applicable
-   current-session grant, or obtain missing approval once. Verify the write and
+   create/append under the standard's **documentary exception** — Exception 1
+   of [§5 least privilege & side
+   effects](../../../docs/skill-generation-standard.md#5-least-privilege--side-effects),
+   which permits authorized ordinary documentation create/append — using an
+   applicable **current-session grant** (a direct instruction in this session
+   that already authorizes the bounded recording), or obtain missing approval
+   once. Verify the write and
    report its actual persistence level. Existing-file replacement is separate.
 5. **Route the survivors.** `not-active`-but-wanted and `partial` gaps go to
    the real backlog; unrecorded decisions go to the decision log/ADR flow;

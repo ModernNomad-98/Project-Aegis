@@ -23,11 +23,13 @@ a gap when that control's agreed cadence required March evidence. This skill
 produces the evidence program:
 per-control evidence specs (type, cadence, population, collector, retention,
 integrity), the register that accrues them, and a window-coverage audit that
-exposes holes before an auditor does. It formalizes what already exists —
-the Phase 5 evidence pack, `audit-log-architect` trails, CI results,
-`agent-governance-audit` reports — rather than inventing a parallel evidence
-world. It designs and audits coverage; it never mutates a live evidence
-store.
+exposes holes before an auditor does. It formalizes what already exists
+rather than inventing a parallel evidence world: the QA evidence pack
+shipped in the QA/manual-QA delivery phase — `screenshot-evidence-planner`
+screenshot and masking policy plus `manual-test-case-creator` manual cases —
+together with `audit-log-architect` trails, CI results, and
+`agent-governance-audit` reports. It designs and audits coverage; it never
+mutates a live evidence store.
 
 ## Use When
 
@@ -79,9 +81,10 @@ store.
    be tied to a complete population invites "how do we know this is all of
    them?"
 4. **Reuse existing artifacts.** Map each spec to what already accrues:
-   PR reviews, CI runs, validator output, screenshot evidence per the
-   Phase 5 policy, audit-log extracts, governance-audit reports. Net-new
-   collection is the exception and gets a named owner.
+   PR reviews, CI runs, validator output, screenshot evidence per
+   `screenshot-evidence-planner`'s masking/storage policy, audit-log
+   extracts, governance-audit reports. Net-new collection is the exception
+   and gets a named owner.
 5. **Set retention and integrity.** Retention at least covering
    window + audit completion (typically longer per contract/policy);
    evidence write path, who can modify/delete, and tamper posture — an

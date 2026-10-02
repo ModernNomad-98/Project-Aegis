@@ -11,7 +11,7 @@ attestation framework, and CPA means certified public accountant. AI means
 artificial intelligence; RLS means row-level security; RMF means risk
 management framework. NIS2 is the European Union's second Network and
 Information Security Directive; US and EU mean United States and European
-Union.
+Union. OWASP is the Open Worldwide Application Security Project.
 
 ## Purpose
 
@@ -24,10 +24,10 @@ risk-assessment controls are written once and satisfy every framework via
 control states its objective, owner, the verified operating mechanism
 (system or process), its evidence hook for
 `compliance-evidence-collector`, and an honest implementation status. The
-shipped Phase 3/4 skills provide design and review routes, not evidence that
-technical controls operate in this organization. This skill maps verified
-systems and processes into compliance shape and exposes what is missing;
-it does not re-derive or re-implement them.
+shipped technical-control skills provide design and review routes, not
+evidence that technical controls operate in this organization. This skill
+maps verified systems and processes into compliance shape and exposes what
+is missing; it does not re-derive or re-implement them.
 
 ## Use When
 
@@ -60,16 +60,18 @@ it does not re-derive or re-implement them.
    (`supply-chain-security-reviewer`), threat models (`threat-modeler`,
    `ai-threat-modeler`), secure-dev review practice
    (`security-pr-reviewer`, `static-analysis-reviewer`).
-2. AI-governance artifacts for the AI-facing controls: the Phase 1.5 pack
-   (`ai-sdlc-operating-model`, `agent-authorization-matrix`,
+2. AI-governance artifacts for the AI-facing controls: the shipped
+   AI-governance pack (`ai-sdlc-operating-model`, `agent-authorization-matrix`,
    `agent-memory-governance`, `agent-governance-audit`) and
    `ai-governance-risk-reviewer` outputs.
 3. Which framework(s) the org is targeting and any existing policy or
    control documents (to reconcile, not duplicate — conflicts go to
    `source-of-truth-reconciler`).
-4. Known control residue from the reconciliation doc (e.g. OWASP D8:
-   encryption-in-transit/at-rest design and app-config hardening are
-   partial) — the catalog must carry these as honest status, not silence.
+4. Known control residue from the reconciliation doc (the **OWASP D8** audit,
+   the [OWASP Top 10:2025 coverage
+   map](../../../docs/reconciliation/step-0-reconciliation-v4.md): encryption
+   and app-config hardening are partial) — the catalog must carry these as
+   honest status, not silence.
 
 ## Workflow
 
@@ -132,8 +134,8 @@ Framework references: none here — see multi-framework-crosswalk
 - [ ] All seven domains covered (plus AI governance when 42001/RMF in
       scope); domain gaps stated, not skipped.
 - [ ] Zero framework clause/criteria citations inside the catalog.
-- [ ] Known residue (e.g. D8 crypto/app-config partials) appears as
-      partial/missing status, not silence.
+- [ ] Known residue (the OWASP D8 audit's crypto/app-config partials) appears
+      as partial/missing status, not silence.
 - [ ] Catalog is versioned with an owner; changes proposed as diffs.
 
 ## Compliance Precision Rules
@@ -161,9 +163,9 @@ Framework references: none here — see multi-framework-crosswalk
 - Vocabulary capture: writing the catalog in one framework's idiom (e.g.
   TSC phrasing) makes the other projections awkward — keep control
   language plain and operational.
-- The rebuild temptation: shipped Phase 3/4 skills can guide design and
-  review, while verified operating controls are mapped by pointer. Neither
-  route justifies rewriting another control's implementation here.
+- The rebuild temptation: the shipped technical-control skills can guide
+  design and review, while verified operating controls are mapped by pointer.
+  Neither route justifies rewriting another control's implementation here.
 - Owners must be humans/roles, not team abstractions — auditors ask "who",
   and so does `compliance-gap-auditor`.
 
