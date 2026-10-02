@@ -73,7 +73,7 @@ document-persistence contract; a proposed graph is not evidence of a file edit.
    the decision history. Propose missing numbers and statuses; label any
    unresolved human decision instead of inventing acceptance.
 2. **Propose the status lifecycle mapping.** Each ADR is proposed (drafted and
-   awaiting a decision), accepted (the record of what the team currently does),
+   awaiting a decision), accepted (the current decision),
    rejected (considered and declined, kept as history), deprecated (no longer
    recommended, with no direct replacement) or superseded (replaced by a
    specific newer ADR) — never ambiguous. A superseded ADR stays in the record
