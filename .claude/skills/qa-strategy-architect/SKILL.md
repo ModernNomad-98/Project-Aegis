@@ -11,9 +11,9 @@ integration (CI) runs automated checks; a pull request (PR) proposes a
 repository change; a database (DB) stores application data; UI means user interface and UX means
 user experience. A change class is the category a change falls into
 before work starts (docs-only, schema/migration, security, and so on),
-set by `change-classification-gate`; the validation floor is the
-minimum set of checks every change in that class must pass, and this
-strategy sets those floors.
+set by `change-classification-gate`, which sets the validation floor —
+the minimum set of checks every change in that class must pass; this
+strategy maps each class to the checks that apply here.
 
 ## Purpose
 
