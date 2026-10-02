@@ -257,11 +257,16 @@ rule](#remaining-page-review-in-larger-batches) keeps an acceptance only for a
 change of at most 10 net lines on the page that adds no section, measured from
 that page's accepted version to now. Four merges relabelled provenance and
 expanded shorthand across skill pages only — **#601** (`ed5f8ae6`), **#602**
-(`253aa338`), **#604** (`c03f77f9`) and **#607** (`cc697914`). Each added no
-`##` section to any page, so only the line limb is in play, and each stayed
-under 10 lines on its own. Their effect is cumulative, and on these nine pages
-it is past the threshold. No commit after `cc697914` touches any of them, so
-each page's accepted version still stands:
+(`253aa338`), **#604** (`c03f77f9`) and **#607** (`cc697914`) — and **#486**
+(`8459ac73`) contributed two more lines to one of the nine. Each added no `##`
+section to any page, so only the line limb is in play. A single merge alone
+took each page past the threshold: decomposing every page into the commits it
+received since acceptance returns one commit whose own change is already over
+10 lines — 31, 26, 18, 15, 14, 14, 12, 12 and 11 — so no cumulation is needed
+and none is claimed. `iso-27001-isms-architect` is the only page with a second
+contributor, the two #486 lines inside its 17, and it too crosses on its
+relabel commit alone. No commit after `cc697914` touches any of them, so each
+page's accepted version still stands:
 
 | Page | Accepted at | Net changed lines | `--numstat` |
 | --- | --- | ---: | --- |
@@ -278,15 +283,24 @@ each page's accepted version still stands:
 Each row is `git diff --numstat <accepted-at> refs/remotes/origin/main --
 .claude/skills/<name>/SKILL.md`, added plus deleted. Each row uses the latest
 revision at which that page is recorded accepted, so every figure is a **lower
-bound**: an earlier acceptance can only enlarge the count.
+bound**: an earlier acceptance can only enlarge the count. The deleted line is
+load-bearing on five rows — `merge-is-deploy-governance`, `authority-
+invalidation-architect`, `adr-sequencer`, `risk-tiered-validation-selector` and
+`resilience-architecture-reviewer` would not reach 10 on added lines alone, and
+the first and fourth sit at exactly 10 added. The rule names added plus deleted,
+so the sum is the measure and the choice is not arbitrary.
 
-All nine are recorded as accepted in the batch list above — the
-"Accepted again after full-page re-reads" entries and the D15 item — and no
-later reading restated any of them. The totals therefore overstate accepted
-readers by nine: at most **575** against the recorded 584. The dated arithmetic
-`584 + 1 + 55 + 16 = 656` is left exactly as the snapshot it is and is **not**
-rewritten; the pending set rises to at least **25**. The exact pending count
-stays not derivable from a command, for the reason recorded above.
+Each page is recorded as accepted at the revision cited: seven in the
+"(102 of the 103)" list above; `risk-tiered-validation-selector` through the
+#224 acceptance batch (`5e0e9ad7`), which the ledger counts as gaining twenty
+pages without naming each; and `resilience-architecture-reviewer` in its own
+#522 row. No later reading restated any of the nine. The totals therefore
+overstate accepted readers by nine: at most **575** against the recorded 584.
+The dated arithmetic `584 + 1 + 55 + 16 = 656` is left exactly as the snapshot
+it is and is **not** rewritten. The pending set rises from the provable floor
+the 2026-10-01 restatement establishes — 17, not the earlier recorded 16 — to
+at least **26**. The exact pending count stays not derivable from a command,
+for the reason recorded above.
 
 Each of the nine needs one independent full-page re-read against [Acceptance
 for each page](#acceptance-for-each-page). The relabels that pushed them over
