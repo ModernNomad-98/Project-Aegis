@@ -5,10 +5,10 @@
 > **Purpose and current-state pointer — added 2026-10-01.** This page is for
 > maintainers and coding agents planning Project Aegis work — a rolling active-work
 > estimate, not a calendar promise and not permission to start blocked work, as its
-> own purpose paragraph further down this section states. The dated snapshots below it
-> run newest first and are history, not current instruction; the block immediately
-> below is itself superseded, and its own appended note says so. This note adds no
-> date, figure or estimate, and changes no dated text.
+> own purpose paragraph further down this section states. The dated snapshots below
+> run newest first; the count figures in the block immediately below are themselves
+> superseded, as its own appended note says. This note adds no date, figure or
+> estimate, and changes no dated text.
 
 **Current reading at the 2026-09-30 catch-up checkpoint after #554:** terms used in this section: **WP-2B-3** to **WP-2B-7** are Behavioral Eval Runner (BER) work packages in the [runner backlog](behavioral-eval-runner-backlog.md); **CP-WP-003** and **CP-WP-004** are control-plane work packages in the [control-plane backlog](resumable-control-plane-backlog.md); **R4/R5** are the runner's selected-host capability and full-profile requirements; **D69**, **D70** and **D71** are rows in the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) log; **BER-BKL-009** is a runner backlog item; **TBD** is to be determined.
 

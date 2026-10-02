@@ -3,14 +3,14 @@
 ## Start here — current measurements
 
 > **Reader key — added 2026-10-01.** These blocks are dated measurements, newest
-> first; they are history, not current instruction. **ETA** means estimated time to
-> complete a work item; **PR** means pull request; **CI** means continuous
-> integration; **UTC** means Coordinated Universal Time; **SDK** means software
-> development kit; **VM** means virtual machine; and **TBD** means to be determined.
-> **D68** names the owner's 2026-09-28 quality assurance (QA) Tier 1 build decision,
-> recorded in the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions)
-> log. The full term key and the identifier glosses are in the purpose paragraph
-> further down this section, and the original paragraph is left as written.
+> first; the date says how each figure was obtained, not whether it governs now.
+> The **current** reading below is live and load-bearing: its 71–146 provisional
+> active hours stand, and only the earlier readings are history. **ETA** means
+> estimated time to complete a work item; **PR** means pull request; **CI** means
+> continuous integration; **UTC** means Coordinated Universal Time. **D68** is the
+> recorded 2026-09-28 decision approving the quality assurance (QA) Tier 1 build
+> batch, in the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions);
+> the fuller term key is in the purpose paragraph below; that paragraph is left as written.
 
 **Current measurements at the catch-up checkpoint after #491:** sixteen PRs merged after #474 with no reassessment, missing three five-merge windows (those ending #475, #481 and #487); this record covers the window ending #491. From #474 to #491 is **3h01m52s observed wall time** across 16 merges; the complete windows ranged from **30m44s** to **1h18m44s**. No active, review, CI or waiting split was measured. The readability sweep (0.5–2 active hours), the checkpoint after #474 (0.5–1.5) and the engine v1.13.4 grant record (0.25–0.75) are delivered; only the checkpoint has a recorded start, and its 1h07m19s of wall time cannot score an active-hour range. The bounded selected subtotal stays **71–146 provisional active hours**; near-term work outside it is a provisional **11.25–21.75 active hours** of agent estimates, 9.75–17.25 of them for the quality assurance (QA) Tier 1 skill batch the owner approved (recorded decision D68, in open #493). Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD), so the full selected and all-options ETA stays unbounded.
 
