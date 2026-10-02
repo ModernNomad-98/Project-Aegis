@@ -33,8 +33,14 @@ marked rows created or repaired, each capability grant's backup reference
 and rollback step, and a re-validation showing what still differs. It also reports a static lint of
 test configuration that could point automation at production. Hand-made test
 accounts drift silently; this skill replaces them with one repeatable,
-checkable procedure. Built under owner decision D68 (roadmap row #198, as
-broadened by owner decision D10).
+checkable procedure.
+
+*Provenance (history, not operative definitions):* built under owner decision
+**D68** (2026-09-28) from roadmap row **#198**, as broadened by owner decision
+**D10**; the [reconciliation
+log](../../../docs/reconciliation/step-0-reconciliation-v4.md) carries the
+entry. Those identifiers are recorded history, not requirements this skill
+relies on — the procedure above is defined by this skill's own rules.
 
 ## Use When
 
