@@ -32,7 +32,7 @@ are BER's host confinement and execution-profile evidence gates. POSIX means
 a Unix-like operating-system interface; continuous integration (CI) runs
 repository checks, not a selected-host proof. A source SHA is a commit hash;
 `NON_BASELINE` means the result cannot qualify for the measured baseline.
-`SYSTEM` is the Windows operating-system service account. A D-number such as D59 is a row in the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) log. `gate-guard` is the continuous-integration check that fails when a PR changes a protected file path. Times are in Coordinated Universal Time (UTC) unless marked Pacific Daylight Time (PDT).
+`SYSTEM` is the Windows operating-system service account. A D-number such as D59 is a row in the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) log. DCO means the [Developer Certificate of Origin](https://developercertificate.org), the commit sign-off requirement. `gate-guard` is the continuous-integration check that fails when a PR changes a protected file path. Times are in Coordinated Universal Time (UTC) unless marked Pacific Daylight Time (PDT).
 
 | Topic | Current status and next gate |
 | --- | --- |
