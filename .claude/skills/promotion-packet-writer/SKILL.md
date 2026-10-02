@@ -30,8 +30,8 @@ future scope, report a single task, or carry work across stages.
 - Do NOT use when: the task is choosing what high-leverage scope to work
   on NEXT — that is `staff-scope-selector` (future scope, not past
   evidence).
-- Do NOT use when: the task is a single task/PR's closeout report — that
-  is `ai-closeout-reporter`.
+- Do NOT use when: the task is a single task's or pull request (PR)'s
+  closeout report — that is `ai-closeout-reporter`.
 - Do NOT use when: the task is carrying decisions/evidence across STAGES
   of one effort for continuation — that is `phased-work-handoff-designer`.
 
@@ -46,7 +46,8 @@ future scope, report a single task, or carry work across stages.
 3. Measurable impact: metrics, before/after, and business/user outcomes
    attributable to the work — not just what was built.
 4. Corroboration available: peer/manager/stakeholder testimony, artifacts
-   (design docs, ADRs, dashboards), and cross-functional recognition.
+   (design docs, architecture decision records (ADRs), dashboards), and
+   cross-functional recognition.
 5. The current draft (if any): whether it reads as activity vs impact and
    which rubric dimensions it under-covers.
 

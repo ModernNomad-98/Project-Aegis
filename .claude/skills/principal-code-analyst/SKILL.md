@@ -36,7 +36,7 @@ worked.
 1. The subsystem's code: entry points, core flows, boundaries with the rest
    of the system — read the top 2–3 flows end to end, not just file skims.
 2. Change history: hotspot files (`git log` churn), bugfix density, authorship
-   concentration (bus factor), recent incident/PR themes.
+   concentration (bus factor), recent incident and pull request (PR) themes.
 3. Data layer: schemas, ownership, migrations, query patterns of the hot
    flows — plus who else reads/writes the same data.
 4. Tests: what is pinned, what is theater, coverage over the money paths.
@@ -112,8 +112,10 @@ Not analyzed: <exclusions + why>
   no timeout on the flaky vendor call, one table written by three services.
 - Rewrite recommendations feel decisive and usually transfer risk rather
   than reduce it; the burden of proof sits on the rewrite, not the refactor.
-- Cost claims need a mechanism ("N+1 on the dashboard × 40k daily loads ≈ 
-  the RDS spike"), not adjectives ("expensive").
+- Cost claims need a mechanism — for example, "a per-row query pattern
+  (N+1: one query for a list, then one more per row) on the dashboard ×
+  40k daily loads ≈ the Amazon Relational Database Service (RDS) spike" —
+  not adjectives ("expensive").
 - Analysis paralysis is a failure mode too: time-box, mark suspected risks
   as suspected, and ship the register.
 

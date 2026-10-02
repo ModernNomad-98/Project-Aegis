@@ -46,9 +46,14 @@ design. It returns severity-ranked findings, each citing the component, the
 failure scenario and the evidence, with a remediation order, and a
 fault-injection or game-day plan written for a person to run. It reads and
 reports only: it runs no fault injection, triggers no failover, restores no
-backup and edits nothing. Built under owner decision D71 (2026-09-28) from
-the Phase 6 expansion backlog, following the
-[Phase 6 batch proposal](../../../docs/roadmaps/phase6-reliability-skill-batch-proposal.md).
+backup and edits nothing.
+
+*Provenance (history, not operative definitions):* built under owner decision
+**D71** (2026-09-28) from the **Phase 6 expansion backlog**, following the
+[Phase 6 batch
+proposal](../../../docs/roadmaps/phase6-reliability-skill-batch-proposal.md).
+Those labels record when and why the skill was commissioned, not what it
+does; the review procedure above is the operative content.
 
 ## Use When
 

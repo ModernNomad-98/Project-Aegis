@@ -13,14 +13,22 @@ runs automated checks; a pull request (PR) proposes a repository change.
 Spend validation where risk lives — mechanically, and erring expensive. Flat
 validation policy fails in both directions: full CI on a typo teaches people
 to resent (and bypass) validation, while light checks on a migration is how
-incidents start. The evidence pattern (Repo B's impact classifier + tier
-protocol, corroborated by Repo A's docs-only rule) is a CLASSIFIER whose
+incidents start. The evidence pattern is a CLASSIFIER whose
 input is the changed file set and whose output is a validation tier — with
 the defining property that it FAILS CLOSED: a file no rule matches, an
 ambiguous match, or a classifier error selects FULL validation. Cheap tiers
 are earned by explicit rules; expensive is the default for the unknown. This
 skill designs that classifier and its tier definitions as reviewable repo
 artifacts.
+
+*Provenance (history, not the classifier this skill defines):* the pattern
+is calibrated on two anonymized source repositories compared in the
+[workflow extraction
+report](../../../docs/research/aegis-workflow-extraction-report.md) — an
+impact classifier with a tier protocol in one ("Repo B" there) corroborated
+by a docs-only rule in the other ("Repo A" there). Those labels name
+repositories in that report, not checkouts or files to access, and the
+classifier above is defined by this skill's own rules.
 
 ## Use When
 
