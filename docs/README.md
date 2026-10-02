@@ -7,7 +7,7 @@ Project Aegis ships a skills library for artificial intelligence-assisted
 engineering. Two
 maintainer tools accompany it:
 
-- The [Behavioral Eval Runner](../tools/behavioral_eval_runner/README.md)
+- The [Behavioral Eval Runner (BER)](../tools/behavioral_eval_runner/README.md)
   inventories test cases and grades recorded behavior so maintainers can
   measure whether the skills work. Its general commands are offline; measured
   model calibration remains gated.
@@ -17,6 +17,16 @@ maintainer tools accompany it:
 
 Each component guide explains normal use, commands, files and current limits.
 The backlog links below show what remains proposed or blocked.
+
+Shorthand: BER is the Behavioral Eval Runner; WP (work package) is the governing
+delivery unit of the
+[durable backlog](roadmaps/behavioral-eval-runner-backlog.md); and OD-1 (owner
+decision 1) is the owner's ratification of a measured judge-calibration result.
+Under the [control-plane register](roadmaps/resumable-control-plane-backlog.md),
+CP-WP is a control-plane work package, T a state transition, C a crash boundary
+and F a finding-specific negative acceptance family. R1–R5 name the five
+capability-evidence gates recorded in the
+[BER durable backlog](roadmaps/behavioral-eval-runner-backlog.md).
 
 ## Use the skills
 
@@ -53,6 +63,15 @@ The backlog links below show what remains proposed or blocked.
 - [Documentation readability backlog](roadmaps/aegis-documentation-readability-backlog.md):
   the plan to explain each component in plain language, define project shorthand,
   and review all repository documentation for human and agent readers.
+- [Approval lifecycle grading](approval-lifecycle-grading.md): normal use,
+  the evidence contract and current limits for the BER approval grader.
+- [BER schema compatibility](behavioral-eval-runner-schema-compatibility.md):
+  normal use, records and current limits for versioned BER records.
+- [Skill-eval behavioral test procedure](skill-eval-behavioral-test-procedure.md):
+  normal use, method and current limits for repeatable skill-eval runs.
+- [Strategic skills roadmap](300-repeatable-software-saas-skills-roadmap.md):
+  the product-agnostic 300-skill backlog that replaced the
+  [superseded 150-skill draft](150-claude-skills-roadmap.md).
 - [Security policy](../SECURITY.md): supported surfaces and private reporting.
 - [Changelog](../CHANGELOG.md), [construction history](HISTORY.md), and
   [reconciliation and decision log](reconciliation/step-0-reconciliation-v4.md):
