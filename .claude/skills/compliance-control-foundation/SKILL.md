@@ -67,8 +67,8 @@ is missing; it does not re-derive or re-implement them.
 3. Which framework(s) the org is targeting and any existing policy or
    control documents (to reconcile, not duplicate — conflicts go to
    `source-of-truth-reconciler`).
-4. Known control residue from the reconciliation doc (the **OWASP D8** audit,
-   the [OWASP Top 10:2025 coverage
+4. Known control residue from the reconciliation doc (the repository's **D8**
+   audit, the [OWASP Top 10:2025 coverage
    map](../../../docs/reconciliation/step-0-reconciliation-v4.md): encryption
    and app-config hardening are partial) — the catalog must carry these as
    honest status, not silence.
@@ -134,8 +134,8 @@ Framework references: none here — see multi-framework-crosswalk
 - [ ] All seven domains covered (plus AI governance when 42001/RMF in
       scope); domain gaps stated, not skipped.
 - [ ] Zero framework clause/criteria citations inside the catalog.
-- [ ] Known residue (the OWASP D8 audit's crypto/app-config partials) appears
-      as partial/missing status, not silence.
+- [ ] Known residue (the repository's **D8** audit: OWASP Top 10:2025
+      crypto/app-config partials) appears as partial/missing status, not silence.
 - [ ] Catalog is versioned with an owner; changes proposed as diffs.
 
 ## Compliance Precision Rules
