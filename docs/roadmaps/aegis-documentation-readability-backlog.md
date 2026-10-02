@@ -141,6 +141,114 @@ round had to settle the register's status from the rule text plus the ledger's
 own dated history, which is exactly where the earlier erroneous acceptance
 came from.
 
+**Current-truth restatement, appended 2026-10-01 — re-derived at `origin/main` `f38dcc25`.**
+Nothing above is rewritten or reordered. This note records only what changed since the last
+reading and re-derives, from the repository, every figure it can. Where a figure cannot be
+derived from a command it is left as read or reported as a proven bound, never replaced by an
+invented number.
+
+*Superseded reading.* The last reading is the **Re-check and restamp, 2026-09-30** above, which
+re-derived its figures at `origin/main` `5c806348`: "`git ls-tree -r --name-only origin/main`
+filtered to `*.md` returns **657** tracked Markdown files". That revision is fourteen commits
+behind the `f38dcc25` this note was asked to re-derive against — `git log --oneline
+5c806348..f38dcc25` lists fourteen — and sixteen behind `origin/main` at the time of writing,
+`29817f50` (PR #597), where `git log --oneline 5c806348..refs/remotes/origin/main` lists sixteen,
+and seventeen behind `origin/main` as this revision was prepared, `253aa338` (PR #602). The
+ledger itself is unchanged between those revisions: `git diff --stat 29817f50
+refs/remotes/origin/main -- docs/roadmaps/aegis-documentation-readability-backlog.md` prints
+nothing, so this note reads the same ledger text at each.
+
+*What changed since `5c806348`.* Two facts settle the inventory, and they are checked per commit
+rather than inferred from the pull-request list. **First, exactly one commit in the range added a
+tracked Markdown file.** Running `git show --name-status <commit>` for every commit in
+`git log --format='%h' 5c806348..f38dcc25` yields a single `A` entry across all fourteen:
+commit `1955c222` adds the
+[2026-09-30 evening session continuation](../evidence/session-continuation-2026-09-30-evening.md).
+Its full line is `git log --diff-filter=A --format='%h %s' refs/remotes/origin/main --
+docs/evidence/session-continuation-2026-09-30-evening.md` →
+`1955c222 docs(evidence): record the 2026-09-30 evening session state for continuation (#586)`.
+**Second, no commit in the range deleted one:** `git diff --name-status --diff-filter=D 5c806348
+refs/remotes/origin/main` prints nothing, as does the same command over `410b90aa`.
+
+The eight merges this correction was asked to account for — **#589**, **#590**, **#591**,
+**#595**, **#596**, **#598**, **#599** and **#600** — are all in that range and are all
+modification-only: `git show --name-status` lists only `M` (modified) entries for each and no `A`
+tracked Markdown path. So are the range's other six merges (#586, #587, #588, #592, #593, #594),
+with the single exception of #586's added page above. The eight named merges therefore move no
+inventory figure at all. Nor does the later **#601** (`ed5f8ae6`), whose only Markdown entries are
+seven modifications under `.claude/skills/`, nor **#597**, which amends `AGENTS.md` only, nor
+**#602** (`253aa338`), which again modifies seven skill files and adds none. So at `f38dcc25`, at
+`29817f50` and at `253aa338` alike, the file count is **658**.
+
+*Tracked Markdown files: **658**.* Command: `git ls-tree -r --name-only
+refs/remotes/origin/main | Select-String '\.md$'` → **658**. The same command returns **657** at
+`5c806348` and **653** at `410b90aa`, and `653 + 5 = 658`, where the five additions are exactly
+the Markdown paths in `git diff --name-status --diff-filter=A 410b90aa refs/remotes/origin/main`:
+the [procedure](../skill-eval-behavioral-test-procedure.md), the
+[authorization request](skill-eval-harness-authorization-request.md), the
+[run record](../evidence/skill-eval-run-2026-09-30.md), the
+[session continuation](../evidence/session-continuation-2026-09-30.md) and the
+[evening session continuation](../evidence/session-continuation-2026-09-30-evening.md).
+
+*Pending pages: **not derivable** from a command. The newest figure the ledger states is **16**,
+and the lowest figure its own newest reading can support at `f38dcc25` is **17**.* This ledger has
+no single command that yields its pending set, and the pages that would move the figure are
+precisely the pages that remain unread. What can be stated is bounded rather than guessed:
+
+- The pending set was **13** at `410b90aa`, the last reading that stated it with a closed
+  arithmetic: `584 + 1 + 55 + 13 = 653`.
+- Five pages were added between `410b90aa` and `f38dcc25`. Under the targeted-edit rule above,
+  each starts pending, because that rule *retains* an acceptance and *confers* none.
+- Three of the five are recorded pending in this ledger: the
+  [procedure](../skill-eval-behavioral-test-procedure.md) and the
+  [authorization request](skill-eval-harness-authorization-request.md) ("the pending set from 13
+  to **15**") and the [run record](../evidence/skill-eval-run-2026-09-30.md) ("from 15 to
+  **16**"). Those three are therefore already inside the recorded 16.
+- The other two are not. The [session continuation](../evidence/session-continuation-2026-09-30.md)
+  does move the tip count: the current-reading note reads "(A later merge, PR #577, adds one
+  further tracked page … so the tip count is now **657**; that page joins the pending set …)".
+  What it does not do is move the pending figure in the arithmetic, which the skill-eval round
+  sections below still close at `584 + 1 + 55 + 16 = 656`, without counting it. The
+  [evening session continuation](../evidence/session-continuation-2026-09-30-evening.md) carries
+  no review result at all. The ledger *before* this note never named it, so no acceptance of it
+  and no review of it could have been recorded:
+  `git show refs/remotes/origin/main:docs/roadmaps/aegis-documentation-readability-backlog.md |
+  Select-String -SimpleMatch 'session-continuation-2026-09-30-evening'` returns **0** lines. On
+  this branch the same filter returns **5** lines, and all five are added by this note — the two
+  cross-references above and this sentence — not by an earlier reading. The rule above therefore
+  leaves a new page pending.
+- That is the gap, and it is a text gap rather than a review gap. The section's `16` is the
+  pre-#577 snapshot at the skill-eval-round revision, and the restamp above — which is the
+  ledger's newest reading — confirms at `5c806348` both that the file count is `657` and that
+  PR #577's page "already joins the pending set", then declines to restate the pending figure.
+  So the ledger's newest *stated* pending count is 16 while its own newest *confirmed* facts imply
+  17 at `5c806348`.
+- At `f38dcc25` the provable floor is therefore `17 + 0 = **17**`: the evening session
+  continuation is a further new page that the rule leaves pending, but this ledger records no
+  reading of it, and a page that has never been reviewed cannot be shown to have joined a set
+  that has never been recomputed. **The exact current pending count is not derivable from a
+  command, and this note does not assert one.** Naming the gap is the honest output; the restamp
+  above already records the owed full-page re-read that would settle the set itself, and it
+  remains owed.
+
+*Accepted readers and classified fixtures: left as read, with one check.* The accepted figure
+(584) counts pages a reviewer has read whole; no command reproduces it, and this note performs no
+review, so it is not re-derived. The classified synthetic-fixture figure (55) has a path-based
+check that reproduces it: `git ls-tree -r --name-only refs/remotes/origin/main -- scripts`
+filtered to `*.md` returns **56**, and removing the one reader-facing
+`scripts/tests/fixtures/README.md` that this ledger's own fixture rule excepts leaves **55**,
+matching the recorded figure. That the remaining 55 files are each genuinely
+classification-only test input is not re-verified here. The generated-report count stays **1**. The
+generator this ledger names is `scripts/audit-skill-contracts.py`, whose `--markdown` option writes
+the [baseline report](../audits/skill-contract-audit-baseline.md); that report is judged on its
+output format rather than by a full-page re-read.
+
+*Unchanged.* None of the eight merges named above adds a Markdown page, changes a grant, or
+touches a protected path, so the eight move no classification by their own content. This
+restatement confers no acceptance. Itself an edit to a page that is already pending, it leaves
+this ledger **pending** its own independent full-page re-read against [Acceptance for each
+page](#acceptance-for-each-page).
+
 ### Ledger update for the skill-eval rounds — 2026-09-30
 
 This round adds Markdown and changes no skill, no eval file and no script. The
