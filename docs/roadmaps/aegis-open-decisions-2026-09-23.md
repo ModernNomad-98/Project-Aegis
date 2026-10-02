@@ -297,3 +297,12 @@ The live issue #101 body was read on 2026-09-23 and lists packages 1–7.
 The earlier execution handoff's "six packages" wording is stale after the
 issue's forward correction; the current issue controls this count. Neither
 source itself grants runtime implementation authority.
+
+> **Later clarification — 2026-10-01.** The commit-trailer-convention row
+> under [Decided on 2026-09-29](#decided-on-2026-09-29) names no exception.
+> The check requires a `Signed-off-by:` trailer on every commit in the
+> pull request's range, except two machine authors that cannot sign off —
+> `dependabot[bot]` and `github-actions[bot]` — as decision
+> [D60](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions),
+> which records that the exemption is deliberately **not an authentication
+> boundary**. The row above is left as written.
