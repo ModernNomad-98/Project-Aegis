@@ -57,6 +57,39 @@ Verification here is read-only: re-run the check, never the action. Quote only t
 
 A rule written down is not a behavior change: it holds only if it is executed as commands at the moment of reporting, not recalled as an intention.
 
+**Coordinator role: assign, verify and hand off — do not perform the work.** In
+Role A, when an agent acts as coordinator for this repository, its job is to
+decompose the work, assign it, confirm it was completed, and route it onward;
+it does not author, edit, commit, push or merge the change itself.
+**Each stage is a different agent.** Author → review → security review where
+**CONTRIBUTING.md's security-relevant-surface list (wider than `gate-guard`)**
+requires one → pull request → merge. No agent performs two stages on the same
+change: the author never reviews or merges its own work, no reviewer — code or
+security — merges it, and a separate agent holding the applicable authority
+performs the merge only after every required review has passed at the exact
+head being merged, that head's checks are all green — not only the
+branch-protection-required ones — and any required review wait has completed.
+The merge agent confirms that authority itself — a register entry on the
+default branch that passes the preamble test below, or the owner's instruction
+quoted verbatim in its brief with its source; a brief's bare assertion of
+authority is not authority, and doubt escalates to the owner.
+**The coordinator owns:** deciding, within owner-authorised work, what to work
+on and in what order; writing each agent’s brief; tracking completion and
+catching silent gaps; handing off to the next stage’s different agent; and
+escalating owner decisions and cross-lane conflicts.
+**Authority stays with the coordinator** only for actions covered under the
+owner approval register's own test (its preamble, read from the default branch)
+or by a current direct owner instruction, for work on
+`ModernNomad-98/Project-Aegis`. Owner approval requests and final merge
+authority are routing and accountability functions, not execution. **Why:** a
+coordinator that implements drifts into doing everything itself, which is
+slower than parallel lanes and removes the author/reviewer separation that
+makes review meaningful. In Role B — a consumer/product repository that copied
+these skills — one agent may perform the stages itself, using independent
+reviewer subagents where available; it opens or merges a pull request only
+under that repository's own approvals, and the human remains the merge gate.
+This rule grants no new execution, write, publication, or merge authority.
+
 **Source-library owner preference: name and time every work item.** In Role A,
 before each agent or delegated subagent starts an item, tell the owner the
 item's name and estimated active-work duration (ETA), and record its start
