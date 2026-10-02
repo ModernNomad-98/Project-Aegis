@@ -34,8 +34,9 @@ itself (`ai-sdlc-operating-model`).
 - Do NOT use when: the task is reporting ONE turn/task's outcome (what
   changed, tests run, next step) — that is `ai-closeout-reporter`; this
   designs the CROSS-STAGE carry-forward.
-- Do NOT use when: the task is defining the end-to-end SDLC operating model
-  — the stages, authority holders, and gates for artificial intelligence (AI)-assisted work — that is
+- Do NOT use when: the task is defining the end-to-end software
+  development lifecycle (SDLC) operating model — the stages, authority
+  holders, and gates for artificial intelligence (AI)-assisted work — that is
   `ai-sdlc-operating-model`; this designs the handoff artifact within it.
 - Do NOT use when: the task is a pre-work guide for PARALLEL lanes at the
   start of work — that is `lane-authoring-guide`; this is for SEQUENTIAL
@@ -142,9 +143,9 @@ Boundaries: one turn → ai-closeout-reporter; lifecycle model → ai-sdlc-opera
 - A handoff written as narrative ("we did a bunch of stuff, looks good")
   can't be verified and can't be continued from cold. Structure it as
   checkable evidence.
-- This is not a single-turn closeout. If you're reporting one PR/task's
-  outcome, that's `ai-closeout-reporter`; this carries a decision register
-  and evidence across MANY stages.
+- This is not a single-turn closeout. If you're reporting one pull
+  request (PR) or task's outcome, that's `ai-closeout-reporter`; this
+  carries a decision register and evidence across MANY stages.
 - This is not the operating model. Defining the stages, authorities, and
   gates of the whole lifecycle is `ai-sdlc-operating-model`; this designs
   the handoff that rides between stages.

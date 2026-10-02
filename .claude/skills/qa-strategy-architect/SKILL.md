@@ -9,7 +9,11 @@ description: Define the product- or repo-level QA strategy — a risk inventory 
 end-to-end (E2E) tests exercise a whole user journey; continuous
 integration (CI) runs automated checks; a pull request (PR) proposes a
 repository change; a database (DB) stores application data; UI means user interface and UX means
-user experience.
+user experience. A change class is the category a change falls into
+before work starts (docs-only, schema/migration, security, and so on),
+set by `change-classification-gate`, which sets the validation floor —
+the minimum set of checks every change in that class must pass; this
+strategy maps each class to the checks that apply here.
 
 ## Purpose
 
@@ -46,8 +50,9 @@ coverage mapping audits against it, and automation architecture implements it.
    what currently gates a merge.
 3. Risk sources: security-sensitive surfaces (auth, tenant boundaries,
    payments, exports), prior incidents/bug history, compliance obligations.
-4. Change classes in use (`change-classification-gate` output if present) —
-   the strategy maps each class to a validation floor.
+4. The change classes in use (`change-classification-gate` output if present)
+   — the strategy maps each class to its validation floor (the minimum set
+   of checks that class must pass).
 5. Team/ownership signals: CODEOWNERS, who fixes broken tests today.
 
 ## Workflow
@@ -70,9 +75,10 @@ coverage mapping audits against it, and automation architecture implements it.
    in-memory fakes, what needs a seeded database, what needs a deployed
    environment; where test data comes from (delegate design to
    `test-data-architect`).
-5. **Define required evidence per change class:** which checks are blocking,
-   which artifacts (reports, screenshots per `screenshot-evidence-planner`)
-   must exist, and what "green" means for docs-only vs schema vs UI changes.
+5. **Define required evidence per change class** (see the reading key):
+   which checks are blocking, which artifacts (reports, screenshots per
+   `screenshot-evidence-planner`) must exist, and what "green" means for
+   docs-only vs schema vs UI changes.
 6. **Place the CI gates:** which layers run on PR, on merge, nightly; what is
    allowed to be non-blocking and why; flake policy pointer
    (`flaky-test-detective` *(manual-only)* owns diagnosis, `regression-suite-curator` owns

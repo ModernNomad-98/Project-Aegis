@@ -6,9 +6,16 @@ description: Audit and (where asked) author row-level-security policies for a te
 # RLS Policy Auditor
 
 **Reading key:** RLS means row-level security; JWT means JSON Web Token;
-SQL means Structured Query Language; DDL means data definition language.
-`GRANT` assigns database privileges; `BYPASSRLS` lets a database role skip
-row policies. PostgreSQL's [row-security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
+SQL means Structured Query Language; DDL means data definition language;
+API means application programming interface, the programmatic surface
+another system calls. `GRANT` assigns database privileges; `BYPASSRLS` lets
+a database role skip row policies. `SECURITY DEFINER` runs a PostgreSQL
+function with its owner's privileges rather than the caller's; if that owner
+is not subject to RLS — for example, a table owner without `FORCE ROW LEVEL
+SECURITY`, superuser, or `BYPASSRLS` role — the helper can bypass caller row
+restrictions, so it requires a pinned `search_path`, least privilege, and
+caller-scoped returns.
+PostgreSQL's [row-security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
 and [policy](https://www.postgresql.org/docs/current/sql-createpolicy.html)
 documentation define the effective behavior described here.
 

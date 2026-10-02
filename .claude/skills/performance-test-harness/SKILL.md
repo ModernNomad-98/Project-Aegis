@@ -23,10 +23,21 @@ how a regression is DETECTED against variance rather than eyeballed,
 which thresholds gate (consumed from the budget and SLO owners — the
 harness asserts numbers, it does not invent them), and where in CI each
 measurement tier runs. It is the MEASURES side of the pack's seam: the
-D12.3 skills design systems to be fast; this harness proves whether
-they are, and catches the release that makes them slower. It designs
-the instrument and its gates; it runs nothing against production, and
-the traffic it drives comes from `load-test-planner` scenarios.
+performance-engineering design pack (called D12.3 in the library's
+catalog) designs systems to be fast; this harness proves whether they
+are, and catches the release that makes them slower. It designs the
+instrument and its gates; it runs nothing against production, and the
+traffic it drives comes from `load-test-planner` scenarios.
+
+*Provenance (history, not operative definitions):* **D12.3** is the
+identifier the [reconciliation
+log](../../../docs/reconciliation/step-0-reconciliation-v4.md) gives the
+six-skill performance-engineering pack
+(`profiling-methodology-designer`, `query-plan-reader` *(manual-only)*,
+`n-plus-one-detector` *(manual-only)*, `caching-strategy-designer`,
+`latency-budget-architect`, `frontend-perf-engineer`). It labels where that
+pack was planned, not a definition this harness relies on; those skills are
+named directly wherever they govern.
 
 ## Use When
 
@@ -42,10 +53,10 @@ the traffic it drives comes from `load-test-planner` scenarios.
   (`slo-reliability-architect`) exist and need enforcement as
   pre-release assertions.
 - Do NOT use when: designing the system to BE fast — caching, query
-  tuning, budgets, frontend optimization are the D12.3 pack
-  (`caching-strategy-designer`, `query-plan-reader` *(manual-only)*,
-  `latency-budget-architect`, `frontend-perf-engineer`); this skill
-  measures what they built.
+  tuning, budgets, frontend optimization are the performance-engineering
+  design pack (catalog row D12.3; `caching-strategy-designer`,
+  `query-plan-reader` *(manual-only)*, `latency-budget-architect`,
+  `frontend-perf-engineer`); this skill measures what they built.
 - Do NOT use when: planning the traffic itself — workload models,
   tenant mix, stress/soak/spike profiles are `load-test-planner`; the
   harness EXECUTES its scenarios and measures the result.
@@ -269,6 +280,6 @@ Execution posture: dedicated environments; production/shared-infra touches
 - `evals/evals.json` — behavior cases including the variance-band
   edge and the run-against-production refusal.
 - `evals/trigger-evals.json` — discrimination against
-  `load-test-planner` (the sibling), the D12.3 design-side skills
-  (`latency-budget-architect`, `frontend-perf-engineer`),
+  `load-test-planner` (the sibling), the performance-engineering
+  design-pack skills (`latency-budget-architect`, `frontend-perf-engineer`),
   `slo-reliability-architect`, and `qa-automation-architect`.
