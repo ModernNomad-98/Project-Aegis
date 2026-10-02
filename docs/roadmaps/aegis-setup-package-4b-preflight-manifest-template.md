@@ -1,5 +1,11 @@
 # Issue #101 Stage 4B preflight manifest template
 
+> **Reader key — added 2026-10-01, before the status template fields.** **SDK** means
+> software development kit — the package that lets a separate program start and
+> control assistant sessions. **VM** means virtual machine — an isolated guest host;
+> this page authorizes no VM work. The fuller "Choice and plain terms" glossary is
+> below.
+
 **Status: unfilled planning template, 2026-09-25 UTC.** Copy this page into a separately reviewed execution packet. Resolve every **preflight** `UNKNOWN` before requesting a live Stage 4B grant; leave **post-run** observations as `NOT RUN` until an authorized session produces receipts. Record the owner-grant receipt later as a separate approval attachment. This page authorizes no SDK session, provider call, credential use, installation, host probe, VM work, helper comparison, deployment, or deletion. The [Stage 4B proof protocol](aegis-setup-package-4b-host-proof-protocol.md) defines the required cases and stop rules. [PR #291](https://github.com/ModernNomad-98/Project-Aegis/pull/291) corrected the offline bridge's permission response, but its synthetic tests do not prove host behavior. An execution packet must pin the corrected source commit and verify the selected runtime independently.
 
 ## Choice and plain terms
