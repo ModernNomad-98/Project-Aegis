@@ -38,7 +38,7 @@ capability-evidence gates recorded in the
 ## Maintain the source library
 
 - [Contributing](../CONTRIBUTING.md): verification, review and sign-off requirements.
-- [Offline CI](offline-ci.md): local reproduction, Linux/Windows checks and known gaps.
+- [Offline continuous integration (CI)](offline-ci.md): local reproduction, Linux/Windows checks and known gaps.
 - [Evidence reading guide](evidence/README.md): routes to 15 dated decision and
   delivery records, with current-status boundaries.
 - [Scenario A acceptance runbook](acceptance/scenario-a-runbook.md): run and read
