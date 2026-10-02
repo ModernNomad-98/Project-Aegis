@@ -29,7 +29,8 @@ navigability.
 - Use when: standing up an ADR log/index for a project, or curating one
   that's grown into an unnavigable pile.
 - Use when: a past decision is being superseded or deprecated and the old
-  and new ADRs need correct bidirectional links and statuses.
+  and new ADRs need correct bidirectional links and statuses (the five
+  status values are defined at Workflow step 2).
 - Use when: two ADRs appear to contradict and the conflict must be
   surfaced and resolved.
 - Use when: deciding whether a change warrants a NEW ADR (a material

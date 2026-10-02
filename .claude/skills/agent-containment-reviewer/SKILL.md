@@ -37,9 +37,11 @@ skill authors or improves that procedure; it does not execute containment.
 - Use when: reviewing drift detection, agent inventory/lifecycle
   (registration, ownership, decommissioning), or kill-switch design for an
   agent fleet.
-- Use when: the Phase 7 (library AI-security skill batch) backlog item
-  #299 "AI feature kill switch" (AI means artificial intelligence) is raised
-  for an AGENT system — this skill owns that agentic slice.
+- Use when: the Phase 7 (AI security and large language model (LLM) systems
+  pack) expansion backlog
+  item roadmap #299 "AI feature kill switch" (AI means artificial
+  intelligence) is raised for an AGENT system — this skill owns that agentic
+  slice.
 - Do NOT use when: the deviation is attacker-directed goal alteration
   (`agent-goal-hijack-defender` — hijack has an adversary; drift does not).
 - Do NOT use when: the only concern is spend/token/loop budgets

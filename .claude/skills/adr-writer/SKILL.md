@@ -20,7 +20,8 @@ date silently becomes permanent.
 - Use when: a significant technical decision was just made or a specific
   option was formally proposed for decision and needs a clearly proposed
   record — framework choice, boundary placement,
-  datastore, build-vs-buy, deprecation.
+  datastore, build-vs-buy, deprecation. The five status values are defined at
+  Workflow step 8.
 - Use when: `architecture-designer` hands over an ADR draft to complete.
 - Use when: an old decision is being superseded or reversed — that gets its
   own ADR linking both directions.
