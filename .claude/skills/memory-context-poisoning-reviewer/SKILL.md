@@ -5,6 +5,12 @@ description: Review an agent's persistent memory and stored context for poisonin
 
 # Memory & Context Poisoning Reviewer
 
+**Reading key:** OWASP means the Open Worldwide Application Security Project.
+Its agentic security identifiers are prefixed `ASI`; its large language model
+(LLM) application identifiers are prefixed `LLM`. Where a category number
+changed between OWASP editions, this skill names the current number and notes
+the earlier one.
+
 ## Purpose
 
 Review whether an attacker can corrupt what an agent REMEMBERS (OWASP

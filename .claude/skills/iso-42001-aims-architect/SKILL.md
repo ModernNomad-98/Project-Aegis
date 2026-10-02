@@ -24,9 +24,7 @@ skeleton (clauses 4–10, same shape as 27001 — verified from the standard's
 table of contents) and adds AI-specific machinery: AI risk assessment (6.1.2/8.2), AI
 risk treatment (6.1.3/8.3), and the AI system impact assessment
 (6.1.4/8.4) that evaluates consequences for individuals and societies, not
-just the organization. D9 is the roadmap's design premise that shipped
-skills route control work. The Phase 1.5 governance pack (the library's AI software development
-lifecycle governance skills) and
+just the organization. Shipped governance guidance for AI systems and the
 `ai-governance-risk-reviewer` provide design guidance, not proof that a
 consumer organization has implemented or operated AI controls. Verify
 mechanisms, owners, status, and evidence before mapping them. This skill
@@ -35,6 +33,14 @@ management system (scope, policy, impact assessments, SoA via
 `statement-of-applicability-author`, internal audit, management review)
 rather than re-deriving them. Readiness design only; certification is the
 accredited body's decision.
+
+*Provenance (history, not operative definitions):* the roadmap's planning
+decision **D9** is the design premise that shipped skills route control work.
+This skill's design routes were originally labelled by library build phase —
+**Phase 1.5** (the AI software development lifecycle governance skills) and
+**Phase 7** (the AI security and large language model systems pack). Those
+labels are catalog history; the Workflow and Inputs above now name the packs
+directly.
 
 ## Use When
 
@@ -66,8 +72,9 @@ accredited body's decision.
 2. The AI system inventory: which systems/features use AI, their roles
    (provider/user of AI), autonomy levels, and affected parties — seeded
    from `ai-governance-risk-reviewer` outputs where they exist.
-3. Shipped AI governance guidance to use as design routes: the Phase 1.5 pack
-   (`ai-sdlc-operating-model` stages/authority, `agent-authorization-matrix` *(manual-only)*
+3. Shipped AI governance guidance to use as design routes: the AI software
+   development lifecycle governance pack (called Phase 1.5 in the library's
+   catalog — `ai-sdlc-operating-model` stages/authority, `agent-authorization-matrix` *(manual-only)*
    standing authority, `agent-memory-governance` *(manual-only)*, `agent-governance-audit`
    per-change audits), `ai-governance-risk-reviewer` feature reviews,
    `ai-threat-modeler` threat models, `ai-evaluation-harness` *(manual-only)* eval
@@ -128,8 +135,9 @@ accredited body's decision.
    existing machinery, not beside it. Third-party AI (providers, models)
    maps to `supply-chain-security-reviewer`'s AI/ML surface plus vendor
    management.
-6. **Select Annex A control objectives via the foundation.** Use Phase 1.5
-   and Phase 7 (AI security and large language model systems) skills to
+6. **Select Annex A control objectives via the foundation.** Use the two
+   packs named above — the AI software development lifecycle governance
+   pack and the AI security and large language model systems pack — to
    find candidate routes; map only verified operated
    mechanisms with evidence to objectives. Missing or unverified mechanisms
    get owners and verification actions. Counts and identifiers come only from the
@@ -173,8 +181,8 @@ Readiness plan: <artifact → owner → date>; certification decision belongs to
 - [ ] All three assessments designed distinctly: risk (6.1.2), treatment
       (6.1.3 → SoA), impact on individuals/societies (6.1.4) — the impact
       assessment is not folded into org risk.
-- [ ] Existing governance artifacts (Phase 1.5 pack,
-      ai-governance-risk-reviewer) used as design routes; only separately
+- [ ] Existing governance artifacts (the AI lifecycle governance pack,
+      `ai-governance-risk-reviewer`) used as design routes; only separately
       verified operated organizational controls map as mechanisms, not
       re-specified.
 - [ ] Annex A selection cites only licensed-text entries; no counts stated

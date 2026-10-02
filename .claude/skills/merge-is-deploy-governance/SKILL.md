@@ -16,16 +16,22 @@ commit's identifying hash.
 Stop pretending there is a deploy step when there isn't one. On platforms
 that auto-deploy every merge to mainline, "we'll validate before deploying"
 is a fiction — the merge IS the deploy, and any validation that runs after
-it runs in production's timeline. The evidence pattern (the rulebook of "Repo B", an anonymized source
-repository studied while this library was built, documents merge-is-deploy
-explicitly, records the branch-protection
-configuration in-repo, and defines revert-based rollback) is standing
+it runs in production's timeline. That is standing
 governance that aligns the paperwork with the physics: PR-time validation
 becomes the authoritative pre-production gate, post-merge checks are
 demoted to verification, the protection config that enforces all this is
 recorded and human-owned, and the exposure window between merge and
 verified deploy is a stated risk, explicitly accepted by an authorized
 owner or marked pending, instead of an unnoticed one.
+
+*Calibration note (source evidence, not this skill's requirements):* the
+pattern was calibrated on the rulebook of "Repo B", an anonymized source
+repository studied while this library was built (see the [workflow extraction
+report](../../../docs/research/aegis-workflow-extraction-report.md)). That
+document states merge-is-deploy explicitly, records the branch-protection
+configuration in-repo, and defines revert-based rollback. A source repository's
+practice is evidence that the pattern is achievable, not the boundary this
+skill imposes.
 
 ## Use When
 

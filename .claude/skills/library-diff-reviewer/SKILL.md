@@ -5,6 +5,11 @@ description: Review a whole skill-library PR end-to-end — skill-adding, skill-
 
 # Library Diff Reviewer
 
+**Reading key:** PR means pull request; CI means continuous integration, the
+repository's automated checks on a PR; SHA means secure hash algorithm, used
+here for the commit hash that identifies one exact revision; JSON means
+JavaScript Object Notation.
+
 ## Purpose
 
 Give a skill-library PR the review its pieces cannot give themselves. The
