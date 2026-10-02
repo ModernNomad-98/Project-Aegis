@@ -30,6 +30,14 @@ entries in the [BER decision log](behavioral-eval-runner-backlog.md).
 > page's step 6 is known to need a caveat, disclosed in PR #564's review
 > record.
 
+> **Later clarification — 2026-10-01.** The evidence page this blockquote
+> said was not yet committed **is now committed**: it is
+> [the skill-eval run of 2026-09-30](../evidence/skill-eval-run-2026-09-30.md),
+> added in PR #568. The claim "**no such page is committed yet**" is
+> therefore superseded, and a run's results now have an attributable record.
+> Nothing above is changed, and no finding of that run is restated here.
+> This records a fact; it grants nothing and alters no authorization.
+
 ## The gap this asks about
 
 A skill's evals are validated **structurally only**. The validator proves
