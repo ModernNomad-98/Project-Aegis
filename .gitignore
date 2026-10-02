@@ -17,3 +17,11 @@ __pycache__/
 # reflexive `git add -A` stages the whole .worktrees tree and embeds a nested
 # repository as a broken gitlink.
 /.worktrees/
+
+# Unreferenced scratch probes written into artifacts/ by free agents. They
+# inspect a local Copilot session database or capture an event export, and
+# nothing tracked references them; without this rule one reflexive
+# `git add -A` stages them. Deliberately narrow, so it cannot reach
+# `artifacts/recovery/` or `artifacts/reviews/`, whose contents are unrelated
+# user property that repository policy forbids ignoring.
+artifacts/tmp-*
