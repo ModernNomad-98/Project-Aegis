@@ -10,14 +10,14 @@
 > [skill authoring standard](../skill-generation-standard.md).
 >
 > **Later clarification — 2026-10-01.** The reading date above stamps the last
-> full-page reading (2026-09-27); material has been appended since, and those
-> append-only passes re-read targeted passages only. The
-> [§6](#6-post-merge-corrections) entry of 2026-09-30 re-verified every
-> `path:NNN` / "line NNN" citation in [§5](#5-recorded-decisions) against
-> `origin/main` at `2184b54f`, and dated corrections of 2026-09-30 and
-> 2026-10-01 were appended inside the D58 and D59 entries and their
-> owner-action ledger. Those passages are current; the banner above is left as
-> the dated scope statement it is.
+> full-page reading (2026-09-27); material has been appended since. The
+> [§6](#6-post-merge-corrections) entry of 2026-09-30 records that pass: a
+> full-page audit checked every `path:NNN` / "line NNN" citation in
+> [§5](#5-recorded-decisions) against `origin/main` at `2184b54f`. The dated
+> corrections of 2026-09-30 and 2026-10-01 were appended inside the affected
+> numbered entries rather than in a separate list; the 2026-10-01 one is in
+> D60. Those passages are current; the banner above is left as the dated
+> scope statement it is.
 
 **How to read this log.** It is still appended as new decisions are made.
 Decisions are numbered D1, D2 and so on, oldest first, in
