@@ -78,6 +78,57 @@ class RecorderTests(unittest.TestCase):
         self.assertNotEqual(0, self.run_check("once", [sys.executable, "-c", "print('replacement')"]).returncode)
         self.assertEqual(before, {p.name: p.read_bytes() for p in self.output.iterdir()})
 
+    def test_concurrent_local_runs_of_one_label_keep_separate_evidence(self):
+        """Two local runs of one label must not collide on a shared temp root.
+
+        Locally RUNNER_TEMP is normally unset, so an unqualified run falls back
+        under the system temporary directory. Before 2026-10-02 that fallback
+        was the shared `aegis-ci`, and the second of two concurrent same-label
+        runs died on the exclusive log create with FileExistsError. The
+        sentinel below fails the test if that shared directory reappears.
+        """
+        with tempfile.TemporaryDirectory(prefix="aegis-ci-fallback-") as temporary:
+            temp_root = Path(temporary).resolve()
+            sentinel = temp_root / "aegis-ci"
+            sentinel.mkdir()
+            (sentinel / "sentinel").write_text("earlier run\n", encoding="utf-8")
+            env = {k: v for k, v in os.environ.items()
+                   if k not in ("AEGIS_CI_EVIDENCE_DIR", "RUNNER_TEMP")}
+            for name in ("TMPDIR", "TEMP", "TMP"):
+                env[name] = str(temp_root)
+            for attempt in ("first", "second"):
+                with self.subTest(attempt=attempt):
+                    result = subprocess.run(
+                        [sys.executable, str(RECORDER), "ber", "--",
+                         sys.executable, "-c", "print('concurrent local run')"],
+                        cwd=REPO, env=env, capture_output=True)
+                    self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+            # Two directories, each with complete evidence: neither run lost its
+            # log to the other, which is the point of the unique fallback.
+            roots = sorted(p for p in temp_root.glob("aegis-ci-*") if p.is_dir())
+            self.assertEqual(2, len(roots), [str(p) for p in roots])
+            for root in roots:
+                with self.subTest(root=root.name):
+                    self.assertIn(b"concurrent local run",
+                                  (root / "ber.log").read_bytes())
+                    self.assertEqual(0, json.loads(
+                        (root / "ber.json").read_text(encoding="utf-8"))["exit_code"])
+            # The fallback must not be redirected by AEGIS_CI_EVIDENCE_DIR when
+            # that variable is absent, and must not reuse a pre-existing
+            # `aegis-ci` directory: both would put two runs back in one place.
+            self.assertEqual(["sentinel"], sorted(p.name for p in sentinel.iterdir()))
+
+    def test_explicit_evidence_directory_is_honoured_verbatim(self):
+        """A supplied AEGIS_CI_EVIDENCE_DIR is the root itself, not its parent.
+
+        The fallback adds `aegis-ci`, so a change that appends it to an explicit
+        value would silently move every locally recorded artefact.
+        """
+        result = self.run_check("explicit", [sys.executable, "-c", "print('explicit root')"])
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        self.assertTrue((self.output / "explicit.log").is_file())
+        self.assertFalse((self.output / "aegis-ci").exists())
+
     def test_label_cannot_escape_evidence_directory(self):
         self.assertNotEqual(0, self.run_check("../escape", [sys.executable, "-c", "pass"]).returncode)
         self.assertFalse(self.output.exists())
