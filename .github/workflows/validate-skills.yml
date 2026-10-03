@@ -119,6 +119,15 @@ jobs:
       - name: Run contract-audit self-tests
         run: python -P scripts/ci/record-check.py contract-audit-tests -- python -P scripts/tests/test_audit_skill_contracts.py
 
+      # The Markdown link/anchor checker (PR #628) arrived with self-tests but
+      # no CI step, so nothing ran them (defect C1b). Both the checker and its
+      # tests live under scripts/, which gate-guard protects, so by the
+      # isolation rule above they belong in this gate job rather than in a
+      # tools-tests job. Like the self-tests above, the cases run the checker
+      # as a subprocess and assert its real exit status and report.
+      - name: Run Markdown link-checker self-tests
+        run: python -P scripts/ci/record-check.py markdown-links -- python -P scripts/tests/test_markdown_links.py
+
       - name: Run BER self-check
         run: python -P scripts/ci/record-check.py ber-self-check -- python -m tools.behavioral_eval_runner self-check
 
@@ -208,6 +217,14 @@ jobs:
 
       - name: Run contract-audit self-tests
         run: python -P scripts/ci/record-check.py contract-audit-tests -- python -P scripts/tests/test_audit_skill_contracts.py
+
+      # Markdown link-checker self-tests (defect C1b). Same placement rule as
+      # the self-tests above: the checker and its tests are scripts/ code that
+      # gate-guard protects, so they belong in the gate job, not in a
+      # tools-tests job that runs PR-controlled code unguarded. This library's
+      # scripts are run on both hosts, so its self-tests run on both hosts.
+      - name: Run Markdown link-checker self-tests
+        run: python -P scripts/ci/record-check.py markdown-links -- python -P scripts/tests/test_markdown_links.py
 
       - name: Run BER self-check
         run: python -P scripts/ci/record-check.py ber-self-check -- python -m tools.behavioral_eval_runner self-check
