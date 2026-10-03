@@ -39,15 +39,39 @@ capability-evidence gates recorded in the
 
 - [Contributing](../CONTRIBUTING.md): verification, review and sign-off requirements.
 - [Offline continuous integration (CI)](offline-ci.md): local reproduction, Linux/Windows checks and known gaps.
-- [Evidence reading guide](evidence/README.md): routes to 15 dated decision and
-  delivery records, with current-status boundaries.
-- [Scenario A acceptance runbook](acceptance/scenario-a-runbook.md): run and read
-  synthetic evidence for the beginner product-state workflow; behavioral
-  acceptance remains a separate gate.
+- [Security policy](../SECURITY.md): supported surfaces and private reporting.
+- [Changelog](../CHANGELOG.md), [construction history](HISTORY.md), and
+  [reconciliation and decision log](reconciliation/step-0-reconciliation-v4.md):
+  delivered changes, historical context and recorded decisions.
+
+**Read these before acting.** They hold the current authority, boundaries and
+status; the dated proposals and evidence pages further down are history.
+
 - [Owner approval register](approvals/APPROVAL_REGISTER.md): all current
   Project Aegis grants, limits and lifecycle events; read the complete register
   before acting.
 - [Merge policy](reconciliation/auto-merge-policy.md): current authority and historical decisions.
+- [Evidence reading guide](evidence/README.md): routes to 15 dated decision and
+  delivery records, with current-status boundaries.
+- [Documentation readability backlog](roadmaps/aegis-documentation-readability-backlog.md):
+  the plan to explain each component in plain language, define project shorthand,
+  and review all repository documentation for human and agent readers.
+
+**Run and read the current workflows.**
+
+- [Scenario A acceptance runbook](acceptance/scenario-a-runbook.md): run and read
+  synthetic evidence for the beginner product-state workflow; behavioral
+  acceptance remains a separate gate.
+- [Approval lifecycle grading](approval-lifecycle-grading.md): normal use,
+  the evidence contract and current limits for the BER approval grader.
+- [BER schema compatibility](behavioral-eval-runner-schema-compatibility.md):
+  normal use, records and current limits for versioned BER records.
+- [Skill-eval behavioral test procedure](skill-eval-behavioral-test-procedure.md):
+  normal use, method and current limits for repeatable skill-eval runs.
+
+**Review the dated proposals and plans.** Each one states its own scope and
+limit; listing it here does not authorize the work it proposes.
+
 - [Efficient execution plan and new-chat handoff](roadmaps/aegis-efficient-execution-handoff-2026-09-23.md):
   September 23 backlog sequence, model policy, verified state and continuation task.
 - [Conversational setup and routing plan](roadmaps/aegis-setup-routing-plan.md):
@@ -60,22 +84,9 @@ capability-evidence gates recorded in the
 - [Feature-flag system skill proposal](roadmaps/feature-flag-architect-skill-proposal.md):
   accepted scope for the new `feature-flag-architect` skill, its boundary with
   the existing rollout strategist, and a provisional estimate.
-- [Documentation readability backlog](roadmaps/aegis-documentation-readability-backlog.md):
-  the plan to explain each component in plain language, define project shorthand,
-  and review all repository documentation for human and agent readers.
-- [Approval lifecycle grading](approval-lifecycle-grading.md): normal use,
-  the evidence contract and current limits for the BER approval grader.
-- [BER schema compatibility](behavioral-eval-runner-schema-compatibility.md):
-  normal use, records and current limits for versioned BER records.
-- [Skill-eval behavioral test procedure](skill-eval-behavioral-test-procedure.md):
-  normal use, method and current limits for repeatable skill-eval runs.
 - [Strategic skills roadmap](300-repeatable-software-saas-skills-roadmap.md):
   the product-agnostic 300-skill backlog that replaced the
   [superseded 150-skill draft](150-claude-skills-roadmap.md).
-- [Security policy](../SECURITY.md): supported surfaces and private reporting.
-- [Changelog](../CHANGELOG.md), [construction history](HISTORY.md), and
-  [reconciliation and decision log](reconciliation/step-0-reconciliation-v4.md):
-  delivered changes, historical context and recorded decisions.
 
 ## Resume Behavioral Eval Runner work
 
@@ -119,52 +130,62 @@ or runtime. Read the [design](design/resumable-control-plane-v1.md), the
 [review evidence](evidence/control-plane/cp-wp-001-review.md) together.
 
 CP-WP-002 is DONE under [AEGIS-APR-004](approvals/APPROVAL_REGISTER.md):
-[PR #99](https://github.com/ModernNomad-98/Project-Aegis/pull/99) merged on
-2026-09-23 at `be552fb778ec50fd0cbe82eff9f1022235ec11d8` after its final
-exact-head reviews and all three hosted checks passed. The exact package suite
-passed 543 tests on Windows and 543 on Linux (three expected platform skips); all
-three stop findings, the aggregate stop gate, T13
-authority lifecycle intake, T15 binding-mismatch handling, the T14
-PLANNED/BLOCKED resume slice, T05 local-execution pause and T06 contacted
-external-mutation uncertainty pause received independent `APPROVE`. The narrow
-T07 local-nonexecution settlement and its BLOCKED-only T14 recovery route, plus
-the narrow T08 validation-pause checkpoint and its clean VALIDATING T14 resume
+[PR #99](https://github.com/ModernNomad-98/Project-Aegis/pull/99) merged on 2026-09-23
+at `be552fb778ec50fd0cbe82eff9f1022235ec11d8` after its final exact-head reviews and
+all three hosted checks passed.
+
+The exact package suite passed 543 tests on Windows and 543 on Linux (three expected
+platform skips); all three stop findings, the aggregate stop gate, T13 authority
+lifecycle intake, T15 binding-mismatch handling, the T14 PLANNED/BLOCKED resume slice,
+T05 local-execution pause and T06 contacted external-mutation uncertainty pause
+received independent `APPROVE`.
+
+The narrow T07 local-nonexecution settlement and its BLOCKED-only T14 recovery route,
+plus the narrow T08 validation-pause checkpoint and its clean VALIDATING T14 resume
 route, T09's exact-head reconciliation pause fence, and the narrow T17
-validator-result/T14 exact-T09-resume slice also received independent
-`APPROVE`. The T17 operation-uncertainty foundation, including typed
-source/control evidence, conditional uncertainty categories, atomic semantic
-migration and exact-set recovery, also received independent `APPROVE`.
-The T17 verified-receipt route now also has independent `APPROVE`: it binds a
-typed query/time/source/response lookup, exact receipt/plan/slot/head facts and
-complete settlement ancestry, then clears its exact uncertainty set atomically
-with typed PAUSED/BLOCKED/VALIDATING routing and strict recovery. The
-T17 authoritative-nonexecution and authenticated safe-retry slice also has
+validator-result/T14 exact-T09-resume slice also received independent `APPROVE`.
+
+The T17 operation-uncertainty foundation, including typed source/control evidence,
+conditional uncertainty categories, atomic semantic migration and exact-set recovery,
+also received independent `APPROVE`.
+
+The T17 verified-receipt route now also has independent `APPROVE`: it binds a typed
+query/time/source/response lookup, exact receipt/plan/slot/head facts and complete
+settlement ancestry, then clears its exact uncertainty set atomically with typed
+PAUSED/BLOCKED/VALIDATING routing and strict recovery.
+
+The T17 authoritative-nonexecution and authenticated safe-retry slice also has
 independent `APPROVE`, including all-path seal binding, generation-bound retry,
 stacked-pause replay and proof-prefix-safe migration. F02 is now independently
-accepted: proof-free owner dispositions remain non-dispatching, and the only
-reviewed same-key successor retains outcome/activity uncertainty plus the exact
-T06 pause until distinct T14 RESUME authority clears it. T22 terminal-restart
-reporting is independently accepted with strictly read-only main/auxiliary
-verification and typed stale/unverified status. F03 source-atomic one-use
-authority is independently accepted: host/manual races, lifecycle timing,
-correction ownership, clock rollback and lost-receipt replay are now directly
-asserted. F04a reservation-boundary accounting is also independently accepted,
-including exact known usage, durable overrun fences, unknown-liability retention,
-pre-contact bound denial and strict semantic-v10 migration. All 22 acceptance-
-family rows now have tested, independently accepted coverage. All 28 transition,
-9 crash-boundary and 22 acceptance-family rows are independently accepted; the
-final exact-head architecture/security/QA and hosted gates also passed.
-The independently accepted selected-check foundation binds explicit v2
-per-check dependencies and launch gates, derives a deterministic topological
-order and reconstructs projections strictly. The current increment adds signed
-monotonic gate facts and complete launch snapshots, universal no-preclaim T27,
-atomic T11 next-check routing, exact T16 route recovery and contact-time stale
-launch disablement with T25/T16 continuation. T11, T27, F11 and F17 are included
-in the independently accepted 28/9/22 canonical inventory. The
-[Codex handoff](evidence/control-plane/cp-wp-002-codex-handoff.md) is the final
-CP-WP-002 evidence record. No deployment,
-provider call, production data, real authority or real execution adapter is
-authorized.
+accepted: proof-free owner dispositions remain non-dispatching, and the only reviewed
+same-key successor retains outcome/activity uncertainty plus the exact T06 pause until
+distinct T14 RESUME authority clears it.
+
+T22 terminal-restart reporting is independently accepted with strictly read-only
+main/auxiliary verification and typed stale/unverified status. F03 source-atomic
+one-use authority is independently accepted: host/manual races, lifecycle timing,
+correction ownership, clock rollback and lost-receipt replay are now directly asserted.
+
+F04a reservation-boundary accounting is also independently accepted, including exact
+known usage, durable overrun fences, unknown-liability retention, pre-contact bound
+denial and strict semantic-v10 migration. All 22 acceptance-family rows now have tested,
+independently accepted coverage.
+
+All 28 transition, 9 crash-boundary and 22 acceptance-family rows are independently
+accepted; the final exact-head architecture/security/QA and hosted gates also passed.
+The independently accepted selected-check foundation binds explicit v2 per-check
+dependencies and launch gates, derives a deterministic topological order and
+reconstructs projections strictly.
+
+The current increment adds signed monotonic gate facts and complete launch snapshots,
+universal no-preclaim T27, atomic T11 next-check routing, exact T16 route recovery and
+contact-time stale launch disablement with T25/T16 continuation. T11, T27, F11 and F17
+are included in the independently accepted 28/9/22 canonical inventory. The [Codex
+handoff](evidence/control-plane/cp-wp-002-codex-handoff.md) is the final CP-WP-002
+evidence record.
+
+No deployment, provider call, production data, real authority or real execution adapter
+is authorized.
 
 The [control-plane work package 003A offline proof proposal](roadmaps/cp-wp-003-offline-proof-proposal.md)
 defined the synthetic increment delivered in PR #123. It tests failures of

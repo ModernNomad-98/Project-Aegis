@@ -1,6 +1,12 @@
+<!-- This file is the pull request description template for Project Aegis. It is
+     pre-filled into every new pull request, whether opened by the maintainer or
+     by an outside contributor. Fill in each section below; the "What & why"
+     answer is what a reviewer reads first, and the security question at the end
+     is mandatory. -->
+
 ## What & why
 
-<!-- This template becomes the description of every pull request, from the maintainer or an outside contributor. What does this change do, and why? -->
+<!-- What does this change do, and why? -->
 
 ## Checklist
 
