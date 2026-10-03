@@ -119,6 +119,20 @@ reviewer subagents where available; it opens or merges a pull request only
 under that repository's own approvals, and the human remains the merge gate.
 This rule grants no new execution, write, publication, or merge authority.
 
+**To tell which head a review finding was raised against, read
+`original_commit_id`, not `commit_id` — GitHub re-anchors `commit_id` as the
+pull request's diff moves, so it can name a later head than the one the finding
+was written against.** On PR #657, read via `commit_id`, a P1 appeared bound to
+the merged head — an automatic merge stop — while `original_commit_id` resolved
+all six findings to the previous head; that P1 was written at `18:51:24Z`, and
+the merged head did not exist until `21:26:28Z`.
+
+**A finished green run can have a job whose `status` still reads `in_progress`
+while its `conclusion` reads `success` — read the run-level state, because a
+job's `status` alone will mislead you.** Run `37156376468` is the instance: a
+reader checking job `status` alone would have read a finished green run as
+unfinished.
+
 **Source-library owner preference: name and time every work item.** In Role A,
 before each agent or delegated subagent starts an item, tell the owner the
 item's name and estimated active-work duration (ETA), and record its start
