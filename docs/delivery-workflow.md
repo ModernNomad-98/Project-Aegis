@@ -76,7 +76,7 @@ the stage as **procedurally enforced** — consistent with
 | C IMPLEMENT | **No skill was found that owns general implementation.** `reviewable-diff-discipline` *(MANUAL-ONLY)* keeps a change small and reviewable when a person names it. |
 | D INDEPENDENT IMPLEMENTATION AUDIT | `code-reviewer` for product-code diffs; `library-diff-reviewer` where the PR changes the skill library — `code-reviewer`'s own contract routes library changes to it. |
 | E VALIDATE | `risk-tiered-validation-selector` **selects** a tier only; by its own contract it "only selects" and must not execute the tier it picks. **Executing** the selected checks is procedural, or belongs to whichever execution procedure the repository authorizes — not to this selector. |
-| F FINAL INDEPENDENT PR CODE REVIEW | `code-reviewer`, or `library-diff-reviewer` where the PR changes the skill library. Where the contribution is external, see **`MG5`**. |
+| F FINAL INDEPENDENT PR CODE REVIEW | `code-reviewer`, or `library-diff-reviewer` where the PR changes the skill library. See also `MG5`. |
 | G MERGE | `human-approval-boundary` checks for an active scoped grant before a risky action. Standing authority is `agent-authorization-matrix` *(MANUAL-ONLY)*; the merge decision itself stays procedural plus branch protection. |
 
 **One scope note this page must not widen: a selector is not an executor.**
@@ -137,7 +137,7 @@ receipt afterwards does not satisfy them — a receipt is a record, not a gate.
   the additional explicit security review required by `CONTRIBUTING.md:233-236`
   — normally `security-pr-reviewer` — has been **posted and accepted at that
   exact head**. The scope is outside contributions **only**:
-  `CONTRIBUTING.md:253-258` and `AGENTS.md:65-68` both state that it is not
+  `CONTRIBUTING.md:253-258` and `AGENTS.md:73-74` both state that it is not
   extended to the maintainer's or other agents' own pull requests. The scope is
   stated **inside the condition** so that it cannot be widened by a reader, and
   cannot be omitted by a reader who stops at this list. The
