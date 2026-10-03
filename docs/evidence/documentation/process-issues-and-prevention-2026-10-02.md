@@ -2067,7 +2067,7 @@ it can be added by this PR.
 
 | Rule | What CI could check | Where it would live |
 | --- | --- | --- |
-| `PROC-01` | For a declared list of (SHA, claim) pairs in the tracked text, fail when `git merge-base --is-ancestor <sha> origin/main` exits non-zero. Needs a machine-readable list, which does not exist yet. | `scripts/` — gate-guard protected |
+| `PROC-01` | For a declared list of (SHA, claim) pairs in the tracked text, fail when `git merge-base --is-ancestor <sha> origin/main` exits non-zero. Needs a machine-readable list, which does not exist yet. **Corrected 2026-10-03:** a machine-readable, revision-keyed list **does** exist on the default branch — `tools/readability_acceptance/acceptance-index.json` (350,376 bytes; 602 `reader_pages` rows, 443 of them carrying a `last_acceptance_sha`, plus an `acceptance_reachability` block whose probe is `git for-each-ref --contains <sha> --format=%(refname) refs/remotes/`, 7 rows annotated, 2 unreachable revisions). It landed as PR #629 at `1cb61f3a` (2026-10-02T18:08:51-07:00), **before** this page's own PR #633. What is still absent is a list **declared for this gate** pairing each SHA with its **claim**: the index pairs a SHA with its **page**. Measured at `origin/main` = `d9db0b83`. | `scripts/` — gate-guard protected |
 | `PROC-04` (forbidden method) | `git grep 'Measure-Object -Line' -- '*.md'` returns hits that are all text *about* the trap. Mechanical only with an allowlist of pages that define the rule; without one it is a review prompt. | `scripts/` — gate-guard protected |
 | `PROC-04` (method named) | Harder: requires parsing prose for a count and checking a method is named nearby. Heuristic, so advisory at best. | `scripts/`, advisory only |
 | `PROC-05` (existence), partially | Fail when a tracked document cites a repository path that does not exist on the default branch. This would have caught reliance on `tools/readability_acceptance/`. A link checker of this kind now **exists on the default branch** — `scripts/ci/check-markdown-links.py` (PR #628, merged 2026-10-03T00:47:45Z) — so the earlier statement here that it was "unmerged, so it is not available and must not be relied on" is **corrected**: it is available at `origin/main` = `1cb61f3a`. It remains **not part of the required checks** this page can rely on, and adding it would still be a `scripts/` change costing a manual review, which is the point this section makes. | `scripts/` — gate-guard protected |
@@ -3046,3 +3046,65 @@ committed on. The corpus closed at the newest comment, `2026-10-03T21:23:54Z`; e
 instant and is a series value, not a constant. No provider or model call was made, no evaluator
 was run, and no dependency was installed. Every PR number, instant, comment id and hash in this
 append comes from the API response or from `git`, not from prose.
+
+
+---
+
+## Appended 2026-10-03 (fifth append) — `Q5`: two published counting claims corrected
+
+This append is **pure addition** except for the one declared in-cell narrowing
+recorded under Claim 2. It corrects two counting claims on this page that
+measurement falsified, renumbers nothing, rewrites no entry and adds no rule.
+
+**Claim 1 — L2023–2024, corrected outright.** The page says:
+
+> - **One class's central figure is unverified.** Class 5's "159 pages" figure is
+>   not reproducible from `main`.
+
+That sentence is **false**. The figure **is** obtainable from the default branch.
+Method: a Python parse of the tracked
+`tools/readability_acceptance/acceptance-index.json` (blob
+`70c114c71be2e8c868347f9d14288e254ac81253`), counting the `reader_pages` rows
+that carry no `last_acceptance_sha` and reading its `counts` block. Measured at
+`origin/main` = `d9db0b83`: `counts.unknown` = **159**, `counts.recorded` =
+**443**, `counts.reader_pages` = **602**, and **159 of the 602** `reader_pages`
+rows carry no `last_acceptance_sha`, with 443 + 159 = 602. That tool's own
+README names this population "no recorded acceptance", which is the quantity
+Class 5's "159 pages have no review record" names at L603.
+
+The correction also removes a contradiction **inside this page**: L2202 records
+the figure as *"not re-derived by this pass; the instrument is now on `main` …
+so re-derivation is possible"*, while L2023–2024 asserted it was not
+reproducible.
+
+**Two limits, carried with the correction and not resolved by assertion.**
+
+1. **A fresh regeneration is UNVERIFIED (`unsure`).** The value above is
+   reproduced from the tracked index, whose own `source_revision` is
+   `d6e484189cc30c67dc69aeb973e15f89b693537d` and whose `counts.tracked_markdown`
+   is **658**, against the **675** tracked Markdown files measured at
+   `d9db0b83`. No run of `check_index.py` was made, so whether a fresh run still
+   yields 159 at the current tree is not established.
+2. **Set identity is UNPROVEN (`unsure`).** That the index's 159 rows are the
+   *same* pages Class 5 counted is not established: the value and the definition
+   agree; the membership does not.
+
+**Claim 2 — L2070, narrowed in place, not deleted.** The `PROC-01` row of the
+mechanically-enforceable table asserted that the machine-readable list it needs
+"does not exist yet". A machine-readable, revision-keyed list **does** exist on
+the default branch, and it landed **before** that sentence was written:
+`tools/readability_acceptance/acceptance-index.json`, PR #629 at `1cb61f3a`
+(2026-10-02T18:08:51-07:00), against this page's own PR #633 at `e88a0a0d`
+(18:24:01). That row now carries the narrower true statement: what is still
+absent is a list **declared for this gate** pairing each SHA with its **claim**
+— the index pairs a SHA with its **page**. The original sentence is left
+standing verbatim and the correction follows it in the same cell, the form the
+`PROC-05` row of that same table already uses.
+
+**What this append does not claim.** It does not re-derive or correct any other
+figure on this page, and it does not annotate items 1–5 of the owed-work list.
+It touches exactly one earlier line — the L2070 row named above — and that
+narrowing is declared here rather than left silent. It adds no gate: the
+`PROC-01` check remains unbuilt, and the mechanically-enforceable table's own
+`scripts/` destination is unchanged. It does not resolve the two limits recorded
+under Claim 1; it carries them.
