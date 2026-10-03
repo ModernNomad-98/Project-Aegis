@@ -366,3 +366,61 @@ it can only make the next acceptance recordable.
 
 No grant, gate, approval or authority changes. No provider call, private input,
 host access or deployment is part of this note.
+
+## Correction — 2026-10-02
+
+**Status: CORRECTION, recorded forward on 2026-10-02.** Appended rather than
+edited in place: the paragraph it corrects is dated text that is now merged to
+`main` (`5703e93f`, PR #630), so it is corrected forward and left verbatim. The
+correction follows this note's own precedence rule at (c)(1): the ledger's
+disagreement is corrected forward by a dated note — never by rewriting the dated
+row (`CONTRIBUTING.md:59-64`, decision rule 4). The note's determination is
+**unchanged**; one clause of supporting prose was false.
+
+### Corrected claim
+
+The **REVIEW-2** paragraph in Part 2 above contains one clause that is **false**.
+It reads, verbatim:
+
+> Its record
+> also binds to the same head and describes itself in its title as a targeted
+> review of the change, but its per-file table carries a separate, and
+> **affirmative**, claim for exactly two rows
+
+Those first two lines of the clause are the error. Its title does **not** so
+describe it; it was **REVIEW-3** that self-described as targeted. The two
+records, read directly from `gh pr view 625 -R ModernNomad-98/Project-Aegis
+--json comments`:
+
+- **REVIEW-2** (comment 2 of 4) — title: `## Independent review record -- PR
+  #625 (REVIEW-2; independent agent, not the author)`. Verdict: `SHIP. All four
+  files read in full at the head`. **Neutral**: it claims no narrower scope in
+  its title.
+- **REVIEW-3** (comment 3 of 4) — title: `## Independent review record - PR #625
+  (REVIEW-3; independent agent, not the author)`. It states: `this is a
+  **targeted** review, not a full-page re-read. It therefore confers and records
+  no full-page acceptance.`
+
+**The correction, in one sentence.** Substituting the clause's second and third
+lines: REVIEW-2 "also binds to the same head", while it is **REVIEW-3** — the
+record discussed immediately above — that "describes itself in its title as a
+targeted review of the change".
+
+**The effect.** This is the misdescription the session's summary repeated: two
+records with **different scopes**, not one record contradicting itself. The
+clause as written **understates REVIEW-2** and misattributes REVIEW-3's narrower
+self-description to it; it does not overstate it.
+
+**What this correction does not change.** REVIEW-2's per-file table carries
+`ACCEPT (full-page re-read)` for **exactly two** rows — the two pending pages —
+and its section 8 offers the review as the independent full-page re-read they
+owe. That finding, and the whole determination that follows it (`a ledger keeper
+who is neither the #625 author nor REVIEW-2` must accept or decline the claim),
+is **correct and unchanged**. No figure, line citation, quoted record, status or
+determination elsewhere in this note is touched by this correction.
+
+**Cost of this correction.** It changes lines on a page that is itself
+**pending**, so it returns this note to pending and adds a second independent
+full-page re-read to what the note already owed its readers. Nothing here
+converts to an acceptance; this note still records no acceptance for any page,
+and the two candidate pages remain **pending**.
