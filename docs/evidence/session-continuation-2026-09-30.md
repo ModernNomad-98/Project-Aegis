@@ -318,13 +318,13 @@ written and no owner decision is now outstanding on them.
   is the one AEGIS-APR-004 authorized and is DONE ...)". That is the
   append-a-pointer convention section 4.1 itself recommended, applied where the
   contradiction sat rather than in a separate list.
-- **The stale date label** is closed by the same PR, which added "(this is a
+- **The stale date label** is closed by PR #579, which added "(this is a
   dated label, not the current state; the current package ledger records later
   dispositions)" beside it. The label text is preserved, so the line still
   reads "Current status, 2026-09-25" and is no longer presented as current.
 
 Measured, not recalled: `git diff --numstat 81ad9017^ 81ad9017 --
-docs/roadmaps/resumable-control-plane-backlog.md` is `5 1`, and the two added
+docs/roadmaps/resumable-control-plane-backlog.md` is `4 1`, and the two added
 passages are exactly the two quoted above, appended inside the lines they
 correct. Section 4.1's own line references therefore still resolve: at the
 current revision the `Next owner decision` row is line 149 and the stale-looking
