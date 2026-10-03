@@ -22,25 +22,33 @@ invariant, never an independent source.
 Every change moves through these seven stages, in this order. The names are the
 binding ones.
 
-| # | Stage | Entry evidence | Exit evidence | Authority holder | Machine-enforced? |
-| --- | --- | --- | --- | --- | --- |
-| A | PLAN | The request or directive that asks for the change, with its source. | A written plan: what, why, blast radius, the paths it will touch, and **proportionate acceptance criteria** — few and short for a small change, but present and checkable. | The agent taking the work, or the coordinator assigning it. | **Nothing** — procedural (see [the split](#what-is-machine-enforced-and-what-is-procedural)). |
-| B | INDEPENDENT PLAN AUDIT | The plan's exact text, **bound to a captured revision** — a content hash taken when the text is captured, or an immutable comment or artifact — by an agent that did **not** write it. | A posted verdict ACCEPT or REVISE **naming the captured revision it audited**. | A different agent from the planner. | **Nothing** — procedural. |
-| C | IMPLEMENT | An **ACCEPTED** plan — not merely a posted one — with the revision the audit bound to. | The changed files; local check output; a changed-files **and** NOT-touched list; a rule-preservation inventory when the change edits governance text. | The implementing agent. | Partly — the Developer Certificate of Origin (DCO) sign-off and `gate-guard` are required checks on the commits. |
-| D | INDEPENDENT IMPLEMENTATION AUDIT | The diff at an exact head, by an agent that did **not** implement it. | A posted audit naming that head, checking the plan's acceptance criteria one by one. | A different agent from the implementer. | **Nothing** — procedural. |
-| E | VALIDATE | The post-audit candidate head. | The repository's own checks at that head, with their commands and output; every check that could not be run named **UNRUN**. | The validating agent. | Partly — `validate-skills` and `gate-guard` are required status checks; nothing verifies that this stage ran. |
-| F | FINAL INDEPENDENT PR CODE REVIEW | The exact candidate head, by an agent that is neither the author nor the merger. | A **posted, accepted** verdict naming that 40-character head, which also checks the PR's "Aegis skills used" table against the work. | A different agent from the author and from the merger. | **Nothing** — procedural. |
-| G | MERGE | Stage F's **posted and accepted** verdict naming this exact head; **every applicable check green at this exact head** — not only the branch-protection-required ones — **or a cited active owner exception covering that exact head and scope**; the automated review posted or confirmed unavailable, with **every P1 and P2 finding triaged** (`AEGIS-APR-050`); and the merge agent's own confirmed authority. See [Before merging](#before-merging-stage-g-entry-conditions). | A merge receipt recording the head, the checks, the review, the triage, and the merge agent's own skill usage. | A separate agent holding applicable authority. | Partly — branch protection and required checks; `enforce_admins` is `false`, so this is bypassable. |
+| # | Stage | Entry evidence | Exit evidence | Authority holder |
+| --- | --- | --- | --- | --- |
+| A | PLAN | The request or directive that asks for the change, with its source. | A written plan: what, why, blast radius, the paths it will touch, and **proportionate acceptance criteria** — few and short for a small change, but present and checkable. | The agent taking the work, or the coordinator assigning it. |
+| B | INDEPENDENT PLAN AUDIT | The plan's exact text, **bound to a captured revision** — a content hash taken when the text is captured, or an immutable comment or artifact — by an agent that did **not** write it. | A posted verdict ACCEPT or REVISE **naming the captured revision it audited**. | A different agent from the planner. |
+| C | IMPLEMENT | Its predecessor's **accepted** exit — see [the chain rule](#the-seven-stages). | The changed files; local check output; a changed-files **and** NOT-touched list; a rule-preservation inventory when the change edits governance text. | The implementing agent. |
+| D | INDEPENDENT IMPLEMENTATION AUDIT | Its predecessor's **accepted** exit — see [the chain rule](#the-seven-stages). | A posted audit naming that head, checking the plan's acceptance criteria one by one. | A different agent from the implementer. |
+| E | VALIDATE | Its predecessor's **accepted** exit — see [the chain rule](#the-seven-stages). | The repository's own checks at that head, with their commands and output; every check that could not be run named **UNRUN**. | The validating agent. |
+| F | FINAL INDEPENDENT PR CODE REVIEW | Its predecessor's **accepted** exit — see [the chain rule](#the-seven-stages). | A **posted, accepted** verdict naming that 40-character head, which also checks the PR's "Aegis skills used" table against the work. | A different agent from the author and from the merger. |
+| G | MERGE | Its predecessor's **accepted** exit — see [the chain rule](#the-seven-stages) — **and `MG1`–`MG5`**, in [the normative list](#before-merging-stage-g-entry-conditions). **No merge-gate condition is restated in this cell.** | A merge receipt recording the head, the checks, the review, the triage, and the merge agent's own skill usage. | A separate agent holding applicable authority. |
 
-**No blank cells.** Every stage above names its entry evidence, its exit
-evidence, its authority holder and its enforcement reality. That is deliberate:
-a stage whose evidence is unstated is a stage nobody can verify.
+**The chain rule: each stage's entry is its predecessor's ACCEPTED exit.** A
+posted but adverse verdict does not flow onward — `REVISE` returns the work to
+the earlier stage (re-plan → re-audit), and the next stage's entry is not
+satisfied until an **ACCEPT** is posted for the revision it will build on.
+
+**Enforcement is classified once**, in
+[the enforcement account](#what-is-machine-enforced-and-what-is-procedural). No
+stage cell restates it. Every stage above names its entry evidence, its exit
+evidence and its authority holder — a stage whose evidence is unstated is a stage
+nobody can verify.
 
 ### The enforcing skill for each stage
 
 `ai-sdlc-operating-model` requires every stage contract to name the skill that
-enforces it. This page meets that requirement as a **duty on the agent holding
-the stage**, not as a fixed table:
+enforces it. **This page does not fully meet that requirement, and records the
+shortfall rather than claiming compliance.** What it does instead is put the duty
+on the agent holding the stage:
 
 > **The agent holding a stage must find the skill that actually owns that stage,
 > read its `SKILL.md`, and verify that the skill's own scope covers this work
@@ -48,6 +56,12 @@ the stage**, not as a fixed table:
 > stage, however plausible its name looks — a product-code reviewer told to route
 > library PRs elsewhere, or a selector told it must not execute what it selects,
 > both disqualify themselves.
+
+**Recorded deviation.** By this page's own map below, **no installed skill owns
+writing a plan (A), a plan-level ACCEPT/REVISE verdict (B), general implementation
+(C), or executing a selected validation tier (E).** Those four stages are
+**procedurally enforced**. The requirement is recorded as **partially met, with
+the shortfall named** — it is not asserted as compliance.
 
 The list below is **illustrative and non-exhaustive**. It records what appeared
 to own each stage when this page was written; it is **not** authority, and a
@@ -62,21 +76,17 @@ the stage as **procedurally enforced** — consistent with
 | C IMPLEMENT | **No skill was found that owns general implementation.** `reviewable-diff-discipline` *(MANUAL-ONLY)* keeps a change small and reviewable when a person names it. |
 | D INDEPENDENT IMPLEMENTATION AUDIT | `code-reviewer` for product-code diffs; `library-diff-reviewer` where the PR changes the skill library — `code-reviewer`'s own contract routes library changes to it. |
 | E VALIDATE | `risk-tiered-validation-selector` **selects** a tier only; by its own contract it "only selects" and must not execute the tier it picks. **Executing** the selected checks is procedural, or belongs to whichever execution procedure the repository authorizes — not to this selector. |
-| F FINAL INDEPENDENT PR CODE REVIEW | `code-reviewer`, or `library-diff-reviewer` where the PR changes the skill library. `security-pr-reviewer` applies **to outside contributions only** — see the scope limit below. |
+| F FINAL INDEPENDENT PR CODE REVIEW | `code-reviewer`, or `library-diff-reviewer` where the PR changes the skill library. Where the contribution is external, see **`MG5`**. |
 | G MERGE | `human-approval-boundary` checks for an active scoped grant before a risky action. Standing authority is `agent-authorization-matrix` *(MANUAL-ONLY)*; the merge decision itself stays procedural plus branch protection. |
 
-**Two scope limits this page must not widen.**
+**One scope note this page must not widen: a selector is not an executor.**
+Naming `risk-tiered-validation-selector` as Stage E's enforcer would let an agent
+satisfy the stage without running any check. That is why the map above marks
+execution procedural.
 
-- **The additional security review is required for outside contributions
-  only.** `AGENTS.md` states it is "required for OUTSIDE contributions only and
-  is not extended to the maintainer's or other agents' own PRs". The
-  security-relevant-surface **question**, by contrast, is answered on **every**
-  pull request (`CONTRIBUTING.md`). Those are two different obligations, and
-  requiring the first universally would over-gate internal changes contrary to
-  the recorded owner scope.
-- **A selector is not an executor.** Naming `risk-tiered-validation-selector` as
-  Stage E's enforcer would let an agent satisfy the stage without running any
-  check.
+The **outside-contribution security scope** is a merge-gate condition, so it lives
+in **`MG5`** and is not restated here — see
+[the normative list](#before-merging-stage-g-entry-conditions).
 
 `change-classification-gate` runs before A and sets the change's class, which is
 what selects the validation depth in E. Closeout after G routes to
@@ -84,30 +94,55 @@ what selects the validation depth in E. Closeout after G routes to
 
 ### Before merging: Stage G entry conditions
 
-The merge is gated on **all four** of the following, checked in the same turn
-against the **exact head being merged**. Recording them in the receipt
-afterwards does not satisfy them — a receipt is a record, not a gate.
+**This is the sole normative rendering of the merge-gate conditions.** Each
+carries a stable ID, `MG1`–`MG5`. Every other mention of a condition on this page
+— and in the `AGENTS.md` summary — is a pointer carrying the ID and **no
+content**; the maintenance rule for that is
+[the agreement check](#the-agreement-check-procedural). All five are checked in
+the same turn against the **exact head being merged**. Recording them in the
+receipt afterwards does not satisfy them — a receipt is a record, not a gate.
 
-1. **Every applicable check is green at that exact head** — not only the
-   branch-protection-required ones. A green required pair alongside a red
-   non-required job is not a green head. **This does not override an active
-   owner exception.** Where an active owner grant covers that exact head and
-   scope, the exception is cited, and the failed check is recorded as **failed
-   with its authorized disposition** — never as green and never as waived. The
-   standing example is `AEGIS-APR-047`, which by its own terms *"narrowly
-   supersedes the all-green condition in AEGIS-APR-013/024/039 for that signal
-   only"* and leaves `gate-guard` red for four named BER paths by owner
-   decision. A page that demanded all-green absolutely would make that live
-   grant unusable, which is the same defect class as omitting a condition —
-   standing policy overridden in the wrong direction.
-2. **The final PR review is posted, accepted, and names that exact head.**
-3. **The automated review has posted, or is confirmed unavailable** (a
-   usage-limit notice, for example), and **every P1 and P2 finding it raised is
-   triaged** — fixed, or recorded in the pull request with the reason it is not a
-   defect. This is `AEGIS-APR-050`'s requirement, and it is not optional.
-4. **The merge agent has confirmed its own authority** — a register entry that
-   passes the preamble test, or the owner's instruction quoted verbatim with its
-   source. A brief's bare assertion is not authority.
+- **`MG1` — checks.** Every applicable check is green **at that exact head** —
+  not only the branch-protection-required ones. A green required pair alongside a
+  red non-required job is not a green head. **This does not override an active
+  owner exception.** Where an active owner grant covers that exact head and
+  scope, the exception is cited and the failed check is recorded as **failed with
+  its authorized disposition** — never as green and never as waived. The standing
+  example is `AEGIS-APR-047`, which by its own terms *"narrowly supersedes the
+  all-green condition in AEGIS-APR-013/024/039 for that signal only"* and leaves
+  `gate-guard` red for four named BER paths by owner decision. A page demanding
+  all-green absolutely would make that live grant unusable — standing policy
+  overridden in the wrong direction, the same defect class as omitting a
+  condition.
+- **`MG2` — final review.** The final PR review is **posted and accepted**, and
+  names that exact head.
+- **`MG3` — automated review.** The automated review has posted **a result for
+  that exact head**, or is confirmed unavailable **for that exact head** (a
+  usage-limit notice, for example); **and** every P1 and P2 finding it raised is
+  triaged — fixed, or recorded in the pull request with the reason it is not a
+  defect. This is `AEGIS-APR-050`'s requirement and it is not optional. A result
+  at a superseded head does not satisfy `MG3`.
+- **`MG4` — authority.** The merge agent has confirmed **its own** authority.
+  **Quoted verbatim from `AGENTS.md:88-91`** — the qualifier this turns on is on
+  `:88-89` — and quoted rather than paraphrased **because paraphrase is exactly
+  what dropped that qualifier** in earlier revisions of this page:
+
+  > The merge agent confirms that authority itself — a register entry
+  > on the default branch that passes the preamble test below, or the owner's
+  > instruction quoted verbatim in its brief with its source; a brief's bare
+  > assertion of authority is not authority, and doubt escalates to the owner.
+
+- **`MG5` — outside-contribution security review.** **Where the contribution is
+  an outside contribution and the change touches a security-relevant surface**,
+  the additional explicit security review required by `CONTRIBUTING.md:233-236`
+  — normally `security-pr-reviewer` — has been **posted and accepted at that
+  exact head**. The scope is outside contributions **only**:
+  `CONTRIBUTING.md:253-258` and `AGENTS.md:65-68` both state that it is not
+  extended to the maintainer's or other agents' own pull requests. The scope is
+  stated **inside the condition** so that it cannot be widened by a reader, and
+  cannot be omitted by a reader who stops at this list. The
+  security-relevant-surface **question** is a different obligation: it is
+  answered on **every** pull request (`CONTRIBUTING.md`).
 
 **An automated review is not the final review verdict. Neither is green CI, an
 author's summary, nor a completed task.** Those are inputs. The verdict is a
@@ -172,6 +207,12 @@ who has not yet published a verdict has not been reviewed. A stage that was
 started is not a stage that was finished. Treat an unposted review as absent,
 not as pending approval.
 
+**The rule reaches every head-bound input.** A verdict, a check result, an
+automated review, or a conditional security review binds to one head and to that
+head only. A result at a superseded head does **not** satisfy the condition that
+cites it — including `MG3` and `MG5` — and "close enough" is not a state this
+page recognises.
+
 This rule is procedural, and it is procedural on purpose: GitHub is configured
 with `dismiss_stale_reviews: false` and `require_last_push_approval: false`, so
 the platform will not invalidate a verdict when a head moves. Nothing
@@ -183,19 +224,10 @@ below is explicit about which parts of this page a machine actually holds.
 **Do not merge before the final PR review is posted, accepted, and verified
 against the exact candidate head.**
 
-The conditions are the ones in
-[Before merging: Stage G entry conditions](#before-merging-stage-g-entry-conditions)
-— the same four, stated there in full. **This section is not a second, narrower
-rule.** In summary, against that exact head:
-
-1. every applicable check is green, **or** an active owner exception covering
-   that head and scope is cited with the failed check recorded as failed;
-2. the final PR review is posted, accepted, and names the head;
-3. the automated review has posted or is confirmed unavailable, and **every P1
-   and P2 finding it raised is triaged** (`AEGIS-APR-050`); and
-4. the merge agent has confirmed its own authority — a register entry passing the
-   preamble test, or the owner's instruction quoted verbatim with its source. A
-   brief's bare assertion of authority is not authority.
+The conditions are **`MG1`–`MG5`**, stated in full once, in
+[Before merging: Stage G entry conditions](#before-merging-stage-g-entry-conditions).
+**This section adds no condition and restates none** — listing them again here is
+what previously let two statements of the same gate drift apart.
 
 A merge that happens before a posted final review — or after the head moved past
 the reviewed one — is a process failure even when every automated check is green.
@@ -207,7 +239,11 @@ for the review and merge gates.
 **A plan is always required, but its size is proportional to the change.** A
 one-line fix's plan may be three sentences in the PR body — what changed, why,
 and the blast radius. A small change must **not** require a design document, a
-separate planning artifact, or a formal review cycle of its own.
+separate planning artifact, or a **multi-round** review cycle.
+
+**It still receives one short independent plan audit.** Stage B is mandatory at
+every size; for a small change a one-paragraph ACCEPT or REVISE verdict is
+enough. Proportionality bounds the audit's **length**, never its **existence**.
 
 **Two things never shrink to nothing, however small the change:**
 
@@ -323,41 +359,74 @@ says so.
 | Requirement | Enforced by |
 | --- | --- |
 | The seven-stage order and stage separation | **Nothing.** No runner can see which agent held which stage. |
+| **The chain rule** — a stage's entry is its predecessor's accepted exit | **Nothing.** No runner inspects the predecessor's verdict. |
+| **The skill-selection duty** — find the skill that owns the stage, read it, verify its scope | **Nothing.** No check reads which skill an agent consulted, and nothing detects that a stage ran with no owning skill. |
 | That a plan was audited by a *different* agent before implementation | **Nothing.** Agent identity is not separable on GitHub — every agent posts as the same account. |
-| That a review was posted, accepted, and by a non-author | **Nothing.** Review records are issue comments, not review objects. |
-| **Exact-head invalidation** | **Nothing.** `dismiss_stale_reviews: false` and `require_last_push_approval: false`, so the platform will not invalidate a verdict when a head moves. |
-| No merge before the final review is posted and head-verified | **Nothing.** |
-| **All applicable checks green at the exact head**, not only the required ones — or a cited active owner exception | **Nothing.** Nothing aggregates a head's check results into a merge decision, and nothing verifies that a cited exception actually covers the head and scope it is invoked for. |
-| **The automated review's wait and P1/P2 triage** (`AEGIS-APR-050`) | **Nothing.** No check reads the review or its findings. |
+| [**`MG1`**](#before-merging-stage-g-entry-conditions) — checks | **Nothing.** No check aggregates a head's results, and none validates a cited exception. |
+| [**`MG2`**](#before-merging-stage-g-entry-conditions) — final review | **Nothing.** Review records are issue comments, not review objects. |
+| [**`MG3`**](#before-merging-stage-g-entry-conditions) — automated review | **Nothing.** No check reads the review or its findings. |
+| [**`MG4`**](#before-merging-stage-g-entry-conditions) — authority | **Nothing.** No check reads the register or the merge agent's brief. |
+| [**`MG5`**](#before-merging-stage-g-entry-conditions) — security review | **Nothing.** No check reads a conditional review, or knows that one was owed. |
+| **Exact-head invalidation**, including every head-bound automated and conditional review | **Nothing.** `dismiss_stale_reviews: false` and `require_last_push_approval: false`, so the platform will not invalidate a verdict when a head moves. |
 | The audited plan being bound to a captured revision | **Nothing.** No test compares a plan to the revision a verdict named. |
+| **The agreement check** — every non-normative mention of a condition is an ID with no content | **Nothing** — and none can be added in this change's scope, because `scripts/` is out of it. |
 | The honesty of the "Aegis skills used" table | **Nothing.** |
 | Proportionality | **Nothing.** |
 | The `AGENTS.md` binding summary drifting from this page | **Nothing** — no test compares them, and no check can be added inside a change of this kind. This is the acknowledged cost of keeping a summary in the startup file at all, and the reason this page must state that it supersedes the summary. |
 | The rule-preservation inventory being honest | **Nothing** — it is carried in the PR body and checked by a human reviewer. |
 
-That is **twelve rows of pure procedural control** — counted as the data rows of
-the table above, excluding its header and separator. The rule is still worth
-having: a documented control that agents actually follow is worth more than an
-undocumented one that nobody can check. But nobody should read this page and
-believe a machine is holding it up.
+The rule is still worth having: a documented control that agents actually follow
+is worth more than an undocumented one that nobody can check. But nobody should
+read this page and believe a machine is holding it up.
+
+### The agreement check (procedural)
+
+**Agreement is by derivation, not by checking.** A condition has one normative
+text; every other mention carries its ID and nothing else. A pointer cannot go
+stale, because it holds nothing that can go stale.
+
+**The backstop is a stated check, and it is procedural.** Every reference to a
+merge-gate condition outside the normative list is its ID and nothing more. To
+verify, run:
+
+```
+grep -n 'MG[1-5]' docs/delivery-workflow.md
+```
+
+Every hit is either one of the five definitions or a pointer. **A hit that states
+any part of a condition's content is a defect.** Editing a condition means editing
+its definition and re-reading the hits — that is the whole maintenance burden, and
+it is bounded by the number of pointers, not by the number of renderings.
+
+**Coverage is the sharper half of this, and nothing detects a gap in it.** The
+IDs make every *existing* dependent mention findable, but a condition that never
+receives an ID is invisible to every pointer and to the grep — and **no check
+detects its absence**. Agreement is therefore the weaker guarantee: two renderings
+can agree with each other while both omit a condition the repository requires.
+Read the rule above with that limit, and treat "does a new condition have an ID?"
+as a human step, not a greppable one.
+
+**No machine executes this.** `scripts/` is outside this change's scope, so no CI
+check can compare renderings. Claiming one would be a false enforcement claim —
+the defect class this page exists to prevent. The gate that `docs-as-code-architect`
+prescribes is recorded as an open gap, not as present.
 
 ## Scope: Role A binds, Role B does not inherit
 
 **This rule binds Role A — the `ModernNomad-98/Project-Aegis` source
 repository.** Copying the Aegis skills or startup files into a consumer/product
 repository (Role B) does **not** import this owner's process, this delivery
-workflow, or any grant recorded in this repository's approval register. In Role
-B, one agent may perform the stages itself, using independent reviewer subagents
-where available; it opens or merges a pull request only under that repository's
-own approvals, and the human remains the merge gate. That carve-out is recorded
-in `AGENTS.md`.
+workflow, or any grant recorded in this repository's approval register. Role B
+keeps its own process, and the carve-out that permits one agent there to perform
+the stages itself is recorded in [`AGENTS.md`](../AGENTS.md) — **cited here, not
+restated**.
 
 ## Failure cases this rule answers
 
 | Failure | The rule's answer |
 | --- | --- |
 | A stage was dispatched but never posted a verdict | **Incomplete, not done.** An unposted review is absent. |
-| The head moved while a review was in flight | **The verdict is void.** Re-review at the new head; record the old verdict as voided. |
+| The head moved while a review was in flight | **The verdict is void.** Re-review at the new head; record the old verdict as voided. This reaches every head-bound input, `MG3` and `MG5` included. |
 | An audit returns **REVISE** | Return to **re-plan → re-audit**. At the same head or a new one, the superseded verdict is recorded as superseded, not deleted. |
 | A verdict was posted but is wrong | Correct it forward with a **re-audit**. Never rely on it silently, and never edit a posted verdict in place to look right. |
 | **Fewer distinct agents are available than the stages this change will run** (including the single-agent case) | **Halt and escalate.** See below. |
