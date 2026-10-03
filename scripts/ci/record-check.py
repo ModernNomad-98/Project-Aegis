@@ -23,9 +23,32 @@ def main() -> int:
     command = args.command[1:] if args.command[:1] == ["--"] else args.command
     if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,63}", args.label) or not command:
         parser.error("use a simple lowercase label and a command after --")
-    root = Path(os.environ.get("AEGIS_CI_EVIDENCE_DIR") or
-                str(Path(os.environ.get("RUNNER_TEMP", tempfile.gettempdir())) / "aegis-ci"))
-    root.mkdir(parents=True, exist_ok=True)
+    # Evidence root. An explicit AEGIS_CI_EVIDENCE_DIR, or a RUNNER_TEMP set by
+    # the CI runner, is honoured exactly as before: CI keeps one shared
+    # `aegis-ci` directory per job, which is what "Retain offline-check
+    # evidence" uploads, and both refusals below still apply there.
+    #
+    # Locally RUNNER_TEMP is normally unset, so that fallback used to be shared
+    # by every process on the host. Two concurrent local runs of the SAME label
+    # then shared one `%TEMP%\aegis-ci`, and the second died on the exclusive
+    # `xb` open below with FileExistsError -- observed 2026-10-02, when two
+    # agents were left wedged on a stale 0-byte log and one had to set a private
+    # AEGIS_CI_EVIDENCE_DIR to get past it. So the fallback -- and only the
+    # fallback -- now resolves to a directory unique to this invocation.
+    # Concurrent same-label runs each get their own, and exclusivity is
+    # untouched: a collision can no longer arise, so `xb` still fails loudly
+    # rather than clobbering if one ever does.
+    supplied = os.environ.get("AEGIS_CI_EVIDENCE_DIR")
+    if supplied:
+        root = Path(supplied)
+        root.mkdir(parents=True, exist_ok=True)
+    elif runner_temp := os.environ.get("RUNNER_TEMP"):
+        root = Path(runner_temp) / "aegis-ci"
+        root.mkdir(parents=True, exist_ok=True)
+    else:
+        # mkdtemp creates the directory privately, so nothing pre-exists for
+        # the `xb` open below or the metadata check above to race against.
+        root = Path(tempfile.mkdtemp(prefix="aegis-ci-"))
     metadata = root / f"{args.label}.json"
     if metadata.exists():
         parser.error(f"refusing to overwrite previous evidence: {metadata}")
