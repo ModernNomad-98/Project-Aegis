@@ -23,8 +23,8 @@ exactly these fields.
 
 ## Use When
 
-- Use when: a human just granted an approval (in chat, PR comment, or issue)
-  and it must be recorded before the wording is lost.
+- Use when: a human just granted an approval (in chat, a pull request (PR)
+  comment, or issue) and it must be recorded before the wording is lost.
 - Use when: an agent re-asks permission for something already decided, and no
   one can point to where the decision lives.
 - Use when: "am I allowed to do X?" has no citable answer — set up or extend

@@ -19,7 +19,7 @@ authentication, the sign-in check. **Drift** is any difference between the
 catalog and what the environment actually holds. A **capability grant**
 gives a user a role, permission or elevated flag. A **lint** is a static
 check that reads files without running them. Playwright is a browser test
-tool.
+tool; URL is uniform resource locator.
 
 ## Purpose
 
