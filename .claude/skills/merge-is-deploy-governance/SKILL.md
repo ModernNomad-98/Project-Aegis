@@ -9,7 +9,7 @@ description: 'When the platform auto-deploys every merge to mainline, author sta
 means application programming interface; PaaS means platform as a service, a
 host that builds and runs an app for you; GitOps means deployment by a
 controller that keeps an environment in sync with a Git branch; `<sha>` is a
-commit's identifying hash.
+commit's identifying hash; UI means user interface.
 
 ## Purpose
 

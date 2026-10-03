@@ -5,6 +5,8 @@ description: 'Design the internal ops/support/superadmin CONSOLE for a multi-ten
 
 # Admin Console Architect
 
+**Reading key:** API means application programming interface.
+
 ## Purpose
 
 The internal admin console is the most powerful and least-scrutinized surface
