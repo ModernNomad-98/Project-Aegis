@@ -33,10 +33,16 @@ LINK = re.compile(r"\[([^\]\n]*)\]\(\s*(<[^<>\n]*>|[^()\n]*?)\s*\)")
 HEADING = re.compile(r"^ {0,3}(#{1,6})(?:[ \t]+(.*?))?[ \t]*$")
 SETEXT = re.compile(r"^ {0,3}(=+|-+)[ \t]*$")
 FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
-INLINE_CODE = re.compile(r"`+[^`\n]*`+")
 HTML_ANCHOR = re.compile(r"<[^<>]*\b(?:id|name)\s*=\s*[\"']([^\"']+)[\"'][^<>]*>")
 EXPLICIT_SLUG = re.compile(r"\{#([^}\s]+)\}\s*$")
 HTML_TAG = re.compile(r"<[^>]*>")
+# A continuation that opens a NEW block is never part of a wrapped link.
+BLOCK_START = re.compile(r"^ {0,3}(?:#{1,6}\s|`{3,}|~{3,}|[-*+][ \t]|\d+[.)][ \t]|>|<!--)")
+# A blockquote marker is container syntax, never link text. The `>` is
+# mandatory in the pattern: were it optional, stripping would consume the first
+# character of every ordinary continuation line and destroy the link instead of
+# joining it.
+QUOTE_MARKER = re.compile(r"^ {0,3}>[ \t]?")
 
 
 def slugify(text: str) -> str:
@@ -57,13 +63,8 @@ def slugify(text: str) -> str:
     return kept.replace(" ", "-")
 
 
-def strip_code(text: str) -> str:
-    """Blank out fenced blocks and inline code spans, preserving line structure.
-
-    A link shown inside a code fence is documentation, not a link, so it must
-    not be resolved. Characters are replaced one-for-one, so every offset -- and
-    therefore every reported line number -- still points at the real source.
-    """
+def blank_fences(text: str) -> str:
+    """Blank out fenced code blocks, keeping every line ending."""
     kept: list[str] = []
     fence: str | None = None
     for line in text.splitlines(keepends=True):
@@ -73,12 +74,180 @@ def strip_code(text: str) -> str:
                 fence = found.group(1)[0]
                 kept.append("\n" if line.endswith("\n") else "")
                 continue
-            kept.append(INLINE_CODE.sub(lambda m: " " * len(m.group(0)), line))
+            kept.append(line)
         else:
             if found and found.group(1)[0] == fence:
                 fence = None
             kept.append("\n" if line.endswith("\n") else "")
     return "".join(kept)
+
+
+def matching_run(text: str, start: int, run: int) -> int | None:
+    """Offset of the next run of EXACTLY `run` backticks at or after `start`.
+
+    A closer is a run of the same length as the opener, so a run that is part
+    of a longer one does not close the span.
+    """
+    probe = start
+    while True:
+        found = text.find("`" * run, probe)
+        if found < 0:
+            return None
+        after = found + run
+        intact_before = found == 0 or text[found - 1] != "`"
+        intact_after = after >= len(text) or text[after] != "`"
+        if intact_before and intact_after:
+            return found
+        probe = found + 1
+
+
+def blank_code_spans(text: str) -> str:
+    """Blank out inline code spans, including one that crosses a line break.
+
+    A per-line pattern cannot see a code span that wraps: CommonMark lets a
+    code span contain a soft line break and folds that break to a space. The
+    text of such a span survives a per-line pass, and a link-shaped construct
+    inside it would then be joined by `unwrap_links` and reported as if it were
+    a real link, so a document whose only 'link' is inside a code span would
+    fail the check. Every character of the span except the line ending is
+    replaced one-for-one, so line structure and every offset are preserved.
+    """
+    blanked = list(text)
+    index = 0
+    while index < len(text):
+        if text[index] != "`":
+            index += 1
+            continue
+        run = 0
+        while index + run < len(text) and text[index + run] == "`":
+            run += 1
+        closer = matching_run(text, index + run, run)
+        if closer is None:
+            # An unmatched backtick run is not a code span, exactly as a
+            # per-line pattern treated it.
+            index += run
+            continue
+        for position in range(index, closer + run):
+            if blanked[position] != "\n":
+                blanked[position] = " "
+        index = closer + run
+    return "".join(blanked)
+
+
+def strip_code(text: str) -> str:
+    """Blank out fenced blocks and inline code spans, preserving line structure.
+
+    A link shown inside a code fence or a code span is documentation, not a
+    link, so it must not be resolved. Characters are replaced one-for-one, so
+    every offset -- and therefore every reported line number -- still points at
+    the real source.
+    """
+    return blank_code_spans(blank_fences(text))
+
+
+def link_text_open(line: str) -> bool:
+    """True when `line` ends inside a link's TEXT, which a later line completes.
+
+    `[the heading](target)` fits on one line. A hand-wrapped document splits it
+    after any word, and the split can land between the `[` and the `](`, so the
+    line ends with an unclosed `[` and the link exists only as a whole once the
+    following lines are read together. Only a `[` left open at the END of the
+    line counts: an unmatched closer above it is ordinary prose, not a wrap.
+    """
+    return line.rfind("[") > line.rfind("]")
+
+
+def link_target_open(line: str) -> bool:
+    """True when `line` ends inside a link's DESTINATION.
+
+    Two shapes wrap here: the line ends on the `](` itself, or it ends part-way
+    through the destination. Detection is grammatical, never positional -- the
+    `[` must precede the `](` and the destination must be unterminated -- so an
+    ordinary parenthesis that ends a prose line is not mistaken for a link.
+    """
+    if "](" not in line:
+        return False
+    after = line[line.rfind("](") + 2:]
+    return line.rfind("[") > line.rfind("])") and (")" not in after or "(" in after)
+
+
+def source_line_at(positions: list[tuple[int, int]], offset: int) -> int:
+    """The 1-based source line the character at `offset` of a merged line is on."""
+    found = positions[0][1]
+    for start, number in positions:
+        if start > offset:
+            break
+        found = number
+    return found
+
+
+def unwrap_links(lines: list[str]) -> tuple[list[str], list[list[tuple[int, int]]]]:
+    """Join the lines a wrapped link was split across, before `LINK` scans.
+
+    `LINK`'s character classes forbid `\\n`, and the scan is per line, so a
+    wrapped link matches nowhere and is counted nowhere. Joining the halves with
+    a space restores what the renderer sees: Markdown folds a soft line break
+    inside link text to a space, and skips whitespace -- including a line ending
+    -- between the `](` and the destination.
+
+    The join continues while, and only while, the accumulated text is still
+    inside a link. Two rules that a two-line world made look right are wrong
+    here and are deliberately absent:
+
+    * The join is NOT required to complete a link at every step. A link may wrap
+      over three or more lines, and the intermediate step leaves the construct
+      open. Requiring a completed `LINK` on each step stopped every wrap longer
+      than two lines, and the two examples longest in the eye counted nowhere.
+    * The join is NOT refused because the opening line already holds a complete
+      link of its own. `See [the guide](guide.md) and [the` is ordinary
+      hand-wrapped prose; refusing that join hid the second link exactly as
+      completely as no fix at all would, and hid it worst when the second link
+      was broken and the report said `broken: 0`.
+
+    The join still cannot invent a link. It starts only when the accumulated
+    line is already PROVEN incomplete -- a `[` or a `](` it never closes -- and
+    it stops at end of input, at a blank line (a paragraph break is a boundary a
+    link does not cross), and at a heading, fence, list item, blockquote or HTML
+    comment. Every consumed line contributes its text to the merged line, so a
+    link that was already complete on a line of its own is still present in the
+    merged text and is still found by `LINK.finditer`.
+
+    Returns the merged lines and, for each, the offsets at which its text
+    switches to a later source line. The offset map is what keeps a finding on
+    the line the link is actually WRITTEN on: without it a link that merely
+    shared a line with a wrap would be reported at the wrap's first line.
+    """
+    merged: list[str] = []
+    spans: list[list[tuple[int, int]]] = []
+    index = 0
+    while index < len(lines):
+        current = lines[index]
+        positions: list[tuple[int, int]] = [(0, index + 1)]
+        while index + 1 < len(lines):
+            # Test the state the join would produce, not the state it started
+            # from: this is the condition that lets a wrap run past two lines,
+            # because an intermediate step is still open.
+            if not (link_text_open(current) or link_target_open(current)):
+                break
+            # A leading `>` is container syntax, never link text, so `> [a`
+            # plus `> b](t)` is the one link `[a b](t)`. The `>` is mandatory in
+            # the pattern: an optional one would eat the first character of an
+            # ordinary continuation line.
+            stripped = QUOTE_MARKER.sub("", lines[index + 1])
+            # A blank line ends the paragraph, and with it any wrap: joining
+            # across one would weld two paragraphs into a link the source does
+            # not contain.
+            if not stripped.strip() or BLOCK_START.match(stripped):
+                break
+            head = current.rstrip()
+            tail = stripped.strip()
+            current = head + " " + tail
+            positions.append((len(head) + 1, index + 2))
+            index += 1
+        merged.append(current)
+        spans.append(positions)
+        index += 1
+    return merged, spans
 
 
 class Document:
@@ -142,13 +311,18 @@ def check(files: list[Path], out) -> tuple[int, dict[str, int]]:
         doc = document(source)
         if doc is None:
             continue
-        for line_number, line in enumerate(doc.body.splitlines(), start=1):
+        # Undo hand-wrapping first, so a link split across a line break is one
+        # candidate line here. The offset map keeps every finding on the source
+        # line the link itself is written on, including a link that only shared
+        # a line with a wrap it was not part of.
+        lines, spans = unwrap_links(doc.body.splitlines())
+        for line, positions in zip(lines, spans):
             if "](" not in line:
                 continue
             for match in LINK.finditer(line):
                 raw = match.group(2)
                 target = raw[1:-1] if raw.startswith("<") and raw.endswith(">") else raw
-                where = f"{source}:{line_number}"
+                where = f"{source}:{source_line_at(positions, match.start())}"
                 if target.startswith("//") or SCHEME.match(target):
                     counts["external"] += 1
                     out.write(f"external (not fetched)  {where} -> {target}\n")
