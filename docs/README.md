@@ -51,6 +51,8 @@ status; the dated proposals and evidence pages further down are history.
   Project Aegis grants, limits and lifecycle events; read the complete register
   before acting.
 - [Merge policy](reconciliation/auto-merge-policy.md): current authority and historical decisions.
+- [Delivery workflow](delivery-workflow.md): the seven-stage delivery rule, each
+  stage's evidence, and the exact-head invalidation rule.
 - [Evidence reading guide](evidence/README.md): routes to 15 dated decision and
   delivery records, with current-status boundaries.
 - [Documentation readability backlog](roadmaps/aegis-documentation-readability-backlog.md):

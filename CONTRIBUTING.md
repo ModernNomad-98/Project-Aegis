@@ -31,7 +31,9 @@ own proven practice, including failures it absorbed during its own construction.
    stale-memory re-merges — a proven failure mode here.
 
 2. **Evidence before merge.** Every change is independently verified — validator green, and
-   claims checked against the actual repo state (git, PRs, files) — before it merges.
+   claims checked against the actual repo state (git, PRs, files) — before it merges. The
+   stage order and the exact-head rule are the
+   [delivery workflow](docs/delivery-workflow.md).
    *Why:* a closeout is a claim, not proof; trusting it instead of checking is exactly how
    rot sets in.
 
@@ -89,6 +91,18 @@ own proven practice, including failures it absorbed during its own construction.
    [CI reproduction guide](docs/offline-ci.md).
    *Why:* the validator checks that the library's structure is intact; a
    red validator means the change is not shippable, full stop.
+
+9. **Follow the delivery workflow.** Every change moves through the seven stages
+   in [`docs/delivery-workflow.md`](docs/delivery-workflow.md): plan, independent
+   plan audit, implement, independent implementation audit, validate, final
+   independent pull-request review, then merge. A plan is always required but its
+   size is proportional to the change. A moved head **voids** the verdicts bound
+   to the old head, and no merge happens before the final review is posted,
+   accepted and verified against the exact candidate head. That page is
+   canonical; this rule is a reference to it, not a copy of it.
+   *Why:* the stages separate the agent that proposes work from the agent that
+   checks it, and a rule that lives only in a session's memory is not a rule —
+   it is a habit nobody can audit.
 
 ## Write documentation for a new reader
 

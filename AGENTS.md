@@ -62,10 +62,16 @@ A rule written down is not a behavior change: it holds only if it is executed as
 Role A, when an agent acts as coordinator for this repository, its job is to
 decompose the work, assign it, confirm it was completed, and route it onward;
 it does not author, edit, commit, push or merge the change itself.
-**Each stage is a different agent.** Author → review → security review where
+**Each stage is a different agent.** The delivery workflow is
+PLAN → INDEPENDENT PLAN AUDIT → IMPLEMENT → INDEPENDENT IMPLEMENTATION AUDIT
+→ VALIDATE → FINAL INDEPENDENT PR CODE REVIEW → MERGE; the canonical rule, and
+the evidence each stage must leave behind, is
+[docs/delivery-workflow.md](docs/delivery-workflow.md). **Do not merge before
+the final PR review is posted, accepted, and verified against the exact
+candidate head.** A further security review is inserted where
 **CONTRIBUTING.md's security-relevant-surface list (wider than `gate-guard`)**
 requires one — which is required for OUTSIDE contributions only and is not
-extended to the maintainer's or other agents' own PRs — → pull request → merge.
+extended to the maintainer's or other agents' own PRs.
 That scope is the one the owner recorded on 2026-09-27 in the
 "Security-surface rule" row of
 [docs/roadmaps/aegis-open-decisions-2026-09-23.md](docs/roadmaps/aegis-open-decisions-2026-09-23.md),
@@ -78,7 +84,10 @@ own work, no reviewer — code or
 security — merges it, and a separate agent holding the applicable authority
 performs the merge only after every required review has passed at the exact
 head being merged, that head's checks are all green — not only the
-branch-protection-required ones — and any required review wait has completed.
+branch-protection-required ones — unless an active owner exception covering
+that exact head and scope is cited, in which case the failed check is recorded
+as failed with its authorized disposition, never as green and never as waived
+— and any required review wait has completed.
 The merge agent confirms that authority itself — a register entry on the
 default branch that passes the preamble test below, or the owner's instruction
 quoted verbatim in its brief with its source; a brief's bare assertion of

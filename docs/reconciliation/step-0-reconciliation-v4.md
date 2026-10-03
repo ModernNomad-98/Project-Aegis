@@ -3682,6 +3682,56 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     catalog note recording #254 as merged land with the build pull
     requests.
 
+- **D72 (2026-10-03) — Adopted the seven-stage delivery workflow as standing
+  policy for this source repository.**
+  - **Why.** The owner's direct instruction asked for one permanent delivery
+    workflow that binds any coding agent regardless of model, provider, editor
+    or harness, and for it to be recorded rather than remembered: a standing
+    rule whose only existence is session state cannot be audited. The repository
+    already carried a partial and inconsistent version of it in three places —
+    a four-stage arrow in `AGENTS.md`, the merge and evidence rules in
+    `CONTRIBUTING.md`, and an advisory skills item in the pull-request template
+    — and reconciling those three into one canonical source is what this
+    decision settles.
+  - **What.** One canonical page, `docs/delivery-workflow.md`, holds the
+    normative rule: the seven stages in order — PLAN, INDEPENDENT PLAN AUDIT,
+    IMPLEMENT, INDEPENDENT IMPLEMENTATION AUDIT, VALIDATE, FINAL INDEPENDENT PR
+    CODE REVIEW, MERGE — each naming its entry evidence and its exit evidence;
+    the exact-head invalidation rule, that a moved head **voids** every
+    head-bound verdict and that a review dispatched but not posted is
+    incomplete; the merge prohibition, that no merge happens before the final PR
+    review is posted, accepted and verified against the exact candidate head;
+    proportionality, so a small change may carry a short plan and must not
+    require a design document; the required four-column "Aegis skills used"
+    table; the Role A source-library / Role B consumer-repository scope; and an
+    explicit split between what CI and branch protection actually enforce and
+    what remains procedural.
+    `AGENTS.md` carries a binding summary of the invariant plus a pointer;
+    `CONTRIBUTING.md` gains operating rule 9 and a pointer from rule 2; and the
+    pull-request template's skills item becomes a required section outside the
+    advisory checklist. `CLAUDE.md` and `README.md` are deliberately unchanged —
+    `CLAUDE.md` imports `AGENTS.md`, so it inherits, and a second copy would
+    drift.
+    The page is the **sole normative rendering** of the merge-gate conditions,
+    which carry stable IDs `MG1`–`MG5`; every other mention of a condition, in
+    any file, is a pointer carrying the ID and **no content**.
+  - **Authority.** The owner's current direct instruction, relayed to the
+    implementing agents through the coordinating agent's brief and recorded here
+    as a transcription rather than as a message an agent can read directly.
+    `AGENTS.md` states that "A current-turn owner instruction is itself valid
+    evidence and needs no command output", and the approval register's preamble
+    states that "Current direct user instructions are valid source evidence
+    before transcription and do not need repeated consent". This entry grants
+    nothing; it records a process. Its companion register entry is
+    `AEGIS-APR-105`, a `POLICY DECISION` that likewise authorizes no work.
+  - **Status at recording.** Recorded 2026-10-03 against `origin/main` at
+    `c74c78d1`. The library has 195 skills; this decision adds no skill and
+    changes no skill file, no workflow file and no protected path. The workflow
+    is **documented, not machine-enforced**, and the page says so: its own
+    enforcement split records that the stage order, the stage separation, the
+    exact-head invalidation rule and proportionality have no mechanical control
+    behind them.
+
 ## 6. Post-merge corrections
 
 - **2026-09-30 — Line-number citations in §5 re-verified; the stale ones are

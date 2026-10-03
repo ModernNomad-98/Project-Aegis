@@ -3376,3 +3376,72 @@ the entry governs.
   disposition, not a waived check".
 - **Expiry / use limit:** One merge of PR #649 at the named head; consumed by
   the merge recorded in this entry. No calendar expiry stated.
+
+### AEGIS-APR-105: Seven-stage delivery workflow policy
+
+- **Event:** POLICY DECISION. This selects a policy target — the delivery
+  workflow this source repository follows — and grants no work of any kind. It
+  is not a GRANT.
+- **Status at recording:** ACTIVE on this reviewed register merge.
+- **Date / Grantor:** 2026-10-03 / Peter Nguyen.
+- **Owner decision:** Adopted from the owner's direct instruction. **Quoted
+  verbatim, as relayed:**
+
+  > Make the workflow below a permanent, repository-wide rule for ANY coding agent working on the Project Aegis source repository, regardless of model, provider, editor, or harness:
+  >
+  > PLAN → INDEPENDENT PLAN AUDIT → IMPLEMENT → INDEPENDENT IMPLEMENTATION AUDIT → VALIDATE → FINAL INDEPENDENT PR CODE REVIEW → MERGE
+  >
+  > The merge must never occur before the required final PR review is posted, accepted, and verified against the exact candidate head.
+  >
+  > This is a standing instruction until I explicitly supersede it. Record it durably through the repository's established instruction and approval mechanisms. It governs future changes, not just this session.
+
+  Each paragraph above is reproduced on one line so the quotation is not
+  sensitive to line wrapping; the stage arrow sequence is exactly as given.
+- **Reason:** The stage order and the merge prohibition existed only partially
+  and inconsistently across `AGENTS.md`, `CONTRIBUTING.md` and the pull-request
+  template, and the parts that existed had no recorded policy home. Recording
+  them once, in one canonical page, makes the process auditable and gives every
+  later reader the same answer. Registering it here matters because `AGENTS.md`
+  sends every agent to this register before requesting consent, and a reader who
+  finds the merge exceptions and nothing about the workflow governing them has
+  an incomplete picture.
+- **Scope allowed (selected policy):** The selected policy target is the
+  seven-stage delivery workflow stated in
+  [`docs/delivery-workflow.md`](../delivery-workflow.md): the stage order and
+  stage separation, each stage's entry and exit evidence, the exact-head
+  invalidation rule, the merge prohibition, proportionality, the required
+  four-column "Aegis skills used" table, the Role A source-library scope, and the
+  enforced-versus-procedural split. The companion decision entry is `D72` in the
+  [reconciliation record](../reconciliation/step-0-reconciliation-v4.md) §5. This
+  selection changes no permission control, no branch protection, no protected
+  path pattern and no harness configuration.
+- **Scope FORBIDDEN:** It grants nothing, so **nothing may cite
+  `AEGIS-APR-105` as authority for any action.** It authorizes no merge, no
+  administrator merge, no `gate-guard` exception and no waiver of any check; it
+  does not widen `AEGIS-APR-002` or `AEGIS-APR-047`. It covers no specific pull
+  request or head. It does not add `AGENTS.md` or `CLAUDE.md` to the
+  protected-path pattern, and it does not decide that open question. It does not
+  make the workflow machine-enforced: the page records that the stage order,
+  stage separation, exact-head invalidation and proportionality have no
+  mechanical control behind them.
+- **Evidence:** The owner's instruction was received in the coordinating session
+  and **relayed here verbatim through the coordinating agent's brief** for this
+  work item, on 2026-10-03. The owner did not type into this register, and the
+  quotation above is a transcription of that relay, not the owner's own signed
+  text. The register's preamble makes it valid source evidence — "Current direct
+  user instructions are valid source evidence before transcription and do not
+  need repeated consent" — so this entry rests on the owner's current direct
+  instruction and **does not claim a repository citation of the owner's own
+  words**.
+  An earlier revision of this entry paraphrased that instruction. It was
+  replaced by the verbatim quotation above on the same terms the preamble
+  permits, and **the replacement is not a rewriting of history**: `AEGIS-APR-105`
+  does not exist on `origin/main`, whose highest entry is `AEGIS-APR-104`, so
+  this entry has never been merged and has no recorded history to preserve. Once
+  merged, any further change to it is an append.
+  The repository artifact that independently records the decision is `D72` in the
+  [reconciliation record](../reconciliation/step-0-reconciliation-v4.md) §5,
+  added by this same change.
+- **Expiry / use limit:** No calendar expiry and no one-use limit stated. This is
+  a policy selection and stands until explicitly superseded; any replacement
+  requires a later recorded owner choice.
