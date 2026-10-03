@@ -3542,3 +3542,49 @@ the entry governs.
   named head and is consumed by that merge. No calendar expiry is stated; the
   exact-head rule is the operative limit, and it is spent on that head or not at
   all.
+
+### AEGIS-APR-107: Consumption of the PR #661 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-106.
+- **Status at recording:** AEGIS-APR-106 has no remaining use. That entry's own
+  `Status at recording` field reads **ACTIVE and `unspent` as recorded**, which
+  was true when it was written and is not true now; **this entry is how the
+  register records the later change of state, and it does not rewrite the
+  earlier field.**
+- **Effective at:** 2026-10-03 23:36:19 UTC.
+- **Recorded at / By:** 2026-10-03 / Project Aegis agent, under the delivery
+  grant in AEGIS-APR-039.
+- **New authority:** None. A later change to a protected path needs its own
+  exception.
+- **Reason:** The sole exact-head administrator merge completed.
+
+  **The bound head is not the commit now on `main`, and there is no continuity
+  between the two SHAs.** AEGIS-APR-106 bound **the act of merging at
+  `4a9e09dd2db7f4cfb59568f198b206e366f63aea`** — in its own words *"the exception
+  covers the merge at the named head only"* and *"one merge of PR #661 at the
+  named head"*. The merge was a **squash**, so the commit that landed on `main`
+  is a **different object**: `cc8fd2cb22666a316aa2dca9981aa75d88f78e06`. Measured:
+  the two SHAs are distinct commits, and **`4a9e09dd…` is not an ancestor of
+  `cc8fd2cb…`** (`git merge-base --is-ancestor` exits non-zero). **`cc8fd2cb…`
+  must not be read as "the bound head."** The binding was satisfied by the merge
+  **act** at the named head, which `--match-head-commit` guaranteed, and not by
+  the identity of the resulting commit. A reader who assumes the merged commit
+  *is* the bound head would be misreading this record, and this sentence exists
+  to prevent that.
+- **Scope FORBIDDEN:** This consumption spends the **first** named path only. The
+  second, `scripts/ci/check-markdown-links.py`, remains **covered by
+  AEGIS-APR-106 and unused**, exactly as that entry records it, and **neither
+  this entry nor that one spends or extends it**. `AEGIS-APR-047` **still does
+  not reach workflow/CI files**. Nothing here revives `AEGIS-APR-104`, and
+  nothing here authorises any later protected-path change: **the grant is
+  exhausted and cannot be spent again.**
+- **Evidence:** [PR #661](https://github.com/ModernNomad-98/Project-Aegis/pull/661)
+  merged `4a9e09dd2db7f4cfb59568f198b206e366f63aea` as
+  `cc8fd2cb22666a316aa2dca9981aa75d88f78e06` at the time above, with the merge
+  pinned to that head. The
+  [merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/661#issuecomment-5974654607),
+  comment `5974654607`, records the disposition as *"MERGED (squash) at the exact
+  reviewed head, under the one-time authority of AEGIS-APR-106"*. **`gate-guard`
+  FAILED on that pull request and the merge proceeded under the one-time
+  disposition** — recorded here as **failed with an authorised disposition,
+  not waived, and not a pass.**
