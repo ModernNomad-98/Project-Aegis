@@ -3376,3 +3376,61 @@ the entry governs.
   disposition, not a waived check".
 - **Expiry / use limit:** One merge of PR #649 at the named head; consumed by
   the merge recorded in this entry. No calendar expiry stated.
+
+### AEGIS-APR-105: Seven-stage delivery workflow policy
+
+- **Event:** POLICY DECISION. This selects a policy target — the delivery
+  workflow this source repository follows — and grants no work of any kind. It
+  is not a GRANT.
+- **Status at recording:** ACTIVE on this reviewed register merge.
+- **Date / Grantor:** 2026-10-03 / Peter Nguyen.
+- **Owner decision:** The owner directed that the repository adopt one permanent,
+  repository-wide delivery workflow binding any coding agent regardless of
+  model, provider, editor or harness: a change moves through plan, independent
+  plan audit, implement, independent implementation audit, validate, final
+  independent pull-request review, then merge; a moved head voids the verdicts
+  bound to the old head; and no merge happens before the final review is posted,
+  accepted and verified against the exact candidate head. The decision is
+  transcribed into this register from the coordinating agent's brief, not typed
+  by the owner.
+- **Reason:** The stage order and the merge prohibition existed only partially
+  and inconsistently across `AGENTS.md`, `CONTRIBUTING.md` and the pull-request
+  template, and the parts that existed had no recorded policy home. Recording
+  them once, in one canonical page, makes the process auditable and gives every
+  later reader the same answer. Registering it here matters because `AGENTS.md`
+  sends every agent to this register before requesting consent, and a reader who
+  finds the merge exceptions and nothing about the workflow governing them has
+  an incomplete picture.
+- **Scope allowed (selected policy):** The selected policy target is the
+  seven-stage delivery workflow stated in
+  [`docs/delivery-workflow.md`](../delivery-workflow.md): the stage order and
+  stage separation, each stage's entry and exit evidence, the exact-head
+  invalidation rule, the merge prohibition, proportionality, the required
+  four-column "Aegis skills used" table, the Role A source-library scope, and the
+  enforced-versus-procedural split. The companion decision entry is `D72` in the
+  [reconciliation record](../reconciliation/step-0-reconciliation-v4.md) §5. This
+  selection changes no permission control, no branch protection, no protected
+  path pattern and no harness configuration.
+- **Scope FORBIDDEN:** It grants nothing, so **nothing may cite
+  `AEGIS-APR-105` as authority for any action.** It authorizes no merge, no
+  administrator merge, no `gate-guard` exception and no waiver of any check; it
+  does not widen `AEGIS-APR-002` or `AEGIS-APR-047`. It covers no specific pull
+  request or head. It does not add `AGENTS.md` or `CLAUDE.md` to the
+  protected-path pattern, and it does not decide that open question. It does not
+  make the workflow machine-enforced: the page records that the stage order,
+  stage separation, exact-head invalidation and proportionality have no
+  mechanical control behind them.
+- **Evidence:** The owner's directive reached the implementing agents **relayed
+  through the coordinating agent**, in the Project Aegis conversation on
+  2026-10-03: it is a transcription of the owner's instruction, not a message an
+  agent can read directly, and the owner did not type into this register. The
+  register's preamble makes that valid source evidence — "Current direct user
+  instructions are valid source evidence before transcription and do not need
+  repeated consent" — so this entry rests on the owner's instruction and does not
+  claim a repository citation of the owner's own text. The repository artifact
+  that independently records the decision is `D72` in the
+  [reconciliation record](../reconciliation/step-0-reconciliation-v4.md) §5,
+  appended by the same change as this entry.
+- **Expiry / use limit:** No calendar expiry and no one-use limit stated. This is
+  a policy selection and stands until explicitly superseded; any replacement
+  requires a later recorded owner choice.

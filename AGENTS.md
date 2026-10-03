@@ -62,10 +62,16 @@ A rule written down is not a behavior change: it holds only if it is executed as
 Role A, when an agent acts as coordinator for this repository, its job is to
 decompose the work, assign it, confirm it was completed, and route it onward;
 it does not author, edit, commit, push or merge the change itself.
-**Each stage is a different agent.** Author → review → security review where
+**Each stage is a different agent.** The delivery workflow is
+PLAN → INDEPENDENT PLAN AUDIT → IMPLEMENT → INDEPENDENT IMPLEMENTATION AUDIT
+→ VALIDATE → FINAL INDEPENDENT PR CODE REVIEW → MERGE; the canonical rule, and
+the evidence each stage must leave behind, is
+[docs/delivery-workflow.md](docs/delivery-workflow.md). **Do not merge before
+the final PR review is posted, accepted, and verified against the exact
+candidate head.** A further security review is inserted where
 **CONTRIBUTING.md's security-relevant-surface list (wider than `gate-guard`)**
 requires one — which is required for OUTSIDE contributions only and is not
-extended to the maintainer's or other agents' own PRs — → pull request → merge.
+extended to the maintainer's or other agents' own PRs.
 That scope is the one the owner recorded on 2026-09-27 in the
 "Security-surface rule" row of
 [docs/roadmaps/aegis-open-decisions-2026-09-23.md](docs/roadmaps/aegis-open-decisions-2026-09-23.md),
