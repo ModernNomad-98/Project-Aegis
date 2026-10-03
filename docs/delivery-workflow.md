@@ -130,7 +130,7 @@ column of the stage table. The maintenance rule is
 | `SD-C` | IMPLEMENT | **COMPLETE** or **INCOMPLETE**. **COMPLETE requires an immutable head: the commit SHA, the tree it resolves to (`git rev-parse <head>^{tree}`), and the base commit the change is against, all recorded** — so the next stage audits fixed objects rather than a moving branch, and "the diff at an exact head" is fully determined. The **tree** fixes content; the **base** fixes the diff. | COMPLETE |
 | `SD-D` | IMPL AUDIT | **ACCEPT** or **REVISE**, resolved **per acceptance criterion**: every criterion is `MET`, `NOT MET` or `UNRUN`. ACCEPT requires **no `NOT MET`**, and **every `UNRUN` must correspond to a criterion the plan at `SD-A` declared not verifiable at this head, with its reason recorded**. A criterion that becomes `UNRUN` at audit time and was **not** so declared forces **`REVISE`** — it is a finding about the implementation or the plan, not a gap to wave through. | ACCEPT |
 | `SD-E` | VALIDATE | **PASS**, **INCOMPLETE — UNRUN LISTED**, or **FAIL**. | PASS, and INCOMPLETE — UNRUN LISTED **only when its condition below is met** |
-| `SD-F` | FINAL REVIEW | **ACCEPT** or **REVISE**, on the exact 40-character head; **and the PR template's *Security-relevant surface?* question is answered** — `No`, or `Yes` with the surfaces named; **and the PR's "Aegis skills used" table is present, with a row for every stage that ran**; **and the `## Reconciliation witness` block is present with one row per numbered site.** | ACCEPT |
+| `SD-F` | FINAL REVIEW | **ACCEPT** or **REVISE**, on the exact 40-character head; **and the PR template's *Security-relevant surface?* question is answered** — `No`, or `Yes` with the surfaces named; **and the PR's "Aegis skills used" table is present, with a row for every stage that ran**; **and the `## Reconciliation witness` block is present with one row per numbered site**; **and the verdict names a content hash over [the bound fields](#the-bound-fields), which void the verdict if they change.** | ACCEPT |
 | `SD-G` | MERGE | **MERGED** or **NOT MERGED**, with [the receipt](#the-receipt-what-stage-g-must-be-able-to-show) recording a status per `MG` ID. | MERGED |
 
 > **`SD-E: INCOMPLETE — UNRUN LISTED`** is affirmative when every unrun
@@ -484,7 +484,13 @@ The rules for that table:
 - **Merge-stage usage is recorded in the merge receipt**, and reflected in the PR
   description where permitted.
 - **Update PR metadata rather than changing candidate files** solely to maintain
-  the table. The table must never be a reason to move a head.
+  the table. The table must never be a reason to move a head. **This holds for
+  cosmetic edits. It does not license an edit to a bound field:** changing the
+  skills table is itself a change to a bound field, and
+  [that voids the Stage F verdict](#the-bound-fields) even though the head has
+  not moved. The two rules do not conflict — one says *do not move the head to
+  fix a table*, the other says *if you change the table, the verdict you hold is
+  void*.
 - **Do not create a separate document** merely to list skills.
 
 ## Honesty: unavailable tests and insufficient authority
@@ -604,6 +610,80 @@ involves a second party. **That is an improvement, not a solution**, and this pa
 says so rather than implying the per-edit gap is closed. The only categorical fix
 is a CI check that the block exists with the expected row count; `scripts/` is
 outside this change's scope, so it is **recorded as open, not present**.
+
+### The bound fields
+
+**Three PR-body fields are bound, and no others.** They are the ones the process
+**relies on** and that live **outside the tracked tree** — no grep on this page
+reaches them, and no head movement covers them, because editing the body moves no
+head:
+
+1. **The `## Reconciliation witness`** — the per-edit control's artefact.
+2. **The Aegis skills table** — the record of which skill each stage read and
+   applied.
+3. **The security-relevant-surface answer** — the `No` / `Yes` answer `SD-F`
+   gates.
+
+They are bound **because the process acts on them**. The witness decides whether
+the edit reconciled its sites; the skills table is the evidence the skills mandate
+was followed; the security answer is what `SD-F` gates and what `MG5`'s
+applicability turns on. **A fourth is not added here.** If one is ever needed, it
+is named by an owner decision on the same terms as this one, not silently.
+
+**The binding, and its method.** A Stage F verdict **names a content hash over
+the three bound fields' text**, alongside the exact 40-character head it already
+names. **This is in addition to the head binding, not a replacement** — the head
+binds the candidate tree, the hash binds the body fields the tree does not
+contain.
+
+> **Method (PROC-04 — a published figure names its method):** take each bound
+> field's text in the order listed above, **collapse every run of whitespace to a
+> single space and trim** it, join the three with a single newline, and take the
+> **`sha256`** of that UTF-8 string, recorded as its **first 16 hex characters**.
+> A field that is absent hashes as the empty string and is recorded as absent.
+
+**Any change to a bound field voids the verdict** — **exactly as a moved head
+does**, and by the same rule: this is the invalidation principle of
+[the exact-head section](#exact-head-invalidation) extended to the inputs that
+live outside the head. **One character changed in any of the three, and the
+verdict that named the old hash no longer covers the pull request**, even though
+the head has not moved and every check on it is still green. **Do not re-use a
+verdict across a bound-field change; take a fresh one at the current head and the
+current hash.**
+
+**How that is detected, stated plainly — and it is procedural.** The page has no
+mechanism that reaches the body, and `scripts/` is outside this change's scope, so
+**no CI check can enforce this**:
+
+- **Who:** the **Stage F reviewer**, and again the **merge agent** in Stage G.
+- **When:** before posting or accepting a Stage F verdict, and again before
+  merging — because the body can be edited between them.
+- **What happens on a mismatch:** the verdict is **void**, and the work returns
+  to Stage F under [the chain rule](#the-seven-stages) — a fresh verdict naming
+  the current head and the current hash. A mismatch is **not** a defect to
+  triage; it is an absence of authority to merge.
+
+**Recorded as a residual, not as enforcement.** Nothing recomputes the hash
+automatically, and nothing detects a bound field that was changed and then
+changed back. **This is a stated limit, not a control** — the same honesty the
+rest of this page applies to its procedural rules.
+
+**Where the failure mode now sits.** Before the witness existed, the risk was
+*"the author forgot a conditional step"* — demonstrated. The witness moved it to
+*"the final reviewer passed a complete but false witness."* **This binding moves
+it again, to: the reviewer passed a verdict against a hash that no longer
+describes the body, and the merge agent did not recompute it.** That is narrower —
+it requires **two** agents to miss the same thing, and the second has an explicit
+step available — but it is **still procedural**, and it is claimed as an
+improvement rather than a solution.
+
+**The owner chose this among three options, and it is recorded as an owner
+decision, not a planner's judgement.** The reviewer named three ways to close the
+body gap: **bind a hash**, **invalidate on change**, or **re-check at Stage G**.
+**The owner's words: *"Bind the body's bound fields by content hash; any change
+voids the verdict."*** The first was chosen; the second is what this section's
+invalidation sentence implements as a consequence, and the third is what the
+who/when above assigns to the merge agent. **The choice is the owner's.**
 
 ## Adoption and review
 

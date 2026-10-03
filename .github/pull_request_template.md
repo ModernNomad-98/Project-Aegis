@@ -87,6 +87,12 @@ is not a rendering of the rule. `SD-F` cannot ACCEPT without it.
 | 7 | The PR body | | |
 | 8 | The stage table's exit-disposition column | | |
 
+**These three fields are the bound fields.** A Stage F verdict names a content
+hash over them (sha256 of the three normalised texts joined by newlines, first 16
+hex characters), and **any change to any of them voids that verdict** even though
+no head has moved. See
+[the bound fields](https://github.com/ModernNomad-98/Project-Aegis/blob/main/docs/delivery-workflow.md#the-bound-fields).
+
 ## Divergence table (required when `AGENTS.md` or a condition changed)
 
 The per-marker measurement behind the statement that the `AGENTS.md` summary
