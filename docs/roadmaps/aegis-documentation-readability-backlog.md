@@ -2796,6 +2796,58 @@ confirms the base is the recorded acceptance for each page: for
 "docs: accept next twenty full-page reviews after 219" the tracker's own row
 cites when it says "keep acceptance" at 9 net.
 
+### Correction: one base SHA in the table above is not an ancestor of `origin/main` — 2026-10-02
+
+**The sentence above is false as written.** It says: *"Each base SHA is the page's
+last recorded acceptance and is an ancestor of `origin/main`, and each figure
+exceeds 10, so every one of the ten returns to pending under the net-difference
+rule quoted above."* The table's `cloud-security-baseline-reviewer/SKILL.md` base
+`65bacc7d6b854205cf8bdcc7a1a58f8ef76dc6c7` is a dangling pre-rebase object, not an
+ancestor of `origin/main`. Re-run at `origin/main` `26b7cd68` with a `git fetch
+origin --prune` first: (1) `git merge-base --is-ancestor 65bacc7d6b85 origin/main`
+exits **1**; (2) `git for-each-ref --contains 65bacc7d6b85 --format='%(refname)'`
+returns **nothing** (0 refs); (3) `git rev-list --all` — 1907 commits, which by
+Git's definition includes branches, remotes, tags, the stash and other refs —
+does **not** contain it; (4) `git cat-file -t 65bacc7d6b85` returns **`commit`**.
+Its subject is `chore: set SKILL-COUNT to 193 after rebase onto d423d53 (#523,
+#518)`, dated 2026-09-28, so it is not an acceptance commit for that page either,
+and its 12 changed lines are therefore not reproducible outside a clone that
+still holds the dangling object. The fourth result is the point: **an object
+resolving is not evidence of reachability**, tests (1) and (2) are the ref graph
+and test (4) is evidence of nothing about it. `reflog --all` does not name the
+object either, so no reflog entry reaches it. This is already a standing rule —
+`PROC-01`, *"A claim that a revision is reachable must be verified by an explicit
+reachability test against the ref graph, never by the mere resolution of the
+object"* — in the process register proposed by **open PR #633**, which is
+**not merged**, so a path link here does not resolve on `main` and this citation
+is **unverified** in this repository as written; correct it when #633 merges.
+
+**The other nine rows are unaffected, and that is measured, not assumed.** Each of
+the ten other SHAs cited in this passage — `cdacb2ff9344`, `754fc7a02f85`,
+`dbad6c25c111`, `cf1963933515`, `5e0e9ad7`, `bf7a4b86b46b`, `620f0268edca`,
+`f27535695b34`, `c0a3d1d4de64` and the abbreviation `bf7a4b8` (the same commit as
+`bf7a4b86b46b`) — passes **both** tests: `merge-base --is-ancestor` exits **0**,
+and `for-each-ref --contains` returns refs in the hundreds (at least 340, the
+lowest measured). Only
+`65bacc7d6b85` fails. The section's conclusion still holds for all ten rows,
+because the cited figures (11 to 92 changed lines) each exceed 10 whether or not
+the base is reachable; what fails is the sentence's reachability claim, and for
+one row the reproducibility of its changed-line figure.
+
+**The two incompatible upper bounds are both still present.** This page says `at
+most **575**` against the recorded 584, and later says `at most **567**` are
+counted accepted or unknown; neither has been withdrawn, and the page's own
+2026-10-02 text already records both as figures no command reproduces. They are
+also arithmetically incompatible on one inventory: 602 reader pages less 575 is
+27, while the same passing text puts the floor at at least 35. That observation is
+added here; no figure above is changed.
+
+**Self-cost.** `git diff --numstat origin/main -- docs/roadmaps/
+aegis-documentation-readability-backlog.md` reports **`52 0`** for this
+correction: **52 lines added, 0 deleted**, to a file that was already pending and
+owing its own independent full-page re-read. It compounds that debt rather than
+clearing it, confers no acceptance, and the page **remains pending**.
+
 **Root cause.** Six of the ten have their **only** acceptance recorded outside
 this ledger, in the batch evidence files under `docs/evidence/documentation/`,
 and this ledger does not mention them at all:
