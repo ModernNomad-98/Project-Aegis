@@ -186,17 +186,24 @@ applicable to this event". These 105 runs are excluded from the duration sample
 ### Warning 3 — a 3.3-day window; min and max are window extremes, not bounds
 
 The sample is the **whole population of that window**, not a random sample and
-not a season: 296 runs covering Tuesday to Friday UTC, taken at roughly 90
-runs per day. Two consequences:
+not a season: 296 runs covering **Tuesday to Saturday UTC**
+(`2026-09-29T19:40:27Z` → `2026-10-03T02:33:04Z`, 3 days 6 h 52 m 37 s), taken
+at roughly 90 runs per day. Two consequences:
 
 - `min` and `max` are the observed extremes **of this window**. A later run can
   and eventually will fall outside them; that is not by itself a regression.
-- Weekend and night-time runner-availability behaviour is **not sampled**. The
-  `windows-*` jobs are the queue-sensitive ones, so their figures are the least
-  transferable part of this table.
+- Weekend and night-time runner-availability behaviour is **effectively
+  unsampled**. The window enters Saturday UTC only for its first
+  **2 h 33 m 04 s** (`2026-10-03T00:00:00Z` → `2026-10-03T02:33:04Z`) and
+  contains no Sunday at all, so the "weekend" case rests on one partial day.
+  The `windows-*` jobs are the queue-sensitive ones, so their figures are the
+  least transferable part of this table.
 
 Re-measure when the workflow file changes, when a step is added or removed, or
-when GitHub rotates the `ubuntu-latest` or `windows-latest` image.
+when GitHub rotates the `ubuntu-latest` or `windows-latest` image. Also re-read
+limit 7 and re-run its check whenever `scripts/ci/check-markdown-links.py`
+changes: a different tool revision can invalidate that limit without touching
+the workflow, and already did once (see limit 7).
 
 ### Warning 4 — workflow-level duration is a DIFFERENT quantity and is queue-dominated
 
@@ -255,7 +262,14 @@ carry an explicit `-R`; a bare workspace directory is not one. `gh api` does
 real checkout.
 
 ```powershell
-# ---- 1) Run-level window (the 300 most recent runs) ---------------------------------
+# ---- 1) Run-level window -------------------------------------------------------------
+# This baseline's window is PINNED, not "the most recent": run ids 36620909745 to
+# 37090194553, created 2026-09-29T19:40:27Z to 2026-10-03T02:33:04Z, 296 runs of
+# the `validate-skills` workflow. The command below fetches whatever is most
+# recent AT THE MOMENT YOU RUN IT, so it does NOT reproduce §3.2 - it yields a
+# NEW baseline over a different window (breaking this page's own §2 rule 3 if it
+# is then read as the table above). To reproduce §3.2, keep only runs whose
+# databaseId lies inside the pinned id range above.
 gh run list --limit 300 -R ModernNomad-98/Project-Aegis `
   --json databaseId,headBranch,event,conclusion,createdAt,updatedAt,workflowName,status `
   | Out-File -FilePath 'runs-300.json' -Encoding utf8
@@ -275,6 +289,7 @@ gh api "/repos/ModernNomad-98/Project-Aegis/actions/runs/<RUN_ID>/jobs" `
 git show origin/main:.github/workflows/validate-skills.yml
 
 # ---- 5) Workflow-level duration (the DIFFERENT quantity, §3.1) ----------------------
+# Same moving-window caveat as step 1: pin the ids if you need §4 warning 4's row.
 gh run list --limit 300 -R ModernNomad-98/Project-Aegis `
   --json databaseId,createdAt,updatedAt     # duration = updatedAt - createdAt
 ```
@@ -304,13 +319,24 @@ a single `json.loads`.
 6. **This page has had no independent full-page re-read.** It is a new tracked
    page and starts `pending`, because the repository's targeted-edit rule
    retains an acceptance and cannot confer one.
-7. **A line-wrapped link here is silently unchecked.** The repository's link
-   checker, `scripts/ci/check-markdown-links.py`, matches a whole link on one
-   line, so a link whose text or destination wraps to the next line is not
-   counted at all rather than reported as broken — the same behaviour recorded
-   in the register's `7.3`. **Keep every link on a single line**, and treat
-   `links checked` in its summary as the number to compare, not `broken: 0`
-   alone. This page's own links were unwrapped for that reason.
+7. **A line-wrapped link was silently unchecked — FIXED on `main`, revision
+   pinned.** When this page was written, the repository's link checker
+   `scripts/ci/check-markdown-links.py` was blob
+   `bb1e40073a0f379e893218cdbb8f5a8aefbfb65b` (revision `9f5dc6b3`). Its
+   `LINK` pattern forbade a newline, so a link whose text or destination
+   wrapped to the next line was not counted at all rather than reported as
+   broken — the behaviour the register's `7.3` proves, and the reason this
+   page's own links were unwrapped. **That is no longer true of the current
+   checker.** PR #648 (`20fadd48`, "count markdown links that wrap across a
+   line break") replaced the pattern; at blob
+   `efa65c95f5444e50867e832a688c8351cd332d2c` (revision `25cc0e7a`) the wrapped
+   fixture and its unwrapped twin produce **identical** counts —
+   `scripts/tests/fixtures/markdown-links/wrapped/README.md` and
+   `unwrapped-twin.md` each report `checked 7, anchors 4, broken 0, dead 0,
+   external 1`, exit 0. Keeping a link on one line is now prose style, not a
+   correctness requirement. **Re-run that comparison whenever the checker's
+   blob changes**, and still compare `links checked` rather than `broken: 0`
+   alone, because a link the scan never reaches is invisible in both numbers.
 
 ## 8. Provenance
 
