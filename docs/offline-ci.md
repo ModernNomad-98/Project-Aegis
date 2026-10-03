@@ -299,8 +299,9 @@ Windows explicitly skips them while running the recorder tests.
 Use an isolated Python 3.14 environment and install the lock the way CI does:
 `python -m pip install --require-hashes --only-binary :all: --no-deps -r requirements-ci.txt`,
 then `python -m pip check`. Set `AEGIS_CI_EVIDENCE_DIR` to a new
-empty directory for each local attempt; otherwise the recorder defaults to
-`aegis-ci` inside `RUNNER_TEMP` or the system temporary directory. Use the same
+empty directory for each local attempt; otherwise the recorder uses
+`aegis-ci` under a set `RUNNER_TEMP`, or a unique per-run directory under the
+system temporary directory. Use the same
 environment's `python` for the recorder and child command.
 
 Run the commands shown in `.github/workflows/validate-skills.yml` from the repository
