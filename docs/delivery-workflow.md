@@ -24,17 +24,89 @@ binding ones.
 
 | # | Stage | Entry evidence | Exit evidence | Authority holder | Machine-enforced? |
 | --- | --- | --- | --- | --- | --- |
-| A | PLAN | The request or directive that asks for the change, with its source. | A written plan: what, why, blast radius, and the paths it will touch. | The agent taking the work, or the coordinator assigning it. | **Nothing** — procedural (see [the split](#what-is-machine-enforced-and-what-is-procedural)). |
-| B | INDEPENDENT PLAN AUDIT | The plan, at a recorded revision (a commit SHA or a file hash), by an agent that did **not** write it. | A posted verdict: ACCEPT or REVISE, bound to that recorded revision. | A different agent from the planner. | **Nothing** — procedural. |
+| A | PLAN | The request or directive that asks for the change, with its source. | A written plan: what, why, blast radius, the paths it will touch, and **proportionate acceptance criteria** — few and short for a small change, but present and checkable. | The agent taking the work, or the coordinator assigning it. | **Nothing** — procedural (see [the split](#what-is-machine-enforced-and-what-is-procedural)). |
+| B | INDEPENDENT PLAN AUDIT | The plan's exact text, **bound to a captured revision** — a content hash taken when the text is captured, or an immutable comment or artifact — by an agent that did **not** write it. | A posted verdict ACCEPT or REVISE **naming the captured revision it audited**. | A different agent from the planner. | **Nothing** — procedural. |
 | C | IMPLEMENT | An **ACCEPTED** plan — not merely a posted one — with the revision the audit bound to. | The changed files; local check output; a changed-files **and** NOT-touched list; a rule-preservation inventory when the change edits governance text. | The implementing agent. | Partly — the Developer Certificate of Origin (DCO) sign-off and `gate-guard` are required checks on the commits. |
 | D | INDEPENDENT IMPLEMENTATION AUDIT | The diff at an exact head, by an agent that did **not** implement it. | A posted audit naming that head, checking the plan's acceptance criteria one by one. | A different agent from the implementer. | **Nothing** — procedural. |
 | E | VALIDATE | The post-audit candidate head. | The repository's own checks at that head, with their commands and output; every check that could not be run named **UNRUN**. | The validating agent. | Partly — `validate-skills` and `gate-guard` are required status checks; nothing verifies that this stage ran. |
 | F | FINAL INDEPENDENT PR CODE REVIEW | The exact candidate head, by an agent that is neither the author nor the merger. | A **posted, accepted** verdict naming that 40-character head, which also checks the PR's "Aegis skills used" table against the work. | A different agent from the author and from the merger. | **Nothing** — procedural. |
-| G | MERGE | Stage F's posted and accepted verdict, a head match, and the merge agent's own confirmed authority. | A merge receipt recording the head, the checks, the review, and the merge agent's own skill usage. | A separate agent holding applicable authority. | Partly — branch protection and required checks; `enforce_admins` is `false`, so this is bypassable. |
+| G | MERGE | Stage F's **posted and accepted** verdict naming this exact head; **every applicable check green at this exact head** — not only the branch-protection-required ones; the automated review posted or confirmed unavailable, with **every P1 and P2 finding triaged** (`AEGIS-APR-049`); and the merge agent's own confirmed authority. See [Before merging](#before-merging-stage-g-entry-conditions). | A merge receipt recording the head, the checks, the review, the triage, and the merge agent's own skill usage. | A separate agent holding applicable authority. | Partly — branch protection and required checks; `enforce_admins` is `false`, so this is bypassable. |
 
 **No blank cells.** Every stage above names its entry evidence, its exit
 evidence, its authority holder and its enforcement reality. That is deliberate:
 a stage whose evidence is unstated is a stage nobody can verify.
+
+### The enforcing skill for each stage
+
+`ai-sdlc-operating-model` requires every stage contract to name the skill that
+enforces it. Where **no** skill owns a stage, this table says so rather than
+leaving a blank — consistent with [the split](#what-is-machine-enforced-and-what-is-procedural).
+
+| Stage | Enforcing skill |
+| --- | --- |
+| A PLAN | `ai-task-decomposer` supplies the task intent and its observable acceptance criterion when the change is a task carved out of a broader goal. **No skill owns writing a single change's plan** — that part is procedural. |
+| B INDEPENDENT PLAN AUDIT | `acceptance-criteria-reviewer` — tests the plan's acceptance criteria for testability, completeness and ambiguity. It reviews criteria that already exist and never authors them, which is exactly why the audit must follow A. |
+| C IMPLEMENT | **No skill owns general implementation.** `reviewable-diff-discipline` *(MANUAL-ONLY)* keeps a change small and reviewable, but only when a person names it. |
+| D INDEPENDENT IMPLEMENTATION AUDIT | `code-reviewer` — reviews an actual diff by severity with `file:line` evidence. `library-diff-reviewer` where the change is a skill-library PR. |
+| E VALIDATE | `risk-tiered-validation-selector` — selects validation depth from the change's impact class and fails closed on ambiguity. |
+| F FINAL INDEPENDENT PR CODE REVIEW | `code-reviewer`; `security-pr-reviewer` where the diff touches a security-relevant surface. |
+| G MERGE | `human-approval-boundary` — confirms an active scoped grant before the risky action. Standing authority itself is `agent-authorization-matrix` *(MANUAL-ONLY)*; the merge decision stays procedural plus branch protection. |
+
+`change-classification-gate` runs before A and sets the change's class, which is
+what selects the validation depth in E. Closeout after G routes to
+`ai-closeout-reporter`. Neither is an eighth stage.
+
+### Before merging: Stage G entry conditions
+
+The merge is gated on **all four** of the following, checked in the same turn
+against the **exact head being merged**. Recording them in the receipt
+afterwards does not satisfy them — a receipt is a record, not a gate.
+
+1. **Every applicable check is green at that exact head** — not only the
+   branch-protection-required ones. A green required pair alongside a red
+   non-required job is not a green head.
+2. **The final PR review is posted, accepted, and names that exact head.**
+3. **The automated review has posted, or is confirmed unavailable** (a
+   usage-limit notice, for example), and **every P1 and P2 finding it raised is
+   triaged** — fixed, or recorded in the pull request with the reason it is not a
+   defect. This is `AEGIS-APR-049`'s requirement, and it is not optional.
+4. **The merge agent has confirmed its own authority** — a register entry that
+   passes the preamble test, or the owner's instruction quoted verbatim with its
+   source. A brief's bare assertion is not authority.
+
+**An automated review is not the final review verdict. Neither is green CI, an
+author's summary, nor a completed task.** Those are inputs. The verdict is a
+posted, accepted review by an agent that is not the author, naming the exact
+head. Anything else that reads as approval is not one.
+
+## Pre-authored diffs: an intake condition, not a new stage
+
+Some changes arrive with the diff already written: the weekly Dependabot pull
+requests (`.github/dependabot.yml` configures `github-actions`, `pip` and `npm`
+updates), other bots, and unsolicited external contributions. They still owe a
+plan and an independent plan audit. They do **not** get to skip the order, and
+the repository does not close and recreate every bot diff to satisfy a
+formality. The intake condition below is an entry condition of Stage A.
+
+1. **The adopting agent writes the plan-of-record** for the diff as it stands —
+   what it changes, why, the blast radius, the paths it touches, and
+   proportionate acceptance criteria. Adopting a diff with no plan is exactly
+   what the stage order forbids.
+2. **A different agent audits that plan** — Stage B — **before any agent adopts,
+   re-applies, modifies or merges the diff.** The audited plan is bound to a
+   captured revision like any other.
+3. **If the audit returns REVISE, the diff is not adopted.** The owner decides
+   whether to close it and supersede it with an authored change, or to have the
+   plan corrected and re-audited. No bot pull request is merged on the argument
+   that its diff already exists.
+4. **The remaining stages run unchanged.** Stage C's work for such a pull request
+   is *adopting* the diff, and it owes the same changed-files and NOT-touched
+   lists as any other implementation, plus the implementation audit, validation,
+   the final review, and a merge that meets every Stage G entry condition.
+
+The point of the intake condition is that the **audited plan precedes adoption**,
+so a pre-authored diff is never retroactively blessed by a plan written to
+describe what someone already did.
 
 ## Stage separation
 
@@ -83,6 +155,19 @@ substitute for the review and merge gates.
 one-line fix's plan may be three sentences in the PR body — what changed, why,
 and the blast radius. A small change must **not** require a design document, a
 separate planning artifact, or a formal review cycle of its own.
+
+**Two things never shrink to nothing, however small the change:**
+
+- **Acceptance criteria.** *Proportionate* means few and short, not absent. Even
+  a three-sentence plan states what observable result would show the change
+  worked, so Stage D has assertions it can check rather than inventing
+  requirements after the implementation exists.
+- **A captured revision, if the plan was audited.** When Stage B audits a plan,
+  its exact text is bound to a content hash taken as that text is captured (or
+  to an immutable comment or artifact holding it), and the verdict names that
+  revision. **Editing the plan afterwards voids the ACCEPT**, exactly as moving
+  a head voids a head-bound verdict. A plan that lives only in a PR body is not
+  exempt from exact-revision binding merely because it is not a file.
 
 Audit depth scales with blast radius. A change that edits enforcement surfaces,
 governance text, or anything a required check mechanically asserts on earns a
@@ -187,13 +272,17 @@ says so.
 | That a review was posted, accepted, and by a non-author | **Nothing.** Review records are issue comments, not review objects. |
 | **Exact-head invalidation** | **Nothing.** `dismiss_stale_reviews: false` and `require_last_push_approval: false`, so the platform will not invalidate a verdict when a head moves. |
 | No merge before the final review is posted and head-verified | **Nothing.** |
+| **All applicable checks green at the exact head**, not only the required ones | **Nothing.** Nothing aggregates a head's check results into a merge decision. |
+| **The automated review's wait and P1/P2 triage** (`AEGIS-APR-049`) | **Nothing.** No check reads the review or its findings. |
+| The audited plan being bound to a captured revision | **Nothing.** No test compares a plan to the revision a verdict named. |
 | The honesty of the "Aegis skills used" table | **Nothing.** |
 | Proportionality | **Nothing.** |
 | The `AGENTS.md` binding summary drifting from this page | **Nothing** — no test compares them, and no check can be added inside a change of this kind. This is the acknowledged cost of keeping a summary in the startup file at all, and the reason this page must state that it supersedes the summary. |
 | The rule-preservation inventory being honest | **Nothing** — it is carried in the PR body and checked by a human reviewer. |
 
-That is nine rows of pure procedural control. The rule is still worth having:
-a documented control that agents actually follow is worth more than an
+That is **twelve rows of pure procedural control** — counted as the data rows of
+the table above, excluding its header and separator. The rule is still worth
+having: a documented control that agents actually follow is worth more than an
 undocumented one that nobody can check. But nobody should read this page and
 believe a machine is holding it up.
 
@@ -225,15 +314,20 @@ in `AGENTS.md`.
 
 ### When the separation cannot be achieved
 
-Every stage above presumes that a **different** agent exists to hold it. When
-only one agent is available for a change, the required independence is
-**unachievable**, and there is no acceptable shortcut: **the agent halts and
-escalates to the owner. It does not review its own work, and it does not merge
-its own work.**
+Every stage above presumes a **different** agent to hold it, so the requirement
+is concrete: **a change needs at least as many distinct agents as the stages it
+will actually run, and in Role A no two stages may share a holder.** A full
+seven-stage change needs seven distinct holders.
 
-The Role B carve-out that permits one agent to perform the stages itself applies
-to consumer repositories. It is **not** imported into Role A. A single-agent
-Role A change stops and waits for a second agent, or for the owner to decide.
+When those agents do not exist, the change **halts**. It does not proceed, it
+does not self-review, it does not self-merge, and it does **not** resume on a
+promise that a second agent will appear later — a run that resumes while the
+separation is still unsatisfied is still non-compliant. The agent escalates to
+the owner and stops there.
+
+The Role B carve-out that lets one agent perform the stages itself applies to
+consumer repositories. It is **not** imported into Role A, and it is not a
+licence to run a Role A change under-strength.
 
 ## Related instruments
 

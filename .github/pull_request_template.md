@@ -8,6 +8,19 @@
 
 <!-- What does this change do, and why? -->
 
+**Plan (required).** Every pull request carries a plan; for a small change it is
+a few sentences. State **what** changes, **why**, the **blast radius**, the
+**paths** it touches, and **proportionate acceptance criteria** — few and short
+is fine, absent is not, because the implementation audit checks those criteria
+one by one. The full rule is the
+[delivery workflow](https://github.com/ModernNomad-98/Project-Aegis/blob/main/docs/delivery-workflow.md).
+
+**Audited plan revision.** <!-- If this plan was independently audited (Stage B),
+record the revision the audit bound to: a content hash of the exact audited plan
+text, or a link to the immutable comment or artifact holding it. Editing the plan
+after the audit voids the ACCEPT. Leave blank if the plan was not audited
+separately. -->
+
 ## Checklist
 
 This checklist is advisory: tick what applies and say why if you skip an item.
