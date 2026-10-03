@@ -2879,6 +2879,109 @@ lines, so under the rule above this ledger returns to **pending** and owes an
 independent full-page re-read against [Acceptance for each
 page](#acceptance-for-each-page) by a reader who did not write this note.
 
+## First ledger-keeper recording — owner-ratified role, 2026-10-02
+
+The owner has **ratified** the *ledger keeper* role defined in
+[the acceptance conversion process](../evidence/documentation/acceptance-conversion-process-2026-10-02.md)
+(merged by PR #630). That note recorded the role as a proposal with "Owner
+ratification is owed"; the owner has now given it, and this section is the
+role's **first use**. The ledger keeper's authority is **recording only**: it
+does not re-review a page, does not judge readability, does not confer an
+acceptance a reviewer declined, and does not merge. Nothing below re-reads
+anything, and nothing below is a readability verdict by the ledger keeper.
+
+Two pages qualified. Both satisfied all three conjunctive evidence conditions
+of that process: a posted review record bound to an exact head SHA, a full-page
+read declared against every criterion in
+[Acceptance for each page](#acceptance-for-each-page), and an acceptance the
+rule can actually give — each page was pending and this record is the
+full-page re-read it owed.
+
+| Page | Acceptance revision | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [The host feasibility evidence](../evidence/setup/issue-101-package-4a-host-feasibility.md) | `e6fc8d24ad782cfc93e3b2639c1e2b6e5a35b08e` | REVIEW-2 | [PR #625 comment 5963410567](https://github.com/ModernNomad-98/Project-Aegis/pull/625#issuecomment-5963410567) | 2026-10-02 |
+| [The Stage 4A offline review](../evidence/setup/issue-101-package-4a-offline-review.md) | `e6fc8d24ad782cfc93e3b2639c1e2b6e5a35b08e` | REVIEW-2 | [PR #625 comment 5963410567](https://github.com/ModernNomad-98/Project-Aegis/pull/625#issuecomment-5963410567) | 2026-10-02 |
+
+REVIEW-2's record **confers** acceptance. Its per-file table carries
+`ACCEPT (full-page re-read)` for exactly these two rows, and its section 8
+states: "for the two pending pages this review is offered as the independent
+**full-page** re-read they owe — I read each in full at the head and checked
+every criterion in 'Acceptance for each page'." It binds to the head and states
+that a moved head voids it.
+
+**The ledger keeper is neither the author nor the reviewer.** REVIEW-2 is not
+the author of PR #625. The ledger keeper that records these rows wrote neither
+page, took no part in PR #625, and is not any reviewer on it or on this
+recording pull request.
+
+**Candidates examined and NOT recorded.** Recording nothing is the correct
+outcome for a candidate that fails a condition, so each refusal is stated with
+its reason rather than left silent.
+
+| Candidate | Reviewer | Bound head | Disposition | Why nothing was recorded |
+| --- | --- | --- | --- | --- |
+| [Behavioral Eval Runner design](../design/behavioral-eval-runner-v1.md), [resumable control plane design](../design/resumable-control-plane-v1.md), [BER fast-track successor](../design/behavioral-eval-runner-v1-fast-track-successor.md) | DESIGN-1 | none | no posted record | No PR and no artifact was produced; the evidence survives only in an agent's own report. Condition (b)(1) needs a posted review record bound to an exact head, and this page's own charter rule is that a self-reported "read it, changed nothing" is not evidence because no artifact exists — it is not independently falsifiable from the diff. |
+| The two setup evidence pages **as reviewed by REVIEW-3** | REVIEW-3 | `e6fc8d24ad782cfc93e3b2639c1e2b6e5a35b08e` | **declines** | Its record self-declares: "this is a **targeted** review, not a full-page re-read. It therefore confers and records no full-page acceptance." Condition (b)(2) fails, and its per-file `ACCEPT` rows do not override its own prose disclaimer. The two pages are recorded above on REVIEW-2's separate conferring record, not on this one. |
+| `docs/README.md`, `docs/roadmaps/aegis-open-decisions-2026-09-23.md`, `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `docs/approvals/APPROVAL_REGISTER.md`, `docs/roadmaps/aegis-backlog-forecast.md`, `docs/roadmaps/aegis-execution-metrics.md`, `docs/skills-catalog.md` | Audit-1, REMEDY-1 | `4e28afa17c86aa4be37b3c6f6b0aea29be00c956` | **declines** | REMEDY-1 writes "**This review does not discharge that debt and confers no acceptance on any page** — I read only the three changed files in full", and Audit-1 explicitly marks six further pages NOT CONFERRED. Independently, `docs/README.md` changed 81 added / 60 deleted = 141 lines, far past 10. |
+| `docs/evidence/session-continuation-2026-09-30.md`, `docs/evidence/session-continuation-2026-09-30-evening.md` | Audit-2, REBIND-1 | `3bdb217f`, then `a0634422` | **declines** | Audit-2 records "**No acceptance was conferred — the trap was avoided**", and "no page here is marked accepted in any case". REBIND-1's later record is a targeted fix verification whose per-file `ACCEPT` means "the two fixes are correctly applied", not a full-page re-read against the criteria. Both heads are squash-merged and are not ancestors of `origin/main`. |
+| This ledger itself (PR #626) | CLOSE-BOTH | `1e8b81e74b4d64ce86884807df4bee4ee557c208` | **neither** | Its record's verdict is FIX-FIRST, not one of the four dispositions, so no acceptance was conferred — and an edit to this ledger cannot be recorded as this ledger's own acceptance without collapsing the author/reviewer separation this role exists to keep. |
+| `.coord/coordinator-cadence.jsonl` (PR #627) | PR #627 record | `fc29229d8c0e879ec271b9c5cd6596fa0bc47e44` | not a reader page | Its own record states "There is ONE review stage here — a governance log append; readability acceptance does not apply." It is not tracked Markdown, so no page acceptance exists to record. |
+| `docs/evidence/documentation/acceptance-conversion-process-2026-10-02.md` (PR #630) | REVIEW-630 | `20857201c8e3d8ed028cf713419a91369c520d1f` | **ACCEPT, but not a full-page acceptance** | Its own record scopes itself to re-deriving the note's measurements and records a required correction; it neither claims a full-page read against every criterion nor names the note as an accepted page. Conditions (b)(2) and (b)(3) do not hold, so the note remains pending. REVIEW-630's independent confirmation that REVIEW-2's full-page claim is real is what this recording relies on; that confirmation is not itself an acceptance of the note. |
+
+**The acceptance revision is `e6fc8d24`, the head REVIEW-2 read.** Measured, not
+assumed: `git merge-base --is-ancestor e6fc8d24 origin/main` is **false** —
+PR #625 was squash-merged as `2ba20c71`, so the branch commit is not an ancestor
+of this ledger's default branch, while `git for-each-ref --contains e6fc8d24`
+shows it is still reached by `origin/docs/readability-batch-b`. The acceptance
+is not void: `git rev-parse e6fc8d24:<path>` and `git rev-parse origin/main:<path>`
+return the **same blob** for both pages (`9bf204cc4b92543c5cf7e18555ce3095850ce3b3`
+and `ed40be87d4d452c4fe48e59a2894ef7b1e1ae264`), and `git diff --numstat
+e6fc8d24 origin/main -- <path>` is **empty** for both. The bytes REVIEW-2 read
+are the bytes on main; neither page has moved since.
+
+**Changed lines since last recorded acceptance.** Neither page is accepted
+earlier in this ledger — PR #542 returned both to pending — so no acceptance
+existed to retain, and the 10-line exemption could not have applied to either.
+For completeness: `git diff --numstat 22a6b7a origin/main` gives **11 added /
+7 deleted = 18** for the feasibility page and **127 added / 0 deleted = 127**
+for the offline-review page. Two different measurements are easy to confuse
+here, and both are correct about different spans: REVIEW-2's own `7/5 = 12`
+and `6/3 = 9` measure **only what PR #625 itself changed**, while 18 and 127
+measure **cumulative change since the last recorded acceptance**. The larger
+figures are what the retention rule reads, and because both pages were already
+pending they do not block a full-page re-read; they would have voided any
+retained acceptance. Under the owner's 2026-09-28 counting rule, changed lines
+are added plus deleted from `git diff --numstat`, counted newline-based.
+
+**Owner-ratified role, first use — the convention is new and may need
+refinement.** This is the first time any agent has recorded through this role.
+Two points are recorded rather than settled: the process's canonical per-path
+acceptance index (section (c) of the conversion note) does not exist on main,
+so these rows are recorded in this ledger as dated prose instead of as index
+rows; and the acceptance revision `e6fc8d24` is a branch commit reachable only
+from `origin/docs/readability-batch-b`, so a reader who deletes that branch
+could no longer reproduce the revision even though the committed bytes survive
+on main. Both deserve an owner ruling before the convention is relied on
+again.
+
+**This ledger returns to pending.** This recording section is itself more than
+10 changed lines, so by the owner's targeted-edit rule of 2026-09-27 — the rule
+stated in this page's prose under
+[Remaining-page review in larger batches](#remaining-page-review-in-larger-batches),
+which has no heading of its own —
+this ledger returns to **pending** and owes its own independent full-page
+re-read against [Acceptance for each page](#acceptance-for-each-page) by a
+reader who did not write this section. That self-cost is the one named in the
+[floor correction](#correction-to-the-pending-floor--2026-10-02) and in PR #626:
+recording acceptance in this ledger spends the ledger's own acceptance. It is
+recorded here as a cost actually paid, not as a reason to withhold the
+recording.
+
+**The tracked Markdown count does not change.** This section edits an existing
+tracked page; it adds no file. `git ls-tree -r --name-only origin/main` filtered
+to `.md` remains **659** before and after, and the pending floor is therefore
+unchanged by this recording.
+
 ## Ledger checkpoint through pull request #186 — 2026-09-23
 
 The seven rows above record documentation batches delivered after the earlier
