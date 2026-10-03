@@ -35,8 +35,8 @@ binding ones.
 **The exit column is split, and the split is the point.** A stage's **exit
 artifacts** — the files, lists and receipts it produces — are that stage's own
 products; no other stage states them, so they stay per-stage. The **verdict** a
-stage reaches is shared normative content, so it is single-sourced: every
-`SD-x` cell is a pointer to
+stage reaches is shared normative content, so it is single-sourced: every cell in
+that disposition column is a pointer to
 [the stage dispositions](#stage-dispositions), carrying an ID and **no content**.
 
 **The chain rule: each stage's entry is its predecessor's AFFIRMATIVE
@@ -516,6 +516,37 @@ disposition means editing its definition and re-reading the hits — that is the
 whole maintenance burden, and it is bounded by the number of pointers, not by the
 number of renderings.
 
+**Two sites are exempt from that test, and they are named here with their reasons
+rather than left to a reader's judgement.** They are named because **a test that
+cannot pass is worse than no test**, and this is the test that detects the
+recurring defect class — an unstated exemption would make it unrunnable:
+
+1. **The chain rule's affirmative list.** It restates the affirmative
+   classification that the `Affirmative?` column of
+   [the stage dispositions](#stage-dispositions) owns. **Why it is permitted:**
+   the chain rule has to be readable at the point where the transitions are
+   described, and the classification is a fixed seven-element set that changes
+   only when a disposition token changes — the same edit that would touch both
+   places. **What guards the duplication:** the `Affirmative?` column exists, so
+   the two renderings can be compared in a single pass, which a free-floating
+   prose list could not support.
+2. **The receipt list** under `SD-G`. It re-encodes each condition's evidence
+   requirement, and it contains phrases that appear nowhere else on the page —
+   measured: `authorized disposition` occurs only in that list and in `MG1`'s
+   condition, and `default branch` only in that list and in `MG4`'s condition.
+   **Why it is permitted, and the tension stated rather than resolved away:** a
+   receipt that did not say what evidence to record could not be kept, and a
+   pointer-only receipt would fail at the one moment it is used — after the merge,
+   when the question is *what has to exist*. So the receipt is a **second
+   rendering of evidence requirements, not of the conditions themselves**, and it
+   is the one place where restating is the document's function. It is recorded as
+   an exempted site in the collapse map, not silently tolerated.
+
+**Both exemptions are load-bearing**, and neither can be collapsed without losing
+something the rule genuinely needs. Neither is a licence to restate a condition
+anywhere else: every other hit remains a pointer, and a third content-bearing site
+is a defect.
+
 **The `AGENTS.md` summary needs a separate human step, because no grep reaches
 it.** The two greps above are scoped to **this page**. The `AGENTS.md` summary is
 derived, carries no IDs, and is restated in prose, so nothing above can see it and
@@ -564,13 +595,13 @@ restated**.
 
 | Failure | The rule's answer |
 | --- | --- |
-| A stage was dispatched but never posted a verdict | **`SD-x: INCOMPLETE`** — see [the stage dispositions](#stage-dispositions). A disposition that was never posted does not flow onward. |
-| The head moved while a review was in flight | **The verdict is void.** Re-review at the new head; record the old verdict as voided. This reaches every head-bound input, `MG3` and `MG5` included. |
+| A stage was dispatched but never posted a verdict | **No disposition was posted**, so nothing flows onward — see [the chain rule](#the-seven-stages) and [the stage dispositions](#stage-dispositions). |
+| The head moved while a review was in flight | **The verdict is void** — record the old verdict as voided and re-review at the new head. See [exact-head invalidation](#exact-head-invalidation) for everything that voiding reaches. |
 | An audit returns **REVISE** | Route it by [the chain rule](#the-seven-stages) — the work returns to the stage that produced it. At the same head or a new one, the superseded verdict is recorded as superseded, not deleted. |
 | A verdict was posted but is wrong | Correct it forward with a **re-audit** — the non-affirmative case of [the chain rule](#the-seven-stages). Never rely on it silently, and never edit a posted verdict in place to look right. |
 | **Fewer distinct agents are available than the stages this change will run** (including the single-agent case) | **Halt and escalate.** See below. |
-| A test could not be run | Report it `UNRUN` — see `SD-E` in [the stage dispositions](#stage-dispositions). A check that did not run is named, not absorbed, and **`UNRUN` is never `PASS`**. |
-| Authority for an action is missing | Name the **exact missing grant**. Do not assume it. |
+| A test could not be run | Report it `UNRUN` — see `SD-E` in [the stage dispositions](#stage-dispositions). |
+| Authority for an action is missing | Route it to [the honesty rules](#honesty-unavailable-tests-and-insufficient-authority) — which is where the naming requirement is stated. |
 | Two instruction sources conflict | Route to `source-of-truth-reconciler`. |
 | The security impact is unclear | Route to `human-approval-boundary`. |
 | Work is left in a broken mid-task state | `agent-failure-recovery` — **MANUAL-ONLY**; hand it to the user by name. |
