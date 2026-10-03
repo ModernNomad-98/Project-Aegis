@@ -3150,3 +3150,81 @@ the entry governs.
 - **Scope FORBIDDEN:** No self-review, overriding review findings, merging by the keeper, or waiver of existing review and delivery requirements. No approval of the charter's proposed canonical index, its precedence, or changed counting rules. No Stage 4B, helper comparison, private BER candidate approval, or other work-package authority.
 - **Evidence:** In the Project Aegis decision conversation, the owner was asked, "Do you approve this limited role and the two historical recording acts, with the coordinator excluded?" The owner answered "approved" on 2026-10-02 at 18:05:09 America/Los_Angeles, equivalent to 2026-10-03 at 01:05:09 UTC. The subsequent owner-supplied handoff prompt authorizes transcription and narrowly scoped consistency updates. Link PR #635 and PR #625 comment 5963410567 as evidence of the historical recording acts, not as substitutes for owner approval.
 - **Expiry / use limit:** Standing until revoked or superseded; historical ratification is limited to the two recording acts above. Append subsequent lifecycle events without rewriting this entry.
+### AEGIS-APR-102: Gradual integration roadmap and release policy
+
+- **Event:** POLICY DECISION; a policy decision only, not a GRANT. It selects a
+  policy target and grants no work.
+- **Status at recording:** ACTIVE as policy. It takes effect once this entry is
+  on the default branch.
+- **Date / Grantor:** 2026-10-02 / Peter Nguyen. The owner approved the roadmap
+  and release policy on 2026-10-02; this entry was recorded at
+  2026-10-03T01:33:16Z.
+- **Reason:** The owner decided how the six candidate integrations — Claude,
+  Codex, DeepSeek, Copilot, Cursor and Kimi — are to be taken up, so that an
+  unproven candidate cannot reach users and so that one integration completes
+  its proofs before the next begins. Without a recorded decision the backlog
+  ordering and the visibility rule existed only in chat.
+- **Scope allowed:** The owner approved a gradual integration roadmap and
+  release policy for those six integrations, on these five binding
+  constraints:
+  1. **Release one integration at a time.** Complete the selected
+     integration's required proof, independent review and scoped release
+     requirements before beginning implementation of the next. If the current
+     integration cannot meet those requirements, explicitly stop and return it
+     to PARKED before selecting another.
+  2. **Show users only proven, released integrations.** Aegis's normal setup,
+     recommendations and integration-selection menus must contain only
+     integrations that passed verification and were released. Never display
+     untested candidates as selectable, experimental, unavailable or
+     coming-soon choices. Research candidates belong in the development
+     backlog.
+  3. **Park everything not selected.** Unproven integrations remain PARKED in
+     the backlog until explicitly selected for a bounded increment. Selection
+     permits only the work separately authorized for that increment; it does
+     not make the integration available to users.
+  4. **Bind support to the tested configuration.** Record the coding
+     application, operating system, relevant versions, provider/model
+     configuration and verified capabilities. Do not extend a successful
+     result automatically to another model, editor, terminal, cloud
+     environment or software version.
+  5. **Keep proof and release separate.** Passing Stage 4B does not by itself
+     authorize release, establish helper quality or prove cost savings. The
+     applicable later evaluation and release requirements must be completed
+     before presenting the integration to users.
+
+  **Candidate ordering.** The owner retained the existing Claude Agent SDK
+  bridge as the first planning candidate and Codex as the proposed second
+  candidate. The remaining integrations stay PARKED. The exact DeepSeek coding
+  environment must be identified before its increment can be selected.
+
+  This approves the roadmap and release policy **only**. It bears on
+  integration selection and release visibility; it resolves no open-decisions
+  row and begins no increment by itself.
+- **Scope FORBIDDEN:** No installation, credential access, live session,
+  provider spending, helper evaluation or release execution. No integration
+  becomes user-visible by virtue of this entry. Each increment requires its own
+  exact scope and applicable authority, recorded before it takes effect. It
+  does not grant Stage 4B, host proof, or CP-WP-003 and CP-WP-004 selection,
+  and it does not authorize any real host session, provider call, paid
+  evaluation or helper default. It waives no review, green-check, `gate-guard`
+  or DCO requirement.
+- **Evidence:** The owner's 2026-10-02 instruction approving the gradual
+  integration roadmap and release policy is the source of this entry. The
+  event vocabulary used above is this register's own, at
+  [the preamble](#how-to-read-this-register), where `POLICY DECISION` "selects
+  a policy target, grants no work". The open-decisions rows this entry leaves
+  unresolved are in `docs/roadmaps/aegis-open-decisions-2026-09-23.md`: "Issue
+  #101 Stage 4B host proof" and "CP-WP-003 and CP-WP-004", the latter reading
+  "then selection of one bounded real integration for CP-WP-004; both need
+  separate reviewed scope and grants". The first planning candidate's
+  in-repository identity is the offline package 4A prototype direction
+  described in `docs/roadmaps/aegis-setup-routing-plan.md`; the phrase "Claude
+  SDK bridge" appears in no file on the default branch, so this entry does not
+  quote it. The owner's approval text itself exists **outside** the repository
+  and is not a repository artifact: that text is **unsure** here — it is not
+  repo-verifiable, and this entry rests on the owner's instruction rather than
+  on any repository citation of it.
+- **Expiry / use limit:** The policy stands until superseded by a later
+  recorded owner decision. The candidate order is revisable only by a later
+  recorded owner decision. Append subsequent lifecycle events without
+  rewriting this entry.
