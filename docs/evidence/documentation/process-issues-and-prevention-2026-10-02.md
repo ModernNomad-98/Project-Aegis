@@ -2508,3 +2508,86 @@ the register's own mechanically-enforceable table still lists the `PROC-08`
 detector as living in `scripts/`, which this change does not touch. It does not
 claim the cadence log's new line has ever been *executed* — it records the step,
 not a run of it.
+
+
+## Appended 2026-10-03 (third append) — the `AGENTS.md` placement instruction corrected forward
+
+This append is **pure addition**. It changes no earlier line, renumbers no class
+and rewrites no rule. The paragraph it corrects — the `AGENTS.md` recommendation
+at lines 2094–2104 — **stands exactly as written**, and is corrected here rather
+than edited, because this page's own practice is to correct forward rather than
+rewrite a dated measurement and because `CONTRIBUTING.md` rule 4 makes the same
+requirement of recorded decisions.
+
+### The instruction that was wrong, quoted
+
+The paragraph directed *where* the two dispatch-time rules should go, and its
+final sentence carried both the method and the claim that the method works
+(lines 2101–2102), verbatim:
+
+> Extending those sentences would place the rule where the coordinator reads it.
+
+**The how and the purpose are in one sentence, and the sentence asserts that the
+how achieves the purpose. Measurement falsifies that assertion** — so the *how*
+was followed and the *purpose* was still not met. This is recorded as a
+correction to an instruction, not as a defect in the rule it directed: both
+rules were placed, and both bind.
+
+### Why the instruction was wrong
+
+`AGENTS.md` has **12 paragraphs**, of which **5 open with a bold span**. That
+paragraph-initial bold lead is the file's only rule-discovery convention — it is
+how `**Determine workspace role before acting.**`,
+`**Audit your own state; assume nothing about your own work.**` and
+`**Source-library owner approvals.**` are found by a reader scanning the file.
+The file has one heading in total, so no heading reaches a rule either.
+
+Extending the two sentences placed both rules **inside one paragraph** — the
+4,062-character coordinator paragraph that opens
+`**Coordinator role: assign, verify and hand off — do not perform the work.**`
+Neither rule opened a paragraph:
+
+| Rule | Position in that paragraph | Sentences before it |
+| --- | --- | --- |
+| `PROC-02` concurrency | offset **1,479** of 4,062 | **5** |
+| `PROC-03` re-verification | offset **2,662** of 4,062 | **8** |
+
+**A reader scanning for paragraph-initial bold — the file's own convention —
+reached neither rule.** The rules were in the file and were not findable by the
+method the file teaches. That is the gap this correction closes.
+
+### Standing instruction, corrected
+
+**A dispatch-time rule reaches the coordinator only when it OPENS its own
+paragraph with a bold lead — that paragraph-initial bold span is this file's
+discovery convention. Extending an existing sentence is necessary but NOT
+sufficient: extend the sentence, and give the rule its own paragraph.**
+
+A rule that is merely appended to a long paragraph is present and unfindable.
+When placing a rule in `AGENTS.md`, verify the placement the same way as the
+placement of a rule anywhere else — **by looking for it with the method a reader
+would use**, not by confirming the words are present. Presence is not
+discoverability, and only the second one is the purpose.
+
+### One consequence for the same rule's wording
+
+A rule given its own paragraph must also **open with a self-contained sentence**.
+A paragraph break puts the previous paragraph's antecedent out of reach: an
+opener such as *"The same holds for every other condition a brief asserts"*
+still binds, because its own clause states the rule in full, but it now reads as
+a continuation of a sentence the reader has left behind. The rule as landed
+therefore opens
+`**A brief's assertion of a gate condition is a claim, not evidence — of any condition, not only of authority. …**`
+— self-contained, so the paragraph stands alone.
+
+### What this append does not claim
+
+It does not re-derive, contradict or renumber anything else on this page, and it
+does not touch items 1–5 of the owed-work list, the Class 7 table, or the second
+append above; the corrected paragraph at lines 2094–2104 is left byte-identical.
+It records no new rule ID: the corrected text is an instruction about *placement*,
+and `PROC-02` and `PROC-03` are unchanged. It does not claim the placement defect
+was a failure of the rule or of its author's reading — the instruction itself was
+followed, and the instruction was what measurement contradicted. It does not
+claim that paragraph-initial bold is enforced: no test reads paragraph shape, and
+this correction is a rule an agent follows rather than a gate that fails.
