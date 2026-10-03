@@ -78,7 +78,11 @@ That scope is the one the owner recorded on 2026-09-27 in the
 which records the owner's instruction for that `CONTRIBUTING.md` rule and is not
 the authority for this file's wording; on the owner's direct instruction this
 file now states the same limit (2026-10-02) as
-[CONTRIBUTING.md's external-contributions rule](CONTRIBUTING.md#external-contributions). No agent
+[CONTRIBUTING.md's external-contributions rule](CONTRIBUTING.md#external-contributions).
+**No two agents may hold the same pull request.** One pull request has one
+holder at a time: a second agent does not pick up, re-review or merge work that
+another agent already holds, and a lane believed dead is confirmed dead before
+it is taken over rather than assumed dead. No agent
 performs two stages on the same change: the author never reviews or merges its
 own work, no reviewer — code or
 security — merges it, and a separate agent holding the applicable authority
@@ -91,7 +95,10 @@ as failed with its authorized disposition, never as green and never as waived
 The merge agent confirms that authority itself — a register entry on the
 default branch that passes the preamble test below, or the owner's instruction
 quoted verbatim in its brief with its source; a brief's bare assertion of
-authority is not authority, and doubt escalates to the owner.
+authority is not authority, and doubt escalates to the owner. **The same holds
+for every other condition a brief asserts: a brief's assertion of a gate
+condition is a claim, not evidence — the agent re-derives it from the
+repository or the live system, in the same turn, before relying on it.**
 **The coordinator owns:** deciding, within owner-authorised work, what to work
 on and in what order; writing each agent’s brief; tracking completion and
 catching silent gaps; handing off to the next stage’s different agent; and
