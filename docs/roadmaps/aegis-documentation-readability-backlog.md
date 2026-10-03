@@ -2984,7 +2984,7 @@ unchanged by this recording.
 
 ## Consistency note — the ledger keeper entry, 2026-10-02 local / recorded 2026-10-03 UTC
 
-The ledger keeper role and the two historical recording acts below are recorded as [AEGIS-APR-101: Ledger keeper role and two historical recording acts](../approvals/APPROVAL_REGISTER.md#aegis-apr-101-ledger-keeper-role-and-two-historical-recording-acts) in the [owner approval register](../approvals/APPROVAL_REGISTER.md), appended 2026-10-03 UTC. The register entry is the authority; this section is a pointer and a record of what did and did not change here.
+The ledger keeper role and the two historical recording acts above are recorded as [AEGIS-APR-101: Ledger keeper role and two historical recording acts](../approvals/APPROVAL_REGISTER.md#aegis-apr-101-ledger-keeper-role-and-two-historical-recording-acts) in the [owner approval register](../approvals/APPROVAL_REGISTER.md), appended 2026-10-03 UTC. The register entry is the authority; this section is a pointer and a record of what did and did not change here.
 
 **The approval postdates the recording it ratifies.** The owner approved the role on 2026-10-02 at 18:05:09 America/Los_Angeles = 2026-10-03 at 01:05:09 UTC. PR #635 merged at 2026-10-03 00:46:52 UTC, roughly eighteen minutes **earlier**. So the [First ledger-keeper recording](#first-ledger-keeper-recording--owner-ratified-role-2026-10-02) section above was merged before the owner gave that approval, and the ratification is of those two acts after the fact. Its heading's "owner-ratified role" reads as a claim about the state at its own merge; correct forward here rather than rewriting it.
 
@@ -3001,7 +3001,7 @@ Both rest on REVIEW-2's [PR #625 comment 5963410567](https://github.com/ModernNo
 
 **Still separately unresolved, and still undecided.** The charter's proposed canonical index — its ownership, path, precedence and changed counting rules — is **not** approved by this entry. Stage 4B remains **OPEN AND UNDECIDED**: it is not parked, deferred or otherwise settled, and this note grants it nothing. The private BER candidates remain outside this work. Ratifying a documentation role grants no installation, host-session, provider-call, credential-access, private-data-access or deployment authority.
 
-**Cost of this note.** It exceeds 10 changed lines on this ledger, so the ledger stays **pending** and its own independent full-page re-read remains owed. That is a cost recorded as paid, not a reason to withhold the note, and no acceptance was manufactured to offset it.
+**Cost of this note.** It exceeds 10 changed lines on this ledger, so the ledger stays **pending** and its own independent full-page re-read remains owed. That is a cost recorded as incurred, not a reason to withhold the note, and no acceptance was manufactured to offset it.
 
 ## Ledger checkpoint through pull request #186 — 2026-09-23
 

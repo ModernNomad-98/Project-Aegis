@@ -427,7 +427,7 @@ and the two candidate pages remain **pending**.
 
 ## Consistency note — the role is ratified; 2026-10-02 local, recorded 2026-10-03 UTC
 
-**The ledger keeper role proposed in this note is now ratified.** It is recorded as [AEGIS-APR-101](../approvals/APPROVAL_REGISTER.md#aegis-apr-101-ledger-keeper-role-and-two-historical-recording-acts) in the [owner approval register](../approvals/APPROVAL_REGISTER.md) — "Ledger keeper role and two historical recording acts". The owner approved it on 2026-10-02 at 18:05:09 America/Los_Angeles (2026-10-03 at 01:05:09 UTC); the register entry is the authority, and this note is not. The role takes effect only once that entry is on the default branch.
+**The ledger keeper role proposed in this note is now ratified.** It is recorded as [AEGIS-APR-101](../../approvals/APPROVAL_REGISTER.md#aegis-apr-101-ledger-keeper-role-and-two-historical-recording-acts) in the [owner approval register](../../approvals/APPROVAL_REGISTER.md) — "Ledger keeper role and two historical recording acts". The owner approved it on 2026-10-02 at 18:05:09 America/Los_Angeles (2026-10-03 at 01:05:09 UTC); the register entry is the authority, and this note is not. The role takes effect only once that entry is on the default branch.
 
 **The coordinator is excluded from the role.** The owner approved it "with the coordinator excluded". The register's `Scope allowed` therefore states that the keeper must differ from the page's author and its accepting reviewer, and that the coordinator may not hold this role. That was the open question flagged at [Ratification owed](#ratification-owed) item 1.
 
