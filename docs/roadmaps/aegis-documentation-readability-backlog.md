@@ -2746,6 +2746,139 @@ The previous integration estimate was none; this ledger update is estimated at
 1–3 active hours. Repository-wide documentation acceptance remains **IN
 PROGRESS**.
 
+## Correction to the pending floor — 2026-10-02
+
+The counts in the readings above are dated snapshots. They are annotated here,
+never rewritten. This note records an independent re-derivation of the pending
+floor at `origin/main` = `d6e484189cc30c67dc69aeb973e15f89b693537d`. The
+revision is one commit past `914dcbb8`: `git diff --stat 914dcbb8 d6e48418`
+returns only `.coord/coordinator-cadence.jsonl | 1 +`, so no Markdown page
+changed and every figure below holds at both.
+
+**The floor is 35 named pages, not 13 or 16, and the recorded "at least 26" is
+proven too low by at least 9.** The six stated per-page `--numstat` figures all
+reproduce exactly at `410b90aa` (`523 2`, `86 2`, `145 6`, `329 14`, `24 1`,
+`79 29`), and all nine 2026-10-01 relabel rows reproduce exactly
+(31/26/18/17/14/14/12/12/11). The defect is coverage, not arithmetic. The floor
+is the total the rule actually catches, and it was reached by re-deriving each
+page rather than trusting the earlier statement.
+
+**Measurement basis.** Numbers marked *added+deleted* come from `git diff
+--numstat <sha> <origin/main> -- <path>`, added plus deleted, the measure the
+net-difference decision above defines. File counts come from
+`git ls-tree -r --name-only <ref>` filtered with the anchored global regex
+`\.md$`, counted per emitted record. No file blob was split on newlines: at
+`d6e48418` this page has 3,231 lines (its blob contains 3,231 `\n` bytes and
+2,980 non-blank lines), which is why `Measure-Object -Line` — which drops blank
+lines — is not used anywhere in this note.
+
+### The ten pages the 2026-10-01 audit did not catch
+
+| Page | Base SHA | Changed lines (added+deleted) |
+| --- | --- | ---: |
+| `compliance-control-foundation/SKILL.md` | `cdacb2ff9344` | 63 (`38 25`) |
+| `agent-startup-context-gate/SKILL.md` | `754fc7a02f85` | 72 (`47 25`) |
+| `lane-authoring-guide/SKILL.md` | `dbad6c25c111` | 38 (`25 13`) |
+| `rls-policy-auditor/SKILL.md` | `cf1963933515` | 92 (`62 30`); 20 (`15 5`) from `5e0e9ad7` |
+| `compliance-evidence-collector/SKILL.md` | `cdacb2ff9344` | 32 (`22 10`) |
+| `local-ci-mirror-preflight/SKILL.md` | `bf7a4b86b46b` | 29 (`24 5`) |
+| `chat-backlog-reconciliation/SKILL.md` | `620f0268edca` | 20 (`16 4`) |
+| `cloud-security-baseline-reviewer/SKILL.md` | `65bacc7d6b85` | 12 (`8 4`) |
+| `adr-writer/SKILL.md` | `f27535695b34` | 12 (`8 4`) |
+| `phased-work-handoff-designer/SKILL.md` | `c0a3d1d4de64` | 11 (`6 5`) |
+
+Each base SHA is the page's last recorded acceptance and is an ancestor of
+`origin/main`, and each figure exceeds 10, so every one of the ten returns to
+pending under the net-difference rule quoted above. That rule *retains* an
+acceptance and *confers* none, and `git log -1 --format='%h' <base> -- <path>`
+confirms the base is the recorded acceptance for each page: for
+`local-ci-mirror-preflight` the base `bf7a4b8` is the merge
+"docs: accept next twenty full-page reviews after 219" the tracker's own row
+cites when it says "keep acceptance" at 9 net.
+
+**Root cause.** Six of the ten have their **only** acceptance recorded outside
+this ledger, in the batch evidence files under `docs/evidence/documentation/`,
+and this ledger does not mention them at all:
+
+| Page | Acceptance recorded only in | Line |
+| --- | --- | ---: |
+| `compliance-control-foundation/SKILL.md` | [batch after 214](../evidence/documentation/full-page-readability-batch-after-214-2026-09-24.md) | 30 |
+| `compliance-evidence-collector/SKILL.md` | [batch after 214](../evidence/documentation/full-page-readability-batch-after-214-2026-09-24.md) | 31 |
+| `agent-startup-context-gate/SKILL.md` | [batch after 208](../evidence/documentation/full-page-readability-batch-after-208-2026-09-24.md) | 39 |
+| `chat-backlog-reconciliation/SKILL.md` | [batch after 213](../evidence/documentation/full-page-readability-batch-after-213-2026-09-24.md) | 30 |
+| `lane-authoring-guide/SKILL.md` | [batch after 219](../evidence/documentation/full-page-readability-batch-after-219-2026-09-24.md) | 21 |
+| `phased-work-handoff-designer/SKILL.md` | [batch after 221](../evidence/documentation/full-page-readability-batch-after-221-2026-09-24.md) | 24 |
+
+A global search of this ledger at `d6e48418` for each of those six path names
+returns **0** matches, while the four whose acceptance this ledger does record
+return 2, 4, 3 and 15. **A tracker-only audit therefore misses them
+structurally, not incidentally:** the audit can only re-derive pages whose
+acceptance this ledger happens to name, and these six are named only in the
+evidence files. The remaining four are caught in this ledger only as prose
+("keep acceptance" at 9, "accepted on `65bacc7`", "ACCEPT on `f275356`") and
+`phased-work-handoff-designer` is named nowhere in it either. An audit scoped
+to this file cannot see an acceptance that lives only in another one; the fix
+is the index described below, not a more careful reading of this page.
+
+### The omitted page is one of the pages added after `410b90aa`
+
+`git diff --name-status --diff-filter=A 410b90aa d6e48418 | Select-String
+'\.md$'` returns five page additions, and no Markdown page was deleted
+(`--diff-filter=DR` returns nothing). The tracker's floor for that set counts
+**4** and records "+ 0" for the fifth: it declines to add
+`docs/evidence/session-continuation-2026-09-30-evening.md`, even while
+observing that "the rule above therefore leaves a new page pending" and calling
+the omission "a text gap rather than a review gap". Under the rule the tracker
+quotes, a new page starts pending and never had an acceptance to retain, so all
+five count. `git log --diff-filter=A` shows the omitted page was added by
+`1955c222` (PR #586, 2026-09-30) and `git ls-tree -r --name-only d6e48418 --
+<path>` confirms it is tracked at `origin/main`. Counting it is what the rule
+requires; the tracker's own `17 + 0 = 17` is therefore a text undercount of
+`17 + 1 = 18` before the ten above are added.
+
+### Why the exact count is still not derivable
+
+The same reason recorded above still holds, and this correction does not
+remove it. The 10-line rule decides acceptance **per page, per revision**, but
+acceptance is stored as prose in two places that do not index each other, and
+this ledger's default remains accepted-unless-listed. The provable floor is 35:
+the tracker's own carried set of 16 at `410b90aa`, plus the 9 relabel pages it
+caught, plus the 10 it missed — each proven above and disjoint by path. Because
+`410b90aa`'s recorded 13 becomes 16 under its own later correction, the same
+reading without this note's second limb is a floor of 26, not 35.
+
+The exact count is not derivable from a command and **no exact count is
+asserted here**. What the repository can show is the floor of 35 named pages,
+and that "at least 26" is too low by at least 9. The unknown remainder is
+unchanged: at `d6e48418` the tracked Markdown inventory is 658 (653 at
+`410b90aa`), of which one file is a generated report
+(`docs/audits/skill-contract-audit-baseline.md`, the only tracked Markdown a
+production script writes — `scripts/audit-skill-contracts.py` line 2072) and 55
+are classified synthetic fixtures (the 56 Markdown paths under `scripts/` minus
+the reader-facing `scripts/tests/fixtures/README.md`). That leaves 602 reader
+pages, so at most **567** are counted accepted or unknown with no per-page
+recorded full-page re-read that a command can bind. The tracker's 584, and its
+own later "at most 575", remain figures no command reproduces. This note ran
+only the >10-line limb; the "any new section" limb needs the same index, and it
+can only raise the floor.
+
+**What would make it exact.** One per-path acceptance index — path, last
+full-page-acceptance SHA, reviewer, PR link and date — maintained beside this
+ledger. Then `git diff --numstat <acceptance-sha> origin/main -- <path>` greater
+than 10, plus the "new section" test (`git diff <acceptance-sha> origin/main --
+<path> | Select-String '^\+#{1,6} '`, where a renamed or renumbered existing
+heading is not a new section), becomes a complete decision procedure, and the
+pending count becomes one command. Pages absent from the index, or with no SHA,
+are pending by definition — which removes the accepted-unless-listed default
+that produced this undercount.
+
+**This note is not an acceptance.** It is an edit to a page that is already
+pending, so it confers no acceptance. `git diff --numstat 410b90aa <this
+branch> -- docs/roadmaps/aegis-documentation-readability-backlog.md` exceeds 10
+lines, so under the rule above this ledger returns to **pending** and owes an
+independent full-page re-read against [Acceptance for each
+page](#acceptance-for-each-page) by a reader who did not write this note.
+
 ## Ledger checkpoint through pull request #186 — 2026-09-23
 
 The seven rows above record documentation batches delivered after the earlier
