@@ -30,7 +30,7 @@ binding ones.
 | D | INDEPENDENT IMPLEMENTATION AUDIT | The diff at an exact head, by an agent that did **not** implement it. | A posted audit naming that head, checking the plan's acceptance criteria one by one. | A different agent from the implementer. | **Nothing** — procedural. |
 | E | VALIDATE | The post-audit candidate head. | The repository's own checks at that head, with their commands and output; every check that could not be run named **UNRUN**. | The validating agent. | Partly — `validate-skills` and `gate-guard` are required status checks; nothing verifies that this stage ran. |
 | F | FINAL INDEPENDENT PR CODE REVIEW | The exact candidate head, by an agent that is neither the author nor the merger. | A **posted, accepted** verdict naming that 40-character head, which also checks the PR's "Aegis skills used" table against the work. | A different agent from the author and from the merger. | **Nothing** — procedural. |
-| G | MERGE | Stage F's **posted and accepted** verdict naming this exact head; **every applicable check green at this exact head** — not only the branch-protection-required ones; the automated review posted or confirmed unavailable, with **every P1 and P2 finding triaged** (`AEGIS-APR-049`); and the merge agent's own confirmed authority. See [Before merging](#before-merging-stage-g-entry-conditions). | A merge receipt recording the head, the checks, the review, the triage, and the merge agent's own skill usage. | A separate agent holding applicable authority. | Partly — branch protection and required checks; `enforce_admins` is `false`, so this is bypassable. |
+| G | MERGE | Stage F's **posted and accepted** verdict naming this exact head; **every applicable check green at this exact head** — not only the branch-protection-required ones — **or a cited active owner exception covering that exact head and scope**; the automated review posted or confirmed unavailable, with **every P1 and P2 finding triaged** (`AEGIS-APR-050`); and the merge agent's own confirmed authority. See [Before merging](#before-merging-stage-g-entry-conditions). | A merge receipt recording the head, the checks, the review, the triage, and the merge agent's own skill usage. | A separate agent holding applicable authority. | Partly — branch protection and required checks; `enforce_admins` is `false`, so this is bypassable. |
 
 **No blank cells.** Every stage above names its entry evidence, its exit
 evidence, its authority holder and its enforcement reality. That is deliberate:
@@ -39,18 +39,44 @@ a stage whose evidence is unstated is a stage nobody can verify.
 ### The enforcing skill for each stage
 
 `ai-sdlc-operating-model` requires every stage contract to name the skill that
-enforces it. Where **no** skill owns a stage, this table says so rather than
-leaving a blank — consistent with [the split](#what-is-machine-enforced-and-what-is-procedural).
+enforces it. This page meets that requirement as a **duty on the agent holding
+the stage**, not as a fixed table:
 
-| Stage | Enforcing skill |
+> **The agent holding a stage must find the skill that actually owns that stage,
+> read its `SKILL.md`, and verify that the skill's own scope covers this work
+> before relying on it.** A skill that excludes the work does not enforce the
+> stage, however plausible its name looks — a product-code reviewer told to route
+> library PRs elsewhere, or a selector told it must not execute what it selects,
+> both disqualify themselves.
+
+The list below is **illustrative and non-exhaustive**. It records what appeared
+to own each stage when this page was written; it is **not** authority, and a
+nearest match is not an owner. Where **no** skill owns a stage, say so and record
+the stage as **procedurally enforced** — consistent with
+[the split](#what-is-machine-enforced-and-what-is-procedural).
+
+| Stage | Candidate skill — verify its scope before relying on it |
 | --- | --- |
-| A PLAN | `ai-task-decomposer` supplies the task intent and its observable acceptance criterion when the change is a task carved out of a broader goal. **No skill owns writing a single change's plan** — that part is procedural. |
-| B INDEPENDENT PLAN AUDIT | `acceptance-criteria-reviewer` — tests the plan's acceptance criteria for testability, completeness and ambiguity. It reviews criteria that already exist and never authors them, which is exactly why the audit must follow A. |
-| C IMPLEMENT | **No skill owns general implementation.** `reviewable-diff-discipline` *(MANUAL-ONLY)* keeps a change small and reviewable, but only when a person names it. |
-| D INDEPENDENT IMPLEMENTATION AUDIT | `code-reviewer` — reviews an actual diff by severity with `file:line` evidence. `library-diff-reviewer` where the change is a skill-library PR. |
-| E VALIDATE | `risk-tiered-validation-selector` — selects validation depth from the change's impact class and fails closed on ambiguity. |
-| F FINAL INDEPENDENT PR CODE REVIEW | `code-reviewer`; `security-pr-reviewer` where the diff touches a security-relevant surface. |
-| G MERGE | `human-approval-boundary` — confirms an active scoped grant before the risky action. Standing authority itself is `agent-authorization-matrix` *(MANUAL-ONLY)*; the merge decision stays procedural plus branch protection. |
+| A PLAN | `ai-task-decomposer` covers breaking a broader goal into tasks that each carry an observable acceptance criterion. **No skill was found that owns writing a single change's plan**; treat that shape as procedural. |
+| B INDEPENDENT PLAN AUDIT | **No skill was found that owns a plan-level ACCEPT/REVISE audit.** `acceptance-criteria-reviewer` is a **partial** fit only: it returns one verdict per criterion (`TESTABLE` / `NEEDS-REWRITE` / `UNTESTABLE`) and by its own contract "**never decides whether work is done**". The plan-level verdict and the captured-revision binding are procedural. |
+| C IMPLEMENT | **No skill was found that owns general implementation.** `reviewable-diff-discipline` *(MANUAL-ONLY)* keeps a change small and reviewable when a person names it. |
+| D INDEPENDENT IMPLEMENTATION AUDIT | `code-reviewer` for product-code diffs; `library-diff-reviewer` where the PR changes the skill library — `code-reviewer`'s own contract routes library changes to it. |
+| E VALIDATE | `risk-tiered-validation-selector` **selects** a tier only; by its own contract it "only selects" and must not execute the tier it picks. **Executing** the selected checks is procedural, or belongs to whichever execution procedure the repository authorizes — not to this selector. |
+| F FINAL INDEPENDENT PR CODE REVIEW | `code-reviewer`, or `library-diff-reviewer` where the PR changes the skill library. `security-pr-reviewer` applies **to outside contributions only** — see the scope limit below. |
+| G MERGE | `human-approval-boundary` checks for an active scoped grant before a risky action. Standing authority is `agent-authorization-matrix` *(MANUAL-ONLY)*; the merge decision itself stays procedural plus branch protection. |
+
+**Two scope limits this page must not widen.**
+
+- **The additional security review is required for outside contributions
+  only.** `AGENTS.md` states it is "required for OUTSIDE contributions only and
+  is not extended to the maintainer's or other agents' own PRs". The
+  security-relevant-surface **question**, by contrast, is answered on **every**
+  pull request (`CONTRIBUTING.md`). Those are two different obligations, and
+  requiring the first universally would over-gate internal changes contrary to
+  the recorded owner scope.
+- **A selector is not an executor.** Naming `risk-tiered-validation-selector` as
+  Stage E's enforcer would let an agent satisfy the stage without running any
+  check.
 
 `change-classification-gate` runs before A and sets the change's class, which is
 what selects the validation depth in E. Closeout after G routes to
@@ -64,12 +90,21 @@ afterwards does not satisfy them — a receipt is a record, not a gate.
 
 1. **Every applicable check is green at that exact head** — not only the
    branch-protection-required ones. A green required pair alongside a red
-   non-required job is not a green head.
+   non-required job is not a green head. **This does not override an active
+   owner exception.** Where an active owner grant covers that exact head and
+   scope, the exception is cited, and the failed check is recorded as **failed
+   with its authorized disposition** — never as green and never as waived. The
+   standing example is `AEGIS-APR-047`, which by its own terms *"narrowly
+   supersedes the all-green condition in AEGIS-APR-013/024/039 for that signal
+   only"* and leaves `gate-guard` red for four named BER paths by owner
+   decision. A page that demanded all-green absolutely would make that live
+   grant unusable, which is the same defect class as omitting a condition —
+   standing policy overridden in the wrong direction.
 2. **The final PR review is posted, accepted, and names that exact head.**
 3. **The automated review has posted, or is confirmed unavailable** (a
    usage-limit notice, for example), and **every P1 and P2 finding it raised is
    triaged** — fixed, or recorded in the pull request with the reason it is not a
-   defect. This is `AEGIS-APR-049`'s requirement, and it is not optional.
+   defect. This is `AEGIS-APR-050`'s requirement, and it is not optional.
 4. **The merge agent has confirmed its own authority** — a register entry that
    passes the preamble test, or the owner's instruction quoted verbatim with its
    source. A brief's bare assertion is not authority.
@@ -88,10 +123,11 @@ plan and an independent plan audit. They do **not** get to skip the order, and
 the repository does not close and recreate every bot diff to satisfy a
 formality. The intake condition below is an entry condition of Stage A.
 
-1. **The adopting agent writes the plan-of-record** for the diff as it stands —
+1. **A planning agent writes the plan-of-record** for the diff as it stands —
    what it changes, why, the blast radius, the paths it touches, and
    proportionate acceptance criteria. Adopting a diff with no plan is exactly
-   what the stage order forbids.
+   what the stage order forbids. **This actor holds Stage A only** — it is the
+   *planning* agent, not the adopting one, and it must not also take Stage C.
 2. **A different agent audits that plan** — Stage B — **before any agent adopts,
    re-applies, modifies or merges the diff.** The audited plan is bound to a
    captured revision like any other.
@@ -99,10 +135,16 @@ formality. The intake condition below is an entry condition of Stage A.
    whether to close it and supersede it with an authored change, or to have the
    plan corrected and re-audited. No bot pull request is merged on the argument
    that its diff already exists.
-4. **The remaining stages run unchanged.** Stage C's work for such a pull request
-   is *adopting* the diff, and it owes the same changed-files and NOT-touched
-   lists as any other implementation, plus the implementation audit, validation,
-   the final review, and a merge that meets every Stage G entry condition.
+4. **A further, different agent adopts the diff at Stage C**, and the remaining
+   stages run unchanged. Stage C's work for such a pull request is *adopting* the
+   diff — a distinct holder from the planning agent at Stage A and from the
+   auditor at Stage B — and it owes the same changed-files and NOT-touched lists
+   as any other implementation, plus the implementation audit, validation, the
+   final review, and a merge that meets every Stage G entry condition.
+
+**The three roles here are three agents.** Naming the plan writer "the adopting
+agent" would give one agent both PLAN and IMPLEMENT and breach the separation
+rule outright; the intake path is not an exception to it.
 
 The point of the intake condition is that the **audited plan precedes adoption**,
 so a pre-authored diff is never retroactively blessed by a plan written to
@@ -139,15 +181,26 @@ below is explicit about which parts of this page a machine actually holds.
 ## The merge prohibition
 
 **Do not merge before the final PR review is posted, accepted, and verified
-against the exact candidate head.** Before merging, the merge agent must, in the
-same turn: re-read the head SHA, confirm the posted review names that exact
-head, confirm the review was accepted, and confirm its own authority. A brief's
-bare assertion of authority is not authority.
+against the exact candidate head.**
 
-A merge that happens before a posted final review — or after the head moved
-past the reviewed one — is a process failure even when every automated check is
-green. Green checks are a validation signal inside a stage; they are not a
-substitute for the review and merge gates.
+The conditions are the ones in
+[Before merging: Stage G entry conditions](#before-merging-stage-g-entry-conditions)
+— the same four, stated there in full. **This section is not a second, narrower
+rule.** In summary, against that exact head:
+
+1. every applicable check is green, **or** an active owner exception covering
+   that head and scope is cited with the failed check recorded as failed;
+2. the final PR review is posted, accepted, and names the head;
+3. the automated review has posted or is confirmed unavailable, and **every P1
+   and P2 finding it raised is triaged** (`AEGIS-APR-050`); and
+4. the merge agent has confirmed its own authority — a register entry passing the
+   preamble test, or the owner's instruction quoted verbatim with its source. A
+   brief's bare assertion of authority is not authority.
+
+A merge that happens before a posted final review — or after the head moved past
+the reviewed one — is a process failure even when every automated check is green.
+Green checks are a validation signal inside a stage; they are not a substitute
+for the review and merge gates.
 
 ## Proportionality
 
@@ -247,17 +300,19 @@ says so.
   commit.
 - **`gate-guard`** (required, pull requests only) — fails when a PR modifies a
   path matching the protected-path pattern. It protects the merge gate and the
-  surfaces that enforce it. The pattern is **directory-based, never
-  extension-based**: it does not protect `.md` files *as a class*, and a `.md`
-  file **is** protected when a protected directory carries it. Measured against
-  the live pattern, `scripts/tests/fixtures/markdown-links/bad/README.md`,
+  surfaces that enforce it. **Protection comes from protected directory prefixes
+  and root-level path or extension atoms together — not from extension alone.**
+  Measured against the live pattern: `scripts/tests/fixtures/markdown-links/bad/README.md`,
   `tools/behavioral_eval_runner/README.md` and `.claude/agents/example-agent.md`
-  all match. Of the 375 tracked files under `docs/`, **2 match** — both
-  `.gitattributes` files, matched by the pattern's depth-agnostic
-  `(.*/)?\.gitattributes$` atom rather than by their location — while **0 of the
-  214 `.md` files** under `docs/` match, and neither `AGENTS.md` nor
-  `CONTRIBUTING.md` matches. Protection is decided by whether a protected
-  directory or a protected path atom carries the file, never by its extension.
+  all match through their directory prefix. Of the 375 tracked files under
+  `docs/`, **2 match** — both `.gitattributes` files, matched by the pattern's
+  depth-agnostic `(.*/)?\.gitattributes$` atom rather than by their location.
+  **Root-level `validate-skills.py`, `setup.py`, `anything.exe` and `foo.dll`
+  all match by extension atom, while `docs/x.py` does not** — the `^` anchors the
+  group, so the extension alternation applies only at the repository root.
+  **0 of the 214 `.md` files** under `docs/` match, and neither `AGENTS.md` nor
+  `CONTRIBUTING.md` matches: `.md` has no extension atom of its own, and a `.md`
+  file is protected only when a protected directory carries it.
 - **`windows-offline-checks`, `tools-tests-linux`, `tools-tests-windows`** —
   visible coverage. They are **not** registered required checks.
 - Everything above is **bypassable**: `enforce_admins` is `false`, and merges are
@@ -272,8 +327,8 @@ says so.
 | That a review was posted, accepted, and by a non-author | **Nothing.** Review records are issue comments, not review objects. |
 | **Exact-head invalidation** | **Nothing.** `dismiss_stale_reviews: false` and `require_last_push_approval: false`, so the platform will not invalidate a verdict when a head moves. |
 | No merge before the final review is posted and head-verified | **Nothing.** |
-| **All applicable checks green at the exact head**, not only the required ones | **Nothing.** Nothing aggregates a head's check results into a merge decision. |
-| **The automated review's wait and P1/P2 triage** (`AEGIS-APR-049`) | **Nothing.** No check reads the review or its findings. |
+| **All applicable checks green at the exact head**, not only the required ones — or a cited active owner exception | **Nothing.** Nothing aggregates a head's check results into a merge decision, and nothing verifies that a cited exception actually covers the head and scope it is invoked for. |
+| **The automated review's wait and P1/P2 triage** (`AEGIS-APR-050`) | **Nothing.** No check reads the review or its findings. |
 | The audited plan being bound to a captured revision | **Nothing.** No test compares a plan to the revision a verdict named. |
 | The honesty of the "Aegis skills used" table | **Nothing.** |
 | Proportionality | **Nothing.** |
@@ -305,7 +360,7 @@ in `AGENTS.md`.
 | The head moved while a review was in flight | **The verdict is void.** Re-review at the new head; record the old verdict as voided. |
 | An audit returns **REVISE** | Return to **re-plan → re-audit**. At the same head or a new one, the superseded verdict is recorded as superseded, not deleted. |
 | A verdict was posted but is wrong | Correct it forward with a **re-audit**. Never rely on it silently, and never edit a posted verdict in place to look right. |
-| The required stage separation cannot be achieved — no second agent exists | **Halt and escalate.** See below. |
+| **Fewer distinct agents are available than the stages this change will run** (including the single-agent case) | **Halt and escalate.** See below. |
 | A test could not be run | Report it **UNRUN**. Never as a pass. |
 | Authority for an action is missing | Name the **exact missing grant**. Do not assume it. |
 | Two instruction sources conflict | Route to `source-of-truth-reconciler`. |

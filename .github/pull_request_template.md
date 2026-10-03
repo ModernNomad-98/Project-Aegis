@@ -15,11 +15,12 @@ is fine, absent is not, because the implementation audit checks those criteria
 one by one. The full rule is the
 [delivery workflow](https://github.com/ModernNomad-98/Project-Aegis/blob/main/docs/delivery-workflow.md).
 
-**Audited plan revision.** <!-- If this plan was independently audited (Stage B),
-record the revision the audit bound to: a content hash of the exact audited plan
-text, or a link to the immutable comment or artifact holding it. Editing the plan
-after the audit voids the ACCEPT. Leave blank if the plan was not audited
-separately. -->
+**Audited plan revision.** <!-- Filled in after Stage B. Record the revision the
+audit bound to: a content hash of the exact audited plan text, or a link to the
+immutable comment or artifact holding it. Editing the plan after the audit voids
+the ACCEPT. Every Role A change passes an independent plan audit before
+implementation, so a blank value here means this PR is not yet ready to
+implement or merge — it is not an invitation to skip the audit. -->
 
 ## Checklist
 
