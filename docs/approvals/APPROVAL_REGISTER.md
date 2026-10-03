@@ -3384,15 +3384,19 @@ the entry governs.
   is not a GRANT.
 - **Status at recording:** ACTIVE on this reviewed register merge.
 - **Date / Grantor:** 2026-10-03 / Peter Nguyen.
-- **Owner decision:** The owner directed that the repository adopt one permanent,
-  repository-wide delivery workflow binding any coding agent regardless of
-  model, provider, editor or harness: a change moves through plan, independent
-  plan audit, implement, independent implementation audit, validate, final
-  independent pull-request review, then merge; a moved head voids the verdicts
-  bound to the old head; and no merge happens before the final review is posted,
-  accepted and verified against the exact candidate head. The decision is
-  transcribed into this register from the coordinating agent's brief, not typed
-  by the owner.
+- **Owner decision:** Adopted from the owner's direct instruction. **Quoted
+  verbatim, as relayed:**
+
+  > Make the workflow below a permanent, repository-wide rule for ANY coding agent working on the Project Aegis source repository, regardless of model, provider, editor, or harness:
+  >
+  > PLAN → INDEPENDENT PLAN AUDIT → IMPLEMENT → INDEPENDENT IMPLEMENTATION AUDIT → VALIDATE → FINAL INDEPENDENT PR CODE REVIEW → MERGE
+  >
+  > The merge must never occur before the required final PR review is posted, accepted, and verified against the exact candidate head.
+  >
+  > This is a standing instruction until I explicitly supersede it. Record it durably through the repository's established instruction and approval mechanisms. It governs future changes, not just this session.
+
+  Each paragraph above is reproduced on one line so the quotation is not
+  sensitive to line wrapping; the stage arrow sequence is exactly as given.
 - **Reason:** The stage order and the merge prohibition existed only partially
   and inconsistently across `AGENTS.md`, `CONTRIBUTING.md` and the pull-request
   template, and the parts that existed had no recorded policy home. Recording
@@ -3420,17 +3424,24 @@ the entry governs.
   make the workflow machine-enforced: the page records that the stage order,
   stage separation, exact-head invalidation and proportionality have no
   mechanical control behind them.
-- **Evidence:** The owner's directive reached the implementing agents **relayed
-  through the coordinating agent**, in the Project Aegis conversation on
-  2026-10-03: it is a transcription of the owner's instruction, not a message an
-  agent can read directly, and the owner did not type into this register. The
-  register's preamble makes that valid source evidence — "Current direct user
-  instructions are valid source evidence before transcription and do not need
-  repeated consent" — so this entry rests on the owner's instruction and does not
-  claim a repository citation of the owner's own text. The repository artifact
-  that independently records the decision is `D72` in the
+- **Evidence:** The owner's instruction was received in the coordinating session
+  and **relayed here verbatim through the coordinating agent's brief** for this
+  work item, on 2026-10-03. The owner did not type into this register, and the
+  quotation above is a transcription of that relay, not the owner's own signed
+  text. The register's preamble makes it valid source evidence — "Current direct
+  user instructions are valid source evidence before transcription and do not
+  need repeated consent" — so this entry rests on the owner's current direct
+  instruction and **does not claim a repository citation of the owner's own
+  words**.
+  An earlier revision of this entry paraphrased that instruction. It was
+  replaced by the verbatim quotation above on the same terms the preamble
+  permits, and **the replacement is not a rewriting of history**: `AEGIS-APR-105`
+  does not exist on `origin/main`, whose highest entry is `AEGIS-APR-104`, so
+  this entry has never been merged and has no recorded history to preserve. Once
+  merged, any further change to it is an append.
+  The repository artifact that independently records the decision is `D72` in the
   [reconciliation record](../reconciliation/step-0-reconciliation-v4.md) §5,
-  appended by the same change as this entry.
+  added by this same change.
 - **Expiry / use limit:** No calendar expiry and no one-use limit stated. This is
   a policy selection and stands until explicitly superseded; any replacement
   requires a later recorded owner choice.

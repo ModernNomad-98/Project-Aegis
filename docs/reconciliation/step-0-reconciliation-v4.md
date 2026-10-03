@@ -3712,6 +3712,9 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     advisory checklist. `CLAUDE.md` and `README.md` are deliberately unchanged —
     `CLAUDE.md` imports `AGENTS.md`, so it inherits, and a second copy would
     drift.
+    The page is the **sole normative rendering** of the merge-gate conditions,
+    which carry stable IDs `MG1`–`MG5`; every other mention of a condition, in
+    any file, is a pointer carrying the ID and **no content**.
   - **Authority.** The owner's current direct instruction, relayed to the
     implementing agents through the coordinating agent's brief and recorded here
     as a transcription rather than as a message an agent can read directly.

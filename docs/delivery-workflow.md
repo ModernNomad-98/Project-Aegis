@@ -411,6 +411,20 @@ check can compare renderings. Claiming one would be a false enforcement claim �
 the defect class this page exists to prevent. The gate that `docs-as-code-architect`
 prescribes is recorded as an open gap, not as present.
 
+**A fragility in this mechanism, recorded rather than hidden.** `MG4`'s lock is a
+plain substring search for the load-bearing phrase inside its quotation, and that
+search is **sensitive to line wrapping**: an editor who rewraps the quotation so
+those words straddle a line break makes the search return zero and **silently
+breaks the lock** — the clause is still there, and the check that guards it stops
+seeing it. This is not hypothetical. The first draft of `MG4` on this page wrapped
+that phrase, and the search returned 0 until it was rewrapped; the independent plan
+auditor hit the same trap in its own substring search. So the mitigation is part of
+the rule: **keep each load-bearing phrase of a quoted condition on one line**, and
+treat a zero result from the substring search as *"check the wrapping"* before
+concluding a clause is missing. A verbatim quotation is only as durable as the line
+breaks someone else may later choose. The phrase itself is not repeated here — this
+section is a pointer like any other.
+
 ## Scope: Role A binds, Role B does not inherit
 
 **This rule binds Role A — the `ModernNomad-98/Project-Aegis` source
