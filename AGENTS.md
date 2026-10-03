@@ -63,10 +63,15 @@ decompose the work, assign it, confirm it was completed, and route it onward;
 it does not author, edit, commit, push or merge the change itself.
 **Each stage is a different agent.** Author → review → security review where
 **CONTRIBUTING.md's security-relevant-surface list (wider than `gate-guard`)**
-requires one — which, per the owner's 2026-09-27 decision recorded in
+requires one — which is required for OUTSIDE contributions only and is not
+extended to the maintainer's or other agents' own PRs — → pull request → merge.
+That scope is the one the owner recorded on 2026-09-27 in the
+"Security-surface rule" row of
 [docs/roadmaps/aegis-open-decisions-2026-09-23.md](docs/roadmaps/aegis-open-decisions-2026-09-23.md),
-is required for OUTSIDE contributions only and is not extended to the
-maintainer's or other agents' own PRs — → pull request → merge. No agent
+which records the owner's instruction for that `CONTRIBUTING.md` rule and is not
+the authority for this file's wording; on the owner's direct instruction this
+file now states the same limit (2026-10-02) as
+[CONTRIBUTING.md's external-contributions rule](CONTRIBUTING.md#external-contributions). No agent
 performs two stages on the same change: the author never reviews or merges its
 own work, no reviewer — code or
 security — merges it, and a separate agent holding the applicable authority
