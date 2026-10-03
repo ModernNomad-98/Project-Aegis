@@ -1,0 +1,30 @@
+{
+  "schema": "aegis.documentation-acceptance-index.stated/1",
+  "purpose": [
+    "Per-page acceptance revisions the tracker states in words but does not store as data.",
+    "Every row carries the tracker line it was read from, and build_index.py verifies each revision resolves to a commit and records whether that commit itself touches the path. Nothing here is inferred from a nearby commit: a page the tracker discusses without naming a revision is absent, not guessed.",
+    "This file is evidence, not a decision. It records what the tracker says; it does not accept any page."
+  ],
+  "source_file": "docs/roadmaps/aegis-documentation-readability-backlog.md",
+  "rows": [
+    {"path": ".claude/skills/performance-test-harness/SKILL.md", "sha": "8c6750a", "pr": 473, "tracker_line": 273, "kind": "tracker-audit-table", "quote": "Accepted at `8c6750a` (batch 3, #473)"},
+    {"path": ".claude/skills/iso-42001-aims-architect/SKILL.md", "sha": "2a86058", "pr": 470, "tracker_line": 274, "kind": "tracker-audit-table", "quote": "Accepted at `2a86058` (batch 7, #470)"},
+    {"path": ".claude/skills/qa-strategy-architect/SKILL.md", "sha": "54034fa", "pr": 468, "tracker_line": 275, "kind": "tracker-audit-table", "quote": "Accepted at `54034fa` (batch 9, #468)"},
+    {"path": ".claude/skills/iso-27001-isms-architect/SKILL.md", "sha": "14ecd0c", "pr": 474, "tracker_line": 276, "kind": "tracker-audit-table", "quote": "Accepted at `14ecd0c` (batch 5, #474)"},
+    {"path": ".claude/skills/merge-is-deploy-governance/SKILL.md", "sha": "2a86058", "pr": 470, "tracker_line": 277, "kind": "tracker-audit-table", "quote": "Accepted at `2a86058` (batch 7, #470)"},
+    {"path": ".claude/skills/authority-invalidation-architect/SKILL.md", "sha": "8c6750a", "pr": 473, "tracker_line": 278, "kind": "tracker-audit-table", "quote": "Accepted at `8c6750a` (batch 3, #473)"},
+    {"path": ".claude/skills/adr-sequencer/SKILL.md", "sha": "2a86058", "pr": 470, "tracker_line": 279, "kind": "tracker-audit-table", "quote": "Accepted at `2a86058` (batch 7, #470)"},
+    {"path": ".claude/skills/risk-tiered-validation-selector/SKILL.md", "sha": "5e0e9ad7", "pr": 224, "tracker_line": 280, "kind": "tracker-audit-table", "quote": "Accepted at `5e0e9ad7` (#224 batch)"},
+    {"path": ".claude/skills/resilience-architecture-reviewer/SKILL.md", "sha": "d75cd58", "pr": 522, "tracker_line": 281, "kind": "tracker-audit-table", "quote": "Accepted at `d75cd58` (#522); tracker L1714-1718 counts both pages accepted on `d75cd58` on a pre-cleared basis"},
+    {"path": ".claude/skills/cloud-security-baseline-reviewer/SKILL.md", "sha": "65bacc7", "pr": 526, "tracker_line": 2574, "kind": "tracker-row", "quote": "All six new pages were **accepted** on `65bacc7`"},
+    {"path": ".claude/skills/cloud-security-baseline-reviewer/references/aws-baseline.md", "sha": "65bacc7", "pr": 526, "tracker_line": 2574, "kind": "tracker-row", "quote": "All six new pages were **accepted** on `65bacc7`"},
+    {"path": ".claude/skills/cloud-security-baseline-reviewer/references/azure-baseline.md", "sha": "65bacc7", "pr": 526, "tracker_line": 2574, "kind": "tracker-row", "quote": "All six new pages were **accepted** on `65bacc7`"},
+    {"path": ".claude/skills/cloud-security-baseline-reviewer/references/gcp-baseline.md", "sha": "65bacc7", "pr": 526, "tracker_line": 2574, "kind": "tracker-row", "quote": "All six new pages were **accepted** on `65bacc7`"},
+    {"path": ".claude/skills/cloud-security-baseline-reviewer/references/supabase-baseline.md", "sha": "65bacc7", "pr": 526, "tracker_line": 2574, "kind": "tracker-row", "quote": "All six new pages were **accepted** on `65bacc7`"},
+    {"path": ".claude/skills/cloud-security-baseline-reviewer/references/vercel-baseline.md", "sha": "65bacc7", "pr": 526, "tracker_line": 2574, "kind": "tracker-row", "quote": "All six new pages were **accepted** on `65bacc7`"},
+    {"path": ".claude/skills/local-ci-mirror-preflight/SKILL.md", "sha": "bf7a4b8", "pr": 220, "tracker_line": 2573, "kind": "tracker-row", "quote": "`local-ci-mirror-preflight` (9), `vite-build-qa-engineer` (6) and the template (4) keep acceptance"},
+    {"path": ".claude/skills/adr-writer/SKILL.md", "sha": "f275356", "pr": 482, "tracker_line": 2586, "kind": "tracker-row", "quote": "`adr-writer` (20) got a full-page re-read and **ACCEPT** on `f275356`, so it is accepted again"},
+    {"path": ".claude/skills/vite-build-qa-engineer/SKILL.md", "sha": "eb3ec53", "pr": 467, "tracker_line": 1834, "kind": "tracker-row", "quote": "`vite-build-qa-engineer/SKILL.md` (#521, 6; 6 net since `eb3ec53`): #521's reviews measured both and passed the edits."},
+    {"path": ".claude/skills/_template/SKILL.md", "sha": "0533764", "pr": 408, "tracker_line": 1836, "kind": "tracker-row", "quote": "`.claude/skills/_template/SKILL.md` (#528, 4; 4 net since #408's `0533764`)"}
+  ]
+}
