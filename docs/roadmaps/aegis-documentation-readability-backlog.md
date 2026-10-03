@@ -57,7 +57,7 @@ index. They do **not** show that the index is where acceptance rows should be
 as two tracked sources state. `docs/approvals/APPROVAL_REGISTER.md:3150`, the
 **`AEGIS-APR-101`** entry's **Scope FORBIDDEN**, reads: *"No approval of the
 charter's proposed canonical index, its precedence, or changed counting rules."*
-This ledger itself says the same, at line 3195 of this head, under
+This ledger itself says the same, at line 3230 of this head, under
 [First ledger-keeper recording](#first-ledger-keeper-recording--owner-ratified-role-2026-10-02):
 *"**Still separately unresolved, and still undecided.** The charter's proposed
 canonical index — its ownership, path, precedence and changed counting rules — is
