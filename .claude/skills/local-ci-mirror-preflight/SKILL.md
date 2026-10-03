@@ -9,8 +9,10 @@ disable-model-invocation: true
 **Reading key:** CI means continuous integration, the repository's automated
 checks on a pull request (PR); PR means pull request; SHA means secure hash
 algorithm, used here for the commit hash that identifies one exact revision;
-docs-only means a change confined to documentation, no code path; the
-repository's own docs-only definition governs where one exists.
+TALI means task-authorized local implementation under the
+[skill standard](../../../docs/skill-generation-standard.md); docs-only means
+a change confined to documentation, no code path; the repository's own
+docs-only definition governs where one exists.
 
 ## Purpose
 

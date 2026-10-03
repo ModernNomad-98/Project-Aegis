@@ -23,8 +23,9 @@ documentation define the effective behavior described here.
 
 Produce a database-level verdict on whether row-level security actually
 enforces tenant and role scope, plus the negative tests that prove it. This
-skill absorbs both policy authoring and negative-test design (reconciliation
-§3): it inspects each table's SELECT/INSERT/UPDATE/DELETE policies for the
+skill absorbs both policy authoring and negative-test design
+([reconciliation §3](../../../docs/reconciliation/step-0-reconciliation-v4.md)):
+it inspects each table's SELECT/INSERT/UPDATE/DELETE policies for the
 classic failure modes, writes or corrects policies where asked, and ALWAYS
 delivers a per-command negative-test plan. RLS enabled needs an effective
 policy review: no applicable policy defaults to deny for a role subject to

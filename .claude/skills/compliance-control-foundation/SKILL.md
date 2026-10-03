@@ -7,9 +7,10 @@ description: Author the framework-agnostic common control set that ISO 27001, IS
 
 **Reading key:** ISO is the International Organization for Standardization;
 SOC 2 is an American Institute of Certified Public Accountants (AICPA)
-attestation framework, and CPA means certified public accountant. AI means
-artificial intelligence; RLS means row-level security; RMF means risk
-management framework. NIS2 is the European Union's second Network and
+attestation framework, and CPA means certified public accountant; TSC means
+the SOC 2 Trust Services Criteria. AI means artificial intelligence; SDLC
+means software development lifecycle; RLS means row-level security; RMF means
+risk management framework. NIS2 is the European Union's second Network and
 Information Security Directive; US and EU mean United States and European
 Union. OWASP is the Open Worldwide Application Security Project.
 
