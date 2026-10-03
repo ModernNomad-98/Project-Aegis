@@ -925,7 +925,7 @@ request description.
 | 1 | The false sentence entered with PR #626's squash commit `bff75d9c` | **PROVEN** | `git log -S "Each base SHA is the page's last recorded acceptance"` |
 | 1 | PR #626's reviewed head `1e8b81e7` is also not on `main` (squash) | **PROVEN** | `git merge-base --is-ancestor 1e8b81e7 origin/main` → 1 |
 | 2 | #626 and #627 merged with no review record in existence | **PROVEN** | `gh pr view <n> --json mergedAt,comments` |
-| 2 | #623's three review records preceded its merge | **PROVEN** | same |
+| 2 | #623 carried **six** review-record comments before its merge: three named records (audit Audit-1 ACCEPT, readability REMEDY-1 SHIP, security SEC-1 SECURITY-ACCEPT) posted once, twice and three times | **PROVEN** | same |
 | 2 | #626's post-merge record returned FIX-FIRST on the Class 1 defect | **PROVEN** | comment body at `2026-10-03T00:13:01Z` |
 | 3 | #624's head instant is 00:04:58Z; a Codex notice postdates it at 00:09:58Z | **PROVEN** | `git log -1 --format=%cI a0634422`; `gh pr view 624 --json comments` |
 | 3 | The UNMET conclusion was measured at 00:09:47Z, 11 s before that notice | **PROVEN** | comment timestamps |
