@@ -2315,7 +2315,9 @@ has **zero** hits, and the only `797ca687` hits are the Class 5 correction,
 `7.3`(c) and the item-5 row — none of which makes this claim.
 
 **Measured instance, re-derived 2026-10-03.** `C:\src\Project Aegis\coord-main`
-is a linked worktree. At `origin/main` = `25cc0e7a284843075b7da79cfe0c481d18fe059a`:
+is a linked worktree. Every figure below was re-derived at
+`origin/main` = `bd622661fe56779227887cbd390eaeab9dfb37fd`, the tip current when
+this correction was written:
 
 | Check | Command | Result |
 | --- | --- | --- |
@@ -2323,13 +2325,36 @@ is a linked worktree. At `origin/main` = `25cc0e7a284843075b7da79cfe0c481d18fe05
 | Merge base | `git merge-base 797ca687 origin/main` | `d6e484189cc30c67dc69aeb973e15f89b693537d` |
 | HEAD an ancestor of main? | `git merge-base --is-ancestor 797ca687 origin/main` | exit **1** — no |
 | Main an ancestor of HEAD? | `git merge-base --is-ancestor origin/main 797ca687` | exit **1** — no, so the pair is **DIVERGENT** |
-| Commits main has that HEAD cannot reach | `git rev-list --count 797ca687..origin/main` | **26** |
-| Commits HEAD has that main lacks | `git rev-list --count origin/main..797ca687` | **2** (`797ca687`, `7c52b6f6`) |
+| Commits main has that HEAD cannot reach | `git rev-list --count 797ca687..<tip>` | **a SERIES, not a number** — see below |
+| Commits HEAD has that main lacks | `git rev-list --count <tip>..797ca687` | **2** (`797ca687`, `7c52b6f6`) |
 
-The **26** is revision-bound and grew while this was being written: it was **25**
-at `origin/main` = `279ac94d` and **26** once #650 landed. The divergence itself
-did not change; only the count of invisible commits did. Quote the revision
-beside the number, as `PROC-04` requires.
+**The unreachable-commit count is published as a series, because a single
+integer beside a named tip decays the moment `main` moves.** Measured with the
+same counted command, one row per tip:
+
+| `origin/main` tip | what landed | `git rev-list --count 797ca687..<tip>` |
+| --- | --- | --- |
+| `279ac94d` | the tip the original brief measured | **25** |
+| `9f5dc6b3` | +#650, the figures page | **26** |
+| `20fadd48` | +#648, the wrapped-link fix | **27** |
+| `25cc0e7a` | +#649, the link-checker self-tests | **28** |
+| `bd622661` | +#652, APR-103/104 | **29** |
+
+The merge base (`d6e48418`), the two ancestor-test exit codes, and the reverse
+count (**2**) are stable across all five tips; only the forward count moves,
+because it counts commits on `main` that `HEAD` cannot see. `HEAD` is frozen, so
+`main`'s growth is the only variable.
+
+**Correction, recorded rather than silently repaired.** An earlier revision of
+this append published **26** beside the named tip `25cc0e7a`. That was wrong by
+two: 26 is the value at `9f5dc6b3`, and the value at `25cc0e7a` is **28**. The
+cause is exactly the failure `PROC-04` forbids — a figure measured at one
+revision and published beside another, because `main` advanced twice between the
+measurement and the write-up. The **argument** that append made was right and is
+kept: the count is revision-bound, and the brief's 25 was true at `279ac94d`.
+Only the published figure was wrong, and it is now a series so that it cannot
+decay again. A reviewer measured it moving 28 → 29 inside a single review window,
+which is why a bare corrected integer would have re-opened this defect.
 
 The false-empty instance, reproduced:
 
@@ -2366,7 +2391,8 @@ script here enforces it — a runner cannot see which ref a reader intended.
 | --- | --- | --- | --- |
 | 7.8 | `git log -S` with no ref, run from the divergent `coord-main` worktree, returns a FALSE EMPTY for text that `origin/main` carries | **PROVEN** | `git log -S "Consistency note 2026-10-02" -- docs/roadmaps/aegis-open-decisions-2026-09-23.md` → no output, exit 0; the same query with `origin/main` named → `3c58e966` |
 | 7.8 | That worktree HEAD is divergent from `origin/main`, not merely behind: neither is an ancestor of the other | **PROVEN** | `git merge-base --is-ancestor 797ca687 origin/main` → 1 **and** `… origin/main 797ca687` → 1; merge base `d6e48418` |
-| 7.8 | Main carries **26** commits unreachable from that HEAD, and HEAD carries **2** that main lacks | **PROVEN** at `origin/main` = `25cc0e7a` | `git rev-list --count 797ca687..origin/main` → 26; `git rev-list --count origin/main..797ca687` → 2 |
+| 7.8 | Main carries **29** commits unreachable from that HEAD at `bd622661`, and HEAD carries **2** that main lacks; the forward count is a **series** (25 / 26 / 27 / 28 / 29 at `279ac94d` / `9f5dc6b3` / `20fadd48` / `25cc0e7a` / `bd622661`) | **PROVEN** — forward count by `git rev-list --count 797ca687..<tip>`, series re-derived 2026-10-03 at `origin/main` = `bd622661` | `git rev-list --count 797ca687..bd622661` → **29**; `git rev-list --count bd622661..797ca687` → **2** |
+| 7.8 | *(superseded, kept for the record)* The same count published as the bare integer **26** beside `origin/main` = `25cc0e7a` | **FALSIFIED** — 26 is the value at `9f5dc6b3`; the value at `25cc0e7a` is **28** | `git rev-list --count 797ca687..25cc0e7a` → 28 |
 
 ### `PROC-04` — the owed writing-standards half is LANDED
 
@@ -2420,9 +2446,18 @@ step.
 
 **Append-only, proven by hash.** The pre-edit blob is
 `5cf558227062143505ed65797b585cfa53acdeaf` (20 507 bytes, **23** newlines,
-terminated). The post-edit file is 21 493 bytes and **24** newlines; the
+terminated). The post-edit file is 21 486 bytes and **24** newlines; the
 pre-edit bytes are an exact byte **prefix** of the post-edit file, the newline
 delta is exactly 1, and every pre-existing JSON line still parses.
+
+**Separator style corrected in review.** The appended line first used
+`json.dumps` defaults, which emit a space after every `:` and `,`; the file's
+other 23 lines are compact. This was raised as a `[NIT]` by the independent
+review and is fixed rather than declined: line 24 now round-trips
+compact-identically (7 bytes smaller, 21 493 → 21 486), its recorded
+`checked_at` and text are unchanged, and the append-only proof above still
+holds against the same base blob. The line's action text contains one `": "`
+of its own prose, which is content, not a separator.
 
 ### PR #649 — the declined `[NIT]` follow-up is now RECORDED
 
@@ -2432,7 +2467,7 @@ Markdown —" was *declared* in the pull request body ("left for its own work
 item") but **never recorded**: there is no matching open issue, and this
 repository has exactly one open issue (#101, unrelated). The follow-up is
 recorded here, with the two facts its record was missing, both re-derived at
-`origin/main` = `25cc0e7a`:
+`origin/main` = `bd622661fe56779227887cbd390eaeab9dfb37fd`:
 
 1. **The named fix would fail CI as written.** The checker's **default scope is
    every tracked `.md` file** — 673 of them now. Run with no arguments at this
@@ -2440,7 +2475,7 @@ recorded here, with the two facts its record was missing, both re-derived at
 
    ```text
    files: 673   links checked: 3184   anchors checked: 800   broken: 6   dead: 1
-   external-skipped: 1781   other-skipped: 0
+   external-skipped: 1791   other-skipped: 0
    ```
 
    **All seven findings (six broken, one dead) lie inside the checker's own
