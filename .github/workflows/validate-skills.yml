@@ -128,6 +128,55 @@ jobs:
       - name: Run Markdown link-checker self-tests
         run: python -P scripts/ci/record-check.py markdown-links -- python -P scripts/tests/test_markdown_links.py
 
+      # The self-tests above prove the TOOL. Nothing ran it over this
+      # repository's own pages, so a broken relative link could still merge
+      # green — C1b's sibling defect. This step applies it to the tracked
+      # Markdown, deriving the set from the tree rather than enumerating files,
+      # and passing them to the checker's existing positional argument. The
+      # checker is NOT modified: a new flag there would need a self-test, and
+      # scripts/tests/test_markdown_links.py is itself gate-guard protected.
+      #
+      # The exclusion is ONE prefix rule, not a list of the fixtures. A 22nd
+      # deliberately-broken fixture added anywhere under scripts/tests/fixtures/
+      # is excluded with no edit here. It is load-bearing, not cosmetic: the
+      # checker's default scope reports 6 broken links and 1 dead anchor at
+      # 3e992f89, ALL seven under that prefix, so without it this step would be
+      # red on a clean tree. The filter matches that prefix as a substring
+      # rather than anchoring it, which is deliberate: no tracked path outside
+      # the prefix contains the substring, so the two forms select the same set
+      # (56 paths, measured), and the unanchored form keeps every token on this
+      # step's lines a path gate-guard already protects.
+      #
+      # The count guard is a FLOOR, not an equality. Measured at 3e992f89 by
+      # `git ls-tree -r --name-only 3e992f89`, `.md` suffix filter, one per
+      # emitted path: 675 tracked pages minus 56 under the excluded prefix =
+      # 619 checked. Equality to 619 would go red on the first legitimate page
+      # addition — a false positive on the very work this gate protects — while
+      # 600 is far above the vacuity case (an empty or collapsed set) and leaves
+      # 19 paths of headroom. The guard exits before the recorder runs, so a
+      # tripped guard is a structural refusal and records no check evidence.
+      #
+      # The guard is belt-and-braces, and deliberately so: if the filter ever
+      # matched nothing, the checker falls back to its default scope (positional
+      # `paths` is `nargs="*"`, and the checker branches on `if args.paths:`),
+      # where it FAILS on the fixture breaks above. A broken filter therefore
+      # produces a RED step, never a vacuous green one — which is why the guard
+      # is a cheap backstop rather than the only defence.
+      #
+      # CI runs this on ubuntu-latest, where the 619-path list (~38.8 KB) is far
+      # inside ARG_MAX. Windows' 32,767-byte command-line limit makes a single
+      # invocation fail with WinError 206, so a local evidence run on Windows
+      # must batch; see the PR body.
+      - name: Run Markdown link checker over the repository's own pages
+        run: |
+          mapfile -t pages < <(git ls-files | grep -v scripts/tests/fixtures/ | grep [.]md$)
+          echo "checked paths: ${#pages[@]}"
+          if [ "${#pages[@]}" -lt 600 ]; then
+            echo "REFUSING: the derived page set collapsed to ${#pages[@]} paths" >&2
+            exit 1
+          fi
+          python -P scripts/ci/record-check.py markdown-link-corpus -- python -P scripts/ci/check-markdown-links.py "${pages[@]}"
+
       - name: Run BER self-check
         run: python -P scripts/ci/record-check.py ber-self-check -- python -m tools.behavioral_eval_runner self-check
 
