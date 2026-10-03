@@ -22,20 +22,38 @@ invariant, never an independent source.
 Every change moves through these seven stages, in this order. The names are the
 binding ones.
 
-| # | Stage | Entry evidence | Exit evidence | Authority holder |
-| --- | --- | --- | --- | --- |
-| A | PLAN | The request or directive that asks for the change, with its source. | A written plan: what, why, blast radius, the paths it will touch, and **proportionate acceptance criteria** — few and short for a small change, but present and checkable. | The agent taking the work, or the coordinator assigning it. |
-| B | INDEPENDENT PLAN AUDIT | The plan's exact text, **bound to a captured revision** — a content hash taken when the text is captured, or an immutable comment or artifact — by an agent that did **not** write it. | A posted verdict ACCEPT or REVISE **naming the captured revision it audited**. | A different agent from the planner. |
-| C | IMPLEMENT | Its predecessor's **accepted** exit — see [the chain rule](#the-seven-stages). | The changed files; local check output; a changed-files **and** NOT-touched list; a rule-preservation inventory when the change edits governance text. | The implementing agent. |
-| D | INDEPENDENT IMPLEMENTATION AUDIT | Its predecessor's **accepted** exit — see [the chain rule](#the-seven-stages). | A posted audit naming that head, checking the plan's acceptance criteria one by one. | A different agent from the implementer. |
-| E | VALIDATE | Its predecessor's **accepted** exit — see [the chain rule](#the-seven-stages). | The repository's own checks at that head, with their commands and output; every check that could not be run named **UNRUN**. | The validating agent. |
-| F | FINAL INDEPENDENT PR CODE REVIEW | Its predecessor's **accepted** exit — see [the chain rule](#the-seven-stages). | A **posted, accepted** verdict naming that 40-character head, which also checks the PR's "Aegis skills used" table against the work. | A different agent from the author and from the merger. |
-| G | MERGE | Its predecessor's **accepted** exit — see [the chain rule](#the-seven-stages) — **and `MG1`–`MG5`**, in [the normative list](#before-merging-stage-g-entry-conditions). **No merge-gate condition is restated in this cell.** | A merge receipt recording the head, the checks, the review, the triage, and the merge agent's own skill usage. | A separate agent holding applicable authority. |
+| # | Stage | Entry evidence | Exit evidence (artifacts) | Exit disposition | Authority holder |
+| --- | --- | --- | --- | --- | --- |
+| A | PLAN | The request or directive that asks for the change, with its source. | A written plan: what, why, blast radius, the paths it will touch, and **proportionate acceptance criteria** — few and short for a small change, but present and checkable. | SD-A | The agent taking the work, or the coordinator assigning it. |
+| B | INDEPENDENT PLAN AUDIT | The plan's exact text, **bound to a captured revision** — a content hash taken when the text is captured, or an immutable comment or artifact — by an agent that did **not** write it. | A posted verdict naming the captured revision it audited. | SD-B | A different agent from the planner. |
+| C | IMPLEMENT | [The chain rule](#the-seven-stages) — stage entry. | The changed files; local check output; a changed-files **and** NOT-touched list; a rule-preservation inventory when the change edits governance text. | SD-C | The implementing agent. |
+| D | INDEPENDENT IMPLEMENTATION AUDIT | [The chain rule](#the-seven-stages) — stage entry. | A posted audit naming that head, checking the plan's acceptance criteria one by one. | SD-D | A different agent from the implementer. |
+| E | VALIDATE | [The chain rule](#the-seven-stages) — stage entry. | The repository's own checks at that head, with their commands and output; every check that could not be run named **UNRUN**. | SD-E | The validating agent. |
+| F | FINAL INDEPENDENT PR CODE REVIEW | [The chain rule](#the-seven-stages) — stage entry. | A posted verdict naming that 40-character head, which also checks the PR's "Aegis skills used" table against the work. | SD-F | A different agent from the author and from the merger. |
+| G | MERGE | [The chain rule](#the-seven-stages) — stage entry — **and `MG1`–`MG5`**, in [the normative list](#before-merging-stage-g-entry-conditions). **No merge-gate condition is restated in this cell.** | A merge receipt carrying the `MG`-keyed evidence in [the receipt list](#the-receipt-what-stage-g-must-be-able-to-show). | SD-G | A separate agent holding applicable authority. |
 
-**The chain rule: each stage's entry is its predecessor's ACCEPTED exit.** A
-posted but adverse verdict does not flow onward — `REVISE` returns the work to
-the earlier stage (re-plan → re-audit), and the next stage's entry is not
-satisfied until an **ACCEPT** is posted for the revision it will build on.
+**The exit column is split, and the split is the point.** A stage's **exit
+artifacts** — the files, lists and receipts it produces — are that stage's own
+products; no other stage states them, so they stay per-stage. The **verdict** a
+stage reaches is shared normative content, so it is single-sourced: every
+`SD-x` cell is a pointer to
+[the stage dispositions](#stage-dispositions), carrying an ID and **no content**.
+
+**The chain rule: each stage's entry is its predecessor's AFFIRMATIVE
+disposition.** The affirmative dispositions are `SD-A: COMPLETE`, `SD-B: ACCEPT`,
+`SD-C: COMPLETE`, `SD-D: ACCEPT`, `SD-E: PASS`, `SD-E: INCOMPLETE — UNRUN
+LISTED` **when its condition is met**, and `SD-F: ACCEPT`. **A non-affirmative
+disposition does not flow onward**: `REVISE` returns the work to the earlier
+stage (re-plan → re-audit), `INCOMPLETE`, `NOT MET` and `FAIL` return it to the
+stage that produced them, and an `SD-E` whose unrun checks are not fully covered
+is non-affirmative. The next stage's entry is not satisfied until an
+**affirmative** disposition is posted for the revision it will build on.
+
+**A disposition is never written bare.** It is always written with its stage
+prefix — `SD-C: INCOMPLETE`, `SD-E: INCOMPLETE — UNRUN LISTED`. A bare
+`INCOMPLETE` is ambiguous and **must not be used**: `SD-C`'s `INCOMPLETE` is
+never affirmative, while `SD-E`'s is conditionally affirmative, so the two
+cannot be told apart without the prefix.
 
 **Enforcement is classified once**, in
 [the enforcement account](#what-is-machine-enforced-and-what-is-procedural). No
@@ -92,15 +110,110 @@ in **`MG5`** and is not restated here — see
 what selects the validation depth in E. Closeout after G routes to
 `ai-closeout-reporter`. Neither is an eighth stage.
 
+### Stage dispositions
+
+**This is the sole normative rendering of the seven stage verdicts.** Each
+carries a stable ID, `SD-A`–`SD-G`. Every other mention on this page is a
+pointer carrying the ID and **no content** — including the exit-disposition
+column of the stage table. The maintenance rule is
+[the agreement check](#the-agreement-check-procedural).
+
+| ID | Stage | Disposition — the verdict the stage reaches | Affirmative? |
+| --- | --- | --- | --- |
+| `SD-A` | PLAN | **COMPLETE** when the plan carries what, why, blast radius, the paths it touches, and proportionate acceptance criteria. | yes |
+| `SD-B` | PLAN AUDIT | **ACCEPT** or **REVISE**, on the captured revision it names. | ACCEPT |
+| `SD-C` | IMPLEMENT | **COMPLETE** or **INCOMPLETE**. **COMPLETE requires an immutable head** — the commit SHA the implementation produced, recorded so the next stage audits a fixed object rather than a moving branch. | COMPLETE |
+| `SD-D` | IMPL AUDIT | **ACCEPT** or **REVISE**, resolved **per acceptance criterion**: every criterion is `MET`, `NOT MET` or `UNRUN`. ACCEPT requires **no `NOT MET`** and **every `UNRUN` recorded as a stated gap with what would resolve it**. | ACCEPT |
+| `SD-E` | VALIDATE | **PASS**, **INCOMPLETE — UNRUN LISTED**, or **FAIL**. | PASS, and INCOMPLETE — UNRUN LISTED **only when its condition below is met** |
+| `SD-F` | FINAL REVIEW | **ACCEPT** or **REVISE**, on the exact 40-character head; **and the PR template's *Security-relevant surface?* question is answered** — `No`, or `Yes` with the surfaces named. | ACCEPT |
+| `SD-G` | MERGE | **MERGED** or **NOT MERGED**, with [the receipt](#the-receipt-what-stage-g-must-be-able-to-show) carrying the evidence keyed to the `MG` IDs. | MERGED |
+
+> **`SD-E: INCOMPLETE — UNRUN LISTED`** is affirmative **only when every unrun
+> check is either (a) run by a named CI job at that exact head, evidenced, or
+> (b) recorded as a stated gap that BOTH the final review and the merge receipt
+> carry.**
+> **`UNRUN` is never `PASS`.** A check that did not run is named, not absorbed.
+
+**Why the token is worded this way.** The word `PASS` does not appear in it, so a
+skim or a `grep -i '^PASS'` cannot read it green. `INCOMPLETE` **cannot be
+skimmed as green** — the failure mode the earlier token had, where an affirmative
+suffix carried a gap onward as though it were covered. The two cases the token
+must not collapse are **covered** (unrun here, but run by a named CI job at that
+head) and **uncovered** (nobody ran it and nothing covers it): the condition
+above separates them by an **evidence test stated inside the definition**, not by
+prose a reader must infer.
+
+**A failed criterion and an unrun check each get a disposition**, which is what
+lets them route: `SD-D`'s `NOT MET` is not an ACCEPT, so the chain rule consumes
+it, and `SD-E`'s `INCOMPLETE — UNRUN LISTED` is not a `PASS`, so an uncovered
+check cannot flow onward as one.
+
+### The receipt: what Stage G must be able to show
+
+The receipt is an **evidence list keyed to the `MG` IDs**, so a merge can be
+shown afterwards. Recording it does not satisfy the conditions — a receipt is a
+record, not a gate.
+
+- **`MG1`** — the exact head and each applicable check's result at it, **or** the
+  cited exception and the failed check's authorized disposition.
+- **`MG2`** — the final review's comment identifier and the 40-character head it
+  names.
+- **`MG3`** — the automated review's result **for that head**, or its confirmed
+  unavailability for that head, **plus the triage of every P1/P2 finding**.
+- **`MG4`** — **the authority source**: the register entry's ID **and that it was
+  read from the default branch**, *or* the owner's verbatim instruction with its
+  source.
+- **`MG5`** — **either** the security verdict's comment identifier and the head it
+  names, **or** `not applicable — internal contribution`, with the reason.
+- **`SD-F`'s template answer** — the *Security-relevant surface?* answer as
+  posted.
+
 ### Before merging: Stage G entry conditions
 
 **This is the sole normative rendering of the merge-gate conditions.** Each
-carries a stable ID, `MG1`–`MG5`. Every other mention of a condition on this page
-— and in the `AGENTS.md` summary — is a pointer carrying the ID and **no
-content**; the maintenance rule for that is
-[the agreement check](#the-agreement-check-procedural). All five are checked in
-the same turn against the **exact head being merged**. Recording them in the
-receipt afterwards does not satisfy them — a receipt is a record, not a gate.
+carries a stable ID, `MG1`–`MG5`. Every other mention of a condition **on this
+page** is a pointer carrying the ID and **no content**; the maintenance rule for
+that is [the agreement check](#the-agreement-check-procedural). All five are
+checked in the same turn against the **exact head being merged**. Recording them
+in the receipt afterwards does not satisfy them — a receipt is a record, not a
+gate.
+
+**The `AGENTS.md` summary is a derived summary, not a pointer set.** It contains
+**no `MG` IDs** — measured, not assumed — and it restates the conditions in prose
+on purpose, because that file must be readable standalone at startup. It is
+derived and non-exhaustive, and **this page governs it.** The page-scoped `grep`
+in the agreement check **cannot see it**, because that grep reads this file only;
+a **separate human step** covers it — whenever `MG1`–`MG5` or `SD-A`–`SD-G`
+change, re-read the `AGENTS.md` summary and correct it forward. **No machine
+performs that step.** An earlier revision of this page claimed the summary was a
+content-free pointer set; it was not, and the claim is corrected rather than
+rescued by putting bare IDs on the startup surface, where their definitions would
+not travel with them.
+
+**What the summary restates, derived by command rather than asserted.** The
+`AGENTS.md` summary restates **all five** conditions in prose. This was derived by
+searching each condition's distinctive content markers over `AGENTS.md` at the
+revision being edited — `grep -inE '<marker>' AGENTS.md` per row — not read off by
+hand:
+
+| Condition | Marker searched | `AGENTS.md` | Verdict |
+| --- | --- | --- | --- |
+| `MG1` checks | `checks are all green\|applicable check` | `:86` | restated |
+| `MG2` final review | `final PR review is posted\|posted, accepted` | `:70` | restated |
+| `MG3` automated review | `automated review\|Codex\|usage-limit` | **none** | — |
+| `MG3` wait half | `review wait has completed\|required review wait` | `:87` | **partial only** |
+| `MG3` triage half | `P1 and P2\|P1/P2\|triaged` | **none** | — |
+| `MG4` authority | `preamble test\|register entry` | `:88-89` | restated |
+| `MG5` security review | `security review\|outside contributions` | `:71-73` | restated |
+
+So **`MG3` is restated only partially** — its review **wait** at `:87`, with **no**
+P1/P2 triage anywhere in the file. **The list is re-derived by that search
+whenever the summary changes; it is not maintained by hand.** That matters because
+the honest reason the `MG` IDs are not in the summary is that it restates *every*
+condition: a summary that restated one condition but not others would need
+explaining, while one that restates all five is simply a summary. A hand-written
+version of this list was previously wrong about exactly this — it omitted `MG5`
+and overstated `MG3` — which is why it is stated as a measurement with its command.
 
 - **`MG1` — checks.** Every applicable check is green **at that exact head** —
   not only the branch-protection-required ones. A green required pair alongside a
@@ -359,17 +472,17 @@ says so.
 | Requirement | Enforced by |
 | --- | --- |
 | The seven-stage order and stage separation | **Nothing.** No runner can see which agent held which stage. |
-| **The chain rule** — a stage's entry is its predecessor's accepted exit | **Nothing.** No runner inspects the predecessor's verdict. |
-| **The skill-selection duty** — find the skill that owns the stage, read it, verify its scope | **Nothing.** No check reads which skill an agent consulted, and nothing detects that a stage ran with no owning skill. |
+| [**the chain rule**](#the-seven-stages) — stage entry | **Nothing.** No runner inspects the predecessor's verdict. |
+| [**the skill-selection duty**](#the-enforcing-skill-for-each-stage) — skill scope | **Nothing.** No check reads which skill an agent consulted, and nothing detects that a stage ran with no owning skill. |
 | That a plan was audited by a *different* agent before implementation | **Nothing.** Agent identity is not separable on GitHub — every agent posts as the same account. |
 | [**`MG1`**](#before-merging-stage-g-entry-conditions) — checks | **Nothing.** No check aggregates a head's results, and none validates a cited exception. |
 | [**`MG2`**](#before-merging-stage-g-entry-conditions) — final review | **Nothing.** Review records are issue comments, not review objects. |
 | [**`MG3`**](#before-merging-stage-g-entry-conditions) — automated review | **Nothing.** No check reads the review or its findings. |
 | [**`MG4`**](#before-merging-stage-g-entry-conditions) — authority | **Nothing.** No check reads the register or the merge agent's brief. |
 | [**`MG5`**](#before-merging-stage-g-entry-conditions) — security review | **Nothing.** No check reads a conditional review, or knows that one was owed. |
-| **Exact-head invalidation**, including every head-bound automated and conditional review | **Nothing.** `dismiss_stale_reviews: false` and `require_last_push_approval: false`, so the platform will not invalidate a verdict when a head moves. |
+| [**exact-head invalidation**](#exact-head-invalidation) — head binding | **Nothing.** `dismiss_stale_reviews: false` and `require_last_push_approval: false`, so the platform will not invalidate a verdict when a head moves. |
 | The audited plan being bound to a captured revision | **Nothing.** No test compares a plan to the revision a verdict named. |
-| **The agreement check** — every non-normative mention of a condition is an ID with no content | **Nothing** — and none can be added in this change's scope, because `scripts/` is out of it. |
+| [**the agreement check**](#the-agreement-check-procedural) — derivation | **Nothing** — and none can be added in this change's scope, because `scripts/` is out of it. |
 | The honesty of the "Aegis skills used" table | **Nothing.** |
 | Proportionality | **Nothing.** |
 | The `AGENTS.md` binding summary drifting from this page | **Nothing** — no test compares them, and no check can be added inside a change of this kind. This is the acknowledged cost of keeping a summary in the startup file at all, and the reason this page must state that it supersedes the summary. |
@@ -386,17 +499,29 @@ text; every other mention carries its ID and nothing else. A pointer cannot go
 stale, because it holds nothing that can go stale.
 
 **The backstop is a stated check, and it is procedural.** Every reference to a
-merge-gate condition outside the normative list is its ID and nothing more. To
-verify, run:
+merge-gate condition outside the normative list is its ID and nothing more, and
+the same holds for a stage disposition. To verify, run **both** greps:
 
 ```
 grep -n 'MG[1-5]' docs/delivery-workflow.md
+grep -n 'SD-[A-G]' docs/delivery-workflow.md
 ```
 
-Every hit is either one of the five definitions or a pointer. **A hit that states
-any part of a condition's content is a defect.** Editing a condition means editing
-its definition and re-reading the hits — that is the whole maintenance burden, and
-it is bounded by the number of pointers, not by the number of renderings.
+Every hit is either one of the five condition definitions or one of the seven
+disposition definitions, or a pointer. **A hit that states any part of a
+condition's or a disposition's content is a defect.** The exit-disposition column
+of the stage table is the only place a stage's verdict may appear outside the
+disposition block, and there it is an ID alone. Editing a condition or a
+disposition means editing its definition and re-reading the hits — that is the
+whole maintenance burden, and it is bounded by the number of pointers, not by the
+number of renderings.
+
+**The `AGENTS.md` summary needs a separate human step, because no grep reaches
+it.** The two greps above are scoped to **this page**. The `AGENTS.md` summary is
+derived, carries no IDs, and is restated in prose, so nothing above can see it and
+**no machine detects its drift**. The compensating step is stated rather than
+implied: **whenever `MG1`–`MG5` or `SD-A`–`SD-G` change, re-read the `AGENTS.md`
+summary and correct it forward.** That is a residual, not a control.
 
 **Coverage is the sharper half of this, and nothing detects a gap in it.** The
 IDs make every *existing* dependent mention findable, but a condition that never
@@ -439,12 +564,12 @@ restated**.
 
 | Failure | The rule's answer |
 | --- | --- |
-| A stage was dispatched but never posted a verdict | **Incomplete, not done.** An unposted review is absent. |
+| A stage was dispatched but never posted a verdict | **`SD-x: INCOMPLETE`** — see [the stage dispositions](#stage-dispositions). A disposition that was never posted does not flow onward. |
 | The head moved while a review was in flight | **The verdict is void.** Re-review at the new head; record the old verdict as voided. This reaches every head-bound input, `MG3` and `MG5` included. |
-| An audit returns **REVISE** | Return to **re-plan → re-audit**. At the same head or a new one, the superseded verdict is recorded as superseded, not deleted. |
-| A verdict was posted but is wrong | Correct it forward with a **re-audit**. Never rely on it silently, and never edit a posted verdict in place to look right. |
+| An audit returns **REVISE** | Route it by [the chain rule](#the-seven-stages) — the work returns to the stage that produced it. At the same head or a new one, the superseded verdict is recorded as superseded, not deleted. |
+| A verdict was posted but is wrong | Correct it forward with a **re-audit** — the non-affirmative case of [the chain rule](#the-seven-stages). Never rely on it silently, and never edit a posted verdict in place to look right. |
 | **Fewer distinct agents are available than the stages this change will run** (including the single-agent case) | **Halt and escalate.** See below. |
-| A test could not be run | Report it **UNRUN**. Never as a pass. |
+| A test could not be run | Report it `UNRUN` — see `SD-E` in [the stage dispositions](#stage-dispositions). A check that did not run is named, not absorbed, and **`UNRUN` is never `PASS`**. |
 | Authority for an action is missing | Name the **exact missing grant**. Do not assume it. |
 | Two instruction sources conflict | Route to `source-of-truth-reconciler`. |
 | The security impact is unclear | Route to `human-approval-boundary`. |
