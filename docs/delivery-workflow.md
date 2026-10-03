@@ -46,16 +46,19 @@ classification** — this sentence names it and does not restate it: `SD-A`, `SD
 `SD-C`, `SD-D` and `SD-F` are affirmative when their verdicts are the ones that
 column marks, and **`SD-E` is affirmative exactly as its own condition states.**
 **A non-affirmative disposition does not flow onward**: `REVISE` returns the work
-to the earlier stage (re-plan → re-audit), `INCOMPLETE`, `NOT MET` and `FAIL`
-return it to the stage that produced them, and an `SD-E` whose unrun checks are not
-fully covered is non-affirmative. The next stage's entry is not satisfied until an
-**affirmative** disposition is posted for the revision it will build on.
+to the earlier stage (re-plan → re-audit), and `INCOMPLETE`, `NOT MET` and `FAIL`
+return it to the stage that produced them. The tokens are named here **as the
+operands this rule routes on, not as a statement of when any stage reaches
+them** — that is the `Affirmative?` column's content. The next stage's entry is
+not satisfied until an **affirmative** disposition is posted for the revision it
+will build on.
 
 **A disposition is never written bare.** It is always written with its stage
 prefix — `SD-C: INCOMPLETE`, `SD-E: INCOMPLETE — UNRUN LISTED`. A bare
-`INCOMPLETE` is ambiguous and **must not be used**: `SD-C`'s `INCOMPLETE` is
-never affirmative, while `SD-E`'s is conditionally affirmative, so the two
-cannot be told apart without the prefix.
+`INCOMPLETE` is ambiguous and **must not be used**, because those two stages'
+`INCOMPLETE`s **do not carry the same affirmative status**; which is which is the
+`Affirmative?` column's content, and the prefix is what keeps the two apart
+without repeating it.
 
 **Enforcement is classified once**, in
 [the enforcement account](#what-is-machine-enforced-and-what-is-procedural). No
@@ -624,11 +627,26 @@ grep -n 'MG[1-5]' docs/delivery-workflow.md
 grep -n 'SD-[A-G]' docs/delivery-workflow.md
 ```
 
-Every hit is either one of the five condition definitions or one of the seven
-disposition definitions, or a pointer. **A hit that states any part of a
-condition's or a disposition's content is a defect.** The exit-disposition column
-of the stage table is the only place a stage's verdict may appear outside the
-disposition block, and there it is an ID alone. Editing a condition or a
+**The criterion is a decision procedure, stated so that a third party can run the
+backstop without judgement.** Every hit is judged by these two rules and nothing
+else:
+
+- **IS content — a defect when it sits outside the block that owns it:** a
+  **statement of the condition under which a verdict is reached, or of the
+  condition under which an obligation is owed.** Such a statement belongs in the
+  one normative block that owns it — the `MG` block, the `SD` block,
+  [the dependency block](#stage-dependencies), or
+  [the handoff block](#stage-handoff).
+- **Is NOT content — permitted anywhere:** an **ID**; a **link**; a **short
+  label**; a **status token** (`present`, `absent`, `not applicable`,
+  `answered`); and **a verdict token named as an operand of a routing rule or of
+  the prefix rule** — because such a rule must be able to name the tokens it
+  routes on, and **naming a token is not stating its condition.**
+
+**So every hit is a definition, a statement inside the block that owns it, a
+pointer, or one of the permitted operand forms above.** The exit-disposition
+column of the stage table is the only place a stage's verdict may appear outside
+the disposition block, and there it is an ID alone. Editing a condition or a
 disposition means editing its definition and re-reading the hits — that is the
 whole maintenance burden, and it is bounded by the number of pointers, not by the
 number of renderings.
