@@ -85,9 +85,8 @@ holder at a time: a second agent does not pick up, re-review or merge work that
 another agent already holds, and a lane believed dead is confirmed dead before
 it is taken over rather than assumed dead.
 
-No agent
-performs two stages on the same change: the author never reviews or merges its
-own work, no reviewer — code or
+**No agent performs two stages on the same change:** the author never reviews
+or merges its own work, no reviewer — code or
 security — merges it, and a separate agent holding the applicable authority
 performs the merge only after every required review has passed at the exact
 head being merged, that head's checks are all green — not only the
