@@ -215,7 +215,7 @@ Handoffs: <secure-migration-reviewer to gate the migration; multi-tenant-securit
 ## Supporting Files
 
 - [references/rls-audit-checklist.md](references/rls-audit-checklist.md) —
-  per-command audit questions, the eight failure-mode catalog with detection
+  per-command audit questions, the seven failure-mode catalog with detection
   and fix, and the negative-test session-sequence templates.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against
