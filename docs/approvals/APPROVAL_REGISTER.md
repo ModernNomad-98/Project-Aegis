@@ -3228,3 +3228,151 @@ the entry governs.
   recorded owner decision. The candidate order is revisable only by a later
   recorded owner decision. Append subsequent lifecycle events without
   rewriting this entry.
+
+### AEGIS-APR-103: PR #648 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by the merge recorded in this entry; no
+  remaining use. Recorded after the merge.
+- **Date / Grantor:** 2026-10-03 / Peter Nguyen.
+- **Reason:** [PR #648](https://github.com/ModernNomad-98/Project-Aegis/pull/648)
+  teaches the Markdown link checker to resolve links that line-wrapping split,
+  and adds the fixtures for it. It changes
+  `scripts/ci/check-markdown-links.py`,
+  `scripts/tests/test_markdown_links.py` and five fixtures under
+  `scripts/tests/fixtures/markdown-links/wrapped/`, protected paths outside
+  AEGIS-APR-047's four BER files, so `gate-guard` fails, and merging needs a
+  one-time owner exception for the exact head.
+- **Owner decision:** "Grant + merge now, track the bound as a follow-up" — a
+  choice among dispositions offered to the owner on 2026-10-03 in the Project
+  Aegis session. The same answer authorized landing the change **with** the
+  non-blocking `[MAJOR]` below tracked as a follow-up, which is why this entry
+  records that bound rather than treating the review as clean.
+- **Scope allowed:** One `gate-guard` exception and administrator merge of
+  PR #648 at exact head `33c81fdabc6e8e59a8378c2206b551fc82ff31dd`, merged as
+  `20fadd4804a965819a2e2c444b30a62ce7c24477` at 2026-10-03T06:20:30Z under
+  `--match-head-commit`, so the merge would have been refused had the head
+  moved. The head changed only `scripts/ci/check-markdown-links.py`,
+  `scripts/tests/test_markdown_links.py` and five fixtures under
+  `scripts/tests/fixtures/markdown-links/wrapped/` (`README.md`, `code.md`,
+  `target-split.md`, `unwrapped-twin.md`, `wrapped-target.md`) — seven paths,
+  +579/−12. At that exact head `validate-skills`, `windows-offline-checks`,
+  `tools-tests-linux` and `tools-tests-windows` concluded SUCCESS and
+  **`gate-guard` concluded FAILURE**; that failure is recorded here as
+  **failed with an authorized disposition, not waived and not a pass**. The
+  [independent review](https://github.com/ModernNomad-98/Project-Aegis/pull/648#issuecomment-5966274908)
+  of the same head, by a reviewer that was not the author, returned
+  **ACCEPT** with `[BLOCKER] none`. The
+  [merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/648#issuecomment-5966307995)
+  records the head, checks, review and merge.
+
+  **Accepted with a tracked bound — one non-blocking `[MAJOR]`.** In
+  `scripts/ci/check-markdown-links.py:226-249` (`unwrap_links`) the merge is
+  quadratic — Θ(L²) in the merged length `L` — for a paragraph containing an
+  unclosed `[`; the input is entirely contributor-controlled. Measured by the
+  reviewer: a single 1.66 MB paragraph costs **20.9 s** at this head against
+  **0.135 s** at `2786841a`, with a fitted exponent of **2.22–2.26**, and
+  roughly an **8.4 MB** single paragraph reaches the `gate-guard` job's
+  15-minute timeout. The trigger is the unclosed `[`, not size alone: the same
+  832 KB shape costs **0.151 s** clean against **4.425 s** with one stray
+  bracket. The real corpus is unaffected at this head (`docs/` +0.19 s,
+  whole tracked tree +0.46 s), and the checker is **unreachable from every
+  automated path** — `git grep check-markdown-links 33c81fda -- .github/`
+  returns 0 hits, and only its own self-test module invokes it — so this is
+  [MAJOR] and not a BLOCKER. The reviewer recorded that it **becomes REVISE**
+  the moment the checker is wired into CI over the tracked tree. The
+  reviewer's preferred remedy is folding the open-construct state
+  incrementally (O(L) with an O(1) per-line test, behaviour-preserving, so the
+  23 pinned tests remain valid evidence); a per-merge cap is acceptable only
+  if it is **loud** — a silent cap would recreate the very defect this PR
+  removes. A **`[MINOR]`** was also recorded: commit `33c81fda`'s message says
+  "49 files gained counted links" where the measured figure is **48** over the
+  667 files present at both the base and that head. Neither finding was
+  resolved by this merge; both remain owed work.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
+  not change branch protection or the protected path set, and it did not widen
+  AEGIS-APR-047. It grants no authority to wire the link checker into CI, to
+  leave the quadratic bound unfixed, or to treat either the `[MAJOR]` or the
+  `[MINOR]` above as discharged.
+- **Evidence:** The owner's decision reached the merge agents **relayed through
+  the coordinating agent**, in the Project Aegis conversation on 2026-10-03: it
+  is a transcription of the owner's selected option, not a message an agent can
+  read directly, and the owner did not type into this register. The register's
+  preamble makes that valid source evidence — "Current direct user instructions
+  are valid source evidence before transcription and do not need repeated
+  consent" — so this entry rests on the owner's instruction and does not claim
+  a repository citation of the owner's own text. The repository artifacts that
+  independently record the facts above are the
+  [independent review](https://github.com/ModernNomad-98/Project-Aegis/pull/648#issuecomment-5966274908)
+  and the
+  [merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/648#issuecomment-5966307995)
+  on PR #648. Codex posted no review of this head; the record here is the
+  independent human-account review named above.
+- **Expiry / use limit:** One merge of PR #648 at the named head; consumed by
+  the merge recorded in this entry. No calendar expiry stated.
+
+### AEGIS-APR-104: PR #649 protected gate-guard exception
+
+- **Event:** GRANT.
+- **Status at recording:** Consumed by the merge recorded in this entry; no
+  remaining use. Recorded after the merge.
+- **Date / Grantor:** 2026-10-03 / Peter Nguyen.
+- **Reason:** [PR #649](https://github.com/ModernNomad-98/Project-Aegis/pull/649)
+  runs the Markdown link-checker's own self-tests from the CI workflow and
+  documents the checker. It changes `.github/workflows/validate-skills.yml`, a
+  protected path outside AEGIS-APR-047's four BER files — so `gate-guard`
+  fails, and merging needs a one-time owner exception for the exact head.
+  AEGIS-APR-047 does not reach this PR: its Scope FORBIDDEN keeps
+  "workflow/CI files, CODEOWNERS, the validator, … " for
+  "separate one-time owner decisions". The red was therefore cured by this
+  one-time decision and by nothing standing.
+- **Owner decision:** "Grant + merge now" — a choice among dispositions offered
+  to the owner on 2026-10-03 in the Project Aegis session. No follow-up was
+  attached to this answer.
+- **Scope allowed:** One `gate-guard` exception and administrator merge of
+  PR #649 at exact head `86725c2aebacf140513fb22f802df0a8c6193998`, merged as
+  `25cc0e7a284843075b7da79cfe0c481d18fe059a` at 2026-10-03T06:22:23Z under
+  `--match-head-commit`, so the merge would have been refused had the head
+  moved. The head changed only `.github/workflows/validate-skills.yml` and the
+  unprotected `docs/offline-ci.md` — two paths, +19/−2. At that exact head
+  `validate-skills`, `windows-offline-checks`, `tools-tests-linux` and
+  `tools-tests-windows` concluded SUCCESS and **`gate-guard` concluded
+  FAILURE**; that failure is recorded here as **failed with an authorized
+  disposition, not waived and not a pass**. The
+  [independent review](https://github.com/ModernNomad-98/Project-Aegis/pull/649#issuecomment-5966277042)
+  of the same head, by a reviewer that was not the author, returned **SHIP**
+  with `[BLOCKER]` none, `[MAJOR]` none and `[MINOR]` none, and one declined
+  `[NIT]` about a follow-up that the review found declared but not recorded.
+  The
+  [merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/649#issuecomment-5966323491)
+  records the head, checks, review and merge.
+
+  **An earlier verdict on this PR was voided, and is recorded as voided.** A
+  first review at head `e93c4887` returned SHIP. The head then moved to
+  `86725c2a` for a required documentation sync, which **voided** that verdict,
+  and a **fresh** review was performed at the new head. The exception above
+  covers the merge at `86725c2a` only; the voided verdict at `e93c4887` is not
+  authority for anything and is recorded here so that no later reader mistakes
+  it for a live review of the merged head.
+- **Scope FORBIDDEN:** No other PR, head or failed check was covered. It did
+  not change branch protection, it removed no path from the protected path
+  set, and it did not widen AEGIS-APR-047. It does not cover the voided
+  `e93c4887` head, and it does not authorize wiring the link checker over the
+  tracked tree — this PR wires only the checker's own self-tests.
+- **Evidence:** The owner's decision reached the merge agents **relayed through
+  the coordinating agent**, in the Project Aegis conversation on 2026-10-03: it
+  is a transcription of the owner's selected option, not a message an agent can
+  read directly, and the owner did not type into this register. The register's
+  preamble makes that valid source evidence — "Current direct user instructions
+  are valid source evidence before transcription and do not need repeated
+  consent" — so this entry rests on the owner's instruction and does not claim
+  a repository citation of the owner's own text. The repository artifacts that
+  independently record the facts above are the
+  [independent review](https://github.com/ModernNomad-98/Project-Aegis/pull/649#issuecomment-5966277042),
+  which states in its own words that "the earlier verdict at `e93c4887` was
+  voided by the head move", and the
+  [merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/649#issuecomment-5966323491)
+  on PR #649, which records the red `gate-guard` as "the authorised
+  disposition, not a waived check".
+- **Expiry / use limit:** One merge of PR #649 at the named head; consumed by
+  the merge recorded in this entry. No calendar expiry stated.
