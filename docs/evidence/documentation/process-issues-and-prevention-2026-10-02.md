@@ -1,6 +1,6 @@
 # Process issues and prevention — issue register, 2026-10-02
 
-> **Current reading, checked 2026-10-02:** this page records five defect classes
+> **Current reading, checked 2026-10-02:** this page records six defect classes
 > that one coordinated documentation session observed, each with the command
 > that proves it and the standing rule that prevents it. It is a **working
 > rule** for agents, not a narrative and not a status report. Every evidence
@@ -28,8 +28,8 @@ This page is read in two situations.
 
 1. **Before dispatching or performing staged work.** Read the rule you are
    about to rely on and run its **Detection check** yourself, in the same turn,
-   against the revision you are acting on. The five rules carry stable IDs
-   (`PROC-01` … `PROC-05`) so a brief, a review record or a PR description can
+   against the revision you are acting on. The six rules carry stable IDs
+   (`PROC-01` … `PROC-06`) so a brief, a review record or a PR description can
    cite one without restating it.
 2. **After a defect is found.** Add a class here using the same five-part shape:
    **Issue / Evidence / How it happened / Standing rule / Detection check**. Do
@@ -603,24 +603,247 @@ $ gh pr list --repo ModernNomad-98/Project-Aegis --state open --json number,titl
 
 ---
 
+## Class 6 — re-dispatching a lane that was not dead, and the second writer it puts on one worktree
+
+### Issue
+
+The coordinator dispatched the TEN-PAGES lane **twice**. The first dispatch created
+the worktree `wt-ten`, its branch and its HEAD at `2026-10-02 17:13:20 -07:00`; the
+second was sent later because the coordinator believed the first had produced
+nothing. **Both ran.** One attempt committed `4d08377d` at 17:15:13 while the other
+was concurrently editing the same files in the same worktree, and five commits landed
+on that branch inside seven minutes (17:13:20 to 17:19:48). The second dispatch did
+not duplicate work on a dead lane; it added a second writer to a live one.
+
+### Evidence
+
+Run read-only, in `C:\src\Project Aegis\coord-main` and with `git -C` into
+`C:\src\Project Aegis\wt-ten`. **PROVEN** except where labelled otherwise. The
+reader's own provenance matters here: `coord-main` is **not** a separate clone —
+`git rev-parse --git-dir` returns
+`C:/src/Project Aegis/Project-Aegis/.git/worktrees/coord-main` — so it shares one
+object store and one ref namespace with every lane's worktree, which is why the
+commits below resolve here at all. `origin/main` was re-fetched, not assumed:
+
+```text
+$ git fetch origin && git rev-parse origin/main
+5703e93f1d29cdc382f691f0e9cfecb8d49faa30
+```
+
+**Two dispatches, one worktree.** The reflog is the artifact, and it shows six
+commits of which five survive:
+
+```text
+$ git -C "C:\src\Project Aegis\wt-ten" reflog --date=iso
+145647cc HEAD@{2026-10-02 17:19:48 -0700}: commit: fix(skills): restore the seven failure-mode count in rls-policy-auditor
+a69d4d1f HEAD@{2026-10-02 17:19:42 -0700}: commit: docs(skills): link the reconciliation citation in rls-policy-auditor
+9dd8c59a HEAD@{2026-10-02 17:19:37 -0700}: reset: moving to 9dd8c59a
+5ebfee93 HEAD@{2026-10-02 17:19:29 -0700}: commit: docs(skills): link the reconciliation citation in rls-policy-auditor
+9dd8c59a HEAD@{2026-10-02 17:19:28 -0700}: commit: docs(skills): define TALI in the local-ci-mirror-preflight reading key
+54f2dd02 HEAD@{2026-10-02 17:19:28 -0700}: commit: docs(skills): define TSC and SDLC at first use in compliance-control-foundation
+4d08377d HEAD@{2026-10-02 17:15:13 -0700}: commit: docs(skills): correct the rls-policy-auditor failure-mode count
+6715cefc HEAD@{2026-10-02 17:13:20 -0700}: reset: moving to HEAD
+6715cefc HEAD@{2026-10-02 17:13:19 -0700}:
+$ git rev-list --count 6715cefc..145647cc
+5
+```
+
+`5ebfee93` is the tell: a commit written at 17:19:29 was removed by a
+`reset: moving to 9dd8c59a` eight seconds later, and a commit with the same subject
+was written again at 17:19:42, thirteen seconds after the first. A commit written,
+reset away and rewritten with the same subject inside one worktree is what concurrent
+writers look like in a reflog.
+
+**Which agent authored which commit is UNVERIFIED and is not asserted here.** Both
+agents commit under one git identity, and commit metadata cannot distinguish them.
+The proven cause is narrower and is enough on its own: **the coordinator issued two
+dispatches for one lane.**
+
+**The regression those writers left behind, reproduced verbatim.**
+
+```text
+$ git show 4d08377d --numstat --format=''
+1       1       .claude/skills/rls-policy-auditor/SKILL.md
+$ git show 4d08377d --format='' -- .claude/skills/rls-policy-auditor/SKILL.md
+-  per-command audit questions, the seven failure-mode catalog with detection
++  per-command audit questions, the eight failure-mode catalog with detection
+$ git show 4d08377d:.claude/skills/rls-policy-auditor/references/rls-audit-checklist.md | sed -n 35p
+## Seven failure modes (detect → fix)
+   numbered items under that heading = 7      # counted, not read off
+   failure modes named in Workflow step 4 of SKILL.md = 7
+```
+
+The commit message asserts "**eight** distinct failure modes" and then lists
+**exactly seven** — missing tenant scope, deny-by-default gap, recursion, unsafe
+SECURITY DEFINER, over-broad GRANT, service-role leakage, frontend-derived scope,
+counted by splitting the parenthetical. It also claims "the reference itself
+enumerates eight numbered modes", and the reference says seven at line 35 with seven
+numbered items beneath it. Workflow step 4 names those same seven. **The only place
+either file says eight is the edited line itself.** A count word was changed to a
+number that no source in the skill supports, by a commit whose own message
+contradicts itself one sentence later. That self-contradicting claim, not the
+one-word edit, is the durable lesson.
+
+**The briefed claim "the branch was NEVER pushed" has DRIFTED and is now FALSE.**
+
+```text
+$ git ls-remote --heads origin | Select-String 'readability-ten-missed-pages'
+145647cc9dc74dff259f651442ab7c9c8a14f70a  refs/heads/docs/readability-ten-missed-pages
+$ git merge-base --is-ancestor 4d08377d 145647cc ; echo $?
+0
+$ git for-each-ref --contains 4d08377d --format='%(refname)'
+refs/heads/docs/readability-ten-missed-pages
+refs/remotes/origin/docs/readability-ten-missed-pages
+```
+
+The regression commit is therefore **reachable and published**, not a dangling
+object: both tests required by `PROC-01` agree. The never-pushed claim was true when
+it was first measured and false by the time it was used, because the owning lane
+pushed during the same session — so the brief carried a stale measurement forward
+without its instant, which is the Class 3 defect. **This is the register's own
+subject turning on the register: evidence drifts between measurement and use.** The
+drift did no harm here only because it moved the fact from "unpublished" to
+"published"; the same mechanism moved Class 3's gate condition the other way.
+
+**The briefed owed item is DISCHARGED by the owning lane, not owed.** The instruction
+"the seven→eight regression must be corrected before that branch is pushed" was
+already satisfied at `145647cc`, whose subject is exactly that correction:
+
+```text
+$ git show 145647cc:.claude/skills/rls-policy-auditor/SKILL.md | sed -n 217p
+  per-command audit questions, the seven failure-mode catalog with detection
+$ git show origin/main:.claude/skills/rls-policy-auditor/SKILL.md | sed -n 217p
+  per-command audit questions, the seven failure-mode catalog with detection
+```
+
+**The line is identical; the file is not.** The blobs differ — `cf8d207f` at
+`145647cc` against `3d25584f` on `origin/main` — because the branch also carries
+`a69d4d1f`'s reconciliation citation. A verifier comparing whole-file hashes would
+report a false mismatch, and the count that had to match does match. This is
+`PROC-01`'s lesson in miniature: run the test that answers the question asked, and do
+not let a broader test answer a narrower one.
+
+**A second instance of the defect, and in this one the rule WORKED.** A later agent
+was dispatched for **this** register lane after the lane already existed. Its
+`git worktree add` failed with exit 255 — "a branch named
+'docs/process-issues-and-prevention' already exists" — and it **self-halted instead
+of adding a second writer**. The event is **UNVERIFIED** from this repository: a
+failed dispatch leaves no ref, no file and no log entry, and the coordinator's
+cadence log `.coord/coordinator-cadence.jsonl` records no such line (read in full,
+9 lines). What is proven is the standing condition the failure left and the outcome:
+
+```text
+$ git worktree list | Select-String 'wt-register|wt-ten'
+C:/src/Project Aegis/wt-register    5520ec4f [docs/process-issues-and-prevention]
+C:/src/Project Aegis/wt-ten         145647cc [docs/readability-ten-missed-pages]
+```
+
+Exactly one worktree holds each of the two branches. No second writer exists. The
+rule worked in the instance where its check had something to see — which is the
+distinction the honest limit below turns on.
+
+**A third drift, in this page's own provenance, observed while this class was
+written.** The "Current reading" block above cites `origin/main` =
+`6715cefc9347ec0c5e3bd93b65f580f0d7545d3f`. Re-fetched while writing this class, it
+is `5703e93f1d29cdc382f691f0e9cfecb8d49faa30`. Classes 1–5 were re-checked at the new
+revision and still hold: `git merge-base --is-ancestor 65bacc7d6b85 origin/main`
+still exits 1, and PR #629 is still `OPEN` with
+`git cat-file -e origin/main:tools/readability_acceptance/check_index.py` still
+exiting 128. The header is left exactly as written, per this document's practice of
+correcting forward rather than rewriting a dated measurement.
+
+### How it happened
+
+**Root cause: the absence of commits was read as evidence that the lane was dead.**
+At the moment of the second dispatch the lane had produced no commits. It was not
+dead; it was early, with uncommitted work in flight in its worktree. The coordinator
+had one observable — the commit log — and read a negative there as a positive
+elsewhere: "no commits" became "no work", and "no work" became "safe to re-dispatch".
+Neither inference holds. A lane's first *durable* artifact is usually its first
+commit, which arrives after its worktree, its branch and its uncommitted edits, and
+in that gap the repository looks the same for a lane that is early and for a lane
+that was never dispatched.
+
+**This shares its cause with Class 2.** There, a merge agent and a review agent held
+one pull request concurrently, and #626 and #627 merged with no review record in
+existence at merge time; here, two agents held one worktree concurrently. Both are
+**one resource with two writers**, and in both the coordinator dispatched the second
+writer on the strength of a state that did not yet show the first one's effect — a
+review record not yet posted, a commit not yet made. `PROC-02` forbids two agents on
+one pull request; this class forbids two agents on one worktree, for the same reason.
+
+### Standing rule — `PROC-06`
+
+**Before re-dispatching any lane, verify that the previous attempt is actually
+inactive. Absence of commits is NOT evidence of an inactive lane.** The verification
+is a positive search for the lane's artifacts, run in the dispatcher's own turn, and
+a lane may be re-dispatched only when that search finds **none** of them — or when
+the previous attempt has **explicitly reported completion**. A lane whose worktree,
+branch, remote ref or pull request exists is live until it says otherwise, however
+long its commit log has been empty.
+
+### Detection check
+
+Run all five in the dispatcher's turn, and treat any output other than a refusal to
+re-dispatch as a bug:
+
+```text
+$ git worktree list
+$ git -C <worktree> status --porcelain
+$ git branch --list <name>
+$ git ls-remote --heads origin <name>
+$ gh pr list --head <name> --state all
+```
+
+A lane may be re-dispatched only when those five show **no worktree, no local branch,
+no remote ref and no pull request**, or when the previous attempt has explicitly
+reported completion. A non-empty `status --porcelain` is the strongest signal of all:
+it is uncommitted work in flight, which is exactly the state the double dispatch of
+Class 6 ran over.
+
+**The honest limit of this rule, which is the load-bearing part.** At the instant of
+the original double dispatch this check would have returned **nothing for all five
+commands** — there was no worktree, no branch, no remote ref, no PR and no commit for
+that lane, because the first dispatch had not yet created them. No check can
+distinguish "early" from "dead" in that window; the only defence there is patience,
+and **this rule does not solve that case**. What it does solve is the case where a
+lane has already left any artifact at all: then the five commands see it and the
+second dispatch is refused, as it was for this register's own lane. Saying plainly
+which case the rule cannot cover is part of the rule's value, because a rule believed
+to cover everything stops the search for the case it misses.
+
+---
+
 ## Honest limits of this register
 
-- **It records the defects this session observed.** Five classes were reported
-  and five reproduced. There may be others that nobody noticed, and an unobserved
-  defect is not covered by any rule here. Silence in this document is not
-  evidence of correctness.
+- **It records the defects this session observed.** Six classes were reported. Five
+  reproduced by command; the sixth reproduces in its consequence — a published
+  regression commit, and a commit written, reset away and rewritten in one worktree —
+  while its cause is session state and is labelled UNVERIFIED. There may be others
+  that nobody noticed, and an unobserved defect is not covered by any rule here.
+  Silence in this document is not evidence of correctness.
 - **A rule that is not enforced mechanically can still be forgotten.** `PROC-01`
-  through `PROC-05` are written as checks so that compliance is observable, but
+  through `PROC-06` are written as checks so that compliance is observable, but
   observability is not enforcement: an agent that does not run the check leaves
   no trace that it skipped one. The repository's own cadence log states the
   consequence for its own case — a missing entry means the check did not run,
   not that nothing was wrong.
-- **Two of the five classes are dispatch-time properties, invisible in the
-  repository.** `PROC-02` (no two agents on one PR) and the re-verification half
-  of `PROC-03` describe what agents were told and when. Git and GitHub record
-  neither, so no gate can read them.
+- **Three of the six classes are dispatch-time properties, and one of them has a
+  readable check.** `PROC-02` (no two agents on one PR), the re-verification half of
+  `PROC-03` and `PROC-06`'s re-dispatch decision describe what agents were told and
+  when; git and GitHub record none of those decisions, so no gate can read them.
+  `PROC-06` differs in that the **artifacts a live lane leaves** — worktree, branch,
+  remote ref, pull request — *are* readable, which is why it has a command check.
+  What stays unreadable is whether a lane that leaves none of them is early rather
+  than dead.
 - **One class rests on a session artifact that is not in this repository.**
   Class 3's claim about what a brief contained is labelled UNVERIFIED above.
+- **One class's cause is session state, and its second instance is a report.**
+  Class 6's double dispatch, and the later `git worktree add` that failed and
+  self-halted, are dispatch events: a failed dispatch leaves no ref, no file and no
+  log entry. Class 6's consequence reproduces in the `wt-ten` reflog and its standing
+  condition reproduces in `git worktree list`, but both events are labelled
+  UNVERIFIED above.
 - **One class's central figure is unverified.** Class 5's "159 pages" figure is
   not reproducible from `main`.
 - **This page is itself subject to the same rules.** Its own line count and
@@ -656,6 +879,7 @@ it can be added by this PR.
 | `PROC-03` (re-verify briefed conditions) | A property of a brief's text and an agent's turn. Unrecorded in the repository. |
 | `PROC-03` (record the measurement instant) | Checkable only by a reader of the record. A reviewer can enforce it; CI cannot. |
 | `PROC-05` (re-derive from `main`) | Whether a conclusion was re-derived is a claim about process, not about bytes. Only the existence half is checkable. |
+| `PROC-06` (re-dispatch check) | A runner sees no dispatch, so there is nothing for it to fail on: the check is five read-only commands a dispatcher must run in its own turn. Every input to it *is* observable — worktree, branch, remote ref, PR — but observability is not a gate, and no run of it can tell an early lane from a dead one (Class 6's honest limit). |
 
 **Recommendation for `AGENTS.md` (not written there by this PR).** The two rules
 that belong in the agent instruction file rather than in a script are the
@@ -711,6 +935,11 @@ request description.
 | 4 | The join-and-split method over-reports by 1 on an unterminated blob | **PROVEN** | `behavioral-eval-runner-wp-2b-0-finalization.json`: 13 vs 12 |
 | 5 | PR #629 is open and its tool is absent from `main` | **PROVEN** | `gh pr view 629`; `git cat-file -e origin/main:tools/...` → 128 |
 | 5 | The "159 no-record pages" figure | **UNVERIFIED** | requires running the unmerged tool; not done |
+| 6 | The seven→eight regression reproduces verbatim, and no source supports "eight" | **PROVEN** | `git show 4d08377d --numstat` → `1 1`; `rls-audit-checklist.md:35` = "Seven failure modes"; 7 numbered items; Workflow step 4 names 7 |
+| 6 | The briefed "branch was NEVER pushed" is now **false**: the branch is on the remote at `145647cc` | **PROVEN** | `git ls-remote --heads origin`; `git merge-base --is-ancestor 4d08377d 145647cc` → 0; `git for-each-ref --contains 4d08377d` → 2 refs |
+| 6 | The seven→eight regression is **discharged** by the owning lane at `145647cc`, not owed | **PROVEN** | line 217 at `145647cc` and at `origin/main` both read "the seven failure-mode catalog" |
+| 6 | Two dispatches put two writers on one worktree (`wt-ten`) | **UNVERIFIED** (the dispatch is session state; its consequence reproduces) | `git -C "C:\src\Project Aegis\wt-ten" reflog --date=iso`: 6 commits, one reset away, 5 surviving |
+| 6 | A later `git worktree add` failed (exit 255) and the agent self-halted | **UNVERIFIED** (reported in a brief; a failed dispatch leaves no trace) | `git worktree list`: exactly one worktree per branch |
 
 ---
 
