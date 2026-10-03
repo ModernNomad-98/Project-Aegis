@@ -636,11 +636,30 @@ names. **This is in addition to the head binding, not a replacement** — the he
 binds the candidate tree, the hash binds the body fields the tree does not
 contain.
 
-> **Method (PROC-04 — a published figure names its method):** take each bound
-> field's text in the order listed above, **collapse every run of whitespace to a
-> single space and trim** it, join the three with a single newline, and take the
-> **`sha256`** of that UTF-8 string, recorded as its **first 16 hex characters**.
-> A field that is absent hashes as the empty string and is recorded as absent.
+> **Method (PROC-04 — a published figure names its method).** Each bound field is
+> **delimited in the body by an explicit sentinel pair**, so its boundaries are
+> fixed by the document rather than by a reader's judgement:
+>
+> | Bound field | Opens with the line | Closes before the line |
+> | --- | --- | --- |
+> | the witness | `<!-- bound-field: witness -->` | `<!-- bound-field: end -->` |
+> | the skills table | `<!-- bound-field: skills -->` | `<!-- bound-field: end -->` |
+> | the security answer | `<!-- bound-field: security -->` | `<!-- bound-field: end -->` |
+>
+> **Payload:** for each field take the lines **strictly between** its opening
+> sentinel and the next `end` sentinel — sentinels themselves excluded —
+> **collapse every run of whitespace to a single space and trim** each field, join
+> the three in the order above with a single newline, take the **`sha256`** of that
+> UTF-8 string, and record its **first 16 hex characters**.
+>
+> **A sentinel that is missing, or an opening sentinel with no matching `end`, is
+> an ERROR.** The hash is then **undefined and the verdict cannot be posted** — it
+> is **not** treated as an empty field and it is **not** skipped. This rule is
+> deliberate and load-bearing: an absent field that hashed as the empty string
+> would let a change to a bound field leave the hash unchanged, which would defeat
+> the binding entirely. **The fields are defined by their sentinels, not by their
+> headings**, so a heading that is missing, reworded or reformatted cannot
+> silently zero a field.
 
 **Any change to a bound field voids the verdict** — **exactly as a moved head
 does**, and by the same rule: this is the invalidation principle of
@@ -723,11 +742,14 @@ else:
   the one normative block that owns it — the `MG` block, the `SD` block,
   [the dependency block](#stage-dependencies),
   [the handoff block](#stage-handoff), or, for the chain rule's entry condition,
-  [the seven stages](#the-seven-stages), which states it once. **The page has
-  exactly two normative ID families, `MG` and `SD`, plus the chain rule, so these
-  clauses reach every kind of normative statement it can contain** — and a future
-  block added to the owning set must be single-sourced the way these are, or the
-  set stops holding.
+  [the seven stages](#the-seven-stages), which states it once. **These clauses
+  reach every ID-bearing condition on the page** — every statement of when an
+  `MG` condition or an `SD` disposition is reached or satisfied, and the chain
+  rule's entry condition — and a future block added to the owning set must be
+  single-sourced the way these are, or the set stops holding. **They do not claim
+  reach over notation conventions** (for example *"a disposition is never written
+  bare"*): those state how a token is written, not when anything is reached or
+  owed, and their token mentions are permitted operands.
 - **Is NOT content — permitted anywhere:** an **ID**; a **link**; a **short
   label**; a **status token** (`present`, `absent`, `not applicable`,
   `answered`); and **a verdict token named as an operand of a routing rule or of
