@@ -40,13 +40,15 @@ that disposition column is a pointer to
 [the stage dispositions](#stage-dispositions), carrying an ID and **no content**.
 
 **The chain rule: each stage's entry is its predecessor's AFFIRMATIVE
-disposition.** The affirmative dispositions are `SD-A: COMPLETE`, `SD-B: ACCEPT`,
-`SD-C: COMPLETE`, `SD-D: ACCEPT`, `SD-E: PASS`, `SD-E: INCOMPLETE — UNRUN
-LISTED` **when its condition is met**, and `SD-F: ACCEPT`. **A non-affirmative
-disposition does not flow onward**: `REVISE` returns the work to the earlier
-stage (re-plan → re-audit), `INCOMPLETE`, `NOT MET` and `FAIL` return it to the
-stage that produced them, and an `SD-E` whose unrun checks are not fully covered
-is non-affirmative. The next stage's entry is not satisfied until an
+disposition.** The **`Affirmative?` column of
+[the stage dispositions](#stage-dispositions) is the only home of that
+classification** — this sentence names it and does not restate it: `SD-A`, `SD-B`,
+`SD-C`, `SD-D` and `SD-F` are affirmative when their verdicts are the ones that
+column marks, and **`SD-E` is affirmative exactly as its own condition states.**
+**A non-affirmative disposition does not flow onward**: `REVISE` returns the work
+to the earlier stage (re-plan → re-audit), `INCOMPLETE`, `NOT MET` and `FAIL`
+return it to the stage that produced them, and an `SD-E` whose unrun checks are not
+fully covered is non-affirmative. The next stage's entry is not satisfied until an
 **affirmative** disposition is posted for the revision it will build on.
 
 **A disposition is never written bare.** It is always written with its stage
@@ -170,7 +172,7 @@ property whose absence produced the deadlock described under `SD-E`.
 | From | To | What the later stage must carry |
 | --- | --- | --- |
 | `SD-A` | `SD-B` | the plan text and its captured revision |
-| `SD-A` | `SD-D` | the recorded classification, and any criterion the plan declared not verifiable at this head |
+| `SD-A` | `SD-D` | the recorded classification, and the plan's own statement of what it cannot verify at this head |
 | `SD-A` | `SD-E` | the recorded classification, which selects the validation depth in E |
 | `SD-B` | `SD-C` | the accepted plan and the revision the verdict named |
 | `SD-C` | `SD-D` | the head commit, **its tree**, and the base commit |
@@ -199,26 +201,28 @@ stage's exit cell points here rather than carrying its own version.
 ### The receipt: what Stage G must be able to show
 
 The receipt is a **status table keyed to the `MG` IDs**. It records **outcomes**,
-never requirements: it says **whether** the evidence exists and **where**, and
-where the condition's own text matters it **links** to the condition. Recording it
-does not satisfy the conditions — a receipt is a record, not a gate.
+never requirements: it says **whether** the evidence exists, and **links** to the
+condition whose requirement it is reporting on. Recording it does not satisfy the
+conditions — a receipt is a record, not a gate.
 
-| ID | Evidence | Pointer, or the scope clause that makes it not applicable |
-| --- | --- | --- |
-| `MG1` | `present` / `absent` / `not applicable` | the head and each check's result, or the cited exception — see [`MG1`](#before-merging-stage-g-entry-conditions) |
-| `MG2` | `present` / `absent` / `not applicable` | the review's comment identifier and the head it names — see [`MG2`](#before-merging-stage-g-entry-conditions) |
-| `MG3` | `present` / `absent` / `not applicable` | the review's result for that head and the P1/P2 triage — see [`MG3`](#before-merging-stage-g-entry-conditions) |
-| `MG4` | `present` / `absent` / `not applicable` | the authority source — see [`MG4`](#before-merging-stage-g-entry-conditions) |
-| `MG5` | `present` / `absent` / `not applicable` | the verdict and its head, **or** `not applicable` with the reason **naming `MG5`'s own scope clause** — see [`MG5`](#before-merging-stage-g-entry-conditions) |
-| `SD-F` template answer | `answered` | the posted answer |
+| ID | Evidence |
+| --- | --- |
+| [`MG1`](#before-merging-stage-g-entry-conditions) | `present` / `absent` / `not applicable` |
+| [`MG2`](#before-merging-stage-g-entry-conditions) | `present` / `absent` / `not applicable` |
+| [`MG3`](#before-merging-stage-g-entry-conditions) | `present` / `absent` / `not applicable` |
+| [`MG4`](#before-merging-stage-g-entry-conditions) | `present` / `absent` / `not applicable` |
+| [`MG5`](#before-merging-stage-g-entry-conditions) | `present` / `absent` / `not applicable` |
+| `SD-F` template answer | `answered` |
+
+**The receipt carries IDs, statuses and pointers only** — the linked ID *is* the
+pointer, and no cell restates what a condition requires.
 
 **`not applicable` is permitted only where the condition's own scope clause says
-so, and the reason column must name that clause.** That is what makes the
-vocabulary truthful for every case, including the one that used to have no true
-option — an **outside contribution that touches no security-relevant surface**:
-`MG5: not applicable`, reason = the same scope clause, because the change does not
-touch a security-relevant surface and so no review is owed. **No fourth option was
-added to make that true.**
+so, and the receipt records which clause by linking to the condition — it does not
+restate the clause.** That is what makes the vocabulary truthful for every case,
+including the one that used to have no true option: a contribution that **owes no
+review under `MG5`'s own scope clause** takes `MG5: not applicable` on that
+clause's authority. **No fourth option was added to make that true.**
 
 **The general rule this receipt obeys, and which any future derived list must
 obey:**
@@ -300,8 +304,8 @@ a measurement with its command, kept where a measurement belongs.
   defect. This is `AEGIS-APR-050`'s requirement and it is not optional. A result
   at a superseded head does not satisfy `MG3`.
 - **`MG4` — authority.** The merge agent has confirmed **its own** authority.
-  **Quoted verbatim from `AGENTS.md:88-91`** — the qualifier this turns on is on
-  `:88-89` — and quoted rather than paraphrased **because paraphrase is exactly
+  **Quoted verbatim from `AGENTS.md:91-94`** — the qualifier this turns on is on
+  `:91-92` — and quoted rather than paraphrased **because paraphrase is exactly
   what dropped that qualifier** in earlier revisions of this page:
 
   > The merge agent confirms that authority itself — a register entry
