@@ -2591,3 +2591,458 @@ was a failure of the rule or of its author's reading — the instruction itself 
 followed, and the instruction was what measurement contradicted. It does not
 claim that paragraph-initial bold is enforced: no test reads paragraph shape, and
 this correction is a rule an agent follows rather than a gate that fails.
+
+---
+
+## Appended 2026-10-03 (fourth append) — `Q1`: the `PROC-02` sweep is DISCHARGED
+
+This append is **pure addition**. It changes no earlier line, renumbers no class and rewrites no
+rule: owed-work items 1–5 above are left exactly as written, and item 2 — *"`PROC-02` — a sweep is
+owed"* — is discharged **here**, so that the discharge and the owed item are both readable without
+either being rewritten.
+
+**Why an append and not a new file.** Item 2 is a debt this page records, in this page's own
+list; a discharge filed elsewhere would leave the debt and its settlement in two places, which is
+the split that made the first sweep invisible in the first place. Before this append,
+`git grep -l 'PROC-02' origin/main` returned **exactly one** tracked file — this page — so the
+sweep existed as a claim about a measurement and not as the measurement. That is the `PROC-12`
+failure mode this register names.
+
+**Revision history of this block.** Four review passes corrected it before it merged, and every
+correction is stated where it applies rather than hidden. A stated **reason** for the inline
+endpoint's zero that was false by 191 rows; a **zero-match count** computed under two different
+patterns and printed as two different numbers; an **unpublished verdict-token set**; a **receipt
+limit**; a **findings heading** that asserted all of its rows were review records; and, in this
+pass, the four corrections in the section immediately below. Every pattern is given verbatim so
+that every count in this append reproduces from the commands and the patterns alone.
+
+### The instrument turned on itself, and that is part of the result
+
+This append exists to catch claims that outrun their evidence. **It made three of them, and two
+different reviews caught them.** The first — a *reason* for a zero that was false by 191 rows —
+was caught by the **independent human review** at comment `5972227605`. The other two — that this
+append's own supporting commands' outputs were quoted, and that this repository has no formal
+review objects — were caught by **`chatgpt-codex-connector[bot]`**, in inline findings
+`4174407637` and `4174407642`, both filed `2026-10-03T18:51:17Z`. Two of the three are the
+identical failure — **a claim about its own evidence that its own text does not support** — which
+is the failure the whole page is about.
+
+I am recording that here rather than quietly fixing it, for one reason a reader needs: **the
+counts below were produced by an instrument that was wrong four times, so they should be read
+with the corrections visible rather than trusted because they are printed.** That is also the
+strongest evidence for this register's own thesis — the errors were found by an independent
+reviewer re-measuring, not by the author re-reading, and the same is true of every finding below.
+
+### Scope
+
+**Every merged pull request in this repository's history**, from the first to the latest,
+enumerated in one paginated sweep rather than sampled. The window is published as a **series**
+for the reason the `PROC-14` append above gives for its own count: a single integer beside a
+moving `main` decays the moment another PR merges, and the corpus of comments grows with every
+cycle.
+
+| measurement | merged PRs | latest `mergedAt` in the window | comment rows found | PRs found |
+| --- | --- | --- | --- | --- |
+| the session that ran the first sweep | 634 | `2026-10-03T02:16:17Z` | 23 | 20 |
+| the first draft of this append | 639 | `2026-10-03T06:56:24Z` | 28 | 25 |
+| this revision's earlier measurement | 640 | `2026-10-03T18:09:29Z` | 29 | 26 |
+| **this revision** (corpus closed at the newest comment, `2026-10-03T21:23:54Z`) | **641** | **`2026-10-03T21:17:59Z`** | **27** | **27** under the per-comment rule; **15** under the register's own detector |
+
+The window opens at the repository's earliest merged pull request, #1, `2026-07-06T19:06:52Z`;
+there is nothing before it to cover. Completeness was cross-checked against `gh pr list --state
+all`: **658** pull requests = **641 merged + 4 open +
+13 closed-unmerged**, so the merged enumeration is whole and no pagination was lost.
+
+**The rows are measurements, not corrections of one another.** The counts move because the corpus
+moves: merges and comments landed between measurements, and one of those merges — #653 — is
+itself a finding here, its review record posting 40 seconds after it merged. Earlier figures are
+left standing as their own rows rather than overwritten, which is the same practice this page
+applies to its own superseded counts.
+
+### Method — the exact commands, the published patterns, and the two definitions of a finding
+
+Both corpora are fetched **in bulk**; no call is made per pull request.
+
+```text
+$ gh pr list --state merged --limit 1000 \
+    --json number,title,mergedAt,headRefOid -R ModernNomad-98/Project-Aegis
+$ gh pr list --state all    --limit 1000 --json number,state \
+    -R ModernNomad-98/Project-Aegis
+$ gh api --paginate --slurp "/repos/ModernNomad-98/Project-Aegis/issues/comments?per_page=100"
+$ gh api --paginate --slurp "/repos/ModernNomad-98/Project-Aegis/pulls/comments?per_page=100"
+```
+
+**One more method check, from the same sweep, because a cap and a pagination are different
+claims.** The two `gh pr list` calls use `--limit 1000` — a **cap**, not pagination — and a cap that
+is reached truncates silently. It is **not** reached: the enumeration returns **658** pull requests
+and the API's own `Link: rel="last"` total for `/pulls?state=all` is **658**, so the merged
+enumeration (**641**) is complete. The comment corpora were checked the same way — their
+`Link: rel="last"` totals matched the rows fetched — which is how the `#77` pagination artifact
+below was found and how its neighbours were cleared.
+
+**A review record is a posted pull-request comment — but this repository does have formal review
+objects, and an earlier draft of this append said it did not.** That was false. Measured, with
+pagination, which is the whole point here:
+
+```text
+$ gh api --paginate --slurp "/repos/ModernNomad-98/Project-Aegis/pulls/<n>/reviews?per_page=100"
+  #77 -> 83    #653 -> 7    #654 -> 2    #29 -> 1
+  #650 -> 0    #623 -> 0    #611 -> 0    #213 -> 0    #2 -> 0
+```
+
+**The first draft of this paragraph published `30` for #77, and that was a pagination artifact.** A
+bare `GET /pulls/77/reviews` returns GitHub's **default page of 30**; `per_page=100` with
+`--paginate` returns **83**. The figure is corrected and the command is published beside it,
+because a count produced by a truncated method is precisely what `PROC-04` governs — the same
+requirement this append already meets for its comment corpora, so publishing `30` was also
+inconsistent with its own method. **Every other review-object count in this append was re-checked
+the same way and none moved**, because `7`, `2`, `1` and the zeros are all below the default page
+size and the cap could not have hidden anything. What is actually true is narrower, and is what the
+method depends on:
+**on the pull requests whose review record is an issue comment, `reviews` comes back empty** —
+measured `0` on #650, #623, #611, #213 and #2 — while the pull requests that *do* carry review
+objects are the ones where the Codex bot submitted an inline review. The empty list is real; the
+generalisation was not. The reason the distinction matters is that the records this sweep counts
+are issue comments, and `gh pr view <n> --json reviews` is therefore not the query that finds them.
+
+**Two definitions of "a finding", both published because they legitimately differ.**
+
+1. **The per-comment rule (A)** — a pull request is a finding if **any** comment matching the
+   record pattern has `created_at` **strictly greater than** its `merged_at`. This was the
+   original definition of this sweep.
+2. **The register's own after-the-fact detector (B)** — this page, `PROC-02`, immediately above:
+   *"For the after-the-fact version, compare `mergedAt` against the **earliest** comment timestamp
+   whose body contains a verdict"* and *"If `mergedAt` precedes the earliest review-record
+   timestamp, that merge gated nothing."* Under B a pull request is a finding only when its
+   **earliest** matching comment postdates the merge.
+
+**A is a strict superset of B.** Measured at this instant: **27 pull requests under A,
+15 under B**, and **every B finding is also an A finding** (the reverse set is empty). The
+difference is **12 pull requests** — 7 merge receipts and 5 records that
+quote or supersede an earlier review. **B is the number comparable to `PROC-02`, and it is the
+headline below.** A is reported beside it because it is what this sweep originally published.
+
+Both instants are read from the API as UTC ISO-8601 and compared as UTC; no local-offset
+arithmetic is used anywhere, because subtracting local from UTC has produced wrong elapsed times
+in this repository before.
+
+**The patterns, published verbatim** so that every count below reproduces exactly. All are Python
+`re` patterns applied case-insensitively (`re.I`) to the comment body as returned by the API; a
+pattern matches when `search()` finds it anywhere in the body.
+
+```text
+P1  review\s+record
+
+HB  (reviewed\s+head|head\s+reviewed|bind(?:s|ing)?\s+to\s+head|bound\s+to\s+head)
+
+V   \b(SHIP-WITH-NITS|SHIP|ACCEPT|APPROVE|APPROVED|REVISE|FIX-FIRST|FIX FIRST|REJECT)\b
+    |\bno objection to merging\b
+    |\bapprove-with-nits\b
+
+P4  <!--\s*codex-pull-request-review-summary\s*-->
+
+U   P1 OR (HB AND V)              <-- the reported union
+
+MARKER  (a merge receipt self-identifies with any one of these three phrases)
+    MERGE\s+RECEIPT
+    Disposition:\s*MERGED
+    STAGE\s+G
+```
+
+The verdict-token set **V** is exactly the one used, with no implicit additions: the four register
+verdicts `SHIP`, `ACCEPT`, `REVISE`, `FIX-FIRST`; the two spellings `SHIP-WITH-NITS` and
+`FIX FIRST` that the records actually use; the review verbs `APPROVE`, `APPROVED` and `REJECT`;
+and the two phrases `no objection to merging` and `approve-with-nits`. **`ABSTAIN` is deliberately
+absent** — the schema records it as a judge outcome, never an expected label or a reviewer verdict;
+and bare `NITS` is absent because it never appears without `SHIP-WITH-NITS`.
+
+**A warning for anyone re-running the register's detector: its sentence has two clauses, and they
+do not agree.** The first is *"whose body contains a verdict"* — read literally on its own that is
+the `V` pattern, and measured it returns **32** pull requests. The second is *"the earliest
+review-record timestamp"* — the record pattern, `U` — and measured it returns **15**, the figure
+reported here. **This append adopts the second**, because *"record"* is the term the sentence is
+defining and because `U` is the pattern this sweep publishes; the narrower `P1` reading gives
+**8**. The 17-pull-request spread between the two clauses is why the definition is stated rather
+than assumed — **a re-runner who takes the first clause literally will get a different headline**, 
+and should cite that clause rather than this append's figure.
+
+| id | pattern (as published above) | comments matched | merged PRs with ≥1 match | merged PRs with **zero** match |
+| --- | --- | --- | --- | --- |
+| **P1** | `review\s+record` | 90 | 59 | 582 |
+| **P2** | `HB` **and** `V` | 201 | 114 | 527 |
+| **P3** | `V` alone — loose upper bound, **not** the finding | 430 | 242 | 399 |
+| **P4** | the Codex bot marker — a *different* reviewer family, for contrast | 169 | 163 | 478 |
+| **U** | **U = P1 ∨ P2** | 244 | 141 | 500 |
+
+Every row splits the same **641** merged pull requests: `≥1 + zero = 641` in each case
+(59+582, 114+527, 141+500, …), which is the arithmetic check that the match
+set is a subset of the enumerated population. **The zero-match figure is `500`**, computed as
+`641 − 141` under the union U defined above. An earlier draft printed **496** in the table and
+**500** in the prose, because the table's row had been computed with one extra head-binding
+alternative — `bound head` and `head bound` — that the union did not include. That variant is real
+and is worth recording, but it is not part of U:
+
+- adding `bound head` and `head bound` to `HB` gives **145** any-match PRs and **496** zero,
+  with the **same findings** — the finding set is insensitive to the choice, while the any-match
+  count is not, which is exactly why the pattern had to be published rather than assumed.
+
+**The inline-diff endpoint contributed 0 findings**, and the reason is a **pattern** result rather
+than a timing result. Its 879 rows are the Codex bot's inline review comments and the author's
+replies — a different artifact class from this repository's review records — and **191 of them do post
+after their pull request's `mergedAt`** (all 191 by `chatgpt-codex-connector[bot]`; the first is PR #29, created
+`2026-07-07T21:51:27Z` against a merge at `21:51:23Z`). **None of those
+191 matches P1, and none matches P2, so none is a review record.** An earlier draft said that no
+inline row was a post-`mergedAt` record; that clause was false by 191 rows. The conclusion was right
+and the reason was wrong, and the reason is corrected here rather than deleted.
+
+**Counting methods, named as `PROC-04` requires.** Every count in this append is an exact count of
+matching records: pull-request counts and row counts are the length of a set or a list; percentages
+are that count over the stated denominator (641 merged pull requests at this measurement). No line count
+is published in this append; where one appears elsewhere in this page it is a **newline count** —
+the number of `0x0A` bytes — and `Measure-Object -Line` is not used, because it drops blank lines.
+
+### Findings — 15 merged pull requests under the register's own detector, 27 under the per-comment rule
+
+**The reported figure is `15`.** It is the register's own after-the-fact detector (definition B above):
+the pull request's **earliest** record-matching comment postdates its merge. The per-comment rule
+gives **27**, which is what this sweep originally published, and the 12-pull-request difference is
+itemised below rather than left as a discrepancy.
+
+`class` is taken from each record's **own words**, not inferred from timing: **A** the record says the
+review itself happened *before* the merge and only the posting was late; **B** the record says the
+review was performed *after* the merge; **C** the record says the merge landed while the review was
+running; **D** the record states the PR was already merged when written; **E** the record is a
+correction or retraction of another record, not a review of the change; **F** the record carries no
+provenance statement, recorded as *unsure* rather than guessed.
+
+| PR | mergedAt (UTC) | earliest matching record (UTC) | lag (min) | class |
+| --- | --- | --- | --- | --- |
+| #557 | `2026-09-30T02:52:05Z` | `2026-09-30T04:34:14Z` | 102.15 | A |
+| #555 | `2026-09-30T03:08:06Z` | `2026-09-30T04:34:12Z` | 86.10 | A |
+| #558 | `2026-09-30T03:14:33Z` | `2026-09-30T04:34:15Z` | 79.70 | A |
+| #559 | `2026-09-30T03:14:51Z` | `2026-09-30T04:34:16Z` | 79.42 | A |
+| #560 | `2026-09-30T03:54:41Z` | `2026-09-30T04:34:17Z` | 39.60 | A |
+| #562 | `2026-09-30T05:31:27Z` | `2026-09-30T05:31:48Z` | 0.35 | A |
+| #563 | `2026-09-30T08:31:36Z` | `2026-09-30T08:36:08Z` | 4.53 | A |
+| #568 | `2026-09-30T18:04:56Z` | `2026-10-02T23:47:54Z` | 3222.97 | B |
+| #578 | `2026-09-30T23:20:19Z` | `2026-09-30T23:20:41Z` | 0.37 | A |
+| #595 | `2026-10-01T17:36:53Z` | `2026-10-02T23:52:18Z` | 1815.42 | E |
+| #597 | `2026-10-02T02:23:16Z` | `2026-10-02T23:49:04Z` | 1285.80 | B |
+| #602 | `2026-10-02T02:32:16Z` | `2026-10-02T23:49:28Z` | 1277.20 | B |
+| #611 | `2026-10-02T03:54:57Z` | `2026-10-02T04:10:14Z` | 15.28 | F |
+| #626 | `2026-10-03T00:10:41Z` | `2026-10-03T00:11:52Z` | 1.18 | F |
+| #627 | `2026-10-03T00:10:55Z` | `2026-10-03T00:13:11Z` | 2.27 | F |
+
+**The `disposition` column has been removed rather than repaired.** An earlier draft carried a
+`disposition recorded?` column whose `yes` meant only that the pull request number **appears** in
+this register or in `.coord/coordinator-cadence.jsonl`. A membership test over mentions is not a
+disposition of a late record — a PR number occurs in those files for unrelated reasons, including
+as a row in an earlier merged-PR count series — so the column asserted more than its method
+established. It is **withdrawn**, not renamed, because a renamed column would still invite the
+reading it cannot support.
+
+### The 12 pull requests the per-comment rule adds — and why the register's detector does not
+
+| PR | receipt? | why the per-comment rule counts it and the register's detector does not |
+| --- | --- | --- |
+| #609 | no | an earlier record for the same pull request precedes the merge, so the merge gated a review |
+| #613 | no | an earlier record for the same pull request precedes the merge, so the merge gated a review |
+| #623 | no | an earlier record for the same pull request precedes the merge, so the merge gated a review |
+| #625 | no | an earlier record for the same pull request precedes the merge, so the merge gated a review |
+| #637 | no | an earlier record for the same pull request precedes the merge, so the merge gated a review |
+| #648 | **yes** | a merge receipt, which postdates the merge by construction while the review record precedes it |
+| #649 | **yes** | a merge receipt, which postdates the merge by construction while the review record precedes it |
+| #650 | **yes** | a merge receipt, which postdates the merge by construction while the review record precedes it |
+| #651 | **yes** | a merge receipt, which postdates the merge by construction while the review record precedes it |
+| #652 | **yes** | a merge receipt, which postdates the merge by construction while the review record precedes it |
+| #653 | **yes** | a merge receipt, which postdates the merge by construction while the review record precedes it |
+| #656 | **yes** | a merge receipt, which postdates the merge by construction while the review record precedes it |
+
+The seven receipts are recognised by the published `MARKER` pattern. **A merge receipt states the
+head it merged and a disposition, so it satisfies `HB ∧ V` by construction** — that is a property of
+what a receipt *is*, not of how the patterns are written, and tightening `P1`, `HB` or `V` to exclude
+receipts would also exclude genuine records that quote the merge. **The register's own detector
+excludes them structurally instead:** a receipt cannot be a pull request's *earliest* matching
+comment when a review record for that same pull request precedes the merge, which is precisely what
+a compliant merge looks like. **Under definition B, no receipt is a finding** — measured, the set of
+B findings that match `MARKER` is empty.
+
+### What the findings are, and what they are not
+
+| subset | register's detector (B) — reported | per-comment rule (A) | A, receipts excluded |
+| --- | --- | --- | --- |
+| all findings (distinct PRs) | **15** | 27 | 20 |
+| class **A** only — the review preceded the merge, so only the posting was late | 8 | 8 | 8 |
+| class **E** — corrections or retractions, not reviews of the change | 1 | 2 | 2 |
+| **governance-relevant (B, C, D or F), de-duplicated** | **6** | **17** | **10** |
+| class **F** rows | 3 | 11 | 4 |
+
+The class-A and class-E pull requests are **not** evidence that a merge escaped review. In class A
+the review demonstrably preceded the merge and only the written record was late; in class E the
+comment is not a review of the change at all. **The governance-relevant subset is therefore
+6 pull requests under the register's detector**, and it is that number that should be compared against
+the rule.
+
+### Any-match and zero-match, corrected
+
+An earlier draft published a receipt-excluded pair of `134` and `506`. **That was wrong by six, and
+the corrected pair is `141` and `500` — the same as the unfiltered figures — for a reason worth
+stating:** every receipt-bearing pull request **also** carries a non-receipt `U` match, and in every
+case it is a record posted **before** the merge. Dropping the receipt **rows** therefore removes no
+pull request from the any-match set. Measured, per receipt-bearing pull request:
+
+| PR | `U` matches | non-receipt `U` matches | of those, posted before the merge |
+| --- | --- | --- | --- |
+| #648 | 3 | 2 | 2 |
+| #649 | 3 | 2 | 2 |
+| #650 | 2 | 1 | 1 |
+| #651 | 3 | 2 | 2 |
+| #652 | 2 | 1 | 1 |
+| #653 | 10 | 3 | 3 |
+| #656 | 3 | 2 | 2 |
+
+**So the receipt contamination affects the findings count, not the denominator.** Excluding receipt
+rows changes the findings from 27 to 20 and the class-F rows from 11 to 4; it does **not** move the
+any-match population (**141**) or the zero-match population (**500**). An earlier draft subtracted whole
+pull requests from the any-match set, which double-counted the correction and overstated the
+zero-match gap by six.
+
+### The larger half this sweep does not detect
+
+The rule is *"do not merge before a review record bound to the current head is posted"*. This
+sweep detects the case where a record was posted **late**. It structurally cannot detect the case
+where **no record was ever posted**, because with no matching comment there is nothing to compare
+against `merged_at`. That population is measured here as the zero-match column, and it is far
+larger:
+
+- **582 of 641 merged pull requests (90.8 %)** have no comment matching P1 at any time,
+  before or after their merge;
+- **527 (82.2 %)** under P2, the head-binding-and-verdict pattern;
+- **500 (78.0 %)** under the reported union U.
+
+**A merged pull request with no matching comment is not evidence that no review happened.** It
+means no comment in this corpus matched the pattern. A review conducted in a session and never
+posted leaves no retrievable trace at all, and the repository's own records say so — a no-change
+reading *"leaves no artifact in the repository and is therefore NOT independently falsifiable"*.
+The zero-match population is a **detection gap**, not a count of unreviewed merges, and closing it
+needs a different instrument from this one.
+
+### The machine-marker route to an exact receipt figure
+
+A review pass identified the one route that would make receipt exclusion exact rather than
+pattern-based: give merge receipts a **stable machine marker** — an invisible HTML comment, of
+exactly the kind this append's own `P4` already matches, which discriminates because it is
+machine-written rather than self-described. Receipts written after such a convention become
+**deterministically excludable**. The same review reports that it tried the other candidate
+discriminators and they failed: **author identity is unavailable** here (one account posts
+everything), and a **merge-commit anchor** finds all the receipts but also several genuine review
+rows. **This append does not adopt the convention** — it governs how future receipts are written,
+which is broader than this artifact. It is recorded as the identified route, attributed to the
+review that found it. **With definition B reported as the headline, the marker is no longer
+load-bearing for the primary figure**, since the register's detector excludes receipts structurally.
+
+### Recurrence — and a correction to the precedent this page cites
+
+Item 2 above cites the cadence log entry `2026-10-01T20:22:51-07:00` — *"PRs #605 and #607 had
+merged with `reviews=[]` … review never posted"* — as evidence that this is a recurrence.
+**Re-measured, that precedent is half right, and the half that is wrong matters.** An earlier draft
+of this append claimed *"the two commands' outputs are quoted rather than summarised"* and quoted
+nothing; the actual records are below, and they are the evidence for the table that follows.
+
+```text
+$ gh api /repos/ModernNomad-98/Project-Aegis/pulls/605 \
+    --jq '{merged_at, head: .head.sha, comments}'
+#605  merged_at=2026-10-02T03:07:53Z  head=6b30b9d91f3c6f460e94d4a801777154dfaa6cb8  comments=5
+
+$ gh api --paginate /repos/ModernNomad-98/Project-Aegis/issues/605/comments \
+    --jq '.[] | {id, created_at, author: .user.login, first: (.body | split("\n")[0])}'
+  5944665363  2026-10-02T02:47:31Z  chatgpt-codex-connector[bot]  You have reached your Codex usage limits …
+  5944723882  2026-10-02T02:53:08Z  ModernNomad-98   ## CI evidence — exact head `9473ec64c5b8…`
+  5944885937  2026-10-02T03:07:39Z  ModernNomad-98   ## Independent review record - AUDIT-3 (APPROVE WITH NITS)
+  5944927849  2026-10-02T03:12:01Z  ModernNomad-98   ## ⚠️ Head change during review — `9473ec64` → `6b30b9d9`
+  5945007480  2026-10-02T03:20:45Z  ModernNomad-98   ## Closeout — merged by the owner, not by this agent
+
+$ gh api --paginate /repos/ModernNomad-98/Project-Aegis/issues/607/comments \
+    --jq '.[] | {id, created_at, author: .user.login, first: (.body | split("\n")[0])}'
+  5944850388  2026-10-02T03:04:02Z  chatgpt-codex-connector[bot]  You have reached your Codex usage limits …
+#607  merged_at=2026-10-02T03:21:27Z  head=c629557f835343e4e39a024e3dfa5012cac06735  comments=1
+```
+
+**#605.** Comment **`5944885937`**, created **`2026-10-02T03:07:39Z`** — **fourteen seconds before**
+the merge at `03:07:53Z` — opens `## Independent review record - AUDIT-3 (APPROVE WITH NITS)` and
+contains the line *"the reviewed head `6b30b9d9` carries the fix"*, naming the head that merged.
+**The cadence entry's "review never posted" clause is therefore FALSIFIED for #605.**
+
+**#607.** One comment, **`5944850388`**, created `2026-10-02T03:04:02Z`, and it is the Codex
+usage-limit notice — not a review record. **The clause holds for #607.**
+
+So the **recurrence is real but the mechanism differs by PR**: #607 is a merge with *no* review
+record at all, while #605 carried a record bound to the merged head posted fourteen seconds before
+the merge. The cadence entry's `reviews=[]` was true in both cases and uninformative in both,
+because formal review objects are empty on exactly these agent-authored pull requests — the same
+narrow fact this append's method section states. **Neither PR is a finding of this sweep** — #605's
+record precedes its merge, and #607 has no record to post — which is the clearest statement of what
+this sweep does and does not detect.
+
+**Where the correction is tracked — and one thing that is `unsure`.** The falsification above and
+the evidence for it are tracked **in this append**. What is **not** tracked is anything that will
+carry the correction *into* the cadence entry: that entry is append-not-edit, so the only way it
+becomes true is a later cadence append by whoever maintains the log, and **no open issue,
+owed-work item or register entry owns that.** Checked at this revision: the repository has **1**
+open issue (#101), and it is not this; owed-work items 1–5 above name no such owner. **That
+destination is therefore `unsure`.** The conflict's owner is named as `source-of-truth-reconciler`,
+and owning a hand-off is not the same as owning a tracked destination; this append does not claim
+one exists.
+
+### The earlier sweep, labelled
+
+The first row of the scope series — **20 of 634** — was produced in a prior agent session whose
+intermediate inputs were not preserved. **It is recorded as UNVERIFIED.** It is not reproducible
+from anything in this repository, its figures were computed with an earlier and looser pattern set,
+and it should not be read as a confirmed earlier measurement or compared arithmetically with the
+rows below it. It is carried only because dropping it would hide that a first sweep happened.
+
+### How a reader re-runs the sweep
+
+```text
+# 1. merge-state enumeration and the completeness cross-check
+$ gh pr list --state merged --limit 1000 --json number,title,mergedAt -R ModernNomad-98/Project-Aegis
+$ gh pr list --state all    --limit 1000 --json number,state    -R ModernNomad-98/Project-Aegis
+# 2. both comment corpora, in bulk
+$ gh api --paginate --slurp "/repos/ModernNomad-98/Project-Aegis/issues/comments?per_page=100"
+$ gh api --paginate --slurp "/repos/ModernNomad-98/Project-Aegis/pulls/comments?per_page=100"
+# 3. join per PR and compare, both instants UTC:
+#    definition A (per-comment) : ANY matching comment.created_at  >  pr.merged_at
+#    definition B (this page)   : MIN matching comment.created_at  >  pr.merged_at   <- reported
+#    classify with the published patterns: U = P1 OR (HB AND V)
+```
+
+Two properties make this reproducible in one pass. The join is keyed on the comment's own
+`issue_url`, so no per-PR call is needed, and both instants are already UTC strings, so no timezone
+conversion is involved. **`gh api` does not accept `-R`** — the owner and repository go in the
+endpoint path — while `gh pr list` requires `-R` or a working directory inside a git repository. A
+re-run at a later revision will return a **new** window, not a reproduction of this one; that is
+why the scope is published as a series, and why the patterns above are published rather than
+described.
+
+### What this append does not claim
+
+It does not rewrite, renumber or annotate owed-work items 1–5, or any class, rule or evidence row
+above; item 2 is discharged here and left standing there. It does not claim the zero-match
+population is unreviewed work. It does not claim any finding was a defect in the change that
+merged — the sweep measures the **record's timing relative to the merge**, not the quality of the
+merge or of the review, and it asserts no verdict about any pull request. It does not present
+either definition as the only one: **A and B are both published, B is reported, and the difference
+is itemised.** It does not correct the cadence log entry it quotes: the falsification of that
+entry's #605 clause is recorded here, and the entry itself is left as written, because this
+register's practice is to append a correction rather than edit a dated record. It adds no gate:
+nothing in `scripts/` or `.github/` reads this table, and the sweep remains something an agent runs
+rather than something a runner enforces.
+
+**Provenance.** The sweep was run read-only against the GitHub API as `ModernNomad-98` on
+2026-10-03, from a self-contained clone of `ModernNomad-98/Project-Aegis` at
+`origin/main` = `a3a72fe5f2c9504f3c97fc312b9250db67d761d5`, the base revision this append is
+committed on. The corpus closed at the newest comment, `2026-10-03T21:23:54Z`; every count above is at that
+instant and is a series value, not a constant. No provider or model call was made, no evaluator
+was run, and no dependency was installed. Every PR number, instant, comment id and hash in this
+append comes from the API response or from `git`, not from prose.
