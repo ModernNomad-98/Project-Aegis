@@ -31,8 +31,11 @@ This is a BOUND PLUS AN UNKNOWN REMAINDER, never one exact pending count.
   (tracker L2497-2499: "an unreviewed edit, however small, needs a targeted
   review before the page counts as accepted"). Git cannot see review, so these
   pages are undecided here, not accepted.
-* UNDECIDABLE - the comparison could not be run (an unreachable revision, a path
-  absent at the acceptance revision, or the empty tree). The reason is printed.
+* UNDECIDABLE - the comparison could not be run (an acceptance revision no
+  remote-tracking ref contains, a path absent at the acceptance revision, or the
+  empty tree). The reason is printed. A row is never decided from an object only
+  this clone happens to hold, so the bound is the same in a fresh clone as in
+  the authoring mirror.
 
     python -B tools/readability_acceptance/check_index.py
     python -B tools/readability_acceptance/check_index.py --json
@@ -53,6 +56,7 @@ INDEX_REL = "tools/readability_acceptance/acceptance-index.json"
 HEADING_RE = re.compile(r"^\+#{1,6} ")
 LINE_THRESHOLD = 10
 EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+REMOTE_REFS = "refs/remotes/"
 
 
 def run(args: list[str], root: Path) -> tuple[int, str, str]:
@@ -101,6 +105,35 @@ def revision_reachable(sha: str, ref: str, root: Path) -> bool:
     return code == 0
 
 
+_CONTAINED: dict[tuple[str, str], tuple[bool, str]] = {}
+
+
+def remote_containment(sha: str, root: Path) -> tuple[bool, str]:
+    """Whether a fresh clone of the remote would hold this object.
+
+    `refs/remotes/**` is this clone's record of the remote's refs, so an object
+    no remote-tracking ref contains is exactly an object a fresh clone lacks -
+    even when this working copy still holds it as a dangling pre-rebase object,
+    or under a local tag that exists on no remote. Such a row must be reported
+    undecidable: deciding it from the local object would make the answer a
+    property of this clone rather than of the repository.
+    """
+    key = (str(root), sha)
+    if key in _CONTAINED:
+        return _CONTAINED[key]
+    code, out, err = run(["for-each-ref", "--contains", sha,
+                          "--format=%(refname)", REMOTE_REFS], root)
+    if code != 0:
+        result = (False, f"git for-each-ref --contains failed: "
+                         f"{err.strip()[:120] or 'object not present in this clone'}")
+    else:
+        refs = [line.strip() for line in out.splitlines() if line.strip()]
+        result = ((True, "") if refs
+                  else (False, f"no {REMOTE_REFS}** ref contains {sha[:12]}"))
+    _CONTAINED[key] = result
+    return result
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(
         description="Decide pending pages from the acceptance index.")
@@ -145,12 +178,22 @@ def main() -> int:
             continue
         if args.limit and checked >= args.limit:
             continue
+        usable, why = remote_containment(sha, root)
+        if not usable:
+            undecided.append({
+                "path": path, "sha": sha, "cause": "unreachable-acceptance",
+                "reason": ("the acceptance revision is contained by no "
+                           "remote-tracking ref, so a fresh clone of the remote "
+                           "does not hold the object and this row cannot be "
+                           f"decided there ({why})"),
+            })
+            continue
         checked += 1
         rebased = not revision_reachable(sha, ref_sha, root)
         total, why = numstat(sha, ref_sha, path, root)
         if total is None:
             undecided.append({
-                "path": path, "sha": sha,
+                "path": path, "sha": sha, "cause": "changed-lines-unavailable",
                 "reason": ("acceptance revision was rebased and is not an "
                            "ancestor of the compared ref; " if rebased else "")
                           + why,
@@ -158,7 +201,9 @@ def main() -> int:
             continue
         section, section_head = new_sections(sha, ref_sha, path, root)
         if section is None:
-            undecided.append({"path": path, "sha": sha, "reason": section_head})
+            undecided.append({"path": path, "sha": sha,
+                              "cause": "section-scan-unavailable",
+                              "reason": section_head})
             continue
         record = {
             "path": path, "sha": sha, "changed_lines": total,
@@ -180,6 +225,8 @@ def main() -> int:
         "no_recorded_acceptance": len(unknown),
         "recorded_acceptance_within_10_lines": len(small),
         "cannot_decide": len(undecided),
+        "cannot_decide_unreachable_acceptance": sum(
+            1 for rec in undecided if rec["cause"] == "unreachable-acceptance"),
         "exact_pending_count": "NOT DERIVABLE from this procedure",
         "bound": (f"at least {len(pending)} pages are provably pending by the "
                   f"tracker's own >10-lines-or-new-section rule"),

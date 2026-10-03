@@ -12,6 +12,15 @@ Three checks, each printed with its disagreement rather than tuned away:
    `reader_pages`;
 3. the row count must reconcile to 602 = 658 - 1 - 55.
 
+Two measurement rules hold throughout:
+
+* A NONZERO git exit is an undecidable result, never 0 changed lines. An object
+  this clone does not hold and a revision that never existed fail the same way,
+  so a failed `git diff` must not become a statement about a page.
+* An acceptance revision no `refs/remotes/**` ref contains is reported
+  unmeasurable in EVERY clone, because deciding it from an object only the
+  authoring clone holds is what makes a result mirror-local.
+
     python -B tools/readability_acceptance/verify_ground_truth.py
 """
 
@@ -26,6 +35,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 INDEX_REL = "tools/readability_acceptance/acceptance-index.json"
+REMOTE_REFS = "refs/remotes/"
 
 # The revision the tracker's 2026-10-01 audit table names for each page ("the
 # latest revision at which that page is recorded accepted", tracker L283-286).
@@ -81,14 +91,46 @@ LIMB_A = [f".claude/skills/{name}/SKILL.md"
           for name in {**AUDIT_REVISIONS, **FURTHER_REVISIONS}]
 
 
-def git(*args: str) -> str:
+def git_rc(*args: str) -> tuple[int, str]:
     proc = subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True,
                           text=True, encoding="utf-8", errors="replace")
-    return proc.stdout if proc.returncode == 0 else ""
+    return proc.returncode, proc.stdout
+
+
+def git(*args: str) -> str:
+    code, out = git_rc(*args)
+    return out if code == 0 else ""
+
+
+_CONTAINED: dict[str, bool] = {}
+
+
+def remote_contained(sha: str) -> bool:
+    """Whether a fresh clone of the remote would hold this object.
+
+    `refs/remotes/**` is this clone's record of the remote's refs, so an object
+    no remote-tracking ref contains is exactly an object a fresh clone lacks -
+    even when this working copy still holds it as a dangling pre-rebase object,
+    or under a local tag that exists on no remote.
+    """
+    if sha not in _CONTAINED:
+        code, out = git_rc("for-each-ref", "--contains", sha,
+                           "--format=%(refname)", REMOTE_REFS)
+        _CONTAINED[sha] = code == 0 and bool(out.strip())
+    return _CONTAINED[sha]
 
 
 def measure(sha: str, path: str, ref: str) -> tuple[int | None, bool]:
-    out = git("diff", "--numstat", sha, ref, "--", path)
+    """Added+deleted for one path, or None when git cannot produce the diff.
+
+    A NONZERO exit is undecidable, never 0 lines: git exits nonzero both when
+    the revision is absent from this clone (the fresh-clone case) and when it is
+    not a revision at all. The only true 0 is a diff that SUCCEEDS and is empty,
+    which means the path is identical at both revisions.
+    """
+    code, out = git_rc("diff", "--numstat", sha, ref, "--", path)
+    if code != 0:
+        return None, False
     total: int | None = None
     for line in out.splitlines():
         parts = line.split("\t")
@@ -96,9 +138,27 @@ def measure(sha: str, path: str, ref: str) -> tuple[int | None, bool]:
             total = int(parts[0]) + int(parts[1])
     if total is None and not out.strip():
         total = 0
-    diff = git("diff", sha, ref, "--", path)
+    code, diff = git_rc("diff", sha, ref, "--", path)
+    if code != 0:
+        return None, False
     section = any(re.match(r"^\+#{1,6} ", line) for line in diff.splitlines())
     return total, section
+
+
+def drift(revision: str | None, path: str, ref: str) -> tuple[int | None, bool, str]:
+    """Measure one revision, or name why it cannot be measured in any clone."""
+    if not revision:
+        return None, False, "-"
+    if not remote_contained(revision):
+        return None, False, "UNREACH"
+    total, section = measure(revision, path, ref)
+    if total is None:
+        return None, False, "UNMEAS"
+    return total, section, ""
+
+
+def cell(total: int | None, mark: str) -> str:
+    return str(total) if total is not None else (mark or "-")
 
 
 def main() -> int:
@@ -107,12 +167,17 @@ def main() -> int:
                     help="ref to measure drift against (default HEAD)")
     args = ap.parse_args()
     ref = args.ref
+    code, out = git_rc("rev-parse", "--verify", "--quiet", ref)
+    if code != 0 or not out.strip():
+        print(f"cannot resolve --ref {ref}", file=sys.stderr)
+        return 2
     index = json.loads((ROOT / INDEX_REL).read_text(encoding="utf-8"))
     rows = {r["path"]: r for r in index["reader_pages"]}
     mismatches: list[str] = []
 
     print(f"=== 1. the 19 relabel pages (drift measured against {ref}) ===")
-    print(f"{'page':38} {'index rev':12} {'a+d':>5} ns  {'audit rev':12} {'a+d':>5} ns")
+    print(f"{'page':38} {'index rev':12} {'a+d':>8} ns  {'audit rev':12} "
+          f"{'a+d':>8} ns")
     for name, audit in {**AUDIT_REVISIONS, **FURTHER_REVISIONS}.items():
         path = f".claude/skills/{name}/SKILL.md"
         row = rows.get(path)
@@ -123,22 +188,34 @@ def main() -> int:
         sha = row["last_acceptance_sha"]
         if not sha:
             mismatches.append(f"{path}: no recorded acceptance revision")
-        index_total, index_section = measure(sha, path, ref) if sha else (None, False)
+        index_total, index_section, index_mark = drift(sha, path, ref)
         audit_sha = git("rev-parse", "--verify", "--quiet", f"{audit}^{{commit}}").strip()
-        audit_total, audit_section = (
-            measure(audit_sha, path, ref) if audit_sha else (None, False))
+        audit_total, audit_section, audit_mark = drift(audit_sha or None, path, ref)
         flag = "" if sha else "  <-- NO REVISION"
-        print(f"{name:38} {(sha or '-')[:12]:12} {str(index_total):>5} "
-              f"{'y' if index_section else 'n':3} {audit:12} {str(audit_total):>5} "
+        print(f"{name:38} {(sha or '-')[:12]:12} "
+              f"{cell(index_total, index_mark):>8} "
+              f"{'y' if index_section else 'n':3} {audit:12} "
+              f"{cell(audit_total, audit_mark):>8} "
               f"{'y' if audit_section else 'n':3}{flag}")
         if index_total is None:
-            mismatches.append(f"{path}: drift from the index revision could not "
-                              f"be measured against {ref}")
+            if sha and not remote_contained(sha):
+                mismatches.append(
+                    f"{path}: the index acceptance revision {sha[:12]} is "
+                    f"contained by no remote-tracking ref, so no fresh clone can "
+                    f"measure the drift; whether the rule catches this page is "
+                    f"not verifiable outside the authoring clone")
+            else:
+                mismatches.append(f"{path}: drift from the index revision "
+                                  f"({(sha or '-')[:12]}) could not be measured "
+                                  f"against {ref}")
         elif index_total <= 10 and not index_section:
+            audit_note = (f"{audit_total} lines" if audit_total is not None
+                          else f"a count that cannot be measured here "
+                               f"({audit_mark or 'unmeasured'})")
             mismatches.append(
                 f"{path}: measured from the index revision ({sha[:12]}) the page is "
                 f"NOT past the rule ({index_total} lines); the derivation counts it "
-                f"pending from the audit revision ({audit}) at {audit_total} lines")
+                f"pending from the audit revision ({audit}) at {audit_note}")
 
     print("\n=== 2. exclusions ===")
     paths = set(rows)

@@ -69,6 +69,26 @@ GENERATED_REPORTS = ("docs/audits/skill-contract-audit-baseline.md",)
 FIXTURE_PREFIX = "scripts/"
 FIXTURE_EXCEPTIONS = ("scripts/tests/fixtures/README.md",)
 
+# Reachability rule for a recorded acceptance revision. `refs/remotes/**` is this
+# clone's record of the remote's refs, so an object no remote-tracking ref
+# contains is exactly an object a fresh clone lacks - it may be a dangling
+# pre-rebase object, or one held only by a local tag no remote has. Such a row is
+# annotated rather than decided, because deciding it from the local object makes
+# the answer a property of the authoring clone instead of the repository.
+REMOTE_REFS = "refs/remotes/"
+REACHABILITY_RULE = (
+    "an acceptance revision is usable only when a remote-tracking ref "
+    "(refs/remotes/**) contains it; that is exactly the object set a fresh "
+    "clone of the remote has"
+)
+REACHABILITY_PROBE = ("git for-each-ref --contains <sha> "
+                      "--format=%(refname) refs/remotes/")
+UNREACHABLE_ROW_REASON = (
+    "no refs/remotes/** ref contains this revision, so a fresh clone does not "
+    "hold the object; check_index.py reports the row as cannot_decide rather "
+    "than deciding it from an object only the authoring clone has"
+)
+
 # Rule citations, pinned to the tracker revision named in `source_revision`.
 # check_index.py re-reads these lines so a tracker edit cannot silently
 # invalidate the citations.
@@ -157,6 +177,7 @@ class Repo:
         self._touch_cache: dict[str, str | None] = {}
         self._ls_cache: dict[str, set[str]] = {}
         self._log_cache: dict[str, bool] = {}
+        self._contained_cache: dict[str, bool] = {}
 
     def sha(self, token: str) -> str | None:
         if token not in self._sha_cache:
@@ -195,6 +216,18 @@ class Repo:
             )
             self._log_cache[key] = proc.returncode == 0
         return self._log_cache[key]
+
+    def remote_contained(self, sha: str) -> bool:
+        """Whether a fresh clone of the remote would hold this object."""
+        if sha not in self._contained_cache:
+            proc = subprocess.run(
+                ["git", "-C", str(self.root), "for-each-ref", "--contains", sha,
+                 "--format=%(refname)", REMOTE_REFS],
+                capture_output=True, text=True, encoding="utf-8", errors="replace",
+            )
+            self._contained_cache[sha] = (proc.returncode == 0
+                                          and bool(proc.stdout.strip()))
+        return self._contained_cache[sha]
 
     def last_touch(self, path: str) -> str | None:
         if path not in self._touch_cache:
@@ -498,6 +531,7 @@ def build(ref: str, root: Path) -> dict:
         by_path.setdefault(cand.path, []).append(cand)
 
     rows = []
+    unreachable: dict[str, int] = {}
     for path in classes["reader"]:
         cands = newest_first(repo, by_path.get(path, []))
         best = cands[0] if cands else None
@@ -513,7 +547,7 @@ def build(ref: str, root: Path) -> dict:
             for c in cands[1:4]
             if c.sha and c.kind == "tracker-audit-table"
         ]
-        rows.append({
+        row = {
             "path": path,
             "last_acceptance_sha": best.sha if best else None,
             "reviewer": best.reviewer if best else None,
@@ -535,15 +569,37 @@ def build(ref: str, root: Path) -> dict:
             "note": best.note if best else
                     "no git-visible source records a full-page acceptance",
             "alternate_acceptances": alternates,
-        })
+        }
+        sha = row["last_acceptance_sha"]
+        if sha and not repo.remote_contained(sha):
+            row["acceptance_reachable"] = False
+            row["acceptance_unreachable_reason"] = UNREACHABLE_ROW_REASON
+            unreachable[sha] = unreachable.get(sha, 0) + 1
+        rows.append(row)
 
     recorded = [r for r in rows if r["confidence"] == "recorded"]
     unknown = [r for r in rows if r["confidence"] == "unknown"]
     verdict_only = [r for r in rows if r["acceptance_verdict_recorded"]
                     and not r["last_acceptance_sha"]]
+    notes = ev_notes + tr_notes + st_notes
+    if unreachable:
+        notes.append(
+            "UNREACHABLE acceptance revision(s), contained by no "
+            f"{REMOTE_REFS}** ref so a fresh clone does not hold the object: "
+            + ", ".join(f"{sha[:12]} x{count}"
+                        for sha, count in sorted(unreachable.items())))
     return {
         "reader_pages": rows,
         "candidates": [c.to_json() for c in newest_first(repo, all_cands)],
+        "acceptance_reachability": {
+            "rule": REACHABILITY_RULE,
+            "probe": REACHABILITY_PROBE,
+            "rows_annotated": sum(unreachable.values()),
+            "unreachable_revisions": [
+                {"sha": sha, "rows": count}
+                for sha, count in sorted(unreachable.items())
+            ],
+        },
         "counts": {
             "tracked_markdown": len(paths),
             "generated_reports": len(classes["generated_reports"]),
@@ -558,7 +614,7 @@ def build(ref: str, root: Path) -> dict:
             "tracker_candidates": len(tr),
             "stated_candidates": len(st),
         },
-        "notes": ev_notes + tr_notes + st_notes,
+        "notes": notes,
         "class_membership": {
             "generated_reports": classes["generated_reports"],
             "fixture_count": len(classes["fixtures"]),
@@ -617,6 +673,7 @@ def main() -> int:
             "source_repository": "ModernNomad-98/Project-Aegis",
             "rule_text_file": TRACKER_REL,
             "rules": RULE_LINES,
+            "acceptance_reachability": data["acceptance_reachability"],
             "counts": counts,
             "class_membership": data["class_membership"],
             "reader_pages": data["reader_pages"],

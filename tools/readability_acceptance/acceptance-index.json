@@ -49,6 +49,21 @@
       2459
     ]
   },
+  "acceptance_reachability": {
+    "rule": "an acceptance revision is usable only when a remote-tracking ref (refs/remotes/**) contains it; that is exactly the object set a fresh clone of the remote has",
+    "probe": "git for-each-ref --contains <sha> --format=%(refname) refs/remotes/",
+    "rows_annotated": 7,
+    "unreachable_revisions": [
+      {
+        "sha": "65bacc7d6b854205cf8bdcc7a1a58f8ef76dc6c7",
+        "rows": 6
+      },
+      {
+        "sha": "d3dcb62a335db83db1cc64dc0d0f8e52594d92f9",
+        "rows": 1
+      }
+    ]
+  },
   "counts": {
     "tracked_markdown": 658,
     "generated_reports": 1,
@@ -1541,7 +1556,9 @@
       "evidence_kind": "tracker-row",
       "precision": "page-level: the statement names this page and a revision",
       "note": "",
-      "alternate_acceptances": []
+      "alternate_acceptances": [],
+      "acceptance_reachable": false,
+      "acceptance_unreachable_reason": "no refs/remotes/** ref contains this revision, so a fresh clone does not hold the object; check_index.py reports the row as cannot_decide rather than deciding it from an object only the authoring clone has"
     },
     {
       "path": ".claude/skills/cloud-security-baseline-reviewer/references/aws-baseline.md",
@@ -1555,7 +1572,9 @@
       "evidence_kind": "tracker-row",
       "precision": "page-level: the statement names this page and a revision",
       "note": "",
-      "alternate_acceptances": []
+      "alternate_acceptances": [],
+      "acceptance_reachable": false,
+      "acceptance_unreachable_reason": "no refs/remotes/** ref contains this revision, so a fresh clone does not hold the object; check_index.py reports the row as cannot_decide rather than deciding it from an object only the authoring clone has"
     },
     {
       "path": ".claude/skills/cloud-security-baseline-reviewer/references/azure-baseline.md",
@@ -1569,7 +1588,9 @@
       "evidence_kind": "tracker-row",
       "precision": "page-level: the statement names this page and a revision",
       "note": "",
-      "alternate_acceptances": []
+      "alternate_acceptances": [],
+      "acceptance_reachable": false,
+      "acceptance_unreachable_reason": "no refs/remotes/** ref contains this revision, so a fresh clone does not hold the object; check_index.py reports the row as cannot_decide rather than deciding it from an object only the authoring clone has"
     },
     {
       "path": ".claude/skills/cloud-security-baseline-reviewer/references/gcp-baseline.md",
@@ -1583,7 +1604,9 @@
       "evidence_kind": "tracker-row",
       "precision": "page-level: the statement names this page and a revision",
       "note": "",
-      "alternate_acceptances": []
+      "alternate_acceptances": [],
+      "acceptance_reachable": false,
+      "acceptance_unreachable_reason": "no refs/remotes/** ref contains this revision, so a fresh clone does not hold the object; check_index.py reports the row as cannot_decide rather than deciding it from an object only the authoring clone has"
     },
     {
       "path": ".claude/skills/cloud-security-baseline-reviewer/references/supabase-baseline.md",
@@ -1597,7 +1620,9 @@
       "evidence_kind": "tracker-row",
       "precision": "page-level: the statement names this page and a revision",
       "note": "",
-      "alternate_acceptances": []
+      "alternate_acceptances": [],
+      "acceptance_reachable": false,
+      "acceptance_unreachable_reason": "no refs/remotes/** ref contains this revision, so a fresh clone does not hold the object; check_index.py reports the row as cannot_decide rather than deciding it from an object only the authoring clone has"
     },
     {
       "path": ".claude/skills/cloud-security-baseline-reviewer/references/vercel-baseline.md",
@@ -1611,7 +1636,9 @@
       "evidence_kind": "tracker-row",
       "precision": "page-level: the statement names this page and a revision",
       "note": "",
-      "alternate_acceptances": []
+      "alternate_acceptances": [],
+      "acceptance_reachable": false,
+      "acceptance_unreachable_reason": "no refs/remotes/** ref contains this revision, so a fresh clone does not hold the object; check_index.py reports the row as cannot_decide rather than deciding it from an object only the authoring clone has"
     },
     {
       "path": ".claude/skills/code-reviewer/SKILL.md",
@@ -1933,7 +1960,9 @@
       "evidence_kind": "tracker-row-cell",
       "precision": "page-level: the statement names this page and a revision",
       "note": "",
-      "alternate_acceptances": []
+      "alternate_acceptances": [],
+      "acceptance_reachable": false,
+      "acceptance_unreachable_reason": "no refs/remotes/** ref contains this revision, so a fresh clone does not hold the object; check_index.py reports the row as cannot_decide rather than deciding it from an object only the authoring clone has"
     },
     {
       "path": ".claude/skills/database-backup-verifier/references/backup-verification-checks.md",

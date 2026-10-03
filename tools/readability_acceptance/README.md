@@ -25,6 +25,7 @@ independent review the rule requires.
 | `check_index.py` | Re-runnable decision procedure: prints the bound, the no-recorded-acceptance remainder, and the undecidable set. |
 | `verify_ground_truth.py` | Checks the index against the known 19-page relabel set, the generated-report and fixture exclusions, and the row-count reconciliation. |
 | `scan_*.py`, `investigate_commits.py` | Diagnostics used to curate `stated-acceptances.json`. They write nothing and apply nothing; they exist so a reviewer can re-derive the curation instead of trusting it. |
+| `tests/test_verify_ground_truth.py` | Runnable regression test: a failed `git diff` is an undecidable result, never 0 lines, and an absent object is not remote-contained. `.github/` is outside this change, so CI does not discover this directory yet; run it with the command below. |
 
 ## Reproduce
 
@@ -33,6 +34,7 @@ python -B tools/readability_acceptance/build_index.py --write
 python -B tools/readability_acceptance/check_index.py            # full listing
 python -B tools/readability_acceptance/check_index.py --json
 python -B tools/readability_acceptance/verify_ground_truth.py --ref refs/remotes/origin/main
+python -B -m unittest discover -s tools/readability_acceptance/tests -p 'test_*.py' -v
 ```
 
 `check_index.py` prints a **bound plus an unknown remainder**, never one exact
@@ -60,5 +62,16 @@ pending figure:
 * Pages whose acceptance revision was rewritten by a rebase are compared anyway,
   with `rebased_acceptance: true` on the row, because the trees are still
   comparable; `cannot_decide` names every page the procedure could not run for.
+* A recorded acceptance revision that no `refs/remotes/**` ref contains is
+  **unreachable**: a fresh clone does not hold the object, so `check_index.py`
+  reports the row as `cannot_decide` (counted in
+  `cannot_decide_unreachable_acceptance`) and never decides it from an object
+  only the authoring clone has. Two such revisions appear in this index,
+  `65bacc7d6b85` on 6 rows and `d3dcb62a335d` on 1 row; each affected row
+  carries `acceptance_reachable: false` with the reason, so the bound is the
+  same in a fresh clone as in the authoring mirror. `verify_ground_truth.py`
+  reports the same limitation rather than measuring it, and says so as a
+  mismatch. A clone with no remote-tracking refs at all therefore reports every
+  recorded row this way; run it against a checkout that has the remote.
 * This directory is under `tools/`, deliberately outside the gate-guard
   protected set in `.github/workflows/validate-skills.yml`.
