@@ -2142,6 +2142,44 @@ request description.
    owns it; this class records the five it could evidence and proposes no
    mechanism, because a mechanism would need a tracked home for briefs and that
    is a larger change than this append.
+
+5. **`PROC-11` and `PROC-12` are DISCHARGED — appended 2026-10-03.** The tracked
+   home that item 4 recorded as missing now exists:
+   [coordinator figures and the check-duration baseline](../../roadmaps/aegis-coordinator-figures.md).
+   It is the tracked home for the coordinator's figures (`PROC-12`) and it
+   carries the maintained job-level check-duration baseline (`PROC-11`) as its
+   first landed figure set, so the two owed items are discharged by **one**
+   artifact rather than two. The page states the rule that makes the home worth
+   having: a figure supplied in a brief is a **claim**, and it enters the page
+   only after being re-derived with its own query and recorded with the
+   command, the revision and the date beside it — or else recorded as
+   `unknown`. **The baseline was independently re-derived before it was
+   landed.** All five job rows matched the handed-over measurement exactly:
+   `validate-skills` 296 / 18 / 104 / 114 / 164 (healthy floor 62 s; the 18 s
+   minimum is the single failed job's early abort), `windows-offline-checks`
+   296 / 129 / 220 / 238 / 412, `tools-tests-linux` 296 / 89 / 148 / 162 / 379,
+   `tools-tests-windows` 296 / 120 / 222 / 239 / 277, `gate-guard`
+   191 / 4 / 6 / 8 / 45 — as did the 105-of-296 `skipped` count for
+   `gate-guard` on a `main` push, which is expected and is not a failure. The
+   `tools-tests-windows` band check also reproduced: **260 of 296 runs
+   (87.8 %)** fall inside the previously claimed 149–240 s band, and that band
+   **contains the 222 s median**, so the earlier "stalled job" alarm raised
+   inside it was false by construction. **One figure disagreed and the
+   measurement was landed, not the prose:** the workflow-level p90 is
+   **258 s**, which is also what the first measurement's own machine-readable
+   output recorded, against **257 s** written in its report prose. That row is
+   the workflow-level contrast quantity, which the page forbids using to judge
+   job stalls; the discrepancy is recorded on the page (§5) rather than
+   silently repaired. **What this append does not claim:** it does not
+   re-audit or correct any figure in `7.5`, whose 13-run sample the new
+   baseline **supersedes rather than corrects**; it adds, renumbers and
+   rewrites no class, rule or earlier owed-work item; and the new page is a
+   **new tracked page and starts `pending`**, because the targeted-edit rule
+   *retains* an acceptance and cannot confer one, so it owes an independent
+   full-page re-read by a reader who did not write it. No tracked home yet
+   exists for coordinator figures of any kind other than check durations; that
+   remaining gap is stated on the page as its honest limit 1.
+
 ## Evidence summary
 
 | Class | Claim | Verdict | Command |
