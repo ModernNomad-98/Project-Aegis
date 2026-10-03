@@ -26,7 +26,7 @@ binding ones.
 | --- | --- | --- | --- | --- | --- |
 | A | PLAN | The request or directive that asks for the change, with its source. | A written plan: what, why, blast radius, the paths it will touch, and **proportionate acceptance criteria** — few and short for a small change, but present and checkable. | SD-A | The agent taking the work, or the coordinator assigning it. |
 | B | INDEPENDENT PLAN AUDIT | The plan's exact text, **bound to a captured revision** — a content hash taken when the text is captured, or an immutable comment or artifact — by an agent that did **not** write it. | A posted verdict naming the captured revision it audited. | SD-B | A different agent from the planner. |
-| C | IMPLEMENT | [The chain rule](#the-seven-stages) — stage entry. | The changed files; local check output; a changed-files **and** NOT-touched list; a rule-preservation inventory when the change edits governance text. | SD-C | The implementing agent. |
+| C | IMPLEMENT | [The chain rule](#the-seven-stages) — stage entry. | The changed files; local check output; [the handoff block](#stage-handoff) — **owed by every stage, not by C alone**; a rule-preservation inventory when the change edits governance text. | SD-C | The implementing agent. |
 | D | INDEPENDENT IMPLEMENTATION AUDIT | [The chain rule](#the-seven-stages) — stage entry. | A posted audit naming that head, checking the plan's acceptance criteria one by one. | SD-D | A different agent from the implementer. |
 | E | VALIDATE | [The chain rule](#the-seven-stages) — stage entry. | The repository's own checks at that head, with their commands and output; every check that could not be run named **UNRUN**. | SD-E | The validating agent. |
 | F | FINAL INDEPENDENT PR CODE REVIEW | [The chain rule](#the-seven-stages) — stage entry. | A posted verdict naming that 40-character head, which also checks the PR's "Aegis skills used" table against the work. | SD-F | A different agent from the author and from the merger. |
@@ -120,19 +120,31 @@ column of the stage table. The maintenance rule is
 
 | ID | Stage | Disposition — the verdict the stage reaches | Affirmative? |
 | --- | --- | --- | --- |
-| `SD-A` | PLAN | **COMPLETE** when the plan carries what, why, blast radius, the paths it touches, and proportionate acceptance criteria. | yes |
+| `SD-A` | PLAN | **COMPLETE** when the plan carries what, why, blast radius, the paths it touches, and proportionate acceptance criteria; **and it records the change's classification from `change-classification-gate`, and any criterion it declares not verifiable at this head, with the reason.** | yes |
 | `SD-B` | PLAN AUDIT | **ACCEPT** or **REVISE**, on the captured revision it names. | ACCEPT |
-| `SD-C` | IMPLEMENT | **COMPLETE** or **INCOMPLETE**. **COMPLETE requires an immutable head** — the commit SHA the implementation produced, recorded so the next stage audits a fixed object rather than a moving branch. | COMPLETE |
-| `SD-D` | IMPL AUDIT | **ACCEPT** or **REVISE**, resolved **per acceptance criterion**: every criterion is `MET`, `NOT MET` or `UNRUN`. ACCEPT requires **no `NOT MET`** and **every `UNRUN` recorded as a stated gap with what would resolve it**. | ACCEPT |
+| `SD-C` | IMPLEMENT | **COMPLETE** or **INCOMPLETE**. **COMPLETE requires an immutable head: the commit SHA, the tree it resolves to (`git rev-parse <head>^{tree}`), and the base commit the change is against, all recorded** — so the next stage audits fixed objects rather than a moving branch, and "the diff at an exact head" is fully determined. The **tree** fixes content; the **base** fixes the diff. | COMPLETE |
+| `SD-D` | IMPL AUDIT | **ACCEPT** or **REVISE**, resolved **per acceptance criterion**: every criterion is `MET`, `NOT MET` or `UNRUN`. ACCEPT requires **no `NOT MET`**, and **every `UNRUN` must correspond to a criterion the plan at `SD-A` declared not verifiable at this head, with its reason recorded**. A criterion that becomes `UNRUN` at audit time and was **not** so declared forces **`REVISE`** — it is a finding about the implementation or the plan, not a gap to wave through. | ACCEPT |
 | `SD-E` | VALIDATE | **PASS**, **INCOMPLETE — UNRUN LISTED**, or **FAIL**. | PASS, and INCOMPLETE — UNRUN LISTED **only when its condition below is met** |
-| `SD-F` | FINAL REVIEW | **ACCEPT** or **REVISE**, on the exact 40-character head; **and the PR template's *Security-relevant surface?* question is answered** — `No`, or `Yes` with the surfaces named. | ACCEPT |
-| `SD-G` | MERGE | **MERGED** or **NOT MERGED**, with [the receipt](#the-receipt-what-stage-g-must-be-able-to-show) carrying the evidence keyed to the `MG` IDs. | MERGED |
+| `SD-F` | FINAL REVIEW | **ACCEPT** or **REVISE**, on the exact 40-character head; **and the PR template's *Security-relevant surface?* question is answered** — `No`, or `Yes` with the surfaces named; **and the PR's "Aegis skills used" table is present, with a row for every stage that ran**; **and the `## Reconciliation witness` block is present with one row per numbered site.** | ACCEPT |
+| `SD-G` | MERGE | **MERGED** or **NOT MERGED**, with [the receipt](#the-receipt-what-stage-g-must-be-able-to-show) recording a status per `MG` ID. | MERGED |
 
-> **`SD-E: INCOMPLETE — UNRUN LISTED`** is affirmative **only when every unrun
+> **`SD-E: INCOMPLETE — UNRUN LISTED`** is affirmative when every unrun
 > check is either (a) run by a named CI job at that exact head, evidenced, or
-> (b) recorded as a stated gap that BOTH the final review and the merge receipt
-> carry.**
+> (b) listed in **the Stage E unrun record** with what would resolve it.
+> *(Both halves are owned by E. **E's affirmativeness depends only on E.**)*
+> **Forward duty, not a precondition:** when `SD-E` is `INCOMPLETE — UNRUN
+> LISTED`, **`SD-F` must accept the Stage E unrun list as part of its review**,
+> and **`SD-G`'s receipt must record it** — because E said so, **not** as a
+> condition of E being affirmative.
 > **`UNRUN` is never `PASS`.** A check that did not run is named, not absorbed.
+
+**Why this shape, and why it changed.** The previous condition made `SD-E`'s
+affirmativeness depend on a gap being carried by *the final review and the merge
+receipt* — Stages **F** and **G**, both of which follow E. Since F and G cannot
+begin until E is affirmative, **an uncovered check deadlocked the chain**: a
+dependency edge pointing backwards in time. Every edge in this rule now points
+**forward**. E owns its own evidence; F and G carry **duties arising from** E's
+disposition.
 
 **Why the token is worded this way.** The word `PASS` does not appear in it, so a
 skim or a `grep -i '^PASS'` cannot read it green. `INCOMPLETE` **cannot be
@@ -148,25 +160,77 @@ lets them route: `SD-D`'s `NOT MET` is not an ACCEPT, so the chain rule consumes
 it, and `SD-E`'s `INCOMPLETE — UNRUN LISTED` is not a `PASS`, so an uncovered
 check cannot flow onward as one.
 
+### Stage dependencies
+
+**This is the sole rendering of every cross-stage obligation** — one row per edge,
+stating what the later stage must carry. Acyclicity is checkable by inspection:
+**every `From` precedes its `To` in the A→G order.** That one-line test is the
+property whose absence produced the deadlock described under `SD-E`.
+
+| From | To | What the later stage must carry |
+| --- | --- | --- |
+| `SD-A` | `SD-B` | the plan text and its captured revision |
+| `SD-A` | `SD-D` | the recorded classification, and any criterion the plan declared not verifiable at this head |
+| `SD-A` | `SD-E` | the recorded classification, which selects the validation depth in E |
+| `SD-B` | `SD-C` | the accepted plan and the revision the verdict named |
+| `SD-C` | `SD-D` | the head commit, **its tree**, and the base commit |
+| `SD-D` | `SD-E` | the per-criterion result set, including every `UNRUN` and the plan's declaration for it |
+| `SD-D` | `SD-F` | the per-criterion result set |
+| `SD-E` | `SD-F` | the Stage E unrun list, when E is `INCOMPLETE — UNRUN LISTED` |
+| `SD-E` | `SD-G` | the Stage E unrun list, when E is `INCOMPLETE — UNRUN LISTED` |
+| `SD-F` | `SD-G` | the accepted verdict, its head, and the template answer |
+
+### Stage handoff
+
+**Owed by every stage, not by Stage C alone.** Each stage leaves this, and each
+stage's exit cell points here rather than carrying its own version.
+
+1. **The decision-ID register** is this page's own `MG1`–`MG5` and `SD-A`–`SD-G`.
+   Each stage declares which prior decisions still bind it and which it changes.
+   **A changed decision is a flagged deviation, not a silent overwrite.**
+2. **Changed-files and NOT-touched lists** — owed by **every stage that changes
+   files**, not only C.
+3. **Proven invocation** for every claim: the command and its tell-tale output,
+   never "tests pass".
+4. **Deviation flags** wherever a stage departs from the plan or a prior decision.
+5. **A continuation line**: what the next stage needs in order to pick the work up
+   cold.
+
 ### The receipt: what Stage G must be able to show
 
-The receipt is an **evidence list keyed to the `MG` IDs**, so a merge can be
-shown afterwards. Recording it does not satisfy the conditions — a receipt is a
-record, not a gate.
+The receipt is a **status table keyed to the `MG` IDs**. It records **outcomes**,
+never requirements: it says **whether** the evidence exists and **where**, and
+where the condition's own text matters it **links** to the condition. Recording it
+does not satisfy the conditions — a receipt is a record, not a gate.
 
-- **`MG1`** — the exact head and each applicable check's result at it, **or** the
-  cited exception and the failed check's authorized disposition.
-- **`MG2`** — the final review's comment identifier and the 40-character head it
-  names.
-- **`MG3`** — the automated review's result **for that head**, or its confirmed
-  unavailability for that head, **plus the triage of every P1/P2 finding**.
-- **`MG4`** — **the authority source**: the register entry's ID **and that it was
-  read from the default branch**, *or* the owner's verbatim instruction with its
-  source.
-- **`MG5`** — **either** the security verdict's comment identifier and the head it
-  names, **or** `not applicable — internal contribution`, with the reason.
-- **`SD-F`'s template answer** — the *Security-relevant surface?* answer as
-  posted.
+| ID | Evidence | Pointer, or the scope clause that makes it not applicable |
+| --- | --- | --- |
+| `MG1` | `present` / `absent` / `not applicable` | the head and each check's result, or the cited exception — see [`MG1`](#before-merging-stage-g-entry-conditions) |
+| `MG2` | `present` / `absent` / `not applicable` | the review's comment identifier and the head it names — see [`MG2`](#before-merging-stage-g-entry-conditions) |
+| `MG3` | `present` / `absent` / `not applicable` | the review's result for that head and the P1/P2 triage — see [`MG3`](#before-merging-stage-g-entry-conditions) |
+| `MG4` | `present` / `absent` / `not applicable` | the authority source — see [`MG4`](#before-merging-stage-g-entry-conditions) |
+| `MG5` | `present` / `absent` / `not applicable` | the verdict and its head, **or** `not applicable` with the reason **naming `MG5`'s own scope clause** — see [`MG5`](#before-merging-stage-g-entry-conditions) |
+| `SD-F` template answer | `answered` | the posted answer |
+
+**`not applicable` is permitted only where the condition's own scope clause says
+so, and the reason column must name that clause.** That is what makes the
+vocabulary truthful for every case, including the one that used to have no true
+option — an **outside contribution that touches no security-relevant surface**:
+`MG5: not applicable`, reason = the same scope clause, because the change does not
+touch a security-relevant surface and so no review is owed. **No fourth option was
+added to make that true.**
+
+**The general rule this receipt obeys, and which any future derived list must
+obey:**
+
+> **A derived list may carry IDs, statuses and pointers. It may not carry a
+> condition's requirement text. Where a derived list needs to say what a
+> condition requires, it links to the condition.**
+
+That is a rule about renderings rather than a rendering, so it applies to lists
+that do not exist yet. The previous exemption for this receipt is **deleted** —
+it was needed only while the receipt restated requirements, which it no longer
+does.
 
 ### Before merging: Stage G entry conditions
 
@@ -190,30 +254,30 @@ content-free pointer set; it was not, and the claim is corrected rather than
 rescued by putting bare IDs on the startup surface, where their definitions would
 not travel with them.
 
-**What the summary restates, derived by command rather than asserted.** The
-`AGENTS.md` summary restates **all five** conditions in prose. This was derived by
-searching each condition's distinctive content markers over `AGENTS.md` at the
-revision being edited — `grep -inE '<marker>' AGENTS.md` per row — not read off by
-hand:
+**What the summary restates, derived by command rather than asserted — the method,
+not the measurement.** The `AGENTS.md` summary restates **all five** conditions in
+prose, **`MG3` only partially** (its review wait, with no P1/P2 triage anywhere in
+the file). That is established per PR by searching each condition's distinctive
+content markers over `AGENTS.md` at the revision being edited:
 
-| Condition | Marker searched | `AGENTS.md` | Verdict |
-| --- | --- | --- | --- |
-| `MG1` checks | `checks are all green\|applicable check` | `:86` | restated |
-| `MG2` final review | `final PR review is posted\|posted, accepted` | `:70` | restated |
-| `MG3` automated review | `automated review\|Codex\|usage-limit` | **none** | — |
-| `MG3` wait half | `review wait has completed\|required review wait` | `:87` | **partial only** |
-| `MG3` triage half | `P1 and P2\|P1/P2\|triaged` | **none** | — |
-| `MG4` authority | `preamble test\|register entry` | `:88-89` | restated |
-| `MG5` security review | `security review\|outside contributions` | `:71-73` | restated |
+```
+grep -inE '<marker>' AGENTS.md      # one invocation per condition, at the head being edited
+```
 
-So **`MG3` is restated only partially** — its review **wait** at `:87`, with **no**
-P1/P2 triage anywhere in the file. **The list is re-derived by that search
-whenever the summary changes; it is not maintained by hand.** That matters because
-the honest reason the `MG` IDs are not in the summary is that it restates *every*
-condition: a summary that restated one condition but not others would need
-explaining, while one that restates all five is simply a summary. A hand-written
-version of this list was previously wrong about exactly this — it omitted `MG5`
-and overstated `MG3` — which is why it is stated as a measurement with its command.
+**The resulting table of markers and their hits is a point-in-time measurement, so
+it lives in the PR body, not on this page.** A rule belongs on the page; a
+measurement goes stale the moment the file it measures changes, and this one kept
+generating findings. **The markers themselves, and the per-marker result table,
+are recorded in the PR body's divergence table, regenerated for each PR.** The
+method stays here; the numbers do not.
+
+**The list is re-derived by that search whenever the summary changes; it is not
+maintained by hand.** That matters because the honest reason the `MG` IDs are not
+in the summary is that it restates *every* condition: a summary that restated one
+condition but not others would need explaining, while one that restates all five is
+simply a summary. A hand-written version of this list was previously wrong about
+exactly this — it omitted `MG5` and overstated `MG3` — which is why it is stated as
+a measurement with its command, kept where a measurement belongs.
 
 - **`MG1` — checks.** Every applicable check is green **at that exact head** —
   not only the branch-protection-required ones. A green required pair alongside a
@@ -492,6 +556,55 @@ The rule is still worth having: a documented control that agents actually follow
 is worth more than an undocumented one that nobody can check. But nobody should
 read this page and believe a machine is holding it up.
 
+### The numbered collapse sites
+
+**Every site an edit may touch is enumerated here, and numbered.** This list is
+what makes *"does this edit reconcile everything it touched?"* a countable check
+instead of a remembered one: the PR body carries a **`## Reconciliation witness`**
+block with **exactly one row per numbered site below**.
+
+1. **The `MG` block** — `### Before merging: Stage G entry conditions`, `MG1`–`MG5`.
+2. **The `SD` block** — `### Stage dispositions`, `SD-A`–`SD-G`.
+3. **The dependency block** — `### Stage dependencies`.
+4. **The handoff block** — the single-sourced per-stage handoff, owed by every stage.
+5. **The pointer-shaped sites** — **one numbered entry, not one per hit.** This
+   entry stands for *every* other mention of a condition or disposition on the
+   page, taken together, and it is verified by running the two greps in
+   [the agreement check](#the-agreement-check-procedural). It is one entry
+   deliberately: enumerating the hits individually would make the witness a
+   second rendering of the grep, and the grep already owns that answer.
+6. **The `AGENTS.md` summary** — the derived startup surface, reached by the
+   separate human step, not by the grep.
+7. **The PR body** — the only rule-bearing content permitted there is the witness
+   block, the skills table and the divergence table.
+8. **The stage table's exit-disposition column** — seven cells, each a bare ID.
+
+**Sites 1–4 and 8 are on this page; 5 is on this page but counted once; 6 is
+another file; 7 is outside the repository.** The witness records `changed` or
+`unchanged-and-verified` for each, with the command output that establishes it.
+**The witness is content-free** — IDs and statuses only — so it is not itself a
+rendering.
+
+**What this control is not.** It is **still procedural**: nothing verifies the
+witness is *true*, only that it is present, complete and shaped right. It makes
+the failure mode *"the author forgot a conditional step"* — which happened — into
+*"the final reviewer passed a complete but false witness"*, which is narrower and
+involves a second party. **That is an improvement, not a solution**, and this page
+says so rather than implying the per-edit gap is closed. The only categorical fix
+is a CI check that the block exists with the expected row count; `scripts/` is
+outside this change's scope, so it is **recorded as open, not present**.
+
+## Adoption and review
+
+**Adoption is incremental by stage, not by document.** Stages A–G take effect on
+merge of this change. Where a stage's required distinct holder does not exist, the
+change **halts** per [When the separation cannot be achieved](#when-the-separation-cannot-be-achieved) —
+it is not exempted from the stages that do have holders.
+
+**Review date: 2026-11-03** (30 days). On that date this rule is re-read against
+`agent-governance-audit`'s method and either reaffirmed, amended, or withdrawn.
+**The date is the trigger**; a rule with no review date fossilizes.
+
 ### The agreement check (procedural)
 
 **Agreement is by derivation, not by checking.** A condition has one normative
@@ -516,36 +629,22 @@ disposition means editing its definition and re-reading the hits — that is the
 whole maintenance burden, and it is bounded by the number of pointers, not by the
 number of renderings.
 
-**Two sites are exempt from that test, and they are named here with their reasons
-rather than left to a reader's judgement.** They are named because **a test that
-cannot pass is worse than no test**, and this is the test that detects the
-recurring defect class — an unstated exemption would make it unrunnable:
+**There are no longer any exempt sites, and the two that existed are gone because
+the sites themselves were collapsed rather than excused.**
 
-1. **The chain rule's affirmative list.** It restates the affirmative
-   classification that the `Affirmative?` column of
-   [the stage dispositions](#stage-dispositions) owns. **Why it is permitted:**
-   the chain rule has to be readable at the point where the transitions are
-   described, and the classification is a fixed seven-element set that changes
-   only when a disposition token changes — the same edit that would touch both
-   places. **What guards the duplication:** the `Affirmative?` column exists, so
-   the two renderings can be compared in a single pass, which a free-floating
-   prose list could not support.
-2. **The receipt list** under `SD-G`. It re-encodes each condition's evidence
-   requirement, and it contains phrases that appear nowhere else on the page —
-   measured: `authorized disposition` occurs only in that list and in `MG1`'s
-   condition, and `default branch` only in that list and in `MG4`'s condition.
-   **Why it is permitted, and the tension stated rather than resolved away:** a
-   receipt that did not say what evidence to record could not be kept, and a
-   pointer-only receipt would fail at the one moment it is used — after the merge,
-   when the question is *what has to exist*. So the receipt is a **second
-   rendering of evidence requirements, not of the conditions themselves**, and it
-   is the one place where restating is the document's function. It is recorded as
-   an exempted site in the collapse map, not silently tolerated.
+- The **receipt list** restated each condition's evidence requirement. It is now
+  a status table carrying IDs, statuses and pointers only — see
+  [the receipt](#the-receipt-what-stage-g-must-be-able-to-show) and the general
+  rule stated there.
+- The **chain rule's affirmative list** restated the classification the
+  `Affirmative?` column owns. `SD-E`'s condition no longer depends on prose
+  carried elsewhere, and every dependency edge is now stated once in
+  [the dependency block](#stage-dependencies).
 
-**Both exemptions are load-bearing**, and neither can be collapsed without losing
-something the rule genuinely needs. Neither is a licence to restate a condition
-anywhere else: every other hit remains a pointer, and a third content-bearing site
-is a defect.
+**So the test above now has no exceptions, and this sentence stays true and
+unedited: a third content-bearing site is a defect.** The rule that keeps it true
+is the receipt's general rule — *a derived list may carry IDs, statuses and
+pointers, never a condition's requirement text*.
 
 **The `AGENTS.md` summary needs a separate human step, because no grep reaches
 it.** The two greps above are scoped to **this page**. The `AGENTS.md` summary is

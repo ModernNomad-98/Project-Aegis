@@ -67,3 +67,32 @@ surface, as listed in
 
 - [ ] Yes — surface(s) touched: <!-- for example `scripts/`, `.github/`, `AGENTS.md` -->
 - [ ] No
+
+## Reconciliation witness (required)
+
+One row per **numbered collapse site** in
+[the numbered collapse sites](https://github.com/ModernNomad-98/Project-Aegis/blob/main/docs/delivery-workflow.md#the-numbered-collapse-sites).
+Record `changed` or `unchanged-and-verified`, plus the command output that
+establishes it. **IDs and statuses only — this block carries no rule text**, so it
+is not a rendering of the rule. `SD-F` cannot ACCEPT without it.
+
+| # | Site | Status | Evidence (command and output) |
+| --- | --- | --- | --- |
+| 1 | The `MG` block | | |
+| 2 | The `SD` block | | |
+| 3 | The dependency block | | |
+| 4 | The handoff block | | |
+| 5 | The pointer-shaped sites | | |
+| 6 | The `AGENTS.md` summary | | |
+| 7 | The PR body | | |
+| 8 | The stage table's exit-disposition column | | |
+
+## Divergence table (required when `AGENTS.md` or a condition changed)
+
+The per-marker measurement behind the statement that the `AGENTS.md` summary
+restates all five conditions. Regenerated per PR; a measurement belongs here, not
+on the rule page.
+
+| Condition | Marker searched | `AGENTS.md` | Verdict |
+| --- | --- | --- | --- |
+| | | | |

@@ -84,7 +84,10 @@ own work, no reviewer — code or
 security — merges it, and a separate agent holding the applicable authority
 performs the merge only after every required review has passed at the exact
 head being merged, that head's checks are all green — not only the
-branch-protection-required ones — and any required review wait has completed.
+branch-protection-required ones — unless an active owner exception covering
+that exact head and scope is cited, in which case the failed check is recorded
+as failed with its authorized disposition, never as green and never as waived
+— and any required review wait has completed.
 The merge agent confirms that authority itself — a register entry on the
 default branch that passes the preamble test below, or the owner's instruction
 quoted verbatim in its brief with its source; a brief's bare assertion of
