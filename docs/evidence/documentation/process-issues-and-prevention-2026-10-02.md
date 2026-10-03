@@ -715,18 +715,82 @@ drift did no harm here only because it moved the fact from "unpublished" to
 already satisfied at `145647cc`, whose subject is exactly that correction:
 
 ```text
-$ git show 145647cc:.claude/skills/rls-policy-auditor/SKILL.md | sed -n 217p
+$ git show 145647cc:.claude/skills/rls-policy-auditor/SKILL.md | sed -n 218p
   per-command audit questions, the seven failure-mode catalog with detection
-$ git show origin/main:.claude/skills/rls-policy-auditor/SKILL.md | sed -n 217p
+$ git show 5703e93f:.claude/skills/rls-policy-auditor/SKILL.md | sed -n 217p
+  per-command audit questions, the seven failure-mode catalog with detection
+$ git show d9f57283:.claude/skills/rls-policy-auditor/SKILL.md | sed -n 218p
   per-command audit questions, the seven failure-mode catalog with detection
 ```
 
-**The line is identical; the file is not.** The blobs differ — `cf8d207f` at
-`145647cc` against `3d25584f` on `origin/main` — because the branch also carries
-`a69d4d1f`'s reconciliation citation. A verifier comparing whole-file hashes would
-report a false mismatch, and the count that had to match does match. This is
-`PROC-01`'s lesson in miniature: run the test that answers the question asked, and do
-not let a broader test answer a narrower one.
+**The line is identical; the file was not — and at the current `origin/main` the
+blobs are identical too.** Two corrections to what this paragraph first said, both
+measured 2026-10-02 and both **PROVEN**.
+
+*The citation was off by one for `145647cc`.* The quoted text sits at line **218**
+in that revision's blob, not line 217, which is the `references/…` link line. The
+block above now gives each revision the number it actually needs, because the two
+blobs do not share a line numbering: the one carrying the reconciliation citation
+has one more line above this point (raw `0x0A` byte counts, the method `PROC-04`
+requires: 223 against 222). The original block showed `sed -n 217p` for both
+revisions with one identical output, which the first of those two commands cannot
+produce. Those runs used Git's bundled `C:\Program Files\Git\usr\bin\sed.exe`,
+which is not on `PATH` in the measuring environment.
+
+*The blob-difference claim is now false.* This paragraph read:
+
+> The blobs differ — `cf8d207f` at `145647cc` against `3d25584f` on `origin/main` —
+> because the branch also carries `a69d4d1f`'s reconciliation citation. A verifier
+> comparing whole-file hashes would report a false mismatch, and the count that had
+> to match does match.
+
+`3d25584f` is the blob at `5703e93f` — the revision this class records as
+`origin/main` four paragraphs above — not at the `origin/main` that exists now.
+Measured after `git fetch origin` in `C:\src\Project Aegis\wt-register`:
+
+```text
+$ git rev-parse origin/main
+d9f57283145ce2608ff76920dddd3db5be48b9a9
+$ git rev-parse 145647cc:.claude/skills/rls-policy-auditor/SKILL.md
+cf8d207f190bf4024b4ba09b8afd186d73870d6a
+$ git rev-parse 5703e93f:.claude/skills/rls-policy-auditor/SKILL.md
+3d25584f5f0d21cfeb36f191a93ab215af77f23e
+$ git rev-parse f6bf9d9a:.claude/skills/rls-policy-auditor/SKILL.md
+cf8d207f190bf4024b4ba09b8afd186d73870d6a
+$ git rev-parse d9f57283:.claude/skills/rls-policy-auditor/SKILL.md
+cf8d207f190bf4024b4ba09b8afd186d73870d6a
+```
+
+`145647cc` and the current `origin/main` are therefore the **same blob** for that
+path, and the mismatch closed at `f6bf9d9a` (PR #632), which carries `cf8d207f` —
+the file the branch already had. The cause the original sentence gave is confirmed
+rather than withdrawn: `git diff 3d25584f cf8d207f` is **3 insertions and 2
+deletions**, all inside the reconciliation §3 citation. **PROVEN.**
+
+**What survives, and what does not.** The conclusion survives: the file at
+`145647cc` carries the `seven` text and so does the current `origin/main`, so the
+owed correction stays discharged and the `seven` finding is untouched. What does
+not survive is the illustration — a verifier comparing whole-file hashes now gets a
+*true* match, not the false mismatch this paragraph warned against. The lesson
+drawn from it stands unchanged: this is `PROC-01`'s lesson in miniature, run the
+test that answers the question asked and do not let a broader test answer a
+narrower one. Its durable part is the revision binding — a figure read from a
+moving ref must carry the revision it was read at, or the next reader inherits a
+falsehood instead of a measurement.
+
+**This is the register's own subject matter, and this instance went undisclosed.**
+The false half was a value read from the moving ref `origin/main` and written down
+without the revision it was read at, so main moving made it false. That is Class
+3's defect — a measurement carried forward without its instant — and Class 1's
+hazard seen from the other side: a claim true of the ref as it then stood and false
+of the ref a reader now looks at. This class already records that drift twice, for
+the "never pushed" claim and for its own provenance; unlike those, this one was not
+noticed. Both provenance notes re-checked "Classes 1–5" at the new tip and left this
+class's own figures unexamined, and the sentence survived both correction passes.
+One `git rev-parse` falsifies it. This page's own branch still carries `3d25584f`
+for that path and does not modify it (`git diff --name-only 6715cefc..HEAD` lists
+only this document), so the stale copy is inert and merging cannot revert `main`'s
+file.
 
 **A second instance of the defect, and in this one the rule WORKED.** A later agent
 was dispatched for **this** register lane after the lane already existed. Its
@@ -944,7 +1008,7 @@ request description.
 | 5 | The "159 no-record pages" figure | **UNVERIFIED** | requires running the unmerged tool; not done |
 | 6 | The seven→eight regression reproduces verbatim, and no source supports "eight" | **PROVEN** | `git show 4d08377d --numstat` → `1 1`; `rls-audit-checklist.md:35` = "Seven failure modes"; 7 numbered items; Workflow step 4 names 7 |
 | 6 | The briefed "branch was NEVER pushed" is now **false**: the branch is on the remote at `145647cc` | **PROVEN** | `git ls-remote --heads origin`; `git merge-base --is-ancestor 4d08377d 145647cc` → 0; `git for-each-ref --contains 4d08377d` → 2 refs |
-| 6 | The seven→eight regression is **discharged** by the owning lane at `145647cc`, not owed | **PROVEN** | line 217 at `145647cc` and at `origin/main` both read "the seven failure-mode catalog" |
+| 6 | The seven→eight regression is **discharged** by the owning lane at `145647cc`, not owed | **PROVEN** | `sed -n 218p` at `145647cc` and at `d9f57283` (`origin/main`), `sed -n 217p` at `5703e93f`: all three read "the seven failure-mode catalog" |
 | 6 | Two dispatches put two writers on one worktree (`wt-ten`) | **UNVERIFIED** (the dispatch is session state; its consequence reproduces) | `git -C "C:\src\Project Aegis\wt-ten" reflog --date=iso`: 6 commits, one reset away, 5 surviving |
 | 6 | A later `git worktree add` failed (exit 255) and the agent self-halted | **UNVERIFIED** (reported in a brief; a failed dispatch leaves no trace) | `git worktree list`: exactly one worktree per branch |
 
