@@ -155,11 +155,20 @@ says so.
   software development kit (SDK) and environment precheck, `test_offline_ci.py`,
   `test_validator.py` including its `AGENTS.md`, `CLAUDE.md` and `README.md`
   text contract, `validate-skills.py`, the contract-audit self-tests, the
-  Behavioral Eval Runner (BER) self-check and full suite, Scenario A acceptance
-  on both PowerShell hosts, and the DCO sign-off check on every commit.
+  Markdown link-checker self-tests, the Behavioral Eval Runner (BER) self-check
+  and full suite, Scenario A acceptance in **PowerShell Core only** — the
+  Windows PowerShell 5.1 acceptance of the same runbook runs in
+  `windows-offline-checks`, not here — and the DCO sign-off check on every
+  commit.
 - **`gate-guard`** (required, pull requests only) — fails when a PR modifies a
   path matching the protected-path pattern. It protects the merge gate and the
-  surfaces that enforce it. It does **not** protect `.md` files.
+  surfaces that enforce it. The pattern is **directory-based, never
+  extension-based**: it does not protect `.md` files *as a class*, and a `.md`
+  file **is** protected when a protected directory carries it. Measured against
+  the live pattern, `scripts/tests/fixtures/markdown-links/bad/README.md`,
+  `tools/behavioral_eval_runner/README.md` and `.claude/agents/example-agent.md`
+  all match, while `AGENTS.md`, `CONTRIBUTING.md` and every file under `docs/`
+  do not.
 - **`windows-offline-checks`, `tools-tests-linux`, `tools-tests-windows`** —
   visible coverage. They are **not** registered required checks.
 - Everything above is **bypassable**: `enforce_admins` is `false`, and merges are
