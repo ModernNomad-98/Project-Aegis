@@ -30,8 +30,8 @@ check names stay `validate-skills` and `gate-guard`; branch protection is unchan
 
 | Job | Coverage | Merge role | Timeout |
 | --- | --- | --- | --- |
-| `validate-skills` on Ubuntu | CI recorder/guard regressions, validator and audit self-tests, skill validation, BER self-check and full suite, PowerShell Core Scenario A acceptance, pull-request-only Developer Certificate of Origin (DCO) check | Existing required check | 15 minutes |
-| `windows-offline-checks` on Windows | Recorder regressions, validator and audit self-tests, skill validation, BER self-check and full suite, sequential PowerShell Desktop 5.1 and Core acceptance | Additional visible coverage; not registered as required | 20 minutes |
+| `validate-skills` on Ubuntu | CI recorder/guard regressions, validator, audit and link-checker self-tests, skill validation, BER self-check and full suite, PowerShell Core Scenario A acceptance, pull-request-only Developer Certificate of Origin (DCO) check | Existing required check | 15 minutes |
+| `windows-offline-checks` on Windows | Recorder regressions, validator, audit and link-checker self-tests, skill validation, BER self-check and full suite, sequential PowerShell Desktop 5.1 and Core acceptance | Additional visible coverage; not registered as required | 20 minutes |
 | `gate-guard` on Ubuntu | Detect changes to the merge gate and its enforcement surfaces | Existing required check; PR only | 5 minutes |
 | `tools-tests-linux` on Ubuntu | Host-bridge Node callback tests, setup routing-contract suite, delivery-control suite | Isolated from the gates; not registered as required | 15 minutes |
 | `tools-tests-windows` on Windows | The same three suites, plus a read-only ownership diagnostic (token user, default owner, elevation, temp-root owners) recorded before the delivery-control suite | Isolated from the gates; not registered as required | 20 minutes |
