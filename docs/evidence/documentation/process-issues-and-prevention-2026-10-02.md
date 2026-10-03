@@ -562,12 +562,19 @@ $ git grep -n 'Measure-Object -Line' -- '*.md'
 ```
 
 **This grep is a review prompt, not a gate.** It has hits on `main` today —
-`docs/evidence/session-continuation-2026-09-30-evening.md:176`,
-`docs/roadmaps/aegis-documentation-readability-backlog.md:2772` and this page —
-and **every one of them is text *about* the trap, not a count produced by it**.
-So a hit must be read, not failed on. A mechanical version of this check needs
-an allowlist of pages that define the rule. Any published count that fails to
-name its method fails this check.
+`docs/evidence/session-continuation-2026-09-30-evening.md:176` and
+`docs/roadmaps/aegis-documentation-readability-backlog.md:2772`
+(`git grep -n 'Measure-Object -Line' origin/main -- '*.md'` at `origin/main` =
+`1cb61f3a`, 2 hits) — and **every one of them is text *about* the trap, not a count
+produced by it**. The list this paragraph first gave included this page as a third
+hit; that was **wrong for `main`** and is corrected here: this page is not on `main`
+at all (`git cat-file -e
+origin/main:docs/evidence/documentation/process-issues-and-prevention-2026-10-02.md`
+→ 128), so its own prohibition cannot be a hit there yet and becomes a third only if
+this page merges. So a hit must be read, not failed on, and the list of hits is itself
+a revision-bound figure. A mechanical version of this check needs an allowlist of
+pages that define the rule. Any published count that fails to name its method fails
+this check.
 
 ---
 
@@ -583,11 +590,28 @@ dispatched from that finding. It was caught before dispatch.
 
 **PROVEN** for the artifact's status; **UNVERIFIED** for the figure.
 
+**Dated correction, 2026-10-02, added by the fix pass that answered an independent
+review of this page.** The figures in this block were read while PR #629 was open and
+several have since moved — this document's own Class 3 defect appearing in its own
+evidence. Re-measured as of `origin/main` = `1cb61f3a312d76afad6ec525155184abd120f24c`:
+PR #629 is **MERGED** (`mergedAt` 2026-10-03T01:08:52Z), not `OPEN`; its head moved to
+`797ca687`, not `7c52b6f6`; `gh pr view 629 --json files --jq '.files | length'`
+returns **13**, not 12, the added path being
+`tools/readability_acceptance/tests/test_verify_ground_truth.py`; and
+`git cat-file -e origin/main:tools/readability_acceptance/check_index.py` now exits
+**0**, so the last listing in the block is stale as well. The block is left verbatim
+because this page's convention is to correct forward rather than rewrite a dated
+measurement. **`PROC-01` applies to this correction too**: `797ca687` is the merged
+PR's head and is **not** an ancestor of `origin/main` (`git merge-base --is-ancestor
+797ca687 origin/main` → 1), because the merge squashed it — so the tool is on the
+default branch as *content*, which is the test `PROC-01` requires, not as that commit.
+
 ```text
 $ gh pr view 629 --repo ModernNomad-98/Project-Aegis --json state,mergedAt,headRefOid,title
 state = OPEN   mergedAt = (empty)   head = 7c52b6f63dc14dd1cb794b486135c2d9eb988302
 title = docs(tools): add a per-path readability acceptance index
-$ gh pr view 629 --repo ModernNomad-98/Project-Aegis --json files    # 12 files, all under:
+$ gh pr view 629 --repo ModernNomad-98/Project-Aegis --json files
+13 files at head 797ca687, all under:
 tools/readability_acceptance/{README.md,acceptance-index.json,build_index.py,
   check_index.py,investigate_commits.py,scan_lines.py,scan_paragraphs.py,
   scan_rounds.py,scan_stated.py,stated-acceptances.json,verify_ground_truth.py,
@@ -599,12 +623,24 @@ $ git ls-tree --name-only origin/main tools/
 tools/aegis_delivery_control
 tools/aegis_setup
 tools/behavioral_eval_runner
+tools/readability_acceptance
 ```
 
-The tool is absent from the default branch, so its output cannot be re-derived
-there. **The "159 no-record pages" figure is UNVERIFIED**: re-deriving it would
-require running the unmerged tool, which this page's PR does not do and does not
-authorize. Anyone acting on that figure must first re-derive it from `main`.
+**Dated correction, same pass — what changed for `PROC-05` and what did not.** PR #629
+merged at 2026-10-03T01:08:52Z, so the instrument is now on the default branch as
+content and `PROC-05`'s "unmerged instrument" clause **no longer applies to it**. What
+survives unchanged is the class's defect: at the time the "159 pages" figure was used,
+the tool was unmerged and unreviewed, which is the act this class records. The `159`
+figure is **still UNVERIFIED**, and the reason is now narrower and is stated rather than
+inherited: this fix pass did not re-derive it. The honest obstacle, named so the next
+reader is not misled: re-running it needs the merged tree in a working checkout, and
+this lane's brief forbids creating worktrees or helpers, so no attempt was made.
+
+The tool was absent from the default branch when the figure was produced, so its output
+could not be re-derived there then, and this page's PR neither ran it nor authorized
+running it. **The "159 no-record pages" figure is UNVERIFIED.** Anyone acting on that
+figure must first re-derive it from `main`; the instrument now exists there, so that
+re-derivation is now possible — which it was not when this class was written.
 
 ### How it happened
 
@@ -857,7 +893,23 @@ still exits 1, and PR #629 is still `OPEN` with
 exiting 128. The header is left exactly as written, per this document's practice of
 correcting forward rather than rewriting a dated measurement.
 
-**A fourth drift, in the same provenance, observed during the correction pass that answered the independent review of this page, on 2026-10-02.** Re-fetched twice in that pass, `origin/main` returned `f6bf9d9a` and then `d9f57283145ce2608ff76920dddd3db5be48b9a9` — the tip at the time of writing, PR #634, committed `2026-10-02T17:39:36-07:00` — so the `5703e93f` named just above was itself overtaken inside the same session, and the header's `6715cefc` is now four commits behind (`git rev-list --count 6715cefc..origin/main` → 4). Classes 1–5 were re-checked at the newest tip and still hold: `git grep -n "Each base SHA is the page's last recorded acceptance" origin/main -- docs/roadmaps/aegis-documentation-readability-backlog.md` still hits line 2790, `git merge-base --is-ancestor 65bacc7d6b85 origin/main` still exits 1, `git cat-file -e origin/main:tools/readability_acceptance/check_index.py` still exits 128, and PR #629 is still `OPEN`. This note is a dated measurement too, and will drift in turn.
+**A fifth drift, in the same provenance, re-measured by the fix pass that answered an
+independent review of this page on 2026-10-02, and this one is a different kind.** The
+note immediately above is a dated measurement and has drifted in turn, exactly as it
+predicted. Re-measured at `origin/main` = `1cb61f3a312d76afad6ec525155184abd120f24c`,
+`git rev-list --count 6715cefc..origin/main` → **10**, not the **4** recorded there;
+that 4 was true at `d9f57283`, the tip the note names, so the figure is corrected to
+name its revision rather than replaced with a number that will be stale by the next
+reader. Of the four checks the note lists, **three still hold** and **one does not**:
+`git grep -n "Each base SHA is the page's last recorded acceptance" origin/main --
+docs/roadmaps/aegis-documentation-readability-backlog.md` still hits line 2790;
+`git merge-base --is-ancestor 65bacc7d6b85 origin/main` still exits 1;
+`git cat-file -e origin/main:tools/readability_acceptance/check_index.py` now exits
+**0**, because PR #629 merged at 2026-10-03T01:08:52Z — so **"PR #629 is still `OPEN`"
+is false at `1cb61f3a`**. That is the fifth drift this class has recorded in its own
+provenance and the first one that changed a *conclusion* rather than only a number,
+which is why Class 5 carries its own dated correction above. This note is a dated
+measurement too, and will drift in turn.
 
 ### How it happened
 
@@ -973,9 +1025,9 @@ it can be added by this PR.
 | Rule | What CI could check | Where it would live |
 | --- | --- | --- |
 | `PROC-01` | For a declared list of (SHA, claim) pairs in the tracked text, fail when `git merge-base --is-ancestor <sha> origin/main` exits non-zero. Needs a machine-readable list, which does not exist yet. | `scripts/` — gate-guard protected |
-| `PROC-04` (forbidden method) | `git grep 'Measure-Object -Line' -- '*.md'` returns hits on `main` today that are all text *about* the trap, including this page's own prohibition. Mechanical only with an allowlist of pages that define the rule; without one it is a review prompt. | `scripts/` — gate-guard protected |
+| `PROC-04` (forbidden method) | `git grep 'Measure-Object -Line' -- '*.md'` returns hits that are all text *about* the trap. Mechanical only with an allowlist of pages that define the rule; without one it is a review prompt. | `scripts/` — gate-guard protected |
 | `PROC-04` (method named) | Harder: requires parsing prose for a count and checking a method is named nearby. Heuristic, so advisory at best. | `scripts/`, advisory only |
-| `PROC-05` (existence), partially | Fail when a tracked document cites a repository path that does not exist on the default branch. This would have caught reliance on `tools/readability_acceptance/`. A link checker of this kind is proposed in open PR #628, which is **unmerged**, so it is not available and must not be relied on (`PROC-05` applies to it). | `scripts/` — gate-guard protected |
+| `PROC-05` (existence), partially | Fail when a tracked document cites a repository path that does not exist on the default branch. This would have caught reliance on `tools/readability_acceptance/`. A link checker of this kind now **exists on the default branch** — `scripts/ci/check-markdown-links.py` (PR #628, merged 2026-10-03T00:47:45Z) — so the earlier statement here that it was "unmerged, so it is not available and must not be relied on" is **corrected**: it is available at `origin/main` = `1cb61f3a`. It remains **not part of the required checks** this page can rely on, and adding it would still be a `scripts/` change costing a manual review, which is the point this section makes. | `scripts/` — gate-guard protected |
 
 **Not mechanically enforceable, and why:**
 
@@ -1032,7 +1084,7 @@ request description.
 | 1 | The false sentence entered with PR #626's squash commit `bff75d9c` | **PROVEN** | `git log -S "Each base SHA is the page's last recorded acceptance"` |
 | 1 | PR #626's reviewed head `1e8b81e7` is also not on `main` (squash) | **PROVEN** | `git merge-base --is-ancestor 1e8b81e7 origin/main` → 1 |
 | 2 | #626 and #627 merged with no review record in existence | **PROVEN** | `gh pr view <n> --json mergedAt,comments` |
-| 2 | #623 carried **six** review-record comments before its merge: three named records (audit Audit-1 ACCEPT, readability REMEDY-1 SHIP, security SEC-1 SECURITY-ACCEPT) posted once, twice and three times | **PROVEN** | same |
+| 2 | #623 carried **seven** comments before its merge: the Codex notice at 23:54:19Z plus **six** review records at six distinct timestamps (23:59:41, 23:59:54, 00:00:08, 00:00:39, 00:00:41, 00:00:42) — the three review **stages** named above (audit Audit-1 ACCEPT, readability REMEDY-1 SHIP, security) carried across six separate comments, two of them byte-identical (`IC_kwDOTPe6NM8AAAABY3Ggyg` / `IC_kwDOTPe6NM8AAAABY3GznQ`, SHA-256 `7080D2F7…`), **not** three records posted "once, twice and three times" | **PROVEN** | `gh pr view 623 --json comments,mergedAt` — 9 comments, 7 with `createdAt` < `mergedAt` 2026-10-03T00:01:15Z |
 | 2 | #626's post-merge record returned FIX-FIRST on the Class 1 defect | **PROVEN** | comment body at `2026-10-03T00:13:01Z` |
 | 3 | #624's head instant is 00:04:58Z; a Codex notice postdates it at 00:09:58Z | **PROVEN** | `git log -1 --format=%cI a0634422`; `gh pr view 624 --json comments` |
 | 3 | The UNMET conclusion was measured at 00:09:47Z, 11 s before that notice | **PROVEN** | comment timestamps |
@@ -1040,8 +1092,8 @@ request description.
 | 4 | True counts are 1492 / 1504; `Measure-Object -Line` gives 1319 / 1331 | **PROVEN** | raw `0x0A` byte count of each blob: `python -c "import subprocess;b=subprocess.run(['git','cat-file','blob','1b9e7049:docs/skills-catalog.md'],capture_output=True).stdout;print(b.count(b'\n'))"` → 1492, the same command at `93c0834f` → 1504; `(git show <rev>:docs/skills-catalog.md \| Measure-Object -Line).Lines` → 1319 / 1331 |
 | 4 | The accusation was published and retracted | **PROVEN** | `gh api .../issues/comments/5963257423` and `/5963289254` |
 | 4 | The join-and-split method over-reports by 1 **only on an unterminated blob**; splitting the **raw text** over-reports by 1 **unconditionally** | **PROVEN** | array form: `behavioral-eval-runner-wp-2b-0-finalization.json` 13 vs 12 (+1), `1b9e7049` 1492 vs 1492 (+0), `93c0834f` 1504 vs 1504 (+0); raw-text form: `(git show 1b9e7049:docs/skills-catalog.md \| Out-String).Split("`n").Count` → 1493 vs 1492, and 1505 vs 1504 at `93c0834f` (+1 at both) |
-| 5 | PR #629 is open and its tool is absent from `main` | **PROVEN** | `gh pr view 629`; `git cat-file -e origin/main:tools/...` → 128 |
-| 5 | The "159 no-record pages" figure | **UNVERIFIED** | requires running the unmerged tool; not done |
+| 5 | PR #629 was open and its tool absent from `main` **when the figure was produced**; both facts are now false — it merged 2026-10-03T01:08:52Z and the tool is on `main` | **PROVEN** | then: `gh pr view 629` → `OPEN`; `git cat-file -e origin/main:tools/...` → 128. Now at `origin/main` = `1cb61f3a`: `state` = `MERGED`; same `cat-file -e` → 0; `gh pr view 629 --json files --jq '.files\|length'` → 13 (head `797ca687`) |
+| 5 | The "159 no-record pages" figure | **UNVERIFIED** | not re-derived by this pass; the instrument is now on `main` (`tools/readability_acceptance/check_index.py`, `origin/main` = `1cb61f3a`), so re-derivation is possible, but this lane is barred from worktrees and helpers and no attempt was made |
 | 6 | The seven→eight regression reproduces verbatim, and no source supports "eight" | **PROVEN** | `git show 4d08377d --numstat` → `1 1`; `rls-audit-checklist.md:35` = "Seven failure modes"; 7 numbered items; Workflow step 4 names 7 |
 | 6 | The briefed "branch was NEVER pushed" is now **false**: the branch is on the remote at `145647cc` | **PROVEN** | `git ls-remote --heads origin`; `git merge-base --is-ancestor 4d08377d 145647cc` → 0; `git for-each-ref --contains 4d08377d` → 2 refs |
 | 6 | The seven→eight regression is **discharged** by the owning lane at `145647cc`, not owed | **PROVEN** | `sed -n 218p` at `145647cc` and at `d9f57283` (`origin/main`), `sed -n 217p` at `5703e93f`: all three read "the seven failure-mode catalog" |
