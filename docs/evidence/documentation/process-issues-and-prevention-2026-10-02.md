@@ -447,7 +447,9 @@ decodes the blob into an array of lines and **discards the information about
 whether the final line was terminated**. Both the element count and the
 join-and-split form built on that array therefore report *lines*, not
 newlines, and **over-report by exactly 1 when the final line has no newline**.
-Measured at `6715cefc`, where 32 of 1426 tracked blobs are unterminated:
+That trailing-newline state is what decides **which of the two deltas above
+applies** — it is not the cause of the over-report. Measured at `6715cefc`,
+where 32 of 1426 tracked blobs are unterminated:
 
 ```text
 $ f=artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json
@@ -472,6 +474,36 @@ agree with the true count only because both blobs are newline-terminated —
 counts newlines is **counting `0x0A` bytes in the raw blob**, or an equivalent
 newline-counting form that sees the final unterminated line.
 
+**The second form: a split of the raw text, which over-reports unconditionally.**
+The trap above describes only the form that splits an **array of lines**, whose
+terminator was already discarded before the split ran. A **raw single-string
+read** preserves the final terminator, and splitting that string on newline
+returns **one more element than there are newline bytes — for a terminated blob
+exactly as much as for an unterminated one.** The over-report is therefore
+**unconditional** here, and it has a different cause: the **empty trailing
+element** a final `0x0A` always produces, not a lost terminator. Measured in
+PowerShell at `14f689e8`:
+
+```text
+$ (git show <rev>:<path> | Out-String) | Get-Member -MemberType Method
+    # a raw read: ONE string, the final terminator preserved
+$ ((git show 1b9e7049:docs/skills-catalog.md | Out-String).Split("`n")).Count
+1493        # the true newline count is 1492 (PROC-04 method)      -> +1
+$ ((git show 93c0834f:docs/skills-catalog.md | Out-String).Split("`n")).Count
+1505        # the true newline count is 1504 (PROC-04 method)      -> +1
+$ (Get-Content -Raw docs/skills-catalog.md).Split("`n").Count
+1505        # same file on disk: 1504 `0x0A` bytes, last byte 0x0A -> +1
+$ ('a' + "`n" + 'b' + "`n" + 'c' + "`n").Split("`n").Count
+4           # a terminated fixture with 3 newlines                 -> +1
+$ ('a' + "`n" + 'b' + "`n" + 'c').Split("`n").Count
+3           # an UNTERMINATED fixture with 2 newlines              -> +1
+```
+
+Both forms over-report by 1, but for different reasons and under different
+conditions, so neither may be used as a newline count: the **array** form's
++1 is conditional on the trailing-newline state and is 0 on a terminated blob,
+while the **raw-text** form's +1 holds whether or not the blob is terminated.
+
 The scratch note also cited the offset as 173 and the two pairs as
 1492/1319 and 1504/1331; those figures reproduce exactly. What does not
 reproduce is its recommended method. The note is session scratch at
@@ -491,7 +523,11 @@ number looks like a line count.
 
 **Every published line count must name the counting method; a line count must
 be a newline count; `Measure-Object -Line` is forbidden for line counts; and a
-trailing-newline change must be checked explicitly.** Concretely: state whether
+trailing-newline change must be checked explicitly.** Both split forms above are
+also forbidden for a line count — neither the array **element count** nor any
+**split-on-newline** of such an array or of the raw text is a newline count, and
+that covers the raw single-string form whose +1 is unconditional. Concretely:
+state whether
 a figure is a file's length (newline count) or a change size (added + deleted,
 or net, from `git diff --numstat`); never place a non-blank count beside a line
 count; never compare counts produced by two different methods without saying so;
@@ -1003,7 +1039,7 @@ request description.
 | 3 | What the coordinator's brief listed | **UNVERIFIED** | brief is a session artifact, not in the repository |
 | 4 | True counts are 1492 / 1504; `Measure-Object -Line` gives 1319 / 1331 | **PROVEN** | raw `0x0A` byte count of each blob: `python -c "import subprocess;b=subprocess.run(['git','cat-file','blob','1b9e7049:docs/skills-catalog.md'],capture_output=True).stdout;print(b.count(b'\n'))"` → 1492, the same command at `93c0834f` → 1504; `(git show <rev>:docs/skills-catalog.md \| Measure-Object -Line).Lines` → 1319 / 1331 |
 | 4 | The accusation was published and retracted | **PROVEN** | `gh api .../issues/comments/5963257423` and `/5963289254` |
-| 4 | The join-and-split method over-reports by 1 on an unterminated blob | **PROVEN** | `behavioral-eval-runner-wp-2b-0-finalization.json`: 13 vs 12 |
+| 4 | The join-and-split method over-reports by 1 **only on an unterminated blob**; splitting the **raw text** over-reports by 1 **unconditionally** | **PROVEN** | array form: `behavioral-eval-runner-wp-2b-0-finalization.json` 13 vs 12 (+1), `1b9e7049` 1492 vs 1492 (+0), `93c0834f` 1504 vs 1504 (+0); raw-text form: `(git show 1b9e7049:docs/skills-catalog.md \| Out-String).Split("`n").Count` → 1493 vs 1492, and 1505 vs 1504 at `93c0834f` (+1 at both) |
 | 5 | PR #629 is open and its tool is absent from `main` | **PROVEN** | `gh pr view 629`; `git cat-file -e origin/main:tools/...` → 128 |
 | 5 | The "159 no-record pages" figure | **UNVERIFIED** | requires running the unmerged tool; not done |
 | 6 | The seven→eight regression reproduces verbatim, and no source supports "eight" | **PROVEN** | `git show 4d08377d --numstat` → `1 1`; `rls-audit-checklist.md:35` = "Seven failure modes"; 7 numbered items; Workflow step 4 names 7 |
