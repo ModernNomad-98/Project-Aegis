@@ -646,6 +646,15 @@ contain.
 > | the skills table | `<!-- bound-field: skills -->` | `<!-- bound-field: end -->` |
 > | the security answer | `<!-- bound-field: security -->` | `<!-- bound-field: end -->` |
 >
+> **A sentinel is a line whose entire stripped content is the sentinel string.**
+> The sentinel strings also appear **as quoted text** in this page's own method
+> table and in the body's record of this method — **those occurrences are not
+> sentinels**, and an implementation that matches the first textual occurrence
+> resolves the fields wrongly. **Resolve sentinels by whole-line equality, not by
+> substring search.** This was found by trying it: an index-based matcher read the
+> quoted `skills` sentinel inside the method table and produced a different figure
+> from a line-state matcher over the same body.
+>
 > **Payload:** for each field take the lines **strictly between** its opening
 > sentinel and the next `end` sentinel — sentinels themselves excluded —
 > **collapse every run of whitespace to a single space and trim** each field, join
