@@ -310,8 +310,8 @@ a measurement with its command, kept where a measurement belongs.
   defect. This is `AEGIS-APR-050`'s requirement and it is not optional. A result
   at a superseded head does not satisfy `MG3`.
 - **`MG4` — authority.** The merge agent has confirmed **its own** authority.
-  **Quoted verbatim from `AGENTS.md:91-94`** — the qualifier this turns on is on
-  `:91-92` — and quoted rather than paraphrased **because paraphrase is exactly
+  **Quoted verbatim from `AGENTS.md:97-100`** — the qualifier this turns on is on
+  `:97-98` — and quoted rather than paraphrased **because paraphrase is exactly
   what dropped that qualifier** in earlier revisions of this page:
 
   > The merge agent confirms that authority itself — a register entry
