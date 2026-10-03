@@ -405,14 +405,18 @@ retracted.
 **PROVEN.** `docs/skills-catalog.md` measured two ways at two revisions:
 
 ```text
-$ git show 1b9e7049:docs/skills-catalog.md    # then count
-  newline count (0x0A bytes in the raw blob) = 1492
-  Measure-Object -Line                       = 1319
-  blank lines                                =  173
-$ git show 93c0834f:docs/skills-catalog.md    # then count
-  newline count (0x0A bytes in the raw blob) = 1504
-  Measure-Object -Line                       = 1331
-  blank lines                                =  173
+$ python -c "import subprocess;b=subprocess.run(['git','cat-file','blob',
+    '1b9e7049:docs/skills-catalog.md'],capture_output=True).stdout;print(b.count(b'\n'))"
+1492                    # the newline count: the 0x0A bytes in the raw blob
+$ git show 1b9e7049:docs/skills-catalog.md | Measure-Object -Line
+1319                    # non-blank lines only (the forbidden method, shown to expose the trap)
+                         # 1492 − 1319 = 173 blank lines
+$ python -c "import subprocess;b=subprocess.run(['git','cat-file','blob',
+    '93c0834f:docs/skills-catalog.md'],capture_output=True).stdout;print(b.count(b'\n'))"
+1504                    # the newline count: the 0x0A bytes in the raw blob
+$ git show 93c0834f:docs/skills-catalog.md | Measure-Object -Line
+1331                    # non-blank lines only (the forbidden method, shown to expose the trap)
+                         # 1504 − 1331 = 173 blank lines
 ```
 
 The identity `1504 − 173 = 1331` (and `1492 − 173 = 1319`) is the whole
@@ -447,11 +451,12 @@ Measured at `6715cefc`, where 32 of 1426 tracked blobs are unterminated:
 
 ```text
 $ f=artifacts/evidence/behavioral-eval-runner-wp-2b-0-finalization.json
-$ (git show 6715cefc:$f | Measure-Object).Count            # 13
-$ (($c -join "`n").Split("`n")).Count                       # 13
+$c = git show 6715cefc:$f      # an array of lines: the terminator is lost on this line
+$ ($c | Measure-Object).Count                              # 13  — lines, not newlines
+$ (($c -join "`n").Split("`n")).Count                       # 13  — the same array joined and re-split
 $ python -c "import subprocess;b=subprocess.run(['git','cat-file','blob',
     '6715cefc:'+'$f'],capture_output=True).stdout;print(b.count(b'\n'))"
-12
+12                                                          # the true newline count
 $ ... b.endswith(b'\n')                                     # False
 ```
 
@@ -752,6 +757,8 @@ still exits 1, and PR #629 is still `OPEN` with
 exiting 128. The header is left exactly as written, per this document's practice of
 correcting forward rather than rewriting a dated measurement.
 
+**A fourth drift, in the same provenance, observed during the correction pass that answered the independent review of this page, on 2026-10-02.** Re-fetched twice in that pass, `origin/main` returned `f6bf9d9a` and then `d9f57283145ce2608ff76920dddd3db5be48b9a9` — the tip at the time of writing, PR #634, committed `2026-10-02T17:39:36-07:00` — so the `5703e93f` named just above was itself overtaken inside the same session, and the header's `6715cefc` is now four commits behind (`git rev-list --count 6715cefc..origin/main` → 4). Classes 1–5 were re-checked at the newest tip and still hold: `git grep -n "Each base SHA is the page's last recorded acceptance" origin/main -- docs/roadmaps/aegis-documentation-readability-backlog.md` still hits line 2790, `git merge-base --is-ancestor 65bacc7d6b85 origin/main` still exits 1, `git cat-file -e origin/main:tools/readability_acceptance/check_index.py` still exits 128, and PR #629 is still `OPEN`. This note is a dated measurement too, and will drift in turn.
+
 ### How it happened
 
 **Root cause: the absence of commits was read as evidence that the lane was dead.**
@@ -930,7 +937,7 @@ request description.
 | 3 | #624's head instant is 00:04:58Z; a Codex notice postdates it at 00:09:58Z | **PROVEN** | `git log -1 --format=%cI a0634422`; `gh pr view 624 --json comments` |
 | 3 | The UNMET conclusion was measured at 00:09:47Z, 11 s before that notice | **PROVEN** | comment timestamps |
 | 3 | What the coordinator's brief listed | **UNVERIFIED** | brief is a session artifact, not in the repository |
-| 4 | True counts are 1492 / 1504; `Measure-Object -Line` gives 1319 / 1331 | **PROVEN** | 0x0A byte count of each blob |
+| 4 | True counts are 1492 / 1504; `Measure-Object -Line` gives 1319 / 1331 | **PROVEN** | raw `0x0A` byte count of each blob: `python -c "import subprocess;b=subprocess.run(['git','cat-file','blob','1b9e7049:docs/skills-catalog.md'],capture_output=True).stdout;print(b.count(b'\n'))"` → 1492, the same command at `93c0834f` → 1504; `(git show <rev>:docs/skills-catalog.md \| Measure-Object -Line).Lines` → 1319 / 1331 |
 | 4 | The accusation was published and retracted | **PROVEN** | `gh api .../issues/comments/5963257423` and `/5963289254` |
 | 4 | The join-and-split method over-reports by 1 on an unterminated blob | **PROVEN** | `behavioral-eval-runner-wp-2b-0-finalization.json`: 13 vs 12 |
 | 5 | PR #629 is open and its tool is absent from `main` | **PROVEN** | `gh pr view 629`; `git cat-file -e origin/main:tools/...` → 128 |
