@@ -63,8 +63,12 @@ decompose the work, assign it, confirm it was completed, and route it onward;
 it does not author, edit, commit, push or merge the change itself.
 **Each stage is a different agent.** Author → review → security review where
 **CONTRIBUTING.md's security-relevant-surface list (wider than `gate-guard`)**
-requires one → pull request → merge. No agent performs two stages on the same
-change: the author never reviews or merges its own work, no reviewer — code or
+requires one — which, per the owner's 2026-09-27 decision recorded in
+[docs/roadmaps/aegis-open-decisions-2026-09-23.md](docs/roadmaps/aegis-open-decisions-2026-09-23.md),
+is required for OUTSIDE contributions only and is not extended to the
+maintainer's or other agents' own PRs — → pull request → merge. No agent
+performs two stages on the same change: the author never reviews or merges its
+own work, no reviewer — code or
 security — merges it, and a separate agent holding the applicable authority
 performs the merge only after every required review has passed at the exact
 head being merged, that head's checks are all green — not only the
