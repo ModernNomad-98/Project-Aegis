@@ -167,8 +167,12 @@ says so.
   file **is** protected when a protected directory carries it. Measured against
   the live pattern, `scripts/tests/fixtures/markdown-links/bad/README.md`,
   `tools/behavioral_eval_runner/README.md` and `.claude/agents/example-agent.md`
-  all match, while `AGENTS.md`, `CONTRIBUTING.md` and every file under `docs/`
-  do not.
+  all match. Of the 375 tracked files under `docs/`, **2 match** — both
+  `.gitattributes` files, matched by the pattern's depth-agnostic
+  `(.*/)?\.gitattributes$` atom rather than by their location — while **0 of the
+  214 `.md` files** under `docs/` match, and neither `AGENTS.md` nor
+  `CONTRIBUTING.md` matches. Protection is decided by whether a protected
+  directory or a protected path atom carries the file, never by its extension.
 - **`windows-offline-checks`, `tools-tests-linux`, `tools-tests-windows`** —
   visible coverage. They are **not** registered required checks.
 - Everything above is **bypassable**: `enforce_admins` is `false`, and merges are
