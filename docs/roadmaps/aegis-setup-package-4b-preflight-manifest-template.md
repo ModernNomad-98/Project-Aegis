@@ -6,7 +6,10 @@
 > this page authorizes no VM work. The fuller "Choice and plain terms" glossary is
 > below.
 
-**Status: unfilled planning template, 2026-09-25 UTC.** Copy this page into a separately reviewed execution packet. Resolve every **preflight** `UNKNOWN` before requesting a live Stage 4B grant; leave **post-run** observations as `NOT RUN` until an authorized session produces receipts. Record the owner-grant receipt later as a separate approval attachment. This page authorizes no SDK session, provider call, credential use, installation, host probe, VM work, helper comparison, deployment, or deletion. The [Stage 4B proof protocol](aegis-setup-package-4b-host-proof-protocol.md) defines the required cases and stop rules. [PR #291](https://github.com/ModernNomad-98/Project-Aegis/pull/291) corrected the offline bridge's permission response, but its synthetic tests do not prove host behavior. An execution packet must pin the corrected source commit and verify the selected runtime independently.
+**Status: unfilled planning template, 2026-09-25 UTC.** Issue #101, the backlog
+item this template serves, asks for a conversational Aegis setup flow that picks
+how workloads are assigned to eligible agents and how their skills are selected.
+Copy this page into a separately reviewed execution packet. Resolve every **preflight** `UNKNOWN` before requesting a live Stage 4B grant; leave **post-run** observations as `NOT RUN` until an authorized session produces receipts. Record the owner-grant receipt later as a separate approval attachment. This page authorizes no SDK session, provider call, credential use, installation, host probe, VM work, helper comparison, deployment, or deletion. The [Stage 4B proof protocol](aegis-setup-package-4b-host-proof-protocol.md) defines the required cases and stop rules. [PR #291](https://github.com/ModernNomad-98/Project-Aegis/pull/291) corrected the offline bridge's permission response, but its synthetic tests do not prove host behavior. An execution packet must pin the corrected source commit and verify the selected runtime independently.
 
 ## Choice and plain terms
 

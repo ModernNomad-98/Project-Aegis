@@ -1,8 +1,11 @@
 # Issue #101 package 4A: host-routing preparation proposal
 
 This is a decision packet for the owner and maintainers of the
-[conversational setup backlog](aegis-setup-routing-plan.md). Package 2's
-four-choice conversation and package 3's Python offline advisory contract have
+[conversational setup backlog](aegis-setup-routing-plan.md). Issue #101, which
+this package belongs to, is the owner's backlog item for a conversational Aegis
+setup flow that picks how workloads are assigned to eligible agents and how
+their skills are selected. Package 2's four-choice conversation and package 3's
+Python offline advisory contract have
 shipped. Package 4's actual host proof and comparison remain pending. This
 page proposes a preparation boundary; it grants no host hook, model call,
 dependency installation, provider connection or measured-savings claim.
