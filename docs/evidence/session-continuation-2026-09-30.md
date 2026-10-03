@@ -9,6 +9,11 @@ not recalled. Re-verify before acting. This session produced over a dozen
 defects of its own, most of the "claim was true once, text drifted" kind, so
 treat the numbers as verification items, not as facts.
 
+**Read [section 8](#8-corrections-appended-to-the-record-above) before quoting
+any figure above.** Section 8 is append-only and carries the later dated
+corrections, including one that marks the run's outcome figures below as
+**unreproduced**. The sections above are left exactly as written.
+
 ---
 
 ## 1. Where the repository stands
@@ -138,6 +143,9 @@ current.
 
 **Decision needed:** confirm the intended status, then approve the minimal
 edit. The repository's pattern is to append a pointer, not rewrite dated text.
+
+**Outcome, appended below in section 8 (2026-10-01):** this decision was taken
+and the finding is closed. See "Both section-4.1 findings are closed" there.
 
 ### 4.2 A documented commit-trailer convention that nobody follows
 
@@ -296,3 +304,33 @@ text, not on the count. Section 4.4's first item asked for exactly that
 `SKILL.md` change, so it is answered. What remains is the **preventive** fix:
 requiring the execution configuration to be recorded, now in
 [step 7 of the procedure](../skill-eval-behavioral-test-procedure.md#7-record-the-evidence).
+
+**Both section-4.1 findings are closed (appended 2026-10-01).** Section 4.1
+asked for an owner decision on two defects in
+[the resumable control-plane backlog](../roadmaps/resumable-control-plane-backlog.md):
+the `CP-WP-002` "BLOCKED vs DONE" contradiction, and the stale
+"Current status, 2026-09-25" label. Both were fixed after this record was
+written and no owner decision is now outstanding on them.
+
+- **The `CP-WP-002` contradiction** is closed by PR #578 (`81ad9017`), which
+  appended an in-place pointer to the `Next owner decision` row — the row now
+  reads "(Row preserved as written; the separately gated CP-WP-002 it asks about
+  is the one AEGIS-APR-004 authorized and is DONE ...)". That is the
+  append-a-pointer convention section 4.1 itself recommended, applied where the
+  contradiction sat rather than in a separate list.
+- **The stale date label** is closed by PR #579, which added "(this is a
+  dated label, not the current state; the current package ledger records later
+  dispositions)" beside it. The label text is preserved, so the line still
+  reads "Current status, 2026-09-25" and is no longer presented as current.
+
+Measured, not recalled: `git diff --numstat 81ad9017^ 81ad9017 --
+docs/roadmaps/resumable-control-plane-backlog.md` is `4 1`, and the two added
+passages are exactly the two quoted above, appended inside the lines they
+correct. Section 4.1's own line references therefore still resolve: at the
+current revision the `Next owner decision` row is line 149 and the stale-looking
+date label is line 41, and both were left in place and annotated rather than
+rewritten. Nothing above is
+changed by this note, and the
+[trailer convention and catalog-count items in sections 4.2 and 4.3 remain as
+they were](session-continuation-2026-09-30-evening.md), which is recorded in
+that page's backlog sweep.

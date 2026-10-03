@@ -117,16 +117,19 @@ for later sessions"*. The open-decisions page says the current instruction has
 "no register entry", which is correct for the current wording. So today's merges
 rest on a chat instruction with **no live register entry**.
 
-## 5. BACKLOG SWEEP — 15 actionable findings
+## 5. BACKLOG SWEEP — the 15 findings, and which are still open
 
-From an independent repository-wide sweep, split by disposition:
+From an independent repository-wide sweep, split by disposition. The sweep
+raised **15** findings. **7 were closed** by this session's PRs and are listed
+first. The other **8 are enumerated** below; the last of them is itself struck
+through as closed by #584, so **7** of the 15 are still open.
 
 **Closed by this session's PRs (7):** the false "delivery-control suite is not
 wired into CI" claim; #486 and #457 "open, not merged"; the stale "Current
 status, 2026-09-25" label; the ledger's 656 figure; the forecast's 656; the
 sweep "in progress" status; the stale "checked 2026-09-26" banner.
 
-**Still open (7):**
+**Still open (7 of the 8 numbered below):**
 
 1. Four open-decisions rows say *"nothing is built at this recording"* for the
    QA-Tier-1, AI-SDLC, Phase 7 and Phase 6 skill batches. Their proposed skills
