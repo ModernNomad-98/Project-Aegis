@@ -245,9 +245,11 @@ does.
 carries a stable ID, `MG1`–`MG5`. Every other mention of a condition **on this
 page** is a pointer carrying the ID and **no content**; the maintenance rule for
 that is [the agreement check](#the-agreement-check-procedural). All five are
-checked in the same turn against the **exact head being merged**. Recording them
-in the receipt afterwards does not satisfy them — a receipt is a record, not a
-gate.
+checked in the same turn against the **exact head being merged**. **A result at a
+superseded head does not satisfy the condition that cites it** — including `MG3`
+and `MG5`; a check result, an automated review or a conditional security review
+binds to one head and to that head only. Recording them in the receipt afterwards
+does not satisfy them — a receipt is a record, not a gate.
 
 **The `AGENTS.md` summary is a derived summary, not a pointer set.** It contains
 **no `MG` IDs** — measured, not assumed — and it restates the conditions in prose
@@ -302,8 +304,9 @@ a measurement with its command, kept where a measurement belongs.
   names that exact head.
 - **`MG3` — automated review.** The automated review has posted **a result for
   that exact head**, or is confirmed unavailable **for that exact head** (a
-  usage-limit notice, for example); **and** every P1 and P2 finding it raised is
-  triaged — fixed, or recorded in the pull request with the reason it is not a
+  usage-limit notice, for example); **and** every finding it raised at **P2 or
+  higher** — `P0`, `P1` and `P2`; this is a **floor, not a range** — is triaged —
+  fixed, or recorded in the pull request with the reason it is not a
   defect. This is `AEGIS-APR-050`'s requirement and it is not optional. A result
   at a superseded head does not satisfy `MG3`.
 - **`MG4` — authority.** The merge agent has confirmed **its own** authority.
@@ -393,9 +396,10 @@ not as pending approval.
 
 **The rule reaches every head-bound input.** A verdict, a check result, an
 automated review, or a conditional security review binds to one head and to that
-head only. A result at a superseded head does **not** satisfy the condition that
-cites it — including `MG3` and `MG5` — and "close enough" is not a state this
-page recognises.
+head only. **What a superseded head does to the merge-gate conditions is stated
+once, in [the merge-gate conditions](#before-merging-stage-g-entry-conditions),
+and is not restated here** — and "close enough" is not a state this page
+recognises.
 
 This rule is procedural, and it is procedural on purpose: GitHub is configured
 with `dismiss_stale_reviews: false` and `require_last_push_approval: false`, so
@@ -632,11 +636,18 @@ backstop without judgement.** Every hit is judged by these two rules and nothing
 else:
 
 - **IS content — a defect when it sits outside the block that owns it:** a
-  **statement of the condition under which a verdict is reached, or of the
-  condition under which an obligation is owed.** Such a statement belongs in the
-  one normative block that owns it — the `MG` block, the `SD` block,
-  [the dependency block](#stage-dependencies), or
-  [the handoff block](#stage-handoff).
+  **statement of the condition under which a verdict is reached, of the condition
+  under which an obligation is owed, of the condition under which a merge-gate
+  condition or a stage disposition is satisfied, or is not satisfied, or of the
+  condition under which a stage entry is satisfied.** Such a statement belongs in
+  the one normative block that owns it — the `MG` block, the `SD` block,
+  [the dependency block](#stage-dependencies),
+  [the handoff block](#stage-handoff), or, for the chain rule's entry condition,
+  [the seven stages](#the-seven-stages), which states it once. **The page has
+  exactly two normative ID families, `MG` and `SD`, plus the chain rule, so these
+  clauses reach every kind of normative statement it can contain** — and a future
+  block added to the owning set must be single-sourced the way these are, or the
+  set stops holding.
 - **Is NOT content — permitted anywhere:** an **ID**; a **link**; a **short
   label**; a **status token** (`present`, `absent`, `not applicable`,
   `answered`); and **a verdict token named as an operand of a routing rule or of
