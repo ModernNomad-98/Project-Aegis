@@ -2278,3 +2278,233 @@ in-place correction, and the register's own precedent (PR #633, which left
 note there — and `lane-authoring-guide`, for keeping this to one lane and one
 unit of work, citing every load-bearing claim or labelling it `UNVERIFIED`, and
 recording explicitly what this append did **not** touch.
+
+
+---
+
+## Appended 2026-10-03 (second append) — `PROC-14` added, the `PROC-04` and `PROC-08` owed halves landed, PR #649's follow-up recorded
+
+This append is **pure addition**. It changes no earlier line, renumbers no class
+and rewrites no rule: items 1–5 of the owed-work list and the Class 7 table's
+rows `7.1`–`7.7` are left exactly as written, and the new Class 7 row is
+recorded here as `7.8` rather than inserted into a table above.
+
+### Standing rule — `PROC-14`
+
+**A history query run from a worktree whose `HEAD` is DIVERGENT from the default
+branch silently omits every commit that HEAD cannot reach, so an empty result is
+not evidence of absence. Name the ref.**
+
+`git log`, `git log -S`, `git log -p`, `git log --follow` and their family
+default to `HEAD`. When the worktree's `HEAD` is *behind* the default branch,
+that default omits the newer commits. When it is **divergent** — neither an
+ancestor nor a descendant of the default branch — it omits them too, and the
+worktree shows no other sign of trouble. The failure is silent in the direction
+that matters: the query **succeeds** (exit 0) and prints nothing, which reads as
+"this text never changed" rather than "this revision cannot see it".
+
+**Why this is not `PROC-01`.** `PROC-01` tests an ancestry claim you already
+hold. This register already records `797ca687` as not an ancestor of
+`origin/main`, and `7.3`(c) records the checker being absent from the
+`coord-main` **working tree**. Both are about a *fact you have been given* or a
+*tree's contents*. Neither states the trap here, which is a property of the
+**query default**: it bites a query you have not yet run, on a tree that looks
+healthy, and it returns a confident empty answer. `PROC-14` is therefore new,
+not a duplicate. Verified by grepping this page before adding it: `divergent`
+has **zero** hits, and the only `797ca687` hits are the Class 5 correction,
+`7.3`(c) and the item-5 row — none of which makes this claim.
+
+**Measured instance, re-derived 2026-10-03.** `C:\src\Project Aegis\coord-main`
+is a linked worktree. Every figure below was re-derived at
+`origin/main` = `bd622661fe56779227887cbd390eaeab9dfb37fd`, the tip current when
+this correction was written:
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Worktree HEAD | `git -C … rev-parse HEAD` | `797ca687c58a059f76b585993cbd72032bc33c88` |
+| Merge base | `git merge-base 797ca687 origin/main` | `d6e484189cc30c67dc69aeb973e15f89b693537d` |
+| HEAD an ancestor of main? | `git merge-base --is-ancestor 797ca687 origin/main` | exit **1** — no |
+| Main an ancestor of HEAD? | `git merge-base --is-ancestor origin/main 797ca687` | exit **1** — no, so the pair is **DIVERGENT** |
+| Commits main has that HEAD cannot reach | `git rev-list --count 797ca687..<tip>` | **a SERIES, not a number** — see below |
+| Commits HEAD has that main lacks | `git rev-list --count <tip>..797ca687` | **2** (`797ca687`, `7c52b6f6`) |
+
+**The unreachable-commit count is published as a series, because a single
+integer beside a named tip decays the moment `main` moves.** Measured with the
+same counted command, one row per tip:
+
+| `origin/main` tip | what landed | `git rev-list --count 797ca687..<tip>` |
+| --- | --- | --- |
+| `279ac94d` | the tip the original brief measured | **25** |
+| `9f5dc6b3` | +#650, the figures page | **26** |
+| `20fadd48` | +#648, the wrapped-link fix | **27** |
+| `25cc0e7a` | +#649, the link-checker self-tests | **28** |
+| `bd622661` | +#652, APR-103/104 | **29** |
+
+The merge base (`d6e48418`), the two ancestor-test exit codes, and the reverse
+count (**2**) are stable across all five tips; only the forward count moves,
+because it counts commits on `main` that `HEAD` cannot see. `HEAD` is frozen, so
+`main`'s growth is the only variable.
+
+**Correction, recorded rather than silently repaired.** An earlier revision of
+this append published **26** beside the named tip `25cc0e7a`. That was wrong by
+two: 26 is the value at `9f5dc6b3`, and the value at `25cc0e7a` is **28**. The
+cause is exactly the failure `PROC-04` forbids — a figure measured at one
+revision and published beside another, because `main` advanced twice between the
+measurement and the write-up. The **argument** that append made was right and is
+kept: the count is revision-bound, and the brief's 25 was true at `279ac94d`.
+Only the published figure was wrong, and it is now a series so that it cannot
+decay again. A reviewer measured it moving 28 → 29 inside a single review window,
+which is why a bare corrected integer would have re-opened this defect.
+
+The false-empty instance, reproduced:
+
+```text
+$ git -C "C:\src\Project Aegis\coord-main" log -S "Consistency note 2026-10-02" \
+    -- docs/roadmaps/aegis-open-decisions-2026-09-23.md
+                                  # no output, exit 0  -- FALSE EMPTY
+$ git -C "C:\src\Project Aegis\coord-main" log origin/main \
+    -S "Consistency note 2026-10-02" -- docs/roadmaps/aegis-open-decisions-2026-09-23.md
+3c58e966 docs(approvals): record AEGIS-APR-102 for the integration roadmap policy (#645)
+```
+
+**Detection check.** Before trusting any empty history result, ask whether the
+ref was named:
+
+```text
+$ git merge-base --is-ancestor HEAD origin/main \
+    || echo "HEAD is NOT an ancestor of origin/main: name the ref in every history query"
+```
+
+A non-zero exit means every `git log`-family call in that worktree must name
+`origin/main` (or the specific revision) explicitly. The check is one command
+and is cheap enough to run whenever a history query is about to decide anything.
+
+**What this rule does not cover.** It does not tell you which ref to name when
+the answer you want is genuinely about a branch's own history, and it does not
+detect a *behind-but-not-divergent* HEAD, where the same silent omission occurs
+for a smaller set of commits. Both need the ref named; neither is a gate, and no
+script here enforces it — a runner cannot see which ref a reader intended.
+
+### Class 7 row `7.8` (appended, not inserted)
+
+| # | Claim | Verdict | Command |
+| --- | --- | --- | --- |
+| 7.8 | `git log -S` with no ref, run from the divergent `coord-main` worktree, returns a FALSE EMPTY for text that `origin/main` carries | **PROVEN** | `git log -S "Consistency note 2026-10-02" -- docs/roadmaps/aegis-open-decisions-2026-09-23.md` → no output, exit 0; the same query with `origin/main` named → `3c58e966` |
+| 7.8 | That worktree HEAD is divergent from `origin/main`, not merely behind: neither is an ancestor of the other | **PROVEN** | `git merge-base --is-ancestor 797ca687 origin/main` → 1 **and** `… origin/main 797ca687` → 1; merge base `d6e48418` |
+| 7.8 | Main carries **29** commits unreachable from that HEAD at `bd622661`, and HEAD carries **2** that main lacks; the forward count is a **series** (25 / 26 / 27 / 28 / 29 at `279ac94d` / `9f5dc6b3` / `20fadd48` / `25cc0e7a` / `bd622661`) | **PROVEN** — forward count by `git rev-list --count 797ca687..<tip>`, series re-derived 2026-10-03 at `origin/main` = `bd622661` | `git rev-list --count 797ca687..bd622661` → **29**; `git rev-list --count bd622661..797ca687` → **2** |
+| 7.8 | *(superseded, kept for the record)* The same count published as the bare integer **26** beside `origin/main` = `25cc0e7a` | **FALSIFIED** — 26 is the value at `9f5dc6b3`; the value at `25cc0e7a` is **28** | `git rev-list --count 797ca687..25cc0e7a` → 28 |
+
+### `PROC-04` — the owed writing-standards half is LANDED
+
+Item 3 above recorded that the rule "belongs in the repository's documentation
+standards, which this PR does not edit." It is now edited, and the location was
+chosen from the repository's own text rather than by preference:
+
+- The [documentation readability backlog](../../roadmaps/aegis-documentation-readability-backlog.md)
+  plan item 4 says to "**add a short writing standard to the contribution
+  guide** and check new or changed documentation against it in review."
+- `CONTRIBUTING.md` already carries that guide as
+  `## Write documentation for a new reader`, a numbered list of documentation
+  rules that this rule extends as **item 7**.
+- `docs/skill-generation-standard.md` was rejected: it is scoped to skill
+  authoring contracts, not to documentation prose. `AGENTS.md` was rejected for
+  this rule: the recommendation paragraph for `AGENTS.md` above
+  reserves that file for the two **dispatch-time** rules (`PROC-02`
+  concurrency, `PROC-03` re-verification), and a line-count rule is a writing
+  rule.
+
+The landed text carries all four clauses this register's `PROC-04` requires: a
+count must name its method; a line count is a **newline count** and
+`Measure-Object -Line` is forbidden for it because it drops blank lines; a
+trailing-newline change must be checked explicitly because it moves a length by
+one; and a change size comes from `git diff --numstat` or a genuine ancestor
+range, never a two-dot diff between unrelated tips, which reports unrelated
+files as deleted.
+
+**The forbidden-method grep is unchanged and still a review prompt, not a gate.**
+Its hit list is a revision-bound figure and gains this page's own wording once
+this change merges, exactly as `PROC-04`'s detection check already predicts.
+
+### `PROC-08` — the owed cadence step is LANDED
+
+Item 4 above recorded that "the durable remedy is a cadence step, not a one-off
+sweep, and this page's pull request adds neither." It is now landed where this
+repository records its cadence: **one appended line in
+`.coord/coordinator-cadence.jsonl`**, the log whose own `_comment` defines the
+schema and states that the file is append-only and hand-maintained.
+
+The step is the detector this page already designed in its "Mechanically
+enforceable, and where it would live" table: for each recent remote ref, fail
+when `gh pr list --head <branch> --state all` is empty. It is a **local**
+cadence check, not a hosted workflow, because a hosted runner has no `gh`
+authentication for this repository. **The detector is complete over the refs it
+reads** — the branch itself is the readable artifact, so an empty result is a
+real finding, unlike `PROC-07`'s silent dispatch, whose absence cannot be
+distinguished from an unrun dispatch. It cannot be retrospective: it reports the
+state at the instant it runs, which is precisely why the remedy is a cadence
+step.
+
+**Append-only, proven by hash.** The pre-edit blob is
+`5cf558227062143505ed65797b585cfa53acdeaf` (20 507 bytes, **23** newlines,
+terminated). The post-edit file is 21 486 bytes and **24** newlines; the
+pre-edit bytes are an exact byte **prefix** of the post-edit file, the newline
+delta is exactly 1, and every pre-existing JSON line still parses.
+
+**Separator style corrected in review.** The appended line first used
+`json.dumps` defaults, which emit a space after every `:` and `,`; the file's
+other 23 lines are compact. This was raised as a `[NIT]` by the independent
+review and is fixed rather than declined: line 24 now round-trips
+compact-identically (7 bytes smaller, 21 493 → 21 486), its recorded
+`checked_at` and text are unchanged, and the append-only proof above still
+holds against the same base blob. The line's action text contains one `": "`
+of its own prose, which is content, not a separator.
+
+### PR #649 — the declined `[NIT]` follow-up is now RECORDED
+
+`PR #649`'s reviewer (comment `5966277042`) found the declined `[NIT]`
+"— the checker is invoked by no workflow step over the repository's own
+Markdown —" was *declared* in the pull request body ("left for its own work
+item") but **never recorded**: there is no matching open issue, and this
+repository has exactly one open issue (#101, unrelated). The follow-up is
+recorded here, with the two facts its record was missing, both re-derived at
+`origin/main` = `bd622661fe56779227887cbd390eaeab9dfb37fd`:
+
+1. **The named fix would fail CI as written.** The checker's **default scope is
+   every tracked `.md` file** — 673 of them now. Run with no arguments at this
+   revision it exits **1**:
+
+   ```text
+   files: 673   links checked: 3184   anchors checked: 800   broken: 6   dead: 1
+   external-skipped: 1791   other-skipped: 0
+   ```
+
+   **All seven findings (six broken, one dead) lie inside the checker's own
+   deliberately-broken test fixtures** under `scripts/tests/fixtures/` — the
+   `markdown-links/bad/`, `paths-tree/` and `contract-audit/` trees. **None is a
+   real repository link.** Over `docs/` alone the same checker reports
+   `broken: 0, dead: 0`, exit 0. So the follow-up is not a one-line step
+   addition: any wiring must first exclude the fixtures.
+2. **The checker exposes no exclusion flag.** Its interface is `paths`
+   (positional, default every tracked `.md`), `--root`, `--quiet` and `--json` —
+   verified from its `argparse` block at blob
+   `efa65c95f5444e50867e832a688c8351cd332d2c`. An exclusion therefore needs
+   either a new flag in `scripts/` or an explicit path list.
+
+**Status at this revision.** The *self-test* half of the original defect (C1b)
+is closed: PR #649 merged as `25cc0e7a` and now runs
+`scripts/tests/test_markdown_links.py` in **both** gate jobs
+(`.github/workflows/validate-skills.yml:129` and `:227`). What remains open is
+the checker **itself** never being run over this repository's own Markdown, so a
+broken relative link can still merge green. That is a different defect from
+C1b, it needs a `scripts/` or `.github/` change, and it is **owed**.
+
+### What this append does not claim
+
+It does not re-derive or correct any earlier figure in this page, and it does
+not renumber, rewrite or annotate items 1–5; where an owed item is now
+discharged, that is stated here and the original text is left standing. It adds
+no gate: `PROC-14` and the `PROC-08` cadence step are rules an agent follows, and
+the register's own mechanically-enforceable table still lists the `PROC-08`
+detector as living in `scripts/`, which this change does not touch. It does not
+claim the cadence log's new line has ever been *executed* — it records the step,
+not a run of it.

@@ -121,6 +121,15 @@ and current limits from the page itself.
    for the repository-wide readability sweep. Ask an independent reviewer to
    describe the component's purpose and normal use from the documentation
    alone, then correct any gap they find.
+7. Name the counting method of every published count, and take a change size
+   from `git diff --numstat` or a genuine ancestor range — never a two-dot diff
+   between unrelated tips, which reports unrelated files as deleted. A line
+   count is a **newline count**: the number of `0x0A` bytes in the raw file, so
+   `Measure-Object -Line` is forbidden for line counts, because it silently
+   drops blank lines. Say whether a figure is a file's length (newline count) or
+   a change size (added plus deleted); never place a non-blank count beside a
+   line count; and check explicitly whether a trailing newline moved, because
+   that changes a file's length by one.
 
 The [documentation readability backlog](docs/roadmaps/aegis-documentation-readability-backlog.md)
 tracks the full repository sweep and reviewed batches. These rules apply to
