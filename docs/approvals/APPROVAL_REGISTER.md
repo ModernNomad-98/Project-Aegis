@@ -3445,3 +3445,100 @@ the entry governs.
 - **Expiry / use limit:** No calendar expiry and no one-use limit stated. This is
   a policy selection and stands until explicitly superseded; any replacement
   requires a later recorded owner choice.
+
+### AEGIS-APR-106: PR #661 one-time protected-path decision
+
+- **Event:** GRANT — one-time, bound to one exact head. Not a standing
+  exception and not a policy decision.
+- **Status at recording:** ACTIVE and **unspent** as recorded. It is consumed by
+  the merge of PR #661 at the exact head named below, and by nothing else. It
+  authorises no action before that merge and none after it.
+- **Date / Grantor:** 2026-10-03 / Peter Nguyen.
+- **Reason:** [PR #661](https://github.com/ModernNomad-98/Project-Aegis/pull/661)
+  changes `.github/workflows/validate-skills.yml`, a protected path, so
+  `gate-guard` fails by construction and the merge needs a one-time owner
+  decision for the exact head. The independent implementation audit at Stage D
+  returned **ACCEPT** and raised **one merge-gate condition rather than a defect
+  in the change**: *"The merge agent must establish it on the record — and
+  confirm it from the register, not from a brief — before merging. **The PR
+  cannot create that entry for itself.**"* This entry is that record, which is
+  why it is a separate change from the pull request it authorises.
+
+  **AEGIS-APR-047 does not reach this merge.** Its title is *"Standing
+  gate-guard exception for four BER files"*, and its **Scope FORBIDDEN** keeps
+  *"workflow/CI files, CODEOWNERS, the validator, Developer Certificate of
+  Origin (DCO) check, guard scripts and tests, requirements, parent import
+  files, acceptance machinery and all other BER paths"* for *"separate
+  one-time owner decisions"*. The red `gate-guard` was therefore cured by this
+  one-time decision and by nothing standing.
+
+  **The register's existing decisions on this workflow are head-scoped to their
+  own pull requests**, so none of them is spendable here. `AEGIS-APR-104`
+  permitted a merge of *"PR #649 at exact head
+  `86725c2aebacf140513fb22f802df0a8c6193998`"* — one head, and that pull
+  request. Under this repository's exact-head rule a grant naming one head
+  cannot be spent on another, so #649's exception buys nothing for #661.
+- **Owner decision:** The owner **selected**, from four presented blocked
+  outcomes, the one authorising:
+
+  > One-time owner decision on the protected paths
+  > (`.github/workflows/validate-skills.yml` and/or
+  > `scripts/ci/check-markdown-links.py`), plus an exclusion mechanism for the
+  > 21 deliberately-broken fixture files.
+
+  **This is a transcription of a selection, not a quotation of the owner's own
+  words.** The owner chose one of four options put to them; the text above is
+  the option's wording, which is why it is introduced as a selection rather than
+  as the owner speaking. The register's preamble makes a current direct user
+  instruction valid source evidence before transcription — *"Current direct user
+  instructions are valid source evidence before transcription and do not need
+  repeated consent"* — so this entry rests on that instruction and **does not
+  claim a repository citation of the owner's own text**.
+- **Scope allowed:** One `gate-guard` exception and a **manual-review merge** of
+  PR #661 at exact head `4a9e09dd2db7f4cfb59568f198b206e366f63aea`, and nothing
+  else. The head changes **one file**, `.github/workflows/validate-skills.yml`,
+  `+49/−0`. **The change uses only the FIRST of the two named paths** — the
+  workflow file — so `scripts/ci/check-markdown-links.py` is covered by this
+  decision but **unused** by it; the second path is not touched by #661 and this
+  grant confers nothing on any other change to it. The `gate-guard` failure at
+  that head is recorded here as **failed with an authorised disposition — not
+  waived, and not a pass**.
+
+  **`gate_pattern` is unchanged by this head**, which is what keeps the
+  exception from outliving the rule it excepts. Measured: the pattern line is
+  byte-identical between this base and #661's head, its SHA-256 first-16 is
+  **`f22f82ce229d9650`** over the raw line, and `gate_pattern` appears **0**
+  times in #661's diff. The pattern itself is neither read from nor cited here —
+  it lives in the workflow, and this entry changes no protection pattern.
+- **Scope FORBIDDEN:** No other pull request, head, path or failed check is
+  covered. It is **not a standing exception**, creates **no precedent**, and
+  must not be cited as authority for any later merge. It does **not** change
+  `gate_pattern`, branch protection, the protected path set, any required check,
+  or any workflow setting. It does **not** reach `scripts/ci/check-markdown-
+  links.py` **in this change** — that path is named in the decision and unused
+  by it. It does not extend `AEGIS-APR-047`, and it does not revive or widen
+  `AEGIS-APR-104`. A moved head voids it: the exception covers the merge at the
+  named head only, and a later push to #661's branch leaves this entry
+  spendable on nothing.
+- **Evidence:** The decision reached this register **relayed through the
+  coordinating agent** in the Project Aegis conversation on 2026-10-03, as a
+  selection among four options; the owner did not type into this register. The
+  evidence splits by where it lives. **Two items are corroborating session
+  artifacts, identified by hash so that a holder can verify them; neither is a
+  tracked file and neither is reachable from this repository**: the **Stage A
+  plan**, whose SHA-256 is
+  `44a4a5968c19b47acc6bb98f183f3a1eee6fdf67bb1fc8d1823342df41e859b0` and which
+  quotes the grant at its L28; and the **Stage B ACCEPT** on that plan. **One
+  item is the repository artifact** — reachable from this repository as a public
+  pull-request comment — the
+  [**Stage D independent implementation audit**](https://github.com/ModernNomad-98/Project-Aegis/pull/661#issuecomment-5974367602),
+  comment `5974367602`, which returns **ACCEPT** at head
+  `4a9e09dd2db7f4cfb59568f198b206e366f63aea` bound to `9e6039f5f17d55e3`, states
+  that `gate_pattern` is byte-identical, and raises the register condition this
+  entry answers. The head, the single changed path and the `+49/−0` figure were
+  re-measured from `git` against `origin/main` for this entry rather than taken
+  from the brief.
+- **Expiry / use limit:** **One use.** It authorises one merge of PR #661 at the
+  named head and is consumed by that merge. No calendar expiry is stated; the
+  exact-head rule is the operative limit, and it is spent on that head or not at
+  all.
