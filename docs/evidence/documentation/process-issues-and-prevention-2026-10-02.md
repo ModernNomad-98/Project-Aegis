@@ -3108,3 +3108,175 @@ narrowing is declared here rather than left silent. It adds no gate: the
 `PROC-01` check remains unbuilt, and the mechanically-enforceable table's own
 `scripts/` destination is unchanged. It does not resolve the two limits recorded
 under Claim 1; it carries them.
+
+---
+
+## Appended 2026-10-03 (sixth append) — five operational findings from the merge gates, landed on owner decision
+
+This append is **pure addition**. It rewrites no line above it, renumbers nothing, adds no stage and
+changes no rule. It lands **five findings that were being carried in working memory, a chat message and
+one untracked scratch file** — the class of carrier this register exists to replace.
+
+**Authorisation.** Owner decision, 2026-10-03, on an audited recommendation, in the owner's words:
+*"Register append, then decide AGENTS.md separately."* That decision authorises **this append only**.
+**Nothing is written to `AGENTS.md` by this change**, and this append takes no position on what belongs
+there — see *What this append does not claim*.
+
+**Two of the five are new; three are instances of an existing rule.** `PROC-04`'s standing rule is at
+**L539** of this page and its owed writing-standards half landed in the second append (**L2397**).
+Findings **2**, **3** and **5** below are covered by it. They are recorded here as **instances with
+evidence**, pointing at `PROC-04` rather than restating it, because a second rendering of a rule this
+page already carries is itself the defect the policy forbids. Findings **1** and **4** are **not**
+covered by any existing rule on this page.
+
+**Each finding is marked with its kind.** A **look-up trap** is a query whose answer is misleading in a
+way that produces a wrong action; a **record-keeping note** is about the fidelity of what gets recorded.
+Both were hit **at a merge gate**, which is why they matter more than their size: a wrong reading there
+produces a wrong action — a **false stop**, or a **false pass**.
+
+| # | finding | kind | rule status |
+| --- | --- | --- | --- |
+| 1 | `commit_id` is re-anchored as a PR's diff moves; `original_commit_id` answers *"which head was this raised against"* | look-up trap | **new** |
+| 2 | `gh api .../reviews` returns one page, and one page is not the count | look-up trap | `PROC-04` instance |
+| 3 | `gh pr list --limit N` is a **cap**, not pagination, and a cap truncates silently | look-up trap | `PROC-04` instance |
+| 4 | a job's `status` and its `conclusion` are different fields; the run-level state is authoritative | look-up trap | **new** |
+| 5 | a verification that examined **nothing** reported success | record-keeping note | `PROC-04` instance — **relayed, not verified here** |
+
+### 1. `commit_id` is re-anchored as a PR's diff moves — `original_commit_id` is the field that answers *which head*
+
+**Kind: look-up trap. New — no existing rule on this page covers it.**
+
+GitHub **re-anchors `commit_id`** on an inline review comment as the pull request's diff moves, so
+`commit_id` answers *"which head does this comment attach to **now**"* — not *"which head was it raised
+against"*. **`original_commit_id` is the stable field** and is the only one that answers the second
+question.
+
+**Evidence, PR #657**, six inline findings, read from
+`gh api --paginate --slurp "/repos/ModernNomad-98/Project-Aegis/pulls/657/comments?per_page=100"`:
+
+| field | value | findings carrying it |
+| --- | --- | --- |
+| `original_commit_id` | `9e5b79b97af5299f902c64c72b8f581407314dc7` | **all six** |
+| `commit_id` | `9e5b79b97af5299f902c64c72b8f581407314dc7` | five, created `2026-10-03T18:38:46Z` |
+| `commit_id` | `a3715be7a8d05ef20d5480a6fb33fc2cd5235a27` | **one — a P1**, id `4174408006`, created `2026-10-03T18:51:24Z` |
+
+**The timestamps settle it, and they settle it the same way the field names do.** The two candidate
+heads, dated from `git log -1 --format=%cI`:
+
+- `9e5b79b9…` was committed `2026-10-03T11:25:21-07:00` — **`18:25:21Z`**;
+- `a3715be7…` was committed `2026-10-03T14:26:28-07:00` — **`21:26:28Z`**.
+
+The P1 was created at **`18:51:24Z`**, which is **two hours and thirty-five minutes before
+`a3715be7…` existed**. It therefore **cannot** have been raised against `a3715be7…`. Its `commit_id`
+was re-anchored to `a3715be7…` later, when that commit became the head; its `original_commit_id` still
+names the head it was actually written against.
+
+**Why this is a merge-gate finding and not trivia.** `a3715be7…` is the head that **merged** — PR #657
+merged as `1e5961454f300261e195f5c71c4785fa723dc708` at `2026-10-03T21:39:30Z`. A merge agent reading
+`commit_id` therefore sees a **P1 bound to the merged head**, which under this page's own entry
+conditions is an untriaged P1 at the exact head being merged — an **automatic STOP**. The same agent
+reading `original_commit_id` sees all six findings bound to the **previous** head, which is what
+actually happened. **This nearly caused a false merge stop.** The reading is not ambiguous once the two
+fields are told apart; the defect is that only one of them is named `commit_id`.
+
+### 2. `gh api .../reviews` returns one page, and one page is not the count
+
+**Kind: look-up trap. A `PROC-04` instance — see L539 and L2397.**
+
+`GET /pulls/<n>/reviews` returns **GitHub's default page**, so a bare call reports whatever fits in one
+page. **Measured:** `#77` reads **30** from a bare call — exactly the default page size — and **83**
+with:
+
+```text
+$ gh api --paginate --slurp "/repos/ModernNomad-98/Project-Aegis/pulls/<n>/reviews?per_page=100"
+```
+
+**The neighbours were checked and none moved**, which is the part that makes the one instance
+trustworthy: `#653` **7**, `#654` **2**, `#29` **1**, and **0** on `#650`, `#623`, `#611`, `#213` and
+`#2`. Every one of those is **below the default page size**, so the cap could not have hidden anything
+there. The single instance is a published count under a **truncated method** — which is the defect
+`PROC-04` names and this append does not restate.
+
+### 3. `gh pr list --limit N` is a cap, and a cap is not pagination
+
+**Kind: look-up trap. A `PROC-04` instance — see L539 and L2397.**
+
+`--limit N` **truncates silently when reached**; it does not page. A count from a capped call and a
+count from a paginated one are **different claims**, and only the second is a count of the population.
+**Measured:** `--limit 1000` returned **658**, and the API's own `Link: rel="last"` total for
+`/pulls?state=all` was **658** — so the cap was **never reached** and the enumeration is complete.
+
+The distinction is worth recording because the **outcome here was benign and the method was still
+wrong**: the figure happened to be right, and nothing in the command said so. The check that makes it
+right is the `Link` header, not the `--limit`.
+
+### 4. A job's `status` and its `conclusion` are different fields; the run-level state is authoritative
+
+**Kind: look-up trap. New — no existing rule on this page covers it.**
+
+In the Actions API a job carries **both** a `status` and a `conclusion`, and they are not the same
+quantity. **Measured on run `37156376468`**: the **run-level** state is `status: completed`,
+`conclusion: success` — a finished, green run — while one of its jobs reports a **job-level
+`status: in_progress` alongside a `conclusion: success`**:
+
+| job | job `status` | job `conclusion` |
+| --- | --- | --- |
+| `gate-guard` | **`in_progress`** | **`success`** |
+| `validate-skills` | `completed` | `success` |
+| `windows-offline-checks` | `completed` | `success` |
+| `tools-tests-linux` | `completed` | `success` |
+| `tools-tests-windows` | `completed` | `success` |
+
+**A reader who checks a job's `status` alone reads a finished, green run as unfinished** — and at a
+merge gate that is a **false stop** produced by a correct query read through the wrong field.
+**The run-level state is authoritative**, and when a job must be read, its `conclusion` is the field
+that carries the outcome. This finding was **confirmed independently by the merge agent on #659** as
+well as measured directly here.
+
+### 5. A verification that examined nothing reported success
+
+**Kind: record-keeping note, whose mechanism is a look-up defect. A `PROC-04` instance — see L539 and
+L2397.**
+
+**This one is relayed, and it is labelled relayed because it cannot be verified from here.** The
+account comes from **`#654`'s merge agent**, relayed by the coordinator, and recorded in an
+**untracked** scratch file —
+`C:\temp\aegis-q5\Q5-SCOPE-CONFLICT-AND-MEASUREMENT-2026-10-03.md`, §13.2 — which is the carrier
+that decays. In its own words:
+
+> two of its three verification attempts returned the right answer for the wrong reason — a nested-array
+> cast meant **zero comments were examined** while reporting success: *"Both would have let me report a
+> pass that examined nothing — the exact failure class `PROC-02` exists to catch."*
+
+**What was actually inspected here, and what was not.** This append's author read that account, quoted
+it, and **did not** observe the agent's process, its scripts or its output, and **did not re-run its
+verification**. It is therefore recorded as a **relayed account attributed to that agent**, not as a
+verified fact about it. What *is* independently established is only what the account is an instance of:
+a result can be reported as a pass while the set it was computed over is **empty**, and the artifact
+the scratch file itself notes is that the empty set was invisible in the success it printed.
+
+**It belongs on this page because it is the same shape as the rest of this register** — a reported
+outcome that outran what was examined — and because its carrier was a file that no `grep` on this page
+reaches. Landing it here is the whole point; verifying it is someone else's step, and this append says
+so rather than implying otherwise.
+
+### What this append does not claim
+
+It does not restate `PROC-04`; findings **2**, **3** and **5** point at its standing rule at **L539**
+and its landed writing-standards half at **L2397**, and this append is deliberately not a second
+rendering of it. It does **not** claim finding **5** is verified — it is **relayed**, attributed to
+`#654`'s merge agent, sourced from an untracked file, and the author did not re-run it; the
+**relayed** label is load-bearing and should not be stripped by a later reader. It does not add
+findings **1**, **2**, **3** or **4** to `AGENTS.md`, and it does not decide whether any of the five
+belongs there: the owner's decision is *"Register append, then decide `AGENTS.md` separately"*, and
+that second decision is untouched. It does not claim the five are the complete set of operational
+traps at the merge gates — they are the five that were **being carried outside tracked artifacts**, which
+is why they were the ones at risk. It changes no stage contract, adds no gate, and nothing in
+`scripts/`, `.github/workflows/` or `tools/**` reads this section. It does not correct the two counts
+recorded in the fourth and fifth appends above; those corrections stand as written.
+
+**Provenance.** Every count and instant above other than finding 5's account was measured on
+2026-10-03 against the GitHub API and a local clone at `origin/main` =
+`3e992f896f7934d9e0f1043c75f942de715af520`; the PR and comment ids and the run id are quoted from the
+API responses. Finding 5 is the single relayed item and is labelled as such in place. No provider or
+model call was made, no evaluator was run, and no dependency was installed.
