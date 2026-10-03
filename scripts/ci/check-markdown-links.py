@@ -37,6 +37,13 @@ INLINE_CODE = re.compile(r"`+[^`\n]*`+")
 HTML_ANCHOR = re.compile(r"<[^<>]*\b(?:id|name)\s*=\s*[\"']([^\"']+)[\"'][^<>]*>")
 EXPLICIT_SLUG = re.compile(r"\{#([^}\s]+)\}\s*$")
 HTML_TAG = re.compile(r"<[^>]*>")
+# A continuation that opens a NEW block is never part of a wrapped link.
+BLOCK_START = re.compile(r"^ {0,3}(?:#{1,6}\s|`{3,}|~{3,}|[-*+][ \t]|\d+[.)][ \t]|>|<!--)")
+# A blockquote marker is container syntax, never link text. The `>` is
+# mandatory in the pattern: were it optional, stripping would consume the first
+# character of every ordinary continuation line and destroy the link instead of
+# joining it.
+QUOTE_MARKER = re.compile(r"^ {0,3}>[ \t]?")
 
 
 def slugify(text: str) -> str:
@@ -79,6 +86,91 @@ def strip_code(text: str) -> str:
                 fence = None
             kept.append("\n" if line.endswith("\n") else "")
     return "".join(kept)
+
+
+def link_text_open(line: str) -> bool:
+    """True when `line` ends inside a link's TEXT, which the next line completes.
+
+    `[the heading](target)` fits on one line. A hand-wrapped document splits it
+    after any word, and the split can land between the `[` and the `](`, so the
+    line ends with an unclosed `[` and the link exists only as a whole once the
+    two lines are read together. Only a `[` left open at the END of the line
+    counts: an unmatched closer above it is ordinary prose, not a wrap.
+    """
+    return line.rfind("[") > line.rfind("]")
+
+
+def link_target_open(line: str) -> bool:
+    """True when `line` ends inside a link's DESTINATION.
+
+    Two shapes wrap here: the line ends on the `](` itself, or it ends part-way
+    through the destination. Detection is grammatical, never positional -- the
+    `[` must precede the `](` and the destination must be unterminated -- so an
+    ordinary parenthesis that ends a prose line is not mistaken for a link.
+    """
+    if "](" not in line:
+        return False
+    after = line[line.rfind("](") + 2:]
+    return line.rfind("[") > line.rfind("])") and (")" not in after or "(" in after)
+
+
+def unwrap_links(lines: list[str]) -> tuple[list[str], list[int]]:
+    """Join the lines a wrapped link was split across, before `LINK` scans.
+
+    `LINK`'s character classes forbid `\\n`, and the scan is per line, so a
+    wrapped link matches nowhere and is counted nowhere. Joining the two halves
+    with a space restores exactly what the renderer sees -- Markdown folds a
+    soft line break inside link text and inside a destination to a space.
+
+    The join cannot invent a link. It happens only when the line is already
+    PROVEN incomplete (a `[` or a `](` it never closes), only when the
+    continuation closes a bracket construct rather than opening a new block,
+    and never onto a blank line or a heading, fence, list item or HTML comment.
+    Both lines are kept, separated by a space, so no match can span a boundary
+    the source did not already have. Returns the merged lines and, for each,
+    the 1-based source line it came from: the first line of a wrap, so a
+    finding points where the link starts.
+    """
+    merged: list[str] = []
+    origins: list[int] = []
+    index = 0
+    while index < len(lines):
+        current = lines[index]
+        # The line the wrap STARTS on. Every guard reads this, and the reported
+        # line number is its number, so merging never moves where a finding
+        # points or lets a merged line VETO its own continuation.
+        source_line = current
+        origin = index + 1
+        first = True
+        while index + 1 < len(lines):
+            if not first:
+                current = QUOTE_MARKER.sub("", current)
+            # Test the state the join would produce, not the state it started
+            # from: a link may wrap over more than two lines, and a link left
+            # open again by its own continuation keeps the loop going.
+            if not (link_text_open(current) or link_target_open(current)):
+                break
+            # A leading `>` is container syntax, never link text, so `> [a`
+            # plus `> b](t)` is the one link `[a b](t)`. The `>` is mandatory in
+            # the pattern: an optional one would eat the first character of an
+            # ordinary continuation line.
+            stripped = QUOTE_MARKER.sub("", lines[index + 1])
+            if BLOCK_START.match(stripped):
+                break
+            joined = current.rstrip() + " " + stripped.strip()
+            # The join must COMPLETE a link the ORIGINAL line did not hold on its
+            # own. Two lines that each already parse stay separate, so a link is
+            # never manufactured across a boundary the source did not already
+            # have; a wrapped link is merely handed to `LINK` in one piece.
+            if not LINK.search(joined) or LINK.search(source_line):
+                break
+            current = joined
+            first = False
+            index += 1
+        merged.append(current)
+        origins.append(origin)
+        index += 1
+    return merged, origins
 
 
 class Document:
@@ -142,7 +234,11 @@ def check(files: list[Path], out) -> tuple[int, dict[str, int]]:
         doc = document(source)
         if doc is None:
             continue
-        for line_number, line in enumerate(doc.body.splitlines(), start=1):
+        # Undo hand-wrapping first, so a link split across two source lines is
+        # one candidate line here. The origin list keeps the reported line
+        # number pointing at the source line the link starts on.
+        lines, origins = unwrap_links(doc.body.splitlines())
+        for line_number, line in zip(origins, lines):
             if "](" not in line:
                 continue
             for match in LINK.finditer(line):
