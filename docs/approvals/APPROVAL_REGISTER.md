@@ -3139,3 +3139,14 @@ the entry governs.
   recorded it as standing on 2026-09-30. It may be revoked or superseded by a
   later lifecycle event, which must be appended rather than applied by editing
   this entry.
+### AEGIS-APR-101: Ledger keeper role and two historical recording acts
+
+- **Event:** GRANT and explicit ratification.
+- **Status at recording:** ACTIVE only after explicit owner approval and recording on the default branch.
+- **Date / Grantor:** 2026-10-03 UTC / Peter Nguyen. Owner approval was given on 2026-10-02 at 18:05:09 America/Los_Angeles; the repository recording date is 2026-10-03 UTC, which is the same UTC date as the approval and a later instant than it.
+- **Reason:** Establish authority for recording completed documentation reviews and resolve the authority gap for the two recording acts delivered in PR #635.
+- **Scope allowed:** Establish a standing ledger keeper role for recording qualifying documentation acceptances in `docs/roadmaps/aegis-documentation-readability-backlog.md`. The keeper must be a different agent from the page's author and accepting reviewer. The coordinator may not hold this role. The keeper may record an existing qualifying review decision, bound to the exact reviewed revision and its posted evidence; it may not independently confer acceptance. If the reviewer declines acceptance or the required evidence is missing, record no acceptance.
+- **Historical ratification:** Ratify only the two recording acts delivered in PR #635 for `docs/evidence/setup/issue-101-package-4a-host-feasibility.md` and `docs/evidence/setup/issue-101-package-4a-offline-review.md`, based on REVIEW-2's PR #625 comment 5963410567 at revision `e6fc8d24ad782cfc93e3b2639c1e2b6e5a35b08e`. This ratification does not assert that authority existed beforehand or that later document versions remain accepted.
+- **Scope FORBIDDEN:** No self-review, overriding review findings, merging by the keeper, or waiver of existing review and delivery requirements. No approval of the charter's proposed canonical index, its precedence, or changed counting rules. No Stage 4B, helper comparison, private BER candidate approval, or other work-package authority.
+- **Evidence:** In the Project Aegis decision conversation, the owner was asked, "Do you approve this limited role and the two historical recording acts, with the coordinator excluded?" The owner answered "approved" on 2026-10-02 at 18:05:09 America/Los_Angeles, equivalent to 2026-10-03 at 01:05:09 UTC. The subsequent owner-supplied handoff prompt authorizes transcription and narrowly scoped consistency updates. Link PR #635 and PR #625 comment 5963410567 as evidence of the historical recording acts, not as substitutes for owner approval.
+- **Expiry / use limit:** Standing until revoked or superseded; historical ratification is limited to the two recording acts above. Append subsequent lifecycle events without rewriting this entry.

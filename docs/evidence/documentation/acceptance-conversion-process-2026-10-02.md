@@ -424,3 +424,17 @@ determination elsewhere in this note is touched by this correction.
 full-page re-read to what the note already owed its readers. Nothing here
 converts to an acceptance; this note still records no acceptance for any page,
 and the two candidate pages remain **pending**.
+
+## Consistency note — the role is ratified; 2026-10-02 local, recorded 2026-10-03 UTC
+
+**The ledger keeper role proposed in this note is now ratified.** It is recorded as [AEGIS-APR-101](../../approvals/APPROVAL_REGISTER.md#aegis-apr-101-ledger-keeper-role-and-two-historical-recording-acts) in the [owner approval register](../../approvals/APPROVAL_REGISTER.md) — "Ledger keeper role and two historical recording acts". The owner approved it on 2026-10-02 at 18:05:09 America/Los_Angeles (2026-10-03 at 01:05:09 UTC); the register entry is the authority, and this note is not. The role takes effect only once that entry is on the default branch.
+
+**The coordinator is excluded from the role.** The owner approved it "with the coordinator excluded". The register's `Scope allowed` therefore states that the keeper must differ from the page's author and its accepting reviewer, and that the coordinator may not hold this role. That was the open question flagged at [Ratification owed](#ratification-owed) item 1.
+
+**The two separate decisions remain unresolved.** The register's `Scope FORBIDDEN` grants no approval of the **canonical index** this note proposes at (c), of its **path or ownership**, of its **precedence**, or of the **changed counting rules** those carry. Items 2 and 3 of [Ratification owed](#ratification-owed) are therefore still owed; only item 1 is settled. Nothing here makes the index authoritative or moves the pending floor.
+
+**The historical proposal stands as written.** Everything above the `Correction — 2026-10-02` section keeps its original wording, including the `Status: PROPOSAL` line and the phrase "Owner ratification is owed". Under this note's own precedence rule at (c)(1) — and `CONTRIBUTING.md` decision rule 4 — dated text is corrected forward by a dated note, never rewritten. Read those lines as the proposal's own record of the state on 2026-10-02, not as the current state.
+
+**What ratification does not do.** It ratifies a recording role and two named historical recording acts, and nothing else. It confers no acceptance of any page, including this one; it grants no authority to re-review a page, to override a review finding, or to waive any existing review or delivery requirement; and it grants no installation, host session, provider call, credential access, private-data access or deployment authority. The register entry's `Historical ratification` is limited to the two acts delivered in PR #635, and expressly does not assert that the keeper held authority beforehand.
+
+**Cost of this note.** This section is more than 10 changed lines on a page that is already **pending**, so this note stays **pending** and owes its own independent full-page re-read against [Acceptance for each page](../../roadmaps/aegis-documentation-readability-backlog.md#acceptance-for-each-page) by a reader who did not write this section. No acceptance is recorded here, and none is manufactured to offset it.
