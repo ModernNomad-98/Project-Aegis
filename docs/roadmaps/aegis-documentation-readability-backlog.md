@@ -30,7 +30,7 @@ records that *"the process's canonical per-path acceptance index (section (c) of
 the conversion note) does not exist on main, so these rows are recorded in this
 ledger as dated prose instead of as index rows."* **The index does exist on
 main.** It is
-[`tools/readability_acceptance/acceptance-index.json`](../../tools/readability_acceptance/README.md),
+[`tools/readability_acceptance/acceptance-index.json`](../../tools/readability_acceptance/acceptance-index.json),
 a tracked file (350,376 bytes) with schema `aegis.documentation-acceptance-index/1`,
 built by `tools/readability_acceptance/build_index.py` and checked by
 `check_index.py` and `verify_ground_truth.py`. Its own `rule_text_file` field
@@ -38,11 +38,32 @@ names **this ledger**, and its `rules` map gives line ranges in it
 (`reader_page_default` 103–104, `acceptance_criteria` 2376–2397,
 `full_page_acceptance_event` 2478–2482) — so the index derives its rule text
 from this page. Those ranges are the index's recorded references at its
-`source_revision` `d6e48418` and **this note shifts them**, which is part of the
-owed `build_index.py` re-run recorded below. The direction of derivation the
+`source_revision` `d6e48418`. **At this head every one of them is wrong**, and
+this note is the cause: it inserts lines at line 19, above every recorded range —
+the lowest recorded start is line 22 — so each range moves down. **Measured by
+comparing the lines at each recorded range between `c3527560` and this head: 0 of
+the 11 ranges still resolves to the text its key names.** `targeted_edit_scope`,
+recorded as 22–26, no longer begins at line 22 at all. Making them correct again
+means rebuilding the index, which is part of the owed `build_index.py` re-run
+recorded below; **this note does not edit committed consumers**, so those anchors
+stay wrong until that re-run. The direction of derivation the
 ledger recorded is therefore the
-reverse of the truth: the ledger is the index's rule source, and the index is
-the artifact the acceptance rows belong in. Measured:
+reverse of the truth: **the ledger is the index's rule source.**
+
+**What that does not establish, and what this note does not decide.** Those
+anchors show that the index **exists** and that the dependence runs ledger →
+index. They do **not** show that the index is where acceptance rows should be
+*recorded*, or which artifact takes precedence — and that question is **open**,
+as two tracked sources state. `docs/approvals/APPROVAL_REGISTER.md:3150`, the
+**`AEGIS-APR-101`** entry's **Scope FORBIDDEN**, reads: *"No approval of the
+charter's proposed canonical index, its precedence, or changed counting rules."*
+This ledger itself says the same, at line 3195 of this head, under
+[First ledger-keeper recording](#first-ledger-keeper-recording--owner-ratified-role-2026-10-02):
+*"**Still separately unresolved, and still undecided.** The charter's proposed
+canonical index — its ownership, path, precedence and changed counting rules — is
+**not** approved by this entry."* So the acceptance rows stay recorded here as
+dated prose, and whether they should ever move to index rows is a question for
+the owner — **not** something this note settles. Measured:
 `git ls-files --error-unmatch tools/readability_acceptance/acceptance-index.json`
 → the path, exit 0.
 
@@ -87,11 +108,14 @@ Cross-checks: `658 + 16 = 674`; `55 + 10 = 65`; `602 + 6 = 608`.
 at least 218.** Repairing (1) is what makes this measurable: while this ledger
 believed the index absent, it recorded the exact count as *"not derivable from a
 command"*. The index's own read-only decision procedure can now be run against a
-named revision. Command, run 2026-10-03 against `c3527560` (that is,
-`origin/main`) using the committed index:
+named revision. Command, run 2026-10-03 against the revision below, with `--ref`
+**pinned explicitly** rather than left to its default: `origin/main` moves, and a
+bound is only meaningful against a named revision. (`origin/main` **was** this
+revision when the command was run.)
 
 ```text
-python -P -B tools/readability_acceptance/check_index.py --json
+python -P -B tools/readability_acceptance/check_index.py --json `
+    --ref c3527560fb7ef06043f56a0cb9bbbabf604e84f0
 ```
 
 Its `summary` at that ref reports `compared_ref`
@@ -103,28 +127,39 @@ procedure"**. Its own bound string reads *"at least 212 pages are provably
 pending by the tracker's own >10-lines-or-new-section rule"*.
 
 **The recorded floor of 35 was the narrower figure** — the pages the tracker's
-2026-10-01 audit could name — and the measured 212 supersedes it as the bound,
-because 212 pages are provably pending under the same rule. Spot-verified
-containment: nine of the ten pages in the ten-page table under **Correction:
-one base SHA in the table above is not an ancestor of `origin/main` — 2026-10-02**
-(below) appear in the index's provably-pending list, and the tenth,
+2026-10-01 audit could name. The tool's 212 is larger, and the containment of the
+ten-page table is spot-verified: nine of the ten pages in the ten-page table under
+**Correction: one base SHA in the table above is not an ancestor of `origin/main`
+— 2026-10-02** (below) appear in the tool's provably-pending list, and the tenth,
 `.claude/skills/cloud-security-baseline-reviewer/SKILL.md`, is the page this
 ledger already records as undecidable because its acceptance revision
-`65bacc7d6b85` is contained by no remote-tracking ref — the same page the index
+`65bacc7d6b85` is contained by no remote-tracking ref — the same page the tool
 reports under `cannot_decide`.
 
-**Two corrections on top of the index's figure.** Six reader pages have been
-added since the index's `source_revision d6e48418`; they are absent from it and
-start pending under this ledger's new-page rule, so **the floor is at least
-`212 + 6 = 218`**. And the ceiling this ledger records — *"at most 567 are
-counted accepted or unknown with no per-page recorded full-page re-read that a
-command can bind"* — was `602 − 35` on the old inputs; on the measured inputs it
-is `608 − 218 = ` **at most 390**.
+**But that bound is the TOOL'S, on the tool's frozen basis — not this ledger's
+floor, and this note does not adopt it as one.** `check_index.py` reads
+acceptance rows **frozen at the index's `source_revision` `d6e48418`**; a page
+whose acceptance was recorded *after* that revision is still counted pending by
+it, so **212 is not guaranteed to be a floor.** Whether the tool over-counts for
+that reason, and by how much, is **`unsure` here** — the same question the
+independent reviewer marked `unsure` rather than implying it had been checked.
+Every figure in this paragraph is quoted from the tool and attributed to it.
+
+**Two adjustments on the tool's figure, carrying the same attribution and the
+same reservation.** Six reader pages have been added since `d6e48418`; they are
+absent from the index and start pending under this ledger's new-page rule, so
+**the tool's bound rises to at least `212 + 6 = 218`** on the same frozen basis.
+And the ceiling this ledger records — *"at most 567 are counted accepted or
+unknown with no per-page recorded full-page re-read that a command can bind"* —
+was `602 − 35` on the old inputs; on these inputs it is `608 − 218 = ` **at most
+390**, again attributed to the tool.
 
 The exact pending count is still **not derivable**, and the index says so in the
-same words this ledger uses. What changed is the size of the gap and its
-provenance: a floor of 35 carried in prose becomes a floor of 218 produced by a
-command. For completeness, the index's companion verifier
+same words this ledger uses. What changed is the provenance of the bound: one of
+35 carried in prose is superseded by one of 218 **produced by a named tool against
+a named revision** — attributed there, with the tool's frozen basis and this
+note's `unsure` recorded beside it rather than absorbed. For completeness, the
+index's companion verifier
 `verify_ground_truth.py` exits **1** at this ref on one pre-existing mismatch —
 `.claude/skills/cloud-security-baseline-reviewer/SKILL.md`, the same
 unreachable-acceptance page — which this ledger already records above and which
@@ -3152,7 +3187,7 @@ again.
 
 **Correction (appended 2026-10-03).** The first point above is wrong as written:
 the canonical per-path acceptance index **does exist on main**, at
-[`tools/readability_acceptance/acceptance-index.json`](../../tools/readability_acceptance/README.md),
+[`tools/readability_acceptance/acceptance-index.json`](../../tools/readability_acceptance/acceptance-index.json),
 tracked, with this ledger as its `rule_text_file`. The original sentence stands
 as the record of what was believed on 2026-10-02. See
 [Premises correction](#premises-correction--appended-2026-10-03-measured-at-c3527560).
