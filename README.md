@@ -388,24 +388,45 @@ conversation (checked 2026-09-26 against
 Copy the `.claude/skills/<name>/` folders you want
 into your own repo's `.claude/skills/` — Claude Code discovers them there exactly the same
 way. If your repo has no `.claude/skills/` folder yet, create it first (it's just a folder). To also reproduce this repo's startup routing, copy the repo-root `CLAUDE.md` and `AGENTS.md` into your repo root — `CLAUDE.md` is Claude Code's startup file and imports `AGENTS.md`.
+
+**Do not copy each skill's `evals/` folder.** Every shipped skill carries `evals/evals.json`
+and (usually) `evals/trigger-evals.json`. Those are the skill's **answer keys**: each case
+records its `id`, the exact `prompt`, and the `assertions` a good response must satisfy.
+This repository's own design classifies that corpus as trusted control-plane data that must
+*never* be readable from an agent workspace
+([`docs/design/behavioral-eval-runner-v1.md`](docs/design/behavioral-eval-runner-v1.md) §5a).
+They are maintainer material for evaluating the library — they do nothing for you in your
+own project, and leaving them in place means any agent working in your repo can read the
+criteria it would be judged against.
+
 Literal copy commands, run from inside the cloned `Project-Aegis` folder — swap
 `tdd-engineer` for the skill you want and the path for your own repo:
 
 On Windows (PowerShell):
 
 ```powershell
-Copy-Item -Recurse .claude\skills\tdd-engineer C:\path\to\your-repo\.claude\skills\tdd-engineer
+$src = ".claude\skills\tdd-engineer"
+$dst = "C:\path\to\your-repo\.claude\skills\tdd-engineer"
+Copy-Item -Recurse $src $dst
+# Remove the answer keys from the copy. -Exclude does NOT work with -Recurse,
+# so this is a second, explicit step.
+Get-ChildItem $dst -Recurse -Directory -Filter evals | Remove-Item -Recurse -Force
 ```
-
-`Copy-Item -Recurse` copies the skill's folder and everything inside it into your repo.
 
 On macOS/Linux:
 
 ```bash
 cp -r .claude/skills/tdd-engineer /path/to/your-repo/.claude/skills/
+find /path/to/your-repo/.claude/skills/tdd-engineer -type d -name evals -prune -exec rm -rf {} +
 ```
 
-`cp -r` is the same copy on Mac and Linux (`-r` means "include everything inside the folder").
+`Copy-Item -Recurse` copies the skill's folder and everything inside it into your repo.
+The second command then removes the `evals/` folder, which is the only part you do not want.
+**Verify the result** — this should print nothing:
+
+```powershell
+Get-ChildItem "C:\path\to\your-repo\.claude\skills" -Recurse -Directory -Filter evals
+```
 
 Copied skills add nothing that runs automatically: no hooks, no `allowed-tools` pre-approvals, no `!` shell injection and no plugin or Model Context Protocol (MCP) server files. The source repository's validator enforces this on every shipped skill, so invoking a copied skill never runs code by itself. One skill also carries scripts: the manual-only `aegis-setup` includes PowerShell scripts, which the assistant can run only through its ordinary command tool, under your normal permission checks.
 
