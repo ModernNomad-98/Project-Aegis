@@ -3588,3 +3588,152 @@ the entry governs.
   FAILED on that pull request and the merge proceeded under the one-time
   disposition** — recorded here as **failed with an authorised disposition,
   not waived, and not a pass.**
+
+### AEGIS-APR-109: One-use merge authority over three agent-authored branches
+
+- **Event:** GRANT — one use, three-branch merge authority, held by a designated
+  merge agent. It is not a standing merge grant, not a policy decision, and it
+  creates no precedent.
+- **Status at recording:** ACTIVE and **unspent** as recorded. It authorises the
+  three merges named in `Scope allowed` and nothing else, and it ends when all
+  three complete or when the owner supersedes it.
+- **Date / Grantor:** 2026-10-04 / Peter Nguyen.
+- **Reason:** Three agent-authored branches, all based on `3006d0a7`, were each
+  waiting on a merge path: `fix/consumer-copy-and-containment`,
+  `docs/consumer-copy-worked-example` and `docs/no-cross-skill-delegation`. The
+  owner was asked how those merges should proceed and selected a **specific
+  agent merge authority** over exactly these three branches, together with the
+  security-review carve-out recorded below, rather than a standing grant or a
+  per-branch one-time exception. This entry widens no existing entry and restates
+  none of them: `AEGIS-APR-100` remains the standing delivery grant for
+  separately authorized work, and its own `Scope FORBIDDEN` still withholds a
+  protected `gate-guard` waiver — a limit the `docs/no-cross-skill-delegation`
+  clause in `Scope FORBIDDEN` below preserves rather than relaxes.
+
+  **The entry ID is derived, not assumed.** The register at this base carries
+  `AEGIS-APR-001` through `AEGIS-APR-107` — **107 headings, no gaps and no
+  duplicates**, measured by extracting every `### AEGIS-APR-nnn:` heading. The
+  headings are **not in strict numeric order** (`087` sits before `085`/`086`),
+  so the highest present was taken and the range checked for gaps rather than the
+  last heading read. **`AEGIS-APR-108` is reserved by the unmerged
+  [PR #665](https://github.com/ModernNomad-98/Project-Aegis/pull/665)** (its
+  title records the Stage 4B first-tranche execution grant as `AEGIS-APR-108`;
+  the register carries no `108` at this base), so this entry is `109` and the gap
+  at `108` is deliberate — it closes when that pull request lands.
+- **Owner decisions, recorded as relayed:** The owner's decisions reached this
+  register **relayed through the coordinating agent** in the Project Aegis
+  conversation on 2026-10-04; **the owner did not type into this register.** Two
+  selections were made:
+
+  1. **Merge authority — a specific agent.** From the presented options the owner
+     selected **"Grant a specific agent merge authority"**, and designated
+     `plan-scrutineer` as the merge agent for the three branches named in
+     `Scope allowed`.
+  2. **Security-review carve-out.** For these agent-authored branches the owner
+     selected **"Carve-out applies"**.
+
+  **These are transcriptions of selections, not quotations of the owner's own
+  words.** The owner chose among options put to them, so the wordings above are
+  reproduced as they were relayed, not as the owner speaking. The register's
+  preamble makes a current direct user instruction valid source evidence before
+  transcription — *"Current direct user instructions are valid source evidence
+  before transcription and do not need repeated consent"* — so this entry rests
+  on that instruction and **does not claim a repository citation of the owner's
+  own text.**
+- **Scope allowed:** Merge authority over, and only over, these three branches,
+  exercised by the designated merge agent `plan-scrutineer`:
+
+  - `fix/consumer-copy-and-containment`
+  - `docs/consumer-copy-worked-example`
+  - `docs/no-cross-skill-delegation`
+
+  All three are based on `3006d0a7`. Measured for this entry rather than taken
+  from the brief: `git merge-base --is-ancestor 3006d0a7 <branch>` exits **0**
+  for each of the three.
+
+  **The grant names no head, deliberately.** For each branch the binding to a
+  head is established at merge time by condition (a) below, which requires the
+  accepted review to name the exact head being merged. `AEGIS-APR-106` records
+  the consequence of the alternative: a grant naming one head cannot be spent on
+  another, so freezing a head here would void the grant the moment a branch moved
+  — and one of these three branches had already moved before this entry was
+  written.
+
+  **Conditional limits — all three must hold for each branch, or that branch is
+  not covered:**
+
+  (a) the **final independent review is posted and accepted naming the exact head
+  being merged** for that branch;
+  (b) **all checks for that head are green** — not only the
+  branch-protection-required ones;
+  (c) the **required review wait has completed**.
+
+  **A head that moves voids that branch's coverage.** A later push leaves this
+  entry spendable on nothing for that branch until a review naming the new head
+  is posted and accepted and that head's checks are green.
+
+  **Security-review carve-out.** For these agent-authored branches the owner
+  applied the `CONTRIBUTING.md` carve-out: **no additional mandatory security
+  review beyond the ordinary independent review.** The page's own scope is the
+  basis: [`CONTRIBUTING.md`](../../CONTRIBUTING.md) attaches that additional
+  review to **external** contributions — *"External contributions are reviewed by
+  the maintainer before merge; pull requests touching a security-relevant surface
+  receive an additional explicit security review"*, and *"An outside contribution
+  that touches any listed surface gets the additional security review described
+  above, whatever it answers."* **The page does not itself say that
+  agent-authored owner-directed work is exempt; the owner's decision is what
+  applies the carve-out to these three branches**, and it is recorded here as a
+  selection, not as a reading the page already contained. It reaches **only**
+  these three branches, is not a standing reading of `CONTRIBUTING.md`, and
+  grants nothing to any later change.
+- **Scope FORBIDDEN:** **No branch other than the three named above is covered**,
+  at any head, and no later branch may cite this entry as authority. Specific
+  prohibitions:
+
+  - **No merge of any other branch**, under any reading of conditions (a)–(c).
+  - **No `gate-guard` waiver.** `docs/no-cross-skill-delegation` changes
+    `scripts/validate-skills.py` and `scripts/tests/test_validator.py`, and the
+    gate pattern in `.github/workflows/validate-skills.yml` matches `scripts/` —
+    measured for this entry by applying the workflow's own `gate_pattern` under
+    its own bash construct — so `gate-guard` fails on that branch by
+    construction. **`AEGIS-APR-047` does not reach it**: that entry's own
+    `Scope FORBIDDEN` keeps *"workflow/CI files, CODEOWNERS, the validator,
+    Developer Certificate of Origin (DCO) check, guard scripts and tests,
+    requirements, parent import files, acceptance machinery and all other BER
+    paths"* for *"separate one-time owner decisions"*. That branch may therefore
+    **not** be merged while `gate-guard` fails unless the owner grants a
+    **PR-specific exception naming that pull request and head**. This entry is
+    not that exception, waives no check, and must not be read as a pass: a red
+    check stays red, and if such a merge proceeds it is **failed with an
+    authorised disposition, not waived**.
+  - **No authority to author, review, edit or reopen.** This is merge authority
+    only. It does not make `plan-scrutineer` an author or a reviewer of the three
+    branches, does not authorise editing them, and does not authorise reopening a
+    merged, closed or superseded pull request.
+  - **No credential of any kind** may be requested, read, recorded, transmitted
+    or stored under this entry.
+  - **Nothing on `main` except via the granted merges.** No direct push, no
+    force-push, no branch-protection change, no required-check change, no
+    auto-merge arming and no other commit to `main` is authorised.
+  - It does not widen `AEGIS-APR-100`, `AEGIS-APR-048`, `AEGIS-APR-047` or any
+    other entry, and it decides nothing about the open question of what belongs in
+    the protected-path set.
+- **Evidence:** The decisions reached this register **relayed through the
+  coordinating agent** in the Project Aegis conversation on 2026-10-04; **the
+  owner did not type into this register**, and the selections above are
+  transcriptions of options put to the owner rather than the owner's own signed
+  text. Three recorded owner decisions are the source: the merge-authority choice
+  **"Grant a specific agent merge authority"**, the merge-agent designation of
+  `plan-scrutineer`, and the security-review carve-out **"Carve-out applies"**.
+  The register's preamble makes a current direct user instruction valid source
+  evidence before transcription — *"Current direct user instructions are valid
+  source evidence before transcription and do not need repeated consent"*. **No
+  repository artifact records the owner's words for these three decisions**, and
+  this entry claims no repository citation of them. Every repository fact asserted
+  above was measured against `3006d0a7` for this entry rather than taken from the
+  brief: the three branches' ancestry, the register's own ID coverage, the
+  absence of `108` at this base, and the `gate_pattern` match on `scripts/`.
+- **Expiry / use limit:** **One use**, covering the three named merges and
+  nothing else. It is consumed when all three merges complete, or earlier if the
+  owner supersedes it; a branch that loses coverage under a moved head does not
+  free the grant for any other branch. No calendar expiry is stated.
