@@ -3599,11 +3599,14 @@ the entry governs.
   three complete or when the owner supersedes it.
 
   **As recorded, this entry takes effect when it is merged into `main`, not when
-  its branch is pushed.** No pull request exists for this branch as this revision
-  is written, so the merge path below is not yet open: until a pull request is
-  opened and merged, this text is a draft on a branch, and **no action is covered
-  by it**. A reader holding the branch cannot cite it as authority; the register
-  on `main` is the record.
+  its branch is pushed.** This entry is carried by the **open pull request
+  [`ModernNomad-98/Project-Aegis#666`](https://github.com/ModernNomad-98/Project-Aegis/pull/666)**
+  against `main`, so the merge path is open but **not complete**: until that pull
+  request merges, this text is a draft on a branch, and **no action is covered by
+  it**. A reader holding the branch cannot cite it as authority; the register on
+  `main` is the record. **No authority audit should read this entry as predating
+  its pull request** — the record above is the state of an open, unmerged
+  proposal.
 - **Date / Grantor:** 2026-10-04 / Peter Nguyen.
 - **Reason:** Three agent-authored branches, all based on `3006d0a7`, were each
   waiting on a merge path: `fix/consumer-copy-and-containment`,
@@ -3686,19 +3689,30 @@ the entry governs.
   written.
 
   **Measured more precisely than that first wording: two of the three had moved
-  within twelve minutes before this entry's commit** —
-  `docs/consumer-copy-worked-example` (remote-reflog pushes at 08:48:30 and
-  08:51:33) and `docs/no-cross-skill-delegation` (08:56:03), against this entry's
-  commit at 09:03:20. "One" understated the measurement; the argument it supports
-  is unaffected.
+  before this entry's commit, each for the last time within twelve minutes of
+  it** — `docs/consumer-copy-worked-example` (`3d15f7c2` and `0165e06e`, committer
+  timestamps 08:48:24 and 08:51:31) and `docs/no-cross-skill-delegation`
+  (`29a103e7`, committer timestamp 08:55:47) — against this entry's creating
+  commit `623632b9` at 09:03:20. **These are transferred commit timestamps, read
+  with `git show -s --format=%cd <sha>` from commits reachable in any fresh clone
+  from their branches. They are deliberately not remote-tracking reflog entries:
+  a reflog is local to one checkout, expires, and is not transferred, so it is not
+  evidence this register may rest on.** From the committer timestamps the two last
+  movements are **11 min 49 s and 7 min 33 s** before the creating commit, so the
+  twelve-minute statement holds on durable evidence. "One" understated the
+  measurement; the argument it supports is unaffected.
 
   **The anchor in that sentence is named precisely: `623632b9` at 09:03:20 — the
   commit that created this entry, not whichever later commit carries the text a
-  reader holds.** A later revision that carried it (`e8081718`, 09:17:02) gives
-  21.0 and 25.5 minutes for the same two pushes, so the twelve-minute statement
-  holds only for `623632b9` and is anchored to it here. The two reflog timestamps
-  are the independently verifiable facts; this entry makes no general claim about
-  the interval measured to any other revision.
+  reader holds.** A later revision that carried it (`e8081718`, 09:17:02) puts the
+  same two movements at **25 min 31 s and 21 min 15 s** before that commit, so the
+  twelve-minute statement holds only for `623632b9` and is anchored to it here.
+  **The durable facts are the commit identifiers and their committer timestamps
+  (`3d15f7c2` 08:48:24, `0165e06e` 08:51:31, `29a103e7` 08:55:47), each reachable
+  from its branch in a fresh clone. The reflog entries that first recorded the
+  pushes are local to one checkout and expire; this entry does not rest on them
+  and does not present them as independently verifiable.** This entry makes no
+  general claim about the interval measured to any other revision.
 
   **Conditional limits — all three must hold for each branch, or that branch is
   not covered:**
@@ -3725,8 +3739,19 @@ the entry governs.
   (c) the **required review wait has completed**.
 
   **A head that moves voids that branch's coverage.** A later push leaves this
-  entry spendable on nothing for that branch until a review naming the new head
-  is posted and accepted and that head's checks are green.
+  entry spendable on nothing for that branch until a review naming the new head is
+  posted and accepted **and that new head satisfies condition (b) as amended above
+  — not an unconditional all-green requirement, which would make recovery
+  impossible for the one branch whose `gate-guard` is red by construction.** For
+  `docs/no-cross-skill-delegation` only, restoring coverage after a later push
+  therefore requires **both** a fresh review naming the new head **and a fresh
+  owner PR-specific exception naming the new pull request and the new head**,
+  disposing the red `gate-guard` and recorded as **failed with an authorised
+  disposition — never green, never waived, and not a pass.** A prior exception
+  does not carry over: it is void with the head it named, and the fresh exception
+  must name the new pull request and the new head. **The other two branches keep
+  the unconditional all-green requirement at any new head, with no exception
+  available to them.**
 
   **One merge slot per branch, and each slot is consumed by its first merge.**
   Each named branch may be merged **exactly once** under this grant. **The first
