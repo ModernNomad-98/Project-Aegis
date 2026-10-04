@@ -437,21 +437,26 @@ staging-design route; prefer it whenever the stronger guarantee is worth the ext
 **One skill alone is rarely enough.** A skill can name and delegate to other skills, and
 those have to be present or the hand-off points at nothing. The biggest case is the beginner
 front door: `project-orchestrator` names **63** other skills across its stage map and
-delegates to three of them directly. Its own text says the canonical stage list, per-stage
-gate, authority model and change-classification matrix are *"OWNED by
-[`ai-sdlc-operating-model`](.claude/skills/ai-sdlc-operating-model/SKILL.md) and
-[`change-classification-gate`](.claude/skills/change-classification-gate/SKILL.md); this
-skill CITES and DELEGATES to them by name."*
+delegates to three of them directly. It does not own that map, and its own text says so: the
+canonical stage list, per-stage gate, authority model and change-classification matrix are
+owned by [`ai-sdlc-operating-model`](.claude/skills/ai-sdlc-operating-model/SKILL.md) — whose
+[`references/stage-gate-map.md`](.claude/skills/ai-sdlc-operating-model/references/stage-gate-map.md)
+holds the stage table — and by
+[`change-classification-gate`](.claude/skills/change-classification-gate/SKILL.md). The
+orchestrator's own words: *"this skill CITES and DELEGATES to them by name — copying any
+inline is failure."*
 
 So there are two sensible starting points:
 
 - **Copy one skill** for that skill's procedure on its own — what the commands below do, and
   the smaller change.
 - **Copy the front door's closure** for the guided beginner journey — `project-orchestrator`
-  plus the skills it names, **64 directories**. The authoritative list lives in
-  `project-orchestrator`'s own `SKILL.md`, not here: it changes as the library grows, and a
-  copy of it in this README would drift. If a skill it names is missing, the orchestrator
-  says so rather than inventing one.
+  plus the skills it names, **64 directories**. The list of skills it names is in its own
+  `SKILL.md`, not here: that list changes as the library grows, and a copy of it in this
+  README would drift. The orchestrator assumes those skills are present rather than checking:
+  its inventory input states that the owning skill for each stage "already exists; route to
+  it, do not invent a new procedure". The shipped-skill inventory is owned by
+  [`docs/skills-catalog.md`](docs/skills-catalog.md) along with this README's own roster.
 
 On Windows (PowerShell) — **validated on PowerShell 5.1.26100.9444 and 7.6.6**:
 
