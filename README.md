@@ -436,8 +436,8 @@ staging-design route; prefer it whenever the stronger guarantee is worth the ext
 
 **One skill alone is rarely enough.** A skill can name and delegate to other skills, and
 those have to be present or the hand-off points at nothing. The biggest case is the beginner
-front door: `project-orchestrator` names **63** other skills across its stage map and
-delegates to three of them directly. It does not own that map, and its own text says so: the
+front door: `project-orchestrator` names **63** other skills across its stage map; it CITES
+and DELEGATES to them by name. It does not own that map, and its own text says so: the
 canonical stage list, per-stage gate, authority model and change-classification matrix are
 owned by [`ai-sdlc-operating-model`](.claude/skills/ai-sdlc-operating-model/SKILL.md) — whose
 [`references/stage-gate-map.md`](.claude/skills/ai-sdlc-operating-model/references/stage-gate-map.md)
