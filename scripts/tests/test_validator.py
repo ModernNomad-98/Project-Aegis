@@ -719,6 +719,58 @@ def _materialize_paths_tree(dst_root: Path) -> Path:
     return tree
 
 
+def test_no_cross_skill_file_dependencies():
+    """Standard section 1: no cross-skill file dependencies.
+
+    The rule was stated in the standard but checked nowhere -- skill bodies were
+    unvalidated. It is deliberately narrow, so this fixture pins BOTH sides:
+    delegation to a sibling entrypoint is accepted, and reaching into a sibling's
+    internals is rejected. Without the accepting half, a future tightening could
+    ban the composition `project-orchestrator` is built on.
+    """
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-xskill-"))
+    try:
+        skills = tmp / ".claude" / "skills"
+        a, b = skills / "alpha", skills / "beta"
+        (b / "references").mkdir(parents=True)
+        (b / "SKILL.md").write_text("---\nname: beta\n---\n", encoding="utf-8")
+        (b / "references" / "detail.md").write_text("detail\n", encoding="utf-8")
+        a.mkdir(parents=True)
+
+        def write(body: str) -> None:
+            (a / "SKILL.md").write_text(body, encoding="utf-8")
+
+        rep = validator.Report()
+        write("See [beta](../beta/SKILL.md) for the map.\n")
+        validator.check_no_cross_skill_file_dependencies(rep, skills)
+        expect_clean(rep, "delegation to a sibling entrypoint is accepted")
+
+        rep = validator.Report()
+        write("See [detail](../beta/references/detail.md) for the map.\n")
+        validator.check_no_cross_skill_file_dependencies(rep, skills)
+        expect_error(
+            rep,
+            "links into another skill's internals",
+            "reaching into a sibling's references/ is rejected",
+        )
+
+        rep = validator.Report()
+        write("See [own](references/local.md) and [docs](../../../docs/x.md).\n")
+        validator.check_no_cross_skill_file_dependencies(rep, skills)
+        expect_clean(
+            rep,
+            "own-directory links and repo-root citations are not this rule's subject",
+        )
+
+        # Pin the real surface: a mis-pathed skills_dir must not make this a no-op.
+        real = validator.check_no_cross_skill_file_dependencies
+        assert callable(real) and validator.SKILLS_DIR.is_dir(), (
+            f"expected the shipped skills dir at {validator.SKILLS_DIR}"
+        )
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def test_docs_paths_links():
     """D55: guided-path and README picker links must resolve. The fixture is
     stored under a neutral dot-claude/ layout and materialized to .claude only
@@ -1514,6 +1566,7 @@ TESTS = [
     test_template_security_checks,
     test_config_surface_paths,
     test_docs_paths_links,
+    test_no_cross_skill_file_dependencies,
     test_no_nested_fixture_skill_or_agent_dirs,
     test_workflows_sha_pinned,
     test_claude_bridge,

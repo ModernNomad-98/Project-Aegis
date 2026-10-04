@@ -1143,6 +1143,80 @@ def check_config_surfaces(rep: Report, paths: list[str] | None = None,
         )
 
 
+def check_no_cross_skill_file_dependencies(
+    rep: Report, skills_dir: Path | None = None
+) -> None:
+    """HARD: a skill must not link into another skill's internals.
+
+    Standard section 1: "Everything the skill needs lives inside its own
+    directory. No cross-skill file dependencies." The rule was stated in the
+    standard but checked nowhere -- `check_docs_paths_links` inspects only
+    docs/paths/*.md and the README picker, so skill bodies were unvalidated.
+
+    Two distinct things, deliberately separated so this check is
+    false-positive-free:
+
+      (a) DELEGATION -- a link to a sibling skill's `SKILL.md` entrypoint. This
+          is ALLOWED. Skills compose; `project-orchestrator` states its own
+          doctrine as "It composes; it never restates ... copying any inline is
+          failure", which requires naming and reaching the owning skill.
+
+      (b) FILE DEPENDENCY -- a relative link that leaves this skill's directory
+          and lands inside ANOTHER skill's directory at anything other than its
+          `SKILL.md`. This is FORBIDDEN: it reaches past that skill's entrypoint
+          into its progressive-disclosure detail (references/, assets/,
+          scripts/, evals/), which section 3 defines as reached through the
+          owning skill, and which a copy of this skill alone would not carry.
+
+    Links that leave the skill directory but leave `.claude/skills/` entirely
+    (for example `../../../docs/...`) are NOT this rule's subject: they are
+    repo-root citations, not cross-skill dependencies. They are out of scope
+    here and are reported by no check.
+    """
+    skills_dir = (skills_dir or SKILLS_DIR).resolve()
+    # Same link form the rest of the validator uses; non-greedy so two links on
+    # one line are counted separately, and whole-document so wrapped links are
+    # matched (a line-by-line scan misses those).
+    link_re = re.compile(r"\[[^\]]*?\]\(([^)\s]+)\)")
+
+    if not skills_dir.is_dir():
+        return
+    dirs = [
+        c for c in sorted(skills_dir.iterdir())
+        if c.is_dir() and c.name not in IGNORED_DIRS
+    ]
+
+    for skill_dir in dirs:
+        body_path = skill_dir / "SKILL.md"
+        if not body_path.exists():
+            continue
+        try:
+            body = body_path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        for m in link_re.finditer(body):
+            target = m.group(1)
+            if target.startswith(("http://", "https://", "#", "mailto:")):
+                continue
+            resolved = (skill_dir / target.split("#", 1)[0]).resolve()
+            # Inside this skill's own directory: fine.
+            if resolved == skill_dir or skill_dir in resolved.parents:
+                continue
+            # Outside .claude/skills/ entirely: a repo-root citation, not our rule.
+            if skills_dir not in resolved.parents:
+                continue
+            # Inside .claude/skills/ but a different skill: must be its entrypoint.
+            if resolved.name == "SKILL.md" and resolved.parent.parent == skills_dir:
+                continue
+            other = resolved.relative_to(skills_dir).parts[0]
+            rep.error(
+                f"[{skill_dir.name}] links into another skill's internals: "
+                f"'{target}' resolves to '{other}/' -- link to "
+                f"../{other}/SKILL.md and let that skill disclose its own files "
+                f"(standard section 1: no cross-skill file dependencies)"
+            )
+
+
 def check_docs_paths_links(
     rep: Report, paths_dir: Path | None = None, readme: Path | None = None
 ) -> None:
@@ -1337,6 +1411,7 @@ def main() -> int:
     check_agents_schema(rep)                       # HARD
     check_config_surfaces(rep)                     # HARD
     check_docs_paths_links(rep)                    # HARD
+    check_no_cross_skill_file_dependencies(rep)    # HARD  (standard section 1)
     check_workflows_sha_pinned(rep)                # HARD
     check_claude_bridge(rep)                       # HARD  (decision D61)
 
