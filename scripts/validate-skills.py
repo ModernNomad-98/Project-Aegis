@@ -1292,6 +1292,18 @@ def check_no_cross_skill_file_dependencies(
     such a citation: it is machine-specific, cannot resolve in a consumer's
     copy, and used to be a silent way past this rule, so it is an error.
 
+    DELIBERATELY OUT OF SCOPE, decided rather than overlooked (A-05b): a
+    NON-anchored machine-specific scheme such as `file:/x`, `ftp://host/x` or
+    `~/x` is accepted. None of them is anchored, so each resolves under the
+    skill's own directory and cannot name a sibling's internals; this rule's
+    contract is where a target RESOLVES, and a scheme deny-list would guard a
+    different property -- a link that will not resolve in a consumer's copy --
+    at the cost of a list to maintain.
+
+    A drive-relative target (`C:foo`) is the opposite case: it IS anchored but
+    has no machine-independent resolution, so it is an error on every platform
+    and the message below says exactly that instead of printing a path.
+
     Percent-escapes are resolved before a target is classified, because a
     renderer resolves them before the path is used: `%2e%2e/` IS `../`, and
     leaving it literal let the encoded spelling of a forbidden link pass while
@@ -1368,10 +1380,14 @@ def check_no_cross_skill_file_dependencies(
                 resolved == REPO_ROOT or REPO_ROOT in resolved.parents
             ):
                 continue
+            where = (
+                f"resolves to '{resolved}', which is not under the repository root"
+                if resolved is not None
+                else "has no machine-independent resolution"
+            )
             rep.error(
                 f"[{skill_dir.name}] links outside the repository: '{target}' "
-                f"resolves to '{resolved}', which is not under the repository "
-                f"root -- a repo-root citation must be a relative link that "
+                f"{where} -- a repo-root citation must be a relative link that "
                 f"stays inside it (for example '../../../docs/x.md'). An "
                 f"absolute, drive-letter, UNC or escaping target cannot resolve "
                 f"in a consumer's copy of this skill"

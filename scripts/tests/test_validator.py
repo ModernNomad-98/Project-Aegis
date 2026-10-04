@@ -974,6 +974,78 @@ def test_no_cross_skill_scan_is_linear():
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+# Task-22 / A-05b: the old implementation, kept here as the ORACLE for the
+# label-bound family below. The scanner's contract is to yield exactly what the
+# pattern yielded, and a scanner that silently DROPS a link leaves that link
+# unchecked by the gate -- the failure mode is a bypass, not a cosmetic miss.
+_LABEL_BOUND_PATTERN = re.compile(r"\[[^\]]*?\]\(([^)\s]+)\)")
+
+# Shapes where the target scan must resume INSIDE a region it has already
+# walked while a later link's `[` still sits inside that region. Collapsing the
+# scanner's two cursors into one -- `pos = max(end, close + 1)`, the direction
+# A-05 §6 suggested -- passes every other assertion in this file and the whole
+# corpus validator (195 valid, 0 warnings) while returning [] for the first two
+# of these, dropping the FIRST link of the third and the SECOND link of the
+# fourth. That is why this family is pinned here: it is the only committed
+# guard on the label-bound invariant.
+_LABEL_BOUND_SHAPES = [
+    ("[a](xx[bb yyy](z)", ["z"]),
+    ("[a](x[bb yyy](z)", ["z"]),
+    ("[a](xx[bb yyy](z)[c](d)", ["z", "d"]),
+    ("[](x)[a](xx[bb yyy](z)", ["x", "z"]),
+]
+
+
+def test_no_cross_skill_scan_keeps_the_link_a_walked_region_hides():
+    """Task-22 / A-05b: resuming a target scan must not move the LABEL bound.
+
+    The scanner carries two cursors: `scanned_to` (the furthest offset any
+    target scan has walked) and `pos` (the lower bound of the LABEL search,
+    used by `rfind("[", pos, close)`). They cannot be collapsed. Advancing
+    `pos` past a walked region also hides every `[` inside it, so a later link
+    whose label starts there is silently never yielded -- the gate then passes
+    a body containing a link it never inspected.
+
+    Measured on the one-line variant `pos = max(end, close + 1)`: it satisfies
+    every other assertion in this file and `validate-skills.py` over the real
+    corpus (195 valid, 0 warnings), while returning [] for the counterexample
+    the correct scanner answers ['z']. The counterexample therefore lives here
+    as an assertion, not only in a docstring.
+
+    The scanner is reached by the same path the other scanner tests use --
+    `validator._iter_link_targets`, on the module object this file loads by
+    path at import (see `_time_scan` above) -- because the hyphenated
+    `validate-skills.py` is not importable by name.
+    """
+    # The counterexample, pinned literally: it is the reason the two cursors
+    # are separate, and it is not reachable from any other committed test.
+    counterexample = list(validator._iter_link_targets("[a](xx[bb yyy](z)"))
+    assert counterexample == ["z"], (
+        "the scanner must yield the link the old pattern yielded for "
+        f"'[a](xx[bb yyy](z)'; it returned {counterexample}. An empty result "
+        "means the LABEL bound was advanced past a `[` that a later link "
+        "needs, which silently stops the gate checking that link"
+    )
+    label = "'[a](xx[bb yyy](z)' still yields ['z'] (label bound not advanced)"
+    PASSES.append(label)
+    print(f"  PASS  {label}")
+
+    for body, expected in _LABEL_BOUND_SHAPES:
+        oracle = [m.group(1) for m in _LABEL_BOUND_PATTERN.finditer(body)]
+        assert oracle == expected, (
+            f"test bug: the old pattern yields {oracle} for {body!r}, not "
+            f"{expected}"
+        )
+        found = list(validator._iter_link_targets(body))
+        assert found == expected, (
+            f"{body!r}: the scanner yielded {found}, the old pattern "
+            f"{oracle}; a dropped link is never inspected by the gate"
+        )
+        label = f"{body!r} yields {expected} (scanner == old regex)"
+        PASSES.append(label)
+        print(f"  PASS  {label}")
+
+
 def test_no_cross_skill_absolute_and_unc_targets():
     """Task-5 defect 3: only a genuine repo-root citation is out of scope.
 
@@ -1886,6 +1958,7 @@ TESTS = [
     test_no_cross_skill_file_dependencies,
     test_no_cross_skill_percent_encoded_traversal,
     test_no_cross_skill_scan_is_linear,
+    test_no_cross_skill_scan_keeps_the_link_a_walked_region_hides,
     test_no_cross_skill_absolute_and_unc_targets,
     test_no_cross_skill_drive_relative_targets_are_cwd_independent,
     test_no_nested_fixture_skill_or_agent_dirs,
