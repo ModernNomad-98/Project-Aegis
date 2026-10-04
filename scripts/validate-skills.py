@@ -1169,8 +1169,25 @@ def _decode_link_target(target: str) -> str:
 
 
 def _is_drive_target(target: str) -> bool:
-    """True for a Windows drive-letter target (`C:/x`, `c:\\x`)."""
+    """True for a Windows drive-letter target (`C:/x`, `c:\\x`, `C:x`)."""
     return len(target) > 1 and target[1] == ":" and target[0].isalpha()
+
+
+def _is_drive_relative_target(target: str) -> bool:
+    """True for a Windows drive-RELATIVE target (`C:foo`, `C:./x`, `C:`).
+
+    A drive letter and colon NOT followed by a separator. `Path("C:foo")`
+    resolves against the PER-DRIVE current directory, so its verdict was a
+    function of wherever the validator happened to run: ACCEPTED when the
+    process CWD was the repository root and an error anywhere else, meaning the
+    same commit could pass on a Windows dev box and fail on `ubuntu-latest`
+    (measured, task-14). Such a target also has no machine-independent meaning,
+    so it is an error on every platform rather than a path resolved against an
+    unknowable base.
+    """
+    return _is_drive_target(target) and (
+        len(target) == 2 or target[2] not in "/\\"
+    )
 
 
 def _is_anchored_target(target: str) -> bool:
@@ -1191,9 +1208,26 @@ def _iter_link_targets(body: str):
     MAX_SKILL_LINES bounds lines, not bytes. Each character below is visited a
     constant number of times, and leftmost-match with non-greedy label
     semantics is preserved.
+
+    The target scan never restarts inside a region it has already walked. It
+    keeps a second cursor, `scanned_to`, at the furthest offset any target scan
+    has reached: everything below it has been examined and holds no `)` and no
+    whitespace, so a later scan resumes there (`end = max(start, scanned_to)`)
+    instead of re-walking the tail, and a scan that reaches end-of-body returns
+    outright because every later `](` faces a suffix of the same unterminated
+    run. `pos` (the LABEL bound) is NOT advanced this way -- moving it past a
+    `[` that a later link needs would silently drop that link, which is why the
+    re-scan and the label bound are separate cursors. The first version of this
+    fix conflated them and lost `[a](xx[bb yyy](z)`; the equivalence harness
+    caught it before the commit.
+
+    Without the second cursor the target scan re-walked the tail once per `](`,
+    which made an unterminated-link body quadratic -- 64 KB of `[a](x` took
+    ~25 s, 5.3x SLOWER than the regex it replaced (measured, task-14).
     """
     pos = 0
     length = len(body)
+    scanned_to = 0
     while True:
         close = body.find("](", pos)
         if close < 0:
@@ -1203,7 +1237,7 @@ def _iter_link_targets(body: str):
             pos = close + 1
             continue
         start = close + 2
-        end = start
+        end = max(start, scanned_to)
         while end < length:
             char = body[end]
             if char == ")" or char.isspace():
@@ -1212,8 +1246,18 @@ def _iter_link_targets(body: str):
         if end > start and end < length and body[end] == ")":
             yield body[start:end]
             pos = end + 1
+            scanned_to = end
+        elif end >= length:
+            # Ran to end-of-body with no `)` and no whitespace: every later
+            # `](` faces a suffix of this same unterminated run, so none can
+            # yield and there is nothing left to examine.
+            return
         else:
+            # Stopped on whitespace, or on `)` with an empty target. The next
+            # label may still start anywhere after this `](`, so `pos` moves
+            # only past it; the tail walk is remembered instead of repeated.
             pos = close + 1
+            scanned_to = end
 
 
 def check_no_cross_skill_file_dependencies(
@@ -1282,12 +1326,20 @@ def check_no_cross_skill_file_dependencies(
             raw = _decode_link_target(target.split("#", 1)[0]).replace("\\", "/")
             anchored = _is_anchored_target(raw)
             if anchored:
-                resolved = Path(raw).resolve()
-                # On POSIX a drive-letter target is a RELATIVE path, so it
-                # would resolve under the repo by accident. It is never a
-                # repo-root citation on a host that cannot resolve it.
-                if os.name != "nt" and _is_drive_target(raw):
+                # A drive-RELATIVE target (`C:foo`, `C:./x`) would be resolved
+                # by Path against the per-drive current directory, so its
+                # verdict would depend on where the validator runs -- the same
+                # commit passing on a Windows dev box and failing on
+                # ubuntu-latest (measured, task-14). It is an error everywhere.
+                # On POSIX every drive-letter target is unresolvable for the
+                # same reason: it would resolve under the repo by accident, and
+                # is never a repo-root citation on a host that cannot read it.
+                if _is_drive_relative_target(raw) or (
+                    os.name != "nt" and _is_drive_target(raw)
+                ):
                     resolved = None
+                else:
+                    resolved = Path(raw).resolve()
             else:
                 resolved = (skill_dir / raw).resolve()
             # Inside this skill's own directory: fine.

@@ -42,6 +42,7 @@ import contextlib
 import importlib.util
 import io
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -841,8 +842,15 @@ def test_no_cross_skill_percent_encoded_traversal():
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def _time_scan(body: str) -> tuple[float, list[str]]:
+    """Time one whole-body scan by the gate's link scanner."""
+    started = time.perf_counter()
+    targets = list(validator._iter_link_targets(body))
+    return time.perf_counter() - started, targets
+
+
 def test_no_cross_skill_scan_is_linear():
-    """Task-5 defect 2: one huge line must not stall the gate.
+    """Task-5 defect 2, extended by task-14 for the shapes it missed.
 
     The old pattern `\\[[^\\]]*?\\]\\(([^)\\s]+)\\)` restarted a lazy label scan
     at every `[`, so a single 64 KB line of `[` took ~12 s to scan (measured
@@ -851,6 +859,16 @@ def test_no_cross_skill_scan_is_linear():
     (the linear scanner measures ~0.02 s) so a loaded runner cannot flake it.
     The link after the pathological run pins that the fix is a linear scan and
     not a truncating size cap, which would silently stop checking the tail.
+
+    Task-14: the `[`-run above was the ONE shape the replacement scanner
+    answered without entering its target-scan branch, so it was the one shape
+    that got faster. An UNTERMINATED link enters that branch, and the first
+    version of the scanner resumed at `close + 1` and re-walked the whole tail
+    once per `](`: 64 KB of `[a](x` took 24.6 s and 64 KB of `[[[](` took
+    22.9 s -- 5.3x and 1.9x SLOWER than the regex they replaced. Both shapes
+    are therefore pinned here by an absolute bound AND by a scaling assertion
+    (doubling the body must not roughly quadruple the time), which is what
+    distinguishes a linear scan from a quadratic one whose constant is small.
     """
     tmp = Path(tempfile.mkdtemp(prefix="aegis-xskill-lin-"))
     try:
@@ -891,6 +909,67 @@ def test_no_cross_skill_scan_is_linear():
             "links into another skill's internals",
             "a link after a 64 KB run of '[' is still seen (no truncating cap)",
         )
+
+        # Task-14: the two unterminated shapes. The `[`-run above contains no
+        # `](` at all, so it never reaches the target scan; these do, and the
+        # pre-task-14 scanner re-walked the tail at every `](` (24.6 s and
+        # 22.9 s at 64 KB). The bound is 2.0 s against a linear scanner that
+        # measures milliseconds, so it cannot flake on a loaded runner.
+        for unit in ("[a](x", "[[[]("):
+            body = unit * (64 * 1024 // len(unit))
+            elapsed, targets = _time_scan(body)
+            assert targets == [], (
+                f"{unit!r} carries no complete link; the scanner returned "
+                f"{targets[:3]}"
+            )
+            assert elapsed < 2.0, (
+                f"scanning {len(body)} bytes of {unit!r} took {elapsed:.2f}s; the "
+                f"target scan must resume past the bytes it already examined "
+                f"(the pre-task-14 form took 24.6s on this shape)"
+            )
+            label = (
+                f"{len(body)} bytes of {unit!r} scanned in {elapsed:.3f}s "
+                f"(bound 2.0s)"
+            )
+            PASSES.append(label)
+            print(f"  PASS  {label}")
+
+        # Scaling, not just an absolute bound. Doubling the body must not
+        # roughly quadruple the time -- that is the signature of the re-scan,
+        # and an absolute bound can be slipped under by a smaller constant
+        # factor. This is the assertion that would have caught task-14.
+        for unit in ("[a](x", "[[[]("):
+            small = unit * (32 * 1024 // len(unit))
+            large = unit * (64 * 1024 // len(unit))
+            t_small, _ = _time_scan(small)
+            t_large, _ = _time_scan(large)
+            assert t_large < 3 * t_small + 0.25, (
+                f"{unit!r}: doubling {len(small)} -> {len(large)} bytes took "
+                f"{t_small:.3f}s -> {t_large:.3f}s; that growth is quadratic, "
+                f"not linear"
+            )
+            label = (
+                f"{unit!r} scales linearly 32 KB -> 64 KB: {t_small:.3f}s -> "
+                f"{t_large:.3f}s"
+            )
+            PASSES.append(label)
+            print(f"  PASS  {label}")
+
+        # Non-vacuity on these shapes too: a short-circuit at the pathology
+        # would fix the stall by silently no longer checking the tail.
+        for unit in ("[a](x", "[[[]("):
+            body = (
+                unit * (64 * 1024 // len(unit))
+                + "\nSee [deep](../beta/references/detail.md).\n"
+            )
+            _, targets = _time_scan(body)
+            assert targets == ["../beta/references/detail.md"], (
+                f"a link after 64 KB of {unit!r} must still be seen; the "
+                f"scanner returned {targets}"
+            )
+            label = f"a link after 64 KB of {unit!r} is still seen"
+            PASSES.append(label)
+            print(f"  PASS  {label}")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -953,6 +1032,60 @@ def test_no_cross_skill_absolute_and_unc_targets():
         expect_clean(rep, "a relative repo-root citation stays accepted")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_no_cross_skill_drive_relative_targets_are_cwd_independent():
+    """Task-14 defect 2: a drive-relative target must not be judged by the CWD.
+
+    `Path("C:foo").resolve()` resolves against the PER-DRIVE current directory,
+    so `C:./docs/x.md` and `C:foo` were ACCEPTED when the process CWD was the
+    repository root and ERROR from anywhere else: the same commit could pass on
+    a Windows dev box and fail on ubuntu-latest, which is the spelling/host
+    dependence this check exists to remove. The verdict must be a function of
+    the target, so the same target is run from two CWDs here and must agree.
+
+    (`C:../x.md` already errored from both, and is pinned with them: the fix
+    must not make a drive-relative target RESOLVE, only stop resolving it
+    against the process directory. On POSIX these already errored, so this
+    test's discriminating power is on Windows -- the platform whose behaviour
+    it pins.)
+    """
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-xskill-cwd-"))
+    elsewhere = Path(tempfile.mkdtemp(prefix="aegis-xskill-other-"))
+    home = Path.cwd()
+    try:
+        skills = tmp / ".claude" / "skills"
+        a, b = skills / "alpha", skills / "beta"
+        (b / "references").mkdir(parents=True)
+        (b / "SKILL.md").write_text("---\nname: beta\n---\n", encoding="utf-8")
+        (b / "references" / "detail.md").write_text("detail\n", encoding="utf-8")
+        a.mkdir(parents=True)
+
+        for target in ("C:foo", "C:./docs/x.md", "C:../x.md"):
+            verdicts = []
+            for cwd in (tmp, elsewhere):
+                (a / "SKILL.md").write_text(
+                    f"See [x]({target}) for detail.\n", encoding="utf-8"
+                )
+                rep = validator.Report()
+                os.chdir(cwd)
+                try:
+                    with repo_root_at(tmp):
+                        validator.check_no_cross_skill_file_dependencies(rep, skills)
+                finally:
+                    os.chdir(home)
+                verdicts.append("ERROR" if rep.errors else "ACCEPT")
+            assert verdicts == ["ERROR", "ERROR"], (
+                f"drive-relative target {target!r} is judged by the CWD: "
+                f"cwd=repo-root -> {verdicts[0]}, cwd=elsewhere -> {verdicts[1]}"
+            )
+            label = f"drive-relative {target!r} is an error from both CWDs"
+            PASSES.append(label)
+            print(f"  PASS  {label}")
+    finally:
+        os.chdir(home)
+        shutil.rmtree(tmp, ignore_errors=True)
+        shutil.rmtree(elsewhere, ignore_errors=True)
 
 
 def test_docs_paths_links():
@@ -1754,6 +1887,7 @@ TESTS = [
     test_no_cross_skill_percent_encoded_traversal,
     test_no_cross_skill_scan_is_linear,
     test_no_cross_skill_absolute_and_unc_targets,
+    test_no_cross_skill_drive_relative_targets_are_cwd_independent,
     test_no_nested_fixture_skill_or_agent_dirs,
     test_workflows_sha_pinned,
     test_claude_bridge,
