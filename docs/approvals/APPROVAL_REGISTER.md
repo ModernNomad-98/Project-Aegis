@@ -3692,6 +3692,14 @@ the entry governs.
   commit at 09:03:20. "One" understated the measurement; the argument it supports
   is unaffected.
 
+  **The anchor in that sentence is named precisely: `623632b9` at 09:03:20 — the
+  commit that created this entry, not whichever later commit carries the text a
+  reader holds.** A later revision that carried it (`e8081718`, 09:17:02) gives
+  21.0 and 25.5 minutes for the same two pushes, so the twelve-minute statement
+  holds only for `623632b9` and is anchored to it here. The two reflog timestamps
+  are the independently verifiable facts; this entry makes no general claim about
+  the interval measured to any other revision.
+
   **Conditional limits — all three must hold for each branch, or that branch is
   not covered:**
 
