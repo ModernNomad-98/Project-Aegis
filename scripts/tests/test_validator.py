@@ -915,20 +915,44 @@ def test_no_cross_skill_scan_is_linear():
         # pre-task-14 scanner re-walked the tail at every `](` (24.6 s and
         # 22.9 s at 64 KB). The bound is 2.0 s against a linear scanner that
         # measures milliseconds, so it cannot flake on a loaded runner.
-        for unit in ("[a](x", "[[[]("):
-            body = unit * (64 * 1024 // len(unit))
+        #
+        # Task-30 / A-05c: the third payload is the shape where the `scanned_to`
+        # cursor is the ONLY guard. The two unterminated runs above end with no
+        # `)` and no whitespace, so their scan always reaches end-of-body and
+        # the `elif end >= length: return` early-exit alone ends it. A run
+        # ended by ONE trailing whitespace instead exercises the resume cursor:
+        # with the cursor's use removed (`end = max(start, scanned_to)` ->
+        # `end = start`, scratch copy only) every other assertion in this file
+        # and the whole-corpus validator (195/0) still pass, while this shape
+        # goes quadratic -- 0.00017s / 0.00278s / 0.00743s committed at
+        # N=250 / 4000 / 64 KB versus 0.00648s / 1.82228s / 24.34s for the
+        # cursor-removed mutant.
+        #
+        # PRECISION: the whitespace must trail the WHOLE run. `"[a](x " * N` (a
+        # space after every unit) stops each scan after two characters and is
+        # indistinguishable on the mutant -- measured 0.0035s committed versus
+        # 0.0033s on the mutant at 64 KB -- so it is not a substitute.
+        adversary = (
+            ("'[a](x' * N", "[a](x", ""),
+            ("'[[[](' * N", "[[[](", ""),
+            ("('[a](x' * N) + ' '", "[a](x", " "),
+        )
+        for name, unit, trailing in adversary:
+            body = unit * (64 * 1024 // len(unit)) + trailing
             elapsed, targets = _time_scan(body)
             assert targets == [], (
-                f"{unit!r} carries no complete link; the scanner returned "
+                f"{name} carries no complete link; the scanner returned "
                 f"{targets[:3]}"
             )
             assert elapsed < 2.0, (
-                f"scanning {len(body)} bytes of {unit!r} took {elapsed:.2f}s; the "
+                f"scanning {len(body)} bytes of {name} took {elapsed:.2f}s; the "
                 f"target scan must resume past the bytes it already examined "
-                f"(the pre-task-14 form took 24.6s on this shape)"
+                f"(the pre-task-14 form took 24.6s on the unterminated shape, "
+                f"and the cursor-removed mutant takes 24.3s on the "
+                f"whitespace-terminated one)"
             )
             label = (
-                f"{len(body)} bytes of {unit!r} scanned in {elapsed:.3f}s "
+                f"{len(body)} bytes of {name} scanned in {elapsed:.3f}s "
                 f"(bound 2.0s)"
             )
             PASSES.append(label)
@@ -937,19 +961,21 @@ def test_no_cross_skill_scan_is_linear():
         # Scaling, not just an absolute bound. Doubling the body must not
         # roughly quadruple the time -- that is the signature of the re-scan,
         # and an absolute bound can be slipped under by a smaller constant
-        # factor. This is the assertion that would have caught task-14.
-        for unit in ("[a](x", "[[[]("):
-            small = unit * (32 * 1024 // len(unit))
-            large = unit * (64 * 1024 // len(unit))
+        # factor. This is the assertion that would have caught task-14, and on
+        # the whitespace-terminated payload it is what separates the resume
+        # cursor from no cursor at all.
+        for name, unit, trailing in adversary:
+            small = unit * (32 * 1024 // len(unit)) + trailing
+            large = unit * (64 * 1024 // len(unit)) + trailing
             t_small, _ = _time_scan(small)
             t_large, _ = _time_scan(large)
             assert t_large < 3 * t_small + 0.25, (
-                f"{unit!r}: doubling {len(small)} -> {len(large)} bytes took "
+                f"{name}: doubling {len(small)} -> {len(large)} bytes took "
                 f"{t_small:.3f}s -> {t_large:.3f}s; that growth is quadratic, "
                 f"not linear"
             )
             label = (
-                f"{unit!r} scales linearly 32 KB -> 64 KB: {t_small:.3f}s -> "
+                f"{name} scales linearly 32 KB -> 64 KB: {t_small:.3f}s -> "
                 f"{t_large:.3f}s"
             )
             PASSES.append(label)
@@ -957,17 +983,18 @@ def test_no_cross_skill_scan_is_linear():
 
         # Non-vacuity on these shapes too: a short-circuit at the pathology
         # would fix the stall by silently no longer checking the tail.
-        for unit in ("[a](x", "[[[]("):
+        for name, unit, trailing in adversary:
             body = (
                 unit * (64 * 1024 // len(unit))
+                + trailing
                 + "\nSee [deep](../beta/references/detail.md).\n"
             )
             _, targets = _time_scan(body)
             assert targets == ["../beta/references/detail.md"], (
-                f"a link after 64 KB of {unit!r} must still be seen; the "
+                f"a link after 64 KB of {name} must still be seen; the "
                 f"scanner returned {targets}"
             )
-            label = f"a link after 64 KB of {unit!r} is still seen"
+            label = f"a link after 64 KB of {name} is still seen"
             PASSES.append(label)
             print(f"  PASS  {label}")
     finally:
