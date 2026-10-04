@@ -434,6 +434,25 @@ there, and move the verified result into place only once it passes. Nothing unve
 inside the consumer repository at any moment, including after a failed check. That is the
 staging-design route; prefer it whenever the stronger guarantee is worth the extra step.
 
+**One skill alone is rarely enough.** A skill can name and delegate to other skills, and
+those have to be present or the hand-off points at nothing. The biggest case is the beginner
+front door: `project-orchestrator` names **63** other skills across its stage map and
+delegates to three of them directly. Its own text says the canonical stage list, per-stage
+gate, authority model and change-classification matrix are *"OWNED by
+[`ai-sdlc-operating-model`](.claude/skills/ai-sdlc-operating-model/SKILL.md) and
+[`change-classification-gate`](.claude/skills/change-classification-gate/SKILL.md); this
+skill CITES and DELEGATES to them by name."*
+
+So there are two sensible starting points:
+
+- **Copy one skill** for that skill's procedure on its own — what the commands below do, and
+  the smaller change.
+- **Copy the front door's closure** for the guided beginner journey — `project-orchestrator`
+  plus the skills it names, **64 directories**. The authoritative list lives in
+  `project-orchestrator`'s own `SKILL.md`, not here: it changes as the library grows, and a
+  copy of it in this README would drift. If a skill it names is missing, the orchestrator
+  says so rather than inventing one.
+
 On Windows (PowerShell) — **validated on PowerShell 5.1.26100.9444 and 7.6.6**:
 
 ```powershell
