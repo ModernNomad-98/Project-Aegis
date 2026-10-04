@@ -3706,12 +3706,51 @@ the entry governs.
   (a) the **final independent review is posted and accepted naming the exact head
   being merged** for that branch;
   (b) **all checks for that head are green** — not only the
-  branch-protection-required ones;
+  branch-protection-required ones — **or, for `docs/no-cross-skill-delegation`
+  only, all checks green EXCEPT `gate-guard`, which remains RED and is disposed
+  by the owner's PR-specific exception naming that pull request and that exact
+  head.** Such a merge is recorded as **failed with an authorised disposition —
+  never green, never waived, and not a pass.** Conditions (a) and (c) still hold
+  in full for that branch, and **the other two branches keep the unconditional
+  all-green requirement, with no exception available to them.** This restates
+  the governing rule rather than relaxing it: `AGENTS.md`:91-96 requires that the
+  head's checks are all green — "not only the branch-protection-required ones —
+  unless an active owner exception covering that exact head and scope is cited,
+  in which case the failed check is recorded as failed with its authorized
+  disposition, never as green and never as waived". **Without an owner exception
+  covering that exact head and scope, `gate-guard` red means that branch is not
+  covered and may not merge** — this clause permits no self-service exception,
+  and the exception must name the pull request and the head, so a moved head
+  voids it;
   (c) the **required review wait has completed**.
 
   **A head that moves voids that branch's coverage.** A later push leaves this
   entry spendable on nothing for that branch until a review naming the new head
   is posted and accepted and that head's checks are green.
+
+  **One merge slot per branch, and each slot is consumed by its first merge.**
+  Each named branch may be merged **exactly once** under this grant. **The first
+  merge of a branch consumes that branch's coverage immediately** and removes
+  that branch from the grant, whether or not the other two branches have merged:
+  a later pull request from an already-merged branch cannot satisfy conditions
+  (a)–(c) again, and **a second merge of any named branch is forbidden and is
+  outside this grant** — the prohibition is on the branch, not only on other
+  branch names, so the count of merges this entry can authorise is **three, one
+  per branch, and never four.** The grant is fully consumed when all three have
+  merged once.
+
+  **Each consumption is recorded, not inferred.** After each merge, a `CONSUMED`
+  follow-up entry is appended under a unique ID naming the target grant
+  (`AEGIS-APR-109`), the branch merged, the pull request, the exact head merged,
+  and the branches still unspent — following the register's own event
+  convention: *"Grant entries are immutable. Append later revocation, expiry,
+  consumption or supersession events with unique IDs and the affected grant ID;
+  do not edit old entries"* (base lines 8-10). This entry is not edited by that
+  event; the append is how the later change of state is recorded, exactly as
+  `AEGIS-APR-107` records the consumption of `AEGIS-APR-106` without rewriting
+  it. The requirement is not optional bookkeeping: `AGENTS.md`:150-153 requires a
+  later reader to apply "the recorded human scope and later lifecycle events",
+  which is possible only if each slot's end is written down.
 
   **Security-review carve-out.** For these agent-authored branches the owner
   applied the `CONTRIBUTING.md` carve-out: **no additional mandatory security
@@ -3797,7 +3836,40 @@ the entry governs.
   above was measured against `3006d0a7` for this entry rather than taken from the
   brief: the three branches' ancestry, the register's own ID coverage, the
   absence of `108` at this base, and the `gate_pattern` match on `scripts/`.
+
+  **The grant's direct source is a verbatim instruction typed by the owner.**
+  Owner, 2026-10-04, coordinating session, relayed here as a quotation:
+
+  > why are you waiting on me, merge them if they are good
+
+  That sentence is the owner's own wording, not an option label, and it **is the
+  direct source** of the merge authority this entry records. The two option
+  selections above are the **proposal context** the instruction answered: the
+  presented choices and the label the owner selected were **"Grant a specific
+  agent merge authority"** (selected; designating `plan-scrutineer`) and
+  **"Carve-out applies"** (selected; the security-review carve-out). The wording
+  of any option that was **not** selected is not recorded here because this entry
+  does not hold it, and writing owner-facing option text that was never
+  transcribed is exactly what a register must not do. The preamble makes a
+  current direct user instruction valid source evidence before transcription —
+  *"Current direct user instructions are valid source evidence before
+  transcription and do not need repeated consent"* (base lines 12-13) — so this
+  entry now rests on the owner's **verbatim instruction**, quoted with its date
+  and source, and not on selection labels alone. The governing rule asks for
+  precisely this: `AGENTS.md`:97-100 says the merge agent confirms authority from
+  "a register entry on the default branch that passes the preamble test below, or
+  the owner's instruction quoted verbatim in its brief with its source; a brief's
+  bare assertion of authority is not authority". The two are recorded so neither
+  is over-read: **the verbatim instruction authorises the merges; the selections
+  record what the owner was choosing between when they said it.** The earlier
+  statement in this field stands unchanged — **no repository artifact records the
+  owner's words**, and this entry still claims no repository citation of them;
+  the quotation above is relayed from the coordinating session, not read out of a
+  tracked file.
 - **Expiry / use limit:** **One use**, covering the three named merges and
-  nothing else. It is consumed when all three merges complete, or earlier if the
-  owner supersedes it; a branch that loses coverage under a moved head does not
-  free the grant for any other branch. No calendar expiry is stated.
+  nothing else. **It is consumed branch by branch: each named branch's coverage
+  ends at that branch's first merge (see the consumption rule in `Scope
+  allowed`), and the grant is fully consumed when all three have merged once**;
+  it also ends earlier if the owner supersedes it. A branch that loses coverage
+  under a moved head does not free the grant for any other branch. No calendar
+  expiry is stated.
