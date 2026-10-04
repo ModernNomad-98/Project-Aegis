@@ -84,7 +84,13 @@ This example does not create or authorize a shipped skill.
 ```
 
 - One skill per directory. The directory name is the skill's canonical name.
-- Everything the skill needs lives inside its own directory. No cross-skill imports.
+- Everything the skill needs lives inside its own directory. No cross-skill file
+  dependencies.
+- **Delegation is not a file dependency.** Name another skill to route to it, and
+  link to its `SKILL.md` entrypoint if a link is useful. Do **not** link into
+  another skill's internals (`references/`, `assets/`, `scripts/`, `evals/`):
+  those are that skill's progressive-disclosure detail, reached through its own
+  entrypoint, and a copy of your skill alone would not carry them.
 
 ---
 
