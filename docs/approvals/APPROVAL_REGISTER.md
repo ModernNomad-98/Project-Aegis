@@ -3902,14 +3902,31 @@ the entry governs.
 ### AEGIS-APR-108: Issue #101 Stage 4B — first-tranche observation grant
 
 - **Event:** GRANT — one use, tranche-scoped, observation-gated.
-- **Status at recording:** **ACTIVE — and EFFECTIVE BUT NOT STARTABLE TODAY.** It is one use and
-  tranche-scoped: it is **CONSUMED** when the 10 attempts are spent **or** the evidence set is
-  complete, whichever comes first; and it is **VOID IMMEDIATELY, without further use, on ANY other
-  terminal stop** (below). **A tranche stopped for any of those reasons MUST NOT read ACTIVE.** No
-  renewal by silence. **It is not startable at the date of recording**, because pre-condition 6 —
-  the frozen Stage 4B preflight — **cannot currently be satisfied**; see the prerequisites. **The
-  entry is effective; the run is not startable, and that distinction is recorded rather than
-  softened.** What resolves it: **freezing the manifest — publishing the case-fixture digests and
+- **Status at recording:** **RECORDED — SCOPE AND LIMITS RECOVERABLE FROM PINNED SOURCES — THE
+  AUTHORISING ACT IS NOT OWNER-AUTHORED ON THIS HOST — EXECUTION BLOCKED.** This entry records a
+  grant; **it does not itself establish operative authority.** What the pinned sources do establish:
+  the approved ceiling option (*"Raise both ceilings to fit full coverage now."*), the option it
+  displaced (*"about 210 requests and about $25"*), and an owner-approval attribution for **220
+  actual provider requests and up to US$50** — in `STAGE-4B-PREFLIGHT-DRAFT.md`, SHA-256
+  `2148226e26d4653c4f23c68d99c81550b2d691a2bb2e6b1a8f3687ad2b493bfa` (the artifact this entry cites
+  as the source of every ceiling), **lines 68, 70, 346, 349 and 350**; and the host and agent-operator
+  as **owner decisions dated 2026-10-03** at `STAGE-4B-FIRST-TRANCHE-GRANT-DRAFT.md` **lines 278 and
+  285**. What they do **not** establish: a **dated owner-authored instruction** for this tranche — the
+  ceiling artifact records its own narrative as *"mine and not the owner's wording"*, the owner did not
+  type into this register, and no owner-authored text was available (see `Evidence`). **Operative
+  authority is therefore NOT claimed**; whether the recorded approval is the authorising act is the
+  owner's call, and the prospective request below asks that one question only.
+  **Nothing in this entry may be cited as authority to start, to spend, or to dispatch.** The recorded
+  shape is one use and tranche-scoped: it *would be* **CONSUMED** when the 10 attempts are spent **or**
+  the evidence set is complete, whichever comes first, and *would be* **VOID IMMEDIATELY** on ANY other
+  terminal stop (below) — **those lifecycle clauses describe the recorded shape and are not operative
+  while the authorising act is unestablished.** **A tranche stopped for any of those reasons MUST NOT
+  read ACTIVE.** No renewal by silence. **It is not startable today** for two independent reasons:
+  pre-condition 6 — the frozen Stage 4B preflight — **cannot currently be satisfied**, **and the
+  authorising act is not established.** **Authority unestablished is not authority denied**, and it is
+  recorded rather than softened. What resolves it: **an owner decision on the prospective request
+  below** — the owner's own words, dated, on whether the recorded approval authorises this tranche —
+  **and then** freezing the manifest: publishing the case-fixture digests and
   naming the signing roles.**
 - **Date / Grantor:** 2026-10-04 UTC / Peter Nguyen.
 - **Reason:** to close the one open external fact — **B3**, whether the pinned
@@ -3937,7 +3954,7 @@ the entry governs.
   not a preference. *(The drafted grant said the credential was "supplied at launch
   by the operator"; that is superseded by this decision and is not what this entry
   authorises.)*
-- **Scope allowed:** **10 attempts total**, being probes **T1×2, T2×2, T3×2, T4×2,
+- **Scope allowed:** **10 attempts total, a MAXIMUM — not a mandate**, being probes **T1×2 (conditional on the T1 rule below), T2×2, T3×2, T4×2,
   T5×2** (base + one declared retry), on **one host**, by **one agent-operator**,
   **concurrency 1**.
   - **Purpose 1 (T1 attempt 1 is the gate):** a plain assistant turn against the
@@ -3948,14 +3965,18 @@ the entry governs.
     separators or suffixes**. **Any other returned identity — a different model, a
     fallback, an alias, a dated variant, or an empty or absent identity — leaves B3
     OPEN and stops the tranche**, and is recorded as `UNKNOWN`/negative rather than
-    as a pass. **T1 attempt 2 runs ONLY after a SUCCESSFUL first call**, to confirm
-    an **ambiguous success** (for example, an identity that is present but not an
-    exact match). **It does not run after a refusal.** **On a refusal, T1 attempt 2 is
-    NOT run and the tranche STOPS**; the earlier claim that attempt 2 could
-    "distinguish a hard rejection from a confirmation round-trip" is **WITHDRAWN as
-    unachievable under this grant's own stop rule**, and the limitation is recorded
+    as a pass. **T1 attempt 2 runs ONLY after a first response whose returned model
+    identity is an EXACT match to `claude-sonnet-5-5` — character-for-character, no
+    normalisation — AND under which no stop condition fired.** Its sole purpose is to
+    observe the *same* exact identity a second time. **It is not a route back from a
+    non-matching identity, and there is no confirmation path after one:** a different
+    model, a fallback, an alias, a dated variant, an empty or absent identity, or a
+    refusal **all leave B3 OPEN, STOP the tranche and void it under `Expiry / use
+    limit`**, exactly like every other terminal stop. The earlier claim that attempt 2
+    could "distinguish a hard rejection from a confirmation round-trip" is **WITHDRAWN
+    as unachievable under this grant's own stop rule**, and the limitation is recorded
     rather than promised.
-  - **Purpose 2:** five shapes each observed twice — **T1 plain assistant turn ·
+  - **Purpose 2:** five shapes, each observed **up to** twice (T1's second attempt only under the T1 rule above) — **T1 plain assistant turn ·
     T2 one allowed synthetic tool invoked once · T3 one subagent dispatch ·
     T4 a denied action via `PreToolUse` · T5 one injected transient failure plus one
     declared retry** — to compute a per-shape and pooled requests-per-attempt
@@ -4029,8 +4050,17 @@ the entry governs.
   tranche.** They ask what the runtime does, and only an authorised observation answers that;
   requiring them in advance made this grant unsatisfiable, which was a defect in the gating
   statement rather than in the items.
-  1. **Owner issue and register recording** with a real entry id and the owner's
-     actual authorising words — **which this entry is.**
+  1. **Owner issue and register recording.** The owner-side source of this entry's authority is
+     **PARTIALLY RECOVERED AND PARTIALLY NOT.** Recovered: the **option set** and the **proposal it
+     answered**, with an owner-approval attribution, in `STAGE-4B-PREFLIGHT-DRAFT.md` — SHA-256
+     `2148226e26d4653c4f23c68d99c81550b2d691a2bb2e6b1a8f3687ad2b493bfa`, **lines 68, 70, 346, 349,
+     350**; and the host and agent-operator as **owner decisions dated 2026-10-03** at
+     `STAGE-4B-FIRST-TRANCHE-GRANT-DRAFT.md` **lines 278 and 285**. **Not recovered: a dated,
+     owner-authored instruction for this tranche.** The decision labels (*Decision 13*, *Decision 14*),
+     the handoff's ceiling statement and the 2026-10-04 continuation instruction are **not** a
+     substitute for it. *Resolved by* an owner decision on the prospective request below — the owner's
+     own words, dated, on whether the recorded approval authorises this tranche. **This entry does not
+     supply that act and does not claim to.**
   2. **Exact host / profile and the agent-operator instance: `UNKNOWN` — no host is
      named and no agent instance is designated.** *Resolved by* an owner decision
      naming the machine **and designating the agent-operator**, plus host facts
@@ -4057,9 +4087,10 @@ the entry governs.
      case-fixture digests and naming the signing roles.** **Items that remain `UNKNOWN` in the
      manifest FAIL this pre-condition.** **It cannot currently be satisfied:** the manifest's
      case-fixture digest is `UNKNOWN` (the variations are proposals) and its signing roles are
-     unnamed. **This grant is therefore EFFECTIVE BUT NOT STARTABLE today**, and **the
-     prerequisite is not weakened to make the grant look ready** — an effective grant that cannot
-     start is honest; one that appears startable and is not is the defect this record exists to
+     unnamed. **This grant is therefore NOT STARTABLE today, and its authorising act is separately
+     not established (see `Status at recording` and `Evidence`)** — **the prerequisite is not
+     weakened to make the grant look ready**; a record that states its own limits is honest, and one
+     that appears authorised or startable when it is neither is the defect this record exists to
      prevent.
   7. **MEASURED, NOT AWAITED — whether the SDK exposes per-request, retry and subagent counts:
      `UNKNOWN`.** *Resolved by the tranche itself* (T1–T5 observe exactly this). **This is a
@@ -4083,6 +4114,38 @@ the entry governs.
   law requires it.** **No zero-retention claim is made.** **The local control remains
   primary**, including **no `/bug` and no thumbs-up/down** during the run — the feedback
   channel is retained up to 5 years and may be used for training.
+- **Prospective approval request — PROPOSAL ONLY, NOT AUTHORITY.** **This bullet requests one decision;
+  it confers none, and nothing may start on the strength of it.** `[A-30]` **It does not re-request the
+  scope, the ceilings, the host, the operator or the credential custody — those are recovered and cited
+  above. It asks only for the one thing that is not recovered: a dated, owner-authored authorising
+  act.** **If the owner decides, the decision is recorded as its own dated register entry (rule 4:
+  correct forward, never edit history) and this entry is superseded forward — never edited to change
+  history.**
+  - **Requested:** the owner's own words, dated, either directly in this register or in a retrievable
+    artifact this entry cites by digest, stating **whether the recorded approval *is* the authorising
+    act for this tranche.** The scope and limits it would authorise are **already recoverable and are
+    not restated as proposals here**: the approved option, and the option it displaced, at
+    `STAGE-4B-PREFLIGHT-DRAFT.md` (SHA-256 `2148226e…`) **lines 68** and **70/349**, with the approval
+    attribution at **lines 346 and 350**; the host and agent-operator as owner decisions dated
+    2026-10-03 at `STAGE-4B-FIRST-TRANCHE-GRANT-DRAFT.md` **lines 278 and 285**; the credential custody
+    as recorded in this entry's own `Credential custody` field.
+  - **The activities and limits the answer would be about** (for the owner's reference; already fixed by
+    the sources above, reproduced here only so the decision is concrete): probes **T1–T5**; **10
+    attempts total** (base + one declared retry per probe, T1's second attempt conditional on an
+    exact-match first response per the T1 rule above); **220 actual provider requests · US$50 total API
+    spend · `claude-sonnet-5-5` · at most one additional repeat per variant · at most one retry per case
+    · concurrency 1 including subagents.**
+  - **Provenance recorded — and what it does not decide:** the host and the agent-operator appear as
+    **owner decisions dated 2026-10-03** at the draft lines cited above — **not** as proposals of this
+    entry. **This entry does not rewrite prerequisite 2** (outside this correction's edit scope); it
+    records the provenance so the owner can decide whether it resolves prerequisite 2, which the
+    register currently holds as `UNKNOWN`.
+  - **What the owner's decision would resolve:** the authorising act only. **Prerequisites 2–6 remain
+    open**, including the frozen preflight (6), so **an affirmative answer still would not make the
+    tranche startable** — it would make it *authorised but still gated*.
+  - **What this request does NOT do:** it does not re-authorise, widen or convert any earlier label into
+    a grant; it does not authorise a ceiling increase; it does not authorise the ≥99-variation run, any
+    repository change, or anything in `Scope FORBIDDEN`.
 - **Scope FORBIDDEN — as explicit as the scope allowed:**
   - **No variation from the ≥99-variation register is executed.** Probes T1–T5 are
     tranche-local and **do not count toward coverage**; **demonstrated coverage
@@ -4133,6 +4196,34 @@ the entry governs.
   **this entry does not purport to quote them.** A missing archival pointer **limits
   future verification without erasing a direct instruction**, and it is **not** a
   substitute for the owner's own wording.
+  **WHICH PARTS ARE RECOVERED, AND BY WHAT SOURCE — corrected in A-30; the audited plan asserted the
+  opposite and was wrong.** The **option set is recoverable and is cited here rather than denied:**
+  `STAGE-4B-PREFLIGHT-DRAFT.md`, SHA-256
+  `2148226e26d4653c4f23c68d99c81550b2d691a2bb2e6b1a8f3687ad2b493bfa`, 100,013 B — **the artifact this
+  entry already binds as the source of every ceiling above** — carries at **line 68** the approved
+  option *"Raise both ceilings to fit full coverage now."* together with *"Request ceiling 140 → 220;
+  spend ceiling $10 → US$50 (owner-approved)"*; at **lines 70 and 349** the option it displaced,
+  verbatim, *"about 210 requests and about $25"*; and at **lines 346 and 350** the attribution *"The
+  owner subsequently approved 220 requests and up to US$50."* **Relay provenance, stated by that source
+  itself:** line 70 records *"it is **mine and not the owner's wording**"*, and records the
+  coordinator's own 220/$30 figure as *"never owner-authorised"*. **The host, the agent-operator and the
+  credential custody are likewise recorded rather than absent:** `STAGE-4B-FIRST-TRANCHE-GRANT-DRAFT.md`
+  **lines 278 and 285** record the host (`win-agent-host-01`) and the operator
+  (`stage4b-operator-01`) as **owner decisions dated 2026-10-03**, and **line 286** records the
+  credential as host-process-environment; the `Credential custody` field above records the later owner
+  instruction that supersedes the draft's "supplied at launch by the operator" wording. **What is NOT
+  recovered: a dated owner-authored instruction for this tranche.** No artifact on this host holds
+  owner-typed authorising words — the register records that the owner did not type into it and that no
+  owner-authored text was available — and the two drafts that carry the rest state of themselves that
+  they are drafts, not issued, not register entries, and that they authorise nothing. **The decision
+  labels** (`Decision 13`, `Decision 14`) name no repository artifact; the **handoff file** states the
+  ceilings without a dated owner instruction; and the **2026-10-04 continuation instruction** cannot
+  serve, because its own §3.2 requires a *separate* owner grant with exact caps and says it *"does not
+  state caps, so it cannot serve as one."* **Consequence: the scope and limits are citable; the
+  authorising act is not owner-authored here; execution BLOCKED.**
+  **No revocation is claimed.** Nothing in this entry asserts that a genuine prior owner instruction
+  was withdrawn or invalidated. What is recorded is **an authorising act that is not owner-authored on
+  this host** — not a rescinded grant — and the distinction is recorded rather than dramatised.
   The drafted grant at SHA-256
   `7fc600faa59dabdcc418fa8e7575909b2971d5ab08442129c3ff998c54d62c71` (30,288 B — the transcription source, **not** re-derived), and the
   bound planning manifest at SHA-256
