@@ -3597,6 +3597,13 @@ the entry governs.
 - **Status at recording:** ACTIVE and **unspent** as recorded. It authorises the
   three merges named in `Scope allowed` and nothing else, and it ends when all
   three complete or when the owner supersedes it.
+
+  **As recorded, this entry takes effect when it is merged into `main`, not when
+  its branch is pushed.** No pull request exists for this branch as this revision
+  is written, so the merge path below is not yet open: until a pull request is
+  opened and merged, this text is a draft on a branch, and **no action is covered
+  by it**. A reader holding the branch cannot cite it as authority; the register
+  on `main` is the record.
 - **Date / Grantor:** 2026-10-04 / Peter Nguyen.
 - **Reason:** Three agent-authored branches, all based on `3006d0a7`, were each
   waiting on a merge path: `fix/consumer-copy-and-containment`,
@@ -3640,6 +3647,25 @@ the entry governs.
   before transcription and do not need repeated consent"* — so this entry rests
   on that instruction and **does not claim a repository citation of the owner's
   own text.**
+
+  **The designated agent name is a coordinator-session designation, not a
+  repository identity.** `plan-scrutineer` has **no repository definition**: a
+  search of every tracked file at `3006d0a7` returns **0** occurrences
+  (`git grep -F 'plan-scrutineer'` exits 1). It is named here because the owner
+  designated it in the coordinating session, and readers should treat it as the
+  **object of the grant** — the role the owner designated — rather than as an
+  identity resolvable from this repository. This register's convention is to name
+  a role rather than a session instance: "the coordinating agent" appears 31
+  times at this base and "the merge agent" twice. Where a session instance had to
+  be recorded, the Stage 4B first-tranche draft declines to name one and leaves
+  it `UNKNOWN` instead — *"no host is named and no agent instance is
+  designated"* (`f7c48212`, `docs/approvals/APPROVAL_REGISTER.md:3723-3724`).
+  **Consequence, stated because this entry exists to be citable later:** a merge
+  performed under this name cannot be attributed from the repository alone, so
+  the merge receipt for each branch must carry enough identity to be checkable
+  later — the agent instance, the session that designated it, and the exact head
+  merged — or the grant's holder stays unresolvable. The name is otherwise
+  unresolvable by design here, not by oversight.
 - **Scope allowed:** Merge authority over, and only over, these three branches,
   exercised by the designated merge agent `plan-scrutineer`:
 
@@ -3658,6 +3684,13 @@ the entry governs.
   another, so freezing a head here would void the grant the moment a branch moved
   — and one of these three branches had already moved before this entry was
   written.
+
+  **Measured more precisely than that first wording: two of the three had moved
+  within twelve minutes before this entry's commit** —
+  `docs/consumer-copy-worked-example` (remote-reflog pushes at 08:48:30 and
+  08:51:33) and `docs/no-cross-skill-delegation` (08:56:03), against this entry's
+  commit at 09:03:20. "One" understated the measurement; the argument it supports
+  is unaffected.
 
   **Conditional limits — all three must hold for each branch, or that branch is
   not covered:**
@@ -3686,6 +3719,29 @@ the entry governs.
   selection, not as a reading the page already contained. It reaches **only**
   these three branches, is not a standing reading of `CONTRIBUTING.md`, and
   grants nothing to any later change.
+
+  **Read that sentence as scoped to `CONTRIBUTING.md` and to no other page: the
+  repository's own instructions file already states the identical limit.**
+  [`AGENTS.md`](../../AGENTS.md):71-74 says that a further security review is
+  inserted where *"CONTRIBUTING.md's security-relevant-surface list (wider than
+  `gate-guard`)"* requires one — *"which is required for OUTSIDE contributions
+  only and is not extended to the maintainer's or other agents' own PRs."* That
+  scope is not this entry's reading of that page: `AGENTS.md`:75-81 records it as
+  the owner's own instruction, stating that it *"is the one the owner recorded on
+  2026-09-27"* in the "Security-surface rule" row of
+  [`docs/roadmaps/aegis-open-decisions-2026-09-23.md`](../roadmaps/aegis-open-decisions-2026-09-23.md),
+  and that *"on the owner's direct instruction this file now states the same
+  limit (2026-10-02)"*. So the carve-out for agent-authored PRs is **already
+  recorded repository policy carrying the owner's own provenance**, and the
+  2026-10-04 selection recorded above applies that standing scope to these three
+  branches. **Whether that selection creates the exemption or confirms the scope
+  already recorded on 2026-09-27 is not determinable from the repository** — only
+  the owner can settle it — and both readings reach the same result for these
+  three branches, so this entry claims neither. The question is recorded as an
+  open owner decision. This paragraph was added after an independent review
+  measured **0** occurrences of `AGENTS.md`, `2026-09-27` and `OUTSIDE
+  contributions` in this block as first written; the correction touches no
+  earlier entry.
 - **Scope FORBIDDEN:** **No branch other than the three named above is covered**,
   at any head, and no later branch may cite this entry as authority. Specific
   prohibitions:
