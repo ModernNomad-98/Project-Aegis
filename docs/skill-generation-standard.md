@@ -91,6 +91,17 @@ This example does not create or authorize a shipped skill.
   another skill's internals (`references/`, `assets/`, `scripts/`, `evals/`):
   those are that skill's progressive-disclosure detail, reached through its own
   entrypoint, and a copy of your skill alone would not carry them.
+- **A required runtime dependency is a manifest obligation on a copy, not a
+  prohibition.** A reference is a required runtime dependency when a copy of the
+  skill cannot perform its documented work without the referenced file present.
+  It is decidable only by constructing the journey manifest: a dependency is
+  required if and only if removing it prevents the documented procedure from
+  executing. **A link checker cannot decide it.** A mention is **not**
+  automatically a dependency, and a conditional-group mention is **not** a
+  dependency at all — the orchestrator's stage-4 security skills, SaaS
+  architecture-depth family, AI/agentic-security packs and analytics skills are
+  **conditional on actual features**, invoked only when the project's features
+  call for it.
 
 ---
 
