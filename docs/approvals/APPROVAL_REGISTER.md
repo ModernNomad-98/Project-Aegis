@@ -4539,14 +4539,18 @@ the entry governs.
   resulting commit — the same distinction AEGIS-APR-107 records for AEGIS-APR-106,
   and this paragraph exists for the same reason.
 
-- **ID resolution, and this entry's own forward consequence.** The register on this
-  branch's base `bdbd688c` ends at `AEGIS-APR-110`, so the next free ID on this base
-  was **111**. **111 is claimed in flight** by the slot-2 consumption on branch
-  `docs/approvals/apr-109-consumed-slot-2`
-  (tip `5740d643f1887ad53f4e20d577c407fe8d63eeee`, not an ancestor of `main`), whose
-  register copy carries one `AEGIS-APR-111` heading. To keep two entries from claiming
-  one ID, **slot 3 takes 112** and cross-references the in-flight 111. **Consequence,
-  recorded so the append order is not left to a merge accident: a `main` containing
-  111 must exist, and this branch must be rebased onto it, before this entry is
-  merged** — so the register reads **110 → 111 → 112**. This entry does not create,
-  depend on, or speak for `AEGIS-APR-111`, and it must not be merged ahead of it.
+- **ID resolution, and this entry's own forward consequence — DISCHARGED by this
+  rebase.** The register on this entry's original base `bdbd688c` ended at
+  `AEGIS-APR-110`, so the next free ID there was **111**. **111 was claimed in
+  flight** by the slot-2 consumption on branch
+  `docs/approvals/apr-109-consumed-slot-2` (tip at that time
+  `5740d643f1887ad53f4e20d577c407fe8d63eeee`, since rebased and merged as
+  [PR #671](https://github.com/ModernNomad-98/Project-Aegis/pull/671)). To keep two
+  entries from claiming one ID, **slot 3 took 112** and cross-references 111.
+  **The consequence recorded above has now been discharged:** this branch has been
+  **rebased onto `3824fe5b2174088f301292a5c168489737433e8a`**, the `main` that
+  contains `AEGIS-APR-111`, and in this file the entries read **110 → 111 → 112** in
+  append order. The rebase resolved the tail-append conflict by keeping
+  `AEGIS-APR-111` byte-intact from `main` and appending this entry after it: entries
+  001–111 are byte-identical to the register at `3824fe5b`, and this entry is a pure
+  append. Nothing in `AEGIS-APR-111` is created, altered or spoken for by this entry.
