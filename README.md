@@ -435,11 +435,15 @@ inside the consumer repository at any moment, including after a failed check. Th
 staging-design route; prefer it whenever the stronger guarantee is worth the extra step.
 
 **The demonstrated journey copies one selected skill — a *standalone* one.** Swap `tdd-engineer`
-for the skill you want, as the copy steps in this section do. **For that demonstrated
-`tdd-engineer` journey the only runtime file is its own `SKILL.md`.** A skill that carries
-`references/`, `assets/` or `scripts/` needs those too — they are runtime folders, not extras.
-`evals/` is never runtime: the evals-exclusion rule in this section is what keeps it out. This is
-a plain file copy: no installer, no hooks, no pre-approved tools, nothing that runs by itself.
+for the skill you want, as the copy steps in this section do. **The allow-list copies that skill's
+`SKILL.md`, plus the runtime folders it has** (`references/`, `assets/`, `scripts/` — runtime
+folders, not extras). **Even the demonstrated skill is not entirely self-contained:** its own text
+requires the repo-root policy `docs/skill-generation-standard.md` for the Task-Authorized Local
+Implementation (TALI) route (`SKILL.md:54-57`), and a one-folder copy does not carry that file.
+Treat a citation like that as the library-meta note in this section treats its inputs: copy the
+named dependency, or accept it as a source-repo-bound reference the copy does not resolve. `evals/`
+is never runtime: the evals-exclusion rule in this section is what keeps it out. This is a plain
+file copy: no installer, no hooks, no pre-approved tools, nothing that runs by itself.
 
 **Not every skill is standalone — check before you swap.** Some skills are **library-meta**: their
 required inputs are the repository's own files, not only their own folder. `skill-quality-reviewer`
