@@ -107,6 +107,7 @@ import os
 import re
 import subprocess
 import sys
+import urllib.parse
 from pathlib import Path
 
 try:
@@ -1143,6 +1144,256 @@ def check_config_surfaces(rep: Report, paths: list[str] | None = None,
         )
 
 
+_MAX_PERCENT_DECODE_PASSES = 5
+
+
+def _decode_link_target(target: str) -> str:
+    """Resolve percent-escapes in a link target the way a renderer does.
+
+    `%2e%2e/` is `../` once decoded, so leaving the escapes literal let the
+    encoded spelling of a forbidden link pass while the plain spelling failed.
+    Decoding (rather than failing closed on every `%`) is deliberate: decoded,
+    `%2e%2e/beta/SKILL.md` IS the sibling entrypoint, and this rule
+    distinguishes targets, not spellings, so that link must stay accepted. One
+    pass matches the WHATWG/GitHub renderer; the bounded repeat closes the
+    re-decode class (`%252e%252e`, which becomes `..` for any consumer that
+    unquotes a second time) without risking an unbounded loop.
+    """
+    decoded = target
+    for _ in range(_MAX_PERCENT_DECODE_PASSES):
+        once = urllib.parse.unquote(decoded)
+        if once == decoded:
+            break
+        decoded = once
+    return decoded
+
+
+def _is_drive_target(target: str) -> bool:
+    """True for a Windows drive-letter target (`C:/x`, `c:\\x`, `C:x`)."""
+    return len(target) > 1 and target[1] == ":" and target[0].isalpha()
+
+
+def _is_drive_relative_target(target: str) -> bool:
+    """True for a Windows drive-RELATIVE target (`C:foo`, `C:./x`, `C:`).
+
+    A drive letter and colon NOT followed by a separator. `Path("C:foo")`
+    resolves against the PER-DRIVE current directory, so its verdict was a
+    function of wherever the validator happened to run: ACCEPTED when the
+    process CWD was the repository root and an error anywhere else, meaning the
+    same commit could pass on a Windows dev box and fail on `ubuntu-latest`
+    (measured, task-14). Such a target also has no machine-independent meaning,
+    so it is an error on every platform rather than a path resolved against an
+    unknowable base.
+    """
+    return _is_drive_target(target) and (
+        len(target) == 2 or target[2] not in "/\\"
+    )
+
+
+def _is_anchored_target(target: str) -> bool:
+    """True for a target rooted outside the tree: `/x`, `//srv/x`, `C:/x`.
+
+    Decided on the string rather than through Path, so the verdict is the same
+    on Windows and POSIX (CI runs this gate on ubuntu-latest).
+    """
+    return target.startswith("/") or _is_drive_target(target)
+
+
+def _iter_link_targets(body: str):
+    """Yield the target of every `[label](target)` link, in O(len(body)).
+
+    Linear equivalent of `re.compile(r"\\[[^\\]]*?\\]\\(([^)\\s]+)\\)")`, which
+    was quadratic in unmatched `[`: the lazy label scan restarted at every `[`,
+    so a single 64 KB line of `[` took ~12 s to scan (measured) while
+    MAX_SKILL_LINES bounds lines, not bytes. Each character below is visited a
+    constant number of times, and leftmost-match with non-greedy label
+    semantics is preserved.
+
+    The target scan never restarts inside a region it has already walked. It
+    keeps a second cursor, `scanned_to`, at the furthest offset any target scan
+    has reached: everything below it has been examined and holds no `)` and no
+    whitespace, so a later scan resumes there (`end = max(start, scanned_to)`)
+    instead of re-walking the tail, and a scan that reaches end-of-body returns
+    outright because every later `](` faces a suffix of the same unterminated
+    run. `pos` (the LABEL bound) is NOT advanced this way -- moving it past a
+    `[` that a later link needs would silently drop that link, which is why the
+    re-scan and the label bound are separate cursors. The first version of this
+    fix conflated them and lost `[a](xx[bb yyy](z)`; the equivalence harness
+    caught it before the commit.
+
+    Without the second cursor the target scan re-walked the tail once per `](`,
+    which made an unterminated-link body quadratic -- 64 KB of `[a](x` took
+    ~25 s, 5.3x SLOWER than the regex it replaced (measured, task-14).
+    """
+    pos = 0
+    length = len(body)
+    scanned_to = 0
+    while True:
+        close = body.find("](", pos)
+        if close < 0:
+            return
+        open_bracket = body.rfind("[", pos, close)
+        if open_bracket < 0 or "]" in body[open_bracket + 1:close]:
+            pos = close + 1
+            continue
+        start = close + 2
+        end = max(start, scanned_to)
+        while end < length:
+            char = body[end]
+            if char == ")" or char.isspace():
+                break
+            end += 1
+        if end > start and end < length and body[end] == ")":
+            yield body[start:end]
+            pos = end + 1
+            scanned_to = end
+        elif end >= length:
+            # Ran to end-of-body with no `)` and no whitespace: every later
+            # `](` faces a suffix of this same unterminated run, so none can
+            # yield and there is nothing left to examine.
+            return
+        else:
+            # Stopped on whitespace, or on `)` with an empty target. The next
+            # label may still start anywhere after this `](`, so `pos` moves
+            # only past it; the tail walk is remembered instead of repeated.
+            pos = close + 1
+            scanned_to = end
+
+
+def check_no_cross_skill_file_dependencies(
+    rep: Report, skills_dir: Path | None = None
+) -> None:
+    """HARD: a skill must not link into another skill's internals.
+
+    Standard section 1: "Everything the skill needs lives inside its own
+    directory. No cross-skill file dependencies." The rule was stated in the
+    standard but checked nowhere -- `check_docs_paths_links` inspects only
+    docs/paths/*.md and the README picker, so skill bodies were unvalidated.
+
+    Two distinct things, deliberately separated so this check is
+    false-positive-free:
+
+      (a) DELEGATION -- a link to a sibling skill's `SKILL.md` entrypoint. This
+          is ALLOWED. Skills compose; `project-orchestrator` states its own
+          doctrine as "It composes; it never restates ... copying any inline is
+          failure", which requires naming and reaching the owning skill.
+
+      (b) FILE DEPENDENCY -- a relative link that leaves this skill's directory
+          and lands inside ANOTHER skill's directory at anything other than its
+          `SKILL.md`. This is FORBIDDEN: it reaches past that skill's entrypoint
+          into its progressive-disclosure detail (references/, assets/,
+          scripts/, evals/), which section 3 defines as reached through the
+          owning skill, and which a copy of this skill alone would not carry.
+
+    Links that leave the skill directory and `.claude/skills/` entirely are NOT
+    this rule's subject when they are genuine repo-root citations -- relative
+    links that stay inside the repository, for example `../../../docs/...`.
+    They are out of scope here. An absolute, drive-letter or UNC target is not
+    such a citation: it is machine-specific, cannot resolve in a consumer's
+    copy, and used to be a silent way past this rule, so it is an error.
+
+    DELIBERATELY OUT OF SCOPE, decided rather than overlooked (A-05b): a
+    NON-anchored machine-specific scheme such as `file:/x`, `ftp://host/x` or
+    `~/x` is accepted. None of them is anchored, so each resolves under the
+    skill's own directory and cannot name a sibling's internals; this rule's
+    contract is where a target RESOLVES, and a scheme deny-list would guard a
+    different property -- a link that will not resolve in a consumer's copy --
+    at the cost of a list to maintain.
+
+    A drive-relative target (`C:foo`) is the opposite case: it IS anchored but
+    has no machine-independent resolution, so it is an error on every platform
+    and the message below says exactly that instead of printing a path.
+
+    Percent-escapes are resolved before a target is classified, because a
+    renderer resolves them before the path is used: `%2e%2e/` IS `../`, and
+    leaving it literal let the encoded spelling of a forbidden link pass while
+    the plain spelling failed.
+    """
+    skills_dir = (skills_dir or SKILLS_DIR).resolve()
+    # Whole-document scan so wrapped links are matched (a line-by-line scan
+    # misses those). The scanner is linear because a skill body is unbounded in
+    # BYTES -- MAX_SKILL_LINES bounds lines only; see _iter_link_targets.
+
+    if not skills_dir.is_dir():
+        return
+    dirs = [
+        c for c in sorted(skills_dir.iterdir())
+        if c.is_dir() and c.name not in IGNORED_DIRS
+    ]
+
+    for skill_dir in dirs:
+        body_path = skill_dir / "SKILL.md"
+        if not body_path.exists():
+            continue
+        try:
+            body = body_path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        for target in _iter_link_targets(body):
+            if target.startswith(("http://", "https://", "#", "mailto:")):
+                continue
+            # Escapes are resolved before classification (a renderer resolves
+            # them before the path is used), and backslashes are treated as
+            # separators so the verdict does not depend on the host OS.
+            raw = _decode_link_target(target.split("#", 1)[0]).replace("\\", "/")
+            anchored = _is_anchored_target(raw)
+            if anchored:
+                # A drive-RELATIVE target (`C:foo`, `C:./x`) would be resolved
+                # by Path against the per-drive current directory, so its
+                # verdict would depend on where the validator runs -- the same
+                # commit passing on a Windows dev box and failing on
+                # ubuntu-latest (measured, task-14). It is an error everywhere.
+                # On POSIX every drive-letter target is unresolvable for the
+                # same reason: it would resolve under the repo by accident, and
+                # is never a repo-root citation on a host that cannot read it.
+                if _is_drive_relative_target(raw) or (
+                    os.name != "nt" and _is_drive_target(raw)
+                ):
+                    resolved = None
+                else:
+                    resolved = Path(raw).resolve()
+            else:
+                resolved = (skill_dir / raw).resolve()
+            # Inside this skill's own directory: fine.
+            if resolved is not None and (
+                resolved == skill_dir or skill_dir in resolved.parents
+            ):
+                continue
+            # Inside .claude/skills/ but a different skill: must be its entrypoint.
+            if resolved is not None and skills_dir in resolved.parents:
+                if resolved.name == "SKILL.md" and resolved.parent.parent == skills_dir:
+                    continue
+                other = resolved.relative_to(skills_dir).parts[0]
+                rep.error(
+                    f"[{skill_dir.name}] links into another skill's internals: "
+                    f"'{target}' resolves to '{other}/' -- link to "
+                    f"../{other}/SKILL.md and let that skill disclose its own files "
+                    f"(standard section 1: no cross-skill file dependencies)"
+                )
+                continue
+            # Outside .claude/skills/: a repo-root citation is in scope only
+            # when it genuinely lands inside this repository. An absolute,
+            # drive-letter, UNC or escaping target is machine-specific, cannot
+            # resolve in a consumer's copy, and is exactly how a link shaped
+            # like a sibling's internals was smuggled past this check.
+            if resolved is not None and (
+                resolved == REPO_ROOT or REPO_ROOT in resolved.parents
+            ):
+                continue
+            where = (
+                f"resolves to '{resolved}', which is not under the repository root"
+                if resolved is not None
+                else "has no machine-independent resolution"
+            )
+            rep.error(
+                f"[{skill_dir.name}] links outside the repository: '{target}' "
+                f"{where} -- a repo-root citation must be a relative link that "
+                f"stays inside it (for example '../../../docs/x.md'). An "
+                f"absolute, drive-letter, UNC or escaping target cannot resolve "
+                f"in a consumer's copy of this skill"
+            )
+
+
 def check_docs_paths_links(
     rep: Report, paths_dir: Path | None = None, readme: Path | None = None
 ) -> None:
@@ -1337,6 +1588,7 @@ def main() -> int:
     check_agents_schema(rep)                       # HARD
     check_config_surfaces(rep)                     # HARD
     check_docs_paths_links(rep)                    # HARD
+    check_no_cross_skill_file_dependencies(rep)    # HARD  (standard section 1)
     check_workflows_sha_pinned(rep)                # HARD
     check_claude_bridge(rep)                       # HARD  (decision D61)
 

@@ -22,12 +22,12 @@ anything irreversible → advance.**
 
 **It composes; it never restates.** The canonical stage list, per-stage gate,
 authority model, and change-classification matrix are OWNED by
-[`ai-sdlc-operating-model`](../ai-sdlc-operating-model/SKILL.md) (its
-[`references/stage-gate-map.md`](../ai-sdlc-operating-model/references/stage-gate-map.md))
-and [`change-classification-gate`](../change-classification-gate/SKILL.md); this
-skill CITES and DELEGATES to them by name — copying any inline is failure.
-**Navigating a specific beginner's project through that map is the gap this
-skill fills** (`ai-sdlc-operating-model` disclaims in-flight navigation).
+[`ai-sdlc-operating-model`](../ai-sdlc-operating-model/SKILL.md) and
+[`change-classification-gate`](../change-classification-gate/SKILL.md) — cited by
+name, never linked into their internals. This skill CITES and DELEGATES to them —
+copying any inline is failure. **Navigating a specific beginner's project through
+that map is the gap this skill fills** (`ai-sdlc-operating-model` disclaims
+in-flight navigation).
 
 ## Use When
 

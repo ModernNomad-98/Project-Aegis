@@ -42,11 +42,13 @@ import contextlib
 import importlib.util
 import io
 import json
+import os
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -105,6 +107,25 @@ def readme_at(path: Path):
         yield
     finally:
         validator.README = original
+
+
+@contextmanager
+def repo_root_at(path: Path):
+    """Point the validator's REPO_ROOT constant at a fixture for one block.
+
+    The no-cross-skill check accepts a link that leaves `.claude/skills/` only
+    when it genuinely lands under the repository root, so a temp fixture has to
+    declare which root it is modelling. The path is resolved because the
+    module defines REPO_ROOT with `.resolve()` and comparisons are made against
+    resolved targets: on Windows `mkdtemp()` can hand back an 8.3 short name
+    (`PETERN~1`) that never matches the long form `resolve()` returns.
+    """
+    original = validator.REPO_ROOT
+    validator.REPO_ROOT = path.resolve()
+    try:
+        yield
+    finally:
+        validator.REPO_ROOT = original
 
 
 # --- existing hard checks (the D50 trio) ------------------------------------
@@ -717,6 +738,453 @@ def _materialize_paths_tree(dst_root: Path) -> Path:
     assert neutral.is_dir(), f"neutral fixture source must exist: {neutral}"
     neutral.rename(tree / ".claude")
     return tree
+
+
+def test_no_cross_skill_file_dependencies():
+    """Standard section 1: no cross-skill file dependencies.
+
+    The rule was stated in the standard but checked nowhere -- skill bodies were
+    unvalidated. It is deliberately narrow, so this fixture pins BOTH sides:
+    delegation to a sibling entrypoint is accepted, and reaching into a sibling's
+    internals is rejected. Without the accepting half, a future tightening could
+    ban the composition `project-orchestrator` is built on.
+    """
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-xskill-"))
+    try:
+        skills = tmp / ".claude" / "skills"
+        a, b = skills / "alpha", skills / "beta"
+        (b / "references").mkdir(parents=True)
+        (b / "SKILL.md").write_text("---\nname: beta\n---\n", encoding="utf-8")
+        (b / "references" / "detail.md").write_text("detail\n", encoding="utf-8")
+        a.mkdir(parents=True)
+
+        def write(body: str) -> None:
+            (a / "SKILL.md").write_text(body, encoding="utf-8")
+
+        rep = validator.Report()
+        write("See [beta](../beta/SKILL.md) for the map.\n")
+        validator.check_no_cross_skill_file_dependencies(rep, skills)
+        expect_clean(rep, "delegation to a sibling entrypoint is accepted")
+
+        rep = validator.Report()
+        write("See [detail](../beta/references/detail.md) for the map.\n")
+        validator.check_no_cross_skill_file_dependencies(rep, skills)
+        expect_error(
+            rep,
+            "links into another skill's internals",
+            "reaching into a sibling's references/ is rejected",
+        )
+
+        rep = validator.Report()
+        write("See [own](references/local.md) and [docs](../../../docs/x.md).\n")
+        with repo_root_at(tmp):
+            validator.check_no_cross_skill_file_dependencies(rep, skills)
+        expect_clean(
+            rep,
+            "own-directory links and repo-root citations are not this rule's subject",
+        )
+
+        # Pin the real surface: a mis-pathed skills_dir must not make this a no-op.
+        real = validator.check_no_cross_skill_file_dependencies
+        assert callable(real) and validator.SKILLS_DIR.is_dir(), (
+            f"expected the shipped skills dir at {validator.SKILLS_DIR}"
+        )
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_no_cross_skill_percent_encoded_traversal():
+    """Task-5 defect 1: `%2e%2e/` IS `../` once a renderer resolves it.
+
+    `Path.resolve()` leaves percent-escapes literal, so the encoded spelling of
+    a link into a sibling's internals was ACCEPTED while the identical literal
+    spelling was rejected: the check was bypassable by spelling. Targets are
+    decoded before they are classified. The accepting half is pinned too --
+    decoded, `%2e%2e/beta/SKILL.md` is the sibling entrypoint (delegation), and
+    it must not become a false positive.
+    """
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-xskill-pct-"))
+    try:
+        skills = tmp / ".claude" / "skills"
+        a, b = skills / "alpha", skills / "beta"
+        (b / "references").mkdir(parents=True)
+        (b / "SKILL.md").write_text("---\nname: beta\n---\n", encoding="utf-8")
+        (b / "references" / "detail.md").write_text("detail\n", encoding="utf-8")
+        a.mkdir(parents=True)
+
+        def write(body: str) -> None:
+            (a / "SKILL.md").write_text(body, encoding="utf-8")
+
+        for encoded in (
+            "%2e%2e/beta/references/detail.md",
+            "%2e./beta/references/detail.md",
+            ".%2e/beta/references/detail.md",
+            "%2E%2E/beta/references/detail.md",
+            "%2e%2e%2fbeta%2freferences%2fdetail.md",
+            "..%2fbeta%2freferences%2fdetail.md",
+            "%252e%252e/beta/references/detail.md",
+            "..%5Cbeta%5Creferences%5Cdetail.md",
+        ):
+            rep = validator.Report()
+            write(f"See [x]({encoded}) for detail.\n")
+            validator.check_no_cross_skill_file_dependencies(rep, skills)
+            expect_error(
+                rep,
+                "links into another skill's internals",
+                f"encoded traversal is rejected: {encoded}",
+            )
+
+        rep = validator.Report()
+        write("See [beta](%2e%2e/beta/SKILL.md) for the map.\n")
+        validator.check_no_cross_skill_file_dependencies(rep, skills)
+        expect_clean(rep, "encoded delegation to a sibling entrypoint stays accepted")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def _time_scan(body: str) -> tuple[float, list[str]]:
+    """Time one whole-body scan by the gate's link scanner."""
+    started = time.perf_counter()
+    targets = list(validator._iter_link_targets(body))
+    return time.perf_counter() - started, targets
+
+
+def test_no_cross_skill_scan_is_linear():
+    """Task-5 defect 2, extended by task-14 for the shapes it missed.
+
+    The old pattern `\\[[^\\]]*?\\]\\(([^)\\s]+)\\)` restarted a lazy label scan
+    at every `[`, so a single 64 KB line of `[` took ~12 s to scan (measured
+    before the fix). MAX_SKILL_LINES bounds LINES, not bytes, so nothing else
+    stopped a contributor stalling CI with one line. The time bound is loose
+    (the linear scanner measures ~0.02 s) so a loaded runner cannot flake it.
+    The link after the pathological run pins that the fix is a linear scan and
+    not a truncating size cap, which would silently stop checking the tail.
+
+    Task-14: the `[`-run above was the ONE shape the replacement scanner
+    answered without entering its target-scan branch, so it was the one shape
+    that got faster. An UNTERMINATED link enters that branch, and the first
+    version of the scanner resumed at `close + 1` and re-walked the whole tail
+    once per `](`: 64 KB of `[a](x` took 24.6 s and 64 KB of `[[[](` took
+    22.9 s -- 5.3x and 1.9x SLOWER than the regex they replaced. Both shapes
+    are therefore pinned here by an absolute bound AND by a scaling assertion
+    (doubling the body must not roughly quadruple the time), which is what
+    distinguishes a linear scan from a quadratic one whose constant is small.
+    """
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-xskill-lin-"))
+    try:
+        skills = tmp / ".claude" / "skills"
+        a, b = skills / "alpha", skills / "beta"
+        (b / "references").mkdir(parents=True)
+        (b / "SKILL.md").write_text("---\nname: beta\n---\n", encoding="utf-8")
+        (b / "references" / "detail.md").write_text("detail\n", encoding="utf-8")
+        a.mkdir(parents=True)
+
+        (a / "SKILL.md").write_text("[" * (64 * 1024), encoding="utf-8")
+        rep = validator.Report()
+        started = time.perf_counter()
+        validator.check_no_cross_skill_file_dependencies(rep, skills)
+        elapsed = time.perf_counter() - started
+        expect_clean(rep, "a 64 KB run of unmatched '[' is scanned without stalling")
+        assert elapsed < 2.0, (
+            f"scanning a 64 KB line of '[' took {elapsed:.2f}s; the gate must not "
+            f"be stallable by one line (the quadratic pattern took ~12s)"
+        )
+        label = f"64 KB of '[' scanned in {elapsed:.3f}s (bound 2.0s)"
+        PASSES.append(label)
+        print(f"  PASS  {label}")
+
+        # A truncating size cap would fix the stall by silently stopping the
+        # scan: this link sits past the pathological run and must still be
+        # seen. (The run has to be UNMATCHED for the stall above -- trailing
+        # text with a ']' would let the old pattern match once and swallow the
+        # run, which is why the stall case and the coverage case are separate.)
+        (a / "SKILL.md").write_text(
+            "[" * (64 * 1024) + "\nSee [deep](../beta/references/detail.md).\n",
+            encoding="utf-8",
+        )
+        rep = validator.Report()
+        validator.check_no_cross_skill_file_dependencies(rep, skills)
+        expect_error(
+            rep,
+            "links into another skill's internals",
+            "a link after a 64 KB run of '[' is still seen (no truncating cap)",
+        )
+
+        # Task-14: the two unterminated shapes. The `[`-run above contains no
+        # `](` at all, so it never reaches the target scan; these do, and the
+        # pre-task-14 scanner re-walked the tail at every `](` (24.6 s and
+        # 22.9 s at 64 KB). The bound is 2.0 s against a linear scanner that
+        # measures milliseconds, so it cannot flake on a loaded runner.
+        #
+        # Task-30 / A-05c: the third payload is the shape where the `scanned_to`
+        # cursor is the ONLY guard. The two unterminated runs above end with no
+        # `)` and no whitespace, so their scan always reaches end-of-body and
+        # the `elif end >= length: return` early-exit alone ends it. A run
+        # ended by ONE trailing whitespace instead exercises the resume cursor:
+        # with the cursor's use removed (`end = max(start, scanned_to)` ->
+        # `end = start`, scratch copy only) every other assertion in this file
+        # and the whole-corpus validator (195/0) still pass, while this shape
+        # goes quadratic -- 0.00017s / 0.00278s / 0.00743s committed at
+        # N=250 / 4000 / 64 KB versus 0.00648s / 1.82228s / 24.34s for the
+        # cursor-removed mutant.
+        #
+        # PRECISION: the whitespace must trail the WHOLE run. `"[a](x " * N` (a
+        # space after every unit) stops each scan after two characters and is
+        # indistinguishable on the mutant -- measured 0.0035s committed versus
+        # 0.0033s on the mutant at 64 KB -- so it is not a substitute.
+        adversary = (
+            ("'[a](x' * N", "[a](x", ""),
+            ("'[[[](' * N", "[[[](", ""),
+            ("('[a](x' * N) + ' '", "[a](x", " "),
+        )
+        for name, unit, trailing in adversary:
+            body = unit * (64 * 1024 // len(unit)) + trailing
+            elapsed, targets = _time_scan(body)
+            assert targets == [], (
+                f"{name} carries no complete link; the scanner returned "
+                f"{targets[:3]}"
+            )
+            assert elapsed < 2.0, (
+                f"scanning {len(body)} bytes of {name} took {elapsed:.2f}s; the "
+                f"target scan must resume past the bytes it already examined "
+                f"(the pre-task-14 form took 24.6s on the unterminated shape, "
+                f"and the cursor-removed mutant takes 24.3s on the "
+                f"whitespace-terminated one)"
+            )
+            label = (
+                f"{len(body)} bytes of {name} scanned in {elapsed:.3f}s "
+                f"(bound 2.0s)"
+            )
+            PASSES.append(label)
+            print(f"  PASS  {label}")
+
+        # Scaling, not just an absolute bound. Doubling the body must not
+        # roughly quadruple the time -- that is the signature of the re-scan,
+        # and an absolute bound can be slipped under by a smaller constant
+        # factor. This is the assertion that would have caught task-14, and on
+        # the whitespace-terminated payload it is what separates the resume
+        # cursor from no cursor at all.
+        for name, unit, trailing in adversary:
+            small = unit * (32 * 1024 // len(unit)) + trailing
+            large = unit * (64 * 1024 // len(unit)) + trailing
+            t_small, _ = _time_scan(small)
+            t_large, _ = _time_scan(large)
+            assert t_large < 3 * t_small + 0.25, (
+                f"{name}: doubling {len(small)} -> {len(large)} bytes took "
+                f"{t_small:.3f}s -> {t_large:.3f}s; that growth is quadratic, "
+                f"not linear"
+            )
+            label = (
+                f"{name} scales linearly 32 KB -> 64 KB: {t_small:.3f}s -> "
+                f"{t_large:.3f}s"
+            )
+            PASSES.append(label)
+            print(f"  PASS  {label}")
+
+        # Non-vacuity on these shapes too: a short-circuit at the pathology
+        # would fix the stall by silently no longer checking the tail.
+        for name, unit, trailing in adversary:
+            body = (
+                unit * (64 * 1024 // len(unit))
+                + trailing
+                + "\nSee [deep](../beta/references/detail.md).\n"
+            )
+            _, targets = _time_scan(body)
+            assert targets == ["../beta/references/detail.md"], (
+                f"a link after 64 KB of {name} must still be seen; the "
+                f"scanner returned {targets}"
+            )
+            label = f"a link after 64 KB of {name} is still seen"
+            PASSES.append(label)
+            print(f"  PASS  {label}")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+# Task-22 / A-05b: the old implementation, kept here as the ORACLE for the
+# label-bound family below. The scanner's contract is to yield exactly what the
+# pattern yielded, and a scanner that silently DROPS a link leaves that link
+# unchecked by the gate -- the failure mode is a bypass, not a cosmetic miss.
+_LABEL_BOUND_PATTERN = re.compile(r"\[[^\]]*?\]\(([^)\s]+)\)")
+
+# Shapes where the target scan must resume INSIDE a region it has already
+# walked while a later link's `[` still sits inside that region. Collapsing the
+# scanner's two cursors into one -- `pos = max(end, close + 1)`, the direction
+# A-05 §6 suggested -- passes every other assertion in this file and the whole
+# corpus validator (195 valid, 0 warnings) while returning [] for the first two
+# of these, dropping the FIRST link of the third and the SECOND link of the
+# fourth. That is why this family is pinned here: it is the only committed
+# guard on the label-bound invariant.
+_LABEL_BOUND_SHAPES = [
+    ("[a](xx[bb yyy](z)", ["z"]),
+    ("[a](x[bb yyy](z)", ["z"]),
+    ("[a](xx[bb yyy](z)[c](d)", ["z", "d"]),
+    ("[](x)[a](xx[bb yyy](z)", ["x", "z"]),
+]
+
+
+def test_no_cross_skill_scan_keeps_the_link_a_walked_region_hides():
+    """Task-22 / A-05b: resuming a target scan must not move the LABEL bound.
+
+    The scanner carries two cursors: `scanned_to` (the furthest offset any
+    target scan has walked) and `pos` (the lower bound of the LABEL search,
+    used by `rfind("[", pos, close)`). They cannot be collapsed. Advancing
+    `pos` past a walked region also hides every `[` inside it, so a later link
+    whose label starts there is silently never yielded -- the gate then passes
+    a body containing a link it never inspected.
+
+    Measured on the one-line variant `pos = max(end, close + 1)`: it satisfies
+    every other assertion in this file and `validate-skills.py` over the real
+    corpus (195 valid, 0 warnings), while returning [] for the counterexample
+    the correct scanner answers ['z']. The counterexample therefore lives here
+    as an assertion, not only in a docstring.
+
+    The scanner is reached by the same path the other scanner tests use --
+    `validator._iter_link_targets`, on the module object this file loads by
+    path at import (see `_time_scan` above) -- because the hyphenated
+    `validate-skills.py` is not importable by name.
+    """
+    # The counterexample, pinned literally: it is the reason the two cursors
+    # are separate, and it is not reachable from any other committed test.
+    counterexample = list(validator._iter_link_targets("[a](xx[bb yyy](z)"))
+    assert counterexample == ["z"], (
+        "the scanner must yield the link the old pattern yielded for "
+        f"'[a](xx[bb yyy](z)'; it returned {counterexample}. An empty result "
+        "means the LABEL bound was advanced past a `[` that a later link "
+        "needs, which silently stops the gate checking that link"
+    )
+    label = "'[a](xx[bb yyy](z)' still yields ['z'] (label bound not advanced)"
+    PASSES.append(label)
+    print(f"  PASS  {label}")
+
+    for body, expected in _LABEL_BOUND_SHAPES:
+        oracle = [m.group(1) for m in _LABEL_BOUND_PATTERN.finditer(body)]
+        assert oracle == expected, (
+            f"test bug: the old pattern yields {oracle} for {body!r}, not "
+            f"{expected}"
+        )
+        found = list(validator._iter_link_targets(body))
+        assert found == expected, (
+            f"{body!r}: the scanner yielded {found}, the old pattern "
+            f"{oracle}; a dropped link is never inspected by the gate"
+        )
+        label = f"{body!r} yields {expected} (scanner == old regex)"
+        PASSES.append(label)
+        print(f"  PASS  {label}")
+
+
+def test_no_cross_skill_absolute_and_unc_targets():
+    """Task-5 defect 3: only a genuine repo-root citation is out of scope.
+
+    Anything resolving outside `.claude/skills/` used to be skipped with the
+    comment "a repo-root citation", so an absolute, drive-letter or UNC target
+    that pointed into a sibling's internals on the authoring machine passed
+    silently. A citation now has to actually land under REPO_ROOT; the
+    accepting half (`../../../docs/x.md` inside the repo) is pinned too.
+    """
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-xskill-abs-"))
+    try:
+        skills = tmp / ".claude" / "skills"
+        a, b = skills / "alpha", skills / "beta"
+        (b / "references").mkdir(parents=True)
+        (b / "SKILL.md").write_text("---\nname: beta\n---\n", encoding="utf-8")
+        (b / "references" / "detail.md").write_text("detail\n", encoding="utf-8")
+        a.mkdir(parents=True)
+
+        def write(body: str) -> None:
+            (a / "SKILL.md").write_text(body, encoding="utf-8")
+
+        # Absolute spelling of a path that IS this sibling's internals: the
+        # in-library branch must still catch it.
+        rep = validator.Report()
+        write(f"See [x]({b / 'references' / 'detail.md'}) for detail.\n")
+        validator.check_no_cross_skill_file_dependencies(rep, skills)
+        expect_error(
+            rep,
+            "links into another skill's internals",
+            "an absolute path into a sibling's references/ is rejected",
+        )
+
+        for target in (
+            "/home/someone/beta/references/detail.md",
+            "C:/other-repo/.claude/skills/beta/references/detail.md",
+            r"C:\other-repo\beta\references\detail.md",
+            r"\\srv\share\beta\references\detail.md",
+            "//srv/share/beta/references/detail.md",
+            "/etc/passwd",
+        ):
+            rep = validator.Report()
+            write(f"See [x]({target}) for detail.\n")
+            validator.check_no_cross_skill_file_dependencies(rep, skills)
+            expect_error(
+                rep,
+                "links outside the repository",
+                f"anchored target outside the repo is rejected: {target}",
+            )
+
+        (tmp / "docs").mkdir()
+        (tmp / "docs" / "x.md").write_text("x\n", encoding="utf-8")
+        rep = validator.Report()
+        write("See [docs](../../../docs/x.md) for context.\n")
+        with repo_root_at(tmp):
+            validator.check_no_cross_skill_file_dependencies(rep, skills)
+        expect_clean(rep, "a relative repo-root citation stays accepted")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_no_cross_skill_drive_relative_targets_are_cwd_independent():
+    """Task-14 defect 2: a drive-relative target must not be judged by the CWD.
+
+    `Path("C:foo").resolve()` resolves against the PER-DRIVE current directory,
+    so `C:./docs/x.md` and `C:foo` were ACCEPTED when the process CWD was the
+    repository root and ERROR from anywhere else: the same commit could pass on
+    a Windows dev box and fail on ubuntu-latest, which is the spelling/host
+    dependence this check exists to remove. The verdict must be a function of
+    the target, so the same target is run from two CWDs here and must agree.
+
+    (`C:../x.md` already errored from both, and is pinned with them: the fix
+    must not make a drive-relative target RESOLVE, only stop resolving it
+    against the process directory. On POSIX these already errored, so this
+    test's discriminating power is on Windows -- the platform whose behaviour
+    it pins.)
+    """
+    tmp = Path(tempfile.mkdtemp(prefix="aegis-xskill-cwd-"))
+    elsewhere = Path(tempfile.mkdtemp(prefix="aegis-xskill-other-"))
+    home = Path.cwd()
+    try:
+        skills = tmp / ".claude" / "skills"
+        a, b = skills / "alpha", skills / "beta"
+        (b / "references").mkdir(parents=True)
+        (b / "SKILL.md").write_text("---\nname: beta\n---\n", encoding="utf-8")
+        (b / "references" / "detail.md").write_text("detail\n", encoding="utf-8")
+        a.mkdir(parents=True)
+
+        for target in ("C:foo", "C:./docs/x.md", "C:../x.md"):
+            verdicts = []
+            for cwd in (tmp, elsewhere):
+                (a / "SKILL.md").write_text(
+                    f"See [x]({target}) for detail.\n", encoding="utf-8"
+                )
+                rep = validator.Report()
+                os.chdir(cwd)
+                try:
+                    with repo_root_at(tmp):
+                        validator.check_no_cross_skill_file_dependencies(rep, skills)
+                finally:
+                    os.chdir(home)
+                verdicts.append("ERROR" if rep.errors else "ACCEPT")
+            assert verdicts == ["ERROR", "ERROR"], (
+                f"drive-relative target {target!r} is judged by the CWD: "
+                f"cwd=repo-root -> {verdicts[0]}, cwd=elsewhere -> {verdicts[1]}"
+            )
+            label = f"drive-relative {target!r} is an error from both CWDs"
+            PASSES.append(label)
+            print(f"  PASS  {label}")
+    finally:
+        os.chdir(home)
+        shutil.rmtree(tmp, ignore_errors=True)
+        shutil.rmtree(elsewhere, ignore_errors=True)
 
 
 def test_docs_paths_links():
@@ -1514,6 +1982,12 @@ TESTS = [
     test_template_security_checks,
     test_config_surface_paths,
     test_docs_paths_links,
+    test_no_cross_skill_file_dependencies,
+    test_no_cross_skill_percent_encoded_traversal,
+    test_no_cross_skill_scan_is_linear,
+    test_no_cross_skill_scan_keeps_the_link_a_walked_region_hides,
+    test_no_cross_skill_absolute_and_unc_targets,
+    test_no_cross_skill_drive_relative_targets_are_cwd_independent,
     test_no_nested_fixture_skill_or_agent_dirs,
     test_workflows_sha_pinned,
     test_claude_bridge,
