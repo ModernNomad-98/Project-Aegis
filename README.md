@@ -434,29 +434,44 @@ there, and move the verified result into place only once it passes. Nothing unve
 inside the consumer repository at any moment, including after a failed check. That is the
 staging-design route; prefer it whenever the stronger guarantee is worth the extra step.
 
-**One skill alone is rarely enough.** A skill can name and delegate to other skills, and
-those have to be present or the hand-off points at nothing. The biggest case is the beginner
-front door: `project-orchestrator` names **63** other skills across its stage map; it CITES
-and DELEGATES to them by name. It does not own that map, and its own text says so: the
-canonical stage list, per-stage gate, authority model and change-classification matrix are
-owned by [`ai-sdlc-operating-model`](.claude/skills/ai-sdlc-operating-model/SKILL.md) — whose
+**The demonstrated journey copies one selected skill.** Swap `tdd-engineer` for the skill you
+want, as the commands below do. What that skill needs at runtime is **its own `SKILL.md`**; its
+`evals/` files must be excluded (see above). This is a plain file copy: no installer, no hooks, no
+pre-approved tools, nothing that runs by itself.
+
+**A mention is not a dependency.** Skills name other skills in their routing text. That is a
+hand-off, not a required file: the named skill is not something the naming skill reads in order to
+run. The biggest case is the beginner front door — `project-orchestrator` names other skills across
+its stage map, and it CITES and DELEGATES to them by name. It does not own that map, and its own
+text says so: the canonical stage list, per-stage gate, authority model and
+change-classification matrix are owned by
+[`ai-sdlc-operating-model`](.claude/skills/ai-sdlc-operating-model/SKILL.md) — whose
 [`references/stage-gate-map.md`](.claude/skills/ai-sdlc-operating-model/references/stage-gate-map.md)
 holds the stage table — and by
 [`change-classification-gate`](.claude/skills/change-classification-gate/SKILL.md). The
 orchestrator's own words: *"this skill CITES and DELEGATES to them by name — copying any
 inline is failure."*
 
-So there are two sensible starting points:
+**Its stage groups are conditional on your project, not a fixed list.** The orchestrator's own rule
+([`.claude/skills/project-orchestrator/SKILL.md`](.claude/skills/project-orchestrator/SKILL.md),
+lines 293-298), quoted in full with no elision:
 
-- **Copy one skill** for that skill's procedure on its own — what the commands below do, and
-  the smaller change.
-- **Copy the front door's closure** for the guided beginner journey — `project-orchestrator`
-  plus the skills it names, **64 directories**. The list of skills it names is in its own
-  `SKILL.md`, not here: that list changes as the library grows, and a copy of it in this
-  README would drift. The orchestrator assumes those skills are present rather than checking:
-  its inventory input states that the owning skill for each stage "already exists; route to
-  it, do not invent a new procedure". The shipped-skill inventory is owned by
-  [`docs/skills-catalog.md`](docs/skills-catalog.md) along with this README's own roster.
+> *"**Invoke by evidence, not by default.** The stage-4 security skills, the SaaS
+> architecture-depth family, the AI/agentic-security packs, and the analytics skills are
+> CONDITIONAL — invoke a skill only when the project's actual features call for it (a file-upload
+> feature earns `file-upload-storage-architect`; an large language model (LLM) feature earns
+> `prompt-injection-defender`; a purely internal single-tenant tool earns none of the tenancy
+> skills)."*
+
+So there is no fixed number of skills you must copy to use this library. A count of the skills
+`project-orchestrator` *mentions* — 63, or 64 with the orchestrator itself — is a count of
+**mentions, not of required dependencies**: the groups above are conditional on the features your
+project actually has, and the list changes as the library grows. The orchestrator assumes the
+owning skill for a stage is present rather than checking for it — its inventory input says the
+owning skill for each stage "already exists; route to it, do not invent a new procedure" — which is
+why the skills it names are worth having when a stage applies, and not a bundle you must copy
+up front. The shipped-skill inventory is owned by
+[`docs/skills-catalog.md`](docs/skills-catalog.md) along with this README's own roster.
 
 On Windows (PowerShell) — **validated on PowerShell 5.1.26100.9444 and 7.6.6**:
 
