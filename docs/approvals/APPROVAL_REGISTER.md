@@ -4357,8 +4357,12 @@ the entry governs.
 - **New authority:** None. This entry grants nothing, and spends nothing beyond slot 2.
 - **Reason:** The second of the three merges named in AEGIS-APR-109 completed.
 - **Scope FORBIDDEN:** This consumption spends **slot 2 only**. The third slot —
-  `docs/no-cross-skill-delegation` — remains **covered by AEGIS-APR-109 and unspent**,
-  still requiring that entry's conditions (a) to (c) at the head being merged, and
+  `docs/no-cross-skill-delegation` — remains **named by AEGIS-APR-109 and unspent**. It becomes
+  **covered only once all three of that entry's conditions hold at the head being merged** — its
+  words: *"all three must hold for each branch, or that branch is not covered"*, and *"a head that
+  moves voids that branch's coverage."* It is not covered now: it has no pull request at all, so it
+  cannot yet carry an accepted exact-head review under condition (a). It is **spendable only
+  conditionally**, not presently effective, and
   **neither this entry nor that one spends or extends it**. **A second merge of
   `docs/consumer-copy-worked-example` is forbidden and is outside the grant**: the
   prohibition is on the branch, so a later pull request from it cannot satisfy conditions
@@ -4388,22 +4392,27 @@ the entry governs.
 
   **Slot 3 was measured unspent at this recording:** `docs/no-cross-skill-delegation` has
   **no pull request at all** (remote tip `536d0b0979ef2fece81dfbd8d43854780f0d04d5`). It is
-  neither consumed, covered nor altered by this entry.
+  neither consumed by this entry, and **it is not `covered` in `AEGIS-APR-109`'s sense** — it
+  stays **named and unspent** until conditions (a) to (c) all hold at a head being merged. This
+  entry alters nothing about it.
 
-- **Numbering — why this entry is 111 and not 110.** The register on this branch's base
-  carries `AEGIS-APR-001` to `109` with no gaps, so 110 is the next free number *here*.
-  But **110 is already claimed**: the slot-1 consumption entry is authored and **in
-  review**, not merged, as `AEGIS-APR-110` on branch
-  `docs/approvals/apr-109-consumed-slot-1` (`5643874361ce7912c290ec370bfb44d0fd0b0994`,
-  open as [PR #669](https://github.com/ModernNomad-98/Project-Aegis/pull/669),
-  `mergeCommit` and `mergedAt` both null at this recording). The register's rule is
-  **no duplicate identifier and monotonic append**, so slot 2 takes **111** and
-  cross-references the in-review `AEGIS-APR-110` rather than duplicating it. **Forward
-  consequence, stated so that it is not discovered later:** this branch's base does not
-  contain `AEGIS-APR-110`, so the file order after both land is `110` then `111` **only
-  if PR #669 merges first**; otherwise this branch must be rebased onto a `main` that
-  already contains `AEGIS-APR-110` before it merges, so that the numbering and the
-  append order agree.
+- **Numbering — why this entry is 111 and not 110, and how the order resolved.** *As first
+  authored*, the register on this branch's base carried `AEGIS-APR-001` to `109` with no gaps, so
+  110 was the next free number there — but **110 was already claimed**: the slot-1 consumption
+  entry was authored and **in review**, not merged, as `AEGIS-APR-110` on branch
+  `docs/approvals/apr-109-consumed-slot-1`
+  (`5643874361ce7912c290ec370bfb44d0fd0b0994`, then open as
+  [PR #669](https://github.com/ModernNomad-98/Project-Aegis/pull/669), `mergeCommit` and
+  `mergedAt` both null at that recording). The rule is **no duplicate identifier and monotonic
+  append**, so slot 2 took **111** rather than duplicating 110.
+
+  **That forward consequence has now resolved, as this entry anticipated it would.** PR #669
+  merged as `bdbd688ccf5368a0f0efbdc197b6181d713b16f9`, so `main` now carries `AEGIS-APR-110`;
+  this entry was **rebased onto that `main`** before its own review, and the register now reads
+  `…107, 109, 108, 110, 111` — numbering and append order agree, with entries `001` to `110`
+  byte-identical to `main`'s register and `111` appended after them. No gap remains at 110, and
+  no duplicate identifier was ever created. Recorded here rather than rewritten above, so that
+  the reason for the choice and its resolution are both legible.
 
 - **Disclosure carried forward — `MG3` clause 1 was NOT satisfied for slot 1, corrected
   forward rather than left standing.** The Stage G receipt on PR #667 recorded
