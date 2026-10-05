@@ -441,9 +441,20 @@ folders, not extras). **Even the demonstrated skill is not entirely self-contain
 requires the repo-root policy `docs/skill-generation-standard.md` for the Task-Authorized Local
 Implementation (TALI) route (`SKILL.md:54-57`), and a one-folder copy does not carry that file.
 Treat a citation like that as the library-meta note in this section treats its inputs: copy the
-named dependency, or accept it as a source-repo-bound reference the copy does not resolve. `evals/`
-is never runtime: the evals-exclusion rule in this section is what keeps it out. This is a plain
-file copy: no installer, no hooks, no pre-approved tools, nothing that runs by itself.
+named dependency, or accept it as a source-repo-bound reference the copy does not resolve.
+
+**`evals/` is excluded for ordinary product-skill execution — not universally.** For a normal
+skill, `evals/` is the library's answer key rather than something the skill reads in order to run,
+and the evals-exclusion rule in this section keeps it out. But a **library-meta** skill can name
+`evals/` as an *input*: `skill-quality-reviewer` reads the reviewed skill's `evals/evals.json` and
+`evals/trigger-evals.json` (`SKILL.md:46-48`, and Check 4 at `:90-95`), and the validator it runs
+first errors when `evals/evals.json` is absent (`scripts/validate-skills.py:542-544`). **A
+one-folder copy cannot both strip `evals/` and run that reviewer:** keep the eval files the skill
+names, or use a source checkout — or an equivalent maintainer corpus — instead of a one-folder
+copy.
+
+This is a plain file copy: no installer, no hooks, no pre-approved tools, nothing that runs by
+itself.
 
 **Not every skill is standalone — check before you swap.** Some skills are **library-meta**: their
 required inputs are the repository's own files, not only their own folder. `skill-quality-reviewer`
