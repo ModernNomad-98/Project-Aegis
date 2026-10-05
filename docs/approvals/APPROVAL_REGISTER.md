@@ -4335,3 +4335,103 @@ the entry governs.
   Neither is consumed by this entry, and **neither is `covered` in `AEGIS-APR-109`'s sense** —
   they stay **named and unspent** until conditions (a) to (c) all hold at a head being merged.
   This entry alters nothing about either branch.
+### AEGIS-APR-111: Consumption of AEGIS-APR-109, slot 2 of 3
+
+- **Event:** CONSUMED; target grant AEGIS-APR-109. It spends **one slot of the three**
+  that entry authorises — its second — and nothing else.
+- **Status at recording:** **AEGIS-APR-109 is two-thirds spent — two slots consumed,
+  one unspent.** The target's own `Status at recording` field reads **"ACTIVE and
+  `unspent` as recorded"**, which was true when it was written and is not true now;
+  **this entry is how the register records the later change of state, and it does not
+  rewrite the earlier field.** AEGIS-APR-109 must **not** be read as exhausted by this
+  entry, and must **not** be read as still wholly unspent.
+- **Effective at:** 2026-10-05 01:46:33 UTC.
+- **Recorded at / By:** 2026-10-04 / Project Aegis agent, under the delivery grant in
+  AEGIS-APR-039. This is an append-only lifecycle record and not an exercise of merge
+  authority: **AEGIS-APR-109 itself requires it** — its `Scope allowed` states that
+  *"after each merge, a `CONSUMED` follow-up entry is appended under a unique ID naming
+  the target grant (`AEGIS-APR-109`), the branch merged, the pull request, the exact head
+  merged, and the branches still unspent"* — while its `Scope FORBIDDEN` states that the
+  grant *"does not make `plan-scrutineer` an author or a reviewer"*. The obligation is the
+  target entry's; the recording is a separate, ordinary delivery act.
+- **New authority:** None. This entry grants nothing, and spends nothing beyond slot 2.
+- **Reason:** The second of the three merges named in AEGIS-APR-109 completed.
+- **Scope FORBIDDEN:** This consumption spends **slot 2 only**. The third slot —
+  `docs/no-cross-skill-delegation` — remains **named by AEGIS-APR-109 and unspent**. It becomes
+  **covered only once all three of that entry's conditions hold at the head being merged** — its
+  words: *"all three must hold for each branch, or that branch is not covered"*, and *"a head that
+  moves voids that branch's coverage."* It is not covered now: it has no pull request at all, so it
+  cannot yet carry an accepted exact-head review under condition (a). It is **spendable only
+  conditionally**, not presently effective, and
+  **neither this entry nor that one spends or extends it**. **A second merge of
+  `docs/consumer-copy-worked-example` is forbidden and is outside the grant**: the
+  prohibition is on the branch, so a later pull request from it cannot satisfy conditions
+  (a) to (c) again, and the count of merges AEGIS-APR-109 can authorise stays **three, one
+  per branch, and never four**. Nothing here revives any other entry, authorises a fourth
+  merge, or waives any check. **AEGIS-APR-109 must not be read as exhausted by this
+  entry: one slot remains.**
+- **Evidence:** [PR #668](https://github.com/ModernNomad-98/Project-Aegis/pull/668) merged
+  at the time above, as a **squash**, with the merge pinned to the exact reviewed head.
+  Measured live for this entry: the pull request reports `state: MERGED`,
+  `headRefOid c0e45d6dffd01c295a600db139ddca8a00cc2392`,
+  `mergedAt 2026-10-05T01:46:33Z`, and merge commit
+  `4a916cea2bee3fb845c64f3e19b9089c493da613`.
+
+  **The reviewed head is not the commit now on `main`, and there is no continuity
+  between the two SHAs.** AEGIS-APR-109 names no head by design, so the binding was
+  established at merge time by condition (a), the independent review **naming the exact
+  head being merged**, which named `c0e45d6dffd01c295a600db139ddca8a00cc2392`. The squash
+  landed a **different object**, `4a916cea2bee3fb845c64f3e19b9089c493da613`. Measured: the
+  two SHAs are distinct commits and **`c0e45d6d…` is not an ancestor of `4a916cea…`**
+  (`git merge-base --is-ancestor` exits non-zero), and the merge commit has **one parent**,
+  `a3353a583d57430dbb6aec10e344f6b710bc397b`, which is what makes it a squash.
+  **`4a916cea…` must not be read as "the reviewed head."** The binding was satisfied by
+  the merge **act** at the named head, not by the identity of the resulting commit — the
+  same distinction `AEGIS-APR-107` records for `AEGIS-APR-106` and `AEGIS-APR-110` for
+  slot 1.
+
+  **Slot 3 was measured unspent at this recording:** `docs/no-cross-skill-delegation` has
+  **no pull request at all** (remote tip `536d0b0979ef2fece81dfbd8d43854780f0d04d5`). It is
+  neither consumed by this entry, and **it is not `covered` in `AEGIS-APR-109`'s sense** — it
+  stays **named and unspent** until conditions (a) to (c) all hold at a head being merged. This
+  entry alters nothing about it.
+
+- **Numbering — why this entry is 111 and not 110, and how the order resolved.** *As first
+  authored*, the register on this branch's base carried `AEGIS-APR-001` to `109` with no gaps, so
+  110 was the next free number there — but **110 was already claimed**: the slot-1 consumption
+  entry was authored and **in review**, not merged, as `AEGIS-APR-110` on branch
+  `docs/approvals/apr-109-consumed-slot-1`
+  (`5643874361ce7912c290ec370bfb44d0fd0b0994`, then open as
+  [PR #669](https://github.com/ModernNomad-98/Project-Aegis/pull/669), `mergeCommit` and
+  `mergedAt` both null at that recording). The rule is **no duplicate identifier and monotonic
+  append**, so slot 2 took **111** rather than duplicating 110.
+
+  **That forward consequence has now resolved, as this entry anticipated it would.** PR #669
+  merged as `bdbd688ccf5368a0f0efbdc197b6181d713b16f9`, so `main` now carries `AEGIS-APR-110`;
+  this entry was **rebased onto that `main`** before its own review, and the register now reads
+  `…107, 109, 108, 110, 111` — numbering and append order agree, with entries `001` to `110`
+  byte-identical to `main`'s register and `111` appended after them. No gap remains at 110, and
+  no duplicate identifier was ever created. Recorded here rather than rewritten above, so that
+  the reason for the choice and its resolution are both legible.
+
+- **Disclosure carried forward — `MG3` clause 1 was NOT satisfied for slot 1, corrected
+  forward rather than left standing.** The Stage G receipt on PR #667 recorded
+  `MG3: present`; the merge agent retracted its first clause in
+  [PR #667 comment 5986328745](https://github.com/ModernNomad-98/Project-Aegis/pull/667#issuecomment-5986328745).
+  The claims are re-verified for this entry rather than repeated on trust:
+  - **Clause 1 — NOT satisfied** at slot 1's merged head
+    `d6dc95808dda29c8e33fed0400473bc9971c458f`. The only automated review object on that
+    pull request carries `commit_id 5e3201dfee152590fa7864cc188eeaacf5f3d4b8`, a
+    **superseded** head, and `docs/delivery-workflow.md:311` reads *"…at a superseded head
+    does not satisfy `MG3`."*
+  - **Clause 2 — satisfied**: the three P2 findings raised against the superseded head
+    were fixed, and the verification reproduced each against the final text.
+  - **It is a procedural gap in the record, not a content defect.** Measured: the merged
+    content **is** the reviewed content — `README.md` blob
+    `52002bc643ed2e6d218a06adccae29c55aebe4b5` is identical at the reviewed head
+    `d6dc9580…` and on `main` `a3353a58…`.
+  - **Remedy outstanding.** This entry records the gap, which is one of the two remedies
+    the merge agent named. The other — a fresh automated result for the merged state —
+    is **not** obtained here and is **not** claimed. The in-review `AEGIS-APR-110` does
+    not carry this disclosure; it is recorded here because slot 1's own entry was already
+    in review when the correction was issued.
