@@ -53,6 +53,55 @@ env:
   AEGIS_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
+  changes:
+    # Path scoping for the advisory tools/offline jobs (owner-approved CI
+    # right-sizing, 2026-10-05). Computes whether the change touches `tools/`
+    # or the pip lock files, so the advisory jobs below skip on skills/docs-only
+    # pull requests while `validate-skills` and `gate-guard` stay unconditional.
+    # On a push to main the flags are forced true, so the detection lane always
+    # runs the full suite.
+    #
+    # Flake signature (documented): all jobs cancelled at the same instant at
+    # durations matching none of their own timeouts = infra flake -> re-run.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      tools: ${{ steps.filter.outputs.tools }}
+      offline: ${{ steps.filter.outputs.offline }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          # Full history so the three-dot diff against the PR base is available.
+          fetch-depth: 0
+
+      - name: Compute changed paths
+        id: filter
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "${{ github.event_name }}" = 'push' ]; then
+            printf 'tools=true\noffline=true\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git fetch origin "$BASE_REF" --quiet
+          # Newline-delimited here (gate-guard uses -z to defend a prefix check
+          # against display-quoting bypass; this is a boolean skip filter on an
+          # advisory lane, and no tracked path in this repo contains a newline).
+          git diff --no-renames --name-only "origin/${BASE_REF}...HEAD" > "$RUNNER_TEMP/aegis-changed-paths"
+          if grep -Eq '^tools/' "$RUNNER_TEMP/aegis-changed-paths"; then
+            echo 'tools=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'tools=false' >> "$GITHUB_OUTPUT"
+          fi
+          if grep -Eq '(^tools/|^requirements-ci\.(in|txt)$)' "$RUNNER_TEMP/aegis-changed-paths"; then
+            echo 'offline=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'offline=false' >> "$GITHUB_OUTPUT"
+          fi
+
   validate-skills:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -222,6 +271,8 @@ jobs:
   windows-offline-checks:
     # Additional coverage; not registered in branch protection. Closeout still
     # requires this job to pass. Do not hide failures with continue-on-error.
+    needs: [changes]
+    if: github.event_name == 'push' || needs.changes.outputs.offline == 'true'
     runs-on: windows-latest
     timeout-minutes: 20
     defaults:
@@ -308,6 +359,8 @@ jobs:
   # token, no secrets, and no credentials persisted in the checkout. Whether
   # these jobs become required status checks is a branch-protection decision.
   tools-tests-linux:
+    needs: [changes]
+    if: github.event_name == 'push' || needs.changes.outputs.tools == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -356,6 +409,8 @@ jobs:
           if-no-files-found: warn
 
   tools-tests-windows:
+    needs: [changes]
+    if: github.event_name == 'push' || needs.changes.outputs.tools == 'true'
     runs-on: windows-latest
     timeout-minutes: 20
     permissions:
