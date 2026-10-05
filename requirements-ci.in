@@ -11,7 +11,7 @@
 # openai hashes must equal AUTHORIZED_SDK_WHEEL_SHA256 and
 # AUTHORIZED_SDK_SDIST_SHA256 (checked by scripts/tests/test_offline_ci.py).
 # Tests use fake transports and synthetic credentials, never a real provider call.
-openai==3.0.0
+openai==3.23.0
 # tqdm needs colorama on Windows only. Pin it on every platform so a lock
 # compiled on Linux (for example by Dependabot) still installs on windows-latest.
 colorama
