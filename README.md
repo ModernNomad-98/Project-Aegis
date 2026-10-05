@@ -434,12 +434,22 @@ there, and move the verified result into place only once it passes. Nothing unve
 inside the consumer repository at any moment, including after a failed check. That is the
 staging-design route; prefer it whenever the stronger guarantee is worth the extra step.
 
-**The demonstrated journey copies one selected skill.** Swap `tdd-engineer` for the skill you
-want, as the copy steps in this section do. **For that demonstrated `tdd-engineer` journey the
-only runtime file is its own `SKILL.md`.** A skill that carries `references/`, `assets/` or
-`scripts/` needs those too — they are runtime folders, not extras. `evals/` is never runtime: the
-evals-exclusion rule in this section is what keeps it out. This is a plain file copy: no installer,
-no hooks, no pre-approved tools, nothing that runs by itself.
+**The demonstrated journey copies one selected skill — a *standalone* one.** Swap `tdd-engineer`
+for the skill you want, as the copy steps in this section do. **For that demonstrated
+`tdd-engineer` journey the only runtime file is its own `SKILL.md`.** A skill that carries
+`references/`, `assets/` or `scripts/` needs those too — they are runtime folders, not extras.
+`evals/` is never runtime: the evals-exclusion rule in this section is what keeps it out. This is
+a plain file copy: no installer, no hooks, no pre-approved tools, nothing that runs by itself.
+
+**Not every skill is standalone — check before you swap.** Some skills are **library-meta**: their
+required inputs are the repository's own files, not only their own folder. `skill-quality-reviewer`
+is the clear case — it runs `scripts/validate-skills.py` and sweeps the shipped-skill corpus, and
+its own `SKILL.md` names `docs/skill-generation-standard.md` and `docs/skills-catalog.md` as inputs.
+A copy of its directory alone cannot run that validator or that sweep. **If the skill you want names
+repo-root inputs (`docs/`, `scripts/`) the same way, the allow-list copy is not a complete
+installation:** copy every repo-root dependency it names, plus whatever corpus it reads, or accept
+that it is not intended for standalone consumer use. Its `SKILL.md` lists what it reads — check
+there before copying.
 
 **A mention is not a dependency.** Skills name other skills in their routing text. Where that is a
 prose hand-off, it is not a required file: the named skill is not something the naming skill reads
