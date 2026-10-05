@@ -4270,9 +4270,14 @@ the entry governs.
   slot 1.
 - **Reason:** The first of the three merges named in AEGIS-APR-109 completed.
 - **Scope FORBIDDEN:** This consumption spends **slot 1 only**. The second and
-  third slots — `docs/consumer-copy-worked-example` and `docs/no-cross-skill-delegation` — remain **covered by
-  AEGIS-APR-109 and unspent**, each still requiring that entry's conditions (a) to (c)
-  at the head being merged, and **neither this entry nor that one spends or
+  third slots — `docs/consumer-copy-worked-example` and `docs/no-cross-skill-delegation` — remain
+  **named by AEGIS-APR-109 and unspent**. Each becomes **covered only once all three of that
+  entry's conditions hold at the head being merged** — its words: *"all three must hold for
+  each branch, or that branch is not covered"*, and *"a head that moves voids that branch's
+  coverage."* Neither is covered now: `docs/no-cross-skill-delegation` has no pull request at
+  all, so it cannot yet carry an accepted exact-head review under condition (a). They are
+  **spendable only conditionally**, not presently effective, and **neither this entry nor that
+  one spends or
   extends them**. **A second merge of `fix/consumer-copy-and-containment` is forbidden and is outside the
   grant**: the prohibition is on the branch, so a later pull request from it
   cannot satisfy conditions (a) to (c) again, and the count of merges
@@ -4284,6 +4289,29 @@ the entry governs.
   reviewed head. Measured live for this entry: the pull request reports
   `state: MERGED`, `headRefOid d6dc95808dda29c8e33fed0400473bc9971c458f`, `mergedAt 2026-10-05T00:42:09Z`, and merge
   commit `a3353a583d57430dbb6aec10e344f6b710bc397b`.
+
+  **Merge receipt, and the identity `AEGIS-APR-109` requires of it.** The MG-keyed receipt for
+  this branch is [PR #667 comment 5986183006](https://github.com/ModernNomad-98/Project-Aegis/pull/667#issuecomment-5986183006)
+  — *"Stage G merge receipt — `SD-G`: MERGED"*, which records `MG1` to `MG5`. That receipt did
+  not carry the identity fields `AEGIS-APR-109` requires of it — its words: the receipt *"must
+  carry enough identity to be checkable later — the agent instance, the session that designated
+  it, and the exact head merged — or the grant's holder stays unresolvable."* Those fields are
+  supplied by the addendum
+  [PR #667 comment 5987805634](https://github.com/ModernNomad-98/Project-Aegis/pull/667#issuecomment-5987805634):
+  - **Agent instance:** `plan-scrutineer`, the designated merge agent.
+  - **Designating session:** the Project Aegis coordinating session of 2026-10-04, in which the
+    owner designated `plan-scrutineer` and selected the three-branch grant (recorded in
+    `AEGIS-APR-109` `Scope allowed`). **No session identifier is resolvable from this
+    repository** — `AEGIS-APR-109` states the name has no repository definition — so this is the
+    most specific session reference the record can carry.
+  - **Exact head merged:** `d6dc95808dda29c8e33fed0400473bc9971c458f`, squash merge commit
+    `a3353a583d57430dbb6aec10e344f6b710bc397b`.
+
+  The omission is corrected forward rather than edited into the receipt, which is why the pointer
+  is to the addendum as well as to the receipt. **A later correction to the same receipt retracted
+  its `MG3` first clause** — [comment 5986328745](https://github.com/ModernNomad-98/Project-Aegis/pull/667#issuecomment-5986328745),
+  *"MG3: present" was wrong on its first clause* — and that correction is recorded in full, with
+  its claims re-verified, in the slot-2 consumption entry rather than here.
 
   **The reviewed head is not the commit now on `main`, and there is no continuity
   between the two SHAs.** AEGIS-APR-109 names no head by design — its own text says
@@ -4304,4 +4332,6 @@ the entry governs.
   ([#668](https://github.com/ModernNomad-98/Project-Aegis/pull/668), head
   `2bede4b557fd2f5826994324fb5d8a5368a09fda`), and `docs/no-cross-skill-delegation` has **no pull
   request at all** (remote tip `536d0b0979ef2fece81dfbd8d43854780f0d04d5`).
-  Neither is consumed, covered or altered by this entry.
+  Neither is consumed by this entry, and **neither is `covered` in `AEGIS-APR-109`'s sense** —
+  they stay **named and unspent** until conditions (a) to (c) all hold at a head being merged.
+  This entry alters nothing about either branch.
