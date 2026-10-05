@@ -191,3 +191,55 @@ class CapabilityProofTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# ---------------------------------------------------------------------------
+# ZT-P1 — positive conformance fixtures (ZT-01 §4.9(2), §E.6)
+#
+# A rejection-only suite cannot distinguish "the gate rejects everything" from
+# "the gate works".  These positive fixtures prove the role/stage gate accepts
+# a well-formed, current-version transition and envelope.
+# ---------------------------------------------------------------------------
+
+
+class RoleStageContractConformanceTests(unittest.TestCase):
+    def test_well_formed_current_version_role_is_accepted(self) -> None:
+        from tools.aegis_delivery_control.authority import (
+            validate_role_stage_contract,
+        )
+        from tools.aegis_delivery_control.contracts import (
+            EffectiveRole,
+            ZT_P1_CONTRACT_VERSION,
+        )
+
+        # A current-version, contract-listed role must be accepted (no raise).
+        validate_role_stage_contract(
+            effective_role=EffectiveRole.SUPERVISOR,
+            contract_version=ZT_P1_CONTRACT_VERSION,
+        )
+
+    def test_well_formed_current_version_envelope_is_accepted(self) -> None:
+        from tools.aegis_delivery_control.contracts import ZT_P1_CONTRACT_VERSION
+        from tools.aegis_delivery_control.evidence import (
+            build_versioned_evidence_envelope,
+            verify_versioned_evidence_envelope,
+        )
+
+        envelope = build_versioned_evidence_envelope(
+            contract_version=ZT_P1_CONTRACT_VERSION,
+            repository="repo-1",
+            task="task-1",
+            plan_revision="plan-1",
+            head="0" * 40,
+            base="0" * 40,
+            tested_merge_tree="0" * 40,
+            policy_version="1",
+            environment="synthetic",
+            coverage_declaration="full",
+            stage_identity="implement",
+            predecessor_verdict="ACCEPT",
+            verdict="RUN",
+            artifact_digests=("a" * 64,),
+        )
+        record = verify_versioned_evidence_envelope(canonical_bytes(envelope))
+        self.assertEqual(record["contract_version"], ZT_P1_CONTRACT_VERSION)

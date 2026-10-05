@@ -1016,3 +1016,40 @@ def probe_owned_path_identity(
         return capability.identity
     finally:
         capability.close()
+
+
+# ---------------------------------------------------------------------------
+# ZT-P1 — one-lease-per-workflow and generation fencing (evaluated predicates)
+# ---------------------------------------------------------------------------
+# Pure predicates over the contract/evidence types (ZT-01 §2.3).  They change
+# nothing about how files, handles or ACLs are actually checked today.
+
+
+def lease_is_exclusive(
+    *,
+    workflow_id: str,
+    existing_lease_holder: str | None,
+    candidate_holder: str,
+    authoritative_store_available: bool,
+) -> bool:
+    """One active coordinator lease per workflow (ZT-01 §2.3).
+
+    A second lease/frontend for the same workflow is rejected (returns False).
+    If the authoritative ownership store is unavailable, no local replacement
+    lease is permitted (returns False).
+    """
+    if not workflow_id or not candidate_holder:
+        raise StorageIntegrityError("workflow lease requires a workflow and holder")
+    if not authoritative_store_available:
+        return False
+    if existing_lease_holder is None:
+        return True
+    return existing_lease_holder == candidate_holder
+
+
+def generation_is_current(
+    *, prior_generation: int, candidate_generation: int,
+) -> bool:
+    """Generation fencing: a late result from an older generation cannot
+    overwrite newer work (ZT-01 §2.3)."""
+    return candidate_generation >= prior_generation

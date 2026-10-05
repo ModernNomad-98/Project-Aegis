@@ -183,3 +183,34 @@ contains the accepted transition, crash and recovery evidence. The
 explains the delivered synthetic proof boundary. The
 [backlog](../../docs/roadmaps/resumable-control-plane-backlog.md) is the
 current status source for any real integration claim.
+
+## Role/stage transition contract (ZT-P1)
+
+Work package ZT-P1 adds an **offline synthetic role/stage transition
+contract** to this kernel. The contract is `RoleStageContract` in
+`contracts.py`, with a single version constant `ZT_P1_CONTRACT_VERSION`
+(currently `1`) that appears in every emitted evidence envelope. It declares
+the effective roles, the permitted role-to-stage transitions, the required
+evidence per transition, and the stop/terminal semantics that a later
+supervisor validates against.
+
+The corresponding evaluated predicates are:
+
+- `authority.validate_role_stage_contract` and
+  `authority.validate_role_stage_transition` — block a presented effective
+  role, contract version, or role-to-stage transition that does not match the
+  contract (the mismatch-blocks rule), including a transition that would widen
+  the real-dispatch refusal.
+- `authority.validate_grant_lifecycle` — blocks an expired, revoked or
+  consumed grant, and a replayed approval.
+- `evidence.build_versioned_evidence_envelope` and
+  `evidence.verify_versioned_evidence_envelope` — the versioned envelope of the
+  design's §4.8(1); malformed and duplicate envelopes are rejected.
+- `owned_paths.lease_is_exclusive` and `owned_paths.generation_is_current` —
+  the one-lease-per-workflow and generation-fencing predicates.
+
+**Honesty requirement:** this contract and its predicates are **offline and
+synthetic and grant nothing**. A passing synthetic probe is not real
+authority, and no real route is authorized. `require_real_dispatch` still
+always denies a real dispatch, and the new checks may only narrow, never
+widen, that refusal.

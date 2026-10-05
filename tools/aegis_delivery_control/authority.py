@@ -3726,3 +3726,82 @@ def reject_real_authority(authority_kind: str) -> None:
     raise DispatchDenied(
         f"authority kind {authority_kind!r} is unavailable in the synthetic kernel"
     )
+
+
+# ---------------------------------------------------------------------------
+# ZT-P1 — contract-version + effective-role + transition validation
+# ---------------------------------------------------------------------------
+# Evaluated predicates that may only narrow, never widen: they add no grant,
+# no dispatch path and no authority source.  They block on mismatch.
+
+_WIDENING_STAGES = frozenset({"real_dispatch", "deploy", "production_write"})
+
+
+def validate_role_stage_contract(
+    *, effective_role: "EffectiveRole", contract_version: int,
+) -> None:
+    """Block a presented effective role / contract version that mismatches the
+    versioned role/stage contract (ZT-01 §1.2 mismatch-blocks rule)."""
+    from .contracts import (
+        EffectiveRole,
+        ZT_P1_CONTRACT_VERSION,
+        ZT_P1_ROLE_STAGE_CONTRACT,
+    )
+
+    if contract_version != ZT_P1_CONTRACT_VERSION:
+        raise DispatchDenied(
+            "contract version mismatch: "
+            f"{contract_version!r} != {ZT_P1_CONTRACT_VERSION!r}"
+        )
+    if not isinstance(effective_role, EffectiveRole):
+        raise DispatchDenied("effective role is not a known role")
+    if not ZT_P1_ROLE_STAGE_CONTRACT.has_role(effective_role):
+        raise DispatchDenied(
+            f"effective role {effective_role.value!r} is absent from the contract"
+        )
+
+
+def validate_role_stage_transition(
+    *, effective_role: "EffectiveRole", contract_version: int,
+    to_stage: str, evidence: "object | None",
+) -> None:
+    """Block a role -> stage transition that the contract does not permit, that
+    is missing evidence, or that would widen the real-dispatch refusal."""
+    from .contracts import ZT_P1_ROLE_STAGE_CONTRACT
+
+    validate_role_stage_contract(
+        effective_role=effective_role, contract_version=contract_version,
+    )
+    if to_stage in _WIDENING_STAGES:
+        raise DispatchDenied(
+            "transition would widen the require_real_dispatch refusal"
+        )
+    if to_stage not in ZT_P1_ROLE_STAGE_CONTRACT.stages_for(effective_role):
+        raise DispatchDenied("foreign-stage evidence is not permitted for this role")
+    if evidence is None:
+        raise DispatchDenied("missing evidence: UNRUN, never PASS")
+
+
+def validate_grant_lifecycle(
+    grant: "GrantLifecycle", *, now: int,
+    seen_approvals: "set[str] | None" = None,
+) -> None:
+    """Block an expired, revoked or consumed grant, and a replayed approval."""
+    from .contracts import GrantLifecycle, GrantStatus
+
+    if not isinstance(grant, GrantLifecycle):
+        raise DispatchDenied("grant is not a known grant lifecycle")
+    if grant.status is GrantStatus.EXPIRED:
+        raise DispatchDenied("grant is expired")
+    if grant.status is GrantStatus.REVOKED:
+        raise DispatchDenied("grant is revoked")
+    if grant.status is GrantStatus.CONSUMED:
+        raise DispatchDenied(
+            "consumed one-use grant; a spent grant cannot authorize a second effect"
+        )
+    if grant.expires_at is not None and now >= grant.expires_at:
+        raise DispatchDenied("grant is expired")
+    if seen_approvals is not None:
+        if grant.grant_id in seen_approvals:
+            raise DispatchDenied("replayed approval is rejected")
+        seen_approvals.add(grant.grant_id)

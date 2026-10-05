@@ -3296,3 +3296,104 @@ class DispatchDenied(RuntimeError):
 
 
 RunHeads = Sequence[tuple[str, str]]
+
+
+# ---------------------------------------------------------------------------
+# ZT-P1 — versioned role/stage transition contract (offline, synthetic)
+# ---------------------------------------------------------------------------
+# The "one versioned contract" spine of ZT-01 §1.2: role card -> allowed
+# transitions -> required evidence per transition -> stop/expiry semantics.
+# Everything here is an offline synthetic type: it grants nothing and encodes
+# no policy a host adapter could not already express.
+
+ZT_P1_CONTRACT_VERSION = 1
+
+
+class EffectiveRole(str, Enum):
+    COORDINATOR = "coordinator"
+    SUPERVISOR = "supervisor"
+    STAGE_WORKER = "stage_worker"
+
+
+class GrantStatus(str, Enum):
+    ACTIVE = "ACTIVE"
+    EXPIRED = "EXPIRED"
+    REVOKED = "REVOKED"
+    CONSUMED = "CONSUMED"
+
+
+class EvidenceStatus(str, Enum):
+    RUN = "RUN"
+    UNRUN = "UNRUN"
+    PASS = "PASS"
+
+
+@dataclass(frozen=True)
+class RoleStageTransition:
+    from_role: EffectiveRole
+    to_stage: str
+    required_evidence: tuple[str, ...]
+    terminal: bool = False
+
+
+@dataclass(frozen=True)
+class RoleStageContract:
+    contract_version: int
+    transitions: tuple[RoleStageTransition, ...]
+
+    def has_role(self, role: EffectiveRole) -> bool:
+        return any(t.from_role is role for t in self.transitions)
+
+    def stages_for(self, role: EffectiveRole) -> tuple[str, ...]:
+        return tuple(t.to_stage for t in self.transitions if t.from_role is role)
+
+    def is_terminal(self, stage: str) -> bool:
+        return any(t.to_stage == stage and t.terminal for t in self.transitions)
+
+
+@dataclass(frozen=True)
+class GrantLifecycle:
+    grant_id: str
+    status: GrantStatus = GrantStatus.ACTIVE
+    expires_at: int | None = None
+
+
+ZT_P1_ROLE_STAGE_CONTRACT = RoleStageContract(
+    contract_version=ZT_P1_CONTRACT_VERSION,
+    transitions=(
+        RoleStageTransition(
+            EffectiveRole.COORDINATOR, "dispatch",
+            ("repository", "task", "plan_revision", "predecessor_verdict"),
+        ),
+        RoleStageTransition(
+            EffectiveRole.COORDINATOR, "handoff",
+            ("verdict", "artifact_digests"),
+            terminal=True,
+        ),
+        RoleStageTransition(
+            EffectiveRole.STAGE_WORKER, "plan",
+            ("repository", "task", "plan_revision"),
+        ),
+        RoleStageTransition(
+            EffectiveRole.STAGE_WORKER, "implement",
+            ("head", "base", "predecessor_verdict"),
+        ),
+        RoleStageTransition(
+            EffectiveRole.STAGE_WORKER, "review",
+            ("verdict", "artifact_digests"),
+        ),
+        RoleStageTransition(
+            EffectiveRole.SUPERVISOR, "validate",
+            ("verdict", "artifact_digests"),
+        ),
+        RoleStageTransition(
+            EffectiveRole.SUPERVISOR, "schedule",
+            ("predecessor_verdict",),
+        ),
+        RoleStageTransition(
+            EffectiveRole.SUPERVISOR, "merge",
+            ("predecessor_verdict", "verdict", "artifact_digests"),
+            terminal=True,
+        ),
+    ),
+)
