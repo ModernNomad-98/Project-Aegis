@@ -406,11 +406,33 @@ repository. The narrow, demonstrated point here is that copying a skill folder a
 that skill's own answer keys into your workspace, where an agent working there can read them — so
 exclude them.
 
+**The rule covers every route that copies a skill folder, not only the commands further down.** Two
+other routes documented on this page carry the same `evals/` files. Zipping a whole skill folder for
+upload to the Claude apps (**Option 6**, above) puts them inside the uploaded zip; and native mode's
+recursive copy of the entire `.claude/skills` tree into `.agents/skills` (below) puts them in the
+agent-visible project tree. Build an upload zip from an allow-list copy rather than from the skill
+folder as it stands, and point native mode at a sanitized result rather than at the raw tree.
+Leaving either route as an unexcluded exception is a deliberate choice this page does not recommend.
+
 **Assemble the copy from an allow-list — never copy the folder and then delete from it.** Copy the
 skill's `SKILL.md` and its runtime folders (`references/`, `assets/`, `scripts/` — whichever it
 has), and copy nothing else. Nothing is deleted at any point, and no recursive copy of the whole
-skill folder is taken, so the skill's `evals/` answer keys never enter your repo — not even
-transiently.
+skill folder is taken, so the skill's own top-level `evals/` folder is never copied.
+
+**What these commands guarantee, stated exactly — the verifier runs after the write.** The check
+below detects eval material *after* the allow-list has been assembled and **fails closed**
+(`exit 30`). It does **not** roll back. So if the **source** is contaminated somewhere the allow-list
+still reaches — a stray `references/evals/evals.json`, say — that file **is copied first and then
+reported**: the destination is left in place, and **you must remove it yourself before retrying**.
+The commands therefore do **not** provide a "never enters your repo, not even transiently"
+guarantee for that case. What they do guarantee by construction is narrower and true: the skill's
+own top-level `evals/` folder is never in the allow-list, so the ordinary case never copies a key.
+
+**The stronger route — stage outside the consumer repository.** Assemble the candidate in a scratch
+directory that is *not* the consumer repo, run the same allow-list copy and the same verification
+there, and move the verified result into place only once it passes. Nothing unverified then exists
+inside the consumer repository at any moment, including after a failed check. That is the
+staging-design route; prefer it whenever the stronger guarantee is worth the extra step.
 
 On Windows (PowerShell) — **validated on PowerShell 5.1.26100.9444 and 7.6.6**:
 
@@ -453,7 +475,8 @@ if ($bad.Count) {
 ```
 
 macOS/Linux — **NOT validated on macOS or Linux.** The block below was exercised only under Git's
-`sh` on Windows; treat it as unverified on macOS/Linux and check the result yourself:
+`sh` on Windows; treat it as unverified on macOS/Linux and check the result yourself. The
+manifest step in particular has not been run on either platform:
 
 ```sh
 set -eu
@@ -461,14 +484,30 @@ src=".claude/skills/tdd-engineer"            # swap for the skill you want
 root="/path/to/your-repo/.claude/skills"
 dst="$root/$(basename "$src")"
 [ -e "$dst" ] && { echo "refusing to install over an existing path: $dst" >&2; exit 20; }
-list() { ( cd "$src" && find . -type f \( -name SKILL.md -o -path './references/*' \
-          -o -path './assets/*' -o -path './scripts/*' \) -print ); }
-list | while IFS= read -r rel; do mkdir -p "$dst/$(dirname "$rel")"; cp -p "$src/$rel" "$dst/$rel"; done
-[ "$(cd "$dst" && find . -type f | wc -l)" -eq "$(list | wc -l)" ] \
-  || { echo "verify failed: file count" >&2; exit 30; }
+
+# Build the allow-list into a manifest FIRST, and check that this step succeeded.
+# A pipeline reports only its last command's status, so an unreadable source
+# subtree could yield a partial list and still look successful -- the manifest
+# cannot. `pipefail` is not POSIX `sh`, so the status is checked directly instead.
+manifest=$(mktemp) || { echo "verify failed: cannot create a manifest" >&2; exit 30; }
+trap 'rm -f "$manifest"' EXIT
+( cd "$src" && find . -type f \( -name SKILL.md -o -path './references/*' \
+  -o -path './assets/*' -o -path './scripts/*' \) -print ) > "$manifest" \
+  || { echo "verify failed: incomplete allow-list (unreadable source subtree?)" >&2; exit 30; }
+count=$(wc -l < "$manifest")
+
+while IFS= read -r rel; do
+  mkdir -p "$dst/$(dirname "$rel")"
+  cp -p "$src/$rel" "$dst/$rel"
+done < "$manifest"
+
+# Verify from the SAME manifest: every allowed file present, then no eval material.
+missing=0
+while IFS= read -r rel; do [ -f "$dst/$rel" ] || missing=$((missing + 1)); done < "$manifest"
+[ "$missing" -eq 0 ] || { echo "verify failed: $missing allowed file(s) missing" >&2; exit 30; }
 bad=$( cd "$dst" && find . \( -name evals -o -name evals.json -o -name trigger-evals.json \) -print -quit )
 [ -z "$bad" ] || { echo "verify failed: eval material present: $bad" >&2; exit 30; }
-echo "OK: $dst assembled by allow-list; no eval material"
+echo "OK: $dst assembled by allow-list; $count file(s); no eval material"
 ```
 
 **Prove the check can fail before you trust it.** The verify step is the only thing standing
