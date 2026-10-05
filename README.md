@@ -434,6 +434,77 @@ there, and move the verified result into place only once it passes. Nothing unve
 inside the consumer repository at any moment, including after a failed check. That is the
 staging-design route; prefer it whenever the stronger guarantee is worth the extra step.
 
+**The demonstrated journey copies one selected skill — a *standalone* one.** Swap `tdd-engineer`
+for the skill you want, as the copy steps in this section do. **The allow-list copies that skill's
+`SKILL.md`, plus the runtime folders it has** (`references/`, `assets/`, `scripts/` — runtime
+folders, not extras). **Even the demonstrated skill is not entirely self-contained:** its own text
+requires the repo-root policy `docs/skill-generation-standard.md` for the Task-Authorized Local
+Implementation (TALI) route (`SKILL.md:54-57`), and a one-folder copy does not carry that file.
+Treat a citation like that as the library-meta note in this section treats its inputs: copy the
+named dependency, or accept it as a source-repo-bound reference the copy does not resolve.
+
+**`evals/` is excluded for ordinary product-skill execution — not universally.** For a normal
+skill, `evals/` is the library's answer key rather than something the skill reads in order to run,
+and the evals-exclusion rule in this section keeps it out. But a **library-meta** skill can name
+`evals/` as an *input*: `skill-quality-reviewer` reads the reviewed skill's `evals/evals.json` and
+`evals/trigger-evals.json` (`SKILL.md:46-48`, and Check 4 at `:90-95`), and the validator it runs
+first errors when `evals/evals.json` is absent (`scripts/validate-skills.py:542-544`). **A
+one-folder copy cannot both strip `evals/` and run that reviewer:** keep the eval files the skill
+names, or use a source checkout — or an equivalent maintainer corpus — instead of a one-folder
+copy.
+
+This is a plain file copy: no installer, no hooks, no pre-approved tools, nothing that runs by
+itself.
+
+**Not every skill is standalone — check before you swap.** Some skills are **library-meta**: their
+required inputs are the repository's own files, not only their own folder. `skill-quality-reviewer`
+is the clear case — it runs `scripts/validate-skills.py` and sweeps the shipped-skill corpus, and
+its own `SKILL.md` names `docs/skill-generation-standard.md` and `docs/skills-catalog.md` as inputs.
+A copy of its directory alone cannot run that validator or that sweep. **If the skill you want names
+repo-root inputs (`docs/`, `scripts/`) the same way, the allow-list copy is not a complete
+installation:** copy every repo-root dependency it names, plus whatever corpus it reads, or accept
+that it is not intended for standalone consumer use. Its `SKILL.md` lists what it reads — check
+there before copying.
+
+**A mention is not a dependency.** Skills name other skills in their routing text. Where that is a
+prose hand-off, it is not a required file: the named skill is not something the naming skill reads
+in order to run. **One exception is worth naming, and it does not weaken the rule:**
+`project-orchestrator`'s own documented inputs cite artifacts it is told to read — the library
+skill inventory, and the gate/authority map it is told to read to *cite* — and those are
+dependencies of *its* journey, which this section does not promise to carry. What does not follow
+is that a skill named in routing text is a file you must copy. The biggest case is the beginner
+front door — `project-orchestrator` names other skills across
+its stage map, and it CITES and DELEGATES to them by name. It does not own that map, and its own
+text says so: the canonical stage list, per-stage gate, authority model and
+change-classification matrix are owned by
+[`ai-sdlc-operating-model`](.claude/skills/ai-sdlc-operating-model/SKILL.md) — whose
+[`references/stage-gate-map.md`](.claude/skills/ai-sdlc-operating-model/references/stage-gate-map.md)
+holds the stage table — and by
+[`change-classification-gate`](.claude/skills/change-classification-gate/SKILL.md). The
+orchestrator's own words: *"this skill CITES and DELEGATES to them by name — copying any
+inline is failure."*
+
+**Its stage groups are conditional on your project, not a fixed list.** The orchestrator's own rule
+([`.claude/skills/project-orchestrator/SKILL.md`](.claude/skills/project-orchestrator/SKILL.md),
+lines 293-298), quoted in full with no elision:
+
+> *"**Invoke by evidence, not by default.** The stage-4 security skills, the SaaS
+> architecture-depth family, the AI/agentic-security packs, and the analytics skills are
+> CONDITIONAL — invoke a skill only when the project's actual features call for it (a file-upload
+> feature earns `file-upload-storage-architect`; an large language model (LLM) feature earns
+> `prompt-injection-defender`; a purely internal single-tenant tool earns none of the tenancy
+> skills)."*
+
+So there is no fixed number of skills you must copy to use this library. A count of the skills
+`project-orchestrator` *mentions* — 63, or 64 with the orchestrator itself — is a count of
+**mentions, not of required dependencies**: the groups above are conditional on the features your
+project actually has, and the list changes as the library grows. The orchestrator assumes the
+owning skill for a stage is present rather than checking for it — its inventory input says the
+owning skill for each stage "already exists; route to it, do not invent a new procedure" — which is
+why the skills it names are worth having when a stage applies, and not a bundle you must copy
+up front. The shipped-skill inventory is owned by
+[`docs/skills-catalog.md`](docs/skills-catalog.md) along with this README's own roster.
+
 On Windows (PowerShell) — **validated on PowerShell 5.1.26100.9444 and 7.6.6**:
 
 ```powershell
