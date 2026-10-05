@@ -435,13 +435,20 @@ inside the consumer repository at any moment, including after a failed check. Th
 staging-design route; prefer it whenever the stronger guarantee is worth the extra step.
 
 **The demonstrated journey copies one selected skill.** Swap `tdd-engineer` for the skill you
-want, as the commands below do. What that skill needs at runtime is **its own `SKILL.md`**; its
-`evals/` files must be excluded (see above). This is a plain file copy: no installer, no hooks, no
-pre-approved tools, nothing that runs by itself.
+want, as the copy steps in this section do. **For that demonstrated `tdd-engineer` journey the
+only runtime file is its own `SKILL.md`.** A skill that carries `references/`, `assets/` or
+`scripts/` needs those too — they are runtime folders, not extras. `evals/` is never runtime: the
+evals-exclusion rule in this section is what keeps it out. This is a plain file copy: no installer,
+no hooks, no pre-approved tools, nothing that runs by itself.
 
-**A mention is not a dependency.** Skills name other skills in their routing text. That is a
-hand-off, not a required file: the named skill is not something the naming skill reads in order to
-run. The biggest case is the beginner front door — `project-orchestrator` names other skills across
+**A mention is not a dependency.** Skills name other skills in their routing text. Where that is a
+prose hand-off, it is not a required file: the named skill is not something the naming skill reads
+in order to run. **One exception is worth naming, and it does not weaken the rule:**
+`project-orchestrator`'s own documented inputs cite artifacts it is told to read — the library
+skill inventory, and the gate/authority map it is told to read to *cite* — and those are
+dependencies of *its* journey, which this section does not promise to carry. What does not follow
+is that a skill named in routing text is a file you must copy. The biggest case is the beginner
+front door — `project-orchestrator` names other skills across
 its stage map, and it CITES and DELEGATES to them by name. It does not own that map, and its own
 text says so: the canonical stage list, per-stage gate, authority model and
 change-classification matrix are owned by
