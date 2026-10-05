@@ -399,34 +399,96 @@ They are maintainer material for evaluating the library — they do nothing for 
 own project, and leaving them in place means any agent working in your repo can read the
 criteria it would be judged against.
 
-Literal copy commands, run from inside the cloned `Project-Aegis` folder — swap
-`tdd-engineer` for the skill you want and the path for your own repo:
+**What this rule is, and what it is not.** §5a binds an **evaluation that uses that corpus** — the
+agent under test must not be able to read the answer keys it is judged against. It is not a claim
+that ordinary users may never hold public examples, and it is not a duty imposed on every consumer
+repository. The narrow, demonstrated point here is that copying a skill folder as it stands carries
+that skill's own answer keys into your workspace, where an agent working there can read them — so
+exclude them.
 
-On Windows (PowerShell):
+**Assemble the copy from an allow-list — never copy the folder and then delete from it.** Copy the
+skill's `SKILL.md` and its runtime folders (`references/`, `assets/`, `scripts/` — whichever it
+has), and copy nothing else. Nothing is deleted at any point, and no recursive copy of the whole
+skill folder is taken, so the skill's `evals/` answer keys never enter your repo — not even
+transiently.
 
-```powershell
-$src = ".claude\skills\tdd-engineer"
-$dst = "C:\path\to\your-repo\.claude\skills\tdd-engineer"
-Copy-Item -Recurse $src $dst
-# Remove the answer keys from the copy. -Exclude does NOT work with -Recurse,
-# so this is a second, explicit step.
-Get-ChildItem $dst -Recurse -Directory -Filter evals | Remove-Item -Recurse -Force
-```
-
-On macOS/Linux:
-
-```bash
-cp -r .claude/skills/tdd-engineer /path/to/your-repo/.claude/skills/
-find /path/to/your-repo/.claude/skills/tdd-engineer -type d -name evals -prune -exec rm -rf {} +
-```
-
-`Copy-Item -Recurse` copies the skill's folder and everything inside it into your repo.
-The second command then removes the `evals/` folder, which is the only part you do not want.
-**Verify the result** — this should print nothing:
+On Windows (PowerShell) — **validated on PowerShell 5.1.26100.9444 and 7.6.6**:
 
 ```powershell
-Get-ChildItem "C:\path\to\your-repo\.claude\skills" -Recurse -Directory -Filter evals
+$ErrorActionPreference = 'Stop'
+$src  = ".claude\skills\tdd-engineer"                  # swap for the skill you want
+$root = "C:\path\to\your-repo\.claude\skills"
+$dst  = Join-Path $root (Split-Path -Leaf $src)
+
+# Reject an existing destination: this never merges, overwrites or deletes.
+if (Test-Path -LiteralPath $dst) {
+  [Console]::Error.WriteLine("A20-E-DEST-EXISTS: refusing to install over an existing path: $dst"); exit 20
+}
+
+# Allow-list: SKILL.md plus the runtime classes. evals/ is never in the list.
+$srcFull = (Get-Item -LiteralPath $src -Force).FullName
+$files = @(Join-Path $srcFull 'SKILL.md')
+foreach ($class in 'references','assets','scripts') {
+  $d = Join-Path $srcFull $class
+  if (Test-Path -LiteralPath $d) { $files += (Get-ChildItem -LiteralPath $d -Recurse -File).FullName }
+}
+New-Item -ItemType Directory -Path $dst | Out-Null
+foreach ($f in $files) {
+  $out = Join-Path $dst $f.Substring($srcFull.Length + 1)
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $out) | Out-Null
+  Copy-Item -LiteralPath $f -Destination $out
+}
+
+# Verify: every allowed file is present, and no eval material is.
+$found = @(Get-ChildItem -LiteralPath $dst -Recurse -File).Count
+if ($found -ne $files.Count) {
+  [Console]::Error.WriteLine("A20-E-VERIFY: expected $($files.Count) files, found $found"); exit 30
+}
+$bad = @(Get-ChildItem -LiteralPath $dst -Recurse -Force |
+         Where-Object { $_.Name -in 'evals','evals.json','trigger-evals.json' })
+if ($bad.Count) {
+  [Console]::Error.WriteLine("A20-E-VERIFY: eval material present: $($bad[0].FullName)"); exit 30
+}
+[Console]::Error.WriteLine("OK: $dst assembled by allow-list; $found file(s); no eval material")
 ```
+
+macOS/Linux — **NOT validated on macOS or Linux.** The block below was exercised only under Git's
+`sh` on Windows; treat it as unverified on macOS/Linux and check the result yourself:
+
+```sh
+set -eu
+src=".claude/skills/tdd-engineer"            # swap for the skill you want
+root="/path/to/your-repo/.claude/skills"
+dst="$root/$(basename "$src")"
+[ -e "$dst" ] && { echo "refusing to install over an existing path: $dst" >&2; exit 20; }
+list() { ( cd "$src" && find . -type f \( -name SKILL.md -o -path './references/*' \
+          -o -path './assets/*' -o -path './scripts/*' \) -print ); }
+list | while IFS= read -r rel; do mkdir -p "$dst/$(dirname "$rel")"; cp -p "$src/$rel" "$dst/$rel"; done
+[ "$(cd "$dst" && find . -type f | wc -l)" -eq "$(list | wc -l)" ] \
+  || { echo "verify failed: file count" >&2; exit 30; }
+bad=$( cd "$dst" && find . \( -name evals -o -name evals.json -o -name trigger-evals.json \) -print -quit )
+[ -z "$bad" ] || { echo "verify failed: eval material present: $bad" >&2; exit 30; }
+echo "OK: $dst assembled by allow-list; no eval material"
+```
+
+**Prove the check can fail before you trust it.** The verify step is the only thing standing
+between you and a silently incomplete copy. Run it once against a deliberately contaminated tree —
+put an `evals/` folder inside the copy and confirm the check reports it. A check you have never
+seen fail is not evidence. (Measured behaviour: clean copy → `exit 0` and 4 files for
+`aegis-setup`; contaminated copy → the detector reports `evals`; a populated destination →
+`exit 20`.)
+
+**Why not `Copy-Item -Exclude`.** `-Exclude` filters only the paths resolved from `-Path`, and it
+is effective **only when `-Path` contains a wildcard**; it is **not** a filter over items discovered
+while recursing. It is therefore the wrong tool for excluding a nested `evals/` folder — which is
+why the copy above is built from an explicit allow-list instead. The published comment
+*"`-Exclude` does NOT work with `-Recurse`"* is broader than Microsoft's documented behaviour and
+should not be repeated.
+
+**How it fails.** Any failure ends the run non-zero with a message and **leaves nothing deleted**:
+an existing destination (`exit 20`), a failed copy, or a failed verify (`exit 30`). `set -eu`
+(`sh`) and `$ErrorActionPreference = 'Stop'` (PowerShell) make the shell stop at the first error
+rather than continuing past it.
 
 Copied skills add nothing that runs automatically: no hooks, no `allowed-tools` pre-approvals, no `!` shell injection and no plugin or Model Context Protocol (MCP) server files. The source repository's validator enforces this on every shipped skill, so invoking a copied skill never runs code by itself. One skill also carries scripts: the manual-only `aegis-setup` includes PowerShell scripts, which the assistant can run only through its ordinary command tool, under your normal permission checks.
 
