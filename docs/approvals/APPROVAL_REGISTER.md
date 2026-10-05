@@ -4435,3 +4435,122 @@ the entry governs.
     is **not** obtained here and is **not** claimed. The in-review `AEGIS-APR-110` does
     not carry this disclosure; it is recorded here because slot 1's own entry was already
     in review when the correction was issued.
+
+### AEGIS-APR-112: Consumption of AEGIS-APR-109, slot 3 of 3
+
+- **Event:** CONSUMED; target grant AEGIS-APR-109. It spends **the third and last of
+  the three slots** that entry authorises, and nothing else.
+- **Status at recording:** **AEGIS-APR-109 is FULLY SPENT — three slots consumed,
+  none unspent, and no fourth merge is authorised.** The target's own
+  `Status at recording` field reads **"ACTIVE and `unspent` as recorded"**, which was
+  true when it was written and is not true now; **this entry is how the register
+  records the final change of state, and it does not rewrite the earlier field.**
+  AEGIS-APR-109 must not be read as still holding any unspent merge authority: the
+  count of merges it can authorise closed at **three, one per branch, and never
+  four.**
+- **Effective at:** 2026-10-05 04:01:28 UTC.
+- **Recorded at / By:** 2026-10-04 / Project Aegis agent, under the delivery grant
+  in AEGIS-APR-039. This is an append-only lifecycle record and not an exercise of
+  merge authority: **AEGIS-APR-109 itself requires it** — its `Scope allowed` states
+  that *"after each merge, a `CONSUMED` follow-up entry is appended under a unique ID
+  naming the target grant (`AEGIS-APR-109`), the branch merged, the pull request, the
+  exact head merged, and the branches still unspent"* (lines 3767–3773), following the
+  register's own event convention at base lines 8–10: *"Grant entries are immutable.
+  Append later revocation, expiry, consumption or supersession events with unique IDs
+  and the affected grant ID; do not edit old entries."* Its `Scope FORBIDDEN` states
+  in turn that the grant *"does not make `plan-scrutineer` an author or a reviewer of
+  the three branches, does not authorise editing them, and does not authorise
+  reopening a merged, closed or superseded pull request"* (lines 3837–3840). The
+  obligation is the target entry's; the recording is a separate, ordinary delivery
+  act.
+- **New authority:** None. This entry grants nothing, and spends nothing beyond
+  slot 3.
+- **Reason:** The third and final merge named in AEGIS-APR-109 completed.
+- **Scope FORBIDDEN:** This consumption spends **slot 3 only, and it is the last** —
+  no slot remains, and **AEGIS-APR-109 holds no merge authority after this entry.**
+  **A second merge of `docs/no-cross-skill-delegation` is forbidden and is outside the
+  grant**: the prohibition is on the branch, not only on other branch names, so no
+  later pull request from it can satisfy conditions (a) to (c) again. Nothing here
+  revives any other entry, authorises a fourth merge, waives any check, or reaches any
+  branch not named in AEGIS-APR-109.
+- **Evidence:** [PR #670](https://github.com/ModernNomad-98/Project-Aegis/pull/670)
+  merged at the time above, as a **squash**, with the merge pinned to the exact
+  reviewed head. Measured live for this entry: the pull request reports
+  `state: closed`, `merged: true`,
+  `headRefOid 536d0b0979ef2fece81dfbd8d43854780f0d04d5`,
+  `mergedAt 2026-10-05T04:01:28Z`, and merge commit
+  `935411cf5b9258dc06c925a9258ab4a90e8e94fc`.
+
+  **Merge receipt.** The MG-keyed receipt for this branch is
+  [PR #670 comment 5987881171](https://github.com/ModernNomad-98/Project-Aegis/pull/670#issuecomment-5987881171)
+  — *"Stage G merge receipt — `SD-G`: **MERGED**"*, which records `MG1` to `MG5` and
+  the identity the grant requires of it: merge agent `plan-scrutineer`, authority
+  `AEGIS-APR-109` `Scope allowed`, branch 3 of 3, merged by the owner as an
+  administrator merge with `--match-head-commit`, and `auto_merge` never armed.
+
+  **`MG1` — the excepted `gate-guard`, recorded as failed with an authorised
+  disposition.** The owner's exception, quoted verbatim (Peter Nguyen, 2026-10-04,
+  coordinator session):
+
+  > "I grant a one-use, PR-specific gate-guard exception for PR #670 at head
+  > 536d0b0979ef2fece81dfbd8d43854780f0d04d5 only: the red gate-guard check for this
+  > PR and this head is excepted; no other PR, head, future commit, or check is
+  > covered."
+
+  Measured at the merged head: `validate-skills`, `tools-tests-linux`,
+  `tools-tests-windows` and `windows-offline-checks` **success**; **`gate-guard`
+  FAILED** (`completed/failure`) and is recorded here as **failed with an authorised
+  disposition — never green, never waived, and not a pass.** The failure is by
+  construction: this pull request changes `scripts/validate-skills.py` and
+  `scripts/tests/test_validator.py`, which the guard pattern protects. That is the
+  disposition AEGIS-APR-109 itself prescribes for the case — a branch touching those
+  paths *"may therefore **not** be merged while `gate-guard` fails unless the owner
+  grants a **PR-specific exception naming that pull request and head**"*, and *"if
+  such a merge proceeds it is **failed with an authorised disposition, not
+  waived**"* (lines 3830–3836).
+
+  **`MG2`:** review `5409892340`, `COMMENTED`, whose body is the Stage F verdict
+  **APPROVE**, bound to `536d0b0979ef2fece81dfbd8d43854780f0d04d5`. The bound-fields
+  hash was recomputed over the live body inside the merge command:
+  `fc62a2fd2b3f3fa5055527b4d9537ee43e2666428052a3c97c6fd20b1c449011` → first 16
+  `fc62a2fd2b3f3fa5`, re-verified against the live body for this entry (**MATCH**).
+  **`MG3`:** confirmed unavailable for this exact head — the automated reviewer
+  returned a usage-limit notice on this pull request, which `MG3` names as its
+  example; **zero** inline findings. **`MG4`:** `AEGIS-APR-109` (register entry on the
+  default branch) covers this branch as slot 3, plus the owner's instruction quoted
+  above, with source and date. **`MG5`:** not applicable — maintainer/agent-authored,
+  `AGENTS.md`:73-74.
+
+  **The reviewed head is not the commit now on `main`, and the squash preserved its
+  content exactly.** AEGIS-APR-109 names no head by design; the binding was
+  established at merge time by condition (a), the independent review **naming the
+  exact head being merged**, which named
+  `536d0b0979ef2fece81dfbd8d43854780f0d04d5`. The squash landed a **different
+  object**, `935411cf5b9258dc06c925a9258ab4a90e8e94fc`. Measured: the reviewed head
+  **is not an ancestor** of the merge commit (`git merge-base --is-ancestor` exits
+  1), and the merge commit has **one parent**,
+  `4a916cea2bee3fb845c64f3e19b9089c493da613`, which is what makes it a squash.
+  **`935411cf…` must not be read as "the reviewed head."** The content did carry: all
+  four changed paths are **byte-identical** between the reviewed head and the merge
+  commit — `.claude/skills/project-orchestrator/SKILL.md` `4400f46d97…`,
+  `docs/skill-generation-standard.md` `1ecbac2d2f…`, `scripts/validate-skills.py`
+  `31f53f9cb2…`, `scripts/tests/test_validator.py` `693853d0b9…`. The binding was
+  satisfied by the merge **act** at the named head, not by the identity of the
+  resulting commit — the same distinction AEGIS-APR-107 records for AEGIS-APR-106,
+  and this paragraph exists for the same reason.
+
+- **ID resolution, and this entry's own forward consequence — DISCHARGED by this
+  rebase.** The register on this entry's original base `bdbd688c` ended at
+  `AEGIS-APR-110`, so the next free ID there was **111**. **111 was claimed in
+  flight** by the slot-2 consumption on branch
+  `docs/approvals/apr-109-consumed-slot-2` (tip at that time
+  `5740d643f1887ad53f4e20d577c407fe8d63eeee`, since rebased and merged as
+  [PR #671](https://github.com/ModernNomad-98/Project-Aegis/pull/671)). To keep two
+  entries from claiming one ID, **slot 3 took 112** and cross-references 111.
+  **The consequence recorded above has now been discharged:** this branch has been
+  **rebased onto `3824fe5b2174088f301292a5c168489737433e8a`**, the `main` that
+  contains `AEGIS-APR-111`, and in this file the entries read **110 → 111 → 112** in
+  append order. The rebase resolved the tail-append conflict by keeping
+  `AEGIS-APR-111` byte-intact from `main` and appending this entry after it: entries
+  001–111 are byte-identical to the register at `3824fe5b`, and this entry is a pure
+  append. Nothing in `AEGIS-APR-111` is created, altered or spoken for by this entry.
