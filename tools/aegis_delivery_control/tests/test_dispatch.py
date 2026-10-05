@@ -7947,3 +7947,157 @@ class MediatedDispatchTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# ---------------------------------------------------------------------------
+# ZT-P1 — negative fixtures (ZT-01 §4.9(3), §E.6): one per class
+# ---------------------------------------------------------------------------
+
+
+class RoleStageTransitionNegativeTests(unittest.TestCase):
+    """One negative fixture per class, each failing with a named code."""
+
+    @staticmethod
+    def _envelope(**overrides: object) -> dict[str, object]:
+        from tools.aegis_delivery_control.contracts import ZT_P1_CONTRACT_VERSION
+        from tools.aegis_delivery_control.evidence import (
+            build_versioned_evidence_envelope,
+        )
+
+        base: dict[str, object] = {
+            "contract_version": ZT_P1_CONTRACT_VERSION,
+            "repository": "repo-1",
+            "task": "task-1",
+            "plan_revision": "plan-1",
+            "head": "0" * 40,
+            "base": "0" * 40,
+            "tested_merge_tree": "0" * 40,
+            "policy_version": "1",
+            "environment": "synthetic",
+            "coverage_declaration": "full",
+            "stage_identity": "implement",
+            "predecessor_verdict": "ACCEPT",
+            "verdict": "RUN",
+            "artifact_digests": ("a" * 64,),
+        }
+        base.update(overrides)
+        return build_versioned_evidence_envelope(**base)
+
+    def test_foreign_stage_evidence_is_rejected(self) -> None:
+        from tools.aegis_delivery_control.authority import (
+            validate_role_stage_transition,
+        )
+        from tools.aegis_delivery_control.contracts import EffectiveRole
+
+        with self.assertRaisesRegex(DispatchDenied, "foreign-stage"):
+            validate_role_stage_transition(
+                effective_role=EffectiveRole.STAGE_WORKER,
+                contract_version=1,
+                to_stage="validate",
+                evidence=self._envelope(),
+            )
+
+    def test_forged_role_identity_is_rejected(self) -> None:
+        from tools.aegis_delivery_control.authority import (
+            validate_role_stage_contract,
+        )
+
+        with self.assertRaisesRegex(DispatchDenied, "not a known role"):
+            validate_role_stage_contract(effective_role="coordinator", contract_version=1)
+
+    def test_replayed_approval_is_rejected(self) -> None:
+        from tools.aegis_delivery_control.authority import (
+            validate_grant_lifecycle,
+        )
+        from tools.aegis_delivery_control.contracts import GrantLifecycle
+
+        grant = GrantLifecycle("grant-1")
+        seen: set[str] = set()
+        validate_grant_lifecycle(grant, now=1, seen_approvals=seen)
+        with self.assertRaisesRegex(DispatchDenied, "replayed approval"):
+            validate_grant_lifecycle(grant, now=1, seen_approvals=seen)
+
+    def test_consumed_one_use_grant_is_rejected(self) -> None:
+        from tools.aegis_delivery_control.authority import (
+            validate_grant_lifecycle,
+        )
+        from tools.aegis_delivery_control.contracts import GrantLifecycle, GrantStatus
+
+        grant = GrantLifecycle("grant-1", status=GrantStatus.CONSUMED)
+        with self.assertRaisesRegex(DispatchDenied, "consumed one-use grant"):
+            validate_grant_lifecycle(grant, now=1)
+
+    def test_expired_grant_is_rejected(self) -> None:
+        from tools.aegis_delivery_control.authority import (
+            validate_grant_lifecycle,
+        )
+        from tools.aegis_delivery_control.contracts import GrantLifecycle
+
+        grant = GrantLifecycle("grant-1", expires_at=10)
+        with self.assertRaisesRegex(DispatchDenied, "expired"):
+            validate_grant_lifecycle(grant, now=10)
+
+    def test_revoked_grant_is_rejected(self) -> None:
+        from tools.aegis_delivery_control.authority import (
+            validate_grant_lifecycle,
+        )
+        from tools.aegis_delivery_control.contracts import GrantLifecycle, GrantStatus
+
+        grant = GrantLifecycle("grant-1", status=GrantStatus.REVOKED)
+        with self.assertRaisesRegex(DispatchDenied, "revoked"):
+            validate_grant_lifecycle(grant, now=1)
+
+    def test_malformed_evidence_is_rejected(self) -> None:
+        from tools.aegis_delivery_control.evidence import (
+            canonical_bytes,
+            verify_versioned_evidence_envelope,
+        )
+
+        # Non-canonical (trailing whitespace) and mistyped envelopes are rejected.
+        malformed = canonical_bytes(self._envelope()) + b" "
+        with self.assertRaisesRegex(DispatchDenied, "envelope rejected"):
+            verify_versioned_evidence_envelope(malformed)
+
+    def test_duplicate_evidence_is_rejected(self) -> None:
+        from tools.aegis_delivery_control.evidence import (
+            canonical_bytes,
+            verify_versioned_evidence_envelope,
+        )
+
+        original = canonical_bytes(self._envelope())
+        seen: set[tuple[str, str, str]] = set()
+        verify_versioned_evidence_envelope(original, seen_identities=seen)
+        with self.assertRaisesRegex(DispatchDenied, "duplicate"):
+            verify_versioned_evidence_envelope(original, seen_identities=seen)
+
+    def test_missing_evidence_is_unrun_never_pass(self) -> None:
+        from tools.aegis_delivery_control.authority import (
+            validate_role_stage_transition,
+        )
+        from tools.aegis_delivery_control.contracts import EffectiveRole
+
+        # Missing execution is UNRUN, never PASS: a transition with no evidence
+        # is rejected rather than treated as a satisfied stage.
+        with self.assertRaisesRegex(DispatchDenied, "missing evidence"):
+            validate_role_stage_transition(
+                effective_role=EffectiveRole.STAGE_WORKER,
+                contract_version=1,
+                to_stage="implement",
+                evidence=None,
+            )
+
+    def test_transition_widening_real_dispatch_is_rejected(self) -> None:
+        from tools.aegis_delivery_control.authority import (
+            validate_role_stage_transition,
+        )
+        from tools.aegis_delivery_control.contracts import EffectiveRole
+
+        with self.assertRaisesRegex(
+            DispatchDenied, "widen the require_real_dispatch"
+        ):
+            validate_role_stage_transition(
+                effective_role=EffectiveRole.SUPERVISOR,
+                contract_version=1,
+                to_stage="real_dispatch",
+                evidence=self._envelope(),
+            )

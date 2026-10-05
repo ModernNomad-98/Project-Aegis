@@ -1661,3 +1661,12 @@ all exact-head check conclusions and owner handoff live in the PR body/final res
 Existing CI logs have finite retention; repository evidence records sanitized
 durable summaries and links, not an assertion that raw hosted logs last forever.
 After gated owner-approved merge, report its SHA and leave every later package blocked.
+
+## 7. ZT-P1 — offline role/stage transition contract
+
+| ID / purpose | Status / entry criteria | Proposed evidence / stop point |
+| --- | --- | --- |
+| ZT-P1 — Offline role/stage transition contract | First Zero Trust package; widens CP-WP-003A by the one explicitly-excluded path `tools/aegis_delivery_control/contracts.py` (revised reviewed scope names it) | Versioned contract (`ZT_P1_CONTRACT_VERSION`) plus positive conformance fixtures and ten negative proofs (foreign-stage evidence, forged/mismatched role, replayed approval, consumed one-use grant, expired grant, revoked grant, malformed evidence, duplicate evidence, missing evidence as `UNRUN`, and a transition that would widen `require_real_dispatch`). Stops at the merge of one signed PR; passing it authorizes nothing else — not P2, not a host adapter, not a real route, not auto-merge |
+
+ZT-P1 is **not started** until a reviewed owner grant recording the revised
+scope (naming `contracts.py` explicitly) exists in the approval register.
