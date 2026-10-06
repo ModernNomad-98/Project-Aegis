@@ -427,7 +427,8 @@ class GateJobIsolationTests(unittest.TestCase):
     def test_gate_jobs_run_no_node_or_tools_suites(self):
         for job_name in self.GATE_JOBS:
             job = self.workflow["jobs"][job_name]
-            self.assertNotIn("needs", job)
+            if "needs" in job:
+                self.assertEqual(["changes"], job["needs"], job_name)
             for step in job["steps"]:
                 with self.subTest(job=job_name, step=step.get("name", step.get("uses"))):
                     self.assertNotIn("setup-node", step.get("uses", ""))
@@ -442,7 +443,8 @@ class GateJobIsolationTests(unittest.TestCase):
             job = self.workflow["jobs"][job_name]
             with self.subTest(job=job_name):
                 self.assertEqual({"contents": "read"}, job["permissions"])
-                self.assertNotIn("needs", job)
+                if "needs" in job:
+                    self.assertEqual(["changes"], job["needs"], job_name)
                 self.assertNotIn("secrets.", json.dumps(job))
                 checkout = next(s for s in job["steps"]
                                 if s.get("uses", "").startswith("actions/checkout@"))
@@ -457,6 +459,25 @@ class GateJobIsolationTests(unittest.TestCase):
             needs = [needs] if isinstance(needs, str) else needs
             with self.subTest(job=job_name):
                 self.assertFalse(set(needs) & set(self.TOOLS_JOBS))
+
+    def test_changes_job_is_gate_protected_and_read_only(self):
+        self.assertIn("changes", self.workflow["jobs"])
+        job = self.workflow["jobs"]["changes"]
+        self.assertNotIn("needs", job)
+        self.assertNotIn("secrets.", json.dumps(job))
+        for step in job["steps"]:
+            with self.subTest(step=step.get("name", step.get("uses"))):
+                self.assertNotIn("setup-node", step.get("uses", ""))
+                run = step.get("run", "")
+                words = set(shlex.split(run, comments=True))
+                self.assertFalse(words & {"node", "npm", "npx"}, words)
+                self.assertNotIn("python", run)
+                self.assertNotIn("GITHUB_ENV", run)
+                self.assertNotIn("GITHUB_PATH", run)
+                text = run + step.get("working-directory", "")
+                for path in ("tools/aegis_setup", "tools/aegis_delivery_control",
+                             "scripts/", "record-check.py"):
+                    self.assertNotIn(path, text)
 
     # Environment variables that make an interpreter, shell or tool load code
     # or configuration from a chosen location. None belongs in a gate job.
