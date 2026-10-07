@@ -4567,6 +4567,12 @@ the entry governs.
   request makes the switch on the conditions below, the
   [readability ledger](../roadmaps/aegis-documentation-readability-backlog.md)
   and its current reading stay the record, unchanged by this entry.
+
+  **The owner paused the program after this decision record** (owner
+  decisions, items 8 and 9 below): the tool repair and the switch do not
+  start unless the owner resumes the program, and AEGIS-APR-114 to
+  AEGIS-APR-117 cover no work until then. While the program is paused, the
+  readability ledger stays the record and its process is unchanged.
 - **Date / Grantor:** 2026-10-07 / Peter Nguyen.
 - **Owner decisions, as transcribed by the coordinator from the session
   chat:** The owner did not type into this register, and the raw chat is not a
@@ -4578,9 +4584,9 @@ the entry governs.
 
      > My recommendation is still **Option 1, with conditions**, but provisional.
 
-     > 1. No CI gate. The index should be the official count, but it should not become a required CI check that every PR must pass.
+     > ... 1. No CI gate. The index should be the official count, but it should not become a required CI check that every PR must pass.
 
-     > Rebuild the index in its own small PR when you want a fresh count. Optionally add a separate, non-blocking CI job later.
+     > ... Rebuild the index in its own small PR when you want a fresh count. Optionally add a separate, non-blocking CI job later.
 
      > 2. The repair is bigger than the four blind spots. The tool isn't fit to be official as-is ...
 
@@ -4633,12 +4639,59 @@ the entry governs.
 
      The owner chose **"Pending until re-reviewed (Recommended)"**; the other
      option was "Trust the ledger's word".
+  6. **Speed-ups** (answered before 2026-10-07T22:29:29Z). The question:
+
+     > Which speed-ups do you want? Pick any.
+
+     The owner chose all four options:
+     **"Ask open decisions now"**, **"Parallel repair PRs"**,
+     **"High effort for low-risk"** and
+     **"Raise rebuild fast path later"**. The first option's text, transcribed
+     by the coordinator in its later clarification, reads:
+
+     > I put the three questions the repair needs to you now (targeted reviews, security classification, unmeasurable changes), each explained with a recommendation.
+
+     It was acted on: the three questions in item 7 were asked. The other
+     three option texts read, in order:
+
+     > Split the repair into small PRs held by separate agents and run in parallel: guards and tests, the table reader, and backfill batches.
+
+     > Keep xhigh for planning, the register PR and the tool code. Use high for backfill batches and routine rebuilds.
+
+     > Bring a lighter review path for machine-checked rebuild PRs to the 2026-10-11 review-cap check-in.
+
+  7. **Open decisions for the repair** (answered before 2026-10-07T22:30:07Z).
+     The targeted-review answer is recorded in AEGIS-APR-116, and the
+     classification answer in AEGIS-APR-118. The third question:
+
+     > If the tool can't measure a page's change for a reason other than a lost commit, how should the page count?
+
+     The owner chose **"Pending until re-reviewed (Recommended)"**; the other
+     option was "Keep last known status". The selected option's text reads:
+
+     > Same as your lost-commit rule: when the change can't be measured, a reviewer looks again.
+
+  8. **Which repair to build** (answered before 2026-10-07T23:16:31Z). The
+     question:
+
+     > Which version of the repair should the team build? In every version the official pending count starts at about 510–610 of 609 pages and falls as pages are reviewed.
+
+     The other options were "V2: verifiable only (Recommended)", "V0: full
+     backfill" and "V1: no backfill". The owner chose
+     **"Pause the program"**, whose option text reads:
+
+     > Merge the decision record, then stop here and decide later whether the repair is worth it.
+
+  9. **The owner's instruction after the pause** (recorded by the coordinator
+     at 2026-10-07T23:27:05Z), verbatim:
+
+     > ok fix the four defects, make sure the ledger is no longer stale, pause the program and turn it into a low priority backlog items for aegis
 
   These are transcriptions of selections among presented options, not the
-  owner's own prose. The register's preamble makes a current direct user
-  instruction valid source evidence before transcription, so this entry rests
-  on those instructions and does not claim a repository citation of the
-  owner's text.
+  owner's own prose, except item 1's reply and item 9. The register's preamble
+  makes a current direct user instruction valid source evidence before
+  transcription, so this entry rests on those instructions and does not claim
+  a repository citation of the owner's text.
 - **Reason:** The ledger states the pending count by hand, while its
   acceptance tool counts on a different basis. The ledger's
   [current-count reconciliation](../roadmaps/aegis-documentation-readability-backlog.md#current-count-reconciliation--appended-2026-10-07-measured-at-03c93c77)
@@ -4665,7 +4718,9 @@ the entry governs.
      accepted-unless-listed default for the official count.
   3. **A lost acceptance commit counts as pending until the page is
      re-reviewed** (item 5). This covers only a page whose recorded acceptance
-     points to a commit that no longer exists anywhere.
+     points to a commit that no longer exists anywhere. The same rule applies
+     when a page's change since its recorded acceptance cannot be measured for
+     any other reason (item 7).
   4. **The recording path is the selected option B** (item 4), as quoted.
      The table's columns and the backfill's checks are D73 conditions 2 and 4,
      which are audit conditions, not the owner's words.
@@ -4694,6 +4749,27 @@ the entry governs.
      > A small edit keeps acceptance only if an independent reviewer checked it; an unreviewed edit, however small, needs a targeted review before the page counts as accepted.
 
      This entry does not relax it.
+  8. **Delivery practice if the program resumes** (item 6): the tool repair
+     may be split into smaller pull requests as quoted (AEGIS-APR-114 covers
+     their merges); effort is set as quoted; and a lighter review path for
+     machine-checked rebuild pull requests is to be raised at the 2026-10-11
+     review-cap check-in. On 2026-10-04 the owner tabled a proposal to cap
+     review rounds and asked to check back in 7 days; the coordinator
+     scheduled that check-in for 2026-10-11. This is recorded only in a
+     coordinator log, `.coord/coordinator-cadence.jsonl` line 72 at commit
+     `4d05c624`, which only the branch `coord/idle-check-2026-10-04` holds; it
+     is not on the default branch. This entry does not decide that review
+     path.
+  9. **The program is paused after this decision record** (items 8 and 9).
+     The tool repair and the switch do not start unless the owner resumes the
+     program; the owner decides "later whether the repair is worth it". While
+     paused:
+     - the readability ledger stays the record;
+     - its process is unchanged: the ledger keeper records under
+       AEGIS-APR-101, and the targeted-edit, net-difference, new-page and
+       10-line rules apply as written;
+     - the work is a low-priority item under "Owner-requested backlog items"
+       in `docs/roadmaps/aegis-open-decisions-2026-09-23.md`.
 - **Relationship to other entries:**
   - **AEGIS-APR-101 is unchanged**, as the selected option itself states. This
     entry neither supersedes nor widens it. Its recording scope fixes no
@@ -4706,18 +4782,23 @@ the entry governs.
     proposed that "The index row is the recording act". Under option B the
     recording stays in the ledger, and the index reads it.
   - AEGIS-APR-105 applies to every pull request of this program.
+  - AEGIS-APR-116 and AEGIS-APR-118 record two of item 7's answers;
+    AEGIS-APR-117 records the withdrawal answer, and AEGIS-APR-114 the
+    split-PR answer, both from the question batch that included item 8's;
+    D73's decision list summarises all of them.
 - **Scope FORBIDDEN:** It grants nothing, so nothing may cite AEGIS-APR-113 as
   authority for an action. This entry makes no switch, changes no published
   count, records or confers no acceptance, creates no keeper table, adds no CI
   job, edits no workflow and waives no review, check or `gate-guard`
-  requirement.
-- **Not decided by this entry** (see D73):
-  1. whether a page counts as pending when its change since its recorded
-     acceptance cannot be measured for a reason other than a lost commit.
-     The owner's answer in item 5 covers lost commits only;
-  2. how targeted reviews are recorded in the table, and on whose authority;
-  3. the security-relevant-surface classification of
-     `tools/readability_acceptance/`.
+  requirement. It does not resume the program.
+- **Not decided by this entry:** (1) whether and when the program resumes,
+  and which repair to build; (2) whether the one-time backfill may
+  transcribe historical targeted reviews as targeted-review rows (the owner
+  was asked about the keeper's recordings, AEGIS-APR-116, not about the
+  backfill); (3) the lighter review path for machine-checked rebuild pull
+  requests (item 8). The targeted-review authority is AEGIS-APR-116, the
+  withdrawal authority is AEGIS-APR-117, and the tool's security
+  classification is AEGIS-APR-118.
 - **Evidence:** The owner's instructions and selections above, as transcribed
   by the coordinator from the Project Aegis session chat of 2026-10-07 and
   relayed in the coordinating agent's brief. Neither the chat nor the
@@ -4732,10 +4813,12 @@ the entry governs.
 ### AEGIS-APR-114: Work and merge terms for the readability count program
 
 - **Event:** GRANT.
-- **Status at recording:** ACTIVE once this entry is on the default branch. It
-  cannot authorize the merge of the pull request that records it. That merge
-  rests on the owner's instructions quoted verbatim in the merge agent's
-  brief, which `AGENTS.md` accepts as authority.
+- **Status at recording:** Owner approved. It covers the tool repair and the
+  switch **only if the owner resumes the program**, which AEGIS-APR-113
+  records as paused after this decision record; until then it covers no
+  work. It cannot authorize the merge of the pull request that records it.
+  That merge rests on the owner's instructions quoted verbatim in the merge
+  agent's brief, which `AGENTS.md` accepts as authority.
 - **Date / Grantor:** 2026-10-07 / Peter Nguyen.
 - **Reason:** The owner directed the program selected in AEGIS-APR-113 and set
   how its pull requests may merge. AEGIS-APR-100 needs a separate applicable
@@ -4748,34 +4831,58 @@ the entry governs.
   > This needs several new PRs: one recording your decision in the approval register and decision log, then the tool repair, then the switch. Your earlier merge approval covered only PR #677. May the team merge these PRs on the same terms: every stage passed and all checks green, admin merge allowed, fix and retry on failure?
 
   The owner chose **"Yes, same terms (Recommended)"**; the other option was
-  "Ask me per PR". The covered pull requests are the three the question names:
-  the decision record, the tool repair and the switch. The work they carry is
-  the program the owner directed with "ok go with your recommendation"
-  (AEGIS-APR-113). The terms are the owner's two earlier instructions for
+  "Ask me per PR". The covered pull requests are those the question names:
+  the decision record, the tool repair and the switch. The tool repair may be
+  delivered in one pull request or several. Asked "Which speed-ups do you
+  want? Pick any." (answered before 2026-10-07T22:29:29Z, an upper bound),
+  the owner's selections included **"Parallel repair PRs"**, whose option
+  text reads:
+
+  > Split the repair into small PRs held by separate agents and run in parallel: guards and tests, the table reader, and backfill batches.
+
+  The owner then confirmed the merge terms for those smaller pull requests
+  directly (answered before 2026-10-07T23:16:31Z). The question:
+
+  > May each of the smaller repair PRs merge on the same terms you already gave the repair (every stage passed, all checks green, admin merge allowed, fix and retry), without asking you each time?
+
+  The owner chose **"Yes (Recommended)"**; the other option was "Ask me per
+  PR". The selected option's text reads:
+
+  > Recorded in the approval register; covers the repair PRs only.
+
+  The owner's other speed-up selections are recorded in AEGIS-APR-113.
+
+  The work these pull requests carry is the program the owner directed with
+  "ok go with your recommendation" (AEGIS-APR-113). The terms are the owner's
+  two earlier instructions for
   [PR #677](https://github.com/ModernNomad-98/Project-Aegis/pull/677):
 
   > I approve for you to merge once all checks are green. Including admin merge
 
   > if a check fails, diagnose and fix the issue and try to merge again. Do not stop until it is merged
 
-  **Recorder's reading:** the one-time reviewed backfill belongs to the
-  tool-repair pull request. The "same terms" answer came before the option-B
-  choice, but option B's text bundles the backfill with the repair ("after a
-  one-time reviewed backfill. About 16–32 agent-hours (estimate).").
-- **Scope FORBIDDEN:** None additionally stated by the owner. The owner's own
-  words limit a merge to a head whose checks are all green, and the question's
-  terms add "every stage passed". These entries continue unchanged and are not
-  restated here: AEGIS-APR-100 (including its `Scope FORBIDDEN`),
-  AEGIS-APR-048, AEGIS-APR-050 and AEGIS-APR-105.
-- **Evidence:** Direct owner instructions and an answer in the Project Aegis
+  **The backfill is part of the tool repair.** The "Parallel repair PRs"
+  option text names "backfill batches" among the repair's pull requests, and
+  option B's text bundles the backfill with the repair ("after a one-time
+  reviewed backfill. About 16–32 agent-hours (estimate).").
+- **Scope FORBIDDEN:** The split-PR answer's option text says it
+  "covers the repair PRs only": only the tool repair may be delivered as several pull
+  requests; the decision record and the switch are each one pull request
+  under this entry. The owner's own words limit a merge to a head whose
+  checks are all green, and the question's terms add "every stage passed".
+  These entries continue unchanged and are not restated here: AEGIS-APR-100
+  (including its `Scope FORBIDDEN`), AEGIS-APR-048, AEGIS-APR-050 and
+  AEGIS-APR-105.
+- **Evidence:** Direct owner instructions and answers in the Project Aegis
   session chat of 2026-10-07, as transcribed by the coordinator. The two merge
   instructions were recorded by the coordinator at 2026-10-07T17:36:13Z and
   17:37:14Z, and the answer at 20:51:30Z. None is a repository artifact.
-  PR #677 merged at 2026-10-07T19:14:33Z.
-- **Expiry / use limit:** The three pull requests the question names. The
-  grant is exhausted once they have merged. The answer does not say whether
-  one function delivered in more than one pull request is covered, so a later
-  planner asks rather than assumes.
+  PR #677 merged at 2026-10-07T19:14:33Z. The speed-up selection was answered
+  before 22:29:29Z. The split-PR answer was given before 23:16:31Z.
+- **Expiry / use limit:** The pull requests the question names, with the tool
+  repair delivered in one or several pull requests. The grant is exhausted
+  once the decision record, every tool-repair pull request and the switch
+  have merged.
 - **Recording of its consumption (a recording step, not an owner limit):** the
   switch pull request appends the `CONSUMED` event for this entry itself, as
   part of its own change, with `Effective at:` the merge of that pull request.
@@ -4789,7 +4896,9 @@ the entry governs.
   request named in AEGIS-APR-114 merges to the default branch. Until then it
   covers nothing. The `CONSUMED` event for AEGIS-APR-114, which the switch pull
   request appends itself, records that merge, and that is where a reader
-  confirms this entry is in effect.
+  confirms this entry is in effect. The switch happens only if the owner
+  resumes the program, which AEGIS-APR-113 records as paused; until then this
+  entry covers nothing.
 - **Date / Grantor:** 2026-10-07 / Peter Nguyen.
 - **Owner decision, as transcribed by the coordinator from the session chat**
   (answered before 2026-10-07T21:13:28Z, an upper bound). The question:
@@ -4810,13 +4919,20 @@ the entry governs.
 - **Scope allowed:** Work and merge authority for routine index-rebuild pull
   requests after the switch, merged on the question's terms (all stages
   passed, all checks green, administrator merge allowed, fix and retry)
-  without asking the owner each time. A rebuild pull request regenerates the
-  files the repaired tool's build writes, using the tool as it stands on the
-  default branch. Today `build_index.py --write` writes
-  `tools/readability_acceptance/acceptance-index.json` and
-  `tools/readability_acceptance/acceptance-verdicts-stage-1.json`.
-- **Scope FORBIDDEN:** As the selected option states, "Nothing else is
-  covered." The option's word "only" excludes a pull request that also changes
+  without asking the owner each time. A rebuild pull request regenerates, with
+  the tool as it stands on the default branch, these two generated files and
+  no other path:
+  - `tools/readability_acceptance/acceptance-index.json`
+  - `tools/readability_acceptance/acceptance-verdicts-stage-1.json`
+
+  These are the files `build_index.py --write` writes at this recording; a
+  rebuild that changes only one of them is covered. Whether a pull request
+  that writes any other path is a rebuild pull request is not decided by this
+  entry. Until the owner decides, such a pull request is not covered: under
+  this register's preamble, "An action is covered only by an effectively
+  ACTIVE human grant whose scope includes it."
+- **Scope FORBIDDEN:** As the selected option states,
+  "Nothing else is covered." The option's word "only" excludes a pull request that also changes
   the tool or its tests, the keeper's table or any other page. The entries
   that AEGIS-APR-114 lists continue unchanged.
 - **Evidence:** A direct owner answer in the Project Aegis session chat of
@@ -4825,3 +4941,119 @@ the entry governs.
 - **Expiry / use limit:** "revocable at any time" (the selected option's words);
   no other limit stated. It recurs from the switch's merge until revoked, and
   routine use does not consume it.
+
+### AEGIS-APR-116: The ledger keeper may record targeted reviews in the acceptance record table
+
+- **Event:** GRANT; a new grant. It widens the ledger keeper's role and does
+  not supersede or rewrite AEGIS-APR-101, whose role, independence limits and
+  Scope FORBIDDEN continue.
+- **Status at recording:** Owner approved; ACTIVE only once the fixed-format
+  table with D73 condition 2's schema, including the event-kind column, which
+  the paused tool repair adds, exists on the default branch. This is the
+  recorder's reading of the question's "in the table". It is not the keeper
+  table already in the ledger's first ledger-keeper recording. Until the owner
+  resumes the program, this entry covers nothing.
+- **Date / Grantor:** 2026-10-07 / Peter Nguyen.
+- **Owner decision, as transcribed by the coordinator from the session chat**
+  (answered before 2026-10-07T22:30:07Z, an upper bound). The question:
+
+  > Should the ledger keeper be allowed to record a "targeted review" in the table, meaning an independent reviewer checked a small edit of 10 lines or fewer, so the page stays accepted?
+
+  The owner chose **"Yes, explicit grant (Recommended)"**; the other option
+  was "No, full re-review". The selected option's text reads:
+
+  > Recorded as a new approval register entry. The keeper records the reviewer's check on the exact revision, never its own judgment. This matches your existing small-edit rule.
+
+- **Reason:** The repaired index can apply the existing small-edit rule only
+  if a reviewer's check of a small edit is recorded (D73 condition 11). The
+  conversion process that AEGIS-APR-101 ratified differs on whether a
+  targeted review qualifies, at its (b)2 and (b)3.
+- **Scope allowed:** As the question and option state: the ledger keeper may
+  record, as a row of the fixed-format table named in Status at recording, an
+  independent reviewer's check of a small edit of 10 lines or fewer, on the
+  exact revision, so the page stays accepted under the existing
+  [small-edit rule](../roadmaps/aegis-documentation-readability-backlog.md#remaining-page-review-in-larger-batches).
+- **Scope FORBIDDEN:** As the option states, "never its own judgment". None
+  additionally stated by the owner. AEGIS-APR-101's limits continue. Whether
+  the one-time backfill may transcribe historical targeted reviews is not
+  decided by this entry.
+- **Evidence:** A direct owner answer in the Project Aegis session chat of
+  2026-10-07, as transcribed by the coordinator. It is not a repository
+  artifact.
+- **Expiry / use limit:** None stated; recurring once active.
+
+### AEGIS-APR-117: The ledger keeper may append withdrawal rows after the switch
+
+- **Event:** GRANT; a new grant. It widens the ledger keeper's role and does
+  not supersede or rewrite AEGIS-APR-101.
+- **Status at recording:** Owner approved; ACTIVE only after the switch pull
+  request named in AEGIS-APR-114 merges to the default branch. The switch
+  happens only if the owner resumes the program (AEGIS-APR-113), so until
+  then this entry covers nothing.
+- **Date / Grantor:** 2026-10-07 / Peter Nguyen.
+- **Owner decision, as transcribed by the coordinator from the session chat**
+  (answered before 2026-10-07T23:16:31Z, an upper bound). The question:
+
+  > After the switch, if a recorded acceptance row turns out to be wrong, may the ledger keeper add a "withdraw" row to cancel it? The ledger is never rewritten; the cancellation is appended.
+
+  The owner chose **"Yes, keeper may (Recommended)"**; the other option was
+  "Each one comes to me". The selected option's text reads:
+
+  > The keeper appends a withdrawal row, bound to evidence, and it goes through normal review. The affected page becomes pending again.
+
+- **Reason:** After a switch, a wrong row in the table would change the
+  official count. The owner chose an append-only correction by the keeper
+  over a per-case owner decision.
+- **Scope allowed:** As the question and option state: after the switch, the
+  ledger keeper may append a withdrawal row that cancels a recorded
+  acceptance row that turns out to be wrong. The row is bound to evidence and
+  goes through normal review, and the affected page becomes pending again.
+  The ledger is never rewritten.
+- **Scope FORBIDDEN:** None additionally stated by the owner. AEGIS-APR-101's
+  limits continue.
+- **Evidence:** A direct owner answer in the Project Aegis session chat of
+  2026-10-07, as transcribed by the coordinator. It is not a repository
+  artifact.
+- **Expiry / use limit:** None stated; recurring once active.
+
+### AEGIS-APR-118: Security classification of the readability acceptance tool
+
+- **Event:** POLICY DECISION; a policy decision only, not a GRANT. It grants
+  nothing.
+- **Status at recording:** ACTIVE as policy once this entry is on the default
+  branch. **It takes effect then, independent of the paused program in
+  AEGIS-APR-113.**
+- **Date / Grantor:** 2026-10-07 / Peter Nguyen.
+- **Owner decision, as transcribed by the coordinator from the session chat**
+  (answered before 2026-10-07T22:30:07Z, an upper bound). The question:
+
+  > Should the readability index tool (tools/readability_acceptance/) be classed as security-relevant "approval/evidence tooling"?
+
+  The owner chose **"Yes, security-relevant (Recommended)"**; the other option
+  was "No". The selected option's text reads:
+
+  > Outside contributors' changes to it get a security review. No extra step for your own or the agents' PRs.
+
+- **Reason:** `CONTRIBUTING.md`'s security-relevant surfaces include
+  "approval/evidence tooling under `tools/`" but do not say whether this tool
+  is such tooling. Every pull request must answer the template's
+  security-relevant-surface question correctly.
+- **Scope allowed (selected policy):** `tools/readability_acceptance/` is
+  "approval/evidence tooling under `tools/`" within the security-relevant
+  surfaces listed in `CONTRIBUTING.md` ("External contributions"). This
+  confirms the existing wording and does not change it. Under existing rules:
+  - a pull request that touches the tool answers the template's question
+    **Yes**, naming it;
+  - an outside contribution that touches it receives the additional security
+    review (`docs/delivery-workflow.md`, `MG5`).
+
+  As the option states, there is "No extra step for your own or the agents'
+  PRs", which matches `MG5`'s outside-contribution scope.
+- **Scope FORBIDDEN:** It grants nothing and changes no file, check or
+  `gate-guard` pattern. None additionally stated by the owner.
+- **Evidence:** A direct owner answer in the Project Aegis session chat of
+  2026-10-07, as transcribed by the coordinator. It is not a repository
+  artifact. The wording it confirms is at `CONTRIBUTING.md` lines 243 to 245
+  on the default branch at recording.
+- **Expiry / use limit:** None stated. It stands until superseded by a later
+  recorded owner decision.

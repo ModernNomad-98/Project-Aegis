@@ -29,13 +29,22 @@ The [catch-up checkpoint after #554](#five-merge-checkpoint--2026-09-30-after-pu
 > five-merge window, changes no dated text and confers no acceptance; this page
 > remains pending.
 
-> **Owner decision — appended 2026-10-07, later the same day.** The open owner
-> question named in the note above is decided. The acceptance index will become
-> the official readability pending count after its tool is repaired and passes
-> an independent review
+> **Owner decision and pause — appended 2026-10-07, later the same day.** The
+> open owner question named in the note above was decided: the acceptance
+> index will give the official readability pending count after a gated repair
 > ([AEGIS-APR-113](../approvals/APPROVAL_REGISTER.md#aegis-apr-113-readability-pending-count-authority-option-1),
-> D73). Until that switch merges, the readability position stated in the note
-> above stands. The early forecast update this decision triggers is
+> D73). The owner then paused the program after that decision record and made
+> it a low-priority
+> [backlog item](aegis-open-decisions-2026-09-23.md#owner-requested-backlog-items),
+> so the readability ledger stays the record. The note above is corrected on
+> one point, and one finding is added: the acceptance tool over-counts
+> relative to the ledger's records by **at least 18** pages, not at least 6;
+> and its reader has a fifth blind spot, since it does not tell positive
+> statements from negative ones. The exact count is still not derivable. The
+> ledger's
+> [current reading](aegis-documentation-readability-backlog.md#current-reading-after-the-owners-decision-and-pause--appended-2026-10-07)
+> gives the figures and their refs. The early forecast update this decision
+> triggers is
 > [Material owner decision — 2026-10-07](#material-owner-decision--2026-10-07-readability-count-authority).
 > This note changes no dated text.
 
@@ -107,23 +116,23 @@ before treating its totals as current.
 ## Material owner decision — 2026-10-07, readability count authority
 
 On 2026-10-07 the owner decided that the acceptance index will give the
-readability pending count after a gated repair, and chose the structured-table
-repair path. The decision is recorded as AEGIS-APR-113 to AEGIS-APR-115 and
-D73. It adds an owner-selected program of three pull requests, outside the
-bounded selected planning subtotal, which stays **71–146 provisional active
-hours**. Stage 4B and BER-BKL-009 remain to be determined (TBD), so there is
-still no finite estimated time to completion (ETA).
+readability pending count after a gated repair (AEGIS-APR-113 to
+AEGIS-APR-118, D73). The owner then paused the program after this decision
+record ("Pause the program") and asked for it to become a low-priority
+backlog item. The repair and the switch are therefore **not selected work**.
+They sit in the
+[owner-requested backlog](aegis-open-decisions-2026-09-23.md#owner-requested-backlog-items),
+outside the bounded selected planning subtotal, which stays **71–146
+provisional active hours**. Stage 4B and BER-BKL-009 remain to be determined
+(TBD), so there is still no finite estimated time to completion (ETA).
 
-| Program pull request | Active hours | Status and basis |
+| Item | Active hours | Status and basis |
 | --- | ---: | --- |
-| Decision record (this change) | 3–5 | In progress; the plan's agent estimate across seven stages |
-| Tool repair with the one-time backfill | 16–32 | Not started; the estimate shown to the owner with the chosen option ("About 16–32 agent-hours (estimate)"), low confidence and unmeasured |
-| Switch | TBD | Not estimated; its own plan estimates it |
-| **Program total** | **19–37 plus TBD** | No finite total until the switch is estimated |
+| Decision record (this change) | 3–5, the initial estimate | Delivered by this change; actual measured at closeout (several plan rounds suggest it may exceed the estimate). |
+| Readability index repair and switch (paused, low priority) | 25–45 for the recommended variant, plus the switch (not estimated) | Paused. Variant estimates in agent-hours: V0, full backfill, 55–103; V1, no backfill, 21–38 plus 90–365 of re-review; V2, mechanical backfill (the planner's recommendation), 25–45; V3, fewer, larger PRs, 47–85. These are agent estimates, unmeasured and low confidence, from the paused program's planning, not repository records. They supersede the "About 16–32 agent-hours (estimate)" shown to the owner with option B. |
 
 This update closes no five-merge window and re-estimates no other row. The
-checkpoint after #554 remains the latest full reassessment; merges since then
-are not re-estimated here.
+checkpoint after #554 remains the latest full reassessment.
 
 ## Five-merge checkpoint — 2026-09-30, after pull request #554 (catch-up for 12 missed windows)
 

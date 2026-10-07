@@ -16,50 +16,96 @@ tracked page — `docs/evidence/session-continuation-2026-09-30.md` — so the t
 count is now **657**; that page joins the pending set, and this sentence is left
 as the dated snapshot it is.)
 
-### Owner decision on the count's authority — appended 2026-10-07
+### Current reading after the owner's decision and pause — appended 2026-10-07
 
-**Scope: this note records where the owner's 2026-10-07 decision is recorded
-and what it changes now: nothing in this ledger's records or readings.** It
-adds no page and no table row, confers nothing, changes no counting rule in
-force today, and rewrites no dated text.
+**Scope.** This note gives the current reading of this ledger after the
+owner's decisions of 2026-10-07. It adds no page and no table row, confers
+nothing, changes no counting rule in force, and rewrites no dated text.
 
-**The decision.** The acceptance index will become the official readability
-pending count once its tool is repaired and passes an independent review. A
-later pull request makes that switch; until it merges, this ledger's records
-and the readings below remain current. Recorded as
+**This ledger stays the record.** On 2026-10-07 the owner decided that the
+acceptance index will one day give the official readability pending count,
+recorded as
 [AEGIS-APR-113](../approvals/APPROVAL_REGISTER.md#aegis-apr-113-readability-pending-count-authority-option-1)
-to AEGIS-APR-115 and decision D73 of the
+to AEGIS-APR-118 and decision D73 of the
 [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions).
+The owner then paused that program after the decision record. The tool repair
+and the switch do not start unless the owner resumes them, and the work is a
+low-priority
+[backlog item](aegis-open-decisions-2026-09-23.md#owner-requested-backlog-items).
+Nothing in this ledger's process changes: the ledger keeper records under
+AEGIS-APR-101, and the
+[targeted-edit rule](#remaining-page-review-in-larger-batches), the
+net-difference measure and the new-page rule apply as written.
 
-**What it answers:** the "Held for the owner" question in the current-count
-reconciliation that directly follows this note;
-"Both deserve an owner ruling before the convention is relied on again" in the
-[first ledger-keeper recording](#first-ledger-keeper-recording--owner-ratified-role-2026-10-02),
-since future records go into one fixed-format table in this ledger, whose
-columns D73 sets as an audit condition (page, full commit and blob ID, a blob
-ID being the Git object ID of the file's exact content), added by the repair
-pull request and not by this note; and the precedence and counting rules the
-[keeper consistency note](#consistency-note--the-ledger-keeper-entry-2026-10-02-local--recorded-2026-10-03-utc)
-calls "still separately unresolved".
+**The current count, and why it is not exact.**
 
-**What changes only at the switch:** the index reads only the keeper's table; a
-page with no recorded acceptance counts as pending, replacing this ledger's
-current default for unlisted pages in the official count; a page whose recorded
-acceptance commit no longer exists anywhere counts as pending until it is
-re-reviewed; and this ledger stops stating its own count and cites the index.
+- This ledger's own figure is stale and is a floor. Its records support at
+  least 40 pending pages, as the current-count reconciliation below derives
+  for main after PR #676. No Markdown file has been added or removed since:
+  main after PR #677 tracks 675, the same as then. The true figure may be
+  higher: this ledger treats a page it does not list as reviewed, and the
+  pages have not been re-measured one by one against their last full-page
+  review.
+- The acceptance tool, `tools/readability_acceptance/check_index.py`, run on
+  main after PR #677, reports 212 pages provably pending, 159 with no
+  recorded revision, 224 within 10 lines of one and 7 it cannot decide, out
+  of 602 indexed pages. It states that the exact count is "NOT DERIVABLE from
+  this procedure".
+- That 212 is on the tool's own basis. It over-counts relative to this
+  ledger's records by **at least 18 pages, not the at least 6 that the
+  reconciliation below states**. An independent verification on 2026-10-07
+  found 12 more pages for which this ledger records a later full-page review
+  with at most 10 changed lines and no new heading since:
+  `.claude/skills/ci-pipeline-architect/SKILL.md`,
+  `.claude/skills/human-approval-boundary/SKILL.md`,
+  `.claude/skills/agent-instruction-consolidator/references/instruction-file-map.md`,
+  `.claude/skills/cloud-architecture-decider/references/decision-inputs.md`,
+  `.claude/skills/rag-security-architect/SKILL.md`,
+  `.claude/skills/ai-misinformation-guard/SKILL.md`,
+  `.claude/skills/model-poisoning-reviewer/SKILL.md`,
+  `.claude/skills/agent-tool-safety-guard/SKILL.md`,
+  `.claude/skills/llm-output-safety-reviewer/references/output-sink-catalog.md`,
+  `docs/roadmaps/ber-selected-host-capability-decision.md`,
+  `.claude/skills/ai-router-architect/SKILL.md` and
+  `.claude/skills/tenant-modeler/SKILL.md`.
+- It also found a fifth blind spot in the tool's reader: it does not tell a
+  positive statement from a negative one. So it binds some pages from text
+  that says they are pending, and at least one page from text that says
+  nothing was conferred.
+- The tool's output also depends on the clone: a shallow clone reports 0
+  pending, and a rebuild in a fresh clone changes 7 rows. The full size of
+  the over-count is not derivable without the repair, which is paused.
+- **So the exact pending count is not derivable today.** This ledger's floor
+  and the tool's figure are different bases: do not add, subtract or merge
+  them.
+- If the program resumes and the switch happens, the official count is
+  expected to start at about 510 to 610 of the 609 reader pages. Pages with no
+  recorded acceptance, and pages with unreviewed small edits, would count as
+  pending, and the count would fall as pages are reviewed. Those are planning
+  projections, not measurements.
 
-**What does not change:** the keeper's role under AEGIS-APR-101, and the
-[targeted-edit rule](#remaining-page-review-in-larger-batches), cited here and
-not restated. The "Owed, not done here" harvester repair becomes D73's
-structured-table repair, so the four prose blind spots are not repaired in the
-parser.
+**What this answers:**
 
-**Self-cost.** This note adds 45 lines and deletes 0 (git diff --numstat
-against the base commit) on an already-pending ledger. It confers nothing, and
-the ledger stays pending its independent full-page re-read. Like the 2026-10-03
-and 2026-10-07 notes, it moves the index's recorded rule line ranges and the
-`tracker_line` labels in `stated-acceptances.json` further down; neither is
-validated, and only the owed rebuild repairs them.
+- the "Held for the owner" question in the current-count reconciliation
+  below: decided, then paused;
+- "Both deserve an owner ruling before the convention is relied on again" in
+  the [first ledger-keeper recording](#first-ledger-keeper-recording--owner-ratified-role-2026-10-02):
+  future records would go into one fixed-format table in this ledger, whose
+  columns D73 sets as an audit condition; no table is added while the program
+  is paused;
+- the precedence and counting rules that the
+  [keeper consistency note](#consistency-note--the-ledger-keeper-entry-2026-10-02-local--recorded-2026-10-03-utc)
+  calls "Still separately unresolved".
+
+The "Owed, not done here" harvester repair in the reconciliation below is now
+part of the paused backlog item.
+
+**Self-cost.** This note adds 91 lines and deletes 0 (git diff --numstat
+against the base commit) on an already-pending ledger. It confers nothing,
+and the ledger stays pending its independent full-page re-read. Like the
+2026-10-03 and 2026-10-07 notes, it moves the index's recorded rule line
+ranges and the `tracker_line` labels in `stated-acceptances.json` further
+down; neither is validated, and only a rebuild repairs them.
 
 ### Current-count reconciliation — appended 2026-10-07, measured at 03c93c77
 

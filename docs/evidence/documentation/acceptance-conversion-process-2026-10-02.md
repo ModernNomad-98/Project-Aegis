@@ -447,4 +447,4 @@ On 2026-10-07 the owner decided the questions that items 2 and 3 of [Ratificatio
 
 **Item 3's consequence is adopted for the repaired index:** a page with no recorded acceptance counts as pending.
 
-**Nothing is in effect yet;** a later pull request makes the switch. This note confers nothing, the earlier text stands as written, and this page stays pending.
+**Nothing is in effect:** the owner paused the program after this decision record, and a switch happens only if the owner resumes it. This note confers nothing, the earlier text stands as written, and this page stays pending.
