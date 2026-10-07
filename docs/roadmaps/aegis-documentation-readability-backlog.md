@@ -16,6 +16,126 @@ tracked page — `docs/evidence/session-continuation-2026-09-30.md` — so the t
 count is now **657**; that page joins the pending set, and this sentence is left
 as the dated snapshot it is.)
 
+### Current-count reconciliation — appended 2026-10-07, measured at 03c93c77
+
+**Scope: this note re-measures the readability position at commit
+`03c93c77a05e89d082f93c91b23dffabb332373c` and points to the current reading.**
+It adds no page, confers or records no acceptance, changes no counting rule,
+approves nothing about the acceptance index's precedence, and rewrites no dated
+text. Terms used here: a **pull request (PR)** is a proposed change reviewed
+before it merges; a **commit SHA** is the 40-character Git object ID of one
+commit, and a short form is its leading characters; the **acceptance index** is
+`tools/readability_acceptance/acceptance-index.json`, a per-page record of the
+revision at which each page last received a full-page acceptance, harvested by
+`tools/readability_acceptance/build_index.py` from this ledger and the
+documentation evidence records; `check_index.py`, in the same folder, is the
+read-only script that applies this ledger's more-than-10-lines-or-new-section
+rule to that index; a **bound** is a provable minimum or maximum, not an exact
+count; the **ledger keeper** is the recording-only role the owner ratified; and
+[AEGIS-APR-101](../approvals/APPROVAL_REGISTER.md#aegis-apr-101-ledger-keeper-role-and-two-historical-recording-acts)
+is the owner approval register entry that ratified that role and expressly did
+not approve the index's precedence or any changed counting rule.
+
+**Dated, not current:** the opening paragraph's counts above (653 tracked, 584
+accepted, thirteen then 16 pending, 656, tip 657); older readings below it such
+as 17 and 18 known pending; the floor of 35 in
+[Correction to the pending floor — 2026-10-02](#correction-to-the-pending-floor--2026-10-02),
+measured at `d6e48418`; and the 674 tracked files, 608 reader pages, 218 and
+"at most 390" of the
+[premises correction](#premises-correction--appended-2026-10-03-measured-at-c3527560),
+measured at `c3527560`.
+
+**Inventory at `03c93c77`.** Method as in the 2026-10-03 note (paths from
+`git ls-tree -r --name-only 03c93c77` ending `.md`, one per path): 675 tracked
+Markdown files; 65 classified fixtures (the 66 under `scripts/` less
+`scripts/tests/fixtures/README.md`); one generated report; so
+`675 − 1 − 65 = 609` reader pages. One page was added since `c3527560`,
+`.coord/proc08-sweep-2026-10-03.md` (PR #656); none was deleted or renamed.
+
+**What the acceptance tool reports, on its own basis.** Command, with `--ref`
+pinned to the full commit SHA:
+
+```text
+python3 -I -B tools/readability_acceptance/check_index.py --json --ref 03c93c77a05e89d082f93c91b23dffabb332373c
+```
+
+Its summary: `reader_pages_in_index` 602, `recorded_pages_compared` 436,
+`provably_pending` 212, `no_recorded_acceptance` 159,
+`recorded_acceptance_within_10_lines` 224, `cannot_decide` 7, and
+`exact_pending_count` "NOT DERIVABLE from this procedure". The 212-page pending
+set is identical at `d6e48418`, `c3527560` and `03c93c77`: the index's
+acceptance rows are frozen at `d6e48418`, and no indexed page crossed the rule's
+threshold in its terms since. The 7 undecidable rows name two acceptance
+revisions, `65bacc7d6b85` and `d3dcb62a335d`, that no remote-tracking ref
+contains. **212 is the tool's count on its own basis — not a floor or ceiling on
+this ledger's records.**
+
+**The 2026-10-03 note's `unsure`, answered: yes, the tool over-counts relative
+to this ledger's records.** For each page below this ledger records a later
+full-page acceptance at revision R; `git diff --numstat <R> 03c93c77 -- <path>`
+prints nothing, so no line and no heading changed since; yet the tool lists the
+page as pending.
+
+| Page | Recorded acceptance revision (R) | Review recorded for |
+| --- | --- | --- |
+| `.claude/skills/iac-reviewer/SKILL.md` | `f5a6dabb7c8b` | PR #521 |
+| `.claude/skills/llm-output-safety-reviewer/SKILL.md` | `af328b512417` | PR #424 |
+| `.claude/skills/multi-tenant-data-architect/SKILL.md` | `a56c60d8ad54` | PR #410 |
+| `.claude/skills/source-of-truth-reconciler/SKILL.md` | `620b24595255` | PR #456 |
+| `tools/behavioral_eval_runner/README.md` | `acdcdad4563b` | PR #475 |
+| `docs/evidence/setup/issue-101-package-4a-host-feasibility.md` | `e6fc8d24ad78` | PR #625 review, recorded by the ledger keeper in PR #635; `e6fc8d24` is not an ancestor of the default branch and is reachable only through `origin/docs/readability-batch-b` |
+
+The over-count is **at least 6** pages; its full size is **not derivable**
+without repairing the harvester and rebuilding the index. So the 2026-10-03
+note's 218 and "at most 390" are tool-basis figures, **not** a floor or ceiling
+on this ledger's records.
+
+**What this ledger's records support at `03c93c77`: at least 40 pending.** This
+is the 2026-10-02 named set carried forward, 35 − 2 + 7 = 40. The 35 names were
+read from the three page lists in `verify_ground_truth.py` (19, 5 and 11, union
+35), the tool's encoding of the 2026-10-02 derivation. The two setup evidence
+pages leave the set because the keeper's first recording gives each a later
+recorded full-page acceptance at `e6fc8d24`, with no line changed since. The seven are reader pages
+added after `d6e48418`; they start pending under the new-page rule and none has
+a recorded full-page acceptance. **This is not a re-run of the 2026-10-02
+audit.** `git diff --numstat d6e48418 03c93c77 -- '*.md'` lists 44 Markdown paths
+changed or added — 34 reader pages and 10 classified fixtures; apart from the
+two setup pages and the seven new pages, those reader pages were not re-measured
+against their last recorded acceptance. For example, `docs/README.md` shows 83
+added and 60 deleted lines (143 changed) since `d6e48418`, and the keeper
+section below already records 141 for it with no acceptance conferred, so a
+re-run could only raise the floor. One carried page,
+`.claude/skills/cloud-security-baseline-reviewer/SKILL.md`, rests on the
+2026-10-02 determination because its drift cannot be re-measured in a fresh
+clone.
+
+Under this ledger's accepted-unless-listed default, 609 reader pages less at
+least 40 pending leaves **at most 569** counted accepted, so the 584 in the
+opening paragraph cannot be current. The floor of 40 and the tool's 212 are
+**different bases and are not nested**: 10 of the 33 carried pages are outside
+the tool's 212 (9 have no recorded index revision, 1 is undecidable). Do not
+add, subtract or merge the two figures. **The exact pending count is not
+derivable; this note asserts no exact count.**
+
+**Held for the owner:** whether this ledger's floor should follow the index's
+decision procedure once the harvester is repaired. AEGIS-APR-101's Scope
+FORBIDDEN reads: *"No approval of the charter's proposed canonical index, its
+precedence, or changed counting rules."*
+
+**Owed, not done here** (each writes under `tools/` and needs its own plan and
+review): the `build_index.py` re-run the 2026-10-03 note already names; and a
+harvester repair for four blind spots — a statement wrapped across lines, a page
+and its verdict in different table cells, short page names without the .md
+suffix and `../`-relative links, and keeper rows that carry no verdict word —
+with the six pages above as its regression cases.
+
+**Self-cost.** This note adds 120 lines and deletes 0 (`git diff --numstat
+03c93c77`) on an already-pending ledger; it confers no acceptance, and the
+ledger stays pending its independent full-page re-read. Like the 2026-10-03
+note, it moves the index's recorded rule line ranges and the `tracker_line`
+labels in `stated-acceptances.json` further down; neither is validated, and only
+the owed rebuild repairs them.
+
 ### Premises correction — appended 2026-10-03, measured at c3527560
 
 **Scope: this note repairs three premises of this ledger and nothing else.** It
