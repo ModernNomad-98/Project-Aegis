@@ -29,6 +29,16 @@ The [catch-up checkpoint after #554](#five-merge-checkpoint--2026-09-30-after-pu
 > five-merge window, changes no dated text and confers no acceptance; this page
 > remains pending.
 
+> **Owner decision — appended 2026-10-07, later the same day.** The open owner
+> question named in the note above is decided. The acceptance index will become
+> the official readability pending count after its tool is repaired and passes
+> an independent review
+> ([AEGIS-APR-113](../approvals/APPROVAL_REGISTER.md#aegis-apr-113-readability-pending-count-authority-option-1),
+> D73). Until that switch merges, the readability position stated in the note
+> above stands. The early forecast update this decision triggers is
+> [Material owner decision — 2026-10-07](#material-owner-decision--2026-10-07-readability-count-authority).
+> This note changes no dated text.
+
 **Earlier reading at the 2026-09-28 catch-up checkpoint after #491:** sixteen PRs merged after #474, missing three five-merge windows (those ending #475, #481 and #487); this record covers the window ending #491. No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The readability sweep is finished: #475 landed the last pending page, the Behavioral Eval Runner (BER) README, under a one-time exception, and open #490 records **569 accepted reader pages and 0 pending** and the owner's net-difference rule for the 10-line rule. Artificial intelligence (AI) is now spelled out at first use on 64 pages (#486). The owner approved a second format-only audit-engine change (v1.13.4), recorded by #491 as AEGIS-APR-079; it is not yet built. The owner also approved building the quality assurance (QA) Tier 1 skill batch proposed in open #492, recorded as decision D68 in open #493, at 9.75–17.25 agent-estimated hours. Near-term work outside the subtotal therefore moves from 1–3.5 to a provisional **11.25–21.75 active hours** of agent estimates, and the unselected skill-expansion candidates fall from 106–220 to 96–200. *(Reading note appended 2026-09-30: both figures belong to this #491-era reading. The arithmetic is 106 − 10 = 96 and 220 − 20 = 200, with QA Tier 1 (10–20) moving to the near-term table; this checkpoint's own optional-scope paragraph still lists the pre-move **106–220** as the base while giving the **96–200** result, and the current reading above records a further reduction to **68–140** after D69, D70 and D71. Dated snapshot: annotated, not rewritten.)* The owner's decisions are in the [open-decisions index](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28) (#460, #487); the next backlog pick is still deferred. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the virtual machine (VM) paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #491](#five-merge-checkpoint--2026-09-28-after-pull-request-491-catch-up-for-3-missed-windows).
 
 **Earlier reading at the 2026-09-28 catch-up checkpoint after #474:** twenty-one PRs merged after #454, missing four five-merge windows (those ending #455, #458, #465 and #471). No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The D15 enrichment deltas (#455; D15 is a recorded decision to improve four shipped skills), the audit-report generator at engine v1.13.3 (#461, with register entries AEGIS-APR-071 to AEGIS-APR-076 from #453 and #465) and the checkpoint after #454 (#457) are delivered, so near-term work outside the subtotal falls from 5.25–14 to a provisional **1–3.5 active hours** of agent estimates. The owner-ordered readability sweep found 103 accepted pages past the 10-line rule; the coordinating session reports 102 of them accepted again after independent full-page re-reads (88 with fixes in #456, #459, #462 and #466 to #474, and 14 unchanged), and the Behavioral Eval Runner (BER) README waits in open #475 for a protected-path exception. The owner's later 2026-09-28 decisions are in the [open-decisions index](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28) (#460); the next backlog pick is still deferred. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the virtual machine (VM) paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #474](#five-merge-checkpoint--2026-09-28-after-pull-request-474-catch-up-for-4-missed-windows).
@@ -93,6 +103,27 @@ the [documentation estimate audit after #205](#documentation-estimate-audit--202
 the [execution measurements](aegis-execution-metrics.md#catch-up-checkpoint-after-pull-request-491--2026-09-28)
 and [documentation batch ledger](aegis-documentation-readability-backlog.md#documentation-batches)
 before treating its totals as current.
+
+## Material owner decision — 2026-10-07, readability count authority
+
+On 2026-10-07 the owner decided that the acceptance index will give the
+readability pending count after a gated repair, and chose the structured-table
+repair path. The decision is recorded as AEGIS-APR-113 to AEGIS-APR-115 and
+D73. It adds an owner-selected program of three pull requests, outside the
+bounded selected planning subtotal, which stays **71–146 provisional active
+hours**. Stage 4B and BER-BKL-009 remain to be determined (TBD), so there is
+still no finite estimated time to completion (ETA).
+
+| Program pull request | Active hours | Status and basis |
+| --- | ---: | --- |
+| Decision record (this change) | 3–5 | In progress; the plan's agent estimate across seven stages |
+| Tool repair with the one-time backfill | 16–32 | Not started; the estimate shown to the owner with the chosen option ("About 16–32 agent-hours (estimate)"), low confidence and unmeasured |
+| Switch | TBD | Not estimated; its own plan estimates it |
+| **Program total** | **19–37 plus TBD** | No finite total until the switch is estimated |
+
+This update closes no five-merge window and re-estimates no other row. The
+checkpoint after #554 remains the latest full reassessment; merges since then
+are not re-estimated here.
 
 ## Five-merge checkpoint — 2026-09-30, after pull request #554 (catch-up for 12 missed windows)
 

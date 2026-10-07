@@ -438,3 +438,13 @@ and the two candidate pages remain **pending**.
 **What ratification does not do.** It ratifies a recording role and two named historical recording acts, and nothing else. It confers no acceptance of any page, including this one; it grants no authority to re-review a page, to override a review finding, or to waive any existing review or delivery requirement; and it grants no installation, host session, provider call, credential access, private-data access or deployment authority. The register entry's `Historical ratification` is limited to the two acts delivered in PR #635, and expressly does not assert that the keeper held authority beforehand.
 
 **Cost of this note.** This section is more than 10 changed lines on a page that is already **pending**, so this note stays **pending** and owes its own independent full-page re-read against [Acceptance for each page](../../roadmaps/aegis-documentation-readability-backlog.md#acceptance-for-each-page) by a reader who did not write this section. No acceptance is recorded here, and none is manufactured to offset it.
+
+## Consistency note — the index decision; 2026-10-07
+
+On 2026-10-07 the owner decided the questions that items 2 and 3 of [Ratification owed](#ratification-owed) raise: [AEGIS-APR-113](../../approvals/APPROVAL_REGISTER.md#aegis-apr-113-readability-pending-count-authority-option-1) and D73 in the [recorded decisions](../../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions). The register is the authority, and this note is a pointer.
+
+**Where the decision differs from this note's proposal.** The recording stays in the readability ledger, as one fixed-format table the ledger keeper fills, and the index is built only from that table. Section (d)'s "The index row is the recording act" was not chosen. Section (c)'s precedence list was not put to the owner and is not adopted by this decision.
+
+**Item 3's consequence is adopted for the repaired index:** a page with no recorded acceptance counts as pending.
+
+**Nothing is in effect yet;** a later pull request makes the switch. This note confers nothing, the earlier text stands as written, and this page stays pending.

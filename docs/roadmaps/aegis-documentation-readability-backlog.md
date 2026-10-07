@@ -16,6 +16,51 @@ tracked page — `docs/evidence/session-continuation-2026-09-30.md` — so the t
 count is now **657**; that page joins the pending set, and this sentence is left
 as the dated snapshot it is.)
 
+### Owner decision on the count's authority — appended 2026-10-07
+
+**Scope: this note records where the owner's 2026-10-07 decision is recorded
+and what it changes now: nothing in this ledger's records or readings.** It
+adds no page and no table row, confers nothing, changes no counting rule in
+force today, and rewrites no dated text.
+
+**The decision.** The acceptance index will become the official readability
+pending count once its tool is repaired and passes an independent review. A
+later pull request makes that switch; until it merges, this ledger's records
+and the readings below remain current. Recorded as
+[AEGIS-APR-113](../approvals/APPROVAL_REGISTER.md#aegis-apr-113-readability-pending-count-authority-option-1)
+to AEGIS-APR-115 and decision D73 of the
+[recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions).
+
+**What it answers:** the "Held for the owner" question in the current-count
+reconciliation that directly follows this note;
+"Both deserve an owner ruling before the convention is relied on again" in the
+[first ledger-keeper recording](#first-ledger-keeper-recording--owner-ratified-role-2026-10-02),
+since future records go into one fixed-format table in this ledger, whose
+columns D73 sets as an audit condition (page, full commit and blob ID, a blob
+ID being the Git object ID of the file's exact content), added by the repair
+pull request and not by this note; and the precedence and counting rules the
+[keeper consistency note](#consistency-note--the-ledger-keeper-entry-2026-10-02-local--recorded-2026-10-03-utc)
+calls "still separately unresolved".
+
+**What changes only at the switch:** the index reads only the keeper's table; a
+page with no recorded acceptance counts as pending, replacing this ledger's
+current default for unlisted pages in the official count; a page whose recorded
+acceptance commit no longer exists anywhere counts as pending until it is
+re-reviewed; and this ledger stops stating its own count and cites the index.
+
+**What does not change:** the keeper's role under AEGIS-APR-101, and the
+[targeted-edit rule](#remaining-page-review-in-larger-batches), cited here and
+not restated. The "Owed, not done here" harvester repair becomes D73's
+structured-table repair, so the four prose blind spots are not repaired in the
+parser.
+
+**Self-cost.** This note adds 45 lines and deletes 0 (git diff --numstat
+against the base commit) on an already-pending ledger. It confers nothing, and
+the ledger stays pending its independent full-page re-read. Like the 2026-10-03
+and 2026-10-07 notes, it moves the index's recorded rule line ranges and the
+`tracker_line` labels in `stated-acceptances.json` further down; neither is
+validated, and only the owed rebuild repairs them.
+
 ### Current-count reconciliation — appended 2026-10-07, measured at 03c93c77
 
 **Scope: this note re-measures the readability position at commit
