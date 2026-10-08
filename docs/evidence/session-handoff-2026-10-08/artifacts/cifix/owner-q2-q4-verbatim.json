@@ -1,0 +1,49 @@
+{
+ "questions": [
+  {
+   "question": "The exception has to name the fix PR's exact commit, which only exists once the fix is written. The last one-time exception (AEGIS-APR-106) handled this with a separate small PR that changes only the approval register, merged just before the protected PR. That's a fourth PR your instruction didn't name. May the team open and merge it on the same terms (all seven stages, all checks green, admin merge allowed)?",
+   "header": "Register PR",
+   "multiSelect": false,
+   "options": [
+    {
+     "label": "Yes, same terms (Recommended)",
+     "description": "Follows the precedent. The fix PR stays one file, and the exception is in the register, approved and pinned to the exact commit, before the fix merges. About 30–45 extra minutes."
+    },
+    {
+     "label": "Ask me before merging",
+     "description": "The team prepares the register PR, and you approve its merge yourself."
+    }
+   ]
+  },
+  {
+   "question": "After the fix merges, the register should record that the one-time exception has been used up. Should that be its own small PR right after the merge (the AEGIS-APR-107 precedent), or wait for the next register PR?",
+   "header": "Used-up note",
+   "multiSelect": false,
+   "options": [
+    {
+     "label": "Batch it later (Recommended)",
+     "description": "Recorded in the next register PR, which will also record FU-2's grant as used up. One PR instead of two, with no loss of safety, since a one-time exception for an exact commit can't be reused anyway."
+    },
+    {
+     "label": "Own PR right after",
+     "description": "Matches APR-107 exactly. Costs one more seven-stage PR, about 30–45 minutes."
+    }
+   ]
+  },
+  {
+   "question": "Suppose the fix PR's commit changes after the exception is recorded, for example because a reviewer asks for a change. The recorded exception would then name the wrong commit. What should happen?",
+   "header": "Commit moves",
+   "multiSelect": false,
+   "options": [
+    {
+     "label": "Ask me again (Recommended)",
+     "description": "Matches the AEGIS-APR-032→034 precedent. Each exception stays tied to a commit you approved. Costs a short wait for your answer if it happens, which is unlikely because the fix is small."
+    },
+    {
+     "label": "Re-record automatically",
+     "description": "The team records a new exception for the new commit under your original approval. Faster, but it stretches a one-time exception further than your wording says."
+    }
+   ]
+  }
+ ]
+}

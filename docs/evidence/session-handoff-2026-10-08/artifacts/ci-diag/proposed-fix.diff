@@ -1,0 +1,19 @@
+--- a/scripts/tests/test_offline_ci.py
++++ b/scripts/tests/test_offline_ci.py
+@@ -155,6 +155,16 @@
+                                        "user.email=fixture@example.invalid", *args], cwd=repo,
+                                       check=True, capture_output=True)
+             git("init", "--quiet")
++            # Git runs auto-maintenance after `commit` and `fetch`, detached by
++            # default (maintenance.autoDetach), and since 2.54 its default
++            # geometric strategy can repack even this tiny repository. That
++            # detached `git repack` then writes into .git while
++            # TemporaryDirectory removes it, so cleanup fails with OSError
++            # ENOTEMPTY (runs 36695924676 and 37713171379). The fixture needs
++            # no maintenance: disable it in the fixture repository's own
++            # config, which the guard's `git fetch` reads as well.
++            git("config", "maintenance.auto", "false")
++            git("config", "gc.auto", "0")
+             (repo / "README.md").write_text("fixture\n", encoding="utf-8")
+             if rename:
+                 old = repo / rename_from
