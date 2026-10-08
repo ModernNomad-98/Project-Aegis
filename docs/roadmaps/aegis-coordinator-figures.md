@@ -79,6 +79,25 @@ Job declarations and their declared limits, read from that file:
 | `tools-tests-windows` | `windows-latest` | 1200 s (20 min) | — |
 | `gate-guard` | `ubuntu-latest` | 300 s (5 min) | `if: github.event_name == 'pull_request'` |
 
+**Dated note, 2026-10-08: the workflow changed after this window.**
+Re-derived with step 4 of [§6](#6-regeneration--exact-commands) against
+`origin/main` at `c060a7cb` on 2026-10-08: the workflow now declares **six**
+jobs. Pull request #676 (merged 2026-10-06T01:29:57Z, after this baseline's
+pinned window ended) added `changes` (`ubuntu-latest`, 300 s / 5 min), which
+reads a pull request's changed paths. `windows-offline-checks` now carries
+`needs: [changes]` and
+`if: github.event_name == 'push' || needs.changes.outputs.offline == 'true'`;
+`tools-tests-linux` and `tools-tests-windows` carry `needs: [changes]` and
+`if: github.event_name == 'push' || needs.changes.outputs.tools == 'true'`.
+The table above, "five jobs" in §3.1 and §3.3, and warning 4's "The five
+jobs also run in parallel" describe the workflow during the pinned window and
+stay as measured. A later window differs in two ways: a skipped job is
+excluded from the sample (step 2), so those three jobs have fewer samples;
+and when they run, they start only after `changes` finishes, so their path
+through the run includes that job and a second wait for a runner. That
+second point is read from the workflow, not measured, and this note lands no
+duration figure. The [CI guide](../offline-ci.md) states when each job runs.
+
 ### 3.2 The baseline table (job level, seconds)
 
 Primary sample: every non-`skipped` job with both timestamps, success **and**

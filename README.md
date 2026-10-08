@@ -1596,6 +1596,7 @@ uses Python 3.14 and provides these jobs:
 | `windows-offline-checks` | Additional Windows coverage: the Python checks plus native Windows PowerShell and PowerShell Core acceptance. This job is not registered as a required branch-protection check. |
 | `tools-tests-linux`, `tools-tests-windows` | Tools test suites (setup host-bridge callback tests on Node.js 24, setup routing-contract tests and delivery-control tests) on separate Ubuntu and Windows runners, isolated from the gate jobs because a pull request can change this test code without tripping `gate-guard`. These jobs are not registered as required branch-protection checks. |
 | `gate-guard` | Required PR-only check: deliberately fails when protected validation, workflow, agent-definition, Claude Code or Git configuration, runtime, test or dependency paths change (including the Dependabot configuration, `.github/dependabot.yml`), so those changes receive explicit review. |
+| `changes` | Reads the pull request's changed paths and decides which advisory jobs run. `changes`, `validate-skills` and `gate-guard` run on every pull request to `main`; `windows-offline-checks` runs only when the change touches `tools/`, `requirements-ci.in` or `requirements-ci.txt`, and `tools-tests-linux` and `tools-tests-windows` only when it touches `tools/`. On a push to `main` every job runs except the pull-request-only `gate-guard`. Record a skipped job as skipped, not as passed. The [CI guide](docs/offline-ci.md#reading-a-failure) explains how to read a skip. |
 
 Notes:
 

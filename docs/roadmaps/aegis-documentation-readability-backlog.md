@@ -108,6 +108,31 @@ and the ledger stays pending its independent full-page re-read. Like the
 ranges and the `tracker_line` labels in `stated-acceptances.json` further
 down; neither is validated, and only a rebuild repairs them.
 
+**Correction (appended 2026-10-08).** Two points in the note above are
+corrected forward. Its text is unchanged.
+
+- **The keeper recording's second point is still open.** The second item
+  under "What this answers" settles only the first of the two points that
+  the first ledger-keeper recording says "deserve an owner ruling": where
+  future records go. Its second point is not settled: the revision that
+  recording names for its two pages is not on the default branch. Measured
+  on 2026-10-08 with `git ls-remote origin`, that revision is still held by
+  the branch `docs/readability-batch-b` and by the head reference of pull
+  request #625. D73 row 8 leaves the durable preservation mechanism to the
+  tool-repair plan, and a new reference namespace, a tag convention or a
+  merge-method rule needs the owner's decision first. Until then, the
+  revision can be fetched only while one of those references exists.
+- **The projected starting count.** "about 510 to 610 of the 609 reader
+  pages" restates the question shown to the owner, which AEGIS-APR-113
+  quotes as "about 510–610 of 609 pages". The count cannot exceed the 609
+  reader pages, so the upper end is all 609.
+
+**Self-cost.** This correction adds 25 lines and deletes 0 (git diff
+--numstat against the base commit) on an already-pending ledger. It confers
+nothing. Like the notes above, it moves the index's recorded rule line ranges
+and the `tracker_line` labels in `stated-acceptances.json` further down;
+neither is validated, and only a rebuild repairs them.
+
 ### Current-count reconciliation — appended 2026-10-07, measured at 03c93c77
 
 **Scope: this note re-measures the readability position at commit

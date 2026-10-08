@@ -10,10 +10,13 @@ inputs; they do not run a live model evaluation.
 
 1. Run the [local checks](#local-reproduction) on the changed revision and
    record the command, result and any skip.
-2. Open a pull request (PR) and wait for all five jobs in the table below
-   (the Linux and Windows verification jobs, the two tools-test jobs and the
-   protected-file guard) on its exact head revision. A later push starts new
-   checks; older green results do not cover the new head.
+2. Open a pull request (PR) and wait for every job in the table below that
+   runs on the pull request's latest commit (its head). `changes`,
+   `validate-skills` and `gate-guard` run on every pull request to `main`;
+   `windows-offline-checks` runs only when the change touches `tools/`,
+   `requirements-ci.in` or `requirements-ci.txt`, and `tools-tests-linux` and
+   `tools-tests-windows` only when it touches `tools/`. A later push starts
+   new checks; older green results do not cover the new head.
 3. Read the job logs and retained evidence if a check fails. Fix a test or
    environment failure and rerun the new candidate. A documented protected
    path guard failure needs an owner disposition under the
@@ -25,11 +28,31 @@ inputs; they do not run a live model evaluation.
    have passed. A skipped capability remains unproven.
 
 The `validate-skills` workflow runs on every pull request targeting `main` and
-every push to `main`. Pull requests have no path filter. The existing required
-check names stay `validate-skills` and `gate-guard`; branch protection is unchanged.
+every push to `main`. Inside it, a path filter decides whether three advisory
+jobs run. On a pull request, the `changes` job lists the paths the pull
+request changes against `main` (a three-dot `git diff --name-only` against
+the base branch) and selects:
+
+- `windows-offline-checks` only when the change touches `tools/`,
+  `requirements-ci.in` or `requirements-ci.txt`;
+- `tools-tests-linux` and `tools-tests-windows` only when it touches
+  `tools/`.
+
+A job the filter does not select is skipped. A pull request that touches
+nothing under `tools/` and neither lock file skips all three, whatever else
+it changes: skills, documentation, `scripts/` or `.github/` alone run
+neither the Windows verification job nor the tools-test jobs. On a push to
+`main` the `changes` job selects all three, so the post-merge run is the
+full suite. `validate-skills` and `gate-guard` have no path filter. The three
+selected jobs need `changes`, so they are also skipped when `changes` itself
+does not succeed; [Reading a failure](#reading-a-failure) says how to tell
+the two apart. Record a skipped job as skipped, not as passed. The existing
+required check names stay `validate-skills` and `gate-guard`; branch
+protection is unchanged.
 
 | Job | Coverage | Merge role | Timeout |
 | --- | --- | --- | --- |
+| `changes` on Ubuntu | Lists the pull request's changed paths and selects the Windows verification and tools-test jobs (on a push to `main`, all three); those jobs need it, so they are skipped if it does not succeed | Not registered as required; runs on every pull request and push | 5 minutes |
 | `validate-skills` on Ubuntu | CI recorder/guard regressions, validator, audit and link-checker self-tests, skill validation, BER self-check and full suite, PowerShell Core Scenario A acceptance, pull-request-only Developer Certificate of Origin (DCO) check | Existing required check | 15 minutes |
 | `windows-offline-checks` on Windows | Recorder regressions, validator, audit and link-checker self-tests, skill validation, BER self-check and full suite, sequential PowerShell Desktop 5.1 and Core acceptance | Additional visible coverage; not registered as required | 20 minutes |
 | `gate-guard` on Ubuntu | Detect changes to the merge gate and its enforcement surfaces | Existing required check; PR only | 5 minutes |
@@ -38,7 +61,9 @@ check names stay `validate-skills` and `gate-guard`; branch protection is unchan
 
 The two verification jobs run independently, without cross-platform fail-fast,
 automatic retries, quarantine or `continue-on-error`. A delivery closeout waits
-for both verification jobs. A post-merge run detects regressions on `main`; it
+for each verification job that runs on the head. Record a skipped job as
+skipped, not as passed. The post-merge run on `main` runs every job except
+the pull-request-only `gate-guard`, so it detects regressions there; it
 cannot retroactively prevent a merge.
 
 ### Gate isolation
@@ -93,7 +118,8 @@ without the variable and does not run with it.
 
 Whether the tools jobs become required status checks is a separate
 branch-protection decision for the owner. Until then they are visible
-coverage, and a delivery closeout waits for them like the Windows job.
+coverage, and a delivery closeout waits for them, as for the Windows job,
+whenever they run.
 
 ## Dependencies and environment
 
@@ -204,8 +230,10 @@ individual tests.
 | --- | --- |
 | Environment precheck fails | The expected interpreter or pinned dependency is absent or changed; later skipped tests cannot be counted as passing coverage. |
 | Validator or test job fails | Read its recorded command, native exit code and raw log. Correct the cause and rerun checks on the new revision. |
+| Every job is cancelled at the same moment | When the durations match none of the jobs' own timeouts, this is the infrastructure-flake signature documented on the `changes` job in `.github/workflows/validate-skills.yml`: re-run the workflow on the same head. A cancelled run is not a pass. |
 | Protected-file guard fails | A changed path needs deliberate manual review and merge. The guard is reporting its intended condition; it was not bypassed or made green. Follow the owner approval register and current merge policy. |
 | Capability test skips | That capability was not exercised on this host. Keep the skip in the closeout and seek another host or proof when required. |
+| An advisory job is skipped | Check the `changes` job first. If it failed, timed out or was cancelled, every job that needs it is skipped too, and that failure is the finding to fix. Otherwise the path filter did not select the job for this pull request. Either way the job did not run: record a skipped job as skipped, not as passed. The post-merge run on `main` selects it. |
 
 ## Protected files
 
