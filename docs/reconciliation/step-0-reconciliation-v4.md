@@ -3870,8 +3870,36 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     The program is paused after this decision record. **Review:** if the
     owner resumes the program, its first plan re-checks each condition above
     against the default branch at that time.
+  - **Correction (appended 2026-10-08, no rewrite of the D73 record; verified
+    against `origin/main` at `c060a7cb`).** Two points in this entry are
+    clarified. No condition, source label, owner decision or count above
+    changes.
+    1. **Row 2 (e) applies per event kind.** "any row whose offline checks
+       (commit, blob ID, identifiers) fail" means the checks that apply to
+       that row's event kind. A lost-commit event, which (d) allows, records a
+       commit that by definition does not resolve, so the build does not
+       reject it for that, and it still never counts as an acceptance. A
+       withdrawal is checked against the earlier event it cancels, as (c)
+       requires. Which checks apply to each kind stays part of the validity
+       rules that the tool-repair plan defines (row 2). This answers minor
+       finding m-1 of the round-3 implementation audit on PR #678 (comment
+       6049874529).
+    2. **"Not decided here" has a fourth item:** 4. whether a targeted-review
+       row may be withdrawn as an "acceptance row" under AEGIS-APR-117. Row 2
+       (c) and its Source cell already mark it Open, and the list above
+       omitted it (finding m-2 of the same audit). AEGIS-APR-113's "Not
+       decided by this entry" list is not edited: the register's preamble
+       says "do not edit old entries", and the item concerns the scope of
+       AEGIS-APR-117, not what AEGIS-APR-113 decides.
 
 ## 6. Post-merge corrections
+
+- **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
+  item.** D73 gained an inline appended correction. Row 2 (e)'s offline checks
+  are the ones that apply to each event kind, and the "Not decided here" list
+  gains the Open question of whether a targeted-review row may be withdrawn
+  under AEGIS-APR-117. No condition, count or register entry changes, and
+  D73's dated text above is unchanged. See the D73 entry.
 
 - **2026-09-30 — Line-number citations in §5 re-verified; the stale ones are
   re-pointed.** A full-page audit checked every `path:NNN` / "line NNN"
