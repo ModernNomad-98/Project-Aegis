@@ -23,8 +23,8 @@ owner's decisions of 2026-10-07. It adds no page and no table row, confers
 nothing, changes no counting rule in force, and rewrites no dated text.
 
 **This ledger stays the record.** On 2026-10-07 the owner decided that the
-acceptance index will one day give the official readability pending count,
-recorded as
+acceptance index would give the official readability pending count after a
+gated repair, recorded as
 [AEGIS-APR-113](../approvals/APPROVAL_REGISTER.md#aegis-apr-113-readability-pending-count-authority-option-1)
 to AEGIS-APR-118 and decision D73 of the
 [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions).
@@ -49,7 +49,8 @@ net-difference measure and the new-page rule apply as written.
 - The acceptance tool, `tools/readability_acceptance/check_index.py`, run on
   main after PR #677, reports 212 pages provably pending, 159 with no
   recorded revision, 224 within 10 lines of one and 7 it cannot decide, out
-  of 602 indexed pages. It states that the exact count is "NOT DERIVABLE from
+  of 602 indexed pages (the index lists no page added after it was built,
+  which is 7 of the 609 reader pages on main after PR #677). It states that the exact count is "NOT DERIVABLE from
   this procedure".
 - That 212 is on the tool's own basis. It over-counts relative to this
   ledger's records by **at least 18 pages, not the at least 6 that the
@@ -100,7 +101,7 @@ net-difference measure and the new-page rule apply as written.
 The "Owed, not done here" harvester repair in the reconciliation below is now
 part of the paused backlog item.
 
-**Self-cost.** This note adds 91 lines and deletes 0 (git diff --numstat
+**Self-cost.** This note adds 92 lines and deletes 0 (git diff --numstat
 against the base commit) on an already-pending ledger. It confers nothing,
 and the ledger stays pending its independent full-page re-read. Like the
 2026-10-03 and 2026-10-07 notes, it moves the index's recorded rule line

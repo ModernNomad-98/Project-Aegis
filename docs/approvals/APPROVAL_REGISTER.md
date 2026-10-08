@@ -4560,8 +4560,11 @@ the entry governs.
 - **Event:** POLICY DECISION; a policy decision only, not a GRANT. It selects
   which record will give this repository's documentation readability pending
   count, and the counting and recording rules that count will follow. It grants
-  no work. The owner's work and merge authority for this program are
-  AEGIS-APR-114 and AEGIS-APR-115.
+  no work. The owner's grants for this program are two delivery grants and
+  two keeper-role grants: AEGIS-APR-114, the program's pull requests;
+  AEGIS-APR-115, routine rebuild pull requests after a switch; AEGIS-APR-116,
+  targeted-review rows; and AEGIS-APR-117, withdrawal rows. None of them
+  covers any work while the program is paused (Status below).
 - **Status at recording:** ACTIVE as policy once this entry is on the default
   branch. **The switch it selects has not happened.** Until a later pull
   request makes the switch on the conditions below, the
@@ -4929,8 +4932,8 @@ the entry governs.
   rebuild that changes only one of them is covered. Whether a pull request
   that writes any other path is a rebuild pull request is not decided by this
   entry. Until the owner decides, such a pull request is not covered: under
-  this register's preamble, "An action is covered only by an effectively
-  ACTIVE human grant whose scope includes it."
+  this register's preamble,
+  "An action is covered only by an effectively ACTIVE human grant whose scope includes it, after considering the full history and any actual limits."
 - **Scope FORBIDDEN:** As the selected option states,
   "Nothing else is covered." The option's word "only" excludes a pull request that also changes
   the tool or its tests, the keeper's table or any other page. The entries

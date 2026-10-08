@@ -280,7 +280,8 @@ not authorize its implementation.
   - **What it is:** repair `tools/readability_acceptance/` so that it reads a
     fixed-format table of recorded reviews kept inside the
     [readability ledger](aegis-documentation-readability-backlog.md), seed
-    that table once, then make the acceptance index the official pending
+    that table once by the one-time reviewed backfill of option B, then make
+    the acceptance index the official pending
     count, under the conditions in decision D73.
   - **Decisions already recorded:**
     - AEGIS-APR-113: the policy and the pause;
@@ -298,7 +299,10 @@ not authorize its implementation.
       recover;
     - V2, mechanical backfill from machine-verifiable records only: about
       25–45. This is the planner's recommendation. It would narrow option B's
-      backfill, so it needs the owner's confirmation;
+      backfill and partly change "Parallel repair PRs" (4 pull requests
+      instead of 10), so it needs the owner's confirmation; V1 would drop that
+      backfill and V3 would reverse "Parallel repair PRs", so each of them
+      would need the owner's decision too;
     - V3, fewer and larger pull requests: about 47–85.
 
     The switch is not estimated.
@@ -310,9 +314,11 @@ not authorize its implementation.
     - plans re-derived against the default branch at that time;
     - D73's conditions, including a durable way to preserve recorded
       acceptance commits, which needs an owner decision if it adds a
-      repository convention;
-    - the lighter rebuild review path, which the owner chose to raise at the
-      2026-10-11 review-cap check-in.
+      repository convention.
+  - **Optional follow-up, not a prerequisite:** a lighter review path for
+    machine-checked rebuild pull requests, which the owner chose to raise at
+    the 2026-10-11 review-cap check-in. Without it, rebuilds use the normal
+    seven-stage path.
   - **Resume trigger:** an owner decision only. Until then the readability
     ledger stays the record.
 
