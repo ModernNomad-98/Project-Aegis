@@ -14,6 +14,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 import yaml
 
@@ -155,6 +156,10 @@ class ProtectedFileGuardTests(unittest.TestCase):
                                        "user.email=fixture@example.invalid", *args], cwd=repo,
                                       check=True, capture_output=True)
             git("init", "--quiet")
+            # Runs 36695924676 and 37713171379 exposed detached Git
+            # auto-maintenance racing this fixture's directory cleanup.
+            git("config", "maintenance.auto", "false")
+            git("config", "gc.auto", "0")
             (repo / "README.md").write_text("fixture\n", encoding="utf-8")
             if rename:
                 old = repo / rename_from
@@ -184,6 +189,29 @@ class ProtectedFileGuardTests(unittest.TestCase):
             return subprocess.run(["bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", self.guard],
                                   cwd=repo, env=dict(os.environ, BASE_REF="fixture-base", RUNNER_TEMP=str(root)),
                                   capture_output=True, text=True)
+
+    def test_fixture_repository_starts_no_auto_maintenance(self):
+        """Keep fixture Git housekeeping out of temporary-directory cleanup."""
+        with tempfile.TemporaryDirectory(prefix="aegis-ci-trace-") as temporary:
+            trace = Path(temporary) / "events.json"
+            with mock.patch.dict(os.environ, {"GIT_TRACE2_EVENT": str(trace)}):
+                result = self.run_guard(["scripts/tests/fixture.py"])
+            self.assertEqual(1, result.returncode, result.stdout + result.stderr)
+            self.assertIn("Gate files touched:", result.stdout)
+            self.assertIn("scripts/tests/fixture.py", result.stdout)
+            self.assertIn("requires manual review and merge", result.stdout)
+            self.assertTrue(trace.is_file(), "Git Trace2 emitted no event file")
+            events = [json.loads(line) for line in trace.read_text(encoding="utf-8").splitlines()]
+            self.assertTrue(events, "Git Trace2 emitted no events")
+            starts = [event["argv"] for event in events
+                      if event.get("event") == "child_start"]
+            upload_packs = [argv for argv in starts
+                            if any("upload-pack" in arg for arg in argv)]
+            self.assertTrue(upload_packs, starts)
+            maintenance = [argv for argv in starts
+                           if "maintenance" in argv or
+                           ("gc" in argv and "--auto" in argv)]
+            self.assertFalse(maintenance, maintenance)
 
     def test_each_enforcement_surface_requires_manual_merge(self):
         for path in (".github/workflows/check.yml", ".github/CODEOWNERS",
