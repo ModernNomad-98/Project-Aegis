@@ -5152,3 +5152,55 @@ the entry governs.
   names one refresh, and the owner's selected option, "Faster, but two PRs
   are open at once", treats FU-2 as one pull request); consumed by its
   merge, which a later lifecycle event records.
+
+### AEGIS-APR-120: PR #682 one-time gate-guard exception for the Errno 39 test fix
+
+- **Event:** GRANT — one-time, bound to one exact head. Not a standing exception or a policy decision.
+- **Status at recording:** ACTIVE and unspent as recorded. Consumed by one merge of PR #682 at the exact head named below, and by nothing else. This entry cannot authorize the merge of the pull request recording it. Consumption will be recorded in the next register pull request, as the owner selected below.
+- **Date / Grantor:** 2026-10-08 / Peter Nguyen. Recorded 2026-10-08 23:16 UTC by /root/preg_preflight.
+- **Reason:** [PR #682](https://github.com/ModernNomad-98/Project-Aegis/pull/682) addresses the intermittent `OSError: [Errno 39] Directory not empty` from `ProtectedFileGuardTests.run_guard` in runs 36695924676 and 37713171379. Its fixture repository started detached Git auto-maintenance while temporary-directory cleanup removed it. The head adds two local config calls, an explanatory comment, one standard-library import and one regression test. It changes only `scripts/tests/test_offline_ci.py`, a protected path. AEGIS-APR-047 excludes guard scripts and tests from its four-file standing exception.
+- **Owner decision and proposal context:** In the Project Aegis session on 2026-10-08, the owner was asked:
+
+  > main's CI failure was a rare race in one CI test: Git 2.55 starts a background clean-up job in a throwaway test folder, and the test deletes the folder while that job is still writing. The one re-run passed, so main is green again, and the same race has happened once before (2026-09-30). The proposed fix adds two lines to scripts/tests/test_offline_ci.py telling Git not to run that background job in the test's folder. scripts/ is protected, so a fix PR's protected-file guard (gate-guard) will be red until you grant a one-time exception for that exact PR commit. Do you want the fix?
+
+  The owner selected "Yes, one-time exception (Recommended)", whose option text was:
+
+  > A third PR touching only that test file, on a third branch, through all seven stages. It merges once gate-guard's red is covered by your one-time exception for that exact commit, recorded in the register, with every other check green. Admin merge allowed.
+
+  The separate register-PR question was:
+
+  > The exception has to name the fix PR's exact commit, which only exists once the fix is written. The last one-time exception (AEGIS-APR-106) handled this with a separate small PR that changes only the approval register, merged just before the protected PR. That's a fourth PR your instruction didn't name. May the team open and merge it on the same terms (all seven stages, all checks green, admin merge allowed)?
+
+  The owner selected "Yes, same terms (Recommended)", whose option text was:
+
+  > Follows the precedent. The fix PR stays one file, and the exception is in the register, approved and pinned to the exact commit, before the fix merges. About 30–45 extra minutes.
+
+  The consumption question was:
+
+  > After the fix merges, the register should record that the one-time exception has been used up. Should that be its own small PR right after the merge (the AEGIS-APR-107 precedent), or wait for the next register PR?
+
+  The owner selected "Batch it later (Recommended)", whose option text was:
+
+  > Recorded in the next register PR, which will also record FU-2's grant as used up. One PR instead of two, with no loss of safety, since a one-time exception for an exact commit can't be reused anyway.
+
+  The changed-head question was:
+
+  > Suppose the fix PR's commit changes after the exception is recorded, for example because a reviewer asks for a change. The recorded exception would then name the wrong commit. What should happen?
+
+  The owner selected "Ask me again (Recommended)", whose option text was:
+
+  > Matches the AEGIS-APR-032→034 precedent. Each exception stays tied to a commit you approved. Costs a short wait for your answer if it happens, which is unlikely because the fix is small.
+
+  The later clarification question was:
+
+  > For the CI test fix, your answer says the exception must be "recorded in the register". I read that as: the register entry has to be merged on main (not just written in an open PR) before the fix can merge. Is that right?
+
+  The owner selected "Yes, merged on main (Recommended)", whose option text was:
+
+  > The safest reading. The register on main is what the repo treats as authority, so the exception only counts once that small register PR has merged.
+
+  These are transcriptions of the owner's selections and the questions/options shown to the owner, relayed by the previous coordinating agent. They are not quotations of the owner typing the option prose into the register. The register preamble accepts current direct owner instructions before transcription. Recording does not create or enlarge authority.
+- **Scope allowed:** One `gate-guard` exception and administrator merge of PR #682 at exact head `a33aa2a620589d2e0412521e6a0ee1ba3594c97f` (tree `490c47ed280e488a63427302decf09b024ea2724`, base `5228977920ee479e1fe1ec6b8d56f8fc24c14947`), changing only `scripts/tests/test_offline_ci.py`, `+28/−0`. The real size includes the two config calls plus comment, import and regression test. At H, gate-guard check run 113518470282 / workflow run 37837581461 concluded FAILURE, and its job 113518470282 log named exactly that path under `Gate files touched:`. Changes and validate-skills concluded SUCCESS; windows-offline-checks, tools-tests-linux and tools-tests-windows were skipped by the verified path filter. The failure is recorded as **failed with an authorized disposition**, never green or waived. The owner requires every other applicable check green and all seven stages; skipped checks are recorded as skipped under the coordinator's procedural reading, not as passed.
+- **Scope FORBIDDEN:** No other PR, head, path or failed check is covered by "only that test file", "for that exact commit", and "every other check green". This is one-time; it does not widen AEGIS-APR-047 or change any workflow, protected-path pattern, branch protection or repository setting. A moved head after this entry merges on main leaves this grant spendable on nothing. A replacement needs the owner's fresh answer to a question naming the replacement 40-character head, following the recorded Q4 choice.
+- **Evidence:** Owner selection timestamps are preserved in `owner-askuserquestion-answers.md` at handoff commit `32f5ae25780c4802184a63d4063507fcf31b3a37`: grant `2026-10-08T15:26:38.922Z`; Q2–Q4 `2026-10-08T16:01:08.352Z`; later clarification `2026-10-08T17:51:48.809Z`. The coordinator's BRIEF relays the grant at 15:28:53Z, the full one-line question/option at 16:10:40Z, Q2–Q4 at 16:01:16Z, and the clarification at 17:52:07Z. The Q2–Q4 JSON is a session artifact, extracted programmatically from the session transcript's own AskUserQuestion call, SHA-256 `74c8cd5a559b1398fe411d6d75f4da1be23fe788b0845cdb59dcfb09bc82f1c2`; its extraction timestamp is not supplied. It is archived at `docs/evidence/session-handoff-2026-10-08/artifacts/cifix/owner-q2-q4-verbatim.json` in that unmerged handoff commit. BRIEF SHA-256 is `682eb1cf401efda27a51c59ca006fa97812df13a259664ccd227653f13f37364`. These are archival transcriptions, not independently authenticated owner signatures or new policy from the snapshot. BRIEF's 16:20:07Z coordinator record says the owner was told about 28 added lines; this is disclosure, not owner approval of size, and authority remains the selected file scope. The [Stage D audit](https://github.com/ModernNomad-98/Project-Aegis/pull/682#issuecomment-6070897402) at H and the [gate-guard job log](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37837581461/job/113518470282) independently support the head, single path, and protected-path failure; they do not prove the owner's question or selections. Head/tree/base/numstat/check facts above were remeasured for this entry from Git and GitHub, not copied from the plan.
+- **Expiry / use limit:** One use, one merge of PR #682 at H. No calendar expiry was stated. A later event records consumption or observed expiry without rewriting this entry.
