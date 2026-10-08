@@ -2,18 +2,18 @@
   "tool": "audit-skill-contracts",
   "version": "1.13.4",
   "engine_sha256": "e64b7430488c5f47c31faf1abcfa5f46aae876f3362ed8e0de105e988ff10153",
-  "repo_sha": "5dbf7bc9e958d932bd0c5b093ebecfe61be41840",
-  "branch": "chore/audit-engine-v1134-report-format",
+  "repo_sha": "cbb084d6f1f2acbd2373510dbd5290dcb18f285a",
+  "branch": "claude/sharp-lovelace-urgxpz-fu2",
   "working_tree_dirty": false,
   "dirty_paths_in_scanned_surfaces": [],
-  "audited_file_count": 715,
-  "audited_byte_count": 4735807,
-  "corpus_content_hash": "a14f70c96c3b3ac4268d0b644dbb7c7b81b6d40e3665baba3ddcde119146b73b",
+  "audited_file_count": 755,
+  "audited_byte_count": 5193044,
+  "corpus_content_hash": "673e7fe93c6ddfb84e485dae4be1f1538f85af6c4fbaed893323e42e7e886b14",
   "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
   "auxiliary_inputs": {
     "skills_catalog": {
       "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-      "sha256": "42ba05192c49db68c152ed6101fedbacb40c48fdb30e611cca811be54f523c80"
+      "sha256": "6e32cee15a6ed1f4d7781c55a389abfafb0f94fb68e186d18cd831ec98a7fd01"
     },
     "agent_names_enumerated": {
       "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -37,7 +37,7 @@
       ]
     }
   },
-  "skill_count": 186,
+  "skill_count": 195,
   "skills": [
     {
       "name": "ab-test-designer",
@@ -58,9 +58,27 @@
       "writes_artifacts": false
     },
     {
+      "name": "acceptance-criteria-reviewer",
+      "skill_md": ".claude/skills/acceptance-criteria-reviewer/SKILL.md",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
+      "description_chars": 1000,
+      "references": [
+        ".claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 8,
+      "trigger_cases": 8,
+      "manual_only": false,
+      "declares_read_only": true,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
       "name": "accessibility-test-harness",
       "skill_md": ".claude/skills/accessibility-test-harness/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 977,
       "references": [
         ".claude/skills/accessibility-test-harness/references/a11y-checklists.md"
@@ -117,7 +135,7 @@
       "references": [],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 5,
+      "eval_cases": 6,
       "trigger_cases": 3,
       "manual_only": false,
       "declares_read_only": false,
@@ -146,7 +164,7 @@
     {
       "name": "agent-authorization-matrix",
       "skill_md": ".claude/skills/agent-authorization-matrix/SKILL.md",
-      "family": "261/#268/#279/#280). These four COMPOSE the Phase 1 skills \u2014 each stage or",
+      "family": "261/#268/#279/#280, plus #266 under D69). These COMPOSE the Phase 1 skills \u2014 each stage or",
       "description_chars": 897,
       "references": [
         ".claude/skills/agent-authorization-matrix/references/matrix-template.md"
@@ -218,7 +236,7 @@
     {
       "name": "agent-governance-audit",
       "skill_md": ".claude/skills/agent-governance-audit/SKILL.md",
-      "family": "261/#268/#279/#280). These four COMPOSE the Phase 1 skills \u2014 each stage or",
+      "family": "261/#268/#279/#280, plus #266 under D69). These COMPOSE the Phase 1 skills \u2014 each stage or",
       "description_chars": 666,
       "references": [
         ".claude/skills/agent-governance-audit/references/audit-control-checklist.md"
@@ -288,14 +306,14 @@
     {
       "name": "agent-memory-governance",
       "skill_md": ".claude/skills/agent-memory-governance/SKILL.md",
-      "family": "261/#268/#279/#280). These four COMPOSE the Phase 1 skills \u2014 each stage or",
+      "family": "261/#268/#279/#280, plus #266 under D69). These COMPOSE the Phase 1 skills \u2014 each stage or",
       "description_chars": 565,
       "references": [
         ".claude/skills/agent-memory-governance/references/memory-rules.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 5,
+      "eval_cases": 6,
       "trigger_cases": 5,
       "manual_only": true,
       "declares_read_only": false,
@@ -325,14 +343,14 @@
       "name": "agent-tool-safety-guard",
       "skill_md": ".claude/skills/agent-tool-safety-guard/SKILL.md",
       "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
-      "description_chars": 876,
+      "description_chars": 967,
       "references": [
         ".claude/skills/agent-tool-safety-guard/references/tool-permission-matrix.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 5,
-      "trigger_cases": 5,
+      "trigger_cases": 6,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": true,
@@ -359,12 +377,12 @@
       "name": "ai-closeout-reporter",
       "skill_md": ".claude/skills/ai-closeout-reporter/SKILL.md",
       "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
-      "description_chars": 912,
+      "description_chars": 1015,
       "references": [],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 5,
-      "trigger_cases": 9,
+      "eval_cases": 9,
+      "trigger_cases": 12,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
@@ -411,16 +429,34 @@
       "name": "ai-governance-risk-reviewer",
       "skill_md": ".claude/skills/ai-governance-risk-reviewer/SKILL.md",
       "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
-      "description_chars": 654,
+      "description_chars": 742,
       "references": [
         ".claude/skills/ai-governance-risk-reviewer/references/ai-governance-framework.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 4,
-      "trigger_cases": 4,
+      "trigger_cases": 5,
       "manual_only": false,
       "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "ai-human-in-the-loop-designer",
+      "skill_md": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
+      "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
+      "description_chars": 1007,
+      "references": [
+        ".claude/skills/ai-human-in-the-loop-designer/references/hitl-design-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 9,
+      "trigger_cases": 10,
+      "manual_only": false,
+      "declares_read_only": true,
       "approval_related": true,
       "state_related": false,
       "writes_artifacts": false
@@ -465,14 +501,14 @@
       "name": "ai-router-architect",
       "skill_md": ".claude/skills/ai-router-architect/SKILL.md",
       "family": "Skills (Phase 7 \u2014 AI security & LLM systems pack)",
-      "description_chars": 1002,
+      "description_chars": 1012,
       "references": [
         ".claude/skills/ai-router-architect/references/ai-router-design.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 5,
-      "trigger_cases": 5,
+      "eval_cases": 8,
+      "trigger_cases": 8,
       "manual_only": true,
       "declares_read_only": false,
       "approval_related": false,
@@ -482,15 +518,31 @@
     {
       "name": "ai-sdlc-operating-model",
       "skill_md": ".claude/skills/ai-sdlc-operating-model/SKILL.md",
-      "family": "261/#268/#279/#280). These four COMPOSE the Phase 1 skills \u2014 each stage or",
+      "family": "261/#268/#279/#280, plus #266 under D69). These COMPOSE the Phase 1 skills \u2014 each stage or",
       "description_chars": 703,
       "references": [
         ".claude/skills/ai-sdlc-operating-model/references/stage-gate-map.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 6,
+      "eval_cases": 7,
       "trigger_cases": 5,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": true,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "ai-task-decomposer",
+      "skill_md": ".claude/skills/ai-task-decomposer/SKILL.md",
+      "family": "261/#268/#279/#280, plus #266 under D69). These COMPOSE the Phase 1 skills \u2014 each stage or",
+      "description_chars": 959,
+      "references": [],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 8,
+      "trigger_cases": 10,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": true,
@@ -518,7 +570,7 @@
     {
       "name": "api-contract-test-designer",
       "skill_md": ".claude/skills/api-contract-test-designer/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 590,
       "references": [
         ".claude/skills/api-contract-test-designer/references/contract-test-patterns.md"
@@ -681,14 +733,14 @@
       "name": "aws-saas-architect",
       "skill_md": ".claude/skills/aws-saas-architect/SKILL.md",
       "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
-      "description_chars": 599,
+      "description_chars": 697,
       "references": [
         ".claude/skills/aws-saas-architect/references/aws-mapping.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 5,
-      "trigger_cases": 4,
+      "trigger_cases": 5,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
@@ -767,14 +819,14 @@
       "name": "change-classification-gate",
       "skill_md": ".claude/skills/change-classification-gate/SKILL.md",
       "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
-      "description_chars": 600,
+      "description_chars": 669,
       "references": [
         ".claude/skills/change-classification-gate/references/classification-matrix.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 5,
-      "trigger_cases": 4,
+      "trigger_cases": 5,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": true,
@@ -800,6 +852,24 @@
       "writes_artifacts": false
     },
     {
+      "name": "ci-failure-classifier",
+      "skill_md": ".claude/skills/ci-failure-classifier/SKILL.md",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
+      "description_chars": 1013,
+      "references": [
+        ".claude/skills/ci-failure-classifier/references/classification-guide.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 11,
+      "trigger_cases": 10,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
       "name": "ci-pipeline-architect",
       "skill_md": ".claude/skills/ci-pipeline-architect/SKILL.md",
       "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
@@ -820,7 +890,7 @@
     {
       "name": "clickthrough-test-engineer",
       "skill_md": ".claude/skills/clickthrough-test-engineer/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 1008,
       "references": [
         ".claude/skills/clickthrough-test-engineer/references/clickthrough-route-catalog.md"
@@ -855,17 +925,39 @@
       "writes_artifacts": false
     },
     {
+      "name": "cloud-security-baseline-reviewer",
+      "skill_md": ".claude/skills/cloud-security-baseline-reviewer/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 994,
+      "references": [
+        ".claude/skills/cloud-security-baseline-reviewer/references/aws-baseline.md",
+        ".claude/skills/cloud-security-baseline-reviewer/references/azure-baseline.md",
+        ".claude/skills/cloud-security-baseline-reviewer/references/gcp-baseline.md",
+        ".claude/skills/cloud-security-baseline-reviewer/references/supabase-baseline.md",
+        ".claude/skills/cloud-security-baseline-reviewer/references/vercel-baseline.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 8,
+      "trigger_cases": 14,
+      "manual_only": false,
+      "declares_read_only": true,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
       "name": "code-reviewer",
       "skill_md": ".claude/skills/code-reviewer/SKILL.md",
       "family": "Skills (Phase 2 \u2014 core architecture & engineering pack)",
-      "description_chars": 883,
+      "description_chars": 937,
       "references": [
         ".claude/skills/code-reviewer/references/severity-rubric.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 5,
-      "trigger_cases": 4,
+      "eval_cases": 8,
+      "trigger_cases": 8,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
@@ -1032,16 +1124,16 @@
       "name": "data-migration-runbook-author",
       "skill_md": ".claude/skills/data-migration-runbook-author/SKILL.md",
       "family": "Skills (D12.1 \u2014 data engineering pack)",
-      "description_chars": 982,
+      "description_chars": 1021,
       "references": [
         ".claude/skills/data-migration-runbook-author/references/runbook-skeleton.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 6,
-      "trigger_cases": 5,
+      "eval_cases": 9,
+      "trigger_cases": 8,
       "manual_only": false,
-      "declares_read_only": false,
+      "declares_read_only": true,
       "approval_related": true,
       "state_related": false,
       "writes_artifacts": false
@@ -1077,6 +1169,24 @@
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "database-backup-verifier",
+      "skill_md": ".claude/skills/database-backup-verifier/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 1004,
+      "references": [
+        ".claude/skills/database-backup-verifier/references/backup-verification-checks.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 16,
+      "trigger_cases": 13,
+      "manual_only": true,
+      "declares_read_only": true,
+      "approval_related": true,
       "state_related": false,
       "writes_artifacts": false
     },
@@ -1200,6 +1310,24 @@
       "has_trigger_evals": true,
       "eval_cases": 5,
       "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "environment-parity-reviewer",
+      "skill_md": ".claude/skills/environment-parity-reviewer/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 986,
+      "references": [
+        ".claude/skills/environment-parity-reviewer/references/parity-matrix-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 9,
+      "trigger_cases": 10,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
@@ -1333,7 +1461,7 @@
     {
       "name": "flaky-test-detective",
       "skill_md": ".claude/skills/flaky-test-detective/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 1012,
       "references": [
         ".claude/skills/flaky-test-detective/references/flake-taxonomy.md"
@@ -1478,12 +1606,12 @@
       "name": "horizontal-scalability-reviewer",
       "skill_md": ".claude/skills/horizontal-scalability-reviewer/SKILL.md",
       "family": "Skills (D31 \u2014 SaaS architecture depth, D12.11 strong cluster)",
-      "description_chars": 920,
+      "description_chars": 1014,
       "references": [],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 5,
-      "trigger_cases": 5,
+      "trigger_cases": 6,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
@@ -1512,12 +1640,12 @@
       "name": "human-approval-boundary",
       "skill_md": ".claude/skills/human-approval-boundary/SKILL.md",
       "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
-      "description_chars": 810,
+      "description_chars": 893,
       "references": [],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 9,
-      "trigger_cases": 4,
+      "trigger_cases": 5,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": true,
@@ -1528,14 +1656,14 @@
       "name": "iac-reviewer",
       "skill_md": ".claude/skills/iac-reviewer/SKILL.md",
       "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
-      "description_chars": 954,
+      "description_chars": 1017,
       "references": [
         ".claude/skills/iac-reviewer/references/iac-review-checklist.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 4,
-      "trigger_cases": 5,
+      "trigger_cases": 7,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
@@ -1563,7 +1691,7 @@
     {
       "name": "integration-test-designer",
       "skill_md": ".claude/skills/integration-test-designer/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 996,
       "references": [
         ".claude/skills/integration-test-designer/references/boundary-catalog.md"
@@ -1688,7 +1816,7 @@
       "name": "library-diff-reviewer",
       "skill_md": ".claude/skills/library-diff-reviewer/SKILL.md",
       "family": "Skills (D13 \u2014 library meta / self-application)",
-      "description_chars": 989,
+      "description_chars": 986,
       "references": [
         ".claude/skills/library-diff-reviewer/references/pr-review-checklist.md"
       ],
@@ -1742,14 +1870,14 @@
       "name": "local-ci-mirror-preflight",
       "skill_md": ".claude/skills/local-ci-mirror-preflight/SKILL.md",
       "family": "Skills (D12.8 \u2014 operational workflow patterns pack)",
-      "description_chars": 715,
+      "description_chars": 844,
       "references": [
         ".claude/skills/local-ci-mirror-preflight/references/preflight-procedure.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 7,
-      "trigger_cases": 5,
+      "trigger_cases": 6,
       "manual_only": true,
       "declares_read_only": false,
       "approval_related": false,
@@ -1759,7 +1887,7 @@
     {
       "name": "manual-test-case-creator",
       "skill_md": ".claude/skills/manual-test-case-creator/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 983,
       "references": [
         ".claude/skills/manual-test-case-creator/references/manual-case-template.md"
@@ -1832,12 +1960,14 @@
       "name": "model-context-designer",
       "skill_md": ".claude/skills/model-context-designer/SKILL.md",
       "family": "Skills (D42 \u2014 CONSTRAIN/CURATE design pack: harness, context, loop)",
-      "description_chars": 634,
-      "references": [],
+      "description_chars": 972,
+      "references": [
+        ".claude/skills/model-context-designer/references/prompt-contract-template.md"
+      ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 6,
-      "trigger_cases": 7,
+      "eval_cases": 8,
+      "trigger_cases": 12,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": true,
@@ -1900,14 +2030,14 @@
       "name": "multi-tenant-security-tester",
       "skill_md": ".claude/skills/multi-tenant-security-tester/SKILL.md",
       "family": "Skills (Phase 4 \u2014 security, RLS & supply-chain pack)",
-      "description_chars": 831,
+      "description_chars": 904,
       "references": [
         ".claude/skills/multi-tenant-security-tester/references/negative-test-matrix.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 6,
-      "trigger_cases": 4,
+      "trigger_cases": 5,
       "manual_only": true,
       "declares_read_only": false,
       "approval_related": true,
@@ -2113,7 +2243,7 @@
     {
       "name": "playwright-e2e-engineer",
       "skill_md": ".claude/skills/playwright-e2e-engineer/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 972,
       "references": [
         ".claude/skills/playwright-e2e-engineer/references/playwright-patterns.md"
@@ -2184,14 +2314,14 @@
       "name": "product-spec-writer",
       "skill_md": ".claude/skills/product-spec-writer/SKILL.md",
       "family": "Skills (D12.5 \u2014 PM / product-engineering interface pack)",
-      "description_chars": 895,
+      "description_chars": 961,
       "references": [
         ".claude/skills/product-spec-writer/references/product-spec-sheet.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 6,
-      "trigger_cases": 5,
+      "trigger_cases": 6,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
@@ -2275,7 +2405,7 @@
     {
       "name": "qa-automation-architect",
       "skill_md": ".claude/skills/qa-automation-architect/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 903,
       "references": [
         ".claude/skills/qa-automation-architect/references/automation-blueprint.md"
@@ -2293,7 +2423,7 @@
     {
       "name": "qa-strategy-architect",
       "skill_md": ".claude/skills/qa-strategy-architect/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 832,
       "references": [
         ".claude/skills/qa-strategy-architect/references/risk-and-layer-catalog.md"
@@ -2381,7 +2511,7 @@
     {
       "name": "regression-suite-curator",
       "skill_md": ".claude/skills/regression-suite-curator/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 851,
       "references": [
         ".claude/skills/regression-suite-curator/references/curation-rules.md"
@@ -2426,6 +2556,24 @@
       "has_trigger_evals": true,
       "eval_cases": 13,
       "trigger_cases": 4,
+      "manual_only": false,
+      "declares_read_only": false,
+      "approval_related": false,
+      "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "resilience-architecture-reviewer",
+      "skill_md": ".claude/skills/resilience-architecture-reviewer/SKILL.md",
+      "family": "Skills (Phase 6 \u2014 cloud, DevOps, reliability & release pack)",
+      "description_chars": 975,
+      "references": [
+        ".claude/skills/resilience-architecture-reviewer/references/resilience-review-sheet.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 8,
+      "trigger_cases": 11,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
@@ -2531,7 +2679,7 @@
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 4,
-      "trigger_cases": 4,
+      "trigger_cases": 5,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
@@ -2616,7 +2764,7 @@
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 11,
+      "eval_cases": 12,
       "trigger_cases": 5,
       "manual_only": false,
       "declares_read_only": false,
@@ -2627,7 +2775,7 @@
     {
       "name": "screenshot-evidence-planner",
       "skill_md": ".claude/skills/screenshot-evidence-planner/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 999,
       "references": [
         ".claude/skills/screenshot-evidence-planner/references/evidence-rules.md"
@@ -2698,14 +2846,14 @@
       "name": "security-logging-alerting-architect",
       "skill_md": ".claude/skills/security-logging-alerting-architect/SKILL.md",
       "family": "Skills (D28 \u2014 OWASP web-app A09/A10 gap closure)",
-      "description_chars": 919,
+      "description_chars": 998,
       "references": [
         ".claude/skills/security-logging-alerting-architect/references/security-event-coverage-sheet.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 6,
-      "trigger_cases": 5,
+      "trigger_cases": 6,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": false,
@@ -3104,7 +3252,7 @@
       "name": "systematic-debugger",
       "skill_md": ".claude/skills/systematic-debugger/SKILL.md",
       "family": "Skills (Phase 2 \u2014 core architecture & engineering pack)",
-      "description_chars": 710,
+      "description_chars": 777,
       "references": [
         ".claude/skills/systematic-debugger/references/isolation-tactics.md"
       ],
@@ -3191,7 +3339,7 @@
     {
       "name": "test-coverage-mapper",
       "skill_md": ".claude/skills/test-coverage-mapper/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 866,
       "references": [
         ".claude/skills/test-coverage-mapper/references/coverage-mapping-method.md"
@@ -3209,15 +3357,15 @@
     {
       "name": "test-data-architect",
       "skill_md": ".claude/skills/test-data-architect/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
-      "description_chars": 999,
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
+      "description_chars": 1005,
       "references": [
         ".claude/skills/test-data-architect/references/test-data-patterns.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 6,
-      "trigger_cases": 4,
+      "trigger_cases": 5,
       "manual_only": false,
       "declares_read_only": false,
       "approval_related": true,
@@ -3227,19 +3375,37 @@
     {
       "name": "test-plan-designer",
       "skill_md": ".claude/skills/test-plan-designer/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
-      "description_chars": 868,
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
+      "description_chars": 961,
       "references": [
         ".claude/skills/test-plan-designer/references/test-plan-template.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 5,
-      "trigger_cases": 4,
+      "eval_cases": 7,
+      "trigger_cases": 6,
       "manual_only": false,
       "declares_read_only": false,
-      "approval_related": false,
+      "approval_related": true,
       "state_related": false,
+      "writes_artifacts": false
+    },
+    {
+      "name": "test-tenant-provisioner",
+      "skill_md": ".claude/skills/test-tenant-provisioner/SKILL.md",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
+      "description_chars": 1006,
+      "references": [
+        ".claude/skills/test-tenant-provisioner/references/provisioning-manifest.md"
+      ],
+      "has_evals": true,
+      "has_trigger_evals": true,
+      "eval_cases": 11,
+      "trigger_cases": 8,
+      "manual_only": true,
+      "declares_read_only": true,
+      "approval_related": false,
+      "state_related": true,
       "writes_artifacts": false
     },
     {
@@ -3279,15 +3445,15 @@
     {
       "name": "vite-build-qa-engineer",
       "skill_md": ".claude/skills/vite-build-qa-engineer/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
-      "description_chars": 863,
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
+      "description_chars": 943,
       "references": [
         ".claude/skills/vite-build-qa-engineer/references/vite-build-checks.md"
       ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 6,
-      "trigger_cases": 4,
+      "trigger_cases": 5,
       "manual_only": true,
       "declares_read_only": false,
       "approval_related": false,
@@ -3297,7 +3463,7 @@
     {
       "name": "vitest-unit-component-engineer",
       "skill_md": ".claude/skills/vitest-unit-component-engineer/SKILL.md",
-      "family": "Skills (Phase 5 \u2014 QA, E2E, manual QA & evidence pack)",
+      "family": "215), auto-invocable because it only reads logs it is given. It ships both eval files and",
       "description_chars": 926,
       "references": [
         ".claude/skills/vitest-unit-component-engineer/references/vitest-patterns.md"

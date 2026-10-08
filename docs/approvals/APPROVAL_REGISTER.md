@@ -5060,3 +5060,95 @@ the entry governs.
   on the default branch at recording.
 - **Expiry / use limit:** None stated. It stands until superseded by a later
   recorded owner decision.
+
+### AEGIS-APR-119: Refresh the skill-contract audit baselines with engine v1.13.4
+
+- **Event:** GRANT; a new grant. AEGIS-APR-058, AEGIS-APR-065, AEGIS-APR-073 and
+  AEGIS-APR-079 were each consumed (AEGIS-APR-060, -066, -076, -084); this entry
+  renews or widens none of them.
+- **Status at recording:** ACTIVE; granted and not yet consumed. A later
+  lifecycle event records its consumption. It cannot authorize the merge of
+  the pull request that records it; that merge rests on the owner's
+  instructions quoted verbatim in the merge agent's brief, which `AGENTS.md`
+  accepts as authority.
+- **Date / Grantor:** 2026-10-08 / Peter Nguyen.
+- **Reason:** The committed baselines record engine v1.13.4 over the frozen
+  commit `5dbf7bc9e958d932bd0c5b093ebecfe61be41840`: 186 skills and 316
+  findings. At main `c060a7cb09758fa2f4f6b67ab00094f01d7c6a46` the same
+  engine, unchanged, reports 195 skills and 339 findings: nine skills were
+  added (author dates 2026-09-28 to 2026-09-29 UTC), and every finding added
+  or removed is a ROUTE-002 row. AEGIS-APR-066 and AEGIS-APR-084 state that
+  any further regeneration needs a new grant.
+- **Owner decision, as transcribed by the coordinator from the session chat**
+  (recorded 2026-10-08T14:13:30Z, an upper bound). The owner's message:
+
+  > also work on these:
+  > Skill contract-audit baseline refresh (186 skills / 316 findings frozen vs 339 today)
+  > Aligning library-diff-reviewer's description with its "skill-library PR" wording
+
+  The two item lines are the coordinating agent's own descriptions, which
+  the owner copied into the message; the figures are the coordinator's and
+  were re-measured as above. Asked "How should the two new items (audit
+  baseline refresh, library-diff-reviewer wording) ship? They're separate
+  from FU-1, and my session is set up to push to one branch.", the owner
+  chose **"Second branch, in parallel"**, whose option text reads:
+
+  > You allow one extra branch so FU-2 is built and reviewed alongside FU-1. Faster, but two PRs are open at once.
+
+  Asked "May FU-2 merge on the same terms (every stage passed, all checks
+  green, admin merge allowed, fix and retry)? Your request to do the
+  baseline refresh will also be recorded as a new approval register grant,
+  quoted word for word, because the register says any further regeneration
+  needs a new grant." (recorded 2026-10-08T14:15:33Z, an upper bound), the
+  owner chose **"Yes, same terms (Recommended)"**. The terms are the ones
+  the question lists in parentheses. Recorder's reading: they are the terms
+  of the owner's two instructions for PR #677, recorded in AEGIS-APR-114,
+  where "every stage passed" comes from the question rather than the
+  owner's prose:
+
+  > I approve for you to merge once all checks are green. Including admin merge
+
+  > if a check fails, diagnose and fix the issue and try to merge again. Do not stop until it is merged
+
+- **Scope allowed:** The owner named no paths, engine or procedure; the
+  following is the recorder's reading of "baseline refresh", modelled on
+  AEGIS-APR-065. One pull request, from branch
+  `claude/sharp-lovelace-urgxpz-fu2`, that regenerates, with
+  `scripts/audit-skill-contracts.py` at engine v1.13.4 (SHA-256
+  `e64b7430488c5f47c31faf1abcfa5f46aae876f3362ed8e0de105e988ff10153`) run
+  unchanged on a clean checkout (`core.autocrlf=false`) of a commit on that
+  branch that contains every change the pull request makes to an audited
+  input (a file under `.claude/skills/`, `docs/skills-catalog.md`, a file
+  name under `.claude/agents/` or `docs/paths/`, or the existence of a
+  Markdown link target), checked out on a branch of
+  the same name, exactly these files:
+  `artifacts/audits/skill-contract-audit-baseline.json`,
+  `artifacts/audits/corpus-route-graph.json`,
+  `artifacts/audits/corpus-manifest-baseline.json` and
+  `docs/audits/skill-contract-audit-baseline.md` with its hand-written
+  preface; adds one dated note to `docs/audits/aegis-060-plus-register.md`;
+  and appends this entry. The scanned commit's SHA is recorded in the
+  regenerated files. Before that pull request merges, the files may be
+  regenerated again whenever an audited input changes; the merged files are
+  the output of the last such run. The same pull request also carries a
+  one-line change to
+  `.claude/skills/library-diff-reviewer/evals/trigger-evals.json`, which
+  rests on the owner's direct request quoted above (as the coordinator read
+  it: the residual eval-file note), not on this grant. The
+  merge terms are those quoted above.
+- **Scope FORBIDDEN:** None additionally stated by the owner. Not covered by
+  this grant: any change under `scripts/` or `tools/` (an engine change is
+  not a baseline refresh and would need its own grant and a one-time
+  `gate-guard` exception); rewriting any historical count in the AEGIS-060+
+  register; any regeneration after this pull request merges. AEGIS-APR-100
+  (including its `Scope FORBIDDEN`), AEGIS-APR-048, AEGIS-APR-050 and
+  AEGIS-APR-105 continue unchanged.
+- **Evidence:** Direct owner message and answers in the Project Aegis Claude
+  Code session chat of 2026-10-08, as transcribed by the coordinator. None
+  is a repository artifact. The baselines this grant's pull request
+  replaces are in git history at `c14338d254bde3fd7fb9b8060033299cde5d5197`
+  (PR #503's merge, recorded in AEGIS-APR-084).
+- **Expiry / use limit:** One pull request (recorder's reading: the request
+  names one refresh, and the owner's selected option, "Faster, but two PRs
+  are open at once", treats FU-2 as one pull request); consumed by its
+  merge, which a later lifecycle event records.

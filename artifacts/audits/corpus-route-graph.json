@@ -6,6 +6,11 @@
       "declares_read_only": false
     },
     {
+      "name": "acceptance-criteria-reviewer",
+      "manual_only": false,
+      "declares_read_only": true
+    },
+    {
       "name": "accessibility-test-harness",
       "manual_only": false,
       "declares_read_only": false
@@ -111,6 +116,11 @@
       "declares_read_only": false
     },
     {
+      "name": "ai-human-in-the-loop-designer",
+      "manual_only": false,
+      "declares_read_only": true
+    },
+    {
       "name": "ai-lifecycle-risk-manager",
       "manual_only": false,
       "declares_read_only": false
@@ -127,6 +137,11 @@
     },
     {
       "name": "ai-sdlc-operating-model",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "ai-task-decomposer",
       "manual_only": false,
       "declares_read_only": false
     },
@@ -216,6 +231,11 @@
       "declares_read_only": false
     },
     {
+      "name": "ci-failure-classifier",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
       "name": "ci-pipeline-architect",
       "manual_only": true,
       "declares_read_only": false
@@ -229,6 +249,11 @@
       "name": "cloud-architecture-decider",
       "manual_only": false,
       "declares_read_only": false
+    },
+    {
+      "name": "cloud-security-baseline-reviewer",
+      "manual_only": false,
+      "declares_read_only": true
     },
     {
       "name": "code-reviewer",
@@ -283,7 +308,7 @@
     {
       "name": "data-migration-runbook-author",
       "manual_only": false,
-      "declares_read_only": false
+      "declares_read_only": true
     },
     {
       "name": "data-partitioning-sharding-strategist",
@@ -294,6 +319,11 @@
       "name": "data-quality-monitor-designer",
       "manual_only": false,
       "declares_read_only": false
+    },
+    {
+      "name": "database-backup-verifier",
+      "manual_only": true,
+      "declares_read_only": true
     },
     {
       "name": "design-review-facilitator",
@@ -327,6 +357,11 @@
     },
     {
       "name": "edge-state-ux-designer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
+      "name": "environment-parity-reviewer",
       "manual_only": false,
       "declares_read_only": false
     },
@@ -676,6 +711,11 @@
       "declares_read_only": false
     },
     {
+      "name": "resilience-architecture-reviewer",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
       "name": "reviewable-diff-discipline",
       "manual_only": true,
       "declares_read_only": false
@@ -906,6 +946,11 @@
       "declares_read_only": false
     },
     {
+      "name": "test-tenant-provisioner",
+      "manual_only": true,
+      "declares_read_only": true
+    },
+    {
       "name": "threat-modeler",
       "manual_only": false,
       "declares_read_only": false
@@ -945,6 +990,51 @@
     {
       "from": "ab-test-designer",
       "to": "funnel-definition-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "acceptance-criteria-reviewer",
+      "to": "manual-test-case-creator",
+      "type": "description-mention"
+    },
+    {
+      "from": "acceptance-criteria-reviewer",
+      "to": "multi-tenant-security-tester",
+      "type": "body-route"
+    },
+    {
+      "from": "acceptance-criteria-reviewer",
+      "to": "product-spec-writer",
+      "type": "description-mention"
+    },
+    {
+      "from": "acceptance-criteria-reviewer",
+      "to": "release-readiness-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "acceptance-criteria-reviewer",
+      "to": "release-readiness-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "acceptance-criteria-reviewer",
+      "to": "requirements-gathering-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "acceptance-criteria-reviewer",
+      "to": "requirements-gathering-facilitator",
+      "type": "description-mention"
+    },
+    {
+      "from": "acceptance-criteria-reviewer",
+      "to": "source-of-truth-reconciler",
+      "type": "body-route"
+    },
+    {
+      "from": "acceptance-criteria-reviewer",
+      "to": "test-plan-designer",
       "type": "description-mention"
     },
     {
@@ -1020,6 +1110,11 @@
     {
       "from": "adr-sequencer",
       "to": "source-of-truth-reconciler",
+      "type": "body-route"
+    },
+    {
+      "from": "adr-writer",
+      "to": "adr-sequencer",
       "type": "body-route"
     },
     {
@@ -1199,6 +1294,11 @@
     },
     {
       "from": "agent-tool-safety-guard",
+      "to": "ai-human-in-the-loop-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "agent-tool-safety-guard",
       "to": "hidden-context-exposure-reviewer",
       "type": "description-mention"
     },
@@ -1324,11 +1424,61 @@
     },
     {
       "from": "ai-governance-risk-reviewer",
+      "to": "ai-human-in-the-loop-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-governance-risk-reviewer",
       "to": "ai-sdlc-operating-model",
       "type": "description-mention"
     },
     {
       "from": "ai-governance-risk-reviewer",
+      "to": "human-approval-boundary",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-human-in-the-loop-designer",
+      "to": "agent-authorization-matrix",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-human-in-the-loop-designer",
+      "to": "agent-tool-safety-guard",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-human-in-the-loop-designer",
+      "to": "ai-governance-risk-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-human-in-the-loop-designer",
+      "to": "ai-governance-risk-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-human-in-the-loop-designer",
+      "to": "ai-governance-risk-reviewer",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-human-in-the-loop-designer",
+      "to": "ai-governance-risk-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-human-in-the-loop-designer",
+      "to": "human-agent-trust-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-human-in-the-loop-designer",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-human-in-the-loop-designer",
       "to": "human-approval-boundary",
       "type": "description-mention"
     },
@@ -1389,11 +1539,6 @@
     },
     {
       "from": "ai-router-architect",
-      "to": "secrets-identity-hardener",
-      "type": "description-mention"
-    },
-    {
-      "from": "ai-router-architect",
       "to": "structured-output-validator",
       "type": "description-mention"
     },
@@ -1410,6 +1555,61 @@
     {
       "from": "ai-sdlc-operating-model",
       "to": "agent-memory-governance",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-task-decomposer",
+      "to": "change-classification-gate",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-task-decomposer",
+      "to": "change-classification-gate",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-task-decomposer",
+      "to": "human-approval-boundary",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-task-decomposer",
+      "to": "lane-authoring-guide",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-task-decomposer",
+      "to": "phased-work-handoff-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-task-decomposer",
+      "to": "phased-work-handoff-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-task-decomposer",
+      "to": "requirements-gathering-facilitator",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-task-decomposer",
+      "to": "roadmap-to-commitments-translator",
+      "type": "description-mention"
+    },
+    {
+      "from": "ai-task-decomposer",
+      "to": "source-of-truth-reconciler",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-task-decomposer",
+      "to": "tech-spec-writer",
+      "type": "body-route"
+    },
+    {
+      "from": "ai-task-decomposer",
+      "to": "tech-spec-writer",
       "type": "description-mention"
     },
     {
@@ -1729,6 +1929,11 @@
     },
     {
       "from": "aws-saas-architect",
+      "to": "cloud-security-baseline-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "aws-saas-architect",
       "to": "iac-reviewer",
       "type": "description-mention"
     },
@@ -1889,6 +2094,11 @@
     },
     {
       "from": "change-classification-gate",
+      "to": "ai-task-decomposer",
+      "type": "description-mention"
+    },
+    {
+      "from": "change-classification-gate",
       "to": "risk-tiered-validation-selector",
       "type": "description-mention"
     },
@@ -1920,6 +2130,36 @@
     {
       "from": "chat-backlog-reconciliation",
       "to": "source-of-truth-reconciler",
+      "type": "description-mention"
+    },
+    {
+      "from": "ci-failure-classifier",
+      "to": "ci-pipeline-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "ci-failure-classifier",
+      "to": "flaky-test-detective",
+      "type": "description-mention"
+    },
+    {
+      "from": "ci-failure-classifier",
+      "to": "local-ci-mirror-preflight",
+      "type": "description-mention"
+    },
+    {
+      "from": "ci-failure-classifier",
+      "to": "sharded-validation-with-resume",
+      "type": "description-mention"
+    },
+    {
+      "from": "ci-failure-classifier",
+      "to": "systematic-debugger",
+      "type": "body-route"
+    },
+    {
+      "from": "ci-failure-classifier",
+      "to": "systematic-debugger",
       "type": "description-mention"
     },
     {
@@ -2040,6 +2280,46 @@
     {
       "from": "cloud-architecture-decider",
       "to": "saas-platform-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "cloud-security-baseline-reviewer",
+      "to": "aws-saas-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "cloud-security-baseline-reviewer",
+      "to": "azure-saas-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "cloud-security-baseline-reviewer",
+      "to": "compliance-gap-auditor",
+      "type": "description-mention"
+    },
+    {
+      "from": "cloud-security-baseline-reviewer",
+      "to": "iac-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "cloud-security-baseline-reviewer",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "cloud-security-baseline-reviewer",
+      "to": "secrets-identity-hardener",
+      "type": "body-route"
+    },
+    {
+      "from": "cloud-security-baseline-reviewer",
+      "to": "secrets-identity-hardener",
+      "type": "description-mention"
+    },
+    {
+      "from": "cloud-security-baseline-reviewer",
+      "to": "security-logging-alerting-architect",
       "type": "description-mention"
     },
     {
@@ -2284,6 +2564,11 @@
     },
     {
       "from": "data-migration-runbook-author",
+      "to": "gated-deployment-prompt-template",
+      "type": "description-mention"
+    },
+    {
+      "from": "data-migration-runbook-author",
       "to": "rollback-runbook-author",
       "type": "description-mention"
     },
@@ -2350,6 +2635,26 @@
     {
       "from": "data-quality-monitor-designer",
       "to": "test-data-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "database-backup-verifier",
+      "to": "data-migration-runbook-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "database-backup-verifier",
+      "to": "incident-response-runbook",
+      "type": "body-route"
+    },
+    {
+      "from": "database-backup-verifier",
+      "to": "pii-lifecycle-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "database-backup-verifier",
+      "to": "resilience-architecture-reviewer",
       "type": "description-mention"
     },
     {
@@ -2510,6 +2815,36 @@
     {
       "from": "edge-state-ux-designer",
       "to": "mobile-viewport-craft",
+      "type": "description-mention"
+    },
+    {
+      "from": "environment-parity-reviewer",
+      "to": "feature-flag-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "environment-parity-reviewer",
+      "to": "iac-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "environment-parity-reviewer",
+      "to": "local-ci-mirror-preflight",
+      "type": "description-mention"
+    },
+    {
+      "from": "environment-parity-reviewer",
+      "to": "observability-operator",
+      "type": "body-route"
+    },
+    {
+      "from": "environment-parity-reviewer",
+      "to": "secrets-identity-hardener",
+      "type": "description-mention"
+    },
+    {
+      "from": "environment-parity-reviewer",
+      "to": "vite-build-qa-engineer",
       "type": "description-mention"
     },
     {
@@ -2999,6 +3334,11 @@
     },
     {
       "from": "horizontal-scalability-reviewer",
+      "to": "resilience-architecture-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "horizontal-scalability-reviewer",
       "to": "slo-reliability-architect",
       "type": "body-route"
     },
@@ -3049,6 +3389,11 @@
     },
     {
       "from": "human-approval-boundary",
+      "to": "ai-human-in-the-loop-designer",
+      "type": "description-mention"
+    },
+    {
+      "from": "human-approval-boundary",
       "to": "human-agent-trust-reviewer",
       "type": "description-mention"
     },
@@ -3070,6 +3415,16 @@
     {
       "from": "iac-reviewer",
       "to": "ci-pipeline-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "iac-reviewer",
+      "to": "cloud-security-baseline-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "iac-reviewer",
+      "to": "environment-parity-reviewer",
       "type": "description-mention"
     },
     {
@@ -3404,7 +3759,17 @@
     },
     {
       "from": "local-ci-mirror-preflight",
+      "to": "ci-failure-classifier",
+      "type": "description-mention"
+    },
+    {
+      "from": "local-ci-mirror-preflight",
       "to": "ci-pipeline-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "local-ci-mirror-preflight",
+      "to": "environment-parity-reviewer",
       "type": "description-mention"
     },
     {
@@ -3544,6 +3909,11 @@
     },
     {
       "from": "model-context-designer",
+      "to": "agent-harness-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "model-context-designer",
       "to": "agent-startup-context-gate",
       "type": "description-mention"
     },
@@ -3560,6 +3930,11 @@
     {
       "from": "model-context-designer",
       "to": "rag-security-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "model-context-designer",
+      "to": "structured-output-validator",
       "type": "description-mention"
     },
     {
@@ -3655,6 +4030,11 @@
     {
       "from": "multi-tenant-security-tester",
       "to": "tenant-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "multi-tenant-security-tester",
+      "to": "test-tenant-provisioner",
       "type": "description-mention"
     },
     {
@@ -4034,6 +4414,11 @@
     },
     {
       "from": "product-spec-writer",
+      "to": "acceptance-criteria-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "product-spec-writer",
       "to": "adr-writer",
       "type": "body-route"
     },
@@ -4159,6 +4544,11 @@
     },
     {
       "from": "project-orchestrator",
+      "to": "ai-task-decomposer",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
       "to": "architecture-advisor",
       "type": "body-route"
     },
@@ -4205,11 +4595,6 @@
     {
       "from": "project-orchestrator",
       "to": "feature-flag-rollout-strategist",
-      "type": "body-route"
-    },
-    {
-      "from": "project-orchestrator",
-      "to": "local-ci-mirror-preflight",
       "type": "body-route"
     },
     {
@@ -4603,6 +4988,46 @@
       "type": "description-mention"
     },
     {
+      "from": "resilience-architecture-reviewer",
+      "to": "authorization-matrix-designer",
+      "type": "body-route"
+    },
+    {
+      "from": "resilience-architecture-reviewer",
+      "to": "database-backup-verifier",
+      "type": "body-route"
+    },
+    {
+      "from": "resilience-architecture-reviewer",
+      "to": "database-backup-verifier",
+      "type": "body-route"
+    },
+    {
+      "from": "resilience-architecture-reviewer",
+      "to": "database-backup-verifier",
+      "type": "description-mention"
+    },
+    {
+      "from": "resilience-architecture-reviewer",
+      "to": "horizontal-scalability-reviewer",
+      "type": "description-mention"
+    },
+    {
+      "from": "resilience-architecture-reviewer",
+      "to": "latency-budget-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "resilience-architecture-reviewer",
+      "to": "rollback-runbook-author",
+      "type": "description-mention"
+    },
+    {
+      "from": "resilience-architecture-reviewer",
+      "to": "slo-reliability-architect",
+      "type": "description-mention"
+    },
+    {
       "from": "risk-tiered-validation-selector",
       "to": "change-classification-gate",
       "type": "description-mention"
@@ -4955,6 +5380,11 @@
     {
       "from": "security-logging-alerting-architect",
       "to": "audit-log-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "security-logging-alerting-architect",
+      "to": "cloud-security-baseline-reviewer",
       "type": "description-mention"
     },
     {
@@ -5589,6 +6019,11 @@
     },
     {
       "from": "systematic-debugger",
+      "to": "ci-failure-classifier",
+      "type": "description-mention"
+    },
+    {
+      "from": "systematic-debugger",
       "to": "full-codebase-auditor",
       "type": "description-mention"
     },
@@ -5728,6 +6163,16 @@
       "type": "body-route"
     },
     {
+      "from": "test-data-architect",
+      "to": "test-tenant-provisioner",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-plan-designer",
+      "to": "acceptance-criteria-reviewer",
+      "type": "description-mention"
+    },
+    {
       "from": "test-plan-designer",
       "to": "manual-test-case-creator",
       "type": "description-mention"
@@ -5740,6 +6185,26 @@
     {
       "from": "test-plan-designer",
       "to": "test-coverage-mapper",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-tenant-provisioner",
+      "to": "multi-tenant-security-tester",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-tenant-provisioner",
+      "to": "secrets-identity-hardener",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-tenant-provisioner",
+      "to": "tenant-modeler",
+      "type": "description-mention"
+    },
+    {
+      "from": "test-tenant-provisioner",
+      "to": "test-data-architect",
       "type": "description-mention"
     },
     {
@@ -5800,6 +6265,11 @@
     {
       "from": "usage-metering-and-cost-attribution-pipeline-designer",
       "to": "saas-cost-architect",
+      "type": "description-mention"
+    },
+    {
+      "from": "vite-build-qa-engineer",
+      "to": "environment-parity-reviewer",
       "type": "description-mention"
     },
     {
@@ -5891,8 +6361,6 @@
     "context-co-update-ci-gate",
     "data-quality-monitor-designer",
     "docs-first-implementer",
-    "gated-deployment-prompt-template",
-    "horizontal-scalability-reviewer",
     "inter-agent-comms-reviewer",
     "reviewable-diff-discipline",
     "usage-metering-and-cost-attribution-pipeline-designer"

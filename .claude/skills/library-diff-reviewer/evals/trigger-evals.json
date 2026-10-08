@@ -1,6 +1,6 @@
 {
   "skill": "library-diff-reviewer",
-  "description": "Trigger discrimination: the whole library-changing PR end-to-end (this skill) vs ONE skill's quality (skill-quality-reviewer — composed as the inner loop; this is the other side of the seam pinned in that skill's trigger-evals), product-code diff correctness (code-reviewer), the change's process/approval trail (agent-governance-audit), and a release go/no-go (release-readiness-reviewer). In-batch: the retirement PLAN belongs to skill-deprecation-planner; this skill reviews the retirement PR.",
+  "description": "Trigger discrimination: the whole skill-library PR end-to-end (this skill) vs ONE skill's quality (skill-quality-reviewer — composed as the inner loop; this is the other side of the seam pinned in that skill's trigger-evals), product-code diff correctness (code-reviewer), the change's process/approval trail (agent-governance-audit), and a release go/no-go (release-readiness-reviewer). In-batch: the retirement PLAN belongs to skill-deprecation-planner; this skill reviews the retirement PR.",
   "overlaps_with": [
     "skill-quality-reviewer",
     "code-reviewer",
