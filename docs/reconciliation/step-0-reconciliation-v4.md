@@ -3732,6 +3732,145 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     exact-head invalidation rule and proportionality have no mechanical control
     behind them.
 
+- **D73 (2026-10-07) — Decided that the acceptance index will give the
+  readability pending count, after a gated repair (Option 1), then paused.**
+  - **Why.** One quantity had two figures. The
+    [readability ledger](../roadmaps/aegis-documentation-readability-backlog.md)
+    states its pending count by hand under an accepted-unless-listed default,
+    and its acceptance tool (`tools/readability_acceptance/`) counts on a
+    different basis. The ledger's 2026-10-07 current-count reconciliation
+    found the exact count not derivable and held the choice for the owner.
+    AEGIS-APR-101 had expressly approved no canonical index, no precedence and
+    no changed counting rule. An independent audit (OPT1-AUDIT, 2026-10-07:
+    four lanes and a verification, coordinator-held session artifacts, not
+    repository records) checked whether making the index official would slow
+    development or break a process. Its conditions are below.
+  - **Decision.** The owner approved the coordinator's recommendation, Option
+    1, answered the follow-up questions, and then paused the program after
+    this decision record. All of it is recorded verbatim in
+    [AEGIS-APR-113](../approvals/APPROVAL_REGISTER.md#aegis-apr-113-readability-pending-count-authority-option-1)
+    to AEGIS-APR-118. AEGIS-APR-113 and AEGIS-APR-118 are POLICY DECISIONs;
+    AEGIS-APR-114 to AEGIS-APR-117 are GRANTs, and none of the four covers any
+    work unless the owner resumes the program. In short:
+    1. the index becomes the official pending count only after its repaired
+       tool passes an independent review;
+    2. a page with no recorded acceptance in the repaired index counts as
+       pending;
+    3. a page whose recorded acceptance commit no longer exists anywhere, or
+       whose change since then cannot be measured for another reason, counts
+       as pending until it is re-reviewed;
+    4. the ledger keeper records each acceptance as one row of a fixed-format
+       table inside the ledger, the index reads only that table, and a
+       one-time reviewed backfill seeds it (the schema is condition 2, an
+       audit condition);
+    5. the index is rebuilt after each keeper recording and on demand, by "a
+       coding agent or a human";
+    6. there is no continuous integration (CI) gate;
+    7. after a switch, the ledger publishes no count of its own;
+    8. the tool repair may be split into several pull requests run in
+       parallel;
+    9. once the fixed-format table exists, the keeper may record targeted
+       reviews (AEGIS-APR-116); after a switch, the keeper may append
+       withdrawal rows (AEGIS-APR-117);
+    10. `tools/readability_acceptance/` is security-relevant "approval/evidence
+        tooling" (AEGIS-APR-118, in effect now);
+    11. **the program is paused** after this decision record and is a
+        low-priority backlog item; until the owner resumes it, the readability
+        ledger stays the record.
+  - **Alternatives considered.**
+    - **Option 2**, the ledger stays official and the index advisory: not
+      chosen. The repair is owed under both options, Option 2 keeps the hand
+      reconciliation that PR #677 needed, and it keeps the under-counting
+      accepted-unless-listed default.
+    - **"A: repair the prose reader"** (the option shown to the owner; the
+      audit estimated 26–52 active hours, low confidence): not chosen. Every
+      later ledger edit would have to stay harvester-safe, and telling positive
+      from negative statements would stay heuristic.
+    - **Recording in the index itself**, as the
+      [conversion note](../evidence/documentation/acceptance-conversion-process-2026-10-02.md)'s
+      section (d) proposed: not chosen. The keeper would write outside the
+      ledger, which AEGIS-APR-101 does not cover.
+    - **The repair variants**, as shown to the owner on 2026-10-07: "V2:
+      verifiable only (Recommended)", "V0: full backfill", "V1: no backfill"
+      or pausing. The owner chose "Pause the program". The variants, with
+      their unmeasured estimates, are kept in the backlog item.
+  - **Conditions on the switch.** These are the audit's reconciled set. Each row
+    has a source label:
+    - **Owner** means the owner's words quoted in AEGIS-APR-113 to
+      AEGIS-APR-118, or an owner-approved condition that AEGIS-APR-113 records
+      in the coordinator's summary.
+    - **Existing rule** means a rule already in force.
+    - **Audit** means an acceptance condition this program adopts from the
+      independent audit. It is not the owner's words, grants nothing and
+      withholds no owner authority; a later plan changes it only by a dated
+      note here.
+    - **Open** means not decided by this record.
+
+    A **blob ID** is the Git object ID of a file's exact content. It survives a
+    squash merge when the content is unchanged.
+
+    | # | Condition | Source |
+    | --- | --- | --- |
+    | 1 | No switch until the repaired tool passes an independent review. That review uses labelled ground truth: the 18 pages the audit found over-counted, as positive backfill cases; the known misreadings (ledger lines 2569, 2634, 2637 and 2638 as of `d6e48418`; `scoped-approval-register`, `database-backup-verifier`, `file-upload-storage-architect`) as negative cases; refusal of a shallow clone; and a fresh-clone rebuild. The tool's tests run locally, including on Python 3.14, because CI does not run them. | Owner (the gate); Audit (content) |
+    | 2 | The index reads only the keeper's table. This record states requirements for that table. The exact schema, field list, validity rules and rejection list are defined by the tool-repair plan and its independent plan audit, if the owner resumes the program. (a) The table keeps the existing keeper table's columns (Page, Acceptance revision, Reviewer, Evidence source, Date, in the first ledger-keeper recording) and adds at least a blob ID, an event kind and a stable identifier for every event. The event kinds include at least a full-page acceptance, a targeted review (AEGIS-APR-116) and a withdrawal (AEGIS-APR-117). (b) Every row carries an evidence pointer to the posted record it rests on: for a backfilled row, the ledger or evidence-record location and revision whose text the row quotes (row 4); for a withdrawal, the evidence that the cancelled event was wrong. The build runs offline, so the recording pull request's independent review checks that the pointer leads to a qualifying record bound to the recorded revision; AEGIS-APR-101 binds each recording "to the exact reviewed revision and its posted evidence". A pull-request comment can still be edited or deleted on GitHub; that residual is recorded, not solved. (c) A withdrawal identifies the specific earlier acceptance event of the same page that it cancels, and cannot cancel a later valid event. A page becomes pending again only when its status rested on the cancelled event, as this record reads AEGIS-APR-117's "The affected page becomes pending again." Whether a targeted-review row may be withdrawn as an "acceptance row" under AEGIS-APR-117 is Open. (d) A lost commit is recorded without binding it, in the backfill's reviewed report or as an event of its own kind, and never counts as an acceptance (rows 5 and 8). (e) The build rejects loudly, and does not count, any malformed row, or any row whose offline checks (commit, blob ID, identifiers) fail. (f) The index never reads the "Candidates examined and NOT recorded" table, `../` links resolve relative to the ledger, and `stated-acceptances.json` stops being an input. | Owner ("the index reads only that table"; AEGIS-APR-116; AEGIS-APR-117, as this record reads it); Existing rule (AEGIS-APR-101's evidence binding); Audit (the requirements); Open (withdrawing a targeted-review row) |
+    | 3 | The keeper keeps recording in the ledger under AEGIS-APR-101, unchanged except for the table's format. Two separate grants add to the keeper's role: targeted-review rows once the fixed-format table exists (AEGIS-APR-116), and withdrawal rows after a switch (AEGIS-APR-117). Neither changes AEGIS-APR-101. | Owner (AEGIS-APR-101 unchanged; AEGIS-APR-116 and AEGIS-APR-117) |
+    | 4 | Backfill verification. Each backfilled row's quoted text is found verbatim in the cited ledger or evidence record at a stated revision, and that location is the row's evidence pointer. The full commit resolves, and the blob ID equals `git rev-parse <commit>:<path>`. In the backfill from ledger prose, retention, negated, targeted-only and "becomes pending" text never yields a full-page acceptance row. Whether the one-time backfill may transcribe a historical targeted review as a targeted-review row is not decided by this record: AEGIS-APR-116 covers the keeper's recordings, and the owner was not asked about the backfill. A row that cannot be verified is not written as an acceptance, so its page counts as pending. An independent reviewer checks every row, and the build rejects a malformed row loudly. | Owner ("one-time reviewed backfill"); Audit (the verifiable quote and all checks); Open (backfill transcription of targeted reviews) |
+    | 5 | A page whose recorded acceptance commit no longer exists anywhere (`65bacc7`, `d3dcb62`, `3c44f4a`, `e9cce7d`, `288d993` and `7f98950` are known) counts as pending until it is re-reviewed. So does a page whose change since its recorded acceptance cannot be measured for any other reason. A commit still held by a pull-request head is not lost (row 8). Such rows are never bound to another commit and never dropped silently. | Owner (AEGIS-APR-113: "Pending until re-reviewed (Recommended)", for lost commits and for other unmeasurable changes); Audit (never re-bound, never dropped silently) |
+    | 6 | Reproducible build. Inputs are read at `--ref`, not from the working tree; diff flags are pinned; an unresolved revision is annotated, never dropped; test expectations are derived, not hard-coded; the build refuses a shallow clone and refuses a drop in recorded rows. | Audit |
+    | 7 | The page set is derived at `--ref`: new pages start pending, deleted pages drop out, and the JSON output lists the no-record pages. This is what makes rebuilding on demand and after each keeper recording sufficient. | Audit |
+    | 8 | Discovery and preservation. Rebuilds run only in a full clone that has fetched `refs/remotes/**` and `refs/pull/*/head`. The build's `--ref` is pinned to the rebuild pull request's base commit on the default branch, named in the pull request, and never to the rebuild's own commit. The reason is that the build records its input ref as `source_revision` in both generated files (`tools/readability_acceptance/build_index.py`), so a run at the candidate head would always differ. The reviewer rebuilds at that same ref and requires a zero diff. If the default branch has moved by merge time, the rebuild is redone at the new tip. A repaired format that records no self-reference is also acceptable, if the tool-repair plan chooses it (row 6). Fetching finds a commit only while some reference still holds it; it does not preserve it. So before the switch, every acceptance commit that a keeper-table row records is held by a durable preservation mechanism that the repaired tool reads; commits already lost are governed by row 5, and no row binds them (row 4). The tool-repair plan names the mechanism, and a new reference namespace, a tag convention or a merge-method rule needs the owner's decision first. The blob ID is a content check: it binds the row to the page's exact bytes at the recorded revision (row 4 verifies it). It is not preservation: under row 5, a page whose commit is lost counts as pending even when its blob survives. Rows 2, 5 and 8 together are how "acceptance commits are preserved" (AEGIS-APR-113) is met. | Owner (approved condition, in the coordinator's summary: "acceptance commits preserved"); Audit (the mechanism) |
+    | 9 | "whoever does the rebuild is a coding agent or a human". When a coding agent does it: never the coordinator, never a holder of another stage of that pull request, and the seven stages apply. | Owner (recommendation); Existing rule (agent limits) |
+    | 10 | Scope fence: repair and rebuild pull requests touch only `tools/readability_acceptance/**` and `docs/**`, and never `tools/__init__.py`, which is a `gate-guard` path. If the repaired build writes any path other than the two files AEGIS-APR-115 names, the switch plan raises it with the owner before relying on AEGIS-APR-115. | Audit; Owner ("Nothing else is covered.") |
+    | 11 | The targeted-edit rule applies as written: "A small edit keeps acceptance only if an independent reviewer checked it". For the index to see that check, it must be recorded as a targeted-review row (row 2's event kind) that identifies the reviewed revision and the retained full-page acceptance it builds on, by its identifier (exact fields: row 2 and the tool-repair plan). A targeted review covers the change from the retained acceptance up to its reviewed revision; a later change needs its own review, as the rule says of any unreviewed edit. The 10-line net difference is still measured from the retained full-page acceptance (the ledger rule). The switch states the resulting count before it takes effect. The keeper may record such rows under AEGIS-APR-116 once the fixed-format table exists. This settles, for the keeper's recordings, the point on which the conversion process's (b)2 and (b)3 differ. | Existing rule; Owner (AEGIS-APR-116: "Yes, explicit grant (Recommended)"); Audit (the recording need and schema) |
+    | 12 | One published count. At the switch, dated forward notes go on every surface that states or implies the ledger's count: at least the open-decisions row on edits made before the 10-line rule (with a re-check of the page's opening banner), `tools/readability_acceptance/README.md`, the ledger's count statements, `docs/skill-eval-behavioral-test-procedure.md` ("the stated totals move with it") and the forecast. `CONTRIBUTING.md`'s sentence that the ledger "tracks the full repository sweep and reviewed batches" is re-checked; it does not claim the count, so it stays. After the switch, no page other than the index states the figure. Otherwise rebuild-only pull requests (AEGIS-APR-115) could not keep the other pages current. | Owner (one source of truth); Audit (list and rule) |
+    | 13 | There is no CI gate. Any later CI job ("a separate, non-blocking CI job") never fails on drift, fetches full history and pull-request heads, has its own path filter, and needs a one-time owner `gate-guard` exception, because `.github/workflows/` is protected. | Owner (no CI gate; an optional non-blocking job later); Audit (conditions) |
+    | 14 | `tools/readability_acceptance/` is security-relevant "approval/evidence tooling under `tools/`" (AEGIS-APR-118, **in effect now**): a pull request that touches it answers the security-relevant-surface question **Yes**, naming it, and an outside contribution that touches it gets the additional security review. This confirms `CONTRIBUTING.md`'s existing wording; that file is unchanged. | Owner (AEGIS-APR-118: "Yes, security-relevant (Recommended)") |
+    | 15 | The rule stays out of `SKILL.md` files and `CLAUDE.md`, and no skill cites the ledger, the index or the tool. | Audit |
+
+  - **Consequences.**
+    - **Easier:** the count becomes one command. After the switch, ledger prose
+      stops being machine input, so ledger edits need no harvester-safe
+      wording. A blob ID lets the build and a reviewer check that a row matches
+      the page's exact content at its recorded revision.
+    - **Harder:** a one-time backfill (option B was shown to the owner at "About
+      16–32 agent-hours (estimate)"; later variant estimates are in the backlog
+      item). Every rebuild is a full seven-stage `tools/` pull request with
+      about 4–5 minutes of CI per head.
+    - **Expected:** the official count will rise once the no-record rule, the
+      lost-commit rule and the targeted-edit rule's review condition apply.
+    - **While paused:** the readability ledger stays the record, and its
+      process is unchanged. That answers the owner's question
+      "we stopped the program but would that break any of the current ledger process":
+      no. Its hand count stays a known-stale floor, and the exact count stays
+      not derivable; the ledger's current reading says why. Nothing in
+      `tools/` changes.
+  - **Reversal.** Before the switch nothing has changed, so there is nothing to
+    reverse. After it, a later owner decision can return the count to the
+    ledger; the keeper's table stays a valid ledger record, so no record is
+    lost. No point of no return was identified.
+  - **Not decided here:**
+    1. whether and when the program resumes, and which repair to build;
+    2. whether the one-time backfill may transcribe historical targeted
+       reviews (row 4);
+    3. the lighter review path for machine-checked rebuild pull requests,
+       which the owner chose to raise at the 2026-10-11 review-cap check-in.
+
+    Whether a program function may be delivered in more than one pull
+    request is no longer open for the tool repair: AEGIS-APR-114 records the
+    owner's "Parallel repair PRs" choice and its split-PR merge terms.
+  - **Authority.** The owner's current direct instructions of 2026-10-07, as
+    transcribed by the coordinator from the session chat. The register's
+    preamble makes them "valid source evidence before transcription". This
+    entry grants nothing. Its register companions are AEGIS-APR-113 and
+    AEGIS-APR-118 (POLICY DECISIONs, which grant nothing) and AEGIS-APR-114 to
+    AEGIS-APR-117 (GRANTs).
+  - **Status at recording.** Recorded 2026-10-07 against `origin/main` at
+    `7d1d05e8`. No skill, tool, script, workflow or protected path changes, and
+    no count changes; the ledger's current reading stands until the switch.
+    The program is paused after this decision record. **Review:** if the
+    owner resumes the program, its first plan re-checks each condition above
+    against the default branch at that time.
+
 ## 6. Post-merge corrections
 
 - **2026-09-30 — Line-number citations in §5 re-verified; the stale ones are

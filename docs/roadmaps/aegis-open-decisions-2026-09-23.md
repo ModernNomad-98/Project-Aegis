@@ -145,7 +145,7 @@ decisions only and grant no authority beyond what they record.
 | Dependabot [PR #443](https://github.com/ModernNomad-98/Project-Aegis/pull/443) (`actions/setup-node` 4.4.0 to 7.0.0) | **One-time `gate-guard` exception at exact head `7d138ee` only.** The owner chose "Approve one-time exception (Recommended)", and after the merge chose "Yes, like #429 (Recommended)" to record it the way the #429 exception was recorded. It covers no other PR, head or workflow change. **Delivered:** #443 merged on 2026-09-28 at 09:07:40 UTC as `e251c51`; recorded as [AEGIS-APR-071](../approvals/APPROVAL_REGISTER.md#aegis-apr-071-pr-443-protected-gate-guard-exception) and its consumption [AEGIS-APR-072](../approvals/APPROVAL_REGISTER.md#aegis-apr-072-consumption-of-the-pr-443-exception) by [PR #453](https://github.com/ModernNomad-98/Project-Aegis/pull/453). |
 | Stale register grants | **Record their closeout.** The owner chose "Add the records (Recommended)": AEGIS-APR-004, -006 and -008 are recorded as consumed and AEGIS-APR-024 as expired. AEGIS-APR-028 (the paused VM setup) is left untouched. The records grant nothing new. **Delivered:** [PR #450](https://github.com/ModernNomad-98/Project-Aegis/pull/450) merged on 2026-09-28 as `bb3b117`, adding [AEGIS-APR-067](../approvals/APPROVAL_REGISTER.md#aegis-apr-067-consumption-of-the-cp-wp-002-kernel-grant) to [AEGIS-APR-070](../approvals/APPROVAL_REGISTER.md#aegis-apr-070-expiry-of-the-2026-09-24-session-delivery-grant). |
 | Audit-report generator format (engine v1.13.3) | **Prepare it, then approved as described.** Following the generated-reports decision above, readability fixes to `docs/audits/skill-contract-audit-baseline.md` go in its generator, the protected `scripts/audit-skill-contracts.py`. The owner chose "Yes, prepare it (Recommended)", then "Approve as described (Recommended)" for the proposed terms, and "Frozen commit 5dbf7bc (Recommended)" for the scan target, so the report's findings and scanned corpus stay the same. Recorded as [AEGIS-APR-073](../approvals/APPROVAL_REGISTER.md#aegis-apr-073-make-the-audit-baseline-report-readable-on-its-own-engine-v1133) by #453; the register entry sets the exact paths and limits. **Delivered:** [PR #461](https://github.com/ModernNomad-98/Project-Aegis/pull/461) merged on 2026-09-28 at 09:36:56 UTC as `dc3c767`. It changes a protected path, so its merge needed its own one-time, exact-head `gate-guard` exception, which this decision did not grant; the owner granted it separately in chat by choosing "Approve for ae719e6 only (Recommended)", covering #461 at head `ae719e6` only. No register entry recording that exception or the consumption of AEGIS-APR-073 was on `main` at this recording. |
-| Readability sweep for edits made before the 10-line rule | **Full sweep now.** The owner chose "Full sweep now". Every accepted page in the [readability ledger](aegis-documentation-readability-backlog.md) is checked now for edits made before the rule since its last full-page acceptance, applying the first decision above; a page past 10 changed lines returns to pending until an independent full-page re-read. **Status:** counting finished: the sweep found 103 of the 558 accepted pages past the rule. They return to pending when a ledger update records them page by page; until then the ledger's own counts govern. Their full-page re-reads are in progress. _2026-09-30: the re-reads finished; the readability ledger's own pending set is the current record._ |
+| Readability sweep for edits made before the 10-line rule | **Full sweep now.** The owner chose "Full sweep now". Every accepted page in the [readability ledger](aegis-documentation-readability-backlog.md) is checked now for edits made before the rule since its last full-page acceptance, applying the first decision above; a page past 10 changed lines returns to pending until an independent full-page re-read. **Status:** counting finished: the sweep found 103 of the 558 accepted pages past the rule. They return to pending when a ledger update records them page by page; until then the ledger's own counts govern. Their full-page re-reads are in progress. _2026-09-30: the re-reads finished; the readability ledger's own pending set is the current record._ _2026-10-07: the owner decided that the acceptance index will become the official pending count after a gated repair, then paused that program; the readability ledger stays the record, so this sentence still holds. See [Decided on 2026-10-07](#decided-on-2026-10-07)._ |
 | Stage 6 manual-only markers in `project-orchestrator` | **Add the markers.** The owner chose "Add the markers (Recommended)": the four manual-only enforcers listed in Stage 6 get the same *(manual-only)* marker that Stages 4, 7 and 8 already use. **Delivered:** [PR #454](https://github.com/ModernNomad-98/Project-Aegis/pull/454) merged on 2026-09-28 as `5bd21fb`. |
 | D15 enrichment deltas | **Apply them now.** The owner chose "Apply them now (Recommended)" for the skill enrichments recorded under decision D15 in the [reconciliation log](../reconciliation/step-0-reconciliation-v4.md) (for `ai-closeout-reporter`, `adr-writer`, `agent-memory-governance` and `ai-sdlc-operating-model`); each delta is checked against the skill first and only missing ones are added. **Delivered:** [PR #455](https://github.com/ModernNomad-98/Project-Aegis/pull/455) merged on 2026-09-28 as `c789f58`. |
 | Certainty-label convention | **Keep it to `adr-writer` for now.** The owner chose "Keep it to adr-writer for now (Recommended)". Certainty labels (marking how sure a statement is) are added to `adr-writer` as a D15 delta; no library-wide writing rule is added. |
@@ -195,6 +195,32 @@ the owner's own words.
 | Sequencing rule for parallel re-reads | **"Resume the queue: forecast checkpoint (1 worker) plus at most 2 re-reads at once (Recommended)".** The owner adopted this after review of the handoff's worker rules. It keeps at most two full-page-re-read pull requests in flight, because each re-read PR needs its own independent reviewer and more would queue reviews behind other work. It sits inside the owner's later `increase worker cap to 4` and does not raise it. |
 | Second security review for the approval-register re-read | The owner answered **"yes please do both"** to a question that asked (1) whether to record the commit-trailer convention in the repository and (2) whether the approval-register re-read should receive a security review as well as the readability acceptance, because `CONTRIBUTING.md` lists the owner approval register as a security-relevant surface. Both are recorded here; the register re-read's PR body marks the surface **Yes** and its independent review includes a security review. This page is not the authority for either; it records the owner's instruction. |
 
+### Decided on 2026-10-07
+
+The owner, Peter Nguyen, decided these items in chat with the coordinating
+agent on 2026-10-07. Where a row names a register entry, the
+[approval register](../approvals/APPROVAL_REGISTER.md) governs and this
+summary is not the authority. Each row quotes the chosen option's label or the
+owner's own words, as transcribed by the coordinator. The rows grant nothing
+beyond the entries they name.
+
+| Topic | Decision and what it does not cover |
+| --- | --- |
+| Readability pending count (Option 1) | **"ok go with your recommendation"**. The acceptance index becomes the official count after its tool is repaired and passes an independent review; no CI gate; one source of truth after the switch. [AEGIS-APR-113](../approvals/APPROVAL_REGISTER.md#aegis-apr-113-readability-pending-count-authority-option-1) and D73 in the [reconciliation log](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions). **Status:** recorded, then paused (row "Which repair to build" below); the readability ledger stays the record. |
+| Pages with no recorded acceptance | **"Count as pending (Recommended)"**. It applies to the repaired index. The question's figure of 159 was the unrepaired tool's unmatched pages, not pages that were never reviewed, and the coordinator disclosed this correction. |
+| When the index is rebuilt | **"On demand + keeper (Recommended)"**. |
+| How the index learns acceptances | **"B: structured table (Recommended)"**. AEGIS-APR-101 is unchanged. |
+| Pages whose recorded acceptance commit no longer exists anywhere | **"Pending until re-reviewed (Recommended)"**. For other cases where a page's change cannot be measured, the owner chose the same rule (row below). |
+| Merges of the program's pull requests | **"Yes, same terms (Recommended)"**. With the owner's later "Parallel repair PRs" choice, the tool repair may be several pull requests. Each smaller repair pull request merges on the same terms: "Yes (Recommended)". [AEGIS-APR-114](../approvals/APPROVAL_REGISTER.md#aegis-apr-114-work-and-merge-terms-for-the-readability-count-program). |
+| Routine rebuilds after the switch | **"Yes, standing approval (Recommended)"**. [AEGIS-APR-115](../approvals/APPROVAL_REGISTER.md#aegis-apr-115-standing-approval-for-index-rebuild-pull-requests-after-the-switch), ACTIVE only after the switch merges. |
+| Speed-ups | All four chosen: **"Ask open decisions now"**, **"Parallel repair PRs"**, **"High effort for low-risk"** and **"Raise rebuild fast path later"**. "Ask open decisions now" was acted on (the three questions recorded as AEGIS-APR-116, AEGIS-APR-118 and the counting rule); "Raise rebuild fast path later" is an item for the 2026-10-11 check-in; the other two apply only if the program resumes. [AEGIS-APR-113](../approvals/APPROVAL_REGISTER.md#aegis-apr-113-readability-pending-count-authority-option-1) and AEGIS-APR-114. |
+| Targeted reviews recorded by the ledger keeper | **"Yes, explicit grant (Recommended)"**. [AEGIS-APR-116](../approvals/APPROVAL_REGISTER.md#aegis-apr-116-the-ledger-keeper-may-record-targeted-reviews-in-the-acceptance-record-table), ACTIVE only once the paused repair adds the fixed-format table. |
+| Security classification of the readability acceptance tool | **"Yes, security-relevant (Recommended)"**. [AEGIS-APR-118](../approvals/APPROVAL_REGISTER.md#aegis-apr-118-security-classification-of-the-readability-acceptance-tool), in effect now; it confirms `CONTRIBUTING.md`'s existing wording, which is unchanged. |
+| Changes that cannot be measured for another reason | **"Pending until re-reviewed (Recommended)"**. AEGIS-APR-113. |
+| Which repair to build | **"Pause the program"**: "Merge the decision record, then stop here and decide later whether the repair is worth it." AEGIS-APR-113; see the backlog item below. |
+| Withdrawal rows after a switch | **"Yes, keeper may (Recommended)"**. [AEGIS-APR-117](../approvals/APPROVAL_REGISTER.md#aegis-apr-117-the-ledger-keeper-may-append-withdrawal-rows-after-the-switch), ACTIVE only after a switch. |
+| Pause and backlog | The owner wrote: **"ok fix the four defects, make sure the ledger is no longer stale, pause the program and turn it into a low priority backlog items for aegis"**. AEGIS-APR-113; the backlog item below. |
+
 ### Still open for the owner
 
 Each item below needs an owner choice or read before work that depends on it
@@ -206,6 +232,7 @@ can start. Listing an item here grants nothing.
 | CP-WP-003 and CP-WP-004 | Real source authority and capability proof for CP-WP-003, then selection of one bounded real integration for CP-WP-004; both need separate reviewed scope and grants. |
 | Private BER candidate labels | Semantic review and exact-byte approval of the 160 pending private candidates; this index does not inspect them. |
 | Disposable Linux VM | Whether and when to resume the paused VirtualBox setup; a Stage A host probe needs its own grant. |
+| Lighter review path for machine-checked rebuild PRs (added 2026-10-07) | The owner chose to raise it at the 2026-10-11 review-cap check-in. On 2026-10-04 the owner tabled a proposal to cap review rounds and asked to check back in 7 days; the coordinator scheduled that check-in for 2026-10-11. This is recorded only in a coordinator log, `.coord/coordinator-cadence.jsonl` line 72 at commit `4d05c624`, which only the branch `coord/idle-check-2026-10-04` holds; it is not on the default branch. Nothing depends on it while the readability program is paused. |
 
 _Re-check 2026-09-30, restamped against `main` at `5c806348` (`git rev-list --count 7b3fbca..origin/main` returns 369). All four rows still hold, so none is corrected: every one of the eight synthetic Stage 4B cases remains NOT RUN; CP-WP-003 still lacks real source authority and CP-WP-004 still has no selected delivery target; the private candidate packet still reads PENDING with its 160 candidates unapproved; and the disposable VirtualBox virtual machine is still paused, its setup un-resumed. The rows above keep their original wording; only this re-check date and ref are new._
 
@@ -245,6 +272,55 @@ not authorize its implementation.
   approved the orchestrator route at Stage 9 ("Decide to release"); see
   [Decided on 2026-09-26](#decided-on-2026-09-26). Both routes merged as
   [PR #384](https://github.com/ModernNomad-98/Project-Aegis/pull/384) on 2026-09-27 at 04:25:58 UTC (`0f46808d`).
+- **Readability index repair and switch (OPT1): paused, low priority.**
+  - **Source:** the owner's instruction on 2026-10-07, "ok fix the four
+    defects, make sure the ledger is no longer stale, pause the program and
+    turn it into a low priority backlog items for aegis", after choosing
+    "Pause the program".
+  - **What it is:** repair `tools/readability_acceptance/` so that it reads a
+    fixed-format table of recorded reviews kept inside the
+    [readability ledger](aegis-documentation-readability-backlog.md), seed
+    that table once by the one-time reviewed backfill of option B, then make
+    the acceptance index the official pending
+    count, under the conditions in decision D73.
+  - **Decisions already recorded:**
+    - AEGIS-APR-113: the policy and the pause;
+    - AEGIS-APR-114: merge terms for the program's pull requests;
+    - AEGIS-APR-115: routine rebuilds after a switch;
+    - AEGIS-APR-116: the keeper records targeted reviews;
+    - AEGIS-APR-117: keeper withdrawals after a switch;
+    - AEGIS-APR-118: the tool's security classification, in effect now.
+
+    None of the grants covers any work until the owner resumes.
+  - **Repair options:** agent estimates from the paused planning, unmeasured
+    and low confidence, outside the bounded selected subtotal:
+    - V0, full backfill: 10 pull requests, about 55–103 agent-hours;
+    - V1, no backfill: about 21–38, plus about 90–365 hours of re-review to
+      recover;
+    - V2, mechanical backfill from machine-verifiable records only: about
+      25–45. This is the planner's recommendation. It would narrow option B's
+      backfill and partly change "Parallel repair PRs" (4 pull requests
+      instead of 10), so it needs the owner's confirmation; V1 would drop that
+      backfill and V3 would reverse "Parallel repair PRs", so each of them
+      would need the owner's decision too;
+    - V3, fewer and larger pull requests: about 47–85.
+
+    The switch is not estimated.
+  - **Expected effect at a switch:** "In every version the official pending
+    count starts at about 510–610 of 609 pages and falls as pages are
+    reviewed."
+  - **Prerequisites on resume:**
+    - the owner's decision to resume, and the choice of repair;
+    - plans re-derived against the default branch at that time;
+    - D73's conditions, including a durable way to preserve recorded
+      acceptance commits, which needs an owner decision if it adds a
+      repository convention.
+  - **Optional follow-up, not a prerequisite:** a lighter review path for
+    machine-checked rebuild pull requests, which the owner chose to raise at
+    the 2026-10-11 review-cap check-in. Without it, rebuilds use the normal
+    seven-stage path.
+  - **Resume trigger:** an owner decision only. Until then the readability
+    ledger stays the record.
 
 The [current forecast](aegis-backlog-forecast.md#start-here--current-reading)
 places the bounded selected subtotal at **71–146 active hours**: the ten
