@@ -119,6 +119,20 @@ v1.13.3, whose files remain in git history at
 [`dc3c767`](https://github.com/ModernNomad-98/Project-Aegis/tree/dc3c767dc91d936cc8cc70589137ca33e6f44b7c/artifacts/audits)
 (PR #461's merge). The historical counts below are unchanged.
 
+**Baseline files regenerated, 2026-10-08.** Under AEGIS-APR-119, an owner grant
+in the [approval register](../approvals/APPROVAL_REGISTER.md), the same four
+files were regenerated with engine v1.13.4, unchanged, from
+`cbb084d6f1f2acbd2373510dbd5290dcb18f285a` on branch
+`claude/sharp-lovelace-urgxpz-fu2` (195 skills, 339 findings, of which 255 are
+ROUTE-002). Against the v1.13.4 baseline, 24 findings were added and 1
+removed, all ROUTE-002, 8 rows differ only in their line number, and the
+84 semantic-review candidates are otherwise the same rows; 9 skills were
+added and none removed. 24 ROUTE-002 rows name a skill pair absent from the
+[2026-09-26 dispositions](../evidence/route002-dispositions-2026-09-26/README.md)
+and are untriaged census rows. The v1.13.4 files remain in git history at
+[`c14338d`](https://github.com/ModernNomad-98/Project-Aegis/tree/c14338d254bde3fd7fb9b8060033299cde5d5197/artifacts/audits)
+(PR #503's merge). The historical counts below are unchanged.
+
 Rules of this register (from the program's operating rules):
 
 - AEGIS-001..059 are never renumbered, merged, or reused. New IDs start at

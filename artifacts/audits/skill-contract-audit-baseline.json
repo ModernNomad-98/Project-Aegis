@@ -3,18 +3,18 @@
     "tool": "audit-skill-contracts",
     "version": "1.13.4",
     "engine_sha256": "e64b7430488c5f47c31faf1abcfa5f46aae876f3362ed8e0de105e988ff10153",
-    "repo_sha": "5dbf7bc9e958d932bd0c5b093ebecfe61be41840",
-    "branch": "chore/audit-engine-v1134-report-format",
+    "repo_sha": "cbb084d6f1f2acbd2373510dbd5290dcb18f285a",
+    "branch": "claude/sharp-lovelace-urgxpz-fu2",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
-    "audited_file_count": 715,
-    "audited_byte_count": 4735807,
-    "corpus_content_hash": "a14f70c96c3b3ac4268d0b644dbb7c7b81b6d40e3665baba3ddcde119146b73b",
+    "audited_file_count": 755,
+    "audited_byte_count": 5193044,
+    "corpus_content_hash": "673e7fe93c6ddfb84e485dae4be1f1538f85af6c4fbaed893323e42e7e886b14",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
         "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-        "sha256": "42ba05192c49db68c152ed6101fedbacb40c48fdb30e611cca811be54f523c80"
+        "sha256": "6e32cee15a6ed1f4d7781c55a389abfafb0f94fb68e186d18cd831ec98a7fd01"
       },
       "agent_names_enumerated": {
         "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -38,22 +38,22 @@
         ]
       }
     },
-    "skill_count": 186,
+    "skill_count": 195,
     "rule_count": 27,
-    "finding_count": 316,
+    "finding_count": 339,
     "by_severity": {
       "P0": 2,
       "P1": 82,
       "P2": 0,
-      "info": 232
+      "info": 255
     },
     "by_rule": {
       "ARTF-001": 9,
-      "ROUTE-002": 232,
+      "ROUTE-002": 255,
       "SIDE-004": 73,
       "STATE-001": 2
     },
-    "mechanical_count": 232,
+    "mechanical_count": 255,
     "semantic_review_candidates": 84
   },
   "rule_inventory": [
@@ -329,7 +329,7 @@
       "negative_fixture": "clean-skill",
       "aegis_map": [],
       "limits": "many one-directional exclusions are correct (hub skills cannot name every excluder); CENSUS data, maps to NO AEGIS id",
-      "hit_count": 232
+      "hit_count": 255
     },
     {
       "id": "ROUTE-003",
@@ -573,6 +573,54 @@
     {
       "rule": "ROUTE-002",
       "severity": "info",
+      "file": ".claude/skills/acceptance-criteria-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "acceptance-criteria-reviewer",
+      "related_skills": [
+        "manual-test-case-creator"
+      ],
+      "evidence": "exclusion toward `manual-test-case-creator` is not reciprocated (manual-test-case-creator's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "acceptance-criteria-reviewer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/acceptance-criteria-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "acceptance-criteria-reviewer",
+      "related_skills": [
+        "release-readiness-reviewer"
+      ],
+      "evidence": "exclusion toward `release-readiness-reviewer` is not reciprocated (release-readiness-reviewer's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "acceptance-criteria-reviewer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/acceptance-criteria-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "acceptance-criteria-reviewer",
+      "related_skills": [
+        "requirements-gathering-facilitator"
+      ],
+      "evidence": "exclusion toward `requirements-gathering-facilitator` is not reciprocated (requirements-gathering-facilitator's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "acceptance-criteria-reviewer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
       "file": ".claude/skills/accessibility-test-harness/SKILL.md",
       "line": 0,
       "owning_skill": "accessibility-test-harness",
@@ -785,7 +833,7 @@
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/agent-authorization-matrix/SKILL.md",
-      "line": 76,
+      "line": 77,
       "owning_skill": "agent-authorization-matrix",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
@@ -834,7 +882,7 @@
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/agent-containment-reviewer/SKILL.md",
-      "line": 87,
+      "line": 90,
       "owning_skill": "agent-containment-reviewer",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
@@ -863,22 +911,6 @@
       "remediation_owner": "agent-governance-audit",
       "confidence": "low",
       "mechanical": false
-    },
-    {
-      "rule": "ROUTE-002",
-      "severity": "info",
-      "file": ".claude/skills/agent-harness-architect/SKILL.md",
-      "line": 0,
-      "owning_skill": "agent-harness-architect",
-      "related_skills": [
-        "model-context-designer"
-      ],
-      "evidence": "exclusion toward `model-context-designer` is not reciprocated (model-context-designer's description never mentions this skill) \u2014 census evidence, no AEGIS id",
-      "family": "route",
-      "aegis_map": [],
-      "remediation_owner": "agent-harness-architect",
-      "confidence": "low",
-      "mechanical": true
     },
     {
       "rule": "SIDE-004",
@@ -947,6 +979,38 @@
       "remediation_owner": "ai-cost-guardrail-designer",
       "confidence": "low",
       "mechanical": false
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "ai-human-in-the-loop-designer",
+      "related_skills": [
+        "agent-authorization-matrix"
+      ],
+      "evidence": "exclusion toward `agent-authorization-matrix` is not reciprocated (agent-authorization-matrix's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "ai-human-in-the-loop-designer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
+      "line": 0,
+      "owning_skill": "ai-human-in-the-loop-designer",
+      "related_skills": [
+        "human-agent-trust-reviewer"
+      ],
+      "evidence": "exclusion toward `human-agent-trust-reviewer` is not reciprocated (human-agent-trust-reviewer's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "ai-human-in-the-loop-designer",
+      "confidence": "low",
+      "mechanical": true
     },
     {
       "rule": "SIDE-004",
@@ -1029,6 +1093,70 @@
       "remediation_owner": "ai-sdlc-operating-model",
       "confidence": "low",
       "mechanical": false
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/ai-task-decomposer/SKILL.md",
+      "line": 0,
+      "owning_skill": "ai-task-decomposer",
+      "related_skills": [
+        "lane-authoring-guide"
+      ],
+      "evidence": "exclusion toward `lane-authoring-guide` is not reciprocated (lane-authoring-guide's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "ai-task-decomposer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/ai-task-decomposer/SKILL.md",
+      "line": 0,
+      "owning_skill": "ai-task-decomposer",
+      "related_skills": [
+        "phased-work-handoff-designer"
+      ],
+      "evidence": "exclusion toward `phased-work-handoff-designer` is not reciprocated (phased-work-handoff-designer's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "ai-task-decomposer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/ai-task-decomposer/SKILL.md",
+      "line": 0,
+      "owning_skill": "ai-task-decomposer",
+      "related_skills": [
+        "roadmap-to-commitments-translator"
+      ],
+      "evidence": "exclusion toward `roadmap-to-commitments-translator` is not reciprocated (roadmap-to-commitments-translator's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "ai-task-decomposer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/ai-task-decomposer/SKILL.md",
+      "line": 0,
+      "owning_skill": "ai-task-decomposer",
+      "related_skills": [
+        "tech-spec-writer"
+      ],
+      "evidence": "exclusion toward `tech-spec-writer` is not reciprocated (tech-spec-writer's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "ai-task-decomposer",
+      "confidence": "low",
+      "mechanical": true
     },
     {
       "rule": "ROUTE-002",
@@ -1294,7 +1422,7 @@
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/audit-log-architect/SKILL.md",
-      "line": 19,
+      "line": 22,
       "owning_skill": "audit-log-architect",
       "related_skills": [],
       "evidence": "claims durability ('durably') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
@@ -1571,6 +1699,54 @@
     {
       "rule": "ROUTE-002",
       "severity": "info",
+      "file": ".claude/skills/ci-failure-classifier/SKILL.md",
+      "line": 0,
+      "owning_skill": "ci-failure-classifier",
+      "related_skills": [
+        "ci-pipeline-architect"
+      ],
+      "evidence": "exclusion toward `ci-pipeline-architect` is not reciprocated (ci-pipeline-architect's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "ci-failure-classifier",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/ci-failure-classifier/SKILL.md",
+      "line": 0,
+      "owning_skill": "ci-failure-classifier",
+      "related_skills": [
+        "flaky-test-detective"
+      ],
+      "evidence": "exclusion toward `flaky-test-detective` is not reciprocated (flaky-test-detective's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "ci-failure-classifier",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/ci-failure-classifier/SKILL.md",
+      "line": 0,
+      "owning_skill": "ci-failure-classifier",
+      "related_skills": [
+        "sharded-validation-with-resume"
+      ],
+      "evidence": "exclusion toward `sharded-validation-with-resume` is not reciprocated (sharded-validation-with-resume's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "ci-failure-classifier",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
       "file": ".claude/skills/ci-pipeline-architect/SKILL.md",
       "line": 0,
       "owning_skill": "ci-pipeline-architect",
@@ -1681,6 +1857,54 @@
       "remediation_owner": "cloud-architecture-decider",
       "confidence": "low",
       "mechanical": false
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/cloud-security-baseline-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "cloud-security-baseline-reviewer",
+      "related_skills": [
+        "azure-saas-architect"
+      ],
+      "evidence": "exclusion toward `azure-saas-architect` is not reciprocated (azure-saas-architect's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "cloud-security-baseline-reviewer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/cloud-security-baseline-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "cloud-security-baseline-reviewer",
+      "related_skills": [
+        "compliance-gap-auditor"
+      ],
+      "evidence": "exclusion toward `compliance-gap-auditor` is not reciprocated (compliance-gap-auditor's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "cloud-security-baseline-reviewer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/cloud-security-baseline-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "cloud-security-baseline-reviewer",
+      "related_skills": [
+        "secrets-identity-hardener"
+      ],
+      "evidence": "exclusion toward `secrets-identity-hardener` is not reciprocated (secrets-identity-hardener's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "cloud-security-baseline-reviewer",
+      "confidence": "low",
+      "mechanical": true
     },
     {
       "rule": "SIDE-004",
@@ -1942,6 +2166,22 @@
     {
       "rule": "ROUTE-002",
       "severity": "info",
+      "file": ".claude/skills/data-migration-runbook-author/SKILL.md",
+      "line": 0,
+      "owning_skill": "data-migration-runbook-author",
+      "related_skills": [
+        "gated-deployment-prompt-template"
+      ],
+      "evidence": "exclusion toward `gated-deployment-prompt-template` is not reciprocated (gated-deployment-prompt-template's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "data-migration-runbook-author",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
       "file": ".claude/skills/data-partitioning-sharding-strategist/SKILL.md",
       "line": 0,
       "owning_skill": "data-partitioning-sharding-strategist",
@@ -2032,6 +2272,38 @@
       "family": "route",
       "aegis_map": [],
       "remediation_owner": "data-quality-monitor-designer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/database-backup-verifier/SKILL.md",
+      "line": 0,
+      "owning_skill": "database-backup-verifier",
+      "related_skills": [
+        "data-migration-runbook-author"
+      ],
+      "evidence": "exclusion toward `data-migration-runbook-author` is not reciprocated (data-migration-runbook-author's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "database-backup-verifier",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/database-backup-verifier/SKILL.md",
+      "line": 0,
+      "owning_skill": "database-backup-verifier",
+      "related_skills": [
+        "pii-lifecycle-designer"
+      ],
+      "evidence": "exclusion toward `pii-lifecycle-designer` is not reciprocated (pii-lifecycle-designer's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "database-backup-verifier",
       "confidence": "low",
       "mechanical": true
     },
@@ -2146,6 +2418,22 @@
       "family": "route",
       "aegis_map": [],
       "remediation_owner": "edge-state-ux-designer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/environment-parity-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "environment-parity-reviewer",
+      "related_skills": [
+        "secrets-identity-hardener"
+      ],
+      "evidence": "exclusion toward `secrets-identity-hardener` is not reciprocated (secrets-identity-hardener's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "environment-parity-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -2752,7 +3040,7 @@
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/human-approval-boundary/SKILL.md",
-      "line": 51,
+      "line": 55,
       "owning_skill": "human-approval-boundary",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
@@ -3480,7 +3768,7 @@
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/offline-first-sync-architect/SKILL.md",
-      "line": 84,
+      "line": 89,
       "owning_skill": "offline-first-sync-architect",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
@@ -3514,7 +3802,7 @@
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/operational-vs-analytical-splitter/SKILL.md",
-      "line": 97,
+      "line": 99,
       "owning_skill": "operational-vs-analytical-splitter",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
@@ -4193,6 +4481,54 @@
       "family": "route",
       "aegis_map": [],
       "remediation_owner": "requirements-gathering-facilitator",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/resilience-architecture-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "resilience-architecture-reviewer",
+      "related_skills": [
+        "latency-budget-architect"
+      ],
+      "evidence": "exclusion toward `latency-budget-architect` is not reciprocated (latency-budget-architect's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "resilience-architecture-reviewer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/resilience-architecture-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "resilience-architecture-reviewer",
+      "related_skills": [
+        "rollback-runbook-author"
+      ],
+      "evidence": "exclusion toward `rollback-runbook-author` is not reciprocated (rollback-runbook-author's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "resilience-architecture-reviewer",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/resilience-architecture-reviewer/SKILL.md",
+      "line": 0,
+      "owning_skill": "resilience-architecture-reviewer",
+      "related_skills": [
+        "slo-reliability-architect"
+      ],
+      "evidence": "exclusion toward `slo-reliability-architect` is not reciprocated (slo-reliability-architect's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "resilience-architecture-reviewer",
       "confidence": "low",
       "mechanical": true
     },
@@ -5165,7 +5501,7 @@
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "line": 105,
+      "line": 117,
       "owning_skill": "standing-approval-and-auto-advance",
       "related_skills": [],
       "evidence": "claims durability ('durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
@@ -5214,7 +5550,7 @@
       "rule": "ARTF-001",
       "severity": "P1",
       "file": ".claude/skills/streaming-event-architect/SKILL.md",
-      "line": 97,
+      "line": 99,
       "owning_skill": "streaming-event-architect",
       "related_skills": [],
       "evidence": "claims durability ('Durable') without naming a durability level (transcript-only / workspace-persisted / Git-tracked / locally committed / remote-persisted / released)",
@@ -5537,6 +5873,38 @@
     {
       "rule": "ROUTE-002",
       "severity": "info",
+      "file": ".claude/skills/test-tenant-provisioner/SKILL.md",
+      "line": 0,
+      "owning_skill": "test-tenant-provisioner",
+      "related_skills": [
+        "secrets-identity-hardener"
+      ],
+      "evidence": "exclusion toward `secrets-identity-hardener` is not reciprocated (secrets-identity-hardener's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "test-tenant-provisioner",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
+      "file": ".claude/skills/test-tenant-provisioner/SKILL.md",
+      "line": 0,
+      "owning_skill": "test-tenant-provisioner",
+      "related_skills": [
+        "tenant-modeler"
+      ],
+      "evidence": "exclusion toward `tenant-modeler` is not reciprocated (tenant-modeler's description never mentions this skill) \u2014 census evidence, no AEGIS id",
+      "family": "route",
+      "aegis_map": [],
+      "remediation_owner": "test-tenant-provisioner",
+      "confidence": "low",
+      "mechanical": true
+    },
+    {
+      "rule": "ROUTE-002",
+      "severity": "info",
       "file": ".claude/skills/threat-modeler/SKILL.md",
       "line": 0,
       "owning_skill": "threat-modeler",
@@ -5700,6 +6068,11 @@
       "estimated": 1,
       "planned": 5
     },
+    "acceptance-criteria-reviewer": {
+      "accepted": 2,
+      "ready": 4,
+      "verified": 3
+    },
     "accessibility-test-harness": {
       "accepted": 1,
       "committed": 5,
@@ -5715,7 +6088,7 @@
       "proposed": 14
     },
     "adr-writer": {
-      "accepted": 3,
+      "accepted": 4,
       "complete": 1,
       "durable": 1,
       "proposed": 5
@@ -5763,8 +6136,8 @@
       "verified": 1
     },
     "agent-memory-governance": {
-      "complete": 1,
-      "durable": 4,
+      "complete": 4,
+      "durable": 6,
       "proposed": 1,
       "verified": 8
     },
@@ -5777,7 +6150,8 @@
       "estimated": 1
     },
     "ai-closeout-reporter": {
-      "complete": 1
+      "complete": 5,
+      "verified": 3
     },
     "ai-cost-guardrail-designer": {
       "estimated": 4,
@@ -5788,6 +6162,10 @@
     },
     "ai-governance-risk-reviewer": {
       "accepted": 1
+    },
+    "ai-human-in-the-loop-designer": {
+      "committed": 9,
+      "proposed": 6
     },
     "ai-lifecycle-risk-manager": {
       "accepted": 1,
@@ -5806,6 +6184,11 @@
       "complete": 1,
       "durable": 1,
       "verified": 2
+    },
+    "ai-task-decomposer": {
+      "planned": 2,
+      "ready": 2,
+      "verified": 4
     },
     "ai-threat-modeler": {
       "accepted": 4,
@@ -5888,7 +6271,13 @@
       "estimated": 3,
       "verified": 14
     },
+    "cloud-security-baseline-reviewer": {
+      "accepted": 6,
+      "committed": 1,
+      "complete": 1
+    },
     "code-reviewer": {
+      "accepted": 4,
       "committed": 2,
       "deployed": 1,
       "proposed": 1
@@ -5940,6 +6329,12 @@
       "complete": 2,
       "planned": 1
     },
+    "database-backup-verifier": {
+      "committed": 3,
+      "estimated": 11,
+      "proposed": 1,
+      "verified": 7
+    },
     "design-review-facilitator": {
       "complete": 1,
       "targeted": 1
@@ -5958,6 +6353,9 @@
     },
     "domain-modeler": {
       "planned": 1
+    },
+    "environment-parity-reviewer": {
+      "committed": 1
     },
     "error-handling-security-reviewer": {
       "accepted": 1,
@@ -6059,6 +6457,7 @@
       "verified": 9
     },
     "lane-authoring-guide": {
+      "proposed": 1,
       "verified": 4
     },
     "latency-budget-architect": {
@@ -6085,9 +6484,6 @@
       "deployed": 2,
       "proposed": 4,
       "verified": 8
-    },
-    "model-context-designer": {
-      "complete": 1
     },
     "model-poisoning-reviewer": {
       "targeted": 3
@@ -6126,7 +6522,7 @@
     },
     "performance-test-harness": {
       "accepted": 1,
-      "planned": 1,
+      "planned": 2,
       "proposed": 1,
       "ready": 1
     },
@@ -6150,6 +6546,9 @@
     },
     "product-analytics-instrumenter": {
       "committed": 1
+    },
+    "product-spec-writer": {
+      "verified": 1
     },
     "profiling-methodology-designer": {
       "complete": 1,
@@ -6198,6 +6597,11 @@
     },
     "requirements-gathering-facilitator": {
       "complete": 2
+    },
+    "resilience-architecture-reviewer": {
+      "accepted": 1,
+      "planned": 1,
+      "verified": 4
     },
     "reviewable-diff-discipline": {
       "verified": 1
@@ -6292,7 +6696,7 @@
       "estimated": 4
     },
     "slo-reliability-architect": {
-      "complete": 3,
+      "complete": 4,
       "planned": 5
     },
     "soc2-trust-criteria-mapper": {
@@ -6311,7 +6715,8 @@
     },
     "standing-approval-and-auto-advance": {
       "durable": 1,
-      "planned": 1
+      "planned": 1,
+      "proposed": 1
     },
     "statement-of-applicability-author": {
       "complete": 1,
@@ -6358,7 +6763,7 @@
     },
     "tenant-modeler": {
       "accepted": 3,
-      "verified": 1
+      "verified": 2
     },
     "test-coverage-mapper": {
       "verified": 1
@@ -6368,8 +6773,11 @@
     },
     "test-plan-designer": {
       "complete": 1,
-      "planned": 4,
+      "planned": 7,
       "verified": 3
+    },
+    "test-tenant-provisioner": {
+      "committed": 1
     },
     "threat-modeler": {
       "accepted": 3,
@@ -6382,7 +6790,7 @@
       "estimated": 3
     },
     "vite-build-qa-engineer": {
-      "deployed": 1,
+      "deployed": 3,
       "ready": 1,
       "verified": 3
     },
