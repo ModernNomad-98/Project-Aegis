@@ -24,7 +24,9 @@ unmerged planning inputs. The recommendations below use independently checked
 text at the source commit where cited. A research conclusion without such
 support is identified as unverified and is not a ranking premise.
 
-It follows the four earlier batch proposals: the
+It follows four earlier batch proposals. Artificial intelligence (AI) means
+software that can perform tasks usually requiring human judgment; here it
+refers to coding assistants. The earlier pages cover the
 [quality assurance Tier 1](qa-tier1-skill-batch-proposal.md),
 [AI-assisted development lifecycle](ai-sdlc-skill-batch-proposal.md),
 [Phase 7 AI engineering](phase7-ai-engineering-skill-batch-proposal.md) and
@@ -34,7 +36,7 @@ them, it records scope, boundaries and estimates, and builds nothing.
 ## Terms used on this page
 
 - A **skill** is a folder under `.claude/skills/` whose `SKILL.md` tells an
-  artificial intelligence (AI) assistant how to do one job. Its **description** is the text the
+  AI assistant how to do one job. Its **description** is the text the
   assistant reads when choosing a skill; the library caps it at 1,024
   characters.
 - A **manual-only** skill carries `disable-model-invocation: true`, so a person
@@ -61,13 +63,16 @@ them, it records scope, boundaries and estimates, and builds nothing.
   interface. **QA** is quality assurance; **E2E** (end-to-end) tests drive the
   whole product like a user; **UI** is the user interface. **RLS** (row-level
   security) is database rules that limit which rows each tenant (customer
-  account) can read or write. **SQL** is the database query language;
+  account) can read or write. **SQL** means Structured Query Language, the
+  language used to query and change a database;
   **SQLi** is SQL injection; **DDL** (data definition language) is the SQL
   that changes tables and policies. **CSRF** (cross-site request forgery) tricks a
   signed-in browser into sending a request; **XSS** (cross-site scripting)
-  runs an attacker's script in a page; **CORS** (cross-origin resource
+  runs an attacker's script in a page. **HTTP** means Hypertext Transfer
+  Protocol, the web request and response protocol. **CORS** (cross-origin resource
   sharing), **CSP** (Content Security Policy) and **HSTS** (HTTP Strict
-  Transport Security) are browser rules set by the server's response headers. **OWASP** is the Open Worldwide Application
+  Transport Security) are browser rules set by the server's response headers.
+  **OWASP** is the Open Worldwide Application
   Security Project, whose Top 10 lists common web risks; **A02** is its
   security-misconfiguration category.
 - **Behavior evals** (`evals/evals.json`) describe prompts and the behavior a
@@ -76,6 +81,9 @@ them, it records scope, boundaries and estimates, and builds nothing.
 - **ROUTE-002** is a census finding from `scripts/audit-skill-contracts.py`:
   skill A's description says "Do NOT use for X (skill B)", but skill B's
   description never names A. It is information, not a failure.
+- **CI** means continuous integration, the automated checks run on a
+  change. **UX** means user experience, how a product feels and works for
+  the person using it.
 - **Active hours** count hands-on work; **wall time** includes review, CI and
   owner waits. Figures below are unverified inherited agent estimates. The
   [execution metrics](aegis-execution-metrics.md) do not provide active-time
@@ -169,11 +177,14 @@ strongest objection is under
 
 ## Item 1: `rls-policy-auditor` extension for storage policies (#115; #112 conditional)
 
-**Roadmap text.** #115 Storage Access Policy Review (P0): "Validate bucket
+**Roadmap text.** A uniform resource locator (URL) is a web address. A remote
+procedure call (RPC) is a database function callable through an application
+programming interface. #115
+Storage Access Policy Review (P0): "Validate bucket
 policies, signed URL expiry, path naming, ownership checks, and public asset
 boundaries." #112 SQL Injection Defense Review (P0): "Check dynamic SQL,
 filters, RPCs, search, sorting, and migration scripts for injection risks."
-(RPCs are remote procedure calls.) Both are in
+Both are in
 [category 03](../skills/03-saas-security-rls.md).
 
 **The textual handoff mismatch.**
@@ -361,11 +372,13 @@ CSP, HSTS, frame, referrer, permissions, and content type headers for browser
 apps". #120 is not in the catalog's remaining Phase 4 list; it is added
 because D8 records its subject as open.
 
-**Recorded gap.** D8's OWASP audit states: "A02 residue: application/platform
+**Recorded gap.** Extensible Markup Language (XML) is a structured document
+format. An XML external entity (XXE) is a parser feature that can expose
+data if handled unsafely. D8's OWASP audit states: "A02 residue: application/platform
 configuration — security headers, CORS, XML-parser hardening (XXE-class),
 default accounts, cloud posture — has no Phase 4 owner … the app-config slice
-remains open residue" (`step-0-reconciliation-v4.md:174-178`). XXE is XML
-external entity injection; this page does not take up that part.
+remains open residue" (`step-0-reconciliation-v4.md:174-178`). This page
+does not take up that XML-parser part.
 
 **What shipped skills already do.**
 [`security-pr-reviewer`](../../.claude/skills/security-pr-reviewer/SKILL.md)
@@ -770,6 +783,7 @@ This page selects and builds nothing. It changes no skill, evaluation,
 catalog, README count, decision log, approval register, forecast, backlog
 status, readability ledger or index, CI/configuration file, audit baseline,
 or script. It does not authorize a migration, provider or database call,
-environment write, deployment, VM/ISO work, reserved evaluation/rehearsal,
-Stage 4B, BER work, or a protected evidence-pin change. The full plan and
+environment write, deployment, virtual machine (VM) or ISO disk-image work,
+reserved evaluation/rehearsal, Stage 4B, Behavioral Eval Runner (BER) work,
+or a protected evidence-pin change. The full plan and
 later authority gates govern any subsequent work.
