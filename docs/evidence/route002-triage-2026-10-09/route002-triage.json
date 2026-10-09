@@ -1,0 +1,938 @@
+{
+  "record": "ROUTE-002 new-edge textual triage; inert maintainer evidence",
+  "review_date": "2026-10-09",
+  "baseline_main_sha": "8e11c8f4c2777265e254057ce0fa1e52f0cf03bf",
+  "observed_checkout_sha": "e834ea7079060314a2bc4f4275938b1cf01e0f7d",
+  "stage_c_fresh_audit_sha": "8e11c8f4c2777265e254057ce0fa1e52f0cf03bf",
+  "skill_tree": "36c856667752cf4f3bdfb49743473ae55e46bb49",
+  "engine_version": "1.13.4",
+  "engine_sha256": "e64b7430488c5f47c31faf1abcfa5f46aae876f3362ed8e0de105e988ff10153",
+  "corpus_content_hash": "673e7fe93c6ddfb84e485dae4be1f1538f85af6c4fbaed893323e42e7e886b14",
+  "prior_record": "docs/evidence/route002-dispositions-2026-09-26/route002-dispositions.json",
+  "matching_method": "Pair source_skill and target_skill; for prior pairs compare normalized message after Unicode NFKC, em/en dash to hyphen, whitespace collapse and lowercase. New set is current pairs absent from prior pair set.",
+  "counts": {
+    "current_route002": 255,
+    "prior_matched_unchanged": 231,
+    "new_pairs": 24,
+    "proposed_buckets": {
+      "a": 17,
+      "b-high": 2,
+      "b-medium": 5,
+      "c": 0,
+      "d": 0
+    }
+  },
+  "authority_status": "No owner selection of reciprocal skill edits for these 24 new pairs is evidenced; all remain census data. The 2026-09-26 decision selected only its named 23 target skills and five named hub exceptions.",
+  "behavioral_evaluation": "UNRUN; these are textual review proposals, not measured model routing failures, passes or improvements.",
+  "findings": [
+    {
+      "id": "N01",
+      "source_skill": "acceptance-criteria-reviewer",
+      "target_skill": "manual-test-case-creator",
+      "normalized_message": "exclusion toward `manual-test-case-creator` is not reciprocated (manual-test-case-creator's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Target H=5. Source judges pre-existing criteria; target writes executable manual cases. ST `vague-words-in-ticket-wins-here` and `manual-cases-go-to-creator` distinguish them. T Stop Conditions 132–134 already halt on untestable criteria, but route measurable restatement via `test-plan-designer`, whose description now yields criterion testability to the source. This is an indirect handoff to inspect if a future change is selected, not proof that a model chooses the wrong skill. Census; no hub exception proposed now.",
+      "source_evidence": {
+        "path": ".claude/skills/acceptance-criteria-reviewer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/manual-test-case-creator/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/acceptance-criteria-reviewer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "manual-cases-go-to-creator",
+          "vague-words-in-ticket-wins-here"
+        ],
+        "target_path": ".claude/skills/manual-test-case-creator/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 5,
+      "excluder_sources": [
+        "acceptance-criteria-reviewer",
+        "accessibility-test-harness",
+        "clickthrough-test-engineer",
+        "screenshot-evidence-planner",
+        "test-plan-designer"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N02",
+      "source_skill": "acceptance-criteria-reviewer",
+      "target_skill": "release-readiness-reviewer",
+      "normalized_message": "exclusion toward `release-readiness-reviewer` is not reciprocated (release-readiness-reviewer's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Distant outputs: per-criterion TESTABLE/NEEDS-REWRITE/UNTESTABLE versus exact-release Go/No-Go evidence gate. T Workflow 71–108 requires a release candidate, CI and rollback evidence. ST `story-done-goes-to-release-gate` and S 219–220 explicitly separate the jobs. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/acceptance-criteria-reviewer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/release-readiness-reviewer/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/acceptance-criteria-reviewer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "story-done-goes-to-release-gate"
+        ],
+        "target_path": ".claude/skills/release-readiness-reviewer/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 4,
+      "excluder_sources": [
+        "acceptance-criteria-reviewer",
+        "ci-pipeline-architect",
+        "library-diff-reviewer",
+        "rollback-runbook-author"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N03",
+      "source_skill": "acceptance-criteria-reviewer",
+      "target_skill": "requirements-gathering-facilitator",
+      "normalized_message": "exclusion toward `requirements-gathering-facilitator` is not reciprocated (requirements-gathering-facilitator's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Target H=5. The shared words “vague” and “contradictory” are plausible adjacency, but T description/Use When center on elicitation before a spec exists; S reviews existing criteria and routes genuinely undecided requirements to T (S 215–218). ST `unclear-requirement-goes-to-facilitator` and `vague-words-in-ticket-wins-here` support that distinction. Census; no new hub exception presumed.",
+      "source_evidence": {
+        "path": ".claude/skills/acceptance-criteria-reviewer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/requirements-gathering-facilitator/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/acceptance-criteria-reviewer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "unclear-requirement-goes-to-facilitator",
+          "vague-words-in-ticket-wins-here"
+        ],
+        "target_path": ".claude/skills/requirements-gathering-facilitator/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 5,
+      "excluder_sources": [
+        "acceptance-criteria-reviewer",
+        "design-review-facilitator",
+        "prioritization-frame-picker",
+        "product-spec-writer",
+        "project-orchestrator"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N04",
+      "source_skill": "ai-human-in-the-loop-designer",
+      "target_skill": "agent-authorization-matrix",
+      "normalized_message": "exclusion toward `agent-authorization-matrix` is not reciprocated (agent-authorization-matrix's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Target is manual-only and H=5. Product AI proposal/review design differs from coding-agent merge/deploy authority. ST `autonomy-classification-wins-here` and explicit `building-agent-authority-goes-to-agent-authorization-matrix` preserve manual invocation. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/agent-authorization-matrix/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/ai-human-in-the-loop-designer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "autonomy-classification-wins-here",
+          "building-agent-authority-goes-to-agent-authorization-matrix"
+        ],
+        "target_path": ".claude/skills/agent-authorization-matrix/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": true,
+      "total_excluders": 5,
+      "excluder_sources": [
+        "admin-console-architect",
+        "ai-human-in-the-loop-designer",
+        "human-agent-trust-reviewer",
+        "scoped-approval-register",
+        "standing-approval-and-auto-advance"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N05",
+      "source_skill": "ai-human-in-the-loop-designer",
+      "target_skill": "human-agent-trust-reviewer",
+      "normalized_message": "exclusion toward `human-agent-trust-reviewer` is not reciprocated (human-agent-trust-reviewer's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Target H=5. A real textual overlap remains: T says review approval UX/flows and also discusses designing new oversight in Use When 37–39; S owns proposal lifecycle, stale-version handling and normal write-path design. S Workflow 168–173 hands the finished flow to T for attack review. ST `stale-proposal-design-wins-here` is concrete evidence. Census under the hub rule; a possible future owner-selected hub exception, not a b-high override here.",
+      "source_evidence": {
+        "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/human-agent-trust-reviewer/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/ai-human-in-the-loop-designer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "stale-proposal-design-wins-here"
+        ],
+        "target_path": ".claude/skills/human-agent-trust-reviewer/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 5,
+      "excluder_sources": [
+        "agent-authorization-matrix",
+        "ai-human-in-the-loop-designer",
+        "ai-misinformation-guard",
+        "human-approval-boundary",
+        "standing-approval-and-auto-advance"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N06",
+      "source_skill": "ai-task-decomposer",
+      "target_skill": "lane-authoring-guide",
+      "normalized_message": "exclusion toward `lane-authoring-guide` is not reciprocated (lane-authoring-guide's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "b-medium",
+      "disposition": "census-data",
+      "rationale": "Shared planning/handoff language, but S gives one ordered PR-sized task sequence and T gives mutually exclusive parallel-lane guides with lifecycle/contracts/recipes. ST `epic-into-pr-sized-tasks-wins-here` and `parallel-agents-goes-to-lane-guide` discriminate the axis already. No concrete reason found to override that clear description boundary. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/ai-task-decomposer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/lane-authoring-guide/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/ai-task-decomposer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "epic-into-pr-sized-tasks-wins-here",
+          "parallel-agents-goes-to-lane-guide"
+        ],
+        "target_path": ".claude/skills/lane-authoring-guide/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 3,
+      "excluder_sources": [
+        "ai-closeout-reporter",
+        "ai-task-decomposer",
+        "phased-work-handoff-designer"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N07",
+      "source_skill": "ai-task-decomposer",
+      "target_skill": "phased-work-handoff-designer",
+      "normalized_message": "exclusion toward `phased-work-handoff-designer` is not reciprocated (phased-work-handoff-designer's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "b-medium",
+      "disposition": "census-data",
+      "rationale": "S creates the ordered tasks; T designs decision/evidence continuity between existing stages. T Workflow 1–5 defines a register, changed/not-touched lists and continuation contract, not task slicing. ST `stage-handoff-goes-to-phased-designer` supports the separation. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/ai-task-decomposer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/phased-work-handoff-designer/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/ai-task-decomposer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "stage-handoff-goes-to-phased-designer"
+        ],
+        "target_path": ".claude/skills/phased-work-handoff-designer/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 3,
+      "excluder_sources": [
+        "ai-closeout-reporter",
+        "ai-task-decomposer",
+        "promotion-packet-writer"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N08",
+      "source_skill": "ai-task-decomposer",
+      "target_skill": "roadmap-to-commitments-translator",
+      "normalized_message": "exclusion toward `roadmap-to-commitments-translator` is not reciprocated (roadmap-to-commitments-translator's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Distant decision: ordered tasks versus capacity-backed delivery promises with a named human commitment authority. T's two modes and evidence prerequisites do not claim decomposing an epic. ST `roadmap-commitments-goes-to-translator`. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/ai-task-decomposer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/roadmap-to-commitments-translator/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/ai-task-decomposer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "roadmap-commitments-goes-to-translator"
+        ],
+        "target_path": ".claude/skills/roadmap-to-commitments-translator/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 3,
+      "excluder_sources": [
+        "ai-task-decomposer",
+        "cross-team-dependency-negotiator",
+        "roadmap-under-uncertainty-planner"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N09",
+      "source_skill": "ai-task-decomposer",
+      "target_skill": "tech-spec-writer",
+      "normalized_message": "exclusion toward `tech-spec-writer` is not reciprocated (tech-spec-writer's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "b-medium",
+      "disposition": "census-data",
+      "rationale": "Both are pre-build work, but S consumes an agreed design and splits implementation tasks; T authors architecture/data/API alternatives and the design review path. ST `sprawling-diffs-wins-here` and `write-design-goes-to-tech-spec` cover the distinction. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/ai-task-decomposer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/tech-spec-writer/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/ai-task-decomposer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "sprawling-diffs-wins-here",
+          "write-design-goes-to-tech-spec"
+        ],
+        "target_path": ".claude/skills/tech-spec-writer/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 4,
+      "excluder_sources": [
+        "adr-writer",
+        "ai-task-decomposer",
+        "design-review-facilitator",
+        "product-spec-writer"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N10",
+      "source_skill": "ci-failure-classifier",
+      "target_skill": "ci-pipeline-architect",
+      "normalized_message": "exclusion toward `ci-pipeline-architect` is not reciprocated (ci-pipeline-architect's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Target manual-only, H=6. Reading already-local logs and classifying a missing token differs from editing stage definitions/secret governance. ST `missing-secret-wins-here` and explicit `pipeline-change-goes-to-architect`. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/ci-failure-classifier/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/ci-pipeline-architect/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/ci-failure-classifier/evals/trigger-evals.json",
+        "source_case_ids": [
+          "missing-secret-wins-here",
+          "pipeline-change-goes-to-architect"
+        ],
+        "target_path": ".claude/skills/ci-pipeline-architect/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": true,
+      "total_excluders": 6,
+      "excluder_sources": [
+        "ci-failure-classifier",
+        "context-co-update-ci-gate",
+        "feature-flag-architect",
+        "iac-reviewer",
+        "release-readiness-reviewer",
+        "sharded-validation-with-resume"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N11",
+      "source_skill": "ci-failure-classifier",
+      "target_skill": "flaky-test-detective",
+      "normalized_message": "exclusion toward `flaky-test-detective` is not reciprocated (flaky-test-detective's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Target manual-only. Single-run evidence classification differs from reproduce/fix/measure for an intermittent test; T's workflow performs those execution steps. ST `intermittent-goes-to-flaky-detective` explicitly invokes T. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/ci-failure-classifier/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/flaky-test-detective/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/ci-failure-classifier/evals/trigger-evals.json",
+        "source_case_ids": [
+          "intermittent-goes-to-flaky-detective"
+        ],
+        "target_path": ".claude/skills/flaky-test-detective/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": true,
+      "total_excluders": 4,
+      "excluder_sources": [
+        "ci-failure-classifier",
+        "qa-automation-architect",
+        "regression-suite-curator",
+        "sharded-validation-with-resume"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N12",
+      "source_skill": "ci-failure-classifier",
+      "target_skill": "sharded-validation-with-resume",
+      "normalized_message": "exclusion toward `sharded-validation-with-resume` is not reciprocated (sharded-validation-with-resume's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "b-high",
+      "disposition": "census-data-pending-owner-selection",
+      "rationale": "Target H=2, auto-invocable. T's broad “Use when full validation times out” can match the source's log-only question before the reason for failure is known; T then designs shards/resume. ST `timeout-vs-failure-wins-here` at line 33 supplies a concrete near-miss prompt and `resume-design-goes-to-sharded` at line 80 supplies its reverse. Candidate yield and prompts below. Census pending separate owner selection.",
+      "source_evidence": {
+        "path": ".claude/skills/ci-failure-classifier/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/ci-failure-classifier/evals/trigger-evals.json",
+        "source_case_ids": [
+          "timeout-vs-failure-wins-here",
+          "resume-design-goes-to-sharded"
+        ],
+        "target_path": ".claude/skills/sharded-validation-with-resume/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 2,
+      "excluder_sources": [
+        "ci-failure-classifier",
+        "risk-tiered-validation-selector"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified",
+      "candidate_prompt_evidence": [
+        {
+          "source_path": ".claude/skills/ci-failure-classifier/evals/trigger-evals.json",
+          "case_id": "timeout-vs-failure-wins-here",
+          "prompt": "The e2e job stopped at its 45-minute limit. From this log, did it time out or did something actually fail?",
+          "expected_owner": "ci-failure-classifier"
+        },
+        {
+          "source_path": ".claude/skills/ci-failure-classifier/evals/trigger-evals.json",
+          "case_id": "resume-design-goes-to-sharded",
+          "prompt": "Our full validation keeps timing out and restarting from scratch. Design shards and a resume mechanism so only unfinished work reruns.",
+          "expected_owner": "sharded-validation-with-resume"
+        }
+      ]
+    },
+    {
+      "id": "N13",
+      "source_skill": "cloud-security-baseline-reviewer",
+      "target_skill": "azure-saas-architect",
+      "normalized_message": "exclusion toward `azure-saas-architect` is not reciprocated (azure-saas-architect's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "b-high",
+      "disposition": "census-data-pending-owner-selection",
+      "rationale": "Target H=3, auto-invocable. T's broad “design or review Azure architecture” and security-posture content overlap a request to judge exported configured controls, although its workflow designs the layout. ST `azure-subscription-exports-win-here` at line 55 and `existing-azure-architecture-goes-to-azure-architect` at line 45 pin both sides. The AWS peer already explicitly yields configured-baseline review in its description; this is corroboration, not authority to edit Azure. Candidate yield/prompts below. Census pending selection.",
+      "source_evidence": {
+        "path": ".claude/skills/cloud-security-baseline-reviewer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/azure-saas-architect/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/cloud-security-baseline-reviewer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "existing-azure-architecture-goes-to-azure-architect",
+          "azure-subscription-exports-win-here"
+        ],
+        "target_path": ".claude/skills/azure-saas-architect/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 3,
+      "excluder_sources": [
+        "cloud-architecture-decider",
+        "cloud-security-baseline-reviewer",
+        "iac-reviewer"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified",
+      "candidate_prompt_evidence": [
+        {
+          "source_path": ".claude/skills/cloud-security-baseline-reviewer/evals/trigger-evals.json",
+          "case_id": "azure-subscription-exports-win-here",
+          "prompt": "Here are az role assignment, az storage account list and az security pricing list exports from our production subscription. Check them against the CIS Azure benchmark and tell me what's missing.",
+          "expected_owner": "cloud-security-baseline-reviewer"
+        },
+        {
+          "source_path": ".claude/skills/cloud-security-baseline-reviewer/evals/trigger-evals.json",
+          "case_id": "existing-azure-architecture-goes-to-azure-architect",
+          "prompt": "Review our existing Azure architecture — landing zone, subscriptions per environment, App Service with Azure SQL elastic pools. Does it hold up for tenant isolation?",
+          "expected_owner": "azure-saas-architect"
+        }
+      ]
+    },
+    {
+      "id": "N14",
+      "source_skill": "cloud-security-baseline-reviewer",
+      "target_skill": "compliance-gap-auditor",
+      "normalized_message": "exclusion toward `compliance-gap-auditor` is not reciprocated (compliance-gap-auditor's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Target H=5. Both compare controls with evidence, but T is parameterized ISO/SOC2/NIST framework readiness and uses the foundation/crosswalk/SoA; S checks configured cloud settings against a named baseline. ST `soc2-readiness-goes-to-compliance-gap-auditor` and `azure-subscription-exports-win-here`. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/cloud-security-baseline-reviewer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/compliance-gap-auditor/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/cloud-security-baseline-reviewer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "azure-subscription-exports-win-here",
+          "soc2-readiness-goes-to-compliance-gap-auditor"
+        ],
+        "target_path": ".claude/skills/compliance-gap-auditor/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 5,
+      "excluder_sources": [
+        "cloud-security-baseline-reviewer",
+        "compliance-control-foundation",
+        "compliance-evidence-collector",
+        "iso-27001-isms-architect",
+        "soc2-trust-criteria-mapper"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N15",
+      "source_skill": "cloud-security-baseline-reviewer",
+      "target_skill": "secrets-identity-hardener",
+      "normalized_message": "exclusion toward `secrets-identity-hardener` is not reciprocated (secrets-identity-hardener's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Target manual-only, H=5. S reports supplied configuration evidence; T moves/rotates secrets and changes identity configuration. ST `leaked-key-rotation-goes-to-secrets-identity-hardener` uses an explicit invocation. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/cloud-security-baseline-reviewer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/secrets-identity-hardener/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/cloud-security-baseline-reviewer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "leaked-key-rotation-goes-to-secrets-identity-hardener"
+        ],
+        "target_path": ".claude/skills/secrets-identity-hardener/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": true,
+      "total_excluders": 5,
+      "excluder_sources": [
+        "appsec-implementer",
+        "cloud-security-baseline-reviewer",
+        "environment-parity-reviewer",
+        "test-tenant-provisioner",
+        "vite-build-qa-engineer"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N16",
+      "source_skill": "data-migration-runbook-author",
+      "target_skill": "gated-deployment-prompt-template",
+      "normalized_message": "exclusion toward `gated-deployment-prompt-template` is not reciprocated (gated-deployment-prompt-template's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "b-medium",
+      "disposition": "census-data",
+      "rationale": "Shared migration/backfill document vocabulary, but S is one approved named run and T explicitly a RECURRING operation template with placeholders/history index. ST `one-off-migration-deploy-not-a-template` and `reusable-template-goes-to-gated-deployment-prompt-template` separate the cases. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/data-migration-runbook-author/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/data-migration-runbook-author/evals/trigger-evals.json",
+        "source_case_ids": [
+          "reusable-template-goes-to-gated-deployment-prompt-template",
+          "one-off-migration-deploy-not-a-template"
+        ],
+        "target_path": ".claude/skills/gated-deployment-prompt-template/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 1,
+      "excluder_sources": [
+        "data-migration-runbook-author"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N17",
+      "source_skill": "database-backup-verifier",
+      "target_skill": "data-migration-runbook-author",
+      "normalized_message": "exclusion toward `data-migration-runbook-author` is not reciprocated (data-migration-runbook-author's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Source manual-only. S proves actual backups under its provider/restore gates; T authors a document consuming verified backup evidence and explicitly names S in Workflow step 2. ST `pre-migration-backup-proof-wins-here` and `migration-runbook-goes-to-runbook-author`. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/database-backup-verifier/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/data-migration-runbook-author/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/database-backup-verifier/evals/trigger-evals.json",
+        "source_case_ids": [
+          "pre-migration-backup-proof-wins-here",
+          "migration-runbook-goes-to-runbook-author"
+        ],
+        "target_path": ".claude/skills/data-migration-runbook-author/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": true,
+      "manual_target": false,
+      "total_excluders": 2,
+      "excluder_sources": [
+        "database-backup-verifier",
+        "rollback-runbook-author"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N18",
+      "source_skill": "database-backup-verifier",
+      "target_skill": "pii-lifecycle-designer",
+      "normalized_message": "exclusion toward `pii-lifecycle-designer` is not reciprocated (pii-lifecycle-designer's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Source manual-only. S verifies backup requirements/restore evidence; T defines personal-data retention/erasure policy across stores. ST `backup-retention-of-personal-data-goes-to-pii` and T Workflow 4–5 separate policy from proof. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/database-backup-verifier/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/pii-lifecycle-designer/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/database-backup-verifier/evals/trigger-evals.json",
+        "source_case_ids": [
+          "backup-retention-of-personal-data-goes-to-pii"
+        ],
+        "target_path": ".claude/skills/pii-lifecycle-designer/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": true,
+      "manual_target": false,
+      "total_excluders": 2,
+      "excluder_sources": [
+        "database-backup-verifier",
+        "file-upload-storage-architect"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N19",
+      "source_skill": "environment-parity-reviewer",
+      "target_skill": "secrets-identity-hardener",
+      "normalized_message": "exclusion toward `secrets-identity-hardener` is not reciprocated (secrets-identity-hardener's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Target manual-only, H=5. S compares environment names/non-secret values and drafts required configuration; T relocates/rotates credentials. S Workflow step 4 explicitly hands exposed secrets to T. Census; no secret operation proposed.",
+      "source_evidence": {
+        "path": ".claude/skills/environment-parity-reviewer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/secrets-identity-hardener/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/environment-parity-reviewer/evals/trigger-evals.json",
+        "source_case_ids": [],
+        "target_path": ".claude/skills/secrets-identity-hardener/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": true,
+      "total_excluders": 5,
+      "excluder_sources": [
+        "appsec-implementer",
+        "cloud-security-baseline-reviewer",
+        "environment-parity-reviewer",
+        "test-tenant-provisioner",
+        "vite-build-qa-engineer"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N20",
+      "source_skill": "resilience-architecture-reviewer",
+      "target_skill": "latency-budget-architect",
+      "normalized_message": "exclusion toward `latency-budget-architect` is not reciprocated (latency-budget-architect's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "b-medium",
+      "disposition": "census-data",
+      "rationale": "Both mention timeouts/retries, but S checks containment across slow/down/error/wrong-data scenarios and T allocates a stated end-to-end latency target per hop. ST `dependency-failure-review-wins-here` and `timeout-values-go-to-latency-budget` discriminate; T workflow consumes/flags a latency target before allocating values. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/resilience-architecture-reviewer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/latency-budget-architect/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/resilience-architecture-reviewer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "dependency-failure-review-wins-here",
+          "timeout-values-go-to-latency-budget"
+        ],
+        "target_path": ".claude/skills/latency-budget-architect/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 3,
+      "excluder_sources": [
+        "frontend-perf-engineer",
+        "horizontal-scalability-reviewer",
+        "resilience-architecture-reviewer"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N21",
+      "source_skill": "resilience-architecture-reviewer",
+      "target_skill": "rollback-runbook-author",
+      "normalized_message": "exclusion toward `rollback-runbook-author` is not reciprocated (rollback-runbook-author's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Target H=5; also distinct outputs. S reviews failure containment/failover design; T writes backout strategy and operator steps for a change. ST `region-failover-review-wins-here` and `release-rollback-goes-to-rollback-author`. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/resilience-architecture-reviewer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/rollback-runbook-author/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/resilience-architecture-reviewer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "region-failover-review-wins-here",
+          "release-rollback-goes-to-rollback-author"
+        ],
+        "target_path": ".claude/skills/rollback-runbook-author/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 5,
+      "excluder_sources": [
+        "data-migration-runbook-author",
+        "gated-deployment-prompt-template",
+        "incident-response-runbook",
+        "release-readiness-reviewer",
+        "resilience-architecture-reviewer"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N22",
+      "source_skill": "resilience-architecture-reviewer",
+      "target_skill": "slo-reliability-architect",
+      "normalized_message": "exclusion toward `slo-reliability-architect` is not reciprocated (slo-reliability-architect's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Target H=9. T's description and Workflow 106–110 analyze dependency failure, retry/timeout amplification and blast radius against targets, close to S's core review. ST `dependency-failure-review-wins-here` and `uptime-target-goes-to-slo` support a concrete discriminator. Census under the hub rule; possible future hub exception, requiring an explicit new selection and a careful split that preserves T's reliability-impact analysis.",
+      "source_evidence": {
+        "path": ".claude/skills/resilience-architecture-reviewer/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/slo-reliability-architect/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/resilience-architecture-reviewer/evals/trigger-evals.json",
+        "source_case_ids": [
+          "dependency-failure-review-wins-here",
+          "uptime-target-goes-to-slo"
+        ],
+        "target_path": ".claude/skills/slo-reliability-architect/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": false,
+      "manual_target": false,
+      "total_excluders": 9,
+      "excluder_sources": [
+        "horizontal-scalability-reviewer",
+        "incident-response-runbook",
+        "latency-budget-architect",
+        "load-test-planner",
+        "observability-operator",
+        "resilience-architecture-reviewer",
+        "security-logging-alerting-architect",
+        "superadmin-observability-console-designer",
+        "synthetic-monitoring-architect"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N23",
+      "source_skill": "test-tenant-provisioner",
+      "target_skill": "secrets-identity-hardener",
+      "normalized_message": "exclusion toward `secrets-identity-hardener` is not reciprocated (secrets-identity-hardener's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Both sides manual-only; target H=5. S creates/repairs marked test identities under a selected non-production apply plan; T stores/rotates their credentials. ST `credential-rotation-goes-to-secrets-hardener` explicitly invokes T. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/test-tenant-provisioner/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/secrets-identity-hardener/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/test-tenant-provisioner/evals/trigger-evals.json",
+        "source_case_ids": [
+          "credential-rotation-goes-to-secrets-hardener"
+        ],
+        "target_path": ".claude/skills/secrets-identity-hardener/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": true,
+      "manual_target": true,
+      "total_excluders": 5,
+      "excluder_sources": [
+        "appsec-implementer",
+        "cloud-security-baseline-reviewer",
+        "environment-parity-reviewer",
+        "test-tenant-provisioner",
+        "vite-build-qa-engineer"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    },
+    {
+      "id": "N24",
+      "source_skill": "test-tenant-provisioner",
+      "target_skill": "tenant-modeler",
+      "normalized_message": "exclusion toward `tenant-modeler` is not reciprocated (tenant-modeler's description never mentions this skill) - census evidence, no aegis id",
+      "proposed_bucket": "a",
+      "disposition": "census-data",
+      "rationale": "Source manual-only; target H=6. S applies an existing persona catalog; T defines tenant semantics/membership/lifecycle. ST `validate-drift-wins-here` and `tenant-definition-goes-to-modeler` distinguish validating fixtures from defining the product model. Census.",
+      "source_evidence": {
+        "path": ".claude/skills/test-tenant-provisioner/SKILL.md",
+        "description_line": 3
+      },
+      "target_evidence": {
+        "path": ".claude/skills/tenant-modeler/SKILL.md",
+        "description_line": 3
+      },
+      "trigger_evidence": {
+        "source_path": ".claude/skills/test-tenant-provisioner/evals/trigger-evals.json",
+        "source_case_ids": [
+          "validate-drift-wins-here",
+          "tenant-definition-goes-to-modeler"
+        ],
+        "target_path": ".claude/skills/tenant-modeler/evals/trigger-evals.json",
+        "target_names_source": false
+      },
+      "manual_source": true,
+      "manual_target": false,
+      "total_excluders": 6,
+      "excluder_sources": [
+        "intra-tenant-scope-architect",
+        "multi-tenant-data-architect",
+        "multi-tenant-security-tester",
+        "saas-platform-architect",
+        "tenant-isolation-reviewer",
+        "test-tenant-provisioner"
+      ],
+      "target_trigger_names_source": false,
+      "observed_model_misrouting": "unverified"
+    }
+  ]
+}
