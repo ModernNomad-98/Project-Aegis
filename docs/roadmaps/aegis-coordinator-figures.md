@@ -15,6 +15,12 @@ Time, and every timestamp and duration on this page is UTC compared with UTC. A
 dependency-update bot. `PROC-11` and `PROC-12` are stable rule identifiers from
 the register above.
 
+**Measurement status, 2026-10-08.** The 296-run table and its decision rule
+below describe a historical pre-#676 workflow. Section 3.5 records a separately
+measured, historical pre-CIFIX job-duration window after #676. Neither window
+is an accepted current post-CIFIX baseline or a new alert rule. Post-CIFIX
+performance is **NOT SAMPLED** here.
+
 ---
 
 ## 1. Why this page exists
@@ -98,7 +104,7 @@ through the run includes that job and a second wait for a runner. That
 second point is read from the workflow, not measured, and this note lands no
 duration figure. The [CI guide](../offline-ci.md) states when each job runs.
 
-### 3.2 The baseline table (job level, seconds)
+### 3.2 The historical baseline table (job level, seconds)
 
 Primary sample: every non-`skipped` job with both timestamps, success **and**
 failure, all events.
@@ -134,14 +140,25 @@ runs, leaving 296 `validate-skills` runs and 1,480 job records
 p-th percentile = x[ ceil(p/100 × n) − 1 ]        # 1-based rank, clamped to n
 ```
 
-For even `n` the median is therefore the **upper-middle** element, not the
+For even `n` the median is therefore the **lower-middle** element, not the
 average of the two middle elements. Cross-check: the standard interpolated
 median agreed exactly with the nearest-rank median for all five jobs, so the
 choice of definition changes no headline figure here. Ranks used: `n = 296`
 gives median rank 148 and p90 rank 267; `n = 191` gives median rank 96 and p90
 rank 172.
 
-### 3.4 The decision rule this baseline supports
+**Dated wording correction, 2026-10-08.** The earlier "upper-middle" wording
+contradicted the unchanged formula: rank 148 of 296 is the lower of the two
+middle observations. The percentile rank is one-based; `x[rank - 1]` is a
+zero-based array subscript (147 for rank 148). This corrects the explanation,
+not the historical figures. Their raw observations were not re-read for this
+wording change.
+
+### 3.4 The historical decision rule this baseline supported
+
+**Historical only:** this rule was derived for the 296-run pre-#676 sample. It
+has not been recalibrated from the small §3.5 window and must not be applied as
+a current post-CIFIX threshold.
 
 | Job | Normal (do not comment) | Slow but expected | Worth a look | Job dies at |
 | --- | --- | --- | --- | --- |
@@ -155,6 +172,88 @@ Read it as: **only a duration beyond the observed maximum of this 296-run
 window is a candidate anomaly.** p95 is the routine-noise ceiling. A green job
 anywhere in the first two columns is normal, and citing it as a stall is the
 error this page exists to prevent.
+
+### 3.5 Historical pre-CIFIX window after #676 (job execution, seconds)
+
+**Status and use.** These are source-verified historical figures for maintainers
+reconciling the workflow change, not an accepted operating baseline or evidence
+that #676 improved durations. Fresh read-only GitHub Actions metadata were
+retrieved on 2026-10-09 UTC and checked against all 27 request receipts and the
+frozen source pins. A separate independent implementation audit remains pending.
+The Stage C implementer authored the fixed GET-only collector; the coordinator
+executed that unchanged script after direct owner approval and automatic review
+acceptance, and the implementer verified and adopted its responses. This
+execution split departed from `AGENTS.md`'s Role A coordinator-only rule and
+is disclosed as a stage-handoff deviation, not counted as an independent Stage D
+collection.
+The [normalized attachment](../evidence/metrics/metrics-1-ci-duration-2026-10-08.json)
+preserves the source operands, all run and job records, original timestamps,
+cutoff witnesses, exclusions, request receipts, sums and percentile ranks.
+Its SHA-256 is `0a592b341f04814ed272b3a5510e5ff1b747a74fbdfef1b0e58fdefbb5f30f8d`.
+
+The frozen half-open run creation window is
+`2026-10-06T01:29:57Z <= created_at < 2026-10-08T19:36:00Z`.
+The primary population is **attempt 1 of main pushes** whose head lies from
+#676's merge `03c93c77` through pinned main `52289779` and matches the pinned
+workflow and offline-test blobs. The five qualifying runs are 37399467224,
+37672991237, 37713171379, 37804698446 and 37807051981. The fresh API
+retrieval returned 12 workflow runs in two matching one-page censuses: five
+main pushes and seven pull-request diagnostics, with no other exclusions.
+All 72 unique attempt-1 job records are retained. This is a census of the
+**API-retrievable** rows at that retrieval time; it cannot establish whether
+any historical run had already been deleted.
+
+Only success or failure jobs from a terminal attempt before the cutoff, with
+valid start and completion timestamps before it, enter a primary duration
+vector. Duration is `completed_at - started_at`; runner queue time and whole-run
+elapsed time are outside this table. Skipped jobs have **no duration**, even
+when the API reports placeholder timestamps. A retry contributes nothing to
+attempt 1. This differs from the older all-event, "non-skipped" sample, whose
+attempt semantics were not specified; the two tables are not a controlled
+before-and-after comparison.
+
+| Main-push job | n | success/failure | min | median | p90 | p95 | max | exact sum | mean |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `changes` | 5 | 5/0 | 4 | 5 | 8 | 8 | 8 | 27 | 5.4 |
+| `validate-skills` | 5 | 4/1 | 20 † | 95 | 108 | 108 | 108 | 392 | 78.4 |
+| `windows-offline-checks` | 5 | 5/0 | 137 | 179 | 250 | 250 | 250 | 947 | 189.4 |
+| `tools-tests-linux` | 5 | 5/0 | 98 | 149 | 157 | 157 | 157 | 701 | 140.2 |
+| `tools-tests-windows` | 5 | 5/0 | 163 | 215 | 238 | 238 | 238 | 1051 | 210.2 |
+| `gate-guard` | 0 | 0/0; 5 skipped | NOT MEASURED | — | — | — | — | — | — |
+
+† Attempt 1 of [run 37713171379](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37713171379)
+failed after 20 seconds in `validate-skills`; its later successful attempt does
+not erase this observation. A success-only companion for that job has `n=4`,
+min 71, median 95, p90 108, p95 108, max 108, sum 372 and mean 93.0 seconds.
+For the other four executed jobs, all five observations succeeded, so their
+success-only figures equal their rows above. The failed 20-second minimum is
+not a healthy floor.
+
+The rows use the unchanged nearest-rank method in §3.3: rank
+`min(n, max(1, (p*n+99)//100))`, with a one-based rank and zero-based array
+subscript. For each `n=5` row, p50 rank is 3 and p90/p95 rank is 5. Means are
+exact sum divided by `n`, displayed to one decimal with decimal half-even
+rounding. For `n=0`, values are **NOT MEASURED**; with one observation all
+quantiles would equal that observation.
+
+The main-push denominator is 30 jobs: 24 successful measured, one failed
+measured and five skipped `gate-guard` jobs. The five skips are supported by
+the pinned workflow's pull-request-only condition. No main-push job had a
+cancelled, timed-out, neutral, invalid-timestamp or cutoff-unresolved
+disposition. For the seven PR diagnostics, the later retrieval recorded 21
+successes and 21 advisory skips; their durations do **not** enter these
+quantiles. Six PR attempts had terminal evidence before the cutoff. The
+seventh, [run 37833100150](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37833100150),
+was created at 19:35:31Z and its validation job completed at 19:37:25Z, after
+the cutoff, so the attempt is **cutoff-unresolved** for this window. All 21 PR
+advisory skip causes remain **unknown**: these metadata lack the actual runtime
+filter outputs and proven PR checkout/workflow revision. `changes` success
+alone does not establish a path-skip cause.
+
+This short window cannot characterize weekends, later runner images, all PR
+workloads or tail behavior; with `n=5`, p90 and p95 both select the maximum.
+Post-CIFIX performance is **NOT SAMPLED**. No new timeout, anomaly threshold,
+cost saving, CI improvement, or time-to-green forecast follows from this sample.
 
 ## 4. Warnings this page exists to carry
 

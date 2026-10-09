@@ -1,0 +1,3268 @@
+{
+  "schema": "metrics-1-ci-duration-v1",
+  "status": "Stage C source-verified historical pre-CIFIX measurement; independent Stage D audit pending",
+  "source_evidence": {
+    "kind": "fresh read-only GitHub Actions GET metadata, verified offline against every receipt and raw response",
+    "fresh_stage_c_collection": "COMPLETE",
+    "retrieval_started_at": "2026-10-09T04:31:12.377976+00:00",
+    "retrieval_finished_at": "2026-10-09T04:31:30.370003+00:00",
+    "request_manifest_sha256": "00f6a845244b798ae6138b5b6f1472ca79b785740f8271c2dd552d630c256bf2",
+    "workflow_id": 308320679,
+    "workflow_path": ".github/workflows/validate-skills.yml",
+    "first_run_ids": [
+      37399467224,
+      37667969180,
+      37672991237,
+      37696470739,
+      37705259359,
+      37709031628,
+      37713171379,
+      37797748542,
+      37799930819,
+      37804698446,
+      37807051981,
+      37833100150
+    ],
+    "second_run_ids": [
+      37399467224,
+      37667969180,
+      37672991237,
+      37696470739,
+      37705259359,
+      37709031628,
+      37713171379,
+      37797748542,
+      37799930819,
+      37804698446,
+      37807051981,
+      37833100150
+    ],
+    "request_receipts": [
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/workflows/validate-skills.yml"
+        ],
+        "started_at": "2026-10-09T04:31:12.377976+00:00",
+        "finished_at": "2026-10-09T04:31:12.843937+00:00",
+        "exit_code": 0,
+        "file": "workflow.json",
+        "sha256": "3c23f443a666f5d20bc7063a5792d26cc1aaad12ce46de8442f421db86397de4",
+        "bytes": 527,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/workflows/308320679/runs?per_page=100&created=2026-10-06T01%3A29%3A57Z..2026-10-08T19%3A35%3A59Z",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:12.845725+00:00",
+        "finished_at": "2026-10-09T04:31:13.822530+00:00",
+        "exit_code": 0,
+        "file": "census-first.json",
+        "sha256": "12a682fb96430c8ce02a259af6ea4fc5853751b0b4043ec57ff22c2a50ab6648",
+        "bytes": 171452,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37399467224/attempts/1"
+        ],
+        "started_at": "2026-10-09T04:31:13.824733+00:00",
+        "finished_at": "2026-10-09T04:31:14.302390+00:00",
+        "exit_code": 0,
+        "file": "attempt-37399467224.json",
+        "sha256": "59f86845b1aaceab99dc77cf58a48de66e84ae2335a4f8e7c78cd17f36da0b5b",
+        "bytes": 14509,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37399467224/attempts/1/jobs?per_page=100",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:14.303367+00:00",
+        "finished_at": "2026-10-09T04:31:15.228839+00:00",
+        "exit_code": 0,
+        "file": "jobs-37399467224.json",
+        "sha256": "75a02d579d0c876ce31a6069745614ad8eeca781d779db137c06701d0dd2d02c",
+        "bytes": 19653,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37667969180/attempts/1"
+        ],
+        "started_at": "2026-10-09T04:31:15.229827+00:00",
+        "finished_at": "2026-10-09T04:31:15.663180+00:00",
+        "exit_code": 0,
+        "file": "attempt-37667969180.json",
+        "sha256": "b8d2ef508db00cf09a528312a2c399b0ad5b226f107d3a4f75d56464e0b02b06",
+        "bytes": 14322,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37667969180/attempts/1/jobs?per_page=100",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:15.664290+00:00",
+        "finished_at": "2026-10-09T04:31:16.439200+00:00",
+        "exit_code": 0,
+        "file": "jobs-37667969180.json",
+        "sha256": "17d5bb46b5a65f95c3c6fab6f445261a38057baae4878bbf72fbe2e49a9e4e2c",
+        "bytes": 11440,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37672991237/attempts/1"
+        ],
+        "started_at": "2026-10-09T04:31:16.440314+00:00",
+        "finished_at": "2026-10-09T04:31:16.851181+00:00",
+        "exit_code": 0,
+        "file": "attempt-37672991237.json",
+        "sha256": "17c1949854368ef8f400664dfa060913823187166075f393618ed1c4def0be57",
+        "bytes": 14309,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37672991237/attempts/1/jobs?per_page=100",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:16.852178+00:00",
+        "finished_at": "2026-10-09T04:31:17.805172+00:00",
+        "exit_code": 0,
+        "file": "jobs-37672991237.json",
+        "sha256": "92a921a4fd33d3b095eb2462f0470e6092c59c14856a4ab48d96770484c9600a",
+        "bytes": 19653,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37696470739/attempts/1"
+        ],
+        "started_at": "2026-10-09T04:31:17.806488+00:00",
+        "finished_at": "2026-10-09T04:31:18.218272+00:00",
+        "exit_code": 0,
+        "file": "attempt-37696470739.json",
+        "sha256": "0aa58e588177feffb2587afc622c260ac9904a6fb2340be88e7a46d0490408f5",
+        "bytes": 14286,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37696470739/attempts/1/jobs?per_page=100",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:18.219328+00:00",
+        "finished_at": "2026-10-09T04:31:18.937213+00:00",
+        "exit_code": 0,
+        "file": "jobs-37696470739.json",
+        "sha256": "ff3158d7ed938340bf4f503840ec52fb1f7ec7e5a2dc8fe07554cb9dfd617ac9",
+        "bytes": 11440,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37705259359/attempts/1"
+        ],
+        "started_at": "2026-10-09T04:31:18.938267+00:00",
+        "finished_at": "2026-10-09T04:31:19.414043+00:00",
+        "exit_code": 0,
+        "file": "attempt-37705259359.json",
+        "sha256": "9e051115e654470ad74664fc45a9a5dc425e9041298f1ca5ddef875d7861c412",
+        "bytes": 14539,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37705259359/attempts/1/jobs?per_page=100",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:19.415161+00:00",
+        "finished_at": "2026-10-09T04:31:20.210241+00:00",
+        "exit_code": 0,
+        "file": "jobs-37705259359.json",
+        "sha256": "7f4a19e1a83158decacf136cf4ef63c98582f0f554769cf714ea6d57c85364e2",
+        "bytes": 11440,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37709031628/attempts/1"
+        ],
+        "started_at": "2026-10-09T04:31:20.211309+00:00",
+        "finished_at": "2026-10-09T04:31:20.739570+00:00",
+        "exit_code": 0,
+        "file": "attempt-37709031628.json",
+        "sha256": "36ec4fa82cf09a60c5ba9950e0800e6b1282ce28e25499a1c46f76cdf05fd689",
+        "bytes": 14463,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37709031628/attempts/1/jobs?per_page=100",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:20.740625+00:00",
+        "finished_at": "2026-10-09T04:31:21.440190+00:00",
+        "exit_code": 0,
+        "file": "jobs-37709031628.json",
+        "sha256": "6ac5daeb7fe47a0520c817cbe67ab43a5be63cf4069a7d3813a1c47780c4f14d",
+        "bytes": 11440,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37713171379/attempts/1"
+        ],
+        "started_at": "2026-10-09T04:31:21.441426+00:00",
+        "finished_at": "2026-10-09T04:31:21.879091+00:00",
+        "exit_code": 0,
+        "file": "attempt-37713171379.json",
+        "sha256": "05afa6a92d1b2bee04edc5baefb2147cce67f723a91ff3149878c28fb22d2c5f",
+        "bytes": 14203,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37713171379/attempts/1/jobs?per_page=100",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:21.880354+00:00",
+        "finished_at": "2026-10-09T04:31:22.847221+00:00",
+        "exit_code": 0,
+        "file": "jobs-37713171379.json",
+        "sha256": "3e8d74c57cefc833491ef0e374703e5516a20db60f94b6d99447597b825f7cd8",
+        "bytes": 19653,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37797748542/attempts/1"
+        ],
+        "started_at": "2026-10-09T04:31:22.848637+00:00",
+        "finished_at": "2026-10-09T04:31:23.250625+00:00",
+        "exit_code": 0,
+        "file": "attempt-37797748542.json",
+        "sha256": "e4caca8a0a62529569313d070ed8a2134dcc878faaa02b1639a6ef095fd87c48",
+        "bytes": 14030,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37797748542/attempts/1/jobs?per_page=100",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:23.251633+00:00",
+        "finished_at": "2026-10-09T04:31:23.945570+00:00",
+        "exit_code": 0,
+        "file": "jobs-37797748542.json",
+        "sha256": "fc48415261c1dc622b20b78b848a5beab42b026d5af40b6d81e6422d6d300c1e",
+        "bytes": 11464,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37799930819/attempts/1"
+        ],
+        "started_at": "2026-10-09T04:31:23.946714+00:00",
+        "finished_at": "2026-10-09T04:31:24.441947+00:00",
+        "exit_code": 0,
+        "file": "attempt-37799930819.json",
+        "sha256": "f3ca40ba39ec1ab238c7e97409b852eaaf14160cea2a0d0a0f048c9e81400531",
+        "bytes": 14817,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37799930819/attempts/1/jobs?per_page=100",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:24.443008+00:00",
+        "finished_at": "2026-10-09T04:31:25.215204+00:00",
+        "exit_code": 0,
+        "file": "jobs-37799930819.json",
+        "sha256": "8c2db2461ec370abe3788f3d881ac9ba0cf4595e1ea5e665b2deab39db502b23",
+        "bytes": 11440,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37804698446/attempts/1"
+        ],
+        "started_at": "2026-10-09T04:31:25.216298+00:00",
+        "finished_at": "2026-10-09T04:31:25.726183+00:00",
+        "exit_code": 0,
+        "file": "attempt-37804698446.json",
+        "sha256": "c8d1d5754de7d7e2a4300c666fbf3091efc558d61889a58d11ce0b3e3111dea5",
+        "bytes": 13511,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37804698446/attempts/1/jobs?per_page=100",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:25.727451+00:00",
+        "finished_at": "2026-10-09T04:31:26.659690+00:00",
+        "exit_code": 0,
+        "file": "jobs-37804698446.json",
+        "sha256": "8a82e7f1d3b4e806ea9125578a1f979054ac3314ef1327e993c63d690c7b4e0e",
+        "bytes": 19653,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37807051981/attempts/1"
+        ],
+        "started_at": "2026-10-09T04:31:26.660922+00:00",
+        "finished_at": "2026-10-09T04:31:27.095718+00:00",
+        "exit_code": 0,
+        "file": "attempt-37807051981.json",
+        "sha256": "fec8fecb0df6c9d51696ff1e3116eeb1ce12a6f5c9e6ef784db5bdb47d4baaba",
+        "bytes": 14915,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37807051981/attempts/1/jobs?per_page=100",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:27.096615+00:00",
+        "finished_at": "2026-10-09T04:31:28.141460+00:00",
+        "exit_code": 0,
+        "file": "jobs-37807051981.json",
+        "sha256": "07bb31bd37418b3021493b00c2894f09424701c23a86c9edb27a560bb7301d1e",
+        "bytes": 19653,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37833100150/attempts/1"
+        ],
+        "started_at": "2026-10-09T04:31:28.142583+00:00",
+        "finished_at": "2026-10-09T04:31:28.610038+00:00",
+        "exit_code": 0,
+        "file": "attempt-37833100150.json",
+        "sha256": "94efdd1a4ab9f08807fc26f7d18cc3255bdfbcf41821f1f9720e8510ded204ff",
+        "bytes": 13671,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/runs/37833100150/attempts/1/jobs?per_page=100",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:28.611149+00:00",
+        "finished_at": "2026-10-09T04:31:29.346790+00:00",
+        "exit_code": 0,
+        "file": "jobs-37833100150.json",
+        "sha256": "59b0d623438ab596b7e46e135c97b2b076a51e9a1d9e44b66dd43eef18c7ed42",
+        "bytes": 11548,
+        "page_count": 1
+      },
+      {
+        "command": [
+          "gh",
+          "api",
+          "--method",
+          "GET",
+          "repos/ModernNomad-98/Project-Aegis/actions/workflows/308320679/runs?per_page=100&created=2026-10-06T01%3A29%3A57Z..2026-10-08T19%3A35%3A59Z",
+          "--paginate",
+          "--slurp"
+        ],
+        "started_at": "2026-10-09T04:31:29.347970+00:00",
+        "finished_at": "2026-10-09T04:31:30.370003+00:00",
+        "exit_code": 0,
+        "file": "census-second.json",
+        "sha256": "12a682fb96430c8ce02a259af6ea4fc5853751b0b4043ec57ff22c2a50ab6648",
+        "bytes": 171452,
+        "page_count": 1
+      }
+    ],
+    "prior_research_comparison": {
+      "observation_sha256": "ecea26ae8c155dcc70e69c529be88bf6480738b0e248410fce55857c1ed10c7c",
+      "collection_manifest_sha256": "3f02f920bc041a0656ec8026e6c156f0ecb521e3e6ad269df6c77d8a97e941d1",
+      "all_27_response_hashes_match_by_endpoint": true
+    },
+    "completeness_scope": "API-retrievable rows at retrieval time; historically deleted rows cannot be ruled out",
+    "collection_execution_provenance": {
+      "collector_script_sha256": "c39a1b474a0dea4c8e2fb7a5fb02ddec395facde41132284e7553b015ef0351a",
+      "collector_author": "Stage C implementer /root/metrics_impl",
+      "collector_executor": "coordinator /root task, mechanically executing the unchanged Stage C-authored command after direct owner approval and auto-review acceptance",
+      "stage_c_verifier": "Stage C implementer /root/metrics_impl, who checked every receipt/raw response, source pin and normalized observation before adopting the data",
+      "deviation": "Coordinator mechanical execution of the Stage C-authored GET-only collector departed from AGENTS.md's Role A coordinator-only rule and is disclosed under the stage handoff deviation rule. It was not an independent Stage D collection or audit.",
+      "command": "python -B C:\\src\\Codex Projects\\Project Aegis\\metricsfix\\stage-c-collection\\collect.py"
+    }
+  },
+  "plan_sha256": "d5aab15358932f36c35367c401e100fab9a9b50f9b61dedf8c53f16737085e77",
+  "source_pins": {
+    "main": "5228977920ee479e1fe1ec6b8d56f8fc24c14947",
+    "main_tree": "6e9608018970d5a693341f6874bd73fa070ba7c3",
+    "merge_676": "03c93c77a05e89d082f93c91b23dffabb332373c",
+    "blobs": {
+      ".github/workflows/validate-skills.yml": "66cca67d0390e739190939abccae99125cb56543",
+      "scripts/tests/test_offline_ci.py": "504d98876bb8e7ca94ebb18c955a03e3dc55a44d"
+    }
+  },
+  "window": {
+    "created_at_inclusive": "2026-10-06T01:29:57Z",
+    "created_at_exclusive": "2026-10-08T19:36:00Z"
+  },
+  "census": {
+    "workflow_id": 308320679,
+    "first_pages": 1,
+    "second_pages": 1,
+    "first_total_count": 12,
+    "second_total_count": 12,
+    "run_ids": [
+      37399467224,
+      37667969180,
+      37672991237,
+      37696470739,
+      37705259359,
+      37709031628,
+      37713171379,
+      37797748542,
+      37799930819,
+      37804698446,
+      37807051981,
+      37833100150
+    ],
+    "repeated_id_census_agrees": true,
+    "completeness_scope": "API-retrievable population at retrieval time; no proof about deleted runs.",
+    "primary_main_runs": 5,
+    "pr_diagnostic_runs": 7,
+    "other_excluded_rows": 0,
+    "primary_jobs": 30,
+    "pr_jobs": 42,
+    "unique_job_keys": 72
+  },
+  "records": [
+    {
+      "run_id": 37399467224,
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37399467224",
+      "workflow_id": 308320679,
+      "event": "push",
+      "head_branch": "main",
+      "head_sha": "03c93c77a05e89d082f93c91b23dffabb332373c",
+      "created_at": "2026-10-06T01:29:59Z",
+      "window_member": true,
+      "latest_attempt_number_at_first_census": 1,
+      "latest_conclusion_at_first_census": "success",
+      "measured_attempt_number": 1,
+      "attempt_status": "completed",
+      "attempt_conclusion": "success",
+      "attempt_run_started_at": "2026-10-06T01:29:59Z",
+      "cutoff_evidence": {
+        "status_at_retrieval": "completed",
+        "conclusion_at_retrieval": "success",
+        "attempt_updated_at": "2026-10-06T01:34:00Z",
+        "latest_executed_job_completed_at": "2026-10-06T01:33:59+00:00",
+        "executed_job_completed_at_or_after_cutoff": false,
+        "terminal_by_cutoff_proven": true,
+        "disposition": "terminal_by_cutoff",
+        "reason": "Completed attempt metadata updated before cutoff, corroborated by executed job completion times."
+      },
+      "population": "primary_pinned_main_push",
+      "source_provenance": {
+        "head_commit_resolvable": true,
+        "merge_676_is_ancestor": true,
+        "head_is_ancestor_of_pinned_main": true,
+        "blob_checks": {
+          ".github/workflows/validate-skills.yml": {
+            "expected": "66cca67d0390e739190939abccae99125cb56543",
+            "actual": "66cca67d0390e739190939abccae99125cb56543",
+            "exit_code": 0,
+            "matches": true
+          },
+          "scripts/tests/test_offline_ci.py": {
+            "expected": "504d98876bb8e7ca94ebb18c955a03e3dc55a44d",
+            "actual": "504d98876bb8e7ca94ebb18c955a03e3dc55a44d",
+            "exit_code": 0,
+            "matches": true
+          }
+        }
+      },
+      "job_page_count": 1,
+      "reported_job_total": 6,
+      "jobs": [
+        {
+          "id": 112063171592,
+          "run_id": 37399467224,
+          "run_attempt": 1,
+          "name": "changes",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T01:30:02Z",
+          "completed_at": "2026-10-06T01:30:06Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37399467224/job/112063171592",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 4,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 2,
+              "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-06T01:30:03Z",
+              "completed_at": "2026-10-06T01:30:05Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 112063171778,
+          "run_id": 37399467224,
+          "run_attempt": 1,
+          "name": "validate-skills",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T01:30:02Z",
+          "completed_at": "2026-10-06T01:31:50Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37399467224/job/112063171778",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 108,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 19,
+              "name": "Retain offline-check evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-06T01:31:47Z",
+              "completed_at": "2026-10-06T01:31:48Z"
+            }
+          ],
+          "reported_step_count": 22
+        },
+        {
+          "id": 112063172397,
+          "run_id": 37399467224,
+          "run_attempt": 1,
+          "name": "gate-guard",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T01:30:00Z",
+          "completed_at": "2026-10-06T01:30:00Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37399467224/job/112063172397",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "expected_event_exclusion",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Verified pinned push workflow has PR-only gate-guard condition.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 112063201367,
+          "run_id": 37399467224,
+          "run_attempt": 1,
+          "name": "tools-tests-windows",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T01:30:09Z",
+          "completed_at": "2026-10-06T01:33:44Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37399467224/job/112063201367",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 215,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 22,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-06T01:33:40Z",
+              "completed_at": "2026-10-06T01:33:42Z"
+            }
+          ],
+          "reported_step_count": 15
+        },
+        {
+          "id": 112063201385,
+          "run_id": 37399467224,
+          "run_attempt": 1,
+          "name": "windows-offline-checks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T01:30:08Z",
+          "completed_at": "2026-10-06T01:33:59Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37399467224/job/112063201385",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 231,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 36,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-06T01:33:56Z",
+              "completed_at": "2026-10-06T01:33:58Z"
+            }
+          ],
+          "reported_step_count": 21
+        },
+        {
+          "id": 112063201430,
+          "run_id": 37399467224,
+          "run_attempt": 1,
+          "name": "tools-tests-linux",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T01:30:09Z",
+          "completed_at": "2026-10-06T01:32:40Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37399467224/job/112063201430",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 151,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 19,
+              "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-06T01:32:37Z",
+              "completed_at": "2026-10-06T01:32:38Z"
+            }
+          ],
+          "reported_step_count": 14
+        }
+      ]
+    },
+    {
+      "run_id": 37667969180,
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37667969180",
+      "workflow_id": 308320679,
+      "event": "pull_request",
+      "head_branch": "claude/sharp-lovelace-urgxpz",
+      "head_sha": "ccf3fc22001b277dd62d1185d939e23a7977e299",
+      "created_at": "2026-10-07T18:35:15Z",
+      "window_member": true,
+      "latest_attempt_number_at_first_census": 1,
+      "latest_conclusion_at_first_census": "success",
+      "measured_attempt_number": 1,
+      "attempt_status": "completed",
+      "attempt_conclusion": "success",
+      "attempt_run_started_at": "2026-10-07T18:35:15Z",
+      "cutoff_evidence": {
+        "status_at_retrieval": "completed",
+        "conclusion_at_retrieval": "success",
+        "attempt_updated_at": "2026-10-07T18:36:35Z",
+        "latest_executed_job_completed_at": "2026-10-07T18:36:34+00:00",
+        "executed_job_completed_at_or_after_cutoff": false,
+        "terminal_by_cutoff_proven": true,
+        "disposition": "terminal_by_cutoff",
+        "reason": "Completed attempt metadata updated before cutoff, corroborated by executed job completion times."
+      },
+      "population": "pr_diagnostic",
+      "source_provenance": {
+        "actual_pr_checkout_sha": null,
+        "actual_pr_workflow_revision": null,
+        "filter_outputs": null
+      },
+      "job_page_count": 1,
+      "reported_job_total": 6,
+      "jobs": [
+        {
+          "id": 112951998232,
+          "run_id": 37667969180,
+          "run_attempt": 1,
+          "name": "validate-skills",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T18:35:18Z",
+          "completed_at": "2026-10-07T18:36:34Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37667969180/job/112951998232",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 19,
+              "name": "Retain offline-check evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T18:36:31Z",
+              "completed_at": "2026-10-07T18:36:32Z"
+            }
+          ],
+          "reported_step_count": 22
+        },
+        {
+          "id": 112951998421,
+          "run_id": 37667969180,
+          "run_attempt": 1,
+          "name": "gate-guard",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T18:35:17Z",
+          "completed_at": "2026-10-07T18:35:24Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37667969180/job/112951998421",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 3,
+              "name": "Fail if this PR modifies the merge gate or its enforcement surfaces",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T18:35:21Z",
+              "completed_at": "2026-10-07T18:35:22Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 112951998514,
+          "run_id": 37667969180,
+          "run_attempt": 1,
+          "name": "changes",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T18:35:18Z",
+          "completed_at": "2026-10-07T18:35:26Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37667969180/job/112951998514",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 3,
+              "name": "Compute changed paths",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T18:35:22Z",
+              "completed_at": "2026-10-07T18:35:23Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 112952072711,
+          "run_id": 37667969180,
+          "run_attempt": 1,
+          "name": "tools-tests-windows",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-07T18:35:26Z",
+          "completed_at": "2026-10-07T18:35:26Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37667969180/job/112952072711",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 112952073286,
+          "run_id": 37667969180,
+          "run_attempt": 1,
+          "name": "windows-offline-checks",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-07T18:35:26Z",
+          "completed_at": "2026-10-07T18:35:26Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37667969180/job/112952073286",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 112952073587,
+          "run_id": 37667969180,
+          "run_attempt": 1,
+          "name": "tools-tests-linux",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-07T18:35:26Z",
+          "completed_at": "2026-10-07T18:35:26Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37667969180/job/112952073587",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        }
+      ]
+    },
+    {
+      "run_id": 37672991237,
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37672991237",
+      "workflow_id": 308320679,
+      "event": "push",
+      "head_branch": "main",
+      "head_sha": "7d1d05e8170254ae60e8deb175c74e244a284a80",
+      "created_at": "2026-10-07T19:14:36Z",
+      "window_member": true,
+      "latest_attempt_number_at_first_census": 1,
+      "latest_conclusion_at_first_census": "success",
+      "measured_attempt_number": 1,
+      "attempt_status": "completed",
+      "attempt_conclusion": "success",
+      "attempt_run_started_at": "2026-10-07T19:14:36Z",
+      "cutoff_evidence": {
+        "status_at_retrieval": "completed",
+        "conclusion_at_retrieval": "success",
+        "attempt_updated_at": "2026-10-07T19:19:30Z",
+        "latest_executed_job_completed_at": "2026-10-07T19:19:29+00:00",
+        "executed_job_completed_at_or_after_cutoff": false,
+        "terminal_by_cutoff_proven": true,
+        "disposition": "terminal_by_cutoff",
+        "reason": "Completed attempt metadata updated before cutoff, corroborated by executed job completion times."
+      },
+      "population": "primary_pinned_main_push",
+      "source_provenance": {
+        "head_commit_resolvable": true,
+        "merge_676_is_ancestor": true,
+        "head_is_ancestor_of_pinned_main": true,
+        "blob_checks": {
+          ".github/workflows/validate-skills.yml": {
+            "expected": "66cca67d0390e739190939abccae99125cb56543",
+            "actual": "66cca67d0390e739190939abccae99125cb56543",
+            "exit_code": 0,
+            "matches": true
+          },
+          "scripts/tests/test_offline_ci.py": {
+            "expected": "504d98876bb8e7ca94ebb18c955a03e3dc55a44d",
+            "actual": "504d98876bb8e7ca94ebb18c955a03e3dc55a44d",
+            "exit_code": 0,
+            "matches": true
+          }
+        }
+      },
+      "job_page_count": 1,
+      "reported_job_total": 6,
+      "jobs": [
+        {
+          "id": 112969203904,
+          "run_id": 37672991237,
+          "run_attempt": 1,
+          "name": "changes",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T19:15:12Z",
+          "completed_at": "2026-10-07T19:15:16Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37672991237/job/112969203904",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 4,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 2,
+              "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T19:15:13Z",
+              "completed_at": "2026-10-07T19:15:15Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 112969204204,
+          "run_id": 37672991237,
+          "run_attempt": 1,
+          "name": "validate-skills",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T19:14:41Z",
+          "completed_at": "2026-10-07T19:16:19Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37672991237/job/112969204204",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 98,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 38,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T19:16:16Z",
+              "completed_at": "2026-10-07T19:16:17Z"
+            }
+          ],
+          "reported_step_count": 22
+        },
+        {
+          "id": 112969206170,
+          "run_id": 37672991237,
+          "run_attempt": 1,
+          "name": "gate-guard",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-07T19:14:37Z",
+          "completed_at": "2026-10-07T19:14:37Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37672991237/job/112969206170",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "expected_event_exclusion",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Verified pinned push workflow has PR-only gate-guard condition.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 112969486295,
+          "run_id": 37672991237,
+          "run_attempt": 1,
+          "name": "tools-tests-windows",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T19:15:19Z",
+          "completed_at": "2026-10-07T19:18:50Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37672991237/job/112969486295",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 211,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 22,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T19:18:47Z",
+              "completed_at": "2026-10-07T19:18:49Z"
+            }
+          ],
+          "reported_step_count": 15
+        },
+        {
+          "id": 112969486296,
+          "run_id": 37672991237,
+          "run_attempt": 1,
+          "name": "tools-tests-linux",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T19:15:19Z",
+          "completed_at": "2026-10-07T19:16:57Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37672991237/job/112969486296",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 98,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 10,
+              "name": "Retain tools-test evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T19:16:53Z",
+              "completed_at": "2026-10-07T19:16:55Z"
+            }
+          ],
+          "reported_step_count": 14
+        },
+        {
+          "id": 112969486331,
+          "run_id": 37672991237,
+          "run_attempt": 1,
+          "name": "windows-offline-checks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T19:15:19Z",
+          "completed_at": "2026-10-07T19:19:29Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37672991237/job/112969486331",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 250,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 36,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T19:19:26Z",
+              "completed_at": "2026-10-07T19:19:28Z"
+            }
+          ],
+          "reported_step_count": 21
+        }
+      ]
+    },
+    {
+      "run_id": 37696470739,
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37696470739",
+      "workflow_id": 308320679,
+      "event": "pull_request",
+      "head_branch": "claude/sharp-lovelace-urgxpz",
+      "head_sha": "18109931a63f4542b976ea3c78918fe77dcb5124",
+      "created_at": "2026-10-07T22:29:07Z",
+      "window_member": true,
+      "latest_attempt_number_at_first_census": 1,
+      "latest_conclusion_at_first_census": "success",
+      "measured_attempt_number": 1,
+      "attempt_status": "completed",
+      "attempt_conclusion": "success",
+      "attempt_run_started_at": "2026-10-07T22:29:07Z",
+      "cutoff_evidence": {
+        "status_at_retrieval": "completed",
+        "conclusion_at_retrieval": "success",
+        "attempt_updated_at": "2026-10-07T22:30:50Z",
+        "latest_executed_job_completed_at": "2026-10-07T22:30:50+00:00",
+        "executed_job_completed_at_or_after_cutoff": false,
+        "terminal_by_cutoff_proven": true,
+        "disposition": "terminal_by_cutoff",
+        "reason": "Completed attempt metadata updated before cutoff, corroborated by executed job completion times."
+      },
+      "population": "pr_diagnostic",
+      "source_provenance": {
+        "actual_pr_checkout_sha": null,
+        "actual_pr_workflow_revision": null,
+        "filter_outputs": null
+      },
+      "job_page_count": 1,
+      "reported_job_total": 6,
+      "jobs": [
+        {
+          "id": 113049330628,
+          "run_id": 37696470739,
+          "run_attempt": 1,
+          "name": "gate-guard",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T22:29:09Z",
+          "completed_at": "2026-10-07T22:29:14Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37696470739/job/113049330628",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 6,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T22:29:12Z",
+              "completed_at": "2026-10-07T22:29:13Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113049330883,
+          "run_id": 37696470739,
+          "run_attempt": 1,
+          "name": "changes",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T22:29:09Z",
+          "completed_at": "2026-10-07T22:29:15Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37696470739/job/113049330883",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 6,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T22:29:13Z",
+              "completed_at": "2026-10-07T22:29:14Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113049330896,
+          "run_id": 37696470739,
+          "run_attempt": 1,
+          "name": "validate-skills",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T22:29:10Z",
+          "completed_at": "2026-10-07T22:30:50Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37696470739/job/113049330896",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 19,
+              "name": "Retain offline-check evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T22:30:46Z",
+              "completed_at": "2026-10-07T22:30:47Z"
+            }
+          ],
+          "reported_step_count": 22
+        },
+        {
+          "id": 113049379304,
+          "run_id": 37696470739,
+          "run_attempt": 1,
+          "name": "tools-tests-windows",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-07T22:29:16Z",
+          "completed_at": "2026-10-07T22:29:16Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37696470739/job/113049379304",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113049379466,
+          "run_id": 37696470739,
+          "run_attempt": 1,
+          "name": "tools-tests-linux",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-07T22:29:16Z",
+          "completed_at": "2026-10-07T22:29:16Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37696470739/job/113049379466",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113049379501,
+          "run_id": 37696470739,
+          "run_attempt": 1,
+          "name": "windows-offline-checks",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-07T22:29:16Z",
+          "completed_at": "2026-10-07T22:29:16Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37696470739/job/113049379501",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        }
+      ]
+    },
+    {
+      "run_id": 37705259359,
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37705259359",
+      "workflow_id": 308320679,
+      "event": "pull_request",
+      "head_branch": "claude/sharp-lovelace-urgxpz",
+      "head_sha": "dbb4cd6793cd583bc407f7152bb275f14945d56f",
+      "created_at": "2026-10-07T23:58:50Z",
+      "window_member": true,
+      "latest_attempt_number_at_first_census": 1,
+      "latest_conclusion_at_first_census": "success",
+      "measured_attempt_number": 1,
+      "attempt_status": "completed",
+      "attempt_conclusion": "success",
+      "attempt_run_started_at": "2026-10-07T23:58:50Z",
+      "cutoff_evidence": {
+        "status_at_retrieval": "completed",
+        "conclusion_at_retrieval": "success",
+        "attempt_updated_at": "2026-10-08T00:00:55Z",
+        "latest_executed_job_completed_at": "2026-10-08T00:00:54+00:00",
+        "executed_job_completed_at_or_after_cutoff": false,
+        "terminal_by_cutoff_proven": true,
+        "disposition": "terminal_by_cutoff",
+        "reason": "Completed attempt metadata updated before cutoff, corroborated by executed job completion times."
+      },
+      "population": "pr_diagnostic",
+      "source_provenance": {
+        "actual_pr_checkout_sha": null,
+        "actual_pr_workflow_revision": null,
+        "filter_outputs": null
+      },
+      "job_page_count": 1,
+      "reported_job_total": 6,
+      "jobs": [
+        {
+          "id": 113077995764,
+          "run_id": 37705259359,
+          "run_attempt": 1,
+          "name": "changes",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T23:58:52Z",
+          "completed_at": "2026-10-07T23:59:00Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37705259359/job/113077995764",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 3,
+              "name": "Compute changed paths",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T23:58:56Z",
+              "completed_at": "2026-10-07T23:58:57Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113077996006,
+          "run_id": 37705259359,
+          "run_attempt": 1,
+          "name": "validate-skills",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T23:58:53Z",
+          "completed_at": "2026-10-08T00:00:54Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37705259359/job/113077996006",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 38,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T00:00:50Z",
+              "completed_at": "2026-10-08T00:00:51Z"
+            }
+          ],
+          "reported_step_count": 22
+        },
+        {
+          "id": 113077996160,
+          "run_id": 37705259359,
+          "run_attempt": 1,
+          "name": "gate-guard",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-07T23:58:52Z",
+          "completed_at": "2026-10-07T23:58:57Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37705259359/job/113077996160",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 3,
+              "name": "Fail if this PR modifies the merge gate or its enforcement surfaces",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-07T23:58:55Z",
+              "completed_at": "2026-10-07T23:58:56Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113078041354,
+          "run_id": 37705259359,
+          "run_attempt": 1,
+          "name": "windows-offline-checks",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-07T23:59:00Z",
+          "completed_at": "2026-10-07T23:59:00Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37705259359/job/113078041354",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113078041479,
+          "run_id": 37705259359,
+          "run_attempt": 1,
+          "name": "tools-tests-linux",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-07T23:59:01Z",
+          "completed_at": "2026-10-07T23:59:00Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37705259359/job/113078041479",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113078041576,
+          "run_id": 37705259359,
+          "run_attempt": 1,
+          "name": "tools-tests-windows",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-07T23:59:01Z",
+          "completed_at": "2026-10-07T23:59:00Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37705259359/job/113078041576",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        }
+      ]
+    },
+    {
+      "run_id": 37709031628,
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37709031628",
+      "workflow_id": 308320679,
+      "event": "pull_request",
+      "head_branch": "claude/sharp-lovelace-urgxpz",
+      "head_sha": "3797739c5cf3a3937b538a09283d29a51c492cac",
+      "created_at": "2026-10-08T00:40:56Z",
+      "window_member": true,
+      "latest_attempt_number_at_first_census": 1,
+      "latest_conclusion_at_first_census": "success",
+      "measured_attempt_number": 1,
+      "attempt_status": "completed",
+      "attempt_conclusion": "success",
+      "attempt_run_started_at": "2026-10-08T00:40:56Z",
+      "cutoff_evidence": {
+        "status_at_retrieval": "completed",
+        "conclusion_at_retrieval": "success",
+        "attempt_updated_at": "2026-10-08T00:42:29Z",
+        "latest_executed_job_completed_at": "2026-10-08T00:42:28+00:00",
+        "executed_job_completed_at_or_after_cutoff": false,
+        "terminal_by_cutoff_proven": true,
+        "disposition": "terminal_by_cutoff",
+        "reason": "Completed attempt metadata updated before cutoff, corroborated by executed job completion times."
+      },
+      "population": "pr_diagnostic",
+      "source_provenance": {
+        "actual_pr_checkout_sha": null,
+        "actual_pr_workflow_revision": null,
+        "filter_outputs": null
+      },
+      "job_page_count": 1,
+      "reported_job_total": 6,
+      "jobs": [
+        {
+          "id": 113090270474,
+          "run_id": 37709031628,
+          "run_attempt": 1,
+          "name": "changes",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T00:40:58Z",
+          "completed_at": "2026-10-08T00:41:04Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37709031628/job/113090270474",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 2,
+              "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T00:40:59Z",
+              "completed_at": "2026-10-08T00:41:02Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113090270667,
+          "run_id": 37709031628,
+          "run_attempt": 1,
+          "name": "gate-guard",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T00:40:58Z",
+          "completed_at": "2026-10-08T00:41:02Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37709031628/job/113090270667",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 3,
+              "name": "Fail if this PR modifies the merge gate or its enforcement surfaces",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T00:41:00Z",
+              "completed_at": "2026-10-08T00:41:01Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113090270682,
+          "run_id": 37709031628,
+          "run_attempt": 1,
+          "name": "validate-skills",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T00:40:58Z",
+          "completed_at": "2026-10-08T00:42:28Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37709031628/job/113090270682",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 19,
+              "name": "Retain offline-check evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T00:42:24Z",
+              "completed_at": "2026-10-08T00:42:25Z"
+            }
+          ],
+          "reported_step_count": 22
+        },
+        {
+          "id": 113090308402,
+          "run_id": 37709031628,
+          "run_attempt": 1,
+          "name": "tools-tests-linux",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T00:41:05Z",
+          "completed_at": "2026-10-08T00:41:04Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37709031628/job/113090308402",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113090308459,
+          "run_id": 37709031628,
+          "run_attempt": 1,
+          "name": "windows-offline-checks",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T00:41:05Z",
+          "completed_at": "2026-10-08T00:41:04Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37709031628/job/113090308459",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113090308528,
+          "run_id": 37709031628,
+          "run_attempt": 1,
+          "name": "tools-tests-windows",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T00:41:05Z",
+          "completed_at": "2026-10-08T00:41:04Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37709031628/job/113090308528",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        }
+      ]
+    },
+    {
+      "run_id": 37713171379,
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37713171379",
+      "workflow_id": 308320679,
+      "event": "push",
+      "head_branch": "main",
+      "head_sha": "c060a7cb09758fa2f4f6b67ab00094f01d7c6a46",
+      "created_at": "2026-10-08T01:29:21Z",
+      "window_member": true,
+      "latest_attempt_number_at_first_census": 2,
+      "latest_conclusion_at_first_census": "success",
+      "measured_attempt_number": 1,
+      "attempt_status": "completed",
+      "attempt_conclusion": "failure",
+      "attempt_run_started_at": "2026-10-08T01:29:21Z",
+      "cutoff_evidence": {
+        "status_at_retrieval": "completed",
+        "conclusion_at_retrieval": "failure",
+        "attempt_updated_at": "2026-10-08T01:33:18Z",
+        "latest_executed_job_completed_at": "2026-10-08T01:33:17+00:00",
+        "executed_job_completed_at_or_after_cutoff": false,
+        "terminal_by_cutoff_proven": true,
+        "disposition": "terminal_by_cutoff",
+        "reason": "Completed attempt metadata updated before cutoff, corroborated by executed job completion times."
+      },
+      "population": "primary_pinned_main_push",
+      "source_provenance": {
+        "head_commit_resolvable": true,
+        "merge_676_is_ancestor": true,
+        "head_is_ancestor_of_pinned_main": true,
+        "blob_checks": {
+          ".github/workflows/validate-skills.yml": {
+            "expected": "66cca67d0390e739190939abccae99125cb56543",
+            "actual": "66cca67d0390e739190939abccae99125cb56543",
+            "exit_code": 0,
+            "matches": true
+          },
+          "scripts/tests/test_offline_ci.py": {
+            "expected": "504d98876bb8e7ca94ebb18c955a03e3dc55a44d",
+            "actual": "504d98876bb8e7ca94ebb18c955a03e3dc55a44d",
+            "exit_code": 0,
+            "matches": true
+          }
+        }
+      },
+      "job_page_count": 1,
+      "reported_job_total": 6,
+      "jobs": [
+        {
+          "id": 113103554167,
+          "run_id": 37713171379,
+          "run_attempt": 1,
+          "name": "changes",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T01:29:23Z",
+          "completed_at": "2026-10-08T01:29:31Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37713171379/job/113103554167",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 8,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 2,
+              "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T01:29:25Z",
+              "completed_at": "2026-10-08T01:29:27Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113103554440,
+          "run_id": 37713171379,
+          "run_attempt": 1,
+          "name": "validate-skills",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-10-08T01:29:23Z",
+          "completed_at": "2026-10-08T01:29:43Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37713171379/job/113103554440",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 20,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 9,
+              "name": "Check CI evidence and protected-path handling",
+              "status": "completed",
+              "conclusion": "failure",
+              "started_at": "2026-10-08T01:29:36Z",
+              "completed_at": "2026-10-08T01:29:40Z"
+            },
+            {
+              "number": 19,
+              "name": "Retain offline-check evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T01:29:40Z",
+              "completed_at": "2026-10-08T01:29:41Z"
+            }
+          ],
+          "reported_step_count": 22
+        },
+        {
+          "id": 113103555380,
+          "run_id": 37713171379,
+          "run_attempt": 1,
+          "name": "gate-guard",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T01:29:22Z",
+          "completed_at": "2026-10-08T01:29:21Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37713171379/job/113103555380",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "expected_event_exclusion",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Verified pinned push workflow has PR-only gate-guard condition.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113103592840,
+          "run_id": 37713171379,
+          "run_attempt": 1,
+          "name": "tools-tests-windows",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T01:29:33Z",
+          "completed_at": "2026-10-08T01:33:17Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37713171379/job/113103592840",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 224,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 22,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T01:33:12Z",
+              "completed_at": "2026-10-08T01:33:15Z"
+            }
+          ],
+          "reported_step_count": 15
+        },
+        {
+          "id": 113103592871,
+          "run_id": 37713171379,
+          "run_attempt": 1,
+          "name": "tools-tests-linux",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T01:29:32Z",
+          "completed_at": "2026-10-08T01:32:09Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37713171379/job/113103592871",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 157,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 10,
+              "name": "Retain tools-test evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T01:32:07Z",
+              "completed_at": "2026-10-08T01:32:08Z"
+            }
+          ],
+          "reported_step_count": 14
+        },
+        {
+          "id": 113103592918,
+          "run_id": 37713171379,
+          "run_attempt": 1,
+          "name": "windows-offline-checks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T01:29:33Z",
+          "completed_at": "2026-10-08T01:31:50Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37713171379/job/113103592918",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 137,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 36,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T01:31:47Z",
+              "completed_at": "2026-10-08T01:31:48Z"
+            }
+          ],
+          "reported_step_count": 21
+        }
+      ]
+    },
+    {
+      "run_id": 37797748542,
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37797748542",
+      "workflow_id": 308320679,
+      "event": "pull_request",
+      "head_branch": "claude/sharp-lovelace-urgxpz-fu2",
+      "head_sha": "1d1a50961edd72400371bad5bb4cddb0b12e62aa",
+      "created_at": "2026-10-08T15:04:42Z",
+      "window_member": true,
+      "latest_attempt_number_at_first_census": 1,
+      "latest_conclusion_at_first_census": "success",
+      "measured_attempt_number": 1,
+      "attempt_status": "completed",
+      "attempt_conclusion": "success",
+      "attempt_run_started_at": "2026-10-08T15:04:42Z",
+      "cutoff_evidence": {
+        "status_at_retrieval": "completed",
+        "conclusion_at_retrieval": "success",
+        "attempt_updated_at": "2026-10-08T15:06:46Z",
+        "latest_executed_job_completed_at": "2026-10-08T15:06:44+00:00",
+        "executed_job_completed_at_or_after_cutoff": false,
+        "terminal_by_cutoff_proven": true,
+        "disposition": "terminal_by_cutoff",
+        "reason": "Completed attempt metadata updated before cutoff, corroborated by executed job completion times."
+      },
+      "population": "pr_diagnostic",
+      "source_provenance": {
+        "actual_pr_checkout_sha": null,
+        "actual_pr_workflow_revision": null,
+        "filter_outputs": null
+      },
+      "job_page_count": 1,
+      "reported_job_total": 6,
+      "jobs": [
+        {
+          "id": 113381526734,
+          "run_id": 37797748542,
+          "run_attempt": 1,
+          "name": "gate-guard",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T15:04:45Z",
+          "completed_at": "2026-10-08T15:04:58Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37797748542/job/113381526734",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 2,
+              "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T15:04:46Z",
+              "completed_at": "2026-10-08T15:04:50Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113381527381,
+          "run_id": 37797748542,
+          "run_attempt": 1,
+          "name": "changes",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T15:04:45Z",
+          "completed_at": "2026-10-08T15:05:04Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37797748542/job/113381527381",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 2,
+              "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T15:04:46Z",
+              "completed_at": "2026-10-08T15:04:48Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113381528165,
+          "run_id": 37797748542,
+          "run_attempt": 1,
+          "name": "validate-skills",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T15:04:45Z",
+          "completed_at": "2026-10-08T15:06:44Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37797748542/job/113381528165",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 19,
+              "name": "Retain offline-check evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T15:06:37Z",
+              "completed_at": "2026-10-08T15:06:38Z"
+            }
+          ],
+          "reported_step_count": 22
+        },
+        {
+          "id": 113381704116,
+          "run_id": 37797748542,
+          "run_attempt": 1,
+          "name": "windows-offline-checks",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T15:05:05Z",
+          "completed_at": "2026-10-08T15:05:05Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37797748542/job/113381704116",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113381704149,
+          "run_id": 37797748542,
+          "run_attempt": 1,
+          "name": "tools-tests-windows",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T15:05:05Z",
+          "completed_at": "2026-10-08T15:05:05Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37797748542/job/113381704149",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113381704161,
+          "run_id": 37797748542,
+          "run_attempt": 1,
+          "name": "tools-tests-linux",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T15:05:05Z",
+          "completed_at": "2026-10-08T15:05:05Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37797748542/job/113381704161",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        }
+      ]
+    },
+    {
+      "run_id": 37799930819,
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37799930819",
+      "workflow_id": 308320679,
+      "event": "pull_request",
+      "head_branch": "claude/sharp-lovelace-urgxpz",
+      "head_sha": "33200aead57ed11c4af72cb56b75b5f5e7e81f6d",
+      "created_at": "2026-10-08T15:20:23Z",
+      "window_member": true,
+      "latest_attempt_number_at_first_census": 1,
+      "latest_conclusion_at_first_census": "success",
+      "measured_attempt_number": 1,
+      "attempt_status": "completed",
+      "attempt_conclusion": "success",
+      "attempt_run_started_at": "2026-10-08T15:20:23Z",
+      "cutoff_evidence": {
+        "status_at_retrieval": "completed",
+        "conclusion_at_retrieval": "success",
+        "attempt_updated_at": "2026-10-08T15:22:18Z",
+        "latest_executed_job_completed_at": "2026-10-08T15:22:17+00:00",
+        "executed_job_completed_at_or_after_cutoff": false,
+        "terminal_by_cutoff_proven": true,
+        "disposition": "terminal_by_cutoff",
+        "reason": "Completed attempt metadata updated before cutoff, corroborated by executed job completion times."
+      },
+      "population": "pr_diagnostic",
+      "source_provenance": {
+        "actual_pr_checkout_sha": null,
+        "actual_pr_workflow_revision": null,
+        "filter_outputs": null
+      },
+      "job_page_count": 1,
+      "reported_job_total": 6,
+      "jobs": [
+        {
+          "id": 113389096978,
+          "run_id": 37799930819,
+          "run_attempt": 1,
+          "name": "validate-skills",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T15:20:26Z",
+          "completed_at": "2026-10-08T15:22:17Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37799930819/job/113389096978",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 19,
+              "name": "Retain offline-check evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T15:22:13Z",
+              "completed_at": "2026-10-08T15:22:14Z"
+            }
+          ],
+          "reported_step_count": 22
+        },
+        {
+          "id": 113389097032,
+          "run_id": 37799930819,
+          "run_attempt": 1,
+          "name": "changes",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T15:20:26Z",
+          "completed_at": "2026-10-08T15:20:31Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37799930819/job/113389097032",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 6,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T15:20:29Z",
+              "completed_at": "2026-10-08T15:20:30Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113389097208,
+          "run_id": 37799930819,
+          "run_attempt": 1,
+          "name": "gate-guard",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T15:20:26Z",
+          "completed_at": "2026-10-08T15:20:32Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37799930819/job/113389097208",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "pr_diagnostic_no_primary_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 3,
+              "name": "Fail if this PR modifies the merge gate or its enforcement surfaces",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T15:20:29Z",
+              "completed_at": "2026-10-08T15:20:30Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113389166919,
+          "run_id": 37799930819,
+          "run_attempt": 1,
+          "name": "tools-tests-linux",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T15:20:32Z",
+          "completed_at": "2026-10-08T15:20:31Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37799930819/job/113389166919",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113389167268,
+          "run_id": 37799930819,
+          "run_attempt": 1,
+          "name": "tools-tests-windows",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T15:20:32Z",
+          "completed_at": "2026-10-08T15:20:31Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37799930819/job/113389167268",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113389167839,
+          "run_id": 37799930819,
+          "run_attempt": 1,
+          "name": "windows-offline-checks",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T15:20:32Z",
+          "completed_at": "2026-10-08T15:20:31Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37799930819/job/113389167839",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        }
+      ]
+    },
+    {
+      "run_id": 37804698446,
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37804698446",
+      "workflow_id": 308320679,
+      "event": "push",
+      "head_branch": "main",
+      "head_sha": "c1acc075910ea1e849401e18cdb60df31c09ef30",
+      "created_at": "2026-10-08T15:55:25Z",
+      "window_member": true,
+      "latest_attempt_number_at_first_census": 1,
+      "latest_conclusion_at_first_census": "success",
+      "measured_attempt_number": 1,
+      "attempt_status": "completed",
+      "attempt_conclusion": "success",
+      "attempt_run_started_at": "2026-10-08T15:55:25Z",
+      "cutoff_evidence": {
+        "status_at_retrieval": "completed",
+        "conclusion_at_retrieval": "success",
+        "attempt_updated_at": "2026-10-08T16:00:10Z",
+        "latest_executed_job_completed_at": "2026-10-08T16:00:09+00:00",
+        "executed_job_completed_at_or_after_cutoff": false,
+        "terminal_by_cutoff_proven": true,
+        "disposition": "terminal_by_cutoff",
+        "reason": "Completed attempt metadata updated before cutoff, corroborated by executed job completion times."
+      },
+      "population": "primary_pinned_main_push",
+      "source_provenance": {
+        "head_commit_resolvable": true,
+        "merge_676_is_ancestor": true,
+        "head_is_ancestor_of_pinned_main": true,
+        "blob_checks": {
+          ".github/workflows/validate-skills.yml": {
+            "expected": "66cca67d0390e739190939abccae99125cb56543",
+            "actual": "66cca67d0390e739190939abccae99125cb56543",
+            "exit_code": 0,
+            "matches": true
+          },
+          "scripts/tests/test_offline_ci.py": {
+            "expected": "504d98876bb8e7ca94ebb18c955a03e3dc55a44d",
+            "actual": "504d98876bb8e7ca94ebb18c955a03e3dc55a44d",
+            "exit_code": 0,
+            "matches": true
+          }
+        }
+      },
+      "job_page_count": 1,
+      "reported_job_total": 6,
+      "jobs": [
+        {
+          "id": 113405785534,
+          "run_id": 37804698446,
+          "run_attempt": 1,
+          "name": "changes",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T15:56:03Z",
+          "completed_at": "2026-10-08T15:56:08Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37804698446/job/113405785534",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 5,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 2,
+              "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T15:56:04Z",
+              "completed_at": "2026-10-08T15:56:06Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113405785931,
+          "run_id": 37804698446,
+          "run_attempt": 1,
+          "name": "validate-skills",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T15:55:28Z",
+          "completed_at": "2026-10-08T15:56:39Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37804698446/job/113405785931",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 71,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 19,
+              "name": "Retain offline-check evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T15:56:35Z",
+              "completed_at": "2026-10-08T15:56:36Z"
+            }
+          ],
+          "reported_step_count": 22
+        },
+        {
+          "id": 113405787644,
+          "run_id": 37804698446,
+          "run_attempt": 1,
+          "name": "gate-guard",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T15:55:26Z",
+          "completed_at": "2026-10-08T15:55:25Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37804698446/job/113405787644",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "expected_event_exclusion",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Verified pinned push workflow has PR-only gate-guard condition.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113406121152,
+          "run_id": 37804698446,
+          "run_attempt": 1,
+          "name": "windows-offline-checks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T15:56:10Z",
+          "completed_at": "2026-10-08T15:59:09Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37804698446/job/113406121152",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 179,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 36,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T15:59:04Z",
+              "completed_at": "2026-10-08T15:59:06Z"
+            }
+          ],
+          "reported_step_count": 21
+        },
+        {
+          "id": 113406121304,
+          "run_id": 37804698446,
+          "run_attempt": 1,
+          "name": "tools-tests-windows",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T15:56:11Z",
+          "completed_at": "2026-10-08T16:00:09Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37804698446/job/113406121304",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 238,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 22,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T16:00:05Z",
+              "completed_at": "2026-10-08T16:00:07Z"
+            }
+          ],
+          "reported_step_count": 15
+        },
+        {
+          "id": 113406121596,
+          "run_id": 37804698446,
+          "run_attempt": 1,
+          "name": "tools-tests-linux",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T15:56:10Z",
+          "completed_at": "2026-10-08T15:58:36Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37804698446/job/113406121596",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 146,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 10,
+              "name": "Retain tools-test evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T15:58:33Z",
+              "completed_at": "2026-10-08T15:58:34Z"
+            }
+          ],
+          "reported_step_count": 14
+        }
+      ]
+    },
+    {
+      "run_id": 37807051981,
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37807051981",
+      "workflow_id": 308320679,
+      "event": "push",
+      "head_branch": "main",
+      "head_sha": "5228977920ee479e1fe1ec6b8d56f8fc24c14947",
+      "created_at": "2026-10-08T16:13:08Z",
+      "window_member": true,
+      "latest_attempt_number_at_first_census": 1,
+      "latest_conclusion_at_first_census": "success",
+      "measured_attempt_number": 1,
+      "attempt_status": "completed",
+      "attempt_conclusion": "success",
+      "attempt_run_started_at": "2026-10-08T16:13:08Z",
+      "cutoff_evidence": {
+        "status_at_retrieval": "completed",
+        "conclusion_at_retrieval": "success",
+        "attempt_updated_at": "2026-10-08T16:16:03Z",
+        "latest_executed_job_completed_at": "2026-10-08T16:16:01+00:00",
+        "executed_job_completed_at_or_after_cutoff": false,
+        "terminal_by_cutoff_proven": true,
+        "disposition": "terminal_by_cutoff",
+        "reason": "Completed attempt metadata updated before cutoff, corroborated by executed job completion times."
+      },
+      "population": "primary_pinned_main_push",
+      "source_provenance": {
+        "head_commit_resolvable": true,
+        "merge_676_is_ancestor": true,
+        "head_is_ancestor_of_pinned_main": true,
+        "blob_checks": {
+          ".github/workflows/validate-skills.yml": {
+            "expected": "66cca67d0390e739190939abccae99125cb56543",
+            "actual": "66cca67d0390e739190939abccae99125cb56543",
+            "exit_code": 0,
+            "matches": true
+          },
+          "scripts/tests/test_offline_ci.py": {
+            "expected": "504d98876bb8e7ca94ebb18c955a03e3dc55a44d",
+            "actual": "504d98876bb8e7ca94ebb18c955a03e3dc55a44d",
+            "exit_code": 0,
+            "matches": true
+          }
+        }
+      },
+      "job_page_count": 1,
+      "reported_job_total": 6,
+      "jobs": [
+        {
+          "id": 113413958884,
+          "run_id": 37807051981,
+          "run_attempt": 1,
+          "name": "changes",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T16:13:10Z",
+          "completed_at": "2026-10-08T16:13:16Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37807051981/job/113413958884",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 6,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 2,
+              "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T16:13:11Z",
+              "completed_at": "2026-10-08T16:13:13Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113413958984,
+          "run_id": 37807051981,
+          "run_attempt": 1,
+          "name": "validate-skills",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T16:13:10Z",
+          "completed_at": "2026-10-08T16:14:45Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37807051981/job/113413958984",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 95,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 37,
+              "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T16:14:42Z",
+              "completed_at": "2026-10-08T16:14:43Z"
+            }
+          ],
+          "reported_step_count": 22
+        },
+        {
+          "id": 113413960534,
+          "run_id": 37807051981,
+          "run_attempt": 1,
+          "name": "gate-guard",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T16:13:09Z",
+          "completed_at": "2026-10-08T16:13:08Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37807051981/job/113413960534",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "expected_event_exclusion",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Verified pinned push workflow has PR-only gate-guard condition.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113414011679,
+          "run_id": 37807051981,
+          "run_attempt": 1,
+          "name": "tools-tests-linux",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T16:13:18Z",
+          "completed_at": "2026-10-08T16:15:47Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37807051981/job/113414011679",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 149,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 10,
+              "name": "Retain tools-test evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T16:15:41Z",
+              "completed_at": "2026-10-08T16:15:43Z"
+            }
+          ],
+          "reported_step_count": 14
+        },
+        {
+          "id": 113414011739,
+          "run_id": 37807051981,
+          "run_attempt": 1,
+          "name": "windows-offline-checks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T16:13:18Z",
+          "completed_at": "2026-10-08T16:15:48Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37807051981/job/113414011739",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 150,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 36,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T16:15:45Z",
+              "completed_at": "2026-10-08T16:15:47Z"
+            }
+          ],
+          "reported_step_count": 21
+        },
+        {
+          "id": 113414011766,
+          "run_id": 37807051981,
+          "run_attempt": 1,
+          "name": "tools-tests-windows",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T16:13:18Z",
+          "completed_at": "2026-10-08T16:16:01Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37807051981/job/113414011766",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": 163,
+          "skip_evidence": null,
+          "disposition": "primary_measured",
+          "step_timestamp_witnesses": [
+            {
+              "number": 22,
+              "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T16:15:57Z",
+              "completed_at": "2026-10-08T16:15:59Z"
+            }
+          ],
+          "reported_step_count": 15
+        }
+      ]
+    },
+    {
+      "run_id": 37833100150,
+      "url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37833100150",
+      "workflow_id": 308320679,
+      "event": "pull_request",
+      "head_branch": "docs/unselected-expansion-skill-batch-proposal",
+      "head_sha": "59031356eb7d7293df28ea8dcc59c6ba3a1ce5ca",
+      "created_at": "2026-10-08T19:35:31Z",
+      "window_member": true,
+      "latest_attempt_number_at_first_census": 1,
+      "latest_conclusion_at_first_census": "success",
+      "measured_attempt_number": 1,
+      "attempt_status": "completed",
+      "attempt_conclusion": "success",
+      "attempt_run_started_at": "2026-10-08T19:35:31Z",
+      "cutoff_evidence": {
+        "status_at_retrieval": "completed",
+        "conclusion_at_retrieval": "success",
+        "attempt_updated_at": "2026-10-08T19:37:26Z",
+        "latest_executed_job_completed_at": "2026-10-08T19:37:25+00:00",
+        "executed_job_completed_at_or_after_cutoff": true,
+        "terminal_by_cutoff_proven": false,
+        "disposition": "cutoff-unresolved",
+        "reason": "Validation completed after cutoff; no terminal attempt by cutoff is established. Later retrieval success is not cutoff success."
+      },
+      "population": "pr_diagnostic",
+      "source_provenance": {
+        "actual_pr_checkout_sha": null,
+        "actual_pr_workflow_revision": null,
+        "filter_outputs": null
+      },
+      "job_page_count": 1,
+      "reported_job_total": 6,
+      "jobs": [
+        {
+          "id": 113503190967,
+          "run_id": 37833100150,
+          "run_attempt": 1,
+          "name": "changes",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T19:35:33Z",
+          "completed_at": "2026-10-08T19:35:38Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37833100150/job/113503190967",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "cutoff-unresolved_no_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 2,
+              "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T19:35:34Z",
+              "completed_at": "2026-10-08T19:35:36Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113503191154,
+          "run_id": 37833100150,
+          "run_attempt": 1,
+          "name": "validate-skills",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T19:35:33Z",
+          "completed_at": "2026-10-08T19:37:25Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37833100150/job/113503191154",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": false,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "cutoff-unresolved_no_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 37,
+              "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T19:37:21Z",
+              "completed_at": "2026-10-08T19:37:22Z"
+            }
+          ],
+          "reported_step_count": 22
+        },
+        {
+          "id": 113503191283,
+          "run_id": 37833100150,
+          "run_attempt": 1,
+          "name": "gate-guard",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-08T19:35:33Z",
+          "completed_at": "2026-10-08T19:35:40Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37833100150/job/113503191283",
+          "timestamp_order_valid": true,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": null,
+          "disposition": "cutoff-unresolved_no_duration",
+          "step_timestamp_witnesses": [
+            {
+              "number": 3,
+              "name": "Fail if this PR modifies the merge gate or its enforcement surfaces",
+              "status": "completed",
+              "conclusion": "success",
+              "started_at": "2026-10-08T19:35:37Z",
+              "completed_at": "2026-10-08T19:35:38Z"
+            }
+          ],
+          "reported_step_count": 5
+        },
+        {
+          "id": 113503246127,
+          "run_id": 37833100150,
+          "run_attempt": 1,
+          "name": "tools-tests-linux",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T19:35:39Z",
+          "completed_at": "2026-10-08T19:35:38Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37833100150/job/113503246127",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113503246172,
+          "run_id": 37833100150,
+          "run_attempt": 1,
+          "name": "tools-tests-windows",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T19:35:39Z",
+          "completed_at": "2026-10-08T19:35:38Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37833100150/job/113503246172",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        },
+        {
+          "id": 113503246471,
+          "run_id": 37833100150,
+          "run_attempt": 1,
+          "name": "windows-offline-checks",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-08T19:35:39Z",
+          "completed_at": "2026-10-08T19:35:38Z",
+          "html_url": "https://github.com/ModernNomad-98/Project-Aegis/actions/runs/37833100150/job/113503246471",
+          "timestamp_order_valid": false,
+          "timestamps_within_cutoff": true,
+          "start_not_before_run_creation": true,
+          "primary_duration_seconds": null,
+          "skip_evidence": "unknown",
+          "disposition": "skipped_no_duration",
+          "skip_reason": "Actual PR workflow/checkout revision and runtime filter outputs not retrieved; changes success alone cannot prove path skip.",
+          "step_timestamp_witnesses": [],
+          "reported_step_count": 0
+        }
+      ]
+    }
+  ],
+  "statistics": {
+    "changes": {
+      "all_executed_success_or_failure": {
+        "n": 5,
+        "sum_seconds": 27,
+        "sorted_seconds": [
+          4,
+          4,
+          5,
+          6,
+          8
+        ],
+        "min_seconds": 4,
+        "max_seconds": 8,
+        "quantiles": {
+          "50": {
+            "rank_one_based": 3,
+            "seconds": 5
+          },
+          "90": {
+            "rank_one_based": 5,
+            "seconds": 8
+          },
+          "95": {
+            "rank_one_based": 5,
+            "seconds": 8
+          }
+        },
+        "mean_exact_fraction": "27/5",
+        "mean_seconds": "5.4"
+      },
+      "success_only_companion": {
+        "n": 5,
+        "sum_seconds": 27,
+        "sorted_seconds": [
+          4,
+          4,
+          5,
+          6,
+          8
+        ],
+        "min_seconds": 4,
+        "max_seconds": 8,
+        "quantiles": {
+          "50": {
+            "rank_one_based": 3,
+            "seconds": 5
+          },
+          "90": {
+            "rank_one_based": 5,
+            "seconds": 8
+          },
+          "95": {
+            "rank_one_based": 5,
+            "seconds": 8
+          }
+        },
+        "mean_exact_fraction": "27/5",
+        "mean_seconds": "5.4"
+      },
+      "conclusion_counts": {
+        "success": 5
+      },
+      "disposition_counts": {
+        "primary_measured": 5
+      },
+      "measured_success_count": 5,
+      "measured_failure_count": 0
+    },
+    "validate-skills": {
+      "all_executed_success_or_failure": {
+        "n": 5,
+        "sum_seconds": 392,
+        "sorted_seconds": [
+          20,
+          71,
+          95,
+          98,
+          108
+        ],
+        "min_seconds": 20,
+        "max_seconds": 108,
+        "quantiles": {
+          "50": {
+            "rank_one_based": 3,
+            "seconds": 95
+          },
+          "90": {
+            "rank_one_based": 5,
+            "seconds": 108
+          },
+          "95": {
+            "rank_one_based": 5,
+            "seconds": 108
+          }
+        },
+        "mean_exact_fraction": "392/5",
+        "mean_seconds": "78.4"
+      },
+      "success_only_companion": {
+        "n": 4,
+        "sum_seconds": 372,
+        "sorted_seconds": [
+          71,
+          95,
+          98,
+          108
+        ],
+        "min_seconds": 71,
+        "max_seconds": 108,
+        "quantiles": {
+          "50": {
+            "rank_one_based": 2,
+            "seconds": 95
+          },
+          "90": {
+            "rank_one_based": 4,
+            "seconds": 108
+          },
+          "95": {
+            "rank_one_based": 4,
+            "seconds": 108
+          }
+        },
+        "mean_exact_fraction": "372/4",
+        "mean_seconds": "93.0"
+      },
+      "conclusion_counts": {
+        "success": 4,
+        "failure": 1
+      },
+      "disposition_counts": {
+        "primary_measured": 5
+      },
+      "measured_success_count": 4,
+      "measured_failure_count": 1
+    },
+    "windows-offline-checks": {
+      "all_executed_success_or_failure": {
+        "n": 5,
+        "sum_seconds": 947,
+        "sorted_seconds": [
+          137,
+          150,
+          179,
+          231,
+          250
+        ],
+        "min_seconds": 137,
+        "max_seconds": 250,
+        "quantiles": {
+          "50": {
+            "rank_one_based": 3,
+            "seconds": 179
+          },
+          "90": {
+            "rank_one_based": 5,
+            "seconds": 250
+          },
+          "95": {
+            "rank_one_based": 5,
+            "seconds": 250
+          }
+        },
+        "mean_exact_fraction": "947/5",
+        "mean_seconds": "189.4"
+      },
+      "success_only_companion": {
+        "n": 5,
+        "sum_seconds": 947,
+        "sorted_seconds": [
+          137,
+          150,
+          179,
+          231,
+          250
+        ],
+        "min_seconds": 137,
+        "max_seconds": 250,
+        "quantiles": {
+          "50": {
+            "rank_one_based": 3,
+            "seconds": 179
+          },
+          "90": {
+            "rank_one_based": 5,
+            "seconds": 250
+          },
+          "95": {
+            "rank_one_based": 5,
+            "seconds": 250
+          }
+        },
+        "mean_exact_fraction": "947/5",
+        "mean_seconds": "189.4"
+      },
+      "conclusion_counts": {
+        "success": 5
+      },
+      "disposition_counts": {
+        "primary_measured": 5
+      },
+      "measured_success_count": 5,
+      "measured_failure_count": 0
+    },
+    "tools-tests-linux": {
+      "all_executed_success_or_failure": {
+        "n": 5,
+        "sum_seconds": 701,
+        "sorted_seconds": [
+          98,
+          146,
+          149,
+          151,
+          157
+        ],
+        "min_seconds": 98,
+        "max_seconds": 157,
+        "quantiles": {
+          "50": {
+            "rank_one_based": 3,
+            "seconds": 149
+          },
+          "90": {
+            "rank_one_based": 5,
+            "seconds": 157
+          },
+          "95": {
+            "rank_one_based": 5,
+            "seconds": 157
+          }
+        },
+        "mean_exact_fraction": "701/5",
+        "mean_seconds": "140.2"
+      },
+      "success_only_companion": {
+        "n": 5,
+        "sum_seconds": 701,
+        "sorted_seconds": [
+          98,
+          146,
+          149,
+          151,
+          157
+        ],
+        "min_seconds": 98,
+        "max_seconds": 157,
+        "quantiles": {
+          "50": {
+            "rank_one_based": 3,
+            "seconds": 149
+          },
+          "90": {
+            "rank_one_based": 5,
+            "seconds": 157
+          },
+          "95": {
+            "rank_one_based": 5,
+            "seconds": 157
+          }
+        },
+        "mean_exact_fraction": "701/5",
+        "mean_seconds": "140.2"
+      },
+      "conclusion_counts": {
+        "success": 5
+      },
+      "disposition_counts": {
+        "primary_measured": 5
+      },
+      "measured_success_count": 5,
+      "measured_failure_count": 0
+    },
+    "tools-tests-windows": {
+      "all_executed_success_or_failure": {
+        "n": 5,
+        "sum_seconds": 1051,
+        "sorted_seconds": [
+          163,
+          211,
+          215,
+          224,
+          238
+        ],
+        "min_seconds": 163,
+        "max_seconds": 238,
+        "quantiles": {
+          "50": {
+            "rank_one_based": 3,
+            "seconds": 215
+          },
+          "90": {
+            "rank_one_based": 5,
+            "seconds": 238
+          },
+          "95": {
+            "rank_one_based": 5,
+            "seconds": 238
+          }
+        },
+        "mean_exact_fraction": "1051/5",
+        "mean_seconds": "210.2"
+      },
+      "success_only_companion": {
+        "n": 5,
+        "sum_seconds": 1051,
+        "sorted_seconds": [
+          163,
+          211,
+          215,
+          224,
+          238
+        ],
+        "min_seconds": 163,
+        "max_seconds": 238,
+        "quantiles": {
+          "50": {
+            "rank_one_based": 3,
+            "seconds": 215
+          },
+          "90": {
+            "rank_one_based": 5,
+            "seconds": 238
+          },
+          "95": {
+            "rank_one_based": 5,
+            "seconds": 238
+          }
+        },
+        "mean_exact_fraction": "1051/5",
+        "mean_seconds": "210.2"
+      },
+      "conclusion_counts": {
+        "success": 5
+      },
+      "disposition_counts": {
+        "primary_measured": 5
+      },
+      "measured_success_count": 5,
+      "measured_failure_count": 0
+    },
+    "gate-guard": {
+      "all_executed_success_or_failure": {
+        "n": 0,
+        "status": "NOT MEASURED",
+        "sum_seconds": null,
+        "min_seconds": null,
+        "max_seconds": null,
+        "quantiles": null,
+        "mean_seconds": null
+      },
+      "success_only_companion": {
+        "n": 0,
+        "status": "NOT MEASURED",
+        "sum_seconds": null,
+        "min_seconds": null,
+        "max_seconds": null,
+        "quantiles": null,
+        "mean_seconds": null
+      },
+      "conclusion_counts": {
+        "skipped": 5
+      },
+      "disposition_counts": {
+        "skipped_no_duration": 5
+      },
+      "measured_success_count": 0,
+      "measured_failure_count": 0
+    }
+  },
+  "calculation_procedure": {
+    "duration": "For a primary job with conclusion success or failure, proven terminal attempt before cutoff, and valid UTC timestamps: Decimal((completed_at - started_at).total_seconds()); otherwise null with disposition.",
+    "quantile": "Sort unrounded durations ascending. For integer p in (50,90,95), rank = min(n,max(1,(p*n+99)//100)); value = sorted_durations[rank-1]. If n=0, NOT MEASURED. For n=1, each quantile is the single observation.",
+    "mean": "Store exact sum and n. Display Decimal(sum)/Decimal(n) quantized to 0.1 with ROUND_HALF_EVEN.",
+    "population": "Primary quantiles use only population=primary_pinned_main_push and job disposition=primary_measured; PR diagnostic records never enter those vectors.",
+    "step_witnesses": "For each job retain the latest completed step and every failed step as cutoff/failure witnesses; reported_step_count records how many steps the API returned. Durations use the complete job timestamps, not step sums."
+  },
+  "post_cifix": {
+    "status": "NOT SAMPLED",
+    "n": null
+  },
+  "limits": [
+    "API retrieval cannot prove no historical run was deleted before both censuses.",
+    "PR checkout/workflow revisions and runtime path filter outputs are unknown.",
+    "Legacy all-event attempt semantics are unspecified; no controlled before/after comparison exists.",
+    "Job execution excludes runner queue time, whole-run latency, and provider spend.",
+    "Independent Stage D re-enumeration and recalculation are pending; Stage C verification is not Stage D acceptance."
+  ]
+}
