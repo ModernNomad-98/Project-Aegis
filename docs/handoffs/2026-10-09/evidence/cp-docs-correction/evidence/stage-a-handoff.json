@@ -1,0 +1,21 @@
+{
+  "stage": "A",
+  "disposition": "SD-A: COMPLETE",
+  "plan": "PLAN-rev1.md",
+  "sha256": "3296d09a382837aee265a71a951406b8f526fc58355bbe949c014ae9fee8bdd5",
+  "started_utc": "2026-10-09T16:47:41.0000000+00:00",
+  "finished_utc": "2026-10-09T16:55:54.4287115+00:00",
+  "elapsed_seconds": 493.429,
+  "active_seconds": null,
+  "eta_active_minutes": "20-30",
+  "timing_note": "Elapsed wall time from first recorded timestamp; exact dispatch time and active-time split unavailable. Wall time is an imperfect comparison to the active-work estimate.",
+  "changed_source_files": [],
+  "written_scratch_files": [
+    "PLAN-rev1.md",
+    "evidence/focused-trace.py",
+    "evidence/focused-trace-result.json",
+    "evidence/source-pins-and-authority.json",
+    "evidence/stage-a-handoff.json"
+  ],
+  "next": "Different Stage B agent audits the captured plan SHA256; no source implementation or later-stage action performed."
+}

@@ -1,0 +1,62 @@
+Message Type: FINAL_ANSWER
+Task name: /root
+Sender: /root/stage4b_reconcile_b
+Payload:
+**SD-B: REVISE** — one required correction to the stage timing of AC8.
+
+Audited [STAGE-A-PLAN.md](</C:/src/Codex Projects/Project Aegis/stage4b-reconcile/STAGE-A-PLAN.md>) at SHA-256:
+
+`5C55D22FF00A59E58E4C9A450FC2FF58EC06B5A658C404FAB72AFFB4B11895B1`
+
+The hash matched on initial read and final recheck. Live main remained `625fc66711eaf7b3ee788cbc2dff98f05f147c1c`.
+
+**Required finding — R1, P2: AC8 mixes the Stage D acceptance test with later stages’ evidence.**
+
+[Plan line 189](</C:/src/Codex Projects/Project Aegis/stage4b-reconcile/STAGE-A-PLAN.md:189>) requires “later stage evidence” and “exact-head CI/delivery evidence,” while line 191 declares no criterion unverifiable at the candidate head. Section 6 instructs Stage D to apply all eight criteria.
+
+The canonical workflow requires Stage D’s affirmative disposition before Stage E begins. It also requires any Stage D `UNRUN` criterion to have been declared unverifiable in Stage A. As written, AC8 leaves Stage D choosing between requiring evidence that later stages have not produced and silently narrowing the criterion. The workflow explicitly avoids this backward dependency. See [delivery-workflow.md at M](https://github.com/ModernNomad-98/Project-Aegis/blob/625fc66711eaf7b3ee788cbc2dff98f05f147c1c/docs/delivery-workflow.md#stage-dispositions), particularly source lines 128–151.
+
+Suggested author correction:
+
+> At Stage C/D, verify that the handoff records C’s immutable base/head/tree, command journal, local check results or explicit UNRUN records with resolutions, and evidence that implementation stayed within the authorized source-only scope. Stage E owns its validation disposition; subsequent CI, final-review and merge evidence are forward duties of their respective holders under the canonical workflow, rather than prerequisites for Stage D acceptance.
+
+Update lines 178/191 and the AC8 evidence cell consistently. Keep the later duties in the handoff contract. This needs a plan amendment and a fresh hash-bound Stage B verdict; no owner policy decision is required.
+
+The eight criteria were assessed individually, with compound clauses checked separately:
+
+| Criterion, quoted from plan | Verdict and evidence test |
+|---|---|
+| **AC1:** “Exactly the three source paths in section 2 change; other source paths and all original historical content outside the two new pointer insertions remain unchanged.” | **TESTABLE.** Exactly three paths, one new note and two additive pointers. Base/head name list and unified diff establish pass or failure. |
+| **AC2:** “The note binds its source observation to one exact commit, distinguishes .281 historical / .283 recorded tranche / .287 current-at-M declarations, and makes no installed-runtime or substitution claim.” | **TESTABLE.** Exact commit and source values are explicit. All three version claims were independently corroborated. |
+| **AC3:** “All P1–P6, M7–M8 and U1–U2 rows carry source-backed fact, missing evidence and role; M7/M8 remain measured-by-tranche and U1/U2 stay unknown. No unresolved field is called complete.” | **TESTABLE.** Ten named rows, three required fields per row, and explicit status distinctions. Row comparison against APR-108 and the template supplies evidence. |
+| **AC4:** “Both unrecovered original hashes are reproduced exactly as register-attributed/not-rederived, bounded recovery limitations are explicit, and no original reconstruction or invented owner words are presented.” | **TESTABLE.** Exact string comparison and attribution inspection provide a clear test. Original-byte recovery is not falsely required. |
+| **AC5:** “First-tranche subceilings, parent-ceiling distinction, exact T1 identity stop, zero coverage credit, >=99 versus frozen N, no hard-cap claim and credential custody match APR-108.” | **TESTABLE.** Each clause maps to explicit APR-108 text. Numerical mismatch, changed identity handling or elevated authority fails. |
+| **AC6:** “Dependency order preserves separate actual-host proof, approved comparison/selection, conditional helpers and package-7 review; Aegis-only is not presented as bypass; APR-102 policy unchanged.” | **TESTABLE.** The owning setup plan’s package-7 section and APR-102 provide the expected dependency order and policy. |
+| **AC7:** “Both pointer links resolve to the new note; note links/anchors resolve; prose/tables render readably and define unfamiliar terms. The note remains evidence-only and clearly names execution/readiness gaps.” | **TESTABLE for this prose change.** Link/anchor resolution, rendering sanity and independent prose review are proportionate. Section 4 explicitly supplies the six terms to explain. |
+| **AC8:** “Required local repository checks and then applicable exact-head CI/delivery evidence are recorded truthfully by their stage holders; no provider/VM/account action, install, grant issuance or settings change occurs in this batch.” | **NEEDS-REWRITE.** Outcomes and evidence exist, but the verification stage is ambiguous. Resolve R1 so later evidence cannot become a Stage D prerequisite. |
+
+**PROVEN**
+
+- The evidence snapshot digest matches its receipt: `07AC029A0EFB7537D0CAD7D96B24FE991D3CE1E8325EF43E5C9EF21628750359`. Its ten recorded source blob IDs match independent GitHub reads at M.
+- Historical package source at `658fa22edbfde2c953f7d21678d08baa79b75052` declares SDK `0.3.281`; APR-108 records `0.3.283`; current package source declares `0.3.287`. API/MCP/Zod values and Node range match the plan.
+- APR-108 explicitly blocks execution and disclaims operative authority. P1–P6 remain prerequisites; M7/M8 are measured by the tranche; network discrimination and ZDR remain accepted unknowns.
+- The complete APR-108 entry, including its prospective request, forbidden scope and expiry/use limits, supports the plan’s account. A scan of the entire later register found no matching APR-108, Stage 4B, tranche, issue-101 or recorded host/operator lifecycle text.
+- The 10-attempt maximum, 40 requests/US$6 tranche limits, other listed subceilings, 220 requests/US$50 parent distinction, exact T1 identity rule, zero full-proof coverage and `220/N` threshold match APR-108.
+- Both original SHA-256 values match APR-108 exactly. An independently repeated bounded current-workspace filename search returned zero matches. This establishes only that search’s result.
+- Issue #101 remains open. Its body/comment, the setup plan and APR-102 support the unfinished comparison/release dependencies.
+- The three-path allowlist supports **docs-only** classification. The proposed evidence-note path is absent at M. The plan preserves original preflight values and excludes authority, runtime, fixture and settings changes.
+- Required validator/self-tests are correctly identified from CONTRIBUTING. Link/render checks, source comparisons and truthful path-filter reporting are proportionate. Current CI scopes the advisory jobs away from documentation-only PRs while retaining the two unconditional checks.
+- Stage B is independent of `/root/issue101_hostproof`. The proposed holder separation is correct; R1 concerns evidence timing, not holder reuse.
+
+**UNVERIFIED / outside this audit**
+
+Original draft bytes and their independently re-derived hashes; owner-authored tranche authorization; actual host/operator designation; installed runtime; account entitlement/pricing; provider counts/concurrency; frozen fixtures/preflight; live host proof; savings and release readiness. No source candidate exists yet, so no implementation, validation or release pass is asserted.
+
+Skills actually read and applied: `acceptance-criteria-reviewer`, `source-of-truth-reconciler`, and `change-classification-gate`, including their relevant supporting references. No MANUAL-ONLY skill was invoked. Plan-level ACCEPT/REVISE is procedurally enforced by the delivery workflow; the criterion-review skill is a partial fit.
+
+No files, Git configuration or external state were changed. Initial sandbox reads failed; read-only escalated commands succeeded. A command-scoped Git trust override resolved the ownership check without changing configuration.
+
+Captured timing: first clock checkpoint **2026-10-09 16:52:24 UTC**; finish **16:55:59 UTC**; measured interval **3m35s**, excluding initial bootstrap before the first checkpoint. Active time was not measured, so this wall interval is an imperfect comparison with the assigned **15–25 active-minute** estimate.
+
+Next: return R1 to the Stage A author, capture the amended plan hash, and obtain the revised Stage B verdict before assigning C.
+

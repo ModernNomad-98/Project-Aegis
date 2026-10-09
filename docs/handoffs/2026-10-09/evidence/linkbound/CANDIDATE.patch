@@ -1,0 +1,332 @@
+diff --git a/scripts/ci/check-markdown-links.py b/scripts/ci/check-markdown-links.py
+index efa65c9..ac76863 100644
+--- a/scripts/ci/check-markdown-links.py
++++ b/scripts/ci/check-markdown-links.py
+@@ -171,6 +171,51 @@ def link_target_open(line: str) -> bool:
+     return line.rfind("[") > line.rfind("])") and (")" not in after or "(" in after)
+ 
+ 
++class _OpenLinkState:
++    """The rightmost markers used by the two wrap predicates, scanned once.
++
++    These are deliberately the predicates above, not a Markdown parser.  In
++    particular, any ``(`` after the latest ``](`` keeps a target open even if
++    a ``)`` also follows it.  Positions include the joining spaces.
++    """
++
++    def __init__(self) -> None:
++        self.length = 0
++        self.previous = ""
++        self.last_open = -1
++        self.last_close = -1
++        self.last_target = -1
++        self.last_closed_target = -1
++        self.target_has_open = False
++        self.target_has_close = False
++
++    def add(self, text: str) -> None:
++        for char in text:
++            position = self.length
++            if position > self.last_target + 1:
++                if char == "(":
++                    self.target_has_open = True
++                elif char == ")":
++                    self.target_has_close = True
++            if char == "[":
++                self.last_open = position
++            elif char == "]":
++                self.last_close = position
++            if self.previous == "]" and char == "(":
++                self.last_target = position - 1
++                self.target_has_open = False
++                self.target_has_close = False
++            elif self.previous == "]" and char == ")":
++                self.last_closed_target = position - 1
++            self.previous = char
++            self.length += 1
++
++    def open(self) -> bool:
++        return (self.last_open > self.last_close or
++                (self.last_target >= 0 and self.last_open > self.last_closed_target
++                 and (not self.target_has_close or self.target_has_open)))
++
++
+ def source_line_at(positions: list[tuple[int, int]], offset: int) -> int:
+     """The 1-based source line the character at `offset` of a merged line is on."""
+     found = positions[0][1]
+@@ -222,12 +267,20 @@ def unwrap_links(lines: list[str]) -> tuple[list[str], list[list[tuple[int, int]
+     index = 0
+     while index < len(lines):
+         current = lines[index]
++        head = current.rstrip()
+         positions: list[tuple[int, int]] = [(0, index + 1)]
++        state = _OpenLinkState()
++        # Removing trailing whitespace cannot remove a punctuation marker, so
++        # these open predicates are identical before and after the trim. The
++        # untouched `current` is still returned if there is no continuation.
++        state.add(head)
++        chunks: list[str] | None = None
++        length = len(head)
+         while index + 1 < len(lines):
+             # Test the state the join would produce, not the state it started
+             # from: this is the condition that lets a wrap run past two lines,
+             # because an intermediate step is still open.
+-            if not (link_text_open(current) or link_target_open(current)):
++            if not state.open():
+                 break
+             # A leading `>` is container syntax, never link text, so `> [a`
+             # plus `> b](t)` is the one link `[a b](t)`. The `>` is mandatory in
+@@ -239,12 +292,18 @@ def unwrap_links(lines: list[str]) -> tuple[list[str], list[list[tuple[int, int]
+             # not contain.
+             if not stripped.strip() or BLOCK_START.match(stripped):
+                 break
+-            head = current.rstrip()
+             tail = stripped.strip()
+-            current = head + " " + tail
+-            positions.append((len(head) + 1, index + 2))
++            if chunks is None:
++                # Only a joined group trims its first line. Later tails are
++                # already stripped, so no accumulated prefix is copied again.
++                chunks = [head]
++            chunks.extend((" ", tail))
++            positions.append((length + 1, index + 2))
++            length += 1 + len(tail)
++            state.add(" ")
++            state.add(tail)
+             index += 1
+-        merged.append(current)
++        merged.append("".join(chunks) if chunks is not None else current)
+         spans.append(positions)
+         index += 1
+     return merged, spans
+diff --git a/scripts/tests/test_markdown_links.py b/scripts/tests/test_markdown_links.py
+index 21c167c..5483c58 100644
+--- a/scripts/tests/test_markdown_links.py
++++ b/scripts/tests/test_markdown_links.py
+@@ -10,6 +10,9 @@ from __future__ import annotations
+ import json
+ from pathlib import Path
+ import importlib
++import importlib.util
++import os
++import random
+ import shutil
+ import subprocess
+ import sys
+@@ -17,7 +20,7 @@ import tempfile
+ import unittest
+ 
+ REPO = Path(__file__).resolve().parents[2]
+-CHECKER = REPO / "scripts/ci/check-markdown-links.py"
++CHECKER = Path(os.environ.get("AEGIS_LINK_CHECKER", REPO / "scripts/ci/check-markdown-links.py"))
+ FIXTURES = REPO / "scripts/tests/fixtures/markdown-links"
+ 
+ 
+@@ -26,6 +29,207 @@ def run_checker(target: Path, *extra: str) -> subprocess.CompletedProcess:
+                           cwd=REPO, capture_output=True, text=True)
+ 
+ 
++def baseline_unwrap(lines: list[str]) -> tuple[list[str], list[list[tuple[int, int]]]]:
++    """Frozen pre-bound unwrapping oracle for small compatibility inputs only."""
++    import re
++
++    quote_marker = re.compile(r"^ {0,3}>[ \t]?")
++    block_start = re.compile(r"^ {0,3}(?:#{1,6}\s|`{3,}|~{3,}|[-*+][ \t]|\d+[.)][ \t]|>|<!--)")
++
++    def text_open(line: str) -> bool:
++        return line.rfind("[") > line.rfind("]")
++
++    def target_open(line: str) -> bool:
++        if "](" not in line:
++            return False
++        after = line[line.rfind("](") + 2:]
++        return line.rfind("[") > line.rfind("])") and (")" not in after or "(" in after)
++
++    merged: list[str] = []
++    spans: list[list[tuple[int, int]]] = []
++    index = 0
++    while index < len(lines):
++        current = lines[index]
++        positions = [(0, index + 1)]
++        while index + 1 < len(lines):
++            if not (text_open(current) or target_open(current)):
++                break
++            stripped = quote_marker.sub("", lines[index + 1])
++            if not stripped.strip() or block_start.match(stripped):
++                break
++            head = current.rstrip()
++            tail = stripped.strip()
++            current = head + " " + tail
++            positions.append((len(head) + 1, index + 2))
++            index += 1
++        merged.append(current)
++        spans.append(positions)
++        index += 1
++    return merged, spans
++
++
++def load_checker():
++    spec = importlib.util.spec_from_file_location("aegis_checker_under_test", CHECKER)
++    assert spec is not None and spec.loader is not None
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    return module
++
++
++class UnwrapCompatibilityTests(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        cls.checker = load_checker()
++
++    def test_explicit_text_and_span_contract(self):
++        cases = (
++            ([], ([], [])),
++            (["plain"], (["plain"], [[(0, 1)]])),
++            (["[a", "b](c)"], (["[a b](c)"], [[(0, 1), (3, 2)]])),
++            (["[a", "b", "c](d)"], (["[a b c](d)"], [[(0, 1), (3, 2), (5, 3)]])),
++            (["[a \t", " b](c)"], (["[a b](c)"], [[(0, 1), (3, 2)]])),
++            (["[a](", "b)"], (["[a]( b)"], [[(0, 1), (5, 2)]])),
++            (["[a", "", "b](c)"], (["[a", "", "b](c)"], [[(0, 1)], [(0, 2)], [(0, 3)]])),
++            (["[a", "# Heading", "b](c)"], (["[a", "# Heading", "b](c)"], [[(0, 1)], [(0, 2)], [(0, 3)]])),
++            (["[a", "> b](c)"], (["[a b](c)"], [[(0, 1), (3, 2)]])),
++            (["[a", ">> b](c)"], (["[a", ">> b](c)"], [[(0, 1)], [(0, 2)]])),
++            (["[a", "- b](c)"], (["[a", "- b](c)"], [[(0, 1)], [(0, 2)]])),
++            (["[a", "<!-- x"], (["[a", "<!-- x"], [[(0, 1)], [(0, 2)]])),
++            (["See [ok](a) and [open", "tail](b)"],
++             (["See [ok](a) and [open tail](b)"], [[(0, 1), (22, 2)]])),
++            (["[a](x) [b", "c](y) [d", "e](z)"],
++             (["[a](x) [b c](y) [d e](z)"], [[(0, 1), (10, 2), (19, 3)]])),
++            (["] stray [b", "c](d)"], (["] stray [b c](d)"], [[(0, 1), (11, 2)]])),
++            (["[x](a) [y](", "b)"], (["[x](a) [y]( b)"], [[(0, 1), (12, 2)]])),
++            (["[x](a) [y]", "(b)"],
++             (["[x](a) [y]", "(b)"], [[(0, 1)], [(0, 2)]])),
++            (["[x](a)b(", "c)", "d"],
++             (["[x](a)b( c) d"], [[(0, 1), (9, 2), (12, 3)]])),
++            (["[x](", "a)b(", "c)"], (["[x]( a)b( c)"], [[(0, 1), (5, 2), (10, 3)]])),
++            (["[x](", "a)", "still"],
++             (["[x]( a)", "still"], [[(0, 1), (5, 2)], [(0, 3)]])),
++            (["[x\u2003", "\tname](target)"],
++             (["[x name](target)"], [[(0, 1), (3, 2)]])),
++            (["[x", "```", "y](z)"],
++             (["[x", "```", "y](z)"], [[(0, 1)], [(0, 2)], [(0, 3)]])),
++            (["[x", "~~~", "y](z)"],
++             (["[x", "~~~", "y](z)"], [[(0, 1)], [(0, 2)], [(0, 3)]])),
++            (["[x", "* item", "y](z)"],
++             (["[x", "* item", "y](z)"], [[(0, 1)], [(0, 2)], [(0, 3)]])),
++            (["[x", "+ item", "y](z)"],
++             (["[x", "+ item", "y](z)"], [[(0, 1)], [(0, 2)], [(0, 3)]])),
++            (["[x", "1. item", "y](z)"],
++             (["[x", "1. item", "y](z)"], [[(0, 1)], [(0, 2)], [(0, 3)]])),
++            (["[x", "\t", "y](z)"],
++             (["[x", "\t", "y](z)"], [[(0, 1)], [(0, 2)], [(0, 3)]])),
++        )
++        for lines, expected in cases:
++            with self.subTest(lines=lines):
++                self.assertEqual(expected, baseline_unwrap(lines))
++                self.assertEqual(expected, self.checker.unwrap_links(lines))
++
++    def test_frozen_oracle_on_seeded_punctuation_and_block_fragments(self):
++        seed = 103648
++        rng = random.Random(seed)
++        fragments = ("[", "]", "(", ")", "](", "])", "a", " ", "\t", "\u2003",
++                     "> ", ">> ", "# ", "```", "~" * 3, "- ", "1. ", "<!--", "\n")
++        for case in range(1200):
++            lines = ["".join(rng.choices(fragments, k=rng.randrange(0, 7)))
++                     for _ in range(rng.randrange(0, 9))]
++            with self.subTest(seed=seed, case=case, lines=lines):
++                self.assertEqual(baseline_unwrap(lines), self.checker.unwrap_links(lines))
++
++    def test_unwrap_runtime_is_linear_on_unclosed_shapes(self):
++        child = """
++import json, runpy, statistics, sys, time
++unwrap = runpy.run_path(sys.argv[1])['unwrap_links']
++shape = sys.argv[2]
++sizes = (4096, 8192, 16384)
++unwrap([shape] + ['a' * 64] * 256)
++samples = {}
++for n in sizes:
++    lines = [shape] + ['a' * 64] * n
++    times = []
++    for _ in range(3):
++        start = time.perf_counter()
++        result, spans = unwrap(lines)
++        times.append(time.perf_counter() - start)
++        assert len(result) == 1 and len(spans[0]) == n + 1
++    samples[n] = times
++print(json.dumps({'samples': samples, 'medians': {n: statistics.median(times) for n, times in samples.items()}}))
++"""
++        for shape in ("[x", "[x]("):
++            with self.subTest(shape=shape):
++                result = subprocess.run([sys.executable, "-B", "-c", child, str(CHECKER), shape],
++                                        cwd=REPO, capture_output=True, text=True, timeout=30)
++                self.assertEqual(0, result.returncode, result.stdout + result.stderr)
++                readings = json.loads(result.stdout)
++                medians = readings["medians"]
++                self.assertLessEqual(medians["16384"], 6 * medians["4096"] + 0.05, readings)
++                self.assertLess(medians["16384"], 5, readings)
++
++
++class BoundAndReportTests(unittest.TestCase):
++    def setUp(self):
++        self.directory = Path(tempfile.mkdtemp(prefix="aegis-md-bound-"))
++        self.addCleanup(shutil.rmtree, self.directory, True)
++
++    def run_with_timeout(self, target: Path, *extra: str):
++        return subprocess.run([sys.executable, "-B", str(CHECKER), str(target), *extra],
++                              cwd=REPO, capture_output=True, text=True, timeout=15)
++
++    def test_large_join_and_boundary_keep_broken_tail_links(self):
++        count = 16384
++        continuation = ("a" * 64 + "\n") * count
++        doc = self.directory / "long.md"
++        doc.write_text("[x\n" + continuation +
++                       "](missing-tail.md) and [other](also-missing.md)\n", encoding="utf-8")
++        joined = self.run_with_timeout(doc)
++        self.assertEqual(1, joined.returncode, joined.stdout + joined.stderr)
++        self.assertIn("broken: 2", joined.stdout)
++        self.assertIn("long.md:1 -> missing-tail.md", joined.stdout)
++        self.assertIn("long.md:16386 -> also-missing.md", joined.stdout)
++        doc.write_text("[x\n" + continuation + "\n[tail](missing-tail.md)\n", encoding="utf-8")
++        boundary = self.run_with_timeout(doc)
++        self.assertEqual(1, boundary.returncode, boundary.stdout + boundary.stderr)
++        self.assertIn("broken: 1", boundary.stdout)
++        self.assertIn("long.md:16387 -> missing-tail.md", boundary.stdout)
++
++    def test_block_boundaries_do_not_absorb_a_later_link(self):
++        doc = self.directory / "boundary.md"
++        for boundary in ("", "# heading", "- item", "1. item", ">> nested", "<!-- comment"):
++            with self.subTest(boundary=boundary):
++                doc.write_text("Open [label\n" + boundary + "\n[real](missing.md)\n",
++                               encoding="utf-8")
++                result = self.run_with_timeout(doc)
++                self.assertEqual(1, result.returncode, result.stdout + result.stderr)
++                self.assertIn("broken: 1", result.stdout)
++                self.assertIn("boundary.md:3 -> missing.md", result.stdout)
++
++    def test_public_modes_and_mixed_classification(self):
++        doc = self.directory / "mixed.md"
++        (self.directory / "target.md").write_text("# Known\n", encoding="utf-8")
++        (self.directory / "asset.txt").write_text("asset\n", encoding="utf-8")
++        doc.write_text("\n".join((
++            "[good](target.md) [dir](.) [anchor](target.md#known)",
++            "[broken](missing.md) [dead](target.md#none)",
++            "[external](https://example.invalid/a) [site](/absolute)",
++            "[file fragment](asset.txt#x)", "")), encoding="utf-8")
++        normal = self.run_with_timeout(doc)
++        as_json = self.run_with_timeout(doc, "--json")
++        quiet = self.run_with_timeout(doc, "--quiet")
++        self.assertEqual((1, 1, 1), (normal.returncode, as_json.returncode, quiet.returncode))
++        self.assertEqual({"files": 1, "checked": 5, "anchors": 2, "broken": 1,
++                          "dead": 1, "external": 1, "skipped": 2}, json.loads(as_json.stdout))
++        self.assertIn("mixed.md:2 -> missing.md", normal.stdout)
++        self.assertIn("mixed.md:2 -> target.md#none", normal.stdout)
++        self.assertIn("external (not fetched)", normal.stdout)
++        self.assertEqual("", quiet.stdout)
++        missing = self.run_with_timeout(self.directory / "absent.md")
++        self.assertEqual(2, missing.returncode)
++        self.assertIn("BROKEN INPUT", missing.stdout)
++
++
+ class CheckerReportTests(unittest.TestCase):
+     def test_valid_links_and_anchors_pass(self):
+         result = run_checker(FIXTURES / "good")

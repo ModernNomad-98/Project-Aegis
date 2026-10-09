@@ -1,0 +1,51 @@
+{
+  "item": "STAGE4B-RECONCILE-1",
+  "stage": "A",
+  "disposition": "SD-A: COMPLETE",
+  "stage_b_verdict": "NOT PERFORMED; different agent required",
+  "holder": "/root/issue101_hostproof",
+  "start_utc": "2026-10-09T16:46:20Z",
+  "finish_checkpoint_utc": "2026-10-09T16:51:21Z",
+  "measured_wall_seconds": 301,
+  "active_work_seconds": null,
+  "initial_active_work_estimate_minutes": [
+    20,
+    30
+  ],
+  "comparison": "5m01s wall time; active time unavailable, so wall time is an imperfect comparison. Receipt serialization follows this checkpoint.",
+  "plan_path": "C:/src/Codex Projects/Project Aegis/stage4b-reconcile/STAGE-A-PLAN.md",
+  "plan_sha256": "5C55D22FF00A59E58E4C9A450FC2FF58EC06B5A658C404FAB72AFFB4B11895B1",
+  "evidence_path": "C:/src/Codex Projects/Project Aegis/stage4b-reconcile/evidence/source-snapshot.json",
+  "evidence_sha256": "07AC029A0EFB7537D0CAD7D96B24FE991D3CE1E8325EF43E5C9EF21628750359",
+  "source_main_start": "625fc66711eaf7b3ee788cbc2dff98f05f147c1c",
+  "source_main_final": "625fc66711eaf7b3ee788cbc2dff98f05f147c1c",
+  "skills_read_applied": [
+    {
+      "name": "phased-work-handoff-designer",
+      "blob_sha": "56fcddce1e006ff7055a3c1bf5ad17d0509ace70",
+      "applied_to": "Cross-stage handoff, binding decisions, file-set carry-forward, evidence and deviation contract",
+      "limit": "Not general single-change Stage A owner; Stage A remains procedural."
+    },
+    {
+      "name": "change-classification-gate",
+      "blob_sha": "3b3e9493296825a7572eac9438f54189b7d6467f",
+      "applied_to": "docs-only classification and exact three-source-file lock",
+      "limit": "Classifies scope; it is not an independent plan audit or a passed test."
+    }
+  ],
+  "write_integrity_checks": {
+    "readback": "First and last nonempty plan lines confirmed; 249 lines before final one-line clarification, full content remains present.",
+    "json_parse": "source-snapshot.json ConvertFrom-Json succeeded; repository and main read back; 10 source entries.",
+    "sha256": "PowerShell Get-FileHash succeeded for final plan and evidence.",
+    "source_tests": "NOT RUN; no source implementation in Stage A",
+    "independent_audit": "NOT RUN"
+  },
+  "mutations": "Only this scratch plan, source-snapshot.json and this receipt under the assigned directory.",
+  "source_repo_edits": 0,
+  "github_writes": 0,
+  "host_provider_vm_account_actions": 0,
+  "credentials_accessed": 0,
+  "installs": 0,
+  "deviations": "None. Drafting clarification preserves explicit read-only source-repository access.",
+  "next": "Independent Stage B audit of exact plan hash; this planner does not audit or implement its own plan."
+}

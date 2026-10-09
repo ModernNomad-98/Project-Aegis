@@ -1,0 +1,19 @@
+{
+  "test": "tools.aegis_delivery_control.tests.test_guard_traceability.GuardGapTests.test_t03_occupied_slot_denies_other_run_intent",
+  "tests_run": 1,
+  "success": true,
+  "readiness_assertion_lines": [
+    10818
+  ],
+  "readiness_assertion_executed": true,
+  "run2_commit_intent_exceptions": [
+    "T03 requires durable PLANNED state"
+  ],
+  "slot_denial_message_lines": [
+    24903
+  ],
+  "run2_reached_slot_denial": false,
+  "runtime": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "source_checkout": "C:\\src\\Codex Projects\\Project Aegis\\route002\\impl",
+  "scope": "single offline synthetic test; in-memory tracing; no source edits"
+}

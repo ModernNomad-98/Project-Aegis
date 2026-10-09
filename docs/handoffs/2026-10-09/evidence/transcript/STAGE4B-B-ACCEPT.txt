@@ -1,0 +1,24 @@
+Message Type: FINAL_ANSWER
+Task name: /root
+Sender: /root/stage4b_reconcile_b
+Payload:
+**SD-B: ACCEPT** for [STAGE-A-PLAN.md](</C:/src/Codex Projects/Project Aegis/stage4b-reconcile/STAGE-A-PLAN.md>) at SHA-256:
+
+`0C1CC66D9A0257820AB56674CA1C1371016CB6BBCBE91F8783633C01D0940FFB`
+
+**R1 is resolved; no required findings remain.**
+
+- **PROVEN — amendment scope:** Replacing only lines 178, 189 and 191 with their previous text, entirely in memory, reproduced original hash `5C55D22FF00A59E58E4C9A450FC2FF58EC06B5A658C404FAB72AFFB4B11895B1`. No other bytes changed.
+- **PROVEN — AC8 is now TESTABLE at Stage D:** It requires C’s immutable base/head/tree, command journal, local check results or explicit UNRUN records with concrete resolutions, and scope evidence. An UNRUN record establishes truthful reporting, never a passing check.
+- **PROVEN — later duties remain:** Line 191 expressly preserves E’s validation disposition and subsequent CI, final-review and merge evidence as forward duties. Stage D no longer depends on evidence from later stages.
+- **PROVEN — source currency:** Live main remains `625fc66711eaf7b3ee788cbc2dff98f05f147c1c`; the canonical workflow blob remains `720a858083f67a4fb91648517a0a918c68cd1d4b`. The unchanged AC1–AC7 assessments carry forward. All eight criteria are now TESTABLE.
+
+The [original Stage A receipt](</C:/src/Codex Projects/Project Aegis/stage4b-reconcile/evidence/STAGE-A-RECEIPT.json>) is historical evidence: it explicitly records the original plan hash and `2026-10-09T16:51:21Z` checkpoint. It does **not** verify the amended plan. Its source-evidence digest still matches `07AC029A0EFB7537D0CAD7D96B24FE991D3CE1E8325EF43E5C9EF21628750359`. No receipt rewrite is required for acceptance; carry this new hash-bound verdict into C’s handoff rather than treating the old receipt as current.
+
+Skills applied from the earlier reads: `acceptance-criteria-reviewer`, `source-of-truth-reconciler`, and `change-classification-gate`. The plan-level verdict remains procedurally enforced by `docs/delivery-workflow.md`; no MANUAL-ONLY skill was invoked.
+
+This acceptance covers the documentary plan only. Original draft bytes, operative tranche authority, runtime/host/provider facts and release readiness remain UNVERIFIED. No files, configuration or external state were changed.
+
+Timing: **16:58:25–16:59:28 UTC**, measured wall time **1m03s**. Active time was not measured; wall time is an imperfect comparison with the **5–10 active-minute** estimate.
+
+Continuation: assign a different Stage C holder with this exact accepted hash, the three-path allowlist, current-source refresh duty and existing source-only boundaries.

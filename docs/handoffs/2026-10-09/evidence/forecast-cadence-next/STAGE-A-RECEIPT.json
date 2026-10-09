@@ -1,0 +1,22 @@
+{
+  "item": "FORECAST-CADENCE-NEXT",
+  "stage": "A",
+  "holder": "/root/backlog_current_inventory",
+  "disposition": "SD-A: COMPLETE",
+  "plan_path": "C:\\src\\Codex Projects\\Project Aegis\\forecast-cadence-next\\PLAN-rev1.md",
+  "plan_sha256": "A69CC6A16BA49437E630C57078C8906B4646501985B7DB1C2D049DAC30475DA5",
+  "start_utc": "2026-10-09T16:53:30Z",
+  "finish_utc": "2026-10-09T17:00:06Z",
+  "elapsed_wall_seconds": 396,
+  "initial_active_estimate_minutes": [
+    15,
+    25
+  ],
+  "measured_active_seconds": null,
+  "comparison": "6m36s wall time; imperfect comparison with active-work estimate",
+  "assessed_cutoff": "625fc66711eaf7b3ee788cbc2dff98f05f147c1c",
+  "integration_evidence_sha256": "1DCC631F8CF8C7D99B0452572008EBB9BBB951128A62C383AF9F0924FC14F57C",
+  "changed_source_files": [],
+  "deviations": [],
+  "next": "Different Stage B holder audits the exact plan hash"
+}

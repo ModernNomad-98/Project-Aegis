@@ -1,0 +1,85 @@
+{
+  "observed_utc": "2026-10-09T16:55:46.8346160Z",
+  "base": "8e11c8f4c2777265e254057ce0fa1e52f0cf03bf",
+  "cutoff": "625fc66711eaf7b3ee788cbc2dff98f05f147c1c",
+  "total_compare_commits": 16,
+  "first_parent_integration_count": 6,
+  "rows": [
+    {
+      "number": 686,
+      "merged_at": "2026-10-09T14:34:16Z",
+      "head": "c03f8c38c1cd26ff07a4ce6b66c9b69c44a2ce07",
+      "merge": "2c68df263c99cdb66d6ea4c76cd480f0bf19b5b5",
+      "title": "docs: record historical METRICS-1 CI durations",
+      "files": [
+        "docs/evidence/metrics/metrics-1-ci-duration-2026-10-08.json",
+        "docs/roadmaps/aegis-coordinator-figures.md"
+      ]
+    },
+    {
+      "number": 681,
+      "merged_at": "2026-10-09T14:56:02Z",
+      "head": "c76114e000134d7c3521eb329958827625724ae8",
+      "merge": "fc3c68b628a5f2660db0ab490706660b90e30d3f",
+      "title": "docs: propose unselected skill expansion batch",
+      "files": [
+        "docs/roadmaps/unselected-expansion-skill-batch-proposal.md"
+      ]
+    },
+    {
+      "number": 687,
+      "merged_at": "2026-10-09T15:46:44Z",
+      "head": "e834ea7079060314a2bc4f4275938b1cf01e0f7d",
+      "merge": "6650f3af091cb14da7de796848d94af5a0aea72c",
+      "title": "docs: catch up backlog cadence through PR #685",
+      "files": [
+        "docs/roadmaps/aegis-backlog-forecast.md",
+        "docs/roadmaps/aegis-execution-metrics.md"
+      ]
+    },
+    {
+      "number": 683,
+      "merged_at": "2026-10-09T15:53:09Z",
+      "head": "abc49113a83a5fce54ce525912416b79859ba232",
+      "merge": "a4fb1445ea92ff6df469627ea9e10f769d69d830",
+      "title": "docs: record one-time gate-guard exception for PR #682",
+      "files": [
+        "docs/approvals/APPROVAL_REGISTER.md"
+      ]
+    },
+    {
+      "number": 689,
+      "merged_at": "2026-10-09T16:03:58Z",
+      "head": "f369585d7b9c7f18caf82a67190db6b819694301",
+      "merge": "c585afdf737ac021d91cd564dc61ad7e1f6b6053",
+      "title": "docs: clarify stale checkout evidence reading",
+      "files": [
+        "docs/evidence/documentation/stale-checkout-instruction-divergence-2026-10-02.md"
+      ]
+    },
+    {
+      "number": 688,
+      "merged_at": "2026-10-09T16:17:39Z",
+      "head": "8107f50a48cf31b68ab833976d5286b9f8a19c9e",
+      "merge": "625fc66711eaf7b3ee788cbc2dff98f05f147c1c",
+      "title": "docs: record ROUTE-002 new-edge textual triage",
+      "files": [
+        "docs/audits/aegis-060-plus-register.md",
+        "docs/evidence/route002-triage-2026-10-09/README.md",
+        "docs/evidence/route002-triage-2026-10-09/route002-triage.json"
+      ]
+    }
+  ],
+  "changed_paths": [
+    "docs/approvals/APPROVAL_REGISTER.md",
+    "docs/audits/aegis-060-plus-register.md",
+    "docs/evidence/documentation/stale-checkout-instruction-divergence-2026-10-02.md",
+    "docs/evidence/metrics/metrics-1-ci-duration-2026-10-08.json",
+    "docs/evidence/route002-triage-2026-10-09/README.md",
+    "docs/evidence/route002-triage-2026-10-09/route002-triage.json",
+    "docs/roadmaps/aegis-backlog-forecast.md",
+    "docs/roadmaps/aegis-coordinator-figures.md",
+    "docs/roadmaps/aegis-execution-metrics.md",
+    "docs/roadmaps/unselected-expansion-skill-batch-proposal.md"
+  ]
+}
