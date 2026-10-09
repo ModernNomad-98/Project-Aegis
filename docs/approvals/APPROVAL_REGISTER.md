@@ -5229,3 +5229,23 @@ the entry governs.
 - **Evidence:** The complete question, chosen label and earlier instruction above were relayed verbatim from the direct current owner conversation by the coordinator to the P-REG Stage A holder on 2026-10-09 UTC. The relay date is known; the owner-answer timestamp is unknown. The current direct instruction has authority before transcription under this register's preamble. The captured reconciliation plan and its independent audit provide recording/design evidence, not independent proof that the owner authored the option prose. Preserve the captured source and the final reviewed record's immutable revision in the stage handoff.
 - **New authority:** None. Historical APR120 remains in the record; effective permission must be derived from the complete history and the owner's current instructions. No automatic red-check merge release follows from recording this entry.
 - **Expiry / future changes:** No calendar expiry or new consumption event was stated. Keep applying the selected condition unless the owner later changes it or its green-check prerequisite is actually satisfied. Any later owner decision is recorded with its own evidence; this entry does not pre-authorize one.
+
+### AEGIS-APR-122: Consumption of the APR-099 guard-documentation correction grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-099.
+- **Status at recording:** AEGIS-APR-099 has no remaining use.
+- **Effective at:** 2026-09-30 17:50:04 UTC, the verified merge time of PR #569.
+- **Recorded at / By:** 2026-10-09 16:50:30 UTC / Codex Stage C agent `/root/apr099_stage_c`.
+- **New authority:** None. This event records the existing one-package limit;
+  it does not reopen AEGIS-APR-099 or AEGIS-APR-086, authorize another code or
+  documentation change under them, or supply a merge exception.
+- **Reason:** AEGIS-APR-099 states that its one package is consumed at merge.
+  The correction package merged in PR #569; this later event records that use.
+- **Evidence:** [PR #569](https://github.com/ModernNomad-98/Project-Aegis/pull/569)
+  merged head `ee27b83e0c16f1327ab80862a78bb3b43c87acd7` as
+  `b9c382c40e2be58123f79bee56fd0f507216576b` at the time above. The head and
+  merge commit resolve to tree `26a30340c03769f5f92fa56d78e15a52d0b38e76`.
+  The delivered diff appended APR-099 and removed the false transaction
+  clause from `tools/aegis_delivery_control/engine.py` and its README.
+  This records package consumption, not a new certification of historical
+  tests or of every claim in the immutable grant.
