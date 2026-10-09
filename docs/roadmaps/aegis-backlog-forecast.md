@@ -1,6 +1,17 @@
 # Project Aegis backlog forecast
 
 ## Start here — current reading
+
+> **Newest reading — 2026-10-09, assessed through PR #688 (frozen cutoff M).**
+> This is the current reading; the **#685 banner below is the prior frozen
+> checkpoint**, retained as dated evidence rather than as the present state.
+> The assessed cutoff is M = `625fc66711eaf7b3ee788cbc2dff98f05f147c1c`, the
+> PR #688 integration at 2026-10-09 16:17:39 Coordinated Universal Time (UTC).
+> Read the
+> [cadence reassessment through PR #688](#cadence-reassessment-through-pr-688-2026-10-09)
+> for selected-outcome status, and the
+> [cadence measurement checkpoint](aegis-execution-metrics.md#cadence-measurement-checkpoint-through-pr-688-2026-10-09)
+> for the six-integration table, cadence arithmetic and timing limits.
 > **Current checkpoint — 2026-10-09, frozen through PR #685.** Read the
 > [catch-up reassessment](#catch-up-reassessment-after-pr-685-2026-10-09)
 > for selected and conditional outcomes. The older “current” readings
@@ -4854,3 +4865,136 @@ as [APR-100](../approvals/APPROVAL_REGISTER.md#aegis-apr-100-standing-commit-pus
 Neither remains estimated work. The #554 checkpoint itself was published
 by #555 and is no longer an in-progress item. This checkpoint selects none
 of these optional, paused or parked outcomes.
+
+## Cadence reassessment through PR #688 (2026-10-09)
+
+This dated checkpoint gives maintainers a source-cutoff reading of the selected
+and conditional backlog. It freezes repository evidence at the assessed cutoff
+**M = `625fc66711eaf7b3ee788cbc2dff98f05f147c1c`**, the PR #688 integration
+(2026-10-09 16:17:39 Coordinated Universal Time, UTC), strictly after the prior
+cutoff **P = `8e11c8f4c2777265e254057ce0fa1e52f0cf03bf`**, the PR #685
+integration (2026-10-09 02:00:04 UTC). The linked [cadence measurement
+checkpoint](aegis-execution-metrics.md#cadence-measurement-checkpoint-through-pr-688-2026-10-09)
+carries the reproducible integration table, the carried window and residual
+arithmetic, and the timing limits behind this reading. It is a factual catch-up
+assessment, not a work grant, a selection, or a forecast of calendar delivery.
+
+**Cadence position.** PR #687 published the [prior
+reassessment](#catch-up-reassessment-after-pr-685-2026-10-09) for source through
+#685 only; it did not assess its own later integration or close a new window.
+One carried member (#685) plus the six integrations between P and M gives **7
+members = one complete five-PR window (#685, #686, #681, #687, #683) plus two
+residuals (#689, #688)**. Nothing resets at #685 or #688, so the next boundary
+needs **three further integrations after M**, and every later integration
+counts, including the pull request that publishes this checkpoint. Two
+integrations after M are already recorded and are carried forward **outside**
+this frozen window:
+[#690](https://github.com/ModernNomad-98/Project-Aegis/pull/690) (merged
+2026-10-09 17:50:26 UTC) and
+[#691](https://github.com/ModernNomad-98/Project-Aegis/pull/691) (merged
+2026-10-09 19:16:22 UTC). The live count therefore stands at two of the three;
+whether this checkpoint's own pull request closes that boundary depends on
+merge order at publication time and is not asserted here.
+
+**What the six assessed integrations did and did not change.** All six are
+documentary additions; none of them executes, delivers or certifies a selected
+outcome. [#686](https://github.com/ModernNomad-98/Project-Aegis/pull/686)
+recorded historical continuous integration (CI) job durations as
+[evidence](../evidence/metrics/metrics-1-ci-duration-2026-10-08.json); a job
+duration sample is not active-labor calibration.
+[#681](https://github.com/ModernNomad-98/Project-Aegis/pull/681) landed the
+[unselected expansion skill batch
+proposal](unselected-expansion-skill-batch-proposal.md), which makes one
+candidate batch available to a future owner selection without selecting it.
+[#687](https://github.com/ModernNomad-98/Project-Aegis/pull/687) published the
+prior #685 assessment on this page and on the metrics page.
+[#683](https://github.com/ModernNomad-98/Project-Aegis/pull/683) recorded
+[APR-120 and APR-121](../approvals/APPROVAL_REGISTER.md) conditions for the PR
+#682 repair path; that is a documented condition and exception record, not
+delivery of the #682 repair.
+[#689](https://github.com/ModernNomad-98/Project-Aegis/pull/689) corrected a
+stale-checkout evidence-reading statement in [recorded
+evidence](../evidence/documentation/stale-checkout-instruction-divergence-2026-10-02.md).
+[#688](https://github.com/ModernNomad-98/Project-Aegis/pull/688) recorded a
+textual triage of ROUTE-002 new edges in the [ROUTE-002 triage
+record](../evidence/route002-triage-2026-10-09/README.md). None of these merges
+shows that a merged source change became running behavior, and no historical
+green-CI, provider or host result is asserted here.
+
+**Selected outcomes, counted once at this cutoff.** Membership and the
+per-outcome historical ranges are the [#685 selected-outcome
+table](#catch-up-reassessment-after-pr-685-2026-10-09); the table below
+reconsiders each of its ten rows exactly once, adds no row, and selects nothing.
+
+| Selected outcome, counted once | Status at #688 | Owning record and why these merges do not close it |
+| --- | --- | --- |
+| WP-2B-3: accepted candidate inputs | open | The [BER backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes) still leaves the candidate labels and private-input acceptance pending; no assessed merge accepts an input; low. |
+| WP-2B-3: measured calibration and OD-1 ratification | open | The same [BER backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes) keeps calibration, selected execution source, allowance, host proof and owner ratification separate; low. |
+| R4/R5 selected-host capability proof | open | The [BER evidence gates](behavioral-eval-runner-backlog.md#6-phase-2b-0-evidence-gates--r1r5) still require selected-host proof, and the disposable VM remains paused in the [open-decisions record](aegis-open-decisions-2026-09-23.md); low. |
+| WP-2B-4 limited live suite | blocked | The [BER status map](behavioral-eval-runner-backlog.md#start-here-status-and-routes) leaves this live phase behind calibration, OD-1, host evidence and its own authority; low. |
+| WP-2B-5 generic corpus | backlog | The [BER phase map](behavioral-eval-runner-backlog.md#start-here-status-and-routes) leaves the corpus after WP-2B-4, curated fixtures and separate phase authority; low. |
+| WP-2B-6 scheduling and dataset operations | backlog | The same [BER phase map](behavioral-eval-runner-backlog.md#start-here-status-and-routes) leaves scheduling, cost, quarantine and dataset controls after the corpus; low. |
+| WP-2B-7 advisory CI and operator workflow | backlog | The same [BER phase map](behavioral-eval-runner-backlog.md#start-here-status-and-routes) leaves this after WP-2B-6 plus a separate workflow review and authority; offline regression CI is not its delivery; low. |
+| CP-WP-003 real authority and execution capability | blocked | The [control-plane status table](resumable-control-plane-backlog.md#start-here-purpose-and-current-delivery) still lacks real source authority, independent freshness, containment, bounded evidence and bounded liability; low. |
+| CP-WP-004 one bounded real integration | blocked | The same [control-plane table](resumable-control-plane-backlog.md#start-here-purpose-and-current-delivery) requires CP-WP-003 evidence, one chosen operation and separate authority; the [integration policy recorded by #645](https://github.com/ModernNomad-98/Project-Aegis/pull/645) chooses a release order, not this integration; low. |
+| Issue #101 package 7, release readiness | open | [Package-7 readiness](aegis-setup-routing-plan.md#package-7-readiness-against-issue-101-acceptance) still requires Stage 4B actual-host proof and a later approved, predeclared comparison; the recorded first-tranche [APR-108](../approvals/APPROVAL_REGISTER.md#aegis-apr-108-issue-101-stage-4b--first-tranche-observation-grant) keeps execution blocked; no host result is credited; low. |
+
+**Totals and unestimated selected residuals.** The ten historical ranges remain
+**71–146 agent-estimated active hours** — an **unvalidated historical subtotal**,
+not measured remaining work — and no assessed merge supplies a new per-row
+active-work basis, so no exact deduction applies. The six still-unselected
+expansion groups remain **68–140 active hours**, an **unvalidated historical
+group total** whose Phase 3/Phase 4 overlap at [source row
+#127](../skills/03-saas-security-rls.md) prevents an exact unique-capability
+deduction. The [Stage 4B host
+mechanics](aegis-setup-package-4b-host-proof-protocol.md) and the [BER-BKL-009
+real-host, runtime, privacy and cleanup
+residual](behavioral-eval-runner-backlog.md#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy)
+stay outside both figures and unestimated. A finite full selected or all-backlog
+estimated time to completion (ETA) remains **not derivable**, and the
+owner-paused [readability index repair and
+switch](#material-owner-decision--2026-10-07-readability-count-authority) stays
+outside the subtotal. [#686's CI duration
+sample](../evidence/metrics/metrics-1-ci-duration-2026-10-08.json) does not
+convert merge intervals or job durations into active labor.
+
+**Conditional and unselected outcomes.** The seven rows of the [#685 conditional
+table](#catch-up-reassessment-after-pr-685-2026-10-09) are unchanged at this
+cutoff: Issue #101 package 5 (local helper), Issue #101 package 6 (online
+helper), BER-BKL-010 signing or immutable storage, BER-BKL-014 additional
+adapters, BER-BKL-015 optional operations products, strategic skill expansion,
+and multi-judge arbitration with CP-FUT-001. Each keeps its unbounded or
+historical range and its named dependency; none gains a selection from an
+assessed merge, and the new [expansion-batch
+proposal](unselected-expansion-skill-batch-proposal.md) adds one available
+candidate batch without changing those dispositions. The six still-unselected
+historical expansion groups — QA Tier 2, QA Tier 3, Phase 2, Phase 3, Phase 4
+and Phase 5 extras — likewise keep their [#685 group
+table](#catch-up-reassessment-after-pr-685-2026-10-09) dispositions; the
+already-delivered QA Tier 1, Phase 6, Phase 7 and remaining category-08 batches
+are not re-added, and the Phase 3/Phase 4 row #127 overlap is not duplicated.
+The parked `UNRUN` tightening and confidential conduct intake remain parked,
+and the authenticated control-plane source inspection keeps its separate
+selection, owner-direction and reviewed-grant gates; none of them is activated
+here.
+
+**Bounded, non-binding horizons.** **Now** describes delivered documentary
+outcomes and this recording: six assessed integrations, one carried window and
+this checkpoint. **Next** identifies already-recorded gates that remain
+unresolved — candidate and private-input acceptance, calibration and OD-1
+ratification, selected-host proof, real control-plane authority, the #682 repair
+path's recorded conditions, and the owner selection any expansion batch would
+need. **Later** retains the dependent and optional outcomes above. No precise
+dates, capacity or workload promise is made, and more agents or more documentary
+merges alone do not prove a selected outcome complete; comparative value and
+active capacity remain unknown.
+
+**Next trigger.** The next reassessment falls due when the boundary after M
+closes — three further integrations after M — and an earlier reassessment is
+owed on a material owner decision, under the retained five-merge rule in the
+[measurement
+rule](aegis-execution-metrics.md#start-here--current-measurements). This pull
+request participates normally in the continuing count. Throughout this section a
+PR number identifies an integration, a named WP/CP/QA outcome identifies backlog
+work, and an AEGIS-APR identifier identifies a recorded owner grant or condition
+in the [approval register](../approvals/APPROVAL_REGISTER.md).
