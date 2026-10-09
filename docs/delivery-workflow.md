@@ -130,7 +130,7 @@ column of the stage table. The maintenance rule is
 | `SD-C` | IMPLEMENT | **COMPLETE** or **INCOMPLETE**. **COMPLETE requires an immutable head: the commit SHA, the tree it resolves to (`git rev-parse <head>^{tree}`), and the base commit the change is against, all recorded** — so the next stage audits fixed objects rather than a moving branch, and "the diff at an exact head" is fully determined. The **tree** fixes content; the **base** fixes the diff. | COMPLETE |
 | `SD-D` | IMPL AUDIT | **ACCEPT** or **REVISE**, resolved **per acceptance criterion**: every criterion is `MET`, `NOT MET` or `UNRUN`. ACCEPT requires **no `NOT MET`**, and **every `UNRUN` must correspond to a criterion the plan at `SD-A` declared not verifiable at this head, with its reason recorded**. A criterion that becomes `UNRUN` at audit time and was **not** so declared forces **`REVISE`** — it is a finding about the implementation or the plan, not a gap to wave through. | ACCEPT |
 | `SD-E` | VALIDATE | **PASS**, **INCOMPLETE — UNRUN LISTED**, or **FAIL**. | PASS, and INCOMPLETE — UNRUN LISTED **only when its condition below is met** |
-| `SD-F` | FINAL REVIEW | **ACCEPT** or **REVISE**, on the exact 40-character head; **and the PR template's *Security-relevant surface?* question is answered** — `No`, or `Yes` with the surfaces named; **and the PR's "Aegis skills used" table is present, with a row for every stage that ran**; **and the `## Reconciliation witness` block is present with one row per numbered site**; **and the verdict names a content hash over [the bound fields](#the-bound-fields), which void the verdict if they change.** | ACCEPT |
+| `SD-F` | FINAL REVIEW | **ACCEPT** or **REVISE**, on the exact 40-character head; **and the PR template's *Security-relevant surface?* question is answered** — `No`, or `Yes` with the surfaces named; **and the PR's "Aegis skills used" table is present, with a row for every stage that ran, each applicable row checked against its captured self-authored source under [the skills-row protocol](#authoring-and-publishing-skills-rows)**; **and the `## Reconciliation witness` block is present with one row per numbered site**; **and the verdict names a content hash over [the bound fields](#the-bound-fields), which void the verdict if they change.** | ACCEPT |
 | `SD-G` | MERGE | **MERGED** or **NOT MERGED**, with [the receipt](#the-receipt-what-stage-g-must-be-able-to-show) recording a status per `MG` ID. | MERGED |
 
 > **`SD-E: INCOMPLETE — UNRUN LISTED`** is affirmative when every unrun
@@ -200,6 +200,9 @@ stage's exit cell points here rather than carrying its own version.
 4. **Deviation flags** wherever a stage departs from the plan or a prior decision.
 5. **A continuation line**: what the next stage needs in order to pick the work up
    cold.
+6. **A self-authored skills row or rows**, when skills were applied, in the
+   stage's normal handoff or posted record. Preserve the author, stage round,
+   reviewed target and any `UNRUN` limits for [sourced publication](#authoring-and-publishing-skills-rows).
 
 ### The receipt: what Stage G must be able to show
 
@@ -476,7 +479,8 @@ Every PR reports its skill usage in a table with exactly these four columns:
 The rules for that table:
 
 - List **only** skills actually read and applied to that PR.
-- **Each agent reports its own usage.** No agent writes another stage's row.
+- **Each agent authors its own usage.** An already authorized PR editor may
+  publish another agent's exact self-authored row under the protocol below.
 - "Followed the skill" is **insufficient** — name the procedure and the check.
 - **Label incomplete checks and unavailable evidence** rather than omitting them.
 - **State when no matching skill exists.** That is a valid and expected answer.
@@ -492,6 +496,96 @@ The rules for that table:
   fix a table*, the other says *if you change the table, the verdict you hold is
   void*.
 - **Do not create a separate document** merely to list skills.
+
+### Authoring and publishing skills rows
+
+The stage agent authors the complete four-column Markdown row or rows for its
+own work in its normal handoff or posted stage record. Each row identifies the
+agent, stage and round, the actual procedure, result and evidence, including
+every applicable `UNRUN` limit. The author records the target plan revision or
+digest for A/B, the exact candidate head for head-bound stages, and any narrower
+evidence revision that matters. An already authorized PR editor may copy that
+existing text into the PR description. The editor does not author, summarize,
+combine, paraphrase, translate, repair or invent another agent's account, change
+its skill list or fill a missing result. A malformed or incomplete row goes back
+to its author for a new self-authored source revision. Exact copying transfers
+no stage credit, PR-holder role, edit or merge authority, or tool permission;
+the current task authority and PR holder still control metadata edits.
+
+Use a retrievable fixed source: an immutable artifact or commit revision with a
+locator, or a retained exact capture with a content digest and locator. The
+source binds the authored row to its agent, stage, round and reviewed target.
+A mutable URL or comment ID alone, a digest of unrelated content, or an
+unretained string does not establish that binding. A digest checks captured
+content, not human identity. If the fixed source is lost, inaccessible or
+changed so its capture cannot be recovered, treat the row as unavailable
+evidence; do not reconstruct it from a rendered table or memory. A correction
+is a new author record with a new binding, never a silent overwrite of a cited
+source under its old identifier.
+
+Compare each complete published row with the decoded raw Markdown row in its
+source, excluding only the transport line terminator. Preserve every UTF-8
+character inside the row, including cell text, whitespace, escaping, links,
+backticks, author, target and `UNRUN` wording. Decode JSON transport escaping
+once; literal escape characters in the authored row remain literal. Rendered
+appearance, Unicode or whitespace normalization, and the separate normalized
+bound-field hash cannot substitute for this raw comparison. An editor cannot
+invent missing author, round or target facts to make a copied row fit.
+
+Immediately after the four-column table, put a compact source record **inside
+the existing skills bound-field payload** for each current row. Identify agent,
+stage, round, source row ordinal or locator, reviewed target, retrievable source
+locator, and immutable revision or digest of the retained exact author record;
+retain its limitations. A group record is acceptable only when it explicitly
+identifies every row and ordinal sharing that source. For example:
+
+```text
+Row source: agent=<author>; stage=<stage>; round=<round>; row=<source locator/ordinal>;
+target=<plan digest or candidate head>; source=<retrievable locator>;
+binding=<immutable source revision OR digest of retained exact author record>.
+```
+
+The digest of an author record excludes this later publisher-added source
+record, avoiding self-reference. This is provenance within the existing skills
+field, not a fifth table column, fourth bound field, new sentinel or separate
+document. Match author, stage, round and target to the **operative** stage
+record. A D/E/F row for an older head or round cannot stand for a later one;
+an A/B row can remain applicable while its captured plan/audit revision still
+binds. If older rows remain in the table, mark **their source records**
+historical or superseded; keep each copied row string unchanged. Those rows
+cannot substitute for the current round. Keep their original stage history in
+the author records.
+
+The PR holder coordinates **one metadata writer at a time**, including any
+finite publication action delegated to another authorized editor. Before an
+edit, the publisher reads the latest raw body and checks its expected revision;
+the edit changes only the intended skills payload and source records. Send a
+structured body argument or UTF-8 body file with real newlines, not shell text
+containing JSON-escaped newline strings. Immediately read back the server's
+decoded raw body. Compare every inserted row with its captured source, confirm
+other sections remain intact, and confirm the existing sentinel pairs still
+delimit the intended fields. Record before/after body revision, time and digest
+in the normal stage handoff. If an intervening edit is found or readback loses
+a row, source record, marker or unrelated content, stop and reconcile from the
+latest body and fixed sources; do not overwrite it from an old full-body copy.
+This serialization and readback are procedural, not an atomic API guarantee.
+
+For the completed table, F finishes the work and source comparisons it will
+report, then authors and captures its own usage row in its stage record. The
+authorized publisher inserts that row and the current source records; F reads
+back and compares the completed skills payload, including its own row, before
+computing the existing three-field hash and posting its verdict outside the
+bound fields. F's row reports work done and limits without preclaiming a future
+verdict or embedding its own source digest or the eventual body hash. This
+does not make F the author of another stage's row or relax stage independence;
+F still reviews the implementation independently.
+
+The [bound-field invalidation rule](#the-bound-fields) also reaches source
+records: a known edit to the skills payload voids F's prior verdict even when
+a whitespace-only change happens to leave the normalized hash equal. G records
+its normal skill usage in the merge receipt. A required pre-merge skills-field
+edit returns through fresh F; later corrections belong in receipts and do not
+retroactively change the body that F accepted.
 
 ## Honesty: unavailable tests and insufficient authority
 
@@ -750,7 +844,8 @@ else:
   condition under which a stage entry is satisfied.** Such a statement belongs in
   the one normative block that owns it — the `MG` block, the `SD` block,
   [the dependency block](#stage-dependencies),
-  [the handoff block](#stage-handoff), or, for the chain rule's entry condition,
+  [the handoff block](#stage-handoff), [the skills-row block](#authoring-and-publishing-skills-rows)
+  (only for row content and provenance), or, for the chain rule's entry condition,
   [the seven stages](#the-seven-stages), which states it once. **These clauses
   reach every ID-bearing condition on the page** — every statement of when an
   `MG` condition or an `SD` disposition is reached or satisfied, and the chain

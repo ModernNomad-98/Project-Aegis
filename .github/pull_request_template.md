@@ -56,16 +56,20 @@ it.
 
 List **only** skills actually read and applied to this PR, each with the
 procedure and the check it contributed — "followed the skill" is not enough.
-Each agent reports its own usage. Label an incomplete or unavailable check
-rather than omitting it, and state plainly when no matching skill exists; that
-is a valid answer, and an unanswered table is not. Do not create a separate
-document for this table.
+Each agent authors its own usage. An authorized editor may publish the exact
+self-authored row with its fixed source record under the
+[skills-row protocol](https://github.com/ModernNomad-98/Project-Aegis/blob/main/docs/delivery-workflow.md#authoring-and-publishing-skills-rows).
+Label an incomplete or unavailable check rather than omitting it, and state
+plainly when no matching skill exists; that is a valid answer, and an unanswered
+table is not. Do not create a separate document for this table.
 
 <!-- bound-field: skills -->
 
 | Skill | Stage / agent | How applied | Result / evidence |
 | --- | --- | --- | --- |
-| <skill name, linked to its repository `SKILL.md`> | <the stage and the agent identity> | <the specific procedure or checks performed> | <the finding, validation result or evidence link> |
+| <skill name, linked to its repository `SKILL.md`> | <the stage, round and agent identity> | <the specific procedure or checks performed> | <the finding, validation result or evidence link> |
+
+<!-- Row source: agent=<author>; stage=<stage>; round=<round>; row=<source ordinal/locator>; target=<plan digest or candidate head>; source=<retrievable locator>; binding=<immutable revision or retained author-record digest>; limits=<UNRUN text, if any>. Repeat for each current row. -->
 
 <!-- bound-field: end -->
 
