@@ -133,6 +133,8 @@ and are untriaged census rows. The v1.13.4 files remain in git history at
 [`c14338d`](https://github.com/ModernNomad-98/Project-Aegis/tree/c14338d254bde3fd7fb9b8060033299cde5d5197/artifacts/audits)
 (PR #503's merge). The historical counts below are unchanged.
 
+**ROUTE-002 new-edge triage, 2026-10-09.** A fresh v1.13.4 audit at main `8e11c8f4c2777265e254057ce0fa1e52f0cf03bf` still reports 255 ROUTE-002 informational findings: 231 unchanged prior census pairs and 24 newly [reviewed textual pairs](../evidence/route002-triage-2026-10-09/README.md) (17 a, 2 b-high, 5 b-medium). N12 and N13 are candidates for a separately owner-selected reciprocal proposal only. The review records no owner selection of new skill edits, observed model misrouting, behavioral pass or new defect ID; the historical baseline paragraph above remains as recorded.
+
 Rules of this register (from the program's operating rules):
 
 - AEGIS-001..059 are never renumbered, merged, or reused. New IDs start at
