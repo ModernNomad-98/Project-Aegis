@@ -70,6 +70,26 @@ or change repository settings to make a change mergeable. Auto-merge is not arme
 See [offline CI](../offline-ci.md) for current job names, protected paths and
 post-merge verification, and [CONTRIBUTING](../../CONTRIBUTING.md) for delivery rules.
 
+> **CI reading note — appended 2026-10-08.** The general references above to
+> "passing Linux and Windows jobs" and "both offline verification jobs"
+> predate the path scoping added in PR #676. At revision `52289779`, the
+> [workflow](../../.github/workflows/validate-skills.yml) selects
+> `windows-offline-checks` on a pull request only for changes under `tools/`
+> or to `requirements-ci.in` or `requirements-ci.txt`; the two tools-test
+> jobs are selected only for `tools/` changes. All three also depend on the
+> `changes` job, and are selected on a push to `main`. The
+> [current CI guide](../offline-ci.md#reading-a-failure) distinguishes a
+> deliberate path-filter skip from a skip caused by `changes` failing.
+> A skipped job is recorded as skipped, not passed.
+>
+> Job selection does not establish permission to merge. The canonical
+> conditions are [MG1–MG5 in the delivery workflow](../delivery-workflow.md#before-merging-stage-g-entry-conditions).
+> Each applicable grant keeps its own named checks and evidence requirements;
+> in particular, the Linux and Windows requirements in AEGIS-APR-047 above
+> are not removed by this note. The [approval register](../approvals/APPROVAL_REGISTER.md#how-to-read-this-register)
+> and its lifecycle events govern the grant's scope. This reading note changes
+> no grant, merge condition, job selection or protected-file exception.
+
 The historical policy below predates this owner grant and the expanded offline
 CI guard. Its original dates, incident description and old guard message are
 retained as history, rather than current instructions to request repeat consent.
