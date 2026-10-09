@@ -3892,6 +3892,22 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
        says "do not edit old entries", and the item concerns the scope of
        AEGIS-APR-117, not what AEGIS-APR-113 decides.
 
+- **D74 (2026-10-08) — Exact sourced publication of stage skills rows.**
+  The owner selected exact sourced copying of another stage agent's
+  self-authored four-column skills row by an already authorized PR editor.
+  This resolves the literal "no agent writes another stage's row" ambiguity:
+  authorship stays with the stage agent while publication may be delegated as
+  an exact copy from a fixed, retrievable source. Preserve agent, round,
+  reviewed target and `UNRUN` limits; compare the completed table with those
+  sources before the existing bound-field hash. The canonical procedure is
+  [Authoring and publishing skills rows](../delivery-workflow.md#authoring-and-publishing-skills-rows),
+  and the complete owner question and selected label are in the new
+  [approval-register policy record](../approvals/APPROVAL_REGISTER.md).
+  The choice grants no new PR edit, stage, merge, tool or reserved-work
+  authority and does not rewrite D72 or AEGIS-APR-105. Source capture and
+  serialized readback are procedural evidence, not machine enforcement or an
+  atomic multiwriter guarantee.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

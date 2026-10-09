@@ -5249,3 +5249,71 @@ the entry governs.
   clause from `tools/aegis_delivery_control/engine.py` and its README.
   This records package consumption, not a new certification of historical
   tests or of every claim in the immutable grant.
+
+### AEGIS-APR-123: Exact sourced publication of stage skills rows
+
+- **Event:** POLICY DECISION. This selects a policy target — the skills-row
+  authorship/publication protocol in `docs/delivery-workflow.md` — and grants
+  no work of any kind. It is not a GRANT, supersession or consumption event.
+- **Status at recording:** ACTIVE on this reviewed register append.
+- **Decision maker / effective order:** Peter Nguyen. The exact owner-answer
+  date/time was not captured. The selection was relayed by the coordinator in
+  the ROWPOLICY-1 assignment of 2026-10-08.
+- **Recorded at / by:** 2026-10-09 18:03:55 UTC / rowpolicy-stage-c. This is a recording
+  timestamp, not the owner-answer timestamp.
+- **Question, quoted verbatim as relayed through the coordinator:**
+
+  > For future Project Aegis PRs, should the workflow explicitly allow an authorized PR editor to copy another stage agent’s exact, self-authored four-column skills row? The editor would preserve the agent, stage round, source revision or digest, and any UNRUN limits; the final reviewer would compare every row with its source before hashing the completed table.
+
+  **Selected label, quoted verbatim:** Allow exact sourced copying (recommended)
+
+  No additional option description or exact owner-answer timestamp was
+  supplied to this record.
+- **Reason:** The literal workflow wording "No agent writes another stage's
+  row" does not distinguish authorship from publication. This choice resolves
+  that ambiguity: authorship stays with the stage agent, while an already
+  authorized PR editor may publish the exact self-authored row from a fixed,
+  retrievable source, preserving agent, round, reviewed target and any `UNRUN`
+  limits, with the final reviewer comparing every row to its source before
+  hashing the completed table.
+- **Scope allowed (selected policy):** The selected policy target is the
+  [Authoring and publishing skills rows](../delivery-workflow.md#authoring-and-publishing-skills-rows)
+  section of `docs/delivery-workflow.md`. An already authorized PR editor may
+  copy another stage agent's exact, self-authored four-column skills row,
+  preserving the agent, stage round, source revision or digest and any `UNRUN`
+  limits; the final reviewer compares every row with its source before hashing
+  the completed table. The companion decision entry is `D74` in the
+  [reconciliation record](../reconciliation/step-0-reconciliation-v4.md) §5.
+  Author-owned exact four-column rows, fixed source, round/revision/`UNRUN`
+  fidelity, serialized publication with readback, and final source comparison
+  before hashing are the reviewed procedure recorded in that section, not
+  additional verbatim owner prose.
+- **Scope FORBIDDEN / boundaries:** This choice grants no work and authorizes
+  no action on its own. It does not let any agent author another stage's row,
+  compose, summarize, paraphrase, translate, repair or invent a row, or edit a
+  PR without existing task authority; it conveys no stage credit, PR-holder
+  role, commit, push or merge permission, extra tool access, history rewrite,
+  relaxed checks, or reserved-work authority. It narrows only the old literal
+  prohibition sufficiently to permit the chosen exact publication. It does not
+  supersede or consume `AEGIS-APR-105`; the seven-stage policy remains, and
+  this later choice clarifies its reporting part. It does not authorize the
+  merge of the PR recording it.
+- **Evidence:** The question and selected label above were relayed verbatim
+  from the direct current owner conversation by the coordinator in the
+  ROWPOLICY-1 assignment of 2026-10-08 and captured in the accepted Stage A
+  plan `PLAN-rev1.md` (SHA-256
+  `adb968cdbad28215fb261f8a8b90f4e202cc8874f903fc0f6d8965bde65aad63`) and its
+  independent Stage B audit (SHA-256
+  `912ca4cc55c7566f13dc2baaca032929612b8cd66e14776c2fbe59bfd75a32be`). These
+  are transcriptions of a coordinator-verified relay, not the owner's own
+  signed repository text; the register preamble accepts current direct owner
+  instructions before transcription. The captured plan and audit provide
+  design and recording evidence, not independent proof that the owner authored
+  the option prose.
+- **New authority:** None. The choice grants no new PR edit, stage, merge,
+  tool or reserved-work authority. Effective permission remains governed by
+  the complete register history and the owner's current instructions.
+- **Expiry / future changes:** No calendar or use limit was stated for "future
+  Project Aegis PRs". Apply until the owner later changes the policy. A later
+  change is recorded with its own evidence; this entry does not pre-authorize
+  one.
