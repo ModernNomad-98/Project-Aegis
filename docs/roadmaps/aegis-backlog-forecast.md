@@ -10,6 +10,18 @@
 > superseded, as its own appended note says. This note adds no date, figure or
 > estimate, and changes no dated text.
 
+> **Skill-expansion overlap — added 2026-10-08.** At source revision
+> `5228977920ee479e1fe1ec6b8d56f8fc24c14947`, the
+> [skills catalog](../skills-catalog.md) lists `security-impact-note-author`
+> in Phase 3 and “security-impact-note authoring” in Phase 4. These are two
+> group listings of one capability: row #127, “Security Impact Note Authoring”,
+> in the [security source catalog](../skills/03-saas-security-rls.md).
+> The dated Phase 3 and Phase 4 forecast rows therefore have overlapping
+> membership. Their group estimates do not establish an exact hours deduction
+> or a corrected value for the later 68–140 agent-hour range. The historical
+> estimates remain unchanged; this note supplies no revised total. This note
+> assigns #127 to neither group for delivery and selects no skill build.
+
 **Current reading at the 2026-09-30 catch-up checkpoint after #554:** terms used in this section: **WP-2B-3** to **WP-2B-7** are Behavioral Eval Runner (BER) work packages in the [runner backlog](behavioral-eval-runner-backlog.md); **CP-WP-003** and **CP-WP-004** are control-plane work packages in the [control-plane backlog](resumable-control-plane-backlog.md); **R4/R5** are the runner's selected-host capability and full-profile requirements; **D69**, **D70** and **D71** are rows in the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) log; **BER-BKL-009** is a runner backlog item; **TBD** is to be determined.
 
 The [catch-up checkpoint after #554](#five-merge-checkpoint--2026-09-30-after-pull-request-554-catch-up-for-12-missed-windows) measured the 62 merged PRs strictly after #491 and through #554: twelve complete five-merge windows and residuals #551 and #554. No selected gated row closed, so the subtotal remains **71–146 provisional active hours**; Stage 4B and BER-BKL-009 remain TBD, the virtual machine (VM) is paused, and there is **no finite estimated time to completion (ETA)**. The former near-term delivery batches landed; this checkpoint is the only quantified in-progress work at **0.5–1.5 agent-estimated active hours**. D69, D70 and D71 reduce unselected skill expansion from 96–200 to **68–140 agent-estimated active hours**. The next backlog pick remains deferred. Pull request #556 (`afe703a4bc2c2f5f299b26967b84a6f05ebfb4bb`) reconciled the readability-ledger arithmetic **at that merge** to 653 tracked Markdown files, 586 accepted reader pages, one generated report, 55 classified synthetic fixtures and 11 known pending pages; those are `afe703a4` values, and the ledger's live totals have since moved to 656 / 584 / 1 / 55 / 16. *(Superseded-state note appended 2026-09-30: those five figures are themselves out of date, because #567 and #568 rewrote that ledger's own `Start here — current reading` block — `git diff 410b90aa origin/main -- docs/roadmaps/aegis-documentation-readability-backlog.md` shows the rewrite. That block now dates its latest count to #561 (`410b90aa`) at 653 tracked Markdown files, 584 accepted reader pages, one generated report, 55 classified synthetic fixtures and thirteen known pending pages, and records the skill-eval round as superseding those totals with three newly pending pages, its own arithmetic closing as 584 + 1 + 55 + 16 = 656 tracked files and 16 pending; PR #577 then added one page, so the tip count is 657. This is a dated snapshot, so it is annotated, not rewritten.)* See the [catch-up checkpoint after #554](#five-merge-checkpoint--2026-09-30-after-pull-request-554-catch-up-for-12-missed-windows).
