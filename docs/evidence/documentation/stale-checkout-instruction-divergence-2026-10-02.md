@@ -18,6 +18,7 @@ The `M`, `A`, and `D` labels in the path table mean, respectively: present in bo
 
 **Command notation and effects.** Replace `<checkout>` or `<root>` with the intended checkout path, `<sha>` with a commit identifier, `<rev>` with a selected revision or commit, and `<path>` with a repository path; quote paths containing spaces.
 These angle-bracket names are placeholders, never literal shell input or redirection. `file` and `f` are scratch output filenames, not repository objects.
+For PowerShell .NET file methods, pass a quoted path string even when the path has no spaces (or a variable containing a path); for example, `[System.IO.File]::ReadAllBytes('f').Length`.
 A displayed `git fetch` contacts the remote and updates local Git metadata; `git ls-remote` queries remote refs without updating those local refs.
 The displayed `git diff`, `rev-list`, `rev-parse`, `show`, and `cat-file` queries read local state.
 In `git ls-files --eol`, `w/` describes the working file, `i/` Git's index (staged copy), and `attr/` the applicable line-ending attribute.
