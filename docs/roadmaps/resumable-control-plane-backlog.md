@@ -330,6 +330,25 @@ appears unreachable. Removing or reworking it would change runtime
 behaviour, which AEGIS-APR-086 forbids, so it is carried here as a CP-WP-003
 input rather than acted on.
 
+> **Current-evidence clarification — 2026-10-09.** The readiness assertion
+> suggested in the historical note above already runs:
+> [test_t03_occupied_slot_denies_other_run_intent](../../tools/aegis_delivery_control/tests/test_guard_traceability.py)
+> calls the inherited
+> [test_t02_repository_slot_in_another_run_blocks_readiness](../../tools/aegis_delivery_control/tests/test_storage.py),
+> which asserts that run-2 is BLOCKED and its blockers include
+> OPERATION_SLOT_OCCUPIED. A focused synthetic run on the tools tree at main
+> 625fc66711eaf7b3ee788cbc2dff98f05f147c1c confirmed that assertion executes,
+> then commit_intent denies run-2 at 'T03 requires durable PLANNED state'
+> before its separate occupied-slot branch. Adding the same readiness
+> assertion would duplicate existing coverage; this test still does not prove
+> that later branch's independent denial. Any test isolating that branch
+> remains a separately scoped follow-up. The second historical
+> receipt-accounting finding is unchanged and has not been re-proven here.
+> The [real-authority decision packet](cp-wp-003-real-authority-decision-packet.md#decisions-and-proof-still-missing)
+> also carries the existing evidence-computed-guard prerequisite. CP-WP-003
+> and CP-WP-004 remain BLOCKED; this clarification grants no runtime or
+> real-capability work.
+
 No later package is authorized by this register or by CP-WP-001 acceptance. BER
 integration, if requested, additionally follows BER's current phase/evidence gates.
 
