@@ -1,6 +1,13 @@
 # Project Aegis execution measurements
 
 ## Start here — current measurements
+> **Current checkpoint — 2026-10-09, frozen through PR #685.** Read the
+> [merge and measurement checkpoint](#merge-and-measurement-checkpoint-after-pr-685-2026-10-09)
+> for the complete census, retained cadence and unavailable time splits.
+> The older “current/latest” #491 wording below is dated evidence; the
+> [forecast reassessment](aegis-backlog-forecast.md#catch-up-reassessment-after-pr-685-2026-10-09)
+> discusses remaining outcomes and estimate uncertainty.
+
 
 > **Reader key — added 2026-10-01.** These blocks are dated measurements, newest
 > first; the date says how each figure was obtained, not whether it governs now.
@@ -3034,3 +3041,236 @@ documentation model narrowed from 48.35–168.85 to 47.15–165.1 hours.
 Active-only, review, CI and queue durations are not separately instrumented;
 the batch PR will report observed first-work-to-merge wall time against its
 original ETA.
+
+## Merge and measurement checkpoint after PR #685 (2026-10-09)
+
+This dated record lets maintainers reproduce the backlog's missed five-merge
+cadence and read its time evidence. It freezes repository integration history
+through pull request (PR) #685 at
+`8e11c8f4c2777265e254057ce0fa1e52f0cf03bf` (2026-10-09 02:00:04
+Coordinated Universal Time, UTC), strictly after #554 at
+`e0c9a0006d130318492ba5fc620a7af13bf4525e` (2026-09-30 02:19:32
+UTC). The linked [forecast reassessment](aegis-backlog-forecast.md#catch-up-reassessment-after-pr-685-2026-10-09)
+uses this census to discuss outcome status and estimate limits; this page
+records the count and timing method, rather than assigning work authority.
+
+**Complete PR census.** At 2026-10-09 07:27:37 and 07:27:49 UTC, two reads of
+GitHub REST `GET /repos/ModernNomad-98/Project-Aegis/pulls?state=closed&base=main&sort=created&direction=asc&per_page=100`
+followed all seven pages. Each page sequence contained
+100/100/100/100/100/100/80 records: 680 unique closed PR identities.
+Explicit UTC conversion of non-null `merged_at` values and the exclusive
+lower/inclusive upper endpoints above exclude 543 merged before or at #554,
+13 closed but unmerged, and zero merged after #685; **124** remain. The two
+reads agree on the complete included PR-number/integration-SHA set. All 124
+unique `merge_commit_sha` values occur once in exactly the same order in
+`git rev-list --first-parent --reverse e0c9a0006d130318492ba5fc620a7af13bf4525e..8e11c8f4c2777265e254057ce0fa1e52f0cf03bf`.
+That chain contains **112 single-parent** and **12 multiple-parent**
+integrations. No unmatched first-parent/direct commit or ambiguous same-second
+boundary occurred in this interval. A merge-commit-only count would omit most
+PRs. The PR title in the table is a scope cue, and each link is the GitHub PR
+record, including its files and mutable discussion; the full SHA is the frozen
+integration identity. Current PR text is not treated as a contemporaneous
+measurement without a separately dated receipt.
+
+The canonical census is the 124 table rows below serialized as
+`number|merged_at_UTC|merge_commit_sha|main`, in UTC/integration order,
+UTF-8 with LF and a trailing LF. Its SHA-256 digest is
+`07a9e45ea64795825107781445e7dd43cdd1d1cc374999c9e1ac3a5e45c5524b`.
+The table deliberately includes documentation, governance and code PRs alike:
+cadence counts integrated PRs, not only the work that advances a selected
+outcome.
+
+**Retained anchor and complete windows.** The published [#344
+checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-26-after-pull-request-344)
+started the next count after #344, while documenting a historical one-merge
+shift relative to a strict earlier count. The [#370
+checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-26-after-pull-request-370-catch-up-for-the-windows-ending-349-354-359-364-369)
+retained that anchor; the later [#491
+checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-28-after-pull-request-491-catch-up-for-3-missed-windows)
+and [#554
+checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-30-after-pull-request-554-catch-up-for-12-missed-windows)
+continued rather than resetting it. #554 records 62 integrations after #491:
+12 complete windows and the carried residual #551, #554. The next window
+therefore closes after three more integrations, at #555. Each following row
+has exactly five PRs in verified first-parent order. The only full forecast
+reassessment merged in this window is #555, which assesses through #554; the
+later forecast/metrics edits through #685 are annotations, reader keys or the
+material readability decision, and do not assess these later five-PR
+boundaries. Thus **25 cadence points were missed**, ending at #555 through
+#684 below; #685 is the one unclosed residual. This is one present catch-up,
+not a retrospective claim that 25 timely assessments happened.
+
+| Window | Five integrated PRs, first-parent order | Boundary |
+| ---: | --- | --- |
+| 1 | #551, #554, #556, #557, #555 | #555 |
+| 2 | #558, #559, #560, #561, #562 | #562 |
+| 3 | #563, #566, #564, #567, #569 | #569 |
+| 4 | #568, #570, #571, #573, #572 | #572 |
+| 5 | #574, #575, #576, #577, #578 | #578 |
+| 6 | #579, #580, #581, #582, #583 | #583 |
+| 7 | #584, #585, #586, #588, #587 | #587 |
+| 8 | #592, #593, #594, #595, #589 | #589 |
+| 9 | #590, #591, #596, #598, #599 | #599 |
+| 10 | #600, #601, #597, #602, #604 | #604 |
+| 11 | #605, #603, #607, #606, #608 | #608 |
+| 12 | #609, #611, #613, #612, #614 | #614 |
+| 13 | #617, #610, #615, #616, #618 | #618 |
+| 14 | #619, #620, #621, #622, #623 | #623 |
+| 15 | #625, #626, #627, #624, #630 | #630 |
+| 16 | #631, #632, #634, #635, #628 | #628 |
+| 17 | #636, #637, #638, #629, #639 | #639 |
+| 18 | #640, #642, #641, #633, #643 | #643 |
+| 19 | #644, #645, #646, #650, #648 | #648 |
+| 20 | #649, #652, #651, #653, #656 | #656 |
+| 21 | #658, #657, #654, #659, #660 | #660 |
+| 22 | #662, #663, #661, #664, #666 | #666 |
+| 23 | #665, #667, #668, #670, #669 | #669 |
+| 24 | #671, #674, #673, #675, #676 | #676 |
+| 25 | #677, #678, #679, #680, #684 | #684 |
+
+**Timing provenance and limits.** The GitHub `merged_at` timestamps in the
+table are merge events at one-second precision; the endpoint span from #554
+to #685 is **8 days 23 hours 40 minutes 32 seconds of wall time**. It
+includes concurrent authoring, reviews, continuous integration (CI), owner
+decisions and idle intervals. A PR's `created_at` to `merged_at` can show only
+its open interval; creation is not first work, and integration spacing is not
+active labor or coding throughput. The 124 current PR bodies were inspected
+for recorded estimates, starts/checkpoints, reviews, CI and owner wait. Their
+format is not a uniform per-item time log, and no comparable active-work,
+review, CI or owner-wait split for this entire window is established. Those
+splits are **unavailable**, not zero. Isolated PR estimates or check receipts
+do not justify an aggregate rate or a revised selected-backlog range. This
+record makes no claim that historical exact-head checks were all green and
+does not import the separately scoped METRICS-1 duration study.
+
+**Included integration rows.** The ordinal fixes cadence order; the title is
+the PR's recorded scope cue. Times are UTC merge events from the two complete
+API reads. The PR link points to its own source and discussion; the frozen
+SHA is checked against local immutable first-parent history.
+
+| Order | PR and recorded scope cue | Merged at UTC | Full integration SHA |
+| ---: | --- | --- | --- |
+| 1 | [#556](https://github.com/ModernNomad-98/Project-Aegis/pull/556): docs: reconcile readability ledger after PR 554 | 2026-09-30T02:45:51Z | `afe703a4bc2c2f5f299b26967b84a6f05ebfb4bb` |
+| 2 | [#557](https://github.com/ModernNomad-98/Project-Aegis/pull/557): docs: improve BER backlog status readability | 2026-09-30T02:52:05Z | `4176459319e95a8d4dd1be7aa3c96e06446572e5` |
+| 3 | [#555](https://github.com/ModernNomad-98/Project-Aegis/pull/555): docs: update backlog forecast checkpoint | 2026-09-30T03:08:06Z | `9e88a5818bf6a76a4f0bfff1c57ffee97e26d17b` |
+| 4 | [#558](https://github.com/ModernNomad-98/Project-Aegis/pull/558): docs: complete step 0 reconciliation readability reread | 2026-09-30T03:14:33Z | `4012161e5b23e665e9ca2882c78bfc4e395766c6` |
+| 5 | [#559](https://github.com/ModernNomad-98/Project-Aegis/pull/559): docs: clarify audit register severity scale | 2026-09-30T03:14:51Z | `52f1b9a28d68a2a0b29613857d58fad0a568e22b` |
+| 6 | [#560](https://github.com/ModernNomad-98/Project-Aegis/pull/560): docs: re-read skills catalog | 2026-09-30T03:54:41Z | `d931443732131b925c29af415361ed1d0a7feed5` |
+| 7 | [#561](https://github.com/ModernNomad-98/Project-Aegis/pull/561): fix(scoped-approval-register): repair an unsatisfiable eval and two gaps a behavioural test exposed | 2026-09-30T03:56:09Z | `410b90aaef918cabd15465c408375438fba8f7ea` |
+| 8 | [#562](https://github.com/ModernNomad-98/Project-Aegis/pull/562): docs: record that PRs #554-#561 earned no readability acceptance | 2026-09-30T05:31:27Z | `9ec87720b1916e088710181d8d7434f7539e8cec` |
+| 9 | [#563](https://github.com/ModernNomad-98/Project-Aegis/pull/563): docs: record the commit-trailer convention and two 2026-09-29 rules (redo of #553) | 2026-09-30T08:31:36Z | `68b5e7e5ea67b8d489315ea7dd8492cb096ad9b0` |
+| 10 | [#566](https://github.com/ModernNomad-98/Project-Aegis/pull/566): docs(delivery-control): correct the verify command's side-effect claim | 2026-09-30T16:53:14Z | `3d3a0868d0a3e998a7661ad5aa5a5b788c3d9508` |
+| 11 | [#564](https://github.com/ModernNomad-98/Project-Aegis/pull/564): docs: add the skill-eval behavioral test procedure | 2026-09-30T16:53:36Z | `6a37c8d80fde284e724d944785a9e2412d832f99` |
+| 12 | [#567](https://github.com/ModernNomad-98/Project-Aegis/pull/567): docs: register the skill-eval pages and correct the ledger totals | 2026-09-30T17:13:06Z | `c97c060d5b92c1fbff5e11b5c26b49134bf60ffd` |
+| 13 | [#569](https://github.com/ModernNomad-98/Project-Aegis/pull/569): fix(delivery-control): delete the un-required false guard clause | 2026-09-30T17:50:04Z | `b9c382c40e2be58123f79bee56fd0f507216576b` |
+| 14 | [#568](https://github.com/ModernNomad-98/Project-Aegis/pull/568): docs: record the skill-eval behavioural run as evidence | 2026-09-30T18:04:56Z | `1bf9340be9e9b13e59009d8024ad05cb099835b5` |
+| 15 | [#570](https://github.com/ModernNomad-98/Project-Aegis/pull/570): docs(skill-eval): add the step-6 attribution caveat the first run exposed | 2026-09-30T18:22:08Z | `a7ac614bb24d68f9873d132a37bd7e94c48724f3` |
+| 16 | [#571](https://github.com/ModernNomad-98/Project-Aegis/pull/571): docs(register): point APR-086 readers at the correction of its false premise | 2026-09-30T18:58:21Z | `e9d2f5dabeeebf0e6c13d2100a8a76b5d27d709f` |
+| 17 | [#573](https://github.com/ModernNomad-98/Project-Aegis/pull/573): docs(evidence): correct the MCP peer dependency count from 16 to 17 | 2026-09-30T19:33:34Z | `48d32a9d213bac7879618ce74ead9cbf927bb28f` |
+| 18 | [#572](https://github.com/ModernNomad-98/Project-Aegis/pull/572): docs(catalog): fix the surface count and close three glossary gaps | 2026-09-30T19:44:40Z | `9955655188ee95c29644873c475e9c86b7ff712a` |
+| 19 | [#574](https://github.com/ModernNomad-98/Project-Aegis/pull/574): docs(ber-backlog): mark the WP-2B-3 pre-merge state as delivered | 2026-09-30T22:00:18Z | `09011d0c644f079776ea0feea4822129094f1c64` |
+| 20 | [#575](https://github.com/ModernNomad-98/Project-Aegis/pull/575): docs(forecast): repair two stale reproducers and gloss the coded identifiers | 2026-09-30T22:52:40Z | `6fd852064739c35517353a13b310fb13ca9209c9` |
+| 21 | [#576](https://github.com/ModernNomad-98/Project-Aegis/pull/576): docs(register): give the certification an explicit re-verification convention | 2026-09-30T22:52:46Z | `3aaaad410e2fc478eba4b053565bccb8d2d269f1` |
+| 22 | [#577](https://github.com/ModernNomad-98/Project-Aegis/pull/577): docs(evidence): record the 2026-09-30 session state for continuation | 2026-09-30T23:09:06Z | `b47fdb8901d3b9e0614348e0141ae88fdb2706c5` |
+| 23 | [#578](https://github.com/ModernNomad-98/Project-Aegis/pull/578): docs: close two confirmed drift findings (CP-WP-002 status, catalog live counts) | 2026-09-30T23:20:19Z | `81ad9017b92b546c8d90ab3df1e46a8b43944dcc` |
+| 24 | [#579](https://github.com/ModernNomad-98/Project-Aegis/pull/579): docs: close seven stale claims across four backlog pages | 2026-09-30T23:47:41Z | `2184b54f8c6d1b6289145e13f1c63ebf0c40b041` |
+| 25 | [#580](https://github.com/ModernNomad-98/Project-Aegis/pull/580): docs(register): define the reading aid's undefined terms and record the APR-005 consumption | 2026-10-01T00:04:20Z | `54f4a05dbd29a7742cf88a6f8c5336247876b0fb` |
+| 26 | [#581](https://github.com/ModernNomad-98/Project-Aegis/pull/581): docs(ber): add a worked example, gloss first-use terms, and point three stale claims | 2026-10-01T01:02:40Z | `f383ca9c02fb0b2d6a0cc12a900dedd0b1c21716` |
+| 27 | [#582](https://github.com/ModernNomad-98/Project-Aegis/pull/582): docs(forecast): annotate six stale-looking claims without changing their figures | 2026-10-01T01:18:53Z | `ad1f96e90ed91f114c62103bed293e73f35e5693` |
+| 28 | [#583](https://github.com/ModernNomad-98/Project-Aegis/pull/583): docs(reconciliation): re-point the drifted line-number citations | 2026-10-01T02:25:15Z | `295fc58fd756704b1b3e1b4f0e8bb954bc826fb9` |
+| 29 | [#584](https://github.com/ModernNomad-98/Project-Aegis/pull/584): docs(catalog): gloss two first-use identifiers and correct Phase 6 build status | 2026-10-01T02:25:18Z | `fa3d3b4e548669a66d8f37723e8619fc689dfa59` |
+| 30 | [#585](https://github.com/ModernNomad-98/Project-Aegis/pull/585): docs(skills): add the two owner-authorized skill clarifications | 2026-10-01T03:43:19Z | `5c8063488e8fe7a610be007acd18a1f52cc73019` |
+| 31 | [#586](https://github.com/ModernNomad-98/Project-Aegis/pull/586): docs(evidence): record the 2026-09-30 evening session state for continuation | 2026-10-01T04:21:42Z | `1955c2229328ba8968bb2c0d5e5d4a91f05c556e` |
+| 32 | [#588](https://github.com/ModernNomad-98/Project-Aegis/pull/588): docs(template): make Aegis skill use auditable at the merge gate | 2026-10-01T06:24:01Z | `06d533d56ba98d91c957db40cd94daac87e61f70` |
+| 33 | [#587](https://github.com/ModernNomad-98/Project-Aegis/pull/587): docs(register): record AEGIS-APR-100, the standing delivery pre-approval | 2026-10-01T06:25:28Z | `151d8dd0bc3ee27bc0fc85a8cf375d68653e952d` |
+| 34 | [#592](https://github.com/ModernNomad-98/Project-Aegis/pull/592): chore(gitignore): ignore the reserved .aegis-control-plane/ scratch path | 2026-10-01T14:33:07Z | `4d604b97ddaacb005aa0748037966a0047d8922d` |
+| 35 | [#593](https://github.com/ModernNomad-98/Project-Aegis/pull/593): docs(agents): make auditing your own state a standing repository rule | 2026-10-01T16:40:16Z | `6299dcbf48a3edfb7994c7c737f3c9a5a2653739` |
+| 36 | [#594](https://github.com/ModernNomad-98/Project-Aegis/pull/594): chore(gitignore): ignore the .worktrees directory | 2026-10-01T17:22:00Z | `f1216fe1a54e17a3522c3b24062305b8d9c18f4b` |
+| 37 | [#595](https://github.com/ModernNomad-98/Project-Aegis/pull/595): docs(backlog): anchor the skills-catalog line count to its recorded revision | 2026-10-01T17:36:53Z | `52b2b4e514bc2de428da29008d4063c94642eb15` |
+| 38 | [#589](https://github.com/ModernNomad-98/Project-Aegis/pull/589): docs(evidence): mark the behavioural eval figure unreproducible and prevent recurrence | 2026-10-01T21:36:02Z | `d3ce5733bdb6a4b3d6a118e1c2bdad60b62c41e6` |
+| 39 | [#590](https://github.com/ModernNomad-98/Project-Aegis/pull/590): docs(roadmaps): close the remaining backlog-sweep findings | 2026-10-01T21:36:09Z | `acb80f38f2d4fff465487708b3955b4526bbccde` |
+| 40 | [#591](https://github.com/ModernNomad-98/Project-Aegis/pull/591): docs(evidence): correct the offline-review page's inverted enforcement claim and counts | 2026-10-01T21:36:17Z | `ad5eeffa90586d5e59ed1906958959abb4ed1d88` |
+| 41 | [#596](https://github.com/ModernNomad-98/Project-Aegis/pull/596): docs(dco): document the trusted-bot exemption in the DCO prose | 2026-10-01T22:37:14Z | `6cb14bf0c763fecc9b9540103470b573a0aaf885` |
+| 42 | [#598](https://github.com/ModernNomad-98/Project-Aegis/pull/598): docs(readme): expand CI at first use and complete the DCO exemption | 2026-10-01T23:13:53Z | `09c23788b02ac476defe30d0a558a7889e899163` |
+| 43 | [#599](https://github.com/ModernNomad-98/Project-Aegis/pull/599): docs(readme): complete the navigation map and expand shorthand at first use | 2026-10-02T00:14:58Z | `a735bac4b3fcf0e147cb4bd5b18b6c23648171e0` |
+| 44 | [#600](https://github.com/ModernNomad-98/Project-Aegis/pull/600): docs(dco): name the bot sign-off exemption in three categorical governance pages | 2026-10-02T00:35:06Z | `f38dcc25c4be3e9d66fbe1011a8f672eeacc3896` |
+| 45 | [#601](https://github.com/ModernNomad-98/Project-Aegis/pull/601): docs(skills): gloss internal jargon at first use in seven skill pages | 2026-10-02T02:20:44Z | `ed5f8ae6035fbc0b7121462a846917a908b31c22` |
+| 46 | [#597](https://github.com/ModernNomad-98/Project-Aegis/pull/597): docs(agents): record the coordinator role as a repository rule | 2026-10-02T02:23:16Z | `29817f50ff335850527e99bfe65e4b63d9c78492` |
+| 47 | [#602](https://github.com/ModernNomad-98/Project-Aegis/pull/602): docs(skills): gloss internal jargon and provenance at first use in seven skills | 2026-10-02T02:32:16Z | `253aa338da49b885f212ae3b63c1f349ecf3ed4c` |
+| 48 | [#604](https://github.com/ModernNomad-98/Project-Aegis/pull/604): docs(skills): label provenance at controlling points in seven skills | 2026-10-02T03:02:24Z | `c03f77f9ae8dfa6c80c0025b29acd3be8db5e231` |
+| 49 | [#605](https://github.com/ModernNomad-98/Project-Aegis/pull/605): docs(skills): correct the invented OWASP D8 category in compliance-control-foundation (#602 defect on main) | 2026-10-02T03:07:53Z | `552f6573319442ea0f7549adf6073c4f0334e0da` |
+| 50 | [#603](https://github.com/ModernNomad-98/Project-Aegis/pull/603): docs(readability): append a dated current-truth restatement to the governing ledger | 2026-10-02T03:08:33Z | `92fe214f1c1fcdf82473b8540a2bfd971ee4f396` |
+| 51 | [#607](https://github.com/ModernNomad-98/Project-Aegis/pull/607): docs(skills): label provenance and expand shorthand at controlling points in eight skills | 2026-10-02T03:21:27Z | `cc697914f2b3fbfae0851d8bb6f3fca3edfd2c6e` |
+| 52 | [#606](https://github.com/ModernNomad-98/Project-Aegis/pull/606): docs(readme): expand CI at first use in the offline verification entry | 2026-10-02T03:25:48Z | `5563155e70e7ea5f319cfe2491ea04e8e1db71d9` |
+| 53 | [#608](https://github.com/ModernNomad-98/Project-Aegis/pull/608): chore(gitignore): ignore unreferenced scratch probes under artifacts/ (D4) | 2026-10-02T03:26:11Z | `1edaa5b1564c08def35b035a4937276e432e1846` |
+| 54 | [#609](https://github.com/ModernNomad-98/Project-Aegis/pull/609): chore(coord): append coordinator idle-check log entry for 2026-10-01T20:22-07:00 | 2026-10-02T03:43:26Z | `13f55c6ca95c58864a89cd0c5639f5939bd2b919` |
+| 55 | [#611](https://github.com/ModernNomad-98/Project-Aegis/pull/611): docs(skills): relabel provenance as non-operative history in two skills | 2026-10-02T03:54:57Z | `bbc3d4ff7e987337fef2deef1356bac94bd492cf` |
+| 56 | [#613](https://github.com/ModernNomad-98/Project-Aegis/pull/613): docs(reconciliation): supplement the stale scope banner with a dated note | 2026-10-02T04:11:42Z | `41866124c61013e0e6a2c55eb8730e58d0a01f6f` |
+| 57 | [#612](https://github.com/ModernNomad-98/Project-Aegis/pull/612): docs(roadmaps): correct the stale no-evidence-page claim in the skill-eval authorization request | 2026-10-02T04:13:59Z | `b80bbabbfb5461a5c0707fc0001950e2523184f8` |
+| 58 | [#614](https://github.com/ModernNomad-98/Project-Aegis/pull/614): docs(roadmaps): gloss DCO in the decisions term key | 2026-10-02T04:18:14Z | `ea72691c0b39e5ffd2cba535d2970448664e40ec` |
+| 59 | [#617](https://github.com/ModernNomad-98/Project-Aegis/pull/617): docs(reconciliation): correct two pointer defects in the 2026-10-01 banner note | 2026-10-02T04:32:16Z | `c58606ceafb72428ef212542b689674bbc976da0` |
+| 60 | [#610](https://github.com/ModernNomad-98/Project-Aegis/pull/610): docs(roadmaps): label embedded provenance and add reader keys | 2026-10-02T04:38:56Z | `11a030df2e5871921f51c8291f4387473429255c` |
+| 61 | [#615](https://github.com/ModernNomad-98/Project-Aegis/pull/615): docs(readability): record nine pages that lost acceptance, each in a single merge | 2026-10-02T04:46:17Z | `a02de49f0fb725ac010f9c80a7581467c5c13576` |
+| 62 | [#616](https://github.com/ModernNomad-98/Project-Aegis/pull/616): docs(roadmaps): correct the second stale claim in the skill-eval authorization request | 2026-10-02T04:50:00Z | `dbbcebcde77cbfe95928e847fc6994dd4953c69a` |
+| 63 | [#618](https://github.com/ModernNomad-98/Project-Aegis/pull/618): docs(roadmaps): correct the stale zero-execution claim in the skill-eval authorization request | 2026-10-02T05:17:31Z | `1920d8b51a351f5ba08e72e314cf55c2c30ca25a` |
+| 64 | [#619](https://github.com/ModernNomad-98/Project-Aegis/pull/619): docs(roadmaps): append dated corrections for two stale figure sets | 2026-10-02T07:13:02Z | `df632515511580ee9cfc94819b0b6defae8f7c2b` |
+| 65 | [#620](https://github.com/ModernNomad-98/Project-Aegis/pull/620): chore(coord): reconcile the coordinator cadence log after a recording gap | 2026-10-02T07:37:32Z | `914dcbb8f64136d63abc4c2f136cd8adc4e6b1e1` |
+| 66 | [#621](https://github.com/ModernNomad-98/Project-Aegis/pull/621): chore(coord): append a correction for the future-dated window end in the cadence log | 2026-10-02T23:46:46Z | `d6e484189cc30c67dc69aeb973e15f89b693537d` |
+| 67 | [#622](https://github.com/ModernNomad-98/Project-Aegis/pull/622): chore(coord): append a correction for the unreproducible causal clause in the cadence log | 2026-10-02T23:53:01Z | `fa9e4739b1aeadba72447037b29d5aba3835eb93` |
+| 68 | [#623](https://github.com/ModernNomad-98/Project-Aegis/pull/623): docs(readability): batch A governance pages re-read, two gaps corrected | 2026-10-03T00:01:15Z | `b0d3ab717438cbff37e85ad8f4f64e6015633889` |
+| 69 | [#625](https://github.com/ModernNomad-98/Project-Aegis/pull/625): docs(readability): gloss issue #101 at first use on four setup pages | 2026-10-03T00:06:42Z | `2ba20c71ce698f00784775734afdfc4e2166f3fa` |
+| 70 | [#626](https://github.com/ModernNomad-98/Project-Aegis/pull/626): docs(roadmaps): correct the readability backlog's pending floor to 35 | 2026-10-03T00:10:41Z | `bff75d9c556009cb0c51dbedaaa97a90d55f4ef8` |
+| 71 | [#627](https://github.com/ModernNomad-98/Project-Aegis/pull/627): chore(coord): append two coordinator idle-check entries | 2026-10-03T00:10:55Z | `e24066dd27779079e3c7e37357cd11b4c1504983` |
+| 72 | [#624](https://github.com/ModernNomad-98/Project-Aegis/pull/624): docs(evidence): annotate the 2026-09-30 continuation records (Batch B ledgers) | 2026-10-03T00:11:39Z | `6715cefc9347ec0c5e3bd93b65f580f0d7545d3f` |
+| 73 | [#630](https://github.com/ModernNomad-98/Project-Aegis/pull/630): docs(evidence): define who converts a completed review into an acceptance | 2026-10-03T00:23:07Z | `5703e93f1d29cdc382f691f0e9cfecb8d49faa30` |
+| 74 | [#631](https://github.com/ModernNomad-98/Project-Aegis/pull/631): [Security-relevant surface: AGENTS.md] docs(agents): limit the security-review stage to outside contributions | 2026-10-03T00:37:09Z | `7a7df9202a1a0c163f0500adc4693adef709710f` |
+| 75 | [#632](https://github.com/ModernNomad-98/Project-Aegis/pull/632): docs(skills): full-page re-read of the ten pending pages the 2026-10-01 audit missed | 2026-10-03T00:37:11Z | `f6bf9d9ac373e88691905ce7a057e139516f9572` |
+| 76 | [#634](https://github.com/ModernNomad-98/Project-Aegis/pull/634): docs(evidence): correct misattributed review self-description | 2026-10-03T00:39:36Z | `d9f57283145ce2608ff76920dddd3db5be48b9a9` |
+| 77 | [#635](https://github.com/ModernNomad-98/Project-Aegis/pull/635): docs(readability): record first ledger-keeper acceptances for two setup pages | 2026-10-03T00:46:52Z | `b09765a56353a2e0c8575e5067ecdd7531e2a547` |
+| 78 | [#628](https://github.com/ModernNomad-98/Project-Aegis/pull/628): fix(ci): per-run evidence directory, plus a permanent Markdown link/anchor checker | 2026-10-03T00:47:45Z | `b97ff2729985dd296df1924c715fed26d69f2edd` |
+| 79 | [#636](https://github.com/ModernNomad-98/Project-Aegis/pull/636): chore(coord): append four evidenced coordinator idle-check entries | 2026-10-03T00:51:25Z | `26b7cd681c587c148fb90743af4a33cde17a3e53` |
+| 80 | [#637](https://github.com/ModernNomad-98/Project-Aegis/pull/637): docs(skills): full-page re-read of the 23 BATCH C skill pages (4 first-use definition fixes) | 2026-10-03T00:59:51Z | `38cd81bad3c2e01999f7713e3757ead4cf745035` |
+| 81 | [#638](https://github.com/ModernNomad-98/Project-Aegis/pull/638): docs(offline-ci): correct the recorder's system-temp fallback | 2026-10-03T01:04:00Z | `2f01ac6aad7cb8df92b810d149adf954c9902d2b` |
+| 82 | [#629](https://github.com/ModernNomad-98/Project-Aegis/pull/629): docs(tools): add a per-path readability acceptance index | 2026-10-03T01:08:52Z | `1cb61f3a312d76afad6ec525155184abd120f24c` |
+| 83 | [#639](https://github.com/ModernNomad-98/Project-Aegis/pull/639): chore(coord): append three evidenced coordinator idle-check entries | 2026-10-03T01:13:51Z | `6c4471b2276bd40ed94536383787f3ca08c632d1` |
+| 84 | [#640](https://github.com/ModernNomad-98/Project-Aegis/pull/640): docs(readability): correct the false ancestry claim for one base SHA | 2026-10-03T01:15:01Z | `f092b1e6e0605f1ab0c3a8e89abdfcfb477beb70` |
+| 85 | [#642](https://github.com/ModernNomad-98/Project-Aegis/pull/642): docs(agents): require unsure/unknown instead of a fabricated answer | 2026-10-03T01:16:43Z | `f1d4e326d71ec4b3a9c8e9bb192932a8e0bad635` |
+| 86 | [#641](https://github.com/ModernNomad-98/Project-Aegis/pull/641): docs(evidence): record the stale root checkout's instruction divergence | 2026-10-03T01:18:38Z | `583b330afda2086f0842cd1149d8e8edfef56260` |
+| 87 | [#633](https://github.com/ModernNomad-98/Project-Aegis/pull/633): docs(evidence): register six process defects with prevention rules | 2026-10-03T01:24:02Z | `e88a0a0d0691259745d20301d3f34b992cb8e1c4` |
+| 88 | [#643](https://github.com/ModernNomad-98/Project-Aegis/pull/643): docs(approvals): record AEGIS-APR-101 for the ledger keeper role | 2026-10-03T01:31:17Z | `d10f6319201adca82a5a0f56b0b6f46241298e0b` |
+| 89 | [#644](https://github.com/ModernNomad-98/Project-Aegis/pull/644): chore(coord): append six evidenced coordinator idle-check entries | 2026-10-03T01:35:59Z | `3adebe6dc852687c08f0c9f3346da7450e3e895d` |
+| 90 | [#645](https://github.com/ModernNomad-98/Project-Aegis/pull/645): docs(approvals): record AEGIS-APR-102 for the integration roadmap policy | 2026-10-03T01:40:00Z | `3c58e9668d137e6bba69de3bc2ef6b73e542e76a` |
+| 91 | [#646](https://github.com/ModernNomad-98/Project-Aegis/pull/646): docs(evidence): register Class 7 dispatch-loop defects with seven prevention rules | 2026-10-03T02:16:17Z | `279ac94d07f95140814e279ff8b04f7661cb15fd` |
+| 92 | [#650](https://github.com/ModernNomad-98/Project-Aegis/pull/650): docs(evidence): create the tracked figures home and land the PROC-11 check-duration baseline | 2026-10-03T06:16:34Z | `9f5dc6b33e20383eff499ba5e3f80911837584e7` |
+| 93 | [#648](https://github.com/ModernNomad-98/Project-Aegis/pull/648): fix(ci): count markdown links that wrap across a line break | 2026-10-03T06:20:30Z | `20fadd4804a965819a2e2c444b30a62ce7c24477` |
+| 94 | [#649](https://github.com/ModernNomad-98/Project-Aegis/pull/649): ci(workflows): run the Markdown link-checker self-tests (C1b) | 2026-10-03T06:22:23Z | `25cc0e7a284843075b7da79cfe0c481d18fe059a` |
+| 95 | [#652](https://github.com/ModernNomad-98/Project-Aegis/pull/652): docs(approvals): record AEGIS-APR-103 and AEGIS-APR-104, the two consumed one-time gate-guard exceptions | 2026-10-03T06:37:45Z | `bd622661fe56779227887cbd390eaeab9dfb37fd` |
+| 96 | [#651](https://github.com/ModernNomad-98/Project-Aegis/pull/651): docs(register): land PROC-04 + PROC-08 + PROC-14, fix three #650 defects, record #649's follow-up | 2026-10-03T06:56:24Z | `c74c78d1a33c7580f8b7b480acf19647b9ae9580` |
+| 97 | [#653](https://github.com/ModernNomad-98/Project-Aegis/pull/653): docs(delivery): codify the seven-stage delivery workflow as standing policy | 2026-10-03T18:09:29Z | `c3527560fb7ef06043f56a0cb9bbbabf604e84f0` |
+| 98 | [#656](https://github.com/ModernNomad-98/Project-Aegis/pull/656): docs(coord): run the PROC-08 stranded-work detector once and record the run (Q4) | 2026-10-03T21:17:59Z | `74ee97b0f2378ac3eab9f89bc90fdb9f19f2af6e` |
+| 99 | [#658](https://github.com/ModernNomad-98/Project-Aegis/pull/658): docs(agents): paragraph the two dispatch-time rules and correct the placing instruction | 2026-10-03T21:37:51Z | `a3a72fe5f2c9504f3c97fc312b9250db67d761d5` |
+| 100 | [#657](https://github.com/ModernNomad-98/Project-Aegis/pull/657): docs(readability): repair the readability ledger's premises (Q2) | 2026-10-03T21:39:30Z | `1e5961454f300261e195f5c71c4785fa723dc708` |
+| 101 | [#654](https://github.com/ModernNomad-98/Project-Aegis/pull/654): docs(evidence): land the PROC-02 sweep and discharge owed item 2 (Q1) | 2026-10-03T21:45:55Z | `d9db0b8379f84300c30cba56fee5f5cbc0fd3506` |
+| 102 | [#659](https://github.com/ModernNomad-98/Project-Aegis/pull/659): docs(evidence): correct two falsified counting claims in the process register (Q5) | 2026-10-03T21:57:37Z | `3e992f896f7934d9e0f1043c75f942de715af520` |
+| 103 | [#660](https://github.com/ModernNomad-98/Project-Aegis/pull/660): docs(evidence): land five operational findings from the merge gates as the sixth append | 2026-10-03T22:51:42Z | `cc65bdde3b83f8037c47b493c520a8919616d284` |
+| 104 | [#662](https://github.com/ModernNomad-98/Project-Aegis/pull/662): docs(agents): add the original_commit_id and run-level-state gate facts | 2026-10-03T22:56:01Z | `6ddf85fd623f0fe97a39174b0d29d25146ee951e` |
+| 105 | [#663](https://github.com/ModernNomad-98/Project-Aegis/pull/663): docs(approvals): record the owner's one-time decision for PR #661 as AEGIS-APR-106 | 2026-10-03T23:33:38Z | `5eb63bb843292231db8905fa6bbcddabb2b01594` |
+| 106 | [#661](https://github.com/ModernNomad-98/Project-Aegis/pull/661): ci(workflows): run the Markdown link checker over the repository's own pages | 2026-10-03T23:36:19Z | `cc8fd2cb22666a316aa2dca9981aa75d88f78e06` |
+| 107 | [#664](https://github.com/ModernNomad-98/Project-Aegis/pull/664): docs(approvals): record the consumption of AEGIS-APR-106 as AEGIS-APR-107 | 2026-10-03T23:46:03Z | `3006d0a707e7c37ea4c447bdb9aa5f9734b853ea` |
+| 108 | [#666](https://github.com/ModernNomad-98/Project-Aegis/pull/666): docs(approvals): record the three-branch merge grant as AEGIS-APR-109 | 2026-10-04T20:25:59Z | `eb878a7b4e0df55bb51450d82f717494c0f0fcca` |
+| 109 | [#665](https://github.com/ModernNomad-98/Project-Aegis/pull/665): docs(approvals): record the Stage 4B first-tranche execution grant as AEGIS-APR-108 | 2026-10-04T23:12:39Z | `9ef112ee0fb42c6fef42c42e69875932d9d0e353` |
+| 110 | [#667](https://github.com/ModernNomad-98/Project-Aegis/pull/667): docs(readme): assemble the consumer copy from an allow-list (R3/R4) | 2026-10-05T00:42:09Z | `a3353a583d57430dbb6aec10e344f6b710bc397b` |
+| 111 | [#668](https://github.com/ModernNomad-98/Project-Aegis/pull/668): docs(readme): state the one-skill journey, and that a mention is not a dependency (R8) | 2026-10-05T01:46:33Z | `4a916cea2bee3fb845c64f3e19b9089c493da613` |
+| 112 | [#670](https://github.com/ModernNomad-98/Project-Aegis/pull/670): feat: enforce no cross-skill file dependencies (validator + standard) + (c) definition | 2026-10-05T04:01:28Z | `935411cf5b9258dc06c925a9258ab4a90e8e94fc` |
+| 113 | [#669](https://github.com/ModernNomad-98/Project-Aegis/pull/669): docs(approvals): record AEGIS-APR-109 slot-1 consumption as AEGIS-APR-110 | 2026-10-05T04:03:04Z | `bdbd688ccf5368a0f0efbdc197b6181d713b16f9` |
+| 114 | [#671](https://github.com/ModernNomad-98/Project-Aegis/pull/671): docs(approvals): record AEGIS-APR-109 slot-2 consumption as AEGIS-APR-111 | 2026-10-05T08:34:09Z | `3824fe5b2174088f301292a5c168489737433e8a` |
+| 115 | [#674](https://github.com/ModernNomad-98/Project-Aegis/pull/674): docs(approvals): record AEGIS-APR-109 slot-3 consumption as AEGIS-APR-112 | 2026-10-05T08:59:52Z | `7751a773b70533e1aa6d21e746d153d65e70f341` |
+| 116 | [#673](https://github.com/ModernNomad-98/Project-Aegis/pull/673): chore(deps): bump the host-bridge group across 1 directory with 2 updates | 2026-10-05T19:25:41Z | `b1e86f088393762ae029fbe7c650f01acd6ee1e6` |
+| 117 | [#675](https://github.com/ModernNomad-98/Project-Aegis/pull/675): feat(aegis_delivery_control): ZT-P1 role/stage contract + validators + versioned evidence | 2026-10-05T22:26:48Z | `feee859daa3f35311ea4c4ebcc9a5aa10d1a7ba4` |
+| 118 | [#676](https://github.com/ModernNomad-98/Project-Aegis/pull/676): ci: path-scope advisory tools jobs; document flake policy | 2026-10-06T01:29:57Z | `03c93c77a05e89d082f93c91b23dffabb332373c` |
+| 119 | [#677](https://github.com/ModernNomad-98/Project-Aegis/pull/677): docs(readability): reconcile the current pending-count statements with the acceptance index | 2026-10-07T19:14:33Z | `7d1d05e8170254ae60e8deb175c74e244a284a80` |
+| 120 | [#678](https://github.com/ModernNomad-98/Project-Aegis/pull/678): docs(approvals): record the owner's Option 1 readability-count decision | 2026-10-08T01:29:19Z | `c060a7cb09758fa2f4f6b67ab00094f01d7c6a46` |
+| 121 | [#679](https://github.com/ModernNomad-98/Project-Aegis/pull/679): chore(audits): refresh the skill contract-audit baseline (AEGIS-APR-119) and align a trigger-eval note | 2026-10-08T15:55:22Z | `c1acc075910ea1e849401e18cdb60df31c09ef30` |
+| 122 | [#680](https://github.com/ModernNomad-98/Project-Aegis/pull/680): docs: dated corrections after PR #678, current CI job conditions, and bound-field markers in the PR template | 2026-10-08T16:13:04Z | `5228977920ee479e1fe1ec6b8d56f8fc24c14947` |
+| 123 | [#684](https://github.com/ModernNomad-98/Project-Aegis/pull/684): docs: clarify Security Impact Note forecast overlap | 2026-10-09T01:55:42Z | `51cd4611782b79e5409d03cb1e8ff375d971096e` |
+| 124 | [#685](https://github.com/ModernNomad-98/Project-Aegis/pull/685): docs: clarify path-scoped CI in auto-merge policy | 2026-10-09T02:00:04Z | `8e11c8f4c2777265e254057ce0fa1e52f0cf03bf` |

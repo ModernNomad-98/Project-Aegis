@@ -1,6 +1,13 @@
 # Project Aegis backlog forecast
 
 ## Start here — current reading
+> **Current checkpoint — 2026-10-09, frozen through PR #685.** Read the
+> [catch-up reassessment](#catch-up-reassessment-after-pr-685-2026-10-09)
+> for selected and conditional outcomes. The older “current” readings
+> below are dated evidence, including the #554 full assessment; the
+> [measurement checkpoint](aegis-execution-metrics.md#merge-and-measurement-checkpoint-after-pr-685-2026-10-09)
+> explains its 124-PR census and timing limits.
+
 
 > **Purpose and current-state pointer — added 2026-10-01.** This page is for
 > maintainers and coding agents planning Project Aegis work — a rolling active-work
@@ -4719,3 +4726,123 @@ becomes **122–254 hours**. The optional BER/CP rows are not included in either
 total because their quantity or adoption is undecided. A fixed “all backlog”
 calendar ETA would hide those decisions and owner/provider waits; the next
 five-merge review must revisit them explicitly.
+
+## Catch-up reassessment after PR #685 (2026-10-09)
+
+This dated checkpoint gives maintainers a source-cutoff reading of the selected
+and conditional backlog. It freezes repository evidence at the #685 integration
+commit `8e11c8f4c2777265e254057ce0fa1e52f0cf03bf` (2026-10-09
+02:00:04 UTC). The linked [merge and measurement checkpoint](aegis-execution-metrics.md#merge-and-measurement-checkpoint-after-pr-685-2026-10-09)
+supplies the complete 124-PR census, continuing five-merge boundaries and
+timing limits behind this reassessment. It is a catch-up assessment now, not
+25 backdated assessments, a work grant or a forecast of calendar delivery.
+
+**What changed since the last full reading.** The full [#554
+assessment](#five-merge-checkpoint--2026-09-30-after-pull-request-554-catch-up-for-12-missed-windows)
+covered source through 2026-09-30 02:19:32 UTC and carried residual merges
+#551 and #554. PR #555 published that prior reading after the next boundary
+closed; it did not assess later work. The intervening edits to this page
+annotated historical statements or recorded the 2026-10-07 readability
+decision and the #127 skill-capability overlap; none is a full five-merge
+reassessment. The metrics checkpoint demonstrates 25 missed boundaries through
+#684 and one residual merge, #685. These are counts of integrated PRs, not
+hours of work or evidence that a blocked outcome was delivered.
+
+**How to read the ranges.** Each prior number below is the agent-estimated
+active-work range inherited from the [#491 selected-outcome
+table](#five-merge-checkpoint--2026-09-28-after-pull-request-491-catch-up-for-3-missed-windows)
+and carried by #554. It includes implementation, local checks, independent
+audit and PR preparation; it excludes owner, CI, provider and queue waits.
+No comparable active-time series or new source-backed per-outcome sizing was
+found in this frozen window. The ranges are retained as **unvalidated historical
+planning estimates**, not measured remaining effort. A row with an unchanged
+scope can carry its old planning range for comparison, but this checkpoint
+does not confirm its present accuracy or narrow it from merge intervals.
+"Open" means the cited owning record still describes a required outcome; it
+does not assert that no work occurred outside the frozen source.
+
+| Selected outcome, counted once | Prior active hours / #685 active hours and status | Remaining source dependency and confidence |
+| --- | --- | --- |
+| WP-2B-3: accepted candidate inputs | 1–4 / not derivable; open | The [BER backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes) still leaves the 160 candidate labels and private input acceptance pending. No acceptance is established by the offline fixes; low. |
+| WP-2B-3: measured calibration and OD-1 ratification | 4–10 / not derivable; open | The [BER backlog](behavioral-eval-runner-backlog.md#start-here-status-and-routes) distinguishes the authorized package and delivered synthetic corrections from approved inputs, selected execution source, allowance, host proof, measured result and owner ratification; low. |
+| R4/R5 selected-host capability proof | 12–24 provisional / not derivable; open | The [BER evidence gates](behavioral-eval-runner-backlog.md#6-phase-2b-0-evidence-gates--r1r5) still require selected-host proof; the disposable VM remains paused in the [open-decisions record](aegis-open-decisions-2026-09-23.md). No guest completion or model-driven proof is inferred; low. |
+| WP-2B-4 limited live suite | 12–24 / not derivable; blocked | The [BER status map](behavioral-eval-runner-backlog.md#start-here-status-and-routes) leaves this live phase blocked behind calibration, OD-1, host evidence and its own authority; low. |
+| WP-2B-5 generic corpus | 8–16 / not derivable; backlog | The [BER phase map](behavioral-eval-runner-backlog.md#start-here-status-and-routes) leaves the corpus after WP-2B-4, curated fixtures and separate phase authority; low. |
+| WP-2B-6 scheduling and dataset operations | 8–16 / not derivable; backlog | The [BER phase map](behavioral-eval-runner-backlog.md#start-here-status-and-routes) leaves scheduling, cost, quarantine and dataset controls after the corpus; low. |
+| WP-2B-7 advisory CI and operator workflow | 4–8 / not derivable; backlog | The [BER phase map](behavioral-eval-runner-backlog.md#start-here-status-and-routes) leaves this after WP-2B-6 and a separate workflow review and authority; offline regression CI is not its delivery; low. |
+| CP-WP-003 real authority and execution capability | 8–16 provisional / not derivable; blocked | The [control-plane status table](resumable-control-plane-backlog.md#start-here-purpose-and-current-delivery) still lacks real source authority, independent freshness, containment, evidence and bounded liability. The later offline role/stage delivery in [#675](https://github.com/ModernNomad-98/Project-Aegis/pull/675) does not supply these real proofs; low. |
+| CP-WP-004 one bounded real integration | 8–16 / not derivable; blocked | The [control-plane status table](resumable-control-plane-backlog.md#start-here-purpose-and-current-delivery) requires CP-WP-003 evidence, one chosen operation and separate authority. The [integration policy recorded by #645](https://github.com/ModernNomad-98/Project-Aegis/pull/645) chooses a release order, not this integration or its execution grant; low. |
+| Issue #101 package 7, release readiness | 6–12 / not derivable; open | The [setup and routing plan](aegis-setup-routing-plan.md) requires actual Stage 4B host proof, helper comparison or an Aegis-only choice, and release review. The recorded first-tranche [APR-108](../approvals/APPROVAL_REGISTER.md#aegis-apr-108-issue-101-stage-4b--first-tranche-observation-grant) says execution remains blocked and operative authority is unestablished; no host result or release is credited; low. |
+
+**Totals and unestimated selected residuals.** The ten distinct historical
+ranges add to **71–146 agent-estimated active hours** (`1–4 + 4–10 + 12–24 +
+12–24 + 8–16 + 8–16 + 4–8 + 8–16 + 8–16 + 6–12`). No cited frozen source
+closes one of those outcomes, and no new per-row active-work basis justifies
+an exact deduction. Thus 71–146 is retained solely as an **unvalidated
+historical subtotal**, not a newly measured or confirmed current subtotal.
+The [Stage 4B host mechanics](aegis-setup-package-4b-host-proof-protocol.md)
+and [BER-BKL-009 real-host, runtime, privacy and cleanup
+residual](behavioral-eval-runner-backlog.md#ber-bkl-009--evidence-retention-access-encryption-redaction-and-deletion-policy)
+remain outside it and unestimated. A finite full selected or all-backlog
+estimated time to completion (ETA) is **not derivable**. The owner-paused
+[readability index repair and switch](#material-owner-decision--2026-10-07-readability-count-authority)
+also remains outside this subtotal; its 25–45-hour recommended variant is an
+unmeasured agent estimate and its switch has no range.
+
+**Conditional and unselected outcomes inherited from #491.** These stay
+outside the ten-row subtotal. The listed ranges are historical agent estimates,
+conditional on a named selection and unchanged only as reference values:
+
+| Outcome | Historical active hours | #685 disposition, dependency and confidence |
+| --- | ---: | --- |
+| Issue #101 package 5, local helper | 8–20 | Unselected. [Setup plan](aegis-setup-routing-plan.md) requires Stage 4B proof, paired helper comparison and a selected local helper; low. |
+| Issue #101 package 6, online helper | 8–20 | Unselected. The same [setup plan](aegis-setup-routing-plan.md) also requires provider terms and authority; low. |
+| BER-BKL-010 signing or immutable storage | 4–12 | Unselected; an owner adoption decision remains in the [BER backlog](behavioral-eval-runner-backlog.md#ber-bkl-010--evidence-signing-or-immutable-external-storage-beyond-sha-256); low. |
+| BER-BKL-014 additional adapters | 8–20 per named host | Unselected; host count and target remain open in the [BER backlog](behavioral-eval-runner-backlog.md#ber-bkl-014--additional-host-adapters); low. |
+| BER-BKL-015 optional operations products | 8–24 per named product | Unselected; product count and target remain open in the [BER backlog](behavioral-eval-runner-backlog.md#ber-bkl-015--optional-operational-products); low. |
+| Strategic skill expansion | #554's 68–140 group estimate, **not a validated current range** | Unselected. The [#127 overlap note](#start-here--current-reading) proves one capability appears in two groups and supplies no per-capability saving; no exact revision is derivable. The owner-paused readability repair is separate; low. |
+| Multi-judge arbitration and CP-FUT-001 service | Unbounded | Neither architecture/adoption decision is selected in the [BER backlog](behavioral-eval-runner-backlog.md) or [CP backlog](resumable-control-plane-backlog.md); no finite quantity is derivable; low. |
+
+The #491 inventory also split skill-expansion candidates into named groups.
+Its [group table](#five-merge-checkpoint--2026-09-28-after-pull-request-454-catch-up-for-16-missed-windows)
+and the #554 delivery account support this disposition of **each** inherited
+group; all numbers are old agent estimates, not measured current effort:
+
+| Candidate group | Historical active hours | Status at #685 |
+| --- | ---: | --- |
+| QA Tier 1 | 10–20 before selection; 9.75–17.25 for the approved batch | Delivered under D68 before #554; no remaining credit claimed. |
+| QA Tier 2 | 12–24 | Unselected; historical range only. |
+| QA Tier 3 | 8–16 | Unselected; historical range only. |
+| Phase 2 | 18–36 | Unselected; historical range only. |
+| Phase 3 | 8–16 | Unselected; shares Security Impact Note Authoring row #127 with Phase 4, so group membership and an exact deduction need a new scope decision. |
+| Phase 4 | 20–40 | Unselected; overlaps Phase 3 at row #127, with no source-backed per-capability hours. |
+| Phase 5 extras | 2–8 | Unselected; historical range only. |
+| Phase 6 | 10–20 | Delivered under D71 before #554; not remaining. |
+| Phase 7 | 8–20 | Delivered under D70 before #554; not remaining. |
+| Remaining category-08 AI-SDLC | 10–20 | Delivered under D69 before #554; not remaining. |
+
+The six still-unselected historical group ranges arithmetically sum to
+**68–140 active hours**, but the Phase 3/4 overlap means that figure is an
+**unvalidated historical group total**, not an exact unique-capability total
+or a newly confirmed estimate. The [catalog](../skills-catalog.md) and
+[security source row #127](../skills/03-saas-security-rls.md) establish the
+overlap; neither supplies an hours split. This checkpoint chooses no build.
+
+If both issue #101 helpers were selected, the *historical* ten-row base plus
+their two ranges would arithmetically be 87–186 active hours. That is a
+conditional partial subtotal, not a current selection or full-backlog ETA.
+The separate authenticated CP source inspection retains its historical
+provisional 4–8-hour agent range outside the selected subtotal and remains
+ungated in the [control-plane backlog](resumable-control-plane-backlog.md).
+The parked `UNRUN` tightening (1–3) and confidential conduct intake (1–2)
+remain outside the selected subtotal and await their respective owner
+decisions; the [#491 reading](#five-merge-checkpoint--2026-09-28-after-pull-request-491-catch-up-for-3-missed-windows)
+records their original estimates. The two small #491 follow-ups also have
+source dispositions: the `library-diff-reviewer` description alignment
+(historical 0.25–0.75 hours) was delivered by [#542](https://github.com/ModernNomad-98/Project-Aegis/pull/542)
+before #554; the standing chat delivery-grant record (historical 0.25–0.5
+hours) was delivered in this window by [#587](https://github.com/ModernNomad-98/Project-Aegis/pull/587)
+as [APR-100](../approvals/APPROVAL_REGISTER.md#aegis-apr-100-standing-commit-push-and-merge-pre-approval).
+Neither remains estimated work. The #554 checkpoint itself was published
+by #555 and is no longer an in-progress item. This checkpoint selects none
+of these optional, paused or parked outcomes.
