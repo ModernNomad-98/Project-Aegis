@@ -3080,25 +3080,39 @@ The table deliberately includes documentation, governance and code PRs alike:
 cadence counts integrated PRs, not only the work that advances a selected
 outcome.
 
-**Retained anchor and complete windows.** The published [#344
+### Retained anchor and conflicting #554 footer
+
+The published [#344
 checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-26-after-pull-request-344)
 started the next count after #344, while documenting a historical one-merge
 shift relative to a strict earlier count. The [#370
 checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-26-after-pull-request-370-catch-up-for-the-windows-ending-349-354-359-364-369)
-retained that anchor; the later [#491
-checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-28-after-pull-request-491-catch-up-for-3-missed-windows)
-and [#554
-checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-30-after-pull-request-554-catch-up-for-12-missed-windows)
-continued rather than resetting it. #554 records 62 integrations after #491:
-12 complete windows and the carried residual #551, #554. The next window
-therefore closes after three more integrations, at #555. Each following row
-has exactly five PRs in verified first-parent order. The only full forecast
-reassessment merged in this window is #555, which assesses through #554; the
-later forecast/metrics edits through #685 are annotations, reader keys or the
-material readability decision, and do not assess these later five-PR
-boundaries. Thus **25 cadence points were missed**, ending at #555 through
-#684 below; #685 is the one unclosed residual. This is one present catch-up,
-not a retrospective claim that 25 timely assessments happened.
+retained that anchor, as did the [#491
+checkpoint](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-28-after-pull-request-491-catch-up-for-3-missed-windows).
+The preserved [#554 residual statement](aegis-backlog-forecast.md#five-merge-checkpoint--2026-09-30-after-pull-request-554-catch-up-for-12-missed-windows)
+records 62 integrations after #491: 12 complete windows and carried residuals
+#551 and #554. Its preserved footer also says the next window starts after
+#554 and is reassessed "after five further merged PRs." That footer conflicts
+with carrying the two residuals. The [original #555 publication at its pinned
+commit](https://github.com/ModernNomad-98/Project-Aegis/blob/9e88a5818bf6a76a4f0bfff1c57ffee97e26d17b/docs/roadmaps/aegis-backlog-forecast.md#L151-L153)
+contains the same footer; this dated note discloses the inconsistency without
+altering its historical text or the cadence rule.
+
+For this catch-up, the documented #344 anchor is retained and #551/#554 are
+carried; the #554 footer's restart wording is treated as inconsistent
+historical prose. The first carried window is **#551, #554, #556, #557,
+#555**. It closes at #555 after three new integrations; a literal restart
+after #554 would instead close at #559 after five new integrations. There is
+no reset at #554, #555 or #685. The 124 new integrations plus two carried
+residuals give 126 members: 25 complete five-PR windows and residual #685,
+with final boundary #684. Each row below shows its five verified first-parent
+members. PR #555 published a reassessment of source through #554, but #555 is
+itself a normal continuing-count integration and that publication did not
+assess the window closing at #555. Inspection of all later forecast/metrics
+integrations through #685 found annotations, reader keys and the material
+readability decision, with no full reassessment of the later boundaries.
+Thus **25 cadence points were missed**, ending at #555 through #684 below;
+this is one present catch-up, not 25 backdated assessments.
 
 | Window | Five integrated PRs, first-parent order | Boundary |
 | ---: | --- | --- |
