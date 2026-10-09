@@ -1,5 +1,30 @@
 # Stale root checkout serves divergent instruction and skill content — 2026-10-02
 
+**Reading aid (2026-10-09; added after the original measurements).** This page is for a new maintainer or coding agent checking whether a checkout can supply current Project Aegis instructions.
+It records what was observed on 2026-10-02; its paths, commits, counts, and tool availability are historical, not today's checkout state.
+For normal work, use the current [startup instructions](../../../AGENTS.md) to identify the workspace and verify its state.
+The [readability ledger](../../roadmaps/aegis-documentation-readability-backlog.md) tracks this page's review status.
+See the dated erratum at the start of section 3 before using its historical count command.
+
+**Reading key.** SHA stands for Secure Hash Algorithm; this page uses 'SHA' as shorthand for a Git commit identifier.
+Short forms such as `00717aa4` name the leading characters of a full identifier. `HEAD` is the commit checked out locally. `origin/main` is a local remote-tracking reference to the last fetched `main`, not a live server query.
+The *root* and `coord-main` names refer to the two historical local checkouts measured here; `canonical` refers to the fetched main revision used for that comparison. `L78` means line 78 of the cited file at that revision.
+A *regex* is a text-matching pattern.
+A Git blob holds file contents; a worktree is a checked-out working directory.
+CRLF means carriage return plus line feed; LF means line feed.
+They are two line-ending encodings. `pwsh` is PowerShell, VM means virtual machine, and `pip` is Python's package installer.
+The named `acceptance-core` check examines Scenario A evidence; it was not run in the historical measurement.
+The `M`, `A`, and `D` labels in the path table mean, respectively: present in both compared trees with different contents; added on main; and present only at the root revision.
+
+**Command notation and effects.** Replace `<checkout>` or `<root>` with the intended checkout path, `<sha>` with a commit identifier, `<rev>` with a selected revision or commit, and `<path>` with a repository path; quote paths containing spaces.
+These angle-bracket names are placeholders, never literal shell input or redirection. `file` and `f` are scratch output filenames, not repository objects.
+A displayed `git fetch` contacts the remote and updates local Git metadata; `git ls-remote` queries remote refs without updating those local refs.
+The displayed `git diff`, `rev-list`, `rev-parse`, `show`, and `cat-file` queries read local state.
+In `git ls-files --eol`, `w/` describes the working file, `i/` Git's index (staged copy), and `attr/` the applicable line-ending attribute.
+Other displayed Git inspection commands (`merge-base`, `ls-tree`, `ls-files`) read local state; the PowerShell file inspectors read local files, while the validator executes a local check.
+A `>` writes or overwrites the selected scratch file.
+The command block below is historical evidence, not permission to run it or modify the measured checkouts.
+
 **Scope.** Measured 2026-10-02, read-only, on `ModernNomad-98/Project-Aegis`. Base:
 `origin/main` re-derived after `git fetch origin` = `2f01ac6aad7cb8df92b810d149adf954c9902d2b`
 (`git ls-remote origin refs/heads/main` returned the same SHA), 15 commits past the
@@ -72,6 +97,13 @@ Swept: `AGENTS.md`, `CLAUDE.md`, `.claude/skills/**`. **Not swept:** `.claude/ag
 on main) and any other instruction surface.
 
 ## 3. The rule — a detectable check, not advice
+
+**Erratum (2026-10-09; original command and results preserved below).** The comment `"0" = at the tip` is too strong.
+In `git rev-list --count HEAD..origin/main`, zero means no commit reachable from the locally cached `origin/main` is missing from `HEAD`; `HEAD` can still be ahead.
+For a local comparison, run `git rev-parse HEAD origin/main` and compare the two full IDs: equality establishes that these two local refs name the same commit. `git rev-list --left-right --count HEAD...origin/main` shows the commits exclusive to each side: `1 0` is an ahead-only example, while `0 0` is the equal-ref case.
+These are examples of command meaning, not new 2026-10-02 measurements.
+Even equal IDs do not prove the local `origin/main` still matches the server; that reference reflects the last successful fetch.
+The historical `0` below therefore cannot, by itself, certify equality or current server freshness.
 
 Read instruction or skill content only from a checkout that passes this test; otherwise read the
 blob directly.
