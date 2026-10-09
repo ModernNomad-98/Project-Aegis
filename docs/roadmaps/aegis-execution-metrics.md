@@ -1,6 +1,17 @@
 # Project Aegis execution measurements
 
 ## Start here — current measurements
+
+> **Newest measurement — 2026-10-09, assessed through PR #688 (frozen cutoff M).**
+> This is the current measurement reading; the **#685 banner below is the prior
+> frozen checkpoint**, retained as dated evidence. The assessed cutoff is
+> M = `625fc66711eaf7b3ee788cbc2dff98f05f147c1c`, the PR #688 integration at
+> 2026-10-09 16:17:39 Coordinated Universal Time (UTC). Read the
+> [cadence measurement checkpoint through PR #688](#cadence-measurement-checkpoint-through-pr-688-2026-10-09)
+> for the six-integration table, the carried window and residual arithmetic, and
+> the timing limits; the
+> [forecast reassessment](aegis-backlog-forecast.md#cadence-reassessment-through-pr-688-2026-10-09)
+> interprets the same cutoff.
 > **Current checkpoint — 2026-10-09, frozen through PR #685.** Read the
 > [merge and measurement checkpoint](#merge-and-measurement-checkpoint-after-pr-685-2026-10-09)
 > for the complete census, retained cadence and unavailable time splits.
@@ -3288,3 +3299,81 @@ SHA is checked against local immutable first-parent history.
 | 122 | [#680](https://github.com/ModernNomad-98/Project-Aegis/pull/680): docs: dated corrections after PR #678, current CI job conditions, and bound-field markers in the PR template | 2026-10-08T16:13:04Z | `5228977920ee479e1fe1ec6b8d56f8fc24c14947` |
 | 123 | [#684](https://github.com/ModernNomad-98/Project-Aegis/pull/684): docs: clarify Security Impact Note forecast overlap | 2026-10-09T01:55:42Z | `51cd4611782b79e5409d03cb1e8ff375d971096e` |
 | 124 | [#685](https://github.com/ModernNomad-98/Project-Aegis/pull/685): docs: clarify path-scoped CI in auto-merge policy | 2026-10-09T02:00:04Z | `8e11c8f4c2777265e254057ce0fa1e52f0cf03bf` |
+
+## Cadence measurement checkpoint through PR #688 (2026-10-09)
+
+This dated record lets maintainers reproduce the next step of the backlog's
+five-merge cadence. It freezes repository integration history at the assessed
+cutoff **M = `625fc66711eaf7b3ee788cbc2dff98f05f147c1c`**, the PR #688
+integration (2026-10-09 16:17:39 Coordinated Universal Time, UTC), strictly
+after the prior cutoff **P = `8e11c8f4c2777265e254057ce0fa1e52f0cf03bf`**, the
+PR #685 integration (2026-10-09 02:00:04 UTC). The [forecast
+reassessment](aegis-backlog-forecast.md#cadence-reassessment-through-pr-688-2026-10-09)
+interprets the same cutoff; this section records the count, order and timing
+method only. The earlier [merge and measurement checkpoint after PR
+#685](#merge-and-measurement-checkpoint-after-pr-685-2026-10-09) and its 124-row
+census are preserved unchanged: this checkpoint continues that count rather than
+restarting it.
+
+**Method.** Local first-parent history,
+`git rev-list --first-parent --reverse P..M`, returns **exactly six**
+integrations in merge order, with no gap, missing commit or duplicate
+membership. The recorded P...M comparison returns `ahead_by = 16`,
+`total_commits = 16` and **10 changed paths**. Each of the six integration
+commits maps through the GitHub API to exactly one merged pull request with base
+`main` and a matching `merge_commit_sha`, and the six file inventories are
+those pull requests' complete file lists. The order below is first-parent
+integration order, not PR-number order, and the count is of integrations rather
+than merge commits only — a merge-commit-only count would omit single-parent
+integrations.
+
+| Order after P | PR and recorded scope cue | Merged at UTC | Full integration SHA |
+| ---: | --- | --- | --- |
+| 1 | [#686](https://github.com/ModernNomad-98/Project-Aegis/pull/686): docs: record historical METRICS-1 CI durations | 2026-10-09T14:34:16Z | `2c68df263c99cdb66d6ea4c76cd480f0bf19b5b5` |
+| 2 | [#681](https://github.com/ModernNomad-98/Project-Aegis/pull/681): docs: propose unselected skill expansion batch | 2026-10-09T14:56:02Z | `fc3c68b628a5f2660db0ab490706660b90e30d3f` |
+| 3 | [#687](https://github.com/ModernNomad-98/Project-Aegis/pull/687): docs: catch up backlog cadence through PR #685 | 2026-10-09T15:46:44Z | `6650f3af091cb14da7de796848d94af5a0aea72c` |
+| 4 | [#683](https://github.com/ModernNomad-98/Project-Aegis/pull/683): docs: record one-time gate-guard exception for PR #682 | 2026-10-09T15:53:09Z | `a4fb1445ea92ff6df469627ea9e10f769d69d830` |
+| 5 | [#689](https://github.com/ModernNomad-98/Project-Aegis/pull/689): docs: clarify stale checkout evidence reading | 2026-10-09T16:03:58Z | `c585afdf737ac021d91cd564dc61ad7e1f6b6053` |
+| 6 | [#688](https://github.com/ModernNomad-98/Project-Aegis/pull/688): docs: record ROUTE-002 new-edge textual triage | 2026-10-09T16:17:39Z | `625fc66711eaf7b3ee788cbc2dff98f05f147c1c` |
+
+**Window arithmetic.** One carried member (#685, merged 2026-10-09 02:00:04 UTC)
+plus these six new integrations gives **7 members**: one complete five-PR
+window — **#685, #686, #681, #687, #683**, closing at #683 in integration order
+— and two residuals, **#689 and #688**. Nothing resets at #685 or #688, so the
+next boundary needs **three further integrations after M**, and every later
+integration counts, including the pull request that carries this checkpoint. The
+window that closes at #683 is the first boundary after the 25 recorded as missed
+through #684; this checkpoint assesses it rather than carrying it as
+outstanding, and it is one continuing catch-up, not a set of backdated
+assessments.
+
+**Carry-forward outside the frozen window.** Two integrations after M are
+already recorded and are deliberately **outside** this checkpoint's assessed
+window, which stays frozen at M:
+[#690](https://github.com/ModernNomad-98/Project-Aegis/pull/690) — merge
+`168d71c326551be126b6e40b686e53f98a744741`, merged 2026-10-09T17:50:26Z — and
+[#691](https://github.com/ModernNomad-98/Project-Aegis/pull/691) — merge
+`a72ca379903f21b44faa2529a5c61a3cd069a6aa`, merged 2026-10-09T19:16:22Z. The
+live residual count therefore stands at **two of the three** integrations the
+next boundary needs; the merge status and timing of the pull request carrying
+this checkpoint are not asserted here.
+
+**Changed paths.** The comparison's ten changed paths are documentation and
+evidence only: the approval register, an audit register, one documentation
+evidence page, one metrics evidence file, two ROUTE-002 triage files, this page,
+the forecast, the coordinator figures page, and the expansion-batch proposal.
+None is a behavioral-eval, control-plane, Stage 4B execution, CI or skill
+implementation path.
+
+**Timing provenance and limits.** The `merged_at` timestamps above are GitHub
+merge events at one-second precision; Git committer timestamps can differ from
+them by a second, so the API merge events are used throughout. The P-to-M
+endpoint span is **14 hours 17 minutes 35 seconds of wall time** and includes
+concurrent authoring, review, continuous integration (CI), owner decisions and
+idle intervals. Integration spacing is not active labor, coding throughput or
+runtime proof, and no comparable active-work, review, CI or owner-wait split for
+this window is established: those splits are **unavailable**, not zero. The
+historical CI job duration sample recorded by #686 is a separate measurement and
+is not used here as active-labor calibration. This record makes no claim that
+historical exact-head checks were green, and no claim that any merged source
+change reached runtime.
