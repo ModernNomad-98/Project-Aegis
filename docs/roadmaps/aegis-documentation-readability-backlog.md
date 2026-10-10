@@ -4347,3 +4347,43 @@ The next batch's selection rule: the pending batch-record notes in creation
 order (`full-page-readability-batch-after-710-2026-10-10.md`, then later
 notes as created), plus any page re-pended by post-acceptance drift above 10
 lines (re-measured at the next implementation base), in the recorded order.
+## Ledger-keeper recording + batch update — readability sweep ninth batch, 2026-10-10
+
+The ledger keeper records under AEGIS-APR-101 (its unchanged recording-only
+role). **This batch is TWO pages — the honest derivation is recorded in the
+batch record.** The batch-8 close named the pending batch-record notes in
+creation order (the after-710 note) plus any page re-pended by >10-line
+post-acceptance drift; at the base exactly two qualify: the after-710 note
+and this ledger (re-pended by batch 8's own keeper update, +47/-0). A sweep
+of the batch-8 pages versus their acceptance head showed no other page
+moved, and the plan's rule that no page enters the batch unless the ledger
+names it pending is satisfied by exactly these two. Both were independently
+full-page re-read (the ledger as a structured full-page review per the
+reviewer's stated method) at the base head against
+[Acceptance for each page](#acceptance-for-each-page) by reviewers who did
+not write the pages, each restating purpose and normal use in the batch
+record. Both are accepted at the reviewed head; no page was edited in this
+batch.
+
+| Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [The batch-after-710 record](../../docs/evidence/documentation/full-page-readability-batch-after-710-2026-10-10.md) | `06d382bb55dae90a049cd940934d020e7b68741b` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-711-2026-10-10.md) | 2026-10-10 |
+| [This readability ledger](../../docs/roadmaps/aegis-documentation-readability-backlog.md) | `06d382bb55dae90a049cd940934d020e7b68741b` (re-pend discharged; +47/-0 = batch 8's keeper section since its batch-8 acceptance) | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-711-2026-10-10.md) | 2026-10-10 |
+
+**Count honesty (unchanged).** No exact pending count is derivable (the tool
+itself says "NOT DERIVABLE from this procedure"); the tool run at this base
+(215 provably pending / 159 no-recorded / 221 within-10 / 7 undecidable) is
+candidate evidence only, and the "212" frozen-basis figure is not reproduced.
+The index repair and official-count switch stay paused; N12/N13 untouched.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read
+against [Acceptance for each page](#acceptance-for-each-page) by a reader who
+did not write this section — the self-cost every prior update states. The
+tracked Markdown count does not change except by the new batch record note
+itself, which is pending and not counted among accepted pages.
+
+The next batch's selection rule: the pending batch-record notes in creation
+order (`full-page-readability-batch-after-711-2026-10-10.md`, then later
+notes as created), plus any page re-pended by post-acceptance drift above 10
+lines (re-measured at the next implementation base), in the recorded order.
