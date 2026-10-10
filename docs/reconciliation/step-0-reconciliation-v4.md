@@ -254,7 +254,7 @@ otherwise invisible to the shipped suite):
 | Candidate *(started as candidate — not built; per-row status below)* | Roadmap ref (cat 06) | Note |
 |---|---|---|
 | `visual-regression-test-designer` — **✅ built (D75, 2026-10-09)** | #203 (P2) | Critical UI states with stable data, deterministic viewport, reviewable diffs. |
-| `role-based-qa-matrix` | #229 (P1) | Behavior across anonymous/member/manager/admin/owner/support/platform roles; QA counterpart to Phase 3 `authorization-matrix-designer`. |
+| `role-based-qa-matrix` — **✅ built (D76, 2026-10-10)** as `role-coverage-test-designer` | #229 (P1) | Behavior across anonymous/member/manager/admin/owner/support/platform roles; QA counterpart to Phase 3 `authorization-matrix-designer`. |
 | `mobile-viewport-qa` — **✅ built (D75, 2026-10-09)** as `mobile-journey-test-designer` | #230 (P1) | Critical journeys on mobile breakpoints, touch interactions, dialogs, navigation. |
 | `exploratory-testing-charter` — **✅ built (D75, 2026-10-09)** as `exploratory-charter-designer` | #228 (P1) | Mission/risks/personas/data/paths/timebox charters for exploratory passes. |
 | `mock-strategy-designer` | #200 + #201 (merged; both P1) | ONE skill: mock/fake/stub/adapter/recording/live selection + test-double contract review keeping doubles aligned with real provider/DB behavior (`api-contract-test-designer`'s fake-fidelity check is the contract-layer slice of this). |
@@ -3925,6 +3925,26 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   are marked built above (§3). This entry records the build decision and the
   shipped arithmetic; it grants no new execution, publication or merge
   authority.
+
+- **D76 (2026-10-10) — Role-coverage test design skill built (#229, narrowed).**
+  Decided and built the G1 row 541 candidate `role-based-qa-matrix` (#229 P1)
+  of [the unselected-expansion proposal](../roadmaps/unselected-expansion-skill-batch-proposal.md),
+  owner-selected and narrowed as `role-coverage-test-designer`. The skill is a
+  read-only QA *design* skill — it emits the role-coverage design (role ×
+  surface allowed-path matrix, interface-consistency deltas, layer-mapped
+  coverage) in conversation and edits, executes and drives nothing — so it is
+  auto-invocable with no `disable-model-invocation` and no MANUAL-ONLY
+  sentinel, per standard §5. It consumes the shipped
+  `authorization-matrix-designer` matrix as input (compose, never restate);
+  denials stay with `authorization-matrix-designer` step 7 and
+  `multi-tenant-security-tester`; custom-role, grant-ceiling and
+  role/resource-inheritance coverage is deferred to the unbuilt #59 extension
+  (a documented seam, not a build claim). It ships `evals/evals.json` and
+  `evals/trigger-evals.json` discriminating against its six named neighbors.
+  Family 6 "QA, E2E & evidence" grows 22 → 23; the library total grows
+  198 → 199; FAMILY-COUNT stays 23. The D10 Tier 2 row for #229 is marked
+  built above (§3). This entry records the build decision and the shipped
+  arithmetic; it grants no new execution, publication or merge authority.
 
 ## 6. Post-merge corrections
 

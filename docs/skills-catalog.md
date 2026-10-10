@@ -544,6 +544,7 @@ auto-invocable, no `disable-model-invocation` — and each ships both eval files
 | `visual-regression-test-designer` | cat 06 **#203** | yes | Visual/pixel-regression coverage design: stable-state capture, baseline/diff mechanics, positive snapshot-selection with explicit update review, deterministic state rendering. Designs; captures nothing. |
 | `exploratory-charter-designer` | cat 06 **#228** | yes | Timeboxed exploratory-testing charter: mission, ranked risks, personas, data, entry paths, note/evidence conventions. Designs; executes nothing. |
 | `mobile-journey-test-designer` | cat 06 **#230** | yes | Critical-journey mobile QA design: breakpoints, touch, dialogs, navigation, orientation, keyboard, safe area, device+data matrix, evidence composition. Layout stays with `mobile-viewport-craft`. |
+| `role-coverage-test-designer` | cat 06 **#229** (D10 Tier 2, built by D76) | yes | Role-coverage QA design over the shipped authorization matrix: role × surface allowed-path matrix, interface-consistency deltas across roles, layer-mapped coverage with persona data and execution handoffs. Denials stay with `authorization-matrix-designer` step 7 / `multi-tenant-security-tester`; custom-role coverage deferred to the unbuilt #59 extension. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 5 clusters:
 **strategy/plan/coverage** (`qa-strategy-architect`, `test-plan-designer`,
@@ -564,6 +565,12 @@ design** (`visual-regression-test-designer`, `exploratory-charter-designer`,
 `regression-suite-curator`, `manual-test-case-creator`,
 `clickthrough-test-engineer`, `qa-strategy-architect`, `mobile-viewport-craft`,
 `playwright-e2e-engineer`, and `test-plan-designer`.
+
+A sixth cluster was added by D76 (2026-10-10): **role coverage**
+(`role-coverage-test-designer`) — discriminated against
+`authorization-matrix-designer`, `multi-tenant-security-tester`,
+`qa-strategy-architect`, `test-plan-designer`, `playwright-e2e-engineer`, and
+`manual-test-case-creator`.
 
 ### Skills (Phase 6 — cloud, DevOps, reliability & release pack)
 
@@ -1361,7 +1368,8 @@ above.**
 The Tier 2 second-wave trio also left it when D75 (2026-10-09) built them:
 `visual-regression-test-designer` (#203, same name), `exploratory-testing-charter`
 (#228, built as `exploratory-charter-designer`), and `mobile-viewport-qa` (#230,
-built as `mobile-journey-test-designer`).
+built as `mobile-journey-test-designer`). `role-based-qa-matrix` (#229) left it
+when D76 (2026-10-10) built it, narrowed as `role-coverage-test-designer`.
 
 ### Phase 6 — Cloud, DevOps, reliability & release (P1)
 ✅ **Implemented** — all 10 first-pass skills moved to
