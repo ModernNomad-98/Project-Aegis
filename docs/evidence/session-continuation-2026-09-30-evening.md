@@ -10,6 +10,8 @@ not recalled. `origin/main` moves; re-verify before acting. This session's own
 defect class was "a claim that was true when written, whose text drifted" — so
 treat every number here as a verification item, not a fact.
 
+**Reading key.** PR = pull request; AEGIS-APR-nnn (APR) = an owner approval-register entry; CP-WP-nnn = a control-plane work package; BER = the Behavioral Eval Runner; FIX-FIRST and ACCEPT are independent-review verdicts (defined in the approval register reading aids); gate-guard = the protected-file guard check; Codex = the automated pull-request reviewer.
+
 ---
 
 ## 1. Repository state at handoff
