@@ -4096,3 +4096,52 @@ pending set (skills-catalog, the readability ledger itself, the
 aegis_delivery_control README, the two issue-101 setup pages, the
 resumable-control-plane backlog), then the new-page set, re-measured at the
 next implementation base.
+## Ledger-keeper recording + batch update — readability sweep fourth batch, 2026-10-10
+
+The ledger keeper records under AEGIS-APR-101 (its unchanged recording-only
+role). The eight pages below were each independently full-page re-read (or,
+for the two largest, structured full-page reviewed per the reviewers' stated
+methods) at the base head against
+[Acceptance for each page](#acceptance-for-each-page) by a reviewer who did
+not write the page, and each reviewer restated the page's purpose and normal
+use from the page alone in the batch record. The one "corrected" row applies
+reviewer-proposed backlog-note prose verbatim (a pronoun disambiguation in
+the catalog's D80 note — the D80 decision mark and all decision text are
+preserved verbatim). Two setup pages were skipped by the re-measure rule
+before the batch (zero drift vs their keeper-recorded acceptance
+`e6fc8d24`, re-measured) and are not recorded here. No acceptance the
+reviewers did not give is recorded, and no governance text changed.
+
+| Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [The control-plane package guide](../../tools/aegis_delivery_control/README.md) | `58058ca95a281491f429b6129001f300bc85fabd` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-705-2026-10-10.md) | 2026-10-10 |
+| [The resumable control plane backlog](../../docs/roadmaps/resumable-control-plane-backlog.md) | `58058ca95a281491f429b6129001f300bc85fabd` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-705-2026-10-10.md) | 2026-10-10 |
+| [The skills catalog](../../docs/skills-catalog.md) | `58058ca95a281491f429b6129001f300bc85fabd` (corrected in-batch: D80-note pronoun disambiguation, decision text preserved, re-read by the coordinator) | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-705-2026-10-10.md) | 2026-10-10 |
+| [exploratory-charter-designer](../../.claude/skills/exploratory-charter-designer/SKILL.md) | `58058ca95a281491f429b6129001f300bc85fabd` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-705-2026-10-10.md) | 2026-10-10 |
+| [mobile-journey-test-designer](../../.claude/skills/mobile-journey-test-designer/SKILL.md) | `58058ca95a281491f429b6129001f300bc85fabd` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-705-2026-10-10.md) | 2026-10-10 |
+| [This readability ledger](../../docs/roadmaps/aegis-documentation-readability-backlog.md) | `58058ca95a281491f429b6129001f300bc85fabd` (its own owed re-read, performed; both optional candidates declined — one targets a dated snapshot, one a dated record row) | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-705-2026-10-10.md) | 2026-10-10 |
+| [membership-invitation-designer](../../.claude/skills/membership-invitation-designer/SKILL.md) | `58058ca95a281491f429b6129001f300bc85fabd` | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-705-2026-10-10.md) | 2026-10-10 |
+| [observability-by-design](../../.claude/skills/observability-by-design/SKILL.md) | `58058ca95a281491f429b6129001f300bc85fabd` | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-705-2026-10-10.md) | 2026-10-10 |
+
+Recorded revisions and re-measured drift per page (50 and 451 measurable;
+six no-recorded, cited) are in the batch record.
+
+**Count honesty (unchanged).** No exact pending count is derivable (the tool
+itself says "NOT DERIVABLE from this procedure"); the tool run at this base
+(215 provably pending / 159 no-recorded / 221 within-10 / 7 undecidable) is
+candidate evidence only, and the "212" frozen-basis figure is not reproduced.
+The index repair and official-count switch stay paused; N12/N13 untouched.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read
+against [Acceptance for each page](#acceptance-for-each-page) by a reader who
+did not write this section — the self-cost every prior update states. The
+tracked Markdown count does not change except by the new batch record note
+itself, which is pending and not counted among accepted pages.
+
+The next batch's selection rule: the remaining new-page set in the recorded
+order (the D75/D77/D81 batch skills not yet reviewed, then
+`.coord/proc08-sweep-2026-10-03.md`, `docs/delivery-workflow.md`, the three
+2026-10-02 evidence notes, the route002 triage README, the two roadmap pages,
+and the tools readability README), re-measured at the next implementation
+base.

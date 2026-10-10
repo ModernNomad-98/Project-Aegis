@@ -1405,8 +1405,8 @@ Per reconciliation §3, the Phase 5 **expansion backlog** (`e2e-test-architect` 
 `test-plan-designer` + `qa-automation-architect` + `regression-suite-curator` +
 `test-data-architect` + `playwright-e2e-engineer` composition,
 `qa-closeout-reporter` — **dropped (D80, 2026-10-10)**: covered by
-`ai-closeout-reporter` + `release-readiness-reviewer` — the latter overlaps the shipped
-`ai-closeout-reporter` + `screenshot-evidence-planner` — plus the remaining cat-06 rows)
+`ai-closeout-reporter` + `release-readiness-reviewer` (the dropped candidate itself
+overlaps the shipped `ai-closeout-reporter` + `screenshot-evidence-planner`) — plus the remaining cat-06 rows)
 remains backlog, built in Phase 8 batches (`acceptance-criteria-tester` left it when D68
 built it as `acceptance-criteria-reviewer`, narrowed to #226, and #198 left it as
 `test-tenant-provisioner`) — **except the Tier 1 headline pair
