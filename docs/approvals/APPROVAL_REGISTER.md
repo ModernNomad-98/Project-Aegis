@@ -5317,3 +5317,17 @@ the entry governs.
   Project Aegis PRs". Apply until the owner later changes the policy. A later
   change is recorded with its own evidence; this entry does not pre-authorize
   one.
+
+### AEGIS-APR-124: Consumption of the APR119 skill-contract audit baseline refresh grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-119.
+- **Status at recording:** AEGIS-APR-119 has no remaining use.
+- **Effective at:** 2026-10-08 15:55:22 UTC.
+- **Recorded at / By:** 2026-10-10 04:25:46 UTC / Stage C agent `pr-publisher`.
+- **New authority:** None. Any further baseline regeneration needs a new grant.
+- **Reason:** APR119's one permitted refresh pull request merged, exhausting its use limit.
+- **Evidence:** [PR #679](https://github.com/ModernNomad-98/Project-Aegis/pull/679)
+  merged head `1d1a50961edd72400371bad5bb4cddb0b12e62aa` as
+  `c1acc075910ea1e849401e18cdb60df31c09ef30` at the effective time above.
+  This records consumption; it does not independently recertify historical
+  validation or authorize another refresh.
