@@ -212,5 +212,5 @@ Residual risk to real CI: <cannot-determine items, matrix gaps>
   and refusing to skip the baseline.
 - `evals/trigger-evals.json` — discrimination against
   `release-readiness-reviewer`, `risk-tiered-validation-selector`,
-  `sharded-validation-with-resume`, `ci-pipeline-architect`, and
-  `environment-parity-reviewer`.
+  `sharded-validation-with-resume`, `ci-pipeline-architect`,
+  `environment-parity-reviewer`, and `ci-failure-classifier`.

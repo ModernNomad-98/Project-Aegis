@@ -4226,6 +4226,28 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   nothing itself and authorizes no host action. D84 and earlier entries are
   byte-untouched.
 
+- **D86 (2026-10-10) — N12 non-hub reciprocal change + folded-in seam fix.**
+  The owner selected N12 from the route002 triage (ci-failure-classifier →
+  sharded-validation-with-resume, b-high). The source side was already
+  complete; this lane closed the one-way gap: sharded's Use When gains the
+  Do-NOT boundary (a single stopped CI run's log classification routes to
+  `ci-failure-classifier`) and the broad-first-bullet qualifier, its
+  Supporting Files names the neighbor, and its trigger-evals gains
+  `ci-failure-classifier` in overlaps_with plus one near-miss case
+  (expected_skill `ci-failure-classifier`, auto-invocable, no §6 prefix).
+  The folded-in batch-2 named follow-up discharged: local-ci-mirror-preflight's
+  trigger-evals gains the `ci-failure-classifier` discrimination case and the
+  overlaps entry, and its Supporting Files names the neighbor (its
+  description/Use When already named it). route002's N12 disposition cell
+  reads built (D86, 2026-10-10); line 46, the §N12 note, and every other row
+  are byte-untouched. N13 remains an owner-selection item — untouched. No
+  posture, Stop Conditions, Security Rules, or description changed anywhere
+  (sharded's description is byte-unchanged at 1009 of the 1024-cap parsed
+  length — the arithmetic is in the PR body). Counts UNCHANGED (SKILL-COUNT
+  204, FAMILY-COUNT 23). This entry records the lane; it grants no new
+  execution, publication or merge authority. D85 and earlier entries are
+  byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

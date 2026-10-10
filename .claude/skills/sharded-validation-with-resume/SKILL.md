@@ -22,7 +22,9 @@ repo; running it is the preflight's and CI's job.
 ## Use When
 
 - Use when: full validation exceeds timeout ceilings, or interruptions
-  (runner death, network, timeout) force full reruns from scratch.
+  (runner death, network, timeout) force full reruns from scratch —
+  designing that machinery is this skill; classifying the run that
+  already timed out is `ci-failure-classifier`.
 - Use when: new tests/checks keep landing without being wired into any
   validation bundle — coverage decays silently.
 - Use when: branch protection breaks or blocks forever because required
@@ -42,6 +44,10 @@ repo; running it is the preflight's and CI's job.
 - Do NOT use when: a test fails intermittently and needs diagnosis — that
   is `flaky-test-detective`; resume semantics must never be used to hide
   flakes.
+- Do NOT use when: a single CI run already stopped and its log must be
+  classified (timeout-only vs a real failure, or a suspicious green run) —
+  that is `ci-failure-classifier` (read-only, by cause type); this skill
+  designs resume machinery, it never classifies one run.
 
 ## Inputs to Inspect
 
@@ -187,4 +193,5 @@ Maintenance:     rebalance triggers; shard-map edits via reviewed PRs
   refusing resume-past-failure.
 - `evals/trigger-evals.json` — discrimination against
   `risk-tiered-validation-selector`, `local-ci-mirror-preflight`,
-  `ci-pipeline-architect`, and `flaky-test-detective`.
+  `ci-pipeline-architect`, `flaky-test-detective`, and
+  `ci-failure-classifier`.
