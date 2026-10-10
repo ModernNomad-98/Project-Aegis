@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "29a453dc127e46e76f78c6486c4853fbe60b768e",
+  "built_at_ref": "408e4d6a2046b37afe7912e9c8643474df7ab037",
   "table_rows": 76,
   "events": [
     {
