@@ -3,7 +3,8 @@
   "purpose": [
     "Per-page acceptance revisions the tracker states in words but does not store as data.",
     "Every row carries the tracker line it was read from, and build_index.py verifies each revision resolves to a commit and records whether that commit itself touches the path. Nothing here is inferred from a nearby commit: a page the tracker discusses without naming a revision is absent, not guessed.",
-    "This file is evidence, not a decision. It records what the tracker says; it does not accept any page."
+    "This file is evidence, not a decision. It records what the tracker says; it does not accept any page.",
+    "RETIRED as an input by the index-repair switch (D84, 2026-10-10): the repaired build_index.py reads only the ledger consolidated keeper table; this file is kept for history and is never read by the builder."
   ],
   "source_file": "docs/roadmaps/aegis-documentation-readability-backlog.md",
   "rows": [

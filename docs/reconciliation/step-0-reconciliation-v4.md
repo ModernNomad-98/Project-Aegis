@@ -4162,6 +4162,41 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   UNCHANGED (SKILL-COUNT 204, FAMILY-COUNT 23). This entry records the
   refresh; it grants no new execution, publication or merge authority.
 
+- **D84 (2026-10-10) — Readability index repair + official-count switch.**
+  The owner-selected item (AEGIS-APR-113 item 9 / D73) resumed: the repaired
+  `build_index.py` reads ONLY the ledger's consolidated keeper table (schema
+  v1, the `<!-- acceptance-index-schema: 1 -->` sentinel; columns Stable ID,
+  Page, Event kind, Acceptance revision, Blob ID, Quote, Reviewer, Evidence
+  source, Date) — the prose harvester and `stated-acceptances.json` are
+  retired as inputs; the four prose blind spots are moot by construction and
+  pinned as negative regression tests together with the three named
+  misreadings. The one-time reviewed backfill transcribed the 12 keeper
+  sections' full-page-acceptance rows (the mechanical count is derived by the
+  build, never asserted) with per-row verbatim quote, resolving commit, and
+  blob ID `git rev-parse <commit>:<path>`; historical targeted reviews were
+  NOT transcribed (lead decision 1 — the D73 row-4 Open stays flagged). The
+  six named lost commits (65bacc7d6b85, d3dcb62a335d, 3c44f4a, e9cce7d,
+  288d993, 7f98950) are recorded as `lost-commit` events — never bound,
+  never dropped; their pages count as pending until re-reviewed. Preservation
+  is main-containment at build time (lead decision 2); a stronger refs
+  namespace/tag convention stays an owner-choice item. `check_index.py` now
+  prints the official buckets and the official pending count at the pinned
+  ref; the switch PR stated that count at its pinned base before effect, and
+  the one-published-count rule moved every counting surface (ledger, tool
+  README, open-decisions row, skill-eval procedure, forecast) to cite the
+  index — the ledger publishes no count of its own. Lifecycle: this PR
+  appends APR-114's CONSUMED event (its own recording step) and APR-115
+  becomes ACTIVE from its merge. The repair and the switch were delivered as
+  ONE pull request under APR-114's repair scope with the switch's
+  requirements embedded. N12/N13 untouched; the "212" frozen-basis figure is
+  not reproduced as any current count. Two further recorded acceptances (the
+  first keeper recording's `e6fc8d24` setup pages) rest on a revision not
+  contained in `refs/remotes/origin/main`; under the owner-selected
+  main-containment preservation rule they carry NO acceptance row and their
+  pages count pending until re-reviewed. Counts UNCHANGED (SKILL-COUNT 204,
+  FAMILY-COUNT 23). This entry records the repair and the switch; it grants
+  no new execution, publication or merge authority.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

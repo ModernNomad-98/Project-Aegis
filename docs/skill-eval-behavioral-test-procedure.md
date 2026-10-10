@@ -199,7 +199,10 @@ report it; never as a rate, and never as a score for the skill.
 A new record under [evidence](evidence/README.md) is a **new tracked page**.
 Under the [readability backlog](roadmaps/aegis-documentation-readability-backlog.md)
 it joins the pending set and the stated totals move with it. Record that rather
-than leaving the ledger wrong.
+than leaving the ledger wrong. **Dated forward note, 2026-10-10 (D84): the
+"stated totals" are now the official count in `tools/readability_acceptance/`
+— the ledger publishes no count of its own and cites the index; the index is
+rebuilt on demand and after each keeper recording (AEGIS-APR-115).**
 
 ## Reporting a case as unsatisfiable
 

@@ -4948,6 +4948,27 @@ the entry governs.
   no other limit stated. It recurs from the switch's merge until revoked, and
   routine use does not consume it.
 
+### AEGIS-APR-114: CONSUMED — the index-repair switch merged
+
+- **Event:** CONSUMED; target grant AEGIS-APR-114.
+- **Status at recording:** AEGIS-APR-114 has no remaining use; its named
+  pull requests (the decision record, the tool repair, the switch) have
+  merged. The tool repair and the switch were delivered as ONE pull request
+  (this PR), which APR-114's repair scope allows ("may be delivered in one
+  pull request or several") with the switch's own requirements met inside it:
+  the count stated at the pinned base ref before effect, and this CONSUMED
+  event appended by the PR itself, per APR-114's recording step.
+- **Effective at:** the merge of this pull request to the default branch; the
+  merged head is recorded by the merge agent in its MG receipt.
+- **Recorded at / By:** 2026-10-10 / Stage C agent `pr-publisher`.
+- **New authority:** None. AEGIS-APR-115 (standing index-rebuild PRs) becomes
+  ACTIVE from this merge, exactly as its own entry states.
+- **Reason:** APR-114's use limit (the decision record, every tool-repair
+  pull request, and the switch) is exhausted by this merge.
+- **Evidence:** The index-repair switch pull request (this PR); merged head
+  in the MG receipt. This records consumption; it does not independently
+  recertify the repair and confers no new authority.
+
 ### AEGIS-APR-116: The ledger keeper may record targeted reviews in the acceptance record table
 
 - **Event:** GRANT; a new grant. It widens the ledger keeper's role and does
