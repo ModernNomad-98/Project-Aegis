@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "role-coverage-test-designer",
+  "description": "Trigger and behavior cases for role-coverage QA design: role × surface allowed-path matrices built on the shipped authorization matrix, interface-consistency deltas across roles, layer-mapped coverage with persona data and execution handoffs, and routing away from matrix design, denial testing, strategy, per-change plans, spec writing and scripted cases.",
+  "cases": [
+    {
+      "id": "happy-path-role-coverage",
+      "type": "should_trigger",
+      "prompt": "Design role coverage for our SaaS app — which allowed behaviors should each role (anonymous, member, manager, admin, owner, support, platform) have covered, and at which test layer?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names every shipped role and builds a role × surface allowed-path matrix from the authorization matrix (composed, not restated).",
+          "Names interface-consistency deltas where the same surface differs across roles, each with the check that would catch a wrong difference.",
+          "Maps each allowed path to the cheapest reliable layer with persona data, and names execution handoffs instead of executing.",
+          "States denials and custom-role coverage as out of scope with their owning owners (authorization-matrix-designer step 7 / multi-tenant-security-tester; the unbuilt #59 extension)."
+        ]
+      }
+    },
+    {
+      "id": "edge-interface-consistency-delta",
+      "type": "should_trigger",
+      "prompt": "The project list screen sometimes shows admin-only actions to managers. What role-coverage checks would catch that?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the delta precisely: project list screen, manager vs admin, the differing actions, and the check that catches a wrong difference (for example a UI-state check per role plus the API path that must not serve the admin action to a manager).",
+          "Does not design the denial tests for the underlying permission — that stays with authorization-matrix-designer step 7 / multi-tenant-security-tester."
+        ]
+      }
+    },
+    {
+      "id": "negative-permission-tests-elsewhere",
+      "type": "should_not_trigger",
+      "prompt": "Write the negative permission tests proving a member cannot delete another member's project.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; denial and negative-permission tests belong to authorization-matrix-designer step 7 and multi-tenant-security-tester."
+        ]
+      }
+    },
+    {
+      "id": "stop-no-matrix",
+      "type": "should_trigger",
+      "prompt": "Set up role coverage testing for our app.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Halts and asks for the authorization matrix design or role inventory before designing coverage.",
+          "Does not invent roles or grants from the product name."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-write-specs",
+      "type": "should_trigger",
+      "prompt": "Design the role coverage for checkout, then write the Playwright specs for each role.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the coverage design, then stops at execution: writing the specs is playwright-e2e-engineer (manual-only) and is handed off by name, not executed in the same pass.",
+          "States the handoff explicitly rather than silently dropping the execution half of the ask."
+        ]
+      }
+    }
+  ]
+}

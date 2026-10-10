@@ -747,7 +747,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->198<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->199<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch), fronted by one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -780,7 +780,7 @@ keeps a human as the approval gate on anything irreversible. See
    policy audit, secrets hardening, supply-chain review, security PR review, migration safety,
    SAST triage. *e.g.* `threat-modeler`, `rls-policy-auditor`, `secrets-identity-hardener`,
    `supply-chain-security-reviewer`, `security-pr-reviewer`.
-6. **QA, E2E & evidence** *(Phase 5, 22)* — test strategy through execution and proof: QA
+6. **QA, E2E & evidence** *(Phase 5, 23)* — test strategy through execution and proof: QA
    strategy, test plans, coverage mapping, Playwright/unit/build QA, flake control, test data,
    evidence policy, and CI run failure classification (added by D68). *e.g.* `qa-strategy-architect`, `test-coverage-mapper`,
    `playwright-e2e-engineer`, `flaky-test-detective`, `screenshot-evidence-planner`.
@@ -1159,6 +1159,7 @@ QA backlog, roadmap #184/#185/#204, plus QA Tier 1 builds under D68):
 | `visual-regression-test-designer` | (G1, #203) Designs visual/pixel-regression coverage: stable-state capture, baseline/diff, positive snapshot-selection + update review, deterministic rendering. Designs; captures nothing. | auto + manual |
 | `exploratory-charter-designer` | (G1, #228) Designs timeboxed exploratory-testing charters: mission, risks, personas, data, entry paths, note/evidence conventions. Designs; executes nothing. | auto + manual |
 | `mobile-journey-test-designer` | (G1, #230) Designs mobile-journey QA: critical journeys × breakpoints/touch/dialogs/navigation/orientation/keyboard/safe area, device+data matrix, evidence composition. Layout stays with `mobile-viewport-craft`. | auto + manual |
+| `role-coverage-test-designer` | (G1, #229) Designs role-coverage QA: role × surface allowed-path matrix, interface-consistency deltas across roles, layer-mapped coverage with persona data and execution handoffs. Designs; executes nothing. | auto + manual |
 
 Phase 6 — cloud, DevOps, reliability & release pack (`rollback-strategy-designer`
 merged into `rollback-runbook-author` per reconciliation §3; expansion builds under D71):

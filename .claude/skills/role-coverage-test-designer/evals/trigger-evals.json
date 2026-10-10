@@ -1,0 +1,88 @@
+{
+  "skill": "role-coverage-test-designer",
+  "description": "Trigger discrimination for role-coverage QA design: allowed-path matrices and cross-role interface deltas versus designing the authorization matrix (authorization-matrix-designer), denial suites (multi-tenant-security-tester, manual-only), product strategy (qa-strategy-architect), per-change plans (test-plan-designer), spec implementation (playwright-e2e-engineer, manual-only), and scripted manual cases (manual-test-case-creator).",
+  "overlaps_with": [
+    "authorization-matrix-designer",
+    "multi-tenant-security-tester",
+    "qa-strategy-architect",
+    "test-plan-designer",
+    "playwright-e2e-engineer",
+    "manual-test-case-creator"
+  ],
+  "cases": [
+    {
+      "id": "role-coverage-wins-here",
+      "prompt": "We have the authorization matrix. Which allowed behaviors should each role have covered, at which layer, and where do the same screens differ between roles?",
+      "expected_skill": "role-coverage-test-designer",
+      "should_not_trigger": [
+        "authorization-matrix-designer",
+        "test-plan-designer"
+      ],
+      "reason": "Coverage of the allowed paths and cross-role interface deltas over an EXISTING matrix is this skill; designing the matrix or planning one change is not."
+    },
+    {
+      "id": "matrix-design-goes-to-amd",
+      "prompt": "Design the authorization matrix for our product — roles, grants, and the deny-by-default policy.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": [
+        "role-coverage-test-designer"
+      ],
+      "reason": "Designing roles, grants and the deny-by-default policy is authorization-matrix-designer; this skill consumes its output as input."
+    },
+    {
+      "id": "denials-go-to-tenant-tester",
+      "prompt": "Explicitly invoke multi-tenant-security-tester. Build the cross-tenant and wrong-role negative suite proving members cannot delete other members' projects.",
+      "expected_skill": "multi-tenant-security-tester",
+      "should_not_trigger": [
+        "role-coverage-test-designer"
+      ],
+      "reason": "Denial and negative-permission suites are multi-tenant-security-tester's (manual-only) and authorization-matrix-designer step 7's; this skill covers allowed paths only."
+    },
+    {
+      "id": "strategy-goes-to-architect",
+      "prompt": "Decide our QA strategy — which layers we invest in and who owns each.",
+      "expected_skill": "qa-strategy-architect",
+      "should_not_trigger": [
+        "role-coverage-test-designer"
+      ],
+      "reason": "Product-wide layer investment and ownership is strategy; role coverage is one design inside it."
+    },
+    {
+      "id": "per-change-plan-goes-to-plan-designer",
+      "prompt": "Plan the testing for the new roles change — what to test at which layer, with what data, and when testing is done.",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "role-coverage-test-designer"
+      ],
+      "reason": "A single change's per-layer plan with exit criteria is test-plan-designer; a role-coverage design spans the shipped role set, not one change."
+    },
+    {
+      "id": "specs-go-to-playwright",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Write Playwright specs covering each role's checkout journey.",
+      "expected_skill": "playwright-e2e-engineer",
+      "should_not_trigger": [
+        "role-coverage-test-designer"
+      ],
+      "reason": "Implementing the E2E specs is playwright-e2e-engineer (manual-only); this skill names the coverage and hands the specs off."
+    },
+    {
+      "id": "scripted-cases-go-to-creator",
+      "prompt": "Write step-by-step manual test cases for the manager role's dashboard with exact data and expected results.",
+      "expected_skill": "manual-test-case-creator",
+      "should_not_trigger": [
+        "role-coverage-test-designer"
+      ],
+      "reason": "Stranger-executable scripted cases are manual-test-case-creator's output; this skill designs the coverage, not the case steps."
+    },
+    {
+      "id": "delta-check-wins-here",
+      "prompt": "The same settings screen hides the billing tab for members. Design the cross-role checks that catch menu and field differences like that.",
+      "expected_skill": "role-coverage-test-designer",
+      "should_not_trigger": [
+        "authorization-matrix-designer",
+        "manual-test-case-creator"
+      ],
+      "reason": "Naming cross-role interface-consistency deltas and their checks is this skill's core; no matrix design or scripted steps are requested."
+    }
+  ]
+}
