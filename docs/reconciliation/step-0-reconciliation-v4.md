@@ -139,8 +139,9 @@ first pass to v4's 10 for quality.
 `multi-tenant-data-architect`, `authorization-matrix-designer`, `plan-entitlement-architect`,
 `audit-log-architect`, `saas-cost-architect`, `api-event-architect`.
 Execution-plan equivalents merged: `rls-policy-author`/`rls-negative-test-designer` →
-**deferred to Phase 4** (RLS pack) to avoid duplication; `tenant-provisioning-designer`,
-`membership-invitation-designer`, `role-permission-architect` — **✅ built (D78, 2026-10-10) as the #59 extension of `authorization-matrix-designer`**, `security-impact-note-author`
+**deferred to Phase 4** (RLS pack) to avoid duplication; `tenant-provisioning-designer` —
+**✅ built (D81, 2026-10-10)**, `membership-invitation-designer` —
+**✅ built (D81, 2026-10-10)**, `role-permission-architect` — **✅ built (D78, 2026-10-10) as the #59 extension of `authorization-matrix-designer`**, `security-impact-note-author`
 → Phase 3 expansion backlog.
 
 ### Phase 4 — Security, RLS & supply chain (P0/P1)
@@ -4087,6 +4088,32 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   history). Counts are UNCHANGED: no skill added, removed or renamed;
   SKILL-COUNT stays 202; FAMILY-COUNT stays 23. This entry records the
   closure decisions and the shipped arithmetic; it grants no new execution,
+  publication or merge authority.
+
+- **D81 (2026-10-10) — Batch E tenant-lifecycle design skills built (two skills).**
+  Decided and built two owner-selected proposal rows in one PR:
+  `tenant-provisioning-designer` (G4 row 587; roadmap #57) and
+  `membership-invitation-designer` (G4 row 588; roadmap #58, built after
+  #59). Both are read-only QA/design skills — they emit workflow designs in
+  conversation and create, configure, send, generate, and execute nothing —
+  so both are auto-invocable with no `disable-model-invocation` and no
+  MANUAL-ONLY sentinel, per standard §5. The honesty caveats stand:
+  `tenant-modeler` gives lifecycle semantics only (row 587) and models
+  invitation states but not token/binding/seat/spam mechanics (row 588);
+  this entry records the build decision, not measured demand. Compose,
+  never restate (proposal rows 514/518/512): both skills compose
+  `command-gateway-architect`'s idempotency contract (including the D79
+  different-payload and in-flight policies), `api-event-architect`'s
+  rate-limit contract, `plan-entitlement-architect`'s seat pool, and the
+  #59-extended `authorization-matrix-designer` grant-ceiling/custom-role
+  output as inputs by reference. Each ships `evals/evals.json` and
+  `evals/trigger-evals.json` discriminating against its named neighbors,
+  including the manual-only ones (test-tenant-provisioner,
+  secrets-identity-hardener, multi-tenant-security-tester) with the §6
+  prefix. Family 4 "SaaS & tenant isolation" grows 10 → 12; the library
+  total grows 202 → 204; FAMILY-COUNT stays 23. The Phase 3 expansion-list
+  marks for #57 and #58 are recorded above (§3). This entry records the
+  build decision and the shipped arithmetic; it grants no new execution,
   publication or merge authority.
 
 ## 6. Post-merge corrections
