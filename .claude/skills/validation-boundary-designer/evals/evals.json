@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "validation-boundary-designer",
+  "description": "Trigger and behavior cases for boundary-validation design: boundary inventories, per-boundary validation and type-safe schema choices, invariants with named enforcement points, database constraint backstops, and routing away from diff review, denial testing, wire contracts, pipeline design and migrations.",
+  "cases": [
+    {
+      "id": "happy-path-boundary-design",
+      "type": "should_trigger",
+      "prompt": "Design where validation should live for our invoicing system — API endpoints, command handlers, forms, and the database. No single layer should be the only guard.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names every boundary (API, commands, forms, database, integrations) and the validation each performs.",
+          "Chooses shared vs boundary-specific type-safe schemas per boundary.",
+          "Lists the non-negotiable business/security invariants with a named enforcement point and re-check layers.",
+          "Plans database-level constraint backstops per invariant, and claims to write or review no code."
+        ]
+      }
+    },
+    {
+      "id": "edge-invariant-split-across-layers",
+      "type": "should_trigger",
+      "prompt": "The 'invoice total must equal the sum of its lines' rule needs to hold across the form, the API, and the database. Design its enforcement points.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the primary enforcement point and the independent backstop (for example a database check or trigger-level guard) for the invariant.",
+          "Does not rely on a single layer, and states what each layer does and does not guarantee."
+        ]
+      }
+    },
+    {
+      "id": "negative-mass-assignment-review",
+      "type": "should_not_trigger",
+      "prompt": "Review this PR diff for mass-assignment and authorization holes in the new update endpoint.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; reviewing an actual diff for mass-assignment and authorization holes belongs to security-pr-reviewer."
+        ]
+      }
+    },
+    {
+      "id": "stop-no-inventory",
+      "type": "should_trigger",
+      "prompt": "Add validation to our system.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Halts and asks for the boundary or surface inventory before designing.",
+          "Does not invent boundaries from the system name."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-diff-or-code",
+      "type": "should_trigger",
+      "prompt": "Design the validation boundaries for the new API, then write the validation code and the migration for the constraint.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the design, then stops at implementation: writing code and migrations is handed off (schema-evolution-planner for the migration), not executed in the same pass.",
+          "States the handoff explicitly rather than silently dropping the implementation half of the ask."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "property-based-test-designer",
+  "description": "Trigger and behavior cases for property-based test design: domain invariants per target, bounded generator domains with shrinking, counterexample triage, runner handoff, and routing away from per-change plans, test-data design, test-file writing and flake repair.",
+  "cases": [
+    {
+      "id": "happy-path-parser-properties",
+      "type": "should_trigger",
+      "prompt": "Design property-based coverage for our CSV parser — which invariants should hold for every input, and what should the generators look like?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States domain invariants (for example parse-then-print round-trips and quoted-field handling) that do not restate the implementation.",
+          "Names the generator domains with bounds and the shrink direction per property.",
+          "Defines counterexample triage and names the runner handoff without writing or running anything."
+        ]
+      }
+    },
+    {
+      "id": "edge-state-machine-invariant",
+      "type": "should_trigger",
+      "prompt": "Design property-based tests for our order state machine — what invariants hold across every transition sequence?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States transition-sequence invariants (for example: no transition reaches a forbidden state; cancelled orders cannot be paid) with bounded transition-sequence generators and shrinking.",
+          "Keeps the properties domain-derived rather than copied from the implementation."
+        ]
+      }
+    },
+    {
+      "id": "negative-write-test-files",
+      "type": "should_not_trigger",
+      "prompt": "Write the vitest property test file for the CSV parser and run it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; writing and running the test files belongs to vitest-unit-component-engineer."
+        ]
+      }
+    },
+    {
+      "id": "stop-no-target",
+      "type": "should_trigger",
+      "prompt": "Add property-based testing to our codebase.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Halts and asks which unit or module the properties should cover.",
+          "Does not invent targets from the codebase name."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-write-suite",
+      "type": "should_trigger",
+      "prompt": "Design the property tests for the invoice amount math, then write the test file and run the suite.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the design, then stops at implementation: writing and running the suite is vitest-unit-component-engineer (manual-only) and is handed off by name, not executed in the same pass.",
+          "States the handoff explicitly rather than silently dropping the implementation half of the ask."
+        ]
+      }
+    }
+  ]
+}

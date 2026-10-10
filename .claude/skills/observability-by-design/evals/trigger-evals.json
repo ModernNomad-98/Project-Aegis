@@ -1,0 +1,68 @@
+{
+  "skill": "observability-by-design",
+  "description": "Trigger discrimination for telemetry-contract design: what to emit and how requests correlate, versus hands-on instrumentation (observability-operator, manual-only), SLOs and alerting (slo-reliability-architect), redaction-rule authorship (sensitive-disclosure-guard), synthetic monitoring (synthetic-monitoring-architect), and platform infrastructure (cloud-architecture-decider).",
+  "overlaps_with": [
+    "observability-operator",
+    "slo-reliability-architect",
+    "sensitive-disclosure-guard",
+    "synthetic-monitoring-architect",
+    "cloud-architecture-decider"
+  ],
+  "cases": [
+    {
+      "id": "telemetry-design-wins-here",
+      "prompt": "Design what our new checkout service should log, metric, and trace, and the correlation-ID scheme across the queue.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "observability-operator",
+        "slo-reliability-architect"
+      ],
+      "reason": "The emission contract and correlation scheme for a system under construction is this skill's design; no instrumentation run or SLO target is in view."
+    },
+    {
+      "id": "instrumentation-goes-to-operator",
+      "prompt": "Explicitly invoke observability-operator. Add the structured log statements and metric emitters to the running checkout service.",
+      "expected_skill": "observability-operator",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "Hands-on instrumentation of a live system is observability-operator's (manual-only); this skill designs the contract and instruments nothing."
+    },
+    {
+      "id": "slo-goes-to-architect",
+      "prompt": "Set the SLO targets, error budgets, and alerting thresholds for the checkout service.",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "SLO targets and alerting policy are slo-reliability-architect's scope; the telemetry contract feeds it, it does not own it."
+    },
+    {
+      "id": "redaction-rules-go-to-guard",
+      "prompt": "Define which fields must be masked in logs and the exact redaction rules.",
+      "expected_skill": "sensitive-disclosure-guard",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "Authoring redaction rules is sensitive-disclosure-guard's scope; the design composes those rules by reference."
+    },
+    {
+      "id": "synthetic-monitoring-goes-to-architect",
+      "prompt": "Design the scheduled production probes that exercise the checkout journey from outside.",
+      "expected_skill": "synthetic-monitoring-architect",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "Synthetic probes against the live app are synthetic-monitoring-architect's scope; this skill designs internal emission, not external checks."
+    },
+    {
+      "id": "platform-goes-to-decider",
+      "prompt": "Choose the cloud platform and the infrastructure layout for our observability stack.",
+      "expected_skill": "cloud-architecture-decider",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "Platform and infrastructure decisions are cloud-architecture-decider's scope; the telemetry contract is platform-neutral."
+    }
+  ]
+}

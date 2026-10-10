@@ -747,7 +747,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->199<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->202<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch), fronted by one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -768,7 +768,7 @@ keeps a human as the approval gate on anything irreversible. See
    process audit.
    *e.g.* `ai-sdlc-operating-model`, `agent-authorization-matrix`, `agent-memory-governance`,
    `agent-governance-audit`.
-3. **Core architecture & engineering** *(Phase 2, 10)* — modeling and building systems well:
+3. **Core architecture & engineering** *(Phase 2, 12)* — modeling and building systems well:
    domain models, architecture design, ADRs, docs-first + test-first implementation, debugging,
    code review. *e.g.* `domain-modeler`, `architecture-designer`, `adr-writer`, `tdd-engineer`,
    `systematic-debugger`.
@@ -780,7 +780,7 @@ keeps a human as the approval gate on anything irreversible. See
    policy audit, secrets hardening, supply-chain review, security PR review, migration safety,
    SAST triage. *e.g.* `threat-modeler`, `rls-policy-auditor`, `secrets-identity-hardener`,
    `supply-chain-security-reviewer`, `security-pr-reviewer`.
-6. **QA, E2E & evidence** *(Phase 5, 23)* — test strategy through execution and proof: QA
+6. **QA, E2E & evidence** *(Phase 5, 24)* — test strategy through execution and proof: QA
    strategy, test plans, coverage mapping, Playwright/unit/build QA, flake control, test data,
    evidence policy, and CI run failure classification (added by D68). *e.g.* `qa-strategy-architect`, `test-coverage-mapper`,
    `playwright-e2e-engineer`, `flaky-test-detective`, `screenshot-evidence-planner`.
@@ -1102,6 +1102,8 @@ Phase 2 — core architecture & engineering pack:
 | `code-simplifier` | Behavior-preserving simplification with the suite green before and after every move; coverage gate; restraint ("not done" list) is a deliverable. | **manual only** |
 | `principal-code-analyst` | Subsystem-level strategic analysis laddering code findings to architecture, security, cost; risk register + small-step remediation with validation signals. | auto + manual |
 | `full-codebase-auditor` | Whole-repo audit with inventory-first coverage; findings filed as confirmed / likely / hypotheses / missing information. (Skill = procedure; same-named subagent composes it.) | auto + manual |
+| `validation-boundary-designer` | (G3, #37/#38/#141/#157) Designs where validation lives at each boundary (API, command, form, database, integration): per-boundary schema choices, non-negotiable invariants with named enforcement points, database constraint backstops. Designs; writes and reviews no code. | auto + manual |
+| `observability-by-design` | (G3, #22) Designs the telemetry contract: per-component logs/metrics/traces, correlation-ID scheme, bounded metric sets, redaction composed by reference to `sensitive-disclosure-guard`. Designs; instruments nothing. | auto + manual |
 
 Phase 3 — SaaS & tenant isolation pack:
 
@@ -1160,6 +1162,7 @@ QA backlog, roadmap #184/#185/#204, plus QA Tier 1 builds under D68):
 | `exploratory-charter-designer` | (G1, #228) Designs timeboxed exploratory-testing charters: mission, risks, personas, data, entry paths, note/evidence conventions. Designs; executes nothing. | auto + manual |
 | `mobile-journey-test-designer` | (G1, #230) Designs mobile-journey QA: critical journeys × breakpoints/touch/dialogs/navigation/orientation/keyboard/safe area, device+data matrix, evidence composition. Layout stays with `mobile-viewport-craft`. | auto + manual |
 | `role-coverage-test-designer` | (G1, #229) Designs role-coverage QA: role × surface allowed-path matrix, interface-consistency deltas across roles, layer-mapped coverage with persona data and execution handoffs. Designs; executes nothing. | auto + manual |
+| `property-based-test-designer` | (G2, #194) Designs property-based test coverage: domain invariants per target, bounded generator domains with shrinking, counterexample triage, runner handoff. On-demand specialized coverage. Designs; writes and runs no tests. | auto + manual |
 
 Phase 6 — cloud, DevOps, reliability & release pack (`rollback-strategy-designer`
 merged into `rollback-runbook-author` per reconciliation §3; expansion builds under D71):

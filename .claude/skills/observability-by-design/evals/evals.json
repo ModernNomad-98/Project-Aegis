@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "observability-by-design",
+  "description": "Trigger and behavior cases for telemetry-contract design: per-component logs/metrics/traces, correlation-ID schemes, redaction composed by reference to sensitive-disclosure-guard, bounded metric sets, and routing away from instrumentation, SLOs, redaction-rule authorship, synthetic monitoring and platform decisions.",
+  "cases": [
+    {
+      "id": "happy-path-telemetry-contract",
+      "type": "should_trigger",
+      "prompt": "Design the telemetry for our new order service — what should each component log, metric, and trace, and how do we tie a request together across the queue?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Writes a per-component telemetry contract (logs, metrics, spans) with a correlation-ID scheme covering synchronous and asynchronous hops.",
+          "Composes redaction by reference to sensitive-disclosure-guard without restating its rules.",
+          "Bounds the metric/trace set and claims to instrument nothing."
+        ]
+      }
+    },
+    {
+      "id": "edge-redaction-composition",
+      "type": "should_trigger",
+      "prompt": "Our new service will log email addresses and invoice IDs. Design the redaction-in-design part of its telemetry contract.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Marks the sensitive fields and names sensitive-disclosure-guard as the rule owner, composing its rules by reference instead of writing new ones.",
+          "Names the emit points where redaction is applied.",
+          "Does not author or weaken redaction rules."
+        ]
+      }
+    },
+    {
+      "id": "negative-instrumentation",
+      "type": "should_not_trigger",
+      "prompt": "Instrument our running service hands-on — add the log statements and metrics now.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; hands-on instrumentation and stack operation belongs to observability-operator."
+        ]
+      }
+    },
+    {
+      "id": "stop-no-context",
+      "type": "should_trigger",
+      "prompt": "Add observability to our system.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Halts and asks for the service architecture and data flows before designing.",
+          "Does not invent components from the system name."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-instrument",
+      "type": "should_trigger",
+      "prompt": "Design the telemetry contract for the billing service, then implement the instrumentation.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the design, then stops at implementation: hands-on instrumentation is observability-operator (manual-only) and is handed off by name, not executed in the same pass.",
+          "States the handoff explicitly rather than silently dropping the implementation half of the ask."
+        ]
+      }
+    }
+  ]
+}

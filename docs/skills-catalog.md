@@ -395,11 +395,21 @@ All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 | `code-simplifier` | cat 01 #11 adjacent | **no** (manual-only; edits working code) | Behavior-preserving simplification, green-before-and-after per move; coverage gate; "not done" list is a deliverable. |
 | `principal-code-analyst` | cat 01 | yes | Subsystem strategic read: findings laddered to architecture/security/cost claims; risk register; small-step remediation + validation plan. |
 | `full-codebase-auditor` | cat 06/08 #280 | yes | Whole-repo audit, inventory BEFORE findings; results filed as confirmed / likely / hypotheses / missing information; provable coverage. |
+| `validation-boundary-designer` | cat 01 **#37/#38** + cat 04 **#141/#157** | yes | Boundary-validation design: where validation lives at each boundary (API, command, form, database, integration), per-boundary schema choices, non-negotiable invariants with named enforcement points, and database constraint backstops. Designs; writes and reviews no code and no diff. |
+| `observability-by-design` | cat 01 **#22** | yes | Telemetry-contract design: per-component logs/metrics/traces, correlation-ID scheme, bounded metric sets, and redaction composed by reference to `sensitive-disclosure-guard` — never restated. Designs; instruments nothing. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the three Phase 2 clusters:
 design (`domain-modeler`, `architecture-designer`, `adr-writer`), implementation
 (`docs-first-implementer`, `tdd-engineer`, `systematic-debugger`), and review/audit
 (`code-reviewer`, `code-simplifier`, `principal-code-analyst`, `full-codebase-auditor`).
+
+A fourth cluster was added by D77 (2026-10-10): **boundary & telemetry design**
+(`validation-boundary-designer`, `observability-by-design`) — with cross-phase
+discrimination against `security-pr-reviewer`, `multi-tenant-security-tester`,
+`api-event-architect`, `command-gateway-architect`, `schema-evolution-planner`,
+`observability-operator`, `slo-reliability-architect`,
+`sensitive-disclosure-guard`, `synthetic-monitoring-architect`, and
+`cloud-architecture-decider`.
 
 > Namespace note (intended, see Phase 6 note below): `full-codebase-auditor` exists as
 > both a **subagent** (`.claude/agents/`, the review lens) and this **skill**
@@ -545,6 +555,7 @@ auto-invocable, no `disable-model-invocation` — and each ships both eval files
 | `exploratory-charter-designer` | cat 06 **#228** | yes | Timeboxed exploratory-testing charter: mission, ranked risks, personas, data, entry paths, note/evidence conventions. Designs; executes nothing. |
 | `mobile-journey-test-designer` | cat 06 **#230** | yes | Critical-journey mobile QA design: breakpoints, touch, dialogs, navigation, orientation, keyboard, safe area, device+data matrix, evidence composition. Layout stays with `mobile-viewport-craft`. |
 | `role-coverage-test-designer` | cat 06 **#229** (D10 Tier 2, built by D76) | yes | Role-coverage QA design over the shipped authorization matrix: role × surface allowed-path matrix, interface-consistency deltas across roles, layer-mapped coverage with persona data and execution handoffs. Denials stay with `authorization-matrix-designer` step 7 / `multi-tenant-security-tester`; custom-role coverage deferred to the unbuilt #59 extension. |
+| `property-based-test-designer` | cat 06 **#194** (D10 Tier 3, built by D77) | yes | Property-based test design: domain invariants per target, bounded generator domains with shrinking, counterexample triage, runner handoff. On-demand, specialized coverage. Designs; writes and runs no tests. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 5 clusters:
 **strategy/plan/coverage** (`qa-strategy-architect`, `test-plan-designer`,
@@ -571,6 +582,11 @@ A sixth cluster was added by D76 (2026-10-10): **role coverage**
 `authorization-matrix-designer`, `multi-tenant-security-tester`,
 `qa-strategy-architect`, `test-plan-designer`, `playwright-e2e-engineer`, and
 `manual-test-case-creator`.
+
+A seventh cluster was added by D77 (2026-10-10): **property-based design**
+(`property-based-test-designer`) — discriminated against `test-plan-designer`,
+`test-data-architect`, `vitest-unit-component-engineer`, and
+`flaky-test-detective`.
 
 ### Skills (Phase 6 — cloud, DevOps, reliability & release pack)
 
@@ -1322,10 +1338,13 @@ the [AI-SDLC batch proposal](roadmaps/ai-sdlc-skill-batch-proposal.md).
 Source: [`docs/skills/01-software-architecture-engineering.md`](skills/01-software-architecture-engineering.md),
 [`04-backend-api-data-engineering.md`](skills/04-backend-api-data-engineering.md).
 The Phase 2 **expansion backlog** (reconciliation §3: `api-contract-designer`,
-`idempotency-first-designer`, `validation-boundary-designer`, `observability-by-design`,
-`operational-runbook-author`, `system-context-mapper`, `bounded-context-identifier`,
-`dependency-direction-guard`, `refactor-safety-planner`) remains backlog, built in
-Phase 8 batches.
+`idempotency-first-designer`, `operational-runbook-author`, `system-context-mapper`,
+`bounded-context-identifier`, `dependency-direction-guard`,
+`refactor-safety-planner`) remains backlog, built in Phase 8 batches — **except
+`validation-boundary-designer` and `observability-by-design`, ✅ built by D77
+(2026-10-10) and moved to
+[Implemented → Skills (Phase 2)](#skills-phase-2--core-architecture--engineering-pack)
+above.**
 
 ### Phase 3 — SaaS & tenant isolation (P0/P1)
 ✅ **Implemented** — all 9 first-pass skills (plus `feature-flag-architect`, D64) moved to
