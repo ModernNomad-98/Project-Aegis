@@ -1,7 +1,7 @@
 {
   "skill": "azure-saas-architect",
-  "description": "Trigger discrimination for the Phase 6 cloud-architecture cluster: Azure mapping vs the cloud decision vs AWS vs IaC review, plus the shipped saas-platform-architect boundary.",
-  "overlaps_with": ["cloud-architecture-decider", "aws-saas-architect", "iac-reviewer", "saas-platform-architect"],
+  "description": "Trigger discrimination for the Phase 6 cloud-architecture cluster: Azure mapping vs the cloud decision vs AWS vs IaC review, plus the shipped saas-platform-architect boundary and the configured-controls review (cloud-security-baseline-reviewer).",
+  "overlaps_with": ["cloud-architecture-decider", "aws-saas-architect", "iac-reviewer", "saas-platform-architect", "cloud-security-baseline-reviewer"],
   "cases": [
     {
       "id": "azure-mapping-wins-here",
@@ -30,6 +30,13 @@
       "expected_skill": "saas-platform-architect",
       "should_not_trigger": ["azure-saas-architect"],
       "reason": "Pooled/siloed and control-plane decisions are provider-neutral platform structure — an INPUT the Azure architect consumes, not something it decides."
+    },
+    {
+      "id": "configured-controls-go-to-cloud-security-baseline-reviewer",
+      "prompt": "Here are az role assignment, az storage account list and az security pricing list exports from our production subscription. Check them against the CIS Azure benchmark and tell me what's missing.",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": ["azure-saas-architect"],
+      "reason": "Checking an already-configured subscription's controls against a named technical baseline from supplied exports is cloud-security-baseline-reviewer; this skill designs or reviews the architecture."
     }
   ]
 }

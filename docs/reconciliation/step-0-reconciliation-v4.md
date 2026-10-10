@@ -4248,6 +4248,28 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   execution, publication or merge authority. D85 and earlier entries are
   byte-untouched.
 
+- **D87 (2026-10-10) — N13 non-hub reciprocal change.** The owner selected
+  N13 from the route002 triage (cloud-security-baseline-reviewer →
+  azure-saas-architect, b-high). The source side was already complete (its
+  description names the boundary and its trigger-evals carries both triage
+  cases + the overlaps entry; its Security Rules section is untouched); the
+  lane closed the one-way gap with zero prior mentions of the neighbor
+  anywhere in azure-saas-architect (git grep count 0 before the edit):
+  azure-saas-architect's Use When gains the Do-NOT boundary (an EXISTING
+  subscription's configured controls vs a named technical baseline routes to
+  `cloud-security-baseline-reviewer`) and the :48–49 bullet qualifier, its
+  Supporting Files names the neighbor, and its trigger-evals gains
+  `cloud-security-baseline-reviewer` in overlaps_with plus one near-miss
+  azure-exports case (expected_skill `cloud-security-baseline-reviewer`,
+  auto-invocable, no §6 prefix). Its description is byte-unchanged at 999 of
+  the 1024-cap parsed length (cap arithmetic in the PR body). route002's N13
+  disposition cell reads built (D87, 2026-10-10); line 46, L58, L60–62, the
+  N12 row (built (D86)), and every other row are byte-untouched. No posture,
+  Stop Conditions, Security Rules, or description changed anywhere. Counts
+  UNCHANGED (SKILL-COUNT 204, FAMILY-COUNT 23). This entry records the lane;
+  it grants no new execution, publication or merge authority. D86 and earlier
+  entries are byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

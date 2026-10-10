@@ -46,7 +46,9 @@ to evaluate; they do not verify a current Azure offering, limit or price.
   vs Container Apps vs AKS; Azure SQL vs Cosmos DB; Service Bus vs Event
   Grid) with SaaS tenancy in play.
 - Use when: reviewing an existing Azure architecture against SaaS isolation,
-  cost, and operability expectations.
+  cost, and operability expectations — that review is of the architecture
+  design; checking an already-configured subscription's controls against a
+  technical baseline is `cloud-security-baseline-reviewer`.
 - Do NOT use when: the provider question is still open —
   `cloud-architecture-decider` first.
 - Do NOT use when: the platform is AWS — `aws-saas-architect`.
@@ -54,6 +56,12 @@ to evaluate; they do not verify a current Azure offering, limit or price.
   `tenant-modeler` / `saas-platform-architect` (their outputs are inputs
   here).
 - Do NOT use when: reviewing a Bicep/Terraform change — `iac-reviewer`.
+- Do NOT use when: the ask is whether an EXISTING Azure subscription's
+  configured controls meet a named technical baseline (az role assignment /
+  storage account / security pricing exports, or posture-scanner findings) —
+  that is `cloud-security-baseline-reviewer`, which reads supplied evidence
+  control by control and calls no cloud API; this skill designs or reviews
+  the architecture.
 
 ## Inputs to Inspect
 
@@ -248,5 +256,6 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
   tenancy-isolation options per store, landing-zone layout patterns.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the cloud cluster
-  (`cloud-architecture-decider`, `aws-saas-architect`, `iac-reviewer`) and
-  against shipped `saas-platform-architect` / `architecture-designer`.
+  (`cloud-architecture-decider`, `aws-saas-architect`, `iac-reviewer`),
+  against shipped `saas-platform-architect` / `architecture-designer`, and
+  against `cloud-security-baseline-reviewer` (configured-controls review).
