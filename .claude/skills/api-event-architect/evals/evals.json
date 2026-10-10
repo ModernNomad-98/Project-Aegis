@@ -79,6 +79,31 @@
           "Makes no support-window or minimum-notice recommendation and asks no owner decision question this turn, and does not assume or invent a cadence."
         ]
       }
+    },
+    {
+      "id": "per-operation-schemas",
+      "type": "should_trigger",
+      "prompt": "Every endpoint in our API grew its own request/response shapes. Impose per-operation schemas and additive-evolution rules across the API.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines a request and response schema per operation (typed fields, required/optional, validation shape).",
+          "States per-operation additive-vs-breaking rules that feed the versioning policy.",
+          "Binds one error envelope to error-taxonomy-designer's model by citation without restating it."
+        ]
+      }
+    },
+    {
+      "id": "edge-first-party-api-scope",
+      "type": "should_trigger",
+      "prompt": "This API is only consumed by our own app — does the contract discipline still apply?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Answers yes with the stated first-party scoping decision (a first-party client-facing endpoint is an external contract to a consumer outside the implementing team).",
+          "Does not drift into internal service-to-service structure (architecture-designer's scope)."
+        ]
+      }
     }
   ]
 }

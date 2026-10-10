@@ -38,6 +38,8 @@ technical decision to `adr-writer`.
   scope/non-scope, and success metrics before work starts.
 - Use when: `requirements-gathering-facilitator` has produced a
   requirements brief and it's time to turn it into a spec.
+- Use when: writing a spec for a feature with state-changing actions — the
+  spec must name repeated-request outcomes.
 - Do NOT use when: the artifact needed is an ARCHITECTURE DECISION — a
   specific technical choice, its alternatives, and consequences — that is
   `adr-writer`; a spec may CITE such a decision but does not make or
@@ -96,7 +98,12 @@ technical decision to `adr-writer`.
 6. **Cover edge cases, errors, and states.** What happens on empty,
    invalid input, permission denied, partial failure. Name the behavior;
    hand the error MODEL to `error-taxonomy-designer` and the UI STATE
-   design to `edge-state-ux-designer` rather than re-specifying them.
+   design to `edge-state-ux-designer` rather than re-specifying them. For
+   every state-changing action, also name the repeated-request outcomes:
+   the observable result on a retry, a double submit, a second tab, and a
+   stale request, and whether duplicate events are possible. The spec
+   states the OUTCOME only; the mechanism belongs to `tech-spec-writer`
+   (design) and `command-gateway-architect` (write-path idempotency).
 7. **List dependencies and open questions.** Cross-team, platform, and
    sequencing dependencies; and the open decisions still needed —
    including any technical decision that belongs in an ADR, routed to
@@ -133,6 +140,8 @@ Scenarios/flows: <key scenarios: happy + important alternates>
 Requirements:    <specific, testable statements>
 Acceptance:      <given/when/then or checklist per requirement — QA-verifiable>
 Edge/error:      <empty, invalid, forbidden, partial-failure behavior>
+Repeated-request outcomes: <per state-changing action: retry / double-submit /
+                  second-tab / stale-request / duplicate-events outcome>
                  (error model → error-taxonomy-designer; UI states → edge-state-ux-designer)
 Dependencies:    <cross-team / platform / sequencing>
 Rollout intent:  <staged? to whom? gated on what?>  (mechanics → feature-flag-rollout-strategist)
@@ -156,6 +165,8 @@ Known / assumed / open separated
       behavior.
 - [ ] Edge/error/permission behavior is specified, with the error model
       and UI states handed to their owning skills.
+- [ ] Every state-changing requirement names its repeated-request outcomes;
+      no idempotency mechanism is spec'd here.
 - [ ] Success metrics and guardrails are defined; rollout INTENT is
       stated without specifying flag mechanics.
 - [ ] Any technical/architecture decision is routed to `adr-writer`, not
@@ -189,6 +200,9 @@ Known / assumed / open separated
 - Specifying error copy and empty-state layouts inline duplicates (and
   will drift from) `error-taxonomy-designer` and `edge-state-ux-designer`.
   Name the behavior; delegate the design.
+- A spec that omits repeated-request behavior ships the AEGIS-013 class of
+  defect — the outcome is a spec fact, the mechanism is not; never restate
+  the gateway's idempotency design.
 
 ## Stop Conditions
 
@@ -210,8 +224,8 @@ Known / assumed / open separated
 
 - [references/product-spec-sheet.md](references/product-spec-sheet.md) —
   the full spec template, acceptance-criteria patterns (given/when/then),
-  a testable-requirement rewrite guide, and the spec-vs-ADR discriminator
-  table.
+  a testable-requirement rewrite guide, the repeated-request-outcomes
+  pattern, and the spec-vs-ADR discriminator table.
 - `evals/evals.json` — behavior cases including testable acceptance
   criteria, the non-goal discipline, and the route-technical-decision-to-
   ADR case.

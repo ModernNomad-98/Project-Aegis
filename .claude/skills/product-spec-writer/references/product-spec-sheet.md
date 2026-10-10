@@ -39,6 +39,28 @@ assurance; `p95` is the 95th-percentile observed value.
 ## Rollout intent
 <staged? to whom? gated on what?>  (mechanics → feature-flag-rollout-strategist)
 
+## Repeated-request outcomes
+
+For every state-changing action, state the observable outcome on each
+repeated-request case (the spec states outcomes only — the mechanism belongs
+to `tech-spec-writer` and `command-gateway-architect`):
+
+| Case | What the spec must state |
+| --- | --- |
+| Retry (same request after a timeout/error) | the result the user observes: same outcome returned, or a new attempt, per action |
+| Double submit (one user, two quick submits) | one effect or two; how the second is recognized |
+| Second tab (same session, parallel submit) | the result on the second tab |
+| Stale request (an old request arrives after newer state) | rejected / ignored / applied — named per action |
+| Duplicate events (webhook/notification repeats) | whether duplicates can reach the user, and what they see |
+
+Template line for the Edge cases & errors section:
+
+```
+Repeated-request outcomes: <action> — retry: <outcome> — double-submit:
+<outcome> — second-tab: <outcome> — stale-request: <outcome> —
+duplicate-events: <possible? outcome>
+```
+
 ## Success metrics & guardrails
 <what proves the problem is solved; what must not regress>
 
