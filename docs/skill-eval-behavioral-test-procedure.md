@@ -20,7 +20,9 @@ knowledge of the answer key. **D3** is the repository's structural-evaluation
 decision in [the skill generation standard](skill-generation-standard.md).
 The **Behavioral Eval Runner (BER)** is the shipped offline harness under
 `tools/behavioral_eval_runner/`. `UNRUN` means no observation was recorded —
-the honest state for a case nobody executed.
+the honest state for a case nobody executed. A **PR** is a pull request, a
+proposed repository change. **WP** means work package, a BER backlog
+delivery unit.
 
 ## Why this exists
 
