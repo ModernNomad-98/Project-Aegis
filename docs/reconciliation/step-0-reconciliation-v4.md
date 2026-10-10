@@ -4205,6 +4205,27 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   now pins LF newlines (`newline="\n"`) so a Windows reviewer rebuild is
   byte-identical to the committed JSONs. No content or count change.
 
+- **D85 (2026-10-10) — WSL2 Linux host proposal for the BER Stage A
+  candidate (repo phase).** The owner revised the BER R4/R5 Stage A Linux
+  capability candidate platform: **WSL2 selected, superseding the VirtualBox
+  path** chosen in APR-028's reviewed proposal; the existing VirtualBox VM is
+  NOT deleted — deletion requires a separate owner approval plus operator
+  confirmation — and stays untouched and unverified. This lane (repo phase
+  ONLY — no wsl or host commands) delivered the reviewed proposal page
+  (`docs/roadmaps/ber-wsl2-stage-a-setup-proposal.md`), the register's two
+  required append-only records — a SUPERSESSION event for APR-028 with its
+  own unique ID **AEGIS-APR-127** and the new **AEGIS-APR-126 GRANT** (the
+  plan under audit named it APR-125; APR-125 was taken by the index-repair
+  lane's APR-114-CONSUMED event, per the D84 amendment) whose scope mirrors
+  APR-028 line-by-line with the WSL2 specifics and the deletion rule — and
+  this entry. Probe facts are quoted from the lead-run read-only 2026-10-10
+  observations (WSL 2.7.12.0, kernel 6.18.33.2-2, WSLg 1.0.73, Windows build
+  10.0.26200.9448); the supply-chain statement is honest (Microsoft-signed
+  Store AppX, no third-party ISO). Counts UNCHANGED (SKILL-COUNT 204,
+  FAMILY-COUNT 23). This entry records the decision and the grant; it grants
+  nothing itself and authorizes no host action. D84 and earlier entries are
+  byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

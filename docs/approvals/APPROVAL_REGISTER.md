@@ -5355,3 +5355,72 @@ the entry governs.
   `c1acc075910ea1e849401e18cdb60df31c09ef30` at the effective time above.
   This records consumption; it does not independently recertify historical
   validation or authorize another refresh.
+
+### AEGIS-APR-126: Agent-assisted disposable WSL2 Ubuntu distribution setup
+
+- **Event:** GRANT.
+- **Status at recording:** Owner approved; ACTIVE for ONE agent-assisted
+  disposable WSL2 Ubuntu 24.04 distribution setup. The setup and its final
+  verification remain to be executed — this entry records the grant, not the
+  setup. (Renumbering: the plan under audit named this grant APR-125; APR-125
+  was taken by the index-repair lane's APR-114-CONSUMED event, per the D84
+  amendment, so this grant is **APR-126**.)
+- **Date / Grantor:** 2026-10-10 / Peter Nguyen.
+- **Reason:** The owner revised the BER R4/R5 Stage A Linux capability
+  candidate platform from the VirtualBox path (APR-028) to WSL2. APR-028's
+  scope names VirtualBox, so WSL2 setup work is not covered by it and needs
+  this grant.
+- **Scope allowed:** The owner's 2026-10-10 decision, as transcribed by the
+  coordinator: **WSL2 selected** for the candidate; the existing VirtualBox VM
+  is **NOT deleted** — deletion requires separate approval plus operator
+  confirmation; the VM stays untouched and unverified. One disposable WSL2
+  Ubuntu 24.04 distribution installed from the Microsoft Store listing
+  (Microsoft-signed Store AppX — no third-party ISO download), with owner
+  participation at first launch (username; a password only if the owner wants
+  one), NAT-default networking, no sharing boundaries, no Windows
+  security/hypervisor/feature change, optional explicit `.wslconfig`
+  (`memory=8GB`, `processors=4`) written only with owner confirmation,
+  scratch root `/home/<user>/aegis-stage-a` (mode 700), and the proposal's
+  non-destructive verification checklist only. The
+  [reviewed proposal](../roadmaps/ber-wsl2-stage-a-setup-proposal.md) is the
+  chosen setup; probe facts (WSL 2.7.12.0 running, kernel 6.18.33.2-2, WSLg
+  1.0.73, Windows build 10.0.26200.9448) were lead-run and read-only.
+- **Scope FORBIDDEN:** This grant does not authorize BER Stage A or Stage B
+  tests, source transfer into the distribution, provider/model calls, private
+  inputs, credentials in chat or source, paid services, production use,
+  changes to Windows security or hypervisor features, any action against the
+  VirtualBox VM (deletion, modification, power-state change), WSL
+  distribution deletion (`wsl --unregister Ubuntu-24.04` IS deletion and
+  requires a separate owner approval plus operator confirmation), or
+  evidence deletion. A separate BER-DEC grant is required before even the
+  offline Stage A host probe.
+- **Evidence:** Direct owner decision of 2026-10-10 in the Project Aegis
+  conversation, as transcribed by the coordinator. The probe facts quoted in
+  the proposal are the coordinator's lead-run read-only observations of the
+  same date. The Microsoft Store channel is the distribution's supply chain
+  (Store signature enforcement at install; no publisher ISO checksum step).
+- **Expiry / use limit:** One named disposable WSL2 distribution setup; no
+  calendar expiry stated. Stop for review if the host, identity, isolation or
+  software configuration differs materially from the approved setup.
+
+### AEGIS-APR-127: AEGIS-APR-028 supersession event — WSL2 platform decision for the BER Stage A candidate
+
+- **Event:** SUPERSESSION; target grant AEGIS-APR-028 (records the platform
+  decision; APR-028's entry text is untouched — immutability).
+- **Status at recording:** For the BER R4/R5 Stage A capability candidate, the
+  VirtualBox platform choice in APR-028's reviewed proposal is **superseded**
+  by the owner's 2026-10-10 WSL2 decision. APR-028's recorded VM-setup
+  authority is history; the VirtualBox VM remains **intact, untouched and
+  unverified**, and its deletion (or the deletion of any WSL distribution)
+  requires a separate owner approval plus operator confirmation.
+- **Date / Grantor:** 2026-10-10 / Peter Nguyen (decision; transcribed by the
+  coordinator).
+- **New authority:** None. The WSL2 setup authority is the new AEGIS-APR-126
+  grant; this event records the supersession and the deletion rule only.
+- **Reason:** The platform change is material — APR-028's scope names
+  VirtualBox, so WSL2 work is not covered by it; the register preamble
+  requires append-only lifecycle events with unique IDs and the affected
+  grant ID for supersessions.
+- **Evidence:** Direct owner decision of 2026-10-10, as transcribed by the
+  coordinator; the reviewed WSL2 proposal; no register entry text edited.
+- **Expiry / use limit:** None — a recording, not a grant.
