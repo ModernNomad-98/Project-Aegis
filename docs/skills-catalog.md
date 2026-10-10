@@ -510,10 +510,13 @@ test accounts to a named non-production environment).
 **Pulled forward from the QA backlog** (in addition to the 13 canonical Phase 5 skills):
 `integration-test-designer` (roadmap #184), `api-contract-test-designer` (roadmap #185),
 and `accessibility-test-harness` (roadmap #204) — each with mandatory trigger-eval
-discrimination against its nearest neighbors. Per reconciliation §3, `e2e-test-architect`
-and `qa-closeout-reporter` stay in the expansion backlog
-(`qa-closeout-reporter` overlaps the shipped `ai-closeout-reporter` +
-`screenshot-evidence-planner`, whose evidence bundle the closeout consumes).
+discrimination against its nearest neighbors. Per reconciliation §3,
+`e2e-test-architect` — **dropped (D80, 2026-10-10)**: covered by the
+`qa-strategy-architect` + `test-plan-designer` + `qa-automation-architect` +
+`regression-suite-curator` + `test-data-architect` + `playwright-e2e-engineer`
+composition; and `qa-closeout-reporter` — **dropped (D80, 2026-10-10)**:
+covered by `ai-closeout-reporter` + `release-readiness-reviewer` (its
+evidence bundle consumes `screenshot-evidence-planner`'s conventions).
 The backlog's `acceptance-criteria-tester` (#226 + #227) was built by owner decision
 D68 (2026-09-28) narrowed to #226 and renamed `acceptance-criteria-reviewer`, because it
 reviews criteria and runs no tests; the #227 definition-of-done check stays covered by
@@ -1341,8 +1344,15 @@ The Phase 2 **expansion backlog** (reconciliation §3: `api-contract-designer` �
 **✅ built (D79, 2026-10-10) as the #9 extension of `api-event-architect`**,
 `idempotency-first-designer` — **✅ built (D79, 2026-10-10) as the #17/#144
 extension of `command-gateway-architect` + `product-spec-writer`**,
-`operational-runbook-author`, `system-context-mapper`,
-`bounded-context-identifier`, `dependency-direction-guard`,
+`operational-runbook-author` — **dropped (D80, 2026-10-10)**: covered by
+`incident-response-runbook`, `rollback-runbook-author`,
+`data-migration-runbook-author`, `gated-deployment-prompt-template`,
+`onboarding-doc-designer`,
+`system-context-mapper` — **dropped (D80, 2026-10-10)**: covered by
+`architecture-designer` + `threat-modeler`,
+`bounded-context-identifier` — **dropped (D80, 2026-10-10)**: covered by
+`domain-modeler` step 4,
+`dependency-direction-guard`,
 `refactor-safety-planner`) remains backlog, built in Phase 8 batches — **except
 `validation-boundary-designer` and `observability-by-design`, ✅ built by D77
 (2026-10-10) and moved to
@@ -1378,8 +1388,12 @@ QA backlog (`integration-test-designer` #184, `api-contract-test-designer` #185,
 [Implemented → Skills (Phase 5)](#skills-phase-5--qa-e2e-manual-qa--evidence-pack) above.
 Source: [`docs/skills/06-qa-test-engineering.md`](skills/06-qa-test-engineering.md),
 [`05-frontend-ux-engineering.md`](skills/05-frontend-ux-engineering.md).
-Per reconciliation §3, the Phase 5 **expansion backlog** (`e2e-test-architect`,
-`qa-closeout-reporter` — the latter overlaps the shipped
+Per reconciliation §3, the Phase 5 **expansion backlog** (`e2e-test-architect` —
+**dropped (D80, 2026-10-10)**: covered by the `qa-strategy-architect` +
+`test-plan-designer` + `qa-automation-architect` + `regression-suite-curator` +
+`test-data-architect` + `playwright-e2e-engineer` composition,
+`qa-closeout-reporter` — **dropped (D80, 2026-10-10)**: covered by
+`ai-closeout-reporter` + `release-readiness-reviewer` — the latter overlaps the shipped
 `ai-closeout-reporter` + `screenshot-evidence-planner` — plus the remaining cat-06 rows)
 remains backlog, built in Phase 8 batches (`acceptance-criteria-tester` left it when D68
 built it as `acceptance-criteria-reviewer`, narrowed to #226, and #198 left it as

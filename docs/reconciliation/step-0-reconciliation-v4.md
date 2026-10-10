@@ -122,8 +122,14 @@ Merges/moves from the execution plan: `grill-with-docs` **→ merged into** `doc
 (same skill, v4 name wins). Architecture skills moved from execution-plan Phase 1 land here.
 Execution-plan Phase 2 extras (`api-contract-designer` — **✅ built (D79, 2026-10-10) as the #9 extension of `api-event-architect`**,
 `idempotency-first-designer` — **✅ built (D79, 2026-10-10) as the #17/#144 extension of `command-gateway-architect` + `product-spec-writer`**,
-`validation-boundary-designer`, `observability-by-design`, `operational-runbook-author`) and
-the moved arch skills (`system-context-mapper`, `bounded-context-identifier`,
+`validation-boundary-designer`, `observability-by-design`, `operational-runbook-author` —
+**dropped (D80, 2026-10-10)**: covered by `incident-response-runbook`,
+`rollback-runbook-author`, `data-migration-runbook-author`,
+`gated-deployment-prompt-template`, `onboarding-doc-designer`) and
+the moved arch skills (`system-context-mapper` — **dropped (D80, 2026-10-10)**:
+covered by `architecture-designer` + `threat-modeler`,
+`bounded-context-identifier` — **dropped (D80, 2026-10-10)**: covered by
+`domain-modeler` step 4,
 `dependency-direction-guard`, `refactor-safety-planner`) are **reconciled into the Phase 2
 expansion backlog** (built in Phase 8 batches, not the initial Phase 2 pass), keeping the
 first pass to v4's 10 for quality.
@@ -194,8 +200,14 @@ work and tracks gaps as Phase 8 backlog items; it creates no skills and changes 
 `qa-automation-architect`, `playwright-e2e-engineer`, `clickthrough-test-engineer`,
 `manual-test-case-creator`, `screenshot-evidence-planner`, `vitest-unit-component-engineer`,
 `vite-build-qa-engineer`, `flaky-test-detective`, `test-data-architect`, `regression-suite-curator`.
-Execution-plan extras merged: `acceptance-criteria-tester`, `e2e-test-architect`,
-`qa-closeout-reporter` → Phase 5 expansion backlog (`qa-closeout-reporter` overlaps
+Execution-plan extras merged: `acceptance-criteria-tester`,
+`e2e-test-architect` — **dropped (D80, 2026-10-10)**: covered by the
+`qa-strategy-architect` + `test-plan-designer` + `qa-automation-architect` +
+`regression-suite-curator` + `test-data-architect` + `playwright-e2e-engineer`
+composition,
+`qa-closeout-reporter` — **dropped (D80, 2026-10-10)**: covered by
+`ai-closeout-reporter` + `release-readiness-reviewer`
+→ Phase 5 expansion backlog (`qa-closeout-reporter` overlaps
 `ai-closeout-reporter` + `screenshot-evidence-planner`; keep as backlog to avoid trigger overlap).
 
 > Note: execution-plan ordering placed QA at Phase 4 and audit/troubleshooting at Phase 5.
@@ -258,8 +270,8 @@ otherwise invisible to the shipped suite):
 | `role-based-qa-matrix` — **✅ built (D76, 2026-10-10)** as `role-coverage-test-designer` | #229 (P1) | Behavior across anonymous/member/manager/admin/owner/support/platform roles; QA counterpart to Phase 3 `authorization-matrix-designer`. |
 | `mobile-viewport-qa` — **✅ built (D75, 2026-10-09)** as `mobile-journey-test-designer` | #230 (P1) | Critical journeys on mobile breakpoints, touch interactions, dialogs, navigation. |
 | `exploratory-testing-charter` — **✅ built (D75, 2026-10-09)** as `exploratory-charter-designer` | #228 (P1) | Mission/risks/personas/data/paths/timebox charters for exploratory passes. |
-| `mock-strategy-designer` | #200 + #201 (merged; both P1) | ONE skill: mock/fake/stub/adapter/recording/live selection + test-double contract review keeping doubles aligned with real provider/DB behavior (`api-contract-test-designer`'s fake-fidelity check is the contract-layer slice of this). |
-| `ci-shard-parallel-isolation` | #211 + #212 (merged; both P1) | ONE skill: shard design (stable shards, run IDs, artifacts) + parallel isolation (no shared users/tenants/records/ports/browser state/queues). Extends `qa-automation-architect`'s blueprint into enforceable rules. |
+| `mock-strategy-designer` — **dropped (D80, 2026-10-10)**: covered by `integration-test-designer` (boundary map + fake pinning), `vitest-unit-component-engineer` (owned seams) and `api-contract-test-designer` (fake-fidelity re-validation) — fresh full-body review, no residual slice | #200 + #201 (merged; both P1) | ONE skill: mock/fake/stub/adapter/recording/live selection + test-double contract review keeping doubles aligned with real provider/DB behavior (`api-contract-test-designer`'s fake-fidelity check is the contract-layer slice of this). |
+| `ci-shard-parallel-isolation` — **dropped (D80, 2026-10-10)**: covered by `sharded-validation-with-resume` (shard map/resume) and `qa-automation-architect` (per-worker isolation + CI sharding plan) — fresh full-body review, no residual slice | #211 + #212 (merged; both P1) | ONE skill: shard design (stable shards, run IDs, artifacts) + parallel isolation (no shared users/tenants/records/ports/browser state/queues). Extends `qa-automation-architect`'s blueprint into enforceable rules. |
 
 **Tier 3 — specialized, defer** (all roadmap P2; build on demand only):
 
@@ -267,8 +279,8 @@ otherwise invisible to the shipped suite):
 |---|---|---|
 | `property-based-test-designer` — **✅ built (D77, 2026-10-10)** | #194 (P2) | Generated input combinations for validation, parsing, math, state, transformations. |
 | `mutation-testing-reviewer` — **✅ built (D78, 2026-10-10)** as the #195 mutation-report extension of `test-coverage-mapper` | #195 (P2) | Mutation thinking to expose tests that pass without proving behavior. |
-| `soak-test-planner` | #207 (P2) | Long-duration runs for leaks, queue buildup, token expiry, degradation. |
-| `chaos-test-planner` | #208 (P2) | Safe injection of service failures, timeouts, retries, partial outages. |
+| `soak-test-planner` — **dropped (D80, 2026-10-10)**: covered by `load-test-planner` | #207 (P2) | Long-duration runs for leaks, queue buildup, token expiry, degradation. |
+| `chaos-test-planner` — **dropped (D80, 2026-10-10)**: covered by `resilience-architecture-reviewer` (fault-injection/game-day plans) | #208 (P2) | Safe injection of service failures, timeouts, retries, partial outages. |
 
 - **Build timing (D10):** after the core phases (7, 7.5) or on demand; nothing here is
   built now.
@@ -279,7 +291,8 @@ otherwise invisible to the shipped suite):
   #199 → `test-data-architect`, #217 → `vite-build-qa-engineer`,
    #213 → `qa-automation-architect` (D78)) and were counted neither as
   gaps nor as coverage. The execution-plan extras note above (`e2e-test-architect`,
-  `qa-closeout-reporter`) is unchanged.
+  `qa-closeout-reporter`) is closed by D80 (2026-10-10) — both names are
+  marked dropped above.
 
 ### Phase 6 — Cloud, DevOps, reliability & release (P1)
 **Canonical = v4's 10:** `cloud-architecture-decider`, `azure-saas-architect`, `aws-saas-architect`,
@@ -4031,6 +4044,46 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   D30/D31/D76/D77/D78 entries are untouched and forward-corrected only by
   this entry's marks. This entry records the build decision and the shipped
   arithmetic; it grants no new execution, publication or merge authority.
+
+- **D80 (2026-10-10) — Batch D: nine DROP closures recorded (docs-only).**
+  Decided and recorded nine DROP dispositions from the unselected-expansion
+  proposal in one docs-only PR. The two tentative drops were resolved by
+  fresh full-body reviews: `mock-strategy-designer` (#200/#201, row 542) —
+  DROP confirmed, covered by `integration-test-designer` (boundary map
+  REAL/FAKED with per-fake rationale, :70–75; drift-symptom Use When,
+  :28–29; fidelity gotcha, :164–167), `vitest-unit-component-engineer`
+  (owned-seam mocking + restore, :64–67; mock-boundaries output, :86;
+  boundary-crossing refusal, :104/:121–123) and `api-contract-test-designer`
+  (fake-fidelity Use When, :33–34; scheduled re-validation, :84–86; plan +
+  checklist, :102/:117) — no residual slice; `ci-shard-parallel-isolation`
+  (#211/#212, row 543) — DROP confirmed, covered by
+  `sharded-validation-with-resume` (named functional shards, :65–68;
+  run-id/status semantics, :111–113; resume law, :120–133; aggregate gate,
+  :148–152) and `qa-automation-architect` (isolation + parallelization,
+  :79–82; CI sharding plan, :86–88) — no residual slice. Plain drops:
+  `soak-test-planner` (#207) → `load-test-planner` (soak named in Use When
+  and body; trigger-evals route soak prompts); `chaos-test-planner` (#208)
+  → `resilience-architecture-reviewer` (fault-injection/game-day plans,
+  execution refused); `operational-runbook-author` (#23) →
+  `incident-response-runbook`, `rollback-runbook-author`,
+  `data-migration-runbook-author`, `gated-deployment-prompt-template`,
+  `onboarding-doc-designer`; `system-context-mapper` (#2) →
+  `architecture-designer` step 1 + `threat-modeler`; `bounded-context-identifier`
+  (#4) → `domain-modeler` step 4; `e2e-test-architect` → the
+  `qa-strategy-architect` + `test-plan-designer` + `qa-automation-architect` +
+  `regression-suite-curator` + `test-data-architect` + `playwright-e2e-engineer`
+  composition; `qa-closeout-reporter` (#235) → `ai-closeout-reporter` +
+  `release-readiness-reviewer` (the shipped trigger-eval pin's "stays in the
+  backlog" intent is now satisfied by this drop record). Intentionally NOT
+  done: the proposal's optional soak token/session-expiry note (row 556) is
+  not taken up — a later `load-test-planner` extension would be its own PR;
+  `dependency-direction-guard` (#6/#7) and `refactor-safety-planner` (#11)
+  remain DEFER (not closed); #189's PARTIAL/DEFER and all non-DROP proposal
+  rows are untouched; the proposal page itself is unchanged (published
+  history). Counts are UNCHANGED: no skill added, removed or renamed;
+  SKILL-COUNT stays 202; FAMILY-COUNT stays 23. This entry records the
+  closure decisions and the shipped arithmetic; it grants no new execution,
+  publication or merge authority.
 
 ## 6. Post-merge corrections
 
