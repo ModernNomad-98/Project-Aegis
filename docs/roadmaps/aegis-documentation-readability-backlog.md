@@ -4049,3 +4049,50 @@ The next batch's selection rule: the next 8 pages of the named pending set in
 `AUDIT_REVISIONS`/`FURTHER_REVISIONS` order (the remaining two
 `FURTHER_REVISIONS` skill pages first, then limb C's carried pages and the
 new-page set), re-measured at the next implementation base.
+## Ledger-keeper recording + batch update — readability sweep third batch, 2026-10-10
+
+The ledger keeper records under AEGIS-APR-101 (its unchanged recording-only
+role). The eight pages below were each independently full-page re-read (or,
+for the three large registers, structured full-page reviewed per the
+reviewers' stated method) at the base head against
+[Acceptance for each page](#acceptance-for-each-page) by a reviewer who did
+not write the page, and each reviewer restated the page's purpose and normal
+use from the page alone in the batch record. The one "corrected" row applies
+reviewer-proposed reading-key prose verbatim (an entry-ordering note); no
+entry body or decision text was touched, and the coordinator re-read the
+changed lines before batch close. No acceptance the reviewers did not give is
+recorded, and no governance text changed.
+
+| Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [cloud-security-baseline-reviewer](../../.claude/skills/cloud-security-baseline-reviewer/SKILL.md) | `de56b736c25a900bcc7db7819b439376931f272d` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-704-2026-10-10.md) | 2026-10-10 |
+| [adr-writer](../../.claude/skills/adr-writer/SKILL.md) | `de56b736c25a900bcc7db7819b439376931f272d` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-704-2026-10-10.md) | 2026-10-10 |
+| [phased-work-handoff-designer](../../.claude/skills/phased-work-handoff-designer/SKILL.md) | `de56b736c25a900bcc7db7819b439376931f272d` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-704-2026-10-10.md) | 2026-10-10 |
+| [The owner approval register](../../docs/approvals/APPROVAL_REGISTER.md) | `de56b736c25a900bcc7db7819b439376931f272d` (corrected in-batch: reading-key ordering note, re-read by the coordinator) | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-704-2026-10-10.md) | 2026-10-10 |
+| [The backlog forecast](../../docs/roadmaps/aegis-backlog-forecast.md) | `de56b736c25a900bcc7db7819b439376931f272d` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-704-2026-10-10.md) | 2026-10-10 |
+| [The behavioral eval runner backlog](../../docs/roadmaps/behavioral-eval-runner-backlog.md) | `de56b736c25a900bcc7db7819b439376931f272d` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-704-2026-10-10.md) | 2026-10-10 |
+| [The reconciliation log](../../docs/reconciliation/step-0-reconciliation-v4.md) | `de56b736c25a900bcc7db7819b439376931f272d` | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-704-2026-10-10.md) | 2026-10-10 |
+| [The AEGIS-060+ register](../../docs/audits/aegis-060-plus-register.md) | `de56b736c25a900bcc7db7819b439376931f272d` | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-704-2026-10-10.md) | 2026-10-10 |
+
+Recorded revisions and re-measured drift per page (1238/4961/164/12/11
+measurable; one unreachable acceptance; two no-recorded) are in the batch
+record, cited with both bases where they differ.
+
+**Count honesty (unchanged).** No exact pending count is derivable (the tool
+itself says "NOT DERIVABLE from this procedure"); the tool run at this base
+(215 provably pending / 159 no-recorded / 221 within-10 / 7 undecidable) is
+candidate evidence only, and the "212" frozen-basis figure is not reproduced.
+The index repair and official-count switch stay paused; N12/N13 untouched.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read
+against [Acceptance for each page](#acceptance-for-each-page) by a reader who
+did not write this section — the self-cost every prior update states. The
+tracked Markdown count does not change except by the new batch record note
+itself, which is pending and not counted among accepted pages.
+
+The next batch's selection rule: the remaining limb-C pages of the named
+pending set (skills-catalog, the readability ledger itself, the
+aegis_delivery_control README, the two issue-101 setup pages, the
+resumable-control-plane backlog), then the new-page set, re-measured at the
+next implementation base.

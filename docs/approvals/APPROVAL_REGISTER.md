@@ -25,7 +25,10 @@ they do not change any entry's scope. Where an entry and this list differ,
 the entry governs.
 
 - **AEGIS-APR-nnn** is an entry ID; some entries shorten it to **APR-nnn**.
-  Event types are GRANT, POLICY DECISION (selects a policy target, grants no
+  Entries are appended in recording order, not ID order; a lower-numbered
+  entry can appear after a higher-numbered one (for example
+  AEGIS-APR-085/086 follow 087/088). Event types are GRANT, POLICY DECISION
+  (selects a policy target, grants no
   work), CONSUMED (a limited grant was used up) and EXPIRED (a grant's time,
   session or other limit ended, whether or not it was used). Some GRANT
   entries clarify, condition or reaffirm an earlier grant and name it on
