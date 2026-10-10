@@ -5424,3 +5424,58 @@ the entry governs.
 - **Evidence:** Direct owner decision of 2026-10-10, as transcribed by the
   coordinator; the reviewed WSL2 proposal; no register entry text edited.
 - **Expiry / use limit:** None — a recording, not a grant.
+
+### AEGIS-APR-128: BER R4/R5 Stage A offline host probe on the WSL2 distro
+
+- **Event:** GRANT.
+- **Status at recording:** Owner approved ("go"); ACTIVE for ONE offline BER
+  R4/R5 Stage A host probe on the named WSL2 distribution. The probe itself
+  is a separate, later host phase that runs only after this reviewed
+  governance PR merges.
+- **Date / Grantor:** 2026-10-10 / Peter Nguyen (the owner's "go",
+  transcribed by the coordinator).
+- **Reason:** APR-126 authorizes the WSL2 distribution setup only — its own
+  Scope FORBIDDEN requires "a separate BER-DEC grant ... before even the
+  offline Stage A host probe". The owner's "go" authorizes that NEXT step
+  after the prepared, verified distro: the offline Stage A host probe.
+- **Scope allowed:** the offline Stage A host probe ON THE WSL2 UBUNTU-24.04
+  DISTRO ONLY — alias `aegis-ber-stage-a-wsl`, default user `peternguyen`,
+  scratch root `/home/peternguyen/aegis-stage-a` (mode 700, verified in the
+  host-phase receipt) — running exactly the capability decision's command
+  list (L144–150) at the pinned signed commit/tree, with the bounded
+  credential-free source placement (a `git archive` of the pinned commit
+  produced on the Windows side with a SHA-256 receipt, copied into the
+  scratch root; no repository credentials, no git clone inside the guest, no
+  `/mnt/c` execution), non-destructive and offline; the five required POSIX
+  test IDs pinned (L152–158); the hardlink / leaf-rename / interrupted-write
+  rows recorded `NOT_RUN`; the R5 configuration-surface inventory recorded
+  as observed absence; evidence: sanitized summary in Git, raw evidence in
+  the approved external root, no private identifiers in Git; a named time
+  ceiling (its exact value fixed by the owner at host-phase authorization
+  and recorded in the host-phase receipt before any probe command); and the
+  stop rules: stop on source/root/account mismatch, path escape, unresolved
+  ACL/encryption fact, unexpected network/provider/credential access,
+  nonzero test, required POSIX skip, surviving child, or unisolated R5
+  configuration (the capability decision L186–192). Passing these offline
+  cases could support a Stage A capability observation only — "not a
+  production isolation claim, permission for provider calls, or a BER
+  baseline result" (the capability-observation honesty line, verbatim).
+- **Scope FORBIDDEN (mirrors APR-126/028 where applicable):** BER Stage B
+  tests or any model-driven session; real baselines or production isolation
+  claims; provider/model calls; credentials in chat or source; paid
+  services; production use; any change to Windows security or hypervisor
+  features; package installation; network-dependent steps; running from
+  `/mnt/c`; and DELETION — of the distro or the VirtualBox VM — which
+  requires the owner's separate approval plus operator confirmation (the
+  owner's 2026-10-10 rule, quoted). A separate authorization is required
+  before any Stage B model-driven proof.
+- **Evidence:** Direct owner "go" of 2026-10-10 in the Project Aegis
+  conversation, as transcribed by the coordinator; the merged WSL2 proposal;
+  the capability decision's Stage A section. The probe runs only after this
+  governance PR merges, and its receipts are recorded under the evidence
+  split above.
+- **Expiry / use limit:** One named offline Stage A host probe on the WSL2
+  distro; consumed when the host phase completes its receipts. No calendar
+  expiry stated. Stop for review if the host, identity, isolation or
+  software configuration differs materially from the approved setup or from
+  this grant's pinned list.

@@ -4294,6 +4294,26 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   records the transcription; it grants no new execution, publication or merge
   authority. D87 and earlier entries are byte-untouched.
 
+- **D89 (2026-10-10) — BER-DEC grant lane: BER R4/R5 Stage A offline host
+  probe authorization (WSL2).** The owner answered "go" to the NEXT step
+  after the prepared, verified WSL2 distribution: the offline Stage A host
+  probe. The lane (repo phase ONLY — no probe execution, no host actions)
+  delivered the three-artifact instrument per the BER-DEC-014/APR-046
+  precedent: the **AEGIS-APR-128 GRANT** (scope allowed pinned to the
+  WSL2 Ubuntu-24.04 distro only — alias `aegis-ber-stage-a-wsl`, user
+  `peternguyen`, scratch root `/home/peternguyen/aegis-stage-a` mode 700 —
+  with the exact command list, the five required POSIX test IDs, the bounded
+  credential-free `git archive` placement, the sanitized-Git/raw-external
+  evidence split, the named time ceiling, and the stop list; scope FORBIDDEN
+  mirrors APR-126/028 and locks DELETION under the owner's quoted rule; the
+  capability-observation honesty line preserved verbatim), the
+  **BER-DEC-016** append-only decision-log entry (the pinned binding), and
+  this entry. The probe executes only after this governance PR merges, in a
+  separate, later host phase. Counts UNCHANGED (SKILL-COUNT 204,
+  FAMILY-COUNT 23). This entry records the decision and the grant; it grants
+  nothing itself and authorizes no host action. D88 and earlier entries are
+  byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
