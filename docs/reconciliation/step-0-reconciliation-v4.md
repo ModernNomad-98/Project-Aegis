@@ -133,7 +133,7 @@ first pass to v4's 10 for quality.
 `audit-log-architect`, `saas-cost-architect`, `api-event-architect`.
 Execution-plan equivalents merged: `rls-policy-author`/`rls-negative-test-designer` →
 **deferred to Phase 4** (RLS pack) to avoid duplication; `tenant-provisioning-designer`,
-`membership-invitation-designer`, `role-permission-architect`, `security-impact-note-author`
+`membership-invitation-designer`, `role-permission-architect` — **✅ built (D78, 2026-10-10) as the #59 extension of `authorization-matrix-designer`**, `security-impact-note-author`
 → Phase 3 expansion backlog.
 
 ### Phase 4 — Security, RLS & supply chain (P0/P1)
@@ -265,7 +265,7 @@ otherwise invisible to the shipped suite):
 | Candidate *(started as candidate — not built; per-row status below)* | Roadmap ref (cat 06) | Note |
 |---|---|---|
 | `property-based-test-designer` — **✅ built (D77, 2026-10-10)** | #194 (P2) | Generated input combinations for validation, parsing, math, state, transformations. |
-| `mutation-testing-reviewer` | #195 (P2) | Mutation thinking to expose tests that pass without proving behavior. |
+| `mutation-testing-reviewer` — **✅ built (D78, 2026-10-10)** as the #195 mutation-report extension of `test-coverage-mapper` | #195 (P2) | Mutation thinking to expose tests that pass without proving behavior. |
 | `soak-test-planner` | #207 (P2) | Long-duration runs for leaks, queue buildup, token expiry, degradation. |
 | `chaos-test-planner` | #208 (P2) | Safe injection of service failures, timeouts, retries, partial outages. |
 
@@ -275,7 +275,8 @@ otherwise invisible to the shipped suite):
   #213, #216–#220, #224, #225), plus the category tail outside this audit's #181–#230 scope
   (#231–#235), stay unprioritized backlog in the Phase 8 batch flow (D5). Several are already
   partially absorbed via shipped catalog source mappings (#191 → `test-coverage-mapper`,
-  #199 → `test-data-architect`, #217 → `vite-build-qa-engineer`) and were counted neither as
+  #199 → `test-data-architect`, #217 → `vite-build-qa-engineer`,
+   #213 → `qa-automation-architect` (D78)) and were counted neither as
   gaps nor as coverage. The execution-plan extras note above (`e2e-test-architect`,
   `qa-closeout-reporter`) is unchanged.
 
@@ -3969,6 +3970,34 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   marked built above (§3). This entry records the build decision and the
   shipped arithmetic; it grants no new execution, publication or merge
   authority.
+
+- **D78 (2026-10-10) — Batch B EXTENDs built (three extensions).**
+  Decided and built three owner-selected proposal EXTENDs in one PR:
+  #213 per-layer test-timeout policy extended into `qa-automation-architect`
+  (G1 row 544; per-suite limits derived from tier budgets, timeout behavior,
+  timeout↔retry interaction; finished-run classification stays with
+  `ci-failure-classifier`, pipeline job-level limits stay with
+  `ci-pipeline-architect`); #59 role-assignment rules with a grant ceiling,
+  role/resource inheritance and tenant-defined custom roles extended into
+  `authorization-matrix-designer` (G4 row 586; Security Rules, Tenant
+  Isolation Rules and Stop Conditions edited — the extension's
+  security-relevant surfaces); #195 mutation-report reading extended into
+  `test-coverage-mapper` (G2 row 555; survived/killed/equivalent triage as
+  coverage-gap evidence; Stop Conditions extended — a security-relevant
+  surface). The honesty caveats from the proposal stand: no timeout guidance
+  existed (row 544), mutation demand is unmeasured (row 555), and only
+  machine actors had assignment/inheritance guidance before this extension
+  (row 586); this entry records the build decision, not measured demand.
+  Counts are UNCHANGED: no new skills, SKILL-COUNT stays 202, FAMILY-COUNT
+  stays 23, family counts stay 12/24. The approved wording-only reciprocity
+  edit refreshed `role-coverage-test-designer`'s deferral seams to "the #59
+  extension (built by D78)" — its Stop Conditions line ("stop; not designed
+  here") was intentionally left unchanged under the lead's constraint and
+  remains correct; D76's entry above is immutable and is forward-corrected
+  here, not rewritten. The D10 Tier 3 row for #195 and the Phase 3
+  `role-permission-architect` row are marked built above (§3). This entry
+  records the build decision and the shipped arithmetic; it grants no new
+  execution, publication or merge authority.
 
 ## 6. Post-merge corrections
 

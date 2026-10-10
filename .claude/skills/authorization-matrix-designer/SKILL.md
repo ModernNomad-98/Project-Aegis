@@ -1,6 +1,6 @@
 ---
 name: authorization-matrix-designer
-description: Design authorization for multi-tenant software as a service (SaaS) as an explicit roles × permissions × resources matrix. Include object-level rules, enforcement points, deny-by-default behavior, brokered support access, negative tests, and a safe migration and rollback plan. Use when roles or permissions need design or repair. Do NOT use for plan entitlements (plan-entitlement-architect), audit records (audit-log-architect), or row-level security (RLS) policy review (rls-policy-auditor).
+description: Design authorization for multi-tenant software as a service (SaaS) as an explicit roles × permissions × resources matrix. Include object-level rules, enforcement points, deny-by-default behavior, brokered support access, role-assignment rules with a grant ceiling, role and resource inheritance, tenant-defined custom roles, negative tests, and a safe migration and rollback plan. Use when roles or permissions need design or repair. Do NOT use for plan entitlements (plan-entitlement-architect), audit records (audit-log-architect), or row-level security (RLS) policy review (rls-policy-auditor).
 ---
 
 # Authorization Matrix Designer
@@ -19,7 +19,9 @@ Produce an authorization model where every allow is written down and
 everything else is denied: a roles × permissions × resources matrix, the
 object-level rules that stop cross-tenant and cross-user reach-through, a map
 of exactly where each check is enforced, brokered rules for support and
-impersonation, and negative tests for the denials that matter. The discipline:
+impersonation, role-assignment rules with a grant ceiling, role and
+resource inheritance, tenant-defined custom roles, and negative tests for the
+denials that matter. The discipline:
 authorization is a designed matrix with enforcement points, not an
 accumulation of `if (user.isAdmin)` checks discovered later by a pen test.
 
@@ -33,6 +35,8 @@ accumulation of `if (user.isAdmin)` checks discovered later by a pen test.
   removal, API keys) that needs an explicit permission and a denial test.
 - Use when: support/admin staff need access to tenant data and the rules for
   it don't exist yet.
+- Use when: designing who may GRANT each role (grant ceilings), how roles
+  inherit permissions or resources, or tenant-defined custom roles.
 - Do NOT use when: the gate is commercial — "is feature X in the Pro plan" is
   `plan-entitlement-architect`. A request may need both; keep the axes
   separate: role says CAN, plan says INCLUDED.
@@ -51,13 +55,17 @@ accumulation of `if (user.isAdmin)` checks discovered later by a pen test.
 - Do NOT use when: auditing or authoring the database's row-level-security
   policies — that is `rls-policy-auditor`; this skill designs the
   roles × permissions matrix those policies must enforce.
+- Do NOT use when: designing role-coverage QA over the matrix (which allowed
+  behaviors to verify per role) — that is `role-coverage-test-designer`.
 
 ## Inputs to Inspect
 
 1. The tenant model — especially the membership model, since roles attach to
    memberships (tenant-modeler output).
 2. Existing authorization code: role enums/tables, permission checks in
-   middleware/handlers/UI, ad-hoc `isAdmin`/`isOwner` conditionals.
+   middleware/handlers/UI, ad-hoc `isAdmin`/`isOwner` conditionals, existing
+   role-assignment surfaces (who can grant roles today), and tenant-defined
+   custom-role needs.
 3. The resource inventory: every tenant-owned resource type and the sensitive
    actions on each (export, delete, share, invite, billing, keys).
 4. Every enforcement surface that exists: UI, API routes, service layer,
@@ -81,11 +89,15 @@ the answer does not authorize widening access or implementing the matrix.
 2. **Inventory actors.** Tenant roles (owner, admin, member, guest — per the
    tenant model), platform/staff roles, service accounts, API keys/machine
    actors. Platform roles that can cross tenant boundaries get enumerated
-   individually — they are the dangerous ones.
+   individually — they are the dangerous ones. Inventory grant authorities
+   alongside actors: who may GRANT each role today.
 3. **Build the matrix**: role × permission × resource, deny-by-default —
    cells are explicit allows; absent means denied. Use the template in
    [references/authorization-matrix-template.md](references/authorization-matrix-template.md).
-   Keep permissions named as verb-resource pairs, not role names.
+   Keep permissions named as verb-resource pairs, not role names. The matrix
+   also carries `grant:<role>` assignment permissions (who may grant which
+   role) and inheritance edges between roles: a parent role's permissions
+   flow to its children, and resource ownership inherits to the parent.
 4. **Write the object-level rules.** Role checks answer "may this role do
    this action"; object rules answer "on THIS resource" — membership in the
    owning tenant, ownership of the object, sharing grants. Every tenant-owned
@@ -103,12 +115,17 @@ the answer does not authorize widening access or implementing the matrix.
    privileged role boundary, a test where the disallowed actor attempts the
    action and the expected result is denial — including revoked-membership,
    cross-tenant, and expired-impersonation cases (catalog in references).
+   Assignment negatives included: self-escalation (granting yourself a
+   higher role), an above-ceiling grant, a custom role exceeding its
+   template bounds, and custom-role cross-tenant reach.
 8. **Plan migration and rollback** for role changes: introduce new
    permissions additively, dual-check (old and new logic in shadow
    comparison) before cutover. A revert flag is usable only if the old
    check still passes deny-by-default and cross-tenant negative tests;
    otherwise halt and obtain an approved safer rollback. Never widen a
    role's reach silently — widening is a change the human approves.
+   Custom-role introduction follows the same discipline: additive,
+   shadow-checked, with the revert path denial-tested.
 
 ## Output Format
 
@@ -121,6 +138,8 @@ Matrix: role × permission × resource (explicit allows; deny by default)
 Object-level rules: <resource → rule (membership/ownership/grant)>
 Enforcement-point map: <surface → where the check runs → authoritative layer>
 Brokered access rules: <grant, scope, time-box, visibility, audit event>
+Role assignment & inheritance: <grant-ceiling rule, grant:<role> permissions,
+  inheritance edges, custom-role template bounds>
 Negative-test plan: <actor — attempted action — expected denial>
 Migration & rollback: <additive introduction → shadow dual-check → cutover →
   tested safe revert or halt; widenings requiring approval listed>
@@ -148,6 +167,10 @@ Owner choice (if needed): <terms, viable permission options, costs/unknowns, pro
       passes denial and cross-tenant tests; silent widenings: none.
 - [ ] Authorization (role CAN) is not conflated with entitlement (plan
       INCLUDES) anywhere in the matrix.
+- [ ] The grant ceiling is stated and structural — no above-ceiling grant
+      exists on any path, and the grant path is the enforced point, not advice.
+- [ ] Custom roles compose from a tenant-bounded template, never exceed the
+      tenant's ceiling, and every create/change emits an audit event.
 
 ## Security Rules
 
@@ -159,6 +182,11 @@ Owner choice (if needed): <terms, viable permission options, costs/unknowns, pro
 - Every high-privilege grant, escalation, and impersonation use emits an
   audit event (schema via `audit-log-architect`).
 - Negative tests are part of the design deliverable, not a QA afterthought.
+- Grant ceiling: an actor may grant only roles at or below their own level —
+  enforced at the grant path, not advice.
+- Custom roles compose from tenant-bounded template permissions, never exceed
+  the tenant's ceiling, and every custom-role create/change emits an audit
+  event via `audit-log-architect`'s schema.
 
 ## Tenant Isolation Rules
 
@@ -170,6 +198,9 @@ Owner choice (if needed): <terms, viable permission options, costs/unknowns, pro
   everywhere, including active sessions and tokens (state the mechanism).
 - Platform roles that cross tenants are the exception, enumerated and
   audited; "platform admin can do everything silently" is a finding.
+- Tenant-defined custom roles stay inside their tenant: a custom role in
+  tenant A grants nothing in tenant B; grant authority is tenant-scoped, with
+  cross-tenant platform roles enumerated as the exception.
 
 ## Gotchas
 
@@ -183,6 +214,12 @@ Owner choice (if needed): <terms, viable permission options, costs/unknowns, pro
   against live sessions, cached permissions, and issued tokens.
 - The admin console tends to grow checks of its own that bypass the shared
   decision point — it is a surface in the map like any other.
+- Grant escalation: letting a member grant a role above their own — or a
+  custom role that includes one — silently widens reach. The ceiling is
+  structural, not advice.
+- Custom-role explosion ("billing-admin-readonly-eu" clones) signals
+  entitlement or scoping leaking into roles — bounded composition templates
+  prevent it.
 
 ## Stop Conditions
 
@@ -194,6 +231,9 @@ Owner choice (if needed): <terms, viable permission options, costs/unknowns, pro
 - Business ambiguity about who should hold a sensitive permission → present
   the explained options and a least-privilege recommendation; do not assign
   sensitive defaults silently.
+- A requested assignment rule would let an actor grant above their own level
+  or a custom role exceed the tenant ceiling → `human-approval-boundary`
+  with the blast radius; a widening, never silent.
 - Asked to implement the permission system in the same pass → separate,
   scoped implementation task; this skill delivers the design and tests plan.
 
@@ -201,7 +241,9 @@ Owner choice (if needed): <terms, viable permission options, costs/unknowns, pro
 
 - [references/authorization-matrix-template.md](references/authorization-matrix-template.md) —
   matrix and enforcement-map templates, permission naming convention, and the
-  negative-test catalog (IDOR probes, revocation, impersonation expiry).
+  negative-test catalog (IDOR probes, revocation, impersonation expiry,
+  self-escalation, above-ceiling grants, custom-role probes), the
+  grant-ceiling table, and the custom-role composition template.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against `audit-log-architect`,
   `api-event-architect` (access & events cluster) and the entitlement axis

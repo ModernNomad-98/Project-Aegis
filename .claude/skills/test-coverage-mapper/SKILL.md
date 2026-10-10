@@ -1,6 +1,6 @@
 ---
 name: test-coverage-mapper
-description: Audit what the EXISTING tests actually cover — map requirements, risks, and code surfaces (routes, commands, services, schema, jobs) to the tests that exercise them, then rank the uncovered critical paths by risk. Distinguishes real verification from tests that execute code without asserting behavior. Produces a coverage map, a risk-ranked gap list, and a recommended fill order at the cheapest reliable layer. Use when asked what the tests cover, what's untested, whether coverage is good enough for a change or release, or to find the riskiest untested paths. Coverage-tool percentages are an input, not the verdict. Do NOT use to define the product QA strategy (qa-strategy-architect), plan tests for one change (test-plan-designer), judge overall test-suite quality/flake patterns (qa-automation-lead agent), or audit whole-repo health (full-codebase-auditor).
+description: Audit what the EXISTING tests actually cover — map requirements, risks, and code surfaces (routes, commands, services, schema, jobs) to the tests that exercise them, then rank the uncovered critical paths by risk. Distinguishes real verification from tests that execute code without asserting behavior. Produces a coverage map, a risk-ranked gap list, and a recommended fill order at the cheapest reliable layer. Use when asked what the tests cover, what's untested, whether coverage is good enough for a change or release, or to find the riskiest untested paths. Coverage-tool percentages are an input, not the verdict; mutation-testing reports are read as coverage-gap evidence. Do NOT use to define the product QA strategy (qa-strategy-architect), plan tests for one change (test-plan-designer), judge overall test-suite quality/flake patterns (qa-automation-lead agent), or audit whole-repo health (full-codebase-auditor).
 ---
 
 # Test Coverage Mapper
@@ -15,7 +15,8 @@ more importantly — what it does not: which requirements, risks, and code
 surfaces have real verifying tests, which have execution-without-assertion
 theater, and which have nothing. The deliverable is a coverage map with a
 risk-ranked gap list and a fill order, so investment goes to the riskiest
-uncovered path first, at the cheapest reliable layer.
+uncovered path first, at the cheapest reliable layer, with mutation-report
+  survivors read as gap evidence when available.
 
 ## Use When
 
@@ -23,6 +24,8 @@ uncovered path first, at the cheapest reliable layer.
   coverage good enough" for an area, change, or release.
 - Use when: prioritizing test investment and needing the riskiest gaps first.
 - Use when: a release/audit needs a coverage statement grounded in evidence.
+- Use when: asked to read a mutation-testing report (survived/killed/equivalent
+  mutants) into the coverage map.
 - Do NOT use when: defining product-wide testing rules — `qa-strategy-architect`.
 - Do NOT use when: planning tests for one upcoming change — `test-plan-designer`
   (it may consume this skill's map as input).
@@ -30,6 +33,9 @@ uncovered path first, at the cheapest reliable layer.
   debt) — the shipped `full-codebase-auditor`.
 - Do NOT use when: the ask is to review a specific diff — the shipped
   `code-reviewer`.
+- Do NOT use when: running a mutation tool or writing mutant-killing tests —
+  implementation belongs to the engineer skills; this skill consumes reports
+  and maps gaps.
 
 ## Inputs to Inspect
 
@@ -41,7 +47,9 @@ uncovered path first, at the cheapest reliable layer.
 3. Requirements/risk sources: QA strategy risk inventory if present, acceptance
    criteria, incident history, bug tracker patterns.
 4. Coverage tool output if available (lcov, istanbul, coverage.py) — as a
-   lead generator for unexecuted code, never as the verdict.
+   lead generator for unexecuted code, never as the verdict; plus
+   mutation-testing report output if available (survived/killed/equivalent
+   per mutant, tool config).
 5. CI config: which tests actually run and gate; identify tests run only
    manually or outside CI as non-gating evidence, with their run provenance.
 
@@ -59,6 +67,10 @@ uncovered path first, at the cheapest reliable layer.
    lines show no execution in that measured run, not the absence of tests in
    other suites; executed-but-unasserted code may be theater, which percentage
    tools cannot establish alone — inspect assertions and say so explicitly.
+   Cross-check mutation-report output too: a survived mutant no test kills
+   is gap evidence (no assertion distinguishes the behavior); equivalent
+   mutants are excluded with a written reason; each actionable survivor
+   maps to the surface it exposes.
 4. **Classify each gap by risk** using the strategy's risk inventory (or a
    quick impact × likelihood pass if no strategy exists): critical-journey
    gaps, security-relevant gaps (delegate specification of cross-tenant/authz
@@ -78,6 +90,7 @@ Surface inventory: <N surfaces by kind; source of inventory>
 Map:
   <surface> — <covered|theater|uncovered> — <verifying tests file:line, layer>
 Theater findings: <tests executing without meaningful assertions + why>
+Mutation evidence: <survived mutants mapped to surfaces; equivalents excluded + reason>
 CI reality check: <tests present but not gating, skipped/quarantined>
 Gap list (risk-ranked):
   <#> <surface/behavior> — risk <why it matters> — recommended layer
@@ -98,6 +111,9 @@ Handoffs: <fill items → test-plan-designer or engineer skills;
 - [ ] Every gap has a risk rationale and a recommended cheapest layer.
 - [ ] Not-inspected areas listed explicitly with reasons.
 - [ ] No fix implementation attempted — gaps are handed off.
+- [ ] Mutation reports, when supplied, are read into the map — survivors are
+      gap evidence, equivalents excluded with reasons — and no mutation tool
+      was run here.
 
 ## Gotchas
 
@@ -111,6 +127,10 @@ Handoffs: <fill items → test-plan-designer or engineer skills;
   shrink real coverage — count them as uncovered.
 - E2E tests "cover" many lines incidentally; incidental execution is not
   verification of those behaviors.
+- A mutation score, like a coverage percentage, is a lead not a verdict: a
+  surviving mutant means "no test distinguishes this behavior" but an
+  equivalent mutant means "no test can" — triage before mapping.
+- Running the tool or writing killing tests is implementation, not mapping.
 
 ## Stop Conditions
 
@@ -122,14 +142,15 @@ Handoffs: <fill items → test-plan-designer or engineer skills;
 - Requirements/risk context is entirely absent and gaps can't be ranked →
   present the unranked map and ask for risk input instead of inventing
   priorities.
-- Asked to also write the missing tests → implementation belongs to the
-  engineer skills per gap; confirm scope first.
+- Asked to also write the missing tests or run a mutation tool →
+  implementation belongs to the engineer skills per gap; confirm scope
+  first.
 
 ## Supporting Files
 
 - [references/coverage-mapping-method.md](references/coverage-mapping-method.md) —
   surface inventory recipe, verifying-vs-theater test rubric, and gap-ranking
-  worksheet.
+  worksheet, plus the mutation-report rubric.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the strategy/plan/coverage
   cluster and against the shipped `full-codebase-auditor` and `code-reviewer`.

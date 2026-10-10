@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "qa-automation-architect",
-  "description": "Trigger and behavior cases for automation architecture: tool selection with rationale, structure, isolation/parallelization, reporting, CI placement, flake policy, migration steps.",
+  "description": "Trigger and behavior cases for automation architecture: tool selection with rationale, structure, isolation/parallelization, reporting, CI placement, flake policy, per-layer timeout policy, migration steps.",
   "cases": [
     {
       "id": "positive-design-framework",
@@ -88,6 +88,32 @@
         "assertions": [
           "Does not invoke qa-automation-architect: a golden dataset and graders for chatbot quality, safety, and hallucination rate evaluate model behavior; this skill designs code-test automation architecture.",
           "Does not auto-invoke ai-evaluation-harness (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute qa-automation-architect for it."
+        ]
+      }
+    },
+    {
+      "id": "timeout-policy-design",
+      "type": "should_trigger",
+      "prompt": "Define per-layer test-timeout policies for our CI tiers — our unit, integration, and E2E suites all need execution limits derived from the tier budgets.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Derives per-suite execution limits from the CI tier runtime budgets, per layer.",
+          "States timeout behavior per layer (kill/fail/quarantine) and the evidence each run emits.",
+          "States the timeout↔retry interaction (a timeout is not by itself a retry reason) and routes TIMEOUT-ONLY evidence to flaky-test-detective and ci-failure-classifier.",
+          "Never masks failures and does not edit pipeline job-level limits (ci-pipeline-architect's job)."
+        ]
+      }
+    },
+    {
+      "id": "edge-suite-at-limit",
+      "type": "should_trigger",
+      "prompt": "Our E2E suite keeps hitting its 45-minute limit. Design the timeout policy for the E2E tier.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reconciles the suite limit with the tier budget (sharding or budget change), states the timeout behavior, and refuses to mask failures.",
+          "Routes finished timed-out runs to ci-failure-classifier and intermittence to flaky-test-detective."
         ]
       }
     }
