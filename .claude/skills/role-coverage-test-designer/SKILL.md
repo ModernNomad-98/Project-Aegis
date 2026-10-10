@@ -34,7 +34,7 @@ restate. It designs and executes nothing.
 - Do NOT use when: the ask is a per-change test plan — that is `test-plan-designer`.
 - Do NOT use when: the ask is writing or running E2E specs — that is `playwright-e2e-engineer` *(manual-only)*.
 - Do NOT use when: the ask is step-by-step scripted manual cases — that is `manual-test-case-creator`.
-- Custom-role, grant-ceiling, and role/resource-inheritance coverage is deferred to the unbuilt #59 extension of `authorization-matrix-designer`: this skill covers the shipped matrix's roles and states the deferral as a seam — it does not claim the extension exists.
+- Custom-role, grant-ceiling, and role/resource-inheritance coverage is designed by the #59 extension of `authorization-matrix-designer` (built by D78): this skill composes that output — never restates it.
 
 ## Inputs to Inspect
 
@@ -43,7 +43,7 @@ restate. It designs and executes nothing.
 3. UI surfaces and routes each role can reach, including screens shared across roles.
 4. Per-role feature flags, plan/entitlement gates, and tenant configuration that change what a role sees.
 5. Existing test coverage across layers, so the design names gaps instead of duplicating.
-6. Anything the shipped matrix does not yet cover (custom roles, grant ceilings, inheritance) → out of scope here; deferred to the unbuilt #59 extension.
+6. Custom roles, grant ceilings, and inheritance → designed by the #59 extension of `authorization-matrix-designer` (built by D78); compose its output, never restate it.
 
 ## Workflow
 
@@ -75,7 +75,7 @@ Execution handoffs:
 Out of scope:
   denials / negative permissions → authorization-matrix-designer step 7 /
   multi-tenant-security-tester
-  custom roles, grant ceilings, inheritance → deferred to the unbuilt #59 extension
+  custom roles, grant ceilings, inheritance → designed via the #59 extension (built by D78); compose, never restate
 Chosen / why / rejected: <the key choices, the reason for each, and the main
   rejected alternative>
 ```
@@ -87,7 +87,7 @@ Chosen / why / rejected: <the key choices, the reason for each, and the main
 - [ ] Every interface-consistency delta names the two roles, the surface, and the check that catches a wrong difference.
 - [ ] Each layer mapping is justified (cheapest reliable layer); persona data is named per role.
 - [ ] Denials are stated out of scope and routed to `authorization-matrix-designer` step 7 / `multi-tenant-security-tester`.
-- [ ] Custom-role / grant-ceiling / inheritance deferral to the unbuilt #59 extension is stated.
+- [ ] Custom-role / grant-ceiling / inheritance coverage is composed from the #59 extension (built by D78), never restated.
 - [ ] The matrix was composed, never restated; the design claims to execute or drive nothing.
 
 ## Gotchas
@@ -97,7 +97,7 @@ Chosen / why / rejected: <the key choices, the reason for each, and the main
 - Matrix explosion: role × surface × behavior grows fast. Scope to the allowed paths the app ships and say what is skipped; a giant matrix proves nothing if nobody can run it.
 - Never restate the matrix: copying `authorization-matrix-designer`'s grants into this design duplicates the source of truth. Reference it and design coverage around it.
 - Denials are `authorization-matrix-designer` step 7's and `multi-tenant-security-tester`'s job; absorbing them here duplicates an executed suite and blurs the seam.
-- Custom roles, grant ceilings, and inheritance are the unbuilt #59 extension's scope; do not design coverage for them here or imply the extension exists.
+- Custom roles, grant ceilings, and inheritance are designed by the #59 extension of `authorization-matrix-designer` (built by D78); compose its output here — do not restate it.
 
 ## Stop Conditions
 

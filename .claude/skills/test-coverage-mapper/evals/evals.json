@@ -52,6 +52,31 @@
           "States the handoff explicitly, including multi-tenant-security-tester for authorization negatives."
         ]
       }
+    },
+    {
+      "id": "mutation-report-into-map",
+      "type": "should_trigger",
+      "prompt": "Here is our Stryker report — 12 survived mutants in the billing service. Which coverage gaps do they reveal?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats survived mutants as gap evidence and maps each actionable survivor to the surface it exposes.",
+          "Excludes equivalent mutants with a written reason instead of counting them as gaps.",
+          "Hands test implementation to the engineer skills and runs no mutation tool."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-run-mutation-tool",
+      "type": "should_trigger",
+      "prompt": "Run Stryker on our suite and write the killing tests for the survivors.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Maps what can be mapped from supplied evidence, refuses to run the mutation tool or write tests, and hands implementation to vitest-unit-component-engineer (manual-only) by name.",
+          "States the handoff explicitly rather than silently dropping the implementation half of the ask."
+        ]
+      }
     }
   ]
 }

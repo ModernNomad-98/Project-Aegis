@@ -50,6 +50,22 @@ Rank = impact-first, likelihood as tiebreaker, low-detectability promotes.
 Security-relevant gaps (tenant/authorization) are always reported, with specification
 delegated to `multi-tenant-security-tester`.
 
+## Mutation-report rubric
+
+When a mutation-testing report is supplied, read it into the map:
+
+- **Killed** mutants: the suite already distinguishes the behavior — no gap.
+- **Survived** mutants: no test distinguishes the mutated behavior — gap
+  evidence; map each actionable survivor to the surface it exposes.
+- **Equivalent** mutants: the mutation changed nothing observable (renamed
+  variable, dead branch) — no test CAN distinguish it; exclude with a
+  written reason, never count as a gap.
+
+A mutation score is a lead, not a verdict: triage survivors into
+"equivalent (excluded)" and "actionable (mapped)" before any gap claim.
+Running the mutation tool or writing killing tests stays with the engineer
+skills; this method consumes reports and maps gaps.
+
 ## Coverage statement discipline
 
 Report four buckets with counts: covered / theater / uncovered /

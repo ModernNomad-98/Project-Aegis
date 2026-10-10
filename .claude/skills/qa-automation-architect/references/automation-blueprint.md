@@ -56,5 +56,12 @@ Import boundary: `tests/**` may import from `src` public entry points and
 - Retry policy: max 1 retry, only on E2E tier, every retry logged and
   reported weekly to `flaky-test-detective` intake; unit/integration retries
   are OFF (a flaky unit test is a bug, not weather).
+- Per-layer test-timeout policy: derive per-suite execution limits from the
+  tier budgets — unit fast-fail (seconds-scale), integration bounded by tier,
+  E2E per-tier limits (PR tier < pre-merge < nightly). Timeout behavior per
+  layer: kill + report, or fail + quarantine, always emitting the evidence
+  the run needs. A timeout is not by itself a retry reason; TIMEOUT-ONLY
+  evidence routes to `flaky-test-detective` and `ci-failure-classifier`;
+  pipeline job-level limits stay with `ci-pipeline-architect`.
 - Artifacts: JUnit/JSON report per suite + failure traces/screenshots
   uploaded with run id; retention per evidence rules.

@@ -1,11 +1,13 @@
 {
   "skill": "qa-automation-architect",
-  "description": "Trigger discrimination for the Phase 5 strategy/plan/coverage cluster: automation architecture vs strategy vs per-change plan vs coverage audit, plus the flake-policy vs flake-diagnosis boundary.",
+  "description": "Trigger discrimination for the Phase 5 strategy/plan/coverage cluster: automation architecture vs strategy vs per-change plan vs coverage audit, plus the flake-policy vs flake-diagnosis boundary, the timeout-policy vs finished-run-classification boundary, and the timeout-policy vs pipeline job-limit boundary.",
   "overlaps_with": [
     "qa-strategy-architect",
     "test-plan-designer",
     "test-coverage-mapper",
-    "flaky-test-detective"
+    "flaky-test-detective",
+    "ci-failure-classifier",
+    "ci-pipeline-architect"
   ],
   "cases": [
     {
@@ -44,6 +46,24 @@
         "qa-automation-architect"
       ],
       "reason": "Auditing present coverage is the mapper; architecture consumes its output."
+    },
+    {
+      "id": "classify-timed-out-run-goes-to-classifier",
+      "prompt": "Here is the log of a CI run that hit its job time limit. Classify what happened.",
+      "expected_skill": "ci-failure-classifier",
+      "should_not_trigger": [
+        "qa-automation-architect"
+      ],
+      "reason": "Classifying a finished timed-out run is ci-failure-classifier's job; the architect designs the timeout policy, it does not classify runs."
+    },
+    {
+      "id": "job-limit-goes-to-pipeline-architect",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Set the job-level timeout to 60 minutes in our pipeline workflow.",
+      "expected_skill": "ci-pipeline-architect",
+      "should_not_trigger": [
+        "qa-automation-architect"
+      ],
+      "reason": "Editing pipeline definitions' job-level limits is ci-pipeline-architect's (manual-only); the architect's blueprint composes those tiers and keeps per-suite limits in the test layer."
     }
   ]
 }

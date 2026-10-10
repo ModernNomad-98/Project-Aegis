@@ -13,7 +13,7 @@
           "Names every shipped role and builds a role × surface allowed-path matrix from the authorization matrix (composed, not restated).",
           "Names interface-consistency deltas where the same surface differs across roles, each with the check that would catch a wrong difference.",
           "Maps each allowed path to the cheapest reliable layer with persona data, and names execution handoffs instead of executing.",
-          "States denials and custom-role coverage as out of scope with their owning owners (authorization-matrix-designer step 7 / multi-tenant-security-tester; the unbuilt #59 extension)."
+          "States denials and custom-role coverage as out of scope with their owning owners (authorization-matrix-designer step 7 / multi-tenant-security-tester; custom-role coverage composed from the #59 extension, built by D78 — never restated)."
         ]
       }
     },

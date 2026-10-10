@@ -78,6 +78,32 @@
           "Does not auto-invoke agent-authorization-matrix (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute authorization-matrix-designer for it."
         ]
       }
+    },
+    {
+      "id": "grant-ceiling-and-custom-roles",
+      "type": "should_trigger",
+      "prompt": "Design who can grant roles: managers may grant member, only owners grant owner; and admins want tenant-defined custom roles.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces a grant-ceiling table with grant:<role> assignment permissions per actor level.",
+          "Defines tenant-bounded custom-role composition (template permissions, ceiling, inheritance) with audit events on create/change.",
+          "Adds negative tests for self-escalation, above-ceiling grants, and custom-role cross-tenant reach.",
+          "Keeps the ceiling structural — enforced at the grant path, not advice."
+        ]
+      }
+    },
+    {
+      "id": "above-ceiling-grant-is-widening",
+      "type": "should_trigger",
+      "prompt": "Let admins grant admin to each other.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the request as a widening: routes it through human-approval-boundary with the blast radius instead of silently adding a matrix entry.",
+          "Does not record the grant above the ceiling as a design default."
+        ]
+      }
     }
   ]
 }
