@@ -64,7 +64,7 @@ discipline this skill applies.
 
 1. The CI workflow definitions (e.g. `.github/workflows/*.yml`): which
    workflows trigger on `pull_request` (and on what paths), what each job
-   actually runs (commands, versions, env), and which checks are REQUIRED
+   actually runs (commands, versions, environment), and which checks are REQUIRED
    by branch protection.
 2. The repo's local runner conventions: package scripts, Makefile,
    validation scripts — the intended local equivalents where they exist.
@@ -106,7 +106,7 @@ the operation and obtain it before proceeding.
    - `pre-existing-on-main` — the same failure signature appears on the
      baseline and work, without a new or worsened work-specific failure;
      report it and route the baseline repair to its own task.
-   - `CI-infrastructure` — env/runner/network/tooling cause, not product
+   - `CI-infrastructure` — environment/runner/network/tooling cause, not product
      code (rate limits, missing local service); state the evidence.
    - `cannot-determine-locally` — no faithful local equivalent; named as a
      residual risk the PR carries to real CI.
@@ -212,4 +212,5 @@ Residual risk to real CI: <cannot-determine items, matrix gaps>
   and refusing to skip the baseline.
 - `evals/trigger-evals.json` — discrimination against
   `release-readiness-reviewer`, `risk-tiered-validation-selector`,
-  `sharded-validation-with-resume`, and `ci-pipeline-architect`.
+  `sharded-validation-with-resume`, `ci-pipeline-architect`, and
+  `environment-parity-reviewer`.

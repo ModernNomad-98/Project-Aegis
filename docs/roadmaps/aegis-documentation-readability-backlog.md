@@ -3998,3 +3998,54 @@ itself, which is pending and not counted among accepted pages.
 The next batch's selection rule: the next 8 limb-A pages in
 `AUDIT_REVISIONS`/`FURTHER_REVISIONS` order, then limb C's carried pages
 and the new-page set, re-measured at the next implementation base.
+## Ledger-keeper recording + batch update — readability sweep second batch, 2026-10-10
+
+The ledger keeper records under AEGIS-APR-101 (its unchanged recording-only
+role). The eight pages below were each independently full-page re-read at the
+base head against [Acceptance for each page](#acceptance-for-each-page) by a
+reviewer who did not write the page, and each reviewer restated the page's
+purpose and normal use from the page alone in the batch record. The one
+"corrected" row applies reviewer-proposed prose verbatim (the Supporting
+Files fifth-neighbor note and the two "env" → "environment" spellings); the
+coordinator re-read the changed lines before batch close. One named follow-up
+is recorded separately below; it is a seam-case gap in another file, not a
+readability defect of the accepted page. No acceptance the reviewers did not
+give is recorded, and no posture, Stop Condition, or Security Rule changed.
+
+| Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [resilience-architecture-reviewer](../../.claude/skills/resilience-architecture-reviewer/SKILL.md) | `31e5635709af5ccdcba5037e99732d426f6b2bdc` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-703-2026-10-10.md) | 2026-10-10 |
+| [compliance-control-foundation](../../.claude/skills/compliance-control-foundation/SKILL.md) | `31e5635709af5ccdcba5037e99732d426f6b2bdc` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-703-2026-10-10.md) | 2026-10-10 |
+| [agent-startup-context-gate](../../.claude/skills/agent-startup-context-gate/SKILL.md) | `31e5635709af5ccdcba5037e99732d426f6b2bdc` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-703-2026-10-10.md) | 2026-10-10 |
+| [lane-authoring-guide](../../.claude/skills/lane-authoring-guide/SKILL.md) | `31e5635709af5ccdcba5037e99732d426f6b2bdc` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-703-2026-10-10.md) | 2026-10-10 |
+| [rls-policy-auditor](../../.claude/skills/rls-policy-auditor/SKILL.md) | `31e5635709af5ccdcba5037e99732d426f6b2bdc` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-703-2026-10-10.md) | 2026-10-10 |
+| [compliance-evidence-collector](../../.claude/skills/compliance-evidence-collector/SKILL.md) | `31e5635709af5ccdcba5037e99732d426f6b2bdc` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-703-2026-10-10.md) | 2026-10-10 |
+| [local-ci-mirror-preflight](../../.claude/skills/local-ci-mirror-preflight/SKILL.md) | `31e5635709af5ccdcba5037e99732d426f6b2bdc` (corrected in-batch: Supporting-Files fifth neighbor + two "env" spellings, re-read by the coordinator) | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-703-2026-10-10.md) | 2026-10-10 |
+| [chat-backlog-reconciliation](../../.claude/skills/chat-backlog-reconciliation/SKILL.md) | `31e5635709af5ccdcba5037e99732d426f6b2bdc` | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-703-2026-10-10.md) | 2026-10-10 |
+
+Recorded acceptance revisions from the tracker's `AUDIT_REVISIONS` /
+`FURTHER_REVISIONS` and the re-measured drift per page (all > 10, so every
+page owed this re-read) are in the batch record. Named follow-up (non-blocking;
+the page itself is accepted): `local-ci-mirror-preflight`'s description and
+Use When name `ci-failure-classifier` as a Do-NOT neighbor while its
+`evals/trigger-evals.json` carries no `ci-failure-classifier`
+discrimination case — owner: a skill-quality/trigger-evals review that adds
+the seam case.
+
+**Count honesty (unchanged).** No exact pending count is derivable (the tool
+itself says "NOT DERIVABLE from this procedure"); the tool run at this base
+(215 provably pending / 159 no-recorded / 221 within-10 / 7 undecidable) is
+candidate evidence only, and the "212" frozen-basis figure is not reproduced.
+The index repair and official-count switch stay paused; N12/N13 untouched.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read
+against [Acceptance for each page](#acceptance-for-each-page) by a reader who
+did not write this section — the self-cost every prior update states. The
+tracked Markdown count does not change except by the new batch record note
+itself, which is pending and not counted among accepted pages.
+
+The next batch's selection rule: the next 8 pages of the named pending set in
+`AUDIT_REVISIONS`/`FURTHER_REVISIONS` order (the remaining two
+`FURTHER_REVISIONS` skill pages first, then limb C's carried pages and the
+new-page set), re-measured at the next implementation base.
