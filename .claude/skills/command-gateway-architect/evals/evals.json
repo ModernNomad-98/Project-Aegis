@@ -69,6 +69,18 @@
           "The gateway is what those endpoints dispatch into, but nothing here asks for the internal write-path pipeline."
         ]
       }
+    },
+    {
+      "id": "same-key-different-payload-and-in-flight",
+      "type": "should_trigger",
+      "prompt": "A client retries a command with the same idempotency key but a changed payload — and separately, two identical requests arrive while the first is still running. Design the idempotency outcomes.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States the different-payload outcome (reject with payload-mismatch evidence; never re-execute, never silently return the old result) and the in-flight outcome (in-progress/conflict with retry guidance or await-outcome; never double-execute) per command.",
+          "Keeps both distinct from concurrency control (version check / row lock)."
+        ]
+      }
     }
   ]
 }

@@ -64,7 +64,8 @@ never accepted from the client.
 4. The audit taxonomy (`audit-log-architect` output if present): which
    actions must produce audit records and the required fields.
 5. Existing idempotency handling: any dedup keys, unique constraints, or
-   "retry made two charges" incident history.
+   "retry made two charges" incident history, including
+   same-key-different-payload and in-flight duplicates.
 6. The datastore access paths: can clients reach tables directly (e.g.
    client-side SDK + row policies) — which determines whether the gateway
    can be the ONLY write path or must be paired with datastore-level denial.
@@ -103,9 +104,15 @@ never accepted from the client.
    not merely the polite one.
 4. **Design idempotency concretely.** Key source (client-supplied UUID vs
    derived business key), the dedup store and its retention, what "same
-   request" means, and the response for a replayed key. Distinguish
-   idempotency (safe replay) from concurrency control (optimistic version /
-   row lock) — name both where the command needs them.
+   request" means, and the response for a replayed key. State the two
+   missing outcomes: (a) a reused key carrying a DIFFERENT payload → reject
+   with a payload-mismatch error and evidence; never re-execute, never
+   silently return the old result; (b) a key arriving while the first
+   request is still IN-FLIGHT → in-progress/conflict response with retry
+   guidance, or await-outcome where the dedup store supports it — never
+   double-execute. Distinguish idempotency (safe replay) from concurrency
+   control (optimistic version / row lock) — name both where the command
+   needs them.
 5. **Design the error envelope.** One shape for all failures: a stable
    machine code + safe message; validation errors field-scoped; authz
    failures return the SAME not-found/forbidden shape regardless of whether
@@ -133,7 +140,7 @@ Pipeline contract (fixed order, every command):
   validate → authenticate(actor from token) → derive-scope(from trusted state) →
   authorize(<policy source, resolved target>) → idempotency(<key, store, retention>) →
   execute(txn) → emit(audit + events) → safe-error-envelope
-Idempotency: <key source, dedup store, replay response, concurrency control>
+Idempotency: <key source, dedup store, replay response, different-payload policy, in-flight policy, concurrency control>
 Error envelope: <shape, codes, no-existence-oracle rule, leak rules>
 Enforcement-point map: <command × stage table; findings flagged>
 Handoffs: policy → authorization-matrix-designer; audit schema →
@@ -154,7 +161,8 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - [ ] Authorization follows trusted target derivation, is deny-by-default,
       and delegates to the authorization model rather than a per-command copy.
 - [ ] Every mutating command has an idempotency contract (key, store,
-      replay response) — retries cannot double-apply side effects.
+      replay response, different-payload policy, in-flight policy) — retries
+      cannot double-apply side effects.
 - [ ] A successful write cannot skip its audit record or event emission
       (same transaction / outbox).
 - [ ] The around-the-gateway path is closed at the datastore, and that
@@ -179,6 +187,11 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - Idempotency is not concurrency control: a replayed key and two DIFFERENT
   concurrent writers are different problems; the second needs a version
   check or lock, not a dedup store.
+- Same key + different payload is a distinct outcome from a replay — decide
+  it explicitly or the dedup store's default decides for you.
+- An in-flight duplicate is not concurrency control either — the dedup store
+  may not yet hold a result to replay, and a version check does not answer
+  it.
 - Authorize-then-derive-scope in the wrong order authorizes against a
   client-claimed target: derive and confirm the real row's tenant, then
   authorize against THAT, or an attacker authorizes on their own object and

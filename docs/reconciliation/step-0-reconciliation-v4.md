@@ -120,7 +120,8 @@ architecture; the architecture skills are **moved to Phase 2**.
 
 Merges/moves from the execution plan: `grill-with-docs` **→ merged into** `docs-first-implementer`
 (same skill, v4 name wins). Architecture skills moved from execution-plan Phase 1 land here.
-Execution-plan Phase 2 extras (`api-contract-designer`, `idempotency-first-designer`,
+Execution-plan Phase 2 extras (`api-contract-designer` — **✅ built (D79, 2026-10-10) as the #9 extension of `api-event-architect`**,
+`idempotency-first-designer` — **✅ built (D79, 2026-10-10) as the #17/#144 extension of `command-gateway-architect` + `product-spec-writer`**,
 `validation-boundary-designer`, `observability-by-design`, `operational-runbook-author`) and
 the moved arch skills (`system-context-mapper`, `bounded-context-identifier`,
 `dependency-direction-guard`, `refactor-safety-planner`) are **reconciled into the Phase 2
@@ -747,7 +748,7 @@ extension flags resolved STANDALONE at build time):*
 same audit gives strong real-world evidence to pull these forward, HIGH priority,
 from their existing expansion backlogs (they are prioritization signals here, not
 part of the 14 D12.11 candidates): `idempotency-first-designer` (Phase 2 —
-"table-stakes for any mutating API"; TOP pull-forward), the unnamed
+"table-stakes for any mutating API"; TOP pull-forward — **✅ built (D79, 2026-10-10)** as the #17/#144 extension), the unnamed
 **rate-limit-design** row (Phase 4 — general per-tenant/plan API rate limits +
 noisy-neighbor defense; needs a NAME when pulled), and
 `resilience-architecture-reviewer` (Phase 6 — circuit
@@ -3998,6 +3999,38 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   `role-permission-architect` row are marked built above (§3). This entry
   records the build decision and the shipped arithmetic; it grants no new
   execution, publication or merge authority.
+
+- **D79 (2026-10-10) — Batch C architecture EXTENDs built (three extensions).**
+  Decided and built three owner-selected proposal EXTENDs in one PR:
+  #9 per-operation request/response schema conventions extended into
+  `api-event-architect` (G3 row 571; typed fields, validation shape,
+  per-operation additive-vs-breaking feeding the versioning policy, error
+  envelope bound to `error-taxonomy-designer`'s model by citation; the
+  extension's scope decision states the skill covers public/partner APIs AND
+  first-party client-facing endpoints — the proposal's "unverified"
+  first-party question is answered by the extension, not assumed away);
+  #17/#144 idempotency outcomes extended into `command-gateway-architect`
+  (G3 row 568 item 2; same-key-different-payload and in-flight duplicate
+  policies added to step 4 and the Output Idempotency line; description
+  unchanged — 944 parsed chars leave too little headroom); #17's spec half
+  extended into `product-spec-writer` (item 3; repeated-request outcomes —
+  retry / double-submit / second-tab / stale-request / duplicate-events —
+  per state-changing action, mechanism routed to `tech-spec-writer` and
+  `command-gateway-architect`; description unchanged — 961 parsed chars).
+  The honesty caveats stand: the #9 first-party scoping premise was
+  unverified at the proposal (row 571); the strongest objection to the
+  gateway extension (a one-endpoint product) and D30's recorded "TOP
+  pull-forward" remain named design questions; AEGIS-013/AEGIS-028's root
+  cause is still recorded "not yet verified" and this extension adds eval
+  cases, not a fresh-session regression run (row 568). This entry records
+  the build decision, not measured demand or effectiveness. Security:
+  **No** — no invocation posture, Security Rules, or Stop Conditions of any
+  target skill was edited. Counts are UNCHANGED: no new skills; SKILL-COUNT
+  stays 202; FAMILY-COUNT stays 23; families 4/14/18 stay 10/15/11. The
+  Phase 2 expansion-list marks for #9 and #17/#144 are recorded above (§3);
+  D30/D31/D76/D77/D78 entries are untouched and forward-corrected only by
+  this entry's marks. This entry records the build decision and the shipped
+  arithmetic; it grants no new execution, publication or merge authority.
 
 ## 6. Post-merge corrections
 

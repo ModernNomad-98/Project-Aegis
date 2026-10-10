@@ -41,6 +41,23 @@ HTTP success response.
 | Redelivery | Manual redelivery window (e.g. 7 days) via API/console |
 | Target validation | HTTPS only; SSRF checks; no redirect following |
 
+## API operation schema conventions
+
+Per-operation schemas apply to the API surface this skill owns: public and
+partner APIs, and first-party client-facing endpoints (both are external
+contracts to a consumer outside the implementing team). Internal
+service-to-service structure stays with `architecture-designer`.
+
+| Element | Convention |
+| --- | --- |
+| Request schema | typed fields, required/optional stated, validation shape per operation |
+| Response schema | typed fields incl. envelope, error shape bound to `error-taxonomy-designer`'s model (cited, not restated) |
+| Breaking (per operation) | field removal/retyping, required-flag flips, semantics changes — additive is non-breaking by contract |
+| Evolution | additive within an operation's schema; breaking changes follow the deprecation sequence and feed the versioning policy |
+
+Shared schema fragments: operations that return the same resource reference
+the same fragment, never per-endpoint copies of the same shape.
+
 ## Consumer checklist (ships with the docs — part of the contract)
 
 - Verify the signature against the exact received body bytes and timestamp

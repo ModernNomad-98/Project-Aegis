@@ -86,6 +86,30 @@
           "This is an architecture decision record, not a user-facing product specification."
         ]
       }
+    },
+    {
+      "id": "repeated-request-outcomes-in-spec",
+      "type": "should_trigger",
+      "prompt": "Write the spec for a claim-approval feature with submit and resubmit actions.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the repeated-request outcomes for every state-changing action (retry, double-submit, second-tab, stale-request, duplicate-events).",
+          "Routes the idempotency mechanism to tech-spec-writer / command-gateway-architect and specs no mechanism."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-idempotency-mechanism",
+      "type": "should_trigger",
+      "prompt": "Design the idempotency keys and dedup store for this feature.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Routes the mechanism design to the owning skills (command-gateway-architect / tech-spec-writer) and keeps the spec at outcomes only.",
+          "States the handoff explicitly rather than silently writing the mechanism into the spec."
+        ]
+      }
     }
   ]
 }

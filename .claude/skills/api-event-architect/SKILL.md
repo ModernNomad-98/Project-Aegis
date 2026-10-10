@@ -1,6 +1,6 @@
 ---
 name: api-event-architect
-description: Design external application programming interface (API) and event contracts for multi-tenant software as a service (SaaS). Tenant context comes from credentials by default; an explicitly authorized partner or aggregator may select only tenants allowed by its credential. Define routes, versioning, idempotency, rate limits, and signed tenant-scoped webhook delivery. Produce contract conventions, event schemas, delivery policy, and migration plan. Use for public API or webhook design and partner contract changes. Do NOT use for internal audit trails (audit-log-architect), internal service structure (architecture-designer), permission design (authorization-matrix-designer), the error-code taxonomy (error-taxonomy-designer), or user-facing sunset comms (sunset-deprecation-communicator).
+description: Design external application programming interface (API) and event contracts for multi-tenant software as a service (SaaS). Tenant context comes from credentials by default; an explicitly authorized partner or aggregator may select only tenants allowed by its credential. Define routes, per-operation request/response schema conventions, versioning, idempotency, rate limits, and signed tenant-scoped webhook delivery. Produce contract conventions, event schemas, delivery policy, and migration plan. Use for public API or webhook design and partner contract changes. Do NOT use for internal audit trails (audit-log-architect), internal service structure (architecture-designer), permission design (authorization-matrix-designer), the error-code taxonomy (error-taxonomy-designer), or user-facing sunset comms (sunset-deprecation-communicator).
 ---
 
 # API & Event Architect
@@ -19,7 +19,8 @@ Produce the external contracts of a multi-tenant SaaS — the API surface and
 the event/webhook feed — designed so that tenant context is structural,
 change is survivable, and delivery is honest about its semantics.
 Deliverables: API conventions (auth-derived tenant context, idempotency,
-errors, rate limits), a versioning/deprecation policy, an event taxonomy
+errors, rate limits, per-operation request/response schemas), a
+versioning/deprecation policy, an event taxonomy
 with versioned schemas, a webhook delivery policy (retries, ordering,
 signing, replay), and a migration/rollback plan for contract changes. A
 public contract is a promise with a support burden; this skill makes the
@@ -29,6 +30,9 @@ promise explicit before integrations harden around accidents.
 
 - Use when: designing a public/partner API for a multi-tenant product, or
   imposing conventions on one that grew endpoint by endpoint.
+- Use when: imposing or repairing per-operation request/response schemas
+  across an API — typed fields, validation shape, additive-vs-breaking per
+  operation.
 - Use when: adding webhooks or an event feed that integrations subscribe to.
 - Use when: partners break on releases — versioning and deprecation policy
   is missing or unenforced.
@@ -52,6 +56,8 @@ promise explicit before integrations harden around accidents.
   (`event-schema-architect`), notification/webhook UX
   (`notification-webhook-ux-designer`), or the generated reference docs for
   this contract (`api-doc-generator-designer`).
+- Do NOT use when: writing or running contract TESTS against the API — that
+  is `api-contract-test-designer` (design vs verification).
 - Do NOT use when: designing the error-code taxonomy and error envelope —
   that is `error-taxonomy-designer` (its model rides this contract); or
   planning user-facing sunset communications — that is
@@ -62,7 +68,8 @@ promise explicit before integrations harden around accidents.
 
 1. The current API surface: routes, auth mechanism, where tenant context
    enters today, existing consumers and their observed usage (the de facto
-   contract).
+   contract, including the de facto per-operation shapes — what each
+   endpoint actually accepts and returns today).
 2. The tenant model (tenant boundary, membership — for whom tokens act) and
    the authorization matrix (permissions → token scopes).
 3. The entitlement matrix: which limits are plan-derived (rate limits,
@@ -83,11 +90,14 @@ promise explicit before integrations harden around accidents.
    may name a tenant per call only after the server validates that selection
    against the tenant allow-list bound to that credential. This exception is
    designed and tested, never assumed by default.
-2. **Set resource conventions**: naming, ids (opaque, non-enumerable where
-   resources are tenant-owned), pagination, filtering, error shape
-   (machine-readable codes; error detail must not leak other tenants'
-   existence), and the 404-vs-403 policy consistent with the isolation
-   posture.
+2. **Set resource and per-operation schema conventions**: naming, ids
+   (opaque, non-enumerable where tenant-owned), pagination, filtering, error
+   shape (machine-readable codes; error detail must not leak other tenants'
+   existence), the 404-vs-403 policy consistent with the isolation posture,
+   and a request and response schema per operation — typed fields,
+   required/optional, validation shape; one error envelope bound to
+   `error-taxonomy-designer`'s model (cited, not restated); and per-operation
+   additive-vs-breaking rules that feed step 5's versioning policy.
 3. **Define idempotency**: mutation endpoints accept idempotency keys;
    retried requests return the original result within a stated window.
    Webhook handlers on the consumer side are told to expect duplicates
@@ -144,7 +154,7 @@ API & EVENT CONTRACT DESIGN — <product/scope>
 Tenant-context contract: <credential → tenant resolution; client-supplied
   tenant ids forbidden on data paths; aggregator exception design if needed>
 API conventions: <resources, ids, pagination, error shape, 404-vs-403 policy,
-  idempotency mechanism + window>
+  idempotency mechanism + window, per-operation request/response schemas>
 Rate limits: <per-credential / per-tenant / plan-derived tiers; headers; 429
   behavior>
 Versioning & deprecation policy: <breaking definition; version expression;
@@ -168,6 +178,10 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 - [ ] Error responses and 404-vs-403 policy leak no other tenant's
       existence; ids are non-enumerable for tenant-owned resources.
 - [ ] Every mutation has idempotency semantics with a stated window.
+- [ ] Every exposed operation has a request/response schema; per-operation
+      additive-vs-breaking is consistent with the versioning policy; the
+      error envelope cites `error-taxonomy-designer`'s model without
+      restating it.
 - [ ] Rate limits exist per tenant (noisy-neighbor floor) and map to the
       entitlement matrix where plan-derived.
 - [ ] "Breaking" is defined; deprecation has a minimum-notice number and a
@@ -224,6 +238,10 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
   decisions, not implementation details.
 - Sequential integer ids on tenant-owned resources are an enumeration
   vulnerability AND a business-intelligence leak (order counts).
+- Per-operation schemas absent → each endpoint's accident becomes its spec,
+  one endpoint at a time; schemas must exist BEFORE the first consumer.
+- Shared schema fragments + additive evolution prevent drift between
+  operations — never per-endpoint copies of the same shape.
 - "We'll never break the API" is not a versioning policy; it is the absence
   of one, discovered at the first unavoidable breaking change.
 
@@ -245,7 +263,8 @@ Assumptions & open questions: <each with risk-if-wrong / who answers>
 
 - [references/api-event-contract-conventions.md](references/api-event-contract-conventions.md) —
   envelope schema, event-type naming, delivery-policy table, consumer
-  checklist, and deprecation-sequence template.
+  checklist, deprecation-sequence template, and the API operation schema
+  conventions.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against `audit-log-architect`
   and `authorization-matrix-designer` (access & events cluster).
