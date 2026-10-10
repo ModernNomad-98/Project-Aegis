@@ -1,0 +1,68 @@
+{
+  "skill": "mobile-journey-test-designer",
+  "description": "Trigger discrimination for mobile journey QA design: critical journeys with mobile-specific checks versus layout correctness (mobile-viewport-craft), live walkthrough execution (clickthrough-test-engineer, manual-only), permanent E2E spec implementation (playwright-e2e-engineer, manual-only), and the general per-change plan (test-plan-designer).",
+  "overlaps_with": [
+    "mobile-viewport-craft",
+    "clickthrough-test-engineer",
+    "playwright-e2e-engineer",
+    "test-plan-designer"
+  ],
+  "cases": [
+    {
+      "id": "journey-qa-wins-here",
+      "prompt": "Which critical journeys should we verify on phones, and what touch, dialog and navigation checks does each need?",
+      "expected_skill": "mobile-journey-test-designer",
+      "should_not_trigger": [
+        "mobile-viewport-craft",
+        "test-plan-designer"
+      ],
+      "reason": "Critical-journey mobile checks (touch, dialogs, navigation) are journey QA design; layout fitting is mobile-viewport-craft and no per-change plan is in view."
+    },
+    {
+      "id": "layout-goes-to-craft",
+      "prompt": "Our 100vh layout breaks on small phones — design the responsive layout so it fits every viewport.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": [
+        "mobile-journey-test-designer"
+      ],
+      "reason": "Fitting the layout to phone viewports is mobile-viewport-craft's correctness design; this skill checks journeys across breakpoints, it does not fix the layout."
+    },
+    {
+      "id": "live-walkthrough-goes-to-clickthrough",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Walk the checkout journey on a real phone and report the defects you find.",
+      "expected_skill": "clickthrough-test-engineer",
+      "should_not_trigger": [
+        "mobile-journey-test-designer"
+      ],
+      "reason": "Executing a live clickthrough on a device is clickthrough-test-engineer (manual-only); this skill designs the coverage and drives nothing."
+    },
+    {
+      "id": "specs-go-to-playwright",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Write Playwright specs for the mobile checkout journey with the iPhone viewport.",
+      "expected_skill": "playwright-e2e-engineer",
+      "should_not_trigger": [
+        "mobile-journey-test-designer"
+      ],
+      "reason": "Implementing permanent E2E specs is playwright-e2e-engineer (manual-only); this skill designs which journeys and checks the specs must cover."
+    },
+    {
+      "id": "per-change-plan-goes-to-plan-designer",
+      "prompt": "Plan the testing for the new payment change across layers.",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "mobile-journey-test-designer"
+      ],
+      "reason": "A general per-change plan with layers and exit criteria is test-plan-designer; mobile journey coverage is one slice a plan may name."
+    },
+    {
+      "id": "small-breakpoint-journey-wins-here",
+      "prompt": "Our checkout works on desktop but breaks on a 320px phone. Design the mobile journey checks that catch what breaks.",
+      "expected_skill": "mobile-journey-test-designer",
+      "should_not_trigger": [
+        "mobile-viewport-craft",
+        "playwright-e2e-engineer"
+      ],
+      "reason": "Designing the journey checks that expose phone-only breakage is this skill's core; fixing the layout is mobile-viewport-craft and writing the specs is playwright-e2e-engineer."
+    }
+  ]
+}
