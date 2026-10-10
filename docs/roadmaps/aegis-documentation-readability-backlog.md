@@ -4204,3 +4204,54 @@ The next batch's selection rule: the remaining new-page set in the recorded
 order (the two 2026-10-02 evidence notes, the route002 triage README, the two
 roadmap pages, and the tools readability README), re-measured at the next
 implementation base.
+## Ledger-keeper recording + batch update — readability sweep sixth batch, 2026-10-10
+
+The ledger keeper records under AEGIS-APR-101 (its unchanged recording-only
+role). The eight pages below were each independently full-page re-read (or,
+for the two longest, structured full-page reviewed per the reviewers' stated
+methods) at the base head against
+[Acceptance for each page](#acceptance-for-each-page) by a reviewer who did
+not write the page, and each reviewer restated the page's purpose and normal
+use from the page alone in the batch record. All eight are accepted at the
+reviewed head; the one "corrected" row applies reviewer-proposed
+reading-key prose verbatim (first-use definitions of PR and WP), re-read by
+the coordinator before batch close. The batch-5 named follow-up on
+role-coverage-test-designer is **discharged**: PR #708 (D83) reworded its
+L108, and this batch's full-page re-read verified the fix and accepted the
+page. No acceptance the reviewers did not give is recorded, and no posture,
+Stop Condition, Security Rule, or governance text changed.
+
+| Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [The process issues register](../../docs/evidence/documentation/process-issues-and-prevention-2026-10-02.md) | `fe8123a3d2786308382cc38da4517d4943ba5271` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-708-2026-10-10.md) | 2026-10-10 |
+| [The ROUTE-002 triage README](../../docs/evidence/route002-triage-2026-10-09/README.md) | `fe8123a3d2786308382cc38da4517d4943ba5271` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-708-2026-10-10.md) | 2026-10-10 |
+| [The coordinator figures page](../../docs/roadmaps/aegis-coordinator-figures.md) | `fe8123a3d2786308382cc38da4517d4943ba5271` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-708-2026-10-10.md) | 2026-10-10 |
+| [The stale-checkout divergence note](../../docs/evidence/documentation/stale-checkout-instruction-divergence-2026-10-02.md) | `fe8123a3d2786308382cc38da4517d4943ba5271` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-708-2026-10-10.md) | 2026-10-10 |
+| [The unselected expansion proposal](../../docs/roadmaps/unselected-expansion-skill-batch-proposal.md) | `fe8123a3d2786308382cc38da4517d4943ba5271` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-708-2026-10-10.md) | 2026-10-10 |
+| [The readability acceptance README](../../tools/readability_acceptance/README.md) | `fe8123a3d2786308382cc38da4517d4943ba5271` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-708-2026-10-10.md) | 2026-10-10 |
+| [role-coverage-test-designer](../../.claude/skills/role-coverage-test-designer/SKILL.md) | `fe8123a3d2786308382cc38da4517d4943ba5271` (batch-5 follow-up discharged by PR #708/D83; L108 fix verified on this re-read) | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-708-2026-10-10.md) | 2026-10-10 |
+| [The skill-eval behavioral test procedure](../../docs/skill-eval-behavioral-test-procedure.md) | `fe8123a3d2786308382cc38da4517d4943ba5271` (corrected in-batch: reading-key PR/WP definitions, re-read by the coordinator) | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-708-2026-10-10.md) | 2026-10-10 |
+
+Recorded revisions: none for any of the eight (new-page/limb-B rules — cited),
+so drift is not derivable; the batch record carries the restatements.
+
+**Count honesty (unchanged).** No exact pending count is derivable (the tool
+itself says "NOT DERIVABLE from this procedure"); the tool run at this base
+(215 provably pending / 159 no-recorded / 221 within-10 / 7 undecidable) is
+candidate evidence only, and the "212" frozen-basis figure is not reproduced.
+The index repair and official-count switch stay paused; N12/N13 untouched.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read
+against [Acceptance for each page](#acceptance-for-each-page) by a reader who
+did not write this section — the self-cost every prior update states. The
+tracked Markdown count does not change except by the new batch record note
+itself, which is pending and not counted among accepted pages.
+
+The next batch's selection rule: the remaining limb-B pages in the recorded
+order (`docs/roadmaps/skill-eval-harness-authorization-request.md`,
+`docs/evidence/skill-eval-run-2026-09-30.md`,
+`docs/evidence/session-continuation-2026-09-30.md`,
+`docs/evidence/session-continuation-2026-09-30-evening.md`), then the pending
+batch-record notes in creation order, re-measured at the next implementation
+base.
