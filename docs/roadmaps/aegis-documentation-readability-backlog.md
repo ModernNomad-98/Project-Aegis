@@ -3951,3 +3951,50 @@ The previous and current batch ETA are both **3–6 active hours**. The
 narrows from 48.35–168.85 to 47.15–165.1 raw hours. Outward five-hour
 rounding leaves documentation at **45–170 active hours** and selected backlog
 at **140–364 active hours**. Acceptance remains **IN PROGRESS**.
+## Ledger-keeper recording + batch update — readability sweep first batch, 2026-10-10
+
+The ledger keeper records under AEGIS-APR-101 (its unchanged recording-only
+role). The eight pages below were each independently full-page re-read at the
+base head against [Acceptance for each page](#acceptance-for-each-page) by a
+reviewer who did not write the page, and each reviewer restated the page's
+purpose and normal use from the page alone in the batch record. The two
+"corrected" rows apply reviewer-proposed description prose verbatim (first-use
+expansions of "ISMS" and "PR"); the coordinator re-read the changed lines
+before batch close. No acceptance the reviewers did not give is recorded, and
+no posture, Stop Condition, or Security Rule changed.
+
+| Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [performance-test-harness](../../.claude/skills/performance-test-harness/SKILL.md) | `b2c643568ac714ad5169a5be31e5430582fee1b9` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-702-2026-10-10.md) | 2026-10-10 |
+| [iso-42001-aims-architect](../../.claude/skills/iso-42001-aims-architect/SKILL.md) | `b2c643568ac714ad5169a5be31e5430582fee1b9` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-702-2026-10-10.md) | 2026-10-10 |
+| [qa-strategy-architect](../../.claude/skills/qa-strategy-architect/SKILL.md) | `b2c643568ac714ad5169a5be31e5430582fee1b9` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-702-2026-10-10.md) | 2026-10-10 |
+| [iso-27001-isms-architect](../../.claude/skills/iso-27001-isms-architect/SKILL.md) | `b2c643568ac714ad5169a5be31e5430582fee1b9` (corrected in-batch: description first-use expansion, re-read by the coordinator) | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-702-2026-10-10.md) | 2026-10-10 |
+| [merge-is-deploy-governance](../../.claude/skills/merge-is-deploy-governance/SKILL.md) | `b2c643568ac714ad5169a5be31e5430582fee1b9` (corrected in-batch: description first-use expansion, re-read by the coordinator) | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-702-2026-10-10.md) | 2026-10-10 |
+| [authority-invalidation-architect](../../.claude/skills/authority-invalidation-architect/SKILL.md) | `b2c643568ac714ad5169a5be31e5430582fee1b9` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-702-2026-10-10.md) | 2026-10-10 |
+| [adr-sequencer](../../.claude/skills/adr-sequencer/SKILL.md) | `b2c643568ac714ad5169a5be31e5430582fee1b9` | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-702-2026-10-10.md) | 2026-10-10 |
+| [risk-tiered-validation-selector](../../.claude/skills/risk-tiered-validation-selector/SKILL.md) | `b2c643568ac714ad5169a5be31e5430582fee1b9` | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-702-2026-10-10.md) | 2026-10-10 |
+
+The recorded acceptance revisions from `AUDIT_REVISIONS` and the re-measured
+drift per page (all > 10, so every page owed this re-read) are in the batch
+record. For `risk-tiered-validation-selector` the tracker-basis revision
+`5e0e9ad7d79b109aabcc3d2531061fadf84af592` and the frozen index's older
+`cf19639335158ffa09c02247d5d7b400f14fb522` give 12 and 22 drift lines
+respectively; both exceed 10, and the page is accepted at the reviewed head
+on the full-page re-read.
+
+**Count honesty (unchanged).** No exact pending count is derivable (the tool
+itself says "NOT DERIVABLE from this procedure"); the tool run at the base
+(215 provably pending / 159 no-recorded / 221 within-10 / 7 undecidable) is
+candidate evidence only, and the "212" frozen-basis figure is not reproduced.
+The index repair and official-count switch stay paused; N12/N13 untouched.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read
+against [Acceptance for each page](#acceptance-for-each-page) by a reader who
+did not write this section — the self-cost every prior update states. The
+tracked Markdown count does not change except by the new batch record note
+itself, which is pending and not counted among accepted pages.
+
+The next batch's selection rule: the next 8 limb-A pages in
+`AUDIT_REVISIONS`/`FURTHER_REVISIONS` order, then limb C's carried pages
+and the new-page set, re-measured at the next implementation base.
