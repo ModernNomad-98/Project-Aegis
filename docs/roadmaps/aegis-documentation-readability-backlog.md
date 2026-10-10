@@ -4145,3 +4145,62 @@ order (the D75/D77/D81 batch skills not yet reviewed, then
 2026-10-02 evidence notes, the route002 triage README, the two roadmap pages,
 and the tools readability README), re-measured at the next implementation
 base.
+## Ledger-keeper recording + batch update — readability sweep fifth batch, 2026-10-10
+
+The ledger keeper records under AEGIS-APR-101 (its unchanged recording-only
+role). The eight pages below were each independently full-page re-read (or,
+for the two longest, structured full-page reviewed per the reviewers' stated
+methods) at the base head against
+[Acceptance for each page](#acceptance-for-each-page) by a reviewer who did
+not write the page, and each reviewer restated the page's purpose and normal
+use from the page alone in the batch record. Seven pages are accepted at the
+reviewed head. One page is **not** accepted: its only finding sits in a Stop
+Conditions line, which the targeted-edit rule routes to a named follow-up
+rather than an edit — recorded below, with no acceptance conferred. No page
+was edited in this batch; no acceptance the reviewers did not give is
+recorded.
+
+| Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [The PROC-08 sweep record](../../.coord/proc08-sweep-2026-10-03.md) | `db49ca280c6ffffacc7281cdaa16a9175afaa586` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-706-2026-10-10.md) | 2026-10-10 |
+| [The delivery workflow](../../docs/delivery-workflow.md) | `db49ca280c6ffffacc7281cdaa16a9175afaa586` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-706-2026-10-10.md) | 2026-10-10 |
+| [The acceptance conversion process](../../docs/evidence/documentation/acceptance-conversion-process-2026-10-02.md) | `db49ca280c6ffffacc7281cdaa16a9175afaa586` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-706-2026-10-10.md) | 2026-10-10 |
+| [property-based-test-designer](../../.claude/skills/property-based-test-designer/SKILL.md) | `db49ca280c6ffffacc7281cdaa16a9175afaa586` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-706-2026-10-10.md) | 2026-10-10 |
+| [tenant-provisioning-designer](../../.claude/skills/tenant-provisioning-designer/SKILL.md) | `db49ca280c6ffffacc7281cdaa16a9175afaa586` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-706-2026-10-10.md) | 2026-10-10 |
+| [validation-boundary-designer](../../.claude/skills/validation-boundary-designer/SKILL.md) | `db49ca280c6ffffacc7281cdaa16a9175afaa586` | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-706-2026-10-10.md) | 2026-10-10 |
+| [visual-regression-test-designer](../../.claude/skills/visual-regression-test-designer/SKILL.md) | `db49ca280c6ffffacc7281cdaa16a9175afaa586` | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-706-2026-10-10.md) | 2026-10-10 |
+
+**Not accepted — named follow-up (no acceptance recorded):**
+[role-coverage-test-designer](../../.claude/skills/role-coverage-test-designer/SKILL.md),
+reviewed by stage-b-auditor at `db49ca280c6ffffacc7281cdaa16a9175afaa586`.
+Reason: L108 (Stop Conditions) reads "deferred to the unbuilt #59 extension"
+while the #59 extension is BUILT (D78) — the page's own L37/46/78/90/100 and
+evals.json:16 read "built by D78"; L108 is internally contradictory and
+factually stale (the stop behavior stays correct). Owning follow-up: the
+lead/owner decision to refresh L108's phrasing (e.g. "deferred to the #59
+extension of authorization-matrix-designer (built by D78), not designed
+here") in a PR whose security-answer surfaces name the Stop Conditions edit.
+Per the targeted-edit rule no edit was prescribed or applied here, and this
+page keeps its pending status.
+
+Recorded revisions: none for any of the eight (new-page rule — cited), so
+drift is not derivable; the batch record carries the reviewer restatements
+and the provenance labels (D75/D76/D77/D81).
+
+**Count honesty (unchanged).** No exact pending count is derivable (the tool
+itself says "NOT DERIVABLE from this procedure"); the tool run at this base
+(215 provably pending / 159 no-recorded / 221 within-10 / 7 undecidable) is
+candidate evidence only, and the "212" frozen-basis figure is not reproduced.
+The index repair and official-count switch stay paused; N12/N13 untouched.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read
+against [Acceptance for each page](#acceptance-for-each-page) by a reader who
+did not write this section — the self-cost every prior update states. The
+tracked Markdown count does not change except by the new batch record note
+itself, which is pending and not counted among accepted pages.
+
+The next batch's selection rule: the remaining new-page set in the recorded
+order (the two 2026-10-02 evidence notes, the route002 triage README, the two
+roadmap pages, and the tools readability README), re-measured at the next
+implementation base.
