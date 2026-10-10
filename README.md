@@ -747,7 +747,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->202<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->204<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch), fronted by one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -772,7 +772,7 @@ keeps a human as the approval gate on anything irreversible. See
    domain models, architecture design, ADRs, docs-first + test-first implementation, debugging,
    code review. *e.g.* `domain-modeler`, `architecture-designer`, `adr-writer`, `tdd-engineer`,
    `systematic-debugger`.
-4. **SaaS & tenant isolation** *(Phase 3, 10)* — multi-tenant foundations: platform structure,
+4. **SaaS & tenant isolation** *(Phase 3, 12)* — multi-tenant foundations: platform structure,
    tenant semantics, per-store scoping, roles/permissions, plans, audit trail, cost, external
    API contracts, and the feature-flag system (added by D64). *e.g.* `saas-platform-architect`, `tenant-isolation-reviewer`,
    `authorization-matrix-designer`, `audit-log-architect`, `api-event-architect`.
@@ -1119,6 +1119,8 @@ Phase 3 — SaaS & tenant isolation pack:
 | `audit-log-architect` | Audit event taxonomy, versioned record schema, append-only integrity with explicit write-failure policy, retention/redaction, tenant-scoped access, negative tests. | auto + manual |
 | `saas-cost-architect` | Bill-grounded cost drivers, per-tenant attribution (or admitted overhead), distribution-based unit economics vs revenue, exposure math, guardrails with observe-first rollout. | auto + manual |
 | `api-event-architect` | External API/event contracts: credential-derived tenant context, idempotency, per-operation request/response schemas, per-tenant/plan rate limits, versioning with dual-run deprecation, tenant-scoped signed webhooks. | auto + manual |
+| `tenant-provisioning-designer` | (G4, #57) Designs the tenant-creation workflow: entry paths, idempotent creation, first-owner assignment, seed data, failure rollback, lifecycle handoff. Designs; creates nothing. | auto + manual |
+| `membership-invitation-designer` | (G4, #58) Designs the membership-invitation workflow: single-use tokens, identity binding, seat checks, spam limits, re-invite/bulk paths, audit hooks. Designs; sends nothing. | auto + manual |
 
 Phase 4 — security, RLS & supply-chain pack:
 

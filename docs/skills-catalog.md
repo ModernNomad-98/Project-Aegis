@@ -438,6 +438,8 @@ negative tests.
 | `audit-log-architect` | cat 02 #70 | yes | Audit event taxonomy + versioned record schema, append-only integrity, explicit write-failure policy per category, retention/redaction, tenant-scoped access, negative tests. |
 | `saas-cost-architect` | cat 02 #89 | yes | Bill-grounded cost drivers, attribution-or-admission per driver, distribution-based unit economics vs revenue, exposure math, guardrails with observe-first rollout + rollback. |
 | `api-event-architect` | cat 04 (API/event contracts) + **#9 (D79)** | yes | Credential-derived tenant context, idempotency, per-operation request/response schemas, per-tenant/plan rate limits, versioning + deprecation with dual-run, tenant-scoped signed webhooks, contract migration + rollback. |
+| `tenant-provisioning-designer` | cat 02 **#57** (D81; tenant-lifecycle batch) | yes | Tenant-creation workflow design: entry paths (signup/sales-led/import), idempotent creation, first-owner assignment, seed data, failure rollback, lifecycle handoff. Composes the gateway's idempotency contract and the matrix's grant rules. Designs; creates nothing. |
+| `membership-invitation-designer` | cat 02 **#58** (D81; built after #59) | yes | Membership-invitation workflow design: single-use token semantics, identity binding, seat checks, invite-spam limits, re-invite/bulk paths, audit hooks. Composes the tenant-modeler state machine, the #59 grant ceiling, the plan seat pool and the rate-limit contract. Designs; sends nothing. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the three Phase 3 clusters:
 tenant (`tenant-modeler`, `tenant-isolation-reviewer`, `multi-tenant-data-architect`),
@@ -445,6 +447,15 @@ platform/commercial (`saas-platform-architect`, `plan-entitlement-architect`,
 `saas-cost-architect`), and access & events (`authorization-matrix-designer`,
 `audit-log-architect`, `api-event-architect`) — plus cross-cluster discrimination for
 the authorization-vs-entitlement axis ("can this ROLE do X" vs "does this PLAN include X").
+
+A fourth cluster was added by D81 (2026-10-10): **tenant lifecycle**
+(`tenant-provisioning-designer`, `membership-invitation-designer`) — with
+cross-phase discrimination against `tenant-modeler`, `saas-platform-architect`,
+`authorization-matrix-designer`, `plan-entitlement-architect`,
+`command-gateway-architect`, `admin-console-architect`, `audit-log-architect`,
+`api-event-architect`, `notification-webhook-ux-designer`,
+`secrets-identity-hardener`, `multi-tenant-security-tester`, and
+`test-tenant-provisioner`.
 
 ### Skills (Phase 4 — security, RLS & supply-chain pack)
 
@@ -1365,7 +1376,8 @@ above.**
 Source: [`docs/skills/02-saas-platform-architecture.md`](skills/02-saas-platform-architecture.md).
 Reconciliation §3 merges: `rls-policy-author` / `rls-negative-test-designer` were
 **delivered in Phase 4** through `rls-policy-auditor`; the Phase 3 **expansion
-backlog** (`tenant-provisioning-designer`, `membership-invitation-designer`,
+backlog** (`tenant-provisioning-designer` — **✅ built (D81, 2026-10-10)**,
+`membership-invitation-designer` — **✅ built (D81, 2026-10-10)**,
 `role-permission-architect` — **✅ built (D78, 2026-10-10) as the #59
 extension of `authorization-matrix-designer`**, `security-impact-note-author`)
 remains backlog, built in Phase 8 batches.

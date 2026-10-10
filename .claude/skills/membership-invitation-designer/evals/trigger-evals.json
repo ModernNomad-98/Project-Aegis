@@ -1,0 +1,98 @@
+{
+  "skill": "membership-invitation-designer",
+  "description": "Trigger discrimination for membership-invitation workflow design: token/binding/seat/spam semantics versus invitation state semantics (tenant-modeler), role-grant rules (authorization-matrix-designer), plan seat pools (plan-entitlement-architect), the rate-limit contract (api-event-architect), email/notification UX (notification-webhook-ux-designer), token hardening (secrets-identity-hardener, manual-only), the audit schema (audit-log-architect), and executable negative suites (multi-tenant-security-tester, manual-only).",
+  "overlaps_with": [
+    "tenant-modeler",
+    "authorization-matrix-designer",
+    "plan-entitlement-architect",
+    "api-event-architect",
+    "notification-webhook-ux-designer",
+    "secrets-identity-hardener",
+    "audit-log-architect",
+    "multi-tenant-security-tester"
+  ],
+  "cases": [
+    {
+      "id": "invitation-workflow-wins-here",
+      "prompt": "Design the invite-by-email flow: single-use tokens, identity binding at acceptance, seat checks, and invite-spam limits.",
+      "expected_skill": "membership-invitation-designer",
+      "should_not_trigger": [
+        "tenant-modeler",
+        "authorization-matrix-designer"
+      ],
+      "reason": "Token/binding/seat/spam semantics on top of the existing state machine are this skill's design; the state machine and the grant rules are its inputs."
+    },
+    {
+      "id": "state-semantics-goes-to-tenant-modeler",
+      "prompt": "Model the invitation lifecycle — the states, transitions, and who may invite.",
+      "expected_skill": "tenant-modeler",
+      "should_not_trigger": [
+        "membership-invitation-designer"
+      ],
+      "reason": "Invitation states and transitions are tenant-modeler's scope; this skill composes its state machine."
+    },
+    {
+      "id": "role-grants-go-to-matrix-designer",
+      "prompt": "Design which role each inviter may grant in an invitation.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": [
+        "membership-invitation-designer"
+      ],
+      "reason": "Who may grant which role (the grant ceiling) is authorization-matrix-designer's scope; the invitation composes it."
+    },
+    {
+      "id": "seat-pool-goes-to-entitlement-architect",
+      "prompt": "Decide how many seats each plan includes and what happens beyond the limit.",
+      "expected_skill": "plan-entitlement-architect",
+      "should_not_trigger": [
+        "membership-invitation-designer"
+      ],
+      "reason": "The plan seat pool is plan-entitlement-architect's scope; the invitation design reads it."
+    },
+    {
+      "id": "rate-limits-go-to-api-event-architect",
+      "prompt": "Design the per-tenant and per-user rate limits for our API endpoints.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "membership-invitation-designer"
+      ],
+      "reason": "The rate-limit contract is api-event-architect's scope; the invite-spam limits consume it."
+    },
+    {
+      "id": "email-ux-goes-to-notification-designer",
+      "prompt": "Design the invitation email — the template, the copy, and the notification flow.",
+      "expected_skill": "notification-webhook-ux-designer",
+      "should_not_trigger": [
+        "membership-invitation-designer"
+      ],
+      "reason": "The email/notification UX is notification-webhook-ux-designer's scope; this skill designs the workflow the email serves."
+    },
+    {
+      "id": "token-hardening-goes-to-secrets-hardener",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Design how invitation tokens are generated, stored, and rotated securely.",
+      "expected_skill": "secrets-identity-hardener",
+      "should_not_trigger": [
+        "membership-invitation-designer"
+      ],
+      "reason": "Token generation and storage hardening are secrets-identity-hardener's (manual-only); this skill designs token SEMANTICS only."
+    },
+    {
+      "id": "audit-schema-goes-to-audit-log-architect",
+      "prompt": "Design the audit record schema for invitation-sent and invitation-accepted events.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": [
+        "membership-invitation-designer"
+      ],
+      "reason": "The audit record schema is audit-log-architect's scope; the workflow emits into its taxonomy."
+    },
+    {
+      "id": "negative-suite-goes-to-tenant-tester",
+      "prompt": "Explicitly invoke multi-tenant-security-tester. Build the executable negative suite proving an invitee of tenant A cannot accept into tenant B.",
+      "expected_skill": "multi-tenant-security-tester",
+      "should_not_trigger": [
+        "membership-invitation-designer"
+      ],
+      "reason": "Executable cross-tenant negative suites are multi-tenant-security-tester's (manual-only); the design names the negative cases, the tester builds the suite."
+    }
+  ]
+}

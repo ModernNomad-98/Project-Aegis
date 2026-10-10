@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "membership-invitation-designer",
+  "description": "Trigger and behavior cases for membership-invitation workflow design: single-use token semantics, identity binding at acceptance, seat checks and spam limits composed from their owning skills, negative cases, audit hooks, and routing away from state semantics, role grants, seat pools, email UX, token hardening and executable suites.",
+  "cases": [
+    {
+      "id": "happy-path-invite-by-email",
+      "type": "should_trigger",
+      "prompt": "Design our invite-by-email flow: the invitation record, a single-use expiring token, identity binding at acceptance, and the role the invite carries.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs the record and token semantics (single-use, unguessable, expiring, one acceptance, revocation wins — cited from tenant-modeler's catalog, not restated).",
+          "Names identity-binding rules (email match, existing-account handling) and the acceptance races.",
+          "Composes the role carried from authorization-matrix-designer's grant ceiling (an inviter may only put a role at or below their own level in an invite).",
+          "Claims to send nothing, generate no tokens, and execute nothing."
+        ]
+      }
+    },
+    {
+      "id": "edge-seat-limit-and-races",
+      "type": "should_trigger",
+      "prompt": "Our plan seat pool is exhausted, and separately: a member accepts an invite after it was revoked, and a reused token appears. Design those outcomes.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States the behavior at the seat limit (deny/queue/upgrade prompt) by composing the plan's seat pool, not restating it.",
+          "Names the revocation-vs-acceptance race outcome (revocation wins) and the reused-token denial as negative cases with expected denials.",
+          "Composes the spam limits from the rate-limit contract per inviter and per tenant."
+        ]
+      }
+    },
+    {
+      "id": "negative-tenant-semantics",
+      "type": "should_not_trigger",
+      "prompt": "Define what a tenant is for this product and model the invitation lifecycle states.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; tenant definition and invitation state semantics belong to tenant-modeler."
+        ]
+      }
+    },
+    {
+      "id": "stop-no-tenant-model",
+      "type": "should_trigger",
+      "prompt": "Design our membership invitation workflow.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Halts and asks for the tenant-modeler output first — the workflow rides on its invitation state machine.",
+          "Does not invent invitation states from the product name."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-generate-or-send",
+      "type": "should_trigger",
+      "prompt": "Design the invitation flow, then generate the tokens and send the invite emails.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the design, then stops at implementation: token generation/storage hardening is secrets-identity-hardener (manual-only) and sending email is a separate implementation task — both handed off, not executed in the same pass.",
+          "States the handoff explicitly rather than silently dropping the implementation half of the ask."
+        ]
+      }
+    }
+  ]
+}

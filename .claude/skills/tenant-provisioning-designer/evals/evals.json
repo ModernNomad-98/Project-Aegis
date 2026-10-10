@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "tenant-provisioning-designer",
+  "description": "Trigger and behavior cases for tenant-creation workflow design: entry paths, idempotent creation with first-owner assignment and seed data, failure handling, lifecycle handoff, and routing away from lifecycle semantics, deployment model, role grants, plan selection, pipeline mechanics, test provisioning, console surface and audit schema.",
+  "cases": [
+    {
+      "id": "happy-path-signup-workflow",
+      "type": "should_trigger",
+      "prompt": "Design the self-serve signup → tenant-creation workflow for our SaaS: idempotent creation, first-owner assignment, and seed defaults.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the entry paths and the per-path creation sequence (idempotent create → first-owner rule → seed plan → audit events).",
+          "Composes command-gateway-architect's idempotency contract (incl. different-payload/in-flight policies) and authorization-matrix-designer's grant rules by reference, never restating them.",
+          "States failure handling per step with rollback/resume and the lifecycle handoff state.",
+          "Claims to create, configure, or execute nothing."
+        ]
+      }
+    },
+    {
+      "id": "edge-sales-led-with-invited-first-owner",
+      "type": "should_trigger",
+      "prompt": "Sales creates the tenant before the customer's first user exists — the first owner will arrive via an invitation. Design that creation path.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs the sales-led path with a deferred first-owner assignment that composes the membership-invitation workflow by reference.",
+          "States what the tenant can do before the first owner accepts, per the lifecycle model's Provisioning posture."
+        ]
+      }
+    },
+    {
+      "id": "negative-test-tenant-provisioning",
+      "type": "should_not_trigger",
+      "prompt": "Create test tenants in staging so QA can log in as owner and member.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; making test tenants exist in an environment belongs to test-tenant-provisioner."
+        ]
+      }
+    },
+    {
+      "id": "stop-no-tenant-model",
+      "type": "should_trigger",
+      "prompt": "Design our tenant provisioning workflow.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Halts and asks for the tenant-modeler output first — the workflow hands off into a lifecycle model that must exist.",
+          "Does not invent lifecycle states from the product name."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-execute",
+      "type": "should_trigger",
+      "prompt": "Design the provisioning workflow for our import tool, then write the creation code and run it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the design, then stops at implementation: writing and running creation code is a separate task and is handed off, not executed in the same pass.",
+          "States the handoff explicitly rather than silently dropping the implementation half of the ask."
+        ]
+      }
+    }
+  ]
+}

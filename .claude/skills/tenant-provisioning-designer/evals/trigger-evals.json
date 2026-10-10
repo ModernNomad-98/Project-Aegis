@@ -1,0 +1,98 @@
+{
+  "skill": "tenant-provisioning-designer",
+  "description": "Trigger discrimination for tenant-creation workflow design: how tenants come into existence versus lifecycle semantics (tenant-modeler), the deployment model (saas-platform-architect), role grants (authorization-matrix-designer), plan selection (plan-entitlement-architect), pipeline mechanics (command-gateway-architect), the console surface (admin-console-architect), test provisioning (test-tenant-provisioner, manual-only), and the audit schema (audit-log-architect).",
+  "overlaps_with": [
+    "tenant-modeler",
+    "saas-platform-architect",
+    "authorization-matrix-designer",
+    "plan-entitlement-architect",
+    "command-gateway-architect",
+    "admin-console-architect",
+    "test-tenant-provisioner",
+    "audit-log-architect"
+  ],
+  "cases": [
+    {
+      "id": "creation-workflow-wins-here",
+      "prompt": "Design how our tenants come into existence: signup and sales-led paths, first-owner assignment, and what a new tenant starts with.",
+      "expected_skill": "tenant-provisioning-designer",
+      "should_not_trigger": [
+        "tenant-modeler",
+        "saas-platform-architect"
+      ],
+      "reason": "The creation workflow, first-owner rule, and seed plan are this skill's design; lifecycle semantics and the deployment model are its inputs, not its job."
+    },
+    {
+      "id": "lifecycle-semantics-goes-to-tenant-modeler",
+      "prompt": "Define what a tenant IS for this product, its lifecycle states, and what each state allows.",
+      "expected_skill": "tenant-modeler",
+      "should_not_trigger": [
+        "tenant-provisioning-designer"
+      ],
+      "reason": "Tenant definition and lifecycle semantics are tenant-modeler's scope; the provisioning workflow composes its model."
+    },
+    {
+      "id": "deployment-model-goes-to-platform-architect",
+      "prompt": "Decide whether tenants share a database or get one each — the pooled/siloed/bridge deployment model.",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": [
+        "tenant-provisioning-designer"
+      ],
+      "reason": "The platform deployment model is saas-platform-architect's call; provisioning allocates within it."
+    },
+    {
+      "id": "role-grants-go-to-matrix-designer",
+      "prompt": "Design which roles the first owner may hold and who may grant roles during tenant setup.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": [
+        "tenant-provisioning-designer"
+      ],
+      "reason": "Role-grant rules (incl. grant ceilings) are authorization-matrix-designer's scope; the workflow composes its matrix."
+    },
+    {
+      "id": "plan-selection-goes-to-entitlement-architect",
+      "prompt": "Decide which plan a new tenant defaults to and what each plan includes.",
+      "expected_skill": "plan-entitlement-architect",
+      "should_not_trigger": [
+        "tenant-provisioning-designer"
+      ],
+      "reason": "Plan/entitlement selection is plan-entitlement-architect's scope; the seed plan consumes its matrix."
+    },
+    {
+      "id": "pipeline-mechanics-go-to-gateway",
+      "prompt": "Design the command pipeline that executes tenant creation — validation, authn, scope derivation, idempotency, audit.",
+      "expected_skill": "command-gateway-architect",
+      "should_not_trigger": [
+        "tenant-provisioning-designer"
+      ],
+      "reason": "Write-path pipeline mechanics are command-gateway-architect's scope; the workflow composes its idempotency contract."
+    },
+    {
+      "id": "console-goes-to-admin-console-architect",
+      "prompt": "Design the internal operator console surface for creating and managing tenants.",
+      "expected_skill": "admin-console-architect",
+      "should_not_trigger": [
+        "tenant-provisioning-designer"
+      ],
+      "reason": "The operator console surface is admin-console-architect's scope; this skill designs the creation workflow, not the console."
+    },
+    {
+      "id": "test-provisioning-goes-to-test-tenant-provisioner",
+      "prompt": "Explicitly invoke test-tenant-provisioner. Create test tenants in staging so QA can log in as owner and member.",
+      "expected_skill": "test-tenant-provisioner",
+      "should_not_trigger": [
+        "tenant-provisioning-designer"
+      ],
+      "reason": "Making test tenants exist in a named non-production environment is test-tenant-provisioner's (manual-only); this skill designs the workflow and creates nothing."
+    },
+    {
+      "id": "audit-schema-goes-to-audit-log-architect",
+      "prompt": "Design the audit record schema for tenant-creation events.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": [
+        "tenant-provisioning-designer"
+      ],
+      "reason": "The audit record schema is audit-log-architect's scope; the workflow emits into its taxonomy."
+    }
+  ]
+}
