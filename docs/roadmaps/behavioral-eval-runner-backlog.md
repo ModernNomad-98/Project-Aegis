@@ -3971,6 +3971,82 @@ become effective only when this reviewed governance PR merges.
   provider-budget, OD-1 or later live-suite gates, and it grants no measured
   calibration, holdout execution, WP-2B-4 or deployment.
 
+### BER-DEC-016: BER R4/R5 Stage A offline host probe on the WSL2 distro — OWNER APPROVED
+
+**Owner decision:** On 2026-10-10 Peter Nguyen answered **"go"** when the
+coordinator asked whether to authorize the NEXT step after the prepared,
+verified WSL2 distribution: the BER R4/R5 Stage A offline host probe. The
+coordinator relayed the answer and attests it. This decision and
+[APR-128](../approvals/APPROVAL_REGISTER.md#aegis-apr-128-ber-r4r5-stage-a-offline-host-probe-on-the-wsl2-distro)
+become effective only when this reviewed governance PR merges; the probe
+itself is a separate, later host phase that runs only under the merged grant.
+
+- **What Stage A is (quoted from the merged proposals):** "Stage A is the
+  proposed offline host probe without model or provider calls" (the WSL2
+  proposal); the capability decision's "Stage A — offline, non-model
+  POSIX/R5 capability probe" runs the repository's own BER modules with no
+  provider, model, network, credential, paid-service, production or
+  Windows/hypervisor step. Passing these offline cases could support a
+  **Stage A capability observation only** — "not a production isolation
+  claim, permission for provider calls, or a BER baseline result" (the
+  capability-observation honesty line, verbatim).
+- **Host alias, account, scratch root:** distro alias `aegis-ber-stage-a-wsl`
+  (install name `Ubuntu-24.04`); default user `peternguyen`; scratch root
+  `/home/peternguyen/aegis-stage-a` (mode 700, verified in the host-phase
+  receipt).
+- **Exact signed source commit and tree:** the BER source is placed inside
+  the distro as `git archive` of the pinned signed commit produced on the
+  Windows side, with a SHA-256 receipt, copied into
+  `/home/peternguyen/aegis-stage-a` — **no repository credentials, no git
+  clone inside the guest, no `/mnt/c` execution** (the 9P interop mount would
+  change the path/ACL boundary being tested). The exact commit and tree are
+  fixed at host-phase start from the then-current `origin/main`, recorded in
+  the host-phase receipt before any probe command.
+- **Exact command list (the capability decision's table, L144–150, plus the
+  five required POSIX test IDs, L152–158):** `python -B -m
+  tools.behavioral_eval_runner version` and `… capabilities`; the five
+  unittest suites (evidence-writer, materialize/review-blockers,
+  process-control, execution-profile/containment) with the five required
+  POSIX test IDs pinned: `test_posix_parent_swap_fails_closed`,
+  `test_posix_area_root_swap_fails_closed`,
+  `test_posix_parent_swap_between_check_and_open_fails_closed`,
+  `test_empty_area_swap_cannot_redirect_creation`,
+  `test_posix_background_child_terminated_after_leader_exit` — a skip of any
+  required case is an unmet proof, not a pass; the hardlink / leaf-rename /
+  interrupted-write rows have no candidate command yet and are recorded
+  `NOT_RUN` (the grant does not invent them); the R5
+  configuration-surface inventory (L164–171) is a read-only observation — on
+  this distro the honest result is the ABSENCE of an adapter configuration
+  surface in the guest, recorded as such, never fabricated.
+- **Evidence readers and retention:** sanitized summary in Git
+  (`stage-a-capability-summary/v1` shape, capability decision L174–184); raw
+  host paths, process IDs, users, secrets and evidence in the separately
+  approved external root under its access and retention rules; no private
+  identifiers in Git.
+- **Time ceiling:** the probe runs under a time ceiling whose exact value is
+  fixed by the owner at host-phase authorization and recorded in the
+  host-phase receipt before any probe command runs — the grant requires it
+  to be named, and no step runs before it is (the capability decision's
+  entry criterion, L210).
+- **Stop conditions (capability decision L186–192, quoted):** stop and
+  preserve the synthetic evidence on a source/root/account mismatch, path
+  escape, unresolved ACL or encryption fact, unexpected
+  network/provider/credential/private access, nonzero test, required POSIX
+  skip, surviving child, or inherited/unisolated R5 configuration. A
+  one-child POSIX no-survivor test supports only its observed fixture;
+  broader descendant/escape paths require a separately named host-specific
+  observation; such a result is `NON_BASELINE` or `UNAVAILABLE`, not a
+  partial pass.
+- **Use limit and excluded gates:** ONE offline Stage A host probe on the
+  named distro; consumed when the host phase completes its receipts. This
+  does not authorize BER Stage B or any model-driven session, real baselines
+  or production isolation claims, provider/model calls, credentials in chat
+  or source, paid services, production use, package installation,
+  network-dependent steps, running from `/mnt/c`, any change to Windows
+  security or hypervisor features, or DELETION of the distro or the
+  VirtualBox VM (which requires the owner's separate approval plus operator
+  confirmation — the owner's 2026-10-10 rule, quoted).
+
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008
