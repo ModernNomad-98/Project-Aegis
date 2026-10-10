@@ -4270,6 +4270,30 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   it grants no new execution, publication or merge authority. D86 and earlier
   entries are byte-untouched.
 
+- **D88 (2026-10-10) — Register-transcription housekeeping (gated item 4,
+  final).** Mechanical transcription of exactly two entries: APR-121 (the PR
+  #682 green-only merge hold) and APR-123 (the exact sourced publication of
+  stage skills rows) each relocate their `New authority` bullet from after
+  `Evidence` to its canonical slot after the `Decision maker / effective
+  order` (Date/Grantor-equivalent) field — the same bullet text, moved only;
+  zero word changes (sorted-line byte-equality per entry, and the register's
+  B..H diff shows exactly the two relocation hunks: 2 removed lines + 2
+  identical added lines). The deviation inventory's exclusions are honored:
+  the alternate field labels (`Decision maker / effective order`,
+  `Scope FORBIDDEN / boundaries`, `Expiry / future changes`,
+  `Related grant / scope`, and the established `Recorded at / by`
+  alternates), APR-127's SUPERSESSION wording, and the six
+  `Scope allowed (selected policy)` variants are NOT normalized — renaming or
+  filling them would change the entries' words, outside the owner's
+  no-content-change scope; each is flagged as an owner-choice item. The
+  APR-028 no-deletion rule is NOT duplicated: it is already recorded with the
+  affected grant ID twice by the WSL2 lane (APR-126 Scope allowed + Scope
+  FORBIDDEN; APR-127 Status at recording, whose heading names target grant
+  AEGIS-APR-028), satisfying the preamble's append convention — no new event
+  added. Counts UNCHANGED (SKILL-COUNT 204, FAMILY-COUNT 23). This entry
+  records the transcription; it grants no new execution, publication or merge
+  authority. D87 and earlier entries are byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

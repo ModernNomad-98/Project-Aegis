@@ -5235,6 +5235,7 @@ the entry governs.
 - **Related grant / scope:** [AEGIS-APR-120](#aegis-apr-120-pr-682-one-time-gate-guard-exception-for-the-errno-39-test-fix), the historical one-time exception for [PR #682](https://github.com/ModernNomad-98/Project-Aegis/pull/682) at head `a33aa2a620589d2e0412521e6a0ee1ba3594c97f`. Its original bytes and state-at-recording remain unchanged.
 - **Status at recording:** ACTIVE as the owner's current merge condition for PR #682. The hold already applies from the direct owner choice; this transcription does not postpone its effect until merge or authorize any action.
 - **Decision maker / effective order:** Peter Nguyen. The exact owner-answer date/time was not captured. This was the later choice made in the current conversation after the earlier exact-head exception and the green-check merge instruction quoted below. The question expressly addresses what governs after PR #683 and the remaining stages pass; an exact timestamp is unknown.
+- **New authority:** None. Historical APR120 remains in the record; effective permission must be derived from the complete history and the owner's current instructions. No automatic red-check merge release follows from recording this entry.
 - **Recorded at / by:** 2026-10-09 01:36 UTC / /root/preg_preflight. This is a recording timestamp, not the owner-answer timestamp.
 - **Earlier direct owner merge instruction, quoted verbatim as relayed:**
 
@@ -5251,7 +5252,6 @@ the entry governs.
 - **Scope allowed (selected policy):** Keep PR #682 held under the owner's local-and-applicable-GitHub-checks-green condition. Completion or merge of PR #683 and completion of the other delivery stages do not by themselves permit merging PR #682 while its applicable `gate-guard` remains failed. A failed check stays failed; a skipped or locally UNRUN check is not represented as a pass. This is a merge condition, not a new validation result or execution grant.
 - **Scope FORBIDDEN / boundaries:** This choice supplies no authority to use APR120 to merge PR #682 while that current green-only condition is unsatisfied. It does not change the guard, workflows, protected-path scope, repository settings, checks, review gates, exact-head rules or any other work grant. It does not revoke or consume APR120, claim a merge occurred, create a replacement grant, record APR119 consumption, or select either unchosen option. PR #683 remains subject to its own work authority and all applicable delivery gates; this entry cannot authorize its own merge.
 - **Evidence:** The complete question, chosen label and earlier instruction above were relayed verbatim from the direct current owner conversation by the coordinator to the P-REG Stage A holder on 2026-10-09 UTC. The relay date is known; the owner-answer timestamp is unknown. The current direct instruction has authority before transcription under this register's preamble. The captured reconciliation plan and its independent audit provide recording/design evidence, not independent proof that the owner authored the option prose. Preserve the captured source and the final reviewed record's immutable revision in the stage handoff.
-- **New authority:** None. Historical APR120 remains in the record; effective permission must be derived from the complete history and the owner's current instructions. No automatic red-check merge release follows from recording this entry.
 - **Expiry / future changes:** No calendar expiry or new consumption event was stated. Keep applying the selected condition unless the owner later changes it or its green-check prerequisite is actually satisfied. Any later owner decision is recorded with its own evidence; this entry does not pre-authorize one.
 
 ### AEGIS-APR-122: Consumption of the APR-099 guard-documentation correction grant
@@ -5283,6 +5283,9 @@ the entry governs.
 - **Decision maker / effective order:** Peter Nguyen. The exact owner-answer
   date/time was not captured. The selection was relayed by the coordinator in
   the ROWPOLICY-1 assignment of 2026-10-08.
+- **New authority:** None. The choice grants no new PR edit, stage, merge,
+  tool or reserved-work authority. Effective permission remains governed by
+  the complete register history and the owner's current instructions.
 - **Recorded at / by:** 2026-10-09 18:03:55 UTC / rowpolicy-stage-c. This is a recording
   timestamp, not the owner-answer timestamp.
 - **Question, quoted verbatim as relayed through the coordinator:**
@@ -5334,9 +5337,6 @@ the entry governs.
   instructions before transcription. The captured plan and audit provide
   design and recording evidence, not independent proof that the owner authored
   the option prose.
-- **New authority:** None. The choice grants no new PR edit, stage, merge,
-  tool or reserved-work authority. Effective permission remains governed by
-  the complete register history and the owner's current instructions.
 - **Expiry / future changes:** No calendar or use limit was stated for "future
   Project Aegis PRs". Apply until the owner later changes the policy. A later
   change is recorded with its own evidence; this entry does not pre-authorize
