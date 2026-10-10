@@ -1,6 +1,6 @@
 ---
 name: file-upload-storage-architect
-description: Design file/object storage and upload flows for a multi-tenant SaaS — direct-to-storage vs proxied upload, short-lived signed URLs scoped to one object + verb + expiry, tenancy by bucket/path-prefix, size/type/CONTENT validation (magic-byte, not just extension), malware scanning, image/derivative processing off the request path, retention/lifecycle, CDN + cache-control, and storage-cost posture. Produces the upload-flow design, the storage-tenancy + signed-URL contract, the validation/scan pipeline, and the retention plan. Use when adding uploads, attachments, or media, when files must be tenant-isolated, or when uploads are slow, unsafe, or unbounded. Do NOT use for the personal-data lifecycle of file CONTENTS — consent, subject-access, deletion SLAs (pii-lifecycle-designer) — or for auditing existing storage RLS/bucket policies (rls-policy-auditor); this designs the storage + upload architecture and defers those.
+description: Design file/object storage and upload flows for a multi-tenant SaaS — direct-vs-proxied upload, short-lived signed URLs scoped to one object + verb + expiry, tenancy by bucket/path-prefix, size/type/CONTENT validation (magic-byte, not just extension), malware scanning, image/derivative processing off-request-path, retention/lifecycle, CDN + cache-control, storage-cost posture. Produces the upload-flow design, the storage-tenancy + signed-URL contract, the validation/scan pipeline, and the retention plan. Use when adding uploads or attachments, when files must be tenant-isolated, or when uploads are slow, unsafe or unbounded. Do NOT use for the personal-data lifecycle of file CONTENTS — consent, subject-access, deletion SLAs (pii-lifecycle-designer) — or for auditing supplied DATABASE RLS policies for object metadata/access (rls-policy-auditor); bucket permissions, public serving and signed-URL enforcement stay unverified unless scoped separately; this designs the storage/upload architecture, defers those.
 ---
 
 # File Upload Storage Architect
@@ -48,9 +48,11 @@ this owns the storage architecture.
   SLAs, PII classification of what's inside the file — that is
   `pii-lifecycle-designer`; this skill designs where and how files are
   stored, not the privacy obligations on their contents.
-- Do NOT use when: the task is auditing EXISTING storage RLS / bucket
-  policies for holes — that is `rls-policy-auditor`; this skill DESIGNS the
-  storage access model, and hands policy auditing there.
+- Do NOT use when: the task is auditing supplied DATABASE RLS policies for
+  object metadata/access — that is `rls-policy-auditor`; provider-native
+  bucket permissions, public-serving behavior and signed-URL enforcement
+  are not part of its database contract. This skill DESIGNS the storage
+  access model.
 - Do NOT use when: the "file" is really structured data that belongs in the
   database, not object storage — say so rather than designing storage for it.
 - Do NOT use when: the risk is instruction injection hidden in file content a
@@ -109,8 +111,10 @@ this owns the storage architecture.
    before selecting it. The access rule: a signed URL or policy for
    tenant A can only ever name objects in A's bucket or under A's prefix,
    according to the chosen model; a client cannot craft a key that escapes
-   its tenant. Hand the resulting bucket/RLS policy to
-   `rls-policy-auditor` for verification.
+   its tenant. Hand any resulting DATABASE RLS policies (e.g., on
+   object-metadata tables) to `rls-policy-auditor` for verification;
+   bucket-level permissions and URL-signing stay with this skill's design
+   and are verified only if separately scoped.
 4. **Validate on CONTENT, not name.** Enforce the size cap at the storage
    layer (not just client-side), and validate type by magic bytes / content
    sniffing, not the extension or the client-sent MIME type. Reject or
@@ -147,7 +151,7 @@ Upload flow:    <direct-to-storage | proxied> + why; app records intent and
 Signed URLs:    <one verb + one object key + short expiry + size/type constraint;
   never prefix/bucket-scoped; server-derived key in tenant bucket or prefix>
 Storage tenancy: <shared bucket + tenant prefix | per-tenant bucket>; a signed
-  URL/policy for A names only A's bucket/prefix keys → policy audit to rls-policy-auditor
+  URL/policy for A names only A's bucket/prefix keys → database RLS policy audit to rls-policy-auditor; non-database storage controls listed as unverified
 Validation:     <storage-enforced size cap; magic-byte/content-type check, not
   extension; mismatch → reject/quarantine>
 Scanning:       <malware/content scan before serve/process; quarantine/pending
@@ -187,8 +191,10 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - [ ] Derivatives run off the request path; the original is immutable.
 - [ ] Every object class has retention, orphan cleanup, and delete-propagation;
       unbounded growth is named as cost.
-- [ ] Storage access-policy verification is handed to `rls-policy-auditor`;
-      PII lifecycle of contents is handed to `pii-lifecycle-designer`.
+- [ ] DATABASE RLS policies on object metadata/access are handed to
+      `rls-policy-auditor`; bucket/public-serving/signing review is stated
+      as out of its scope. PII lifecycle of contents is handed to
+      `pii-lifecycle-designer`.
 
 ## Gotchas
 
@@ -236,6 +242,6 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   lifecycle non-trigger.
 - `evals/trigger-evals.json` — discrimination against `pii-lifecycle-designer`
   (personal-data lifecycle of contents) and `rls-policy-auditor` (auditing
-  existing storage policies).
+  supplied database RLS policies for object metadata/access).
 - No `references/` — the upload/tenancy/validation/retention procedure above
   is complete; detail lives in the produced artifacts.

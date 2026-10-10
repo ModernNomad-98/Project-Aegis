@@ -13,7 +13,7 @@
           "Chooses direct-to-storage vs proxied with a stated reason, and for direct uploads has the app issue a scoped signed URL, record intent and verify object existence/metadata at storage before completion rather than trust a client success report.",
           "Scopes signed URLs to one verb + one object key + short expiry (never prefix/bucket) with server-derived keys that cannot escape the tenant's chosen bucket or prefix.",
           "Validates size at the storage layer and type by magic bytes/content, not extension, and scans files before they are served or processed (quarantine until clean).",
-          "Designs storage tenancy (shared bucket + tenant prefix or per-tenant bucket) and hands the resulting access policy to rls-policy-auditor; designs retention with orphan cleanup and delete-propagation."
+          "Designs storage tenancy (shared bucket + tenant prefix or per-tenant bucket) and hands any database RLS policies governing object metadata/access to rls-policy-auditor, naming bucket-permission/public-serving/signed-URL review as unverified unless separately scoped; designs retention with orphan cleanup and delete-propagation."
         ]
       }
     },
@@ -82,6 +82,18 @@
           "Compares money, setup work, and ongoing upkeep for both paths, marking unknown storage, transfer, scan, or service costs instead of inventing prices.",
           "Recommends direct upload because the stated store supports scoped URLs and the proxy is failing, and names a required inline byte transformation as a fact that could change that choice.",
           "Asks one clear decision question without treating the choice as permission to provision or spend; preserves server verification, size/content checks, quarantine, and scan-before-serve."
+        ]
+      }
+    },
+    {
+      "id": "mixed-bucket-and-metadata-rls-database-slice-only",
+      "type": "should_trigger",
+      "prompt": "We have storage bucket policies AND row-level rules on our object-metadata tables. Which parts can be audited, and what stays unreviewed?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States exactly which artifact is handed off: the database RLS policies on the object-metadata tables (to rls-policy-auditor), with the unresolved non-database concerns named — provider-native bucket permissions, public-serving behavior, and signed-URL enforcement.",
+          "Does not report a database review as object-store safety, and does not invent a reviewer for the non-database remainder."
         ]
       }
     }

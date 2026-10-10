@@ -4116,6 +4116,32 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   build decision and the shipped arithmetic; it grants no new execution,
   publication or merge authority.
 
+- **D82 (2026-10-10) — Storage-policy handoff narrowed (option R; five files).**
+  The owner selected option R — a narrow routing correction, not an
+  EXTEND. The shipped overbroad handoff in
+  `file-upload-storage-architect` (its description, Use When, workflow,
+  output, checklist, supporting-file note, evals, trigger-evals, catalog row
+  and README row) claimed `rls-policy-auditor` audits "existing storage
+  RLS/bucket policies"; the receiver's contract is database-RLS-only. The
+  five-file edit set (P1/P2/P3/P8/P8b) narrows every sender promise to the
+  supplied DATABASE RLS policies governing object metadata/access, and
+  explicitly states that provider-native bucket permissions, public-serving
+  behavior and signed-URL enforcement remain UNVERIFIED unless separately
+  scoped. The receiver (`rls-policy-auditor` — SKILL.md, its checklist
+  reference, evals.json, trigger-evals.json) is byte-preserved (P4–P7); the
+  sender's Stop Conditions and invocation posture are untouched; no
+  provider reviewer was invented and no blanket rerouting occurred. The
+  mixed trigger case was split: the database-RLS prompt keeps
+  `expected_skill: rls-policy-auditor`, and the mixed bucket+RLS prompt's
+  reason states the database slice routes there while the bucket/
+  public-serving/signing evidence stays unreviewed — no object-store safety
+  verdict is claimed. Roadmap #115 remains residual in the catalog's Phase 4
+  expansion backlog (catalog "storage-policy review" entry untouched);
+  #112 and #127 are out of scope. Counts are UNCHANGED: no skill added or
+  renamed; SKILL-COUNT stays 204; FAMILY-COUNT stays 23. This entry records
+  the owner's R selection and the shipped correction; it grants no new
+  execution, publication or merge authority.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
