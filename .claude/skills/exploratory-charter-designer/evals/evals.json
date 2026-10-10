@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "exploratory-charter-designer",
+  "description": "Trigger and behavior cases for exploratory charter design: mission + hard timebox, ranked risks and probes, personas/data/entry paths, note/evidence conventions, and routing away from scripted manual cases, deterministic plans, the QA strategy, and live session execution.",
+  "cases": [
+    {
+      "id": "happy-path-charter",
+      "type": "should_trigger",
+      "prompt": "Write an exploratory testing charter for the new team-invite flow — we want a focused session, not a script.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces a charter with a one-sentence mission and a hard timebox.",
+          "Ranks the risks and open questions to probe, and names personas, data, and entry paths.",
+          "States note and evidence conventions and an out-of-scope list.",
+          "Contains no step-by-step scripted cases with expected results."
+        ]
+      }
+    },
+    {
+      "id": "edge-hard-timebox-limited-data",
+      "type": "should_trigger",
+      "prompt": "We have 45 minutes and one owner test account. What exploratory charter fits the billing export feature?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Respects the 45-minute timebox and bounds the scope to what one owner persona and one account can probe.",
+          "Lists what the session deliberately skips with the rationale.",
+          "Does not inflate the charter with probes the single persona cannot reach."
+        ]
+      }
+    },
+    {
+      "id": "negative-scripted-cases",
+      "type": "should_not_trigger",
+      "prompt": "Write step-by-step manual test cases for password reset, with exact data and expected results per step.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; step-by-step scripted manual cases belong to manual-test-case-creator."
+        ]
+      }
+    },
+    {
+      "id": "stop-ambiguous-target",
+      "type": "should_trigger",
+      "prompt": "We should probably explore the app at some point.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Halts and asks which feature or surface to charter, instead of writing a charter from the vague target.",
+          "Does not invent risks or personas for an unnamed surface."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-execute-session",
+      "type": "should_trigger",
+      "prompt": "Create the exploratory charter for checkout, then run the session and report the defects.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the charter, then stops at execution: running the session is clickthrough-test-engineer (manual-only) and is handed off by name, not executed in the same pass.",
+          "States the handoff explicitly rather than silently dropping the execution half of the ask."
+        ]
+      }
+    }
+  ]
+}

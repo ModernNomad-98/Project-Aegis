@@ -1,0 +1,68 @@
+{
+  "skill": "exploratory-charter-designer",
+  "description": "Trigger discrimination for exploratory charter design: a timeboxed scoped session versus scripted manual cases (manual-test-case-creator), live walkthrough execution (clickthrough-test-engineer, manual-only), the deterministic per-change plan (test-plan-designer), and the product-wide QA strategy (qa-strategy-architect).",
+  "overlaps_with": [
+    "manual-test-case-creator",
+    "clickthrough-test-engineer",
+    "test-plan-designer",
+    "qa-strategy-architect"
+  ],
+  "cases": [
+    {
+      "id": "charter-wins-here",
+      "prompt": "We keep finding checkout edge cases by accident. Design a timeboxed exploratory session to hunt for more deliberately.",
+      "expected_skill": "exploratory-charter-designer",
+      "should_not_trigger": [
+        "test-plan-designer",
+        "qa-strategy-architect"
+      ],
+      "reason": "A timeboxed, risk-driven exploratory session is a charter; no per-change layer plan or product-wide strategy decision is in view."
+    },
+    {
+      "id": "scripted-cases-go-to-creator",
+      "prompt": "Write step-by-step manual test cases for password reset with exact data and expected results.",
+      "expected_skill": "manual-test-case-creator",
+      "should_not_trigger": [
+        "exploratory-charter-designer"
+      ],
+      "reason": "Stranger-executable scripted cases are manual-test-case-creator's output; a charter has no scripted steps or expected results."
+    },
+    {
+      "id": "live-session-goes-to-clickthrough",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Walk through the running app's checkout flow and report the defects you find.",
+      "expected_skill": "clickthrough-test-engineer",
+      "should_not_trigger": [
+        "exploratory-charter-designer"
+      ],
+      "reason": "Executing a live walkthrough and reporting defects is clickthrough-test-engineer (manual-only); this skill designs the session and runs nothing."
+    },
+    {
+      "id": "per-change-plan-goes-to-plan-designer",
+      "prompt": "Plan the testing for the upcoming release — layers, data, entry and exit criteria.",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "exploratory-charter-designer"
+      ],
+      "reason": "A deterministic per-change plan with layers and exit criteria is test-plan-designer; a charter is a manual exploration contract, not a test plan."
+    },
+    {
+      "id": "strategy-goes-to-architect",
+      "prompt": "Decide our long-term QA investment — what to automate, what stays manual, and who owns each layer.",
+      "expected_skill": "qa-strategy-architect",
+      "should_not_trigger": [
+        "exploratory-charter-designer"
+      ],
+      "reason": "Product-wide automation/manual investment is the QA strategy; a charter scopes one exploratory session inside it."
+    },
+    {
+      "id": "vague-explore-wins-here",
+      "prompt": "QA keeps saying we need to explore the dashboard rewrite. Turn that into a scoped session plan.",
+      "expected_skill": "exploratory-charter-designer",
+      "should_not_trigger": [
+        "manual-test-case-creator",
+        "test-plan-designer"
+      ],
+      "reason": "Turning an unguided 'explore X' into a timeboxed, scoped charter is this skill's core; no scripted cases or deterministic plan are requested."
+    }
+  ]
+}

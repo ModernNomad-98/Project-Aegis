@@ -251,12 +251,12 @@ performance/load headline):
 **Tier 2 — second wave** (roadmap P1 hardening, plus #203 promoted because UI drift is
 otherwise invisible to the shipped suite):
 
-| Candidate *(all: candidate — not built)* | Roadmap ref (cat 06) | Note |
+| Candidate *(started as candidate — not built; per-row status below)* | Roadmap ref (cat 06) | Note |
 |---|---|---|
-| `visual-regression-test-designer` | #203 (P2) | Critical UI states with stable data, deterministic viewport, reviewable diffs. |
+| `visual-regression-test-designer` — **✅ built (D75, 2026-10-09)** | #203 (P2) | Critical UI states with stable data, deterministic viewport, reviewable diffs. |
 | `role-based-qa-matrix` | #229 (P1) | Behavior across anonymous/member/manager/admin/owner/support/platform roles; QA counterpart to Phase 3 `authorization-matrix-designer`. |
-| `mobile-viewport-qa` | #230 (P1) | Critical journeys on mobile breakpoints, touch interactions, dialogs, navigation. |
-| `exploratory-testing-charter` | #228 (P1) | Mission/risks/personas/data/paths/timebox charters for exploratory passes. |
+| `mobile-viewport-qa` — **✅ built (D75, 2026-10-09)** as `mobile-journey-test-designer` | #230 (P1) | Critical journeys on mobile breakpoints, touch interactions, dialogs, navigation. |
+| `exploratory-testing-charter` — **✅ built (D75, 2026-10-09)** as `exploratory-charter-designer` | #228 (P1) | Mission/risks/personas/data/paths/timebox charters for exploratory passes. |
 | `mock-strategy-designer` | #200 + #201 (merged; both P1) | ONE skill: mock/fake/stub/adapter/recording/live selection + test-double contract review keeping doubles aligned with real provider/DB behavior (`api-contract-test-designer`'s fake-fidelity check is the contract-layer slice of this). |
 | `ci-shard-parallel-isolation` | #211 + #212 (merged; both P1) | ONE skill: shard design (stable shards, run IDs, artifacts) + parallel isolation (no shared users/tenants/records/ports/browser state/queues). Extends `qa-automation-architect`'s blueprint into enforceable rules. |
 
@@ -3907,6 +3907,24 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   authority and does not rewrite D72 or AEGIS-APR-105. Source capture and
   serialized readback are procedural evidence, not machine enforcement or an
   atomic multiwriter guarantee.
+
+- **D75 (2026-10-09) — QA Tier 2 design batch built (three skills).**
+  Decided and built the three G1 BUILD rows of
+  [the unselected-expansion proposal](../roadmaps/unselected-expansion-skill-batch-proposal.md)
+  (rows 538–540, owner-selected): `visual-regression-test-designer` (roadmap
+  #203), `exploratory-charter-designer` (roadmap #228, banked as
+  `exploratory-testing-charter`), and `mobile-journey-test-designer` (roadmap
+  #230, banked as `mobile-viewport-qa`). All three are read-only QA *design*
+  skills — they emit coverage designs and charters in conversation and
+  capture, execute and drive nothing — so all three are auto-invocable with
+  no `disable-model-invocation` and no MANUAL-ONLY sentinel, per standard §5
+  and the proposal's posture note. Each ships `evals/evals.json` and
+  `evals/trigger-evals.json` discriminating against its named neighbors.
+  Family 6 "QA, E2E & evidence" grows 19 → 22; the library total grows
+  195 → 198; FAMILY-COUNT stays 23. The D10 Tier 2 rows for #203/#228/#230
+  are marked built above (§3). This entry records the build decision and the
+  shipped arithmetic; it grants no new execution, publication or merge
+  authority.
 
 ## 6. Post-merge corrections
 

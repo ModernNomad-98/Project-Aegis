@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "mobile-journey-test-designer",
+  "description": "Trigger and behavior cases for mobile journey QA design: critical journeys with a mobile check matrix (breakpoints, touch, dialogs, navigation, orientation, keyboard, safe area), a device + data matrix, evidence composition via screenshot-evidence-planner, and routing away from layout correctness, live execution, spec implementation, and per-change plans.",
+  "cases": [
+    {
+      "id": "happy-path-journey-qa",
+      "type": "should_trigger",
+      "prompt": "Design mobile journey QA for our invoicing app — which critical journeys to verify on phones, and what mobile-specific checks does each journey need?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the critical journeys with a why-critical reason each.",
+          "Enumerates the mobile-specific check matrix per journey: breakpoints, touch, dialogs, navigation, orientation, keyboard, safe area.",
+          "Names the device/viewport + data matrix and states evidence follows screenshot-evidence-planner conventions.",
+          "Designs journey checks without redesigning the layout, and claims to drive nothing."
+        ]
+      }
+    },
+    {
+      "id": "edge-small-breakpoint-only",
+      "type": "should_trigger",
+      "prompt": "Two of our journeys only differ at the 320px breakpoint. What mobile QA do they need?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the 320px-specific checks those journeys need (touch targets, safe area, dialogs) instead of duplicating the full matrix for every journey.",
+          "Keeps layout fitting and viewport correctness with mobile-viewport-craft rather than absorbing it."
+        ]
+      }
+    },
+    {
+      "id": "negative-layout-fix",
+      "type": "should_not_trigger",
+      "prompt": "Fix the 100vh layout bug on phones — the footer overlaps the browser chrome.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; layout and viewport correctness design belongs to mobile-viewport-craft."
+        ]
+      }
+    },
+    {
+      "id": "stop-no-inventory",
+      "type": "should_trigger",
+      "prompt": "We need mobile testing.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Halts and asks for the journey or route inventory before designing coverage.",
+          "Does not invent journeys from the product name."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-run-pass",
+      "type": "should_trigger",
+      "prompt": "Design the mobile journey coverage for checkout, then run the pass on a real phone.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the coverage design, then stops at execution: running the pass is clickthrough-test-engineer (manual-only) or playwright-e2e-engineer (manual-only) and is handed off by name, not executed in the same pass.",
+          "States the handoff explicitly rather than silently dropping the execution half of the ask."
+        ]
+      }
+    }
+  ]
+}

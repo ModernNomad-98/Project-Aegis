@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "visual-regression-test-designer",
+  "description": "Trigger and behavior cases for visual regression coverage design: stability-classified states, baseline/diff mechanics with an explicit update-review gate, the positive snapshot-selection rule, deterministic state rendering, and routing away from evidence policy, per-change plans, tooling design, suite curation and spec execution.",
+  "cases": [
+    {
+      "id": "happy-path-design-coverage",
+      "type": "should_trigger",
+      "prompt": "Design visual regression coverage for our checkout flow — which screens and states should we snapshot, and how should the baseline and diff workflow work?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the checkout states to capture, each with its data source and fixed viewport (determinism per state).",
+          "Defines baseline capture, the diff/compare mechanics, and an explicit update-review gate with a named human approver — never an update-all.",
+          "Specifies the deterministic state-rendering slice (seeded data, fixed timezone/locale, frozen animation).",
+          "Names CI placement per suite and an out-of-scope list, and claims to capture, compare, or run nothing."
+        ]
+      }
+    },
+    {
+      "id": "edge-dynamic-content",
+      "type": "should_trigger",
+      "prompt": "Our dashboard has a live price ticker and a user-selectable locale. Which of its states can we safely pixel-snapshot?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies the ticker and locale content as unstable as-is, and proposes the deterministic alternative (fixtured ticker values, fixed locale) or excludes the state with a reason.",
+          "Applies the positive snapshot-selection rule: kept captures are stable AND meaningful, and each states what a diff would prove.",
+          "Does not recommend snapshotting the live ticker unchanged."
+        ]
+      }
+    },
+    {
+      "id": "negative-evidence-policy",
+      "type": "should_not_trigger",
+      "prompt": "What should our screenshot naming, masking, and storage policy be for the evidence we attach to pull requests?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke this skill; evidence naming, masking, metadata and storage policy belongs to screenshot-evidence-planner."
+        ]
+      }
+    },
+    {
+      "id": "stop-missing-inventory",
+      "type": "should_trigger",
+      "prompt": "Set up visual regression testing for our app.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Halts and asks for the UI surface or route inventory before designing coverage.",
+          "Does not invent screens or states from the app name."
+        ]
+      }
+    },
+    {
+      "id": "should-not-do-execute",
+      "type": "should_trigger",
+      "prompt": "Design the visual regression coverage for the settings page, then capture the baselines and run the diff.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the coverage design, then stops at execution: capturing baselines and running diffs is playwright-e2e-engineer (manual-only) and is handed off by name, not executed in the same pass.",
+          "States the handoff explicitly rather than silently dropping the execution half of the ask."
+        ]
+      }
+    }
+  ]
+}

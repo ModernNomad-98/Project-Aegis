@@ -514,6 +514,12 @@ reviews criteria and runs no tests; the #227 definition-of-done check stays cove
 is pinned against `flaky-test-detective`, `systematic-debugger`,
 `local-ci-mirror-preflight`, `sharded-validation-with-resume` and `ci-pipeline-architect`.
 
+**Added by D75** (QA Tier 2 batch, 2026-10-09): `visual-regression-test-designer`
+(roadmap #203), `exploratory-charter-designer` (roadmap #228, banked as
+`exploratory-testing-charter`), and `mobile-journey-test-designer` (roadmap #230,
+banked as `mobile-viewport-qa`). All three are read-only design skills —
+auto-invocable, no `disable-model-invocation` — and each ships both eval files.
+
 | Skill | Source (category doc) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
 | `qa-strategy-architect` | cat 06 #181/#182 | yes | Product-level QA strategy: ranked risk inventory → cheapest-reliable-layer decisions, explicit automation/manual split, evidence per change class, CI gates, ownership; delegates security negatives. |
@@ -535,6 +541,9 @@ is pinned against `flaky-test-detective`, `systematic-debugger`,
 | `acceptance-criteria-reviewer` | cat 06 #226 (D68; #227 stays with `release-readiness-reviewer`) | yes | Reviews EXISTING acceptance criteria in a spec, ticket or story: per-criterion TESTABLE / NEEDS-REWRITE / UNTESTABLE verdict (observable outcome, pass/fail threshold, evidence), vague words flagged with suggested rewrites for the author to accept, missing negative/boundary/permission cases listed as gaps (never invented as requirements), one owner question per unclear or contradictory item. Edits nothing; hands checked criteria to `test-plan-designer`. |
 | `test-tenant-provisioner` | cat 06 #198 (D10 Tier 1, built by D68) | **no** (manual-only; writes test accounts to an environment) | Makes the persona catalog's test tenants, users, roles and memberships exist in a named NON-PRODUCTION environment: validate-only drift report by default (missing/drifted/orphaned/blocked), apply creates or repairs only marked rows after plan approval, never touches unmarked rows, credentials by environment-variable name only, backup-gated capability grants with inline rollback, static production-reach lint. Pinned ≠ `test-data-architect` (designs the catalog), `multi-tenant-security-tester`, `tenant-modeler`, `playwright-e2e-engineer`, `secrets-identity-hardener`. |
 | `ci-failure-classifier` | cat 06 **#214 + #215 (D68)** | yes (read-only) | Classifies a finished CI run from logs supplied or on disk: exactly one cause class per failed or suspicious job with quoted lines and durations, timeouts never conflated with regressions, green runs scanned for hidden markers; fetches, reruns and edits nothing; refuses to raise timeouts or add retries to mask failures. |
+| `visual-regression-test-designer` | cat 06 **#203** | yes | Visual/pixel-regression coverage design: stable-state capture, baseline/diff mechanics, positive snapshot-selection with explicit update review, deterministic state rendering. Designs; captures nothing. |
+| `exploratory-charter-designer` | cat 06 **#228** | yes | Timeboxed exploratory-testing charter: mission, ranked risks, personas, data, entry paths, note/evidence conventions. Designs; executes nothing. |
+| `mobile-journey-test-designer` | cat 06 **#230** | yes | Critical-journey mobile QA design: breakpoints, touch, dialogs, navigation, orientation, keyboard, safe area, device+data matrix, evidence composition. Layout stays with `mobile-viewport-craft`. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 5 clusters:
 **strategy/plan/coverage** (`qa-strategy-architect`, `test-plan-designer`,
@@ -547,6 +556,14 @@ and **unit/build/flake/data** (`vite-build-qa-engineer`, `flaky-test-detective`,
 against the shipped `code-reviewer`, `full-codebase-auditor`, `api-event-architect`,
 `multi-tenant-security-tester`, `tdd-engineer`, `systematic-debugger`,
 `secrets-identity-hardener`, and `ai-closeout-reporter`.
+
+A fifth cluster was added by D75 (2026-10-09): **visual/exploratory/mobile QA
+design** (`visual-regression-test-designer`, `exploratory-charter-designer`,
+`mobile-journey-test-designer`) — with cross-phase discrimination against
+`screenshot-evidence-planner`, `qa-automation-architect`,
+`regression-suite-curator`, `manual-test-case-creator`,
+`clickthrough-test-engineer`, `qa-strategy-architect`, `mobile-viewport-craft`,
+`playwright-e2e-engineer`, and `test-plan-designer`.
 
 ### Skills (Phase 6 — cloud, DevOps, reliability & release pack)
 
@@ -1341,6 +1358,10 @@ built it as `acceptance-criteria-reviewer`, narrowed to #226, and #198 left it a
 (2026-07-07) as two skills and moved to
 [Implemented → Skills (D10 Tier 1)](#skills-d10-tier-1--performanceload-validation)
 above.**
+The Tier 2 second-wave trio also left it when D75 (2026-10-09) built them:
+`visual-regression-test-designer` (#203, same name), `exploratory-testing-charter`
+(#228, built as `exploratory-charter-designer`), and `mobile-viewport-qa` (#230,
+built as `mobile-journey-test-designer`).
 
 ### Phase 6 — Cloud, DevOps, reliability & release (P1)
 ✅ **Implemented** — all 10 first-pass skills moved to

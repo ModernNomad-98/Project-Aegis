@@ -1,0 +1,77 @@
+{
+  "skill": "visual-regression-test-designer",
+  "description": "Trigger discrimination for visual regression coverage design: which states to capture and how to baseline/diff them, versus the evidence policy (screenshot-evidence-planner), the per-change plan (test-plan-designer), tooling design (qa-automation-architect), suite curation (regression-suite-curator), and spec execution (playwright-e2e-engineer, manual-only).",
+  "overlaps_with": [
+    "screenshot-evidence-planner",
+    "test-plan-designer",
+    "qa-automation-architect",
+    "regression-suite-curator"
+  ],
+  "cases": [
+    {
+      "id": "coverage-design-wins-here",
+      "prompt": "Which screens and UI states should we cover with visual regression snapshots, and how should baseline capture and diff review work?",
+      "expected_skill": "visual-regression-test-designer",
+      "should_not_trigger": [
+        "screenshot-evidence-planner",
+        "test-plan-designer"
+      ],
+      "reason": "Choosing which states to capture plus the baseline/diff/update-review mechanics is coverage design; naming/masking/storage policy and per-change layer plans are the neighbors' jobs."
+    },
+    {
+      "id": "policy-goes-to-evidence-planner",
+      "prompt": "Define our screenshot evidence policy: deterministic naming, mandatory masking before storage, metadata and retention classes.",
+      "expected_skill": "screenshot-evidence-planner",
+      "should_not_trigger": [
+        "visual-regression-test-designer"
+      ],
+      "reason": "The evidence naming/masking/metadata/storage policy is screenshot-evidence-planner's scope; this skill designs which states to capture and how to compare them."
+    },
+    {
+      "id": "per-change-plan-goes-to-plan-designer",
+      "prompt": "Plan the testing for the new billing change — what to test at which layer, with what data, and when testing is done.",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "visual-regression-test-designer"
+      ],
+      "reason": "A single change's layer split, data, and exit criteria is a per-change test plan; visual regression coverage design is one possible output of it, not the plan itself."
+    },
+    {
+      "id": "tooling-goes-to-automation-architect",
+      "prompt": "Design our visual testing tooling: which runner, how to structure fixtures and auth state, and which CI tiers run which suites.",
+      "expected_skill": "qa-automation-architect",
+      "should_not_trigger": [
+        "visual-regression-test-designer"
+      ],
+      "reason": "Runner choice, fixture structure and CI tiering are the automation blueprint; this skill designs the coverage content, not the tooling."
+    },
+    {
+      "id": "curation-goes-to-regression-curator",
+      "prompt": "Review our existing regression suite — which tests should we promote, keep, demote, or retire?",
+      "expected_skill": "regression-suite-curator",
+      "should_not_trigger": [
+        "visual-regression-test-designer"
+      ],
+      "reason": "Promote/retain/demote/retire curation of existing tests is regression-suite-curator; this skill designs new visual coverage."
+    },
+    {
+      "id": "snapshot-governance-wins-here",
+      "prompt": "Decide which of our proposed snapshots are worth keeping, what each one proves, and what the baseline update review should be.",
+      "expected_skill": "visual-regression-test-designer",
+      "should_not_trigger": [
+        "qa-automation-architect",
+        "regression-suite-curator"
+      ],
+      "reason": "Governing snapshot selection and the update-review rule is this skill's core; it is neither tooling design nor curation of existing suites."
+    },
+    {
+      "id": "spec-writing-goes-to-playwright",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Write the Playwright spec that captures checkout screenshots and asserts them against the baseline.",
+      "expected_skill": "playwright-e2e-engineer",
+      "should_not_trigger": [
+        "visual-regression-test-designer"
+      ],
+      "reason": "Writing and running the capture specs is playwright-e2e-engineer (manual-only); this skill designs the coverage and executes nothing."
+    }
+  ]
+}
