@@ -105,7 +105,7 @@ Chosen / why / rejected: <the key choices, the reason for each, and the main
 - The request drifts into designing the matrix itself (roles, grants, policy) → hand off to `authorization-matrix-designer`.
 - The request drifts into denial or negative-permission testing → hand off to `authorization-matrix-designer` step 7 and `multi-tenant-security-tester` *(manual-only)*.
 - The request becomes executing a pass, writing specs, or driving a browser → hand off to `playwright-e2e-engineer` *(manual-only)* or `manual-test-case-creator`; this skill designs only.
-- The request covers custom roles, grant ceilings, or inheritance → stop; that coverage is deferred to the unbuilt #59 extension, not designed here.
+- The request covers custom roles, grant ceilings, or inheritance → stop; that coverage is deferred to the #59 extension (built by D78) — compose, never restate; not designed here.
 - The request involves destructive or live-state action → stop and refuse.
 
 ## Supporting Files

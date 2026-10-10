@@ -4142,6 +4142,26 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   the owner's R selection and the shipped correction; it grants no new
   execution, publication or merge authority.
 
+- **D83 (2026-10-10) — role-coverage L108 Stop Conditions refreshed.**
+  Origin: the readability sweep fifth batch (PR #707) recorded a named
+  follow-up for `role-coverage-test-designer`: L108 (Stop Conditions) read
+  "deferred to the unbuilt #59 extension" while the page's own L37/46/78/90/100
+  and evals.json:16 read "built by D78" — the internal contradiction the D78
+  entry intentionally left, because any L108 refresh is a Stop Conditions
+  edit and must be named in the PR's security-answer surfaces. The
+  lead/coordinator, the follow-up's recorded owner, decided to proceed under
+  exactly that condition. This lane rewords L108 to "deferred to the #59
+  extension (built by D78) — compose, never restate; not designed here":
+  wording-only, the stop behavior (still refuses to design custom-role,
+  grant-ceiling and inheritance coverage) is unchanged, and no frontmatter,
+  posture, evals or trigger-evals line changed. The PR's security answer is
+  **Yes — the edited skill's Stop Conditions** (the single named surface),
+  which is the D78-entry condition honored. D76's entry above keeps its
+  historical "unbuilt" text — immutable history, forward-corrected here, not
+  rewritten. D82 and earlier entries are byte-untouched; counts are
+  UNCHANGED (SKILL-COUNT 204, FAMILY-COUNT 23). This entry records the
+  refresh; it grants no new execution, publication or merge authority.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
