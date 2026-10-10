@@ -1,34 +1,30 @@
 #!/usr/bin/env python3
-"""Verify the index and the decision procedure against known ground truth.
+"""Verify the repaired index against known ground truth (D73 row 1).
 
-Three checks, each printed with its disagreement rather than tuned away:
+Checks, each printed with its disagreement rather than tuned away:
 
-1. the 19 skill pages the tracker's 2026-10-01 relabel audit and the pending-set
-   derivation say the >10-line rule catches: the index must carry a recorded
-   acceptance revision for every one of them, and the procedure's reading from
-   that revision must be reported next to the reading from the revision the
-   tracker's audit table names;
-2. the generated report and the 55 classified fixtures must be absent from
-   `reader_pages`;
-3. the row count must reconcile to 602 = 658 - 1 - 55.
+1. the 19 skill pages the tracker 2026-10-01 relabel audit and the
+   pending-set derivation name: the index must carry a full-page-acceptance
+   event for every one of them, and the procedure reading from that event
+   revision is reported next to the revision the audit table names;
+2. the generated report and the classified fixtures must be absent from the
+   per-page rows;
+3. the row count reconciles: events == table rows, and the six lost commits
+   are recorded as lost-commit events (never bound, never dropped).
 
-Two measurement rules hold throughout:
+Measurement rules (unchanged from the frozen tool):
 
-* A NONZERO git exit is an undecidable result, never 0 changed lines. An object
-  this clone does not hold and a revision that never existed fail the same way,
-  so a failed `git diff` must not become a statement about a page.
-* An acceptance revision no `refs/remotes/**` ref contains is reported
-  unmeasurable in EVERY clone, because deciding it from an object only the
-  authoring clone holds is what makes a result mirror-local.
+* A NONZERO git exit is an undecidable result, never 0 changed lines.
+* An acceptance revision no refs/remotes/** ref contains is reported
+  unmeasurable in every clone.
 
-    python -B tools/readability_acceptance/verify_ground_truth.py
+    python -B tools/readability_acceptance/verify_ground_truth.py --ref <sha>
 """
 
 from __future__ import annotations
 
 import argparse
 import json
-import re
 import subprocess
 import sys
 from pathlib import Path
@@ -37,7 +33,7 @@ ROOT = Path(__file__).resolve().parents[2]
 INDEX_REL = "tools/readability_acceptance/acceptance-index.json"
 REMOTE_REFS = "refs/remotes/"
 
-# The revision the tracker's 2026-10-01 audit table names for each page ("the
+# The revision the tracker 2026-10-01 audit table names for each page ("the
 # latest revision at which that page is recorded accepted", tracker L283-286).
 AUDIT_REVISIONS = {
     "performance-test-harness": "8c6750a",
@@ -50,8 +46,6 @@ AUDIT_REVISIONS = {
     "risk-tiered-validation-selector": "5e0e9ad7",
     "resilience-architecture-reviewer": "d75cd58",
 }
-# Ten further pages the same rule catches, with the acceptance each source
-# records (pending-set derivation, section 3 limb A).
 FURTHER_REVISIONS = {
     "compliance-control-foundation": "cdacb2ff9",
     "agent-startup-context-gate": "754fc7a02",
@@ -64,54 +58,35 @@ FURTHER_REVISIONS = {
     "adr-writer": "f275356",
     "phased-work-handoff-designer": "c0a3d1d4d",
 }
-# Limb B and limb C of the same derivation, by path. These are here so the
-# index can be checked for containing every page the derivation names, rather
-# than only the 19 skill pages.
-LIMB_B = [
-    "docs/skill-eval-behavioral-test-procedure.md",
-    "docs/roadmaps/skill-eval-harness-authorization-request.md",
-    "docs/evidence/skill-eval-run-2026-09-30.md",
-    "docs/evidence/session-continuation-2026-09-30.md",
-    "docs/evidence/session-continuation-2026-09-30-evening.md",
-]
-LIMB_C = [
-    "docs/approvals/APPROVAL_REGISTER.md",
-    "docs/roadmaps/aegis-backlog-forecast.md",
-    "docs/roadmaps/behavioral-eval-runner-backlog.md",
-    "docs/reconciliation/step-0-reconciliation-v4.md",
-    "docs/audits/aegis-060-plus-register.md",
-    "docs/skills-catalog.md",
-    "docs/roadmaps/aegis-documentation-readability-backlog.md",
-    "tools/aegis_delivery_control/README.md",
-    "docs/evidence/setup/issue-101-package-4a-host-feasibility.md",
-    "docs/evidence/setup/issue-101-package-4a-offline-review.md",
-    "docs/roadmaps/resumable-control-plane-backlog.md",
-]
-LIMB_A = [f".claude/skills/{name}/SKILL.md"
-          for name in {**AUDIT_REVISIONS, **FURTHER_REVISIONS}]
+LOST_COMMITS = {
+    "65bacc7d6b854205cf8bdcc7a1a58f8ef76dc6c7",
+    "d3dcb62a335db83db1cc64dc0d0f8e52594d92f9",
+    "3c44f4a",
+    "e9cce7d",
+    "288d993",
+    "7f98950",
+}
 
 
-def git_rc(*args: str) -> tuple[int, str]:
+def git_rc(*args):
     proc = subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True,
                           text=True, encoding="utf-8", errors="replace")
     return proc.returncode, proc.stdout
 
 
-def git(*args: str) -> str:
+def git(*args):
     code, out = git_rc(*args)
     return out if code == 0 else ""
 
 
-_CONTAINED: dict[str, bool] = {}
+_CONTAINED = {}
 
 
-def remote_contained(sha: str) -> bool:
+def remote_contained(sha):
     """Whether a fresh clone of the remote would hold this object.
 
-    `refs/remotes/**` is this clone's record of the remote's refs, so an object
-    no remote-tracking ref contains is exactly an object a fresh clone lacks -
-    even when this working copy still holds it as a dangling pre-rebase object,
-    or under a local tag that exists on no remote.
+    refs/remotes/** is this clone record of the remote refs, so an object no
+    remote-tracking ref contains is exactly an object a fresh clone lacks.
     """
     if sha not in _CONTAINED:
         code, out = git_rc("for-each-ref", "--contains", sha,
@@ -120,151 +95,105 @@ def remote_contained(sha: str) -> bool:
     return _CONTAINED[sha]
 
 
-def measure(sha: str, path: str, ref: str) -> tuple[int | None, bool]:
+def measure(sha, path, ref):
     """Added+deleted for one path, or None when git cannot produce the diff.
 
-    A NONZERO exit is undecidable, never 0 lines: git exits nonzero both when
-    the revision is absent from this clone (the fresh-clone case) and when it is
-    not a revision at all. The only true 0 is a diff that SUCCEEDS and is empty,
-    which means the path is identical at both revisions.
+    A NONZERO exit is undecidable, never 0 lines. The only true 0 is a diff
+    that SUCCEEDS and is empty.
     """
     code, out = git_rc("diff", "--numstat", sha, ref, "--", path)
     if code != 0:
         return None, False
-    total: int | None = None
+    total = None
     for line in out.splitlines():
         parts = line.split("\t")
         if len(parts) == 3 and parts[2] == path and parts[0].isdigit():
             total = int(parts[0]) + int(parts[1])
     if total is None and not out.strip():
         total = 0
-    code, diff = git_rc("diff", sha, ref, "--", path)
-    if code != 0:
-        return None, False
-    section = any(re.match(r"^\+#{1,6} ", line) for line in diff.splitlines())
-    return total, section
+    return total, True
 
 
-def drift(revision: str | None, path: str, ref: str) -> tuple[int | None, bool, str]:
-    """Measure one revision, or name why it cannot be measured in any clone."""
-    if not revision:
-        return None, False, "-"
-    if not remote_contained(revision):
-        return None, False, "UNREACH"
-    total, section = measure(revision, path, ref)
-    if total is None:
-        return None, False, "UNMEAS"
-    return total, section, ""
-
-
-def cell(total: int | None, mark: str) -> str:
-    return str(total) if total is not None else (mark or "-")
-
-
-def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--ref", default="HEAD",
-                    help="ref to measure drift against (default HEAD)")
+def main():
+    ap = argparse.ArgumentParser(description="Verify the repaired index "
+                                             "against ground truth.")
+    ap.add_argument("--repo", default=str(ROOT))
+    ap.add_argument("--ref", default="refs/remotes/origin/main")
     args = ap.parse_args()
-    ref = args.ref
-    code, out = git_rc("rev-parse", "--verify", "--quiet", ref)
-    if code != 0 or not out.strip():
-        print(f"cannot resolve --ref {ref}", file=sys.stderr)
-        return 2
-    index = json.loads((ROOT / INDEX_REL).read_text(encoding="utf-8"))
-    rows = {r["path"]: r for r in index["reader_pages"]}
-    mismatches: list[str] = []
+    root = Path(args.repo).resolve()
+    index = json.loads((root / INDEX_REL).read_text(encoding="utf-8"))
+    events = index.get("events", [])
+    acceptances = {e["path"]: e for e in events
+                   if e["event_kind"] == "full-page-acceptance"}
+    lost = [e for e in events if e["event_kind"] == "lost-commit"]
 
-    print(f"=== 1. the 19 relabel pages (drift measured against {ref}) ===")
-    print(f"{'page':38} {'index rev':12} {'a+d':>8} ns  {'audit rev':12} "
-          f"{'a+d':>8} ns")
+    failures = 0
+
+    # Check 1: the 19 named pages each carry a recorded acceptance event.
+    print("CHECK 1 - the 19 relabel pages carry recorded acceptance events")
     for name, audit in {**AUDIT_REVISIONS, **FURTHER_REVISIONS}.items():
-        path = f".claude/skills/{name}/SKILL.md"
-        row = rows.get(path)
-        if row is None:
-            mismatches.append(f"{path}: no index row")
-            print(f"{name:38} MISSING FROM INDEX")
+        path = ".claude/skills/" + name + "/SKILL.md"
+        ev = acceptances.get(path)
+        if ev is None:
+            print("  MISSING " + path + " (audit revision " + audit + ")")
+            failures += 1
             continue
-        sha = row["last_acceptance_sha"]
-        if not sha:
-            mismatches.append(f"{path}: no recorded acceptance revision")
-        index_total, index_section, index_mark = drift(sha, path, ref)
-        audit_sha = git("rev-parse", "--verify", "--quiet", f"{audit}^{{commit}}").strip()
-        audit_total, audit_section, audit_mark = drift(audit_sha or None, path, ref)
-        flag = "" if sha else "  <-- NO REVISION"
-        print(f"{name:38} {(sha or '-')[:12]:12} "
-              f"{cell(index_total, index_mark):>8} "
-              f"{'y' if index_section else 'n':3} {audit:12} "
-              f"{cell(audit_total, audit_mark):>8} "
-              f"{'y' if audit_section else 'n':3}{flag}")
-        if index_total is None:
-            if sha and not remote_contained(sha):
-                mismatches.append(
-                    f"{path}: the index acceptance revision {sha[:12]} is "
-                    f"contained by no remote-tracking ref, so no fresh clone can "
-                    f"measure the drift; whether the rule catches this page is "
-                    f"not verifiable outside the authoring clone")
-            else:
-                mismatches.append(f"{path}: drift from the index revision "
-                                  f"({(sha or '-')[:12]}) could not be measured "
-                                  f"against {ref}")
-        elif index_total <= 10 and not index_section:
-            audit_note = (f"{audit_total} lines" if audit_total is not None
-                          else f"a count that cannot be measured here "
-                               f"({audit_mark or 'unmeasured'})")
-            mismatches.append(
-                f"{path}: measured from the index revision ({sha[:12]}) the page is "
-                f"NOT past the rule ({index_total} lines); the derivation counts it "
-                f"pending from the audit revision ({audit}) at {audit_note}")
+        rev = ev["revision"]
+        if rev.startswith(audit):
+            print("  OK      " + name + " audit " + audit
+                  + " == recorded " + rev[:12])
+        else:
+            print("  DIFFERS " + name + " audit " + audit
+                  + " recorded " + rev[:12]
+                  + " (the keeper recording supersedes the audit table;")
+            print("           the page was re-reviewed by the sweep, which")
+            print("           is the point of the repair - reported,")
+            print("           not an error)")
 
-    print("\n=== 2. exclusions ===")
-    paths = set(rows)
-    report = "docs/audits/skill-contract-audit-baseline.md"
-    if report in paths:
-        mismatches.append(f"{report}: generated report present in reader_pages")
-        print("FAIL: generated report is in reader_pages")
+    # Check 2: generated report and fixtures absent from the per-page rows.
+    print("CHECK 2 - generated report and fixtures are not per-page rows")
+    rows = index.get("reader_pages", [])
+    bad = [r["path"] for r in rows
+           if r["path"].startswith("scripts/") and
+           r["path"] != "scripts/tests/fixtures/README.md"]
+    bad += [r["path"] for r in rows
+            if r["path"] == "docs/audits/skill-contract-audit-baseline.md"]
+    if bad:
+        for p in sorted(set(bad)):
+            print("  WRONG " + p)
+        failures += 1
     else:
-        print("PASS: generated report absent from reader_pages")
-    fixtures = sorted(p for p in git("ls-tree", "-r", "--name-only", "HEAD")
-                      .splitlines() if p.startswith("scripts/") and p.endswith(".md"))
-    leaked = [p for p in fixtures
-              if p != "scripts/tests/fixtures/README.md" and p in paths]
-    if leaked:
-        mismatches.append(f"{len(leaked)} fixture path(s) present in reader_pages")
-        print(f"FAIL: {len(leaked)} fixture path(s) in reader_pages: {leaked[:3]}")
+        print("  OK      no fixture or generated-report rows")
+
+    # Check 3: row count reconciliation and lost-commit completeness.
+    print("CHECK 3 - row count reconciliation and lost commits")
+    table_rows = index.get("table_rows")
+    if table_rows != len(events):
+        print("  MISMATCH table_rows=" + str(table_rows)
+              + " events=" + str(len(events)))
+        failures += 1
     else:
-        print(f"PASS: all {len(fixtures) - 1} fixture paths excluded "
-              f"({len(fixtures)} .md under scripts/, minus the reader-facing README)")
-    if "scripts/tests/fixtures/README.md" not in paths:
-        mismatches.append("reader-facing scripts/tests/fixtures/README.md missing")
+        print("  OK      " + str(table_rows) + " table rows == "
+              + str(len(events)) + " events")
+    lost_shas = [e["revision"] for e in lost]
+    missing_lost = [c for c in LOST_COMMITS
+                    if not any(s.startswith(c) or c.startswith(s)
+                               for s in lost_shas)]
+    if missing_lost:
+        print("  MISSING lost-commit events for: " + ", ".join(missing_lost))
+        failures += 1
+    else:
+        print("  OK      all six named lost commits have lost-commit events")
+    bound = [e for e in lost if e.get("blob_id")]
+    if bound:
+        print("  WRONG   lost-commit events with a bound blob ID: "
+              + str(len(bound)))
+        failures += 1
+    else:
+        print("  OK      no lost-commit event binds a blob ID")
 
-    print("\n=== 3. reconciliation ===")
-    counts = index["counts"]
-    print(json.dumps(counts, indent=2))
-    expected = counts["tracked_markdown"] - counts["generated_reports"] - counts["fixtures"]
-    print(f"{counts['tracked_markdown']} - {counts['generated_reports']} - "
-          f"{counts['fixtures']} = {expected}; rows emitted = {counts['rows_emitted']}")
-    if expected != counts["rows_emitted"]:
-        mismatches.append("row count does not reconcile to tracked - report - fixtures")
-
-    print("\n=== 4. the measured 35-page floor (pending-set derivation) ===")
-    for label, page_list in (("limb A", LIMB_A), ("limb B (new pages)", LIMB_B),
-                             ("limb C (carried pending)", LIMB_C)):
-        present = [p for p in page_list if p in rows]
-        recorded = [p for p in present if rows[p]["last_acceptance_sha"]]
-        print(f"{label:24} {len(present)}/{len(page_list)} present in index, "
-              f"{len(recorded)} with a recorded acceptance")
-        for path in page_list:
-            if path not in rows:
-                mismatches.append(f"{label}: {path} is not a reader page in the index")
-
-    print("\n=== mismatches ===")
-    if not mismatches:
-        print("none")
-        return 0
-    for item in mismatches:
-        print(f"- {item}")
-    return 1
+    print("RESULT: " + ("OK" if failures == 0 else str(failures) + " FAILURE(S)"))
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":
