@@ -262,9 +262,9 @@ otherwise invisible to the shipped suite):
 
 **Tier 3 — specialized, defer** (all roadmap P2; build on demand only):
 
-| Candidate *(all: candidate — not built)* | Roadmap ref (cat 06) | Note |
+| Candidate *(started as candidate — not built; per-row status below)* | Roadmap ref (cat 06) | Note |
 |---|---|---|
-| `property-based-test-designer` | #194 (P2) | Generated input combinations for validation, parsing, math, state, transformations. |
+| `property-based-test-designer` — **✅ built (D77, 2026-10-10)** | #194 (P2) | Generated input combinations for validation, parsing, math, state, transformations. |
 | `mutation-testing-reviewer` | #195 (P2) | Mutation thinking to expose tests that pass without proving behavior. |
 | `soak-test-planner` | #207 (P2) | Long-duration runs for leaks, queue buildup, token expiry, degradation. |
 | `chaos-test-planner` | #208 (P2) | Safe injection of service failures, timeouts, retries, partial outages. |
@@ -3945,6 +3945,30 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   198 → 199; FAMILY-COUNT stays 23. The D10 Tier 2 row for #229 is marked
   built above (§3). This entry records the build decision and the shipped
   arithmetic; it grants no new execution, publication or merge authority.
+
+- **D77 (2026-10-10) — Batch A design trio built (three skills).**
+  Decided and built three owner-selected proposal rows in one batch:
+  `validation-boundary-designer` (G3 row 569; roadmap #37 + #38 + #141 +
+  #157), `observability-by-design` (G3 row 570; roadmap #22), and
+  `property-based-test-designer` (G2 row 554; roadmap #194, D10 Tier 3). All
+  three are read-only *design* skills — they emit designs in conversation and
+  write, run, edit and drive nothing — so all three are auto-invocable with
+  no `disable-model-invocation` and no MANUAL-ONLY sentinel, per standard §5.
+  Each ships `evals/evals.json` and `evals/trigger-evals.json` discriminating
+  against its named neighbors, including the manual-only ones. Honesty
+  caveats from the proposal stand: design-time placement is a research
+  hypothesis (row 569), comparative demand needs review (row 570), and
+  property-based testing stays on-demand-qualified (row 554); this entry
+  records the build decision, not verified demand or effectiveness.
+  `validation-boundary-designer` composes the mass-assignment and denial
+  coverage of `security-pr-reviewer` and `multi-tenant-security-tester`;
+  `observability-by-design` composes `sensitive-disclosure-guard`'s redaction
+  rules by reference. Family 3 "Core architecture & engineering" grows
+  10 → 12; family 6 "QA, E2E & evidence" grows 23 → 24; the library total
+  grows 199 → 202; FAMILY-COUNT stays 23. The D10 Tier 3 row for #194 is
+  marked built above (§3). This entry records the build decision and the
+  shipped arithmetic; it grants no new execution, publication or merge
+  authority.
 
 ## 6. Post-merge corrections
 

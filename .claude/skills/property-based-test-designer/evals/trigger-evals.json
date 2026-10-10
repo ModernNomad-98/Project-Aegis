@@ -1,0 +1,68 @@
+{
+  "skill": "property-based-test-designer",
+  "description": "Trigger discrimination for property-based test design: domain invariants and generator/shrink specs versus per-change plans (test-plan-designer), test-data catalog design (test-data-architect), writing/running test files (vitest-unit-component-engineer, manual-only), and flake repair (flaky-test-detective, manual-only).",
+  "overlaps_with": [
+    "test-plan-designer",
+    "test-data-architect",
+    "vitest-unit-component-engineer",
+    "flaky-test-detective"
+  ],
+  "cases": [
+    {
+      "id": "property-design-wins-here",
+      "prompt": "Which invariants should hold for every input to our email validator, and how should we generate and shrink the inputs?",
+      "expected_skill": "property-based-test-designer",
+      "should_not_trigger": [
+        "test-plan-designer",
+        "test-data-architect"
+      ],
+      "reason": "Domain invariants plus generator/shrink specs for one unit are property design; no per-change plan or data catalog is in view."
+    },
+    {
+      "id": "plan-goes-to-plan-designer",
+      "prompt": "Plan the testing for the new parser change — what to test at which layer, with what data, and when testing is done.",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "property-based-test-designer"
+      ],
+      "reason": "A per-change plan with layers and exit criteria is test-plan-designer; a property design covers one unit's invariants, not the change's testing."
+    },
+    {
+      "id": "data-catalog-goes-to-architect",
+      "prompt": "Design the test-data catalog: personas, baseline datasets, and per-layer fixtures.",
+      "expected_skill": "test-data-architect",
+      "should_not_trigger": [
+        "property-based-test-designer"
+      ],
+      "reason": "Persona/baseline catalogs and per-layer data sources are test-data-architect's scope; property design names generator domains, not the data catalog."
+    },
+    {
+      "id": "write-tests-go-to-vitest",
+      "prompt": "Explicitly invoke vitest-unit-component-engineer. Write the property test file for the CSV parser and run the suite.",
+      "expected_skill": "vitest-unit-component-engineer",
+      "should_not_trigger": [
+        "property-based-test-designer"
+      ],
+      "reason": "Writing and running the test files is vitest-unit-component-engineer's (manual-only); this skill designs the properties and hands them off."
+    },
+    {
+      "id": "flake-repair-goes-to-detective",
+      "prompt": "Explicitly invoke flaky-test-detective. Our new property suite fails once every few runs — find the cause and fix it.",
+      "expected_skill": "flaky-test-detective",
+      "should_not_trigger": [
+        "property-based-test-designer"
+      ],
+      "reason": "Intermittent-failure root-causing and repair is flaky-test-detective's (manual-only); this skill designs coverage and runs nothing."
+    },
+    {
+      "id": "state-machine-property-wins-here",
+      "prompt": "Design the properties every transition sequence of our order state machine must satisfy, with bounded generators.",
+      "expected_skill": "property-based-test-designer",
+      "should_not_trigger": [
+        "vitest-unit-component-engineer",
+        "flaky-test-detective"
+      ],
+      "reason": "Transition-sequence invariants with generator bounds are property design; nothing is written or debugged here."
+    }
+  ]
+}

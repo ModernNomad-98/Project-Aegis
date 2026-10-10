@@ -1,0 +1,68 @@
+{
+  "skill": "validation-boundary-designer",
+  "description": "Trigger discrimination for boundary-validation design: where validation lives per boundary versus actual-diff security review (security-pr-reviewer), denial test plans (multi-tenant-security-tester, manual-only), external wire contracts (api-event-architect), the write-path pipeline (command-gateway-architect), and migration scripts (schema-evolution-planner).",
+  "overlaps_with": [
+    "security-pr-reviewer",
+    "multi-tenant-security-tester",
+    "api-event-architect",
+    "command-gateway-architect",
+    "schema-evolution-planner"
+  ],
+  "cases": [
+    {
+      "id": "boundary-design-wins-here",
+      "prompt": "Which layers should validate our new order intake — the form, the API, the command handler, and the database — and which schema should each use?",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "security-pr-reviewer",
+        "api-event-architect"
+      ],
+      "reason": "Placing validation and schema choices across layers is boundary design; no diff is under review and no external contract is being specified."
+    },
+    {
+      "id": "diff-review-goes-to-security-pr-reviewer",
+      "prompt": "Review this pull request's diff for mass-assignment and authorization holes.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "validation-boundary-designer"
+      ],
+      "reason": "Reviewing an actual diff for mass-assignment/authz holes is security-pr-reviewer's checklist; this skill designs placement, it reviews no diff."
+    },
+    {
+      "id": "denials-go-to-tenant-tester",
+      "prompt": "Explicitly invoke multi-tenant-security-tester. Plan the denial tests proving a member cannot update another tenant's invoice via the API.",
+      "expected_skill": "multi-tenant-security-tester",
+      "should_not_trigger": [
+        "validation-boundary-designer"
+      ],
+      "reason": "Permission-denial test plans are multi-tenant-security-tester's (manual-only); this skill designs validation placement, not denial suites."
+    },
+    {
+      "id": "wire-contract-goes-to-api-event-architect",
+      "prompt": "Design the external API contract for the orders service — wire shapes, versioning, and the error envelope.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "validation-boundary-designer"
+      ],
+      "reason": "External wire contracts, versioning and error envelopes are api-event-architect's scope; validation placement is one input to it, not the contract itself."
+    },
+    {
+      "id": "pipeline-goes-to-command-gateway",
+      "prompt": "Design the write path for invoice creation — commands, transactions, and side effects.",
+      "expected_skill": "command-gateway-architect",
+      "should_not_trigger": [
+        "validation-boundary-designer"
+      ],
+      "reason": "The command/transaction pipeline is command-gateway-architect's scope; this skill designs the validation this pipeline enforces."
+    },
+    {
+      "id": "migration-goes-to-schema-evolution-planner",
+      "prompt": "Write the migration that adds the check constraint to the invoices table.",
+      "expected_skill": "schema-evolution-planner",
+      "should_not_trigger": [
+        "validation-boundary-designer"
+      ],
+      "reason": "Migration scripts and schema-evolution mechanics are schema-evolution-planner's job; this skill plans the constraint as a backstop, it writes nothing."
+    }
+  ]
+}
