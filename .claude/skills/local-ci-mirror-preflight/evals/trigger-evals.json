@@ -1,12 +1,13 @@
 {
   "skill": "local-ci-mirror-preflight",
-  "description": "Trigger discrimination: per-commit local CI mirroring with failure classification vs the release gate (release-readiness-reviewer), tier selection (risk-tiered-validation-selector), shard/resume architecture (sharded-validation-with-resume), and pipeline design (ci-pipeline-architect).",
+  "description": "Trigger discrimination: per-commit local CI mirroring with failure classification vs the release gate (release-readiness-reviewer), tier selection (risk-tiered-validation-selector), shard/resume architecture (sharded-validation-with-resume), pipeline design (ci-pipeline-architect), environment inventory (environment-parity-reviewer), and finished-run failure classification (ci-failure-classifier).",
   "overlaps_with": [
     "release-readiness-reviewer",
     "risk-tiered-validation-selector",
     "sharded-validation-with-resume",
     "ci-pipeline-architect",
-    "environment-parity-reviewer"
+    "environment-parity-reviewer",
+    "ci-failure-classifier"
   ],
   "cases": [
     {
@@ -65,6 +66,15 @@
       ],
       "note": "SEAM CASE (reciprocated yield, D71) — an inventory of configuration differences, not a run of the CI checks.",
       "reason": "A cross-environment inventory of runtime and configuration differences is environment-parity-reviewer; the preflight runs the repository's checks locally and classifies their failures."
+    },
+    {
+      "id": "finished-run-classification-goes-to-ci-failure-classifier",
+      "prompt": "CI is red on main and I have the logs saved locally. Which failures are real bugs and which are the runner?",
+      "expected_skill": "ci-failure-classifier",
+      "should_not_trigger": [
+        "local-ci-mirror-preflight"
+      ],
+      "reason": "Classifying a finished CI run's failures from saved logs is ci-failure-classifier; the preflight mirrors checks locally before commit and does not classify a finished remote run."
     }
   ]
 }
