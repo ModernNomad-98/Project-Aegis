@@ -80,7 +80,7 @@ The [catch-up checkpoint after #554](#five-merge-checkpoint--2026-09-30-after-pu
 
 **Dated forward note — 2026-10-10 (D84): the repair and switch have merged.**
 The official readability pending count is now the summary printed by
-[`tools/readability_acceptance/check_index.py`](../tools/readability_acceptance/check_index.py)
+[`tools/readability_acceptance/check_index.py`](../../tools/readability_acceptance/check_index.py)
 at the pinned ref; the readability ledger publishes no count of its own and
 cites the index; this forecast carries no readability count either. This note
 changes no dated text.
