@@ -4060,21 +4060,25 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   `sharded-validation-with-resume` (named functional shards, :65–68;
   run-id/status semantics, :111–113; resume law, :120–133; aggregate gate,
   :148–152) and `qa-automation-architect` (isolation + parallelization,
-  :79–82; CI sharding plan, :86–88) — no residual slice. Plain drops:
+  :87–90; CI sharding plan, :94–95) — no residual slice. Plain drops:
   `soak-test-planner` (#207) → `load-test-planner` (soak named in Use When
-  and body; trigger-evals route soak prompts); `chaos-test-planner` (#208)
-  → `resilience-architecture-reviewer` (fault-injection/game-day plans,
-  execution refused); `operational-runbook-author` (#23) →
+  :25 and body :227–230; trigger-evals route soak prompts :30–33);
+  `chaos-test-planner` (#208) → `resilience-architecture-reviewer`
+  (fault-injection/game-day plan :47–48; step 7 writes it :158; execution
+  refused :231–233); `operational-runbook-author` (#23) →
   `incident-response-runbook`, `rollback-runbook-author`,
   `data-migration-runbook-author`, `gated-deployment-prompt-template`,
   `onboarding-doc-designer`; `system-context-mapper` (#2) →
-  `architecture-designer` step 1 + `threat-modeler`; `bounded-context-identifier`
-  (#4) → `domain-modeler` step 4; `e2e-test-architect` → the
-  `qa-strategy-architect` + `test-plan-designer` + `qa-automation-architect` +
-  `regression-suite-curator` + `test-data-architect` + `playwright-e2e-engineer`
-  composition; `qa-closeout-reporter` (#235) → `ai-closeout-reporter` +
-  `release-readiness-reviewer` (the shipped trigger-eval pin's "stays in the
-  backlog" intent is now satisfied by this drop record). Intentionally NOT
+  `architecture-designer` step 1 (:57–59) + `threat-modeler` (:70–72, output
+  :104–106); `bounded-context-identifier` (#4) → `domain-modeler` step 4
+  (:55–58); `e2e-test-architect` → the `qa-strategy-architect` +
+  `test-plan-designer` + `qa-automation-architect` +
+  `regression-suite-curator` (:126) + `test-data-architect` (:3, :61–63) +
+  `playwright-e2e-engineer` (:122) composition; `qa-closeout-reporter` (#235)
+  → `ai-closeout-reporter` (:3, :14–19) + `release-readiness-reviewer` (:3,
+  :14–21) (the shipped trigger-eval pin's "stays in the backlog" intent —
+  `screenshot-evidence-planner` trigger-evals:25 — is now satisfied by this
+  drop record). Intentionally NOT
   done: the proposal's optional soak token/session-expiry note (row 556) is
   not taken up — a later `load-test-planner` extension would be its own PR;
   `dependency-direction-guard` (#6/#7) and `refactor-safety-planner` (#11)
