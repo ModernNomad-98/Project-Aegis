@@ -4255,3 +4255,48 @@ order (`docs/roadmaps/skill-eval-harness-authorization-request.md`,
 `docs/evidence/session-continuation-2026-09-30-evening.md`), then the pending
 batch-record notes in creation order, re-measured at the next implementation
 base.
+## Ledger-keeper recording + batch update — readability sweep seventh batch, 2026-10-10
+
+The ledger keeper records under AEGIS-APR-101 (its unchanged recording-only
+role). The eight pages below were each independently full-page re-read at
+the base head against
+[Acceptance for each page](#acceptance-for-each-page) by a reviewer who did
+not write the page, and each reviewer restated the page's purpose and normal
+use from the page alone in the batch record. All eight are accepted at the
+reviewed head; the one "corrected" row applies a reviewer-proposed
+definitions-only reading-key insertion, re-read by the coordinator before
+batch close. No acceptance the reviewers did not give is recorded, and no
+figure, decision, dated text, or governance content changed.
+
+| Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [The skill-eval harness authorization request](../../docs/roadmaps/skill-eval-harness-authorization-request.md) | `0b05461b31cd9962529fb973b00ca9c790dd0d63` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-709-2026-10-10.md) | 2026-10-10 |
+| [The skill-eval run evidence](../../docs/evidence/skill-eval-run-2026-09-30.md) | `0b05461b31cd9962529fb973b00ca9c790dd0d63` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-709-2026-10-10.md) | 2026-10-10 |
+| [The 2026-09-30 session continuation](../../docs/evidence/session-continuation-2026-09-30.md) | `0b05461b31cd9962529fb973b00ca9c790dd0d63` | pr-publisher | [batch record](../evidence/documentation/full-page-readability-batch-after-709-2026-10-10.md) | 2026-10-10 |
+| [The 2026-09-30 evening continuation](../../docs/evidence/session-continuation-2026-09-30-evening.md) | `0b05461b31cd9962529fb973b00ca9c790dd0d63` (corrected in-batch: reading-key definitions, re-read by the coordinator) | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-709-2026-10-10.md) | 2026-10-10 |
+| [The batch-after-702 record](../../docs/evidence/documentation/full-page-readability-batch-after-702-2026-10-10.md) | `0b05461b31cd9962529fb973b00ca9c790dd0d63` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-709-2026-10-10.md) | 2026-10-10 |
+| [The batch-after-703 record](../../docs/evidence/documentation/full-page-readability-batch-after-703-2026-10-10.md) | `0b05461b31cd9962529fb973b00ca9c790dd0d63` | stage-b-auditor | [batch record](../evidence/documentation/full-page-readability-batch-after-709-2026-10-10.md) | 2026-10-10 |
+| [The batch-after-704 record](../../docs/evidence/documentation/full-page-readability-batch-after-704-2026-10-10.md) | `0b05461b31cd9962529fb973b00ca9c790dd0d63` | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-709-2026-10-10.md) | 2026-10-10 |
+| [The batch-after-705 record](../../docs/evidence/documentation/full-page-readability-batch-after-705-2026-10-10.md) | `0b05461b31cd9962529fb973b00ca9c790dd0d63` | auditor-2 | [batch record](../evidence/documentation/full-page-readability-batch-after-709-2026-10-10.md) | 2026-10-10 |
+
+Recorded revisions: none for any of the eight (limb-B / pending-batch-record
+rules — cited), so drift is not derivable; the batch record carries the
+restatements.
+
+**Count honesty (unchanged).** No exact pending count is derivable (the tool
+itself says "NOT DERIVABLE from this procedure"); the tool run at this base
+(215 provably pending / 159 no-recorded / 221 within-10 / 7 undecidable) is
+candidate evidence only, and the "212" frozen-basis figure is not reproduced.
+The index repair and official-count switch stay paused; N12/N13 untouched.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read
+against [Acceptance for each page](#acceptance-for-each-page) by a reader who
+did not write this section — the self-cost every prior update states. The
+tracked Markdown count does not change except by the new batch record note
+itself, which is pending and not counted among accepted pages.
+
+The next batch's selection rule: the remaining pending batch-record notes in
+creation order (`full-page-readability-batch-after-706-2026-10-10.md`
+through `after-708`, then this note), re-measured at the next
+implementation base.
