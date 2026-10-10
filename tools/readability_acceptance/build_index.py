@@ -365,11 +365,14 @@ def main():
     root = Path(args.repo).resolve()
     payload = build(root, args.ref)
     if args.write:
+        # newline="\n" pins LF bytes: a Windows rebuild must be byte-identical
+        # to the committed files (SD-D defect 1, recorded in D84's amendment).
         (root / INDEX_REL).write_text(
-            json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+            json.dumps(payload, indent=2) + "\n", encoding="utf-8",
+            newline="\n")
         (root / STAGE1_REL).write_text(
             json.dumps(stage1(payload["events"]), indent=2) + "\n",
-            encoding="utf-8")
+            encoding="utf-8", newline="\n")
         print("wrote " + INDEX_REL + " and " + STAGE1_REL + " at "
               + payload["built_at_ref"][:12] + " (" + str(len(payload["events"]))
               + " keeper events)")

@@ -4948,7 +4948,7 @@ the entry governs.
   no other limit stated. It recurs from the switch's merge until revoked, and
   routine use does not consume it.
 
-### AEGIS-APR-114: CONSUMED — the index-repair switch merged
+### AEGIS-APR-125: AEGIS-APR-114 CONSUMED — the index-repair switch merged
 
 - **Event:** CONSUMED; target grant AEGIS-APR-114.
 - **Status at recording:** AEGIS-APR-114 has no remaining use; its named

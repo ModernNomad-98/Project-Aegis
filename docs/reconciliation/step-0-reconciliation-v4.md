@@ -4197,6 +4197,14 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   FAMILY-COUNT 23). This entry records the repair and the switch; it grants
   no new execution, publication or merge authority.
 
+  **Amendment, 2026-10-10 (SD-D REVISE round 2, PR #715).** Two narrow
+  fixes, append-only: (1) the APR-114 CONSUMED event's defining ID was
+  duplicated; the event now carries its own ID **AEGIS-APR-125** (the
+  ID-114 entry keeps its GRANT heading), so the WSL2 lane's planned
+  "APR-125 grant" renumbers to **APR-126**; (2) `build_index.py`'s writer
+  now pins LF newlines (`newline="\n"`) so a Windows reviewer rebuild is
+  byte-identical to the committed JSONs. No content or count change.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
