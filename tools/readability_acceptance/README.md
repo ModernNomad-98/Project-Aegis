@@ -62,3 +62,31 @@ row). The tool states its basis; no bucket is silently collapsed.
   acceptances only (lead decision 1), so none exist yet.
 * Historical targeted reviews were not transcribed; transcribing them later
   is a flagged Open item (D73 row 4, D84).
+
+## Official count reference (pinned)
+
+A durable citation point, recorded by D96 (2026-10-11) — NOT the live
+figure. The live figure remains `check_index.py` run at the current ref;
+this section pins one historical reading so later readers can cite it
+without re-deriving it, and later rebuilds at newer refs supersede it.
+
+- **Pinned ref:** `408e4d6a2046b37afe7912e9c8643474df7ab037` ("fix: LF-pinned
+  writer and APR-125 CONSUMED ID (SD-D REVISE round 2)"; an ancestor of
+  origin/main).
+- **The six labeled numbers at that ref:** reader pages **631** / accepted
+  on recorded review **50** / provably pending **4** / no recorded
+  acceptance **564** / recorded acceptance within 10 lines **7** /
+  cannot-decide **6** — **official pending count 581**.
+- **Computation method** (this README's formula above): provably_pending +
+  no_recorded_acceptance + cannot_decide + (within-10 not covered by a
+  recorded targeted-review row).
+- **Exact re-derivation command** (full clone; refs/remotes + refs/pull
+  heads fetched):
+
+  ```bash
+  python -B tools/readability_acceptance/check_index.py --ref 408e4d6a2046b37afe7912e9c8643474df7ab037
+  ```
+
+- **Provenance:** the six numbers above were re-derived byte-for-byte by
+  Stage C of the Q4 durable-acceptance-refs lane at the implementation base
+  before this section was appended (recorded in D96).
