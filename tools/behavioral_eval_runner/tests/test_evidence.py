@@ -439,7 +439,7 @@ class TestEvidenceWriterTrustedRoot(unittest.TestCase):
             _dirfd_replace_supported,
         )
 
-        if os.name == "posix" and _dirfd_replace_probe():
+        if os.name == "posix" and _dirfd_replace_probe()[0]:
             # The 3.12/Ubuntu host class the defect was found on: the static
             # set omits os.replace but the real call succeeds.
             self.assertTrue(_dirfd_replace_supported())
@@ -555,7 +555,14 @@ def _replace_oracle(probe_fn) -> bool:
         raise AssertionError("probe did not pass directory descriptors")
     if kw["src_dir_fd"] == kw["dst_dir_fd"]:
         raise AssertionError("probe passed the SAME descriptor for src and dst")
-    if outcomes["checked"] and not outcomes["ok"]:
+    if not outcomes["checked"]:
+        # F2: an UNCHECKED outcome is a REJECT, never a pass - True only
+        # when checked AND ok.
+        raise AssertionError(
+            "outcomes were never checked: the replacement did not succeed, "
+            "so the descriptor-relative behavior is unproven - the oracle "
+            "rejects")
+    if not outcomes["ok"]:
         raise AssertionError(
             "observable outcomes failed: destination content mismatch or "
             "source still present")
@@ -647,7 +654,7 @@ class TestDirfdProbeRepair(unittest.TestCase):
             # The noop replace moves nothing: the destination file never
             # appears, so the observable outcome fails and the probe returns
             # False - the intended mechanism, not a fixture failure.
-            self.assertFalse(ev._dirfd_replace_probe())
+            self.assertFalse(ev._dirfd_replace_probe()[0])
             # Exactly 2 probe-class opens (no dir_fd kwarg): the probe's own
             # source-directory and destination-directory opens. Ambient
             # cleanup opens carry dir_fd and are excluded by the
@@ -690,8 +697,238 @@ class TestDirfdProbeRepair(unittest.TestCase):
                 mock.patch.object(ev.os, "open", side_effect=fake_open), \
                 mock.patch.object(ev.os, "close",
                                   side_effect=close_fake_only):
-            self.assertFalse(ev._dirfd_replace_probe())
+            self.assertFalse(ev._dirfd_replace_probe()[0])
             self.assertEqual(fd_counter["n"], 2)
+
+    def _close_failure_scenario(self, fail_on):
+        """Shared F1 close-failure harness: real directory descriptors, only
+        ``os.close`` mocked to fail on the targeted probe descriptor(s).
+        The accounting reflects REAL closes (Codex P2 4242513000): the
+        success branch closes via real_close BEFORE recording; the
+        injected-error branch records the force-failed descriptor and
+        releases it via real_close in the post-assertion finally - both
+        descriptors are provably released in every path, so the harness
+        never leaks a real fd.
+        Returns (supported, conclusive, opened, close_calls)."""
+        from unittest import mock
+
+        import tools.behavioral_eval_runner.evidence as ev
+
+        opened: list = []
+        close_calls: list = []
+        force_failed: list = []
+        probe_fds: set = set()
+        real_open = os.open
+        real_close = os.close
+
+        def spy_open(path, flags, *args, **kw):
+            fd = real_open(path, flags, *args, **kw)
+            # The established discriminator (dirfd-repair AC4 class): ONLY
+            # the probe's own directory opens count - fixture basenames AND
+            # no dir_fd kwarg. POSIX TemporaryDirectory cleanup (shutil
+            # .rmtree) re-opens srcd/dstd WITH dir_fd; those ambient opens
+            # pass through uncounted so len(opened) stays exactly 2.
+            if (os.path.basename(os.fspath(path)) in ("srcd", "dstd")
+                    and "dir_fd" not in kw):
+                opened.append(fd)
+                probe_fds.add(fd)  # the probe's OWN live descriptor
+            return fd
+
+        def spy_close(fd):
+            # Identity-based, not number-based (SD-E 6112038138): a close
+            # counts ONLY while the number names one of the probe's OWN
+            # live descriptors. POSIX fd-number reuse (the ambient cleanup
+            # reopening the subdirectories with the SAME numbers after the
+            # probe real-closed them) passes through uncounted.
+            if fd in probe_fds:
+                probe_fds.discard(fd)  # membership consumed once
+                target_fds = {opened[i] for i in fail_on if i < len(opened)}
+                if fd in target_fds:
+                    # Injected-error branch: the mock raises, but the REAL
+                    # descriptor is still ours - recorded here and closed
+                    # for real in the finally below (never leaked).
+                    force_failed.append(fd)
+                    raise OSError("injected close failure on " + str(fd))
+                # Success branch: the real close happens FIRST; only a real
+                # close of a member is accounted.
+                real_close(fd)
+                close_calls.append(fd)
+                return None
+            return real_close(fd)
+
+        release_failures: list = []
+        try:
+            with mock.patch.object(ev.os, "open", side_effect=spy_open), \
+                    mock.patch.object(ev.os, "close", side_effect=spy_close):
+                supported, conclusive = ev._dirfd_replace_probe()
+        finally:
+            # Post-assertion release: every force-failed descriptor is
+            # closed for real here (the probe's own cleanup already
+            # released the others). Any release failure is surfaced for
+            # the caller to assert on - the harness must never leak.
+            for fd in force_failed:
+                try:
+                    real_close(fd)
+                except OSError:
+                    release_failures.append(fd)
+        return (supported, conclusive, opened, close_calls,
+                force_failed, release_failures)
+
+    def test_close_failure_source_returns_false_not_conclusive(self) -> None:
+        # F1 regression 1: the replacement succeeds, the SOURCE close fails.
+        # The probe reports supported=True, conclusively_released=False, the
+        # OTHER descriptor was still closed exactly once, and the failing
+        # descriptor was close-attempted AT MOST ONCE (no blind re-close).
+        if not _dirfd_open_constructible():
+            self.skipTest(
+                "directory descriptors not openable on this host (Windows) - "
+                "the close-failure regression is POSIX-executed; UNRUN here, "
+                "never a pass")
+        (supported, conclusive, opened, close_calls,
+         force_failed, release_failures) = \
+            self._close_failure_scenario(fail_on={0})
+        self.assertTrue(supported)
+        self.assertFalse(conclusive)
+        self.assertEqual(len(opened), 2,
+                         "the fixture must genuinely reach the probe")
+        src_fd, dst_fd = opened
+        # The failing descriptor was injected-failed exactly once and then
+        # released for real by the harness (no leak).
+        self.assertEqual(force_failed, [src_fd])
+        self.assertEqual(release_failures, [])
+        self.assertEqual(close_calls.count(src_fd), 0,
+                         "the injected-failed close is not a real close")
+        # The OTHER descriptor was REAL-closed exactly once.
+        self.assertEqual(close_calls.count(dst_fd), 1)
+
+    def test_close_failure_destination_returns_false_not_conclusive(self) -> None:
+        # F1 regression 2: the replacement succeeds, the DESTINATION close
+        # fails - same contract, mirrored.
+        if not _dirfd_open_constructible():
+            self.skipTest(
+                "directory descriptors not openable on this host (Windows) - "
+                "the close-failure regression is POSIX-executed; UNRUN here, "
+                "never a pass")
+        (supported, conclusive, opened, close_calls,
+         force_failed, release_failures) = \
+            self._close_failure_scenario(fail_on={1})
+        self.assertTrue(supported)
+        self.assertFalse(conclusive)
+        self.assertEqual(len(opened), 2)
+        src_fd, dst_fd = opened
+        self.assertEqual(force_failed, [dst_fd])
+        self.assertEqual(release_failures, [])
+        self.assertEqual(close_calls.count(dst_fd), 0,
+                         "the injected-failed close is not a real close")
+        self.assertEqual(close_calls.count(src_fd), 1)
+
+    def test_close_failure_both_returns_false_not_conclusive(self) -> None:
+        # F1 regression 3: BOTH closes fail - each attempted at most once,
+        # conclusively_released False, and the replacement itself succeeded.
+        if not _dirfd_open_constructible():
+            self.skipTest(
+                "directory descriptors not openable on this host (Windows) - "
+                "the close-failure regression is POSIX-executed; UNRUN here, "
+                "never a pass")
+        (supported, conclusive, opened, close_calls,
+         force_failed, release_failures) = \
+            self._close_failure_scenario(fail_on={0, 1})
+        self.assertTrue(supported)
+        self.assertFalse(conclusive)
+        self.assertEqual(len(opened), 2)
+        self.assertEqual(sorted(force_failed), sorted(opened))
+        self.assertEqual(release_failures, [])
+        self.assertEqual(close_calls, [],
+                         "no real closes when both are injected-failed")
+
+    def test_oracle_rejects_failed_replacement_negative_control(self) -> None:
+        # F2 negative control: correct-looking operands and distinct fds,
+        # but the REAL replacement raises OSError - the oracle must reject
+        # (True only on checked AND ok), never pass on unchecked outcomes.
+        from unittest import mock
+
+        import tools.behavioral_eval_runner.evidence as ev
+
+        def scratch_probe() -> bool:
+            try:
+                with tempfile.TemporaryDirectory() as tmp:
+                    src_dir = os.path.join(tmp, "srcd")
+                    dst_dir = os.path.join(tmp, "dstd")
+                    os.mkdir(src_dir)
+                    os.mkdir(dst_dir)
+                    with open(os.path.join(src_dir, "probe"), "wb") as handle:
+                        handle.write(ev._DIRFD_PROBE_PAYLOAD)
+                    os.replace("probe", "probe", src_dir_fd=3101,
+                               dst_dir_fd=3102)
+                    return True
+            except (NotImplementedError, OSError, AttributeError):
+                return False
+            return False
+
+        with mock.patch("os.replace",
+                        side_effect=OSError("injected failed replacement")):
+            with self.assertRaises(AssertionError) as ctx:
+                _replace_oracle(scratch_probe)
+        self.assertIn("never checked", str(ctx.exception))
+
+    def test_probe_false_when_substitute_runs_real_replace_in_controlled_cwd(
+            self) -> None:
+        # F3 distinct case: the substitute ACCEPTS the descriptor kwargs but
+        # invokes the captured REAL os.replace with its OWN relative operands
+        # against a controlled temp cwd created inside the fixture (chdir +
+        # try/finally restore). The descriptor-relative outcomes stay ABSENT
+        # in the probe's dirs, and the probe returns False BECAUSE of those
+        # absent outcomes - not an unrelated setup failure.
+        if not _dirfd_open_constructible():
+            self.skipTest(
+                "directory descriptors not openable on this host (Windows) - "
+                "the distinct-cwd regression is POSIX-executed; UNRUN here, "
+                "never a pass")
+        from unittest import mock
+
+        import tools.behavioral_eval_runner.evidence as ev
+
+        real_replace = os.replace
+        original_cwd = os.getcwd()
+        reached = {"substitute": False, "real_replace": False}
+        marker = b"controlled-cwd-marker"
+        with tempfile.TemporaryDirectory() as cwd_tmp:
+            with open(os.path.join(cwd_tmp, "cwd_src"), "wb") as handle:
+                handle.write(marker)
+
+            def substitute(src, dst, **kw):
+                # Accepts the descriptor arguments and ignores them.
+                reached["substitute"] = True
+                real_replace("cwd_src", "cwd_dst")
+                reached["real_replace"] = True
+
+            os.chdir(cwd_tmp)
+            try:
+                with mock.patch.object(ev.os, "replace",
+                                      side_effect=substitute):
+                    supported, conclusive = ev._dirfd_replace_probe()
+            finally:
+                os.chdir(original_cwd)
+            # E round-2 defect 2: verify the observable states WHILE the
+            # controlled cwd still exists - the TemporaryDirectory cleanup
+            # deletes the markers when the with-block exits, so these
+            # assertions run inside the controlled scope.
+            self.assertTrue(reached["substitute"],
+                            "execution must reach the substitute")
+            self.assertTrue(reached["real_replace"],
+                            "the substitute must run the captured REAL replace")
+            # The real replace executed in the CONTROLLED cwd: the markers
+            # moved there, while the probe's descriptor-relative destination
+            # never appeared (the probe returned False because of that
+            # absence).
+            with open(os.path.join(cwd_tmp, "cwd_dst"), "rb") as handle:
+                self.assertEqual(handle.read(), marker)
+            self.assertFalse(
+                os.path.exists(os.path.join(cwd_tmp, "cwd_src")))
+        self.assertFalse(supported)
+        self.assertTrue(conclusive)
+        self.assertEqual(os.getcwd(), original_cwd,
+                         "the original cwd must be restored")
 
     def test_setup_failure_closes_every_opened_descriptor(self) -> None:
         from unittest import mock
@@ -737,7 +974,7 @@ class TestDirfdProbeRepair(unittest.TestCase):
         with mock.patch.object(ev.os, "open", side_effect=flaky_open), \
                 mock.patch.object(ev.os, "close", side_effect=spy_close), \
                 mock.patch.object(ev.tempfile, "TemporaryDirectory", SpyTD):
-            self.assertFalse(ev._dirfd_replace_probe())
+            self.assertFalse(ev._dirfd_replace_probe()[0])
         self.assertEqual(sorted(opened), sorted(closed),
                          "every opened descriptor must be released")
         self.assertTrue(fixtures, "the probe must build its temp fixture")
@@ -773,7 +1010,7 @@ class TestDirfdProbeRepair(unittest.TestCase):
                     mock.patch.object(ev.os, "close",
                                       side_effect=close_fake_only):
                 self.assertFalse(
-                    ev._dirfd_replace_probe(),
+                    ev._dirfd_replace_probe()[0],
                     exc.__name__ + " must yield False, not propagate")
 
     def test_static_membership_short_circuits_without_probe(self) -> None:
@@ -801,12 +1038,21 @@ class TestDirfdProbeRepair(unittest.TestCase):
 
         import tools.behavioral_eval_runner.evidence as ev
 
+        # The probe now returns (supported, conclusive); a conclusively
+        # released measurement passes its supported element through.
         for probe_result in (True, False):
             with mock.patch.object(ev.os, "supports_dir_fd", frozenset(),
                                    create=True), \
                     mock.patch.object(ev, "_dirfd_replace_probe",
-                                      return_value=probe_result):
+                                      return_value=(probe_result, True)):
                 self.assertIs(ev._dirfd_replace_supported(), probe_result)
+        # A supported measurement whose cleanup was NOT conclusive is
+        # reported False - never a blind pass.
+        with mock.patch.object(ev.os, "supports_dir_fd", frozenset(),
+                               create=True), \
+                mock.patch.object(ev, "_dirfd_replace_probe",
+                                  return_value=(True, False)):
+            self.assertFalse(ev._dirfd_replace_supported())
 
 
 if __name__ == "__main__":  # pragma: no cover
