@@ -4403,6 +4403,36 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   lane; it grants no new execution, publication or merge authority. D92 and
   earlier entries are byte-untouched.
 
+- **D94 (2026-10-11) — Q2 BER Stage B (model-driven eval) authorization
+  record.** The owner selected Q2 with "start on all these" plus the
+  standing blanket pre-approval (APR-100: "Pre-aproved all troubleshooting,
+  commit, push, and mergs once local and GH chekcs are green. If not, take
+  it in thand fry to fix it.") — both quoted verbatim. The lane adds NO
+  repository code; this entry is the lane's only repo change. Boundaries
+  recorded: ONE bounded run class — three synthetic Scenario-A-shaped
+  prompts executed via the session harness's current model route (no new
+  provider account, no credentials stored anywhere), on the named distro
+  only (alias `aegis-ber-stage-a-wsl`, user `peternguyen`, scratch root
+  `/home/peternguyen/aegis-stage-a` mode 700; the placed BER source
+  refreshed to the Stage B base pin `26bfc772` by the credential-free
+  archive method), a 60-minute ceiling, the runner's NON-LIVE construction
+  respected — the live-dispatch gate's deterministic
+  `LIVE_DISPATCH_DISABLED` denial is invoked and observed per prompt, never
+  worked around — no deletion, no package installs, no network beyond the
+  harness provider route. The honesty line every Stage B artifact carries:
+  a capability observation ONLY — NOT a production isolation claim, NOT a
+  BER baseline result. Stop conditions: harness route unreachable, a
+  missing harness credential (never remedied by storing one), the bounded
+  class exceeded, or any cap-dec L186–192 stop — a stop is a
+  `NON_BASELINE` disposition, never a partial pass. No new APR is created
+  (the register preamble L12–13 makes the owner's live instruction the
+  grant and this entry its durable transcription); the disposition record
+  and raw evidence stay in the lane's evidence tree and the distro's
+  protected raw dir — nothing further is published to the repo by this
+  lane. Counts UNCHANGED (SKILL-COUNT 205, FAMILY-COUNT 23). This entry
+  records the authorization; it grants no new execution, publication or
+  merge authority. D93 and earlier entries are byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
