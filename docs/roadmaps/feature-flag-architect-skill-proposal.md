@@ -1,7 +1,12 @@
 # Feature-flag system skill (`feature-flag-architect`): scope proposal
 
-> **Status:** Accepted by the owner 2026-09-26 (chat); implementation in
-> progress; this page grants no authority beyond the standing delivery
+> **Status:** Accepted by the owner 2026-09-26 (chat); **delivered**. The
+> `feature-flag-architect` skill and both `project-orchestrator` routes
+> (Stage 3 and Stage 9) are delivered: proposal PR #378 (`a2d2b831`),
+> skill PR #383 (`6844ab9f`), routes PR #384 (`0f46808d`), and the
+> owner-choice `edge-owner-deadline-ramp-pace-choice` step and eval case
+> PR #377 (`5c14ba95`); all merged 2026-09-27 UTC (banner corrected
+> 2026-10-11). This page grants no authority beyond the standing delivery
 > approvals ([AEGIS-APR-039](../approvals/APPROVAL_REGISTER.md#aegis-apr-039-reaffirmation-of-ongoing-backlog-delivery-approval)).
 
 Prepared 2026-09-26 from `ModernNomad-98/Project-Aegis` `origin/main` at
