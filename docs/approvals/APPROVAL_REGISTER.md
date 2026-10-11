@@ -36,6 +36,8 @@ the entry governs.
   the entry was written; later events can change it. A one-use grant can be
   used up even before a later event records that; check its use limit and
   linked delivery record.
+- **Annotation ANNOT-Q3-003 (D95, 2026-10-11):** the accepted POLICY-DECISION scope form `Scope allowed (selected policy):` carried by SIX entries — APR-009, APR-105, APR-113, APR-118, APR-121, APR-123 — is the policy entries' established variant meaning "grants nothing"; it is not a defect and stays as written. — binding source: the six entries' `Scope allowed (selected policy):` lines, re-derived at the base. Original entries' text unchanged (immutability, preamble L8–12).
+
 - **PR** is a GitHub pull request; **issue #nnn** is a GitHub issue. A bare
   **#nnn** does not say which: `#333`, for example, is PR #333, and only the
   word before it tells the two apart. The
@@ -3142,6 +3144,8 @@ the entry governs.
   recorded it as standing on 2026-09-30. It may be revoked or superseded by a
   later lifecycle event, which must be appended rather than applied by editing
   this entry.
+- **Annotation ANNOT-Q3-005 (D95, 2026-10-11):** the quote divergence the Q2 D-audit flagged (AUDIT-D-PR725.md L7 note): this entry's canonical text quotes the 2026-09-28 instruction — "all commits, push, and merges are pre-approved as long as they passed local tests and green on github actions" (first written at commit `36be74b5`) — while the merged PR #724 body carries the newer owner blanket wording ("Pre-aproved all troubleshooting, commit, push, and mergs once local and GH chekcs are green. If not, take it in thand fry to fix it."), which D94 quotes. Both texts are recorded here verbatim; the divergence is recorded, not judged. — binding source: APR-100 L3090–3092 + the merged PR #724 body + D94. Original entry text unchanged (immutability, preamble L8–12).
+
 ### AEGIS-APR-101: Ledger keeper role and two historical recording acts
 
 - **Event:** GRANT and explicit ratification.
@@ -5254,6 +5258,8 @@ the entry governs.
 - **Evidence:** The complete question, chosen label and earlier instruction above were relayed verbatim from the direct current owner conversation by the coordinator to the P-REG Stage A holder on 2026-10-09 UTC. The relay date is known; the owner-answer timestamp is unknown. The current direct instruction has authority before transcription under this register's preamble. The captured reconciliation plan and its independent audit provide recording/design evidence, not independent proof that the owner authored the option prose. Preserve the captured source and the final reviewed record's immutable revision in the stage handoff.
 - **Expiry / future changes:** No calendar expiry or new consumption event was stated. Keep applying the selected condition unless the owner later changes it or its green-check prerequisite is actually satisfied. Any later owner decision is recorded with its own evidence; this entry does not pre-authorize one.
 
+- **Annotation ANNOT-Q3-001 (D95, 2026-10-11):** the alternate field labels INSIDE this entry — `Decision maker / effective order`, `Scope FORBIDDEN / boundaries`, `Expiry / future changes`, `Related grant / scope`, and the lowercase `Recorded at / by` — are the transcription lane's field-spelling variants of the register-wide canonical forms (`Date / Grantor`, `Scope FORBIDDEN`, `Expiry / use limit`, `Recorded at / By`); they stay as written. — binding source: the register's canonical-form census (D88 transcription lane, PLAN-rev2 §2) + this entry's own lines. Original entry text unchanged (immutability, preamble L8–12).
+
 ### AEGIS-APR-122: Consumption of the APR-099 guard-documentation correction grant
 
 - **Event:** CONSUMED; target grant AEGIS-APR-099.
@@ -5342,6 +5348,8 @@ the entry governs.
   change is recorded with its own evidence; this entry does not pre-authorize
   one.
 
+- **Annotation ANNOT-Q3-002 (D95, 2026-10-11):** the same four alternate field labels inside this entry — `Decision maker / effective order`, `Scope FORBIDDEN / boundaries`, `Expiry / future changes`, `Related grant / scope` — plus the lowercase `Recorded at / by`, are the transcription lane's field-spelling variants of the register-wide canonical forms; they stay as written. — binding source: the register's canonical-form census (D88 transcription lane, PLAN-rev2 §2) + this entry's own lines. Original entry text unchanged (immutability, preamble L8–12).
+
 ### AEGIS-APR-124: Consumption of the APR119 skill-contract audit baseline refresh grant
 
 - **Event:** CONSUMED; target grant AEGIS-APR-119.
@@ -5424,6 +5432,8 @@ the entry governs.
 - **Evidence:** Direct owner decision of 2026-10-10, as transcribed by the
   coordinator; the reviewed WSL2 proposal; no register entry text edited.
 - **Expiry / use limit:** None — a recording, not a grant.
+
+- **Annotation ANNOT-Q3-004 (D95, 2026-10-11):** the event-type wording `**Event:** SUPERSESSION; target grant AEGIS-APR-028…` (L5408): the preamble's four named event types (GRANT / POLICY DECISION / CONSUMED / EXPIRED) do not include SUPERSESSION, while the preamble's append rule speaks of "supersession events" in prose; the transcription is faithful to the owner's 2026-10-10 WSL2 decision as recorded in APR-126/127. The wording stays. — binding source: APR-126's Scope allowed / Scope FORBIDDEN quotes + APR-127's Status cell + the owner decision as transcribed. Original entry text unchanged (immutability, preamble L8–12).
 
 ### AEGIS-APR-128: BER R4/R5 Stage A offline host probe on the WSL2 distro
 

@@ -4433,6 +4433,26 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   records the authorization; it grants no new execution, publication or
   merge authority. D93 and earlier entries are byte-untouched.
 
+- **D95 (2026-10-11) — Q3 register normalizations (annotations, never
+  rewrites).** The owner selected Q3 — the long-standing normalization
+  items. Delivered as FIVE append-only dated annotation blocks, one per
+  item, with unique non-colliding IDs in the fixed order A1/A2/B1/C1/D1:
+  ANNOT-Q3-001 (APR-121's alternate field labels), ANNOT-Q3-002 (APR-123's
+  same labels + lowercase Recorded at / by), ANNOT-Q3-003 (the six entries'
+  accepted `Scope allowed (selected policy):` form — APR-009, APR-105,
+  APR-113, APR-118, APR-121, APR-123), ANNOT-Q3-004 (APR-127's
+  SUPERSESSION event-type wording vs the preamble's four named types),
+  ANNOT-Q3-005 (the APR-100 quote divergence: the canonical 2026-09-28
+  instruction vs the newer owner blanket wording quoted in the merged
+  PR #724 body and D94 — both texts verbatim, recorded not judged). Every
+  annotation names its variant in plain words, quotes its binding source,
+  and states the original entry text is unchanged; NO new APR IDs (the
+  annotations grant nothing and are none of the four lifecycle-event
+  types). The register's B..H diff is additions only (+N/−0). Counts
+  UNCHANGED (SKILL-COUNT 205, FAMILY-COUNT 23). This entry records the
+  lane; it grants no new execution, publication or merge authority. D94 and
+  earlier entries are byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
