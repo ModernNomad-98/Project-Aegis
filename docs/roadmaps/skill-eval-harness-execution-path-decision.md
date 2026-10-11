@@ -84,10 +84,14 @@ refuse and close the request. The three options are sections 3, 4 and 5.
 **Boundary: this page is the presentation, not the decision.** It creates no
 grant, and no option below is authorized by anything written here.
 
-## 3. Option A — authorize the bounded Option 2 execution path now
+## 3. Option A — authorize preparing the bounded Option 2 execution path now
 
-Option A is **Option 2 of the request page, restated — nothing wider.** Its own
-scope table (request page L146-152) fixes the shape:
+Option A is **Option 2 of the request page, restated — nothing wider.** An
+Option A answer authorizes **preparing** that path — drafting the
+implementation proposal — and nothing further: the code, every provider/model
+call, the `gate-guard` exception and the cap numbers are separate owner actions
+(sections 3b, 3c and 8). Its own scope table (request page L146-152) fixes the
+shape:
 
 - Scope: "**One** skill (`scoped-approval-register`), **one run per case**, a stated case ceiling (recommend ≤12 cases)."
 - New code: "A live host adapter implementing the existing `HostAdapter` interface, and an assertion-judging path for generic `evals.json` assertions. Existing contracts, canonical hashing and evidence bundles are reused, never duplicated."
@@ -111,11 +115,12 @@ every live-dispatch path is disabled in WP-2B-1 (BER-DEC-006; 0 dispatches,
 0 live sessions, USD $0). Option A would build that seam; it cannot run on what
 ships today.
 
-### 3b. The two authorities Option A needs
+### 3b. The authorities and resolutions Option A needs
 
 The request page says a PR implementing Option 2 "needs **both** of these,
 recorded before the branch is cut" (L154-158). **Neither exists today**, and
-neither is covered by an existing grant:
+neither is covered by an existing grant; a third requirement the request page's
+two items do not cover is unresolved as well:
 
 1. **A new `gate-guard` exception.** The request page records it (L159-165):
 
@@ -174,6 +179,23 @@ neither is covered by an existing grant:
 
    So provider-call authority for Option A is a **new** owner decision. It must
    not be described as renewing, continuing or consuming any prior BER grant.
+
+3. **The first-live prerequisites those two items do not cover.** Items 1 and 2
+   are necessary but not sufficient for any run. Section 4 records that WP-2B-4
+   is **BLOCKED** and "NOT authorized by BER-DEC-007", unblocking only when R1
+   (a truthful activation-identifying mechanism, or an owner-approved bounded
+   claim), R2/OD-1 (measured calibration and OD-1 ratification through
+   WP-2B-3), R4 (per-tool-path confinement proven for the selected live host)
+   and R5 (execution-profile observability and isolation proven, or a narrower
+   owner-approved claim scope) are resolved, together with the separate
+   reviewed and merged WP-2B-4 authorization carrying a live-token budget, a
+   live external evidence root, evidence-handling and retention terms, and
+   live stop conditions (backlog L1239-1242, L1251-1269; L1270-1272). Before
+   any run, each of those must either be resolved or be covered by an explicit
+   bounded owner override recorded in that authorization. Absent those
+   resolutions or overrides, an Option A answer reaches non-live scaffolding
+   only: it authorizes **preparing** the path (section 8), and no run follows
+   from it.
 
 ### 3c. Costs and boundaries
 
@@ -245,7 +267,7 @@ That figure is time-scoped: it is keyed to the corpus as counted at ref
 unjudgeable-as-written candidates" (L84-86). It is **not** the current corpus.
 
 **Current figures at this page's pin (command census, re-run for this page).**
-See section 9 for the command and its exact output: **205** shipped skills,
+See section 9 for the command and the excerpt of its output: **205** shipped skills,
 **1,329** behavior cases (969 `should_trigger` + 360 `should_not_trigger`),
 1,133 discrimination cases, **2,462** authored single-prompt units, 30
 manual-only skills, 203 trigger-eval files, 4,192 assertions. The current
@@ -265,28 +287,48 @@ The request page states what refusal means (L196-200):
 > next round does not re-litigate it. WP-2B-4 and WP-2B-5 remain the designed
 > route for the automated form.
 
-Cost: zero. Benefit: a clean close on the record, with the manual procedure and
-the structural floor unchanged.
+Cost: no immediate spend and no new grant — but **not unconditionally zero**.
+Refusal explicitly retains the by-hand procedure quoted above, so future checks
+of this defect class keep consuming maintainer setup and execution time while the
+class stays unautomated; that ongoing maintenance and opportunity cost is real,
+and this page does not measure its size (**unknown**). Benefit: a clean close on
+the record, with the manual procedure and the structural floor unchanged.
 
 ## 6. The exact owner question (one, atomic)
 
-> Should the bounded Option 2 execution path (one skill, owner-set spend cap) be
-> authorized now, left deferred to WP-2B-4/WP-2B-5, or refused and closed?
+**Recommendation: Option B — defer to the designed WP-2B-4 → WP-2B-5 route.**
+It is the only one of the three that needs no new authority and no spend: it
+leaves the automated form to the route the backlog already designs and gates
+(section 4), keeps the manual procedure and the structural floor unchanged, and
+closes nothing that cannot be reopened. Option A cannot run on what ships today
+(3a); it needs two authorities that do not exist, an owner-set cap and a
+protected-path exception (3b), and it would still wait on the same unresolved
+first-live prerequisites (3b.3) — so an answer now buys preparation, not a run.
+Option C closes the request while the defect class stays unautomated and the
+by-hand cost in section 5 continues. **This recommendation is not authority and
+pre-answers nothing**: it names the best fit among the constraints recorded
+above, and the choice remains the owner's.
 
-The three answers correspond to sections 3 (authorize), 4 (defer) and 5 (refuse
-and close), in that order. **This page does not mark one as recommended**: the
-coordinator's one-question convention — session record L120, "**One question at a
-time**, waiting for the answer, with the recommendation **first** among the
-choices" — belongs to the coordinator's presentation of this packet, and nothing
-above or below pre-answers the question.
+> Should the bounded Option 2 execution path (one skill, owner-set spend cap) be
+> authorized now — where an Option A answer authorizes preparing that path only
+> — left deferred to WP-2B-4/WP-2B-5, or refused and closed?
+
+The three answers correspond to sections 3 (authorize preparing), 4 (defer) and
+5 (refuse and close), in that order. The recommendation sits first, in the
+packet, per the owner's one-question convention — session record L120, "**One
+question at a time**, waiting for the answer, with the recommendation **first**
+among the choices" — so it no longer depends on a later coordinator
+presentation. Beyond that recommendation, nothing above or below pre-answers
+the question.
 
 ## 7. Evidence each option needs
 
-- **Option A (authorize):** the owner's cap numbers (per-case and total call
-  ceiling, token or dollar ceiling, stop condition) plus both authorities in
-  3b, recorded as a new `AEGIS-APR` entry and a `BER-DEC` entry carrying the
-  exact wording and scope (request page L173-175). The implementation PR, the
-  protected-path exception and any provider call remain separately gated.
+- **Option A (authorize preparing):** the owner's cap numbers (per-case and
+  total call ceiling, token or dollar ceiling, stop condition) plus both
+  authorities in 3b and the resolutions or bounded overrides in 3b.3, recorded
+  as a new `AEGIS-APR` entry and a `BER-DEC` entry carrying the exact wording
+  and scope (request page L173-175). The implementation PR, the protected-path
+  exception and any provider call remain separately gated.
 - **Option B (defer):** nothing. The status quo needs no new evidence; the
   backlog rows in section 4 are the current state.
 - **Option C (refuse and close):** nothing. Refusal is self-contained (request
@@ -294,10 +336,12 @@ above or below pre-answers the question.
 
 ## 8. What an answer does and does not authorize
 
-- **An Option A answer authorizes only drafting the implementation PR.** The
-  code itself, every provider/model call, and the `gate-guard` exception are
-  each separate owner actions. No spend begins without the cap numbers; no
-  merge is implied.
+- **An Option A answer authorizes only preparing the implementation PR** — the
+  bounded Option 2 path is prepared, not run. The code itself, every
+  provider/model call, the `gate-guard` exception and the cap numbers are each
+  separate owner actions, and no run follows while the first-live prerequisites
+  in 3b.3 remain unresolved. No spend begins without the cap numbers; no merge
+  is implied.
 - **An Option B or Option C answer authorizes no work at all.** Deferral leaves
   the WP-2B-4/5 route exactly as it stands; refusal closes the request with the
   manual procedure and the structural floor intact.
@@ -310,13 +354,18 @@ above or below pre-answers the question.
 
 **Pinned ref.** This page was prepared and every quoted line read at
 `279338a938168843fabebff12acd30359a0fc414` (= `origin/main` at
-2026-10-11 15:58 -07:00; tree `dc3ac8470378be65fd647ba7e6376bc0e9be9f72`) in a
-clone created for this deliverable. `AEGIS-APR-047`'s and `AEGIS-APR-128`'s
+2026-10-11 15:38 -07:00, inside this page's recorded 15:38:47 finish minute;
+tree `dc3ac8470378be65fd647ba7e6376bc0e9be9f72`) in a clone created for this
+deliverable. `AEGIS-APR-047`'s and `AEGIS-APR-128`'s
 line numbers above are from that ref; register, backlog, request-page, procedure
 and evidence line numbers are all read at the same ref.
 
-**Command census (this page's own run, at the pinned ref).** Run in the clone at
-that ref:
+**Command census (this page's own run, at the pinned ref) — a relevant excerpt,
+not an exact transcript.** Run in the clone at that ref; the block below keeps
+the command line and the fields this page relies on, replaces the rest of the
+canonical JSON with ellipses, and appends the process exit status on its own
+`exit 0` line — that last line is the status this page observed, not output the
+command printed:
 
 ```text
 $ python -B -m tools.behavioral_eval_runner census --repo . --ref 279338a938168843fabebff12acd30359a0fc414 --canonical
@@ -328,8 +377,8 @@ exit 0
 The same run's per-skill line for this option's one skill reads
 `"assertions":35,"behavior_cases":12,"discrimination_cases":5`, `"skill":"scoped-approval-register"`.
 
-**The stale-baseline observation (O1, with the exit code this run printed).**
-The same command with `--verify-baseline` prints:
+**The pinned-historical-baseline observation (O1, with the exit code this run
+printed).** The same command with `--verify-baseline` prints:
 
 ```text
 $ python -B -m tools.behavioral_eval_runner census --repo . --ref 279338a938168843fabebff12acd30359a0fc414 --canonical --verify-baseline
@@ -346,18 +395,31 @@ rev2 audit flagged that digit — and the code path is visible at this ref:
 `tools/behavioral_eval_runner/cli.py` L1403-1408 catches `RunnerError` (the
 parent of `CensusBaselineMismatchError`) and returns 2, and
 `tools/behavioral_eval_runner/__main__.py` L6 raises `SystemExit(main())`. The
-substantive observation stands: the `EXPECTED_PINNED_BASELINE` constant in
-`tools/behavioral_eval_runner/census.py` (L154-162) is stale at this ref —
-expects 184 shipped skills / 184 behavior eval files / 882 behavior cases / 181
-trigger-eval files / 858 discrimination cases / 1,740 authored units / 1
-conversation suite / 1,741 potential units, against the actuals above. **No
-figure in this page is taken from that constant.** The 1,740 figure also appears
-in WP-2B-5's own text as "the design-time count at `e2f1da0`" (L1321-1326); it
-is not a current count.
+observation stands, with its semantics corrected: the `EXPECTED_PINNED_BASELINE`
+constant in `tools/behavioral_eval_runner/census.py` (L154-162) is **not** a
+current-count assertion and is **not stale** — it is the deliberately pinned
+historical baseline, and its own comment fixes its only consumer: "Expected
+pinned baseline (prompt Phase 8). Consumed ONLY by verify_expected_baseline —
+never by census computation." (L152-153). The BER README documents the flag the
+same way: `--verify-baseline` "checks one pinned historical census (882
+behavioral cases and 858 trigger cases), counted from commit `e2f1da0` and set
+on 2026-08-13 in commit `72e74af`. A later revision may legitimately have
+different counts." (README L84-88). Running that check against this page's
+current ref therefore **fails by design** — it compares today's corpus with the
+historical pin, and the mismatch above is the expected outcome of that
+comparison, not evidence that the constant is stale. The pin holds 184 shipped
+skills / 184 behavior eval files / 882 behavior cases / 181 trigger-eval files /
+858 discrimination cases / 1,740 authored units / 1 conversation suite / 1,741
+potential units, against the actuals above; the check belongs to the historical
+revision `e2f1da0`, and this page does not run it there. **No figure in this
+page is taken from that constant.** The 1,740 figure also appears in WP-2B-5's
+own text as "the design-time count at `e2f1da0`" (L1321-1326); it is not a
+current count.
 
 **Boundaries this page does not cross.**
 
-- **Not in the register's open table.** The register
+- **Not in the register's open table, and not published as an actionable open
+  choice.** The register
   `docs/roadmaps/aegis-open-decisions-2026-09-23.md` lists five open items in
   its "Still open for the owner" table (L229-235): Issue #101 Stage 4B host
   proof; CP-WP-003 and CP-WP-004; private BER candidate labels; the disposable
@@ -367,6 +429,12 @@ is not a current count.
   can start. Listing an item here grants nothing." This page therefore does not
   claim register authority it does not have; adding a row there would be a
   register edit needing its own owner grant, and this page does not make it.
+  Until that row exists in the canonical table, a coordinator enumerating
+  pending owner choices from it will not find this decision: this page presents
+  the choice for the owner and **does not publish it as an actionable open
+  item** in that index. Registering it there — the only step that makes the
+  choice enumerable from the canonical set — remains owed to a separately
+  governed register edit, and this page neither performs nor pre-claims it.
 - **Record gap on an owner answer.** A new `AEGIS-APR` entry and `BER-DEC`
   entry for an Option A grant are approval-register and backlog edits requiring
   their own grants at that time (request page L173-175).
@@ -379,11 +447,12 @@ is not a current count.
 current counts): "1,265" appears in this page only as the request page's dated
 2026-10-01 clarification with its 1,268-at-`68b5e7e5` basis (section 4a); the
 current corpus figures are the command-run census output above; no figure is
-taken from the stale `EXPECTED_PINNED_BASELINE` constant. Item 12 (Option 1
-recorded as delivered, not re-offered): section 1 states the 2026-09-30
-selection and its delivery (#564/#568/#570; corrections #612/#616/#618; the
-post-run finding fixed in #585), and every "Option 1" occurrence in this page is
-that delivery record — the only choice presented is section 6's open one.
+taken from the pinned historical `EXPECTED_PINNED_BASELINE` constant. Item 12
+(Option 1 recorded as delivered, not re-offered): section 1 states the
+2026-09-30 selection and its delivery (#564/#568/#570; corrections
+#612/#616/#618; the post-run finding fixed in #585), and every "Option 1"
+occurrence in this page is that delivery record — the only choice presented is
+section 6's open one.
 
 ### Item timing (owner rule)
 
