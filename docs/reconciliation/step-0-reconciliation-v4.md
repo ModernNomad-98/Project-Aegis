@@ -4471,6 +4471,27 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   grants no new execution, publication or merge authority. D95 and earlier
   entries are byte-untouched.
 
+- **D97 (2026-10-11) — Q5 issue #101 status reconciliation.** The owner
+  selected Q5 ("start on all these"; APR-100 blanket applies). The
+  reconciliation is a dated section appended under the plan doc's own
+  "Dated product decisions" convention
+  (`docs/roadmaps/aegis-setup-routing-plan.md`, additions only): packages
+  1–3 delivered and unchanged (PRs #109/#124/#121); package 4 preparation
+  delivered synthetic-only (PRs #271/#286/#281/#319/#329/#335 with
+  APR-031/036/040 lifecycle — every fixture case NOT RUN); package 4 live
+  evaluation NOT started (the issue's sentence quoted: "Live evaluations
+  require explicit inputs, authority, and spending limits"); packages 5/6
+  conditional, package 7 pending; no changed decisions; the four
+  next-step decision pointers stated, never started; the BER live-dispatch
+  gates intact (NON-LIVE, OD-1-gated, unchanged). The same dated section
+  is appended to issue #101's body via the gh API AFTER this PR merges
+  (the post-merge follow-through, with the byte-preservation proof:
+  the original body is a verbatim prefix of the new body). The lane closes
+  nothing and grants nothing. Counts UNCHANGED (SKILL-COUNT 205,
+  FAMILY-COUNT 23). This entry records the lane; it grants no new
+  execution, publication or merge authority. D96 and earlier entries are
+  byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

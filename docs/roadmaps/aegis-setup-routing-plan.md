@@ -68,6 +68,44 @@ or package-4 comparison is authorized or completed.
 | 2026-09-23, this package 1 design | Keep the baseline usable without an add-on; use a single advisory contract and separate setup/host/adapter responsibilities | Proposed implementation architecture, subject to review and package 2/3 authority |
 | 2026-09-25, owner reply to the package-4 host-path question | Use the recommended separate SDK managed Windows session for the first offline prototype | Planning direction at the time; bounded Stage 4A implementation was later granted by APR-031, while Stage 4B host execution remains separately gated |
 
+### Status — reconciled 2026-10-11 (issue #101, D97)
+
+**Packages 1–3 — delivered and unchanged.** PRs #109
+(planning/screening), #124 (manual four-choice conversation + Windows
+PowerShell Aegis-only saved selection) and #121 (offline advisory contract +
+fake adapter) remain the delivered record; the `aegis-setup` *(manual-only)*
+skill and `tools/aegis_setup` ship at the base (this page, L3–27).
+
+**Package 4 preparation — delivered, synthetic-only.** Stage 4A archive
+review + bounded-scope proposal (PR #271); Stage 4B host-proof decision
+packet (PR #286); the APR-031 bounded offline bridge (PR #281, merged
+`ea40ab48`); APR-036 completion; the request-ID binding v2 (PR #319,
+APR-040 consumed); the source-only preflight (PR #329); and the invented
+fixture prompts 01–08 (PR #335) — **every fixture case NOT RUN** (synthetic
+construction only).
+
+**Package 4 live evaluation — NOT started.** The issue's own sentence is
+quoted: "Live evaluations require explicit inputs, authority, and spending
+limits". None of those exist, and this record supplies none: no provider
+call, no model install, no new grant.
+
+**Packages 5/6 — conditional** on package 4's selection; **package 7 —
+pending** (waits on 5/6).
+
+**Changed decisions — none.** The four user-facing choices, the agreed
+Laya/Decider-0.8B shortlist with OpenJev optional, and the CPU-first
+constraint are all unchanged at the current repository; the table above
+stands as written.
+
+**Next-step decision pointers (stated, never started):** (1) package 4's
+comparative evaluation + selection gate needs a separate owner decision
+with explicit inputs, authority, and spending limits; (2) the BER
+live-dispatch gates remain intact — the runner is NON-LIVE
+(`LIVE_DISPATCH_DISABLED`) and runner-side live dispatch stays
+OD-1-gated, unchanged by this record; (3) packages 5/6 wait on package 4's
+selection; (4) package 7 waits on 5/6. **This record closes nothing and
+grants nothing** (D97, 2026-10-11).
+
 ## Historical source snapshot and design forces
 
 This is the package-1 snapshot, inspected at public `main` after
