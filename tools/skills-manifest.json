@@ -1,0 +1,1032 @@
+{
+  "schema": "aegis.skills-manifest/1",
+  "source_revision": "bd5d2ff52f063b8854b39e4f216ddbf8aff60530",
+  "hash_input": "SKILL.md bytes, CRLF->LF normalized",
+  "skills": [
+    {
+      "name": "ab-test-designer",
+      "path": ".claude/skills/ab-test-designer/SKILL.md",
+      "sha256": "6604b6da14a0de631250d2e9ddaf5be48af94786710ef7e80270b8083f2be160"
+    },
+    {
+      "name": "acceptance-criteria-reviewer",
+      "path": ".claude/skills/acceptance-criteria-reviewer/SKILL.md",
+      "sha256": "c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021"
+    },
+    {
+      "name": "accessibility-test-harness",
+      "path": ".claude/skills/accessibility-test-harness/SKILL.md",
+      "sha256": "f8d9946dc7bb280d0c7f8f9fa656ebcfdc6ca97646b68455065e474455fdc87a"
+    },
+    {
+      "name": "admin-console-architect",
+      "path": ".claude/skills/admin-console-architect/SKILL.md",
+      "sha256": "c0125b99d4d38136c782e16bac0ee550011c952015e77bbc15243f7c8dc30537"
+    },
+    {
+      "name": "adr-sequencer",
+      "path": ".claude/skills/adr-sequencer/SKILL.md",
+      "sha256": "91def952925e919a2df563dd29e5cf79841a6c71b6ad0ec4da324d6d1a1b8f24"
+    },
+    {
+      "name": "adr-writer",
+      "path": ".claude/skills/adr-writer/SKILL.md",
+      "sha256": "684bf2b7535f7c19b557728b69491dcddb090eec7e8654b9b9567001f63ed3d4"
+    },
+    {
+      "name": "aegis-setup",
+      "path": ".claude/skills/aegis-setup/SKILL.md",
+      "sha256": "d82bbbfca59944f6eb04cd9ab2127e89c67e6a59d58902d518a6c7f5c8a84f13"
+    },
+    {
+      "name": "agent-authorization-matrix",
+      "path": ".claude/skills/agent-authorization-matrix/SKILL.md",
+      "sha256": "7acb3f2385cd5b27c48ed1335ffb81f2a1b83caac270781a7f6a22b2095fea31"
+    },
+    {
+      "name": "agent-containment-reviewer",
+      "path": ".claude/skills/agent-containment-reviewer/SKILL.md",
+      "sha256": "dc7b8db1a0a04ceb403a12f06aed52e45569e19fc43fcae4ee676311890955b8"
+    },
+    {
+      "name": "agent-failure-recovery",
+      "path": ".claude/skills/agent-failure-recovery/SKILL.md",
+      "sha256": "1a11951e3326f28b4e1c4a1511658b928dbaf88855b96a19d480946eeb1bffe1"
+    },
+    {
+      "name": "agent-goal-hijack-defender",
+      "path": ".claude/skills/agent-goal-hijack-defender/SKILL.md",
+      "sha256": "df02d88e72e4458c32518a6c0135410a6bbf1a00c0d4f8029cae97c873761d61"
+    },
+    {
+      "name": "agent-governance-audit",
+      "path": ".claude/skills/agent-governance-audit/SKILL.md",
+      "sha256": "3dc82bb5177f326bbb6dedc76129783bb29f841cb773fe4474996acc5212ea27"
+    },
+    {
+      "name": "agent-harness-architect",
+      "path": ".claude/skills/agent-harness-architect/SKILL.md",
+      "sha256": "61350a042d0ad1a223359317afd2b6265ebccf05e86634998da4d20f7512252f"
+    },
+    {
+      "name": "agent-identity-privilege-reviewer",
+      "path": ".claude/skills/agent-identity-privilege-reviewer/SKILL.md",
+      "sha256": "a61d43550e59a3763ca4a1cda36d85a7a05da7d474638cac20b1c77812075b10"
+    },
+    {
+      "name": "agent-instruction-consolidator",
+      "path": ".claude/skills/agent-instruction-consolidator/SKILL.md",
+      "sha256": "f8ae697f980201ef1bea6e856ea6d8e59a42b75ac0847300d001aedbd99518bc"
+    },
+    {
+      "name": "agent-memory-governance",
+      "path": ".claude/skills/agent-memory-governance/SKILL.md",
+      "sha256": "37c218101ed5b7340585c11c9b08777fe46fba457c26c97a9a9cd89b29df1a4f"
+    },
+    {
+      "name": "agent-startup-context-gate",
+      "path": ".claude/skills/agent-startup-context-gate/SKILL.md",
+      "sha256": "bb26064ce14dac0ea76b983eb05c83bfe809a720f9b01913f4d7a842942a4d42"
+    },
+    {
+      "name": "agent-tool-safety-guard",
+      "path": ".claude/skills/agent-tool-safety-guard/SKILL.md",
+      "sha256": "d183fe5f3c2f336984e1e99cc4be685ea1db10064761fed90dce8b45e18407df"
+    },
+    {
+      "name": "agentic-loop-designer",
+      "path": ".claude/skills/agentic-loop-designer/SKILL.md",
+      "sha256": "d8948d7bcc1e5feea62227eb922956e7b883c83d9e85d208cbdab384bd70e962"
+    },
+    {
+      "name": "ai-closeout-reporter",
+      "path": ".claude/skills/ai-closeout-reporter/SKILL.md",
+      "sha256": "8c57b3607de52ffaa30beafcb1ff0c187cac48d85339f8c8b3abcc6c60279329"
+    },
+    {
+      "name": "ai-cost-guardrail-designer",
+      "path": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
+      "sha256": "611c5baefabfa8de7ca5f5e992df8b945e15600e22c43c9348053d6b99b1af12"
+    },
+    {
+      "name": "ai-evaluation-harness",
+      "path": ".claude/skills/ai-evaluation-harness/SKILL.md",
+      "sha256": "d40b75c92b9035fdd835502bfebfaca80da82203da45b5c989c0f98053bb23c5"
+    },
+    {
+      "name": "ai-governance-risk-reviewer",
+      "path": ".claude/skills/ai-governance-risk-reviewer/SKILL.md",
+      "sha256": "05de22cee2839bc71e891070887ffb076f90c52b70cb299eea1c1132c9885b1f"
+    },
+    {
+      "name": "ai-human-in-the-loop-designer",
+      "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
+      "sha256": "b2ea03710a8628bff99511627ef58e52851c70f67dc8262b6ec11a8e0751d6fc"
+    },
+    {
+      "name": "ai-lifecycle-risk-manager",
+      "path": ".claude/skills/ai-lifecycle-risk-manager/SKILL.md",
+      "sha256": "7e71215f4fae67d25e2081100230b2d0dc88c6a45966bf19218e5d2c8c13175a"
+    },
+    {
+      "name": "ai-misinformation-guard",
+      "path": ".claude/skills/ai-misinformation-guard/SKILL.md",
+      "sha256": "415724cddeb4dda7078f1c55a3f001d3d4a55c9df5fe461e321db84bbd12fb9b"
+    },
+    {
+      "name": "ai-router-architect",
+      "path": ".claude/skills/ai-router-architect/SKILL.md",
+      "sha256": "6b3a9c8a3ca0da9d961f3e2225bf006ef27ee92b6215e6d49ba6adcbfe809a73"
+    },
+    {
+      "name": "ai-sdlc-operating-model",
+      "path": ".claude/skills/ai-sdlc-operating-model/SKILL.md",
+      "sha256": "604e4d5aee14a88ec124a369fd4f7600d049e42bfef49f780cf858086426682e"
+    },
+    {
+      "name": "ai-task-decomposer",
+      "path": ".claude/skills/ai-task-decomposer/SKILL.md",
+      "sha256": "16c34764aa3a466a49118c7953170057722c3fb0751521f0ab3942a74027722e"
+    },
+    {
+      "name": "ai-threat-modeler",
+      "path": ".claude/skills/ai-threat-modeler/SKILL.md",
+      "sha256": "baef0709098bbb0a4292290ffae298c02db0d972aee7ae9d086276b1858b80a0"
+    },
+    {
+      "name": "api-contract-test-designer",
+      "path": ".claude/skills/api-contract-test-designer/SKILL.md",
+      "sha256": "bd5b9b9fb47e0e5ae0f01c09c05f49aa905d0d1afc9008d5cf58b4e67a64ac5e"
+    },
+    {
+      "name": "api-doc-generator-designer",
+      "path": ".claude/skills/api-doc-generator-designer/SKILL.md",
+      "sha256": "58eac2ed6db4dd10c30dfe90c702285ce660361054ebe389bebfa30d8273e8ab"
+    },
+    {
+      "name": "api-event-architect",
+      "path": ".claude/skills/api-event-architect/SKILL.md",
+      "sha256": "349edde4f7cba33ab56b8627c9cbd3f31640d5ddfb92395609b7906b4eb8abe7"
+    },
+    {
+      "name": "appsec-implementer",
+      "path": ".claude/skills/appsec-implementer/SKILL.md",
+      "sha256": "19ae5c576a452cc29613c15a83a5f1ac52f6d5a25c22fe955c10a1cd2ddd4297"
+    },
+    {
+      "name": "architecture-advisor",
+      "path": ".claude/skills/architecture-advisor/SKILL.md",
+      "sha256": "eebdca170aeb00e25ac2c9967db041da144258a8006717d665fc68c91533c68d"
+    },
+    {
+      "name": "architecture-designer",
+      "path": ".claude/skills/architecture-designer/SKILL.md",
+      "sha256": "a6f56df1da1ed960d057290c905766fcd1a8266cd7cb13a0185d095ab342ec33"
+    },
+    {
+      "name": "audit-log-architect",
+      "path": ".claude/skills/audit-log-architect/SKILL.md",
+      "sha256": "0b7a536aff1319bae4100fee8adab301f1d326e5e122db3fc7f35aac469415b2"
+    },
+    {
+      "name": "authority-invalidation-architect",
+      "path": ".claude/skills/authority-invalidation-architect/SKILL.md",
+      "sha256": "371c8ac3d3ce2ab2e95c4d35db409568a604ec65480c6a3c311232cfbabdb22f"
+    },
+    {
+      "name": "authorization-matrix-designer",
+      "path": ".claude/skills/authorization-matrix-designer/SKILL.md",
+      "sha256": "ebde96937bf70935ca8d42650a5c54d36a3fd230fd5784cd34d4bc7bc6dee76e"
+    },
+    {
+      "name": "aws-saas-architect",
+      "path": ".claude/skills/aws-saas-architect/SKILL.md",
+      "sha256": "324d5b289b6b103638fb82d9f6365a3b1d7e670c4b36ecdc8a86c0e955751445"
+    },
+    {
+      "name": "azure-saas-architect",
+      "path": ".claude/skills/azure-saas-architect/SKILL.md",
+      "sha256": "72f0bfde0e9da93dc42a3fa4e925d72ec5d0d1a9e32755f66a0dd681da14d455"
+    },
+    {
+      "name": "background-job-orchestration-architect",
+      "path": ".claude/skills/background-job-orchestration-architect/SKILL.md",
+      "sha256": "ff08383df882175ef963115a5675ff91564e54055ea72caab7d2f0555b630fff"
+    },
+    {
+      "name": "caching-strategy-designer",
+      "path": ".claude/skills/caching-strategy-designer/SKILL.md",
+      "sha256": "91fe036080607a22772fc50bc21a77c75fd88d23bb2a580fba12b40350db5a88"
+    },
+    {
+      "name": "cell-based-architecture-designer",
+      "path": ".claude/skills/cell-based-architecture-designer/SKILL.md",
+      "sha256": "8326a9f45d47764a7cd80a6031d5de70d84387e10754a784b2918ed37a67b7ec"
+    },
+    {
+      "name": "change-classification-gate",
+      "path": ".claude/skills/change-classification-gate/SKILL.md",
+      "sha256": "08d91a834460beebc9c66fa896b8b422f064bf1d7524f6e5b1512cda3afdc996"
+    },
+    {
+      "name": "chat-backlog-reconciliation",
+      "path": ".claude/skills/chat-backlog-reconciliation/SKILL.md",
+      "sha256": "f3d1900af13cc427f9f3730b84f829b11dc9d9a9217be210c42c753d0eb9d2de"
+    },
+    {
+      "name": "ci-failure-classifier",
+      "path": ".claude/skills/ci-failure-classifier/SKILL.md",
+      "sha256": "6ae34fa358ddece480e2e72b6de6e9965d269aa0dd5daab7ae55a9a946232ce7"
+    },
+    {
+      "name": "ci-pipeline-architect",
+      "path": ".claude/skills/ci-pipeline-architect/SKILL.md",
+      "sha256": "80f63bcf6dce0a895ce29f191051d867886df92091d41d5f2e0ec99feb25b07e"
+    },
+    {
+      "name": "clickthrough-test-engineer",
+      "path": ".claude/skills/clickthrough-test-engineer/SKILL.md",
+      "sha256": "00bb2e6ebaa759e0015ae6920439f2955df983569a38b0625ab68072ac8ea29c"
+    },
+    {
+      "name": "cloud-architecture-decider",
+      "path": ".claude/skills/cloud-architecture-decider/SKILL.md",
+      "sha256": "76a3c4da1d6a339b2939caa399f985a8a18fc03382bc0c456e0a7069cb2b0662"
+    },
+    {
+      "name": "cloud-security-baseline-reviewer",
+      "path": ".claude/skills/cloud-security-baseline-reviewer/SKILL.md",
+      "sha256": "ee4b354e73f23b8e7da0f20964f70fcb147f3954601a3a95e7afc652c72c4b10"
+    },
+    {
+      "name": "code-reviewer",
+      "path": ".claude/skills/code-reviewer/SKILL.md",
+      "sha256": "6238b67b7b90fcbb26fcc45300562efa9e290a9d3870548e37bedaabbc76449a"
+    },
+    {
+      "name": "code-simplifier",
+      "path": ".claude/skills/code-simplifier/SKILL.md",
+      "sha256": "d409ffcb8c93514f7e16c3b22734609c5ee28b32db29f85fee2ae441b35f52b3"
+    },
+    {
+      "name": "command-gateway-architect",
+      "path": ".claude/skills/command-gateway-architect/SKILL.md",
+      "sha256": "4b32c53f1abb738b004c04e93c3b60810f795535277f7f87cc735783f7a82933"
+    },
+    {
+      "name": "compliance-control-foundation",
+      "path": ".claude/skills/compliance-control-foundation/SKILL.md",
+      "sha256": "ff7badaa9b47710924c706f3661664bfdf7de43454cdfb7ca3b40e6afd73eca8"
+    },
+    {
+      "name": "compliance-evidence-collector",
+      "path": ".claude/skills/compliance-evidence-collector/SKILL.md",
+      "sha256": "382e8f1ce569832854f388161e6e4cb0fb4faa197573dec14f8fd8aa332c9e24"
+    },
+    {
+      "name": "compliance-gap-auditor",
+      "path": ".claude/skills/compliance-gap-auditor/SKILL.md",
+      "sha256": "3cd11c8c2c88cb53747bfc317785edcb53b75d285d3ee1abe65948f94fedcad3"
+    },
+    {
+      "name": "context-co-update-ci-gate",
+      "path": ".claude/skills/context-co-update-ci-gate/SKILL.md",
+      "sha256": "688393a38ef9e40302400285253e40da9ff1e7607c7782f0fa8e1bce70720c50"
+    },
+    {
+      "name": "contribution-guide-author",
+      "path": ".claude/skills/contribution-guide-author/SKILL.md",
+      "sha256": "16e5dd3740231db9ab84956e830012dfcc110d8f3bc4dc6d273d593c9ae6c0c3"
+    },
+    {
+      "name": "cross-team-dependency-negotiator",
+      "path": ".claude/skills/cross-team-dependency-negotiator/SKILL.md",
+      "sha256": "f0d4bb2882d90f34ed175d84ca7e48c1513d73bef50ec3870cad9f5b68ea6876"
+    },
+    {
+      "name": "dast-safety-harness-designer",
+      "path": ".claude/skills/dast-safety-harness-designer/SKILL.md",
+      "sha256": "101a3aa592bc0e1b1331ca92cecc07b5a5b404d0a37b04e2a9d70d4674098741"
+    },
+    {
+      "name": "data-migration-runbook-author",
+      "path": ".claude/skills/data-migration-runbook-author/SKILL.md",
+      "sha256": "928f9559b9d6a1ed8e78011e92a003f64d3cb67df104f60307837ea151e37985"
+    },
+    {
+      "name": "data-partitioning-sharding-strategist",
+      "path": ".claude/skills/data-partitioning-sharding-strategist/SKILL.md",
+      "sha256": "9052e954c1054d19ce7d47a563e2480e7dc23fa685f6cf6ab00ed8d5f020e669"
+    },
+    {
+      "name": "data-quality-monitor-designer",
+      "path": ".claude/skills/data-quality-monitor-designer/SKILL.md",
+      "sha256": "c698875f059be8befb696c3a37f2e3bad78554ea787d3a8f57c095e409f159b6"
+    },
+    {
+      "name": "database-backup-verifier",
+      "path": ".claude/skills/database-backup-verifier/SKILL.md",
+      "sha256": "44233bbb9d3db3f2e70e8788b7e32d9dca2029ad602a645e5304ff3d55f82773"
+    },
+    {
+      "name": "design-review-facilitator",
+      "path": ".claude/skills/design-review-facilitator/SKILL.md",
+      "sha256": "ececc41b0c3963130a8d7f283598978db0c87eb135f068915645450612aefaa1"
+    },
+    {
+      "name": "diataxis-doc-organizer",
+      "path": ".claude/skills/diataxis-doc-organizer/SKILL.md",
+      "sha256": "a38cc95779d1821843055f326305c798cab8a025a2498053fb731c129fea08cd"
+    },
+    {
+      "name": "docs-as-code-architect",
+      "path": ".claude/skills/docs-as-code-architect/SKILL.md",
+      "sha256": "d6cafdb7bbdbe95704f426b4eb2dea3fdbcf7d03fffafe6572931a8050ffab65"
+    },
+    {
+      "name": "docs-first-implementer",
+      "path": ".claude/skills/docs-first-implementer/SKILL.md",
+      "sha256": "bffeb0b5c5a5c3fae9fd3b52838d604c31950b857ad62aff27577f9851b5b40e"
+    },
+    {
+      "name": "docs-retention-index",
+      "path": ".claude/skills/docs-retention-index/SKILL.md",
+      "sha256": "141b7036469f9f99ef6b8e152299619a6d0ab572656a5ba307062551d311d8a5"
+    },
+    {
+      "name": "domain-modeler",
+      "path": ".claude/skills/domain-modeler/SKILL.md",
+      "sha256": "4001c1edff7ed32025f31e4d69c656ad2610a2fd0a12aade2fb25adc49e09c37"
+    },
+    {
+      "name": "edge-state-ux-designer",
+      "path": ".claude/skills/edge-state-ux-designer/SKILL.md",
+      "sha256": "cf72fe022a5769be8a8842e369d2177d0227ef5f084d4182425b331e4ea04abd"
+    },
+    {
+      "name": "environment-parity-reviewer",
+      "path": ".claude/skills/environment-parity-reviewer/SKILL.md",
+      "sha256": "65f6c6640faa103540742674adaf95d7bff178d25a0314269b2e6d3f22d37731"
+    },
+    {
+      "name": "error-handling-security-reviewer",
+      "path": ".claude/skills/error-handling-security-reviewer/SKILL.md",
+      "sha256": "2e79f11f2f4ccbd7afdb4ba57ba9c72bfa2cb35a4c46f75bc3cd2020d0987ab5"
+    },
+    {
+      "name": "error-taxonomy-designer",
+      "path": ".claude/skills/error-taxonomy-designer/SKILL.md",
+      "sha256": "83649145b4931d6617edd8ecafdd89ad15a5f5391301251bb98fdd9aff83dbb4"
+    },
+    {
+      "name": "eval-runner-designer",
+      "path": ".claude/skills/eval-runner-designer/SKILL.md",
+      "sha256": "10ecf2232fbbe77a4ed37fb525f720686e0fbc3ff0fe2ea2fa9d5aa07bb3a6c7"
+    },
+    {
+      "name": "event-schema-architect",
+      "path": ".claude/skills/event-schema-architect/SKILL.md",
+      "sha256": "5939f336b46e4dd19da60677f9fffa9784ac9b225b89821fe377dd381fbb4359"
+    },
+    {
+      "name": "exploratory-charter-designer",
+      "path": ".claude/skills/exploratory-charter-designer/SKILL.md",
+      "sha256": "82418000c1b44f1079a16fe9a1036a3d7e17ae7aa4a8f8d0cfdb491407cc4946"
+    },
+    {
+      "name": "feature-flag-architect",
+      "path": ".claude/skills/feature-flag-architect/SKILL.md",
+      "sha256": "4d625cd0a07f98025702ce354e16d78e48ec68d435e46ce7a641e465622b8551"
+    },
+    {
+      "name": "feature-flag-rollout-strategist",
+      "path": ".claude/skills/feature-flag-rollout-strategist/SKILL.md",
+      "sha256": "9f0f156a47158a49eea0841d19d006a0ab2a58be175d7b286fbfb9ead5ea40ae"
+    },
+    {
+      "name": "file-upload-storage-architect",
+      "path": ".claude/skills/file-upload-storage-architect/SKILL.md",
+      "sha256": "eff3900cdb85273be6463e4d716b2bf58fe1f0c84afdfc3a60e30a094c277810"
+    },
+    {
+      "name": "flaky-test-detective",
+      "path": ".claude/skills/flaky-test-detective/SKILL.md",
+      "sha256": "377028a6ad5ab440ea37def3b3bba82bce6f1b8eacaa14ec23ed3e32fc244ffe"
+    },
+    {
+      "name": "framework-edition-tracker",
+      "path": ".claude/skills/framework-edition-tracker/SKILL.md",
+      "sha256": "3797e71dfe3469f4582dd3fd3aacc465cbb08c15a953c9e19bb135819d2e6821"
+    },
+    {
+      "name": "framework-mapping-refresher",
+      "path": ".claude/skills/framework-mapping-refresher/SKILL.md",
+      "sha256": "66c157e5a3a3ecd0bcdddfd249cf836cdfa9ca206de8b375a335227617dcb434"
+    },
+    {
+      "name": "frontend-perf-engineer",
+      "path": ".claude/skills/frontend-perf-engineer/SKILL.md",
+      "sha256": "4e5722a8989a334779d66a67385d539b6fecc69b31eebf243750b2c1c3c2189d"
+    },
+    {
+      "name": "full-codebase-auditor",
+      "path": ".claude/skills/full-codebase-auditor/SKILL.md",
+      "sha256": "aac136045ba0c690838a8620eac682ee20bdb79b18db5f0e5c93bc5b7ee17426"
+    },
+    {
+      "name": "funnel-definition-designer",
+      "path": ".claude/skills/funnel-definition-designer/SKILL.md",
+      "sha256": "414c59f192300353cc2bc7f1f237816f411ef9aa1ae6ce5b5fd41a8337ec6ae7"
+    },
+    {
+      "name": "gated-deployment-prompt-template",
+      "path": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
+      "sha256": "889a423e25311af494cbb5ecaaec2d091d9bde0f09128bec80b9f02c834388d2"
+    },
+    {
+      "name": "hidden-context-exposure-reviewer",
+      "path": ".claude/skills/hidden-context-exposure-reviewer/SKILL.md",
+      "sha256": "036c619f92365af2fe44d6efa93c34f06d7fe530806450812e2f8fd3a2b3edcc"
+    },
+    {
+      "name": "horizontal-scalability-reviewer",
+      "path": ".claude/skills/horizontal-scalability-reviewer/SKILL.md",
+      "sha256": "9b1870cef2948d0f0efe7b97c1eff94f4708d23718113d5aad1110a6e8bde793"
+    },
+    {
+      "name": "human-agent-trust-reviewer",
+      "path": ".claude/skills/human-agent-trust-reviewer/SKILL.md",
+      "sha256": "77489e4579e72ed32000b6974b9abef63d800e6748cd0573eaa2288876214826"
+    },
+    {
+      "name": "human-approval-boundary",
+      "path": ".claude/skills/human-approval-boundary/SKILL.md",
+      "sha256": "2a81404fb9247048b2299585631a676aa3755db23b34ee67f983350ffe42ee26"
+    },
+    {
+      "name": "iac-reviewer",
+      "path": ".claude/skills/iac-reviewer/SKILL.md",
+      "sha256": "948fd875af0bc5cb7f777816d3311e02eb2692fddf68fb3543833930c9b82b85"
+    },
+    {
+      "name": "incident-response-runbook",
+      "path": ".claude/skills/incident-response-runbook/SKILL.md",
+      "sha256": "00954c766c88d78b4e9d27a06b095cceb422bf1ddf7a32e370825908c66e61f7"
+    },
+    {
+      "name": "integration-test-designer",
+      "path": ".claude/skills/integration-test-designer/SKILL.md",
+      "sha256": "eb772d807d9144ba3988ceecacd0edbc047d4b024ddd0b405b90434f3514ac9e"
+    },
+    {
+      "name": "inter-agent-comms-reviewer",
+      "path": ".claude/skills/inter-agent-comms-reviewer/SKILL.md",
+      "sha256": "735f5f01a47b8931b46e2e7c2dd744bf49ea63344537b2439b120cf9b77dbc65"
+    },
+    {
+      "name": "intra-tenant-scope-architect",
+      "path": ".claude/skills/intra-tenant-scope-architect/SKILL.md",
+      "sha256": "a860850a3f13cb8ffb7396b60143a4fe3dd18b5938cf038e5b9830076b9cbd1a"
+    },
+    {
+      "name": "iso-27001-isms-architect",
+      "path": ".claude/skills/iso-27001-isms-architect/SKILL.md",
+      "sha256": "337bdad4e736a68f0d93e78aed3c2c60749340aff4158d4aab47813532e6bcda"
+    },
+    {
+      "name": "iso-42001-aims-architect",
+      "path": ".claude/skills/iso-42001-aims-architect/SKILL.md",
+      "sha256": "2f924277a2ec9c1a39d845bcae8e371dcabe3235a97a8f26d2e34b26be729707"
+    },
+    {
+      "name": "lane-authoring-guide",
+      "path": ".claude/skills/lane-authoring-guide/SKILL.md",
+      "sha256": "80686fb8cb9ffadf6fa30e748decac7fe9cc76317838a62f11c70a3e27e01dfe"
+    },
+    {
+      "name": "latency-budget-architect",
+      "path": ".claude/skills/latency-budget-architect/SKILL.md",
+      "sha256": "c43a7b4a28a4001d9559a37d66070b9d655b279aeb066f2d2c6cb4c0327b14a2"
+    },
+    {
+      "name": "library-diff-reviewer",
+      "path": ".claude/skills/library-diff-reviewer/SKILL.md",
+      "sha256": "a327ec6d4454f0d44a0adf00b59da018d5cd6eccd83cbd7138f0f30b6377f00a"
+    },
+    {
+      "name": "llm-output-safety-reviewer",
+      "path": ".claude/skills/llm-output-safety-reviewer/SKILL.md",
+      "sha256": "376b27b89b8b1bbe5308179907893fdd70c23c33fc29524c5e99666b58255b7e"
+    },
+    {
+      "name": "load-test-planner",
+      "path": ".claude/skills/load-test-planner/SKILL.md",
+      "sha256": "d9e997669da84d1b1ff78d53d59342898bb92dd5f9d6a267f0a6762527335ab0"
+    },
+    {
+      "name": "local-ci-mirror-preflight",
+      "path": ".claude/skills/local-ci-mirror-preflight/SKILL.md",
+      "sha256": "3a8be5d3d64bd3f7523f518fc723c75b6f8ae0efc0f2324ece389173ce514251"
+    },
+    {
+      "name": "manual-test-case-creator",
+      "path": ".claude/skills/manual-test-case-creator/SKILL.md",
+      "sha256": "3bb047776c288af49ed95648fb70a18163f8ce168119ba8d5e715eb5134b2743"
+    },
+    {
+      "name": "membership-invitation-designer",
+      "path": ".claude/skills/membership-invitation-designer/SKILL.md",
+      "sha256": "4d78b890a18f367c8adede645cf62691ebf0ac7ea432f0ed81e961d736125819"
+    },
+    {
+      "name": "memory-context-poisoning-reviewer",
+      "path": ".claude/skills/memory-context-poisoning-reviewer/SKILL.md",
+      "sha256": "b80e01e6eec97e2d3c0e01251fc4276b0e81802b862e3a56dd96659c9469fe92"
+    },
+    {
+      "name": "merge-is-deploy-governance",
+      "path": ".claude/skills/merge-is-deploy-governance/SKILL.md",
+      "sha256": "0e53774d2c2972d721c5fbf6c57dae3e42acb56af04b2094fff7c0591c6e7ee8"
+    },
+    {
+      "name": "mobile-journey-test-designer",
+      "path": ".claude/skills/mobile-journey-test-designer/SKILL.md",
+      "sha256": "0cba3e154cc4efbe86b9c0be8ca67a40377bb6654a3ff90f8ed336121fe10af6"
+    },
+    {
+      "name": "mobile-viewport-craft",
+      "path": ".claude/skills/mobile-viewport-craft/SKILL.md",
+      "sha256": "f70c87a0ce1c2750b670cbd4dab9db1ab44e9f17cc5c1075bd4b7e82e41056c2"
+    },
+    {
+      "name": "model-context-designer",
+      "path": ".claude/skills/model-context-designer/SKILL.md",
+      "sha256": "4cb3540336ed2a88c418f6008af492f7e770087fd60a15eacb3a4b8a7298c036"
+    },
+    {
+      "name": "model-poisoning-reviewer",
+      "path": ".claude/skills/model-poisoning-reviewer/SKILL.md",
+      "sha256": "66fd2aa6dd7998438bececfdb4272ee1a6b68c47962ec488b7558d323c3fab4c"
+    },
+    {
+      "name": "multi-framework-crosswalk",
+      "path": ".claude/skills/multi-framework-crosswalk/SKILL.md",
+      "sha256": "9293b80a9a83c67e7d9af90ac600611ab6a2c1e474175e1140f69fb26c5540b1"
+    },
+    {
+      "name": "multi-tenant-data-architect",
+      "path": ".claude/skills/multi-tenant-data-architect/SKILL.md",
+      "sha256": "17ad32d99140008c312eeb36269db192df10bad092063e114378891cb4dc98d6"
+    },
+    {
+      "name": "multi-tenant-security-tester",
+      "path": ".claude/skills/multi-tenant-security-tester/SKILL.md",
+      "sha256": "1cb7e565310b8b6bfc48a0b4e700e9f6c20b09ef816d89deff25561050cd8af6"
+    },
+    {
+      "name": "n-plus-one-detector",
+      "path": ".claude/skills/n-plus-one-detector/SKILL.md",
+      "sha256": "dea70778f65475d7c572248e4d58501413750668c2de3fcf715d0ca9b45a3b71"
+    },
+    {
+      "name": "notification-webhook-ux-designer",
+      "path": ".claude/skills/notification-webhook-ux-designer/SKILL.md",
+      "sha256": "1c5755ca4585ac3a9c84e05f7be5e4f51dfcdef3a7773b104d5787e09d14af1d"
+    },
+    {
+      "name": "observability-by-design",
+      "path": ".claude/skills/observability-by-design/SKILL.md",
+      "sha256": "1eea28906a72fbd2e7a6e9f9ed947d86e0923975c3481c8334fa4ad511d2c243"
+    },
+    {
+      "name": "observability-operator",
+      "path": ".claude/skills/observability-operator/SKILL.md",
+      "sha256": "9134d0a291bd8b2330ded44a90cf13eab332c8ceb5be545915038af236f48d82"
+    },
+    {
+      "name": "offline-first-sync-architect",
+      "path": ".claude/skills/offline-first-sync-architect/SKILL.md",
+      "sha256": "296104c73244233ef2df0b33015160a93824d1f4769c295c64a18ae787510b96"
+    },
+    {
+      "name": "onboarding-doc-designer",
+      "path": ".claude/skills/onboarding-doc-designer/SKILL.md",
+      "sha256": "702e0f66161a8f6b4526a674597341a64b0eb4d01f564f1cac6b8b0194c9de18"
+    },
+    {
+      "name": "operational-vs-analytical-splitter",
+      "path": ".claude/skills/operational-vs-analytical-splitter/SKILL.md",
+      "sha256": "f362a712be0a8d8171e49a703304bd85cfddf9618de1cc5c56776b08ca474edc"
+    },
+    {
+      "name": "pagination-cursor-designer",
+      "path": ".claude/skills/pagination-cursor-designer/SKILL.md",
+      "sha256": "8dff6ef7de3877ce2e17dcf6ecadf2cb6018755cd7a3604ea102109e25fc5e73"
+    },
+    {
+      "name": "performance-test-harness",
+      "path": ".claude/skills/performance-test-harness/SKILL.md",
+      "sha256": "3826cef6c8b92f7719f2043c814c7059d93363752b85ff5f8d51d4a9669c53d5"
+    },
+    {
+      "name": "phased-work-handoff-designer",
+      "path": ".claude/skills/phased-work-handoff-designer/SKILL.md",
+      "sha256": "12e0caf60ec50d75b6370292e027b3926caddeecd2c77cd51a58d33e817984d4"
+    },
+    {
+      "name": "pii-lifecycle-designer",
+      "path": ".claude/skills/pii-lifecycle-designer/SKILL.md",
+      "sha256": "e36ed61466dc94e8269de506bf8b560c96875855dc13008de9a343d61f30799e"
+    },
+    {
+      "name": "plan-entitlement-architect",
+      "path": ".claude/skills/plan-entitlement-architect/SKILL.md",
+      "sha256": "bc6b608591a5110d20f9ce01fac9a518ca9b73f75fabff3079fbb55c860b900c"
+    },
+    {
+      "name": "playwright-e2e-engineer",
+      "path": ".claude/skills/playwright-e2e-engineer/SKILL.md",
+      "sha256": "73672430848b54354baa0e7a419c538e77dd916a4d6efc21eec0f46db6d997be"
+    },
+    {
+      "name": "principal-code-analyst",
+      "path": ".claude/skills/principal-code-analyst/SKILL.md",
+      "sha256": "8eab88ac782404a7e46606c04d8e3b5f40485effe9cb69441cbeb5b752e837cb"
+    },
+    {
+      "name": "prioritization-frame-picker",
+      "path": ".claude/skills/prioritization-frame-picker/SKILL.md",
+      "sha256": "bea42f461ac77d01bd58aabd5f94b851cc56969e4e6ea7ee3828d34fb2aa3c4e"
+    },
+    {
+      "name": "product-analytics-instrumenter",
+      "path": ".claude/skills/product-analytics-instrumenter/SKILL.md",
+      "sha256": "03586675ccd1f123444d71eb0f2fa5cfe7fc4543616872363a933d424a5ef8b0"
+    },
+    {
+      "name": "product-spec-writer",
+      "path": ".claude/skills/product-spec-writer/SKILL.md",
+      "sha256": "a8fef31f8992436dd2fb75cf9575b293373dda45362fa950481573299d1185cc"
+    },
+    {
+      "name": "profiling-methodology-designer",
+      "path": ".claude/skills/profiling-methodology-designer/SKILL.md",
+      "sha256": "e15ffe8bf7ce5f725436dc82129578c3e2dfb85c823a6eaf623f4c03bfdd2918"
+    },
+    {
+      "name": "project-orchestrator",
+      "path": ".claude/skills/project-orchestrator/SKILL.md",
+      "sha256": "487ce822b14ae48b60714cf3abba54e8303a41839a5849ec584cb234d700dd86"
+    },
+    {
+      "name": "promotion-packet-writer",
+      "path": ".claude/skills/promotion-packet-writer/SKILL.md",
+      "sha256": "e8e38abe012b9f3dd6db71a454ae1a4cd44ab6ce972fe7a70725457196a4c076"
+    },
+    {
+      "name": "prompt-injection-defender",
+      "path": ".claude/skills/prompt-injection-defender/SKILL.md",
+      "sha256": "f4c1a06085cef55c46b1701bc195155f1398e8d7c9414a705af7ace6f421fea8"
+    },
+    {
+      "name": "property-based-test-designer",
+      "path": ".claude/skills/property-based-test-designer/SKILL.md",
+      "sha256": "0c0c592598d382a576be7b21962e969041c069e1f06e19559e066bb4f0fcd9ad"
+    },
+    {
+      "name": "qa-automation-architect",
+      "path": ".claude/skills/qa-automation-architect/SKILL.md",
+      "sha256": "3790e36b85b90751b13b2ac10b186c70de5d4d477de7b117942106438f11f277"
+    },
+    {
+      "name": "qa-strategy-architect",
+      "path": ".claude/skills/qa-strategy-architect/SKILL.md",
+      "sha256": "dce017df89349657f4f5c6d51bdd7a3c5976522cfa974e1f991086d5eabe981e"
+    },
+    {
+      "name": "query-plan-reader",
+      "path": ".claude/skills/query-plan-reader/SKILL.md",
+      "sha256": "21d5a9f9f2db1d77746a3b95374b2f22df2c96158d0bff8d0d8f2a33f2dcec6a"
+    },
+    {
+      "name": "rag-security-architect",
+      "path": ".claude/skills/rag-security-architect/SKILL.md",
+      "sha256": "a5cfb92d757e77befa01bc19f3d150ad7323bf98c6e8d4ae95caa0da1cf0fc79"
+    },
+    {
+      "name": "readme-craftsman",
+      "path": ".claude/skills/readme-craftsman/SKILL.md",
+      "sha256": "d0ef3e6d2889f2deb63b547755b7d408f58afa7132dbd4dec06899dc8e9c4f57"
+    },
+    {
+      "name": "realtime-subscription-architect",
+      "path": ".claude/skills/realtime-subscription-architect/SKILL.md",
+      "sha256": "d629b9bc822d6732d77658bd29861e0cb599dae0b1da9604bdcc8b039ba27ece"
+    },
+    {
+      "name": "regression-suite-curator",
+      "path": ".claude/skills/regression-suite-curator/SKILL.md",
+      "sha256": "0fe9dcd1a0eed45b52ea2d7c6a52d31643d11d7d1fc1d7922ad9d53e3853b3ba"
+    },
+    {
+      "name": "release-readiness-reviewer",
+      "path": ".claude/skills/release-readiness-reviewer/SKILL.md",
+      "sha256": "9d1cd8091385e537f823c6b8d78be4b180f2599fc354129ec8f735389dd5d305"
+    },
+    {
+      "name": "requirements-gathering-facilitator",
+      "path": ".claude/skills/requirements-gathering-facilitator/SKILL.md",
+      "sha256": "db5c6795ae85bbf07faa5a791702e76edf09a0305399600f56d34975029b8c37"
+    },
+    {
+      "name": "resilience-architecture-reviewer",
+      "path": ".claude/skills/resilience-architecture-reviewer/SKILL.md",
+      "sha256": "a9abd21cf074e4ac40e5d229ec30cb3d7ba00e53d6fad22c415d1d4f0ad24384"
+    },
+    {
+      "name": "reviewable-diff-discipline",
+      "path": ".claude/skills/reviewable-diff-discipline/SKILL.md",
+      "sha256": "59b07ade2cd8a2aae3907c8d6c2609ae46641559f3b97dadc6019a4b4c8eab7b"
+    },
+    {
+      "name": "risk-tiered-validation-selector",
+      "path": ".claude/skills/risk-tiered-validation-selector/SKILL.md",
+      "sha256": "cb436c8bb80d4e29b48651d7b55161e37853c144b1ea6daf506686c8f4c3824d"
+    },
+    {
+      "name": "rls-policy-auditor",
+      "path": ".claude/skills/rls-policy-auditor/SKILL.md",
+      "sha256": "8cf131fed74b9a12a2687a01c26024e0220a7b10c9c83f36c743c08216d8bac2"
+    },
+    {
+      "name": "roadmap-to-commitments-translator",
+      "path": ".claude/skills/roadmap-to-commitments-translator/SKILL.md",
+      "sha256": "dc13a979b9f71d6dfda4d89896d07ba726b01277f889208221c10b4e3b68e53f"
+    },
+    {
+      "name": "roadmap-under-uncertainty-planner",
+      "path": ".claude/skills/roadmap-under-uncertainty-planner/SKILL.md",
+      "sha256": "2ae699e07c0f4f9d5b9959eecd0d5928428d09c8922646046e14b5de9b73eac8"
+    },
+    {
+      "name": "role-coverage-test-designer",
+      "path": ".claude/skills/role-coverage-test-designer/SKILL.md",
+      "sha256": "23f752b157efa7baa6095d1c2960b7e53c909b384af8e63f103bf32f7d7345e0"
+    },
+    {
+      "name": "rollback-runbook-author",
+      "path": ".claude/skills/rollback-runbook-author/SKILL.md",
+      "sha256": "3f727f3cfc548633d76bcc4ad4e35f5c72f471f77b513c9d351cbc7df8641e9a"
+    },
+    {
+      "name": "saas-cost-architect",
+      "path": ".claude/skills/saas-cost-architect/SKILL.md",
+      "sha256": "241c71c614d3ccc67e46036d54517a7d6012089d194f52bd0cc0ac76241bf18d"
+    },
+    {
+      "name": "saas-platform-architect",
+      "path": ".claude/skills/saas-platform-architect/SKILL.md",
+      "sha256": "910e24c734ba7e0253436c7aa75eb7bcd814c659e9f1533425c09885b8ab8be7"
+    },
+    {
+      "name": "sast-orchestration-designer",
+      "path": ".claude/skills/sast-orchestration-designer/SKILL.md",
+      "sha256": "d8a68cd2e4bb54491a31539baaaf66c27243a5c2cbf4d425ed412d0ac46da246"
+    },
+    {
+      "name": "schema-evolution-planner",
+      "path": ".claude/skills/schema-evolution-planner/SKILL.md",
+      "sha256": "495af0d8ca8936113cf02357dff8a869147731e3f79ea92c3e0a12a850a03aac"
+    },
+    {
+      "name": "scoped-approval-register",
+      "path": ".claude/skills/scoped-approval-register/SKILL.md",
+      "sha256": "a74d2a22579cf93f737725aa0c54197b5d496a9f33a291a93c2cf2073cd7d076"
+    },
+    {
+      "name": "screenshot-evidence-planner",
+      "path": ".claude/skills/screenshot-evidence-planner/SKILL.md",
+      "sha256": "b0910f9003a3479d7753f4da608dfd9b275ab8ca5d0157c7adb8e5d8813a8c1f"
+    },
+    {
+      "name": "search-architecture-designer",
+      "path": ".claude/skills/search-architecture-designer/SKILL.md",
+      "sha256": "ceec34e56c60b4ab63d6832e228b59c5651126fcb3d45ce620417a1a9cfe6d36"
+    },
+    {
+      "name": "secrets-identity-hardener",
+      "path": ".claude/skills/secrets-identity-hardener/SKILL.md",
+      "sha256": "d414e084bbe2b9b20d24bab28285d75f505cfe961e477a1ec90d926bf76be0c1"
+    },
+    {
+      "name": "secure-migration-reviewer",
+      "path": ".claude/skills/secure-migration-reviewer/SKILL.md",
+      "sha256": "4baad58efb00c0d4e0cc8d73c88139a742d1eee0f2b58c5c218dd83cec108322"
+    },
+    {
+      "name": "security-logging-alerting-architect",
+      "path": ".claude/skills/security-logging-alerting-architect/SKILL.md",
+      "sha256": "4fa1a8d28bdd885fca394ed06ecb23f049da33411680eb4cb28a3e68f6bbc465"
+    },
+    {
+      "name": "security-pr-reviewer",
+      "path": ".claude/skills/security-pr-reviewer/SKILL.md",
+      "sha256": "1bbc3ca6944341cb81e8575da26fd558b605bc8d55c94031d98094b3a90a6955"
+    },
+    {
+      "name": "security-scan-orchestrator",
+      "path": ".claude/skills/security-scan-orchestrator/SKILL.md",
+      "sha256": "ce830277b99d535a0757f05ae414777d5830e6fe1989ea80b72022617e378f8c"
+    },
+    {
+      "name": "sensitive-disclosure-guard",
+      "path": ".claude/skills/sensitive-disclosure-guard/SKILL.md",
+      "sha256": "3b160409bcbd74a4cdf1deda5323ae2e610fb319f15c46f373215e04cb785b72"
+    },
+    {
+      "name": "sharded-validation-with-resume",
+      "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
+      "sha256": "723020119510023722c764d97cb130649b2ba0bf0763d08a0ad4651f3b5cfc96"
+    },
+    {
+      "name": "share-link-access-architect",
+      "path": ".claude/skills/share-link-access-architect/SKILL.md",
+      "sha256": "cc3f16da24772799a09fba984f80969ad8723cce93ec8c345b26db95b1e189f2"
+    },
+    {
+      "name": "skill-deprecation-planner",
+      "path": ".claude/skills/skill-deprecation-planner/SKILL.md",
+      "sha256": "e923b8331a86902c25cd663175d8b97f20a108459085f841d4badb14ab4aa459"
+    },
+    {
+      "name": "skill-quality-reviewer",
+      "path": ".claude/skills/skill-quality-reviewer/SKILL.md",
+      "sha256": "276975239752ea5be4b168fbc80900a5fb8effed00bb590d9be35589c3330dfb"
+    },
+    {
+      "name": "skill-usage-instrumenter",
+      "path": ".claude/skills/skill-usage-instrumenter/SKILL.md",
+      "sha256": "b9cca91f3df385022bf36321b6d3aeb39bdd307f7a09bf2b02f77822eb2af8ca"
+    },
+    {
+      "name": "skill-usage-ledger",
+      "path": ".claude/skills/skill-usage-ledger/SKILL.md",
+      "sha256": "6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4"
+    },
+    {
+      "name": "slo-reliability-architect",
+      "path": ".claude/skills/slo-reliability-architect/SKILL.md",
+      "sha256": "564bb2a9f02e80dc0e4ed7002f29d8327aaf1c1fb9d43c50b3c1898b4c60e573"
+    },
+    {
+      "name": "soc2-trust-criteria-mapper",
+      "path": ".claude/skills/soc2-trust-criteria-mapper/SKILL.md",
+      "sha256": "38cd99022b196fd72af4df7786ece76540c5eaa190c6c7257fcb4e8f8bc5903f"
+    },
+    {
+      "name": "source-currency-auditor",
+      "path": ".claude/skills/source-currency-auditor/SKILL.md",
+      "sha256": "7137600e6e79154ffe70c73903ce0f89d3e8bdc10f2bbcc8b57bb80ae2ce4cb9"
+    },
+    {
+      "name": "source-of-truth-reconciler",
+      "path": ".claude/skills/source-of-truth-reconciler/SKILL.md",
+      "sha256": "b5fd9feda97235430259913aedd33447ab06e1c0ded281e9e131fa6bf9b78be2"
+    },
+    {
+      "name": "staff-scope-selector",
+      "path": ".claude/skills/staff-scope-selector/SKILL.md",
+      "sha256": "aa8cd9ca8bf90c1edc2d247e9dfe16c9c2bceb5b079c7416407e08b21c7d3fa4"
+    },
+    {
+      "name": "standing-approval-and-auto-advance",
+      "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
+      "sha256": "90149099d1415ba240566ef59196b85b2aba94cd8c6d5ed9444034d9ab5d3fbd"
+    },
+    {
+      "name": "statement-of-applicability-author",
+      "path": ".claude/skills/statement-of-applicability-author/SKILL.md",
+      "sha256": "40b62d3a355b45f97ea53b3e04121e30ae9e71d3046655af31619319111c318f"
+    },
+    {
+      "name": "static-analysis-reviewer",
+      "path": ".claude/skills/static-analysis-reviewer/SKILL.md",
+      "sha256": "5c8b721e6c9110d05a1f4cb447c957221062b45cfd74f5cd8060e8cf93934c49"
+    },
+    {
+      "name": "streaming-event-architect",
+      "path": ".claude/skills/streaming-event-architect/SKILL.md",
+      "sha256": "6b0992ec8d98e63be45a41bcdb4fdb9d9662f999073b695523a8c6685f9a68b1"
+    },
+    {
+      "name": "structured-output-validator",
+      "path": ".claude/skills/structured-output-validator/SKILL.md",
+      "sha256": "5bcc02dfa9814d2cbc84320abb06ba8d9f998098b8f745181ece4f88608825f3"
+    },
+    {
+      "name": "sunset-deprecation-communicator",
+      "path": ".claude/skills/sunset-deprecation-communicator/SKILL.md",
+      "sha256": "ffaf6518ee7a7f4997bb02fc5ad7f69d9450624e38d7d989a34606c05627356f"
+    },
+    {
+      "name": "superadmin-observability-console-designer",
+      "path": ".claude/skills/superadmin-observability-console-designer/SKILL.md",
+      "sha256": "37cebb01b0a7c601fa0f72cd07ce1bb4df438a516680a116ed300896b0bfe3f5"
+    },
+    {
+      "name": "supply-chain-security-reviewer",
+      "path": ".claude/skills/supply-chain-security-reviewer/SKILL.md",
+      "sha256": "f3378d7e4bc6e60ab6488ef8204c5170fb41c348aeb347051abbed4aee72c279"
+    },
+    {
+      "name": "synthetic-monitoring-architect",
+      "path": ".claude/skills/synthetic-monitoring-architect/SKILL.md",
+      "sha256": "8529eff6d6efe438101661ff59d36be64bf8bfd87311a4c516affe8148fb3e88"
+    },
+    {
+      "name": "systematic-debugger",
+      "path": ".claude/skills/systematic-debugger/SKILL.md",
+      "sha256": "cec373dbaf47d3d445cf90b558bcbae833013702842ff9ac9eb36b3cbb205ddf"
+    },
+    {
+      "name": "tdd-engineer",
+      "path": ".claude/skills/tdd-engineer/SKILL.md",
+      "sha256": "d48c7907f480ab2b97dedb75b6473759a6c3ff9c1be02b4aa4d979d06a7e969e"
+    },
+    {
+      "name": "tech-spec-writer",
+      "path": ".claude/skills/tech-spec-writer/SKILL.md",
+      "sha256": "cd1ee59dc53452de93404ceb2c1afdea49f64d2a1576dd1ba3621d93da3806f5"
+    },
+    {
+      "name": "tenant-isolation-reviewer",
+      "path": ".claude/skills/tenant-isolation-reviewer/SKILL.md",
+      "sha256": "9904d87360685e21a179b246c05b5e0c951c8cec72b5ff6dc707c08573692f13"
+    },
+    {
+      "name": "tenant-modeler",
+      "path": ".claude/skills/tenant-modeler/SKILL.md",
+      "sha256": "456631dc14f1ba1b833a40d0684a4443b65c86d681d444fb5724fa6ff98511aa"
+    },
+    {
+      "name": "tenant-provisioning-designer",
+      "path": ".claude/skills/tenant-provisioning-designer/SKILL.md",
+      "sha256": "dd7c2fd79bb3a34146a8cf58bfede1310435928648612df47ac97660d45424d8"
+    },
+    {
+      "name": "test-coverage-mapper",
+      "path": ".claude/skills/test-coverage-mapper/SKILL.md",
+      "sha256": "1b11e44913e0dd85e0de2ac3a5d4a830c5b6c1f96b99ac876cd4186222c5843f"
+    },
+    {
+      "name": "test-data-architect",
+      "path": ".claude/skills/test-data-architect/SKILL.md",
+      "sha256": "50046af7de604c9a678f17ab5d1dff15529b02e0d4ef58cd659da32d8152dd5d"
+    },
+    {
+      "name": "test-plan-designer",
+      "path": ".claude/skills/test-plan-designer/SKILL.md",
+      "sha256": "a372ee3a922e34bcc3ccaaafe654bcb85062ef005a40538deae2f9f44aadfdc1"
+    },
+    {
+      "name": "test-tenant-provisioner",
+      "path": ".claude/skills/test-tenant-provisioner/SKILL.md",
+      "sha256": "77650214c27e86c410fcd85cb6b3d1c38ac74d18b8315b732c51dd620c37faed"
+    },
+    {
+      "name": "threat-modeler",
+      "path": ".claude/skills/threat-modeler/SKILL.md",
+      "sha256": "0809835df58474b4f355cf99108ee08faafe1a51c83ec4d086b32599baafe4e7"
+    },
+    {
+      "name": "usage-metering-and-cost-attribution-pipeline-designer",
+      "path": ".claude/skills/usage-metering-and-cost-attribution-pipeline-designer/SKILL.md",
+      "sha256": "82dc82868105ba4e51383d6796326edde29e5d414551ac8c58e71fe9ffa1e278"
+    },
+    {
+      "name": "validation-boundary-designer",
+      "path": ".claude/skills/validation-boundary-designer/SKILL.md",
+      "sha256": "8605fd89bbd54517cd47c0d926cb0a196f9ee8af406d24951e1f127619b42ff6"
+    },
+    {
+      "name": "visual-regression-test-designer",
+      "path": ".claude/skills/visual-regression-test-designer/SKILL.md",
+      "sha256": "75e0e03294f51618605bff87799a3c1fc57bd99432f0d5ad2ad0c737479c080b"
+    },
+    {
+      "name": "vite-build-qa-engineer",
+      "path": ".claude/skills/vite-build-qa-engineer/SKILL.md",
+      "sha256": "cebbad27c5c915c5ab3e898ad484087a5c4ca6c40823f111c6f550adf7eb0477"
+    },
+    {
+      "name": "vitest-unit-component-engineer",
+      "path": ".claude/skills/vitest-unit-component-engineer/SKILL.md",
+      "sha256": "591fc3393819d27fdacf7670ed8f30c68318f21b5d2e301397e1daa6ae21ce60"
+    },
+    {
+      "name": "warehouse-lake-architect",
+      "path": ".claude/skills/warehouse-lake-architect/SKILL.md",
+      "sha256": "d11106bc4bc71effe86155aaeb750c2a591335cc6e00fbd11502c95ec8316594"
+    }
+  ]
+}
