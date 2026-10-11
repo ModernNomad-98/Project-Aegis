@@ -4532,6 +4532,24 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   execution, publication or merge authority. D97 and earlier entries are
   byte-untouched.
 
+- **D99 (2026-10-11) — post-queue 2 documentation-batch ledger
+  reconciliation.** The owner's instruction: "go, do not stop until all
+  to-dos are completed" (verbatim). The dated "Documentation-batch
+  reconciliation — 2026-10-11 (D99)" section is APPENDED at the end of
+  the ledger's "Documentation batches" section (after the pre-PQ1 L3167
+  boundary) — additions only, the PQ1 Start-here append range untouched
+  (the PQ1/PQ2 disjoint-range separation). The per-batch table maps the
+  eleven sweep batches (60 recorded pages) to the official acceptance
+  state — all 60 carry full-page-acceptance rows in the consolidated
+  keeper table; the older dated-table rows are annotated at the batch
+  level (paths in the linked review pages), never re-scored. The official
+  basis: `check_index.py --ref 408e4d6a` re-run in a full clone → 631/50/
+  4/564/7/6 → **official pending count 581** (citing D96), reproduced
+  byte-for-byte. Named follow-ups: none. Counts UNCHANGED (SKILL-COUNT
+  205, FAMILY-COUNT 23). This entry records the lane; it grants no new
+  execution, publication or merge authority. D97 and earlier entries are
+  byte-untouched (D98 is reserved by the in-flight PQ1 PR #730).
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

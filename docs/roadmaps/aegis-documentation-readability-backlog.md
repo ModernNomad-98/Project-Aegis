@@ -3211,6 +3211,29 @@ The previous integration estimate was none; this ledger update is estimated at
 1–3 active hours. Repository-wide documentation acceptance remains **IN
 PROGRESS**.
 
+### Documentation-batch reconciliation — 2026-10-11 (D99)
+
+**Scope.** A post-queue-2 reconciliation of the batch rows ABOVE against the official acceptance state, appended at this section's end (additions only — the historical rows are dated snapshots, annotated here, never rewritten). The official state is re-derived from the consolidated keeper table (this ledger's foot, L4487–4582) and from `check_index.py` re-run at the pinned ref `408e4d6a` in a full clone at this base: reader pages 631 / accepted 50 / provably-pending 4 / no-recorded 564 / within-10 7 / cannot-decide 6 → **official pending count 581** (the D96 record, reproduced byte-for-byte).
+
+| Batch (section anchor, reviewed revision ab7182d8) | Recorded pages | Official state (keeper table + check_index) |
+| --- | --- | --- |
+| Readability sweep first batch (L3968) | 8 | all 8 carry full-page-acceptance rows → accepted |
+| Readability sweep second batch (L4015) | 8 | all 8 accepted |
+| Readability sweep third batch (L4066) | 8 | all 8 accepted |
+| Readability sweep fourth batch (L4113) | 8 | all 8 accepted |
+| Readability sweep fifth batch (L4162) | 7 | all 7 accepted |
+| Readability sweep sixth batch (L4221) | 8 | all 8 accepted |
+| Readability sweep seventh batch (L4272) | 6 | all 6 accepted |
+| Readability sweep eighth batch (L4317) | 4 | all 4 accepted |
+| Readability sweep ninth batch (L4364) | 1 | accepted |
+| Readability sweep tenth batch (autonomous tail, L4404) | 1 | accepted |
+| Readability sweep eleventh batch (third autonomous tail, L4444) | 1 | accepted |
+| "Documentation batches" dated table rows above (L2836–3167) | paths recorded in the linked review pages | annotated: each row's pages map to the keeper table's accepted rows where present; every other page falls in the official 581's buckets (no-recorded / provably-pending / within-10 / cannot-decide) — the dated rows themselves are not re-scored |
+
+**Method honesty:** the sweep-batch page counts were re-derived programmatically at the base (page-path extraction per section, intersected with the keeper table's full-page-acceptance set); the dated-table row is annotated at the batch level because its page paths live in the linked review pages, not inline. **Named follow-ups found: none** — every sweep-batch page's recorded state matches the official keeper table; the two `e6fc8d24` pages recorded in the first keeper recording carry NO acceptance row by the main-containment rule (recorded in D84) and count pending until re-reviewed — a recorded state, not a new defect. No row is rewritten.
+
+**Self-cost.** This note adds lines and deletes 0 (git diff --numstat against the base commit). It confers nothing, changes no counting rule in force, and rewrites no dated text.
+
 ## Correction to the pending floor — 2026-10-02
 
 The counts in the readings above are dated snapshots. They are annotated here,
