@@ -4453,6 +4453,24 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   lane; it grants no new execution, publication or merge authority. D94 and
   earlier entries are byte-untouched.
 
+- **D96 (2026-10-11) — Q4 durable acceptance refs (pinned official-count
+  reference).** The owner selected Q4. The durable record is an APPENDED
+  "Official count reference (pinned)" section in
+  `tools/readability_acceptance/README.md` (annotate-don't-rewrite;
+  additions only): the pinned ref
+  `408e4d6a2046b37afe7912e9c8643474df7ab037`, the six labeled numbers
+  (reader pages 631 / accepted 50 / provably-pending 4 / no-recorded 564 /
+  within-10 7 / cannot-decide 6 → **official pending count 581**), the
+  formula, the exact re-derivation command, and the D96 provenance — framed
+  as a durable citation point, NOT the live figure (the live figure remains
+  `check_index.py` at the current ref; later rebuilds supersede it). The
+  re-derivation proof: Stage C re-ran
+  `check_index.py --ref 408e4d6a…` in a full clone at the implementation
+  base and reproduced all six numbers byte-for-byte. Counts UNCHANGED
+  (SKILL-COUNT 205, FAMILY-COUNT 23). This entry records the lane; it
+  grants no new execution, publication or merge authority. D95 and earlier
+  entries are byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
