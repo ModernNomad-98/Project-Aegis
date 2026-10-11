@@ -4532,6 +4532,37 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   execution, publication or merge authority. D97 and earlier entries are
   byte-untouched.
 
+- **D99 (2026-10-11) — post-queue 2 documentation-batch ledger
+  reconciliation.** The owner's instruction: "go, do not stop until all
+  to-dos are completed" (verbatim). The dated "Documentation-batch
+  reconciliation — 2026-10-11 (D99)" section is APPENDED at the end of the
+  ledger's "Documentation batches" section: this lane's diff touches ONLY
+  its own append range (that section's bytes and this entry), so D98's
+  Start-here range — PQ1's PR #730, MERGED FIRST as the merge `279338a9` —
+  and every dated entry above are byte-untouched. Round 1 appended the
+  section at base `ab7182d8`; round 2 rebuilt its per-batch states after
+  Codex P1 finding 4242876575, which was right: an acceptance row records an
+  acceptance at a REVISION, not the page's current state. Re-derived with
+  the checker: the eleven sweep batches hold **66 acceptance records over 61
+  unique pages** (round 1 said 60 — it counted batches 7–11 as 6/4/1/1/1
+  against the tables' actual 8/5/2/2/2 rows), and at the pinned `408e4d6a`
+  those 61 pages are **50 accepted / 4 provably pending / 7 within-10-lines
+  pending** — an accepted row does not make a page accepted (even the first
+  batch is 6 accepted + 2 within-10). The official basis is labeled:
+  (a) HISTORICAL — the D96-pinned `check_index.py --ref 408e4d6a` re-run in
+  a full clone → 631/50/4/564/7/6 → **official pending count 581**,
+  reproduced byte-for-byte and NOT the live figure; (b) LIVE at the
+  candidate head (this entry's commit; `check_index.py --ref <the new
+  head>`) → 633/48/5/566/8/6 → **585** — the exact head/tree and the
+  verbatim JSON are recorded in the PR's Stage C round-2 record, because a
+  commit cannot name its own SHA inside its own bytes. The dated batch rows
+  are annotated at the batch level, never re-scored; the ledger itself stays
+  provably pending at the new head (the self-cost paragraph states it, and
+  the measured figure is in that PR record). Named follow-ups: none. Counts
+  UNCHANGED (SKILL-COUNT 205, FAMILY-COUNT 23). This entry records the lane;
+  it grants no new execution, publication or merge authority. D97 and
+  earlier entries are byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
