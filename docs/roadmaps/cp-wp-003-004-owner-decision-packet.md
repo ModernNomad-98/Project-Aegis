@@ -24,6 +24,22 @@ and governance pages listed under [Sources and verification](#sources-and-verifi
 This packet adds no new research and contacts no account, service, host,
 credential, or endpoint.
 
+**Inbound links, and why they arrive next.** This page is added by one docs-only
+change that adds one file and edits nothing else, so it cannot also edit the
+pages that route readers here. A repository-wide exact-name search at the base
+commit finds zero inbound references to this file: its expected readers reach it
+only if they already know its path. The durable inbound links therefore belong
+in the follow-up governance change that records the owner's answer, and their
+exact targets are the CP-WP-003/CP-WP-004 row of the
+[open-decisions register](aegis-open-decisions-2026-09-23.md)
+([Still open for the owner](aegis-open-decisions-2026-09-23.md#still-open-for-the-owner),
+L232) and the CP-WP-003 and CP-WP-004 rows of the
+[backlog forecast](aegis-backlog-forecast.md)
+([Conditional and unselected scope](aegis-backlog-forecast.md#conditional-and-unselected-scope),
+L4795-4796). Until those links exist, this packet's
+[Sources and verification](#sources-and-verification) list is the only route
+back to them.
+
 ## Reading key
 
 These five terms are the ones a later grant must bind. They are the
@@ -55,7 +71,7 @@ definitions, restated so this packet can be read on its own:
 | CP-WP-003 — real authority, evidence and execution capability | **BLOCKED** — real source, freshness, containment, evidence and billing unselected | Backlog L81, L269, L279–282; [open-decisions register](aegis-open-decisions-2026-09-23.md) L43 |
 | CP-WP-004 — one bounded real integration | **BLOCKED** — no target selected; CP-WP-003 prerequisites absent | Backlog L82, L270; open-decisions register L44, L232 |
 | CP-FUT-001 — distributed ownership or hosted service | BLOCKED — out of this packet's scope | Backlog L83, L271 |
-| ZT-P1 — offline role/stage transition contract | **NOT started** — needs a reviewed owner grant naming `tools/aegis_delivery_control/contracts.py` | Backlog L1688–1691 |
+| ZT-P1 — offline role/stage transition contract | **DELIVERED (offline contract); the real role/stage delivery remains NOT started** — no active approval-register grant names `tools/aegis_delivery_control/contracts.py` | [PR #675](https://github.com/ModernNomad-98/Project-Aegis/pull/675), merged 2026-10-05 as `feee859daa3f35311ea4c4ebcc9a5aa10d1a7ba4` (an ancestor of the base ref): 8 files, +592/−0 — `contracts.py` (+101, `ZT_P1_CONTRACT_VERSION`), `authority.py` (+79), `evidence.py` (+129), `owned_paths.py` (+37), `README.md` (+31), `test_capabilities.py` (+52), `test_dispatch.py` (+154). Backlog L1688–1691 records that the later pass "authorizes nothing else — not P2, not a host adapter, not a real route, not auto-merge" |
 | P2-6 guard maintenance | DONE (PR #539 `2bb44db2`) under APR-086; grant consumed by APR-098; option (a) explicitly **not authorized** | Backlog L284–319 |
 | Source-only research (named candidates; DynamoDB public contract) | COMPLETE — no source selected, nothing contacted | [Named-candidate matrix](cp-wp-003-named-candidate-matrix.md) L3; [DynamoDB public-contract inspection](cp-wp-003-dynamodb-public-contract-inspection.md) L7 |
 | Gradual integration roadmap and release policy | POLICY DECISION (AEGIS-APR-102, 2026-10-02) — **grants no work; selects neither CP-WP-003 nor CP-WP-004** | Register L3160–3237; open-decisions register L239 |
@@ -166,34 +182,44 @@ research compared the candidates; nothing is chosen.
 | **C. Local single-owner ledger only** | Keep authority in one controlled host's ledger, with every controller and manual consumer routed through that one owner | Small offline prototype; clear local crash tests; no provider account or credential | Only viable as real authority if the **actual grant and operation** prove exclusive custody and fencing — neither is selected or proven. Restore of an older valid ledger still needs an independent anchor, and an outside consumer can otherwise reuse the same grant. This option is not available on the current evidence |
 | **D. Defer the authenticated inspection** | Decide nothing now; keep researching or wait for owner, account and cost terms | Contacts nothing; leaves all options open; no spend and no credential exposure | Leaves real authority unproved and CP-WP-003/CP-WP-004 BLOCKED. Public documentation alone cannot establish this project's cross-consumer and host guarantees |
 
-**Evidence any option must produce before it can be accepted.** This is the
-requirement list, not a promise that any of it exists:
+**Evidence the source-selecting options must produce before one can be
+accepted.** Option D defers and is not a candidate for this acceptance; it has
+its own row above and no evidence list here. The invariants below are
+provider-neutral; the table maps each one onto the source each option selects. A
+source that cannot produce its column has not met the invariant, and the option
+that names it fails rather than being deferred.
 
-1. The exact account, Region and table (or project) identity, plus an
-   independently protected table-incarnation pin such as DynamoDB's
-   creation-time `TableId` — "a table name or ARN alone cannot reject deletion
-   and recreation under the same name" (DynamoDB inspection L19).
-2. The custody and broker principals, credential issuance, rotation,
-   break-glass and trust boundary; and exhaustive IAM allow/deny and
-   resource-policy tests. IAM scoping alone is not enough: "`dynamodb:LeadingKeys`
-   only restricts keys; it does not enforce monotonic or append-only semantics"
-   (DynamoDB inspection L42).
-3. The verification read: "A strongly consistent `GetItem` of one complete head
-   item, or one `TransactGetItems` for a multi-item vector, is the proposed
-   verification read" (DynamoDB inspection L12).
+**Invariants D1 needs at selection, and each source's equivalent:**
+
+| Invariant | DynamoDB first | Firestore Native mode first | Local single-owner ledger only |
+| --- | --- | --- | --- |
+| 1. The exact account, project or host identity, Region, and the table, document collection or ledger path that holds authority — plus an independently protected incarnation pin, because a name alone cannot reject deletion and recreation under the same name | Account, Region and table identity plus a creation-time `TableId` pin — "a table name or ARN alone cannot reject deletion and recreation under the same name" (DynamoDB inspection L19) | Project, database, collection and document identity plus the project number and the database `uid` as the incarnation pin; a project ID or display name alone cannot reject recreation under the same name | Host identity, ledger file path and file identity (inode or equivalent) plus an owner-held incarnation record outside that file; a path alone cannot reject deletion and recreation under the same path either |
+| 2. The custody and broker principals, credential issuance, rotation, break-glass and trust boundary, with allow/deny tests for the mechanism that actually gates access | Exhaustive IAM allow/deny and resource-policy tests, because a key condition alone is not semantics — "`dynamodb:LeadingKeys` only restricts keys; it does not enforce monotonic or append-only semantics" (DynamoDB inspection L42) | IAM for the server libraries plus Firestore Security Rules for every direct client path; the server libraries bypass the Rules and use IAM, so the local writer must not hold unrestricted server credentials | The operating-system permissions, exclusive file lock and process fence on the one host; this proves something only if one owner is genuinely the only writer, which is why this option "is not available on the current evidence" (option C above) |
+| 3. The verification read that establishes the current head: one read of one complete head record, or one transaction read of a multi-item vector | "A strongly consistent `GetItem` of one complete head item, or one `TransactGetItems` for a multi-item vector, is the proposed verification read" (DynamoDB inspection L12) | A transaction or strongly consistent read of the head document, or a multi-document transaction where the vector spans documents; a stale or non-transactional read does not meet the invariant | A read of the complete head record under the same exclusive lock that writes it, with the owner-held incarnation record read in the same step |
+
+**Later CP-WP-003 write-proof criteria.** Items 4–6 below are evidence the later
+disposable write proof must produce. They belong there, not to D1: they need the
+capped, separately granted write step that the
+[real-authority packet](cp-wp-003-real-authority-decision-packet.md) L47–50
+places after this inspection, so they gate that proof's acceptance and not D1's.
+That proof needs its own source, host, budget and rollback terms and its own
+reviewed grant, under a disposable test namespace.
+
 4. The write-ahead protocol: a uniquely keyed `PENDING` record written before
    any external contact, so that "No target call occurs until a positive source
    outcome **and** a fresh current-head check establish this exact pending
-   record" (DynamoDB inspection L22).
+   record" (DynamoDB inspection L22). A conditional-write transaction, a
+   Firestore transaction or an atomic local write can each provide it.
 5. Race and lifecycle falsifiers: exactly one of the controller and the manual
    consumer can win one grant; revoke, expire and supersede are strictly
    ordered; and an uncertain acknowledgement is resolved by an authoritative
    marker read — never by a blind replay "after 10 minutes" (DynamoDB
    inspection L25, L33).
-6. Recovery falsifiers: a restored table is "neither a current-head witness nor
-   necessarily an atomic snapshot of the live transaction boundary" (DynamoDB
-   inspection L15), and a replacement table must be rejected by the incarnation
-   pin (L35).
+6. Recovery falsifiers: a restored table, project or ledger copy is "neither a
+   current-head witness nor necessarily an atomic snapshot of the live
+   transaction boundary" (DynamoDB inspection L15), and a replacement resource
+   must be rejected by the incarnation pin (L35).
+
 7. **No claim, reservation or redemption write under any option.** The
    real-authority packet L48 is explicit for this step: "Select an exact
    candidate and obtain a separate reviewed grant before inspecting
@@ -250,10 +276,21 @@ records it.
 
 | Option | What it means | Reason and benefit | Cost, drawback and condition |
 | --- | --- | --- | --- |
-| **A. Claude Agent SDK bridge first** | The APR-102 first planning candidate becomes the bounded increment | Consistent with the recorded candidate order; an integration already scoped as a 4A prototype direction | APR-102 grants no work for it; the exact operation, target, host, containment, receipt and budget are all unpinned. Selection permits "only the work separately authorized for that increment" (L3188–3191) |
 | **B. Draft GitHub PR target** | One bounded, reversible real target: open a draft PR as the operation, compared with local artifact export | The original packet row L352 names it: "a draft GitHub PR is a candidate reversible target for comparison with local artifact export"; reversible and already inside the repository's tooling | Needs exact target idempotency, status and receipt semantics, a rollback/cancellation rule, and host/containment proof. A GitHub approval record still cannot by itself make "an atomic one-use claim spanning a manual consumer and the controller" (real-authority packet L27) |
 | **C. Local artifact export target** | One bounded export of a local artefact, with no external target | Smallest blast radius; no external provider call and no external spend | Does not prove an external target's receipt or bill; the [named-candidate matrix](cp-wp-003-named-candidate-matrix.md) L44 warns that a host/protocol proof "does not satisfy CP-WP-004's selected real delivery integration" |
 | **D. Defer D2** | Decide the integration only after CP-WP-003's real prerequisites are accepted and evidenced | Matches the register's own ordering and the original packet row L352: "Decide the single integration only after CP-WP-003 evidence" | Leaves CP-WP-004 BLOCKED and delivers no integration; this is an honest option, not a failure |
+
+**Two decisions, not one menu — and the policy chooses neither.** Options B and
+C above are the mutually exclusive target operations: each is an operation with
+a target and a receipt, and selecting one is what closes D2. APR-102's retained
+Claude Agent SDK bridge is a *component* decision, not an operation: it settles
+which bridge the chosen operation would later be prepared against, it can be
+combined with either B or C, and it is not an alternative to them. The
+[backlog forecast](aegis-backlog-forecast.md) states the same boundary at
+L4796: the integration policy "chooses a release order, not this integration or
+its execution grant", and CP-WP-004 still requires "one chosen operation and
+separate authority". Until the owner records both the operation and the bridge,
+D2 is open and no target is selected.
 
 **What the chosen option must pin before it is a selection.** Per the backlog
 L270 and the real-authority packet L21 and L53, the owner grant must record:
@@ -292,9 +329,16 @@ added to the quoted cells):
 | Prerequisite | State | Evidence |
 | --- | --- | --- |
 | Evidence-computed transition guards (P2-6 option (a)) | **Entry criterion for CP-WP-003; not authorized** | Backlog L294–296: "Making the engine enforce guards computed from the checks that actually ran (option (a)) is now an entry criterion for CP-WP-003." Backlog L318–319: "Option (a), evidence-computed guards, remains an entry criterion for CP-WP-003 and is not authorized." The maintenance grant APR-086 is consumed by APR-098 |
-| ZT-P1 offline role/stage transition contract | **NOT started**; needs a reviewed owner grant naming `tools/aegis_delivery_control/contracts.py` | Backlog L1688–1691 |
 | CP-FUT-001 distributed ownership or hosted service | BLOCKED; out of scope for this packet | Backlog L83, L271 |
 | BER separation | The Behavioral Eval Runner (BER) is a separate tool with separate approvals, data and runtime contracts; CP does not inherit BER policy by implication | Offline proof proposal L112–113; real-authority packet L41 |
+
+ZT-P1 is deliberately not in this table: it is outside the status table's
+CP-WP-003/CP-WP-004 chain (L78-83) and absent from the owning open-decisions
+row (L232), and CP-WP-003's own block (L269, L279-282) names source, freshness,
+containment, evidence and billing instead. The offline ZT-P1 increment delivered
+by PR #675 supplies none of those real proofs, and no active grant covers the
+real role/stage delivery, so it stays a separate row in section 1 rather than a
+prerequisite here.
 
 These are named so the owner sees the whole chain. Naming a prerequisite grants
 it nothing and starts nothing.
@@ -318,12 +362,16 @@ This packet authorizes **nothing**. In particular it does not authorize:
 
 ## 7. Recording note
 
-Decisions D1 and D2 become real only when the owner's exact words are recorded
-through separately reviewed governance changes — the
-[CP backlog](resumable-control-plane-backlog.md),
-the [approval register](../approvals/APPROVAL_REGISTER.md), and/or the
-[open-decisions register](aegis-open-decisions-2026-09-23.md). This packet's own
-pull request does not edit any of them and does not record an answer.
+An owner answer to D1 or D2 grants only when it is an effectively active
+[approval register](../approvals/APPROVAL_REGISTER.md) grant or a current
+direct owner instruction; nothing else creates the authority. The
+[CP backlog](resumable-control-plane-backlog.md) states this itself at L98-112:
+"A backlog entry or approved design is not implementation authority" and "these
+records do not create grants or replace the repository's one approval
+register." The register, the CP backlog and the
+[open-decisions register](aegis-open-decisions-2026-09-23.md) are read for
+status, not for authority. This packet's own pull request does not edit any of
+them and does not record an answer.
 
 ## Sources and verification
 
@@ -332,7 +380,8 @@ All quoted lines were read at the base commit
 
 - [`docs/roadmaps/aegis-open-decisions-2026-09-23.md`](aegis-open-decisions-2026-09-23.md) — L43, L44, L232, L239, L351, L352.
 - [`docs/approvals/APPROVAL_REGISTER.md`](../approvals/APPROVAL_REGISTER.md) — AEGIS-APR-006 (L275–321), AEGIS-APR-068 (L1858–1879), AEGIS-APR-102 (L3160–3237).
-- [`docs/roadmaps/resumable-control-plane-backlog.md`](resumable-control-plane-backlog.md) — L78–83, L268–271, L273–282, L284–319, L1684–1691.
+- [`docs/roadmaps/resumable-control-plane-backlog.md`](resumable-control-plane-backlog.md) — L78–83, L98–112, L268–271, L273–282, L284–319, L1684–1691.
+- [`docs/roadmaps/aegis-backlog-forecast.md`](aegis-backlog-forecast.md) — L4795–4796.
 - [`docs/roadmaps/cp-wp-003-named-candidate-matrix.md`](cp-wp-003-named-candidate-matrix.md) — L3, L7–11, L19–22, L32–36, L40–44, L48–52.
 - [`docs/roadmaps/cp-wp-003-dynamodb-public-contract-inspection.md`](cp-wp-003-dynamodb-public-contract-inspection.md) — L7, L11–15, L19–25, L33–38, L42–46.
 - [`docs/roadmaps/cp-wp-003-offline-proof-proposal.md`](cp-wp-003-offline-proof-proposal.md) — L16–24, L61–69, L86–100, L104–116.
