@@ -612,6 +612,30 @@ The Project Aegis source repository is identified by its source-package landmark
 [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) defines the
 format if you want to write your own.
 
+### Using Aegis skills — record what you used
+
+Anyone using Aegis skills records which skills they used, why, and the
+result. The record is one line per skill, six fields separated by `/`:
+
+```text
+skill@<manifest-sha256[:12]> / reason / applied / result / incomplete / by
+```
+
+`skill@<hash>` binds the record to the exact instructions applied:
+the hash is that skill's entry in
+[`tools/skills-manifest.json`](tools/skills-manifest.json), the
+validator-generated manifest of every shipped skill's `SKILL.md` content
+SHA-256 (CRLF-normalized, checkout-independent). Paste the block into the
+pull-request description (or your own ledger); the
+`skill-usage-ledger` skill produces the block for you — it emits the record
+in conversation and writes nothing.
+
+This is deliberately trivial, verifiable, and expected: trivial (one line
+per skill), verifiable (every hash resolves in the manifest), and expected
+(as the repository's own delivery workflow already requires each stage agent
+to record its skills). Compliance remains yours — the record is an aid to
+verifiability, never a replacement for your own accountability.
+
 #### Using Aegis with Codex CLI and other Agent Skills tools
 
 Aegis skills use the open Agent Skills format — one `SKILL.md` with frontmatter (a short settings block written in YAML, a plain-text data format) per
@@ -747,7 +771,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->204<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->205<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch), fronted by one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -759,7 +783,7 @@ plain-language business question, records each dated decision in a `docs/project
 keeps a human as the approval gate on anything irreversible. See
 *[Your first session](#your-first-session)* for the opening prompt.
 
-1. **Operating discipline** *(Phase 1, 8)* — the always-on rules that keep AI-assisted work
+1. **Operating discipline** *(Phase 1, 9)* — the always-on rules that keep AI-assisted work
    honest: classify before acting, verify against evidence, keep diffs small, halt for
    approval, close out honestly. *e.g.* `change-classification-gate`, `human-approval-boundary`,
    `reviewable-diff-discipline`, `ai-closeout-reporter`.
@@ -1073,6 +1097,7 @@ Phase 1 — AI engineering operating-discipline pack, under `.claude/skills/<nam
 | `human-approval-boundary` | Halts for explicit approval before schema, RLS/security, prod-data, secrets, deploy, billing, or destructive work; stops when security impact is unclear. | auto + manual |
 | `reviewable-diff-discipline` | Keeps diffs small and intentional; stages exact files only; staged set must equal declared intent. | manual only |
 | `ai-closeout-reporter` | Terminal closeout report with a mandatory "intentionally not done / omitted" section — scope reductions are never silent. | auto + manual |
+| `skill-usage-ledger` | Emits the six-field record of which Aegis skills a task used, each bound to its skills-manifest SHA-256, for pasting into a PR description or ledger; writes nothing itself. | auto |
 | `agent-failure-recovery` | Preserve-first recovery from broken git/tree state; destructive cleanup only with backup + explicit approval. | **manual only** |
 | `agent-instruction-consolidator` | Aligns CLAUDE.md / AGENTS.md / Cursor / Copilot instruction files to one canonical source with rule-preservation proof. | **manual only** |
 

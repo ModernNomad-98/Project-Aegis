@@ -102,6 +102,7 @@ that way by using plain asserts rather than a test framework (decision D55).
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -587,6 +588,83 @@ def check_catalog_integrity(skill_names: list[str], rep: Report) -> None:
 # wrapped in HTML-comment markers the validator owns, so there is no guessing
 # which "179" in the prose is the current total (historical and aspirational
 # numbers are deliberately left unmarked).
+
+MANIFEST_PATH = REPO_ROOT / "tools" / "skills-manifest.json"
+MANIFEST_SCHEMA = "aegis.skills-manifest/1"
+MANIFEST_HASH_INPUT = "SKILL.md bytes, CRLF->LF normalized"
+
+
+def _manifest_entries(skills: list[Path]) -> list[dict]:
+    """One entry per shipped skill: name, path, and the SHA-256 of the
+    SKILL.md bytes as stored in git (CRLF->LF normalized before hashing), so
+    the identity is checkout-independent and git-blob reproducible."""
+    entries = []
+    for skill_dir in skills:
+        skill_md = skill_dir / "SKILL.md"
+        data = skill_md.read_bytes().replace(b"\r\n", b"\n")
+        entries.append({
+            "name": skill_dir.name,
+            "path": skill_md.relative_to(REPO_ROOT).as_posix(),
+            "sha256": hashlib.sha256(data).hexdigest(),
+        })
+    return sorted(entries, key=lambda e: e["name"])
+
+
+def _manifest_payload(skills: list[Path], source_revision: str) -> dict:
+    return {
+        "schema": MANIFEST_SCHEMA,
+        "source_revision": source_revision,
+        "hash_input": MANIFEST_HASH_INPUT,
+        "skills": _manifest_entries(skills),
+    }
+
+
+def check_skills_manifest(skills: list[Path], rep: Report, refresh: bool = False,
+                          manifest_ref: str | None = None) -> None:
+    """(D91) The committed tools/skills-manifest.json must equal the manifest
+    built from the current tree's shipped SKILL.md files. Drift means a
+    skill's identity changed without the manifest, so every skill PR must
+    carry the refreshed manifest or the validator fails."""
+    if refresh:
+        try:
+            source_revision = manifest_ref or subprocess.check_output(
+                ["git", "-C", str(REPO_ROOT), "rev-parse", "HEAD"],
+                text=True).strip()
+        except (subprocess.CalledProcessError, OSError) as exc:
+            rep.error("skills manifest refresh: cannot resolve source revision: "
+                      + str(exc))
+            return
+        payload = _manifest_payload(skills, source_revision)
+        # newline="\n" pins LF bytes: a Windows refresh is byte-identical to
+        # the committed manifest (the D84 lesson).
+        MANIFEST_PATH.write_text(
+            json.dumps(payload, indent=2) + "\n", encoding="utf-8",
+            newline="\n")
+        print(f"wrote {MANIFEST_PATH.relative_to(REPO_ROOT)} at "
+              f"{source_revision[:12]} ({len(payload['skills'])} skills)")
+        return
+    if not MANIFEST_PATH.is_file():
+        rep.error("tools/skills-manifest.json missing - run "
+                  "python scripts/validate-skills.py --refresh-skills-manifest")
+        return
+    try:
+        committed = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        rep.error("skills manifest unreadable: " + str(exc))
+        return
+    if committed.get("schema") != MANIFEST_SCHEMA:
+        rep.error("skills manifest schema mismatch: " + str(committed.get("schema")))
+        return
+    if committed.get("hash_input") != MANIFEST_HASH_INPUT:
+        rep.error("skills manifest hash_input changed without a decision")
+        return
+    recorded = committed.get("skills")
+    built = _manifest_entries(skills)
+    if recorded != built:
+        rep.error("skills manifest drift - a SKILL.md changed without a "
+                  "refreshed manifest; run: python scripts/validate-skills.py "
+                  "--refresh-skills-manifest")
+
 
 SKILL_COUNT_MARKER = re.compile(
     r"<!--\s*SKILL-COUNT\s*-->\s*(\d+)\s*<!--\s*/SKILL-COUNT\s*-->"
@@ -1556,6 +1634,11 @@ def check_name_collisions(skill_names: list[str], rep: Report) -> None:
 
 
 def main() -> int:
+    refresh_manifest = "--refresh-skills-manifest" in sys.argv
+    manifest_ref = None
+    for arg in sys.argv[1:]:
+        if arg.startswith("--manifest-ref="):
+            manifest_ref = arg.split("=", 1)[1]
     if yaml is None:
         print(
             "ERROR PyYAML is required for the strict frontmatter parse "
@@ -1583,6 +1666,8 @@ def main() -> int:
 
     check_name_collisions(names, rep)
     check_catalog_integrity([n for n in names if n], rep)
+    check_skills_manifest(skills, rep, refresh=refresh_manifest,
+                          manifest_ref=manifest_ref)     # HARD  (D91)
 
     # Repo surfaces outside .claude/skills/ (decision D55).
     check_agents_schema(rep)                       # HARD

@@ -4338,6 +4338,28 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   nothing new and creates no new APR/BER-DEC. Counts UNCHANGED (SKILL-COUNT
   204, FAMILY-COUNT 23). D89 and earlier entries are byte-untouched.
 
+- **D91 (2026-10-10) — Skills-recording hardening (manifest + skill-usage-ledger
+  + one README guidance page).** The owner's REVISED selection ("YES!") is
+  delivered as three components: (1) `tools/skills-manifest.json` — the
+  validator-generated manifest binding every shipped skill's name to the
+  SHA-256 of its `SKILL.md` bytes (CRLF→LF normalized, checkout-independent,
+  git-blob reproducible; `_template` and the manifest itself excluded);
+  `scripts/validate-skills.py` gains `check_skills_manifest` (drift → the
+  validator fails, so every skill PR must carry the refreshed manifest) and
+  the `--refresh-skills-manifest` / `--manifest-ref` flags; (2) the
+  `skill-usage-ledger` skill (auto-invocable, emits the six-field
+  `skill@<manifest-sha256[:12]> / reason / applied / result / incomplete /
+  by` record in conversation and writes nothing; evals + trigger-evals with
+  the ai-closeout-reporter near-miss) — registered like any skill: catalog
+  Phase-1 row, README shipped row, family 1 *(Phase 1, 8 → 9)*, SKILL-COUNT
+  204 → 205, FAMILY-COUNT 23 unchanged, roles table and ZERO_TRUST
+  unchanged; (3) the ONE README guidance subsection "Using Aegis skills —
+  record what you used" with the honesty framing (trivial, verifiable,
+  expected; compliance remains the user's); AGENTS.md untouched. Counts
+  UNCHANGED as above except the one new skill (SKILL-COUNT 205, FAMILY-COUNT
+  23). This entry records the lane; it grants no new execution, publication
+  or merge authority. D90 and earlier entries are byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

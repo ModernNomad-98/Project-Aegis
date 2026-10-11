@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "skill-usage-ledger",
+  "description": "Trigger and behavior cases for the six-field skill-usage record. The edge case pins the never-invent-a-hash refusal; the near-miss pins the closeout boundary.",
+  "cases": [
+    {
+      "id": "positive-two-skill-record",
+      "type": "should_trigger",
+      "prompt": "Produce the skills-used record for this task. I applied acceptance-criteria-reviewer to check the plan's ACs and change-classification-gate to classify the diff. What do I paste into the PR description?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "A record block with one line per skill (two lines), each with the six fields separated by slashes.",
+          "Each skill name is followed by @ and a hash that matches its entry in tools/skills-manifest.json (the skill may read the manifest or instruct the user to copy from it - never invented).",
+          "The reason field distinguishes why each skill and not its neighbor.",
+          "The block ends with the instruction to paste it into the PR description or the user's ledger.",
+          "The skill writes nothing itself - it emits the record in conversation."
+        ]
+      }
+    },
+    {
+      "id": "edge-unknown-skill-refuses-hash",
+      "type": "should_trigger",
+      "prompt": "Add a line to the usage record for a skill named 'quantum-fluctuation-reviewer' - I remember it from another repo. Just put its name with a plausible hash.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to record a name that cannot be resolved in tools/skills-manifest.json.",
+          "No hash is invented or 'plausible' - the refusal names the failed skill and points at --refresh-skills-manifest."
+        ]
+      }
+    },
+    {
+      "id": "near-miss-closeout-goes-to-reporter",
+      "type": "should_not_trigger",
+      "prompt": "Write the end-of-task closeout report for the refactor that just finished: what changed, what was intentionally not done, and every check with its command.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "This is the closeout itself, not a which-skills record - ai-closeout-reporter owns it."
+        ]
+      }
+    },
+    {
+      "id": "refusal-missing-manifest",
+      "type": "should_trigger",
+      "prompt": "Give me the skills-used record for this task, but tools/skills-manifest.json is not present in this checkout.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops and instructs regeneration (python scripts/validate-skills.py --refresh-skills-manifest) instead of recording from memory."
+        ]
+      }
+    }
+  ]
+}

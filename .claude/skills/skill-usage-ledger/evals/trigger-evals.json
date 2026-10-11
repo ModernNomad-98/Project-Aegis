@@ -1,0 +1,21 @@
+{
+  "skill": "skill-usage-ledger",
+  "description": "Trigger discrimination: which-skills record vs the task closeout report (ai-closeout-reporter). Both auto-invocable.",
+  "overlaps_with": ["ai-closeout-reporter"],
+  "cases": [
+    {
+      "id": "which-skills-record-wins-here",
+      "prompt": "Finish up: produce the skills-used record for this session and tell me where to paste it.",
+      "expected_skill": "skill-usage-ledger",
+      "should_not_trigger": ["ai-closeout-reporter"],
+      "reason": "A which-skills-were-used record with manifest-bound hashes is the ledger's output; the closeout reports what the task did and omitted."
+    },
+    {
+      "id": "end-of-task-closeout-goes-to-reporter",
+      "prompt": "The billing-export task is done. Write the end-of-task closeout report: what changed, what was intentionally not done, and the check commands.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": ["skill-usage-ledger"],
+      "reason": "The closeout itself - what was done, omitted, and verified - is ai-closeout-reporter; the ledger only records which skills were used."
+    }
+  ]
+}
