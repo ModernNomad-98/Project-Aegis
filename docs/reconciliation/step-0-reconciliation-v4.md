@@ -4379,6 +4379,30 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   (SKILL-COUNT 205, FAMILY-COUNT 23). D91 and earlier entries are
   byte-untouched.
 
+- **D93 (2026-10-11) — Q1 PR-body CI structural check (skills-documentation
+  enforcement).** The owner-selected queue item: CI enforcement that every
+  human/agent PR body carries the template's three bound fields. Delivered:
+  `scripts/ci/check_pr_body_skills.py` (structural rules only — whole-line
+  sentinel pairs for skills/security/witness; ≥1 four-cell skills data row
+  or the no-matching-skill statement; a Row source record naming every
+  published data row; bot authors dependabot[bot]/renovate[bot] exempt; no
+  hash equality, no content grading), its six ORIGINAL subprocess-level
+  fixture
+  [count annotation, 2026-10-11 — the suite has grown through nine Codex-review
+  revise rounds (rounds 1-10) to 34 tests; the six acceptance fixtures of the
+  original delivery are cases (a)-(f), each rule's regression lives beside
+  it, and the count above records the original six, not the current suite —
+  corrected in place so the durable record does not preserve a stale count]
+  tests, and ONE pull_request-only workflow step `pr-body-skills-check` in
+  the existing validate-skills job immediately after the DCO step (no new
+  job, no branch-protection change). The lane's own PR trips the
+  protected-path guard by design; the body records the owner's standing
+  blanket pre-approval (APR-100) with its verbatim quote and the
+  CONTRIBUTING rule-3 exception route — the gate is not weakened. Counts
+  UNCHANGED (SKILL-COUNT 205, FAMILY-COUNT 23). This entry records the
+  lane; it grants no new execution, publication or merge authority. D92 and
+  earlier entries are byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

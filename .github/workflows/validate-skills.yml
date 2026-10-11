@@ -15,6 +15,7 @@ name: validate-skills
 #                 clean merge of two individually-clean branches).
 on:
   pull_request:
+    types: [opened, synchronize, reopened, edited]
     branches:
       - main
   push:
@@ -153,6 +154,12 @@ jobs:
       - name: Check CI evidence and protected-path handling
         run: python -P scripts/ci/record-check.py ci-tests -- python -P scripts/tests/test_offline_ci.py
 
+      # The Q1 lane's own checker self-tests run inside the same gate job
+      # (decision D93), exercising every rule against good/bad fixtures
+      # before the pr-body-skills-check step judges real PR bodies.
+      - name: Run PR-body bound-field checker self-tests
+        run: python -P scripts/ci/record-check.py pr-body-skills-tests -- python -P scripts/tests/test_pr_body_skills_check.py
+
       # Who validates the validator (decision D55). The gate's own hard checks
       # are exercised against good/bad fixtures BEFORE it is trusted to judge
       # the library, so a refactor cannot silently disarm one.
@@ -259,6 +266,13 @@ jobs:
           git fetch origin "$BASE_REF" --quiet
           python -P scripts/check_dco.py --range "origin/${BASE_REF}..${HEAD_SHA}"
 
+      - name: pr-body-skills-check
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr view "${{ github.event.number }}" --json body --jq .body | python -P scripts/ci/check_pr_body_skills.py --body-file - --author "${{ github.event.pull_request.user.login }}"
+
       - name: Retain offline-check evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
@@ -308,6 +322,9 @@ jobs:
 
       - name: Check CI evidence handling
         run: python -P scripts/ci/record-check.py ci-tests -- python -P scripts/tests/test_offline_ci.py
+
+      - name: Run PR-body bound-field checker self-tests
+        run: python -P scripts/ci/record-check.py pr-body-skills-tests -- python -P scripts/tests/test_pr_body_skills_check.py
 
       - name: Run validator self-tests
         run: python -P scripts/ci/record-check.py validator-tests -- python -P scripts/tests/test_validator.py
