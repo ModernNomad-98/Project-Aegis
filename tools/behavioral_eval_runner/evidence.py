@@ -90,7 +90,7 @@ def _utc_now_iso() -> str:
 _DIRFD_PROBE_PAYLOAD = b"dirfd-probe-payload"
 
 
-def _dirfd_replace_probe() -> bool:
+def _dirfd_replace_probe() -> tuple[bool, bool]:
     """Measure, never assume: can THIS stdlib/host combination run a
     descriptor-relative ``os.replace`` with RELATIVE basename operands and
     distinct src/dst directory descriptors?
@@ -102,19 +102,47 @@ def _dirfd_replace_probe() -> bool:
     directories, each opened O_DIRECTORY and retained, a probe file created
     in the source directory, and one descriptor-relative replace called with
     RELATIVE basenames and distinct src/dst directory descriptors (no
-    process-cwd change) — and returns True only after the destination file
-    exists with the exact probe payload AND the source file is absent.
+    process-cwd change) — and reports supported=True only after the
+    destination file exists with the exact probe payload AND the source file
+    is absent.
 
-    Failure to construct or run the probe (no temp dir, missing constants,
-    unsupported call) returns False. Each acquired descriptor is released
-    independently on success AND partial failure, before the temporary
-    directory is cleaned up. Assertion and other programming errors are
-    never caught here. The static membership in
-    ``_dirfd_replace_supported`` is the FIRST short circuit; this probe is
-    the measurement behind it, not the primary path.
+    Returns ``(supported, conclusively_released)`` (F1): *supported* is the
+    measured capability; *conclusively_released* is True only when EVERY
+    descriptor this probe acquired was closed exactly once with no close
+    error. Cleanup ownership is per-descriptor and single-site: each close
+    is attempted AT MOST ONCE, a failed close is never retried (a descriptor
+    number may already have been reused elsewhere), and a close failure on
+    one descriptor never skips the other's cleanup — the descriptor is then
+    cleanup-ATTEMPTED, not conclusively released. The TemporaryDirectory
+    cleanup stays OUTERMOST, independent of descriptor cleanup. Expected
+    capability/cleanup failures (NotImplementedError, OSError,
+    AttributeError) never propagate; programming errors (TypeError etc.) do.
     """
-    fd_src = -1
-    fd_dst = -1
+    # Per-descriptor cleanup ownership: opened/attempted/released, ONE close
+    # site each, at most once — no blind re-close anywhere (F1).
+    cleanup = {
+        "src": {"fd": -1, "opened": False, "attempted": False,
+                "released": False},
+        "dst": {"fd": -1, "opened": False, "attempted": False,
+                "released": False},
+    }
+
+    def close_one(name: str) -> None:
+        """Close the named descriptor AT MOST ONCE, independently. An
+        expected close error marks the attempt (ownership released — no
+        retry, the number may be reused) and leaves released=False: the
+        descriptor is cleanup-ATTEMPTED, not conclusively released."""
+        slot = cleanup[name]
+        if not slot["opened"] or slot["attempted"]:
+            return
+        slot["attempted"] = True
+        try:
+            os.close(slot["fd"])
+        except (NotImplementedError, OSError, AttributeError):
+            return
+        slot["released"] = True
+
+    supported = False
     try:
         with tempfile.TemporaryDirectory() as tmp:
             src_dir = os.path.join(tmp, "srcd")
@@ -124,11 +152,13 @@ def _dirfd_replace_probe() -> bool:
             # O_DIRECTORY is a POSIX safety hint, not part of the measured
             # capability: hosts without the constant (Windows) take plain
             # O_RDONLY opens, and those that cannot open a directory at all
-            # fail the probe honestly (OSError -> False).
+            # fail the probe honestly (OSError -> supported False).
             dirfd_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
-            fd_src = os.open(src_dir, dirfd_flags)
+            cleanup["src"]["fd"] = os.open(src_dir, dirfd_flags)
+            cleanup["src"]["opened"] = True
             try:
-                fd_dst = os.open(dst_dir, dirfd_flags)
+                cleanup["dst"]["fd"] = os.open(dst_dir, dirfd_flags)
+                cleanup["dst"]["opened"] = True
                 try:
                     with open(os.path.join(src_dir, "probe"), "wb") as handle:
                         handle.write(_DIRFD_PROBE_PAYLOAD)
@@ -136,39 +166,47 @@ def _dirfd_replace_probe() -> bool:
                     # absolute operands, which is exactly the class of bug
                     # this probe exists to catch.
                     os.replace("probe", "probe",
-                               src_dir_fd=fd_src, dst_dir_fd=fd_dst)
+                               src_dir_fd=cleanup["src"]["fd"],
+                               dst_dir_fd=cleanup["dst"]["fd"])
                     with open(os.path.join(dst_dir, "probe"), "rb") as handle:
                         dst_ok = handle.read() == _DIRFD_PROBE_PAYLOAD
-                    src_ok = not os.path.exists(os.path.join(src_dir, "probe"))
-                    return dst_ok and src_ok
+                    src_ok = not os.path.exists(
+                        os.path.join(src_dir, "probe"))
+                    supported = dst_ok and src_ok
                 finally:
-                    if fd_dst >= 0:
-                        os.close(fd_dst)
-                        fd_dst = -1
+                    # Independent per-descriptor close: a dst-close failure
+                    # never skips the src close below.
+                    close_one("dst")
             finally:
-                if fd_src >= 0:
-                    os.close(fd_src)
-                    fd_src = -1
+                close_one("src")
     except (NotImplementedError, OSError, AttributeError):
-        return False
+        supported = False
     finally:
-        if fd_src >= 0:
-            os.close(fd_src)
-        if fd_dst >= 0:
-            os.close(fd_dst)
-    return False
+        # The ONLY remaining close sites (each at-most-once) — the
+        # TemporaryDirectory context above is OUTERMOST and cleans up
+        # independently of descriptor cleanup. No blind re-close exists.
+        close_one("dst")
+        close_one("src")
+    conclusive = all(
+        not slot["opened"] or slot["released"]
+        for slot in cleanup.values())
+    return supported, conclusive
 
 
 def _dirfd_replace_supported() -> bool:
     """True when the documented static membership already says dir-fd replace
     works — the FIRST short circuit, so the probe is not consulted at all on
     those hosts; otherwise the runtime probe measures the relative-operand
-    dir-fd replacement on the actual host. The static set remains the
-    documented fallback where the probe environment cannot be constructed.
-    """
+    dir-fd replacement on the actual host. A measured capability is only
+    reported when the probe also vouches for its own cleanup: a supported
+    replacement whose descriptor close failed is reported False (the cleanup
+    state is the probe's second element), never as a blind pass. The static
+    set remains the documented fallback where the probe environment cannot
+    be constructed."""
     if os.replace in getattr(os, "supports_dir_fd", frozenset()):
         return True
-    return _dirfd_replace_probe()
+    supported, conclusive = _dirfd_replace_probe()
+    return supported and conclusive
 
 
 #: True only on POSIX hosts whose stdlib can create + atomically replace relative
