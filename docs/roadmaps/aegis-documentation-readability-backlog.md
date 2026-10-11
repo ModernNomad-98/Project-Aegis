@@ -3213,26 +3213,92 @@ PROGRESS**.
 
 ### Documentation-batch reconciliation — 2026-10-11 (D99)
 
-**Scope.** A post-queue-2 reconciliation of the batch rows ABOVE against the official acceptance state, appended at this section's end (additions only — the historical rows are dated snapshots, annotated here, never rewritten). The official state is re-derived from the consolidated keeper table (this ledger's foot, L4487–4582) and from `check_index.py` re-run at the pinned ref `408e4d6a` in a full clone at this base: reader pages 631 / accepted 50 / provably-pending 4 / no-recorded 564 / within-10 7 / cannot-decide 6 → **official pending count 581** (the D96 record, reproduced byte-for-byte).
+**Scope.** A post-queue-2 reconciliation of the batch rows ABOVE against the
+official acceptance state, appended at this section's end (additions only — the
+historical rows are dated snapshots, annotated here, never rewritten). Round 1
+appended this section at base `ab7182d8`; PQ1's full-page re-read (D98) merged
+first as `279338a9`, so round 2 re-derives every figure at that base. This
+lane's diff is confined to its own append range — this section's bytes and the
+D99 entry in the reconciliation log; D98's Start-here range and every dated row
+are byte-untouched.
 
-| Batch (section anchor, reviewed revision ab7182d8) | Recorded pages | Official state (keeper table + check_index) |
-| --- | --- | --- |
-| Readability sweep first batch (L3968) | 8 | all 8 carry full-page-acceptance rows → accepted |
-| Readability sweep second batch (L4015) | 8 | all 8 accepted |
-| Readability sweep third batch (L4066) | 8 | all 8 accepted |
-| Readability sweep fourth batch (L4113) | 8 | all 8 accepted |
-| Readability sweep fifth batch (L4162) | 7 | all 7 accepted |
-| Readability sweep sixth batch (L4221) | 8 | all 8 accepted |
-| Readability sweep seventh batch (L4272) | 6 | all 6 accepted |
-| Readability sweep eighth batch (L4317) | 4 | all 4 accepted |
-| Readability sweep ninth batch (L4364) | 1 | accepted |
-| Readability sweep tenth batch (autonomous tail, L4404) | 1 | accepted |
-| Readability sweep eleventh batch (third autonomous tail, L4444) | 1 | accepted |
-| "Documentation batches" dated table rows above (L2836–3167) | paths recorded in the linked review pages | annotated: each row's pages map to the keeper table's accepted rows where present; every other page falls in the official 581's buckets (no-recorded / provably-pending / within-10 / cannot-decide) — the dated rows themselves are not re-scored |
+**Why the per-batch states were rebuilt (Codex P1 4242876575).** Round 1 read a
+batch table's acceptance row as "the page is accepted". Those are different
+claims: a row records an acceptance at a REVISION, and a page counts accepted
+only while it has zero drift against that revision at the ref being measured.
+Round 2 therefore re-derives every batch state from the checker's own buckets.
 
-**Method honesty:** the sweep-batch page counts were re-derived programmatically at the base (page-path extraction per section, intersected with the keeper table's full-page-acceptance set); the dated-table row is annotated at the batch level because its page paths live in the linked review pages, not inline. **Named follow-ups found: none** — every sweep-batch page's recorded state matches the official keeper table; the two `e6fc8d24` pages recorded in the first keeper recording carry NO acceptance row by the main-containment rule (recorded in D84) and count pending until re-reviewed — a recorded state, not a new defect. No row is rewritten.
+**Bucket definitions used here** (the checker's own,
+`tools/readability_acceptance/check_index.py`): *accepted* — a
+full-page-acceptance row exists, its revision is contained in
+`refs/remotes/origin/main`, and the page has ZERO drift against it; *within-10
+pending* — the recorded acceptance exists, the page drifted by 1–10
+added+deleted lines with no new section heading, and no recorded targeted-review
+row covers the drift (it counts in the official pending total); *provably
+pending* — the page drifted past the rule (more than 10 added+deleted lines, or
+a new section heading). Below, "accepted" always means the checker's accepted
+bucket at the named ref — never the presence of a batch-table row.
 
-**Self-cost.** This note adds lines and deletes 0 (git diff --numstat against the base commit). It confers nothing, changes no counting rule in force, and rewrites no dated text.
+| Batch (abbreviated section heading) | Acceptance records | Unique pages | Pinned `408e4d6a`: accepted / within-10 pending / provably pending | Live at the candidate head: accepted / within-10 pending / provably pending |
+| --- | --- | --- | --- | --- |
+| Readability sweep first batch | 8 | 8 | 6 / 2 / 0 | 6 / 2 / 0 |
+| Readability sweep second batch | 8 | 8 | 7 / 1 / 0 | 7 / 1 / 0 |
+| Readability sweep third batch | 8 | 8 | 5 / 1 / 2 | 4 / 1 / 3 |
+| Readability sweep fourth batch | 8 | 8 | 6 / 1 / 1 | 6 / 1 / 1 |
+| Readability sweep fifth batch | 7 | 7 | 7 / 0 / 0 | 7 / 0 / 0 |
+| Readability sweep sixth batch | 8 | 8 | 6 / 1 / 1 | 5 / 2 / 1 |
+| Readability sweep seventh batch | 8 | 8 | 7 / 1 / 0 | 7 / 1 / 0 |
+| Readability sweep eighth batch | 5 | 5 | 3 / 0 / 2 | 3 / 0 / 2 |
+| Readability sweep ninth batch | 2 | 2 | 1 / 0 / 1 | 1 / 0 / 1 |
+| Readability sweep tenth batch (autonomous tail) | 2 | 2 | 1 / 0 / 1 | 1 / 0 / 1 |
+| Readability sweep eleventh batch (third autonomous tail) | 2 | 2 | 1 / 0 / 1 | 1 / 0 / 1 |
+| **All eleven sweep batches** | **66** | **61** | **50 / 7 / 4** | **48 / 8 / 5** |
+| "Documentation batches" dated table rows above | paths recorded in the linked review pages | — | annotated at the batch level, never re-scored | annotated at the batch level, never re-scored |
+
+Each batch heading above is that section's own `## Ledger-keeper recording +
+batch update — readability sweep …` heading. Batch rows are per-batch counts;
+the total row counts UNIQUE pages across all eleven batches, because this ledger
+appears in five of the batch tables and this reconciliation log in two — on the
+record basis the provably-pending column sums to 9 records at `408e4d6a` and 10
+at the candidate head.
+
+**Method honesty.** Every state above was re-derived with commands, not prose:
+`python -B tools/readability_acceptance/check_index.py --ref
+408e4d6a2046b37afe7912e9c8643474df7ab037 --json` (its `accepted`,
+`provably_pending`, `small_drift` and `undecided` arrays give each page's
+bucket, with `changed_lines`, `new_section` and `targeted_review_covers`), and
+the same command with `--ref <the candidate head>` for the live column; the
+batch tables' rows were extracted from their sections and each Markdown link
+resolved against `docs/roadmaps/`, then joined to the checker's per-page arrays
+by path. **The 66-vs-60 correction:** round 1 stated 60 recorded pages; the
+eleven batch tables hold **66** acceptance records — batches 7–11 carry
+8/5/2/2/2 rows, not the 6/4/1/1/1 round 1 listed (a 6-record shortfall) — and
+that record total is corroborated independently by the consolidated keeper table
+(`## Consolidated keeper table — index schema v1 (D84, 2026-10-10)`: 66 rows
+over the same 61 unique pages). Those 61 unique pages are exactly the checker's
+50 accepted + 4 provably-pending + 7 within-10 pages at `408e4d6a`; no sweep
+page falls in the 564 no-recorded-acceptance or the 6 cannot-decide buckets.
+**Named follow-ups found: none** — a page in a pending bucket is a recorded
+state, not a new defect: it needs a re-read (or a covering targeted-review row)
+before it can be called accepted. No dated row is rewritten.
+
+**Live figure (labeled).** The candidate head (this section's own commit)
+measures `check_index.py --ref <the candidate head>` → reader pages 633 /
+accepted 48 / provably-pending 5 / no-recorded 566 / within-10 8 /
+cannot-decide 6 → **official pending count 585** — labeled LIVE at the candidate
+head and NOT the historical 581; the exact head/tree and the verbatim JSON are
+recorded in the PR's Stage C round-2 record, because a commit cannot name its
+own SHA inside its own bytes. The tool's default `--ref` is
+`refs/remotes/origin/main`, not `HEAD`, so the candidate head is passed
+explicitly.
+
+**Self-cost.** This note deletes nothing from the base's content and rewrites
+only this lane's own appended bytes; the ledger itself stays **provably
+pending** at the candidate head (a new section plus a changed-lines count far
+past the 10-line rule against its recorded acceptance `2c6b6fc6` — the measured
+figure at the exact head is recorded in the PR's Stage C round-2 record, since
+a commit cannot state its own post-commit measurement inside its own bytes). It
+confers nothing, changes no counting rule in force, and rewrites no dated text.
 
 ## Correction to the pending floor — 2026-10-02
 
