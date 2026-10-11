@@ -4360,6 +4360,25 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   23). This entry records the lane; it grants no new execution, publication
   or merge authority. D90 and earlier entries are byte-untouched.
 
+- **D92 (2026-10-11) — dirfd capability-probe repair, published.** The
+  owner-queued brief (PLAN-rev1 4985989d…) delivered a LOCAL patch first:
+  the probe repair (relative basenames, distinct retained descriptors,
+  verified observable outcomes, honest failure categories, static-first
+  short circuit) + the regression suite, through local A–F rounds — three
+  C/E revise rounds culminating in the AC4 dir_fd-discriminator finding
+  (ambient cleanup opens carry dir_fd; the probe's own do not) and the
+  round-3 patch fingerprint 7ae0ef34…, SD-F ACCEPT (REVIEW-F-final.md
+  9644764c…). This entry records the publication of that patch: the same
+  two files (tools/behavioral_eval_runner/evidence.py +
+  tools/behavioral_eval_runner/tests/test_evidence.py) now land as a
+  reviewed pull request, with the unrun record's resolvers accepted by F
+  (the 11 git-dependent tests resolve in CI where .git exists; the 8
+  calibration skips need the pinned SDK host; the 4 Windows-only tests need
+  a Windows host). Grants nothing new and carries no PR number here; the
+  PR's own record is its body and SD-C comment. Counts UNCHANGED
+  (SKILL-COUNT 205, FAMILY-COUNT 23). D91 and earlier entries are
+  byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
