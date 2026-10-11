@@ -85,36 +85,70 @@ def _utc_now_iso() -> str:
     return _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+#: The probe payload — any fixed byte string would do; it must only be
+#: compared byte-for-byte after the replace.
+_DIRFD_PROBE_PAYLOAD = b"dirfd-probe-payload"
+
+
 def _dirfd_replace_probe() -> bool:
-    """Measure, never assume: can THIS stdlib/host combination run
-    ``os.replace(src, dst, src_dir_fd=..., dst_dir_fd=...)`` for real?
+    """Measure, never assume: can THIS stdlib/host combination run a
+    descriptor-relative ``os.replace`` with RELATIVE basename operands and
+    distinct src/dst directory descriptors?
 
     The static ``os.supports_dir_fd`` set omits ``os.replace`` on some stdlib
     versions (Python 3.12.3 carries ``os.rename`` only), so set membership is
-    the wrong gate. The probe constructs the minimum real environment inside
-    a ``tempfile.TemporaryDirectory`` — two O_DIRECTORY-opened directory
-    descriptors, a probe file, and one dir-fd-relative replace — and returns
-    True only when that replace succeeds. Any failure to construct or run the
-    probe (no temp dir, missing constants, unsupported call) returns False;
-    the static membership below is the documented fallback, never an
-    assumption beyond it.
+    the wrong gate. This probe constructs the minimum real environment inside
+    a ``tempfile.TemporaryDirectory`` — SEPARATE source and destination
+    directories, each opened O_DIRECTORY and retained, a probe file created
+    in the source directory, and one descriptor-relative replace called with
+    RELATIVE basenames and distinct src/dst directory descriptors (no
+    process-cwd change) — and returns True only after the destination file
+    exists with the exact probe payload AND the source file is absent.
+
+    Failure to construct or run the probe (no temp dir, missing constants,
+    unsupported call) returns False. Each acquired descriptor is released
+    independently on success AND partial failure, before the temporary
+    directory is cleaned up. Assertion and other programming errors are
+    never caught here. The static membership in
+    ``_dirfd_replace_supported`` is the FIRST short circuit; this probe is
+    the measurement behind it, not the primary path.
     """
+    fd_src = -1
+    fd_dst = -1
     try:
-        fd_src = -1
-        fd_dst = -1
         with tempfile.TemporaryDirectory() as tmp:
             src_dir = os.path.join(tmp, "srcd")
             dst_dir = os.path.join(tmp, "dstd")
             os.mkdir(src_dir)
             os.mkdir(dst_dir)
-            fd_src = os.open(src_dir, os.O_RDONLY | os.O_DIRECTORY)
-            fd_dst = os.open(dst_dir, os.O_RDONLY | os.O_DIRECTORY)
-            src = os.path.join(src_dir, "probe")
-            dst = os.path.join(dst_dir, "probe")
-            with open(src, "wb") as handle:
-                handle.write(b"probe")
-            os.replace(src, dst, src_dir_fd=fd_src, dst_dir_fd=fd_dst)
-            return True
+            # O_DIRECTORY is a POSIX safety hint, not part of the measured
+            # capability: hosts without the constant (Windows) take plain
+            # O_RDONLY opens, and those that cannot open a directory at all
+            # fail the probe honestly (OSError -> False).
+            dirfd_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
+            fd_src = os.open(src_dir, dirfd_flags)
+            try:
+                fd_dst = os.open(dst_dir, dirfd_flags)
+                try:
+                    with open(os.path.join(src_dir, "probe"), "wb") as handle:
+                        handle.write(_DIRFD_PROBE_PAYLOAD)
+                    # Relative basenames only: Python ignores dir_fd for
+                    # absolute operands, which is exactly the class of bug
+                    # this probe exists to catch.
+                    os.replace("probe", "probe",
+                               src_dir_fd=fd_src, dst_dir_fd=fd_dst)
+                    with open(os.path.join(dst_dir, "probe"), "rb") as handle:
+                        dst_ok = handle.read() == _DIRFD_PROBE_PAYLOAD
+                    src_ok = not os.path.exists(os.path.join(src_dir, "probe"))
+                    return dst_ok and src_ok
+                finally:
+                    if fd_dst >= 0:
+                        os.close(fd_dst)
+                        fd_dst = -1
+            finally:
+                if fd_src >= 0:
+                    os.close(fd_src)
+                    fd_src = -1
     except (NotImplementedError, OSError, AttributeError):
         return False
     finally:
@@ -126,10 +160,11 @@ def _dirfd_replace_probe() -> bool:
 
 
 def _dirfd_replace_supported() -> bool:
-    """True when the documented static membership says dir-fd replace works,
-    OR the runtime probe measured it working. The static set is the fallback
-    (e.g., probe environment not constructible); the probe is the primary
-    evidence on the actual host.
+    """True when the documented static membership already says dir-fd replace
+    works — the FIRST short circuit, so the probe is not consulted at all on
+    those hosts; otherwise the runtime probe measures the relative-operand
+    dir-fd replacement on the actual host. The static set remains the
+    documented fallback where the probe environment cannot be constructed.
     """
     if os.replace in getattr(os, "supports_dir_fd", frozenset()):
         return True
@@ -138,8 +173,9 @@ def _dirfd_replace_supported() -> bool:
 
 #: True only on POSIX hosts whose stdlib can create + atomically replace relative
 #: to a retained no-follow directory descriptor (openat/renameat-style) —
-#: measured by the runtime probe above, with the static supports_dir_fd
-#: membership as the documented fallback. When True, ``_atomic_write`` PREVENTS
+#: the static supports_dir_fd membership short-circuits first, and where it
+#: is absent the runtime probe above measures the relative-operand dir-fd
+#: replacement on the actual host. When True, ``_atomic_write`` PREVENTS
 #: a root/parent swap; when False (Windows, and POSIX without dir_fd) it can
 #: only DETECT a pre-existing reparse and is NON_BASELINE for the mid-operation
 #: swap (§5). Evaluated once at import — bounded and non-persistent.
