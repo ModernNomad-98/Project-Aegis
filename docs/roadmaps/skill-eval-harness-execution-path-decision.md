@@ -164,14 +164,18 @@ two items do not cover is unresolved as well:
    approve, needs a new owner decision." (L2864-2867).
 
    Two later entries postdate APR-095 and do **not** supply provider-call
-   authority either. `AEGIS-APR-127` (register L5414) supersedes the WSL2
-   platform decision, and `AEGIS-APR-128` (register L5438-5491) grants one
-   **offline** BER R4/R5 Stage A host probe on the WSL2 distro, "ON THE WSL2
-   UBUNTU-24.04 DISTRO ONLY" (L5451-5452). Its Scope FORBIDDEN (L5473-5475)
-   keeps (L5473-5476) "BER Stage B tests or any model-driven session; real
-   baselines or production isolation claims; provider/model calls; credentials in
-   chat or source; paid services; production use" forbidden, and it closes: "A separate
-   authorization is required before any Stage B model-driven proof."
+   authority either. `AEGIS-APR-127` (register L5414-5434) records the owner's
+   2026-10-10 WSL2 decision superseding APR-028's VirtualBox platform choice,
+   and does not withdraw the WSL2 setup authority: "**New authority:** None.
+   The WSL2 setup authority is the new AEGIS-APR-126 grant; this event records
+   the supersession and the deletion rule only." (L5426-5427). `AEGIS-APR-128`
+   (register L5438-5491) grants one **offline** BER R4/R5 Stage A host probe on
+   the WSL2 distro, "ON THE WSL2 UBUNTU-24.04 DISTRO ONLY" (L5451-5452). Its
+   Scope FORBIDDEN (L5473-5475) keeps (L5473-5476) "BER Stage B tests or any
+   model-driven session; real baselines or production isolation claims;
+   provider/model calls; credentials in chat or source; paid services;
+   production use" forbidden, and it closes: "A separate authorization is
+   required before any Stage B model-driven proof."
    (L5480-5481). The matching decision-log entry `BER-DEC-016` records the same
    offline scope: the 2026-10-10 owner "go" authorized the next step after the
    prepared WSL2 distribution, and Stage A is "the proposed offline host probe
