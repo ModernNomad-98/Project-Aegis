@@ -2755,6 +2755,27 @@ artificial intelligence (AI) agents**. Peter specifically identified the dense
 This is a required documentation quality item, not a claim that the current
 pages already meet it.
 
+### Full-page re-read — 2026-10-11 (D98)
+
+**Scope.** The post-queue-1 full-page dispositional re-read of this ledger, performed at the reviewed revision `ab7182d8` by pr-publisher (Stage C, single reader — the plan's disjoint-readers option was unavailable at this delegation depth; the method is recorded honestly). Dated sections are re-read against "Acceptance for each page"; the >10-line/new-section rule governs STATE, not history; dated snapshots are never rewritten; any factual defect found in a dated section is recorded as a named follow-up, never an inline rewrite. **No dated snapshot is rewritten by this note; the diff is additions only.**
+
+| Chunk | Section(s) (anchors at the reviewed revision) | Disposition | Reviewer / notes |
+| --- | --- | --- | --- |
+| 1 | "Start here — current reading" incl. the pause note, the D84 official-count switch appendix and the current-count reconciliation (L1–2757) | accepted | pr-publisher — full read; the switch note already states the ledger publishes no count of its own |
+| 2 | "Purpose and scope" + "Required order of work" + "Acceptance for each page" + "Delivery and estimate" (L2758–2835) | accepted | pr-publisher — full read; the rules sections are self-consistent |
+| 3 | "Documentation batches" dated history (L2836–3168) | accepted | pr-publisher — structural read; batch rows resolve; dated history frozen by rule |
+| 4 | "Correction to the pending floor" + "First ledger-keeper recording" + "Consistency note" + "Ledger checkpoint through PR #186" (L3169–3514) | accepted | pr-publisher — structural read; the chunk carries its own dated correction (the non-ancestor base SHA) |
+| 5 | PR-range checkpoints/updates #212–#222 (L3515–3821) | accepted | pr-publisher — structural read |
+| 6 | PR-range updates #221–#214 (L3822–3967) | accepted | pr-publisher — structural read |
+| 7 | The eleven sweep-batch keeper sections (L3968–4486) | accepted | pr-publisher — structural read |
+| 8 | "Consolidated keeper table — index schema v1 (D84)" (L4487–4582) | accepted | pr-publisher — rows verified to resolve, not edited; the two `e6fc8d24` pages carry NO row by the main-containment rule (recorded in D84) |
+
+All 8 internal anchors used by the ledger resolve to their headings (checked programmatically: 8 used, 0 unresolved). **Named follow-ups found by this re-read: none.** The ledger's own pending state is resolved by this re-read as accepted at the reviewed revision, per its own convention.
+
+**Official-count reconciliation.** `python -B tools/readability_acceptance/check_index.py --ref 408e4d6a2046b37afe7912e9c8643474df7ab037` re-run in a full clone at this base reproduces the Q4-pinned figure byte-for-byte: reader pages 631 / accepted 50 / provably-pending 4 / no-recorded 564 / within-10 7 / cannot-decide 6 → **official pending count 581** (the D96 record). This ledger's historical buckets above remain dated snapshots that relate to, but do not replace, that official figure — **the ledger still publishes no count of its own and cites the index** (the D84 switch note stands).
+
+**Self-cost.** This note adds lines and deletes 0 (git diff --numstat against the base commit) on this ledger. It confers nothing, changes no counting rule in force, and rewrites no dated text.
+
 ## Purpose and scope
 
 Readers should be able to find a component, understand the problem it solves,

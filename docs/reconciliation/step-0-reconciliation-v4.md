@@ -4492,6 +4492,24 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   execution, publication or merge authority. D96 and earlier entries are
   byte-untouched.
 
+- **D98 (2026-10-11) — post-queue 1 readability ledger full-page re-read.**
+  The owner's instruction: "go, do not stop until all to-dos are completed"
+  (verbatim). The re-read covers the ledger's 8 chunks (its own section
+  boundaries, L1–4582 at the reviewed revision `ab7182d8`) with per-chunk
+  dispositions — all 8 accepted; the internal anchors resolve (8 used, 0
+  unresolved); named follow-ups: none; no dated snapshot rewritten (the
+  diff is additions only). The official-count reconciliation re-ran
+  `check_index.py --ref 408e4d6a` in a full clone: reader pages 631 /
+  accepted 50 / provably-pending 4 / no-recorded 564 / within-10 7 /
+  cannot-decide 6 → **official pending count 581**, reproducing the
+  Q4/D96-pinned figure byte-for-byte; the ledger still publishes no count
+  of its own and cites the index. The tracker tool needs NO change. The
+  dated "Full-page re-read — 2026-10-11 (D98)" section is appended in the
+  ledger's Start-here area. Counts UNCHANGED (SKILL-COUNT 205,
+  FAMILY-COUNT 23). This entry records the lane; it grants no new
+  execution, publication or merge authority. D97 and earlier entries are
+  byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
