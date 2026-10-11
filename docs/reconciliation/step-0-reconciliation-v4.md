@@ -4495,18 +4495,40 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
 - **D98 (2026-10-11) — post-queue 1 readability ledger full-page re-read.**
   The owner's instruction: "go, do not stop until all to-dos are completed"
   (verbatim). The re-read covers the ledger's 8 chunks (its own section
-  boundaries, L1–4582 at the reviewed revision `ab7182d8`) with per-chunk
-  dispositions — all 8 accepted; the internal anchors resolve (8 used, 0
-  unresolved); named follow-ups: none; no dated snapshot rewritten (the
-  diff is additions only). The official-count reconciliation re-ran
+  boundaries, L1–4581 at the reviewed revision `ab7182d8`; the plan anchor
+  L4582 overshoots the true EOF by one line) and was performed by TWO
+  independent **non-author full-content readers** — pq1-reader-a (chunks 1–4)
+  and pq1-reader-b (chunks 5–8) — whose retained records carry a per-chunk
+  disposition, a purpose/normal-use restatement and any named follow-up for
+  every chunk; the round-1 single-reader deviation (pr-publisher as sole
+  reviewer) is superseded. Dispositions: chunks 1, 2, 3, 5, 6 and 7 accepted;
+  chunk 4 needs a named follow-up (2: the stale "open PR #633" citation at
+  L3238–3243 and the "ten other SHAs" count at L3245–3248); chunk 8 needs a
+  named follow-up (1: the stale L-001–L-006 evidence-source anchors at base
+  L2574/L2575). Named follow-ups: those 3 plus the self-cost follow-up below.
+  No dated snapshot rewritten (the diff is additions only). The official-count
+  reconciliation now labels three figures: (a) HISTORICAL — the D96-pinned
   `check_index.py --ref 408e4d6a` in a full clone: reader pages 631 /
   accepted 50 / provably-pending 4 / no-recorded 564 / within-10 7 /
-  cannot-decide 6 → **official pending count 581**, reproducing the
-  Q4/D96-pinned figure byte-for-byte; the ledger still publishes no count
-  of its own and cites the index. The tracker tool needs NO change. The
-  dated "Full-page re-read — 2026-10-11 (D98)" section is appended in the
-  ledger's Start-here area. Counts UNCHANGED (SKILL-COUNT 205,
-  FAMILY-COUNT 23). This entry records the lane; it grants no new
+  cannot-decide 6 → **official pending count 581**, labeled historical and NOT
+  the live figure (the tool README); (b) LIVE at the reviewed revision
+  `ab7182d8` (`check_index.py --ref ab7182d8`, independently re-run in a
+  detached worktree at that revision): 633 / 48 / 5 / 566 / 8 / 6 →
+  **official pending count 585**; (c) LIVE at the candidate head (this
+  entry's commit; `check_index.py --ref <the new head>`): 633 / 48 / 5 /
+  566 / 8 / 6 → **585** — the exact head/tree and the verbatim JSON are
+  recorded in the PR's Stage C round-2 record, because a commit cannot name
+  its own SHA inside its own bytes. The ledger still publishes no count of its
+  own and cites the index. SELF-COST: this entry's commit changes the ledger
+  by +45/−0 against the base (+21 round 1, +24 round 2), so the ledger is
+  provably pending at the new head (197 changed lines against its recorded
+  acceptance `2c6b6fc6`, with a new section; it was already pending at the
+  base with 152) — the page stays pending until a subsequent full-page
+  re-read accepts the resulting head, and D98 accepts only the
+  reviewed-revision content, not the new head's state. The tracker tool needs
+  NO change. The dated "Full-page re-read — 2026-10-11 (D98)" section is
+  appended in the ledger's Start-here area. Counts UNCHANGED (SKILL-COUNT
+  205, FAMILY-COUNT 23). This entry records the lane; it grants no new
   execution, publication or merge authority. D97 and earlier entries are
   byte-untouched.
 
