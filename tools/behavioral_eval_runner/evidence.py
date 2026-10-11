@@ -24,6 +24,7 @@ import datetime as _dt
 import json
 import os
 import stat
+import tempfile
 from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any, Mapping
@@ -84,18 +85,71 @@ def _utc_now_iso() -> str:
     return _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _dirfd_replace_probe() -> bool:
+    """Measure, never assume: can THIS stdlib/host combination run
+    ``os.replace(src, dst, src_dir_fd=..., dst_dir_fd=...)`` for real?
+
+    The static ``os.supports_dir_fd`` set omits ``os.replace`` on some stdlib
+    versions (Python 3.12.3 carries ``os.rename`` only), so set membership is
+    the wrong gate. The probe constructs the minimum real environment inside
+    a ``tempfile.TemporaryDirectory`` — two O_DIRECTORY-opened directory
+    descriptors, a probe file, and one dir-fd-relative replace — and returns
+    True only when that replace succeeds. Any failure to construct or run the
+    probe (no temp dir, missing constants, unsupported call) returns False;
+    the static membership below is the documented fallback, never an
+    assumption beyond it.
+    """
+    try:
+        fd_src = -1
+        fd_dst = -1
+        with tempfile.TemporaryDirectory() as tmp:
+            src_dir = os.path.join(tmp, "srcd")
+            dst_dir = os.path.join(tmp, "dstd")
+            os.mkdir(src_dir)
+            os.mkdir(dst_dir)
+            fd_src = os.open(src_dir, os.O_RDONLY | os.O_DIRECTORY)
+            fd_dst = os.open(dst_dir, os.O_RDONLY | os.O_DIRECTORY)
+            src = os.path.join(src_dir, "probe")
+            dst = os.path.join(dst_dir, "probe")
+            with open(src, "wb") as handle:
+                handle.write(b"probe")
+            os.replace(src, dst, src_dir_fd=fd_src, dst_dir_fd=fd_dst)
+            return True
+    except (NotImplementedError, OSError, AttributeError):
+        return False
+    finally:
+        if fd_src >= 0:
+            os.close(fd_src)
+        if fd_dst >= 0:
+            os.close(fd_dst)
+    return False
+
+
+def _dirfd_replace_supported() -> bool:
+    """True when the documented static membership says dir-fd replace works,
+    OR the runtime probe measured it working. The static set is the fallback
+    (e.g., probe environment not constructible); the probe is the primary
+    evidence on the actual host.
+    """
+    if os.replace in getattr(os, "supports_dir_fd", frozenset()):
+        return True
+    return _dirfd_replace_probe()
+
+
 #: True only on POSIX hosts whose stdlib can create + atomically replace relative
-#: to a retained no-follow directory descriptor (openat/renameat-style). When
-#: True, ``_atomic_write`` PREVENTS a root/parent swap; when False (Windows, and
-#: POSIX without dir_fd) it can only DETECT a pre-existing reparse and is
-#: NON_BASELINE for the mid-operation swap (§5).
+#: to a retained no-follow directory descriptor (openat/renameat-style) —
+#: measured by the runtime probe above, with the static supports_dir_fd
+#: membership as the documented fallback. When True, ``_atomic_write`` PREVENTS
+#: a root/parent swap; when False (Windows, and POSIX without dir_fd) it can
+#: only DETECT a pre-existing reparse and is NON_BASELINE for the mid-operation
+#: swap (§5). Evaluated once at import — bounded and non-persistent.
 _POSIX_EVIDENCE_ATOMIC = (
     os.name == "posix"
     and hasattr(os, "O_NOFOLLOW")
     and hasattr(os, "O_DIRECTORY")
     and os.open in getattr(os, "supports_dir_fd", frozenset())
-    and os.replace in getattr(os, "supports_dir_fd", frozenset())
     and os.mkdir in getattr(os, "supports_dir_fd", frozenset())
+    and _dirfd_replace_supported()
 )
 
 

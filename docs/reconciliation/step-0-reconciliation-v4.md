@@ -4314,6 +4314,30 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   nothing itself and authorizes no host action. D88 and earlier entries are
   byte-untouched.
 
+- **D90 (2026-10-10) — BER guard-fix lane: `_POSIX_EVIDENCE_ATOMIC` runtime
+  capability probe.** Root cause: the gate required
+  `os.replace in os.supports_dir_fd`, but Python 3.12.3 (Ubuntu 24.04, the
+  probe host) carries `os.rename` in that set and NOT `os.replace`, so the
+  required POSIX test skipped on the host class the grant was meant to
+  unlock. The fix measures instead of assuming: a module-level runtime probe
+  runs a real `os.replace(src, dst, src_dir_fd=..., dst_dir_fd=...)` against
+  two O_DIRECTORY-opened descriptors inside a `TemporaryDirectory`
+  (try/except NotImplementedError/OSError/AttributeError → False); the flag
+  is `posix + O_NOFOLLOW + O_DIRECTORY + open/mkdir in supports_dir_fd +
+  _dirfd_replace_supported()`, where the static membership is only the
+  documented fallback when the probe environment cannot be constructed. The
+  write path (`_atomic_write`'s dir-fd mechanics, fail-closed checks,
+  Windows detection) is byte-unchanged — the fix changes what the gate
+  REPORTS and which test RUNS, never how evidence is written. A regression
+  test pins the probe on the POSIX host class and the fallback elsewhere.
+  This entry records the **one Stage A probe RE-RUN under APR-128's existing
+  scope**: the grant's one bounded probe ran to completion with a required
+  POSIX skip (NON_BASELINE, proof incomplete), so after this fix merges the
+  same pinned probe program re-runs once — same distro, account, scratch
+  root, command list, 60-minute ceiling, and receipt discipline. It grants
+  nothing new and creates no new APR/BER-DEC. Counts UNCHANGED (SKILL-COUNT
+  204, FAMILY-COUNT 23). D89 and earlier entries are byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

@@ -431,6 +431,24 @@ class TestEvidenceWriterTrustedRoot(unittest.TestCase):
             self.assertEqual(report["implementation_state"], "UNAVAILABLE")
             self.assertEqual(report["root_anchor"], "UNTRUSTED_REALPATH_DERIVED")
 
+    def test_dirfd_replace_probe_measures_not_assumes(self) -> None:
+        """The gate must measure the runtime dir-fd replace capability; the
+        static supports_dir_fd membership is only the documented fallback."""
+        from tools.behavioral_eval_runner.evidence import (
+            _dirfd_replace_probe,
+            _dirfd_replace_supported,
+        )
+
+        if os.name == "posix" and _dirfd_replace_probe():
+            # The 3.12/Ubuntu host class the defect was found on: the static
+            # set omits os.replace but the real call succeeds.
+            self.assertTrue(_dirfd_replace_supported())
+            self.assertTrue(_POSIX_EVIDENCE_ATOMIC)
+        else:
+            # Windows, or POSIX without a working dir-fd replace: the gate
+            # must never claim prevention it cannot run.
+            self.assertFalse(_POSIX_EVIDENCE_ATOMIC)
+
     @unittest.skipUnless(
         _POSIX_EVIDENCE_ATOMIC,
         "dir-fd atomic evidence write is POSIX-only (UNRUN on Windows)",
