@@ -1,6 +1,7 @@
 # BER WP-2B-3 owner decision chain — WP-2B-3/4/5/6/7, R2 and OD-1
 
-**Status: owner decision-chain page for review, 2026-10-11. This page grants
+**Status: owner decision-chain page for review, 2026-10-11 (Stage C revision 2,
+the seven Codex findings triaged at Stage D applied). This page grants
 nothing.** Every gate below is separately authorized, separately evidenced and
 separately recorded. Reading this page, or merging the pull request that adds
 it, approves no label, selects no execution source, renews no allowance,
@@ -58,7 +59,7 @@ gate 4 is authorized by completing H.
 | G5 | Measured development, then `OWNER_WAIT` | Authorize the 40-case development stage | Not authorized (measurement packet L19) |
 | G6 | Holdout freeze | Freeze every BER-DEC-008 decision-35 field, source pin and reconciled allowance | Not frozen (measurement packet L20) |
 | G7 | One measured holdout and OD-1 | Execute the 120 holdout identities once; ratify or explicitly decline OD-1 | OD-1 OPEN, never ratified (backlog L2139, L2175–L2181) |
-| H | Host / R4 / R5 ladder | Fix the Stage A host-phase time ceiling and disposition Stage A; confirm or stop Stage B | Stage A grant merged, probe unrun; Stage B authorized, bounded, in flight (backlog L3974–L4048; reconciliation v4 L4406–L4434) |
+| H | Host / R4 / R5 ladder | Fix the Stage A host-phase time ceiling and disposition Stage A; confirm or stop Stage B | Stage A grant merged; no public receipt found, so the probe's execution state is unverified; Stage B authorized, bounded, in flight (backlog L3974–L4048; reconciliation v4 L4406–L4434) |
 
 **Recommended order (mirrors the measurement packet's own):** G1 → G2 → G3 →
 G4, then G5, G6, G7; the host ladder H runs in parallel with G1–G3 and is not a
@@ -70,10 +71,13 @@ packet L31, *confirmed*).
 AUTHORIZED but not DONE (backlog L1079–L1090, L1254–L1255); all seven gates
 above remain open except the offline synthetic-support increment (backlog
 L1092–L1112); OD-1 is open (backlog L2139); R2 is BLOCKED (backlog L472–L476);
-the Stage A host probe grant is merged but no probe receipt exists in
-`docs/evidence/` on the baseline; Stage B is authorized and recorded but not
-an R4/R5 proof (backlog L4040–L4048; reconciliation v4 L4406–L4434). The owner
-work that remains is exactly the chain this page presents.
+no public Stage A probe receipt exists in `docs/evidence/` on the baseline, and
+absence from the repository does not establish that no probe command ran — the
+grant places raw receipts in an external evidence root, so the probe's
+execution state is **unverified** until those artifacts are checked; Stage B is
+authorized and recorded but not an R4/R5 proof (backlog L4040–L4048;
+reconciliation v4 L4406–L4434). The owner work that remains is exactly the
+chain this page presents.
 
 ## 2. The seven measured-calibration gates
 
@@ -186,7 +190,7 @@ historical grant" (register L349, *confirmed*).
 
 | Option | What it means | Cost, risk, or rejection reason |
 | --- | --- | --- |
-| A. Reconcile, then authorize within remaining headroom | Dispatch is permitted against a reconciled ledger and a current price | Requires authoritative historical usage including uncertain attempts; a provider-side project spend limit at or below the ceiling; and a stop-before-exceed rule. An unresolved or exhausted headroom stops it |
+| A. Reconcile, then authorize within remaining headroom | Reconciliation alone permits no dispatch: it records the remaining allowance against a current price, and dispatch stays prohibited until G4 and G5 separately pass | Requires authoritative historical usage including uncertain attempts; a provider-side project spend limit at or below the ceiling; and a stop-before-exceed rule. An unresolved or exhausted headroom stops it |
 | B. Assume zero available and stop | No dispatch is attempted | Safest and always available; leaves the calibration unmeasured and OD-1 open |
 | C. Defer | Accounting is done later | Costs schedule; no spend risk |
 
@@ -226,15 +230,20 @@ superseded.
 
 | Option | What it means | Cost, risk, or rejection reason |
 | --- | --- | --- |
-| A. Authorize the preflight on the WSL2 distro path | Host identity, evidence root, credential custody, provider project and TLS path are verified before any dispatch | Requires every listed fact to be present and verifiable, and the one read-only model-availability request to wait for G3; no Stage A result substitutes for it |
+| A. Authorize the preflight, on whichever live host the owner has separately selected | Host identity, evidence root, credential custody, provider project and TLS path are verified on the selected host before any dispatch | G4 stays host-agnostic: no source selects a measured-execution host yet, so the owner's selection of the live host is a separate decision before this option can be taken; on a host other than the current Windows root it also needs APR-009's own verified mechanism and access decision (APR register L419–L421, *confirmed*). It requires every listed fact to be present and verifiable, and the one read-only model-availability request to wait for G3; no Stage A result substitutes for it |
 | B. Defer | No host or provider step occurs | Leaves G5–G7 closed; costs schedule only |
 
 **Evidence each option needs:** the full preflight fact list quoted above, plus
-Stage A receipts where available (measurement packet L18, *confirmed*). The
-capability observation from Stage A "could support a **Stage A capability
-observation only** — 'not a production isolation claim, permission for
-provider calls, or a BER baseline result'" (backlog L3989–L3992; APR register
-L5469–L5472, *confirmed*, the capability-observation honesty line verbatim).
+Stage A receipts where available (measurement packet L18, *confirmed*). Two
+decisions separate here: selecting the live host, and authorizing this
+preflight on it. APR-126 selects WSL2 only for the Stage A candidate, and "A
+different selected host requires its own verified mechanism and access
+decision" (APR register L419–L421, *confirmed*); selecting the live host is
+its own decision, and taking this gate does not make it. Stage A's capability
+observation "could support a **Stage A capability observation only** — 'not a
+production isolation claim, permission for provider calls, or a BER baseline
+result'" (backlog L3989–L3992; APR register L5469–L5472, *confirmed*, the
+capability-observation honesty line verbatim).
 
 ### G5 — Measured development, then `OWNER_WAIT`
 
@@ -256,9 +265,15 @@ packet L19, *confirmed*).
 | A. Authorize development to `OWNER_WAIT` | Produces the characterization distribution the freeze decision reads | Spends against the reconciled allowance and requires the G3 and G4 facts to hold; the stage cannot touch the sealed holdout |
 | B. Stop before development | Nothing is spent; no distribution exists | Leaves G6 and G7 without their input and OD-1 open |
 
-**Evidence each option needs:** the development distribution, the
-incomplete/`JUDGE_ERROR` outcomes, and a proposed safety margin — nothing more
-is asked of the owner at this gate (measurement packet L19, *confirmed*).
+**Evidence each option needs before authorizing:** the G3 and G4 facts must
+hold — the reconciled ledger and the passed selected-host/credential/provider
+preflight; the development distribution does not exist yet, and nothing more is
+asked of the owner at this authorization (measurement packet L18–L19,
+*confirmed*). **Evidence the later G6 decision needs at `OWNER_WAIT`:** the
+development distribution, the incomplete/`JUDGE_ERROR` outcomes, and a proposed
+safety margin, produced by the authorized run and presented there at
+`OWNER_WAIT`; the stop option produces no distribution (measurement packet L19,
+*confirmed*).
 
 ### G6 — Holdout freeze
 
@@ -281,7 +296,7 @@ authorization" (measurement packet L20, *confirmed*).
 
 | Option | What it means | Cost, risk, or rejection reason |
 | --- | --- | --- |
-| A. Freeze all fields, pins and allowance | The single sealed holdout pass may proceed under the frozen configuration | Any later change voids the attempt and needs a new sealed holdout; the freeze must be complete, not partial |
+| A. Freeze all fields, pins and allowance | A complete freeze makes the run eligible for the separate G7 execution decision — the freeze itself authorizes no execution, and the holdout stays unsealed until G7 is separately granted | Any later change voids the attempt and needs a new sealed holdout; the freeze must be complete, not partial |
 | B. Stop | No unsealing occurs | Leaves OD-1 without its measured input; the 120 identities stay sealed |
 
 **Evidence each option needs:** the complete freeze field list quoted above,
@@ -377,9 +392,12 @@ the host-phase receipt before any probe command" (backlog L4002–L4004,
 *confirmed*). The grant is merged on the baseline: commit `b65bd3fc`
 ("docs: BER Stage A offline host probe grant - APR-128 + BER-DEC-016 (D89)",
 2026-10-10 13:33:28 -07:00) is an ancestor of `origin/main` `279338a9`
-(*confirmed* by `git merge-base --is-ancestor`). **No Stage A probe receipt
-exists in `docs/evidence/` on the baseline** (*confirmed* by the Stage B
-audit's `git ls-tree` absence check, audit evidence (6)).
+(*confirmed* by `git merge-base --is-ancestor`). **No public Stage A probe
+receipt exists in `docs/evidence/` on the baseline** (*confirmed* by the Stage B
+audit's `git ls-tree` absence check, audit evidence (6)) — public absence does
+not establish that no probe command ran, because the grant places raw receipts
+in the external evidence root; the execution state stays **unverified** until
+that root is checked (APR register L5438–L5491, *confirmed*).
 
 **Stage B (model-driven), authorized 2026-10-11.** D94 in reconciliation v4
 records the owner's Q2 selection with "start on all these" plus the standing
@@ -428,7 +446,7 @@ case "is an unmet proof, not a pass" (backlog L4014–L4015, *confirmed*).
 | Option | What it means | Cost, risk, or rejection reason |
 | --- | --- | --- |
 | A. Fix the Stage A host-phase time ceiling and run the probe | The merged APR-128/BER-DEC-016 grant is executed under its own receipts | The exact ceiling value "is fixed by the owner at host-phase authorization and recorded in the host-phase receipt before any probe command runs" (backlog L4026–L4030, *confirmed*); a required POSIX skip or any stop rule ends it as `NON_BASELINE` or `UNAVAILABLE`, "not a partial pass" (backlog L4036–L4039) |
-| B. Disposition Stage A, then confirm or stop Stage B | Stage A receipts are reviewed before Stage B continues or halts | Stage B is already authorized and bounded by D94 (reconciliation v4 L4406–L4434); stopping it is available and costs only the capability observation |
+| B. Disposition Stage A, and separately confirm or stop Stage B | Stage A's disposition is reviewed on its own; Stage B continues under its own recorded authorization, with no Stage A-first ordering | D94 imposes no Stage A precondition on Stage B's continuation — its start is unconditional (reconciliation v4 L4406–L4434) — and stopping Stage B is available and costs only the capability observation |
 | C. Defer | Nothing further runs | Costs schedule only; G1–G7 are unaffected in either direction |
 
 ## 4. Downstream prerequisites (named, not decided here)
@@ -547,8 +565,16 @@ authorize **none** of the following:
 - **No new private-input access, credential use, dependency installation, or
   unsanctioned network step.**
 - **No claim that previous work is already delivered.** WP-2B-3 is AUTHORIZED,
-  not DONE; the offline synthetic-support increment is the only delivered part
-  (backlog L1092–L1112, L1254–L1255).
+  not DONE, and its measured calibration remains undelivered. The delivered
+  support increments recorded in the backlog are the offline synthetic-support
+  increment (backlog L1092–L1112, delivered by PR #249 at `fa37c0e5`), the
+  merged engineering corrections and recovery documentation from PR #88
+  together with the shared contracts and permanent offline CI of PRs #90/#91
+  (backlog L1081–L1085), BER-DEC-014 with the selected-precheck aggregate
+  correction delivered by PR #374 (backlog L1122–L1135), and BER-DEC-015 with
+  the non-executed-aggregate correction delivered by PR #535 (backlog
+  L1146–L1161); WP-2B-3 itself stays AUTHORIZED, not DONE (backlog
+  L1254–L1255).
 
 ## 7. Recording note
 
