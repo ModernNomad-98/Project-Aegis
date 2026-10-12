@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 from typing import Mapping, Sequence
 
+from . import ci_durations
 from .authority import SyntheticAuthority
 from .contracts import DispatchDenied, StorageIntegrityError
 from .storage import SQLiteStateStore, default_state_root
@@ -112,6 +113,7 @@ def build_parser() -> argparse.ArgumentParser:
     verify = subparsers.add_parser("verify")
     verify.add_argument("--expected-vector", required=True, type=Path)
     verify.add_argument("--authority-key-file", required=True, type=Path)
+    ci_durations.build_parser(subparsers)
     return parser
 
 
@@ -196,6 +198,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         )
         return 0
+    if arguments.command == "ci-durations":
+        # Read-only GitHub metadata read; it never opens a state database.
+        return ci_durations.main(arguments)
     try:
         database_path = _database_path(arguments)
     except (PathCapabilityUnavailable, OSError) as error:
