@@ -5489,3 +5489,40 @@ the entry governs.
   expiry stated. Stop for review if the host, identity, isolation or
   software configuration differs materially from the approved setup or from
   this grant's pinned list.
+
+### AEGIS-APR-129: The lighter review path for pure-docs pull requests (2026-10-12)
+
+- **Event:** POLICY DECISION; a policy decision only, not a GRANT. It selects a
+  policy target and grants no work.
+- **Status at recording:** ACTIVE as policy once this entry is on the default
+  branch. It grants nothing, and nothing may cite it as authority for an action.
+- **Date / Grantor:** 2026-10-12 / Peter Nguyen, by his direct chat message
+  "GO WITH YOUR RECOMMENDATION" as relayed by the coordinating agent — the
+  message adopts the recommendation in the coordinator's 2026-10-12 review-path
+  check-in packet — and transcribed here by the change's implementing agent. The
+  option and recommendation wording in D103 is the coordinator's, not the
+  owner's.
+- **Owner decision:** the owner's message and the recommendation it adopts, as
+  quoted in D103 in the
+  [reconciliation record](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions).
+- **Reason:** the question was left undecided on the default branch by
+  AEGIS-APR-113 (its item 8 and its "Not decided by this entry" sub-item (3)),
+  while the owner decided it on 2026-10-12. A review rule whose only existence is
+  session state is not auditable.
+- **Scope allowed (selected policy):** the rule stated in
+  [the lighter review path section](../delivery-workflow.md#the-lighter-review-path-pure-docs-pull-requests-only)
+  of the delivery workflow, and nothing else.
+- **Relationship to other entries:** AEGIS-APR-113's item 8 and its
+  "Not decided by this entry" sub-item (3) left this question undecided; this
+  entry is the owner's later decision on it. AEGIS-APR-113 is otherwise
+  unchanged and is not superseded. AEGIS-APR-100 is unchanged and is not waived.
+- **Scope FORBIDDEN:** it grants no repository, host, provider or spending
+  authority; it caps no review round; it waives no review, check, DCO sign-off,
+  `gate-guard` requirement, `MG1`–`MG5` condition or auto-merge rule; it
+  resumes no paused program; and it changes no readability-ledger rule.
+- **Not decided by this entry:** whether the lighter path should ever extend to
+  a pull request that changes any code file — it does not, and extending it would
+  need a new owner decision.
+- **Expiry / use limit:** the owner revisits it on 2026-11-11 (30 days) and
+  reaffirms, amends or withdraws it then. The policy stands until superseded by a
+  later recorded owner decision.

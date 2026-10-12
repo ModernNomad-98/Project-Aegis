@@ -4673,6 +4673,65 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   the lane; **it grants no new execution, publication, review or merge
   authority**; the approval register is byte-untouched.
 
+- **D103 (2026-10-12) — the review-path decision: the broad review-round cap is
+  rejected, and a lighter documented review path is adopted for pure-docs pull
+  requests only.** The authorizing act is the owner's direct chat message of
+  2026-10-12, quoted as relayed: "GO WITH YOUR RECOMMENDATION". By that message
+  the owner adopted the recommendation in the coordinator's 2026-10-12
+  review-path check-in packet — "REJECT B; adopt C … Revisit in 30 days with the
+  next round-cost sample" (the coordinator's wording, not the owner's) — whose
+  selected option is the packet's Option C, "NARROW lighter path - cap only
+  pure-docs PRs (zero code diff, tier docs-only)". The owner's own words are the
+  short message; the option and recommendation wording is the coordinator's. The
+  normative rule is ADDED as one new section,
+  `## The lighter review path: pure-docs pull requests only`, in
+  `docs/delivery-workflow.md` between its `MG` block and its
+  `## Pre-authored diffs` section (at base `9c4eb595`: after line 389, before
+  line 391). It is scoped exactly to a pull request whose diff is documentation
+  only — zero code diff, and the tier `docs-only` from
+  `change-classification-gate`. One divergence from the packet is recorded
+  deliberately: the packet's "Authorization effect" line says approving C
+  permits a lighter path "without mandated repair-re-audit cycles for findings
+  that a follow-up docs PR can carry", and the recorded rule declines that
+  permission and keeps repair-and-re-audit mandatory for pure-docs pull
+  requests. What the section does and does not do is stated there once; this
+  entry records the decision and does not restate the rule. The dated row for
+  the decision is ADDED as a `### Decided on 2026-10-12` section of
+  `docs/roadmaps/aegis-open-decisions-2026-09-23.md`, placed with the page's
+  other decided sections, and the open row it replaces (added 2026-10-07, line
+  235 at the base) is kept in place with a DECIDED state, a pointer to that
+  section, and a dated citation correction. The correction was re-derived at the
+  base: the cited commit `4d05c624` exists, resolves
+  `.coord/coordinator-cadence.jsonl` (89 lines), and its line 72 IS the tabled
+  two-tier proposal the owner declined on 2026-10-04; it is reachable only from
+  `origin/coord/idle-check-2026-10-04` and is not an ancestor of `main`
+  (`git merge-base --is-ancestor 4d05c624 origin/main` → exit 1). The cited
+  **path** is a different matter and is also on `main`: the `main` copy of
+  `.coord/coordinator-cadence.jsonl` is 25 lines and contains no such record
+  (last written on `main` by `74ee97b0`, 2026-10-03). The coordinator's reported
+  2026-10-12 finding that the citation "does not resolve to the tabled proposal"
+  was NOT reproduced in this lane; the coordinator's own packet now carries a
+  dated correction withdrawing it and attributing the failed check to the wrong
+  ref/line, and this entry records that as reported rather than measured. That
+  branch has since advanced to `d0a0847c` (2026-10-11), whose line 90 closes the
+  check-in and parks the lighter question with the paused readability program;
+  the decision recorded here supersedes that parked state for pure-docs pull
+  requests only. The rule changes no gate: a pure-docs pull request keeps
+  Stages A–G, the stage separation rule, the exact-head invalidation rule,
+  `MG1`–`MG5` intact, `APR-100`'s standing pre-approval on its own terms, and
+  the auto-merge rules — the lighter path removes no required check, downgrades
+  no tier, and widens no scope to make a pass. The revisit date is 2026-11-11
+  (30 days), which is separate from this page's own review date of 2026-11-03 in
+  `docs/delivery-workflow.md`; the earlier of the two is the page's review, and
+  neither date changes the other. The register's two statements that AEGIS-APR-113
+  does not decide this review path — its item 8 and its "Not decided by this
+  entry" sub-item (3), both on the default branch — are RECORDED HERE, not
+  edited: entries are immutable and are corrected by appending a later lifecycle
+  event, which is this change's companion register note (see below). This entry
+  records the lane; it grants no new execution, publication, review or merge
+  authority. Counts UNCHANGED (SKILL-COUNT 205, FAMILY-COUNT 23). D102 and
+  earlier entries are byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
