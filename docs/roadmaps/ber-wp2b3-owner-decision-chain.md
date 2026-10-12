@@ -651,3 +651,24 @@ sanitized hashes and public line references.
   [BKL-009 residual cleanup
   proposal](ber-bkl-009-residual-host-runtime-privacy-cleanup-proposal.md),
   [replacement storage decision](ber-calibration-replacement-storage-decision.md).
+
+## 10. Superseding status note — Stage B stopped (2026-10-12)
+
+**This note supersedes the current-status reading of §1's H row and of §3's
+options, and it edits neither.** The owner has **stopped Stage B**; the stop is
+recorded in the merged entry at
+[the BER backlog](behavioral-eval-runner-backlog.md) §13 (BER-DEC-016 region,
+merged `9ea98e45`, PR #747) and in
+[the approval register](../approvals/APPROVAL_REGISTER.md) as
+**AEGIS-APR-130 / D104**, whose status records the D94-authorized class as
+spent. The H row's "Stage B authorized, bounded, in flight" and §3's
+confirming-or-stopping option are therefore **historical text, not current
+status**; they stay byte-identical here per §7's recording note.
+
+**What a reader must not do.** No agent may read this page's H row or §3 as
+authority to start, resume or extend a model-driven Stage B run: no further
+Stage B run class is authorized, and the A–G ladder's next step is the owner's,
+not this page's. This note grants nothing and decides nothing; the decision it
+reports is the owner's, taken elsewhere and recorded in the entries above.
+Recorded here at Codex's finding `4251900237` (review `5495472980`, PR #747),
+which named exactly this hazard.

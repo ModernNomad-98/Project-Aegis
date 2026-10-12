@@ -195,6 +195,17 @@ Two successful push runs on `main`, re-read from the GitHub API on 2026-10-11 17
 skipped job reports an inverted window, which is how `gate-guard` appears on a
 push run):
 
+**Footnote, 2026-10-12 — the skipped-window sentence above is over-general.**
+A skipped job's timestamp window is not always inverted. The measured set over
+the live payloads the A2 audit read is **{−1 s, 0 s, absent}** — skipped
+windows of both signs and of zero — and a 0-second window would render as an
+executed job with a duration of 0 s if state were derived from the window. The
+rule that follows is **conclusion-first**: `conclusion=skipped` means
+skipped with no duration, whatever the window says; the window is used only for
+executed jobs. The `gate-guard` instance above stays true and no figure in
+the table changes. Recorded as the page-level follow-up required by
+`P0A-A2-AUDIT-B-rev2.md` R3.
+
 | Run ID | Event | Head | `changes` | `validate-skills` | `gate-guard` | `windows-offline-checks` | `tools-tests-linux` | `tools-tests-windows` |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `38184781825` | push (post-merge) | `6ea8a723ee90346f2e7203229b5103f4c25d58d2` | 8 s | 111 s | skipped (PR-only) | 241 s | 100 s | 165 s |

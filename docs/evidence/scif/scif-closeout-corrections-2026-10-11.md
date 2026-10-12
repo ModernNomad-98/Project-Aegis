@@ -110,8 +110,8 @@ as a waiver.**
   whole; … and all other BER paths keep separate one-time owner decisions. …
   Expanding the four-path list needs a new owner decision."
 - **No register or reconciliation entry names #729.** `git grep -n -i -E
-  '#729|PR ?729'` over `docs/approvals/APPROVAL_REGISTER.md` and
-  `docs/reconciliation/` at this base returns **no matches** (exit 1).
+  '#729|PR ?729' 5a9adea0f2dce00c8ffe4be959ffb7e4a91ad566 -- docs/approvals/APPROVAL_REGISTER.md
+  docs/reconciliation/` at this base returns **no matches** (exit 1).
 - **APR-100's own Scope FORBIDDEN excludes a gate-guard waiver** (L3121-3128):
   the delivery grant "does not … waive a failed local test or GitHub Actions
   check, waive a protected `gate-guard` (a protected-path failure still needs a
@@ -218,5 +218,38 @@ gh api repos/ModernNomad-98/Project-Aegis/pulls/729/reviews
 gh api repos/ModernNomad-98/Project-Aegis/commits/f356157c633a28fc09aa9c98b50bddd90469dec9/check-runs
 gh api repos/ModernNomad-98/Project-Aegis/issues/comments/6104148527 --jq .issue_url
 git show c4fbee1d:docs/delivery-workflow.md   # then read L250-255 and L308-314
-git grep -n -i -E '#729|PR ?729' -- docs/approvals/APPROVAL_REGISTER.md docs/reconciliation/
+git grep -n -i -E '#729|PR ?729' 5a9adea0f2dce00c8ffe4be959ffb7e4a91ad566 -- docs/approvals/APPROVAL_REGISTER.md docs/reconciliation/
 ```
+
+## 6. Dated addendum — the re-derivation recipe pinned (2026-10-12)
+
+**The defect.** The §5 recipe's last command was merged unpinned. Run at the
+revision that merged this page — `503c3b30`, the branch commit of PR #738
+(merged as `09a5d2b3`) — `git grep -n -i -E '#729|PR ?729' --
+docs/approvals/APPROVAL_REGISTER.md docs/reconciliation/` returns **9
+matches**, all inside the D100 entry (L4566-4599) that the same change added to
+`docs/reconciliation/step-0-reconciliation-v4.md`. The #729 close-out is
+what D100 *corrects*; it is not what added D100, so the recipe cannot reproduce
+the nil result §1 publishes beside it.
+
+**The pin.** Both sites — the §1 bullet and the §5 fence — now carry the page's
+own declared base, `5a9adea0f2dce00c8ffe4be959ffb7e4a91ad566` (L13), as
+one argument before the `--` path separator:
+
+```
+git grep -n -i -E '#729|PR ?729' 5a9adea0f2dce00c8ffe4be959ffb7e4a91ad566 -- docs/approvals/APPROVAL_REGISTER.md docs/reconciliation/
+```
+
+At `…566` — the merge commit of PR #737, and `503c3b30`'s parent —
+that command exits **1 with zero matches**, which is the result §1 states. The
+original unpinned text is quoted here so it stays visible: `git grep -n -i -E
+'#729|PR ?729'` over `docs/approvals/APPROVAL_REGISTER.md` and
+`docs/reconciliation/`.
+
+**Correct-forward note.** The two commands were edited **in place** on
+2026-10-12 and nothing else in §1 or §5 changed. The SHA the repair prompt
+printed, `5a9adea0f2dce00c8ffe4be959ffb7e4a91ad569`, **resolves to no
+object**: `git cat-file -t` → `fatal: git cat-file: could not get
+object info` (exit 128) and `git fetch origin …569` → `remote error:
+upload-pack: not our ref`. The pin written is therefore `…566`, the
+revision this page declares at L13 and the one on `origin/main`'s history.

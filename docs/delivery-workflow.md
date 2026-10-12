@@ -906,6 +906,16 @@ contain.
 > headings**, so a heading that is missing, reworded or reformatted cannot
 > silently zero a field.
 
+**Normalization, named (2026-10-12) — one method, and the variant it is not.** A
+field's payload is **single-line**: every whitespace run, **including line
+breaks**, collapses; each field is trimmed; the three join with single newlines
+in order witness → skills → security; `sha256` over the UTF-8 string, **no
+trailing newline**, first 16 hex published. The **per-line-strip** variant
+(lines stripped, breaks kept) is **not** this method, and its figures are not
+comparable; every republished digest must name its normalization (PROC-04). The
+A2 Stage G errata records the mix; nothing merged is in doubt — that lane
+settled invalidation by reconstruction, not by its method choice.
+
 **Any change to a bound field voids the verdict** — **exactly as a moved head
 does**, and by the same rule: this is the invalidation principle of
 [the exact-head section](#exact-head-invalidation) extended to the inputs that

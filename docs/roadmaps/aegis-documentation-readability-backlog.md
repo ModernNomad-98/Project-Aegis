@@ -4616,6 +4616,75 @@ order (`full-page-readability-batch-after-713-2026-10-10.md`, then later
 notes as created), plus any page re-pended by post-acceptance drift above 10
 lines (re-measured at the next implementation base), in the recorded order.
 
+## Ledger recording — the 2026-10-12 docs lanes' keeper pages, and AC12's owed write (2026-10-12)
+
+**Under AEGIS-APR-101 (recording only).** This note applies the ledger's own
+10-line rule and its 2026-09-28 net-difference decision
+(`git diff --numstat <acceptance> <now>`, added plus deleted) to the keeper
+rows the documentation-currency refresh (PR #745) and this lane touched. It
+edits no page.
+
+**Method correction, recorded.** The refresh's AC12 table published each
+page's **change size**, not the net difference since acceptance, so its
+"two >10 / four ≤10" split does not survive the rule. Net figures at that
+lane's reviewed head `9bff63a5` and at this write's head:
+
+| Page | Keeper rows | Change size | Net @ 9bff63a5 | Net @ this head | Outcome |
+| --- | --- | --- | --- | --- | --- |
+| aegis-backlog-forecast.md | K-021 | 83 | 90 | 118 | >10 → **pending** |
+| step-0-reconciliation-v4.md | K-023, K-059 | 35 | 531 / 511 | 644 / 624 | >10 → **pending** |
+| behavioral-eval-runner-backlog.md | K-022 | 7 | 83 | 157 | >10 → **pending** |
+| aegis-coordinator-figures.md | K-042 | 2 | 2 | 2 | ≤10 → acceptance kept with the reviewer check below |
+| resumable-control-plane-backlog.md | K-026 | 8 | 8 | 8 | ≤10 → same |
+| skill-eval-harness-authorization-request.md | K-048 | 8 | 8 | 8 | ≤10 → same |
+| delivery-workflow.md (this lane, §"The bound fields") | K-034 | 10 (9 text + 1 separator) | **61** (55+6) | **164** = 154 pre-lane (148+6) + this lane's 10 | >10 → **pending** |
+
+**That row is additive, not a second count.** Its `61` is the page's net at
+`9bff63a5`; its `154` is the page's net at `ad1e40fc` **before** this
+lane's edit; its `164` is `154` **plus** this lane's own **10** added lines
+(9 wrapped text lines + 1 separator blank, 0 deletions) — which is exactly what
+`git diff --numstat db49ca28… <this lane's head> --
+docs/delivery-workflow.md` returns (`158\t6`).
+
+**The >10 pages are returned to pending** until an independent reader re-reads
+each whole page against [Acceptance for each page](#acceptance-for-each-page);
+that is the rule's outcome, not a judgement about the edits, and the official
+instrument already counts all three as provably pending.
+
+**The ≤10 pages keep acceptance on an independent reviewer check that covers
+every changed line.** The check of record is by **`docs-refresh-auditor-d`**
+(a different agent from that lane's implementer) at `9bff63a5`: all four small
+edits were read in full as dated appended notes changing no status and no
+figure, with no correctness problem found. This lane's Stage D auditor is a
+different agent again and re-checks the three pages at this lane's exact head;
+if that check disagrees, the page returns to pending here rather than keeping
+acceptance. Not a substitute: this note records a review, it does not perform
+one.
+
+**Machine-readable coverage — recorded as owed, with its blocker.** No
+`targeted-review` row is added to the consolidated keeper table by this
+change, so `check_index.py` still reports the three ≤10 pages inside
+`within_10_not_covered_by_targeted_review`. The blocker is mechanical, not a
+choice: `build_index.py` writes `acceptance-index.json` with its own
+`built_at_ref`, and that field cannot name the commit that contains the file
+it describes inside a single-commit change; rebuilding at a parent ref would
+publish an index that lacks the new rows. **Resolver:** a two-commit follow-up
+(rows, then the rebuilt index at that commit) or a merger-side rebuild at the
+merged tip, which is the D73 row-8 practice for a moved main.
+
+**Count honesty.** This note publishes no count of its own. The official count
+is `check_index.py`'s printed summary at the pinned ref (D84; the instrument's
+own README): at `ad1e40fc` it reads
+`reader_pages_in_tree 642, accepted_on_recorded_review 43, provably_pending 8,
+no_recorded_acceptance 575, recorded_acceptance_within_10_lines 10,
+within_10_not_covered_by_targeted_review 10, cannot_decide 6,
+official_pending_count 599` — quoted as the instrument's figure, not as this
+lane's measurement of readability.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read by a
+reader who did not write this section — the self-cost every prior update states.
+
 <!-- acceptance-index-schema: 1 -->
 
 ## Consolidated keeper table — index schema v1 (D84, 2026-10-10)
