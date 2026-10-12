@@ -55,12 +55,6 @@ BACKSLASH = chr(92)
 # SEPARATOR (U+2029) are the three above ASCII.
 UNICODE_LINE_SEPARATORS = frozenset((0x85, 0x2028, 0x2029))
 
-# F3: every separator Python's str.splitlines() recognises must be escaped,
-# not only the C0 controls, or a payload string can add a table line and forge
-# a status marker. NEXT LINE (U+0085), LINE SEPARATOR (U+2028) and PARAGRAPH
-# SEPARATOR (U+2029) are the three above ASCII.
-UNICODE_LINE_SEPARATORS = frozenset((0x85, 0x2028, 0x2029))
-
 EXIT_COMPLETE = 0
 EXIT_INCOMPLETE = 1
 EXIT_REFUSED = 2
@@ -100,13 +94,27 @@ SKIP_REASON_UNEXPECTED = "unexpected-skip-for-event"
 # F2: a job the inspected workflow makes unconditional on an event is a
 # prerequisite of that event's run, so its absence is a gap and never a pass.
 # `gate-guard` is gated `if: github.event_name == 'pull_request'`
-# (.github/workflows/validate-skills.yml L490-493) and is one of the two
-# registered required contexts, so a pull_request run may not skip it; only a
-# push may, and only as the event filter the workflow itself encodes.
-# `changes` is deliberately absent: on a filtered pull request it is EXPECTED
-# to be skipped, and that legitimate skip must not stop a COMPLETE marker.
+# (.github/workflows/validate-skills.yml L484-493, the `if:` at L493) and is
+# one of the two registered required contexts, so a pull_request run may not
+# skip it; only a push may, and only as the event filter the workflow itself
+# encodes.
+#
+# N1: the same rule must hold for EVERY roster job, so the allowed-skip set is
+# derived from the workflow's own conditions and enforced, not left as dead
+# code. `changes` (L57) and `validate-skills` (L106) carry no `if:` at all:
+# on both events they always run, and a skip is a gap. `windows-offline-checks`
+# (L285-289), `tools-tests-linux` (L378-380) and `tools-tests-windows`
+# (L428-430) are `if: github.event_name == 'push' || <flag>`, and on a push the
+# `changes` job forces both flags true (L86-89), so on a push those three
+# always run and only `gate-guard` may skip; on a pull_request the same three
+# may skip when the path filter did not select them. A skipped roster job
+# outside its event's set is INCOMPLETE with the job named, never COMPLETE.
 REQUIRED_JOBS_BY_EVENT = {"pull_request": ("gate-guard",)}
-EXPECTED_SKIPS_BY_EVENT = {"pull_request": ("changes",)}
+EXPECTED_SKIPS_BY_EVENT = {
+    "push": ("gate-guard",),
+    "pull_request": ("windows-offline-checks", "tools-tests-linux",
+                     "tools-tests-windows"),
+}
 
 # F4: the two PR-only validate-skills steps. Their real state comes from the
 # steps the API returned for that job, never from a hard-coded assumption.
@@ -134,7 +142,8 @@ IDENTITY_BLOCK = {
     "mutating_verbs": [], "download_artifacts": False, "invokes_gh": False,
     "exit_codes": {
         "0": ("printed and COMPLETE (candidate bound to the run head, green, "
-              "no required job skipped, no uninspected jobs)"),
+              "no required job skipped, no unexpected skip, no uninspected "
+              "jobs)"),
         "1": "printed but STALE, INCOMPLETE or UNBOUND",
         "2": ("refused or unresolvable input (including an --attempt the run "
               "payload cannot confirm)"),
@@ -169,11 +178,15 @@ def escape_text(value) -> str:
     is capped at 300 characters with a visible marker, so no field can
     produce a second output line or forge a row or status marker.
 
-    F10: this is the ONE canonical escape rule. It is applied exactly once,
-    to a raw value, at the moment that value is stored in the evidence
-    object; `render_table` renders the stored strings verbatim and never
-    escapes a second time, and `render_json` serialises those same stored
-    strings, so both renderings name the same characters.
+    F10: this is the ONE canonical escape rule, and it is applied in exactly
+    one place, `render_table`. The evidence object stores RAW payload
+    values; the table is the single escaping pass and never escapes a stored
+    string twice. `render_json` serialises those same raw values, so the
+    JSON leg is control-safe only through `json.dumps`, which escapes the
+    ASCII controls and non-ASCII code points itself. The 300-character cap
+    and the pipe escape are table rules and do NOT apply to the JSON
+    rendering: D19's "both renderings" wording is a known, disclosed
+    deviation, and the JSON is the raw, authoritative record.
     """
     text = "" if value is None else str(value)
     text = text.replace(BACKSLASH, BACKSLASH * 2)
@@ -209,20 +222,26 @@ def duration_seconds(started_at, completed_at):
 
 
 def _derive_skip_reason(job_name, event, changes_conclusion):
-    """Derive the reason token for a job the API reported as skipped."""
+    """Derive the reason token for a job the API reported as skipped.
+
+    F2/N1: only a job inside EXPECTED_SKIPS_BY_EVENT for this event may be
+    called an `event-filter` skip. Any other skip - an unconditional job, or
+    a filtered job on the event whose `if:` forces it to run - is
+    `unexpected-skip-for-event`, because saying `event-filter` there would
+    launder a gap. A skip the failed `changes` prerequisite explains stays
+    `dependency-failed`: it is a consequence of that failure, which already
+    makes the run FAILED.
+    """
     if job_name != "changes" and (
             changes_conclusion in NON_GREEN_EXECUTED_CONCLUSIONS):
         return "%s (changes=%s)" % (SKIP_REASON_DEPENDENCY_FAILED,
                                     changes_conclusion)
+    if job_name not in EXPECTED_SKIPS_BY_EVENT.get(event, ()):
+        return ("%s (%s is not filter-skippable on event=%s; the marker is "
+                "INCOMPLETE)" % (SKIP_REASON_UNEXPECTED, job_name,
+                                 event if event else NOT_RECORDED))
     if job_name == "gate-guard":
-        if event == "pull_request":
-            # F2: an unconditional PR job that skipped is NOT an event
-            # filter. Saying `event-filter` here would launder the gap.
-            return ("%s (gate-guard is unconditional on pull_request; "
-                    "the marker is INCOMPLETE)" % SKIP_REASON_UNEXPECTED)
         return "%s (pull_request-only job)" % SKIP_REASON_EVENT_FILTER
-    if job_name == "changes":
-        return "%s (no path filter)" % SKIP_REASON_EVENT_FILTER
     return "%s (paths did not select it on event=%s)" % (
         SKIP_REASON_EVENT_FILTER,
         event if event else NOT_RECORDED)
@@ -404,8 +423,9 @@ def _derive_job_rows(payload_jobs, run_head_sha, event, artifacts, entries):
         started_at = job.get("started_at")
         completed_at = job.get("completed_at")
         # F10: raw payload values are stored here and escaped by exactly one
-        # pass in render_table, so the table and the JSON name the same
-        # characters instead of the table double-escaping a stored string.
+        # pass, in render_table; render_json emits these same raw values, so
+        # the table never double-escapes a stored string and the JSON stays
+        # the raw, authoritative record.
         row = {"job": name,
                "conclusion": conclusion
                if isinstance(conclusion, str) else NOT_RECORDED,
@@ -465,10 +485,32 @@ def derive_staleness(candidate_sha, run_head_sha):
 
 
 def _marker(status, exit_code, reason, failing=(), non_green=(),
-            skipped_required=()):
+            skipped_required=(), unexpected_skips=()):
     return {"status": status, "exit_code": exit_code, "reason": reason,
             "failing_jobs": list(failing), "non_green_jobs": list(non_green),
-            "skipped_required_jobs": list(skipped_required)}
+            "skipped_required_jobs": list(skipped_required),
+            "unexpected_skipped_jobs": list(unexpected_skips)}
+
+
+def _unexpected_skips(rows, event):
+    """N1: roster jobs skipped outside their event's allowed-skip set.
+
+    EXPECTED_SKIPS_BY_EVENT is the workflow's own truth (see its comment); a
+    job outside that set for this event should have run, so its skip is a
+    prerequisite gap. A skip explained by a failed `changes` prerequisite is
+    not counted here: that failure is already FAILED on its own and naming the
+    dependent jobs twice would misdescribe why they stopped. An unrecorded
+    event yields the empty set, so every skip is then unexpected (fail closed).
+    """
+    changes_conclusion = next(
+        (row["conclusion"] for row in rows if row["job"] == "changes"), None)
+    dependency_failed = (
+        isinstance(changes_conclusion, str)
+        and changes_conclusion in NON_GREEN_EXECUTED_CONCLUSIONS)
+    allowed = EXPECTED_SKIPS_BY_EVENT.get(event, ())
+    return [row["job"] for row in rows
+            if row["state"] == "skipped" and row["job"] not in allowed
+            and not (dependency_failed and row["job"] != "changes")]
 
 
 def derive_status(run_identity, rows, roster_delta=(), event=None,
@@ -484,6 +526,9 @@ def derive_status(run_identity, rows, roster_delta=(), event=None,
     An unresolvable run head is a gap, not a pass.
     F2: a job the event makes required (REQUIRED_JOBS_BY_EVENT) that the API
     reports as skipped is a prerequisite gap and forces INCOMPLETE.
+    N1: any other roster job skipped outside EXPECTED_SKIPS_BY_EVENT for the
+    run's event is the same class of gap; every offending job is named in the
+    marker and in the reason, so the run can never certify COMPLETE/exit 0.
     F8: a jobs payload that advertises more jobs than the pages read forces
     INCOMPLETE through `truncated` and the named roster_delta entries.
     """
@@ -497,6 +542,7 @@ def derive_status(run_identity, rows, roster_delta=(), event=None,
                         if row["state"] == "skipped"
                         and row["job"] in REQUIRED_JOBS_BY_EVENT.get(
                             event, ())]
+    unexpected = _unexpected_skips(rows, event)
     run_conclusion = run_identity["run_conclusion"]
     run_red = (run_identity["run_status"] == "completed"
                and isinstance(run_conclusion, str)
@@ -506,14 +552,14 @@ def derive_status(run_identity, rows, roster_delta=(), event=None,
         if run_red and run_conclusion and run_conclusion not in failing:
             offending.append("run_conclusion=%s" % run_conclusion)
         return _marker("FAILED", EXIT_FAILED, "not_green", offending,
-                       failing + soft, skipped_required)
+                       failing + soft, skipped_required, unexpected)
     if run_identity["candidate_sha"] == NOT_SUPPLIED:
         return _marker("UNBOUND", EXIT_INCOMPLETE, "no_candidate_supplied",
-                       (), (), skipped_required)
+                       (), (), skipped_required, unexpected)
     if run_identity["stale"]:
         return _marker("STALE", EXIT_INCOMPLETE,
                        "candidate_differs_from_run_head", (), (),
-                       skipped_required)
+                       skipped_required, unexpected)
     blocked = []
     if run_identity["candidate_status"] != "matches":
         # F1: derived from the equality test, never from the `stale` boolean,
@@ -527,6 +573,8 @@ def derive_status(run_identity, rows, roster_delta=(), event=None,
             reasons.append("%s=duration_not_recorded" % row["job"])
     for name in skipped_required:
         reasons.append("required-job-skipped:%s" % name)
+    for name in unexpected:
+        reasons.append("%s:%s" % (SKIP_REASON_UNEXPECTED, name))
     if truncated:
         reasons.append("jobs-truncated")
     if soft:
@@ -542,9 +590,9 @@ def derive_status(run_identity, rows, roster_delta=(), event=None,
     if reasons or blocked:
         return _marker("INCOMPLETE", EXIT_INCOMPLETE,
                        "; ".join(blocked + reasons), (), soft,
-                       skipped_required)
+                       skipped_required, unexpected)
     return _marker("COMPLETE", EXIT_COMPLETE, "head_bound_green", (), (),
-                   skipped_required)
+                   skipped_required, unexpected)
 
 
 def _validate_skills_job(payload_jobs):
@@ -658,8 +706,9 @@ def render_table(evidence):
     """Render the same evidence as fixed-width Markdown-pipe text.
 
     F10: this is the SINGLE escaping pass (escape_text). The evidence object
-    stores raw payload values, so the JSON and the table describe the same
-    characters instead of the table double-escaping a pre-escaped string.
+    stores raw payload values and render_json emits them unchanged, so the
+    table names - through escapes - exactly the characters the JSON carries
+    raw, instead of double-escaping a pre-escaped stored string.
     """
     run = evidence["run_identity"]
     lines = ["## ci-durations run identity"]
@@ -709,6 +758,9 @@ def render_table(evidence):
     if marker.get("skipped_required_jobs"):
         lines.append("required-job-skipped: %s" % ", ".join(
             escape_text(name) for name in marker["skipped_required_jobs"]))
+    if marker.get("unexpected_skipped_jobs"):
+        lines.append("unexpected-skip: %s" % ", ".join(
+            escape_text(name) for name in marker["unexpected_skipped_jobs"]))
     return chr(10).join(lines)
 
 

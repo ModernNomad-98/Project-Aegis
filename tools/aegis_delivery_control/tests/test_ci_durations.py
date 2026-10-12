@@ -14,6 +14,13 @@ a `pull_request` run whose required `gate-guard` job was skipped, the Unicode
 line separators, the real PR-only step states, a multi-record artifact and its
 `pr_head_sha` binding, the cross-host redirect refusal, a truncated and a
 paginated jobs list, and `--attempt` selection.
+
+`UnexpectedSkipEnforcementTests` adds the SD-D round-2 finding N1: the
+workflow's own per-event allowed-skip set is enforced, so a skipped
+`validate-skills`, `changes`, `tools-tests-linux` or
+`windows-offline-checks` job on an event that should run it is INCOMPLETE
+with the job named, while the lawful `gate-guard` skip on a push and the
+three advisory skips on a pull request stay COMPLETE.
 """
 
 from __future__ import annotations
@@ -110,8 +117,12 @@ def filler_jobs(prefix, first, last):
 
 
 def pr_jobs(dco="success", pr_body="success", gate="success"):
-    """A pull_request fixture: `gate-guard` REQUIRED and executing (F2)."""
-    return [job(1, "changes", "skipped", None, None,
+    """A pull_request fixture: `gate-guard` REQUIRED and executing (F2).
+
+    `changes` executes here: the workflow gives it no `if:` (L57), so its
+    skip is a gap (N1) rather than the path-filter skip SD-C2 assumed.
+    """
+    return [job(1, "changes", "success", 0, 6,
                 step_list=steps("pull_request")),
             job(2, "validate-skills", "success", 0, 118,
                 step_list=steps("pull_request", dco, pr_body)),
@@ -695,10 +706,12 @@ class RepairRoundTests(unittest.TestCase):
         self.assertEqual(evidence["marker"]["skipped_required_jobs"],
                          ["gate-guard"])
         self.assertEqual(row["skip_reason"],
-                         "unexpected-skip-for-event (gate-guard is "
-                         "unconditional on pull_request; the marker is "
-                         "INCOMPLETE)")
+                         "unexpected-skip-for-event (gate-guard is not "
+                         "filter-skippable on event=pull_request; the marker "
+                         "is INCOMPLETE)")
         self.assertNotIn("event-filter", row["skip_reason"])
+        self.assertEqual(evidence["marker"]["unexpected_skipped_jobs"],
+                         ["gate-guard"])
 
     def test_f2_pull_request_executed_gate_guard_stays_complete(self):
         code, evidence = evidence_of(jobs=pr_jobs(),
@@ -714,15 +727,27 @@ class RepairRoundTests(unittest.TestCase):
         self.assertIn("event-filter",
                       rows_of(evidence)["gate-guard"]["skip_reason"])
 
-    def test_f2_pull_request_skipped_changes_is_legitimate(self):
-        """`changes` is not in REQUIRED_JOBS_BY_EVENT: its skip is expected."""
+    def test_n1_pull_request_skipped_changes_is_not_legitimate(self):
+        """N1 corrected SD-C2's claim.
+
+        SD-C2 held that `changes` skipping on a filtered pull_request was
+        expected. The workflow disagrees: `changes` (L57) has no `if:`, so
+        it always runs, and its skip is an unexpected skip - INCOMPLETE.
+        """
+        jobs = pr_jobs()
+        jobs[0] = job(1, "changes", "skipped", None, None,
+                      step_list=steps("pull_request"))
         code, evidence = evidence_of(
-            jobs=pr_jobs(), run=run_payload(event="pull_request"))
+            jobs=jobs, run=run_payload(event="pull_request"))
         self.assertEqual(rows_of(evidence)["changes"]["state"], "skipped")
-        self.assertEqual(evidence["status"], "COMPLETE")
-        self.assertEqual(code, 0)
-        self.assertIn("event-filter",
-                      rows_of(evidence)["changes"]["skip_reason"])
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+        self.assertEqual(evidence["marker"]["unexpected_skipped_jobs"],
+                         ["changes"])
+        self.assertIn("unexpected-skip-for-event:changes",
+                      evidence["marker"]["reason"])
+        self.assertNotIn("event-filter",
+                         rows_of(evidence)["changes"]["skip_reason"])
 
     def test_f4_pr_run_reports_both_steps_executed(self):
         _, evidence = evidence_of(jobs=pr_jobs(),
@@ -1019,6 +1044,128 @@ class RepairRoundTests(unittest.TestCase):
         self.assertIn("| exit_codes |", text)
         self.assertIn("| exit_code_provenance |", text)
         self.assertIn("- step_state: Verify DCO sign-off on every commit", text)
+
+
+class UnexpectedSkipEnforcementTests(unittest.TestCase):
+    """N1: a roster job may skip only where the workflow lets it.
+
+    `.github/workflows/validate-skills.yml`: `changes` (L57) and
+    `validate-skills` (L106) have no `if:`; `windows-offline-checks` (L289),
+    `tools-tests-linux` (L380) and `tools-tests-windows` (L430) are
+    `if: github.event_name == 'push' || <flag>`, and on a push the `changes`
+    job forces both flags true (L86-89); `gate-guard` (L493) is
+    pull_request-only. So on a push only `gate-guard` may skip and on a
+    pull_request only the three advisory jobs may; any other skip is
+    INCOMPLETE/exit 1 with the job named, never COMPLETE/exit 0.
+    """
+
+    def _skip(self, name, event):
+        jobs = green_jobs(event) if event == "push" else pr_jobs()
+        index = [entry["name"] for entry in jobs].index(name)
+        jobs[index] = job(index + 1, name, "skipped", None, None,
+                          step_list=steps(event))
+        return jobs
+
+    def _evidence(self, jobs, event):
+        return evidence_of(jobs=jobs, run=run_payload(event=event))
+
+    def test_n1_push_validate_skills_skip_is_incomplete(self):
+        jobs = self._skip("validate-skills", "push")
+        code, evidence = self._evidence(jobs, "push")
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+        self.assertEqual(evidence["marker"]["unexpected_skipped_jobs"],
+                         ["validate-skills"])
+        self.assertIn("unexpected-skip-for-event:validate-skills",
+                      evidence["marker"]["reason"])
+        row = rows_of(evidence)["validate-skills"]
+        self.assertEqual(row["state"], "skipped")
+        self.assertIn("not filter-skippable on event=push",
+                      row["skip_reason"])
+        self.assertNotIn("event-filter", row["skip_reason"])
+
+    def test_n1_pull_request_validate_skills_skip_is_incomplete(self):
+        jobs = self._skip("validate-skills", "pull_request")
+        code, evidence = self._evidence(jobs, "pull_request")
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+        self.assertEqual(evidence["marker"]["unexpected_skipped_jobs"],
+                         ["validate-skills"])
+        self.assertIn("unexpected-skip-for-event:validate-skills",
+                      evidence["marker"]["reason"])
+
+    def test_n1_push_tools_tests_linux_skip_is_incomplete(self):
+        jobs = self._skip("tools-tests-linux", "push")
+        code, evidence = self._evidence(jobs, "push")
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+        self.assertEqual(evidence["marker"]["unexpected_skipped_jobs"],
+                         ["tools-tests-linux"])
+        self.assertNotIn("event-filter",
+                         rows_of(evidence)["tools-tests-linux"]["skip_reason"])
+
+    def test_n1_push_windows_offline_checks_skip_is_incomplete(self):
+        jobs = self._skip("windows-offline-checks", "push")
+        code, evidence = self._evidence(jobs, "push")
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+        self.assertEqual(evidence["marker"]["unexpected_skipped_jobs"],
+                         ["windows-offline-checks"])
+        self.assertNotIn(
+            "event-filter",
+            rows_of(evidence)["windows-offline-checks"]["skip_reason"])
+
+    def test_n1_push_gate_guard_skip_is_the_lawful_event_filter(self):
+        code, evidence = evidence_of()
+        self.assertEqual(evidence["status"], "COMPLETE")
+        self.assertEqual(code, 0)
+        self.assertEqual(evidence["marker"]["unexpected_skipped_jobs"], [])
+        self.assertIn("pull_request-only job",
+                      rows_of(evidence)["gate-guard"]["skip_reason"])
+
+    def test_n1_pull_request_advisory_skips_stay_lawful(self):
+        jobs = pr_jobs()
+        for name in ("windows-offline-checks", "tools-tests-linux",
+                     "tools-tests-windows"):
+            index = [entry["name"] for entry in jobs].index(name)
+            jobs[index] = job(index + 1, name, "skipped", None, None,
+                              step_list=steps("pull_request"))
+        code, evidence = self._evidence(jobs, "pull_request")
+        self.assertEqual(evidence["status"], "COMPLETE")
+        self.assertEqual(code, 0)
+        self.assertEqual(evidence["marker"]["unexpected_skipped_jobs"], [])
+        for name in ("windows-offline-checks", "tools-tests-linux",
+                     "tools-tests-windows"):
+            self.assertIn("event-filter",
+                          rows_of(evidence)[name]["skip_reason"])
+
+    def test_n1_dependency_failed_skip_is_not_called_unexpected(self):
+        jobs = green_jobs()
+        jobs[0] = job(1, "changes", "failure", 0, 5)
+        code, evidence = evidence_of(jobs=jobs)
+        self.assertEqual(evidence["status"], "FAILED")
+        self.assertEqual(code, 4)
+        self.assertEqual(evidence["marker"]["unexpected_skipped_jobs"], [])
+        self.assertIn("dependency-failed",
+                      rows_of(evidence)["gate-guard"]["skip_reason"])
+
+    def test_n1_expected_skip_sets_are_exact(self):
+        """The enforced set is the workflow's truth, not a convenience."""
+        self.assertEqual(ci_durations.EXPECTED_SKIPS_BY_EVENT, {
+            "push": ("gate-guard",),
+            "pull_request": ("windows-offline-checks", "tools-tests-linux",
+                             "tools-tests-windows")})
+        self.assertEqual(ci_durations.REQUIRED_JOBS_BY_EVENT,
+                         {"pull_request": ("gate-guard",)})
+
+    def test_n1_table_names_the_unexpected_skip(self):
+        code, text, _ = invoke(
+            jobs=self._skip("tools-tests-windows", "push"),
+            argv=("--candidate", HEAD, "--format", "table"))
+        self.assertEqual(code, 1)
+        self.assertIn("unexpected-skip: tools-tests-windows", text)
+        self.assertIn("unexpected-skip-for-event:tools-tests-windows", text)
+        self.assertEqual(text.count("STATUS: "), 1)
 
 
 class CliContractTests(unittest.TestCase):

@@ -209,11 +209,20 @@ roster job is a reported `roster_delta`.
 
 Two further gaps force `INCOMPLETE` (exit 1) rather than a pass:
 
-- **A required job the event makes unconditional was skipped.** On a
-  `pull_request` run `gate-guard` is unconditional and branch-protected, so a
-  skipped `gate-guard` yields `required-job-skipped:gate-guard`. On a push the
-  same skip is the lawful event filter and stays green. A skipped `changes` is
-  always lawful: `changes` is the path filter itself.
+- **A roster job was skipped on an event that should have run it.** The
+  allowed-skip set is the workflow's own truth. In
+  `.github/workflows/validate-skills.yml`, `changes` (L57) and
+  `validate-skills` (L106) carry no `if:` at all;
+  `windows-offline-checks`, `tools-tests-linux` and `tools-tests-windows`
+  are `if: github.event_name == 'push' || <path flag>`, and on a push the
+  `changes` job forces both flags true; `gate-guard` is
+  `github.event_name == 'pull_request'`. So on a push only `gate-guard` may
+  skip - that lawful skip stays green with an `event-filter` reason - and on
+  a pull request only the three advisory jobs may skip by path filter. Any
+  other skip is `unexpected-skip-for-event:<job>` in the marker reason, is
+  listed by `unexpected-skip: <job>` in the table, and is named in
+  `marker.unexpected_skipped_jobs`. A skipped `gate-guard` on a pull request
+  additionally yields `required-job-skipped:gate-guard`.
 - **The jobs list was truncated.** If the API advertises a `total_count`
   larger than the jobs actually read, the report says `jobs-truncated`,
   `jobs_truncated` is `true`, and `roster_delta` names `truncated-jobs-page`.
