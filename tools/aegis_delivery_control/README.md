@@ -175,7 +175,9 @@ one host, no mutating verb, no artifact download) as JSON and exits 0.
 
 - **One host, with no override.** The only contactable host is
   `api.github.com`; no argument selects another, so a GitHub Enterprise
-  deployment is out of scope for this reader.
+  deployment is out of scope for this reader. The live transport also
+  **refuses any redirect that changes scheme or host**, so a 3xx response
+  cannot move the read - or the `--token-env` bearer token - to a second host.
 - **Opt-in, read-only, no token required.** Live reads require
   `--allow-network`. No POST, PUT, PATCH or DELETE is ever issued, no file is
   written, no artifact is downloaded and `gh` is never invoked. `--token-env
@@ -190,17 +192,36 @@ one host, no mutating verb, no artifact download) as JSON and exits 0.
 | --- | --- | --- |
 | 0 | `COMPLETE` | Evidence printed; the run is green and `--candidate` equals the run head. |
 | 1 | `STALE`, `INCOMPLETE` or `UNBOUND` | Evidence printed, but nothing is certified: the candidate differs, a required field is missing, or no `--candidate` was supplied. |
-| 2 | (none) | Refused or unresolvable input: no `--fixture` and no `--allow-network`, an unknown workflow, no run for the head, a malformed fixture, a missing artifact directory. |
+| 2 | (none) | Refused or unresolvable input: no `--fixture` and no `--allow-network`, an unknown workflow, no run for the head, a malformed fixture, a missing artifact directory, or an `--attempt N` the run payload cannot confirm. |
 | 3 | (none) | Transport or API failure: HTTP status, timeout or malformed JSON. |
 | 4 | `FAILED` | Evidence printed, but the run or an executed job is not green. |
 
 **Exit 0 is a green, head-bound claim - not merely "the report is complete".**
 `--candidate` is required for it: without a candidate the marker is `UNBOUND`
-and the exit code is 1. The reader never rounds a missing, skipped or red
-value up to a pass: a skipped job is `not_applicable` whatever its timestamp
-window looks like (-1 s, 0 s or absent), an unrecorded value is the literal
-token `not_recorded` and never zero, an executed job that is not `success` is
-never green, and a missing roster job is a reported `roster_delta`.
+and the exit code is 1. The candidate must also **bind**: if the run payload
+records no usable `head_sha`, `candidate_status` is `unresolvable`, the
+reason carries `candidate_status=unresolvable`, and the exit code is 1. The
+reader never rounds a missing, skipped or red value up to a pass: a skipped
+job is `not_applicable` whatever its timestamp window looks like (-1 s, 0 s or
+absent), an unrecorded value is the literal token `not_recorded` and never
+zero, an executed job that is not `success` is never green, and a missing
+roster job is a reported `roster_delta`.
+
+Two further gaps force `INCOMPLETE` (exit 1) rather than a pass:
+
+- **A required job the event makes unconditional was skipped.** On a
+  `pull_request` run `gate-guard` is unconditional and branch-protected, so a
+  skipped `gate-guard` yields `required-job-skipped:gate-guard`. On a push the
+  same skip is the lawful event filter and stays green. A skipped `changes` is
+  always lawful: `changes` is the path filter itself.
+- **The jobs list was truncated.** If the API advertises a `total_count`
+  larger than the jobs actually read, the report says `jobs-truncated`,
+  `jobs_truncated` is `true`, and `roster_delta` names `truncated-jobs-page`.
+  Later pages are fetched while the advertised total demands them.
+
+`--attempt N` **selects or refuses**: when the run payload reports a different
+`run_attempt` (or none), the command exits 2 with the mismatch named, instead
+of silently reporting attempt 1 for every request.
 
 ### Worked example (run 38198781208, push, head 4d5ccb0b, attempt 1)
 
@@ -217,14 +238,35 @@ never green, and a missing roster job is a reported `roster_delta`.
 pull-request-only job on a push run. A GitHub job record carries a
 *conclusion*, never a process exit code, so `exit_code` stays `not_recorded`
 unless you also pass `--artifact-dir` with the extracted
-`record-check.py` artifacts; each record is then used only for the job whose
+`record-check.py` artifacts. Each record is then used only for the job whose
 **real uploaded artifact name** contained it
 (`offline-checks-linux-<run>-<attempt>` maps to `validate-skills`,
 `offline-checks-windows-...` to `windows-offline-checks`,
 `tools-tests-linux-...` and `tools-tests-windows-...` to their same-named
-jobs; `changes` and `gate-guard` upload nothing), and only when the record's
-`checkout_sha` equals the run head. An unrecognised directory is reported as
-`not_mapped`, never guessed at.
+jobs; `changes` and `gate-guard` upload nothing), and only when the record
+binds to the run head. One uploaded directory holds **many** records - the
+`offline-checks-linux` artifact alone is fed by every recorded step of that
+job - so the whole per-job set is reported in `exit_codes` with its
+provenance, and the singular `exit_code` is filled only when every bound
+record agrees on one code; otherwise it reads `not_applicable` rather than
+promoting one arbitrary record to the job.
+
+On a `pull_request` run the binding field is **`pr_head_sha`**, not
+`checkout_sha`: GitHub checks out a synthetic merge commit that no contributor
+signed, and the workflow records the pull request head separately
+(`AEGIS_PR_HEAD_SHA`). On a push the checkout *is* the head, so
+`checkout_sha` binds. Both fields are listed in the provenance, and an
+unrecognised directory is reported as `not_mapped`, never guessed at.
+
+### Step-level prerequisites
+
+The two pull-request-only steps of the `validate-skills` job - `Verify DCO
+sign-off on every commit` and `pr-body-skills-check` - are reported under
+`step_details` with the state the API actually returned for them: `executed`
+on a `pull_request` run, `skipped` on a push, and `not_recorded` when the
+payload does not carry the step. Only genuinely skipped steps appear in
+`step_skipped`, so a pull-request report never claims a validation gap the
+workflow does not have.
 
 ## Storage and current guarantees
 

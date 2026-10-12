@@ -7,6 +7,13 @@ mirrors the A1 page cross-check pair 8/111/skipped/241/100/165 s. No test
 performs network I/O: the zero-socket proof patches socket.socket,
 urllib.request.urlopen and ci_durations.HttpTransport together, and the
 fixture path is additionally asserted never to construct a transport.
+
+`RepairRoundTests` adds the negative fixtures for the Stage D findings F1-F9
+and the nine Codex review comments at the same head: an unresolvable run head,
+a `pull_request` run whose required `gate-guard` job was skipped, the Unicode
+line separators, the real PR-only step states, a multi-record artifact and its
+`pr_head_sha` binding, the cross-host redirect refusal, a truncated and a
+paginated jobs list, and `--attempt` selection.
 """
 
 from __future__ import annotations
@@ -40,12 +47,36 @@ def _iso(second):
     return "2026-10-12T03:%02d:%02dZ" % (second // 60, second % 60)
 
 
-def job(index, name, conclusion, start=None, end=None, html=None):
+STEP_NAMES = (
+    "Set up job", "Checkout", "Validate the skill library",
+    "Verify DCO sign-off on every commit", "pr-body-skills-check",
+    "Retain offline-check evidence", "Complete job")
+
+
+def steps(event, dco="success", pr_body="success"):
+    """The step list the API returns for validate-skills (F4 fixture).
+
+    `.github/workflows/validate-skills.yml` L260-274 runs both PR-only steps
+    when `github.event_name == 'pull_request'`; on any other event the API
+    reports them `skipped`.
+    """
+    return [{"name": name,
+             "conclusion": ("skipped" if event != "pull_request"
+                            else {"Verify DCO sign-off on every commit": dco,
+                                  "pr-body-skills-check": pr_body}.get(
+                                      name, "success"))}
+            for name in STEP_NAMES]
+
+
+def job(index, name, conclusion, start=None, end=None, html=None,
+        step_list=None):
     entry = {"id": 100 + index, "name": name, "status": "completed",
              "conclusion": conclusion, "artifacts": [],
              "html_url": html or ("%s%s/job/%d" % (API, RUN_ID, 100 + index))}
     entry["started_at"] = _iso(start) if start is not None else None
     entry["completed_at"] = _iso(end) if end is not None else None
+    entry["steps"] = list(step_list) if step_list is not None else list(
+        steps("push"))
     return entry
 
 
@@ -58,13 +89,40 @@ def run_payload(head=HEAD, conclusion="success", status="completed",
             "updated_at": "2026-10-12T03:15:40Z"}
 
 
-def green_jobs():
-    return [job(1, "changes", "success", 0, 7),
-            job(2, "validate-skills", "success", 0, 109),
-            job(3, "gate-guard", "skipped", 71, 70),
-            job(4, "windows-offline-checks", "success", 30, 254),
-            job(5, "tools-tests-linux", "success", 40, 172),
-            job(6, "tools-tests-windows", "success", 50, 279)]
+def green_jobs(event="push"):
+    """The push fixture: six real durations, `gate-guard` legitimately skipped."""
+    return [job(1, "changes", "success", 0, 7, step_list=steps(event)),
+            job(2, "validate-skills", "success", 0, 109,
+                step_list=steps(event)),
+            job(3, "gate-guard", "skipped", 71, 70, step_list=steps(event)),
+            job(4, "windows-offline-checks", "success", 30, 254,
+                step_list=steps(event)),
+            job(5, "tools-tests-linux", "success", 40, 172,
+                step_list=steps(event)),
+            job(6, "tools-tests-windows", "success", 50, 279,
+                step_list=steps(event))]
+
+
+def filler_jobs(prefix, first, last):
+    """Ordinary out-of-roster jobs, for the multi-page fixtures (F8)."""
+    return [job(1000 + index, "%s-%d" % (prefix, index), "success", 0, 1)
+            for index in range(first, last + 1)]
+
+
+def pr_jobs(dco="success", pr_body="success", gate="success"):
+    """A pull_request fixture: `gate-guard` REQUIRED and executing (F2)."""
+    return [job(1, "changes", "skipped", None, None,
+                step_list=steps("pull_request")),
+            job(2, "validate-skills", "success", 0, 118,
+                step_list=steps("pull_request", dco, pr_body)),
+            job(3, "gate-guard", gate, 0, 7,
+                step_list=steps("pull_request")),
+            job(4, "windows-offline-checks", "success", 0, 209,
+                step_list=steps("pull_request")),
+            job(5, "tools-tests-linux", "success", 0, 151,
+                step_list=steps("pull_request")),
+            job(6, "tools-tests-windows", "success", 0, 246,
+                step_list=steps("pull_request"))]
 
 
 def a1_jobs():
@@ -76,14 +134,21 @@ def a1_jobs():
             job(6, "tools-tests-windows", "success", 50, 215)]
 
 
+ENTRY = object()
+
+
 def fixture(jobs=None, run=None, run_id=RUN_ID, with_runs_list=False,
-            head=HEAD):
+            head=HEAD, total_count=ENTRY, extra_pages=None):
     run = run if run is not None else run_payload(head=head, run_id=run_id)
     jobs = green_jobs() if jobs is None else jobs
     base = "%s%s" % (API, run_id)
+    total = len(jobs) if total_count is ENTRY else total_count
     mapping = {base: run,
                "%s/jobs?per_page=100" % base:
-                   {"total_count": len(jobs), "jobs": jobs}}
+                   {"total_count": total, "jobs": jobs}}
+    for page, page_jobs in (extra_pages or {}).items():
+        mapping["%s/jobs?per_page=100&page=%d" % (base, page)] = {
+            "total_count": total, "jobs": page_jobs}
     if with_runs_list:
         mapping[("https://api.github.com/repos/ModernNomad-98/Project-Aegis"
                  "/actions/workflows/validate-skills.yml/runs?head_sha=%s"
@@ -92,7 +157,18 @@ def fixture(jobs=None, run=None, run_id=RUN_ID, with_runs_list=False,
     return mapping
 
 
-ENTRY = object()
+def paginated_fixture(pages, run_id=RUN_ID, head=HEAD, total_count=ENTRY):
+    """A multi-page fixture: `pages` is a list of job lists, page 1 first."""
+    run = run_payload(head=head, run_id=run_id)
+    base = "%s%s" % (API, run_id)
+    total = sum(len(page) for page in pages) \
+        if total_count is ENTRY else total_count
+    mapping = {base: run}
+    for index, page_jobs in enumerate(pages, 1):
+        url = ("%s/jobs?per_page=100" % base if index == 1
+               else "%s/jobs?per_page=100&page=%d" % (base, index))
+        mapping[url] = {"total_count": total, "jobs": page_jobs}
+    return mapping
 
 
 def invoke(jobs=None, run=None, run_id=RUN_ID, argv=(), fixture_path=ENTRY,
@@ -101,7 +177,7 @@ def invoke(jobs=None, run=None, run_id=RUN_ID, argv=(), fixture_path=ENTRY,
     if fixture_path is ENTRY:
         fixture_path = _write_fixture(
             fixture(jobs=jobs, run=run, run_id=run_id,
-                    with_runs_list=with_runs_list, head=head))
+                    with_runs_list=with_runs_list, head=head, **kwargs))
     args = ["--repository-id", "p0a-a2", "ci-durations", "--now", NOW]
     if run_id is not None:
         args += ["--run-id", run_id]
@@ -462,7 +538,12 @@ class ArtifactMappingTests(unittest.TestCase):
         for name in ("validate-skills", "windows-offline-checks",
                      "tools-tests-linux", "tools-tests-windows"):
             self.assertEqual(rows[name]["exit_code"], 0)
-            self.assertIn("artifact:", rows[name]["exit_code_provenance"])
+            self.assertEqual(rows[name]["exit_codes"],
+                             [["delivery-control", 0]])
+            self.assertIn("bound_by=checkout_sha",
+                          rows[name]["exit_codes_provenance"])
+            self.assertIn("delivery-control.json",
+                          rows[name]["exit_codes_provenance"])
         self.assertEqual(rows["changes"]["exit_code"], "not_recorded")
         self.assertEqual(rows["gate-guard"]["exit_code"], "not_recorded")
         self.assertEqual(evidence["prerequisites"]["artifact_unmapped"], [])
@@ -526,18 +607,28 @@ class EscapingTests(unittest.TestCase):
             self.assertNotIn(chr(27), line)
         self.assertEqual(text.count("STATUS: "), 1)
 
-    def test_ac7_json_carries_no_raw_control_character(self):
+    def test_ac7_json_and_table_agree_on_one_escape_rule(self):
+        """F10: one canonical rule - the JSON string IS the table cell."""
         hostile = "line1" + chr(10) + "line2" + chr(27) + "|end"
         jobs = green_jobs()
         jobs[5] = job(6, "tools-tests-windows", "success", 50, 279,
                       html=hostile)
         _, evidence = evidence_of(jobs=jobs)
         row = rows_of(evidence)["tools-tests-windows"]
+        escaped = ci_durations.escape_text(hostile)
+        self.assertEqual(row["log_url"], hostile)
         for control in (chr(10), chr(13), chr(27)):
-            self.assertNotIn(control, row["log_url"])
-        self.assertIn(chr(92) + "x0a", row["log_url"])
-        self.assertIn(chr(92) + "x1b", row["log_url"])
-        self.assertIn(chr(92) + "|", row["log_url"])
+            self.assertNotIn(control, escaped)
+        self.assertIn(chr(92) + "x0a", escaped)
+        self.assertIn(chr(92) + "x1b", escaped)
+        self.assertIn(chr(92) + "|", escaped)
+        code, text, _ = invoke(jobs=jobs,
+                               argv=("--candidate", HEAD, "--format", "table"))
+        self.assertEqual(code, 0)
+        cell = [column for column in columns_of(text)
+                if column.startswith("| tools-tests-windows ")][0]
+        self.assertIn(escaped, cell)
+        self.assertNotIn(escaped.replace(chr(92), chr(92) * 2), cell)
 
     def test_ac7_escape_rules_are_exact(self):
         self.assertEqual(ci_durations.escape_text("a|b"), "a" + chr(92) + "|b")
@@ -549,6 +640,385 @@ class EscapingTests(unittest.TestCase):
         long_text = ci_durations.escape_text("y" * 500)
         self.assertTrue(long_text.startswith("y" * 300))
         self.assertIn("[truncated 200]", long_text)
+
+
+
+
+class RepairRoundTests(unittest.TestCase):
+    """SD-D F1-F9 and the nine Codex findings: the negative fixtures.
+
+    Each case is the exact payload the finding was reproduced with, so the
+    suite fails if the honest behaviour regresses.
+    """
+
+    def test_f1_missing_head_sha_may_not_certify_complete(self):
+        run = run_payload()
+        del run["head_sha"]
+        code, evidence = evidence_of(run=run)
+        self.assertEqual(evidence["run_identity"]["candidate_status"],
+                         "unresolvable")
+        self.assertEqual(evidence["run_identity"]["run_head_sha"],
+                         "not_recorded")
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+        self.assertIn("candidate_status=unresolvable",
+                      evidence["marker"]["reason"])
+        self.assertEqual(evidence["run_identity"]["stale"], False)
+
+    def test_f1_non_string_head_sha_may_not_certify_complete(self):
+        run = run_payload()
+        run["head_sha"] = 12345
+        code, evidence = evidence_of(run=run)
+        self.assertEqual(evidence["run_identity"]["candidate_status"],
+                         "unresolvable")
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+        self.assertIn("candidate_status=unresolvable",
+                      evidence["marker"]["reason"])
+
+    def test_f1_empty_string_head_sha_may_not_certify_complete(self):
+        run = run_payload(head="")
+        code, evidence = evidence_of(run=run)
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+
+    def test_f2_pull_request_skipped_gate_guard_is_not_complete(self):
+        jobs = pr_jobs(gate="skipped")
+        code, evidence = evidence_of(jobs=jobs,
+                                     run=run_payload(event="pull_request"))
+        row = rows_of(evidence)["gate-guard"]
+        self.assertEqual(row["state"], "skipped")
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+        self.assertIn("required-job-skipped:gate-guard",
+                      evidence["marker"]["reason"])
+        self.assertEqual(evidence["marker"]["skipped_required_jobs"],
+                         ["gate-guard"])
+        self.assertEqual(row["skip_reason"],
+                         "unexpected-skip-for-event (gate-guard is "
+                         "unconditional on pull_request; the marker is "
+                         "INCOMPLETE)")
+        self.assertNotIn("event-filter", row["skip_reason"])
+
+    def test_f2_pull_request_executed_gate_guard_stays_complete(self):
+        code, evidence = evidence_of(jobs=pr_jobs(),
+                                     run=run_payload(event="pull_request"))
+        self.assertEqual(evidence["status"], "COMPLETE")
+        self.assertEqual(code, 0)
+        self.assertEqual(evidence["marker"]["skipped_required_jobs"], [])
+
+    def test_f2_push_skipped_gate_guard_remains_event_filter(self):
+        code, evidence = evidence_of()
+        self.assertEqual(evidence["status"], "COMPLETE")
+        self.assertEqual(code, 0)
+        self.assertIn("event-filter",
+                      rows_of(evidence)["gate-guard"]["skip_reason"])
+
+    def test_f2_pull_request_skipped_changes_is_legitimate(self):
+        """`changes` is not in REQUIRED_JOBS_BY_EVENT: its skip is expected."""
+        code, evidence = evidence_of(
+            jobs=pr_jobs(), run=run_payload(event="pull_request"))
+        self.assertEqual(rows_of(evidence)["changes"]["state"], "skipped")
+        self.assertEqual(evidence["status"], "COMPLETE")
+        self.assertEqual(code, 0)
+        self.assertIn("event-filter",
+                      rows_of(evidence)["changes"]["skip_reason"])
+
+    def test_f4_pr_run_reports_both_steps_executed(self):
+        _, evidence = evidence_of(jobs=pr_jobs(),
+                                  run=run_payload(event="pull_request"))
+        details = {item["step"]: item
+                   for item in evidence["prerequisites"]["step_details"]}
+        self.assertEqual(sorted(details), [
+            "Verify DCO sign-off on every commit", "pr-body-skills-check"])
+        for name, item in details.items():
+            self.assertEqual(item["state"], "executed", name)
+            self.assertIn("not a job", item["detail"])
+        self.assertEqual(evidence["prerequisites"]["step_skipped"], [])
+
+    def test_f4_push_run_reports_both_steps_skipped(self):
+        _, evidence = evidence_of()
+        details = {item["step"]: item
+                   for item in evidence["prerequisites"]["step_details"]}
+        for name, item in details.items():
+            self.assertEqual(item["state"], "skipped", name)
+        skipped = evidence["prerequisites"]["step_skipped"]
+        self.assertEqual(len(skipped), 2)
+        self.assertTrue(any("DCO" in line for line in skipped))
+        self.assertTrue(any("pr-body-skills-check" in line for line in skipped))
+
+    def test_f4_pr_run_failed_pr_body_step_is_not_claimed_skipped(self):
+        _, evidence = evidence_of(
+            jobs=pr_jobs(pr_body="failure"),
+            run=run_payload(event="pull_request"))
+        details = {item["step"]: item for item in
+                   evidence["prerequisites"]["step_details"]}
+        state = details["pr-body-skills-check"]["state"]
+        self.assertEqual(state, "executed")
+        self.assertIn("failure", details["pr-body-skills-check"]["detail"])
+
+    def test_f4_absent_step_payload_is_not_recorded_not_skipped(self):
+        jobs = green_jobs()
+        for entry in jobs:
+            entry.pop("steps", None)
+        _, evidence = evidence_of(jobs=jobs)
+        states = {item["step"]: item["state"] for item in
+                  evidence["prerequisites"]["step_details"]}
+        self.assertEqual(set(states.values()), {"not_recorded"})
+        self.assertEqual(evidence["prerequisites"]["step_skipped"], [])
+
+    def test_f3_unicode_separators_are_escaped(self):
+        for character in (chr(0x85), chr(0x2028), chr(0x2029)):
+            with self.subTest(character=hex(ord(character))):
+                escaped = ci_durations.escape_text("a" + character + "b")
+                self.assertNotIn(character, escaped)
+                self.assertIn("x%02x" % ord(character), escaped)
+                self.assertEqual(len(escaped.splitlines()), 1)
+
+    def test_f3_hostile_unicode_adds_no_line_and_no_marker(self):
+        clean = invoke(argv=("--candidate", HEAD,
+                             "--format", "table"))[1]
+        for character in (chr(0x85), chr(0x2028), chr(0x2029)):
+            with self.subTest(character=hex(ord(character))):
+                jobs = green_jobs()
+                jobs[0] = job(1, "changes", "success", 0, 7,
+                              html="evil" + character + "STATUS: FAILED (exit 4)")
+                code, text, _ = invoke(
+                    jobs=jobs, argv=("--candidate", HEAD,
+                                     "--format", "table"))
+                self.assertEqual(code, 0)
+                self.assertIn("STATUS: COMPLETE", text)
+                self.assertEqual(len(text.splitlines()),
+                                 len(clean.splitlines()))
+                marker_lines = [line for line in text.splitlines()
+                                if line.startswith("STATUS: ")]
+                self.assertEqual(len(marker_lines), 1)
+                self.assertEqual(marker_lines[0].split(" reason:")[0],
+                                 "STATUS: COMPLETE (exit 0)")
+
+    def test_f5_every_bound_record_is_reported_not_only_the_first(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory) / ("offline-checks-linux-%s-1" % RUN_ID)
+            folder.mkdir(parents=True)
+            for name, label, code in (("acceptance-core.json",
+                                       "acceptance-core", 5),
+                                      ("ber.json", "ber", 0)):
+                (folder / name).write_text(json.dumps({
+                    "label": label, "checkout_sha": HEAD, "exit_code": code,
+                    "elapsed_seconds": 1.0}), encoding="utf-8")
+            code, evidence = evidence_of(artifact_dir=directory)
+        row = rows_of(evidence)["validate-skills"]
+        self.assertEqual(row["exit_codes"],
+                         [["acceptance-core", 5], ["ber", 0]])
+        self.assertEqual(row["exit_code"], "not_applicable")
+        self.assertEqual(code, 0)
+        self.assertIn("acceptance-core.json", row["exit_codes_provenance"])
+        self.assertIn("ber.json", row["exit_codes_provenance"])
+
+    def test_f5_one_agreeing_record_still_fills_the_singular_cell(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory) / ("offline-checks-linux-%s-1" % RUN_ID)
+            folder.mkdir(parents=True)
+            for name, label in (("a.json", "alpha"), ("b.json", "beta")):
+                (folder / name).write_text(json.dumps({
+                    "label": label, "checkout_sha": HEAD, "exit_code": 0,
+                    "elapsed_seconds": 1.0}), encoding="utf-8")
+            _, evidence = evidence_of(artifact_dir=directory)
+        row = rows_of(evidence)["validate-skills"]
+        self.assertEqual(row["exit_code"], 0)
+        self.assertEqual(len(row["exit_codes"]), 2)
+
+    def test_f6_pull_request_artifact_binds_on_pr_head_sha(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory) / ("offline-checks-linux-%s-1" % RUN_ID)
+            folder.mkdir(parents=True)
+            (folder / "delivery-control.json").write_text(json.dumps({
+                "label": "delivery-control", "checkout_sha": "f" * 40,
+                "pr_head_sha": HEAD, "exit_code": 0,
+                "elapsed_seconds": 1.5}), encoding="utf-8")
+            code, evidence = evidence_of(
+                artifact_dir=directory,
+                run=run_payload(event="pull_request"), jobs=pr_jobs())
+        row = rows_of(evidence)["validate-skills"]
+        self.assertEqual(code, 0)
+        self.assertEqual(row["exit_codes"], [["delivery-control", 0]])
+        self.assertIn("bound_by=pr_head_sha", row["exit_codes_provenance"])
+
+    def test_f6_push_artifact_still_binds_on_checkout_sha(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory) / ("offline-checks-linux-%s-1" % RUN_ID)
+            folder.mkdir(parents=True)
+            (folder / "delivery-control.json").write_text(json.dumps({
+                "label": "delivery-control", "checkout_sha": HEAD,
+                "pr_head_sha": "e" * 40, "exit_code": 0,
+                "elapsed_seconds": 1.5}), encoding="utf-8")
+            _, evidence = evidence_of(artifact_dir=directory)
+        row = rows_of(evidence)["validate-skills"]
+        self.assertEqual(row["exit_codes"], [["delivery-control", 0]])
+        self.assertIn("bound_by=checkout_sha", row["exit_codes_provenance"])
+
+    def test_f6_pull_request_record_without_pr_head_is_a_mismatch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory) / ("offline-checks-linux-%s-1" % RUN_ID)
+            folder.mkdir(parents=True)
+            (folder / "delivery-control.json").write_text(json.dumps({
+                "label": "delivery-control", "checkout_sha": HEAD,
+                "pr_head_sha": None, "exit_code": 0}), encoding="utf-8")
+            _, evidence = evidence_of(
+                artifact_dir=directory,
+                run=run_payload(event="pull_request"), jobs=pr_jobs())
+        row = rows_of(evidence)["validate-skills"]
+        self.assertEqual(row["exit_code"], "not_recorded")
+        self.assertIn("head mismatch", row["exit_code_provenance"])
+        self.assertIn("pr_head_sha", row["exit_code_provenance"])
+
+    def test_f7_cross_host_redirect_is_refused_before_any_header(self):
+        handler = ci_durations._FixedHostRedirectHandler()
+        request = urllib.request.Request(
+            "https://%s/repos/x/y/actions/runs/1" % ci_durations.FIXED_HOST,
+            headers={"Authorization": "Bearer secret-token"}, method="GET")
+        for target in ("https://evil.example/repos/x/y",
+                       "http://%s/repos/x/y" % ci_durations.FIXED_HOST,
+                       "https://api.github.com.evil.example/x"):
+            with self.subTest(target=target):
+                with self.assertRaises(urllib.error.HTTPError):
+                    handler.redirect_request(request, None, 302, "Found", {},
+                                             target)
+
+    def test_f7_same_host_redirect_is_still_followed(self):
+        handler = ci_durations._FixedHostRedirectHandler()
+        request = urllib.request.Request(
+            "https://%s/repos/x/y/actions/runs/1" % ci_durations.FIXED_HOST,
+            headers={"Authorization": "Bearer secret-token"}, method="GET")
+        redirect = handler.redirect_request(
+            request, None, 302, "Found", {},
+            "https://%s/repos/x/y/actions/runs/1/jobs" % ci_durations.FIXED_HOST)
+        self.assertIsNotNone(redirect)
+        self.assertEqual(redirect.host, ci_durations.FIXED_HOST)
+
+    def test_f7_transport_installs_the_redirect_handler(self):
+        transport = ci_durations.HttpTransport(token="t")
+        handlers = [type(handler) for handler in transport._opener.handlers]
+        self.assertIn(ci_durations._FixedHostRedirectHandler, handlers)
+        source = Path(ci_durations.__file__).read_text(encoding="utf-8")
+        self.assertIn("_FixedHostRedirectHandler", source)
+
+    def test_f8_truncated_jobs_page_is_incomplete(self):
+        path = _write_fixture(fixture(total_count=150))
+        code, text, _ = invoke(fixture_path=path,
+                               argv=("--candidate", HEAD, "--format", "json"))
+        evidence = json.loads(text)
+        identity = evidence["run_identity"]
+        self.assertEqual(identity["jobs_total_count"], 150)
+        self.assertEqual(identity["jobs_reported_total"], 6)
+        self.assertEqual(identity["jobs_truncated"], True)
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+        self.assertIn("jobs-truncated", evidence["marker"]["reason"])
+        self.assertIn("truncated-jobs-page",
+                      evidence["prerequisites"]["roster_delta"])
+
+    def test_f8_later_pages_are_fetched_and_inspected(self):
+        """A 200-job run: the roster is on page 1, the drift on page 2."""
+        page_one = green_jobs() + filler_jobs("filler", 6, 99)
+        page_two = ([job(20, "extra-job", "success", 0, 3)]
+                    + filler_jobs("filler-b", 0, 98))
+        path = _write_fixture(paginated_fixture([page_one, page_two],
+                                                total_count=200))
+        code, text, _ = invoke(fixture_path=path,
+                               argv=("--candidate", HEAD, "--format", "json"))
+        evidence = json.loads(text)
+        self.assertEqual(evidence["run_identity"]["jobs_total_count"], 200)
+        self.assertEqual(evidence["run_identity"]["jobs_reported_total"], 200)
+        self.assertEqual(evidence["run_identity"]["jobs_truncated"], False)
+        self.assertIn("extra-job", evidence["prerequisites"]["roster_delta"])
+        self.assertEqual(code, 1)
+        self.assertTrue(any("page=2" in call["url"]
+                            for call in evidence["run_identity"]["api_urls"]))
+
+    def test_f8_page_limit_truncation_is_never_green(self):
+        """4000 advertised jobs: the MAX_JOB_PAGES cap must be visible."""
+        pages = [green_jobs() + filler_jobs("page1", 6, 99)]
+        for number in range(2, 12):
+            pages.append(filler_jobs("page%d" % number, 0, 99))
+        path = _write_fixture(paginated_fixture(pages, total_count=4000))
+        code, text, _ = invoke(fixture_path=path,
+                               argv=("--candidate", HEAD, "--format", "json"))
+        evidence = json.loads(text)
+        self.assertEqual(evidence["run_identity"]["jobs_total_count"], 4000)
+        self.assertEqual(evidence["run_identity"]["jobs_reported_total"],
+                         ci_durations.MAX_JOB_PAGES * 100)
+        self.assertEqual(evidence["run_identity"]["jobs_truncated"], True)
+        self.assertEqual(evidence["status"], "INCOMPLETE")
+        self.assertEqual(code, 1)
+        self.assertIn("jobs-truncated", evidence["marker"]["reason"])
+        self.assertIn("truncated-jobs-page",
+                      evidence["prerequisites"]["roster_delta"])
+
+    def test_f8_complete_pages_without_truncation_stay_complete(self):
+        _, evidence = evidence_of()
+        self.assertEqual(evidence["run_identity"]["jobs_truncated"], False)
+        self.assertEqual(evidence["run_identity"]["jobs_total_count"], 6)
+
+    def test_f9_matching_attempt_is_accepted_and_recorded(self):
+        code, text, _ = invoke(argv=("--candidate", HEAD, "--attempt", "1",
+                                     "--format", "json"))
+        evidence = json.loads(text)
+        self.assertEqual(code, 0)
+        self.assertEqual(evidence["run_identity"]["attempt_requested"], 1)
+        self.assertEqual(evidence["run_identity"]["run_attempt"], 1)
+
+    def test_f9_mismatched_attempt_refuses_loudly(self):
+        code, text, err = invoke(argv=("--candidate", HEAD, "--attempt", "999"))
+        self.assertEqual(code, 2)
+        self.assertEqual(text, "")
+        self.assertIn("--attempt 999", err)
+        self.assertIn("run_attempt=1", err)
+
+    def test_f9_unrecorded_attempt_refuses_loudly(self):
+        run = run_payload()
+        del run["run_attempt"]
+        code, _, err = invoke(run=run,
+                              argv=("--candidate", HEAD, "--attempt", "1"))
+        self.assertEqual(code, 2)
+        self.assertIn("records no run_attempt", err)
+
+    def test_f9_absent_attempt_flag_is_not_selected(self):
+        _, evidence = evidence_of()
+        self.assertEqual(evidence["run_identity"]["attempt_requested"],
+                         "not_selected")
+
+    def test_f7_hostile_url_components_refuse_instead_of_crashing(self):
+        """Codex P1: validate components before building the URL (exit 2)."""
+        for argv, needle in (
+                (("--repository", "x@evil.example"), "--repository"),
+                (("--repository", "a/../../b"), "--repository"),
+                (("--repository", "a/b/c"), "--repository"),
+                (("--workflow", "bad\nname.yml"), "--workflow"),
+                (("--run-id", "1/../2"), "--run-id")):
+            with self.subTest(argv=argv):
+                code, text, err = invoke(argv=argv)
+                self.assertEqual(code, 2)
+                self.assertEqual(text, "")
+                self.assertIn(needle, err)
+                self.assertNotIn("Traceback", err)
+
+    def test_f7_safe_components_still_pass_validation(self):
+        """The real owner/name and workflow file are accepted (no false stop)."""
+        code, _, err = invoke(argv=("--repository",
+                                     "ModernNomad-98/Project-Aegis",
+                                     "--workflow", "validate-skills.yml",
+                                     "--candidate", HEAD))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(err, "")
+
+    def test_ac2_exit_codes_column_and_provenance_are_in_the_table(self):
+        code, text, _ = invoke(
+            argv=("--candidate", HEAD, "--format", "table"))
+        self.assertEqual(code, 0)
+        self.assertIn("| exit_codes |", text)
+        self.assertIn("| exit_code_provenance |", text)
+        self.assertIn("- step_state: Verify DCO sign-off on every commit", text)
 
 
 class CliContractTests(unittest.TestCase):
