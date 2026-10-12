@@ -4047,6 +4047,80 @@ itself is a separate, later host phase that runs only under the merged grant.
   VirtualBox VM (which requires the owner's separate approval plus operator
   confirmation — the owner's 2026-10-10 rule, quoted).
 
+### 2026-10-12 — time-ceiling correction to BER-DEC-016: 60 minutes
+
+- **Date:** 2026-10-12.
+- **Addresses:** BER-DEC-016 (L3974–L4048), whose "Time ceiling" bullet
+  (L4026–L4030) fixes the rule for producing the ceiling and does not state
+  its value. This entry is appended under the rule of this log at L2672–L2675:
+  "entries are **never edited or deleted**; corrections append a superseding
+  entry that names the entry it supersedes." BER-DEC-016's own lines are
+  byte-untouched and remain the historical record this entry corrects.
+- **Decision:** the exact ceiling value BER-DEC-016's "Time ceiling" bullet
+  leaves to host-phase authorization was fixed by the owner at host-phase
+  authorization and is **60 minutes**. It was recorded in the host-phase
+  receipt before any probe command ran, as that bullet requires:
+  "Time ceiling: 60 minutes (owner-selected)" (run-1 receipt L6) and
+  "Ceiling: 60 minutes" (the D90-authorized re-run receipt L6); both runs'
+  `probe-results.json` carry `"ceiling": "60 minutes"`; and D90 records
+  the same 60-minute ceiling for the re-run
+  (`docs/reconciliation/step-0-reconciliation-v4.md` L4337).
+- **Observed use:** run 1 completed in about two minutes, the authorized
+  re-run in about 0.2 minutes; the ceiling was never approached in either.
+- **Scope:** this entry records an already-fixed value at the point of
+  definition and corrects none of BER-DEC-016's text. It authorizes no host
+  step, creates no new ceiling for any future phase, and is not a new grant.
+
+### 2026-10-12 — Stage A host-phase disposition for BER-DEC-016: the probe RAN and the grant is CONSUMED
+
+- **Date:** 2026-10-12.
+- **Addresses:** BER-DEC-016 (L3974–L4048), whose "Use limit and excluded gates"
+  bullet (L4040–L4048) grants ONE offline Stage A host probe "consumed when the
+  host phase completes its receipts", and [APR-128](../approvals/APPROVAL_REGISTER.md)
+  L5487–L5489, which carries the same one-use limit. Appended under this log's
+  rule at L2672–L2675; BER-DEC-016's own lines are byte-untouched.
+- **Decision:** the ONE offline Stage A host probe this entry grants has
+  **RUN**, and the grant's one use is **CONSUMED**. Two host phases were
+  executed on the named distro under the grant (the second under D90's recorded
+  single re-run authority): the first completed with
+  `test_posix_parent_swap_fails_closed` SKIPPED on the genuine POSIX host and
+  is dispositioned **NON_BASELINE — not a partial pass**; the D90-authorized
+  re-run (2026-10-11) ran all five required POSIX IDs with no skip and is
+  dispositioned a **Stage A capability observation for the executed subset** —
+  "NOT a production isolation claim, NOT permission for provider calls, NOT a
+  BER baseline result". The three rows with no candidate command (hardlink,
+  leaf-rename, interrupted-write) remain **NOT_RUN**, and the R5 configuration
+  surface is recorded as **observed absence**, not as a verified isolation
+  mechanism.
+- **Evidence location:** sanitized receipts live in the lane's evidence tree
+  outside Git; raw logs stay in the separately approved external root under its
+  access and retention rules. The receipt hashes recorded here are therefore
+  **not verifiable from a clone** — this is the publication gap the receipts
+  themselves state, not a claim of publication.
+- **Pinned source archives:** `d4c36739…` (first run, 2026-10-10) and
+  `ec7ef949…` (the authorized re-run); full hashes are held in the receipts
+  and re-verified against the archives. The 60-minute ceiling recorded in the
+  entry above was never approached: about two minutes, then about 0.2 minutes.
+- **Scope:** this entry records an executed host phase and its consumption of
+  D90's single re-run. It grants nothing new, and no further host-phase run,
+  Stage B run class or model-driven session is authorized by it.
+
+### 2026-10-12 — owner stop of the BER host ladder's Stage B, in light of the Stage A disposition
+
+- **Date:** 2026-10-12.
+- **Addresses:** BER-DEC-016's Stage B boundary ("does not authorize BER Stage B
+  or any model-driven session") and D94's bounded class
+  (`docs/reconciliation/step-0-reconciliation-v4.md` L4412–L4413, whose class is
+  **SPENT**). Appended under this log's rule at L2672–L2675.
+- **Decision:** the owner has **stopped Stage B** until the Stage A probe
+  disposition (the entry above) is confirmed and next steps are chosen. No
+  further Stage B run class, prompt batch or model-driven session is
+  authorized. The standing honesty line is unchanged: the completed class is a
+  capability observation only — never a baseline and not a production
+  isolation claim.
+- **Scope:** this entry is a **stop**, not a grant. It creates no APR, no
+  BER-DEC entry and no new authority.
+
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008

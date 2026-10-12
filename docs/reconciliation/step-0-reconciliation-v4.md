@@ -4731,6 +4731,40 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   records the lane; it grants no new execution, publication, review or merge
   authority. Counts UNCHANGED (SKILL-COUNT 205, FAMILY-COUNT 23). D102 and
   earlier entries are byte-untouched.
+- **D104 (2026-10-12) — BER host ladder Stage C: the ceiling fix, the Stage A
+  disposition, the APR-128 consumption event and the Stage B stop.** The
+  owner's instruction, quoted as relayed (the H row,
+  `ber-wp2b3-owner-decision-chain.md` L62): "Fix the Stage A host-phase time
+  ceiling and disposition Stage A; confirm or stop Stage B"; and the owner's
+  acceptance of the probe-is-consumed finding (the 2026-10-12 owner decision
+  log, item 8): "records-only lane: ceiling fix as a named §13 log entry,
+  Stage A disposition, Stage B stop, APR-128 CONSUMED event". Three paths are
+  touched, all additions, in ONE DCO-signed commit:
+  `docs/roadmaps/behavioral-eval-runner-backlog.md` gains THREE named entries
+  appended at the end of `## 13. Append-only governance log`, after
+  BER-DEC-016's last line and before the `## 14` heading — the time-ceiling
+  correction, which records **60 minutes** at the point of definition
+  (BER-DEC-016's "Time ceiling" bullet, L4026–L4030, states only the rule for
+  producing a value); the Stage A host-phase disposition, which records that
+  the probe RAN and the grant's one use is CONSUMED; and the owner's stop of
+  Stage B. `docs/approvals/APPROVAL_REGISTER.md` gains ONE appended lifecycle
+  event, **AEGIS-APR-130** (`CONSUMED; target grant AEGIS-APR-128`, New
+  authority: None), because the register still showed APR-128 as unspent
+  although its single use was spent. Nothing is edited or deleted:
+  BER-DEC-016's block (L3974–L4048) and APR-128's entry are byte-untouched,
+  and every backlog change is a new entry appended under §13's own rule
+  (L2672–L2675). The Stage A receipts and the pinned source archives live
+  outside Git, so the archive hashes are recorded **by reference and by hash**
+  and are **not verifiable from a clone** — the publication gap the receipts
+  themselves state; publication of the sanitized
+  `stage-a-capability-summary/v1` stays an owner decision and was deferred.
+  SELF-COST: this entry's commit changes three files by +142/−0 against the
+  base (this page +34, the ladder backlog named above +74, and the approval
+  register +34), so nothing it adds is a code path, a check or a counted
+  artifact, and no acceptance record's review state changes. Counts UNCHANGED
+  (SKILL-COUNT 205, FAMILY-COUNT 23). This entry records the lane; it grants
+  no new execution, publication or merge authority. D103 and earlier entries
+  are byte-untouched.
 
 ## 6. Post-merge corrections
 
