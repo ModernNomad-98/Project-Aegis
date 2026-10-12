@@ -4638,6 +4638,41 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   or merge authority; the approval register is byte-untouched. D100 and earlier
   entries are byte-untouched.
 
+- **D102 (2026-10-12) — documentation-currency refresh: the two live cutoffs
+  advanced, the index routes repaired, and the SCIF page's closing sentence
+  corrected forward.** A repository-wide currency change in the
+  DOCUMENTATION-CURRENCY REFRESH lane, planned at `DOCS-REFRESH-PLAN-rev3.md`
+  (above-Foot prefix sha256 `c779dd18…` over 82,167 bytes) and audited **SD-B
+  ACCEPT** (`DOCS-REFRESH-AUDIT-B-rev3.md`, Foot sha256 `329d2fda…`). Fifteen
+  files change, docs-only, one commit. `README.md`: the `## CI (merge gate)`
+  `validate-skills` row now names the Markdown link-checker corpus step and the
+  pull-request body bound-field check; the "What is included" table adds the
+  setup-routing and readability-acceptance tools; the delivery-control row adds
+  `ci-durations` (#740) and `fast-save` (#741). `docs/README.md`: the evidence
+  guide's count 15 → **16**, seven new routing entries, and the feature-flag
+  entry notes the delivered banner. `docs/roadmaps/aegis-backlog-forecast.md`
+  and `docs/roadmaps/aegis-execution-metrics.md`: the newest reading and
+  measurement advance to **M2 = `7fbc2335ee4494ecb8ae6aaea0fe6ecdc297d9f2`,
+  assessed through PR #741**, with the #688 and #685 banners kept verbatim.
+  `docs/offline-ci.md`: the `validate-skills` coverage cell. Dated forward
+  notes on `docs/roadmaps/p0b-fast-save-directive-2026-10-11.md` (**B2 landed
+  through its own PR #741, not by that record**; B3 still unscoped),
+  `docs/design/fast-save-handoff-protocol-v1.md`,
+  `docs/roadmaps/aegis-coordinator-figures.md`,
+  `docs/roadmaps/resumable-control-plane-backlog.md`,
+  `docs/roadmaps/behavioral-eval-runner-backlog.md`,
+  `docs/roadmaps/aegis-ci-baseline-2026-10-11.md`,
+  `docs/roadmaps/skill-eval-harness-authorization-request.md` and
+  `docs/roadmaps/aegis-open-decisions-2026-09-23.md`; and the SCIF page's
+  part-4 closing sentence corrected forward (already **3** old-name lines at its
+  own PR #739 head `4d5ccb0b`; **187 / 45 files / 118 / 3 / 16** at both
+  `4d5ccb0b` and `7fbc2335`). No historical or evidence file is rewritten:
+  every edit is an insertion or a live current-state correction, and D1–D101 are
+  byte-untouched. Source: the owner's direct instruction of 2026-10-12 to bring
+  all documents, context maps and README files up to date. This entry records
+  the lane; **it grants no new execution, publication, review or merge
+  authority**; the approval register is byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

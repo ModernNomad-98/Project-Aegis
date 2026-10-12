@@ -56,7 +56,7 @@ status; the dated proposals and evidence pages further down are history.
 - [Aegis SCIF naming and the necessity/reuse check](aegis-scif-naming-and-necessity.md):
   the framework's name and its forms, the five questions Stage A owes and Stage B
   tests, and the residual-occurrence inventory.
-- [Evidence reading guide](evidence/README.md): routes to 15 dated decision and
+- [Evidence reading guide](evidence/README.md): routes to 16 dated decision and
   delivery records, with current-status boundaries.
 - [Documentation readability backlog](roadmaps/aegis-documentation-readability-backlog.md):
   the plan to explain each component in plain language, define project shorthand,
@@ -88,7 +88,31 @@ limit; listing it here does not authorize the work it proposes.
   reviewable Aegis-only conversation and saved-state implementation boundary.
 - [Feature-flag system skill proposal](roadmaps/feature-flag-architect-skill-proposal.md):
   accepted scope for the new `feature-flag-architect` skill, its boundary with
-  the existing rollout strategist, and a provisional estimate.
+  the existing rollout strategist, and a provisional estimate. The proposal now
+  carries a **delivered** status banner (added 2026-10-11 by PR #734); the scope
+  description above is unchanged by it, and the banner adds no authorization.
+- [CI baseline and bottleneck observations](roadmaps/aegis-ci-baseline-2026-10-11.md)
+  (2026-10-11): the observed six jobs, branch protection and ranked bottlenecks,
+  with the method to re-derive every figure. Observation only — it authorizes no
+  CI change.
+- [P0-B FAST SAVE directive record](roadmaps/p0b-fast-save-directive-2026-10-11.md)
+  (2026-10-11): the owner's directive transcribed on `main`, with its prohibited
+  actions, acceptance tests and open grouping questions; it closes and grants nothing.
+- [FAST SAVE handoff protocol v1](design/fast-save-handoff-protocol-v1.md): the
+  DRAFT operator-facing procedure for "save progress and pause" — documented
+  policy with no mechanical enforcement.
+- [Skill-eval harness execution-path decision](roadmaps/skill-eval-harness-execution-path-decision.md)
+  (PR #735): the owner's decision on the harness execution path. A decision
+  record, not an authorization to run.
+- [CP-WP-003 / CP-WP-004 owner decision packet](roadmaps/cp-wp-003-004-owner-decision-packet.md)
+  (PR #733): the two open control-plane decisions prepared for the owner; it
+  selects no option and grants nothing.
+- [BER WP-2B-3 owner decision chain](roadmaps/ber-wp2b3-owner-decision-chain.md)
+  (PR #732): the order of the WP-2B-3/4/5/6/7, R2 and OD-1 decisions and the
+  evidence each needs; it changes no work-package status.
+- [SCIF eval-assets and pilot census](evidence/scif/scif-eval-assets-and-pilot-census-2026-10-11.md)
+  (PR #739): the fitted eval cases and the bounded read-only census, with assets,
+  static results, actual runs and unrun checks kept apart.
 - [Strategic skills roadmap](300-repeatable-software-saas-skills-roadmap.md):
   the product-agnostic 300-skill backlog that replaced the
   [superseded 150-skill draft](150-claude-skills-roadmap.md).

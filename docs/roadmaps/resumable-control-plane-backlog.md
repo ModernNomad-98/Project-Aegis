@@ -1689,3 +1689,11 @@ After gated owner-approved merge, report its SHA and leave every later package b
 
 ZT-P1 is **not started** until a reviewed owner grant recording the revised
 scope (naming `contracts.py` explicitly) exists in the approval register.
+
+**Dated pointer — 2026-10-12: the CP-WP-003 / CP-WP-004 owner decision packet.** The
+CP-WP-003 and CP-WP-004 status rows above are unchanged and remain the authority.
+The two open decisions those rows carry now also have a prepared packet:
+[cp-wp-003-004-owner-decision-packet.md](cp-wp-003-004-owner-decision-packet.md)
+(PR #733, merge `b38cd2e6`) presents the two decisions and the evidence each needs.
+**It selects no option, changes no work-package status and grants nothing**; CP-WP-003
+and CP-WP-004 stay BLOCKED exactly as recorded above.
