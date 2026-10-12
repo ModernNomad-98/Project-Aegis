@@ -4765,6 +4765,26 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   (SKILL-COUNT 205, FAMILY-COUNT 23). This entry records the lane; it grants
   no new execution, publication or merge authority. D103 and earlier entries
   are byte-untouched.
+- **D105 (2026-10-12) — the CP-1 grant record: AEGIS-APR-131 records the owner's bounded
+  read-only DynamoDB-first inspection grant.** The authorising act is the owner's dated relay
+  **"A"** of 2026-10-12, relayed by the coordinating agent and quoted as relayed: "approving the
+  bounded read-only DynamoDB-first inspection", with "[grant] as drafted" the coordinator's gloss
+  on that approval and not part of the relayed words — the draft being
+  `1351ba260c410f1151df5e598b54f2ccdf6f8993429b8cd5826be6217b5cc5b0`. The four inputs the draft
+  left open are resolved and recorded in the register entry, not restated here: authorising words
+  = the dated relay "A"; calendar expiry = **none stated** (one use is its own expiry); spend
+  ceiling = **USD $0 external**; billing-surface reads = **OUT OF SCOPE**. The register append is
+  append-only — no prior entry's bytes change — and carries the exact limits: one account, one
+  Region, one table, one strongly consistent verification read path, the named custody and
+  configuration reads, read-shaped negative tests only, one sanitized evidence record, 4–8 active
+  hours, USD $0 external spend, and the six stop conditions with no discretion and no retry. The
+  source identifiers (account, Region, table, incarnation pin), the principals and credential
+  custody, the evidence root and retention, and the billing-contract facts are **unselected** and
+  are recorded as unselected; the next gate is the owner's AWS credential and identifier
+  selection, and **the inspection itself is NOT RUN by this change and is not startable until
+  that selection is recorded**. AEGIS-APR-006 is not reused, extended or re-scoped. This entry
+  records the lane; it grants no new execution, publication, review or merge authority. D104 and
+  earlier entries are byte-untouched.
 
 ## 6. Post-merge corrections
 
