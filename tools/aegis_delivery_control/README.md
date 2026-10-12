@@ -7,7 +7,9 @@ to decide, from durable facts, whether a proposed next operation still has
 valid authority, budget, identity and evidence. The shipped package is an
 **offline synthetic kernel**: it demonstrates those decisions with fake
 authorities and targets, not with GitHub, a model provider or a production
-deployment.
+deployment. Its kernel decisions stay offline and synthetic; exactly one
+opt-in, read-only command, `ci-durations` (`--allow-network`), additionally
+reads public GitHub run metadata and never writes or dispatches anything.
 
 For example, if a synthetic target accepts a change but the controller crashes
 before receiving the receipt, the controller must not assume the change failed
@@ -89,7 +91,8 @@ authority or prove the source is fresh.
 | `dispatch.py` | Coordinate permission, intent and synthetic target contact order; compare a returned receipt with the exact committed operation before intake. |
 | `evidence.py` | Canonicalize a synthetic evidence record, create a new evidence file and return its SHA-256 hash. Receipt and authority checks occur in the dispatch, authority and storage paths. |
 | `owned_paths.py` | Resolve the user-state root and reject unsafe links, ownership and path substitutions. |
-| `cli.py` | Provide a read-only command-line interface for capabilities, status and verification, plus `fast-save`, the single command that writes: it writes one checkpoint file at the path the operator names. No lifecycle mutation command is exposed. |
+| `cli.py` | Provide the command-line interface for capabilities, status, verification and the CI-run duration reader, plus `fast-save`, the single command that writes: it writes one checkpoint file at the path the operator names. No lifecycle mutation command is exposed. |
+| `ci_durations.py` | Read one public GitHub Actions run's per-job durations and coverage: conclusion-first job state, honest `not_recorded`/`not_applicable` tokens and a head-bound status marker. Offline unless `--allow-network` is given. |
 | `fast_save.py` | Capture one offline synthetic FAST SAVE checkpoint: a strict state schema, a position-independent secret guard, a path guard, a checkpoint bound to the CLI repository identity, and an atomic write whose temporary file is verified before it replaces the target. It reports statuses and observes nothing. |
 
 The kernel allows one outstanding synthetic operation per repository. The
@@ -142,6 +145,137 @@ input, unsafe path, or unavailable source fact. A state file's own contents
 cannot prove its freshness. The command changes no run's lifecycle state; it
 does not repair or advance a run, though opening the state file may apply a
 pending schema migration.
+
+## ci-durations: read the duration of one CI run (read-only)
+
+`ci-durations` answers one question honestly: *what did each job of this
+GitHub Actions run actually do, and may I call it green?* It reads one run
+and its jobs through the GitHub REST API, prints a fixed evidence report to
+standard output, and writes nothing. It is the one command in this package
+that can reach the network, and only when you ask for it:
+
+```powershell
+python -m tools.aegis_delivery_control --repository-id example-project ci-durations --run-id 38198781208 --allow-network --candidate 4d5ccb0b38369812bef198b7083d113d559ad387 --format table
+```
+
+The **offline form** replays a `{"<url>": <payload>}` fixture map of the two
+endpoints the reader calls (`.../actions/runs/<id>` and its `/jobs`). A
+fixture always wins over `--allow-network`, and the fixture path constructs
+no transport and opens no socket. The test module is the fixture's source of
+truth, so an operator can emit one and replay it:
+
+```powershell
+python -m tools.aegis_delivery_control --repository-id example-project ci-durations --run-id 38198781208 --fixture tools/aegis_delivery_control/tests/fixtures/run-38198781208.json --candidate 4d5ccb0b38369812bef198b7083d113d559ad387 --now 2026-10-12T04:00:00Z
+```
+
+`--show-identity` prints the command's fixed identity block (read-only true,
+one host, no mutating verb, no artifact download) as JSON and exits 0.
+
+### Boundary of this one command
+
+- **One host, with no override.** The only contactable host is
+  `api.github.com`; no argument selects another, so a GitHub Enterprise
+  deployment is out of scope for this reader. The live transport also
+  **refuses any redirect that changes scheme or host**, so a 3xx response
+  cannot move the read - or the `--token-env` bearer token - to a second host.
+- **Opt-in, read-only, no token required.** Live reads require
+  `--allow-network`. No POST, PUT, PATCH or DELETE is ever issued, no file is
+  written, no artifact is downloaded and `gh` is never invoked. `--token-env
+  GH_TOKEN` names an environment variable (never the token itself) and is
+  applied only to `api.github.com`, to lift the anonymous rate limit.
+- **Never auto-run.** No workflow, schedule, hook or wrapper calls it; a
+  person or an agent runs it deliberately. FAST SAVE never triggers it.
+
+### Exit codes and the status marker
+
+| Exit | Marker | Meaning |
+| --- | --- | --- |
+| 0 | `COMPLETE` | Evidence printed; the run is green and `--candidate` equals the run head. |
+| 1 | `STALE`, `INCOMPLETE` or `UNBOUND` | Evidence printed, but nothing is certified: the candidate differs, a required field is missing, or no `--candidate` was supplied. |
+| 2 | (none) | Refused or unresolvable input: no `--fixture` and no `--allow-network`, an unknown workflow, no run for the head, a malformed fixture, a missing artifact directory, or an `--attempt N` the run payload cannot confirm. |
+| 3 | (none) | Transport or API failure: HTTP status, timeout or malformed JSON. |
+| 4 | `FAILED` | Evidence printed, but the run or an executed job is not green. |
+
+**Exit 0 is a green, head-bound claim - not merely "the report is complete".**
+`--candidate` is required for it: without a candidate the marker is `UNBOUND`
+and the exit code is 1. The candidate must also **bind**: if the run payload
+records no usable `head_sha`, `candidate_status` is `unresolvable`, the
+reason carries `candidate_status=unresolvable`, and the exit code is 1. The
+reader never rounds a missing, skipped or red value up to a pass: a skipped
+job is `not_applicable` whatever its timestamp window looks like (-1 s, 0 s or
+absent), an unrecorded value is the literal token `not_recorded` and never
+zero, an executed job that is not `success` is never green, and a missing
+roster job is a reported `roster_delta`.
+
+Two further gaps force `INCOMPLETE` (exit 1) rather than a pass:
+
+- **A roster job was skipped on an event that should have run it.** The
+  allowed-skip set is the workflow's own truth. In
+  `.github/workflows/validate-skills.yml`, `changes` (L57) and
+  `validate-skills` (L106) carry no `if:` at all;
+  `windows-offline-checks`, `tools-tests-linux` and `tools-tests-windows`
+  are `if: github.event_name == 'push' || <path flag>`, and on a push the
+  `changes` job forces both flags true; `gate-guard` is
+  `github.event_name == 'pull_request'`. So on a push only `gate-guard` may
+  skip - that lawful skip stays green with an `event-filter` reason - and on
+  a pull request only the three advisory jobs may skip by path filter. Any
+  other skip is `unexpected-skip-for-event:<job>` in the marker reason, is
+  listed by `unexpected-skip: <job>` in the table, and is named in
+  `marker.unexpected_skipped_jobs`. A skipped `gate-guard` on a pull request
+  additionally yields `required-job-skipped:gate-guard`.
+- **The jobs list was truncated.** If the API advertises a `total_count`
+  larger than the jobs actually read, the report says `jobs-truncated`,
+  `jobs_truncated` is `true`, and `roster_delta` names `truncated-jobs-page`.
+  Later pages are fetched while the advertised total demands them.
+
+`--attempt N` **selects or refuses**: when the run payload reports a different
+`run_attempt` (or none), the command exits 2 with the mismatch named, instead
+of silently reporting attempt 1 for every request.
+
+### Worked example (run 38198781208, push, head 4d5ccb0b, attempt 1)
+
+| job | state | conclusion | duration_s | exit_code | coverage |
+| --- | --- | --- | --- | --- | --- |
+| changes | executed | success | 7 | not_recorded | demonstrated |
+| validate-skills | executed | success | 109 | not_recorded | demonstrated |
+| gate-guard | skipped | skipped | not_applicable | not_recorded | not_selected |
+| windows-offline-checks | executed | success | 224 | not_recorded | demonstrated |
+| tools-tests-linux | executed | success | 132 | not_recorded | demonstrated |
+| tools-tests-windows | executed | success | 229 | not_recorded | demonstrated |
+
+`STATUS: COMPLETE (exit 0)`. `gate-guard` is skipped because it is a
+pull-request-only job on a push run. A GitHub job record carries a
+*conclusion*, never a process exit code, so `exit_code` stays `not_recorded`
+unless you also pass `--artifact-dir` with the extracted
+`record-check.py` artifacts. Each record is then used only for the job whose
+**real uploaded artifact name** contained it
+(`offline-checks-linux-<run>-<attempt>` maps to `validate-skills`,
+`offline-checks-windows-...` to `windows-offline-checks`,
+`tools-tests-linux-...` and `tools-tests-windows-...` to their same-named
+jobs; `changes` and `gate-guard` upload nothing), and only when the record
+binds to the run head. One uploaded directory holds **many** records - the
+`offline-checks-linux` artifact alone is fed by every recorded step of that
+job - so the whole per-job set is reported in `exit_codes` with its
+provenance, and the singular `exit_code` is filled only when every bound
+record agrees on one code; otherwise it reads `not_applicable` rather than
+promoting one arbitrary record to the job.
+
+On a `pull_request` run the binding field is **`pr_head_sha`**, not
+`checkout_sha`: GitHub checks out a synthetic merge commit that no contributor
+signed, and the workflow records the pull request head separately
+(`AEGIS_PR_HEAD_SHA`). On a push the checkout *is* the head, so
+`checkout_sha` binds. Both fields are listed in the provenance, and an
+unrecognised directory is reported as `not_mapped`, never guessed at.
+
+### Step-level prerequisites
+
+The two pull-request-only steps of the `validate-skills` job - `Verify DCO
+sign-off on every commit` and `pr-body-skills-check` - are reported under
+`step_details` with the state the API actually returned for them: `executed`
+on a `pull_request` run, `skipped` on a push, and `not_recorded` when the
+payload does not carry the step. Only genuinely skipped steps appear in
+`step_skipped`, so a pull-request report never claims a validation gap the
+workflow does not have.
 
 ## Fast save: the offline checkpoint demonstration
 

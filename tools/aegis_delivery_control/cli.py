@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 from typing import Mapping, Sequence
 
+from . import ci_durations
 from . import fast_save
 from .authority import SyntheticAuthority
 from .contracts import DispatchDenied, StorageIntegrityError
@@ -151,6 +152,7 @@ def build_parser() -> argparse.ArgumentParser:
     verify = subparsers.add_parser("verify")
     verify.add_argument("--expected-vector", required=True, type=Path)
     verify.add_argument("--authority-key-file", required=True, type=Path)
+    ci_durations.build_parser(subparsers)
     fast_save_parser = subparsers.add_parser("fast-save")
     fast_save_parser.add_argument("--state", required=True, type=Path)
     fast_save_parser.add_argument("--checkpoint", required=True, type=Path)
@@ -259,6 +261,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         )
         return 0
+    if arguments.command == "ci-durations":
+        # Read-only GitHub metadata read; it never opens a state database.
+        return ci_durations.main(arguments)
     try:
         database_path = _database_path(arguments)
     except (PathCapabilityUnavailable, OSError) as error:

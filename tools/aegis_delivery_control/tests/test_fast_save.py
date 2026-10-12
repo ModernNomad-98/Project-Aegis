@@ -599,7 +599,9 @@ class FastSaveTests(unittest.TestCase):
         )
         self.assertEqual(
             sorted(subparsers.choices),
-            ["capabilities", "fast-save", "status", "verify"],
+            # ci-durations was merged in beside fast-save (PR #740); the exact
+            # set is still pinned, now to all five subcommands.
+            ["capabilities", "ci-durations", "fast-save", "status", "verify"],
         )
         fast_save_parser = subparsers.choices["fast-save"]
         options = sorted({
