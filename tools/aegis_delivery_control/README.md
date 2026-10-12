@@ -89,7 +89,8 @@ authority or prove the source is fresh.
 | `dispatch.py` | Coordinate permission, intent and synthetic target contact order; compare a returned receipt with the exact committed operation before intake. |
 | `evidence.py` | Canonicalize a synthetic evidence record, create a new evidence file and return its SHA-256 hash. Receipt and authority checks occur in the dispatch, authority and storage paths. |
 | `owned_paths.py` | Resolve the user-state root and reject unsafe links, ownership and path substitutions. |
-| `cli.py` | Provide a read-only command-line interface for capabilities, status and verification. No lifecycle mutation command is exposed. |
+| `cli.py` | Provide a read-only command-line interface for capabilities, status and verification, plus `fast-save`, the single command that writes: it writes one checkpoint file at the path the operator names. No lifecycle mutation command is exposed. |
+| `fast_save.py` | Capture one offline synthetic FAST SAVE checkpoint: a strict state schema, a secret guard, a path guard, and an atomic write whose temporary file is verified before it replaces the target. It reports statuses and observes nothing. |
 
 The kernel allows one outstanding synthetic operation per repository. The
 operation slot remains occupied while an effect, validator or accounting
@@ -142,6 +143,133 @@ cannot prove its freshness. The command changes no run's lifecycle state; it
 does not repair or advance a run, though opening the state file may apply a
 pending schema migration.
 
+## Fast save: the offline checkpoint demonstration
+
+`fast-save` is the one command in this package that writes. It captures a small
+JSON **checkpoint** of a paused engineering task at a path the operator names.
+It is an **offline synthetic demonstration of the capture mechanics**, and the
+contract it follows is the
+[FAST SAVE handoff protocol](../../docs/design/fast-save-handoff-protocol-v1.md)
+with the
+[P0-B FAST SAVE directive record](../../docs/roadmaps/p0b-fast-save-directive-2026-10-11.md).
+It **grants nothing and enforces nothing**, and **fast save is not QA**: a saved
+checkpoint is not evidence that any process stopped, and a successful run does
+not authorize any later action.
+
+```powershell
+python -m tools.aegis_delivery_control --repository-id example-project fast-save --state .\state.json --checkpoint .\checkpoint.json --invocation-phrase "fast save"
+```
+
+The command prints one JSON line and exits **0** when the checkpoint status is
+SAVED, or **4** when it is FAILED. The line carries `checkpoint_status`,
+`reason_code`, `reason`, `execution_status`, `execution_status_source`,
+`durable_location`, `bounded_readback` and `one_line_resume`. On FAILED the
+status fields are `null`, because no checkpoint was written.
+
+### The state document
+
+The operator supplies a JSON **state document** with exactly these keys, each
+one a report by the operator rather than an observation by this tool:
+
+| Key | Meaning |
+| --- | --- |
+| `item_id`, `objective`, `workstream_id`, `repository_id`, `current_stage`, `holder` | Non-empty identifying and progress strings. |
+| `completed_work`, `remaining_work`, `unfinished_files`, `evidence_references`, `failures_blockers`, `gaps`, `authority_references` | Lists of non-empty strings. Evidence and authority references are recorded verbatim and never read back or revalidated. |
+| `changed_files` | A list of `{"path": ..., "uncommitted": true|false}` entries. The tool runs no git command and reads no filesystem inventory, so both parts are reported rather than observed. |
+| `operations` | A list of `{"operation_id": ..., "reported_state": STOPPED|ACTIVE|UNKNOWN, "authorized_to_stop": true|false, "authorization_ref": ...}`. An authorization reference is required whenever `authorized_to_stop` is true, and a reference without the flag is refused as contradictory. |
+| `dispatch_state_reported` | One of `stopped`, `not stopped`, `unknown`. |
+| `pause_reported_complete`, `pause_incomplete_reason` | A boolean, plus a non-empty reason whenever the pause is reported incomplete. |
+| `one_line_resume`, `next_safe_action` | Non-empty strings; the resume line must be a single line. |
+
+Example:
+
+```json
+{
+  "item_id": "P0-B B2",
+  "objective": "capture one offline FAST SAVE checkpoint",
+  "workstream_id": "p0b",
+  "repository_id": "example-project",
+  "current_stage": "C",
+  "holder": "operator",
+  "completed_work": ["read the plan"],
+  "remaining_work": ["stage the commit"],
+  "changed_files": [{"path": "tools/aegis_delivery_control/cli.py", "uncommitted": true}],
+  "unfinished_files": ["tools/aegis_delivery_control/README.md"],
+  "evidence_references": ["evidence/p0/P0B-B2-PLAN-rev2.md"],
+  "failures_blockers": [],
+  "gaps": [],
+  "operations": [
+    {"operation_id": "op-1", "reported_state": "STOPPED", "authorized_to_stop": true, "authorization_ref": "coordinator item brief"}
+  ],
+  "dispatch_state_reported": "stopped",
+  "pause_reported_complete": true,
+  "pause_incomplete_reason": "",
+  "authority_references": ["coordinator item brief"],
+  "one_line_resume": "Resume B2 at the SD-C handoff",
+  "next_safe_action": "run the focused fixture module"
+}
+```
+
+### The checkpoint
+
+The written file is one JSON object, machine-readable and human-readable, with
+the checkpoint version and sequence, the created timestamp, the invocation
+phrase, the workstream and item identity, the reported dispatch state, the
+captured progress, the preserved unfinished-file list, the reported execution
+status, the checkpoint status, the durable location, the bounded-readback
+result, the one-line resume, the previous-valid-checkpoint reference, the
+no-provider-call attestation, the safe-stopped operations with their
+authorization references, the no-credentials/tokens/secrets attestation, the
+capture-portion idle measurement, the recorded evidence and authority
+references, the reported failures and gaps, and an `integrity` object carrying
+the SHA-256 of the document's canonical JSON (the integrity field itself
+excluded). The field list is the protocol's **provisional scaffold** (its gap
+**G1** is open: the directive's own verbatim contents list was not in the relay),
+and the durable location is **operator-named at runtime** (gap **G3**), because
+this tool invents no default location and creates no parent directory.
+
+### Refusal rules
+
+Nothing is written when the command refuses, and a refusal returns exit 4:
+
+- the state document is not readable JSON, or its key set is not exact, or a
+  required string is empty, or a status is unknown (**STATE_INVALID**);
+- a credential-shaped key (for example `token` or `password`) or a
+  token-shaped value appears anywhere in the document (**SECRET_DETECTED**);
+- the target is a symlink (refused by a check that runs first and never follows
+  the link), a directory or other non-regular file, a file that does not parse
+  as JSON, or a file whose `checkpoint_format` differs (**PATH_GUARD_DENIED**);
+- the parent directory is absent (it is never created);
+- the serialized checkpoint exceeds 65536 bytes (**CHECKPOINT_TOO_LARGE**); or
+- the temporary file cannot be written, cannot be verified, or cannot be
+  atomically replaced (**WRITE_FAILED**, **READBACK_FAILED**, **REPLACE_FAILED**).
+
+A recognizable previous checkpoint whose integrity digest fails is not refused:
+it is overwritten and recorded as not valid. There is no bypass flag.
+
+### Two statuses, reported and never inferred
+
+The checkpoint status is `SAVED` or `FAILED`, and the execution status is
+`STOPPED`, `ACTIVE`, `UNKNOWN` or `PAUSE INCOMPLETE`. They are independent:
+a saved checkpoint does not imply that execution stopped, and it never implies
+that any process was stopped by this tool. `execution_status_source` is always
+`reported-by-operator`, an operation reported `UNKNOWN` is never upgraded to
+`STOPPED`, and contradictions between the reports are recorded in the
+checkpoint rather than resolved. The tool holds no process handle, starts no
+process, stops nothing, and verifies no authority.
+
+### Honest limits
+
+The write is atomic replace plus a file fsync. Like the kernel's own limit
+above, that is **not a proof of physical power-loss durability**, and no
+directory fsync is attempted because it is not portable on Windows. The
+negative-control proof that the save path performs no network, process,
+continuous-integration or test action is an **enumerated deny set, not a closed
+proof**: a `ctypes`-mediated call raises no audit event, and the closed import
+allowlist (which excludes `ctypes` and `pty`) is what actually blocks that
+import. Every unsupported path claim, and every residual limit of this
+demonstration, is recorded rather than rounded up.
+
 ## Storage and current guarantees
 
 State lives outside the repository checkout in a user-local directory:
@@ -174,6 +302,13 @@ The focused offline suite runs without a real target or provider:
 
 ```powershell
 python -m unittest discover -s tools/aegis_delivery_control/tests -p "test_*.py" -v
+```
+
+That discovery run includes the fast-save demonstration's fixtures, and they can
+also be run on their own:
+
+```powershell
+python -m unittest tools.aegis_delivery_control.tests.test_fast_save -v
 ```
 
 Record the exact revision, platform and skips with results. The

@@ -1,4 +1,9 @@
-"""Read-only command interface for the offline synthetic kernel."""
+"""Command interface for the offline synthetic kernel.
+
+capabilities, status and verify are read-only. fast-save is the single command
+that writes: it writes exactly one JSON checkpoint file at the path the operator
+names, and it opens no state database.
+"""
 
 from __future__ import annotations
 
@@ -10,6 +15,7 @@ import sys
 from pathlib import Path
 from typing import Mapping, Sequence
 
+from . import fast_save
 from .authority import SyntheticAuthority
 from .contracts import DispatchDenied, StorageIntegrityError
 from .storage import SQLiteStateStore, default_state_root
@@ -100,10 +106,43 @@ def _load_authority(path: Path) -> SyntheticAuthority:
     return SyntheticAuthority(bytes.fromhex(key_hex))
 
 
+def _fast_save_report(result: fast_save.SaveResult) -> dict[str, object]:
+    document = result.document
+    return {
+        "checkpoint_status": result.checkpoint_status,
+        "reason_code": result.reason_code,
+        "reason": result.reason,
+        "execution_status": None if document is None else document["execution_status"],
+        "execution_status_source": None
+        if document is None
+        else document["execution_status_source"],
+        "durable_location": result.durable_location,
+        "bounded_readback": result.bounded_readback,
+        "one_line_resume": result.one_line_resume,
+    }
+
+
+def _fast_save_refusal(error: fast_save.FastSaveRefused) -> dict[str, object]:
+    return {
+        "checkpoint_status": "FAILED",
+        "reason_code": error.reason_code,
+        "reason": error.reason,
+        "execution_status": None,
+        "execution_status_source": None,
+        "durable_location": None,
+        "bounded_readback": None,
+        "one_line_resume": None,
+    }
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m tools.aegis_delivery_control",
-        description="Read-only interface for the synthetic offline control kernel.",
+        description=(
+            "Read-only for capabilities, status and verify; fast-save is the "
+            "single command that writes one checkpoint file at the path the "
+            "operator names."
+        ),
     )
     parser.add_argument("--repository-id", required=True)
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -112,6 +151,10 @@ def build_parser() -> argparse.ArgumentParser:
     verify = subparsers.add_parser("verify")
     verify.add_argument("--expected-vector", required=True, type=Path)
     verify.add_argument("--authority-key-file", required=True, type=Path)
+    fast_save_parser = subparsers.add_parser("fast-save")
+    fast_save_parser.add_argument("--state", required=True, type=Path)
+    fast_save_parser.add_argument("--checkpoint", required=True, type=Path)
+    fast_save_parser.add_argument("--invocation-phrase", default="fast save")
     return parser
 
 
@@ -180,6 +223,19 @@ def _status(
 
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = build_parser().parse_args(argv)
+    if arguments.command == "fast-save":
+        try:
+            request = fast_save.load_state_document(arguments.state)
+        except fast_save.FastSaveRefused as error:
+            print(json.dumps(_fast_save_refusal(error), sort_keys=True))
+            return 4
+        result = fast_save.capture(
+            request,
+            arguments.checkpoint,
+            invocation_phrase=arguments.invocation_phrase,
+        )
+        print(json.dumps(_fast_save_report(result), sort_keys=True))
+        return 0 if result.checkpoint_status == "SAVED" else 4
     if arguments.command == "capabilities":
         print(
             json.dumps(
