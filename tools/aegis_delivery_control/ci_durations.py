@@ -66,6 +66,25 @@ NOT_APPLICABLE = "not_applicable"
 NOT_SELECTED = "not_selected"
 NOT_SUPPLIED = "not_supplied"
 NONE_UPLOADED = "none_uploaded"
+# SD-D-3 (Codex P2 #2): a record that reported a NONEMPTY artifact inventory
+# whose names were attributed to no row has proven an upload exists, so its own
+# row may not render the NONE_UPLOADED absence claim. This fourth state says
+# only what the payload supports: this row cannot be told "nothing uploaded".
+UNMAPPED_INVENTORY = "unmapped_inventory"
+# F-r4-1: the placeholder that replaces a token value in any text that can
+# reach stderr.
+TOKEN_REDACTED = "<redacted>"
+
+# F-r4-1: the characters this module refuses in an HTTP header value. It is a
+# strict superset of what http.client rejects: its regex
+# `\n(?![ \t])|\r(?![ \t\n])` (Python 3.14 http/client.py L152, applied at
+# L1363) rejects bare CR and LF, while NUL is refused by this module's own
+# rule (the stdlib accepts it). A non-latin-1 character is caught by the
+# encode check in token_header_defect below. A folded value (obs-fold) is
+# deliberately refused even though http.client would accept it: a folded value
+# supplied as a credential is not a legitimate bearer token, and the refusal
+# also removes a header-continuation surface.
+ILLEGAL_HEADER_VALUE_CHARS = ("\r", "\n", "\0")
 
 JOB_ROSTER = ("changes", "validate-skills", "gate-guard",
               "windows-offline-checks", "tools-tests-linux",
@@ -164,6 +183,36 @@ class FixtureMiss(RefusedInput):
     """The offline fixture has no payload for a requested URL."""
 
 
+def token_header_defect(token):
+    """A value-free reason the token cannot be a header value, or None.
+
+    F-r4-1: total on None and "" (B3 - HttpTransport(None) is the default
+    anonymous live path), and it never returns or prints any part of the
+    value, so the reason is safe to print in a refusal message.
+    """
+    if not token:
+        return None
+    if any(character in token for character in ILLEGAL_HEADER_VALUE_CHARS):
+        return "contains a character that is not valid in an HTTP header value"
+    try:
+        token.encode("latin-1")
+    except UnicodeEncodeError:
+        return "is not encodable as an HTTP header value"
+    return None
+
+
+def redact_token(text, token):
+    """Replace the token value in `text` before it can reach stderr (F-r4-1).
+
+    The falsy guard is load-bearing: str.replace("", TOKEN_REDACTED) inserts
+    the placeholder between every character, and the token-less live path
+    reaches the handlers that call this helper (A3).
+    """
+    if not token:
+        return str(text)
+    return str(text).replace(token, TOKEN_REDACTED)
+
+
 def identity():
     """Return the fixed command identity block (D21)."""
     return json.loads(json.dumps(IDENTITY_BLOCK))
@@ -256,15 +305,62 @@ def _artifact_text(artifact):
         bool(artifact.get("expired")))
 
 
+def _artifact_cell(name, artifacts, inventory_empty):
+    """The payload's own statement about this job's uploads (F-r4-2, SD-D-3).
+
+    Four states, per job: a prefix-mapped upload -> its text; the job's own
+    record carried an `artifacts` key whose inventory was EMPTY -> an observed
+    absence (NONE_UPLOADED); the job's own record carried a NONEMPTY inventory
+    and no name of it was attributed to this row -> UNMAPPED_INVENTORY, because
+    the payload has proven an upload exists and this row may not claim an
+    absence (SD-D-3: the false-absence instance Codex P2 #2 reproduced, which
+    this cell used to render as NONE_UPLOADED); the record carried no such key,
+    or the job is absent from the payload -> NOT_RECORDED, because the payload
+    never made the claim.
+
+    D17 is untouched: the mapping still follows the artifact NAME through
+    ARTIFACT_JOB_MAP + _segments and never guesses, so an unrecognised name is
+    attributed to no row - it only stops being an absence claim on the row
+    that reported it.
+    """
+    if name in artifacts:
+        return _artifact_text(artifacts[name])
+    empty = inventory_empty.get(name)
+    if empty is None:
+        return NOT_RECORDED
+    return NONE_UPLOADED if empty else UNMAPPED_INVENTORY
+
+
 def _artifacts_by_job(jobs):
-    mapping = {}
+    """(reporting record -> its own inventory was empty, roster job -> artifact).
+
+    F-r4-2: the jobs endpoint returned no `artifacts` key at all for runs
+    38198781208 and 38212458000 (`gh api .../runs/<id>/jobs --jq
+    '.jobs[] | {name, artifacts: (.artifacts // "ABSENT")}'` -> ABSENT for all
+    six), so key presence is the payload's own statement about that job's
+    uploads: `"artifacts": []` and `"artifacts": null` report an empty
+    inventory, an absent key reports nothing. `mapping` reuses the D17 prefix
+    rule (ARTIFACT_JOB_MAP + _segments) and never guesses: an uploaded name
+    whose stem is not in the map is attributed to no row.
+
+    SD-D-3: emptiness is recorded PER REPORTING RECORD, not once for the whole
+    payload, so only a record whose own inventory was empty can ever make the
+    absence claim; a record that reported a nonempty inventory keeps that fact
+    even when none of its names was attributed to any row.
+    """
+    empty, mapping = {}, {}
     for job in jobs:
         if not isinstance(job, dict):
             continue
+        if "artifacts" in job and isinstance(job.get("name"), str):
+            empty[job["name"]] = not (job.get("artifacts") or [])
         for artifact in job.get("artifacts") or []:
-            if isinstance(artifact, dict):
-                mapping[artifact.get("name")] = artifact
-    return mapping
+            if isinstance(artifact, dict) \
+                    and isinstance(artifact.get("name"), str):
+                target = ARTIFACT_JOB_MAP.get(_segments(artifact["name"]))
+                if target:
+                    mapping[target] = artifact
+    return empty, mapping
 
 
 def _negative_note(seconds):
@@ -279,7 +375,7 @@ def _missing_row(name):
             "exit_code": NOT_RECORDED, "exit_code_provenance": NOT_SELECTED,
             "exit_codes": NOT_SELECTED, "exit_codes_provenance": NOT_SELECTED,
             "coverage": "not_demonstrated", "skip_reason": NOT_SELECTED,
-            "artifact": NONE_UPLOADED, "log_url": NOT_RECORDED,
+            "artifact": NOT_RECORDED, "log_url": NOT_RECORDED,
             "note": "roster-job-absent-from-api-response"}
 
 
@@ -406,7 +502,8 @@ def _apply_artifact_exit_codes(rows, run_head_sha, artifact_entries, event):
 
 
 
-def _derive_job_rows(payload_jobs, run_head_sha, event, artifacts, entries):
+def _derive_job_rows(payload_jobs, run_head_sha, event, artifacts, entries,
+                     inventory_empty):
     """Build one row per roster job; always len(JOB_ROSTER) rows."""
     by_name = {}
     for job in payload_jobs:
@@ -435,7 +532,7 @@ def _derive_job_rows(payload_jobs, run_head_sha, event, artifacts, entries):
                if isinstance(completed_at, str) else NOT_RECORDED,
                "exit_code": NOT_RECORDED, "exit_code_provenance": NOT_SELECTED,
                "exit_codes": NOT_SELECTED, "exit_codes_provenance": NOT_SELECTED,
-               "artifact": _artifact_text(artifacts.get(name)),
+               "artifact": _artifact_cell(name, artifacts, inventory_empty),
                "log_url": job.get("html_url")
                if isinstance(job.get("html_url"), str) else NOT_RECORDED,
                "state": NOT_RECORDED, "duration_s": NOT_RECORDED,
@@ -803,6 +900,12 @@ class HttpTransport:
             _FixedHostRedirectHandler)
 
     def fetch(self, url):
+        if self._token:
+            defect = token_header_defect(self._token)
+            if defect is not None:
+                raise TransportFailure(
+                    "refusing to send the Authorization header for %s: %s"
+                    % (url, defect))
         headers = {"Accept": "application/vnd.github+json",
                    "X-GitHub-Api-Version": API_VERSION,
                    "User-Agent": USER_AGENT}
@@ -818,11 +921,30 @@ class HttpTransport:
                         "redirected off %s" % FIXED_HOST)
                 status, body = resp.getcode(), resp.read().decode()
         except urllib.error.HTTPError as error:
-            raise TransportFailure(
-                "HTTP %s for %s" % (error.code, url)) from error
+            raise TransportFailure(redact_token(
+                "HTTP %s for %s" % (error.code, url), self._token)) from error
         except (urllib.error.URLError, OSError) as error:
+            # SD-D-2 (Codex P2 #1): redacting the new message is not enough
+            # while the raw error stays chained - traceback.format_exception
+            # prints `__cause__` verbatim, token included when the underlying
+            # text carries it. Raising `from None` drops the cause and sets
+            # __suppress_context__, so the formatted traceback is value-free,
+            # which is exactly what AC2's threshold states with no branch
+            # qualifier.
+            raise TransportFailure(redact_token(
+                "transport error for %s: %s" % (url, error),
+                self._token)) from None
+        except UnicodeDecodeError:
+            # A response body that is not UTF-8 is a read failure, not a
+            # rejected request value, and it must not inherit the diagnosis
+            # below (B4). Its disposition is deliberately unchanged from the
+            # base bytes: it escapes as before, carrying response bytes and
+            # never the Authorization value.
+            raise
+        except ValueError:
             raise TransportFailure(
-                "transport error for %s: %s" % (url, error)) from error
+                "malformed request for %s: a request value was rejected and is "
+                "redacted" % url) from None
         try:
             return json.loads(body), status
         except json.JSONDecodeError as error:
@@ -1066,6 +1188,12 @@ def run_command(repository_id, *, repository=DEFAULT_REPOSITORY,
         if token_env and not token:
             raise RefusedInput(
                 "environment variable %s is empty or unset" % token_env)
+        if token:
+            defect = token_header_defect(token)
+            if defect is not None:
+                raise RefusedInput(
+                    "--token-env %s: the value %s; refusing before any request "
+                    "(the value is never printed)" % (token_env, defect))
         transport = HttpTransport(token)
     api_calls = []
     if not run_id:
@@ -1094,9 +1222,10 @@ def run_command(repository_id, *, repository=DEFAULT_REPOSITORY,
         repository, workflow, run_payload, run_id, candidate, candidate_status,
         fetched_at, fixture_precedence, attempt, jobs_total,
         len(payload_jobs), truncated)
+    inventory_empty, artifacts = _artifacts_by_job(payload_jobs)
     rows = _derive_job_rows(payload_jobs, run_payload.get("head_sha"),
-                            run_identity["run_event"],
-                            _artifacts_by_job(payload_jobs), artifact_entries)
+                            run_identity["run_event"], artifacts,
+                            artifact_entries, inventory_empty)
     prerequisites = _prerequisites(
         rows, payload_jobs, artifact_entries, run_identity["run_event"],
         truncated)
