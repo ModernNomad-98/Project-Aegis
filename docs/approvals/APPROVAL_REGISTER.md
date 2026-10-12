@@ -5795,12 +5795,21 @@ the entry governs.
   did not license editing the bot pull request to move its head.
 - **Evidence:** The direct owner answer quoted above, relayed by the coordinating
   agent and recorded as relayed (the coordinator's relay log
-  `evidence/docs-refresh-2026-10-12/OWNER-DECISION-LOG-2026-10-12.md`, item 15,
-  records the same decision — a relay log, not a repository citation of the
-  owner's text). [PR #742](https://github.com/ModernNomad-98/Project-Aegis/pull/742)
+  `evidence/docs-refresh-2026-10-12/OWNER-DECISION-LOG-2026-10-12.md`
+  (out-of-tree coordinator relay log; not a repository path), item 15, records
+  the same decision — a relay log, not a repository citation of the owner's
+  text). [PR #742](https://github.com/ModernNomad-98/Project-Aegis/pull/742)
   merged `7c3ed395…` as `ce865c9122d991bbf0ee9cbc47b692a885d4ccf9` at
-  2026-10-12 23:23:09 UTC through the REST merge pinned to that head (`sha=`),
-  with no administrator override and no protection edit. The
+  2026-10-12 23:23:09 UTC through the REST merge pinned to that head (`sha=`).
+  The merge passed the **failed required `gate-guard`** check using
+  repository-administrator rights — an **administrator merge** under this
+  register's own definition (L71–72) — because that required check was red and
+  `enforce_admins` is `false` on the protected `main`. The authority relied on
+  is the owner's dated one-time exact-head exception recorded above; the
+  relayed grant **is** that exception, and the standing `AEGIS-APR-002`
+  administrator-merge authority was **not** separately invoked. No protection
+  edit is recorded: the required-check set stated at the pre-merge base
+  `ad1e40fc` and the live protection config agree. The
   [merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/742#issuecomment-6134538429)
   records the merge, the checks, the exception and the coordinator's answers.
 - **Expiry / use limit:** One merge of PR #742 at the named head; consumed by the
@@ -5874,12 +5883,23 @@ the entry governs.
   authorise the documentation follow-up, which needs its own work authority.
 - **Evidence:** The direct owner answer quoted above, relayed by the coordinating
   agent and recorded as relayed (the coordinator's relay log
-  `evidence/docs-refresh-2026-10-12/OWNER-DECISION-LOG-2026-10-12.md`, item 15,
-  records the same decision — a relay log, not a repository citation of the
-  owner's text). [PR #743](https://github.com/ModernNomad-98/Project-Aegis/pull/743)
+  `evidence/docs-refresh-2026-10-12/OWNER-DECISION-LOG-2026-10-12.md`
+  (out-of-tree coordinator relay log; not a repository path), item 15, records
+  the same decision — a relay log, not a repository citation of the owner's
+  text). [PR #743](https://github.com/ModernNomad-98/Project-Aegis/pull/743)
   merged `af49536c…` as `81081ca4f7745de8bb6275e890f09e9b4a109325` at
-  2026-10-12 23:23:20 UTC through the REST merge pinned to that head (`sha=`),
-  with no administrator override and no protection edit. The
+  2026-10-12 23:23:20 UTC (GitHub's API `merged_at`, the source AEGIS-APR-135
+  names; the merge commit's committer date is `2026-10-12T16:23:19-07:00` =
+  23:23:19Z, one second earlier) through the REST merge pinned to that head
+  (`sha=`). The merge passed the **failed required `gate-guard`** check using
+  repository-administrator rights — an **administrator merge** under this
+  register's own definition (L71–72) — because that required check was red and
+  `enforce_admins` is `false` on the protected `main`. The authority relied on
+  is the owner's dated one-time exact-head exception recorded above; the
+  relayed grant **is** that exception, and the standing `AEGIS-APR-002`
+  administrator-merge authority was **not** separately invoked. No protection
+  edit is recorded: the required-check set stated at the pre-merge base
+  `ad1e40fc` and the live protection config agree. The
   [merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/743#issuecomment-6134538683)
   records the merge, the checks, the exception and the coordinator's answers.
 - **Expiry / use limit:** One merge of PR #743 at the named head; consumed by the
@@ -5904,7 +5924,10 @@ the entry governs.
 
 - **Event:** CONSUMED; target grant AEGIS-APR-133.
 - **Status at recording:** AEGIS-APR-133 has no remaining use.
-- **Effective at:** 2026-10-12 23:23:20 UTC.
+- **Effective at:** 2026-10-12 23:23:20 UTC — the GitHub API's `merged_at`
+  (the source named here); the merge commit's own committer date is
+  `2026-10-12T16:23:19-07:00` = **23:23:19Z**, one second earlier, and that
+  one-second difference is recorded here rather than silently resolved.
 - **Recorded at / By:** 2026-10-12 / the Stage G merger agent
   (`dependabot-closeout-merger-g`), the agent that performed the merge.
 - **New authority:** None. A later change to a protected path needs its own
