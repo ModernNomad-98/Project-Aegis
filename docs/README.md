@@ -53,6 +53,9 @@ status; the dated proposals and evidence pages further down are history.
 - [Merge policy](reconciliation/auto-merge-policy.md): current authority and historical decisions.
 - [Delivery workflow](delivery-workflow.md): the seven-stage delivery rule, each
   stage's evidence, and the exact-head invalidation rule.
+- [Aegis SCIF naming and the necessity/reuse check](aegis-scif-naming-and-necessity.md):
+  the framework's name and its forms, the five questions Stage A owes and Stage B
+  tests, and the residual-occurrence inventory.
 - [Evidence reading guide](evidence/README.md): routes to 15 dated decision and
   delivery records, with current-status boundaries.
 - [Documentation readability backlog](roadmaps/aegis-documentation-readability-backlog.md):

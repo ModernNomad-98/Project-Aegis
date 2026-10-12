@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "acceptance-criteria-reviewer",
-  "description": "Behavior cases for reviewing existing acceptance criteria (D68, catalog item #226): mixed per-criterion verdicts with a measurable rewrite, missing negative and permission classes reported as gaps rather than invented requirements, the read-only refusal to edit the source ticket, contradicting criteria answered with one owner question, and routing away from spec writing, test planning and the definition-of-done gate.",
+  "description": "Behavior cases for reviewing existing acceptance criteria (D68, catalog item #226): mixed per-criterion verdicts with a measurable rewrite, missing negative and permission classes reported as gaps rather than invented requirements, the read-only refusal to edit the source ticket, contradicting criteria answered with one owner question, and routing away from spec writing, test planning and the definition-of-done gate. Added fit for the necessity/reuse check: check existing criteria without taking over the owning team's surface, citing an existing grant rather than re-requesting it.",
   "cases": [
     {
       "id": "mixed-verdicts-happy-path",
@@ -98,6 +98,20 @@
         "triggers": false,
         "assertions": [
           "Does not invoke this skill; the definition-of-done and release evidence gate belongs to release-readiness-reviewer."
+        ]
+      }
+    },
+    {
+      "id": "existing-criteria-check-does-not-take-over-ownership",
+      "type": "should_trigger",
+      "prompt": "Before we plan the tests for the audit-log retention story (PROJ-318), check that its criteria can be verified. AC1: retention is configurable per workspace. AC2: a workspace admin can set retention from 30 to 365 days. AC3: purging follows the retention setting. The retention limits and the purge policy are owned by the platform-security team, and their recorded decision D-114 already grants the 30 to 365 range; the AC3 text was written by the data team, not by us.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Quotes AC1 to AC3 verbatim with their ids and gives each exactly one verdict, marking AC1 NEEDS-REWRITE because \"configurable\" names no threshold or observable, and stating what would make AC2 TESTABLE.",
+          "Stays read-only: any rewrite is a suggestion for the author to accept, and the ticket, the spec and the other team's policy document are not edited.",
+          "Preserves ownership: names the platform-security team as the owner of the retention limits and the purge policy and cites their recorded D-114 grant rather than re-requesting the same range decision, and does not take over the data team's criterion.",
+          "For the criterion that depends on the owners' policy, asks one concrete question naming the artifact that would settle it instead of inventing retention numbers or writing the missing policy."
         ]
       }
     }
