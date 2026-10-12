@@ -8,6 +8,14 @@ its bytes, its integrity digest and its key set. Every FAILED return therefore
 happens before os.replace, and a failed save leaves the previous checkpoint
 byte-for-byte intact (protocol P7 rules 1, 2 and 3).
 
+The secret guard is position-independent: every string value in the state
+document, prose included, is scanned for the declared token-shaped prefixes at
+any offset, and a hit refuses the save as SECRET_DETECTED with nothing written,
+so no written checkpoint can attest that none was found while carrying one. The
+checkpoint's repository_id is bound to the CLI --repository-id identity, and a
+mismatch is refused as STATE_INVALID rather than writing a valid-looking
+checkpoint for another repository.
+
 It reports statuses; it observes nothing. execution_status is the operator's
 REPORTED state and never an observation: this tool holds no process handle,
 starts no process, stops nothing, and verifies no authority. Authority
@@ -76,7 +84,53 @@ CREDENTIAL_KEY_NAMES = frozenset({
     "credential", "credentials", "client_secret", "access_token",
     "refresh_token", "session_token", "authorization_header", "bearer",
 })
+# The declared prefix list (plan section 4.3 step 2, and the README's refusal
+# rule). The two matchers below must cover exactly this list, and a fixture
+# asserts that they do, so the documented list and the code cannot drift apart.
 TOKEN_VALUE_PREFIXES = ("ghp_", "github_pat_", "gho_", "sk-", "AKIA", "-----BEGIN")
+# The scan is position-independent: it never only calls startswith. These five
+# prefixes have shapes that do not occur inside ordinary English words, so they
+# are matched at ANY offset inside a string value (case-insensitively, because
+# the matcher folds the value first and never echoes the matched text back).
+TOKEN_VALUE_ANY_OFFSET_PREFIXES = ("ghp_", "github_pat_", "gho_", "akia", "-----begin")
+# "sk-" is two letters and a hyphen, and it DOES occur inside ordinary words
+# ("task-list", "risk-based", "disk-usage"). Matching it at any offset would
+# refuse ordinary prose, so it is matched only at a token boundary: the start of
+# the value, or a position whose preceding character is neither a letter, a digit
+# nor an underscore. This is the strictest reading that does not manufacture a
+# refusal out of a word that merely contains those two letters.
+TOKEN_VALUE_BOUNDARY_PREFIXES = ("sk-",)
+# The two measured scopes of idle_measurement.measured_what. The document names
+# exactly the phases the number covers, so the claim can never overstate it: the
+# CLI passes its own branch entry instant (the wider scope), and a direct
+# capture() call gets the narrower one, which says so.
+_MEASURED_WHAT_FROM_COMMAND = (
+    "the fast-save command's capture portion, timed from the start of the "
+    "fast-save CLI branch: state-document load, strict-schema validation, the "
+    "repository-identity binding, path guard, predecessor inspection, checkpoint "
+    "build and the serialization pass that preceded the final one, up to the "
+    "last refresh of this field; the final serialization and digest, the write, "
+    "the fsync, the replace and the post-replace confirmation are excluded, and "
+    "the end-to-end command-to-pause time is not observable here and is never "
+    "inferred"
+)
+_MEASURED_WHAT_UNSTATED = (
+    "the checkpoint build performed by this call only, up to the moment this "
+    "field was last refreshed; the caller supplied the number and this document "
+    "claims no wider scope for it, and the end-to-end command-to-pause time is "
+    "not observable here and is never inferred"
+)
+_MEASURED_WHAT_FROM_CAPTURE = (
+    "this tool's capture portion only, timed from capture() entry: path guard, "
+    "predecessor inspection, checkpoint build and the serialization pass that "
+    "preceded the final one, up to the last refresh of this field; the "
+    "state-document load, its strict-schema validation and the "
+    "repository-identity binding happen in the caller BEFORE capture() is "
+    "entered and are NOT included, and neither are the final serialization and "
+    "digest, the write, the fsync, the replace, the post-replace confirmation or "
+    "the end-to-end command-to-pause time, which is not observable here and is "
+    "never inferred"
+)
 
 STATE_KEYS = frozenset({
     "item_id", "objective", "workstream_id", "repository_id", "current_stage",
@@ -186,8 +240,39 @@ def _require_text_list(value: object, label: str) -> tuple[str, ...]:
     return tuple(_require_text(item, label + " entry") for item in value)
 
 
+def _token_prefix_hits(text: str) -> tuple[tuple[str, int], ...]:
+    """Every token-shaped prefix in one string, with its offset. Never echoes it.
+
+    The value is folded once and searched, so the scan is position-independent
+    and case-insensitive. Offsets index the folded copy, which is the same length
+    as the original for every character this module can be handed in practice.
+    """
+    folded = text.lower()
+    hits: list[tuple[str, int]] = []
+    for prefix in TOKEN_VALUE_ANY_OFFSET_PREFIXES:
+        offset = folded.find(prefix)
+        if offset != -1:
+            hits.append((prefix, offset))
+    for prefix in TOKEN_VALUE_BOUNDARY_PREFIXES:
+        offset = folded.find(prefix)
+        while offset != -1:
+            preceding = folded[offset - 1] if offset else ""
+            if not (preceding.isalnum() or preceding == "_"):
+                hits.append((prefix, offset))
+                break
+            offset = folded.find(prefix, offset + 1)
+    return tuple(hits)
+
+
 def _scan_for_secrets(value: object, label: str) -> None:
-    """Refuse credential-shaped keys and token-shaped values (never redact)."""
+    """Refuse credential-shaped keys and token-shaped values (never redact).
+
+    The value scan is position-independent: a token-shaped prefix is refused
+    wherever it appears inside a string value, not only at offset zero, so a
+    credential embedded in ordinary prose is refused rather than saved under an
+    attestation that none was found. The refusal names the prefix and the offset
+    and never repeats the matched text.
+    """
     if isinstance(value, Mapping):
         for key, item in value.items():
             if isinstance(key, str) and key.strip().lower() in CREDENTIAL_KEY_NAMES:
@@ -203,21 +288,29 @@ def _scan_for_secrets(value: object, label: str) -> None:
         for item in value:
             _scan_for_secrets(item, label)
         return
-    if isinstance(value, str) and value.startswith(TOKEN_VALUE_PREFIXES):
-        raise FastSaveRefused(
-            "SECRET_DETECTED",
-            label + " carries a token-shaped value; the save is refused and "
-            "nothing is written rather than redacting silently",
-        )
+    if isinstance(value, str):
+        hits = _token_prefix_hits(value)
+        if hits:
+            prefix, offset = hits[0]
+            raise FastSaveRefused(
+                "SECRET_DETECTED",
+                label + " carries a token-shaped value (prefix " + repr(prefix)
+                + " at character offset " + str(offset) + "); the value is "
+                "scanned at every position, so an embedded token is refused "
+                "exactly like a leading one. The save is refused and nothing is "
+                "written rather than redacting silently",
+            )
 
 
 def load_state_document(path: Path) -> SaveRequest:
     """Load and strictly validate the operator's state document.
 
     The schema is exact: unknown or missing keys, empty required strings,
-    unknown statuses and contradictory authorizations are refused as
-    STATE_INVALID. Credential-shaped keys and token-shaped values are refused
-    as SECRET_DETECTED before any other consideration.
+    unknown statuses, wrong-typed fields (including a null or otherwise
+    non-list operations or changed_files collection) and contradictory
+    authorizations are refused as STATE_INVALID, never as a traceback.
+    Credential-shaped keys and token-shaped values are refused as
+    SECRET_DETECTED before any other consideration.
     """
     try:
         raw = Path(path).read_bytes()
@@ -237,9 +330,16 @@ def load_state_document(path: Path) -> SaveRequest:
             "the state document schema is exact; unknown key(s): "
             + str(unknown or "none") + "; missing key(s): " + str(missing or "none")
         )
+    operations_value = value["operations"]
+    if not isinstance(operations_value, list):
+        raise _invalid(
+            "operations must be a list of operation objects, not "
+            + type(operations_value).__name__ + "; every collection field is "
+            "type-checked before it is iterated"
+        )
     operations: list[OperationReport] = []
     seen: set[str] = set()
-    for entry in value["operations"]:
+    for entry in operations_value:
         if not isinstance(entry, dict):
             raise _invalid("operations entries must be JSON objects")
         if set(entry) != OPERATION_KEYS:
@@ -294,8 +394,15 @@ def load_state_document(path: Path) -> SaveRequest:
     one_line_resume = _require_text(value["one_line_resume"], "one_line_resume")
     if "\n" in one_line_resume or "\r" in one_line_resume:
         raise _invalid("one_line_resume must be a single line")
+    changed_files_value = value["changed_files"]
+    if not isinstance(changed_files_value, list):
+        raise _invalid(
+            "changed_files must be a list of path/uncommitted entries, not "
+            + type(changed_files_value).__name__ + "; every collection field is "
+            "type-checked before it is iterated"
+        )
     changed_files: list[Mapping[str, Any]] = []
-    for entry in value["changed_files"]:
+    for entry in changed_files_value:
         if not isinstance(entry, dict) or set(entry) != CHANGED_FILE_KEYS:
             raise _invalid(
                 "each changed_files entry needs exactly "
@@ -330,6 +437,30 @@ def load_state_document(path: Path) -> SaveRequest:
         one_line_resume=one_line_resume,
         next_safe_action=_require_text(value["next_safe_action"], "next_safe_action"),
     )
+
+
+def bind_repository_identity(request: SaveRequest, repository_id: str) -> None:
+    """Bind the checkpoint to the CLI repository identity, or refuse (STATE_INVALID).
+
+    The plan maps the checkpoint's repository_id to the CLI identity already
+    required by the parser, so the two must agree before anything is written: a
+    typo or a reused state document from another repository must never produce a
+    valid-looking checkpoint for the wrong repository. This runs before
+    capture(), so a mismatch writes nothing and leaves any previous checkpoint
+    byte-for-byte intact.
+    """
+    if not isinstance(repository_id, str) or not repository_id.strip():
+        raise _invalid(
+            "the --repository-id identity must be a non-empty string"
+        )
+    if repository_id != request.repository_id:
+        raise _invalid(
+            "the CLI repository identity " + repr(repository_id) + " does not "
+            "match the state document repository_id " + repr(request.repository_id)
+            + "; the checkpoint is bound to the CLI identity, and a mismatch is "
+            "refused rather than writing a valid-looking checkpoint for another "
+            "repository"
+        )
 
 
 def report_execution_state(request: SaveRequest) -> tuple[str, tuple[str, ...]]:
@@ -425,8 +556,14 @@ def build_checkpoint(
     previous: Mapping[str, Any] | None = None,
     measured_seconds: float = 0.0,
     durable_location: str = "",
+    measured_what: str = _MEASURED_WHAT_UNSTATED,
 ) -> dict[str, Any]:
-    """Build the checkpoint document. Pure: it opens no file and writes none."""
+    """Build the checkpoint document. Pure: it opens no file and writes none.
+
+    measured_what must name the phases measured_seconds actually covers; its
+    default claims nothing beyond this call, and capture() passes the scope that
+    matches whether the caller supplied a command-start instant.
+    """
     if not isinstance(invocation_phrase, str) or not invocation_phrase.strip():
         raise _invalid("the invocation phrase must be a non-empty string")
     moment = _utc(now)
@@ -508,8 +645,10 @@ def build_checkpoint(
             "checked": True,
             "finding": "none",
             "rule": (
-                "credential-shaped keys and token-shaped values refuse the save "
-                "with SECRET_DETECTED rather than being redacted silently"
+                "credential-shaped keys, and token-shaped prefixes at ANY "
+                "position inside a string value (not only at offset zero, so an "
+                "embedded token in prose is caught too), refuse the save with "
+                "SECRET_DETECTED rather than being redacted silently"
             ),
         },
         "evidence_references": list(request.evidence_references),
@@ -529,18 +668,17 @@ def build_checkpoint(
             "reads no inventory and no source bytes"
         ),
         "idle_measurement": {
-            "measured_what": (
-                "this tool's capture portion (state load, strict-schema "
-                "validation, path guard, document build and serialization) up to "
-                "the moment these bytes were built; the write, fsync and replace "
-                "are excluded, and the end-to-end command-to-pause time is not "
-                "observable here and is never inferred"
-            ),
+            "measured_what": measured_what,
             "measured_when_utc": moment.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "measured_seconds": round(max(0.0, float(measured_seconds)), 6),
             "target_seconds": IDLE_TARGET_SECONDS,
             "within_target": float(measured_seconds) < IDLE_TARGET_SECONDS,
-            "note": "measurement target only (protocol P6/S9): measured, never guaranteed",
+            "note": (
+                "measurement target only (protocol P6/S9): measured, never "
+                "guaranteed; measured_what names the exact phases this number "
+                "covers and is refreshed by capture() after the build, so a slow "
+                "build or serialization cannot be reported as a fast one"
+            ),
         },
         "bounded_readback": {
             "performed": True,
@@ -854,11 +992,44 @@ def _confirm_after_replace(
     }
 
 
+def start_idle_measurement() -> float:
+    """The instant the fast-save COMMAND began, for idle_measurement.
+
+    The CLI takes this before it loads the state document, so the number the
+    checkpoint carries really covers the phases measured_what names - including
+    the state load and the strict-schema validation - instead of only the part
+    that happens inside capture(). It is a monotonic reading, so a clock
+    adjustment cannot make the measurement negative.
+    """
+    return time.monotonic()
+
+
 def capture(
-    request: SaveRequest, checkpoint_path: Path, *, invocation_phrase: str
+    request: SaveRequest,
+    checkpoint_path: Path,
+    *,
+    invocation_phrase: str,
+    command_started_monotonic: float | None = None,
 ) -> SaveResult:
-    """The single entry point: guard, build, serialize, verify, replace."""
-    started = time.monotonic()
+    """The single entry point: guard, build, serialize, verify, replace.
+
+    command_started_monotonic is the optional instant the fast-save COMMAND
+    began, taken by the caller with start_idle_measurement() before the state
+    document is loaded. When it is supplied, idle_measurement.measured_what
+    names the wider scope that includes the state load and validation; when it is
+    absent, the measurement starts here and the document says so instead of
+    claiming phases that ran outside this call.
+    """
+    started = (
+        time.monotonic()
+        if command_started_monotonic is None
+        else float(command_started_monotonic)
+    )
+    measured_what = (
+        _MEASURED_WHAT_FROM_CAPTURE
+        if command_started_monotonic is None
+        else _MEASURED_WHAT_FROM_COMMAND
+    )
     target = Path(checkpoint_path)
     path_text = os.fspath(target)
     try:
@@ -871,17 +1042,31 @@ def capture(
             previous=previous,
             measured_seconds=time.monotonic() - started,
             durable_location=_durable_location(target),
+            measured_what=measured_what,
         )
         _scan_for_secrets(document, "the checkpoint document")
+        # The measurement is refreshed at the END of every build/serialize pass,
+        # so the number the document carries really covers the phases that
+        # measured_what names - including a slow state load (through the
+        # command_started_monotonic the CLI took before loading) and a slow
+        # build_checkpoint. Only the final serialization and digest below fall
+        # outside it, and measured_what says so.
         for _ in range(4):
+            elapsed = time.monotonic() - started
+            document["idle_measurement"]["measured_seconds"] = round(
+                max(0.0, elapsed), 6
+            )
+            document["idle_measurement"]["within_target"] = (
+                float(elapsed) < IDLE_TARGET_SECONDS
+            )
             payload = json.dumps(
                 document, sort_keys=True, indent=2, ensure_ascii=True
             ).encode("utf-8")
             if document["bounded_readback"]["bytes_read"] == len(payload):
                 break
             document["bounded_readback"]["bytes_read"] = len(payload)
-        # The bytes_read update is inside the digest's input, so the digest is
-        # recomputed over the final document before it is written.
+        # The bytes_read and measurement updates are inside the digest's input, so
+        # the digest is recomputed over the final document before it is written.
         document["integrity"]["content_sha256"] = _content_digest(document)
         payload = json.dumps(
             document, sort_keys=True, indent=2, ensure_ascii=True

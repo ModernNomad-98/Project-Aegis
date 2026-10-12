@@ -90,7 +90,7 @@ authority or prove the source is fresh.
 | `evidence.py` | Canonicalize a synthetic evidence record, create a new evidence file and return its SHA-256 hash. Receipt and authority checks occur in the dispatch, authority and storage paths. |
 | `owned_paths.py` | Resolve the user-state root and reject unsafe links, ownership and path substitutions. |
 | `cli.py` | Provide a read-only command-line interface for capabilities, status and verification, plus `fast-save`, the single command that writes: it writes one checkpoint file at the path the operator names. No lifecycle mutation command is exposed. |
-| `fast_save.py` | Capture one offline synthetic FAST SAVE checkpoint: a strict state schema, a secret guard, a path guard, and an atomic write whose temporary file is verified before it replaces the target. It reports statuses and observes nothing. |
+| `fast_save.py` | Capture one offline synthetic FAST SAVE checkpoint: a strict state schema, a position-independent secret guard, a path guard, a checkpoint bound to the CLI repository identity, and an atomic write whose temporary file is verified before it replaces the target. It reports statuses and observes nothing. |
 
 The kernel allows one outstanding synthetic operation per repository. The
 operation slot remains occupied while an effect, validator or accounting
@@ -166,6 +166,12 @@ SAVED, or **4** when it is FAILED. The line carries `checkpoint_status`,
 `durable_location`, `bounded_readback` and `one_line_resume`. On FAILED the
 status fields are `null`, because no checkpoint was written.
 
+The command also binds the checkpoint to the `--repository-id` identity the
+parser already requires: the state document's `repository_id` must equal it, and
+a mismatch is refused as **STATE_INVALID** before anything is built. A typo or a
+state document reused from another repository therefore cannot produce a
+valid-looking checkpoint for the wrong repository.
+
 ### The state document
 
 The operator supplies a JSON **state document** with exactly these keys, each
@@ -228,14 +234,30 @@ excluded). The field list is the protocol's **provisional scaffold** (its gap
 and the durable location is **operator-named at runtime** (gap **G3**), because
 this tool invents no default location and creates no parent directory.
 
+The idle measurement names the phases its own number covers. A `fast-save` run
+is timed from the start of the command's branch, so the number includes the state
+load, the strict-schema validation, the repository-identity binding, the path
+guard, the predecessor inspection and the checkpoint build; the final
+serialization, the write, the fsync, the replace and the post-replace
+confirmation are excluded. A direct `capture()` call is timed from its own entry
+instead, and its `measured_what` says that the state load happened before it and
+is not included. `within_target` is a measurement, never a guarantee (protocol
+P6/S9).
+
 ### Refusal rules
 
 Nothing is written when the command refuses, and a refusal returns exit 4:
 
 - the state document is not readable JSON, or its key set is not exact, or a
   required string is empty, or a status is unknown (**STATE_INVALID**);
-- a credential-shaped key (for example `token` or `password`) or a
-  token-shaped value appears anywhere in the document (**SECRET_DETECTED**);
+- a credential-shaped key (for example `token` or `password`) appears, or a
+  token-shaped prefix (`ghp_`, `github_pat_`, `gho_`, `sk-`, `AKIA`,
+  `-----BEGIN`) appears at **any position inside any string value** - including
+  embedded in ordinary prose, not only at the start (**SECRET_DETECTED**). The
+  short prefix `sk-` is matched only at a token boundary, because it also occurs
+  inside ordinary words such as `task-list`;
+- the state document's `repository_id` does not equal `--repository-id`
+  (**STATE_INVALID**);
 - the target is a symlink (refused by a check that runs first and never follows
   the link), a directory or other non-regular file, a file that does not parse
   as JSON, or a file whose `checkpoint_format` differs (**PATH_GUARD_DENIED**);

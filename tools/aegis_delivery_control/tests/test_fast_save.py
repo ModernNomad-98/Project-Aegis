@@ -33,6 +33,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest import mock
 
@@ -74,6 +75,11 @@ FORBIDDEN_EVENT_PATTERNS = (
 CLI_BRANCH_CALL_ALLOWLIST = frozenset({
     "print", "json.dumps", "fast_save.load_state_document", "fast_save.capture",
     "_fast_save_refusal", "_fast_save_report",
+    # Added at the Stage C2 repair: the branch binds the checkpoint to the CLI
+    # repository identity (D2) and takes the idle-measurement start before it
+    # loads the state document (D4). Both are module entry points, so the branch
+    # still adds no import and calls nothing but formatting plus this module.
+    "fast_save.bind_repository_identity", "fast_save.start_idle_measurement",
 })
 
 _SENTINEL_ENABLED = False
@@ -182,6 +188,16 @@ class FastSaveTests(unittest.TestCase):
             request, checkpoint if checkpoint is not None else self.checkpoint_path,
             invocation_phrase=phrase,
         )
+
+    def _run_cli(self, argv: list) -> tuple[int, str]:
+        """Run the CLI with the state root patched to prove it is never opened."""
+        stdout = io.StringIO()
+        with mock.patch.object(
+            cli, "default_state_root",
+            side_effect=AssertionError("the state root was opened"),
+        ), contextlib.redirect_stdout(stdout):
+            exit_code = cli.main(argv)
+        return exit_code, stdout.getvalue().strip()
 
     def _read_saved(self) -> dict:
         return fast_save.read_checkpoint_bounded(self.checkpoint_path)
@@ -790,6 +806,257 @@ class FastSaveTests(unittest.TestCase):
         self.assertEqual(
             successor["previous_valid_checkpoint"]["content_sha256"],
             document["integrity"]["content_sha256"],
+        )
+
+    def test_d1_embedded_token_in_objective_refuses_and_keeps_the_previous_checkpoint(
+        self,
+    ) -> None:
+        """D1: a token inside prose is refused, not saved under a 'none' attestation."""
+        first = self._save()
+        self.assertEqual(first.checkpoint_status, "SAVED")
+        before = self._sha256(self.checkpoint_path)
+        before_document = self._read_saved()
+        embedded = _state_document(
+            objective="resume the increment using ghp_exampleTokenValueNotReal now"
+        )
+        state = self._write_state(embedded)
+        with self.assertRaises(fast_save.FastSaveRefused) as refused:
+            fast_save.load_state_document(state)
+        self.assertEqual(refused.exception.reason_code, "SECRET_DETECTED")
+        # The refusal says WHERE the prefix was found (a non-zero offset, which is
+        # what proves the scan is position-independent) and never repeats the
+        # matched text back into the log.
+        self.assertIn("at character offset", refused.exception.reason)
+        offset = int(
+            refused.exception.reason.split("at character offset ")[1].split(")")[0]
+        )
+        self.assertGreater(offset, 0)
+        self.assertNotIn("ghp_exampleTokenValueNotReal", refused.exception.reason)
+        # End to end: exit 4, a FAILED line, no traceback, and the PREVIOUS
+        # checkpoint byte-for-byte intact.
+        exit_code, line = self._run_cli([
+            "--repository-id", "example-project", "fast-save",
+            "--state", str(state), "--checkpoint", str(self.checkpoint_path),
+        ])
+        self.assertEqual(exit_code, 4)
+        payload = json.loads(line)
+        self.assertEqual(payload["checkpoint_status"], "FAILED")
+        self.assertEqual(payload["reason_code"], "SECRET_DETECTED")
+        self.assertIsNone(payload["execution_status"])
+        self.assertEqual(self._sha256(self.checkpoint_path), before)
+        self.assertEqual(self._read_saved(), before_document)
+        self.assertEqual(
+            self._read_saved()["no_credentials_tokens_secrets"]["finding"], "none"
+        )
+        self.assertEqual(self._temp_leftovers(self.checkpoint_path), [])
+
+    def test_d1_token_scan_covers_every_position_and_keeps_ordinary_words_safe(
+        self,
+    ) -> None:
+        """D1: any string position is scanned, and 'sk-' does not fire inside words."""
+        # The two matchers cover the whole declared prefix list, so the README's
+        # list and the code cannot drift apart silently.
+        self.assertEqual(
+            {prefix.lower() for prefix in fast_save.TOKEN_VALUE_PREFIXES},
+            set(fast_save.TOKEN_VALUE_ANY_OFFSET_PREFIXES)
+            | set(fast_save.TOKEN_VALUE_BOUNDARY_PREFIXES),
+        )
+        embedded_cases = {
+            "objective_prose": _state_document(
+                objective="see token (ghp_embeddedNotARealToken) for details"
+            ),
+            "list_entry": _state_document(
+                failures_blockers=["blocked by github_pat_embeddedNotARealToken"]
+            ),
+            "changed_file_path": _state_document(
+                changed_files=[
+                    {"path": "tools/gho_embeddedNotARealToken.py", "uncommitted": True}
+                ]
+            ),
+            "authorization_ref": _state_document(
+                operations=[
+                    _operation(
+                        "op-embedded", "STOPPED", True,
+                        "brief AKIAEMBEDDEDNOTAREALKEY",
+                    )
+                ]
+            ),
+            "trailing_sk_prefix": _state_document(
+                next_safe_action="rotate sk-embeddedNotARealKey now"
+            ),
+            "begin_marker": _state_document(
+                gaps=["-----BEGIN PRIVATE KEY----- material"]
+            ),
+        }
+        for name, document in embedded_cases.items():
+            with self.subTest(case=name):
+                with self.assertRaises(fast_save.FastSaveRefused) as refused:
+                    fast_save.load_state_document(self._write_state(document))
+                self.assertEqual(refused.exception.reason_code, "SECRET_DETECTED")
+                self.assertFalse(self.checkpoint_path.exists())
+        # The strictest honest reading must not manufacture a refusal out of an
+        # ordinary word that merely contains the two letters of "sk-".
+        for safe_prose in (
+            "update the task-list before the next stage",
+            "risk-based ordering of the remaining work",
+            "check disk-usage and desk-tidy notes",
+        ):
+            with self.subTest(safe=safe_prose):
+                request = fast_save.load_state_document(
+                    self._write_state(_state_document(objective=safe_prose))
+                )
+                self.assertEqual(request.objective, safe_prose)
+        # ...while a leading or delimiter-preceded token is still refused.
+        for token in ("sk-notARealKey", "(sk-notARealKey)"):
+            with self.subTest(token=token):
+                with self.assertRaises(fast_save.FastSaveRefused) as refused:
+                    fast_save.load_state_document(
+                        self._write_state(_state_document(one_line_resume=token))
+                    )
+                self.assertEqual(refused.exception.reason_code, "SECRET_DETECTED")
+
+    def test_d2_repository_identity_mismatch_is_refused_as_state_invalid(self) -> None:
+        """D2: the checkpoint is bound to the CLI identity, or it is refused."""
+        first = self._save()
+        self.assertEqual(first.checkpoint_status, "SAVED")
+        before = self._sha256(self.checkpoint_path)
+        state = self._write_state(_state_document(repository_id="other-repo"))
+        request = fast_save.load_state_document(state)
+        with self.assertRaises(fast_save.FastSaveRefused) as refused:
+            fast_save.bind_repository_identity(request, "example-project")
+        self.assertEqual(refused.exception.reason_code, "STATE_INVALID")
+        self.assertIn("other-repo", refused.exception.reason)
+        with self.assertRaises(fast_save.FastSaveRefused) as blank:
+            fast_save.bind_repository_identity(request, "   ")
+        self.assertEqual(blank.exception.reason_code, "STATE_INVALID")
+        # End to end: exit 4 with STATE_INVALID, nothing written, the previous
+        # checkpoint intact and still bound to its own repository.
+        exit_code, line = self._run_cli([
+            "--repository-id", "example-project", "fast-save",
+            "--state", str(state), "--checkpoint", str(self.checkpoint_path),
+        ])
+        self.assertEqual(exit_code, 4)
+        payload = json.loads(line)
+        self.assertEqual(payload["checkpoint_status"], "FAILED")
+        self.assertEqual(payload["reason_code"], "STATE_INVALID")
+        self.assertIsNone(payload["execution_status"])
+        self.assertIsNone(payload["durable_location"])
+        self.assertEqual(self._sha256(self.checkpoint_path), before)
+        self.assertEqual(self._read_saved()["repository_id"], "example-project")
+        self.assertEqual(self._temp_leftovers(self.checkpoint_path), [])
+        # Positive control: the matching identity still saves, so the refusal is
+        # not a blanket refusal of every fast save.
+        matching = self._write_state(
+            _state_document(repository_id="example-project"), name="matching.json"
+        )
+        target = self.root / "matching-checkpoint.json"
+        exit_code, line = self._run_cli([
+            "--repository-id", "example-project", "fast-save",
+            "--state", str(matching), "--checkpoint", str(target),
+        ])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(json.loads(line)["checkpoint_status"], "SAVED")
+        self.assertEqual(
+            fast_save.read_checkpoint_bounded(target)["repository_id"],
+            "example-project",
+        )
+
+    def test_d3_null_and_wrong_typed_collections_are_state_invalid(self) -> None:
+        """D3: a null or wrong-typed collection is refused, never a traceback."""
+        for field in ("operations", "changed_files"):
+            for bad in (None, {}, "text", 7, True):
+                with self.subTest(field=field, value=repr(bad)):
+                    state = self._write_state(_state_document(**{field: bad}))
+                    with self.assertRaises(fast_save.FastSaveRefused) as refused:
+                        fast_save.load_state_document(state)
+                    self.assertEqual(refused.exception.reason_code, "STATE_INVALID")
+                    self.assertIn(field, refused.exception.reason)
+                    self.assertIn(type(bad).__name__, refused.exception.reason)
+        # The remaining list fields keep their own type check.
+        for field in (
+            "completed_work", "remaining_work", "unfinished_files",
+            "evidence_references", "failures_blockers", "gaps",
+            "authority_references",
+        ):
+            with self.subTest(field=field):
+                state = self._write_state(_state_document(**{field: None}))
+                with self.assertRaises(fast_save.FastSaveRefused) as refused:
+                    fast_save.load_state_document(state)
+                self.assertEqual(refused.exception.reason_code, "STATE_INVALID")
+        # End to end: the documented STATE_INVALID JSON and exit 4 replace the
+        # uncaught TypeError, and the previous checkpoint is untouched.
+        self.assertEqual(self._save().checkpoint_status, "SAVED")
+        before = self._sha256(self.checkpoint_path)
+        for bad in (None, {}):
+            with self.subTest(cli=repr(bad)):
+                state = self._write_state(
+                    _state_document(operations=bad), name="null-collection.json"
+                )
+                exit_code, line = self._run_cli([
+                    "--repository-id", "example-project", "fast-save",
+                    "--state", str(state), "--checkpoint", str(self.checkpoint_path),
+                ])
+                self.assertEqual(exit_code, 4)
+                payload = json.loads(line)
+                self.assertEqual(payload["checkpoint_status"], "FAILED")
+                self.assertEqual(payload["reason_code"], "STATE_INVALID")
+                self.assertIn("operations", payload["reason"])
+        self.assertEqual(self._sha256(self.checkpoint_path), before)
+
+    def test_d4_idle_measurement_covers_the_phases_it_names(self) -> None:
+        """D4: the number covers the named phases, so a slow phase cannot hide."""
+        real_build = fast_save.build_checkpoint
+
+        def slow_build(*args: object, **kwargs: object) -> dict:
+            time.sleep(2.0)
+            return real_build(*args, **kwargs)
+
+        # (a) capture() with no command start: the document claims the narrower
+        # scope, says the state load is NOT included, and the slow build IS
+        # visible in the number.
+        state = self._write_state()
+        request = fast_save.load_state_document(state)
+        with mock.patch.object(fast_save, "build_checkpoint", side_effect=slow_build):
+            result = fast_save.capture(
+                request, self.checkpoint_path, invocation_phrase="fast save"
+            )
+        self.assertEqual(result.checkpoint_status, "SAVED")
+        idle = fast_save.read_checkpoint_bounded(self.checkpoint_path)["idle_measurement"]
+        self.assertGreaterEqual(idle["measured_seconds"], 2.0)
+        self.assertIn("capture portion", idle["measured_what"])
+        self.assertIn("NOT included", idle["measured_what"])
+        self.assertIn("never inferred", idle["measured_what"])
+        self.assertEqual(
+            idle["within_target"],
+            idle["measured_seconds"] < idle["target_seconds"],
+        )
+        # (b) the CLI path: the start instant is taken BEFORE the state load, so a
+        # slow load is covered as well and measured_what names that scope.
+        target = self.root / "cli-idle-checkpoint.json"
+        real_load = fast_save.load_state_document
+
+        def slow_load(path: Path) -> fast_save.SaveRequest:
+            time.sleep(2.0)
+            return real_load(path)
+
+        with mock.patch.object(
+            fast_save, "load_state_document", side_effect=slow_load
+        ):
+            exit_code, line = self._run_cli([
+                "--repository-id", "example-project", "fast-save",
+                "--state", str(state), "--checkpoint", str(target),
+            ])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(json.loads(line)["checkpoint_status"], "SAVED")
+        idle = fast_save.read_checkpoint_bounded(target)["idle_measurement"]
+        self.assertGreaterEqual(idle["measured_seconds"], 2.0)
+        self.assertIn("state-document load", idle["measured_what"])
+        self.assertIn("fast-save CLI branch", idle["measured_what"])
+        self.assertIn("never inferred", idle["measured_what"])
+        self.assertTrue(idle["within_target"])
+        self.assertEqual(
+            idle["within_target"],
+            idle["measured_seconds"] < idle["target_seconds"],
         )
 
     def test_module_import_has_no_side_effects(self) -> None:

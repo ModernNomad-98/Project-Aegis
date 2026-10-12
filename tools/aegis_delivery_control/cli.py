@@ -224,8 +224,14 @@ def _status(
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = build_parser().parse_args(argv)
     if arguments.command == "fast-save":
+        # Taken BEFORE the state document is loaded, so idle_measurement really
+        # covers the state load and validation that measured_what names.
+        command_started = fast_save.start_idle_measurement()
         try:
             request = fast_save.load_state_document(arguments.state)
+            # The checkpoint is bound to this CLI identity: a state document from
+            # another repository is refused here, before anything is written.
+            fast_save.bind_repository_identity(request, arguments.repository_id)
         except fast_save.FastSaveRefused as error:
             print(json.dumps(_fast_save_refusal(error), sort_keys=True))
             return 4
@@ -233,6 +239,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             request,
             arguments.checkpoint,
             invocation_phrase=arguments.invocation_phrase,
+            command_started_monotonic=command_started,
         )
         print(json.dumps(_fast_save_report(result), sort_keys=True))
         return 0 if result.checkpoint_status == "SAVED" else 4
