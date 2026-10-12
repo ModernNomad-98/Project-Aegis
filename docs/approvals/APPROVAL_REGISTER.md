@@ -5560,3 +5560,176 @@ the entry governs.
   this is the publication gap the receipts themselves state, not a claim of
   publication. AEGIS-APR-128's entry text is byte-untouched (immutability,
   preamble L8–L12).
+
+### AEGIS-APR-131: CP-WP-003 real-authority source — bounded read-only DynamoDB-first inspection grant
+
+- **Event:** GRANT — one use, read-only, inspection-scoped. Inspection only; no claim,
+  reservation, redemption or other write of any kind.
+- **Status at recording:** ACTIVE for ONE bounded read-only inspection, **and only after the
+  reviewed governance change carrying this entry merges**. **The inspection cannot start today.**
+  The source identifiers (AWS account, Region, table, incarnation pin), the principals and
+  credential custody, the evidence root and retention, and the billing-contract facts are
+  **UNSELECTED** and are recorded as unselected rather than invented (draft §5.4 / UNSURE-2);
+  until the owner's selection is recorded by a later append-only event, this scope names no
+  reachable source and **nothing may be read**. **Nothing in this entry may be cited as authority
+  to start, to spend, or to dispatch** beyond the one named read-only inspection and only once
+  those facts exist and the credential gate below is satisfied.
+- **Date / Grantor:** 2026-10-12 / Peter Nguyen, by his dated relay **"A"** of 2026-10-12,
+  quoted exactly as relayed — "approving the bounded read-only DynamoDB-first inspection" —
+  with "[grant] as drafted" the coordinator's characterization of it ("as drafted" is **not** part
+  of the relay's own record), relayed by
+  the coordinating agent and transcribed here by the change's implementing agent. The relay is
+  the authorising act; the approved text is the draft with SHA-256
+  `1351ba260c410f1151df5e598b54f2ccdf6f8993429b8cd5826be6217b5cc5b0`. Consistent with the
+  preamble (L12–13, "Current direct user instructions are valid source evidence before
+  transcription") and with the chat-instruction convention of AEGIS-APR-121 (L5244–5258), this
+  entry **does not claim a repository citation of the owner's own text**.
+- **Reason:** CP-WP-003 is BLOCKED on real source authority, independent freshness, containment,
+  evidence and billing, and no active grant covers a real inspection: the one prior increment
+  (AEGIS-APR-006) is CONSUMED and grants nothing (L1860–1867), and AEGIS-APR-098 records that
+  the evidence-computed-guards option remains an entry criterion, not authorization
+  (L2967–2970). The published DynamoDB public-contract inspection is complete but was
+  source-only. The project's own sequence next names an authenticated read-only inspection under
+  a separate reviewed grant (owner-decision packet L353–354; real-authority packet L48; matrix
+  L50). This grant supplies exactly that step and nothing after it.
+- **Scope allowed (SCOPE) — the inspection, and only the inspection:**
+  - **One source, already narrowed by the packet to one hypothesis:** the DynamoDB-first
+    candidate. The inspection may read authenticated source state for exactly one AWS account,
+    one Region and one table: account `<UNSELECTED>`, Region `<UNSELECTED>`, table
+    `<UNSELECTED>`, with the creation-time incarnation pin `<UNSELECTED>`. A table name or ARN
+    alone cannot reject deletion and recreation under the same name.
+  - **Allowed read operations:** a strongly consistent `GetItem` of one complete head item, or
+    one `TransactGetItems` for a multi-item vector, being the verification read;
+    `DescribeTable` and the table-description read needed for the incarnation pin; and the
+    custody reads in the next bullet. Default eventually consistent reads, `BatchGetItem`,
+    `Query`, `Scan` and any GSI read are not verification reads and must not be used as one.
+  - **Allowed custody and control-plane reads (read-only, same account/Region unless the owner
+    permits otherwise):** the IAM policy, role and condition documents that gate the selected
+    table; the table's own settings needed for the D1 invariants (deletion protection, PITR
+    setting, streams, tags); and CloudTrail data-event and log configuration, read as forensic
+    configuration only and never treated as a synchronous head.
+  - **Allowed purposes:** to establish and record (a) the exact account/Region/table identity and
+    an independently protected incarnation pin; (b) the custody and broker principals, credential
+    issuance/rotation/break-glass and trust boundary, with allow/deny tests for the mechanism
+    that actually gates access; (c) the verification read that establishes the current head; and
+    (d) the evidence and billing contract facts named in the packet's D1 invariant list. A
+    documentation claim or an inference stays UNPROVEN until these reads establish it.
+  - **Read-only negative tests that this grant permits — read-shaped only:** an attempt to read
+    with a principal or key outside the allowed set, an attempted bypass read through a path the
+    protocol does not use, and a repeated read to observe consistency behaviour. Each attempt is
+    recorded with its denial; a **write**-shaped negative test is outside this grant.
+  - **Evidence:** the inspection writes exactly one evidence record under `<UNSELECTED: evidence
+    root>`, with `<UNSELECTED: writer>` as writer and `<UNSELECTED: readers>` as readers,
+    containing the sanitized account/Region/table identity, the incarnation pin, the observed read
+    operation and its consistency class, the head/vector values observed, the IAM/deny
+    observations, the CloudTrail configuration observation, and an explicit `UNKNOWN`/`UNPROVEN`
+    list. No credential, key, token, session string, customer data or full item payload beyond the
+    head vector the inspection exists to read appears in the record. Retention:
+    `<UNSELECTED: retention term>`.
+  - **Time and size bounds:** at most **4–8 active hours** of inspection work, excluding provider
+    and owner waiting. Spend ceiling: **USD $0 external spend** — see Scope FORBIDDEN.
+  - **Stop rules:** see "Stop conditions" below; they are part of the allowed scope, not advice.
+- **Stop conditions (STOP CONDITIONS) — stop immediately, with no discretion, no completion
+  attempt and no retry:**
+  1. **Source outage or unavailability**, or any read that is not the proven strongly consistent
+     read path, leaves the fact UNPROVEN; deny and stop rather than substitute a weaker read.
+  2. **Missing, stale, conflicting or unavailable proof** — including equal sequence numbers with
+     different hashes, a later source watermark, or a read that cannot be qualified against the
+     pinned incarnation, account, Region and epoch. Fail closed; do not "retry until it agrees".
+  3. **Any contradiction with a pinned custody fact**, including a table identity that does not
+     match the pin, an unexpected principal able to read the table, or a policy change observed
+     during the inspection.
+  4. **Uncertain claim or uncertain billing**: any charge, any cost estimate that is not derivable
+     from the account's own billing evidence, or a billing surface the grant did not name.
+     **Unknown amount keeps worst-case liability and the slot; no assumed zero charge or refund.**
+  5. **Containment escape or scope drift** — any access outside the one account/Region/table and
+     the named custody reads, any credential material appearing in an artefact, any attempt to
+     write, or any consequence not anticipated by this grant, whether or not it looks minor.
+  6. **Expiry of the use limit** — the one inspection is complete, or a terminal stop above fires,
+     whichever comes first. A stopped inspection is **VOID IMMEDIATELY**, with no further use, and
+     **must not read ACTIVE**.
+- **Scope FORBIDDEN (PROHIBITIONS) — as explicit as the scope allowed:**
+  - **No write of any kind, anywhere**: no `PutItem`, `UpdateItem`, `DeleteItem`, batch write,
+    `TransactWriteItems`, table creation, table restore, PITR restore, export, import, stream
+    enablement change, tag change, deletion-protection change or capacity-mode change. **No claim,
+    reservation or redemption write is included** — not in a test namespace, not anywhere.
+  - **No credential creation, issuance, rotation or break-glass use.** No IAM policy, role, trust
+    policy or resource-policy change. Credential custody is the owner's: `<UNSELECTED: custody
+    statement — who holds the credential, and how the operating agent receives access without
+    reading or recording the secret>`.
+  - **No spend, and no commitment that can spend**: no paid resource created, no capacity
+    reservation, no PITR enablement, no CloudTrail data-event enablement, no broker compute, and
+    no purchase. The ceiling is **USD $0 external spend**; reads that bill against an existing
+    account remain the owner's recorded risk, not a granted budget, and this grant pins **no**
+    positive budget figure.
+  - **No billing-surface read.** Billing-surface reads are **OUT OF SCOPE** for this grant; the
+    billing-contract facts come from the public-contract documentation, not from the authenticated
+    read. No billing lookup, cost explorer, invoice, credit or receipt read is authorised, and the
+    six-control stop 4 still governs any billing fact the inspection encounters.
+  - **No data export beyond the one evidence record.** No customer data, no full-table read, no
+    bulk collection, and no copy of item payloads beyond the head vector this inspection exists
+    to read.
+  - **No cross-account or beyond-DynamoDB access.** One account and one Region only; no
+    cross-account broker call, no Firestore or other provider, no S3 bucket read, no GitHub API
+    mutation, no host probe and no process/containment test.
+  - **No host capability probe and no real dispatch.** Selected-host containment, operation
+    descriptor, target idempotency/receipt semantics and rollback remain unproven and ungranted.
+  - **No reuse of a consumed increment.** AEGIS-APR-006 may not be cited or extended for any part
+    of this work.
+  - **No repository write by the inspecting agent or lane** beyond the one evidence record at the
+    named path; governance edits travel through their own separately reviewed change.
+  - **No phase advance and no CP-WP-004 selection.** This grant proves, at most, facts about one
+    source's read path and custody. It does not select a source for execution, does not close D1,
+    and does not begin CP-WP-004.
+  - **Anything not named above is not authorised. Silence is not permission.**
+- **Evidence:** the owner's dated relay **"A"** of 2026-10-12, quoted as relayed by the
+  coordinating agent (the owner's own text is not repository-citable; see `Date / Grantor`), and
+  the owner-approved draft at SHA-256 `1351ba26…`, which carries the clause-by-clause citation
+  index to the base files. Supporting evidence, at this base: the owner-decision packet (D1
+  option A and its invariant table); the DynamoDB public-contract inspection's status line
+  ("Published AWS contracts were read; no account, credential, host, service endpoint, or
+  customer data was accessed. This is an inference for later falsification, not a source
+  selection or implementation grant"); the real-authority packet's proposed sequence; the owning
+  open-decisions row (L232); and the consumption record of the previous increment (L1860–1867).
+  The inspection's own evidence record at the named root is the receipt for the completed use.
+- **Consumption and receipt:** this grant is **one use**. It is CONSUMED when the single bounded
+  inspection and its evidence record are complete, or VOID IMMEDIATELY on any stop condition
+  above, whichever comes first. The consumption is recorded as its own append-only lifecycle
+  event ("CONSUMED; target grant AEGIS-APR-131", effective time, recorder, "New authority: None"),
+  in the shape AEGIS-APR-068 uses (L1858–1867), appended after the evidence record lands and
+  never used to reactivate the grant. **The receipt is the evidence record itself — the durable
+  answer identifying what was inspected and what remains UNPROVEN — not the inspection's own log
+  and not a request acknowledgement.**
+- **Expiry / use limit:** one bounded read-only inspection of the one named account/Region/table.
+  Consumed as above. **No calendar expiry stated** — the owner's resolution of 2026-10-12 is that
+  one use is its own expiry. No renewal by silence. Lifecycle events append; no prior field is
+  edited.
+- **Owner resolutions recorded (2026-10-12; the four inputs the draft left open, quoted as
+  relayed by the coordinating agent):** (1) **authorising words** = the owner's dated relay
+  **"A"** of 2026-10-12, "approving the bounded read-only DynamoDB-first inspection", [grant]
+  as drafted (the bracketed words are the coordinator's gloss, not the relay log's):
+  (2) **calendar expiry** = **none stated** (one use is its own expiry); (3) **spend ceiling** =
+  **USD $0 external**; (4) **billing-surface reads** = **OUT OF SCOPE** for this
+  grant. No fifth resolution is claimed and no unfilled value is invented.
+- **Unresolved identifiers, recorded as unselected (draft §5.4 / UNSURE-2):** AWS account ID or
+  alias · Region · table name · incarnation pin (`TableId` value or equally proved mechanism) ·
+  credential holder, operating principal(s) and broker · credential issuance/rotation/break-glass
+  and the no-read/no-record access path · evidence root, writer, readers, classification,
+  encryption/key custody, retention, redaction and incident hold · billing/receipt source,
+  currency/units and payer (and, per resolution 4, out of scope). **No value is invented for any
+  of these.** The next gate is the owner's selection of the AWS credential and these identifiers;
+  that selection is recorded by a later append-only event, and only then may the one inspection
+  run.
+- **Line-reference caution carried forward (draft UNSURE-5):** two citations in the
+  owner-decision packet do not resolve to the same line numbers at the base the draft was read
+  at; the quoted sentences were verified verbatim, and this entry therefore cites **the sentence
+  and the file digest**, never the packet's line numbers.
+- **Numbering (draft UNSURE-6):** both sibling appends are on this entry's base — `AEGIS-APR-129`
+  is the review-path lane's headed note (L5493) and `AEGIS-APR-130` is the BER host-ladder lane's
+  headed `CONSUMED` event (L5530). This entry takes **131**, re-derived at the Stage C base by the
+  plan's own rule (heading census 130 entries, contiguous `1..130`; `AEGIS-APR-131` 0 hits
+  whole-tree) — the case the rule reserves for a sibling event that already holds 130. This number
+  **differs from the relay log's provisional `AEGIS-APR-130`**; the divergence was escalated to the
+  coordinator and confirmed before recording, nothing else about the wording changes, and it is
+  recorded in the Stage C handoff and the PR body (the register's renumbering precedent,
+  L5373–5375). `AEGIS-APR-006` is not reused, extended or re-scoped.
