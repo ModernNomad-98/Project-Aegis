@@ -388,6 +388,99 @@ author's summary, nor a completed task.** Those are inputs. The verdict is a
 posted, accepted review by an agent that is not the author, naming the exact
 head. Anything else that reads as approval is not one.
 
+## The lighter review path: pure-docs pull requests only
+
+**This section states one class-scoped condition. It adds no stage, no gate, no
+receipt row and no bound field, and it removes nothing.** Its subject is a
+**pure-docs pull request**: a pull request whose diff is documentation only —
+**zero code diff** — classified **`docs-only`** by `change-classification-gate`
+before Stage A. The classification is recorded in the plan, as `SD-A` already
+requires.
+
+**Who may use it.** Only a pure-docs pull request. One code, script, workflow,
+test, configuration, data or lock file in the diff makes the pull request
+code-bearing, and a code-bearing pull request **never** uses this path.
+
+**What is lighter, and what is not.** On this path the change still runs
+**every one of the seven stages, in order, with a different holder per stage**
+— the separation rule is untouched — and it still meets **every `MG1`–`MG5`**
+condition in [Before merging: Stage G entry conditions](#before-merging-stage-g-entry-conditions).
+Lighter means only this: the review work each stage performs is proportionate to
+a documentation diff. The independent plan audit, the independent implementation
+audit, validation and the final independent review are all still posted against
+the exact head; a criterion or check that is **`UNRUN`** or **`NOT MET`** routes
+exactly as [the stage dispositions](#stage-dispositions) and [the chain
+rule](#the-seven-stages) already route it. **No round of repair-and-re-audit is
+skipped**: a defect found anywhere in these stages returns the work to the stage
+that produced it and is fixed and re-checked there, exactly as for any other
+change.
+
+**One permission the packet offered is deliberately not used (audit F3).** The
+coordinator's 2026-10-12 check-in packet recorded that approving Option C permits
+a documented lighter path "still Stage D/E/F present, but without mandated
+repair-re-audit cycles for findings that a follow-up docs PR can carry", and the
+owner adopted the packet's recommendation on 2026-10-12. This section declines
+that permission: here the cycles stay mandatory. A rule may be stricter than its
+authorization without exceeding it, and this record keeps one reading of what
+"lighter" removes instead of two.
+
+**What each stage checks here.** The claim set of a pure-docs pull request can be
+reduced to what a machine or a reader can re-derive, and each stage checks **at
+least** that reduced set below — the list is a floor, never a ceiling:
+
+- **Stage A/B — the plan and its audit.** What the change asserts, and the exact
+  evidence that settles each assertion: the commands and their output, the
+  commit and ref they were run at, and the line anchors. A plan or audit that
+  carries a claim with no artifact is **not** lighter, it is incomplete.
+- **Stage C — the handoff.** The changed files, the local check output and the
+  handoff block the stage table already requires are still produced and
+  recorded; only their volume is proportionate to a documentation diff.
+- **Stage D — the implementation audit.** Every acceptance criterion the plan
+  states is checked one by one against the changed files at the recorded head,
+  and each criterion gets `MET`, `NOT MET` or `UNRUN`.
+- **Stage E — validation.** The applicable checks are run at that head and their
+  commands and output are recorded. The mechanical ones are the link and
+  Markdown checks this repository already runs; the `docs-only` tier's own
+  expectation — links and rendering sanity plus review — is the depth baseline,
+  and validating deeper never counts as a defect here.
+- **Stage F — the final independent review.** The verdict names the exact
+  40-character head and the bound-fields hash, as `SD-F` requires, and it checks
+  the PR's "Aegis skills used" table against the work.
+- **Stage G — the receipt.** The `MG`-keyed receipt the page already defines — a
+  status table for the exact head, with its bound fields — is still shown; the
+  receipt is not shortened by this path.
+
+**Nothing a stage, a gate or the receipt checks today is removed by this path**:
+the reduction is in the volume of evidence a documentation diff needs, never in
+the set of obligations.
+
+**Follow-up documentation is allowed to carry.** When a change's code half has
+already merged and a later pull request carries only the documentation it
+promised — a ledger row, a decision row, a dated note, a pointer — that later
+pull request is a pure-docs pull request and may use this path. Carrying the
+documentation is not a reason to reopen the merged half, and it does not make
+the later pull request code-bearing.
+
+**What this path never does.** It **never applies to a code-bearing pull
+request**; it **never waives `AEGIS-APR-100`** or any other register entry on its
+own terms, including the green-check condition and the auto-merge rules; it never
+waives a red check, a failed required check, or the rule that merges wait for the
+automated review; it never waives the DCO sign-off; it never turns a protected
+path into an unprotected one — `gate-guard` and its owner-exception route are
+unchanged, and a pure-docs pull request that touches a protected path still fails
+`gate-guard` and still needs its own owner decision; it never permits merging on
+an author's summary, green CI alone, or an unposted review; and it never
+authorises a bot or pre-authored diff to skip its own intake condition, which
+[the section below](#pre-authored-diffs-an-intake-condition-not-a-new-stage)
+already states and which this one does not touch.
+
+**Documented, and revisitable.** The owner adopted this path on 2026-10-12 and
+set a **revisit on 2026-11-11** (30 days). It is recorded as a dated decision
+row in the [owner decisions page](roadmaps/aegis-open-decisions-2026-09-23.md)
+and as `D103` in the [recorded decisions
+log](reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions). **This
+section is the authority for the path itself.**
+
 ## Pre-authored diffs: an intake condition, not a new stage
 
 Some changes arrive with the diff already written: the weekly Dependabot pull
