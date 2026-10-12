@@ -4598,6 +4598,46 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   the corrections; it grants no new execution, publication or merge
   authority. D99 and earlier entries are byte-untouched.
 
+- **D101 (2026-10-11) — SCIF PR-2 name record, the Stage A/B
+  necessity-and-reuse check, and the fitted eval cases.** The SCIF package's
+  outcomes (2) and (3). The naming decision as rendered (D1–D4): **Aegis SCIF —
+  Secure Compartmented Integrity Framework**, short form **Aegis SCIF**, with
+  the plain-language definition and the explanatory line recorded on the new
+  page `docs/aegis-scif-naming-and-necessity.md`. The former name has **zero**
+  occurrences in the tree and in reachable history (the greps and the
+  `git log -S` searches are recorded on the page), so the record is **added,
+  not applied to existing prose**; the P0 directive's supervisor wording is
+  carried as an **alias** — the same workstream, transcribed in future
+  documents under the new name — and the page adds exactly one quotation of the
+  historical phrase, to define that alias. The residual-occurrence inventory at
+  base `09a5d2b3`: (a) 0, (b) 0, (c) 113 technical identifiers, (d) 29
+  unrelated uses, (e) the one deliberate alias quotation; every line is listed
+  with file:line and a disposition. Outcome (3): ONE normative subsection added
+  inside `## The seven stages` of `docs/delivery-workflow.md` — *Necessity and
+  reuse: the five questions owed at Stage A and tested at Stage B* — plus
+  pointer-shaped edits to the stage-table rows A/B, the `SD-A`/`SD-B`
+  disposition rows and the existing `SD-A`→`SD-B` / `SD-B`→`SD-C` dependency
+  rows (no rows added, no new numbered collapse site, site 8
+  unchanged-and-verified). The check adds the five questions (necessity /
+  reuse / ownership / minimum-safe action / complexity justification), the
+  routing dispositions (cite / preserve / smallest change / bounded check), the
+  six reuse tests and the never-transfers list, and it adds no new field, gate,
+  report or register (D6/D7). The fitted eval assets are five new cases across
+  three existing `evals.json` files (`risk-tiered-validation-selector` +2,
+  `ai-task-decomposer` +2, `acceptance-criteria-reviewer` +1); no `SKILL.md`
+  is edited. The evidence record
+  `docs/evidence/scif/scif-eval-assets-and-pilot-census-2026-10-11.md` keeps
+  assets, static, deterministic, actual-runs and unrun separate, reports
+  scenario #10 as UNRUN, and records the bounded pilot: the read-only offline
+  `census` at the pinned base (exit 0, `behavior_cases` 1329,
+  `behavior_eval_files` 205) with the candidate-head census's measured delta
+  (`behavior_cases` 1334, +5; the three skills 8 / 10 / 9; the head commit and
+  tree in the PR's Stage C record, because a commit cannot name its own SHA
+  inside its own bytes). Counts UNCHANGED (SKILL-COUNT 205, FAMILY-COUNT 23).
+  This entry records the lane; it grants no new execution, publication, review
+  or merge authority; the approval register is byte-untouched. D100 and earlier
+  entries are byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open

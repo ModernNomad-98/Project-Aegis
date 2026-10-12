@@ -24,8 +24,8 @@ binding ones.
 
 | # | Stage | Entry evidence | Exit evidence (artifacts) | Exit disposition | Authority holder |
 | --- | --- | --- | --- | --- | --- |
-| A | PLAN | The request or directive that asks for the change, with its source. | A written plan: what, why, blast radius, the paths it will touch, and **proportionate acceptance criteria** — few and short for a small change, but present and checkable. | SD-A | The agent taking the work, or the coordinator assigning it. |
-| B | INDEPENDENT PLAN AUDIT | The plan's exact text, **bound to a captured revision** — a content hash taken when the text is captured, or an immutable comment or artifact — by an agent that did **not** write it. | A posted verdict naming the captured revision it audited. | SD-B | A different agent from the planner. |
+| A | PLAN | The request or directive that asks for the change, with its source. | A written plan: what, why, blast radius, the paths it will touch, and **proportionate acceptance criteria** — few and short for a small change, but present and checkable; and the plan's **five-question necessity and reuse answers**, which [the necessity-and-reuse subsection](#necessity-and-reuse-the-five-questions-owed-at-stage-a-and-tested-at-stage-b) defines. | SD-A | The agent taking the work, or the coordinator assigning it. |
+| B | INDEPENDENT PLAN AUDIT | The plan's exact text, **bound to a captured revision** — a content hash taken when the text is captured, or an immutable comment or artifact — by an agent that did **not** write it; and the plan's **five-question necessity and reuse answers**, which this stage tests. | A posted verdict naming the captured revision it audited; and the **per-question routing disposition** recorded under [the necessity-and-reuse subsection](#necessity-and-reuse-the-five-questions-owed-at-stage-a-and-tested-at-stage-b). | SD-B | A different agent from the planner. |
 | C | IMPLEMENT | [The chain rule](#the-seven-stages) — stage entry. | The changed files; local check output; [the handoff block](#stage-handoff) — **owed by every stage, not by C alone**; a rule-preservation inventory when the change edits governance text. | SD-C | The implementing agent. |
 | D | INDEPENDENT IMPLEMENTATION AUDIT | [The chain rule](#the-seven-stages) — stage entry. | A posted audit naming that head, checking the plan's acceptance criteria one by one. | SD-D | A different agent from the implementer. |
 | E | VALIDATE | [The chain rule](#the-seven-stages) — stage entry. | The repository's own checks at that head, with their commands and output; every check that could not be run named **UNRUN**. | SD-E | The validating agent. |
@@ -115,6 +115,55 @@ in **`MG5`** and is not restated here — see
 what selects the validation depth in E. Closeout after G routes to
 `ai-closeout-reporter`. Neither is an eighth stage.
 
+### Necessity and reuse: the five questions owed at Stage A and tested at Stage B
+
+**Stage A owes the answers; Stage B tests them.** The plan records an answer to
+each question below, with the evidence that settles it, and a question that is
+already answered elsewhere is **cited, not re-asked**.
+
+1. **Necessity** — what need does this serve, and what is the evidence that the
+   need exists? *Routing:* satisfied → cite the proof (an issue, a defect, a
+   decision or a measurement).
+2. **Reuse** — what existing mechanism, skill, script, document or decision
+   already does this? *Routing:* owned elsewhere → preserve that ownership and
+   cite it; nothing suitable → the smallest new thing.
+3. **Ownership** — who holds the authority and the responsibility for this
+   surface, at this revision? *Routing:* owned → proceed inside the existing
+   authority and do not re-ask; absent, expired or out of scope → prepare one
+   concrete decision for the owner instead of proceeding.
+4. **Minimum-safe action** — the smallest action that satisfies the need without
+   weakening a control: no removal of a required check, no tier downgrade, and
+   no scope widening to make a pass.
+5. **Complexity justification** — why the machinery is warranted, and what would
+   be smaller? *Routing:* uncertain → a bounded check (a time-boxed, read-only
+   investigation) before building.
+
+**Stage B tests them; it does not repeat them.** The plan audit challenges
+duplication ("this already exists"), machinery ("this is larger than the need"),
+an approval request ("this is already granted"), a missed dependency (a lane, a
+policy page or an evidence obligation the plan did not name) and an unjustified
+split ("these belong in one change"), and it records a per-question routing
+disposition — cite / preserve / smallest change / bounded check — before
+`ACCEPT`.
+
+**Reuse is conditional, never automatic.** Before an earlier result is carried
+into a decision, all six properties are re-checked: **revision** (is the fact
+still true at this head?), **policy** (has the rule that governed it changed?),
+**environment** (same host, runner or profile?), **scope** (does the original
+scope reach this action?), **provenance** (is the source retrievable, and is it
+the right author?) and **validity** (is it still in force and un-superseded?).
+Reuse **never** transfers roles, **never** treats a publisher as a reviewer,
+**never** reuses a previous-head verdict, and **never** replaces fresh
+validation where a stage's own requirement is a fresh check — the same rule
+[the skills-row protocol](#authoring-and-publishing-skills-rows),
+[exact-head invalidation](#exact-head-invalidation) and
+[the merge prohibition](#the-merge-prohibition) already carry in their own words.
+
+**The explanatory copy of these questions is on
+[the Aegis SCIF naming and necessity page](aegis-scif-naming-and-necessity.md),
+which holds no normative force. This subsection is the single source of the
+check's definition.**
+
 ### Stage dispositions
 
 **This is the sole normative rendering of the seven stage verdicts.** Each
@@ -125,8 +174,8 @@ column of the stage table. The maintenance rule is
 
 | ID | Stage | Disposition — the verdict the stage reaches | Affirmative? |
 | --- | --- | --- | --- |
-| `SD-A` | PLAN | **COMPLETE** when the plan carries what, why, blast radius, the paths it touches, and proportionate acceptance criteria; **and it records the change's classification from `change-classification-gate`, and any criterion it declares not verifiable at this head, with the reason.** | yes |
-| `SD-B` | PLAN AUDIT | **ACCEPT** or **REVISE**, on the captured revision it names. | ACCEPT |
+| `SD-A` | PLAN | **COMPLETE** when the plan carries what, why, blast radius, the paths it touches, and proportionate acceptance criteria; **and it records the change's classification from `change-classification-gate`, and any criterion it declares not verifiable at this head, with the reason.** **It also carries the five-question necessity and reuse answers** required by [the necessity-and-reuse subsection](#necessity-and-reuse-the-five-questions-owed-at-stage-a-and-tested-at-stage-b). | yes |
+| `SD-B` | PLAN AUDIT | **ACCEPT** or **REVISE**, on the captured revision it names; **and, before `ACCEPT`, it tests the plan's five-question necessity and reuse answers and records a per-question routing disposition — cite / preserve / smallest change / bounded check** — under [the necessity-and-reuse subsection](#necessity-and-reuse-the-five-questions-owed-at-stage-a-and-tested-at-stage-b). | ACCEPT |
 | `SD-C` | IMPLEMENT | **COMPLETE** or **INCOMPLETE**. **COMPLETE requires an immutable head: the commit SHA, the tree it resolves to (`git rev-parse <head>^{tree}`), and the base commit the change is against, all recorded** — so the next stage audits fixed objects rather than a moving branch, and "the diff at an exact head" is fully determined. The **tree** fixes content; the **base** fixes the diff. | COMPLETE |
 | `SD-D` | IMPL AUDIT | **ACCEPT** or **REVISE**, resolved **per acceptance criterion**: every criterion is `MET`, `NOT MET` or `UNRUN`. ACCEPT requires **no `NOT MET`**, and **every `UNRUN` must correspond to a criterion the plan at `SD-A` declared not verifiable at this head, with its reason recorded**. A criterion that becomes `UNRUN` at audit time and was **not** so declared forces **`REVISE`** — it is a finding about the implementation or the plan, not a gap to wave through. | ACCEPT |
 | `SD-E` | VALIDATE | **PASS**, **INCOMPLETE — UNRUN LISTED**, or **FAIL**. | PASS, and INCOMPLETE — UNRUN LISTED **only when its condition below is met** |
@@ -174,10 +223,10 @@ property whose absence produced the deadlock described under `SD-E`.
 
 | From | To | What the later stage must carry |
 | --- | --- | --- |
-| `SD-A` | `SD-B` | the plan text and its captured revision |
+| `SD-A` | `SD-B` | the plan text and its captured revision; the five-question necessity and reuse answers and the proofs they cite ([the necessity-and-reuse subsection](#necessity-and-reuse-the-five-questions-owed-at-stage-a-and-tested-at-stage-b)) |
 | `SD-A` | `SD-D` | the recorded classification, and the plan's own statement of what it cannot verify at this head |
 | `SD-A` | `SD-E` | the recorded classification, which selects the validation depth in E |
-| `SD-B` | `SD-C` | the accepted plan and the revision the verdict named |
+| `SD-B` | `SD-C` | the accepted plan and the revision the verdict named; the per-question routing disposition — cite / preserve / smallest change / bounded check ([the necessity-and-reuse subsection](#necessity-and-reuse-the-five-questions-owed-at-stage-a-and-tested-at-stage-b)) |
 | `SD-C` | `SD-D` | the head commit, **its tree**, and the base commit |
 | `SD-D` | `SD-E` | the per-criterion result set, including every `UNRUN` and the plan's declaration for it |
 | `SD-D` | `SD-F` | the per-criterion result set |

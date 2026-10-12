@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "risk-tiered-validation-selector",
-  "description": "Behavior cases for the fail-closed tier selector: file-list-only input, max-over-files aggregation, never-docs-only enforcement, unmatched-means-full, and refusal of just-this-once downgrades.",
+  "description": "Behavior cases for the fail-closed tier selector: file-list-only input, max-over-files aggregation, never-docs-only enforcement, unmatched-means-full, and refusal of just-this-once downgrades. Added fit for the necessity/reuse check: re-tier when an input changes instead of reusing the earlier tier result, and the negative control that a FAST CHECKPOINT save is not a validation tier.",
   "cases": [
     {
       "id": "positive-classify-a-mixed-change",
@@ -77,6 +77,34 @@
         "assertions": [
           "Does not invoke risk-tiered-validation-selector: the tier is already chosen, and the ask is to execute it locally against a clean-main baseline.",
           "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute risk-tiered-validation-selector for it."
+        ]
+      }
+    },
+    {
+      "id": "invalidate-and-re-tier-on-a-changed-input",
+      "type": "should_trigger",
+      "prompt": "Last week you put the release-branch change on the fast tier and it passed. Since then I have added a new authorization policy file (src/auth/roles.ts) and bumped the lockfile. Nothing else moved. Can we just reuse that earlier fast-tier result so we do not have to run the heavy suite again?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the changed inputs (the new authorization policy file and the lockfile bump) and states that they invalidate the earlier classification instead of carrying it forward.",
+          "Re-runs the classification against the current structured diff rather than the earlier file list or the PR description.",
+          "Both the authorization policy path and the lockfile hit the never-docs-only or forced-full overrides, so the aggregate tier is FULL by max-over-files with no averaging and no \"most files are unchanged\" reasoning.",
+          "Refuses to report the earlier fast-tier result as still valid, and hands execution of the full tier to the local-ci-mirror-preflight / CI path rather than running it."
+        ]
+      }
+    },
+    {
+      "id": "fast-checkpoint-is-not-a-validation-tier",
+      "type": "should_not_trigger",
+      "prompt": "Save progress and pause: write a FAST CHECKPOINT of this session - the files we have touched, the decisions so far and the open questions - so I can resume tomorrow. Keep it lightweight; this is a save, not a QA pass, and I do not want CI, tests or audits run for it.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not classify the session, the working tree or the checkpoint itself into a validation tier; a save request is not a change awaiting validation.",
+          "Does not run, request or schedule CI, tests, a corpus census or any tier check for the checkpoint.",
+          "Keeps the response to the save itself (touched files, decisions, open questions) and names the separate action that validates a change when a real change exists.",
+          "Does not read the word FAST in the request as a tier name."
         ]
       }
     }

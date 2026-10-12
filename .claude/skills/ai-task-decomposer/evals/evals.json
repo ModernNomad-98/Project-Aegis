@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "ai-task-decomposer",
-  "description": "Behavior cases for splitting a broad goal into ordered, pull-request-sized tasks (D69, category 08 roadmap item #266): the team-invitations happy path with per-task done criteria, evidence, provisional classes and an approval flag on the schema task; a schema-API-UI task split again; an unknown single sign-on provider turned into a spike and an owner question; the refusal to start implementing; a goal that is already one small change handed to change-classification-gate; and routing away from classification, design, parallel lanes and product specs.",
+  "description": "Behavior cases for splitting a broad goal into ordered, pull-request-sized tasks (D69, category 08 roadmap item #266): the team-invitations happy path with per-task done criteria, evidence, provisional classes and an approval flag on the schema task; a schema-API-UI task split again; an unknown single sign-on provider turned into a spike and an owner question; the refusal to start implementing; a goal that is already one small change handed to change-classification-gate; and routing away from classification, design, parallel lanes and product specs. Added fit for the necessity/reuse check: reuse an accepted diagnostic instead of re-planning it, and the negative control that one reviewable change is not a programme.",
   "cases": [
     {
       "id": "team-invitations-happy-path",
@@ -99,6 +99,35 @@
         "triggers": false,
         "assertions": [
           "Does not invoke this skill; writing the technical design belongs to tech-spec-writer."
+        ]
+      }
+    },
+    {
+      "id": "reuse-an-accepted-diagnostic",
+      "type": "should_trigger",
+      "prompt": "Our checkout-latency investigation already produced an accepted diagnosis last month: the report at docs/perf/checkout-latency-2026-09.md was accepted by the owner on 2026-09-14 and pins the N+1 query in the cart loader with its query plan. Now plan the work to fix it - the fix itself, a regression test that would catch it again, and the rollout. Break that into PR-sized tasks for an agent.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Cites the accepted diagnostic (the report and its acceptance date) and builds the tasks on its finding instead of planning a fresh diagnosis or new measurement of the same problem.",
+          "Names the existing mechanisms the tasks will use - the existing test suite, the captured query plan and the established rollout path - before proposing any new tooling.",
+          "Returns ordered PR-sized tasks for the fix, the regression test and the rollout, each with one intent, an observable done criterion and the evidence that will prove it.",
+          "Leaves no unknown that the accepted diagnosis already settled as an open question, and carries any genuinely open point as one owner question or a bounded spike.",
+          "Does not start implementing, does not create tickets and does not edit the repository."
+        ]
+      }
+    },
+    {
+      "id": "one-reviewable-change-is-not-a-programme",
+      "type": "should_not_trigger",
+      "prompt": "Next up is a small cohesive change: swap the hard-coded 30-second timeout in src/lib/fetch.ts for the value already read from config, and update its one unit test. Write me the multi-PR programme for it - phases, milestones and the parallel lanes I can run.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not produce a multi-PR programme, phases, milestones or parallel lanes for a change that fits one review.",
+          "States plainly that this is one reviewable change with one intent, and routes it to change-classification-gate for its class and minimum required checks instead of decomposing it.",
+          "Names one pull request worth of work (the timeout change plus its unit-test update) rather than splitting the change into several.",
+          "Invents no tasks, spikes or owner questions to fill out a plan that the change does not need."
         ]
       }
     }
