@@ -4124,3 +4124,10 @@ before doing anything else:
 10. **Record all outcomes durably** through reviewed repository artifacts — evidence
     reports at their authorized paths and reviewed PRs updating this register — never
     through conversation memory alone.
+
+**Dated pointer — 2026-10-12: the WP-2B-3 owner decision chain.** The work-package
+statuses above are unchanged and remain the authority. The decision inputs owned here —
+WP-2B-3/4/5/6/7, R2 and OD-1 — are now collected in one prepared order with the evidence
+each needs: [ber-wp2b3-owner-decision-chain.md](ber-wp2b3-owner-decision-chain.md)
+(PR #732, merge `6ea8a723`). **It changes no status, starts nothing and grants nothing**;
+WP-2B-4 and later work remain unauthorized, and OD-1 remains open.

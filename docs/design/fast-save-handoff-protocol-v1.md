@@ -291,3 +291,13 @@ owner's 2026-10-11 P0 directive. It **grants nothing and closes nothing**: no gr
 no decision (D) entry is minted, no register, backlog, index or instruction file is edited, and no
 implementation exists behind it. Nothing here is mechanically enforced (G4). Later increments (B2/B3) remain
 separate and are not scoped or authorized by this page.
+
+**Forward pointer — 2026-10-12: an offline synthetic demonstration of the checkpoint capture
+exists.** PR #741 (merge `6c83b723`, on `main` at `7fbc2335`) landed the P0-B **B2** increment:
+an offline synthetic FAST SAVE checkpoint capture in `tools/aegis_delivery_control`
+(`fast_save.py`; see the [delivery control plane
+README](../../tools/aegis_delivery_control/README.md)). It is the nearest artifact to this
+protocol's checkpoint rules and the first executable demonstration of the capture. **It does
+not enforce this protocol and does not change P12:** enforcement remains future host router
+work and is **owner-decision gated** (G4), and no runtime behavior, host router or delivery
+action exists behind this page. B3 remains unscoped and unauthorized.

@@ -260,3 +260,13 @@ and edits no register, backlog, index or instruction file. **No D-entry was mint
    L128 and the SD-C immutable-head rule is in the SD-C row at L130.
 
 **This record closes nothing and grants nothing** (2026-10-11).
+
+**Forward note — 2026-10-12: B2 has landed, B3 has not, and this record authorized neither.**
+The sentence above that keeps B2 and B3 "not scoped, planned or authorized **by this record**"
+still holds as written. **B2 landed through its own reviewed pull request, not by this record**:
+PR #741 (merge `6c83b723`, integrated into `7fbc2335`), titled "offline synthetic FAST SAVE
+checkpoint capture in aegis_delivery_control (P0-B B2)", added
+`tools/aegis_delivery_control/fast_save.py` (1,102 lines),
+`tools/aegis_delivery_control/tests/test_fast_save.py` (1,088 lines), +158/-1 lines on the tool
+README (159 changed lines) and `cli.py` changes to `main`. **B3 remains unscoped, unplanned and unauthorized.**
+This note adds a fact and changes no earlier text; it grants nothing.

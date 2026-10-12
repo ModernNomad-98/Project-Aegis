@@ -208,3 +208,11 @@ and by reading
 `tools/behavioral_eval_runner/adapters/claude_code.py`, `graders/__init__.py`
 and the [BER backlog](behavioral-eval-runner-backlog.md) work-package register.
 **Proposal only — this page grants nothing and starts nothing.**
+
+**Dated forward pointer — 2026-10-12: the owner's decision on the same subject exists.**
+This request is not withdrawn, not granted and not rewritten. The owner's decision on the
+harness execution path is recorded in
+[skill-eval-harness-execution-path-decision.md](skill-eval-harness-execution-path-decision.md)
+(PR #735, merge `5ad973a2`), which links back to this page. Read the two together; the
+decision record states its own scope and authorization effect, and **this pointer adds no
+authority and no figure**.

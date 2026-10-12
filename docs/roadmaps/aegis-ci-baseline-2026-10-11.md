@@ -447,3 +447,13 @@ hash of the revision that contains it, and this increment is constrained to one
 commit. The head SHA, the tree it resolves to, the base and the pull-request
 number are recorded in the Stage C handoff record and in the pull request; a
 later increment may add the merged pull-request number here.
+
+**Dated cross-reference — 2026-10-12: the instrument §8(b) requires now exists.** This
+page stays bound to head `5ad973a2d8ef5908021deea9861ac57bd9f72292`, and its line-number
+citations stay bound to that tree (a later head may move them). §8(b) states what a future
+optimisation claim measured against this baseline must carry; the read-only reader that
+produces the per-run and per-job durations such a claim needs now exists: **`ci-durations`**
+in `tools/aegis_delivery_control` (PR #740, merge `7fbc2335`, the current `main` head),
+documented in the tool's README. This block changes no figure on this page, adds no
+criterion, and **grants no CI change, no protected-path change, no branch-protection change
+and no merge**.

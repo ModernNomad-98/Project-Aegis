@@ -2,6 +2,21 @@
 
 ## Start here — current reading
 
+> **Newest reading — 2026-10-12, assessed through PR #741 (frozen cutoff M2).**
+> This is the current reading; the **#688 banner below is the prior frozen
+> checkpoint**, retained as dated evidence rather than as the present state.
+> The assessed cutoff is M2 = `7fbc2335ee4494ecb8ae6aaea0fe6ecdc297d9f2`, the
+> PR #740 integration at 2026-10-12 07:18:51 Coordinated Universal Time (UTC).
+> Its first parent `6c83b723` is the PR #741 integration (2026-10-12 06:03:08
+> UTC) and its second parent `2159effe` is the branch-sync merge (2026-10-12
+> 06:22:12 UTC), so "assessed through PR #741" is arithmetic, not a label of
+> convenience: the highest-numbered pull request the cutoff integrates is #741.
+> Read the
+> [cadence reassessment through PR #741](#cadence-reassessment-through-pr-741-2026-10-12)
+> for the selected and conditional outcome status of the 52 pull-request
+> integrations (#690–#741) the window carried, and the
+> [cadence measurement checkpoint](aegis-execution-metrics.md#cadence-measurement-checkpoint-through-pr-741-2026-10-12)
+> for the integration table, window arithmetic and timing limits.
 > **Newest reading — 2026-10-09, assessed through PR #688 (frozen cutoff M).**
 > This is the current reading; the **#685 banner below is the prior frozen
 > checkpoint**, retained as dated evidence rather than as the present state.
@@ -5005,3 +5020,99 @@ request participates normally in the continuing count. Throughout this section a
 PR number identifies an integration, a named WP/CP/QA outcome identifies backlog
 work, and an AEGIS-APR identifier identifies a recorded owner grant or condition
 in the [approval register](../approvals/APPROVAL_REGISTER.md).
+
+## Cadence reassessment through PR #741 (2026-10-12)
+
+This dated checkpoint gives maintainers a source-cutoff reading of the selected
+and conditional backlog. It freezes repository evidence at the assessed cutoff
+**M2 = `7fbc2335ee4494ecb8ae6aaea0fe6ecdc297d9f2`**, the PR #740 integration
+(2026-10-12 07:18:51 Coordinated Universal Time, UTC), strictly after the prior
+cutoff **M = `625fc66711eaf7b3ee788cbc2dff98f05f147c1c`**, the PR #688
+integration (2026-10-09 16:17:39 UTC). The linked [cadence measurement
+checkpoint](aegis-execution-metrics.md#cadence-measurement-checkpoint-through-pr-741-2026-10-12)
+carries the reproducible integration table, the window arithmetic and the timing
+limits behind this reading. It is a factual catch-up assessment, not a work
+grant, a selection, or a forecast of calendar delivery.
+
+**Cutoff pairing (why "through PR #741" is checkable).** `7fbc2335` is the
+**#740** integration (`git log -1 --format='%s' 7fbc2335` → "Merge pull request
+#740 from ModernNomad-98/tools/ci-durations-reader-20261011"). Its parents pair
+the cutoff with the pull request integrated through it: `6c83b723` is **#741**'s
+integration (2026-10-12 06:03:08 UTC) and `2159effe` is the branch-sync merge
+that brought #741 into the #740 branch (2026-10-12 06:22:12 UTC). The
+highest-numbered pull request integrated by the cutoff is therefore **#741**.
+
+**Cadence position.** `git rev-list --count 625fc667..7fbc2335` → **119**
+commits; `git log --merges --oneline 625fc667..7fbc2335` → **53** merges, of
+which 52 are first-parent pull-request integrations, **#690–#741**, and one is
+the branch-sync merge `2159effe`. The two residuals the #688 checkpoint carried
+(**#689**, **#688**) are carried, not reset, so the series stands at **54
+members = 10 complete five-integration windows plus 4 residuals** after M. The
+first boundary after M therefore closed at **#693**, the **third** integration
+after M: the first integrations after M in first-parent order are #690, #691,
+#693, #692 and #694, so #694 is the fifth, but the carried rule closed the
+boundary on the third — #690, #691 and #693 were the three further integrations
+it required — and #694 is a member of the next window. The next boundary needs
+**one further integration after M2**, and the pull request carrying this reading
+participates normally in that count. The missed-boundary ledger
+stays in the [measurement
+rule](aegis-execution-metrics.md#start-here--current-measurements); this reading
+does not re-derive it.
+
+**What the 52 integrations did and did not change.** Every one of the 52 is a
+documentary, skill, tool, test or continuous-integration (CI) addition. **None
+delivers, certifies or measures a selected outcome**, and no historical green-CI
+or host result is asserted here. The window records **28 decisions, D74–D101**
+(PRs #691, #694, #696–#702, #708, #715–#728, #730, #731, #738 and #739 — the
+[recorded
+decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions)),
+including the D84 readability-count switch and the D93 pull-request body
+bound-field check. The other 24 integrations are: two approval-register
+consumption records (#690 APR-099, #695 APR-119); two cadence and correction
+records (#692 control-plane docs correction, #693 forecast cadence next); eleven
+readability batch sweeps (#703–#707 and #709–#714); one follow-up cleanup
+(#729); two owner decision packets (#732 BER WP-2B-3 chain, #733 CP-WP-003/004
+packet); one delivered-status banner (#734); one owner decision (#735 skill-eval
+harness execution path); one CI baseline observation page (#736); one P0-B B1
+directive record with its companion protocol (#737); and two tool increments
+(#740 `ci-durations`, #741 P0-B B2 `fast-save`). Three kinds of window record
+speak to conditional rows and none closes a selected outcome: the **D75–D81**
+decisions this window recorded (within D74–D101 above) owner-selected, built,
+extended or closed candidates of the [unselected expansion
+proposal](unselected-expansion-skill-batch-proposal.md) — the dated
+qualification below records the disposition; the [CI baseline and bottleneck
+observations](aegis-ci-baseline-2026-10-11.md) is the declared pre-optimisation
+baseline and grants no CI change; and the [skill-eval harness execution-path
+decision](skill-eval-harness-execution-path-decision.md) authorizes no session,
+provider call or spend. The selected-outcome statuses this page carried at M
+therefore stand unchanged: measured WP-2B-3 calibration remains unfinished,
+OD-1 remains open, WP-2B-4 remains blocked, and the issue #101 Stage 4B host
+proof remains NOT RUN.
+
+**Dated qualification — the D75–D81 outcomes and the inherited conditional
+table (added 2026-10-12, Stage C2 repair round).** The [conditional
+table](#catch-up-reassessment-after-pr-685-2026-10-09) and [group
+table](#catch-up-reassessment-after-pr-685-2026-10-09) above are the pre-window
+reading, and their "Unselected; historical range only" rows are not restated
+here as the current status of every group. Within this window the recorded
+decisions **D75–D81** acted on the [unselected expansion
+proposal](unselected-expansion-skill-batch-proposal.md): D75, D76, D77 and D81
+built nine design skills from G1–G4 rows, D78 and D79 built six EXTENDs into
+existing skills, and D80 recorded nine DROP closures. Disposition: the rows
+those decisions name are **delivered** (built or extended) or **closed**
+(dropped), not conditional work, and the groups they touch — QA Tier 2, QA Tier
+3, Phase 2 and Phase 3 — are qualified as partly consumed; the rows the
+decisions did not name, and the untouched groups, stay conditional. No per-group
+residual is published: the proposal's row hours are its own unverified
+historical estimates and the DROPs and EXTENDs change row membership, so an
+exact current remaining-hours figure is **not derivable** without a new scope
+decision — the same limit the Phase 3/Phase 4 row #127 overlap already imposes
+on the 68–140-hour historical group total.
+
+**Next trigger.** The next reassessment falls due when the boundary after M2
+closes — **one further integration after M2** — and an earlier reassessment is
+owed on a material owner decision, under the retained five-merge rule in the
+[measurement rule](aegis-execution-metrics.md#start-here--current-measurements).
+Within this section a PR number identifies an integration and a `D` number
+identifies a recorded decision in the [reconciliation
+log](../reconciliation/step-0-reconciliation-v4.md).

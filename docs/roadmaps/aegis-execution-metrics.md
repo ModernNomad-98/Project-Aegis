@@ -2,6 +2,19 @@
 
 ## Start here — current measurements
 
+> **Newest measurement — 2026-10-12, assessed through PR #741 (frozen cutoff M2).**
+> This is the current measurement reading; the **#688 banner below is the prior
+> frozen checkpoint**, retained as dated evidence. The assessed cutoff is
+> M2 = `7fbc2335ee4494ecb8ae6aaea0fe6ecdc297d9f2`, the PR #740 integration at
+> 2026-10-12 07:18:51 Coordinated Universal Time (UTC). Its parents pair the
+> cutoff with the pull request it integrates: `6c83b723` is PR #741's
+> integration (2026-10-12 06:03:08 UTC) and `2159effe` is the branch-sync merge
+> (2026-10-12 06:22:12 UTC), so the highest-numbered pull request integrated by
+> the cutoff is #741. Read the
+> [cadence measurement checkpoint through PR #741](#cadence-measurement-checkpoint-through-pr-741-2026-10-12)
+> for the 52-integration table, the window arithmetic and the timing limits; the
+> [forecast reassessment](aegis-backlog-forecast.md#cadence-reassessment-through-pr-741-2026-10-12)
+> interprets the same cutoff.
 > **Newest measurement — 2026-10-09, assessed through PR #688 (frozen cutoff M).**
 > This is the current measurement reading; the **#685 banner below is the prior
 > frozen checkpoint**, retained as dated evidence. The assessed cutoff is
@@ -3377,3 +3390,106 @@ historical CI job duration sample recorded by #686 is a separate measurement and
 is not used here as active-labor calibration. This record makes no claim that
 historical exact-head checks were green, and no claim that any merged source
 change reached runtime.
+
+## Cadence measurement checkpoint through PR #741 (2026-10-12)
+
+This dated record continues the count rather than restarting it. It freezes
+repository integration history at the assessed cutoff **M2 =
+`7fbc2335ee4494ecb8ae6aaea0fe6ecdc297d9f2`**, the PR #740 integration
+(2026-10-12 07:18:51 Coordinated Universal Time, UTC), strictly after the prior
+cutoff **M = `625fc66711eaf7b3ee788cbc2dff98f05f147c1c`**, the PR #688
+integration (2026-10-09 16:17:39 UTC). The [forecast
+reassessment](aegis-backlog-forecast.md#cadence-reassessment-through-pr-741-2026-10-12)
+interprets the same cutoff; this section records the count, order and timing
+method only. The earlier [cadence measurement checkpoint through PR
+#688](#cadence-measurement-checkpoint-through-pr-688-2026-10-09) and its
+seven-member window are preserved unchanged.
+
+**Method.** `git rev-list --count 625fc667..7fbc2335` → **119** commits;
+`git log --merges --oneline 625fc667..7fbc2335` → **53** merges, of which
+`git rev-list --first-parent --reverse 625fc667..7fbc2335` returns **52**
+pull-request integrations, **#690–#741**, plus the branch-sync merge
+`2159effe`. The order below is first-parent integration order, not PR-number
+order (the two differ, for example at #692/#693). Each row's full SHA is the
+integration commit, and each maps through the GitHub API to exactly one merged
+pull request whose `merge_commit_sha` matches, as the #688 checkpoint's own
+method requires.
+
+| Order after M | PR and recorded scope cue | Integration time (UTC, committer) | Full integration SHA |
+| ---: | --- | --- | --- |
+| 1 | [#690](https://github.com/ModernNomad-98/Project-Aegis/pull/690) | 2026-10-09T17:50:25Z | `168d71c326551be126b6e40b686e53f98a744741` |
+| 2 | [#691](https://github.com/ModernNomad-98/Project-Aegis/pull/691) | 2026-10-09T19:16:22Z | `a72ca379903f21b44faa2529a5c61a3cd069a6aa` |
+| 3 | [#693](https://github.com/ModernNomad-98/Project-Aegis/pull/693) | 2026-10-09T23:16:52Z | `2cf140af5eac7c31259c635130b52d5a29bc8780` |
+| 4 | [#692](https://github.com/ModernNomad-98/Project-Aegis/pull/692) | 2026-10-09T23:19:58Z | `b5cf2803cb8166446123b1b88f3f5565f2bd7e8c` |
+| 5 | [#694](https://github.com/ModernNomad-98/Project-Aegis/pull/694) | 2026-10-10T04:05:44Z | `0878c368f89a1def0e0104f09a2b591d93e34c1b` |
+| 6 | [#695](https://github.com/ModernNomad-98/Project-Aegis/pull/695) | 2026-10-10T04:55:06Z | `48ecc4e233d86295115eca20ee4c9ac3acb56f3c` |
+| 7 | [#696](https://github.com/ModernNomad-98/Project-Aegis/pull/696) | 2026-10-10T06:04:44Z | `e6fa9bc234f526d9193fd60e8a71deceb83c3cc0` |
+| 8 | [#697](https://github.com/ModernNomad-98/Project-Aegis/pull/697) | 2026-10-10T06:48:34Z | `7c23831bffe68e6e0e61cf68743e6b311399389a` |
+| 9 | [#698](https://github.com/ModernNomad-98/Project-Aegis/pull/698) | 2026-10-10T07:24:13Z | `def384e8dad21c5cd5f62b089dd91f8ce494a25a` |
+| 10 | [#699](https://github.com/ModernNomad-98/Project-Aegis/pull/699) | 2026-10-10T07:56:42Z | `4ea70f294a564b21806070582b5f050dffa22650` |
+| 11 | [#700](https://github.com/ModernNomad-98/Project-Aegis/pull/700) | 2026-10-10T08:32:21Z | `3f271558167736c7cb46849fb3acc7bfa27f8b9c` |
+| 12 | [#701](https://github.com/ModernNomad-98/Project-Aegis/pull/701) | 2026-10-10T08:56:22Z | `e68a22fcc5b4475f15c662d644bcba62fc7daa96` |
+| 13 | [#702](https://github.com/ModernNomad-98/Project-Aegis/pull/702) | 2026-10-10T09:29:54Z | `b2c643568ac714ad5169a5be31e5430582fee1b9` |
+| 14 | [#703](https://github.com/ModernNomad-98/Project-Aegis/pull/703) | 2026-10-10T10:47:46Z | `31e5635709af5ccdcba5037e99732d426f6b2bdc` |
+| 15 | [#704](https://github.com/ModernNomad-98/Project-Aegis/pull/704) | 2026-10-10T11:19:40Z | `de56b736c25a900bcc7db7819b439376931f272d` |
+| 16 | [#705](https://github.com/ModernNomad-98/Project-Aegis/pull/705) | 2026-10-10T11:53:05Z | `58058ca95a281491f429b6129001f300bc85fabd` |
+| 17 | [#706](https://github.com/ModernNomad-98/Project-Aegis/pull/706) | 2026-10-10T12:26:17Z | `db49ca280c6ffffacc7281cdaa16a9175afaa586` |
+| 18 | [#707](https://github.com/ModernNomad-98/Project-Aegis/pull/707) | 2026-10-10T12:55:12Z | `4103d2156c1741eeb7826178a64553282fc0a954` |
+| 19 | [#708](https://github.com/ModernNomad-98/Project-Aegis/pull/708) | 2026-10-10T13:15:16Z | `fe8123a3d2786308382cc38da4517d4943ba5271` |
+| 20 | [#709](https://github.com/ModernNomad-98/Project-Aegis/pull/709) | 2026-10-10T13:44:03Z | `0b05461b31cd9962529fb973b00ca9c790dd0d63` |
+| 21 | [#710](https://github.com/ModernNomad-98/Project-Aegis/pull/710) | 2026-10-10T14:13:16Z | `e5dbfe8a05f431f470e37334cf08222b05d0b873` |
+| 22 | [#711](https://github.com/ModernNomad-98/Project-Aegis/pull/711) | 2026-10-10T14:46:08Z | `06d382bb55dae90a049cd940934d020e7b68741b` |
+| 23 | [#712](https://github.com/ModernNomad-98/Project-Aegis/pull/712) | 2026-10-10T15:22:22Z | `518b0b384675af3e702e27373f4f886e0d273891` |
+| 24 | [#713](https://github.com/ModernNomad-98/Project-Aegis/pull/713) | 2026-10-10T15:55:50Z | `2c6b6fc634d1e4e256abb5472208a3053a98ec55` |
+| 25 | [#714](https://github.com/ModernNomad-98/Project-Aegis/pull/714) | 2026-10-10T16:20:59Z | `9e91ea85dc8a3bb5f872140d9898e46b88145e89` |
+| 26 | [#715](https://github.com/ModernNomad-98/Project-Aegis/pull/715) | 2026-10-10T17:53:31Z | `6582f58a6ae6734c025235e50f4f0bc0dbcab909` |
+| 27 | [#716](https://github.com/ModernNomad-98/Project-Aegis/pull/716) | 2026-10-10T18:14:43Z | `5e6ac6b6a07a75b9d549d5925147c478947b92e6` |
+| 28 | [#717](https://github.com/ModernNomad-98/Project-Aegis/pull/717) | 2026-10-10T18:49:36Z | `d8f74d4c088b4bfc7c067e16b3f2407cbd6413b9` |
+| 29 | [#718](https://github.com/ModernNomad-98/Project-Aegis/pull/718) | 2026-10-10T19:08:12Z | `4c6a401651d0c5630a02776b0a46e3f92771891a` |
+| 30 | [#719](https://github.com/ModernNomad-98/Project-Aegis/pull/719) | 2026-10-10T19:31:40Z | `15df4efa85742a6c0c1083152ac9201662a86d45` |
+| 31 | [#720](https://github.com/ModernNomad-98/Project-Aegis/pull/720) | 2026-10-10T20:42:42Z | `3c384b2532b8e512ba879a4187df19ca3bd0b0dd` |
+| 32 | [#721](https://github.com/ModernNomad-98/Project-Aegis/pull/721) | 2026-10-11T01:33:13Z | `bd5d2ff52f063b8854b39e4f216ddbf8aff60530` |
+| 33 | [#722](https://github.com/ModernNomad-98/Project-Aegis/pull/722) | 2026-10-11T02:00:18Z | `e4be4fe78d4d09381e78047b895418022f85e7c2` |
+| 34 | [#723](https://github.com/ModernNomad-98/Project-Aegis/pull/723) | 2026-10-11T08:32:03Z | `6cc75765112abbf69e5ce3996e07e60dabbb4e0b` |
+| 35 | [#724](https://github.com/ModernNomad-98/Project-Aegis/pull/724) | 2026-10-11T11:29:17Z | `26bfc77281cb3d001cea1dbf5c5382948f80381a` |
+| 36 | [#725](https://github.com/ModernNomad-98/Project-Aegis/pull/725) | 2026-10-11T11:48:22Z | `a7a1dbf68b64a0334f2596812d8af475cc6b631a` |
+| 37 | [#726](https://github.com/ModernNomad-98/Project-Aegis/pull/726) | 2026-10-11T12:06:18Z | `89f2e2f1a391fbe95e8f9a4d4b314370fd9b1c7d` |
+| 38 | [#727](https://github.com/ModernNomad-98/Project-Aegis/pull/727) | 2026-10-11T12:24:30Z | `b3eae6d427b5493ad87d894e73e8bd84c1f8a575` |
+| 39 | [#728](https://github.com/ModernNomad-98/Project-Aegis/pull/728) | 2026-10-11T12:39:27Z | `c4fbee1d9de13d9f8c79a46d1f7470810858011a` |
+| 40 | [#729](https://github.com/ModernNomad-98/Project-Aegis/pull/729) | 2026-10-11T18:32:38Z | `ab7182d8b1577e739f13b25577b32d2da67f3509` |
+| 41 | [#730](https://github.com/ModernNomad-98/Project-Aegis/pull/730) | 2026-10-11T21:54:23Z | `279338a938168843fabebff12acd30359a0fc414` |
+| 42 | [#731](https://github.com/ModernNomad-98/Project-Aegis/pull/731) | 2026-10-11T22:44:29Z | `23208234a969c1d1675c529f2793a45fa8d1a069` |
+| 43 | [#734](https://github.com/ModernNomad-98/Project-Aegis/pull/734) | 2026-10-11T23:05:38Z | `f41a29525b36c9c0c95099e20b63289ad17710ae` |
+| 44 | [#732](https://github.com/ModernNomad-98/Project-Aegis/pull/732) | 2026-10-11T23:34:15Z | `6ea8a723ee90346f2e7203229b5103f4c25d58d2` |
+| 45 | [#733](https://github.com/ModernNomad-98/Project-Aegis/pull/733) | 2026-10-11T23:37:03Z | `b38cd2e6fe0a1503a7c0c56d1516c62da4a5981e` |
+| 46 | [#735](https://github.com/ModernNomad-98/Project-Aegis/pull/735) | 2026-10-11T23:45:45Z | `5ad973a2d8ef5908021deea9861ac57bd9f72292` |
+| 47 | [#736](https://github.com/ModernNomad-98/Project-Aegis/pull/736) | 2026-10-12T00:51:51Z | `95480f67733a2ce90347c0f5a68c72a7d4e827a7` |
+| 48 | [#737](https://github.com/ModernNomad-98/Project-Aegis/pull/737) | 2026-10-12T01:04:10Z | `5a9adea0f2dce00c8ffe4be959ffb7e4a91ad566` |
+| 49 | [#738](https://github.com/ModernNomad-98/Project-Aegis/pull/738) | 2026-10-12T02:06:39Z | `09a5d2b3c9a3e9e3cff307d94b6f241600e0dc2d` |
+| 50 | [#739](https://github.com/ModernNomad-98/Project-Aegis/pull/739) | 2026-10-12T03:11:27Z | `4d5ccb0b38369812bef198b7083d113d559ad387` |
+| 51 | [#741](https://github.com/ModernNomad-98/Project-Aegis/pull/741) | 2026-10-12T06:03:08Z | `6c83b723dd1d540f0c2b3237a5570ab5afc5bdba` |
+| 52 | [#740](https://github.com/ModernNomad-98/Project-Aegis/pull/740) | 2026-10-12T07:18:51Z | `7fbc2335ee4494ecb8ae6aaea0fe6ecdc297d9f2` |
+
+**Window arithmetic.** The two residuals of the preceding checkpoint (**#689**
+and **#688**) are carried, not reset: with these 52 integrations the continuing
+series has **54 members = 10 complete five-integration windows plus 4
+residuals**. Under the carried rule the first boundary after M closed at
+**#693**, the **third** integration after M — #690, #691 and #693 were the three
+the rule required — so the ten boundary-closing members are #693, #697, #702,
+#707, #712, #717, #722, #727, #734 and #737, and the four residuals are #738,
+#739, #741 and #740. Nothing resets at M2, so the next boundary needs **one
+further integration after M2**, and every later integration counts, including
+the pull request that carries this checkpoint. The missed-boundary ledger
+recorded through #684 is not re-derived here.
+
+**Timing provenance and limits.** The times above are the integration commits'
+committer timestamps in UTC; GitHub merge events can differ from them by a
+second, and for the two cutoffs the API merge events are 2026-10-09 16:17:39 UTC
+(M) and 2026-10-12 07:18:51 UTC (M2). The M-to-M2 endpoint span is **63 hours 1
+minute 12 seconds of wall time** and includes concurrent authoring, review,
+continuous integration (CI), owner decisions and idle intervals. Integration
+spacing is not active labor, coding throughput or runtime proof, and no
+comparable active-work, review, CI or owner-wait split for this window is
+established: **those splits are unavailable, not zero.** This record makes no
+claim that historical exact-head checks were green, and no claim that any merged
+source change reached runtime.

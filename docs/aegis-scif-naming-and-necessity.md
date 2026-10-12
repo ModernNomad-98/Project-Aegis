@@ -267,3 +267,19 @@ The class split is a classification of those 142 lines, not a second grep: the
 and the remaining 29 are class (d). At this PR's head the same greps return
 **1** old-name line — the deliberate alias quotation at 1.4 — and the class
 (c)/(d) figures are unchanged, because this PR edits none of those lines.
+
+**Dated re-derivation — 2026-10-12: the closing sentence above was already false at the head it names.**
+The part-4 commands were re-run at three refs on 2026-10-12. At base `09a5d2b3` they reproduce the
+base measurement exactly — `factory` **142 matching lines over 44 files**, class (c) **113**, the
+old-name grep **0** and `aegis scif` **0**. At **this page's own PR #739 head `4d5ccb0b`** they
+already return **187 lines over 45 files, class (c) 118, old-name 3 and `aegis scif` 16**, and
+`7fbc2335` returns the **same five figures** (187 / 45 files / 118 / 3 / 16). The whole delta is this
+page's own inventory text: a per-file comparison of the `factory` count between the base and the head
+returns exactly **one** differing file — `docs/aegis-scif-naming-and-necessity.md` itself (absent at
+the base tree, 45 lines at the head; class (c) 5, and 113 + 5 = 118) — and **zero** common files
+changed their count, so no product or code file contributed a `factory` line. The closing sentence is
+therefore **already 3 at this PR's head**, not "0 → 3 since". It is left as written, because records
+are corrected forward and never rewritten; this note is its correction. Commands, each at all three
+refs: `git grep -i -c factory`, `git grep -i -E
+'row_factory|default_factory|factory=CheckedSQLiteConnection|test_client_factory_configuration'`,
+`git grep -i -E 'aegis[ _-]factory|factory[ _-]framework'` and `git grep -i 'aegis scif'`.

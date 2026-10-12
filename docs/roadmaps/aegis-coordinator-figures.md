@@ -21,6 +21,8 @@ measured, historical pre-CIFIX job-duration window after #676. Neither window
 is an accepted current post-CIFIX baseline or a new alert rule. Post-CIFIX
 performance is **NOT SAMPLED** here.
 
+**Routing note, 2026-10-12 — the instruments this status needs, and both `NOT SAMPLED` sites.** Both `NOT SAMPLED` sites on this page (the 2026-10-08 status block above and §3.5) are routed to the two artifacts that own the next measurement. The **CI baseline and bottleneck observation page** ([aegis-ci-baseline-2026-10-11.md](aegis-ci-baseline-2026-10-11.md), PR #736, merge `95480f67`) records the declared pre-optimisation baseline and the §8(b) criteria any optimisation claim measured against it must carry; the **read-only CI-run duration reader** `ci-durations` (PR #740, merge `7fbc2335`) is the instrument that produces the per-run and per-job durations such a claim needs. **The status itself does not change: nothing has been sampled, so post-CIFIX performance remains NOT SAMPLED here.** This note adds a route and no figure.
+
 ---
 
 ## 1. Why this page exists
