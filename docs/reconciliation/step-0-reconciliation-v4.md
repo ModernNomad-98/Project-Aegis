@@ -4563,6 +4563,41 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
   it grants no new execution, publication or merge authority. D97 and
   earlier entries are byte-untouched.
 
+- **D100 (2026-10-11) — SCIF PR-1 #729 close-out corrections record.** The
+  owner's SCIF queue item (received ~17:00 PT) outcome (1): correct the
+  #723/#729 close-out record forward. The dated record
+  `docs/evidence/scif/scif-closeout-corrections-2026-10-11.md` is ADDED (new
+  page), with the evidence index row and this entry as its only other
+  touches; `docs/approvals/APPROVAL_REGISTER.md` is byte-untouched. The four
+  correction blocks and their verdicts: (a) **MG3 at merge time for #729 —
+  NOT MET AT MERGE TIME** — against the rule in force at `c4fbee1d`, neither
+  branch existed for the merged head `f356157c`: exactly one review object
+  (`5484238846`, `chatgpt-codex-connector[bot]`, 17:30:06Z) names the
+  superseded head `8959fd260d`, and no comment carries a Codex result or an
+  unavailability notice for `f356157c`; the recorded `MG3 EXACT-HEAD
+  PRECEDENT` is cited as a record, never as a waiver, and the triage trail is
+  recorded as real without creating satisfaction. (b) **the #729 gate-guard
+  authority — NOT ESTABLISHED FROM ACCESSIBLE EVIDENCE** — APR-047's four
+  eligible paths exclude #729's two changed files, its Scope FORBIDDEN makes
+  such a PR ineligible as a whole, no register or reconciliation entry names
+  #729, and APR-100's Scope FORBIDDEN does not waive a protected gate-guard;
+  the only accessible authority record is the PR #729 body's verbatim owner
+  instruction, whose provenance APR-100 ANNOT-Q3-005 records. (c)
+  **HANDOFF-CORRECTION.md dated addenda** — `6104148527`, `6104196189` and
+  `6104213124` belong to PR #721 (that lane's SD-D/SD-E/SD-F verdicts), the
+  four correct #723 IDs are `6107054131`, `6107118947`, `6107142849` and
+  `6107164055`, publisher identity (one account, `ModernNomad-98`) is not
+  distinct agent identity, and the 36 (local module), 620 (CI
+  tools-tests-linux at #723's head) and 1107 (#729 post-merge BER suite)
+  counts are separated by scope. (d) The 36 merged PRs #694..#729 are a
+  merge count, not an all-gates-audited claim. The verification base is
+  `5a9adea0f2dce00c8ffe4be959ffb7e4a91ad566`; inputs `SCIF-recon.md`
+  (above-footer `a3c8a53f…`) and `HANDOFF-CORRECTION.md` (whole-file
+  `f508eb4c…`). The D-number was re-derived immediately before this append:
+  D99 was the last recorded entry and no D100 existed. This entry records
+  the corrections; it grants no new execution, publication or merge
+  authority. D99 and earlier entries are byte-untouched.
+
 ## 6. Post-merge corrections
 
 - **2026-10-08 — D73 clarified: per-kind rejection checks and a fourth open
