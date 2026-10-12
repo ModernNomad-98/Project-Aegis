@@ -1,6 +1,6 @@
 # Project Aegis evidence: where to read next
 
-This index helps maintainers and reviewing agents find **15 selected decision
+This index helps maintainers and reviewing agents find **16 selected decision
 and delivery evidence pages**. These pages record what was checked or decided
 at a particular time. They are not a current work queue, approval grant, or
 instruction to repeat an old run. For current authority and status, read the
@@ -42,7 +42,8 @@ to the dated record that reports them.
 | Which synthetic control-plane capability failures were tested | [CP-WP-003A review](control-plane/cp-wp-003a-review.md) | PR #123 delivered the offline proof; real CP-WP-003 remains BLOCKED. |
 | What issue #101 package 2 delivered | [Package 2 review](setup/issue-101-package-2-review.md) | Windows-tested Aegis-only saved choice shipped; no helper or provider connection. |
 | What issue #101 package 3 delivered | [Package 3 review](setup/issue-101-package-3-review.md) | Offline advisory contract shipped; a host hook and actual fallback remain future work. |
+| What the #723/#729 close-out record got wrong, corrected forward | [SCIF close-out corrections](scif/scif-closeout-corrections-2026-10-11.md) | Dated corrections only; the approval register is untouched and no authority is created. |
 
 Other dated records are reachable from the owning backlogs and the
 [documentation index](../README.md). Do not infer that an unlisted evidence
-page has been reviewed or that these 15 pages cover the full repository.
+page has been reviewed or that these 16 pages cover the full repository.
