@@ -283,3 +283,25 @@ are corrected forward and never rewritten; this note is its correction. Commands
 refs: `git grep -i -c factory`, `git grep -i -E
 'row_factory|default_factory|factory=CheckedSQLiteConnection|test_client_factory_configuration'`,
 `git grep -i -E 'aegis[ _-]factory|factory[ _-]framework'` and `git grep -i 'aegis scif'`.
+
+**Dated addendum — 2026-10-12: the PR body's witness count 33 / 46 is a
+matching-line count, and it reproduces.** Re-read at base `09a5d2b3` and at
+`d6d186c8` (**PR #739 head**; merged as `4d5ccb0b` — the page's own L274 note
+names the merge, and the two commits carry the same tree `2e35f9a7…`):
+`git grep -c -E 'MG[1-5]' -- docs/delivery-workflow.md` → **33** matching
+lines; `git grep -c -E 'SD-[A-G]' -- docs/delivery-workflow.md` → **46**
+matching lines. The figures the Stage F review could not reproduce — 42 and 66
+— are the **occurrence** counts of the same patterns in the same file:
+`git grep -o -E …` → 42 and 66. Two methods, one file, no contradiction; the
+method is named here because the figure is (PROC-04). R5's own parenthetical
+"grep -n line counts 74 / 136" is the same **matching-line** method over the
+**whole tree** at that head: `git grep -c -E 'MG[1-5]'` sums to **74** lines
+and `git grep -c -E 'SD-[A-G]'` to **136** (whole-tree occurrences 91 / 168).
+All four published numbers are therefore one method at three scopes — 33 / 46
+in this file, 74 / 136 in the tree, 42 / 66 occurrences in this file — and
+none is contradicted. The counts are identical at the base and the head, which
+is the witness's substantive claim (no `MG` or `SD` token was added or
+edited). They are revision-bound: at `ad1e40fc` the same four commands return
+34 / 44 and 48 / 68. For completeness of the part-4 correction above, at that
+head the `factory` class (d) figure is **69** (= 187 − 118), beside class (c)
+118 and the base 29.

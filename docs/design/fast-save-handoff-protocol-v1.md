@@ -301,3 +301,37 @@ protocol's checkpoint rules and the first executable demonstration of the captur
 not enforce this protocol and does not change P12:** enforcement remains future host router
 work and is **owner-decision gated** (G4), and no runtime behavior, host router or delivery
 action exists behind this page. B3 remains unscoped and unauthorized.
+
+## P13. Carried plan-wording items from the B2 increment — recorded, not corrected (2026-10-12)
+
+The P0-B FAST SAVE increment B2 (PR #741) closed at H2 with six plan-wording
+items **recorded, not corrected**: four behaviours the B2 plan sanctions or
+leaves silent, one sharper-than-plan sentence, and one schema gap. They are
+repeated here so the record is durable outside the review comment, and so a
+reader of this protocol does not mistake them for open defects.
+
+1. D1's §4.3 step-2 origin (the token-scan sentence is sharper than the plan's wording).
+2. The §4.2 idle row's phase list and its excluded tail.
+3. D6a — a same-format predecessor carrying a higher checkpoint_version is
+   overwritten and its reference downgraded (Codex 4244702834).
+4. D6b — a mismatched post-replace confirmation still reports SAVED
+   (Codex 4244702836).
+5. D7 — the FAILED result carries no previous-checkpoint reference, no durable
+   location and no resume line (Codex 4244702832).
+6. The pause-incomplete reason is required on load but is absent from the
+   checkpoint key set (Codex 4244702830).
+
+**No code change is expected or made for any of the six, and nothing here
+changes the schema.** At `ad1e40fc` the written checkpoint's key set is
+`REQUIRED_CHECKPOINT_KEYS` in `tools/aegis_delivery_control/fast_save.py`
+(48 keys) and it carries no pause-reason key, while the state document's
+`STATE_KEYS` does require `pause_incomplete_reason`. Items 3–6 are
+behaviour-level; changing any of them is a schema or behaviour revision, not a
+documentation repair, and is **not authorized by this page** (P12).
+
+**Owner question (P10 style, item 6).** Should the pause-incomplete reason
+become a checkpoint field — a 49-key schema revision — or does the load-time
+requirement stand alone? Either answer is a separate, separately reviewed
+change. The six items' full record is P0B-B2-FINAL-REVIEW-F.md §3 (the four
+reproduced behaviours), §4 (the Codex triage) and the SD-C2 comment section
+"D4 / D6 / D7 plan-wording note".
