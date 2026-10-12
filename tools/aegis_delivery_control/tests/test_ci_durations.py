@@ -32,7 +32,15 @@ row). The F-r4-1 tests build their own fake-response/fake-opener double
 `os.environ["V"] = "a\0b"` and `mock.patch.dict(os.environ, ...)` both
 raise `ValueError: embedded null character`), so the assertion survives the
 tools-tests-windows job.
+
+`TokenHeaderRefusalTests` and `ArtifactCellTests` also carry the SD-C2 repair
+round: SD-D-2 (Codex P2 #1) asserts AC2's published threshold on the
+`URLError`/`OSError` branch too - `__cause__ is None` and no token in
+`traceback.format_exception` - and SD-D-3 (Codex P2 #2) asserts that a record
+reporting a NONEMPTY inventory whose names were attributed to no row reads the
+distinct `unmapped_inventory` state, never the `none_uploaded` absence claim.
 """
+
 
 from __future__ import annotations
 
@@ -624,6 +632,12 @@ def reported_upload(run_id=RUN_ID):
             "expired": False}
 
 
+def unmapped_upload():
+    """A nonempty inventory entry whose stem is not in ARTIFACT_JOB_MAP."""
+    return {"id": 9, "name": "mystery-bundle-1-1", "size_in_bytes": 1,
+            "expires_at": UPLOAD_EXPIRES, "expired": False}
+
+
 def jobs_reporting(reported):
     """`green_jobs()` where only the named records carry an `artifacts` key.
 
@@ -815,6 +829,34 @@ class TokenHeaderRefusalTests(unittest.TestCase):
         self.assertNotIn(TOKEN_SENTINEL, printed)
         self.assertNotIn("Invalid header value", printed)
 
+    def test_sd_d2_urlerror_and_oserror_causes_are_suppressed_and_token_free(
+            self):
+        # SD-D-2 (Codex P2 #1): redacting the new message is not enough while
+        # `from error` keeps the raw cause - traceback.format_exception prints
+        # the cause line verbatim, token included. AC2's published threshold
+        # (`__cause__ is None` plus "no token in traceback.format_exception")
+        # carries no branch qualifier, so it must hold here exactly as it does
+        # for the ValueError leg.
+        token = "ghp_" + TOKEN_SENTINEL
+        for error in (urllib.error.URLError("boom %s leaked" % token),
+                      OSError("boom %s leaked" % token)):
+            with self.subTest(error=type(error).__name__):
+                transport = ci_durations.HttpTransport(token)
+                with mock.patch.object(transport, "_opener",
+                                       _FakeOpener(raises=error)):
+                    with self.assertRaises(
+                            ci_durations.TransportFailure) as caught:
+                        transport.fetch(self.URL)
+                text = str(caught.exception)
+                self.assertNotIn(TOKEN_SENTINEL, text)
+                self.assertNotIn(token, text)
+                self.assertIn(ci_durations.TOKEN_REDACTED, text)
+                self.assertIsNone(caught.exception.__cause__)
+                printed = "".join(
+                    traceback.format_exception(caught.exception))
+                self.assertNotIn(TOKEN_SENTINEL, printed)
+                self.assertNotIn(token, printed)
+
     def test_fr41_decode_failure_is_not_reported_as_a_rejected_request_value(
             self):
         # B4: UnicodeDecodeError is a ValueError subclass and the body read
@@ -910,18 +952,63 @@ class ArtifactCellTests(unittest.TestCase):
                 self.assertEqual(rows[name]["artifact"], "not_recorded")
 
     def test_fr42_unmapped_artifact_name_is_never_attributed(self):
-        mystery = {"id": 9, "name": "mystery-bundle-1-1",
-                   "size_in_bytes": 1, "expires_at": UPLOAD_EXPIRES,
-                   "expired": False}
+        mystery = unmapped_upload()
         _, evidence = evidence_of(
             jobs=jobs_reporting({"validate-skills": [mystery]}))
         for row in evidence["jobs"]:
             self.assertNotIn("mystery-bundle-1-1", row["artifact"])
-        # The record DID report an inventory, so its own row is an observed
-        # absence - and a payload name never reaches the --artifact-dir
-        # surface, which only a filesystem scan feeds.
-        self.assertEqual(rows_of(evidence)["validate-skills"]["artifact"],
-                         "none_uploaded")
+        # SD-D-3: the record DID report a NONEMPTY inventory and no name of it
+        # was attributed to any row, so its own row may not claim an observed
+        # absence - it reads the distinct unmapped state, never none_uploaded.
+        # A payload name never reaches the --artifact-dir surface either,
+        # which only a filesystem scan feeds.
+        cell = rows_of(evidence)["validate-skills"]["artifact"]
+        self.assertEqual(cell, ci_durations.UNMAPPED_INVENTORY)
+        self.assertNotEqual(cell, ci_durations.NONE_UPLOADED)
+        self.assertEqual(evidence["prerequisites"]["artifact_unmapped"], [])
+
+    def test_sd_d3_nonempty_unmapped_inventory_is_not_an_absence_claim(self):
+        # Codex P2 #2 / SD-D-3: the reporting record's own row must not render
+        # the false absence, and the five silent records stay silent.
+        _, evidence = evidence_of(jobs=jobs_reporting(
+            {"validate-skills": [unmapped_upload()]}))
+        rows = rows_of(evidence)
+        self.assertEqual(rows["validate-skills"]["artifact"],
+                         ci_durations.UNMAPPED_INVENTORY)
+        for name in self.OTHERS:
+            self.assertEqual(rows[name]["artifact"],
+                             ci_durations.NOT_RECORDED)
+
+    def test_sd_d3_empty_and_unmapped_inventories_are_told_apart(self):
+        # One payload, two reporting records: a reported EMPTY inventory is an
+        # observed absence, a nonempty unattributed one is not. A
+        # payload-global flag cannot pass this test.
+        _, evidence = evidence_of(jobs=jobs_reporting(
+            {"changes": [], "validate-skills": [unmapped_upload()]}))
+        rows = rows_of(evidence)
+        self.assertEqual(rows["changes"]["artifact"],
+                         ci_durations.NONE_UPLOADED)
+        self.assertEqual(rows["validate-skills"]["artifact"],
+                         ci_durations.UNMAPPED_INVENTORY)
+        for name in ("gate-guard", "windows-offline-checks",
+                     "tools-tests-linux", "tools-tests-windows"):
+            self.assertEqual(rows[name]["artifact"],
+                             ci_durations.NOT_RECORDED)
+
+    def test_sd_d3_inventory_attributed_elsewhere_is_not_this_rows_absence(
+            self):
+        # OBS-2's shape: the `changes` record reports an upload that the D17
+        # prefix rule attributes to `validate-skills`. The upload is still
+        # attributed to exactly one row, and `changes` - which reported a
+        # nonempty inventory - does not claim an absence of its own.
+        upload = reported_upload()
+        _, evidence = evidence_of(jobs=jobs_reporting({"changes": [upload]}))
+        rows = rows_of(evidence)
+        self.assertIn(upload["name"], rows["validate-skills"]["artifact"])
+        self.assertEqual(rows["changes"]["artifact"],
+                         ci_durations.UNMAPPED_INVENTORY)
+        self.assertNotEqual(rows["changes"]["artifact"],
+                            ci_durations.NONE_UPLOADED)
         self.assertEqual(evidence["prerequisites"]["artifact_unmapped"], [])
 
     def test_fr42_missing_roster_job_artifact_is_not_recorded(self):
@@ -939,10 +1026,13 @@ class ArtifactCellTests(unittest.TestCase):
         _, empty = evidence_of(
             jobs=[dict(entry, artifacts=[]) for entry in green_jobs()])
         _, silent = evidence_of(jobs=green_jobs())
+        _, unmapped = evidence_of(jobs=jobs_reporting(
+            {"validate-skills": [unmapped_upload()]}))
         values = {rows_of(mapped)["validate-skills"]["artifact"],
                   rows_of(empty)["validate-skills"]["artifact"],
-                  rows_of(silent)["validate-skills"]["artifact"]}
-        self.assertEqual(len(values), 3)
+                  rows_of(silent)["validate-skills"]["artifact"],
+                  rows_of(unmapped)["validate-skills"]["artifact"]}
+        self.assertEqual(len(values), 4)
 
 
 class EscapingTests(unittest.TestCase):
