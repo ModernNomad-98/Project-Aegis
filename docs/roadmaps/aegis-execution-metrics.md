@@ -3470,12 +3470,17 @@ method requires.
 | 51 | [#741](https://github.com/ModernNomad-98/Project-Aegis/pull/741) | 2026-10-12T06:03:08Z | `6c83b723dd1d540f0c2b3237a5570ab5afc5bdba` |
 | 52 | [#740](https://github.com/ModernNomad-98/Project-Aegis/pull/740) | 2026-10-12T07:18:51Z | `7fbc2335ee4494ecb8ae6aaea0fe6ecdc297d9f2` |
 
-**Window arithmetic.** 52 integrations is **10 complete five-integration
-windows plus 2 residuals**. The first boundary after M closed at #694, the fifth
-integration after M (first-parent order); nothing resets at M2, so the next
-boundary needs **three further integrations after M2**, and every later
-integration counts, including the pull request that carries this checkpoint.
-The missed-boundary ledger recorded through #684 is not re-derived here.
+**Window arithmetic.** The two residuals of the preceding checkpoint (**#689**
+and **#688**) are carried, not reset: with these 52 integrations the continuing
+series has **54 members = 10 complete five-integration windows plus 4
+residuals**. Under the carried rule the first boundary after M closed at
+**#693**, the **third** integration after M — #690, #691 and #693 were the three
+the rule required — so the ten boundary-closing members are #693, #697, #702,
+#707, #712, #717, #722, #727, #734 and #737, and the four residuals are #738,
+#739, #741 and #740. Nothing resets at M2, so the next boundary needs **one
+further integration after M2**, and every later integration counts, including
+the pull request that carries this checkpoint. The missed-boundary ledger
+recorded through #684 is not re-derived here.
 
 **Timing provenance and limits.** The times above are the integration commits'
 committer timestamps in UTC; GitHub merge events can differ from them by a

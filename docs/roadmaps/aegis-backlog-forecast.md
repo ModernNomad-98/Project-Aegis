@@ -5045,12 +5045,16 @@ highest-numbered pull request integrated by the cutoff is therefore **#741**.
 **Cadence position.** `git rev-list --count 625fc667..7fbc2335` → **119**
 commits; `git log --merges --oneline 625fc667..7fbc2335` → **53** merges, of
 which 52 are first-parent pull-request integrations, **#690–#741**, and one is
-the branch-sync merge `2159effe`. The five-merge cadence therefore stands at
-**10 complete five-integration windows plus 2 residuals** after M; the next
-boundary needs **three further integrations after M2**, and the pull request
-carrying this reading participates normally in that count. The first five
-integrations after M, in first-parent order, are #690, #691, #693, #692 and
-#694, so the first boundary after M closed at #694. The missed-boundary ledger
+the branch-sync merge `2159effe`. The two residuals the #688 checkpoint carried
+(**#689**, **#688**) are carried, not reset, so the series stands at **54
+members = 10 complete five-integration windows plus 4 residuals** after M. The
+first boundary after M therefore closed at **#693**, the **third** integration
+after M: the first integrations after M in first-parent order are #690, #691,
+#693, #692 and #694, so #694 is the fifth, but the carried rule closed the
+boundary on the third — #690, #691 and #693 were the three further integrations
+it required — and #694 is a member of the next window. The next boundary needs
+**one further integration after M2**, and the pull request carrying this reading
+participates normally in that count. The missed-boundary ledger
 stays in the [measurement
 rule](aegis-execution-metrics.md#start-here--current-measurements); this reading
 does not re-derive it.
@@ -5071,18 +5075,42 @@ readability batch sweeps (#703–#707 and #709–#714); one follow-up cleanup
 packet); one delivered-status banner (#734); one owner decision (#735 skill-eval
 harness execution path); one CI baseline observation page (#736); one P0-B B1
 directive record with its companion protocol (#737); and two tool increments
-(#740 `ci-durations`, #741 P0-B B2 `fast-save`). Two window artifacts speak to
-conditional rows and neither closes one: the [CI baseline and bottleneck
+(#740 `ci-durations`, #741 P0-B B2 `fast-save`). Three kinds of window record
+speak to conditional rows and none closes a selected outcome: the **D75–D81**
+decisions this window recorded (within D74–D101 above) owner-selected, built,
+extended or closed candidates of the [unselected expansion
+proposal](unselected-expansion-skill-batch-proposal.md) — the dated
+qualification below records the disposition; the [CI baseline and bottleneck
 observations](aegis-ci-baseline-2026-10-11.md) is the declared pre-optimisation
-baseline and grants no CI change, and the [skill-eval harness execution-path
+baseline and grants no CI change; and the [skill-eval harness execution-path
 decision](skill-eval-harness-execution-path-decision.md) authorizes no session,
 provider call or spend. The selected-outcome statuses this page carried at M
 therefore stand unchanged: measured WP-2B-3 calibration remains unfinished,
 OD-1 remains open, WP-2B-4 remains blocked, and the issue #101 Stage 4B host
 proof remains NOT RUN.
 
+**Dated qualification — the D75–D81 outcomes and the inherited conditional
+table (added 2026-10-12, Stage C2 repair round).** The [conditional
+table](#catch-up-reassessment-after-pr-685-2026-10-09) and [group
+table](#catch-up-reassessment-after-pr-685-2026-10-09) above are the pre-window
+reading, and their "Unselected; historical range only" rows are not restated
+here as the current status of every group. Within this window the recorded
+decisions **D75–D81** acted on the [unselected expansion
+proposal](unselected-expansion-skill-batch-proposal.md): D75, D76, D77 and D81
+built nine design skills from G1–G4 rows, D78 and D79 built six EXTENDs into
+existing skills, and D80 recorded nine DROP closures. Disposition: the rows
+those decisions name are **delivered** (built or extended) or **closed**
+(dropped), not conditional work, and the groups they touch — QA Tier 2, QA Tier
+3, Phase 2 and Phase 3 — are qualified as partly consumed; the rows the
+decisions did not name, and the untouched groups, stay conditional. No per-group
+residual is published: the proposal's row hours are its own unverified
+historical estimates and the DROPs and EXTENDs change row membership, so an
+exact current remaining-hours figure is **not derivable** without a new scope
+decision — the same limit the Phase 3/Phase 4 row #127 overlap already imposes
+on the 68–140-hour historical group total.
+
 **Next trigger.** The next reassessment falls due when the boundary after M2
-closes — three further integrations after M2 — and an earlier reassessment is
+closes — **one further integration after M2** — and an earlier reassessment is
 owed on a material owner decision, under the retained five-merge rule in the
 [measurement rule](aegis-execution-metrics.md#start-here--current-measurements).
 Within this section a PR number identifies an integration and a `D` number

@@ -267,6 +267,6 @@ still holds as written. **B2 landed through its own reviewed pull request, not b
 PR #741 (merge `6c83b723`, integrated into `7fbc2335`), titled "offline synthetic FAST SAVE
 checkpoint capture in aegis_delivery_control (P0-B B2)", added
 `tools/aegis_delivery_control/fast_save.py` (1,102 lines),
-`tools/aegis_delivery_control/tests/test_fast_save.py` (1,088 lines), +159 lines on the tool
-README and `cli.py` changes to `main`. **B3 remains unscoped, unplanned and unauthorized.**
+`tools/aegis_delivery_control/tests/test_fast_save.py` (1,088 lines), +158/-1 lines on the tool
+README (159 changed lines) and `cli.py` changes to `main`. **B3 remains unscoped, unplanned and unauthorized.**
 This note adds a fact and changes no earlier text; it grants nothing.
