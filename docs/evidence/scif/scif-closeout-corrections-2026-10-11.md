@@ -5,6 +5,10 @@ original claim or record, the primary evidence, and the correction. The earlier
 texts stay byte-identical, so a reader can see both the original and the
 correction.*
 
+*Exception, dated 2026-10-12: §1's and §5's command sites are the sanctioned
+in-place fix (plan §2.3 item 3a, F6); all else here stays byte-identical, and §6
+quotes the original.*
+
 - **What this page corrects.** Three close-out records are corrected forward:
   (1) the MG3 status of PR #729 at its merge time; (2) the authority status of
   PR #729's failed `gate-guard` check; (3) the citation and identity claims of

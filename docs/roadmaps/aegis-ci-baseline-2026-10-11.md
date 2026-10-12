@@ -198,13 +198,24 @@ push run):
 **Footnote, 2026-10-12 — the skipped-window sentence above is over-general.**
 A skipped job's timestamp window is not always inverted. The measured set over
 the live payloads the A2 audit read is **{−1 s, 0 s, absent}** — skipped
-windows of both signs and of zero — and a 0-second window would render as an
-executed job with a duration of 0 s if state were derived from the window. The
-rule that follows is **conclusion-first**: `conclusion=skipped` means
-skipped with no duration, whatever the window says; the window is used only for
-executed jobs. The `gate-guard` instance above stays true and no figure in
-the table changes. Recorded as the page-level follow-up required by
+windows of negative, zero, or absent duration — and a 0-second window would
+render as an executed job with a duration of 0 s if state were derived from the
+window. The rule that follows is **conclusion-first**: `conclusion=skipped`
+means skipped with no duration, whatever the window says; the window is used
+only for executed jobs. The `gate-guard` instance above stays true and no
+figure in the table changes. Recorded as the page-level follow-up required by
 `P0A-A2-AUDIT-B-rev2.md` R3.
+
+**Correction to this footnote, 2026-10-12 (Stage C2 repair; Codex finding
+`4252843353`, Stage D item F-A).** The footnote first read "skipped windows of
+both signs and of zero". That clause was false: the set stated above holds a
+negative window, a zero window and an absent window, and **no positive
+window**. The sentence now reads "skipped windows of negative, zero, or absent
+duration", which is the contract the reader already carries —
+`tools/aegis_delivery_control/ci_durations.py` L11-14: "A skipped job carries
+`not_applicable` whatever its window looks like (-1 s, 0 s, null or absent)."
+The conclusion-first rule, the `gate-guard` instance and every figure above are
+unchanged.
 
 | Run ID | Event | Head | `changes` | `validate-skills` | `gate-guard` | `windows-offline-checks` | `tools-tests-linux` | `tools-tests-windows` |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
