@@ -5526,3 +5526,37 @@ the entry governs.
 - **Expiry / use limit:** the owner revisits it on 2026-11-11 (30 days) and
   reaffirms, amends or withdraws it then. The policy stands until superseded by a
   later recorded owner decision.
+
+### AEGIS-APR-130: Consumption of the AEGIS-APR-128 BER Stage A host-probe grant
+
+- **Event:** CONSUMED; target grant AEGIS-APR-128.
+- **Status at recording:** AEGIS-APR-128 has no remaining use. Its one named
+  offline Stage A host probe ran, and the single re-run D90 authorized
+  completed its receipts too, so the grant's one-use limit is spent. This
+  entry supplies the consumption record the register was missing; it is not a
+  new grant and it does not recertify the probe.
+- **Effective at:** 2026-10-11, when the D90-authorized re-run completed its
+  receipts.
+- **Recorded at / By:** 2026-10-12 / Stage C agent
+  `ber-host-ladder-implementer-c`.
+- **New authority:** None. This event records an executed host phase and grants
+  nothing. No third host-phase run, no BER Stage B run class and no
+  model-driven session is covered by AEGIS-APR-128 or by this event.
+- **Reason:** AEGIS-APR-128's use limit is "One named offline Stage A host
+  probe on the WSL2 distro; consumed when the host phase completes its
+  receipts" (L5487–L5489). The host phase completed its receipts: run 1
+  finished with `test_posix_parent_swap_fails_closed` SKIPPED on the genuine
+  POSIX host and is dispositioned NON_BASELINE — not a partial pass; the
+  re-run authorized by D90 ran all five required POSIX IDs with no skip and is
+  dispositioned a Stage A capability observation for the executed subset. The
+  consumption is recorded after the fact, as AEGIS-APR-122 and AEGIS-APR-124
+  record their own consumption events.
+- **Evidence:** the two run dispositions in the lane's evidence tree outside
+  Git — `STAGE-A-PROBE-DISPOSITION.md` (run 1) and
+  `STAGE-A-PROBE-RERUN-DISPOSITION.md` (the D90-authorized re-run) — with the
+  pinned source archives `d4c36739…` and `ec7ef949…` and the same 60-minute
+  ceiling recorded in both `probe-results.json` files. The receipts and the
+  archives live outside Git, so those hashes are not verifiable from a clone;
+  this is the publication gap the receipts themselves state, not a claim of
+  publication. AEGIS-APR-128's entry text is byte-untouched (immutability,
+  preamble L8–L12).
