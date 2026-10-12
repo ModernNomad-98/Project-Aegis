@@ -21,6 +21,17 @@ workflow's own per-event allowed-skip set is enforced, so a skipped
 `windows-offline-checks` job on an event that should run it is INCOMPLETE
 with the job named, while the lawful `gate-guard` skip on a push and the
 three advisory skips on a pull request stay COMPLETE.
+
+`TokenHeaderRefusalTests` and `ArtifactCellTests` close the two MINOR
+findings the #740 final review r4 carried into this follow-up round: F-r4-1
+(a malformed `--token-env` value escaped as a traceback that quoted the raw
+token, exit 1) and F-r4-2 (the artifact cell read `none_uploaded` on every
+row). The F-r4-1 tests build their own fake-response/fake-opener double
+(A2: the F7 tests patch nothing) and keep the NUL leg off the environment
+(B1: an embedded NUL cannot be stored in a Windows environment variable -
+`os.environ["V"] = "a\0b"` and `mock.patch.dict(os.environ, ...)` both
+raise `ValueError: embedded null character`), so the assertion survives the
+tools-tests-windows job.
 """
 
 from __future__ import annotations
@@ -28,10 +39,12 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import socket
 import sys
 import tempfile
+import traceback
 import unittest
 from unittest import mock
 import urllib.request
@@ -48,6 +61,8 @@ A1_RUN_ID = "38184781825"
 NOW = "2026-10-12T04:00:00Z"
 API = ("https://api.github.com/repos/ModernNomad-98/Project-Aegis"
        "/actions/runs/")
+TOKEN_SENTINEL = "ghp_SENTINELtokenVALUE0123456789"
+UPLOAD_EXPIRES = "2026-11-01T00:00:00Z"
 
 
 def _iso(second):
@@ -75,11 +90,21 @@ def steps(event, dco="success", pr_body="success"):
             for name in STEP_NAMES]
 
 
+# F-r4-2: a sentinel meaning "this record says nothing about artifacts". The
+# live jobs endpoint carries no `artifacts` key at all (runs 38198781208 and
+# 38212458000: `.jobs[] | has("artifacts")` -> false for all six), so the
+# `job()` default omits the key instead of modelling `[]`; a test that needs
+# a reported inventory passes `artifacts=[]` or a list explicitly.
+ARTIFACTS_ABSENT = object()
+
+
 def job(index, name, conclusion, start=None, end=None, html=None,
-        step_list=None):
+        step_list=None, artifacts=ARTIFACTS_ABSENT):
     entry = {"id": 100 + index, "name": name, "status": "completed",
-             "conclusion": conclusion, "artifacts": [],
+             "conclusion": conclusion,
              "html_url": html or ("%s%s/job/%d" % (API, RUN_ID, 100 + index))}
+    if artifacts is not ARTIFACTS_ABSENT:
+        entry["artifacts"] = artifacts
     entry["started_at"] = _iso(start) if start is not None else None
     entry["completed_at"] = _iso(end) if end is not None else None
     entry["steps"] = list(step_list) if step_list is not None else list(
@@ -590,6 +615,334 @@ class ArtifactMappingTests(unittest.TestCase):
         code, _, err = invoke(artifact_dir="no-such-directory-here")
         self.assertEqual(code, 2)
         self.assertIn("artifact directory not found", err)
+
+
+def reported_upload(run_id=RUN_ID):
+    """An uploaded artifact as the jobs payload reports it (F-r4-2)."""
+    return {"id": 77, "name": "offline-checks-linux-%s-1" % run_id,
+            "size_in_bytes": 4321, "expires_at": UPLOAD_EXPIRES,
+            "expired": False}
+
+
+def jobs_reporting(reported):
+    """`green_jobs()` where only the named records carry an `artifacts` key.
+
+    F-r4-2: key presence is the payload's own per-job statement, so this is
+    the mixed shape that distinguishes a reported empty inventory from a
+    record that said nothing at all.
+    """
+    return [dict(entry, artifacts=reported[entry["name"]])
+            if entry["name"] in reported else entry
+            for entry in green_jobs()]
+
+
+class _FakeResponse:
+    """The response surface the real `fetch` uses (F-r4-1 tests; A2).
+
+    The F7 tests patch nothing, so this double is new test code. AF-2: the
+    default `url` is a fixed-host URL on purpose - the real `fetch` checks
+    `_same_host_target(resp.geturl())` before it reads the body, and
+    `_same_host_target(None)` is False, so a default of None would fail every
+    leg for the wrong reason. A leg that wants another URL passes one.
+    """
+
+    def __init__(self, body=b"{}", status=200,
+                 url="https://api.github.com/"):
+        self._body, self._status, self._url = body, status, url
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def getcode(self):
+        return self._status
+
+    def geturl(self):
+        return self._url
+
+    def read(self):
+        return self._body
+
+
+class _FakeOpener:
+    """Records the Request; returns a response or raises (F-r4-1 tests)."""
+
+    def __init__(self, response=None, raises=None):
+        self.requests, self._response, self._raises = [], response, raises
+
+    def open(self, request, timeout=None):
+        self.requests.append(request)
+        if self._raises is not None:
+            raise self._raises
+        return self._response
+
+
+class TokenHeaderRefusalTests(unittest.TestCase):
+    """F-r4-1: a malformed token refuses value-free and is never echoed."""
+
+    URL = ("https://api.github.com/repos/ModernNomad-98/Project-Aegis"
+           "/actions/runs/38198781208")
+
+    def _spy(self):
+        built = []
+        real_transport = ci_durations.HttpTransport
+
+        def spy(token=None):
+            built.append(token)
+            return real_transport(token)
+
+        return built, spy
+
+    def test_fr41_control_char_token_refuses_before_any_transport(self):
+        token = "ghp_" + TOKEN_SENTINEL + "\r\nX-Inject: 1"
+        built, spy = self._spy()
+        with mock.patch.dict(os.environ, {"AEGIS_TOKEN": token}), \
+                mock.patch.object(ci_durations, "HttpTransport", spy):
+            code, out, err = invoke(fixture_path=None,
+                                    argv=("--allow-network", "--token-env",
+                                          "AEGIS_TOKEN"))
+        self.assertEqual(code, 2)
+        self.assertEqual(out, "")
+        self.assertNotIn(TOKEN_SENTINEL, out + err)
+        self.assertEqual(built, [])
+        self.assertIn("--token-env", err)
+
+    def test_fr41_nul_value_refuses_by_the_helper_and_the_mocked_environment(
+            self):
+        # B1: an embedded NUL cannot travel through a real environment
+        # variable on this host - os.environ["V"] = "a\0b" and
+        # mock.patch.dict(os.environ, {"V": "a\0b"}) both raise
+        # `ValueError: embedded null character` - so the NUL assertion is
+        # kept and moved off the environment: the helper is called directly,
+        # and the CLI leg patches os.environ.get with a fall-through.
+        nul_value = "ghp_" + TOKEN_SENTINEL + "\0"
+        defect = ci_durations.token_header_defect(nul_value)
+        self.assertIsNotNone(defect)
+        self.assertNotIn(TOKEN_SENTINEL, defect)
+
+        real_get = os.environ.get
+        built, spy = self._spy()
+
+        def mocked_get(key, default=None):
+            if key == "AEGIS_TOKEN":
+                return nul_value
+            return real_get(key, default)
+
+        with mock.patch("os.environ.get", side_effect=mocked_get), \
+                mock.patch.object(ci_durations, "HttpTransport", spy):
+            code, out, err = invoke(fixture_path=None,
+                                    argv=("--allow-network", "--token-env",
+                                          "AEGIS_TOKEN"))
+        self.assertEqual(code, 2)
+        self.assertEqual(out, "")
+        self.assertNotIn(TOKEN_SENTINEL, out + err)
+        self.assertEqual(built, [])
+
+    def test_fr41_u2028_value_refuses_before_any_transport(self):
+        # B1: U+2028 does round-trip through os.environ on Windows, so this
+        # leg stays at the environment/CLI level. It is not latin-1
+        # encodable, so the helper's encode check refuses it.
+        token = "ghp_" + TOKEN_SENTINEL + "\u2028y"
+        built, spy = self._spy()
+        with mock.patch.dict(os.environ, {"AEGIS_TOKEN": token}), \
+                mock.patch.object(ci_durations, "HttpTransport", spy):
+            code, out, err = invoke(fixture_path=None,
+                                    argv=("--allow-network", "--token-env",
+                                          "AEGIS_TOKEN"))
+        self.assertEqual(code, 2)
+        self.assertEqual(out, "")
+        self.assertNotIn(TOKEN_SENTINEL, out + err)
+        self.assertEqual(built, [])
+
+    def test_fr41_legal_token_still_builds_the_bearer_header(self):
+        token = "ghp_" + TOKEN_SENTINEL
+        transport = ci_durations.HttpTransport(token)
+        opener = _FakeOpener(response=_FakeResponse(body=b'{"ok": true}'))
+        with mock.patch.object(transport, "_opener", opener):
+            payload, status = transport.fetch(self.URL)
+        request = opener.requests[0]
+        self.assertEqual(request.get_header("Authorization"),
+                         "Bearer " + token)
+        self.assertEqual(payload, {"ok": True})
+        self.assertEqual(status, 200)
+        self.assertEqual(
+            {key.lower(): value for key, value in request.headers.items()},
+            {"accept": "application/vnd.github+json",
+             "x-github-api-version": ci_durations.API_VERSION,
+             "user-agent": ci_durations.USER_AGENT,
+             "authorization": "Bearer " + token})
+
+    def test_fr41_no_token_sends_no_authorization_header(self):
+        # B3: HttpTransport() is the default anonymous live path.
+        self.assertIsNone(ci_durations.token_header_defect(None))
+        self.assertIsNone(ci_durations.token_header_defect(""))
+        transport = ci_durations.HttpTransport()
+        opener = _FakeOpener(response=_FakeResponse(body=b'{"ok": true}'))
+        with mock.patch.object(transport, "_opener", opener):
+            payload, status = transport.fetch(self.URL)
+        self.assertIsNone(opener.requests[0].get_header("Authorization"))
+        self.assertEqual(payload, {"ok": True})
+        self.assertEqual(status, 200)
+
+        # A3 second leg: redact_token leaves a token-less message untouched,
+        # so the placeholder is never interleaved through its characters.
+        error = urllib.error.URLError("boom")
+        failing = ci_durations.HttpTransport()
+        with mock.patch.object(failing, "_opener", _FakeOpener(raises=error)):
+            with self.assertRaises(ci_durations.TransportFailure) as caught:
+                failing.fetch(self.URL)
+        self.assertEqual(str(caught.exception),
+                         "transport error for %s: %s" % (self.URL, error))
+        self.assertNotIn(ci_durations.TOKEN_REDACTED,
+                         str(caught.exception))
+
+    def test_fr41_header_quoting_valueerror_is_redacted_and_uncaused(self):
+        token = "ghp_" + TOKEN_SENTINEL
+        transport = ci_durations.HttpTransport(token)
+        opener = _FakeOpener(raises=ValueError(
+            "Invalid header value b'Bearer %s'" % token))
+        with mock.patch.object(transport, "_opener", opener):
+            with self.assertRaises(ci_durations.TransportFailure) as caught:
+                transport.fetch(self.URL)
+        text = str(caught.exception)
+        self.assertNotIn(TOKEN_SENTINEL, text)
+        self.assertNotIn(token, text)
+        self.assertIn("redacted", text)
+        self.assertIsNone(caught.exception.__cause__)
+        printed = "".join(traceback.format_exception(caught.exception))
+        self.assertNotIn(TOKEN_SENTINEL, printed)
+        self.assertNotIn("Invalid header value", printed)
+
+    def test_fr41_decode_failure_is_not_reported_as_a_rejected_request_value(
+            self):
+        # B4: UnicodeDecodeError is a ValueError subclass and the body read
+        # sits inside the same try block, so it must keep its base
+        # disposition instead of inheriting the request-value diagnosis.
+        transport = ci_durations.HttpTransport("ghp_" + TOKEN_SENTINEL)
+        opener = _FakeOpener(response=_FakeResponse(body=b"\xff\xfe"))
+        with mock.patch.object(transport, "_opener", opener):
+            with self.assertRaises(UnicodeDecodeError) as caught:
+                transport.fetch(self.URL)
+        self.assertNotIsInstance(caught.exception,
+                                 ci_durations.TransportFailure)
+        self.assertNotIn("request value was rejected",
+                         str(caught.exception))
+        self.assertNotIn(ci_durations.TOKEN_REDACTED, str(caught.exception))
+
+    def test_fr41_cli_reports_exit_three_without_a_traceback(self):
+        token = "ghp_" + TOKEN_SENTINEL
+        error = ValueError("Invalid header value b'Bearer %s'" % token)
+        with mock.patch.dict(os.environ, {"AEGIS_TOKEN": token}), \
+                mock.patch.object(urllib.request, "build_opener",
+                                  lambda *args, **kwargs: _FakeOpener(
+                                      raises=error)):
+            code, out, err = invoke(fixture_path=None,
+                                    argv=("--allow-network", "--token-env",
+                                          "AEGIS_TOKEN"))
+        self.assertEqual(code, 3)
+        self.assertEqual(out, "")
+        self.assertNotIn(TOKEN_SENTINEL, err)
+        self.assertNotIn("Traceback", err)
+        self.assertIn("ci-durations transport failure:", err)
+        self.assertIn("redacted", err)
+
+
+class ArtifactCellTests(unittest.TestCase):
+    """F-r4-2: the cell reports the payload's own per-job statement."""
+
+    OTHERS = ("changes", "gate-guard", "windows-offline-checks",
+              "tools-tests-linux", "tools-tests-windows")
+
+    def test_fr42_no_inventory_reads_not_recorded(self):
+        # The live shape: no record carries an artifacts key at all.
+        code, evidence = evidence_of(jobs=green_jobs())
+        self.assertEqual(code, 0)
+        self.assertEqual(len(evidence["jobs"]), len(ci_durations.JOB_ROSTER))
+        for row in evidence["jobs"]:
+            self.assertEqual(row["artifact"], "not_recorded")
+
+    def test_fr42_reported_upload_maps_by_prefix_to_validate_skills(self):
+        upload = reported_upload()
+        code, evidence = evidence_of(
+            jobs=jobs_reporting({"validate-skills": [upload]}))
+        rows = rows_of(evidence)
+        cell = rows["validate-skills"]["artifact"]
+        self.assertIn(upload["name"], cell)
+        self.assertIn("id=%s" % upload["id"], cell)
+        self.assertIn("bytes=%s" % upload["size_in_bytes"], cell)
+        self.assertIn("expires=%s" % upload["expires_at"], cell)
+        self.assertIn("expired=False", cell)
+        for name in self.OTHERS:
+            self.assertNotIn(upload["name"], rows[name]["artifact"])
+            self.assertEqual(rows[name]["artifact"], "not_recorded")
+        self.assertEqual(code, 0)
+
+    def test_fr42_reported_but_empty_inventory_reads_none_uploaded(self):
+        code, evidence = evidence_of(
+            jobs=[dict(entry, artifacts=[]) for entry in green_jobs()])
+        self.assertEqual(code, 0)
+        for row in evidence["jobs"]:
+            self.assertEqual(row["artifact"], "none_uploaded")
+
+    def test_fr42_mixed_payload_marks_only_the_reporting_job(self):
+        # Sub-case 1: one record reports an empty inventory, the other five
+        # say nothing - the shape revision 1's payload-global flag got wrong.
+        with self.subTest(reported="empty-inventory"):
+            _, evidence = evidence_of(
+                jobs=jobs_reporting({"validate-skills": []}))
+            rows = rows_of(evidence)
+            self.assertEqual(rows["validate-skills"]["artifact"],
+                             "none_uploaded")
+            for name in self.OTHERS:
+                self.assertEqual(rows[name]["artifact"], "not_recorded")
+        # Sub-case 2: one record reports a real upload, the other five say
+        # nothing - no silent job's row may claim none_uploaded.
+        with self.subTest(reported="real-upload"):
+            upload = reported_upload()
+            _, evidence = evidence_of(
+                jobs=jobs_reporting({"validate-skills": [upload]}))
+            rows = rows_of(evidence)
+            self.assertIn(upload["name"],
+                          rows["validate-skills"]["artifact"])
+            for name in self.OTHERS:
+                self.assertEqual(rows[name]["artifact"], "not_recorded")
+
+    def test_fr42_unmapped_artifact_name_is_never_attributed(self):
+        mystery = {"id": 9, "name": "mystery-bundle-1-1",
+                   "size_in_bytes": 1, "expires_at": UPLOAD_EXPIRES,
+                   "expired": False}
+        _, evidence = evidence_of(
+            jobs=jobs_reporting({"validate-skills": [mystery]}))
+        for row in evidence["jobs"]:
+            self.assertNotIn("mystery-bundle-1-1", row["artifact"])
+        # The record DID report an inventory, so its own row is an observed
+        # absence - and a payload name never reaches the --artifact-dir
+        # surface, which only a filesystem scan feeds.
+        self.assertEqual(rows_of(evidence)["validate-skills"]["artifact"],
+                         "none_uploaded")
+        self.assertEqual(evidence["prerequisites"]["artifact_unmapped"], [])
+
+    def test_fr42_missing_roster_job_artifact_is_not_recorded(self):
+        jobs = [entry for entry in green_jobs()
+                if entry["name"] != "changes"]
+        code, evidence = evidence_of(jobs=jobs)
+        row = rows_of(evidence)["changes"]
+        self.assertEqual(row["state"], "missing")
+        self.assertEqual(row["artifact"], "not_recorded")
+        self.assertEqual(code, 1)
+
+    def test_fr42_the_cell_is_not_a_constant(self):
+        _, mapped = evidence_of(
+            jobs=jobs_reporting({"validate-skills": [reported_upload()]}))
+        _, empty = evidence_of(
+            jobs=[dict(entry, artifacts=[]) for entry in green_jobs()])
+        _, silent = evidence_of(jobs=green_jobs())
+        values = {rows_of(mapped)["validate-skills"]["artifact"],
+                  rows_of(empty)["validate-skills"]["artifact"],
+                  rows_of(silent)["validate-skills"]["artifact"]}
+        self.assertEqual(len(values), 3)
 
 
 class EscapingTests(unittest.TestCase):
