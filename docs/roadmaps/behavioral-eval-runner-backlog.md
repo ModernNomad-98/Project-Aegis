@@ -4189,6 +4189,196 @@ itself is a separate, later host phase that runs only under the merged grant.
 - **Scope:** this entry records a closure. It creates no stage, gate, receipt row or bound field, edits no
   existing byte and touches no merged body. **New authority: None.**
 
+### 2026-10-13 — the workspace-archive citations in the O-F1 note are superseded by published, in-repo evidence
+
+- **Date:** 2026-10-13.
+- **Addresses:** the three evidence citations in the entry at L4149–L4190 ("2026-10-13 — O-F1 discharged:
+  the FU-3 record lane's carried publication item is closed by this note"). Appended under this log's rule
+  at L2672–L2675. No existing line of this file is edited, and that entry's closure decision, its Scope
+  bullet and its "New authority: None" all stand unchanged.
+- **Why:** those citations named files inside `_resume-2026-10-09/` — in plain words, *the session
+  workspace archive, which sits outside every repository and therefore inside no checkout*. The citations
+  were **accurate** (the cited sections are at the lines they name) and the defect was **durability, not
+  accuracy**: a fresh checkout could not retrieve the Stage F record, the Stage G record or the F-F1
+  precedent they support. Raised as P2 finding `4261109123` on pull request #765 (review `5506577448`,
+  written at head `e0a026e2...`) and verified true.
+- **Correction:** the three cited records — and the FU-3 execution record they rest on — are published,
+  byte-identical, with per-file sha256 digests, at
+  [docs/evidence/fu3-record-publication-2026-10-13/](../evidence/fu3-record-publication-2026-10-13/README.md).
+  The citations above therefore now resolve inside this repository:
+  [FU3-RECORD-FINAL-REVIEW-F.md section 10](../evidence/fu3-record-publication-2026-10-13/FU3-RECORD-FINAL-REVIEW-F.md#10-o-f1-and-two-smaller-notes),
+  [FU3-RECORD-stage-g-summary.md section 9](../evidence/fu3-record-publication-2026-10-13/FU3-RECORD-stage-g-summary.md#9---------the-carried-open-publication-item),
+  and [REVIEWPATH-FINAL-REVIEW-F.md](../evidence/fu3-record-publication-2026-10-13/REVIEWPATH-FINAL-REVIEW-F.md)
+  L68 for the F-F1 precedent.
+- **Rule stated by this entry:** a permanent repository record must support each claim with evidence a
+  fresh checkout can retrieve — a path inside this repository, cited as a Markdown link so the repository's
+  own link checker proves it resolves — or, where the artifact cannot be published, a digest of its bytes
+  plus an explicit statement that the artifact is **not retrievable from this repository**. An out-of-tree
+  path alone is not acceptable support. A digest pins identity; it never makes an absent artifact
+  retrievable. It is never a substitute for publishing an artifact that could have been published.
+- **Owed, and named so it is not forgotten:** the remaining archive citations in
+  `docs/roadmaps/aegis-ci-baseline-2026-10-11.md` (L43, L45, L49),
+  `docs/evidence/scif/scif-closeout-corrections-2026-10-11.md` (L15, L84), the entry directly above this
+  one (L4143) and `docs/approvals/APPROVAL_REGISTER.md` (L5964) are corrected by a later change under
+  each record's own rules. The publication record carries the full list.
+- **Scope:** this entry corrects citations and states a rule. It decides nothing about the separate O-F1
+  closure question raised as P2 finding `4261109109` on the same review - **its text is retained in the publication
+  record's preamble under *The second finding, retained the same way*, with the digest `e1bf5013fe2491...` and the locator
+  of the comment; a pull-request comment can be edited or deleted, so the digest, not the URL, pins it, and it is NOT
+  retrievable from this repository** - re-opens no gate, edits no
+  merged pull-request body, and edits no existing byte of this file. **New authority: None.**
+
+### 2026-10-13 — the publication entry above is corrected on one word: the fourth published file is a sanitized derivative, not a byte-identical copy
+
+- **Date:** 2026-10-13.
+- **Addresses:** the entry directly above (L4192–L4226, "2026-10-13 — the workspace-archive citations in the O-F1
+  note are superseded by published, in-repo evidence"), and in particular its sentence that the three cited
+  records "and the FU-3 execution record they rest on — are published, byte-identical". Appended under this log's
+  rule at L2672–L2675; no existing line of this file is edited, and that entry's closure decision and its rule
+  statement stand unchanged.
+- **Correction:** the four files are published as **three byte-identical copies and one sanitized derivative**.
+  `docs/evidence/fu3-record-publication-2026-10-13/BER-G3-FU3-EXECUTION.md` is a **SANITIZED DERIVATIVE**
+  (25,606 → 26,345 bytes): two identifiers that appeared in no tracked file at this lane's base revision — a
+  shell-history artefact's filename and a drive-enumeration command's root list — were removed under this
+  repository's evidence-retention rule ("no private identifiers in Git", L4021–L4025), and three published claims
+  inside that copy were corrected (an impossible worst-case figure, a `Test-Path` result stated as proof of
+  historical absence, and the copy's own self-digest footer, recomputed over the derivative). **The other three
+  copies remain byte-identical to their archive sources and were not altered.**
+- **Evidence:** [the publication record's section 1.1](../evidence/fu3-record-publication-2026-10-13/README.md#11-the-sanitized-derivative-every-difference-from-its-source-and-why)
+  enumerates every difference between the derivative and its source, with the reason for each, and records both the
+  source-side and the committed-side digest of all four files. The unsanitized original remains in the session
+  workspace archive at `_resume-2026-10-09/evidence/docs-refresh-2026-10-12/BER-G3-FU3-EXECUTION.md`
+  (sha256 `ea521f84c4d0d88f8e888f3588147a6a63c659f8773f7d41339d9eeca47b9915`), which is **not retrievable from this
+  repository**.
+- **Scope:** this entry corrects one sentence's scope. It edits no existing byte, re-opens no gate, edits no merged
+  pull-request body, and grants nothing. **New authority: None.**
+
+### 2026-10-13 — three corrections to the two entries above: the O-F1 shorthand, the derivative's scope, and an unreconciled census
+
+- **Date:** 2026-10-13.
+- **Addresses:** the O-F1 note at L4149–L4190 ("2026-10-13 — O-F1 discharged: the FU-3 record lane's carried
+  publication item is closed by this note") and the entry directly above (L4228–L4252). Appended under this log's
+  rule at L2672–L2675; no existing line of this file is edited, and neither entry's closure decision is re-opened.
+- **Correction 1 — the O-F1 shorthand is false as to Stage F.** The note says the publication item existed because
+  "no stage read a skill". The published Stage F record lists **three** skills that stage used — `code-reviewer`,
+  `acceptance-criteria-reviewer` and `source-of-truth-reconciler` — in its section 11 at
+  `docs/evidence/fu3-record-publication-2026-10-13/FU3-RECORD-FINAL-REVIEW-F.md` L214–L220. The missing rows were caused by
+  those **recorded rows never being inserted into the body**, not by an absence of skill use; the note's own detail
+  bullet already distinguishes Stage F from Stages D and E, and only the shorthand is wrong.
+- **Correction 2 — the fourth published file is sanitized further than that entry states.** The entry above
+  describes a derivative with two identifiers removed. After an automated review, **every occurrence of the host
+  identity** was removed — the username, the distro release, the wsl-root and the distro-side directory name — at four
+  sites, under the evidence-retention rule at L4021–L4025. The earlier ruling that such identifiers could stay
+  because they are already tracked at the base revision **was wrong and has been withdrawn**: prior publication is
+  not an exception to that rule, and the publication directory does not exist at the base revision, so nothing inside
+  it was already published. The difference inventory is **seven** items, not five, and now includes the record's own
+  recomputed self-digest footer; the publication record's section 1.1 enumerates them.
+- **Correction 3 — the census in that copy is UNRECONCILED, and is labelled so rather than adjusted.** Its three
+  top-directory rows sum to **1,915** against a recorded total of **1,719**, and this lane cannot re-derive it because
+  its own boundaries forbid touching the WSL distro. The rows, the total, the dependent 1,455-file scan figure and
+  every completeness claim resting on them are recorded as **unreliable as a set**. No number was adjusted to make
+  the sum work.
+- **Scope:** this entry corrects three statements. It edits no existing byte, re-opens no gate, edits no merged
+  pull-request body, and grants nothing. **New authority: None.**
+### 2026-10-13 — the third correction entry above was itself corrected in place; this entry records that deviation and the corrected counts
+
+- **Event:** correction and disclosure. Appended under this log's rule at L2672-L2675.
+- **Addresses:** the entry directly above (L4253-L4279, "three corrections to the two entries above"),
+  specifically its **Correction 2** text at L4265-L4271.
+- **What happened, stated plainly.** Commit `c46d9057` **edited that entry's Correction 2 in place** —
+  a 1-line change at L4267 — to replace the token "the project directory name" with "the distro-side
+  directory name" and the word "five" with "four". **That departs from the rule at L2672-L2675**, which
+  says entries are never edited and corrections append a superseding entry. The edit was made on the
+  reasoning that the entry had not yet been merged and so was still this change's own text; **that
+  reasoning was wrong in one respect worth recording: the entry merges with this pull request, and at
+  merge it would have asserted something false about itself** — see the next bullet.
+- **A sentence in that entry is no longer true of it.** L4257-L4258 says the entry was *"Appended under
+  this log's rule at L2672-L2675; no existing line of this file is edited."* After `c46d9057` that
+  sentence is **false of its own entry**. No reader should rely on it. The deviation is disclosed here
+  rather than repaired by reverting, because reverting would re-introduce the false claim the edit
+  corrected.
+- **The corrected facts, as of `c46d9057`:**
+  - **Four** sites had the private host identity removed — the search-census row for the distro root,
+    the section 2.2 opening, the quoted stop record, and the enumeration command — **not five**.
+  - A fifth candidate, the **searched-roots list**, is **deliberately retained** and named as such at
+    item 5 of the publication record's difference inventory. Its retention rests on **scope**, not on
+    prior publication: `C:\src\Project Aegis` is the project and session workspace path, not private
+    host identity. **This entry does not revive the prior-publication exception**, which Correction 2
+    withdrew.
+  - The difference inventory is **eight** items, not seven. **This entry records the count that
+    Correction 2's own text still calls seven at L4271 and does not edit that line.**
+- **Why this entry exists rather than another edit.** The rule exists so that historical decisions
+  remain visible verbatim. A deviation recorded by appending demonstrates the rule can still be
+  honoured after it was broken; a second in-place edit would compound the first.
+- **Scope:** this entry changes no status, re-opens no closure decision, edits no existing line of this
+  file, and grants no authority. It is insert-only.
+- **New authority:** None.
+
+### 2026-10-13 - a second in-place edit of this log is recorded, and the warning against it was violated
+
+- **Supersedes:** the entry at L4192, specifically its **Scope** bullet at L4225 (edited) and its own sentence at L4197.
+- **What was done, by whom, and why it is recorded rather than justified.** The bullet at L4225 cited the separate O-F1
+  closure question by a **bare pull-request comment identifier** - no digest, no locator, no availability statement -
+  which is the failure mode this change exists to remove. It was **edited in place** in `9872c642`: one line replaced
+  by four, and the digest, locator and limitation supplied. **That is an in-place edit of a log entry, which the rule at
+  L2672-L2675 forbids**, and Stage D upheld a finding against it at HIGH.
+- **The entry two above warned against exactly this, and that warning is now false of the file.** The `35acbbe8` entry says:
+  *"a deviation recorded by appending demonstrates the rule can still be honoured after it was broken; a second
+  in-place edit would compound the first."* **This was the second in-place edit, so that sentence no longer holds.** It
+  is named here rather than edited for the same reason the first one was: after merge it is history a reader must be
+  able to audit. **No third in-place edit of these entries is made; every later correction is appended.**
+- **Why the edit is left standing rather than reverted, stated because it is a choice and not an oversight.** Reverting
+  would restore the bare identifier, so the file would carry a citation the rule this change publishes calls
+  unacceptable. **Leaving it, disclosed, keeps the repair and records the mechanism** - and the mechanism is now
+  recorded twice, which is the strongest available statement that the rule was broken knowingly and honestly rather
+  than quietly.
+- **And the metric that hid it, which is a finding in its own right:** this change reported the log as **147 added /
+  0 deleted versus base**. Both figures are true, and **a base-relative numstat cannot see an edit inside the change's
+  own range** - the range figure for `277a0f4d..9872c642` is **26 added / 1 deleted**. **From here this log's state is
+  reported both ways**, because a metric that reads clean over work that is not clean is the defect this lane keeps
+  removing.
+
+### 2026-10-13 - three in-place edits of this log are recorded together, and the rule against them stands
+
+- **Supersedes:** the entry appended at `9872c642` and headed *"the bare finding identifier in the third correction entry above is
+  repaired HERE, not in place"* (that revision's L4317-L4338), which this entry's own commit replaced rather than
+  superseded. **It also records, in one place, the two earlier edits, so a reader gets the sequence once.**
+- **The three edits, in order, with the commit that made each:**
+  1. `c46d9057` edited the **Correction 2** line at L4267 (the inventory count), recorded by the entry at L4280.
+  2. `9872c642` edited the **Scope** bullet at L4225 (a bare pull-request comment identifier), recorded by the entry
+     appended in that same commit.
+  3. `8e40488e` **replaced that second entry's text rather than appending to it** - `23 added / 21 deleted` against
+     `9872c642` - which is the edit this entry records.
+- **Root cause, recorded because it is structural rather than careless: each repair of an in-place edit was itself an
+  in-place edit.** The disclosure entry and the commit that orders the repair are the same commit, so writing *"this
+  edit is recorded"* while the repair is still being shaped means the record is edited again to say so. **That is a
+  trap in the ordering, not three lapses of attention.**
+- **The rule stands as written and is not amended for unmerged content.** The argument that pre-merge entries are
+  editable was considered and refused: **a reader sees the merged state, so that is the state the rule protects** - if
+  entries appended by an unmerged pull request can be rewritten until merge, the log's history is unrecoverable at
+  exactly the moment it becomes history. **This entry is appended, not edited into anything.**
+- **And the metric that concealed the third edit, which is the generalisable part.** The change reported the log's state
+  as a **range** from a head that predates the intermediate commit, where a replacement **nets out**: `277a0f4d..8e40488e` reads
+  **28 / 1** and versus base reads **149 / 0**. The figures that reveal it are **per-commit** - `9872c642` is 26 / 1 and
+  `8e40488e` is 23 / 21. **A range is clean about a replacement for the same reason a base-relative number is clean about an
+  in-range edit: the scope is wider than the work.** Report per-commit, or from the immediately preceding head.
+
+### 2026-10-13 - the edit chronology in the entry above is corrected, and the sequence is stated as Git records it
+
+- **Supersedes:** the entry at L4341, specifically its **Supersedes** bullet and its first two numbered edits.
+- **What was wrong:** that bullet described the replaced entry as headed *"the bare finding identifier in the third
+  correction entry above is repaired HERE, not in place"* and as replaced by its own commit. **Git records otherwise.**
+  At `9872c642` the entry at L4317-L4338 is headed *"the citation in the third correction entry above is repaired in
+  place, and this entry discloses the edit"*, and it was replaced by `8e40488e`, not by the commit that wrote the
+  description. **The entry's account of its own provenance was wrong in the same way the edits it records were.**
+- **The sequence as Git records it, stated once and checkable with `git log -p`:** `c46d9057` edited the Correction 2 line
+  (L4267); `9872c642` edited the Scope bullet (L4225) **and** appended an entry disclosing that edit; `8e40488e` replaced
+  that appended entry's text (23 added / 21 deleted against `9872c642`); `3ed6931c` appended the consolidated entry at
+  L4341; and this entry corrects the chronology that entry states.
+- **And the citations are named by content rather than by line, because the lines move.** Every line number in this entry
+  was measured at the head carrying it; a reader at a later head should match on the heading text. **The commit hashes
+  are the stable half and they are what the sequence should be reconstructed from.**
+
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008

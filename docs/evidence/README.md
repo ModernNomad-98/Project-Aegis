@@ -1,6 +1,6 @@
 # Project Aegis evidence: where to read next
 
-This index helps maintainers and reviewing agents find **16 selected decision
+This index helps maintainers and reviewing agents find **17 selected decision
 and delivery evidence pages**. These pages record what was checked or decided
 at a particular time. They are not a current work queue, approval grant, or
 instruction to repeat an old run. For current authority and status, read the
@@ -10,6 +10,14 @@ instruction to repeat an old run. For current authority and status, read the
 [setup routing plan](../roadmaps/aegis-setup-routing-plan.md).
 The current-reading boundaries below were checked on 2026-09-23 against the
 source-library tree at `e2145b1`; recheck the owning registers after later work.
+This index was created that day and fifteen of its seventeen rows date from that
+sweep. **Exactly two rows post-date it and are therefore not covered by it:** the SCIF
+close-out corrections row, added 2026-10-11 by commit `503c3b30`, whose provenance is
+that commit's record; and the FU-3 record publication row, added 2026-10-13 by the
+workspace-citation-durability change against base `dbe2ee28`, which states its own date
+and base revision in the row itself. Neither row can name the commit that contains it -
+a page cannot cite its own commit, the convention
+`docs/roadmaps/aegis-ci-baseline-2026-10-11.md` L51-L52 states for itself.
 
 **Reading key:** Behavioral Eval Runner (BER) is the skill evaluation tool;
 control plane (CP) is the delivery state and recovery component. A work package
@@ -43,7 +51,35 @@ to the dated record that reports them.
 | What issue #101 package 2 delivered | [Package 2 review](setup/issue-101-package-2-review.md) | Windows-tested Aegis-only saved choice shipped; no helper or provider connection. |
 | What issue #101 package 3 delivered | [Package 3 review](setup/issue-101-package-3-review.md) | Offline advisory contract shipped; a host hook and actual fallback remain future work. |
 | What the #723/#729 close-out record got wrong, corrected forward | [SCIF close-out corrections](scif/scif-closeout-corrections-2026-10-11.md) | Dated corrections only; the approval register is untouched and no authority is created. |
+| Where the evidence cited by the O-F1 publication note now lives, and the rule that keeps citations retrievable | [FU-3 record publication](fu3-record-publication-2026-10-13/README.md) | Published copies with per-file sha256 digests; the superseded citations were accurate but not retrievable from a fresh checkout. **Added 2026-10-13 by the workspace-citation-durability change, against base `dbe2ee28` - not part of the 2026-09-23 sweep at `e2145b1`.** |
 
 Other dated records are reachable from the owning backlogs and the
 [documentation index](../README.md). Do not infer that an unlisted evidence
-page has been reviewed or that these 16 pages cover the full repository.
+page has been reviewed or that these 17 pages cover the full repository.
+
+## Citation durability
+
+A permanent record here — a governance log entry, a register entry, a dated evidence page or a roadmap
+fact — supports each claim with evidence a fresh checkout can retrieve: a path inside this repository,
+written as a Markdown link so the repository's own link checker proves it resolves. Where the artifact
+cannot be published (an oversized archive, an external system, a private input), the record carries the
+artifact's digest, names the locator it is known by, and says plainly that the artifact is **not
+retrievable from this repository**. An out-of-tree path alone is not acceptable support. A digest pins
+identity; it never makes an absent artifact retrievable.
+
+**The rule is prospective, and this is its effective date.** It binds citations **added from this change forward** -
+the change that states it, **effective when that change merges** - the date is recorded after the merge, not asserted before it. It does **not** retroactively invalidate records already merged:
+**five archive citations in earlier, merged records remain OWED**, enumerated with their dispositions in section 3 of the
+publication record [docs/evidence/fu3-record-publication-2026-10-13/README.md](fu3-record-publication-2026-10-13/README.md) and tracked as open items. Those
+records neither **violate** this rule nor are **silently excused** by it: they predate it, the work that would publish
+their evidence is named and outstanding, and this paragraph exists so a reader can tell the two cases apart. **A rule
+stated as a universal invariant while five known sites remain unmet is a false claim about its own scope** - Codex
+raised exactly that, and the scope sentence is the repair.
+
+This is a documented rule, not a machine-enforced one, and the difference is stated rather than blurred:
+the "Run Markdown link checker over the repository's own pages" step of `validate-skills` validates the
+links a record **already contains** - it goes red when a written link stops resolving - and it does
+**not** require a record to contain a durable citation at all. A record can cite an out-of-tree path as
+plain text, or omit its evidence entirely, and that step stays green. Supplying the citation this rule
+requires is therefore a **documentation obligation that nothing machine-checks**; the *digest* half is
+checked by nothing either, and a record that relies on it says so.
