@@ -40,9 +40,12 @@ identifier alone. It is retained here on the same terms, and its own limit is st
 comment can be edited or deleted, so the digest - not the URL - is what pins the text, and neither makes the comment
 retrievable from this repository.**
 
-- **Locator:** pull request #766 review comment `4261109109`, on `docs/roadmaps/behavioral-eval-runner-backlog.md` line 4188,
+- **Locator:** pull request **#765** review comment `4261109109`, on `docs/roadmaps/behavioral-eval-runner-backlog.md` line 4188,
   written against commit `e0a026e2...`:
-  [discussion_r4261109109](https://github.com/ModernNomad-98/Project-Aegis/pull/766#discussion_r4261109109).
+  [discussion_r4261109109](https://github.com/ModernNomad-98/Project-Aegis/pull/765#discussion_r4261109109).
+  **The pull request number is stated because it is checkable and it was wrong here**: an earlier revision sent a reader to
+  #766, which is this change's own pull request, while the finding was raised on #765 - verified against the comment's own
+  `pull_request_url`. **A durable locator that resolves to the wrong review page is a citation that does not resolve at all.**
 - **Digest of the retained text below:** sha256 `e1bf5013fe24913cb9cd4be586d695fc3a2b8fcd491ed939578b54c131f62acc` over its **903
   UTF-8 bytes**, no trailing newline added.
 - **Retained verbatim:**
@@ -55,9 +58,11 @@ retrievable from this repository.**
 identifier with no digest, no locator and no availability statement - **the exact failure this change exists to
 remove, committed inside the change itself**, and the second such instance (the first, `4261109123`, is retained
 above). The repair is the same treatment: the text is retained here with a digest and a locator, the limitation is
-stated rather than implied, and **the log entry's citation is corrected in place with that edit disclosed in an
-appended entry**, because the entry's text is unmerged and the log's own rule against editing entries protects
-**merged** content.
+stated rather than implied, and **the log entry's citation was corrected in place - a departure from the log's rule at
+L2672-L2675, disclosed in an appended entry rather than excused.** **The rule is NOT amended for unmerged content:** an
+earlier draft of this paragraph argued that the rule protects only merged entries, and that argument was considered and
+refused, because a reader sees the merged state and that is the state the rule protects. **So this is recorded as a rule
+violation with its reasons stated, not as a permitted edit** - and the appended entry is the form the rule requires.
 **The defect is durability, not accuracy.** The citations were correct: the sections they name
 really do sit at the lines they name (section 2 re-states each anchor). What failed was
 **retrievability** — the archive directory sits outside every Git repository on this host, so no
