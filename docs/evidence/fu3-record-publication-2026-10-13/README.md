@@ -368,9 +368,9 @@ path, and three of them carry a byte-identical copy of the archive original:
 | `95351dda` | 26,345 | `cc183e4504a1b280d04e5726…` | 5 | 6 | 5 |
 | `61e73442` | 26,345 | `cc183e4504a1b280d04e5726…` | 5 | 6 | 5 |
 
-The seven later commits are clean (0 / 0 / 0). **Materiality:** the same identifiers are already in **4, 5 and 2 tracked files
+At that same head the seven later commits are clean (0 / 0 / 0). **Materiality:** the same identifiers are already in **4, 5 and 2 tracked files
 at the base revision** respectively, so the history adds **a verbatim copy of a full unsanitized record**, not a new class
-of identifier. **What a full purge would require:** rewriting five commits of a **twelve-commit** branch (5 unsanitized + 7 clean; `git rev-list --count bd210954^..HEAD` = 12). **What it would
+of identifier. **What a full purge would require:** rewriting five commits of the branch **as it stood at `9872c642` - thirteen commits there, 5 unsanitized + 8 clean** (`git rev-list --count bd210954^..9872c642` = 13). **The head is named because a count of this branch cannot be stated without one: the commit that records this sentence is a fourteenth, so any bare number is false in the commit that publishes it** - which is exactly how the previous "twelve" was falsified by its own cited command. **What it would
 invalidate:** every binding that names them - eleven Stage D records, eight Stage E validations, the Stage F verdicts and
 MG2 - because a rewritten commit ceases to exist. **And it would still not free the repository**, since the identifiers
 remain in tracked files at the base revision. **A partial purge that produces a clean-looking result without removing the

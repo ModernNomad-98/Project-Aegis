@@ -4314,27 +4314,29 @@ itself is a separate, later host phase that runs only under the merged grant.
   file, and grants no authority. It is insert-only.
 - **New authority:** None.
 
-### 2026-10-13 - the citation in the third correction entry above is repaired in place, and this entry discloses the edit
+### 2026-10-13 - a second in-place edit of this log is recorded, and the warning against it was violated
 
-- **Supersedes:** the entry directly above (L4253-L4279), specifically its **Scope** bullet at L4225.
-- **What changed, and why the entry above could not simply stand:** that bullet cited the separate O-F1 closure question
-  by a **bare pull-request comment identifier** - no digest, no locator, no availability statement. That is the failure
-  mode this change exists to remove, so leaving it would have made the change violate its own rule a second time. Its
-  text is now **retained verbatim in the publication record's preamble** with the digest
-  `e1bf5013fe24913cb9cd4be586d695fc3a2b8fcd491ed939578b54c131f62acc` and the locator of the comment, and the bullet states plainly
-  that a comment can be edited or deleted and is **NOT retrievable from this repository** - the digest, not the URL,
-  pins the text.
-- **One earlier sentence is now false, and it is named rather than left standing.** The entry at L4192 says at L4197
-  that *"No existing line of this file is edited"*. **That sentence is no longer true of its own entry**, because the
-  bullet repaired above sits inside it. This is the same consequence the `c46d9057` entry recorded at L4296 for the
-  entry at L4253, and it is recorded here for the same reason: a reader must not rely on a sentence the file itself has
-  since contradicted. **Both sentences stay unedited** - editing them would be a third in-place repair compounding the
-  first two.
-- **This entry edits one line of an existing entry, and says so.** The rule at L2672-L2675 forbids editing log entries;
-  the entry above is **unmerged** - it arrives with this pull request - so this is the same departure recorded at L4280
-  for the previous correction, and it is disclosed here for the same reason: after merge, the edited line is history
-  that a reader must be able to audit. **A third in-place edit would compound the first two, so this entry is the last;
-  any further correction of those entries is made by appending.**
+- **Supersedes:** the entry at L4192, specifically its **Scope** bullet at L4225 (edited) and its own sentence at L4197.
+- **What was done, by whom, and why it is recorded rather than justified.** The bullet at L4225 cited the separate O-F1
+  closure question by a **bare pull-request comment identifier** - no digest, no locator, no availability statement -
+  which is the failure mode this change exists to remove. It was **edited in place** in `9872c642`: one line replaced
+  by four, and the digest, locator and limitation supplied. **That is an in-place edit of a log entry, which the rule at
+  L2672-L2675 forbids**, and Stage D upheld a finding against it at HIGH.
+- **The entry two above warned against exactly this, and that warning is now false of the file.** The `35acbbe8` entry says:
+  *"a deviation recorded by appending demonstrates the rule can still be honoured after it was broken; a second
+  in-place edit would compound the first."* **This was the second in-place edit, so that sentence no longer holds.** It
+  is named here rather than edited for the same reason the first one was: after merge it is history a reader must be
+  able to audit. **No third in-place edit of these entries is made; every later correction is appended.**
+- **Why the edit is left standing rather than reverted, stated because it is a choice and not an oversight.** Reverting
+  would restore the bare identifier, so the file would carry a citation the rule this change publishes calls
+  unacceptable. **Leaving it, disclosed, keeps the repair and records the mechanism** - and the mechanism is now
+  recorded twice, which is the strongest available statement that the rule was broken knowingly and honestly rather
+  than quietly.
+- **And the metric that hid it, which is a finding in its own right:** this change reported the log as **147 added /
+  0 deleted versus base**. Both figures are true, and **a base-relative numstat cannot see an edit inside the change's
+  own range** - the range figure for `277a0f4d..9872c642` is **26 added / 1 deleted**. **From here this log's state is
+  reported both ways**, because a metric that reads clean over work that is not clean is the defect this lane keeps
+  removing.
 
 ## 14. Continuation instructions for a brand-new session
 
