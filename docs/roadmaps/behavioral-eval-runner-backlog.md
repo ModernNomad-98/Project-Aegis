@@ -4224,6 +4224,31 @@ itself is a separate, later host phase that runs only under the merged grant.
 - **Scope:** this entry corrects citations and states a rule. It decides nothing about the separate O-F1
   closure question raised as P2 finding `4261109109` on the same review, re-opens no gate, edits no
   merged pull-request body, and edits no existing byte of this file. **New authority: None.**
+
+### 2026-10-13 — the publication entry above is corrected on one word: the fourth published file is a sanitized derivative, not a byte-identical copy
+
+- **Date:** 2026-10-13.
+- **Addresses:** the entry directly above (L4192–L4226, "2026-10-13 — the workspace-archive citations in the O-F1
+  note are superseded by published, in-repo evidence"), and in particular its sentence that the three cited
+  records "and the FU-3 execution record they rest on — are published, byte-identical". Appended under this log's
+  rule at L2672–L2675; no existing line of this file is edited, and that entry's closure decision and its rule
+  statement stand unchanged.
+- **Correction:** the four files are published as **three byte-identical copies and one sanitized derivative**.
+  `docs/evidence/fu3-record-publication-2026-10-13/BER-G3-FU3-EXECUTION.md` is a **SANITIZED DERIVATIVE**
+  (25,606 → 26,345 bytes): two identifiers that appeared in no tracked file at this lane's base revision — a
+  shell-history artefact's filename and a drive-enumeration command's root list — were removed under this
+  repository's evidence-retention rule ("no private identifiers in Git", L4021–L4025), and three published claims
+  inside that copy were corrected (an impossible worst-case figure, a `Test-Path` result stated as proof of
+  historical absence, and the copy's own self-digest footer, recomputed over the derivative). **The other three
+  copies remain byte-identical to their archive sources and were not altered.**
+- **Evidence:** [the publication record's section 1.1](../evidence/fu3-record-publication-2026-10-13/README.md#11-the-sanitized-derivative-every-difference-from-its-source-and-why)
+  enumerates every difference between the derivative and its source, with the reason for each, and records both the
+  source-side and the committed-side digest of all four files. The unsanitized original remains in the session
+  workspace archive at `_resume-2026-10-09/evidence/docs-refresh-2026-10-12/BER-G3-FU3-EXECUTION.md`
+  (sha256 `ea521f84c4d0d88f8e888f3588147a6a63c659f8773f7d41339d9eeca47b9915`), which is **not retrievable from this
+  repository**.
+- **Scope:** this entry corrects one sentence's scope. It edits no existing byte, re-opens no gate, edits no merged
+  pull-request body, and grants nothing. **New authority: None.**
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008
