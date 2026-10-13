@@ -194,14 +194,18 @@ dispositions are declared in section 2 deviation 3.
    merging them into one claim. The page's line count at this revision, 4,941, is
    `(Get-Content <page> -Encoding UTF8).Count` — the plan's declared convention, and the same
    convention that gives 5,118 / 4,879 / 5,939 for P1 / P3 / P7.
-   **One carried inconsistency, disclosed rather than hidden.** The ledger's own appended keeper
-   section (this PR's ledger hunk, L4826-4895) still describes the seven slices as covering one
-   another at their joins and the three capped outputs as re-read inside the following slice, and it
-   concludes that no line is unread; its declared-deviation list is the older two. That section is a
-   dated recording appended before this correction and it is bound to no acceptance: row **K-076**
-   binds the page's blob at `0237f611f718`, where the section does not exist. This round does not
-   rewrite the ledger — the section and the row stay byte-unchanged — and it is named here so no
-   reader takes that sentence for the accounting the row rests on, which is the one in this item.
+   **One carried inconsistency, disclosed rather than hidden, and now historical.** That disclosure
+   described the C2/C3-era state of the ledger's appended keeper section, which then carried the old
+   coverage sentence — the seven slices said to overlap at their joins and the three capped outputs
+   said to be re-read inside the following slice, concluding that no line is unread — and the older
+   **two**-item declared-deviation list. The Stage C4 round corrected that section to the record's
+   coverage wording: it names all **four** elisions by exact range, each with the read that displayed
+   it, and carries the **three**-item deviation list, at L4826-4911 of this head. The section is a
+   dated recording and is bound to no acceptance either way: row **K-076** binds the page's blob at
+   `0237f611f718`, where no such section exists. This record states the correction as history rather
+   than as head state, so that no reader carries away a sentence this head has already replaced, and
+   it is named here so no reader takes that superseded sentence for the accounting the row rests on,
+   which is the one in this item.
 
 **The six acceptance bullets, addressed for the accepted page.**
 
@@ -331,3 +335,12 @@ acceptance row this record does not support; bound no row to this commit's own S
 `build_index.py --write` and rebuilt no `tools/` artifact; touched no `.github/workflows/` path; and
 claims no authority beyond recording. The batching procedure does not grant provider, private-input,
 real-host or deployment authority (ledger L3018-3020).
+---
+## Footer
+
+sha256: 260321d50e8badc55b0ec93f4cbbfb304a9cde9e1269889e24971626a23cff3a
+
+This digest covers every byte of this file strictly above the last `## Footer` heading — the whole
+batch record through the closing `---` rule line and its terminating newline, encoded UTF-8 with LF line
+endings. It does not cover this footer. Any edit above the rule voids the digest and requires a fresh
+validation.
