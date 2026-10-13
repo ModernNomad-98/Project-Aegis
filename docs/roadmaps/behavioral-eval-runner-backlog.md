@@ -4146,6 +4146,49 @@ itself is a separate, later host phase that runs only under the merged grant.
   first-segment declaration from the authorized external evidence root, or restate the allowance; only then
   can headroom, the provider-side spend limit and the stop-before-exceed rule be recorded as facts.
 
+### 2026-10-13 — O-F1 discharged: the FU-3 record lane's carried publication item is closed by this note
+
+- **Date:** 2026-10-13.
+- **Addresses:** `O-F1` — in plain words, *observation F1 from the FU-3 reconciliation record lane's Stage F
+  final review: the merged pull request's "Aegis skills used" table publishes no row for Stages D, E or F,
+  because no stage read a skill* (`FU-3` — in plain words, *the Behavioral Eval Runner (BER)
+  provider-usage reconciliation attempt whose record lane merged as pull request #764*). It relates to the
+  entry directly above (L4124–L4148, the FU-3 provider-usage reconciliation note) without superseding or
+  editing it. Appended under this log's rule at L2672–L2675; no existing line in this file is edited, and
+  no merged pull-request body is touched.
+- **Carried, and why it was not repaired then:** Stage F raised it and left the body unedited
+  (`_resume-2026-10-09/evidence/docs-refresh-2026-10-12/FU3-RECORD-FINAL-REVIEW-F.md` section 10); Stage G
+  recorded it as an **open publication item** rather than repairing it
+  (`_resume-2026-10-09/evidence/docs-refresh-2026-10-12/FU3-RECORD-stage-g-summary.md` section 9), on the
+  coordinator's decision and on the precedent of finding `F-F1` — in plain words, *the same carried
+  skills-row gap, recorded and accepted earlier on the review-path lane*
+  (`_resume-2026-10-09/evidence/docs-refresh-2026-10-12/REVIEWPATH-FINAL-REVIEW-F.md` L68).
+- **Reason:** the table publishes **12** data rows — 6 for Stage A and 6 for Stage C — plus an explicit Stage B
+  absence record, and **no Stage D, E or F row exists because no stage read a skill**: Stages D and E named no
+  Aegis skill, and Stage F authored its own row inside its evidence file (section 11) without inserting it into
+  the body. `docs/delivery-workflow.md:182` words the `SD-F` condition (`SD-F` — in plain words,
+  *the Stage F final independent pull-request review*) as a table "with a row for every stage that ran".
+- **Decision:** the merged body **stays frozen** and the **digest of record stands**:
+  `482ee760bc99ca36` — in plain words, *the first 16 hex characters of the sha256 over pull request #764's
+  three bound body fields (the reconciliation witness, the Aegis skills table and the security answer),
+  computed at the merged head and named by the Stage F verdict*. Inserting a D/E/F row edits the **skills**
+  bound field and would void that digest, so the repair is a **new change** by the authorized publisher —
+  never an edit to the merged body.
+- **Evidence:** merge commit `05e93f499c827c4749b12cef09d2bbb7989121c4` — in plain words, *the commit that
+  brought pull request #764 into `main` on 2026-10-13*; merge receipt comment `6149285129` — in plain
+  words, *the Stage G merge receipt on pull request #764 that recorded this item as open*; Stage F verdict
+  comment `6149151592` — in plain words, *the Stage F review comment on pull request #764 that raised the
+  observation*; and the digest above.
+- **Disposition — closed by this note, and the publication-item rule stated:** an **open publication item** is a
+  gap between what a **frozen** merged pull-request body publishes in its bound fields and what
+  `docs/delivery-workflow.md` expects of them. It is **never a satisfied check**; it is non-blocking only
+  where no acceptance criterion's threshold depends on it; and it is **discharged by a dated note in this
+  append-only log**, never by editing the merged body, because any change to a bound field voids the digest
+  under which the merge was recorded and returns the change through a fresh `SD-F`. **O-F1 is closed by
+  this note.**
+- **Scope:** this entry records a closure. It creates no stage, gate, receipt row or bound field, edits no
+  existing byte and touches no merged body. **New authority: None.**
+
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008
