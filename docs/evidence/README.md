@@ -70,7 +70,7 @@ identity; it never makes an absent artifact retrievable.
 **The rule is prospective, and this is its effective date.** It binds citations **added from this change forward** -
 the change that states it, merged `2026-10-13`. It does **not** retroactively invalidate records already merged:
 **five archive citations in earlier, merged records remain OWED**, enumerated with their dispositions in section 3 of the
-publication record `docs/evidence/fu3-record-publication-2026-10-13/README.md` and tracked as open items. Those
+publication record [docs/evidence/fu3-record-publication-2026-10-13/README.md](fu3-record-publication-2026-10-13/README.md) and tracked as open items. Those
 records neither **violate** this rule nor are **silently excused** by it: they predate it, the work that would publish
 their evidence is named and outstanding, and this paragraph exists so a reader can tell the two cases apart. **A rule
 stated as a universal invariant while five known sites remain unmet is a false claim about its own scope** - Codex

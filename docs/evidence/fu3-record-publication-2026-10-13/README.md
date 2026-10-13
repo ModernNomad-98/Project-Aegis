@@ -21,7 +21,7 @@ URL, is what pins the text.
 
 - **Locator:** pull request #765 review comment `4261109123`, on `docs/roadmaps/behavioral-eval-runner-backlog.md` line 4162, written against commit `e0a026e2...`:
   [discussion_r4261109123](https://github.com/ModernNomad-98/Project-Aegis/pull/765#discussion_r4261109123).
-- **Digest of the retained text below:** sha256 `be0e3aab224a7384c0aedb734c3d1bffa65407b836b6b0a0dfa257bcdb266ecb` over its 913 characters, UTF-8, no trailing newline added.
+- **Digest of the retained text below:** sha256 `be0e3aab224a7384c0aedb734c3d1bffa65407b836b6b0a0dfa257bcdb266ecb` over its **918 UTF-8 bytes** (911 code points; 913 UTF-16 code units - the earlier label said "913 characters, UTF-8", which was wrong in both number and unit), no trailing newline added.
 - **Retained verbatim:**
 
 ```text
@@ -35,6 +35,29 @@ Useful? React with 👍 / 👎.
 ```
 
 
+**The second finding, retained the same way.** The same review raised a second P2 finding that the log cites by
+identifier alone. It is retained here on the same terms, and its own limit is stated the same way: **a pull-request
+comment can be edited or deleted, so the digest - not the URL - is what pins the text, and neither makes the comment
+retrievable from this repository.**
+
+- **Locator:** pull request #766 review comment `4261109109`, on `docs/roadmaps/behavioral-eval-runner-backlog.md` line 4188,
+  written against commit `e0a026e2...`:
+  [discussion_r4261109109](https://github.com/ModernNomad-98/Project-Aegis/pull/766#discussion_r4261109109).
+- **Digest of the retained text below:** sha256 `e1bf5013fe24913cb9cd4be586d695fc3a2b8fcd491ed939578b54c131f62acc` over its **903
+  UTF-8 bytes**, no trailing newline added.
+- **Retained verbatim:**
+
+```text
+**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Do not close a mandatory Stage F failure by logging it**For O-F1, the missing D/E/F rows are themselves part of the `SD-F` acceptance threshold: `docs/delivery-workflow.md:182` requires a row for every stage that ran, and its pure-docs path explicitly requires every defect to be repaired and re-audited. Declaring the omission “discharged by a dated note” therefore records an unsatisfied final-review gate as closed and creates a precedent for carrying mandatory gate failures past merge. Record this as a historical process failure or keep it open; a later log entry cannot substitute for satisfying the canonical workflow.AGENTS.md reference: [AGENTS.md:L65-L70](https://github.com/ModernNomad-98/Project-Aegis/blob/e0a026e2843e299d02180d31d7202a3598759a94/AGENTS.md#L65-L70)Useful? React with 👍 / 👎.
+```
+
+**This one is the rule's own violation, caught by the review that found it.** The log carried a bare mutable comment
+identifier with no digest, no locator and no availability statement - **the exact failure this change exists to
+remove, committed inside the change itself**, and the second such instance (the first, `4261109123`, is retained
+above). The repair is the same treatment: the text is retained here with a digest and a locator, the limitation is
+stated rather than implied, and **the log entry's citation is corrected in place with that edit disclosed in an
+appended entry**, because the entry's text is unmerged and the log's own rule against editing entries protects
+**merged** content.
 **The defect is durability, not accuracy.** The citations were correct: the sections they name
 really do sit at the lines they name (section 2 re-states each anchor). What failed was
 **retrievability** — the archive directory sits outside every Git repository on this host, so no
@@ -121,7 +144,7 @@ own evidence-retention rule is a blanket *no private identifiers in Git*; prior 
 Second, and decisively: **this publication directory does not exist at the base revision, so nothing inside it was
 "already published"** - every occurrence in this new file is new to Git no matter what appears elsewhere in the repository.
 The base-relative test answered a narrower question than the rule asks. The Lead withdrew the ruling, the identifiers are
-removed at the four prose and table sites enumerated in item 4 above, and at the three verification commands items 2 and 3 replace - seven source lines in all - while the session workspace path `C:\src\Project Aegis` and the distro-side directory name are **deliberately retained** and named as such in item 5, and the original with them intact is retained only at its digest-pinned
+removed at the four prose and table sites enumerated in item 4 above, and at the three verification commands items 2 and 3 replace - seven source lines in all - while the session workspace path `C:\src\Project Aegis` alone is **deliberately retained** and named as such in item 5 - the distro-side directory name was **removed** with the other tokens, as item 4 records and as the derivative confirms (it contains no `aegis-stage-a` at all), and the original with them intact is retained only at its digest-pinned
 external locator below.
 
 **Where the unsanitized original is retained, and the plain limit.** The original remains at
@@ -188,7 +211,7 @@ identity; it never makes an absent artifact retrievable.
 **The rule is prospective, and this is its effective date.** It binds citations **added from this change forward** -
 the change that states it, merged `2026-10-13`. It does **not** retroactively invalidate records already merged:
 **five archive citations in earlier, merged records remain OWED**, enumerated with their dispositions in section 3 of the
-publication record `docs/evidence/fu3-record-publication-2026-10-13/README.md` and tracked as open items. Those
+publication record [docs/evidence/fu3-record-publication-2026-10-13/README.md](README.md) and tracked as open items. Those
 records neither **violate** this rule nor are **silently excused** by it: they predate it, the work that would publish
 their evidence is named and outstanding, and this paragraph exists so a reader can tell the two cases apart. **A rule
 stated as a universal invariant while five known sites remain unmet is a false claim about its own scope** - Codex
@@ -205,9 +228,13 @@ checked by nothing either, and a record that relies on it says so.
 
 The four files were scanned before publication for AWS access keys, private-key blocks, GitHub
 tokens, ARNs, e-mail addresses, password- and secret-shaped assignments, and bare
-12-digit account-shaped numbers. **No credential material is present.** Three broad-pattern hits were
-read and dismissed as benign: a provider price line, a GitHub Actions job id inside a CI results
-table, and a sha256 value inside a table row. The scan is repeated as an acceptance check at the
+12-digit account-shaped numbers. **No credential material is present.** **Four** broad-pattern hits were read and each is
+dispositioned in section 5.1: a provider price line (credential-shape, the token-assignment
+alternative), a GitHub Actions job id inside a CI results table (account-shape, twelve digits), a
+sha256 value inside a table row (account-shape, twelve digits), and the derivative's own recomputed
+sha256 footer (account-shape, twelve digits). **The pre-publication scan and the acceptance check
+therefore examine the same four lines, which is the point of repeating the scan at the candidate
+head.** The scan is repeated as an acceptance check at the
 candidate head, so the result is a measurement rather than an assurance.
 
 **A privacy and identifier check, added because a secret scan is not a privacy check.** The four files were scanned
@@ -341,9 +368,9 @@ path, and three of them carry a byte-identical copy of the archive original:
 | `95351dda` | 26,345 | `cc183e4504a1b280d04e5726…` | 5 | 6 | 5 |
 | `61e73442` | 26,345 | `cc183e4504a1b280d04e5726…` | 5 | 6 | 5 |
 
-The six later commits are clean (0 / 0 / 0). **Materiality:** the same identifiers are already in **4, 5 and 2 tracked files
+The seven later commits are clean (0 / 0 / 0). **Materiality:** the same identifiers are already in **4, 5 and 2 tracked files
 at the base revision** respectively, so the history adds **a verbatim copy of a full unsanitized record**, not a new class
-of identifier. **What a full purge would require:** rewriting five commits of an eleven-commit branch. **What it would
+of identifier. **What a full purge would require:** rewriting five commits of a **twelve-commit** branch (5 unsanitized + 7 clean; `git rev-list --count bd210954^..HEAD` = 12). **What it would
 invalidate:** every binding that names them - eleven Stage D records, eight Stage E validations, the Stage F verdicts and
 MG2 - because a rewritten commit ceases to exist. **And it would still not free the repository**, since the identifiers
 remain in tracked files at the base revision. **A partial purge that produces a clean-looking result without removing the

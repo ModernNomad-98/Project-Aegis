@@ -4222,7 +4222,10 @@ itself is a separate, later host phase that runs only under the merged grant.
   one (L4143) and `docs/approvals/APPROVAL_REGISTER.md` (L5964) are corrected by a later change under
   each record's own rules. The publication record carries the full list.
 - **Scope:** this entry corrects citations and states a rule. It decides nothing about the separate O-F1
-  closure question raised as P2 finding `4261109109` on the same review, re-opens no gate, edits no
+  closure question raised as P2 finding `4261109109` on the same review - **its text is retained in the publication
+  record's preamble under *The second finding, retained the same way*, with the digest `e1bf5013fe2491...` and the locator
+  of the comment; a pull-request comment can be edited or deleted, so the digest, not the URL, pins it, and it is NOT
+  retrievable from this repository** - re-opens no gate, edits no
   merged pull-request body, and edits no existing byte of this file. **New authority: None.**
 
 ### 2026-10-13 — the publication entry above is corrected on one word: the fourth published file is a sanitized derivative, not a byte-identical copy
@@ -4310,6 +4313,28 @@ itself is a separate, later host phase that runs only under the merged grant.
 - **Scope:** this entry changes no status, re-opens no closure decision, edits no existing line of this
   file, and grants no authority. It is insert-only.
 - **New authority:** None.
+
+### 2026-10-13 - the citation in the third correction entry above is repaired in place, and this entry discloses the edit
+
+- **Supersedes:** the entry directly above (L4253-L4279), specifically its **Scope** bullet at L4225.
+- **What changed, and why the entry above could not simply stand:** that bullet cited the separate O-F1 closure question
+  by a **bare pull-request comment identifier** - no digest, no locator, no availability statement. That is the failure
+  mode this change exists to remove, so leaving it would have made the change violate its own rule a second time. Its
+  text is now **retained verbatim in the publication record's preamble** with the digest
+  `e1bf5013fe24913cb9cd4be586d695fc3a2b8fcd491ed939578b54c131f62acc` and the locator of the comment, and the bullet states plainly
+  that a comment can be edited or deleted and is **NOT retrievable from this repository** - the digest, not the URL,
+  pins the text.
+- **One earlier sentence is now false, and it is named rather than left standing.** The entry at L4192 says at L4197
+  that *"No existing line of this file is edited"*. **That sentence is no longer true of its own entry**, because the
+  bullet repaired above sits inside it. This is the same consequence the `c46d9057` entry recorded at L4296 for the
+  entry at L4253, and it is recorded here for the same reason: a reader must not rely on a sentence the file itself has
+  since contradicted. **Both sentences stay unedited** - editing them would be a third in-place repair compounding the
+  first two.
+- **This entry edits one line of an existing entry, and says so.** The rule at L2672-L2675 forbids editing log entries;
+  the entry above is **unmerged** - it arrives with this pull request - so this is the same departure recorded at L4280
+  for the previous correction, and it is disclosed here for the same reason: after merge, the edited line is history
+  that a reader must be able to audit. **A third in-place edit would compound the first two, so this entry is the last;
+  any further correction of those entries is made by appending.**
 
 ## 14. Continuation instructions for a brand-new session
 
