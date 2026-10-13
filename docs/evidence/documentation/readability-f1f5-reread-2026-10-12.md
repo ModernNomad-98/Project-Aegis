@@ -54,7 +54,7 @@ in the pull request body, never inside the commit that produces them.
 **Concurrency: one reader, inside the three-reader ceiling** — the ceiling is a maximum, and a single
 reader satisfies it by construction.
 
-**Declared deviations (read honestly, not silently). Three, all measured facts about this session:**
+**Declared deviations (read honestly, not silently). Three, all measured facts:**
 
 1. **The reader is the same agent that writes this record and the ledger keeper section it rests
    on.** The plan section 5 table asks, for item 3, that the reader also differ from the writer of the
@@ -81,6 +81,14 @@ reader satisfies it by construction.
    keep their named follow-ups (section 7) and get **no row**. The plan allows exactly this (N = 0-6;
    a page the reader does not accept gets a named follow-up instead of a row), and no page is
    asserted accepted on the strength of a partial read.
+3. **Two of the six acceptance-bullet dispositions for the accepted page are partial, and the page's
+   own text was not rewritten to make them unqualified.** The "purpose and audience up front" bullet
+   and the "abbreviation or coded identifier at first use" bullet are recorded as **partial —
+   deviation declared** in the six-bullet table at the end of section 4.1, with the facts each turns
+   on (L1-17 names no intended audience; the page's first `PR` token is L14 against the definition at
+   L156). Both are properties of the page's text at the bound revision, which this lane may not
+   rewrite, so they are declared as deviations rather than repaired; item 2 of section 4.1 states them
+   in full.
 
 ## 3. Per-page dispositions
 
@@ -115,16 +123,23 @@ read-again rather than skipped.
 
 ### 4.1 R1 — this ledger, P4, read whole and accepted
 
-Four numbered items follow, and each is stated as what it is (item 1 is this repair round's own correction, declared in section 2 deviation 1):
+Four numbered items follow, and each is stated as what it is: item 1 records the coverage corrections
+this lane has made (the Stage C2 round's and this Stage C3 round's), and item 2's two partial bullet
+dispositions are declared in section 2 deviation 3.
 
-1. **The coverage sentence in section 4.1 item 4 needed correction, and it is corrected there.**
-   The item asserted that three tool-output elisions were "re-read inside the next slice" and concluded
-   "no line of the page is unread". That mechanism was false at two of the three elisions, and one
-   25-line span (L4171-4195) was displayed by no read call in the reader's session; item 4 now states each elision by its
-   exact line range; the 25-line span (L4171-4195) left uncovered by the reader's session was then
-   **re-read by this repair round**, so it is a residual against the reader's own session and is now
-   **read by direct line-range reads** — stated that way rather than folded into the reader's claim.
-   Declared here because a Stage E verdict (E-1) rests on the correction.
+1. **The coverage sentence in section 4.1 item 4 needed correction, and it is corrected there — twice.**
+   The item asserted that three tool-output elisions were "re-read inside the next slice", that the
+   slices overlapped at their joins, and it concluded "no line of the page is unread".
+   The Stage C2 round replaced the mechanism sentence and named three elisions; the Stage E2 verdict
+   (`READABILITY-F1F5-VALIDATE-E2.md`, item R-1) then showed that (a) the join-overlap clause
+   survived at L138 and is false — only the L720-800 join overlaps — (b) the seventh slice's elided
+   L4845-4895 cannot have been displayed by the call at L4896-4941, and (c) a **fourth, larger**
+   elision, **L3058-3479 (422 lines)**, was named by no read at all, so the coverage sentence was
+   false by 422 lines. Item 4 now states all **four** capped slices by their exact line ranges with
+   the read that displayed each, and both the "next slice" and the join-overlap wording are gone.
+   This Stage C3 round read **L3058-3479** directly at the bound revision, which is what closes that
+   band. Declared here because the Stage E item E-1 and its re-validation item R-1 rest on the
+   correction.
 2. **Two of the six acceptance-bullet dispositions are partial, not unqualified.** See the six-bullet table at the end of section 4.1:
    the "purpose and audience up front" bullet is **partial** (no intended audience is named in L1-17)
    and the "abbreviation or coded identifier at first use" bullet is **partial** (the page's first `PR`
@@ -135,32 +150,64 @@ Four numbered items follow, and each is stated as what it is (item 1 is this rep
    **candidate list, never a defect list**; the repository's own instrument is the adjudicating one.
 4. **Every line, line by line, as prose at 0237f611f718 — L1-4941, the whole page.** Seven
    contiguous slices covered the file (L1-800, 720-1419, 1420-2079, 2080-2739, 2740-3479, 3480-4219,
-   4220-4941, overlapping at the slice joins), and the three tool-output elisions those slices
-   produced were **not all displayed**, and this correction names each one by its exact line range:
-   **first slice (L1-800): L786-800** — 15 lines; the read stopped at L785 under a per-call output cap,
-   and those 15 lines were re-read in the reader's own subsequent read call at L720-1419. **Sixth slice
-   (L3480-4219): L4171-4219** — 49 lines; the read stopped at L4170, the next slice starts at L4220,
-   and a separate fill read covered L4196-4221 only. **Seventh slice (L4220-4941): L4845-4895** — 51
-   lines; the read stopped at L4844, and those lines were re-read explicitly in the reader's call at
-   L4896-4941. **The one gap the reader's own session left, now closed by this repair round.** Of the
-   sixth slice's elided 49 lines, **L4171-4195 (25 lines) were displayed by no read call in the reader's
-   session** — the reader's own recorded reasoning names the elision and then reads from L4196 only, so
-   those 25 lines were **not established as read by the session that produced this record** and are
-   carried as a residual against that evidence, not asserted read. **The Stage C2 repair round then read
-   them**: this round read the file's bytes at `0237f611f718` directly, at the three elided ranges
-   **L786-800 (15 lines), L4171-4219 (49 lines) and L4845-4895 (51 lines)** — 115 lines in total — so
-   the three ranges are now read by direct line-range reads, and **no line of the page is left unread by
-   the reader's slices plus this repair round's reads**; the row's whole-page coverage therefore rests
-   on both, and this record says which read covered which range rather than merging them into one
-   claim. The slices' union still covers L1-4941. The page's line count at this revision, 4,941, is
+   4220-4941); only the 1-to-2 join overlaps (at L720-800) and the other five joins abut exactly, so
+   the slices' union is L1-4941 and no join hides a line — the earlier claim that the slices
+   overlapped at their joins was false for five of the six joins and is deleted here. **Four of the seven slices
+   were capped**, and the four elisions they produced are named below by exact range, each with the
+   read that displayed it — never merged into one claim:
+   **first slice (L1-800): L786-800** — 15 lines; the read stopped at L785 under a per-call output
+   cap, and these 15 lines were displayed by the reader's own subsequent read call at L720-1419.
+   **fifth slice (L2740-3479): L3058-3479** — **422 lines, the largest of the four**; the read stopped
+   at L3057 with "Use offset=3058 to continue", and no read in the reader's session **and no read in
+   the Stage C2 round** displayed them — established by the Stage E2 verdict
+   (`READABILITY-F1F5-VALIDATE-E2.md` section 3.3) on three independent observations (the cap marker
+   and its offset, the absence of any covering call in that session, and the absence of twelve
+   distinctive probes drawn from the band across that session's whole transcript and all eleven of its
+   spill files). This record's earlier "three elisions" accounting omitted that band, so its "no line
+   of the page is left unread" sentence was **false by 422 lines** as it stood. **The Stage C3 repair
+   round (this one) read the band directly:** this round extracted the page's bytes at `0237f611f718`
+   (`git show`, 4,941 lines, `git hash-object` = `1e0190ee3faea7dbde5b01384fa2cbc56c9783d7`) and
+   displayed **L3058-3479** in its own read calls, in eleven chunks (L3058-3107, 3108-3157, 3158-3197,
+   3198-3237, 3238-3277, 3278-3317, 3318-3357, 3358-3397, 3398-3437, 3438-3477, 3478-3479). The first
+   attempt to display the whole band in one step was itself capped by that session's own output limit
+   (1,216 bytes omitted and spilled to a file), which is why the band is recorded as eleven displayed
+   chunks rather than one; the omitted bytes were re-read inside those chunks.
+   **sixth slice (L3480-4219): L4171-4219** — 49 lines; the read stopped at L4170 and the next slice
+   starts at L4220, so this elision splits: **L4196-4219** was displayed by the reader's own fill read
+   at L4196-4221, while **L4171-4195 (25 lines)** was displayed by no read call in the reader's
+   session — carried as a residual against that session's evidence and then displayed by the **Stage
+   C2 repair round's read of L4166-4225**.
+   **seventh slice (L4220-4941): L4845-4895** — 51 lines; the read stopped at L4844, and these 51
+   lines were displayed by the **Stage C2 repair round's read of L4840-4899** — *not* by the reader's
+   later call at L4896-4941, which begins after the elision and displays L4896-4941 only; the earlier
+   attribution of this elision to that call was wrong and is corrected here.
+   **The honest total, by covering read.** The reader's own session displayed L1-785, L720-1419,
+   1420-2079, 2080-2739, 2740-3057, 3480-4170 and 4220-4844, plus L4196-4221 and L4896-4941 in its
+   two fill reads. The Stage C2 round displayed L780-804, L4166-4225 and L4840-4899. The Stage C3
+   round (this one) displayed L3058-3479. **Every one of the page's 4,941 lines is displayed by one of
+   those named reads**: the seven slices cover L1-4941, and each of the four capped bands is supplied
+   by the read named for it — L786-800 by the reader's own L720-1419 call, **L3058-3479 by this
+   round's read**, L4171-4195 by the Stage C2 round's L4166-4225 read (with L4196-4219 from the
+   reader's own L4196-4221 fill read), and L4845-4895 by the Stage C2 round's L4840-4899 read. The
+   coverage therefore rests on the reader's slices, the Stage C2 round's three reads and this round's
+   L3058-3479 read, in that order, and this record says which read covered which range rather than
+   merging them into one claim. The page's line count at this revision, 4,941, is
    `(Get-Content <page> -Encoding UTF8).Count` — the plan's declared convention, and the same
    convention that gives 5,118 / 4,879 / 5,939 for P1 / P3 / P7.
+   **One carried inconsistency, disclosed rather than hidden.** The ledger's own appended keeper
+   section (this PR's ledger hunk, L4826-4895) still describes the seven slices as covering one
+   another at their joins and the three capped outputs as re-read inside the following slice, and it
+   concludes that no line is unread; its declared-deviation list is the older two. That section is a
+   dated recording appended before this correction and it is bound to no acceptance: row **K-076**
+   binds the page's blob at `0237f611f718`, where the section does not exist. This round does not
+   rewrite the ledger — the section and the row stay byte-unchanged — and it is named here so no
+   reader takes that sentence for the accounting the row rests on, which is the one in this item.
 
 **The six acceptance bullets, addressed for the accepted page.**
 
 | Bullet | P4 `docs/roadmaps/aegis-documentation-readability-backlog.md` |
 | --- | --- |
-| Purpose and audience up front | **partial — deviation declared.** L1-3 "Start here — current reading" states what the page is and, at L5-17, what the current reading is; L1-17 names **no intended audience** — the rule's second clause ("and who should read it", ledger L2843) is not met anywhere in the page's opening, and the nearest statement of readership (the purpose-and-normal-use paragraphs at L127-140) is not an opening and addresses the reader generically. The record states that as a partial rather than as an unqualified `yes`; L19-31 states in its first sentence that "**The index is now the count**", names the instrument, and says the ledger "publishes no count of its own and cites the index" (D84), before any dated history begins. The dated rounds that follow are labelled as dated history, oldest first, and say no dated snapshot is rewritten (L9-10). |
+| Purpose and audience up front | **partial — deviation declared.** L1-3 "Start here — current reading" states what the page is and, at L5-17, what the current reading is; L1-17 names **no intended audience** — the rule's second clause ("and who should read it", ledger L2843) is not met anywhere in the page's opening, and the nearest statement of readership (the **Purpose and normal use** restatement heading at L2773, the `## Purpose and scope` section at L2803 — its reader statement at L2805-2809 — through L2835) is not an opening and addresses the reader generically. The record states that as a partial rather than as an unqualified `yes`; L19-31 states in its first sentence that "**The index is now the count**", names the instrument, and says the ledger "publishes no count of its own and cites the index" (D84), before any dated history begins. The dated rounds that follow are labelled as dated history, oldest first, and say no dated snapshot is rewritten (L9-10). |
 | Abbreviations and coded identifiers defined at first use | **partial — deviation declared.** The term block at L156-168 defines pull request (PR), commit SHA, the acceptance index, `check_index.py`, "a bound", the ledger keeper and AEGIS-APR-101, and it is the definition the page's own rule turns on. The rule says *at first use*, and the page's **first `PR` token is at L14** ("A later merge, PR #577, adds one further tracked page"), **142 lines before the definition at L156** — the one place the page breaks its own rule, and the record now states it instead of reading the term block as if it preceded every use. The later 2026-10-12 sections keep the discipline (`D84`, `D98`, `K-074/K-075`, "CARRY-WITH-DEVIATION" are each glossed where they first appear in the section that uses them), and coded identifiers are resolved to their own records rather than left bare: AEGIS-APR-101/113-118 to the approval register, D73/D83/D84 to `step-0-reconciliation-v4.md#5-recorded-decisions`. |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes** — every dated round is its own descriptive heading, the counting rules are set out as headed rule paragraphs ("Targeted edits to accepted pages", the net-difference decision, the generated-report class, the manual-only-marker decision), each keeper round carries a table with the column contract, and the concrete examples are worked numbers rather than abstractions: the 2026-10-03 premises correction re-derives `674 − 1 − 65 = 608` from a named command, and this page's own count-honesty block quotes the instrument's printed summary instead of asserting a figure. |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes** — accepted, pending, generated-report and classified-fixture are distinct states with their own rules, "IN PROGRESS" is the stated status of the sweep, the estimates are labelled historical or planning projections ("Those are planning projections, not measurements", L99-100), and the page states repeatedly what it does **not** do: it "confers nothing", grants no provider, private-input, real-host or deployment authority (L3018-3020), and the D98 note records that it "accepts only the reviewed-revision CONTENT at `ab7182d8`". |
@@ -241,7 +288,7 @@ evidence source at `--ref`; the row's `Blob ID` is `git rev-parse 0237f611f718ed
    tool actually derives at the declared revision, `git rev-parse 0237f611f718ed833935e72a0d98dd42362388a0:<ledger>`, and records the
    plan text as superseded on this point rather than dropping the discrepancy.
 5. **F3 — DISCHARGED by this commit.** P4's remnant whole-page read is the same read as F5's: the
-   page's bytes at `0237f611f718ed833935e72a0d98dd42362388a0` were read whole, L1-4941, including the 512-line excluded range, and the
+   page's bytes at `0237f611f718ed833935e72a0d98dd42362388a0` were read whole, L1-4941, including the 512-line excluded range (the coverage is the reader's seven slices plus the Stage C2 round's three reads plus this Stage C3 round's L3058-3479 read, each named in section 4.1 item 4), and the
    single accepted-page row **K-076** is that read's record.
 6. **F6 (carried, not this lane's) — the D98 follow-up 3 stale evidence-source anchors.** Rows L-001
    to L-006 in the consolidated keeper table cite `docs/roadmaps/aegis-documentation-readability-backlog.md:2574`
