@@ -54,13 +54,29 @@ in the pull request body, never inside the commit that produces them.
 **Concurrency: one reader, inside the three-reader ceiling** — the ceiling is a maximum, and a single
 reader satisfies it by construction.
 
-**Declared deviations (read honestly, not silently). Two, both measured facts about this session:**
+**Declared deviations (read honestly, not silently). Three, all measured facts about this session:**
 
 1. **The reader is the same agent that writes this record and the ledger keeper section it rests
    on.** The plan section 5 table asks, for item 3, that the reader also differ from the writer of the
    keeper section the row rests on. A single-agent lane cannot satisfy that second clause; it is
    **not satisfied**. The clause the row turns on — the reader differs from
    `readability-batches-implementer-c` — **is** satisfied by a different agent again.
+   **Restated as an exposure against the register's own text (carried exposure E-3).**
+   `docs/approvals/APPROVAL_REGISTER.md:3155` (AEGIS-APR-101, at the bound revision
+   `0237f611f718`) requires that "the keeper must be a different agent from the page's author and
+   accepting reviewer", and permits the keeper only to record an existing qualifying decision rather
+   than to confer acceptance. For **K-076** the reviewer cell and the writer of the keeper section the
+   row rests on are the **same** agent, `readability-f1f5-implementer-c`, so **that condition is not
+   satisfied on the register's text** and this row is **not green**. It is also not hidden: the same
+   pattern was declared for `K-074`/`K-075` and carried by the coordinator ruling recorded in
+   `READABILITY-CLOSEOUT-AUDIT-D2.md` (*AC7/AC9 "declared deviation, coordinator ruling (a)
+   CARRY-WITH-DEVIATION; remedy is staffing"*), and this lane is carried the same way — as a
+   **CARRY-WITH-DEVIATION under that SD-D2 coordinator-ruling precedent**, which covers the *carry* and
+   does not itself satisfy the register condition. Disposing of the **authority question** is left where
+   the authority sits: the merge holder disposes of it under AEGIS-APR-100 (the standing commit, push
+   and merge pre-approval), by either citing the authority that permits a same-agent recording at this
+   head or withholding the row for an eligible keeper to re-record. This record claims no such
+   authority.
 2. **F1, F2 and F4 are not discharged by this session.** P1, P3 and P7 were **not** read whole; they
    keep their named follow-ups (section 7) and get **no row**. The plan allows exactly this (N = 0-6;
    a page the reader does not accept gets a named follow-up instead of a row), and no page is
@@ -99,17 +115,44 @@ read-again rather than skipped.
 
 ### 4.1 R1 — this ledger, P4, read whole and accepted
 
-Two passes were made, and each is stated as what it is:
+Four numbered items follow, and each is stated as what it is (item 1 is this repair round's own correction, declared in section 2 deviation 1):
 
-1. **Every line, exhaustively and mechanically**, at 0237f611f718: every Markdown link target
+1. **The coverage sentence in section 4.1 item 4 needed correction, and it is corrected there.**
+   The item asserted that three tool-output elisions were "re-read inside the next slice" and concluded
+   "no line of the page is unread". That mechanism was false at two of the three elisions, and one
+   25-line span (L4171-4195) was displayed by no read call in the reader's session; item 4 now states each elision by its
+   exact line range; the 25-line span (L4171-4195) left uncovered by the reader's session was then
+   **re-read by this repair round**, so it is a residual against the reader's own session and is now
+   **read by direct line-range reads** — stated that way rather than folded into the reader's claim.
+   Declared here because a Stage E verdict (E-1) rests on the correction.
+2. **Two of the six acceptance-bullet dispositions are partial, not unqualified.** See the six-bullet table at the end of section 4.1:
+   the "purpose and audience up front" bullet is **partial** (no intended audience is named in L1-17)
+   and the "abbreviation or coded identifier at first use" bullet is **partial** (the page's first `PR`
+   token is at L14; the definition is at L156).
+3. **Every line, exhaustively and mechanically**, at 0237f611f718: every Markdown link target
    and in-page anchor, every 40-character SHA-shaped token, every 7-12 character backticked SHA
    token. The mechanical figures quoted here are the lane's own narrower classifier and are a
    **candidate list, never a defect list**; the repository's own instrument is the adjudicating one.
-2. **Every line, line by line, as prose at 0237f611f718 — L1-4941, the whole page.** Seven
+4. **Every line, line by line, as prose at 0237f611f718 — L1-4941, the whole page.** Seven
    contiguous slices covered the file (L1-800, 720-1419, 1420-2079, 2080-2739, 2740-3479, 3480-4219,
    4220-4941, overlapping at the slice joins), and the three tool-output elisions those slices
-   produced (inside the first, sixth and seventh slices) were **re-read inside the next slice**, so
-   **no line of the page is unread**. The page's line count at this revision, 4,941, is
+   produced were **not all displayed**, and this correction names each one by its exact line range:
+   **first slice (L1-800): L786-800** — 15 lines; the read stopped at L785 under a per-call output cap,
+   and those 15 lines were re-read in the reader's own subsequent read call at L720-1419. **Sixth slice
+   (L3480-4219): L4171-4219** — 49 lines; the read stopped at L4170, the next slice starts at L4220,
+   and a separate fill read covered L4196-4221 only. **Seventh slice (L4220-4941): L4845-4895** — 51
+   lines; the read stopped at L4844, and those lines were re-read explicitly in the reader's call at
+   L4896-4941. **The one gap the reader's own session left, now closed by this repair round.** Of the
+   sixth slice's elided 49 lines, **L4171-4195 (25 lines) were displayed by no read call in the reader's
+   session** — the reader's own recorded reasoning names the elision and then reads from L4196 only, so
+   those 25 lines were **not established as read by the session that produced this record** and are
+   carried as a residual against that evidence, not asserted read. **The Stage C2 repair round then read
+   them**: this round read the file's bytes at `0237f611f718` directly, at the three elided ranges
+   **L786-800 (15 lines), L4171-4219 (49 lines) and L4845-4895 (51 lines)** — 115 lines in total — so
+   the three ranges are now read by direct line-range reads, and **no line of the page is left unread by
+   the reader's slices plus this repair round's reads**; the row's whole-page coverage therefore rests
+   on both, and this record says which read covered which range rather than merging them into one
+   claim. The slices' union still covers L1-4941. The page's line count at this revision, 4,941, is
    `(Get-Content <page> -Encoding UTF8).Count` — the plan's declared convention, and the same
    convention that gives 5,118 / 4,879 / 5,939 for P1 / P3 / P7.
 
@@ -117,8 +160,8 @@ Two passes were made, and each is stated as what it is:
 
 | Bullet | P4 `docs/roadmaps/aegis-documentation-readability-backlog.md` |
 | --- | --- |
-| Purpose and audience up front | **yes** — L1-3 "Start here — current reading" states what the page is and, at L5-17, what the current reading is; L19-31 states in its first sentence that "**The index is now the count**", names the instrument, and says the ledger "publishes no count of its own and cites the index" (D84), before any dated history begins. The dated rounds that follow are labelled as dated history, oldest first, and say no dated snapshot is rewritten (L9-10). |
-| Abbreviations and coded identifiers defined at first use | **yes** — the term block at L156-168 defines pull request (PR), commit SHA, the acceptance index, `check_index.py`, "a bound", the ledger keeper and AEGIS-APR-101 before those short forms carry weight, and the later 2026-10-12 sections keep the same discipline (`D84`, `D98`, `K-074/K-075`, "CARRY-WITH-DEVIATION" are each glossed where they first appear in the section that uses them). Coded identifiers are resolved to their own records rather than left bare: AEGIS-APR-101/113-118 to the approval register, D73/D83/D84 to `step-0-reconciliation-v4.md#5-recorded-decisions`. |
+| Purpose and audience up front | **partial — deviation declared.** L1-3 "Start here — current reading" states what the page is and, at L5-17, what the current reading is; L1-17 names **no intended audience** — the rule's second clause ("and who should read it", ledger L2843) is not met anywhere in the page's opening, and the nearest statement of readership (the purpose-and-normal-use paragraphs at L127-140) is not an opening and addresses the reader generically. The record states that as a partial rather than as an unqualified `yes`; L19-31 states in its first sentence that "**The index is now the count**", names the instrument, and says the ledger "publishes no count of its own and cites the index" (D84), before any dated history begins. The dated rounds that follow are labelled as dated history, oldest first, and say no dated snapshot is rewritten (L9-10). |
+| Abbreviations and coded identifiers defined at first use | **partial — deviation declared.** The term block at L156-168 defines pull request (PR), commit SHA, the acceptance index, `check_index.py`, "a bound", the ledger keeper and AEGIS-APR-101, and it is the definition the page's own rule turns on. The rule says *at first use*, and the page's **first `PR` token is at L14** ("A later merge, PR #577, adds one further tracked page"), **142 lines before the definition at L156** — the one place the page breaks its own rule, and the record now states it instead of reading the term block as if it preceded every use. The later 2026-10-12 sections keep the discipline (`D84`, `D98`, `K-074/K-075`, "CARRY-WITH-DEVIATION" are each glossed where they first appear in the section that uses them), and coded identifiers are resolved to their own records rather than left bare: AEGIS-APR-101/113-118 to the approval register, D73/D83/D84 to `step-0-reconciliation-v4.md#5-recorded-decisions`. |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes** — every dated round is its own descriptive heading, the counting rules are set out as headed rule paragraphs ("Targeted edits to accepted pages", the net-difference decision, the generated-report class, the manual-only-marker decision), each keeper round carries a table with the column contract, and the concrete examples are worked numbers rather than abstractions: the 2026-10-03 premises correction re-derives `674 − 1 − 65 = 608` from a named command, and this page's own count-honesty block quotes the instrument's printed summary instead of asserting a figure. |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes** — accepted, pending, generated-report and classified-fixture are distinct states with their own rules, "IN PROGRESS" is the stated status of the sweep, the estimates are labelled historical or planning projections ("Those are planning projections, not measurements", L99-100), and the page states repeatedly what it does **not** do: it "confers nothing", grants no provider, private-input, real-host or deployment authority (L3018-3020), and the D98 note records that it "accepts only the reviewed-revision CONTENT at `ab7182d8`". |
 | Navigation links current and every referenced file or command existing | **yes, read as a candidate list and adjudicated on the page's own terms** — every local link target in the accepted span resolves to a tracked path at 0237f611f718, and the in-page anchors the page itself uses (`#acceptance-for-each-page`, `#remaining-page-review-in-larger-batches`, the keeper-recording and premises-correction anchors) each resolve to a heading that exists in this file at this revision. The page also records which anchors it knows to be stale instead of silently rewriting them: the D98 named follow-up 3 is exactly a stale evidence-source anchor (rows L-001 to L-006 cite L2574/L2575), and it is carried forward below rather than repaired. |
@@ -169,7 +212,7 @@ reader. No row is appended for any of them.
 no protected path — the lane is Markdown-only by construction, which is why the pull request answers
 the security question `No`.
 
-**Source rows.** The row's `Quote` string appears in section 9 byte-for-byte and names the full
+**Source rows.** The row's `Quote` string appears in section 8 byte-for-byte and names the full
 40-character acceptance revision `0237f611f718ed833935e72a0d98dd42362388a0` verbatim, which `build_index.py` L275-278 requires in the
 evidence source at `--ref`; the row's `Blob ID` is `git rev-parse 0237f611f718ed833935e72a0d98dd42362388a0:<ledger>` =
 `1e0190ee3faea7dbde5b01384fa2cbc56c9783d7`, which L258-263 requires.
