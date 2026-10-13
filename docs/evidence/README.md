@@ -10,6 +10,8 @@ instruction to repeat an old run. For current authority and status, read the
 [setup routing plan](../roadmaps/aegis-setup-routing-plan.md).
 The current-reading boundaries below were checked on 2026-09-23 against the
 source-library tree at `e2145b1`; recheck the owning registers after later work.
+Rows added after that sweep state their own date and base revision in the row
+itself, because the 2026-09-23 sweep does not reach them.
 
 **Reading key:** Behavioral Eval Runner (BER) is the skill evaluation tool;
 control plane (CP) is the delivery state and recovery component. A work package
@@ -43,7 +45,7 @@ to the dated record that reports them.
 | What issue #101 package 2 delivered | [Package 2 review](setup/issue-101-package-2-review.md) | Windows-tested Aegis-only saved choice shipped; no helper or provider connection. |
 | What issue #101 package 3 delivered | [Package 3 review](setup/issue-101-package-3-review.md) | Offline advisory contract shipped; a host hook and actual fallback remain future work. |
 | What the #723/#729 close-out record got wrong, corrected forward | [SCIF close-out corrections](scif/scif-closeout-corrections-2026-10-11.md) | Dated corrections only; the approval register is untouched and no authority is created. |
-| Where the evidence cited by the O-F1 publication note now lives, and the rule that keeps citations retrievable | [FU-3 record publication](fu3-record-publication-2026-10-13/README.md) | Published copies with per-file sha256 digests; the superseded citations were accurate but not retrievable from a fresh checkout. |
+| Where the evidence cited by the O-F1 publication note now lives, and the rule that keeps citations retrievable | [FU-3 record publication](fu3-record-publication-2026-10-13/README.md) | Published copies with per-file sha256 digests; the superseded citations were accurate but not retrievable from a fresh checkout. **Added 2026-10-13 by the workspace-citation-durability change, against base `dbe2ee28` - not part of the 2026-09-23 sweep at `e2145b1`. This row names its date and base revision rather than its own commit, because a page cannot cite the commit that contains it (the same convention `docs/roadmaps/aegis-ci-baseline-2026-10-11.md` L51-L52 states for itself).** |
 
 Other dated records are reachable from the owning backlogs and the
 [documentation index](../README.md). Do not infer that an unlisted evidence
@@ -60,6 +62,9 @@ retrievable from this repository**. An out-of-tree path alone is not acceptable 
 identity; it never makes an absent artifact retrievable.
 
 This is a documented rule, not a machine-enforced one, and the difference is stated rather than blurred:
-the *in-repo* half is enforced by the "Run Markdown link checker over the repository's own pages" step of
-`validate-skills`, which goes red when a cited path or heading stops resolving; the *digest* half is
-checked by nothing, and a record that relies on it says so.
+the "Run Markdown link checker over the repository's own pages" step of `validate-skills` validates the
+links a record **already contains** - it goes red when a written link stops resolving - and it does
+**not** require a record to contain a durable citation at all. A record can cite an out-of-tree path as
+plain text, or omit its evidence entirely, and that step stays green. Supplying the citation this rule
+requires is therefore a **documentation obligation that nothing machine-checks**; the *digest* half is
+checked by nothing either, and a record that relies on it says so.

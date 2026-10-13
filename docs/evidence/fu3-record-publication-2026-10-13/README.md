@@ -71,10 +71,20 @@ The frozen note itself is **not edited** by this publication: it is bound to the
 which the merge of pull request #765 was recorded, and the correction is an appended entry in
 the section 13 governance log that names the entry it supersedes.
 
-## 3. Every archive path a tracked record cites, and its disposition
+## 3. Every archive path the pre-change records cite, and its disposition
 
-Ten citation occurrences across four tracked files name **nine distinct** archive paths. Four
-are published here; **five are owed** and are named in section 6 rather than dropped.
+Ten citation occurrences across the **four pre-change tracked records** - the four files that cited the
+archive at the base revision this change is against - name **nine distinct** archive paths. Four are
+published here; **five are owed** and are named in section 6 rather than dropped.
+
+**Scope of this census, stated because the heading promises it.** The census was taken over the tracked
+tree at the base revision, **before** this change. The four published copies in this directory are frozen
+verbatim re-publications: they are archival records in their own right, and they carry their own
+out-of-tree references internally - for example the two source-archive paths inside
+`BER-G3-FU3-EXECUTION.md` at L113-L114, and a row-source locator inside
+`FU3-RECORD-FINAL-REVIEW-F.md` at L222. Those internal references are **not** counted above and are
+**not** repaired by this change: rewriting them would falsify the copies' own integrity claims (section 1),
+and widening the census to include them would breach this change's audited scope.
 
 | # | Archive path cited | Cited in | Disposition |
 | --- | --- | --- | --- |
@@ -101,9 +111,12 @@ retrievable from this repository**. An out-of-tree path alone is not acceptable 
 identity; it never makes an absent artifact retrievable.
 
 This is a documented rule, not a machine-enforced one, and the difference is stated rather than blurred:
-the *in-repo* half is enforced by the "Run Markdown link checker over the repository's own pages" step of
-`validate-skills`, which goes red when a cited path or heading stops resolving; the *digest* half is
-checked by nothing, and a record that relies on it says so.
+the "Run Markdown link checker over the repository's own pages" step of `validate-skills` validates the
+links a record **already contains** - it goes red when a written link stops resolving - and it does
+**not** require a record to contain a durable citation at all. A record can cite an out-of-tree path as
+plain text, or omit its evidence entirely, and that step stays green. Supplying the citation this rule
+requires is therefore a **documentation obligation that nothing machine-checks**; the *digest* half is
+checked by nothing either, and a record that relies on it says so.
 ## 5. Credential and secret scan of the published bytes
 
 The four files were scanned before publication for AWS access keys, private-key blocks, GitHub
