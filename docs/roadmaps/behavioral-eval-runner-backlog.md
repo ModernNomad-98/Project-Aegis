@@ -4189,6 +4189,41 @@ itself is a separate, later host phase that runs only under the merged grant.
 - **Scope:** this entry records a closure. It creates no stage, gate, receipt row or bound field, edits no
   existing byte and touches no merged body. **New authority: None.**
 
+### 2026-10-13 — the workspace-archive citations in the O-F1 note are superseded by published, in-repo evidence
+
+- **Date:** 2026-10-13.
+- **Addresses:** the three evidence citations in the entry at L4149–L4190 ("2026-10-13 — O-F1 discharged:
+  the FU-3 record lane's carried publication item is closed by this note"). Appended under this log's rule
+  at L2672–L2675. No existing line of this file is edited, and that entry's closure decision, its Scope
+  bullet and its "New authority: None" all stand unchanged.
+- **Why:** those citations named files inside `_resume-2026-10-09/` — in plain words, *the session
+  workspace archive, which sits outside every repository and therefore inside no checkout*. The citations
+  were **accurate** (the cited sections are at the lines they name) and the defect was **durability, not
+  accuracy**: a fresh checkout could not retrieve the Stage F record, the Stage G record or the F-F1
+  precedent they support. Raised as P2 finding `4261109123` on pull request #765 (review `5506577448`,
+  written at head `e0a026e2...`) and verified true.
+- **Correction:** the three cited records — and the FU-3 execution record they rest on — are published,
+  byte-identical, with per-file sha256 digests, at
+  [docs/evidence/fu3-record-publication-2026-10-13/](../evidence/fu3-record-publication-2026-10-13/README.md).
+  The citations above therefore now resolve inside this repository:
+  [FU3-RECORD-FINAL-REVIEW-F.md section 10](../evidence/fu3-record-publication-2026-10-13/FU3-RECORD-FINAL-REVIEW-F.md#10-o-f1-and-two-smaller-notes),
+  [FU3-RECORD-stage-g-summary.md section 9](../evidence/fu3-record-publication-2026-10-13/FU3-RECORD-stage-g-summary.md#9---------the-carried-open-publication-item),
+  and [REVIEWPATH-FINAL-REVIEW-F.md](../evidence/fu3-record-publication-2026-10-13/REVIEWPATH-FINAL-REVIEW-F.md)
+  L68 for the F-F1 precedent.
+- **Rule stated by this entry:** a permanent repository record must support each claim with evidence a
+  fresh checkout can retrieve — a path inside this repository, cited as a Markdown link so the repository's
+  own link checker proves it resolves — or, where the artifact cannot be published, a digest of its bytes
+  plus an explicit statement that the artifact is **not retrievable from this repository**. An out-of-tree
+  path alone is not acceptable support. A digest pins identity; it never makes an absent artifact
+  retrievable. It is never a substitute for publishing an artifact that could have been published.
+- **Owed, and named so it is not forgotten:** the remaining archive citations in
+  `docs/roadmaps/aegis-ci-baseline-2026-10-11.md` (L43, L45, L49),
+  `docs/evidence/scif/scif-closeout-corrections-2026-10-11.md` (L15, L84), the entry directly above this
+  one (L4143) and `docs/approvals/APPROVAL_REGISTER.md` (L5964) are corrected by a later change under
+  each record's own rules. The publication record carries the full list.
+- **Scope:** this entry corrects citations and states a rule. It decides nothing about the separate O-F1
+  closure question raised as P2 finding `4261109109` on the same review, re-opens no gate, edits no
+  merged pull-request body, and edits no existing byte of this file. **New authority: None.**
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008
