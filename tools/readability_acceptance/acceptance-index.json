@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "75d185e65c0c0ebb303e37e9b39c7f3c635cc664",
-  "table_rows": 95,
+  "built_at_ref": "f9cc456016dfbda089687a27b415d33c2b9433b2",
+  "table_rows": 99,
   "events": [
     {
       "stable_id": "K-001",
@@ -1049,6 +1049,50 @@
       "reviewer": "readability-closeout-implementer-c",
       "evidence_source": "docs/evidence/documentation/readability-closeout-reread-2026-10-12.md",
       "date": "2026-10-12"
+    },
+    {
+      "stable_id": "K-076",
+      "path": "docs/roadmaps/aegis-documentation-readability-backlog.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "0237f611f718ed833935e72a0d98dd42362388a0",
+      "blob_id": "1e0190ee3faea7dbde5b01384fa2cbc56c9783d7",
+      "quote": "K-076 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at 0237f611f718ed833935e72a0d98dd42362388a0",
+      "reviewer": "readability-f1f5-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "stable_id": "K-077",
+      "path": "docs/roadmaps/aegis-backlog-forecast.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c80c8d2d553671579e878584914eae695028eab4",
+      "blob_id": "d3f2c4b1c21709e34fecb695713b22f31cfdb552",
+      "quote": "K-077 accepted: docs/roadmaps/aegis-backlog-forecast.md read whole at c80c8d2d553671579e878584914eae695028eab4",
+      "reviewer": "readability-final3-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "stable_id": "K-078",
+      "path": "docs/reconciliation/step-0-reconciliation-v4.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c80c8d2d553671579e878584914eae695028eab4",
+      "blob_id": "e89e5f75b7fd49d97c6f5b3bf4ab1cf435b0909b",
+      "quote": "K-078 accepted: docs/reconciliation/step-0-reconciliation-v4.md read whole at c80c8d2d553671579e878584914eae695028eab4",
+      "reviewer": "readability-final3-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "stable_id": "K-079",
+      "path": "docs/approvals/APPROVAL_REGISTER.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c80c8d2d553671579e878584914eae695028eab4",
+      "blob_id": "548e80efdc630eb04a9b41839c608b4928b4bc2a",
+      "quote": "K-079 accepted: docs/approvals/APPROVAL_REGISTER.md read whole at c80c8d2d553671579e878584914eae695028eab4",
+      "reviewer": "readability-final3-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
+      "date": "2026-10-12"
     }
   ],
   "reader_pages": [
@@ -1415,10 +1459,10 @@
     {
       "path": "docs/approvals/APPROVAL_REGISTER.md",
       "event_kind": "full-page-acceptance",
-      "last_acceptance_sha": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "last_acceptance_sha": "c80c8d2d553671579e878584914eae695028eab4",
       "blob_id": "548e80efdc630eb04a9b41839c608b4928b4bc2a",
-      "reviewer": "readability-batches-implementer-c",
-      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "reviewer": "readability-final3-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
       "date": "2026-10-12",
       "acceptance_reachable": true
     },
@@ -1615,20 +1659,20 @@
     {
       "path": "docs/reconciliation/step-0-reconciliation-v4.md",
       "event_kind": "full-page-acceptance",
-      "last_acceptance_sha": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "last_acceptance_sha": "c80c8d2d553671579e878584914eae695028eab4",
       "blob_id": "e89e5f75b7fd49d97c6f5b3bf4ab1cf435b0909b",
-      "reviewer": "readability-batches-implementer-c",
-      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "reviewer": "readability-final3-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
       "date": "2026-10-12",
       "acceptance_reachable": true
     },
     {
       "path": "docs/roadmaps/aegis-backlog-forecast.md",
       "event_kind": "full-page-acceptance",
-      "last_acceptance_sha": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "last_acceptance_sha": "c80c8d2d553671579e878584914eae695028eab4",
       "blob_id": "d3f2c4b1c21709e34fecb695713b22f31cfdb552",
-      "reviewer": "readability-batches-implementer-c",
-      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "reviewer": "readability-final3-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
       "date": "2026-10-12",
       "acceptance_reachable": true
     },
@@ -1645,11 +1689,11 @@
     {
       "path": "docs/roadmaps/aegis-documentation-readability-backlog.md",
       "event_kind": "full-page-acceptance",
-      "last_acceptance_sha": "2c6b6fc634d1e4e256abb5472208a3053a98ec55",
-      "blob_id": "af063d1e45c06367021c82d30ec87b01fcd353d4",
-      "reviewer": "auditor-2",
-      "evidence_source": "docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md",
-      "date": "2026-10-10",
+      "last_acceptance_sha": "0237f611f718ed833935e72a0d98dd42362388a0",
+      "blob_id": "1e0190ee3faea7dbde5b01384fa2cbc56c9783d7",
+      "reviewer": "readability-f1f5-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md",
+      "date": "2026-10-12",
       "acceptance_reachable": true
     },
     {

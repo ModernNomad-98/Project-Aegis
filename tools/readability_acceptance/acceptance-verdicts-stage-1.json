@@ -762,6 +762,38 @@
       "reviewer": "readability-closeout-implementer-c",
       "evidence_source": "docs/evidence/documentation/readability-closeout-reread-2026-10-12.md",
       "date": "2026-10-12"
+    },
+    {
+      "path": "docs/roadmaps/aegis-documentation-readability-backlog.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "0237f611f718ed833935e72a0d98dd42362388a0",
+      "reviewer": "readability-f1f5-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/roadmaps/aegis-backlog-forecast.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c80c8d2d553671579e878584914eae695028eab4",
+      "reviewer": "readability-final3-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/reconciliation/step-0-reconciliation-v4.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c80c8d2d553671579e878584914eae695028eab4",
+      "reviewer": "readability-final3-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/approvals/APPROVAL_REGISTER.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c80c8d2d553671579e878584914eae695028eab4",
+      "reviewer": "readability-final3-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
+      "date": "2026-10-12"
     }
   ]
 }
