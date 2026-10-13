@@ -106,8 +106,8 @@ Nothing else differs.
 | 1 | the search-census row for the shell history | the shell-history artefact's filename is removed; the row now reads "the distro's interactive shell-history file" | the filename appears in **no tracked file at the base revision**, and the governing evidence-retention rule (backlog L4021-L4025: *no private identifiers in Git*) requires it out. The **substance is preserved**: the history was 16 bytes **when inspected**, and what that does and does not establish is stated in item 9 |
 | 2 | the verification command that enumerated the bulk-storage roots | the command is replaced by a prose statement of the same search and the same result | the command's host-specific root list appears in **no tracked file at the base revision**; its substance - a recursive name-and-content search that found only the schema and never the data - is preserved |
 | 3 | the verification command that sized the shell history | replaced by "the distro's interactive shell-history file, sized", with the same 16-byte result | same reason as 1 |
-| 4 | four sites: the search-census row for the distro root, the 2.2 opening, the quoted stop record, and the enumeration command | **every occurrence of the private host identity is removed** - the username, the distro release, the `wsl$` root and the distro-side directory name - replaced by "the external distro-private evidence root on the WSL2 Linux distro (raw host path withheld)" | the evidence-retention rule this record's own lane is governed by says flatly *no private identifiers in Git*, and the raw host paths and users belong in the separately approved external root. **The Lead first ruled these identifiers could stay because they are already tracked at the base revision; Codex showed that prior publication is not an exception to the rule, and that the ruling was wrong twice over - see the note below. The ruling was overturned.** |
-| 5 | the **searched-roots list**, named above as a site | **NOT sanitized, deliberately** - `C:\src\Project Aegis` is retained. It is the **project and session workspace path, not private host identity**: the removed tokens were the username, the distro release, the `wsl$` root and the distro-side directory name. Removing it would also delete the record's honest account of *where the search was performed* | it is a project path rather than a user or host identifier, and an earlier draft of this row wrongly listed it among the sanitized sites, which made the claim false; a reader can now see the distinction instead of having to infer it |
+| 4 | **the private host identity, at four prose and table sites** - the census table's S2 row (original L46 to published L46), the section 2.2 opening (L66 to L69), the quoted stop record (L208 to L228) and the drafted lifecycle entry (L255 to L275). **The same raw path also appears at L330, L333 and L336 inside the three verification commands, which items 2 and 3 replace - seven source lines in total, all sanitized** | **every occurrence of the private host identity is removed** - the username, the distro release, the `wsl$` root and the distro-side directory name - replaced by "the external distro-private evidence root on the WSL2 Linux distro (raw host path withheld)" | the evidence-retention rule this record's own lane is governed by says flatly *no private identifiers in Git*, and the raw host paths and users belong in the separately approved external root. **The Lead first ruled these identifiers could stay because they are already tracked at the base revision; Codex showed that prior publication is not an exception to the rule, and that the ruling was wrong twice over - see the note below. The ruling was overturned.** An earlier revision of this row said *four sites* and named "the searched-roots list" - a site that never existed; the enumeration above replaces it and is checkable line by line |
+| 5 | the **session workspace path** `C:\src\Project Aegis`, which appears in the searched-roots enumeration and in the S1 search-census row | **NOT sanitized, deliberately** - `C:\src\Project Aegis` is retained. It is the **project and session workspace path, not private host identity**: the removed tokens were the username, the distro release, the `wsl$` root and the distro-side directory name. Removing it would also delete the record's honest account of *where the search was performed* | it is a project path rather than a user or host identifier, so it is outside the token set item 4 removes; an earlier revision of this row wrongly called it "the searched-roots list" and listed it among the sanitized sites, which made the claim false in two ways, and it is now stated as the deliberate retention it is |
 | 6 | the sentence about the authorized external evidence root | "No provider execution evidence was ever placed at the authorized root" becomes a **current-state** statement: the directory was not present when searched, and its **historical existence is UNKNOWN** | a `Test-Path` result cannot prove a historical absence, and this record's own governing packet says missing old evidence does not prove zero use |
 | 7 | the worst-case arithmetic block | corrected to **200 charged judgment attempts plus at most one read-only metadata request = $158.00**; the previous "$158.79" implied 201 charged attempts, an impossible path | the approved maxima are 200 judgment attempts + 1 metadata availability request, and that request invokes no generation and submits no calibration content, so the attempt charge does not apply to it |
 | 8 | the record's own self-digest footer | rewritten from `f5a6b9ca…` (the archive original's value) to `9038e3e6…` over the current derivative | the footer is the file's own integrity claim; leaving the original's value would have published a file carrying a **false** claim, which is the defect class this lane exists to remove. Recomputing it was correct - and the change belongs in this inventory rather than being left implicit |
@@ -121,7 +121,7 @@ own evidence-retention rule is a blanket *no private identifiers in Git*; prior 
 Second, and decisively: **this publication directory does not exist at the base revision, so nothing inside it was
 "already published"** - every occurrence in this new file is new to Git no matter what appears elsewhere in the repository.
 The base-relative test answered a narrower question than the rule asks. The Lead withdrew the ruling, the identifiers are
-removed at the four sites named in item 4 above (a fifth candidate, the project directory name, is considered and **deliberately retained** - item 5), and the original with them intact is retained only at its digest-pinned
+removed at the four prose and table sites enumerated in item 4 above, and at the three verification commands items 2 and 3 replace - seven source lines in all - while the session workspace path `C:\src\Project Aegis` and the distro-side directory name are **deliberately retained** and named as such in item 5, and the original with them intact is retained only at its digest-pinned
 external locator below.
 
 **Where the unsanitized original is retained, and the plain limit.** The original remains at
@@ -184,6 +184,15 @@ cannot be published (an oversized archive, an external system, a private input),
 artifact's digest, names the locator it is known by, and says plainly that the artifact is **not
 retrievable from this repository**. An out-of-tree path alone is not acceptable support. A digest pins
 identity; it never makes an absent artifact retrievable.
+
+**The rule is prospective, and this is its effective date.** It binds citations **added from this change forward** -
+the change that states it, merged `2026-10-13`. It does **not** retroactively invalidate records already merged:
+**five archive citations in earlier, merged records remain OWED**, enumerated with their dispositions in section 3 of the
+publication record `docs/evidence/fu3-record-publication-2026-10-13/README.md` and tracked as open items. Those
+records neither **violate** this rule nor are **silently excused** by it: they predate it, the work that would publish
+their evidence is named and outstanding, and this paragraph exists so a reader can tell the two cases apart. **A rule
+stated as a universal invariant while five known sites remain unmet is a false claim about its own scope** - Codex
+raised exactly that, and the scope sentence is the repair.
 
 This is a documented rule, not a machine-enforced one, and the difference is stated rather than blurred:
 the "Run Markdown link checker over the repository's own pages" step of `validate-skills` validates the
@@ -318,6 +327,28 @@ their own procedure, not as a side effect of a publication.
   merge review. The rule does not depend on the check existing, and the check must not be
   smuggled in to make the rule look enforced.
 
+### OWED-9 - an unsanitized copy of the record survives in this branch's history, and no rewrite is done here
+
+**What is true, measured rather than reasoned:** `bd210954` **is an ancestor of this head**
+(`git merge-base --is-ancestor` exits 0). Five commits on this branch carry an **unsanitized** copy of the derivative at that
+path, and three of them carry a byte-identical copy of the archive original:
+
+| commit | bytes | sha256 | peternguyen | Ubuntu-24.04 | wsl$ |
+| --- | ---: | --- | ---: | ---: | ---: |
+| `bd210954` | 25,606 | `ea521f84c4d0d88f8e888f35…` | 7 | 8 | 7 |
+| `b591e0d9` | 25,606 | `ea521f84c4d0d88f8e888f35…` | 7 | 8 | 7 |
+| `c5f71554` | 25,606 | `ea521f84c4d0d88f8e888f35…` | 7 | 8 | 7 |
+| `95351dda` | 26,345 | `cc183e4504a1b280d04e5726…` | 5 | 6 | 5 |
+| `61e73442` | 26,345 | `cc183e4504a1b280d04e5726…` | 5 | 6 | 5 |
+
+The six later commits are clean (0 / 0 / 0). **Materiality:** the same identifiers are already in **4, 5 and 2 tracked files
+at the base revision** respectively, so the history adds **a verbatim copy of a full unsanitized record**, not a new class
+of identifier. **What a full purge would require:** rewriting five commits of an eleven-commit branch. **What it would
+invalidate:** every binding that names them - eleven Stage D records, eight Stage E validations, the Stage F verdicts and
+MG2 - because a rewritten commit ceases to exist. **And it would still not free the repository**, since the identifiers
+remain in tracked files at the base revision. **A partial purge that produces a clean-looking result without removing the
+exposure is worse than an honest statement of the limit.** The owner's goal explicitly permits carried open publication
+items; this is one, named so a future change can act on it.
 ## 7. How to verify this page
 
 From a clone of the candidate head, with the session workspace archive unavailable:
