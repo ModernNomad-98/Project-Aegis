@@ -4363,6 +4363,22 @@ itself is a separate, later host phase that runs only under the merged grant.
   `8e40488e` is 23 / 21. **A range is clean about a replacement for the same reason a base-relative number is clean about an
   in-range edit: the scope is wider than the work.** Report per-commit, or from the immediately preceding head.
 
+### 2026-10-13 - the edit chronology in the entry above is corrected, and the sequence is stated as Git records it
+
+- **Supersedes:** the entry at L4341, specifically its **Supersedes** bullet and its first two numbered edits.
+- **What was wrong:** that bullet described the replaced entry as headed *"the bare finding identifier in the third
+  correction entry above is repaired HERE, not in place"* and as replaced by its own commit. **Git records otherwise.**
+  At `9872c642` the entry at L4317-L4338 is headed *"the citation in the third correction entry above is repaired in
+  place, and this entry discloses the edit"*, and it was replaced by `8e40488e`, not by the commit that wrote the
+  description. **The entry's account of its own provenance was wrong in the same way the edits it records were.**
+- **The sequence as Git records it, stated once and checkable with `git log -p`:** `c46d9057` edited the Correction 2 line
+  (L4267); `9872c642` edited the Scope bullet (L4225) **and** appended an entry disclosing that edit; `8e40488e` replaced
+  that appended entry's text (23 added / 21 deleted against `9872c642`); `3ed6931c` appended the consolidated entry at
+  L4341; and this entry corrects the chronology that entry states.
+- **And the citations are named by content rather than by line, because the lines move.** Every line number in this entry
+  was measured at the head carrying it; a reader at a later head should match on the heading text. **The commit hashes
+  are the stable half and they are what the sequence should be reconstructed from.**
+
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008

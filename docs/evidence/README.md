@@ -68,7 +68,7 @@ retrievable from this repository**. An out-of-tree path alone is not acceptable 
 identity; it never makes an absent artifact retrievable.
 
 **The rule is prospective, and this is its effective date.** It binds citations **added from this change forward** -
-the change that states it, merged `2026-10-13`. It does **not** retroactively invalidate records already merged:
+the change that states it, **effective when that change merges** - the date is recorded after the merge, not asserted before it. It does **not** retroactively invalidate records already merged:
 **five archive citations in earlier, merged records remain OWED**, enumerated with their dispositions in section 3 of the
 publication record [docs/evidence/fu3-record-publication-2026-10-13/README.md](fu3-record-publication-2026-10-13/README.md) and tracked as open items. Those
 records neither **violate** this rule nor are **silently excused** by it: they predate it, the work that would publish

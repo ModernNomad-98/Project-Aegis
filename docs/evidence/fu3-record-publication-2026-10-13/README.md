@@ -48,7 +48,9 @@ retrievable from this repository.**
   `pull_request_url`. **A durable locator that resolves to the wrong review page is a citation that does not resolve at all.**
 - **Digest of the retained text below:** sha256 `e1bf5013fe24913cb9cd4be586d695fc3a2b8fcd491ed939578b54c131f62acc` over its **903
   UTF-8 bytes**, no trailing newline added.
-- **Retained verbatim:**
+- **Retained as a normalised capture - not verbatim, and labelled so:** the comment's line breaks are collapsed in this
+  block, so the digest below pins **these normalised bytes**, not the comment's own bytes. **An earlier revision called it
+  "retained verbatim", which was false of a collapsed copy**; the text is otherwise unaltered.
 
 ```text
 **<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Do not close a mandatory Stage F failure by logging it**For O-F1, the missing D/E/F rows are themselves part of the `SD-F` acceptance threshold: `docs/delivery-workflow.md:182` requires a row for every stage that ran, and its pure-docs path explicitly requires every defect to be repaired and re-audited. Declaring the omission “discharged by a dated note” therefore records an unsatisfied final-review gate as closed and creates a precedent for carrying mandatory gate failures past merge. Record this as a historical process failure or keep it open; a later log entry cannot substitute for satisfying the canonical workflow.AGENTS.md reference: [AGENTS.md:L65-L70](https://github.com/ModernNomad-98/Project-Aegis/blob/e0a026e2843e299d02180d31d7202a3598759a94/AGENTS.md#L65-L70)Useful? React with 👍 / 👎.
@@ -126,7 +128,9 @@ publication, not the archival body of a dated record.
 
 `BER-G3-FU3-EXECUTION.md` is **not** a verbatim copy. **Nine changes** were made, plus **one deliberate non-change**
 recorded as item 5 so the inventory is exhaustive: four items are privacy sanitizations and five are corrections of
-claims the published text got wrong - **two of which changed what the record concludes**, not merely how it is worded.
+claims the published text got wrong - **three of which changed what the record concludes** rather than how it is worded:
+**items 6, 9 and 10** (the evidence root's historical absence, the shell history's execution history, and the census's
+completeness). **An earlier revision said two, counting only the first two.**
 Nothing else differs.
 
 | # | Location | Change | Why |
@@ -134,8 +138,8 @@ Nothing else differs.
 | 1 | the search-census row for the shell history | the shell-history artefact's filename is removed; the row now reads "the distro's interactive shell-history file" | the filename appears in **no tracked file at the base revision**, and the governing evidence-retention rule (backlog L4021-L4025: *no private identifiers in Git*) requires it out. The **substance is preserved**: the history was 16 bytes **when inspected**, and what that does and does not establish is stated in item 9 |
 | 2 | the verification command that enumerated the bulk-storage roots | the command is replaced by a prose statement of the same search and the same result | the command's host-specific root list appears in **no tracked file at the base revision**; its substance - a recursive name-and-content search that found only the schema and never the data - is preserved |
 | 3 | the verification command that sized the shell history | replaced by "the distro's interactive shell-history file, sized", with the same 16-byte result | same reason as 1 |
-| 4 | **the private host identity, at four prose and table sites** - the census table's S2 row (original L46 to published L46), the section 2.2 opening (L66 to L69), the quoted stop record (L208 to L228) and the drafted lifecycle entry (L255 to L275). **The same raw path also appears at L330, L333 and L336 inside the three verification commands, which items 2 and 3 replace - seven source lines in total, all sanitized** | **every occurrence of the private host identity is removed** - the username, the distro release, the `wsl$` root and the distro-side directory name - replaced by "the external distro-private evidence root on the WSL2 Linux distro (raw host path withheld)" | the evidence-retention rule this record's own lane is governed by says flatly *no private identifiers in Git*, and the raw host paths and users belong in the separately approved external root. **The Lead first ruled these identifiers could stay because they are already tracked at the base revision; Codex showed that prior publication is not an exception to the rule, and that the ruling was wrong twice over - see the note below. The ruling was overturned.** An earlier revision of this row said *four sites* and named "the searched-roots list" - a site that never existed; the enumeration above replaces it and is checkable line by line |
-| 5 | the **session workspace path** `C:\src\Project Aegis`, which appears in the searched-roots enumeration and in the S1 search-census row | **NOT sanitized, deliberately** - `C:\src\Project Aegis` is retained. It is the **project and session workspace path, not private host identity**: the removed tokens were the username, the distro release, the `wsl$` root and the distro-side directory name. Removing it would also delete the record's honest account of *where the search was performed* | it is a project path rather than a user or host identifier, so it is outside the token set item 4 removes; an earlier revision of this row wrongly called it "the searched-roots list" and listed it among the sanitized sites, which made the claim false in two ways, and it is now stated as the deliberate retention it is |
+| 4 | **the private host identity, at four prose and table sites** - the census table's S2 row (original L46 to published L46), the section 2.2 opening (L66 to L69), the quoted stop record (L208 to L228) and the drafted lifecycle entry (L255 to L275). **The same raw path also appears at L330, L333 and L336 inside the three verification commands, which items 2 and 3 replace - and at L67, the second line of the section 2.2 opening - so the count is EIGHT source lines in total, all sanitized.** An earlier revision said seven because it treated the two-line opening as one source line | **every occurrence of the private host identity is removed** - the username, the distro release, the `root token` root and the distro-side directory name - replaced by "the external distro-private evidence root on the WSL2 Linux distro (raw host path withheld)" | the evidence-retention rule this record's own lane is governed by says flatly *no private identifiers in Git*, and the raw host paths and users belong in the separately approved external root. **The Lead first ruled these identifiers could stay because they are already tracked at the base revision; Codex showed that prior publication is not an exception to the rule, and that the ruling was wrong twice over - see the note below. The ruling was overturned.** An earlier revision of this row said *four sites* and named "the searched-roots list" - a site that never existed; the enumeration above replaces it and is checkable line by line |
+| 5 | the **session workspace path** `C:\src\Project Aegis`, which appears in the searched-roots enumeration and in the S1 search-census row | **NOT sanitized, deliberately** - `C:\src\Project Aegis` is retained. It is the **project and session workspace path, not private host identity**: the removed tokens were the username, the distro release, the `root token` root and the distro-side directory name. Removing it would also delete the record's honest account of *where the search was performed* | it is a project path rather than a user or host identifier, so it is outside the token set item 4 removes; an earlier revision of this row wrongly called it "the searched-roots list" and listed it among the sanitized sites, which made the claim false in two ways, and it is now stated as the deliberate retention it is |
 | 6 | the sentence about the authorized external evidence root | "No provider execution evidence was ever placed at the authorized root" becomes a **current-state** statement: the directory was not present when searched, and its **historical existence is UNKNOWN** | a `Test-Path` result cannot prove a historical absence, and this record's own governing packet says missing old evidence does not prove zero use |
 | 7 | the worst-case arithmetic block | corrected to **200 charged judgment attempts plus at most one read-only metadata request = $158.00**; the previous "$158.79" implied 201 charged attempts, an impossible path | the approved maxima are 200 judgment attempts + 1 metadata availability request, and that request invokes no generation and submits no calibration content, so the attempt charge does not apply to it |
 | 8 | the record's own self-digest footer | rewritten from `f5a6b9ca…` (the archive original's value) to `9038e3e6…` over the current derivative | the footer is the file's own integrity claim; leaving the original's value would have published a file carrying a **false** claim, which is the defect class this lane exists to remove. Recomputing it was correct - and the change belongs in this inventory rather than being left implicit |
@@ -214,7 +218,7 @@ retrievable from this repository**. An out-of-tree path alone is not acceptable 
 identity; it never makes an absent artifact retrievable.
 
 **The rule is prospective, and this is its effective date.** It binds citations **added from this change forward** -
-the change that states it, merged `2026-10-13`. It does **not** retroactively invalidate records already merged:
+the change that states it, **effective when that change merges** - the date is recorded after the merge, not asserted before it. It does **not** retroactively invalidate records already merged:
 **five archive citations in earlier, merged records remain OWED**, enumerated with their dispositions in section 3 of the
 publication record [docs/evidence/fu3-record-publication-2026-10-13/README.md](README.md) and tracked as open items. Those
 records neither **violate** this rule nor are **silently excused** by it: they predate it, the work that would publish
@@ -246,7 +250,7 @@ candidate head, so the result is a measurement rather than an assurance.
 for host-specific identifiers under the repository's own rule - *no private identifiers in Git*, backlog L4021-L4025 -
 by extracting every path- and artefact-shaped token and testing it against the tracked tree at the base revision.
 That check found the shell-history artefact's filename, the drive-enumeration command, **and the host identity itself at
-four sites**: a username, a distro release, a `wsl$` root and the distro-side directory name. **All four are removed**
+four sites**: the username token, the distro token, the root token and the distro-side directory name. **All four are removed** - and this paragraph names them by **category**, not by value, for the same reason the table above does
 (section 1.1, items 1 to 4). One argument was tested and rejected: that the last group could stay because the same
 identifiers already appear in tracked files. **Prior publication is not an exception to the rule, and the argument fails
 on its own terms anyway** - this publication directory does not exist at the base revision, so nothing inside it was
@@ -365,7 +369,7 @@ their own procedure, not as a side effect of a publication.
 (`git merge-base --is-ancestor` exits 0). Five commits on this branch carry an **unsanitized** copy of the derivative at that
 path, and three of them carry a byte-identical copy of the archive original:
 
-| commit | bytes | sha256 | peternguyen | Ubuntu-24.04 | wsl$ |
+| commit | bytes | sha256 | username token | distro token | root token |
 | --- | ---: | --- | ---: | ---: | ---: |
 | `bd210954` | 25,606 | `ea521f84c4d0d88f8e888f35…` | 7 | 8 | 7 |
 | `b591e0d9` | 25,606 | `ea521f84c4d0d88f8e888f35…` | 7 | 8 | 7 |
@@ -396,8 +400,11 @@ From a clone of the candidate head, with the session workspace archive unavailab
    derivative, as section 1.1 records, not over the original.
 3. **Retrievability** — read the four files directly from the clone. No step of that path
    requires the archive, and no Markdown link on this page targets it.
-4. **The citing entries** — the section 13 entries that link back to this page are the **first two**: the entry at
-   **L4192-L4227** carries the links to this record and to three of the four copies, and the entry at **L4228-L4252**
-   carries a further link to section 1.1. **The two newest entries - L4253-L4279 and L4280 and following - carry no
-   link at all**; they correct counts, scope and an in-place edit. All four are named here so that a reader does not go
-   looking for a link that is not there.
+4. **The citing entries** — **six** section 13 entries belong to this change, and the map is stated by content rather
+   than by position because the positions move as entries are appended. **The two that link back to this page are the
+   first two**: the entry now at **L4192-L4227** carries the links to this record and to three of the four copies, and the
+   entry now at **L4228-L4252** carries a further link to section 1.1. **The four later entries - L4253-L4279, L4280 and
+   following, L4317 and following, and L4341 and following - carry no link at all**; they correct counts, scope, an
+   in-place edit and the edit chronology. **An earlier revision called the last two the "two newest" and counted four
+   entries in all**, which stopped being true when two more were appended; the anchors above are the ones to trust, and
+   they were re-derived at this head.
