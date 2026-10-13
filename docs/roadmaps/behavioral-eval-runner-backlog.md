@@ -4121,6 +4121,31 @@ itself is a separate, later host phase that runs only under the merged grant.
 - **Scope:** this entry is a **stop**, not a grant. It creates no APR, no
   BER-DEC entry and no new authority.
 
+### 2026-10-13 — FU-3 provider-usage reconciliation attempted: headroom UNVERIFIABLE, zero-residual posture stands
+
+- **Date:** 2026-10-13.
+- **Addresses:** BER-DEC-008's lifetime maxima (L3371–L3384) and the allowance gate they serve (the
+  measurement packet's checklist row 3, L17). Appended under this log's rule at L2672–L2675; no existing
+  line in this file is edited.
+- **Decision:** the historical provider-usage reconciliation (FU-3) was **attempted and NOT completed**. No
+  durable provider ledger, no first-segment declaration and no provider usage or reservation artefact
+  exists on any root reachable from this host: the session workspace; the external distro root
+  \\wsl$\Ubuntu-24.04\home\peternguyen\aegis-stage-a\; the authorized external evidence root
+  C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence (verified not to exist); C:\temp;
+  D:\; and the repository. The two archive hashes named in the receipts verified exactly, but both are
+  digests of the probe's **source tarball**, not of provider usage. **Remaining headroom against
+  BER-DEC-008 is therefore UNVERIFIABLE — not zero and not positive** — and the operational posture stands
+  unchanged: zero available residual allowance until independently reconciled. Recorded in the register as
+  AEGIS-APR-136.
+- **Scope:** this entry records a failed recovery and a stop. It grants nothing; it creates no ceiling,
+  renews no allowance and authorizes no metadata request, judgment call, dependency install, host step or
+  dispatch. **New authority: None.**
+- **Evidence:** _resume-2026-10-09/evidence/docs-refresh-2026-10-12/BER-G3-FU3-EXECUTION.md — the FU-3
+  execution record, whose section 6 carries the stop verbatim.
+- **Unblocking action (owner), named verbatim:** supply the durable ledger event chain and its
+  first-segment declaration from the authorized external evidence root, or restate the allowance; only then
+  can headroom, the provider-side spend limit and the stop-before-exceed rule be recorded as facts.
+
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008

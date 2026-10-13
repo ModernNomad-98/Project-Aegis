@@ -5937,3 +5937,31 @@ the entry governs.
   merged `af49536c8e51e93f4112889832981380f51e814f` as
   `81081ca4f7745de8bb6275e890f09e9b4a109325` at the time above, with the REST
   merge pinned to that head.
+
+### AEGIS-APR-136: BER provider-usage reconciliation attempted — headroom UNVERIFIABLE; zero-residual posture stands
+
+- **Event:** RECONCILIATION ATTEMPTED AND NOT COMPLETED; no allowance effect.
+- **Recorded at / By:** 2026-10-13 / fu3-record-implementer-c.
+- **Finding:** FU-3 (the execution of BER-G3's remaining-allowance reconciliation) searched the session
+  workspace, the external distro-private root \\wsl$\Ubuntu-24.04\home\peternguyen\aegis-stage-a\, the
+  authorized external evidence root
+  C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence (verified absent), C:\temp, D:\ and
+  the public repository. The single durable provider ledger — the append-only hash-chained event log that
+  records every external interaction, its attempts, tokens and spend — was not found on any of them. The
+  two archive hashes named in the receipts were recovered and verified exactly, but both are digests of the
+  probe's SOURCE TARBALL, not of provider usage; the probe-results.json files record host-phase timing only.
+- **Status at recording:** headroom against the BER-DEC-008 lifetime maxima is **UNVERIFIABLE**, not zero
+  and not positive. Prior consumption of the 200-attempt / 1-metadata / 201-total-request / 8,000-input-token
+  / USD $175-total / USD $175-per-day ceilings remains unreconciled. An orphaned or uncertain attempt cannot
+  be distinguished from no attempt once the ledger is missing, so zero use cannot be asserted.
+- **Effective at:** 2026-10-13, on recording.
+- **New authority:** None. This entry records a failed recovery and grants nothing. No metadata request, no
+  judgment call, no dispatch, and no cap renewal is covered by it. The operational posture stands unchanged:
+  zero available residual allowance until independently reconciled (open-decisions L360).
+- **Reason:** "Missing old evidence does not prove zero use. Unknown or exhausted headroom, unavailable
+  telemetry, or materially changed price stops all metadata and judgment calls until the owner resolves it"
+  — docs/roadmaps/ber-wp2b3-measurement-prerequisite-decision-packet.md L17.
+- **Evidence:** _resume-2026-10-09/evidence/docs-refresh-2026-10-12/BER-G3-FU3-EXECUTION.md (this record).
+- **Unblocking action (owner):** supply the durable ledger event chain and its first-segment declaration
+  from the authorized external evidence root, or restate the allowance; only then can headroom, the
+  provider-side spend limit and the stop-before-exceed rule be recorded as facts.
