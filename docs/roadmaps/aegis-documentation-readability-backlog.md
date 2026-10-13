@@ -4909,6 +4909,69 @@ binds no row to this commit's own SHA, edits none of the four named pages, rebui
 artifact, touches no `.github/workflows/` path, and confers no authority. The batching procedure does
 not grant provider, private-input, real-host or deployment authority (L3018-3020).
 
+## Ledger-keeper recording — this ledger's own whole-page re-acceptance, 2026-10-13
+
+**Under AEGIS-APR-101 (recording only).** This note records the whole-page prose re-read of
+this ledger at the merged tip `878b7d460d8cce5efb1cb8ecb3197e93e6cbf609`, performed by
+`readability-ledger-reader-c` — a **different agent** from `readability-batches-implementer-c`
+(the writer of the F1-F5 section that changed this page, and the reader of all four #753
+passes), from `readability-closeout-implementer-c`, `readability-closeout-repairer-c2`,
+`readability-f1f5-implementer-c`, `readability-final3-implementer-c` and
+`readability-final3-repairer-c2`. Its tracked evidence source is
+[the batch record](../evidence/documentation/readability-ledger-reread-2026-10-13.md), which
+names this row's full 40-character acceptance revision verbatim and carries the read ranges,
+the two tool-output display elisions each with its covering read named by range, the six
+acceptance bullets, the stale/new/source rows, the named follow-ups and the count honesty.
+
+**What was read, and where the exclusions stand.** This page was read **whole, line by line, as
+prose**, at the declared revision `878b7d460d8cce5efb1cb8ecb3197e93e6cbf609` — **L1-5031, every
+line of this ledger**, in nineteen named ranges (R0 `L4914-5031` first, then R1 `L1-260` through
+R18 `L4747-4916`) whose union is L1-5031. **The ranges are not all disjoint:** exactly one
+overlap exists, `L4914-4916`, shared by R18 and R0; no other pair overlaps and no pair gaps.
+**Two tool-output display elisions occurred**, and each is named by its own range with the read
+that displayed it — never merged into one claim: **L3043-3046**, the 2,664 bytes omitted from
+the `L2821-3102` display, by the covering read at `L3040-3055`; and **L3133-3135**, the 1,611
+bytes omitted from the `L3103-3186` display, by the covering reads at `L3134-3135` and
+`L3131-3137`. The `L3103-3422` request returned only `L3103-3186`, so `L3187-3422` was displayed
+by the later read at `L3187-3436`. Every one of the page's 5,031 lines is displayed by one of
+those named reads. The excluded already-read set is the recorded-acceptance drift
+`0237f611f718..878b7d460d8c` = **90 / 0** — 86 lines of F1-F5 keeper section and 4 table rows
+(K-076 to K-079); **those lines were read again in this session rather than skipped**, so no part
+of this acceptance rests on an earlier read.
+
+**Accepted: this page, at the main-contained merged tip.** The row is **K-080**, bound to
+`878b7d460d8cce5efb1cb8ecb3197e93e6cbf609` (`origin/main`, the PR #758 merge) with `Blob ID`
+`b44d47c9a10cde4c62d6fdae52bf577e04242a50` =
+`git rev-parse 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609:docs/roadmaps/aegis-documentation-readability-backlog.md`.
+The page is **not** edited by this lane beyond this note and that row; `git diff -U0` against
+the declared revision shows two insertion hunks and **0 deletion lines**.
+
+**The instrument's figures at the declared revision, quoted as the instrument's.** `build_index.py
+--ref 878b7d46… --report` exits 0 with `table_rows 99, events 99, full_page_acceptances 79,
+lost_commit_events 10, reader_pages_with_rows 68`; `check_index.py --ref 878b7d46… --quiet`
+exits 0 with `646 / 60 / 1 / 579 / 0 / 0 / 6 / 586`, and its provably-pending list holds exactly
+one page — this one, 90 drift lines against its recorded acceptance `0237f611f718`. **This note
+publishes no count of its own** (D84); the figures at this commit's head are published in the
+Stage C record and the pull request body, **no post-commit bucket figure is predicted**, and
+**no `--write` was run**.
+
+**Declared deviations, carried rather than hidden.** (1) The reader also writes this keeper
+section and the batch record, so the AEGIS-APR-101 condition that the keeper differ from the
+page's accepting reviewer is **not satisfied** and the row is **not green**; the carry is the
+same CARRY-WITH-DEVIATION the SD-D2 coordinator ruling recorded for K-074/K-075, and the
+authority question stays with the merge holder under AEGIS-APR-100. (2) Two of the six
+acceptance bullets are **partial** — "purpose and audience up front" (no intended audience is
+named) and "abbreviations and coded identifiers defined at first use" (the page's first `PR` is
+L14 against the definition at L156-157) — recorded as properties of the page's text at the
+bound revision, not repaired, because the lane may not rewrite dated text. (3) The D98
+follow-ups 1 to 3 (the stale "open PR #633" citation, the nine-distinct-commits "ten other SHAs"
+imprecision, and the stale `L-001` to `L-006` evidence-source anchors) remain open and are
+restated, not repaired.
+
+**Self-cost.** This section changes this ledger by more than 10 lines and adds a section, so
+this page returns to **pending** at the new head and owes a subsequent independent full-page
+re-read by a reader who did not write it — the self-cost every prior update states.
+
 <!-- acceptance-index-schema: 1 -->
 
 ## Consolidated keeper table — index schema v1 (D84, 2026-10-10)
@@ -5029,3 +5092,4 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-077 | docs/roadmaps/aegis-backlog-forecast.md | full-page-acceptance | c80c8d2d553671579e878584914eae695028eab4 | d3f2c4b1c21709e34fecb695713b22f31cfdb552 | K-077 accepted: docs/roadmaps/aegis-backlog-forecast.md read whole at c80c8d2d553671579e878584914eae695028eab4 | readability-final3-implementer-c | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | 2026-10-12 |
 | K-078 | docs/reconciliation/step-0-reconciliation-v4.md | full-page-acceptance | c80c8d2d553671579e878584914eae695028eab4 | e89e5f75b7fd49d97c6f5b3bf4ab1cf435b0909b | K-078 accepted: docs/reconciliation/step-0-reconciliation-v4.md read whole at c80c8d2d553671579e878584914eae695028eab4 | readability-final3-implementer-c | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | 2026-10-12 |
 | K-079 | docs/approvals/APPROVAL_REGISTER.md | full-page-acceptance | c80c8d2d553671579e878584914eae695028eab4 | 548e80efdc630eb04a9b41839c608b4928b4bc2a | K-079 accepted: docs/approvals/APPROVAL_REGISTER.md read whole at c80c8d2d553671579e878584914eae695028eab4 | readability-final3-implementer-c | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | 2026-10-12 |
+| K-080 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | b44d47c9a10cde4c62d6fdae52bf577e04242a50 | K-080 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | readability-ledger-reader-c | docs/evidence/documentation/readability-ledger-reread-2026-10-13.md | 2026-10-13 |
