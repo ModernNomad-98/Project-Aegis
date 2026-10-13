@@ -5733,3 +5733,207 @@ the entry governs.
   coordinator and confirmed before recording, nothing else about the wording changes, and it is
   recorded in the Stage C handoff and the PR body (the register's renumbering precedent,
   L5373–5375). `AEGIS-APR-006` is not reused, extended or re-scoped.
+
+### AEGIS-APR-132: PR #742 gate-guard exception for the clean rebased Dependabot head
+
+- **Event:** GRANT — one use, one pull request, one exact head.
+- **Status at recording:** Consumed by AEGIS-APR-134; no remaining use. Recorded
+  after the merge.
+- **Date / Grantor:** 2026-10-12 / Peter Nguyen, by his dated answer of
+  2026-10-12 quoted exactly as relayed — "go with your recommendations" —
+  answering the coordinating agent's packet question "Your call, per PR:
+  grant-742 / grant-743 / regenerate-744 / close", relayed by the coordinating
+  agent and transcribed here by the Stage G merger agent
+  (`dependabot-closeout-merger-g`). Consistent with the preamble's rule that
+  current direct user instructions are valid source evidence before
+  transcription, and with the chat-instruction convention of AEGIS-APR-121
+  (L5244–5258), this entry **does not claim a repository citation of the owner's
+  own text**.
+- **Reason:** [PR #742](https://github.com/ModernNomad-98/Project-Aegis/pull/742)
+  bumps `actions/setup-node` from 7.0.0 to 7.1.0 by moving one full-length commit
+  pin in the two places the workflow uses that action, inside
+  `.github/workflows/validate-skills.yml`. That path is inside `gate_pattern`, so
+  `gate-guard` fails deterministically at its enforcement step and the pull
+  request cannot reach the register's all-green condition without a one-time
+  owner exception. The owner's answer covers this pull request's clean rebase
+  onto `main` **by construction**: the Dependabot head `5239bfc9…` was based on
+  `7fbc2335…`, and the covered head is its pushed rebase onto `ad1e40fc…`. The
+  two SHA labels an earlier packet computed for this grant (`4341ea56`,
+  `549cb243`) name no commit —
+  `gh api repos/ModernNomad-98/Project-Aegis/commits/4341ea56` → HTTP 422 — and
+  are recorded as placeholders that never existed, not as heads.
+- **Scope allowed:** One `gate-guard` exception and one merge of PR #742 at exact
+  head `7c3ed3957cce5b3f36f1ce4ed31bfa1b8858b80a`, the pushed clean rebase of
+  `5239bfc9b9e66259d2ec757b407e2265cf805577` onto
+  `ad1e40fc257c3f7cc04be0067d6a63008d1eacb1` with no content change (the two
+  patches are byte-identical, the post-image blob `74723d47…` is the same, the
+  message is byte-identical at 583 bytes, the author `dependabot[bot]` is
+  preserved and the committer is
+  `ModernNomad-98 <263130032+ModernNomad-98@users.noreply.github.com>`, never
+  `GitHub <noreply@github.com>`).
+  [Exact-head run 38320295484](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/38320295484)
+  passed `validate-skills` (all 24 steps, including "Verify DCO sign-off on
+  every commit") and `changes`; `windows-offline-checks`, `tools-tests-linux`
+  and `tools-tests-windows` were **skipped** by their own path conditions and
+  are recorded as skipped, never as passed; `gate-guard` **failed** only on its
+  step "Fail if this PR modifies the merge gate or its enforcement surfaces",
+  which printed "This PR modifies the merge gate or an enforcement surface and
+  requires manual review and merge." and `##[error]Process completed with exit
+  code 1.` The failed check is recorded **failed, with this authorized
+  disposition — never green and never waived**. Codex posted a result at that
+  head with no finding (no review object, no inline comment); the Stage F
+  verdict ([comment 6134477275](https://github.com/ModernNomad-98/Project-Aegis/pull/742#issuecomment-6134477275))
+  accepted the exact head; the Stage G merger posted an independent security
+  review at the head
+  ([comment 6134520975](https://github.com/ModernNomad-98/Project-Aegis/pull/742#issuecomment-6134520975))
+  before merging, re-deriving the new pin as the genuine upstream
+  `actions/setup-node` v7.1.0 release commit.
+- **Scope FORBIDDEN:** No other pull request, head or failed check was covered.
+  It did not change branch protection, rulesets, checks or any repository
+  setting; removed no path from the protected set; did not widen AEGIS-APR-047
+  or any earlier grant; did not authorise the rebase of any other bot head; and
+  did not license editing the bot pull request to move its head.
+- **Evidence:** The direct owner answer quoted above, relayed by the coordinating
+  agent and recorded as relayed (the coordinator's relay log
+  `evidence/docs-refresh-2026-10-12/OWNER-DECISION-LOG-2026-10-12.md`
+  (out-of-tree coordinator relay log; not a repository path), item 15, records
+  the same decision — a relay log, not a repository citation of the owner's
+  text). [PR #742](https://github.com/ModernNomad-98/Project-Aegis/pull/742)
+  merged `7c3ed395…` as `ce865c9122d991bbf0ee9cbc47b692a885d4ccf9` at
+  2026-10-12 23:23:09 UTC through the REST merge pinned to that head (`sha=`).
+  The merge passed the **failed required `gate-guard`** check using
+  repository-administrator rights — an **administrator merge** under this
+  register's own definition (L71–72) — because that required check was red and
+  `enforce_admins` is `false` on the protected `main`. The authority relied on
+  is the owner's dated one-time exact-head exception recorded above; the
+  relayed grant **is** that exception, and the standing `AEGIS-APR-002`
+  administrator-merge authority was **not** separately invoked. No protection
+  edit is recorded: the required-check set stated at the pre-merge base
+  `ad1e40fc` and the live protection config agree. The
+  [merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/742#issuecomment-6134538429)
+  records the merge, the checks, the exception and the coordinator's answers.
+- **Expiry / use limit:** One merge of PR #742 at the named head; consumed by the
+  merge recorded in AEGIS-APR-134.
+
+### AEGIS-APR-133: PR #743 gate-guard exception for the clean rebased Dependabot head
+
+- **Event:** GRANT — one use, one pull request, one exact head.
+- **Status at recording:** Consumed by AEGIS-APR-135; no remaining use. Recorded
+  after the merge.
+- **Date / Grantor:** 2026-10-12 / Peter Nguyen, by his dated answer of
+  2026-10-12 quoted exactly as relayed — "go with your recommendations" —
+  answering the coordinating agent's packet question "Your call, per PR:
+  grant-742 / grant-743 / regenerate-744 / close", relayed by the coordinating
+  agent and transcribed here by the Stage G merger agent
+  (`dependabot-closeout-merger-g`). Consistent with the preamble's rule that
+  current direct user instructions are valid source evidence before
+  transcription, and with the chat-instruction convention of AEGIS-APR-121
+  (L5244–5258), this entry **does not claim a repository citation of the owner's
+  own text**.
+- **Reason:** [PR #743](https://github.com/ModernNomad-98/Project-Aegis/pull/743)
+  bumps `actions/upload-artifact` from 7.0.1 to 7.0.2 by moving one full-length
+  commit pin in all four evidence-retention steps, inside
+  `.github/workflows/validate-skills.yml`. That path is inside `gate_pattern`, so
+  `gate-guard` fails deterministically at its enforcement step and the pull
+  request cannot reach the register's all-green condition without a one-time
+  owner exception. The owner's answer covers this pull request's clean rebase
+  onto `main` **by construction**: the Dependabot head `08841e99…` was based on
+  `7fbc2335…`, and the covered head is its pushed rebase onto `ad1e40fc…`. The
+  two SHA labels an earlier packet computed for this grant (`4341ea56`,
+  `549cb243`) name no commit — HTTP 422 — and are recorded as placeholders that
+  never existed, not as heads.
+- **Scope allowed:** One `gate-guard` exception and one merge of PR #743 at exact
+  head `af49536c8e51e93f4112889832981380f51e814f`, the pushed clean rebase of
+  `08841e99e1338c5efa2a7df9b397ea558b52a4a1` onto
+  `ad1e40fc257c3f7cc04be0067d6a63008d1eacb1` with no content change (the two
+  patches are byte-identical, the post-image blob `de018e53…` is the same, the
+  message is byte-identical at 613 bytes, the author `dependabot[bot]` is
+  preserved and the committer is
+  `ModernNomad-98 <263130032+ModernNomad-98@users.noreply.github.com>`, never
+  `GitHub <noreply@github.com>`).
+  [Exact-head run 38320300219](https://github.com/ModernNomad-98/Project-Aegis/actions/runs/38320300219)
+  passed `validate-skills` (all 24 steps, including "Verify DCO sign-off on
+  every commit") and `changes`; `windows-offline-checks`, `tools-tests-linux`
+  and `tools-tests-windows` were **skipped** by their own path conditions and
+  are recorded as skipped, never as passed; `gate-guard` **failed** only on its
+  step "Fail if this PR modifies the merge gate or its enforcement surfaces",
+  which printed "This PR modifies the merge gate or an enforcement surface and
+  requires manual review and merge." and `##[error]Process completed with exit
+  code 1.` The failed check is recorded **failed, with this authorized
+  disposition — never green and never waived**. Codex posted a result at that
+  head whose review object `5496934057` is state `COMMENTED`: its **P1** (a
+  missing DCO sign-off) concerns commit `93c0d4f`, which does not exist
+  (`gh api …/commits/93c0d4f` → HTTP 422) while the real head is an exempt
+  `dependabot[bot]` commit whose sign-off check passed, so the P1 is a false
+  positive refuted with evidence; its **P2** (the `docs/offline-ci.md` artifact
+  pin going stale) is a valid observation that is not a defect of this diff and
+  is carried by the follow-up documentation pull request, the bot pull request
+  being deliberately not edited. The Stage F verdict
+  ([comment 6134477529](https://github.com/ModernNomad-98/Project-Aegis/pull/743#issuecomment-6134477529))
+  accepted the exact head; the Stage G merger posted an independent security
+  review at the head
+  ([comment 6134521157](https://github.com/ModernNomad-98/Project-Aegis/pull/743#issuecomment-6134521157))
+  before merging, re-deriving the new pin as the genuine upstream
+  `actions/upload-artifact` v7.0.2 release commit.
+- **Scope FORBIDDEN:** No other pull request, head or failed check was covered.
+  It did not change branch protection, rulesets, checks or any repository
+  setting; removed no path from the protected set; did not widen AEGIS-APR-047
+  or any earlier grant; did not authorise the rebase of any other bot head; and
+  did not license editing the bot pull request to move its head. It does not
+  authorise the documentation follow-up, which needs its own work authority.
+- **Evidence:** The direct owner answer quoted above, relayed by the coordinating
+  agent and recorded as relayed (the coordinator's relay log
+  `evidence/docs-refresh-2026-10-12/OWNER-DECISION-LOG-2026-10-12.md`
+  (out-of-tree coordinator relay log; not a repository path), item 15, records
+  the same decision — a relay log, not a repository citation of the owner's
+  text). [PR #743](https://github.com/ModernNomad-98/Project-Aegis/pull/743)
+  merged `af49536c…` as `81081ca4f7745de8bb6275e890f09e9b4a109325` at
+  2026-10-12 23:23:20 UTC (GitHub's API `merged_at`, the source AEGIS-APR-135
+  names; the merge commit's committer date is `2026-10-12T16:23:19-07:00` =
+  23:23:19Z, one second earlier) through the REST merge pinned to that head
+  (`sha=`). The merge passed the **failed required `gate-guard`** check using
+  repository-administrator rights — an **administrator merge** under this
+  register's own definition (L71–72) — because that required check was red and
+  `enforce_admins` is `false` on the protected `main`. The authority relied on
+  is the owner's dated one-time exact-head exception recorded above; the
+  relayed grant **is** that exception, and the standing `AEGIS-APR-002`
+  administrator-merge authority was **not** separately invoked. No protection
+  edit is recorded: the required-check set stated at the pre-merge base
+  `ad1e40fc` and the live protection config agree. The
+  [merge receipt](https://github.com/ModernNomad-98/Project-Aegis/pull/743#issuecomment-6134538683)
+  records the merge, the checks, the exception and the coordinator's answers.
+- **Expiry / use limit:** One merge of PR #743 at the named head; consumed by the
+  merge recorded in AEGIS-APR-135.
+
+### AEGIS-APR-134: Consumption of the PR #742 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-132.
+- **Status at recording:** AEGIS-APR-132 has no remaining use.
+- **Effective at:** 2026-10-12 23:23:09 UTC.
+- **Recorded at / By:** 2026-10-12 / the Stage G merger agent
+  (`dependabot-closeout-merger-g`), the agent that performed the merge.
+- **New authority:** None. A later change to a protected path needs its own
+  exception.
+- **Reason:** The sole exact-head merge completed.
+- **Evidence:** [PR #742](https://github.com/ModernNomad-98/Project-Aegis/pull/742)
+  merged `7c3ed3957cce5b3f36f1ce4ed31bfa1b8858b80a` as
+  `ce865c9122d991bbf0ee9cbc47b692a885d4ccf9` at the time above, with the REST
+  merge pinned to that head.
+
+### AEGIS-APR-135: Consumption of the PR #743 exception
+
+- **Event:** CONSUMED; target grant AEGIS-APR-133.
+- **Status at recording:** AEGIS-APR-133 has no remaining use.
+- **Effective at:** 2026-10-12 23:23:20 UTC — the GitHub API's `merged_at`
+  (the source named here); the merge commit's own committer date is
+  `2026-10-12T16:23:19-07:00` = **23:23:19Z**, one second earlier, and that
+  one-second difference is recorded here rather than silently resolved.
+- **Recorded at / By:** 2026-10-12 / the Stage G merger agent
+  (`dependabot-closeout-merger-g`), the agent that performed the merge.
+- **New authority:** None. A later change to a protected path needs its own
+  exception.
+- **Reason:** The sole exact-head merge completed.
+- **Evidence:** [PR #743](https://github.com/ModernNomad-98/Project-Aegis/pull/743)
+  merged `af49536c8e51e93f4112889832981380f51e814f` as
+  `81081ca4f7745de8bb6275e890f09e9b4a109325` at the time above, with the REST
+  merge pinned to that head.
