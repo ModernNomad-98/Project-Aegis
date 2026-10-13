@@ -73,11 +73,14 @@ checkable by a reader who does not have the archive.
 | 3 | [FU3-RECORD-stage-g-summary.md](FU3-RECORD-stage-g-summary.md) | byte-identical | 25,454 → 25,454 | `d2ed1cfba306c12d993b5718b1d903de656409f1ff91af2e90c3ee1b178aa031` | `d2ed1cfba306c12d993b5718b1d903de656409f1ff91af2e90c3ee1b178aa031` |
 | 4 | [REVIEWPATH-FINAL-REVIEW-F.md](REVIEWPATH-FINAL-REVIEW-F.md) | byte-identical | 21,023 → 21,023 | `f367d36eda52c45289dee5d2cbdcde82c534db8c97786d23b78d51531491cd55` | `f367d36eda52c45289dee5d2cbdcde82c534db8c97786d23b78d51531491cd55` |
 
-**Each file's own integrity claim, recomputed from the published bytes:** file 1's self-digest footer is now
-`9038e3e6…` (the full 64-hex value is stated in that file's own footer; it was recomputed over the derivative **three times** as it was
+**Each file's own integrity claim, recomputed from the committed files rather than copied from this page:**
+**file 1**'s self-digest footer is now `9038e3e6…` - its full 64-hex value is stated in that file's own footer, and it was
+recomputed over the derivative each time the derivative changed (it was
 `f5a6b9ca66c99dd8baa61018fb60974a08ab92efcffce3583285ca6cd97b8b97` in the archive original and `3a4d3264…` after the first
-revised - leaving the original's value would have made the published file carry a false claim); file 2's footer is
-`059822aabffb13cb417adcd1714bb00a90244c0df040a457db7ba9ac895bb2d7`; file 4 carries a body digest,
+repair round; leaving the original's value would have made the published file carry a false claim). **File 2**'s footer is
+`8f554598a04d91567fbb10e301d1a8bc1e0c2940b2a82fb8a5bac4be9258937b` and **file 3**'s is
+`059822aabffb13cb417adcd1714bb00a90244c0df040a457db7ba9ac895bb2d7` - **each recomputed from its own file**, which is what
+section 7's verification step asks a reader to do. **File 4** carries a body digest,
 `81884e0d49cb117c7f7884350ce23adcfac6788891c0a9bc8828dc19461abcc8`, over every byte above its footer heading.
 
 **All four are LF-only** (zero CRLF byte pairs) and the repository root `.gitattributes` is `* text=auto eol=lf`.
@@ -93,13 +96,14 @@ publication, not the archival body of a dated record.
 
 ### 1.1 The sanitized derivative: every difference from its source, and why
 
-`BER-G3-FU3-EXECUTION.md` is **not** a verbatim copy. **Eight changes** were made, all named here: three are privacy
-sanitizations, three are corrections of claims the published text got wrong, and one is the record's own integrity
-footer. Nothing else differs.
+`BER-G3-FU3-EXECUTION.md` is **not** a verbatim copy. **Nine changes** were made, plus **one deliberate non-change**
+recorded as item 5 so the inventory is exhaustive: four items are privacy sanitizations and five are corrections of
+claims the published text got wrong - **two of which changed what the record concludes**, not merely how it is worded.
+Nothing else differs.
 
 | # | Location | Change | Why |
 | --- | --- | --- | --- |
-| 1 | the search-census row for the shell history | the shell-history artefact's filename is removed; the row now reads "the distro's interactive shell-history file" | the filename appears in **no tracked file at the base revision**, and the governing evidence-retention rule (backlog L4021-L4025: *no private identifiers in Git*) requires it out. The **substance is preserved**: the history was 16 bytes and no live provider command was recorded |
+| 1 | the search-census row for the shell history | the shell-history artefact's filename is removed; the row now reads "the distro's interactive shell-history file" | the filename appears in **no tracked file at the base revision**, and the governing evidence-retention rule (backlog L4021-L4025: *no private identifiers in Git*) requires it out. The **substance is preserved**: the history was 16 bytes **when inspected**, and what that does and does not establish is stated in item 9 |
 | 2 | the verification command that enumerated the bulk-storage roots | the command is replaced by a prose statement of the same search and the same result | the command's host-specific root list appears in **no tracked file at the base revision**; its substance - a recursive name-and-content search that found only the schema and never the data - is preserved |
 | 3 | the verification command that sized the shell history | replaced by "the distro's interactive shell-history file, sized", with the same 16-byte result | same reason as 1 |
 | 4 | four sites: the search-census row for the distro root, the 2.2 opening, the quoted stop record, and the enumeration command | **every occurrence of the private host identity is removed** - the username, the distro release, the `wsl$` root and the distro-side directory name - replaced by "the external distro-private evidence root on the WSL2 Linux distro (raw host path withheld)" | the evidence-retention rule this record's own lane is governed by says flatly *no private identifiers in Git*, and the raw host paths and users belong in the separately approved external root. **The Lead first ruled these identifiers could stay because they are already tracked at the base revision; Codex showed that prior publication is not an exception to the rule, and that the ruling was wrong twice over - see the note below. The ruling was overturned.** |
@@ -107,6 +111,8 @@ footer. Nothing else differs.
 | 6 | the sentence about the authorized external evidence root | "No provider execution evidence was ever placed at the authorized root" becomes a **current-state** statement: the directory was not present when searched, and its **historical existence is UNKNOWN** | a `Test-Path` result cannot prove a historical absence, and this record's own governing packet says missing old evidence does not prove zero use |
 | 7 | the worst-case arithmetic block | corrected to **200 charged judgment attempts plus at most one read-only metadata request = $158.00**; the previous "$158.79" implied 201 charged attempts, an impossible path | the approved maxima are 200 judgment attempts + 1 metadata availability request, and that request invokes no generation and submits no calibration content, so the attempt charge does not apply to it |
 | 8 | the record's own self-digest footer | rewritten from `f5a6b9ca…` (the archive original's value) to `9038e3e6…` over the current derivative | the footer is the file's own integrity claim; leaving the original's value would have published a file carrying a **false** claim, which is the defect class this lane exists to remove. Recomputing it was correct - and the change belongs in this inventory rather than being left implicit |
+| 9 | the shell-history **conclusion**, in the census table's S5 row and in the verification commands | the sentence `no live provider command ever recorded` becomes a **current-state** statement: the history was empty **when inspected**, that is equally consistent with its having been cleared, disabled or bypassed by non-interactive execution, and **whether any live provider command was ever recorded is UNKNOWN** | an effectively empty history file proves only what was true at inspection. The earlier wording inferred a historical fact from a present-tense measurement - the same defect as item 6, in the same copy, and it is enumerated separately because it changes the record's **conclusion** rather than its wording |
+| 10 | the **census**, in section 2.2 and in the verification commands | the three top-directory rows sum to **1,915** against a recorded total of **1,719**, and the block now carries an explicit **UNRECONCILED** warning: both numbers are shown, no number was adjusted to make the sum work, and the rows, the total and the dependent 1,455-file scan figure are labelled **unreliable as a set** | this lane cannot re-derive the census - its boundaries forbid touching the WSL distro - so the honest form is a labelled gap rather than a balanced sum. A reader can now check the arithmetic and see that it does not add up, instead of trusting a total |
 
 **A ruling of the Lead's was overturned here, and it is recorded rather than quietly rewritten.** The first version of
 this section said the host identifiers could stay because they are *already published at the base revision* - the username
@@ -239,6 +245,11 @@ $hits = Select-String -Path $files -Pattern $pat
 "hits_on_copies = $($hits.Count)"
 $hits | ForEach-Object { "{0}:{1}" -f (Split-Path $_.Path -Leaf), $_.LineNumber }
 "hits_on_record = $((Select-String -Path docs/evidence/fu3-record-publication-2026-10-13/README.md -Pattern $pat).Count)"
+# the substantive figure: this record's evidentiary prose only. Exclusion rule: the fenced quotation of the
+# rule above is NOT a hit, so fenced blocks are stripped before counting.
+$fence = '```'
+$prose = ((Get-Content -Raw docs/evidence/fu3-record-publication-2026-10-13/README.md) -split ('(?ms)^' + $fence + '.*?^' + $fence)) -join ''
+"hits_on_record_substantive = $((($prose -split [char]10) | Select-String -Pattern $pat).Count)"
 ```
 
 **The command prints `hits_on_copies = 4` and `hits_on_record = 1`.** (The command above reuses the `$pat` set immediately above it.) The single record hit is the pattern text quoted from the plan **in this
@@ -259,6 +270,26 @@ derivative is a new artifact: the plan's prose is registered here as **historica
 the revision Stage B accepted, so neither its pattern nor its prose is edited, and this record's amended criterion
 supersedes L421 **for the four published copies at this head only**.
 
+**The two citations of `PLAN.md` above, and their limit - this change's own rule applied to itself.** Two sentences in
+this section rest on the plan: that the pattern is taken **verbatim** from it, and that its own threshold was **three**.
+**`PLAN.md` is not in this repository** (`git ls-files` finds no such path), so those claims are recorded in the shape
+this rule requires for an artifact that cannot be published:
+
+- **Locator:** `_resume-2026-10-09/evidence/workspace-citation-durability-2026-10-13/PLAN.md` - *in plain words, the
+  untracked session workspace archive*.
+- **Digest of the exact text relied on:** the pattern block at **L424-L425** is
+  `18793b709c1826bfc078427b66e439e6b429c2e442d54b43071418d53b8014f3` (those two lines joined by LF plus one trailing LF);
+  the plan as a whole is `d02022bcfeef11278feee0048f8ed259c6560e673cfabf7b1313af16a1cf05ee` (77,404 bytes, 700 lines), and the
+  threshold sentence relied on is at **L421**.
+- **Plain statement of retrievability: the plan is NOT retrievable from this repository and cannot be verified from a
+  fresh checkout.** The digest identifies it; it does not make it fetchable, so **the verbatim-pattern claim is not
+  checkable here** - only its digest is.
+
+**What does not rest on the plan.** The three hits the plan's threshold names are reproduced **from the four source
+files**, which are described above and digest-pinned in section 1: running the printed pattern over the archive
+originals yields `BER-G3-FU3-EXECUTION.md` L155, `FU3-RECORD-FINAL-REVIEW-F.md` L121 and
+`REVIEWPATH-FINAL-REVIEW-F.md` L47. That measurement is what establishes that the published set adds exactly one line to the
+plan's three, and it needs no plan.
 ## 6. Owed, named so it is not forgotten
 
 Publishing four files does not fix the other five cited paths, and this page does not claim it
@@ -302,5 +333,8 @@ From a clone of the candidate head, with the session workspace archive unavailab
    derivative, as section 1.1 records, not over the original.
 3. **Retrievability** — read the four files directly from the clone. No step of that path
    requires the archive, and no Markdown link on this page targets it.
-4. **The citing entry** — read the newest entry of section 13 of the backlog linked in section 2,
-   which names the entry it supersedes and links back to this page.
+4. **The citing entries** — the section 13 entries that link back to this page are the **first two**: the entry at
+   **L4192-L4227** carries the links to this record and to three of the four copies, and the entry at **L4228-L4252**
+   carries a further link to section 1.1. **The two newest entries - L4253-L4279 and L4280 and following - carry no
+   link at all**; they correct counts, scope and an in-place edit. All four are named here so that a reader does not go
+   looking for a link that is not there.
