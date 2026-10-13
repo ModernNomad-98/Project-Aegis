@@ -3597,8 +3597,10 @@ missed-boundary ledger recorded through #684 is not re-derived here.
 
 **Timing provenance and limits.** The times above are the integration commits'
 committer timestamps in UTC; GitHub merge events can differ from them by a
-second — measured on this window, 9 of the 18 API `merged_at` values are one
-second later than the corresponding committer timestamp — and for the two
+second — measured on this window, 10 of the 18 API `merged_at` values are one
+second later than the corresponding committer timestamp (#743, #745, #748,
+#751, #753, #755, #756, #757, #759, #760), the other 8 are exactly equal
+(#742, #746, #747, #749, #750, #752, #754, #758) — and for the two
 cutoffs the API merge events are 2026-10-12 07:18:51 UTC (M2, equal to its
 committer timestamp) and 2026-10-13 12:39:17 UTC (M3, one second after its
 committer timestamp). The M2-to-M3 endpoint span measured on the committer
