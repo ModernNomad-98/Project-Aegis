@@ -46,7 +46,7 @@ read was read-only.
 | S2 | `\\wsl$\Ubuntu-24.04\home\peternguyen\aegis-stage-a\` | the external distro-private evidence root on the WSL2 Linux distro | **reached; fully censused** — 1,719 files, **no usage artefact** (§2.2) |
 | S3 | `C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence` | the **authorized** external evidence root named by the owner's decision 24 | **DOES NOT EXIST on this host** (§2.1) |
 | S4 | `C:\temp` (whole), `D:\` (whole), `C:\src\Project Aegis` (whole) | all other local bulk storage | **searched by name and by content** — no ledger file, no usage JSONL, no billing record |
-| S5 | `.bash_history` on the distro | the Linux shell history that would show a live-run command | **16 bytes — effectively empty**; no live provider command ever recorded |
+| S5 | the distro's interactive shell-history file | the Linux shell history that would show a live-run command | **16 bytes — effectively empty**; no live provider command ever recorded |
 | S6 | the public repository via the accounting clone at `878b7d46` | the published Git record | **searched** — the ledger *implementation* is published; no ledger *data* is in Git (and cannot be) |
 
 ### 2.1 The authorized evidence root does not exist
@@ -57,9 +57,12 @@ The owner-approved external evidence root is fixed by the authorization decision
 
 > `C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence`
 
-Measured this pass: **`Test-Path` returns `False`; the directory does not exist.** `C:\temp` exists and
-holds ~100 unrelated older work directories, none of them the calibration evidence root. **No provider
-execution evidence was ever placed at the authorized root on this host.**
+Measured this pass: **`Test-Path` returns `False`; the directory was NOT PRESENT WHEN
+SEARCHED.** `C:\temp` exists and holds ~100 unrelated older work directories, none of them the
+calibration evidence root. That is a **current-state observation and nothing more**: it does not establish
+whether the directory, or any provider execution evidence at it, ever existed on this host. **Its historical
+existence is UNKNOWN**, in line with this record's own governing packet, which states that missing old evidence
+does not prove zero use.
 
 ### 2.2 The external distro root holds source code and host logs — not usage
 
@@ -174,8 +177,15 @@ attempt its maximum possible cost*):
 ```text
 per attempt = 8,000 input x 5,000 + 25,000 output x 30,000
             = 40,000,000 + 750,000,000 = 790,000,000 nano-USD = USD $0.79
-200 attempts (the judgment ceiling)  = 158,000,000,000 nano-USD  = USD $158.00
-201 requests (the total ceiling)     = 158,790,000,000 nano-USD  = USD $158.79
+200 judgment attempts (the judgment ceiling; each charged at the worst case)
+                                     = 158,000,000,000 nano-USD  = USD $158.00
++ at most 1 read-only metadata availability request (the 201st request: the
+  decision package section 17 row 17 caps the total at 200 judgment attempts
+  plus 1 metadata request; it submits no calibration content and invokes no
+  generation, so the worst-case attempt charge above does not apply to it)
+                                     = not charged by the attempt formula
+worst case on the permitted 201-request path
+                                     = 158,000,000,000 nano-USD  = USD $158.00
 spend ceiling                        = 175,000,000,000 nano-USD  = USD $175.00
 request ceiling                      = 201
 ```
@@ -330,11 +340,11 @@ Test-Path 'C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence
 Get-ChildItem '\\wsl$\Ubuntu-24.04\home\peternguyen\aegis-stage-a' -Recurse -File | Measure-Object
   -> Count = 1719   (all source trees + host logs; zero ledger, usage, spend or billing files)
 
-Get-ChildItem 'C:\src\Project Aegis','C:\temp','D:\','\\wsl$\Ubuntu-24.04\home\peternguyen' -Recurse -File -Filter '*ledger*'
+A recursive name-and-content search across the local bulk-storage roots and the distro home, for any ledger file
   -> only calibration-ledger-entry.schema.json (the SCHEMA, never the data)
 
-(Get-Item '\\wsl$\Ubuntu-24.04\home\peternguyen\.bash_history').Length
-  -> 16      (no live provider command ever recorded)
+(the distro's interactive shell-history file, sized)
+  -> 16 bytes   (no live provider command ever recorded)
 
 git -C _resume-2026-10-09\clone-ber-g3-accounting grep -n 'MAX_TOTAL_EXTERNAL_REQUESTS' -- tools/behavioral_eval_runner/judge/calibration_ledger.py
   -> 62: MAX_TOTAL_EXTERNAL_REQUESTS = 201
@@ -344,4 +354,4 @@ git -C _resume-2026-10-09\clone-ber-g3-accounting grep -n 'MAX_TOTAL_EXTERNAL_RE
      literal placeholder {{SHA256}}, so the digest is stable and independently reproducible.
      Verify by replacing the 64 hex characters on the line beginning "sha256:" with {{SHA256}}, then
      hashing the UTF-8 bytes including the final newline. Line endings are LF only. -->
-sha256: f5a6b9ca66c99dd8baa61018fb60974a08ab92efcffce3583285ca6cd97b8b97
+sha256: 3a4d32645e0e2189ccef64fa0cfc3518e88884d18087ba2f0d7ca29d35d1b148

@@ -2,8 +2,9 @@
 
 **What this page is.** The publication record for four Behavioral Eval Runner (BER) FU-3
 record-lane evidence files that this repository's append-only governance log cites, and that
-until now existed only inside the session workspace archive. The four files are published
-**byte-identically** in this directory. This page records their digests, the citations the
+until now existed only inside the session workspace archive. The four files are published in this
+directory: **three byte-identically**, and **one as an explicitly labelled sanitized derivative** whose
+difference is enumerated in section 1.1. This page records their digests, the citations the
 copies make retrievable, every archive path a tracked record still cites with its disposition,
 and the citation-durability rule that keeps this defect from recurring.
 
@@ -12,6 +13,27 @@ inline P2 finding posted by the repository's automated reviewer, Codex* — agai
 `docs/roadmaps/behavioral-eval-runner-backlog.md` line 4162, asking for "a retained capture with
 an immutable revision or digest and locator". The finding is **true**, and the repository-wide
 scope is wider than the three files it names.
+
+**The finding this page answers, retained rather than merely cited.** Citing a mutable comment URL is the
+failure mode this change exists to remove, so the finding is retained here with a digest and a locator, and
+the locator's own limit is stated: a pull-request comment can be edited or deleted, so the **digest**, not the
+URL, is what pins the text.
+
+- **Locator:** pull request #765 review comment `4261109123`, on `docs/roadmaps/behavioral-eval-runner-backlog.md` line 4162, written against commit `e0a026e2...`:
+  [discussion_r4261109123](https://github.com/ModernNomad-98/Project-Aegis/pull/765#discussion_r4261109123).
+- **Digest of the retained text below:** sha256 `be0e3aab224a7384c0aedb734c3d1bffa65407b836b6b0a0dfa257bcdb266ecb` over its 913 characters, UTF-8, no trailing newline added.
+- **Retained verbatim:**
+
+```text
+**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Publish the evidence cited by the permanent log**
+
+A target-tree and workspace-wide basename search finds none of the three `_resume-2026-10-09/...` files cited here, so a fresh checkout cannot inspect the Stage F/Stage G records or the claimed F-F1 precedent. The later bare comment IDs do not preserve those cited sections as immutable evidence; the workflow itself requires a retrievable fixed source rather than a mutable comment ID or unretained string. Publish a retained capture with an immutable revision or digest and locator, or explicitly mark these claims unavailable instead of presenting the missing files as auditable support.
+
+AGENTS.md reference: [AGENTS.md:L49-L54](https://github.com/ModernNomad-98/Project-Aegis/blob/e0a026e2843e299d02180d31d7202a3598759a94/AGENTS.md#L49-L54)
+
+Useful? React with 👍 / 👎.
+```
+
 
 **The defect is durability, not accuracy.** The citations were correct: the sections they name
 really do sit at the lines they name (section 2 re-states each anchor). What failed was
@@ -31,30 +53,62 @@ A *self-digest footer* — in plain words, *the repository convention where a li
 `{{SHA256}}`, UTF-8, LF, final newline included*. The *body digest* — in plain words, *the same
 idea applied to every byte above a named footer heading instead of to the whole file*.
 
-## 1. The four published files
+## 1. The four published files, and the one that is not verbatim
 
-Each copy is **byte-identical** to the archive source it came from. The whole-file sha256 below
-is the plain digest a fresh clone reproduces with `sha256sum` or `Get-FileHash`; the last column
-is the record's **own** integrity claim, recomputed from the published bytes, so that publishing
-is shown not to have falsified it.
+**Three of the four copies are byte-identical to their archive source. The fourth is a labelled sanitized
+derivative**, and section 1.1 enumerates every difference. For each file the table gives BOTH sides: the
+**source-side** digest, measured from the archive original when the copy was taken, and the **committed-side**
+digest a fresh clone reproduces. Recording both is what makes the equality - or the enumerated difference -
+checkable by a reader who does not have the archive.
 
-| # | Published file | Bytes | Lines | Whole-file sha256 | Its own digest, recomputed here |
-| --- | --- | ---: | ---: | --- | --- |
-| 1 | [BER-G3-FU3-EXECUTION.md](BER-G3-FU3-EXECUTION.md) | 25,606 | 347 | `ea521f84c4d0d88f8e888f3588147a6a63c659f8773f7d41339d9eeca47b9915` | self-digest footer `f5a6b9ca66c99dd8baa61018fb60974a08ab92efcffce3583285ca6cd97b8b97` — recomputes |
-| 2 | [FU3-RECORD-FINAL-REVIEW-F.md](FU3-RECORD-FINAL-REVIEW-F.md) | 30,777 | 274 | `c0b0c548fa6b8f2cc9b961814099e8e12e690729bfdaa16e6c4b96263d7dab8a` | self-digest footer `8f554598a04d91567fbb10e301d1a8bc1e0c2940b2a82fb8a5bac4be9258937b` — recomputes |
-| 3 | [FU3-RECORD-stage-g-summary.md](FU3-RECORD-stage-g-summary.md) | 25,454 | 233 | `d2ed1cfba306c12d993b5718b1d903de656409f1ff91af2e90c3ee1b178aa031` | self-digest footer `059822aabffb13cb417adcd1714bb00a90244c0df040a457db7ba9ac895bb2d7` — recomputes |
-| 4 | [REVIEWPATH-FINAL-REVIEW-F.md](REVIEWPATH-FINAL-REVIEW-F.md) | 21,023 | 107 | `f367d36eda52c45289dee5d2cbdcde82c534db8c97786d23b78d51531491cd55` | body digest `81884e0d49cb117c7f7884350ce23adcfac6788891c0a9bc8828dc19461abcc8` (bytes above the footer heading at L103) — recomputes |
+| # | Published file | Status | Source bytes → committed | Source sha256 (archive original) | Committed sha256 (fresh clone) |
+| --- | --- | --- | ---: | --- | --- |
+| 1 | [BER-G3-FU3-EXECUTION.md](BER-G3-FU3-EXECUTION.md) | **SANITIZED DERIVATIVE** - see 1.1 | 25,606 → 26,345 | `ea521f84c4d0d88f8e888f3588147a6a63c659f8773f7d41339d9eeca47b9915` | `cc183e4504a1b280d04e5726279c71daaa4593e1e5272ee43ce2110838cf6ac3` |
+| 2 | [FU3-RECORD-FINAL-REVIEW-F.md](FU3-RECORD-FINAL-REVIEW-F.md) | byte-identical | 30,777 → 30,777 | `c0b0c548fa6b8f2cc9b961814099e8e12e690729bfdaa16e6c4b96263d7dab8a` | `c0b0c548fa6b8f2cc9b961814099e8e12e690729bfdaa16e6c4b96263d7dab8a` |
+| 3 | [FU3-RECORD-stage-g-summary.md](FU3-RECORD-stage-g-summary.md) | byte-identical | 25,454 → 25,454 | `d2ed1cfba306c12d993b5718b1d903de656409f1ff91af2e90c3ee1b178aa031` | `d2ed1cfba306c12d993b5718b1d903de656409f1ff91af2e90c3ee1b178aa031` |
+| 4 | [REVIEWPATH-FINAL-REVIEW-F.md](REVIEWPATH-FINAL-REVIEW-F.md) | byte-identical | 21,023 → 21,023 | `f367d36eda52c45289dee5d2cbdcde82c534db8c97786d23b78d51531491cd55` | `f367d36eda52c45289dee5d2cbdcde82c534db8c97786d23b78d51531491cd55` |
 
-**All four are LF-only** (zero CRLF byte pairs) and the repository root `.gitattributes` is
-`* text=auto eol=lf`, so the committed bytes equal the archive bytes and every digest above
-stays reproducible from a clone.
+**Each file's own integrity claim, recomputed from the published bytes:** file 1's self-digest footer is now
+`3a4d32645e0e2189ccef64fa0cfc3518e88884d18087ba2f0d7ca29d35d1b148` (recomputed over the derivative, because leaving
+the original's value would have made the published file carry a false claim); file 2's footer is
+`8f554598a04d91567fbb10e301d1a8bc1e0c2940b2a82fb8a5bac4be9258937b`; file 3's footer is
+`059822aabffb13cb417adcd1714bb00a90244c0df040a457db7ba9ac895bb2d7`; file 4 carries a body digest,
+`81884e0d49cb117c7f7884350ce23adcfac6788891c0a9bc8828dc19461abcc8`, over every byte above its footer heading.
 
-**Nothing in them was edited.** No re-wrap, no trailing-whitespace fix, no link rewrite, no
-re-encoding — a single changed byte would falsify both the self-digest and this page's
-whole-file digest. Their internal citations to further out-of-tree artifacts are part of the
-frozen archival text and are deliberately left as they are; the rule in section 4 binds new
-citations and the citations superseded by this publication, not the archival body of a dated
-record.
+**All four are LF-only** (zero CRLF byte pairs) and the repository root `.gitattributes` is `* text=auto eol=lf`.
+For the three byte-identical copies the committed bytes therefore equal the archive bytes and every digest above
+is reproducible from a clone alone; for the derivative, the committed-side digest is the one the clone reproduces,
+and the source-side digest identifies the original it was derived from.
+
+**Three copies were edited in no way at all.** No re-wrap, no trailing-whitespace fix, no link rewrite, no
+re-encoding - a single changed byte in any of them would falsify both the self-digest and this page's whole-file
+digest. Their internal citations to further out-of-tree artifacts are part of the frozen archival text and are
+deliberately left as they are; the rule in section 4 binds new citations and the citations superseded by this
+publication, not the archival body of a dated record.
+
+### 1.1 The sanitized derivative: every difference from its source, and why
+
+`BER-G3-FU3-EXECUTION.md` is **not** a verbatim copy. Five changes were made, all named here. Two are privacy
+sanitizations and three are corrections of claims the published text got wrong; nothing else differs.
+
+| # | Location | Change | Why |
+| --- | --- | --- | --- |
+| 1 | the search-census row for the shell history | the shell-history artefact's filename is removed; the row now reads "the distro's interactive shell-history file" | the filename appears in **no tracked file at the base revision**, and the governing evidence-retention rule (backlog L4021-L4025: *no private identifiers in Git*) requires it out. The **substance is preserved**: the history was 16 bytes and no live provider command was recorded |
+| 2 | the verification command that enumerated the bulk-storage roots | the command is replaced by a prose statement of the same search and the same result | the command's host-specific root list appears in **no tracked file at the base revision**; its substance - a recursive name-and-content search that found only the schema and never the data - is preserved |
+| 3 | the verification command that sized the shell history | replaced by "the distro's interactive shell-history file, sized", with the same 16-byte result | same reason as 1 |
+| 4 | the sentence about the authorized external evidence root | "No provider execution evidence was ever placed at the authorized root" becomes a **current-state** statement: the directory was not present when searched, and its **historical existence is UNKNOWN** | a `Test-Path` result cannot prove a historical absence, and this record's own governing packet says missing old evidence does not prove zero use |
+| 5 | the worst-case arithmetic block | corrected to **200 charged judgment attempts plus at most one read-only metadata request = $158.00**; the previous "$158.79" implied 201 charged attempts, an impossible path | the approved maxima are 200 judgment attempts + 1 metadata availability request, and that request invokes no generation and submits no calibration content, so the attempt charge does not apply to it |
+
+**What was deliberately NOT changed.** The identifiers the derivative already shares with the base revision stay:
+the distro root and username it names are already published in tracked files at the base revision (the username in
+4, the distro release in 5, the root in 2), so removing them here would make the copy differ from its source for no
+privacy gain. Only what is **new to Git** was sanitized.
+
+**Where the unsanitized original is retained, and the plain limit.** The original remains at
+`_resume-2026-10-09/evidence/docs-refresh-2026-10-12/BER-G3-FU3-EXECUTION.md`, 25,606 bytes, whole-file sha256
+`ea521f84c4d0d88f8e888f3588147a6a63c659f8773f7d41339d9eeca47b9915` - *in plain words, the untracked session workspace archive*.
+**That original is NOT retrievable from this repository.** The digest identifies it; it does not make it fetchable,
+and nothing here should be read as claiming otherwise.
 
 ## 2. The citations these copies make retrievable
 
@@ -78,8 +132,9 @@ archive at the base revision this change is against - name **nine distinct** arc
 published here; **five are owed** and are named in section 6 rather than dropped.
 
 **Scope of this census, stated because the heading promises it.** The census was taken over the tracked
-tree at the base revision, **before** this change. The four published copies in this directory are frozen
-verbatim re-publications: they are archival records in their own right, and they carry their own
+tree at the base revision, **before** this change. The re-publications in this directory (three byte-identical
+copies and one sanitized derivative, section 1.1) are archival records in their own right - the derivative's
+enumerated differences touch none of the references counted here - and they carry their own
 out-of-tree references internally - for example the two source-archive paths inside
 `BER-G3-FU3-EXECUTION.md` at L113-L114, and a row-source locator inside
 `FU3-RECORD-FINAL-REVIEW-F.md` at L222. Those internal references are **not** counted above and are
@@ -126,6 +181,16 @@ read and dismissed as benign: a provider price line, a GitHub Actions job id ins
 table, and a sha256 value inside a table row. The scan is repeated as an acceptance check at the
 candidate head, so the result is a measurement rather than an assurance.
 
+**A privacy and identifier check, added because a secret scan is not a privacy check.** The four files were also
+scanned for host-specific identifiers that are **new to Git** - usernames, distro paths, shell-history artefacts and
+bulk-storage commands - by extracting every path- and artefact-shaped token and testing each against the tracked
+tree at the base revision. That check found exactly two such items, and both are now sanitized (section 1.1, items
+1 to 3): the shell-history artefact's filename and the drive-enumeration command. Every other host identifier in
+the copies, including the distro root and the username inside it, is **already published at the base revision** and
+was deliberately left untouched. This paragraph exists because the credential scan passed while identifier-shaped
+content was still present: a scan for secrets does not answer whether an identifier is already public, and the
+repository's own evidence-retention rule asks a different question.
+
 ## 6. Owed, named so it is not forgotten
 
 Publishing four files does not fix the other five cited paths, and this page does not claim it
@@ -159,11 +224,14 @@ their own procedure, not as a side effect of a publication.
 From a clone of the candidate head, with the session workspace archive unavailable:
 
 1. **Digests** — hash each of the four files in this directory with `Get-FileHash -Algorithm SHA256`
-   or `sha256sum` and compare against the whole-file column in section 1. All four reproduce.
+   or `sha256sum` and compare against the **committed-side** column in section 1. All four reproduce it.
+   The source-side column identifies the archive originals: for the three byte-identical copies the two columns are
+   equal, and for the derivative they differ by exactly the changes enumerated in section 1.1.
 2. **Self-digests** — for files 1 to 3, replace the 64 hex characters on the line beginning
    `sha256:` with the literal placeholder and hash the UTF-8 bytes including the final newline,
    LF only; for file 4, hash every byte above the whole-line `## SHA-256 footer` heading (L103)
-   the same way. All four reproduce the values in section 1.
+   the same way. All four reproduce the values stated for them in section 1; file 1's footer is over the
+   derivative, as section 1.1 records, not over the original.
 3. **Retrievability** — read the four files directly from the clone. No step of that path
    requires the archive, and no Markdown link on this page targets it.
 4. **The citing entry** — read the newest entry of section 13 of the backlog linked in section 2,
