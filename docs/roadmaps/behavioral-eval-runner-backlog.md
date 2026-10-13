@@ -4277,6 +4277,40 @@ itself is a separate, later host phase that runs only under the merged grant.
   the sum work.
 - **Scope:** this entry corrects three statements. It edits no existing byte, re-opens no gate, edits no merged
   pull-request body, and grants nothing. **New authority: None.**
+### 2026-10-13 — the third correction entry above was itself corrected in place; this entry records that deviation and the corrected counts
+
+- **Event:** correction and disclosure. Appended under this log's rule at L2672-L2675.
+- **Addresses:** the entry directly above (L4253-L4279, "three corrections to the two entries above"),
+  specifically its **Correction 2** text at L4265-L4271.
+- **What happened, stated plainly.** Commit `c46d9057` **edited that entry's Correction 2 in place** —
+  a 1-line change at L4267 — to replace the token "the project directory name" with "the distro-side
+  directory name" and the word "five" with "four". **That departs from the rule at L2672-L2675**, which
+  says entries are never edited and corrections append a superseding entry. The edit was made on the
+  reasoning that the entry had not yet been merged and so was still this change's own text; **that
+  reasoning was wrong in one respect worth recording: the entry merges with this pull request, and at
+  merge it would have asserted something false about itself** — see the next bullet.
+- **A sentence in that entry is no longer true of it.** L4257-L4258 says the entry was *"Appended under
+  this log's rule at L2672-L2675; no existing line of this file is edited."* After `c46d9057` that
+  sentence is **false of its own entry**. No reader should rely on it. The deviation is disclosed here
+  rather than repaired by reverting, because reverting would re-introduce the false claim the edit
+  corrected.
+- **The corrected facts, as of `c46d9057`:**
+  - **Four** sites had the private host identity removed — the search-census row for the distro root,
+    the section 2.2 opening, the quoted stop record, and the enumeration command — **not five**.
+  - A fifth candidate, the **searched-roots list**, is **deliberately retained** and named as such at
+    item 5 of the publication record's difference inventory. Its retention rests on **scope**, not on
+    prior publication: `C:\src\Project Aegis` is the project and session workspace path, not private
+    host identity. **This entry does not revive the prior-publication exception**, which Correction 2
+    withdrew.
+  - The difference inventory is **eight** items, not seven. **This entry records the count that
+    Correction 2's own text still calls seven at L4271 and does not edit that line.**
+- **Why this entry exists rather than another edit.** The rule exists so that historical decisions
+  remain visible verbatim. A deviation recorded by appending demonstrates the rule can still be
+  honoured after it was broken; a second in-place edit would compound the first.
+- **Scope:** this entry changes no status, re-opens no closure decision, edits no existing line of this
+  file, and grants no authority. It is insert-only.
+- **New authority:** None.
+
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008
