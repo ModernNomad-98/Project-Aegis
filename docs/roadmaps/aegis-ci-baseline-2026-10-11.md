@@ -479,3 +479,26 @@ in `tools/aegis_delivery_control` (PR #740, merge `7fbc2335`, the current `main`
 documented in the tool's README. This block changes no figure on this page, adds no
 criterion, and **grants no CI change, no protected-path change, no branch-protection change
 and no merge**.
+
+## Footnote, 2026-10-12 — the artifact pin this page cites has moved to v7.0.2
+
+**Appended, never rewritten.** The S4 paragraph above is the dated 2026-10-11 observation and its bytes
+are untouched, exactly as the ledger rule requires (dated snapshots are never rewritten; a factual
+defect found in a dated section is recorded as a note like this one, ledger L2760). This note corrects
+the citation forward.
+
+**What was stale.** Lines 188-189 above read `actions/upload-artifact` v7.0.1 commit
+`043fb46d1a93c77aae656e7c1c64a875d1fc6a0a` (offline-ci.md L203-210). PR #743 (`81081ca4`, parents
+`ce865c91` / `af49536c`) bumped all four upload steps in `.github/workflows/validate-skills.yml` to
+**v7.0.2**, commit `cf430e030ddbb5b0abf93d22962f4752f3646cd9`, and updated no documentation; the
+second surface, `docs/offline-ci.md` L207-208, was corrected in the same change that appends this note.
+
+**The current pins, measured.** `git grep -n upload-artifact -- .github/workflows` returns exactly four
+lines, at `.github/workflows/validate-skills.yml` L278, L365, L421 and L477, each
+`actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2`; and
+`git grep -n -e v7.0.1 -e 043fb46d -- docs/offline-ci.md` now returns nothing.
+
+**Scope.** This note records a citation correction on a live page and nothing else. The dated
+2026-10-11 measurements on this page — the durations, the skipped-window footnote and every figure in
+S5 — are unchanged and are not re-measured here. No workflow file was edited by this change: the pin
+in `.github/workflows/validate-skills.yml` was already correct.
