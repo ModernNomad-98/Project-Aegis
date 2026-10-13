@@ -4264,7 +4264,7 @@ itself is a separate, later host phase that runs only under the merged grant.
   bullet already distinguishes Stage F from Stages D and E, and only the shorthand is wrong.
 - **Correction 2 — the fourth published file is sanitized further than that entry states.** The entry above
   describes a derivative with two identifiers removed. After an automated review, **every occurrence of the host
-  identity** was removed — the username, the distro release, the wsl-root and the project directory name — at five
+  identity** was removed — the username, the distro release, the wsl-root and the distro-side directory name — at four
   sites, under the evidence-retention rule at L4021–L4025. The earlier ruling that such identifiers could stay
   because they are already tracked at the base revision **was wrong and has been withdrawn**: prior publication is
   not an exception to that rule, and the publication directory does not exist at the base revision, so nothing inside
