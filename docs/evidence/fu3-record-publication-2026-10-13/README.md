@@ -127,7 +127,7 @@ and nothing here should be read as claiming otherwise.
 
 | Cited by | What the citation supports | Where it now resolves |
 | --- | --- | --- |
-| backlog line 4143 | the FU-3 execution record, "whose section 6 carries the stop verbatim" | [BER-G3-FU3-EXECUTION.md](BER-G3-FU3-EXECUTION.md) — section 6, "THE STOP RECORD (verbatim)", at L208 |
+| backlog line 4143 | the FU-3 execution record, "whose section 6 carries the stop verbatim" | [BER-G3-FU3-EXECUTION.md](BER-G3-FU3-EXECUTION.md) — section 6, "THE STOP RECORD (verbatim)", at L218 |
 | backlog line 4160 (inside the frozen O-F1 note) | that Stage F raised the carried item and left the body unedited, in its section 10 | [FU3-RECORD-FINAL-REVIEW-F.md](FU3-RECORD-FINAL-REVIEW-F.md) — section 10, "O-F1 and two smaller notes", at L202 |
 | backlog line 4162 (inside the frozen O-F1 note) | that Stage G recorded it as an open publication item, in its section 9 | [FU3-RECORD-stage-g-summary.md](FU3-RECORD-stage-g-summary.md) — section 9, at L176 |
 | backlog line 4165 (inside the frozen O-F1 note) | the `F-F1` precedent | [REVIEWPATH-FINAL-REVIEW-F.md](REVIEWPATH-FINAL-REVIEW-F.md) — the `F-F1` paragraph at L68 |
@@ -149,7 +149,7 @@ tree at the base revision, **before** this change. The re-publications in this d
 copies and one sanitized derivative, section 1.1) are archival records in their own right - the derivative's
 enumerated differences touch none of the references counted here - and they carry their own
 out-of-tree references internally - for example the two source-archive paths inside
-`BER-G3-FU3-EXECUTION.md` at L116-L117, and a row-source locator inside
+`BER-G3-FU3-EXECUTION.md` at L126-L127, and a row-source locator inside
 `FU3-RECORD-FINAL-REVIEW-F.md` at L222. Those internal references are **not** counted above and are
 **not** repaired by this change: rewriting them would falsify the copies' own integrity claims (section 1),
 and widening the census to include them would breach this change's audited scope.
@@ -204,11 +204,59 @@ identifiers already appear in tracked files. **Prior publication is not an excep
 on its own terms anyway** - this publication directory does not exist at the base revision, so nothing inside it was
 already published. This paragraph exists because the credential scan passed while identifier-shaped content was
 present: a scan for secrets does not answer whether an identifier is private.
-1 to 3): the shell-history artefact's filename and the drive-enumeration command. Every other host identifier in
-the copies, including the distro root and the username inside it, is **already published at the base revision** and
-was deliberately left untouched. This paragraph exists because the credential scan passed while identifier-shaped
-content was still present: a scan for secrets does not answer whether an identifier is already public, and the
-repository's own evidence-retention rule asks a different question.
+
+### 5.1 The acceptance check, stated so it can be reproduced
+
+The credential and account-shape scan is acceptance criterion **AC8**. Its pattern is taken **verbatim** from the
+plan at `PLAN.md` L424-L425 and is **not** modified here. Its counting rule is **lines, not matches** - one count per
+matching **line** - `Select-String` returns one match object per line that matches, however many hits that line contains:
+
+```text
+$pat='AKIA[0-9A-Z]{16}|BEGIN [A-Z ]*PRIVATE KEY|gh[pousr]_[A-Za-z0-9]{20,}|arn:aws|'
+$pat+='[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+[.][A-Za-z]{2,}|password *[:=]|secret *[:=]|token *[:=]|[0-9]{12}'
+```
+
+Run it over the four published copies in this directory and count matching **lines**. **The measurement at this head
+is 4 lines**, and which alternative matched each one is part of the result, because this single criterion bundles a
+**credential-shape** scan with an **account-shape** scan:
+
+| # | Line | Which alternative matched | Disposition |
+| --- | --- | --- | --- |
+| 1 | `BER-G3-FU3-EXECUTION.md` L168 | **credential-shape** - the token-assignment alternative, on the published provider-price line (a per-token rate stated in nano-USD) | read; a published provider price, not a credential |
+| 2 | `BER-G3-FU3-EXECUTION.md` L367 | **account-shape** - the twelve-digit alternative, on a run inside the file's **own recomputed sha256 footer** | **accepted false positive**: a substring of a hex digest is not an account number |
+| 3 | `FU3-RECORD-FINAL-REVIEW-F.md` L121 | **account-shape** - the twelve-digit alternative, on a GitHub Actions job id inside a CI results table | read; a job id, not an account |
+| 4 | `REVIEWPATH-FINAL-REVIEW-F.md` L47 | **account-shape** - the twelve-digit alternative, on a sha256 value inside a table row | read; a digest, not an account |
+
+**Scoping rule, stated so the two numbers are not confused.** The criterion's number is **what the plan's own command prints**, so the command
+is printed here and both of its outputs are reported:
+
+```powershell
+$files = @('BER-G3-FU3-EXECUTION.md','FU3-RECORD-FINAL-REVIEW-F.md',
+           'FU3-RECORD-stage-g-summary.md','REVIEWPATH-FINAL-REVIEW-F.md') |
+         ForEach-Object { "docs/evidence/fu3-record-publication-2026-10-13/$_" }
+$hits = Select-String -Path $files -Pattern $pat
+"hits_on_copies = $($hits.Count)"
+$hits | ForEach-Object { "{0}:{1}" -f (Split-Path $_.Path -Leaf), $_.LineNumber }
+"hits_on_record = $((Select-String -Path docs/evidence/fu3-record-publication-2026-10-13/README.md -Pattern $pat).Count)"
+```
+
+**The command prints `hits_on_copies = 4` and `hits_on_record = 1`.** (The command above reuses the `$pat` set immediately above it.) The single record hit is the pattern text quoted from the plan **in this
+very section** - the record states its own scan rule, so it necessarily contains a copy of it, and **the plan itself trips the same pattern at four
+of its own sites** (L421, L422, L424, L673) for the same reason. The number is therefore **reported as the command produces it rather than
+redefined**, and a second figure is printed beside it - **`hits_on_record_substantive = 0`**, counting this record's **evidentiary prose only**,
+with the quotation of the rule excluded.
+
+**Both numbers are printed because a criterion whose stated number is not what its stated command produces is the defect class this lane exists to
+remove.** Without the second figure the first would read as an unread credential-shaped string; with it, a reader sees that the one hit is the rule
+quoting itself, and that nothing in the record's substance matches the pattern at all.
+
+**The threshold is amended on the record from the plan's 3 to 4**, exactly as AC1 is amended. The plan's own number
+**reproduces at 3 for the four byte-identical *source* files** - measured, with the three hits landing at
+`BER-G3-FU3-EXECUTION.md` L155, `FU3-RECORD-FINAL-REVIEW-F.md` L121 and `REVIEWPATH-FINAL-REVIEW-F.md` L47, which is
+precisely what `PLAN.md` L421 records. The fourth line appears only in the **published** set, because the sanitized
+derivative is a new artifact: the plan's prose is registered here as **historical, not amended** - the plan is frozen at
+the revision Stage B accepted, so neither its pattern nor its prose is edited, and this record's amended criterion
+supersedes L421 **for the four published copies at this head only**.
 
 ## 6. Owed, named so it is not forgotten
 
