@@ -4840,9 +4840,19 @@ reader of all four #753 passes), from `readability-closeout-implementer-c` and f
 remedy for the withheld item-2 row, and it is satisfied.
 
 **What was read, and where the exclusions stand.** This page was read **whole, line by line, as prose**,
-at the declared revision `0237f611f718ed833935e72a0d98dd42362388a0` — **L1-4941, every line of this ledger**, in seven overlapping
-contiguous slices, with the three tool-output elisions those slices produced re-read inside the next
-slice, so no line is unread. The excluded already-read set is the recorded-acceptance drift
+at the declared revision `0237f611f718ed833935e72a0d98dd42362388a0` — **L1-4941, every line of this ledger**, in seven
+contiguous slices (L1-800, L720-1419, L1420-2079, L2080-2739, L2740-3479, L3480-4219, L4220-4941) whose
+union is L1-4941: only the 1-to-2 join overlaps (at L720-800) and the other five joins abut exactly. **Four
+of the seven slices were capped**, and each of the four elisions is named by its exact range with the read
+that displayed it — never merged into one claim: **L786-800** (15 lines) by the reader's own read at
+L720-1419; **L3058-3479** (**422 lines**, the largest of the four) by **the Stage C3 repair round's own
+read at `0237f611f718`**, in eleven displayed chunks; **L4171-4219** (49 lines) — **L4196-4219** by the
+reader's own fill read at L4196-4221 and **L4171-4195** (25 lines) by the Stage C2 repair round's read at
+L4166-4225; and **L4845-4895** (51 lines) by the Stage C2 repair round's read at L4840-4899 — *not* by the
+reader's later call at L4896-4941, which begins after the elision. **Every one of the page's 4,941 lines is
+displayed by one of those named reads**, so the coverage rests on the reader's slices, the Stage C2 round's
+three reads and the Stage C3 round's L3058-3479 read, each range bound to the read that displayed it.
+The excluded already-read set is the recorded-acceptance drift
 `2c6b6fc634d1..0237f611f718` = **512 / 0**, split as `2c6b6fc634d1..f5ac8444` 355 / 0,
 `f5ac8444..79c5c590` 78 / 0 (#753's own appended rows and keeper note) and
 `79c5c590..0237f611f718` 79 / 0 (the close-out lane's keeper section and rows K-074/K-075);
@@ -4878,11 +4888,17 @@ revision the instrument reads `table_rows 95, events 95, full_page_acceptances 7
 commit's head are published in the Stage C record and the pull request body, not inside the commit that
 produces them**, and **no post-commit bucket figure is predicted.**
 
-**Two declared deviations.** (1) The single reader also writes this keeper section and the batch record,
+**Three declared deviations.** (1) The single reader also writes this keeper section and the batch record,
 so the plan section 5 clause that the reader differ from this lane's keeper-section writer is **not
 satisfied**; the clause the row turns on — a reader different from `readability-batches-implementer-c` —
-**is** satisfied. (2) Three of the four F1-F4 pages are not discharged by this session and keep named
-follow-ups.
+**is** satisfied. The condition this leaves unmet on the register's own text (AEGIS-APR-101) is the carried
+exposure **E-3** stated in the batch record (section 2, deviation 1), so this row is **not green** and the
+authority question stays with the merge holder. (2) Three of the four F1-F4 pages are not discharged by this
+session: P1, P3 and P7 were not read whole, get **no row** and keep named follow-ups. (3) Two of the six
+acceptance-bullet dispositions for the accepted page are **partial — deviation declared**: "purpose and
+audience up front" (L1-17 names no intended audience) and "abbreviation or coded identifier at first use"
+(the page's first `PR` token is L14 against the definition at L156), both properties of the page's text at
+the bound revision that this lane may not rewrite.
 
 **Self-cost.** This section changes this ledger by more than 10 lines and adds a section, so this page
 returns to **pending** at the new head and owes a subsequent independent full-page re-read by a reader
