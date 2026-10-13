@@ -2,6 +2,24 @@
 
 ## Start here — current reading
 
+> **Newest reading — 2026-10-13, assessed through PR #760 (frozen cutoff M3).**
+> This is the current reading; the **#741 banner below is the prior frozen
+> checkpoint**, retained as dated evidence rather than as the present state.
+> The assessed cutoff is M3 = `ba522f133d05624c2130f15eb8ef3b6329b0f37a`, the
+> PR #760 integration at 2026-10-13 12:39:16 Coordinated Universal Time (UTC).
+> Its first parent `8a97724c` is the PR #759 integration (2026-10-13 11:26:41
+> UTC) and its second parent `ed864367` is the branch commit the #760
+> integration carried, so "assessed through PR #760" is arithmetic, not a label
+> of convenience: the highest-numbered pull request the cutoff integrates is
+> #760.
+> Read the
+> [cadence reassessment through PR #760](#cadence-reassessment-through-pr-760-2026-10-13)
+> for the selected and conditional outcome status of the 18 first-parent
+> pull-request integrations (#742–#760) the window carried — the range holds 19
+> numbered pull requests because **#744** has a merge SHA but no main
+> integration merge commit, its content having arrived inside #751 — and the
+> [cadence measurement checkpoint](aegis-execution-metrics.md#cadence-measurement-checkpoint-through-pr-760-2026-10-13)
+> for the integration table, window arithmetic and timing limits.
 > **Newest reading — 2026-10-12, assessed through PR #741 (frozen cutoff M2).**
 > This is the current reading; the **#688 banner below is the prior frozen
 > checkpoint**, retained as dated evidence rather than as the present state.
@@ -5112,6 +5130,90 @@ on the 68–140-hour historical group total.
 **Next trigger.** The next reassessment falls due when the boundary after M2
 closes — **one further integration after M2** — and an earlier reassessment is
 owed on a material owner decision, under the retained five-merge rule in the
+[measurement rule](aegis-execution-metrics.md#start-here--current-measurements).
+Within this section a PR number identifies an integration and a `D` number
+identifies a recorded decision in the [reconciliation
+log](../reconciliation/step-0-reconciliation-v4.md).
+
+## Cadence reassessment through PR #760 (2026-10-13)
+
+This dated checkpoint gives maintainers a source-cutoff reading of the selected
+and conditional backlog. It freezes repository evidence at the assessed cutoff
+**M3 = `ba522f133d05624c2130f15eb8ef3b6329b0f37a`**, the PR #760 integration
+(2026-10-13 12:39:16 Coordinated Universal Time, UTC), strictly after the prior
+cutoff **M2 = `7fbc2335ee4494ecb8ae6aaea0fe6ecdc297d9f2`**, the PR #740
+integration (2026-10-12 07:18:51 UTC). The linked [cadence measurement
+checkpoint](aegis-execution-metrics.md#cadence-measurement-checkpoint-through-pr-760-2026-10-13)
+carries the reproducible integration table, the window arithmetic and the timing
+limits behind this reading. It is a factual catch-up assessment, not a work
+grant, a selection, or a forecast of calendar delivery.
+
+**Cutoff pairing (why "through PR #760" is checkable).** `ba522f13` is the
+**#760** integration (`git log -1 --format='%s' ba522f13` → "Merge pull request
+#760 from ModernNomad-98/docs/ber-g3-fu-docs-20261013"). Its parents pair the
+cutoff with the pull request integrated through it: `8a97724c` is **#759**'s
+integration (2026-10-13 11:26:41 UTC) and `ed864367` is the branch commit the
+#760 integration carried. The highest-numbered pull request integrated by the
+cutoff is therefore **#760**.
+
+**Cadence position.** `git rev-list --count 7fbc2335..ba522f13` → **48**
+commits; `git log --merges --oneline 7fbc2335..ba522f13` → **18** merges, all
+of them first-parent pull-request integrations, **#742–#760**, so unlike the
+previous window no branch-sync merge sits in this range, and the 19 numbered
+pull requests of the range reduce to 18 integrations because **#744** has no
+integration merge commit of its own. The four residuals the #741 checkpoint
+carried (**#738**, **#739**, **#741**, **#740**) are carried, not reset, so the
+continuing series stands at **72 members = 14 complete five-integration windows
+plus 2 residuals** after M3. The boundaries that closed in this window, in
+first-parent order, are **#745** (the 11th), **#742** (the 12th), **#753** (the
+13th) and **#758** (the 14th) — four boundary closings with no checkpoint
+written, which is the cadence debt this reading pays. The two residuals at M3
+are **#759** and **#760**, so the next boundary needs **three further
+integrations after M3**, and the pull request carrying this reading participates
+normally in that count. The missed-boundary ledger stays in the [measurement
+rule](aegis-execution-metrics.md#start-here--current-measurements); this reading
+does not re-derive it.
+
+**What the 18 integrations did and did not change.** Every one of the 18 is a
+documentary, tool, configuration or continuous-integration (CI) addition.
+**None delivers, certifies or measures a selected outcome**, and no historical
+green-CI or host result is asserted here. The window records **four decisions,
+D102–D105** (PRs #745, #746, #747 and #748 — the [recorded
+decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions)):
+D102 the documentation-currency refresh that advanced the two live cutoffs to
+M2 and repaired the index routes; D103 the review-path decision adopting the
+lighter documented review path for pure-docs pull requests only; D104 the BER
+host ladder Stage C ceiling fix, Stage A disposition and Stage B stop; and D105
+the CP-1 grant record — AEGIS-APR-131's bounded read-only DynamoDB-first
+inspection grant, which the decision records as **NOT RUN** and not startable
+until the owner's credential and identifier selection is recorded. The other 14
+integrations are: two Dependabot action bumps (#742 `actions/setup-node`
+7.1.0 and #743 `actions/upload-artifact` 7.0.2, both to
+`.github/workflows/validate-skills.yml`); one host-bridge lockfile
+regeneration (#751) that also carried the content of **#744**, whose own
+single-parent commit `7583ec8b4c1f2aba2c735671e3895363d7c1f26f` has no main
+integration merge commit and must not be counted as a nineteenth integration;
+three tool increments (#750 `tools/aegis_delivery_control/ci_durations.py` and
+its test, #755 and #758 the readability-acceptance index and Stage 1 verdict
+JSON); and eight documentation integrations — the follow-up documentation sweep
+#749, the APR-132–135 Dependabot closeout record #752, four readability re-read
+records (#753, #754, #756, #757), the readability ledger re-read #759 and the
+BER-G3 follow-up documentation note #760, whose own added text states that it
+corrects citations and changes no status. Applied case-insensitively to the
+window's changed paths, the live `gate_pattern` in
+`.github/workflows/validate-skills.yml` L545 matches exactly **two** of the 18
+integrations (**#742** and **#743**, both on that workflow file) and zero times
+for the other sixteen, including #750's nested
+`tools/aegis_delivery_control/ci_durations.py`; the window is therefore **not**
+a docs-only window, even though the pull request recording it is a
+documentation-only change. The selected-outcome statuses this page carried at M2
+therefore stand unchanged — re-verified at M3, not assumed: measured WP-2B-3
+calibration remains unfinished, OD-1 remains open, WP-2B-4 remains blocked, and
+the issue #101 Stage 4B host proof remains NOT RUN.
+
+**Next trigger.** The next reassessment falls due when the boundary after M3
+closes — **three further integrations after M3** — and an earlier reassessment
+is owed on a material owner decision, under the retained five-merge rule in the
 [measurement rule](aegis-execution-metrics.md#start-here--current-measurements).
 Within this section a PR number identifies an integration and a `D` number
 identifies a recorded decision in the [reconciliation

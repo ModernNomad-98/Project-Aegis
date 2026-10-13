@@ -2,6 +2,19 @@
 
 ## Start here — current measurements
 
+> **Newest measurement — 2026-10-13, assessed through PR #760 (frozen cutoff M3).**
+> This is the current measurement reading; the **#741 banner below is the prior
+> frozen checkpoint**, retained as dated evidence. The assessed cutoff is
+> M3 = `ba522f133d05624c2130f15eb8ef3b6329b0f37a`, the PR #760 integration at
+> 2026-10-13 12:39:16 Coordinated Universal Time (UTC). Its parents pair the
+> cutoff with the pull request it integrates: `8a97724c` is PR #759's
+> integration (2026-10-13 11:26:41 UTC) and `ed864367` is the branch commit the
+> #760 integration carried, so the highest-numbered pull request integrated by
+> the cutoff is #760. Read the
+> [cadence measurement checkpoint through PR #760](#cadence-measurement-checkpoint-through-pr-760-2026-10-13)
+> for the 18-integration table, the window arithmetic and the timing limits; the
+> [forecast reassessment](aegis-backlog-forecast.md#cadence-reassessment-through-pr-760-2026-10-13)
+> interprets the same cutoff.
 > **Newest measurement — 2026-10-12, assessed through PR #741 (frozen cutoff M2).**
 > This is the current measurement reading; the **#688 banner below is the prior
 > frozen checkpoint**, retained as dated evidence. The assessed cutoff is
@@ -3493,3 +3506,108 @@ comparable active-work, review, CI or owner-wait split for this window is
 established: **those splits are unavailable, not zero.** This record makes no
 claim that historical exact-head checks were green, and no claim that any merged
 source change reached runtime.
+
+## Cadence measurement checkpoint through PR #760 (2026-10-13)
+
+This dated record continues the count rather than restarting it. It freezes
+repository integration history at the assessed cutoff **M3 =
+`ba522f133d05624c2130f15eb8ef3b6329b0f37a`**, the PR #760 integration
+(2026-10-13 12:39:16 Coordinated Universal Time, UTC), strictly after the prior
+cutoff **M2 = `7fbc2335ee4494ecb8ae6aaea0fe6ecdc297d9f2`**, the PR #740
+integration (2026-10-12 07:18:51 UTC). The [forecast
+reassessment](aegis-backlog-forecast.md#cadence-reassessment-through-pr-760-2026-10-13)
+interprets the same cutoff; this section records the count, order and timing
+method only. The earlier [cadence measurement checkpoint through PR
+#741](#cadence-measurement-checkpoint-through-pr-741-2026-10-12) and its
+52-member table are preserved unchanged.
+
+**Method.** `git rev-list --count 7fbc2335..ba522f13` → **48** commits;
+`git log --merges --oneline 7fbc2335..ba522f13` → **18** merges, of which
+`git rev-list --count --first-parent 7fbc2335..ba522f13` returns **18**
+pull-request integrations, **#742–#760**, with no branch-sync merge in the
+range. The order below is first-parent integration order, not PR-number order
+(the two differ, for example at #742/#743, which land sixth and seventh, and at
+#751/#750, where #751 lands first). Each row's full SHA is the integration
+commit, and each maps through the GitHub API to exactly one merged pull request
+whose `merge_commit_sha` matches, as the #688 checkpoint's own method
+requires.
+
+| Order after M2 | PR and recorded scope cue | Integration time (UTC, committer) | Full integration SHA |
+| ---: | --- | --- | --- |
+| 1 | [#745](https://github.com/ModernNomad-98/Project-Aegis/pull/745) D102 documentation-currency refresh | 2026-10-12T18:59:39Z | `9c4eb5951bf3b5cdcde54a398f12006ac339cd27` |
+| 2 | [#746](https://github.com/ModernNomad-98/Project-Aegis/pull/746) D103 review-path decision record | 2026-10-12T19:51:34Z | `d1c7544c074ad459b15adb1176d2bb6dce3d114a` |
+| 3 | [#747](https://github.com/ModernNomad-98/Project-Aegis/pull/747) D104 BER host ladder Stage C | 2026-10-12T20:46:43Z | `9ed5a66ff66c044b515739e4cf0bb36545d184c9` |
+| 4 | [#748](https://github.com/ModernNomad-98/Project-Aegis/pull/748) D105 CP-1 grant record (AEGIS-APR-131) | 2026-10-12T21:29:39Z | `ad1e40fc257c3f7cc04be0067d6a63008d1eacb1` |
+| 5 | [#749](https://github.com/ModernNomad-98/Project-Aegis/pull/749) follow-up documentation sweep | 2026-10-12T23:10:44Z | `625b3b9613b841bb78ea9dd2e03ac5a2a717520c` |
+| 6 | [#742](https://github.com/ModernNomad-98/Project-Aegis/pull/742) Dependabot: actions/setup-node 7.1.0 (workflow) | 2026-10-12T23:23:09Z | `ce865c9122d991bbf0ee9cbc47b692a885d4ccf9` |
+| 7 | [#743](https://github.com/ModernNomad-98/Project-Aegis/pull/743) Dependabot: actions/upload-artifact 7.0.2 (workflow) | 2026-10-12T23:23:19Z | `81081ca4f7745de8bb6275e890f09e9b4a109325` |
+| 8 | [#751](https://github.com/ModernNomad-98/Project-Aegis/pull/751) host-bridge lockfile regeneration (carried #744) | 2026-10-12T23:48:49Z | `1c7563791909e29af163d722fe46ee0cccc647d9` |
+| 9 | [#750](https://github.com/ModernNomad-98/Project-Aegis/pull/750) ci-durations tool follow-ups and test | 2026-10-12T23:56:49Z | `10dd9c8000dead02cb5db75a49b774f394b144c9` |
+| 10 | [#752](https://github.com/ModernNomad-98/Project-Aegis/pull/752) APR-132–135 Dependabot closeout record | 2026-10-13T00:29:01Z | `f5ac84445c78cc7b5fb87e39757a43dc22ad75d7` |
+| 11 | [#753](https://github.com/ModernNomad-98/Project-Aegis/pull/753) readability re-read batches record | 2026-10-13T02:08:00Z | `79c5c5901cd69101a58a696e0f03f1f7dd2264db` |
+| 12 | [#754](https://github.com/ModernNomad-98/Project-Aegis/pull/754) readability closeout follow-up record | 2026-10-13T04:23:52Z | `75d185e65c0c0ebb303e37e9b39c7f3c635cc664` |
+| 13 | [#755](https://github.com/ModernNomad-98/Project-Aegis/pull/755) readability-acceptance index and verdicts | 2026-10-13T05:24:22Z | `0237f611f718ed833935e72a0d98dd42362388a0` |
+| 14 | [#756](https://github.com/ModernNomad-98/Project-Aegis/pull/756) readability F1–F5 re-read record | 2026-10-13T08:19:37Z | `c80c8d2d553671579e878584914eae695028eab4` |
+| 15 | [#757](https://github.com/ModernNomad-98/Project-Aegis/pull/757) readability final-3 re-read record | 2026-10-13T09:39:47Z | `f9cc456016dfbda089687a27b415d33c2b9433b2` |
+| 16 | [#758](https://github.com/ModernNomad-98/Project-Aegis/pull/758) readability-acceptance index rebuild | 2026-10-13T10:30:27Z | `878b7d460d8cce5efb1cb8ecb3197e93e6cbf609` |
+| 17 | [#759](https://github.com/ModernNomad-98/Project-Aegis/pull/759) readability ledger re-read record | 2026-10-13T11:26:41Z | `8a97724c9ad30596cd3475c3a54175e37779f26b` |
+| 18 | [#760](https://github.com/ModernNomad-98/Project-Aegis/pull/760) BER-G3 follow-up documentation note | 2026-10-13T12:39:16Z | `ba522f133d05624c2130f15eb8ef3b6329b0f37a` |
+
+**The PR #744 special case.** The range holds **19 numbered pull requests**
+(#742–#760) but only **18 integrations**, because PR #744 — the host-bridge
+Dependabot group — has a merge SHA and no main integration merge commit: its
+API record is `state` closed, `merged` true, `merge_commit_sha`
+`7583ec8b4c1f2aba2c735671e3895363d7c1f26f`, and that commit is a
+**single-parent** commit whose parent is M2, an ancestor of M3 but not in M3's
+first-parent chain; it is the parent of `f6b87c97`, the branch commit the #751
+integration carried, so #744's content reached main **inside #751**. It is
+therefore not a nineteenth integration, and it is not dropped from the census
+either. Its reported API `merged_at` (2026-10-12 23:48:52 UTC) is later than
+its merge SHA's committer timestamp (2026-10-12 17:02:08 UTC) because GitHub's
+`merge_commit_sha` there is the pull request's own single-parent commit rather
+than a commit created at merge time.
+
+**Path classes and the protected-path count.** Measured per integration with
+`git diff --name-only <merge>^1 <merge>` over the 55 changed paths the window
+carries: **12** integrations touch Markdown documentation only (#745, #746,
+#747, #748, #749, #752, #753, #754, #756, #757, #759, #760) and **6** touch a
+non-documentation path (#742, #743, #751, #750, #755, #758). The window is
+therefore **not** a docs-only window, even though the pull request recording it
+is a documentation-only change. Applied case-insensitively to those 55 paths,
+the live `gate_pattern` extracted from
+`.github/workflows/validate-skills.yml` L545 (with `shopt -s nocasematch`
+at L546) matches exactly **two** integrations — **#742** and **#743**, each
+once, both on `.github/workflows/validate-skills.yml` — and zero times for
+the other sixteen, including **#750**'s
+`tools/aegis_delivery_control/ci_durations.py`: the extension alternative is
+start-anchored with no `(.*/)?` prefix, so `[^/]` cannot cross a slash and
+it protects repository-root files only. The two paths this checkpoint adds are
+also matched zero times by that expression.
+
+**Window arithmetic.** The four residuals of the preceding checkpoint
+(**#738**, **#739**, **#741** and **#740**) are carried, not reset: with these
+18 integrations the continuing series has **72 members = 14 complete
+five-integration windows plus 2 residuals**. Under the carried rule the four
+boundary-closing members in this window are **#745**, **#742**, **#753** and
+**#758** — the 11th, 12th, 13th and 14th boundaries — so the two residuals at M3
+are **#759** and **#760**, and the next boundary needs **three further
+integrations after M3**. Nothing resets at M3, and every later integration
+counts, including the pull request that carries this checkpoint. The
+missed-boundary ledger recorded through #684 is not re-derived here.
+
+**Timing provenance and limits.** The times above are the integration commits'
+committer timestamps in UTC; GitHub merge events can differ from them by a
+second — measured on this window, 10 of the 18 API `merged_at` values are one
+second later than the corresponding committer timestamp (#743, #745, #748,
+#751, #753, #755, #756, #757, #759, #760), the other 8 are exactly equal
+(#742, #746, #747, #749, #750, #752, #754, #758) — and for the two
+cutoffs the API merge events are 2026-10-12 07:18:51 UTC (M2, equal to its
+committer timestamp) and 2026-10-13 12:39:17 UTC (M3, one second after its
+committer timestamp). The M2-to-M3 endpoint span measured on the committer
+timestamps is **29 hours 20 minutes 25 seconds of wall time** and includes
+concurrent authoring, review, continuous integration (CI), owner decisions and
+idle intervals. Integration spacing is not active labor, coding throughput or
+runtime proof, and no comparable active-work, review, CI or owner-wait split for
+this window is established: **those splits are unavailable, not zero.** This
+record makes no claim that historical exact-head checks were green, and no claim
+that any merged source change reached runtime.
