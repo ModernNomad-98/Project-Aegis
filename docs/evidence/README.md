@@ -10,8 +10,14 @@ instruction to repeat an old run. For current authority and status, read the
 [setup routing plan](../roadmaps/aegis-setup-routing-plan.md).
 The current-reading boundaries below were checked on 2026-09-23 against the
 source-library tree at `e2145b1`; recheck the owning registers after later work.
-Rows added after that sweep state their own date and base revision in the row
-itself, because the 2026-09-23 sweep does not reach them.
+This index was created that day and fifteen of its seventeen rows date from that
+sweep. **Exactly two rows post-date it and are therefore not covered by it:** the SCIF
+close-out corrections row, added 2026-10-11 by commit `503c3b30`, whose provenance is
+that commit's record; and the FU-3 record publication row, added 2026-10-13 by the
+workspace-citation-durability change against base `dbe2ee28`, which states its own date
+and base revision in the row itself. Neither row can name the commit that contains it -
+a page cannot cite its own commit, the convention
+`docs/roadmaps/aegis-ci-baseline-2026-10-11.md` L51-L52 states for itself.
 
 **Reading key:** Behavioral Eval Runner (BER) is the skill evaluation tool;
 control plane (CP) is the delivery state and recovery component. A work package
@@ -45,7 +51,7 @@ to the dated record that reports them.
 | What issue #101 package 2 delivered | [Package 2 review](setup/issue-101-package-2-review.md) | Windows-tested Aegis-only saved choice shipped; no helper or provider connection. |
 | What issue #101 package 3 delivered | [Package 3 review](setup/issue-101-package-3-review.md) | Offline advisory contract shipped; a host hook and actual fallback remain future work. |
 | What the #723/#729 close-out record got wrong, corrected forward | [SCIF close-out corrections](scif/scif-closeout-corrections-2026-10-11.md) | Dated corrections only; the approval register is untouched and no authority is created. |
-| Where the evidence cited by the O-F1 publication note now lives, and the rule that keeps citations retrievable | [FU-3 record publication](fu3-record-publication-2026-10-13/README.md) | Published copies with per-file sha256 digests; the superseded citations were accurate but not retrievable from a fresh checkout. **Added 2026-10-13 by the workspace-citation-durability change, against base `dbe2ee28` - not part of the 2026-09-23 sweep at `e2145b1`. This row names its date and base revision rather than its own commit, because a page cannot cite the commit that contains it (the same convention `docs/roadmaps/aegis-ci-baseline-2026-10-11.md` L51-L52 states for itself).** |
+| Where the evidence cited by the O-F1 publication note now lives, and the rule that keeps citations retrievable | [FU-3 record publication](fu3-record-publication-2026-10-13/README.md) | Published copies with per-file sha256 digests; the superseded citations were accurate but not retrievable from a fresh checkout. **Added 2026-10-13 by the workspace-citation-durability change, against base `dbe2ee28` - not part of the 2026-09-23 sweep at `e2145b1`.** |
 
 Other dated records are reachable from the owning backlogs and the
 [documentation index](../README.md). Do not infer that an unlisted evidence
