@@ -610,6 +610,158 @@
       "reviewer": "\u2014",
       "evidence_source": "D73 row 5 named lost commit",
       "date": "2026-10-10"
+    },
+    {
+      "path": "docs/roadmaps/aegis-backlog-forecast.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/roadmaps/behavioral-eval-runner-backlog.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/reconciliation/step-0-reconciliation-v4.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "tools/readability_acceptance/README.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/delivery-workflow.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/approvals/APPROVAL_REGISTER.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "tools/aegis_delivery_control/README.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": ".claude/skills/iso-27001-isms-architect/SKILL.md",
+      "event_kind": "targeted-review",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": ".claude/skills/local-ci-mirror-preflight/SKILL.md",
+      "event_kind": "targeted-review",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": ".claude/skills/merge-is-deploy-governance/SKILL.md",
+      "event_kind": "targeted-review",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/evidence/route002-triage-2026-10-09/README.md",
+      "event_kind": "targeted-review",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/evidence/session-continuation-2026-09-30-evening.md",
+      "event_kind": "targeted-review",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/roadmaps/aegis-coordinator-figures.md",
+      "event_kind": "targeted-review",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/roadmaps/resumable-control-plane-backlog.md",
+      "event_kind": "targeted-review",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/roadmaps/skill-eval-harness-authorization-request.md",
+      "event_kind": "targeted-review",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/skill-eval-behavioral-test-procedure.md",
+      "event_kind": "targeted-review",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/skills-catalog.md",
+      "event_kind": "targeted-review",
+      "revision": "f5ac84445c78cc7b5fb87e39757a43dc22ad75d7",
+      "reviewer": "readability-batches-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-reread-batches-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/roadmaps/behavioral-eval-runner-backlog.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "79c5c5901cd69101a58a696e0f03f1f7dd2264db",
+      "reviewer": "readability-closeout-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-closeout-reread-2026-10-12.md",
+      "date": "2026-10-12"
+    },
+    {
+      "path": "docs/delivery-workflow.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "79c5c5901cd69101a58a696e0f03f1f7dd2264db",
+      "reviewer": "readability-closeout-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-closeout-reread-2026-10-12.md",
+      "date": "2026-10-12"
     }
   ]
 }
