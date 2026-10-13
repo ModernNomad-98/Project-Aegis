@@ -4823,6 +4823,76 @@ provider, private-input, real-host or deployment authority (L3018-3020).
 returns to **pending** and owes a subsequent independent full-page re-read at the merged head — the same
 self-cost every prior update states, and the reason F5 remains owed.
 
+
+## Ledger-keeper recording + batch update — readability F1-F5 re-read, 2026-10-12
+
+**Under AEGIS-APR-101 (recording only).** This note records the F1-F5 whole-page re-read lane's Stage C
+work. It is additions only: it rewrites no dated text, edits no existing keeper row, and **confers
+nothing**. Its tracked evidence source is
+[the batch record](../evidence/documentation/readability-f1f5-reread-2026-10-12.md), which names the
+row's full 40-character acceptance revision verbatim.
+
+**The reader is a different agent, and that is the whole point of this lane.**
+`readability-f1f5-implementer-c` wrote this note and read the page; it is a **different agent** from
+`readability-batches-implementer-c` (the writer of the ledger section that changed this page, and the
+reader of all four #753 passes), from `readability-closeout-implementer-c` and from
+`readability-closeout-repairer-c2`. PR #754's coordinator decision made exactly that staffing the
+remedy for the withheld item-2 row, and it is satisfied.
+
+**What was read, and where the exclusions stand.** This page was read **whole, line by line, as prose**,
+at the declared revision `0237f611f718ed833935e72a0d98dd42362388a0` — **L1-4941, every line of this ledger**, in seven overlapping
+contiguous slices, with the three tool-output elisions those slices produced re-read inside the next
+slice, so no line is unread. The excluded already-read set is the recorded-acceptance drift
+`2c6b6fc634d1..0237f611f718` = **512 / 0**, split as `2c6b6fc634d1..f5ac8444` 355 / 0,
+`f5ac8444..79c5c590` 78 / 0 (#753's own appended rows and keeper note) and
+`79c5c590..0237f611f718` 79 / 0 (the close-out lane's keeper section and rows K-074/K-075);
+512 = 355 + 78 + 79. **Those lines were read again in this session rather than skipped**, so no part
+of this acceptance rests on an earlier read.
+
+**Accepted: this page, at a pre-existing main-contained revision.** The row is **K-076**, bound to
+`0237f611f718ed833935e72a0d98dd42362388a0` (`origin/main`, the PR #755 merge) with `Blob ID` `1e0190ee3faea7dbde5b01384fa2cbc56c9783d7` =
+`git rev-parse 0237f611f718ed833935e72a0d98dd42362388a0:<this page>`. That is the resolver PR #754's repair note recorded — a
+post-change row bound to a main-contained revision **whose ledger blob equals the blob at the merged
+tip** — and **never** `e6b99cee35a5de99a31deda38308deb244083516`, the pre-#754 base blob this lane's
+own writes had already moved. The row is **carried** by this commit and **binds** `0237f611f718ed833935e72a0d98dd42362388a0`; it never
+names this commit's own SHA.
+
+**Item 2 (F5) and item 3's P4 (F3) are both discharged by that one read.** The page's bytes at the
+bound revision are the bytes read whole, so the item-2 owed row and the P4 remnant whole-page read are
+the same act, recorded once, with one row — one per accepted page.
+
+**F1, F2 and F4 stay open, honestly.** P1 `aegis-backlog-forecast.md` (5,118 lines, drift 118 / 0),
+P3 `step-0-reconciliation-v4.md` (4,879 lines, drift 624 / 0) and P7 `APPROVAL_REGISTER.md` (5,939
+lines, drift 611 / 5 = 616) were **not** read whole this session and get **no row** — the plan allows
+N = 0-6. Each must be bound by a **different agent** from this session's reader. One carried defect is
+restated as still open rather than silently repaired: the D98 follow-up 3 stale evidence-source anchors
+at keeper rows L-001 to L-006, whose recorded citation lines hold other text at this revision.
+
+**Count honesty (no count of this lane's own).** This ledger publishes no count of its own and cites
+the index (D84). The instrument classifies the page tree at `--ref` and reads the recorded acceptances
+from the committed `acceptance-index.json`, so **this appended row changes nothing until a further
+rebuild**, and a rebuild can only run after the commit that carries the row because the builder stamps
+its own `built_at_ref`; the two resolvers this ledger already names (L4671-4673) apply. At the declared
+revision the instrument reads `table_rows 95, events 95, full_page_acceptances 75, lost_commit_events
+10, reader_pages_with_rows 68` and `644 / 60 / 1 / 577 / 0 / 0 / 6 / 584`; **the figures at this
+commit's head are published in the Stage C record and the pull request body, not inside the commit that
+produces them**, and **no post-commit bucket figure is predicted.**
+
+**Two declared deviations.** (1) The single reader also writes this keeper section and the batch record,
+so the plan section 5 clause that the reader differ from this lane's keeper-section writer is **not
+satisfied**; the clause the row turns on — a reader different from `readability-batches-implementer-c` —
+**is** satisfied. (2) Three of the four F1-F4 pages are not discharged by this session and keep named
+follow-ups.
+
+**Self-cost.** This section changes this ledger by more than 10 lines and adds a section, so this page
+returns to **pending** at the new head and owes a subsequent independent full-page re-read by a reader
+who did not write it — the self-cost every prior update states.
+
+**What this note does not do.** It rewrites no dated snapshot, reorders or deletes no existing row,
+binds no row to this commit's own SHA, edits none of the four named pages, rebuilds no `tools/`
+artifact, touches no `.github/workflows/` path, and confers no authority. The batching procedure does
+not grant provider, private-input, real-host or deployment authority (L3018-3020).
+
 <!-- acceptance-index-schema: 1 -->
 
 ## Consolidated keeper table — index schema v1 (D84, 2026-10-10)
@@ -4939,3 +5009,4 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | T-010 | docs/skills-catalog.md | targeted-review | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | f4b5e11dd762fbe17ab8e35a8287e8e048f91130 | W10 targeted review covers every changed line: docs/skills-catalog.md at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
 | K-074 | docs/roadmaps/behavioral-eval-runner-backlog.md | full-page-acceptance | 79c5c5901cd69101a58a696e0f03f1f7dd2264db | dbdb3c5143f9ed2f1aeeddcae58a542accf4f052 | P2 accepted: docs/roadmaps/behavioral-eval-runner-backlog.md read whole at 79c5c5901cd69101a58a696e0f03f1f7dd2264db | readability-closeout-implementer-c | docs/evidence/documentation/readability-closeout-reread-2026-10-12.md | 2026-10-12 |
 | K-075 | docs/delivery-workflow.md | full-page-acceptance | 79c5c5901cd69101a58a696e0f03f1f7dd2264db | bff407a65ade2fc7f07871e9d57bf0dc20a55516 | P6 accepted: docs/delivery-workflow.md read whole at 79c5c5901cd69101a58a696e0f03f1f7dd2264db | readability-closeout-implementer-c | docs/evidence/documentation/readability-closeout-reread-2026-10-12.md | 2026-10-12 |
+| K-076 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | 0237f611f718ed833935e72a0d98dd42362388a0 | 1e0190ee3faea7dbde5b01384fa2cbc56c9783d7 | K-076 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at 0237f611f718ed833935e72a0d98dd42362388a0 | readability-f1f5-implementer-c | docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md | 2026-10-12 |
