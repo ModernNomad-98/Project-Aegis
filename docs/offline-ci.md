@@ -204,8 +204,8 @@ Each verification job uploads its logs and records on success or failure, with a
 unique operating-system (OS)/run/attempt artifact name and **14-day retention**.
 Setup failures before
 the recorder runs remain visible in native Actions logs. The upload action is
-pinned to the verified `actions/upload-artifact` v7.0.1 commit
-`043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`; checkout and setup-python retain their
+pinned to the verified `actions/upload-artifact` v7.0.2 commit
+`cf430e030ddbb5b0abf93d22962f4752f3646cd9`; checkout and setup-python retain their
 existing reviewed pins. See the action's
 [retention documentation](https://github.com/actions/upload-artifact#retention-period).
 
