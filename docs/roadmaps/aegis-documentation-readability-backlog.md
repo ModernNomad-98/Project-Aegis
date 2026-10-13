@@ -4685,6 +4685,67 @@ lane's measurement of readability.
 ledger stays **pending** and owes its own independent full-page re-read by a
 reader who did not write this section — the self-cost every prior update states.
 
+## Ledger-keeper recording + batch update — readability remaining-page re-read batches, 2026-10-12
+
+**Under AEGIS-APR-101 (recording only).** This note records the remaining-page re-read batch the
+owner resumed on 2026-10-12. It is additions only: it rewrites no dated text, edits no existing
+keeper row, and **confers nothing**. Its tracked evidence source is
+[the batch record](../evidence/documentation/readability-reread-batches-2026-10-12.md), which names
+every row's full 40-character acceptance revision verbatim.
+
+**What was read.** Eighteen pages in four disjoint sets, at the base
+`f5ac84445c78cc7b5fb87e39757a43dc22ad75d7`: **B1** the docs-currency lane's OWED trio
+(`aegis-backlog-forecast.md`, `behavioral-eval-runner-backlog.md`,
+`step-0-reconciliation-v4.md`) — full-page re-reads; **B2** this program's own pages (this ledger,
+`tools/readability_acceptance/README.md`, `docs/delivery-workflow.md`) — full-page re-reads, with
+**this ledger read at the lane's head**; **B3** the two long governance records
+(`docs/approvals/APPROVAL_REGISTER.md`, `tools/aegis_delivery_control/README.md`) — full-page
+re-reads, **read only and never edited**; **B4** the ten within-10 pages of bucket W — targeted
+reviews. Per-page dispositions, the drift re-measured for each page, the six acceptance bullets and
+the offline re-verification of every link, SHA, blob ID and coded identifier are in the batch record.
+
+**The OWED carry list, resolved as far as this lane can resolve it.** The docs-currency lane's four
+full-page re-reads are discharged by this batch for three of the four pages (forecast, BER backlog,
+step-0) and for the fourth by B2 (`docs/delivery-workflow.md`). The four <=10 **reviewer checks**
+were already done by the follow-ups docs lane; what remained owed was their **machine-readable
+record**, which this batch's ten `targeted-review` rows supply — the first such rows this
+repository has ever carried.
+
+**The at-most-10 claims are conditional in their own words.** Of the ten B4 pages: **for each page,
+its recorded drift at the base is 1-9 added-plus-deleted lines, it gains no new section heading, and
+the independent reviewer named in the batch record read every changed line**; the page therefore
+remains inside the targeted-review class and **no page is asserted to be accepted by this note** —
+the rows are records of a review, and the instrument's buckets move only at the rebuild.
+
+**This ledger's own outcome, stated once.** B2 read this page whole at the lane's head `H`. Under
+this ledger's own self-cost rule (D98 follow-up 4, restated at L4684-4686) this lane's section
+changes the ledger by more than 10 lines and adds a section, so **this page returns to pending** and
+needs a subsequent full-page re-read at the merged head. The reader's whole-page disposition is
+recorded in the batch record; **its acceptance row is WITHHELD and recorded as owed (1)**, because
+`H` is a descendant of `refs/remotes/origin/main` and not an ancestor of it, so the tool's
+main-containment rule refuses any row bound to it — the same disposition this table already records
+at L4700-4705 for two earlier acceptances. **The appended count is therefore 7 full-page-acceptance
+rows + 10 targeted-review rows = 17, with this page's own row owed: 7 + 1 owed.**
+
+**Count honesty (unchanged; no count of this lane's own).** This ledger publishes no count of its
+own and cites the index (D84). The instrument classifies the page tree at `--ref` and reads the
+recorded acceptances from the committed `acceptance-index.json`, so **the seventeen rows above
+change nothing until a rebuild**, and the builder can only be rebuilt after the commit that carries
+the rows because it stamps its own `built_at_ref`. The two resolvers this ledger already names
+(L4671-4673) apply: a two-commit follow-up, or a merger-side rebuild at the merged tip (D73 row 8).
+**The only movement at this lane's head is this lane's own new reader page**, which enters the
+no-recorded-acceptance bucket: the published head expectation is **643 / 43 / 8 / 576 / 10 / 10 / 6 /
+600** — the base's 642 / 43 / 8 / 575 / 10 / 10 / 6 / 599 with +1 reader page, +1
+no_recorded_acceptance and +1 official pending count, all three attributed to
+`docs/evidence/documentation/readability-reread-batches-2026-10-12.md`. **No post-rebuild count is
+predicted.**
+
+**What this note does not do.** It rewrites no dated snapshot, reorders or deletes no existing row,
+binds no row to this lane's unmerged head, edits none of the eighteen read pages (the register and
+the delivery-control README among them are **read only**), rebuilds no `tools/` artifact, and
+confers no authority. The batching procedure "does not grant provider, private-input, real-host or
+deployment authority" (L3018-3020).
+
 <!-- acceptance-index-schema: 1 -->
 
 ## Consolidated keeper table — index schema v1 (D84, 2026-10-10)
@@ -4782,3 +4843,20 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | L-008 | (historical — no surviving frozen-index row) | lost-commit | e9cce7d | — | lost-commit:e9cce7d | — | D73 row 5 named lost commit | 2026-10-10 |
 | L-009 | (historical — no surviving frozen-index row) | lost-commit | 288d993 | — | lost-commit:288d993 | — | D73 row 5 named lost commit | 2026-10-10 |
 | L-010 | (historical — no surviving frozen-index row) | lost-commit | 7f98950 | — | lost-commit:7f98950 | — | D73 row 5 named lost commit | 2026-10-10 |
+| K-067 | docs/roadmaps/aegis-backlog-forecast.md | full-page-acceptance | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | d3f2c4b1c21709e34fecb695713b22f31cfdb552 | P1 accepted: docs/roadmaps/aegis-backlog-forecast.md read whole at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| K-068 | docs/roadmaps/behavioral-eval-runner-backlog.md | full-page-acceptance | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | dbdb3c5143f9ed2f1aeeddcae58a542accf4f052 | P2 accepted: docs/roadmaps/behavioral-eval-runner-backlog.md read whole at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| K-069 | docs/reconciliation/step-0-reconciliation-v4.md | full-page-acceptance | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | e89e5f75b7fd49d97c6f5b3bf4ab1cf435b0909b | P3 accepted: docs/reconciliation/step-0-reconciliation-v4.md read whole at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| K-070 | tools/readability_acceptance/README.md | full-page-acceptance | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | 4b18b24e618a736b4b608d84d2202d0dd393518d | P5 accepted: tools/readability_acceptance/README.md read whole at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| K-071 | docs/delivery-workflow.md | full-page-acceptance | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | bff407a65ade2fc7f07871e9d57bf0dc20a55516 | P6 accepted: docs/delivery-workflow.md read whole at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| K-072 | docs/approvals/APPROVAL_REGISTER.md | full-page-acceptance | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | 548e80efdc630eb04a9b41839c608b4928b4bc2a | P7 accepted: docs/approvals/APPROVAL_REGISTER.md read whole at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| K-073 | tools/aegis_delivery_control/README.md | full-page-acceptance | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | 7aff1ea3a45d2ae68d351c1b330c40dbe83802fa | P8 accepted: tools/aegis_delivery_control/README.md read whole at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| T-001 | .claude/skills/iso-27001-isms-architect/SKILL.md | targeted-review | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | a2aafadc510dcdebb1b1524eb3f1359afc992312 | W1 targeted review covers every changed line: .claude/skills/iso-27001-isms-architect/SKILL.md at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| T-002 | .claude/skills/local-ci-mirror-preflight/SKILL.md | targeted-review | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | 5103597f761ad1fed112126be521ca0e4c8a0ba9 | W2 targeted review covers every changed line: .claude/skills/local-ci-mirror-preflight/SKILL.md at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| T-003 | .claude/skills/merge-is-deploy-governance/SKILL.md | targeted-review | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | 219d2e791c6674faac24bf9c9035ec6a0dbb69cc | W3 targeted review covers every changed line: .claude/skills/merge-is-deploy-governance/SKILL.md at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| T-004 | docs/evidence/route002-triage-2026-10-09/README.md | targeted-review | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | ddc43d9af786cccddfcea26649acbffd17babba6 | W4 targeted review covers every changed line: docs/evidence/route002-triage-2026-10-09/README.md at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| T-005 | docs/evidence/session-continuation-2026-09-30-evening.md | targeted-review | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | 736bd869ab5093365e978c99eaf1fa196b3caaf1 | W5 targeted review covers every changed line: docs/evidence/session-continuation-2026-09-30-evening.md at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| T-006 | docs/roadmaps/aegis-coordinator-figures.md | targeted-review | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | 38c960d131ac3dfcfd0ef1569a8e580a3d33ad34 | W6 targeted review covers every changed line: docs/roadmaps/aegis-coordinator-figures.md at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| T-007 | docs/roadmaps/resumable-control-plane-backlog.md | targeted-review | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | 86c6529952f6abe75a7417a2e66909e019c39f11 | W7 targeted review covers every changed line: docs/roadmaps/resumable-control-plane-backlog.md at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| T-008 | docs/roadmaps/skill-eval-harness-authorization-request.md | targeted-review | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | 22e19a7cef3c39d696b08e689f4019916b99e3a5 | W8 targeted review covers every changed line: docs/roadmaps/skill-eval-harness-authorization-request.md at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| T-009 | docs/skill-eval-behavioral-test-procedure.md | targeted-review | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | 679024726818810736687a61d9f6e92d4e360398 | W9 targeted review covers every changed line: docs/skill-eval-behavioral-test-procedure.md at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
+| T-010 | docs/skills-catalog.md | targeted-review | f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | f4b5e11dd762fbe17ab8e35a8287e8e048f91130 | W10 targeted review covers every changed line: docs/skills-catalog.md at f5ac84445c78cc7b5fb87e39757a43dc22ad75d7 | readability-batches-implementer-c | docs/evidence/documentation/readability-reread-batches-2026-10-12.md | 2026-10-12 |
