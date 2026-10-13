@@ -4338,6 +4338,31 @@ itself is a separate, later host phase that runs only under the merged grant.
   reported both ways**, because a metric that reads clean over work that is not clean is the defect this lane keeps
   removing.
 
+### 2026-10-13 - three in-place edits of this log are recorded together, and the rule against them stands
+
+- **Supersedes:** the entry appended at `9872c642` and headed *"the bare finding identifier in the third correction entry above is
+  repaired HERE, not in place"* (that revision's L4317-L4338), which this entry's own commit replaced rather than
+  superseded. **It also records, in one place, the two earlier edits, so a reader gets the sequence once.**
+- **The three edits, in order, with the commit that made each:**
+  1. `c46d9057` edited the **Correction 2** line at L4267 (the inventory count), recorded by the entry at L4280.
+  2. `9872c642` edited the **Scope** bullet at L4225 (a bare pull-request comment identifier), recorded by the entry
+     appended in that same commit.
+  3. `8e40488e` **replaced that second entry's text rather than appending to it** - `23 added / 21 deleted` against
+     `9872c642` - which is the edit this entry records.
+- **Root cause, recorded because it is structural rather than careless: each repair of an in-place edit was itself an
+  in-place edit.** The disclosure entry and the commit that orders the repair are the same commit, so writing *"this
+  edit is recorded"* while the repair is still being shaped means the record is edited again to say so. **That is a
+  trap in the ordering, not three lapses of attention.**
+- **The rule stands as written and is not amended for unmerged content.** The argument that pre-merge entries are
+  editable was considered and refused: **a reader sees the merged state, so that is the state the rule protects** - if
+  entries appended by an unmerged pull request can be rewritten until merge, the log's history is unrecoverable at
+  exactly the moment it becomes history. **This entry is appended, not edited into anything.**
+- **And the metric that concealed the third edit, which is the generalisable part.** The change reported the log's state
+  as a **range** from a head that predates the intermediate commit, where a replacement **nets out**: `277a0f4d..8e40488e` reads
+  **28 / 1** and versus base reads **149 / 0**. The figures that reveal it are **per-commit** - `9872c642` is 26 / 1 and
+  `8e40488e` is 23 / 21. **A range is clean about a replacement for the same reason a base-relative number is clean about an
+  in-range edit: the scope is wider than the work.** Report per-commit, or from the immediately preceding head.
+
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008
