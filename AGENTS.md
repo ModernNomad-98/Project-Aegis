@@ -147,6 +147,25 @@ or actual duration; mark unavailable measurements explicitly. Keep the
 existing work-package measurement log and five-merge re-estimation rule in
 [the execution measurements](docs/roadmaps/aegis-execution-metrics.md).
 
+**Source-library owner preference: never report a bare label to the owner.** In
+Role A, every internal label that appears in anything the owner reads as a
+report — a final report, a status line, a to-do or progress panel entry, or a
+summary inside a pull request (PR) body — carries a one-line plain-English
+description beside it, in the same item: what the thing is, in words a reader
+who does not already know the label can act on. A gate ID, lane ID, follow-up
+ID, decision ID or record ID is never shown alone. The owner made this a
+permanent rule for all agents on 2026-10-13, in these words: *"this should be a
+permantent rule for all agents working on this repo: instead of reporting like
+BER-G1 or FU3 - I need you to add a on line description next to it so I know
+what it is."* (The owner's spelling is preserved.) As relayed and accepted,
+that means: every internal label — gate ID, lane ID, follow-up ID, decision ID
+or record ID — reported to the owner carries a one-line plain-English
+description beside it in the same item, never bare, in every final report,
+status line, to-do panel entry and pull-request body summary the owner may
+read. This is a reporting-style rule: it changes no stage, gate, check,
+receipt or bound field, and it grants no new execution, write, publication or
+merge authority.
+
 **Source-library owner approvals.** For work on `ModernNomad-98/Project-Aegis` in
 Role A, read [the owner approval register](docs/approvals/APPROVAL_REGISTER.md)
 before asking for an approval already granted. Apply the recorded human scope and
