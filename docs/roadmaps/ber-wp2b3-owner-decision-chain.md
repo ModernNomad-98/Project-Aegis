@@ -672,3 +672,147 @@ not this page's. This note grants nothing and decides nothing; the decision it
 reports is the owner's, taken elsewhere and recorded in the entries above.
 Recorded here at Codex's finding `4251900237` (review `5495472980`, PR #747),
 which named exactly this hazard.
+
+## 11. Citation correction — the G3 allowance row (2026-10-13)
+
+**Appended 2026-10-13 against `main` `878b7d460d8cce5efb1cb8ecb3197e93e6cbf609`**, the
+recorded bound revision — `origin/main` at implementation, which had not moved from the plan
+base. **This note edits nothing.** L57, L189 and L530 stay byte-identical per §7's recording
+note (L579–L590); the stale text is corrected by record here, not rewritten.
+
+**The three sites.** Three lines carry the same shorthand, stale in the same
+way: **L57** (the G3 row of §1's gate table), **L189** (§3's reading of the G3
+options), and **L530** (§3's recorded operational posture).
+
+**Where the posture text actually is.** The zero-allowance posture sentence sits in
+[the open decisions register](aegis-open-decisions-2026-09-23.md) at **L360** at the recorded
+bound revision above (file total **401 lines**), and it sat at **L349** at the citation's own
+base **`7fbc2335`** (file total **388 lines**). The citation was correct **at its own base**
+and is stale at the tip. The **+11**-line shift came from commit **`49c98ac8`** ("docs: record
+the 2026-10-12 review-path decision (D103 / AEGIS-APR-129)", PR **#746**); `9bff63a5`
+(PR #745) did not move it. The `L349`/`7fbc2335` half is anchored at `7fbc2335` itself and
+never moves.
+
+**The fault is the line drift, not the shorthand.** This page's own citation
+convention — **L15–L21** — makes `register` [the open decisions
+register](aegis-open-decisions-2026-09-23.md) (L16) and `APR register` [the
+approval register](../approvals/APPROVAL_REGISTER.md) (L20), so the three
+sites' bare `register L…` shorthand resolves to lines of the open-decisions
+file: 25 lines of this page carry the string `register L…`, and every
+bare-form reference sits at or below L350, well inside that file's 401 lines.
+The citation moved rather than changed its target: the prefix was correct and only the line number is stale
+— `L349` → `L360`, **+11**, `49c98ac8` / PR **#746** (item 4 above).
+**The ambiguity note.** A bare shorthand can still mislead a reader who takes
+`register` to mean the approval register, and that reading is resolved here:
+at **both** `878b7d46` and `7fbc2335` the approval register's L349 reads
+`  and 1,200 added lines`, the continuation of an unrelated setup-package
+scope line, so that file never carried the posture text and the correction
+must not be looked for there. The stale four-token shorthand, quoted here
+because it is what a reader will search for, is `register L349`.
+
+**The measurement.** The re-anchored pair is measured in the accounting record
+`BER-G3-RECONCILIATION-ACCOUNTING.md` §2 — an evidence-tree file outside Git — whose own
+`{{SHA256}}` footer convention (replace the 64 hex characters on the `sha256:` line with the
+literal placeholder, then hash the UTF-8 bytes including the final newline) reproduces its
+digest `7715de95a6caa1e2a725bfcc9eab779f0aadad40b20e2f36c9a5abd8a0e49a02`. The shorthand
+named above is the exact string the three stale sites carry, so this correction stays
+discoverable from them by a literal search.
+
+**This note grants nothing.** It corrects a citation; it changes no status, renews no cap,
+authorizes no dispatch and no host step, and creates no new ID.
+
+## 12. Records-lane note — PR #747 review 5495472980 P2 bookkeeping (2026-10-13)
+
+**Appended 2026-10-13 against `main` `878b7d460d8cce5efb1cb8ecb3197e93e6cbf609`.** This is the
+records-lane home of the four P2 findings that PR #747's Stage G routed here; each is recorded
+below as **ACCEPTED-WITH-REASON**, and none is a byte defect in the merged head. The review's
+**P1 `4251900237`** was discharged by this page's **§10**. This note edits no existing byte of
+`ber-wp2b3-owner-decision-chain.md`.
+
+1. **P2 `4251900252` — "Record evidence before declaring the D94 class spent"
+   (ACCEPTED-WITH-REASON).** The Stage G record first tracked this P2 under the sub-label
+   *ALREADY EVIDENCED*; that sub-label is recorded here as this item's reason text, not revived
+   as a bucket of its own. The evidence is `evidence/ber-stage-b-lane/STAGE-B-DISPOSITION.md`,
+   SHA-256 `1C207DA04A74E64B3D222DF5789D415AA11FB98374FCA1CA6530B9A5D6EAB0BC`, 10,191 bytes,
+   which records the three-prompt class run of 2026-10-11 against the 60-minute ceiling. That
+   file is **outside Git and not verifiable from a clone**; its off-Git status is sourced to
+   [step-0-reconciliation-v4.md](../reconciliation/step-0-reconciliation-v4.md) **L4429–L4431**
+   — "the disposition record and raw evidence stay in the lane's evidence tree and the distro's
+   protected raw dir — nothing further is published to the repo by this lane" — and **not** to
+   APR-130's own entry, which records a publication gap only for the two Stage A run
+   dispositions and their source archives (register **L5554–L5561**), never for this Stage B
+   file. Its hash was re-verified read-only in the evidence tree during this lane.
+   L4412–L4413 bounds D94's class but does not itself record consumption.
+
+2. **P2 `4251900257` — "Date consumption at the first completed host phase"
+   (ACCEPTED-WITH-REASON).** APR-130's effective-consumption date is restated by quoting the
+   register verbatim: **Effective at:** `2026-10-11, when the D90-authorized re-run completed
+   its receipts` (register L5538–L5539). The date rests on the one-use rule's own words —
+   consumed when the host phase **completes its receipts** (register L5487–L5489) — and on the
+   register's record that run 1 finished with `test_posix_parent_swap_fails_closed` SKIPPED on
+   the genuine POSIX host and is dispositioned `NON_BASELINE` — not a partial pass — so run 1's
+   receipt set was not complete for the five required POSIX IDs, and the D90-authorized re-run
+   ran all five with no skip. That is the completeness the register's CONSUMED event dates
+   consumption on — the branch Codex's finding `4258019180` asks to establish — rather than the
+   absence of a register event between the runs: between run 1 and the D90 re-run the register
+   showed no consumption event for APR-128, and the CONSUMED event dates consumption at the
+   re-run's completion, which is the reported effective date.
+
+3. **P2 `4251900265` — "Name BER-DEC-016 as the probe grantor" (ACCEPTED-WITH-REASON).**
+   [The backlog](behavioral-eval-runner-backlog.md) **L4082** reads "the ONE offline Stage A
+   host probe **this entry grants** has **RUN**". "This entry" is the appended §13 log entry
+   whose heading is at backlog **L4074** ("### 2026-10-12 — Stage A host-phase disposition for
+   BER-DEC-016: the probe RAN and the grant is CONSUMED") — the entry that grants nothing new,
+   per its own Scope bullet (L4104–L4106) — and the grantor is **BER-DEC-016** (backlog
+   L3974–L4048; its "Use limit and excluded gates" bullet L4040–L4048), whose one-use limit is
+   carried at register L5487–L5489. The backlog's bytes are untouched because its own rule
+   (L2672–L2675) makes entries never-edited and routes corrections to an appended superseding
+   entry; quoting the phrase keeps the correction discoverable from the site, because a search
+   for it returns the site and this note.
+
+4. **P2 `4251900271` — "Record complete digests for the external evidence"
+   (ACCEPTED-WITH-REASON).** The digests are carried in full with the line ending that
+   reproduces each one; all seven rows were re-derived in this lane's clone at the recorded
+   bound revision. `.gitattributes` pins `* text=auto eol=lf`, so every clone sees LF, while
+   the values PR #747's body quoted inline reproduce only under **CRLF** — which is why each
+   value is written beside its convention. The two external source archives are outside Git
+   and not clone-verifiable:
+   `d4c36739bb591419f37605f69f19025164c37e1603bf8a5d5a11839dc610e618`
+   (`ber-source-3c384b25.tar`, run 1, 2026-10-10) and
+   `ec7ef949045bcee62ea3d883994185ed7a72fbfb133b74df13472229b68c490d`
+   (`ber-source-bd5d2ff5.tar`, the D90-authorized re-run). The seven byte runs:
+   - backlog L3974–L4048, 4,990 B, LF + final LF —
+     `fe690a4fb1ce9780fc2fd39289336c15492f962543b9105484dbdd3e34f1ede3`;
+   - backlog L3974–L4048, 4,989 B, LF with no trailing newline —
+     `fed3bbe1f5347416f27e45776f7863583035c1e8c420b4176ce8c8d8db69769b`;
+   - backlog L3974–L4048, 5,065 B, CRLF + final CRLF —
+     `af92575fc25106d702cddbd62066cbafac6862f2c33c868bc68248555e8e3c1f`;
+   - register L5438–L5491, 3,630 B, LF + final LF —
+     `0a919281c24d4235f69dfaddb6742d7bc61104bb2e59142c519501580ad195a7`;
+   - register L5438–L5491, 3,684 B, CRLF + final CRLF —
+     `76ed3b5cab4c59b0bed802916d39c7c886e11b973eeee5aaf8d3dcd4a0ae7950`;
+   - register L5436–L5491, 4,269 B, LF + final LF —
+     `d090a1ffbef7c9045fc36e469bccd42412b47211a8e60116381b44f2797c9bc7`
+     (the LF counterpart of the CRLF value below);
+   - register L5436–L5491, 4,325 B, CRLF + final CRLF —
+     `7d02351bdf312e4c15051a69574df1af1d236e4360aaacee0e0a671946893857`.
+**The four Codex P2s of PR #760's review `5502772966` at head
+`31804169666e90ea09e2cd42c67f86707d8be3b0`** (state `COMMENTED`) are each dispositioned
+here at the head they were raised at, by severity, never as a green: `4258019170` (the framing
+of the fault in §11) — **fixed in the bytes** by §11's corrected fault paragraph above, which
+restores this page's own L15–L21 alias, states the fault as the line drift and carries the
+approval register's L349 as the ambiguity note; `4258019185` (the Stage B evidence claim's
+record) — **fixed in the bytes** by item 1's attribution to `step-0-reconciliation-v4.md`
+L4429–L4431 and its bounded statement of APR-130's coverage (register L5554–L5561);
+`4258019180` (dating consumption at the first completed probe) — **fixed in the bytes** by
+item 2's receipt-completeness ground above; `4258019190` (keeping the grantor finding open
+until the backlog is superseded) — **recorded with an explicit reason**: the backlog's own
+rule (L2672–L2675) makes its bytes never-edited, so the antecedent stays open at its own site
+and item 3 routes its closure to a separately reviewed §13 superseding entry, not to an edit
+of the backlog here.
+
+**What this note does not do.** It edits **no register and no backlog byte** (register preamble
+L8–L13; [backlog](behavioral-eval-runner-backlog.md) L2672–L2675), creates no APR ID and
+grants nothing. If the owner wants the antecedent closed at its own site, the compliant vehicle
+is a **separately reviewed** appended §13 superseding entry naming the entry it supersedes, or a
+register event with a unique ID; both are routed as recommendations here, not performed.
