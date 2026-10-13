@@ -173,3 +173,25 @@ later lifecycle events. These are this source repository's owner instructions;
 consumer/product repositories and unrelated forks do not inherit them by copying
 Aegis files. Current direct user instructions retain their authority before they
 are transcribed into the register.
+**Source-library owner rule: name the AI that wrote it.** In Role A, any text an
+agent publishes under the owner account — a pull-request comment, a review, a PR body,
+or a commit message — states which AI model produced it. **If the work was not done by
+DeepSeek, the text names the model that did it** — for example Claude names Claude. A
+reader must never have to guess which system is speaking, and must never be left to
+assume the owner wrote it. The owner made this a permanent rule for all agents on
+2026-10-13, in these words: *"make it a permanent rule for all agents, so if it's not
+deepseek doing the work and claude is then claude mention itself in the comment."* As
+relayed and accepted, that means: every agent states its own model honestly and
+specifically; a generic phrase such as "an AI agent" is not enough where the model is
+known; and where an agent cannot establish which model produced existing text, it says
+so rather than attributing it. **A review that stands in for a named tool that could not
+run also says so**: that it is a stopgap, why the named tool could not run, and that it
+does not discharge the gate that required that tool. This is a disclosure rule: it
+changes no stage, gate, check, receipt or bound field, and it grants no new execution,
+write, publication or merge authority.
+
+**Correction to 2026-10-13 records:** comments posted on PR #766 before this rule were
+published under the owner account without naming the model that drafted them. They are
+recorded as unattributed rather than retroactively attributed, because the model that
+drafted each one was not established at the time.
+
