@@ -4249,6 +4249,34 @@ itself is a separate, later host phase that runs only under the merged grant.
   repository**.
 - **Scope:** this entry corrects one sentence's scope. It edits no existing byte, re-opens no gate, edits no merged
   pull-request body, and grants nothing. **New authority: None.**
+
+### 2026-10-13 — three corrections to the two entries above: the O-F1 shorthand, the derivative's scope, and an unreconciled census
+
+- **Date:** 2026-10-13.
+- **Addresses:** the O-F1 note at L4149–L4190 ("2026-10-13 — O-F1 discharged: the FU-3 record lane's carried
+  publication item is closed by this note") and the entry directly above (L4228–L4252). Appended under this log's
+  rule at L2672–L2675; no existing line of this file is edited, and neither entry's closure decision is re-opened.
+- **Correction 1 — the O-F1 shorthand is false as to Stage F.** The note says the publication item existed because
+  "no stage read a skill". The published Stage F record lists **three** skills that stage used — `code-reviewer`,
+  `acceptance-criteria-reviewer` and `source-of-truth-reconciler` — in its section 11 at
+  `docs/evidence/fu3-record-publication-2026-10-13/FU3-RECORD-FINAL-REVIEW-F.md` L214–L220. The missing rows were caused by
+  those **recorded rows never being inserted into the body**, not by an absence of skill use; the note's own detail
+  bullet already distinguishes Stage F from Stages D and E, and only the shorthand is wrong.
+- **Correction 2 — the fourth published file is sanitized further than that entry states.** The entry above
+  describes a derivative with two identifiers removed. After an automated review, **every occurrence of the host
+  identity** was removed — the username, the distro release, the wsl-root and the project directory name — at five
+  sites, under the evidence-retention rule at L4021–L4025. The earlier ruling that such identifiers could stay
+  because they are already tracked at the base revision **was wrong and has been withdrawn**: prior publication is
+  not an exception to that rule, and the publication directory does not exist at the base revision, so nothing inside
+  it was already published. The difference inventory is **seven** items, not five, and now includes the record's own
+  recomputed self-digest footer; the publication record's section 1.1 enumerates them.
+- **Correction 3 — the census in that copy is UNRECONCILED, and is labelled so rather than adjusted.** Its three
+  top-directory rows sum to **1,915** against a recorded total of **1,719**, and this lane cannot re-derive it because
+  its own boundaries forbid touching the WSL distro. The rows, the total, the dependent 1,455-file scan figure and
+  every completeness claim resting on them are recorded as **unreliable as a set**. No number was adjusted to make
+  the sum work.
+- **Scope:** this entry corrects three statements. It edits no existing byte, re-opens no gate, edits no merged
+  pull-request body, and grants nothing. **New authority: None.**
 ## 14. Continuation instructions for a brand-new session
 
 ### 2026-09-10 reconciliation of merged BER-DEC-008

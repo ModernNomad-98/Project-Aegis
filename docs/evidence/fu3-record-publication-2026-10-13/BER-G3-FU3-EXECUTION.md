@@ -43,10 +43,10 @@ read was read-only.
 | # | Location searched | What it is (plain English) | Result |
 | --- | --- | --- | --- |
 | S1 | `C:\src\Project Aegis` and its `_resume-2026-10-09` subtree | the session workspace and the resumed work tree | **searched** — receipts, lane records, clones, no provider-usage bytes |
-| S2 | `\\wsl$\Ubuntu-24.04\home\peternguyen\aegis-stage-a\` | the external distro-private evidence root on the WSL2 Linux distro | **reached; fully censused** — 1,719 files, **no usage artefact** (§2.2) |
+| S2 | the external distro-private evidence root on the WSL2 Linux distro (raw host path withheld; see 2.2) | the external distro-private evidence root on the WSL2 Linux distro | **reached; enumerated below, and the enumeration is UNRECONCILED** — 1,719 files, **no usage artefact** (§2.2) |
 | S3 | `C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence` | the **authorized** external evidence root named by the owner's decision 24 | **DOES NOT EXIST on this host** (§2.1) |
 | S4 | `C:\temp` (whole), `D:\` (whole), `C:\src\Project Aegis` (whole) | all other local bulk storage | **searched by name and by content** — no ledger file, no usage JSONL, no billing record |
-| S5 | the distro's interactive shell-history file | the Linux shell history that would show a live-run command | **16 bytes — effectively empty**; no live provider command ever recorded |
+| S5 | the distro's interactive shell-history file | the Linux shell history that would show a live-run command | **16 bytes — effectively empty WHEN INSPECTED**. That is a current-state measurement and nothing more: an empty history is equally consistent with history having been cleared, disabled, or bypassed by non-interactive execution. **Whether any live provider command was ever recorded is UNKNOWN.** |
 | S6 | the public repository via the accounting clone at `878b7d46` | the published Git record | **searched** — the ledger *implementation* is published; no ledger *data* is in Git (and cannot be) |
 
 ### 2.1 The authorized evidence root does not exist
@@ -66,9 +66,9 @@ does not prove zero use.
 
 ### 2.2 The external distro root holds source code and host logs — not usage
 
-`\\wsl$\Ubuntu-24.04\home\peternguyen\aegis-stage-a\` **is reachable and was read in full** (the distro
-`Ubuntu-24.04` — *the WSL2 Linux distribution this project's host probe used* — reported `Stopped` at
-this pass's first probe and `Running` shortly after; **this agent started, resumed and launched nothing**,
+The external distro-private evidence root **is reachable and was read** (the enumeration's completeness is qualified below) (the WSL2 Linux
+distribution this project's host probe used reported `Stopped` at this pass's first probe and `Running` shortly
+after; **this agent started, resumed and launched nothing**,
 and the paused VM was not touched).
 
 | Top directory | Files | What it actually is |
@@ -76,7 +76,16 @@ and the paused VM was not touched).
 | `raw`, `raw-rerun` | 12 | the six per-command host-phase log files from probe run 1 and the D90 re-run |
 | `ber-src`, `ber-src-fixed`, `ber-src-repair`, `-repair-r2`, `-repair-r3`, `-src-verify`, `ber-stage-b` | 1,362 | extracted copies of the `tools/behavioral_eval_runner` **source tree** |
 | `ber-followup`, `ber-followup-r2` | 541 | source trees plus two suite logs and one module log |
-| **Total** | **1,719** | **source code (1,455 files), tests, schemas and host-phase logs. Zero data files.** |
+| **Total as recorded in this pass** | **1,719** | **source code (1,455 files), tests, schemas and host-phase logs. No data file was found in the enumerated set - a negative that inherits the census's unreliability, stated below.** |
+| **Sum of the three rows above** | **1,915** | **the rows and the recorded total do not agree.** |
+
+**The census is UNRECONCILED, and it is labelled so rather than adjusted.** The three rows sum to **1,915** while
+the total recorded in this pass reads **1,719**; any reader can check that arithmetic and it does not add up. This
+lane **cannot re-derive it**: the root is the distro-private one, and this change's own boundaries forbid touching
+the WSL distro, so re-enumerating it is out of scope here. **The rows, the recorded total, the 1,455-file scan
+figure and every sentence that depends on the census being complete are therefore UNRELIABLE AS A SET.** No number
+has been adjusted to make the sum work. **What would resolve it:** a read-only re-enumeration of that root under an
+authorization that permits reaching the distro, recorded with its command and its output.
 
 Decisive negatives, each actively tested:
 
@@ -84,7 +93,8 @@ Decisive negatives, each actively tested:
   the distro home — so the two named archive hashes can only refer to the two Windows-side tarballs (§3).
 - **No file named** for a ledger, usage, spend, token, cost, price, quota or reservation record exists.
 - A content scan for `usage|spend|tokens_used|input_tokens|output_tokens|cost_usd|billing|quota|reservation`
-  swept **1,455** files and matched **377** — every match is inside the tool's **own source code**
+  swept the files the census enumerated (**recorded as 1,455** - a figure that inherits the census's
+  unreliability, §2.2) and matched **377** — every match is inside the tool's **own source code**
   (`budget.py`, `calibration_ledger.py`, `calibration_provider.py` and their tests). **Not one match is
   recorded data.** The strings are the caps *declared in code*, not usage *observed at runtime*.
 
@@ -215,7 +225,7 @@ unaccounted-for therefore **overruns the external-request ceiling outright**. Th
 > Specifically, the single durable ledger — the one append-only, hash-chained event log in which every
 > external interaction is recorded before and after transport (reporting attempts, tokens, spend and
 > day-spend) — **was not found**, in whole or in part, on the session workspace, on the external
-> distro-private root `\\wsl$\Ubuntu-24.04\home\peternguyen\aegis-stage-a\`, on the authorized external
+> distro-private root (raw host path withheld; see 2.2), on the authorized external
 > evidence root `C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence` (**which does not
 > exist**), on `C:\temp`, on `D:\`, or in the public repository. The two archive hashes named in the
 > receipts were recovered and verified **exactly**, but both are digests of the **probe's source tarball**,
@@ -262,7 +272,7 @@ follow-up docs PR; nothing was written to the repository by this pass):**
 - **Event:** RECONCILIATION ATTEMPTED AND NOT COMPLETED; no allowance effect.
 - **Recorded at / By:** 2026-10-13 / <records-lane agent id>.
 - **Finding:** FU-3 (the execution of BER-G3's remaining-allowance reconciliation) searched the session
-  workspace, the external distro-private root \\wsl$\Ubuntu-24.04\home\peternguyen\aegis-stage-a\, the
+  workspace, the external distro-private root (raw host path withheld; see 2.2), the
   authorized external evidence root
   C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence (verified absent), C:\temp, D:\ and
   the public repository. The single durable provider ledger — the append-only hash-chained event log that
@@ -337,14 +347,14 @@ Get-FileHash '_resume-2026-10-09\evidence\ber-dec-lane\ber-source-bd5d2ff5.tar' 
 Test-Path 'C:\temp\Project-Aegis-BER-WP-2B-3-Measured-Judge-Calibration-Evidence'
   -> False     (the authorized external evidence root, decision 24 / package L631, does NOT exist)
 
-Get-ChildItem '\\wsl$\Ubuntu-24.04\home\peternguyen\aegis-stage-a' -Recurse -File | Measure-Object
-  -> Count = 1719   (all source trees + host logs; zero ledger, usage, spend or billing files)
+(a recursive enumeration of the distro-private root, in full)
+  -> Count = 1719 recorded, but the census rows sum to 1,915 - UNRECONCILED, see the note in 2.2
 
 A recursive name-and-content search across the local bulk-storage roots and the distro home, for any ledger file
   -> only calibration-ledger-entry.schema.json (the SCHEMA, never the data)
 
 (the distro's interactive shell-history file, sized)
-  -> 16 bytes   (no live provider command ever recorded)
+  -> 16 bytes   (empty WHEN INSPECTED; whether a live provider command was ever recorded is UNKNOWN)
 
 git -C _resume-2026-10-09\clone-ber-g3-accounting grep -n 'MAX_TOTAL_EXTERNAL_REQUESTS' -- tools/behavioral_eval_runner/judge/calibration_ledger.py
   -> 62: MAX_TOTAL_EXTERNAL_REQUESTS = 201
@@ -354,4 +364,4 @@ git -C _resume-2026-10-09\clone-ber-g3-accounting grep -n 'MAX_TOTAL_EXTERNAL_RE
      literal placeholder {{SHA256}}, so the digest is stable and independently reproducible.
      Verify by replacing the 64 hex characters on the line beginning "sha256:" with {{SHA256}}, then
      hashing the UTF-8 bytes including the final newline. Line endings are LF only. -->
-sha256: 3a4d32645e0e2189ccef64fa0cfc3518e88884d18087ba2f0d7ca29d35d1b148
+sha256: 9038e3e6e652e72796608766718e85e695989de500a1a1cc2b701bfa336ae76b

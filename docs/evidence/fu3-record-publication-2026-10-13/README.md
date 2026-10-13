@@ -45,8 +45,13 @@ correction is a publication plus a **superseding** log entry that names the entr
 **Reading key.** A *finding* is a defect raised by an automated or human reviewer on a pull
 request. *FU-3* — in plain words, *the Behavioral Eval Runner provider-usage reconciliation
 attempt whose record lane merged as pull request #764*. *O-F1* — in plain words, *the carried
-defect under which that lane's merged pull-request body published a skills table with no row for
-Stages D, E or F, because no stage read a skill*. The *archive* — in plain words, *the untracked
+defect under which that lane's merged pull-request body published a skills table with no row for Stages D, E or F*.
+The original shorthand for its cause - "no stage read a skill" - is **wrong as to Stage F**: the published Stage F
+record lists three skills it used (`code-reviewer`, `acceptance-criteria-reviewer`, `source-of-truth-reconciler`) in
+its section 11, `FU3-RECORD-FINAL-REVIEW-F.md` L214-L220. The missing rows were caused by those recorded rows **never
+being inserted into the body**, not by an absence of skill use. The shorthand is corrected here, and a further
+superseding entry carries the same correction into the append-only governance log.
+The *archive* — in plain words, *the untracked
 session workspace folder `_resume-2026-10-09/`, which is outside every repository on this host*.
 A *self-digest footer* — in plain words, *the repository convention where a line reading
 `sha256: <64 hex>` covers the file's bytes with that digest replaced by the literal placeholder
@@ -63,15 +68,15 @@ checkable by a reader who does not have the archive.
 
 | # | Published file | Status | Source bytes → committed | Source sha256 (archive original) | Committed sha256 (fresh clone) |
 | --- | --- | --- | ---: | --- | --- |
-| 1 | [BER-G3-FU3-EXECUTION.md](BER-G3-FU3-EXECUTION.md) | **SANITIZED DERIVATIVE** - see 1.1 | 25,606 → 26,345 | `ea521f84c4d0d88f8e888f3588147a6a63c659f8773f7d41339d9eeca47b9915` | `cc183e4504a1b280d04e5726279c71daaa4593e1e5272ee43ce2110838cf6ac3` |
+| 1 | [BER-G3-FU3-EXECUTION.md](BER-G3-FU3-EXECUTION.md) | **SANITIZED DERIVATIVE** - see 1.1 | 25,606 → 27,721 | `ea521f84c4d0d88f8e888f3588147a6a63c659f8773f7d41339d9eeca47b9915` | `89005849d1d2ea5d7b12d9a13b0ff8f87973a103bf0f387f85c2b673fdf30ae0` |
 | 2 | [FU3-RECORD-FINAL-REVIEW-F.md](FU3-RECORD-FINAL-REVIEW-F.md) | byte-identical | 30,777 → 30,777 | `c0b0c548fa6b8f2cc9b961814099e8e12e690729bfdaa16e6c4b96263d7dab8a` | `c0b0c548fa6b8f2cc9b961814099e8e12e690729bfdaa16e6c4b96263d7dab8a` |
 | 3 | [FU3-RECORD-stage-g-summary.md](FU3-RECORD-stage-g-summary.md) | byte-identical | 25,454 → 25,454 | `d2ed1cfba306c12d993b5718b1d903de656409f1ff91af2e90c3ee1b178aa031` | `d2ed1cfba306c12d993b5718b1d903de656409f1ff91af2e90c3ee1b178aa031` |
 | 4 | [REVIEWPATH-FINAL-REVIEW-F.md](REVIEWPATH-FINAL-REVIEW-F.md) | byte-identical | 21,023 → 21,023 | `f367d36eda52c45289dee5d2cbdcde82c534db8c97786d23b78d51531491cd55` | `f367d36eda52c45289dee5d2cbdcde82c534db8c97786d23b78d51531491cd55` |
 
 **Each file's own integrity claim, recomputed from the published bytes:** file 1's self-digest footer is now
-`3a4d32645e0e2189ccef64fa0cfc3518e88884d18087ba2f0d7ca29d35d1b148` (recomputed over the derivative, because leaving
-the original's value would have made the published file carry a false claim); file 2's footer is
-`8f554598a04d91567fbb10e301d1a8bc1e0c2940b2a82fb8a5bac4be9258937b`; file 3's footer is
+`9038e3e6e652e72796608766718e85e695989de500a1a1cc2b701bfa336ae76b` (recomputed over the derivative **three times** as it was
+`f5a6b9ca66c99dd8baa61018fb60974a08ab92efcffce3583285ca6cd97b8b97` in the archive original and `3a4d3264…` after the first
+revised - leaving the original's value would have made the published file carry a false claim); file 2's footer is
 `059822aabffb13cb417adcd1714bb00a90244c0df040a457db7ba9ac895bb2d7`; file 4 carries a body digest,
 `81884e0d49cb117c7f7884350ce23adcfac6788891c0a9bc8828dc19461abcc8`, over every byte above its footer heading.
 
@@ -88,21 +93,29 @@ publication, not the archival body of a dated record.
 
 ### 1.1 The sanitized derivative: every difference from its source, and why
 
-`BER-G3-FU3-EXECUTION.md` is **not** a verbatim copy. Five changes were made, all named here. Two are privacy
-sanitizations and three are corrections of claims the published text got wrong; nothing else differs.
+`BER-G3-FU3-EXECUTION.md` is **not** a verbatim copy. **Seven changes** were made, all named here: three are privacy
+sanitizations, three are corrections of claims the published text got wrong, and one is the record's own integrity
+footer. Nothing else differs.
 
 | # | Location | Change | Why |
 | --- | --- | --- | --- |
 | 1 | the search-census row for the shell history | the shell-history artefact's filename is removed; the row now reads "the distro's interactive shell-history file" | the filename appears in **no tracked file at the base revision**, and the governing evidence-retention rule (backlog L4021-L4025: *no private identifiers in Git*) requires it out. The **substance is preserved**: the history was 16 bytes and no live provider command was recorded |
 | 2 | the verification command that enumerated the bulk-storage roots | the command is replaced by a prose statement of the same search and the same result | the command's host-specific root list appears in **no tracked file at the base revision**; its substance - a recursive name-and-content search that found only the schema and never the data - is preserved |
 | 3 | the verification command that sized the shell history | replaced by "the distro's interactive shell-history file, sized", with the same 16-byte result | same reason as 1 |
-| 4 | the sentence about the authorized external evidence root | "No provider execution evidence was ever placed at the authorized root" becomes a **current-state** statement: the directory was not present when searched, and its **historical existence is UNKNOWN** | a `Test-Path` result cannot prove a historical absence, and this record's own governing packet says missing old evidence does not prove zero use |
-| 5 | the worst-case arithmetic block | corrected to **200 charged judgment attempts plus at most one read-only metadata request = $158.00**; the previous "$158.79" implied 201 charged attempts, an impossible path | the approved maxima are 200 judgment attempts + 1 metadata availability request, and that request invokes no generation and submits no calibration content, so the attempt charge does not apply to it |
+| 4 | five sites: the search-census row for the distro root, the 2.2 opening, the quoted stop record, the searched-roots list, and the enumeration command | **every occurrence of the host identity is removed** - the username, the distro release, the `wsl$` root and the project directory name - replaced by "the external distro-private evidence root on the WSL2 Linux distro (raw host path withheld)" | the evidence-retention rule this record's own lane is governed by says flatly *no private identifiers in Git*, and the raw host paths and users belong in the separately approved external root. **The Lead first ruled these identifiers could stay because they are already tracked at the base revision; Codex showed that prior publication is not an exception to the rule, and that the ruling was wrong twice over - see the note below. The ruling was overturned.** |
+| 5 | the sentence about the authorized external evidence root | "No provider execution evidence was ever placed at the authorized root" becomes a **current-state** statement: the directory was not present when searched, and its **historical existence is UNKNOWN** | a `Test-Path` result cannot prove a historical absence, and this record's own governing packet says missing old evidence does not prove zero use |
+| 6 | the worst-case arithmetic block | corrected to **200 charged judgment attempts plus at most one read-only metadata request = $158.00**; the previous "$158.79" implied 201 charged attempts, an impossible path | the approved maxima are 200 judgment attempts + 1 metadata availability request, and that request invokes no generation and submits no calibration content, so the attempt charge does not apply to it |
+| 7 | the record's own self-digest footer | rewritten from `f5a6b9ca…` (the archive original's value) to `9038e3e6…` over the current derivative | the footer is the file's own integrity claim; leaving the original's value would have published a file carrying a **false** claim, which is the defect class this lane exists to remove. Recomputing it was correct - and the change belongs in this inventory rather than being left implicit |
 
-**What was deliberately NOT changed.** The identifiers the derivative already shares with the base revision stay:
-the distro root and username it names are already published in tracked files at the base revision (the username in
-4, the distro release in 5, the root in 2), so removing them here would make the copy differ from its source for no
-privacy gain. Only what is **new to Git** was sanitized.
+**A ruling of the Lead's was overturned here, and it is recorded rather than quietly rewritten.** The first version of
+this section said the host identifiers could stay because they are *already published at the base revision* - the username
+in 4 tracked files, the distro release in 5, the root in 2. **That reasoning was wrong twice over.** First, the repository's
+own evidence-retention rule is a blanket *no private identifiers in Git*; prior publication is not an exception to it.
+Second, and decisively: **this publication directory does not exist at the base revision, so nothing inside it was
+"already published"** - every occurrence in this new file is new to Git no matter what appears elsewhere in the repository.
+The base-relative test answered a narrower question than the rule asks. The Lead withdrew the ruling, the identifiers are
+removed at all five sites (item 4 above), and the original with them intact is retained only at its digest-pinned
+external locator below.
 
 **Where the unsanitized original is retained, and the plain limit.** The original remains at
 `_resume-2026-10-09/evidence/docs-refresh-2026-10-12/BER-G3-FU3-EXECUTION.md`, 25,606 bytes, whole-file sha256
@@ -114,7 +127,7 @@ and nothing here should be read as claiming otherwise.
 
 | Cited by | What the citation supports | Where it now resolves |
 | --- | --- | --- |
-| backlog line 4143 | the FU-3 execution record, "whose section 6 carries the stop verbatim" | [BER-G3-FU3-EXECUTION.md](BER-G3-FU3-EXECUTION.md) — section 6, "THE STOP RECORD (verbatim)", at L198 |
+| backlog line 4143 | the FU-3 execution record, "whose section 6 carries the stop verbatim" | [BER-G3-FU3-EXECUTION.md](BER-G3-FU3-EXECUTION.md) — section 6, "THE STOP RECORD (verbatim)", at L208 |
 | backlog line 4160 (inside the frozen O-F1 note) | that Stage F raised the carried item and left the body unedited, in its section 10 | [FU3-RECORD-FINAL-REVIEW-F.md](FU3-RECORD-FINAL-REVIEW-F.md) — section 10, "O-F1 and two smaller notes", at L202 |
 | backlog line 4162 (inside the frozen O-F1 note) | that Stage G recorded it as an open publication item, in its section 9 | [FU3-RECORD-stage-g-summary.md](FU3-RECORD-stage-g-summary.md) — section 9, at L176 |
 | backlog line 4165 (inside the frozen O-F1 note) | the `F-F1` precedent | [REVIEWPATH-FINAL-REVIEW-F.md](REVIEWPATH-FINAL-REVIEW-F.md) — the `F-F1` paragraph at L68 |
@@ -136,7 +149,7 @@ tree at the base revision, **before** this change. The re-publications in this d
 copies and one sanitized derivative, section 1.1) are archival records in their own right - the derivative's
 enumerated differences touch none of the references counted here - and they carry their own
 out-of-tree references internally - for example the two source-archive paths inside
-`BER-G3-FU3-EXECUTION.md` at L113-L114, and a row-source locator inside
+`BER-G3-FU3-EXECUTION.md` at L116-L117, and a row-source locator inside
 `FU3-RECORD-FINAL-REVIEW-F.md` at L222. Those internal references are **not** counted above and are
 **not** repaired by this change: rewriting them would falsify the copies' own integrity claims (section 1),
 and widening the census to include them would breach this change's audited scope.
@@ -181,10 +194,16 @@ read and dismissed as benign: a provider price line, a GitHub Actions job id ins
 table, and a sha256 value inside a table row. The scan is repeated as an acceptance check at the
 candidate head, so the result is a measurement rather than an assurance.
 
-**A privacy and identifier check, added because a secret scan is not a privacy check.** The four files were also
-scanned for host-specific identifiers that are **new to Git** - usernames, distro paths, shell-history artefacts and
-bulk-storage commands - by extracting every path- and artefact-shaped token and testing each against the tracked
-tree at the base revision. That check found exactly two such items, and both are now sanitized (section 1.1, items
+**A privacy and identifier check, added because a secret scan is not a privacy check.** The four files were scanned
+for host-specific identifiers under the repository's own rule - *no private identifiers in Git*, backlog L4021-L4025 -
+by extracting every path- and artefact-shaped token and testing it against the tracked tree at the base revision.
+That check found the shell-history artefact's filename, the drive-enumeration command, **and the host identity itself at
+five sites**: a username, a distro release, a `wsl$` root and a project directory name. **All of them are removed**
+(section 1.1, items 1 to 4). One argument was tested and rejected: that the last group could stay because the same
+identifiers already appear in tracked files. **Prior publication is not an exception to the rule, and the argument fails
+on its own terms anyway** - this publication directory does not exist at the base revision, so nothing inside it was
+already published. This paragraph exists because the credential scan passed while identifier-shaped content was
+present: a scan for secrets does not answer whether an identifier is private.
 1 to 3): the shell-history artefact's filename and the drive-enumeration command. Every other host identifier in
 the copies, including the distro root and the username inside it, is **already published at the base revision** and
 was deliberately left untouched. This paragraph exists because the credential scan passed while identifier-shaped
