@@ -4972,6 +4972,145 @@ restated, not repaired.
 this page returns to **pending** at the new head and owes a subsequent independent full-page
 re-read by a reader who did not write it — the self-cost every prior update states.
 
+## Ledger-keeper recording — this ledger's self-cost re-acceptance and the D98 follow-up corrections, 2026-10-13
+
+**Under AEGIS-APR-101 (recording only).** This note records the whole-page prose
+re-read of this ledger at the merged tip `ba522f133d05624c2130f15eb8ef3b6329b0f37a`,
+performed by `ledger-selfcost-stagec-c` — a **different agent** from
+`readability-batches-implementer-c` (the writer of the F1-F5 section that changed
+this page, and the reader of all four #753 passes), from
+`readability-closeout-implementer-c`, `readability-closeout-repairer-c2`,
+`readability-f1f5-implementer-c`, `readability-final3-implementer-c`,
+`readability-final3-repairer-c2`, `readability-ledger-reader-c` and **every**
+repairer and reader before this session. Its tracked evidence source is
+[the batch record](../evidence/documentation/readability-ledger-selfcost-2026-10-13.md),
+which names this row's full 40-character acceptance revision verbatim and carries
+the read ranges, the two tool-output display elisions each with its covering read
+named by range, the one short read with its covering reads, the six acceptance
+bullets, the stale/new/source rows, the named follow-ups and the count honesty.
+
+**What was read, and where the exclusions stand.** This page was read **whole,
+line by line, as prose**, at the declared revision
+`ba522f133d05624c2130f15eb8ef3b6329b0f37a` — **L1-5095, every line of this
+ledger**, in the named ranges of the batch record's section 4 (R0 `L4912-5095`
+first, then R1 `L1-740` through R17 `L4820-4914`), whose union is L1-5095.
+**The ranges are not all disjoint: two overlaps exist and both are named** —
+`L4820-4874`, shared by R16 and R17, and `L4912-4914`, shared by R17 and R0; no
+pair gaps, and no claim is made that the joins "abut exactly". **Two tool-output
+display elisions occurred**, and each is named by its own range with the read
+that displayed it — never merged into one claim: **L374-408**, the 2,457 bytes
+omitted from the `L1-740` display (the visible text jumps from mid-`L374` to
+mid-`L408`), by the covering read at `L355-424`; and **L3037-3038**, the 2,825
+bytes omitted from the `L2781-3089` display (the visible text jumps from the end
+of `L3036` to mid-`L3038`), by the covering reads at `L3028-3043` and, at full
+row width, `L3034-3038`. **One read request returned fewer lines than it asked
+for:** the `L2781-3120` request returned only `L2781-3089`, so `L3090-3129` was
+displayed by the two later reads at `L3090-3109` and `L3110-3129`. Every one of
+the page's 5,095 lines is displayed by one of those named reads. The excluded
+already-read set is the recorded-acceptance drift `878b7d460d8c..ba522f133d05` =
+**64 / 0** — 63 lines of the K-080 self-acceptance note and 1 table row (K-080);
+**those lines were read again in this session rather than skipped**, so no part
+of this acceptance rests on an earlier read.
+
+**Accepted: this page, at the main-contained merged tip.** The row is **K-081**,
+bound to `ba522f133d05624c2130f15eb8ef3b6329b0f37a` (`origin/main`, the PR #760
+merge) with `Blob ID` `5928d98534e95a79e2ffbcc2065d38602dd98b0f` =
+`git rev-parse ba522f133d05624c2130f15eb8ef3b6329b0f37a:docs/roadmaps/aegis-documentation-readability-backlog.md`.
+The page is **not** edited by this lane beyond this note, the three dated
+correction notes below and that row; `git diff -U0` against the declared revision
+shows two insertion hunks and **0 deletion lines**.
+
+**The instrument's figures at the declared revision, quoted as the instrument's.**
+`build_index.py --ref ba522f13… --report` exits 0 with `table_rows 100, events
+100, full_page_acceptances 80, lost_commit_events 10, reader_pages_with_rows 68`;
+`check_index.py --ref ba522f13… --quiet` exits 0 with `647 / 60 / 1 / 580 / 0 / 0
+/ 6 / 587`, and its provably-pending list holds exactly one page — this one, 64
+drift lines against its recorded acceptance `878b7d46`. **This note publishes no
+count of its own** (D84); the figures at this commit's head are published in the
+Stage C record and the pull request body, **no post-commit bucket figure is
+predicted**, and **no `--write` was run**.
+
+**D98 follow-up 1 — dated correction appended 2026-10-13; the old lines are never edited.**
+L3375-3377 still reads that `PROC-01` is "in the process register proposed by
+**open PR #633**, which is **not merged**, so a path link here does not resolve on
+`main` and this citation is **unverified** in this repository as written; correct
+it when #633 merges." **The forward instruction it carries is discharged here.**
+PR #633 merged as `e88a0a0d0691259745d20301d3f34b992cb8e1c4` ("docs(evidence):
+register six process defects with prevention rules (#633)", 2026-10-02 18:24:01
+-0700), and `git merge-base --is-ancestor e88a0a0d0691259745d20301d3f34b992cb8e1c4
+refs/remotes/origin/main` exits **0** at this bound revision — so the citation
+resolves on `main` and the "unverified" reading no longer holds as written. The
+dated sentence is **not** rewritten; this note is the correction it asked for.
+Severity: minor — citation currency only; no count, hash or derivation is
+affected.
+
+**D98 follow-up 2 — dated correction appended 2026-10-13; the old lines are never edited.**
+L3379-3385 still says "the ten other SHAs cited in this passage" and lists ten
+strings. The list is **ten strings but nine distinct commits**: the last two,
+`bf7a4b86b46b` and its abbreviation `bf7a4b8`, resolve to the same commit
+`bf7a4b86b46bcac2b6cace1d99f6ffc290a47b80`, so `git rev-parse` over the ten
+strings returns **nine distinct full SHAs**. The passage itself acknowledges the
+identity parenthetically, so no reader is misled about reachability and **no
+figure and no conclusion changes**; the count word "ten" is the imprecision, in a
+section whose whole subject is counting precision. Corrected forward here, never
+in place. Severity: trivial/minor.
+
+**D98 follow-up 3 — dated correction appended 2026-10-13; the row values are never edited.**
+The evidence-source column of keeper rows `L-001` to `L-006` still cites
+`docs/roadmaps/aegis-documentation-readability-backlog.md:2574` (L-001 to L-005)
+and `:2575` (L-006). At this bound revision those two lines hold the
+protected-file guard decision-packet prose of PR #333 — L2574 "…selects an option
+or creates a standing exception. Its recommended option preserves" and L2575
+"separate owner decisions for all other protected paths and work-package rules." —
+and **not** the lost-commit material those six rows cite. At this bound revision
+the lost-commit material sits at L200-L201 and L387 ("no remote-tracking ref
+contains" / "contained by no remote-tracking ref", the two sentences naming
+`65bacc7d6b85` and `d3dcb62a335d`), at L3329-L3342 (the ten-page table whose
+`cloud-security-baseline-reviewer` row carries the base `65bacc7d6b85`) and at
+L3353-L3389 (the reachability analysis of that commit); what resolves all **six**
+lost commits at once is **D73 row 5**, `docs/reconciliation/step-0-reconciliation-v4.md:3834`,
+which names `65bacc7d6b85`, `d3dcb62a335d`, `3c44f4a`, `e9cce7d`, `288d993`
+and `7f98950` — the same resolving citation rows `L-007` to `L-010` already
+use. **This note therefore re-anchors those six citations forward**, to
+`docs/reconciliation/step-0-reconciliation-v4.md:3834` and to this ledger's
+L3329-L3342 and L3353-L3389; the six rows' `Page`, `Event kind`, `Acceptance
+revision`, `Blob ID`, `Quote`, `Reviewer` and `Date` cells are **not**
+edited. Severity: minor — no Blob ID, acceptance revision or count binding is
+affected, and all 100 table rows still build.
+
+**D98 follow-ups 1, 2 and 3 are now discharged — by dated correction notes, not by
+rewriting dated text.** The three paragraphs above are the corrections the D98
+note's named follow-ups asked for; they are appended here and the sentences they
+correct keep their original words at L3375-3377 and L3379-3385 and in the six
+keeper rows. The earlier keeper section at L4966-4969, which restated these three
+as "remain open and are restated, not repaired", is a dated snapshot of the state
+at `878b7d46` and is left exactly as written.
+
+**Declared deviations, carried rather than hidden.** (1) The reader also writes
+this keeper section and the batch record, so the AEGIS-APR-101 condition that the
+keeper differ from the page's author and accepting reviewer is **not satisfied**
+and the row is **not green**; the carry is the same CARRY-WITH-DEVIATION the
+SD-D2 coordinator ruling recorded for K-074/K-075 and applied again to K-076,
+K-077/K-078/K-079 and K-080, and the authority question stays with the merge
+holder under AEGIS-APR-100. (2) Two of the six acceptance bullets are **partial** —
+"purpose and audience up front" (no intended audience is named) and
+"abbreviations and coded identifiers defined at first use" (the page's first `PR`
+is L14 against the definition at L156-157) — recorded as properties of the page's
+text at the bound revision, not repaired, because the lane may not rewrite dated
+text.
+
+**Self-cost.** This section changes this ledger by more than 10 lines and adds a
+section, so this page returns to **pending** at the new head and owes a
+subsequent independent full-page re-read by a reader who did not write it — the
+self-cost every prior update states.
+
+**What this note does not do.** It rewrites no dated snapshot, reorders or deletes
+no existing keeper row, binds no row to this commit's own SHA, edits none of the
+six lost-commit rows' cells, rebuilds no `tools/` artifact, runs no
+`build_index.py --write`, touches no `.github/workflows/` path, and confers no
+authority. The batching procedure does not grant provider, private-input,
+real-host or deployment authority (L3018-3020).
+
 <!-- acceptance-index-schema: 1 -->
 
 ## Consolidated keeper table — index schema v1 (D84, 2026-10-10)
@@ -5093,3 +5232,4 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-078 | docs/reconciliation/step-0-reconciliation-v4.md | full-page-acceptance | c80c8d2d553671579e878584914eae695028eab4 | e89e5f75b7fd49d97c6f5b3bf4ab1cf435b0909b | K-078 accepted: docs/reconciliation/step-0-reconciliation-v4.md read whole at c80c8d2d553671579e878584914eae695028eab4 | readability-final3-implementer-c | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | 2026-10-12 |
 | K-079 | docs/approvals/APPROVAL_REGISTER.md | full-page-acceptance | c80c8d2d553671579e878584914eae695028eab4 | 548e80efdc630eb04a9b41839c608b4928b4bc2a | K-079 accepted: docs/approvals/APPROVAL_REGISTER.md read whole at c80c8d2d553671579e878584914eae695028eab4 | readability-final3-implementer-c | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | 2026-10-12 |
 | K-080 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | b44d47c9a10cde4c62d6fdae52bf577e04242a50 | K-080 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | readability-ledger-reader-c | docs/evidence/documentation/readability-ledger-reread-2026-10-13.md | 2026-10-13 |
+| K-081 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | ba522f133d05624c2130f15eb8ef3b6329b0f37a | 5928d98534e95a79e2ffbcc2065d38602dd98b0f | K-081 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at ba522f133d05624c2130f15eb8ef3b6329b0f37a | ledger-selfcost-stagec-c | docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md | 2026-10-13 |
