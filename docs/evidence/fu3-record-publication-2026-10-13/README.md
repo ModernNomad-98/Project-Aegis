@@ -74,7 +74,7 @@ checkable by a reader who does not have the archive.
 | 4 | [REVIEWPATH-FINAL-REVIEW-F.md](REVIEWPATH-FINAL-REVIEW-F.md) | byte-identical | 21,023 → 21,023 | `f367d36eda52c45289dee5d2cbdcde82c534db8c97786d23b78d51531491cd55` | `f367d36eda52c45289dee5d2cbdcde82c534db8c97786d23b78d51531491cd55` |
 
 **Each file's own integrity claim, recomputed from the published bytes:** file 1's self-digest footer is now
-`9038e3e6e652e72796608766718e85e695989de500a1a1cc2b701bfa336ae76b` (recomputed over the derivative **three times** as it was
+`9038e3e6…` (the full 64-hex value is stated in that file's own footer; it was recomputed over the derivative **three times** as it was
 `f5a6b9ca66c99dd8baa61018fb60974a08ab92efcffce3583285ca6cd97b8b97` in the archive original and `3a4d3264…` after the first
 revised - leaving the original's value would have made the published file carry a false claim); file 2's footer is
 `059822aabffb13cb417adcd1714bb00a90244c0df040a457db7ba9ac895bb2d7`; file 4 carries a body digest,
