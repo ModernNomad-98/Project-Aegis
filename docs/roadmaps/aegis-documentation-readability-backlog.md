@@ -4759,7 +4759,7 @@ changed this ledger, and the reader of all four #753 passes — re-read the unch
 named pages at the declared revision `79c5c5901cd69101a58a696e0f03f1f7dd2264db`, in two passes per page:
 an exhaustive mechanical pass over every line, and a whole-page prose read where it was completed.
 **Two pages were read whole and are accepted — P2 (`docs/roadmaps/behavioral-eval-runner-backlog.md`,
-4,208 lines) and P6 (`docs/delivery-workflow.md`, 1,142 lines).** Four are **not accepted** and carry
+4,207 lines) and P6 (`docs/delivery-workflow.md`, 1,141 lines).** Four are **not accepted** and carry
 named follow-ups F1-F4 in the batch record: P1 `aegis-backlog-forecast.md`, P3
 `step-0-reconciliation-v4.md`, P4 this page, and P7 `APPROVAL_REGISTER.md`. The plan allows exactly this
 (N = 0-6; a page the reader does not accept gets a named follow-up instead of a row), and no page is
@@ -4780,7 +4780,7 @@ session read, at the bytes of blob `e6b99cee35a5de99a31deda38308deb244083516` (i
 and at `79c5c590`, both measured): **L1-3054 and L3130-3450, plus L4650-4780** — the live reading, the
 purpose and acceptance sections, the counting rules in force, the D98 full-page re-read section and the
 consolidated keeper table head and column contract — and **did not read L3055-3129, L3451-4649 and
-L4781-4863**, about 1,357 of the page 4,862 lines. **The whole-page read is therefore not complete and
+L4781-4862**, **1,356** of the page's 4,862 lines. **The whole-page read is therefore not complete and
 no acceptance row is claimed for this page**; the owed row stays owed as follow-up F5 in the batch
 record. Writing it anyway would be the defect class this program exists to prevent: a partial or
 targeted read cannot confer full-page acceptance (L2943-2947, L4707-4712).
@@ -4803,6 +4803,16 @@ keeper-section writer is **not satisfied** — the clause that matters most, a r
 so its row is not appended: the plan formula `93 + 1 + N + M` carries that `+1` as `0` here, and the
 measured instrument output is the authority for the count. (3) Item 3 accepted 2 of the 6 remnant pages,
 with the other four carried as named follow-ups.
+
+**The coordinator's decision on the two appended rows, recorded 2026-10-12: CARRY-WITH-DEVIATION for
+K-074/K-075.** The rows stand, with the unmet second eligibility clause declared above rather than
+hidden: the clause they turn on — the reader is a **different** agent from
+`readability-batches-implementer-c` — **is** satisfied, and the unmet clause is a disclosure, not an
+acceptance assertion. That is the disposition the #753 lane's Stage D took on the identical
+second-clause failure ("ACCEPT with the deviation recorded", `READABILITY-BATCHES-AUDIT-D.md` F-A1).
+**The remedy is staffing, not withdrawal: the owed row for this ledger's own page (F5 in the batch
+record) and any row for the four unread remnant pages (F1-F4) must be bound by a DIFFERENT agent from
+this session's reader.** AC7 and AC9 stay NOT MET as written either way.
 
 **What this note does not do.** It rewrites no dated snapshot, reorders or deletes no existing row,
 binds no row to this commit own SHA, edits none of the six remnant pages, rebuilds no `tools/` artifact,

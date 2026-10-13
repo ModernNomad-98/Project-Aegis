@@ -64,6 +64,17 @@ this lane was staffed and how far its read got — not a claim that the plan tex
    was not completed in this session. The plan allows exactly this: N = 0-6, and a page the reader does
    not accept gets a named follow-up instead of a row (plan section 4.2 step 4).
 
+**Coordinator decision, recorded 2026-10-12 and relayed to the Stage C2 repair: CARRY-WITH-DEVIATION
+for the two appended rows.** Rows **K-074/K-075 stand**, with deviation 1 above declared rather than
+hidden. The unmet second eligibility clause (reader ≠ this lane keeper-section writer) touches a
+*disclosure* — this record states it in terms — not a false acceptance assertion, and the clause the two
+rows turn on, **reader ≠ `readability-batches-implementer-c`**, **is** satisfied; that is the same
+disposition the #753 lane's Stage D took on the identical second-clause failure — **"ACCEPT with the
+deviation recorded"** (`READABILITY-BATCHES-AUDIT-D.md` F-A1) — and it is why the rows are carried rather
+than withheld. **The remedy is staffing, not withdrawal: the ledger own owed row (F5) and any row for the
+four unread pages (F1-F4) must be bound by a DIFFERENT agent from this session's reader.** AC7 and AC9
+stay **NOT MET** as written either way.
+
 ## 3. Per-page dispositions
 
 Drift is `git diff --numstat <recorded acceptance> <ref> -- <page>`, added plus deleted, re-measured at
@@ -98,14 +109,18 @@ Two complementary passes were made over each accepted page, and each is stated a
    in-page anchor, every 40-character SHA-shaped token, every 7-12 character backticked SHA token,
    each resolved offline against the local Git object store at that revision. Figures in section 4.3.
 2. **Every line, line by line, as prose at `79c5c590`** — the read this item exists to supply.
-   - **P2, `docs/roadmaps/behavioral-eval-runner-backlog.md` (4,208 lines): L1-4208.** Eight contiguous
+   - **P2, `docs/roadmaps/behavioral-eval-runner-backlog.md` (4,207 lines): L1-4207.** Eight contiguous
      slices covered the whole file. Two tool-output elisions inside the first slice (L328-349 and
      approximately L690-700) were **re-read** inside the second slice (L320-870), so no line of the
      page is unread. The excluded already-read set is the recorded drift `de56b736c25a..f5ac8444`,
-     **157 / 0**, which #753 read in full; the P2 remainder is L1-4208 less those changed lines.
-   - **P6, `docs/delivery-workflow.md` (1,142 lines): L1-1142**, in two slices, no elision anywhere.
+     **157 / 0**, which #753 read in full; the P2 remainder is L1-4207 less those changed lines.
+   - **P6, `docs/delivery-workflow.md` (1,141 lines): L1-1141**, in two slices, no elision anywhere.
      The excluded already-read set is the recorded drift `db49ca280c6f..f5ac8444`, **158 / 6 = 164**;
      the P6 remainder is the rest of the page, including its dated adoption history.
+
+**Count convention (R1).** Both figures are `(Get-Content <page>).Count` at `79c5c590` — the plan's own
+declared convention, and the plan's table gives the same two figures — and each equals the file's
+newline count: **4,207** for P2 and **1,141** for P6.
 
 **The six acceptance bullets, addressed for each accepted page.**
 
@@ -115,7 +130,7 @@ Two complementary passes were made over each accepted page, and each is stated a
 | Abbreviations and coded identifiers defined at first use | yes — the L13-33 key above, plus status vocabulary (L300-335) and priority vocabulary (L337-353), which spell out every status token a record can carry | yes — every stage token (SD-A..SD-G) and gate token (MG1..MG5) is defined once in its normative block and used elsewhere as an ID only |
 | Descriptive headings, lists or tables, and at least one concrete example | yes — headed registers throughout, and a worked numeric example at L2389-2416 (one selected case that preflight excludes: selected_coverage 0.2, runnable_coverage 0.5, execution_coverage 0, with the aggregate re-derivation and the rejected PASS claim) | yes — headed sections plus tables, and concrete worked text: the MG4 verbatim quotation (L369-372), the two agreement-check greps (L984-985) and the per-marker divergence method (L318-341) |
 | Shipped behaviour separated from proposed or blocked behaviour | yes — DONE / AUTHORIZED / BLOCKED / BACKLOG / PROHIBITED are distinct and each record states which; the simulated and mock scopes are labelled non-live | yes — procedural versus machine-enforced is its own section (L750-810), and the lighter docs-only path is bounded in its own section (L391-482) |
-| Navigation links current and every referenced file or command existing | **P2: 107 local links checked, 106 resolve; 1 does not** — `../../tools/behavioral_eval_runner/schemas/` is a directory link, not a file (recorded as a follow-up, not a defect of the prose). 30 anchors checked, 7 resolve | **P6: 10 local links, 10 resolve; 69 anchors checked, 68 resolve** — the single unresolved anchor is `reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions`, a cross-file anchor whose target section heading is on the linked page; recorded as a follow-up |
+| Navigation links current and every referenced file or command existing | **P2: 107 links checked, 30 anchors checked, 0 broken, 0 dead** — the repository's own instrument, `python -B scripts/ci/check-markdown-links.py --json docs/roadmaps/behavioral-eval-runner-backlog.md`, prints `{"anchors": 30, "broken": 0, "checked": 107, "dead": 0, "external": 78, "files": 1, "skipped": 0}` at exit 0; `../../tools/behavioral_eval_runner/schemas/` is an existing directory, which that instrument's contract treats as a valid target | **P6: 10 links checked, 69 anchors checked, 0 broken, 0 dead** — `python -B scripts/ci/check-markdown-links.py --json docs/delivery-workflow.md` prints `{"anchors": 69, "broken": 0, "checked": 10, "dead": 0, "external": 0, "files": 1, "skipped": 0}` at exit 0; the cross-file anchor `reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions` resolves on the linked page |
 | The non-author review itself | this record, with the staffing deviation in section 2 | same |
 
 **Purpose and normal use restated from each page alone** (the acceptance contract own non-author test, ledger L2860-2862):
@@ -139,8 +154,9 @@ at `80d406b6` and `79c5c590`, both measured):
 - **in full: L1-3054 and L3130-3450, plus L4650-4780** — the live reading, the purpose and acceptance
   sections, the counting rules in force, the dated per-PR accounting, the D98 full-page re-read
   section, and the consolidated keeper table head and column contract;
-- **not read: L3055-3129, L3451-4649 and L4781-4863** — approximately 1,357 of the page 4,862 lines,
-  overwhelmingly the long per-batch table rows and the dated keeper sections that follow them.
+- **not read: L3055-3129, L3451-4649 and L4781-4862** — **1,356** of the page's 4,862 lines
+  (75 + 1,199 + 82; the read ranges total 3,506, and 3,506 + 1,356 = 4,862), overwhelmingly the long
+  per-batch table rows and the dated keeper sections that follow them.
 
 **Disposition: the whole-page read is NOT complete, so no acceptance row is claimed for this page.**
 The item 2 row stays **owed**, exactly as #753 recorded it, and F5 names it. Writing the row anyway would
@@ -158,7 +174,7 @@ targeted read cannot confer full-page acceptance (L2943-2947, L4707-4712, L2492-
 **The mechanical pass, by contrast, covered all six pages at 100 per cent of their lines.** Measured at
 `79c5c590`:
 
-| Page | Lines | Local links | Links resolved | Anchors checked | Anchors resolved | 40-hex tokens | 7-12 hex tokens |
+| Page | Lines | Local links | Links resolved (lane classifier) | Anchors checked | Anchors resolved (same-page) | 40-hex tokens | 7-12 hex tokens |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P1 | 5,118 | 314 | 314 | 173 | 40 | 209 | 34 |
 | P2 | 4,207 | 107 | 106 | 30 | 7 | 39 | 6 |
@@ -176,9 +192,21 @@ defect list**: a cross-file anchor names a heading on the linked page, and only 
 accepted pages were adjudicated line by line (section 4.1). No page in this table is accepted on the
 strength of the mechanical pass alone.
 
+**The two accepted pages' link and anchor dispositions are read from the repository's own instrument,
+not from this record's narrower classifier.** For P2 and P6 the adjudicating instrument is
+`python -B scripts/ci/check-markdown-links.py --json <page>`: it reports **P2 `checked 107 / anchors 30 /
+broken 0 / dead 0`** and **P6 `checked 10 / anchors 69 / broken 0 / dead 0`**, both at exit 0
+(section 4.1). An existing directory is a valid target under that instrument's own contract, and the P6
+cross-file anchor resolves on the linked page. The `Links resolved (lane classifier)` and
+`Anchors resolved (same-page)` columns above are this record's own narrower mechanical classification —
+a link counts only when its target is an existing **file**, an anchor only when it sits on the **same
+page** — so they are a candidate list, never a defect list, and they carry **no** unresolved-link or
+dead-anchor claim about any page.
+
 ## 5. Stale / new / source rows
 
-**Every line this lane changes.** `git diff --numstat 79c5c590` at this commit head:
+**Every line this lane changes.** `git diff --numstat 79c5c590` at Stage C's commit head
+(`c2916d29`; the Stage C2 repair's cumulative figures are in section 10):
 
 | Path | Added | Deleted | Source |
 | --- | ---: | ---: | --- |
@@ -196,6 +224,10 @@ full 40-character acceptance revision `79c5c5901cd69101a58a696e0f03f1f7dd2264db`
 
 ## 6. Named follow-ups
 
+**Staffing bound to the coordinator's decision (section 2):** every row this record still owes — F5's
+ledger row and any row for the four pages named in F1-F4 — must be bound by a **different agent** from
+this session's reader.
+
 1. **F1 — P1 `docs/roadmaps/aegis-backlog-forecast.md` whole-page prose read.** Owner: the next reader
    of this lane (a different agent from this one). Reason: not read this session; the page is 5,118
    lines and its recorded drift is 118 / 0. No row is appended.
@@ -209,13 +241,20 @@ full 40-character acceptance revision `79c5c5901cd69101a58a696e0f03f1f7dd2264db`
    Reason: not read this session; 5,939 lines, drift 616 = 611 / 5.
 5. **F5 — item 2, the ledger own acceptance row, still WITHHELD and OWED (1).** Owner: the coordinator
    or the merger at the merged tip. Reason: the whole-page re-read this row requires is not complete
-   (section 4.2). Resolver: a post-merge row bound to a main-contained revision whose ledger blob
-   equals the head (`80d406b6…` or the merged tip, blob `e6b99cee…`), or the merger-side rebuild
-   practice (D73 row 8). Until it exists the ledger stays inside the instrument provably-pending
-   bucket.
-6. **F6 — P2 directory link and P6 cross-file anchor.** Owner: the next editor of those pages. Reason:
-   the one unresolvable local link and the one unresolvable anchor recorded in section 4.1; neither
-   changes a count, a claim or a rule.
+   (section 4.2). **Resolver, corrected by the Stage C2 repair to be blob-bound:** a post-merge row
+   bound to a main-contained revision **whose ledger blob equals the blob at the merged tip** — never
+   `e6b99cee35a5de99a31deda38308deb244083516`, the *base* blob this lane own append has already moved
+   (at `c2916d29` the ledger blob this commit reads is `529b91d39ac789f54b86133b46994f3f92f1246f`, and
+   this repair commit moves it again, so at any later head the resolver is that head's blob, whatever
+   it is) — or the merger-side rebuild practice (D73 row 8). **Plan-inherited contradiction, recorded
+   for the coordinator and not dropped:** the plan AC6 text (plan L607) names `e6b99cee…` as the blob
+   item 2's row must equal, so AC6 as written cannot be satisfied by any row appended after this
+   commit; that plan-versus-artifact conflict is the coordinator's to resolve before the row is bound.
+   Until the row exists the ledger stays inside the instrument provably-pending bucket.
+6. **F6 — deleted by the Stage C2 repair (2026-10-12); recorded, not silently dropped.** The former F6
+   named a P2 directory link and a P6 cross-file anchor as unresolved work. The repository's own
+   instrument reports both accepted pages `broken: 0, dead: 0` (section 4.1), so there is nothing left
+   to follow up. **F7 keeps its number** so every existing reference to it stays valid.
 7. **F7 — item 1, the index rebuild.** Owner: the rebuild holder (never the coordinator, never a holder
    of another stage of that pull request; D73 row 9). Reason: the rows this commit appends are not
    machine-visible until `build_index.py --write --ref <the rebuild pull request base commit on the
@@ -255,3 +294,31 @@ six remnant pages; appended no acceptance row this record does not support; boun
 commit own SHA; ran no `build_index.py --write` and rebuilt no `tools/` artifact; touched no
 `.github/workflows/` path; and claims no authority beyond recording. The batching procedure does not
 grant provider, private-input, real-host or deployment authority (ledger L3018-3020).
+
+## 10. The Stage C2 repair (2026-10-12), recorded
+
+A second, different agent (`readability-closeout-repairer-c2`) discharged the Stage D `SD-D REVISE`
+items R1-R4 in a second commit on this pull request, after this record was first published. (These
+Stage D revision labels are distinct from the roster batches R1-R3 in section 2.):
+
+- **R1** — the two accepted pages' line counts and read ranges are corrected in place to **4,207 /
+  L1-4207** (P2) and **1,141 / L1-1141** (P6), and item 2's unread total to **1,356** lines
+  (**L4781-4862**); the same figures are corrected in the ledger keeper section this pull request adds.
+- **R2** — section 4.1's navigation bullet now carries the repository instrument's own disposition for
+  both accepted pages, and the former F6, which rested on the narrower classifier, is deleted with its
+  number tombstoned so F7's references stay valid.
+- **R3** — F5's resolver is blob-bound: the owed row must bind the ledger blob at the merged tip, never
+  the base blob `e6b99cee…`; the plan AC6 contradiction (plan L607 names `e6b99cee…`) is recorded for
+  the coordinator rather than dropped.
+- **R4** — the coordinator's CARRY-WITH-DEVIATION decision for rows K-074/K-075 is recorded in section 2
+  above and in the ledger keeper section, with the staffing remedy that binds F1-F5's rows.
+
+**The ledger path's cumulative figures over `79c5c590`, for the re-audit.** `git diff --numstat
+79c5c590 -- docs/roadmaps/aegis-documentation-readability-backlog.md` prints **79 / 0** (the keeper
+section plus the two rows, additions only); `git diff -U0` prints exactly two hunks,
+`@@ -4747,0 +4748,77 @@` and `@@ -4862,0 +4940,2 @@`, with **0 deletion lines**; the ledger at the
+repaired head is **4,941 lines**, blob `1e0190ee3faea7dbde5b01384fa2cbc56c9783d7`. The other two paths
+keep Stage C's figures (`2 2` for `docs/offline-ci.md`, `23 0` for
+`docs/roadmaps/aegis-ci-baseline-2026-10-11.md`). The pull request body's Stage C2 notes carry the same
+four items and re-derive its 16-hex bound-field digest (placeholder convention). **The Stage D re-audit
+this repair owes binds to the repaired head, not to the head this record was first written against.**
