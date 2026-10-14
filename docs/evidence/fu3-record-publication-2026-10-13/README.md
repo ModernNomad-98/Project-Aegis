@@ -400,11 +400,15 @@ From a clone of the candidate head, with the session workspace archive unavailab
    derivative, as section 1.1 records, not over the original.
 3. **Retrievability** — read the four files directly from the clone. No step of that path
    requires the archive, and no Markdown link on this page targets it.
-4. **The citing entries** — **six** section 13 entries belong to this change, and the map is stated by content rather
-   than by position because the positions move as entries are appended. **The two that link back to this page are the
-   first two**: the entry now at **L4192-L4227** carries the links to this record and to three of the four copies, and the
-   entry now at **L4228-L4252** carries a further link to section 1.1. **The four later entries - L4253-L4279, L4280 and
-   following, L4317 and following, and L4341 and following - carry no link at all**; they correct counts, scope, an
-   in-place edit and the edit chronology. **An earlier revision called the last two the "two newest" and counted four
-   entries in all**, which stopped being true when two more were appended; the anchors above are the ones to trust, and
-   they were re-derived at this head.
+4. **The citing entries** — **seven** section 13 entries belong to this change, and the map is stated by content
+   rather than by position because the positions move as entries are appended. **The count is measured, not repeated:**
+   the file carried **71** `###` headings at the base revision `dbe2ee28` and **78** at this change's head, so this
+   change appended **seven**. **The two that link back to this page are the first two**: the entry at **L4192-L4230**
+   carries the links to this record and to three of the four copies, and the entry at **L4231-L4255** carries a further
+   link to section 1.1. **The five later entries - L4256-L4282, L4283-L4316, L4317-L4340, L4341-L4365 and L4366-L4383 -
+   carry no link at all**; they correct counts, scope, three in-place edits and the edit chronology.
+   **How this item was wrong, and why the correction is stated rather than silently applied.** It read *"six"* with
+   anchors that were off by three lines, because the count and the anchors were written by the commit `eebe60f` **that
+   itself appended the seventh entry** — a total stated by the change that changes it, which is the same defect as a
+   count written with `HEAD`. **The seven anchors above were re-derived from the base and head heading lists, not
+   carried from an earlier revision.**
