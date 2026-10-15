@@ -5980,7 +5980,11 @@ the entry governs.
   All eight defaults are therefore adopted as written.
 - **What that adopts, one line each:**
   1. **D-1 — Ratify the resume.** The readability index program is recorded as
-     having resumed on 2026-10-10; AEGIS-APR-114/115/116/117 are in effect. The
+     having resumed on 2026-10-10. **AEGIS-APR-115, AEGIS-APR-116 and
+     AEGIS-APR-117 are ACTIVE; AEGIS-APR-114 is CONSUMED** — its named pull
+     requests (the decision record, the tool repair, the switch) have merged
+     (AEGIS-APR-125 L4955-L4969, "New authority: None"). The program stands on
+     the owner's resume ratification recorded here, not on the spent grant. The
      open-decisions rows that say the program "stays paused" are corrected
      **forward, by dated note, not by rewriting** them — see the lifecycle event
      below.
@@ -6025,9 +6029,18 @@ the entry governs.
 - **Scope allowed:** the readability sweep to zero pending — full-page re-reads,
   targeted reviews, keeper recordings under AEGIS-APR-101/116/117, and
   AEGIS-APR-115 rebuild pull requests — delivered on the standing terms of
-  AEGIS-APR-039 and AEGIS-APR-100 (all stages passed, all checks green,
-  administrator merge allowed, fix and retry), with the ledger's rules as
-  written, and with re-read concurrency at 4.
+  AEGIS-APR-039 and AEGIS-APR-100. The four terms that follow are a summary
+  drawn from several entries — their exact wording is the owner's merge-terms
+  question transcribed in AEGIS-APR-114 (L4841), a grant now CONSUMED — and
+  each is attributed to where it actually lives: **all stages passed** — the
+  seven-stage workflow AEGIS-APR-105 records (L3387-L3418; that entry is a
+  policy decision and grants nothing by itself); **all checks green** —
+  AEGIS-APR-100 (L3092-L3099) and AEGIS-APR-048 (L1308-L1317); **administrator
+  merge allowed** — AEGIS-APR-048 (L1314-L1316) and AEGIS-APR-039 (L1016);
+  **fix and retry** — transcribed in AEGIS-APR-114 (L4870-L4872; that grant
+  is CONSUMED, AEGIS-APR-125 L4955-L4969) and recorded on AEGIS-APR-100 only
+  via annotation ANNOT-Q3-005/D95 (L3147). Delivered with the ledger's rules
+  as written, and with re-read concurrency at 4.
 - **Scope FORBIDDEN:** nothing here waives a failed protected `gate-guard`;
   renews any consumed one-use grant; resumes the paused virtual machine;
   authorizes provider calls, private input, real-host proof, deployment or
