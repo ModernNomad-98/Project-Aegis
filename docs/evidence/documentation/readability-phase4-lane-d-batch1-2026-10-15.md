@@ -28,7 +28,8 @@ cannot_decide 6, official_pending_count 596
 exit 0
 ```
 
-**This lane publishes no readability count of its own** (ledger L19-31, D84) and presents the figures
+**This lane publishes no readability count of its own** (ledger L19-31; decision D84 — the
+official count is the instrument's computed figure, not the ledger's own) and presents the figures
 above as the instrument's, not as its own measurement.
 
 ## 2. The lane derivation, stated with its command
@@ -114,7 +115,7 @@ Markdown link (local and external) and every in-page anchor target; every 40-cha
 External links (git-scm.com x2 on LD-5, github.com x1 on LD-6) were **not fetched**, matching the
 2026-09-23 sample's own recorded practice ("external links were not fetched"). The six forty-hex
 SHAs are the base/merge revisions each note cites, and every one resolves in the local object store
-at `e2a3e20b`; the four merge SHAs were additionally verified against their pull-request subjects:
+at `e2a3e20b`; the six merge SHAs were additionally verified against their pull-request subjects:
 `b545d075` = "Merge pull request #233", `5c46c7b3` = "#234", `2c6b6fc6` = "#713",
 `6051ab0a` = "#205", `e6148322` = "#173", `a8b81d49` = "#190". LD-3's three backtick tokens are
 `2c6b6fc6`, `518b0b38` (twice) and all resolve.
@@ -177,7 +178,7 @@ Row shape: `stale:` the exact text as it stands at the declared revision; `new:`
 
 | # | stale | new | source |
 | --- | --- | --- | --- |
-| O-1 | LD-3 L25-26 and L28-29 cite "tracker L2941-2947" and "tracker L2801" for the up-to-three structure and the non-author rule. At `e2a3e20b` L2941-2947 holds the denominator paragraph and L2801 the self-cost note; the cited texts sit at L2900-2905 and L2860-2862. | **unchanged** — a dated 2026-10-10 record is a snapshot and is never rewritten (the 2026-10-12 close-out's D-5 treatment of stale anchors). | `git show e2a3e20b:docs/roadmaps/aegis-documentation-readability-backlog.md` lines read at those anchors. |
+| O-1 | LD-3 L25-26 and L28-29 cite "tracker L2941–2947" and "tracker L2801" for the up-to-three structure and the non-author rule. At `e2a3e20b` L2941-2947 holds the denominator paragraph and L2801 the self-cost note; the cited texts sit at L3002 (paragraph L3000-3006) and L2860-2862. | **unchanged** — a dated 2026-10-10 record is a snapshot and is never rewritten (the 2026-10-12 close-out's disposition row D-5: stale anchors in dated records stay unchanged, never rewritten). | `git show e2a3e20b:docs/roadmaps/aegis-documentation-readability-backlog.md` lines read at those anchors. |
 | O-2 | LD-4 L30 "Reconciled the 30-day evidence-policy choice, schema-shape and D9 decisions" uses `D9` without a gloss. `D9` is owner decision 9, recorded in the decisions log. | **unchanged** — the code resolves in `docs/reconciliation/step-0-reconciliation-v4.md` L941 ("D9 (2026-07-06) — A Compliance & Governance batch"), and the page is a dated record. | `step-0-reconciliation-v4.md` L941, read at the base. |
 | O-3 | LD-3 L6-7 name the plan artifacts `PLAN-first-batch.md 4eeaf8aa…`, `AUDIT-B ca7e3b9f…`, `STAGE0 8cbd113f…`. The three 8-hex prefixes do not resolve in the local object store. | **unchanged** — they name the 2026-10-10 sweep's plan artifacts outside the tree, the same shape the 2026-10-12 record used for its plan evidence sha256 (outside git). | `git cat-file -t 4eeaf8aa` / `ca7e3b9f` / `8cbd113f` each exit non-zero at the base. |
 | O-4 | LD-5 L59 "all seven local links resolved" is the note's own 2026-09-23 figure; the page at `e2a3e20b` carries six local links. | **unchanged** — the historical sentence describes the page at its own revision; today's six links all resolve (section 5). | `git show e2a3e20b:<LD-5>`; the mechanical pass's link count. |
@@ -191,10 +192,11 @@ Zero rows above have an empty source.
   acceptances from the **committed index JSON**, so **the eight appended rows change nothing until a
   rebuild**, and the builder can only be rebuilt after the commit that carries the rows because it
   stamps its own `built_at_ref`. The two resolvers the ledger already names apply: a two-commit
-  follow-up, or a merger-side rebuild at the merged tip (D73 row 8). `build_index.py --write` is
+  follow-up, or a merger-side rebuild at the merged tip (decision D73 row 8 — the recorded
+  practice for a moved main). `build_index.py --write` is
   **not** run in-lane: a rebuild adds JSON under `tools/`, which is not Markdown, and would break
-  this change's `docs-only` tier; the rebuild itself is the standing AEGIS-APR-115 rebuild pull
-  request's own scope.
+  this change's `docs-only` tier; the rebuild itself is the standing AEGIS-APR-115 (the register
+  grant for routine index-rebuild pull requests) rebuild pull request's own scope.
 - **The only movement at this lane's head is this lane's own new reader page**, which enters
   `no_recorded_acceptance` and therefore the official pending count. The published head expectation
   is **654 / 57 / 4 / 587 / 0 / 0 / 6 / 597** — the base's 653 / 57 / 4 / 586 / 0 / 0 / 6 / 596 with
@@ -231,8 +233,9 @@ verbatim, blob ID equals `git rev-parse <revision>:<page>`, path tracked), and
 It edited none of the eight read pages (no-rewrite discipline); rewrote no dated snapshot; edited,
 reordered or deleted no existing keeper row; bound no acceptance row to the lane's own unmerged head;
 ran no `build_index.py --write` and rebuilt no `tools/` artifact; touched no page outside the
-lane's stated range; and claims no authority beyond recording under AEGIS-APR-101 and the standing
-backlog delivery grant AEGIS-APR-039. The batching procedure "does not grant provider, private-input,
+lane's stated range; and claims no authority beyond recording under AEGIS-APR-101 (the ledger-
+keeper recording role) and the standing backlog delivery grant AEGIS-APR-039. The batching
+procedure "does not grant provider, private-input,
 real-host or deployment authority" (ledger L3018-3020).
 
 ## 13. Skills used (this lane, Stage C)
@@ -244,8 +247,10 @@ applied to each of the eight pages, each bullet addressed with line cites rather
 `source-of-truth-reconciler` — the four observations resolved against the repository (stale anchors,
 the `D9` decision, the non-resolving plan tokens, the historical link count) instead of against the
 pages' own prose. `scoped-approval-register` — established this change records under
-AEGIS-APR-101, performs backlog work under AEGIS-APR-039, and consumes, extends and requests no
-grant; the index rebuild is AEGIS-APR-115's separate scope, not this change's. `docs-retention-index`
+AEGIS-APR-101 (the ledger-keeper recording role), performs backlog work under AEGIS-APR-039 (the
+standing backlog delivery grant), and consumes, extends and requests no grant; the index rebuild
+is AEGIS-APR-115's separate scope (the register grant for routine index-rebuild pull requests),
+not this change's. `docs-retention-index`
 — consulted; no retention entry or frontmatter mechanism exists for
 `docs/evidence/documentation/` pages (zero files there carry `retention:` frontmatter at the
 base), so the new page follows the established shape and creates no retention row; recorded as
@@ -270,6 +275,40 @@ skill@6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 / reason:
   (approximate); active time was **not instrumented**, so wall time is an imperfect comparison with
   the estimate rule's active-time requirement and no per-page active rate is claimed.
 - Batch-1 finish and full wall time are recorded in the pull-request body at the head.
+
+## 15. Stage D repair note (2026-10-15)
+
+The Stage D audit returned **REVISE** on this pull request with two P3 factual citation errors inside
+this record. Both are repaired in place at this lane's second head (the record is unmerged, so in-place
+repair is allowed; after merge a dated record can only be superseded). **The two corrections, with the
+commands behind them:**
+
+1. **Section 5 count word.** The record said "the four merge SHAs" and then listed six. All six facts
+   are correct — `git show -s --format=%s b545d075 5c46c7b3 2c6b6fc6 6051ab0a e6148322 a8b81d49` prints
+   "Merge pull request #233", "#234", "#713", "#205", "#173", "#190" — so the count word now says
+   **six**, matching the six listed subjects.
+2. **Observation O-1 anchor.** The record said the cited texts sit at "L2900-2905 and L2860-2862".
+   L2860-2862 is correct. L2900-2905 is wrong: at `e2a3e20b` it holds the 61-requests measurement-gap
+   paragraph, while the up-to-three-read-only-agents text sits at **L3002** (paragraph L3000-3006),
+   verified with `git show e2a3e20b:docs/roadmaps/aegis-documentation-readability-backlog.md` and a grep
+   for the phrase. The row's quoted tracker range is now byte-verbatim too: the page prints an en dash
+   ("tracker L2941–2947", LD-3 L25), where the row had quoted a hyphen.
+3. Every other figure in this record was re-verified against the artifact at the bound revision
+   `e2a3e20b` — the section 1 instrument figures (653 / 57 / 4 / 586 / 0 / 0 / 6 / 596), the 590-path
+   lane derivation (586 + 4, split 148 / 148 / 148 / 146, lane D first and last path, "3 of 590 sort at
+   or after t"), the per-page depth and mechanical table (391 lines, 30 local links, 6 resolving 40-hex
+   SHAs, 3 external links not fetched), the six merge-SHA subjects, the section 10 quote strings
+   (verbatim in the eight appended ledger rows), and the eight row blob IDs (each 40 hex, each equal to
+   `git rev-parse e2a3e20b:<page>`) — all unchanged and correct, so nothing else was edited.
+
+**Keeper rows.** This repair authors no keeper row and withdraws none. The withdrawal of the same-agent
+rows K-090..K-097 (the keeper-table row IDs this lane appended) and their re-recording by a separate
+eligible keeper is **PR #781**'s scope (its record is
+`docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md`, the
+AEGIS-APR-117 route the owner directed on 2026-10-15).
+
+*Repair drafted by **DeepSeek v4 Pro** (`deepseek-v4-pro`), the Stage D repairing agent, under the owner
+account, as the repository's 2026-10-13 attribution rule requires.*
 
 ---
 
