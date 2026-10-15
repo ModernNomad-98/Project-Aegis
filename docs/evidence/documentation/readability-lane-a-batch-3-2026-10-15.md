@@ -146,6 +146,21 @@ Line and byte counts are `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<pag
 transcribed. No page needed a fix, so no "corrected" row exists and no page's net line change is
 anything other than 0.
 
+**Full 40-character blob IDs at the bound revision (section 3 verification, computed by command,
+not transcribed).** `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` × 8, run in this
+session; each ID below is 40 hex characters and each section 7 prefix is its first eight:
+
+| # | Page | Full blob ID (40 hex) |
+| --- | --- | --- |
+| P1 | `.claude/skills/adr-writer/assets/adr-template.md` | `b0337e23a06d47b759c9e7263ed6050026ae752e` |
+| P2 | `.claude/skills/aegis-setup/SKILL.md` | `8b45f8a2b3de6f54abd5a2c5c673f1e38bf4080b` |
+| P3 | `.claude/skills/aegis-setup/references/state-contract.md` | `d2c483b69a327a9ad36112b6a3b35595ad0e9d1a` |
+| P4 | `.claude/skills/agent-authorization-matrix/SKILL.md` | `bc6351cfd3daac2d0f8a0bfd008a53e240d86073` |
+| P5 | `.claude/skills/agent-authorization-matrix/references/matrix-template.md` | `d3b2df8fe8a868ba5e455774ea4994c47feb337a` |
+| P6 | `.claude/skills/agent-containment-reviewer/SKILL.md` | `f8d3ad11f1dac6764aaffe8866698c33e4facb0e` |
+| P7 | `.claude/skills/agent-containment-reviewer/references/containment-patterns.md` | `3d79aaf520a6cefb5da81b410ca52aa015bab9c4` |
+| P8 | `.claude/skills/agent-failure-recovery/SKILL.md` | `27fd46658f83c90aa9bfffb3e1ce89622e5d5ad0` |
+
 ## 4. Per-page read detail — ranges, bullets, purpose restatements, verification
 
 **P1 — `.claude/skills/adr-writer/assets/adr-template.md`** — read whole, L1-65.
@@ -266,8 +281,9 @@ than hidden. B3 satisfied — the canonical sections in order, a numbered workfl
 concrete propagation path for every HIGH-severity finding, an Output Format template with a
 mandatory "Not reviewed" field, and Stop Conditions that refuse live execution and
 side-effecting kills. B4 satisfied with note — the page separates what it designs from what it
-executes ("This skill designs containment controls; … it does not execute containment"; live
-incidents belong to the human incident owner following the approved runbook); it makes no
+executes ("This skill designs containment controls; the `incident-response-runbook` skill authors
+the procedure but does not run an incident." — verbatim, page L50-52; live incidents belong to the
+human incident owner following the approved runbook); it makes no
 shipped-vs-proposed claim about a system. B5 satisfied — one link
 (`references/containment-patterns.md`, present); zero commands; `evals/evals.json` and
 `evals/trigger-evals.json` exist; every named skill it routes to exists in the library
@@ -334,7 +350,8 @@ P8 accepted: .claude/skills/agent-failure-recovery/SKILL.md read whole at e2a3e2
 
 ## 6. Count honesty, the machine-visibility note, and the self-cost
 
-- **This lane publishes no readability count of its own** (the D84 official-count switch). The
+- **This lane publishes no readability count of its own** (the D84 official-count switch — D84 is
+  the 2026-10-10 index-repair decision that made `check_index.py` the official pending count). The
   instrument's figures at the base are quoted in section 1 as the instrument's.
 - **This batch appends no keeper rows, so there is nothing for the builder to pick up.**
   `build_index.py --report` is run in-lane at this batch's committed head as a regression check
