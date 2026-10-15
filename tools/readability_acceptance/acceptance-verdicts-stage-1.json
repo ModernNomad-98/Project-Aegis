@@ -794,6 +794,22 @@
       "reviewer": "readability-final3-implementer-c",
       "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
       "date": "2026-10-12"
+    },
+    {
+      "path": "docs/roadmaps/aegis-documentation-readability-backlog.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "878b7d460d8cce5efb1cb8ecb3197e93e6cbf609",
+      "reviewer": "readability-ledger-reader-c",
+      "evidence_source": "docs/evidence/documentation/readability-ledger-reread-2026-10-13.md",
+      "date": "2026-10-13"
+    },
+    {
+      "path": "docs/roadmaps/aegis-documentation-readability-backlog.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "ba522f133d05624c2130f15eb8ef3b6329b0f37a",
+      "reviewer": "ledger-selfcost-stagec-c",
+      "evidence_source": "docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md",
+      "date": "2026-10-13"
     }
   ]
 }

@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "f9cc456016dfbda089687a27b415d33c2b9433b2",
-  "table_rows": 99,
+  "built_at_ref": "e6ed06a3f67b89710d9a0f200525c6b1131009e3",
+  "table_rows": 101,
   "events": [
     {
       "stable_id": "K-001",
@@ -1093,6 +1093,28 @@
       "reviewer": "readability-final3-implementer-c",
       "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
       "date": "2026-10-12"
+    },
+    {
+      "stable_id": "K-080",
+      "path": "docs/roadmaps/aegis-documentation-readability-backlog.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "878b7d460d8cce5efb1cb8ecb3197e93e6cbf609",
+      "blob_id": "b44d47c9a10cde4c62d6fdae52bf577e04242a50",
+      "quote": "K-080 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609",
+      "reviewer": "readability-ledger-reader-c",
+      "evidence_source": "docs/evidence/documentation/readability-ledger-reread-2026-10-13.md",
+      "date": "2026-10-13"
+    },
+    {
+      "stable_id": "K-081",
+      "path": "docs/roadmaps/aegis-documentation-readability-backlog.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "ba522f133d05624c2130f15eb8ef3b6329b0f37a",
+      "blob_id": "5928d98534e95a79e2ffbcc2065d38602dd98b0f",
+      "quote": "K-081 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at ba522f133d05624c2130f15eb8ef3b6329b0f37a",
+      "reviewer": "ledger-selfcost-stagec-c",
+      "evidence_source": "docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md",
+      "date": "2026-10-13"
     }
   ],
   "reader_pages": [
@@ -1689,11 +1711,11 @@
     {
       "path": "docs/roadmaps/aegis-documentation-readability-backlog.md",
       "event_kind": "full-page-acceptance",
-      "last_acceptance_sha": "0237f611f718ed833935e72a0d98dd42362388a0",
-      "blob_id": "1e0190ee3faea7dbde5b01384fa2cbc56c9783d7",
-      "reviewer": "readability-f1f5-implementer-c",
-      "evidence_source": "docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md",
-      "date": "2026-10-12",
+      "last_acceptance_sha": "ba522f133d05624c2130f15eb8ef3b6329b0f37a",
+      "blob_id": "5928d98534e95a79e2ffbcc2065d38602dd98b0f",
+      "reviewer": "ledger-selfcost-stagec-c",
+      "evidence_source": "docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md",
+      "date": "2026-10-13",
       "acceptance_reachable": true
     },
     {
