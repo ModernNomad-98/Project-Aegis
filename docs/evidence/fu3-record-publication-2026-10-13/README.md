@@ -380,15 +380,18 @@ path, and three of them carry a byte-identical copy of the archive original:
 At that same head the seven later commits are clean (0 / 0 / 0). **Materiality:** the same identifiers are already in **4, 5 and 2 tracked files
 at the base revision** respectively, so the history adds **a verbatim copy of a full unsanitized record**, not a new class
 of identifier. **What a full purge would require:** rewriting five commits of the branch as it stood at a **named revision** - `git rev-list --count bd210954^..277a0f4d` = **12** (5 unsanitized + 7 clean), and the same formula at any later revision gives that revision's count. **A bare count cannot be stated at all: the commit that writes the number adds one, so the figure is correct when measured and stale when published - which is how the earlier "eleven" and "twelve" were each falsified by their own cited commands. The revision is named, `HEAD` is not**. **What it would
-invalidate:** every binding that names them - this lane's Stage D records and Stage E validations, the Stage F verdicts and
-MG2 - because a rewritten commit ceases to exist. **The bindings are named by kind, not counted:** the sentence used to
-state "eleven Stage D records, eight Stage E validations", but a tree-wide search finds those two figures nowhere else in the
-repository, and they are not derivable from a fresh checkout - the stage records they counted live in the session workspace
-archive (`_resume-2026-10-09/evidence/workspace-citation-durability-2026-10-13/`), which is not retrievable from this
-repository - so no count is asserted here (Codex finding 4264432721 on PR #766). **And it would still not free the repository**, since the identifiers
+invalidate:** every binding that names them - eleven Stage D records, eight Stage E validations, the Stage F verdicts and
+MG2 - because a rewritten commit ceases to exist. **And it would still not free the repository**, since the identifiers
 remain in tracked files at the base revision. **A partial purge that produces a clean-looking result without removing the
 exposure is worse than an honest statement of the limit.** The owner's goal explicitly permits carried open publication
 items; this is one, named so a future change can act on it.
+
+**Correction (2026-10-15), appended beside the original claim - the claim above is not edited.** The "eleven
+Stage D records, eight Stage E validations" counts in the paragraph above are unreproducible and are withdrawn:
+a tree-wide search finds the two figures nowhere else in the repository, and the stage records they counted live
+only in the session workspace archive (`_resume-2026-10-09/evidence/workspace-citation-durability-2026-10-13/`),
+which is not retrievable from a fresh checkout (Codex finding 4264432721 on PR #766).
+
 ## 7. How to verify this page
 
 From a clone of the candidate head, with the session workspace archive unavailable:
