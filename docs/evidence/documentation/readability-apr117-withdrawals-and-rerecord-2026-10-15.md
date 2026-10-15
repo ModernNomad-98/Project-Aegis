@@ -19,14 +19,25 @@ by a different agent. No page is re-read; the reads stand; only the recording
 authority changes. The ledger is never rewritten; both the withdrawn rows and
 the new rows remain appended in the consolidated keeper table.
 
+Gloss, plain English, for the three labels the sentence above uses: **K-074**
+is the 2026-10-12 full-page-acceptance row for
+`docs/roadmaps/behavioral-eval-runner-backlog.md`; **K-075** is the
+2026-10-12 full-page-acceptance row for `docs/delivery-workflow.md`;
+**CARRY-WITH-DEVIATION** is the SD-D2 coordinator's recorded 2026-10-12 ruling
+that those two rows stand with their unmet second eligibility clause declared
+rather than hidden.
+
 ## Binding method
 
 - Every **acceptance revision** is the exact reviewed head the lane rows bound: e2a3e20b7c20ef8385b219b39c6405237163406f.
 - Every **Blob ID** equals `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>`, recomputed at authoring
-  time, never transcribed. One recorded value is corrected: lane D's withdrawn
-  K-097 row carried a 38-hex blob (9c5b58990d7e3d649fb60bcf6b7355a1cccaea5b); the
-  recomputed 40-hex value is 9c5b58990d7e3d649fb60bcf6b7355a1cccaea5b, recorded in
-  both the withdrawal row and the fresh row for that page.
+  time, never transcribed. All 32 lane-recorded blobs were re-derived and
+  compared: **all 32 match**, so nothing was corrected. Measured by command at
+  PR #774's head (370bc8db), lane D's withdrawn K-097 row's blob cell is the
+  40-hex `9c5b58990d7e3d649fb60bcf6b7355a1cccaea5b`, equal to
+  `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md`.
+  (An earlier draft claimed a 38-hex correction here; that claim is withdrawn
+  — the commit-message record is corrected by the ledger's appended entry.)
 - Every **quote** below is the lane row's quote transcribed verbatim from the
   lane batch record named with it. The fresh rows cite this file as their
   evidence source because the lane batch records are not yet on the default
@@ -35,6 +46,22 @@ the new rows remain appended in the consolidated keeper table.
   here byte-for-byte and the originating batch record is named per block.
 - Every **withdrawal row quote** is the `WD-<lane><n> withdraws ...` line below,
   which the build-time quote check finds verbatim in this file.
+
+## Stable-id choice - audited against every open pull request
+
+The fresh rows sit at lane A K-098..K-105, lane B K-189..K-196, lane C
+**K-297..K-304** and lane D K-389..K-396 (withdrawal ids K-082W..K-089W,
+K-181W..K-188W, K-281W..K-288W and K-381W..K-388W). The first draft placed
+lane C at K-289..K-296; those ids are the stable ids of open PR #779 (lane C
+batch 2, head d1de3296), which records eight different pages there, so the
+lane C fresh rows were moved above them. Every id in the final set was
+audited by command against every open PR (#770-#783) and against main: each
+open PR head's consolidated table was diffed against the table at the base
+`e2a3e20b7c20ef8385b219b39c6405237163406f`, its newly introduced stable ids were extracted, and the
+intersection with this PR's ids is empty for all thirteen other open PRs and
+for main. The lane C withdrawal ids stay K-281W..K-288W: they mirror the
+renumbered position (K-281..K-288) of the rows they cancel and still sort
+before the fresh rows.
 
 ## The 32 pages (one block per withdrawn row)
 
@@ -198,7 +225,7 @@ the new rows remain appended in the consolidated keeper table.
 - Withdrawal row quote (AEGIS-APR-117): WD-B8 withdraws K-089 (readability-lane-b-implementer-c): B1-8 accepted: .claude/skills/frontend-perf-engineer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Fresh row: K-196, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
 
-### WD-C1 - lane C, withdrawn row K-082 (#776), fresh row K-289
+### WD-C1 - lane C, withdrawn row K-082 (#776), fresh row K-297
 
 - Page: .claude/skills/skill-deprecation-planner/SKILL.md
 - Original keeper (accepting reviewer agent): readability-lane-c-implementer-c
@@ -206,9 +233,9 @@ the new rows remain appended in the consolidated keeper table.
 - Blob ID, recomputed at authoring time with `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/skill-deprecation-planner/SKILL.md` (never transcribed): 22cf10be2f3b4dff3b727288700dea2b1a6861e8
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md (in #776, not on the default branch at authoring time): C1-1 accepted: .claude/skills/skill-deprecation-planner/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-C1 withdraws K-082 (readability-lane-c-implementer-c): C1-1 accepted: .claude/skills/skill-deprecation-planner/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-- Fresh row: K-289, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
+- Fresh row: K-297, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
 
-### WD-C2 - lane C, withdrawn row K-083 (#776), fresh row K-290
+### WD-C2 - lane C, withdrawn row K-083 (#776), fresh row K-298
 
 - Page: .claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md
 - Original keeper (accepting reviewer agent): readability-lane-c-implementer-c
@@ -216,9 +243,9 @@ the new rows remain appended in the consolidated keeper table.
 - Blob ID, recomputed at authoring time with `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md` (never transcribed): e3fa656bdbffb99d661e3c9e0b5fff27fedefa34
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md (in #776, not on the default branch at authoring time): C1-2 accepted: .claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-C2 withdraws K-083 (readability-lane-c-implementer-c): C1-2 accepted: .claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-- Fresh row: K-290, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
+- Fresh row: K-298, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
 
-### WD-C3 - lane C, withdrawn row K-084 (#776), fresh row K-291
+### WD-C3 - lane C, withdrawn row K-084 (#776), fresh row K-299
 
 - Page: .claude/skills/skill-quality-reviewer/SKILL.md
 - Original keeper (accepting reviewer agent): readability-lane-c-implementer-c
@@ -226,9 +253,9 @@ the new rows remain appended in the consolidated keeper table.
 - Blob ID, recomputed at authoring time with `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/skill-quality-reviewer/SKILL.md` (never transcribed): 48230d027c5e8580419efc596fae3cad96896f65
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md (in #776, not on the default branch at authoring time): C1-3 accepted: .claude/skills/skill-quality-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-C3 withdraws K-084 (readability-lane-c-implementer-c): C1-3 accepted: .claude/skills/skill-quality-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-- Fresh row: K-291, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
+- Fresh row: K-299, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
 
-### WD-C4 - lane C, withdrawn row K-085 (#776), fresh row K-292
+### WD-C4 - lane C, withdrawn row K-085 (#776), fresh row K-300
 
 - Page: .claude/skills/skill-quality-reviewer/references/quality-review-checklist.md
 - Original keeper (accepting reviewer agent): readability-lane-c-implementer-c
@@ -236,9 +263,9 @@ the new rows remain appended in the consolidated keeper table.
 - Blob ID, recomputed at authoring time with `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/skill-quality-reviewer/references/quality-review-checklist.md` (never transcribed): 9e5a912a2be5fc3ab1036dc40591c275ad247dff
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md (in #776, not on the default branch at authoring time): C1-4 accepted: .claude/skills/skill-quality-reviewer/references/quality-review-checklist.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-C4 withdraws K-085 (readability-lane-c-implementer-c): C1-4 accepted: .claude/skills/skill-quality-reviewer/references/quality-review-checklist.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-- Fresh row: K-292, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
+- Fresh row: K-300, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
 
-### WD-C5 - lane C, withdrawn row K-086 (#776), fresh row K-293
+### WD-C5 - lane C, withdrawn row K-086 (#776), fresh row K-301
 
 - Page: .claude/skills/skill-usage-instrumenter/SKILL.md
 - Original keeper (accepting reviewer agent): readability-lane-c-implementer-c
@@ -246,9 +273,9 @@ the new rows remain appended in the consolidated keeper table.
 - Blob ID, recomputed at authoring time with `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/skill-usage-instrumenter/SKILL.md` (never transcribed): fcc886160b3ca4d15d3fd6e757b113dcfcf00f5b
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md (in #776, not on the default branch at authoring time): C1-5 accepted: .claude/skills/skill-usage-instrumenter/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-C5 withdraws K-086 (readability-lane-c-implementer-c): C1-5 accepted: .claude/skills/skill-usage-instrumenter/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-- Fresh row: K-293, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
+- Fresh row: K-301, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
 
-### WD-C6 - lane C, withdrawn row K-087 (#776), fresh row K-294
+### WD-C6 - lane C, withdrawn row K-087 (#776), fresh row K-302
 
 - Page: .claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md
 - Original keeper (accepting reviewer agent): readability-lane-c-implementer-c
@@ -256,9 +283,9 @@ the new rows remain appended in the consolidated keeper table.
 - Blob ID, recomputed at authoring time with `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md` (never transcribed): 54b4bec5f9a1b125f1c097d759ba12dc7e803d60
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md (in #776, not on the default branch at authoring time): C1-6 accepted: .claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-C6 withdraws K-087 (readability-lane-c-implementer-c): C1-6 accepted: .claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-- Fresh row: K-294, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
+- Fresh row: K-302, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
 
-### WD-C7 - lane C, withdrawn row K-088 (#776), fresh row K-295
+### WD-C7 - lane C, withdrawn row K-088 (#776), fresh row K-303
 
 - Page: .claude/skills/skill-usage-ledger/SKILL.md
 - Original keeper (accepting reviewer agent): readability-lane-c-implementer-c
@@ -266,9 +293,9 @@ the new rows remain appended in the consolidated keeper table.
 - Blob ID, recomputed at authoring time with `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/skill-usage-ledger/SKILL.md` (never transcribed): 594220d9701f964700030e1408a61b022f86b869
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md (in #776, not on the default branch at authoring time): C1-7 accepted: .claude/skills/skill-usage-ledger/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-C7 withdraws K-088 (readability-lane-c-implementer-c): C1-7 accepted: .claude/skills/skill-usage-ledger/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-- Fresh row: K-295, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
+- Fresh row: K-303, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
 
-### WD-C8 - lane C, withdrawn row K-089 (#776), fresh row K-296
+### WD-C8 - lane C, withdrawn row K-089 (#776), fresh row K-304
 
 - Page: .claude/skills/slo-reliability-architect/SKILL.md
 - Original keeper (accepting reviewer agent): readability-lane-c-implementer-c
@@ -276,7 +303,7 @@ the new rows remain appended in the consolidated keeper table.
 - Blob ID, recomputed at authoring time with `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/slo-reliability-architect/SKILL.md` (never transcribed): 74ced9ed454753657e2f8f0de3648a08f22b9fa9
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md (in #776, not on the default branch at authoring time): C1-8 accepted: .claude/skills/slo-reliability-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-C8 withdraws K-089 (readability-lane-c-implementer-c): C1-8 accepted: .claude/skills/slo-reliability-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-- Fresh row: K-296, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
+- Fresh row: K-304, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
 
 ### WD-D1 - lane D, withdrawn row K-090 (#774), fresh row K-389
 
@@ -357,4 +384,3 @@ the new rows remain appended in the consolidated keeper table.
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md (in #774, not on the default branch at authoring time): LD-8 accepted: docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-D8 withdraws K-097 (readability-phase4-lane-d-implementer-c): LD-8 accepted: docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Fresh row: K-396, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
-
