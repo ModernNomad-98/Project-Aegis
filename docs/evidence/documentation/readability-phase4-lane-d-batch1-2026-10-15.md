@@ -134,8 +134,9 @@ request" in full (LD-6 L10, LD-7 L9). The one identifier not glossed on its page
 LD-2, LD-3 and LD-4 are headed records with disposition tables; LD-5, LD-7 and LD-8 use headed
 sections and lists; concrete worked content sits on LD-5 (the `git revert` and `A..B`
 explanations, L31-49) — a dated evidence note's concrete content is its recorded work, not an
-abstract component. **(d) Shipped behaviour separated from proposed or blocked behaviour.** LD-1/LD-2
-close with "Exact-head Actions and merge remain delivery gates"; LD-3 states no page was edited and
+abstract component. **(d) Shipped behaviour separated from proposed or blocked behaviour.** LD-1
+closes with "Exact-head Actions and merge remain outstanding." (L68); LD-2 closes with
+"Exact-head GitHub Actions and merge remain delivery gates." (L41); LD-3 states no page was edited and
 the acceptance binds to the reviewed head (L45-47); LD-4 states the batch "does not accept the other
 tracked Markdown files... or grant execution authority" (L50-53); LD-5 states "This note does not
 claim that any revert or live incident operation was run" (L49-50); LD-6 "The edits clarify historical
@@ -235,7 +236,7 @@ reordered or deleted no existing keeper row; bound no acceptance row to the lane
 ran no `build_index.py --write` and rebuilt no `tools/` artifact; touched no page outside the
 lane's stated range; and claims no authority beyond recording under AEGIS-APR-101 (the ledger-
 keeper recording role) and the standing backlog delivery grant AEGIS-APR-039. The batching
-procedure "does not grant provider, private-input,
+procedure does "not mark earlier screens as full-page acceptance or grant provider, private-input,
 real-host or deployment authority" (ledger L3018-3020).
 
 ## 13. Skills used (this lane, Stage C)
@@ -299,16 +300,67 @@ commands behind them:**
    or after t"), the per-page depth and mechanical table (391 lines, 30 local links, 6 resolving 40-hex
    SHAs, 3 external links not fetched), the six merge-SHA subjects, the section 10 quote strings
    (verbatim in the eight appended ledger rows), and the eight row blob IDs (each 40 hex, each equal to
-   `git rev-parse e2a3e20b:<page>`) — all unchanged and correct, so nothing else was edited.
+   `git rev-parse e2a3e20b:<page>`) — all unchanged and correct, so nothing else was edited in the
+   first round. **Narrowed by the Stage D REVISE (second round):** that re-verification missed two
+   quotations — the section 6(d) LD-1/LD-2 closing-phrase quotation and the section 12
+   batching-procedure quotation — which the second round found wrong; both are corrected at the
+   lane's third head in the second-round note below, and nothing else was edited there either.
 
 **Keeper rows.** This repair authors no keeper row and withdraws none. The withdrawal of the same-agent
 rows K-090..K-097 (the keeper-table row IDs this lane appended) and their re-recording by a separate
 eligible keeper is **PR #781**'s scope (its record is
 `docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md`, the
-AEGIS-APR-117 route the owner directed on 2026-10-15).
+AEGIS-APR-117 route (the grant that lets the ledger keeper append withdrawal rows) the owner
+directed on 2026-10-15).
 
 *Repair drafted by **DeepSeek v4 Pro** (`deepseek-v4-pro`), the Stage D repairing agent, under the owner
 account, as the repository's 2026-10-13 attribution rule requires.*
+
+## 16. Stage D REVISE repair note, second round (2026-10-15)
+
+The Stage D audit's second round returned **REVISE** on this pull request with three further P3
+citation/gloss errors inside this record. All three are repaired in place at this lane's third head
+(the record is still unmerged, so in-place repair remains allowed). **The three corrections, with
+the commands behind them:**
+
+1. **Section 6(d) closing-phrase quotation.** The record said LD-1/LD-2 close with "Exact-head
+   Actions and merge remain delivery gates". That string is verbatim on neither page, verified with
+   `git show e2a3e20b:<page>` and substring checks: LD-1 L68 closes "Exact-head Actions and merge
+   remain outstanding." and the phrase "delivery gates" occurs nowhere in LD-1, while LD-2 L41
+   closes "Exact-head GitHub Actions and merge remain delivery gates." — the record had omitted the
+   word GitHub. Section 6(d) now quotes each page's actual closing phrase separately, each with its
+   own line cite (LD-1 L68, LD-2 L41).
+2. **Section 12 batching-procedure quotation.** The record quoted "does not grant provider,
+   private-input, real-host or deployment authority" (ledger L3018-3020), eliding material without
+   an ellipsis. At `e2a3e20b` L3018-3020 reads "This batching procedure is a work plan. It does not
+   mark earlier screens as full-page acceptance or grant provider, private-input, real-host or
+   deployment authority." — verified with `git show
+   e2a3e20b:docs/roadmaps/aegis-documentation-readability-backlog.md`. The record now quotes the
+   contiguous fragment "not mark earlier screens as full-page acceptance or grant provider,
+   private-input, real-host or deployment authority". The ledger's own pre-existing dated sections
+   (L4746, L4910) quote the elided form identically; they are dated sections the no-rewrite
+   discipline protects, and they are **not** edited.
+3. **The AEGIS-APR-117 label.** The keeper-rows paragraph named "the AEGIS-APR-117 route" without a
+   plain-English description. It now reads AEGIS-APR-117 (the grant that lets the ledger keeper
+   append withdrawal rows) — the same gloss the pull-request body carries and the register's own
+   heading states ("The ledger keeper may append withdrawal rows after the switch",
+   `docs/approvals/APPROVAL_REGISTER.md` L5016 at the base).
+4. **Base note (recorded, not repaired):** `origin/main` has moved since the lane's derivation
+   base `e2a3e20b` (the PR #769 merge). It is now `7abb98eb88ec3253521ab4ff5418d225413bd193`
+   (the PR #770 merge, "docs/apr-137-phase1-transcription"). The lane's base binding and every
+   figure in this record are unchanged, and the branch's own two files stay insert-only against the
+   base (`git diff --numstat e2a3e20b HEAD`: 316/0 record, 59/0 ledger, 0 deleted lines). Against
+   the moved main the same diff carries 190 deleted lines in three files
+   (APPROVAL_REGISTER.md 137, delivery-workflow.md 24, open-decisions 29) — all of them main-side
+   additions from PR #770, none written by this lane; reconciling that divergence is the merger's
+   decision, not this repair's.
+
+**Keeper rows.** This second-round repair authors no keeper row and withdraws none — the same
+statement the first-round note makes, restated for the third head: the withdrawal of K-090..K-097
+and their re-recording by a separate eligible keeper remain **PR #781**'s scope.
+
+*Repair drafted by **DeepSeek v4 Pro** (`deepseek-v4-pro`), the Stage D repairing agent (second
+round), under the owner account, as the repository's 2026-10-13 attribution rule requires.*
 
 ---
 
