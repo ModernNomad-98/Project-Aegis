@@ -262,7 +262,7 @@ the skills-manifest hashes.
 skill@08d91a834460beebc9c66fa896b8b422f064bf1d7524f6e5b1512cda3afdc996 / reason: classify before writing, the class decides the tier and review path / applied: classified docs-only before any write / result: docs-only tier asserted in the PR body with the file set / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
 skill@c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 / reason: the acceptance contract's six bullets are criteria and were checked one by one / applied: each bullet per page with line cites in section 6 / result: 8/8 accepted unchanged / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
 skill@b5fd9feda97235430259913aedd33447ab06e1c0ded281e9e131fa6bf9b78be2 / reason: four page items needed resolution against the repo, not the page's prose / applied: observations O-1..O-4 sourced to repo artifacts / result: all four dispositioned unchanged / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
-skill@a74d2a22579cf93f737725aa0c54197b5d496a9f33a291a93c2cf2073cd7d076 / reason: recording requires knowing which grant covers what / applied: read AEGIS-APR-039, -101, -113..-118, -125, -129 at the base / result: recording-only under APR-101; no grant consumed, extended or requested / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
+skill@a74d2a22579cf93f737725aa0c54197b5d496a9f33a291a93c2cf2073cd7d076 / reason: recording requires knowing which grant covers what / applied: read AEGIS-APR-039, -101, -113..-118, -125, -129 at the base (register entries; one-line descriptions in section 17) / result: recording-only under APR-101; no grant consumed, extended or requested / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
 skill@141b7036469f9f99ef6b8e152299619a6d0ab572656a5ba307062551d311d8a5 / reason: a new page may owe a retention entry / applied: checked for a retention registry and per-doc frontmatter practice / result: none exists for this directory; no retention change needed, recorded not skipped / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
 skill@6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 / reason: the repository requires the skills-used record where a reader can see it / applied: emitted this six-field block bound to the manifest hashes / result: record present in this file and mirrored in the PR body's skills field / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
 ```
@@ -360,6 +360,61 @@ statement the first-round note makes, restated for the third head: the withdrawa
 and their re-recording by a separate eligible keeper remain **PR #781**'s scope.
 
 *Repair drafted by **DeepSeek v4 Pro** (`deepseek-v4-pro`), the Stage D repairing agent (second
+round), under the owner account, as the repository's 2026-10-13 attribution rule requires.*
+
+## 17. Stage D REVISE repair note, third round (2026-10-15)
+
+The Stage D audit's third round returned **REVISE** on this pull request with two P3 findings in the
+citation/gloss class — one against the pull-request body, one inside this record. Both are repaired
+at this lane's fourth head (the record is still unmerged, so in-place repair remains allowed). **The
+corrections, with the commands behind them:**
+
+1. **Stale sibling-lane attribution (body).** The pull-request body said at three sites that lanes A
+   and B had "already pushed their first batches with rows K-082..K-089 (PR #771 and PR #772)". That
+   was stale: lane B (PR #772) renumbered its rows from K-082..K-089 into the lane-B band
+   **K-181..K-188** at commit `a94dc5ea2f996f47cdaeb10f8995d8f68e232950` (2026-10-15 13:53:52 -0700,
+   "docs(readability): renumber PR 772 keeper rows into lane B band K-181..K-188"), before this body
+   was last revised. Measured by command, not memory:
+   `git show refs/pull/772/head:docs/roadmaps/aegis-documentation-readability-backlog.md` — lane B's
+   file now carries the eight rows K-181..K-188 and holds no K-082..K-089 rows; lane A (PR #771, head
+   `f6a4e4189ecfbe874f97ec9b6b09bf8fe14f49ad`, 2026-10-15 13:53:50 -0700) still holds K-082..K-089.
+   This lane's own band **K-090..K-097** was re-checked against both sibling heads with the same
+   command at 2026-10-15T15:07:40-07:00 and collides with neither (no K-090..K-097 row in either
+   sibling file). All three body sites were corrected, and the body now carries a frozen
+   sibling-PR observation note (the facts, the revision each was true at, and the observation time)
+   instead of a live claim.
+2. **Bare register ID (body and record).** The body's moved-main note named "(the PR #770 merge,
+   APR-137)" without a plain-English gloss; the body now carries the register's gloss beside the ID:
+   "AEGIS-APR-137: Readability index program - resume ratified, historical backfill approved, and
+   the sweep reaffirmed to zero pending" (the register's heading at main
+   `7abb98eb88ec3253521ab4ff5418d225413bd193`). This record's `scoped-approval-register` ledger row
+   named the register entries AEGIS-APR-039, -101, -113..-118, -125, -129 with no descriptions; they
+   are register entries read at the base, and their one-line register headings (each read from
+   `docs/approvals/APPROVAL_REGISTER.md` at `e2a3e20b`) are:
+   - **AEGIS-APR-039:** Reaffirmation of ongoing backlog delivery approval
+   - **AEGIS-APR-101:** Ledger keeper role and two historical recording acts
+   - **AEGIS-APR-113:** Readability pending-count authority (Option 1)
+   - **AEGIS-APR-114:** Work and merge terms for the readability count program
+   - **AEGIS-APR-115:** Standing approval for index-rebuild pull requests after the switch
+   - **AEGIS-APR-116:** The ledger keeper may record targeted reviews in the acceptance record table
+   - **AEGIS-APR-117:** The ledger keeper may append withdrawal rows after the switch
+   - **AEGIS-APR-118:** Security classification of the readability acceptance tool
+   - **AEGIS-APR-125:** AEGIS-APR-114 CONSUMED — the index-repair switch merged
+   - **AEGIS-APR-129:** The lighter review path for pure-docs pull requests (2026-10-12)
+3. **Bound-field digest (body).** The body's witness bound field is corrected (one of the three
+   corrected body sites sits inside it), so the bound-field digest changed: the published figure was
+   `1b72bdbbee456702` and the new figure over the corrected three fields is stated in the body's
+   digest line (which sits outside all three bound fields, so stating it changes nothing). A digest
+   change with a stated reason is correct; one without is the failure mode.
+4. **Systemic note (body).** The body now states which sibling-PR facts it asserts, the revision at
+   which each was true, and that they may have moved since — frozen with the observation time, the
+   same treatment this body already gives a moved main.
+
+**Keeper rows.** This third-round repair authors no keeper row and withdraws none — the same
+statement the first two rounds make, restated for the fourth head: the withdrawal of K-090..K-097
+and their re-recording by a separate eligible keeper remain **PR #781**'s scope.
+
+*Repair drafted by **DeepSeek v4 Pro** (`deepseek-v4-pro`), the Stage D repairing agent (third
 round), under the owner account, as the repository's 2026-10-13 attribution rule requires.*
 
 ---
