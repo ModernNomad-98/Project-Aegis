@@ -5111,6 +5111,50 @@ six lost-commit rows' cells, rebuilds no `tools/` artifact, runs no
 authority. The batching procedure does not grant provider, private-input,
 real-host or deployment authority (L3018-3020).
 
+
+
+## Ledger-keeper recording + batch update — Phase 4 re-read lane C, batch 2, 2026-10-15
+
+**Under AEGIS-APR-101 (recording only).** This note records Phase 4 re-read lane C, batch 2 — paths
+9–16 of lane C's quarter of the pending set. It is additions only: it rewrites no dated text, edits
+no existing keeper row, and **confers nothing**. Its tracked evidence source is [the batch
+record](../evidence/documentation/readability-lane-c-batch-2-2026-10-15.md), which names every
+row's full 40-character acceptance revision verbatim.
+
+**What was read.** Eight pages — sorted indices 304–311 of the 590-path pending list at
+`e2a3e20b7c20ef8385b219b39c6405237163406f`, the next eight of lane C's command-derived quarter:
+`.claude/skills/slo-reliability-architect/references/slo-derivation.md`,
+`.claude/skills/soc2-trust-criteria-mapper/SKILL.md` and its `references/tsc-scoping-map.md`,
+`.claude/skills/source-currency-auditor/SKILL.md` and its `references/currency-audit-sheet.md`,
+`.claude/skills/source-of-truth-reconciler/SKILL.md` and its
+`references/conflict-resolution-examples.md`, and `.claude/skills/staff-scope-selector/SKILL.md` —
+all read **whole, line by line, as prose**, at the bound revision, and all **accepted unchanged**:
+zero pages corrected, zero lines edited, zero partial six-bullet dispositions this batch. The
+per-page dispositions, the read ranges, the display-elision statement (none occurred) and the
+offline verification of every link, blob ID and named skill are in the batch record.
+
+**The keeper condition and the APR-117 route, stated not hidden.** For K-289…K-296 the reviewer
+cell and the writer of the record the rows rest on are the same agent
+(`readability-lane-c-implementer-c`, batch 2). This note does **not** claim the AEGIS-APR-101 keeper
+independence condition is satisfied. The owner's ruling (decision 3 of 2026-10-15) directs the
+**AEGIS-APR-117 route**: the same-agent rows are **withdrawn and re-recorded by a different agent
+from the same evidence — no page needs re-reading.** The disposition is the merge holder's.
+
+**Keeper-ID offset, stated not hidden.** The rows are authored K-289…K-296 — the first eight ids of
+lane C's allocated band K-281–K-380 that remain free after batch 1's eight rows (authored
+K-082…K-089) are renumbered into the band by the merge holder. The merge holder may renumber these
+rows within the band; the `Blob ID` column must survive any renumber unchanged (recompute and
+confirm).
+
+**Count honesty (unchanged; no count of this lane's own).** This ledger publishes no count of its
+own and cites the index (D84). The eight rows above change nothing until a rebuild, and a rebuild
+can only be run after the commit that carries the rows; the batch record predicts no post-rebuild
+figure.
+
+**What this note does not do.** It rewrites no dated snapshot, reorders or deletes no existing row,
+binds no row to this lane's unmerged head, edits none of the eight read pages, rebuilds no
+`tools/` artifact, and confers no authority. The batching procedure "does not grant provider,
+private-input, real-host or deployment authority" (L3018-3020).
 <!-- acceptance-index-schema: 1 -->
 
 ## Consolidated keeper table — index schema v1 (D84, 2026-10-10)
@@ -5233,3 +5277,11 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-079 | docs/approvals/APPROVAL_REGISTER.md | full-page-acceptance | c80c8d2d553671579e878584914eae695028eab4 | 548e80efdc630eb04a9b41839c608b4928b4bc2a | K-079 accepted: docs/approvals/APPROVAL_REGISTER.md read whole at c80c8d2d553671579e878584914eae695028eab4 | readability-final3-implementer-c | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | 2026-10-12 |
 | K-080 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | b44d47c9a10cde4c62d6fdae52bf577e04242a50 | K-080 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | readability-ledger-reader-c | docs/evidence/documentation/readability-ledger-reread-2026-10-13.md | 2026-10-13 |
 | K-081 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | ba522f133d05624c2130f15eb8ef3b6329b0f37a | 5928d98534e95a79e2ffbcc2065d38602dd98b0f | K-081 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at ba522f133d05624c2130f15eb8ef3b6329b0f37a | ledger-selfcost-stagec-c | docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md | 2026-10-13 |
+| K-289 | .claude/skills/slo-reliability-architect/references/slo-derivation.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | ca3aaef3cb5a7bd388f10510a5e9397db2155a96 | C2-1 accepted: .claude/skills/slo-reliability-architect/references/slo-derivation.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-2-2026-10-15.md | 2026-10-15 |
+| K-290 | .claude/skills/soc2-trust-criteria-mapper/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 108108eaf1d20e0b40a30d1b54663817b50aca01 | C2-2 accepted: .claude/skills/soc2-trust-criteria-mapper/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-2-2026-10-15.md | 2026-10-15 |
+| K-291 | .claude/skills/soc2-trust-criteria-mapper/references/tsc-scoping-map.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 259b579d9413ca37276b7195f0951d22f9527193 | C2-3 accepted: .claude/skills/soc2-trust-criteria-mapper/references/tsc-scoping-map.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-2-2026-10-15.md | 2026-10-15 |
+| K-292 | .claude/skills/source-currency-auditor/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 1f5bb4f9fe41a94d6b58bf202ad02a20826c8945 | C2-4 accepted: .claude/skills/source-currency-auditor/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-2-2026-10-15.md | 2026-10-15 |
+| K-293 | .claude/skills/source-currency-auditor/references/currency-audit-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 3bde1ca58cb7f861496d86431b829899350e6aa7 | C2-5 accepted: .claude/skills/source-currency-auditor/references/currency-audit-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-2-2026-10-15.md | 2026-10-15 |
+| K-294 | .claude/skills/source-of-truth-reconciler/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 763db236af399f9524cdd5033650ba7030d21b35 | C2-6 accepted: .claude/skills/source-of-truth-reconciler/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-2-2026-10-15.md | 2026-10-15 |
+| K-295 | .claude/skills/source-of-truth-reconciler/references/conflict-resolution-examples.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | f37223718a08214ae1ae1fbca13f6076f054f774 | C2-7 accepted: .claude/skills/source-of-truth-reconciler/references/conflict-resolution-examples.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-2-2026-10-15.md | 2026-10-15 |
+| K-296 | .claude/skills/staff-scope-selector/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 4508a953e0223d96c506aecc124173f265e4e533 | C2-8 accepted: .claude/skills/staff-scope-selector/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-2-2026-10-15.md | 2026-10-15 |
