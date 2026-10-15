@@ -10,10 +10,23 @@
 - **What this page is.** The lane's tracked batch record. It is the **evidence source** from which
   a **separate, eligible keeper** records the acceptance rows for the eight pages, under the
   **AEGIS-APR-117** route (owner decision 3 of 2026-10-15, recorded in
-  `OWNER-DECISIONS-2026-10-15.md`; also the 2026-10-15 routing ruling's per-lane fix list):
+  `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`, read at PR #786 head
+  `08856b64e1e74d065e7d3af3b366917a0d13f13d` — that pull request is **not yet merged**, so this
+  path does not exist on `main` today and becomes the mergeable path once #786 lands):
   the reader and the row-recorder are different agents, and **no page needs re-reading**. **This
   lane authors no keeper row and edits no ledger line** — the deliverable is this evidence record
   only. Every read below names the full 40-character acceptance revision verbatim.
+- **Citation note (Stage D repair of this record).** Owner decision 3 of 2026-10-15 (the
+  AEGIS-APR-117 withdrawal-and-re-record route) and the keeper-ID band allocation are both
+  recorded in `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` (S2 and S4), read at PR #786 head
+  `08856b64e1e74d065e7d3af3b366917a0d13f13d`, which is **not yet merged** — the path exists only
+  on #786's branch today and becomes the mergeable path when #786 lands. The 2026-10-15 routing
+  ruling itself (the disposition of the six `cannot_decide` pages) is recorded in S5 of that
+  same file. The ruling's **per-lane fix list** — cited by earlier drafts of this record as "fix
+  item 4" and "fix item 5" — is **not recorded in any repository file**: measured by grep at the
+  bound base `e2a3e20b7c20ef8385b219b39c6405237163406f`, at `origin/main` (`7abb98eb`) and at PR
+  #786's head. This record therefore states those two points plainly instead of citing the list
+  (section 2, the 148/148/148/146 split; section 3, the undefined-term rule).
 - **Acceptance revision bound by all eight reads of this batch:**
   `e2a3e20b7c20ef8385b219b39c6405237163406f`
   That revision resolves to itself and is contained in `refs/remotes/origin/main`
@@ -62,8 +75,10 @@ measurement.
   is sorted indices 296–443** (0-based): first
   `.claude/skills/skill-deprecation-planner/SKILL.md`, last
   `docs/evidence/documentation/full-page-readability-batch-after-231-2026-09-24.md`. (The
-  2026-10-15 routing ruling's fix item 4 names this split — 590 paths cannot form four 148-path
-  quarters — and this lane states it: **148/148/148/146**.)
+  590 paths cannot form four 148-path quarters, and this lane states its measured split:
+  **148/148/148/146**. The 2026-10-15 routing ruling's per-lane fix list, cited by earlier
+  drafts for this point, is not recorded in any repository file — see the header's citation
+  note.)
 - **The six `cannot_decide` (lost-commit) pages are in no lane** — each carries a lost-commit row
   in the acceptance index, so none is in the two-bucket pending union at all. They are:
   `.claude/skills/cloud-security-baseline-reviewer/references/aws-baseline.md`,
@@ -97,7 +112,7 @@ measurement.
 Line counts measured by `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` per page, 2026-10-15, and reproduced by the
 read tool's own line numbers in section 4.
 
-## 3. Per-page dispositions — 8 of 8 read whole; 5 full acceptances, 3 honest partials
+## 3. Per-page dispositions — 8 of 8 read whole; 4 full acceptances, 4 honest partials
 
 Every page below was read **whole, line by line, as prose**, at
 `e2a3e20b7c20ef8385b219b39c6405237163406f` against
@@ -114,26 +129,29 @@ measure; this record is the first recorded read for each page.
 | C3-4 | `.claude/skills/statement-of-applicability-author/SKILL.md` | none | **read whole — accepted unchanged (full)** |
 | C3-5 | `.claude/skills/statement-of-applicability-author/assets/soa-template.md` | none | **read whole — PARTIAL acceptance (first-use gap, page property)** |
 | C3-6 | `.claude/skills/static-analysis-reviewer/SKILL.md` | none | **read whole — PARTIAL acceptance (first-use gap, page property)** |
-| C3-7 | `.claude/skills/static-analysis-reviewer/references/triage-rubric.md` | none | **read whole — accepted unchanged (full)** |
+| C3-7 | `.claude/skills/static-analysis-reviewer/references/triage-rubric.md` | none | **read whole — PARTIAL acceptance (first-use gap, page property)** |
 | C3-8 | `.claude/skills/streaming-event-architect/SKILL.md` | none | **read whole — PARTIAL acceptance (first-use gap, page property)** |
 
 **Zero pages were corrected; zero lines of any read page were edited by this lane; no new section
-was added to any page**, so no page owes anything under the targeted-edit rule. **Three of the
+was added to any page**, so no page owes anything under the targeted-edit rule. **Four of the
 eight dispositions are partial, recorded honestly rather than forced green** — an undefined term
-used before its definition is not a full acceptance (the 2026-10-15 routing ruling's per-lane fix
-item 5):
+used before its definition is not a full acceptance. (This record states that rule itself: the
+2026-10-15 routing ruling's per-lane fix list, cited by earlier drafts for it, is **not recorded
+in any repository file** — see the citation note in the header block.)
 
 1. **C3-5 `.../statement-of-applicability-author/assets/soa-template.md`** — bullet 2
    (abbreviations at first use): `ISMS-AIMS` (L10), the clause number `6.1.3` (L16, "the 6.1.3
-   trace source" — not glossed here), `CC-id` (L26) and the annex-status word `normative`
-   (L51, L57–58) are used before definition within the page. The page is consumed through the
+   trace source" — not glossed here), `CC-id` (L26), the annex-status word `normative`
+   (L51, L56, L58), `ISO/IEC` (L4, L11) and the standard designations `27001:2022` (L4, L11, L51)
+   / `42001:2023` (L4, L11, L56) are used before definition within the page. The page is consumed through the
    parent skill's step 2 (which routes readers to this template), and the parent's reading key
    expands ISMS/AIMS and glosses 6.1.3 as the risk-treatment clause — but the page itself neither
    expands these terms nor declares itself the parent's companion (its title says "— template").
    The gap is a page property; this lane edits nothing.
 2. **C3-6 `.claude/skills/static-analysis-reviewer/SKILL.md`** — bullet 2: the terms block
    (L20–23) expands SAST, SARIF, CVE, TP and FP, but `SaaS` (L58, L124), `PII` (L58),
-   `sink` (L64) and `SQL` / `XSS` / `ORM` (L151–152) are used before definition. The
+   `sink` (L64), `CI` (L3, L33, L174) and `SQL` / `XSS` / `ORM` (L151–152) are used before
+   definition. The
    companion reference `triage-rubric.md` expands PII/SaaS/SQL/ORM/XSS in its own first-use
    block (its L5–7), but this page neither expands them nor points the reader there for them.
    Page property; this lane edits nothing.
@@ -143,11 +161,19 @@ item 5):
    assumption") is used without definition. (`idempotency` is glossed by its mechanism at
    L112–114 and `backpressure` by its behavior at L142–143 — observation-level, not gaps.)
    Page property; this lane edits nothing.
+4. **C3-7 `.claude/skills/static-analysis-reviewer/references/triage-rubric.md`** — bullet 2: the
+   terms block (L5–7) expands PII, SaaS, SQL, ORM, XSS and FP, but `sink` (L22, L62) and `authz`
+   (L80) are used before definition. This is the same `sink` term the parent SKILL.md (C3-6)
+   uses unexpanded at its own L64 — the first-use gap sits in both pages. Page property; this
+   lane edits nothing.
 
 **No keeper row is authored anywhere in this batch** — no row ID, no ledger append, no
-`build_index.py` run of any kind. The three partials therefore cannot lower the official count
+`build_index.py` run of any kind. The four partials therefore cannot lower the official count
 through a structurally-valid-but-ineligible row; the separate eligible keeper records every row
-from this evidence under **AEGIS-APR-117**, and the partial pages are recorded as partial there.
+from this evidence under **AEGIS-APR-117** (owner decision 3 of 2026-10-15, recorded in
+`docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` — path and read-head SHA in the header's citation
+note), and the partial pages are recorded as partial there — **C3-7 must be recorded as partial,
+never as a full-page acceptance.**
 
 **Concurrency:** one reader (`readability-lane-c-implementer-c`, batch 3), inside the
 three-reader ceiling the batching procedure allows.
@@ -158,16 +184,19 @@ three-reader ceiling the batching procedure allows.
    authored keeper rows and drew the 2026-10-15 P1 finding for it (the reader also recording the
    rows, contrary to **AEGIS-APR-101**, the register entry that established the ledger-keeper
    role and its different-agent condition). Under owner decision 3 of 2026-10-15 (the
-   **AEGIS-APR-117** route) the rows are withdrawn and re-recorded by a **different agent from
+   **AEGIS-APR-117** route, recorded in `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` — path and
+   read-head SHA in the header's citation note) the rows are withdrawn and re-recorded by a **different agent from
    the same evidence — no page needs re-reading**. This record is that evidence. The lane does
    not claim the keeper-independence condition for itself because it authors no rows at all; the
    keeper's recording is a separate agent's act.
 2. **No display elision occurred.** Every one of the eight files was returned whole by the read
    tool, and no line of any file exceeded the display cap: measured per page with
-   `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>`, the longest line across all eight pages is 1,038 characters
-   (C3-8), under the 2,000-character cap. Nothing to repair; no byte of any page was left
-   unread.
-3. **Three partial dispositions are recorded instead of full acceptances.** Each names the exact
+   `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>`, the longest line across all eight pages is 1,038 bytes /
+   1,032 characters (C3-8), under the 2,000-character display cap. **The no-elision conclusion
+   holds under both metrics** — the larger of the two figures (the byte count) is still under the
+   cap. Both metrics were measured per page; C3-1, C3-2, C3-3 and C3-7 are ASCII-only, where the
+   two metrics coincide. Nothing to repair; no byte of any page was left unread.
+3. **Four partial dispositions are recorded instead of full acceptances.** Each names the exact
    lines and terms (section 3). These are page properties — the lane edited nothing — and the
    dispositions stay honest rather than inflating the accepted set.
 
@@ -192,7 +221,7 @@ returned whole in one call, so each union below is trivially the whole page, wit
 | Bullet | C3-1 `.claude/skills/staff-scope-selector/references/staff-scope-sheet.md` |
 | --- | --- |
 | Purpose and audience up front | **yes.** L1-8 names the file, states its Use with the parent skill ("Use this reference with the Staff Scope Selector"), and defines "staff" (L5-6) before the body. |
-| Abbreviations and coded identifiers defined at first use | **yes.** No abbreviation or lifecycle/status code appears; "staff" is defined at L5-6 before first body use. The provenance label "Larson/Cutler-style" (L10) names the origin authors of the archetype taxonomy and is not a lifecycle/status code; comprehension of the page does not depend on it (observation, not a gap). |
+| Abbreviations and coded identifiers defined at first use | **yes.** No lifecycle/status code appears; the abbreviation `org` (L17, L26) is used unexpanded and is recorded as an observation. "staff" is defined at L5-6 before first body use. The provenance label "Larson/Cutler-style" (L10) names the origin authors of the archetype taxonomy and is not a lifecycle/status code; comprehension of the page does not depend on it (observation, not a gap). |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes.** Five headed sections; two worked tables (archetypes, traps); the scope-rationale block is a complete fill-in format with a concrete skeleton. |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes.** The page claims no shipped system behaviour; the trap fixes are advice ("Pick boring-high-impact over exciting-low-impact"), and the rationale template is explicitly a format to fill in. |
 | Navigation links current and every referenced file or command existing | **yes.** 1 Markdown link (`../SKILL.md`) — exists at the bound revision (section 5); no external links, no in-page anchors; the page names no runnable command. |
@@ -230,7 +259,7 @@ edited by this lane.
 | Abbreviations and coded identifiers defined at first use | **yes.** The reading key (L9-11) expands PR and CI before the first body use; no other unexplained coded identifier appears — the backtick-named skills all exist, "Repo A"/"Repo B" are explained at L28-31, and "open-PR-and-STOP" is defined in context (L113-116). |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes.** Eight numbered workflow steps; the Output Format is a complete worked template; the merge-profile choice brief requirement (L121-127) and the reviewer-block step are concrete. |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes.** The skill drafts policy for human adoption — "delivered as a DRAFT for human adoption, not enacted by this skill" (L179); the provenance paragraph is marked "history, not the requirements this skill states" (L25); Stop Conditions refuse enacting without human adoption and refuse default-on merge. |
-| Navigation links current and every referenced file or command existing | **yes.** 3 Markdown link occurrences over 2 distinct targets, all existing at the bound revision (section 5); no external links, no in-page anchors; the six backtick-named skills exist; the one quoted command (`gh pr view <n> --json autoMergeRequest`, L202) is a real gh subcommand. |
+| Navigation links current and every referenced file or command existing | **yes.** 3 Markdown link occurrences over 2 distinct targets, all existing at the bound revision (section 5); no external links, no in-page anchors; the six backtick-named skills exist; the one quoted command (`gh pr view <n> --json autoMergeRequest`, L201) is a real gh subcommand. |
 | The non-author review itself | **this record**, with the staffing deviation in section 3 declared in terms |
 
 **Purpose and normal use restated from the page alone:**
@@ -282,7 +311,7 @@ edited by this lane.
 ### 4.4 C3-4 — `.claude/skills/statement-of-applicability-author/SKILL.md`, read whole, accepted (full)
 
 1. **Ranges.** One slice: **L1-216** (the whole file at the bound revision). No elision; longest
-   line 1,023 characters.
+   line 1,023 bytes / 1,019 characters.
 2. **Every line was read as prose** — the frontmatter description, the reading key, Purpose, Use
    When with its Do-NOT-use counter-examples, Inputs to Inspect, the seven-step Workflow with
    its two decision briefs, the Output Format template, Validation Checklist, Compliance
@@ -296,7 +325,7 @@ edited by this lane.
 | Bullet | C3-4 `.claude/skills/statement-of-applicability-author/SKILL.md` |
 | --- | --- |
 | Purpose and audience up front | **yes.** L8-12 expands ISO, IEC, SOC 2, AICPA, ISMS and AIMS before the body; L14-28 states what the skill produces (the Statement of Applicability tying every Annex A control to an inclusion/exclusion justification through the 6.1.3 risk-treatment process) and its controlled-document discipline. Use When addresses the reader directly. |
-| Abbreviations and coded identifiers defined at first use | **yes.** The reading key expands the six terms above before first body use; "6.1.3" is paired with "risk-treatment process" at every occurrence (frontmatter, L19, L36-37, L52-53, L161-162) and the Compliance Precision Rules direct verifying the clause wording against the licensed standard; "Annex A" is glossed by each standard's normative annex titles (L21-23); SoA is expanded at L16. Observation: the clause pair "6.1.2/6.1.4" (L55) names its subject ("AI risk and impact assessments") in the same sentence. |
+| Abbreviations and coded identifiers defined at first use | **yes.** The reading key expands the six terms above before first body use; "6.1.3" is paired with "risk-treatment process" at every occurrence except L183 (frontmatter, L19, L36-37, L52-53, L161-162 pair it; L183 — "for YOUR 6.1.3 trace" — has no pairing) and the Compliance Precision Rules direct verifying the clause wording against the licensed standard; "Annex A" is glossed by each standard's normative annex titles (L21-23); SoA is expanded at L16. Observation: the clause pair "6.1.2/6.1.4" (L55) names its subject ("AI risk and impact assessments") in the same sentence. |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes.** Seven workflow steps including two worked decision briefs (document format, per-control applicability); the Output Format is a complete worked template; the justification and exclusion patterns are concrete. |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes.** The SoA "never asserts that the organization 'is certified' or 'will pass'" (L170-172); pending rows are draft-only; updates to an existing SoA are diffs, never replacements; Stop Conditions refuse reconstructing Annex A from memory and refuse in-place rewrites. |
 | Navigation links current and every referenced file or command existing | **yes.** 2 Markdown link occurrences over 1 target (`assets/soa-template.md`) — exists at the bound revision (section 5); no external links, no in-page anchors; all ten backtick-named skills exist. |
@@ -317,7 +346,7 @@ edited by this lane.
 ### 4.5 C3-5 — `.claude/skills/statement-of-applicability-author/assets/soa-template.md`, read whole, PARTIAL acceptance (first-use gap, page property)
 
 1. **Ranges.** One slice: **L1-62** (the whole file at the bound revision). No elision; longest
-   line 337 characters.
+   line 337 bytes / 335 characters.
 2. **Every line was read as prose** — the controlled-document statement, the header block, the
    row template, the pending-state note, the justification patterns, and the per-standard notes.
 3. **Links** checked mechanically: the page carries **zero Markdown links** (the row template
@@ -330,7 +359,7 @@ edited by this lane.
 | Bullet | C3-5 `.claude/skills/statement-of-applicability-author/assets/soa-template.md` |
 | --- | --- |
 | Purpose and audience up front | **yes.** L1-5 names the document (the SoA template), its controlled-document nature, and the licensed-Annex-A seeding rule before the blocks. |
-| Abbreviations and coded identifiers defined at first use | **PARTIAL.** Within the page, `ISMS-AIMS` (L10), the clause number `6.1.3` (L16, "the 6.1.3 trace source" — not glossed here), `CC-id` (L26) and the annex-status word `normative` (L51, L57-58) are used before definition. The parent skill's reading key expands ISMS/AIMS and glosses 6.1.3, and its step 2 routes readers to this template — but this page itself neither expands them nor declares itself the parent's companion (the title says "— template"). The gap is a page property; this lane edits nothing. |
+| Abbreviations and coded identifiers defined at first use | **PARTIAL.** Within the page, `ISMS-AIMS` (L10), the clause number `6.1.3` (L16, "the 6.1.3 trace source" — not glossed here), `CC-id` (L26), the annex-status word `normative` (L51, L56, L58), `ISO/IEC` (L4, L11) and the standard designations `27001:2022` (L4, L11, L51) / `42001:2023` (L4, L11, L56) are used before definition. The parent skill's reading key expands ISMS/AIMS and glosses 6.1.3, and its step 2 routes readers to this template — but this page itself neither expands them nor declares itself the parent's companion (the title says "— template"). The gap is a page property; this lane edits nothing. |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes.** Header block, row template, three-part exclusion test, per-standard notes; the row template and both inclusion patterns are concrete fill-in patterns. |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes.** "Draft state: incomplete while any applicability decision is pending" (L18) and "pending risk-owner decision is a draft-only state, not an exclusion" (L29-32) separate draft from final; nothing claims a shipped document. |
 | Navigation links current and every referenced file or command existing | **yes.** 0 Markdown links — nothing to resolve; no external links; no in-page anchors; the two inline-named skills exist at the bound revision. |
@@ -351,7 +380,7 @@ named line by line above; no line of the page was edited by this lane.
 ### 4.6 C3-6 — `.claude/skills/static-analysis-reviewer/SKILL.md`, read whole, PARTIAL acceptance (first-use gap, page property)
 
 1. **Ranges.** One slice: **L1-185** (the whole file at the bound revision). No elision; longest
-   line 927 characters.
+   line 927 bytes / 925 characters.
 2. **Every line was read as prose** — the frontmatter description, the terms block, Purpose, Use
    When with its Do-NOT-use counter-examples, Inputs to Inspect, the eight-step Workflow, the
    Output Format template, Validation Checklist, Security Rules, Gotchas, Stop Conditions and
@@ -366,7 +395,7 @@ named line by line above; no line of the page was edited by this lane.
 | Bullet | C3-6 `.claude/skills/static-analysis-reviewer/SKILL.md` |
 | --- | --- |
 | Purpose and audience up front | **yes.** L8-18 states what the skill turns scanner output into (a short, trustworthy, prioritized remediation list with a suppression policy) and its boundary ("A scanner hit is a lead, not a verdict"). Use When addresses the reader directly. |
-| Abbreviations and coded identifiers defined at first use | **PARTIAL.** The terms block (L20-23) expands SAST, SARIF, CVE, TP and FP, but `SaaS` (L58, L124), `PII` (L58), `sink` (L64) and `SQL` / `XSS` / `ORM` (L151-152) are used before definition. The companion reference `triage-rubric.md` expands PII/SaaS/SQL/ORM/XSS in its own first-use block (its L5-7), but this page neither expands them nor points the reader there for them. Page property; this lane edits nothing. |
+| Abbreviations and coded identifiers defined at first use | **PARTIAL.** The terms block (L20-23) expands SAST, SARIF, CVE, TP and FP, but `SaaS` (L58, L124), `PII` (L58), `sink` (L64), `CI` (L3, L33, L174) and `SQL` / `XSS` / `ORM` (L151-152) are used before definition. The companion reference `triage-rubric.md` expands PII/SaaS/SQL/ORM/XSS in its own first-use block (its L5-7), but this page neither expands them nor points the reader there for them. Page property; this lane edits nothing. |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes.** Eight numbered workflow steps; the Output Format is a worked template with a disposition legend; Gotchas carry worked illustrations (the ORM auto-parameterization example, L151-153; the test-file reachability note, L154-156). |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes.** The Security Rules separate scanner input from truth ("Scanner output is input, not truth", L134-135), require written rationale for every suppression, require a human sign-off for accepted risk, and state fixes are handed off, not applied here (L91-92, L130). |
 | Navigation links current and every referenced file or command existing | **yes.** 3 Markdown link occurrences over 2 targets, all existing at the bound revision (section 5); no external links, no in-page anchors; all nine backtick-named skills exist. |
@@ -385,7 +414,7 @@ named line by line above; no line of the page was edited by this lane.
 **Disputed lines: none.** The partial is a first-use-definition gap in the page's own bytes,
 named line by line above; no line of the page was edited by this lane.
 
-### 4.7 C3-7 — `.claude/skills/static-analysis-reviewer/references/triage-rubric.md`, read whole, accepted (full)
+### 4.7 C3-7 — `.claude/skills/static-analysis-reviewer/references/triage-rubric.md`, read whole, PARTIAL acceptance (first-use gap, page property)
 
 1. **Ranges.** One slice: **L1-82** (the whole file at the bound revision). No elision; longest
    line 115 characters.
@@ -402,11 +431,11 @@ named line by line above; no line of the page was edited by this lane.
 | Bullet | C3-7 `.claude/skills/static-analysis-reviewer/references/triage-rubric.md` |
 | --- | --- |
 | Purpose and audience up front | **yes.** L1-10 names the file, states its Use with the parent skill, and states the progressive-disclosure relationship. |
-| Abbreviations and coded identifiers defined at first use | **yes.** PII, SaaS, SQL, ORM, XSS and FP are expanded at L5-7 before the first body use; "True positive" is spelled out in the dispositions table (TP's expansion); `escapeHtml()` (L22) is a code example inside a quoted rationale. Observation: this reference expands the very terms (PII, SaaS, SQL, ORM, XSS) its parent SKILL.md (C3-6) uses unexpanded — the first-use gap is in the parent, not here. |
+| Abbreviations and coded identifiers defined at first use | **PARTIAL.** PII, SaaS, SQL, ORM, XSS and FP are expanded at L5-7 before the first body use, and "True positive" is spelled out in the dispositions table (TP's expansion); but `sink` (L22 — the quoted-rationale example; L62 — the deduplication rule) and `authz` (L80 — the scope-honesty note) are used before definition and appear in no term block. Observation: this reference expands the very terms (PII, SaaS, SQL, ORM, XSS) its parent SKILL.md (C3-6) uses unexpanded; `sink` is a first-use gap in **both** pages (C3-6's own L64 and this page's L22/L62). The gap is a page property; this lane edits nothing. |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes.** The dispositions table is a worked catalogue with required evidence; the ranking axes carry worked orderings; the false-positive patterns table maps rule classes to confirmation checks. |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes.** The rubric classifies findings; the Scope honesty section states triage is not a full security review and routes deeper needs onward; no shipped behaviour is claimed. |
 | Navigation links current and every referenced file or command existing | **yes.** 1 Markdown link (`../SKILL.md`) — exists at the bound revision; no external links; no in-page anchors; the four named skills exist. |
-| The non-author review itself | **this record**, with the staffing deviation in section 3 declared in terms |
+| The non-author review itself | **this record**, with the partial disposition recorded honestly in section 3 |
 
 **Purpose and normal use restated from the page alone:**
 
@@ -417,12 +446,12 @@ named line by line above; no line of the page was edited by this lane.
   the parent SKILL.md while triaging, assign each disposition from the table, rank true
   positives on the five axes, and write every suppression in the format — changing nothing.
 
-**Disputed lines: none.**
+**Disputed lines: none.** The partial is a first-use-definition gap in the page's own bytes, named line by line above; no line of the page was edited by this lane.
 
 ### 4.8 C3-8 — `.claude/skills/streaming-event-architect/SKILL.md`, read whole, PARTIAL acceptance (first-use gap, page property)
 
 1. **Ranges.** One slice: **L1-252** (the whole file at the bound revision). No elision; longest
-   line 1,038 characters.
+   line 1,038 bytes / 1,032 characters.
 2. **Every line was read as prose** — the frontmatter description, the terms block, Purpose, Use
    When with its Do-NOT-use counter-examples, Inputs to Inspect, the ten-step Workflow, the
    Output Format guarantee-card template, Validation Checklist, Gotchas, Stop Conditions and
@@ -464,7 +493,7 @@ named line by line above; no line of the page was edited by this lane.
 | 2 | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` × 8 | blob IDs: C3-1 `99cf2d355035a200232b5a2853dca15f69262959`, C3-2 `4384a420d531ff1cabf8ff370cc99fbbf8e79843`, C3-3 `8e503e9cc2118d53ba1dfc3065fdfece6690682f`, C3-4 `0e642f0c07f6439007bd6430c38d3caa544ae4a3`, C3-5 `cd7e251cf7c0e2d2f3a40c53f2ee0ba2a2320fb2`, C3-6 `c91ef954c3dce3df1be9e45e9c66dcb7cf041b6d`, C3-7 `6e069157d27e5b6cbceb8b148a84526938d8e8c6`, C3-8 `ca0fcc8d296233f854b7ef48952d45b45d045391` (computed by command, not transcribed) |
 | 3 | `git cat-file -e e2a3e20b7c20ef8385b219b39c6405237163406f:<target>` over every link target of the 8 pages | 13 link occurrences over 9 distinct resolved targets — all EXISTS |
 | 4 | `git cat-file -e e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/<name>/SKILL.md` over every backtick-named skill in the 8 pages | 41 backtick occurrences checked, 0 missing (plus the 2 inline-named skills of C3-5, both existing) |
-| 5 | `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` × 8 | line/byte/longest-line counts in sections 2 and 4 reproduced; longest line across all eight pages 1,038 (C3-8) |
+| 5 | `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` × 8 | line/byte/longest-line counts in sections 2 and 4 reproduced (UTF-8 byte counts and character counts measured per page, both reported in section 4); longest line across all eight pages 1,038 bytes / 1,032 characters (C3-8) |
 | 6 | `python -B scripts/validate-skills.py` | exit 0: `OK: 205 skill(s) valid, 0 warning(s)` |
 | 7 | `python -B scripts/ci/check-markdown-links.py <8 pages>` | exit 0: `files: 8   links checked: 13   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0` |
 | 8 | per-path check against `tools/readability_acceptance/acceptance-index.json` `reader_pages` | all 8 paths absent (pending, as derived) |
@@ -502,13 +531,15 @@ which is why the pull request answers the security question `No`. The eight read
 
 ## 7. Named follow-ups
 
-1. **Keeper recording — the AEGIS-APR-117 route (owner decision 3 of 2026-10-15).** A
-   **separate, eligible keeper** records the acceptance rows for the eight pages **from this
-   evidence record**; the reader and the recorder are different agents, and **no page needs
-   re-reading**. This lane authors no row, allocates no row ID, and edits no ledger line. The
-   three partial pages (C3-5, C3-6, C3-8) are to be recorded **as partial** there — a partial
-   disposition must not be transcribed into a full acceptance row.
-2. **The three first-use-definition gaps are page properties, named line by line in section 3.**
+1. **Keeper recording — the AEGIS-APR-117 route (owner decision 3 of 2026-10-15, recorded in
+   `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` — path and read-head SHA in the header's
+   citation note).** A **separate, eligible keeper** records the acceptance rows for the eight
+   pages **from this evidence record**; the reader and the recorder are different agents, and
+   **no page needs re-reading**. This lane authors no row, allocates no row ID, and edits no
+   ledger line. The four partial pages (C3-5, C3-6, C3-7, C3-8) are to be recorded **as
+   partial** there — **the keeper must record C3-7 as partial, never as a full-page
+   acceptance** — a partial disposition must not be transcribed into a full acceptance row.
+2. **The four first-use-definition gaps are page properties, named line by line in section 3.**
    Any fix is for the pages' maintainers, under the ordinary correction path; this lane edits
    nothing and does not decide the fix.
 3. **No page-own follow-up remains undischarged at the bound revision for the eight pages.**
@@ -542,7 +573,7 @@ C3-3 full: .claude/skills/standing-approval-and-auto-advance/references/standing
 C3-4 full: .claude/skills/statement-of-applicability-author/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 C3-5 partial (first-use gap, section 3): .claude/skills/statement-of-applicability-author/assets/soa-template.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 C3-6 partial (first-use gap, section 3): .claude/skills/static-analysis-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-C3-7 full: .claude/skills/static-analysis-reviewer/references/triage-rubric.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+C3-7 partial (first-use gap, section 3): .claude/skills/static-analysis-reviewer/references/triage-rubric.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 C3-8 partial (first-use gap, section 3): .claude/skills/streaming-event-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 ```
 
@@ -568,9 +599,9 @@ repository's own instruments provide (`scripts/validate-skills.py`,
 
 ## Footer
 
-sha256: 8c94c065849d1489ba4ec75f61a9ad9c828070f03bb3769a8152e7a05c97ca82
+sha256: cbe73ad31ad997cd98375ebf3c9c7e8b16e5fc6a15b26faff8693382bd6556e9
 
-This digest covers every byte of this file strictly above the last `## Footer` heading - the whole
-batch record through the closing `---` rule line and its terminating newline, encoded UTF-8 with LF
-line endings. It does not cover this footer. Any edit above the rule voids the digest and requires a
-fresh validation.
+This digest covers the batch record's bytes from the first line through the closing `---` rule line
+and its terminating newline, encoded UTF-8 with LF line endings. It does not cover the blank
+separator line between that rule and the `## Footer` heading, and it does not cover this footer.
+Any edit above the rule voids the digest and requires a fresh validation.
