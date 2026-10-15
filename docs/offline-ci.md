@@ -56,8 +56,8 @@ protection is unchanged.
 | `validate-skills` on Ubuntu | CI recorder/guard regressions, validator, audit and link-checker self-tests, skill validation, BER self-check and full suite, PowerShell Core Scenario A acceptance, pull-request-only Developer Certificate of Origin (DCO) check, the Markdown link checker over the repository's own tracked pages (the corpus step, with its 600-path floor), and the pull-request body bound-field check (`Run PR-body bound-field checker self-tests` plus `pr-body-skills-check`) | Existing required check | 15 minutes |
 | `windows-offline-checks` on Windows | Recorder regressions, validator, audit and link-checker self-tests, skill validation, BER self-check and full suite, sequential PowerShell Desktop 5.1 and Core acceptance | Additional visible coverage; not registered as required | 20 minutes |
 | `gate-guard` on Ubuntu | Detect changes to the merge gate and its enforcement surfaces | Existing required check; PR only | 5 minutes |
-| `tools-tests-linux` on Ubuntu | Host-bridge Node callback tests, setup routing-contract suite, delivery-control suite | Isolated from the gates; not registered as required | 15 minutes |
-| `tools-tests-windows` on Windows | The same three suites, plus a read-only ownership diagnostic (token user, default owner, elevation, temp-root owners) recorded before the delivery-control suite | Isolated from the gates; not registered as required | 20 minutes |
+| `tools-tests-linux` on Ubuntu | Host-bridge Node callback tests, setup routing-contract suite, delivery-control suite, readability-acceptance suite | Isolated from the gates; not registered as required | 15 minutes |
+| `tools-tests-windows` on Windows | The same four suites, plus a read-only ownership diagnostic (token user, default owner, elevation, temp-root owners) recorded before the delivery-control suite | Isolated from the gates; not registered as required | 20 minutes |
 
 The two verification jobs run independently, without cross-platform fail-fast,
 automatic retries, quarantine or `continue-on-error`. A delivery closeout waits
@@ -74,8 +74,8 @@ pinned dependencies. PR files outside that set are read only as
 data, for example skills checked by the validator. Test code that a pull
 request can change without tripping `gate-guard` runs in the separate
 `tools-tests-linux` and `tools-tests-windows` jobs instead. That covers the
-host-bridge Node tests, `tools/aegis_setup/tests` and
-`tools/aegis_delivery_control/tests`. A step in a gate job could write to
+host-bridge Node tests, `tools/aegis_setup/tests`,
+`tools/aegis_delivery_control/tests` and `tools/readability_acceptance/tests`. A step in a gate job could write to
 `$GITHUB_ENV` or `$GITHUB_PATH`, or rewrite a gate script before it runs, and
 make a failing gate pass. A separate job shares no runner, environment file,
 `PATH` or checkout with the gates, so this code cannot reach them.

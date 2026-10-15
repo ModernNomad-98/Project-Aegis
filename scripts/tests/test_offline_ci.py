@@ -387,9 +387,11 @@ class GateJobIsolationTests(unittest.TestCase):
     GATE_JOBS = ("validate-skills", "windows-offline-checks")
     TOOLS_JOBS = ("tools-tests-linux", "tools-tests-windows")
     TOOLS_LABELS = {
-        "tools-tests-linux": ["setup-bridge", "setup-tests", "delivery-control"],
+        "tools-tests-linux": ["setup-bridge", "setup-tests", "delivery-control",
+                              "readability-tests"],
         "tools-tests-windows": ["setup-bridge", "setup-tests",
-                                "delivery-control-diagnostic", "delivery-control"],
+                                "delivery-control-diagnostic", "delivery-control",
+                                "readability-tests"],
     }
 
     @classmethod
