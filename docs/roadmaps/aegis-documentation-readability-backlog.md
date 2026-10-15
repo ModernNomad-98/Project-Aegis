@@ -5111,6 +5111,200 @@ six lost-commit rows' cells, rebuilds no `tools/` artifact, runs no
 authority. The batching procedure does not grant provider, private-input,
 real-host or deployment authority (L3018-3020).
 
+## Ledger-keeper AEGIS-APR-117 withdrawal and re-record - Phase 4 re-read lanes A-D, first batches, 2026-10-15
+
+The ledger keeper records under AEGIS-APR-101 (its unchanged recording-only
+role) and AEGIS-APR-117 (withdrawal rows). The four Phase 4 re-read lanes
+recorded their first batches - 32 keeper rows total - with a declared
+deviation: each lane's one agent both read the pages and wrote the keeper
+rows, so the APR-101 condition ("the keeper must be a different agent from
+the page's author and accepting reviewer") is **not satisfied** and the rows
+are **not green**. The owner declined to ratify the carry (the
+K-074/K-075-style CARRY-WITH-DEVIATION precedent is not extended) and
+directed this route instead (owner decision 3, 2026-10-15): append
+AEGIS-APR-117 withdrawal rows that cancel the 32 rows, then append fresh
+keeper rows for the same pages from the same evidence, recorded by a
+different agent. **No page is re-read; the reads stand; for 29 of the 32
+pages only the recording authority changes. For three pages the VERDICT also
+changes: the lane records marked them PARTIAL** - lane A's P8
+(`.claude/skills/_template/SKILL.md`) and lane C's C1-3 and C1-4
+(`.claude/skills/skill-quality-reviewer/SKILL.md` and
+`.claude/skills/skill-quality-reviewer/references/quality-review-checklist.md`)
+- so no full-page-acceptance row is recorded for them here. The ledger's
+fixed-format contract names four event kinds - `full-page-acceptance`,
+`targeted-review`, `withdrawal` and `lost-commit` - and has **no
+partial-acceptance kind**, so those three pages keep only their withdrawal
+rows and stay **pending**: an honest gap, stated plainly, beats a false
+acceptance. The withdrawn rows remain appended (the ledger is never
+rewritten); the 29 pages with fresh rows return from pending when those rows
+take over - the builder takes the highest stable id per page, so each such
+page's latest event is the fresh acceptance - and the three partial pages
+carry no acceptance row.
+
+**The PARTIAL rule - a design gap in the revision cycle, now stated.** The
+APR-117 keeper was instructed to re-record rows from the lane evidence; it
+was **never instructed that a lane-marked PARTIAL must stay partial**, so the
+first draft recorded three fresh full-page-acceptance rows (K-105, K-299,
+K-300) for pages whose lane verdicts are partial. That is a gap in the keeper
+brief, not carelessness in the lanes. The rule is now explicit: **a page a
+lane marked PARTIAL is never recorded as a full-page-acceptance.** Lane B's
+own handoff already said this - "the keeper must not copy a partial quote
+into a full-page-acceptance row" - but the keeper brief did not. (The handoff
+is a coordinator workspace artifact; this repair could not verify the quote
+in any fetched ref and relays it exactly as the Stage D REVISE instruction
+quotes it.)
+
+**Gloss, plain English, for the labels named above.** K-074 is the
+2026-10-12 full-page-acceptance row for
+`docs/roadmaps/behavioral-eval-runner-backlog.md`; K-075 is the 2026-10-12
+full-page-acceptance row for `docs/delivery-workflow.md`;
+CARRY-WITH-DEVIATION is the SD-D2 coordinator's recorded 2026-10-12 ruling
+that those two rows stand with their unmet second eligibility clause
+declared rather than hidden.
+
+**Withdrawn rows and fresh rows appended to the consolidated table:**
+
+| Lane | Lane PR | Withdrawn rows (as authored) | Withdrawal row ids | Fresh row ids (allocated band) | First / last page |
+| --- | --- | --- | --- | --- | --- |
+| A | #771 | K-082..K-089 | K-082W..K-089W | K-098..K-104 (band K-082..K-180) | .claude/agents/ai-security-red-team-reviewer.md / .claude/agents/senior-troubleshooting-lead.md |
+| B | #772 | K-082..K-089 | K-181W..K-188W | K-189..K-196 (band K-181..K-280) | .claude/skills/file-upload-storage-architect/SKILL.md / .claude/skills/frontend-perf-engineer/SKILL.md |
+| C | #776 | K-082..K-089 | K-281W..K-288W | K-297..K-298, K-301..K-304 (band K-281..K-380) | .claude/skills/skill-deprecation-planner/SKILL.md / .claude/skills/slo-reliability-architect/SKILL.md |
+| D | #774 | K-090..K-097 | K-381W..K-388W | K-389..K-396 (band K-381..K-480) | docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md / docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md |
+
+**Why the fresh ids sit where they do - and the open-PR audit.** The allocation bands are lane A
+K-082..K-180, lane B K-181..K-280, lane C K-281..K-380, lane D K-381..K-480,
+and the merge protocol renumbers each lane's rows into its band at merge
+(lane A's K-082..K-089 stay; lane B's become K-181..K-188; lane C's
+K-281..K-288; lane D's batch-1 rows move into band D). Every id this section
+appends was audited by command against every open pull request and against
+main, not just against the base table: each open PR head's consolidated table
+was diffed against the table at `e2a3e20b7c20ef8385b219b39c6405237163406f`, its newly introduced
+stable ids were extracted, and the intersection with this PR's ids is empty.
+**The audit was re-run on 2026-10-15 at the then-current heads** (the open-PR
+set has drifted since authoring: #770 has merged, #784 and #785 are now open,
+and #774 and #782 have moved heads) with the same command procedure, and the
+intersection is **still empty** for every other PR and for main: #771
+K-082..K-089 (head f6a4e418), #772 K-181..K-188 (a94dc5ea), #774 K-090..K-097
+(8ee87116), #776 K-082..K-089 (aa88923f), #777 K-090..K-097 (05ad7607), #778
+K-381..K-388 (7dcef8fc), #779 K-289..K-296 (d1de3296), #780 K-181..K-188
+(78af4ef2); #770 (7bd11623), #773, #775, #782 (27ee6291), #783, #784 and #785
+introduce none, and main (7abb98eb) has introduced none of its own. The first
+draft put lane C's fresh rows at K-289..K-296; that band is the stable-id
+band of open PR #779 (lane C batch 2, head d1de3296), which records eight
+different pages there, so merging that draft after #779 would raise a
+duplicate-stable-ID error and stop the merge sequence. The lane C fresh rows
+are therefore recorded at **K-297..K-298 and K-301..K-304** - the first free
+ids of lane C's band above every id an open PR claims; K-299 and K-300 are
+deliberately left unused because the two pages they would cover carry lane
+PARTIAL verdicts and get no fresh row (the PARTIAL rule above). The other
+bands collide with nothing open: lane A K-098..K-104 (above #771's and #777's
+claims; K-105 is left unused for the same PARTIAL reason - lane A's P8),
+lane B K-189..K-196 (between #772's band position K-181..K-188 and the merge
+position #780's rows would take if renumbered - an earlier draft asserted
+that position as K-197..K-204, corrected below because no fetched ref names
+it), lane D K-389..K-396 (above #778's K-381..K-388; the merge holder's
+renumber of #774 batch 1 into band D must avoid both #778's rows and these
+rows, and the KEEPER-ID-ALLOCATION.md file #778 and #780 cite exists in no
+fetched ref at authoring time). The withdrawn rows stay in the table forever,
+so the
+fresh rows start after the band positions the withdrawn rows will occupy; the
+withdrawal ids mirror those positions with a W suffix for the same reason (a
+withdrawal must sort after the row it cancels and before the fresh row that
+replaces it).
+
+**Recording authority.** This section and its rows are recorded by
+**DeepSeek V4 Pro** (deepseek-v4-pro-apr117-keeper, Stage C) - an agent that performed none of
+the four lanes' reads and authored none of the 32 pages. The accepting
+reviewers remain the lane agents named in the withdrawn rows; the keeper is
+a different agent from each page's author (the lanes' batch records list the
+authors; `git log -1 --format=%an -- <page>` names a human identity for
+every page) and from each accepting reviewer, so the APR-101 condition is
+satisfied for the 29 fresh rows recorded here.
+
+**Blob IDs recomputed, never transcribed.** Every blob ID in the appended
+rows equals `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` recomputed at authoring time. All 32
+lane-recorded blobs were re-derived and compared: **all 32 match**, so
+nothing was corrected. Measured by command at PR #774's head (370bc8db),
+lane D's K-097 row's blob cell is the 40-hex
+`9c5b58990d7e3d649fb60bcf6b7355a1cccaea5b`, equal to
+`git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md`.
+(The first commit's message claimed that row "had carried a 38-hex blob,
+corrected to the recomputed 40-hex value"; that claim is false and is
+withdrawn by the appended correction entry below - the message itself is not
+rewritten, because the bindings name the head it produced.)
+
+**Count honesty.** This edit changes this ledger by more than 10 lines, so
+the ledger page stays **pending** and owes its own independent full-page
+re-read. This PR records **29 fresh full-page-acceptance rows** and, for the
+three lane-marked PARTIAL pages, **no acceptance row** (the PARTIAL rule
+above). Measured by command at this PR's head with a fresh
+`build_index.py --write` and `check_index.py --json`: the instrument
+prints accepted_on_recorded_review **89** and official_pending_count **565** -
+the three partial pages stay inside the printed accepted bucket only because
+`check_index.py`'s code classifies each page's withdrawal row (their only
+row) as an acceptance at zero drift, although its own documented definition
+of that bucket requires a full-page-acceptance row. The ledger-honest figure
+- what the instrument would print if it honoured its documented definition -
+is **568 = 596 - 29 + 1** (base pending 596, 29 pages accepted by fresh rows,
++1 for the new evidence file, a new reader page with no acceptance row).
+Both figures are measured by command, not taken from the auditor's
+arithmetic; the disagreement between the printed figure and the ledger's own
+record is stated, not hidden.
+
+**Merge order expectation.** The four lane PRs merge first (serially, with
+the merge protocol's band renumbering), then this PR. Everything here is
+append-only: at the dated-section anchor and at the table tail, keep both
+sides, in the order lane A, lane B, lane C, lane D, then this section and
+its rows.
+
+**Correction appended 2026-10-15 - a withdrawn claim in the first commit's message, never rewritten.**
+The commit `eb6e72ce728288631d1de4280681df5788b79c53` carries the message "lane D's withdrawn K-097 row had
+carried a 38-hex blob, corrected to the recomputed 40-hex value". Measurement refutes that claim: the
+K-097 row PR #774 records has a blob cell of `9c5b58990d7e3d649fb60bcf6b7355a1cccaea5b` - **40 hex, not
+38** - and it equals
+`git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md`,
+so **all 32/32 lane-recorded blobs matched and nothing needed correcting**. The same commit's message
+names lane C's band as K-289..K-296, which the open-PR audit above found to duplicate open PR #779's
+stable ids; the correction commit records the lane C rows at K-297..K-304. The commit message is not
+rewritten - rewriting it would invalidate the bindings that name the head it produced - so this dated
+entry records the withdrawal instead. A dated record is never rewritten; it is corrected by appending.
+
+**Correction appended 2026-10-15 (repair round 3, Stage D REVISE) - the PARTIAL rule, three withdrawn fresh rows, the corrected count, and two disclosures.**
+The first repair head recorded K-105, K-299 and K-300 as full-page-acceptance
+rows for pages whose lane verdicts are **partial**: lane A's P8
+(`.claude/skills/_template/SKILL.md` - its B2 abbreviation bullet, recorded
+partial at lines 113, 118-122, 242, 305 and 321-325 of PR #771's record) and
+lane C's C1-3 and C1-4
+(`.claude/skills/skill-quality-reviewer/SKILL.md` and its
+`references/quality-review-checklist.md` - their B2 bullets, recorded
+partial at lines 130-136, 224, 255 and 455-457 of PR #776's record).
+Recording them as full-page acceptances laundered three partial verdicts into
+full acceptances. This correction removes those three fresh rows; the three
+withdrawal rows (K-089W, K-283W, K-284W) stay and cancel the lanes'
+ineligible rows, and the three pages keep no acceptance row and stay
+**pending**. The ledger's four event kinds have no partial kind, so the gap
+is stated plainly instead of forcing a full-page-acceptance. The sweep over
+the other 29 fresh rows found **no other lane-marked PARTIAL page** (lane A
+P1-P7 accepted; lane B B1-1..B1-8 accepted; lane C C1-1, C1-2, C1-5..C1-8
+accepted; lane D LD-1..LD-8 accepted) - a clean sweep. Two P3 disclosures
+land with this entry: (1) the earlier claim that "#780 renumbers to
+K-197..K-204 at its merge" is **not verifiable** - `git grep -n K-197
+origin/pr/780` returns nothing and #780's record says only that its rows are
+authored K-181..K-188 and defers any renumbering to the merge holder, so the
+claim is now recorded as a coordinator-stated plan, not as fact; (2) the
+open-PR stable-id audit was re-run at the drifted current heads (the audit
+note above) and the intersection remains empty, so the earlier id-collision
+repair still stands. Measured by command: `build_index.py --report` at this
+head reports table_rows **162** = 101 + 61, and `check_index.py --json` at
+this head prints accepted_on_recorded_review 89 and official_pending_count
+565 (the three partial pages remain in the printed accepted bucket only
+through their withdrawal rows - the instrument gap the Count honesty note
+above states); the ledger-honest figure is 568 = 596 - 29 + 1. The structural
+rule this correction makes explicit: **a page a lane marked PARTIAL is never
+recorded as a full-page-acceptance** - Lane B's handoff said this, the keeper
+brief did not (the handoff is a coordinator workspace artifact and the quote
+is relayed, not repo-verified). Recorded by **DeepSeek V4 Pro**
+(deepseek-v4-pro), Stage C repair round 3, under the owner account.
 <!-- acceptance-index-schema: 1 -->
 
 ## Consolidated keeper table — index schema v1 (D84, 2026-10-10)
@@ -5233,3 +5427,64 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-079 | docs/approvals/APPROVAL_REGISTER.md | full-page-acceptance | c80c8d2d553671579e878584914eae695028eab4 | 548e80efdc630eb04a9b41839c608b4928b4bc2a | K-079 accepted: docs/approvals/APPROVAL_REGISTER.md read whole at c80c8d2d553671579e878584914eae695028eab4 | readability-final3-implementer-c | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | 2026-10-12 |
 | K-080 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | b44d47c9a10cde4c62d6fdae52bf577e04242a50 | K-080 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | readability-ledger-reader-c | docs/evidence/documentation/readability-ledger-reread-2026-10-13.md | 2026-10-13 |
 | K-081 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | ba522f133d05624c2130f15eb8ef3b6329b0f37a | 5928d98534e95a79e2ffbcc2065d38602dd98b0f | K-081 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at ba522f133d05624c2130f15eb8ef3b6329b0f37a | ledger-selfcost-stagec-c | docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md | 2026-10-13 |
+| K-082W | .claude/agents/ai-security-red-team-reviewer.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 447d20b2083b5f07113061a7cbe6a1092e121357 | WD-A1 withdraws K-082 (readability-lane-a-implementer-c): P1 accepted: .claude/agents/ai-security-red-team-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-083W | .claude/agents/full-codebase-auditor.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | e15ffa02533e8e63a76bb5c1248e28d53b6f3a70 | WD-A2 withdraws K-083 (readability-lane-a-implementer-c): P2 accepted: .claude/agents/full-codebase-auditor.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-084W | .claude/agents/principal-architecture-reviewer.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 86ffeb6fd2ceac7e1b66068f3ee5373172a92846 | WD-A3 withdraws K-084 (readability-lane-a-implementer-c): P3 accepted: .claude/agents/principal-architecture-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-085W | .claude/agents/qa-automation-lead.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 34cd8c0e73cc89eb04d507b0039394831aee656f | WD-A4 withdraws K-085 (readability-lane-a-implementer-c): P4 accepted: .claude/agents/qa-automation-lead.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-086W | .claude/agents/release-readiness-reviewer.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | b54a9f5efc139b16578014a9b804c801b6132941 | WD-A5 withdraws K-086 (readability-lane-a-implementer-c): P5 accepted: .claude/agents/release-readiness-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-087W | .claude/agents/secure-saas-reviewer.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 490b57942a156f896457897a1aa45750594c8309 | WD-A6 withdraws K-087 (readability-lane-a-implementer-c): P6 accepted: .claude/agents/secure-saas-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-088W | .claude/agents/senior-troubleshooting-lead.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 6ae09b38b11ac0565384bdc864dcac6e19a82df7 | WD-A7 withdraws K-088 (readability-lane-a-implementer-c): P7 accepted: .claude/agents/senior-troubleshooting-lead.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-089W | .claude/skills/_template/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | de6d954b6040fff33122377b2f47b8b48106166b | WD-A8 withdraws K-089 (readability-lane-a-implementer-c): P8 accepted: .claude/skills/_template/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-098 | .claude/agents/ai-security-red-team-reviewer.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 447d20b2083b5f07113061a7cbe6a1092e121357 | P1 accepted: .claude/agents/ai-security-red-team-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-099 | .claude/agents/full-codebase-auditor.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | e15ffa02533e8e63a76bb5c1248e28d53b6f3a70 | P2 accepted: .claude/agents/full-codebase-auditor.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-100 | .claude/agents/principal-architecture-reviewer.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 86ffeb6fd2ceac7e1b66068f3ee5373172a92846 | P3 accepted: .claude/agents/principal-architecture-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-101 | .claude/agents/qa-automation-lead.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 34cd8c0e73cc89eb04d507b0039394831aee656f | P4 accepted: .claude/agents/qa-automation-lead.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-102 | .claude/agents/release-readiness-reviewer.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | b54a9f5efc139b16578014a9b804c801b6132941 | P5 accepted: .claude/agents/release-readiness-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-103 | .claude/agents/secure-saas-reviewer.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 490b57942a156f896457897a1aa45750594c8309 | P6 accepted: .claude/agents/secure-saas-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-104 | .claude/agents/senior-troubleshooting-lead.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 6ae09b38b11ac0565384bdc864dcac6e19a82df7 | P7 accepted: .claude/agents/senior-troubleshooting-lead.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-181W | .claude/skills/file-upload-storage-architect/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 5a527691661a5bffb53aaca26b1cd397e4843a10 | WD-B1 withdraws K-082 (readability-lane-b-implementer-c): B1-1 accepted: .claude/skills/file-upload-storage-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-182W | .claude/skills/flaky-test-detective/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | f5f340fc5c9235b5483ce1db8a4d2f6921c4e60c | WD-B2 withdraws K-083 (readability-lane-b-implementer-c): B1-2 accepted: .claude/skills/flaky-test-detective/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-183W | .claude/skills/flaky-test-detective/references/flake-taxonomy.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 0a8ca8cf6122feaa3bb483d5c76aaada738715ec | WD-B3 withdraws K-084 (readability-lane-b-implementer-c): B1-3 accepted: .claude/skills/flaky-test-detective/references/flake-taxonomy.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-184W | .claude/skills/framework-edition-tracker/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | a9d5b1f28ba71ab03fe3653144b4ac5759d91102 | WD-B4 withdraws K-085 (readability-lane-b-implementer-c): B1-4 accepted: .claude/skills/framework-edition-tracker/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-185W | .claude/skills/framework-edition-tracker/references/edition-tracking-sheet.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 0db64a054397abd29858b06029b3e48adc8a5e5a | WD-B5 withdraws K-086 (readability-lane-b-implementer-c): B1-5 accepted: .claude/skills/framework-edition-tracker/references/edition-tracking-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-186W | .claude/skills/framework-mapping-refresher/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 903f6166b46b0e1aa7fe272bd244a7e25a5a162e | WD-B6 withdraws K-087 (readability-lane-b-implementer-c): B1-6 accepted: .claude/skills/framework-mapping-refresher/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-187W | .claude/skills/framework-mapping-refresher/references/mapping-refresh-sheet.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 6c8e31d7c61dd26ef72ded2925ecaeb0042e7ab8 | WD-B7 withdraws K-088 (readability-lane-b-implementer-c): B1-7 accepted: .claude/skills/framework-mapping-refresher/references/mapping-refresh-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-188W | .claude/skills/frontend-perf-engineer/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | cdf145b28a4d8d1445b6483ac590f3573deea092 | WD-B8 withdraws K-089 (readability-lane-b-implementer-c): B1-8 accepted: .claude/skills/frontend-perf-engineer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-189 | .claude/skills/file-upload-storage-architect/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 5a527691661a5bffb53aaca26b1cd397e4843a10 | B1-1 accepted: .claude/skills/file-upload-storage-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-190 | .claude/skills/flaky-test-detective/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | f5f340fc5c9235b5483ce1db8a4d2f6921c4e60c | B1-2 accepted: .claude/skills/flaky-test-detective/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-191 | .claude/skills/flaky-test-detective/references/flake-taxonomy.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 0a8ca8cf6122feaa3bb483d5c76aaada738715ec | B1-3 accepted: .claude/skills/flaky-test-detective/references/flake-taxonomy.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-192 | .claude/skills/framework-edition-tracker/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | a9d5b1f28ba71ab03fe3653144b4ac5759d91102 | B1-4 accepted: .claude/skills/framework-edition-tracker/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-193 | .claude/skills/framework-edition-tracker/references/edition-tracking-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 0db64a054397abd29858b06029b3e48adc8a5e5a | B1-5 accepted: .claude/skills/framework-edition-tracker/references/edition-tracking-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-194 | .claude/skills/framework-mapping-refresher/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 903f6166b46b0e1aa7fe272bd244a7e25a5a162e | B1-6 accepted: .claude/skills/framework-mapping-refresher/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-195 | .claude/skills/framework-mapping-refresher/references/mapping-refresh-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 6c8e31d7c61dd26ef72ded2925ecaeb0042e7ab8 | B1-7 accepted: .claude/skills/framework-mapping-refresher/references/mapping-refresh-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-196 | .claude/skills/frontend-perf-engineer/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | cdf145b28a4d8d1445b6483ac590f3573deea092 | B1-8 accepted: .claude/skills/frontend-perf-engineer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-281W | .claude/skills/skill-deprecation-planner/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 22cf10be2f3b4dff3b727288700dea2b1a6861e8 | WD-C1 withdraws K-082 (readability-lane-c-implementer-c): C1-1 accepted: .claude/skills/skill-deprecation-planner/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-282W | .claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | e3fa656bdbffb99d661e3c9e0b5fff27fedefa34 | WD-C2 withdraws K-083 (readability-lane-c-implementer-c): C1-2 accepted: .claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-283W | .claude/skills/skill-quality-reviewer/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 48230d027c5e8580419efc596fae3cad96896f65 | WD-C3 withdraws K-084 (readability-lane-c-implementer-c): C1-3 accepted: .claude/skills/skill-quality-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-284W | .claude/skills/skill-quality-reviewer/references/quality-review-checklist.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 9e5a912a2be5fc3ab1036dc40591c275ad247dff | WD-C4 withdraws K-085 (readability-lane-c-implementer-c): C1-4 accepted: .claude/skills/skill-quality-reviewer/references/quality-review-checklist.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-285W | .claude/skills/skill-usage-instrumenter/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | fcc886160b3ca4d15d3fd6e757b113dcfcf00f5b | WD-C5 withdraws K-086 (readability-lane-c-implementer-c): C1-5 accepted: .claude/skills/skill-usage-instrumenter/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-286W | .claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 54b4bec5f9a1b125f1c097d759ba12dc7e803d60 | WD-C6 withdraws K-087 (readability-lane-c-implementer-c): C1-6 accepted: .claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-287W | .claude/skills/skill-usage-ledger/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 594220d9701f964700030e1408a61b022f86b869 | WD-C7 withdraws K-088 (readability-lane-c-implementer-c): C1-7 accepted: .claude/skills/skill-usage-ledger/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-288W | .claude/skills/slo-reliability-architect/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 74ced9ed454753657e2f8f0de3648a08f22b9fa9 | WD-C8 withdraws K-089 (readability-lane-c-implementer-c): C1-8 accepted: .claude/skills/slo-reliability-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-297 | .claude/skills/skill-deprecation-planner/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 22cf10be2f3b4dff3b727288700dea2b1a6861e8 | C1-1 accepted: .claude/skills/skill-deprecation-planner/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-298 | .claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | e3fa656bdbffb99d661e3c9e0b5fff27fedefa34 | C1-2 accepted: .claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-301 | .claude/skills/skill-usage-instrumenter/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | fcc886160b3ca4d15d3fd6e757b113dcfcf00f5b | C1-5 accepted: .claude/skills/skill-usage-instrumenter/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-302 | .claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 54b4bec5f9a1b125f1c097d759ba12dc7e803d60 | C1-6 accepted: .claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-303 | .claude/skills/skill-usage-ledger/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 594220d9701f964700030e1408a61b022f86b869 | C1-7 accepted: .claude/skills/skill-usage-ledger/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-304 | .claude/skills/slo-reliability-architect/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 74ced9ed454753657e2f8f0de3648a08f22b9fa9 | C1-8 accepted: .claude/skills/slo-reliability-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-381W | docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 82c2800bea638c5c007f2239073289b8b7fa35e5 | WD-D1 withdraws K-090 (readability-phase4-lane-d-implementer-c): LD-1 accepted: docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-382W | docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 6e8b63df01bcf7e57e47cf9d6338bc350bd68c7a | WD-D2 withdraws K-091 (readability-phase4-lane-d-implementer-c): LD-2 accepted: docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-383W | docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 702c7ff8676628dce0c91b8a517f316438df889a | WD-D3 withdraws K-092 (readability-phase4-lane-d-implementer-c): LD-3 accepted: docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-384W | docs/evidence/documentation/full-page-readability-sample-2026-09-23.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | eba6ddbb05e774632262e115374b55ecf3617856 | WD-D4 withdraws K-093 (readability-phase4-lane-d-implementer-c): LD-4 accepted: docs/evidence/documentation/full-page-readability-sample-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-385W | docs/evidence/documentation/governance-poisoning-routing-correction-2026-09-23.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | c3132e2e9a98b8c8b920efd0fc39615d4199e2bb | WD-D5 withdraws K-094 (readability-phase4-lane-d-implementer-c): LD-5 accepted: docs/evidence/documentation/governance-poisoning-routing-correction-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-386W | docs/evidence/documentation/historical-evidence-reading-2026-09-23.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 1cb9397d971c9f935e3753b9b1ea3b06372f1e97 | WD-D6 withdraws K-095 (readability-phase4-lane-d-implementer-c): LD-6 accepted: docs/evidence/documentation/historical-evidence-reading-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-387W | docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | a071d86fd5d951d1d4e322d2a5fbb8efde5b8eb2 | WD-D7 withdraws K-096 (readability-phase4-lane-d-implementer-c): LD-7 accepted: docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-388W | docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 9c5b58990d7e3d649fb60bcf6b7355a1cccaea5b | WD-D8 withdraws K-097 (readability-phase4-lane-d-implementer-c): LD-8 accepted: docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-389 | docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 82c2800bea638c5c007f2239073289b8b7fa35e5 | LD-1 accepted: docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-390 | docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 6e8b63df01bcf7e57e47cf9d6338bc350bd68c7a | LD-2 accepted: docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-391 | docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 702c7ff8676628dce0c91b8a517f316438df889a | LD-3 accepted: docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-392 | docs/evidence/documentation/full-page-readability-sample-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | eba6ddbb05e774632262e115374b55ecf3617856 | LD-4 accepted: docs/evidence/documentation/full-page-readability-sample-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-393 | docs/evidence/documentation/governance-poisoning-routing-correction-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | c3132e2e9a98b8c8b920efd0fc39615d4199e2bb | LD-5 accepted: docs/evidence/documentation/governance-poisoning-routing-correction-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-394 | docs/evidence/documentation/historical-evidence-reading-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 1cb9397d971c9f935e3753b9b1ea3b06372f1e97 | LD-6 accepted: docs/evidence/documentation/historical-evidence-reading-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-395 | docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | a071d86fd5d951d1d4e322d2a5fbb8efde5b8eb2 | LD-7 accepted: docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-396 | docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 9c5b58990d7e3d649fb60bcf6b7355a1cccaea5b | LD-8 accepted: docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
