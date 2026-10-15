@@ -5124,11 +5124,35 @@ K-074/K-075-style CARRY-WITH-DEVIATION precedent is not extended) and
 directed this route instead (owner decision 3, 2026-10-15): append
 AEGIS-APR-117 withdrawal rows that cancel the 32 rows, then append fresh
 keeper rows for the same pages from the same evidence, recorded by a
-different agent. **No page is re-read; the reads stand; only the recording
-authority changes.** The withdrawn rows remain appended (the ledger is never
-rewritten); their pages return to pending only until the fresh rows that
-follow them in the same table take over - the builder takes the highest
-stable id per page, so each page's latest event is the fresh acceptance.
+different agent. **No page is re-read; the reads stand; for 29 of the 32
+pages only the recording authority changes. For three pages the VERDICT also
+changes: the lane records marked them PARTIAL** - lane A's P8
+(`.claude/skills/_template/SKILL.md`) and lane C's C1-3 and C1-4
+(`.claude/skills/skill-quality-reviewer/SKILL.md` and
+`.claude/skills/skill-quality-reviewer/references/quality-review-checklist.md`)
+- so no full-page-acceptance row is recorded for them here. The ledger's
+fixed-format contract names four event kinds - `full-page-acceptance`,
+`targeted-review`, `withdrawal` and `lost-commit` - and has **no
+partial-acceptance kind**, so those three pages keep only their withdrawal
+rows and stay **pending**: an honest gap, stated plainly, beats a false
+acceptance. The withdrawn rows remain appended (the ledger is never
+rewritten); the 29 pages with fresh rows return from pending when those rows
+take over - the builder takes the highest stable id per page, so each such
+page's latest event is the fresh acceptance - and the three partial pages
+carry no acceptance row.
+
+**The PARTIAL rule - a design gap in the revision cycle, now stated.** The
+APR-117 keeper was instructed to re-record rows from the lane evidence; it
+was **never instructed that a lane-marked PARTIAL must stay partial**, so the
+first draft recorded three fresh full-page-acceptance rows (K-105, K-299,
+K-300) for pages whose lane verdicts are partial. That is a gap in the keeper
+brief, not carelessness in the lanes. The rule is now explicit: **a page a
+lane marked PARTIAL is never recorded as a full-page-acceptance.** Lane B's
+own handoff already said this - "the keeper must not copy a partial quote
+into a full-page-acceptance row" - but the keeper brief did not. (The handoff
+is a coordinator workspace artifact; this repair could not verify the quote
+in any fetched ref and relays it exactly as the Stage D REVISE instruction
+quotes it.)
 
 **Gloss, plain English, for the labels named above.** K-074 is the
 2026-10-12 full-page-acceptance row for
@@ -5142,9 +5166,9 @@ declared rather than hidden.
 
 | Lane | Lane PR | Withdrawn rows (as authored) | Withdrawal row ids | Fresh row ids (allocated band) | First / last page |
 | --- | --- | --- | --- | --- | --- |
-| A | #771 | K-082..K-089 | K-082W..K-089W | K-098..K-105 (band K-082..K-180) | .claude/agents/ai-security-red-team-reviewer.md / .claude/skills/_template/SKILL.md |
+| A | #771 | K-082..K-089 | K-082W..K-089W | K-098..K-104 (band K-082..K-180) | .claude/agents/ai-security-red-team-reviewer.md / .claude/agents/senior-troubleshooting-lead.md |
 | B | #772 | K-082..K-089 | K-181W..K-188W | K-189..K-196 (band K-181..K-280) | .claude/skills/file-upload-storage-architect/SKILL.md / .claude/skills/frontend-perf-engineer/SKILL.md |
-| C | #776 | K-082..K-089 | K-281W..K-288W | K-297..K-304 (band K-281..K-380) | .claude/skills/skill-deprecation-planner/SKILL.md / .claude/skills/slo-reliability-architect/SKILL.md |
+| C | #776 | K-082..K-089 | K-281W..K-288W | K-297..K-298, K-301..K-304 (band K-281..K-380) | .claude/skills/skill-deprecation-planner/SKILL.md / .claude/skills/slo-reliability-architect/SKILL.md |
 | D | #774 | K-090..K-097 | K-381W..K-388W | K-389..K-396 (band K-381..K-480) | docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md / docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md |
 
 **Why the fresh ids sit where they do - and the open-PR audit.** The allocation bands are lane A
@@ -5155,22 +5179,34 @@ K-281..K-288; lane D's batch-1 rows move into band D). Every id this section
 appends was audited by command against every open pull request and against
 main, not just against the base table: each open PR head's consolidated table
 was diffed against the table at `e2a3e20b7c20ef8385b219b39c6405237163406f`, its newly introduced
-stable ids were extracted, and the intersection with this PR's ids is empty
-(#771 K-082..K-089, #772 K-181..K-188, #774 K-090..K-097, #776 K-082..K-089,
-#777 K-090..K-097, #778 K-381..K-388, #779 K-289..K-296, #780 K-181..K-188;
-#770, #773, #775, #782 and #783 introduce none). The first draft put lane C's
-fresh rows at K-289..K-296; that band is the stable-id band of open PR #779
-(lane C batch 2, head d1de3296), which records eight different pages there,
-so merging that draft after #779 would raise a duplicate-stable-ID error and
-stop the merge sequence. The lane C fresh rows are therefore recorded at
-**K-297..K-304** - the first free eight ids of lane C's band above every id
-an open PR claims. The other bands collide with nothing open: lane A
-K-098..K-105 (above #771's and #777's claims), lane B K-189..K-196 (between
-#772's band position K-181..K-188 and #780's merge position K-197..K-204),
-lane D K-389..K-396 (above #778's K-381..K-388; the merge holder's renumber
-of #774 batch 1 into band D must avoid both #778's rows and these rows, and
-the KEEPER-ID-ALLOCATION.md file #778 and #780 cite exists in no fetched ref
-at authoring time). The withdrawn rows stay in the table forever, so the
+stable ids were extracted, and the intersection with this PR's ids is empty.
+**The audit was re-run on 2026-10-15 at the then-current heads** (the open-PR
+set has drifted since authoring: #770 has merged, #784 and #785 are now open,
+and #774 and #782 have moved heads) with the same command procedure, and the
+intersection is **still empty** for every other PR and for main: #771
+K-082..K-089 (head f6a4e418), #772 K-181..K-188 (a94dc5ea), #774 K-090..K-097
+(8ee87116), #776 K-082..K-089 (aa88923f), #777 K-090..K-097 (05ad7607), #778
+K-381..K-388 (7dcef8fc), #779 K-289..K-296 (d1de3296), #780 K-181..K-188
+(78af4ef2); #770 (7bd11623), #773, #775, #782 (27ee6291), #783, #784 and #785
+introduce none, and main (7abb98eb) has introduced none of its own. The first
+draft put lane C's fresh rows at K-289..K-296; that band is the stable-id
+band of open PR #779 (lane C batch 2, head d1de3296), which records eight
+different pages there, so merging that draft after #779 would raise a
+duplicate-stable-ID error and stop the merge sequence. The lane C fresh rows
+are therefore recorded at **K-297..K-298 and K-301..K-304** - the first free
+ids of lane C's band above every id an open PR claims; K-299 and K-300 are
+deliberately left unused because the two pages they would cover carry lane
+PARTIAL verdicts and get no fresh row (the PARTIAL rule above). The other
+bands collide with nothing open: lane A K-098..K-104 (above #771's and #777's
+claims; K-105 is left unused for the same PARTIAL reason - lane A's P8),
+lane B K-189..K-196 (between #772's band position K-181..K-188 and the merge
+position #780's rows would take if renumbered - an earlier draft asserted
+that position as K-197..K-204, corrected below because no fetched ref names
+it), lane D K-389..K-396 (above #778's K-381..K-388; the merge holder's
+renumber of #774 batch 1 into band D must avoid both #778's rows and these
+rows, and the KEEPER-ID-ALLOCATION.md file #778 and #780 cite exists in no
+fetched ref at authoring time). The withdrawn rows stay in the table forever,
+so the
 fresh rows start after the band positions the withdrawn rows will occupy; the
 withdrawal ids mirror those positions with a W suffix for the same reason (a
 withdrawal must sort after the row it cancels and before the fresh row that
@@ -5183,7 +5219,7 @@ reviewers remain the lane agents named in the withdrawn rows; the keeper is
 a different agent from each page's author (the lanes' batch records list the
 authors; `git log -1 --format=%an -- <page>` names a human identity for
 every page) and from each accepting reviewer, so the APR-101 condition is
-satisfied for the fresh rows.
+satisfied for the 29 fresh rows recorded here.
 
 **Blob IDs recomputed, never transcribed.** Every blob ID in the appended
 rows equals `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` recomputed at authoring time. All 32
@@ -5199,8 +5235,21 @@ rewritten, because the bindings name the head it produced.)
 
 **Count honesty.** This edit changes this ledger by more than 10 lines, so
 the ledger page stays **pending** and owes its own independent full-page
-re-read. No readability count of its own is published here; the instrument's
-figures are unchanged by these rows until the routine index rebuild.
+re-read. This PR records **29 fresh full-page-acceptance rows** and, for the
+three lane-marked PARTIAL pages, **no acceptance row** (the PARTIAL rule
+above). Measured by command at this PR's head with a fresh
+`build_index.py --write` and `check_index.py --json`: the instrument
+prints accepted_on_recorded_review **89** and official_pending_count **565** -
+the three partial pages stay inside the printed accepted bucket only because
+`check_index.py`'s code classifies each page's withdrawal row (their only
+row) as an acceptance at zero drift, although its own documented definition
+of that bucket requires a full-page-acceptance row. The ledger-honest figure
+- what the instrument would print if it honoured its documented definition -
+is **568 = 596 - 29 + 1** (base pending 596, 29 pages accepted by fresh rows,
++1 for the new evidence file, a new reader page with no acceptance row).
+Both figures are measured by command, not taken from the auditor's
+arithmetic; the disagreement between the printed figure and the ledger's own
+record is stated, not hidden.
 
 **Merge order expectation.** The four lane PRs merge first (serially, with
 the merge protocol's band renumbering), then this PR. Everything here is
@@ -5219,6 +5268,43 @@ names lane C's band as K-289..K-296, which the open-PR audit above found to dupl
 stable ids; the correction commit records the lane C rows at K-297..K-304. The commit message is not
 rewritten - rewriting it would invalidate the bindings that name the head it produced - so this dated
 entry records the withdrawal instead. A dated record is never rewritten; it is corrected by appending.
+
+**Correction appended 2026-10-15 (repair round 3, Stage D REVISE) - the PARTIAL rule, three withdrawn fresh rows, the corrected count, and two disclosures.**
+The first repair head recorded K-105, K-299 and K-300 as full-page-acceptance
+rows for pages whose lane verdicts are **partial**: lane A's P8
+(`.claude/skills/_template/SKILL.md` - its B2 abbreviation bullet, recorded
+partial at lines 113, 118-122, 242, 305 and 321-325 of PR #771's record) and
+lane C's C1-3 and C1-4
+(`.claude/skills/skill-quality-reviewer/SKILL.md` and its
+`references/quality-review-checklist.md` - their B2 bullets, recorded
+partial at lines 130-136, 224, 255 and 455-457 of PR #776's record).
+Recording them as full-page acceptances laundered three partial verdicts into
+full acceptances. This correction removes those three fresh rows; the three
+withdrawal rows (K-089W, K-283W, K-284W) stay and cancel the lanes'
+ineligible rows, and the three pages keep no acceptance row and stay
+**pending**. The ledger's four event kinds have no partial kind, so the gap
+is stated plainly instead of forcing a full-page-acceptance. The sweep over
+the other 29 fresh rows found **no other lane-marked PARTIAL page** (lane A
+P1-P7 accepted; lane B B1-1..B1-8 accepted; lane C C1-1, C1-2, C1-5..C1-8
+accepted; lane D LD-1..LD-8 accepted) - a clean sweep. Two P3 disclosures
+land with this entry: (1) the earlier claim that "#780 renumbers to
+K-197..K-204 at its merge" is **not verifiable** - `git grep -n K-197
+origin/pr/780` returns nothing and #780's record says only that its rows are
+authored K-181..K-188 and defers any renumbering to the merge holder, so the
+claim is now recorded as a coordinator-stated plan, not as fact; (2) the
+open-PR stable-id audit was re-run at the drifted current heads (the audit
+note above) and the intersection remains empty, so the earlier id-collision
+repair still stands. Measured by command: `build_index.py --report` at this
+head reports table_rows **162** = 101 + 61, and `check_index.py --json` at
+this head prints accepted_on_recorded_review 89 and official_pending_count
+565 (the three partial pages remain in the printed accepted bucket only
+through their withdrawal rows - the instrument gap the Count honesty note
+above states); the ledger-honest figure is 568 = 596 - 29 + 1. The structural
+rule this correction makes explicit: **a page a lane marked PARTIAL is never
+recorded as a full-page-acceptance** - Lane B's handoff said this, the keeper
+brief did not (the handoff is a coordinator workspace artifact and the quote
+is relayed, not repo-verified). Recorded by **DeepSeek V4 Pro**
+(deepseek-v4-pro), Stage C repair round 3, under the owner account.
 <!-- acceptance-index-schema: 1 -->
 
 ## Consolidated keeper table — index schema v1 (D84, 2026-10-10)
@@ -5356,7 +5442,6 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-102 | .claude/agents/release-readiness-reviewer.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | b54a9f5efc139b16578014a9b804c801b6132941 | P5 accepted: .claude/agents/release-readiness-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
 | K-103 | .claude/agents/secure-saas-reviewer.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 490b57942a156f896457897a1aa45750594c8309 | P6 accepted: .claude/agents/secure-saas-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
 | K-104 | .claude/agents/senior-troubleshooting-lead.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 6ae09b38b11ac0565384bdc864dcac6e19a82df7 | P7 accepted: .claude/agents/senior-troubleshooting-lead.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
-| K-105 | .claude/skills/_template/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | de6d954b6040fff33122377b2f47b8b48106166b | P8 accepted: .claude/skills/_template/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
 | K-181W | .claude/skills/file-upload-storage-architect/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 5a527691661a5bffb53aaca26b1cd397e4843a10 | WD-B1 withdraws K-082 (readability-lane-b-implementer-c): B1-1 accepted: .claude/skills/file-upload-storage-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
 | K-182W | .claude/skills/flaky-test-detective/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | f5f340fc5c9235b5483ce1db8a4d2f6921c4e60c | WD-B2 withdraws K-083 (readability-lane-b-implementer-c): B1-2 accepted: .claude/skills/flaky-test-detective/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
 | K-183W | .claude/skills/flaky-test-detective/references/flake-taxonomy.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 0a8ca8cf6122feaa3bb483d5c76aaada738715ec | WD-B3 withdraws K-084 (readability-lane-b-implementer-c): B1-3 accepted: .claude/skills/flaky-test-detective/references/flake-taxonomy.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
@@ -5383,8 +5468,6 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-288W | .claude/skills/slo-reliability-architect/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 74ced9ed454753657e2f8f0de3648a08f22b9fa9 | WD-C8 withdraws K-089 (readability-lane-c-implementer-c): C1-8 accepted: .claude/skills/slo-reliability-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
 | K-297 | .claude/skills/skill-deprecation-planner/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 22cf10be2f3b4dff3b727288700dea2b1a6861e8 | C1-1 accepted: .claude/skills/skill-deprecation-planner/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
 | K-298 | .claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | e3fa656bdbffb99d661e3c9e0b5fff27fedefa34 | C1-2 accepted: .claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
-| K-299 | .claude/skills/skill-quality-reviewer/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 48230d027c5e8580419efc596fae3cad96896f65 | C1-3 accepted: .claude/skills/skill-quality-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
-| K-300 | .claude/skills/skill-quality-reviewer/references/quality-review-checklist.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 9e5a912a2be5fc3ab1036dc40591c275ad247dff | C1-4 accepted: .claude/skills/skill-quality-reviewer/references/quality-review-checklist.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
 | K-301 | .claude/skills/skill-usage-instrumenter/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | fcc886160b3ca4d15d3fd6e757b113dcfcf00f5b | C1-5 accepted: .claude/skills/skill-usage-instrumenter/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
 | K-302 | .claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 54b4bec5f9a1b125f1c097d759ba12dc7e803d60 | C1-6 accepted: .claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
 | K-303 | .claude/skills/skill-usage-ledger/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 594220d9701f964700030e1408a61b022f86b869 | C1-7 accepted: .claude/skills/skill-usage-ledger/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |

@@ -15,8 +15,18 @@ the carry (the K-074/K-075-style CARRY-WITH-DEVIATION precedent is not
 extended) and directed this route instead (owner decision 3, 2026-10-15):
 under AEGIS-APR-117, append withdrawal rows that cancel the 32 rows, then
 append fresh keeper rows for the same pages from the same evidence, recorded
-by a different agent. No page is re-read; the reads stand; only the recording
-authority changes. The ledger is never rewritten; both the withdrawn rows and
+by a different agent. No page is re-read; the reads stand; for 29 of the 32
+pages only the recording authority changes. **For three pages the VERDICT
+also changes: the lane records marked them PARTIAL, so they get no
+full-page-acceptance row here** (lane A's P8
+`.claude/skills/_template/SKILL.md`, lane C's C1-3
+`.claude/skills/skill-quality-reviewer/SKILL.md` and C1-4
+`.claude/skills/skill-quality-reviewer/references/quality-review-checklist.md`).
+The ledger's fixed-format contract has four event kinds
+(`full-page-acceptance`, `targeted-review`, `withdrawal`,
+`lost-commit`) and no partial kind, so the three pages keep only their
+withdrawal rows and stay **pending** - an honest gap stated plainly, not a
+false acceptance. The ledger is never rewritten; both the withdrawn rows and
 the new rows remain appended in the consolidated keeper table.
 
 Gloss, plain English, for the three labels the sentence above uses: **K-074**
@@ -49,21 +59,25 @@ rather than hidden.
 
 ## Stable-id choice - audited against every open pull request
 
-The fresh rows sit at lane A K-098..K-105, lane B K-189..K-196, lane C
-**K-297..K-304** and lane D K-389..K-396 (withdrawal ids K-082W..K-089W,
-K-181W..K-188W, K-281W..K-288W and K-381W..K-388W). The first draft placed
-lane C at K-289..K-296; those ids are the stable ids of open PR #779 (lane C
-batch 2, head d1de3296), which records eight different pages there, so the
-lane C fresh rows were moved above them. Every id in the final set was
-audited by command against every open PR (#770-#783) and against main: each
-open PR head's consolidated table was diffed against the table at the base
-`e2a3e20b7c20ef8385b219b39c6405237163406f`, its newly introduced stable ids were extracted, and the
-intersection with this PR's ids is empty for all thirteen other open PRs and
-for main. The lane C withdrawal ids stay K-281W..K-288W: they mirror the
-renumbered position (K-281..K-288) of the rows they cancel and still sort
-before the fresh rows.
+The fresh rows sit at lane A K-098..K-104, lane B K-189..K-196, lane C
+**K-297..K-298 and K-301..K-304** and lane D K-389..K-396 (withdrawal ids
+K-082W..K-089W, K-181W..K-188W, K-281W..K-288W and K-381W..K-388W); the three
+ids K-105, K-299 and K-300 are deliberately left unused because their pages
+carry lane PARTIAL verdicts and get no fresh row (the PARTIAL rule below).
+The first draft placed lane C at K-289..K-296; those ids are the stable ids
+of open PR #779 (lane C batch 2, head d1de3296), which records eight
+different pages there, so the lane C fresh rows were moved above them. Every
+id in the final set was audited by command against every open PR and against
+main: each open PR head's consolidated table was diffed against the table at
+the base `e2a3e20b7c20ef8385b219b39c6405237163406f`, its newly introduced stable ids were extracted,
+and the intersection with this PR's ids is empty. **The audit was re-run on
+2026-10-15 at the drifted current heads** (#770 merged, #784/#785 open,
+#774/#782 heads moved): the intersection is **still empty** for every other
+PR and for main, so the earlier id-collision repair stands. The lane C
+withdrawal ids stay K-281W..K-288W: they mirror the renumbered position
+(K-281..K-288) of the rows they cancel and still sort before the fresh rows.
 
-## The 32 pages (one block per withdrawn row)
+## The 32 pages (one block per withdrawn row; 29 end in a fresh acceptance row, 3 end in a stated partial gap)
 
 ### WD-A1 - lane A, withdrawn row K-082 (#771), fresh row K-098
 
@@ -143,7 +157,7 @@ before the fresh rows.
 - Blob ID, recomputed at authoring time with `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/_template/SKILL.md` (never transcribed): de6d954b6040fff33122377b2f47b8b48106166b
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md (in #771, not on the default branch at authoring time): P8 accepted: .claude/skills/_template/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-A8 withdraws K-089 (readability-lane-a-implementer-c): P8 accepted: .claude/skills/_template/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-- Fresh row: K-105, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
+- Fresh row: **none.** Lane A's own record marks P8 **partial** (its B2 abbreviation bullet: YAML, API and MCP appear without an on-page first-use definition; record lines 113, 118-122, 242, 305 and 321-325 of PR #771, head f6a4e418). The ledger's four event kinds have no partial kind, so no full-page-acceptance row is recorded and the page stays pending - the gap is stated plainly, not forced into a full-page-acceptance (the PARTIAL rule).
 
 ### WD-B1 - lane B, withdrawn row K-082 (#772), fresh row K-189
 
@@ -253,7 +267,7 @@ before the fresh rows.
 - Blob ID, recomputed at authoring time with `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/skill-quality-reviewer/SKILL.md` (never transcribed): 48230d027c5e8580419efc596fae3cad96896f65
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md (in #776, not on the default branch at authoring time): C1-3 accepted: .claude/skills/skill-quality-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-C3 withdraws K-084 (readability-lane-c-implementer-c): C1-3 accepted: .claude/skills/skill-quality-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-- Fresh row: K-299, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
+- Fresh row: **none.** Lane C's record marks C1-3's abbreviation bullet **partial** (bare D13/D22, LLM/ASI unexpanded; record lines 130-136, 224, 255 and 455-457 of PR #776, head aa88923f). The ledger's four event kinds have no partial kind, so no full-page-acceptance row is recorded and the page stays pending - stated plainly, not forced into a full-page-acceptance (the PARTIAL rule).
 
 ### WD-C4 - lane C, withdrawn row K-085 (#776), fresh row K-300
 
@@ -263,7 +277,7 @@ before the fresh rows.
 - Blob ID, recomputed at authoring time with `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/skill-quality-reviewer/references/quality-review-checklist.md` (never transcribed): 9e5a912a2be5fc3ab1036dc40591c275ad247dff
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md (in #776, not on the default branch at authoring time): C1-4 accepted: .claude/skills/skill-quality-reviewer/references/quality-review-checklist.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-C4 withdraws K-085 (readability-lane-c-implementer-c): C1-4 accepted: .claude/skills/skill-quality-reviewer/references/quality-review-checklist.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-- Fresh row: K-300, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
+- Fresh row: **none.** Lane C's record marks C1-4's abbreviation bullet **partial** (RBAC and DDL unexpanded; record lines 130-136, 255 and 455-457 of PR #776, head aa88923f). The ledger's four event kinds have no partial kind, so no full-page-acceptance row is recorded and the page stays pending - stated plainly, not forced into a full-page-acceptance (the PARTIAL rule).
 
 ### WD-C5 - lane C, withdrawn row K-086 (#776), fresh row K-301
 
@@ -384,3 +398,56 @@ before the fresh rows.
 - Original quote, transcribed verbatim from the lane batch record docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md (in #774, not on the default branch at authoring time): LD-8 accepted: docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Withdrawal row quote (AEGIS-APR-117): WD-D8 withdraws K-097 (readability-phase4-lane-d-implementer-c): LD-8 accepted: docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Fresh row: K-396, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-v4-pro-apr117-keeper
+
+## The PARTIAL rule - why three fresh rows do not exist, and the sweep over the other 29
+
+**The rule.** A page a lane marked PARTIAL is never recorded as a
+full-page-acceptance. The APR-117 keeper was instructed to re-record rows
+from the lane evidence; it was never instructed that a lane-marked PARTIAL
+must stay partial, so the first draft recorded three fresh
+full-page-acceptance rows (K-105, K-299, K-300) for pages whose lane verdicts
+are partial. That is a design gap in the revision cycle, not carelessness:
+Lane B's own handoff said "the keeper must not copy a partial quote into a
+full-page-acceptance row", but the keeper brief did not. (The handoff is a
+coordinator workspace artifact; this repair could not verify the quote in any
+fetched ref and relays it exactly as the Stage D REVISE instruction quotes
+it.)
+
+**The three pages, with their lane-recorded partial dispositions.**
+
+1. `.claude/skills/_template/SKILL.md` (lane A P8, PR #771 head f6a4e418): the
+   disposition table records the verdict **partial** (record line 113); lines
+   118-122 name the partial bullet (B2 abbreviation definitions: YAML, API
+   and MCP used without on-page first-use definition); line 242 says "Verdict:
+   partial acceptance, recorded honestly - not a full-page acceptance"; lines
+   305 and 321-325 say "A partial checklist bullet is not a full-page
+   acceptance".
+2. `.claude/skills/skill-quality-reviewer/SKILL.md` (lane C C1-3, PR #776
+   head aa88923f): lines 130-136 and 224 record the abbreviation bullet
+   **partial** (bare D13/D22, LLM/ASI unexpanded), and follow-up 2 (lines
+   455-457) carries the disposition.
+3. `.claude/skills/skill-quality-reviewer/references/quality-review-checklist.md`
+   (lane C C1-4, PR #776): line 255 records the abbreviation bullet
+   **partial** (RBAC and DDL unexpanded), and follow-up 2 (lines 455-457)
+   carries the disposition.
+
+Because the ledger's four event kinds have no partial kind, these three pages
+keep only their withdrawal rows (K-089W, K-283W, K-284W, which cancel the
+lanes' ineligible rows) and carry **no acceptance row**; they stay pending.
+The first repair head's three rows for them are removed by this round.
+
+**The sweep over the other 29 fresh rows - a clean sweep.** Each of the 29
+remaining fresh rows covers a page whose lane record marks **no partial
+disposition**: lane A P1-P7 all "accepted" (PR #771's disposition table,
+lines 106-112); lane B B1-1..B1-8 all "accepted unchanged" (PR #772's
+record); lane C C1-1, C1-2 and C1-5..C1-8 all carry "yes" bullet dispositions
+(the only "partial" hits in PR #776's record are lines 130-136, 224, 255 and
+455-457 - the three pages above); lane D LD-1..LD-8 all "accepted unchanged"
+(PR #774's record). No other fresh row launders a partial verdict.
+
+**The count, measured.** See the ledger section's Count honesty note: 29
+fresh full-page-acceptance rows; three pages recorded with no acceptance row;
+the instrument's printed figures at this PR's head and the ledger-honest
+figure 568 = 596 - 29 + 1, both measured by command.
+
+Recorded by **DeepSeek V4 Pro** (deepseek-v4-pro), Stage C repair round 3.
