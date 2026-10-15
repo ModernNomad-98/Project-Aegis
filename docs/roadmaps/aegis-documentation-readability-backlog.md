@@ -5111,6 +5111,84 @@ six lost-commit rows' cells, rebuilds no `tools/` artifact, runs no
 authority. The batching procedure does not grant provider, private-input,
 real-host or deployment authority (L3018-3020).
 
+## Ledger-keeper recording + batch update — Phase 4 re-read lane A, second batch, 2026-10-15
+
+The ledger keeper records under AEGIS-APR-101 (its unchanged recording-only
+role). The eight pages below were each independently full-page re-read at the
+base head against [Acceptance for each page](#acceptance-for-each-page) by a
+reviewer who did not write the page, and the reviewer restated each page's
+purpose and normal use from the page alone in the batch record. No page was
+edited, so no "corrected" row exists; the two partial acceptance bullets
+(P1: `p<0.05`, `p-hacking` and "Overall Evaluation Criterion" used without
+an on-page first-use definition; P7: `authz` used once without expansion) are
+recorded in the batch record as properties of the text at the bound revision,
+not repaired (editing an instruction file under `.claude/skills/` would
+reclassify this change beyond docs-only). No acceptance the reviewer did not
+give is recorded, and no posture, Stop Condition, or Security Rule changed.
+
+**Lane derivation (Phase 4 re-read lanes; lane A is the alphabetically first
+quarter of the sorted pending set).** The pending set is the
+`no_recorded_acceptance` and `provably_pending` buckets of
+`python -P -B tools/readability_acceptance/check_index.py --json --ref e2a3e20b7c20ef8385b219b39c6405237163406f`
+— 586 + 4 = **590** paths, sorted by repository path; lane A takes the first
+`ceil(590 / 4) = 148` paths, first
+`.claude/agents/ai-security-red-team-reviewer.md`, last
+`.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md`.
+This batch is paths 9–16 of that range (the next eight after batch 1's paths
+1–8); no page outside the range is read or recorded.
+
+**Keeper IDs.** Rows are authored **K-090…K-097** — lane A's allocated band is
+K-082–K-180 (`KEEPER-ID-ALLOCATION.md`) and batch 1 authored K-082…K-089, so
+these are the band's first free ids. This lane expects the merge holder to
+renumber rows into the allocated bands per that file's merge protocol — the
+stable ID only, never the `Blob ID` — then re-run `build_index.py` and the
+checker; if any of K-090…K-097 is moved, its `Blob ID` must be recomputed
+with `git rev-parse <Acceptance revision>:<Page>` and confirmed unchanged.
+
+| Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [ab-test-designer](../../.claude/skills/ab-test-designer/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-2-2026-10-15.md) | 2026-10-15 |
+| [ab-test-sheet](../../.claude/skills/ab-test-designer/references/ab-test-sheet.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-2-2026-10-15.md) | 2026-10-15 |
+| [acceptance-criteria-reviewer](../../.claude/skills/acceptance-criteria-reviewer/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-2-2026-10-15.md) | 2026-10-15 |
+| [criteria-review-sheet](../../.claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-2-2026-10-15.md) | 2026-10-15 |
+| [accessibility-test-harness](../../.claude/skills/accessibility-test-harness/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-2-2026-10-15.md) | 2026-10-15 |
+| [a11y-checklists](../../.claude/skills/accessibility-test-harness/references/a11y-checklists.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-2-2026-10-15.md) | 2026-10-15 |
+| [admin-console-architect](../../.claude/skills/admin-console-architect/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-2-2026-10-15.md) | 2026-10-15 |
+| [adr-corpus-sheet](../../.claude/skills/adr-sequencer/references/adr-corpus-sheet.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-2-2026-10-15.md) | 2026-10-15 |
+
+The re-measured facts per page (line and byte counts, blob IDs, link targets,
+named-skill existence checks) are in the batch record.
+
+**Declared deviation (recorded, not hidden).** AEGIS-APR-101 requires the
+ledger keeper to be a different agent from the page's author and accepting
+reviewer; this lane's one agent is both the accepting reader and the writer
+of this keeper section, so that condition is **not satisfied** and the rows
+are **not green**. The owner has directed the **AEGIS-APR-117 route**: the
+same-agent rows are withdrawn and re-recorded by a different agent from the
+same evidence — **no page needs re-reading** — and the disposition stays with
+the merge holder under AEGIS-APR-100. The reader did not write any of the
+eight pages (`git log -1 --format=%an -- <page>` names Peter Nguyen for all
+eight; the batch record lists the commits). This lane delivers under
+AEGIS-APR-039 and records only under AEGIS-APR-101.
+
+**Count honesty (unchanged).** This lane publishes no readability count of
+its own (D84). The instrument's figures at the base are quoted in the batch
+record (official pending count **596** at `e2a3e20b7c20…`). The appended rows
+are not machine-visible until the routine index rebuild; `build_index.py
+--report` was run in-lane this batch (the lane's clone is full-depth, so the
+builder's shallow-clone refusal does not apply) and its result is recorded in
+the batch record; no `--write` was run.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read
+against [Acceptance for each page](#acceptance-for-each-page) by a reader who
+did not write this section — the self-cost every prior update states. The
+tracked Markdown count does not change except by the new batch record note
+itself, which is pending and not counted among accepted pages.
+
+The next batch's selection rule: the next 8 paths of lane A's sorted range
+(paths 17–24 of 148), re-measured at the next implementation base.
+
 <!-- acceptance-index-schema: 1 -->
 
 ## Consolidated keeper table — index schema v1 (D84, 2026-10-10)
@@ -5233,3 +5311,11 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-079 | docs/approvals/APPROVAL_REGISTER.md | full-page-acceptance | c80c8d2d553671579e878584914eae695028eab4 | 548e80efdc630eb04a9b41839c608b4928b4bc2a | K-079 accepted: docs/approvals/APPROVAL_REGISTER.md read whole at c80c8d2d553671579e878584914eae695028eab4 | readability-final3-implementer-c | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | 2026-10-12 |
 | K-080 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | b44d47c9a10cde4c62d6fdae52bf577e04242a50 | K-080 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | readability-ledger-reader-c | docs/evidence/documentation/readability-ledger-reread-2026-10-13.md | 2026-10-13 |
 | K-081 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | ba522f133d05624c2130f15eb8ef3b6329b0f37a | 5928d98534e95a79e2ffbcc2065d38602dd98b0f | K-081 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at ba522f133d05624c2130f15eb8ef3b6329b0f37a | ledger-selfcost-stagec-c | docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md | 2026-10-13 |
+| K-090 | .claude/skills/ab-test-designer/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 775b774fde08e5d7ac1df462bef78de148b07a8a | P1 accepted: .claude/skills/ab-test-designer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md | 2026-10-15 |
+| K-091 | .claude/skills/ab-test-designer/references/ab-test-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 28e206977eacb05084844fcbc7d5aff7f90f1ed1 | P2 accepted: .claude/skills/ab-test-designer/references/ab-test-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md | 2026-10-15 |
+| K-092 | .claude/skills/acceptance-criteria-reviewer/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 56899580a8a30b194a1ba5cf63ab810984426604 | P3 accepted: .claude/skills/acceptance-criteria-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md | 2026-10-15 |
+| K-093 | .claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | bf44030a2928081b1720396233d3208938d9e85c | P4 accepted: .claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md | 2026-10-15 |
+| K-094 | .claude/skills/accessibility-test-harness/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 61a36e4f3acbc2aa25bf743a804add2e32492786 | P5 accepted: .claude/skills/accessibility-test-harness/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md | 2026-10-15 |
+| K-095 | .claude/skills/accessibility-test-harness/references/a11y-checklists.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 0be76bc052efba600c5f7296aa1d0f8421fb725f | P6 accepted: .claude/skills/accessibility-test-harness/references/a11y-checklists.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md | 2026-10-15 |
+| K-096 | .claude/skills/admin-console-architect/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | d9500b3bde91301cef76dc76ac659712d4e93e91 | P7 accepted: .claude/skills/admin-console-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md | 2026-10-15 |
+| K-097 | .claude/skills/adr-sequencer/references/adr-corpus-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 84ed16cabe2e7390ea95825c173382900ee4430e | P8 accepted: .claude/skills/adr-sequencer/references/adr-corpus-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md | 2026-10-15 |
