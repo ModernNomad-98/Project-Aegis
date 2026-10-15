@@ -61,8 +61,10 @@ Union with the 4 `provably_pending` paths = **590** paths; sorted, the first
 three-reader ceiling (ledger L3000-3006) is satisfied by construction and is recorded here rather
 than presented as multiple agents.
 
-**Declared deviation (read honestly, not silently).** The ledger-keeper role (AEGIS-APR-101)
-requires the keeper to be a different agent from the page's author **and accepting reviewer**;
+**Declared deviation (read honestly, not silently).** The ledger-keeper role (AEGIS-APR-101, the
+owner-approval-register grant that defines the recording-only ledger-keeper role and its
+keeper-independence condition) requires the keeper to be a different agent from the page's
+author **and accepting reviewer**;
 this lane's one agent is both the accepting reader and the writer of this lane's ledger section
 and batch record, so the second condition is **not satisfied** and the rows are **not green**.
 The first condition **is** satisfied — the lane wrote none of the eight read pages: this lane's
@@ -80,12 +82,18 @@ page names other authors (`git log -1 --format="%h %an" -- <page>`):
 | P7 | `d72c07e2` nguyenpv1980-wq |
 | P8 | `1e1cc705` Peter Nguyen ("fix(ci): apply #528 security review items 2-4 and the hardening") |
 
-The carry is the same CARRY-WITH-DEVIATION the SD-D2 coordinator ruling recorded for K-074/K-075
-and applied through K-081, and the authority question stays with the merge holder under
-AEGIS-APR-100; this lane records under AEGIS-APR-101 (recording only) and delivers under
-AEGIS-APR-039.
+The carry is the same CARRY-WITH-DEVIATION (carrying the rows forward with the declared
+deviation recorded, not hidden — the precedent first recorded for K-074/K-075) the SD-D2
+coordinator ruling (the coordinator's 2026-10-12 ruling that let the K-074/K-075 rows stand
+with the unmet keeper-eligibility clause declared) recorded for K-074/K-075 (the two earlier
+keeper-row IDs in this backlog's consolidated table) and applied through K-081 (the last
+earlier keeper-row ID the carry was applied through), and the authority question stays with
+the merge holder under AEGIS-APR-100 (the owner's standing commit, push and merge
+pre-approval grant); this lane records under AEGIS-APR-101 (the ledger-keeper recording
+grant; recording only) and delivers under AEGIS-APR-039 (the standing backlog-delivery
+approval).
 
-## 3. Per-page dispositions — eight full-page re-reads, zero edits
+## 3. Per-page dispositions — eight full-page re-reads, zero edits (seven accepted, one partial)
 
 Every page was read **whole, line by line, as prose**, at the bound revision
 `e2a3e20b7c20ef8385b219b39c6405237163406f`, in this session; each page's full text was displayed in one read with no
@@ -95,22 +103,27 @@ were judged per page; the disposition table:
 
 | # | Page | Lines / bytes at the bound revision | Verdict | Edits |
 | --- | --- | ---: | --- | ---: |
-| P1 | `.claude/agents/ai-security-red-team-reviewer.md` | 34 / 2,055 | **accepted** | 0 |
-| P2 | `.claude/agents/full-codebase-auditor.md` | 31 / 1,611 | **accepted** | 0 |
-| P3 | `.claude/agents/principal-architecture-reviewer.md` | 32 / 1,739 | **accepted** | 0 |
-| P4 | `.claude/agents/qa-automation-lead.md` | 32 / 1,691 | **accepted** | 0 |
-| P5 | `.claude/agents/release-readiness-reviewer.md` | 32 / 1,765 | **accepted** | 0 |
-| P6 | `.claude/agents/secure-saas-reviewer.md` | 35 / 1,908 | **accepted** | 0 |
-| P7 | `.claude/agents/senior-troubleshooting-lead.md` | 31 / 1,651 | **accepted** | 0 |
-| P8 | `.claude/skills/_template/SKILL.md` | 120 / 7,081 | **accepted** | 0 |
+| P1 | `.claude/agents/ai-security-red-team-reviewer.md` | 33 / 2,055 | **accepted** | 0 |
+| P2 | `.claude/agents/full-codebase-auditor.md` | 30 / 1,611 | **accepted** | 0 |
+| P3 | `.claude/agents/principal-architecture-reviewer.md` | 31 / 1,739 | **accepted** | 0 |
+| P4 | `.claude/agents/qa-automation-lead.md` | 31 / 1,691 | **accepted** | 0 |
+| P5 | `.claude/agents/release-readiness-reviewer.md` | 31 / 1,765 | **accepted** | 0 |
+| P6 | `.claude/agents/secure-saas-reviewer.md` | 34 / 1,908 | **accepted** | 0 |
+| P7 | `.claude/agents/senior-troubleshooting-lead.md` | 30 / 1,651 | **accepted** | 0 |
+| P8 | `.claude/skills/_template/SKILL.md` | 119 / 7,081 | **partial** | 0 |
 
 Line and byte counts are `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` measured in this session, not
-transcribed. No page needed a fix, so no "corrected" row exists and no page's net line change is
-anything other than 0.
+transcribed; the repair pass re-measured all eight with the same command under `wc -l` semantics
+and corrected the line counts and `L1-N` ranges here (section 8). No page needed a fix, so no
+"corrected" row exists and no page's net line change is anything other than 0. P8's verdict is
+**partial**, not accepted: its B2 abbreviation-definition bullet is partial (YAML, API and MCP
+appear without an on-page first-use definition), so P8 is recorded honestly as a partial
+acceptance and the full-page-acceptance keeper row K-089 (this PR's keeper row for P8) does not
+stand as authored — PR #781 withdraws it and re-records from the same evidence (section 8).
 
 ## 4. Per-page read detail — ranges, bullets, purpose restatements, verification
 
-**P1 — `.claude/agents/ai-security-red-team-reviewer.md`** — read whole, L1-34.
+**P1 — `.claude/agents/ai-security-red-team-reviewer.md`** — read whole, L1-33.
 Purpose and normal use (restated from the page alone): a read-only red-team reviewer persona for
 large language model (LLM)/agent features; it traces where untrusted data enters a prompt and
 which tools the model can call with model-chosen arguments, then reports an exposure verdict
@@ -128,7 +141,7 @@ commands on the page (grep `](` returns nothing), so nothing to check. B6 indepe
 this record; the page's author is another agent/human (see section 2).
 **Verdict: accepted, no edit.**
 
-**P2 — `.claude/agents/full-codebase-auditor.md`** — read whole, L1-31.
+**P2 — `.claude/agents/full-codebase-auditor.md`** — read whole, L1-30.
 Purpose and normal use: a read-only staff-engineer persona performing a whole-repository health
 audit — consistency, dead/duplicated code, structure, dependency and config hygiene, and a
 prioritized technical-debt map, with an explicit coverage note separating what was inspected
@@ -140,7 +153,7 @@ headings, bullets, the method names the sampling discipline, the Output contract
 parts. B4 not applicable. B5 zero links, zero commands. B6 this record (author: nguyenpv1980-wq).
 **Verdict: accepted, no edit.**
 
-**P3 — `.claude/agents/principal-architecture-reviewer.md`** — read whole, L1-32.
+**P3 — `.claude/agents/principal-architecture-reviewer.md`** — read whole, L1-31.
 Purpose and normal use: a read-only principal-engineer persona reviewing architecture (module
 boundaries, coupling, data flow, extensibility, scalability, simplicity), returning a one-line
 verdict (sound / needs revision / redesign), ranked findings with file:line, minimal
@@ -151,7 +164,7 @@ the accept/produce shape, the refusal case is stated (stop and ask when requirem
 unclear). B4 not applicable. B5 zero links, zero commands. B6 this record (author: Peter Nguyen).
 **Verdict: accepted, no edit.**
 
-**P4 — `.claude/agents/qa-automation-lead.md`** — read whole, L1-32.
+**P4 — `.claude/agents/qa-automation-lead.md`** — read whole, L1-31.
 Purpose and normal use: a read-only quality assurance (QA) automation lead reviewing test
 strategy and coverage — coverage gaps, assertion strength, test-pyramid balance, flakiness,
 fixture hygiene and continuous integration (CI) gating — returning a coverage verdict, priority
@@ -163,7 +176,7 @@ is stated (stop and ask when the spec is ambiguous). B4 not applicable. B5 zero 
 commands. B6 this record (author: Peter Nguyen).
 **Verdict: accepted, no edit.**
 
-**P5 — `.claude/agents/release-readiness-reviewer.md`** — read whole, L1-32.
+**P5 — `.claude/agents/release-readiness-reviewer.md`** — read whole, L1-31.
 Purpose and normal use: a read-only release-manager persona running a ship / no-ship gate —
 change risk, rollback, migration and data safety, feature-flag state, docs/changelog,
 observability and test signal — returning a Go/No-Go line, blocking items, non-blocking risks
@@ -175,7 +188,7 @@ release readiness; it makes no shipped-vs-proposed claim about a system. B5 zero
 commands. B6 this record (author: nguyenpv1980-wq).
 **Verdict: accepted, no edit.**
 
-**P6 — `.claude/agents/secure-saas-reviewer.md`** — read whole, L1-35.
+**P6 — `.claude/agents/secure-saas-reviewer.md`** — read whole, L1-34.
 Purpose and normal use: a read-only application-security reviewer persona for multi-tenant
 software as a service (SaaS) — authentication, authorization, tenant isolation, data handling,
 secrets and injection exposure — returning a ship / fix-before-ship / block verdict, ranked
@@ -188,7 +201,7 @@ undocumented). B4 not applicable. B5 zero links, zero commands. B6 this record (
 Nguyen).
 **Verdict: accepted, no edit.**
 
-**P7 — `.claude/agents/senior-troubleshooting-lead.md`** — read whole, L1-31.
+**P7 — `.claude/agents/senior-troubleshooting-lead.md`** — read whole, L1-30.
 Purpose and normal use: a read-only senior-engineer persona leading incident and bug triage —
 restate the symptom, form hypotheses, localize with Grep/Read, confirm root cause at file:line,
 propose a minimal fix plus a regression test — returning root cause, causal chain and fix plan.
@@ -198,7 +211,7 @@ missing artifact rather than fabricate a repro). B4 not applicable. B5 zero link
 commands. B6 this record (author: nguyenpv1980-wq).
 **Verdict: accepted, no edit.**
 
-**P8 — `.claude/skills/_template/SKILL.md`** — read whole, L1-120.
+**P8 — `.claude/skills/_template/SKILL.md`** — read whole, L1-119.
 Purpose and normal use: a reference template for authoring a new Aegis skill — copy the
 directory, rename it, set `name`, and rewrite every section against
 `docs/skill-generation-standard.md`; it is not a shipped skill and is never invoked.
@@ -226,7 +239,7 @@ at the bound revision, not repaired: editing an instruction file under `.claude/
 reclassify this change beyond docs-only (the change-classification-gate's agent-instruction-file
 rule), and the page's own contract points every reader at the standard where the terms are
 defined.
-**Verdict: accepted, no edit.**
+**Verdict: partial acceptance, recorded honestly — not a full-page acceptance.** The full-page-acceptance keeper row K-089 does not stand as authored; PR #781 withdraws it (withdrawal row K-089W, the row that cancels K-089) and re-records it from the same evidence by a different eligible keeper (section 8).
 
 ## 5. The verbatim quote lines the keeper rows cite (one per data row)
 
@@ -241,14 +254,17 @@ P8 accepted: .claude/skills/_template/SKILL.md read whole at e2a3e20b7c20ef8385b
 
 ## 6. Count honesty, the machine-visibility note, and the self-cost
 
-- **This lane publishes no readability count of its own** (the D84 official-count switch). The
-  instrument's figures at the base are quoted in section 1 as the instrument's.
+- **This lane publishes no readability count of its own** (the D84 official-count switch — the
+  2026-10-10 decision that the acceptance index supplies the official pending count and the
+  ledger publishes none of its own). The instrument's figures at the base are quoted in section
+  1 as the instrument's.
 - **The appended keeper rows are not machine-visible until the routine index rebuild.**
   `build_index.py --report` was **not run in-lane**: the shared clone is shallow
   (`git rev-parse --is-shallow-repository` = `true`), and the builder refuses shallow
-  repositories by design ("the rebuild must reproduce in a full clone (D73 row 6)") — the
-  refusal was reproduced this session. No `build_index.py --write` was run, and none is
-  claimed.
+  repositories by design ("the rebuild must reproduce in a full clone (D73 row 6 — the
+  full-clone-reproducibility guarantee of D73, the 2026-10-07 decision that the acceptance
+  index gives the readability pending count after a gated repair)") — the refusal was
+  reproduced this session. No `build_index.py --write` was run, and none is claimed.
 - **Self-cost.** This lane appends a dated keeper section to the ledger and eight keeper rows,
   which changes the ledger by more than 10 lines, so the ledger stays **pending** and owes its
   own independent full-page re-read — the self-cost every prior update states. This batch record
@@ -270,3 +286,49 @@ P8 accepted: .claude/skills/_template/SKILL.md read whole at e2a3e20b7c20ef8385b
 | 7 | per-path check against `tools/readability_acceptance/acceptance-index.json` `reader_pages` | all 8 paths absent (pending, as derived) |
 | 8 | `git log -1 --format="%h %an %s" -- <page>` × 8 | other authors only (section 2 table) |
 | 9 | `python -P -B tools/readability_acceptance/check_index.py --json --ref e2a3e20b7c20ef8385b219b39c6405237163406f` | section 1 summary, exit 0 |
+
+## 8. Stage F REVISE repair — 2026-10-15 (this record corrected pre-merge)
+
+**Repairer.** `readability-lane-a-repairer-c` — a DeepSeek (deepseek-v4-pro) agent different
+from this lane's reader/keeper `readability-lane-a-implementer-c` (this PR's one reader and
+row author) and from every page's author, per the revision-cycle design (reader / keeper /
+repairer are three different agents). The repair corrects this record in place (the record is
+pre-merge, so in-place correction is the dated-record rule's pre-merge path) and authors **no
+keeper rows and no withdrawal rows** — that work is PR #781's and is not re-created here.
+
+**The five Codex automated-review findings at the reviewed head `09a7ee1c…` — each with its
+recorded disposition, none left untriaged (a P1 is never untriaged):**
+
+| # | Severity | Finding | Disposition recorded here |
+| --- | --- | --- | --- |
+| 1 | P1 | withhold rows recorded by the accepting reviewer (K-082..K-089, this PR's eight keeper rows) | **Fixed externally, coordinated.** PR #781 (AEGIS-APR-117, the approval-register grant that authorises withdrawal rows) appends withdrawal rows K-082W..K-089W (the eight rows that cancel K-082..K-089) and fresh keeper rows K-098..K-105 (lane A's allocated band of fresh row IDs) recorded by a different eligible keeper (`deepseek-v4-pro-apr117-keeper`) from the same evidence. This repair leaves the eight rows as authored so #781's withdrawal rows stay aligned, and authors none of its own. |
+| 2 | P2 | do not accept a page with an acknowledged checklist gap (K-089, this PR's keeper row for P8) | **Fixed in this record.** P8 is now recorded **partial** (sections 3 and 4): its B2 abbreviation-definition bullet is partial (YAML, API, MCP undefined on-page). The K-089 full-page-acceptance row does not stand as authored and is withdrawn by PR #781. The docs-only classification (the change-classification-gate class for a diff touching only documentation paths) is not a waiver of the gap — it records only why the page was not edited. |
+| 3 | P2 | include cannot-decide pages in the lane partition | **Recorded, not a defect of this batch.** The six `cannot_decide` (lost-commit-event) pages are outside this lane's 590-path partition (586 no-record + 4 provably-pending); assigning them a lane is the coordinator's routing call, already recorded in the coordinator's revision-cycle design note (a coordinator workspace artifact, not a repo file). This repair does not invent a re-partition it is not authorised to make. |
+| 4 | P1 | expand the bare governance labels in the report | **Fixed in this record and in the ledger section.** Every previously-bare label now carries a one-line plain-English gloss in the same item: CARRY-WITH-DEVIATION (the carry-with-recorded-deviation precedent), SD-D2 (the coordinator ruling that first recorded it), K-074/K-075 and K-081 (the earlier keeper-row IDs the carry spans), AEGIS-APR-100/101/039 (the standing pre-approval, ledger-keeper and backlog-delivery grants), D84 (the official-count switch) and D73 (the index-authority decision; row 6 the full-clone guarantee). |
+| 5 | P2 | correct the off-by-one page line counts | **Fixed in this record.** All eight counts and `L1-N` ranges re-measured at the bound revision and corrected (the recorded values were split-length counts that include a phantom trailing element; the correction uses `wc -l` semantics): lines 33/30/31/31/31/34/30/119; bytes unchanged 2,055/1,611/1,739/1,691/1,765/1,908/1,651/7,081. |
+
+**Commands behind the corrections (all run in a full clone with `refs/pull/*/head` fetched):**
+- `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` for each of the eight pages, lines counted as newline
+  characters (`wc -l` semantics) and bytes as the blob's byte length — sections 3 and 4 corrected from these numbers;
+- `git diff --numstat e2a3e20b7c20ef8385b219b39c6405237163406f..HEAD` — every deleted line of the PR's diff counted by git (the
+  insert-only count), not by regex;
+- `python tools/readability_acceptance/build_index.py --repo <full clone> --ref HEAD --report` — run by this
+  repair pass (the lane pass could not: its clone was shallow, which the builder refuses by design); output in
+  the PR body's validation table;
+- `python scripts/ci/check_pr_body_skills.py --body-file <posted body readback>` exit 0;
+  `python scripts/check_dco.py --range origin/main..HEAD` SIGNED; `git diff --check` exit 0.
+
+**K-089 honesty.** P8's B2 bullet is partial and this record now says so in its verdict. A
+partial checklist bullet is not a full-page acceptance, so the K-089 row as authored
+(full-page-acceptance) does not stand; PR #781's withdrawal row K-089W (the row that cancels
+K-089) cancels it and the fresh row is recorded there by the eligible keeper. The docs-only
+classification is not treated as a waiver of the gap.
+
+**Coordination with PR #781.** Rows K-082..K-089 (this PR's keeper rows for P1-P8) are
+withdrawn by PR #781 and re-recorded there as K-098..K-105 (lane A's allocated band of fresh
+row IDs) from the same evidence by `deepseek-v4-pro-apr117-keeper`; no page is re-read by
+either PR. This repair's diff leaves the eight rows as authored and adds no keeper or
+withdrawal rows, so the two PRs' row edits do not conflict.
+
+**Attribution (the 2026-10-13 rule).** This section and every corrected line above are
+drafted by DeepSeek (deepseek-v4-pro), an AI agent operating under the owner account.
