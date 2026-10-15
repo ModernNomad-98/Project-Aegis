@@ -451,3 +451,27 @@ the instrument's printed figures at this PR's head and the ledger-honest
 figure 568 = 596 - 29 + 1, both measured by command.
 
 Recorded by **DeepSeek V4 Pro** (deepseek-v4-pro), Stage C repair round 3.
+
+## Correction appended 2026-10-15 (Stage C) - WD-D4-r1 withdraws K-392; LD-4 stays pending
+
+The WD-D4 block above ends "Fresh row: K-392, event kind full-page-acceptance". That row is
+wrong and is withdrawn: LD-4's lane record records an acknowledged first-use gap - `D9` at page
+L30, unglossed, a failure of acceptance bullet 2 (abbreviations and coded identifiers defined
+at first use) - as observation O-2 (section 6(b)/O-2 of PR #774's lane D record, head
+8fbc2f2e). The re-audit sweep that keyed on the literal word 'partial' missed it because the
+lane record records the gap as an observation, not as a partial disposition; a sweep keyed on a
+disposition label cannot see a gap recorded as an observation. The withdrawal row appended to
+the ledger's consolidated keeper table cancels K-392 and no fresh row replaces it: the ledger's
+four event kinds (full-page-acceptance, targeted-review, withdrawal, lost-commit) have no
+partial event kind, so no fresh row replaces it: LD-4's disposition is PARTIAL, the page keeps only its withdrawal rows and stays pending - the gap stated
+plainly, not forced into a full-page-acceptance. The other 28 fresh rows were re-swept by
+reading each lane record's observations and acceptance bullets: no other fresh row covers a
+page whose lane record flags a gap (the method and result are recorded in the ledger's appended
+correction section). Counts, measured at this correction's head: the instrument prints
+accepted_on_recorded_review 88 and official_pending_count 567; the ledger-honest figure is 571
+= 596 - 28 + 3. Both measured by command, not taken from arithmetic.
+
+- Withdrawal row quote (AEGIS-APR-117 correction, the register grant that lets the ledger keeper append withdrawal rows): WD-D4-r1 withdraws K-392 (deepseek-v4-pro-apr117-keeper): LD-4 accepted: docs/evidence/documentation/full-page-readability-sample-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+
+Recorded by **DeepSeek V4 Pro** (deepseek-v4-pro), Stage C, under the owner account, as the
+repository's 2026-10-13 attribution rule requires.

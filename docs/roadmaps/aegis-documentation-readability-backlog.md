@@ -5488,3 +5488,89 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-394 | docs/evidence/documentation/historical-evidence-reading-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 1cb9397d971c9f935e3753b9b1ea3b06372f1e97 | LD-6 accepted: docs/evidence/documentation/historical-evidence-reading-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
 | K-395 | docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | a071d86fd5d951d1d4e322d2a5fbb8efde5b8eb2 | LD-7 accepted: docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
 | K-396 | docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 9c5b58990d7e3d649fb60bcf6b7355a1cccaea5b | LD-8 accepted: docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+| K-392W | docs/evidence/documentation/full-page-readability-sample-2026-09-23.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | eba6ddbb05e774632262e115374b55ecf3617856 | WD-D4-r1 withdraws K-392 (deepseek-v4-pro-apr117-keeper): LD-4 accepted: docs/evidence/documentation/full-page-readability-sample-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-v4-pro-apr117-keeper | docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md | 2026-10-15 |
+
+**Correction appended 2026-10-15 (Stage C) - K-392 withdrawn; LD-4 left pending; the
+observation-keyed sweep stated.**
+The merged PR #781 (the AEGIS-APR-117 withdrawal-and-re-record pull request) recorded K-392, a
+full-page-acceptance row for lane D's LD-4
+(`docs/evidence/documentation/full-page-readability-sample-2026-09-23.md`). LD-4's own lane
+record records an acknowledged first-use gap for that page (PR #774's lane D batch record
+`docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md`, head 8fbc2f2e):
+its section 6(b) says "The one identifier not glossed on its page is LD-4's `D9` (observation
+O-2 below)." and its O-2 records that LD-4 L30 - "Reconciled the 30-day evidence-policy choice,
+schema-shape and D9 decisions" - uses `D9` without a gloss and dispositions it unchanged. That
+is a failure of acceptance bullet 2 (abbreviations and coded identifiers defined at first use).
+Measured on the page itself at the bound revision e2a3e20b: `D9` occurs exactly once, at L30,
+unglossed, and a scan of all eight lane-D pages finds LD-4 the only page with this defect. So
+main carries a full-page-acceptance row for a page whose own lane record flags the gap - the
+same class as the P2 (the second-highest-severity automated-review finding; a P1, the highest,
+is an automatic merge stop) the Codex audit raised on PR #771's P8/K-089 (lane A's template
+page and its row), and the same class as the three rows round 3 of PR #781's repair removed
+before merge (K-105, K-299 and K-300, the fresh row IDs whose pages carry lane PARTIAL
+verdicts).
+
+**Why the earlier sweep missed it - the generalisable lesson, stated.** The Stage D re-audit of
+PR #781 swept for the literal word 'partial' and reported the remaining rows clean. Lane D's
+record does not use that word for LD-4: it records the gap as an OBSERVATION (section 6(b)/O-2)
+while its disposition table (section 4) says LD-4 "accepted unchanged". A sweep keyed on a
+disposition label cannot see a gap recorded as an observation. The rule this correction makes
+explicit: a sweep over fresh full-page-acceptance rows must read each lane record's
+observations and acceptance bullets, not its disposition words.
+
+**The withdrawal - one appended row, no replacement.** Row K-392W (the withdrawal row that
+cancels K-392; a W suffix marks a withdrawal row) is appended at the table tail under
+AEGIS-APR-117 (the register grant that lets the ledger keeper append withdrawal rows). It binds
+the same page, the same acceptance revision, the same blob ID, and a quote that names the row,
+the keeper whose row it is (deepseek-v4-pro-apr117-keeper, the keeper that recorded PR #781's
+rows) and the withdrawn row's own quote, so it cancels the right row and stays robust to any
+renumbering. The ledger's fixed-format contract names four event kinds - full-page-acceptance,
+targeted-review, withdrawal and lost-commit - and has no partial event kind, so no replacement
+acceptance row is recorded: LD-4's disposition is PARTIAL (the gap above), and because the schema has no partial kind the page is left pending, the gap stated plainly rather than forced
+into a full-page-acceptance (the same honest-gap treatment the round-3 repair gave P8, C1-3 and
+C1-4, the three lane-marked partial pages). K-392 and K-384W (the withdrawal row that cancelled
+lane D's ineligible K-093) remain appended; the ledger is never rewritten.
+
+**The sweep over the other 28 fresh rows - re-run on observations, not disposition words;
+clean.**
+Method: each of the four lane batch records was read at its current open-PR head (lane A #771
+f6a4e418, lane B #772 a94dc5ea, lane C #776 aa88923f, lane D #774 8fbc2f2e - the four lane pull
+requests and their heads at read time), and every observation, declared deviation and per-page
+acceptance-bullet row was checked for a recorded gap on any of the 28 pages that keep a fresh
+full-page-acceptance row (lane A P1-P7 -> K-098..K-104; lane B B1-1..B1-8 -> K-189..K-196; lane
+C C1-1, C1-2 and C1-5..C1-8 -> K-297, K-298 and K-301..K-304; lane D LD-1..LD-3 and LD-5..LD-8
+-> K-389..K-391 and K-393..K-396). Result: clean - and a clean sweep is a finding too. Lane A:
+P1-P7's six bullets all recorded satisfied, no observation flags a gap. Lane B: all eight
+pages' bullets recorded satisfied, no observations. Lane C: the only recorded gaps are C1-3's
+and C1-4's partial abbreviation bullets (declared deviation 3, sections 3-4 and follow-up 2),
+and those two pages correctly carry no fresh row (K-299 and K-300 left unused). Lane D: O-2 is
+the only observation recording an acceptance-bullet-2 failure, and its page is LD-4; O-1, O-3
+and O-4 are stale-citation properties of dated records (LD-3's tracker anchors, LD-3's plan
+tokens, LD-5's historical link count) that fail no acceptance bullet, so LD-3 and LD-5 keep
+their fresh rows. No other fresh row launders a recorded gap.
+
+**The count, re-measured at this correction's head - printed vs ledger-honest.** LD-4 leaves
+the ledger-honest accepted bucket (its only rows are now withdrawal rows) but stays inside the
+instrument's printed accepted bucket: check_index.py (the script that reports the official
+pending count) documents that accepted-on-recorded-review requires a full-page-acceptance row,
+while its code buckets any zero-drift row, so LD-4's withdrawal row counts as an acceptance at
+zero drift. Measured by command at this head with a fresh build_index.py --write and
+check_index.py --json (the builder and the checker): the instrument prints
+accepted_on_recorded_review 88 and official_pending_count 567 - the same figures a fresh write
+prints at the derivation base f490c16f (the merged main tip), where they moved from the
+pre-merge repair head's 89/565 because PR #786's new OWNER-DECISIONS page adds a no-row reader
+page and PR #770's delivery-workflow edits drifted that page past its recorded acceptance (both
+measured, not assumed). The ledger-honest figure - what the instrument would print if it
+honoured its documented definition - is 571 = 596 - 28 + 3: base pending 596; 28 pages honestly
+accepted by the fresh rows that remain; +1 the APR-117 evidence file, +1 the OWNER-DECISIONS
+page, +1 delivery-workflow's drift - three reader pages with no fresh full-page-acceptance row.
+The instrument will not print 571; it prints 567, counting LD-4 (like the three partial pages)
+as accepted through its withdrawal row. Both figures are measured by command; the disagreement
+is stated, not hidden. This section changes the ledger by more than 10 lines, so the ledger
+itself stays pending and owes its own independent full-page re-read.
+
+**Recording authority and attribution.** This section and row K-392W are recorded by DeepSeek
+V4 Pro (deepseek-v4-pro), the Stage C implementing agent, under the owner account, as the
+repository's 2026-10-13 attribution rule requires. The withdrawal is recorded under
+AEGIS-APR-117 (the register grant that lets the ledger keeper append withdrawal rows) and names
+the keeper identity deepseek-v4-pro-apr117-keeper that recorded K-392.
