@@ -5111,6 +5111,61 @@ six lost-commit rows' cells, rebuilds no `tools/` artifact, runs no
 authority. The batching procedure does not grant provider, private-input,
 real-host or deployment authority (L3018-3020).
 
+## Ledger-keeper recording + batch update — readability Phase 4 lane B batch 1, 2026-10-15
+
+**Under AEGIS-APR-101 (recording only).** This note records Phase 4 full-page
+re-read lane B batch 1 (lane B — the second quarter of the pending set sorted
+by repository path). It is additions only: it rewrites no dated text, edits no
+existing keeper row, and confers nothing.
+
+**Lane derivation, by command.** At the base head
+`e2a3e20b7c20ef8385b219b39c6405237163406f`,
+`python -P -B tools/readability_acceptance/check_index.py --json --ref HEAD`
+reports `no_recorded_acceptance` 586 and `provably_pending` 4; the pending
+set (the 590 paths of the two buckets the lane's brief names), sorted by path,
+splits into four quarters of 148. Lane B is sorted indices 148–295: first
+`.claude/skills/file-upload-storage-architect/SKILL.md`, last
+`.claude/skills/share-link-access-architect/SKILL.md`. The quarter's actual
+letter span is f–s inside `.claude/skills/`, not the brief's "G through N"
+description; the command-derived quarter is authoritative and matches the
+sibling lanes' derivations. Batch 1 is the first eight pages of lane B.
+
+The eight pages below were each independently full-page re-read at the base
+head against [Acceptance for each page](#acceptance-for-each-page) by
+`readability-lane-b-implementer-c` — a single DeepSeek deepseek-v4-pro Stage C
+implementer who wrote none of the eight pages and also writes this section
+(the same declared deviation the 2026-10-12 record states) — and each page's
+purpose and normal use was restated from the page alone in the batch record.
+**All eight were accepted unchanged**: zero corrections, zero edits to any
+read page; no posture, Stop Condition or Security Rule changed.
+
+| Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [file-upload-storage-architect](../../.claude/skills/file-upload-storage-architect/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-1-2026-10-15.md) | 2026-10-15 |
+| [flaky-test-detective](../../.claude/skills/flaky-test-detective/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-1-2026-10-15.md) | 2026-10-15 |
+| [flake-taxonomy](../../.claude/skills/flaky-test-detective/references/flake-taxonomy.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-1-2026-10-15.md) | 2026-10-15 |
+| [framework-edition-tracker](../../.claude/skills/framework-edition-tracker/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-1-2026-10-15.md) | 2026-10-15 |
+| [edition-tracking-sheet](../../.claude/skills/framework-edition-tracker/references/edition-tracking-sheet.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-1-2026-10-15.md) | 2026-10-15 |
+| [framework-mapping-refresher](../../.claude/skills/framework-mapping-refresher/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-1-2026-10-15.md) | 2026-10-15 |
+| [mapping-refresh-sheet](../../.claude/skills/framework-mapping-refresher/references/mapping-refresh-sheet.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-1-2026-10-15.md) | 2026-10-15 |
+| [frontend-perf-engineer](../../.claude/skills/frontend-perf-engineer/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-1-2026-10-15.md) | 2026-10-15 |
+
+**Cross-lane note.** The sibling lanes append keeper rows from the same base,
+so the consolidated table's stable IDs K-082 onward may collide when sibling
+rows land first; the merge agent renumbers the table sequentially at merge.
+These rows are recorded here as K-082–K-089.
+
+**Count honesty.** This note publishes no count of its own. The instrument at
+the base reports 653 reader pages and an official pending count of 596. The
+eight appended rows change nothing until the index rebuild (the two-commit
+follow-up or the merger-side rebuild the ledger already names); the new batch
+record page enters `no_recorded_acceptance`.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read
+against [Acceptance for each page](#acceptance-for-each-page) by a reader who
+did not write this section — the self-cost every prior update states.
+
 <!-- acceptance-index-schema: 1 -->
 
 ## Consolidated keeper table — index schema v1 (D84, 2026-10-10)
@@ -5233,3 +5288,11 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-079 | docs/approvals/APPROVAL_REGISTER.md | full-page-acceptance | c80c8d2d553671579e878584914eae695028eab4 | 548e80efdc630eb04a9b41839c608b4928b4bc2a | K-079 accepted: docs/approvals/APPROVAL_REGISTER.md read whole at c80c8d2d553671579e878584914eae695028eab4 | readability-final3-implementer-c | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | 2026-10-12 |
 | K-080 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | b44d47c9a10cde4c62d6fdae52bf577e04242a50 | K-080 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | readability-ledger-reader-c | docs/evidence/documentation/readability-ledger-reread-2026-10-13.md | 2026-10-13 |
 | K-081 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | ba522f133d05624c2130f15eb8ef3b6329b0f37a | 5928d98534e95a79e2ffbcc2065d38602dd98b0f | K-081 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at ba522f133d05624c2130f15eb8ef3b6329b0f37a | ledger-selfcost-stagec-c | docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md | 2026-10-13 |
+| K-082 | .claude/skills/file-upload-storage-architect/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 5a527691661a5bffb53aaca26b1cd397e4843a10 | B1-1 accepted: .claude/skills/file-upload-storage-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-1-2026-10-15.md | 2026-10-15 |
+| K-083 | .claude/skills/flaky-test-detective/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | f5f340fc5c9235b5483ce1db8a4d2f6921c4e60c | B1-2 accepted: .claude/skills/flaky-test-detective/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-1-2026-10-15.md | 2026-10-15 |
+| K-084 | .claude/skills/flaky-test-detective/references/flake-taxonomy.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 0a8ca8cf6122feaa3bb483d5c76aaada738715ec | B1-3 accepted: .claude/skills/flaky-test-detective/references/flake-taxonomy.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-1-2026-10-15.md | 2026-10-15 |
+| K-085 | .claude/skills/framework-edition-tracker/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | a9d5b1f28ba71ab03fe3653144b4ac5759d91102 | B1-4 accepted: .claude/skills/framework-edition-tracker/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-1-2026-10-15.md | 2026-10-15 |
+| K-086 | .claude/skills/framework-edition-tracker/references/edition-tracking-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 0db64a054397abd29858b06029b3e48adc8a5e5a | B1-5 accepted: .claude/skills/framework-edition-tracker/references/edition-tracking-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-1-2026-10-15.md | 2026-10-15 |
+| K-087 | .claude/skills/framework-mapping-refresher/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 903f6166b46b0e1aa7fe272bd244a7e25a5a162e | B1-6 accepted: .claude/skills/framework-mapping-refresher/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-1-2026-10-15.md | 2026-10-15 |
+| K-088 | .claude/skills/framework-mapping-refresher/references/mapping-refresh-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 6c8e31d7c61dd26ef72ded2925ecaeb0042e7ab8 | B1-7 accepted: .claude/skills/framework-mapping-refresher/references/mapping-refresh-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-1-2026-10-15.md | 2026-10-15 |
+| K-089 | .claude/skills/frontend-perf-engineer/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | cdf145b28a4d8d1445b6483ac590f3573deea092 | B1-8 accepted: .claude/skills/frontend-perf-engineer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-1-2026-10-15.md | 2026-10-15 |
