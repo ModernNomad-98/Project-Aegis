@@ -5965,3 +5965,127 @@ the entry governs.
 - **Unblocking action (owner):** supply the durable ledger event chain and its first-segment declaration
   from the authorized external evidence root, or restate the allowance; only then can headroom, the
   provider-side spend limit and the stop-before-exceed rule be recorded as facts.
+
+### AEGIS-APR-137: Readability index program — resume ratified, historical backfill approved, and the sweep reaffirmed to zero pending
+
+- **Event:** GRANT; standing for the sweep, with two lifecycle events appended below.
+- **Status at recording:** Owner approved; **ACTIVE on recording**.
+- **Date / Grantor:** 2026-10-15 / Peter Nguyen.
+- **Owner decision, in the owner's own words.** The owner was given the eight
+  decisions D-1 to D-8 of an independent audit and plan, each with a recommended
+  default, and replied:
+
+  > approve all defaults
+
+  All eight defaults are therefore adopted as written.
+- **What that adopts, one line each:**
+  1. **D-1 — Ratify the resume.** The readability index program is recorded as
+     having resumed on 2026-10-10; AEGIS-APR-114/115/116/117 are in effect. The
+     open-decisions rows that say the program "stays paused" are corrected
+     **forward, by dated note, not by rewriting** them — see the lifecycle event
+     below.
+  2. **D-2 — Historical backfill approved.** The ledger keeper may transcribe
+     pre-2026-10-02 full-page acceptances from the posted September evidence
+     records into the keeper table, **one row per page, only where** the record
+     names the page, the revision resolves, the revision is contained in
+     `origin/main`, and `git rev-parse <rev>:<page>` reproduces the blob — the
+     same D73 row-4 checks D84 used. Historical **targeted** reviews are still
+     not transcribed (AEGIS-APR-113 "Not decided (2)", unchanged).
+  3. **D-3 — Sweep reaffirmed** as standing work to `official_pending_count` = 0
+     at `main`, under AEGIS-APR-039/100/101/115/116/117 and the ledger's rules
+     as written, without per-batch approval.
+  4. **D-4 — Re-read concurrency raised** from at most 2 full-page-re-read pull
+     requests in flight to **4**, equal to the worker cap. Each pull request
+     still carries its own independent reviewer and the seven stages.
+  5. **D-5 — Lighter review path extended** to an AEGIS-APR-115 rebuild pull
+     request whose diff is exactly the two generated JSON files, with Stage E
+     validation being an independent agent rebuilding at the same ref and the
+     files proving byte-identical.
+  6. **D-6 — Rebuild cadence set** at every **five merged batch pull requests**
+     or on demand, not after every batch.
+  7. **D-7 — OD-4 recorded as DEFERRED, not adopted**, until WP-2B-5 produces
+     live evidence — see the lifecycle event below.
+  8. **D-8 — BER-BKL-011 to 015 recorded as PARKED** behind their named gates; no
+     agent raises them again until an owner decision reopens WP-2B-5/6/7 or names
+     a host.
+- **Reason.** The audit established, and the coordinator independently
+  re-verified, two things that had been blocking work incorrectly. **First**, the
+  authority for reading pages was never AEGIS-APR-114 — that grant covered the
+  decision record, the tool repair and the switch, all now merged. Page re-reads
+  are ordinary backlog work already covered by **AEGIS-APR-039's** standing grant
+  ("Continue authorized Project Aegis backlog work… without repeated delivery
+  approval"), whose own text excludes provider calls, real-host proof and the
+  paused virtual machine — not documentation review. **Second**, most of the 596
+  pages counted pending are a **transcription gap, not a reading gap**: the D84
+  backfill transcribed only the twelve keeper sections written after 2026-10-02,
+  leaving the September independent full-page reviews unrecorded. Ratifying the
+  resume, approving the backfill and reaffirming the sweep removes the only
+  authority ambiguity found and lets the program proceed without re-litigating it
+  for every new coordinator.
+- **Scope allowed:** the readability sweep to zero pending — full-page re-reads,
+  targeted reviews, keeper recordings under AEGIS-APR-101/116/117, and
+  AEGIS-APR-115 rebuild pull requests — delivered on the standing terms of
+  AEGIS-APR-039 and AEGIS-APR-100 (all stages passed, all checks green,
+  administrator merge allowed, fix and retry), with the ledger's rules as
+  written, and with re-read concurrency at 4.
+- **Scope FORBIDDEN:** nothing here waives a failed protected `gate-guard`;
+  renews any consumed one-use grant; resumes the paused virtual machine;
+  authorizes provider calls, private input, real-host proof, deployment or
+  evidence deletion (all unchanged from AEGIS-APR-039 L1019-L1022); transcribes
+  historical *targeted* reviews; adopts OD-4; or starts any item in D-8. **The
+  sweep is documentation work only.**
+- **Evidence:** the owner's reply, given directly in the Project Aegis session
+  on 2026-10-15. Transcribed here by the Phase 1 Stage C implementing agent —
+  DeepSeek V4, DeepSeek Harness. It is a session instruction and is **not a
+  repository artifact**. The audit it adopts is *"Project Aegis — audit of the
+  2026-10-15 coordinator message, and a plan that needs one owner reply"*,
+  authored by Claude Fable 5.1 and dated 2026-10-15; **it is not in this
+  repository, so it is cited by title, author and date, and is NOT retrievable
+  from here.** The two findings the coordinator re-verified in this repository
+  before recording are AEGIS-APR-039 at L1003-L1030 and the resume contradiction described in the lifecycle event below.
+- **Expiry / use limit:** standing for the sweep; no one-use limit stated;
+  revocable at any time.
+
+#### Lifecycle event: AEGIS-APR-113's pause superseded by an owner-ratified resume
+
+- **Event:** SUPERSEDED (partial); target AEGIS-APR-113's pause posture only.
+- **What is superseded:** AEGIS-APR-113 records the owner's instruction to
+  *"pause the program and turn it into a low priority backlog items"*, and its
+  own text at L4773 says the program *"is paused after this decision record"*,
+  with AEGIS-APR-115/116/117 covering *"no work until then"*. **The owner has now
+  ratified that the program resumed on 2026-10-10.** From this recording, the
+  pause posture no longer describes the program's state.
+- **The defect this closes, stated rather than smoothed.** Two statements are on
+  `main` and they disagree: the register (L4581, L4773) and the open-decisions
+  page (L287, L334) say the program **stayed paused**, while D84 in the
+  reconciliation record says the item **"resumed"** and the switch merged on
+  2026-10-10. **No register event and no transcribed owner instruction recording
+  a resume was found** — a search of the register for an entry mentioning both a
+  resume and readability returns one entry, L5522, and it says the opposite
+  ("resumes no paused program"). **The audit could not determine from the
+  repository whether a resume instruction exists in session history and was never
+  transcribed, or whether the switch merged on authority that had not yet
+  activated.** It reports both possibilities rather than choosing one, and this
+  entry does the same.
+- **What this entry does and does not do.** It **ratifies the resume forward**,
+  so the program's authority is unambiguous from here. It **does not rewrite**
+  the pause text, does not assert that a resume instruction was previously
+  recorded, and does not treat the earlier gap as resolved. The earlier records
+  stand as written; dated forward notes point at this entry.
+- **New authority:** none beyond the grant above. This event records a state
+  change; it confers nothing by itself.
+
+#### Lifecycle event: OD-4 recorded as DEFERRED
+
+- **Event:** DEFERRED; target open decision OD-4 (evidence authenticity beyond
+  tamper evidence).
+- **What is deferred:** OD-4 is recorded as **DEFERRED, not adopted**, until
+  WP-2B-5 produces live evidence.
+- **Reason:** signing or immutable external storage protects evidence against a
+  compromised control plane, and **there is no live evidence yet** — WP-2B-5/6/7
+  are BACKLOG and WP-2B-4 is BLOCKED. Adopting now buys design work with no
+  consumer plus a key-custody obligation. Version 1 already states the limit
+  honestly in design §13.
+- **Effect:** BER-BKL-010 stays gated on OD-4 and no agent raises OD-4 again
+  until an owner decision reopens it.
+- **New authority:** none.
