@@ -5111,6 +5111,57 @@ six lost-commit rows' cells, rebuilds no `tools/` artifact, runs no
 authority. The batching procedure does not grant provider, private-input,
 real-host or deployment authority (L3018-3020).
 
+## Ledger-keeper recording + batch update — readability Phase 4 re-read lane D, batch 1, 2026-10-15
+
+**Under AEGIS-APR-101 (recording only).** This note records Phase 4 re-read lane D's first batch —
+eight full-page re-reads of dated evidence notes in the lane's fixed range, under the standing
+backlog delivery grant AEGIS-APR-039. It is additions only: it rewrites no dated text, edits no
+existing keeper row, and **confers nothing**. Its tracked evidence source is
+[the batch record](../evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md), which
+names every row's full 40-character acceptance revision verbatim.
+
+**The lane's fixed range.** The pending set at the base is the instrument's `no_recorded_acceptance`
+(586) plus `provably_pending` (4) buckets: **590 paths** (`python -P
+tools/readability_acceptance/check_index.py --json --ref refs/remotes/origin/main` at
+`e2a3e20b`). Sorted and split into four contiguous quarters by count, **lane D takes the last
+quarter: 146 pages, first
+`docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md`, last
+`tools/behavioral_eval_runner/README.md`.** Batch 1 = the first eight, re-checked against the
+instrument at the base: all eight in `no_recorded_acceptance`, so none is already accepted and none
+is outside the lane's range. (The coordinator's "T through Z" gloss is not the quarter this rule
+produces — only 3 of the 590 paths sort at or after "t" — and the record states that divergence.)
+
+**What was read.** Eight dated evidence notes, 24–71 lines each, read **whole, line by line, as
+prose** at the base `e2a3e20b7c20ef8385b219b39c6405237163406f` (391 lines total; no display elision),
+plus the mechanical pass: 30 local links with zero broken paths and zero bad anchors; 6 forty-hex
+SHAs and 3 backtick tokens all resolving; 3 external links not fetched. All eight pass as they
+stand; **no page was edited** (the no-rewrite discipline forbids edits to dated records). Per-page
+dispositions, the six acceptance bullets addressed per page, the four recorded observations
+(O-1..O-4) and the depth record are in the batch record.
+
+**Eight full-page-acceptance rows are appended** (K-090 to K-097), one per page, bound to the
+main-contained base revision. The appended count is therefore **8**, with no withheld or owed row —
+none of the eight pages is this ledger, so the self-cost question does not arise for them. The batch
+record itself is a new reader page and enters `no_recorded_acceptance` pending its own later review.
+
+**Count honesty (unchanged; no count of this lane's own).** This ledger publishes no count of its
+own and cites the index (D84). The eight rows change nothing until a rebuild, and the builder can
+only be rebuilt after the commit that carries the rows because it stamps its own `built_at_ref`; the
+resolvers this ledger already names apply (a two-commit follow-up, or a merger-side rebuild at the
+merged tip, D73 row 8). The rebuild itself is the standing AEGIS-APR-115 rebuild pull request's own
+scope and is not part of this change.
+
+**Self-cost.** This section changes this ledger by more than 10 lines and adds a section, so this
+page returns to **pending** at the new head and owes a subsequent independent full-page re-read by a
+reader who did not write it — the self-cost every prior update states.
+
+**What this note does not do.** It rewrites no dated snapshot, reorders or deletes no existing row,
+binds no row to this lane's unmerged head, edits none of the eight read pages, rebuilds no `tools/`
+artifact, and confers no authority. The batching procedure "does not grant provider, private-input,
+real-host or deployment authority" (L3018-3020). Prepared by a **DeepSeek agent**
+(`deepseek-v4-pro`) operating under the owner account, as the repository's attribution rule
+(2026-10-13) requires.
+
 <!-- acceptance-index-schema: 1 -->
 
 ## Consolidated keeper table — index schema v1 (D84, 2026-10-10)
@@ -5233,3 +5284,11 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-079 | docs/approvals/APPROVAL_REGISTER.md | full-page-acceptance | c80c8d2d553671579e878584914eae695028eab4 | 548e80efdc630eb04a9b41839c608b4928b4bc2a | K-079 accepted: docs/approvals/APPROVAL_REGISTER.md read whole at c80c8d2d553671579e878584914eae695028eab4 | readability-final3-implementer-c | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | 2026-10-12 |
 | K-080 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | b44d47c9a10cde4c62d6fdae52bf577e04242a50 | K-080 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | readability-ledger-reader-c | docs/evidence/documentation/readability-ledger-reread-2026-10-13.md | 2026-10-13 |
 | K-081 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | ba522f133d05624c2130f15eb8ef3b6329b0f37a | 5928d98534e95a79e2ffbcc2065d38602dd98b0f | K-081 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at ba522f133d05624c2130f15eb8ef3b6329b0f37a | ledger-selfcost-stagec-c | docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md | 2026-10-13 |
+| K-090 | docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 82c2800bea638c5c007f2239073289b8b7fa35e5 | LD-1 accepted: docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c | docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md | 2026-10-15 |
+| K-091 | docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 6e8b63df01bcf7e57e47cf9d6338bc350bd68c7a | LD-2 accepted: docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c | docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md | 2026-10-15 |
+| K-092 | docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 702c7ff8676628dce0c91b8a517f316438df889a | LD-3 accepted: docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c | docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md | 2026-10-15 |
+| K-093 | docs/evidence/documentation/full-page-readability-sample-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | eba6ddbb05e774632262e115374b55ecf3617856 | LD-4 accepted: docs/evidence/documentation/full-page-readability-sample-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c | docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md | 2026-10-15 |
+| K-094 | docs/evidence/documentation/governance-poisoning-routing-correction-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | c3132e2e9a98b8c8b920efd0fc39615d4199e2bb | LD-5 accepted: docs/evidence/documentation/governance-poisoning-routing-correction-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c | docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md | 2026-10-15 |
+| K-095 | docs/evidence/documentation/historical-evidence-reading-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 1cb9397d971c9f935e3753b9b1ea3b06372f1e97 | LD-6 accepted: docs/evidence/documentation/historical-evidence-reading-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c | docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md | 2026-10-15 |
+| K-096 | docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | a071d86fd5d951d1d4e322d2a5fbb8efde5b8eb2 | LD-7 accepted: docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c | docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md | 2026-10-15 |
+| K-097 | docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 9c5b58990d7e3d649fb60bcf6b7355a1cccaea5b | LD-8 accepted: docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c | docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md | 2026-10-15 |
