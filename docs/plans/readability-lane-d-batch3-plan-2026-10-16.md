@@ -1,8 +1,10 @@
-# Stage A plan — Phase 4 readability lane D, batch 3 (PR #784) — revision 5
+# Stage A plan — Phase 4 readability lane D, batch 3 (PR #784) — revision 6
 
-**Plan revision 5**, 2026-10-16 — it re-captures plan revision 4 to correct the three findings of the
-posted **SD-B: REVISE** (comment `6215508676`): §8's label for AEGIS-APR-117, §10.1's list of the
-frozen record's pairing sites, and two non-bound PR-body sentences; it carries revisions 1-4's
+**Plan revision 6**, 2026-10-16 — it re-captures plan revision 5 to correct the two findings of the
+posted **SD-B: REVISE** (comment `6216021775`): the two line-range cites of the bound-field
+invalidation rule, each one line short at the tail at both refs (§14), and the PR body's capture table,
+which still bound superseded revision 4's blob and told Stage B to bind it (corrected in the body
+alone — free, because the table sits above all three bound fields); it carries revisions 1-5's
 corrections (§11). **Stage: A (PLAN).** **Role A**
 is this repository, the Project Aegis source library (Role B is a consumer or product repository that
 copied the Aegis files).
@@ -483,7 +485,7 @@ own change, not here; the strings it records from are the record's §10 block, e
 | The instrument's figures at three refs | reproducible by command: `python -P -B tools/readability_acceptance/check_index.py --json --ref <ref>`; base `e2a3e20b…` `653 / 57 / 4 / 586 / 0 / 0 / 6 / 596`, superseded head `1aa632f7…` and head `87c637df…` both `654 / 57 / 4 / 587 / 0 / 0 / 6 / 597`, all exit 0; `--quiet` exits 0 at each; `build_index.py --report` gives the identical block `101 / 101 / 81 / 10 / 68`, exit 0, at **base, `1aa632f7…` and `87c637df…` alike**. All were run in this planning session; **the head move changed none of them** |
 | The C-1 prevalence table | this plan §4, reproducible by the command in §4.1 |
 | The row-quote strings for the keeper | record §10 (8 strings, FULL pages only) |
-| The stage receipts (SD-A…SD-G) | the PR conversation: SD-B **REVISE** `6211504777` and SD-B **REVISE** `6212915586` (both against revision 1); SD-B **ACCEPT** `6213318266` (against revision 2); SD-D **REVISE** `6209631818`; then SD-D **ACCEPT** `6213714837` and SD-E **FAIL** `6213965761`. **Those last two are bound to `1aa632f7…` and are therefore void at `87c637df…`** — a fresh SD-D and a fresh SD-E are owed at this head; SD-B **REVISE** `6214819169` and its addendum `6214824546` are posted against revision 3 (the finding revision 4 corrected), and SD-B **REVISE** `6215508676` is posted against revision 4 (the finding revision 5 corrects), so **a fresh SD-B is owed over revision 5's bytes too** |
+| The stage receipts (SD-A…SD-G) | the PR conversation: SD-B **REVISE** `6211504777` and SD-B **REVISE** `6212915586` (both against revision 1); SD-B **ACCEPT** `6213318266` (against revision 2); SD-D **REVISE** `6209631818`; then SD-D **ACCEPT** `6213714837` and SD-E **FAIL** `6213965761`. **Those last two are bound to `1aa632f7…` and are therefore void at `87c637df…`** — a fresh SD-D and a fresh SD-E are owed at this head; SD-B **REVISE** `6214819169` and its addendum `6214824546` are posted against revision 3 (the finding revision 4 corrected), and SD-B **REVISE** `6215508676` is posted against revision 4 (the finding revision 5 corrects) and SD-B **REVISE** `6216021775` is posted against revision 5 (the two findings revision 6 corrects: §14's two line-range cites at both workflow blobs, and the PR body's own capture table, body-only), so **a fresh SD-B is owed over revision 6's bytes too** |
 | The keeper's rows | the consolidated keeper table in `docs/roadmaps/aegis-documentation-readability-backlog.md`, appended by the separate keeper's own change — **not** by this PR |
 
 ## 10. What this plan does NOT decide
@@ -555,13 +557,40 @@ Named rather than left implicit:
 
 ## 11. The plan's own revision, and how it is captured
 
-**Revision 5** of this plan — it re-captures revision 4 to correct the three findings of SD-B
-`6215508676` (§8's label for AEGIS-APR-117, §10.1's list of the record's pairing sites, and the two
-non-bound PR-body sentences), and it carries revisions 1-4's corrections.
+**Revision 6** of this plan — it re-captures revision 5 to correct the two findings of SD-B
+`6216021775` (the two line-range cites of the bound-field invalidation rule, one line short at the tail
+at both blobs; and the PR body's capture table, which still bound revision 4's superseded blob and told
+Stage B to bind it — corrected in the body, where the table sits above all three bound fields and the
+edit is free), and it carries revisions 1-5's corrections.
 Capture, so that Stage B has an exact text to bind (the requirement is the workflow's own: **L611-616**
 at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in this head's blob
 `bff407a6…`, the numbering revision 3 quoted):
 
+- **Why a sixth revision, stated first.** The posted **SD-B: REVISE** (issue comment `6216021775`,
+  2026-10-16T12:58:55Z) found **two** things in revision 5, having re-derived the capture, confirmed it
+  byte-exact by its own extraction, and confirmed revision 5's three corrections genuinely made:
+  **(F1)** the **PR body's own capture table still named revision 4 as the plan of record** — its
+  heading (body L28), its "the plan of record for this diff **as it stands**" line (L57), its
+  `Plan revision | **4**` row (L62), the capturing-commit and blob rows (L64-L65), the sha256 (L66), the
+  byte/line row (L67), the posted-copy row naming comment `6215216290` (L68) and the binding instruction
+  "**Stage B must bind the blob above**" with a superseded row that **omitted revision 4 entirely**
+  (L69) — while the same body fifteen lines earlier said revision 5 was "this capture" and that
+  "**Revision 4** … **is superseded**" (L47, L53); and the body's unedited-comment list (L51) named
+  **four** capture comments where **five** existed. **That correction is free**: the table and the
+  heading sit **above** all three sentinel-delimited bound fields (witness L201-203, skills L207-230,
+  security L234-236), so editing them moves neither the head nor the PROC-04 digest — and this plan's
+  own rule, adopted in revision 5, is that **a free correction of a live false statement is not
+  deferrable**. **(F2)** the two line-range cites of the **bound-field invalidation rule** — §14 below
+  and the revision-5 capture comment's own L27 — published `L919-925` / `L943-949` where the
+  paragraph runs **`L919-926`** / **`L943-950`**: **one line short at the tail at both refs**, clipping
+  the terminal words `current hash.**`. Both ranges were **re-measured here from the two blobs' own
+  bytes** (`git cat-file blob`, split on LF) rather than carried from any brief or verdict — head blob
+  `bff407a6…`, 1,141 LF, rule at L919-926; `origin/main` blob `9a2ea2bd…`, 1,165 LF, rule at
+  L943-950 — and the defect is **the same shape revision 4 corrected** when it moved the capture bullet
+  from `L612-616` to `L611-616` on the head side, now **reproduced twice**. **F2 needs fresh plan
+  bytes**, because editing captured bytes voids the ACCEPT on them, so revision 6 corrects §14 and
+  re-captures. **What is NOT changed here:** revision 5's own three corrections, its sharp-test
+  re-sweep and its body edits were re-verified by that SD-B and are left untouched.
 - **Why a fifth revision, stated first.** The posted **SD-B: REVISE** (issue comment `6215508676`,
   2026-10-16T12:28:40Z) found three things in revision 4, having re-derived the capture and confirmed
   it sound: (1) **§8 still paired AEGIS-APR-117 with re-recording** — at L441, which sourced the
@@ -629,6 +658,23 @@ at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in th
   declared-not-verifiable criteria, the path-anchored selection rule and its eight paths, the five
   answers with their routings, the non-author test's substance, the evidence inventory, the
   non-decisions, the head-move sweep (§13), the bound-field analysis and the unapplied row block (§14).
+- **What revision 6 changes, and nothing else.** (a) **§14's two line-range cites**: `L919-925` →
+  `L919-926` at this head's blob `bff407a6…` and `L943-949` → `L943-950` at `origin/main`'s blob
+  `9a2ea2bd…`, both re-measured from the blobs' own bytes rather than carried; the paragraph's
+  terminal line at both refs is `current hash.**`. (b) **The PR body's capture table, its heading and
+  its unedited-comment list** — body-only and free: the table now names **revision 6's** capturing
+  commit, blob SHA, sha256, byte count and fresh capture comment, and **revision 5 joins revisions 4,
+  3, 2 and 1 in the superseded row**, each with its own blob, commit and comment; the heading and the
+  list are corrected with it. **No bound field is edited**, so the body digest is still
+  `77a6db9c7a5c31d0` and §14's projected value is still `f15e3d128da4cd52`. (c) **§9's stage-receipt
+  row** gains SD-B `REVISE` `6216021775` and states that a fresh SD-B is owed over revision 6's bytes.
+  (d) **Every revision identifier** — the title, the header, this section and §15. **Every other element
+  is revision 5's text, unchanged**: the scope and the eight paths, the what/why and blast radius, the
+  `docs-only` classification, the fifteen criteria with the C-1 screen and the two
+  declared-not-verifiable criteria, the path-anchored selection rule and its eight paths, the five
+  answers with their routings, the non-author test and its withdrawal-only reading, the evidence
+  inventory, the non-decisions, the head-move sweep (§13), the revision-5 sweep table, and the bound-field
+  analysis with the unapplied row block (§14).
 - **The revision-5 sweep, site by site, with the test stated.** The test is **not** revision 4's weaker
   check ("does any text pair AEGIS-APR-117 as authority to record?", which passed while three §8 sites
   still carried the compound). The test applied here is: **"does any text attach the word `re-record`,
@@ -652,7 +698,10 @@ at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in th
   of AEGIS-APR-117.** Every surviving occurrence of the compound in the plan is either a quotation of
   another artefact's defective text with the defect labelled, a negative count about the register, or
   the owner's route name cited to the owner's document.
-- **Superseded captures.** Revision 4 was captured at commit
+- **Superseded captures.** Revision 5 was captured at commit
+  `28d28ced5e0ee2de62d854dccff26d71a0a1bb49` (blob `49882fb48b65105dc3fa7e71c0a27aa61e21dfc2`,
+  sha256 `7ac6199c81d527a53c09492556603857dfdc04eab8b988ddf9a4a7a660c23322`, 81,221 bytes / 930 LF,
+  posted verbatim as issue comment `6215701897`). Revision 4 was captured at commit
   `dd53c6997c43566269fd87c38812d98c72b5880b` (blob `2f8df14f7400addeab6c7d0ca5f2c49856545601`,
   sha256 `c5517bddc37f654c5b1c6e7f348a2519681645d3a4ece0fe4eebb885f9c00ac3`, 69,918 bytes / 824 LF,
   posted verbatim as issue comment `6215216290`). Revision 3 was captured at commit
@@ -664,8 +713,8 @@ at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in th
   comment `6212482822`). Revision 2 was captured at commit
   `b8f91cfe504a11119cb23c642db373fb8b55df83` (blob `2b16f53f6b85a2d30eee81174b0a0f9d71611949`,
   sha256 `967df6b9e336acc03ab678e0a4cf977c75adc0672986112b6894c32b61241fd9`, posted verbatim as issue
-  comment `6213082533`). **All four blobs are superseded by this revision's blob**, which the PR body
-  and the fresh capture comment both name; **all four earlier comments stay posted and unedited**,
+  comment `6213082533`). **All five blobs are superseded by this revision's blob**, which the PR body
+  and the fresh capture comment both name; **all five earlier comments stay posted and unedited**,
   each as its own revision's record. The plan branch is not the PR branch, so **no head moves** with
   this supersession.
 - **Tracked file:** `docs/plans/readability-lane-d-batch3-plan-2026-10-16.md`, committed on branch
@@ -809,15 +858,19 @@ alone for revision 2. **Adding** a row block for revision 3 asserts a skill appl
 occur: this planning session applied the same four Stage A skills to the moved head, so the
 `skill-usage-ledger` obligation is not discharged for revision 3 without it. But the block belongs
 **inside** the `skills` bound field, and the workflow is explicit that any change to a bound field
-voids the verdict over it (**L919-925** at this head's blob `bff407a6…`; **L943-949** at `origin/main`'s blob `9a2ea2bd…`). **So revision 3 did not edit the field.** The exact text is
+voids the verdict over it (**L919-926** at this head's blob `bff407a6…`; **L943-950** at `origin/main`'s blob `9a2ea2bd…`; the terminal line at both refs is `current hash.**`, re-measured from the blobs' own bytes in revision 6 after revision 5 published both ranges one line short). **So revision 3 did not edit the field.** The exact text is
 authored below and the edit is left to whoever will republish the digest; both digest values are
 stated.
 
-**Revision 5 authors no further block, and re-points none.** It changes §8's labels, §10.1's record
-list and the two non-bound PR-body sentences, and it edits none of the three bound fields, so the
-published digest stays `77a6db9c7a5c31d0` and the projected value for the authored block below stays
+**Revision 6 authors no further block, and re-points none.** It corrects §14's two line-range cites —
+re-measured from the two blobs' own bytes, the bound-field invalidation paragraph runs **L919-926** at
+this head's blob `bff407a6…` and **L943-950** at `origin/main`'s blob `9a2ea2bd…`, the terminal line
+at both refs being `current hash.**` — and it edits none of the three bound fields, so the published
+digest stays `77a6db9c7a5c31d0` and the projected value for the authored block below stays
 `f15e3d128da4cd52`; the four-record block below is left byte-identical to revision 3's, and the two
-notes under it are revision 3's, kept because the block they describe is revision 3's.
+notes under it are revision 3's, kept because the block they describe is revision 3's. **Revision 5
+authored no further block either, and re-pointed none**: it changed §8's labels, §10.1's record list and
+the two non-bound PR-body sentences, all outside the three bound fields.
 
 **Old digest (published; reproduced above):** `77a6db9c7a5c31d0`.
 
@@ -912,9 +965,16 @@ the PR body and the fresh comment, since the comment is posted after this plan's
 - **Finish and wall time (plan revision 4):** these necessarily fall **after** that commit exists, so
   they are stated in the fresh capture comment and in the PR body's capture section, which carry the
   comment's creation time, the capturing commit's own committer timestamp and both wall figures.
-- **Start (plan revision 5, this text):** 2026-10-16T05:30:01-07:00 (America/Los_Angeles; the turn-1
-  snapshot of this session).
-- **Finish and wall time (plan revision 5):** these necessarily fall **after** this commit exists, so
+- **Start (plan revision 5):** 2026-10-16T05:30:01-07:00 (America/Los_Angeles; the turn-1
+  snapshot of that session).
+- **Finish and wall time (plan revision 5):** these necessarily fall **after** that revision's commit
+  exists, so they are stated in its capture comment `6215701897`, in its timing note `6215723312` and
+  in the PR body's capture section, which carry the comment's creation time, the capturing commit's own
+  committer timestamp and both wall figures. They are re-derivable from
+  `git log -1 --format=%cI 28d28ced5e0ee2de62d854dccff26d71a0a1bb49` and
+  `gh api repos/ModernNomad-98/Project-Aegis/issues/comments/6215701897 --jq .created_at`.
+- **Start (plan revision 6, this text):** 2026-10-16T06:14:42-07:00 (America/Los_Angeles; the turn-1 snapshot of this session)
+- **Finish and wall time (plan revision 6):** these necessarily fall **after** this commit exists, so
   they are stated in the fresh capture comment and in the PR body's capture section, which carry the
   comment's creation time, the capturing commit's own committer timestamp and both wall figures. The
   reason is the one revision 3 stated: **the plan is inside the commit that would supply its own finish
