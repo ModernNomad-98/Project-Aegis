@@ -24,6 +24,20 @@
   observed in this batch's fresh clone).
 - **The batch changed none of the eight read pages**, so the bytes read are the bytes `main`
   carries, and the acceptance is not voided by the merge.
+- **Bound-field digest — the commit repairs moved it, and a move voids the verdicts that quoted the
+  old figure.** The PROC-04 digest over the three bound fields of this change's pull-request body
+  (witness, skills, security, each collapsed to one line, joined in that order, `sha256` over the UTF-8
+  bytes, first 16 hex) was **`1fcd0143e13198a3`** at the Stage C head `cac5c67d` — quoted as the first
+  audit published it, **not reproduced**, because that body revision was edited in place and is no
+  longer retrievable from the API — then **`54d5e1e9a06ccbbc`** at `d784c4dc` (payload lengths
+  **1,175 / 5,197 / 567**) and **`605d99411a3a6bbe`** at the audited head `c4a55185` (payload lengths
+  **1,331 / 5,280 / 567**). **The security field, 567, did not move**; the movement is entirely the
+  witness (1,175 → 1,331) and the skills field (5,197 → 5,280). **Any edit to a bound field voids that
+  figure and requires a fresh one, exactly as a moved head does — so both prior Stage D verdicts are
+  void at the head this repair produces, and a fresh Stage D/F is owed there.** This repair's own body
+  revision moves the figure again (its witness names the new head), so the post-repair value must be
+  re-derived from the live body and is stated there, outside all three bound fields; **this record
+  asserts no bound-field digest of its own and names no verdict as covering it.**
 
 ## Labels used in this record, glossed (plain-English description beside every internal label)
 
@@ -94,8 +108,18 @@ figures above as the instrument's, not as its own measurement.
    `148 / 148 / 148 / 146`, and lane D began at index **444**. Three paths **entered** the pending
    set between the two bases and none left it: `docs/delivery-workflow.md`,
    `docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md` and
-   `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` (all three added to `origin/main` by PR #781, the
-   APR-117 withdrawal and re-record PR). The quarter start therefore moved **444 → 447 (+3)**, and two
+   `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`. **Two of the three are new files that PR #781 added
+   to `origin/main`** (the APR-117 withdrawal and re-record record, and the owner-decisions page).
+   **The third, `docs/delivery-workflow.md`, is not new and PR #781 did not add it:** it already exists
+   at `e2a3e20b` (blob `bff407a65a`; added to `origin/main` on 2026-10-03 by `c3527560`, PR #653), and it
+   entered the pending set by **drifting out of its recorded acceptance** — **24 added and 0 deleted
+   lines** against ledger row **K-075** (`last_acceptance_sha 79c5c590`, `blob_id bff407a65a`, reviewer
+   `readability-closeout-implementer-c`), past the 10-line rule, its blob moving
+   `bff407a65a → 9a2ea2bd`; the touching commit inside the window is **`7baf0b57`** (AEGIS-APR-137),
+   which reached `origin/main` through the **PR #770** merge, not #781. **The set therefore grew by two
+   new files plus one acceptance regression, not by three additions**, and the measured deltas agree:
+   `accepted_on_recorded_review` fell **57 → 56** and `provably_pending` rose **4 → 5**, with that one
+   page the only page in both deltas. The quarter start therefore moved **444 → 447 (+3)**, and two
    pages that were in lane D's quarter at the older base — `full-page-readability-batch-after-233` and
    `…-after-234` — now fall in **lane C's** quarter at this base while batches 1 and 2 of lane D
    already read them. **Reported to the coordinator, not decided here** (section 8, O-1): it is a
@@ -112,11 +136,18 @@ figures above as the instrument's, not as its own measurement.
    **586 + 4 = 590** at `e2a3e20b` and **588 + 5 = 593** at this base, with exactly **three paths
    entering and none leaving** (`docs/delivery-workflow.md`,
    `docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md`,
-   `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` — the three paths PR #781 added), and the index JSON
-   is byte-identical at both refs (**88,316 bytes**, `sha256 b97e5fc9fbeb6b71` over the tracked blob
-   bytes; the same bytes copied through a PowerShell `Out-File` pipeline re-encode LF as CRLF and hash
-   as `0b76b1a87db59019` at 90,230 bytes, so that figure names a different normalization of the same
-   file, not a different file). Every one
+   `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` — **two new files PR #781 added plus one acceptance
+   regression**: `docs/delivery-workflow.md` drifting 24 lines past its recorded acceptance, row K-075,
+   per step 3 above), and the index JSON
+   is byte-identical at **all six refs read** — `e2a3e20b`, `f490c16f`, `988b5067` (main), `cac5c67d`,
+   `d784c4dc` and this head — as blob `eeda4929cca872d626eb2ca6ca21583586335d11`: **88,316 bytes**,
+   `sha256 b97e5fc9fbeb6b710d1ecbc449af80143156d9b24af512367a75b2c69295a0c3` over the tracked blob
+   bytes, pure LF (**1,914 LF, 0 CR**). **The circulating `0b76b1a87db59019` / 90,230-byte pair is a
+   CRLF re-encoding of the same file and is RETIRED here:** a PowerShell `Out-File` copy rewrites each
+   of the 1,914 LF bytes as CRLF, so the arithmetic is exact — **88,316 + 1,914 = 90,230 bytes**, with
+   `sha256 0b76b1a87db59019e735582db74a09f9d60a8f41a16f6d01c8028169ea1ee9a0`. **The real figure is
+   88,316 bytes / `b97e5fc9fbeb6b71`**; 90,230 bytes names a different normalization of the same file,
+   not a different file, and the file itself was never in doubt. Every one
    of the 24+8 pages batch 1 onward read survives in it: the eight of this batch sit at **indices
    470-477 of the 593**, i.e. **lane D positions 24-31** of 146 (1-based). The alternative literal
    reading — "the first 24 positions of the lane's quarter at this base, then the next 8" — would
@@ -427,7 +458,7 @@ carries a full disposition alongside it.
 
 | # | stale | new | source |
 | --- | --- | --- | --- |
-| O-1 | The derivation base moved: `origin/main` gained three pending paths between `e2a3e20b` and `f490c16f` (PR #781's new record, `docs/delivery-workflow.md` and `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`), so lane D's quarter start moved 444 to 447 and two pages batches 1-2 read (`full-page-readability-batch-after-233`, `…-234`) now fall inside **lane C's** quarter at this base. | **unchanged — reported, not decided.** This batch touches neither page; the overlap is a cross-lane boundary question for the coordinator (a lane D batch-1/2 page and a lane C quarter can now name the same path). | `check_index.py --json` at both bases; the 590-set/593-set set-difference; `git ls-tree` counts. |
+| O-1 | The derivation base moved: `origin/main` gained three pending paths between `e2a3e20b` and `f490c16f` (PR #781's two new files — its own withdrawal-and-rerecord record and `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` — plus `docs/delivery-workflow.md` by 24-line drift out of its recorded acceptance, row K-075; section 2 step 3), so lane D's quarter start moved 444 to 447 and two pages batches 1-2 read (`full-page-readability-batch-after-233`, `…-234`) now fall inside **lane C's** quarter at this base. | **unchanged — reported, not decided.** This batch touches neither page; the overlap is a cross-lane boundary question for the coordinator (a lane D batch-1/2 page and a lane C quarter can now name the same path). | `check_index.py --json` at both bases; the 590-set/593-set set-difference; `git ls-tree` counts. |
 | O-2 | Batch 4's window under the moved boundary: the same eight pages are lane D positions **24-31** at this base, not 25-32; position 24 (`scenario-a-runbook-readability-2026-09-23.md`) was unread by batches 1-3 and would be skipped by a literal re-indexing. | **unchanged — the eight were selected by the lane's own sequence (indices 468-475 of the 590-set, verified boundary-for-boundary against batches 1-3), so nothing is skipped and nothing is re-read.** | `check_index.py --json` at `e2a3e20b` with that revision's index (the 590-set) and at the base (the 593-set); the three boundary comparisons. |
 | O-3 | The 2026-09-23 pages' historical validation figures ("185 skills valid" on LD-25 L36 and LD-28 L33; "185 valid skills" on LD-26 L53, LD-27 L44, LD-29 L55-56, LD-30 L60-61, LD-31 L56 and LD-32 L54; link counts 23/25/4/11/9/6 on LD-26 to LD-32) describe those batches at their own checkpoints. **The six link-count values are stated on six of those seven pages, in page order, and LD-28 states no link count at all** — so read them 23 (LD-26 L54), 25 (LD-27 L45), 4 (LD-29 L56), 11 (LD-30 L61), 9 (LD-31 L57), 6 (LD-32 L55), and never shifted one page earlier. | **unchanged — historical sentences about their own batches, not restated as today's.** | The pages' own dates and base commits; the mechanical pass's per-page link counts (section 5). |
 | O-4 | LD-28 L8 cites commits `90f74c6` and `0c3d1c2` as the two category maps' introduction commits; both resolve at the base. | **unchanged — resolved, no repair.** | `git cat-file -t 90f74c6` / `0c3d1c2` at the base (both exit 0). |
@@ -446,6 +477,13 @@ stated as one:** a term the repository uses as the naming convention for its own
 (26/655, and 6 of these 8 pages) is a domain term a page can gloss in one clause — and both audits and
 the standing brief treat it as a real per-page gap. The row above is the measurement; the
 classification is this record's, and a later reader can re-draw it from the same numbers.
+**Two reservations are recorded here so the coordinator can weigh them: (1) the criterion has no
+numeric threshold, so it is not falsifiable from the numbers alone — the counts are evidence for the
+judgement, not the judgement; and (2) keeping `isolated worktree` as a gap is load-bearing for this
+record's own subordinate claim that "the fewest is two" (LD-28, LD-31 and LD-32), because retiring the
+term would leave LD-31 with exactly one gap (G-31.1). Neither reservation changes an outcome: no page
+would flip to full and no page would leave the pending set either way, so no acceptance outcome
+depends on where the line is drawn.**
 
 ## 9. Count honesty
 
@@ -474,13 +512,21 @@ classification is this record's, and a later reader can re-draw it from the same
 - **This batch publishes no readability count of its own** (ledger L19-31, D84) and cites the
   instrument for every figure.
 - **The instrument classifies the page tree at `--ref`** and reads recorded acceptances from the
-  **committed index JSON**, so this batch's new page changes nothing until a rebuild. The published
-  head expectation after this record lands is **656 / 56 / 5 / 589 / 0 / 0 / 6 / 600** — the base's
+  **committed index JSON**. **The two sides move on different clocks, and this record states which is
+  which:** the page-count side is **immediate** — the page is in the tree at `--ref`, so the
+  instrument's `classify_tree` counts it as a reader page, as `no_recorded_acceptance` and in the
+  official pending count the moment the record lands — while **only the acceptance-row side awaits a
+  rebuild**, because a row is read from the committed index JSON. **Codex finding #8, the P2
+  "Distinguish the immediate count change from a rebuild" (review comment `4290117780`, written against
+  `cac5c67d`; the eighth of the eight findings reported on this change, and the one the second Stage D
+  verdict's F1–F7 triage omitted), is SUSTAINED and corrected here.** The published head expectation
+  after this record lands is **656 / 56 / 5 / 589 / 0 / 0 / 6 / 600** — the base's
   655 / 56 / 5 / 588 / 0 / 0 / 6 / 599 with **+1 reader page, +1 `no_recorded_acceptance` and +1
-  official pending count**, all three attributed to this record. **No post-rebuild count is
-  predicted.** `build_index.py --write` is not run in this batch: a rebuild adds JSON under
-  `tools/`, which is not Markdown and would break this change's `docs-only` tier; the rebuild is the
-  standing AEGIS-APR-115 pull request's own scope (D73 row 8).
+  official pending count**, all three attributed to this record. Those three effects are **already
+  measured at this record's head, not predicted**; **no post-rebuild count is predicted.**
+  `build_index.py --write` is not run in this batch: a rebuild adds JSON under `tools/`, which is not
+  Markdown and would break this change's `docs-only` tier; the rebuild is the standing AEGIS-APR-115
+  pull request's own scope (D73 row 8), and its effect when it runs is the **acceptance-row** side only.
 
 ## 10. The eight disposition lines, verbatim (evidence, NOT rows)
 
@@ -521,10 +567,17 @@ PAGE LD-32 partial, no acceptance row, stays pending; gaps G-32.1..G-32.3 (secti
 link check, `scripts/validate-skills.py`, `scripts/tests/test_validator.py`,
 `git diff --check`, the numstat check (the Stage C commit is insert-only against the derivation
 base, 455 added / 0 deleted; the Stage D repair commit adds 45 and deletes 19 of those lines; the
-second Stage D repair commit adds 167 and deletes 56, counted over every `-` line excluding the
-`---` headers, so neither repair is insert-only, while the base-relative figure is 592 added /
-0 deleted because the record file is new at the base — the file has grown, and this record states the
-new figure rather than leaving the first repair's 481 standing),
+second Stage D repair commit adds 167 and deletes 56; **the third Stage D repair commit, this one,
+adds 73 and deletes 20** — every figure counted over every `-` line excluding the `---` headers, so
+none of the three repairs is insert-only, while the base-relative figure is **645 added /
+0 deleted** because the record file is new at the base — the file has grown, and this record states
+the current figure rather than leaving the first repair's 481 standing. **The third repair's 20
+deleted lines sit at these sites (old-side line numbers at `c4a55185`): L97-98** (the false PR #781
+provenance sentence), **L115-119** (the second provenance clause and the index-figure paragraph),
+**L430** (O-1's provenance parenthetical), **L477-478 and L480-483** (the "changes nothing until a
+rebuild" sentence and its count sentences), **L524-527** (this numstat sentence itself) and
+**L584-585** (the timing section's "two repair commits"). **None of its 20 deleted lines begins
+with a second `-`**, so the two-dash trap did not fire in this round),
 `scripts/check_dco.py --range
 origin/main..HEAD`, and `python -P scripts/ci/check_pr_body_skills.py --body-file <f>`.
 
@@ -581,8 +634,8 @@ skill@6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 / reason:
   taken after the turn-1 snapshot).
 - Finish: the machine-recorded bound is the Stage C commit's own author date,
   **2026-10-16T01:43:17Z** (2026-10-15T18:43:17-07:00) — **12 minutes 46 seconds** after the recorded
-  start. The pull-request body carries that figure, the two repair commits' own start/finish/wall times
-  and this second repair's timing. **No separately instrumented finish time exists for the batch**:
+  start. The pull-request body carries that figure, the three repair commits' own start/finish/wall times
+  and this third repair's timing. **No separately instrumented finish time exists for the batch**:
   active time was **not** instrumented, so wall time is an imperfect comparison with the estimate
   rule's active-time requirement and no per-page active rate is claimed.
 
