@@ -14,6 +14,33 @@
   is recomputed again over the corrected bytes, and the pull-request body is updated to the new head.
   No disposition, gap, page line, FULL/PARTIAL count, norm measurement, blob ID or per-page line/byte
   figure changed.
+- **Third correction, the first made after an independent audit of this head, disclosed rather than
+  hidden.** Stage D re-audited this head on 2026-10-15 and returned **REVISE** (review comment
+  `6208465042`) on three findings. **Finding 1 (substantive) — a calibration claim that was
+  inherited, not measured, and was false by publication.** This record's footer had carried, word for
+  word, the merged lane A batch 5 record's sentence naming four published bound-field digests; it
+  named pull request **#790's superseded** value `15328d3c5603fe61`, which no longer reproduces
+  over #790's **live** body (measured this round: `1d69dc6f748f945f`). #790's body was
+  **replaced at 20:21 PT, about eighteen minutes before this record's own 20:39:42–20:44:26 write
+  window**, so a sentence that was true when lane A's record was written was already false when this
+  record copied it. Both this footer and the pull-request body now say that, name
+  `15328d3c5603fe61` as superseded with the reason, and state the rule the failure teaches:
+  **a calibration list must be re-measured against each body it names, never copied from another
+  record.** The count that disagreed between the two sites — the pull-request body named **five**
+  calibrated bodies, this record's footer **four** — is reconciled at both: **four** live bodies
+  reproduce (#783, #787, #792, #795), and #790 is named as superseded rather than counted.
+  **Finding 2 (small) — quotations that were not verbatim.** The audit named three (P5 L19, P5 L18,
+  P8 L148); a re-sweep of **every** quoted span in this record and the pull-request body against the
+  repository text found two more of the same classes — P4 L175, differing only in the quotation
+  marks, and P3 L4, differing only in the leading capital — and all five now reproduce their source
+  characters exactly. The same sweep found one quoted span naming a figure the page does not carry —
+  the phrase that read 12 of 12 in the P2 observation, now replaced by the two counts measured by
+  command: **11** checklist items, **9** workflow steps. **Finding 3 (small) — two bare decision labels.**
+  `AEGIS-APR-115` appeared in the pull-request body without its one-line gloss at two sites;
+  both now carry it. A new subsection in section 9 records **what this repair round did not verify**,
+  so that disclosure is auditable inside the record rather than only in a message to the coordinator.
+  The footer digest is recomputed over the corrected bytes. **No disposition, gap, page line,
+  FULL/PARTIAL count, norm measurement, blob ID or per-page line/byte figure changed.**
 
 - **Lane:** PHASE 4 RE-READ LANE B. *Phase 4 re-read* is the fourth phase of the documentation
   readability backlog — a whole-page re-read of every page that has no recorded full-page
@@ -322,18 +349,19 @@ what the page names (the fan-out tail edge, the refuse-to-invent-the-SLO case, a
 `overlaps_with` list of exactly the four neighbours L272 names: `slo-reliability-architect`,
 `performance-test-harness`, `observability-operator` and the per-hop reduction skills).
 **B6** this record.
-**Verdict: FULL, no edit. No defect recorded.** Observation (not counted): the page's "12 of 12"
-style checklist items are consistent with the workflow steps above them — the headroom figure is
-15–25% at L107, L139, L166 and L196 alike (checked because a figure repeated four times is a figure
-that can drift).
+**Verdict: FULL, no edit. No defect recorded.** Observation (not counted): the Validation Checklist
+carries **11** tick-box items (L182–L202) against **9** numbered workflow steps (L87–L145), both
+counted by command this session — an earlier phrase in this item that read 12 of 12 named a figure
+the page does not carry and is corrected here rather than kept — and the headroom figure is 15–25% at L107,
+L139, L166 and L196 alike (checked because a figure repeated four times is a figure that can drift).
 
 **P3 — `.claude/skills/latency-budget-architect/references/tail-math-worksheet.md`** — read whole,
 **L1–102**. Purpose and normal use: the owning skill's arithmetic companion — composition rules per
 path shape, the fan-out tail-exposure formula with a worked example, the overhead-rows checklist, the
 timeout-cascade worksheet, retry-spend accounting, the budget-claim review template and the
 attribution convention.
-**B1** satisfied — the title (L1) and L3–5 state what the page is ("the arithmetic here is the
-skill's spine — budgets that skip it are fiction"), and L7 names it as detail for the parent skill.
+**B1** satisfied — the title (L1) and L3–5 state what the page is ("The arithmetic here is the
+skill's spine — budgets that skip it are fiction."), and L7 names it as detail for the parent skill.
 **B2** satisfied — the reading key at L7–9 expands `p95`, `p99`, `N`, TLS, PR and `ε` (explicit
 safety margin) before first body use, and the template blocks' tokens are explained by their lines.
 **B3** satisfied — tables for shape/rule and the overhead checklist, and a worked example (L34–41)
@@ -359,10 +387,10 @@ and each sibling owner it composes with or defers to.
 One below-norm internal term is recorded as an observation, not a gap: `banked candidates` /
 `banking site` (L92–93) — 9 of 656 pages, used as this library's candidate-lifecycle vocabulary;
 the sentence supplies the state it is checking for, and the check's own FAIL case names it
-("a candidate table still says 'not built'", P5 L19).
+verbatim (P5 L19: Candidate table still says "not built").
 **B3** satisfied — descriptive headings, per-area numbered workflow, the Output Format block
-(L130–142), and concrete examples ("a diff labeled 'add 4 skills' that also rewrites a neighbor's
-description is two changes", L175–177; stale green checks, L163–165).
+(L130–142), and concrete examples (L175–177: a diff labeled "add 4 skills" that also rewrites a
+neighbor's description is two changes; stale green checks, L163–165).
 **B4** satisfied — L120–122 states the shipped boundary of the artifact itself: the review "never
 merges, approves on-platform, or arms auto-merge — merge authority stays human", which is behavior,
 not a proposal.
@@ -384,8 +412,8 @@ operates at the pull request (PR) level"); L3 and L6 give the reading key.
 **B2** satisfied — PR, CI and SHA are expanded at L3 and L6–7 before first body use; `squash
 merging` is explained where it matters (L94–101: the merged result is one commit, and rollback is an
 ordinary revert).
-**B3** satisfied — three tables, the site list, and concrete FAIL examples ("'added in this branch'",
-"One site still shows the old total").
+**B3** satisfied — three tables, the site list, and concrete FAIL examples (L18: "added in this
+branch"; L21: "One site still shows the old total").
 **B4** satisfied — instructional; it describes the review's procedure, and where it touches process
 it routes it away ("that trail is `agent-governance-audit`'s target", L102–104).
 **B5** satisfied — its one link (rendered text: ../SKILL.md) resolves; the two backticked bare
@@ -469,8 +497,8 @@ first 90 seconds of a 10× spike", L89–90; the three target-environment option
 language with their costs and blast radii, L139–149), and the Output Format block (L162–179).
 **B4** satisfied — the safety envelope is stated as behavior, not intent: L131–135 and the Stop
 Conditions (L241–245) require explicit recorded human approval for production or live third-party
-load, and L148–149 separates "choosing a production window is a preference" from "it still needs
-explicit recorded human approval".
+load, and L148–149 states that "Choosing a production window is a preference, not approval" while
+"it still needs explicit recorded human approval before anything runs".
 **B5** satisfied — both links (rendered text: references/workload-model-worksheet.md) resolve; the
 claimed `evals/evals.json` contains the noisy-neighbour edge and the should-not-load-production case,
 and `evals/trigger-evals.json` discriminates against exactly the four skills L274–276 names
@@ -690,19 +718,91 @@ material only in a separate eligible keeper's hands, under AEGIS-APR-101 and AEG
 - **This record cannot make itself machine-visible.** The pending count changes only when a keeper
   records rows and the index is rebuilt; nothing in this batch does either.
 
+### What this repair round did not verify (stated, not hidden)
+
+This subsection is about the **Stage D REVISE repair** made at this head, not about the eight
+re-reads. It sits in the record rather than only in a message to the coordinator so that a later
+auditor can read it in the artifact.
+
+- **Codex's finding bodies were not obtained, and Codex is not recorded as clean.** The independent
+  reviewer's state block reports `has_any_findings: true` and `has_unresolved_findings: true` with
+  `status: failed`, **bound to `39a3e5d03a73f0c89de7b250a10b554ea5c2412e` — this branch's
+  FIRST commit, superseded twice, not this head**; `GET /pulls/796/reviews` and
+  `GET /pulls/796/comments` both return **0**, and the second bot comment records a usage limit.
+  Stated exactly: **no finding bodies, a flag bound to a superseded commit, and a P1-class item that
+  cannot be triaged from this pull request's artifacts.** This round did not resolve it and does not
+  record it as a pass.
+- **GitHub's revision history for pull request #790's body was not obtained.** GitHub exposes only
+  the current body: `GET /pulls/790` returns one body and no edit history. The evidence that #790's
+  body had been replaced before this record was written is therefore (a) local snapshot **mtime** for
+  the pre-repair and post-repair captures on this machine — 20:03:35 and 20:21:41 PT — plus
+  (b) #790's own live body, which names its first Stage C repair's digest `15328d3c5603fe61` and
+  its second's `1d69dc6f748f945f`. **The exact replacement instant is not verified from GitHub.**
+- **This record's intermediate footer digests were not re-verified against the body revisions that
+  published them.** The first and second commits' footer digests are recomputable from those
+  commits' own bytes, which are in this branch's history; but GitHub exposes no pull-request body
+  history, so this round **cannot** show that the body revision live at that moment carried the same
+  figure. Only the current body revision's figures were verified here.
+- **The frontmatter sub-figures 183 and 168 were not re-measured by this repair round.** The record's
+  own coarser frontmatter measurement — 213 reader pages beginning with frontmatter, **183** carrying
+  an all-caps token inside the frontmatter block, **168** of those never expanding at least one such
+  token in the body — is the earlier session's measurement at the derivation base; this round
+  re-ran no detector over those pages, changed neither figure, and (per the record's own refusal)
+  does not restate the programme's separate 128-of-213 figure as its own.
+- **The host's global git identity could not be re-observed as the stale placeholder.** This round's
+  `git config --global user.name` read returned `Peter Nguyen`, and no `.git/config` in this
+  workspace still contains `F reviewer`; the record states that the **earlier** write session read
+  the placeholder `F reviewer <reviewer@example.invalid>` there and did not use it. That earlier
+  reading is a statement about that session and is **not** re-confirmed now — recorded here as
+  unverified this round rather than restated. The part that matters was re-checked and holds: every
+  commit of this branch carries the explicit identity
+  `Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>`.
+
 ---
 
 ## Footer
 
-sha256: 5b5c499b3b914598717787efc600a6747de95981fb3757ca96025ed85056fb38
+sha256: 833cbf82dc007eb1410ef51b55d5cb97081c4e7a330772db366edcdf5aa9354d
 
 This digest covers the batch record's bytes from the first line through the closing `---` rule line
-and its terminating newline, encoded UTF-8 with LF line endings: exactly 53,845 bytes, byte offsets
-0 through 53,844 inclusive, lines 1-693. It does not cover the blank
+and its terminating newline, encoded UTF-8 with LF line endings: exactly 60,048 bytes, byte offsets
+0 through 60,047 inclusive, lines 1-761. It does not cover the blank
 separator line between that rule and the `## Footer` heading, nor this footer. Any edit above the
-rule needs a fresh validation. The method was calibrated before it was trusted: applying it to lane A
-batch 5's committed record reproduces its published value
+rule needs a fresh validation. **This footer digest is recomputed at this head** over the bytes the
+Stage D REVISE repair corrected (the five quotations, the P2 count phrase, the header correction
+bullet and the new section-9 subsection); its predecessor was
+`5b5c499b3b914598717787efc600a6747de95981fb3757ca96025ed85056fb38` over 53,845 bytes and lines 1–693,
+and that earlier figure is now superseded rather than re-used.
+
+**The calibration sentence that stood here was inherited, and it was false at this head — corrected
+here rather than kept.** The sentence "and the same collapse-and-hash method reproduces the four
+published bound-field digests this batch calibrated against (pull requests #783
+`3913683c686e6e71`, #787 `82ed906d2f228f0e`, #790 `15328d3c5603fe61` and #792
+`88300e711714200a`)." was **copied word-for-word from the footer of lane A's batch 5 record,
+which is already merged into `main`**; it was not measured against the bodies it names. It named
+pull request **#790's superseded** value: #790's body was **replaced before this record was written**
+(pre-repair snapshot 20:03:35 PT, replacement 20:21:41 PT; this record's write window was
+20:39:42–20:44:26 PT), and #790's live body yields **`1d69dc6f748f945f`**, not
+`15328d3c5603fe61` — #790's own live body says its first Stage C repair carried
+`15328d3c5603fe61` and its second carries `1d69dc6f748f945f`. The two readings have the
+**same witness-field length, 1,689 characters, and the same security-field length, 40, while a
+40-character SHA inside the witness field moved** (`1901b6d8cc8802012b5702934ad5032a3df2cda6` →
+`fdbcddcee0496ce17f69cd127f8613e54e410490`) and the skills field grew from 3,602 to 3,893
+characters: the same-lengths, different-bytes hazard, measured rather than asserted.
+`15328d3c5603fe61` is kept here **as the superseded value, with that reason**, and is **not**
+counted as reproducing.
+
+**The count, reconciled.** The pull-request body named **five** calibrated bodies; this footer named
+**four**. The correct figure, re-measured this round over the **live posted bodies**, is **four**
+bodies whose digest reproduces: #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`, #792
+`88300e711714200a` and #795 `5fabf87b2df899e9` — with **#790 named as superseded and
+excluded**, not silently dropped. The rule the failure teaches is recorded with it: **a calibration
+list must be re-measured against each body it names, never copied from another record**, because a
+claim that is true when it is written becomes false when the body it names is replaced.
+
+**Footer-digest calibration, re-measured this round.** Applying this footer method to lane A batch
+5's committed record reproduces its published value
 `6342e38b3cf2adfddf72b51d4bee4311afd990d2a730445f331771ce6c739727` (53,301 bytes, lines 1–650), and
-the same collapse-and-hash method reproduces the four published bound-field digests this batch
-calibrated against (pull requests #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`, #790
-`15328d3c5603fe61` and #792 `88300e711714200a`). Drafted by **DeepSeek-4.1-Flash (deepseek-flash)**.
+to lane C batch 3's committed record its published value
+`db9796c63ac8ab53022d8c4c237e62484cb4786ce19a261b81bbe36d9f58e2f8` (66,134 bytes, lines 1–721).
+Drafted by **DeepSeek-4.1-Flash (deepseek-flash)**.
