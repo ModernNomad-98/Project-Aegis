@@ -391,6 +391,8 @@ class GateJobIsolationTests(unittest.TestCase):
         "tools-tests-windows": ["setup-bridge", "setup-tests",
                                 "delivery-control-diagnostic", "delivery-control"],
     }
+    TOOLS_LABELS["tools-tests-linux"].append("readability-tests")
+    TOOLS_LABELS["tools-tests-windows"].append("readability-tests")
 
     @classmethod
     def setUpClass(cls):
