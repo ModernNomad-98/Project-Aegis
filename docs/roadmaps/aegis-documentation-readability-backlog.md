@@ -5411,6 +5411,87 @@ CI state at the new head, because this pull request is **CONFLICTING/DIRTY** aga
 The repair commit carries this note; the audited head's commit message, which names no model, is
 corrected forward in the batch record section 8.7.2 (a commit message is immutable).
 
+## Ledger-keeper recording + batch update — readability Phase 4 lane B batch 2, 2026-10-15
+
+**Under AEGIS-APR-101 (recording only).** This note records Phase 4 full-page
+re-read lane B batch 2 (lane B — the second quarter of the pending set sorted
+by repository path). It is additions only: it rewrites no dated text, edits no
+existing keeper row, and confers nothing.
+
+**Lane derivation, by command.** At the base head
+`e2a3e20b7c20ef8385b219b39c6405237163406f`,
+`python -P -B tools/readability_acceptance/check_index.py --json --ref HEAD`
+reports `no_recorded_acceptance` 586 and `provably_pending` 4; the pending
+set (the 590 paths of the two buckets the lane's brief names), sorted by path,
+splits into four quarters — 148 / 148 / 148 / 146. Lane B is sorted indices
+148–295: first `.claude/skills/file-upload-storage-architect/SKILL.md`, last
+`.claude/skills/share-link-access-architect/SKILL.md` (the count-based quarter,
+not the brief's illustrative letter range; the command-derived quarter is
+authoritative). Batch 1 (PR #772) read sorted indices 148–155; batch 2 reads
+sorted indices 156–163, the next eight pages of the quarter, in lane order.
+
+The eight pages below were each independently full-page re-read at the base
+head against [Acceptance for each page](#acceptance-for-each-page) by
+`readability-lane-b-implementer-c` — a single DeepSeek deepseek-v4-pro Stage C
+implementer who wrote none of the eight pages and also writes this section
+(the same-agent deviation, stated below) — and each page's purpose and normal
+use was restated from the page alone in the batch record.
+**All eight were accepted unchanged**: zero corrections, zero edits to any
+read page; no posture, Stop Condition or Security Rule changed.
+
+| Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [frontend-metric-budget-sheet](../../.claude/skills/frontend-perf-engineer/references/frontend-metric-budget-sheet.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-2-2026-10-15.md) | 2026-10-15 |
+| [full-codebase-auditor](../../.claude/skills/full-codebase-auditor/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-2-2026-10-15.md) | 2026-10-15 |
+| [audit-inventory-checklist](../../.claude/skills/full-codebase-auditor/references/audit-inventory-checklist.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-2-2026-10-15.md) | 2026-10-15 |
+| [funnel-definition-designer](../../.claude/skills/funnel-definition-designer/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-2-2026-10-15.md) | 2026-10-15 |
+| [funnel-sheet](../../.claude/skills/funnel-definition-designer/references/funnel-sheet.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-2-2026-10-15.md) | 2026-10-15 |
+| [gated-deployment-prompt-template](../../.claude/skills/gated-deployment-prompt-template/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-2-2026-10-15.md) | 2026-10-15 |
+| [deployment-prompt-template](../../.claude/skills/gated-deployment-prompt-template/references/deployment-prompt-template.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-2-2026-10-15.md) | 2026-10-15 |
+| [hidden-context-exposure-reviewer](../../.claude/skills/hidden-context-exposure-reviewer/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-b-implementer-c | [batch record](../evidence/documentation/readability-lane-b-batch-2-2026-10-15.md) | 2026-10-15 |
+
+**Keeper-ID band, by command.** These rows are authored as **K-181–K-188**,
+the first eight ids of lane B's allocated band **K-181–K-280**
+(`_resume-2026-10-09/KEEPER-ID-ALLOCATION.md`, 2026-10-15). The consolidated
+table at the base carries 81 rows whose highest stable id is K-081, so
+K-181–K-188 were the band's first free ids (verified by command over the
+table at `e2a3e20b`). This lane renumbers no other lane's rows and expects the
+merge holder to apply the allocation file's protocol if any renumbering is
+still needed at merge: renumber the stable ID only, never the `Blob ID`;
+recompute each `Blob ID` with `git rev-parse <Acceptance revision>:<Page>` and
+confirm it is unchanged; re-run the build so a missed renumber fails loudly.
+
+**Keeper independence — declared deviation, disposition left to the merge
+holder.** AEGIS-APR-101 requires the ledger keeper to be a different agent
+from the page's author and accepting reviewer. The same agent that performed
+all eight reads (`readability-lane-b-implementer-c`) also authors these keeper
+rows, so **the APR-101 keeper-independence condition is not satisfied and the
+rows are not claimed green on it.** The owner's 2026-10-15 decision 3
+(`OWNER-DECISIONS-2026-10-15.md`) directs the **withdraw-then-record-afresh route**: the
+same-agent rows are withdrawn under **AEGIS-APR-117** (withdrawal-only) and a fresh acceptance
+row is recorded under **AEGIS-APR-101** by a different agent from the same evidence — **no
+page needs re-reading**. AEGIS-APR-117 grants the ledger keeper the right to append withdrawal
+rows bound to evidence (active after the switch named in AEGIS-APR-114); the fresh recording
+is AEGIS-APR-101's, and an eligible keeper performs both at merge, not by this lane. This lane
+states the deviation plainly and leaves the disposition to the merge holder.
+
+**Cross-lane note.** The sibling lanes append keeper rows from the same base;
+the allocation file's bands and the serial-merge protocol
+(`MERGE-QUEUE-2026-10-15.md`) keep the consolidated table's stable ids
+disjoint after the merge holder's renumbering. These rows are recorded here as
+K-181–K-188.
+
+**Count honesty.** This note publishes no count of its own. The instrument at
+the base reports 653 reader pages and an official pending count of 596. The
+eight appended rows change nothing until the index rebuild (the two-commit
+follow-up or the merger-side rebuild the ledger already names); the new batch
+record page enters `no_recorded_acceptance`.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read
+against [Acceptance for each page](#acceptance-for-each-page) by a reader who
+did not write this section — the self-cost every prior update states.
+
 ## Ledger-keeper recording + batch update — readability Phase 4 re-read lane D, batch 1, 2026-10-15
 
 **Under AEGIS-APR-101 (recording only).** This note records Phase 4 re-read lane D's first batch —
@@ -6030,3 +6111,11 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-119 | .claude/skills/accessibility-test-harness/references/a11y-checklists.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 0be76bc052efba600c5f7296aa1d0f8421fb725f | P6 accepted: .claude/skills/accessibility-test-harness/references/a11y-checklists.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
 | K-120 | .claude/skills/admin-console-architect/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | d9500b3bde91301cef76dc76ac659712d4e93e91 | P7 accepted: .claude/skills/admin-console-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
 | K-121 | .claude/skills/adr-sequencer/references/adr-corpus-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 84ed16cabe2e7390ea95825c173382900ee4430e | P8 accepted: .claude/skills/adr-sequencer/references/adr-corpus-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-197 | .claude/skills/frontend-perf-engineer/references/frontend-metric-budget-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | c6c8dd593de4c0ab48ae991166ee427101562502 | B2-1 accepted: .claude/skills/frontend-perf-engineer/references/frontend-metric-budget-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md | 2026-10-15 |
+| K-198 | .claude/skills/full-codebase-auditor/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 87f49bbcc8524f707a60e16981020ab2fad2f400 | B2-2 accepted: .claude/skills/full-codebase-auditor/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md | 2026-10-15 |
+| K-199 | .claude/skills/full-codebase-auditor/references/audit-inventory-checklist.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | d68fda84cac40c09acf802d8282525686e51b629 | B2-3 accepted: .claude/skills/full-codebase-auditor/references/audit-inventory-checklist.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md | 2026-10-15 |
+| K-200 | .claude/skills/funnel-definition-designer/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 34c3583d726c179d56ee3db65817a4e615ac65e4 | B2-4 accepted: .claude/skills/funnel-definition-designer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md | 2026-10-15 |
+| K-201 | .claude/skills/funnel-definition-designer/references/funnel-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | c7456559bfa7b31200232ff6631614c2daba39f2 | B2-5 accepted: .claude/skills/funnel-definition-designer/references/funnel-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md | 2026-10-15 |
+| K-202 | .claude/skills/gated-deployment-prompt-template/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 0582c3a6d7b9e8137d9f9e767d2d904b73995429 | B2-6 accepted: .claude/skills/gated-deployment-prompt-template/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md | 2026-10-15 |
+| K-203 | .claude/skills/gated-deployment-prompt-template/references/deployment-prompt-template.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 59c065326306befe862aa8cd60b30d1f4c05b62b | B2-7 accepted: .claude/skills/gated-deployment-prompt-template/references/deployment-prompt-template.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md | 2026-10-15 |
+| K-204 | .claude/skills/hidden-context-exposure-reviewer/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 43ba5d0990dc63c290866ad6b2239c0cff2e3c8f | B2-8 accepted: .claude/skills/hidden-context-exposure-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-b-implementer-c | docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md | 2026-10-15 |
