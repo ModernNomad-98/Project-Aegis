@@ -39,13 +39,16 @@ commit message. *CI* = continuous integration, the automated checks GitHub runs 
 ## The change under plan, and where this plan comes from
 
 - **Work item.** "Phase 4 re-read, lane A, batch 4 — evidence record for eight whole-page re-reads".
-- **The change.** PR #789 on branch `docs/readability-lane-a-batch-4-20261015`, **three commits**,
-  base `f490c16f9ed23f3d489e42f7696323bffcce6fd3`, head
-  `fb3dfe34f3a362c4cb67bfb5bfde732ffda14922` at the moment this plan was written. The diff is **one
-  added Markdown path**,
-  [the batch-4 evidence record](../evidence/documentation/readability-lane-a-batch-4-2026-10-15.md),
-  `+675/-0` against the base (0 deleted lines, counted as every deletion line of
-  `git diff --numstat`, not by a regular expression).
+- **The change, re-derived for revision 2 of this plan (2026-10-16).** PR #789 on branch
+  `docs/readability-lane-a-batch-4-20261015`, **five commits**, base
+  `f490c16f9ed23f3d489e42f7696323bffcce6fd3`, head `0c994d77ad491bb329e07c056065b4d9bb8401ed`, tree
+  `a9555e9dd0d09cc73e4860901ae8527431552e60`. The diff against the base is **three added Markdown
+  paths** and 0 modified or deleted: the batch-4 evidence record
+  ([the record](../evidence/documentation/readability-lane-a-batch-4-2026-10-15.md), `675/0`), the
+  skills author records
+  ([the skills records](../evidence/documentation/readability-lane-a-batch-4-skills-records-2026-10-16.md),
+  `165/0`) and this plan file (`442/0`) — `+1282/-0` in total, where the deleted count is every
+  deletion line of `git diff --numstat`, not the output of a regular expression.
 - **The head, verified not assumed (2026-10-16).** `git ls-remote origin
   refs/heads/docs/readability-lane-a-batch-4-20261015` and `git rev-parse HEAD` in a fresh clone
   both returned the 40-character ID above; it had **not** moved. The live `main` tip is
@@ -84,7 +87,8 @@ commit message. *CI* = continuous integration, the automated checks GitHub runs 
 revision; judge each against the ledger's six acceptance bullets; record the per-page evidence —
 **writing nothing into any page**.
 
-- **Paths this change adds:** the evidence record and this plan file. **Paths it edits:** none.
+- **Paths this change adds:** the evidence record, the skills-records file and this plan file — **three**
+  added `docs/` paths, counted by `git diff --name-only` at the head. **Paths it edits:** none.
   **Paths it deletes:** none.
 - **The eight pages in scope, by path**, with the verdict the record gives each (the record's
   section 3 roster table is the list of record):
@@ -131,22 +135,26 @@ official count falls.
 
 **Blast radius — what the diff touches, by count.**
 
-| Measure | Value at head `fb3dfe34…` | Command |
+| Measure | Value at head `0c994d77…` | Command |
 | --- | --- | --- |
-| Files changed vs base | **1** (added; 0 modified, 0 deleted) | `git diff --name-only f490c16f…..HEAD` |
-| Added / deleted lines vs base | **675 / 0** | `git diff --numstat f490c16f…..HEAD` |
-| Commits vs base | **3** | `git rev-list --count f490c16f…...HEAD` |
-| Intra-branch scopes | **35/10**, **203/47**, **227/46** | `git diff --numstat` on each commit pair |
-| Code, script, workflow, test, configuration, data or lock files | **0** | the added path is one `.md` under `docs/` |
+| Files changed vs base | **3** (all added; 0 modified, 0 deleted) | `git diff --name-only f490c16f…..HEAD` |
+| Added / deleted lines vs base | **1282 / 0** | `git diff --numstat f490c16f…..HEAD` |
+| Commits vs base | **5** | `git rev-list --count f490c16f…...HEAD` |
+| Intra-branch scopes, one per commit | **494/0**, **35/10**, **203/47**, **442/0**, **165/0** | `git diff --numstat <parent> <commit>` for each of the five |
+| Code, script, workflow, test, configuration, data or lock files | **0** | all three added paths are `.md` under `docs/` |
 
-- **The capture's own blast radius, stated because it is real.** Committing this plan adds **one**
-  more added Markdown path (`docs/plans/…`), so at the implementation head the diff is **two added
-  `docs/` paths and 0 deleted lines**. It also adds one reader page to the repository: if this plan
-  merges, the instrument's pending set grows by the plan path, and the record path is likewise a new
-  reader page with no acceptance row. Both sort late in repository-path order — the plan path would
-  sit at sorted index 523 of 594 at the base and 526 of 597 at the live `main` tip — so **neither
-  lands in lane A's first 149 paths**, which are all under `.claude/`. Recorded so the next
-  re-measurement is not surprised by it.
+- **The capture's own blast radius, restated at revision 2 because the file set grew.** The capture
+  added **one** added Markdown path (`docs/plans/…`) to the two the branch already carried, so the
+  diff at the change head is **three added `docs/` paths, 0 modified and 0 deleted lines**. Revision 2
+  re-captures the same path with corrected content on a side branch and **does not move the change
+  head**, so the added-path set is unchanged by the re-capture. Each added path is also a new reader
+  page: if this change merges, the instrument's pending set grows by the plan path and by the
+  skills-records path, and the record path is likewise a new reader page with no acceptance row. All
+  three sort under `docs/`, after every `.claude/` path, and lane A's quarter at the base is its first
+  149 sorted pending paths, ending at `.claude/skills/file-upload-storage-architect/SKILL.md` — so
+  **none lands in it**. The two sorted-index figures revision 1 carried for the plan path are removed
+  here: they were not re-derived at this revision, and this plan does not carry a figure it cannot
+  reproduce. Recorded so the next re-measurement is not surprised by it.
 - **Rollback.** Reverting the branch's commits restores the base bytes exactly: every change is an
   addition, no file is edited, deleted or renamed, and the ledger, the index and the eight pages are
   untouched.
@@ -161,9 +169,10 @@ against the committed file set rather than against the request's wording:
 
 ```text
 CHANGE CLASSIFICATION
-Deliverables:    one evidence record docs/evidence/documentation/readability-lane-a-batch-4-2026-10-15.md;
+Deliverables:    the evidence record docs/evidence/documentation/readability-lane-a-batch-4-2026-10-15.md;
+                 the skills author records docs/evidence/documentation/readability-lane-a-batch-4-skills-records-2026-10-16.md;
                  this plan file docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md.
-Classes:         docs-only (both deliverables).
+Classes:         docs-only (all three deliverables).
 Governing class: docs-only.
 Approval path:   none new. Delivery (commit, branch push, pull request) is covered by AEGIS-APR-039
                  (register L1003-L1024). No schema, security, cloud or agent-behaviour class is
@@ -174,7 +183,7 @@ Validation plan: the docs-only floor is links/rendering sanity plus review. Conc
                  The gate's agent-instruction-file rule is what keeps the four recorded page defects
                  recorded and NOT repaired: editing anything under .claude/skills/ would reclassify
                  this change out of docs-only, because those pages are instruction files.
-Scope contract:  exactly the two added docs/ paths above; nothing under scripts/, tools/, .github/ or
+Scope contract:  exactly the three added docs/ paths above; nothing under scripts/, tools/, .github/ or
                  .claude/, and no ledger, index, workflow, test, configuration, data or lock file.
 ```
 
@@ -214,7 +223,7 @@ and the term's prevalence is recorded as an observation instead.
 | --- | --- | --- | --- | --- | --- |
 | AC1 | The plan of record is a tracked file, not a body section. | The PR body names the plan path and a 40-hex blob ID, and `git rev-parse <head>:docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` equals that value character for character. | the body's capture block; `git rev-parse`; `git cat-file -s` | TESTABLE | Yes |
 | AC2 | The capture does not disturb the evidence record. | `git rev-parse <head>:docs/evidence/documentation/readability-lane-a-batch-4-2026-10-15.md` = `493c48414d3c97c97cdffa8bc422415284d899f9`, and the record's numstat against the base is `675 0`. | `git rev-parse`; `git diff --numstat <base>..<head>` | TESTABLE | Yes |
-| AC3 | No page is edited and nothing code-bearing is added. | `git diff --name-only <base>..<head>` returns exactly two added `docs/` paths; 0 deleted lines; no path under `scripts/`, `tools/`, `.github/` or `.claude/`, and no lock, configuration or data file. | `git diff --name-only`; `git diff --numstat` | TESTABLE | Yes |
+| AC3 | No page is edited and nothing code-bearing is added. | At the change head `0c994d77…`, `git diff --name-only <base>..<head>` returns exactly **three** added `docs/` paths — the evidence record, the skills-records file and the plan — with 0 modified and 0 deleted; 0 deleted lines; no path under `scripts/`, `tools/`, `.github/` or `.claude/`, and no lock, configuration or data file. The same command at this plan's capture revision returns the same three added paths, 0 modified and 0 deleted. | `git diff --name-only`; `git diff --numstat` | TESTABLE | Yes |
 | AC4 | The lane derivation reproduces from the instrument at the base. | Summary exactly `reader_pages_in_tree 655, accepted_on_recorded_review 56, provably_pending 5, no_recorded_acceptance 588, cannot_decide 6, official_pending_count 599`; union **593**; lane A = first `ceil(593/4) = 149` sorted pending paths; first `.claude/agents/ai-security-red-team-reviewer.md`; last `.claude/skills/file-upload-storage-architect/SKILL.md`. | `python -P -B tools/readability_acceptance/check_index.py --json --ref f490c16f…` plus the tree/index re-derivation; output quoted in the record's section 1 and in section 10 here | TESTABLE | Yes |
 | AC5 | The batch's eight pages are the next eight unread pages after batches 1-3 — verified by path, not inherited. | The batch-1/2/3 records' committed path lists, read from their own committed bytes, are exactly the 24 paths that precede this batch's eight in the base's sorted lane-A order; this batch's eight follow them, in order, with 0 gaps and 0 duplicates. | `git show` of each record at a named revision; their section 3 roster tables; section 5 below | TESTABLE | Yes |
 | AC6 | The record's per-page verdicts are complete, consistent and honest. | Exactly **4 FULL / 4 PARTIAL**; every one of the 8 pages has a verdict, a read range and (in the record's section 5) one quote line; every recorded defect names its page line; **no page carries a defect with a FULL verdict**; the four PARTIAL quote lines say "partial"; the record states that only the four FULL pages are row-eligible. | the record's sections 3-5, counted | TESTABLE | Yes |
@@ -225,8 +234,9 @@ and the term's prevalence is recorded as an observation instead.
 | AC11 | The repository's own checks pass at the implementation head. | `git diff --check` exit 0; `python -P scripts/validate-skills.py` exit 0; `python scripts/tests/test_validator.py` exit 0; `python -P scripts/ci/check-markdown-links.py` over the added paths reports `broken 0` and `dead 0`; `python -B scripts/check_dco.py --range <base>..<head>` reports SIGNED for every commit. | the commands and their observed output, in the record's section 7 and this plan's section 10 | TESTABLE | Yes |
 | AC12 | CI at the exact implementation head. | Every required job (`changes`, `validate-skills`, `gate-guard`) concludes success at the head that carries the capture commit; jobs that do not apply are recorded skipped, never passed. | the GitHub Actions run for that head | TESTABLE | **No — declared not verifiable at this head; see 3.3.** |
 
-**Proportionality.** Twelve criteria for a change that carries a 675-line evidence record and a
-mandated plan capture; each is one line of assertion over a command, and none requires new
+**Proportionality.** Twelve criteria for a change that carries a 675-line evidence record, a 165-line
+skills author-record file and a mandated plan capture; each is one line of assertion over a command,
+and none requires new
 machinery. The six acceptance bullets the pages were judged against are the ledger's own
 (L2843-L2862), not invented here.
 
@@ -376,19 +386,36 @@ Named rather than left implicit:
 
 ## 9. This plan's own revision and how it is captured
 
-- **Capture mechanism:** this file is committed as a **tracked file**; the commit that adds it
-  (`git commit -s`, DCO-signed) is the capture, and it adds **only** this file.
+- **This is captured revision 2 of this plan.** Revision 1 was blob
+  `ac8da53e011796bc9086a355b14e4cc9fca8eb81`, added by commit
+  `44d8f43169b0dbe822a08c838d7b5249e384dd0c`. Revision 1 is **superseded** by this revision: the SD-B
+  verdict of 2026-10-16 (issue comment `6214235532`) returned `REVISE` because revision 1's scope
+  contract and its AC3 still described a **two**-path file set after the branch acquired a third added
+  path. The blob values this revision supersedes are named in the PR body and in the comment that
+  carries this text, not here.
+- **Capture mechanism:** this file is committed as a **tracked file** on a **side branch** whose parent
+  chain reaches the change head `0c994d77ad491bb329e07c056065b4d9bb8401ed`; the commit
+  (`git commit -s`, DCO-signed) is the capture, and it changes **only** this file. **The change head is
+  not moved by this capture** — the PR branch still points at `0c994d77…`, which carries revision 1's
+  blob — so the capturing commit and this blob are *candidate* values, published in the PR body and in
+  a fresh immutable comment.
 - **Path:** `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md`.
 - **Captured revision:** this file's **blob ID** — Git's content hash of this exact text — computed as
   `git hash-object docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` before the commit and
   re-verified afterwards as
   `git rev-parse <capture commit>:docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md`. **The
-  value is recorded in the PR body**, and cannot appear inside this file: writing it here would
-  change the hash it names.
-- **Head at planning, and after capture:** planned at `fb3dfe34…`; the capture commit moves the
-  branch head, and the record's bytes are unchanged by it — verified by blob ID (AC2). The head that
-  carries the capture is the implementation head for the following stages; verdicts naming earlier
-  heads are void for it.
+  value is recorded in the PR body and in the capture comment**, and cannot appear inside this file:
+  writing it here would change the hash it names. The same impossibility applies to the capturing
+  commit's own ID, which is computed over these bytes.
+- **Verbatim check of the capture comment.** The comment carries this text in one fenced block. A
+  reader takes the block's lines, joins them with LF and appends one final LF, and `git hash-object`
+  over those bytes must return the blob ID. This file ends with exactly one LF, so the variant that
+  matches is **lines joined with LF plus one final LF**; a copy that drops the final newline does
+  **not** hash to this blob. The method and its observed result are recorded in the PR body.
+- **Head at planning, and after capture:** planned at `0c994d77…`; the capture commit does **not** move
+  the change head, so the bytes under audit are unchanged by it and the evidence record's blob
+  (`493c4841…`) and the skills-records file's blob (`405dfd44…`) are untouched (AC2). Verdicts naming
+  earlier heads are void for the head the capture names.
 - **Immutability:** editing this file after capture changes the blob ID and **voids** any ACCEPT that
   named the old value (L611-L616).
 
@@ -413,10 +440,11 @@ Named rather than left implicit:
 | 15 | `python -P scripts/ci/check_pr_body_skills.py --body-file <body before this capture>` | `PR body bound fields: OK` |
 | 16 | `python -P scripts/ci/check-markdown-links.py docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` | `files: 1   links checked: 8   anchors checked: 0   broken: 0   dead: 0` |
 
-**Two observations recorded here rather than repaired.** (a) The final commit message of the branch
-publishes intra-branch scopes `667/0`, `218/45` and `194/46`; against the same boundaries the
-measured values are `675/0`, `227/46` and `203/47` (and `494/0` for the round-1 record alone at
-`e8c8a67c…`). The message cannot be corrected without rewriting the published head, so it is recorded
+**Two observations recorded here rather than repaired.** (a) The branch's commit messages publish
+intra-branch scopes `667/0`, `218/45` and `194/46`; against the boundaries the earlier plan used the
+measured values are `675/0`, `227/46` and `203/47`, and at the change head the five per-commit
+measurands are `494/0`, `35/10`, `203/47`, `442/0` and `165/0` (section 2). A commit message cannot be
+corrected without rewriting the published head, so it is recorded
 as an observation. (b) The three commit subjects say "plan commit `e8c8a67c…`" and the body's plan
 section had a heading "Audited plan revision"; `e8c8a67c…` adds the **evidence record**, not a plan —
 there was no plan artifact at that revision. This captured plan is the plan artifact, and the naming
@@ -440,3 +468,215 @@ above is corrected here.
 - **The correctness of the record's historical comparison claims** where they concern records on other
   open pull-request branches at revisions that may move; each such revision is named in section 5 with
   the value read at planning time.
+
+---
+
+# Part II — revision 2 additions (2026-10-16)
+
+Every line above this heading is revision 1's text with only the ten replacements listed in 12.1
+applied; no other byte of it changed. Everything from here on is new at revision 2.
+
+## 12. The bounded Stage C repair — authored here, and deliberately NOT applied
+
+**What this section is.** The SD-B verdict of 2026-10-16 (`REVISE`; issue comment `6214235532`) raised three
+blocking findings. **B-1** is answered by correcting this plan (12.1). **B-2** and **B-3** are defects in
+the PR body's skills bound field and in the tracked skills-records file; repairing them means writing
+Stage C text. That text is given **exactly** below and is **left unapplied**.
+
+**Why it is not applied here.** This agent holds **Stage A** on this change and was additionally asked
+to perform a bounded **Stage C** repair. The repository rule is that no agent holds two stages of one
+change, so the Stage A capture is made on a side branch and the Stage C repair is authored but not
+performed. **A later, different agent applies it.** Nothing in this section has been written into the
+PR body's skills field or into the skills-records file, and **whether the replacement text is correct
+when applied is declared NOT VERIFIABLE at this head**, because the bytes it would produce do not exist
+yet.
+
+*Gloss: bound field = one of the three PR-body sections the workflow binds by content hash (witness,
+skills, security). Row source record = the HTML-comment provenance line that binds a published skills
+row to its author, stage, round, target and source.*
+
+### 12.1 The ten exact replacements applied to revision 1's text
+
+| # | Revision 1 location | Change |
+| --- | --- | --- |
+| 1 | the `**The change.**` bullet | head, tree, commit count and path set re-derived at `0c994d77…` |
+| 2 | section 1 (`Paths this change adds`) | two added `docs/` paths becomes **three** |
+| 3 | section 2 blast-radius table | every row re-measured at `0c994d77…` |
+| 4 | section 2, the capture's own blast radius | restated for the three-path set; two un-re-derived sorted-index figures removed |
+| 5 | section 2 classification block, `Deliverables` and `Classes` | names all three deliverables |
+| 6 | section 2 classification block, `Scope contract` | exactly the **three** added `docs/` paths |
+| 7 | section 3.2 **AC3** | threshold restated for the three-path file set |
+| 8 | section 3.2 `Proportionality` | names the 165-line skills author-record file |
+| 9 | section 9 | replaced by the revision-2 capture record |
+| 10 | section 10, observation (a) | restated at the five-commit head |
+
+Two consequences are stated rather than left implicit. First, the classification block above is
+therefore **re-derived at revision 2**, not a verbatim revision-1 artifact: the class, the governing
+class and the approval path are unchanged (docs-only; none new; delivery under AEGIS-APR-039), and only
+the deliverable list and the scope contract gained the third path. Second, AC3 is now satisfiable: at
+both the change head and at this plan's capture revision, `git diff --name-only <base>..<head>`
+returns exactly three added `docs/` paths, 0 modified and 0 deleted.
+
+**No rule label is offered as authority.** The four labels this plan's reading key uses are **not
+tracked rulings anywhere in the tree**; each is stated here by its content — the rule that a term the
+library uses as a convention is not a per-page defect; the rule that the next batch is the next eight
+**unread** pages, named by path and never by index or pinned range; this lane's repair of that rule
+after a Stage D finding pinned an index; and the rule that a PARTIAL page gets no acceptance row and
+stays pending. None of the four is cited as a ruling, and the plan's authority for each is the
+reasoning given beside it.
+
+### 12.2 B-2 — the five malformed rows, and their exact replacement line
+
+**The defect, re-measured for this revision.** Five of the eighteen published rows — rows **14, 15, 16,
+17 and 18** — end their RESULT cell with the literal, unexpanded template token
+
+    " + BY + "
+
+where the six-field record shape the file itself declares requires the author. Counted by command, the
+token occurs **five times** in the PR body's skills bound field (body lines 167-171) and **five times**
+in the tracked skills-records file (file lines 121, 127, 133, 139 and 145), byte-identically in both
+places. The protocol treats this as an authoring defect and not a cosmetic one: a malformed or
+incomplete row goes back to its author for a new self-authored source revision
+(docs/delivery-workflow.md L676-L677), and the raw comparison must preserve author, target and `UNRUN`
+wording (L692-L699).
+
+**The author value used, and why it is that value.** The replacement names
+
+    DeepSeek-4.1-Flash (deepseek-flash), Stage C repair, round 3.
+
+Nothing here is invented, and the derivation is stated so that it can be checked line by line:
+
+- It is the value this **same file already carries in its four gap rows, rows 10-13**, which are not
+  malformed — so the file itself supplies the convention for a Stage C round-3 row's author field.
+- It agrees with rows 14-18's own second cell, "Stage C repair, round 3 / DeepSeek-4.1-Flash
+  (deepseek-flash), 2026-10-16".
+- It agrees with the `Row source` records published for rows 14-18, whose `agent=` field reads
+  `readability-lane-a-batch-4-stage-c (DeepSeek-4.1-Flash (deepseek-flash))`, with
+  `provenance=self-authored by the Stage C repair agent round 3`.
+
+**The substitution. Old string, in each of the five rows:**
+
+    **by:** " + BY + ".
+
+**New string, in each of the five rows:**
+
+    **by:** DeepSeek-4.1-Flash (deepseek-flash), Stage C repair, round 3.
+
+Applied to those five lines and to nothing else — **in both** places, the body's rows 14-18 (body lines
+167-171) and the file's rows 14-18 (file lines 121, 127, 133, 139, 145) — it makes all five rows well
+formed. It also **keeps the exact-copy property**: the same substitution on both sides leaves each body
+row byte-identical to its file row, so **18 of 18** still match, compared excluding only the transport
+line terminator. Repairing the skills field this way **does** move the bound-field digest, and that is
+expected — the values are in section 13. A verdict that named the old digest is void for the repaired
+body: changing the table voids the Stage F verdict even though the head has not moved
+(docs/delivery-workflow.md L656-L663).
+
+### 12.3 B-3 — the placeholders, and the false count in the tracked file
+
+**(a) The placeholders in the PR body.** Body lines 112, 116 and 118 name `REPAIRCOMMIT` and
+`REPAIRBLOB` where the real values belong. Those values exist: all eighteen `Row source` records carry
+them, and they are the Stage C round-3 repair commit
+`0c994d77ad491bb329e07c056065b4d9bb8401ed` and that commit's blob for the skills-records file,
+`405dfd44295428064a0b603639b0e30614d29da1`. The exact replacement is a token-for-token substitution of
+the five occurrences on those three lines, with the backticks, spaces and punctuation around each token
+unchanged — so each backticked code span stays a backticked code span:
+
+| Body line | Old token, replaced verbatim | New token |
+| --- | --- | --- |
+| 112 | `REPAIRCOMMIT` | `0c994d77ad491bb329e07c056065b4d9bb8401ed` |
+| 112 | `REPAIRBLOB` | `405dfd44295428064a0b603639b0e30614d29da1` |
+| 116 | `REPAIRCOMMIT` | `0c994d77ad491bb329e07c056065b4d9bb8401ed` |
+| 116 | `REPAIRBLOB` | `405dfd44295428064a0b603639b0e30614d29da1` |
+| 118 | `REPAIRCOMMIT` | `0c994d77ad491bb329e07c056065b4d9bb8401ed` |
+
+**(b) The false count, in two places.** Both the PR body (line 114) and the tracked skills-records file
+(line 151) state that the four posted stage records each carry **0** occurrences of the skills-table
+header, **0** of the string `Row source` and **0** of `WHAT:`. Re-measured for this revision by command
+(`gh api` on each comment, counting occurrences in the posted body):
+
+| Stage | Comment | skills-table header | `Row source` | `WHAT:` |
+| --- | --- | ---: | ---: | ---: |
+| B | `6212640376` | 0 | 0 | 0 |
+| D | `6213003590` | 0 | 0 | 0 |
+| E | `6213436600` | 0 | 0 | 0 |
+| F | `6213567787` | 0 | **7**, three of them backticked | **1** |
+
+The skills-table-header half is true for all four. The `Row source` and `WHAT:` halves are true for B, D
+and E and **false for Stage F, issue comment 6213567787**, whose seven `Row source` occurrences are its
+own argument rather than a skills record. The substance survives — that record's own section 7 states it
+authored no skills row — but the count as published is false, and the plan states the corrected count
+here so that the tracked plan cannot repeat it either.
+
+**Exact replacement text for the tracked skills-records file, line 151 (Stage C, NOT applied).** Old
+fragment, as the file wraps it:
+
+    the four posted stage records (issue comments 6212640376, 6213003590, 6213436600, 6213567787) each
+    carry 0 occurrences of the skills-table header, 0 of the string `Row source` and 0 of `WHAT:`
+
+New fragment, one logical paragraph:
+
+    the four posted stage records (issue comments 6212640376, 6213003590, 6213436600, 6213567787) each carry 0 occurrences of the skills-table header; Stages B, D and E carry 0 of the string `Row source` and 0 of `WHAT:`, and Stage F carries 7 of `Row source` (3 of them backticked) and 1 of `WHAT:`, all of them its own argument rather than a skills record
+
+The line breaks in the old fragment are the file's own wrapping, not a boundary and not content; the
+applying agent matches the file's bytes and re-wraps the new fragment to the file's own width without
+changing a word of it.
+
+### 12.4 The three Stage B judgments, carried forward unchanged
+
+This revision **does not contradict** the Stage B verdict's three judgments, and it must not be read as
+reopening any of them:
+
+1. **The "a row for every stage that ran" condition is discharged, in the only honest form that
+   exists.** Rows 10-13 name **0 skills**, mark the usage **NOT RECOVERED**, and disclaim the
+   self-authored half. The workflow requires the absence to be stated (L651-L652) and forbids the
+   editor authoring another agent's account (L674-L675). **Keep them.**
+2. **The "each applicable row checked against its captured self-authored source" condition is not
+   discharged for Stages B, D, E and F, and is not dischargeable.** The word "applicable" (workflow
+   L182) makes the conjunct inapplicable to a gap row rather than failed by it. **Do not try to close it
+   by inventing rows — that is the defect.** It stays a recorded limitation for a later Stage F to weigh.
+3. **The transcription limit for rows 1-9 is acceptable but must stay stated.** Acceptable as a fixed
+   source for the exact-copy check (L681-L683 admits a retained exact capture with a content digest and
+   locator); **not** acceptable as evidence of contemporaneous self-authorship (L685-L686: a digest
+   checks captured content, not human identity).
+
+## 13. The bound-field digest, calibrated and re-stated
+
+**Method, declared rather than assumed.** Each of the three bound fields' payloads has every whitespace
+run — line breaks included — collapsed to a single space and is then trimmed; the three payloads are
+joined witness, then skills, then security, with single newlines; SHA-256 over the UTF-8 string; first
+16 hex. This is the **collapse-all** method the PR body declares.
+
+**Calibration, each from that pull request's own live body, before the method was applied here:**
+
+| PR | digest computed | value this programme records | result |
+| --- | --- | --- | --- |
+| #783 | `3913683c686e6e71` | `3913683c686e6e71` | reproduces |
+| #787 | `82ed906d2f228f0e` | `82ed906d2f228f0e` | reproduces |
+| #792 | `88300e711714200a` | `88300e711714200a` | reproduces |
+| #795 | `5fabf87b2df899e9` | `5fabf87b2df899e9` | reproduces |
+
+**4 of 4 reproduce**, so the method is pinned before it is used on this change.
+
+- **The old value:** `9d8d2f26e69cca4b` — PR #789's live body as read for this revision, 65,306 bytes,
+  payload lengths witness 1,259 / skills 29,966 / security 40. The earlier value the SD-F verdict named,
+  and which the round-3 repair superseded, was `233c8915c8bec2ec` (skills 12,023).
+- **The new value after revision 2's own body edit:** `9d8d2f26e69cca4b` — **unchanged**, because every
+  edit revision 2 makes to the body (the two capture values, the five placeholder occurrences and the
+  one count claim) lies **outside** all three bound fields. **Applying the 12.2 substitution would move
+  it again**, and that is expected; the projected value is computed from a simulated edit and is
+  reported in the PR body as a projection, never as a posted measurement.
+
+**The exact-copy property, kept.** With or without the 12.2 substitution, all **18 of 18** published
+rows occur byte-for-byte in the tracked skills-records file, in published order, compared excluding only
+the transport line terminator — re-counted for this revision rather than inherited from revision 1.
+
+## 14. What revision 2 could not verify
+
+- **Everything section 12 authors.** The Stage C repair text, including the corrected author field and
+  the corrected count for the tracked file, is not applied, so its correctness once applied is not
+  observable at this head — by construction, and by the stage-separation rule that produced it.
+- **The projected post-repair digest.** It is computed by simulating an edit that has not been posted.
+  It is labelled a projection wherever it appears and is not offered as a measurement.
+- **The two sorted-index figures revision 1 carried** for the plan path in the pending order. They were
+  removed rather than repeated, because this revision did not re-derive them.
+- Plus every item already listed in section 11, which this revision does not weaken.
