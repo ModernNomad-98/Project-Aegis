@@ -757,9 +757,10 @@ section 8 names all eight by path. The earlier rule — "the next 8 paths of lan
   dashes.
 - **The repair commit itself is NOT insert-only against its parent**: `aa88923f..9c9b13de`
   measures `410 added / 154 deleted` (this record 410/106; the ledger 0/48) — the eight withheld
-  ledger rows (48 lines) are deleted, plus this record's rewritten lines. The correction commit that
-  follows it replaces three lines of this record (the digest reference, the commit-count sentence and
-  the footer digest) and is likewise not insert-only. The insert-only claim holds for **base..head** only, and this
+  ledger rows (48 lines) are deleted, plus this record's rewritten lines. The correction commits
+  that follow it rewrite the digest reference, the commit-count sentence, this numstat sentence and
+  the footer digest line; they are likewise not insert-only, and their changed-line counts are read
+  from `git diff --numstat` rather than restated here. The insert-only claim holds for **base..head** only, and this
   disclosure is required so a reader does not read the repair commit as insert-only.
 - **Table arithmetic asserted before the tool ran:** the consolidated table's header row has 9
   columns, 1 separator row, **101** data rows to end of file (81 `full-page-acceptance` + 10
@@ -779,13 +780,15 @@ section 8 names all eight by path. The earlier rule — "the next 8 paths of lan
 
 The test is **only the commits this branch introduces** — never "no such commit is reachable from
 the head", which is unsatisfiable because the head contains main's history. This branch introduces
-**3** commits (`git rev-list --count e2a3e20b..HEAD` = 3): `aa88923f2517ebf2b0b3b56c3891fabe53d20b4c` (the
+**4** commits (`git rev-list --count e2a3e20b..HEAD` = 4): `aa88923f2517ebf2b0b3b56c3891fabe53d20b4c` (the
 original read commit), `9c9b13ded93db0667f42e5088cf1046db339c851` (the repair commit, which withholds the
-rows and re-marks the two pages) and one **dated correction commit** that answers this section: it
-updates this record's reference to the body's bound-field digest (the repaired body's skills field
-had to place its `Row source` records immediately after the skills table, which moved the digest)
-and states the commit count as three. That correction commit is the repository's prescribed form for
-a published commit's stale figure — the repair commit's message is **not** amended. Both are authored and committed by `ModernNomad-98
+rows and re-marks the two pages), `6b80493da508037aa3f12b9bea73bbbdd4f6ca1c` (a dated correction commit that
+kept this record's reference to the body's bound-field digest in step with the body as posted — its
+skills field had to place the `Row source` records immediately after the skills table, which moved the
+digest — and stated the commit count as three) and **the erratum commit that carries this sentence**,
+which corrects the two counts that correction got wrong: the correction commit's changed-line
+count, and the commit count itself (now four). The repair commit's message is **not** amended: it is
+published history, and these dated notes are the repository's prescribed correction. Both are authored and committed by `ModernNomad-98
 <263130032+ModernNomad-98@users.noreply.github.com>` (the repair commit under the host config identity `Peter
 Nguyen`, the same address), and **0** occurrences of the stale placeholder identity
 `reviewer@example.invalid` appear in either raw commit object.
@@ -829,7 +832,7 @@ by **DeepSeek (deepseek-v4-pro)** (header).
 
 ## Footer
 
-sha256: b5e38b9d833e817fefdeb1d6e9fd4bc71646857734ca20f842d8f7afd4bfde4b
+sha256: 0600213f67f9ad6c700d544bfaff7c8f200a60da61b0b24968de9c2b3b44f26b
 
 This digest covers every byte of this file strictly above the last `## Footer` heading — the whole
 batch record through the closing `---` rule line and its terminating newline, encoded UTF-8 with LF
