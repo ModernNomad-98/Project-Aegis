@@ -584,3 +584,230 @@ No PR opened since the window carries the defect.
 anchors are unchanged — their anchor equality is the evidence, and re-deriving them
 would add no information. It does not re-open the question of the comments and reviews
 layer, which section 7 item 3 already scopes as not adjudicated one by one.
+
+## 10. Repair round — both published values DO reproduce, and the route changes
+
+**Appended 2026-10-15 (local date) on the Stage D repair round, by an AI agent running on
+DeepSeek-4.1-Flash (deepseek-flash).** It answers the Stage D implementation-audit verdict
+**`SD-D: REVISE`** (issue comment 6206533032 on PR #793).
+
+**Reading key.** `SD-D: REVISE` is the independent implementation-audit verdict label.
+The **canonical** figure is the first 16 hex of a SHA-256 over the three bound fields'
+text after every whitespace run **including line breaks** collapses to one space and each
+field is trimmed, joined witness → skills → security with single newlines, hashed as
+UTF-8, with no trailing newline. A **reading** is any named alternative to that. The
+**search space** is the set of (normalization × field order/subset × joiner × trailing
+newline × sentinel resolution) combinations enumerated in §10.3.
+
+### 10.1 The claims this section corrects, quoted
+
+| Where | What it said | What is true |
+| --- | --- | --- |
+| §1 | "two because the value cannot be derived from the posted body at all" | all four reproduce; the class is an unnamed normalization in every case |
+| §3, the table rows for #780 and #785 | "does not reproduce under any method tested" | each reproduces **exactly** under a reading that can be named |
+| §3, the paragraph after the sweep table | "two of those four publish a figure that no normalization tested produces at all" | those two are #780 and #785, and both are produced by the readings named in §10.2 |
+| §4.5, title and table row | "the published figure does not reproduce from the posted body at all"; "Reproduces under any method tested? **no**" | it reproduces exactly, as the naive marker-string split |
+| §4.5, conclusion | "the published figure is bound to text this body does not contain" | it is bound to **this** body's three bound fields, and it changes if any of them changes |
+| §4.5 and §4.6, verdict consequence | "**a fresh Stage F is owed before merge**" | no fresh Stage F is owed **on the void-binding ground**; see §10.5 |
+| §4.6, title and table row | the same two sentences as §4.5 | it reproduces exactly, as the verbatim between-sentinel text |
+| §5, the table rows for #780 and #785 | "the published one binds nothing" | each binds its own body under its own named reading; what it will not do is compare with a canonical figure |
+| §6, the two per-PR reasons | "the published figure cannot be derived from this body under any normalization or near-variant tested; a fresh Stage F is owed" | replaced by the two named readings, with no Stage F owed on that ground |
+| §9 item 4, closing paragraph | "**#780 and #785 under no normalization tested at all**" | replaced by the two named readings |
+| §2, both occurrences | "thirteen" | **fourteen** — the count §2's own table lists; all fourteen re-derived for this repair |
+| §7 item 2 | "The pre-edit text of #771's body was not recovered" | it **is** recoverable, and the superseded figure has been re-derived from it (§10.6) |
+| §8 | "Deleted lines: 0 … insert-only by construction" | true at the pull-request level and true of the first two commits; **not** true of the repair round, which deleted 85 lines (§10.7) |
+
+### 10.2 What each published value actually is
+
+| PR | Published | Canonical | What the published value **is** | Raw payload lengths | Re-derived |
+| --- | --- | --- | --- | --- | --- |
+| #785 | `45db39e238a3a4e6` | `6682e8afc5f8ac5e` | the three bound-field payloads taken **verbatim** — the lines strictly between each sentinel pair, **unmodified**, so the blank line after the opening sentinel and the blank line before the closing sentinel survive as a leading and a trailing newline — joined witness → skills → security with `\n`, hashed as UTF-8 | `1819 / 7340 / 384` | yes, twice: Python `hashlib` and Node `crypto` |
+| #780 | `64bf6a407e23e47f` | `5feb2e444d998034` | the same payloads under the **naive marker-string split**, `body.split("<!-- bound-field: <field> -->", 1)[1].split("<!-- bound-field: end -->", 1)[0]` per field, which keeps the newline that ends the opening sentinel line and the newline that begins the closing sentinel line, so each field carries one extra newline at each end | `1930 / 7086 / 481` | yes, twice: Python `hashlib` and Node `crypto` |
+
+**Both readings are "the payload resolved correctly and the collapse step not applied".**
+For #785 the boundaries are the right ones and only the collapse is missing. For #780 the
+marker-string split happens to select the **same boundary lines** — each sentinel string
+occurs **exactly once** in that body — so its figure differs from the canonical one in two
+named ways (resolution, and the missing collapse) while #785's differs in one. Both are
+one class, and it is the class §4.3 and §4.4 already carry.
+
+### 10.3 The search space, with counts
+
+Re-run for this repair against the live bodies. #780's and #785's body anchors are
+**unchanged** from §3 (`2d1363e0…`, `2afc2d18…`), so these are the same bodies §4.5 and
+§4.6 measured.
+
+| Axis | Values | Count |
+| --- | --- | --- |
+| Normalization | canonical; verbatim; strip leading/trailing newlines only; strip; per-line strip with blank lines kept; per-line strip with blank lines dropped; per-line rstrip; inline-collapse keeping breaks; per-line strip joined with a space (blank lines kept / dropped); blank lines dropped without strip; line breaks replaced by a space; per-line whitespace collapse; canonical with an ASCII-only whitespace class; canonical without the trailing trim | 15 |
+| Field order or subset | all 6 permutations of witness → skills → security; the 6 ordered two-field subsets; the 3 singletons | 15 |
+| Joiner | newline; space; empty; double newline; CRLF; comma-space | 6 |
+| Trailing newline | absent; present | 2 |
+| Sentinel resolution | whole-line equality on the stripped line; first-occurrence marker-string split | 2 |
+
+**15 × 15 × 6 × 2 × 2 = 5,400 combinations per PR.** Exactly **five** of the 5,400 produce
+#780's published value and exactly **five** produce #785's — and in each case the five are
+**one** reading, because the five normalizations involved are identical transformations on
+that payload. **No other combination in the space produces either value.** As a positive
+control, the same space produces #776's published value (4 combinations) and #789's
+(4 combinations), so the space is demonstrably wide enough to find a non-canonical
+published value.
+
+Deletion sweeps, counted rather than estimated:
+
+| Sweep | #780 | #785 | Published-value hits |
+| --- | --- | --- | --- |
+| Every single-line removal from each field payload, both sentinel resolutions | 70 | 70 | **0** |
+| Every single-character deletion from each field payload, both sentinel resolutions | 18,988 | 19,092 | **0** |
+| Every single-line removal from the **whole body**, sentinels re-resolved each time | 214 | 200 | **0** |
+| Every single-character deletion from the **whole body** | 21,676 | 21,470 | **0** |
+| The combination space above | 5,400 | 5,400 | 5 (the named readings) |
+| **Total variants** | **46,348** | **46,232** | 5 each |
+
+**92,580 variants across the two PRs, and no deletion variant of either body produces
+either published value.** The two sweeps §4.5 originally described — every single-line
+removal from every field, and a single-character-deletion sweep — are inside this set and
+**were not falsified**: they find nothing, exactly as the earlier text reported. What was
+wrong was not the sweeps but the **conclusion drawn from them**.
+
+### 10.4 The lesson
+
+**"I could not reproduce it" is not "it cannot be reproduced."** The earlier §4.5 and
+§4.6 reported a negative result as a property of the artifact — *"bound to text this body
+does not contain"* — when it was a property of the search. A hash of text the body does
+not contain is a claim about the body; a hash the searcher's normalizations do not produce
+is a claim about the searcher. Only the first is a defect, and reporting the second as the
+first is how a valid digest gets destroyed.
+
+**This was the third instance of that error recorded tonight, and the first two were
+refuted the same way.** The defect report on #777 and #782 (§1) made the same move — a
+negative reading reported as a non-reproducing digest — and §4.1, §4.2 and §4.7 refute it.
+A published figure that is merely computed a different way is **not** unverifiable, and
+this record is the worked example: two figures it declared underivable are both exact
+hashes of the bodies they name.
+
+**The rule this repair adds.** A figure may be reported as *non-reproducing* only after
+the searching agent has **(a)** named the normalizations **and** the sentinel resolutions
+it tested, and **(b)** said how many combinations it tested and how many variants each
+deletion sweep covered — because "no method tested produces it" is a statement about a
+set, and a set that is not written down cannot be audited. Where a figure is a valid hash
+of the artifact under a reading that can be named, the finding is **"a misstated or
+unnamed normalization"** and the remedy is **a corrected statement** — never the
+invalidation of the value. **A record that declares a value unverifiable when it is merely
+computed a different way would destroy a valid digest**, and it would do so in the one
+place a reader can least check: the body lives outside the tracked tree, where no head
+move and no grep reaches it.
+
+### 10.5 The route, corrected
+
+- **#780 and #785: no fresh Stage F is owed on the void-binding ground.** The obligation
+  rested on the premise that each figure could not be re-derived from the body it names.
+  That premise is false for both, so the obligation it created falls with it. **What is
+  owed instead is a corrected statement of what each published figure is** — the naive
+  marker-string split for #780, the verbatim between-sentinel text for #785 — published
+  where a reader of those bodies will meet it, so that nobody compares one of them with a
+  canonical figure and draws a false conclusion. §6 carries ready-to-append text with both
+  readings named; **whether to append it belongs to the lanes that hold those PRs, and
+  this record holds neither.** Neither body's anchor has moved since §3, so each figure
+  remains a valid binding of the body it names, under its own reading.
+- **Unchanged obligations.** Nothing here withdraws any other route. #771 still needs its
+  supersession recorded and a fresh Stage F at the current body (§4.8). **This record's
+  own PR has had a bound field edited** — the `change-classification-gate` row's figure,
+  §10.7 — which **voids the verdict that named `33ba8ddf7431365e`** (the `SD-D: REVISE`
+  verdict, issue comment 6206533032) and owes a fresh Stage D re-audit at the new head and
+  the new figure, with Stage F following the ordinary workflow at the then-current head.
+
+### 10.6 The gap in §7 item 2 is retracted — the method exists
+
+§7 item 2 recorded that #771's pre-edit body text "was not recovered". **That was wrong,
+and this record already depended on the capability it denied** — §2's calibration value
+`8d441a1bfdff46d9` is derivable only from a superseded #774 revision. GraphQL's
+`userContentEdits.diff` **does** return the full body text at each recorded revision.
+Read for #771:
+
+| #771 revision | Characters | Body anchor (SHA-256) | Canonical digest | Normalized lengths |
+| --- | --- | --- | --- | --- |
+| 2026-10-15T20:58:34Z — the live body | 26,202 | `a5386f24ec43e91763acb1b4f65a68a5e1520242a5c4f2c0173567a229177706` | `b1acc2b2f5817fab` | `1262 / 11819 / 40` |
+| 2026-10-15T18:24:59Z — superseded | 18,781 | `8356d7b4c2488102ddd3c925c6ef28473480f23a5f71c5915e0abc8fff389cc1` | `b8e293e668e5b525` | `1262 / 6276 / 40` |
+
+The superseded revision computes to **`b8e293e668e5b525`** at lengths
+**`1262 / 6276 / 40`** — exactly the value and the lengths that both of #771's live
+verdicts publish. **§4.8's conclusion is unchanged and is now independently confirmed
+rather than merely asserted.** The same field yields #774's 2026-10-16T01:05:24Z revision
+(anchor `d07319919fff1732…`), which computes to `8d441a1bfdff46d9` at
+`2707 / 5594 / 738` — the fourteenth value in §2's calibration table.
+
+### 10.7 What this repair round changed, and its deleted-line count
+
+**This record.** Corrected **in place**: the preamble, and §1, §2 (both occurrences of the
+calibration count), §3 (two status cells and the paragraph after the table), §4.5, §4.6,
+§5 (two rows, plus a clarifying paragraph), §6 (the blockquote and the two per-PR reasons),
+§7 items 1 and 2, §8 (change shape and deleted lines), §9 (the "not rewritten" paragraph
+and item 4's closing paragraph), plus this new §10.
+
+**Deleted lines: 85**, excluding only the `---` diff headers. Counted as every deletion
+line in `git diff ab8a8c0667fd1bcf1ce6644af84d3bcf95aa040e..HEAD -- docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md`
+(`--numstat` reports `160  85` for that step), and cross-checked against a second diff
+implementation, which found 81 — the two differ only in which lines they choose to match
+inside the rewritten passages. **The higher figure is the one published here**, because it
+is the one this record's own stated method produces. The superseded sentences are quoted
+verbatim in §10.1.
+
+| Site (line numbers at `ab8a8c06`) | Lines deleted |
+| --- | --- |
+| Preamble L7–10 — "It rewrites nothing" | 4 |
+| §1 L63–65, L71 — the four-PR class, and the "never rewritten" discipline | 4 |
+| §2 L97, L111 — "thirteen" (both occurrences) | 2 |
+| §3 L137, L141, L149–150 — the two status cells and the paragraph after the table | 4 |
+| §4.5 L258, L263–265, L269–296 — title, table rows, conclusion, search paragraph, verdict consequence | 32 |
+| §4.6 L297, L303–304, L308–311 — title, table rows, conclusion, verdict consequence | 7 |
+| §5 L369, L371 — the two "binds nothing" rows | 2 |
+| §6 L381–383, L389–392, L398–401 — introduction, blockquote, the two per-PR reasons | 11 |
+| §7 L405 — "No PR body was edited" | 1 |
+| §7 L416–424 — items 1 and 2 | 9 |
+| §8 L443–446 — change shape and "insert-only by construction" | 4 |
+| §9 L461–463, L504–505 — "not rewritten", and item 4's closing paragraph | 5 |
+| **Total deleted** | **85** |
+
+**The pull request body.** One figure **inside the bound skills field**: the
+`change-classification-gate` row's evidence cell read `454\t0`, the pre-addendum figure
+(commit 1 is 454 lines; the addendum commit adds 57; the pull-request-level numstat at
+that time is `511\t0`). It now reads the figure the artifact supports. **That edit is to
+a bound field, so the bound-field digest moved:** `33ba8ddf7431365e` before it,
+`078ec42572ff330a` after it, with normalized payload lengths `1380 / 3868 / 40` —
+witness and security unchanged at 1380 and 40, skills 3639 → 3868. **A bound-field edit
+voids the verdict that named the old value** — `SD-D: REVISE`, issue comment 6206533032 —
+and owes a fresh verdict at the current head and the current figure. The body's Paths
+section states the pull-request-level numstat at the repair head, and it records that the
+zero there is a property of comparing against a base where the path does not exist, not
+evidence that no prose was replaced.
+
+**Two correction comments on #777 and #782.** The appended corrections (issue comments
+6206359136 and 6206359408) said the implementation reproduces "**thirteen**"
+independently published known-good values and listed seven "and six more", while §2's
+table lists **fourteen**. Both comments were corrected from "thirteen" to "fourteen" and
+from "six more" to "seven more". **Their superseded wording is preserved here** so the
+change is auditable: *"the same implementation reproduces thirteen independently published
+known-good values exactly … and six more"*. A posted comment is a dated record, and the
+repository's ordinary discipline is to correct it by appending; that discipline was set
+aside once, under an explicit repair instruction naming those two comments as a site to
+fix, and only for a count that contradicted the table those comments themselves cite.
+**Nothing else in either comment changed.**
+
+### 10.8 What this repair round did not verify
+
+- **#780's and #785's authoring path.** Both readings are named and both reproduce; which
+  agent or script produced each figure, and whether the collapse step was simply omitted,
+  is not established and is not claimed.
+- **Whether any other PR body carries a reading this search space still does not contain.**
+  The space in §10.3 is wide, not complete: it is bounded by the axes listed there, and an
+  unlisted normalization falls outside it. All four non-canonical figures in §3 are
+  produced within it; that is a statement about those four, not a proof about every figure
+  in the repository.
+- **The record's own §9 snapshot.** §9 is a measurement at 2026-10-16T02:02Z and is not
+  re-measured here. Several bodies have moved since (their `updated_at` values are later
+  than 02:02Z: #774 02:06:59Z, #783 02:09:14Z, #788 02:11:32Z, #790 02:09:35Z, #791
+  02:05:07Z, #792 02:08:19Z, #777 02:02:31Z, #782 02:02:32Z); §10.2's derivations use the
+  anchors §3 names, which are unchanged for #780 and #785.
+- **Codex.** PR #793 has no Codex review to triage: its review did not run (usage limit,
+  issue comment 6206352377). Recorded as unavailable, never as clean.
