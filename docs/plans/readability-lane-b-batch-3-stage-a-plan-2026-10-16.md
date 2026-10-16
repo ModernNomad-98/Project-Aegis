@@ -5,6 +5,17 @@ its own branch, so its revision is immutable and a Stage B auditor can bind the 
 branch, the capturing commit and **this file's blob SHA of the captured revision** are recorded in the
 PR #785 body, together with the id of an issue comment on that PR that carries the same text.
 
+**Revision 2 (2026-10-16) supersedes revision 1 of this plan.** Revision 1 is blob
+`d0ae95e3b0cffc69d5f1150940ab5e9525584c09` (32,328 bytes, 412 lines) at capturing commit
+`43ef40235fe44c36642a788900cec9e3b43e41a5`, held as issue comment `6212436516`. It is superseded
+because the **second Stage D on this PR (SD-D: REVISE, issue comment `6213174939`)** found its
+criterion 4 **NOT MET** — the C-1 screen carried no measured prevalence for `LLM08` or `LLM07`,
+two terms the record's own gap list turns on — and because the C-1 reconciliation and the record's
+section 5 / section 11 self-contradiction had to be bound. **Stage B must bind this revision, not
+revision 1;** a verdict that names `d0ae95e3...` is void. This revision keeps the same head binding
+and **does not move the PR head**: it is committed on the plan's own side branch, exactly as revision
+1 was.
+
 - **Planner:** DeepSeek-4.1-Flash (`deepseek-flash`), **Stage A only**. The planner is **not** the
   auditor of this plan and holds no Stage B, D, E, F or G on this change.
 - **Work item:** *Phase 4 full-page re-read — lane B, batch 3* — the work delivered by PR #785.
@@ -37,12 +48,19 @@ PR #785 body, together with the id of an issue comment on that PR that carries t
 - **Keeper row / ledger keeper** — one row of the consolidated acceptance table, and the distinct agent
   role AEGIS-APR-101 allows to record it (a different agent from the page's author and reviewer).
 - **AEGIS-APR-*nnn*** — an entry in `docs/approvals/APPROVAL_REGISTER.md`.
-- **C-1** — the ruling *a library-wide convention is not a per-page defect*: a first-use criterion may
-  not fail a page for a term that is a convention across the reader pages.
-- **C-3 / R2** — the ruling *"the next 8" means the next 8 UNREAD pages in the unread sequence* —
-  never a pinned index, never index arithmetic; R2 is that reading (lane A batch 5's record, §"The
-  reading used: R2").
-- **C-4** — the ruling *a PARTIAL page gets no acceptance row of any kind and stays pending*.
+- **C-1** — the label this plan uses for the **convention screen**: *a term used on about 12 or more of
+  the 653 reader pages is a library-wide convention, so an unglossed first use of it is an OBSERVATION,
+  not a gap, and may not make a page PARTIAL*. The label is only a label: **no tracked document in this
+  tree defines a ruling named `C-1`** (see the naming caveat in section 6), and the screen is stated
+  here by its content.
+- **C-3 / R2** — the label this plan uses for the **next-batch selection rule**, which is a *different*
+  rule from the convention screen above: *the next batch is the next eight UNREAD pages in the unread
+  sequence, re-measured at that batch's own implementation base and named by path — never a pinned
+  index, never index arithmetic, never a pinned range*. Again the label is only a label: **`C-3`
+  occurs in this tree's head only as an unrelated change-site ID**, and the reading named `R2` is
+  recorded in lane A batch 5's record, not as a ruling (section 6 measures what is where).
+- **C-4** — the label this plan uses for the rule *a PARTIAL page gets no acceptance row of any kind
+  and stays pending*; at this head the token occurs only in this PR's own new record (section 6).
 - **Reader-page set** — the pages `check_index.py` classifies at a pinned ref: every tracked `.md`
   path except `scripts/**` (one fixture README excepted) and one generated audit report.
 - **SD-D** — the Stage D implementation-audit verdict; **DCO** — the Developer Certificate of Origin
@@ -83,7 +101,7 @@ touched; no merge performed.
 **What.** Add one tracked evidence record that (a) names the eight pages by path and by acceptance
 revision, (b) records one disposition per page against the ledger's six "Acceptance for each page"
 bullets, (c) states the first-use gaps it found and (d) states, verbatim, the row-quote string a
-keeper may copy for each page.
+keeper may copy **for each page the record accepts FULL** - after the section 13 correction, three pages.
 
 **Why.** The readability programme needs an accepted, recorded, non-author review per page before a
 page can leave the pending set. This batch supplies that review for eight pages. Measured need (the
@@ -125,45 +143,109 @@ this head**. The **C-1 screen is applied to every criterion**: no criterion fail
 unglossed term unless the term is first shown *not* to be a library-wide convention, by the
 measurement in §4.1.
 
-### 4.1 The C-1 screen, measured (this plan's own command and numbers)
+### 4.1 The C-1 screen, measured — every term the record's gap list turns on
 
-Method — term prevalence over the reader-page set at the acceptance revision:
+**Method — term prevalence over the reader-page set at the acceptance revision.** Run by this planner
+in a fresh HTTPS clone on 2026-10-16; the two steps are exactly these:
 
 ```text
-python -P -B tools/readability_acceptance/check_index.py --quiet --ref e2a3e20b…   # 653 reader pages
-git grep -l -w -e <TERM> e2a3e20b7c20ef8385b219b39c6405237163406f -- '*.md'        # whole-word, case-sensitive
-   … intersected with the reader-page set from check_index.py's own classify_tree() at that ref
+python -P -B tools/readability_acceptance/check_index.py --quiet --ref e2a3e20b...   # 653 reader pages
+#   the reader-page SET is check_index.py's own classify_tree(), imported and called at that ref:
+#   sys.path.insert(0, "tools/readability_acceptance"); import check_index
+#   check_index.classify_tree("e2a3e20b7c20ef8385b219b39c6405237163406f", repo)["reader"] -> 653 paths
+git grep -l -w -e <TERM> e2a3e20b7c20ef8385b219b39c6405237163406f -- '*.md'
+#   git grep prints each hit as "<tree-ish>:<path>"; strip the "<tree-ish>:" prefix, then intersect
+#   the paths with that 653-path reader set. That prefix is the one step an earlier statement of this
+#   method left implicit: without stripping it the intersection is empty and every term reads 0.
 ```
 
-| Term | Pages (of 653) | Term | Pages | Term | Pages |
-| --- | ---: | --- | ---: | --- | ---: |
-| `API` | **204** | `PII` | 56 | `RBAC` | **15** |
-| `JSON` | **85** | `MCP` | 28 | `LLM03` | **14** |
-| `RLS` | **73** | `SLO` | 24 | `LLM09` | **14** |
-| `OWASP` | **61** | `IAM` | **20** | `DNS` | 11 (below) |
-| `UX` | **41** | `IDOR` | **20** | `SLI` | 10 (below) |
-| `TLS` | **16** | `SSRF` | **17** | `LLM02` | 9 (below) |
+**Every term the record's section 3a gap list turns on — measured in this revision by that command.**
 
-Below the threshold and therefore still gap candidates: `CDK` 8, `CVE` 8, `KMS` 7, `ASI09` 5,
-`SBOM` 3, `tfvars` 1, `RG` 1, `SEV1` 1, `OAuth` 1.
+| Term (the page whose gap list names it) | Pages of 653 | The screen's classification |
+| --- | ---: | --- |
+| `API` (B3-4) | **204** | at/above ~12 — convention (OBSERVATION, not a gap) |
+| `JSON` (B3-7) | **85** | at/above — convention |
+| `RLS` (B3-5) | **73** | at/above — convention |
+| `OWASP` (B3-1, B3-3, B3-4) | **61** | at/above — convention |
+| `UX` (B3-3) | **41** | at/above — convention |
+| `IAM` (B3-6) | **20** | at/above — convention |
+| `LLM08` (B3-1) | **17** | **at/above — convention** |
+| `RBAC` (B3-6) | **15** | at/above — convention |
+| `LLM03` (B3-1) | **14** | at/above — convention |
+| `LLM09` (B3-1) | **14** | at/above — convention |
+| `DNS` (B3-7) | 11 | below — gap candidate |
+| `SLI` (B3-8) | 10 | below — gap candidate |
+| `LLM02` (B3-1) | 9 | below — gap candidate |
+| `LLM07` (B3-1) | 9 | below — gap candidate |
+| `CDK` (B3-6) | 8 | below — gap candidate |
+| `ASI09` (B3-3) | 5 | below — gap candidate |
+| `tfvars` (B3-7) | 1 | below — gap candidate |
+| `RG` (B3-7) | 1 | below — gap candidate |
+| `SEV1` (B3-8) | 1 | below — gap candidate |
+| `SEV4` (B3-8) | 1 | below — gap candidate |
+| `SEV2` (B3-8) | 0 | below — gap candidate |
+| `SEV3` (B3-8) | 0 | below — gap candidate |
+
+**The two terms this revision adds, and the reconciliation.** Revision 1 measured 27 terms and did
+**not** measure `LLM08` or `LLM07`, although the record's section 3a names both as B3-1's first two
+gap elements. Measured independently here, from the run above: **`LLM08` = 17 of 653** and
+**`LLM07` = 9 of 653**. The second Stage D reported the same two figures (17 and 9) from its own run;
+**my count agrees exactly, and the command above is my own — not a copy of its numbers.** `SEV2` = 0,
+`SEV3` = 0 and `SEV4` = 1 are measured here too, so the `SEV1–SEV4` family the record writes as a
+range is measured term by term and is wholly below the threshold.
+
+**The 27 terms revision 1 already measured all reproduce in this run** (same command, same ref):
+`API` 204, `JSON` 85, `RLS` 73, `OWASP` 61, `PII` 56, `UX` 41, `MCP` 28, `SLO` 24,
+`IAM` 20, `IDOR` 20, `SSRF` 17, `TLS` 16, `RBAC` 15, `LLM03` 14, `LLM09` 14, `DNS` 11,
+`SLI` 10, `LLM02` 9, `CDK` 8, `CVE` 8, `KMS` 7, `ASI09` 5, `SBOM` 3, `tfvars` 1,
+`RG` 1, `SEV1` 1, `OAuth` 1 — **27 of 27**, so revision 1's method and figures were honest and
+this revision extends them rather than displacing them.
 
 **The screen's rule, stated so it is decidable:** a term used on **~12 or more** of the 653 reader
 pages is a **library-wide convention**; an unglossed first use of it is recorded as an
 **OBSERVATION**, not as a gap, and may not make a page PARTIAL. A term below the threshold may be a
 gap, and the gap must still be recorded with the page's own line cite.
 
-**The first-use criterion as this plan states it (the screen applied, no fixed count).**
+**The screen applied to each of the eight pages, using the counts above and each page's own gap list:**
 
-- **4.1a — the plan carries the screen and the measurements.** Decidable by reading this section and
-  re-running the two commands above. **Verifiable at this head: yes.**
-- **4.1b — the dispositions are not asserted as a settled count.** Under the screen, four of the
-  record's seven partials turn only on terms at or above the threshold (B3-4: `OWASP` 61, `API` 204),
-  only on the description-before-terms shape (B3-5: `RLS` 73; B3-3 and B3-6 mix, B3-8 mixes), and the
-  record's own §11 already concedes: *"Under C-1's stronger test four of the seven partials could be
-  argued FULL"*. The plan therefore records the seven-partial standard as **an open Lead decision
-  (§10), not as a plan criterion that fixes the count of seven**. Decidable test: the record's §11
-  carries that concession in its own bytes (present, verified), and this plan does not assert the
-  count as a criterion. **Verifiable at this head: yes.**
+| Page | That page's gap terms, with the counts above | What the screen decides |
+| --- | --- | --- |
+| B3-1 | `LLM08` 17 (conv) `LLM07` 9 `LLM02` 9 `LLM09` 14 (conv) `LLM03` 14 (conv) | **PARTIAL** — `LLM07` and `LLM02` are below the threshold |
+| B3-2 | none recorded | **FULL** (accepted unchanged) |
+| B3-3 | `OWASP` 61 (conv) `ASI09` 5 `UX` 41 (conv) | **PARTIAL** — `ASI09` is below the threshold |
+| B3-4 | `OWASP` 61 (conv) `API` 204 (conv) | **FULL** — its gap set has no below-threshold term |
+| B3-5 | `RLS` 73 (conv) | **FULL** — its gap set has no below-threshold term |
+| B3-6 | `CDK` 8 `IAM` 20 (conv) `RBAC` 15 (conv) | **PARTIAL** — `CDK` is below the threshold |
+| B3-7 | `DNS` 11 `tfvars` 1 `JSON` 85 (conv) `RG` 1 | **PARTIAL** — three terms are below the threshold |
+| B3-8 | `SEV1` 1 `SEV2` 0 `SEV3` 0 `SEV4` 1 `SLI` 10 | **PARTIAL** — every term is below the threshold |
+
+("conv" marks a term the screen classifies as a library-wide convention: an unglossed first use of it
+is an OBSERVATION and may not make the page PARTIAL.)
+
+**4.1a — the plan carries the screen and the measurements.** Decidable by reading this section and
+re-running the two commands above. **Verifiable at this head: yes.**
+
+**4.1b — the C-1 reconciliation, now taken: the dispositions the screen decides.**
+Applied literally, the screen says the same thing about exactly **two** pages: **B3-4 and B3-5 have
+their entire gap sets at or above the ~12-page threshold, so no term in either gap set can make the
+page PARTIAL.** The **coordinator ruling of 2026-10-16** — issued on this evidence after the second
+Stage D, and applied here rather than re-litigated — records **B3-4 and B3-5 as FULL**, with these
+measurements as its basis: **B3-4 = `OWASP` 61 + `API` 204; B3-5 = `RLS` 73.** **The final counts
+are 3 FULL — B3-2, B3-4, B3-5 — and 5 PARTIAL — B3-1, B3-3, B3-6, B3-7, B3-8.**
+
+**The "four" is a different set and is not used for this.** The record's section 11 (L484) and
+revision 1 of this plan spoke of *four* of the seven partials being arguable as FULL. That four is the
+**description-before-terms** shape — `B3-3`, `B3-5`, `B3-6`, `B3-8`, a page whose frontmatter
+`description:` line uses an abbreviation its own Terms block defines a few lines later — which is a
+**different set** from the two pages the convention screen actually clears. Conflating the two sets is
+the error the second Stage D identified; the count **the screen** decides is two, and with the ruling
+the record's dispositions become **3 FULL / 5 PARTIAL** (section 13 binds the record's correction).
+
+**The ruling lifts the escalation.** The second Stage D recorded that no keeper should record a row
+from the B3-4 or B3-5 dispositions while the reconciliation was open. With B3-4 and B3-5 recorded FULL,
+an eligible keeper may record their rows from the corrected record (section 13), bound to the
+acceptance revision `e2a3e20b...`. **Verifiable at this head: yes** — the measurements are re-runnable
+by the command above, and the ruling is recorded in this plan and in this PR's issue comments.
 
 ### 4.2 The criteria
 
@@ -172,12 +254,13 @@ gap, and the gap must still be recorded with the page's own line cite.
 | 1 | The diff base→head is exactly one added `docs/` Markdown file, insert-only, and contains **no** code, script, workflow, test, config, data or lock file (the L400–403 test). | `git diff --name-only` / `--numstat` / `--check` | **yes** — measured: 1 path, +506/−0, `--check` exit 0 |
 | 2 | The change classification **`docs-only`** is recorded **in the plan** (not only in the skills table). | this file §3 + criterion 1's diff | **yes** |
 | 3 | All eight pages are named **by path**, each bound to the full 40-character acceptance revision, each with one disposition, and the six acceptance bullets are addressed per page. | the record's own bytes (§2/§3 tables, §5 row-quote strings); `git show`/`rev-parse` per page | **yes** — measured: 8/8 paths present, 8/8 blob SHAs and line counts reproduce |
-| 4 | The C-1 screen of §4.1 is stated with a measured prevalence for every term the record's gap list turns on, and the record carries the §11 concession rather than asserting the count of seven as settled. | §4.1 of this file; record §11 | **yes** (measurements re-runnable; concession present) |
+| 4 | The C-1 screen of section 4.1 is stated with a measured prevalence for **every** term the record's section 3a gap list turns on — including `LLM08` (17) and `LLM07` (9) and each member of the `SEV1–SEV4` family — and the screen is applied per page, with the dispositions it decides recorded (the 2026-10-16 coordinator ruling: B3-4 and B3-5 FULL; final counts 3 FULL / 5 PARTIAL). | section 4.1 of this file (the commands and their numbers); record section 3a for the gap list | **yes** — all 22 gap-list terms measured in this revision, and the 27 terms revision 1 measured reproduce 27/27 |
 | 5 | **C-4, both directions:** no acceptance row, no index event and no raw occurrence of any of the eight page paths exists in the acceptance index, and all eight remain pending at the head. | `git grep` over `tools/readability_acceptance/acceptance-index.json`; `check_index.py --path <page> --ref <head>` | **yes** — measured: 0 raw occurrences; each page reports `no_recorded_acceptance` = 1 |
 | 6 | The record's claimed index arithmetic holds at the base: `table_rows` 101, `events` 101, `full_page_acceptances` 81, `lost_commit_events` 10, `reader_pages_with_rows` 68. | `build_index.py --ref e2a3e20b… --report` in a full clone (`refs/remotes/**` and `refs/pull/*/head` present) | **yes** — measured at the base and at the head; the two reports differ **only** in their `built_at_ref` field (the record's word "byte-identical" is loose; the five counts are equal) |
 | 7 | Branch hygiene: every branch commit carries a DCO sign-off, `git diff --check` is clean, and the PR body's bound fields still parse. | `scripts/check_dco.py --range`; `git diff --check`; `scripts/ci/check_pr_body_skills.py --body-file` | **yes** — measured: 2/2 commits signed; `--check` exit 0; body checker "PR body bound fields: OK" |
 | 8 | The capture: this plan exists as a tracked file, and the PR body names its **path, blob SHA and capturing commit** (and the id of the comment carrying the same text). | `git cat-file -p <blob>`; the body text | **yes** — the capture receipt is recorded in the PR #785 body |
 | 9 | The capture edit does not disturb the PR's bound fields: the published bound-field digest still recomputes to `1e2150fefd6c2ea9` under the body's declared method. | the declared method, recomputed over the live body | **yes** — measured before and after the edit |
+| 10 | The record's required corrections — the ruling's two re-dispositions, the section 5 strings, the section 5 preamble and the section 11 direction-1 sentence — are bound with exact replacement text in section 13, so that applying them makes the record's section 11 claim true of the file it sits in and leaves section 5 offering strings only for genuinely FULL pages. | section 13 of this file against the record's bytes at the head | **yes** as a binding of this plan; the corrected record's own bytes are decided at the Stage C commit that applies them (declared not verifiable at this head as N8, section 5) |
 
 ## 5. Criteria declared not verifiable at this head, with reasons (element 5)
 
@@ -192,9 +275,11 @@ of §4.2** and none of them may be used to force a disposition on this PR.
 - **N2 — the reader's model attribution** (`deepseek-v4-pro`). The repository's attribution rule
   requires the naming; nothing verifies which model produced the bytes. The SD-B recorded the same
   limit.
-- **N3 — the C-1 disposition of the seven partials** (which, if any, are FULL under the stronger
-  test). This is the Lead's decision, referred in §10; it is not decidable at this head by any
-  command, and this plan does not decide it.
+- **N3 — the C-1 disposition of the partials** (which, if any, are FULL under the screen). **This item is
+  now decided, not deferred:** the coordinator's 2026-10-16 ruling (section 4.1b) records B3-4 and
+  B3-5 FULL on the measured grounds, and lifts the escalation against recording rows from those two
+  dispositions. What remains open is not the decision but its *application* to the record's bytes
+  (N8).
 - **N4 — the record's `43 of the 653 reader pages` "description-before-terms shape" figure.** It is
   the Stage C repair's own measurement with no committed instrument behind it; this plan did not
   re-derive it and does not rely on it (§4.1b rests on the term prevalences, which were measured).
@@ -206,8 +291,51 @@ of §4.2** and none of them may be used to force a disposition on this PR.
 - **N7 — that the eight pages' authors are different agents from the reader.** Git's author field
   cannot distinguish agents: every commit in this repository is made under the owner account. What is
   stated instead is the falsifiable form in §8.
+- **N8 — the record's corrected section 5 / section 11 bytes.** The correction section 13 binds is
+  **Stage C's to commit**; this planner holds Stage A only, and the coordinator's instruction freezes
+  the PR head at `2a719cd46c891eed15548d9500bab951083d87ac` in the meantime. The correction is
+  therefore decidable only at the Stage C commit that applies it, and is declared not verifiable at
+  this head.
 
 ## 6. The C-3 / R2 selection rule for the next batch (element 6)
+
+**The naming caveat — no label in this plan is offered as authority.** The labels this plan uses for
+its rules are **not tracked rulings in this tree**, and every rule here is stated by CONTENT; a reader
+who wants to rely on a rule must rely on its content, its derivation and its measurements, never on a
+label. Measured by command at this head (2026-10-16):
+
+- **The convention screen (called "C-1" here)** — content: *a term used on about 12 or more of the 653
+  reader pages is a library-wide convention, so an unglossed first use of it is an OBSERVATION, not a
+  gap, and may not make a page PARTIAL.* `git grep -n -w -e C-1 2a719cd4 -- '*.md'` returns exactly two
+  files: this PR's own new record (L484, L489) and
+  `docs/evidence/documentation/readability-reread-batches-2026-10-12.md` L229, where `C-1` is a
+  **change-site ID** in a change-site table — not a ruling. Nothing in the ledger, the delivery
+  workflow or any approval defines it.
+- **The next-batch selection rule (called "C-3 / R2" here)** — content: *the next batch is the next
+  eight UNREAD pages in the unread sequence, re-measured at that batch's own implementation base and
+  named by path — never a pinned index, never index arithmetic, never a pinned range.* `git grep -n -w
+  -e C-3 2a719cd4 -- '*.md'` returns **one** line, the same change-site table
+  (`readability-reread-batches-2026-10-12.md` L231) — again an unrelated change-site ID. The reading
+  itself **is** named, as `### The reading used: R2`, in lane A batch 5's record.
+- **Where that reading actually lives — measured, and a correction to the SD-D and to the brief.** The
+  second Stage D recorded that the R2 reading "exists only on unmerged branches ... and not at this
+  head and not on main"; the coordinator's dispatch repeated that. **My measurement disagrees with that
+  one clause and I record the correction:** the lane A batch 5 record is **on live main**
+  (`git grep -n -e 'The reading used' origin/main -- '*.md'` ->
+  `origin/main:docs/evidence/documentation/readability-lane-a-batch-5-2026-10-15.md:101`), merged by
+  PR #795 as `3b0d6cd5` at 2026-10-15T21:20:36-07:00 — i.e. it was already on main when the second
+  Stage D ran. It is **not** at this PR's head (`2a719cd4`), whose base `e2a3e20b` predates that
+  merge (`git merge-base --is-ancestor origin/docs/readability-lane-a-batch-5-20261015 e2a3e20b`
+  exits 1; the same check against `origin/main` exits 0). **The substance of the caveat is unchanged
+  either way:** a reading recorded inside one lane's batch record is not a tracked ruling, and no
+  label — `R2`, `C-1`, `C-3` or `C-4` — is offered here as authority for any rule.
+- **They are two different rules.** The convention screen (this plan's "C-1") decides whether an
+  unglossed term may make a page PARTIAL; the next-batch rule (this plan's "C-3 / R2") decides which
+  eight pages the next batch reads. Sharing a label family does not make them one rule.
+- **"C-4" is in the same position.** `git grep -n -w -e C-4 2a719cd4 -- '*.md'` returns one line, in
+  this PR's own new record (L464); it appears nowhere on main. Its content — *a PARTIAL page gets no
+  acceptance row of any kind and stays pending* — is what this plan relies on, stated by content in
+  sections 1 and 8.
 
 **The rule, stated in full.** *The next batch is the **next eight unread pages in the unread
 sequence**, re-measured at that batch's **own implementation base**, and **named by path**.* It is
@@ -276,8 +404,10 @@ Each answer names the evidence that settles it and the routing disposition Stage
    out to be wrong"); it does not authorise *recording* acceptances from retained evidence, which is
    APR-101's recording limb. Standing backlog delivery: AEGIS-APR-039 (register L1003 at the base).
    Merge: Stage G, not this PR. *Routing: **preserve*** — proceed inside that authority and do not
-   re-ask. The one decision this plan prepares rather than takes is the C-1 reconciliation of the
-   seven partials (§10, item 3), with the measured table of §4.1 attached.
+   re-ask. The C-1 reconciliation of the partials is **no longer prepared-and-deferred**: the coordinator's
+2026-10-16 ruling took it (section 4.1b) and this plan records it, with the measured table of section
+4.1 attached. What remains is not a decision but an application — the record correction section 13
+binds, which is Stage C's commit to make.
 4. **Minimum-safe action — the smallest action that satisfies the need without weakening a control?**
    Commit **one** Markdown plan file on its own branch and add an out-of-bound-field capture
    reference to the PR body. No page edited, no keeper row authored, no ledger or index line changed,
@@ -317,7 +447,7 @@ agents.
 
 | Evidence | Where it lives |
 | --- | --- |
-| The per-page dispositions, first-use gaps, six-bullet line cites, per-page purpose/normal-use restatements and the verbatim row-quote strings | `docs/evidence/documentation/readability-lane-b-batch-3-2026-10-15.md` at head `2a719cd4` (this PR's only added file) |
+| The per-page dispositions, first-use gaps, six-bullet line cites, per-page purpose/normal-use restatements and the verbatim row-quote strings — **after the section 13 correction, the row-quote strings are the three FULL pages' only** | `docs/evidence/documentation/readability-lane-b-batch-3-2026-10-15.md` at head `2a719cd4` (this PR's only added file) |
 | The pages' bytes at the acceptance revision, and their blob SHAs / line counts | the git objects at `e2a3e20b…` (table in §1; re-measurable by command) |
 | The instrument's counts (`653 / 57 / 4 / 586 / 6 / 596`) and the 590-path pending set | `check_index.py --quiet|--json --ref e2a3e20b…`; recorded in the record's §1 |
 | The C-1 prevalence screen of §4.1 | this plan (commands and numbers, re-runnable) |
@@ -330,13 +460,13 @@ agents.
 1. **It does not decide that the record's dispositions are correct.** It plans the work, states the
    criteria and declares what is not verifiable; the independent implementation audit (Stage D) is the
    decider.
-2. **It does not reclassify any page.** Whether B3-3/B3-4/B3-5/B3-6/B3-8 stand as PARTIAL under the
-   C-1 screen is **not** this plan's call.
-3. **The C-1 reconciliation is prepared as one concrete decision for the Lead, not taken here:** with
-   the §4.1 measurements attached, the Lead (or owner) decides whether the seven-partial standard
-   stands as applied, or whether the pages whose only gap is a term at/above the convention threshold
-   are recorded FULL. The record's §11 concession is the input; this plan neither ratifies nor
-   overrides it.
+2. **It does not reclassify any page of its own motion.** The reclassification of B3-4 and B3-5 to
+   FULL is the **coordinator's 2026-10-16 ruling**, recorded in section 4.1b and applied here rather
+   than re-litigated; this plan does not extend it to any other page (B3-3, B3-6, B3-7 and B3-8 each
+   keep at least one below-threshold gap term and stay PARTIAL).
+3. **The C-1 reconciliation was taken, not left open.** Section 4.1b records the ruling and its
+   measurement; the record's section 11 concession is superseded by it. Nothing in this plan re-opens
+   or re-argues the decision — the only remaining work is the record correction section 13 binds.
 4. **It does not decide the keeper IDs, the keeper's identity, or the row types** — lane B's band and
    the row protocol belong to the allocation file and the separate keeper.
 5. **It does not decide whether or when the index is rebuilt** (AEGIS-APR-115) or when the PR merges
@@ -345,7 +475,14 @@ agents.
    other lane's pages, batches, records or quarters.
 7. **It does not hold or post Stage B, D, E, F or G** on this change, and it states no verdict on the
    implementation that already exists at this head.
-8. **It does not re-derive** the figures listed as not verifiable in §5 (N1–N7).
+8. **It does not re-derive** the figures listed as not verifiable in §5 (N1-N8).
+9. **It does not perform Stage C.** The record corrections section 13 binds are the implementation
+   stage's to commit. This planner holds **Stage A only**, and the coordinator's instruction freezes
+   the PR head at `2a719cd46c891eed15548d9500bab951083d87ac`, so that the commit applying the
+   correction moves the head deliberately and visibly at Stage C rather than as a side effect of this
+   plan's own capture. **Applying section 13 will move the head**; when it does, the plan's head
+   binding must be re-read as section 12 states, and the criteria that measure the base-to-head diff
+   (1, 3, 5, 6) must be re-derived at the new head.
 
 ## 11. Verification ledger — what was run, and what could not be verified
 
@@ -365,13 +502,18 @@ shared clone was **not** used or cleaned; no worktree was created):
 | Raw occurrences of the eight page paths in the acceptance index at head | **0** |
 | `check_index.py --path <page> --ref <head>` × 8 | each page `no_recorded_acceptance` = 1 (still pending) |
 | Term prevalence (§4.1) | API 204, JSON 85, RLS 73, OWASP 61, UX 41 (all of 653) — reproduces the SD-B's numbers |
+| Gap-list term prevalence, this revision's own run: `LLM08` **17**, `LLM07` **9**, `SEV2` 0, `SEV3` 0, `SEV4` 1, and the 27 terms revision 1 measured | **27/27 reproduce**; `LLM08` agrees with the second Stage D's 17 and `LLM07` with its 9 — derived here, not copied |
+| The record's own bytes at the head, counted by command | section 3 table: **1** `accepted unchanged` + **7** `partial — first-use gaps`; section 5: **1** `accepted:` string + **7** `partial:`-prefixed strings; section 11 L473 carries the "no row-quote string for a partial page" denial — the self-contradiction the SD-D's P2 names |
+| `git ls-remote origin refs/heads/docs/readability-lane-b-batch-3-20261015 refs/heads/docs/readability-lane-b-batch-3-stage-a-plan-2026-10-16` | head `2a719cd4...`, plan branch `43ef4023...` — **the head has not moved** |
+| Naming check: `git grep -n -w -e C-1 / C-3 / C-4 / R2 2a719cd4 -- '*.md'` | `C-1` in 2 files (this PR's record; a change-site table), `C-3` once (change-site table), `C-4` once (this PR's record) — none a ruling; the reading named `R2` is on live main (PR #795, `3b0d6cd5`) but not at this head |
 | Cross-lane table-row scan (46 lane records, 20 lane refs) | no other lane claims any of the eight |
 | PR body bound-field digest, declared method | `1e2150fefd6c2ea9` — reproduced before the capture edit |
 | PR body bytes as fetched | 29,211 bytes (LF, trailing newline), sha256 `abc0ec903b17…` — identical to the body the SD-B audited |
 | `scripts/ci/check_pr_body_skills.py --body-file` | exit 0 — "PR body bound fields: OK" |
 
-**Could not verify (stated, not waved through):** N1–N7 in §5; the record's 19,800-variant sweep; the
-Codex finding body on this PR; and the four non-GitHub suites. `build_index.py` refuses to run
+**Could not verify (stated, not waved through):** N1–N8 in §5 — in particular the record's corrected
+section 5 / section 11 bytes, which are Stage C's to commit and therefore do not exist at this head;
+the record's 19,800-variant sweep; the Codex finding body on this PR; and the four non-GitHub suites. `build_index.py` refuses to run
 without `refs/pull/**` and `refs/remotes/**` in the clone (its own D73 row 8 rule) — the clone used
 here fetched both, which is why its report could be run at all.
 
@@ -389,6 +531,97 @@ here fetched both, which is why its report could be run at all.
   a Stage B auditor must audit the revision it can name, exactly as moving a head voids a head-bound
   verdict.
 - **Editing this file after capture voids an ACCEPT that named the captured revision** (L587–592).
+- **Revision 2 (2026-10-16).** This text is revision 2. It supersedes revision 1 — blob
+  `d0ae95e3b0cffc69d5f1150940ab5e9525584c09` (32,328 bytes, 412 lines), capturing commit
+  `43ef40235fe44c36642a788900cec9e3b43e41a5`, capture comment `6212436516` — which stays immutable
+  and **must not be bound by Stage B**. Revision 2's own capturing commit and blob SHA are recorded in
+  the PR #785 body and in a fresh capture comment on PR #785, for the reason above (a file cannot
+  contain its own content hash). This revision was prompted by the **SD-D: REVISE at issue comment
+  `6213174939`** (criterion 4 NOT MET, plus the record's section 5 / section 11 contradiction).
+- **No other element of the plan regressed.** The head, base, page set, counts, selection rule and
+  five-question answers of revision 1 are unchanged except where this revision says so; the only
+  substantive additions are the measured gap-list prevalences and the application of the coordinator
+  ruling (sections 4.1 and 4.1b), the naming caveat (section 6) and the bound record correction
+  (section 13).
+
+---
+
+## 13. The record corrections this revision binds (SD-D P2 and the ruling), with the exact text
+
+**Why this section exists.** The record at the head
+(`docs/evidence/documentation/readability-lane-b-batch-3-2026-10-15.md`, blob
+`a3068f773a2d0a65d0ae6dc598b66c1510d3f074`, 40,400 bytes, 506 lines) contradicts itself: its
+section 11 (L473) says *"No acceptance row, and no row-quote string for a partial page, was authored
+by this lane or by this repair"*, while its own section 5 offers **eight** row-quote strings, **seven**
+of them prefixed `B3-n partial:` (counted by command in this planner's run: 7 `partial:`-prefixed
+lines, 1 `accepted:` line, 8 lines in all). The second Stage D (comment `6213174939`, finding P2)
+requires the two to be reconciled; the coordinator's 2026-10-16 ruling requires the ruling itself to
+be recorded in the record. Both are **Stage C's commits, not this planner's**: this planner holds
+Stage A only, and the coordinator's instruction freezes the PR head. This section therefore binds the
+correction in advance, with the exact replacement text, so that Stage C has no interpretation latitude
+and Stage D can check the result mechanically at the commit that applies it.
+
+**13.1 The dispositions the ruling sets (the record's section 3 table and section 3a).** B3-4 and B3-5
+change from `**partial — first-use gaps (3a)**` to `**accepted unchanged — C-1 screen (entire gap
+set at or above the convention threshold; coordinator ruling 2026-10-16)**`. B3-1, B3-3, B3-6, B3-7
+and B3-8 keep `**partial — first-use gaps (3a)**`. **The record's final counts become 3 FULL -
+B3-2, B3-4, B3-5 — and 5 PARTIAL — B3-1, B3-3, B3-6, B3-7, B3-8**, and every sentence that states a
+count is corrected with them (the section 3a heading *"why the seven partials are partial"*, its *"These
+seven gaps are exactly the shape Codex flagged"*, section 4's *"The seven partial dispositions"* and
+*"Only B3-2 carries a full acceptance here; the seven partials stay partial"*, and section 11's
+*"four of the seven partials could be argued FULL"*). **The ruling IS recorded in the record, with its
+measurement:** B3-4 `OWASP` 61 + `API` 204; B3-5 `RLS` 73 — all of 653 reader pages at
+`e2a3e20b7c20ef8385b219b39c6405237163406f`, measured by the command in section 4.1 of this plan.
+Because B3-4 and B3-5 are FULL, an eligible keeper may record a row for those two pages from the
+corrected record; no keeper row is authored by the correction itself.
+
+**13.2 The record's section 5 must offer strings ONLY for genuinely FULL pages, and NO string
+prefixed `partial:`.** After 13.1 the genuinely FULL pages are B3-2, B3-4 and B3-5, so section 5
+carries exactly three lines:
+
+```text
+B3-2 accepted: .claude/skills/horizontal-scalability-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+B3-4 accepted: .claude/skills/human-agent-trust-reviewer/references/trust-exploitation-patterns.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+B3-5 accepted: .claude/skills/human-approval-boundary/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+```
+
+**13.3 The record's section 5 preamble must match what section 5 now offers.** The present preamble
+(*"Each line below appears in this file byte-for-byte and is the verbatim string a keeper copies into
+the row for the page whose label prefixes it."*) is written for eight copying instructions; with three
+lines, all of them for FULL pages, it must say so. **Binding replacement:**
+
+> Each line below appears in this file byte-for-byte and is the verbatim string a keeper copies into
+> the **full-page-acceptance** row for the page whose label prefixes it. **Only the three pages this
+> record accepts FULL — B3-2, B3-4, B3-5 — are offered a row-quote string here; no string is offered
+> for a page recorded PARTIAL, because a PARTIAL page gets no acceptance row of any kind and stays
+> pending.** Every line also contains the full 40-character acceptance revision, the second binding
+> rule the validator enforces.
+
+**13.4 The record's section 11 direction-1 sentence must be TRUE of the file it sits in.** Binding
+replacement for the sentence at section 11 L473:
+
+> No acceptance row was authored by this lane or by this repair, and **no row-quote string is offered
+> in this file for any page recorded PARTIAL**; the only row-quote strings this file offers belong to
+> the three FULL pages (section 5).
+
+and section 11's direction-2 sentence *"Under C-1's stronger test four of the seven partials could be
+argued FULL"* is replaced by the ruling as applied:
+
+> The convention screen clears exactly two of the seven: B3-4 (`OWASP` 61 + `API` 204) and B3-5
+> (`RLS` 73) have their entire gap sets at or above the ~12-page threshold, so the coordinator's
+> 2026-10-16 ruling records them FULL. The description-before-terms shape (four pages: B3-3, B3-5,
+> B3-6, B3-8) is a **different set** and does not decide this. The record's final count is 3 FULL /
+> 5 PARTIAL.
+
+**13.5 What must NOT change.** The acceptance revision stays `e2a3e20b...`; the eight pages' bytes,
+blob SHAs and line counts stay as recorded; no keeper row is authored by the correction; no ledger,
+index, tool, workflow or approval byte changes; the correction touches only
+`docs/evidence/documentation/readability-lane-b-batch-3-2026-10-15.md`.
+
+**13.6 When it becomes decidable.** At this head only section 13's *binding* is decidable (criterion
+10, section 4.2). The corrected file's own bytes are decidable at the Stage C commit that applies
+them — declared not verifiable at this head as **N8** (section 5). Applying them moves the PR head,
+which is exactly why this planner does not apply them here.
 
 ---
 
