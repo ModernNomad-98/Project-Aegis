@@ -452,3 +452,60 @@ same reason as #780.
   posted body; the DCO check (`python -B scripts/check_dco.py --range origin/main..HEAD`,
   exit 0); the bound-field digest recomputed from the posted body read back from the
   API, with the hex length checked **by hand (16)**.
+
+## 9. Addendum — re-verification after this record was first written
+
+**Why this section is appended and not edited in.** Section 3 is a snapshot with a
+stated window, and section 7 item 4 says what happens when a body moves: the entry is
+superseded by the new body and a re-measurement, not by re-reading the same text. This
+addendum is that clause being exercised on this record's own subject matter. The
+sections above are **not rewritten**; nothing in them is deleted; the superseded anchor
+stays readable in section 3.
+
+**Re-verification method.** Identical to section 2, run against a fresh fetch of every
+open PR body, made after this record was committed. Deliverable window of this
+addendum: **2026-10-16T02:02Z**.
+
+**1. Eighteen of the nineteen anchors in section 3 are unchanged.** For #771–#788,
+#790 and #791 the body measured in section 3 is byte-identical to the body measured
+now, so the section 3 measurement still applies to them without re-derivation.
+
+**2. PR #789's body moved — and its bound fields did not.** The body anchor changed
+from `bddefc8c5a9f67193a7683192dc941125b0b764ab37c7881c08e3dea9783b1c4` to
+`2fdc91aec0f3bf25764e995cbb8739231bef832f7ba0545d92294237bbbc33a5` (API
+`updated_at` 2026-10-16T02:01:58Z, head now `de2bfe7237d6e853fa81925faa9f68a82881bba7`).
+**Every value in the section 4.4 entry is unchanged**: the canonical recompute is still
+`086faa099024ee57`, the normalized payload lengths are still `1259 / 6185 / 40`, and
+the body still publishes exactly one 16-hex value, `7c5d5bc30a8e4301`. The edit
+therefore fell **outside** the three bound fields and **outside** the digest line, and
+it neither changes the correction nor voids anything. **Section 4.4 stands, with the
+anchor replaced by `2fdc91ae…` for future re-measurement.**
+
+**3. Two PRs opened after the window, and both are clean.**
+
+- **PR #792** — publishes `88300e711714200a`, which the canonical method reproduces
+  exactly; normalized lengths `1565 / 3824 / 40`; body anchor
+  `f5101aa10e2a32a9d8ff7e277773ed0f35dd045ccda009f2e064fec4535916e4`.
+- **PR #793** — this change's own pull request. It publishes `d86798fb331fe7d7`,
+  reproduced from its own posted body; normalized lengths `1380 / 3639 / 40`; body
+  anchor `5cb5dd71090e1c4a7673c62ba63fad662a723fca5eb3c18bd7bef681a14fd76d`. A pull
+  request cannot make its own body reproducible by assertion; the figure was recomputed
+  from the body read back from the API after posting, and its hex length counted by hand.
+
+**4. Sweep counts, restated for the reader at this addendum's window.**
+
+| | In the section 3 window | Now |
+| --- | --- | --- |
+| Open PR bodies measured | 19 | 20 (excluding this change's own PR) |
+| Publish a digest that reproduces canonically | 13 | 14 |
+| Publish a named placeholder instead of a digest (correct by design) | 2 | 2 |
+| Publish a digest the canonical method does not produce | **4** | **4** |
+
+**The four are unchanged: #776 and #789 under a line-breaks-preserved normalization
+their own sentence does not name; #780 and #785 under no normalization tested at all.**
+No PR opened since the window carries the defect.
+
+**What this addendum does not claim.** It does not re-derive the eighteen bodies whose
+anchors are unchanged — their anchor equality is the evidence, and re-deriving them
+would add no information. It does not re-open the question of the comments and reviews
+layer, which section 7 item 3 already scopes as not adjudicated one by one.
