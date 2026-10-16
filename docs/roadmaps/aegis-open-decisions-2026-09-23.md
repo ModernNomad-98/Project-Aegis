@@ -20,6 +20,35 @@
 > [Decided on 2026-09-28](#decided-on-2026-09-28) were added; twenty-two later
 > decisions from the same day were added to that section.
 
+## Dated note — 2026-10-15: the pause is superseded by an owner-ratified resume
+
+**Appended under AEGIS-APR-137 by the Phase 1 Stage C implementing agent (DeepSeek V4) on 2026-10-15. It corrects forward and rewrites nothing.**
+
+This page records, at L232, L287 and L334, that the readability index program
+**"stays paused"** (L334) and that *"nothing in the decision revives it"*
+(L232). The register says the same at L4581 and L4773. **D84 in the
+reconciliation record says the opposite** — that the item *"resumed"* and the
+index switch merged on 2026-10-10.
+
+**The owner resolved the contradiction on 2026-10-15**, adopting the eight
+defaults of an independent audit and plan, including: **the resume is
+ratified**; the historical backfill is approved; the sweep to zero pending is
+reaffirmed; the re-read concurrency is raised to 4; the lighter review path is
+extended to index-rebuild pull requests; the rebuild cadence is set at every
+five merged batches; OD-4 is recorded as DEFERRED; and BER-BKL-011 to 015 are
+PARKED. The authority for all of it is **AEGIS-APR-137**.
+
+**What this note does not do.** It does not rewrite the paused rows above, and
+it does not claim a resume instruction was previously recorded. **No register
+event and no transcribed owner instruction recording a resume was found** — a
+search of the register for an entry mentioning both a resume and readability
+returns one entry, L5522, and it says the opposite. Whether a resume
+instruction exists in session history and was never transcribed, or whether
+the switch merged on authority that had not yet activated, **is not
+determinable from this repository**, and this note does not choose between
+those two possibilities. The dated rows above stand as written; this note is
+what a reader should apply.
+
 ## Current disposition
 
 For this page, Behavioral Eval Runner (BER) names the evaluation tool and

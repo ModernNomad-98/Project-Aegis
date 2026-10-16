@@ -389,6 +389,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           persist-credentials: false
+          # Full history so the readability-acceptance tests can resolve every
+          # keeper row's acceptance revision and blob id (D73 row 4, the
+          # backfill-verification checks). The same mechanism the `changes`
+          # and gate jobs already use.
+          fetch-depth: 0
 
       - name: Keep synthetic fixture storage outside the checkout
         run: printf 'TMPDIR=%s\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
@@ -416,6 +421,18 @@ jobs:
       - name: Run delivery-control tests
         run: python -P scripts/ci/record-check.py delivery-control -- python -m unittest discover -s tools/aegis_delivery_control/tests -p 'test_*.py' -v
 
+      # Readability-acceptance regression tests (D1, the readability-tests
+      # CI-wiring backlog item). The two modules under
+      # tools/readability_acceptance/tests pin the repaired keeper-table
+      # reader (D73 row 4, the backfill verification): each test resolves
+      # every keeper row's acceptance revision and blob id against git,
+      # which needs full history - hence the fetch-depth: 0 on this job's
+      # checkout above. `-m unittest` needs the checkout root on sys.path
+      # to import `tools.*`, so like the suites above it, this run cannot
+      # take -P.
+      - name: Run readability-acceptance tests
+        run: python -P scripts/ci/record-check.py readability-tests -- python -m unittest discover -s tools/readability_acceptance/tests -p 'test_*.py' -v
+
       - name: Retain tools-test evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
@@ -439,6 +456,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           persist-credentials: false
+          # Full history so the readability-acceptance tests can resolve every
+          # keeper row's acceptance revision and blob id (D73 row 4, the
+          # backfill-verification checks). The same mechanism the `changes`
+          # and gate jobs already use.
+          fetch-depth: 0
 
       - name: Keep synthetic fixture storage outside the checkout
         run: |
@@ -471,6 +493,15 @@ jobs:
 
       - name: Run delivery-control tests
         run: python -P scripts/ci/record-check.py delivery-control -- python -m unittest discover -s tools/aegis_delivery_control/tests -p 'test_*.py' -v
+
+      # Readability-acceptance regression tests (D1, the readability-tests
+      # CI-wiring backlog item). Same suite and reasons as the Linux job:
+      # the tests resolve every keeper row's acceptance revision and blob id
+      # against git (D73 row 4, the backfill verification), which needs the
+      # full history that fetch-depth: 0 above provides, and `-m unittest`
+      # needs the checkout root on sys.path, so no -P on the inner run.
+      - name: Run readability-acceptance tests
+        run: python -P scripts/ci/record-check.py readability-tests -- python -m unittest discover -s tools/readability_acceptance/tests -p 'test_*.py' -v
 
       - name: Retain tools-test evidence
         if: always()
