@@ -5,14 +5,17 @@ request #766 body's 56 skills-table **Row source** records cite — *in plain wo
 the provenance record that binds each published skills-table row to the exact capture file its
 author hashed* — from the untracked session workspace archive. **24 of the 27 are published
 byte-identically; 3 are published as explicitly labelled sanitized derivatives**, and section 3
-enumerates every difference for each of the three. This page records the measured gap, the
-digests on both sides, the scan results, and what deliberately remains out-of-tree.
+enumerates every difference for each of the three. It also commits a digest-bound extraction of the
+defining 56 `Row source` records (section 2.1). This page records the measured gap, the digests on
+both sides, the scan results, and what deliberately remains out-of-tree.
 
 **Why it exists.** Sixteen of the 56 Row source records in the merged PR #766 body carry
 `limits=none` — *in plain words, they declare no limitation on their cited source* — while the
 files they cite live only in the session workspace archive and no fresh checkout can retrieve
-them. This publication makes every artifact those 56 records cite retrievable from this
-repository, under the repository's own evidence-retention rule
+them. This publication makes the artifact paths those 56 records cite retrievable from this
+repository — **with one exception: the superseded Stage F round-1 revision `eb42fc90…`, whose
+1,688 bytes were overwritten in the archive and survive nowhere (CARRIED-2, section 5)** —
+under the repository's own evidence-retention rule
 ([the Behavioral Eval Runner backlog](../../roadmaps/behavioral-eval-runner-backlog.md) L4021–L4025):
 *sanitized summary in Git; raw host paths, process IDs, users, secrets and evidence in the
 separately approved external root under its access and retention rules; no private identifiers
@@ -22,7 +25,11 @@ in Git*.
 **DeepSeek**, the Stage C (implementation) agent `d2-stage-c` for backlog item D2 — *in plain
 words, the carried backlog item that publishes the supporting files the merged PR #766 body
 cites* — on 2026-10-15. The published copies themselves are archival records authored by the
-lane's earlier stage agents, whose own attributions stand inside those files.
+lane's earlier stage agents, whose own attributions stand inside those files. This page was
+corrected in place on 2026-10-16 by **DeepSeek-4.1-Flash (deepseek-flash)**, the Stage C repair
+agent, under the posted Stage D verdict *SD-D: REVISE* at the audited head `56a8e603…`; section 7
+records the three review findings and this page's own three over-assertions, each with its
+disposition. No published copy was changed.
 
 **Base revision.** `e2a3e20b` — *in plain words, the merge commit of pull request #769, the
 default-branch head this change branches from*.
@@ -36,7 +43,8 @@ digest* — the sha256 of the archive original; *committed-side digest* — the 
 reproduces. *Self-digest footer* — the repository convention where a line reading
 `sha256: <64 hex>` covers the file's bytes with that value replaced by the literal placeholder
 `{{SHA256}}`, UTF-8, LF, final newline included. *PR #766* — the already-merged pull request
-whose body carries the 56 records. *D2* — this backlog item.
+whose body carries the 56 records. *D2* — this backlog item. *Defining artifact* — the merged PR #766 body itself, whose 56 Row
+source records select the published set and supply its 56/40/16 counts.
 
 ## 1. The gap, re-measured before acting
 
@@ -45,10 +53,16 @@ non-retrievability limitation; 16 rest outside the repository and do not say so*
 all of it before acting.
 
 - Command: the merged PR #766 body was fetched with `gh pr view 766 --repo ModernNomad-98/Project-Aegis --json body`
-  (140,650 bytes) and every `Row source:` occurrence was extracted with a regular-expression
-  counter over that text.
-- Measured: **56 Row source occurrences**, **all 56** citing a path under the archive;
-  **40** carrying a non-retrievability statement; **16** carrying none.
+  — **140,678 UTF-8 bytes (140,650 characters)**, sha256
+  `64a42be475fbdff2a6a5f3f2657d335a970dffb7bc9d74828209da2b996a452d`, unchanged since
+  2026-10-14T16:42:56Z — and every `Row source:` occurrence was extracted with a
+  regular-expression counter over that text. The body is remote and editable, so the 56 records
+  are also committed here as a digest-bound extraction (section 2.1).
+- Measured: **56 Row source occurrences**; **53** cite a path under the archive and **3**
+  (SC-1, SC-2, SC-3 — the Stage C rows) cite the sibling scratch capture
+  `_resume-2026-10-09/_wcd-c-scratch/wcd-c-rows.txt`, published here as `wcd-c-rows.txt`
+  (section 2, row 27); **40** carry a non-retrievability statement (28 in lower case, 12 in upper
+  case); **16** carry none (`limits=none`).
 - The 16 are all Stage D records (agent `of1-stage-d`) citing eight AUDIT-D files with
   `limits=none` — `AUDIT-D.md`, `AUDIT-D-round3.md`, `AUDIT-D-round4.md`, and
   `AUDIT-D-rows-round7R/8/9/10/11.txt`.
@@ -93,12 +107,35 @@ enumerated changes in section 3. All 27 are LF-only, no BOM, matching the archiv
 | 26 | [captures/VALIDATE-E-round11-SDE11-3ed6931c.rows.txt](captures/VALIDATE-E-round11-SDE11-3ed6931c.rows.txt) | byte-identical | 1,987 → 1,987 | `895122506e82930e26d895260b55247e07e4ce470e5fcbdcbe4708fad0fffa42` | same |
 | 27 | [wcd-c-rows.txt](wcd-c-rows.txt) | byte-identical (from `_wcd-c-scratch/`) | 2,575 → 2,575 | `3caaf88cf10096bf7d32fdb6112e246a0719dc0cae796512bbb383b5d93f444c` | same |
 
+**2.1 The defining artifact, and the committed count basis.** The published set is defined by the
+merged PR #766 body's 56 `Row source:` records. That body lives in a pull-request body — external
+to Git and editable — so a fresh checkout cannot re-derive the selection or the 56/40/16 counts
+from it unless both are recorded here. Two things are:
+
+- **The body itself, digest-recorded and not committed.** Fetched 2026-10-16 with
+  `gh pr view 766 --repo ModernNomad-98/Project-Aegis --json body`: **140,678 UTF-8 bytes
+  (140,650 characters)**, sha256
+  `64a42be475fbdff2a6a5f3f2657d335a970dffb7bc9d74828209da2b996a452d`, unchanged since
+  2026-10-14T16:42:56Z. The body's own text is not committed: a merged body is a record, and
+  CARRIED-3 records that its `limits=none` texts are not amended. The remote body stays editable,
+  so a later re-fetch may not reproduce this digest (CARRIED-5).
+- **[PR-766-row-source-records.txt](PR-766-row-source-records.txt) — the 56 record lines, verbatim
+  and in body order**, LF-joined with one trailing LF: **56 lines, 50,489 bytes**, sha256
+  `31736576b73a970168ada9c69eac0ffb921f43180e8dfd7ce8630f47109a123e`. Counting its
+  `<!-- Row source:` lines reproduces 56; reading their `limits=` fields reproduces **40** records
+  with a non-retrievability statement and **16** with `limits=none`. Its bytes were scanned for the
+  six token classes with **0 hits** (section 4). Its filename is not an archive-relative name and it
+  is **not one of the 27 published files** — it is a provenance artifact, so that the counts and the
+  selection are re-derivable from a fresh checkout without fetching the body.
+
 **How the 56 records map onto these files.** The records' cited sources fall on the 27 files
 above: the Stage A records cite PLAN.md; Stage B cites AUDIT-B-rev2.md; Stage C cites
 wcd-c-rows.txt (and SD-C.md, which reproduces it); the 16 Stage D records cite the eight
 AUDIT-D files; the Stage E records cite the VALIDATE-E files and the three captures; the Stage F
 records cite the five F-ROW captures. Every record's cited artifact is now inside this
-repository.
+repository **except the superseded Stage F round-1 revision** bound by `eb42fc90…` over
+`F-ROW-capture.txt` — 1,688 bytes overwritten in the archive, surviving nowhere (CARRIED-2,
+section 5); the round-2 bytes that replaced them are published.
 
 ## 3. The three sanitized derivatives — every difference, and why
 
@@ -160,9 +197,10 @@ the bound one.
 
 ### 3.4 The deliberate non-change, recorded so the inventory is exhaustive
 
-The project/session workspace path `C:\src\Project Aegis` appears in the published set — twice
-in AUDIT-D-rows-round8.txt L1 and twice in VALIDATE-E-round4.md L193 — and is **deliberately
-retained**, exactly as the FU-3 publication's item 5 retained it: it is the project and session
+The project/session workspace path `C:\src\Project Aegis` appears in the published set — **once**
+in AUDIT-D-rows-round8.txt L1 and **twice** on VALIDATE-E-round4.md L193, three occurrences
+across the 27 files — and is **deliberately retained**, exactly as the FU-3 publication's item 5
+retained it: it is the project and session
 workspace path, not private host identity, and removing it would delete the records' honest
 account of where the work was performed. No username, distro, UNC root, directory-name or
 shell-history token survives anywhere in the published set (section 4's scan).
@@ -173,10 +211,15 @@ shell-history token survives anywhere in the published set (section 4's scan).
 **24 equal, 3 differing** — the three derivatives of section 3. The count is measured, not
 copied from the table above.
 
-**Binding reproduction.** The PR #766 body's whole-file bindings over the `.txt` captures
-reproduce from the published copies for all 14 (the five AUDIT-D-rows round files, the five
-F-ROW captures, the three VALIDATE-E captures, and wcd-c-rows.txt). The two-row block bindings
-reproduce from the published copies for 9 of 10: AUDIT-D.md (`f2182c82…`), AUDIT-D-round3.md
+**Binding reproduction.** The PR #766 body carries **15 distinct whole-file capture bindings**;
+**14 of the 15 reproduce from the published copies** — those 14 bind the retained revisions of the
+five AUDIT-D-rows round files, the five F-ROW captures, the three VALIDATE-E captures and
+wcd-c-rows.txt. The fifteenth, `eb42fc90…` (1,688 bytes) over `F-ROW-capture.txt`'s **round-1**
+revision, **does not reproduce from anything in this repository**: the archive's `F-ROW-capture.txt`
+was overwritten in place with the round-2 capture (1,735 bytes, `bd1ccf3f…`), the round-1 bytes
+survive nowhere, and the published copy reproduces only the round-2 binding (CARRIED-2). The
+two-row block bindings reproduce from the published copies for 9 of 10: AUDIT-D.md (`f2182c82…`),
+AUDIT-D-round3.md
 (`2f2e4c2b…`), VALIDATE-E.md (`d08418e5…`), VALIDATE-E-round2.md (`1ff5e868…`),
 VALIDATE-E-round3.md (`cb7bca16…`), VALIDATE-E-round4.md (`db40662e…`),
 VALIDATE-E-round6.md (`b9ad5aba…`), PLAN.md L590–L593 (`08cb06e4…`), and AUDIT-B-rev2.md
@@ -187,9 +230,10 @@ published copies.
 
 **Privacy/token scan.** Every published file was scanned for the six token classes of section 3,
 plus Windows user, temp and home path shapes, drive-root lists, e-mail addresses, and
-credential-shaped keys. Result: **0 hits across the 27 published files.** The scan pattern
-contains the raw token values, which is why this page states the classes and the count rather
-than reprinting the pattern with its values.
+credential-shaped keys. Result: **0 hits across the 27 published files, and 0 hits in the
+defining-artifact extraction** (`PR-766-row-source-records.txt`, scanned on the same classes). The
+scan pattern contains the raw token values, which is why this page states the classes and the
+count rather than reprinting the pattern with its values.
 
 **Credential scan — the FU-3 pattern, run as the plan's own AC8 shape.** The pattern
 `AKIA[0-9A-Z]{16}|BEGIN [A-Z ]*PRIVATE KEY|gh[pousr]_[A-Za-z0-9]{20,}|arn:aws|…|token *[:=]|[0-9]{12}`
@@ -202,18 +246,23 @@ self-digest footers. **The three class counts sum to 36 over 34 distinct lines: 
 both the token shape and the twelve-digit shape, and both are among the 34 read.** This page
 itself carries 7 shape hits of its own — one pattern self-quote and six twelve-digit runs inside
 its own digest columns — all self-referential and benign. **No credential material is present.** A scan for secrets does not answer
-whether an identifier is private; the token scan above is the privacy check, and it is zero.
+whether an identifier is private; the token scan above is the privacy check, and it is zero. The
+defining-artifact extraction carries **2 twelve-digit hit lines** of its own — the binding digest
+`f2182c82…` on its SDD-1/SDD-2 records contains the run `824775790350` — read and benign; it is not
+one of the 27 copies, so the 34-hit figure above is unchanged.
 
 ## 5. What remains out-of-tree — the carried items
 
-**The gap is closed for the artifacts the 56 records cite; it is NOT closed for every file in
-the archive directory.** Four carried items remain, counted and named so a later change can act
-on them:
+**The gap is closed for every artifact the 56 records cite except the superseded Stage F round-1
+revision, which survives nowhere (CARRIED-2); it is NOT closed for every file in the archive
+directory.** Five carried items remain, counted and named so a later change can act on them:
 
-- **CARRIED-1 — 48 archive files remain out-of-tree.** The archive directory holds 74 files;
-27 are published here; **48 are not**, because the merged PR #766 body does not cite them
-(superseded round records, superseded captures, and the lane's Stage F and Stage G records whose
-cited forms are the F-ROW captures). Each is listed with its digest below so the debt is
+- **CARRIED-1 — 48 archive files remain out-of-tree.** The archive directory holds **74** files;
+  **26 of them are published here**, and the 27th published file — `wcd-c-rows.txt` — comes from the
+  sibling `_wcd-c-scratch/` folder (section 2, row 27), so **26 + 48 = 74** and **48 archive files are
+  not** published, because the merged PR #766 body does not cite them
+  (superseded round records, superseded captures, and the lane's Stage F and Stage G records whose
+  cited forms are the F-ROW captures). Each is listed with its digest below so the debt is
 measurable, not forgotten:
 
 | # | Archive file | Bytes | sha256 |
@@ -272,7 +321,9 @@ measurable, not forgotten:
   the archive file, which now holds the round-2 capture (1,735 bytes, `bd1ccf3f…`) — the
   round-1 bytes were overwritten in place in the archive and survive nowhere in that directory.
   The round-2 bytes are published; the round-1 binding stays checkable only from whatever else
-  may retain the earlier bytes, and this page records that the archive copy does not.
+  may retain the earlier bytes, and this page records that the archive copy does not. Measured
+  over all 74 archive files: **none is 1,688 bytes and none hashes to `eb42fc90…`**; the archive's
+  only `F-ROW-capture.txt` is the 1,735-byte round-2 capture.
 - **CARRIED-3 — the 16 `limits=none` records in the merged body are not edited.** A merged
   pull-request body is a record, not a working document; this publication makes their cited
   artifacts retrievable but does not rewrite the body's own text. The ledger keeper — *in plain
@@ -283,10 +334,17 @@ measurable, not forgotten:
   outdated.** Its section 5 states the plan "is NOT retrievable from this repository"; the plan
   is now published byte-identically in this directory. That dated record is deliberately not
   edited by this change; correcting it is a change to that record under its own rules.
+- **CARRIED-5 — the merged PR #766 body is digest-recorded but not committed.** Its 140,678
+  UTF-8 bytes and sha256 are recorded in section 2.1, and its 56 `Row source:` records are committed
+  as a verbatim extraction, but the body's other text is not in Git. A merged pull-request body is
+  remote and editable, so re-fetching it later may not reproduce the recorded digest; the committed
+  extraction is what keeps the counts and the selection re-derivable.
 
-**The honest bottom line.** 27 files published (24 byte-identical, 3 sanitized derivatives);
-every artifact the 56 Row source records cite is now retrievable from a fresh checkout; **48
-archive files, one lost capture revision, and the merged body's own 16 unamended
+**The honest bottom line.** 27 cited files published (24 byte-identical, 3 sanitized derivatives),
+plus a committed digest-bound extraction of the defining 56 records (section 2.1); every artifact
+the 56 Row source records cite is now retrievable from a fresh checkout **except the superseded
+Stage F round-1 revision bound by `eb42fc90…`, whose 1,688 bytes survive nowhere**; **48 archive
+files, that one lost capture revision, the uncommitted merged body, and the body's own 16 unamended
 `limits=none` texts remain, each recorded above.**
 
 ## 6. How to verify this page
@@ -305,3 +363,35 @@ From a clone of this change's head, with the archive unavailable:
    ones section 3 enumerates.
 5. **Scans.** Run the two scans of section 4; the token scan prints 0 and the credential scan
    prints 34 read-and-benign lines.
+6. **The counts.** Hash `PR-766-row-source-records.txt` against its section 2.1 digest; count its
+   `<!-- Row source:` lines (56) and read their `limits=` fields (40 non-retrievability statements,
+   16 `limits=none`). To check the extraction against its source, fetch the merged body with the
+   section 1 command and compare the 56 lines; the recorded body digest is the check that the
+   fetched bytes are the ones counted here.
+
+## 7. Dispositions of the review findings at the audited head `56a8e603`
+
+The Stage D audit posted on the pull request (*SD-D: REVISE*, 2026-10-16T06:02:41Z — *in plain
+words, the independent implementation audit that found defects and asked for corrections*) found
+one P1, two P2s and three over-assertions of this page's own. All six are sustained, and all six
+are corrected above in this repair revision. The P1 is bound to this head: its review comment
+`4286909853` carries `commit_id` = `original_commit_id` = `56a8e603…`, the audited head, not a
+superseded one.
+
+| # | Finding | Disposition | Correction in this revision |
+| --- | --- | --- | --- |
+| 1 | P1 `4286909853` — the closure claims are false as to the Stage F round-1 capture revision | **sustained and corrected** | the "Why it exists" paragraph, section 2, section 4, CARRIED-2 and the bottom line now say the cited artifacts are retrievable **except** the superseded round-1 revision `eb42fc90…` (1,688 bytes), which survives nowhere; the "all 14" whole-file claim became **14 of 15 distinct whole-file capture bindings** |
+| 2 | P2 `4286909861` — the defining PR #766 body is neither committed nor digest-recorded | **sustained and corrected** | section 2.1 records the body's 140,678 UTF-8 bytes and sha256 and commits its 56 record lines as a digest-bound extraction; CARRIED-5 records what stays uncommitted |
+| 3 | P2 `4286909872` — the archive arithmetic accounts for 75 files | **sustained and corrected** | CARRIED-1 now states 26 archive files published + 1 separate scratch capture + 48 carried, with 26 + 48 = 74 |
+| 4 | audit over-assertion — "all 56" cite the archive folder | **sustained and corrected** | section 1 now states 53 archive citations and the 3 scratch citations |
+| 5 | audit over-assertion — the workspace path appears twice in AUDIT-D-rows-round8.txt | **sustained and corrected** | section 3.4 now states once there and twice on VALIDATE-E-round4.md L193 |
+| 6 | audit over-assertion — the fetched body's size was a character count | **sustained and corrected** | section 1 and section 2.1 state 140,678 UTF-8 bytes (140,650 characters) |
+
+**What this repair round did not verify.** It did not re-reproduce the ten two-row block bindings
+(9 of 10 stands as the Stage D measurement at `56a8e603`), re-run the credential-scan class split
+(3/12/21) over the 27 copies, or re-run the three derivatives' difference inventories (12/5/3). The
+27 published files are byte-unchanged by this repair, so their digests and the byte-identity count
+rest on that round; this repair re-measured the three review findings, the 15 distinct whole-file
+capture bindings, the 56/53/40/16 counts, the archive arithmetic (26 archive + 48 carried = 74,
+plus the one scratch capture), the section 3.4 occurrences (1 + 2 = 3 across the 27 files) and the
+extraction's own bytes, lines, digest and privacy scan.
