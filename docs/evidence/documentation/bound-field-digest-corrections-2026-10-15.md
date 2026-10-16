@@ -8,10 +8,14 @@ record or comment drafted by an AI agent says so, and names the model).
 appended, not substituted: every superseded value it names stays readable where it was
 published, and the correction sits beside it. No pull-request (PR) body was edited to
 produce this record, and no merged artifact was rewritten to produce it. **This record's
-own text was corrected once, in place, on its Stage D repair round: §1, §2, §4.5, §4.6,
-§5, §6, §7 items 1 and 2, §8 and §9 changed, and §10 quotes every sentence that was
-replaced and names the reason. This change's own PR body was edited once as well, for a
-stale figure sitting inside its own bound skills field (§8, §10). No other pull request's
+own text has been corrected in place twice: on its Stage D repair round (§1, §2, §4.5,
+§4.6, §5, §6, §7 items 1 and 2, §8 and §9 changed; §10 quotes every sentence that was
+replaced and names the reason), and again on its Stage F repair round (§4.1, §4.5, §4.6,
+§4.7, §4.8, §7 item 3 and this preamble changed; §11 quotes every sentence that was
+replaced and names the reason). This change's own PR body was edited once as well, for a
+stale figure sitting inside its own bound skills field (§8, §10); its Stage F repair round
+added plain-English label glosses to the body **outside** all three bound fields and left
+the bound-field digest unchanged at `078ec42572ff330a` (§11). No other pull request's
 body was touched.**
 
 **Reading key (one line per internal label, in plain English).**
@@ -212,8 +216,10 @@ stated purpose)**, the **current value (marked current)**, and why they differ.
 **Current: `121a60bce86cff98`. Superseded: none.** The claim that the published digest
 "no longer reproduces" is **false for this body**, as is the claim that the body was
 edited after the digest was written: the API records **zero** body edits on #782
-(control: the same API records 6 on #783, 3 on #789, 2 on #776 and 2 on #771, so a
-zero is a measurement, not a missing field).
+(control, re-measured for the Stage F repair round at **2026-10-16T03:00:16Z**: the same
+API records **7** on #783, **4** on #789, 2 on #776 and 2 on #771, so a zero is a
+measurement, not a missing field; the earlier reading of this control — 6 on #783 and 3
+on #789 — was true when it was taken and is recorded as disclosed drift in §11).
 
 ### 4.2 PR #777 — no correction is owed on the digest; the defect claim is refuted
 
@@ -277,7 +283,7 @@ consequence: none from this entry.**
 | What the published value **is** | the SHA-256 first-16 of the **same three payloads** taken by the **naive marker-string split**, `body.split("<!-- bound-field: <field> -->", 1)[1].split("<!-- bound-field: end -->", 1)[0]` per field, joined witness → skills → security with `\n`, hashed as UTF-8. That split keeps the newline that ends the opening sentinel line and the newline that begins the closing sentinel line, so each field carries **one extra newline at each end** |
 | Reproduces exactly under that reading? | **yes** — re-derived for this repair, twice, in Python `hashlib` and in Node `crypto` |
 | Recomputed normalized payload lengths (canonical) | `1926 / 7081 / 477` |
-| Raw payload lengths under the published reading | `1930 / 7086 / 481` — each field exactly +2 |
+| Raw payload lengths under the published reading | `1930 / 7086 / 481` — **+4 / +5 / +4 against the canonical row directly above**, which is the base these deltas are measured against: the naive split keeps the newline that ends the opening sentinel *line* and the newline that begins the closing sentinel line, two newlines per end, so +4 per field, plus the skills payload's one internal blank line, which the canonical collapse absorbs and this reading keeps (+5 there). The earlier version of this row read "each field exactly +2" with no base named; **+2 / +3 / +2** is what these payloads measure against the **verbatim** reading §4.6 names (`1928 / 7084 / 479`), not against canonical. §11 records the correction. |
 | Body edits recorded by the API | **0** — weak evidence, not proof: the body's `updated_at` is 19:08:06Z, 15 s after its `created_at` at 19:07:51Z, so this body moved and the API recorded no edit for it |
 | Body anchor | `2d1363e0a7f7bb1b8693f503f5f04e63c81746d1a7e24998893eef57b9f1afac` |
 
@@ -288,10 +294,12 @@ read by the marker-string split the delivery workflow explicitly rejects and wit
 collapse step not applied. **Class: the same defect as §4.3 and §4.4 — a misstated or
 unnamed normalization, not a stale value and not a foreign one.**
 
-**Resolve-by-whole-line versus resolve-by-substring, precisely.** Each sentinel string
-occurs **exactly once** in this body, so the marker-string split lands on the **same
-boundary lines** that whole-line equality selects; the only difference between the two
-readings is the two extra newlines per field. The published figure therefore differs
+**Resolve-by-whole-line versus resolve-by-substring, precisely.** Each of the three
+*opening* sentinel strings occurs **exactly once** in this body (counted: 1, 1, 1); the
+closing `<!-- bound-field: end -->` occurs **three** times, once per field, and the first
+closing sentinel after an opening one is that field's own. So the marker-string split
+lands on the **same boundary lines** that whole-line equality selects, and the only
+difference between the two readings is the two extra newlines per field. The published figure therefore differs
 from the canonical one in **two** named ways — sentinel resolution, and the missing
 collapse — while §4.6's differs in **one** (the missing collapse). Both are one class.
 
@@ -331,7 +339,7 @@ the refuted premise and is withdrawn in §10.
 | What the published value **is** | the SHA-256 first-16 of the **same three payloads taken verbatim** — the lines strictly between each sentinel pair, **unmodified**, so the blank line after the opening sentinel and the blank line before the closing sentinel survive as a leading and a trailing newline — joined witness → skills → security with `\n`, hashed as UTF-8. Equivalently `body.split(openMarker + "\n")[1].split("\n" + closeMarker)[0]` per field. The sentinel boundaries are the **correct** ones; **the collapse step is simply not applied** |
 | Reproduces exactly under that reading? | **yes** — re-derived for this repair, twice, in Python `hashlib` and in Node `crypto` |
 | Recomputed normalized payload lengths (canonical) | `1817 / 7337 / 382` |
-| Raw payload lengths under the published reading | `1819 / 7340 / 384` — each field exactly +2 |
+| Raw payload lengths under the published reading | `1819 / 7340 / 384` — **+2 / +3 / +2 against the canonical row directly above**, which is the base these deltas are measured against: the verbatim reading keeps the blank line after the opening sentinel and the blank line before the closing sentinel as a leading and a trailing newline (+2 per field), and the skills payload's one internal blank line, which the canonical collapse absorbs, survives as a newline (+3 there). The earlier version of this row read "each field exactly +2", which holds for the witness and the security payloads and not for the skills payload, whose delta is +3. §11 records the correction. |
 | Body edits recorded by the API | **0** — weak evidence for the same reason as §4.5 |
 | Body anchor | `2afc2d18e8147fc4f89d8fd3bee5c0f2506b38236009a436b46a44347665083a` |
 
@@ -355,9 +363,23 @@ The comments themselves are defective, in three measured ways. Each is corrected
 
 | # | What the comment says | What was measured |
 | --- | --- | --- |
-| 1 | #777's "**Published value**" is `b8e293e668e5b525` | That value occurs **zero times** in #777's body. #777's body publishes `70ef1815189fe918`, which reproduces. `b8e293e668e5b525` is **PR #771's** superseded figure: PR #771's `SD-F: REVISE` (2026-10-15T18:55:04Z) and `SD-D: ACCEPT` (18:57:55Z) comments both publish it with lengths `1262 / 6276 / 40`. |
+| 1 | #777's "**Published value**" is `b8e293e668e5b525` | That value occurs **zero times** in #777's body. #777's body publishes `70ef1815189fe918`, which reproduces. `b8e293e668e5b525` is **PR #771's** superseded figure, and the attribution splits — the earlier version of this row merged the two comments: PR #771's `SD-F: REVISE` (issue comment **6199880678**, 2026-10-15T18:55:04Z) publishes the value **with** the lengths `1262 / 6276 / 40`, while its `SD-D: ACCEPT` (issue comment **6199939375**, 18:57:55Z, created and updated in the same second — never edited) publishes the **value alone** and contains no `1262`, `6276` or `40` anywhere. **The value attribution is true for both comments; the lengths attribution is true for the Stage F verdict only.** §11 quotes the superseded wording. |
 | 2 | #777's skills lengths are "published 6855 / current 6856" | Those two numbers are **#782's**: #782's body publishes `6855`, and its per-line variant measures `6856`. #777's body publishes `6413`, and its per-line variant measures `6414`. **The two comments swap the pair between the two PRs.** |
 | 3 | #782's "**Recomputed from the live body**: differs" | `121a60bce86cff98` **is** #782's body's published value **and** the canonical recompute. It does not differ. |
+
+**Both defect comments were retracted by their author about a minute later, and this
+section records that history.** Issue comment **6206298939** on #777
+(2026-10-16T01:57:59Z, 65 s after the defect comment **6206283930** at 01:56:54Z) and
+issue comment **6206299433** on #782 (2026-10-16T01:58:02Z, 66 s after the defect comment
+**6206284392** at 01:56:56Z) are **retraction** comments posted by the same account. Each
+opens "**RETRACTION - the previous comment on this PR is WRONG. Disregard it entirely.**",
+records that the published digest "reproduces exactly", and states that the value the
+earlier comment named "appears nowhere in this body". **Neither retraction has been edited
+or deleted, and neither defect comment has been edited or deleted either.** §4.7's
+correction therefore agrees with the retractions and adds what they do not: the measured
+identification of the invented value (PR #771's superseded figure) and of the swapped
+length pair. A reader of this section alone should know that the author withdrew both
+claims before this record was written.
 
 **Where the "+1 character" comes from, exactly.** The per-line normalization that
 strips each line and **keeps blank lines as empty contributions** measures the skills
@@ -381,7 +403,8 @@ This is the same defect class, one layer up: not a body's own published figure, 
 
 | | |
 | --- | --- |
-| Value published by PR #771's `SD-F: REVISE` (18:55:04Z) and `SD-D: ACCEPT` (18:57:55Z) | `b8e293e668e5b525`, lengths `1262 / 6276 / 40` |
+| Value published by PR #771's `SD-F: REVISE` (issue comment 6199880678, 18:55:04Z) | `b8e293e668e5b525`, **with** lengths `1262 / 6276 / 40` |
+| Value published by PR #771's `SD-D: ACCEPT` (issue comment 6199939375, 18:57:55Z; never edited) | `b8e293e668e5b525`, **value alone** — that comment contains no `1262`, `6276` or `40` |
 | PR #771 body's current published value | `b1acc2b2f5817fab`, lengths `1262 / 11819 / 40` |
 | Canonical recompute of the #771 body measured here | `b1acc2b2f5817fab` — reproduces |
 | Body edits recorded by the API | **2** — the later at **2026-10-15T20:58:34Z**, after both verdicts |
@@ -478,8 +501,11 @@ text, collapse not applied", same reason as #780.
    **2026-10-15T18:24:59Z** (18,781 characters; body anchor
    `8356d7b4c2488102ddd3c925c6ef28473480f23a5f71c5915e0abc8fff389cc1`) computes
    canonically to **`b8e293e668e5b525`** with normalized payload lengths
-   **`1262 / 6276 / 40`** — exactly the value and the lengths that both of #771's live
-   verdicts publish. **§4.8's conclusion is unchanged by this: it is now independently
+   **`1262 / 6276 / 40`** — the **value** both of #771's live verdicts publish, and the
+   **lengths** that one of them publishes: the `SD-F: REVISE` comment (issue comment
+   6199880678) carries the value and the triple; the `SD-D: ACCEPT` comment (issue comment
+   6199939375, never edited) carries the value alone and contains no `1262`, `6276` or
+   `40`. **§4.8's conclusion is unchanged by this: it is now independently
    confirmed rather than merely asserted.** The same field yields #774's superseded
    revision at 2026-10-16T01:05:24Z, from which this record's own calibration value
    `8d441a1bfdff46d9` is derived — so the capability the earlier text denied is one this
@@ -489,8 +515,8 @@ text, collapse not applied", same reason as #780.
    swept completely (all nineteen). Comments and reviews were read for the PRs in §4
    and for every open PR whose comments contain a 16-hex token; several such tokens are
    *deliberate controls* published by reviewers with their method named (for example
-   PR #787's Stage F publishes the per-line-strip value `3200b7c5f2d153e5` and says in
-   terms "not this method", which is exactly the discipline PROC-04 asks for). Those
+   PR #787's **Stage D** audit comment — issue comment 6205805001, `SD-D: REVISE` — publishes the per-line-strip value `3200b7c5f2d153e5` and says in
+   terms "not this method", which is exactly the discipline PROC-04 asks for; #787's Stage F comment, issue comment 6206644774, contains neither the value nor the phrase, and the earlier version of this item labelled that Stage D comment "Stage F"). Those
    were not adjudicated one by one, and this record does not claim they are all clean
    or all defective.
 4. **The measurement is a snapshot.** Every value here is anchored to a body anchor; if
@@ -626,8 +652,9 @@ newline × sentinel resolution) combinations enumerated in §10.3.
 
 **Both readings are "the payload resolved correctly and the collapse step not applied".**
 For #785 the boundaries are the right ones and only the collapse is missing. For #780 the
-marker-string split happens to select the **same boundary lines** — each sentinel string
-occurs **exactly once** in that body — so its figure differs from the canonical one in two
+marker-string split happens to select the **same boundary lines** — each *opening*
+sentinel string occurs **exactly once** in that body, and the first closing sentinel after
+an opening one is that field's own — so its figure differs from the canonical one in two
 named ways (resolution, and the missing collapse) while #785's differs in one. Both are
 one class, and it is the class §4.3 and §4.4 already carry.
 
@@ -731,8 +758,12 @@ Read for #771:
 | 2026-10-15T18:24:59Z — superseded | 18,781 | `8356d7b4c2488102ddd3c925c6ef28473480f23a5f71c5915e0abc8fff389cc1` | `b8e293e668e5b525` | `1262 / 6276 / 40` |
 
 The superseded revision computes to **`b8e293e668e5b525`** at lengths
-**`1262 / 6276 / 40`** — exactly the value and the lengths that both of #771's live
-verdicts publish. **§4.8's conclusion is unchanged and is now independently confirmed
+**`1262 / 6276 / 40`** — the **value** both of #771's live verdicts publish, and the
+**lengths** that one of them publishes: the `SD-F: REVISE` comment (issue comment
+6199880678) carries the value and the triple `1262 / 6276 / 40`, while the `SD-D: ACCEPT`
+comment (issue comment 6199939375, never edited) carries the value alone and contains no
+`1262`, `6276` or `40`; §4.7 and §4.8 state the same split and §11 quotes the superseded
+wording. **§4.8's conclusion is unchanged and is now independently confirmed
 rather than merely asserted.** The same field yields #774's 2026-10-16T01:05:24Z revision
 (anchor `d07319919fff1732…`), which computes to `8d441a1bfdff46d9` at
 `2707 / 5594 / 738` — the fourteenth value in §2's calibration table.
@@ -834,3 +865,162 @@ as a correction, or the next reader cannot tell a repair from a drift. **Note th
 the number that was wrong was a *supporting* figure quoted beside a *correct* total, which
 is exactly how #780's and #785's published values were misjudged: the artifact was fine and
 the reading of it was not.
+
+## 11. Stage F repair round — the false attributions corrected, and the body's label glosses
+
+**Appended 2026-10-16 on the Stage F repair round, by an AI agent running on
+DeepSeek-4.1-Flash (deepseek-flash).** It answers the Stage F final-review verdict
+**`SD-F: REVISE`** (issue comment 6206966415 on PR #793, which binds head
+`c50ce2d9256d27ad9323e74348f48cb7b38d3c08` and bound-field digest `078ec42572ff330a`).
+**Every finding that verdict raised is answered**, and the ones in this record are
+corrected in place with their superseded wording quoted here, so the correction stays
+auditable — the discipline §10.9 applies to its own case and §10.7 applied to the Stage D
+round. **One further false statement, which the verdict did not list, is corrected here
+too** — the sentinel-occurrence count in §4.5 and §10.2, a claim the verdict's own §2 table
+repeats; it is the last row of §11.1. **Nothing the verdict verified is changed:** the central claim (both published
+values reproduce under the readings §4.5, §4.6 and §10.2 name), §10.5's routing, the §7
+item 2 retraction, the count of fourteen (re-counted for this round from §2's own table:
+14 distinct 16-hex values), and the Stage D round's 85 deleted lines with their site
+table, which §11.3 re-confirms.
+
+### 11.1 The wording this round replaced, quoted
+
+| Site (line numbers at `c50ce2d9`) | What it said | What is true, measured |
+| --- | --- | --- |
+| §4.7 row 1, L358 | "PR #771's `SD-F: REVISE` (2026-10-15T18:55:04Z) and `SD-D: ACCEPT` (18:57:55Z) comments **both publish it with lengths `1262 / 6276 / 40`**" | issue comment **6199880678** (`SD-F: REVISE`) publishes the value **and** the lengths; issue comment **6199939375** (`SD-D: ACCEPT`, created and updated 18:57:55Z — **never edited**) publishes the value and contains **no** `1262`, `6276` or `40`. The value attribution was true for both comments; the lengths attribution was true for one |
+| §4.8's first table row, L384 | "Value published by PR #771's `SD-F: REVISE` (18:55:04Z) and `SD-D: ACCEPT` (18:57:55Z) \| `b8e293e668e5b525`, lengths `1262 / 6276 / 40`" | the same split; the row is now two rows, one per comment, each naming its issue-comment id |
+| §7 item 2, L481–482 | "exactly the value and the lengths that both of #771's live verdicts publish" | the same false joint attribution, **at a fourth site the Stage F verdict did not list** — it is the sentence §10.6 duplicates. It is corrected here **and recorded here**, rather than corrected silently, so a reader can see that the review's three sites were four |
+| §10.6, L734–735 | the same sentence again | the same split |
+| §4.6's raw-lengths row, L334 | "`1819 / 7340 / 384` — **each field exactly +2**" | measured against the canonical row directly above it (`1817 / 7337 / 382`): **+2 / +3 / +2**. The skills payload carries **one internal blank line** (counted: 3 blank payload lines, of which 2 are the boundary lines), which the canonical collapse absorbs into one space and the verbatim reading keeps as a newline |
+| §4.5's raw-lengths row, L280 | "`1930 / 7086 / 481` — **each field exactly +2**" | measured against the canonical row directly above it (`1926 / 7081 / 477`): **+4 / +5 / +4** — two kept newlines per end, four per field, plus the same internal blank line in the skills payload. **+2 / +3 / +2** is what these payloads measure against the **verbatim** reading §4.6 names (`1928 / 7084 / 479`), a base the row did not name |
+| §7 item 3, L492–493 | "PR #787's **Stage F** publishes the per-line-strip value `3200b7c5f2d153e5` and says in terms 'not this method'" | the comment is #787's **Stage D** audit — issue comment **6205805001**, `SD-D: REVISE`, 2026-10-16T01:17:23Z — which reads: "The per-line-strip normalization variant would give `3200b7c5f2d153e5` — not this method." #787's Stage F comment (**6206644774**, `SD-F: ACCEPT`) contains **neither** the value nor the phrase (counted: 0 occurrences of each) |
+| §4.1's edit-count control, L215–216 | "control: the same API records 6 on #783, 3 on #789, 2 on #776 and 2 on #771" | re-measured **2026-10-16T03:00:16Z**: **7** on #783, **4** on #789, 2 on #776 and 2 on #771 — and still **0** on #782 and **0** on #777, the zeros this control exists to qualify. The earlier reading was true when it was taken; the drift is the verdict's O-2 |
+| §4.5's boundary paragraph, L291–294, and §10.2, L629–630 | "Each sentinel string occurs **exactly once** in this body" (§4.5), and the same clause in §10.2 for #780 | **true of the three *opening* sentinel strings only.** Counted in both bodies: the `witness`, `skills` and `security` opening sentinels occur **1** time each, while `<!-- bound-field: end -->` occurs **3** times — once per field (#785 L101, L109, L126; #780 L100, L108, L125). The conclusion the sentence supports still holds, for the corrected reason: the first closing sentinel after an opening one is that field's own, so the marker-string split lands on the same boundary lines. **This site was not in the verdict's F-1–F-3; the verdict's §2 table repeats the claim, so it is corrected and recorded here rather than left standing** |
+
+**O-1 is a gap of omission, not a false statement, and it is closed by addition.** §4.7 now
+records the two **retraction** comments the same author posted about a minute after the two
+defect comments — issue comment **6206298939** on #777 (2026-10-16T01:57:59Z, 65 s after
+defect comment 6206283930 at 01:56:54Z) and **6206299433** on #782 (2026-10-16T01:58:02Z,
+66 s after defect comment 6206284392 at 01:56:56Z). Both say the previous comment was
+wrong, that the digest "reproduces exactly", and that the named value "appears nowhere in
+this body". **Neither retraction and neither defect comment has been edited or deleted**
+(all four carry `created_at == updated_at`). No cell of §4.7's table changed for this; the
+history is what was missing.
+
+### 11.2 The calibration split, re-measured — ten live, four revision-only
+
+§2 validates the method against fourteen independently published values. What §2 does not
+say, and what the Stage F verdict asked a future round to say, is **how many of the
+fourteen still reproduce from a live body**. Measured this round by recomputing each
+value's canonical digest from the live body and, where that fails, from **every** revision
+of that body returned by GraphQL `userContentEdits`:
+
+| Value | PR | Reproduces from |
+| --- | --- | --- |
+| `3913683c686e6e71` | #783 | the **live** body |
+| `b1acc2b2f5817fab` | #771 | the **live** body |
+| `7cf3094b11ba4339` | #772 | the **live** body |
+| `d10fb1e4977b8ccb` | #774 | the **live** body |
+| `4e50d937ea45ee8e` | #773 | the **live** body |
+| `340a14ee6921277a` | #775 | the **live** body |
+| `71a73c01f92b23eb` | #779 | the **live** body |
+| `82ed906d2f228f0e` | #787 | the **live** body |
+| `70ef1815189fe918` | #777 | the **live** body |
+| `121a60bce86cff98` | #782 | the **live** body |
+| `bd9ccf55efbead2d` | #790 | revision 2026-10-16T01:43:57Z, anchor `83e5d149314467e3…` = §3's anchor; the live body has since moved **inside** its bound fields |
+| `1fcd0143e13198a3` | #791 | revision 2026-10-16T01:48:55Z, anchor `8f2196d6684174ef…` = §3's anchor; the live body has since moved **inside** its bound fields |
+| `00092958ec2cc906` | #788 | revision 2026-10-16T01:45:01Z, anchor `e71eeab75d0c0b76…` = §3's anchor; the live body has since moved **inside** its bound fields |
+| `8d441a1bfdff46d9` | #774 | revision 2026-10-16T01:05:24Z, anchor `d07319919fff1732…` — a **labelled superseded** figure, which no live body produces |
+
+**The split is ten live and four revision-only.** The Stage D re-audit recorded "Eleven of
+the fourteen reproduce against the **live bodies now**. The other three — #790's
+`bd9ccf55efbead2d`, #791's `1fcd0143e13198a3`, #788's `00092958ec2cc906` — reproduce
+exactly at the revisions the record's own §3 anchors name" (issue comment 6206838331, its
+§7 "Claim 6") — that is **eleven plus three**, and its own list in the same section labels
+the fourteenth value "#774, superseded revision", so its eleven carries a superseded
+figure as live. The Stage F verdict measured ten and four. **This round independently
+agrees with ten and four**, by the measurement in the table above: `8d441a1bfdff46d9` is
+the one §2's own row calls "its fourth-round figure, now superseded there", and a
+superseded figure cannot reproduce from a live body. All fourteen
+still reproduce from *some* artifact of the PR they name, which is what §2 claims and what
+continues to hold; the three bodies that moved did so **inside** their bound fields, which
+is why their published values moved with them. §7 item 4 and §10.8 already disclose that a
+measurement is a snapshot.
+
+### 11.3 This round's deleted lines, counted and sited
+
+**Correcting a false statement means replacing text, and replaced text is deleted text.**
+This round replaced sentences at eleven sites. Counted as **every deletion line** in
+`git diff c50ce2d9256d27ad9323e74348f48cb7b38d3c08..HEAD -- docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md`,
+excluding only the `---` diff header, and taken from `-U0` hunks so no deletion is hidden
+by context:
+
+| Site (line numbers at `c50ce2d9`) | Lines deleted |
+| --- | --- |
+| Preamble L11–14 — "corrected once … edited once as well" | 4 |
+| §4.1's edit-count control, L215–216 | 2 |
+| §4.5's raw-lengths row, L280 | 1 |
+| §4.6's raw-lengths row, L334 | 1 |
+| §4.7's row 1, L358 | 1 |
+| §4.8's first table row, L384 | 1 |
+| §7 item 2, L481–482 | 2 |
+| §7 item 3, L492–493 | 2 |
+| §10.6, L734–735 | 2 |
+| §4.5's boundary paragraph, L291–294 | 4 |
+| §10.2's boundary clause, L629–630 | 2 |
+| **Total deleted** | **22** |
+
+**The set is exact in both directions, measured the same way §10.7's was**: the 22 old-line
+numbers parsed from the `-U0` hunks are exactly the 22 numbers the ranges above claim —
+measured-minus-claimed is empty and claimed-minus-measured is empty — and the claimed
+counts sum to 22. `--numstat` over that range and path reports `212  22`. A second
+implementation, Python `difflib` (`SequenceMatcher` delete+replace **and** `ndiff`),
+reports **22** as well: this round's replacements are line-disjoint, so the two diff
+implementations agree, unlike the Stage D round where they disagreed (85 against 81) and
+the higher figure was published with the reason stated. **This round does not claim to be
+insert-only** — it is not; it deleted 22 lines to correct statements that were false.
+
+**Ranges written as `..HEAD` move with the head, so this section quotes its own figure at
+the head that produced it.** Measured at this round's head, `git diff --numstat` over the
+range `ab8a8c0667fd1bcf1ce6644af84d3bcf95aa040e..HEAD` and this path reports **91**
+deleted lines, not the 85 §10.7 measured from the same starting commit: `..HEAD` now
+contains this round's edits too. §10.7's 85 and §10.9's two pinned ranges (`160  85` and
+`387  85`) are measurements at `c50ce2d9` and are untouched — §10.9's self-correction is
+exact, as the Stage F verdict verified. The three counts are consistent only if **sixteen
+of the twenty-two lines this round deleted were lines the Stage D round had introduced**
+(85 + 22 − 91 = 16), and a direct check confirms it: those sixteen are the preamble's
+L11–14, §4.5's L280 and L291–294, §4.6's L334, §7 item 2's L481–482, §10.2's L629–630 and
+§10.6's L734–735, each of which is an insertion in the `ab8a8c06..c50ce2d9` diff. **That
+is why this section quotes a figure for `c50ce2d9..HEAD` only** at this round's head, and
+the PR body's Paths section pins the Stage D round's range at `ab8a8c06..c50ce2d9`.
+
+### 11.4 What this round changed in the PR body, and what is thereby owed
+
+The body's **F-4** glosses — one-line plain-English descriptions of **Stage C** (the
+implementation stage), **Stage D** (the independent implementation-audit stage) and
+**`SD-D`** (the verdict label a Stage D audit publishes) — were added at every occurrence
+of those labels **outside** the three bound fields. **The bound-field digest did not move:
+it is `078ec42572ff330a` at normalized payload lengths `1380 / 3868 / 40` both before and
+after the body edit**, recomputed from the body in both states. The labels' occurrences
+**inside** the skills bound field are the round-1 rows' `Stage / agent` cells; they were
+deliberately **not** glossed, because the skills-row protocol forbids changing a single
+character inside an existing row and because an edit there would move the digest.
+
+**What that does and does not void.** Correcting this record **moves the head**, so the
+`SD-D: ACCEPT` verdict (issue comment 6206838331) and the `SD-F: REVISE` verdict (issue
+comment 6206966415), both of which bind `c50ce2d9…`, no longer cover the artifact: **a
+fresh Stage D and a fresh Stage F are owed at the new head.** Because the body edit stayed
+outside the bound fields, **`078ec42572ff330a` still binds the body**, so the body edit
+itself causes no further voiding. **If a later round edits a bound field, both verdicts
+named above lose their body binding as well**, and the new value must be published with its
+move, exactly as §10.7 publishes `33ba8ddf7431365e` → `078ec42572ff330a`.
+
+**Not verified by this round, stated as such.** The Stage F verdict's §14 gaps stand
+unreproduced here: §10.3's 5,400-combination space and its deletion sweeps were not re-run
+(this round re-derived only the two named readings, plus the fourteen calibration values);
+the historical open-PR count of nineteen was not re-observed; and whether any other open
+body carries a reading outside §10.3's space remains unverified, as §10.8 says. **The two
+readings this record exists for were re-derived again in this round** from the live bodies
+of #785 and #780 — verbatim `45db39e238a3a4e6` at `1819 / 7340 / 384`, naive split
+`64bf6a407e23e47f` at `1930 / 7086 / 481`, canonical `6682e8afc5f8ac5e` and
+`5feb2e444d998034` — and each body's three *opening* sentinel strings still occur exactly once there, the closing sentinel occurring three times (once per field).
