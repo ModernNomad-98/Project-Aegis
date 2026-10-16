@@ -71,7 +71,7 @@ the second is **not**, because the same agent writes this lane's ledger section 
 rows. **The rows are therefore not green on the AEGIS-APR-101 keeper-independence condition, and this
 record does not claim they are.**
 
-**Disposition, per the owner's Decision 3 of 2026-10-15 ("No ratification — use the APR-117 route").**
+**Disposition, per the owner's Decision 3 of 2026-10-15, headed "Decision 3 — NO ratification; use the AEGIS-APR-117 route".**
 The owner directed that the same-agent rows are **withdrawn and re-recorded by a different agent from
 the same evidence — no page needs re-reading** (AEGIS-APR-117: withdrawal rows plus fresh keeper rows
 from the same evidence, in one pure-docs pull request). This lane states that deviation plainly here
@@ -326,7 +326,7 @@ skill@6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 / reason:
   was **not instrumented**, so wall time is an imperfect comparison with the estimate rule's
   active-time requirement and no per-page active rate is claimed.
 
-## 15. Dated correction notes — 2026-10-15, appended after the first Stage D audit
+## 15. Dated correction notes — 2026-10-15 and 2026-10-16, appended after the Stage D audits
 
 The first Stage D audit of this record (**SD-D: REVISE**, at the audited head
 `7dcef8fc177226e62d1c7cb7546c746362b09880`) raised three text-accuracy findings. Two are corrected in
@@ -362,7 +362,7 @@ is the correction instead of an amend.
   read summary said the non-resolving revision `9644ef079db763802223180ae5b11af39919c781` was "named
   follow-up 1 by PR #754's lane". The page that discloses it
   (`readability-closeout-reread-2026-10-12.md` L189, quoted verbatim in section 5 above) says
-  **"#753 named as follow-up 1"**, and PR #754's own body (25,654 bytes, fetched this round) contains
+  **"#753 named as follow-up 1"**, and PR #754's own body (25,653 bytes, fetched this round) contains
   neither the string `9644ef07` nor the phrase "follow-up 1" — its F1 is a *page*, P1, not this
   revision. The body now carries the page's own attribution.
 - **CN-4 — the pull-request body said the four lanes re-read 596 pages; they re-read 590.** 596 is the
@@ -371,7 +371,17 @@ is the correction instead of an amend.
   derivation set is **590** (section 2), and the same body says a few lines later that the six
   `cannot_decide` lost-commit pages are in **no lane's list**. The body now names both numbers.
 
-## 16. What this repair round did not verify
+- **CN-5 (2026-10-16, after the third Stage D audit) — the repair commit's own message miscounts the
+  record.** Commit `e5d327ca6ba7750b1e04a6587de0b607b19cd99b` says *"record 399/0 (was 323/0)"*. The
+  measured figure is **402/0**: `git diff --numstat e2a3e20b 7dcef8fc` gives the record `323  0`,
+  `git diff --numstat 7dcef8fc e5d327ca` gives `86  7`, and 323 + 86 − 7 = **402** — the record's LF
+  count at that head, and the addition count `git diff --numstat e2a3e20b e5d327ca` reports (`402  0`).
+  **A commit message is immutable**, so this dated note — not an amend, exactly as CN-1 disposes of the
+  message's ledger count — is the correction. Deleted-line scopes, both counted by a hunk parse of
+  `git diff --unified=0` (so a deleted line beginning with `--` cannot hide): **0** base-relative
+  (`e2a3e20b` → `e5d327ca`) and **13** intra-branch (`7dcef8fc` → `e5d327ca`; record 7 + ledger 6).
+
+## 16. What the first repair round did not verify
 
 Recorded here rather than only in a message, so the disclosure is auditable in the record itself.
 
@@ -398,5 +408,7 @@ Recorded here rather than only in a message, so the disclosure is auditable in t
 repository's attribution rule (2026-10-13) requires.*
 
 *Repaired 2026-10-15 by **DeepSeek-4.1-Flash (deepseek-flash)**, which made the corrections in sections 4,
-6(b), 15 and 16 of this record. The drafter named above is unchanged, and this repair rewrites no
-drafted claim of the original text except the two the Stage D audit measured as wrong.*
+6(b), 15 and 16 of this record; and again 2026-10-16 by the same model, which appended CN-5. The drafter
+named above is unchanged, and this repair rewrites no drafted claim of the original text except **four**,
+all recorded above: the section 3 closing sentence (CN-2), the section 4 closing line (R1), section 6(b)
+and the ledger's "Stable IDs" paragraph (CN-2).*
