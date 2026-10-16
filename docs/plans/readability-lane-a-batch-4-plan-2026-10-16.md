@@ -663,8 +663,17 @@ joined witness, then skills, then security, with single newlines; SHA-256 over t
 - **The new value after revision 2's own body edit:** `9d8d2f26e69cca4b` — **unchanged**, because every
   edit revision 2 makes to the body (the two capture values, the five placeholder occurrences and the
   one count claim) lies **outside** all three bound fields. **Applying the 12.2 substitution would move
-  it again**, and that is expected; the projected value is computed from a simulated edit and is
-  reported in the PR body as a projection, never as a posted measurement.
+  it again**, and that is expected. Re-measured on the posted bytes rather than assumed.
+- **The projected value after the 12.2 substitution, labelled as a projection:** `c00e879d68f7c9c0`,
+  with the skills payload at **30,216** characters against **29,966** - a growth of **250**, because the
+  literal token is **10** characters and the author string is **60**, so each of the five rows gains
+  **50**. The witness and security payloads are untouched at **1,259** and **40**. It was computed by
+  applying the substitution to an in-memory copy of this PR's posted body and re-running the declared
+  method; the edit it models has **not** been posted, so the figure is a projection and never a
+  measurement. It is published in the capture comment, not in the PR body, and the reason is measured:
+  after revision 2's own body edit the body is **65,531** characters, **5** below GitHub's 65,536
+  character ceiling, so a bound-field edit is the one edit it cannot take without moving the digest
+  that is at issue here.
 
 **The exact-copy property, kept.** With or without the 12.2 substitution, all **18 of 18** published
 rows occur byte-for-byte in the tracked skills-records file, in published order, compared excluding only
