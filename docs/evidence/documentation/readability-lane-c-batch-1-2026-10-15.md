@@ -700,7 +700,11 @@ accounts for how it was produced. (A body with 0 edits and no reproduction would
 never-true class.)
 
 **After the repair:** the body republishes the recomputed value for its post-repair bytes —
-**`58f9c49557487336`** (16 hex, counted by hand in two groups of eight). **What the movement
+**`0c68bdd68a75dcab`** (16 hex, counted by hand in two groups of eight: `0c68bdd6 8a75dcab`). The
+first posting of the repaired body stated `58f9c49557487336`; that body's skills field carried its
+five `Row source` records after an intervening paragraph, which `scripts/ci/check_pr_body_skills.py`
+rejects (it associates only the records consecutive to the table), so the field was reordered and the
+digest moved to `0c68bdd68a75dcab`. The correction is carried by the third commit (11.8). **What the movement
 voids:** the body's own sentence that any later edit to a bound field voids a verdict naming the old
 figure — so the Stage C placeholder `c34e4d0057b09a3f` is void, and any Stage F verdict that named
 it must be re-run against the new value; the merge agent records the final value at merge.
@@ -751,9 +755,11 @@ section 8 names all eight by path. The earlier rule — "the next 8 paths of lan
   lines** in any hunk, counted line by line in the unified diff rather than by regex; the two
   `---` file headers sit outside every hunk, and no deleted content line begins with two
   dashes.
-- **The repair commit itself is NOT insert-only against its parent**: `aa88923f..<this head>`
-  measures `410 added / 154 deleted (this record 410/106; the ledger 0/48)` — the eight withheld ledger rows (48 lines) are deleted,
-  plus this record's rewritten lines. The insert-only claim holds for **base..head** only, and this
+- **The repair commit itself is NOT insert-only against its parent**: `aa88923f..9c9b13de`
+  measures `410 added / 154 deleted` (this record 410/106; the ledger 0/48) — the eight withheld
+  ledger rows (48 lines) are deleted, plus this record's rewritten lines. The correction commit that
+  follows it replaces three lines of this record (the digest reference, the commit-count sentence and
+  the footer digest) and is likewise not insert-only. The insert-only claim holds for **base..head** only, and this
   disclosure is required so a reader does not read the repair commit as insert-only.
 - **Table arithmetic asserted before the tool ran:** the consolidated table's header row has 9
   columns, 1 separator row, **101** data rows to end of file (81 `full-page-acceptance` + 10
@@ -773,8 +779,13 @@ section 8 names all eight by path. The earlier rule — "the next 8 paths of lan
 
 The test is **only the commits this branch introduces** — never "no such commit is reachable from
 the head", which is unsatisfiable because the head contains main's history. This branch introduces
-**2** commits (`git rev-list --count e2a3e20b..HEAD` = 2): `aa88923f2517ebf2b0b3b56c3891fabe53d20b4c` and the repair
-commit. Both are authored and committed by `ModernNomad-98
+**3** commits (`git rev-list --count e2a3e20b..HEAD` = 3): `aa88923f2517ebf2b0b3b56c3891fabe53d20b4c` (the
+original read commit), `9c9b13ded93db0667f42e5088cf1046db339c851` (the repair commit, which withholds the
+rows and re-marks the two pages) and one **dated correction commit** that answers this section: it
+updates this record's reference to the body's bound-field digest (the repaired body's skills field
+had to place its `Row source` records immediately after the skills table, which moved the digest)
+and states the commit count as three. That correction commit is the repository's prescribed form for
+a published commit's stale figure — the repair commit's message is **not** amended. Both are authored and committed by `ModernNomad-98
 <263130032+ModernNomad-98@users.noreply.github.com>` (the repair commit under the host config identity `Peter
 Nguyen`, the same address), and **0** occurrences of the stale placeholder identity
 `reviewer@example.invalid` appear in either raw commit object.
@@ -818,7 +829,7 @@ by **DeepSeek (deepseek-v4-pro)** (header).
 
 ## Footer
 
-sha256: cd3de984b34dd7fca92aa27ab146d4cac7e2bf9c2218c06f438bc6e9c44a715d
+sha256: b5e38b9d833e817fefdeb1d6e9fd4bc71646857734ca20f842d8f7afd4bfde4b
 
 This digest covers every byte of this file strictly above the last `## Footer` heading — the whole
 batch record through the closing `---` rule line and its terminating newline, encoded UTF-8 with LF
