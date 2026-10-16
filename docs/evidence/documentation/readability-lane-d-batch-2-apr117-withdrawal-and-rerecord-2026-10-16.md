@@ -160,6 +160,62 @@ page's latest event and the page does not read as accepted.
 - Withdrawal row quote (AEGIS-APR-117): WD-D2-8 withdraws K-388 (readability-phase4-lane-d-implementer-c2): LD-16 accepted: docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 - Fresh row: K-404, event kind full-page-acceptance, same page, same revision, same blob, recorded by deepseek-flash-apr117-keeper
 
+## The ordering property, verified by running the builder — and the N measured from the diff
+
+Every command below was run in a full clone (the builder refuses a shallow clone) on 2026-10-16,
+and each line is that command's observed output, not a summary from memory.
+
+- `python -P -B tools/readability_acceptance/build_index.py --report --ref 89dd380847ca5d59027781f2ca84b3f2bbb8d0a9` (the
+  audited head, **before** this act) — exit **0**; `table_rows` **109**, `events` 109,
+  `full_page_acceptances` 89, `lost_commit_events` 10, `reader_pages_with_rows` 76.
+- `python -P -B tools/readability_acceptance/build_index.py --report --ref c106adb6bf9741a3eb2c7a0586ad9f948d00b0a0` (this
+  act's commit) — exit **0**; `table_rows` **125**, `events` 125, `full_page_acceptances`
+  **97**, `lost_commit_events` 10, `reader_pages_with_rows` 76.
+- **N measured from the diff, not transcribed: 125 — 109 = 16** = 8 withdrawal rows + 8 fresh
+  rows.
+
+*N* is the count of rows this act adds to the consolidated keeper table. The eight withdrawn rows
+stay in the table, so the table grows by 16 and the page count it covers does not change.
+
+### Per-page selection, read from the builder's own `reader_pages` output
+
+| Page | Withdrawn row | Withdrawal row | Fresh row | Latest event selected | Event kind | Reviewer |
+| --- | --- | --- | --- | --- | --- | --- |
+| LD-9 | K-381 | K-389W | K-397 | **K-397** | full-page-acceptance | deepseek-flash-apr117-keeper |
+| LD-10 | K-382 | K-390W | K-398 | **K-398** | full-page-acceptance | deepseek-flash-apr117-keeper |
+| LD-11 | K-383 | K-391W | K-399 | **K-399** | full-page-acceptance | deepseek-flash-apr117-keeper |
+| LD-12 | K-384 | K-393W | K-400 | **K-400** | full-page-acceptance | deepseek-flash-apr117-keeper |
+| LD-13 | K-385 | K-394W | K-401 | **K-401** | full-page-acceptance | deepseek-flash-apr117-keeper |
+| LD-14 | K-386 | K-395W | K-402 | **K-402** | full-page-acceptance | deepseek-flash-apr117-keeper |
+| LD-15 | K-387 | K-396W | K-403 | **K-403** | full-page-acceptance | deepseek-flash-apr117-keeper |
+| LD-16 | K-388 | K-397W | K-404 | **K-404** | full-page-acceptance | deepseek-flash-apr117-keeper |
+
+**For all eight pages the latest event is the fresh row** — never the withdrawal row and never the
+withdrawn row. The selection is the builder's own (`derive_reader_pages` keeps the row with the
+greatest `stable_id` by string comparison), so this table reports the builder's decision, not a
+re-implementation of it. The lexical relation `withdrawn < withdrawal < fresh` holds on every one
+of the eight rows above (for example `K-388 < K-397W < K-404`). Had the fresh ids been chosen
+below the withdrawal ids, the withdrawal would be each page's latest event and the page would not
+read as accepted; that is why the ids are ordered and measured rather than assumed.
+
+### Id-absence audit across every ref
+
+One `git for-each-ref` pass over this clone enumerated **1,571 refs** (including **797**
+`refs/pull/*/head` pull-request heads and `refs/remotes/origin/main`); the consolidated table
+was parsed from each ref that carries it with the builder's own sentinel-and-header rule, giving
+**227 distinct stable ids**. The sixteen ids this act uses (K-389W, K-390W, K-391W, K-393W,
+K-394W, K-395W, K-396W, K-397W and K-397...K-404) occur in **no** keeper-table row in **any** of
+them. Band D's highest row id anywhere is **K-396**; `K-480` is the band's upper bound, not a
+row. `K-392W` is the one candidate in the withdrawal window that is already held (PR #787),
+which is why the withdrawal block skips it.
+
+### What the withdrawn rows and the fresh rows share
+
+Same page, same acceptance revision `e2a3e20b7c20ef8385b219b39c6405237163406f`, same `Blob ID`
+(recomputed this round with `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` and matching the withdrawn rows'
+cells). What changes is the recording authority in the `Reviewer` cell and the bound evidence
+source.
+
 ## What this act did not verify
 
 - Whether the eight pages were truly read 'whole, line by line, as prose' — the lane reader's
