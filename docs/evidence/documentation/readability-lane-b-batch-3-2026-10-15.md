@@ -6,12 +6,11 @@
 - **Reader:** `readability-lane-b-implementer-c` — a single Stage C implementer agent, model DeepSeek
   (deepseek-v4-pro), who wrote none of the eight pages below. **This batch authors no keeper rows and
   edits no ledger** (section 7): the evidence recorded here is the deliverable from which a separate
-  eligible keeper (the AEGIS-APR-117 route) records the acceptance rows.
+  eligible keeper (the AEGIS-APR-101 keeper route) records the acceptance rows.
 - **What this page is.** The lane's tracked batch record. It is the evidence source a separate eligible
   ledger keeper — a different agent from this reader, per AEGIS-APR-101 (the approval that requires the
   ledger keeper to be a different agent from the page's author and accepting reviewer) — will cite when
-  it records the acceptance rows for these eight pages under AEGIS-APR-117 (the approval that gives the
-  ledger keeper the right to append withdrawal rows and re-record acceptances from retained evidence).
+  it records the acceptance rows for these eight pages under AEGIS-APR-101 (the approval that establishes the standing ledger keeper role for recording qualifying documentation acceptances, with the keeper a different agent from the page's author and accepting reviewer); AEGIS-APR-117 supplies the withdrawal route only.
   It **names every page's full 40-character acceptance revision verbatim** in its own bytes.
 - **Acceptance revision bound by this batch's dispositions:**
   `e2a3e20b7c20ef8385b219b39c6405237163406f`
@@ -124,8 +123,8 @@ assertion(s) passed.` (system Python 3.14.7 carries PyYAML 6.0.3).
 | B3-1 | `hidden-context-exposure-reviewer/references/hidden-context-checks.md` | 186 | 1 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
 | B3-2 | `horizontal-scalability-reviewer/SKILL.md` | 198 | 0 | 0 | 0 | 0 | **accepted unchanged** |
 | B3-3 | `human-agent-trust-reviewer/SKILL.md` | 214 | 2 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
-| B3-4 | `human-agent-trust-reviewer/references/trust-exploitation-patterns.md` | 83 | 1 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
-| B3-5 | `human-approval-boundary/SKILL.md` | 142 | 0 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
+| B3-4 | `human-agent-trust-reviewer/references/trust-exploitation-patterns.md` | 83 | 1 | 0 | 0 | 0 | **accepted unchanged — C-1 screen (entire gap set at or above the convention threshold; coordinator ruling 2026-10-16)** |
+| B3-5 | `human-approval-boundary/SKILL.md` | 142 | 0 | 0 | 0 | 0 | **accepted unchanged — C-1 screen (entire gap set at or above the convention threshold; coordinator ruling 2026-10-16)** |
 | B3-6 | `iac-reviewer/SKILL.md` | 205 | 0 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
 | B3-7 | `iac-reviewer/references/iac-review-checklist.md` | 69 | 1 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
 | B3-8 | `incident-response-runbook/SKILL.md` | 216 | 0 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
@@ -136,11 +135,11 @@ any read page were edited by this lane. No new section was added to any page, so
 under the targeted-edit rule. No read of any page was elided: each page was returned whole by the read
 tool in one call, and every page's whole-file line count matches `git show` (section 2 table).
 
-### 3a. The first-use gaps, per page — why the seven partials are partial
+### 3a. The first-use gaps, per page — why the five partials are partial, and why B3-4 and B3-5 are FULL under the C-1 screen
 
 The 2026-10-15 urgent correction to the lanes (after Codex raised P1 findings on all four batch-1 PRs)
 requires re-examining every page against the ledger's first-use criterion and recording a partial
-acceptance honestly where a gap exists. These seven gaps are exactly the shape Codex flagged on batch 1
+acceptance honestly where a gap exists. These five gaps are exactly the shape Codex flagged on batch 1
 (an abbreviation or coded identifier used before its definition):
 
 - **B3-1:** `LLM08:2026` first used at L6-7, formally defined in the Terms block at L21-22;
@@ -152,10 +151,9 @@ acceptance honestly where a gap exists. These seven gaps are exactly the shape C
 - **B3-3:** `OWASP`, `ASI09` and `UX` are used in the frontmatter description (L3) before the
   Terms block (L8-11) defines them (together with AI, UI and PR); the body re-uses ASI09 at L15 before
   the Terms block.
-- **B3-4:** `OWASP` (L4) and `API` (L43) are used with no expansion on this page, and the page
-  carries no terms block of its own. ASI09 (L4) and S/A (L5) are defined inline at first use; AI is
+- **B3-4 — recorded FULL by the C-1 screen; the terms below are observations, not gaps:** `OWASP` (L4) and `API` (L43) are used with no expansion on this page, and the page carries no terms block of its own; both occur at or above the ~12-page convention threshold (`OWASP` 61, `API` 204 of 653 reader pages), so neither can hold the page partial. ASI09 (L4) and S/A (L5) are defined inline at first use; AI is
   glossed at its first use (L80).
-- **B3-5:** `RLS` is used in the frontmatter description (L3) before the Terms line (L8) defines it.
+- **B3-5 — recorded FULL by the C-1 screen; the term below is an observation, not a gap:** `RLS` is used in the frontmatter description (L3) before the Terms line (L8) defines it; `RLS` occurs on 73 of the 653 reader pages, at or above the ~12-page threshold, so it cannot hold the page partial.
 - **B3-6:** `CDK`, `IAM` and `RBAC` are used in the frontmatter description (L3) before the Terms
   block (L8-10) defines them.
 - **B3-7:** `DNS` (L31), `tfvars` (L44), `JSON` (L66) and `RG` (L67, "cross-RG coupling") are
@@ -165,8 +163,7 @@ acceptance honestly where a gap exists. These seven gaps are exactly the shape C
   block (L8-12) defines them (together with IC, SLO and SLA).
 
 None of these gaps changes a safety boundary, an approval entry or an evidence record, and this lane
-edited none of the pages; the gaps are recorded here for the keeper and the owning process, and no
-full acceptance is claimed for the seven partial pages. **B3-2 carries no first-use gap:** its Terms
+edited none of the pages; the gaps are recorded here for the keeper and the owning process, and no full acceptance is claimed for the five partial pages — B3-1, B3-3, B3-6, B3-7, B3-8 — while B3-2, B3-4 and B3-5 are recorded FULL under the C-1 screen. **B3-2 carries no first-use gap:** its Terms
 block (L8-10) defines DB, LB, DoS, SLO, TTL and N before any use, and its description line uses no
 abbreviation. (Observation, not a gap: L163 writes "DOS" as a capitalization variant of the defined
 "DoS", same acronym.)
@@ -175,8 +172,7 @@ abbreviation. (Observation, not a gap: L163 writes "DOS" as a capitalization var
 front* — every page: B3-1 L1-17 (what the page is, its doctrine, its scope source and its read-on-demand
 role), B3-2 Purpose L14-26, B3-3 Purpose L15-27, B3-4 L1-5, B3-5 Purpose L12-16, B3-6 Purpose L22-33,
 B3-7 L1-8, B3-8 Purpose L15-25; each SKILL.md's Use When names when and when not to invoke. (b)
-*Abbreviations and coded identifiers defined at first use* — partial on seven pages exactly as 3a
-states; B3-2 satisfies it. (c) *Descriptive headings, lists or tables, and at least one concrete
+*Abbreviations and coded identifiers defined at first use* — partial on five pages exactly as 3a states (B3-1, B3-3, B3-6, B3-7, B3-8); B3-2 satisfies it outright, and B3-4 and B3-5 are FULL under the C-1 screen (section 3a). (c) *Descriptive headings, lists or tables, and at least one concrete
 example* — every page uses headed sections; concrete worked examples exist on B3-1 (the Aegis reading
 of LLM08 Scenario #2, L130; the worked anti-pattern rows L108-118), B3-2 ("on 8 nodes that is 8
 charges / 8 emails / 8 rollups", L159; "Autoscaling can DOS your own database", L163-165), B3-3
@@ -259,28 +255,27 @@ test).**
   committed index JSON. This batch records **no rows**, so nothing moves at this lane's head except
   this record itself, which enters `no_recorded_acceptance` (+1 reader page, +1 official pending —
   654 / 597 at the lane's head).
-- **The seven partial dispositions must not move pages out of pending on rows that ignore the
-  partials.** Only B3-2 carries a full acceptance here; the seven partials stay partial until their
+- **The five partial dispositions must not move pages out of pending on rows that ignore the
+  partials.** Three pages carry a full acceptance here — B3-2 (unchanged), B3-4 and B3-5 (the coordinator's 2026-10-16 C-1 ruling); the five partials (B3-1, B3-3, B3-6, B3-7, B3-8) stay partial until their
   gaps are repaired or a keeper records them as partial (row type per AEGIS-APR-116, the approval
   letting the ledger keeper record targeted reviews in the acceptance table).
 - The instrument figures at the base are quoted in section 1 and are not re-derived here.
 
 ## 5. The row-quote strings, verbatim
 
-Each line below appears in this file byte-for-byte and is the verbatim string a keeper copies into the
-row for the page whose label prefixes it. Every line also contains the full 40-character acceptance
-revision, the second binding rule the validator enforces. **A line that says `partial` must never be
-copied into a full-page-acceptance row.**
+Each line below appears in this file byte-for-byte and is the verbatim string a keeper copies into
+the **full-page-acceptance** row for the page whose label prefixes it. **Only the three pages this
+record accepts FULL — B3-2, B3-4, B3-5 — are offered a row-quote string here; no string is offered
+for a page recorded PARTIAL, because a PARTIAL page gets no acceptance row of any kind and stays
+pending.** Every line also contains the full 40-character acceptance revision, the second binding
+rule the validator enforces. **No row-quote line in this file is `partial:`-prefixed - the form a
+keeper could copy - because `partial:`-prefixed row-quote strings are removed by 13.2; a page recorded
+PARTIAL gets no row-quote string and no acceptance row of any kind.**
 
 ```text
-B3-1 partial: .claude/skills/hidden-context-exposure-reviewer/references/hidden-context-checks.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 B3-2 accepted: .claude/skills/horizontal-scalability-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-B3-3 partial: .claude/skills/human-agent-trust-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-B3-4 partial: .claude/skills/human-agent-trust-reviewer/references/trust-exploitation-patterns.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-B3-5 partial: .claude/skills/human-approval-boundary/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-B3-6 partial: .claude/skills/iac-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-B3-7 partial: .claude/skills/iac-reviewer/references/iac-review-checklist.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-B3-8 partial: .claude/skills/incident-response-runbook/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+B3-4 accepted: .claude/skills/human-agent-trust-reviewer/references/trust-exploitation-patterns.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+B3-5 accepted: .claude/skills/human-approval-boundary/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 ```
 
 ## 6. Skills applied and not applied (this lane, Stage C)
@@ -294,8 +289,7 @@ were read in full this session and applied at the step each names. None is padde
   mid-task growth into another class occurred.
 - **`acceptance-criteria-reviewer` — applied.** The ledger's six "Acceptance for each page" bullets
   are the acceptance criteria; each of the eight pages was judged against all six with quoted line
-  cites (section 3) and one verdict each — one accepted, seven partial with the first-use gaps named
-  (section 3a). The read-and-report-only posture held: no page text was edited.
+  cites (section 3) and one verdict each — **three FULL (B3-2, B3-4, B3-5) and five PARTIAL (B3-1, B3-3, B3-6, B3-7, B3-8)**, the first-use gaps named in section 3a and the C-1-screen ruling recorded there and in section 11. The read-and-report-only posture held: no page text was edited.
 - **`source-of-truth-reconciler` — applied.** Two brief anchors conflict with the command-derived
   state and were reconciled against the artifact that defines the set — `check_index.py` run at the
   base, and `docs/roadmaps/KEEPER-ID-ALLOCATION-2026-10-15.md` (PR #792's head `aeae752a`, **unmerged**):
@@ -307,7 +301,7 @@ were read in full this session and applied at the step each names. None is padde
   section 2.
 - **`scoped-approval-register` — applied.** Read AEGIS-APR-039 (the standing owner approval for
   backlog work: commits, pushes, PRs, merges), AEGIS-APR-101 (keeper independence), AEGIS-APR-116
-  (targeted-review rows) and AEGIS-APR-117 (withdrawal and re-record route) at the base to determine
+  (targeted-review rows) and AEGIS-APR-117 (the withdrawal route only) at the base to determine
   what this lane may record. Result: this change records under AEGIS-APR-101 (recording only) and
   delivers under AEGIS-APR-039; it consumes, extends and requests no grant; it authors no rows. The
   index rebuild is AEGIS-APR-115's (the approval covering the acceptance-index rebuild) separate
@@ -327,7 +321,7 @@ not consulted — no retention entry exists for `docs/evidence/documentation/` p
 creates none, and the lane's skills record is stated inline in this section rather than through the
 ledger's six-field format; no other skill in the catalog owns any step of this batch.
 
-## 7. Keeper rows — withheld, by design (the AEGIS-APR-117 route)
+## 7. Keeper rows — withheld, by design (the AEGIS-APR-101 keeper route)
 
 **This batch authors no acceptance rows and edits no ledger section.** It follows the Lead's
 2026-10-15 urgent correction, written after Codex raised P1 findings on all four batch-1 PRs:
@@ -342,9 +336,9 @@ The division of labour this batch applies:
 2. **It appends no `full-page-acceptance` rows** to the consolidated keeper table, and edits no
    ledger text.
 3. **A separate, eligible keeper** — an agent that did not read these pages — records the rows from
-   this evidence under AEGIS-APR-101 and AEGIS-APR-117. **No page needs re-reading.**
+   this evidence under AEGIS-APR-101 (recording); AEGIS-APR-117 supplies the withdrawal route only. **No page needs re-reading.**
 
-Batch 1's rows (K-082–K-089) and batch 2's rows (K-181–K-188) follow the same APR-117 cycle (PR #781
+Batch 1's rows (K-082–K-089) and batch 2's rows (K-181–K-188) follow the same keeper cycle — AEGIS-APR-101 recording, with AEGIS-APR-117 supplying the withdrawal route (PR #781
 carries the batch-1 withdrawals and re-records). Lane B's allocated keeper-ID band is K-181–K-280;
 the batch-3 keeper assigns the ids for these eight pages per the allocation file's protocol. This
 record assigns none and claims no keeper authority.
@@ -469,8 +463,8 @@ independent audit that follows this Stage C record; *Stage C* is the implementat
   zero rows. `tools/readability_acceptance/acceptance-index.json` contains **no row, no event and no
   occurrence of any of the eight page paths as a raw string** (0 for each), and none of the eight
   appears as a keeper-table data row in the tracker. All eight therefore sit in
-  `no_recorded_acceptance` (586 at the base → 587 at the head) and remain **PENDING**. No acceptance
-  row, and no row-quote string for a partial page, was authored by this lane or by this repair.
+  `no_recorded_acceptance` (586 at the base → 587 at the head) and remain **PENDING**. No acceptance row was authored by this lane or by this repair, and **no row-quote string is offered in this file for any page recorded PARTIAL**;
+  the only row-quote strings this file offers belong to the three FULL pages (section 5).
 - *Direction 2 — no page called partial actually deserves a row.* Measured per page against the page's
   own bytes and its linked companion. B3-1 (LLM02/LLM03/LLM09 never expanded anywhere on the page;
   `LLM02` on 9, `LLM03` on 14, `LLM09` on 14 of the 653 reader pages) and B3-7 (`tfvars` 1, `RG` 1,
@@ -481,13 +475,9 @@ independent audit that follows this Stage C record; *Stage C* is the implementat
   (`../SKILL.md` = B3-3, which defines OWASP at its L8) while its `API` (L43) is unexpanded on both
   (`API` appears on 204 of 653 reader pages — 31%, a library-wide convention). The
   description-before-terms shape is a **library norm**, not a one-off: by this round's measurement
-  **43 of the 653 reader pages** carry it. Under C-1's stronger test four of the seven partials could
-  be argued FULL, and this round **does not reclassify them**: the applied standard is the 2026-10-15
-  urgent correction, whose exact shape Codex's P1 on PR #772 ratifies, and re-litigating it is the
-  Lead's call, not a Stage C repair's. Recorded as a live tension, as the SD-D recorded it.
+  **43 of the 653 reader pages** carry it. Under C-1's stronger test, the convention screen clears exactly two of the pages the applied standard called partial: B3-4 (`OWASP` 61 + `API` 204) and B3-5 (`RLS` 73) have their entire gap sets at or above the ~12-page threshold, and the coordinator's 2026-10-16 ruling therefore records them FULL. No other page is reclassified: the five remaining partials (B3-1, B3-3, B3-6, B3-7, B3-8) keep the applied 2026-10-15 urgent correction. The final count is **3 FULL / 5 PARTIAL**. The description-before-terms shape (B3-3, B3-5, B3-6, B3-8) is a **different set** and does not decide this.
 
-**What this round did not verify (carried in the record, not only in a message).** The C-1
-classification of the seven partials is *reported, not adjudicated* (direction 2 above). The exclusion
+**What this round did not verify (carried in the record, not only in a message).** The C-1 classification of the partials is *reported, not adjudicated* here, except for the two the coordinator's 2026-10-16 ruling decided — B3-4 and B3-5, recorded FULL with their measurements in section 11 direction 2; the remaining five are reported as measured, not adjudicated by this repair. The exclusion
 of the six `cannot_decide` pages from the 590-path pending set is taken from the brief's two-bucket
 rule and cross-checked only against the instrument's own summary arithmetic (57 + 4 + 586 + 0 + 6 =
 653), not re-derived from the lost-commit policy. The eight pages were **not re-read as prose**; only
