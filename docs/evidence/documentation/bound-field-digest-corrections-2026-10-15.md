@@ -8,15 +8,21 @@ record or comment drafted by an AI agent says so, and names the model).
 appended, not substituted: every superseded value it names stays readable where it was
 published, and the correction sits beside it. No pull-request (PR) body was edited to
 produce this record, and no merged artifact was rewritten to produce it. **This record's
-own text has been corrected in place twice: on its Stage D repair round (§1, §2, §4.5,
-§4.6, §5, §6, §7 items 1 and 2, §8 and §9 changed; §10 quotes every sentence that was
-replaced and names the reason), and again on its Stage F repair round (§4.1, §4.5, §4.6,
-§4.7, §4.8, §7 item 3 and this preamble changed; §11 quotes every sentence that was
-replaced and names the reason). This change's own PR body was edited once as well, for a
-stale figure sitting inside its own bound skills field (§8, §10); its Stage F repair round
-added plain-English label glosses to the body **outside** all three bound fields and left
-the bound-field digest unchanged at `078ec42572ff330a` (§11). No other pull request's
-body was touched.**
+own text has been corrected in place three times. First on its Stage D repair round
+(§1, §2, §4.5, §4.6, §5, §6, §7 items 1 and 2, §8 and §9 changed; §10 quotes every
+sentence that was replaced and names the reason). Then on its Stage F repair round
+(§4.1, §4.5, §4.6, §4.7, §4.8, §7 item 2, §7 item 3, §10.2, §10.6 and this preamble
+changed; §11 quotes every sentence that was replaced and names the reason). Then on the
+**Stage D re-audit repair round** (the round that answers the second `SD-D: REVISE`
+verdict, issue comment 6207351316), which corrects §4.5, §8, §10.8, §11's introduction,
+§11.1 and §11.4 and appends §11.5–§11.8; §11.5 quotes every sentence that round replaced and names the
+reason. This change's own PR body was edited once as well, for a stale figure sitting
+inside its own bound skills field (§8, §10); its Stage F repair round added plain-English
+label glosses to the body **outside** all three bound fields and left the bound-field
+digest unchanged at `078ec42572ff330a` (§11); and the Stage D re-audit repair round
+corrected one further body figure **outside** every bound field — the false deletion
+count in its Blast-radius section — leaving the same digest (§11.7). No other pull
+request's body was touched.**
 
 **Reading key (one line per internal label, in plain English).**
 
@@ -283,7 +289,7 @@ consequence: none from this entry.**
 | What the published value **is** | the SHA-256 first-16 of the **same three payloads** taken by the **naive marker-string split**, `body.split("<!-- bound-field: <field> -->", 1)[1].split("<!-- bound-field: end -->", 1)[0]` per field, joined witness → skills → security with `\n`, hashed as UTF-8. That split keeps the newline that ends the opening sentinel line and the newline that begins the closing sentinel line, so each field carries **one extra newline at each end** |
 | Reproduces exactly under that reading? | **yes** — re-derived for this repair, twice, in Python `hashlib` and in Node `crypto` |
 | Recomputed normalized payload lengths (canonical) | `1926 / 7081 / 477` |
-| Raw payload lengths under the published reading | `1930 / 7086 / 481` — **+4 / +5 / +4 against the canonical row directly above**, which is the base these deltas are measured against: the naive split keeps the newline that ends the opening sentinel *line* and the newline that begins the closing sentinel line, two newlines per end, so +4 per field, plus the skills payload's one internal blank line, which the canonical collapse absorbs and this reading keeps (+5 there). The earlier version of this row read "each field exactly +2" with no base named; **+2 / +3 / +2** is what these payloads measure against the **verbatim** reading §4.6 names (`1928 / 7084 / 479`), not against canonical. §11 records the correction. |
+| Raw payload lengths under the published reading | `1930 / 7086 / 481` — **+4 / +5 / +4 against the canonical row directly above**, which is the base these deltas are measured against: the naive split keeps the newline that ends the opening sentinel *line* and the newline that begins the closing sentinel line, two newlines per end, so +4 per field, plus the skills payload's one internal blank line, which the canonical collapse absorbs and this reading keeps (+5 there). The earlier version of this row read "each field exactly +2" with no base named. Against the **verbatim** reading §4.6 names (`1928 / 7084 / 479`) these payloads measure **+2 / +2 / +2** — every field exactly +2, so that superseded sentence was in fact true of this row's figures against the *verbatim* base and false against canonical — while **+2 / +3 / +2** is what the **verbatim** reading measures against canonical, and belongs to §4.6's own row alone. §11 records the correction; §11.5 quotes this row's superseded wording and records the correction of the correction. |
 | Body edits recorded by the API | **0** — weak evidence, not proof: the body's `updated_at` is 19:08:06Z, 15 s after its `created_at` at 19:07:51Z, so this body moved and the API recorded no edit for it |
 | Body anchor | `2d1363e0a7f7bb1b8693f503f5f04e63c81746d1a7e24998893eef57b9f1afac` |
 
@@ -527,7 +533,28 @@ text, collapse not applied", same reason as #780.
 
 - **Derivation base SHA:** `f490c16f9ed23f3d489e42f7696323bffcce6fd3` — the
   `origin/main` tip at clone time and re-verified immediately before this file was
-  written (2026-10-15, local date; the repository's `main` has not moved).
+  written (2026-10-15, local date). **That clause read "the repository's `main` has not
+  moved" when it was written, and it is now stale: `main` has moved twice since** — to
+  `87d6b460` (the merge of PR #787) and to
+  `988b50673cdd0e9ab0c15df891744cd02d1d2d2b` (the merge of PR #783). The **merge base of
+  this head and the current `main` is still `f490c16f`** (`git merge-base HEAD origin/main`,
+  re-derived on the Stage D re-audit repair round), and `git merge-base --is-ancestor
+  f490c16f HEAD` exits 0, so **nothing is voided and no figure here depends on `main`'s
+  tip**; the drift is recorded rather than edited away, because a measurement is a
+  snapshot (§7 item 4).
+- **The one-path shape is a property of the merge base, not of `main`'s tip.**
+  `git diff --numstat f490c16f..HEAD` on this path reports **one** row and **0** deleted
+  lines — `1026	0` at the Stage F repair round's head (`6d4295a9`) and `1228	0` at the
+  Stage D re-audit repair round's head — with a **single** `-U0` hunk (`@@ -0,0 +1,1026 @@`,
+  and `@@ -0,0 +1,1228 @@` at the newer head), because the path does not exist at
+  `f490c16f`; that is this change's shape. The **two-dot** form
+  `git diff --numstat origin/main..HEAD` reports **four** rows — this record added
+  (`1228	0`), `docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md`
+  modified (`0	67`), `docs/evidence/documentation/readability-lane-c-batch-3-2026-10-15.md`
+  deleted (`0	731`) and `docs/roadmaps/aegis-documentation-readability-backlog.md` modified
+  (`0	132`) — because `main` advanced past this branch. **A reader must not read the
+  four-row two-dot form as this change's shape, nor the one-row merge-base form as a
+  statement about `main`'s tip.**
 - **Change shape:** **one new file added** —
   `docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md` — with a
   re-verification addendum appended in a second commit and the Stage D repair round in
@@ -840,8 +867,27 @@ fix, and only for a count that contradicted the table those comments themselves 
   than 02:02Z: #774 02:06:59Z, #783 02:09:14Z, #788 02:11:32Z, #790 02:09:35Z, #791
   02:05:07Z, #792 02:08:19Z, #777 02:02:31Z, #782 02:02:32Z); §10.2's derivations use the
   anchors §3 names, which are unchanged for #780 and #785.
-- **Codex.** PR #793 has no Codex review to triage: its review did not run (usage limit,
-  issue comment 6206352377). Recorded as unavailable, never as clean.
+- **Codex — CONFIRMED UNAVAILABILITY of the finding TEXT, with the connector's own
+  state disclosed.** Two Codex artifacts exist on this PR, both posted by
+  `chatgpt-codex-connector[bot]`. **(1)** The review-summary comment **6206351959**
+  (created == updated 2026-10-16T02:01:57Z), whose machine-readable state block reads
+  `code_review{commit_sha 8e9392f8c4df0359f2cccd297af4535a0a2cff7c, has_any_findings: true,
+  has_unresolved_findings: true, status: "failed"}` — so the connector asserts that the
+  code review **ran and FAILED** at `8e9392f8` (this branch's first commit) **with
+  unresolved findings**, and its human-readable table shows Code Review **Failed** at
+  `8e9392f8`, triggered by the PR being opened. **(2)** The usage-limit comment
+  **6206352377** (2026-10-16T02:02:00Z): "You have reached your Codex usage limits for
+  code reviews" — which is why the run failed. **What is retrievable:** the state block,
+  the outcome, the commit and the trigger. **What is NOT retrievable:** the findings
+  themselves. Re-read on the Stage D re-audit repair round:
+  `repos/…/pulls/793/reviews` returns **0** reviews and `repos/…/pulls/793/comments`
+  returns **0** review comments, so **no readable API exposes the text of whatever the
+  connector flagged, and a P1 cannot be ruled out.** The state names `8e9392f8`, **not**
+  this head, so it binds no later revision either. **This is recorded as confirmed
+  unavailability, never as clean, and not as "its review did not run": the connector says
+  it ran and failed.** The wording this bullet replaced — "its review did not run (usage
+  limit, issue comment 6206352377)", citing only the usage-limit comment — is quoted and
+  corrected in §11.5.
 
 ### 10.9 A figure in §10.7 is corrected here — the same defect class, inside this record's own text
 
@@ -876,8 +922,10 @@ DeepSeek-4.1-Flash (deepseek-flash).** It answers the Stage F final-review verdi
 corrected in place with their superseded wording quoted here, so the correction stays
 auditable — the discipline §10.9 applies to its own case and §10.7 applied to the Stage D
 round. **One further false statement, which the verdict did not list, is corrected here
-too** — the sentinel-occurrence count in §4.5 and §10.2, a claim the verdict's own §2 table
-repeats; it is the last row of §11.1. **Nothing the verdict verified is changed:** the central claim (both published
+too** — the sentinel-occurrence count in §4.5 and §10.2, a claim **both** prior verdicts'
+§2 tables repeat (the `SD-F: REVISE` verdict, issue comment 6206966415, and the
+`SD-D: ACCEPT` verdict, issue comment 6206838331); it is the last row of §11.1, and a
+fresh Stage F must read **this record's** corrected reason and not either verdict. **Nothing the verdict verified is changed:** the central claim (both published
 values reproduce under the readings §4.5, §4.6 and §10.2 name), §10.5's routing, the §7
 item 2 retraction, the count of fourteen (re-counted for this round from §2's own table:
 14 distinct 16-hex values), and the Stage D round's 85 deleted lines with their site
@@ -892,10 +940,10 @@ table, which §11.3 re-confirms.
 | §7 item 2, L481–482 | "exactly the value and the lengths that both of #771's live verdicts publish" | the same false joint attribution, **at a fourth site the Stage F verdict did not list** — it is the sentence §10.6 duplicates. It is corrected here **and recorded here**, rather than corrected silently, so a reader can see that the review's three sites were four |
 | §10.6, L734–735 | the same sentence again | the same split |
 | §4.6's raw-lengths row, L334 | "`1819 / 7340 / 384` — **each field exactly +2**" | measured against the canonical row directly above it (`1817 / 7337 / 382`): **+2 / +3 / +2**. The skills payload carries **one internal blank line** (counted: 3 blank payload lines, of which 2 are the boundary lines), which the canonical collapse absorbs into one space and the verbatim reading keeps as a newline |
-| §4.5's raw-lengths row, L280 | "`1930 / 7086 / 481` — **each field exactly +2**" | measured against the canonical row directly above it (`1926 / 7081 / 477`): **+4 / +5 / +4** — two kept newlines per end, four per field, plus the same internal blank line in the skills payload. **+2 / +3 / +2** is what these payloads measure against the **verbatim** reading §4.6 names (`1928 / 7084 / 479`), a base the row did not name |
+| §4.5's raw-lengths row, L280 | "`1930 / 7086 / 481` — **each field exactly +2**" | measured against the canonical row directly above it (`1926 / 7081 / 477`): **+4 / +5 / +4** — two kept newlines per end, four per field, plus the same internal blank line in the skills payload. **+2 / +2 / +2** is what these payloads measure against the **verbatim** reading §4.6 names (`1928 / 7084 / 479`) — a base the row did not name, and the base against which the superseded "each field exactly +2" was in fact true; **+2 / +3 / +2** is measured only between the **verbatim** and canonical readings, and belongs to §4.6's own row. §11.5 quotes this row's superseded wording |
 | §7 item 3, L492–493 | "PR #787's **Stage F** publishes the per-line-strip value `3200b7c5f2d153e5` and says in terms 'not this method'" | the comment is #787's **Stage D** audit — issue comment **6205805001**, `SD-D: REVISE`, 2026-10-16T01:17:23Z — which reads: "The per-line-strip normalization variant would give `3200b7c5f2d153e5` — not this method." #787's Stage F comment (**6206644774**, `SD-F: ACCEPT`) contains **neither** the value nor the phrase (counted: 0 occurrences of each) |
 | §4.1's edit-count control, L215–216 | "control: the same API records 6 on #783, 3 on #789, 2 on #776 and 2 on #771" | re-measured **2026-10-16T03:00:16Z**: **7** on #783, **4** on #789, 2 on #776 and 2 on #771 — and still **0** on #782 and **0** on #777, the zeros this control exists to qualify. The earlier reading was true when it was taken; the drift is the verdict's O-2 |
-| §4.5's boundary paragraph, L291–294, and §10.2, L629–630 | "Each sentinel string occurs **exactly once** in this body" (§4.5), and the same clause in §10.2 for #780 | **true of the three *opening* sentinel strings only.** Counted in both bodies: the `witness`, `skills` and `security` opening sentinels occur **1** time each, while `<!-- bound-field: end -->` occurs **3** times — once per field (#785 L101, L109, L126; #780 L100, L108, L125). The conclusion the sentence supports still holds, for the corrected reason: the first closing sentinel after an opening one is that field's own, so the marker-string split lands on the same boundary lines. **This site was not in the verdict's F-1–F-3; the verdict's §2 table repeats the claim, so it is corrected and recorded here rather than left standing** |
+| §4.5's boundary paragraph, L291–294, and §10.2, L629–630 | "Each sentinel string occurs **exactly once** in this body" (§4.5), and the same clause in §10.2 for #780 | **true of the three *opening* sentinel strings only.** Counted in both bodies: the `witness`, `skills` and `security` opening sentinels occur **1** time each, while `<!-- bound-field: end -->` occurs **3** times — once per field (#785 L101, L109, L126; #780 L100, L108, L125). The conclusion the sentence supports still holds, for the corrected reason: the first closing sentinel after an opening one is that field's own, so the marker-string split lands on the same boundary lines. **This site was not in the verdict's F-1–F-3; both prior verdicts' §2 tables repeat the claim, so it is corrected and recorded here rather than left standing — two verdicts, not one.** The `SD-F: REVISE` verdict (**issue comment 6206966415**) says "each sentinel string occurs exactly once in each body" and its §2 table says "each of the four sentinel strings occurs **exactly once** in the body (counted)"; the `SD-D: ACCEPT` verdict (**issue comment 6206838331**) says "Each sentinel string occurs exactly once in each body (counted)". The wording this row replaced named only "the verdict's §2 table", singular, and that is now corrected. Both verdicts are dated records and neither is edited; the corrected reading is **four sentinel strings in all — the three *opening* sentinels at 1 occurrence each and the single closing sentinel at 3** — and **a fresh Stage F must read this record's corrected reason, not either verdict** |
 
 **O-1 is a gap of omission, not a false statement, and it is closed by addition.** §4.7 now
 records the two **retraction** comments the same author posted about a minute after the two
@@ -998,8 +1046,23 @@ the PR body's Paths section pins the Stage D round's range at `ab8a8c06..c50ce2d
 
 The body's **F-4** glosses — one-line plain-English descriptions of **Stage C** (the
 implementation stage), **Stage D** (the independent implementation-audit stage) and
-**`SD-D`** (the verdict label a Stage D audit publishes) — were added at every occurrence
-of those labels **outside** the three bound fields. **The bound-field digest did not move:
+**`SD-D`** (the verdict label a Stage D audit publishes, `SD-D` being the label an
+independent implementation audit's verdict carries) — were added at every occurrence
+of those labels **outside** the three bound fields, **with one exception recorded below
+rather than glossed**. **The count is NINE gloss phrases, not the eight this round's
+brief carried:** measured on the whitespace-collapsed body text, `Stage C (the
+implementation stage)` occurs **four** times (body L71, L103, L164, L189), `Stage D (the
+independent implementation-audit stage)` **three** times (L43, L73, L179), and “`SD-D`
+labels a Stage D audit” **twice** (L74, L185) — nine in all. All nine score **0** in the
+body revision before this round's edit (`userContentEdits`, 2026-10-16T02:31:50Z, 16,455
+characters) and **4 / 3 / 2** in the live body, which is the `02:01:52Z → 03:09:57Z`
+revision walk §11.2's method describes. **The one exception to "every occurrence":** this
+round's own new paragraph at body **L195** uses `Stage D`, `SD-D` and `Stage F` with no
+in-item gloss, the `Stage F` gloss living in a different item (the acceptance criteria,
+body L60). The claim "at every occurrence" was therefore too strong as first written; it
+is corrected here rather than repaired by glossing, and the paragraph is named so a
+reader can see exactly which labels it covers. §11.5 quotes the superseded wording.
+**The bound-field digest did not move:
 it is `078ec42572ff330a` at normalized payload lengths `1380 / 3868 / 40` both before and
 after the body edit**, recomputed from the body in both states. The labels' occurrences
 **inside** the skills bound field are the round-1 rows' `Stage / agent` cells; they were
@@ -1024,3 +1087,142 @@ readings this record exists for were re-derived again in this round** from the l
 of #785 and #780 — verbatim `45db39e238a3a4e6` at `1819 / 7340 / 384`, naive split
 `64bf6a407e23e47f` at `1930 / 7086 / 481`, canonical `6682e8afc5f8ac5e` and
 `5feb2e444d998034` — and each body's three *opening* sentinel strings still occur exactly once there, the closing sentinel occurring three times (once per field).
+
+### 11.5 The Stage D re-audit repair round — the wording it replaced, quoted
+
+**Appended 2026-10-16 by the Stage C (the implementation stage) agent running on
+DeepSeek-4.1-Flash (deepseek-flash)**, answering the **second** `SD-D: REVISE` verdict
+(issue comment **6207351316** on PR #793, which binds head
+`6d4295a938705546160f7a44af12c6391570f8c9` and bound-field digest `078ec42572ff330a`).
+Its two grounds were measured false figures — one introduced by the Stage F repair round
+**inside this record**, one carried by the PR body and by the head commit message — and
+its §14 named further gaps. Each is answered here, and every superseded sentence is
+quoted so the correction stays auditable, the discipline §10.9 and §11.1 apply.
+
+**Calibration first, on the same code path and before any of these figures was used**
+(hashing UTF-8 bytes): the three values the repair brief names — #783 →
+`3913683c686e6e71`, #787 → `82ed906d2f228f0e`, #774 → `d10fb1e4977b8ccb` — and then all
+fourteen of §2's calibration values, ten reproducing from their **live** bodies
+(`3913683c686e6e71` #783, `b1acc2b2f5817fab` #771, `7cf3094b11ba4339` #772,
+`d10fb1e4977b8ccb` #774, `4e50d937ea45ee8e` #773, `340a14ee6921277a` #775,
+`71a73c01f92b23eb` #779, `82ed906d2f228f0e` #787, `70ef1815189fe918` #777,
+`121a60bce86cff98` #782) and four from the revisions §11.2 names (`bd9ccf55efbead2d`
+#790 @ 01:43:57Z, `1fcd0143e13198a3` #791 @ 01:48:55Z, `00092958ec2cc906` #788 @ 01:45:01Z,
+`8d441a1bfdff46d9` #774 @ 01:05:24Z), each at its published anchor prefix — reproducing
+**§11.2's ten-live / four-revision-only split exactly.** The posted body then hashed to
+`078ec42572ff330a` at `1380 / 3868 / 40`.
+
+| Site (line numbers at `6d4295a9`) | What it said | What is true, measured |
+| --- | --- | --- |
+| §4.5's raw-lengths row, L286, and §11.1's row for it, L895 | "`1930 / 7086 / 481` — **+4 / +5 / +4 against the canonical row directly above** … **+2 / +3 / +2** is what these payloads measure against the **verbatim** reading §4.6 names (`1928 / 7084 / 479`)" | measured this round, hashing UTF-8 bytes in one implementation and re-checking the arithmetic: `1930 − 1928 = +2`, `7086 − 7084 = +2`, `481 − 479 = +2`, so the naive split is **+2 / +2 / +2** against the verbatim reading — every field exactly +2, which is why the superseded "each field exactly +2" was **true** against that base and false against canonical. **+2 / +3 / +2** is measured only between the **verbatim** and canonical readings (`1928 / 7084 / 479` vs `1926 / 7081 / 477`), and §4.6's own row already states it correctly. The structural cause is measured: each body's skills payload carries exactly **one internal** blank line, which the canonical collapse absorbs and both raw readings keep |
+| The PR body's Blast-radius section, body L34 | "the two repair rounds replaced sentences in it and deleted 85 and **16** lines respectively (record §10.7, §11)" — and, later in the same paragraph, "no PR body edited" | the Stage F repair round deleted **22** lines: `git diff --numstat c50ce2d9..6d4295a9` on this path reports `212	22`, the `-U0` deletion lines number 22, and §11.3 totals 22 with a site table summing to 22. **16** is only the subset of those 22 that the Stage D round had introduced (`85 + 22 − 91 = 16`, verified exactly by set intersection). The paragraph now carries the **site-by-site list** record §11.3 tabulates, and its "no PR body edited" clause now reads "no PR body edited **other than this pull request's own**", because the absolute form became false the moment this change first edited its own body (§10.7) |
+| The head commit message of `6d4295a938705546160f7a44af12c6391570f8c9` | "counts this round's deleted lines (**16**, sited, set-equality both ways)" | the same measured **22**. **A commit message is immutable and is NOT rewritten here** — the forward correction is stated in the body and in this record instead; see §11.7 |
+| §11.1's last row, L898 | "the verdict's §2 table repeats the claim" | **two** verdicts repeat the sentinel claim, not one: the `SD-F: REVISE` verdict (issue comment **6206966415**) and the `SD-D: ACCEPT` verdict (issue comment **6206838331**). Both are dated records and neither is edited; **a fresh Stage F must read this record's corrected reason, not either verdict** |
+| §11's introduction, L879–880 | "a claim the verdict's own §2 table repeats", singular | the same singular attribution at the section's own head; it now names **both** verdicts and points a fresh Stage F at this record |
+| §8's derivation-base bullet, L528–530 | "the repository's `main` has not moved" | stale: `main` has moved twice since (`f490c16f` → `87d6b460` → `988b5067`). The **merge base of this head and the current `main` is unchanged** at `f490c16f`, so nothing is voided and no figure here depends on `main`'s tip. §8 now also states that the one-path shape is a property of the **merge base**, while the two-dot form `main..HEAD` shows four paths |
+| §10.8's Codex bullet, L843–844 | "its review did not run (usage limit, issue comment 6206352377)" | the connector's state block on issue comment **6206351959** says the code review **ran and FAILED** at `8e9392f8` with `has_any_findings: true` and `has_unresolved_findings: true`; the usage-limit comment **6206352377** explains why it failed. The finding **text** is not retrievable by any API this round could read (0 reviews, 0 review comments), so a P1 cannot be ruled out. Recorded as confirmed unavailability, never as clean |
+| The preamble's enumeration of the Stage F round's changed sections | "§4.1, §4.5, §4.6, §4.7, §4.8, §7 item 3 and this preamble changed" | **§7 item 2, §10.2 and §10.6 were changed by that round too**, and all three are listed in §11.3's own site table. The enumeration now names them |
+| §11.4's first paragraph | the glosses "were added at every occurrence of those labels **outside** the three bound fields" | true of every item **except** that round's own new paragraph at body **L195**, which uses `Stage D`, `SD-D` and `Stage F` with no in-item gloss (the `Stage F` gloss lives in a different item, the acceptance criteria at body L60). The count is **nine** gloss phrases — four `Stage C`, three `Stage D`, two `SD-D` — **not the eight that round's brief carried**, and all nine score 0 in the pre-edit body revision and 4 / 3 / 2 in the live body |
+| The PR body's Paths section, body L48 | "The Stage F repair round replaced sentences at **nine** sites in the same file" | **eleven** sites, which is this record's own count in §11.3; the nine are §11.1's nine *wording rows*, and those eleven sites fall into them. A figure found while making the required 16 → 22 correction and corrected with it |
+
+**What this round did not change.** The central claim, §10.5's routing, §7 item 2's
+retraction, the ten-live/four-revision-only calibration split, the sentinel count's
+corrected reason in all four places, and the F-4 judgement that the skills-field omission
+is **correct** all stand — the second Stage D verdict verified each of them independently.
+**The skills-field omission is confirmed by that audit's own measurement:** inserting a
+gloss **inside** the skills field of a copy of the live body moves the digest
+`078ec42572ff330a` → `3b49811d4c22add9` (skills payload `3868` → `3895`), because the
+field's payload is the whole table plus its `Row source` records. A gloss there would
+void the body binding, which is why §11.4 keeps the omission and the disclosed remedy: a
+round-2 row authored at the head that round verifies, never a character changed inside an
+existing row.
+
+### 11.6 The Stage D re-audit repair round's deleted lines, counted and sited
+
+**Correcting a false statement means replacing text, and replaced text is deleted text.**
+Counted as **every deletion line** in
+`git diff 6d4295a938705546160f7a44af12c6391570f8c9..HEAD -- docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md`,
+excluding only the `---` diff header, and taken from `-U0` hunks so no deletion is hidden
+by context. `--numstat` over that range and path reports `221	19`.
+
+| Site (line numbers at `6d4295a9`) | Lines deleted |
+| --- | --- |
+| Preamble L11–19 — the two-round account and the body-edit sentence | 9 |
+| §4.5's raw-lengths row, L286 | 1 |
+| §8's derivation-base bullet, L530 — the stale "`main` has not moved" clause | 1 |
+| §10.8's Codex bullet, L843–844 | 2 |
+| §11's introduction, L879–880 — the sentinel-claim clause | 2 |
+| §11.1's row for §4.5, L895 | 1 |
+| §11.1's last row, L898 | 1 |
+| §11.4's first paragraph, L1001–1002 | 2 |
+| **Total deleted** | **19** |
+
+**The set is exact in both directions, measured the way §10.7's and §11.3's were**: the
+old-line numbers parsed from the `-U0` hunks are exactly the numbers the ranges above
+claim — measured-minus-claimed empty and claimed-minus-measured empty — and the claimed
+counts sum to `19`. **This round does not claim to be insert-only** — it is not; it
+deleted `19` lines to correct statements that were false, and appended §11.5–§11.8.
+
+**A range written as `..HEAD` moves with the head, so this section quotes its own figure
+at the head that produced it** — the same caveat §11.3 states for its range. The site
+table is the durable part: it pins the **old** line numbers at `6d4295a9`, so a later
+round can recompute exactly which lines this round deleted, whatever `HEAD` has become.
+
+### 11.7 The PR body's correction, the commit message that cannot be corrected in place, and what is thereby owed
+
+**The body's false deletion count is corrected in place, outside every bound field.** The
+Blast-radius sentence at body L34 now reads **22** where it read 16, with the site list,
+and the Paths sentence at body L48 now names **eleven** sites with §11.3 as the source of
+that count; the Paths sentence's own "numstat at this head" pair, and the paragraph that
+closed the digest section with the previous head, are refreshed to this round's measured
+figures so that no sentence in the body states a head figure that this head contradicts. Both edits sit **outside** the three bound fields. **The bound-field digest
+did not move: it is `078ec42572ff330a` at normalized payload lengths `1380 / 3868 / 40`,
+recomputed from the posted body read back from the API both before and after the edit.**
+
+**The commit message of `6d4295a938705546160f7a44af12c6391570f8c9` cannot be corrected in
+place, and it is not.** A commit message is immutable: it is covered by that commit's own
+hash, and this branch's earlier commits and the verdicts that name them are bound through
+those hashes — including the two `Row source` records **inside** the body's bound skills
+field, whose head names would have to be re-pointed, which would move the digest. Rewriting
+history to repair one figure would therefore destroy bindings that matter more than the
+figure. **The discrepancy is stated instead, in both places a reader meets it:**
+
+- **in the body**, immediately after the corrected sentence, naming the commit and the
+  wrong figure; and
+- **here**, in this record: commit `6d4295a9`'s message says "counts this round's deleted
+  lines (**16**, sited, set-equality both ways)"; the figure that commit's own diff
+  measures is **`22`** (`85 + 22 − 91 = 16`), and this round's own deleted-line count is
+  the separate **`19`** §11.6 measures.
+
+That is the forward-correction discipline this repository uses for dated records: **a
+dated record is never rewritten, it is corrected by appending.** A commit message is the
+most immutable dated record there is.
+
+**What is owed.** This round moves the head, so the `SD-D` verdict `6207351316`
+(`SD-D` labels an independent implementation audit's verdict), the `SD-D: ACCEPT` verdict
+`6206838331` and the `SD-F: REVISE` verdict `6206966415` no longer cover the artifact:
+**a fresh Stage D and a fresh Stage F are owed at the new head.** Because every edit in
+this round stayed outside the three bound fields, **`078ec42572ff330a` still binds the
+body**, so nothing further is voided by the body edit.
+
+### 11.8 What this round did not verify, stated as gaps
+
+1. **Codex's unresolved findings at `8e9392f8`** — claimed by the connector's state block
+   and **not retrievable**: `repos/…/pulls/793/reviews` returns 0 and
+   `repos/…/pulls/793/comments` returns 0. This round could not triage a finding it
+   cannot read, and does not report the surface as clean.
+2. **§10.3's enumerated 5,400-combination space and its 92,580 deletion variants** — not
+   re-run. This round re-derived the two named readings, all fourteen of §2's calibration
+   values (ten from live bodies, four from the named revisions — §11.5 records both lists),
+   and the posted body's own digest; the enumeration's per-axis counts remain the
+   enumeration's own claim.
+3. **The historical snapshots** (§3's 01:50:47–01:51:00Z window and §9's 02:02Z window) —
+   not re-observable; only the anchors and the named revisions can be checked.
+4. **The second Stage D verdict's remaining claims** — its passages on the two grounds,
+   F-1 to F-5, the calibration split, the deletion arithmetic, routing and Codex were read
+   and used; the verdict was not adjudicated in full, and it is void at this head in any case.
+5. **The exact insertion that produced** `3b49811d4c22add9` — cited as that audit's
+   measurement, with its stated payload growth (`3868` → `3895`); the insertion itself is
+   not reproduced here, so the value is the audit's, not this round's.
+6. **Whether any other open PR body carries a reading §10.3's space does not contain** —
+   unverified, as §10.8 says.
