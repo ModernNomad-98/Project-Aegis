@@ -1,7 +1,8 @@
-# Stage A plan — Phase 4 readability lane D, batch 3 (PR #784) — revision 1
+# Stage A plan — Phase 4 readability lane D, batch 3 (PR #784) — revision 2
 
-**Plan revision 1**, 2026-10-16. **Stage: A (PLAN).** **Role A** is this repository, the Project Aegis
-source library (Role B is a consumer or product repository that copied the Aegis files).
+**Plan revision 2**, 2026-10-16 — it corrects plan revision 1 (§11). **Stage: A (PLAN).** **Role A**
+is this repository, the Project Aegis source library (Role B is a consumer or product repository that
+copied the Aegis files).
 **Planner:** agent `readability-phase4-lane-d-planner-a1`, model **DeepSeek-4.1-Flash
 (`deepseek-flash`)** — a holder that did not draft, repair, read, audit or merge the diff, and holds
 **Stage A only**. **SD-B**, the independent plan audit, is a different agent's stage; this planner must
@@ -11,9 +12,11 @@ not hold it (and does not hold C, D, E, F or G on this change either).
 `SD-A`…`SD-G` are the delivery workflow's verdict tokens for its seven stages (A PLAN, B PLAN AUDIT,
 C IMPLEMENT, D IMPLEMENTATION AUDIT, E VALIDATE, F FINAL REVIEW, G MERGE). **C-1** is the standing
 ruling that an unglossed term which is a library-wide convention is an **observation**, not a
-per-page defect; the stronger test is whether the page itself resolves it. **C-3** is the standing
-ruling that the next batch means the next eight **unread** pages, selected from the unread sequence
-and named **by path** — never by index and never by index arithmetic. **C-4** is the standing ruling
+per-page defect; the stronger test is whether the page itself resolves it. **C-3** is this plan's
+label for the batch-selection rule — the next batch means the next eight **unread** pages, selected
+from the unread sequence and named **by path**, never by index and never by index arithmetic. **That
+label is not a tracked ruling in this tree (§6)**; the rule rests on its own derivation, not on the
+name. **C-4** is the standing ruling
 that a page dispositioned **PARTIAL** gets no acceptance row of any kind and stays pending. The
 **keeper** is the agent that records a page's acceptance row in the consolidated ledger table; a
 **keeper row** is one such row. A **reader page** is a tracked `.md` file other than the `scripts/`
@@ -80,8 +83,10 @@ not moved**: it is the first head `99d46d752357c6cb127274944ce2ac2ff0b9b78e` plu
   author its own acceptance rows. The record is the evidence the separate eligible keeper will record
   from, and the artifact the programme's count honesty depends on.
 - **Blast radius.** Exactly **one path, added**, against the merge base
-  `e2a3e20b7c20ef8385b219b39c6405237163406f` (which is also the API `base.sha` and the head's only
-  parent): `449` added, `0` deleted, one `A` entry in `--name-status`, 0 other paths. **No code,
+  `e2a3e20b7c20ef8385b219b39c6405237163406f` (which is also the API `base.sha` and the **first**
+  commit's only parent — **not** the head's: the head `1aa632f7…`'s only parent is that first commit,
+  `99d46d752357c6cb127274944ce2ac2ff0b9b78e`): `449` added, `0` deleted, one `A` entry in
+  `--name-status`, 0 other paths. **No code,
   script, workflow, test, configuration, data or lock file is added, modified or deleted** — the diff
   is Markdown only, so the change is not code-bearing (workflow blob `bff407a6…` L400-403) and the
   lighter pure-docs path applies. The repair commit alone is +133/−45 inside the same file; no path is
@@ -314,11 +319,20 @@ base and at the head, but the anchor path's **0-based position in the unread seq
 rule would therefore have to be re-derived at every ref and could silently select a different page; a
 path-anchored rule is stable. This is C-3's point, demonstrated on this change's own data.
 
-**One honest note on "R2".** The dispatch that requested this plan calls this "the C-3 / R2 selection
-rule". A search of the tracked tree at the head finds no readability standing ruling named `R2`; the
-`R2` hits are the Behavioral Eval Runner's judge-calibration item and unrelated re-read range labels.
-**The rule above is stated as C-3 and is the rule this plan binds the next batch to**; if "R2" names a
-separate ruling, this plan could not verify it (§12).
+**One honest note on the two labels, "C-3" and "R2".** The dispatch that requested this plan calls
+this "the C-3 / R2 selection rule". **Neither label is a tracked ruling in this tree, and neither is
+offered here as the rule's authority.** A search of the tracked tree at the head finds no readability
+standing ruling named `R2` — the `R2` hits are the Behavioral Eval Runner's judge-calibration item
+and unrelated re-read range labels — and none named `C-3`: the only two `C-3` hits at the head are
+unrelated change-site IDs (a worked `C-1..C-3` row range inside the batch-3 record, and a table row
+ID in `docs/evidence/documentation/readability-reread-batches-2026-10-12.md`). "R2" is a **reading**
+defined in the merged lane A batch-5 record
+(`docs/evidence/documentation/readability-lane-a-batch-5-2026-10-15.md`, blob `a1f537a9…` at
+`origin/main`, its section "The reading used: R2") — a record, not a ruling. **The rule above is the
+rule this plan binds the next batch to; it rests on its own derivation from the lane records'
+committed bytes and the instrument, not on either name.** This plan keeps the label `C-3` for
+continuity with the dispatch, with this caveat stated; if a ruling by either name exists elsewhere,
+this plan could not verify it (§12).
 
 ## 7. The five-question necessity and reuse answers, with routing
 
@@ -440,11 +454,29 @@ Named rather than left implicit:
 
 ## 11. The plan's own revision, and how it is captured
 
-**Revision 1** of this plan. Capture, so that Stage B has an exact text to bind (the requirement is
-the workflow's own: blob `bff407a6…` L587-592 at this head — at `origin/main`'s newer blob
-`9a2ea2bd…` the same paragraph sits at L612-616, which is the numbering the dispatch quoted as
-"L613-616"):
+**Revision 2** of this plan — it corrects plan revision 1, and §13 states its own timing directly.
+Capture, so that Stage B has an exact text to bind (the requirement is the workflow's own: blob
+`bff407a6…` L587-592 at this head — at `origin/main`'s newer blob `9a2ea2bd…` the same paragraph
+sits at L612-616, which is the numbering the dispatch quoted as "L613-616"):
 
+- **What revision 2 changes, and nothing else.** Both findings of the posted **SD-B: REVISE**
+  (`6212915586`, the independent plan audit) are corrected, plus one naming caveat:
+  **B-1** — §2 said the merge base was "the head's only parent"; that clause was false and now says the
+  merge base is the **first** commit's only parent and names the head's actual only parent
+  `99d46d75…`. **B-2** — §13 said the finish and wall time were "recorded in this plan's PR-body
+  capture section and in the posted comment", and neither carried them; §13 now states both
+  **directly**, with their derivation. **Naming caveat** — §6 and the reading key no longer present
+  `C-3` or `R2` as a tracked ruling name. **Every other element is revision 1's text, unchanged**:
+  the scope and the eight paths, the what/why and blast radius, the `docs-only` classification, the
+  fifteen criteria with the C-1 screen and the two declared-not-verifiable criteria, the path-anchored
+  selection rule and its eight paths, the five answers with their routings, the non-author test, the
+  evidence inventory, the non-decisions and the capture record.
+- **Superseded capture.** Revision 1 was captured at commit
+  `491bad103254d561054d631294d43a09db20493d` (blob `dbc244c3793fd05cdeded3f9383a906799bdd87f`,
+  sha256 `8beb89caed02974d8b30c452f535c87d49be689facc66eec71b6f3f901020b8a`, posted verbatim as issue
+  comment `6212482822`). **That blob is superseded by this revision's blob**, which the PR body and the
+  fresh capture comment both name; the revision-1 comment stays posted and unedited as the revision-1
+  record. The plan branch is not the PR branch, so **no head moves** with this supersession.
 - **Tracked file:** `docs/plans/readability-lane-d-batch3-plan-2026-10-16.md`, committed on branch
   `stage-a/lane-d-batch3-plan-2026-10-16` (branched from the PR head commit, so the plan sits in the
   same tree as the change it plans). **The blob SHA of the plan's bytes at that commit, the commit's
@@ -482,10 +514,27 @@ the workflow's own: blob `bff407a6…` L587-592 at this head — at `origin/main
 
 ## 13. Timing
 
-- **Start:** 2026-10-16T02:14:37-07:00 (America/Los_Angeles; the turn-1 snapshot of this planning
-  session).
-- **Finish and wall time:** recorded in this plan's PR-body capture section and in the posted comment
-  alongside the capture identifiers.
+- **Start (plan revision 1):** 2026-10-16T02:14:37-07:00 (America/Los_Angeles; the turn-1 snapshot of
+  this planning session).
+- **Finish (plan revision 1):** 2026-10-16T02:29:57-07:00 — the creation time of the verbatim capture
+  comment `6212482822` (`2026-10-16T09:29:57Z`), the last publication act of that capture. The
+  capturing commit `491bad103254d561054d631294d43a09db20493d` is a few seconds earlier, at
+  2026-10-16T02:29:26-07:00 by its own committer timestamp; both instants are stated because both are
+  finish instants of the same capture — commit first, comment second.
+- **Wall time (plan revision 1):** **15m 20s** from the stated start `02:14:37` to the finish
+  `02:29:57`; **14m 49s** from the start to the capturing commit `02:29:26`. Both are **measured
+  wall time**; **active time is not instrumented**, so wall time is an imperfect comparison and no
+  active-time split is claimed. *Derivation — the values are stated here and are re-derivable, not a
+  pointer to somewhere else:* the start is this planning session's own turn-1 snapshot, recorded in
+  revision 1 of this plan; the two finish instants are read from the repository and the API —
+  `git log -1 --format=%cI 491bad103254d561054d631294d43a09db20493d` → `2026-10-16T02:29:26-07:00`,
+  and `gh api repos/ModernNomad-98/Project-Aegis/issues/comments/6212482822 --jq .created_at` →
+  `2026-10-16T09:29:57Z`.
+- **Timing of plan revision 2 (this text).** Start `2026-10-16T02:59:36-07:00` (the turn-1 snapshot
+  of the revision-2 session). Its finish and wall time necessarily fall **after** this commit exists,
+  so they are stated in the fresh capture comment and in the PR body's capture section, both of which
+  carry them; revision 1's figures above are stated **directly here**, which is what finding **B-2**
+  requires.
 - **Identity and environment:** written on a fresh HTTPS clone
   (`git clone -c http.sslBackend=openssl`) outside the shared clone, with `git config user.name` =
   Peter Nguyen; no `wt-*` worktree created; nothing merged.
