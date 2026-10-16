@@ -155,6 +155,7 @@ the batching procedure allows.
    L3090-3128) says in terms that it "does not ... waive the independent-review requirement".
    **Authority analysis, recorded in full because a fresh-append route was proposed and is not
    available:**
+   - **The owner declined to ratify carry-with-deviation (2026-10-15, Decision 3 of `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`, present on `main` and at `50241ba5` but NOT at the bound revision `e2a3e20b`) and directed the AEGIS-APR-117 withdrawal route together with a fresh re-record under AEGIS-APR-101; this record applies that direction and states it here so the authority path is complete.**
    - **AEGIS-APR-117 is WITHDRAWAL-ONLY** (register L5038-5042: after the switch, "the ledger keeper
      may append a withdrawal row that cancels a recorded acceptance row that turns out to be wrong
      ... The row is bound to evidence and goes through normal review, and the affected page becomes
@@ -168,7 +169,7 @@ the batching procedure allows.
      AEGIS-APR-117 and re-record through an eligible keeper under AEGIS-APR-101. Section 11 records
      that this route has since been exercised: an eligible keeper who is not this reader has
      recorded withdrawal rows for these eight and fresh rows for the six FULL pages in sibling
-     PR #797 at head `c856cffd` (measured 2026-10-15), deliberately leaving the two PARTIAL pages
+     PR #781 at head `bfcf402a` (merged 2026-10-15T22:50:57Z), deliberately leaving the two PARTIAL pages
      with no row.
    - **One claim this removes.** The earlier draft asserted "the pages' authors are other agents".
      No artifact establishes agent-level authorship of any of the eight pages (section 11, Codex
@@ -504,7 +505,7 @@ the declared revision for `| K-082 |` through `| K-089 |` returns no match for a
 the keeper table's last row at that revision is `K-081`, so the eight identifiers were the next
 free ones in string order and no duplicate was created at the base. **This change no longer claims
 them**: the rows are withheld (section 3 deviation 1). For the record, the ids an eligible keeper
-has since recorded for these pages in sibling PR #797 at head `c856cffd` are
+has since recorded for these pages in the merged PR #781 at head `bfcf402a` are
 K-297/K-298/K-301…K-304 for the six FULL pages, with K-299/K-300 deliberately left unused for the
 two PARTIAL pages (section 11). The four lanes append against the same base in parallel; the merge
 holder renumbers or serializes colliding rows across lanes.
@@ -516,7 +517,7 @@ holder renumbers or serializes colliding rows across lanes.
    recording. Owner for any future recording: an eligible keeper who is neither the page's author
    nor its accepting reviewer, under AEGIS-APR-101; a recorded row that later proves wrong is
    cancelled by an appended withdrawal row under AEGIS-APR-117, which never creates an acceptance.
-   Sibling PR #797 at head `c856cffd` has already recorded withdrawals for these eight ids and
+   Merged PR #781 at head `bfcf402a` has already recorded withdrawals for these eight ids and
    fresh rows for the six FULL pages (K-297/K-298/K-301…K-304), leaving K-299/K-300 unused for the
    two PARTIAL pages.
 2. **The two PARTIAL pages stay PENDING and owe either a page repair or a re-record as partial
@@ -550,7 +551,7 @@ holder renumbers or serializes colliding rows across lanes.
   next eight **UNREAD** pages of lane C — the first eight lane C pages that carry no recorded
   acceptance and are not already carried by an in-flight lane C batch. Measured at this base
   (2026-10-15): lane C indices 296-303 are this batch, indices 304-335 are the sibling batches
-  (PRs #779, #783/#774, #790, #797), so the next eight unread pages are indices **336-343**, named
+  (PRs #779, #783, #790, #797), so the next eight unread pages are indices **336-343**, named
   by path —
   `.claude/skills/tenant-isolation-reviewer/references/isolation-surface-checklist.md`,
   `.claude/skills/tenant-modeler/SKILL.md`,
@@ -614,7 +615,7 @@ aa88923f2517ebf2b0b3b56c3891fabe53d20b4c`** (the head this repair supersedes), `
 
 | Thread | Sev | Finding (abridged) | Disposition at the new head |
 | --- | --- | --- | --- |
-| r4286898432 | P1 | withhold K-082…K-089 until an eligible keeper records them; the register permits no waiver | **Accepted, applied.** The eight rows are withheld: the ledger is byte-unchanged and `build_index.py` at this head reports the base's own 101/81/10/68 (11.7), so no rebuild can read them. **Authority analysis:** AEGIS-APR-101 (register L3149-3159) requires a keeper who is not the page's author or accepting reviewer, forbids self-review and permits no waiver — the line Codex cites (L3155-3157) is that scope, and the delivery grant at L3090-3128 says in terms that it does not waive the independent-review requirement. **AEGIS-APR-117 (register L5038-5042) is WITHDRAWAL-ONLY**: it appends a withdrawal row that cancels a *recorded* acceptance and returns the page to pending; it never creates an acceptance, so it is **not** authority to append fresh rows. Appending is AEGIS-APR-101, by an eligible keeper. The route back is therefore: withdraw under APR-117, re-record under APR-101 — and sibling PR #797 at head `c856cffd` has already recorded withdrawals for these eight ids and fresh rows for the six FULL pages (K-297/K-298/K-301…K-304). |
+| r4286898432 | P1 | withhold K-082…K-089 until an eligible keeper records them; the register permits no waiver | **Accepted, applied.** The eight rows are withheld: the ledger is byte-unchanged and `build_index.py` at this head reports the base's own 101/81/10/68 (11.7), so no rebuild can read them. **Authority analysis:** AEGIS-APR-101 (register L3149-3159) requires a keeper who is not the page's author or accepting reviewer, forbids self-review and permits no waiver — the line Codex cites (L3155-3157) is that scope, and the delivery grant at L3090-3128 says in terms that it does not waive the independent-review requirement. **AEGIS-APR-117 (register L5038-5042) is WITHDRAWAL-ONLY**: it appends a withdrawal row that cancels a *recorded* acceptance and returns the page to pending; it never creates an acceptance, so it is **not** authority to append fresh rows. Appending is AEGIS-APR-101, by an eligible keeper. The route back is therefore: withdraw under APR-117, re-record under APR-101 — and merged PR #781 at head `bfcf402a` has already recorded withdrawals for these eight ids and fresh rows for the six FULL pages (K-297/K-298/K-301…K-304), signed to the keeper `deepseek-v4-pro-apr117-keeper`. |
 | r4286898444 | P1 | do not accept pages with known checklist gaps (K-084/K-085) | **Accepted, applied; the Stage D audit concurred independently.** C1-3 and C1-4 are PARTIAL in every place (section 3 table, sections 4.3 and 4.4, section 7, section 9), take no acceptance row of any kind and stay PENDING; the rule is stated in section 3.1. The keeper band leaves K-299/K-300 unused for them. |
 | r4286898457 | P1 | prove the reader did not author the accepted pages | **Accepted as an evidenced limit — the check is NOT performable with the artifacts that exist.** `git log -1 --format="%an <%ae>" <head> -- <page>` per page returns only the shared publishing identities (`petern@carrotanddaikon.com` for C1-1, C1-2, C1-4, C1-5, C1-6 and C1-8; `263130032+ModernNomad-98@users.noreply.github.com` for C1-3 and C1-7) and cannot establish agent-level authorship. The record's earlier assertion that "the pages' authors are other agents" is removed (section 3 deviation 1), and this round records the check as unperformable rather than claiming it passed. |
 | r4286898465 | P2 | the nonexistent `code-review` artifact claim | **Verified true; corrected.** Section 4.4's navigation bullet no longer lists `code-review` among existing skills: `git cat-file -e e2a3e20b:.claude/skills/code-review/SKILL.md` fails, `.claude/skills/code-reviewer/SKILL.md` exists, and `code-review` is a reserved bundled name (used by the page and by `scripts/validate-skills.py`). The row-4 sweep of 25 backtick-named skills with 0 missing is unaffected once `code-review` is not counted as a shipped skill. |
@@ -699,15 +700,22 @@ body is **2** (measured this round), so the "0 edits + no reproduction ⇒ never
 accounts for how it was produced. (A body with 0 edits and no reproduction would be the
 never-true class.)
 
-**After the repair:** the body republishes the recomputed value for its post-repair bytes —
-**`0c68bdd68a75dcab`** (16 hex, counted by hand in two groups of eight: `0c68bdd6 8a75dcab`). The
-first posting of the repaired body stated `58f9c49557487336`; that body's skills field carried its
-five `Row source` records after an intervening paragraph, which `scripts/ci/check_pr_body_skills.py`
-rejects (it associates only the records consecutive to the table), so the field was reordered and the
-digest moved to `0c68bdd68a75dcab`. The correction is carried by the third commit (11.8). **What the movement
-voids:** the body's own sentence that any later edit to a bound field voids a verdict naming the old
-figure — so the Stage C placeholder `c34e4d0057b09a3f` is void, and any Stage F verdict that named
-it must be re-run against the new value; the merge agent records the final value at merge.
+**After the Stage C repair round of 2026-10-16 (the frozen plan's section 13, C-1 and C-2):** the
+body as posted republishes the recomputed value for its own posted bytes —
+**`283d9ad6647090cb`** (16 hex, counted by hand in two groups of eight: `283d9ad6 647090cb`). C-2
+completed the truncated skills bound field and is the only one of this round's body edits that lies
+inside a bound field — the witness and security payloads are byte-unchanged — so the digest moved
+from `0c68bdd68a75dcab` to `283d9ad6647090cb` for that reason alone. The two earlier figures are
+superseded as this body's current value, and neither is republished as such: `58f9c49557487336`
+(the first posting of the repaired body, whose skills field carried its five `Row source` records
+after an intervening paragraph, which `scripts/ci/check_pr_body_skills.py` rejects, so the field was
+reordered) and `0c68bdd68a75dcab` (the value this record republished before the Stage C round, which
+the body's captured-plan sections still name, correctly, as the value recomputed before and after
+those capture edits). **What the movement voids:** the
+body's own sentence that any later edit to a bound field voids a verdict naming the old figure — so
+the Stage C placeholder `c34e4d0057b09a3f` and the value `0c68bdd68a75dcab` are void, and any Stage F
+verdict that named either must be re-run against the new value; the merge agent records the final
+value at merge.
 
 **This record's own footer digest.** Before the repair:
 `60e418c2031077cd2b8e2db5d4282b19850976661b1c9baf4a888dc67fe2fc4e`, 64 hex characters (counted
@@ -743,9 +751,10 @@ Re-derived at the bound revision: 586 `no_recorded_acceptance` + 4 `provably_pen
 pending paths; quarters **148/148/148/146**; lane C = sorted indices **296-443**, first
 `.claude/skills/skill-deprecation-planner/SKILL.md`, last
 `docs/evidence/documentation/full-page-readability-batch-after-231-2026-09-24.md`. This batch is
-indices 296-303; indices 304-335 are carried by the sibling lane C batches (PRs #779, #783/#774,
-#790, #797), none of whose rows is on `origin/main` yet (checked: no lane C sibling page has a
-ledger row at `50241ba5`). The next eight **unread** pages are therefore indices **336-343**, and
+indices 296-303; indices 304-335 are carried by the sibling lane C batch records (PRs #779, #783,
+#790, #797), whose batch records author no keeper rows at all. The lane C withdrawal rows
+K-281W..K-288W and the fresh rows K-297/K-298/K-301..K-304 are already on `origin/main` through
+the merged PR #781, whose head `bfcf402a` is an ancestor of `50241ba5`. The next eight **unread** pages are therefore indices **336-343**, and
 section 8 names all eight by path. The earlier rule — "the next 8 paths of lane C's sorted range
 (paths 9-16 of 148)" — was index arithmetic and is replaced.
 
@@ -780,18 +789,21 @@ section 8 names all eight by path. The earlier rule — "the next 8 paths of lan
 
 The test is **only the commits this branch introduces** — never "no such commit is reachable from
 the head", which is unsatisfiable because the head contains main's history. This branch introduces
-**4** commits (`git rev-list --count e2a3e20b..HEAD` = 4): `aa88923f2517ebf2b0b3b56c3891fabe53d20b4c` (the
+**5** commits (`git rev-list --count e2a3e20b..HEAD` = 5): `aa88923f2517ebf2b0b3b56c3891fabe53d20b4c` (the
 original read commit), `9c9b13ded93db0667f42e5088cf1046db339c851` (the repair commit, which withholds the
 rows and re-marks the two pages), `6b80493da508037aa3f12b9bea73bbbdd4f6ca1c` (a dated correction commit that
 kept this record's reference to the body's bound-field digest in step with the body as posted — its
 skills field had to place the `Row source` records immediately after the skills table, which moved the
 digest — and stated the commit count as three) and **the erratum commit that carries this sentence**,
 which corrects the two counts that correction got wrong: the correction commit's changed-line
-count, and the commit count itself (now four). The repair commit's message is **not** amended: it is
-published history, and these dated notes are the repository's prescribed correction. Both are authored and committed by `ModernNomad-98
-<263130032+ModernNomad-98@users.noreply.github.com>` (the repair commit under the host config identity `Peter
-Nguyen`, the same address), and **0** occurrences of the stale placeholder identity
-`reviewer@example.invalid` appear in either raw commit object.
+count, and the commit count it restated. **A fifth commit — the Stage C repair commit that carries
+this note — applies the frozen plan's section 13 (C-5, C-6, C-7 and C-8), recomputes this file's
+footer digest and brings 11.4's bound-field-digest sentence into step with the body as posted; the
+count this branch introduces is therefore now five.** The repair commit's message is **not** amended: it is
+published history, and these dated notes are the repository's prescribed correction. All five are authored and committed under the one address
+`263130032+ModernNomad-98@users.noreply.github.com` — four as `Peter Nguyen` and one (the original
+read commit) as `ModernNomad-98`, and **0** occurrences of the stale placeholder identity
+`reviewer@example.invalid` appear in any of the five raw commit objects.
 
 ### 11.9 Codex availability and CI
 
@@ -813,7 +825,7 @@ at the new head is read from the newest run there and carried in the PR body's C
   (deepseek-v4-pro); no artifact binds an agent to a model.
 - **Whether the reads occurred.** No repository artifact can evidence a reading act; only that
   nothing contradicts it (blob line counts, byte lengths under the display cap, recorded ranges).
-- **Whether sibling PRs #779, #783/#774, #790 and #797 merge.** Their rows are unmerged; section 8's
+- **Whether sibling PRs #779, #783, #790 and #797 merge.** Their rows are unmerged; section 8's
   frontier and 11.1's re-recording note describe those PR heads as measured, not as merged state.
 - **The lane's own venv run** quoted in section 5 row 6 — that venv is not in the repository.
 - **The CI state at this head at the moment these bytes were committed** — the push creates it; the
@@ -832,7 +844,7 @@ by **DeepSeek (deepseek-v4-pro)** (header).
 
 ## Footer
 
-sha256: 0600213f67f9ad6c700d544bfaff7c8f200a60da61b0b24968de9c2b3b44f26b
+sha256: 2342431b8089c4cda4144a232ff1607812968fa26333f7409328b262a833a4e5
 
 This digest covers every byte of this file strictly above the last `## Footer` heading — the whole
 batch record through the closing `---` rule line and its terminating newline, encoded UTF-8 with LF
