@@ -12,8 +12,18 @@ captured-revision rule of [the delivery workflow](../delivery-workflow.md) L611�
 `BASE` = the commit `f490c16f9ed23f3d489e42f7696323bffcce6fd3`, which is the PR's merge base and
 the acceptance (bound) revision. `HEAD` = the commit `fdbcddcee0496ce17f69cd127f8613e54e410490`,
 PR #790's head. `PLAN` = this file, `docs/plans/readability-lane-c-batch-4-plan-2026-10-16.md`.
-`CAPTURE` = the commit that first adds this file to the repository, named with its full 40-character
-ID in section 9.3 and in the PR body. `LEDGER` = the path
+`CAPTURE` = the **commit that carries the revision under audit** — the commit whose tree holds the
+exact plan bytes an audit is reading; for any revision it is that revision's capturing commit (the
+commit that put those bytes into the repository), that is, the side branch's commit for that
+revision. The definition is chosen deliberately: **a criterion must be decidable at the revision it
+is audited at.** It is **not** the commit that first added this file,
+`bfd975d83d9dff5c9c13a794dcc06807901469fb` → blob `f71c38a73389c75ee605b9dc11675de3948565a3`, which
+is **superseded**: an equality between the audited bytes and that revision's bytes cannot come out
+true after any re-capture. The capturing commit this text itself supersedes is
+`847124d241b99a1e43e29a0d4b3b6cc50d6ced41` → blob `1538f17bcde7de1e741b4107b5feaca486d30876`, and
+section 9.3 names the whole chain. The revision under audit's own capturing commit and blob ID
+cannot appear in this file — writing them here would change the hash they name — so they are
+published in the PR body and in the fresh capture comment. `LEDGER` = the path
 `docs/roadmaps/aegis-documentation-readability-backlog.md`. `PAGE` = whichever one of the eight
 batch pages a command is being run against. Every command below is written with these three words in
 backticks so it can be read and re-run without an unfilled placeholder anywhere in this text.
@@ -154,8 +164,8 @@ of this file.
 | AC7 | The record's own reproducibility claim holds: its 17 measurement rows reproduce under its stated method. | the measurement in section 9 (E8) | all 17 rows reproduce exactly |
 | AC8 | The record's footer digest covers what the footer says it covers. | sha256 over bytes 0–90200 inclusive of the record's blob | `040ddd6afafeb154ea169ee3f6dfa4b8a94fed61cab6b0bf333ff3c377f10bc4` over 90,201 bytes, lines 1–955 |
 | AC9 | The change adds no ledger line and no keeper row. | `git diff --name-status BASE HEAD -- docs/roadmaps/aegis-documentation-readability-backlog.md` and a grep for `K-` over the added record | no output from the diff; **0** `K-` tokens |
-| AC10 | The plan is a tracked file with an immutable revision, not a body section. | `git rev-parse CAPTURE:docs/plans/readability-lane-c-batch-4-plan-2026-10-16.md` and `git cat-file -t` on the result | the plan's blob ID, and the type `blob` |
-| AC11 | The plan's bytes on disk hash to the committed blob. | `git hash-object --no-filters -- docs/plans/readability-lane-c-batch-4-plan-2026-10-16.md` | equals `git rev-parse CAPTURE:docs/plans/readability-lane-c-batch-4-plan-2026-10-16.md` |
+| AC10 | The plan is a tracked file with an immutable revision, not a body section. | `git rev-parse CAPTURE:docs/plans/readability-lane-c-batch-4-plan-2026-10-16.md` and `git cat-file -t` on the result | **the plan's blob ID at `CAPTURE`** — the blob the revision under audit carries, never an earlier revision's — and the type `blob`; the same 40-hex value the PR body and the fresh capture comment publish for that revision |
+| AC11 | The plan's bytes on disk hash to the blob carried by the commit that carries the revision under audit. | `git hash-object --no-filters -- docs/plans/readability-lane-c-batch-4-plan-2026-10-16.md` | equals `git rev-parse CAPTURE:docs/plans/readability-lane-c-batch-4-plan-2026-10-16.md` — both commands read the same revision, so the equality holds at the revision under audit — and equals the blob ID the PR body and the fresh capture comment publish for it; it is **not** a comparison against the superseded first-capture blob `f71c38a7…` |
 | AC12 | The published comment holds the plan genuinely verbatim (section 9.3's declared method). | extract the fenced block between the plan's digest markers, then sha256 both it and the tracked file's bytes | the two sha256 values are equal, and the comment contains exactly one such block |
 | AC13 | PR #790's head did not move during this capture. | `git ls-remote origin refs/pull/790/head` and the PR's `head.sha` | `fdbcddcee0496ce17f69cd127f8613e54e410490` from both |
 | AC14 | The record was not touched by this capture. | `git rev-parse CAPTURE:docs/evidence/documentation/readability-lane-c-batch-4-2026-10-15.md` | `788f5b035ffe707181931380d01b00165f8d0304` — the same blob as at the PR head |
@@ -337,19 +347,37 @@ All commands were run in a fresh HTTPS clone
   over the file's raw bytes and confirmed by `git cat-file -t` as a `blob`. The blob ID and the
   capturing commit are published in **both** the PR body (appended, line-neutral) **and** one fresh
   immutable comment.
-- **Re-capture, and what it supersedes.** This is the **second** capture of this file on the same
-  side branch. It supersedes blob `f71c38a73389c75ee605b9dc11675de3948565a3` (38,358 bytes, **345**
-  lines) added by commit `bfd975d83d9dff5c9c13a794dcc06807901469fb`, the revision the first `SD-B`
-  read: that text named the ledger's blob wrongly in two places and overstated one `NV-1`
-  measurement, and this revision corrects those bytes only. The supersession is **not** an append —
-  the superseded blob is not a byte prefix of this one — so the change is shown to be confined to
-  the intended bytes by diffing the two blobs and naming every changed offset, in the PR body and
+- **Re-capture, and the capture count.** The revision the second `SD-B` audited carried the file's
+  **third** commit on the side branch; this is the **fourth**, so **three** revisions are superseded
+  and are named here in order. (1) The **first capture**:
+  `bfd975d83d9dff5c9c13a794dcc06807901469fb` → blob `f71c38a73389c75ee605b9dc11675de3948565a3`,
+  38,358 bytes / **345** lines — the revision the first `SD-B` read. (2) The **first re-capture**,
+  the **intermediate**: `eb3c73108755b5de3b37181cb38570b7b5550930` → blob
+  `1997b6f2b094f082fc2bb10f995576b16c64fb6f`, 40,918 bytes / 367 lines, the revision whose added code
+  spans were written as escaped backticks (**58** backslashes where revision 1 has **0**), published
+  in comment 6223748351 and removed by revision 3. (3) The **second re-capture**:
+  `847124d241b99a1e43e29a0d4b3b6cc50d6ced41` → blob `1538f17bcde7de1e741b4107b5feaca486d30876`,
+  40,860 bytes / 367 lines, **0** backslashes — the revision the second `SD-B` audited, which
+  returned `REVISE` on one criterion, and the revision this text supersedes. The text this replaces
+  called revision 3 "the **second** capture" and did not name revision 2 at all; the branch's own
+  history (`git log --oneline` over this path) and the PR body's own "first re-capture" / "second
+  pass" headings both make it the **third**, and revision 2 is named here with its defect. Every
+  superseded blob is `git cat-file -t` → `blob`; none is a byte prefix of this revision, so
+  confinement is shown by diffing the two blobs and naming every changed offset, in the PR body and
   in the fresh capture comment. This revision's blob ID and its capturing commit are published in
   both of those places; no earlier comment is edited and no pull request head is moved.
-- **Where `AC10` and `AC11` bind after a re-capture.** Both name `CAPTURE`, the commit that *first*
-  added this file. Run at `CAPTURE` those commands return the superseded blob named just above;
-  run at this re-captured revision they return this revision's blob. Each is `git cat-file -t` →
-  `blob`, and both results are named here rather than one silently replacing the other.
+- **Where `AC10` and `AC11` bind.** Both name `CAPTURE`, defined in the names block at the top of
+  this file as **the commit that carries the revision under audit** — not the commit that first
+  added this file. The old binding (`bfd975d8…` → blob `f71c38a7…`) is **superseded**: run at it,
+  the two commands compare the audited bytes against a revision two captures old, so the equality
+  cannot come out true after any re-capture. Under the definition both commands read the same
+  revision as the audit: `AC10` returns that revision's blob and `AC11`'s two values are equal at
+  it, and each is `git cat-file -t` → `blob`. This was the one bounded fix the second `SD-B`
+  required — the criterion is **rewritten**, not disclosed, because the delivery workflow's `L180`
+  accepts a criterion only as `MET` or as one declared not verifiable at Stage A with its reason,
+  and a stale literal that a re-capture created is neither. The superseded captures are named above;
+  the capturing commit of the revision under audit is published in the PR body and in the fresh
+  capture comment.
 - **Matching newline variant:** **LF** (`0x0A`) only, with **0** carriage returns, matching the
   repository's `.gitattributes` policy `* text=auto eol=lf`.
 - **Verbatim publication.** The comment embeds this file's bytes between two digest markers, inside a
