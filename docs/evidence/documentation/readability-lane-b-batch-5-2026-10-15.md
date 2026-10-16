@@ -7,8 +7,12 @@
 - **Self-audit correction, made after this branch's first push and disclosed rather than hidden.**
   The first commit of this record named a clock sample this session never took (a guessed 20:52); the
   header above now names the two samples it did take — 20:39:42 and 20:44:26, the latter at the pull
-  request's creation — and the footer digest below is recomputed over the corrected bytes. No
-  disposition, gap, page line, FULL/PARTIAL count, norm measurement, blob ID or per-page line/byte
+  request's creation — and the footer digest below is recomputed over the corrected bytes. A second
+  self-audit at 20:52 found two counted-not-guessed errors in section 8: the link-resolution item said
+  **13** relative links where the command returns **15**, and the record-link item said **four** where
+  this record carries **3**. Both are corrected by re-measurement in the same items, the footer digest
+  is recomputed again over the corrected bytes, and the pull-request body is updated to the new head.
+  No disposition, gap, page line, FULL/PARTIAL count, norm measurement, blob ID or per-page line/byte
   figure changed.
 
 - **Lane:** PHASE 4 RE-READ LANE B. *Phase 4 re-read* is the fourth phase of the documentation
@@ -644,7 +648,7 @@ material only in a separate eligible keeper's hands, under AEGIS-APR-101 and AEG
 4. **Norm measurement** — 656 files loaded and matched; `git status --porcelain --untracked-files=no`
    returned **empty** before the measurement, so the bytes measured are the base's bytes.
 5. **Link and file resolution over all eight pages** — every Markdown link target resolves at the
-   bound revision (13 relative links) and every claimed file exists; the two apparent failures on P5
+   bound revision (15 relative links, none of them external) and every claimed file exists; the two apparent failures on P5
    are the bare filenames discussed in its entry and are **not** path claims.
 6. **Cross-file claim checks** — `observability-operator` and `agent-authorization-matrix` carry
    `disable-model-invocation: true` (P2 and P6's `manual-only` marks are true);
@@ -663,7 +667,7 @@ material only in a separate eligible keeper's hands, under AEGIS-APR-101 and AEG
    `Signed-off-by: Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>`. Result quoted in
    the pull-request body.
 10. **Record link check** — `python -P scripts/check-markdown-links.py` over this new record, so the
-    record's own four relative links are proven to resolve rather than assumed. Result quoted in the
+    record's own three relative links are proven to resolve rather than assumed. Result quoted in the
     pull-request body.
 
 ## 9. What this batch could not verify (stated, not hidden)
@@ -690,11 +694,11 @@ material only in a separate eligible keeper's hands, under AEGIS-APR-101 and AEG
 
 ## Footer
 
-sha256: fc5a82ae84a3f9d104d99a3a9c6d90a42e9d8055158d2f69684b86afbd13fa33
+sha256: 5b5c499b3b914598717787efc600a6747de95981fb3757ca96025ed85056fb38
 
 This digest covers the batch record's bytes from the first line through the closing `---` rule line
-and its terminating newline, encoded UTF-8 with LF line endings: exactly 53,401 bytes, byte offsets
-0 through 53,400 inclusive, lines 1-689. It does not cover the blank
+and its terminating newline, encoded UTF-8 with LF line endings: exactly 53,845 bytes, byte offsets
+0 through 53,844 inclusive, lines 1-693. It does not cover the blank
 separator line between that rule and the `## Footer` heading, nor this footer. Any edit above the
 rule needs a fresh validation. The method was calibrated before it was trusted: applying it to lane A
 batch 5's committed record reproduces its published value
