@@ -210,7 +210,7 @@ why the fresh rows need identifiers that no ref has ever carried.
 | The committed index | **byte-identical at `BASE` and `HEAD`; 101 rows; `built_at_ref` `e6ed06a3f67b89710d9a0f200525c6b1131009e3`** | `git rev-parse` on both refs returns the same blob `eeda4929cca872d626eb2ca6ca21583586335d11`; parsing it gives 101 events, `table_rows` 101, 68 reader pages (E4) |
 | The eight read pages | **not modified** | no page appears in `git diff --name-status BASE HEAD` (E1) |
 | Code / workflow / script / test / config / data / lock paths | **0** | both changed paths are `.md` under `docs/`; no path under `scripts/`, `tools/`, `.github/` or `.claude/` appears (E1) |
-| Required checks at the head | **3 green, 3 skipped by design** | `gh api` check-runs at `HEAD`: `changes`, `validate-skills`, `gate-guard` all `success`; `tools-tests-linux`, `tools-tests-windows`, `windows-offline-checks` all `skipped` (E9) |
+| Required checks at the head | **3 green, 3 skipped by design** — the reading taken while planning, before publication | `gh api` check-runs at `HEAD`: `changes`, `validate-skills`, `gate-guard` all `success`; `tools-tests-linux`, `tools-tests-windows`, `windows-offline-checks` all `skipped` (E9). Publishing a capture re-triggers the `pull_request` workflows at this same head, so a **second** suite runs; at this head both suites settle 3 green and 3 skipped, which is why the head's check reading must be retaken after publication rather than assumed |
 | Mergeability | **MERGEABLE, blocked pending review** | the PR's `mergeable` is `true`, `mergeStateStatus` is `BLOCKED`, and branch protection requires `["gate-guard","validate-skills"]` plus 1 approving review (E9) |
 
 **The table is not truncated — the silent-stop trap is ruled out by measurement.** The builder's
@@ -354,7 +354,10 @@ The following are therefore declared now, not discovered later.
 4. **`NV-4` — hosted CI at a head that does not exist yet.** The required checks are readable at the
    current head and all three are green (E9), but any head created after this plan is written has no
    result yet. **Reason: it has not run.** Publishing this capture moves no head, so no check
-   re-runs on `HEAD`; a later revision of this plan that itself moves a head would owe a fresh
+   runs on a *new* head — but publishing **does** re-trigger the `pull_request` workflows against
+   the **same** head, and that re-triggered suite has no result until it settles. A reading of the
+   head's checks is therefore owed again *after* publication, and E9 states **both** readings
+   rather than one. A later revision of this plan that itself moves a head would owe a fresh
    reading.
 5. **`NV-5` — the merge itself.** AEGIS-APR-101's Scope FORBIDDEN bars the keeper from merging what
    it recorded, so the merge is another agent's act at another time. This plan can state the
@@ -495,7 +498,7 @@ blob's bytes were the object of the measurement.
 | E6 | the table is not truncated | `git show` of the ledger at both refs, walking from the sentinel and header to the last line | sentinel line **5,890**, header line **5,909** at both; lines 5,910-6,121 at `BASE` and 5,910-6,137 at `HEAD` **all** start with a pipe; no intervening non-row line |
 | E7 | the lexical property and the trap | string comparison of stable IDs | 8 of 8 pages: `K-n` < `K-nW` < `K-(n+8)`; `"K-204W" < "K-205"` **true**; `"K-205" < "K-205W"` **true**, so a fresh-suffixed withdrawal would win |
 | E8 | the two reviewer-cell populations | the parsed table at `HEAD`, grouped by row family | withdrawn rows: `readability-lane-b-implementer-c`; withdrawal rows and fresh rows: `deepseek-flash-apr117-keeper`; all sixteen bind `BOUND`; the withdrawn rows are byte-equal to their `BASE` rows |
-| E9 | checks, mergeability and identity | `gh api repos/ModernNomad-98/Project-Aegis/commits/HEAD/check-runs`; the PR's own JSON; `gh api repos/ModernNomad-98/Project-Aegis/branches/main/protection` | 6 runs: `changes`, `validate-skills`, `gate-guard` **success**; `tools-tests-linux`, `tools-tests-windows`, `windows-offline-checks` **skipped**; `mergeable: true`, `mergeStateStatus: BLOCKED`; required contexts `["gate-guard","validate-skills"]` with **1** required approving review |
+| E9 | checks, mergeability and identity — read **twice**, before and after publication | `gh api repos/ModernNomad-98/Project-Aegis/commits/HEAD/check-runs` at both moments; the PR's own JSON; `gh api repos/ModernNomad-98/Project-Aegis/branches/main/protection` | **before publication: 6 runs** — `changes`, `validate-skills`, `gate-guard` **success**, and `tools-tests-linux`, `tools-tests-windows`, `windows-offline-checks` **skipped**; **after publication: 12 runs in two six-run suites at the same head** — the same 3 success and the same 3 skipped in each, the three required jobs carrying run ids 117188302230, 117188302530 and 117188302591 in the first suite and 117199072664, 117199072927 and 117199072957 in the second, with **0** runs pending; `mergeable: true`, `mergeStateStatus: BLOCKED`; required contexts `["gate-guard","validate-skills"]` with **1** required approving review |
 | E10 | the ledger's own lane-B prose still leaves the disposition open | `git show HEAD:LEDGER` read at lines 5,464-5,476 | *"an eligible keeper performs both at merge, not by this lane. This lane states the deviation plainly and leaves the disposition to the merge holder."* |
 | E11 | the lane-D and lane-A precedent bands | the parsed table at `HEAD`, filtered to each band | lane D: `K-381W`..`K-388W`, `K-389`..`K-396`, `K-392W` — **no** `K-389W`..`K-397W`, **no** `K-397`..`K-404`; lane A: `K-106`..`K-113`, `K-106W`..`K-113W`, `K-114`..`K-121` present |
 | E12 | register line ranges | reading the register at `HEAD` | AEGIS-APR-101 at L3149-L3159 (Scope allowed L3155, Scope FORBIDDEN L3157); AEGIS-APR-117 at L5016-L5049 (Scope allowed L5038-L5042, Scope FORBIDDEN L5043-L5044); AEGIS-APR-100 at L3075-L3099 (Scope allowed L3092-L3099); AEGIS-APR-039 at L1003-L1026 |
@@ -558,7 +561,17 @@ blob's bytes were the object of the measurement.
   negative** accompanies the result, so the check is shown capable of failing.
 - **Zero stray backslashes, zero unsubstituted tokens.** The published comment and this plan are
   scanned for backslash characters and for unfilled template tokens; the count must be **0** (AC23).
-- **What this capture supersedes.** Nothing. This is the first capture of a plan for PR #800.
+- **What this capture supersedes.** The **first capture** of this plan: commit
+  `f0ffc27139920f010e719590386eb977a702089b` -> blob
+  `818ecc370d35745e55fbe84407f3104dd0492720`, **60,323** bytes / **567** lines, published in issue
+  comment **6224804664**, which is left unedited. Its two defects, measured rather than described:
+  (1) its `NV-4` stated that publishing would run no check against the head, and publishing in fact
+  **re-triggered** the `pull_request` workflows at the same head, producing a second six-run suite;
+  (2) its element-2 checks row consequently reported one suite without saying a second would run.
+  Both sentences are corrected in this revision and nothing else is changed. The superseded blob is
+  **not** a byte prefix of this one, so confinement is shown by naming every changed site rather
+  than by a prefix comparison; the sites are the `NV-4` sentence, the element-2 checks row and this
+  bullet.
 
 ---
 
