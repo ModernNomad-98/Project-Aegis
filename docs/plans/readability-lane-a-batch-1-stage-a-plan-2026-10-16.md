@@ -6,6 +6,16 @@ branch, the capturing commit and **this file's blob SHA of the captured revision
 PR #771 body, together with the id of a fresh issue comment on that PR carrying the same text
 verbatim (a file cannot contain its own content hash).
 
+**Revision 2 (2026-10-16) supersedes revision 1 of this plan.** Revision 1 is blob
+`ea048399f14dd13ed91c13ab6d1123dabe9c774b` (58,466 bytes, 727 lines) at capturing commit
+`462d786bf8803d5794c21a6cb0486ff03f5829d8`, held as issue comment `6213972798`; it stays immutable and
+**Stage B must bind revision 2, not revision 1.** Revision 2 corrects one wrong line cite revision 1
+carried (the appended lane-A ledger section is **L5114-L5237** plus the single blank insertion line at
+L5238, not "L5114-L5253"), restates criterion 6 so that it claims only what was measured, and adds
+**N9** for the one check it does not reproduce. Every other figure in revision 1 was re-checked and
+stands unchanged; the head and acceptance revisions, the criteria set, the routing dispositions and §14
+are unchanged.
+
 - **Planner:** DeepSeek-4.1-Flash (`deepseek-flash`), **Stage A only**. This planner is **not** the
   auditor of this plan and holds **no** Stage B, D, E, F or G on this change; it authored no keeper
   row, edited no file of the PR's diff, moved no head, and merged nothing.
@@ -143,7 +153,7 @@ revision `e2a3e20b` by `git cat-file -s` / newline count / `git rev-parse`:**
 | Path | Status | At head | In the diff, `base..head` |
 | --- | --- | --- | --- |
 | `docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md` | new | blob `1c8ba69f…`, 45,835 bytes, 556 lines | `556 0` |
-| `docs/roadmaps/aegis-documentation-readability-backlog.md` | modified | blob `12c7c08c…`, 498,478 bytes, 5,369 lines | `133 0` (the lane-A section inserted at L5114 and rows K-082..K-089 appended at L5361-5368) |
+| `docs/roadmaps/aegis-documentation-readability-backlog.md` | modified | blob `12c7c08c…`, 498,478 bytes, 5,369 lines | `133 0` — the lane-A section inserted at **L5114-L5237** (with its single trailing blank insertion line at L5238) and rows K-082..K-089 appended at **L5361-L5368** |
 
 **Not touched — named so that it is not implicit.** This PR's diff contains **no** page text
 correction; **no** change to any of the eight read pages under `.claude/`; **no** change to
@@ -279,7 +289,7 @@ any page for them.
 | 3 | All eight pages are named **by path**, bound to the full 40-character acceptance revision, each with a disposition, and the six acceptance bullets are addressed per page. | the record's own bytes; `git rev-parse` / `git cat-file -s` per page | **yes** — measured: 8/8 paths, 8/8 blob SHAs and line/byte counts reproduce ▼ |
 | 4 | The eight pages are **untouched** by the diff (the bytes read are the bytes merged), so no acceptance is voided by the merge of this head. | the two-path file list (§3) against the eight page paths | **yes** — measured: intersection is empty |
 | 5 | The C-1 screen is stated with **measured prevalence for every term the record's gap list turns on** and applied: **YAML 32, API 204, MCP 28** of 653 — all at/above the threshold, so none may make P8 fail; no criterion in this plan treats them as gaps. | §5.1 (commands and numbers, re-runnable) | **yes** — measured in this plan's own run |
-| 6 | **No page recorded PARTIAL carries an acceptance row, and no page recorded PARTIAL deserves its row** (the both-directions rule): at this head the record records **zero** partial pages among the eight and `check_index.py --path` reports each of the eight `full-page-acceptance`, `changed_lines 0`. | `build_index.py --report --ref <head>`; `check_index.py --json --path <page> --ref <head>` × 8 | **yes** — measured: `full_page_acceptances 89`, and all eight report an acceptance with 0 changed lines |
+| 6 | **No page recorded PARTIAL carries an acceptance row, and no page recorded PARTIAL deserves its row** (the both-directions rule): the record's own disposition table (L120-127) has **8 rows, all `**accepted**`, zero partial** — the only two `**partial**` strings in the record (L425, L426) sit inside section 9's *Before:* quotation of the text that pass superseded — and the ledger at this head holds exactly **8 rows for the eight paths, all `full-page-acceptance`, all bound to `e2a3e20b…`**, so no acceptance row exists for a page recorded partial. | the record's own bytes (rows counted by verdict); `git grep '^\| K-08[2-9] \|'` over the ledger at the head | **yes** — measured: 8/8 accepted dispositions; 8/8 ledger rows `full-page-acceptance` on the acceptance revision. **The index-level form of this check** (rebuild with `build_index.py --write`, then `check_index.py --path` per page, as the PR body's validation row 20 states it) is **not** reproduced by this planner — declared **N9**; the read-only `--report` form is criterion 7 |
 | 7 | The record's own appended evidence is machine-visible: the ledger's consolidated table holds **109** data rows, **0** malformed, **0** duplicate IDs, and the builder reports `table_rows 109, events 109, full_page_acceptances 89, lost_commit_events 10, reader_pages_with_rows 76` at this head. | `build_index.py --report --ref 0bd37e4d` in a clone holding `refs/pull/**` and `refs/remotes/**` | **yes** — measured exactly |
 | 8 | Every load-bearing figure in the record that this plan re-derived **reproduces**: the eight line/byte counts, the eight blob SHAs, the instrument's eight summary figures, the pending union 590, the quarters 148/148/148/146. | §1 rows 13-16; §7 derivation | **yes** — measured |
 | 9 | The diff-scope count the record publishes **matches the head it publishes it at**: `base..head` is **689 added / 0 deleted** (the record says 445 — see §14.1, a Stage C correction). | `git diff --numstat` at the head; §14.1 | **no at this head** — the record's bytes say 445; declared **N1** in §6 and bound in §14.1 |
@@ -331,6 +341,14 @@ a disposition on this PR; each is excluded from §5.2's passing set.
   (`38413563…`); reconciling the appended rows with `main`'s is the merge holder's step. Reason: a
   rebase or a merge would move the head and void every head-bound verdict, so this plan does not
   perform it and cannot decide it.
+- **N9 — the index-level both-directions check as the PR body's validation row 20 states it**
+  (`build_index.py --write --ref HEAD` followed by `check_index.py --json --path <each of the eight>`,
+  "all eight pages ACCEPTED, event_kind full-page-acceptance, changed_lines 0", with the two generated
+  JSON files then restored byte-identically). Reason: it requires writing the generated index into a
+  working tree; this planner ran only the read-only `--report` form and does not reproduce a
+  write-then-restore inside a capture run. **Decidable now:** both directions at the record and ledger
+  level (criterion 6) and the report's counts (criterion 7); the write-based form is Stage D/E's to
+  reproduce.
 
 ## 7. The next-batch selection rule, stated by content, and how its frontier is derived (element 6)
 
@@ -510,7 +528,7 @@ list**, which cannot distinguish agents.
 | --- | --- |
 | The eight dispositions, their six-bullet judgements, the purpose/normal-use restatements and the eight verbatim row-quote strings | `docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md` at head `0bd37e4d` (blob `1c8ba69f…`, 556 lines) |
 | The eight keeper rows K-082..K-089 (full-page-acceptance, bound to `e2a3e20b…` with the page's blob SHA in the row) | `docs/roadmaps/aegis-documentation-readability-backlog.md` L5361-5368 at head (blob `12c7c08c…`) |
-| The lane-A section: derivation, keeper-independence defect and routing, count honesty, self-cost, next-batch rule | same ledger, L5114-L5253 |
+| The lane-A section: derivation, keeper-independence defect and routing, count honesty, self-cost, next-batch rule | same ledger, **L5114-L5237** (the insertion carries one trailing blank line at L5238) |
 | The pages' bytes at the acceptance revision and their blob SHAs / line / byte counts | the git objects at `e2a3e20b…` (§2's table, re-measurable by command) |
 | The instrument's counts (`653 / 57 / 4 / 586 / 6 / 596`), the 590-path pending set and the 148-path lane-A quarter | `check_index.py --json --ref e2a3e20b…`; recorded in the record's §1 |
 | The C-1 prevalence screen | §5.1 of this file — commands and per-term numbers, re-runnable |
@@ -540,7 +558,7 @@ content hash; §13 states the binding and what voids it.
    (Stage G, a separate holder; the head is frozen by this plan's binding).
 7. **It does not hold or post Stage B, D, E, F or G** on this change, and it states no verdict on the
    implementation that already exists at this head.
-8. **It does not re-derive** the items declared not verifiable in §6 (N1-N8).
+8. **It does not re-derive** the items declared not verifiable in §6 (N1-N9).
 9. **It does not perform Stage C.** The corrections of §14 are the implementation stage's to commit —
    this planner holds Stage A only, and applying them would move the head deliberately and visibly at
    Stage C rather than as a side effect of the plan's own capture. **Applying §14 will move the head**;
@@ -575,6 +593,8 @@ worktree was created; `git config user.name` was read **first** and is `Peter Ng
 | `check_index.py --json --ref e2a3e20b` | `653 / 57 / 4 / 586 / 0 / 0 / 6 / 596`; pending 590; quarters 148/148/148/146 |
 | `build_index.py --report --ref 0bd37e4d` (full clone) | `109 / 109 / 89 / 10 / 76` |
 | Ledger table scan | 109 data rows (K 89 + L 10 + T 10), 0 malformed, 0 duplicate IDs |
+| Record's disposition table / ledger rows for the eight paths | 8/8 `**accepted**`, 0 partial; 8/8 ledger rows `full-page-acceptance` bound to `e2a3e20b…` |
+| The appended lane-A ledger section's extent | L5114-L5237 + one blank insertion line at L5238 (124 section lines + 1 blank + 8 rows = the diff's 133 added lines) |
 | The eight pages at the base | 8/8 blob SHAs, line counts and byte counts reproduce the record's and the body's figures |
 | Term prevalence (§5.1) | 21 terms measured over the same 653 pages; `API` 204, `YAML` 32, `MCP` 28 — the record's own figures reproduce exactly |
 | R2 derivation (§7) | pending 590 → lane A 148 → read set 40 pages at indices 0..39 contiguous → first eight unread at 40..47; the record's list is at 8..15 (batch 2's pages) |
@@ -582,12 +602,14 @@ worktree was created; `git config user.name` was read **first** and is `Peter Ng
 | Check runs / workflow runs at the head | 0 / 0 |
 | Naming check | `C-1`/`C-3`/`C-4` are not rulings anywhere on `main`; `page-resolves-it` is absent from `main`; the ledger on `main` carries none of the labels |
 
-**Could not verify (stated, not waved through):** N1-N8 of §6 — in particular the record's corrected
+**Could not verify (stated, not waved through):** N1-N9 of §6 — in particular the record's corrected
 diff-scope bytes and next-batch list (a Stage C commit's to make, so they do not exist at this head),
 the body's corrected validation rows, the reading act, the model attributions, PR #781's patch in
 full, the four non-GitHub CI suites and the Codex comment bodies. `build_index.py` refuses to run
 without `refs/pull/**` and `refs/remotes/**` in the clone (measured: it raised `BuildError` before
 those refs were fetched) — the clone used here fetched both, which is why its report could be run.
+Also not reproduced by this planner: **N9** — the index-level both-directions check that the PR body's
+validation row 20 states, which requires a `--write` rebuild in a working tree.
 
 ## 13. This plan's own revision and how it is captured
 
