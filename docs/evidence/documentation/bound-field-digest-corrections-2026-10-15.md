@@ -811,3 +811,26 @@ fix, and only for a count that contradicted the table those comments themselves 
   anchors §3 names, which are unchanged for #780 and #785.
 - **Codex.** PR #793 has no Codex review to triage: its review did not run (usage limit,
   issue comment 6206352377). Recorded as unavailable, never as clean.
+
+### 10.9 A figure in §10.7 is corrected here — the same defect class, inside this record's own text
+
+**§10.7's parenthetical is imprecise.** It reports "`--numstat` reports `160  85` for that
+step" while naming the range `ab8a8c06…HEAD`. Measured directly:
+
+| Range | `git diff --numstat` |
+| --- | --- |
+| `ab8a8c0667fd1bcf1ce6644af84d3bcf95aa040e..47b64a3afc9117d969e1687b1f3f9084591c5d0b` — the first correction commit alone | `160  85` |
+| `ab8a8c0667fd1bcf1ce6644af84d3bcf95aa040e..d436bb613fcf44dc13384bb689b15cbe6cde5a5d` — the range up to the commit that appended section 10 | `387  85` |
+
+**The deletion count is 85 in both ranges**, because the section-10 commit added lines and
+deleted none; only the addition count differs. So the number §10.7 relies on — **85 deleted
+lines** — is right and is confirmed by both ranges, while the pair printed beside it
+belongs to the **first** range alone.
+
+**This is the defect class this whole record is about, found once more inside the record's
+own text**, one section after stating the lesson. It is recorded here rather than quietly
+overwritten, for the same reason as everything in §10.1: a corrected figure must be visible
+as a correction, or the next reader cannot tell a repair from a drift. **Note the shape** —
+the number that was wrong was a *supporting* figure quoted beside a *correct* total, which
+is exactly how #780's and #785's published values were misjudged: the artifact was fine and
+the reading of it was not.
