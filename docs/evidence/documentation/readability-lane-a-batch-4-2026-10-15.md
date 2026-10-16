@@ -622,7 +622,7 @@ pure-docs path (L404–416), and routes a non-affirmative disposition back rathe
 point is accepted: a plan audit performed later cannot retroactively satisfy the Stage C entry
 condition. **No Stage B verdict is posted on this PR** (PR #789's issue comments are the Codex
 summary and the Stage D verdict, and its only review is Codex's), so this item's Stage C entry
-condition is **unmet**. This Stage C repair cannot self-issue the audit — no agent performs two
+condition is **unmet**. **(Dated correction, 2026-10-16 - SD-B (the independent plan audit: the stage that reviews the plan before implementation begins) has posted three verdicts on this PR, each verified with `gh api repos/ModernNomad-98/Project-Aegis/issues/comments/<id>`: `6211547391` (SD-B: REVISE, 2026-10-16T08:37:37Z), `6212640376` (SD-B: ACCEPT, 2026-10-16T09:38:47Z) and `6218833659` (SD-B: REVISE, 2026-10-16T15:28:08Z). The parenthetical above was therefore false when it was committed and is false at this head; the latest of the three is a REVISE, so the conclusion this item draws is unchanged and still holds. The historical sentence is corrected in place, never deleted.)** This Stage C repair cannot self-issue the audit — no agent performs two
 stages — so the required step is an **independent Stage B ACCEPT bound to the captured plan
 revision**, posted before merge; until it is posted this PR **must not merge**. This is a recorded,
 unresolved gate, not a waiver.
