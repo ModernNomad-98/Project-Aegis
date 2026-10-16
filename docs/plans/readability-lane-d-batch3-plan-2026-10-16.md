@@ -1,6 +1,8 @@
-# Stage A plan — Phase 4 readability lane D, batch 3 (PR #784) — revision 2
+# Stage A plan — Phase 4 readability lane D, batch 3 (PR #784) — revision 3
 
-**Plan revision 2**, 2026-10-16 — it corrects plan revision 1 (§11). **Stage: A (PLAN).** **Role A**
+**Plan revision 3**, 2026-10-16 — it re-captures plan revision 2 because a Stage C repair moved the
+head and made two of revision 2's own criteria false; it also carries revision 1's corrections
+(§11). **Stage: A (PLAN).** **Role A**
 is this repository, the Project Aegis source library (Role B is a consumer or product repository that
 copied the Aegis files).
 **Planner:** agent `readability-phase4-lane-d-planner-a1`, model **DeepSeek-4.1-Flash
@@ -42,8 +44,8 @@ batch 3, recorded as evidence only.
 
 - `docs/evidence/documentation/readability-phase4-lane-d-batch3-2026-10-15.md` — **one new file**, the
   lane's tracked batch record (the primary artifact). At the head it is blob
-  `af7a8502d2aed730da9befd45920fd0a08b9f06a`, 449 lines, 38,937 bytes,
-  sha256 `705ebf145372c5f8653e690a59a67a1abb6245e7d0095602cd385fb204587fae`.
+  `cc460c0cd9fae1846046df65ffc36c6c5efe6157`, 446 lines, 38,937 bytes,
+  sha256 `6f02d168d47482bbad80dfbe71445052eec5ad0bc53bd06af0640ab6358c6c1a`.
 
 **In scope, by path (the eight pages the record dispositions — read, never edited):**
 
@@ -64,13 +66,19 @@ the no-rewrite discipline forbids it). No keeper row, no ledger edit. No index r
 range, no merge, no rebase, no head move.
 
 **The revision this plan is written against.** The head is
-`1aa632f7e66a865c5206b6361d8ebf5121208e64` (40 hex, re-derived here — see §11). **The dispatch that
-requested this plan named `1aa632f7e66a865c5206b6361d8ebf512120e8c4`; that 40-hex object does not
+`87c637dfb9dd646965d2dc43fff08887160c35f8` (40 hex, re-derived here — see §11). **The dispatch that
+requested revision 1 named `1aa632f7e66a865c5206b6361d8ebf512120e8c4`; that 40-hex object does not
 exist in the repository** (`git cat-file -t` fails; `git ls-tree` answers "not a tree object"). The
 two strings differ only in the last three bytes, transposed (`…1208e64` is real; `…120e8c4` is not).
-Both the API field `head.sha` and `git rev-parse refs/pull/784/head` return `…1208e64`. **The head has
-not moved**: it is the first head `99d46d752357c6cb127274944ce2ac2ff0b9b78e` plus repair commit
-`1aa632f7…`, two commits, exactly the revision the posted SD-B audited (issue comment `6211504777`).
+The API field `head.sha`, `git rev-parse refs/pull/784/head` and `refs/remotes/pr/784/head` all
+return `87c637df…` at this capture. **The head HAS moved since revision 2**, and that move is the
+whole reason for this revision: `87c637df…` is the first head
+`99d46d752357c6cb127274944ce2ac2ff0b9b78e` plus repair commit `1aa632f7…` (repair round 1) plus
+repair commit `87c637df…` (repair round 2, Stage C's fix of SD-E's rendering FAIL) — **three
+commits**, one more than the two revision 2 was written against. Revision 2's AC-15 asserted the head
+was still `1aa632f7…`; it is not. Revision 2's AC-1 asserted `+449/−0`; it is `+446/−0`. **Both are
+corrected here rather than excused by a Stage D exception**, following this plan's own precedent —
+revision 1 → 2 was the same repair, after the first SD-D moved the head. §13 carries the full sweep.
 
 ## 2. What the change is, why it exists, and the blast radius
 
@@ -84,13 +92,15 @@ not moved**: it is the first head `99d46d752357c6cb127274944ce2ac2ff0b9b78e` plu
   from, and the artifact the programme's count honesty depends on.
 - **Blast radius.** Exactly **one path, added**, against the merge base
   `e2a3e20b7c20ef8385b219b39c6405237163406f` (which is also the API `base.sha` and the **first**
-  commit's only parent — **not** the head's: the head `1aa632f7…`'s only parent is that first commit,
-  `99d46d752357c6cb127274944ce2ac2ff0b9b78e`): `449` added, `0` deleted, one `A` entry in
+  commit's only parent — **not** the head's: the head `87c637df…`'s only parent is `1aa632f7…`,
+  whose own only parent is that first commit, `99d46d752357c6cb127274944ce2ac2ff0b9b78e`): `446`
+  added, `0` deleted, one `A` entry in
   `--name-status`, 0 other paths. **No code,
   script, workflow, test, configuration, data or lock file is added, modified or deleted** — the diff
   is Markdown only, so the change is not code-bearing (workflow blob `bff407a6…` L400-403) and the
-  lighter pure-docs path applies. The repair commit alone is +133/−45 inside the same file; no path is
-  touched in either scope.
+  lighter pure-docs path applies. The repair commits alone are **+133/−45** (repair round 1,
+  `99d46d75…` → `1aa632f7…`) and **+1/−4** (repair round 2, `1aa632f7…` → `87c637df…`) inside
+  the same file; no path is touched in either scope.
 - **Governance text is not touched**: the diff adds a new file only; no rule, register entry, skill,
   script or workflow is edited.
 
@@ -119,7 +129,7 @@ would move the change off this path; no such growth is authorised by this plan.
 ## 4. Proportionate acceptance criteria (each decidable; C-1 screened)
 
 Every criterion states its decision procedure and whether it is verifiable at the implementation head
-(`1aa632f7…`). The C-1 screen is applied to every criterion that could fail a page for an unglossed
+(`87c637df…`). The C-1 screen is applied to every criterion that could fail a page for an unglossed
 term: **the term must first be shown not to be a library-wide convention, measured over the reader
 pages at the measured revision.** The convention threshold used is the one the merged lane A batch-5
 record published and applied (`docs/evidence/documentation/readability-lane-a-batch-5-2026-10-15.md`,
@@ -149,11 +159,16 @@ convention terms — the +1 in each case is this change's own new record, which 
 **No criterion below fails a page for any of these terms.**
 
 **AC-1 — scope and blast radius.** The change under this plan is exactly one added file,
-`docs/evidence/documentation/readability-phase4-lane-d-batch3-2026-10-15.md`, `+449/−0` against
+`docs/evidence/documentation/readability-phase4-lane-d-batch3-2026-10-15.md`, `+446/−0` against
 `e2a3e20b…`, and no code, script, workflow, test, configuration, data or lock file is added, modified
 or deleted.
-*Decide by:* `git diff --numstat e2a3e20b… <head>` (one line, `449  0  <path>`) and
+*Decide by:* `git diff --numstat e2a3e20b… <head>` (one line, `446  0  <path>`) and
 `git diff --name-status` (one `A`). **Verifiable at the implementation head: yes.**
+> **Corrected in revision 3.** Revision 2 stated `+449/−0` and `449  0`. Stage C's repair round 2
+> joined four wrapped source lines into one (record old L308-L311 → new L308), removing three LF
+> lines and so three added lines: the numstat at `87c637df…` is `446  0`, and the record's own LF
+> count is 446 (it was 449). **The byte count is unchanged at 38,937** — three removed newlines equal
+> three inserted spaces — so only AC-1's line figure moves, never its byte figure.
 
 **AC-2 — classification recorded.** The plan records `docs-only` as the change's class in §3, and the
 diff carries no skill frontmatter, security rules or stop conditions.
@@ -235,15 +250,25 @@ F1: any row in this diff would be the same agent recording its own read). **Reas
 L180 requires**; a Stage D `UNRUN` is permitted. The sub-facts that *are* verifiable at this head are
 AC-7 (no row exists here) and the eligibility conditions in §8.
 
-**AC-15 — the plan is captured, and the head has not moved.** This plan's exact text is captured at a
-named immutable revision: a tracked file at
+**AC-15 — the plan is captured, and the PR head is named as it stands.** This plan's exact text is
+captured at a named immutable revision: a tracked file at
 `docs/plans/readability-lane-d-batch3-plan-2026-10-16.md` on branch
 `stage-a/lane-d-batch3-plan-2026-10-16` (commit and blob SHA named in the PR body and in the posted
-comment), and posted verbatim as a PR issue comment whose id the PR body names. The PR head is still
-`1aa632f7e66a865c5206b6361d8ebf5121208e64`.
+comment), and posted verbatim as a PR issue comment whose id the PR body names. The PR head is
+`87c637dfb9dd646965d2dc43fff08887160c35f8`, and **this plan does not move it** — the plan's own
+commit is on the side branch, and no commit of the PR branch is touched by this capture. **Stated
+exactly, because the topology is not what a reader would guess:** the plan branch was cut from
+`1aa632f7…`, which is the current head's only parent and **not** the head, so `87c637df…` is **not** an
+ancestor of the plan branch (`git merge-base --is-ancestor 87c637df… HEAD` exits 1). §11 says why the
+branch is deliberately not rebased onto the new head.
 *Decide by:* `git rev-parse origin/stage-a/lane-d-batch3-plan-2026-10-16:docs/plans/…`;
 `gh pr view 784 --json headRefOid`; read the named comment. **Verifiable: yes** (at those refs, not
 inside the frozen PR diff — see §11 for why the plan is deliberately not in the PR diff).
+> **Corrected in revision 3.** Revision 2 said "the head has not moved" and "The PR head is still
+> `1aa632f7…`". Both were true when revision 2 was captured, and both became false at
+> `2026-10-16T04:03:49-07:00`, when Stage C's repair round 2 committed `87c637df…`. The criterion is
+> restated above as a *checkable* claim about a named revision plus a claim about **this plan's own
+> act**: the head's movement is Stage C's, and no plan can promise that a head will never move.
 
 ### 4.1 The C-1 measurement, reproducible
 
@@ -266,6 +291,20 @@ decidable at the head by the command named. This is the plan's own `SD-A` obliga
 workflow's `SD-D` row (blob `bff407a6…` L180): an `UNRUN` at audit time is permitted **only** for a
 criterion declared here with its reason.
 
+
+**Re-checked in revision 3, after the repair.** Stage C's repair round 2 changed the *record's* bytes
+(joining four wrapped source lines) and nothing else, so **it did not change what AC-13 or AC-14 can
+decide.** AC-13's decidable component is the eight **pages'** line counts — 43+319+48+63+33+30+55+37
+= **628**, re-counted here at the acceptance revision `e2a3e20b…` (the eight pages are untouched by the
+repair) — and AC-14's decidable component is that no keeper row exists in this diff, which is still
+true: the ledger blob is `aa6acddf…` at the base and at `87c637df…`, the index blob is `eeda4929…` at both,
+and the diff remains one added `docs/` path. **Neither declaration is stale and neither is widened.** One
+adjacent fact the repair *did* change is **verifiable** and was previously false — the record's §8
+observations table now renders one `tr` per source row (asked directly of GitHub's own GFM renderer,
+`POST /markdown` with `mode=gfm`: **5** `tr` elements where the same section produced **8** at
+`1aa632f7…`) — and this plan records that in §13 rather than adding a sixteenth criterion, because §4's
+criterion set is the set Stage B and Stage D have audited, and a re-capture is not the place to widen
+it.
 ## 6. The C-3 / next-batch selection rule (path-anchored; never an index)
 
 **The rule for the next batch (batch 4), stated so it cannot be misread:**
@@ -286,7 +325,7 @@ frontier, so the rule is anchored on the records' own text):
    `origin/main`; LD-1…LD-8), batch 2 =
    `docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md` (blob `706bf4aa…` at
    `refs/pull/778/head`, whose head is `e5d327ca…`; **not merged** — PR #778 is still open), batch 3 =
-   this change's record (blob `af7a8502…`; LD-17…LD-24).
+   this change's record (blob `cc460c0c…`; LD-17…LD-24).
 2. Re-measure the unread sequence at the next base with the instrument: reader pages minus the paths
    the committed `acceptance-index.json` carries rows for (`no_recorded_acceptance`) plus the paths
    whose recorded acceptance has drifted past the rule (`provably_pending`), sorted. At
@@ -417,12 +456,12 @@ own change, not here; the strings it records from are the record's §10 block, e
 
 | Evidence | Where it lives |
 | --- | --- |
-| The batch-3 evidence record (the change itself) | `docs/evidence/documentation/readability-phase4-lane-d-batch3-2026-10-15.md`, blob `af7a8502…`, at the PR head |
+| The batch-3 evidence record (the change itself) | `docs/evidence/documentation/readability-phase4-lane-d-batch3-2026-10-15.md`, blob `cc460c0c…`, at the PR head |
 | This plan, captured | `docs/plans/readability-lane-d-batch3-plan-2026-10-16.md` on branch `stage-a/lane-d-batch3-plan-2026-10-16` (blob SHA and commit named in the PR body), and posted verbatim as a PR comment (id named in the PR body) |
-| The instrument's figures at both refs | reproducible by command: `python -P -B tools/readability_acceptance/check_index.py --json --ref <ref>`; base `653 / 57 / 4 / 586 / 0 / 0 / 6 / 596`, head `654 / 57 / 4 / 587 / 0 / 0 / 6 / 597`, both exit 0; `--quiet` exit 0; `build_index.py --report` `101 / 101 / 81 / 10 / 68` at **both** refs, exit 0 (run in this planning session) |
+| The instrument's figures at three refs | reproducible by command: `python -P -B tools/readability_acceptance/check_index.py --json --ref <ref>`; base `e2a3e20b…` `653 / 57 / 4 / 586 / 0 / 0 / 6 / 596`, superseded head `1aa632f7…` and head `87c637df…` both `654 / 57 / 4 / 587 / 0 / 0 / 6 / 597`, all exit 0; `--quiet` exits 0 at each; `build_index.py --report` gives the identical block `101 / 101 / 81 / 10 / 68`, exit 0, at **base, `1aa632f7…` and `87c637df…` alike**. All were run in this planning session; **the head move changed none of them** |
 | The C-1 prevalence table | this plan §4, reproducible by the command in §4.1 |
 | The row-quote strings for the keeper | record §10 (8 strings, FULL pages only) |
-| The stage receipts (SD-A…SD-G) | the PR conversation (SD-B `6211504777`; SD-D `6209631818`; the rest owed) |
+| The stage receipts (SD-A…SD-G) | the PR conversation: SD-B **REVISE** `6211504777` and SD-B **REVISE** `6212915586` (both against revision 1); SD-D **REVISE** `6209631818`; then SD-D **ACCEPT** `6213714837` and SD-E **FAIL** `6213965761`. **Those last two are bound to `1aa632f7…` and are therefore void at `87c637df…`** — a fresh SD-D and a fresh SD-E are owed at this head |
 | The keeper's rows | the consolidated keeper table in `docs/roadmaps/aegis-documentation-readability-backlog.md`, appended by the separate keeper's own change — **not** by this PR |
 
 ## 10. What this plan does NOT decide
@@ -430,11 +469,15 @@ own change, not here; the strings it records from are the record's §10 block, e
 Named rather than left implicit:
 
 1. **It does not move the head and does not authorise any edit to the record or the eight pages.** The
-   head stays `1aa632f7e66a865c5206b6361d8ebf5121208e64` so that every head-bound verdict continues to
-   bind. In particular it does **not** rewrite the record's §2 index-arithmetic wording or its
-   L6-10 "Plan applied" sentence (which says no separate plan artifact exists — **superseded by fact**
-   once this plan is captured, and named here and in §6 as a declared observation carried at the frozen
-   head). A later head-moving repair may align that sentence; that decision is not taken here.
+   head is `87c637dfb9dd646965d2dc43fff08887160c35f8` and **this plan leaves it there**: the plan's
+   own commit lands on the side branch `stage-a/lane-d-batch3-plan-2026-10-16`, never on the PR
+   branch, so no head-bound verdict can be moved by this capture. (The head *did* move at
+   `2026-10-16T04:03:49-07:00` by Stage C's repair round 2 — that is Stage C's act, and the reason
+   this revision exists; see §13.) In particular this plan does **not** rewrite the record's §2
+   index-arithmetic wording or its L6-10 "Plan applied" sentence (which says no separate plan artifact
+   exists — **superseded by fact** once this plan is captured, and named here and in §6 as a declared
+   observation carried at the frozen head). A later head-moving repair may align that sentence; that
+   decision is not taken here.
 2. **It does not record, withdraw or re-record any keeper row**, does not allocate row IDs, and does
    not name or bind the keeper. It does not claim the keeper's independence (AEGIS-APR-101's second
    clause is the keeper's to satisfy).
@@ -454,87 +497,270 @@ Named rather than left implicit:
 
 ## 11. The plan's own revision, and how it is captured
 
-**Revision 2** of this plan — it corrects plan revision 1, and §13 states its own timing directly.
-Capture, so that Stage B has an exact text to bind (the requirement is the workflow's own: blob
-`bff407a6…` L587-592 at this head — at `origin/main`'s newer blob `9a2ea2bd…` the same paragraph
-sits at L612-616, which is the numbering the dispatch quoted as "L613-616"):
+**Revision 3** of this plan — it re-captures revision 2 after a Stage C repair moved the PR head, and
+it carries revision 1's corrections. Capture, so that Stage B has an exact text to bind (the
+requirement is the workflow's own: blob `bff407a6…` L587-592 at this head — at `origin/main`'s newer
+blob `9a2ea2bd…` the same paragraph sits at L612-616, which is the numbering the dispatch quoted as
+"L613-616"):
 
-- **What revision 2 changes, and nothing else.** Both findings of the posted **SD-B: REVISE**
-  (`6212915586`, the independent plan audit) are corrected, plus one naming caveat:
-  **B-1** — §2 said the merge base was "the head's only parent"; that clause was false and now says the
-  merge base is the **first** commit's only parent and names the head's actual only parent
-  `99d46d75…`. **B-2** — §13 said the finish and wall time were "recorded in this plan's PR-body
-  capture section and in the posted comment", and neither carried them; §13 now states both
-  **directly**, with their derivation. **Naming caveat** — §6 and the reading key no longer present
-  `C-3` or `R2` as a tracked ruling name. **Every other element is revision 1's text, unchanged**:
-  the scope and the eight paths, the what/why and blast radius, the `docs-only` classification, the
-  fifteen criteria with the C-1 screen and the two declared-not-verifiable criteria, the path-anchored
-  selection rule and its eight paths, the five answers with their routings, the non-author test, the
-  evidence inventory, the non-decisions and the capture record.
-- **Superseded capture.** Revision 1 was captured at commit
+- **Why a third revision, stated first.** Revision 2 was captured against the head `1aa632f7…` and
+  asserted `+449/−0`. At `2026-10-16T04:03:49-07:00` Stage C committed `87c637df…` (repair round 2,
+  the fix of SD-E's rendering FAIL: record old L308-L311 joined onto new L308). That moved the head
+  and changed the record's LF line count 449 → 446, so **two of revision 2's own criteria were false
+  at the new head** — AC-1 (`+449/−0`) and AC-15 ("the PR head is still `1aa632f7…`"). A Stage D run at
+  the new head would have returned `REVISE` on a plan that was accurate when captured. **The remedy is a
+  re-capture, not a Stage D exception** — this plan's own precedent, since revision 1 → 2 was the same
+  repair after the first SD-D moved the head. **§13 carries the full before → after sweep**, including
+  the items beyond AC-1 and AC-15 that the dispatch did not name.
+- **What revision 3 changes, and nothing else.** (a) AC-1's line figures and §1's and §2's line and
+  numstat counts: `449` → `446`. (b) Every head reference: `1aa632f7…` → `87c637df…`, and the
+  commit count two → three. (c) The record's blob and sha256 in §1, §6 and §9: `af7a8502…` →
+  `cc460c0c…`, sha256 `705ebf14…` → `6f02d168…` (bytes unchanged, 38,937). (d) The stage receipts in
+  §9. (e) §12's Codex note, corrected to name the commit the Codex state block actually binds.
+  (f) §5: an explicit re-check that AC-13 and AC-14 are not stale. (g) §14 (new): the bound-field
+  digest and the Stage A row block this revision does not insert. (h) §13 (new): the head-move sweep.
+  (i) §15 (timing, renumbered from §13) with revision 2's measured finish stated directly.
+  **Every other element is revision 2's text, unchanged**: the scope and the eight paths, the what/why
+  and blast radius, the `docs-only` classification, the fifteen criteria with the C-1 screen and the two
+  declared-not-verifiable criteria, the path-anchored selection rule and its eight paths, the five
+  answers with their routings, the non-author test, the evidence inventory and the non-decisions.
+- **Superseded captures.** Revision 1 was captured at commit
   `491bad103254d561054d631294d43a09db20493d` (blob `dbc244c3793fd05cdeded3f9383a906799bdd87f`,
   sha256 `8beb89caed02974d8b30c452f535c87d49be689facc66eec71b6f3f901020b8a`, posted verbatim as issue
-  comment `6212482822`). **That blob is superseded by this revision's blob**, which the PR body and the
-  fresh capture comment both name; the revision-1 comment stays posted and unedited as the revision-1
-  record. The plan branch is not the PR branch, so **no head moves** with this supersession.
+  comment `6212482822`). Revision 2 was captured at commit
+  `b8f91cfe504a11119cb23c642db373fb8b55df83` (blob `2b16f53f6b85a2d30eee81174b0a0f9d71611949`,
+  sha256 `967df6b9e336acc03ab678e0a4cf977c75adc0672986112b6894c32b61241fd9`, posted verbatim as issue
+  comment `6213082533`). **Both blobs are superseded by this revision's blob**, which the PR body and the
+  fresh capture comment both name; **both earlier comments stay posted and unedited**, each as its own
+  revision's record. The plan branch is not the PR branch, so **no head moves** with this supersession.
 - **Tracked file:** `docs/plans/readability-lane-d-batch3-plan-2026-10-16.md`, committed on branch
-  `stage-a/lane-d-batch3-plan-2026-10-16` (branched from the PR head commit, so the plan sits in the
-  same tree as the change it plans). **The blob SHA of the plan's bytes at that commit, the commit's
-  own SHA and the file's sha256 are recorded in the PR body** and re-derivable with
+  `stage-a/lane-d-batch3-plan-2026-10-16`. **The branch's topology is stated exactly rather than
+  assumed**, because it is not what a reader would guess: the chain below this revision's capturing
+  commit runs `b8f91cfe…` → `491bad10…` → `1aa632f7…` → `99d46d75…` → `e2a3e20b…` (the merge base), so
+  **the branch was cut from `1aa632f7…`** — the head as it stood when revision 1 was captured, which is
+  now the **parent** of the current head, not the head. Therefore **the current head `87c637df…` is not
+  in this branch's history** (`git merge-base --is-ancestor 87c637df… HEAD` exits 1): the branch
+  predates the repair that moved the head. The plan still sits beside the change in the same lineage,
+  but the two refs have diverged by one commit. **It is deliberately not rebased onto the new head**: a
+  rebase would rewrite the revision-1 and revision-2 capture commits whose SHAs are already published
+  in the PR body and its comments, and re-pointing a published capture is exactly what this plan's own
+  rule forbids. **The capturing commit's own SHA, the blob SHA of the plan's bytes at it and the file's
+  sha256 are recorded in the PR body** and re-derivable with
   `git rev-parse origin/stage-a/lane-d-batch3-plan-2026-10-16:docs/plans/readability-lane-d-batch3-plan-2026-10-16.md`.
 - **Immutable posted copy:** the same text posted verbatim as a PR issue comment; **the comment id is
-  recorded in the PR body**.
+  recorded in the PR body**. The copy is proved byte-exact by extraction and hash, not asserted: the
+  declared extraction method is in §14, and **a prior revision of this plan's sibling claimed a
+  verbatim copy that did not exist, while a later one dropped the final newline** — so the method and
+  the byte-exact comparison are both named. The result is stated in the PR body and the fresh comment,
+  because the comment is posted after this plan's bytes are fixed.
 - **Deliberately not in the PR diff.** Adding the plan to the PR branch would move the head and void
-  every head-bound verdict (workflow L48-49 and the exact-head rule); the head is frozen by the
-  instruction under which this plan is written. The plan therefore lives beside the change, not inside
-  it, and the PR body carries the capture reference so Stage B can bind it without the head moving.
+  every head-bound verdict (workflow L48-49 and the exact-head rule). The plan therefore lives beside
+  the change, not inside it, and the PR body carries the capture reference so Stage B can bind it
+  without the head moving.
 - **Editing this plan after capture voids the ACCEPT** on it, exactly as moving a head voids a
   head-bound verdict.
 
 ## 12. What this plan could not verify
 
-- **The dispatch's head string.** `1aa632f7e66a865c5206b6361d8ebf512120e8c4` is not an object in the
-  repository; the real head is `1aa632f7e66a865c5206b6361d8ebf5121208e64`. Which string was intended
-  cannot be verified from the repository — only that the former does not exist and the latter is the
-  head.
+- **The dispatch's head string (revision 1's dispatch).** `1aa632f7e66a865c5206b6361d8ebf512120e8c4`
+  is not an object in the repository. The string it transposes is
+  `1aa632f7e66a865c5206b6361d8ebf512120e8c4`'s real neighbour
+  `1aa632f7e66a865c5206b6361d8ebf5121208e64` — the head that revisions 1 and 2 were written against,
+  and now the **second** of this branch's three commits (the head is `87c637df…`). Which string the
+  dispatch intended cannot be verified from the repository — only that the former does not exist and
+  the latter is real.
+- **The order of the head move and the dispatch.** This revision was requested *because* Stage C's
+  repair round 2 moved the head; the repository shows that commit at `2026-10-16T04:03:49-07:00` and this
+  session's first snapshot at `2026-10-16T04:07:51-07:00`, but what the coordinator read, and when, is
+  not a tracked artifact.
 - **"R2" as a standing ruling.** No tracked artifact at the head defines a readability ruling by that
-  name (§6).
+  name (§6). **Re-measured at `87c637df…`: 78 `\bR2\b` hits, none of them a readability standing
+  ruling, and 2 `\bC-3\b` hits, both unrelated change-site IDs — the same counts as at `1aa632f7…`**, so the
+  head move changed nothing here.
 - **The coordinator's batch-3 brief.** No tracked artifact at any ref carries it; the record itself
-  says its quotations of it are "unverifiable, not false" (record §15), and the SD-B found the same.
+  says its quotations of it are "unverifiable, not false" (its §15), and the SD-B found the same.
 - **Artifacts cited from `origin/main`, absent at this base and head:** the lane A batch-5 record
   (`a1f537a9…`, the ≥12 convention threshold), the batch-1 record (`7a479f86…`) and
   `OWNER-DECISIONS-2026-10-15.md` (`f2010a75…`). All three are cited by blob at `origin/main`
-  (`38413563a8…`, 30+ commits ahead of the merge base), not from the frozen tree. A re-measurement at
+  (`38413563a8…`, **35** commits ahead of the merge base), not from the frozen tree. A re-measurement at
   a future base re-reads them there.
 - **The two external links** on LD-17 (PR #122) and LD-24 (PR #176): not fetched, matching the dated
   records' own practice.
-- **Any Codex P1 content.** The Codex state block reports `"has_unresolved_findings": true` at this
-  head, but the PR has 0 reviews and 0 review comments, so no finding text is retrievable.
+- **Any Codex P1 content.** The Codex state block reports `"has_unresolved_findings": true` with
+  `code_review.commit_sha` = `99d46d752357c6cb127274944ce2ac2ff0b9b78e` — the **first** head, not
+  `1aa632f7…` and not `87c637df…` — and the PR has 0 submitted reviews and 0 review comments, so no
+  finding text is retrievable at any of the three heads. The bot's second comment is a usage-limit
+  notice. **Revision 2 said this block reported "at this head"; it never did, and the claim is
+  corrected here rather than carried.**
+- **The fresh capture comment's byte-exactness.** The extraction method is declared in §14, but the
+  comment is posted **after** this plan's bytes are fixed, so the plan cannot carry its own
+  verification result; that result is stated in the PR body and in the fresh comment.
 - **Any post-rebuild figure**, which this plan does not predict (§10.4).
 
-## 13. Timing
+## 13. The head move: every figure and identifier it invalidated, before → after
+
+The dispatch named two criteria (AC-1, AC-15) as the reason for this revision. **They were not the
+only two false figures.** This section is the whole sweep: every count, head reference, line count,
+blob id and "at this head" claim in revision 2, re-derived at `87c637df…` by command. Items 1-14 are
+statements in this plan that were false at the new head and are corrected above; items 15-17 are
+adjacent facts the same move changed, published alongside the plan and recorded here because they
+would otherwise stay wrong in the PR body.
+
+| # | Item (revision 2's text) | Before | After | How re-derived |
+| --- | --- | --- | --- | --- |
+| 1 | AC-1 blast radius | `+449/−0` | **`+446/−0`** | `git diff --numstat e2a3e20b… 87c637df…` → one line, `446  0` |
+| 2 | AC-1 decision command's expected output | `449  0  <path>` | **`446  0  <path>`** | the same command |
+| 3 | AC-15 head binding | "the PR head is still `1aa632f7…`" | **the head is `87c637df…`; this plan does not move it** | `gh pr view 784 --json headRefOid`, `git rev-parse refs/pull/784/head` |
+| 4 | §1 "the head is `1aa632f7…`" | `1aa632f7…` | **`87c637df…`** | `git cat-file -p 87c637df…` |
+| 5 | §1 "The head has not moved … two commits" | 2 commits | **3 commits: `99d46d75…`, `1aa632f7…`, `87c637df…`** | `git rev-list --count e2a3e20b…87c637df…` → 3 |
+| 6 | §2 "the head `1aa632f7…`'s only parent" | the head's parent = `99d46d75…` | **the head `87c637df…`'s only parent is `1aa632f7…`; `1aa632f7…`'s only parent is `99d46d75…`; the merge base is still `e2a3e20b…`** | `git cat-file -p` on each; `git merge-base 87c637df… origin/main` → `e2a3e20b…` |
+| 7 | §1, §6 and §9, the record's blob | `af7a8502d2aed730da9befd45920fd0a08b9f06a` | **`cc460c0cd9fae1846046df65ffc36c6c5efe6157`** | `git rev-parse 87c637df…:<path>` |
+| 8 | §1 the record's line count | 449 lines | **446 lines** | LF count of the blob: 446, CRLF 0 |
+| 9 | §1 the record's sha256 | `705ebf145372c5f8653e690a59a67a1abb6245e7d0095602cd385fb204587fae` | **`6f02d168d47482bbad80dfbe71445052eec5ad0bc53bd06af0640ab6358c6c1a`** | sha256 over the blob's bytes |
+| 10 | §1 the record's byte count | 38,937 | **38,937 — unchanged** | `git cat-file -s`: three removed newlines equal three inserted spaces |
+| 11 | §4 "verifiable at the implementation head (`1aa632f7…`)" | `1aa632f7…` | **`87c637df…`** | this plan's own text |
+| 12 | §9 stage receipts | "SD-B `6211504777`; SD-D `6209631818`; the rest owed" | **SD-D `ACCEPT` `6213714837` and SD-E `FAIL` `6213965761` are posted, both bound to `1aa632f7…` and therefore void at this head; a fresh SD-D and a fresh SD-E are owed** | the PR conversation, via the API |
+| 13 | §12 Codex state block | `"has_unresolved_findings": true` **"at this head"** | **the block's `code_review.commit_sha` is `99d46d75…`** — the *first* head — so "at this head" was already imprecise; no Codex review has run at `1aa632f7…` or `87c637df…` (the bot posted a usage-limit notice) | the bot comment's embedded JSON, via the API |
+| 14 | §10.1 "The head stays `1aa632f7…`" | "the head stays" | **the head moved at Stage C's repair round 2; this plan does not move it further** | the commit's committer timestamp |
+| 15 | The record's own section line numbers (published alongside this plan) | §9 L317, §10 L331, §11 L361, §12 L369, §13 L384, §14 L410, §15 L424 | **§9 L314, §10 L328, §11 L358, §12 L366, §13 L381, §14 L407, §15 L421** | heading line numbers of the blob at each head. Headings §1-§8 are unchanged, because the join is inside §8's table at L308. **The plan cites the record by section number, not by line**, and its only line-level citations of the record are L3-24 (AC-3) and L6-10 (§10.1) — both above L308, so neither breaks |
+| 16 | The PR body's structural-gate block | "all at the head `1aa632f7…`"; numstat `449 added, 0 deleted`; DCO "2 checked"; CI run `38872542401` | **head `87c637df…`; `446 added, 0 deleted`; DCO "3 checked, all signed off"; CI run `38891331698`** (created `2026-10-16T11:04:08Z`, conclusion success) | the API, and the commands in that block |
+| 17 | The PR body's witness bound field | "Candidate head `1aa632f7…` … any move of it voids this record" | **text unchanged, and therefore now void on its own terms.** This plan does **not** edit it (§14) | the field's own sentence |
+
+**What the sweep found beyond the two named criteria, stated plainly:** the record's blob and sha256
+(items 7 and 9), the record's line count as a property of the change under plan (item 8), the commit
+count and the parent chain (items 5 and 6), the stage receipts (item 12), the Codex block's actual
+binding (item 13), the record's shifted section line numbers (item 15), and the PR body's gate block
+(item 16).
+
+**What the head move did *not* invalidate — re-measured here, not assumed.** The C-1 prevalence table
+(at `87c637df…`: 292 / 107 / 38 / 31 over 654 reader pages; at the base: 291 / 106 / 37 / 30 over 653
+— identical to revision 2's figures); the instrument's summary at the head
+(`654 / 57 / 4 / 587 / 0 / 0 / 6 / 597`) and at the base (`653 / 57 / 4 / 586 / 0 / 0 / 6 / 596`), both
+exit 0, with `--quiet` also exit 0 at each; `build_index.py --report`'s identical block
+`101 / 101 / 81 / 10 / 68` at exit 0 for the base, `1aa632f7…` and `87c637df…` alike; the unread
+sequence (**591** at the head, **590** at the base); the anchor path's 0-based position in it (**468**
+at the head, **467** at the base); the eight next-batch paths, unchanged and in the same order; the
+ledger blob `aa6acddf…` and the index blob `eeda4929…` (identical at the base, `1aa632f7…` and
+`87c637df…`); the register blob `7947260b…`; the workflow blob `bff407a6…`; the skills-manifest blob
+`d60fa564…`; and all sixteen page blobs in §1 and §6. **None of them moved.**
+
+## 14. The bound fields, the PROC-04 digest, and the Stage A row this revision does not insert
+
+**The published digest, re-derived.** The PR body states a PROC-04 digest over its three
+sentinel-delimited bound fields: `77a6db9c7a5c31d0` (full
+`77a6db9c7a5c31d0438afdf01aab5970ba741ea005431fc471a5927633c828e1`). Re-computed here from the live body
+with the method `docs/delivery-workflow.md` L875-898 fixes — sentinels resolved by **whole-line equality**,
+not by substring search; each field's payload taken strictly between its opening sentinel and the next
+`end` sentinel, sentinels excluded; every run of whitespace collapsed to a single space and each field
+trimmed; the three joined witness → skills → security with single newlines; `sha256` over the UTF-8
+string with no trailing newline; first 16 hex published — **it reproduces exactly**, field for field
+(witness 1,298 characters, skills 8,191, security 567). The repair round's earlier value
+`e0d31bd3c7a7e796` does **not** reproduce against the live body, correctly: the body itself records it
+as void once the Stage A rows were added to the skills field.
+
+**What the digest binds, and the tension this revision must handle rather than ignore.** The `skills`
+bound field's last four records are the Stage A `Row source` lines, each carrying
+`target=captured plan revision 491bad103254d561054d631294d43a09db20493d` — the **revision-1** capture
+those rows were produced against. The coordinator's ruling that the field stays was made **for
+revision 2**, and this revision may not carry it over unexamined.
+
+**Does a Stage A row for this revision belong? Yes — and it still must not be inserted here.** The
+distinction is between *re-pointing* and *adding*. Re-pointing the four revision-1 rows at a later
+revision would assert a skill application that did not occur — which is exactly why the field was left
+alone for revision 2. **Adding** a row block for this revision asserts a skill application that **did**
+occur: this planning session applied the same four Stage A skills to the moved head, so the
+`skill-usage-ledger` obligation is not discharged for revision 3 without it. But the block belongs
+**inside** the `skills` bound field, and the workflow is explicit that any change to a bound field
+voids the verdict over it (L919-925). **So this revision does not edit the field.** The exact text is
+authored below and the edit is left to whoever will republish the digest; both digest values are
+stated.
+
+**Old digest (published; reproduced above):** `77a6db9c7a5c31d0`.
+
+**New digest if the row block below is appended to the `skills` field, immediately before its closing
+`end` sentinel:** `f15e3d128da4cd52` — computed with the same normalization (PROC-04, named) over the
+same three fields with only that block added.
+
+**The exact row block to append** — four records, one per Stage A skill, mirroring the revision-1
+block. The four skill sha256 values were re-read from `tools/skills-manifest.json` at `87c637df…`, whose
+manifest blob `d60fa564…` is identical at the base, at `1aa632f7…` and at `87c637df…`:
+
+<!-- ROWBLOCK-START -->
+```text
+<!-- Row source: agent=readability-phase4-lane-d-planner-a1 (DeepSeek-4.1-Flash (deepseek-flash)); stage=A; round=2; row=SA-5; target=captured plan revision 3, this revision's capturing commit and blob named in the PR body and the fresh capture comment; source=.claude/skills/change-classification-gate/SKILL.md, applied to re-classify this change docs-only before re-planning at the moved head 87c637df; binding=sha256 08d91a834460beebc9c66fa896b8b422f064bf1d7524f6e5b1512cda3afdc996 of that skill's SKILL.md bytes from tools/skills-manifest.json at 87c637df -->
+<!-- Row source: agent=readability-phase4-lane-d-planner-a1 (DeepSeek-4.1-Flash (deepseek-flash)); stage=A; round=2; row=SA-6; target=captured plan revision 3, this revision's capturing commit and blob named in the PR body and the fresh capture comment; source=.claude/skills/acceptance-criteria-reviewer/SKILL.md, applied to re-check AC-1 to AC-15 against the moved head and correct the two criteria the head move falsified; binding=sha256 c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 of that skill's SKILL.md bytes from tools/skills-manifest.json at 87c637df -->
+<!-- Row source: agent=readability-phase4-lane-d-planner-a1 (DeepSeek-4.1-Flash (deepseek-flash)); stage=A; round=2; row=SA-7; target=captured plan revision 3, this revision's capturing commit and blob named in the PR body and the fresh capture comment; source=.claude/skills/scoped-approval-register/SKILL.md, applied to re-read AEGIS-APR-101 and AEGIS-APR-117 at the moved head and restate the non-author test; binding=sha256 a74d2a22579cf93f737725aa0c54197b5d496a9f33a291a93c2cf2073cd7d076 of that skill's SKILL.md bytes from tools/skills-manifest.json at 87c637df -->
+<!-- Row source: agent=readability-phase4-lane-d-planner-a1 (DeepSeek-4.1-Flash (deepseek-flash)); stage=A; round=2; row=SA-8; target=captured plan revision 3, this revision's capturing commit and blob named in the PR body and the fresh capture comment; source=.claude/skills/skill-usage-ledger/SKILL.md, applied to emit this revision's six-field skills record and state the row block this revision does not insert; binding=sha256 6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 of that skill's SKILL.md bytes from tools/skills-manifest.json at 87c637df -->
+```
+<!-- ROWBLOCK-END -->
+
+**Two notes the inserter needs, so the block is not inserted blind.**
+
+- **The `target=` value is exact as written, and is deliberately not a literal 40-hex.** The natural
+  literal is this revision's capturing commit — and **this plan is inside that commit**, so the value
+  cannot be known when the plan's bytes are fixed. The record therefore names the revision and the two
+  publication sites that carry the commit and blob SHA, exactly as this plan's own capture reference
+  does (§11). If the inserter prefers a literal SHA, substituting it **changes the digest again** and
+  the value above becomes void: recompute with the same method and publish the new value.
+- **`round=2`** is this Stage A capture's ordinal among the rounds that publish `Row source` records:
+  revision 1 published the four `round=1` rows, revision 2 published none (the coordinator's ruling), and
+  this revision is the second such round. The token is stated so the inserter can re-check it against
+  the repository's convention rather than guess.
+
+**Verbatim copy of this plan: the extraction method, declared.** The fresh capture comment holds the
+plan inside a fenced code block **opened by a line of four backticks followed by the info string
+`text`, and closed by a line of four backticks.** **Four, not three, and that is load-bearing:** this
+plan's own bytes contain two three-backtick fences (its §3 classification block and its §14 row block),
+so a three-backtick outer fence would close early and the "copy" would silently be a prefix — the exact
+class of error this verification exists to catch. The declared method: **take the comment body; find
+the line that is exactly ````text and the next line that is exactly ````; take the lines strictly
+between them; join those lines with a single LF after each and terminate the result with one LF; then
+`git hash-object -t blob --path docs/plans/readability-lane-d-batch3-plan-2026-10-16.md <extract>` must
+return this plan's blob SHA itself.** A method that matches the fence by substring, that uses a
+three-backtick fence, or that normalises the final newline is **not** this method and its result is not
+comparable — the rule that a republished figure names its method applies here too (PROC-04). This
+plan's bytes end with exactly one LF, so the extract that matches is the one that keeps it. **This is
+stated rather than assumed because a prior revision of this plan's sibling claimed a verbatim copy that
+did not exist, and a later one dropped the final newline.** The result is stated in the PR body and the
+fresh comment, since the comment is posted after this plan's bytes are fixed.
+
+## 15. Timing
 
 - **Start (plan revision 1):** 2026-10-16T02:14:37-07:00 (America/Los_Angeles; the turn-1 snapshot of
-  this planning session).
+  that planning session).
 - **Finish (plan revision 1):** 2026-10-16T02:29:57-07:00 — the creation time of the verbatim capture
   comment `6212482822` (`2026-10-16T09:29:57Z`), the last publication act of that capture. The
   capturing commit `491bad103254d561054d631294d43a09db20493d` is a few seconds earlier, at
-  2026-10-16T02:29:26-07:00 by its own committer timestamp; both instants are stated because both are
+  `2026-10-16T02:29:26-07:00` by its own committer timestamp; both instants are stated because both are
   finish instants of the same capture — commit first, comment second.
 - **Wall time (plan revision 1):** **15m 20s** from the stated start `02:14:37` to the finish
   `02:29:57`; **14m 49s** from the start to the capturing commit `02:29:26`. Both are **measured
   wall time**; **active time is not instrumented**, so wall time is an imperfect comparison and no
   active-time split is claimed. *Derivation — the values are stated here and are re-derivable, not a
-  pointer to somewhere else:* the start is this planning session's own turn-1 snapshot, recorded in
-  revision 1 of this plan; the two finish instants are read from the repository and the API —
+  pointer to somewhere else:* the start is that session's own turn-1 snapshot, recorded in revision 1
+  of this plan; the two finish instants are read from the repository and the API —
   `git log -1 --format=%cI 491bad103254d561054d631294d43a09db20493d` → `2026-10-16T02:29:26-07:00`,
   and `gh api repos/ModernNomad-98/Project-Aegis/issues/comments/6212482822 --jq .created_at` →
   `2026-10-16T09:29:57Z`.
-- **Timing of plan revision 2 (this text).** Start `2026-10-16T02:59:36-07:00` (the turn-1 snapshot
-  of the revision-2 session). Its finish and wall time necessarily fall **after** this commit exists,
-  so they are stated in the fresh capture comment and in the PR body's capture section, both of which
-  carry them; revision 1's figures above are stated **directly here**, which is what finding **B-2**
-  requires.
+- **Start (plan revision 2):** 2026-10-16T02:59:36-07:00 (the turn-1 snapshot of that session).
+- **Finish (plan revision 2):** 2026-10-16T03:04:26-07:00 — the creation time of the verbatim capture
+  comment `6213082533` (`2026-10-16T10:04:26Z`). Its capturing commit
+  `b8f91cfe504a11119cb23c642db373fb8b55df83` is earlier, at `2026-10-16T03:03:38-07:00` by its own
+  committer timestamp.
+- **Wall time (plan revision 2):** **4m 50s** from `02:59:36` to `03:04:26`; **4m 2s** to the capturing
+  commit `03:03:38`. Measured the same way as above. **These are stated directly here**, because
+  revision 2 left its own figures to the comment and the PR body, and the rule finding **B-2**
+  established for revision 1 — that a revision's timing is stated in the plan, not pointed at —
+  applies to every revision of it.
+- **Start (plan revision 3, this text):** 2026-10-16T04:07:51-07:00 (the turn-1 snapshot of this
+  session).
+- **Finish and wall time (plan revision 3):** these necessarily fall **after** this commit exists, so
+  they are stated in the fresh capture comment and in the PR body's capture section, which carry the
+  comment's creation time, the capturing commit's own committer timestamp and both wall figures. The
+  reason they cannot appear in these bytes is stated rather than hidden: **the plan is inside the
+  commit that would supply its own finish instant.** They are re-derivable from
+  `git log -1 --format=%cI <capturing commit>` and
+  `gh api repos/ModernNomad-98/Project-Aegis/issues/comments/<fresh comment id> --jq .created_at`.
 - **Identity and environment:** written on a fresh HTTPS clone
   (`git clone -c http.sslBackend=openssl`) outside the shared clone, with `git config user.name` =
   Peter Nguyen; no `wt-*` worktree created; nothing merged.
