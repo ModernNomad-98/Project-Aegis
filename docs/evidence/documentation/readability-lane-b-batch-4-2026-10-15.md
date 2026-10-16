@@ -166,7 +166,7 @@ Two complete, complementary passes were made over each page:
    B4-8, all `iso.org`) which the checker reports as `external (not fetched)`; **0 anchors** on
    every page, so the bad-anchor count is zero by enumeration. Every 40-character SHA counted —
    **0 on every page**. Every backticked skill name existence-checked against the tree at the base
-   — **69 occurrences, 36 distinct names, every one present** as a directory under
+   — **92 occurrences, 36 distinct names, every one present** as a directory under
    `.claude/skills/`. Every named `references`/`evals` file existence-checked at the base —
    **every one present**. The three external `iso.org` URLs were **not fetched** (the pages
    themselves record `iso.org` blocking direct fetch); they are counted, not verified.
