@@ -6,14 +6,16 @@
   `git rev-parse origin/main` at 2026-10-15 18:31 PT.
 - **Reader:** `readability-lane-b-batch4-reader-c` — a single Stage C implementer agent, model
   **DeepSeek-4.1-Flash (deepseek-flash)**, who wrote none of the eight pages below. **This batch
-  authors no keeper rows and edits no ledger** (section 7): the evidence recorded here is the
+  authors no keeper rows of any kind — no `full-page-acceptance` row and no `targeted-review` row —
+  and edits no ledger** (sections 4 and 7): the evidence recorded here is the
   deliverable from which a separate eligible keeper (the AEGIS-APR-117 route — the approval that
   lets the ledger keeper append withdrawal rows and re-record acceptances from retained evidence)
   records the acceptance rows.
 - **What this page is.** The lane's tracked batch record. It is the evidence source a separate
   eligible ledger keeper — a *different agent* from this reader, per **AEGIS-APR-101** (the
   approval that requires the ledger keeper to be an agent other than the page's author and its
-  accepting reviewer) — will cite when it records the acceptance rows for these eight pages.
+  accepting reviewer) — will cite when it records the rows this evidence supports: **no row of any
+  kind for the six pages still marked partial, and the two corrected-full pages per section 4b.**
   It **names every page's full 40-character acceptance revision verbatim** in its own bytes.
 - **Acceptance revision bound by this batch's dispositions:**
   `f490c16f9ed23f3d489e42f7696323bffcce6fd3`
@@ -176,11 +178,11 @@ Mechanical gates: `python -B scripts/validate-skills.py` → exit 0,
 | # | Page | Lines | Local links | External links | Broken | 40-hex tokens | Disposition |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | B4-1 | `incident-response-runbook/references/incident-runbook-template.md` | 75 | 1 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
-| B4-2 | `integration-test-designer/SKILL.md` | 195 | 2 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
+| B4-2 | `integration-test-designer/SKILL.md` | 195 | 2 | 0 | 0 | 0 | **full — conventions corrected (3a, 4b)** |
 | B4-3 | `integration-test-designer/references/boundary-catalog.md` | 53 | 1 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
 | B4-4 | `inter-agent-comms-reviewer/SKILL.md` | 215 | 2 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
 | B4-5 | `inter-agent-comms-reviewer/references/inter-agent-comms-checklist.md` | 88 | 1 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
-| B4-6 | `intra-tenant-scope-architect/SKILL.md` | 229 | 0 | 0 | 0 | 0 | **partial — first-use gaps (3a)** |
+| B4-6 | `intra-tenant-scope-architect/SKILL.md` | 229 | 0 | 0 | 0 | 0 | **full — conventions corrected (3a, 4b)** |
 | B4-7 | `iso-27001-isms-architect/references/isms-clause-map.md` | 74 | 1 | 2 | 0 | 0 | **partial — first-use gaps (3a)** |
 | B4-8 | `iso-42001-aims-architect/references/aims-clause-map.md` | 71 | 1 | 1 | 0 | 0 | **partial — first-use gaps (3a)** |
 
@@ -189,7 +191,7 @@ added to any page, so no page owes anything under the targeted-edit rule. No rea
 elided: each page was returned whole by the read tool in one call, and every page's whole-file line
 count matches `git show` (section 2 table).
 
-### 3a. The first-use gaps, per page — why all eight partials are partial
+### 3a. The first-use gaps, per page — six partials, and the two convention over-flags
 
 The test applied to every page, stated so a reader can re-run it: **a page is PARTIAL when an
 acronym, abbreviation, clipped form, internal code or named scheme appears at a line earlier than
@@ -197,7 +199,9 @@ the line that expands it on the page, or is never expanded on the page and is no
 owning `SKILL.md`.** The owning `SKILL.md` is read as part of the page's own context — the same
 tolerance batch 3 applied when it cleared `DNS`/`JSON` against the owning skill and flagged the
 terms neither carried. Every gap below is named with its line number in the page's own bytes at
-`f490c16f9ed23f3d489e42f7696323bffcce6fd3`. **All eight pages are partial; no page is claimed full.**
+`f490c16f9ed23f3d489e42f7696323bffcce6fd3`. **Six pages are partial and two are full** — the two
+full dispositions are corrections rather than fresh readings, and the measurement behind each is in
+section 4b; the six partial pages each keep the gaps named here.
 
 - **B4-1 `incident-runbook-template.md` (75 lines) — partial.** Two gaps.
   `non-prod` (non-production) at **L19** is a clipped form never expanded on the page or in the
@@ -209,11 +213,15 @@ terms neither carried. Every gap below is named with its line number in the page
   defines SEV, IC, ops, comms and `p99` and glosses "error budget" *before* any body use, so every
   true acronym on the page is clean; the two gaps above are the entire defect and they are minor.
   This is the page nearest to full in the batch, and it is still not full.
-- **B4-2 `integration-test-designer/SKILL.md` (195 lines) — partial.** The frontmatter description
-  at **L3** uses `E2E` (expanded at L8), `API` (expanded at L9) and `authz` before the Terms
-  block at L8–12. `authz` at **L3** is never expanded anywhere on the page or in its own Terms
-  block. The description is part of the page's bytes, so these are first-use gaps of exactly the
-  shape batch 3 recorded for B3-3, B3-5, B3-6 and B3-8.
+- **B4-2 `integration-test-designer/SKILL.md` (195 lines) — observation, not a gap; disposition
+  corrected to `full` (section 4b).** The frontmatter description at **L3** uses `E2E` (expanded at
+  L8), `API` (expanded at L9) and `authz` before the Terms block at L8–12; `authz` at **L3** is
+  never expanded anywhere on the page or in its own Terms block. **Why this is an observation and
+  not a gap:** all three terms are library-wide conventions (`E2E` 50 pages use it / 39 leave it
+  unglossed, `API` 205/176, `authz` 51/29 at the base) and the frontmatter-position rule this entry
+  also invokes is a library norm (128 of the 213 reader pages carrying a frontmatter description
+  leave a listed acronym unexpanded at or before its first use — 217 of 254 occurrences). Under the
+  coordinator's two rulings of 2026-10-15 neither is a per-page defect, so the page carries no gap.
 - **B4-3 `boundary-catalog.md` (53 lines) — partial.** Three gaps. `LLM` at **L17** is never
   expanded on the page or in the owning `integration-test-designer/SKILL.md`. `ambient` at **L18**
   and **L19** is used as a table Class label and never defined on the page (the owning skill mentions
@@ -230,12 +238,15 @@ terms neither carried. Every gap below is named with its line number in the page
   precedes. `stdio` at **L13** and `TCP` at **L17** are never expanded on the page or in the
   owning `SKILL.md`. **Observation, not a gap:** `ASI03` (L15) and `ASI04` (L13) are both
   expanded in the owning `SKILL.md` at its L10, so they are not counted.
-- **B4-6 `intra-tenant-scope-architect/SKILL.md` (229 lines) — partial.** Two gaps, both at
-  **L3**. `authz` is used in the frontmatter description and is first expanded at **L45**
-  ("object-level authorization (authz)") — after the L3 use. `SaaS` is used at **L3** and is never
-  expanded on the page; the Terms block at L8–11 defines HQ, ORM, IDOR, RLS, SQL and UI but not it.
-  **Observation, not a gap:** `tenant_id` (L3 and throughout) is a literal schema column name used
-  in the predicate, not an abbreviation to expand.
+- **B4-6 `intra-tenant-scope-architect/SKILL.md` (229 lines) — observation, not a gap; disposition
+  corrected to `full` (section 4b).** Two flags, both at **L3**. `authz` is used in the frontmatter
+  description and is first expanded at **L45** ("object-level authorization (authz)") — after the
+  L3 use. `SaaS` is used at **L3** and is never expanded on the page; the Terms block at L8–11
+  defines HQ, ORM, IDOR, RLS, SQL and UI but not it. **Why this is an observation and not a gap:**
+  both terms are library-wide conventions (`authz` 51 pages use it / 29 leave it unglossed; `SaaS`
+  63/47 at the base) and they are the page's only two flags — nothing page-specific stands behind
+  them — so under Ruling 1 the page carries no gap. **Observation, not a gap:** `tenant_id` (L3 and
+  throughout) is a literal schema column name used in the predicate, not an abbreviation to expand.
 - **B4-7 `isms-clause-map.md` (74 lines) — partial.** The title at **L1** uses `ISMS` (expanded
   L13), `ISO` (L12), `IEC` (L13) and `Amd` (L14) before the Reading key at L12–15. `TOC` at
   **L3** is used before its expansion at L14. `PDF` at **L3** is never expanded on the page or in
@@ -254,15 +265,20 @@ terms neither carried. Every gap below is named with its line number in the page
   only its position — before the Reading key — is the defect, not its absence.
 
 **None of these gaps changes a safety boundary, an approval entry or an evidence record**, and this
-lane edited none of the pages; the gaps are recorded here for the keeper and the owning process, and
-**no full acceptance is claimed for any of the eight pages.**
+lane edited none of the pages; the gaps are recorded here for the keeper and the owning process.
+**Six items stand as gaps (B4-1, B4-3, B4-4, B4-5, B4-7, B4-8) and two stand as observations
+(B4-2, B4-6) whose dispositions the coordinator's 2026-10-15 rulings corrected to `full`** — the
+measurements behind both are in section 4b; **no page of this batch carries a gap with a full
+disposition, and no acceptance row of any kind — no `full-page-acceptance` row and no
+`targeted-review` row — is recorded by this batch for any of the eight pages (section 4).**
 
 **The six acceptance bullets, addressed per page.** (a) *Purpose and audience up front* — every
 page: B4-1 L1–10 (what the file is, its reading key, and that the parent skill owns the workflow),
 B4-2 Purpose L14–22 and Use When L24–42, B4-3 L1–6, B4-4 Purpose L21–35 and Use When L37–54, B4-5
 L1–7, B4-6 Purpose L13–26 and Use When L28–50, B4-7 L1–17, B4-8 L1–21; each page names its owning
 skill and what that skill owns. (b) *Abbreviations and coded identifiers defined at first use* —
-**partial on all eight pages**, exactly as 3a states. (c) *Descriptive headings, lists or tables,
+**partial on six pages (B4-1, B4-3, B4-4, B4-5, B4-7, B4-8); on B4-2 and B4-6 the flags are
+library conventions recorded as observations** (section 4b), exactly as 3a states. (c) *Descriptive headings, lists or tables,
 and at least one concrete example* — every page uses headed sections and tables; concrete worked
 examples exist on B4-1 (the severity ladder table L14–19 and the finding-disposition table L60–67),
 B4-2 (the output template L116–134 and the false-confidence gotcha L158–161, "a 200 with the wrong
@@ -345,8 +361,9 @@ test).**
 **Why this subsection exists.** Section 3a flags eight pages. Some of the terms it flags are left
 unglossed across much of this library, so a gap on one of them is weak evidence that *this* page is
 the defective one. The measurement below separates the two classes, so the keeper and later readers
-can weigh each PARTIAL instead of treating all eight as equal. **It changes no disposition here** —
-see the disposition note at the end of this subsection.
+can weigh each partial instead of treating all eight as equal. **It is the measurement the two
+corrected dispositions rest on** — see the disposition note at the end of this subsection and
+section 4b.
 
 **Method, stated so it can be re-run.** The page set is the one section 2 derives (every `.md` in
 the tree at `f490c16f9ed23f3d489e42f7696323bffcce6fd3`, minus the `scripts/` fixtures except
@@ -387,7 +404,11 @@ definition this table uses. Re-run under this table's single definition, the sam
 `authz` **29**/51 and `SaaS` **53**/63, with `E2E` 39/50 and `API` 176/205 unchanged. A later
 reader who re-derives one row and gets a different number should know that the two published
 `authz`/`SaaS` figures were produced under a stricter test, not that one of the runs is wrong. The
-classification is the same under either run.
+classification is the same under either run. **Re-measured again in this repair round** under this
+table's single definition (655 reader-page blobs read from the base with `git cat-file --batch`):
+`authz` **51 / 29**, `SaaS` **63 / 47**, `E2E` **50 / 39**, `API` **205 / 176** — so the `SaaS` row
+above (**53**) is this record's earlier run and **47** is the figure this repair reproduces
+first-hand; both clear the bar and the classification does not change under either.
 
 **Which pages of this batch the conventions affect — exactly two.** `authz`, `SaaS`, `E2E` and
 `API` appear as flags on **B4-6** (`authz`, `SaaS` — and nothing else) and **B4-2** (`E2E`,
@@ -404,71 +425,152 @@ not a library convention:**
 - **B4-8** — the internal label "Phase 7 + 7.5 packs" and the named scheme
   `GOVERN/MAP/MEASURE/MANAGE`.
 
-**Disposition on the convention flags — stated explicitly, and deliberately not changed here.** Read
-strictly, this measurement says **B4-6's PARTIAL rests on exactly two flags, both library
-conventions, with no page-specific gap behind it**; under the ruling that an unglossed library
-convention is not a defect, **B4-6 is an over-flag and its disposition would be `full`, not
-partial**. **B4-2** rests on `E2E`, `API` and `authz` — all three conventions — and additionally on
-the frontmatter-description rule batch 3 applied to B3-3/B3-5/B3-6/B3-8, so it is
-methodology-dependent twice over. **This repair changes neither disposition**, for three reasons:
-(1) "an unglossed library convention is not a defect" is a process ruling the owner has not made,
-and a Stage C lane cannot make it; (2) changing a disposition would move a page between the accepted
-and pending buckets, which a repair of an evidence record has no authority to do; and (3)
-`0 full / 8 partial` is this batch's audited claim, and a repair must not quietly rewrite an audited
-claim into a different one. **A re-audit is owed for B4-6** before any keeper acts on it: the parent
-should rule on the convention question first, and a fresh, independent audit at the then-current head
-must confirm any changed disposition. **If the frontmatter-position rule is relaxed as well, B4-2
-owes the same re-audit**; if it is not, B4-2's PARTIAL stands on that rule regardless of the
-conventions.
+**Disposition on the convention flags — applied, per the coordinator's rulings of 2026-10-15.** Read
+strictly, this measurement says **B4-6's flags are exactly two, both library conventions, with no
+page-specific gap behind them**, and that **B4-2's three flags (`E2E`, `API`, `authz`) are all
+conventions** while the frontmatter-position rule it also invokes is a library norm (measured:
+128 of the 213 reader pages with a frontmatter description, 217 of 254 occurrences — section 4b).
+**The two rulings issued after the SD-D re-audit now apply, so both dispositions are corrected to
+`full` — the batch's count moves from `0 full / 8 partial` to `2 full / 6 partial` (section 4b states
+the change, the two rulings, the measurements and the two pages that moved; section 4 states the
+keeper consequence).** No other page's disposition moves: **B4-1, B4-3, B4-4, B4-5, B4-7 and B4-8
+each keep at least one non-convention gap** and stand partial, exactly as the list below shows.
+The two corrected pages were **not re-read** and their read lines stand — only the classification of
+their flags changed.
 
 ## 4. Count honesty
 
-- **0 full / 8 partial.** No page in this batch carries a full acceptance. **B4-1 is the nearest to
-  full** and is still partial, on `non-prod` (L19) and the `h` placeholder (L28).
+- **The count is `2 full / 6 partial`.** Full: **B4-2** and **B4-6**. Partial: **B4-1, B4-3,
+  B4-4, B4-5, B4-7, B4-8**. **This is a correction: the batch's audited count was `0 full / 8
+  partial`** (item below and section 4b). **B4-1 is the nearest to full among the partials** and is
+  still partial, on `non-prod` (L19) and the `h` placeholder (L28).
+- **Disposition correction, 2026-10-15 (2026-10-16 UTC) — old count `0 full / 8 partial`, new count
+  `2 full / 6 partial`, two pages moved (B4-2 and B4-6).** Two coordinator rulings issued after the
+  SD-D re-audit apply: **(1)** an unglossed term that is a **library-wide convention** is not a
+  per-page defect — measure how many reader pages use it unglossed, and record a convention as an
+  observation about the library, not as a gap on the page; **(2)** the **frontmatter-position rule is
+  a norm, not an independent defect class**. The measurements, re-run at the base in this repair
+  round: `authz` 51 pages use it / 29 unglossed, `SaaS` 63/47, `E2E` 50/39, `API` 205/176; the
+  frontmatter norm is 128 of the 213 reader pages carrying a frontmatter description (217 of 254
+  occurrences, 85%). **B4-6's flags are exactly `authz` and `SaaS`, and B4-2's are `E2E`, `API` and
+  `authz` plus the frontmatter position — all conventions or the norm — so both pages move to
+  `full`, and the six other pages each keep a non-convention gap.** **Both counts are published here
+  rather than the old one being quietly overwritten**; section 4b states the change in full, and the
+  two moved pages' gap text is kept in section 3a as an **observation with the measurement that
+  justified the move.**
 - **No gap recorded anywhere in this section coexists with a full disposition** — the defect that
   recurred three times on 2026-10-15. Every gap named in 3a belongs to a page whose disposition
-  column in section 3 reads **partial**.
+  column in section 3 reads **partial**; the two full dispositions (B4-2, B4-6) carry
+  **observations** in 3a, not gaps.
 - **This lane publishes no readability count of its own** and cites the instrument, as the D84
   switch requires. This batch records **no rows**, so nothing moves at this lane's head except this
   record itself, which enters `no_recorded_acceptance` (+1 reader page, +1 official pending —
   656 / 600 at the lane's head).
-- **A page marked PARTIAL gets no acceptance row.** All eight pages of this batch are **partial**,
-  so **no row of any kind is recorded for any of them, and all eight stay PENDING.** The ledger's
+- **A page marked PARTIAL gets no acceptance row of any kind — no `full-page-acceptance` row and no
+  `targeted-review` row.** Six pages of this batch are **partial** (B4-1, B4-3, B4-4, B4-5, B4-7,
+  B4-8), so **no row of any kind is recorded for those six, and all six stay PENDING.** The ledger's
   fixed-format contract names four event kinds — `full-page-acceptance`, `targeted-review`,
   `withdrawal` and `lost-commit` — and has **no partial-acceptance kind**; of its own partial pages
   the ledger says they "keep only their withdrawal rows and stay **pending**" and "carry no acceptance
   row" (ledger L5136–5142), and the PARTIAL rule is explicit: **"a page a lane marked PARTIAL is
   never recorded as a full-page-acceptance"** (ledger L5144–5155).
-- **AEGIS-APR-116 is not the row type for these pages and does not apply to them.** That approval is
-  scoped to "an independent reviewer's check of a small edit of 10 lines or fewer, on the exact
-  revision, **so the page stays accepted**" (register L5002–5006, applying the existing small-edit
-  rule): it presumes a page that is, or remains, accepted. This lane edited none of the eight pages
-  and accepted none of them, so the targeted-review row that approval authorises is not available
-  for them. **An earlier version of this section said "row type per AEGIS-APR-116"; that was wrong
-  and is corrected here.**
+- **AEGIS-APR-116 is not the row type for these pages and does not apply to the six partial pages.**
+  That approval is scoped to "an independent reviewer's check of a small edit of 10 lines or fewer,
+  on the exact revision, **so the page stays accepted**" (register L5002–5006, applying the existing
+  small-edit rule): it presumes a page that is, or remains, accepted. This lane edited none of the
+  eight pages and accepted none of them, so the targeted-review row that approval authorises is not
+  available for the six partial pages (B4-1, B4-3, B4-4, B4-5, B4-7, B4-8). **An earlier version of
+  this section said "row type per AEGIS-APR-116"; that was wrong and is corrected here.**
+- **What the two corrected dispositions mean for rows.** B4-2 and B4-6 are no longer partial, so the
+  PARTIAL rule above does not reach them; whether a `full-page-acceptance` row is recorded for those
+  two is the separate eligible keeper's act on this retained evidence, under **AEGIS-APR-101** (the
+  approval requiring the ledger keeper to be an agent other than the page's author and its accepting
+  reviewer) and **AEGIS-APR-117** (the approval covering withdrawal rows and re-records from retained
+  evidence). **This lane records no row of any kind for any page of the batch.**
 - **Why the distinction is not pedantic.** `check_index.py` L181–184 classifies a **zero-drift**
   page carrying any non-`lost-commit` row as **`accepted`**, so a targeted-review row authored for
   a partial page would read as an acceptance at the next rebuild, move the page out of pending, and
   undercount the official pending total — the laundering class the 2026-10-15 correction exists to
   stop.
-- **What this record now tells the keeper, in one sentence: record no acceptance row, of any event
-  kind, for any of the eight pages — every one is PARTIAL and every one stays PENDING.** The handoff
-  under AEGIS-APR-101 / AEGIS-APR-117 is therefore **no rows for this batch**, not rows of a different
-  type; a page leaves pending only when a later, independent reviewer records a **full** acceptance
-  supported by fresh evidence. This agrees with section 5 — every verbatim row-quote string begins
-  `partial`, and "a line that says `partial` must never be copied into a full-page-acceptance row" —
-  and with the pull request body, which now states the same rule in the same words ("Partial
-  dispositions keep the eight pages **pending** until the keeper records them; they must not be
-  recorded as full acceptances. **A page marked PARTIAL gets no acceptance row of any kind — no
-  `full-page-acceptance` row and no `targeted-review` row.**").
+- **What this record tells the keeper, in one sentence: for a page this batch marks PARTIAL, record
+  no acceptance row of any kind — no `full-page-acceptance` row and no `targeted-review` row.** The
+  handoff under AEGIS-APR-101 / AEGIS-APR-117 is therefore **no rows of any kind for the six partial
+  pages**, not rows of a different type; a partial page leaves pending only when a later, independent
+  reviewer records a **full** acceptance supported by fresh evidence. **This agrees with section 5**,
+  which now states the same prohibition in the same words — "**No acceptance row of any kind is
+  recorded for a page this batch marks PARTIAL — no `full-page-acceptance` row and no
+  `targeted-review` row**" — and with the pull request body, which states the same rule in the same
+  words ("Partial dispositions keep the six partial pages **pending**; **a page marked PARTIAL gets
+  no acceptance row of any kind — no `full-page-acceptance` row and no `targeted-review` row.**").
 - The instrument figures at the base are quoted in section 1 and are not re-derived here.
+
+### 4b. The disposition correction in full — old count, new count, the two rulings, the measurements
+
+**A reader cannot miss this: the batch's count changed after the audit.** The count published at the
+audited head was **`0 full / 8 partial`**. The count now is **`2 full / 6 partial`**. The two pages
+that moved are **B4-2** and **B4-6**; **no other disposition changed, no page was re-read, and no
+page's text was edited.** The two moved pages' gap text is kept in section 3a as an **observation**,
+each with the measurement that justified the move.
+
+**The two coordinator rulings of 2026-10-15** (gloss: rulings the coordinating agent issued after the
+second SD-D re-audit; they are counting rules for first-use findings, and they edit no page):
+
+- **Ruling 1 — an unglossed term that is a library-wide convention is not a per-page defect.** The
+  test is how many reader pages use the term unglossed; when the term is a convention, the finding is
+  recorded as **an observation about the library, not as a gap on the page**.
+- **Ruling 2 — the frontmatter-position rule is not an independent defect class; it is a norm.**
+
+**The measurements, re-run in this repair round at the base `f490c16f`** (all 655 reader pages, every
+blob read from the base with `git cat-file --batch`, "unglossed" = the term's expansion does not
+appear at or before the term's first use on that page — the record's own single definition, section 3b):
+
+| Flagged term | Pages that use it (of 655) | Pages that leave it unglossed | Class under the stated rule |
+| --- | ---: | ---: | --- |
+| `authz` | 51 | 29 (57%) | **library convention** |
+| `SaaS` | 63 | 47 (75%) | **library convention** |
+| `E2E` | 50 | 39 (78%) | **library convention** |
+| `API` | 205 | 176 (86%) | **library convention** |
+
+**The frontmatter-position norm, measured the same way:** of the **213** reader pages that carry a
+frontmatter description, **151** use at least one listed acronym there and **128 (60%)** leave at
+least one of those acronyms unexpanded at or before its first use — **217 of 254 occurrences (85%)**.
+The pattern the rule flags is therefore itself library-wide.
+
+**Which pages moved, and on what measurement.**
+
+- **B4-6 → `full`.** Its flagged set is exactly two terms, `authz` (51 pages use it / 29 unglossed)
+  and `SaaS` (63/47), both conventions, and nothing page-specific stands behind them. Its section 3a
+  text is kept as an **observation** carrying those measurements.
+- **B4-2 → `full`.** Its three flags (`E2E` 50/39, `API` 205/176, `authz` 51/29) are all
+  conventions, and the frontmatter-position rule it additionally invokes is a norm under Ruling 2
+  (128 of 213 described pages; 217 of 254 occurrences). Its section 3a text is kept as an
+  **observation** carrying those measurements.
+- **Unchanged, and why — each keeps a non-convention gap:** **B4-1** (`non-prod`, used by 2 of the
+  655 pages and unglossed on both, plus the one-letter `h` placeholder), **B4-3** (`LLM` 59/26 —
+  below the half-way mark — plus `ambient`, 11 pages, and `5xx`, 5 pages, both page-local labels),
+  **B4-4** (`stdio` 3/3 plus the internal review codes `ASI07`/`ASI04`), **B4-5** (`ASI07` unexpanded
+  in the page title, `stdio` 3/3, `TCP` 1/1), **B4-7** (`mgmt` 5/1, `PDF` 9/9, the internal code
+  `D28`, "shipped Phase 3/4 packs") and **B4-8** ("Phase 7 + 7.5 packs",
+  `GOVERN/MAP/MEASURE/MANAGE`).
+
+**Keeper consequence, stated where the count is corrected as well as in section 4:** the six pages
+that stay partial get **no acceptance row of any kind**; B4-2 and B4-6 are no longer partial, so the
+PARTIAL rule does not bar a `full-page-acceptance` row for those two, and recording it is the separate
+eligible keeper's act from this retained evidence under AEGIS-APR-101 and AEGIS-APR-117. **This lane
+records no row of any kind for any page of the batch.**
 
 ## 5. The row-quote strings, verbatim
 
-Each line below appears in this file byte-for-byte and is the verbatim string a keeper copies into
-the row for the page whose label prefixes it. Every line also contains the full 40-character
-acceptance revision, the second binding rule the validator enforces. **Every line says `partial`;
-a line that says `partial` must never be copied into a full-page-acceptance row.**
+Each line below appears in this file byte-for-byte as the reader's own whole-page reading line for
+the page whose label prefixes it — **retained evidence, not row material**. **No acceptance row of
+any kind is recorded for a page this batch marks PARTIAL — no `full-page-acceptance` row and no
+`targeted-review` row** — because `check_index.py` reads a zero-drift page carrying any
+non-`lost-commit` row as **accepted**, so such a row would launder a partial page into an acceptance
+(section 4). Every line also contains the full 40-character acceptance revision, the second binding
+rule the validator enforces. **Every line says `partial`; a line that says `partial` must never be
+copied into a full-page-acceptance row, and no line below is copied into a row of any kind for a
+partial page.** The corrected dispositions for B4-2 and B4-6 are stated in section 4b; their two
+lines below keep the reader's original `partial` prefix as the reading that was made.
 
 ```text
 B4-1 partial: .claude/skills/incident-response-runbook/references/incident-runbook-template.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
@@ -537,7 +639,7 @@ Not applied, and why:
 
 ## 7. Keeper rows — withheld, by design (the AEGIS-APR-117 route)
 
-**This batch authors no acceptance rows and edits no ledger section.** It follows the Lead's
+**This batch authors no acceptance rows of any kind and edits no ledger section.** It follows the Lead's
 2026-10-15 urgent correction, written after Codex raised P1 (highest-severity) findings on all four
 batch-1 PRs: `build_index.py` validates row structure but not agent-role separation, so rows
 recorded by the same agent that read the pages would be ingested by the next rebuild and
@@ -548,10 +650,12 @@ The division of labour this batch applies:
 
 1. **This agent reads the pages and writes this evidence record** — the ranges read, the per-page
    dispositions and the observations. That is the deliverable.
-2. **It appends no `full-page-acceptance` rows** to the consolidated keeper table, and edits no
-   ledger text.
-3. **A separate, eligible keeper** — an agent that did not read these pages — records the rows from
-   this evidence under AEGIS-APR-101 and AEGIS-APR-117. **No page needs re-reading.**
+2. **It appends no row of any kind — no `full-page-acceptance` row and no `targeted-review` row —**
+   to the consolidated keeper table, and edits no ledger text.
+3. **A separate, eligible keeper** — an agent that did not read these pages — records the rows this
+   evidence supports under AEGIS-APR-101 and AEGIS-APR-117: **no row of any kind for the six pages
+   that stay partial (B4-1, B4-3, B4-4, B4-5, B4-7, B4-8), and the two corrected-full pages (B4-2,
+   B4-6) stand on section 4b.** **No page needs re-reading.**
 
 Batch 1's rows (K-082–K-089) and batch 2's rows (K-181–K-188) follow the same APR-117 cycle (PR #781
 carries the batch-1 withdrawals and re-records). Lane B's allocated keeper-ID band is K-181–K-280
@@ -561,8 +665,9 @@ record assigns none and claims no keeper authority.
 
 ## 8. What this lane did not do
 
-It rewrote no dated snapshot; authored no keeper row and edited, reordered or deleted no existing
-keeper row or ledger text; edited none of the eight read pages; added no new section to any page;
+It rewrote no dated snapshot; authored no keeper row of any kind and edited, reordered or deleted no
+existing keeper row or ledger text; edited none of the eight read pages; added no new section to any
+page;
 bound no acceptance row to the lane's own unmerged head; ran no `build_index.py --write` and
 rebuilt no `tools/` artifact; re-read none of the six lost-commit pages of the `cannot_decide`
 bucket; touched no page outside the lane's quarter (sorted indices 149–297) and none outside this
@@ -592,6 +697,8 @@ deployment authority" (ledger, batching section). The reader is the **DeepSeek-4
 | 14 | `git diff --check` | clean (run at the pushed head, recorded in the PR closeout) |
 | 15 | `git ls-tree -r --name-only f490c16f9ed23f3d489e42f7696323bffcce6fd3` searched for `KEEPER-ID` | no match — the allocation file is **not** in the repository at the base; it was read from `_resume-2026-10-09/KEEPER-ID-ALLOCATION.md` in the workspace (section 2a) |
 | 16 | read of `_resume-2026-10-09/KEEPER-ID-ALLOCATION.md` | 445 lines; lane B band K-181–K-280 at its L27; count-based-quarter rule at its L125; PR-content ruling at its L169–172 |
+| 17 | convention and norm re-measurement at the base: 655 reader-page blobs read with `git cat-file --batch` | `authz` 51/29, `SaaS` 63/47, `E2E` 50/39, `API` 205/176, `LLM` 59/26, `PDF` 9/9, `TCP` 1/1, `stdio` 3/3, `non-prod` 2/2, `mgmt` 5/1; frontmatter norm 213 described / 151 using an acronym / 128 unexpanded, 217 of 254 occurrences — the figures section 4b applies |
+| 18 | keeper-rule site sweep (the nine sites named in 11a; the pull request body checked separately) | every site states the prohibition in the "`no row of any kind` — no `full-page-acceptance` row and no `targeted-review` row" form; no site permits a `targeted-review` row |
 
 ## 10. Timing
 
@@ -606,7 +713,7 @@ deployment authority" (ledger, batching section). The reader is the **DeepSeek-4
   was not instrumented**; wall time is labelled an imperfect comparison with any active-time
   expectation, and no per-page active rate is claimed.
 
-## 11. Repair round — 2026-10-15 (Stage C repair after SD-D: REVISE)
+## 11. Repair rounds — 2026-10-15/16 (Stage C repairs after SD-D: REVISE)
 
 **SD-D** is the independent implementation-audit stage's verdict on this batch (gloss: the Stage D
 audit reads the change and returns ACCEPT or REVISE; it does not fix it). It returned **REVISE** at
@@ -653,13 +760,14 @@ Stage C lane — stated per the repository's 2026-10-13 attribution rule.
   fixed.** Section 3(c) said "seven-case" while section 3(e) said "eight-case". Measured on the page:
   B4-5's catalog table at L79–88 has **8** data rows (Peer spoof … Off-map edge). Section 3(c) now
   reads "eight-case"; the two copies agree.
-- **SD-D finding — library-norm over-flags: MEASURED, recorded in section 3b, and no disposition
-  changed.** Section 3b states the counts (the audit's published `authz` 38/51, `SaaS` 32/63,
-  `E2E` 39/50, `API` 176/205, and my single-definition re-run `authz` 29/51, `SaaS` 53/63, `E2E`
-  39/50, `API` 176/205), names the two pages they affect (**B4-6**, **B4-2**), and states the
-  disposition explicitly: neither page's disposition is changed here — **a re-audit is owed for
-  B4-6**, which now stands as the record's one over-flag candidate, and conditionally for B4-2 if the
-  frontmatter-position rule is relaxed.
+- **SD-D finding — library-norm over-flags: MEASURED in section 3b, and the dispositions are now
+  CORRECTED (see 11a).** Section 3b states the counts (the first audit's published `authz` 38/51,
+  `SaaS` 32/63, `E2E` 39/50, `API` 176/205, this record's single-definition run `authz` 29/51,
+  `SaaS` 53/63, `E2E` 39/50, `API` 176/205, and round 2's re-run `authz` 51/29, `SaaS` 63/47,
+  `E2E` 50/39, `API` 205/176) and names the two pages they affect (**B4-6**, **B4-2**). Round 1 left
+  both dispositions unchanged because no ruling on the convention question had been made; **the
+  coordinator's two rulings of 2026-10-15 have since been issued and applied — both pages move to
+  `full` (11a).**
 - **SD-D finding — body label glosses: CONFIRMED and fixed.** The pull-request body's witness rows 1–2
   now gloss the `MG` and `SD` blocks in the same words PR #783 uses, and the `scoped-approval-register`
   row now glosses `AEGIS-APR-039`, `AEGIS-APR-101`, `AEGIS-APR-116` and `AEGIS-APR-117` rather than
@@ -682,12 +790,63 @@ protocol requires: **a bound-field edit voids any verdict that named the old fig
 verdicts are owed at the new head.** No page, ledger, tool, workflow or approval file was touched by
 this repair; no keeper row was authored or edited; nothing was merged.
 
-**Repair arithmetic, counted not regexed.** Against the audited head `6443ff87` this repair
+### 11a. Second repair round — 2026-10-15/16 (Stage C repair after the second SD-D: REVISE)
+
+**The second SD-D** (gloss: the same independent implementation-audit stage, re-run on the repaired
+head) returned **REVISE** at head `42c5657ac4de399919986776e2e24edde07e57fb` in comment **6206895535**,
+with **one blocking finding (F1)** and **one non-blocking finding (F2)** plus its disposition
+judgment. It re-verified the P1 fix against all four artifacts, the five Codex comments and their
+dispositions, the digest, the deleted-line arithmetic, the 92/36 backtick correction, the builder's
+`table_rows` 162 and the CI states; those verifications are preserved, not re-argued here.
+
+- **F1 (blocking) — section 5 still permitted the laundering by silence: CONFIRMED and fixed.**
+  Section 5 called the lines below "the verbatim string a keeper copies into the row" and forbade only
+  `full-page-acceptance` rows, so it permitted, by silence, the `targeted-review` row that
+  `check_index.py` reads as an acceptance. **Section 5 now reads: "No acceptance row of any kind is
+  recorded for a page this batch marks PARTIAL — no `full-page-acceptance` row and no
+  `targeted-review` row"**, the copy-into-a-row premise is replaced by "retained evidence, not row
+  material", and **section 4's agreement sentence is corrected**: it no longer asserts agreement with
+  a narrower rule but quotes section 5's own words. **Every site that states the keeper rule was
+  re-read after the edit — 9 sites: the header bullet, the section 3 tail, section 4, section 4b,
+  section 5, section 7, section 8, section 9 (validation row 18) and this section — and each states
+  the prohibition in the "no row of any kind" form; the pull request body states the same rule in the
+  same words.**
+- **The disposition judgment — APPLIED: `0 full / 8 partial` → `2 full / 6 partial`.** Section 4's
+  first two bullets and **section 4b** state the old count, the new count, the two coordinator
+  rulings, the measurements (`authz` 51/29, `SaaS` 63/47, `E2E` 50/39, `API` 205/176; frontmatter norm
+  213/151/128 and 217 of 254) and the two pages that moved (**B4-2**, **B4-6**). Sections 3, 3a, 3b,
+  4, 4b, 5, 7 and 8 and the pull request body carry the same count and the same rule. **Both counts
+  are published; no disposition was changed silently, and both moved pages keep their gap text as an
+  observation with the measurement that justified the move.**
+- **F2 (non-blocking) — the body's repair-commit paragraph: CONFIRMED and fixed.** The body named
+  `42c5657a` twice as "a third and a fourth commit" and never named the first repair commit
+  `05546c10`; it now names `05546c10` (third), `42c5657a` (fourth, the head round 1 produced) and
+  round 2's commit (fifth) in the order they were made. **That fix is outside all three bound fields
+  and on its own does not move the digest.** Round 2 moves it for a different reason: the head SHA
+  and the record's line count sit **inside** the fields — witness row 1's command, row 5's base
+  numstat, the security bullet's command, and the skills `ai-closeout-reporter` row with its
+  `Row source` line — so those were updated and the digest moves from `277ee09042d9091c` to the value
+  this round publishes at the body's digest line. **A bound-field edit voids any verdict that named
+  the old figure, and fresh verdicts are owed at this head.**
+- **Repair arithmetic for round 2, counted not regexed.** Against the head round 2 started from
+  (`42c5657a`) this round **replaces** text as well as adding it: enumerating every raw diff line
+  beginning with `-` (excluding the `---` file header) gives **82 deleted** lines and
+  **241 added** lines; **7 of the deleted lines themselves begin with `--`**, which a naive
+  pattern misses, and the deleted lines' sites are listed in the pull request body. Against the named
+  base `f490c16f` the pull request is still **additions only** — the record does not exist at that
+  base — so the tree-to-tree diff is now **854 insertions and 0 deletions**, and the record's
+  length is now **854 lines**. Nothing else in the change moved: the ledger is byte-identical
+  at the base and at this head, no keeper row was authored, and no page, tool, workflow or approval
+  file was touched.
+
+**Repair arithmetic, counted not regexed — round 1, at the head that round produced (`42c5657a`).**
+Against the audited head `6443ff87` this repair
 **replaces** text: enumerating every raw diff line beginning with `-` (excluding the `---` file
 header) gives **27 deleted** lines and **234 added** lines; three of the deleted lines themselves begin
 with `--`, which a naive pattern misses. Against the named base `f490c16f` the pull request is
 still **additions only** — this record does not exist at that base, so the tree-to-tree diff is
-**695 insertions and 0 deletions**, and the record's own length is **695 lines**.
+**695 insertions and 0 deletions**, and the record's length at `42c5657a` was **695 lines**.
+**Round 2's own arithmetic is in 11a.**
 
 ---
 
