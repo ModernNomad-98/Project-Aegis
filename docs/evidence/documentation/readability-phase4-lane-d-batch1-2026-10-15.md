@@ -488,9 +488,10 @@ unmerged, so in-place repair remains allowed). **The corrections, with the comma
    elided splice this record's section 12 and the body's residual list already fixed. The ledger
    section now quotes the contiguous fragment "not mark earlier screens as full-page acceptance or
    grant provider, private-input, real-host or deployment authority" (`git show
-   e2a3e20b:docs/roadmaps/aegis-documentation-readability-backlog.md` L3018-3020). The three
-   pre-existing dated sections that quote the elided form (L4746, L4910, L5111 — one more than the
-   second round's note named) are no-rewrite-protected and untouched.
+   e2a3e20b:docs/roadmaps/aegis-documentation-readability-backlog.md` L3018-3020). The four
+   pre-existing dated sections that quote the elided form (L4746, L4819, L4909, L5111 — counted by
+   command over the whole file, two more than the second round's note named) are no-rewrite-protected
+   and untouched.
 5. **F5 (P3) — the promised finish/wall time.** Section 14 promised a batch finish timestamp and wall
    time "recorded in the pull-request body"; neither was ever recorded anywhere. The promise is
    corrected (the figures are recorded as not recorded — stated, not filled), and this repair item's
