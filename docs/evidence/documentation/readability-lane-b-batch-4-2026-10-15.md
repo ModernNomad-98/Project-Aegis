@@ -123,8 +123,10 @@ out-of-repository coordinator file in the workspace, not a repository path.** (B
 cites the same file by bare filename, which reads as though it lived in the tree; it does not —
 `git ls-tree -r --name-only <base>` lists no such path, and the file exists only in the workspace.)
 The band is the file's table row for lane B ("**B** | K-181 – K-280 | second quarter") at its
-L27. The ids for these eight pages are the separate eligible keeper's to assign. See section 7 and
-the cross-check in section 2a.
+L27. The ids for the rows the keeper records are the separate eligible keeper's to assign — **and
+under the corrected count those rows reach only the two pages that stand `full` (B4-2 and B4-6);
+the six pages that stay partial get no row of any kind and so take no id** (sections 4 and 7). See
+section 7 and the cross-check in section 2a.
 
 ### 2a. Cross-check against the lane-allocation file (read this session, not inherited)
 
@@ -245,7 +247,9 @@ section 4b; the six partial pages each keep the gaps named here.
   defines HQ, ORM, IDOR, RLS, SQL and UI but not it. **Why this is an observation and not a gap:**
   both terms are library-wide conventions (`authz` 51 pages use it / 29 leave it unglossed; `SaaS`
   63/47 at the base) and they are the page's only two flags — nothing page-specific stands behind
-  them — so under Ruling 1 the page carries no gap. **Observation, not a gap:** `tenant_id` (L3 and
+  them — so under Ruling 1 the page carries no gap (`authz` clears the 50-page bar by one page;
+  **section 4b records that margin and the code-excluding variant that would reverse this
+  disposition**). **Observation, not a gap:** `tenant_id` (L3 and
   throughout) is a literal schema column name used in the predicate, not an abbreviation to expand.
 - **B4-7 `isms-clause-map.md` (74 lines) — partial.** The title at **L1** uses `ISMS` (expanded
   L13), `ISO` (L12), `IEC` (L13) and `Amd` (L14) before the Reading key at L12–15. `TOC` at
@@ -361,7 +365,7 @@ test).**
 **Why this subsection exists.** Section 3a flags eight pages. Some of the terms it flags are left
 unglossed across much of this library, so a gap on one of them is weak evidence that *this* page is
 the defective one. The measurement below separates the two classes, so the keeper and later readers
-can weigh each partial instead of treating all eight as equal. **It is the measurement the two
+can weigh each page's flags instead of treating all eight as equal. **It is the measurement the two
 corrected dispositions rest on** — see the disposition note at the end of this subsection and
 section 4b.
 
@@ -377,6 +381,21 @@ use" shape the section 3a test applies, so this table measures the thing the dis
 **Class rule, stated so it can be challenged:** a term is a **library convention** when at least 50 of
 the 655 pages use it **and** at least half of those pages leave it unglossed at first use. Otherwise
 a gap on it is treated as page-specific.
+
+**Sensitivity of the `authz` row — recorded, not hidden.** `authz` is the one headline row
+that clears the 50-page half of this rule **narrowly**: **51** of the 655 pages use it under this
+record's stated method, **one page over** the bar (the Stage D re-audit's independent re-run under a
+looser, case-insensitive word boundary gives **52**, two over). **A variant that excludes fenced and
+inline code from the same 655 pages drops `authz` below the bar — 44/25 under this record's own
+case-sensitive method, 45/26 under the audit's — so under that variant `authz` would not be a
+library convention at all, and the two corrected dispositions would reverse: `authz` would then
+be a page-specific first-use gap on B4-6 and on B4-2, and both pages would stand `partial`.** The
+other three headline rows survive the same variant (`SaaS` 63/47, `E2E` 50/39 and `API`
+198/170 under this record's method), so `authz` is the one row the variant flips. **Under the
+stated method this record applies, `authz` is a convention and neither page carries a gap** —
+this paragraph records a margin in the library-wide measurement; it creates no gap on any page and
+changes no disposition. Section 4b carries the same figures in the item that justifies B4-6's
+disposition.
 
 | Flagged term | Pages that use it (of 655) | Pages that leave it unglossed at first use | Class under the stated rule |
 | --- | ---: | ---: | --- |
@@ -538,9 +557,22 @@ The pattern the rule flags is therefore itself library-wide.
 
 **Which pages moved, and on what measurement.**
 
-- **B4-6 → `full`.** Its flagged set is exactly two terms, `authz` (51 pages use it / 29 unglossed)
-  and `SaaS` (63/47), both conventions, and nothing page-specific stands behind them. Its section 3a
-  text is kept as an **observation** carrying those measurements.
+- **B4-6 → `full`, on a thin margin for one of its two terms — recorded here, not suppressed.**
+  Its flagged set is exactly two terms, `authz` (51 pages use it / 29 unglossed) and `SaaS`
+  (63/47), both conventions, and nothing page-specific stands behind them. Its section 3a text is
+  kept as an **observation** carrying those measurements. **The `authz` row clears this record's
+  50-page convention bar by one page: 51 of the 655 reader pages use it under the stated method, and
+  the Stage D re-audit's looser, case-insensitive re-run gives 52 — so the bar is cleared by one to
+  two pages.** **A variant that excludes fenced and inline code puts `authz` below the bar —
+  45/26 under the audit's boundary, 44/25 under this record's — and that variant would reverse this
+  disposition:** `authz` would stop being a library convention, would stand as a page-specific
+  first-use gap on B4-6, and the page would be `partial` rather than `full`. **B4-2 carries
+  `authz` as one of its three flags and is exposed to the same reversal; its `E2E` (50/39) and
+  `API` (205/176) rows — 198/170 under the variant — and B4-6's `SaaS` (63/47) are not close
+  to the line and survive it.** **As published, B4-6 carries no gap:** under the method this record
+  states and applies, `authz` is a library convention, and the margin above belongs to the
+  library-wide measurement, not to the page. **The disposition therefore stands unchanged — this
+  item records the margin so a reader can see that the disposition is margin-dependent.**
 - **B4-2 → `full`.** Its three flags (`E2E` 50/39, `API` 205/176, `authz` 51/29) are all
   conventions, and the frontmatter-position rule it additionally invokes is a norm under Ruling 2
   (128 of 213 described pages; 217 of 254 occurrences). Its section 3a text is kept as an
@@ -598,7 +630,11 @@ applied would report work that did not occur. None is padded.
 - **`acceptance-criteria-reviewer`** (the skill that judges a page against written acceptance
   criteria) — **applied.** The ledger's six "Acceptance for each page" bullets are the acceptance
   criteria; each of the eight pages was judged against all six with quoted line cites (section 3)
-  and one verdict each — **eight partials**, with every gap named by line (section 3a). The
+  and one verdict each. **The verdict count is `2 full / 6 partial`, not "eight partials"** —
+  the reader's first verdicts were eight partials, and the two coordinator rulings of 2026-10-15
+  then corrected **B4-2** and **B4-6** to `full` (sections 4 and 4b state the old count, the
+  new count, the two rulings and the measurements). **Every gap is named by line (section 3a); the
+  six pages that keep a gap are B4-1, B4-3, B4-4, B4-5, B4-7 and B4-8.** The
   read-and-report-only posture held: no page text was edited.
 - **`source-of-truth-reconciler`** (the skill that reconciles conflicting statements against the
   artifact that defines them) — **applied.** Three brief anchors conflict with the command-derived
@@ -660,8 +696,10 @@ The division of labour this batch applies:
 Batch 1's rows (K-082–K-089) and batch 2's rows (K-181–K-188) follow the same APR-117 cycle (PR #781
 carries the batch-1 withdrawals and re-records). Lane B's allocated keeper-ID band is K-181–K-280
 (read from the out-of-repository coordinator file named in section 2a, not from a repository path);
-the batch-4 keeper assigns the ids for these eight pages per the allocation file's protocol. This
-record assigns none and claims no keeper authority.
+the batch-4 keeper assigns the ids for the rows it records per the allocation file's protocol —
+**under the corrected count those rows are for the two pages that stand `full` (B4-2 and B4-6)
+only; the six partial pages (B4-1, B4-3, B4-4, B4-5, B4-7, B4-8) get no row of any kind and take no
+id**. This record assigns none and claims no keeper authority.
 
 ## 8. What this lane did not do
 
@@ -699,6 +737,8 @@ deployment authority" (ledger, batching section). The reader is the **DeepSeek-4
 | 16 | read of `_resume-2026-10-09/KEEPER-ID-ALLOCATION.md` | 445 lines; lane B band K-181–K-280 at its L27; count-based-quarter rule at its L125; PR-content ruling at its L169–172 |
 | 17 | convention and norm re-measurement at the base: 655 reader-page blobs read with `git cat-file --batch` | `authz` 51/29, `SaaS` 63/47, `E2E` 50/39, `API` 205/176, `LLM` 59/26, `PDF` 9/9, `TCP` 1/1, `stdio` 3/3, `non-prod` 2/2, `mgmt` 5/1; frontmatter norm 213 described / 151 using an acronym / 128 unexpanded, 217 of 254 occurrences — the figures section 4b applies |
 | 18 | keeper-rule site sweep (the nine sites named in 11a; the pull request body checked separately) | every site states the prohibition in the "`no row of any kind` — no `full-page-acceptance` row and no `targeted-review` row" form; no site permits a `targeted-review` row |
+| 19 | round-3 sweep of the retired pre-correction state over the pull-request **title**, the whole pull-request body and this whole record, whitespace-collapsed, against every form of the retired state (the count `0 full / 8 partial`, "eight partials", "eight acceptance rows", "all eight ... pending", and any keeper row or keeper id assigned to eight pages) | three further copies found and fixed (section 11b); no site in the title, the body or this record now states the retired count, the retired row scope or the retired pending set as current |
+| 20 | convention re-measurement at the base, 655 reader-page blobs read with `git cat-file --batch`, under this record's stated method (word boundary, case-sensitive, all bytes) and under a variant that excludes fenced and inline code | stated method `authz` **51/29** (one page over the 50-page bar), `SaaS` 63/47, `E2E` 50/39, `API` 205/176; code-excluding variant `authz` **44/25**, `SaaS` 63/47, `E2E` 50/39, `API` 198/170; the audit's looser boundary gives `authz` 52/30 and, with the same exclusion, 45/26. Sections 3b and 4b record the margin |
 
 ## 10. Timing
 
@@ -727,7 +767,9 @@ Stage C lane — stated per the repository's 2026-10-13 attribution rule.
 
 - **Codex P1 (r4290065866) — "Do not record partial reviews as targeted reviews": CONFIRMED and
   fixed.** The reasoning is in section 4, which now states that **a page marked PARTIAL gets no
-  acceptance row of any kind** and that all eight pages stay pending. The P1's own evidence is
+  acceptance row of any kind** and that **the six pages that stay partial are the pages that stay
+  pending** — B4-1, B4-3, B4-4, B4-5, B4-7 and B4-8; the two corrected-full pages (B4-2 and B4-6)
+  are no longer partial (section 4b). The P1's own evidence is
   reproduced in section 4 from the artifacts (ledger L5136–5142, ledger L5144–5155, register
   L5002–5006, `check_index.py` L181–184).
 - **Codex P2 (r4290065869) — "Replace the copied B4-1 criterion evidence": CONFIRMED and fixed.**
@@ -755,7 +797,10 @@ Stage C lane — stated per the repository's 2026-10-13 attribution rule.
   count at the repaired head is larger; **both body rows now state the same figure, measured at the
   repaired head and repeated in the body's checklist and validation table** (**4**: the original
   Stage C commit, the correction commit, and the two repair commits — the first repair commit is
-  `05546c10`; the second is the commit that carries this sentence).
+  `05546c10`; the second is the commit that carries this sentence). **That `4` is the count at
+  round 1's head `42c5657a`; the count moved with every later commit — 5 at `18667de5`, which the
+  body states — and round 3's figure is in section 11b**, so no superseded number has to be read as
+  the current one.
 - **SD-D finding, not in Codex — the seven-case/eight-case catalog contradiction: CONFIRMED and
   fixed.** Section 3(c) said "seven-case" while section 3(e) said "eight-case". Measured on the page:
   B4-5's catalog table at L79–88 has **8** data rows (Peer spoof … Off-map edge). Section 3(c) now
@@ -834,8 +879,9 @@ dispositions, the digest, the deleted-line arithmetic, the 92/36 backtick correc
   **241 added** lines; **7 of the deleted lines themselves begin with `--`**, which a naive
   pattern misses, and the deleted lines' sites are listed in the pull request body. Against the named
   base `f490c16f` the pull request is still **additions only** — the record does not exist at that
-  base — so the tree-to-tree diff is now **854 insertions and 0 deletions**, and the record's
-  length is now **854 lines**. Nothing else in the change moved: the ledger is byte-identical
+  base — so the tree-to-tree diff at that round's head was **854 insertions and 0 deletions**, and
+  the record's length there was **854 lines** (round 3's own figures are in section 11b). Nothing
+  else in the change moved: the ledger is byte-identical
   at the base and at this head, no keeper row was authored, and no page, tool, workflow or approval
   file was touched.
 
@@ -847,6 +893,74 @@ with `--`, which a naive pattern misses. Against the named base `f490c16f` the p
 still **additions only** — this record does not exist at that base, so the tree-to-tree diff is
 **695 insertions and 0 deletions**, and the record's length at `42c5657a` was **695 lines**.
 **Round 2's own arithmetic is in 11a.**
+
+### 11b. Third repair round — 2026-10-15/16 (Stage C repair after the third SD-D: REVISE)
+
+**The third SD-D** (gloss: the same independent implementation-audit stage, run again at the repaired
+head) returned **REVISE** at head `18667de51dedc5c10d6af27ea129af631795d674` in comment
+**6207344797**, with **three stale copies of the pre-correction state** to fix and **one caveat to
+record rather than suppress**. It confirmed that F1 is closed across 13 row-rule sites, that
+**neither FULL page carries an acknowledged gap**, that the disposition change is disclosed and not
+silent, that F2 is fixed and sits outside all three bound fields, that the bound-field digest
+calibrates on four named values, that the deleted-line and `table_rows` arithmetic reproduces, that
+the history amend is sound and that declining to rewrite the first commits is right, and that the CI
+at the head is 30 completed check runs — 18 `success` and **12 `skipped`, recorded as skipped
+and never as passed**.
+
+- **Stale copy 1 (blocking) — the pull-request body's Plan section: CONFIRMED and fixed.** The Plan
+  told the ledger keeper it "records the eight acceptance rows". It now separates the two groups:
+  **one `full-page-acceptance` row for each of the TWO pages that stand `full` (B4-2 and B4-6),
+  re-recorded by a separate eligible keeper under AEGIS-APR-101 and AEGIS-APR-117, and NO row of any
+  kind — no `full-page-acceptance` row and no `targeted-review` row — for the SIX pages that
+  stay PARTIAL (B4-1, B4-3, B4-4, B4-5, B4-7, B4-8), which stay pending.**
+- **Stale copy 2 — the pull-request TITLE: CONFIRMED and fixed.** The title read
+  "(0 full / 8 partial, no keeper rows)" and carried no corrected count; it now reads
+  "(2 full / 6 partial, no keeper rows)". **This site was on no prior sweep list**, which is why it
+  survived two repair rounds.
+- **Stale copy 3 — section 6: CONFIRMED and fixed.** Section 6 said the acceptance-criteria-reviewer
+  produced "one verdict each — **eight partials**". It now states the corrected count
+  (`2 full / 6 partial`), names the two corrected pages and the six that keep a gap, and keeps the
+  history: the reader's first verdicts were eight partials.
+- **The sweep the third SD-D required, and what else it found.** The sweep covered the pull-request
+  **title**, the **whole pull-request body** (every line, not the named sections) and the **whole
+  record**, whitespace-collapsed, against every form of the retired state: the count
+  `0 full / 8 partial`, "eight partials", "eight acceptance rows", "all eight ... pending", and any
+  statement that assigns keeper rows or keeper ids to eight pages. **Three further copies had
+  survived, and all three are fixed:** section 2's keeper-band paragraph and section 7's
+  division-of-labour paragraph both gave the keeper "the ids for these eight pages" (both now scope
+  the ids to the rows the keeper records — the two full pages — and say expressly that the six
+  partial pages take no id); and section 11's Codex-P1 disposition bullet said "all eight pages stay
+  pending" (it now says the six partial pages stay pending). **The sweep also found one stale copy
+  outside that class, fixed with it:** the body's acceptance-index-builder row listed three refs but
+  said `table_rows` **162** "at both" (now "at all three"). **No site in the title, the body or
+  this record now states the retired count, the retired row scope or the retired pending set as
+  current.**
+- **The audit's caveat — recorded in the item that justifies the disposition, not suppressed.**
+  Section 4b's **B4-6 → `full`** item now carries the margin, and section 3b's class rule carries
+  the same figures: `authz` clears this record's own 50-page convention bar by **one to two pages**
+  (51 of 655 under the stated method, 52 under the audit's looser re-run), and **a code-excluding
+  variant gives 45/26 — 44/25 under this record's exact method — below the bar, which would reverse
+  the B4-6 and B4-2 dispositions.** **The dispositions themselves are unchanged**, because the
+  record's stated method is the method that was applied and reproduced; the margin is recorded so a
+  reader can see that the dispositions are margin-dependent. Section 3a's B4-6 entry carries a
+  one-line pointer to it. **Neither full page carries a gap after this round either** — the margin is
+  a property of the library-wide measurement, not a gap on a page.
+- **Repair arithmetic for round 3, counted not regexed.** Against the head round 3 started from
+  (`18667de5`) this round **replaces** text as well as adding it: enumerating every raw diff line
+  beginning with `-` (excluding the `---` file header) gives **14 deleted** lines and
+  **128 added** lines, and **1 of the deleted lines itself begins with `--`**, which a
+  naive `^--` exclusion would drop. Their sites are listed in the pull request body. Against the
+  named base `f490c16f` the pull request is still **additions only** — the record does not exist
+  at that base — so the tree-to-tree diff is now **968 insertions and 0 deletions**, and this
+  record's length is now **968 lines**.
+- **DCO at this round's head:** `python -P scripts/check_dco.py --range origin/main..HEAD` → exit 0,
+  `OK: 6 commit(s) checked, all signed off or exempt.`, matching the two rows in the body.
+- **Identity.** This round's commit carries the explicit
+  `DeepSeek-4.1-Flash (Stage C, Role A source library) <deepseek-flash@project-aegis.local>`
+  identity — **not** the stale global `F reviewer <reviewer@example.invalid>` — and the first
+  five commits are not rewritten, because rewriting `b03e6bc4` or `6443ff87` would falsify the
+  five Codex review comments' `original_commit_id` binding. This round's commit is named in the pull
+  request body.
 
 ---
 
