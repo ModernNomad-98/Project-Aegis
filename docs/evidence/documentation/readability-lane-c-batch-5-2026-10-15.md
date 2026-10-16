@@ -33,6 +33,15 @@ time to the pull request is reported in the pull-request body).
   lane B batch 5, commits 39a3e5d0 / 4b830eb4 / 3a2546b4). The host's global identity was read first and
   was the stale placeholder `F reviewer <reviewer@example.invalid>`; it was **not** used, because a
   merge would inscribe it into `main`. The identity was set explicitly before this clone's first commit.
+- **Stage C repair of this record, disclosed rather than hidden.** The implementation audit of this
+  record (PR #797, comment `6209620458`; verdict `SD-D: REVISE`) recorded nine measured-claim findings
+  (F1–F9) and ruled that none of them voids a disposition. This revision applies all nine to the record:
+  four per-page counts (C5-5's link occurrences, and the named-skill counts and descriptors of C5-5,
+  C5-6 and C5-7), the frontmatter numeral, the section 6.1 table size, four convention-table and
+  below-norm figures plus the `n-a` substring artifact, two quotations, and the recording authority.
+  The footer digest below is recomputed over the corrected bytes. No disposition, gap, page line,
+  FULL/PARTIAL count, blob ID or per-page line/byte figure changed; no page, ledger line, index entry,
+  register entry or workflow file is touched.
 - **What this page is.** The batch's tracked evidence record. *Tracked* means committed to the
   repository rather than left in a working directory. It is the **evidence source** the separate keeper
   cites when it records this batch's pages: a *keeper row* is one row of the ledger's consolidated
@@ -42,10 +51,14 @@ time to the pull request is reported in the pull-request body).
   adds exactly this record file. Under **AEGIS-APR-101** — *AEGIS-APR-101* is the owner's register entry
   establishing the standing ledger-keeper role, whose first condition is that the keeper must be a
   different agent from the page's author **and** from the accepting reviewer — the rows for this batch's
-  eligible pages are recorded later by a separate eligible keeper from this evidence, under
-  **AEGIS-APR-117** (*AEGIS-APR-117* is the owner's decision that a wrong or same-agent row is cancelled
-  by an appended withdrawal row and the page is re-recorded by a different agent from the same
-  evidence), so **no page needs re-reading**.
+  eligible pages are recorded later by a separate eligible keeper from this evidence. The **recording**
+  authority is **AEGIS-APR-101** — its unchanged recording-only role, as the ledger states it at
+  L5116-5117 ("The ledger keeper records under AEGIS-APR-101 (its unchanged recording-only role) and
+  AEGIS-APR-117 (withdrawal rows)"). **AEGIS-APR-117** is the **withdrawal route only** and adds no
+  recording power: *AEGIS-APR-117* is the owner's decision that a wrong or same-agent row is cancelled
+  by an appended withdrawal row, bound to evidence, and the page becomes pending again. These seven
+  pages carry no row at all, so there is nothing to withdraw: AEGIS-APR-117 covers nothing here, and
+  **no page needs re-reading**.
 - **AEGIS-APR-039** is the standing grant for authorized Project Aegis backlog work (commits, pushes,
   pull requests and merges); this batch uses the commit, push and pull-request part only and **does not
   merge**. **AEGIS-APR-137** is the owner's merged approval of the eight defaults this lane's brief
@@ -469,9 +482,9 @@ reproduction is statistically reliable, and instrument only the boundary between
 2. **Every line was read as prose** — the frontmatter with its MANUAL-ONLY marker, the reading key, Purpose,
    Use When with its three Do-NOT-use counter-examples, Inputs to Inspect, the Workflow preamble and its eight
    numbered steps, the Output Format block, Validation Checklist, Gotchas, Stop Conditions and Supporting Files.
-3. **Links and named references** were checked mechanically (section 9): the page's two link occurrences
-   (rendered text: skill-generation standard) resolve at the bound revision and share the page's one anchor,
-   which the repository's link checker verified; **all 6** distinct backticked skill names exist; the page names
+3. **Links and named references** were checked mechanically (section 9): the page's one link occurrence
+   (rendered text: skill-generation standard) resolves at the bound revision, with the one anchor it carries
+   verified by the repository's link checker; **all 3** distinct backticked skill names exist; the page names
    no shell command that could be stale.
 
 **The six acceptance bullets, addressed.**
@@ -482,7 +495,7 @@ reproduction is statistically reliable, and instrument only the boundary between
 | Abbreviations and coded identifiers defined at first use | **yes.** CI is expanded at L9-10 ("CI means continuous integration, the automated checks run for a change"); TDD at L14; TALI as "Task-Authorized Local Implementation (TALI)" at L55-56; RED, GREEN and REFACTOR are defined by the Purpose at L14-16 and by the workflow steps that name them (L70, L78, L80); `mid-batch` (L123) is a transparent two-word compound and is recorded as an observation in section 6. |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes.** Nine headed sections; an eight-step numbered workflow; a copyable Output Format block (L89-99) showing one iteration's RED/GREEN/REFACTOR lines; a Validation Checklist; and concrete failure examples (L71-73 "an import error, name error, fixture crash, or an unexpectedly passing test means the test is wrong — fix the test, not the code"). |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes.** L54-61 states the execution boundary in the same words the sibling skill uses (explicit human invocation "does not expand the allowed target or activate Task-Authorized Local Implementation (TALI)"), and Stop Conditions refuse the operation when authority is absent. |
-| Navigation links current and every referenced file or command existing | **yes.** 2 Markdown link occurrences over 1 target — exists at the bound revision, with the page's one anchor resolving; no external links; **all 6** named skills exist. |
+| Navigation links current and every referenced file or command existing | **yes.** 1 Markdown link occurrence over 1 target — exists at the bound revision, with the page's one anchor resolving; no external links; **all 3** named skills exist. |
 | The non-author review itself | **this record** (page author: Peter Nguyen, last-touching commit `cce5c378`) |
 
 **Purpose and normal use restated from the page alone:** implementing a behavior change test-first — state the
@@ -504,7 +517,7 @@ the regression test.
    discipline, the Output Format block, Validation Checklist, Gotchas, Stop Conditions and Supporting Files.
 3. **Links and named references** were checked mechanically (section 9): the page's two link occurrences
    (rendered text: references/tech-spec-sheet.md, twice) resolve to the one existing target at the bound
-   revision; no external links; no in-page anchors; **all 8** distinct backticked skill names exist.
+   revision; no external links; no in-page anchors; **all 6** distinct backticked skill names exist.
 
 **The six acceptance bullets, addressed.**
 
@@ -514,7 +527,7 @@ the regression test.
 | Abbreviations and coded identifiers defined at first use | **yes.** The reading key at L8-10 expands ADR, RFC, API and PII before the body; `hot paths` (L78) is below library norm and is recorded as an **observation, not a gap**, in section 6 with the resolving sentence; `cross-cutting concerns` is resolved by the page's own enumeration at L77-81; `observability` is a library convention, measured in section 6. |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes.** Eight headed sections; an eight-step workflow; a copyable Output Format block (L114-127) listing the spec's sections; a Validation Checklist; and concrete examples of the failure modes (L149-150 "A tech spec with no non-goals expands in review until it's a re-architecture"; L156-158 "Show the roads not taken"). |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes.** L144-145 requires known, assumed and open to be separated and forbids "confident fiction over unresolved design"; L84-97 states the owner-question discipline and that an answer "sets the design only and does not authorize starting the build". |
-| Navigation links current and every referenced file or command existing | **yes.** 2 Markdown link occurrences over 1 target — exists at the bound revision; no external links; no in-page anchors; **all 8** named skills exist. |
+| Navigation links current and every referenced file or command existing | **yes.** 2 Markdown link occurrences over 1 target — exists at the bound revision; no external links; no in-page anchors; **all 6** named skills exist. |
 | The non-author review itself | **this record** (page author: Peter Nguyen, last-touching commit `67f577e2`) |
 
 **Purpose and normal use restated from the page alone:** writing the technical spec / design doc for a
@@ -537,7 +550,10 @@ the decisions inside it.
    discriminator table.
 3. **Links and named references** were checked mechanically (section 9): the page's one link occurrence
    (rendered text: Tech Spec Writer) resolves at the bound revision; no external links; no in-page anchors;
-   **all 6** distinct backticked skill names exist.
+   **1** distinct backticked skill name exists (`tech-spec-writer`), and the six further skill names the
+   page gives in plain text — `adr-writer`, `architecture-designer`, `latency-budget-architect`,
+   `observability-operator`, `pii-lifecycle-designer`, `product-spec-writer` — each resolve to a real
+   skill at the bound revision.
 
 **The six acceptance bullets, addressed.**
 
@@ -547,7 +563,7 @@ the decisions inside it.
 | Abbreviations and coded identifiers defined at first use | **yes.** The reading key at L7-9 expands API, ADR, authn, authz, PII and E2E before the body. Two further coded items are below library norm and are recorded as **observations, not gaps**, in section 6 with the resolving sentence for each: `hot paths` and the `expand→migrate→contract` sequence; `blast radius` is a library convention, measured in section 6. |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes.** Three headed sections; the full tech-spec template as a copyable block (L13-46); an eight-item checklist (L50-57); and a four-row discriminator table comparing scope, question, content and relationship across tech spec, ADR and product spec — a worked comparison rather than an assertion. |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes.** The sheet is a template and a checklist and claims no shipped behaviour; the template's review-and-sign-off section (L44-45) and its risks section (L37-42) keep what is proposed separate from what is agreed. |
-| Navigation links current and every referenced file or command existing | **yes.** 1 Markdown link occurrence over 1 target — exists at the bound revision; no external links; no in-page anchors; **all 6** named skills exist. |
+| Navigation links current and every referenced file or command existing | **yes.** 1 Markdown link occurrence over 1 target — exists at the bound revision; no external links; no in-page anchors; **1** backticked skill name and the **6** further plain-text skill names all exist. |
 | The non-author review itself | **this record** (page author: Peter Nguyen, last-touching commit `02e88b18`) |
 
 **Purpose and normal use restated from the page alone:** the owning skill's detail sheet — the fill-in
@@ -649,9 +665,9 @@ restated from memory or from the brief.
 | `authz` | 53 | convention |
 | `webhook` | 49 | convention |
 | `idempotent` | 43 | convention |
-| `lockfile` | 39 | convention |
+| `lockfile` | 28 | convention |
 | `attestation` | 35 | convention |
-| `kill switch` | 33 | convention |
+| `kill switch` | 38 | convention |
 | `normative` | 32 | convention |
 | `IaC` | 31 | convention |
 | `RAG` | 31 | convention |
@@ -681,25 +697,25 @@ companion) supply the meaning, and the justification is recorded per term rather
 | --- | --- | --- | --- |
 | `safetensors` (**3**) | C5-1 L108, L141, L153 | **Yes, by C5-1's own sentence.** L141 states the defining property inside the promotion table: "Non-executable format (for example `safetensors`) or a verified restricted loader", against the same row's failing case "Pickle-based checkpoint promoted to production". L102-109 has already explained why an executable pickle is the hazard ("can execute arbitrary code from an untrusted artifact") and directs the reader to prefer it. A reader who does not know the format recovers what it is: the non-executable model format. | **observation** |
 | `Sigstore` (**1**) | C5-1 L92 | **Yes, by C5-1's own sentence, and it is a named third-party tool.** L92 reads "Releases signed/attested (Sigstore/provenance) where the ecosystem supports it?", which places it as the mechanism of the signing/attestation the same sentence asks about; L140 then states exactly what a signature or attestation does ("ties the digest to the build job, source revision, base model, and data snapshot; verified at promotion AND at load"). The page treats every named tool this way — `PyTorch` (L104), `npm`/`cargo`/`python` (L68), `Dockerfile`/`Makefile` (L69) — none of which it expands either. | **observation** |
-| `transitive` (**10**) | C5-1 L39 | **Yes, by C5-1's own sentence.** L39 asks "Is the vulnerable package a **direct** or **transitive** dependency?" and L40-41 tells the reader how to tell them apart ("Compare the lockfile with the resolved installed graph in the reviewed environment; a lockfile entry alone does not prove what was installed"). The direct/transitive contrast against the resolved installed graph supplies the meaning: pulled in indirectly rather than declared. | **observation** |
+| `transitive` (**9**) | C5-1 L39 | **Yes, by C5-1's own sentence.** L39 asks "Is the vulnerable package a **direct** or **transitive** dependency?" and L40-41 tells the reader how to tell them apart ("Compare the lockfile with the resolved installed graph in the reviewed environment; a lockfile entry alone does not prove what was installed"). The direct/transitive contrast against the resolved installed graph supplies the meaning: pulled in indirectly rather than declared. | **observation** |
 | `PRODUCT-BUG` (**3**) | C5-3 L34 | **Yes, by C5-3's own sentence.** L32-34 places it as one value of an enumerated classification: "the question is which jobs in a CI run failed and why, by cause class — `ci-failure-classifier` classifies first; it hands a `PRODUCT-BUG` with an unknown cause back here." The reader learns it is a cause class (as against the TEST-BUG class the page's audience is routing around) and that it means a failure attributed to the product's own behaviour — which is what the two ordinary words say. The label is not opaque the way a numbered phase label is, and the sentence names the skill that owns the classification. | **observation** |
-| `heisenbug` (**2**) | C5-4 L46 | **Yes, by C5-4's own sentence — the phenomenon is stated in plain words before the label.** L44-46: "Instrument the BOUNDARY between suspect and victim … not the whole path; too many probes change timing and can hide races (heisenbug)." The parenthetical names a phenomenon the sentence has just described without jargon; a reader who does not know the word already knows what is meant. | **observation** |
+| `heisenbug` (**1**) | C5-4 L46 | **Yes, by C5-4's own sentence — the phenomenon is stated in plain words before the label.** L44-46: "Instrument the BOUNDARY between suspect and victim … not the whole path; too many probes change timing and can hide races (heisenbug)." The parenthetical names a phenomenon the sentence has just described without jargon; a reader who does not know the word already knows what is meant. | **observation** |
 | `ulimits` (**1**) | C5-4 L40 | **Yes, by C5-4's own sentence.** L40 reads "resource limits (memory, ulimits, container caps)" — the parent category is stated immediately before the term, so the reader recovers that a ulimit is a per-process resource limit, which is the only thing the checklist item asks them to compare. | **observation** |
 | `property-based` (**8**) | C5-4 L28 | **Yes — the row states the operation, and the term is library vocabulary.** L28's amplifier row reads "Capture failing production payload shapes (sanitized); property-based fuzz around the boundary". The instruction is complete and actionable without the modifier (fuzz around the boundary of the captured failing shapes), and the library owns the technique as a first-class named skill (`property-based-test-designer`, in the skills catalog and the README), so the term is a name for something the library already documents rather than a loose coding. Recorded as a judgement with its reason, not as a measurement-only call. | **observation** |
 | `ring-fenced` (**2**) | C5-2 L66, L84, L137, L159, L174, L202 | **Yes, by C5-2's own sentence.** L83-86 defines the property at the point of use: "it uses a ring-fenced synthetic account/tenant and a designated test path, and the write is isolated from real tenants and real billing/notifications." The isolating property is stated; L90-91 adds the least-privilege consequence. | **observation** |
-| `white-box` (**4**) / `black-box` (**2**) | C5-2 L15, L18, L52, L61, L150 | **Yes, by C5-2's own sentences.** The two are characterised rather than named: L15 "internal white-box telemetry can look healthy", L50-52 "metrics, traces, logs from inside the app — that is `observability-operator`; synthetic monitoring is the external black-box complement", and L18-20 "scheduled probes that exercise the real critical journeys and dependencies from the outside, on the same path a user takes". Inside versus outside is exactly the distinction. | **observation** |
-| `prod` (shorthand, **21**) | C5-2 L21, L46, L119, L165, L174, L180, L202 | **Yes, by C5-2's own sentences.** The page writes PRODUCTION in full at L18, L30, L56, L82, L96, L105, L115, L120, L133, L167 and L197-203, and pairs the shorthand with it in the same constructions ("a probe runs against PRODUCTION" / "prod-safety contract"; "distinguish probe-broke from prod-broke"). | **observation** |
+| `white-box` (**4**) / `black-box` (**2**) | C5-2 L15, L18, L52, L61, L150 | **Yes, by C5-2's own sentences.** The two are characterised rather than named: L15 "internal white-box telemetry can look healthy", L50-52 "metrics, traces, logs from inside the app — that is `observability-operator` *(manual-only)*; synthetic monitoring is the external black-box complement", and L18-20 "scheduled probes that exercise the real critical journeys and dependencies from the outside, on the same path a user takes". Inside versus outside is exactly the distinction. | **observation** |
+| `prod` (shorthand, **21**) | C5-2 L21, L46, L119, L165, L174, L180, L202 | **Yes, by C5-2's own sentences.** The page writes PRODUCTION in full at L18, L30, L56, L82, L96, L105, L115, L120, L133, L167 and L197-203, and pairs the shorthand with it in the same constructions ("a probe runs against PRODUCTION" / "prod-safety contract"; "distinguishes probe-broke from prod-broke"). | **observation** |
 | `service-role` (**13**) | C5-8 L51, L70, L126 | **Yes, by C5-8's own sentence.** L51-52 reads "Privileged paths: support/admin tooling, service-role or superuser DB access, background jobs and their credentials" — the term is paired with the plain description "superuser DB access" under the heading "Privileged paths". | **observation** |
 | `hot path` (**7**) | C5-6 L78; C5-7 L32, L52 | **Yes — a self-describing compound in the page's own list.** C5-6 L77-81 designs "performance (budgets, hot paths)" among the cross-cutting concerns, and C5-7 L32 and L52 repeat it inside the checklist item "Performance: latency/throughput budgets; hot paths." The two words carry the sense (the paths that run hot), and the same term is used by two other library skills (`code-reviewer`, `profiling-methodology-designer`), so it is vocabulary rather than a private code. | **observation** |
 | `expand→migrate→contract` (**4**) | C5-7 L54 | **Yes — the item names its subject and the three ordinary verbs state the order.** C5-7 L54 reads "Migration: schema/data changes; expand→migrate→contract." The reader is told what it applies to (schema and data changes) and the sequence of three operations to plan (expand, migrate, contract). Recorded as a judgement: the *compatibility discipline* behind the sequence lives in the owning pages (`schema-evolution-planner`, `secure-migration-reviewer`, which this page does not link), so a reader recovers the operation order but not the per-stage compatibility rule. The checklist item, as written, is actionable. | **observation** |
 | `env var` (**10**; `environment variable` **22**) | C5-4 L37 | **Yes, by C5-4's own heading and sentence.** The section is headed "Environment-delta checklist (fails only in env X)" (L34) and the item reads "env vars/secrets present and non-empty" (L37); the page's parent states the same list as "versions, env vars, data volume, permissions, concurrency" (C5-3 L45). The clipped form sits inside the full word's own heading. | **observation** |
 | `mid-batch` (**1**) | C5-5 L123 | **Yes — a transparent two-word compound.** L122-123: "Writing all the tests up front, then all the code, is not TDD — it loses the design feedback and usually produces untestable interfaces mid-batch." "Mid" plus "batch" states its own meaning in a sentence that already names the batch (all the tests, then all the code). | **observation** |
-| `n-a` (**258**) | C5-8 L92 | **Yes — a template token, and it is a library convention besides.** It appears once, inside the Output Format block: "Surface inventory: <surface — applicable / n-a (why) / not-inspected (why)>" (L92). L61-63 tells the reader what to write there in words ("classify each as applicable, not-applicable (say why), or applicable-but-not-inspectable"), and L113-114 treats an empty not-inspected list as meaningful. This is the same class as the `r/w` template token lane A batch 5 and the `[SEV]` token lane B batch 5 recorded as observations rather than gaps. | **observation** |
+| `n-a` (**3**; the literal substring matches **258** pages, a count that is an artifact of "non-author" — 20 pages — and other "non-a…" words) | C5-8 L92 | **Yes — a template token, and the page's own bytes resolve it.** It appears once, inside the Output Format block: "Surface inventory: <surface — applicable / n-a (why) / not-inspected (why)>" (L92). L61-63 tells the reader what to write there in words ("classify each as applicable, not-applicable (say why), or applicable-but-not-inspectable"), and L113-114 treats an empty not-inspected list as meaningful. It is **not** a library convention — only 3 of 657 reader pages carry the token — so this row rests on the page's own bytes, not on prevalence. This is the same class as the `r/w` template token lane A batch 5 and the `[SEV]` token lane B batch 5 recorded as observations rather than gaps. | **observation** |
 | `pen test` / `pen-test` (**7** together; `penetration` **2**) | C5-8 L25, L53 | **Yes — and the library's own practice is the clipped form.** L25 places it among security-assurance triggers the reader already knows ("before an enterprise or regulated-customer onboarding, a security questionnaire, or a pen test") and L53 names its output as a review input ("Prior incidents, existing isolation tests, and pen-test reports if any"). Measured: of the **7** reader pages that use the clipped form, only **1** also writes "penetration" — so the library's established practice is to use the short form as vocabulary, and this page follows it rather than departing from it. The third condition of the gap test therefore fails. | **observation** |
 | `authn` (**14**) | C5-8 L36 | **No — neither the page nor its own linked companion resolves it. THIS IS THE BATCH'S ONE GAP (G-C5.1).** L36 uses it at first use inside a parenthetical list: "the ask is a full security review beyond tenancy (authn, injection, secrets)". The page's reading key (L8-10) expands its two other abbreviations, RLS and IDOR, and does not expand this one; the page's own linked companion `references/isolation-surface-checklist.md` contains **neither** `authn` **nor** the word "authentication" (both measured by command). Measured practice: of the **14** reader pages that use `authn`, **11** also supply its expansion — so the library's established practice **is** to gloss it, and this page is one of the **3** that do not (`.claude/skills/security-pr-reviewer/SKILL.md`, this page, and `docs/prompts/phased-claude-skills-prompts.md`). All three conditions of the gap test hold. | **GAP — C5-8 is PARTIAL** |
 
 **The distinction, stated so it is not left implicit.** What separates `authn` from every other row above is not
-its count — `Sigstore` (1), `ulimits` (1) and `heisenbug` (2) are rarer still and are observations. It is
+its count — `Sigstore` (1), `ulimits` (1) and `heisenbug` (1) are rarer still and are observations. It is
 that those terms are resolved by the page's own bytes, and `authn` is not resolved by either the page or the
 companion it links, **while the library's own practice is to resolve it**. A term the page defines, or that its own
 sentence explains, is not a defect however rare it is; a term left bare when eleven of fourteen sibling pages
@@ -707,7 +723,7 @@ gloss it is.
 
 **The frontmatter-position rule was also applied as a norm.** *Frontmatter position* is the observation that a
 page's YAML metadata header may expand an acronym later than its first use in the body; the brief records that
-about 60% of pages with a frontmatter description do this. Three pages in this batch carry frontmatter
+about 60% of pages with a frontmatter description do this. Five pages in this batch carry frontmatter
 (C5-2, C5-3, C5-5, C5-6, C5-8) and **no page in this batch is flagged for it** — it is a norm, not a defect.
 
 ### 6.3 Specific claims on the pages that were measured rather than accepted
@@ -830,7 +846,7 @@ C5-8 PARTIAL - NO ROW AND NO ACCEPTANCE OF ANY KIND: .claude/skills/tenant-isola
 | 16 | `git log --all --author="F reviewer" --oneline -- <page>` × 8 | **0** commits for every page (the stale identity never touched them) |
 | 17 | `git log --all --author="F reviewer" --oneline` | **11** commits, all on other lanes' branches or open pull requests; disclosed in section 3 |
 | 18 | batch-record extraction and cross-check (19 records at their branch heads) | **152** read slots, **152** distinct pages; lane A→0–39, lane B→148–187, lane C→296–327, lane D→445–486 (gaps 460, 461); lane C's 32 match exactly, in order, no gap |
-| 19 | library-norm measurement over the 657 reader pages (section 6) | 39-term convention table plus 17 below-norm terms measured with their page-resolves-it justification |
+| 19 | library-norm measurement over the 657 reader pages (section 6) | 40-term convention table plus 17 below-norm terms measured with their page-resolves-it justification |
 | 20 | `git diff --check` | exit 0 — no output |
 | 21 | `python -P -B scripts/check_dco.py --range origin/main..HEAD` | recorded in the pull-request body after the commit (a commit cannot cite its own not-yet-made commit as a result) |
 | 22 | `python -P scripts/ci/check_pr_body_skills.py --body-file <the posted body>` | exit 0 — `PR body bound fields: OK` (recorded in the pull-request body) |
@@ -897,11 +913,11 @@ quoted in section 9.
 
 ## Footer
 
-sha256: 91090441a7809522747a4c741e4979fa2d3ffe899435e02c40c5de29d31af9da
+sha256: 2fbcd4d7875e9c839971071472b79c92a5c5e8d3a4983d2cca1378772295943a
 
 This digest covers the batch record's bytes from the first line through the closing `---` rule line
-and its terminating newline, encoded UTF-8 with LF line endings: exactly 89,051 bytes, byte offsets
-0 through 89,050 inclusive, lines 1-896. It does not cover the blank separator line between that
+and its terminating newline, encoded UTF-8 with LF line endings: exactly 90,939 bytes, byte offsets
+0 through 90,938 inclusive, lines 1-912. It does not cover the blank separator line between that
 rule and the `## Footer` heading, nor this footer. Any edit above the rule needs a fresh validation.
 The method was calibrated before it was trusted: applying it to lane C batch 3's committed record reproduces
 its published value `db9796c63ac8ab53022d8c4c237e62484cb4786ce19a261b81bbe36d9f58e2f8` exactly, and the same
