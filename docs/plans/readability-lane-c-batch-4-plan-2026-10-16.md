@@ -180,15 +180,15 @@ The following are therefore declared now, not discovered later.
    occurs on it") but not the *strings*. Measured this session with the most natural candidate
     strings, at the base, over the 655 reader pages **and** — for each term — over the pages that
     *use* it, the domain the record's own rule names, since it says the expansion string **also**
-    occurs on the page (E15): \`SaaS\` via "software as a service" → **31** of the **63** pages that
-    use \`SaaS\` (published 42); \`HTTP\` via "Hypertext Transfer Protocol" → **13** of the **34** that
-    use \`HTTP\` (published 17); \`404\` via "Not Found" → **6** of the **29** that use \`404\` (published
-    7); \`500\` via "Internal Server Error" → **0** of the **38** that use \`500\` (published 0,
-    reproduced); \`403\` via "Forbidden" → **13** of the **23** that use \`403\` (published 13). So
-    **three** of the four candidates miss, several by a wide margin, and the fourth, \`403\`, does
+    occurs on the page (E15): `SaaS` via "software as a service" → **31** of the **63** pages that
+    use `SaaS` (published 42); `HTTP` via "Hypertext Transfer Protocol" → **13** of the **34** that
+    use `HTTP` (published 17); `404` via "Not Found" → **6** of the **29** that use `404` (published
+    7); `500` via "Internal Server Error" → **0** of the **38** that use `500` (published 0,
+    reproduced); `403` via "Forbidden" → **13** of the **23** that use `403` (published 13). So
+    **three** of the four candidates miss, several by a wide margin, and the fourth, `403`, does
     **not**: its published cell is reproduced exactly in the rule's own domain, and only there —
     over all 655 pages the same string occurs on **90**. Those three published figures can be
-    neither confirmed nor refuted from the record's own text, while \`403\`'s can be confirmed by
+    neither confirmed nor refuted from the record's own text, while `403`'s can be confirmed by
     the natural candidate; and all four cells stay unreproducible **from the record**, which names
     no expansion string at all. **This is recorded, not cured**: curing it would require editing the
    record, which is out of scope for a plan and would void the record's footer digest and every
@@ -311,7 +311,7 @@ All commands were run in a fresh HTTPS clone
 | E12 | the record's footer digest | sha256 over bytes 0–90200 inclusive of the record's blob | `040ddd6afafeb154ea169ee3f6dfa4b8a94fed61cab6b0bf333ff3c377f10bc4` over **90,201** bytes, lines **1–955** — **reproduces exactly**. The record total is 975 lines / 91,642 bytes; the two earlier named digests (`2e7c9ed3…` and `7e1b59e7…`) cover **earlier blobs** and are not reproducible from this blob, as expected |
 | E13 | the PR body's bound-field digest, and its calibration | the three marker-delimited payloads (witness → skills → security), each whitespace-collapsed and trimmed, joined with single newlines, sha256, first 16 hex | **`1d69dc6f748f945f` — reproduces exactly**; the **same procedure over PR #783's body reproduces that PR's published `3913683c686e6e71`**, so the published order and normalization are confirmed, not assumed |
 | E14 | hex lengths, counted by hand | written out in groups of four | `788f5b03 5ffe7071 81931380 d01b0016 5f8d0304` = 10 groups = **40 hex**; `f490c16f 9ed23f3d 489e42f7 696323bf fcce6fd3` = **40**; `fdbcddce e0496ce1 7f69cd12 7f8613e5 4e410490` = **40**; `040ddd6a fafeb154 ea169ee3 f6dfa4b8 a94fed61 cab6b0bf 333ff3c3 77f10bc4` = 16 groups = **64**; `1d69dc6f 748f945f` = 4 groups = **16** |
-| E15 | the four expansion cells, read in the rule's own domain | \`git cat-file --batch\` over the 655 reader pages at \`BASE\`, whole-token match as at E8, split by whether the page uses the term | pages using \`403\` **23**, of which **13** also carry "Forbidden" (published **13**, so this cell reproduces); \`404\` **6** of **29** (published 7); \`HTTP\` **13** of **34** (published 17); \`SaaS\` **31** of **63** (published 42); \`500\` **0** of **38** (published 0) |
+| E15 | the four expansion cells, read in the rule's own domain | `git cat-file --batch` over the 655 reader pages at `BASE`, whole-token match as at E8, split by whether the page uses the term | pages using `403` **23**, of which **13** also carry "Forbidden" (published **13**, so this cell reproduces); `404` **6** of **29** (published 7); `HTTP` **13** of **34** (published 17); `SaaS` **31** of **63** (published 42); `500` **0** of **38** (published 0) |
 
 ### 9.2 What this plan does not decide (non-decisions)
 
@@ -338,18 +338,18 @@ All commands were run in a fresh HTTPS clone
   capturing commit are published in **both** the PR body (appended, line-neutral) **and** one fresh
   immutable comment.
 - **Re-capture, and what it supersedes.** This is the **second** capture of this file on the same
-  side branch. It supersedes blob \`f71c38a73389c75ee605b9dc11675de3948565a3\` (38,358 bytes, **345**
-  lines) added by commit \`bfd975d83d9dff5c9c13a794dcc06807901469fb\`, the revision the first \`SD-B\`
-  read: that text named the ledger's blob wrongly in two places and overstated one \`NV-1\`
+  side branch. It supersedes blob `f71c38a73389c75ee605b9dc11675de3948565a3` (38,358 bytes, **345**
+  lines) added by commit `bfd975d83d9dff5c9c13a794dcc06807901469fb`, the revision the first `SD-B`
+  read: that text named the ledger's blob wrongly in two places and overstated one `NV-1`
   measurement, and this revision corrects those bytes only. The supersession is **not** an append —
   the superseded blob is not a byte prefix of this one — so the change is shown to be confined to
   the intended bytes by diffing the two blobs and naming every changed offset, in the PR body and
   in the fresh capture comment. This revision's blob ID and its capturing commit are published in
   both of those places; no earlier comment is edited and no pull request head is moved.
-- **Where \`AC10\` and \`AC11\` bind after a re-capture.** Both name \`CAPTURE\`, the commit that *first*
-  added this file. Run at \`CAPTURE\` those commands return the superseded blob named just above;
-  run at this re-captured revision they return this revision's blob. Each is \`git cat-file -t\` →
-  \`blob\`, and both results are named here rather than one silently replacing the other.
+- **Where `AC10` and `AC11` bind after a re-capture.** Both name `CAPTURE`, the commit that *first*
+  added this file. Run at `CAPTURE` those commands return the superseded blob named just above;
+  run at this re-captured revision they return this revision's blob. Each is `git cat-file -t` →
+  `blob`, and both results are named here rather than one silently replacing the other.
 - **Matching newline variant:** **LF** (`0x0A`) only, with **0** carriage returns, matching the
   repository's `.gitattributes` policy `* text=auto eol=lf`.
 - **Verbatim publication.** The comment embeds this file's bytes between two digest markers, inside a
