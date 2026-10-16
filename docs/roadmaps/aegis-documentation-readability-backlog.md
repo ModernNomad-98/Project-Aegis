@@ -5134,15 +5134,22 @@ produces — only 3 of the 590 paths sort at or after "t" — and the record sta
 **What was read.** Eight dated evidence notes, 24–71 lines each, read **whole, line by line, as
 prose** at the base `e2a3e20b7c20ef8385b219b39c6405237163406f` (391 lines total; no display elision),
 plus the mechanical pass: 30 local links with zero broken paths and zero bad anchors; 6 forty-hex
-SHAs and 3 backtick tokens all resolving; 3 external links not fetched. All eight pass as they
-stand; **no page was edited** (the no-rewrite discipline forbids edits to dated records). Per-page
+SHAs and 3 backtick tokens all resolving; 3 external links not fetched. Seven pass as they stand;
+LD-4 fails acceptance bullet 2 — its `D9` at page L30 is unglossed (observation O-2) — recorded
+**partial**, not repaired. **No page was edited** (the no-rewrite discipline forbids edits to dated
+records). Per-page
 dispositions, the six acceptance bullets addressed per page, the four recorded observations
 (O-1..O-4) and the depth record are in the batch record.
 
-**Eight full-page-acceptance rows are appended** (K-090 to K-097), one per page, bound to the
-main-contained base revision. The appended count is therefore **8**, with no withheld or owed row —
-none of the eight pages is this ledger, so the self-cost question does not arise for them. The batch
-record itself is a new reader page and enters `no_recorded_acceptance` pending its own later review.
+**Eight full-page-acceptance rows are appended as authored** (K-090 to K-097), one per page,
+bound to the main-contained base revision. **Seven stand; K-093 does not stand as authored** — LD-4's
+disposition is **partial** (its `D9` at page L30 is unglossed, a failure of acceptance bullet 2,
+observation O-2 in the batch record), and the row lineage is cancelled on main by K-384W with the
+re-record withdrawn by PR #787 (withdrawal row K-392W; LD-4 left pending) — see the repair pass note
+below. The appended count is therefore
+**8 as authored** (seven standing, one withdrawn on main), with no withheld or owed row — none of the
+eight pages is this ledger, so the self-cost question does not arise for them. The batch record
+itself is a new reader page and enters `no_recorded_acceptance` pending its own later review.
 
 **Count honesty (unchanged; no count of this lane's own).** This ledger publishes no count of its
 own and cites the index (D84). The eight rows change nothing until a rebuild, and the builder can
@@ -5157,10 +5164,22 @@ reader who did not write it — the self-cost every prior update states.
 
 **What this note does not do.** It rewrites no dated snapshot, reorders or deletes no existing row,
 binds no row to this lane's unmerged head, edits none of the eight read pages, rebuilds no `tools/`
-artifact, and confers no authority. The batching procedure "does not grant provider, private-input,
-real-host or deployment authority" (L3018-3020). Prepared by a **DeepSeek agent**
+artifact, and confers no authority. The batching procedure does "not mark earlier screens as
+full-page acceptance or grant provider, private-input, real-host or deployment authority"
+(L3018-3020). Prepared by a **DeepSeek agent**
 (`deepseek-v4-pro`) operating under the owner account, as the repository's attribution rule
 (2026-10-13) requires.
+
+**Repair pass 2026-10-15 (fourth round, pre-merge correction by a different agent).** LD-4 is
+recorded **partial** in the batch record (its `D9` at page L30 is unglossed — a failure of
+acceptance bullet 2, observation O-2), so the K-093 full-page-acceptance row does not stand as
+authored. On main, K-093's lineage is cancelled by withdrawal row K-384W (merged PR #781) and the
+re-record K-392 is withdrawn by PR #787 (the AEGIS-APR-117 withdrawal pull request, open at head
+`1419d480e0c2f90ccb62cd4f491ae2b8c4aa676d`), which appends withdrawal row K-392W and records LD-4
+PARTIAL, left pending. This repair authors no keeper row and no withdrawal row, and leaves the eight
+rows as authored so the main-side withdrawals stay aligned — the same shape PR #771 used for its
+P8/K-089 partial page. Drafted by DeepSeek V4 (`deepseek-v4-pro`, DeepSeek Harness), an AI agent
+operating under the owner account.
 
 <!-- acceptance-index-schema: 1 -->
 

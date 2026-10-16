@@ -67,7 +67,7 @@ wrote none of the eight pages (each is a dated record of a 2026-09-23, 2026-09-2
 authored by other agents) — and the second is **not**, because the same agent writes this lane's
 ledger section and appends the keeper rows. Carried into the pull-request body.
 
-## 4. Per-page dispositions — 8 of 8 full-page re-reads, accepted unchanged
+## 4. Per-page dispositions — eight full-page re-reads, zero edits (seven accepted unchanged, one partial)
 
 Every page below was read **whole** at `e2a3e20b`. None has a recorded acceptance, so drift has no
 recorded acceptance revision to diff against (`not derivable`, the same wording the after-713 record
@@ -78,7 +78,7 @@ used for its no-recorded page).
 | LD-1 | `docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md` | none (no-recorded bucket) | not derivable | **accepted unchanged** | `readability-phase4-lane-d-implementer-c` |
 | LD-2 | `docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md` | none (no-recorded bucket) | not derivable | **accepted unchanged** | `readability-phase4-lane-d-implementer-c` |
 | LD-3 | `docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md` | none (no-recorded bucket) | not derivable | **accepted unchanged** | `readability-phase4-lane-d-implementer-c` |
-| LD-4 | `docs/evidence/documentation/full-page-readability-sample-2026-09-23.md` | none (no-recorded bucket) | not derivable | **accepted unchanged** | `readability-phase4-lane-d-implementer-c` |
+| LD-4 | `docs/evidence/documentation/full-page-readability-sample-2026-09-23.md` | none (no-recorded bucket) | not derivable | **partial** — `D9` at page L30 unglossed (acceptance bullet 2) | `readability-phase4-lane-d-implementer-c` |
 | LD-5 | `docs/evidence/documentation/governance-poisoning-routing-correction-2026-09-23.md` | none (no-recorded bucket) | not derivable | **accepted unchanged** | `readability-phase4-lane-d-implementer-c` |
 | LD-6 | `docs/evidence/documentation/historical-evidence-reading-2026-09-23.md` | none (no-recorded bucket) | not derivable | **accepted unchanged** | `readability-phase4-lane-d-implementer-c` |
 | LD-7 | `docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md` | none (no-recorded bucket) | not derivable | **accepted unchanged** | `readability-phase4-lane-d-implementer-c` |
@@ -86,6 +86,19 @@ used for its no-recorded page).
 
 No page needed a fix, so no page was edited: the no-rewrite discipline forbids edits to dated records,
 and the four observations below (section 8) are recorded rather than rewritten in place.
+
+LD-4's verdict is **partial**, not accepted unchanged: acceptance bullet 2 (abbreviations and coded
+identifiers defined at first use) fails — the coded identifier `D9` (owner decision 9) appears at
+page L30 with no on-page gloss (observation O-2), verified with `git show
+e2a3e20b:docs/evidence/documentation/full-page-readability-sample-2026-09-23.md` (`D9` occurs exactly
+once, at L30). LD-4 is recorded honestly as a **partial** acceptance, and the full-page-acceptance
+keeper row K-093 (this lane's keeper-table row for LD-4) **does not stand as authored** — PR #787
+(the open AEGIS-APR-117 withdrawal pull request, head
+`1419d480e0c2f90ccb62cd4f491ae2b8c4aa676d`, verified with `git fetch origin refs/pull/787/head`)
+appends withdrawal row K-392W on its branch and records LD-4 PARTIAL, leaving it pending; on main,
+K-093's lineage is already cancelled by withdrawal row K-384W (merged PR #781). The eight rows stay
+in the keeper table as authored so the main-side withdrawal lineage stays aligned — the same shape
+PR #771 used for its P8/K-089 partial page. Section 18 records the commands behind this.
 
 ## 5. Depth records
 
@@ -116,8 +129,12 @@ External links (git-scm.com x2 on LD-5, github.com x1 on LD-6) were **not fetche
 2026-09-23 sample's own recorded practice ("external links were not fetched"). The six forty-hex
 SHAs are the base/merge revisions each note cites, and every one resolves in the local object store
 at `e2a3e20b`; the six merge SHAs were additionally verified against their pull-request subjects:
-`b545d075` = "Merge pull request #233", `5c46c7b3` = "#234", `2c6b6fc6` = "#713",
-`6051ab0a` = "#205", `e6148322` = "#173", `a8b81d49` = "#190". LD-3's three backtick tokens are
+`b545d075` = "Merge pull request #233 from ModernNomad-98/docs/checkpoint-after-232",
+`5c46c7b3` = "Merge pull request #234 from ModernNomad-98/docs/skill-references-after-233-readable",
+`2c6b6fc6` = "Merge pull request #713 from ModernNomad-98/docs/readability-tenth-batch-20261010",
+`6051ab0a` = "Merge pull request #205 from ModernNomad-98/docs/evidence-reading-clarity",
+`e6148322` = "Merge pull request #173 from ModernNomad-98/docs/skill-references-final-16-readable",
+`a8b81d49` = "Merge pull request #190 from ModernNomad-98/docs/agent-contributor-docs-readable". LD-3's three backtick tokens are
 `2c6b6fc6`, `518b0b38` (twice) and all resolve.
 
 ## 6. The six acceptance bullets, addressed for each of the eight pages
@@ -129,8 +146,9 @@ maintainers read..." (L3-4); LD-7 and LD-8 open with the current-reading route (
 reading-keys purpose (LD-8 L1). **(b) Abbreviations and coded identifiers defined at first use.**
 "pull request (PR)" is expanded at first use on LD-1 L3, LD-2 L3, LD-3 L3; "Coordinated Universal
 Time (UTC)" on LD-4 L12, LD-5 L25, LD-6 L6-7, LD-7 L6, LD-8 L3; LD-6 and LD-7 spell out "Pull
-request" in full (LD-6 L10, LD-7 L9). The one identifier not glossed on its page is LD-4's `D9`
-(observation O-2 below). **(c) Descriptive headings, lists or tables, and concrete examples.** LD-1,
+request" in full (LD-6 L10, LD-7 L9). The one identifier not glossed on its page is LD-4's `D9` at page L30
+(observation O-2 below) — a failure of acceptance bullet 2, so LD-4's disposition is **partial**
+(section 4), recorded not repaired. **(c) Descriptive headings, lists or tables, and concrete examples.** LD-1,
 LD-2, LD-3 and LD-4 are headed records with disposition tables; LD-5, LD-7 and LD-8 use headed
 sections and lists; concrete worked content sits on LD-5 (the `git revert` and `A..B`
 explanations, L31-49) — a dated evidence note's concrete content is its recorded work, not an
@@ -180,9 +198,9 @@ Row shape: `stale:` the exact text as it stands at the declared revision; `new:`
 | # | stale | new | source |
 | --- | --- | --- | --- |
 | O-1 | LD-3 L25-26 and L28-29 cite "tracker L2941–2947" and "tracker L2801" for the up-to-three structure and the non-author rule. At `e2a3e20b` L2941-2947 holds the denominator paragraph and L2801 the self-cost note; the cited texts sit at L3002 (paragraph L3000-3006) and L2860-2862. | **unchanged** — a dated 2026-10-10 record is a snapshot and is never rewritten (the 2026-10-12 close-out's disposition row D-5: stale anchors in dated records stay unchanged, never rewritten). | `git show e2a3e20b:docs/roadmaps/aegis-documentation-readability-backlog.md` lines read at those anchors. |
-| O-2 | LD-4 L30 "Reconciled the 30-day evidence-policy choice, schema-shape and D9 decisions" uses `D9` without a gloss. `D9` is owner decision 9, recorded in the decisions log. | **unchanged** — the code resolves in `docs/reconciliation/step-0-reconciliation-v4.md` L941 ("D9 (2026-07-06) — A Compliance & Governance batch"), and the page is a dated record. | `step-0-reconciliation-v4.md` L941, read at the base. |
+| O-2 | LD-4 L30 "Reconciled the 30-day evidence-policy choice, schema-shape and D9 decisions" uses `D9` without a gloss. `D9` is owner decision 9, recorded in the decisions log. | **unchanged** — the code resolves in `docs/reconciliation/step-0-reconciliation-v4.md` L941 ("D9 (2026-07-06) — A Compliance & Governance batch"), and the page is a dated record. The unglossed `D9` fails acceptance bullet 2, so LD-4's disposition is **partial** (section 4), recorded not repaired — the gap is stated, never filled silently. | `step-0-reconciliation-v4.md` L941, read at the base. |
 | O-3 | LD-3 L6-7 name the plan artifacts `PLAN-first-batch.md 4eeaf8aa…`, `AUDIT-B ca7e3b9f…`, `STAGE0 8cbd113f…`. The three 8-hex prefixes do not resolve in the local object store. | **unchanged** — they name the 2026-10-10 sweep's plan artifacts outside the tree, the same shape the 2026-10-12 record used for its plan evidence sha256 (outside git). | `git cat-file -t 4eeaf8aa` / `ca7e3b9f` / `8cbd113f` each exit non-zero at the base. |
-| O-4 | LD-5 L59 "all seven local links resolved" is the note's own 2026-09-23 figure; the page at `e2a3e20b` carries six local links. | **unchanged** — the historical sentence describes the page at its own revision; today's six links all resolve (section 5). | `git show e2a3e20b:<LD-5>`; the mechanical pass's link count. |
+| O-4 | LD-5 L59 "all **seven local links** resolved" is the note's own 2026-09-23 figure; the page at `e2a3e20b` carries six local links. | **unchanged** — the historical sentence describes the page at its own revision; today's six links all resolve (section 5). | `git show e2a3e20b:<LD-5>`; the mechanical pass's link count. |
 
 Zero rows above have an empty source.
 
@@ -219,6 +237,12 @@ LD-6 accepted: docs/evidence/documentation/historical-evidence-reading-2026-09-2
 LD-7 accepted: docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 LD-8 accepted: docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 ```
+
+The LD-4 line's row K-093 (full-page-acceptance) does not stand as authored — LD-4's disposition is
+**partial** (section 4), and on main the row lineage is cancelled by withdrawal row K-384W (merged
+PR #781) with the re-record withdrawn by PR #787's K-392W (section 18). The line is kept
+byte-identical because the row remains in the keeper table as authored until that main-side
+withdrawal lineage completes — the same shape PR #771 used for its P8/K-089 partial page.
 
 ## 11. Verification commands (run at the head; outputs in the pull-request body)
 
@@ -260,7 +284,7 @@ the skills-manifest hashes.
 
 ```text
 skill@08d91a834460beebc9c66fa896b8b422f064bf1d7524f6e5b1512cda3afdc996 / reason: classify before writing, the class decides the tier and review path / applied: classified docs-only before any write / result: docs-only tier asserted in the PR body with the file set / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
-skill@c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 / reason: the acceptance contract's six bullets are criteria and were checked one by one / applied: each bullet per page with line cites in section 6 / result: 8/8 accepted unchanged / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
+skill@c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 / reason: the acceptance contract's six bullets are criteria and were checked one by one / applied: each bullet per page with line cites in section 6 / result: 7/8 accepted unchanged, 1/8 partial (LD-4: `D9` at page L30 unglossed — acceptance bullet 2) / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
 skill@b5fd9feda97235430259913aedd33447ab06e1c0ded281e9e131fa6bf9b78be2 / reason: four page items needed resolution against the repo, not the page's prose / applied: observations O-1..O-4 sourced to repo artifacts / result: all four dispositioned unchanged / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
 skill@a74d2a22579cf93f737725aa0c54197b5d496a9f33a291a93c2cf2073cd7d076 / reason: recording requires knowing which grant covers what / applied: read AEGIS-APR-039, -101, -113..-118, -125, -129 at the base (register entries; one-line descriptions in section 17) / result: recording-only under APR-101; no grant consumed, extended or requested / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
 skill@141b7036469f9f99ef6b8e152299619a6d0ab572656a5ba307062551d311d8a5 / reason: a new page may owe a retention entry / applied: checked for a retention registry and per-doc frontmatter practice / result: none exists for this directory; no retention change needed, recorded not skipped / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
@@ -275,7 +299,7 @@ skill@6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 / reason:
   (approximate, from the recorded step timestamps) and finished 2026-10-15T11:22-07:00
   (approximate); active time was **not instrumented**, so wall time is an imperfect comparison with
   the estimate rule's active-time requirement and no per-page active rate is claimed.
-- Batch-1 finish and full wall time are recorded in the pull-request body at the head.
+- Batch-1 finish and full wall time were **not recorded** — the lane's session record carried neither, and this record does not invent them (gap stated, not filled). The fourth-round repair item's own start, finish and wall time are recorded in section 18 and in the pull-request body.
 
 ## 15. Stage D repair note (2026-10-15)
 
@@ -286,7 +310,12 @@ commands behind them:**
 
 1. **Section 5 count word.** The record said "the four merge SHAs" and then listed six. All six facts
    are correct — `git show -s --format=%s b545d075 5c46c7b3 2c6b6fc6 6051ab0a e6148322 a8b81d49` prints
-   "Merge pull request #233", "#234", "#713", "#205", "#173", "#190" — so the count word now says
+   "Merge pull request #233 from ModernNomad-98/docs/checkpoint-after-232",
+   "Merge pull request #234 from ModernNomad-98/docs/skill-references-after-233-readable",
+   "Merge pull request #713 from ModernNomad-98/docs/readability-tenth-batch-20261010",
+   "Merge pull request #205 from ModernNomad-98/docs/evidence-reading-clarity",
+   "Merge pull request #173 from ModernNomad-98/docs/skill-references-final-16-readable",
+   "Merge pull request #190 from ModernNomad-98/docs/agent-contributor-docs-readable" — so the count word now says
    **six**, matching the six listed subjects.
 2. **Observation O-1 anchor.** The record said the cited texts sit at "L2900-2905 and L2860-2862".
    L2860-2862 is correct. L2900-2905 is wrong: at `e2a3e20b` it holds the 61-requests measurement-gap
@@ -385,9 +414,12 @@ corrections, with the commands behind them:**
    instead of a live claim.
 2. **Bare register ID (body and record).** The body's moved-main note named "(the PR #770 merge,
    APR-137)" without a plain-English gloss; the body now carries the register's gloss beside the ID:
-   "AEGIS-APR-137: Readability index program - resume ratified, historical backfill approved, and
+   "AEGIS-APR-137: Readability index program — resume ratified, historical backfill approved, and
    the sweep reaffirmed to zero pending" (the register's heading at main
-   `7abb98eb88ec3253521ab4ff5418d225413bd193`). This record's `scoped-approval-register` ledger row
+   `7abb98eb88ec3253521ab4ff5418d225413bd193` and at the current main
+   `f490c16f9ed23f3d489e42f7696323bffcce6fd3`, both verified with `git show
+   <ref>:docs/approvals/APPROVAL_REGISTER.md` — the heading prints an em dash; the fourth round
+   restored the dash here and in the body). This record's `scoped-approval-register` ledger row
    named the register entries AEGIS-APR-039, -101, -113..-118, -125, -129 with no descriptions; they
    are register entries read at the base, and their one-line register headings (each read from
    `docs/approvals/APPROVAL_REGISTER.md` at `e2a3e20b`) are:
@@ -417,7 +449,92 @@ and their re-recording by a separate eligible keeper remain **PR #781**'s scope.
 *Repair drafted by **DeepSeek v4 Pro** (`deepseek-v4-pro`), the Stage D repairing agent (third
 round), under the owner account, as the repository's 2026-10-13 attribution rule requires.*
 
+## 18. Stage D REVISE repair note, fourth round (2026-10-15)
+
+The Stage D audit's fourth round returned **REVISE** on this pull request with five findings — one
+P2 (a must-fix review finding) and four P3 (citation/gloss defects) — posted on the pull request as
+comment 6204472704. All five are repaired in place at this lane's fifth head (the record is still
+unmerged, so in-place repair remains allowed). **The corrections, with the commands behind them:**
+
+1. **F1 (P2) — LD-4 partial, not full.** The record's section 4 recorded LD-4 "accepted unchanged"
+   and keeper row K-093 full-page-acceptance, while section 6(b)/O-2 acknowledged that LD-4's `D9`
+   (owner decision 9) is unglossed at page L30 — a failure of acceptance bullet 2 (abbreviations and
+   coded identifiers defined at first use). Verified by command: `git show
+   e2a3e20b:docs/evidence/documentation/full-page-readability-sample-2026-09-23.md` — `D9` occurs
+   exactly once, at L30, unglossed. LD-4's disposition is now **partial** in section 4 (table,
+   heading and the note after the table), section 6(b), O-2, the section 10 note under the row-quote
+   block, the skills ledger's acceptance row, the ledger section and the pull-request body; K-093
+   **does not stand as authored**. The withdrawal is **PR #787**'s work, not re-done here: verified
+   by command `git fetch origin refs/pull/787/head` → head
+   `1419d480e0c2f90ccb62cd4f491ae2b8c4aa676d` (PR open), which appends withdrawal row K-392W
+   ("WD-D4-r1 withdraws K-392 (deepseek-v4-pro-apr117-keeper): LD-4 accepted: docs/evidence/documentation/full-page-readability-sample-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f")
+   and records LD-4 PARTIAL, left pending; K-093's own lineage is cancelled on main by K-384W
+   ("WD-D4 withdraws K-093 (readability-phase4-lane-d-implementer-c): LD-4 accepted: docs/evidence/documentation/full-page-readability-sample-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f",
+   merged PR #781). The eight rows stay in the keeper table as authored so the main-side withdrawals
+   stay aligned — the same shape PR #771 used for its P8/K-089 partial page.
+2. **F2 (P3) — bare register IDs in the body.** The security-surface bullet and the security bound
+   field named AEGIS-APR-118 (the register entry "Security classification of the readability
+   acceptance tool") without a gloss, and the skills bound field's AEGIS-APR list was bare. Each now
+   carries its one-line register heading (section 17; each heading verified verbatim at `e2a3e20b`
+   with `git show e2a3e20b:docs/approvals/APPROVAL_REGISTER.md`).
+3. **F3 (P3) — the AEGIS-APR-137 heading quote.** The body and this record's section 17 printed a
+   hyphen where the register prints an em dash. Verified at the current main: `git show
+   f490c16f9ed23f3d489e42f7696323bffcce6fd3:docs/approvals/APPROVAL_REGISTER.md` prints
+   "### AEGIS-APR-137: Readability index program — resume ratified, historical backfill approved,
+   and the sweep reaffirmed to zero pending" (the same at `7abb98eb88ec3253521ab4ff5418d225413bd193`);
+   both copies (body and record) now print the em dash.
+4. **F4 (P3) — the elided splice quote in the new ledger section.** The ledger section still quoted
+   "does not grant provider, private-input, real-host or deployment authority" (L3018-3020) — the
+   elided splice this record's section 12 and the body's residual list already fixed. The ledger
+   section now quotes the contiguous fragment "not mark earlier screens as full-page acceptance or
+   grant provider, private-input, real-host or deployment authority" (`git show
+   e2a3e20b:docs/roadmaps/aegis-documentation-readability-backlog.md` L3018-3020). The three
+   pre-existing dated sections that quote the elided form (L4746, L4910, L5111 — one more than the
+   second round's note named) are no-rewrite-protected and untouched.
+5. **F5 (P3) — the promised finish/wall time.** Section 14 promised a batch finish timestamp and wall
+   time "recorded in the pull-request body"; neither was ever recorded anywhere. The promise is
+   corrected (the figures are recorded as not recorded — stated, not filled), and this repair item's
+   own start, finish and wall time are recorded here and in the body.
+
+**The whole-diff quotation sweep (F4's second half).** Every quotation this branch's diff reproduces
+was re-checked against its source at `e2a3e20b` by command, in every copy — this record, the ledger
+section and the pull-request body. Results, all verbatim: the LD-1/LD-2 closing phrases (LD-1 L68
+"Exact-head Actions and merge remain outstanding.", LD-2 L41 "Exact-head GitHub Actions and merge
+remain delivery gates."); the section 6(d) LD-4..LD-8 fragments (each spans a page line break and
+joins verbatim; LD-4's is elision-marked with "..."); O-1's "tracker L2941–2947" (en dash) and
+"tracker L2801"; O-2's "Reconciled the 30-day evidence-policy choice, schema-shape and D9 decisions"
+(LD-4 L30) and "D9 (2026-07-06) — A Compliance & Governance batch" (step-0-reconciliation-v4.md
+L941); O-3's `PLAN-first-batch.md 4eeaf8aa…`, `AUDIT-B ca7e3b9f…`, `STAGE0 8cbd113f…` (LD-3
+L6-7); O-4's "all **seven local links** resolved" (LD-5 L59 — the bold markers are now quoted too);
+the six merge subjects (full subjects now quoted, `git show -s --format=%s b545d075 5c46c7b3
+2c6b6fc6 6051ab0a e6148322 a8b81d49`); the batching-procedure fragment (record section 12, body
+residual item 6, ledger section — the three copies now agree); the ten register headings in section
+17 (each verbatim at `e2a3e20b`, with AEGIS-APR-125's em dash); the AEGIS-APR-117 heading ("The
+ledger keeper may append withdrawal rows after the switch", register L5016 at the base); and the
+AEGIS-APR-137 heading (em dash, above).
+
+**Keeper rows.** This fourth-round repair authors no keeper row and withdraws none — the same
+statement the first three rounds make, restated for the fifth head: the withdrawal of K-090..K-097
+and their re-recording by a separate eligible keeper were PR #781's scope (merged as
+`f490c16f9ed23f3d489e42f7696323bffcce6fd3`), and the withdrawal of LD-4's re-record K-392 as
+K-392W, with LD-4 recorded PARTIAL and left pending, is PR #787's scope (open at head
+`1419d480e0c2f90ccb62cd4f491ae2b8c4aa676d`).
+
+**Timing (the name-and-time rule).** Item: PR #774 fourth-round repair — five Stage D findings,
+one P2 and four P3. Start: 2026-10-15T17:14:30-07:00 (harness-sampled at the first work step). ETA:
+none was given in the coordinator's brief — recorded as unavailable, not invented. Finish
+(edit phase, through this commit): 2026-10-15T17:28:29-07:00 (measured by command immediately
+before the commit). Wall time (edit phase): 13 minutes 59.7 seconds. Active time was not
+instrumented, so the wall time is an imperfect comparison with the estimate rule's active-time
+requirement. Post-commit verification and the pull-request-body publication continue after this
+commit; their total wall time is reported to the owner at completion.
+
+*Repair drafted by **DeepSeek V4** (`deepseek-v4-pro`, DeepSeek Harness), the Stage C repairing
+agent (fourth round), under the owner account, as the repository's 2026-10-13 attribution rule
+requires.*
+
 ---
 
 *Prepared by a **DeepSeek agent** (`deepseek-v4-pro`) operating under the owner account, as the
-repository's attribution rule (2026-10-13) requires.*
+repository's attribution rule (2026-10-13) requires; fourth-round repair (section 18) drafted by
+**DeepSeek V4** (`deepseek-v4-pro`, DeepSeek Harness), the Stage C repairing agent.*
