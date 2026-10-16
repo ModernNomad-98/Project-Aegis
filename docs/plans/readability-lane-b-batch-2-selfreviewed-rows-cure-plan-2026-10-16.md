@@ -237,26 +237,47 @@ while the keeper table at `BASE` already carries 211 rows. The staleness is ther
 and is **not** introduced by this change; regenerating it is a different change under the standing
 index-rebuild approval (PR #798 does that work), and this change does not touch it.
 
-**Two open review findings, measured and NOT cured here — recorded so they are not mistaken for
-fixed.** The hosting service's automated reviewer posted two P2 findings at `HEAD`; both are
-substantiated by this session's own measurements, and neither is cured by this capture:
+**One open review finding, and one item WITHDRAWN as a ref artefact — recorded so neither is
+mistaken for fixed.** The hosting service's automated reviewer posted two P2 findings at `HEAD`.
+Item 1 is **withdrawn by this revision**: the two-ref measurement below shows it was an artefact of
+measuring **one** ref of a work item that has **not merged** — a **ref artefact**, meaning a true
+fact about the refs this plan reads that is *not* a fact about the work item under review — and so
+not an error in the record. Item 2 stands as an open finding and is **not** cured by this capture.
+Whether the surviving finding is correct as a *finding* — as opposed to correct as a
+*measurement* — is **not judged here**; section 5's `NV-2` records that this plan takes no such
+decision:
 
-1. **The record's lane-D precedent claim does not match the ledger.** The record says the remedy was
-   already applied to lane D batch 2 as *"K-381..K-388 withdrawn as K-389W..K-397W, re-recorded as
-   K-397..K-404"*. Measured at `HEAD`, the ledger's lane-D band contains exactly:
-   `K-381W`..`K-388W`, then `K-389`..`K-396`, plus a later `K-392W`. There is **no**
-   `K-389W`..`K-397W` and **no** `K-397`..`K-404` in the table at that ref, and the stated
-   range would contain nine identifiers. The record's **lane A** precedent claim *is* accurate when
-   measured: `K-106`..`K-113`, `K-106W`..`K-113W` and `K-114`..`K-121` are all present.
+1. **WITHDRAWN — a ref artefact, not a defect in the record: the record's lane-D precedent claim.**
+   The record says the remedy was already applied to lane D batch 2 as *"K-381..K-388 withdrawn as
+   K-389W..K-397W, re-recorded as K-397..K-404"*. Measured at that work item's **own** head (PR
+   #778's head commit, `5c462e1262cc205bca8d5a3194b50aff3452260a`; `git cat-file -t` -> `commit`;
+   `git ls-remote origin refs/pull/778/head` returns the same value), the ledger's
+   `K-375`..`K-410` band holds **every identifier the record names**: `K-381`..`K-388` (eight
+   full-page acceptances), the **eight** withdrawals `K-389W`..`K-391W` and `K-393W`..`K-397W` —
+   the written range `K-389W`..`K-397W` **skipping `K-392W` deliberately**, so that the merge cannot
+   collide with the `K-392W` that `main` already carries (the record gives that reason itself, at
+   `RECORD` lines 60-62) — and `K-397`..`K-404` (eight re-records). Driving the builder **at that
+   head**, the builder's own `derive_reader_pages` over the rows parsed there returns
+   `full-page-acceptance` at `BOUND` for **8 of 8** of that work item's pages, so every one of them
+   selects the **fresh** row. Measured at this plan's refs the same band is a **different** change:
+   at `HEAD` and at `BASE` it is `K-381W`..`K-388W`, `K-389`..`K-396` and a later `K-392W` — lane D
+   **batch 1's** cure, not batch 2's. The identifiers the record names are absent at this plan's
+   refs **because that work item has not merged**: `git merge-base --is-ancestor
+   5c462e1262cc205bca8d5a3194b50aff3452260a refs/remotes/origin/main` exits **1**. Absence at the
+   merge base is exactly what unmerged-ness predicts, so the reviewer's reading was a true statement
+   about the wrong ref, and its conclusion about the record does not follow. **The finding is
+   withdrawn**: the record's sentence is **true at its own head**. The record's **lane A** precedent
+   claim *is* accurate when measured at `HEAD`: `K-106`..`K-113`, `K-106W`..`K-113W` and
+   `K-114`..`K-121` are all present.
 2. **The ledger's own lane-B section still leaves the disposition open.** At `HEAD`, ledger lines
    5,464-5,476 state that *"an eligible keeper performs both at merge, not by this lane. This lane
    states the deviation plainly and leaves the disposition to the merge holder."* That text is now
    stale against the sixteen rows this change appends. A merge holder reading it could attempt a
    redundant recording and create another latest event.
 
-Both are recorded in section 9.2 as non-decisions. Curing either requires editing the record or the
-ledger's prose, which would change the blobs under audit and move the head; neither is a plan's act,
-and neither is performed here.
+Both items are recorded in section 9.2 as non-decisions, and both are left alone here. Curing the
+surviving finding would mean editing the ledger's prose, which would change a blob under audit and
+move the head; that is not a plan's act, and it is not performed here.
 
 ## 3. The change class, recorded in the plan
 
@@ -345,10 +366,11 @@ The following are therefore declared now, not discovered later.
    IDs at the bound revision, the row bindings and the identifier ordering - not the act of
    reading."* Curing it is not available to any agent: re-reading the pages would produce a new
    round's evidence, not proof of the earlier round's act.
-2. **`NV-2` — whether the two open automated-review findings of section 2 are correct as
+2. **`NV-2` — whether the automated reviewer's findings of section 2 are correct as
    *findings*, as opposed to correct as *measurements*.** The measurements are reproduced here
-   (the lane-D band contents; the ledger's lines 5,464-5,476 text). Whether they **should** be cured
-   in this change, and by whom, is a routing decision this plan does not take.
+   (the lane-D band contents at **two** refs, whose first item is **withdrawn** as a ref artefact;
+   the ledger's lines 5,464-5,476 text). Whether the surviving finding **should** be cured in this
+   change, and by whom, is a routing decision this plan does not take.
 3. **`NV-3` — whether a Stage B verdict will be posted for this plan, and what it will say.** This
    plan can be captured; it cannot audit itself. `SD-B` is a different holder's act.
 4. **`NV-4` — hosted CI at a head that does not exist yet.** The required checks are readable at the
@@ -500,7 +522,7 @@ blob's bytes were the object of the measurement.
 | E8 | the two reviewer-cell populations | the parsed table at `HEAD`, grouped by row family | withdrawn rows: `readability-lane-b-implementer-c`; withdrawal rows and fresh rows: `deepseek-flash-apr117-keeper`; all sixteen bind `BOUND`; the withdrawn rows are byte-equal to their `BASE` rows |
 | E9 | checks, mergeability and identity — read **twice**, before and after publication | `gh api repos/ModernNomad-98/Project-Aegis/commits/HEAD/check-runs` at both moments; the PR's own JSON; `gh api repos/ModernNomad-98/Project-Aegis/branches/main/protection` | **before publication: 6 runs** — `changes`, `validate-skills`, `gate-guard` **success**, and `tools-tests-linux`, `tools-tests-windows`, `windows-offline-checks` **skipped**; **after publication: 12 runs in two six-run suites at the same head** — the same 3 success and the same 3 skipped in each, the three required jobs carrying run ids 117188302230, 117188302530 and 117188302591 in the first suite and 117199072664, 117199072927 and 117199072957 in the second, with **0** runs pending; `mergeable: true`, `mergeStateStatus: BLOCKED`; required contexts `["gate-guard","validate-skills"]` with **1** required approving review |
 | E10 | the ledger's own lane-B prose still leaves the disposition open | `git show HEAD:LEDGER` read at lines 5,464-5,476 | *"an eligible keeper performs both at merge, not by this lane. This lane states the deviation plainly and leaves the disposition to the merge holder."* |
-| E11 | the lane-D and lane-A precedent bands | the parsed table at `HEAD`, filtered to each band | lane D: `K-381W`..`K-388W`, `K-389`..`K-396`, `K-392W` — **no** `K-389W`..`K-397W`, **no** `K-397`..`K-404`; lane A: `K-106`..`K-113`, `K-106W`..`K-113W`, `K-114`..`K-121` present |
+| E11 | the lane-D and lane-A precedent bands read at **two refs**, and the withdrawal of finding 1 | the builder's own `find_table` at `HEAD`, at `BASE` and at lane D's head `5c462e1262cc205bca8d5a3194b50aff3452260a` (PR #778's head), each filtered to its band; `derive_reader_pages` over the rows parsed at that head; `git merge-base --is-ancestor 5c462e1262cc205bca8d5a3194b50aff3452260a refs/remotes/origin/main`; `git ls-remote origin refs/pull/778/head`; `git cat-file -t` on that commit | lane D's head: `K-381`..`K-388`, the eight withdrawals `K-389W`..`K-391W` and `K-393W`..`K-397W` (`K-392W` deliberately skipped — it is `main`'s), and `K-397`..`K-404` — **every identifier the record names**; **8 of 8** of that work item's pages select the fresh row there; `merge-base --is-ancestor` exits **1**, so the work item is **not merged**, and `ls-remote` returns `5c462e1262cc205bca8d5a3194b50aff3452260a` for `refs/pull/778/head` (`git cat-file -t` -> `commit`). At `HEAD` and at `BASE` the band is `K-381W`..`K-388W`, `K-389`..`K-396`, `K-392W` — lane D **batch 1's** cure; lane A at `HEAD`: `K-106`..`K-113`, `K-106W`..`K-113W`, `K-114`..`K-121` present |
 | E12 | register line ranges | reading the register at `HEAD` | AEGIS-APR-101 at L3149-L3159 (Scope allowed L3155, Scope FORBIDDEN L3157); AEGIS-APR-117 at L5016-L5049 (Scope allowed L5038-L5042, Scope FORBIDDEN L5043-L5044); AEGIS-APR-100 at L3075-L3099 (Scope allowed L3092-L3099); AEGIS-APR-039 at L1003-L1026 |
 | E13 | the next-batch rule's provenance gap | the on-repository transcription at `HEAD` searched for the amendment's own words | `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`, 364 lines, blob `f2010a750f36fb6d290612096d945ee63a7b2426` (`git cat-file -t` -> `blob`), carries **0** matches; the rule is in the workspace record outside the repository |
 | E14 | object types for every hash stated above | `git cat-file -t` on each | `HEAD` **commit**; `BASE` **commit**; `1da42d3f3df95ac0f8e2a251cfefa1ef73b8f82d` **tree**; `BOUND` **commit**; `e6ed06a3f67b89710d9a0f200525c6b1131009e3` **commit**; ledger at `BASE` `4e4321680040d7bf2bda28226c1824414c7d3df6` **blob**; ledger at `HEAD` `519bb614c9fca65ffff534726f1fa2eb47207112` **blob**; record at `HEAD` `f2298f0ba4277528109ff185e906268dc3a2d59c` **blob**; index `eeda4929cca872d626eb2ca6ca21583586335d11` **blob**; owner-decisions transcription `f2010a750f36fb6d290612096d945ee63a7b2426` **blob** |
@@ -509,10 +531,13 @@ blob's bytes were the object of the measurement.
 
 ### 9.2 What this plan does not decide (non-decisions)
 
-1. It does **not** cure either of the two open automated-review findings of section 2 — neither the
-   record's lane-D precedent sentence nor the ledger's stale lines 5,464-5,476. Both would require
-   editing a blob that is under audit at `HEAD`, which would void this plan's own scope claims and
-   move nothing that a plan has authority to move. They are recorded and **routed**.
+1. It does **not** cure the open automated-review finding of section 2 — the ledger's stale lines
+   5,464-5,476. Curing it would require editing a blob that is under audit at `HEAD`, which would
+   void this plan's own scope claims and move nothing that a plan has authority to move. It is
+   recorded and **routed**. The reviewer's other item — the record's lane-D precedent sentence — is
+   **withdrawn** rather than cured: the two-ref measurement in section 2's item 1 and in `E11` shows
+   that sentence is true at its own work item's head, and absent at this plan's refs only because
+   that work item has not merged.
 2. It does **not** edit the ledger, the record, the index, the register, the workflow, the builder,
    the checker, or any of the eight pages.
 3. It does **not** move PR #800's head, and it does **not** merge anything.
@@ -561,17 +586,24 @@ blob's bytes were the object of the measurement.
   negative** accompanies the result, so the check is shown capable of failing.
 - **Zero stray backslashes, zero unsubstituted tokens.** The published comment and this plan are
   scanned for backslash characters and for unfilled template tokens; the count must be **0** (AC23).
-- **What this capture supersedes.** The **first capture** of this plan: commit
-  `f0ffc27139920f010e719590386eb977a702089b` -> blob
+- **What this capture supersedes.** **Two** earlier captures of this plan, both left unedited.
+  **Revision 1**: commit `f0ffc27139920f010e719590386eb977a702089b` -> blob
   `818ecc370d35745e55fbe84407f3104dd0492720`, **60,323** bytes / **567** lines, published in issue
-  comment **6224804664**, which is left unedited. Its two defects, measured rather than described:
-  (1) its `NV-4` stated that publishing would run no check against the head, and publishing in fact
-  **re-triggered** the `pull_request` workflows at the same head, producing a second six-run suite;
-  (2) its element-2 checks row consequently reported one suite without saying a second would run.
-  Both sentences are corrected in this revision and nothing else is changed. The superseded blob is
-  **not** a byte prefix of this one, so confinement is shown by naming every changed site rather
-  than by a prefix comparison; the sites are the `NV-4` sentence, the element-2 checks row and this
-  bullet.
+  comment **6224804664**. Its two defects, measured rather than described: (1) its `NV-4` stated
+  that publishing would run no check against the head, and publishing in fact **re-triggered** the
+  `pull_request` workflows at the same head, producing a second six-run suite; (2) its element-2
+  checks row consequently reported one suite without saying a second would run. **Revision 2**:
+  commit `0daf85aad02775d7ad91574e0cd7c117d09c0634` -> blob
+  `e8489cb79794610ca6b0fcf35ecd404ff952a3b5`, **62,182** bytes / **580** lines, published in issue
+  comment **6224875111**. Its defect was that it carried, as an **open finding**, the reviewer's
+  lane-D precedent item, which the two-ref measurement of `E11` now shows to be a **ref artefact** of
+  measuring an unmerged work item at one ref. This revision **withdraws that item**, replaces the
+  `HEAD`-only measurement with the two-ref measurement in section 2 and in `E11`, and stops section 2
+  asserting that both findings are substantiated while section 5's `NV-2` declines to judge them.
+  Nothing else is changed. The two superseded blobs are **not** byte prefixes of this one, so
+  confinement is shown by naming every changed site rather than by a prefix comparison; the sites are
+  section 2's findings lead, section 2's item 1, section 2's closing paragraph, `NV-2`, the `E11`
+  row, section 9.2's item 1 and this bullet.
 
 ---
 
