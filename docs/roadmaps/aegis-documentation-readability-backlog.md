@@ -5144,12 +5144,12 @@ main-contained base revision. The appended count is therefore **8**, with no wit
 none of the eight pages is this ledger, so the self-cost question does not arise for them. The batch
 record itself is a new reader page and enters `no_recorded_acceptance` pending its own later review.
 
-**Stable IDs — the lane's allocated band, used as directed.** The KEEPER-ID-ALLOCATION file
-allocates lane D the band **K-381..K-480**; batch 1 authored K-090..K-097 before the bands existed,
-and batch 2 starts at the band's first free id and goes up (**K-381..K-388**, verified absent from
-the ledger at the base by command). If the merge holder renumbers batch 1 into the band, it must not
-collide with K-381..K-388 (for example K-389..K-396 for batch 1); the renumber-at-merge procedure in
-KEEPER-ID-ALLOCATION.md governs, and the Blob IDs are never touched.
+**Stable IDs — the lane's allocated band, used as directed.** Lane D's band is **K-381..K-480**,
+recorded in section S4 of `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` — not in a tracked
+`KEEPER-ID-ALLOCATION.md`, a name no ref binds and no path matches. Batch 1 authored
+K-090..K-097 before the bands existed; batch 2 starts at the band's first free id and goes up
+(**K-381..K-388**, verified absent at the base by command). A merge-holder renumber of batch 1
+must not collide with these (for example K-389..K-396) and touches the stable ID, never the Blob ID.
 
 **Count honesty (unchanged; no count of this lane's own).** This ledger publishes no count of its
 own and cites the index (D84). The eight rows change nothing until a rebuild, and the builder can

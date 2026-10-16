@@ -76,8 +76,12 @@ The owner directed that the same-agent rows are **withdrawn and re-recorded by a
 the same evidence — no page needs re-reading** (AEGIS-APR-117: withdrawal rows plus fresh keeper rows
 from the same evidence, in one pure-docs pull request). This lane states that deviation plainly here
 and in the pull-request body, records the reading and the rows as evidence, and **leaves the
-withdrawal-and-re-record disposition to the merge holder**, exactly as the owner's decision and the
-KEEPER-ID-ALLOCATION file direct. This record claims no keeper-independence and no ratification.
+withdrawal-and-re-record disposition to the merge holder**, exactly as the owner's decision directs.
+That decision's band allocation is recorded in section S4 of
+`docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` (present on `origin/main`, added by PR #786; **not**
+present at this record's base) — not in a tracked `KEEPER-ID-ALLOCATION.md`, a filename no ref binds
+and `git ls-tree` matches nowhere (correction note CN-2). This record claims no keeper-independence
+and no ratification.
 
 ## 4. Per-page dispositions — 8 of 8 full-page re-reads, accepted unchanged
 
@@ -97,7 +101,7 @@ used for its no-recorded page).
 | LD-16 | `docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md` | none (no-recorded bucket) | not derivable | **accepted unchanged** | `readability-phase4-lane-d-implementer-c2` |
 
 No page needed a fix, so no page was edited: the no-rewrite discipline forbids edits to dated records,
-and the five observations below (section 8) are recorded rather than rewritten in place.
+and the six observations below (section 8) are recorded rather than rewritten in place.
 
 ## 5. Depth records
 
@@ -151,10 +155,15 @@ artifacts they name. That is a property of the dated text, which this lane may n
 **(b) Abbreviations and coded identifiers defined at first use.** LD-9 expands "pull request (PR)" at
 first use (L14) and LD-10 writes "pull request #169" in full (L9), but APR-009/APR-012, CP-WP-003A/
 CP-WP-003/CP-WP-004, R4/R5, POSIX (LD-9 L34-48, LD-10 L26-31), BER-DEC-010, WP-2B-3/2B-4, AEGIS-060
-(LD-10 L25-31) and AEGIS-APR-007/008/009/012, BER-DEC-008/011 (LD-11 L37-44) appear without an on-page
-gloss — LD-9 defers to the index it links ("The new page defines its abbreviations and status code
-before the current index", L53). LD-12..LD-16 use PR/F1-F7/AC7/AC9/K-0xx/D-nn/OWED unexpanded, the
-identifiers of the plan and lane records they cite. **Recorded, unchanged** — dated records.
+(LD-10 L25-31) appear without an on-page gloss — LD-9 defers to the index it links ("The new page
+defines its abbreviations and status code before the current index", L53). **LD-11 is the exception,
+and the first issue of this sentence over-stated it:** that page's own banner *does* gloss the
+identifier families — "`APR` identifies an owner approval-register entry; `BER-DEC` identifies a
+BER decision record; UTC means Coordinated Universal Time" (LD-11 L9-11, exactly as section 6(a)
+states) — so AEGIS-APR-007/008/009/012 and BER-DEC-008/011 (LD-11 L37-44) carry prefixes the page
+defines; only the individual numbers are unglossed there. LD-12..LD-16 use PR/F1-F7/AC7/AC9/K-0xx/
+D-nn/OWED unexpanded, the identifiers of the plan and lane records they cite. **Recorded, unchanged**
+— dated records.
 
 **(c) Descriptive headings, lists or tables, and concrete examples.** LD-9 headed sections with
 bulleted reconciliations and concrete artifacts (PR #144, the 5,179-byte packet, the 4m23s interval);
@@ -317,7 +326,77 @@ skill@6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 / reason:
   was **not instrumented**, so wall time is an imperfect comparison with the estimate rule's
   active-time requirement and no per-page active rate is claimed.
 
+## 15. Dated correction notes — 2026-10-15, appended after the first Stage D audit
+
+The first Stage D audit of this record (**SD-D: REVISE**, at the audited head
+`7dcef8fc177226e62d1c7cb7546c746362b09880`) raised three text-accuracy findings. Two are corrected in
+place above — **R1**, the observation count on section 4's closing line, and **R2**, section 6(b)'s
+claim about LD-11's glosses. The third cannot be corrected in place, and three further items were
+found by this repair's own quotation, provenance and over-assertion sweep rather than by that audit.
+The audited commit `7dcef8fc…` is **not rewritten**: its bytes and its message stand, and this section
+is the correction instead of an amend.
+
+- **CN-1 (the audit's R3) — the audited commit message's ledger count is wrong by one, and is not
+  amended.** Commit `7dcef8fc177226e62d1c7cb7546c746362b09880` says *"Additions only: 75/0 on the
+  ledger"*. The measured figure is **74**, and it is 74 three ways: `git diff --numstat e2a3e20b
+  7dcef8fc` gives `74  0  docs/roadmaps/aegis-documentation-readability-backlog.md`; the ledger's
+  line count is 5,309 at that head minus 5,235 at the base = 74; and the added keeper section is 66
+  lines plus the 8 appended rows = 74. The pull-request body already stated `(+74/−0)`, so the body
+  was right and the message was wrong. **A commit message is immutable**, so this note — not an amend
+  — is the correction; amending would rewrite the audited commit and move the head, voiding every
+  head-bound verdict for a one-digit error.
+- **CN-2 — the `KEEPER-ID-ALLOCATION.md` citation has no tracked home.** Section 3 above, the
+  pull-request body and the ledger section this change adds all named `KEEPER-ID-ALLOCATION.md` as
+  though it were a repository path. **It is not one**: no ref binds it — `git ls-tree -r --name-only`
+  at `e2a3e20b`, at `7dcef8fc` and at `origin/main` (`3b0d6cd5`) lists no such path, and
+  `git grep -l -F KEEPER-ID-ALLOCATION e2a3e20b` returns **0** files, so this change introduced the
+  first references to that name anywhere in the tree. The lane bands are allocated in a
+  session-workspace file outside the repository; the tracked home is section **S4** of
+  `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` (lane D **K-381..K-480**), which is on `origin/main`
+  but **not at this record's base** (it arrived with PR #786), and the open PR #792 publishes the
+  allocation as `docs/roadmaps/KEEPER-ID-ALLOCATION-2026-10-15.md`. The band, the first-free-id rule
+  and the renumber-the-stable-ID-only procedure are therefore recorded here as the owner's direction,
+  not as a citation that resolves at the base. The sibling lane records (#782 and #788) carry the same
+  correction for the same filename.
+- **CN-3 — the pull-request body attributed "follow-up 1" to PR #754; the page says #753.** The body's
+  read summary said the non-resolving revision `9644ef079db763802223180ae5b11af39919c781` was "named
+  follow-up 1 by PR #754's lane". The page that discloses it
+  (`readability-closeout-reread-2026-10-12.md` L189, quoted verbatim in section 5 above) says
+  **"#753 named as follow-up 1"**, and PR #754's own body (25,654 bytes, fetched this round) contains
+  neither the string `9644ef07` nor the phrase "follow-up 1" — its F1 is a *page*, P1, not this
+  revision. The body now carries the page's own attribution.
+- **CN-4 — the pull-request body said the four lanes re-read 596 pages; they re-read 590.** 596 is the
+  instrument's `official_pending_count` at the base (4 `provably_pending` + 586
+  `no_recorded_acceptance` + 6 `cannot_decide`), which is what section 1 quotes; but the lanes'
+  derivation set is **590** (section 2), and the same body says a few lines later that the six
+  `cannot_decide` lost-commit pages are in **no lane's list**. The body now names both numbers.
+
+## 16. What this repair round did not verify
+
+Recorded here rather than only in a message, so the disclosure is auditable in the record itself.
+
+1. **The four external links' live state** — not fetched by the reading round and not fetched by this
+   repair; the record's "not fetched" statement remains accurate and the links remain unverified.
+2. **Codex's actual findings at the audited head** — the review was attempted, did not complete under
+   a usage limit, and no finding content is retrievable; recorded as **confirmed unavailability**, not
+   as clean and not as "did not run".
+3. **Which model drafted the original text.** No artifact binds the agent name
+   `readability-phase4-lane-d-implementer-c2` to a model, so this repair leaves the drafter line as
+   published and names only its own model; it asserts nothing about the drafter.
+4. **The audited head's own checks after this repair.** The verification commands in section 11 were
+   re-run at the **new** head; the numbers reported for the audited head `7dcef8fc…` are that audit's
+   and this repair's read-back of the same ref, not a re-run at that ref.
+5. **Nothing else outstanding.** The audit's fifth unverified item — the body's local Markdown-link
+   count — *was* reproduced this round at the new head:
+   `python -B scripts/ci/check-markdown-links.py` over the two changed files exits 0 with
+   `files: 2   links checked: 594   anchors checked: 143   broken: 0   dead: 0   external-skipped: 67`,
+   matching the body's figure exactly. It is recorded here as verified rather than left as a gap.
+
 ---
 
 *Prepared by a **DeepSeek agent** (`deepseek-v4-pro`) operating under the owner account, as the
 repository's attribution rule (2026-10-13) requires.*
+
+*Repaired 2026-10-15 by **DeepSeek-4.1-Flash (deepseek-flash)**, which made the corrections in sections 4,
+6(b), 15 and 16 of this record. The drafter named above is unchanged, and this repair rewrites no
+drafted claim of the original text except the two the Stage D audit measured as wrong.*
