@@ -691,10 +691,10 @@ repository's own instruments provide (`scripts/validate-skills.py`,
 
 ## Footer
 
-sha256: 9e851fdb9b62b9b771e2322d27e826529d8cd117798e164053cb5b975b417d05
+sha256: 21e5b0081c0d1fc49a16ffaacd8f72b5e3a90aaffea23b4b0160a524e29c5491
 
 This digest covers the batch record's bytes from the first line through the closing `---` rule line
-and its terminating newline, encoded UTF-8 with LF line endings. It does not cover the blank
-separator line between that rule and the `## Footer` heading, and it does not cover this footer.
-Any edit above the rule voids the digest and requires a fresh validation. Recomputed at the
-2026-10-15 second Stage C repair head after the Stage F re-review's SD-F: REVISE edits (comment 6205260793).
+and its terminating newline, encoded UTF-8 with LF line endings: exactly 62,775 bytes, byte offsets
+0 through 62,774 inclusive, lines 1-690. It does not cover the blank separator line between that
+rule and the `## Footer` heading, nor this footer. Any edit above the rule needs a fresh validation.
+Recomputed at this Stage C repair head (SD-F: REVISE, comment 6205747330) by DeepSeek-4.1-Flash (deepseek-flash).
