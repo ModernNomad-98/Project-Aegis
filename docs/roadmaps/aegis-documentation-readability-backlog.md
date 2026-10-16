@@ -5119,13 +5119,14 @@ keeper-independence condition). The eight pages below were each independently fu
 base head against [Acceptance for each page](#acceptance-for-each-page) by a
 reviewer who did not write the page, and the reviewer restated each page's
 purpose and normal use from the page alone in the batch record. No page was
-edited, so no "corrected" row exists; the template page's one partial
-acceptance bullet (its B2 abbreviation-definition bullet: YAML, API and MCP
-appear without an on-page first-use definition) is recorded in the batch
-record as a property of its text at the bound revision, not repaired (editing
-an instruction file under `.claude/skills/` would reclassify this change
-beyond the docs-only class, and the page's own contract defers its terms to
-the standard it names). No acceptance the reviewer did not give is recorded,
+edited, so no "corrected" row exists; the template page's three flagged terms
+(**YAML**, **API**, **MCP**) are an **observation, not a gap**: the page's own
+opening blockquote links `docs/skill-generation-standard.md`, its frontmatter
+directs the author to "rewrite every section against docs/skill-generation-standard.md",
+and that standard defines **YAML** at L29, **API** at L33 and **MCP** at L34
+(C-1's page-resolves-it test), so the page is recorded **accepted** — the
+coordinator's 2026-10-15 ruling on the first Stage D audit of this PR
+(comment 6209064290). No acceptance the reviewer did not give is recorded,
 and no posture, Stop Condition, or Security Rule changed.
 
 **Lane derivation (Phase 4 re-read lanes; lane A is the alphabetically first
@@ -5155,24 +5156,25 @@ template's two resolved link targets, its validator-exemption claim and the
 sentinel/1024-character claims re-verified against the standard) are in the
 batch record.
 
-**Declared deviation (recorded, not hidden).** AEGIS-APR-101 (the
-owner-approval-register grant defining the recording-only ledger-keeper role
-and its keeper-independence condition) requires the ledger keeper to be a
-different agent from the page's author and accepting reviewer; this lane's
-one agent is both the accepting reader and the writer of this keeper section,
-so that condition is **not satisfied** and the rows are **not green**. The
-carry is the same CARRY-WITH-DEVIATION (carrying the rows forward with the
-declared deviation recorded, not hidden) the SD-D2 coordinator ruling (the
-coordinator's 2026-10-12 ruling that let the K-074/K-075 rows stand with the
-unmet keeper-eligibility clause declared) recorded for K-074/K-075 (the two
-earlier keeper-row IDs in the consolidated table) and applied through K-081
-(the last earlier keeper-row ID the carry was applied through), and the
-authority question stays with the merge holder under AEGIS-APR-100 (the
-owner's standing commit, push and merge pre-approval grant). The reader did
-not write any of the eight pages (`git log -1 --format=%an -- <page>`
-names other authors for all eight; the batch record lists them). This lane
-delivers under AEGIS-APR-039 (the standing backlog-delivery approval) and
-records only under AEGIS-APR-101 (the ledger-keeper recording grant).
+**Keeper-independence defect, routed — not a deviation carried.** AEGIS-APR-101
+(the owner-approval-register grant defining the recording-only ledger-keeper
+role and its keeper-independence condition) requires the ledger keeper to be a
+different agent from the page's author and accepting reviewer; this lane's one
+agent is both the accepting reader and the writer of this keeper section, so
+that condition is **not satisfied** and the rows are **not green**. On
+2026-10-15 the owner **declined to ratify** the carry-with-deviation of
+same-agent keeper rows and directed the **AEGIS-APR-117** withdrawal-and-re-record
+route instead (owner decision 3 of 2026-10-15, in
+`docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` on `main`); the earlier
+CARRY-WITH-DEVIATION framing of this section, and the SD-D2 ruling's K-074/K-075
+carry it leaned on, are **closed, not extended** — the decision records that
+"its precedent must not be extended further". The reader did not write any of
+the eight pages (`git log -1 --format=%an -- <page>` names other authors for
+all eight; the batch record lists them). The authority question stays with the
+merge holder under AEGIS-APR-100 (the owner's standing commit, push and merge
+pre-approval grant). This lane delivers under AEGIS-APR-039 (the standing
+backlog-delivery approval) and records only under AEGIS-APR-101 (the
+ledger-keeper recording grant).
 
 **Count honesty (unchanged).** This lane publishes no readability count of
 its own (D84, the official-count switch — the 2026-10-10 decision that the
@@ -5195,24 +5197,44 @@ did not write this section — the self-cost every prior update states. The
 tracked Markdown count does not change except by the new batch record note
 itself, which is pending and not counted among accepted pages.
 
-The next batch's selection rule: the next 8 paths of lane A's sorted range
-(paths 9–16 of 148), re-measured at the next implementation base.
+**The next batch's selection rule is R2, with the frontier measured, never index
+arithmetic.** *R2*: the next eight **unread** pages in the unread sequence (the
+sorted list of pages no lane's batch record has read yet) — not the eight
+contiguous pages after the frontier (that reading, R1, orphaned sorted index 456
+for seven rounds in lane D) and not index arithmetic (forbidden). Measured by
+the 2026-10-15 Stage C repair at the bound base `e2a3e20b7c20…`: lane A's read
+frontier after this batch is `.claude/skills/_template/SKILL.md`, the last path
+this batch read (sorted index 7 of the 590-path pending set); **0 unread pages
+sit behind it** (indices 0..7 are exactly this batch's eight), and no lane B/C/D
+batch record reads any path in lane A's quarter (20 lane batch records parsed
+across all refs; lane A's own five batches read indices 0..39 with no gap). **The
+next batch's pages, by path only**, to be re-measured at the next implementation
+base: `.claude/skills/ab-test-designer/SKILL.md`,
+`.claude/skills/ab-test-designer/references/ab-test-sheet.md`,
+`.claude/skills/acceptance-criteria-reviewer/SKILL.md`,
+`.claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md`,
+`.claude/skills/accessibility-test-harness/SKILL.md`,
+`.claude/skills/accessibility-test-harness/references/a11y-checklists.md`,
+`.claude/skills/admin-console-architect/SKILL.md`,
+`.claude/skills/adr-sequencer/references/adr-corpus-sheet.md`.
 
-**Repair pass 2026-10-15 (pre-merge correction by a different agent).** The
-eight rows below are recorded by `readability-lane-a-implementer-c` (this
-PR's one reader and row author) with the declared deviation; they are **not
-green** and do not stand as authored. PR #781 (AEGIS-APR-117, the
-approval-register grant that authorises withdrawal rows) appends the
-withdrawal rows K-082W..K-089W (the eight rows that cancel K-082..K-089) and
-fresh keeper rows K-098..K-105 (lane A's allocated band of fresh row IDs)
-recorded by a different eligible keeper (`deepseek-v4-pro-apr117-keeper`)
-from the same evidence; no page is re-read. P8's template page is recorded
-**partial** in the batch record (its B2 abbreviation-definition bullet is
-partial: YAML, API, MCP undefined on-page), so the K-089 full-page-acceptance
-row does not stand as authored. This repair authors no keeper rows and no
-withdrawal rows, and leaves the eight rows as authored so PR #781's
-withdrawals stay aligned — the two PRs' row edits do not conflict. Drafted by
-DeepSeek (deepseek-v4-pro), an AI agent operating under the owner account.
+**Repair passes 2026-10-15 (pre-merge corrections by different agents).** The
+eight rows below are recorded by `readability-lane-a-implementer-c` (this PR's
+one reader and row author); they are **not green** for that reason alone
+(AEGIS-APR-101). The first repair pass corrected the record's prose. The second
+(Stage C, `readability-lane-a-stagec-repairer-2`, DeepSeek-4.1-Flash
+(deepseek-flash)) corrects this section and the batch record per the first Stage
+D audit (comment 6209064290) and the coordinator's 2026-10-15 ruling: the
+template page P8 is recorded **accepted** on the page-resolves-it evidence, so
+its K-089 `full-page-acceptance` row now matches the disposition and the earlier
+*partial* reading in this section is superseded. The rows remain as authored
+here: PR #781 (AEGIS-APR-117) carries K-082W..K-089W and fresh rows
+K-098..K-104 and **has merged to `main`** (`f490c16f`, 2026-10-15T22:50:57Z);
+because it was written while P8 was still recorded partial, the fresh lane-A row
+K-105 was left unused (`main` ledger L5200-L5201), so P8's fresh full-page row is
+owed on that route. No keeper row and no withdrawal row is authored here, and no
+page is re-read. Drafted by DeepSeek-4.1-Flash (deepseek-flash), an AI agent
+operating under the owner account.
 
 <!-- acceptance-index-schema: 1 -->
 

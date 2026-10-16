@@ -61,15 +61,31 @@ Union with the 4 `provably_pending` paths = **590** paths; sorted, the first
 three-reader ceiling (ledger L3000-3006) is satisfied by construction and is recorded here rather
 than presented as multiple agents.
 
-**Declared deviation (read honestly, not silently).** The ledger-keeper role (AEGIS-APR-101, the
-owner-approval-register grant that defines the recording-only ledger-keeper role and its
-keeper-independence condition) requires the keeper to be a different agent from the page's
-author **and accepting reviewer**;
+**Keeper-independence defect, recorded and routed — not a deviation carried.** The ledger-keeper
+role (AEGIS-APR-101, the owner-approval-register grant that defines the recording-only
+ledger-keeper role and its keeper-independence condition) requires the keeper to be a different
+agent from the page's author **and accepting reviewer**;
 this lane's one agent is both the accepting reader and the writer of this lane's ledger section
 and batch record, so the second condition is **not satisfied** and the rows are **not green**.
-The first condition **is** satisfied — the lane wrote none of the eight read pages: this lane's
-agent authored no commit in the repository before this batch, and the last commit touching each
-page names other authors (`git log -1 --format="%h %an" -- <page>`):
+This is a **defect**, not a deviation to carry: on 2026-10-15 the owner **declined to ratify**
+the carry-with-deviation of same-agent keeper rows and directed the **AEGIS-APR-117**
+withdrawal-and-re-record route instead (owner decision 3 of 2026-10-15, recorded in
+`docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` on `main` — blob
+`f2010a750f36fb6d290612096d945ee63a7b2426`; that path does **not** exist at this head, so it is
+cited by ref, not by tree). Two glosses: *carry-with-deviation* is keeping the same-agent rows
+while declaring the AEGIS-APR-101 deviation instead of removing them; *AEGIS-APR-117* is the
+register entry — "The ledger keeper may append withdrawal rows after the switch" — that lets the
+keeper cancel a wrong row by appending a withdrawal row bound to evidence. The same decision
+governs the precedent: the **K-074 to K-081 carry** (the earlier carried rows, keeper IDs 74
+through 81) is **not ratified**, and "its precedent must not be extended further". The route is:
+the rows this PR appends are cancelled by withdrawal rows and re-recorded by a different,
+eligible keeper from the same evidence — **no page needs re-reading**. PR #781 carries that
+route and has since **merged to `main`** (`f490c16f9ed23f3d489e42f7696323bffcce6fd3`, merged
+2026-10-15T22:50:57Z); it appends K-082W…K-089W and fresh rows K-098…K-104. At this head the
+eight rows remain as authored; this repair authors no keeper rows and no withdrawal rows. The
+first condition **is** satisfied — the lane wrote none of the eight read pages: this lane's agent
+authored no commit in the repository before this batch, and the last commit touching each page
+names other authors (`git log -1 --format="%h %an" -- <page>`):
 
 | Page | Last-touching commit / author |
 | --- | --- |
@@ -82,18 +98,16 @@ page names other authors (`git log -1 --format="%h %an" -- <page>`):
 | P7 | `d72c07e2` nguyenpv1980-wq |
 | P8 | `1e1cc705` Peter Nguyen ("fix(ci): apply #528 security review items 2-4 and the hardening") |
 
-The carry is the same CARRY-WITH-DEVIATION (carrying the rows forward with the declared
-deviation recorded, not hidden — the precedent first recorded for K-074/K-075) the SD-D2
-coordinator ruling (the coordinator's 2026-10-12 ruling that let the K-074/K-075 rows stand
-with the unmet keeper-eligibility clause declared) recorded for K-074/K-075 (the two earlier
-keeper-row IDs in this backlog's consolidated table) and applied through K-081 (the last
-earlier keeper-row ID the carry was applied through), and the authority question stays with
-the merge holder under AEGIS-APR-100 (the owner's standing commit, push and merge
-pre-approval grant); this lane records under AEGIS-APR-101 (the ledger-keeper recording
-grant; recording only) and delivers under AEGIS-APR-039 (the standing backlog-delivery
-approval).
+The authority question stays with the merge holder under AEGIS-APR-100 (the owner's standing
+commit, push and merge pre-approval grant); this lane records under AEGIS-APR-101 (the
+ledger-keeper recording grant; recording only) and delivers under AEGIS-APR-039 (the standing
+backlog-delivery approval). The CARRY-WITH-DEVIATION framing this section first used — carrying
+the rows forward with the deviation declared, on the K-074/K-075 precedent — is **removed** by
+the 2026-10-15 Stage C repair (section 9): the owner's decision closed that precedent instead of
+extending it, and the SD-D2 coordinator ruling (the 2026-10-12 ruling that let the K-074/K-075
+rows stand with the unmet keeper-eligibility clause declared) governs those rows only.
 
-## 3. Per-page dispositions — eight full-page re-reads, zero edits (seven accepted, one partial)
+## 3. Per-page dispositions — eight full-page re-reads, zero edits (eight accepted)
 
 Every page was read **whole, line by line, as prose**, at the bound revision
 `e2a3e20b7c20ef8385b219b39c6405237163406f`, in this session; each page's full text was displayed in one read with no
@@ -110,16 +124,25 @@ were judged per page; the disposition table:
 | P5 | `.claude/agents/release-readiness-reviewer.md` | 31 / 1,765 | **accepted** | 0 |
 | P6 | `.claude/agents/secure-saas-reviewer.md` | 34 / 1,908 | **accepted** | 0 |
 | P7 | `.claude/agents/senior-troubleshooting-lead.md` | 30 / 1,651 | **accepted** | 0 |
-| P8 | `.claude/skills/_template/SKILL.md` | 119 / 7,081 | **partial** | 0 |
+| P8 | `.claude/skills/_template/SKILL.md` | 119 / 7,081 | **accepted** | 0 |
 
 Line and byte counts are `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` measured in this session, not
 transcribed; the repair pass re-measured all eight with the same command under `wc -l` semantics
 and corrected the line counts and `L1-N` ranges here (section 8). No page needed a fix, so no
 "corrected" row exists and no page's net line change is anything other than 0. P8's verdict is
-**partial**, not accepted: its B2 abbreviation-definition bullet is partial (YAML, API and MCP
-appear without an on-page first-use definition), so P8 is recorded honestly as a partial
-acceptance and the full-page-acceptance keeper row K-089 (this PR's keeper row for P8) does not
-stand as authored — PR #781 withdraws it and re-records from the same evidence (section 8).
+**accepted**: the three terms the first pass flagged — **YAML**, **API** and **MCP** — are
+resolved by the page's **own linked companion**, so under C-1 (the readability rule that an
+unglossed term the page itself resolves, or that a library-wide convention covers, is an
+observation and not a per-page defect) they are an observation, not a gap. The page's opening
+blockquote ends "Full rules: [docs/skill-generation-standard.md](../../../docs/skill-generation-standard.md)."
+(`.claude/skills/_template/SKILL.md` L27 at the bound revision; the link target is blob
+`1ecbac2d2fb679cdce6f840e132f2bbc56dfa229` there), and its frontmatter description directs the
+author to "rewrite every section against docs/skill-generation-standard.md"; that standard
+defines **YAML** at L29 ("**YAML** is its structured text format"), **API** at L33 and **MCP** at
+L34 ("Section 5's action table also names **API** (application programming interface) and
+**MCP** (Model Context Protocol) calls"). The full-page-acceptance keeper row K-089 (this PR's
+keeper row for P8) matches this disposition and stands at this head. The coordinator's ruling of
+2026-10-15 records P8 as **FULL** on exactly this evidence (section 9).
 
 ## 4. Per-page read detail — ranges, bullets, purpose restatements, verification
 
@@ -216,12 +239,15 @@ Purpose and normal use: a reference template for authoring a new Aegis skill —
 directory, rename it, set `name`, and rewrite every section against
 `docs/skill-generation-standard.md`; it is not a shipped skill and is never invoked.
 Bullets: B1 satisfied (the opening blockquote names what the page is, where it lives and who
-should read it). B2 **partial, recorded not repaired** — TALI is glossed at first use ("a
+should read it). B2 satisfied by the page's own linked companion —
+TALI is glossed at first use ("a
 separately classified, separately activated execution route…") and the MANUAL-ONLY sentinel is
-explained, but **YAML**, **API** and **MCP** appear without an on-page first-use definition
-("strict-YAML-valid line", the Stop Conditions' "network, API, webhook, or MCP access"); the
-page's own contract defers every section to the standard it names, and the standard defines
-these terms. B3 satisfied — Purpose/Use When/Inputs/Workflow/Output/Checklist/Gotchas/Stop
+explained; **YAML**, **API** and **MCP** carry no on-page definition, but the page's opening
+blockquote points at `docs/skill-generation-standard.md`, its frontmatter directs the author to
+"rewrite every section against docs/skill-generation-standard.md", and that standard defines
+**YAML** at L29, **API** at L33 and **MCP** at L34. Under C-1 the page itself resolves the
+terms, so this is an **observation, not a gap**; the 2026-10-15 Stage C repair (section 9)
+records the disposition as accepted. B3 satisfied — Purpose/Use When/Inputs/Workflow/Output/Checklist/Gotchas/Stop
 Conditions/Supporting Files headings, a concrete example output ("Produces a normalized
 spreadsheet and summary tab from a messy export."), and what each section accepts/produces.
 B4 satisfied — the template states explicitly that it activates neither TALI route and that
@@ -234,12 +260,12 @@ factual claims about the validator were re-verified against the validator source
 checks but not V1/V2" comment at :1651) and against the standard (the 1024-character parsed-value
 limit at L115/L148; the 32-character sentinel with trailing space at L169 — the page's visible
 "MANUAL-ONLY; never auto-invoke." is 31 characters plus the stated trailing space). B6 this
-record (author: Peter Nguyen). The partial bullet is recorded as a property of the page's text
+record (author: Peter Nguyen). The flagged terms are recorded as an observation on the page's text
 at the bound revision, not repaired: editing an instruction file under `.claude/skills/` would
 reclassify this change beyond docs-only (the change-classification-gate's agent-instruction-file
 rule), and the page's own contract points every reader at the standard where the terms are
 defined.
-**Verdict: partial acceptance, recorded honestly — not a full-page acceptance.** The full-page-acceptance keeper row K-089 does not stand as authored; PR #781 withdraws it (withdrawal row K-089W, the row that cancels K-089) and re-records it from the same evidence by a different eligible keeper (section 8).
+**Verdict: accepted, no edit.** The full-page-acceptance keeper row K-089 matches this disposition (the page-resolves-it evidence is the bullet above; the coordinator's 2026-10-15 ruling and the C-4 both-direction check are in section 9).
 
 ## 5. The verbatim quote lines the keeper rows cite (one per data row)
 
@@ -251,6 +277,13 @@ P5 accepted: .claude/agents/release-readiness-reviewer.md read whole at e2a3e20b
 P6 accepted: .claude/agents/secure-saas-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 P7 accepted: .claude/agents/senior-troubleshooting-lead.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 P8 accepted: .claude/skills/_template/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+
+All eight strings name **full** pages: each of the eight dispositions in sections 3 and 4 is an
+acceptance, and each string is byte-identical to its keeper row's `Quote` cell at this head. The
+strings were recounted after the P8 disposition was corrected to **accepted** by the 2026-10-15
+coordinator ruling: the eighth string, `P8 accepted: …`, matches K-089's
+`full-page-acceptance` kind, and no string is offered for a page recorded partial, because no
+page of this batch is partial.
 
 ## 6. Count honesty, the machine-visibility note, and the self-cost
 
@@ -270,8 +303,38 @@ P8 accepted: .claude/skills/_template/SKILL.md read whole at e2a3e20b7c20ef8385b
   own independent full-page re-read — the self-cost every prior update states. This batch record
   itself is a new reader page with no acceptance row, so it is pending and not counted among
   accepted pages.
-- **Next batch selection rule:** the next 8 paths of lane A's sorted range (paths 9-16 of 148),
-  re-measured at the next implementation base.
+- **Next batch selection rule — R2, with the frontier measured, never index arithmetic.** *R2* is
+  the reading lane A batch 5 records and the reading applied here: **the next eight unread pages
+  in the unread sequence**, where the unread sequence is the sorted list of pages that no lane's
+  batch record has yet read. It is not R1 (the eight contiguous pages after the frontier, which
+  can leave a page unread **behind** it — R1 orphaned sorted index 456 for seven rounds in lane
+  D) and not R3 (index arithmetic, forbidden). The frontier was measured at the bound base
+  `e2a3e20b7c20…`, not assumed:
+
+  ```text
+  lane A read frontier after this batch      : sorted index 7  .claude/skills/_template/SKILL.md
+  pages behind the frontier                  : indices 0..7 = exactly this batch's eight, 0 unread
+  UNREAD PAGES BEHIND THE FRONTIER           : 0   (local sense: nothing below index 7 is unread;
+                                                     cross-lane sense: no lane B/C/D batch record
+                                                     reads inside lane A's 148-path quarter)
+  cross-check at the later state (2026-10-16): 20 lane batch records parsed across all refs (lane A
+                                                     b1-b5, lane B b1-b5, lane C b1-b5, lane D b1-b5);
+                                                     lane A's own reads are indices 0..39 with no gap
+  ```
+
+  **The next batch's pages, named by path only** — the first eight entries of the unread sequence
+  at this base, to be **re-measured at the next implementation base** because the pending set
+  shifts as sibling records land:
+  `.claude/skills/ab-test-designer/SKILL.md`,
+  `.claude/skills/ab-test-designer/references/ab-test-sheet.md`,
+  `.claude/skills/acceptance-criteria-reviewer/SKILL.md`,
+  `.claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md`,
+  `.claude/skills/accessibility-test-harness/SKILL.md`,
+  `.claude/skills/accessibility-test-harness/references/a11y-checklists.md`,
+  `.claude/skills/admin-console-architect/SKILL.md`,
+  `.claude/skills/adr-sequencer/references/adr-corpus-sheet.md`.
+  No index is pinned for a following batch and no arithmetic selects it (section 9 records the
+  measurement commands and output).
 
 ## 7. Validation actually run (commands and their real results)
 
@@ -301,10 +364,10 @@ recorded disposition, none left untriaged (a P1 is never untriaged):**
 
 | # | Severity | Finding | Disposition recorded here |
 | --- | --- | --- | --- |
-| 1 | P1 | withhold rows recorded by the accepting reviewer (K-082..K-089, this PR's eight keeper rows) | **Fixed externally, coordinated.** PR #781 (AEGIS-APR-117, the approval-register grant that authorises withdrawal rows) appends withdrawal rows K-082W..K-089W (the eight rows that cancel K-082..K-089) and fresh keeper rows K-098..K-105 (lane A's allocated band of fresh row IDs) recorded by a different eligible keeper (`deepseek-v4-pro-apr117-keeper`) from the same evidence. This repair leaves the eight rows as authored so #781's withdrawal rows stay aligned, and authors none of its own. |
-| 2 | P2 | do not accept a page with an acknowledged checklist gap (K-089, this PR's keeper row for P8) | **Fixed in this record.** P8 is now recorded **partial** (sections 3 and 4): its B2 abbreviation-definition bullet is partial (YAML, API, MCP undefined on-page). The K-089 full-page-acceptance row does not stand as authored and is withdrawn by PR #781. The docs-only classification (the change-classification-gate class for a diff touching only documentation paths) is not a waiver of the gap — it records only why the page was not edited. |
+| 1 | P1 | withhold rows recorded by the accepting reviewer (K-082..K-089, this PR's eight keeper rows) | **Upheld; remedy routed to AEGIS-APR-117, not to this diff — the earlier "fixed externally" wording is retracted.** The previous repair changed only prose; **the rows remained**, and the named remedy was then a plan, not a state. The owner declined to ratify the carry-with-deviation (owner decision 3 of 2026-10-15) and directed withdrawal-and-re-record. PR #781 carries that route and **has since merged to `main`** (`f490c16f`, merged 2026-10-15T22:50:57Z), appending K-082W..K-089W and fresh rows K-098..K-104. At this head the eight rows are still present; this repair authors no keeper rows and no withdrawal rows, so the remedial state lives on `main`, not in this diff. |
+| 2 | P2 | do not accept a page with an acknowledged checklist gap (K-089, this PR's keeper row for P8) | **Disposition changed to FULL by coordinator ruling — the rows now MATCH the disposition.** The 2026-10-15 ruling records P8 as **FULL** on C-1's page-resolves-it test: the page's opening blockquote links `docs/skill-generation-standard.md`, its frontmatter says "rewrite every section against docs/skill-generation-standard.md", and that standard defines **YAML** at L29, **API** at L33 and **MCP** at L34. Sections 3 and 4 record **accepted**, so there is no acknowledged checklist gap and no full disposition carrying one: K-089's `full-page-acceptance` kind is the kind this evidence supports. The earlier "Fixed in this record" wording is retracted — only the prose had changed while the row remained, which contradicted the row; the prose and the row agree now. |
 | 3 | P2 | include cannot-decide pages in the lane partition | **Recorded, not a defect of this batch.** The six `cannot_decide` (lost-commit-event) pages are outside this lane's 590-path partition (586 no-record + 4 provably-pending); assigning them a lane is the coordinator's routing call, already recorded in the coordinator's revision-cycle design note (a coordinator workspace artifact, not a repo file). This repair does not invent a re-partition it is not authorised to make. |
-| 4 | P1 | expand the bare governance labels in the report | **Fixed in this record and in the ledger section.** Every previously-bare label now carries a one-line plain-English gloss in the same item: CARRY-WITH-DEVIATION (the carry-with-recorded-deviation precedent), SD-D2 (the coordinator ruling that first recorded it), K-074/K-075 and K-081 (the earlier keeper-row IDs the carry spans), AEGIS-APR-100/101/039 (the standing pre-approval, ledger-keeper and backlog-delivery grants), D84 (the official-count switch) and D73 (the index-authority decision; row 6 the full-clone guarantee). |
+| 4 | P1 | expand the bare governance labels in the report | **Fixed in this record and in the ledger section.** Every previously-bare label now carries a one-line plain-English gloss in the same item: CARRY-WITH-DEVIATION (the carry-with-recorded-deviation precedent), SD-D2 (the coordinator ruling that first recorded it), K-074/K-075 and K-081 (the earlier keeper-row IDs the carry spans), AEGIS-APR-100/101/039 (the standing pre-approval, ledger-keeper and backlog-delivery grants), D84 (the official-count switch) and D73 (the index-authority decision; row 6 the full-clone guarantee). The 2026-10-15 Stage C repair (section 9) keeps every gloss and adds two of its own in the same item: AEGIS-APR-117 (the withdrawal-row grant) and the readability rules C-1/C-3/C-4 (page-resolves-it; the next 8 *unread* pages, measured; no acceptance row for a page recorded partial). The CARRY-WITH-DEVIATION gloss now serves the historical reference only, because section 2's carry framing was removed. |
 | 5 | P2 | correct the off-by-one page line counts | **Fixed in this record.** All eight counts and `L1-N` ranges re-measured at the bound revision and corrected (the recorded values were split-length counts that include a phantom trailing element; the correction uses `wc -l` semantics): lines 33/30/31/31/31/34/30/119; bytes unchanged 2,055/1,611/1,739/1,691/1,765/1,908/1,651/7,081. |
 
 **Commands behind the corrections (all run in a full clone with `refs/pull/*/head` fetched):**
@@ -318,17 +381,170 @@ recorded disposition, none left untriaged (a P1 is never untriaged):**
 - `python scripts/ci/check_pr_body_skills.py --body-file <posted body readback>` exit 0;
   `python scripts/check_dco.py --range origin/main..HEAD` SIGNED; `git diff --check` exit 0.
 
-**K-089 honesty.** P8's B2 bullet is partial and this record now says so in its verdict. A
-partial checklist bullet is not a full-page acceptance, so the K-089 row as authored
-(full-page-acceptance) does not stand; PR #781's withdrawal row K-089W (the row that cancels
-K-089) cancels it and the fresh row is recorded there by the eligible keeper. The docs-only
-classification is not treated as a waiver of the gap.
+**K-089.** P8 is a full-page acceptance on the page-resolves-it evidence (sections 3 and 4; C-1's
+stronger test), so K-089's `full-page-acceptance` kind matches the disposition and the row
+stands at this head. Its separate keeper-independence defect (the row's recording agent is the
+page's accepting reader, which AEGIS-APR-101 does not allow) is routed through AEGIS-APR-117:
+`main`'s merged PR #781 carries withdrawal row K-089W, and because #781 was written while P8 was
+still recorded partial it left the fresh lane-A row ID K-105 unused (`main` ledger L5200-L5201:
+"K-105 is left unused for the same PARTIAL reason - lane A's P8"). On this repair's disposition
+the fresh full-page-acceptance row for P8 is owed on that route; it is **not** authored here
+(this repair authors no keeper rows and no withdrawal rows).
 
-**Coordination with PR #781.** Rows K-082..K-089 (this PR's keeper rows for P1-P8) are
-withdrawn by PR #781 and re-recorded there as K-098..K-105 (lane A's allocated band of fresh
-row IDs) from the same evidence by `deepseek-v4-pro-apr117-keeper`; no page is re-read by
-either PR. This repair's diff leaves the eight rows as authored and adds no keeper or
-withdrawal rows, so the two PRs' row edits do not conflict.
+**Coordination with PR #781 — a landed state, not a plan.** Rows K-082..K-089 (this PR's keeper
+rows for P1-P8) are withdrawn on `main` by the merged PR #781 (`f490c16f`, 2026-10-15T22:50:57Z):
+it appends K-082W..K-089W and fresh rows K-098..K-104 recorded by
+`deepseek-v4-pro-apr117-keeper` from the same evidence; no page is re-read by either PR. This
+PR's diff still appends the eight original rows, because this head predates that merge and this
+repair authors no keeper or withdrawal rows; reconciling the two row sets is the merge holder's
+step. The earlier claim that #781 records "K-098..K-105" overstated the band: the merged PR
+stops at K-104 and leaves K-105 unused for P8 (see the K-089 item above).
 
 **Attribution (the 2026-10-13 rule).** This section and every corrected line above are
 drafted by DeepSeek (deepseek-v4-pro), an AI agent operating under the owner account.
+
+## 9. Second Stage C repair — 2026-10-15 (P8 recorded FULL on the coordinator's ruling; the R2 frontier rule; the false "fixed" claims retracted)
+
+**Repairer.** `readability-lane-a-stagec-repairer-2` — a third agent identity, distinct from this
+lane's reader/keeper `readability-lane-a-implementer-c` and from the first repairer
+`readability-lane-a-repairer-c`; this pass is drafted by **DeepSeek-4.1-Flash (deepseek-flash)**,
+an AI agent operating under the owner account (the 2026-10-13 attribution rule). It authors no
+keeper rows and no withdrawal rows, edits none of the eight read pages, and does not merge.
+
+**What this pass answers.** The first Stage D independent implementation audit of this PR
+(comment 6209064290, "SD-D: REVISE") and the coordinator's 2026-10-15 ruling on P8 that followed
+it. The audit's F1 (a page recorded partial carrying a full-page-acceptance row — the C-4
+contradiction; *C-4* is the readability rule that a page recorded partial gets no acceptance row
+of any kind and stays pending) and F2 (the pinned-index next-batch rule — *C-3*, the rule that
+"the next 8" means the next 8 **unread** pages, measured, never index arithmetic) are blocking; the audit's F3 (the
+P8 over-flag) was put to the coordinator, who **decided P8 is FULL**, and its F4 (two bare labels
+in the PR body's witness table) is minor.
+
+**F1, first half — P8 is FULL, with the page-resolves-it evidence cited per term.**
+*Before:* section 3's heading read "(seven accepted, one partial)"; the section 3 table read
+`**partial**` for P8; section 4's verdict read "partial acceptance, recorded honestly — not a
+full-page acceptance"; section 8 read "P8 is now recorded **partial**" — while the ledger this PR
+appends carries **K-089, event kind `full-page-acceptance`**, for the same page, and section 5
+offered eight keeper row-quote strings including "P8 accepted: …". The audit showed with the
+instrument itself that the page lands in the **accepted** bucket, so the head contradicted
+itself. *After:* P8 is recorded **accepted** in the section 3 table and in the section 4 verdict,
+the heading reads "eight accepted", and section 8's row 2 states the disposition directly instead
+of claiming a fix it had not made. The disposition rests on C-1's stronger test — the page's own
+linked companion resolves the flagged terms:
+- **the page's own opening blockquote** (`.claude/skills/_template/SKILL.md` at the bound
+  revision, L23-27) ends "Full rules: [docs/skill-generation-standard.md](../../../docs/skill-generation-standard.md).";
+  that link target is present at the bound revision as blob
+  `1ecbac2d2fb679cdce6f840e132f2bbc56dfa229`;
+- **the page's own frontmatter sentence** (L3) directs the author to "rewrite every section
+  against docs/skill-generation-standard.md";
+- **the standard defines the three flagged terms** at the bound revision: **YAML** at L29
+  ("**YAML** is its structured text format"), **API** at L33 and **MCP** at L34 ("Section 5's
+  action table also names **API** (application programming interface) and **MCP** (Model Context
+  Protocol) calls").
+Prevalence, measured by this pass over the 653 reader pages at the bound base
+(`git grep -l -E '\bTERM\b' <base> -- '*.md'` intersected with the instrument's own reader-page
+classification): **API 204 pages (31.2%)**, **YAML 32 (4.9%)**, **MCP 28 (4.3%)**. The audit's
+figures were 203 / 31 / 28; my API and YAML counts are one page higher each and I could not
+reproduce 203/31 exactly, so I record my own command, method and count. The difference changes
+nothing material: no term approaches a library-wide majority, and for all three the dispositive
+test is the page-resolves-it one above. The coordinator's ruling records P8 as **FULL** and
+K-089 **may stand**.
+
+**F1, second half — the false "fixed" claims are retracted.** *Before:* section 8 row 2 said
+Codex's P2 (review comment 4286821716, "do not accept a page with an acknowledged checklist gap")
+was "**Fixed in this record**", and row 1 said Codex's P1 (4286821702, withhold the
+K-082..K-089 rows) was "**fixed externally**"; only the prose had changed, the rows were
+untouched, and the named remedy ("PR #781 withdraws it") was a **plan, not a state** as written.
+*After:* row 1 records the P1 as **upheld**, with the rows still present at this head and the
+remedy landed on `main` by the merged PR #781; row 2 records the P2's premise as **resolved by
+the FULL ruling**, so the prose and the row agree. The earlier claim that #781 records
+"K-098..K-105" is corrected: measured on `main`, #781 appends K-082W..K-089W and K-098..K-104,
+leaving K-105 unused for P8.
+
+**F2 — C-3: R2 with a measured frontier, never a pinned index.** *Before:* section 6 read "the
+next 8 paths of lane A's sorted range (paths 9-16 of 148), re-measured at the next implementation
+base"; the ledger repeated it and the PR body repeated it. The word `frontier` occurred **0
+times** in the record and **0 times** in the added ledger section. *After:* section 6 records the
+rule as **R2 — the next eight unread pages in the unread sequence** (not index-contiguous, and
+not index arithmetic) with the frontier measured both ways; the next batch's eight pages are
+named **by path only**, to be re-measured at the next implementation base. The measurement this
+pass ran (2026-10-16, full clone at the bound base):
+
+```text
+pending set at e2a3e20b            : 590 paths (586 no_recorded_acceptance + 4 provably_pending)
+lane A quarter                     : first ceil(590 / 4) = 148 paths, sorted
+lane A read frontier after batch 1 : sorted index 7  .claude/skills/_template/SKILL.md
+unread pages behind the frontier   : 0   (indices 0..7 are exactly this batch's eight)
+cross-check at the later state     : 20 lane batch records parsed across all refs (lane A b1-b5,
+                                     lane B b1-b5, lane C b1-b5, lane D b1-b5); 159 read indices;
+                                     lane A's reads are exactly indices 0..39 with no gap;
+                                     no lane B/C/D record reads any index below 148
+next eight unread, R2              : named by path in section 6, to be re-measured at the next base
+```
+
+So the frontier is stated **either way**: no unread page sits behind lane A's frontier, in the
+local sense (nothing below index 7 is unread) or in the cross-lane sense (no other lane's record
+reaches into lane A's quarter).
+
+**F3/F4 — the body's bare `MG` and `SD` labels.** *Before:* the PR body's witness table named
+the `MG` block and the `SD` block with no plain-English gloss in the same item. *After:* the body
+carries both glosses immediately above the witness bound field, in PR #787's phrasing — `MG` is
+the merge receipt's MG1-MG5 block (the merge-gate conditions a merge agent must be able to show
+before merging) and `SD` is the stage-disposition block (the delivery workflow's stage table and
+the exit dispositions it records). Placing the glosses above the field is deliberate: the witness
+payload, and therefore the bound-field digest, is unchanged by them, exactly as PR #787 did.
+
+**C-4, both directions (the rule this pass exists to satisfy).**
+- *Direction 1 — no page recorded partial carries a row of any kind:* after this pass the record
+  records **zero** partial pages among the eight (all eight accepted), so no page recorded
+  partial carries a full-page-acceptance row or a targeted-review row, and no partial page is
+  silently un-pended. Verified with the instrument at this pass's head; the command and output
+  are in the PR body's validation table.
+- *Direction 2 — no page recorded partial deserves its row:* the only page this record ever
+  called partial was P8, and the page-resolves-it evidence above shows it is a full-page
+  acceptance; applying C-4 to it would have wrongly withdrawn the good acceptance K-089. No
+  other page of the eight was recorded partial at any point.
+
+**Diff scopes, counted by hand (not by regex).** `base..head` remains **insert-only**:
+**445 added / 0 deleted** over two file headers, and with no deleted line at all, no deleted line
+begins with two dashes. The **intra-branch correction commit** `f6a4e418` is **not** insert-only
+against its parent `09a7ee1c`: **145 added / 51 deleted** — disclosed because the two scopes
+differ and an insert-only claim that silently covered that commit would be false. This pass's own
+commit is a third scope; its counts are in the PR body's validation table.
+
+**Bound-field digest movement.** The PR body's three bound fields (witness, skills, security, in
+that order; each field's whitespace runs collapsed to single spaces and trimmed, joined with
+single newlines, SHA-256 over the UTF-8 string, first 16 hex) hashed to **`b1acc2b2f5817fab`** at
+head `f6a4e418`, with normalized payload lengths 1262 / 11819 / 40. Calibration was recomputed
+**first**, each from its own live posted body: #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`,
+#792 `88300e711714200a`, #795 `5fabf87b2df899e9` — all four exact. This pass edits the skills
+field (the round-3 rows and the corrected dispositions), so the digest **moves**; the new value
+is published in the PR body's own bound-field digest line, which sits outside all three fields.
+**What the movement voids:** any verdict that named the old value against this head's body.
+Measured: the SD-D (comment 6209064290) named no digest, and this record made no digest claim of
+that kind at `f6a4e418`, so no head-bound verdict is voided by the movement; the body's digest
+line is republished with the current value so a later reader has it.
+
+**What this round did not verify.**
+- PR #781's patch was not re-audited in full: its content is measured through `main`'s ledger
+  rows (K-082W..K-089W and K-098..K-104 present at `main`) and its PR metadata (merged,
+  `f490c16f`), not by reading the whole diff.
+- The coordinator's ruling is quoted from this repair's brief and from the tracked
+  `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`; the brief itself is a workspace message, not a
+  tracked artifact, so only the tracked decision file is cited as a ref.
+- The merge of this head with `main` was **not** performed and is not resolved here: `main` has
+  advanced past this branch's base (`50241ba5036e36ec9bcd1ce7a4b93ffa23a0392b` at this pass) and
+  `gh pr view 771` reports the pull request **CONFLICTING**; reconciling the appended keeper rows
+  with `main`'s is the merge holder's step. The branch is not rebased, because a rebase would move
+  the head and void every head-bound verdict.
+- The six `cannot_decide` (lost-commit) pages' lane routing remains a coordinator call outside
+  this record.
+- Stage D, Stage E and Stage F are owed at the new head; this pass is a Stage C repair only.
+- Claims of the earlier passes that this pass does not touch (for example the validator line
+  numbers and the 1024-character/sentinel checks, which the SD-D verified at `f6a4e418`) are
+  left as recorded, not re-derived here.
+
+**Attribution (the 2026-10-13 rule).** This section and every corrected line above are drafted by
+**DeepSeek-4.1-Flash (deepseek-flash)**, an AI agent operating under the owner account, under the
+agent identity `readability-lane-a-stagec-repairer-2`; the earlier sections keep the attribution
+their own lines state.
