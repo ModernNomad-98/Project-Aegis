@@ -5,6 +5,19 @@
 **record written** 2026-10-15T18:40:26-07:00 (the same session; wall time to the pull request is
 reported in the pull-request body).
 
+- **Repair after the first continuous-integration run (stated, not hidden).** The first pushed head
+  `e8c8a67c7f99feb4a02c6b334f4ca1a8aea83c5c` failed the required `validate-skills` job on its
+  **Markdown link checker over the repository's own pages** step (`markdown-link-corpus`), not on the
+  skill validator, which passed on that same run (`CHECK skills: exit 0`). Six relative link targets
+  written from this record's own directory did not resolve: the two ledger links in this record's
+  prose used `../roadmaps/` where the ledger sits two levels up, and four quotations reproduced a
+  source page's raw link markup (`../SKILL.md`), which resolves from the quoted page's directory and
+  not from this one. The repair re-points the two ledger links at `../../roadmaps/` and lets the
+  four quotations carry the source pages' rendered link text — the form every sibling lane record
+  uses; **no disposition, page line number, count or quoted word changes**, and the link target each
+  quotation carried is still recorded in that page's B5 sentence. Section 7 row 20 records the
+  re-run; the repair was made by the same agent, **DeepSeek-4.1-Flash (deepseek-flash)**.
+
 - **Lane:** PHASE 4 RE-READ LANE A. *Phase 4 re-read* is the fourth phase of the documentation
   readability backlog — a whole-page re-read of every page that has no recorded full-page
   acceptance; *lane A* is the alphabetically first quarter of that sorted pending list, run
@@ -32,7 +45,7 @@ reported in the pull-request body).
   repository rather than left in a working directory. It is the **evidence source** the separate
   keeper cites when it records this batch's pages: a *keeper row* is one row of the ledger's
   consolidated acceptance table, and the *ledger* is
-  [the documentation readability backlog](../roadmaps/aegis-documentation-readability-backlog.md),
+  [the documentation readability backlog](../../roadmaps/aegis-documentation-readability-backlog.md),
   the tracked page that carries the acceptance record for every reader page.
 - **This batch authors NO keeper rows and appends NOTHING to the ledger.** The diff against the
   base adds exactly this record file. Under **AEGIS-APR-101** — the standing rule that the keeper
@@ -145,7 +158,7 @@ identifier; the separate keeper assigns the IDs when recording from this evidenc
 Every page was read **whole, line by line, as prose**, at the bound revision
 `f490c16f9ed23f3d489e42f7696323bffcce6fd3` in this session, each page in one read with no display
 elision. *Full-page re-read* means the reader judged **all six** acceptance bullets of the ledger's
-[Acceptance for each page](../roadmaps/aegis-documentation-readability-backlog.md#acceptance-for-each-page)
+[Acceptance for each page](../../roadmaps/aegis-documentation-readability-backlog.md#acceptance-for-each-page)
 against the whole page — not a sample and not a targeted diff. The bullets are referenced below as
 **B1** open with what the page is for and who should read it; **B2** define an abbreviation or coded
 identifier at first use; **B3** descriptive headings, short paragraphs, lists or tables, at least one
@@ -212,8 +225,8 @@ the `agent-failure-recovery` skill — for each damaged-state case (failed tests
 conflicted tree, interrupted rebase/merge/cherry-pick, partial or wrong commit, broken or mis-based
 branch, blocked permission) it gives the diagnose / preserve / recover / verify steps and ends with
 a safe-versus-destructive command table.
-Bullets: **B1** satisfied — L1 title plus L3 "Use this with the [Agent Failure Recovery
-skill](../SKILL.md)" and L5 "Supporting detail for `agent-failure-recovery`" state the page's job
+Bullets: **B1** satisfied — L1 title plus L3 "Use this with the Agent Failure Recovery
+skill" and L5 "Supporting detail for `agent-failure-recovery`" state the page's job
 and its reader (the agent running that skill). **B2 partial** — `WIP` at **L17** ("leave it on a
 labeled stash or WIP branch") is an abbreviation that is never expanded on the page, and it is the
 only use of `WIP` anywhere in the library's 383 `.claude/skills` Markdown pages (measured this
@@ -268,7 +281,7 @@ whole, **L1–88**. Purpose and normal use: the reference sheet the skill reads 
 record schema, the deterministic-versus-model-mediated step-tracing checks, the deviation-signal
 catalog, the drift-response ladder, the mutation-channel rules, and the per-channel hijack red-team
 payload catalog.
-Bullets: **B1** satisfied — L3 "Use this with the [Agent Goal Hijack Defender](../SKILL.md)" and L5
+Bullets: **B1** satisfied — L3 "Use this with the Agent Goal Hijack Defender" and L5
 "Detail file for `agent-goal-hijack-defender`. Read on demand." **B2** satisfied — OWASP and ASI01
 are explained in L3, and the page's field names (`objective`, `scope`, `constraints`,
 `principal`, `provenance`) are defined by the schema table at L12–18; `SAFE` (L77) is a template
@@ -321,7 +334,7 @@ so it is recorded as an observation only.
 whole, **L1–55**. Purpose and normal use: the parent skill's control catalog — C1–C7 with each
 control's primary evidence source and pass criteria, the retrieval commands that produce the primary
 record, the verdict discipline, and the known evidence traps.
-Bullets: **B1** satisfied — L3 "Use this with the [Agent Governance Audit](../SKILL.md)" plus L5–7
+Bullets: **B1** satisfied — L3 "Use this with the Agent Governance Audit" plus L5–7
 state what the page is and how it is used. **B2** satisfied — the opening line defines PR, RLS, CI
 and SHA at first use; C1–C7 are defined by the table itself; UNVERIFIABLE and CONDITIONAL are
 defined at L42–45; `policy gap` / `discipline gap` at L39–41; the strategy-specific auto-merge
@@ -330,7 +343,7 @@ and a concrete worked example (L32–34: "a squash-merge repo emits `auto_squash
 only for `auto_merge_enabled` MISSES an armed state"), with each control's pass criteria and
 refusals (missing evidence → UNVERIFIABLE, never PASS). **B4** satisfied with note — a reference
 sheet for an explicitly read-only audit; it makes no shipped-versus-proposed claim. **B5**
-satisfied — the one link resolves; every command is real (`gh pr view`, `gh api`,
+satisfied — the one link (`../SKILL.md`, present) resolves; every command is real (`gh pr view`, `gh api`,
 `gh run list`, `gh run view`, `git log`, `git diff`) and the JSON fields are the real fields;
 `agent-memory-governance` and `ai-sdlc-operating-model` exist (checked by command); zero
 links are stale. **B6** this record (author: Peter Nguyen).
@@ -393,8 +406,8 @@ read whole, **L1–82**. Purpose and normal use: the parent skill's reference sh
 models ranked weakest to strongest, short-lived task-scoped issuance, the delegation/attenuation
 trace method, the confused-deputy catalog, the dual-attribution audit schema, and the
 escalation-path severity rubric.
-Bullets: **B1** satisfied — L3 "Use this with the [Agent Identity and Privilege
-Reviewer](../SKILL.md)" and L5–6 state the sheet's job and its reader. **B2 partial** — ASI03, the
+Bullets: **B1** satisfied — L3 "Use this with the Agent Identity and Privilege
+Reviewer" and L5–6 state the sheet's job and its reader. **B2 partial** — ASI03, the
 A0–A3 hop labels, VM, OIDC, STS, A2A and OWASP are all defined at first use (L3, L6–10), and the
 subset notation at L45 is stated in words at L3 ("each delegated scope must fit within its
 predecessor"), but **L3's "the current authorization matrix" is an ambiguous referent**: the library
@@ -405,7 +418,7 @@ makes the matrix the source of "exact permissions" for the whole trace method, a
 neither of them and links neither. **B3** satisfied — tables, a fill-and-verify template, worked
 examples ("Summarize <other tenant's doc>", L55) and the severity rubric's concrete conditions.
 **B4** satisfied with note — a reference sheet; it makes no shipped-versus-proposed claim about a
-system. **B5** satisfied — the one link resolves; zero commands; every named skill
+system. **B5** satisfied — the one link (`../SKILL.md`, present) resolves; zero commands; every named skill
 (`secrets-identity-hardener`, `inter-agent-comms-reviewer`, `agent-tool-safety-guard`,
 `audit-log-architect`, `agent-goal-hijack-defender`, `human-approval-boundary`) exists (checked
 by command). **B6** this record (author: Peter Nguyen).
@@ -466,6 +479,7 @@ P8 partial: .claude/skills/agent-identity-privilege-reviewer/references/agent-id
 | 17 | library-wide convention measurements (sections 4) | `WIP` 1 page / 0 glosses; `authz` 41 / 3; `JSON` 30 / 16; `URL` 46 / 2; `Phase 1.5` 4 pages, 1 of which defines it |
 | 18 | `python -P scripts/ci/check_pr_body_skills.py --body-file <the posted body>` | exit 0 (recorded in the pull-request body's validation table) |
 | 19 | `python -B scripts/check_dco.py --range origin/main..HEAD` | recorded in the pull-request body after the commit (the record cannot cite its own not-yet-made commit as a result) |
+| 20 | `python -P scripts/ci/check-markdown-links.py` over the repository's own 666-page corpus set (the `markdown-link-corpus` step's derived path list, batched on Windows, where one 38 KB command line exceeds the 32,767-byte limit) | pre-repair head `e8c8a67c…`: `files: 666   links checked: 3775   anchors checked: 1111   broken: 6   dead: 0`, exit 1, all six inside this record; after the repair: `files: 666   links checked: 3777   anchors checked: 1112   broken: 0   dead: 0   external-skipped: 2073   other-skipped: 0`, exit 0 |
 
 ## 8. What this batch could not verify (stated, not hidden)
 
@@ -481,6 +495,17 @@ P8 partial: .claude/skills/agent-identity-privilege-reviewer/references/agent-id
   because the bodies were edited after the lines were written. This batch's own digest is computed
   from the exact bytes it posts and re-derived from the post readback; it is not offered as a
   reproduction of either stale value.
+- **The digest reading is ambiguous by one character, and this record's value follows the
+  line-preserving reading.** Re-derived by command from the posted body readback: the published
+  `7c5d5bc30a8e4301` reproduces when each field's lines are stripped and joined with newlines before
+  the hash (payload lengths witness 1,259 / skills 6,186 / security 40), and does **not** reproduce
+  under the stricter reading in which every whitespace run, line breaks included, collapses to one
+  space (witness 1,259 / skills 6,185 / security 40, digest `086faa099024ee57`). Two sibling
+  pull-request bodies reproduce under that stricter reading: PR #782's published `121a60bce86cff98`
+  and PR #783's published `3913683c686e6e71` both recompute exactly from their live bodies. The
+  earlier note above, that PR #782's skills payload "6,856 against the published 6,855" showed a body
+  edited after its digest line was written, is therefore superseded: 6,855 is the stricter reading of
+  the same live bytes.
 - **Continuous integration at this exact head is owed, never claimed.** The batch record's own
   commit is new, so no CI run result for it can be reported here; the offline checks in section 7
   are the ones that were actually run.
