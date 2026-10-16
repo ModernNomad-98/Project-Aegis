@@ -14,9 +14,11 @@
 - **What this page is.** The lane's tracked batch record for its fourth batch. It is the
   **evidence source** a **separate eligible keeper** reads under AEGIS-APR-117 (the owner's
   approval-register item letting a different agent re-record rows from the same evidence when the
-  original recorder's independence failed; no page needs re-reading for that). **This batch authors
-  no keeper rows and edits no ledger section** — see section 12.
-- **Acceptance revision bound by the whole batch and named by every row-quote string:**
+  original recorder's independence failed; no page needs re-reading for that). **That keeper records no
+  row for any of these eight pages**: all eight are partial, and the ledger's PARTIAL rule
+  (L5133-5137, L5149-5150) gives a partial page no acceptance row — so the eight **stay pending**
+  (section 10). **This batch authors no keeper rows and edits no ledger section** — see section 12.
+- **Acceptance revision bound by the whole batch and named by every section 10 disposition line:**
   `f490c16f9ed23f3d489e42f7696323bffcce6fd3`. It resolves to itself and is contained in
   `refs/remotes/origin/main` (`git merge-base --is-ancestor f490c16f… refs/remotes/origin/main` exits 0,
   observed in this batch's fresh clone).
@@ -31,7 +33,9 @@
 - **AEGIS-APR-101** — the keeper-independence rule: the agent that records an acceptance row must
   differ from the page's author **and** from the accepting reviewer.
 - **AEGIS-APR-117** — the route that lets a different eligible agent re-record rows from the same
-  evidence after a withdrawal; **no page needs re-reading** for it.
+  evidence after a withdrawal; **no page needs re-reading** for it, and for the eight pages here it
+  records **no** row, because all eight are partial and the ledger has no partial-acceptance kind
+  (section 10).
 - **AEGIS-APR-115** — the standing index-rebuild PR scope (it rebuilds `tools/` JSON; this batch
   does not run it).
 - **AEGIS-APR-118** — the owner's classification of the readability acceptance tool as
@@ -103,7 +107,16 @@ figures above as the instrument's, not as its own measurement.
    boundary**: indices **444-451**, **452-459** and **460-467** are exactly batch 1's, batch 2's and
    batch 3's eight pages (three comparisons, each true). **Batch 4 is therefore indices 468-475 of
    that 590-path set — the next eight after the first 24, with nothing skipped and nothing re-read.**
-5. **The same eight paths at this base.** The 590-set is not a subset of the 593-set, but every one
+5. **The same eight paths at this base.** The 590-set **is** a subset of the 593-set — re-deriving both
+   pending sets with `check_index.py` at each ref against that ref's own committed index gives
+   **586 + 4 = 590** at `e2a3e20b` and **588 + 5 = 593** at this base, with exactly **three paths
+   entering and none leaving** (`docs/delivery-workflow.md`,
+   `docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md`,
+   `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` — the three paths PR #781 added), and the index JSON
+   is byte-identical at both refs (**88,316 bytes**, `sha256 b97e5fc9fbeb6b71` over the tracked blob
+   bytes; the same bytes copied through a PowerShell `Out-File` pipeline re-encode LF as CRLF and hash
+   as `0b76b1a87db59019` at 90,230 bytes, so that figure names a different normalization of the same
+   file, not a different file). Every one
    of the 24+8 pages batch 1 onward read survives in it: the eight of this batch sit at **indices
    470-477 of the 593**, i.e. **lane D positions 24-31** of 146 (1-based). The alternative literal
    reading — "the first 24 positions of the lane's quarter at this base, then the next 8" — would
@@ -125,9 +138,13 @@ from the accepting reviewer. The **first** condition is satisfied — this batch
 eight pages (each is a dated 2026-09-23 record whose last-touching commit is another author's; the
 last-touching commits are named in section 5). The **second** is **not** claimed: this batch's
 single agent is both the accepting reader and the writer of this record. **The rows are not this
-batch's work**: this record authors no keeper row and edits no ledger section, and the rows for
-these pages are a separate eligible keeper's work under AEGIS-APR-117 from this evidence — which is
-why section 10 carries verbatim row-quote strings naming each disposition. The authority question
+batch's work**: this record authors no keeper row and edits no ledger section. The rows for these pages
+are a separate eligible keeper's work under AEGIS-APR-117 — **and under the ledger's PARTIAL rule that
+keeper records no row for any of the eight, because all eight are partial: the ledger's fixed-format
+contract has "no partial-acceptance kind" (ledger L5133-5137) and "a page a lane marked PARTIAL is never
+recorded as a full-page-acceptance" (L5149-5150), so the eight get no acceptance row and stay pending.**
+Section 10 carries the eight disposition lines verbatim as **evidence of the gaps, not as rows** — see
+the explicit statement there. The authority question
 stays with the merge holder; this batch records under AEGIS-APR-101 (recording only) and delivers
 under AEGIS-APR-039.
 
@@ -143,12 +160,12 @@ column here**, and no page carries a gap with a full disposition.
 | LD-26 | `docs/evidence/documentation/setup-routing-plan-readability-2026-09-23.md` | L1-67 (whole) | 67 | **partial** | G-26.1 … G-26.6 |
 | LD-27 | `docs/evidence/documentation/skill-category-01-07-readability-2026-09-23.md` | L1-61 (whole) | 61 | **partial** | G-27.1 … G-27.3 |
 | LD-28 | `docs/evidence/documentation/skill-category-map-readability-2026-09-23.md` | L1-52 (whole) | 52 | **partial** | G-28.1 … G-28.2 |
-| LD-29 | `docs/evidence/documentation/skill-docs-eighth-20-readability-2026-09-23.md` | L1-64 (whole) | 64 | **partial** | G-29.1 … G-29.5 |
-| LD-30 | `docs/evidence/documentation/skill-docs-fifth-20-readability-2026-09-23.md` | L1-71 (whole) | 71 | **partial** | G-30.1 … G-30.4 |
-| LD-31 | `docs/evidence/documentation/skill-docs-final-screen-readability-2026-09-23.md` | L1-64 (whole) | 64 | **partial** | G-31.1 … G-31.3 |
+| LD-29 | `docs/evidence/documentation/skill-docs-eighth-20-readability-2026-09-23.md` | L1-64 (whole) | 64 | **partial** | G-29.1, G-29.4, G-29.5 |
+| LD-30 | `docs/evidence/documentation/skill-docs-fifth-20-readability-2026-09-23.md` | L1-71 (whole) | 71 | **partial** | G-30.1, G-30.3, G-30.4 |
+| LD-31 | `docs/evidence/documentation/skill-docs-final-screen-readability-2026-09-23.md` | L1-64 (whole) | 64 | **partial** | G-31.1, G-31.3 |
 | LD-32 | `docs/evidence/documentation/skill-docs-first-20-readability-2026-09-23.md` | L1-63 (whole) | 63 | **partial** | G-32.1 … G-32.3 |
 
-**Counts: 0 full / 8 partial. 30 named gaps, each with its page line numbers.** No page needed a fix,
+**Counts: 0 full / 8 partial. 26 named gaps, each with its page line numbers.** No page needed a fix,
 so no page was edited: the no-rewrite discipline forbids edits to dated records, and every gap is
 recorded here rather than repaired in place.
 
@@ -161,6 +178,31 @@ corrected three citations to the pages' verbatim wording (O-3's `185 skills vali
 sentence under "Explicitly not counted as gaps", and two `PR` tokens the committed text had mangled)
 and re-issued the section 10 row-quote strings at the corrected ranges. No page, disposition, blob,
 byte count, derivation figure or gate figure moved.
+
+**Second correction, after the second Stage D audit (2026-10-16) — the gap count was 30 and is now 26.**
+The re-audit measured every benchmark term over the **655 reader pages** at the base and applied the
+owner's norm ruling: **an unglossed term that is a library-wide convention is not a per-page readability
+defect — it is recorded as an observation about the library, with its count, not as a gap on the page.**
+`manual-only` occurs on **206** of 655 pages and `frontmatter` on **53**, so the gaps that rest on them
+are retired: **G-29.2** (`manual-only`), **G-31.2** (`MANUAL-ONLY`, the same convention — and its own
+cite was wrong under the rule it applied: LD-31's first use is `manual-only` at **L36**, not
+`MANUAL-ONLY` at L47) and **G-29.3** (`frontmatter`); the `frontmatter` clause of **G-31.3** and of
+**G-32.2** is retired the same way, and both gaps remain on their `isolated worktree` clause.
+**G-30.2** (`ASI07`) is retired as a false gap: LD-30 L47-48 gives the coded identifier its
+plain-language name ("Insecure Inter-Agent Communication") at first use, which is what bullet (b) asks
+for. **Both standards are stated, and the count under each: it was 30; on the record's own former
+standard LD-30 would owe a frontmatter gap and the count would be 31; on the norm standard the three
+pure-convention gaps fall away and the count is 27; with G-30.2 retired the count is 26.** The
+**LD-30 / LD-29 asymmetry is resolved by applying one rule to both pages**: LD-29 L57-58 ("The four
+frontmatter blocks …") and LD-30 L62-63 ("The four YAML (YAML Ain't Markup Language) frontmatter blocks
+…") are the same sentence apart from the YAML expansion, both are the library convention, and **neither**
+page owes a `frontmatter` gap — the former "does the page name the format?" test is withdrawn entirely
+rather than applied unevenly. The four retired items are recorded as observations with their counts in
+section 8 (O-6, O-7), and the chain is restated in section 9. `isolated worktree` (**26** of 655) stays
+a per-page gap: it is the term this batch's own `(b-plain)` class measures, it is used unglossed on
+**6 of these 8 pages**, and a page can remedy it in one clause — which a repository-wide convention
+cannot, since a false `partial` keeps a page pending with no actionable remedy. The dispositions are
+**unchanged (0 full / 8 partial)**, and no retained gap moved page or line.
 
 ## 5. Depth record and the mechanical pass
 
@@ -229,14 +271,24 @@ record names at least one item in these classes, and **full** when it names none
 - **(d-unperformed)** the page states that a verification it presents was **not** performed;
 - **(e-fail)** a link, anchor, referenced file, command or cited revision does not resolve — **none
   of the eight is in this class** (section 5);
-- **(f-none)** no non-author read-only review is recorded — **none of the eight is in this class**.
+- **(f-none)** no non-author read-only review is recorded — **none of the eight is in this class**;
+- **the convention test (the owner's ruling of 2026-10-16), applied before any `(b-def)` or `(b-plain)`
+  gap is recorded:** a term that is a **library-wide convention** is **not** a per-page readability
+  defect. The term is measured first over the reader pages at the base (`manual-only` **206**/655,
+  `frontmatter` **53**/655, `isolated worktree` **26**/655 — section 8, O-6) and, where the count shows
+  a convention, it is recorded as an **observation about the library**, with its count, instead of as a
+  gap on the page. **The cost is asymmetric:** a false `partial` keeps a page pending forever with no
+  actionable remedy, and pending pages are exactly what the programme's exit condition counts.
 
 **Explicitly not counted as gaps** (recorded so the classification is visible, not hidden): an
 authority or scope boundary (the four skill-document pages' L7 sentence "This note does not grant
 implementation or merge authority") — that is bullet (d) working correctly; the disclosure
 "active-only time was not instrumented", which the repository's timing rule **requires** and no
 acceptance bullet contradicts; and repository-wide work the page correctly says it does not close.
-Each of these is listed per page where it appears.
+**Only the first of these three is listed per page where it appears** — section 6(d) cites the
+authority sentence on all four skill-document pages. The timing disclosure and the repository-wide-sweep
+class appear **only in this exclusion bullet and are not enumerated per page**; this sentence is
+corrected so that a reader does not take it as a per-page listing for them.
 
 **(a) Purpose and audience up front — 8 of 8 name the purpose, 0 of 8 name the reader.** Every page
 opens by saying what it covers (LD-25 L1-18, LD-26 L1-21, LD-27 L1-14, LD-28 L1-13, LD-29…LD-32
@@ -252,16 +304,22 @@ use) but jargon unmet (G-25.2). LD-26: **`Laya` and `Decider` (L31), `OpenJev` (
 and `PR` (L14) are correctly defined, but `isolated worktree` (L14) is used without plain words
 (G-26.6). LD-27: clean (`PR` L7, `P0/P1/P2` L28-30, `IDs` L34,
 `UTC` L48). LD-28: clean (`AI` L6, `P0/P1` L16-17, `UTC` L37, `ID` L40). LD-29:
-`manual-only` (L18) is a repository convention used as a label with no explanation (G-29.2),
-`frontmatter` (L57-58) is used without naming the format (G-29.3), and `isolated worktree` (L21) is
-used without plain words (G-29.5); `UTC` is defined at L53. LD-30:
-`ASI07` (L48) is a coded identifier in an external taxonomy with no on-page explanation
-(G-30.2); `OWASP` L47-48, `W3C` L51, `HTML` L52, `YAML` L62, `IDs` L38 and `UTC` L57 are
-correctly defined. LD-31: `MANUAL-ONLY` (L47) is a repository label used unexplained (G-31.2);
-`TDD` L9/L33, `TALI` L34, `SAST`/`SARIF`/`CVE`/`TP`/`FP` L41-43 and `DCO` L63 are defined.
+`isolated worktree` (L21) is used without plain words (G-29.5); `UTC` is defined at L53; and
+`manual-only` (L18) and `frontmatter` (L57-58) are **library conventions**, measured at 206/655 and
+53/655 pages and recorded as observations with their counts (section 8, O-6) rather than as gaps. LD-30:
+`ASI07` (L48) **carries its plain-language name at first use** — "Agentic Top 10's `ASI07 Insecure
+Inter-Agent Communication category`" (L47-48) — so the former G-30.2 is withdrawn as a false gap and
+the coded identifier is correctly defined under bullet (b) (section 8, O-7); the `frontmatter` at L62-63
+is the library convention, recorded as an observation, and is **not** a gap, which is the same treatment
+LD-29's identical sentence gets; `OWASP` L47-48, `W3C` L51, `HTML` L52, `YAML` L62, `IDs` L38 and
+`UTC` L57 are correctly defined. LD-31: `MANUAL-ONLY` (L47) is the same library convention as `manual-only`, whose first use on this
+page is at **L36** — recorded as an observation, not a gap (section 8, O-6); `frontmatter` (L48-49) is
+the same convention, also an observation; `TDD` L9/L33, `TALI` L34,
+`SAST`/`SARIF`/`CVE`/`TP`/`FP` L41-43 and `DCO` L63 are defined.
 LD-32: the reading key (L9-16) covers WCAG, E2E, both `CI` senses, a11y, EN 301 549, ADA, ARIA,
-SR, AT, VPAT and YAML; `PR` L28, `MDE` L35 and `SRM` L36 are defined; `frontmatter` (L14-15)
-is used without saying what frontmatter is (G-32.2).
+SR, AT, VPAT and YAML; `PR` L28, `MDE` L35 and `SRM` L36 are defined; `frontmatter` (L14-15, and again
+L44 and L56) is the library convention — the reading key at L14-15 in fact defines YAML as "the text
+format used for skill frontmatter" — recorded as an observation, not a gap (section 8, O-6).
 
 **(c) Descriptive headings, lists or tables, and concrete examples — satisfied on all eight.** Every
 page uses headed sections and either a table or a list; each carries concrete worked content (LD-25
@@ -293,9 +351,10 @@ links were not fetched.
 LD-27 L48-56 (three rounds); LD-28 L37-43 (two rounds); LD-29 L61-62; LD-30 L67-69; LD-31 L62-63;
 LD-32 L60-61. **On the pages whose review was narrower than the batch's own verification, the page
 says so and this record counts it** (G-25.4 reviewer did not rerun the 113-test suite; G-26.5
-reviewer did not re-fetch the live issue #101). **On the four skill-document batches the pages
-record that no live model evaluation was run** (LD-29 L60-61, LD-30 L65-66, LD-32 L59-60), which
-this record also counts (G-29.4, G-30.4, G-32.3). **Closed, not counted:** LD-27 L48-51 (a first-use
+reviewer did not re-fetch the live issue #101). **On three of the four skill-document pages the page
+records that no live model evaluation was run** (LD-29 L60-61, LD-30 L65-66, LD-32 L59-60), which
+this record also counts (G-29.4, G-30.4, G-32.3); **LD-31 records no such sentence anywhere** and so
+carries no `(d-unperformed)` gap — the count of five pages is unchanged, the word "four" was wrong. **Closed, not counted:** LD-27 L48-51 (a first-use
 gap the reviewer found and the batch corrected), LD-28 L40-41 (missing ID/AI/P0/P1/UTC explanations,
 corrected) and LD-30 L68-69 (the note's own abbreviations expanded and its checks rerun) are
 histories of corrections made **before** the bound revision; this batch verified the corrected text
@@ -310,7 +369,7 @@ directly (section 6(b)) rather than trusting the sentence.
 - **G-26.1** (a) LD-26 L3-8, L10-21: purpose stated, intended reader never named.
 - **G-26.2** (b-def) LD-26 L31-32: `Laya`, `Decider` and `OpenJev` are bare names with no on-page definition.
 - **G-26.3** (b-def) LD-26 L36: the `unselected` status value is used without plain-words explanation.
-- **G-26.4** (b-plain) LD-26 L45: "no-silent-online fallback boundary" unglossed.
+- **G-26.4** (b-plain) LD-26 L45-46: "no-silent-online fallback boundary" (the phrase runs across the two lines) unglossed.
 - **G-26.5** (d-unperformed) LD-26 L62-63: the reviewer "did not re-fetch the live issue" in its sandbox.
 - **G-26.6** (b-plain) LD-26 L14: "isolated worktree" used without plain words.
 - **G-27.1** (a) LD-27 L1-14: purpose stated, intended reader never named.
@@ -319,20 +378,22 @@ directly (section 6(b)) rather than trusting the sentence.
 - **G-28.1** (a) LD-28 L1-13: purpose stated, intended reader never named.
 - **G-28.2** (c-contract) LD-28 L31-32: the 40-row comparison names only "the worktree base commit", no revision, so the check is not reproducible from the page.
 - **G-29.1** (a) LD-29 L3-7: purpose stated, intended reader never named.
-- **G-29.2** (b-def) LD-29 L18: `manual-only` used as a repository label with no on-page explanation.
-- **G-29.3** (b-plain) LD-29 L57-58: "frontmatter blocks" used without naming the format.
 - **G-29.4** (d-unperformed) LD-29 L60-61: "no live model evaluation was run for these wording changes."
 - **G-29.5** (b-plain) LD-29 L21: "isolated worktree" used without plain words.
 - **G-30.1** (a) LD-30 L3-7: purpose stated, intended reader never named.
-- **G-30.2** (b-def) LD-30 L48: `ASI07` is a coded identifier with no on-page explanation.
 - **G-30.3** (b-plain) LD-30 L20: "isolated worktree" used without plain words.
 - **G-30.4** (d-unperformed) LD-30 L65-66: "no live model evaluation was run for these wording changes."
 - **G-31.1** (a) LD-31 L3-7: purpose stated, intended reader never named.
-- **G-31.2** (b-def) LD-31 L47: `MANUAL-ONLY` used as a repository label with no on-page explanation.
-- **G-31.3** (b-plain) LD-31 L21-22 "isolated worktree" and L48-49 "frontmatter blocks" used without plain words.
+- **G-31.3** (b-plain) LD-31 L21: "isolated worktree" used without plain words (the term is wholly on L21; the L48-49 `frontmatter` clause is retired to an observation, section 8 O-6).
 - **G-32.1** (a) LD-32 L3-7: purpose stated, intended reader never named.
-- **G-32.2** (b-plain) LD-32 L14-15 "frontmatter" (the format is named, the concept is not) and L27 "isolated worktree".
+- **G-32.2** (b-plain) LD-32 L27: "isolated worktree" used without plain words (the L14-15 `frontmatter` clause is retired to an observation, section 8 O-6).
 - **G-32.3** (d-unperformed) LD-32 L59-60: "no live model evaluation was run for this wording-only correction."
+
+**Numbering, stated so the list can be counted:** the labels **G-29.2**, **G-29.3**, **G-30.2** and
+**G-31.2** are **retired, not renumbered** — the retained gaps keep the labels and page lines the first
+audit verified (in particular the two it added, **G-26.6** and **G-29.5**). Each retirement is
+explained in section 4's second correction and in section 8 (O-6, O-7). **26 gaps remain**, one line
+each: LD-25 four, LD-26 six, LD-27 three, LD-28 two, LD-29 three, LD-30 three, LD-31 two, LD-32 three.
 
 ## 7. Purpose and normal use restated from each page alone
 
@@ -368,9 +429,23 @@ carries a full disposition alongside it.
 | --- | --- | --- | --- |
 | O-1 | The derivation base moved: `origin/main` gained three pending paths between `e2a3e20b` and `f490c16f` (PR #781's new record, `docs/delivery-workflow.md` and `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`), so lane D's quarter start moved 444 to 447 and two pages batches 1-2 read (`full-page-readability-batch-after-233`, `…-234`) now fall inside **lane C's** quarter at this base. | **unchanged — reported, not decided.** This batch touches neither page; the overlap is a cross-lane boundary question for the coordinator (a lane D batch-1/2 page and a lane C quarter can now name the same path). | `check_index.py --json` at both bases; the 590-set/593-set set-difference; `git ls-tree` counts. |
 | O-2 | Batch 4's window under the moved boundary: the same eight pages are lane D positions **24-31** at this base, not 25-32; position 24 (`scenario-a-runbook-readability-2026-09-23.md`) was unread by batches 1-3 and would be skipped by a literal re-indexing. | **unchanged — the eight were selected by the lane's own sequence (indices 468-475 of the 590-set, verified boundary-for-boundary against batches 1-3), so nothing is skipped and nothing is re-read.** | `check_index.py --json` at `e2a3e20b` with that revision's index (the 590-set) and at the base (the 593-set); the three boundary comparisons. |
-| O-3 | The 2026-09-23 pages' historical validation figures ("185 skills valid" on LD-25 L36 and LD-28 L33; "185 valid skills" on LD-26 L53, LD-27 L44, LD-29 L55-56, LD-30 L60-61, LD-31 L56 and LD-32 L54; link counts 23/25/4/11/9/6 on LD-26 to LD-32) describe those batches at their own checkpoints. | **unchanged — historical sentences about their own batches, not restated as today's.** | The pages' own dates and base commits; the mechanical pass's per-page link counts (section 5). |
+| O-3 | The 2026-09-23 pages' historical validation figures ("185 skills valid" on LD-25 L36 and LD-28 L33; "185 valid skills" on LD-26 L53, LD-27 L44, LD-29 L55-56, LD-30 L60-61, LD-31 L56 and LD-32 L54; link counts 23/25/4/11/9/6 on LD-26 to LD-32) describe those batches at their own checkpoints. **The six link-count values are stated on six of those seven pages, in page order, and LD-28 states no link count at all** — so read them 23 (LD-26 L54), 25 (LD-27 L45), 4 (LD-29 L56), 11 (LD-30 L61), 9 (LD-31 L57), 6 (LD-32 L55), and never shifted one page earlier. | **unchanged — historical sentences about their own batches, not restated as today's.** | The pages' own dates and base commits; the mechanical pass's per-page link counts (section 5). |
 | O-4 | LD-28 L8 cites commits `90f74c6` and `0c3d1c2` as the two category maps' introduction commits; both resolve at the base. | **unchanged — resolved, no repair.** | `git cat-file -t 90f74c6` / `0c3d1c2` at the base (both exit 0). |
 | O-5 | The six `cannot_decide` lost-commit pages (LD: `.claude/skills/cloud-security-baseline-reviewer/references/aws-baseline.md`, `…/azure-baseline.md`, `…/gcp-baseline.md`, `…/supabase-baseline.md`, `…/vercel-baseline.md` and `.claude/skills/database-backup-verifier/SKILL.md`) are in the instrument's `cannot_decide` bucket, not in the 593-path pending set, and therefore in **no lane**. | **unchanged — excluded, and stated.** This batch picked up none of them; they are also outside lane D's quarter at the base (checked: the intersection of the six with lane D's 146 paths is empty). | `check_index.py --json` `undecided` array at the base; the intersection check. |
+| O-6 | Four gaps in this record's own `(b-def)`/`(b-plain)` classes rested on terms that are **library-wide conventions**, not page defects: `manual-only` / `MANUAL-ONLY` and `frontmatter`. Measured case-insensitively over the **655 reader pages** at the base they occur on **206** and **53** pages. | **unchanged as a library fact — recorded here as observations with their counts, and the gaps that rested on them are retired** (section 4's second correction; the count 30 → 26). | The eleven-term count over the 655 reader pages at `f490c16f`, per page, case-insensitive, over the page's own `git cat-file blob` bytes — the table below. |
+| O-7 | LD-30 L47-48 gives the coded identifier `ASI07` its **plain-language name at first use** ("Agentic Top 10's `ASI07 Insecure Inter-Agent Communication category`"), so the former **G-30.2** recorded a page as defective for doing what bullet (b) asks. | **unchanged — G-30.2 is withdrawn as a false gap; the 30 → 26 correction includes it.** | The page's own L47-48 bytes at the base. |
+
+**The eleven benchmark terms measured** (pages containing the term, case-insensitively, over the 655
+reader pages at the base): `UTC` **222**, `manual-only` **206**, `verdict` **165**, `screen` **148**,
+`PR #` **141**, `AEGIS-APR-` **88**, `receipt` **74**, `DCO` **71**, `frontmatter` **53**,
+`authz` **52**, `isolated worktree` **26**. The convention test in section 6 is applied to the terms
+this record had itself flagged; the seven more frequent terms are not gaps on these pages either, which
+is the same standard applied to all eleven rather than to two. **Where the line is drawn is a judgement,
+stated as one:** a term the repository uses as the naming convention for its own artifacts
+(`manual-only` 206/655, `frontmatter` 53/655) is a library convention, while `isolated worktree`
+(26/655, and 6 of these 8 pages) is a domain term a page can gloss in one clause — and both audits and
+the standing brief treat it as a real per-page gap. The row above is the measurement; the
+classification is this record's, and a later reader can re-draw it from the same numbers.
 
 ## 9. Count honesty
 
@@ -382,6 +457,20 @@ carries a full disposition alongside it.
   `isolated worktree` gaps (**G-26.6**, **G-29.5**), so the count in this record is **30**. Both
   figures are stated rather than the old one being quietly overwritten, and the two gaps carry
   their page lines in section 6.
+- **The gap count was corrected again after the second audit: 30 → 26.** The second Stage D audit of
+  2026-10-16 measured all eleven benchmark terms over the 655 reader pages and applied the owner's norm
+  ruling. Four gaps are retired and the whole chain is stated rather than the old figure being quietly
+  overwritten: **30** was the audited figure; on the record's own former standard LD-30 would owe a
+  frontmatter gap and the figure would be **31**; on the norm standard the three pure-convention gaps
+  fall away and the figure is **27**; with the false `ASI07` gap withdrawn the figure is **26**.
+  **Retired:** **G-29.2** and **G-31.2** (`manual-only` / `MANUAL-ONLY`, 206 of 655 pages),
+  **G-29.3** and the `frontmatter` clauses of G-31.3 and G-32.2 (53 of 655), and **G-30.2**
+  (`ASI07`, given its plain-language name at LD-30 L47-48). **Kept:** every other gap, including the
+  two the first audit added (**G-26.6**, **G-29.5**) and all six `isolated worktree` gaps (26 of
+  655). The retired items are recorded as observations with their counts (section 8, O-6 and O-7), and
+  the labels are retired rather than renumbered. **0 full / 8 partial is unchanged**, and every page
+  still carries named gaps — the fewest is **two** (LD-28, LD-31 and LD-32), the most is **six**
+  (LD-26), 26 in all.
 - **This batch publishes no readability count of its own** (ledger L19-31, D84) and cites the
   instrument for every figure.
 - **The instrument classifies the page tree at `--ref`** and reads recorded acceptances from the
@@ -393,22 +482,36 @@ carries a full disposition alongside it.
   `tools/`, which is not Markdown and would break this change's `docs-only` tier; the rebuild is the
   standing AEGIS-APR-115 pull request's own scope (D73 row 8).
 
-## 10. The row-quote strings, verbatim (offered for the separate keeper)
+## 10. The eight disposition lines, verbatim (evidence, NOT rows)
 
-Each line below appears in this file byte-for-byte and is **offered** for the separate eligible
-keeper's rows under AEGIS-APR-117 — **this batch authors no rows and claims no row IDs.** Every line
-contains the full 40-character acceptance revision, and **every line names its partial disposition**
-so that a keeper row cannot silently read as full.
+**No keeper may author an acceptance row for any of these eight pages, and not one of them leaves the
+official pending count.** The ledger that governs the AEGIS-APR-117 keeper is the same file this record
+cites, and it says the opposite of a row offer: the ledger's fixed-format contract "names four event
+kinds — `full-page-acceptance`, `targeted-review`, `withdrawal` and `lost-commit` — and has **no
+partial-acceptance kind**" (ledger L5133-5137), and the rule the ledger made explicit after the last
+keeper draft is "**a page a lane marked PARTIAL is never recorded as a full-page-acceptance**"
+(ledger L5149-5150). **All eight pages in this batch are marked partial** (section 4), so under that
+rule they get **no acceptance row** and **stay pending**. A keeper that read the lines below as a row
+offer would record eight full-page acceptances and **drop eight pages out of the official pending
+count**; the builder takes `event_kind` from the row, so nothing downstream would catch it. **This
+batch authors no rows, claims no row IDs, and offers none.**
+
+The lines below are **evidence, not rows**: each names its page, the full 40-character revision the page
+was read at, its partial disposition and its gaps, so that a later reader can see what the reading
+covered and what it did not. They are kept because they are the evidentiary record of the gaps — **they
+are not a row template and nothing here may be pasted into the ledger's keeper block.** Every line
+appears in this file byte-for-byte, and **every line states its partial disposition**, so that no reader
+can mistake one for a full-page-acceptance.
 
 ```text
-LD-25 accepted (partial; gaps G-25.1..G-25.4, section 6): docs/evidence/documentation/scenario-a-runbook-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-26 accepted (partial; gaps G-26.1..G-26.6, section 6): docs/evidence/documentation/setup-routing-plan-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-27 accepted (partial; gaps G-27.1..G-27.3, section 6): docs/evidence/documentation/skill-category-01-07-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-28 accepted (partial; gaps G-28.1..G-28.2, section 6): docs/evidence/documentation/skill-category-map-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-29 accepted (partial; gaps G-29.1..G-29.5, section 6): docs/evidence/documentation/skill-docs-eighth-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-30 accepted (partial; gaps G-30.1..G-30.4, section 6): docs/evidence/documentation/skill-docs-fifth-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-31 accepted (partial; gaps G-31.1..G-31.3, section 6): docs/evidence/documentation/skill-docs-final-screen-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-32 accepted (partial; gaps G-32.1..G-32.3, section 6): docs/evidence/documentation/skill-docs-first-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
+PAGE LD-25 partial, no acceptance row, stays pending; gaps G-25.1..G-25.4 (section 6); read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3: docs/evidence/documentation/scenario-a-runbook-readability-2026-09-23.md
+PAGE LD-26 partial, no acceptance row, stays pending; gaps G-26.1..G-26.6 (section 6); read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3: docs/evidence/documentation/setup-routing-plan-readability-2026-09-23.md
+PAGE LD-27 partial, no acceptance row, stays pending; gaps G-27.1..G-27.3 (section 6); read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3: docs/evidence/documentation/skill-category-01-07-readability-2026-09-23.md
+PAGE LD-28 partial, no acceptance row, stays pending; gaps G-28.1..G-28.2 (section 6); read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3: docs/evidence/documentation/skill-category-map-readability-2026-09-23.md
+PAGE LD-29 partial, no acceptance row, stays pending; gaps G-29.1, G-29.4, G-29.5 (section 6); read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3: docs/evidence/documentation/skill-docs-eighth-20-readability-2026-09-23.md
+PAGE LD-30 partial, no acceptance row, stays pending; gaps G-30.1, G-30.3, G-30.4 (section 6); read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3: docs/evidence/documentation/skill-docs-fifth-20-readability-2026-09-23.md
+PAGE LD-31 partial, no acceptance row, stays pending; gaps G-31.1, G-31.3 (section 6); read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3: docs/evidence/documentation/skill-docs-final-screen-readability-2026-09-23.md
+PAGE LD-32 partial, no acceptance row, stays pending; gaps G-32.1..G-32.3 (section 6); read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3: docs/evidence/documentation/skill-docs-first-20-readability-2026-09-23.md
 ```
 
 ## 11. Verification commands (run at the head; outputs in the pull-request body)
@@ -417,16 +520,21 @@ LD-32 accepted (partial; gaps G-32.1..G-32.3, section 6): docs/evidence/document
 `build_index.py --ref <head> --report` (no row change versus the base), the changed-path Markdown
 link check, `scripts/validate-skills.py`, `scripts/tests/test_validator.py`,
 `git diff --check`, the numstat check (the Stage C commit is insert-only against the derivation
-base, 455 added / 0 deleted; the Stage D repair commit adds 45 and deletes 19 of those lines, counted
-over every `-` line excluding the `---` headers, so the repair is not insert-only, while the
-base-relative figure is 481 added / 0 deleted because the record file is new at the base),
+base, 455 added / 0 deleted; the Stage D repair commit adds 45 and deletes 19 of those lines; the
+second Stage D repair commit adds 167 and deletes 56, counted over every `-` line excluding the
+`---` headers, so neither repair is insert-only, while the base-relative figure is 592 added /
+0 deleted because the record file is new at the base — the file has grown, and this record states the
+new figure rather than leaving the first repair's 481 standing),
 `scripts/check_dco.py --range
 origin/main..HEAD`, and `python -P scripts/ci/check_pr_body_skills.py --body-file <f>`.
 
 ## 12. What this batch did not do
 
 It **authored no keeper row and edited no ledger section** (AEGIS-APR-101's corrected posture; the
-rows are a separate eligible keeper's work under AEGIS-APR-117); edited none of the eight read pages
+rows are a separate eligible keeper's work under AEGIS-APR-117) — and it states plainly that under the
+ledger's PARTIAL rule (L5133-5137, "no partial-acceptance kind"; L5149-5150) the eight partial pages get
+**no acceptance row** and stay **pending**, so no keeper authors one from this evidence; edited none of
+the eight read pages
 (no-rewrite discipline); rewrote no dated snapshot; bound no acceptance row to this batch's own
 unmerged head; ran no `build_index.py --write` and rebuilt no `tools/` artifact; touched no page
 outside lane D's quarter; touched no other lane's branch, PR or clone; picked up none of the six
@@ -458,7 +566,7 @@ at the base.
 
 ```text
 skill@08d91a834460beebc9c66fa896b8b422f064bf1d7524f6e5b1512cda3afdc996 / reason: classify before writing, the class decides the tier and review path / applied: classified docs-only before any write / result: docs-only tier asserted in the PR body with the file set / incomplete: None / by: readability-phase4-lane-d-batch4-implementer (Stage C; DeepSeek-4.1-Flash (deepseek-flash))
-skill@c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 / reason: the acceptance contract's six bullets are criteria and were checked one by one / applied: each bullet per page with line cites in section 6, every gap named with its page line / result: 0 full, 8 partial, 30 named gaps (28 → 30, corrected after the Stage D audit; section 4) / incomplete: None / by: readability-phase4-lane-d-batch4-implementer (Stage C; DeepSeek-4.1-Flash (deepseek-flash))
+skill@c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 / reason: the acceptance contract's six bullets are criteria and were checked one by one / applied: each bullet per page with line cites in section 6, every gap named with its page line / result: 0 full, 8 partial, 26 named gaps (28 → 30 → 26: two missing isolated worktree gaps added, then four convention/false gaps retired; sections 4 and 9) / incomplete: None / by: readability-phase4-lane-d-batch4-implementer (Stage C; DeepSeek-4.1-Flash (deepseek-flash))
 skill@b5fd9feda97235430259913aedd33447ab06e1c0ded281e9e131fa6bf9b78be2 / reason: the moved quarter boundary and the items not resolvable from prose needed the artifacts that own them / applied: observations O-1..O-5 sourced to instrument runs and git objects / result: all five dispositioned, none repaired in place / incomplete: None / by: readability-phase4-lane-d-batch4-implementer (Stage C; DeepSeek-4.1-Flash (deepseek-flash))
 skill@a74d2a22579cf93f737725aa0c54197b5d496a9f33a291a93c2cf2073cd7d076 / reason: recording requires knowing which grant covers what / applied: read AEGIS-APR-039, -101, -115, -117 and -118 at the base / result: recording-only under APR-101; no grant consumed, extended or requested / incomplete: None / by: readability-phase4-lane-d-batch4-implementer (Stage C; DeepSeek-4.1-Flash (deepseek-flash))
 skill@141b7036469f9f99ef6b8e152299619a6d0ab572656a5ba307062551d311d8a5 / reason: a new page may owe a retention entry / applied: checked for a retention registry and per-doc frontmatter practice / result: none exists for this directory; no retention change needed, recorded not skipped / incomplete: None / by: readability-phase4-lane-d-batch4-implementer (Stage C; DeepSeek-4.1-Flash (deepseek-flash))
@@ -471,9 +579,12 @@ skill@6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 / reason:
   re-reads of the lane's next eight pages, evidence record only), started
   **2026-10-15T18:30:31-07:00** (America/Los_Angeles; the first timestamp this batch recorded,
   taken after the turn-1 snapshot).
-- Finish and full wall time are recorded in the pull-request body at the head. Active time was **not
-  instrumented**, so wall time is an imperfect comparison with the estimate rule's active-time
-  requirement and no per-page active rate is claimed.
+- Finish: the machine-recorded bound is the Stage C commit's own author date,
+  **2026-10-16T01:43:17Z** (2026-10-15T18:43:17-07:00) — **12 minutes 46 seconds** after the recorded
+  start. The pull-request body carries that figure, the two repair commits' own start/finish/wall times
+  and this second repair's timing. **No separately instrumented finish time exists for the batch**:
+  active time was **not** instrumented, so wall time is an imperfect comparison with the estimate
+  rule's active-time requirement and no per-page active rate is claimed.
 
 ---
 
