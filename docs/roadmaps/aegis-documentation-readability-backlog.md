@@ -5118,13 +5118,23 @@ role). The eight pages below were each independently full-page re-read at the
 base head against [Acceptance for each page](#acceptance-for-each-page) by a
 reviewer who did not write the page, and the reviewer restated each page's
 purpose and normal use from the page alone in the batch record. No page was
-edited, so no "corrected" row exists; the two partial acceptance bullets
-(P1: `p<0.05`, `p-hacking` and "Overall Evaluation Criterion" used without
-an on-page first-use definition; P7: `authz` used once without expansion) are
-recorded in the batch record as properties of the text at the bound revision,
-not repaired (editing an instruction file under `.claude/skills/` would
-reclassify this change beyond docs-only). No acceptance the reviewer did not
-give is recorded, and no posture, Stop Condition, or Security Rule changed.
+edited, so no "corrected" row exists. **Corrected 2026-10-16 (Stage C repair
+round):** the two bullets round 1 called "partial" are **observations, not
+gaps, under C-1**, and both pages keep their acceptance rows. Measured on the
+pages at the bound revision: P1's `p<0.05` occurs once (L178) and is resolved
+by the page's own L176-177 plus its own linked companion
+`references/ab-test-sheet.md` L13; P1's `p-hacking` occurs once and L183
+defines it by apposition; P1's "Overall Evaluation Criterion" occurs once, is
+glossed in apposition at L82, and is not an abbreviation at all. P7's `authz`
+occurs **twice, not once** — L143 and L160, both inside the one Output Format
+fenced block — and both uses are resolved by the page itself, which spells
+"authorization" 20 times including L25 ("that ENFORCES the authorization
+policy") mirroring L143, and names `authorization-matrix-designer` at
+L146/L160. Library-wide, 54 of 658 reader pages use `authz` and 47 of the 54
+also spell the word out, so a short form is a library convention under C-1; the
+full measurement is in the batch record section 8.3. No acceptance the reviewer
+did not give is recorded, and no posture, Stop Condition, or Security Rule
+changed.
 
 **Lane derivation (Phase 4 re-read lanes; lane A is the alphabetically first
 quarter of the sorted pending set).** The pending set is the
@@ -5137,13 +5147,22 @@ quarter of the sorted pending set).** The pending set is the
 This batch is paths 9–16 of that range (the next eight after batch 1's paths
 1–8); no page outside the range is read or recorded.
 
-**Keeper IDs.** Rows are authored **K-090…K-097** — lane A's allocated band is
-K-082–K-180 (`KEEPER-ID-ALLOCATION.md`) and batch 1 authored K-082…K-089, so
-these are the band's first free ids. This lane expects the merge holder to
-renumber rows into the allocated bands per that file's merge protocol — the
-stable ID only, never the `Blob ID` — then re-run `build_index.py` and the
-checker; if any of K-090…K-097 is moved, its `Blob ID` must be recomputed
-with `git rev-parse <Acceptance revision>:<Page>` and confirmed unchanged.
+**Keeper IDs, as repaired (2026-10-16).** Round 1 authored **K-090…K-097**;
+lane A's allocated band is K-082–K-180 (the published allocation page
+`docs/roadmaps/KEEPER-ID-ALLOCATION-2026-10-15.md`; the bare filename
+`KEEPER-ID-ALLOCATION.md` resolves to no repository path) and batch 1 authored
+K-082…K-089, so round 1 took the band's first free ids. The repair round
+**withdraws K-090…K-097 as K-090W…K-097W** and **re-records the same eight pages
+as K-106…K-113** — a contiguous block above every id claimed at `main` or by
+any open pull request in lane A's band (highest claimed: K-104 at `main`; K-097
+in this pull request; K-089 in open PR #771) and absent from all of them;
+K-105 is skipped deliberately because the merged PR #781 record and the
+allocation page record it as withheld and never authored under the PARTIAL rule.
+This lane still expects the merge holder to renumber rows into the allocated
+bands per the allocation page's merge protocol — the stable ID only, never the
+`Blob ID` — then re-run `build_index.py` and the checker; if any of
+K-106…K-113 is moved, its `Blob ID` must be recomputed with
+`git rev-parse <Acceptance revision>:<Page>` and confirmed unchanged.
 
 | Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
 | --- | --- | --- | --- | --- |
@@ -5159,17 +5178,23 @@ with `git rev-parse <Acceptance revision>:<Page>` and confirmed unchanged.
 The re-measured facts per page (line and byte counts, blob IDs, link targets,
 named-skill existence checks) are in the batch record.
 
-**Declared deviation (recorded, not hidden).** AEGIS-APR-101 requires the
-ledger keeper to be a different agent from the page's author and accepting
-reviewer; this lane's one agent is both the accepting reader and the writer
-of this keeper section, so that condition is **not satisfied** and the rows
-are **not green**. The owner has directed the **AEGIS-APR-117 route**: the
-same-agent rows are withdrawn and re-recorded by a different agent from the
-same evidence — **no page needs re-reading** — and the disposition stays with
-the merge holder under AEGIS-APR-100. The reader did not write any of the
-eight pages (`git log -1 --format=%an -- <page>` names Peter Nguyen for all
-eight; the batch record lists the commits). This lane delivers under
-AEGIS-APR-039 and records only under AEGIS-APR-101.
+**Declared deviation, now resolved by the AEGIS-APR-117 route (2026-10-16
+repair round; the disposition is no longer left to the merge holder).**
+AEGIS-APR-101 requires the ledger keeper to be a different agent from the
+page's author and accepting reviewer; this lane's one agent was both the
+accepting reader and the writer of this keeper section, so that condition was
+**not satisfied** and the eight rows were **not green**. **Owner decision 3 of
+2026-10-15 declined to ratify the carry** (the K-074..K-081 precedent is not
+extended) and directed the **AEGIS-APR-117 route**: the same-agent rows are
+withdrawn and re-recorded by a different, eligible keeper from the same
+evidence — **no page needs re-reading**. The repair round executed it: K-090…K-097
+are cancelled by K-090W…K-097W, and the same eight pages are re-recorded as
+K-106…K-113 by `deepseek-flash-apr117-keeper` (**DeepSeek-4.1-Flash
+(deepseek-flash)**), an agent that ran none of the reads, wrote none of the
+eight pages, is not the coordinator and holds no other stage of PR #777. The
+reader did not write any of the eight pages (`git log -1 --format=%an -- <page>`
+names Peter Nguyen for all eight; the batch record lists the commits). This lane
+delivers under AEGIS-APR-039 and records under AEGIS-APR-101 and AEGIS-APR-117.
 
 **Count honesty (unchanged).** This lane publishes no readability count of
 its own (D84). The instrument's figures at the base are quoted in the batch
@@ -5186,8 +5211,62 @@ did not write this section — the self-cost every prior update states. The
 tracked Markdown count does not change except by the new batch record note
 itself, which is pending and not counted among accepted pages.
 
-The next batch's selection rule: the next 8 paths of lane A's sorted range
-(paths 17–24 of 148), re-measured at the next implementation base.
+The next batch's selection rule, corrected 2026-10-16 — **no index is pinned**:
+the next batch takes the next **8 contiguous unread** pages of lane A's sorted
+range — pages carrying no keeper row and named in no lane A batch record —
+**re-derived at the next implementation base**, never by index arithmetic. The
+frontier is derived from the lane records' own bytes, because the instrument is
+not lane-aware and cannot compute it. Measured at the bound base
+`e2a3e20b7c20ef8385b219b39c6405237163406f` and re-measured at `origin/main`
+`50241ba5036e36ec9bcd1ce7a4b93ffa23a0392b`, both name, in order:
+`.claude/skills/agent-instruction-consolidator/SKILL.md`,
+`.claude/skills/agent-instruction-consolidator/references/instruction-file-map.md`,
+`.claude/skills/agent-memory-governance/SKILL.md`,
+`.claude/skills/agent-memory-governance/references/memory-rules.md`,
+`.claude/skills/agent-startup-context-gate/references/context-source-checklist.md`,
+`.claude/skills/agent-tool-safety-guard/SKILL.md`,
+`.claude/skills/agent-tool-safety-guard/references/tool-permission-matrix.md` and
+`.claude/skills/agentic-loop-designer/SKILL.md`.
+
+**Repair round appended 2026-10-16 (Stage C, answering `SD-D: REVISE`).** Drafted by
+**DeepSeek-4.1-Flash (deepseek-flash)**, an agent that ran none of the eight reads and wrote none
+of the eight pages. The corrections it made in the paragraphs above, and the measurements behind
+them, in one place:
+
+1. **F1:** the false "`authz` used once" claim is corrected to the measured **twice** (L143,
+   L160); `git grep -n -i -F -e authz` over the page returns exactly those two lines.
+2. **F3:** the two "partial" bullets are re-worded as observations under C-1, with the per-term
+   measurement (page-resolves-it evidence and library prevalence) in the batch record section 8.3.
+   **No page loses its acceptance row, and no page is re-read.**
+3. **F4:** the index pin ("paths 17-24 of 148") is replaced by the eight unread pages named by
+   path, derived from the lane records' own bytes and re-measured at `origin/main` `50241ba5…`.
+4. **F2:** the batch record's P1 blob prefix `775b774b…` does not reproduce; the measured prefix
+   is `775b774f…` (full ID `775b774fde08e5d7ac1df462bef78de148b07a8a`), and all eight IDs were
+   re-resolved by command this round.
+5. **F6 (found this round):** the batch record's eight line counts in its section 3 were each one
+   high; corrected to 228/69/234/84/196/77/243/75 (newline counts), byte counts unchanged.
+6. **F5:** the Codex state block at the audited head `05ad7607…` carries
+   `has_unresolved_findings: true` and `status: "failed"`; the cause is the bot's own next
+   comment ("You have reached your Codex usage limits for code reviews."), and this round's counts
+   are **0 reviews / 0 review comments / 6 issue comments (2 from the bot)** — **CONFIRMED
+   UNAVAILABILITY**, not clean and not "did not run", with no substantive finding content to
+   triage.
+7. **The same-agent rows:** K-090…K-097 are withdrawn by K-090W…K-097W and the eight pages
+   re-recorded as K-106…K-113 by `deepseek-flash-apr117-keeper` under AEGIS-APR-117 and
+   AEGIS-APR-101, from the same evidence, per owner decision 3 of 2026-10-15. The row-by-row
+   evidence, the id audit against every open pull request, and the C-1 measurements are in
+   `docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md`.
+
+**What this round did not verify, recorded here rather than in a message:** the act of reading the
+eight pages as prose (round 1's process claim is not checkable from the repository); whether any
+repair round owes a fresh Stage F (it does — the head moves and a bound field is edited, so the
+verdicts at `05ad76072d12070164aaf9135223e49e28a296ae` do not cover the repaired head); and the
+CI state at the new head, because this pull request is **CONFLICTING/DIRTY** against `main`
+(`mergeable: false`, `mergeable_state: "dirty"`, measured 2026-10-16), so no new
+`pull_request` workflow run can exist at it.
+
+The repair commit carries this note; the audited head's commit message, which names no model, is
+corrected forward in the batch record section 8.7.2 (a commit message is immutable).
 
 <!-- acceptance-index-schema: 1 -->
 
@@ -5319,3 +5398,19 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-095 | .claude/skills/accessibility-test-harness/references/a11y-checklists.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 0be76bc052efba600c5f7296aa1d0f8421fb725f | P6 accepted: .claude/skills/accessibility-test-harness/references/a11y-checklists.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md | 2026-10-15 |
 | K-096 | .claude/skills/admin-console-architect/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | d9500b3bde91301cef76dc76ac659712d4e93e91 | P7 accepted: .claude/skills/admin-console-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md | 2026-10-15 |
 | K-097 | .claude/skills/adr-sequencer/references/adr-corpus-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 84ed16cabe2e7390ea95825c173382900ee4430e | P8 accepted: .claude/skills/adr-sequencer/references/adr-corpus-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md | 2026-10-15 |
+| K-090W | .claude/skills/ab-test-designer/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 775b774fde08e5d7ac1df462bef78de148b07a8a | WD-A2-1 withdraws K-090 (readability-lane-a-implementer-c): P1 accepted: .claude/skills/ab-test-designer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-091W | .claude/skills/ab-test-designer/references/ab-test-sheet.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 28e206977eacb05084844fcbc7d5aff7f90f1ed1 | WD-A2-2 withdraws K-091 (readability-lane-a-implementer-c): P2 accepted: .claude/skills/ab-test-designer/references/ab-test-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-092W | .claude/skills/acceptance-criteria-reviewer/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 56899580a8a30b194a1ba5cf63ab810984426604 | WD-A2-3 withdraws K-092 (readability-lane-a-implementer-c): P3 accepted: .claude/skills/acceptance-criteria-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-093W | .claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | bf44030a2928081b1720396233d3208938d9e85c | WD-A2-4 withdraws K-093 (readability-lane-a-implementer-c): P4 accepted: .claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-094W | .claude/skills/accessibility-test-harness/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 61a36e4f3acbc2aa25bf743a804add2e32492786 | WD-A2-5 withdraws K-094 (readability-lane-a-implementer-c): P5 accepted: .claude/skills/accessibility-test-harness/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-095W | .claude/skills/accessibility-test-harness/references/a11y-checklists.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 0be76bc052efba600c5f7296aa1d0f8421fb725f | WD-A2-6 withdraws K-095 (readability-lane-a-implementer-c): P6 accepted: .claude/skills/accessibility-test-harness/references/a11y-checklists.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-096W | .claude/skills/admin-console-architect/SKILL.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | d9500b3bde91301cef76dc76ac659712d4e93e91 | WD-A2-7 withdraws K-096 (readability-lane-a-implementer-c): P7 accepted: .claude/skills/admin-console-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-097W | .claude/skills/adr-sequencer/references/adr-corpus-sheet.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 84ed16cabe2e7390ea95825c173382900ee4430e | WD-A2-8 withdraws K-097 (readability-lane-a-implementer-c): P8 accepted: .claude/skills/adr-sequencer/references/adr-corpus-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-106 | .claude/skills/ab-test-designer/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 775b774fde08e5d7ac1df462bef78de148b07a8a | P1 accepted: .claude/skills/ab-test-designer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-107 | .claude/skills/ab-test-designer/references/ab-test-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 28e206977eacb05084844fcbc7d5aff7f90f1ed1 | P2 accepted: .claude/skills/ab-test-designer/references/ab-test-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-108 | .claude/skills/acceptance-criteria-reviewer/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 56899580a8a30b194a1ba5cf63ab810984426604 | P3 accepted: .claude/skills/acceptance-criteria-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-109 | .claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | bf44030a2928081b1720396233d3208938d9e85c | P4 accepted: .claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-110 | .claude/skills/accessibility-test-harness/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 61a36e4f3acbc2aa25bf743a804add2e32492786 | P5 accepted: .claude/skills/accessibility-test-harness/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-111 | .claude/skills/accessibility-test-harness/references/a11y-checklists.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 0be76bc052efba600c5f7296aa1d0f8421fb725f | P6 accepted: .claude/skills/accessibility-test-harness/references/a11y-checklists.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-112 | .claude/skills/admin-console-architect/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | d9500b3bde91301cef76dc76ac659712d4e93e91 | P7 accepted: .claude/skills/admin-console-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-113 | .claude/skills/adr-sequencer/references/adr-corpus-sheet.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 84ed16cabe2e7390ea95825c173382900ee4430e | P8 accepted: .claude/skills/adr-sequencer/references/adr-corpus-sheet.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
