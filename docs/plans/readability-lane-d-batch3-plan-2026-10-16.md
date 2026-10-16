@@ -1,8 +1,9 @@
-# Stage A plan — Phase 4 readability lane D, batch 3 (PR #784) — revision 4
+# Stage A plan — Phase 4 readability lane D, batch 3 (PR #784) — revision 5
 
-**Plan revision 4**, 2026-10-16 — it re-captures plan revision 3 to correct **AC-14**'s attribution of
-the keeper's recording authority (the SD-B finding in comment `6214819169`), and it carries revisions
-1-3's corrections (§11). **Stage: A (PLAN).** **Role A**
+**Plan revision 5**, 2026-10-16 — it re-captures plan revision 4 to correct the three findings of the
+posted **SD-B: REVISE** (comment `6215508676`): §8's label for AEGIS-APR-117, §10.1's list of the
+frozen record's pairing sites, and two non-bound PR-body sentences; it carries revisions 1-4's
+corrections (§11). **Stage: A (PLAN).** **Role A**
 is this repository, the Project Aegis source library (Role B is a consumer or product repository that
 copied the Aegis files).
 **Planner:** agent `readability-phase4-lane-d-planner-a1`, model **DeepSeek-4.1-Flash
@@ -72,7 +73,7 @@ exist in the repository** (`git cat-file -t` fails; `git ls-tree` answers "not a
 two strings differ only in the last three bytes, transposed (`…1208e64` is real; `…120e8c4` is not).
 The API field `head.sha`, `git rev-parse refs/pull/784/head` and `refs/remotes/pr/784/head` all
 return `87c637df…` at this capture. **The head HAS moved since revision 2**, and that move is the
-whole reason for this revision: `87c637df…` is the first head
+whole reason for revision 3: `87c637df…` is the first head
 `99d46d752357c6cb127274944ce2ac2ff0b9b78e` plus repair commit `1aa632f7…` (repair round 1) plus
 repair commit `87c637df…` (repair round 2, Stage C's fix of SD-E's rendering FAIL) — **three
 commits**, one more than the two revision 2 was written against. Revision 2's AC-15 asserted the head
@@ -438,23 +439,37 @@ from this evidence.
   "Scope FORBIDDEN" clause (L3157) bars self-review, overriding review findings, merging by the keeper,
   and **waiver of existing review and delivery requirements**. **There is no waiver provision at
   L3155-3157.**
-- **AEGIS-APR-117** (register L5016-5042) is the keeper's **withdrawal-and-re-record** route: "the
-  ledger keeper may append a withdrawal row that cancels a recorded acceptance row that turns out to
-  be wrong … The ledger is never rewritten" (L5038-5042). It is **withdrawal-only**; it is not an
-  authority to record a fresh acceptance in place of a missing one.
+- **AEGIS-APR-117** (register L5016-5042) is the keeper's **withdrawal** route: "the ledger keeper may
+  append a withdrawal row that cancels a recorded acceptance row that turns out to be wrong … the
+  affected page becomes pending again. The ledger is never rewritten" (L5038-5042). **It is
+  withdrawal-only, and the register's own text ends at *pending again*:** it authorises no fresh
+  recording, so it is not an authority to record an acceptance in place of a missing one. **The string
+  `re-record` appears nowhere in the register** — 0 occurrences of `re-record`, `rerecord` or any
+  dash variant in the register blob `7947260b6973b7b885cd33e526c177613a84fbe8`. The compound
+  "withdrawal-and-re-record" is the **owner's route name** for the two-part programme action
+  (`docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` L122, blob `f2010a75…` at `origin/main`), and that
+  document's own gloss (L138-140) attributes **only the cancellation** to this register entry. **So the
+  re-recording is cited to the owner, and the register is cited only for the withdrawal** — the two are
+  never merged into one citation, which is what revision 4's label did and what revision 5 corrects.
 - **The owner declined to ratify a carry-with-deviation on 2026-10-15.** Decision 3 of
   `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` (blob `f2010a75…` at `origin/main`) is headed
-  "NO ratification; use the AEGIS-APR-117 route": the same-agent rows are to be **withdrawn and
-  re-recorded by a different, eligible keeper**, not carried with a declared deviation. That file is
+  "NO ratification; use the AEGIS-APR-117 route": the same-agent rows are to be **withdrawn by
+  AEGIS-APR-117's register entry and re-recorded afresh by a different, eligible keeper under
+  AEGIS-APR-101's recording clause**, not carried with a declared deviation. **The compound
+  "withdrawal-and-re-record" is the owner's route name** for that two-part action (that file, L122;
+  its gloss at L138-140 splits it, attributing only the cancellation to the register entry) — the
+  re-recording half is cited to the owner's decision, never to the register. That file is
   **absent at this change's base and head** (§12); it is cited from `origin/main` by blob.
 
 **Who will record the rows, stated plainly:** a separate **eligible keeper** — one that is **not** any
 page's author, **not** its accepting reviewer, **not** any stage of this change (not this Stage A
 planner, not the Stage C reader/implementer, not the Stage B, D, E, F or G holder) and **not the
 coordinator**. This plan **allocates no row ID and names no keeper identity**; the eligibility test is
-satisfied (or not) at recording time, by the keeper's own row metadata. For orientation only: the
-merged AEGIS-APR-117 re-record PR #781 recorded this lane's batch-1 rows (K-389…K-396) under an
-eligible keeper identity — the same identity is a natural candidate for batch 3's rows, **subject to
+satisfied (or not) at recording time, by the keeper's own row metadata. For orientation only: merged
+PR #781 recorded this lane's batch-1 rows (K-389…K-396) under an eligible keeper identity — its own
+merged title, "AEGIS-APR-117 withdrawals and fresh re-records for the four Phase 4 lane batch-1 keeper
+rows", is that artefact's title and not this plan's reading of the register entry, which authorises
+only the withdrawal. The same identity is a natural candidate for batch 3's rows, **subject to
 the same test at recording time**, and this plan does not bind it. Recording happens in the keeper's
 own change, not here; the strings it records from are the record's §10 block, each carrying the full
 40-character acceptance revision (AC-12).
@@ -468,7 +483,7 @@ own change, not here; the strings it records from are the record's §10 block, e
 | The instrument's figures at three refs | reproducible by command: `python -P -B tools/readability_acceptance/check_index.py --json --ref <ref>`; base `e2a3e20b…` `653 / 57 / 4 / 586 / 0 / 0 / 6 / 596`, superseded head `1aa632f7…` and head `87c637df…` both `654 / 57 / 4 / 587 / 0 / 0 / 6 / 597`, all exit 0; `--quiet` exits 0 at each; `build_index.py --report` gives the identical block `101 / 101 / 81 / 10 / 68`, exit 0, at **base, `1aa632f7…` and `87c637df…` alike**. All were run in this planning session; **the head move changed none of them** |
 | The C-1 prevalence table | this plan §4, reproducible by the command in §4.1 |
 | The row-quote strings for the keeper | record §10 (8 strings, FULL pages only) |
-| The stage receipts (SD-A…SD-G) | the PR conversation: SD-B **REVISE** `6211504777` and SD-B **REVISE** `6212915586` (both against revision 1); SD-D **REVISE** `6209631818`; then SD-D **ACCEPT** `6213714837` and SD-E **FAIL** `6213965761`. **Those last two are bound to `1aa632f7…` and are therefore void at `87c637df…`** — a fresh SD-D and a fresh SD-E are owed at this head; SD-B **REVISE** `6214819169` and its addendum `6214824546` are posted against revision 3 (the finding revision 4 corrects), so **a fresh SD-B is owed over revision 4's bytes too** |
+| The stage receipts (SD-A…SD-G) | the PR conversation: SD-B **REVISE** `6211504777` and SD-B **REVISE** `6212915586` (both against revision 1); SD-B **ACCEPT** `6213318266` (against revision 2); SD-D **REVISE** `6209631818`; then SD-D **ACCEPT** `6213714837` and SD-E **FAIL** `6213965761`. **Those last two are bound to `1aa632f7…` and are therefore void at `87c637df…`** — a fresh SD-D and a fresh SD-E are owed at this head; SD-B **REVISE** `6214819169` and its addendum `6214824546` are posted against revision 3 (the finding revision 4 corrected), and SD-B **REVISE** `6215508676` is posted against revision 4 (the finding revision 5 corrects), so **a fresh SD-B is owed over revision 5's bytes too** |
 | The keeper's rows | the consolidated keeper table in `docs/roadmaps/aegis-documentation-readability-backlog.md`, appended by the separate keeper's own change — **not** by this PR |
 
 ## 10. What this plan does NOT decide
@@ -480,22 +495,47 @@ Named rather than left implicit:
    own commit lands on the side branch `stage-a/lane-d-batch3-plan-2026-10-16`, never on the PR
    branch, so no head-bound verdict can be moved by this capture. (The head *did* move at
    `2026-10-16T04:03:49-07:00` by Stage C's repair round 2 — that is Stage C's act, and the reason
-   this revision exists; see §13.) In particular this plan does **not** rewrite the record's §2
+   revision 3 exists; see §13.) In particular this plan does **not** rewrite the record's §2
    index-arithmetic wording or its L6-10 "Plan applied" sentence (which says no separate plan artifact
    exists — **superseded by fact** once this plan is captured, and named here and in §6 as a declared
    observation carried at the frozen head). A later head-moving repair may align that sentence; that
-   decision is not taken here. **Two further statements are declared observations carried at the frozen
-   head rather than edited**, because neither is this plan's to rewrite: the frozen record pairs
-   AEGIS-APR-117 with recording (its front matter L16 calls it "the keeper's targeted-review recording
-   authority: withdraw and re-record by a different agent from the same evidence"; its §3 at L100
-   "leaves the row recording to a separate eligible keeper under AEGIS-APR-117"; the same pairing
-   recurs at L268, L331, L370 and L375), and the PR body's `witness` bound field says "the rows are a
-   separate eligible keeper's work under AEGIS-APR-117 from this evidence". Editing the record would
-   move the head `87c637df…` and void every head-bound verdict; editing a bound field would move the
-   PROC-04 digest and void the verdict that names it, and the `witness` field is **already void on its
-   own terms** at this head (it names `1aa632f7…` and says any move of it voids the record). Both are
-   therefore **declared, not edited** — the mechanism AC-10 already uses for the record's §2 index
-   arithmetic. A fresh witness and a corrected record are owed to their own stages, not to this plan.
+   decision is not taken here.
+   **The frozen record's AEGIS-APR-117 pairing, enumerated from the record's own bytes and declared,
+   not edited.** At blob `cc460c0cd9fae1846046df65ffc36c6c5efe6157` (`87c637df…`) the record names
+   AEGIS-APR-117 at **exactly seven lines — L16, L79, L100, L268, L331, L370 and L374 — and every one
+   of the seven attaches a recording act, or the compound, to that entry**: L16 calls it "the keeper's
+   targeted-review recording authority: withdraw and re-record by a different agent from the same
+   evidence"; L79 calls PR #781 "the APR-117 re-record PR"; L100 "leaves the row recording to a
+   separate eligible keeper under AEGIS-APR-117"; L268 and L370 call the rows "a separate eligible
+   keeper's work under AEGIS-APR-117"; L331 says the rows are recorded "under AEGIS-APR-117"; L374
+   calls PR #781 "the APR-117 re-record's holder". **L375 is NOT one of the seven** — it says the
+   record "claims no authority beyond recording under **AEGIS-APR-101** and the standing backlog
+   delivery grant", which is the correct attribution. **Revision 4's list named L375 and omitted L79
+   and L374; this revision corrects the list, not the record.** Editing the record would move the head
+   `87c637df…` and void every head-bound verdict, so the seven sites stay **declared here, not
+   edited**, and a corrected record is owed to its own stage.
+   **The two non-bound PR-body sentences are corrected in this round, not deferred.** The body's
+   Summary sentence (its L21-23) and Residual item 1 (its L240-242) carried the same false
+   attribution; both lie **outside** the three sentinel-delimited bound fields (witness L201-203,
+   skills L207-230, security L234-236), so correcting them moves neither the head nor the PROC-04
+   digest. **The earlier ruling that they were deferrable is withdrawn**, and the reason revision 4
+   gave — that they are Stage C's narrative, which a one-clause Stage A capture does not rewrite —
+   does not hold: this planner has already edited this body for revisions 3 and 4, and a free
+   correction of a live false statement is not deferrable. Both sentences now name **AEGIS-APR-101's
+   recording clause (register L3155)**, and AEGIS-APR-117 is named there only as the withdrawal grant.
+   The same free correction is applied to the body's disjointness line (its L117), which called PR
+   #781 "the APR-117 re-record PR". The body's own stale line cites — Residual item 1 given as
+   L229-231 and the skills-field sentence as L202 — are corrected to **L240-242** and **L213** in the
+   same edit, and **L202 is the witness field**, which is not edited. **No bound field moved: the
+   digest is still `77a6db9c7a5c31d0`** (§14).
+   **The two bound-field instances stay declared, not edited.** The body's `witness` bound field (L202)
+   says "the rows are a separate eligible keeper's work under AEGIS-APR-117 from this evidence", and
+   the `skills` bound field (L213) says "the rows are the separate keeper's AEGIS-APR-117 scope".
+   Editing either would move the PROC-04 digest and void the verdict that names it, and the `witness`
+   field is **already void on its own terms** at this head (it names `1aa632f7…` and says any move of
+   it voids the record). Both are therefore declared here — the mechanism AC-10 already uses for the
+   record's §2 index arithmetic — and a fresh witness and corrected field text are owed to their own
+   stages, not to this plan.
 2. **It does not record, withdraw or re-record any keeper row**, does not allocate row IDs, and does
    not name or bind the keeper. It does not claim the keeper's independence (AEGIS-APR-101's second
    clause is the keeper's to satisfy).
@@ -515,12 +555,25 @@ Named rather than left implicit:
 
 ## 11. The plan's own revision, and how it is captured
 
-**Revision 4** of this plan — it re-captures revision 3 to correct one clause of AC-14, which named a
-withdrawal-only grant as the authority for recording, and it carries revisions 1-3's corrections.
+**Revision 5** of this plan — it re-captures revision 4 to correct the three findings of SD-B
+`6215508676` (§8's label for AEGIS-APR-117, §10.1's list of the record's pairing sites, and the two
+non-bound PR-body sentences), and it carries revisions 1-4's corrections.
 Capture, so that Stage B has an exact text to bind (the requirement is the workflow's own: **L611-616**
 at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in this head's blob
 `bff407a6…`, the numbering revision 3 quoted):
 
+- **Why a fifth revision, stated first.** The posted **SD-B: REVISE** (issue comment `6215508676`,
+  2026-10-16T12:28:40Z) found three things in revision 4, having re-derived the capture and confirmed
+  it sound: (1) **§8 still paired AEGIS-APR-117 with re-recording** — at L441, which sourced the
+  compound to `register L5016-5042`, and again at L447-448 and L456 — so revision 4's claim that the
+  pairing survived nowhere but AC-14 was not accurate; (2) **§10.1's list of the record's sites named
+  L375**, the one nearby line that is *right*, and **omitted L79 and L374**, which are wrong; (3) **the
+  same false attribution was left live in the PR body's Summary and Residual item 1**, where
+  correcting it moves neither the head nor the digest. **The coordinator's earlier ruling that those
+  two sentences were deferrable is withdrawn** — a free correction of a live false statement is not
+  deferrable. Revision 5 makes those three corrections, sweeps the whole plan with the right test
+  (the sweep table below), and re-captures — because editing captured bytes voids the verdict that
+  names them, so a corrected plan needs fresh bytes, a fresh blob and a fresh comment.
 - **Why a fourth revision, stated first.** The posted **SD-B: REVISE** (issue comment `6214819169`, with
   its addendum `6214824546`) found **one** defect in revision 3: **AC-14** attributed the eight pages'
   rows to AEGIS-APR-117, which the register makes **withdrawal-only** (heading L5016; `Scope allowed`
@@ -558,7 +611,51 @@ at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in th
   rule and its eight paths, the five answers with their routings, the non-author test, the evidence
   inventory, the non-decisions, the head-move sweep (§13), the bound-field analysis and the unapplied
   row block (§14).
-- **Superseded captures.** Revision 3 was captured at commit
+- **What revision 5 changes, and nothing else.** (a) **§8's labels**: the AEGIS-APR-117 bullet no longer
+  attaches the compound to `register L5016-5042`; the owner-decision bullet and the PR #781 sentence
+  now cite the re-recording to the owner's route name and to PR #781's own merged title, and cite the
+  register only for the withdrawal. (b) **§10.1's record list**: the true seven sites (L16, L79, L100,
+  L268, L331, L370, L374), with L375 named as the line that is *not* one of them. (c) **§10.1 and the
+  PR body**: the two non-bound body sentences are corrected rather than declared, with the digest
+  re-derived unchanged. (d) **The revision-5 sweep table** below. (e) **§9's stage-receipt row** gains
+  SD-B `ACCEPT` `6213318266` (revision 2) and the SD-B `REVISE` `6215508676` (revision 4). (f)
+  **§14's two workflow cites** now name their blob at both refs. (g) **Two incidental corrections found
+  by re-deriving**: §11's branch-chain sentence now names `13e0117d…` (revision 4's version omitted
+  it; verified against `git log -1 --format=%P`), and §12's "this revision" and §13's "the reason for
+  this revision" now say **revision 3**, which is the revision the head move caused. (h) **Every
+  revision identifier** — the title, the header, this section and §15. **Every other element is
+  revision 4's text, unchanged**: the scope and the eight paths, the what/why and blast radius, the
+  `docs-only` classification, the fifteen criteria with the C-1 screen and the two
+  declared-not-verifiable criteria, the path-anchored selection rule and its eight paths, the five
+  answers with their routings, the non-author test's substance, the evidence inventory, the
+  non-decisions, the head-move sweep (§13), the bound-field analysis and the unapplied row block (§14).
+- **The revision-5 sweep, site by site, with the test stated.** The test is **not** revision 4's weaker
+  check ("does any text pair AEGIS-APR-117 as authority to record?", which passed while three §8 sites
+  still carried the compound). The test applied here is: **"does any text attach the word `re-record`,
+  or any recording act, to a citation of AEGIS-APR-117?"** It was applied to the whole plan, to the
+  frozen record's own bytes and to the live PR body:
+
+  | Site | What the text is | Result under the test |
+  | --- | --- | --- |
+  | Plan §8, the AEGIS-APR-117 bullet (old L441) | the plan's own label for the register entry | **DEFECT — fixed here**: the compound is gone; the register is cited only for the withdrawal, and the owner's document for the route name. |
+  | Plan §8, the owner-decision bullet (old L447-448) | the plan's gloss of the owner's decision | **DEFECT — fixed here**: the withdrawal is cited to the register entry, the fresh recording to AEGIS-APR-101's recording clause, and the compound is named as the owner's route name. |
+  | Plan §8, the PR #781 sentence (old L456) | "the AEGIS-APR-117 re-record PR #781" | **DEFECT — fixed here**: PR #781 is named by its own merged title and cited to the artefact, not to the register. |
+  | Plan §8's new register-absence sentence | "The string `re-record` appears nowhere in the register … 0 occurrences" | **not an attribution**: a negative count cited to the register's own bytes, with the compound explicitly assigned to the owner's document. |
+  | Plan AC-14, §11's revision narratives, §8's second sentence | "AEGIS-APR-117 is reserved for withdrawals"; "withdrawal-only" | clean — each is a negation, and each names AEGIS-APR-101's recording clause (L3155) as the grant that records. |
+  | Plan §7 question 3, §8's heading, AC-11, §10.2 | mentions of the route with no recording act attached | clean — read line by line; AC-11 names the route without attributing recording to it. |
+  | Plan §14's row block (SA-5…SA-8) | "re-read AEGIS-APR-101 and AEGIS-APR-117 at the moved head" | clean — no recording act; the block is frozen byte-for-byte so the projected digest stays `f15e3d128da4cd52`. |
+  | The frozen record, blob `cc460c0c…` | seven sites: L16, L79, L100, L268, L331, L370, L374 | **DEFECTS in that artefact — declared, not edited** (§10.1); L375 is clean and is the correct attribution. |
+  | The live PR body, Summary L21-23 and Residual item 1 L240-242 and the disjointness line L117 | non-bound body sentences | **DEFECTS — fixed by this round's body edit**; the head and the digest do not move. |
+  | The live PR body, the `witness` field (L202) and the `skills` field (L213) | **bound fields** | **DEFECTS — declared, not edited**: the digest binds them, and the `witness` field is already void on its own terms (§10.1, §14). |
+
+  **Result: no site in this plan now attaches the word `re-record`, or any recording act, to a citation
+  of AEGIS-APR-117.** Every surviving occurrence of the compound in the plan is either a quotation of
+  another artefact's defective text with the defect labelled, a negative count about the register, or
+  the owner's route name cited to the owner's document.
+- **Superseded captures.** Revision 4 was captured at commit
+  `dd53c6997c43566269fd87c38812d98c72b5880b` (blob `2f8df14f7400addeab6c7d0ca5f2c49856545601`,
+  sha256 `c5517bddc37f654c5b1c6e7f348a2519681645d3a4ece0fe4eebb885f9c00ac3`, 69,918 bytes / 824 LF,
+  posted verbatim as issue comment `6215216290`). Revision 3 was captured at commit
   `13e0117d644933f1a9b2fd6cfa1bfd93b0444a6d` (blob `553e81d395a75102b6099410d0c20c26204a3699`,
   sha256 `63ba249544801d14ca1d0036887217a197c8fdb6cbd34942438ad969f9d40b7e`, posted verbatim as issue
   comment `6214445839`). Revision 1 was captured at commit
@@ -567,14 +664,15 @@ at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in th
   comment `6212482822`). Revision 2 was captured at commit
   `b8f91cfe504a11119cb23c642db373fb8b55df83` (blob `2b16f53f6b85a2d30eee81174b0a0f9d71611949`,
   sha256 `967df6b9e336acc03ab678e0a4cf977c75adc0672986112b6894c32b61241fd9`, posted verbatim as issue
-  comment `6213082533`). **All three blobs are superseded by this revision's blob**, which the PR body
-  and the fresh capture comment both name; **all three earlier comments stay posted and unedited**,
+  comment `6213082533`). **All four blobs are superseded by this revision's blob**, which the PR body
+  and the fresh capture comment both name; **all four earlier comments stay posted and unedited**,
   each as its own revision's record. The plan branch is not the PR branch, so **no head moves** with
   this supersession.
 - **Tracked file:** `docs/plans/readability-lane-d-batch3-plan-2026-10-16.md`, committed on branch
   `stage-a/lane-d-batch3-plan-2026-10-16`. **The branch's topology is stated exactly rather than
   assumed**, because it is not what a reader would guess: the chain below this revision's capturing
-  commit runs `b8f91cfe…` → `491bad10…` → `1aa632f7…` → `99d46d75…` → `e2a3e20b…` (the merge base), so
+  commit runs `dd53c699…` → `13e0117d…` → `b8f91cfe…` → `491bad10…` → `1aa632f7…` → `99d46d75…` →
+  `e2a3e20b…` (the merge base), so
   **the branch was cut from `1aa632f7…`** — the head as it stood when revision 1 was captured, which is
   now the **parent** of the current head, not the head. Therefore **the current head `87c637df…` is not
   in this branch's history** (`git merge-base --is-ancestor 87c637df… HEAD` exits 1): the branch
@@ -607,10 +705,10 @@ at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in th
   and now the **second** of this branch's three commits (the head is `87c637df…`). Which string the
   dispatch intended cannot be verified from the repository — only that the former does not exist and
   the latter is real.
-- **The order of the head move and the dispatch.** This revision was requested *because* Stage C's
-  repair round 2 moved the head; the repository shows that commit at `2026-10-16T04:03:49-07:00` and this
-  session's first snapshot at `2026-10-16T04:07:51-07:00`, but what the coordinator read, and when, is
-  not a tracked artifact.
+- **The order of the head move and the dispatch that produced revision 3.** Revision 3 was requested
+  *because* Stage C's repair round 2 moved the head; the repository shows that commit at
+  `2026-10-16T04:03:49-07:00` and revision 3's session first snapshot at `2026-10-16T04:07:51-07:00`, but
+  what the coordinator read, and when, is not a tracked artifact.
 - **"R2" as a standing ruling.** No tracked artifact at the head defines a readability ruling by that
   name (§6). **Re-measured at `87c637df…`: 78 `\bR2\b` hits, none of them a readability standing
   ruling, and 2 `\bC-3\b` hits, both unrelated change-site IDs — the same counts as at `1aa632f7…`**, so the
@@ -637,7 +735,7 @@ at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in th
 
 ## 13. The head move: every figure and identifier it invalidated, before → after
 
-The dispatch named two criteria (AC-1, AC-15) as the reason for this revision. **They were not the
+The dispatch named two criteria (AC-1, AC-15) as the reason for revision 3. **They were not the
 only two false figures.** This section is the whole sweep: every count, head reference, line count,
 blob id and "at this head" claim in revision 2, re-derived at `87c637df…` by command. Items 1-14 are
 statements in this plan that were false at the new head and are corrected above; items 15-17 are
@@ -687,7 +785,9 @@ ledger blob `aa6acddf…` and the index blob `eeda4929…` (identical at the bas
 **The published digest, re-derived.** The PR body states a PROC-04 digest over its three
 sentinel-delimited bound fields: `77a6db9c7a5c31d0` (full
 `77a6db9c7a5c31d0438afdf01aab5970ba741ea005431fc471a5927633c828e1`). Re-computed here from the live body
-with the method `docs/delivery-workflow.md` L875-898 fixes — sentinels resolved by **whole-line equality**,
+with the method `docs/delivery-workflow.md` **L875-898** at this head's blob
+`bff407a65ade2fc7f07871e9d57bf0dc20a55516` (**L899-922** at `origin/main`'s blob
+`9a2ea2bd3557740373cce1285b9f31736b7fe1ec`) fixes — sentinels resolved by **whole-line equality**,
 not by substring search; each field's payload taken strictly between its opening sentinel and the next
 `end` sentinel, sentinels excluded; every run of whitespace collapsed to a single space and each field
 trimmed; the three joined witness → skills → security with single newlines; `sha256` over the UTF-8
@@ -709,14 +809,15 @@ alone for revision 2. **Adding** a row block for revision 3 asserts a skill appl
 occur: this planning session applied the same four Stage A skills to the moved head, so the
 `skill-usage-ledger` obligation is not discharged for revision 3 without it. But the block belongs
 **inside** the `skills` bound field, and the workflow is explicit that any change to a bound field
-voids the verdict over it (L919-925). **So revision 3 did not edit the field.** The exact text is
+voids the verdict over it (**L919-925** at this head's blob `bff407a6…`; **L943-949** at `origin/main`'s blob `9a2ea2bd…`). **So revision 3 did not edit the field.** The exact text is
 authored below and the edit is left to whoever will republish the digest; both digest values are
 stated.
 
-**Revision 4 authors no further block, and re-points none.** It changes one clause of AC-14 and the
-revision identifiers, and it edits none of the three bound fields, so the published digest stays
-`77a6db9c7a5c31d0` and the projected value for the authored block below stays `f15e3d128da4cd52`; the
-four-record block below is left byte-identical to revision 3's.
+**Revision 5 authors no further block, and re-points none.** It changes §8's labels, §10.1's record
+list and the two non-bound PR-body sentences, and it edits none of the three bound fields, so the
+published digest stays `77a6db9c7a5c31d0` and the projected value for the authored block below stays
+`f15e3d128da4cd52`; the four-record block below is left byte-identical to revision 3's, and the two
+notes under it are revision 3's, kept because the block they describe is revision 3's.
 
 **Old digest (published; reproduced above):** `77a6db9c7a5c31d0`.
 
@@ -806,9 +907,14 @@ the PR body and the fresh comment, since the comment is posted after this plan's
   commit that would supply its own finish instant.** They are re-derivable from
   `git log -1 --format=%cI <capturing commit>` and
   `gh api repos/ModernNomad-98/Project-Aegis/issues/comments/<fresh comment id> --jq .created_at`.
-- **Start (plan revision 4, this text):** 2026-10-16T04:59:39-07:00 (America/Los_Angeles; the turn-1
+- **Start (plan revision 4):** 2026-10-16T04:59:39-07:00 (America/Los_Angeles; the turn-1 snapshot of
+  that session).
+- **Finish and wall time (plan revision 4):** these necessarily fall **after** that commit exists, so
+  they are stated in the fresh capture comment and in the PR body's capture section, which carry the
+  comment's creation time, the capturing commit's own committer timestamp and both wall figures.
+- **Start (plan revision 5, this text):** 2026-10-16T05:30:01-07:00 (America/Los_Angeles; the turn-1
   snapshot of this session).
-- **Finish and wall time (plan revision 4):** these necessarily fall **after** this commit exists, so
+- **Finish and wall time (plan revision 5):** these necessarily fall **after** this commit exists, so
   they are stated in the fresh capture comment and in the PR body's capture section, which carry the
   comment's creation time, the capturing commit's own committer timestamp and both wall figures. The
   reason is the one revision 3 stated: **the plan is inside the commit that would supply its own finish
