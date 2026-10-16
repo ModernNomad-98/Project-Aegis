@@ -386,7 +386,7 @@ stronger test), so K-089's `full-page-acceptance` kind matches the disposition a
 stands at this head. Its separate keeper-independence defect (the row's recording agent is the
 page's accepting reader, which AEGIS-APR-101 does not allow) is routed through AEGIS-APR-117:
 `main`'s merged PR #781 carries withdrawal row K-089W, and because #781 was written while P8 was
-still recorded partial it left the fresh lane-A row ID K-105 unused (`main` ledger L5200-L5201:
+still recorded partial it left the fresh lane-A row ID K-105 unused (`main` ledger L5270-L5271 at `main` = `50241ba5036e36ec9bcd1ce7a4b93ffa23a0392b` (the same sentence sat at L5200-L5201 when `main` was `3b0d6cd54222442e2e0b1598829bd078c03a22d4`, so the citation names its ref and its line):
 "K-105 is left unused for the same PARTIAL reason - lane A's P8"). On this repair's disposition
 the fresh full-page-acceptance row for P8 is owed on that route; it is **not** authored here
 (this repair authors no keeper rows and no withdrawal rows).
@@ -510,7 +510,13 @@ payload, and therefore the bound-field digest, is unchanged by them, exactly as 
 begins with two dashes. The **intra-branch correction commit** `f6a4e418` is **not** insert-only
 against its parent `09a7ee1c`: **145 added / 51 deleted** — disclosed because the two scopes
 differ and an insert-only claim that silently covered that commit would be false. This pass's own
-commit is a third scope; its counts are in the PR body's validation table.
+commits are a third scope (the repair commit and its follow-up citation-correction
+commit); their counts are in the PR body's validation table. **Dated correction inside this
+pass:** the first cut of section 8 and of the ledger section cited `main`'s K-105
+sentence at L5200-L5201 — correct when `main` was `3b0d6cd54222442e2e0b1598829bd078c03a22d4`; `main` has since
+advanced to `50241ba5036e36ec9bcd1ce7a4b93ffa23a0392b`, where the sentence sits at L5270-L5271. The
+follow-up commit corrects both citations to name the ref with the line; the repair commit is not
+amended, because amending would move the head and void every head-bound verdict.
 
 **Bound-field digest movement.** The PR body's three bound fields (witness, skills, security, in
 that order; each field's whitespace runs collapsed to single spaces and trimmed, joined with

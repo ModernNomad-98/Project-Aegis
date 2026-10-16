@@ -5231,7 +5231,7 @@ its K-089 `full-page-acceptance` row now matches the disposition and the earlier
 here: PR #781 (AEGIS-APR-117) carries K-082W..K-089W and fresh rows
 K-098..K-104 and **has merged to `main`** (`f490c16f`, 2026-10-15T22:50:57Z);
 because it was written while P8 was still recorded partial, the fresh lane-A row
-K-105 was left unused (`main` ledger L5200-L5201), so P8's fresh full-page row is
+K-105 was left unused (`main` ledger L5270-L5271 at `main` = `50241ba5036e36ec9bcd1ce7a4b93ffa23a0392b`; the sentence sat at L5200-L5201 when `main` was `3b0d6cd5`), so P8's fresh full-page row is
 owed on that route. No keeper row and no withdrawal row is authored here, and no
 page is re-read. Drafted by DeepSeek-4.1-Flash (deepseek-flash), an AI agent
 operating under the owner account.
