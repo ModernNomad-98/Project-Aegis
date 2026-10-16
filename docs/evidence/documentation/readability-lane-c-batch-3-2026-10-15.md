@@ -37,9 +37,14 @@
   (previously full) is reclassified **PARTIAL** for `org` used unexpanded at L17, L19, L26 and
   L49 and defined nowhere in the page; **C3-4** (previously full) is reclassified **PARTIAL**
   for the same `org` shorthand at L68, L122 and L182, previously undisclosed; **C3-3**
-  (previously full) is reclassified **PARTIAL** for `auto-merge` used at L23, L25 and L26
-  before its only in-page gloss at L46. **No generic-shorthand exemption exists in this
-  repository** (measured by `git grep` at the bound base and at `origin/main`; zero hits), so
+  (previously full) is reclassified **PARTIAL** for `auto-merge` on the reference page, whose
+  **complete** measured line set is six lines: the uses at L23, L25, L26, L65 and L104 plus the
+  gloss line L46, which is the **first** in-page gloss, not the term's last occurrence. The
+  earlier wording "used at L23, L25 and L26 before its only in-page gloss at L46" claimed an
+  exhaustiveness the bytes do not support and is corrected at this head; the enumeration above
+  is the complete set, measured by grep over the page's bytes. **No generic-shorthand
+  exemption exists in this repository** (measured by `git grep` at the bound base and at
+  `origin/main`; zero hits), so
   none is cited. The four pre-existing partials (C3-5, C3-6, C3-7, C3-8) are untouched. The
   section 3 heading counts, the dispositions table, the section 4 depth records, the section 9
   keeper source lines and the pull request body were all updated together, so no site still
@@ -53,15 +58,30 @@
   `auto-merge` used unexpanded at L3, L68, L71, L72, L120, L122, L155, L163, L178, L199 and
   L206 and defined nowhere in the page (its L9–11 reading key expands only PR and CI; the
   companion gloss at the reference page's L46–47 is not pointed to from this page), and for
-  `merge-after-green` used at L3 before its only in-page gloss at L113–116. The line list is
-  measured by grep over the page bytes and verified by whole-page read. **No page remains
-  marked full — the section 3 heading and table, the section 4.2 depth record, the section 9
+  `merge-after-green`, whose **complete** measured line set on this page is four lines: used at
+  L3, glossed **first** at L113–116, then used again at L166 and L207. The earlier wording
+  "used at L3 before its only in-page gloss at L113–116" claimed an exhaustiveness the bytes do
+  not support and is corrected at this head; the enumeration above is the complete set. Both
+  lists are measured by grep over the page bytes and verified by whole-page read. **No page
+  remains marked full — the section 3 heading and table, the section 4.2 depth record, the section 9
   keeper source line and the pull request body were all updated together, so no site still says
   "C3-2 full".** The secondary findings are repaired too: C3-6's `sink` citations corrected
   from L64 to the measured L65 and L149 (this record and the pull request body), the C3-3
   citation-style split unified (section 4.3's copy aligned to section 3's en dash), and the
   C3-5 quote cut without an ellipsis in section 4.5 closed with the record's own ellipsis
   discipline.
+- **Repair note (third Stage C repair of this record, 2026-10-15, after the SD-D implementation
+  audit's REVISE verdict, comment 6206307266).** Drafted by **DeepSeek-4.1-Flash (deepseek-flash)**.
+  The finding: two completeness claims about this record's own line lists were false. **C3-3**'s
+  `auto-merge` enumeration named only the three uses before the gloss and called L46 the term's
+  only in-page gloss, omitting the later uses at L65 and L104. **C3-2**'s `merge-after-green`
+  enumeration named only L3 and the L113–116 gloss, omitting L166 and L207. **Neither disposition
+  changes**: both pages stay **PARTIAL** for the pre-gloss first-use gap the audit confirms is
+  correct, and no other disposition, keeper row or ledger line is touched. Both enumerations are
+  corrected to their measured, complete line sets, and every site now states the scope of its list
+  instead of asserting an exhaustiveness that was never measured: the header notes above, section 3
+  items 2 and 3, the section 4.2 and 4.3 depth records, and the pull request body. The footer digest
+  is recomputed over the corrected bytes.
 - **Acceptance revision bound by all eight reads of this batch:**
   `e2a3e20b7c20ef8385b219b39c6405237163406f`
   That revision resolves to itself and is contained in `refs/remotes/origin/main`
@@ -199,9 +219,14 @@ in any repository file** — see the citation note in the header block.)
    nowhere in the page — the reading key expands only PR and CI, the companion reference
    page's gloss (its L46–47) is not pointed to from this page, and no in-page expansion
    exists. `merge-after-green` is likewise used at L3 ("Merge-after-green is never the
-   default template.") before its only in-page gloss at L113–116 ("The source pattern
-   includes default-on autonomous merge after green validation."). Earlier versions of
-   this record marked the page full and recorded the `auto-merge` gap only as an
+   default template.") before its **first** in-page gloss at L113–116 ("The source pattern
+   includes default-on autonomous merge after green validation."), and again after that gloss
+   at L166 ("Merge-after-green appears only as an explicit opt-in profile with the") and L207
+   ("this skill was invoked, or to make merge-after-green the default → refuse,"). The
+   **complete** `merge-after-green` line set for this page is therefore the four lines L3,
+   L113–116, L166 and L207 — measured by grep over the page bytes this session, so the earlier
+   wording that called L113–116 the only in-page gloss must not be read as exhaustive. Earlier
+   versions of this record marked the page full and recorded the `auto-merge` gap only as an
    explanation inside the C3-3 entries; the disposition is **partial** here, with the
    complete line list, so the separate keeper cannot transcribe a full acceptance for a
    gapped page. Page property; this lane edits
@@ -210,9 +235,15 @@ in any repository file** — see the citation note in the header block.)
    `APR-<NNN>` are expanded at L5–7 before the first template use, but `auto-merge` is used at
    L23 ("Arming auto-merge is forbidden to agents by default and requires its own"), L25
    ("approval to merge does not also approve arming auto-merge.") and L26 ("An agent finding
-   auto-merge already armed treats it as a hazard:") before its only in-page gloss at L46
-   ("GitHub auto-merge is a setting that queues a merge when conditions later pass; …"). The
-   parent SKILL.md uses `auto-merge` unexpanded and never defines it (its L9–11 reading key
+   auto-merge already armed treats it as a hazard:") before its **first** in-page gloss at L46
+   ("GitHub auto-merge is a setting that queues a merge when conditions later pass; …"), and
+   again after that gloss at L65 ("does not arm GitHub auto-merge. The opt-out phrase (§5)
+   suspends it.") and L104 ("the ungoverned-auto-merge incident (a prior session armed
+   auto-merge; a"). The **complete** `auto-merge` line set for this page is therefore the six
+   lines L23, L25, L26, L46, L65 and L104 — measured by grep over the page bytes this session,
+   so the earlier wording that called L46 the only in-page gloss must not be read as
+   exhaustive. The parent SKILL.md uses `auto-merge` unexpanded and never defines it (its
+   L9–11 reading key
    expands only PR and CI), so no companion expansion exists (the parent's own gap is recorded under C3-2 — item 2 above). Under this record's own rule — an
    undefined term used before its definition is not a full acceptance — the disposition is
    **partial**. Page property; this lane edits nothing.
@@ -345,7 +376,7 @@ named line by line above; no line of the page was edited by this lane.
 | Bullet | C3-2 `.claude/skills/standing-approval-and-auto-advance/SKILL.md` |
 | --- | --- |
 | Purpose and audience up front | **yes.** L13-39 states what the skill designs (the governed approval-fatigue layer: named standing approval, phase advance only through already-approved phases, per-session restatement, opt-out phrase, reviewer-block path) and why manual-only (a model auto-invoking the skill that widens its own autonomy is self-escalation, L36-39). Use When addresses the reader directly. |
-| Abbreviations and coded identifiers defined at first use | **PARTIAL.** The reading key (L9–11) expands PR and CI before the first body use, the backtick-named skills all exist, "Repo A"/"Repo B" are explained at L28–31, and "open-PR-and-STOP" is defined in context (L113–116) — but `auto-merge` is used unexpanded at L3, L68, L71, L72, L120, L122, L155, L163, L178, L199 and L206 and defined nowhere in the page, and `merge-after-green` is used at L3 before its only in-page gloss at L113–116; the companion reference page glosses `auto-merge` at its own L46–47 but this page neither expands it nor points the reader there for it. The complete line list with quotes is in section 3, item 2. |
+| Abbreviations and coded identifiers defined at first use | **PARTIAL.** The reading key (L9–11) expands PR and CI before the first body use, the backtick-named skills all exist, "Repo A"/"Repo B" are explained at L28–31, and "open-PR-and-STOP" is defined in context (L113–116) — but `auto-merge` is used unexpanded at L3, L68, L71, L72, L120, L122, L155, L163, L178, L199 and L206 and defined nowhere in the page, and `merge-after-green` is used at L3 before its **first** in-page gloss at L113–116 and again at L166 and L207 — the complete four-line set for this page (L3, L113–116, L166, L207, measured by grep over the page bytes this session), so the gloss is not the term's only occurrence; the companion reference page glosses `auto-merge` at its own L46–47 but this page neither expands it nor points the reader there for it. The complete line list with quotes is in section 3, item 2. |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes.** Eight numbered workflow steps; the Output Format is a complete worked template; the merge-profile choice brief requirement (L121-127) and the reviewer-block step are concrete. |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes.** The skill drafts policy for human adoption — "delivered as a DRAFT for human adoption, not enacted by this skill" (L179); the provenance paragraph is marked "history, not the requirements this skill states" (L25); Stop Conditions refuse enacting without human adoption and refuse default-on merge. |
 | Navigation links current and every referenced file or command existing | **yes.** 3 Markdown link occurrences over 2 distinct targets, all existing at the bound revision (section 5); no external links, no in-page anchors; the six backtick-named skills exist; the one quoted command (`gh pr view <n> --json autoMergeRequest`, L201) is a real gh subcommand. |
@@ -380,7 +411,7 @@ named line by line above; no line of the page was edited by this lane.
 | Bullet | C3-3 `.claude/skills/standing-approval-and-auto-advance/references/standing-approval-policy.md` |
 | --- | --- |
 | Purpose and audience up front | **yes.** L1-7 states the companion role, that every `<placeholder>` is filled by the adopting HUMAN, and expands PR, CI and `APR-<NNN>` before the template body. |
-| Abbreviations and coded identifiers defined at first use | **PARTIAL.** PR, CI and `APR-<NNN>` are expanded at L5–7 before the first template use, and the named skill exists; but `auto-merge` is used at L23 ("Arming auto-merge is forbidden to agents by default and requires its own"), L25 ("approval to merge does not also approve arming auto-merge.") and L26 ("An agent finding auto-merge already armed treats it as a hazard:") before its only in-page gloss at L46 ("GitHub auto-merge is a setting that queues a merge when conditions later pass; …"). The parent SKILL.md uses `auto-merge` unexpanded and never defines it (its L9–11 reading key expands only PR and CI), so no companion expansion exists (the parent's own gap is recorded under C3-2 — section 4.2). Under this record's own rule — an undefined term used before its definition is not a full acceptance — the disposition is partial. |
+| Abbreviations and coded identifiers defined at first use | **PARTIAL.** PR, CI and `APR-<NNN>` are expanded at L5–7 before the first template use, and the named skill exists; but `auto-merge` is used at L23 ("Arming auto-merge is forbidden to agents by default and requires its own"), L25 ("approval to merge does not also approve arming auto-merge.") and L26 ("An agent finding auto-merge already armed treats it as a hazard:") before its **first** in-page gloss at L46 ("GitHub auto-merge is a setting that queues a merge when conditions later pass; …"), and again at L65 ("does not arm GitHub auto-merge. The opt-out phrase (§5) suspends it.") and L104 ("the ungoverned-auto-merge incident (a prior session armed auto-merge; a") — the complete six-line set for this page is L23, L25, L26, L46, L65 and L104 (measured by grep over the page bytes, this session), so the gloss is not the term's only occurrence. The parent SKILL.md uses `auto-merge` unexpanded and never defines it (its L9–11 reading key expands only PR and CI), so no companion expansion exists (the parent's own gap is recorded under C3-2 — section 4.2). Under this record's own rule — an undefined term used before its definition is not a full acceptance — the disposition is partial. |
 | Descriptive headings, lists or tables, and at least one concrete example | **yes.** Eight numbered template sections plus design notes, a worksheet and anti-patterns; the merge-profile table works two concrete options with costs stated as unknowns where unknown (L49-52). |
 | Shipped behaviour separated from proposed or blocked behaviour | **yes.** The document is a template that instantiates a policy; nothing claims shipped behaviour; the default merge profile is open-PR-and-STOP and "Unchecked = default" (L66). |
 | Navigation links current and every referenced file or command existing | **yes.** 1 Markdown link (`../SKILL.md`) — exists at the bound revision; no external links, no in-page anchors; the fenced gh commands are real subcommands. |
@@ -691,10 +722,10 @@ repository's own instruments provide (`scripts/validate-skills.py`,
 
 ## Footer
 
-sha256: 21e5b0081c0d1fc49a16ffaacd8f72b5e3a90aaffea23b4b0160a524e29c5491
+sha256: db9796c63ac8ab53022d8c4c237e62484cb4786ce19a261b81bbe36d9f58e2f8
 
 This digest covers the batch record's bytes from the first line through the closing `---` rule line
-and its terminating newline, encoded UTF-8 with LF line endings: exactly 62,775 bytes, byte offsets
-0 through 62,774 inclusive, lines 1-690. It does not cover the blank separator line between that
+and its terminating newline, encoded UTF-8 with LF line endings: exactly 66,134 bytes, byte offsets
+0 through 66,133 inclusive, lines 1-721. It does not cover the blank separator line between that
 rule and the `## Footer` heading, nor this footer. Any edit above the rule needs a fresh validation.
-Recomputed at this Stage C repair head (SD-F: REVISE, comment 6205747330) by DeepSeek-4.1-Flash (deepseek-flash).
+Recomputed at this Stage C repair head (SD-D: REVISE, comment 6206307266) by DeepSeek-4.1-Flash (deepseek-flash).
