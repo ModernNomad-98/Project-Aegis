@@ -5220,8 +5220,9 @@ the recorded ids must satisfy **withdrawn < withdrawal < fresh** lexically, or t
 not that page's latest event and the page does not read as accepted.
 
 - **Fresh block, measured:** `K-397`..`K-404` is the first free contiguous eight in lane D's
-  allocated band **K-381..K-480** (band table in S4 of
-  [owner decisions 2026-10-15](OWNER-DECISIONS-2026-10-15.md); no tracked
+  allocated band **K-381..K-480** (band table in S4 of the owner decisions page
+  `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`, which is on `main` and is not a path at this
+  branch's base, so it is named here rather than linked; no tracked
   `KEEPER-ID-ALLOCATION.md` exists). Across `main` and every fetched pull-request head, band
   D's highest row id is **K-396**, so K-397..K-404 are free; `K-480` is the band bound, not a
   row.
