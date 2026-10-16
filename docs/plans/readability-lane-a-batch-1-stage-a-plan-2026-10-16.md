@@ -473,8 +473,17 @@ Each answer names the evidence that settles it and the routing disposition Stage
 5. **Complexity justification — why is this machinery warranted, and what would be smaller?** The
    machinery is the workflow's own minimum: Stage B cannot audit what was never captured, and a plan
    may be small but never absent. Smaller alternatives and why they fail: **a plan paragraph in the PR
-   body is not a capture** (the workflow says so explicitly, and three PRs in this programme were
-   returned REVISE for exactly that); **a comment alone** is allowed by the workflow but weaker than a
+   body is not a capture as the workflow uses that word**, and the workflow's own sentence is weaker than
+   that phrasing, so the plan states the sentence's own terms: a plan that lives only in a PR body *is
+   not exempt from exact-revision binding merely because it is not a file*
+   (`docs/delivery-workflow.md` L587-592, quoted at revision 1's own line cite). The consequence is the
+   one that matters and it is measured, not asserted: the three Stage B verdicts in this programme that
+   turned on exactly that were PR #784 (comment `6211504777`, SD-B REVISE, "no captured plan exists for
+   this PR, so Stage B has nothing to bind"), PR #785 (comment `6211647547`, SD-B REVISE, no captured
+   plan revision) and PR #789 (comment `6211547391`, SD-B REVISE, no captured plan revision; that one was
+   later discharged by the ACCEPT at comment `6212640376`, which names it as superseded and discharged)
+   -- each read this pass and each bound to its own head; **a comment alone** is allowed by the workflow
+   but weaker than a
    tracked file and it would still have to hold the text; **widening the plan into a design document**
    is disproportionate for a two-file docs change. *Routing: **cite*** — the requirement is textual,
    so no bounded check is needed.
@@ -627,7 +636,25 @@ validation row 20 states, which requires a `--write` rebuild in a working tree.
   Stage B auditor must audit the revision it can name, exactly as moving a head voids a head-bound
   verdict.
 - **Editing this file after capture voids an ACCEPT that named the captured revision.**
-- **Revision 1** is the only revision of this plan.
+- **This plan has more than one revision, and this file is not the register of them.** Each revision
+  was captured separately on the branch above and held by its own immutable comment on PR #771, each
+  naming its own file blob and capturing commit; no later revision rewrites an earlier one. Stage B
+  must bind the revision its own verdict names. Revision 1 is blob `ea048399f14dd13ed91c13ab6d1123dabe9c774b`,
+  at capturing commit `462d786bf8803d5794c21a6cb0486ff03f5829d8`, held as comment `6213972798`; revision 2
+  is blob `6d579cdca95663f0851ade204adc625d5f315658` at capturing commit
+  `e3a4a19c0d048ece8b1121a0437613105bf19771`, held as comment `6214016914`. The revision identifiers of
+  the revision that supersedes revision 2 are recorded in the PR #771 body, for the reason given above.
+- **How the verbatim claim is verified (method declared, because the newline variant decides the hash).**
+  The holding comment wraps the plan in a fence of **four** backticks, so the plan's own three-backtick
+  fences cannot close it; a reader therefore cannot find the block by taking the first three-backtick
+  fence. The declared method here is: take the comment body's first fence line, read its backtick run
+  length N, and take every line up to the next line whose backtick run is N or longer. That block is the
+  file's bytes **minus the single final trailing newline**, which the closing fence line replaces: the
+  normalized variant that matches the blob is **LF with exactly one trailing LF appended** (line endings
+  are LF, with no CR anywhere), and `git hash-object` on that byte string returns the blob SHA. The CRLF
+  variants do **not** match, and neither does the block as extracted without its trailing newline. Both
+  revision 1 and revision 2 were re-verified this way before this revision was written, and the same
+  method is applied to the comment that holds this revision.
 
 ---
 
