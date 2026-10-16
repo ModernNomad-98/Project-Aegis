@@ -5111,46 +5111,6 @@ six lost-commit rows' cells, rebuilds no `tools/` artifact, runs no
 authority. The batching procedure does not grant provider, private-input,
 real-host or deployment authority (L3018-3020).
 
-
-## Ledger-keeper recording + batch update — Phase 4 re-read lane C, batch 1, 2026-10-15
-
-**Under AEGIS-APR-101 (recording only).** This note records Phase 4 re-read lane C, batch 1 — the
-first eight full-page re-reads of lane C's quarter of the pending set. It is additions only: it
-rewrites no dated text, edits no existing keeper row, and **confers nothing**. Its tracked evidence
-source is [the batch record](../evidence/documentation/readability-lane-c-batch-1-2026-10-15.md),
-which names every row's full 40-character acceptance revision verbatim.
-
-**What was read.** Eight pages — the first eight of lane C's command-derived quarter (sorted
-indices 296-443 of the 590-path pending list at `e2a3e20b7c20ef8385b219b39c6405237163406f`):
-`.claude/skills/skill-deprecation-planner/SKILL.md` and its
-`references/deprecation-stage-playbook.md`, `.claude/skills/skill-quality-reviewer/SKILL.md`
-and its `references/quality-review-checklist.md`,
-`.claude/skills/skill-usage-instrumenter/SKILL.md` and its
-`references/usage-signal-catalog.md`, `.claude/skills/skill-usage-ledger/SKILL.md`, and
-`.claude/skills/slo-reliability-architect/SKILL.md` — all read **whole, line by line, as prose**,
-at the bound revision, and all **accepted unchanged**: zero pages corrected, zero lines edited.
-Two partial acceptance-bullet dispositions are recorded as page properties (the bare decision IDs
-`D13`/`D22` and unexpanded LLM/ASI on the skill-quality-reviewer page; unexpanded `RBAC`/`DDL`
-on its checklist reference) rather than repaired. The per-page six-bullet dispositions, the read
-ranges, the display-elision statement (none occurred) and the offline verification of every link,
-blob ID and named skill are in the batch record.
-
-**The keeper condition, carried not satisfied.** For K-082…K-089 the reviewer cell and the writer
-of the record the rows rest on are the same agent (`readability-lane-c-implementer-c`), so the
-AEGIS-APR-101 keeper condition is not satisfied on the register's text. The rows are carried with
-that deviation declared, under the SD-D2 coordinator-ruling precedent, and the merge holder
-disposes of the authority question — the same carry the 2026-10-12 records declared for K-074/K-075,
-K-076 and K-077/K-078/K-079.
-
-**Count honesty (unchanged; no count of this lane's own).** This ledger publishes no count of its
-own and cites the index (D84). The eight rows above change nothing until a rebuild, and a rebuild
-can only be run after the commit that carries the rows; the batch record predicts no post-rebuild
-figure.
-
-**What this note does not do.** It rewrites no dated snapshot, reorders or deletes no existing row,
-binds no row to this lane's unmerged head, edits none of the eight read pages, rebuilds no
-`tools/` artifact, and confers no authority. The batching procedure "does not grant provider,
-private-input, real-host or deployment authority" (L3018-3020).
 <!-- acceptance-index-schema: 1 -->
 
 ## Consolidated keeper table — index schema v1 (D84, 2026-10-10)
@@ -5273,11 +5233,3 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-079 | docs/approvals/APPROVAL_REGISTER.md | full-page-acceptance | c80c8d2d553671579e878584914eae695028eab4 | 548e80efdc630eb04a9b41839c608b4928b4bc2a | K-079 accepted: docs/approvals/APPROVAL_REGISTER.md read whole at c80c8d2d553671579e878584914eae695028eab4 | readability-final3-implementer-c | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | 2026-10-12 |
 | K-080 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | b44d47c9a10cde4c62d6fdae52bf577e04242a50 | K-080 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | readability-ledger-reader-c | docs/evidence/documentation/readability-ledger-reread-2026-10-13.md | 2026-10-13 |
 | K-081 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | ba522f133d05624c2130f15eb8ef3b6329b0f37a | 5928d98534e95a79e2ffbcc2065d38602dd98b0f | K-081 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at ba522f133d05624c2130f15eb8ef3b6329b0f37a | ledger-selfcost-stagec-c | docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md | 2026-10-13 |
-| K-082 | .claude/skills/skill-deprecation-planner/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 22cf10be2f3b4dff3b727288700dea2b1a6861e8 | C1-1 accepted: .claude/skills/skill-deprecation-planner/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md | 2026-10-15 |
-| K-083 | .claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | e3fa656bdbffb99d661e3c9e0b5fff27fedefa34 | C1-2 accepted: .claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md | 2026-10-15 |
-| K-084 | .claude/skills/skill-quality-reviewer/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 48230d027c5e8580419efc596fae3cad96896f65 | C1-3 accepted: .claude/skills/skill-quality-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md | 2026-10-15 |
-| K-085 | .claude/skills/skill-quality-reviewer/references/quality-review-checklist.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 9e5a912a2be5fc3ab1036dc40591c275ad247dff | C1-4 accepted: .claude/skills/skill-quality-reviewer/references/quality-review-checklist.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md | 2026-10-15 |
-| K-086 | .claude/skills/skill-usage-instrumenter/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | fcc886160b3ca4d15d3fd6e757b113dcfcf00f5b | C1-5 accepted: .claude/skills/skill-usage-instrumenter/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md | 2026-10-15 |
-| K-087 | .claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 54b4bec5f9a1b125f1c097d759ba12dc7e803d60 | C1-6 accepted: .claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md | 2026-10-15 |
-| K-088 | .claude/skills/skill-usage-ledger/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 594220d9701f964700030e1408a61b022f86b869 | C1-7 accepted: .claude/skills/skill-usage-ledger/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md | 2026-10-15 |
-| K-089 | .claude/skills/slo-reliability-architect/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 74ced9ed454753657e2f8f0de3648a08f22b9fa9 | C1-8 accepted: .claude/skills/slo-reliability-architect/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-c-implementer-c | docs/evidence/documentation/readability-lane-c-batch-1-2026-10-15.md | 2026-10-15 |
