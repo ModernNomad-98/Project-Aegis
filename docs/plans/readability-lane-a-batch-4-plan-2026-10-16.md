@@ -39,13 +39,16 @@ commit message. *CI* = continuous integration, the automated checks GitHub runs 
 ## The change under plan, and where this plan comes from
 
 - **Work item.** "Phase 4 re-read, lane A, batch 4 — evidence record for eight whole-page re-reads".
-- **The change.** PR #789 on branch `docs/readability-lane-a-batch-4-20261015`, **three commits**,
-  base `f490c16f9ed23f3d489e42f7696323bffcce6fd3`, head
-  `fb3dfe34f3a362c4cb67bfb5bfde732ffda14922` at the moment this plan was written. The diff is **one
-  added Markdown path**,
-  [the batch-4 evidence record](../evidence/documentation/readability-lane-a-batch-4-2026-10-15.md),
-  `+675/-0` against the base (0 deleted lines, counted as every deletion line of
-  `git diff --numstat`, not by a regular expression).
+- **The change, re-derived for revision 2 of this plan (2026-10-16).** PR #789 on branch
+  `docs/readability-lane-a-batch-4-20261015`, **five commits**, base
+  `f490c16f9ed23f3d489e42f7696323bffcce6fd3`, head `0c994d77ad491bb329e07c056065b4d9bb8401ed`, tree
+  `a9555e9dd0d09cc73e4860901ae8527431552e60`. The diff against the base is **three added Markdown
+  paths** and 0 modified or deleted: the batch-4 evidence record
+  ([the record](../evidence/documentation/readability-lane-a-batch-4-2026-10-15.md), `675/0`), the
+  skills author records
+  ([the skills records](../evidence/documentation/readability-lane-a-batch-4-skills-records-2026-10-16.md),
+  `165/0`) and this plan file (`442/0`) — `+1282/-0` in total, where the deleted count is every
+  deletion line of `git diff --numstat`, not the output of a regular expression.
 - **The head, verified not assumed (2026-10-16).** `git ls-remote origin
   refs/heads/docs/readability-lane-a-batch-4-20261015` and `git rev-parse HEAD` in a fresh clone
   both returned the 40-character ID above; it had **not** moved. The live `main` tip is
@@ -84,7 +87,8 @@ commit message. *CI* = continuous integration, the automated checks GitHub runs 
 revision; judge each against the ledger's six acceptance bullets; record the per-page evidence —
 **writing nothing into any page**.
 
-- **Paths this change adds:** the evidence record and this plan file. **Paths it edits:** none.
+- **Paths this change adds:** the evidence record, the skills-records file and this plan file — **three**
+  added `docs/` paths, counted by `git diff --name-only` at the head. **Paths it edits:** none.
   **Paths it deletes:** none.
 - **The eight pages in scope, by path**, with the verdict the record gives each (the record's
   section 3 roster table is the list of record):
@@ -131,22 +135,26 @@ official count falls.
 
 **Blast radius — what the diff touches, by count.**
 
-| Measure | Value at head `fb3dfe34…` | Command |
+| Measure | Value at head `0c994d77…` | Command |
 | --- | --- | --- |
-| Files changed vs base | **1** (added; 0 modified, 0 deleted) | `git diff --name-only f490c16f…..HEAD` |
-| Added / deleted lines vs base | **675 / 0** | `git diff --numstat f490c16f…..HEAD` |
-| Commits vs base | **3** | `git rev-list --count f490c16f…...HEAD` |
-| Intra-branch scopes | **35/10**, **203/47**, **227/46** | `git diff --numstat` on each commit pair |
-| Code, script, workflow, test, configuration, data or lock files | **0** | the added path is one `.md` under `docs/` |
+| Files changed vs base | **3** (all added; 0 modified, 0 deleted) | `git diff --name-only f490c16f…..HEAD` |
+| Added / deleted lines vs base | **1282 / 0** | `git diff --numstat f490c16f…..HEAD` |
+| Commits vs base | **5** | `git rev-list --count f490c16f…...HEAD` |
+| Intra-branch scopes, one per commit | **494/0**, **35/10**, **203/47**, **442/0**, **165/0** | `git diff --numstat <parent> <commit>` for each of the five |
+| Code, script, workflow, test, configuration, data or lock files | **0** | all three added paths are `.md` under `docs/` |
 
-- **The capture's own blast radius, stated because it is real.** Committing this plan adds **one**
-  more added Markdown path (`docs/plans/…`), so at the implementation head the diff is **two added
-  `docs/` paths and 0 deleted lines**. It also adds one reader page to the repository: if this plan
-  merges, the instrument's pending set grows by the plan path, and the record path is likewise a new
-  reader page with no acceptance row. Both sort late in repository-path order — the plan path would
-  sit at sorted index 523 of 594 at the base and 526 of 597 at the live `main` tip — so **neither
-  lands in lane A's first 149 paths**, which are all under `.claude/`. Recorded so the next
-  re-measurement is not surprised by it.
+- **The capture's own blast radius, restated at revision 2 because the file set grew.** The capture
+  added **one** added Markdown path (`docs/plans/…`) to the two the branch already carried, so the
+  diff at the change head is **three added `docs/` paths, 0 modified and 0 deleted lines**. Revision 2
+  re-captures the same path with corrected content on a side branch and **does not move the change
+  head**, so the added-path set is unchanged by the re-capture. Each added path is also a new reader
+  page: if this change merges, the instrument's pending set grows by the plan path and by the
+  skills-records path, and the record path is likewise a new reader page with no acceptance row. All
+  three sort under `docs/`, after every `.claude/` path, and lane A's quarter at the base is its first
+  149 sorted pending paths, ending at `.claude/skills/file-upload-storage-architect/SKILL.md` — so
+  **none lands in it**. The two sorted-index figures revision 1 carried for the plan path are removed
+  here: they were not re-derived at this revision, and this plan does not carry a figure it cannot
+  reproduce. Recorded so the next re-measurement is not surprised by it.
 - **Rollback.** Reverting the branch's commits restores the base bytes exactly: every change is an
   addition, no file is edited, deleted or renamed, and the ledger, the index and the eight pages are
   untouched.
@@ -161,9 +169,10 @@ against the committed file set rather than against the request's wording:
 
 ```text
 CHANGE CLASSIFICATION
-Deliverables:    one evidence record docs/evidence/documentation/readability-lane-a-batch-4-2026-10-15.md;
+Deliverables:    the evidence record docs/evidence/documentation/readability-lane-a-batch-4-2026-10-15.md;
+                 the skills author records docs/evidence/documentation/readability-lane-a-batch-4-skills-records-2026-10-16.md;
                  this plan file docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md.
-Classes:         docs-only (both deliverables).
+Classes:         docs-only (all three deliverables).
 Governing class: docs-only.
 Approval path:   none new. Delivery (commit, branch push, pull request) is covered by AEGIS-APR-039
                  (register L1003-L1024). No schema, security, cloud or agent-behaviour class is
@@ -174,7 +183,7 @@ Validation plan: the docs-only floor is links/rendering sanity plus review. Conc
                  The gate's agent-instruction-file rule is what keeps the four recorded page defects
                  recorded and NOT repaired: editing anything under .claude/skills/ would reclassify
                  this change out of docs-only, because those pages are instruction files.
-Scope contract:  exactly the two added docs/ paths above; nothing under scripts/, tools/, .github/ or
+Scope contract:  exactly the three added docs/ paths above; nothing under scripts/, tools/, .github/ or
                  .claude/, and no ledger, index, workflow, test, configuration, data or lock file.
 ```
 
@@ -184,8 +193,8 @@ Each criterion below names an **observable outcome**, a **pass/fail threshold**,
 that proves it; each carries a verdict from the `acceptance-criteria-reviewer` skill's vocabulary
 (TESTABLE — all three parts present; NEEDS-REWRITE — a part missing; UNTESTABLE — no observable
 outcome derivable), plus a statement of whether it is **verifiable at the implementation head** (the
-head that carries the capture commit; the record's bytes at that head are the bytes audited at
-`fb3dfe34…`, proven by blob ID — AC2).
+change head `0c994d77…`, which the side-branch capture of this plan does not move; the record's bytes
+at that head are the bytes audited there, proven by blob ID — AC2).
 
 ### 3.1 The C-1 screen, applied before the criteria were written
 
@@ -212,21 +221,22 @@ and the term's prevalence is recorded as an observation instead.
 
 | ID | Criterion (observable outcome) | Pass/fail threshold | Evidence | Verdict | Verifiable at the implementation head? |
 | --- | --- | --- | --- | --- | --- |
-| AC1 | The plan of record is a tracked file, not a body section. | The PR body names the plan path and a 40-hex blob ID, and `git rev-parse <head>:docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` equals that value character for character. | the body's capture block; `git rev-parse`; `git cat-file -s` | TESTABLE | Yes |
+| AC1 | The plan of record is a tracked file, not a body section. | The PR body names the plan path and a 40-hex blob ID, and `git rev-parse <capture commit>:docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` equals that value character for character. The equality holds **at the capture revision**, which the change head does not carry: at the head the same path resolves to revision 1's blob `ac8da53e011796bc9086a355b14e4cc9fca8eb81`, and 16.2 states what merges. | the body's capture block; `git rev-parse`; `git cat-file -s` | TESTABLE | Yes |
 | AC2 | The capture does not disturb the evidence record. | `git rev-parse <head>:docs/evidence/documentation/readability-lane-a-batch-4-2026-10-15.md` = `493c48414d3c97c97cdffa8bc422415284d899f9`, and the record's numstat against the base is `675 0`. | `git rev-parse`; `git diff --numstat <base>..<head>` | TESTABLE | Yes |
-| AC3 | No page is edited and nothing code-bearing is added. | `git diff --name-only <base>..<head>` returns exactly two added `docs/` paths; 0 deleted lines; no path under `scripts/`, `tools/`, `.github/` or `.claude/`, and no lock, configuration or data file. | `git diff --name-only`; `git diff --numstat` | TESTABLE | Yes |
+| AC3 | No page is edited and nothing code-bearing is added. | At the change head `0c994d77…`, `git diff --name-only <base>..<head>` returns exactly **three** added `docs/` paths — the evidence record, the skills-records file and the plan — with 0 modified and 0 deleted; 0 deleted lines; no path under `scripts/`, `tools/`, `.github/` or `.claude/`, and no lock, configuration or data file. The same command at this plan's capture revision returns the same three added paths, 0 modified and 0 deleted. | `git diff --name-only`; `git diff --numstat` | TESTABLE | Yes |
 | AC4 | The lane derivation reproduces from the instrument at the base. | Summary exactly `reader_pages_in_tree 655, accepted_on_recorded_review 56, provably_pending 5, no_recorded_acceptance 588, cannot_decide 6, official_pending_count 599`; union **593**; lane A = first `ceil(593/4) = 149` sorted pending paths; first `.claude/agents/ai-security-red-team-reviewer.md`; last `.claude/skills/file-upload-storage-architect/SKILL.md`. | `python -P -B tools/readability_acceptance/check_index.py --json --ref f490c16f…` plus the tree/index re-derivation; output quoted in the record's section 1 and in section 10 here | TESTABLE | Yes |
 | AC5 | The batch's eight pages are the next eight unread pages after batches 1-3 — verified by path, not inherited. | The batch-1/2/3 records' committed path lists, read from their own committed bytes, are exactly the 24 paths that precede this batch's eight in the base's sorted lane-A order; this batch's eight follow them, in order, with 0 gaps and 0 duplicates. | `git show` of each record at a named revision; their section 3 roster tables; section 5 below | TESTABLE | Yes |
 | AC6 | The record's per-page verdicts are complete, consistent and honest. | Exactly **4 FULL / 4 PARTIAL**; every one of the 8 pages has a verdict, a read range and (in the record's section 5) one quote line; every recorded defect names its page line; **no page carries a defect with a FULL verdict**; the four PARTIAL quote lines say "partial"; the record states that only the four FULL pages are row-eligible. | the record's sections 3-5, counted | TESTABLE | Yes |
 | AC7 | No recorded unglossed-term defect rests on a library-wide convention (the C-1 screen of 3.1). | For P1 (`WIP`) and P4 (`Phase 1.5`) the measured prevalence is below 12 of 655, so each defect stands; for P8 the recorded defect is the referent ambiguity, and the term's 23-of-655 prevalence is recorded as an observation, not as the defect. | the measurements in 3.1; the record's sections 3-4 | TESTABLE | Yes |
 | AC8 | The record's keeper handoff states the non-author test as a constraint, not as a claimed fact. | The record states that only a different agent — not the page's author, not the accepting reviewer, not any other stage of this PR, and not the coordinator — may record an acceptance row; that this batch authors no rows; and that it consumes no keeper-row ID. | the record's keeper statement; `docs/approvals/APPROVAL_REGISTER.md` L3149-L3159 (APR-101) | TESTABLE | Yes |
-| AC9 | The evidence the work produced exists, is tracked, and is where this plan says. | The record path exists at the head with the blob ID of AC2; the plan path exists with the blob ID of AC1; both are tracked. | `git ls-files`; `git rev-parse <head>:<path>` | TESTABLE | Yes |
+| AC9 | The evidence the work produced exists, is tracked, and is where this plan says. | The record path exists **at the head** with the blob ID of AC2; the plan path exists with the blob ID of AC1 **at AC1's capture revision**, and at the change head it resolves to revision 1's blob; both are tracked. | `git ls-files`; `git rev-parse <ref>:<path>` | TESTABLE | Yes |
 | AC10 | The PR body carries the capture reference and the "not decided" list, and stays structurally valid. | The posted body names the plan path and blob ID and lists what the plan does not decide; `python -P scripts/ci/check_pr_body_skills.py --body-file <posted body>` exits 0. | read-back of the posted body; the checker's exit code | TESTABLE | Yes |
 | AC11 | The repository's own checks pass at the implementation head. | `git diff --check` exit 0; `python -P scripts/validate-skills.py` exit 0; `python scripts/tests/test_validator.py` exit 0; `python -P scripts/ci/check-markdown-links.py` over the added paths reports `broken 0` and `dead 0`; `python -B scripts/check_dco.py --range <base>..<head>` reports SIGNED for every commit. | the commands and their observed output, in the record's section 7 and this plan's section 10 | TESTABLE | Yes |
 | AC12 | CI at the exact implementation head. | Every required job (`changes`, `validate-skills`, `gate-guard`) concludes success at the head that carries the capture commit; jobs that do not apply are recorded skipped, never passed. | the GitHub Actions run for that head | TESTABLE | **No — declared not verifiable at this head; see 3.3.** |
 
-**Proportionality.** Twelve criteria for a change that carries a 675-line evidence record and a
-mandated plan capture; each is one line of assertion over a command, and none requires new
+**Proportionality.** Twelve criteria for a change that carries a 675-line evidence record, a 165-line
+skills author-record file and a mandated plan capture; each is one line of assertion over a command,
+and none requires new
 machinery. The six acceptance bullets the pages were judged against are the ledger's own
 (L2843-L2862), not invented here.
 
@@ -331,11 +341,23 @@ grants the keeper **only** the append-a-withdrawal-row act (scope allowed, L5038
 keeper may append a withdrawal row that cancels a recorded acceptance row that turns out to be
 wrong … The ledger is never rewritten"). On 2026-10-15 the owner **declined to ratify** the
 carry-with-deviation of same-agent rows — keeping them with the deviation declared — and directed
-the APR-117 withdrawal-and-re-record route instead
+the owner's "**AEGIS-APR-117** withdrawal-and-re-record route" instead
 ([the owner decisions of 2026-10-15](../roadmaps/OWNER-DECISIONS-2026-10-15.md), Decision 3,
-L117-L137). The same decision refuses to extend the earlier `K-074…K-081` carry precedent. Where this
-plan says "a different agent records the rows", that is the constraint the owner's route imposes, not
-a prediction.
+L117-L137). **The compound is the owner's own term, quoted and attributed, and it names two acts under
+two different register entries — not one.** That decision's own heading is "Decision 3 — NO
+ratification; use the AEGIS-APR-117 route", its L122 reads verbatim "the **AEGIS-APR-117**
+withdrawal-and-re-record route instead", and its relayed instruction at L124 splits that route into
+"AEGIS-APR-117 withdrawal rows **plus fresh keeper rows** from the same evidence". Read against the
+register's own bytes, the split is exact, and this plan states it at the point of use rather than
+leaving it to the reader: **the withdrawal half is AEGIS-APR-117's append-a-withdrawal-row act** (scope
+allowed, L5038-L5042), and **the re-record half is a fresh recording act under AEGIS-APR-101**
+(L3149-L3159), performed by an eligible ledger keeper — a different agent from the page's author and
+from the accepting reviewer, with the coordinator excluded. **AEGIS-APR-117 grants no re-recording**,
+and the register says so by omission: its own bytes contain the string `re-record` in **none** of
+twelve dash variants and `rerecord` nowhere — **0** occurrences, measured at this revision (17.2).
+The same decision refuses to extend the earlier `K-074…K-081` carry precedent. Where this plan says
+"a different agent records the rows", that is the constraint the owner's route imposes, not a
+prediction.
 
 ## 7. The evidence this work produces, and where it lives
 
@@ -363,8 +385,14 @@ Named rather than left implicit:
    the eight paths measured today; the next implementation base re-measures them, and the named paths
    may change with the set.
 5. **It does not decide any page's wording.** The measurements in 3.1 are observations, not edits.
-6. **It does not withdraw, rewrite or re-record any historical row** — that is the APR-117 route, in
-   its own pull request.
+6. **It does not withdraw, rewrite or re-record any historical row.** The owner's compound term for
+   that route is quoted and attributed in section 6 (owner decisions of 2026-10-15, Decision 3, whose
+   L122 reads "the **AEGIS-APR-117** withdrawal-and-re-record route instead"), and the two halves are
+   split here exactly as they are split there: **withdrawing** a historical row is the
+   **AEGIS-APR-117** append-a-withdrawal-row act, and **re-recording** it is a **fresh recording act
+   under AEGIS-APR-101** by an eligible keeper — a different agent from the page's author and from the
+   accepting reviewer, with the coordinator excluded. Both halves belong to that route's own pull
+   request, not to this one.
 7. **It does not decide the Stage D disposition `D3`** recorded in the record's section 9, which is
    acknowledged there and not rebutted here.
 8. **It decides nothing about the Codex review threads or the earlier Stage D verdict**, which are
@@ -376,19 +404,53 @@ Named rather than left implicit:
 
 ## 9. This plan's own revision and how it is captured
 
-- **Capture mechanism:** this file is committed as a **tracked file**; the commit that adds it
-  (`git commit -s`, DCO-signed) is the capture, and it adds **only** this file.
+- **This is captured revision 5 of this plan.** Revision 1 was blob
+  `ac8da53e011796bc9086a355b14e4cc9fca8eb81`, added by commit
+  `44d8f43169b0dbe822a08c838d7b5249e384dd0c`; revision 2 was blob
+  `cbac865eb3541cadbffd604dc584865c6b8709ed`, added by commit
+  `2df74c860b94abdd541df390483ec2916c092f8b`, whose predecessor blob
+  `cdd7fd4583eafb25e88074ae83cac78868810026` at commit
+  `dc92153ba0f951d3d7c304241890619efaedf73b` is **superseded** and was never the plan of record;
+  revision 3 was blob `659f0794c6c2a1080015b165dee5d739248dcab4` (**75,123** bytes, 775 lines), added
+  by commit `c21dce40d0b6bd4d0a62b78aaf5ee1c9649c7387` at committer time **2026-10-16T12:00:19Z**;
+  revision 4 was blob `4a7e5ec0fd393bcb740ca1891872e8fe09e936aa` (**90,700** bytes, 931 lines), added
+  by commit `6458eae9f681266683a3dc85eb94781a44e996a7` at committer time **2026-10-16T12:42:17Z**
+  (2026-10-16T05:42:17-07:00), with its capture receipt at issue comment `6215773770` and its
+  pre-publication void copy at `6215757389`.
+  **Revisions 2, 3 and 4 are superseded** by this revision, each for a recorded reason: the second SD-B
+  verdict of 2026-10-16 (issue comment `6214669507`, `REVISE`) found four false statements about live
+  artefacts inside revision 2's captured text — 12.3(a), 12.3(b), section 10 and section 13, with the
+  same stale head also in the section 3 preamble — and returned the plan to Stage A; the third
+  (issue comment `6215491017`, `REVISE`, 2026-10-16T12:27:36Z) found that revision 3's sections 12.3(a)
+  and 15.2 stated a body-revision count their own capture round had already superseded; and the fourth
+  (issue comment `6216381457`, `REVISE`, 2026-10-16T13:19:07Z) found that revision 4's section 6 and
+  section 8 attached the word `re-record`, and a recording act, to citations of AEGIS-APR-117, and that
+  16.1's sweep claimed a cleanliness it does not reproduce under the sharp test. What revision 5
+  changes is listed exactly in 17.1, and nothing else in this file moved. **The capture is off-head at
+  this revision exactly as at revisions 3 and 4**, and 16.2 states what merging this pull request lands.
+- **Capture mechanism:** this file is committed as a **tracked file** on a **side branch** whose parent
+  chain reaches the change head `0c994d77ad491bb329e07c056065b4d9bb8401ed`; the commit
+  (`git commit -s`, DCO-signed) is the capture, and it changes **only** this file. **The change head is
+  not moved by this capture** — the PR branch still points at `0c994d77…`, which carries revision 1's
+  blob — so the capturing commit and this blob are *candidate* values, published in the PR body and in
+  a fresh immutable comment.
 - **Path:** `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md`.
 - **Captured revision:** this file's **blob ID** — Git's content hash of this exact text — computed as
   `git hash-object docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` before the commit and
   re-verified afterwards as
   `git rev-parse <capture commit>:docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md`. **The
-  value is recorded in the PR body**, and cannot appear inside this file: writing it here would
-  change the hash it names.
-- **Head at planning, and after capture:** planned at `fb3dfe34…`; the capture commit moves the
-  branch head, and the record's bytes are unchanged by it — verified by blob ID (AC2). The head that
-  carries the capture is the implementation head for the following stages; verdicts naming earlier
-  heads are void for it.
+  value is recorded in the PR body and in the capture comment**, and cannot appear inside this file:
+  writing it here would change the hash it names. The same impossibility applies to the capturing
+  commit's own ID, which is computed over these bytes.
+- **Verbatim check of the capture comment.** The comment carries this text in one fenced block. A
+  reader takes the block's lines, joins them with LF and appends one final LF, and `git hash-object`
+  over those bytes must return the blob ID. This file ends with exactly one LF, so the variant that
+  matches is **lines joined with LF plus one final LF**; a copy that drops the final newline does
+  **not** hash to this blob. The method and its observed result are recorded in the PR body.
+- **Head at planning, and after capture:** planned at `0c994d77…`; the capture commit does **not** move
+  the change head, so the bytes under audit are unchanged by it and the evidence record's blob
+  (`493c4841…`) and the skills-records file's blob (`405dfd44…`) are untouched (AC2). Verdicts naming
+  earlier heads are void for the head the capture names.
 - **Immutability:** editing this file after capture changes the blob ID and **voids** any ACCEPT that
   named the old value (L611-L616).
 
@@ -396,27 +458,28 @@ Named rather than left implicit:
 
 | # | Command | Observed result |
 | --- | --- | --- |
-| 1 | `git ls-remote origin refs/heads/docs/readability-lane-a-batch-4-20261015 refs/heads/main` | branch `fb3dfe34f3a362c4cb67bfb5bfde732ffda14922` (unmoved); `main` `38413563a843f030d3ac992b375b5db5528f2926` |
-| 2 | `git rev-parse HEAD` (fresh clone, branch checked out) | `fb3dfe34f3a362c4cb67bfb5bfde732ffda14922` |
+| 1 | `git ls-remote origin refs/heads/docs/readability-lane-a-batch-4-20261015 refs/heads/main` | branch `0c994d77ad491bb329e07c056065b4d9bb8401ed` (unmoved); `main` `38413563a843f030d3ac992b375b5db5528f2926` |
+| 2 | `git rev-parse HEAD` (fresh clone, branch checked out) | `0c994d77ad491bb329e07c056065b4d9bb8401ed` |
 | 3 | `git rev-list --count f490c16f…..38413563…` | `26` |
 | 4 | `python -P -B tools/readability_acceptance/check_index.py --json --ref f490c16f…` | `reader_pages_in_tree 655, accepted_on_recorded_review 56, provably_pending 5, no_recorded_acceptance 588, cannot_decide 6, official_pending_count 599` |
 | 5 | Re-derivation of the pending set at the base | 721 tracked `.md` paths − 65 fixtures − 1 generated report = **655** reader pages; 588 with no index row; ∪ 5 provably pending = **593**; `ceil(593/4) = 149`; lane A first `.claude/agents/ai-security-red-team-reviewer.md`, last `.claude/skills/file-upload-storage-architect/SKILL.md` |
 | 6 | Batch-1/2/3 committed path lists vs the base's sorted quarter | 24 paths, **all 24 match, in order**, 0 duplicates; this batch's eight are the next eight |
 | 7 | `python -P -B tools/readability_acceptance/check_index.py --json --ref 38413563…` (live `main`) | `reader_pages_in_tree 658, accepted_on_recorded_review 56, provably_pending 5, no_recorded_acceptance 591, cannot_decide 6, official_pending_count 602`; pending **596**, `ceil(596/4) = 149`; the same next eight paths |
 | 8 | `git grep` prevalence measurements over the 655 reader pages at the base (C-1 screen) | `WIP` 1; `work in progress` 2; `Phase 1.5` 11; `authorization matrix` 23; `JSON` 85; `matrix` 187 |
-| 9 | `git diff --name-only` / `--numstat` / `--check` at the head | one added path; `675 0`; `git diff --check` exit 0 |
+| 9 | `git diff --name-only` / `--numstat` / `--check` at the head | **three** added paths, 0 modified, 0 deleted; `675 0`, `442 0`, `165 0` (`+1282/-0`); `git diff --check` exit 0 |
 | 10 | `git rev-parse f490c16f…:<page>` × 8 | the eight blob IDs in section 1, each matching the record's own table |
 | 11 | `git rev-parse HEAD:docs/evidence/documentation/readability-lane-a-batch-4-2026-10-15.md` | `493c48414d3c97c97cdffa8bc422415284d899f9` |
-| 12 | `python -B scripts/check_dco.py --range f490c16f…..HEAD` | `OK: 3 commit(s) checked, all signed off or exempt.` (all three SIGNED) |
+| 12 | `python -B scripts/check_dco.py --range f490c16f…..HEAD` | `OK: 5 commit(s) checked, all signed off or exempt.` (all five SIGNED) |
 | 13 | `python -P scripts/validate-skills.py` | `OK: 205 skill(s) valid, 0 warning(s)` |
 | 14 | `python scripts/tests/test_validator.py` | `OK: 181 gate self-test assertion(s) passed.` |
 | 15 | `python -P scripts/ci/check_pr_body_skills.py --body-file <body before this capture>` | `PR body bound fields: OK` |
-| 16 | `python -P scripts/ci/check-markdown-links.py docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` | `files: 1   links checked: 8   anchors checked: 0   broken: 0   dead: 0` |
+| 16 | `python -P scripts/ci/check-markdown-links.py docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` | `files: 1   links checked: 9   anchors checked: 0   broken: 0   dead: 0   external-skipped: 1   other-skipped: 0` — re-run at revision 5 on **revision 4's bytes**. The **8** this row carried is the count for **revision 1's** bytes, which is what the change head carries (17.1 item 4); the ninth link is the external reference revision 3 added in 15.2 |
 
-**Two observations recorded here rather than repaired.** (a) The final commit message of the branch
-publishes intra-branch scopes `667/0`, `218/45` and `194/46`; against the same boundaries the
-measured values are `675/0`, `227/46` and `203/47` (and `494/0` for the round-1 record alone at
-`e8c8a67c…`). The message cannot be corrected without rewriting the published head, so it is recorded
+**Two observations recorded here rather than repaired.** (a) The branch's commit messages publish
+intra-branch scopes `667/0`, `218/45` and `194/46`; against the boundaries the earlier plan used the
+measured values are `675/0`, `227/46` and `203/47`, and at the change head the five per-commit
+measurands are `494/0`, `35/10`, `203/47`, `442/0` and `165/0` (section 2). A commit message cannot be
+corrected without rewriting the published head, so it is recorded
 as an observation. (b) The three commit subjects say "plan commit `e8c8a67c…`" and the body's plan
 section had a heading "Audited plan revision"; `e8c8a67c…` adds the **evidence record**, not a plan —
 there was no plan artifact at that revision. This captured plan is the plan artifact, and the naming
@@ -430,13 +493,777 @@ above is corrected here.
   dispositions recorded against them.
 - **CI at the implementation head** — owed to GitHub Actions after the capture push, and never
   self-graded (AC12, declared in 3.3).
-- **The PR body's pre-edit bytes.** The body has five recorded edits and their earlier states are not
-  retrievable to this agent; the only retained measurements of the pre-capture text are the SD-B
-  verdict's read-time SHA-256 values (full body `f34c1059…`, plan block `971118e6…`), which are
-  read-time measurements and are **not** a captured revision.
+- **The PR body's full revision history, and what it does and does not settle.** The body's
+  revisions **are** retrievable, contrary to what revision 1 assumed: `userContentEdits` returns every
+  revision with its text, and 12.3(a) below reads them by timestamp to date the 11:23:42Z swap — the
+  order the connection returns is relied on nowhere in this plan. The count is not fixed, so no revision
+  of this plan can state a number that stays true. It is recorded as a chain of readings, each with its
+  moment: **five** when revision 1 was written; **nine** as measured for revision 3, inside the window
+  **2026-10-16T11:26:13Z to 11:56:37Z**; **twelve** by revision 3's own capture commit at
+  **2026-10-16T12:00:19Z**; **thirteen** with `totalCount` 13 when re-measured with `first: 100` at
+  **2026-10-16T12:30:54Z**; and **fourteen** with `totalCount` 14 when re-measured with the same query
+  shape at **2026-10-16T13:44:08Z**, the fourteenth node being the length- and digest-neutral body edit of
+  **2026-10-16T12:46:30Z** (17.4).
+  does not settle is authorship, because GitHub shows one posting account for all of them. The SD-B
+  verdict's read-time SHA-256 values (full body `f34c1059…`, plan block `971118e6…`) remain read-time
+  measurements and are **not** a captured revision.
 - **That a future keeper is a different agent.** GitHub shows one posting account and the workflow
   records that agent identity is not separable there; the separation is a constraint on the recording
   act, checked by the process, not by a mechanism this plan can run.
 - **The correctness of the record's historical comparison claims** where they concern records on other
   open pull-request branches at revisions that may move; each such revision is named in section 5 with
   the value read at planning time.
+
+---
+
+# Part II — revision 2 additions (2026-10-16)
+
+Every line above this heading is revision 1's text with the ten replacements listed in 12.1 and the
+five corrections listed in 15.1 applied; no other byte of it changed. Sections 12 to 14 are new at
+revision 2; section 15 is new at revision 3.
+
+## 12. The bounded Stage C repair — authored here, and deliberately NOT applied
+
+**What this section is.** The SD-B verdict of 2026-10-16 (`REVISE`; issue comment `6214235532`) raised three
+blocking findings. **B-1** is answered by correcting this plan (12.1). **B-2** and **B-3** are defects in
+the PR body's skills bound field and in the tracked skills-records file; repairing them means writing
+Stage C text. That text is given **exactly** below and is **left unapplied**.
+
+**A second SD-B verdict returned `REVISE` again, and this revision answers it.** Issue comment
+`6214669507` (2026-10-16T11:39:10Z) found four false statements about live artefacts *inside this
+captured text* and returned the plan to Stage A a second time. Section 15 answers all four and lists
+every byte revision 3 changes. 12.2 now carries the disposition that makes the B-2 repair postable at
+all — revision 2 measured the +250 growth and the 5-character headroom a few lines apart and never
+joined them; 12.3 records that the (a) half is **withdrawn**, because the work it assigns was already
+done before this plan's own capture commit, and that the (b) half survives for the **tracked file
+only**, because the body half was already correct.
+
+**Why it is not applied here.** This agent holds **Stage A** on this change and was additionally asked
+to perform a bounded **Stage C** repair. The repository rule is that no agent holds two stages of one
+change, so the Stage A capture is made on a side branch and the Stage C repair is authored but not
+performed. **A later, different agent applies it.** Nothing in this section has been written into the
+PR body's skills field or into the skills-records file, and **whether the replacement text is correct
+when applied is declared NOT VERIFIABLE at this head**, because the bytes it would produce do not exist
+yet.
+
+*Gloss: bound field = one of the three PR-body sections the workflow binds by content hash (witness,
+skills, security). Row source record = the HTML-comment provenance line that binds a published skills
+row to its author, stage, round, target and source.*
+
+### 12.1 The ten exact replacements applied to revision 1's text
+
+| # | Revision 1 location | Change |
+| --- | --- | --- |
+| 1 | the `**The change.**` bullet | head, tree, commit count and path set re-derived at `0c994d77…` |
+| 2 | section 1 (`Paths this change adds`) | two added `docs/` paths becomes **three** |
+| 3 | section 2 blast-radius table | every row re-measured at `0c994d77…` |
+| 4 | section 2, the capture's own blast radius | restated for the three-path set; two un-re-derived sorted-index figures removed |
+| 5 | section 2 classification block, `Deliverables` and `Classes` | names all three deliverables |
+| 6 | section 2 classification block, `Scope contract` | exactly the **three** added `docs/` paths |
+| 7 | section 3.2 **AC3** | threshold restated for the three-path file set |
+| 8 | section 3.2 `Proportionality` | names the 165-line skills author-record file |
+| 9 | section 9 | replaced by the revision-2 capture record |
+| 10 | section 10, observation (a) | restated at the five-commit head |
+
+Two consequences are stated rather than left implicit. First, the classification block above is
+therefore **re-derived at revision 2**, not a verbatim revision-1 artifact: the class, the governing
+class and the approval path are unchanged (docs-only; none new; delivery under AEGIS-APR-039), and only
+the deliverable list and the scope contract gained the third path. Second, AC3 is now satisfiable: at
+both the change head and at this plan's capture revision, `git diff --name-only <base>..<head>`
+returns exactly three added `docs/` paths, 0 modified and 0 deleted.
+
+**No rule label is offered as authority.** The four labels this plan's reading key uses are **not
+tracked rulings anywhere in the tree**; each is stated here by its content — the rule that a term the
+library uses as a convention is not a per-page defect; the rule that the next batch is the next eight
+**unread** pages, named by path and never by index or pinned range; this lane's repair of that rule
+after a Stage D finding pinned an index; and the rule that a PARTIAL page gets no acceptance row and
+stays pending. None of the four is cited as a ruling, and the plan's authority for each is the
+reasoning given beside it.
+
+### 12.2 B-2 — the five malformed rows, and their exact replacement line
+
+**The defect, re-measured for this revision.** Five of the eighteen published rows — rows **14, 15, 16,
+17 and 18** — end their RESULT cell with the literal, unexpanded template token
+
+    " + BY + "
+
+where the six-field record shape the file itself declares requires the author. Counted by command, the
+token occurs **five times** in the PR body's skills bound field (body lines 167-171) and **five times**
+in the tracked skills-records file (file lines 121, 127, 133, 139 and 145), byte-identically in both
+places. The protocol treats this as an authoring defect and not a cosmetic one: a malformed or
+incomplete row goes back to its author for a new self-authored source revision
+(docs/delivery-workflow.md L676-L677), and the raw comparison must preserve author, target and `UNRUN`
+wording (L692-L699).
+
+**The author value used, and why it is that value.** The replacement names
+
+    DeepSeek-4.1-Flash (deepseek-flash), Stage C repair, round 3.
+
+Nothing here is invented, and the derivation is stated so that it can be checked line by line:
+
+- It is the value this **same file already carries in its four gap rows, rows 10-13**, which are not
+  malformed — so the file itself supplies the convention for a Stage C round-3 row's author field.
+- It agrees with rows 14-18's own second cell, "Stage C repair, round 3 / DeepSeek-4.1-Flash
+  (deepseek-flash), 2026-10-16".
+- It agrees with the `Row source` records published for rows 14-18, whose `agent=` field reads
+  `readability-lane-a-batch-4-stage-c (DeepSeek-4.1-Flash (deepseek-flash))`, with
+  `provenance=self-authored by the Stage C repair agent round 3`.
+
+**The substitution. Old string, in each of the five rows:**
+
+    **by:** " + BY + ".
+
+**New string, in each of the five rows:**
+
+    **by:** DeepSeek-4.1-Flash (deepseek-flash), Stage C repair, round 3.
+
+Applied to those five lines and to nothing else — **in both** places, the body's rows 14-18 (body lines
+167-171) and the file's rows 14-18 (file lines 121, 127, 133, 139, 145) — it makes all five rows well
+formed. It also **keeps the exact-copy property**: the same substitution on both sides leaves each body
+row byte-identical to its file row, so **18 of 18** still match, compared excluding only the transport
+line terminator. Repairing the skills field this way **does** move the bound-field digest, and that is
+expected — the values are in section 13. A verdict that named the old digest is void for the repaired
+body: changing the table voids the Stage F verdict even though the head has not moved
+(docs/delivery-workflow.md L656-L663).
+
+**Disposition — what is removed to make room, and why the B-2 repair is postable at all (added at revision 3).** Revision 2 measured the growth and the ceiling a few lines apart and never joined them; this is the joined form, and it is a Stage A decision because no other stage can take it. The five substitutions add **250** characters. The body is **65,531** characters against a **65,536** ceiling, so the body has **5** characters of room and the edit as first authored is **245 over**. It cannot be posted as written, and repairing the tracked file alone would break the **18 of 18** exact-copy property that 12.2 and section 13 both assert. **The disposition is to make room — not to let the exact-copy property yield — and the removal is exact, measured, and outside every bound field:**
+
+1. **Remove 404 characters of duplicated method text. Nothing measured and no verdict is lost.** The body already declares the **collapse-all** digest method twice: canonically at body L233-L237 ("Computed by the declared **collapse-all** method (…first 16 hex)") and again, in the round-2 note, at body L84-L87. Two later notes restate the same method a third and a fourth time, in parentheses, and both already open with the words "the same declared method". Delete exactly
+   ` (each field's whitespace runs, line breaks included, collapsed to single spaces and trimmed; payloads joined witness → skills → security with single newlines; SHA-256 over the UTF-8 string; first 16 hex)` — **204** characters — from body line **247**, and exactly
+   ` (each field whitespace runs, line breaks included, collapsed to single spaces and trimmed; payloads joined witness, skills, security with single newlines; SHA-256 over the UTF-8 string; first 16 hex)` — **200** characters — from body line **249**. Both lines keep their own figure and their own payload lengths, and the method stays declared twice in the same body.
+2. **Both deletions lie outside all three bound fields, so no payload moves.** Measured by construction: the body's digest is `9d8d2f26e69cca4b` before **and** after the deletion (witness 1,259 / skills 29,966 / security 40), and the post-substitution digest stays `c00e879d68f7c9c0` with skills at **30,216** — so the projection already published in the capture comment remains the correct one, and no figure in section 13 changes.
+3. **Then the five substitutions are applied in both places, as 12.2 instructs.** Body: 65,531 − 404 + 250 = **65,377** characters, **159 under** the ceiling. Tracked file: the same substitution on the same five rows, so **18 of 18** still match byte-for-byte and the exact-copy property is **kept**, not yielded.
+
+**The fallback, stated with its cost rather than applied silently.** If the applying agent judges the deduplication unacceptable, the tracked-file-only variant is postable but the exact-copy property then **yields**: **13 of 18** rows match, the five body rows 14-18 stay malformed, and F-2's conjunct stays failed for those five. That variant must be recorded as a named limitation, never presented as 18 of 18.
+
+### 12.3 B-3 — the placeholder repair WITHDRAWN as already done, and the false count in the tracked file
+
+**(a) The placeholders in the PR body — the work is already done, and this prescription is withdrawn (corrected at revision 3).** Revision 2 stated here that "Body lines 112, 116 and 118 name `REPAIRCOMMIT` and `REPAIRBLOB` where the real values belong", and gave an exact five-token substitution to apply. **That statement is false against the posted body, and the work it assigns was already complete before revision 2 was captured.** Measured by command on the posted body: `REPAIRCOMMIT` occurs **0** times and `REPAIRBLOB` occurs **0** times, and the real values are already there — `0c994d77ad491bb329e07c056065b4d9bb8401ed` at body lines 112, 116 and 118, and `405dfd44295428064a0b603639b0e30614d29da1` at body lines 112 and 116.
+
+**How the staleness happened — measured by direct body-revision comparison, not by an edit count.** The body's own revision history gives the two revisions either side of the change, and they are read by their **timestamps** below, so nothing here depends on the order the query returns. The ordering claim revision 2 made ("oldest first") is withdrawn as not reproducible: measured at 2026-10-16T12:30:54Z, a `userContentEdits` query with `first: 3` returned the three **newest** edits and one with `last: 3` the three oldest. **The count is not fixed, so no number is stated unqualified.** Queried with `first: 100`, the list held **9 revisions, `totalCount` 9** only inside the window **2026-10-16T11:26:13Z to 11:56:37Z** — the honest reading while revision 2 was drafted — and it was already **12** by this plan's revision-3 capture commit at **2026-10-16T12:00:19Z**, three of the four publishing edits preceding it. Re-measured at **2026-10-16T12:30:54Z** it returned **13 nodes with `totalCount` 13**, and re-measured again at **2026-10-16T13:44:08Z** it returns **14 nodes with `totalCount` 14**, the fourteenth node being the length- and digest-neutral body edit of **2026-10-16T12:46:30Z** (17.4). The two revisions used below are present in all of those readings:
+
+| Body revision | `REPAIRCOMMIT` | `REPAIRBLOB` | body characters | body bytes |
+| --- | ---: | ---: | ---: | ---: |
+| 2026-10-16T10:55:30Z | 3 | 2 | 65,134 | 65,306 |
+| **2026-10-16T11:23:42Z** | **0** | **0** | **65,531** | **65,705** |
+
+The swap therefore happened in the **2026-10-16T11:23:42Z** revision — the same revision that replaced the false count recorded in (b) below — which is **68 seconds before** this plan's capture commit `2df74c86…` at **11:24:50Z** and **134 seconds before** the capture comment `6214463509` at **11:25:56Z**. Revision 2's text was authored against the **10:55:30Z** body and was overtaken before its own capture. **Nothing is to be applied here.** A later agent told to apply this prescription would search the posted body for a token that is not in it. The prescription is withdrawn, and the measured state of those three lines is recorded above in its place. *(The revision-2 table's mapping was right about the body it was reading: the 10:55:30Z revision does carry 3 `REPAIRCOMMIT` and 2 `REPAIRBLOB`, five token occurrences on those three lines.)*
+
+**(b) The false count — one place, not two (corrected at revision 3).** Revision 2 stated that **both** the PR body (line 114) **and** the tracked skills-records file (line 151) state that the four posted stage records each carry **0** occurrences of the skills-table header, **0** of the string `Row source` and **0** of `WHAT:`. **The body half of that claim is false.** Body line 114 already reads the **corrected** count — "B, D and E carry **0** of `Row source` and **0** of `WHAT:`, but **Stage F 6213567787 carries 7 `Row source` (3 of them backticked) and 1 `WHAT:`**" — because the 11:23:42Z revision in (a) replaced it. **Only the tracked-file half is true**, and only **file line 151** still needs the repair.
+
+Re-measured for this revision by command (`gh api` on each comment, counting occurrences in the posted body):
+
+| Stage | Comment | skills-table header | `Row source` | of them backticked | `WHAT:` |
+| --- | --- | ---: | ---: | ---: | ---: |
+| B | `6212640376` | 0 | 0 | 0 | 0 |
+| D | `6213003590` | 0 | 0 | 0 | 0 |
+| E | `6213436600` | 0 | 0 | 0 | 0 |
+| F | `6213567787` | 0 | **7** | **3** | **1** |
+
+The skills-table-header half is true for all four. The `Row source` and `WHAT:` halves are true for B, D and E and **false for Stage F, issue comment 6213567787**, whose seven `Row source` occurrences are its own argument rather than a skills record. The substance survives — that record's own section 7 states it authored no skills row — but the count as published is false, and the plan states the corrected count here so that the tracked plan cannot repeat it either.
+
+**Exact replacement text for the tracked skills-records file, line 151 (Stage C, NOT applied).** The file does **not** wrap at this fragment: line 151 is a single line and the fragment is a contiguous substring of it. Revision 2 printed the fragment across two lines and called the break "the file's own wrapping"; that is wrong — the fragment as printed with its internal line break does **not** occur in the file, and a literal match would fail. Old fragment, **exactly as the file's bytes carry it** (one line, **192** characters, occurring once in the file):
+
+    the four posted stage records (issue comments 6212640376, 6213003590, 6213436600, 6213567787) each carry 0 occurrences of the skills-table header, 0 of the string `Row source` and 0 of `WHAT:`
+
+New fragment, replacing exactly that substring and leaving the rest of line 151 — which resumes "; the B, D and E drafting scratch files are byte-identical…" — untouched:
+
+    the four posted stage records (issue comments 6212640376, 6213003590, 6213436600, 6213567787) each carry 0 occurrences of the skills-table header; Stages B, D and E carry 0 of the string `Row source` and 0 of `WHAT:`, and Stage F carries 7 of `Row source` (3 of them backticked) and 1 of `WHAT:`, all of them its own argument rather than a skills record
+
+The new fragment is **353** characters against the old fragment's **192**, so file line 151 grows by **161** characters, from **873** to **1,034**, and the file grows by the same 161. That growth is in a **tracked file**, not in the PR body, so no length ceiling applies to it. Nothing is re-wrapped: the replacement is longer than the fragment it replaces, and the rest of the line is untouched.
+
+### 12.4 The three Stage B judgments, carried forward unchanged
+
+This revision **does not contradict** the Stage B verdict's three judgments, and it must not be read as
+reopening any of them:
+
+1. **The "a row for every stage that ran" condition is discharged, in the only honest form that
+   exists.** Rows 10-13 name **0 skills**, mark the usage **NOT RECOVERED**, and disclaim the
+   self-authored half. The workflow requires the absence to be stated (L651-L652) and forbids the
+   editor authoring another agent's account (L674-L675). **Keep them.**
+2. **The "each applicable row checked against its captured self-authored source" condition is not
+   discharged for Stages B, D, E and F, and is not dischargeable.** The word "applicable" (workflow
+   L182) makes the conjunct inapplicable to a gap row rather than failed by it. **Do not try to close it
+   by inventing rows — that is the defect.** It stays a recorded limitation for a later Stage F to weigh.
+3. **The transcription limit for rows 1-9 is acceptable but must stay stated.** Acceptable as a fixed
+   source for the exact-copy check (L681-L683 admits a retained exact capture with a content digest and
+   locator); **not** acceptable as evidence of contemporaneous self-authorship (L685-L686: a digest
+   checks captured content, not human identity).
+
+## 13. The bound-field digest, calibrated and re-stated
+
+**Method, declared rather than assumed.** Each of the three bound fields' payloads has every whitespace
+run — line breaks included — collapsed to a single space and is then trimmed; the three payloads are
+joined witness, then skills, then security, with single newlines; SHA-256 over the UTF-8 string; first
+16 hex. This is the **collapse-all** method the PR body declares.
+
+**Calibration, each from that pull request's own live body, before the method was applied here:**
+
+| PR | digest computed | value this programme records | result |
+| --- | --- | --- | --- |
+| #783 | `3913683c686e6e71` | `3913683c686e6e71` | reproduces |
+| #787 | `82ed906d2f228f0e` | `82ed906d2f228f0e` | reproduces |
+| #792 | `88300e711714200a` | `88300e711714200a` | reproduces |
+| #795 | `5fabf87b2df899e9` | `5fabf87b2df899e9` | reproduces |
+
+**4 of 4 reproduce**, so the method is pinned before it is used on this change.
+
+- **The old value:** `9d8d2f26e69cca4b` — PR #789's body as read for revision 2, **65,134
+  characters / 65,306 UTF-8 bytes** (the 2026-10-16T10:55:30Z revision, re-measured at revision 5 from
+  `userContentEdits`), payload lengths witness 1,259 / skills 29,966 / security 40. **The same digest
+  holds on the live body, which is 65,531 characters / 65,705 UTF-8 bytes**; the digest does not
+  distinguish the two reads because every edit between them lies outside all three bound fields (17.4).
+  The earlier value the SD-F verdict named, which the round-3 repair superseded, was
+  `233c8915c8bec2ec` (skills 12,023, the 2026-10-16T09:28:09Z revision).
+- **The new value after revision 2's own body edits:** `9d8d2f26e69cca4b` — **unchanged**. Revision 2 made **two** body edits, and they are attributed exactly rather than in the singular: the **2026-10-16T11:23:42Z** revision replaced the five placeholder occurrences (three `REPAIRCOMMIT`, two `REPAIRBLOB` — 12.3(a)) **and** the one count claim (12.3(b)), and is the revision that grew the body from 65,134 to 65,531 characters; the **2026-10-16T11:26:13Z** revision changed **only** the two capture values (`cdd7fd45…`→`cbac865e…`, `dc92153b…`→`2df74c86…`) and is byte-length-identical to its predecessor at 65,531 characters and 65,705 bytes. Every one of those edits lies **outside** all three bound fields, which is why the digest did not move. **Applying the 12.2 substitution would move it again**, and that is expected. Re-measured on the posted bytes rather than assumed.
+- **The projected value after the 12.2 substitution, labelled as a projection:** `c00e879d68f7c9c0`,
+  with the skills payload at **30,216** characters against **29,966** - a growth of **250**, because the
+  literal token is **10** characters and the author string is **60**, so each of the five rows gains
+  **50**. The witness and security payloads are untouched at **1,259** and **40**. It was computed by
+  applying the substitution to an in-memory copy of this PR's posted body and re-running the declared
+  method; the edit it models has **not** been posted, so the figure is a projection and never a
+  character ceiling, so a bound-field edit is the one edit it cannot take without moving the digest
+  that is at issue here. **Section 12.2 now carries the disposition that resolves this**, and it leaves
+  this projection intact: 404 characters of duplicated method text are removed from **outside** all
+  three bound fields, after which the substitution is postable at **65,377** characters, **159** under
+  the ceiling, and the exact-copy property is kept at 18 of 18. The ceiling itself is measured as a
+  **character** ceiling and not a byte one: the live body is **65,705** UTF-8 bytes and was accepted,
+  while its **65,531** characters sit 5 under the limit.
+
+**The exact-copy property, kept.** With or without the 12.2 substitution, all **18 of 18** published
+rows occur byte-for-byte in the tracked skills-records file, in published order, compared excluding only
+the transport line terminator — re-counted for this revision rather than inherited from revision 1.
+
+## 14. What revision 2 could not verify
+
+- **Everything section 12 authors.** The Stage C repair text, including the corrected author field and
+  the corrected count for the tracked file, is not applied, so its correctness once applied is not
+  observable at this head — by construction, and by the stage-separation rule that produced it.
+- **The projected post-repair digest.** It is computed by simulating an edit that has not been posted.
+  It is labelled a projection wherever it appears and is not offered as a measurement.
+- **The two sorted-index figures revision 1 carried** for the plan path in the pending order. They were
+  removed rather than repeated, because this revision did not re-derive them.
+- Plus every item already listed in section 11, which this revision does not weaken.
+
+## 15. Revision 3 — the second `REVISE`, answered (2026-10-16)
+
+**Why this revision exists.** The second independent plan audit — SD-B, issue comment `6214669507`,
+2026-10-16T11:39:10Z, drafting agent **DeepSeek-4.1-Flash (deepseek-flash)** — returned `REVISE` on four
+grounds, every one of them a false statement about a live artefact **inside** the captured revision-2
+text. It also answered the question revision 2 had left open: whether the B-2 repair was unapplied
+because of stage separation, or because it could not be applied at all. The answer is the second: Stage
+separation (workflow L546-L549) is a correct reason not to apply Stage C text, and section 12 states
+that limit honestly, but it is **not the binding constraint**. Even a different agent cannot post the
+12.2 body edit as written, because the body has 5 characters of room and the edit needs 250. The repair
+was therefore **homeless for a reason section 12 did not state**, and 12.2 now states it and disposes of
+it. The B-3 body half was homeless in the opposite direction — the work it assigned was **already done**
+— and 12.3(a) now records that and withdraws the prescription.
+
+*Gloss: SD-B = the independent plan audit, the second of the seven delivery stages; REVISE = its
+non-affirmative verdict, which returns the plan to Stage A. Homeless = the instruction names no agent
+who could carry it out as written.*
+
+### 15.1 The five corrections applied above, and every byte they cover
+
+| # | Revision 2 location | Ground the audit measured | Correction applied in revision 3 |
+| --- | --- | --- | --- |
+| 1 | section 3 preamble | the head that defined "verifiable at the implementation head" for the whole criteria table was the superseded `fb3dfe34…`, while sections 1, 2 and 3.2 all said `0c994d77…` | now the change head `0c994d77…`, with the side-branch capture stated as not moving it |
+| 2 | section 10, rows 1-2 | both reported the branch and `git rev-parse HEAD` as `fb3dfe34f3a362c4cb67bfb5bfde732ffda14922` | both now report `0c994d77ad491bb329e07c056065b4d9bb8401ed`, re-measured live with `git ls-remote` at this revision |
+| 3 | section 10, row 9 | "one added path; `675 0`", contradicting section 2's three-path `1282 / 0` | now "**three** added paths, 0 modified, 0 deleted; `675 0`, `442 0`, `165 0` (`+1282/-0`)" |
+| 4 | section 10, row 12 | `OK: 3 commit(s) checked`, the value the same command returns at `fb3dfe34…` and not at the head | now `OK: 5 commit(s) checked, all signed off or exempt.` (all five SIGNED), re-measured at `0c994d77…` |
+| 5 | section 11, the body-revision bullet | **not one of the audit's grounds**: found at revision 3 by re-reading this captured text against its own measurements — 11 stated "the body has five recorded edits and their earlier states are not retrievable to this agent", while the measured `userContentEdits` list holds **nine** revisions and returns every one with its text, so 11 contradicted 12.3(a) as well as the artefact | now states that the revisions **are** retrievable and that 12.3(a) uses them, and qualifies the count as not fixed: **five** when revision 1 was written, **nine** as measured for revision 3 |
+
+**The five corrections are complete as a set, and are the only bytes of revision 1's text that moved at
+revision 3.** Four of them answer the audit's four grounds: `fb3dfe34` occurs at exactly **three**
+places in the captured revision-2 text (the preamble and rows 1-2), and rows 9 and 12 carried their own
+stale values — five lines in all. **The fifth correction was not in the audit's grounds**: it was found
+here, by re-reading this captured revision against its own measurements, and it removes a contradiction
+this revision would otherwise have shipped. No other line above the Part II heading changed. The stale values are not erased from the
+record: they are named in this table, which is the same treatment 12.1 gave revision 1's text.
+
+**What the audit re-derived and this revision does not touch.** The Stage B audit reproduced, at the
+head and independently of this plan: the blob `cbac865e…` (60,489 bytes) and the capture commit
+`2df74c86…`; the change head `0c994d77…` and its tree; the merge base `f490c16f…`; AC3's three
+added `docs/` paths with 0 modified and 0 deleted at **both** the change head and the capture revision
+(numstat `675/0`, `165/0`, `442/0` at the head and `675/0`, `165/0`, `691/0` at the capture
+revision); the **18 of 18** exact-copy property; and the section 13 digest figures — payload lengths
+`1,259 / 29,966 / 40` and digest `9d8d2f26e69cca4b` on the live body, with the 12.2 substitution
+giving skills `30,216` and the projection `c00e879d68f7c9c0`. All of those are unchanged by revision 3,
+and the disposition in 12.2 was chosen so that they stay true: the deletions it makes are outside all
+three bound fields, so the digest and the projection survive it unchanged.
+
+### 15.2 What revision 3 could not verify
+
+- **That GitHub's ceiling is exactly 65,536 characters, from this repository's own tree.** The figure is
+  the one the plan itself names and the one the audit measured against; the arithmetic is verified
+  against it, and it is corroborated outside the tree (several public reports of a 65,536-character
+  PR-body cap, including [a ClickHouse change that truncates issue bodies to it](https://github.com/ClickHouse/ClickHouse/pull/97567)).
+  What **is** measured here is that the ceiling binds **characters, not bytes**: the live body is
+  **65,705** UTF-8 bytes and is accepted, while its **65,531** characters sit 5 under the limit.
+- **That the body's revision list is complete — a claim made only of the moment it describes.** The
+  list grows, so "not truncated" cannot be stated once and left standing. At the moment revision 2
+  recorded it — the window **2026-10-16T11:26:13Z to 11:56:37Z** — `userContentEdits`, queried with
+  `first: 100`, returned **`totalCount` 9** with **9** nodes, and 9 = 9 below the page size, so the list
+  was **not truncated at that moment**. That reading does not survive this plan's own capture round: by
+  the revision-3 capture commit at **2026-10-16T12:00:19Z** the count was already **12**; re-measured
+  with the same query at **2026-10-16T12:30:54Z** it returned **13 nodes with `totalCount` 13**; and
+  re-measured again at **2026-10-16T13:44:08Z** it returns **14 nodes with `totalCount` 14**, the fourteenth
+  node being the length- and digest-neutral body edit of **2026-10-16T12:46:30Z** (17.4). A nine-node
+  list against a `totalCount` of 14 **would** be truncated, so the earlier sentence must not
+  be read as current. What stands in its place is the equality, re-run at the moment of reading: **the list
+  is complete when the returned node count equals `totalCount` and both are below the page size** —
+  9 = 9 then, 14 = 14 now, both under 100. The API is the only witness to body revisions and no earlier
+  body byte is retained locally. The two revisions this section relies on (10:55:30Z and 11:23:42Z) are
+  both present in the 13-node reading and both are quoted by their measured token counts and lengths.
+- **That the applying agent will accept the 12.2 deletion.** It is a judgment about whether removing a
+  duplicated method restatement is worth the space it frees. The plan states the fallback and its
+  measured cost rather than deciding it for the applier; what the plan **does** decide is that the
+  exact-copy property is not silently downgraded, and that a 13-of-18 outcome may not be presented as
+  18 of 18.
+- **CI at the implementation head** — owed to GitHub Actions after the capture push, and never
+  self-graded (AC12, declared in 3.3). Unchanged from revision 2.
+- Plus every item already listed in sections 11 and 14, which this revision does not weaken.
+
+---
+
+# Part III — revision 4 additions (2026-10-16)
+
+Every line above this heading is revisions 1 to 3's text with the six corrections listed in 16.1
+applied; no other byte of it changed. Section 16 is new at revision 4.
+
+## 16. Revision 4 — the third REVISE, answered, and the off-head disposition stated
+
+**Why this revision exists.** The third independent plan audit — SD-B, issue comment `6215491017`,
+posted 2026-10-16T12:27:36Z by **DeepSeek-4.1-Flash (deepseek-flash)** — returned `REVISE` on one
+blocking finding: the captured revision-3 text stated **a body-revision count its own capture round had
+already superseded**. Section 12.3(a) read "`userContentEdits`, oldest first, **9 revisions, totalCount
+9**", and section 15.2 read "returned **`totalCount 9`** with 9 nodes, **so the list is not truncated by
+the query**". Nine was true only inside the window **2026-10-16T11:26:13Z to 11:56:37Z**; the count was
+already **12** by revision 3's own capture commit at **2026-10-16T12:00:19Z**, three of the four
+publishing edits preceding it; and a nine-node list against a live `totalCount` of 13 **would** be
+truncated, so 15.2's completeness inference asserted the opposite of what the query shows. Section 11
+had received the time-qualification at revision 3; 12.3(a) and 15.2 had not, which made the correction
+internally inconsistent with itself.
+
+*Gloss: SD-B = the independent plan audit, the second of the seven delivery stages; REVISE = its
+non-affirmative verdict, which returns the work to Stage A; `userContentEdits` = the GraphQL field that
+lists a pull request body's recorded revisions; capture = committing this plan as a tracked file so its
+exact text has an immutable content hash; blob = the content hash Git computes for one file revision;
+head = a branch's exact latest commit; off-head = the captured revision is committed on a side branch,
+so the pull request's own head does not contain it; Stage C = the implement stage.*
+
+### 16.1 The six corrections applied above, and every byte they cover
+
+| # | Revision 3 location | Defect the audit measured | Correction applied in revision 4 |
+| --- | --- | --- | --- |
+| 1 | section 12.3(a) | "9 revisions, totalCount 9" stated as a bare fact about the live artefact, and the list called "oldest first" | time-qualified and method-stated: **9** inside the window **11:26:13Z to 11:56:37Z**, already **12** by the capture commit at 12:00:19Z, **13** at 12:30:54Z; the query shape (`first: 100`) is named; the two revisions the paragraph uses are identified by timestamp, so the reading does not depend on list order |
+| 2 | section 15.2, second bullet | "returned totalCount 9 with 9 nodes, so the list is not truncated by the query" — not reproducible, and false as written against a 13-node list | the completeness claim is now made only of the moment it describes, and the standing test is the **equality** node count = `totalCount` below the page size, re-run at the moment of reading; the 12:30:54Z reading (13 = 13) is recorded beside it |
+| 3 | section 11, third bullet | "is **nine** as measured for revision 3" left the then-current count in the present tense, and the same "oldest first" ordering claim stood here too | the qualification now runs **five, then nine (11:26:13Z to 11:56:37Z), then twelve (12:00:19Z), then thirteen (12:30:54Z)**, each with its moment; the ordering claim is withdrawn here as well and the list is read by timestamp |
+| 4 | section 3.2, **AC1** and **AC9** | AC1's own threshold (`git rev-parse <head>:<path>` equals the blob the body names) returns **false** at the change head, which carries revision 1's blob; only AC3 said "at this plan's capture revision" | both now name the **capture revision** as the ref at which the equality holds, and state the head's value explicitly (revision 1's blob `ac8da53e...`) |
+| 5 | section 9, the capture record | it described revision 3 as current while this revision supersedes it, and did not name revision 3 among the superseded blobs | now the revision-4 capture record: it names revision 3's blob, byte count, line count, capturing commit and committer time, and records both superseding verdicts |
+| 6 | sections 16.2 and 16.3 | no disposition existed for the fact that the capture is **off-head**, which both prior audits recorded as a note and left to the drafter | 16.2 states the disposition, the blob that merges, and the duty a head-moving round inherits; 16.3 records what remains unverified |
+
+**Corrections 1 and 2 are the audit's ground. Corrections 3 to 6 were found here, at revision 4.**
+Correction 3 removes the inconsistency the ground itself names — its complaint was that section 11 got
+the time-qualification and 12.3(a) and 15.2 did not, and extending section 11's chain to the fresh
+reading is what makes the three statements one statement. Correction 4 is the note the audit recorded
+and expressly left to the drafter ("the one criterion a reader can run and get a false answer from").
+Correction 5 is mechanical: the capture record must describe the revision it is in. Correction 6 is the
+second note; the audit asked for a disposition, not a fix, and 16.2 gives one. **No superseded value is
+erased:** each is named in the table above, which is the same treatment 12.1 gave revision 1's text and
+15.1 gave revision 2's.
+
+**What the audit verified, and what this revision re-measured rather than inherited.** Every figure
+below was re-derived by command while writing revision 4, and none of them moved:
+
+- the **404-character deletion** the 12.2 disposition authors: the two strings are **204** and **200**
+  characters, each occurs **exactly once**, at body line **247** and body line **249**; the three bound
+  fields occupy body lines **148-192** (skills), **196-201** (security) and **218-231** (witness), so
+  both deletions lie **outside all three**; the body is **65,127** characters after them and the digest
+  is **unchanged** at `9d8d2f26e69cca4b`;
+- the **five substitutions**, each gaining exactly **50** characters, giving **65,377** characters,
+  **159 under** the ceiling, digest `c00e879d68f7c9c0` with the skills payload at **30,216**;
+- the ceiling binds **characters, not bytes**: the live body is **65,705** UTF-8 bytes and is accepted,
+  while its **65,531** characters sit 5 under the limit;
+- the **18 of 18** exact-copy property holds now and holds after the repair, and the file-only fallback
+  is **13 of 18**, as 12.2 states with its cost and does not apply;
+- the **digest method** self-pins **4 of 4** on the sibling pull requests, each read from its own live
+  body and normalised to LF after fetch: #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`,
+  #792 `88300e711714200a`, #795 `5fabf87b2df899e9`; #789 then reproduces `9d8d2f26e69cca4b` with
+  payload lengths **1,259 / 29,966 / 40**;
+- the **instrument** at the base reads `reader_pages_in_tree 655, accepted_on_recorded_review 56,
+  provably_pending 5, no_recorded_acceptance 588, cannot_decide 6, official_pending_count 599`, and at
+  the live `main` tip `658 / 56 / 5 / 591 / 6 / 602`; pending **593** and **596**, `ceil(593/4) = 149`
+  and `ceil(596/4) = 149`;
+- the lane A records of batches 1 to 4 concatenate to **exactly lane A's first 32 paths, in order, with
+  0 duplicates**, and the eight paths section 5 names for the next batch are **exactly lane A's paths
+  33 to 40**;
+- the **APR-117 sweep**, re-run at revision 5 in the **sharp** form the fourth SD-B verdict requires —
+  does any text attach the word `re-record`, or any recording act, to a citation of `AEGIS-APR-117`?
+  Swept over revision 4's 931 lines it returns **two** sites, **not zero**: section 6's line ("the
+  APR-117 withdrawal-and-re-record route instead") and section 8's item 6 ("that is the APR-117
+  route") — the two the audit named. The weaker pairing form this bullet previously published
+  ("`APR-117` is offered nowhere as authority to record") was true and **did not reproduce** the sharp
+  test's answer, so it is **withdrawn here as incomplete** rather than repeated. Both sites are repaired
+  at revision 5, and the full sweep — over this plan, the two tracked evidence files and the PR body,
+  with every site named and each one's disposition — is recorded in 17.2.
+
+### 16.2 The off-head capture, and what merging this pull request lands
+
+**The fact, re-derived by command.** The plan path resolves to **revision 1's** blob at the change head,
+not to the revision the PR body names: `git rev-parse
+0c994d77ad491bb329e07c056065b4d9bb8401ed:docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md`
+returns `ac8da53e011796bc9086a355b14e4cc9fca8eb81`, while the revision-4 capture is committed on the
+side branch `docs/readability-lane-a-batch-4-plan-rev4-20261016` and the revision-5 capture on
+`docs/readability-lane-a-batch-4-plan-rev5-20261016`, each of whose parent chains reaches that head.
+The branch that carries the pull request is `docs/readability-lane-a-batch-4-20261015`, and it is
+**not** where a capture lands. Neither audit made this a ground; both recorded it as a note and left
+the disposition to this stage, and this is that disposition.
+
+**The disposition: the accepted revision is off-head, and what merges is revision 1.** Merging this pull
+request as it stands lands **revision 1's blob `ac8da53e...`** at that path — the text revisions 2, 3
+and 4 exist to supersede — while the PR body advertises revision 4 as the plan of record. That is a
+disclosed property of capturing on a side branch, not a falsehood; but revision 1 does not itself
+disclose its supersession, because its own section 9 tells the reader that "the head that carries the
+capture is the implementation head for the following stages", which the PR body and the later revisions
+now contradict. **So the of-record revision is named in the PR body and in the capture comment, and this
+section is where the plan states, in its own bytes, which revision the pull request carries.**
+
+1. **The revision this plan's audits bind is the side-branch blob named in the PR body**, not the blob
+   at the change head.
+2. **What merges under this pull request is revision 1's blob
+   `ac8da53e011796bc9086a355b14e4cc9fca8eb81`** unless and until a later, separate round carries a later
+   revision into the pull request's own branch.
+3. **Carrying a later revision into the pull request is a head-moving act, and it is NOT performed
+   here.** It would move the change head and void the head-bound verdicts, and it would make this text
+   stale in exactly the way this revision is answering: at a head carrying this file, section 2's
+   file-set row, its per-commit scopes and its 1282/0 total, section 10's rows 1-2, 9 and 12, and AC1,
+   AC3 and AC9 all change — the plan path would become **modified** rather than added, and the commit
+   and sign-off counts would both grow. **A round that moves the head must re-derive those values at the
+   head it produces**, and must re-audit there; that is a duty this section states, not a forecast it
+   makes.
+4. **The values this plan binds as final are bound to a named head, and this round moves none.** The
+   head `0c994d77...`, the diff scope, the commit count (**5**) and the sign-off count (`OK: 5 commit(s)
+   checked, all signed off or exempt.`) recorded above are true **at that head** and at this capture
+   revision. **This round contains no head-moving commit** — the capture lands on a side branch and the
+   change head is unmoved — so nothing here supersedes them. A rule of this programme holds that a plan
+   may not bind a head, a diff scope, a commit count or a sign-off count as a final value **in the same
+   round as a head-moving commit**; this round moves no head, and the duty that any later head-moving
+   round inherits is stated in item 3 above, by content rather than by any label.
+
+**What this disposition does not do.** It does not move the head, does not edit the pull request's
+branch, does not apply the Stage C repair text of section 12, decides no page's acceptance, and confers
+no merge authority. It records, inside the plan, which revision the pull request carries and which
+revision its audits bind, and it names the one act that would change that together with its cost.
+
+### 16.3 What revision 4 could not verify
+
+- **That GitHub's body ceiling is exactly 65,536 characters.** Unchanged from 15.2 and from the audit's
+  own concession: the negative **is** measured — the live body is **65,705** UTF-8 bytes and is
+  accepted, so the ceiling cannot bind bytes — while the exact figure is not, because testing it means
+  editing the body. The plan keeps the figure it was audited against and claims only what it measured.
+- **That the page size behind revision 2's original `userContentEdits` reading was `first: 100`.** The
+  page size now recorded in 12.3(a) and 15.2 is the one **this revision** used; revision 2 did not state
+  its own, which is exactly why 15.2's completeness inference is now stated as an equality to be re-run
+  rather than as a number.
+- **That no further body revision will be recorded after the 2026-10-16T13:44:08Z reading.** The count is not
+  fixed; every figure this revision records carries the moment it was taken for that reason. It was
+  **13** at 12:30:54Z and **14** at 2026-10-16T13:44:08Z, and the chain is recorded in sections 11, 12.3(a), 15.2
+  and 17.4. This revision's own PR-body edit lands **after** this capture and adds a fifteenth node, so
+  the number to use is the one a reader's own query returns.
+- **That the eight pages were read "whole, line by line, in one read"**, and every other item already
+  listed in sections 11, 14 and 15.2, none of which this revision weakens.
+
+---
+
+# Part IV — revision 5 additions (2026-10-16)
+
+Every line above this heading is revisions 1 to 4's text with the ten corrections listed in 17.1
+applied; no other byte of it changed. Section 17 is new at revision 5.
+
+## 17. Revision 5 — the fourth `REVISE`, answered, and the sharp APR-117 sweep
+
+**Why this revision exists.** The fourth independent plan audit — SD-B, issue comment `6216381457`,
+posted **2026-10-16T13:19:07Z** by **DeepSeek-4.1-Flash (deepseek-flash)** — returned `REVISE` on one
+blocking ground: **the captured revision-4 text attaches the word `re-record`, and a recording act, to
+citations of `AEGIS-APR-117` at two sites** — section 6's line ("the APR-117 withdrawal-and-re-record
+route instead") and section 8's item 6 ("that is the APR-117 route") — while the register's own bytes
+contain the string `re-record` in **none** of twelve dash variants and `rerecord` nowhere, and
+AEGIS-APR-117's entry (L5016-L5049) grants **only** the append-a-withdrawal-row act. Section 16.1
+published the sweep as "clean" in a **weak** pairing form that cannot catch this. The audit recorded two
+further items and made neither a ground: section 10 row 16's link count (a stale 8 against a measured
+9), and an imprecision in the revision-4 receipt's account of the void comment `6215757389`. All three
+are answered here.
+
+*Gloss: SD-B = the independent plan audit, the second of the seven delivery stages; REVISE = its
+non-affirmative verdict, which returns the work to Stage A; the **sharp test** = the question "does any
+text attach the word `re-record`, or any recording act, to a citation of AEGIS-APR-117?", which catches
+a recording name welded to the entry even when the entry is not offered as authority to record; the
+**weak form** = the narrower question "is APR-117 offered as authority to record?", which returns clean
+on text the sharp test catches; register = `docs/approvals/APPROVAL_REGISTER.md`, the tracked file
+holding the numbered approval entries; eligible keeper = the recording agent AEGIS-APR-101 requires to
+be a different agent from the page's author and from the accepting reviewer, with the coordinator
+excluded; bound field = one of the three PR-body sections (witness, skills, security) whose payload a
+later verdict hashes; capture = committing this plan as a tracked file so its exact text has an
+immutable content hash; off-head = the captured revision is on a side branch, so the pull request's
+head does not contain it.*
+
+### 17.1 The ten corrections applied above, and every byte they cover
+
+| # | Revision 4 location | Defect measured at revision 5 | Correction applied in revision 5 |
+| --- | --- | --- | --- |
+| 1 | section 6, the owner-route paragraph | **the audit's ground, site 1**: the paragraph welded the recording name to AEGIS-APR-117 — "and directed the APR-117 withdrawal-and-re-record route instead" — a few lines after stating correctly that AEGIS-APR-117 grants only the append-a-withdrawal-row act | the owner's compound is kept **quoted and attributed** ("the owner's \"**AEGIS-APR-117** withdrawal-and-re-record route\""), and the same paragraph now **splits it at the point of use**: the withdrawal half is AEGIS-APR-117's append-a-withdrawal-row act (L5038-L5042), and **the re-record half is a fresh recording act under AEGIS-APR-101** (L3149-L3159) by an eligible keeper; the register's measured **0** occurrences of `re-record` are stated there |
+| 2 | section 8, item 6 | **the audit's ground, site 2**: "It does not withdraw, rewrite or re-record any historical row — that is the APR-117 route" named the recording act itself as the APR-117 route | the same split is stated at the second site: **withdrawing** is AEGIS-APR-117, **re-recording is a fresh recording act under AEGIS-APR-101** by an eligible keeper; the owner's compound is attributed to Decision 3 and quoted by its L122 |
+| 3 | section 16.1, the sweep bullet | **the audit's ground, the incomplete claim**: the sweep was published as "clean" in the weak pairing form, which does not reproduce under the sharp test; swept sharply, revision 4 has **two** sites | the bullet now states the **sharp** result — two sites, named — records that the weak form is **withdrawn as incomplete**, and points to 17.2, where the whole sweep is reproduced site by site |
+| 4 | section 10, row 16 | **the audit's measured secondary discrepancy**: row 16 published `links checked: 8`, which is revision 1's bytes, not revision 4's | re-run at revision 5 on revision 4's bytes: `files: 1   links checked: 9   anchors checked: 0   broken: 0   dead: 0   external-skipped: 1   other-skipped: 0`, with the reason for the difference named (revision 3 added the external reference in 15.2) |
+| 5 | section 13, the "old value" bullet | the bullet published a byte count with no moment — "PR #789's live body as read for this revision, 65,306 bytes" — and 65,306 is the **10:55:30Z** revision's byte count, while the live body is 65,705 bytes | time-qualified and measured: 65,134 characters / 65,306 UTF-8 bytes is the read taken **for revision 2** (the 10:55:30Z revision); the live body is 65,531 characters / 65,705 bytes; the digest is the same on both because no edit between them lies inside a bound field |
+| 6 | section 11, the body-revision bullet | the chain ended at thirteen (12:30:54Z) and did not carry the fourteenth reading | the chain now runs five, nine, twelve, thirteen, **fourteen**, each with its moment and its query shape, and names the fourteenth node as the length- and digest-neutral edit of 12:46:30Z |
+| 7 | section 12.3(a) | the same staleness in the (a) paragraph, whose newest reading was 13 | the `2026-10-16T13:44:08Z` reading (14 = 14) is added beside the 12:30:54Z one, with `first: 100` still named |
+| 8 | section 15.2, second bullet | its clause "13 nodes with `totalCount` 13" and its "13 = 13 now" were the newest readings when written and are not any more | both now run to the **fourteen**-node reading, and the standing test is unchanged: node count = `totalCount`, below the page size, re-run at the moment of reading |
+| 9 | section 16.3 | it claimed no further body revision would be recorded after the 12:30:54Z reading, which the 12:46:30Z node falsifies | the moment is the reading taken at `2026-10-16T13:44:08Z`, the 13-then-14 chain is stated, and so is the fact that this revision's own body edit adds a fifteenth node |
+| 10 | sections 9 and 16.2 | both describe the revision-4 capture as current | section 9 is now the revision-5 capture record (revision 4's blob, byte count, line count, capturing commit, committer time and receipt comment among the superseded set); 16.2 names both side branches, and the PR body now advertises revision 5 |
+
+**Corrections 1 to 3 are the audit's ground. Correction 4 is the audit's secondary discrepancy.
+Corrections 5 to 10 were found here, at revision 5**, by re-reading this captured text against its own
+measurements: correction 5 time-qualifies a figure that was true when written and is not true of the
+live artefact, which is the class of defect the third verdict made a ground of; corrections 6 to 9 carry
+the count chain forward instead of leaving a superseded number in the present tense; correction 10 is
+mechanical, because the capture record must describe the revision it is in. **No superseded value is
+erased:** each is named in the table above, which is the same treatment 12.1 gave revision 1's text,
+15.1 gave revision 2's and 16.1 gave revision 3's.
+
+### 17.2 The sharp APR-117 sweep, run in full, with every site named
+
+**The test, stated as the question it is.** *Does any text attach the word `re-record`, or any
+recording act, to a citation of `AEGIS-APR-117`?* It is a question about **attachment**, not about the
+mere co-occurrence of two strings on one line, so every co-occurrence the mechanical scan returns is
+inspected here and each one is either named as a site or explained as an artifact of the scan.
+
+**The warrant: what the register's own bytes say.** Measured at revision 5 by reading the blob directly
+(`git cat-file blob 7b2a0411fc4c408c713d4a4959fd192f3f978c01`, **408,612** bytes, byte-for-byte, no
+text-mode conversion, so the line-ending filter cannot change the answer), the blob is **identical at
+the base and at the change head**, and the string `re-record` occurs in it **not once**:
+
+| Dash variant used in `re<variant>record` | Occurrences |
+| --- | ---: |
+| hyphen U+002D | 0 |
+| U+2010 hyphen | 0 |
+| U+2011 non-breaking hyphen | 0 |
+| U+2012 figure dash | 0 |
+| U+2013 en dash | 0 |
+| U+2014 em dash | 0 |
+| U+2015 horizontal bar | 0 |
+| U+2212 minus sign | 0 |
+| U+FE58 small em dash | 0 |
+| U+FE63 small hyphen-minus | 0 |
+| U+FF0D fullwidth hyphen-minus | 0 |
+| U+00AD soft hyphen | 0 |
+| `rerecord`, no separator at all | 0 |
+| **Total** | **0** |
+
+The only `re…record`-shaped matches in the whole register are ordinary words — "are recorded",
+"recorded", "recording" — none of them prefixed with `re-`. **AEGIS-APR-117's entry (L5016-L5049,
+scope allowed L5038-L5042) therefore grants no re-recording**, and any text that says otherwise about
+that entry is wrong about the register, however it is worded.
+
+**What the owner's own documents say, so the fix is not read as a correction of the owner.** The
+OWNER-DECISIONS-2026-10-15 file (blob `f2010a750f36fb6d290612096d945ee63a7b2426`, **26,109** bytes)
+carries **4** occurrences of `re-record`, all inside Decision 3 (L117-L137): its heading is "Decision 3
+— NO ratification; use the AEGIS-APR-117 route", its L122 is "the **AEGIS-APR-117**
+withdrawal-and-re-record route instead", its L130-L131 records that the rows are "withdrawn and
+re-recorded by a different, eligible keeper from the same evidence", and its own gloss at L138-L140
+confines AEGIS-APR-117 to cancelling a wrong row. The compound is the owner's; the plan quotes it, and
+what revision 5 adds is the split the owner's own L124 already makes ("AEGIS-APR-117 withdrawal rows
+**plus fresh keeper rows**").
+
+**The sweep over this plan, both revisions.**
+
+| Text swept | Size | Sites attaching `re-record` or a recording act to a citation of `AEGIS-APR-117` | Disposition |
+| --- | --- | --- | --- |
+| revision 4's blob `4a7e5ec0fd393bcb740ca1891872e8fe09e936aa` | 90,700 bytes, 931 lines | **2** — section 6's line and section 8 item 6's line | both repaired at revision 5 (17.1 items 1 and 2) |
+| revision 5's blob (this file) | recorded in the capture receipt, because this file cannot contain its own hash | see the two-part statement below | — |
+
+**The revision-5 result, in two parts, so that no reader has to interpret a single number.** (a) The
+string `re-record` occurs in this file on **32** lines, and exactly **two** of those lines attach
+it to a citation of `AEGIS-APR-117`: section 6's owner quotation (line `344`) and section 8's
+item 6 (line `388`). At both, the enclosing sentence names the **re-record** half as a fresh
+recording act under **AEGIS-APR-101** by an eligible keeper and confines the AEGIS-APR-117 citation to
+the append-a-withdrawal-row act. Every other occurrence of the string on those lines is this section's,
+or the audit record's, own discussion **about** the phrase — a statement about it, never a route
+attributed to the entry. (b) A site that leaves a recording act **inside** AEGIS-APR-117's
+grant — the defect the sharp test exists to catch, and the only thing the test is for — occurs **0**
+times in this file. The audit's remedy requires the owner's compound to be **kept** where it is needed,
+quoted and attributed, so a sweep that returned zero `re-record` strings in this file would mean the
+remedy had been answered by deleting the owner's words, which it is not.
+
+**The sweep over the two tracked evidence files at the change head — measured, named, and NOT repaired
+in this round.** Both files stand at the change head `0c994d77…`, and both carry one site:
+
+| File at the head | Blob | Size | Site | Why it is recorded rather than repaired here |
+| --- | --- | --- | --- | --- |
+| `docs/evidence/documentation/readability-lane-a-batch-4-2026-10-15.md` | `493c48414d3c97c97cdffa8bc422415284d899f9` | 58,912 bytes, 676 lines | **L66-L68**: "the earlier same-agent rows of batches 1 and 2 follow the owner's **AEGIS-APR-117** route (*AEGIS-APR-117* is the owner's withdrawal-and-re-record decision: rows recorded by the same agent that read the page are withdrawn and re-recorded by a different agent from the same evidence)" | it is a tracked file **at the change head**; editing it is a head-moving act, which this round does not perform (16.2 item 3), and its blob `493c4841…` is bound by section 7 and by AC2 |
+| `docs/evidence/documentation/readability-lane-a-batch-4-skills-records-2026-10-16.md` | `405dfd44295428064a0b603639b0e30614d29da1` | 27,162 bytes, 166 lines | **L37**: "the owner's AEGIS-APR-117 route governs withdrawal and re-record of same-agent rows" | the same head-bound reason; and this row is the byte-for-byte source of the PR body's row 3, so repairing one side alone would break the **18 of 18** exact-copy property |
+
+Both sites are of the same kind as the two the audit found in this plan, and neither is repaired by
+this capture. They are **recorded here so that the next round inherits them as named work rather than as
+a fresh finding**, and the next head-moving round is the round that can repair them.
+
+**The sweep over the PR body — two sites, one repaired and one deliberately not.**
+
+| PR body line | Bound field? | Text | Disposition at revision 5 |
+| --- | --- | --- | --- |
+| L26 | **outside** all three bound fields | "it does not withdraw, rewrite or re-record any historical row (that is the AEGIS-APR-117 route, in its own pull request)" | **repaired at revision 5**, in a **length-neutral** rewrite (see below), because the same defect the audit found in the plan stood in the body too |
+| L156 | **inside** the skills bound field, row 3 | "the owner's AEGIS-APR-117 route governs withdrawal and re-record of same-agent rows" | **NOT repaired**, for two measured reasons: editing a bound field moves the bound-field digest `9d8d2f26e69cca4b` and voids every verdict that named it (L656-L663), and the row is the byte-for-byte copy of the tracked file's L37, so repairing the body alone would break the **18 of 18** exact-copy property and repairing both means editing a file at the change head |
+
+The reason the body's L26 repair is **length-neutral** is itself measured and not stylistic: the body is
+**65,531** characters against a **65,536** ceiling, so it has **5** characters of room (12.2), and the
+404-character removal plus the five substitutions in 12.2 are computed from that exact count. A repair
+that changed the body's length would invalidate 12.2's arithmetic and could push the body past the
+ceiling; a repair that changed a bound field would move the digest. The replacement therefore keeps the
+character count of the whole body **identical**, and its measured effect is recorded in the capture
+receipt: characters **65,531 → 65,531**, bytes **65,705 → 65,705**, bound-field digest
+`9d8d2f26e69cca4b` **unmoved**, and the 404-character deletion still exactly 404 characters at body
+lines 247 and 249.
+
+**The sweep over every comment on this pull request — 21 issue comments and 6 review comments.**
+
+| Comments | Finding | Disposition |
+| --- | --- | --- |
+| `6214405566`, `6214463509` (revision-2 captures), `6214979456`, `6214990611`, `6215035887` (revision-3 captures), `6215757389` (the void copy) and `6215773770` (the revision-4 receipt) | each **carries a copy of an earlier revision's plan text**, and in each copy the two sites appear as the plan's own lines (the scan returns one line pair per comment) | the copies are **superseded** by revision 5; an earlier comment is never edited, so they are named here as superseded text rather than repaired |
+| `6215491017` (the third SD-B verdict) and `6216381457` (the fourth) | each **quotes the two lines in order to name them as the defect** | correct as written: a verdict that names a defect must quote it |
+| `6211547391` (the first SD-B verdict) | two lines carry both strings as the verdict's own prose about the two entries, not as a route attribution | no attachment; recorded as a scan artifact |
+| the remaining 11 issue comments and all **6** review comments | **0** lines carrying both strings | — |
+
+**The sweep's own limit, stated rather than left implicit.** It is a scan by line, inspected by hand at
+every hit; a site that attached `re-record` to a citation of AEGIS-APR-117 across two lines, or by an
+unspelled implication, could evade it. What the scan does establish is that no such attachment survives
+in this file, and that every attachment the same scan finds elsewhere is named above with its
+disposition.
+
+### 17.3 The void comment's substitution account, corrected
+
+**What was said, and where it actually stands.** The imprecise sentence is at **line 7 of issue comment
+`6215773770`** — the revision-4 receipt — which says that "every literal occurrence of the strings
+`0c994d77ad491bb329e07c056065b4d9bb8401ed` (8 times) and `6458eae9f681266683a3dc85eb94781a44e996a7`
+(5 times, inside `REPAIR6458eae9…`) in the plan was overwritten with the 40-character capturing-commit
+ID". **The subject of that substitution is the placeholder name, not the value it was replaced by**:
+the generator searched the plan for the names `HEAD`, `COMMIT` and `BLOB` and replaced each with a
+40-character ID. The void comment `6215757389` itself carries **no account of its own substitution** —
+measured: it contains neither the string `91,338`, nor `+638`, nor "not verbatim", nor "the generator
+that assembled it" — so the account to correct is the receipt's, and this is that correction.
+
+**The corrected account, measured by direct comparison of the two byte strings.** The void comment's
+fenced block and revision 4's blob agree on **932 lines** (the line count) and differ on **exactly 12
+lines**; the block is **91,338** bytes against the blob's **90,700**, a delta of **+638**, decomposed
+exactly and completely:
+
+| Placeholder name in the plan | Occurrences | Replaced by | Length change | Total |
+| --- | ---: | --- | ---: | ---: |
+| `HEAD` (4 characters) | 8 | the head ID `0c994d77ad491bb329e07c056065b4d9bb8401ed` (40) | +36 each | **+288** |
+| `COMMIT` (6 characters, inside `REPAIRCOMMIT`) | 5 | the capturing-commit ID `6458eae9f681266683a3dc85eb94781a44e996a7` (40) | +34 each | **+170** |
+| `BLOB` (4 characters, inside `REPAIRBLOB`) | 5 | revision 4's blob ID `4a7e5ec0fd393bcb740ca1891872e8fe09e936aa` (40) | +36 each | **+180** |
+| | | | | **+638** |
+
+288 + 170 + 180 = **638**, which is the measured byte delta, and every one of the 12 differing lines is
+explained by one of the three rows. The substance the receipt asserted is confirmed and unchanged: the
+void copy is **not** verbatim, it is **91,338** bytes against **90,700**, the extraction check caught
+it, the comment is named **VOID as a capture**, and it was **neither edited nor deleted**
+(`updated_at` = `created_at` = 2026-10-16T12:43:31Z). **The correction cannot be made by editing
+`6215773770`** — the programme's rule is that an earlier comment is never edited — so it is stated
+here, in the artifact that outlives the comment, and again in the revision-5 receipt.
+
+### 17.4 The body-revision count, re-stated with its moment and method
+
+**The method, named:** GraphQL `userContentEdits(first: 100)` on this pull request, each retained node
+read by its `editedAt` timestamp and its text. The order the connection returns is relied on nowhere.
+
+**The chain, each reading with the moment it was taken:** **five** when revision 1 was written;
+**nine** inside the window **2026-10-16T11:26:13Z to 11:56:37Z**; **twelve** by revision 3's capture
+commit at **2026-10-16T12:00:19Z**; **thirteen** at **2026-10-16T12:30:54Z**; and **fourteen**, with
+`totalCount` 14, at **2026-10-16T13:44:08Z**. The fourteenth node is the body edit of
+**2026-10-16T12:46:30Z**, and it is **exactly neutral** — measured, not assumed:
+
+| Body revision (`editedAt`) | Characters | UTF-8 bytes | collapse-all digest | Payloads (witness / skills / security) |
+| --- | ---: | ---: | --- | --- |
+| **2026-10-16T12:46:30Z** (the fourteenth node, and the newest) | 65,531 | 65,705 | `9d8d2f26e69cca4b` | 1,259 / 29,966 / 40 |
+| 2026-10-16T12:00:31Z | 65,531 | 65,705 | `9d8d2f26e69cca4b` | 1,259 / 29,966 / 40 |
+| 2026-10-16T11:59:51Z | 65,531 | 65,705 | `9d8d2f26e69cca4b` | 1,259 / 29,966 / 40 |
+| 2026-10-16T11:59:40Z | 65,531 | 65,705 | `9d8d2f26e69cca4b` | 1,259 / 29,966 / 40 |
+| 2026-10-16T11:56:37Z | 65,531 | 65,705 | `9d8d2f26e69cca4b` | 1,259 / 29,966 / 40 |
+| 2026-10-16T11:26:13Z | 65,531 | 65,705 | `9d8d2f26e69cca4b` | 1,259 / 29,966 / 40 |
+| 2026-10-16T11:23:42Z | 65,531 | 65,705 | `9d8d2f26e69cca4b` | 1,259 / 29,966 / 40 |
+| **2026-10-16T10:55:30Z** (the read taken for revision 2, whose byte figure section 13 time-qualifies) | 65,134 | 65,306 | `9d8d2f26e69cca4b` | 1,259 / 29,966 / 40 |
+| 2026-10-16T09:28:09Z (the Stage A re-plan) | 37,801 | 37,973 | `233c8915c8bec2ec` | 1,259 / 12,023 / 40 |
+| 2026-10-16T08:19:27Z | 35,323 | 35,513 | `086faa099024ee57` | 1,259 / 6,185 / 40 |
+| 2026-10-16T02:01:58Z | 26,731 | 26,815 | `086faa099024ee57` | 1,259 / 6,185 / 40 |
+| 2026-10-16T01:46:26Z | 23,492 | 23,560 | `086faa099024ee57` | 1,259 / 6,185 / 40 |
+| 2026-10-16T01:43:34Z | 22,879 | 22,945 | `086faa099024ee57` | 1,259 / 6,185 / 40 |
+| 2026-10-16T01:42:55Z (the oldest retained) | 22,423 | 22,485 | `086faa099024ee57` | 1,259 / 6,185 / 40 |
+
+All **14** retained revisions are listed above; the figures were measured node by node, not inferred from
+the ones that repeat. **Seven** of the 14 (11:23:42Z through 12:46:30Z) carry identical figures; **one**
+(10:55:30Z) carries the same digest at a different size, which is exactly why section 13's byte figure
+needed its moment added to it; and the three oldest differ from each other in size while sharing a
+digest, which is the same property one level down. Two consequences are stated rather than left to be
+discovered: **the count is not fixed** — this revision's own PR-body edit lands after this capture and
+adds a fifteenth node — and **the digest does not date the body**, so a figure quoted without its
+`editedAt` moment cannot be checked against anything.
+
+### 17.5 What the audit verified, re-measured at this revision rather than inherited
+
+- the **404-character deletion** the 12.2 disposition authors: the two strings are **204** and **200**
+  characters, each occurs **exactly once**, at body line **247** and body line **249**; the three bound
+  fields are body lines **148-192** (skills), **196-201** (security) and **218-231** (witness), so both
+  deletions lie **outside all three**; the body is **65,127** characters after them and the digest is
+  **unchanged** at `9d8d2f26e69cca4b`;
+- the **five substitutions**, each gaining exactly **50** characters: skills **29,966 → 30,216**, the
+  body **65,377** characters after the deletion and the substitution, **159 under** the ceiling, digest
+  `c00e879d68f7c9c0` — the plan's published projection reproduces exactly from the plan's own named
+  inputs (the live body, the literal token, the 60-character replacement string, the declared method);
+- the **live-body digest** `9d8d2f26e69cca4b` with payload lengths **1,259 / 29,966 / 40**, and the
+  **digest method self-pinned 4 of 4** on the sibling pull requests, each read from its own live body:
+  #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`, #792 `88300e711714200a`, #795
+  `5fabf87b2df899e9`;
+- the ceiling binds **characters, not bytes**: the live body is **65,705** UTF-8 bytes and is accepted,
+  while its **65,531** characters sit 5 under the stated limit;
+- the **18 of 18** exact-copy property holds now — all 18 published body rows occur byte-for-byte in
+  the tracked skills-records file (blob `405dfd44…`) in published order, compared excluding only the
+  transport line terminator — and the file-only fallback is **13 of 18**, stated with its cost and
+  **not applied**;
+- the **instrument** at the base reads `reader_pages_in_tree 655, accepted_on_recorded_review 56,
+  provably_pending 5, no_recorded_acceptance 588, cannot_decide 6, official_pending_count 599`, and at
+  the live `main` tip `658 / 56 / 5 / 591 / 6 / 602`; pending **593** and **596**, `ceil(593/4) =
+  149` and `ceil(596/4) = 149`;
+- the lane A records of batches 1 to 4 concatenate to **exactly lane A's first 32 paths, in order, with
+  0 duplicates**, and the eight paths section 5 names for the next batch are **exactly lane A's paths
+  33 to 40**;
+- the **C-1 screen** of 3.1, re-counted by page over the 655 reader pages at the base: `WIP` (whole
+  word) **1**; `work in progress` **2**; `Phase 1.5` **11** (**4** under `.claude/skills/`);
+  `authorization matrix` case-insensitive **23** (**19** under `.claude/skills/`); `JSON` whole
+  word **85** (**30**); `matrix` whole word case-insensitive **187** (**114**) — each figure below or
+  3.1 disposes;
+- the **change head is unmoved** and the capture does not touch the pull request's branch:
+  `git ls-remote origin refs/heads/docs/readability-lane-a-batch-4-20261015` returns
+  `0c994d77ad491bb329e07c056065b4d9bb8401ed`; the diff at that head is **three added `docs/` paths, 0
+  modified, 0 deleted**, numstat `675 0`, `442 0`, `165 0` (**+1282/-0**), `git diff --check` exit
+  **0**, and the DCO checker returns **`OK: 5 commit(s) checked, all signed off or exempt.`**;
+- the **projection's inputs are bound**: the value was computed here from the live body, the token named
+  in 12.2, the replacement string named in 12.2 and the method declared in section 13 — the four inputs
+  a re-runner needs — so it is a measurement of a modelled edit, not a number carried from a brief.
+
+### 17.6 What revision 5 could not verify
+
+- **That GitHub's body ceiling is exactly 65,536 characters.** Unchanged from 16.3: the negative **is**
+  measured — the live body is 65,705 UTF-8 bytes and is accepted, so the ceiling cannot bind bytes —
+  while the exact figure is not, because testing it means editing the body until it is refused.
+- **The 12:30:54Z and 2026-10-16T13:44:08Z readings as historical moments.** The list cannot be queried as of a
+  past instant; what was verified is the retained chain, each node's own text and timestamp, and the
+  ordering behaviour.
+- **Body revisions before 2026-10-16T01:42:55Z** — not retrievable, and nothing above claims them.
+- **The page size behind revision 2's original `userContentEdits` reading** — the plan declares this
+  unverifiable, and it remains so.
+- **That the two head-bound evidence files' APR-117 sites will be repaired by the next head-moving
+  round.** This round names them and does not perform a head-moving repair.
+- **The Stage C repair text's correctness once applied**, CI at the implementation head (AC12), and the
+  record's per-page reads — all declared unverifiable at this stage in sections 11, 14, 15.2 and 16.3,
+  none of which this revision weakens.
