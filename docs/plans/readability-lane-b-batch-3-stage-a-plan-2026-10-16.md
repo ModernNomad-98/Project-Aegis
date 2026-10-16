@@ -10,17 +10,20 @@ this file's bytes exactly - the extracted block's sha256 equals the committed bl
 the method and both numbers). The comment's id is in the body rather than here because the comment is
 posted after this file is committed. **Five backticks, not three and not four:** the longest backtick
 run anywhere inside this file is three, and the **10** lines that carry a backtick run of
-three or more are L147, L151, L182, L191, L792, L796, L801, L810, L853, L856 - re-measured at
+three or more are L154, L158, L189, L198, L857, L861, L866, L875, L926, L929 - re-measured at
 this revision by command, never carried from another revision's numbering; so a five-backtick outer
 fence is longer than any fence inside the plan and cannot be closed early by the plan's own text - the
 failure mode that made one sibling's three-backtick extraction stop inside the plan. No fence length or
 line number is asserted from memory: both are measured by command and stated in section 12.
 
-**Revision 5 (2026-10-16) supersedes revision 4, which superseded revision 3, revision 2 and revision
-1.** This file is revision 5: every earlier revision's own text, kept below as the record of what it
-changed, is superseded and **must not be bound** - a Stage B verdict that names revision 4's, 3's, 2's or
-1's blob does not cover revision 5. Revision 5's **eight** corrections are listed in section 12: six from
-the fifth Stage B on this PR and two found by this revision's own re-measurement. **Revision 1 is blob
+**Revision 6 (2026-10-16) supersedes revision 5, which superseded revision 4, revision 3, revision 2
+and revision 1.** This file is revision 6: every earlier revision's own text, kept below as the record of
+what it changed, is superseded and **must not be bound** - a Stage B verdict that names revision 5's, 4's,
+3's, 2's or 1's blob does not cover revision 6. Revision 6's **six** corrections are listed in section 12:
+the sixth Stage B's blocking finding on section 13.4, its four findings F-2 to F-5, and its section 7
+note on criterion 7's base-to-head count. **Revision 5 is blob
+`007512cc7710359a0c76d6fd478fa75e3a1441c5` (86,960 bytes, 933 lines) at commit
+`1f5f4fb24d33ef6f82157212db3aa510f60e73cf`, carried in comment `6215795614`; revision 1 is blob
 `d0ae95e3b0cffc69d5f1150940ab5e9525584c09` (32,328 bytes, 412 lines) at commit
 `43ef40235fe44c36642a788900cec9e3b43e41a5`, carried in comment `6212436516`; revision 2 is blob
 `03e2464cecce49d6228f1a3eda873a3db6b33163` (52,572 bytes, 645 lines) at commit
@@ -29,8 +32,8 @@ receipt only** and does **not** hold the plan text - the regression revision 4 f
 `95568046d301fb26c40f8f5a7fc014a5994cb371` (63,778 bytes, 720 lines) at commit
 `a15c3a113d566bc425f9a78e8186232b8d8efa04`, comment `6214006870`; and revision 4 is blob
 `5c77e81f8ac41e0fa08443bc590f235ddc5a8b31` (78,682 bytes, 881 lines) at commit
-`dd1d3d8471c8edf31d582c55f9122986eb983131`, comment `6214763849`. All four are **SUPERSEDED and must not
-be bound. Stage B must bind this revision, not revision 4 or anything earlier;** a verdict naming an
+`dd1d3d8471c8edf31d582c55f9122986eb983131`, comment `6214763849`. All five are **SUPERSEDED and must
+not be bound. Stage B must bind this revision, not revision 5 or anything earlier;** a verdict naming an
 earlier blob is void. Revision 1 fell to the **second Stage D (SD-D: REVISE, comment `6213174939`)**,
 which found criterion 4 **NOT MET** (no measured prevalence for `LLM08` or `LLM07`); revision 2 fell to
 the **third Stage B (SD-B: REVISE, comment `6213731998`)**, which found that its receipt claimed an
@@ -39,13 +42,17 @@ record's **nine** count sentences and left section 13.4 a contradicting tail, se
 ambiguous and section 3a's B3-4/B3-5 bullets without a disposition, that the record attributes the
 keeper's **recording** authority to AEGIS-APR-117 (withdrawal-only) with no correction bound, and two
 stale figures; revision 3 fell to the **fourth Stage B (SD-B: REVISE, comment `6214354503`)**; and
-revision 4 fell to the **fifth (SD-B: REVISE, comment `6215479353`)**, whose findings F1-F6 are this
-revision's first six corrections. This revision keeps the same head binding and **does not move the PR
-head**: it is committed on the plan's own side branch, as revisions 1, 2, 3 and 4 were. **The verbatim
-in-PR copy revision 2 claimed and did not have exists, and revision 5 keeps it**: this revision's capture
+revision 4 fell to the **fifth (SD-B: REVISE, comment `6215479353`)**, whose findings F1-F6 are
+revision 5's first six corrections; and **revision 5 fell to the sixth (SD-B: REVISE, comment
+`6216354608`)**, whose section 3 finding (section 13.4's stated extent deletes a sentence) and section 4
+findings F-2 to F-5 are this revision's corrections, together with its section 7 note that criterion 7's
+base-to-head count belongs in the re-derive list. This revision keeps the same head binding and **does not
+move the PR head**: it is committed on the plan's own side branch, as revisions 1, 2, 3, 4 and 5 were.
+**The verbatim in-PR copy revision 2 claimed and did not have exists, and revision 6 keeps it**: this
+revision's capture
 comment carries these bytes inside a five-backtick fence, and section 12 states the extraction method and
-both hashes. **Revision 5 carries every element the auditors verified in revisions 1-4 and regresses
-none of them** (section 12 lists the eight corrections and what was left untouched).
+both hashes. **Revision 6 carries every element the auditors verified in revisions 1-5 and regresses
+none of them** (section 12 lists the six corrections and what was left untouched).
 
 - **Planner:** DeepSeek-4.1-Flash (`deepseek-flash`), **Stage A only**. The planner is **not** the
   auditor of this plan and holds no Stage B, D, E, F or G on this change.
@@ -190,7 +197,7 @@ git grep -l -w -e <TERM> e2a3e20b7c20ef8385b219b39c6405237163406f -- '*.md'
 #   method left implicit: without stripping it the intersection is empty and every term reads 0.
 ```
 
-**Every term the record's section 3a gap list turns on — re-measured at revision 5 by that command (2026-10-16T12:33:57Z; 32/32 figures reproduce).**
+**Every term the record's section 3a gap list turns on — re-measured at revision 6 by that command (2026-10-16, the window stated in section 11; 32/32 figures reproduce).**
 
 | Term (the page whose gap list names it) | Pages of 653 | The screen's classification |
 | --- | ---: | --- |
@@ -286,13 +293,13 @@ by the command above, and the ruling is recorded in this plan and in this PR's i
 | 1 | The diff base→head is exactly one added `docs/` Markdown file, insert-only, and contains **no** code, script, workflow, test, config, data or lock file (the L400–403 test). | `git diff --name-only` / `--numstat` / `--check` | **yes** — measured: 1 path, +506/−0, `--check` exit 0 |
 | 2 | The change classification **`docs-only`** is recorded **in the plan** (not only in the skills table). | this file §3 + criterion 1's diff | **yes** |
 | 3 | All eight pages are named **by path**, each bound to the full 40-character acceptance revision, each with one disposition, and the six acceptance bullets are addressed per page. | the record's own bytes (§2/§3 tables, §5 row-quote strings); `git show`/`rev-parse` per page | **yes** — measured: 8/8 paths present, 8/8 blob SHAs and line counts reproduce |
-| 4 | The C-1 screen of section 4.1 is stated with a measured prevalence for **every** term the record's section 3a gap list turns on — including `LLM08` (17) and `LLM07` (9) and each member of the `SEV1–SEV4` family — and the screen is applied per page, with the dispositions it decides recorded (the 2026-10-16 coordinator ruling: B3-4 and B3-5 FULL; final counts 3 FULL / 5 PARTIAL). | section 4.1 of this file (the commands and their numbers); record section 3a for the gap list | **yes** — all 22 gap-list terms re-measured at revision 5 (2026-10-16T12:33:57Z); **32/32** figures reproduce, and the 27 terms revision 1 measured reproduce 27/27 |
+| 4 | The C-1 screen of section 4.1 is stated with a measured prevalence for **every** term the record's section 3a gap list turns on — including `LLM08` (17) and `LLM07` (9) and each member of the `SEV1–SEV4` family — and the screen is applied per page, with the dispositions it decides recorded (the 2026-10-16 coordinator ruling: B3-4 and B3-5 FULL; final counts 3 FULL / 5 PARTIAL). | section 4.1 of this file (the commands and their numbers); record section 3a for the gap list | **yes** — all 32 terms re-measured at revision 6 (2026-10-16, section 11's window); **32/32** figures reproduce, and the 27 terms revision 1 measured reproduce 27/27 |
 | 5 | **C-4, both directions:** no acceptance row, no index event and no raw occurrence of any of the eight page paths exists in the acceptance index, and all eight remain pending at the head. | `git grep` over `tools/readability_acceptance/acceptance-index.json`; `check_index.py --path <page> --ref <head>` | **yes** — measured: 0 raw occurrences; each page reports `no_recorded_acceptance` = 1 |
 | 6 | The record's claimed index arithmetic holds at the base: `table_rows` 101, `events` 101, `full_page_acceptances` 81, `lost_commit_events` 10, `reader_pages_with_rows` 68. | `build_index.py --ref e2a3e20b… --report` in a full clone (`refs/remotes/**` and `refs/pull/*/head` present) | **yes** — measured at the base and at the head; the two reports differ **only** in their `built_at_ref` field (the record's word "byte-identical" is loose; the five counts are equal) |
 | 7 | Branch hygiene: every branch commit carries a DCO sign-off, `git diff --check` is clean, and the PR body's bound fields still parse. | `scripts/check_dco.py --range`; `git diff --check`; `scripts/ci/check_pr_body_skills.py --body-file` | **yes** — measured: 2/2 commits signed; `--check` exit 0; body checker "PR body bound fields: OK" |
 | 8 | The capture: this plan exists as a tracked file; the PR body names its **path, blob SHA and capturing commit**; and the issue comment the body names as the copy **holds this file's bytes verbatim**, checkable by section 12's method (strip the five-backtick fence, join with LF, keep the final LF, sha256 equal to the blob's). | `git cat-file -p <blob>`; the body text; section 12's extraction command over the named comment | **yes** - measured this revision: the comment's extracted block hashes to the blob, every non-trivial line of this file appears in it, and the body names path, blob SHA, capturing commit and the comment id. The comment id and the two sha256 values are printed in the PR body and in the comment's receipt, because a file cannot contain its own content hash |
 | 9 | The capture edit does not disturb the PR's bound fields: the published bound-field digest still recomputes to `1e2150fefd6c2ea9` under the body's declared method. | the declared method, recomputed over the live body | **yes** — measured before and after the edit |
-| 10 | The record's required corrections are bound with exact replacement text in section 13 - the ruling's two re-dispositions (with the exact section 3 cells and the B3-4/B3-5 section 3a bullets), **all nine** count sentences (L139, L143, L169, L178, L262, L263, L297, L484, L489-L490; the last two re-worded, and the ninth sentence's fragment begins on L489, not L490), the section 5 strings (all eight L276-L283 lines replaced by three), the section 5 preamble (L270-L273 in full), the section 11 direction-1 and direction-2 sentences (L472-L473 in full; L484-L487 in full), and the AEGIS-APR-101 recording correction (L9, L13-L14, L310, L330, L345, L347) - so that applying section 13 literally leaves the record's counts, disposition tables, row-quote strings and authority attribution consistent with each other. | section 13 of this file against the record's bytes at the head | **yes** as a binding of this plan; the corrected record's own bytes are decided at the Stage C commit that applies them (declared not verifiable at this head as N8, section 5) |
+| 10 | The record's required corrections are bound with exact replacement text in section 13 - the ruling's two re-dispositions (with the exact section 3 cells and the B3-4/B3-5 section 3a bullets), **all nine** count sentences (L139, L143, L169, L178, L262, L263, L297, L484, L489-L490; the last two re-worded, and the ninth sentence's fragment begins on L489, not L490), the section 5 strings (all eight L276-L283 lines replaced by three), the section 5 preamble (L270-L273 in full), the section 11 direction-1 sentence (**the fragment from `No acceptance` inside L472 through the end of L473 - not "L472-L473 in full", which deletes the previous sentence's completion; the sixth Stage B's blocking finding**) and direction-2 sentence (L484-L487 in full), and the AEGIS-APR-101 recording correction (L9, L13-L14, L310, L330, L345, L347) - so that applying section 13 literally leaves the record's counts, disposition tables, row-quote strings and authority attribution consistent with each other. **Stage D must run 13.7(a)-(e) on the corrected record's own bytes.** | section 13 of this file against the record's bytes at the head | **yes** as a binding of this plan; the corrected record's own bytes are decided at the Stage C commit that applies them (declared not verifiable at this head as N8, section 5) |
 
 ## 5. Criteria declared not verifiable at this head, with reasons (element 5)
 
@@ -329,7 +336,9 @@ of §4.2** and none of them may be used to force a disposition on this PR.
   13 binds is **Stage C's to commit**; this planner holds Stage A only, and the coordinator's instruction
   freezes the PR head at `2a719cd46c891eed15548d9500bab951083d87ac` in the meantime. The correction is
   therefore decidable only at the Stage C commit that applies it, and is declared not verifiable at this
-  head.
+  head. **Stage D must run 13.7(a)-(e) on those corrected bytes once they exist** (section 13.7): the
+  corrected bytes are what the checks are written to decide, and a Stage D that runs them against this
+  plan's binding instead can pass a record that section 13.4's superseded extent would have destroyed.
 
 ## 6. The C-3 / R2 selection rule for the next batch (element 6)
 
@@ -419,7 +428,7 @@ acceptance revision `e2a3e20b` and again at lane B's later base `988b5067`):
 **Cross-check: a scan of every remote branch whose name contains `readability-lane`.** Two of the four
 numbers revision 3 published here did not reproduce at the moment they were taken (16 refs did; 21 pairs
 over 16 paths did not), so revision 4 published the whole measurement as a **dated snapshot with the
-moment and the method**, and revision 5 re-measures it at its own moment with the boundary named explicitly.
+moment and the method**, and revisions 5 and 6 re-measure it at their own moments with the boundary named explicitly.
 
 **Measured by this planner at 2026-10-16T11:35:34Z (2026-10-16T04:35:34-07:00), over every
 `origin` ref whose name contains `readability-lane`:**
@@ -430,19 +439,34 @@ moment and the method**, and revision 5 re-measures it at its own moment with th
   filtered to basenames containing `readability-lane`;
 - **17 distinct record paths** over those pairs;
 - **0** occurrences of any of the eight batch-3 page paths in any of them outside this PR's own record —
-  a literal substring search with `git show <ref>:<path>`; so **no other lane's record claims any of the
-  eight batch-3 pages as a read page**, and nothing was skipped or double-read. This is the substantive
-  claim, and it reproduces in every variant of the count.
+  a literal substring search with `git show <ref>:<path>`, **each page path in the
+  `.claude/skills/`-prefixed form section 1 uses**. **The figure is variant-dependent and the variant is
+  now named (sixth Stage B, F-3):** with the **bare relative path** (no `.claude/skills/` prefix, e.g.
+  `incident-response-runbook/SKILL.md`) the same search over the same records returns **1** hit — lane B
+  batch 4's record at this plan's own cited ref `92e15720`, **L210**, `owning
+  \`incident-response-runbook/SKILL.md\``, an ownership cross-reference to a companion file, not a
+  read-page claim. So **no other lane's record claims any of the eight batch-3 pages as a read page**, and
+  nothing was skipped or double-read: **the substantive claim holds in both variants**; only the count is
+  prefix-dependent, and the prefixed form is the one published here.
 
-**Re-measured at revision 5, 2026-10-16T12:38:46Z, by the same four steps over this revision's clone:**
+**Re-measured at revision 5, 2026-10-16T12:38:46Z, by the same four steps over revision 5's own clone:**
 **21 refs, 29 (ref, record) pairs, 17 distinct record paths, 0 hits.** The ref and pair counts have moved
 with the refs, exactly as the method predicts, and **the substantive claim reproduces again: no other
 lane's record claims any of the eight batch-3 pages as a read page.**
 
-**The same method at this plan's own capture moment** (refs whose tip commit is at or before this plan's
-capturing commit `a15c3a113d566bc425f9a78e8186232b8d8efa04`, committer time 2026-10-16T03:58:21-07:00 =
-**10:58:21Z**): **16 refs, 22 pairs, 17 distinct paths** — the ref count revision 3 published, with the
-pair and path counts corrected. The ref set is time-dependent by construction, which is why the count is
+**Re-measured at revision 6, 2026-10-16T13:53:57Z, by the same four steps over revision 6's clone:**
+**24 refs, 33 (ref, record) pairs, 17 distinct record paths; 0 hits with the `.claude/skills/` prefix and
+1 with the bare relative path** (the L210 ownership cross-reference named above). The ref and pair counts
+have moved with the refs, exactly as the method predicts, and **the substantive claim reproduces again.**
+
+**The same method at revision 3's capture moment** — **not this plan's own capturing commit, which is
+the sixth Stage B's finding F-2** (refs whose tip commit is at or before
+`a15c3a113d566bc425f9a78e8186232b8d8efa04`, committer time 2026-10-16T03:58:21-07:00 = **10:58:21Z**;
+that commit is still the tip of the **canonical** plan branch
+`refs/heads/docs/readability-lane-b-batch-3-stage-a-plan-2026-10-16`, which has not moved since revision
+3 — measured 2026-10-16, section 11's branch row — so revisions 4's and 5's own capturing commits live
+only on their own `-rev4-` and `-rev5-` branches): **16 refs, 22 pairs, 17 distinct paths** — the ref
+count revision 3 published, with the pair and path counts corrected. The ref set is time-dependent by construction, which is why the count is
 published here with both its moment and its method rather than as a bare figure:
 `readability-lane-c-batch-1-stage-a-plan-2026-10-16` (tip `aba18f63`, 11:00:26Z) and
 `readability-lane-a-batch-4-plan-rev2-20261016` (tip `2df74c86`, 11:24:50Z) are both after the capture
@@ -570,14 +594,16 @@ agents.
    correction moves the head deliberately and visibly at Stage C rather than as a side effect of this
    plan's own capture. **Applying section 13 will move the head**; when it does, the plan's head
    binding must be re-read as section 12 states, and the criteria that measure the base-to-head diff
-   (1, 3, 5, 6) must be re-derived at the new head.
+   (1, 3, 5, 6) **and criterion 7's 2/2 sign-off count - a snapshot of the same kind, added by revision 6
+   on the sixth Stage B's section 7 note** must be re-derived at the new head.
 
 ## 11. Verification ledger — what was run, and what could not be verified
 
 Run by this planner on 2026-10-16, in a fresh HTTPS clone, and **every row below was re-executed at**
-**revision 5 on 2026-10-16T12:30Z-12:41Z on that clone unless the row says otherwise**
+**revision 6 on 2026-10-16T13:45Z-14:10Z on that clone unless the row says otherwise**
 (`git clone -c http.sslBackend=openssl https://github.com/ModernNomad-98/Project-Aegis.git`; the
-shared clone was **not** used or cleaned; no worktree was created):
+shared clone was **not** used or cleaned; no worktree was created; `git config user.name` was checked
+first and reads Peter Nguyen):
 
 | Check | Result |
 | --- | --- |
@@ -586,21 +612,21 @@ shared clone was **not** used or cleaned; no worktree was created):
 | Head tree / base tree | `1a65903f…` / `effc7250…` |
 | `scripts/check_dco.py --range e2a3e20b…2a719cd4` | exit 0 — 2 commits, both signed |
 | `check_index.py --quiet --ref e2a3e20b…` | 653 / 57 / 4 / 586 / 6 / pending 596 |
-| Two-bucket pending set, quarters | 590; **148 / 148 / 148 / 146** — re-derived at revision 5 (2026-10-16T12:36Z) by the allocation file's own `ceil(n/4)` convention (`ceil(590/4)` = 148, the last quarter taking the remainder); lane B 148 (bounds by path, §6) |
-| `build_index.py --report` at base and head | counts 101 / 101 / 81 / 10 / 68 at both; only `built_at_ref` differs. Re-run at revision 5 (2026-10-16T12:40Z) after fetching `refs/pull/785/head` into the clone — without a `refs/pull/**` ref the tool exits 1 on its own full-clone guard (its D73 row 8 rule), which is the only reason revision 4 could not run it |
+| Two-bucket pending set, quarters | 590; **148 / 148 / 148 / 146** — re-derived at revision 6 (2026-10-16, this section's window) by the allocation file's own `ceil(n/4)` convention (`ceil(590/4)` = 148, the last quarter taking the remainder); lane B 148 (bounds by path, §6) |
+| `build_index.py --report` at base and head | counts 101 / 101 / 81 / 10 / 68 at both; only `built_at_ref` differs. Re-run at revision 6 (2026-10-16, this section's window) after fetching `refs/pull/785/head` into the clone — without a `refs/pull/**` ref the tool exits 1 on its own full-clone guard (its D73 row 8 rule), which is the only reason revision 4 could not run it |
 | Raw occurrences of the eight page paths in the acceptance index at head | **0** |
 | `check_index.py --path <page> --ref <head>` × 8 | each page `no_recorded_acceptance` = 1 (still pending) |
 | Term prevalence (§4.1) | API 204, JSON 85, RLS 73, OWASP 61, UX 41 (all of 653) — reproduces the SD-B's numbers |
-| Gap-list term prevalence, **re-measured at revision 5** (2026-10-16T12:33:57Z; the section 4.1 command — `check_index.classify_tree` at the base plus `git grep -l -w -e <TERM> <base> -- '*.md'` with the `<tree-ish>:` prefix stripped): all **32** terms, i.e. `API` 204, `JSON` 85, `RLS` 73, `OWASP` 61, `PII` 56, `UX` 41, `MCP` 28, `SLO` 24, `IAM` 20, `IDOR` 20, `SSRF` 17, `LLM08` **17**, `TLS` 16, `RBAC` 15, `LLM03` 14, `LLM09` 14, `DNS` 11, `SLI` 10, `LLM07` **9**, `LLM02` 9, `CDK` 8, `CVE` 8, `KMS` 7, `ASI09` 5, `SBOM` 3, `tfvars` 1, `RG` 1, `SEV1` 1, `SEV2` 0, `SEV3` 0, `SEV4` 1, `OAuth` 1 | **32/32 reproduce**, of which **27/27** are revision 1's; `LLM08` agrees with the second Stage D's 17 and `LLM07` with its 9 — derived here, not copied |
-| The record's own bytes at the head, counted by command | section 3 table: **1** `accepted unchanged` + **7** `partial — first-use gaps`; section 5: **1** `accepted:` string + **7** row-quote lines of the form `B3-n partial: <path> read whole at ...`; section 11 L473 carries the "no row-quote string for a partial page" denial - the self-contradiction the SD-D's P2 names. **Re-measured at revision 5 (2026-10-16T12:33Z): applying section 13 literally to a scratch copy of the record at `a3068f77...` leaves the substring `partial:` exactly 3 times** — twice inside section 13.3's narrowed final sentence (its two `partial:`-prefixed mentions) and once in row h's replacement text (`...the pages the applied standard called partial: B3-4 ...`) — and **0** `partial:`-prefixed lines, which is the property section 13.7(a) decides. Revision 4 published **8** here, and 8 is true of no application: the seven row-quote lines it counted are the ones 13.2 removes. The figure is a measurement, so it is stated with its moment and its method (the twenty-two replacements of 13.1b-13.1k, 13.2, 13.3, 13.4 and 13.5a-13.5f, each verified to occur exactly once in the record's bytes, applied one at a time) |
-| `git ls-remote origin refs/heads/docs/readability-lane-b-batch-3-20261015 refs/heads/docs/readability-lane-b-batch-3-stage-a-plan-2026-10-16` | head `2a719cd4...`, plan branch `dd1d3d84...` (revision 4's capturing commit; revision 5's is recorded in the PR body and in its own capture comment) - **the head has not moved** |
-| Fence structure of this file, at this revision | **10** lines carry a backtick run of three or more (L147, L151, L182, L191, L792, L796, L801, L810, L853, L856); the maximum backtick run **anywhere** in the file is **3**, so the five-backtick outer fence cannot be closed early by the plan's own text. Revision 4's count (six, at revision 3's line numbers) was stale and its fence structure was unbalanced - both repaired here |
-| Literal application of section 13 to a scratch copy of the record at `a3068f77...` (2026-10-16T12:33Z) | 13.7(a) `partial:`-prefixed lines = **0**; 13.7(b) section 3 = **1** `accepted unchanged` + **5** `partial — first-use gaps (3a)` + **2** `accepted unchanged — C-1 screen ...`; 13.7(c) `seven partial` **0**, `four of the seven` **0**, `AEGIS-APR-117 route` **0**; 13.7(e), on the whitespace-normalised corrected direction-1 sentence: `No acceptance` occurs **exactly once**, at its head, followed by `row was authored by this lane or by this repair`, and the two-line fragment quoted in 13.4 no longer occurs. **The same run shows the repaired check is not inverted:** the *uncorrected* text fails 13.7(e)'s second clause and the revision-3 splice fails its first (two `No acceptance`) |
+| Gap-list term prevalence, **re-measured at revision 6** (2026-10-16, this section's window; the section 4.1 command — `check_index.classify_tree` at the base plus `git grep -l -w -e <TERM> <base> -- '*.md'` with the `<tree-ish>:` prefix stripped): all **32** terms, i.e. `API` 204, `JSON` 85, `RLS` 73, `OWASP` 61, `PII` 56, `UX` 41, `MCP` 28, `SLO` 24, `IAM` 20, `IDOR` 20, `SSRF` 17, `LLM08` **17**, `TLS` 16, `RBAC` 15, `LLM03` 14, `LLM09` 14, `DNS` 11, `SLI` 10, `LLM07` **9**, `LLM02` 9, `CDK` 8, `CVE` 8, `KMS` 7, `ASI09` 5, `SBOM` 3, `tfvars` 1, `RG` 1, `SEV1` 1, `SEV2` 0, `SEV3` 0, `SEV4` 1, `OAuth` 1 | **32/32 reproduce**, of which **27/27** are revision 1's; `LLM08` agrees with the second Stage D's 17 and `LLM07` with its 9 — derived here, not copied |
+| The record's own bytes at the head, counted by command | section 3 table: **1** `accepted unchanged` + **7** `partial — first-use gaps`; section 5: **1** `accepted:` string + **7** row-quote lines of the form `B3-n partial: <path> read whole at ...`; section 11 L473 carries the "no row-quote string for a partial page" denial - the self-contradiction the SD-D's P2 names. **Re-measured at revision 6 (2026-10-16T13:56Z): applying section 13 literally to a scratch copy of the record at `a3068f77...` leaves the substring `partial:` exactly 3 times** — twice inside section 13.3's narrowed final sentence (its two `partial:`-prefixed mentions) and once in row h's replacement text (`...the pages the applied standard called partial: B3-4 ...`) — and **0** `partial:`-prefixed lines, which is the property section 13.7(a) decides. Revision 4 published **8** here, and 8 is true of no application: the seven row-quote lines it counted are the ones 13.2 removes. The figure is a measurement, so it is stated with its moment and its method: **the twenty-two replacements of 13.1b-13.1k, 13.2, 13.3, 13.4 and 13.5a-13.5f, plus 13.1's two line-scoped cell edits at L127 and L128, applied one at a time in document order — 24 applications, and the 22 alone are the enumeration the sixth Stage B's F-4 corrected** |
+| `git ls-remote origin refs/heads/docs/readability-lane-b-batch-3-20261015 refs/heads/docs/readability-lane-b-batch-3-stage-a-plan-2026-10-16 refs/heads/docs/readability-lane-b-batch-3-stage-a-plan-rev4-2026-10-16 refs/heads/docs/readability-lane-b-batch-3-stage-a-plan-rev5-2026-10-16 refs/pull/785/head`, re-run at revision 6 (2026-10-16T13:46Z) | head `2a719cd46c891eed15548d9500bab951083d87ac`; **the canonical plan branch `…batch-3-stage-a-plan-2026-10-16` returns `a15c3a113d566bc425f9a78e8186232b8d8efa04`, which is revision 3's SUPERSEDED bytes — it has not moved since revision 3** (the sixth Stage B's F-2: revision 5's row named `dd1d3d84` as this branch's value); revision 4 is on `…-stage-a-plan-rev4-2026-10-16` = `dd1d3d8471c8edf31d582c55f9122986eb983131`; revision 5 on `…-rev5-2026-10-16` = `1f5f4fb24d33ef6f82157212db3aa510f60e73cf`; revision 6 on `…-rev6-2026-10-16`, whose own capturing commit and blob SHA are recorded in the PR #785 body and in its own capture comment (a file cannot contain its own commit's hash or its own blob SHA), as revision 5's are - **the head has not moved** |
+| Fence structure of this file, at this revision | **10** lines carry a backtick run of three or more (L154, L158, L189, L198, L857, L861, L866, L875, L926, L929); the maximum backtick run **anywhere** in the file is **3**, so the five-backtick outer fence cannot be closed early by the plan's own text. The numbers are re-measured at this revision, never carried from another revision's numbering |
+| Literal application of section 13 to a scratch copy of the record at `a3068f77...` (revision 6, 2026-10-16, this section's window) — **two applications, because the enumeration matters (the sixth Stage B's F-4)** | **The 22 replacements of 13.1b-13.1k, 13.2, 13.3, 13.4 and 13.5a-13.5f applied alone give section 3 = 1 `accepted unchanged` + 7 `partial — first-use gaps (3a)` + 0 `accepted unchanged — C-1 screen ...`, not the 1/5/2 check (b) requires; with 13.1's two line-scoped cell edits at record L127 and L128 applied first — the 24 applications the corrected 13.7 lists — section 3 = 1 / 5 / 2.** In both runs: 13.7(a) `partial:`-prefixed lines = **0**; 13.7(c) `seven partial` **0**, `four of the seven` **0**, `AEGIS-APR-117 route` **0**; and 13.7(e), read on the corrected bytes, finds **exactly one** `No acceptance` in the whole corrected record, at the head of the replacement and followed by `row was authored by this lane or by this repair`, with 13.4's fragment absent — the corrected direction-1 lines read `… and remain **PENDING**. No acceptance row was authored by this lane or by this repair, and **no row-quote string is offered in this file for any page recorded PARTIAL**; the only row-quote strings this file offers belong to the three FULL pages (section 5).` **The repaired check is not inverted:** the *uncorrected* text fails 13.7(e) (its continuation is the deleted fragment's) and the revision-3 splice writes two `No acceptance` |
 | Naming check: `git grep -n -w -e C-1 / C-3 / C-4 / R2 2a719cd4 -- '*.md'` | `C-1` in 2 files (this PR's record; a change-site table), `C-3` once (change-site table), `C-4` once (this PR's record) — none a ruling; the reading named `R2` is on live main (PR #795, `3b0d6cd5`) but not at this head |
-| Cross-lane table-row scan, **dated snapshots** with the method in section 6 | at 2026-10-16T11:35:34Z: 18 refs, 25 (ref, record) pairs, 17 distinct record paths; at revision 4's capture moment: 16 refs, 22 pairs, 17 paths; **re-measured at revision 5, 2026-10-16T12:38:46Z: 21 refs, 29 (ref, record) pairs, 17 distinct record paths** | no other lane's record claims any of the eight as a read page: **0** hits outside this PR's own record, in every variant |
-| PR body bound-field digest, declared method | `1e2150fefd6c2ea9` — reproduced at revision 5 over the body **as fetched at 2026-10-16T12:42:54Z, before this revision's capture edit** (that edit sits outside the three bound fields). The same declared method reproduces all four calibration bodies from their own live bytes: #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`, #792 `88300e711714200a`, #795 `5fabf87b2df899e9` — and #785's own published figure. **The declared text stands unchanged** |
-| PR body bytes as fetched, **before this revision's capture edit** | **35,082 bytes** (34,907 characters, LF, trailing newline), sha256 `bf0d3bd5fcec7bcfeb03281d6a21d80490c1941cb602686a7d0244b1e369f988`, fetched 2026-10-16T12:42:54Z. Revision 4's value here (33,029 bytes, `29d6a158...`) was the body **before revision 4's own capture edit**, not the live body; the row is qualified here as the digest row already is, and the live value is whatever the body returns when it is fetched |
-| `scripts/ci/check_pr_body_skills.py --body-file` (run at revision 5 over this revision's PR body) | exit 0 — "PR body bound fields: OK" |
+| Cross-lane table-row scan, **dated snapshots** with the method in section 6 | at 2026-10-16T11:35:34Z: 18 refs, 25 (ref, record) pairs, 17 distinct record paths; at revision 3's capture moment: 16 refs, 22 pairs, 17 paths; at revision 5, 2026-10-16T12:38:46Z: 21 refs, 29 pairs, 17 paths; **re-measured at revision 6, 2026-10-16T13:53:57Z: 24 refs, 33 (ref, record) pairs, 17 distinct record paths** | no other lane's record claims any of the eight as a read page: **0** hits outside this PR's own record **with the `.claude/skills/`-prefixed path form; with the bare relative path the same scan returns 1 hit, lane B batch 4's record at `92e15720` L210, an ownership cross-reference — the variant the sixth Stage B's F-3 named, and the substantive claim holds in both** |
+| PR body bound-field digest, declared method | `1e2150fefd6c2ea9` — reproduced at revision 6 over the body **as fetched at 2026-10-16T13:48Z, before this revision's capture edit** (that edit sits outside the three bound fields). The same declared method reproduces all four calibration bodies from their own live bytes: #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`, #792 `88300e711714200a`, #795 `5fabf87b2df899e9` — and #785's own published figure. **The declared text stands unchanged** |
+| PR body bytes as fetched, **before this revision's capture edit** | **36,519 bytes** (36,344 characters, LF, 322 LF, no CRLF, trailing newline), sha256 `aa53b22dde3cfd5b985e9661a43879e1fc74c8b52015f63a8d90f895efb43ff`, fetched 2026-10-16T13:48Z. Revision 5's value here (35,082 bytes, `bf0d3bd5...`) was the body **before revision 5's own capture edit**, not the live body; the row is qualified here as the digest row already is, and the live value is whatever the body returns when it is fetched |
+| `scripts/ci/check_pr_body_skills.py --body-file` (run at revision 6 over this revision's PR body, 2026-10-16T13:49Z) | exit 0 — "PR body bound fields: OK" |
 
 **Could not verify (stated, not waved through):** N1–N8 in §5 — in particular the record's corrected
 section 5 / section 11 bytes, which are Stage C's to commit and therefore do not exist at this head;
@@ -621,7 +647,7 @@ here fetched both, which is why its report could be run at all.
   line); (3) take the lines **strictly between** those two lines, join them with LF, and keep the final
   LF this file ends with. Those bytes are this file's bytes and their sha256 equals the committed blob's.
   **Why five and not three or four:** the longest backtick run anywhere inside this file is **three**
-  (measured at this revision: the **10** fence lines L147, L151, L182, L191, L792, L796, L801, L810, L853, L856; the
+  (measured at this revision: the **10** fence lines L154, L158, L189, L198, L857, L861, L866, L875, L926, L929; the
   maximum backtick run of length 3 or more anywhere in the file is 3), so the outer fence is strictly
   longer than any fence inside the plan; an
   extractor that stops at the plan's own three-backtick lines stops inside the plan, which is the failure
@@ -637,11 +663,40 @@ here fetched both, which is why its report could be run at all.
   `e2a3e20b7c20ef8385b219b39c6405237163406f`. **If either moves, this binding is void** and a Stage B
   auditor must audit the revision it can name, exactly as moving a head voids a head-bound verdict.
 - **Editing this file after capture voids an ACCEPT that named the captured revision** (L587–592).
-- **Revision 5 (2026-10-16) - this text.** It supersedes revision 4 (blob
+- **Revision 6 (2026-10-16) - this text.** It supersedes revision 5 (blob
+  `007512cc7710359a0c76d6fd478fa75e3a1441c5`, 86,960 bytes, 933 lines, capturing commit
+  `1f5f4fb24d33ef6f82157212db3aa510f60e73cf`, capture comment `6215795614`), which superseded revision 4,
+  revision 3, revision 2 and revision 1. **Stage B must bind revision 6**; a verdict naming an earlier blob
+  does not cover this text. It was prompted by the **sixth Stage B on this PR (SD-B: REVISE, issue comment
+  `6216354608`)**. **What revision 6 changes, and nothing else:** (1) **blocking - section 13.4's stated
+  extent is restated as the fragment that begins at `No acceptance` inside record L472 and runs to the end
+  of L473**, not "L472-L473 in full": that superset deleted the prior sentence's completion - the
+  `no_recorded_acceptance` 586 → 587 movement and the eight pages' **PENDING** status, which occurs nowhere
+  else in the record - and left the corrected record reading `All eight therefore sit in`. The fragment used
+  instead occurs **exactly once** in the record (measured), and applying it yields correct prose with
+  nothing deleted. **The same correction carries the Stage D duty:** section 13.7 requires Stage D to run
+  13.7(a)-(e) on the corrected record's bytes, and (d) now also requires each bound fragment to have been
+  replaced by exactly its declared replacement, so a partial splice inside a bound extent fails instead of
+  passing by construction. (2) **F-2
+  - section 6's capture moment and section 11's plan-branch row name the right commit:** the canonical plan
+  branch still returns revision 3's `a15c3a11`, and revisions 4's and 5's capturing commits live on their
+  own `-rev4-` and `-rev5-` branches. (3) **F-3 - the cross-lane `0` names its prefix variant**
+  (`.claude/skills/`-prefixed: 0; bare relative path: 1, lane B batch 4's record at `92e15720` L210, an
+  ownership cross-reference) and states that the substantive claim holds in both variants. (4) **F-4 -
+  section 13.7's apply list adds 13.1's two line-scoped cell edits at record L127 and L128** - 24
+  applications in document order; the 22 alone give section 3 counts 1/7/0, not the 1/5/2 the check
+  requires. (5) **F-5 - the *How to read* paragraph declares the backslash-before-backtick escape** used by
+  row h and 13.1j/13.1k. (6) The sixth Stage B's section 7 note is taken: criterion 7's base-to-head count
+  joins criteria 1, 3, 5 and 6 in the list re-derived when the head moves. The head binding,
+  base/acceptance revision, eight pages, instrument counts, criterion 4's 32 term measurements (re-measured
+  at revision 6), the next-batch rule and its appendix, the five-question answers, the nine elements, the
+  non-author test with AEGIS-APR-117 as withdrawal-only, the section 4.1b ruling and the capture are
+  **unchanged**; section 11's rows are refreshed to this revision's measurements.
+- **Revision 5 (2026-10-16), superseded - kept as the record of what it changed.** It superseded revision 4 (blob
   `5c77e81f8ac41e0fa08443bc590f235ddc5a8b31`, 78,682 bytes, 881 lines, capturing commit
   `dd1d3d8471c8edf31d582c55f9122986eb983131`, capture comment `6214763849`), which superseded revision 3,
-  revision 2 and revision 1. **Stage B must bind revision 5**; a verdict naming an earlier blob does not
-  cover this text. It was prompted by the **fifth Stage B on this PR (SD-B: REVISE, issue comment
+  revision 2 and revision 1. **Stage B was to bind revision 5 while it was current**; revision 6 supersedes
+  it. It was prompted by the **fifth Stage B on this PR (SD-B: REVISE, issue comment
   `6215479353`)**. **What revision 5 changes, and nothing else:** (1) **blocking - section 13.3 is carried
   once.** Revision 4 carried it **twice**, with no supersession marker, and the first copy still
   prescribed "No `partial:` string appears in this file at all" - the sentence section 12 said revision 4
@@ -706,7 +761,7 @@ here fetched both, which is why its report could be run at all.
 
 ---
 
-## 13. The record corrections this revision binds (SD-D P2, the coordinator ruling and the Stage B findings, re-bound at revision 5), with the exact text
+## 13. The record corrections this revision binds (SD-D P2, the coordinator ruling and the Stage B findings, re-bound at revision 6), with the exact text
 
 **Why.** The record at the head (`docs/evidence/documentation/readability-lane-b-batch-3-2026-10-15.md`,
 blob `a3068f77...`, 40,400 bytes, 506 lines) contradicts itself: section 11 (L473) denies authoring any
@@ -715,12 +770,22 @@ row-quote string for a partial page, while section 5 offers **eight** strings, *
 requires those reconciled; the coordinator's 2026-10-16 ruling requires the ruling recorded; the third
 Stage B (comment `6213731998`) requires text complete enough to apply **literally**; the fifth Stage B
 (comment `6215479353`) requires section 13.3 to be carried **once** and section 13.7(e) to quote the
-**replacement** rather than the fragment it deletes. All are **Stage C's
-commits, not this planner's** (Stage A only; the head is frozen), so this section binds them here.
+**replacement** rather than the fragment it deletes; and the sixth Stage B (comment `6216354608`)
+requires **section 13.4's extent to be the fragment that occurs exactly once** - the two whole lines
+delete the previous sentence's completion - and **section 13.7's apply list to name every replacement its
+own check (b) counts**. All are **Stage C's commits, not this planner's** (Stage A only; the head is
+frozen), so this section binds them here, and **Stage D must run section 13.7(a)-(e) on the corrected
+record's own bytes** - not on this plan's binding, which is why 13.7 says so and why criterion 10 states
+it.
 
 **How to read.** Each binding gives the record's line number, the **exact fragment replaced** and the
-**full replacement**; `\n` inside a fragment is the record's LF byte, and the
-two-space indent of a wrapped list item is part of the fragment. **Every *fully quoted* fragment - the 19
+**full replacement**. **Two escape conventions are declared, and only two** (the second is new in revision
+6; the sixth Stage B's F-5): (i) `\n` inside a fragment or a replacement is the record's LF byte; (ii) a
+backslash immediately before a backtick (`\``) is an escape for the backtick character itself - the
+corrected record's bytes carry the backtick and **no** backslash. Convention (ii) is declared because the
+replacements in row h and in 13.1j and 13.1k carry it (`\`OWASP\``, `\`API\``, `\`RLS\``), and
+a literal application that inserted the backslash would edit a code span, which the last sentence of this
+paragraph forbids. **The two-space indent of a wrapped list item is part of the fragment.** **Every *fully quoted* fragment - the 19
 fragments this section quotes in full, in 13.1b-13.1i, 13.1j (two), 13.1k (two) and 13.5a-13.5f - was
 checked by command to occur exactly once in the record's bytes at this head**, so each replacement is
 unambiguous; fragments are replaced one at a time and nothing else changes. **The section 3 cell fragment
@@ -838,26 +903,34 @@ sentence and its check now agree: the sentence claims the prefixed-line property
 check decides. **A reader who wants the substring count must measure it; the sentence no longer makes a
 claim about it.**
 
-**13.4 Section 11's direction-1 sentence (L472-L473 in full) — the extent is the whole sentence, not
-one line.** The direction-1 sentence the replacement rewrites **begins on L472**, not L473: L472 ends
-`...and remain **PENDING**. No acceptance` and L473 is the wrapped continuation `  row, and no row-quote
-string for a partial page, was authored by this lane or by this repair.` **Revision 3 said *"Replaced:
-the whole of L473"*, which is a splice**: applying that literally on its own leaves L472's trailing `No
+**13.4 Section 11's direction-1 sentence — the extent is the FRAGMENT that begins at `No acceptance`
+inside L472 and runs to the end of L473, not L472-L473 in full.** The direction-1 sentence the
+replacement rewrites **begins inside L472**, not at L473 and not at L472's start: L471 ends
+`...All eight therefore sit in`, L472 carries the completion of the *previous* sentence
+(`no_recorded_acceptance` (586 at the base → 587 at the head) and remain **PENDING**.) and then this
+sentence's own head `No acceptance`, and L473 is the wrapped continuation `  row, and no row-quote string
+for a partial page, was authored by this lane or by this repair.` **Revision 3 said *"Replaced: the whole
+of L473"*, which is a splice**: applying that literally on its own leaves L472's trailing `No
 acceptance` in place and inserts a second one, so the corrected record reads `No acceptance No
-acceptance row was authored by this lane or by this repair` — a doubled phrase and a broken sentence,
-**and section 13.7(d) would pass it**, because that check compares a whitespace-normalised remainder
-against the bound extents and the splice is *inside* an extent. **Stated extent, exact: L472-L473 in
-full — both lines, nothing else, and L472's own `No acceptance` is removed with them.**
-*Replace this fragment (L472's text, LF, L473's text):*
+acceptance row was authored by this lane or by this repair` — a doubled phrase and a broken sentence.
+**Revision 5 replaced that splice with its opposite error, and the sixth Stage B found it (blocking): it
+bound *L472-L473 in full — both lines, nothing else*, a SUPERSET of the sentence, and applying that
+literally deletes the previous sentence's completion — the `no_recorded_acceptance` movement from 586 to
+587 and the eight pages' **PENDING** status, which occurs nowhere else in the record — so the corrected
+record reads `All eight therefore sit in`. Neither 13.7(d) nor 13.7(e) catches that: (d) passes a
+deletion *inside* a bound extent, and (e) reads the well-formed replacement. Revision 6 therefore states
+the extent as the fragment that occurs EXACTLY ONCE in the record's bytes (measured by command):**
+*replace this fragment (L472's tail from `No acceptance` to its end, the LF, and L473 in full; the
+fragment begins mid-line, immediately after the space that closes `remain **PENDING**.`):*
 
 ```text
-  `no_recorded_acceptance` (586 at the base → 587 at the head) and remain **PENDING**. No acceptance
+No acceptance
   row, and no row-quote string for a partial page, was authored by this lane or by this repair.
 ```
 
 *With this replacement (one paragraph; it carries no leading two-space indent because it replaces a
-wrapped list item's continuation as well as its first line — the applying commit re-indents it to the
-list item's continuation indent, which is presentation only and changes no word):*
+wrapped list item's continuation as well as text on its first line — the applying commit re-indents the
+whole paragraph to the list item's continuation indent, which is presentation only and changes no word):*
 
 > No acceptance row was authored by this lane or by this repair, and **no row-quote string is offered
 > in this file for any page recorded PARTIAL**; the only row-quote strings this file offers belong to
@@ -890,26 +963,37 @@ touches only `docs/evidence/documentation/readability-lane-b-batch-3-2026-10-15.
 **13.7 When it becomes decidable, and Stage D's check.** Only section 13's *binding* is decidable at this
 head (criterion 10, section 4.2); the corrected file's bytes are decidable at the Stage C commit that
 applies them — declared not verifiable at this head as **N8** (section 5), which is why this planner does
-not apply them. **Check:** apply 13.1b-13.1k, 13.2, 13.3, 13.4 and 13.5a-13.5f to the record at
-`a3068f77...`, then (a) `partial:`-prefixed lines in section 5 = **0**; (b) section 3 dispositions =
-**1** `accepted unchanged` + **5** `partial — first-use gaps (3a)` + **2** `accepted unchanged — C-1
-screen ...`; (c) `seven partial`, `four of the seven` and `AEGIS-APR-117 route` = **0** each; (d) the
-whitespace-normalised remainder differs from the record only at the bound extents. **(e) Stage D must
-also READ the corrected direction-1 sentence at record L472-L473 and confirm it contains no doubled
-phrase:** checks (a)-(d) are counts and comparisons, and (d) passes a splice that sits inside a bound
-extent, so the direction-1 splice the fourth Stage B found is invisible to all four. The required read is
-that, after its whitespace runs are collapsed to single spaces, the corrected sentence contains **exactly
-one** occurrence of `No acceptance`, at its head, immediately followed by
-`row was authored by this lane or by this repair` - the continuation 13.4's replacement actually writes,
-and **not** the continuation of the fragment 13.4 deletes, `row, and no row-quote string for a partial
-page, was authored by this lane or by this repair` - that it also contains `no row-quote string is offered
-in this file for any page recorded PARTIAL` (the clause the deleted fragment's `no row-quote string for a
-partial page` becomes), and that the two-line fragment quoted in 13.4 no longer occurs in the corrected
-file. **This required read is the one revision 4 mis-specified:** it quoted the fragment 13.4 deletes, so
-it passed the unfixed text and failed the fixed text - the inversion the fifth Stage B measured. The
-repaired read does the opposite: it fails the unfixed text (whose continuation is the deleted fragment's),
-fails the revision-3 splice (which contains two `No acceptance`), and passes the corrected text. **A
-count-only Stage D does not discharge this criterion.**
+not apply them. **Stage D must run (a)-(e) below on the corrected record's own bytes** - the bytes the
+Stage C commit produces, read from the file - **not on this plan's binding, and not on counts alone:**
+(d) and (e) are the two checks that can pass a record still reading `All eight therefore sit in` when
+they are run against the binding instead of the corrected file, and the sixth Stage B's blocking finding
+is exactly that failure mode. **Check:** apply **13.1's two line-scoped cell edits at record L127 and
+L128 first**, then **13.1b-13.1k, 13.2, 13.3, 13.4 and 13.5a-13.5f** - **24 applications in document
+order: the two L127/L128 cell replacements plus the 22** - to the record at `a3068f77...`, because check
+(b) counts the two C-1-screen cells and the **22 alone leave them as `partial — first-use gaps (3a)`**
+(measured: **1 + 7 + 0**, not the 1 + 5 + 2 below; the short enumeration is the sixth Stage B's F-4).
+Then (a) `partial:`-prefixed lines in section 5 = **0**; (b) section 3 dispositions = **1** `accepted
+unchanged` + **5** `partial — first-use gaps (3a)` + **2** `accepted unchanged — C-1 screen ...`; (c)
+`seven partial`, `four of the seven` and `AEGIS-APR-117 route` = **0** each; (d) the
+whitespace-normalised remainder differs from the record only at the bound extents, **and each bound
+fragment has been replaced by exactly its declared replacement** - the second half is new in revision 6:
+without it (d) passes any splice that sits inside a bound extent, which is how revision 5's superset
+extent escaped it. **(e) Stage D must also READ the corrected direction-1 lines and confirm the previous
+sentence survives:** on the corrected record's actual bytes, the required read is that **exactly one**
+occurrence of `No acceptance` exists in the whole corrected file, at the head of the replacement and
+immediately followed by `row was authored by this lane or by this repair`; that the corrected L472-L473,
+with whitespace runs collapsed to single spaces, contain `and remain **PENDING**. No acceptance row was
+authored by this lane or by this repair, and **no row-quote string is offered in this file for any page
+recorded PARTIAL**; the only row-quote strings this file offers belong to the three FULL pages (section
+5).`; and that the fragment 13.4 quotes - `No acceptance` plus L473's continuation `row, and no
+row-quote string for a partial page, was authored by this lane or by this repair.` - no longer occurs.
+**This required read is the one revision 4 mis-specified:** it quoted the fragment 13.4 deletes, so it
+passed the unfixed text and failed the fixed text - the inversion the fifth Stage B measured. Revision 6
+repairs that and adds the superset's own read: the **uncorrected** text fails (e)'s first clause, the
+**revision-3 splice** fails it (two `No acceptance`), **revision 5's superset extent** fails on
+`All eight therefore sit in` no longer being followed by the `no_recorded_acceptance` clause, and the
+corrected text passes all five checks. **A count-only Stage D does not discharge this criterion, and
+neither does a Stage D that never opens the corrected file.**
 
 ---
 
