@@ -463,7 +463,10 @@ lane record records the gap as an observation, not as a partial disposition; a s
 disposition label cannot see a gap recorded as an observation. The withdrawal row appended to
 the ledger's consolidated keeper table cancels K-392 and no fresh row replaces it: the ledger's
 four event kinds (full-page-acceptance, targeted-review, withdrawal, lost-commit) have no
-partial event kind, so no fresh row replaces it: LD-4's disposition is PARTIAL, the page keeps only its withdrawal rows and stays pending - the gap stated
+partial event kind, so no fresh row replaces it: LD-4's disposition is PARTIAL and the page stays pending. K-392, K-384W and K-392W all remain
+physically present in the ledger's table exactly as authored, so the withdrawal lineage stays
+anchored: the page's acceptance row K-392 is **withdrawn** by K-392W, and that withdrawal is the
+page's effective event - the gap is stated
 plainly, not forced into a full-page-acceptance. The other 28 fresh rows were re-swept by
 reading each lane record's observations and acceptance bullets: no other fresh row covers a
 page whose lane record flags a gap (the method and result are recorded in the ledger's appended
@@ -471,7 +474,47 @@ correction section). Counts, measured at this correction's head: the instrument 
 accepted_on_recorded_review 88 and official_pending_count 567; the ledger-honest figure is 571
 = 596 - 28 + 3. Both measured by command, not taken from arithmetic.
 
+**The authority conflict this correction records.** The withdrawal does not move the official
+count, and this record states that plainly rather than implying otherwise. Side one, the
+approval: AEGIS-APR-117's own scope says "The affected page becomes pending again."
+(`APPROVAL_REGISTER.md` L5033, repeated at L5038-5041). Side two, the instrument: AEGIS-APR-113
+item 1 / D84 made `check_index.py`'s printed summary the official readability pending count.
+Measured at this correction's head with a fresh `build_index.py --write` and
+`check_index.py --json`: the instrument prints accepted_on_recorded_review 88 and
+official_pending_count 567 - identical to a fresh write at the derivation base f490c16f - with
+LD-4 in the accepted bucket through its `withdrawal` row at 0 changed lines. **So the approval
+says the page is pending and the instrument says the page is accepted; the printed figure does
+not follow the withdrawal.** The cause is the checker's docstring/code gap: its docstring
+requires a full-page-acceptance row for that bucket, its code buckets any zero-drift row and
+special-cases only lost-commit. The fix is out of scope for this docs-only PR - it needs its own
+tooling pull request under a fresh owner exception, with its own independent implementation
+audit (Stage D), owned by **the coordinating agent for the documentation-readability programme**
+(the role charged with deciding what work runs and in what order and with routing each lane;
+named as a role rather than a session, because a session identifier is not a durable record).
+This record does not request that exception, does not assume it and does not wait on it.
+
 - Withdrawal row quote (AEGIS-APR-117 correction, the register grant that lets the ledger keeper append withdrawal rows): WD-D4-r1 withdraws K-392 (deepseek-v4-pro-apr117-keeper): LD-4 accepted: docs/evidence/documentation/full-page-readability-sample-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 
-Recorded by **DeepSeek V4 Pro** (deepseek-v4-pro), Stage C, under the owner account, as the
+**The Codex review findings at head 1419d480 - triaged one by one, none left undisposed.** The
+automated Codex review posted at 2026-10-16T00:00:07Z carries four inline findings bound to this
+pull request's head 1419d480e0c2f90ccb62cd4f491ae2b8c4aa676d by `original_commit_id` - one P1
+(the highest severity; an automatic merge stop) and three P2. The Stage D verdict that preceded
+this repair did not dispose of them, so each is disposed of here:
+
+| Finding | What it says | Anchor at the head it was raised against | Disposition |
+| --- | --- | --- | --- |
+| P1, id 4289482694 | "Make withdrawal rows pending in the official index": a fresh build selects K-392W, but `check_index.py` special-cases only lost-commit and so buckets this zero-drift withdrawal row as accepted; the official count stays 567 although AEGIS-APR-117 requires the page to become pending. | keeper table row K-392W, ledger L5491 | **Accepted as a real defect. Not fixable in this PR; now recorded with an owner and a route.** Re-confirmed by command at this repair's head: 567 and 88, LD-4's derived row `withdrawal` at 0 changed lines, in the accepted bucket. `scripts/` and `tools/` are untouched because this PR is docs-only; the required change ("the checker must stop bucketing a withdrawal row as an accepted row") and its follow-up owner are recorded in the ledger's authority-conflict paragraph and in the PR body. |
+| P2, id 4289482705 | "Keep the ledger from publishing a competing count": the section derives and publishes 571 beside the checker's official 567, contradicting the ledger's own L21-28 rule. | ledger L5568 at the pre-repair head | **Fixed.** The ledger section no longer publishes any count of its own; it cites the index's printed 567 and points at this evidence file for the divergence arithmetic, which is where the ledger's L24-25 rule puts it. |
+| P2, id 4289482711 | "Keep the keeper table at the append-only file tail": prose placed after the table makes `build_index.find_table()` stop at the first non-pipe line, so the next keeper row appended at end-of-file would be silently excluded while the build still exits 0. | ledger L5494 at the pre-repair head | **Fixed.** The correction prose moved above the schema sentinel; the table is contiguous and its last row is the file's last line. Asserted by command: 163 rows, no blank line inside the table region. |
+| P2, id 4289482716 | "Preserve retained acceptance rows in the history description": the new text says the page's only rows are withdrawal rows, while the table still carries K-392 as a full-page-acceptance row and the same section says K-392 remains appended. | ledger L5553 at the pre-repair head | **Fixed.** The text now states that the page's acceptance row K-392 is withdrawn by K-392W and that K-392, K-384W and K-392W all remain physically present in the table as authored, so the withdrawal lineage stays anchored. |
+
+**Summary of the triage.** One P1, disposed of as accepted-and-recorded rather than fixed, because
+the fix is a checker-semantics change that this docs-only PR may not make; the recorded
+disposition names the follow-up owner, the required change and the route (its own tooling pull
+request under a fresh owner exception, with its own independent implementation audit). Three P2,
+all fixed in this repair. No finding is left untriaged.
+
+Recorded by **DeepSeek V4 Pro** (deepseek-v4-pro), Stage C round 1, under the owner account; the
+authority-conflict record and the prose corrections above were made by
+**DeepSeek-4.1-Flash** (deepseek-flash), Stage C repair round 4, under the owner account, as the
 repository's 2026-10-13 attribution rule requires.
