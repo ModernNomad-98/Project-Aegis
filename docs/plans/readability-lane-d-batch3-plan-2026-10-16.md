@@ -1,12 +1,21 @@
 # Stage A plan — Phase 4 readability lane D, batch 3 (PR #784) — revision 7
 
-**Plan revision 7**, 2026-10-16 — it re-captures plan revision 6 to correct the one defect the posted
-**SD-B: REVISE** (comment `6216769124`) found in it: **§11 named the wrong line as the second
-locus of the stale line-range cite** — it said the revision-5 capture comment's L27, where those
-ranges occur nowhere; measured, they sit in that comment at **L849**, its verbatim copy of revision 5's
-§14 (revision-5 plan blob `49882fb4…` L812). It also states §12's R2 count method, which earlier
-revisions left unstated, and it edits the PR body's capture table for revision 7 (body-only, free and
-line-neutral); it carries revisions 1-6's corrections (§11). **Stage: A (PLAN).** **Role A**
+**Plan revision 8**, 2026-10-16 — it re-captures plan revision 7 to correct the three defects the posted
+**SD-B: REVISE** (comment `6217390041`) found in revision 7 and in the PR body revision 7's capture
+edited: **(D-1)** §11's universal sentence "Across all six capture comments the stale ranges sit only
+inside each one's frozen §14 copy" is **false** — revision 6's capture comment `6216405076` carries
+`L919-925` / `L943-949` at its own header row **L16** (above the copy fence opened at L37) and
+at copy lines 584 / 661 / 662, which sit in that copy's **§11**, not its §14; the sentence is replaced by
+a per-comment measurement of all seven capture comments (§11). **(D-2)** the body published two variant
+figures that the readings they are labelled with do not produce — `23e150f3d61c…` is the
+**CR-joined** reading at 94,469 bytes and `74fb7ac62ea0…` the closing-fence line counted twice at
+94,481 bytes, where the labelled readings give 95,529 bytes / `5c2064fe861c…` and 94,475 bytes /
+`35f4049863c4…` — and neither string was ever an object in this repository; corrected in the body,
+with every hash this revision publishes re-checked by `git cat-file -t` (§11). **(D-3)** the same
+body edit had deleted revision 6's dropped-LF figure (87,449 bytes / `16d7702e…`), leaving the
+sentence "dropping it gives and the three-backtick …"; restored. It carries revision 7's §12 R2 count
+method statement and edits the PR body's capture table for revision 8 (body-only, free and line-neutral);
+it carries revisions 1-7's corrections (§11). **Stage: A (PLAN).** **Role A**
 is this repository, the Project Aegis source library (Role B is a consumer or product repository that
 copied the Aegis files).
 **Planner:** agent `readability-phase4-lane-d-planner-a1`, model **DeepSeek-4.1-Flash
@@ -558,15 +567,65 @@ Named rather than left implicit:
 
 ## 11. The plan's own revision, and how it is captured
 
-**Revision 7** of this plan — it re-captures revision 6 to correct the one defect of SD-B `6216769124`
-(a **false line attribution**: §11's F2 sentence gave the stale cite's second locus as the revision-5
-capture comment's L27, where the stale ranges occur nowhere; the measured locus is that comment's
-**L849**, its verbatim copy of revision 5's §14 at plan blob `49882fb4…` L812), and it states the §12
-R2 count's method restriction; it carries revisions 1-6's corrections.
+**Revision 8** of this plan — it re-captures revision 7 to correct the three findings of SD-B
+`6217390041`: **(a)** §11's claim that the stale ranges `L919-925` / `L943-949` sit only
+inside each capture comment's frozen §14 copy, which is **false for revision 6's capture comment**
+(measured per comment below); **(b)** the PR body's two variant figures that the readings they are
+labelled with do not produce; and **(c)** the PR body's deleted revision-6 dropped-LF figure, restored.
+It carries revisions 1-7's corrections, including revision 7's corrected second locus for the stale cite
+(that comment's **L849**, its verbatim copy of revision 5's §14 at plan blob `49882fb4…` L812).
 Capture, so that Stage B has an exact text to bind (the requirement is the workflow's own: **L611-616**
 at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in this head's blob
 `bff407a6…`, the numbering revision 3 quoted):
 
+- **Why an eighth revision, stated first.** The posted **SD-B: REVISE** (issue comment `6217390041`,
+  2026-10-16T14:13:15Z; 19,871 characters / 20,097 bytes / 101 LF) found **three** defects in revision 7
+  and in the PR body that revision's capture edited, having re-derived the capture and confirmed it
+  sound. **(D-1) §11's false universal.** Revision 7 published "Across **all six** capture comments the
+  stale ranges sit only inside each one's frozen §14 copy … and **no capture comment carries them at its
+  L27**". The second clause is true; the **first is false for revision 6's capture comment**, which is
+  one of the six it names, and the measurement is now stated per comment (§11). The clause was **carried,
+  not measured**: SD-B `6216769124` **L41** reads "Measured across **all six** capture comments on
+  this PR: the stale ranges sit only inside each comment's verbatim copy of its own revision's §14 —
+  revision 3's comment `6214445839` at **L726**, revision 4's `6215216290` at **L751**,
+  revision 5's `6215701897` at **L849** — and **no capture comment carries them at its L27**", and
+  revision 7 reproduced it as this plan's own finding. With the per-comment measurement in hand this is
+  the **fourth reproduction of this plan's own defect shape** — revision 4 moved the capture bullet from
+  `L612-616` to `L611-616`, revision 6 moved the rule from `L919-925` to
+  `L919-926`, revision 7 moved the stale cite's second locus from L27 to L849, and now a claim
+  about where the ranges sit in *other* capture comments — **inside the very bullet that states the rule
+  that a sentence claiming a measurement is not a measurement**. **(D-2) the body's two mislabelled
+  variant figures.** The body's revision-7 verbatim paragraph published four measured negatives for
+  comment `6217042182`. Re-run here against that comment's live `.body` (104,300 bytes /
+  1,097 LF, 0 CR) by the declared method: dropping the final LF → 94,468 bytes /
+  `19ec25350ee71bab767c1d4a6b69b6926f469523` (published value matches); one line short → 94,373 /
+  `f2f046c3b67b9b0c78917c1c5870cc5d9f498f07` (matches); **joining CRLF → 95,529 bytes /
+  `5c2064fe861c9af597f7bd4de74a7cbfd218931d`**, where the body published `23e150f3d61c…`;
+  **including the closing fence line → 94,475 bytes /
+  `35f4049863c43f76dc2bc28255591723211d08af`**, where the body published `74fb7ac62ea0…`.
+  Both published strings are real hashes of **readings other than the ones their labels name**:
+  `23e150f3d61c…` is the lines joined with a single **CR** and terminated with a CR (94,469 bytes),
+  and `74fb7ac62ea0…` is the closing fence line **counted twice** — the extract ending at L1097
+  inclusive with one further five-backtick line appended (94,481 bytes). Measured over **720**
+  fence/line/separator/terminator readings, exactly one produces each string; **neither is an object in
+  this repository** (`git cat-file -t` on both exits 128, "Not a valid object name"), and outside
+  the SD-B that reports them (`6217390041`) and that audit's own timing note (`6217393617`)
+  they occur in no comment on this PR (full-text search over all 30 issue comments). They are the
+  sibling-failure class in the sense the rule cares about: **an identity published in an evidence field
+  that the stated measurement does not produce.** The plan's own timing note (comment `6217099362`)
+  publishes the **correct** pair, so the two publication sites of revision 7's capture contradicted each
+  other; the body is corrected to the measured pair and now agrees with the note. **(D-3) the body's
+  deleted figure.** The same body edit removed revision 6's dropped-LF figure, leaving "dropping it gives
+  and the three-backtick …". Re-measured from revision 6's posted copy (comment `6216405076`,
+  87,450 bytes / 990 LF, blob `ea3e9053…`): dropping the final LF gives **87,449 bytes /
+  `16d7702eff380709b79fa143bb2c7ee8aeff697b`** — restored in the body. **Every hash this revision
+  publishes was resolved with `git cat-file -t`** (token by token in the timing note): of the
+  **128** distinct hex tokens in these bytes, **80** resolve in the capture clone as Git objects
+  (56 blobs, 24 commits) and the other **48** are labelled for what they are — **25** numeric comment or
+  CI-run ids, **17** digest values (14 sha256, 3 PROC-04 prefixes), **3** the dispatch's transposed head
+  string this plan already declares absent from the repository, **2** the mislabelled variant readings
+  above, measured but never written as objects, and **1** a skill-file sha256 prefix — because a
+  fabricated identity in an evidence field passes every structural check.
 - **Why a seventh revision, stated first.** The posted **SD-B: REVISE** (issue comment `6216769124`,
   2026-10-16T13:40:19Z) found **one** defect in revision 6, having re-derived the capture, re-measured
   both corrected ranges and confirmed F1 and F2 genuinely fixed: **§11's F2 sentence named the wrong
@@ -578,11 +637,34 @@ at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in th
   §14 (revision-5 plan blob `49882fb4…`, source line **L812**; the copy's fences are comment L37 and
   L968, and the bytes between them hash to that blob). **They occur nowhere at L27**: comment L27
   contains no `919`, no `943` and no "invalidation", and its own two line cites are `L875-898` /
-  `L899-922`, the **PROC-04 method** ranges, which are correct at their own ref. Across **all six**
-  capture comments the stale ranges sit only inside each one's frozen §14 copy — revision 3's
-  `6214445839` **L726** (plan blob `553e81d3…` L674), revision 4's `6215216290` **L751** (plan blob
-  `2f8df14f…` L712), revision 5's `6215701897` **L849** (plan blob `49882fb4…` L812) — and **no
-  capture comment carries them at its L27**. The false locus was **carried, not measured**: SD-B
+  `L899-922`, the **PROC-04 method** ranges, which are correct at their own ref. The locus of the stale ranges, stated per comment rather than as a universal — **all seven** capture
+  comments posted before this revision were checked, not six. Method: each capture comment's own posted
+  body (REST API `.body`) split on LF, reporting every line that carries either string:
+  **r1 `6212482822`** (38,603 bytes / 521 LF): **none** — and not because the plan went unposted,
+  since revision 1's own bytes (blob `dbc244c3…`, 36,674 bytes) carry neither string either.
+  **r2 `6213082533`** (47,886 bytes / 579 LF): **none**, for the same measured reason (blob
+  `2b16f53f…`, 41,147 bytes). **r3 `6214445839`** (69,444 bytes / 830 LF): **L726 only** —
+  copy line 674, inside that revision's **§14** (four-backtick copy fences L52 / L824; copy blob
+  `553e81d3…`; §14 heading at copy line 647). **r4 `6215216290`** (80,215 bytes / 867 LF):
+  **L751 only** — copy line 712, **§14** (five-backtick fences L39 / L864; copy blob `2f8df14f…`;
+  §14 heading copy line 685). **r5 `6215701897`** (90,458 bytes / 972 LF): **L849 only** — copy
+  line 812, **§14** (fences L37 / L968; copy blob `49882fb4…`; §14 heading copy line 783).
+  **r6 `6216405076`** (96,794 bytes / 1,032 LF): **L16, L621, L698, L699 — and §14 is not where
+  three of those sit**: L16 is that comment's own "Why revision 6" header row, **above the copy fence
+  that opens at L37**, and L621 / L698 / L699 are copy lines **584 / 661 / 662**, inside that revision's
+  **§11** (fences L37 / L1028; copy blob `ea3e9053…`; §11 heading at copy line 558; **§14's
+  heading is copy line 832**). **r7 `6217042182`** (104,300 bytes / 1,097 LF): **L16, L610, L612,
+  L613, L631, L655, L656, L733, L734** — L16 again a header row above the fence opened at L36, and the
+  other eight copy lines 574 / 576 / 577 / 595 / 619 / 620 / 697 / 698, all inside that revision's
+  **§11** (copy blob `b59aeb6a…`; §14 heading copy line 895). Every copy named above was extracted
+  by that comment's own fence convention and hashed to its revision's blob, so the copy-line mapping is
+  measured rather than inferred. **So the sentence revision 7 published is true for r3, r4 and r5,
+  vacuously true for r1 and r2 (their revisions' own bytes carry neither string), and false for r6 — and
+  r7's own copy reproduces the same shape**; that is why this revision states the finding per comment
+  instead of as a universal. **No capture comment carries either string at its L27** — measured for all
+  seven (2026-10-16, this capture): none of those seven L27 lines contains `919`, `943` or
+  "invalidation"; this revision's own capture comment is checked the same way in its timing note, after
+  it is posted. The false locus was **carried, not measured**: SD-B
   `6216021775` L72 asserts "The same two numbers also sit in the capture comment (L27), which is
   immutable", and revision 6 reproduced that figure in the very sentence claiming both ranges "were
   re-measured here from the two blobs' own bytes … rather than carried from any brief or verdict".
@@ -734,6 +816,30 @@ at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in th
   answers with their routings, the non-author test and its withdrawal-only reading, the evidence
   inventory, the non-decisions, the head-move sweep (§13), the revision-5 sweep table, §14's corrected
   ranges and terminal line, and the bound-field analysis with the unapplied row block.
+- **What revision 8 changes, and nothing else.** (a) **§11's stale-range locus sentence**: the false
+  universal is replaced by the per-comment measurement above — all seven comments checked, every hit
+  classified by copy line and enclosing section, and every copy proved to hash to its revision's blob.
+  (b) **§11's superseded list** now names revision 7 (blob `b59aeb6a…`, commit `a9b19b11…`,
+  comment `6217042182`) and revision 6 (blob `ea3e9053…`, commit `62391eb6…`, comment
+  `6216405076`), which revision 7's list omitted, so the counts read **seven** earlier blobs and
+  **seven** earlier comments. (c) **§11's branch-chain sentence** now names the measured first-parent
+  chain below this revision's capturing commit, where revision 7's text began at `dd53c699…` and
+  therefore omitted `a9b19b11…`, `62391eb6…` and `28d28ced…` — an incidental
+  correction found by re-deriving, of the kind revision 5's (g) records. (d) **The PR body's three
+  fixes**, body-only, free and line-neutral: the D-2 pair corrected to the measured values with the
+  mislabelling stated, the D-3 figure restored, and the capture table, its heading, its unedited-comment
+  list and its timing row updated for revision 8. **No bound field is edited**, so the body digest is
+  still `77a6db9c7a5c31d0` and §14's projected value is still `f15e3d128da4cd52`.
+  (e) **§9's stage-receipt row** gains SD-B `REVISE` `6217390041` and states that a fresh SD-B
+  is owed over revision 8's bytes. (f) **§14** records that revision 8 authors no further row block and
+  re-points none. (g) **§15** gains this revision's timing rows. (h) **Every revision identifier** — the
+  title, the header, this section and §15. **Every other element is revision 7's text, unchanged**: the
+  scope and the eight paths, the what/why and blast radius, the `docs-only` classification, the
+  fifteen criteria with the C-1 screen and the two declared-not-verifiable criteria, the path-anchored
+  selection rule and its eight paths, the five answers with their routings, the non-author test and its
+  withdrawal-only reading, the evidence inventory, the non-decisions, the head-move sweep (§13), the
+  revision-5 sweep table, §14's corrected ranges and terminal line, and the bound-field analysis with the
+  unapplied row block.
 - **The revision-5 sweep, site by site, with the test stated.** The test is **not** revision 4's weaker
   check ("does any text pair AEGIS-APR-117 as authority to record?", which passed while three §8 sites
   still carried the compound). The test applied here is: **"does any text attach the word `re-record`,
@@ -757,7 +863,13 @@ at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in th
   of AEGIS-APR-117.** Every surviving occurrence of the compound in the plan is either a quotation of
   another artefact's defective text with the defect labelled, a negative count about the register, or
   the owner's route name cited to the owner's document.
-- **Superseded captures.** Revision 5 was captured at commit
+- **Superseded captures.** Revision 7 was captured at commit
+  `a9b19b11ba3106eb5e66e6386d06a4669d2b14fd` (blob `b59aeb6a7b4d943ae8e3731a59c7d19e499e37af`,
+  sha256 `36ce7377fa26065701a33041a05a7597b75a88fac93b1a4d2f1591d5afba73d6`, 94,469 bytes / 1,060 LF,
+  posted verbatim as issue comment `6217042182`). Revision 6 was captured at commit
+  `62391eb63479a6b21fe109e9becbdd1c59c9f1c7` (blob `ea3e9053f603e9986ea413d3fd0500b0bafa3605`,
+  sha256 `3cdc53cc5c6ee632066fcb1ccdaf41800cbf14e0943229dd177b562be8dd7d73`, 87,450 bytes / 990 LF,
+  posted verbatim as issue comment `6216405076`). Revision 5 was captured at commit
   `28d28ced5e0ee2de62d854dccff26d71a0a1bb49` (blob `49882fb48b65105dc3fa7e71c0a27aa61e21dfc2`,
   sha256 `7ac6199c81d527a53c09492556603857dfdc04eab8b988ddf9a4a7a660c23322`, 81,221 bytes / 930 LF,
   posted verbatim as issue comment `6215701897`). Revision 4 was captured at commit
@@ -772,15 +884,18 @@ at `origin/main`'s blob `9a2ea2bd…` — the same bullet sits at L587-592 in th
   comment `6212482822`). Revision 2 was captured at commit
   `b8f91cfe504a11119cb23c642db373fb8b55df83` (blob `2b16f53f6b85a2d30eee81174b0a0f9d71611949`,
   sha256 `967df6b9e336acc03ab678e0a4cf977c75adc0672986112b6894c32b61241fd9`, posted verbatim as issue
-  comment `6213082533`). **All five blobs are superseded by this revision's blob**, which the PR body
-  and the fresh capture comment both name; **all five earlier comments stay posted and unedited**,
+  comment `6213082533`). **All seven earlier blobs are superseded by this revision's blob**, which the PR body
+  and the fresh capture comment both name; **all seven earlier comments stay posted and unedited**,
   each as its own revision's record. The plan branch is not the PR branch, so **no head moves** with
   this supersession.
 - **Tracked file:** `docs/plans/readability-lane-d-batch3-plan-2026-10-16.md`, committed on branch
   `stage-a/lane-d-batch3-plan-2026-10-16`. **The branch's topology is stated exactly rather than
   assumed**, because it is not what a reader would guess: the chain below this revision's capturing
-  commit runs `dd53c699…` → `13e0117d…` → `b8f91cfe…` → `491bad10…` → `1aa632f7…` → `99d46d75…` →
-  `e2a3e20b…` (the merge base), so
+  commit runs `a9b19b11…` → `62391eb6…` → `28d28ced…` → `dd53c699…` →
+  `13e0117d…` → `b8f91cfe…` → `491bad10…` → `1aa632f7…` → `99d46d75…` →
+  `e2a3e20b…` (the merge base) — revision 7's list began at `dd53c699…` and omitted
+  `a9b19b11…`, `62391eb6…` and `28d28ced…`; re-derived with `git log --format=%H
+  --first-parent origin/stage-a/lane-d-batch3-plan-2026-10-16` — so
   **the branch was cut from `1aa632f7…`** — the head as it stood when revision 1 was captured, which is
   now the **parent** of the current head, not the head. Therefore **the current head `87c637df…` is not
   in this branch's history** (`git merge-base --is-ancestor 87c637df… HEAD` exits 1): the branch
@@ -925,7 +1040,11 @@ voids the verdict over it (**L919-926** at this head's blob `bff407a6…`; **L94
 authored below and the edit is left to whoever will republish the digest; both digest values are
 stated.
 
-**Revision 7 authors no further block, and re-points none:** it corrects §11's F2 locus sentence and
+**Revision 8 authors no further block, and re-points none:** it replaces §11's stale-range locus sentence
+with the per-comment measurement, completes §11's superseded list and branch chain, corrects the body's
+two mislabelled variant figures and restores the body's deleted revision-6 figure, and it edits none of
+the three bound fields, so the published digest stays `77a6db9c7a5c31d0` and the projected value
+stays `f15e3d128da4cd52`. **Revision 7 authors no further block, and re-points none:** it corrects §11's F2 locus sentence and
 states §12's R2 count method, and it edits none of the three bound fields, so the published digest
 stays `77a6db9c7a5c31d0` and the projected value stays `f15e3d128da4cd52`. **Revision 6 authors no
 further block, and re-points none.** It corrects §14's two line-range cites —
@@ -1045,6 +1164,14 @@ the PR body and the fresh comment, since the comment is posted after this plan's
 - **Start (plan revision 7, this text):** `2026-10-16T06:44:37-07:00` (America/Los_Angeles; the turn-1
   snapshot of this session).
 - **Finish and wall time (plan revision 7):** these necessarily fall **after** this commit exists, so
+  they are stated in the fresh capture comment and in the PR body's capture section, which carry the
+  comment's creation time, the capturing commit's own committer timestamp and both wall figures. The
+  reason is the one revision 3 stated: **the plan is inside the commit that would supply its own finish
+  instant.** They are re-derivable from `git log -1 --format=%cI <capturing commit>` and
+  `gh api repos/ModernNomad-98/Project-Aegis/issues/comments/<fresh comment id> --jq .created_at`.
+- **Start (plan revision 8, this text):** `2026-10-16T07:14:38-07:00` (America/Los_Angeles; the
+  turn-1 snapshot of this session).
+- **Finish and wall time (plan revision 8):** these necessarily fall **after** this commit exists, so
   they are stated in the fresh capture comment and in the PR body's capture section, which carry the
   comment's creation time, the capturing commit's own committer timestamp and both wall figures. The
   reason is the one revision 3 stated: **the plan is inside the commit that would supply its own finish
