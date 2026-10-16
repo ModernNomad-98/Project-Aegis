@@ -169,7 +169,8 @@ three-reader ceiling the batching procedure allows.
    `08856b64e1e74d065e7d3af3b366917a0d13f13d` — see the citation note in the header). **This lane's
    first head `d1de329646f1e0c4a69b6af95b8b6226c97c8ac7` did author eight same-agent rows (authored
    as K-289…K-296) for this batch; the first SD-D implementation audit upheld the P1 finding against
-   it (Codex review comment 4287225934, `original_commit_id` = that head) and repair round 1
+   it (verdict receipt: issue comment `6209259913`, section 13, "SD-D: REVISE"; Codex review comment
+   4287225934, `original_commit_id` = that head) and repair round 1
    **removed** those rows and the ledger note that carried them, leaving the ledger byte-identical
    to the bound revision.** The eight pages therefore stay **pending**: this record is evidence, not
    an acceptance record. **No page needs re-reading** — an eligible keeper records the rows from
@@ -665,7 +666,9 @@ run and are quoted in section 5.
 Drafted by **DeepSeek-4.1-Flash (deepseek-flash)**, the repairing agent. Labels used in this
 section, each glossed in-item as the repository's reporting rule requires: **SD-D** — the
 independent implementation-audit stage (stage D of the seven-stage delivery workflow in
-`docs/delivery-workflow.md`), whose verdict on this record was **REVISE**; **P1** — that audit's
+`docs/delivery-workflow.md`), whose verdict on this record was **REVISE** — the posted receipt is
+issue comment `6209259913` on this pull request (2026-10-16T06:07:58Z), whose section 13 reads
+"**SD-D: REVISE**"; **P1** — that audit's
 highest-severity finding, an automatic merge stop; **P2** — the finding next below it; **MG** — the
 merge-gate IDs `MG1`–`MG5` of that same workflow; **SD** — the per-stage exit-disposition IDs
 `SD-A`–`SD-G` of that same stage table; **D84** — the ledger's 2026-10-10 "Official-count switch"
@@ -810,10 +813,10 @@ request, not here.
 
 ## Footer
 
-sha256: 7ce1e47c85db16facd475cfc0423aa036c4b2f8a0ac7355bb7a3ede40081a428
+sha256: 8b3cfda7b23999b9f801b200c2781452af4057c50ba00f533d63178c38d38ea0
 
 This digest covers **one** range, stated by byte count so that two readings cannot disagree: the
-**70,672 bytes** running from the first byte of this file through the closing `---` rule line and
+**70,888 bytes** running from the first byte of this file through the closing `---` rule line and
 its terminating newline, encoded UTF-8 with LF line endings. It does **not** cover the blank line
 that separates that rule line from this heading, and it does not cover this footer. Any edit above
 the rule line voids the digest and requires a fresh validation.
@@ -825,3 +828,10 @@ published, `0967e4acaf26fb7165e479e6c2026f20670746d03f7bd6c932b8e82f2ab3489f`, w
 **45,479** bytes through the rule line — the reading the sentence's second clause described.
 The published value was correct for that reading; the sentence is now that reading only, and the
 value above is recomputed for this head.)*
+
+*Recomputed and published by **DeepSeek-4.1-Flash (deepseek-flash)**, the repairing agent of
+repair round 1, over this file's own committed bytes and by command, at each repair commit:
+`7ce1e47c85db16facd475cfc0423aa036c4b2f8a0ac7355bb7a3ede40081a428` over **70,672** bytes at the
+first repair commit, and the value above over **70,888** bytes at the second, which adds the SD-D
+verdict receipt reference. The SD-D verdict this round answers is the posted issue comment
+`6209259913` on this pull request, whose section 13 reads "**SD-D: REVISE**".*
