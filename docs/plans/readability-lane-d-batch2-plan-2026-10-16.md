@@ -224,10 +224,28 @@ the class where that sentence is most likely to be misread as an exemption, whic
 request came to have no plan while every other stage had run.
 
 **The stage path this implies: the FULL path, at documentation depth.** Stages A to G, in order, a
-different holder per stage, and every `MG1`-`MG5` condition met. Because the ledger is a surface a
-required check mechanically asserts on (the builder and checker read it), the audit depth is the deeper
-end of the docs-only band — L594-L596: a change that edits enforcement surfaces, governance text, *"or
-anything a required check mechanically asserts on earns a deeper audit"*. This agent holds Stage A
+different holder per stage, and every `MG1`-`MG5` condition met.
+**The warrant for that depth is the measured enforcement surface, not an assumed one.** A required
+check — a status check branch protection requires before `main` can accept a merge — is what that depth
+turns on, so here is the measured position. Branch protection registers **exactly two** required
+checks, `gate-guard` and `validate-skills`. `gate-guard` is a path classifier: it decides by file path,
+and none of this change’s three paths matches its pattern, so it asserts nothing about the ledger. The
+one required check that would touch the file when it runs is `validate-skills` — the required CI job
+that runs the repository’s merge gate — and only through its markdown-link-corpus step, which sweeps
+every tracked Markdown page, the ledger among them, for **links and anchors only**; it does not parse
+the keeper table, its stable IDs, its reviewer cells or its blob bindings. And
+`git grep -i -E "readability_acceptance|build_index|check_index|keeper table|acceptance-index" 5c462e12... -- .github scripts`
+exits **1 with no output** at this head, so **no CI job and no required check runs
+`tools/readability_acceptance/build_index.py` or `check_index.py`** — they are local maintainer
+instruments, the role the repository README gives the acceptance index. **The audit depth is therefore
+still the deeper end of the docs-only band** — L594-L596: a change that edits enforcement surfaces,
+governance text, *"or anything a required check mechanically asserts on earns a deeper audit"*. **Why
+this strengthens the case rather than weakening it:** the surface this change edits **is** the keeper
+table — 24 new row lines — and the next holder to touch it is the merge holder (the agent performing
+Stage G, merge), resolving a conflict *inside that table*. The deleted parenthetical claimed a required
+check mechanically asserts on those rows; nothing does, so a merge holder who trusted it could resolve
+the 24 rows by hand believing a check had verified them. This change edits governance text and adds rows
+that no check asserts on — the condition L594-L596 calls a deeper audit. This agent holds Stage A
 only.
 ## 4. Acceptance criteria, decidable at this head
 
@@ -402,8 +420,10 @@ byte comparison reported with the capture.
 **5. Complexity justification — why is the machinery warranted, and what would be smaller?**
 
 *Answer: the work is warranted because the alternative has already failed on this change, once.* This
-pull request ran Stage C twice and Stage D three times and reached a documented ACCEPT — and still
-cannot merge, because the one artifact that must exist before Stage B can run does not exist. Adding
+pull request has recorded **two Stage C acts** (comments `6219830496` and `6222423414`) and posted
+**five Stage D verdicts** — three `SD-D: REVISE` (`6209226725`, `6210904568`, `6219302568`) and two
+`SD-D: ACCEPT` (`6220176819`, `6222961181`) — and reached a documented ACCEPT — and still cannot
+merge, because the one artifact that must exist before Stage B can run does not exist. Adding
 the plan now is the only route that does not discard the verified implementation. What is added is one
 Markdown page and one comment: **no new tooling, no new script, no new gate, no new check**. **What
 would be smaller, and why each smaller unit fails:** a plan living only in the PR body is the smallest
