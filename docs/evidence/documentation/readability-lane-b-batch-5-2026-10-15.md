@@ -2,8 +2,14 @@
 
 **Work item: "Phase 4 re-read, lane B, batch 5 — evidence record for eight whole-page re-reads".**
 **Started** 2026-10-15T20:29:31-07:00 (this session's first clock sample, before the clone);
-**record written** 2026-10-15 between the 20:39:42 and 20:52 clock samples of this session
+**record written** 2026-10-15 between the 20:39:42 and 20:44:26 clock samples of this session
 (the same session; wall time to the pull request is reported in the pull-request body).
+- **Self-audit correction, made after this branch's first push and disclosed rather than hidden.**
+  The first commit of this record named a clock sample this session never took (a guessed 20:52); the
+  header above now names the two samples it did take — 20:39:42 and 20:44:26, the latter at the pull
+  request's creation — and the footer digest below is recomputed over the corrected bytes. No
+  disposition, gap, page line, FULL/PARTIAL count, norm measurement, blob ID or per-page line/byte
+  figure changed.
 
 - **Lane:** PHASE 4 RE-READ LANE B. *Phase 4 re-read* is the fourth phase of the documentation
   readability backlog — a whole-page re-read of every page that has no recorded full-page
@@ -684,11 +690,11 @@ material only in a separate eligible keeper's hands, under AEGIS-APR-101 and AEG
 
 ## Footer
 
-sha256: dc52d77e9d177ee1a3ec0c9a4a9b985b1d86c580922e2ed654fb7dbaa18e6794
+sha256: fc5a82ae84a3f9d104d99a3a9c6d90a42e9d8055158d2f69684b86afbd13fa33
 
 This digest covers the batch record's bytes from the first line through the closing `---` rule line
-and its terminating newline, encoded UTF-8 with LF line endings: exactly 52,881 bytes, byte offsets
-0 through 52,880 inclusive, lines 1-683. It does not cover the blank
+and its terminating newline, encoded UTF-8 with LF line endings: exactly 53,401 bytes, byte offsets
+0 through 53,400 inclusive, lines 1-689. It does not cover the blank
 separator line between that rule and the `## Footer` heading, nor this footer. Any edit above the
 rule needs a fresh validation. The method was calibrated before it was trusted: applying it to lane A
 batch 5's committed record reproduces its published value
