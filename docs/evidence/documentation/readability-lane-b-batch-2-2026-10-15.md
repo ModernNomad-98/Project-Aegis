@@ -125,20 +125,20 @@ Purpose L19-31; each SKILL.md's Use When names when and when not to invoke. (b) 
 coded identifiers defined at first use* — each page carries a terms paragraph expanding its
 abbreviations before use: B2-1 L8 (CSR, SSR, SSG, RTT, KB, PR), B2-2 L8-12 (CI/CD, IaC, CLI, ADR,
 CVE, authn, authz), B2-3 L6 (CI, CORS, CVE, ADR, CLI), B2-4 L8-9 (QA, n-day), B2-5 L4-6 (cohort,
-counting model), B2-6 L8 (PR, env-var), B2-7 L5-6 (ETA, PR, APR), B2-8 L10-17 (LLM08, OWASP, hidden
+counting model), B2-6 L8 (PR, env-var), B2-7 L5-6 (ETA, PR, APR), B2-8 L8-17 (LLM08, OWASP, hidden
 context, LLM, RAG, MCP, RBAC, API, JSON, URL, UX). (c) *Descriptive headings, lists or tables, and
 at least one concrete example* — every page uses headed sections; concrete worked examples exist on
-B2-1 (the device-class definitions L27-30 and the budget-gate block L86-93, e.g. `route "/app":
+B2-1 (the device-class definitions L22-26 and the budget-gate block L86-93, e.g. `route "/app":
 ≤ 220 KB gz`), B2-2 (the sampling rule "3 largest + 3 highest-churn files", L60), B2-3 (the worked
 CONFIRMED example row in the tier table, L66), B2-4 (the "34%" worked problem, L13; the confound
 gotcha, L150-152), B2-5 (the worked table cells throughout), B2-6 (the ETA-folklore gotcha,
 L164-166), B2-7 (the two worked history-index rows with phase durations, L81-82), B2-8 (the LLM08
-Scenario #2 reading, L123-126; the API-key-in-the-prompt gotcha, L217-219). (d) *Shipped behaviour
+Scenario #2 reading, L141-143; the API-key-in-the-prompt gotcha, L217-219). (d) *Shipped behaviour
 separated from proposed or blocked behaviour* — B2-1 separates the sheet's current rules from the
 owning skill's measurement ("Silent raises are review blocks", L99-100); B2-2 states "Repo-level
 review, not a pentest — say so" (L69) and "the audit changes nothing" (L120); B2-3 states "An audit
-is allowed to be shallow; it is not allowed to be secretly shallow" (L37) and separates the four
-evidence tiers (L62-68); B2-4 separates WHERE users drop (measurable) from WHY (a hypothesis,
+is allowed to be shallow; it is not allowed to be secretly shallow" (L39-40) and separates the four
+evidence tiers (L66-69); B2-4 separates WHERE users drop (measurable) from WHY (a hypothesis,
 L22-23, L139-141) and routes causal tests to `ab-test-designer` (L158-165); B2-5 states "The funnel
 locates drop-off. It does NOT explain it." (L69-70); B2-6 states the phase "produces an
 in-conversation draft only" (L73-78) and "It never executes the operation" (L23); B2-7 states
@@ -148,9 +148,9 @@ and that hardening is "defense-in-depth, never the primary control". (e) *Naviga
 and every referenced file or command existing* — the mechanical pass above: 12 links, 0 broken, 0
 dead; every backtick-named skill exists under `.claude/skills/` at the bound revision (B2-1: no
 backtick-named skills, and its plain-text neighbor names caching-strategy-designer, L63;
-vite-build-qa-engineer, L86; performance-test-harness, L91, all exist; B2-2: code-reviewer,
+vite-build-qa-engineer, L87; performance-test-harness, L92, all exist; B2-2: code-reviewer,
 principal-code-analyst, systematic-debugger, sensitive-disclosure-guard, human-approval-boundary,
-agent-startup-context-gate, full-codebase-auditor; B2-3: full-codebase-auditor; B2-4:
+agent-startup-context-gate, code-simplifier, full-codebase-auditor; B2-3: full-codebase-auditor; B2-4:
 event-schema-architect, product-analytics-instrumenter, ab-test-designer; B2-5: ab-test-designer;
 B2-6: incident-response-runbook, rollback-runbook-author, secure-migration-reviewer,
 merge-is-deploy-governance, agent-authorization-matrix, scoped-approval-register; B2-7:
@@ -338,6 +338,102 @@ model, stated per the repository's agent-attribution rule.
 - Finish and measured wall time are recorded in the pull request body closeout. **Active time was
   not instrumented**; wall time is labelled an imperfect comparison with any active-time
   expectation, and no per-page active rate is claimed.
+
+## 11. Repair note — 2026-10-15, after the Stage D audit returned REVISE
+
+*Glosses for the labels this note uses. **Stage D** = the independent implementation-audit stage: an
+agent that did not write the change re-derives its claims from the artifacts. **REVISE** = that
+stage's verdict that rework is required before merge. **Stage C** = the implementing stage that wrote
+this record. **Bound-field digest** = the 16-hex sha256 over a pull request body's three
+machine-checked bound fields (witness, skills, security). **`userContentEdits`** = GitHub's own edit
+counter for a pull request body, read through the GraphQL API. **AEGIS-APR-101 / 117** = the
+approval-register entries governing who may record an acceptance row, and the withdraw-and-re-record
+route.*
+
+**What the audit found, and what this repair changed.** The Stage D audit of this pull request
+returned **REVISE** against `78af4ef2d0421a16341865402efcdeeb06ca922c`. It raised two defects: one in
+this record's acceptance evidence (section 3), and one in the pull request body's bound-field digest.
+Both are fixed; nothing else in this record was touched.
+
+**1. Seven line cites in section 3 were wrong; all seven are corrected in place.** Every correction
+was re-measured against the page's own bytes at the acceptance revision
+(`git cat-file blob e2a3e20b7c20ef8385b219b39c6405237163406f:<page>`), not against a later revision:
+
+| Section 3 site | Cite as written | Corrected to | What is at the corrected lines |
+| --- | --- | --- | --- |
+| (b) B2-8 terms | `L10-17` | **`L8-17`** | `LLM08` and `OWASP` are introduced at L8-9; the rest of that list runs to L17 |
+| (c) B2-1 worked example | `L27-30` | **`L22-26`** | the fence and its two definitions — `device-class "baseline-mobile"` L23-24, `device-class "desktop"` L25; L27-30 is a blank line, the `## Weight-audit worksheet` heading and a fence |
+| (c) B2-8 worked example | `L123-126` | **`L141-143`** | the official LLM08 entry's example Scenario #2; L123-126 is procedure step 3 (Axis 2) |
+| (d) B2-3 quotation | `(L37)` | **`(L39-40)`** | "An audit is allowed to be shallow; it is not allowed to be secretly shallow."; L37 is a table row |
+| (d) B2-3 tiers | `L62-68` | **`L66-69`** | all four evidence tiers — CONFIRMED L66, LIKELY L67, HYPOTHESIS L68, MISSING INFO L69; the cited range stopped after the third |
+| (e) B2-1 plain-text name | `L86` | **`L87`** | `vite-build-qa-engineer`; L86 is the fence line that opens the budget-gate block |
+| (e) B2-1 plain-text name | `L91` | **`L92`** | `performance-test-harness`; L91 is blank |
+
+No other cite in section 3 changed, and the eight dispositions are unchanged: all eight pages remain
+**accepted unchanged**.
+
+**2. Section 3(e)'s B2-2 name list was one name short of the record's own stated total.** The page
+names eight backticked skills; the list carried seven. The missing name — `code-simplifier` (B2-2
+L161, and `.claude/skills/code-simplifier/SKILL.md` exists at the acceptance revision) — is now in
+the list. With it the enumeration sums to the stated total: 0+8+1+3+1+6+5+15 = **39**. This was an
+enumeration error only; the page line counts, the link counts and the 40-hex counts are unchanged.
+
+**3. The pull request body's bound-field digest is corrected in the body, not in this record, and the
+correction is stated there in full.** The measurement is recorded here because this record is the
+batch's evidence page. The body published `64bf6a407e23e47f` (16 hex), while the method the body
+itself declares — the three payloads in the published order witness → skills → security, each field's
+whitespace runs collapsed to single spaces and trimmed, joined with single newlines, sha256 over the
+UTF-8 string, first 16 hex — yields **`5feb2e444d998034`** (16 hex, counted by hand as four groups of
+four: 5feb / 2e44 / 4d99 / 8034) over payload lengths witness **1926** / skills **7081** / security
+**477**. Two independent implementations (Python `hashlib` and Node `crypto`) agree, and the same
+method reproduces the published digests of #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`, #792
+`88300e711714200a` and #795 `5fabf87b2df899e9` from each body's own live readback, plus #790's
+current live value `1d69dc6f748f945f`. **The published figure was never true of any posted body under
+the body's declared method.** GitHub's `userContentEdits` for this body returns `totalCount: 0`
+(measured 2026-10-15; the same call returns 7 for #783, 3 for #787, 6 for #790, 2 for #792, 5 for #795
+and 4 for #796), so the body has never been edited and no earlier posted revision exists for the
+figure to have been true of. This is not staleness: there is no revision at which that figure is the
+value the declared method produces. *Measured refinement:* the old figure is reproducible from the
+same posted body under a **different** normalization — each field collapsed line by line with no trim
+(payload lengths 1930 / 7086 / 481) — which identifies it as a method-implementation mismatch rather
+than an arbitrary number; a sweep of 1,680 normalization variants found that one and no other. The
+repair publishes `5feb2e444d998034` in the body and states the movement there. **No bound field was
+edited by this repair**, so the three payloads and their lengths are unchanged, and the published
+value is stable across this correction.
+
+**What this repair did not change.** The eight dispositions and the section-3 table's verdicts; this
+record's section 5 row-quote strings (all eight, one per page); sections 1-4 and 6-10; the ledger's
+appended section and its rows K-181–K-188; every read page (zero edits); and no footer digest was
+added (the F6 ruling does not require one). The branch's diff against the merge base stays
+additions-only: this record is a file the branch adds, so correcting lines inside it removes no line
+of any base revision.
+
+**What this repair round did not verify.**
+
+1. **The authoring-time basis of the old figure.** GitHub exposes no superseded body revisions and
+   `userContentEdits` shows there were none, so no candidate posted body exists for it to have been
+   true of, and the exact procedure that produced it is not observable from any repository ref. The
+   undeclared normalization above reproduces it from the current body — the closest available
+   explanation, not a proven provenance.
+2. **The two sources this record cites that no ref binds.** `_resume-2026-10-09/KEEPER-ID-ALLOCATION.md`
+   (sections 2 and 6) and `OWNER-DECISIONS-2026-10-15.md` (section 7). The workspace bytes support the
+   claims made — lane B's band K-181–K-280 and the APR-117 route — but no repository ref binds them, so
+   "unchanged since the lane read them" is not checkable. The tracked copy of those decisions that later
+   entered `main` words the route as "NO ratification; use the AEGIS-APR-117 route", not as section 7
+   quotes it; the ledger section's `MERGE-QUEUE-2026-10-15.md` is in the same position.
+3. **The acts this record describes** — that the eight pages were read whole, line by line, as prose,
+   and returned whole by the read tool in one call: an act and a tool-internal behaviour, not
+   observable from the repository.
+4. **The Codex review findings for this head**: no finding text of any severity is retrievable (0
+   reviews, 0 inline review comments; the bot's own state block reports a failed review and its
+   companion comment reports the usage limit), so no finding of any severity could be triaged.
+
+**Attribution.** The Stage C record and its keeper rows were prepared by DeepSeek `deepseek-v4-pro`.
+**This repair note, the seven cite corrections, the list completion and the body's digest correction
+were made by DeepSeek-4.1-Flash (`deepseek-flash`)** as the repairer, under the repository's
+2026-10-13 attribution rule. This repair is the branch's second commit; its parent is
+`78af4ef2d0421a16341865402efcdeeb06ca922c`, and the resulting head is named in the pull request
+body's repair note.
 
 ---
 
