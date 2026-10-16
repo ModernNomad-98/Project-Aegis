@@ -52,12 +52,18 @@ presents the figures above as the instrument's, not as its own measurement.
   `e2a3e20b7c20ef8385b219b39c6405237163406f`, derived from the `--json` output by the same rule the
   checker's own source applies (reader pages minus emitted rows).
 - Sorted by repository path, the 590 split into **four contiguous count-based quarters — 148 / 148 /
-  148 / 146** (the Lead's own corrected split, per `KEEPER-ID-ALLOCATION.md`, 2026-10-15). **Lane B is
+  148 / 146** (the Lead's own corrected split, per `docs/roadmaps/KEEPER-ID-ALLOCATION-2026-10-15.md` at
+  PR #792's head `aeae752a` — **unmerged**: that file is not an ancestor of this base or of
+  `origin/main`). **Lane B is
   sorted indices 148–295**: first `.claude/skills/file-upload-storage-architect/SKILL.md`, last
   `.claude/skills/share-link-access-architect/SKILL.md`. The quarter's actual letter span is **f
   through s inside `.claude/skills/`**; the command-derived quarter is authoritative and matches the
-  coordinator's `laneB-pages.json` (verified byte-for-byte by script: the 148-entry list equals
-  `sorted_pending[148:296]`).
+  coordinator's `laneB-pages.json` — a session workspace artifact that occurs in none of the fetched
+  refs and is not present in the workspace at the 2026-10-16 repair, so it cannot be cited as a
+  repository source — by re-deriving the list from the checker's own bytes instead:
+  `sorted_pending[148:296]` is a **148-entry** list whose first entry is
+  `.claude/skills/file-upload-storage-architect/SKILL.md` and whose last is
+  `.claude/skills/share-link-access-architect/SKILL.md`.
 - **The brief's "quarter index 164 (0-based start)" anchor, reconciled.** 164 is the 0-based index in
   the sorted pending list where **batch 3 starts** — quarter start 148 plus the 16 pages batches 1 and 2
   already read (148–163). The quarter itself starts at 0-based index 148; "approximately paths 165 to
@@ -84,8 +90,10 @@ Line counts measured with `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<pa
 2026-10-15, and confirmed against the read tool's own total-line report for each page.
 
 **Keeper rows: this batch authors none and assigns no keeper ID.** Lane B's allocated keeper-ID band
-is **K-181–K-280** (`KEEPER-ID-ALLOCATION.md`, 2026-10-15); the ids for these eight pages are the
-separate eligible keeper's to assign under the allocation file's protocol. See section 7.
+is **K-181–K-280**, from the lane table in `docs/roadmaps/KEEPER-ID-ALLOCATION-2026-10-15.md` at PR
+#792's head `aeae752a` (**unmerged**; the bare name `KEEPER-ID-ALLOCATION.md` occurs in no fetched
+ref); the ids for these eight pages are the separate eligible keeper's to assign under that file's
+protocol. See section 7.
 
 ## 3. Per-page dispositions — 8 of 8 full-page re-reads
 
@@ -97,9 +105,10 @@ Two complete, complementary passes were made over each page:
 1. **Mechanical pass.** `python -B scripts/ci/check-markdown-links.py <page>` per page — 5 links
    total across the eight pages, **0 broken, 0 dead** (per-page outputs in section 9); every
    40-character SHA counted — **0 on every page**; every backtick-named skill reference checked to
-   exist under `.claude/skills/` — **every one present** (68 occurrences across the pages); the
-   named `references` and `evals` files existence-checked at the bound revision — **every one
-   present**. No page carries an in-page anchor link, so the bad-anchor count is zero by enumeration.
+   exist under `.claude/skills/` — **every one present** (**68 distinct skill names** — 17/5/10/7/5/13/2/9
+   per page — in **129 occurrences**); the named `references` and `evals` files existence-checked at
+   the bound revision — **every one present**. No page carries an in-page anchor link, so the
+   bad-anchor count is zero by enumeration.
    There are **no external links** on any of the eight pages (B3-1's OWASP scope-source citation is
    plain text with a check date, not a link), so none was fetched (zero by enumeration, not an
    omission).
@@ -138,51 +147,55 @@ acceptance honestly where a gap exists. These seven gaps are exactly the shape C
   `LLM07:2025` (L7) named by title only; `LLM02` (L55, L171), `LLM09` (L172) and `LLM03` (L175)
   are used with their OWASP titles but are never expanded anywhere on the page. OWASP and LLM are
   glossed at first use (L6); GenAI is glossed at first use (L11); API/JSON/MCP/OAuth/IP/PII/RAG/URL/
-  RBAC/UX are defined in the Terms block (L23-28) before first body use.
+  RBAC/UX are defined in the Terms block at L25-28 (the API/JSON/MCP/OAuth/IP/PII/RAG/URL group) and at
+  L29 (RBAC / UX) before first body use.
 - **B3-3:** `OWASP`, `ASI09` and `UX` are used in the frontmatter description (L3) before the
   Terms block (L8-11) defines them (together with AI, UI and PR); the body re-uses ASI09 at L15 before
   the Terms block.
 - **B3-4:** `OWASP` (L4) and `API` (L43) are used with no expansion on this page, and the page
   carries no terms block of its own. ASI09 (L4) and S/A (L5) are defined inline at first use; AI is
-  glossed at its first use (L76).
+  glossed at its first use (L80).
 - **B3-5:** `RLS` is used in the frontmatter description (L3) before the Terms line (L8) defines it.
 - **B3-6:** `CDK`, `IAM` and `RBAC` are used in the frontmatter description (L3) before the Terms
   block (L8-10) defines them.
 - **B3-7:** `DNS` (L31), `tfvars` (L44), `JSON` (L66) and `RG` (L67, "cross-RG coupling") are
-  used with no expansion on this page or in its owning SKILL.md. The page's own terms (L3-8) define
+  used with no expansion on this page or in its owning SKILL.md. The page's own terms (L4-8) define
   IaC, AZ, NSG, CIDR, IAM, RBAC, ACL, ARM and CDK — but not these four.
 - **B3-8:** `SEV1–SEV4` and `SLI` are used in the frontmatter description (L3) before the Terms
-  block (L8-11) defines them (together with IC, SLO and SLA).
+  block (L8-12) defines them (together with IC, SLO and SLA).
 
 None of these gaps changes a safety boundary, an approval entry or an evidence record, and this lane
 edited none of the pages; the gaps are recorded here for the keeper and the owning process, and no
 full acceptance is claimed for the seven partial pages. **B3-2 carries no first-use gap:** its Terms
-block (L8-13) defines DB, LB, DoS, SLO, TTL and N before any use, and its description line uses no
+block (L8-10) defines DB, LB, DoS, SLO, TTL and N before any use, and its description line uses no
 abbreviation. (Observation, not a gap: L163 writes "DOS" as a capitalization variant of the defined
 "DoS", same acronym.)
 
 **The six acceptance bullets, addressed for each of the eight pages.** (a) *Purpose and audience up
-front* — every page: B3-1 L1-9 (what the page is, its doctrine, its scope source and its read-on-demand
-role), B3-2 Purpose L14-24, B3-3 Purpose L16-27, B3-4 L1-5, B3-5 Purpose L12-19, B3-6 Purpose L22-33,
-B3-7 L1-8, B3-8 Purpose L14-24; each SKILL.md's Use When names when and when not to invoke. (b)
+front* — every page: B3-1 L1-17 (what the page is, its doctrine, its scope source and its read-on-demand
+role), B3-2 Purpose L14-26, B3-3 Purpose L15-27, B3-4 L1-5, B3-5 Purpose L12-16, B3-6 Purpose L22-33,
+B3-7 L1-8, B3-8 Purpose L15-25; each SKILL.md's Use When names when and when not to invoke. (b)
 *Abbreviations and coded identifiers defined at first use* — partial on seven pages exactly as 3a
 states; B3-2 satisfies it. (c) *Descriptive headings, lists or tables, and at least one concrete
 example* — every page uses headed sections; concrete worked examples exist on B3-1 (the Aegis reading
-of LLM08 Scenario #2, L130-131; the worked anti-pattern rows L96-111), B3-2 ("on 8 nodes that is 8
-charges / 8 emails / 8 rollups", L155-156; "Autoscaling can DOS your own database", L163-165), B3-3
-("47 routine changes + 1 scope expansion" bundling gotcha, L188-189), B3-4 (the verified-summary
-request template with its (S)/(A) field rules, L49-60), B3-5 ("Yes to staging does not cover
-production", L117-118; the two classic false positives, L121-123), B3-6 (the `moved`-block rename
-gotcha, L160-162; the "Temporary" 0.0.0.0/0 gotcha, L169-171), B3-7 (the worked tool-specific
+of LLM08 Scenario #2, L130; the worked anti-pattern rows L108-118), B3-2 ("on 8 nodes that is 8
+charges / 8 emails / 8 rollups", L159; "Autoscaling can DOS your own database", L163-165), B3-3
+("47 routine changes + 1 scope expansion" — line-wrapped in the source across L177/178 — bundling
+gotcha, L177-178), B3-4 (the verified-summary request template with its (S)/(A) field rules, L38-54),
+B3-5 ("Yes to staging does not cover
+production", L115-116; the two classic false positives, L119-120), B3-6 (the `moved`-block rename
+gotcha, L160-163; the "Temporary" 0.0.0.0/0 gotcha, L167-169), B3-7 (the worked tool-specific
 sharp-edges table, L64-69), B3-8 ("database primary down" might be SEV1 or a non-event, L173-174;
-"we've identified the issue" aging badly, L181-183). (d) *Shipped behaviour separated from proposed
-or blocked behaviour* — B3-1 states the doctrine outright ("hidden context is not a security
-control", L7-8; "the control is the code", L108-109) and labels extraction techniques "for awareness
-— NOT the fix" (L136); B3-2 states "It reviews readiness; it does not set the targets, the latency
-budget, or design the cache" (L24-25); B3-3's AI Security Rules state "a claim is not evidence"
-(L179-180); B3-4's boundary notes separate gate placement, post-hoc audit and content overreliance
-(L79-83); B3-5 states "This skill IS a stop condition" (L128); B3-6 states "review is not execution
-approval" and "applying is outside this skill" (L64-66); B3-7 marks the blast-radius checklist "run
+"we've identified the issue" — line-wrapped in the source across L178/179 — aging badly, L178-179).
+(d) *Shipped behaviour separated from proposed or blocked behaviour* — B3-1 states the doctrine
+outright ("hidden context is not a security
+control", L7-8; "the control is the code" — line-wrapped in the source across L120/121 — L120-121) and
+labels extraction techniques "for awareness — NOT the fix" (L134); B3-2 states "It reviews readiness;
+it does not set the targets, the latency budget, or design the cache" — line-wrapped in the source
+across L24/25 — (L24-25); B3-3's AI Security Rules state "a claim is not evidence"
+(L158); B3-4's boundary notes separate gate placement, post-hoc audit and content overreliance
+(L74-83); B3-5 states "This skill IS a stop condition" (L128); B3-6 states "review is not execution
+approval" (L138) and "applying is outside this skill" (L192); B3-7 marks the blast-radius checklist "run
 FIRST" (L10); B3-8 states "Authors documents only — never runs an incident" (description) and routes
 live incidents away in its Stop Conditions. (e) *Navigation links current and every referenced file
 or command existing* — the mechanical pass above: 5 links, 0 broken, 0 dead; every backtick-named
@@ -285,10 +298,12 @@ were read in full this session and applied at the step each names. None is padde
   (section 3a). The read-and-report-only posture held: no page text was edited.
 - **`source-of-truth-reconciler` — applied.** Two brief anchors conflict with the command-derived
   state and were reconciled against the artifact that defines the set — `check_index.py` run at the
-  base, and `KEEPER-ID-ALLOCATION.md`: (1) the brief's "quarter index 164 (0-based start)" is the
+  base, and `docs/roadmaps/KEEPER-ID-ALLOCATION-2026-10-15.md` (PR #792's head `aeae752a`, **unmerged**):
+  (1) the brief's "quarter index 164 (0-based start)" is the
   batch-3 start index, not the quarter start (the quarter starts at 148; 148/148/148/146 is the
   Lead's own corrected split of the 590); (2) the illustrative letter ranges never appear in a PR
-  (the allocation file's ruling) — the quarter's real span is f-through-s. Both are recorded in
+  (the allocation file's ruling, at PR #792's head) — the quarter's real span is f-through-s. Both are
+  recorded in
   section 2.
 - **`scoped-approval-register` — applied.** Read AEGIS-APR-039 (the standing owner approval for
   backlog work: commits, pushes, PRs, merges), AEGIS-APR-101 (keeper independence), AEGIS-APR-116
@@ -359,7 +374,7 @@ deepseek-v4-pro model, stated per the repository's agent-attribution rule.
 | 7 | per-path check against `tools/readability_acceptance/acceptance-index.json` `reader_pages` | all 8 paths absent (pending, as derived) |
 | 8 | `git log -1 --format="%h %an %s" e2a3e20b… -- <page>` × 8 | other authors only (section 3) |
 | 9 | `python -P -B tools/readability_acceptance/check_index.py --json --ref origin/main` | exit 0; section 1 figures |
-| 10 | `python -P -B <derive script>` over the checker JSON and `laneB-pages.json` | pending set 590; `sorted_pending[148:296] == laneB-pages.json` → True |
+| 10 | re-derivation of the two-bucket pending union from the checker's own bytes at the base | pending set **590**; quarters **148/148/148/146**; `sorted_pending[148:296]` is a **148-entry** list, first `.claude/skills/file-upload-storage-architect/SKILL.md`, last `.claude/skills/share-link-access-architect/SKILL.md`; batch 3 = indices 164–171, exactly the eight pages above. (The earlier round attributed this equality to `laneB-pages.json`, an untracked session artifact — see section 11.) |
 | 11 | `git diff --check` | clean (run at the pushed head, recorded in the PR closeout) |
 
 ## 10. Timing
@@ -370,6 +385,120 @@ deepseek-v4-pro model, stated per the repository's agent-attribution rule.
 - Finish and measured wall time are recorded in the pull request body closeout. **Active time was
   not instrumented**; wall time is labelled an imperfect comparison with any active-time
   expectation, and no per-page active rate is claimed.
+
+## 11. Stage C repair round — 2026-10-16 (SD-D: REVISE)
+
+**Repaired by DeepSeek-4.1-Flash (`deepseek-flash`), Stage C repair implementer, operating under the
+owner account.** The repairer did not write this record and did not perform the audit. The audit being
+discharged is the first Stage D on this PR (SD-D: REVISE, posted as issue comment `6209769689`).
+**Nothing in the eight dispositions changes:** the acceptance revision stays
+`e2a3e20b7c20ef8385b219b39c6405237163406f`, no read page is touched, no ledger text is edited and no
+keeper row is authored. (Glosses: *SD-D* is the Stage D implementation-audit verdict; *Stage D* is the
+independent audit that follows this Stage C record; *Stage C* is the implementation stage that wrote it.)
+
+**What this round corrected (before → after).**
+
+1. **The skill-reference metric was mislabelled.** Section 3 said "68 occurrences". Measured: **68
+   distinct skill names** (17/5/10/7/5/13/2/9 per page) appearing in **129 occurrences**
+   (26/12/26/9/6/23/2/25 per page). Both are now stated and the distinct figure is labelled distinct.
+2. **Every line cite in sections 3a and 3 was re-measured against the page bytes** at the bound
+   revision. **Twenty-five cited ranges were wrong** and are corrected (the SD-D itemised fourteen of
+   them — seven out of range, four off by 2–4, three loose Terms spans; this round's full sweep found
+   eleven more). Before → after: B3-1 "the control is the code" L108-109 → **L120-121**; B3-1 "for
+   awareness — NOT the fix" L136 → **L134**; B3-1 anti-pattern rows L96-111 → **L108-118**; B3-1
+   terms group L23-28 → **L25-28 for the API group and L29 for RBAC/UX**; B3-1 Purpose/scope source
+   L1-9 → **L1-17**; B3-1 LLM08 Scenario #2 reading L130-131 → **L130**; B3-2 "on 8 nodes…" L155-156 →
+   **L159**; B3-2 Terms L8-13 → **L8-10**; B3-2 Purpose L14-24 → **L14-26**; B3-3 "a claim is not
+   evidence" L179-180 → **L158**; B3-3 "47 routine changes + 1 scope expansion" L188-189 →
+   **L177-178**; B3-3 Purpose L16-27 → **L15-27**; B3-4 "AI is glossed at its first use" L76 →
+   **L80**; B3-4 verified-summary template L49-60 → **L38-54**; B3-4 boundary notes L79-83 →
+   **L74-83**; B3-5 "Yes to staging does not cover production" L117-118 → **L115-116**; B3-5 classic
+   false positives L121-123 → **L119-120**; B3-5 Purpose L12-19 → **L12-16**; B3-6 "review is not
+   execution approval" and "applying is outside this skill" L64-66 → **L138 and L192**; B3-6
+   `moved`-block gotcha L160-162 → **L160-163**; B3-6 "Temporary" 0.0.0.0/0 gotcha L169-171 →
+   **L167-169**; B3-7 own terms L3-8 → **L4-8**; B3-8 Terms block L8-11 → **L8-12**; B3-8 "we've
+   identified the issue" L181-183 → **L178-179**; B3-8 Purpose L14-24 → **L15-25**. Cites measured
+   correct and left alone include B3-3 Terms L8-11, B3-5 RLS L3 and Terms L8, B3-6 description L3 and
+   Terms L8-10, B3-7 DNS L31 / tfvars L44 / JSON L66 / RG L67 / sharp-edges table L64-69 / "run FIRST"
+   L10, B3-8 description L3 and "database primary down" L173-174, B3-2 "Autoscaling can DOS your own
+   database" L163-165, B3-5 "This skill IS a stop condition" L128.
+3. **The four line-wrapped quotations are now marked as wrapped in place** — B3-3 "47 routine changes
+   + 1 scope expansion" (L177/178), B3-8 "we've identified the issue" (L178/179), B3-1 "the control is
+   the code" (L120/121) and B3-2 "It reviews readiness; it does not set the targets, the latency
+   budget, or design the cache" (L24/25). The one duplicated string — "quarter index 164 (0-based
+   start)", at this file's L61 and L288 — is identical in both copies; the one-copy-fix class does not
+   occur.
+4. **Citation provenance.** `KEEPER-ID-ALLOCATION.md` and `laneB-pages.json` occur in **zero** of the
+   19,303 object paths reachable from the 2,345 fetched refs (796 `refs/pull/*/head` + 1,548
+   `refs/remotes/*` + one local working branch; measured with `git rev-list --all --objects`). The
+   tracked artifact of that name family is `docs/roadmaps/KEEPER-ID-ALLOCATION-2026-10-15.md`, added by
+   `aeae752a`, contained only in `refs/remotes/pr/792` and
+   `refs/remotes/origin/docs/keeper-id-allocation-2026-10-15-publish` — **not** an ancestor of the base
+   or of `origin/main`, i.e. it exists only on PR #792's **unmerged** branch (blob
+   `663b101138a79e56410c3c3f1a4d09c813c5e2e3`, 298 lines; its lane table gives lane B `K-181`–`K-280`,
+   the band this record cites). `laneB-pages.json` is a session workspace artifact, untracked in every
+   ref and absent from the workspace at repair time; `_resume-2026-10-09/KEEPER-ID-ALLOCATION.md` is
+   likewise a workspace path and the `_resume-2026-10-09` directory is not present either. Every
+   citation in this file now either resolves at a named ref or says plainly that it is a session
+   artifact that is not retrievable from the repository. **The substance the two artifacts supported
+   was independently re-verified** by this round from the instrument and the checker's own bytes (the
+   590-path pending union, the four quarters, lane B's bounds and batch 3's eight paths — section 2),
+   so only the citation was wrong, not the number.
+5. **The bound-field digest (P1).** The PR body published `45db39e238a3a4e6` under a declared method:
+   each field's whitespace runs collapsed to single spaces and trimmed, the three fields joined with
+   single newlines in the order witness → skills → security, sha256 over the UTF-8 string, first 16
+   hex. Recomputed under that declared method from the live body: **`6682e8afc5f8ac5e`**. **The
+   published figure is not fabricated.** A 19,800-variant sweep (field extraction × normalisation ×
+   field order × joiner × trailing newline) found exactly one undeclared normalisation that reproduces
+   it: the three payloads taken **verbatim** — no whitespace collapsing, no trimming — joined with
+   single newlines in the same order, sha256 first 16 hex =
+   `45db39e238a3a4e63997bf98c0ea5eb8aadb33c8cdc336a0548bb7ea9474ac45`. The four calibration bodies do
+   **not** reproduce under that verbatim variant (783 `69837df2f4d351f1`, 787 `feaaf29c5071c3fe`, 792
+   `9ee7eebbe9538ee5`, 795 `afb2b77e6b7adf81`), which is why the undeclared normalisation went
+   unnoticed. **The SD-D's premise that no method reproduces the old figure is therefore corrected
+   here by measurement** — this is the #780 class exactly (a sibling whose old figure also reproduced
+   under one undeclared normalisation), not a figure that was never true of any posted body. The
+   defect is a **declared-method mismatch**, and the body now publishes the declared-method value for
+   the repaired body.
+
+**C-4, both directions, checked at the lane's head.**
+
+- *Direction 1 — a partial page gets no row or string of any kind and stays pending.*
+  `build_index.py --report` is **byte-identical at the base and at the head**: table_rows 101, events
+  101, full_page_acceptances 81, lost_commit_events 10, reader_pages_with_rows 68 — so the branch adds
+  zero rows. `tools/readability_acceptance/acceptance-index.json` contains **no row, no event and no
+  occurrence of any of the eight page paths as a raw string** (0 for each), and none of the eight
+  appears as a keeper-table data row in the tracker. All eight therefore sit in
+  `no_recorded_acceptance` (586 at the base → 587 at the head) and remain **PENDING**. No acceptance
+  row, and no row-quote string for a partial page, was authored by this lane or by this repair.
+- *Direction 2 — no page called partial actually deserves a row.* Measured per page against the page's
+  own bytes and its linked companion. B3-1 (LLM02/LLM03/LLM09 never expanded anywhere on the page;
+  `LLM02` on 9, `LLM03` on 14, `LLM09` on 14 of the 653 reader pages) and B3-7 (`tfvars` 1, `RG` 1,
+  `DNS` 11, `JSON` 85 of 653) are partial under **either** reading, because the page does not resolve
+  them at all. B3-3, B3-5, B3-6 and B3-8 use abbreviations in their frontmatter `description:` line that
+  their **own** Terms block defines a few lines later (B3-3 L8-11, B3-5 L8, B3-6 L8-10, B3-8 L8-12);
+  B3-4 carries no terms block and its `OWASP` (L4) is resolved only by its linked companion
+  (`../SKILL.md` = B3-3, which defines OWASP at its L8) while its `API` (L43) is unexpanded on both
+  (`API` appears on 204 of 653 reader pages — 31%, a library-wide convention). The
+  description-before-terms shape is a **library norm**, not a one-off: by this round's measurement
+  **43 of the 653 reader pages** carry it. Under C-1's stronger test four of the seven partials could
+  be argued FULL, and this round **does not reclassify them**: the applied standard is the 2026-10-15
+  urgent correction, whose exact shape Codex's P1 on PR #772 ratifies, and re-litigating it is the
+  Lead's call, not a Stage C repair's. Recorded as a live tension, as the SD-D recorded it.
+
+**What this round did not verify (carried in the record, not only in a message).** The C-1
+classification of the seven partials is *reported, not adjudicated* (direction 2 above). The exclusion
+of the six `cannot_decide` pages from the 590-path pending set is taken from the brief's two-bucket
+rule and cross-checked only against the instrument's own summary arithmetic (57 + 4 + 586 + 0 + 6 =
+653), not re-derived from the lost-commit policy. The eight pages were **not re-read as prose**; only
+their bytes were re-measured (line counts, blob IDs, citations, quotations, links, 40-hex tokens,
+backticked reference existence). The four non-GitHub suites (supabase / vercel / claude / cursor) still
+have no runs at any head and were not re-checked. Codex's asserted unresolved findings remain
+unretrievable under its usage limit.
+
+**Files touched by this repair:** this record only. The eight read pages are byte-unchanged
+(`git diff --name-only` between the base and the repaired head lists exactly this one path), no ledger
+text is edited, and no keeper row is authored.
 
 ---
 
