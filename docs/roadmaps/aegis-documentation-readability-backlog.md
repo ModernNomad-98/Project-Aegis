@@ -5111,6 +5111,149 @@ six lost-commit rows' cells, rebuilds no `tools/` artifact, runs no
 authority. The batching procedure does not grant provider, private-input,
 real-host or deployment authority (L3018-3020).
 
+## Ledger-keeper recording + batch update — Phase 4 re-read lane A, first batch, 2026-10-15
+
+The ledger keeper records under AEGIS-APR-101 (the owner-approval-register
+grant defining the recording-only ledger-keeper role and its
+keeper-independence condition). The eight pages below were each independently full-page re-read at the
+base head against [Acceptance for each page](#acceptance-for-each-page) by a
+reviewer who did not write the page, and the reviewer restated each page's
+purpose and normal use from the page alone in the batch record. No page was
+edited, so no "corrected" row exists; the template page's three flagged terms
+(**YAML**, **API**, **MCP**) are an **observation, not a gap**: the page's own
+opening blockquote links `docs/skill-generation-standard.md`, its frontmatter
+directs the author to "rewrite every section against docs/skill-generation-standard.md",
+and that standard defines **YAML** at L29, **API** at L33 and **MCP** at L34
+(C-1's page-resolves-it test), so the page is recorded **accepted** — the
+coordinator's 2026-10-15 ruling on the first Stage D audit of this PR
+(comment 6209064290). No acceptance the reviewer did not give is recorded,
+and no posture, Stop Condition, or Security Rule changed.
+
+**Lane derivation (Phase 4 re-read lanes; lane A is the alphabetically first
+quarter of the sorted pending set).** The pending set is the
+`no_recorded_acceptance` and `provably_pending` buckets of
+`python -P -B tools/readability_acceptance/check_index.py --json --ref e2a3e20b7c20ef8385b219b39c6405237163406f`
+— 586 + 4 = **590** paths, sorted by repository path; lane A takes the first
+`ceil(590 / 4) = 148` paths, first
+`.claude/agents/ai-security-red-team-reviewer.md`, last
+`.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md`.
+This batch is the first eight paths of that range; no page outside the range
+is read or recorded.
+
+| Page | Acceptance revision (reviewed head) | Reviewer | Evidence source | Date |
+| --- | --- | --- | --- | --- |
+| [ai-security-red-team-reviewer](../../.claude/agents/ai-security-red-team-reviewer.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-1-2026-10-15.md) | 2026-10-15 |
+| [full-codebase-auditor](../../.claude/agents/full-codebase-auditor.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-1-2026-10-15.md) | 2026-10-15 |
+| [principal-architecture-reviewer](../../.claude/agents/principal-architecture-reviewer.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-1-2026-10-15.md) | 2026-10-15 |
+| [qa-automation-lead](../../.claude/agents/qa-automation-lead.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-1-2026-10-15.md) | 2026-10-15 |
+| [release-readiness-reviewer](../../.claude/agents/release-readiness-reviewer.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-1-2026-10-15.md) | 2026-10-15 |
+| [secure-saas-reviewer](../../.claude/agents/secure-saas-reviewer.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-1-2026-10-15.md) | 2026-10-15 |
+| [senior-troubleshooting-lead](../../.claude/agents/senior-troubleshooting-lead.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-1-2026-10-15.md) | 2026-10-15 |
+| [the skill template](../../.claude/skills/_template/SKILL.md) | `e2a3e20b7c20ef8385b219b39c6405237163406f` | readability-lane-a-implementer-c | [batch record](../evidence/documentation/readability-lane-a-batch-1-2026-10-15.md) | 2026-10-15 |
+
+The re-measured facts per page (line and byte counts, blob IDs, the
+template's two resolved link targets, its validator-exemption claim and the
+sentinel/1024-character claims re-verified against the standard) are in the
+batch record.
+
+**Keeper-independence defect, routed — not a deviation carried.** AEGIS-APR-101
+(the owner-approval-register grant defining the recording-only ledger-keeper
+role and its keeper-independence condition) requires the ledger keeper to be a
+different agent from the page's author and accepting reviewer; this lane's one
+agent is both the accepting reader and the writer of this keeper section, so
+that condition is **not satisfied** and the rows are **not green**. On
+2026-10-15 the owner **declined to ratify** the carry-with-deviation of
+same-agent keeper rows and directed the **AEGIS-APR-117** withdrawal-and-re-record
+route instead (owner decision 3 of 2026-10-15, in
+`docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` on `main`); the earlier
+CARRY-WITH-DEVIATION framing of this section, and the SD-D2 ruling's K-074/K-075
+carry it leaned on, are **closed, not extended** — the decision records that
+"its precedent must not be extended further". The reader did not write any of
+the eight pages (`git log -1 --format=%an -- <page>` names other authors for
+all eight; the batch record lists them). The authority question stays with the
+merge holder under AEGIS-APR-100 (the owner's standing commit, push and merge
+pre-approval grant). This lane delivers under AEGIS-APR-039 (the standing
+backlog-delivery approval) and records only under AEGIS-APR-101 (the
+ledger-keeper recording grant).
+
+**Count honesty (unchanged).** This lane publishes no readability count of
+its own (D84, the official-count switch — the 2026-10-10 decision that the
+acceptance index supplies the official pending count and the ledger publishes
+none of its own). The instrument's figures at the base are quoted in the batch
+record (official pending count **596** at `e2a3e20b7c20…`). The appended rows
+are not machine-visible until the routine index rebuild;
+`build_index.py --report` was **not run in-lane** because the shared clone
+is shallow and the builder refuses shallow repositories (D73 row 6, the
+full-clone-reproducibility guarantee of D73, the 2026-10-07 decision that the
+acceptance index gives the readability pending count after a gated repair),
+and no `--write` was run. The repair pass (2026-10-15, a different agent)
+ran `build_index.py --report` in a full clone; its output is in the PR
+body's validation table.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so the
+ledger stays **pending** and owes its own independent full-page re-read
+against [Acceptance for each page](#acceptance-for-each-page) by a reader who
+did not write this section — the self-cost every prior update states. The
+tracked Markdown count does not change except by the new batch record note
+itself, which is pending and not counted among accepted pages.
+
+**The next batch's selection rule is R2, with the frontier measured, never index
+arithmetic.** *R2*: the next eight **unread** pages in the unread sequence (the
+sorted list of pages no lane's batch record has read yet) — not the eight
+contiguous pages after the frontier (that reading, R1, orphaned sorted index 456
+for seven rounds in lane D) and not index arithmetic (forbidden). Measured by
+the 2026-10-15 Stage C repair at the bound base `e2a3e20b7c20…`: lane A's read
+frontier after this batch is `.claude/skills/_template/SKILL.md`, the last path
+this batch read (sorted index 7 of the 590-path pending set); **0 unread pages
+sit behind it** (indices 0..7 are exactly this batch's eight), and no lane B/C/D
+batch record reads any path in lane A's quarter (20 lane batch records parsed
+across all refs; lane A's own five batches read indices 0..39 with no gap). **The
+next batch's pages, by path only**, to be re-measured at the next implementation
+base: `.claude/skills/ab-test-designer/SKILL.md`,
+`.claude/skills/ab-test-designer/references/ab-test-sheet.md`,
+`.claude/skills/acceptance-criteria-reviewer/SKILL.md`,
+`.claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md`,
+`.claude/skills/accessibility-test-harness/SKILL.md`,
+`.claude/skills/accessibility-test-harness/references/a11y-checklists.md`,
+`.claude/skills/admin-console-architect/SKILL.md`,
+`.claude/skills/adr-sequencer/references/adr-corpus-sheet.md`.
+
+**Which state each list belongs to (2026-10-16 Stage A measurement).** The eight paths above are the
+first eight **unread** entries of lane A's quarter **when batch 1 was lane A's only committed record**
+(post-batch-1 frontier, sorted index 7). Lane A batch 2 has since read exactly those eight paths
+(8/8 measured from that record's own bytes), so they are **not** unread at the later state this
+section's cross-check measures. Under the read set this section's cross-check asserts (lane A's
+reads = sorted indices 0..39, contiguous, from batch records 1-5), the first eight unread at the base
+`e2a3e20b` are, by path:
+`.claude/skills/ai-closeout-reporter/SKILL.md`,
+`.claude/skills/ai-closeout-reporter/assets/closeout-template.md`,
+`.claude/skills/ai-cost-guardrail-designer/SKILL.md`,
+`.claude/skills/ai-cost-guardrail-designer/references/cost-guardrail-patterns.md`,
+`.claude/skills/ai-evaluation-harness/SKILL.md`,
+`.claude/skills/ai-evaluation-harness/references/eval-harness-design.md`,
+`.claude/skills/ai-governance-risk-reviewer/SKILL.md`,
+`.claude/skills/ai-governance-risk-reviewer/references/ai-governance-framework.md`.
+Both lists are re-measurement **outputs at one base, not pinned ranges**: the next batch re-runs the
+three-step derivation at its own base and only that run's output is binding.
+
+**Repair passes 2026-10-15 (pre-merge corrections by different agents).** The
+eight rows below are recorded by `readability-lane-a-implementer-c` (this PR's
+one reader and row author); they are **not green** for that reason alone
+(AEGIS-APR-101). The first repair pass corrected the record's prose. The second
+(Stage C, `readability-lane-a-stagec-repairer-2`, DeepSeek-4.1-Flash
+(deepseek-flash)) corrects this section and the batch record per the first Stage
+D audit (comment 6209064290) and the coordinator's 2026-10-15 ruling: the
+template page P8 is recorded **accepted** on the page-resolves-it evidence, so
+its K-089 `full-page-acceptance` row now matches the disposition and the earlier
+*partial* reading in this section is superseded. The rows remain as authored
+here: PR #781 (AEGIS-APR-117) carries K-082W..K-089W and fresh rows
+K-098..K-104 and **has merged to `main`** (`f490c16f`, 2026-10-15T22:50:57Z);
+because it was written while P8 was still recorded partial, the fresh lane-A row
+K-105 was left unused (`main` ledger L5270-L5271 at `main` = `50241ba5036e36ec9bcd1ce7a4b93ffa23a0392b`; the sentence sat at L5200-L5201 when `main` was `3b0d6cd5`), so P8's fresh full-page row is
+owed on that route. No keeper row and no withdrawal row is authored here, and no
+page is re-read. Drafted by DeepSeek-4.1-Flash (deepseek-flash), an AI agent
+operating under the owner account.
+
 ## Ledger-keeper recording + batch update — readability Phase 4 re-read lane D, batch 1, 2026-10-15
 
 **Under AEGIS-APR-101 (recording only).** This note records Phase 4 re-read lane D's first batch —
@@ -5628,6 +5771,14 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-079 | docs/approvals/APPROVAL_REGISTER.md | full-page-acceptance | c80c8d2d553671579e878584914eae695028eab4 | 548e80efdc630eb04a9b41839c608b4928b4bc2a | K-079 accepted: docs/approvals/APPROVAL_REGISTER.md read whole at c80c8d2d553671579e878584914eae695028eab4 | readability-final3-implementer-c | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | 2026-10-12 |
 | K-080 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | b44d47c9a10cde4c62d6fdae52bf577e04242a50 | K-080 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at 878b7d460d8cce5efb1cb8ecb3197e93e6cbf609 | readability-ledger-reader-c | docs/evidence/documentation/readability-ledger-reread-2026-10-13.md | 2026-10-13 |
 | K-081 | docs/roadmaps/aegis-documentation-readability-backlog.md | full-page-acceptance | ba522f133d05624c2130f15eb8ef3b6329b0f37a | 5928d98534e95a79e2ffbcc2065d38602dd98b0f | K-081 accepted: docs/roadmaps/aegis-documentation-readability-backlog.md read whole at ba522f133d05624c2130f15eb8ef3b6329b0f37a | ledger-selfcost-stagec-c | docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md | 2026-10-13 |
+| K-082 | .claude/agents/ai-security-red-team-reviewer.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 447d20b2083b5f07113061a7cbe6a1092e121357 | P1 accepted: .claude/agents/ai-security-red-team-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md | 2026-10-15 |
+| K-083 | .claude/agents/full-codebase-auditor.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | e15ffa02533e8e63a76bb5c1248e28d53b6f3a70 | P2 accepted: .claude/agents/full-codebase-auditor.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md | 2026-10-15 |
+| K-084 | .claude/agents/principal-architecture-reviewer.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 86ffeb6fd2ceac7e1b66068f3ee5373172a92846 | P3 accepted: .claude/agents/principal-architecture-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md | 2026-10-15 |
+| K-085 | .claude/agents/qa-automation-lead.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 34cd8c0e73cc89eb04d507b0039394831aee656f | P4 accepted: .claude/agents/qa-automation-lead.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md | 2026-10-15 |
+| K-086 | .claude/agents/release-readiness-reviewer.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | b54a9f5efc139b16578014a9b804c801b6132941 | P5 accepted: .claude/agents/release-readiness-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md | 2026-10-15 |
+| K-087 | .claude/agents/secure-saas-reviewer.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 490b57942a156f896457897a1aa45750594c8309 | P6 accepted: .claude/agents/secure-saas-reviewer.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md | 2026-10-15 |
+| K-088 | .claude/agents/senior-troubleshooting-lead.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 6ae09b38b11ac0565384bdc864dcac6e19a82df7 | P7 accepted: .claude/agents/senior-troubleshooting-lead.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md | 2026-10-15 |
+| K-089 | .claude/skills/_template/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | de6d954b6040fff33122377b2f47b8b48106166b | P8 accepted: .claude/skills/_template/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-lane-a-implementer-c | docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md | 2026-10-15 |
 | K-090 | docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 82c2800bea638c5c007f2239073289b8b7fa35e5 | LD-1 accepted: docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c | docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md | 2026-10-15 |
 | K-091 | docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 6e8b63df01bcf7e57e47cf9d6338bc350bd68c7a | LD-2 accepted: docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c | docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md | 2026-10-15 |
 | K-092 | docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 702c7ff8676628dce0c91b8a517f316438df889a | LD-3 accepted: docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c | docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md | 2026-10-15 |
