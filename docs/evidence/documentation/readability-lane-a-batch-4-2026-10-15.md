@@ -18,6 +18,14 @@ reported in the pull-request body).
   quotation carried is still recorded in that page's B5 sentence. Section 7 row 20 records the
   re-run; the repair was made by the same agent, **DeepSeek-4.1-Flash (deepseek-flash)**.
 
+- **Stage C repair round 2 — the Stage D `REVISE` findings are disposed (2026-10-16).** *Stage D*
+  is the independent implementation audit: a different agent's posted verdict that names the exact
+  head and checks the plan's acceptance criteria one by one. The posted Stage D verdict on this PR
+  (comment `6209593464`) is **SD-D: REVISE**; its two blocking findings were four undispositioned
+  Codex P1 review comments and a false bound-field digest, and it named the P4 `L34–36`
+  attribution as a minor. Round 2 dispositions all of them, corrects the digest against a five-body
+  calibration, corrects the two minor items and records what it could not verify — section 9.
+
 - **Lane:** PHASE 4 RE-READ LANE A. *Phase 4 re-read* is the fourth phase of the documentation
   readability backlog — a whole-page re-read of every page that has no recorded full-page
   acceptance; *lane A* is the alphabetically first quarter of that sorted pending list, run
@@ -50,8 +58,11 @@ reported in the pull-request body).
 - **This batch authors NO keeper rows and appends NOTHING to the ledger.** The diff against the
   base adds exactly this record file. Under **AEGIS-APR-101** — the standing rule that the keeper
   who records an acceptance row must be a different agent from the page's author **and** from the
-  accepting reviewer — the rows for these eight pages are recorded later by a separate eligible
-  keeper from this evidence; the earlier same-agent rows of batches 1 and 2 follow the owner's
+  accepting reviewer — the **full-page-acceptance rows for the four FULL pages only** (P2, P3, P5
+  and P6, per section 3) are recorded later by a separate eligible keeper from this evidence; the
+  four PARTIAL pages receive **no row of any kind** and stay pending, exactly as section 3's
+  eligibility rule states, so this opening handoff cannot be read as covering all eight; the
+  earlier same-agent rows of batches 1 and 2 follow the owner's
   **AEGIS-APR-117** route (*AEGIS-APR-117* is the owner's withdrawal-and-re-record decision: rows
   recorded by the same agent that read the page are withdrawn and re-recorded by a different agent
   from the same evidence), so **no page needs re-reading**.
@@ -144,11 +155,15 @@ another author (`git log -1 --format="%h %an %s" -- <page>`, measured this sessi
 | P8 | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | `1c2f026c` Peter Nguyen ("docs: accept twenty full-page skill reviews after 221") |
 
 **Honest disclosure about the shared identity string.** `git log --all --author="F reviewer"`
-returns **6** commits in this clone, all on other Stage C/D lanes' branches (lane C batch 3, the
-APR-117 withdrawal work and a CI-label repair). **Zero** of those commits touch any of the eight
-pages in this batch (checked per path by command), and this session had made no commit in this
-repository before this batch; the string is shared by the concurrently running Stage C lanes, so it
-is disclosed here rather than presented as a unique agent identity.
+returns **10** commits in this round's full clone (all `refs/pull/*/head` fetched) **before this
+round's own commit**, across other Stage C/D lanes' work (lane B batch 4, lane C batch 3, this
+branch's two commits, PR #787's repair and the APR-117 withdrawal work); the Stage D audit's clone
+measured **11** on the same fetch pattern, so the figure is stated with its ref scope — it moves as
+lanes push — rather than as a constant, and the earlier draft's **6** was a smaller clone's count.
+**Zero** of those commits touch any of the eight pages in this batch (checked per path by command),
+and this session had made no commit in this repository before this batch; the string is shared by
+the concurrently running Stage C lanes, so it is disclosed here rather than presented as a unique
+agent identity.
 
 **Keeper IDs — none allocated here.** This batch records evidence only and consumes no keeper-row
 identifier; the separate keeper assigns the IDs when recording from this evidence.
@@ -176,7 +191,7 @@ verdict.
 
 | # | Page | Lines / bytes at the bound revision | Verdict | Gaps named (page line) | Edits |
 | --- | --- | ---: | --- | --- | ---: |
-| P1 | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | 88 / 4,586 | **PARTIAL** | L17: `WIP` | 0 |
+| P1 | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | 88 / 4,586 | **PARTIAL** | L17: `WIP`; L31–32: recovery-check scope | 0 |
 | P2 | `.claude/skills/agent-goal-hijack-defender/SKILL.md` | 198 / 11,623 | **FULL** | none | 0 |
 | P3 | `.claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | 88 / 4,988 | **FULL** | none | 0 |
 | P4 | `.claude/skills/agent-governance-audit/SKILL.md` | 167 / 9,616 | **PARTIAL** | L167: `Phase 1.5` | 0 |
@@ -236,16 +251,22 @@ short bullets, a concrete example (L14 "for example a rescue branch or `git stas
 the safe/destructive table at L81–88, with what each command changes and refuses. **B4** satisfied
 with note — L3 fixes the operative boundary ("Diagnosis is read-only; preservation and recovery
 mutate state only within the task's authorization") and the page makes no shipped-versus-proposed
-claim about a system. **B5** satisfied — one link (`../SKILL.md`, present at the bound revision);
-the git commands named (`status`, `diff`, `stash push -u`, `reset --soft`, `restore --staged`,
-`branch -vv`, `--abort`/`--continue`) are real. **B6** this record (author: Peter Nguyen,
-section 2 table).
-**Verdict: PARTIAL, no edit. Named defect: L17 — `WIP` used without an on-page first-use
-definition.**
-Observation (not a defect counted above): L32's recovery check
-`grep -r '<<<<<<<' --include=*` leaves the `*` unquoted, so in a POSIX shell the glob expands
-before `grep` sees it; it behaves as written in PowerShell, the environment this library's setup
-pages target, so it is recorded as an observation and not as a gap.
+claim about a system. **B5 partial** — one link (`../SKILL.md`, present at the bound revision)
+resolves and the git commands named (`status`, `diff`, `stash push -u`, `reset --soft`,
+`restore --staged`, `branch -vv`, `--abort`/`--continue`) are real, but the verification command
+the page prints at **L31–32** does not implement its stated scope: the page says the scan runs
+"on changed files", while the literal `grep -r '<<<<<<<' --include=*` scans the whole tree — the
+`*` stays part of the single word `--include=*` (no filename begins with `--include=`), and GNU
+`grep` then reads `--include=*` as *match every file*, so the check also returns its own command
+text as a false positive (verified in round 2 from the repository root in `bash`: the playbook and
+this record both match). Named as this page's second defect in section 9 (Codex P2 comment
+`4290095430`). **B6** this record (author: Peter Nguyen, section 2 table).
+**Verdict: PARTIAL, no edit. Named defects: L17 — `WIP` used without an on-page first-use
+definition; L31–32 — the recovery check's stated "on changed files" scope is not what the command
+does (unrestricted scan, false-positive on its own text).**
+(The earlier draft's observation that the unquoted `*` "expands before `grep` sees it" in a POSIX
+shell is **withdrawn**: measured in `bash`, the word survives as `--include=*` and the false
+positive stands; section 9 records the command and output.)
 
 **P2 — `.claude/skills/agent-goal-hijack-defender/SKILL.md`** — read whole, **L1–198**. Purpose and
 normal use: a MANUAL-ONLY skill (*manual-only* means the skill is never auto-invoked; a human must
@@ -316,7 +337,9 @@ of the 30 pages that use it (measured this session). **B3** satisfied — descri
 per-control bullet list, a copyable Output Format, and concrete examples (L137–140 "An approval
 that exists but covers a different scope ("yes to staging") is a FAIL for the production action").
 **B4** satisfied — the skill is explicitly read-only and third-party ("Read-only; changes nothing",
-L34–36), and it makes no shipped-versus-proposed claim about a system. **B5** satisfied — the link
+**L3**; the string occurs exactly once on the page, in the frontmatter description, and the earlier
+draft's L34–36 attribution was wrong — corrected in round 2), and it makes no
+shipped-versus-proposed claim about a system. **B5** satisfied — the link
 `references/audit-control-checklist.md` (twice, present) resolves; the named `gh` and `git`
 commands are real and their JSON fields exist (`author`, `reviews`, `mergedBy`,
 `autoMergeRequest`, `statusCheckRollup` — all listed by `gh pr view --help` this session), and
@@ -430,7 +453,7 @@ naming which of the two matrix artifacts it means (ambiguous referent, no link).
 Only the four FULL pages may become full-page-acceptance rows. The four PARTIAL lines are stated as
 partial so that a keeper cannot read them as acceptances.
 
-P1 partial: .claude/skills/agent-failure-recovery/references/recovery-playbooks.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3 — defect at L17 (WIP undefined)
+P1 partial: .claude/skills/agent-failure-recovery/references/recovery-playbooks.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3 — defects at L17 (WIP undefined) and L31-32 (recovery-check scope)
 P2 accepted: .claude/skills/agent-goal-hijack-defender/SKILL.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
 P3 accepted: .claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
 P4 partial: .claude/skills/agent-governance-audit/SKILL.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3 — defect at L167 (Phase 1.5 undefined)
@@ -450,7 +473,9 @@ P8 partial: .claude/skills/agent-identity-privilege-reviewer/references/agent-id
   `build_index.py --report` is run in-lane at this batch's committed head as a regression check; no
   `build_index.py --write` is run and the index JSON is not edited, so the machine-visible count
   still comes from the routine index-rebuild pull request. The rows the separate keeper later
-  records become machine-visible at that rebuild, not here.
+  records become machine-visible at that rebuild, not here. **Round 2 adds this check to the
+  validation table it was missing from** (section 7 rows 21–23), because this bullet claimed a run
+  the table did not carry (Codex P1 comment `4290095415`).
 - **Self-cost.** This batch record is itself a new reader page with no acceptance row, so it is
   pending and is not counted among accepted pages — the self-cost every prior batch record states.
 - **Next batch selection rule:** the next 8 paths of lane A's sorted range (paths 33–40 of 149),
@@ -480,40 +505,171 @@ P8 partial: .claude/skills/agent-identity-privilege-reviewer/references/agent-id
 | 18 | `python -P scripts/ci/check_pr_body_skills.py --body-file <the posted body>` | exit 0 (recorded in the pull-request body's validation table) |
 | 19 | `python -B scripts/check_dco.py --range origin/main..HEAD` | recorded in the pull-request body after the commit (the record cannot cite its own not-yet-made commit as a result) |
 | 20 | `python -P scripts/ci/check-markdown-links.py` over the repository's own 666-page corpus set (the `markdown-link-corpus` step's derived path list, batched on Windows, where one 38 KB command line exceeds the 32,767-byte limit) | pre-repair head `e8c8a67c…`: `files: 666   links checked: 3775   anchors checked: 1111   broken: 6   dead: 0`, exit 1, all six inside this record; after the repair: `files: 666   links checked: 3777   anchors checked: 1112   broken: 0   dead: 0   external-skipped: 2073   other-skipped: 0`, exit 0 |
+| 21 | `python -B tools/readability_acceptance/build_index.py --report --ref f490c16f9ed23f3d489e42f7696323bffcce6fd3` (the derivation base) — round 2 | exit 0: `table_rows 162, events 162, full_page_acceptances 110, lost_commit_events 10, reader_pages_with_rows 100` — the run section 6 claims, now in the table |
+| 22 | the same command at `de2bfe7237d6e853fa81925faa9f68a82881bba7` (the pre-round-2 head) — round 2 | exit 0: the same five counts, so this record's evidence-only diff perturbs nothing |
+| 23 | ledger consolidated-table arithmetic at both refs, run before trusting the tool's `table_rows` — round 2 | the consolidated keeper table in `docs/roadmaps/aegis-documentation-readability-backlog.md` holds **162** well-formed 9-column data rows, exactly **1** separator, **0** malformed rows, and runs to EOF with **no interior blank line**; the 162 is 152 K/L rows plus the ten `T-001`…`T-010` rows an id-shape regex accepting only K/L ids would miss. Equals the tool's `table_rows 162` above |
 
 ## 8. What this batch could not verify (stated, not hidden)
 
-- **The bound-field digest is calibrated in method, not by a reproducing body.** The method is fixed
-  by the repository's own published statement (three payloads in the order witness → skills →
-  security; each field's whitespace runs collapsed to single spaces and trimmed; joined with single
-  newlines; `sha256` over the UTF-8 string with no trailing newline; first 16 hex characters; the
-  canonical script `_stagec-digest.py` that produced the reference values is **not in the
-  repository's history** — searched by command and absent). Recomputing two published bodies from
-  their live text reproduced the witness and security payload lengths exactly (PR #782: 1,259 and
-  40; PR #777: 1,262 and 40) but not the skills payload (6,856 against the published 6,855; 6,414
-  against 6,413), so those two digest lines no longer reproduce from their live bodies, most likely
-  because the bodies were edited after the lines were written. This batch's own digest is computed
-  from the exact bytes it posts and re-derived from the post readback; it is not offered as a
-  reproduction of either stale value.
-- **The digest reading is ambiguous by one character, and this record's value follows the
-  line-preserving reading.** Re-derived by command from the posted body readback: the published
-  `7c5d5bc30a8e4301` reproduces when each field's lines are stripped and joined with newlines before
-  the hash (payload lengths witness 1,259 / skills 6,186 / security 40), and does **not** reproduce
-  under the stricter reading in which every whitespace run, line breaks included, collapses to one
-  space (witness 1,259 / skills 6,185 / security 40, digest `086faa099024ee57`). Two sibling
-  pull-request bodies reproduce under that stricter reading: PR #782's published `121a60bce86cff98`
-  and PR #783's published `3913683c686e6e71` both recompute exactly from their live bodies. The
-  earlier note above, that PR #782's skills payload "6,856 against the published 6,855" showed a body
-  edited after its digest line was written, is therefore superseded: 6,855 is the stricter reading of
-  the same live bytes.
+- **The bound-field digest is calibrated against five sibling bodies, and the value this body first
+  published was false (corrected in round 2).** The declared method is the **collapse-all** reading:
+  each field's whitespace runs — line breaks included — collapse to single spaces and are trimmed;
+  the three payloads are joined with single newlines; SHA-256 over the UTF-8 string; first 16 hex.
+  Recomputed from its own live body, each of **five** sibling values reproduces under that reading,
+  and **none** reproduces under the line-preserving reading: PR #783 `3913683c686e6e71`, PR #787
+  `82ed906d2f228f0e`, PR #792 `88300e711714200a`, PR #795 `5fabf87b2df899e9` and PR #782's
+  current `14a96bd772f6083e` — **5 of 5**. Under that declared method this body's live bytes hash to
+  **`086faa099024ee57`** (payload lengths witness 1,259 / skills 6,185 / security 40), not to the
+  `7c5d5bc30a8e4301` the body published: that first value hashes the same fields under a reading no
+  sibling body uses, and it contradicts the method sentence printed beside it. Correcting the digest
+  **voids any verdict that treated `7c5d5bc30a8e4301` as this body's digest**; this round changes no
+  bound-field byte, so `086faa099024ee57` is the digest of the bytes as posted, and any later edit
+  to a bound field moves it again and voids a verdict naming the new value.
+- **PR #782's `121a60bce86cff98` is a frozen observation of an earlier revision, not a live
+  reproduction.** 782's live body now publishes `14a96bd772f6083e` and names the cited value as the
+  figure at its earlier audited head `27ee6291…`; it does **not** recompute from 782's live body.
+  The earlier claim in this section that `121a60bce86cff98` and `3913683c686e6e71` both "recompute
+  exactly from their live bodies" was wrong for 782 and is withdrawn: under the corrected
+  calibration, `3913683c686e6e71` reproduces from PR #783's live body and `121a60bce86cff98`
+  reproduces from no live body — it is kept here as a dated observation of 782's superseded
+  revision. The earlier inference drawn from a 6,856-versus-6,855 payload reading (a body edited
+  after its digest line) is withdrawn with it: the collapse-all reading of 782's live skills payload
+  is 7,063 characters, and 6,855 belonged to the superseded revision.
 - **Continuous integration at this exact head is owed, never claimed.** The batch record's own
   commit is new, so no CI run result for it can be reported here; the offline checks in section 7
   are the ones that were actually run.
+- **What repair round 2 did not verify.** (i) The pre-edit body bytes of the 2026-10-15 repair: the
+  earlier claim that the digest was "unchanged" across that edit cannot be re-checked now, and the
+  corrected five-body calibration replaces it. (ii) That each of the eight pages was read whole "in
+  one read with no display elision" — a claim about a session no later agent can observe; only its
+  checkable consequences (line counts, ranges, per-bullet content, defect lines) were verified.
+  (iii) The contents of the Stage B plan audit — it is not posted, so the PR's Stage C entry
+  condition remains unmet (section 9, D3) and the ordering breach cannot be cured retroactively.
+  (iv) Continuous integration at this round's head: owed to GitHub Actions after the push and
+  recorded in the pull-request body, never claimed here.
 - **The six `cannot_decide` pages remain undecided.** This batch did not investigate whether their
   lost commits are recoverable; that is outside lane A's scope and no lane owns them.
-- **The four named defects are recorded, not fixed.** Whether each defect warrants a repair pull
-  request, and in which change class, is a decision this batch does not make; editing an instruction
-  file under `.claude/skills/` would move the change out of the docs-only class.
+- **The named defects (five: two on P1, one each on P4, P7 and P8) are recorded, not fixed.**
+  Whether each defect warrants a repair pull request, and in which change class, is a decision this
+  batch does not make; editing an instruction file under `.claude/skills/` would move the change out
+  of the docs-only class.
 - **Page authorship is read from git metadata only.** The claim that this lane did not write the
   eight pages rests on `git log` author fields, which are self-asserted; the last-touching commits
   name Peter Nguyen for all eight.
+
+## 9. Stage C repair round 2 — the Stage D `REVISE` findings, disposed (2026-10-16)
+
+**Receipt.** The Stage D independent implementation audit of this PR — *Stage D* is the posted audit
+by a different agent that checks the plan's acceptance criteria one by one against one exact head —
+is PR #789 comment `6209593464` (posted 2026-10-16T06:32:36Z, author `ModernNomad-98`, drafting
+agent **DeepSeek-4.1-Flash (deepseek-flash)**), verdict **SD-D: REVISE**. Its two blocking findings
+were (i) four Codex P1 review comments with no disposition anywhere in the PR and (ii) a false
+bound-field digest; it also named the P4 `L34–36` attribution and the section 2 `F reviewer`
+count. Round 2 was drafted by **DeepSeek-4.1-Flash (deepseek-flash)**, executed in a fresh full
+clone (HTTPS, `-c http.sslBackend=openssl`, no `wt-*` worktrees, the shared clone untouched), and
+disposes every finding below. *Codex* is the `chatgpt-codex-connector[bot]` automated reviewer; its
+findings are read by `original_commit_id` — the head a finding was written against — never by the
+re-anchored `commit_id`.
+
+**Binding of the four P1s.** Codex review `5542076883` (state COMMENTED) is bound to the
+**superseded** plan head `e8c8a67c7f99feb4a02c6b334f4ca1a8aea83c5c`; all **six** of its review
+comments carry `original_commit_id = e8c8a67c…`, and GitHub re-anchored `commit_id` to the live
+head `de2bfe72…` on four of them. Round 1 changed only link lines, so all four P1 findings remain
+live in substance and each is dispositioned against its live line:
+
+| Codex comment | Badge | Live anchor | Disposition |
+| --- | --- | --- | --- |
+| `4290095408` | P1 | section 4, P2 B2 (L258–262) | **Rebutted under C-1** — measurement in D1 |
+| `4290095415` | P1 | section 6 (the build-index claim) | **Fixed** — section 7 rows 21–23 (D2) |
+| `4290095421` | P1 | the plan statement / Stage C entry | **Acknowledged, not rebutted** — blocks merge (D3) |
+| `4290095424` | P1 | the opening keeper handoff (L50–57) | **Fixed** — four-FULL-only scope (D4) |
+| `4290095417` | P2 | the round-1 link lines | **Fixed in round 1** (D5) |
+| `4290095430` | P2 | section 4, P1 B5 | **Accepted** — new named defect (D6) |
+
+**D1 — `authz` (comment `4290095408`): rebutted under C-1; P2 stays FULL.** *C-1* is the standing
+ruling for a claimed "abbreviation used before its definition": measure how many reader pages use
+the term at all and how many define it, and test whether the page itself (its own sentence or its
+own linked companion) resolves it; a bare usage that is the library's own convention — about **12 or
+more** pages — is not a defect. Measured at the bound revision `f490c16f…` over the **383**
+`.claude/skills` Markdown pages: **41** use lower-case `authz`; only **3** carry a parenthetical
+expansion (`intra-tenant-scope-architect/SKILL.md`, `memory-context-poisoning-reviewer/SKILL.md`,
+`model-context-designer/SKILL.md`); **38** use it bare, far above the ~12-page convention. The
+stronger, page-self test also holds: P2's own page spells the full word `authorization` /
+`authorizing` on **8** lines (L3, L21, L59, L60, L65, L71, L95, L124), so a reader of that page can
+resolve the shorthand from the page itself. Commands: `git grep -l -I -F -e authz f490c16f… --
+'.claude/skills/*.md'` → **41**; the gloss pattern
+`authorization \(authz\)|authz \(authorization` → the **3** pages above; `git grep -c -i -F -e
+authoriz … agent-goal-hijack-defender/SKILL.md` → **8**. The comment's request (hold P2 PARTIAL
+until `authz` is defined) is therefore rebutted with its measurement, and P2's verdict remains
+**FULL**; nothing in the eligibility statement changes.
+
+**D2 — the build-index row (comment `4290095415`): fixed.** Section 6 claimed a
+`build_index.py --report` regression run that section 7's "Validation actually run" table did not
+carry. Round 2 adds rows 21–23: the exact command and its five counts at the base and at the
+pre-round-2 head, plus the arithmetic-first assertion of the ledger's **162** rows (**152** K/L rows
+plus the ten `T-001`…`T-010` rows an id-shape regex accepting only K/L ids would miss), which
+equals the tool's `table_rows`. The claim now has its command and output in the table it belongs
+to.
+
+**D3 — the Stage B plan audit (comment `4290095421`): acknowledged, not rebutted; the finding
+stands and blocks merge.** *Stage B* is the independent plan audit: a different agent's posted
+verdict on the plan's exact captured text, and by the delivery workflow's chain rule Stage C's
+entry condition is Stage B's affirmative disposition. `docs/delivery-workflow.md` makes Stage B
+**mandatory at every size** (L601–603: "Proportionality bounds the audit's **length**, never its
+**existence**"), keeps **all seven stages in order with a different holder per stage** on the
+pure-docs path (L404–416), and routes a non-affirmative disposition back rather than onward
+(L42–53); `AGENTS.md` L65–68 states the same order and the merge prohibition. The finding's own
+point is accepted: a plan audit performed later cannot retroactively satisfy the Stage C entry
+condition. **No Stage B verdict is posted on this PR** (PR #789's issue comments are the Codex
+summary and the Stage D verdict, and its only review is Codex's), so this item's Stage C entry
+condition is **unmet**. This Stage C repair cannot self-issue the audit — no agent performs two
+stages — so the required step is an **independent Stage B ACCEPT bound to the captured plan
+revision**, posted before merge; until it is posted this PR **must not merge**. This is a recorded,
+unresolved gate, not a waiver.
+
+**D4 — keeper-row scope (comment `4290095424`): fixed.** The opening handoff (L50–57) now says the
+**full-page-acceptance rows for the four FULL pages only** are recorded later by a separate
+eligible keeper and that the four PARTIAL pages receive **no row of any kind** and stay pending,
+matching the eligibility rule section 3 already stated (L195–202). The two statements can no longer
+be read as contradicting each other.
+
+**D5 — the relative links (comment `4290095417`): fixed in round 1.** Commit `de2bfe72…`
+re-pointed the two ledger links and let the four quotations carry the source pages' rendered link
+text; section 7 row 20 records the corpus re-run (`files: 666   links checked: 3777   anchors
+checked: 1112   broken: 0   dead: 0`). No action remains in round 2.
+
+**D6 — the recovery check (comment `4290095430`): accepted; P1 gains a second named defect.** The
+comment is correct: the page's verification command does not implement its stated "on changed files"
+scope. Measured in `bash` from the repository root, the unquoted `*` in `--include=*` **does
+not** expand (nothing in the directory begins with `--include=`), so GNU `grep` reads it as
+*match every file* and the scan returns its own command text:
+`./.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` and this record both
+match. The earlier observation that the glob "expands before `grep` sees it" is withdrawn. P1 is
+**already PARTIAL** (L17 `WIP`), receives no row, and its defect list now carries both defects;
+repairing the page itself is out of this change's docs-only class, so the fix stays with the page's
+own authorized change.
+
+**Digest correction (the audit's second blocking finding).** The published `7c5d5bc30a8e4301` was
+false under the method the body declares. Round 2 republishes **`086faa099024ee57`** (16 hex,
+counted by hand), calibrated first: five sibling bodies, each recomputed from its own live text,
+reproduce under the collapse-all reading and **none** under the line-preserving reading (PR #783
+`3913683c686e6e71`, PR #787 `82ed906d2f228f0e`, PR #792 `88300e711714200a`, PR #795
+`5fabf87b2df899e9`, PR #782's current `14a96bd772f6083e`). The corrected calibration and the
+frozen-observation status of PR #782's superseded `121a60bce86cff98` are in section 8. This round
+changes no bound-field byte, so `086faa099024ee57` is the digest of the bytes as posted; the
+movement voided any verdict that named the old value.
+
+**Minor correction — the P4 `L34–36` attribution.** Section 4 P4 B4 cited "Read-only; changes
+nothing" at L34–36; the string occurs **exactly once** on that page, at **L3** (frontmatter
+description). Corrected in place.
+
+**P8 — left as recorded, not flipped.** P8's **PARTIAL** rests on the referent of "the current
+authorization matrix" at L3, and its own linked companion names and distinguishes both matrix
+artifacts, so the Stage D audit recorded the verdict as contestable under C-1 and non-blocking. This
+round did not re-measure it; under C-4 a withholding verdict is not the risk direction (P8 receives
+no row of any kind), so it stays **PARTIAL** and no page's eligibility changes.
+
+**Minor correction — the `F reviewer` count.** Section 2 now states the count with its ref scope
+(**10** before this round's own commit in this full clone; the Stage D audit's clone measured
+**11** on the same fetch pattern) instead of the earlier clone-dependent "6"; the load-bearing half
+(**0** of those commits touch any of the eight pages) is unchanged and verified per path.
