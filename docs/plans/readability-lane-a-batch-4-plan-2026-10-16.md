@@ -484,7 +484,7 @@ above is corrected here.
 # Part II — revision 2 additions (2026-10-16)
 
 Every line above this heading is revision 1's text with the ten replacements listed in 12.1 and the
-four corrections listed in 15.1 applied; no other byte of it changed. Sections 12 to 14 are new at
+five corrections listed in 15.1 applied; no other byte of it changed. Sections 12 to 14 are new at
 revision 2; section 15 is new at revision 3.
 
 ## 12. The bounded Stage C repair — authored here, and deliberately NOT applied
@@ -724,7 +724,7 @@ it. The B-3 body half was homeless in the opposite direction — the work it ass
 non-affirmative verdict, which returns the plan to Stage A. Homeless = the instruction names no agent
 who could carry it out as written.*
 
-### 15.1 The four corrections applied above, and every byte they cover
+### 15.1 The five corrections applied above, and every byte they cover
 
 | # | Revision 2 location | Ground the audit measured | Correction applied in revision 3 |
 | --- | --- | --- | --- |
@@ -732,11 +732,14 @@ who could carry it out as written.*
 | 2 | section 10, rows 1-2 | both reported the branch and `git rev-parse HEAD` as `fb3dfe34f3a362c4cb67bfb5bfde732ffda14922` | both now report `0c994d77ad491bb329e07c056065b4d9bb8401ed`, re-measured live with `git ls-remote` at this revision |
 | 3 | section 10, row 9 | "one added path; `675 0`", contradicting section 2's three-path `1282 / 0` | now "**three** added paths, 0 modified, 0 deleted; `675 0`, `442 0`, `165 0` (`+1282/-0`)" |
 | 4 | section 10, row 12 | `OK: 3 commit(s) checked`, the value the same command returns at `fb3dfe34…` and not at the head | now `OK: 5 commit(s) checked, all signed off or exempt.` (all five SIGNED), re-measured at `0c994d77…` |
+| 5 | section 11, the body-revision bullet | **not one of the audit's grounds**: found at revision 3 by re-reading this captured text against its own measurements — 11 stated "the body has five recorded edits and their earlier states are not retrievable to this agent", while the measured `userContentEdits` list holds **nine** revisions and returns every one with its text, so 11 contradicted 12.3(a) as well as the artefact | now states that the revisions **are** retrievable and that 12.3(a) uses them, and qualifies the count as not fixed: **five** when revision 1 was written, **nine** as measured for revision 3 |
 
-**The four corrections are complete as a set, and are the only bytes of revision 1's text that moved at
-revision 3.** `fb3dfe34` occurs at exactly **three** places in the captured revision-2 text (the
-preamble and rows 1-2); rows 9 and 12 carried their own stale values. All five lines are corrected
-above, and no other line above the Part II heading changed. The stale values are not erased from the
+**The five corrections are complete as a set, and are the only bytes of revision 1's text that moved at
+revision 3.** Four of them answer the audit's four grounds: `fb3dfe34` occurs at exactly **three**
+places in the captured revision-2 text (the preamble and rows 1-2), and rows 9 and 12 carried their own
+stale values — five lines in all. **The fifth correction was not in the audit's grounds**: it was found
+here, by re-reading this captured revision against its own measurements, and it removes a contradiction
+this revision would otherwise have shipped. No other line above the Part II heading changed. The stale values are not erased from the
 record: they are named in this table, which is the same treatment 12.1 gave revision 1's text.
 
 **What the audit re-derived and this revision does not touch.** The Stage B audit reproduced, at the
