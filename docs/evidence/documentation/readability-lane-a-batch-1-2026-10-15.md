@@ -523,13 +523,13 @@ payload, and therefore the bound-field digest, is unchanged by them, exactly as 
   acceptance; applying C-4 to it would have wrongly withdrawn the good acceptance K-089. No
   other page of the eight was recorded partial at any point.
 
-**Diff scopes, counted by hand (not by regex).** `base..head` is **insert-only**:
-**689 added / 0 deleted** over two file headers and three hunks, and with no deleted line at all, no
-deleted line
+**Diff scopes, counted by hand (not by regex).** `base..head` is **insert-only** — it adds no
+deleted line at all, over two file headers and three hunks — and its added-line count is **re-derived
+at the head that publishes this record** (`git diff --numstat e2a3e20b..HEAD`), never carried; no deleted line
 begins with two dashes. The **intra-branch correction commit** `f6a4e418` is **not** insert-only
 against its parent `09a7ee1c`: **145 added / 51 deleted** — disclosed because the two scopes
 differ and an insert-only claim that silently covered that commit would be false. (`445 added / 0 deleted` is the **`base..f6a4e418`** figure — the scope before this pass's own two
-commits; it is superseded by the head figure above and is not a count of this head.) This pass's own
+commits, fixed by immutable commits and not a count of the head that publishes this record — what this record binds is the re-derivation above, and the value for the head it is read at is stated in the PR body's validation rows 4 and 16.) This pass's own
 commits are a third scope (the repair commit and its follow-up citation-correction
 commit); their counts are in the PR body's validation table. **Dated correction inside this
 pass:** the first cut of section 8 and of the ledger section cited `main`'s K-105
