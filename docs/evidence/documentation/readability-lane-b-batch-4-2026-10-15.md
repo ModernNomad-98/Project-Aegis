@@ -639,11 +639,16 @@ Stage C lane — stated per the repository's 2026-10-13 attribution rule.
   loose wording; fixed.** Section 6 now says AEGIS-APR-101 was **consulted for the later keeper
   handoff, not exercised by this write**, and that the evidence write itself is delivered under
   AEGIS-APR-039. The pull-request body's row says the same.
-- **SD-D finding, not in Codex — the body's DCO count: CONFIRMED and fixed.** The body's checklist
-  said `OK: 2 commit(s) checked` while its validation table said `OK: 1 commit(s) checked`. Measured:
-  `python -P scripts/check_dco.py --range f490c16f..HEAD` → exit 0, `OK: 2 commit(s) checked, all
-  signed off or exempt.`, and `git rev-list --count f490c16f..HEAD` → 2. The table's copy was stale
-  from before the correction commit; it now reads 2.
+- **SD-D finding, not in Codex — the body's DCO count: CONFIRMED and fixed.** The body gave two
+  results for one command: its checklist said `OK: 2 commit(s) checked` and its validation table said
+  `OK: 1 commit(s) checked`. **Measured at the audited head `6443ff87`:** `python -P
+  scripts/check_dco.py --range f490c16f..6443ff87` → exit 0, `OK: 2 commit(s) checked, all signed off
+  or exempt.`, and `git rev-list --count f490c16f..6443ff87` → 2 — **so the table's copy was the wrong
+  one**, stale from before the correction commit. This repair's own commits join that range, so the
+  count at the repaired head is larger; **both body rows now state the same figure, measured at the
+  repaired head and repeated in the body's checklist and validation table** (**4**: the original
+  Stage C commit, the correction commit, and the two repair commits — the first repair commit is
+  `05546c10`; the second is the commit that carries this sentence).
 - **SD-D finding, not in Codex — the seven-case/eight-case catalog contradiction: CONFIRMED and
   fixed.** Section 3(c) said "seven-case" while section 3(e) said "eight-case". Measured on the page:
   B4-5's catalog table at L79–88 has **8** data rows (Peer spoof … Off-map edge). Section 3(c) now
@@ -679,10 +684,10 @@ this repair; no keeper row was authored or edited; nothing was merged.
 
 **Repair arithmetic, counted not regexed.** Against the audited head `6443ff87` this repair
 **replaces** text: enumerating every raw diff line beginning with `-` (excluding the `---` file
-header) gives **27 deleted** lines and **229 added** lines; three of the deleted lines themselves begin
+header) gives **27 deleted** lines and **234 added** lines; three of the deleted lines themselves begin
 with `--`, which a naive pattern misses. Against the named base `f490c16f` the pull request is
 still **additions only** — this record does not exist at that base, so the tree-to-tree diff is
-**690 insertions and 0 deletions**, and the record's own length is **690 lines**.
+**695 insertions and 0 deletions**, and the record's own length is **695 lines**.
 
 ---
 
