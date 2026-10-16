@@ -160,7 +160,7 @@ before/after with the command. The byte counts reproduce exactly. No page needed
 
 ## 4. Per-page read detail — ranges, bullets, purpose restatements, verification
 
-**P1 — `.claude/skills/ab-test-designer/SKILL.md`** — read whole, L1-229.
+**P1 — `.claude/skills/ab-test-designer/SKILL.md`** — read whole, L1-228.
 Purpose and normal use (restated from the page alone): a skill that designs A/B and controlled
 experiments honestly **and** reads their results — a falsifiable hypothesis, ONE primary metric
 plus guardrails, a sticky non-contaminating randomization unit, a power/sample-size calculation
@@ -198,7 +198,7 @@ links, both to `references/ab-test-sheet.md`, target present in
 independent read — this record; the page's author is another agent/human (see section 2).
 **Verdict: accepted, no edit.**
 
-**P2 — `.claude/skills/ab-test-designer/references/ab-test-sheet.md`** — read whole, L1-70.
+**P2 — `.claude/skills/ab-test-designer/references/ab-test-sheet.md`** — read whole, L1-69.
 Purpose and normal use: the ab-test-designer reference sheet for recording experiment inputs —
 the power/sample-size inputs (baseline, MDE, alpha, power), the peeking-inflation explanation
 and its two remedies, multiple-comparison corrections, the validity-check table, result-reading
@@ -213,7 +213,7 @@ one link (`../SKILL.md`, resolves to `.claude/skills/ab-test-designer/SKILL.md`,
 zero commands. B6 this record (author: Peter Nguyen).
 **Verdict: accepted, no edit.**
 
-**P3 — `.claude/skills/acceptance-criteria-reviewer/SKILL.md`** — read whole, L1-235.
+**P3 — `.claude/skills/acceptance-criteria-reviewer/SKILL.md`** — read whole, L1-234.
 Purpose and normal use: a skill that reviews acceptance criteria **that already exist** (in a
 spec, ticket or user story) for testability, completeness and ambiguity — each criterion must
 name an observable outcome, a pass/fail threshold and the evidence that will prove it; vague
@@ -237,7 +237,7 @@ record (author: Peter Nguyen).
 **Verdict: accepted, no edit.**
 
 **P4 — `.claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md`** —
-read whole, L1-85.
+read whole, L1-84.
 Purpose and normal use: the acceptance-criteria-reviewer reference sheet — the three-part
 testability check (observable outcome / pass-fail threshold / evidence), the vague-word catalog
 with rewrite patterns whose placeholders stay visible, the completeness classes (negative,
@@ -252,7 +252,7 @@ named skill it routes to (`multi-tenant-security-tester`, manual-only) exists in
 B6 this record (author: Peter Nguyen).
 **Verdict: accepted, no edit.**
 
-**P5 — `.claude/skills/accessibility-test-harness/SKILL.md`** — read whole, L1-197.
+**P5 — `.claude/skills/accessibility-test-harness/SKILL.md`** — read whole, L1-196.
 Purpose and normal use: a skill that designs the accessibility verification harness — WCAG-oriented
 automated scans placed at the right layers (component tests, E2E, CI contrast/lint) for what
 machines can catch, plus manual keyboard and screen-reader checklists for what they cannot, with
@@ -273,7 +273,7 @@ B6 this record (author: Peter Nguyen).
 **Verdict: accepted, no edit.**
 
 **P6 — `.claude/skills/accessibility-test-harness/references/a11y-checklists.md`** — read
-whole, L1-78.
+whole, L1-77.
 Purpose and normal use: the accessibility-test-harness reference sheet — the automated-vs-manual
 split table, the keyboard-only checklist with WCAG references, the screen-reader smoke checklist
 per committed assistive-technology combo, the a11y-specific severity rubric, and the
@@ -286,7 +286,7 @@ applicable. B5 satisfied — one link (`../SKILL.md`, resolves to the harness sk
 zero commands. B6 this record (author: Peter Nguyen).
 **Verdict: accepted, no edit.**
 
-**P7 — `.claude/skills/admin-console-architect/SKILL.md`** — read whole, L1-244.
+**P7 — `.claude/skills/admin-console-architect/SKILL.md`** — read whole, L1-243.
 Purpose and normal use: a skill that designs the internal ops/support/superadmin console for a
 multi-tenant SaaS — least-privilege admin tiers (view-ops / write-ops / superadmin), cross-tenant
 access audited by construction on every read and write, impersonation/support-mode with hard
@@ -316,7 +316,7 @@ superadmin-observability-console-designer, audit-log-architect, human-approval-b
 record (author: Peter Nguyen).
 **Verdict: accepted, no edit.**
 
-**P8 — `.claude/skills/adr-sequencer/references/adr-corpus-sheet.md`** — read whole, L1-76.
+**P8 — `.claude/skills/adr-sequencer/references/adr-corpus-sheet.md`** — read whole, L1-75.
 Purpose and normal use: the adr-sequencer reference sheet for maintaining a decision index and
 chronology — the index/log table format, the status lifecycle (Proposed / Accepted / Rejected /
 Deprecated / Superseded), the bidirectional superseding links (drafts for a separately authorized
