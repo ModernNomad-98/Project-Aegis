@@ -22,6 +22,16 @@
   (`git merge-base --is-ancestor e2a3e20b7c20ef8385b219b39c6405237163406f refs/remotes/origin/main` exits 0).
 - **The lane changed none of the eight read pages.** So the bytes this record read are the bytes the
   merge receives, and the acceptance is not voided by the merge.
+- **Revision 2, 2026-10-16 — the first SD-D applied (findings F1-F5).** The Stage D audit of the
+  first head (`99d46d752357c6cb127274944ce2ac2ff0b9b78e`) returned **REVISE**; the posted receipt is
+  PR #784 issue comment `6209631818`. This revision re-records the five bullet-(b) PARTIAL pages as
+  FULL under the standing C-1 ruling, with the measurement cited per term (sections 4 and 6(b));
+  replaces section 10's false "cannot silently read as full" safeguard with the C-4 rule and its
+  construction proof, and offers its strings for FULL pages only (all eight are FULL); corrects the
+  ledger quotation (F3), the lost-commit phrase's source (F4) and the timing claim (F5, section 14);
+  and adds section 15, what this round did not verify. Prepared by **DeepSeek-4.1-Flash
+  (deepseek-flash)**, Stage C — a different agent from the record's first drafter
+  (`deepseek-v4-pro`); the Stage D auditor also ran on DeepSeek-4.1-Flash (deepseek-flash).
 
 ## 1. The instrument's figures at the base, quoted
 
@@ -93,7 +103,7 @@ construction — this lane wrote none of the eight pages (each is a dated record
 2026-09-24, 2026-10-10 or 2026-10-12 batch authored by other agents) — and the second clause is the
 future keeper's to satisfy, not this lane's.
 
-## 4. Per-page dispositions — 8 whole-page re-reads; 3 full, 5 partial with named gaps
+## 4. Per-page dispositions — 8 whole-page re-reads; all eight FULL (revision 2 re-recorded the five former partials under C-1)
 
 Every page below was read **whole** at `e2a3e20b7c20ef8385b219b39c6405237163406f`. None has a recorded
 acceptance, so drift has no recorded acceptance revision to diff against (`not derivable`, the same
@@ -102,19 +112,39 @@ wording the after-713 record used for its no-recorded page).
 | # | Page | Recorded acceptance | Drift | Disposition | Reader |
 | --- | --- | --- | ---: | --- | --- |
 | LD-17 | `docs/evidence/documentation/readability-maintainer-guides-2026-09-23.md` | none (no-recorded bucket) | not derivable | **accepted unchanged (full)** | `readability-phase4-lane-d-implementer-c3` |
-| LD-18 | `docs/evidence/documentation/readability-reread-batches-2026-10-12.md` | none (no-recorded bucket) | not derivable | **partial — named gaps, section 6(b)** | `readability-phase4-lane-d-implementer-c3` |
-| LD-19 | `docs/evidence/documentation/readability-technical-guides-2026-09-23.md` | none (no-recorded bucket) | not derivable | **partial — named gaps, section 6(b)** | `readability-phase4-lane-d-implementer-c3` |
-| LD-20 | `docs/evidence/documentation/remaining-active-docs-readability-2026-09-23.md` | none (no-recorded bucket) | not derivable | **partial — named gaps, section 6(b)** | `readability-phase4-lane-d-implementer-c3` |
-| LD-21 | `docs/evidence/documentation/roadmap-current-forecast-routes-2026-09-23.md` | none (no-recorded bucket) | not derivable | **partial — named gaps, section 6(b)** | `readability-phase4-lane-d-implementer-c3` |
+| LD-18 | `docs/evidence/documentation/readability-reread-batches-2026-10-12.md` | none (no-recorded bucket) | not derivable | **accepted unchanged (full)** — observations, section 6(b) | `readability-phase4-lane-d-implementer-c3` |
+| LD-19 | `docs/evidence/documentation/readability-technical-guides-2026-09-23.md` | none (no-recorded bucket) | not derivable | **accepted unchanged (full)** — observations, section 6(b) | `readability-phase4-lane-d-implementer-c3` |
+| LD-20 | `docs/evidence/documentation/remaining-active-docs-readability-2026-09-23.md` | none (no-recorded bucket) | not derivable | **accepted unchanged (full)** — observations, section 6(b) | `readability-phase4-lane-d-implementer-c3` |
+| LD-21 | `docs/evidence/documentation/roadmap-current-forecast-routes-2026-09-23.md` | none (no-recorded bucket) | not derivable | **accepted unchanged (full)** — observations, section 6(b) | `readability-phase4-lane-d-implementer-c3` |
 | LD-22 | `docs/evidence/documentation/roadmap-deep-status-terms-2026-09-23.md` | none (no-recorded bucket) | not derivable | **accepted unchanged (full)** | `readability-phase4-lane-d-implementer-c3` |
-| LD-23 | `docs/evidence/documentation/root-readme-workspace-routing-2026-09-23.md` | none (no-recorded bucket) | not derivable | **partial — named gaps, section 6(b)** | `readability-phase4-lane-d-implementer-c3` |
+| LD-23 | `docs/evidence/documentation/root-readme-workspace-routing-2026-09-23.md` | none (no-recorded bucket) | not derivable | **accepted unchanged (full)** — observations, section 6(b) | `readability-phase4-lane-d-implementer-c3` |
 | LD-24 | `docs/evidence/documentation/root-status-docs-readability-2026-09-23.md` | none (no-recorded bucket) | not derivable | **accepted unchanged (full)** | `readability-phase4-lane-d-implementer-c3` |
 
-**Honest partials, per the brief's rule** ("an undefined term used before its definition is not a
-full acceptance; do not complete a batch over an acknowledged gap"): five pages carry a bullet-(b)
-gap, each named in section 6(b) with line cites. No page needed a fix, so no page was edited: the
-no-rewrite discipline forbids edits to dated records, and the gaps are recorded rather than
-rewritten in place.
+**Revision 2 dispositions (SD-D F2).** The first head dispositioned five pages partial on
+bullet-(b) grounds. The standing C-1 ruling makes those grounds **observations**: an unglossed term
+that is a library-wide convention is not a per-page defect, and the stronger test is whether the
+page itself resolves it. Measured here by command over the **653 reader pages at the base**
+(`classify_tree` replicated: tracked `.md` at the ref, minus the `scripts/` fixtures except the one
+README, minus the one generated report):
+
+| Term | Reader pages containing it | Occurrences | C-1 treatment |
+| --- | ---: | ---: | --- |
+| `PR`/`PRs` | 291 | 4,153 | library-wide convention — observation (LD-18, LD-23) |
+| `UTC` | 106 | 842 | library-wide convention — observation (LD-19) |
+| `sha256` | 37 | 146 | library-wide convention — observation (LD-18) |
+| `ETA` | 30 | 270 | library-wide convention — observation (LD-19) |
+| `EVAL-004`, `AEGIS-060` | — | — | the page resolves it: first used L25-26, defined on-page L27-29 (LD-20) |
+| `#186` | — | — | the page resolves it: used bare L3, expanded to "pull request #186" L23 (LD-21) |
+
+The convention threshold is the one the **merged** lane A batch-5 record
+(`docs/evidence/documentation/readability-lane-a-batch-5-2026-10-15.md`, section 5, present on
+`main`) published and applied: at its bound revision `acceptor` on **12** reader pages is
+"convention — observation", while `Phase 1.5` on **11** is "below convention — the one gap
+recorded in this batch". All four terms above sit far above 12. The batch-3 brief's own rule ("an
+undefined term used before its definition is not a full acceptance") conflicts with C-1 for LD-20
+and LD-21; the standing C-1 ruling governs, as the SD-D states. **All five pages are accordingly
+re-recorded FULL**, their observations named in section 6(b). No page needed a fix, so no page was
+edited: the no-rewrite discipline forbids edits to dated records.
 
 ## 5. Depth records
 
@@ -146,8 +176,12 @@ residue in the table above was opened and dispositioned; none is a defect the pa
 unresolvable 40-hex occurrences are LD-18's own D-1 row's `9644ef07…`, which the page discloses
 as the unreachable grant revision it names follow-up 1; the six not-resolving backtick tokens are
 LD-18's D-4 row's six named lost commits (`65bacc7`, `d3dcb62`, `3c44f4a`, `e9cce7d`,
-`288d993`, `7f98950`), which the page itself explains (D73 row 5: lost-commit events,
-"recorded, never bound, never dropped"). The one 40-hex SHA on each of LD-20/LD-21/LD-22/LD-24 and
+`288d993`, `7f98950`), which the page itself explains as lost-commit events. The phrase "recorded, never bound,
+never dropped" is the acceptance tool's own wording (`tools/readability_acceptance/build_index.py`
+L15-16 and `tools/readability_acceptance/README.md` L58), carried by LD-18's D-4 row; D73 row 5
+(`docs/reconciliation/step-0-reconciliation-v4.md` L3834) records the same six as counting as
+pending until re-reviewed and says they are "never bound to another commit and never dropped
+silently", not the quoted phrase (SD-D F4). The one 40-hex SHA on each of LD-20/LD-21/LD-22/LD-24 and
 the two 7-hex tokens (LD-17 `b2c6db2`, LD-24 `02ff5f0`) all resolve in the local object store at
 `e2a3e20b`.
 
@@ -163,24 +197,35 @@ README and ledger (L3-7); LD-24's banner names the merged PR #176 and defines UT
 the eight names an intended audience in so many words — the banner pages address "current reading"
 to a generic reader. That is a property of the dated text, which this lane may not rewrite.
 
-**(b) Abbreviations and coded identifiers defined at first use — the five named gaps.**
-- **LD-18 — GAP:** `PR` (L4, L240) and `sha256` (L6, L8) are used and never expanded
-  on-page; SD-B ACCEPT (L7), the batch labels B1-B4 (L49-54), P1-P8 / W1-W10 (L74-93), F4/F5 (L57,
-  L98), AC1/AC2/AC7/AC10 (L230, L233, L246, L263), D73/D84/D86/D87/D98 (L242, L259, L261-263, L266)
-  and the L-citations (L229, L242, L258) are the cited plan and ledger artifacts' identifiers,
-  presumed by design.
-- **LD-19 — GAP:** `UTC` (L47) and `ETA` (L43-46) are used and never expanded on-page (the
-  banner defines AI/JSON/YAML/SHA-256, L7-9, and the table spells out the other terms, L20).
-- **LD-20 — GAP:** `EVAL-004` and `AEGIS-060` are first used at L25-26 and only defined at
-  L27-29 — used before their on-page definition. (UTC L10, ID L28, AI/API/CQRS L48-49, PR L12 are
-  each at first use.)
-- **LD-21 — GAP:** `#186` is used bare at L3 ("The #186-at-base … language") before its expansion
-  "pull request #186" at L23. (UTC is defined L9; pull request is spelled out L11, L19, L23.)
-- **LD-23 — GAP:** `PR` is used unexpanded at L47-48 ("merged PRs #122, #126, #127, #128 and
-  #133") and never defined on-page. (BER L6 and UTC L7 are defined before use.)
+**(b) Abbreviations and coded identifiers — every term dispositioned; observations, not gaps (revision 2).**
+- **LD-18 — observations:** `PR` is used unglossed on nine lines (L4, L136, L138, L195, L196, L200,
+  L240, L244, L254) and `sha256` at L6 and L8; neither is expanded on-page. Both are library-wide
+  conventions under C-1 (section 4: `PR`/`PRs` on 291 of the 653 reader pages at the base, `sha256`
+  on 37 — both above the ≥12-page convention threshold the merged lane A batch-5 record published
+  and applied). The remaining coded identifiers — SD-B ACCEPT (L7), the batch labels B1-B4 (L49-54),
+  P1-P8 / W1-W10 (L74-93), F4/F5 (L57, L98), AC1/AC2/AC7/AC10 (L230, L233, L246, L263),
+  D73/D84/D86/D87/D98 (L242, L259, L261-263, L266) and the L-citations (L229, L242, L258) — are the
+  cited plan and ledger artifacts' identifiers, carried by design.
+- **LD-19 — observations:** `UTC` (L47) and `ETA` (L43-45; four occurrences) are used without an
+  on-page expansion. Both are library-wide conventions (section 4: 106 and 30 reader pages), above
+  the ≥12 threshold. (The banner defines AI/JSON/YAML/SHA-256, L7-9, and the table spells out the
+  other terms, L20.)
+- **LD-20 — the page resolves it:** `EVAL-004` and `AEGIS-060` are first used at L25-26 and defined
+  on the page at L27-29 ("EVAL-004 is the audit rule for named evaluation targets; AEGIS-060 is the
+  identifier (ID) of the rejected proposed finding.") — two to three lines after first use, so the
+  page itself resolves them (C-1's stronger test); observation, not a gap. (UTC L10, ID L28,
+  AI/API/CQRS L48-49, PR L12 are each at first use.)
+- **LD-21 — the page resolves it:** `#186` is used bare at L3 ("The #186-at-base … language") and
+  expanded on the page at L23 ("at this base it names pull request #186") — the page itself
+  resolves it; observation, not a gap. (UTC is defined L9; pull request is spelled out L11, L19,
+  L23.)
+- **LD-23 — observation:** `PR` is used unexpanded in "merged PRs #122, #126, #127, #128 and #133"
+  (L47-48; one occurrence); a library-wide convention (section 4: 291 reader pages), above the ≥12
+  threshold. (BER L6 and UTC L7 are defined before use.)
 LD-17 (PR L3, API L7-8), LD-22 (pull request L16/L22/L24, work package L19, UTC L15, Behavioral Eval
 Runner L5) and LD-24 (PR L3-4, UTC L7-8) define at first use. **Recorded, not repaired** — dated
-records; each gap is named above so the keeper can record an honest partial row.
+records; every term above is dispositioned, so each of the eight pages is eligible for a full-page
+acceptance row, and no page is offered a partial row.
 
 **(c) Descriptive headings, lists or tables, and concrete examples.** LD-17 carries a three-row
 problem/change table (L18-22) and verification bullets (L30-35); LD-18 headed sections 1-9, the
@@ -260,7 +305,10 @@ Row shape: `stale:` the exact text as it stands at the declared revision; `new:`
 | # | stale | new | source |
 | --- | --- | --- | --- |
 | O-1 | LD-18's D-1 row (its L240) discloses `9644ef079db763802223180ae5b11af39919c781` as the unreachable grant revision and names it follow-up 1. At `e2a3e20b` the object still does not resolve (mechanical pass, two occurrences, both on LD-18). | **unchanged** — the page already discloses the non-resolution; nothing to repair. | `git cat-file -t 9644ef079db763802223180ae5b11af39919c781` exits non-zero at the base; LD-18's own D-1 row. |
-| O-2 | LD-18's D-4 row names the six lost-commit tokens `65bacc7`, `d3dcb62`, `3c44f4a`, `e9cce7d`, `288d993`, `7f98950` and explains them (D73 row 5: lost-commit events, recorded, never bound, never dropped). All six fail to resolve at the base. | **unchanged** — the page is correct as written; these are the program's known lost commits. | `git cat-file -t` over each token at the base; LD-18's own D-4 row. |
+| O-2 | LD-18's D-4 row names the six lost-commit tokens `65bacc7`, `d3dcb62`, `3c44f4a`, `e9cce7d`, `288d993`, `7f98950` and explains them as lost-commit events (the wording "recorded, never bound, never dropped" is
+`build_index.py` L15-16 and the tool README L58, carried by LD-18's own D-4 row; D73 row 5 is
+`docs/reconciliation/step-0-reconciliation-v4.md` L3834, which says these pages count as pending
+until re-reviewed). All six fail to resolve at the base. | **unchanged** — the page is correct as written; these are the program's known lost commits. | `git cat-file -t` over each token at the base; LD-18's own D-4 row. |
 | O-3 | LD-19 L32 ("184 skills valid"), LD-20 L44/L57, LD-21 L30-31, LD-23 L37, LD-24 L26 ("185 valid skills") and LD-20's "25 links" describe the batches at their own 2026-09-23 checkpoints. At `e2a3e20b` the validator reports 205 skills, and the pages' present link counts are 4 / 0 / 4 / 8 / 5 / 5 / 5 / 2 local links (section 5). | **unchanged** — historical sentences about their own batches, not restated as today's. | mechanical pass (section 5); `python -B scripts/validate-skills.py` at the base reports 205 skills (run this session). |
 | O-4 | LD-22 L21's link anchor `#aegis-apr-012-offline-behavioral-eval-runner-evidence-policy-proof` carries the identifier APR-012 without a prose gloss. The anchor resolves into the approval register's own APR-012 section, which is the identifier's definition site. | **unchanged** — the identifier's definition is the link's target, and the link resolves. | mechanical pass (no bad anchors); the register's own APR-012 section at the base. |
 
@@ -280,21 +328,33 @@ Zero rows above have an empty source.
   **+1 reader page, +1 no_recorded_acceptance and +1 official pending count**, all three attributed
   to this page. **No post-rebuild count is predicted.**
 
-## 10. The row-quote strings, verbatim (offered for the separate keeper)
+## 10. The row-quote strings, verbatim (offered for the separate keeper) — FULL pages only
 
 Each line below appears in this file byte-for-byte and is offered for the separate eligible keeper's
 rows under AEGIS-APR-117 (this lane authors no rows and claims no row IDs). Every line contains the
-full 40-character acceptance revision; the five partial pages name their partial disposition so a
-keeper row cannot silently read as full.
+full 40-character acceptance revision, and every line below belongs to a page dispositioned **FULL**
+(section 4). **The C-4 rule, stated here where a keeper will read it: a page dispositioned PARTIAL
+gets no acceptance row and no string of any kind and stays PENDING** — the ledger names only
+`full-page-acceptance`, `targeted-review`, `withdrawal` and `lost-commit`, so there is no
+partial-acceptance kind to record. A disclaimer inside a quote cannot prevent the flip:
+`build_index.py` reads row structure only, and `check_index.py` buckets any zero-drift page carrying
+any non-lost-commit row as **ACCEPTED**. Proved by construction in a throwaway local commit (never
+pushed): one row appended for LD-18 quoting the first head's own "(partial; gap(s) section 6(b))"
+string — `build_index.py --report` exited 0 (`table_rows` 101→102, `full_page_acceptances` 81→82,
+`reader_pages_with_rows` 68→69) and `check_index.py --json` exited 0
+(`accepted_on_recorded_review` 57→58, `no_recorded_acceptance` 587→586, `official_pending_count`
+597→596), with LD-18 in the **accepted** bucket at `changed_lines: 0`. The mitigation is to offer no
+string at all for a partial page. **All eight pages are dispositioned FULL in revision 2**, so all
+eight strings below are offered; none is offered for a partial page.
 
 ```text
 LD-17 accepted (full): docs/evidence/documentation/readability-maintainer-guides-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-LD-18 accepted (partial; gap(s) section 6(b)): docs/evidence/documentation/readability-reread-batches-2026-10-12.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-LD-19 accepted (partial; gap(s) section 6(b)): docs/evidence/documentation/readability-technical-guides-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-LD-20 accepted (partial; gap(s) section 6(b)): docs/evidence/documentation/remaining-active-docs-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-LD-21 accepted (partial; gap(s) section 6(b)): docs/evidence/documentation/roadmap-current-forecast-routes-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+LD-18 accepted (full; C-1 observations, section 6(b)): docs/evidence/documentation/readability-reread-batches-2026-10-12.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+LD-19 accepted (full; C-1 observations, section 6(b)): docs/evidence/documentation/readability-technical-guides-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+LD-20 accepted (full; the page resolves its terms, section 6(b)): docs/evidence/documentation/remaining-active-docs-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+LD-21 accepted (full; the page resolves its term, section 6(b)): docs/evidence/documentation/roadmap-current-forecast-routes-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 LD-22 accepted (full): docs/evidence/documentation/roadmap-deep-status-terms-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
-LD-23 accepted (partial; gap(s) section 6(b)): docs/evidence/documentation/root-readme-workspace-routing-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
+LD-23 accepted (full; C-1 observation, section 6(b)): docs/evidence/documentation/root-readme-workspace-routing-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 LD-24 accepted (full): docs/evidence/documentation/root-status-docs-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f
 ```
 
@@ -317,8 +377,9 @@ touched no page outside the lane's stated range; touched no other lane's branch,
 APR-117 re-record's holder); picked up none of the six `cannot_decide` lost-commit pages; and
 claims no authority beyond recording under AEGIS-APR-101 and the standing backlog delivery grant
 AEGIS-APR-039 (the owner's standing grant for backlog work, commits, pushes, PRs and merges, granted
-2026-10-15 with the eight defaults). The batching procedure "does not grant provider,
-private-input, real-host or deployment authority" (ledger L3018-3020).
+2026-10-15 with the eight defaults). The batching procedure "is a work plan" and "does not mark
+earlier screens as full-page acceptance or grant provider, private-input, real-host or deployment
+authority" (ledger L3018-3020).
 
 ## 13. Skills used (this lane, Stage C)
 
@@ -339,7 +400,7 @@ six-field records in this section, bound to the skills-manifest hashes.
 
 ```text
 skill@08d91a834460beebc9c66fa896b8b422f064bf1d7524f6e5b1512cda3afdc996 / reason: classify before writing, the class decides the tier and review path / applied: classified docs-only before any write / result: docs-only tier asserted in the PR body with the file set / incomplete: None / by: readability-phase4-lane-d-implementer-c3 (Stage C)
-skill@c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 / reason: the acceptance contract's six bullets are criteria and were checked one by one / applied: each bullet per page with line cites in section 6 / result: 3 full, 5 partial with named bullet-(b) gaps / incomplete: None / by: readability-phase4-lane-d-implementer-c3 (Stage C)
+skill@c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 / reason: the acceptance contract's six bullets are criteria and were checked one by one / applied: each bullet per page with line cites in section 6 / result: 8 full — the five former bullet-(b) partials re-recorded FULL under C-1 in revision 2, observations in section 6(b) / incomplete: None / by: readability-phase4-lane-d-implementer-c3 (Stage C)
 skill@b5fd9feda97235430259913aedd33447ab06e1c0ded281e9e131fa6bf9b78be2 / reason: four page items needed resolution against the repo, not the page's prose / applied: observations O-1..O-4 sourced to repo artifacts / result: all four dispositioned unchanged / incomplete: None / by: readability-phase4-lane-d-implementer-c3 (Stage C)
 skill@a74d2a22579cf93f737725aa0c54197b5d496a9f33a291a93c2cf2073cd7d076 / reason: recording requires knowing which grant covers what / applied: read AEGIS-APR-039, -101, -115, -117, -118 at the base / result: recording-only under APR-101; no grant consumed, extended or requested / incomplete: None / by: readability-phase4-lane-d-implementer-c3 (Stage C)
 skill@141b7036469f9f99ef6b8e152299619a6d0ab572656a5ba307062551d311d8a5 / reason: a new page may owe a retention entry / applied: checked for a retention registry and per-doc frontmatter practice / result: none exists for this directory; no retention change needed, recorded not skipped / incomplete: None / by: readability-phase4-lane-d-implementer-c3 (Stage C)
@@ -351,11 +412,38 @@ skill@6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 / reason:
 - Work item named **LaneD-Phase4-Batch3** (Phase 4 re-read, lane D, batch 3: eight whole-page
   re-reads of the lane's fixed page range, evidence record only), started
   **2026-10-15T13:44:57-07:00** (America/Los_Angeles; the turn-1 snapshot).
-- Finish and full wall time are recorded in the pull-request body at the head. Active time was
-  **not instrumented**, so wall time is an imperfect comparison with the estimate rule's
-  active-time requirement and no per-page active rate is claimed.
+- **Finish: `2026-10-15T13:57:46-07:00`** — the first head commit's own committer timestamp
+  (`git log -1 --format=%cI 99d46d752357c6cb127274944ce2ac2ff0b9b78e`), the last recorded write of
+  this lane; the pull request itself was opened at `2026-10-15T21:00:51Z` (`14:00:51-07:00`).
+  **Wall time ≈ 12m 49s** from the stated start to that timestamp. (Corrected in revision 2: the
+  first head said the figures were "recorded in the pull-request body", which the body did not do —
+  SD-D F5. The same figures are stated in the body's timing bullet.) Active time was **not
+  instrumented**, so wall time is an imperfect comparison with the estimate rule's active-time
+  requirement and no per-page active rate is claimed.
+
+## 15. What revision 2 did not verify (recorded here, not only in a message)
+
+- It did **not** re-perform the eight pages' whole-page prose reads. It re-verified by command what
+  is artifact-checkable: the flagged terms' line cites, the C-1 prevalence counts (section 4), the
+  eight line counts and blob IDs, the lane derivation and batch boundaries, the six acceptance
+  bullets' cited lines, every quoted span it touched, and the citations' provenance.
+- It did **not** re-fetch the two external links (PR #122 on LD-17, PR #176 on LD-24); the record's
+  own "external links were not fetched" statement stands and their live status is unverified.
+- It did **not** run `build_index.py --write` and predicts **no** post-rebuild bucket figure. The
+  published head expectation (654 / 57 / 4 / 587 / 0 / 0 / 6 / 597) still holds: the repair changes
+  the same one file, appends no page and no row, and was re-measured at the new head.
+- It did **not** read any other lane's record or pull request in full; it re-checked only the eight
+  page paths and the figures this record states.
+- It did **not** verify the coordinator's batch-3 brief: no tracked artifact at any ref carries it,
+  so the record's quotations of it remain **unverifiable, not false**.
+- It did **not** merge, rebase or move the derivation base, and did **not** resolve any merge
+  conflict (that is the merge holder's step).
+- It did **not** run the CI workflows locally; it read the run and check-run APIs at the new head
+  after the push.
 
 ---
 
 *Prepared by a **DeepSeek agent** (`deepseek-v4-pro`) operating under the owner account, as the
-repository's attribution rule (2026-10-13) requires.*
+repository's attribution rule (2026-10-13) requires. **Revision 2 (2026-10-16) prepared by a
+DeepSeek agent (`DeepSeek-4.1-Flash`, `deepseek-flash`)** under the same rule; the Stage D audit that
+returned REVISE also ran on DeepSeek-4.1-Flash (deepseek-flash).*
