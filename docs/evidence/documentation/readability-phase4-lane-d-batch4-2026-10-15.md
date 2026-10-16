@@ -140,17 +140,27 @@ column here**, and no page carries a gap with a full disposition.
 | # | Page | Read range | Lines | Disposition | Gaps (section 6) |
 | --- | --- | --- | ---: | --- | --- |
 | LD-25 | `docs/evidence/documentation/scenario-a-runbook-readability-2026-09-23.md` | L1-46 (whole) | 46 | **partial** | G-25.1 … G-25.4 |
-| LD-26 | `docs/evidence/documentation/setup-routing-plan-readability-2026-09-23.md` | L1-67 (whole) | 67 | **partial** | G-26.1 … G-26.5 |
+| LD-26 | `docs/evidence/documentation/setup-routing-plan-readability-2026-09-23.md` | L1-67 (whole) | 67 | **partial** | G-26.1 … G-26.6 |
 | LD-27 | `docs/evidence/documentation/skill-category-01-07-readability-2026-09-23.md` | L1-61 (whole) | 61 | **partial** | G-27.1 … G-27.3 |
 | LD-28 | `docs/evidence/documentation/skill-category-map-readability-2026-09-23.md` | L1-52 (whole) | 52 | **partial** | G-28.1 … G-28.2 |
-| LD-29 | `docs/evidence/documentation/skill-docs-eighth-20-readability-2026-09-23.md` | L1-64 (whole) | 64 | **partial** | G-29.1 … G-29.4 |
+| LD-29 | `docs/evidence/documentation/skill-docs-eighth-20-readability-2026-09-23.md` | L1-64 (whole) | 64 | **partial** | G-29.1 … G-29.5 |
 | LD-30 | `docs/evidence/documentation/skill-docs-fifth-20-readability-2026-09-23.md` | L1-71 (whole) | 71 | **partial** | G-30.1 … G-30.4 |
 | LD-31 | `docs/evidence/documentation/skill-docs-final-screen-readability-2026-09-23.md` | L1-64 (whole) | 64 | **partial** | G-31.1 … G-31.3 |
 | LD-32 | `docs/evidence/documentation/skill-docs-first-20-readability-2026-09-23.md` | L1-63 (whole) | 63 | **partial** | G-32.1 … G-32.3 |
 
-**Counts: 0 full / 8 partial. 28 named gaps, each with its page line numbers.** No page needed a fix,
+**Counts: 0 full / 8 partial. 30 named gaps, each with its page line numbers.** No page needed a fix,
 so no page was edited: the no-rewrite discipline forbids edits to dated records, and every gap is
 recorded here rather than repaired in place.
+
+**Correction after the Stage D audit (2026-10-16) — the gap count was 28 and is now 30.** The audit's
+read-not-grep check found this record's own `(b-plain)` term `isolated worktree` on two further pages
+at their own lines — **G-26.6** (LD-26 L14) and **G-29.5** (LD-29 L21) — where the record had counted
+the same term only on LD-27, LD-30, LD-31 and LD-32. Both gaps are added to the list below and to
+their pages' rows above; the dispositions are **unchanged (0 full / 8 partial)**. The same repair
+corrected three citations to the pages' verbatim wording (O-3's `185 skills valid`, the authority
+sentence under "Explicitly not counted as gaps", and two `PR` tokens the committed text had mangled)
+and re-issued the section 10 row-quote strings at the corrected ranges. No page, disposition, blob,
+byte count, derivation figure or gate figure moved.
 
 ## 5. Depth record and the mechanical pass
 
@@ -188,9 +198,11 @@ hex token in backticks, and coded identifiers by the pattern
 
 All 42 local links resolve at the base and no anchor is stale; the 5 external links (all on LD-30,
 the OWASP, Agent2Agent, Model Context Protocol, W3C and HTML references) were **not fetched**,
-matching the dated-note practice. The three 40-hex SHAs are the base/merge revisions each note
-cites and each resolves in the local object store at the base; the two 7-hex tokens on LD-28 are
-commit abbreviations and both resolve. The named commands (`python -B
+matching the dated-note practice. The **four** 40-hex SHA occurrences in the table above (one each
+on LD-29, LD-30, LD-31 and LD-32) are **three distinct values** — LD-29 and LD-31 both cite
+`e900a0455c5ee3bb138b9292a6bcb71cbdfe7be8` — and each is the base or merge revision its note cites;
+each resolves in the local object store at the base. The two 7-hex tokens on LD-28 are commit
+abbreviations and both resolve. The named commands (`python -B
 scripts/validate-skills.py`, `git diff --check`) exist at the named path or as git builtins
 (checked with `git cat-file -e`).
 
@@ -220,10 +232,11 @@ record names at least one item in these classes, and **full** when it names none
 - **(f-none)** no non-author read-only review is recorded — **none of the eight is in this class**.
 
 **Explicitly not counted as gaps** (recorded so the classification is visible, not hidden): an
-authority or scope boundary ("this note does not grant merge authority") — that is bullet (d)
-working correctly; the disclosure "active-only time was not instrumented", which the repository's
-timing rule **requires** and no acceptance bullet contradicts; and repository-wide work the page
-correctly says it does not close. Each of these is listed per page where it appears.
+authority or scope boundary (the four skill-document pages' L7 sentence "This note does not grant
+implementation or merge authority") — that is bullet (d) working correctly; the disclosure
+"active-only time was not instrumented", which the repository's timing rule **requires** and no
+acceptance bullet contradicts; and repository-wide work the page correctly says it does not close.
+Each of these is listed per page where it appears.
 
 **(a) Purpose and audience up front — 8 of 8 name the purpose, 0 of 8 name the reader.** Every page
 opens by saying what it covers (LD-25 L1-18, LD-26 L1-21, LD-27 L1-14, LD-28 L1-13, LD-29…LD-32
@@ -236,16 +249,18 @@ G-32.1** below.
 **(b) First-use definitions, per page.** LD-25: clean (`ID` L7 and `PDT` L8 glossed at first
 use) but jargon unmet (G-25.2). LD-26: **`Laya` and `Decider` (L31), `OpenJev` (L31-32) and the
 `unselected` status value (L36) are used with no on-page definition** (G-26.2, G-26.3); `UTC` (L8)
-and `PR@@ (L14) are correctly defined. LD-27: clean (`PR` L7, `P0/P1/P2` L28-30, `IDs` L34,
+and `PR` (L14) are correctly defined, but `isolated worktree` (L14) is used without plain words
+(G-26.6). LD-27: clean (`PR` L7, `P0/P1/P2` L28-30, `IDs` L34,
 `UTC` L48). LD-28: clean (`AI` L6, `P0/P1` L16-17, `UTC` L37, `ID` L40). LD-29:
-`manual-only` (L18) is a repository convention used as a label with no explanation (G-29.2), and
-`frontmatter` (L57-58) is used without naming the format (G-29.3); `UTC` is defined at L53. LD-30:
+`manual-only` (L18) is a repository convention used as a label with no explanation (G-29.2),
+`frontmatter` (L57-58) is used without naming the format (G-29.3), and `isolated worktree` (L21) is
+used without plain words (G-29.5); `UTC` is defined at L53. LD-30:
 `ASI07` (L48) is a coded identifier in an external taxonomy with no on-page explanation
 (G-30.2); `OWASP` L47-48, `W3C` L51, `HTML` L52, `YAML` L62, `IDs` L38 and `UTC` L57 are
 correctly defined. LD-31: `MANUAL-ONLY` (L47) is a repository label used unexplained (G-31.2);
 `TDD` L9/L33, `TALI` L34, `SAST`/`SARIF`/`CVE`/`TP`/`FP` L41-43 and `DCO` L63 are defined.
 LD-32: the reading key (L9-16) covers WCAG, E2E, both `CI` senses, a11y, EN 301 549, ADA, ARIA,
-SR, AT, VPAT and YAML; `PR@@ L28, `MDE` L35 and `SRM` L36 are defined; `frontmatter` (L14-15)
+SR, AT, VPAT and YAML; `PR` L28, `MDE` L35 and `SRM` L36 are defined; `frontmatter` (L14-15)
 is used without saying what frontmatter is (G-32.2).
 
 **(c) Descriptive headings, lists or tables, and concrete examples — satisfied on all eight.** Every
@@ -297,6 +312,7 @@ directly (section 6(b)) rather than trusting the sentence.
 - **G-26.3** (b-def) LD-26 L36: the `unselected` status value is used without plain-words explanation.
 - **G-26.4** (b-plain) LD-26 L45: "no-silent-online fallback boundary" unglossed.
 - **G-26.5** (d-unperformed) LD-26 L62-63: the reviewer "did not re-fetch the live issue" in its sandbox.
+- **G-26.6** (b-plain) LD-26 L14: "isolated worktree" used without plain words.
 - **G-27.1** (a) LD-27 L1-14: purpose stated, intended reader never named.
 - **G-27.2** (b-plain) LD-27 L25-26: "the original conversion checklist" is named with no path or location, so it cannot be found.
 - **G-27.3** (b-plain) LD-27 L7: "isolated worktree" used without plain words.
@@ -306,6 +322,7 @@ directly (section 6(b)) rather than trusting the sentence.
 - **G-29.2** (b-def) LD-29 L18: `manual-only` used as a repository label with no on-page explanation.
 - **G-29.3** (b-plain) LD-29 L57-58: "frontmatter blocks" used without naming the format.
 - **G-29.4** (d-unperformed) LD-29 L60-61: "no live model evaluation was run for these wording changes."
+- **G-29.5** (b-plain) LD-29 L21: "isolated worktree" used without plain words.
 - **G-30.1** (a) LD-30 L3-7: purpose stated, intended reader never named.
 - **G-30.2** (b-def) LD-30 L48: `ASI07` is a coded identifier with no on-page explanation.
 - **G-30.3** (b-plain) LD-30 L20: "isolated worktree" used without plain words.
@@ -351,7 +368,7 @@ carries a full disposition alongside it.
 | --- | --- | --- | --- |
 | O-1 | The derivation base moved: `origin/main` gained three pending paths between `e2a3e20b` and `f490c16f` (PR #781's new record, `docs/delivery-workflow.md` and `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`), so lane D's quarter start moved 444 to 447 and two pages batches 1-2 read (`full-page-readability-batch-after-233`, `…-234`) now fall inside **lane C's** quarter at this base. | **unchanged — reported, not decided.** This batch touches neither page; the overlap is a cross-lane boundary question for the coordinator (a lane D batch-1/2 page and a lane C quarter can now name the same path). | `check_index.py --json` at both bases; the 590-set/593-set set-difference; `git ls-tree` counts. |
 | O-2 | Batch 4's window under the moved boundary: the same eight pages are lane D positions **24-31** at this base, not 25-32; position 24 (`scenario-a-runbook-readability-2026-09-23.md`) was unread by batches 1-3 and would be skipped by a literal re-indexing. | **unchanged — the eight were selected by the lane's own sequence (indices 468-475 of the 590-set, verified boundary-for-boundary against batches 1-3), so nothing is skipped and nothing is re-read.** | `check_index.py --json` at `e2a3e20b` with that revision's index (the 590-set) and at the base (the 593-set); the three boundary comparisons. |
-| O-3 | The 2026-09-23 pages' historical validation figures ("185 skills valid" on LD-25 L36, LD-26 L53, LD-27 L44, LD-28 L33, LD-29 L55-56, LD-30 L60-61, LD-31 L56, LD-32 L54; link counts 23/25/4/11/9/6 on LD-26 to LD-32) describe those batches at their own checkpoints. | **unchanged — historical sentences about their own batches, not restated as today's.** | The pages' own dates and base commits; the mechanical pass's per-page link counts (section 5). |
+| O-3 | The 2026-09-23 pages' historical validation figures ("185 skills valid" on LD-25 L36 and LD-28 L33; "185 valid skills" on LD-26 L53, LD-27 L44, LD-29 L55-56, LD-30 L60-61, LD-31 L56 and LD-32 L54; link counts 23/25/4/11/9/6 on LD-26 to LD-32) describe those batches at their own checkpoints. | **unchanged — historical sentences about their own batches, not restated as today's.** | The pages' own dates and base commits; the mechanical pass's per-page link counts (section 5). |
 | O-4 | LD-28 L8 cites commits `90f74c6` and `0c3d1c2` as the two category maps' introduction commits; both resolve at the base. | **unchanged — resolved, no repair.** | `git cat-file -t 90f74c6` / `0c3d1c2` at the base (both exit 0). |
 | O-5 | The six `cannot_decide` lost-commit pages (LD: `.claude/skills/cloud-security-baseline-reviewer/references/aws-baseline.md`, `…/azure-baseline.md`, `…/gcp-baseline.md`, `…/supabase-baseline.md`, `…/vercel-baseline.md` and `.claude/skills/database-backup-verifier/SKILL.md`) are in the instrument's `cannot_decide` bucket, not in the 593-path pending set, and therefore in **no lane**. | **unchanged — excluded, and stated.** This batch picked up none of them; they are also outside lane D's quarter at the base (checked: the intersection of the six with lane D's 146 paths is empty). | `check_index.py --json` `undecided` array at the base; the intersection check. |
 
@@ -360,6 +377,11 @@ carries a full disposition alongside it.
 - **0 full / 8 partial.** That is the count this batch actually found; it is stated plainly rather
   than rounded toward a better-looking figure. The gaps are named per page with line numbers in
   section 6, and no page carries a gap with a full disposition.
+- **The gap count was corrected after audit: 28 → 30.** The count first published at this record's
+  audited head was **28**; the Stage D audit of 2026-10-16 found the two missing (b-plain)
+  `isolated worktree` gaps (**G-26.6**, **G-29.5**), so the count in this record is **30**. Both
+  figures are stated rather than the old one being quietly overwritten, and the two gaps carry
+  their page lines in section 6.
 - **This batch publishes no readability count of its own** (ledger L19-31, D84) and cites the
   instrument for every figure.
 - **The instrument classifies the page tree at `--ref`** and reads recorded acceptances from the
@@ -380,10 +402,10 @@ so that a keeper row cannot silently read as full.
 
 ```text
 LD-25 accepted (partial; gaps G-25.1..G-25.4, section 6): docs/evidence/documentation/scenario-a-runbook-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-26 accepted (partial; gaps G-26.1..G-26.5, section 6): docs/evidence/documentation/setup-routing-plan-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
+LD-26 accepted (partial; gaps G-26.1..G-26.6, section 6): docs/evidence/documentation/setup-routing-plan-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
 LD-27 accepted (partial; gaps G-27.1..G-27.3, section 6): docs/evidence/documentation/skill-category-01-07-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
 LD-28 accepted (partial; gaps G-28.1..G-28.2, section 6): docs/evidence/documentation/skill-category-map-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-29 accepted (partial; gaps G-29.1..G-29.4, section 6): docs/evidence/documentation/skill-docs-eighth-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
+LD-29 accepted (partial; gaps G-29.1..G-29.5, section 6): docs/evidence/documentation/skill-docs-eighth-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
 LD-30 accepted (partial; gaps G-30.1..G-30.4, section 6): docs/evidence/documentation/skill-docs-fifth-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
 LD-31 accepted (partial; gaps G-31.1..G-31.3, section 6): docs/evidence/documentation/skill-docs-final-screen-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
 LD-32 accepted (partial; gaps G-32.1..G-32.3, section 6): docs/evidence/documentation/skill-docs-first-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
@@ -394,7 +416,11 @@ LD-32 accepted (partial; gaps G-32.1..G-32.3, section 6): docs/evidence/document
 `check_index.py --json --ref <head>` and `check_index.py --ref <head> --quiet` (the head counts),
 `build_index.py --ref <head> --report` (no row change versus the base), the changed-path Markdown
 link check, `scripts/validate-skills.py`, `scripts/tests/test_validator.py`,
-`git diff --check`, the numstat additions-only check, `scripts/check_dco.py --range
+`git diff --check`, the numstat check (the Stage C commit is insert-only against the derivation
+base, 455 added / 0 deleted; the Stage D repair commit adds 45 and deletes 19 of those lines, counted
+over every `-` line excluding the `---` headers, so the repair is not insert-only, while the
+base-relative figure is 481 added / 0 deleted because the record file is new at the base),
+`scripts/check_dco.py --range
 origin/main..HEAD`, and `python -P scripts/ci/check_pr_body_skills.py --body-file <f>`.
 
 ## 12. What this batch did not do
@@ -432,7 +458,7 @@ at the base.
 
 ```text
 skill@08d91a834460beebc9c66fa896b8b422f064bf1d7524f6e5b1512cda3afdc996 / reason: classify before writing, the class decides the tier and review path / applied: classified docs-only before any write / result: docs-only tier asserted in the PR body with the file set / incomplete: None / by: readability-phase4-lane-d-batch4-implementer (Stage C; DeepSeek-4.1-Flash (deepseek-flash))
-skill@c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 / reason: the acceptance contract's six bullets are criteria and were checked one by one / applied: each bullet per page with line cites in section 6, every gap named with its page line / result: 0 full, 8 partial, 28 named gaps / incomplete: None / by: readability-phase4-lane-d-batch4-implementer (Stage C; DeepSeek-4.1-Flash (deepseek-flash))
+skill@c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 / reason: the acceptance contract's six bullets are criteria and were checked one by one / applied: each bullet per page with line cites in section 6, every gap named with its page line / result: 0 full, 8 partial, 30 named gaps (28 → 30, corrected after the Stage D audit; section 4) / incomplete: None / by: readability-phase4-lane-d-batch4-implementer (Stage C; DeepSeek-4.1-Flash (deepseek-flash))
 skill@b5fd9feda97235430259913aedd33447ab06e1c0ded281e9e131fa6bf9b78be2 / reason: the moved quarter boundary and the items not resolvable from prose needed the artifacts that own them / applied: observations O-1..O-5 sourced to instrument runs and git objects / result: all five dispositioned, none repaired in place / incomplete: None / by: readability-phase4-lane-d-batch4-implementer (Stage C; DeepSeek-4.1-Flash (deepseek-flash))
 skill@a74d2a22579cf93f737725aa0c54197b5d496a9f33a291a93c2cf2073cd7d076 / reason: recording requires knowing which grant covers what / applied: read AEGIS-APR-039, -101, -115, -117 and -118 at the base / result: recording-only under APR-101; no grant consumed, extended or requested / incomplete: None / by: readability-phase4-lane-d-batch4-implementer (Stage C; DeepSeek-4.1-Flash (deepseek-flash))
 skill@141b7036469f9f99ef6b8e152299619a6d0ab572656a5ba307062551d311d8a5 / reason: a new page may owe a retention entry / applied: checked for a retention registry and per-doc frontmatter practice / result: none exists for this directory; no retention change needed, recorded not skipped / incomplete: None / by: readability-phase4-lane-d-batch4-implementer (Stage C; DeepSeek-4.1-Flash (deepseek-flash))
