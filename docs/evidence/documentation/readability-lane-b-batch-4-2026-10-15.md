@@ -116,8 +116,40 @@ and `database-backup-verifier/SKILL.md`. They are excluded here explicitly, by n
 exclusion is part of the batch's claim.
 
 **Keeper rows: this batch authors none and assigns no keeper ID.** Lane B's allocated keeper-ID band
-is **K-181–K-280** (`KEEPER-ID-ALLOCATION.md`, 2026-10-15); the ids for these eight pages are the
-separate eligible keeper's to assign. See section 7.
+is **K-181–K-280**, read this session from `_resume-2026-10-09/KEEPER-ID-ALLOCATION.md` — **an
+out-of-repository coordinator file in the workspace, not a repository path.** (Batch 3's record
+cites the same file by bare filename, which reads as though it lived in the tree; it does not —
+`git ls-tree -r --name-only <base>` lists no such path, and the file exists only in the workspace.)
+The band is the file's table row for lane B ("**B** | K-181 – K-280 | second quarter") at its
+L27. The ids for these eight pages are the separate eligible keeper's to assign. See section 7 and
+the cross-check in section 2a.
+
+### 2a. Cross-check against the lane-allocation file (read this session, not inherited)
+
+`_resume-2026-10-09/KEEPER-ID-ALLOCATION.md` (445 lines, workspace, **out of repository**) is the
+coordinator's allocation and merge protocol for the four lanes. Two of its rulings bear on this
+batch, and both were read and checked rather than assumed:
+
+- **The method is pinned; the figures were not.** The file records the partition as "by count —
+  four contiguous quarters of the sorted pending list (148/148/148/146)" and, of lane C's
+  derivation, rules "**That is the right method and the right answer**" (its L123), then states the
+  rule generally (its L125): *"Sort, split into four contiguous count-based quarters, take your
+  quarter. State first and last path in the PR. Do not put the letters in a PR."* The
+  **148/148/148/146** figures belong to the **590-path** pending set at the batch-1 base
+  `e2a3e20b`, the base all four lanes branched from. **This batch applies the same pinned method at
+  a moved base** (593 paths → 149/149/149/146) and states its first path, last path and count,
+  exactly as the file requires. **The quarter in section 2 therefore does not contradict the
+  allocation file — it is the same rule at a later base.** If the parent intends the 148-based split
+  to be frozen across bases rather than re-derived at each base, that is a process ruling this lane
+  cannot make; it is flagged in the PR body's risks rather than decided here.
+- **The merge protocol's "what every lane must state in its PR" (its L169–172)** asks for the lane
+  quarter (given in section 2: first path, last path, count 149) and the K-id range **as authored**.
+  This batch authors **no** K-id: the 2026-10-15 urgent correction and the AEGIS-APR-117 route
+  supersede that line for this batch, because a row authored by the page's own reader is precisely
+  the laundering that correction exists to stop. **The absence is deliberate and is stated in the
+  PR body, not silently omitted.**
+- The file's merge protocol resolves conflicts at two ledger insertion points. **This batch writes
+  nothing to the ledger**, so it presents neither of those conflicts.
 
 ## 3. Per-page dispositions — 8 of 8 full-page re-reads
 
@@ -402,7 +434,8 @@ The division of labour this batch applies:
    this evidence under AEGIS-APR-101 and AEGIS-APR-117. **No page needs re-reading.**
 
 Batch 1's rows (K-082–K-089) and batch 2's rows (K-181–K-188) follow the same APR-117 cycle (PR #781
-carries the batch-1 withdrawals and re-records). Lane B's allocated keeper-ID band is K-181–K-280;
+carries the batch-1 withdrawals and re-records). Lane B's allocated keeper-ID band is K-181–K-280
+(read from the out-of-repository coordinator file named in section 2a, not from a repository path);
 the batch-4 keeper assigns the ids for these eight pages per the allocation file's protocol. This
 record assigns none and claims no keeper authority.
 
@@ -437,6 +470,8 @@ deployment authority" (ledger, batching section). The reader is the **DeepSeek-4
 | 12 | `git log -1 --format="%h %an %s" f490c16f9ed23f3d489e42f7696323bffcce6fd3 -- <page>` × 8 | other authors only (section 3, bullet f) |
 | 13 | whole-file line count, twice by independent means (git object bytes; read tool end-of-file) | 75/195/53/215/88/229/74/71 — agree |
 | 14 | `git diff --check` | clean (run at the pushed head, recorded in the PR closeout) |
+| 15 | `git ls-tree -r --name-only f490c16f9ed23f3d489e42f7696323bffcce6fd3` searched for `KEEPER-ID` | no match — the allocation file is **not** in the repository at the base; it was read from `_resume-2026-10-09/KEEPER-ID-ALLOCATION.md` in the workspace (section 2a) |
+| 16 | read of `_resume-2026-10-09/KEEPER-ID-ALLOCATION.md` | 445 lines; lane B band K-181–K-280 at its L27; count-based-quarter rule at its L125; PR-content ruling at its L169–172 |
 
 ## 10. Timing
 
