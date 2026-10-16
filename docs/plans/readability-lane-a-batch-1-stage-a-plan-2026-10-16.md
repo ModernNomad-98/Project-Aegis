@@ -6,7 +6,7 @@ branch, the capturing commit and **this file's blob SHA of the captured revision
 PR #771 body, together with the id of a fresh issue comment on that PR carrying the same text
 verbatim (a file cannot contain its own content hash).
 
-**Revision 5 (2026-10-16) supersedes revisions 1, 2, 3 and 4 of this plan.** Superseded, immutable and
+**Revision 6 (2026-10-16) supersedes revisions 1, 2, 3, 4 and 5 of this plan and is the revision the PR #771 body records; revision 5 superseded revisions 1-4 and is retained unchanged except where this revision amends it.** Superseded, immutable and
 **not to be bound**: revision 1 is blob `ea048399f14dd13ed91c13ab6d1123dabe9c774b` (58,466 bytes, 727
 lines) at capturing commit `462d786bf8803d5794c21a6cb0486ff03f5829d8`, held as issue comment
 `6213972798`; revision 2 is blob `6d579cdca95663f0851ade204adc625d5f315658` (61,173 bytes, 747 lines)
@@ -115,27 +115,27 @@ was **not** used or cleaned; no worktree was created; `git config user.name` was
 the command given; none is carried forward as a standing fact.** **Three places where what I measured
 differs from the brief I was given, or from the PR's own bytes, are marked ⚠ and planned against as
 found; all three were re-measured at revision 4's head and again at revision 5's (the head has not
-moved between them), and two of them have changed since revision 3 because the Stage C commit landed.**
+moved between them), and two of them have changed since revision 3 because the Stage C commit landed.** **Revision 6 re-read every row below at `8608431267f7959d6921a4181d9ed6fdbc1f669c`, the head the accepted plan's own bound corrections produced; the rows that moved are marked in place, and no row that still reproduces was rewritten.**
 
 | # | Fact | Measured value |
 | --- | --- | --- |
 | 1 | Head | `2e5236222080dc6064df0b493ab83a8a94441176` — `refs/pull/771/head` and `refs/heads/docs/readability-lane-a-batch-1-20261015` both resolve to it (measured 2026-10-16T05:30-07:00) |
 | 2 | Base = merge base | `e2a3e20b7c20ef8385b219b39c6405237163406f` (`git merge-base origin/main refs/pull/771/head`) |
 | 3 | `main` at this reading | `38413563a843f030d3ac992b375b5db5528f2926` (advanced past the PR's base; the PR is CONFLICTING/DIRTY — not resolved here) |
-| 4 | Commits in `base..head` | **5** (`09a7ee1c`, `f6a4e418`, `7b010eea`, `0bd37e4d`, `2e523622` — `git rev-list --count e2a3e20b..2e523622`) |
+| 4 | Commits in `base..head` | **5 at `2e523622`**, and **6 at the head this revision binds** (`09a7ee1c`, `f6a4e418`, `7b010eea`, `0bd37e4d`, `2e5236222080dc6064df0b493ab83a8a94441176`, `8608431267f7959d6921a4181d9ed6fdbc1f669c` — `git rev-list --count origin/main..8608431267` = 6, measured 2026-10-16) |
 | 5 | Files in `base..head` | **2**, both Markdown under `docs/` |
 | 6 | `git diff --shortstat` | `2 files changed, 727 insertions(+)` — insert-only |
 | 7 | `git diff --numstat` | `576 0` batch record, `151 0` ledger; `576+151 = 727` |
 | 8 | Raw patch, hand-counted | **729** lines beginning `+` (= 727 added + 2 `+++` file headers), **2** beginning `-` (both `---` headers), **3** hunks |
-| 9 | DCO over `origin/main..head` | exit 0 — `OK: 5 commit(s) checked, all signed off or exempt` |
+| 9 | DCO over `origin/main..head` | exit 0 at `2e523622` — `OK: 5 commit(s) checked, all signed off or exempt`; **exit 0 at `8608431267`** — `OK: 6 commit(s) checked, all signed off or exempt` (re-measured 2026-10-16) |
 | 10 | `git diff --check` | exit 0, no output |
 | 11 | Check runs / workflow runs at the head | **0 / 0** (the PR is DIRTY against `main`, so no `pull_request` run can build a merge commit) |
-| 12 | Record blob at head | `49d677a9255925e9f3a91492996d81032c62e81c` — 47,345 bytes, **575** newline-terminated lines (**576** lines by splitting on LF: the last line ends `.` and carries no LF) |
+| 12 | Record blob at head | at `2e523622`: `49d677a9255925e9f3a91492996d81032c62e81c` — 47,345 bytes, **575** newline-terminated lines; **at `8608431267`: `90a824c1f043b882fc2d390ddc85b85dcd882d50`** — **47,616** bytes, **575** newline-terminated lines, last line unterminated (the §14.1 replacement is 3 lines for 3 lines, so the count does not move); the ledger blob is **unchanged** at `d27eada876c7a0ed61e7166e21c722d3fe29b7b0` (499,791 bytes, 5,386 newline-terminated lines) |
 | 13 | Ledger blob at head | `d27eada876c7a0ed61e7166e21c722d3fe29b7b0` — 499,791 bytes, **5,386** newline-terminated lines (the file ends with LF); consolidated table = **109** data rows (K 89 + L 10 + T 10), **9 columns per row**, 0 malformed, 0 duplicate IDs |
 | 14 | Instrument at the base (`check_index.py --json --ref e2a3e20b`) | `653 / 57 / 4 / 586 / 0 / 0 / 6 / 596`; pending union (`586+4`) = **590**; quarters **148 / 148 / 148 / 146** |
 | 15 | `build_index.py --ref 2e523622 --report` (full clone with `refs/pull/**`) | exit 0: `table_rows 109, events 109, full_page_acceptances 89, lost_commit_events 10, reader_pages_with_rows 76` |
 | 16 | The eight pages' blob / lines / bytes at the base | all eight reproduce the record's and the body's figures **exactly** (table in §2) |
-| 17 | PR body bound-field digest, recomputed from the live body by the body's own declared method | `4cd96b537eb398a1` (full `4cd96b537eb398a19bb8c2cd608b22f48c7695b29b21f74e30d4dc9580d748b0`), normalized lengths **1262 / 17182 / 40** — **exactly the published value**; the four sibling calibrations (`#783 3913683c686e6e71`, `#787 82ed906d2f228f0e`, `#792 88300e711714200a`, `#795 5fabf87b2df899e9`) reproduce exactly, each from its **own live body**, with line endings normalised after fetch |
+| 17 | PR body bound-field digest, recomputed from the live body by the body's own declared method | at `2e523622`: `4cd96b537eb398a1`, normalized lengths **1262 / 17182 / 40**; **at `8608431267`: `b78221cc2ae8f394` (full `b78221cc2ae8f394c34c26ad1dace7a722c6e4ec456faf61057f6b03c8b5ef4d`), lengths 1262 / 19172 / 40** — exactly the value §14.2b bound, and **that body fails the repository's own body checker** (§14.6). The four sibling calibrations (`#783 3913683c686e6e71`, `#787 82ed906d2f228f0e`, `#792 88300e711714200a`, `#795 5fabf87b2df899e9`) reproduce exactly, each from its **own live body**, with line endings normalised after fetch |
 
 **⚠ Difference 1 — the record's own diff-scope figure is false of the head that publishes it, and the
 body's rows contradict each other.** Measured at `2e523622…` (2026-10-16, this planner): the **record**
@@ -361,13 +361,13 @@ any page for them.
 | 6 | **No page recorded PARTIAL carries an acceptance row, and no page recorded PARTIAL deserves its row** (the both-directions rule): the record's own disposition table (L120-127) has **8 rows, all `**accepted**`, zero partial** — the only two `**partial**` strings in the record (L443, L444 at `2e523622`) sit inside section 9's *Before:* quotation of the text that pass superseded — and the ledger at this head holds exactly **8 rows for the eight paths, all `full-page-acceptance`, all bound to `e2a3e20b…`**, so no acceptance row exists for a page recorded partial. | the record's own bytes (rows counted by verdict); `git grep '^\| K-08[2-9] \|'` over the ledger at the head | **yes** — measured: 8/8 accepted dispositions; 8/8 ledger rows `full-page-acceptance` on the acceptance revision. **The index-level form of this check** (rebuild with `build_index.py --write`, then `check_index.py --path` per page, as the PR body's validation row 20 states it) is **not** reproduced by this planner — declared **N9**; the read-only `--report` form is criterion 7 |
 | 7 | The record's own appended evidence is machine-visible: the ledger's consolidated table holds **109** data rows, **9 columns per row**, **0** malformed, **0** duplicate IDs, and the builder reports `table_rows 109, events 109, full_page_acceptances 89, lost_commit_events 10, reader_pages_with_rows 76` at this head. | `build_index.py --report --ref 2e523622` in a clone holding `refs/pull/**` and `refs/remotes/**`; the column count also by that tool's own `find_table(root, '2e523622')` (109 rows, 9 keys each) and by counting the 109 row lines' cells | **yes** — re-measured at `2e523622` (2026-10-16, 796 `refs/pull/*/head` fetched) |
 | 8 | Every load-bearing figure in the record that this plan re-derived **reproduces**: the eight line/byte counts, the eight blob SHAs, the instrument's eight summary figures, the pending union 590, the quarters 148/148/148/146. | §1 rows 13-16; §7 derivation | **yes** — re-measured at `2e523622` (2026-10-16); the derivation was re-run from the five batch records' own bytes |
-| 9 | The record publishes **no `base..head` count that a head move can falsify**: it states the insert-only facts and binds the added-line count as a **re-derivation at the head that publishes it** (`git diff --numstat e2a3e20b..HEAD`), and the literal for the head it is read at is stated in the PR body's validation rows 4 and 16 by the final metadata pass. | `git diff --numstat` at the head read; §14.0-§14.2 | **no at this head** — the record's bytes at L526-528 say `689` where the head measures **727**; declared **N1** in §6 and bound as a duty in §14.1 |
-| 10 | The PR body's validation table does not contradict itself **at the head it is read at**: after the final metadata pass — which contains no head-moving commit — rows 1, 2, 4, 13 and 16 and the narrative state the values re-derived at that pass's head `H` (`git rev-parse refs/pull/771/head`, `git rev-list --count origin/main..H`, `check_dco.py --range origin/main..H`, `git diff --numstat e2a3e20b..H`). | the live body + `gh api`; §14.2 | **no at this head** — rows 1/2/4/13 say `0bd37e4d` / 4 commits / `556 0`+`133 0`, and row 16 says `556 0`+`133 0` = 689, where the head measures `2e523622` / 5 commits / `576 0`+`151 0` / **727**; declared **N2** and bound as the final metadata pass in §14.2 |
+| 9 | The record publishes **no `base..head` count that a head move can falsify**: it states the insert-only facts and binds the added-line count as a **re-derivation at the head that publishes it** (`git diff --numstat e2a3e20b..HEAD`), and the literal for the head it is read at is stated in the PR body's validation rows 4 and 16 by the final metadata pass. | `git diff --numstat` at the head read; §14.0-§14.2 | **yes at the head this revision binds** — measured 2026-10-16: the §14.1 commit landed as `2e523622`, and the record at `8608431267` (blob `90a824c1f043b882fc2d390ddc85b85dcd882d50`, L526-528) states the insert-only facts and the re-derivation command and publishes no falsifiable count. It was **no** at revision 5's head and was declared **N1** (§6), which is retained and marked discharged. |
+| 10 | The PR body's validation table does not contradict itself **at the head it is read at**: after the final metadata pass — which contains no head-moving commit — rows 1, 2, 4, 13 and 16 and the narrative state the values re-derived at that pass's head `H` (`git rev-parse refs/pull/771/head`, `git rev-list --count origin/main..H`, `check_dco.py --range origin/main..H`, `git diff --numstat e2a3e20b..H`). | the live body + `gh api`; §14.2, §14.6 | **partly at the head this revision binds** — the pass ran: rows 1, 4, 13 and 16 state `8608431267` and `576 0` + `151 0` = **727** (measured 2026-10-16). **Three sites still contradict it and are bound in §14.6.6:** the `**What.**` paragraph's **Four commits**, row 2's enumeration naming **5** of the 6, and the revision-1 receipt's items (2)/(3) stating `0bd37e4d` / **4** commits in the present tense. N2 is discharged for the rows it named and re-opened for these three sites. |
 | 11 | The next-batch list is labelled by the state it was measured at, and the first eight **unread** pages at the acceptance revision are named by path: derived = lane-A indices **40..47** (§7), and the labelling block is present in the record, the ledger and the body. | §7's three-step derivation, re-runnable | **yes at this head** — applied by the Stage C commit `2e523622` (record L339-355, ledger L5221-L5237, body L278-294) and re-verified by this planner: the derived eight paths are 8/8 the inserted ones (N3 discharged) |
 | 12 | Every page path this PR **reads** is distinct from every path it **writes**: the eight read pages appear nowhere in the diff, and the two written paths are not among the 653 reader pages' acceptance rows authored here. | file list + `git grep` over the diff | **yes** — measured: empty intersection |
 | 13 | The capture exists: this plan is a tracked file whose **blob SHA and capturing commit** are recorded in the PR #771 body **and** in a fresh issue comment holding the same text verbatim, with the earlier comments unedited, and with every superseded revision named. | the body text; the comment id and its extracted fenced block hashed against the committed bytes | **yes** — the revision-5 capture receipt is in the PR body; the verbatim check is reproducible by extracting the fence and hashing (the fence-strip read differs from the committed bytes by exactly one trailing newline); revisions 1, 2, 3 and 4 remain immutable and are named in §13 |
-| 14 | The capture edit **does not disturb the PR's bound fields**: the published bound-field digest still recomputes to `4cd96b537eb398a1` under the body's declared method. The **owed** §14.2b edit moves it **once**, to the value §14.2b binds and the final metadata pass republishes. | the declared method, recomputed over the live body before and after the edit | **yes** — measured before the edit (reproduced exactly, with the four sibling calibrations) and re-measured after; §14.2b states the post-insertion value `b78221cc2ae8f394` and the precondition under which it holds |
-| 15 | Branch hygiene: every commit on the plan's own branch is DCO-signed, `git diff --check` is clean, and the body's bound fields still parse. | `scripts/check_dco.py --range`; `git diff --check`; `scripts/ci/check_pr_body_skills.py --body-file` | **yes** — measured for revision 5 (2026-10-16): the plan commit is DCO-signed (`check_dco.py` over `origin/main..<capture commit>`), `git diff --check` exit 0, and the body checker returns `PR body bound fields: OK` before and after this revision's receipt is appended (revision 4 was measured the same way) |
+| 14 | The capture edit **does not disturb the PR's bound fields**: the bound-field digest recomputes to the value §14.6.4 states, measured over the live body plus the named in-field edits. | the declared method, recomputed over the live body before and after the edit | **yes, with the correction §14.6 binds** — §14.2b's literal `b78221cc2ae8f394` (1262 / 19172 / 40) is the live body's current, **un-remedied** value and is not the value a parsing body carries; the operative literal is **`ccfe63ff90cfdb04`** (1262 / 20030 / 40), re-measured 2026-10-16 from the live body plus §14.6.3's three edits. The capture edit itself was re-measured to leave the fields at `b78221cc2ae8f394`: the seven body edits this revision makes in place are line-neutral and sit **outside** all three fields, and the receipt it appends at the body's end is outside them too (all measured; the appended receipt adds lines but nothing above it moves). |
+| 15 | Branch hygiene: every commit on the plan's own branch is DCO-signed, `git diff --check` is clean, **and the PR body passes the repository's own body checker** (`scripts/ci/check_pr_body_skills.py`). The third limb is stated separately from the first two because revision 5 asserted it of a body revision 5's own bound edit does not produce. | `scripts/check_dco.py --range`; `git diff --check`; `scripts/ci/check_pr_body_skills.py --body-file` | **limbs 1-2: yes** — measured for revision 6 (2026-10-16): the capture commit is DCO-signed, `git diff --check` exit 0. **Limb 3: NO at this head, and no longer asserted** — measured this turn, the live body at `8608431267` exits **1** (one failure; §14.6.1). Limb 3 becomes decidable and required at the final metadata pass, which must run the checker on its own readback and return exit 0; §14.6.3's remedy is measured to return exit 0. |
 
 ▼ Criterion 3's page-level truth (that each bullet was judged *per page*) is only as strong as the
 record's own text; the parts of it that no artifact can carry are declared in §6 (N4, N5).
@@ -385,14 +385,14 @@ a disposition on this PR; each is excluded from §5.2's passing set.
   L526-528 say `689` while the head's diff measures **727** — measured, and bound as a duty in §14.1.
   The **value** for the head the correction produces is not bound here at all: it is re-derived and
   published in the final metadata pass (§14.2), because a number inside a head-moving file is falsified
-  by the commit that writes it (§14.0).
+  by the commit that writes it (§14.0). **DISCHARGED at `2e523622`:** the §14.1 commit landed and the corrected bytes exist at `8608431267` (blob `90a824c1…`, L526-528, re-read 2026-10-16).
 - **N2 — the PR body's corrected validation rows, and the republished digest.** The body is PR
   metadata, not a candidate file, so correcting it moves no head; but the correction is not this
   planner's to publish *as a result*, and the rows' correctness depends on which head they are stated
   for. Reason: the corrected text does not exist in the live body at this head. **Decidable now:** that
   the live rows contradict the measured head (row 1 `0bd37e4d` vs `2e523622`; row 2 "4 commits" vs 5;
   row 4 and row 16 `556 0`+`133 0` = 689 vs `576 0`+`151 0` = 727; row 13 "4 commit(s)" vs 5) —
-  measured, and bound as the final metadata pass in §14.2.
+  measured, and bound as the final metadata pass in §14.2. **PARTLY DISCHARGED at `8608431267`:** the pass ran and rows 1, 4, 13, 16 and 21 carry its values; three sites it did not reach are bound in §14.6.6.
 - **N3 — the corrected next-batch list — DISCHARGED at `2e523622`.** The labelling block was applied by
   the Stage C commit in all three places (record L339-355, ledger L5221-L5237, body L278-294); this
   planner re-verified it against its own derivation: the eight paths it names are 8/8 the first eight
@@ -770,6 +770,12 @@ worktree was created; `git config user.name` was read **first** and is `Peter Ng
 | Naming check | `C-1`/`C-3`/`C-4` are not rulings anywhere on `main`; `page-resolves-it` is absent from `main`; the ledger on `main` carries none of the labels |
 | Capture verification (this revision, revision 5) | blob SHA from `git hash-object` on the committed file; the holding comment's fenced block extracted by the declared method (fence run N, first run of N or longer closes it) + **one trailing LF** reproduces the blob byte-for-byte and is byte-identical to the committed blob; the fence run is longer than any backtick run inside the plan; **zero unsubstituted generator tokens** in the posted body and comment |
 
+| Revision 6's state reading (2026-10-16, this planner's fresh clone) | `git rev-parse refs/pull/771/head` = `8608431267f7959d6921a4181d9ed6fdbc1f669c`; `git rev-list --count origin/main..HEAD` = **6**; `git diff --numstat e2a3e20b..HEAD` = `576 0` + `151 0`, `--shortstat` = `2 files changed, 727 insertions(+)`; `python -B scripts/check_dco.py --range origin/main..HEAD` exit 0, `OK: 6 commit(s) checked, all signed off or exempt`; record blob `90a824c1f043b882fc2d390ddc85b85dcd882d50` (47,616 bytes, 575 newline-terminated lines), ledger blob unchanged at `d27eada876c7a0ed61e7166e21c722d3fe29b7b0` |
+| The checker conflict, measured **by running** the checker (§14.6.1) | exit **1** on the live body at `8608431267`; exit **0** on the pre-edit body reconstructed by reversing §14.2b's three edits (its digest recomputes to `4cd96b537eb398a1` / 1262 / 17182 / 40); exit **1** with the owed-note line fixed alone, and the message *changes* to `... name 12 source row(s) but the block publishes 13 data rows`; exit **1** with the thirteenth `Row source` record added alone, message *unchanged*; exit **0** with both; exit **0** with §14.6.3's three edits |
+| §14.6.4's remedy digest, reproduced from bound inputs | `ccfe63ff90cfdb04` (full `ccfe63ff90cfdb04dabc3bb9c992945a2ca6042e91b7a7d43cd83a266907270c`), normalized payload lengths **1262 / 20030 / 40**, by the body's declared method over the live body fetched with `gh pr view 771 --json body --jq .body` (66,155 characters, sha256 `630446050cc7582eb07db5e55dee648072a406a1f5f04ff20d02acb0749d3c69`, whose payloads hash to `b78221cc2ae8f394`) **plus exactly the three edits §14.6.3 names**, each verified to occur the stated number of times |
+| Body-size ceiling check | the live posted body measures **66,155 characters** — **619 past** the 65,536 figure earlier plans in this programme budgeted against — and the post was accepted; `git grep -n -E '65,536|65536'` at this head returns **one** hit, `README.md` L399, about a serialized checkpoint, not a PR body; no repository artifact states a PR-body limit |
+| FLAG 3 (is the capture commit an ancestor of the PR head?) | **trigger absent** — `git merge-base --is-ancestor <capture commit> 8608431267` exits non-zero: the capture commit is a child of revision 5's commit on the plan branch, not an ancestor of the head (§14.6.8) |
+| Sharp APR-117 sweep of revision 6's own added text | **clean** — every `AEGIS-APR-117` occurrence in this file was read in context; revision 6's added text names it on **three** lines (this row and §14.6.8's check), none attaching a recording act to it; §14.6.8 states the test and the result |
 **Could not verify (stated, not waved through):** the items of §6 — in particular the record's
 corrected diff-scope bytes (a Stage C commit's to make, so they do not exist at this head), the body's
 corrected validation rows and the republished digest, the reading act, the model attributions, PR
@@ -799,12 +805,12 @@ implying a fresh measurement.
   recorded in the PR #771 body**, together with the id of the fresh issue comment on PR #771 that
   holds the same text **verbatim**. They are recorded there rather than here because a file cannot
   contain its own content hash.
-- **Binding:** this plan binds head `2e5236222080dc6064df0b493ab83a8a94441176` and acceptance
+- **Binding:** this plan binds head `8608431267f7959d6921a4181d9ed6fdbc1f669c` and acceptance
   revision `e2a3e20b7c20ef8385b219b39c6405237163406f`. **If either moves, this binding is void** and a
   Stage B auditor must audit the revision it can name, exactly as moving a head voids a head-bound
-  verdict. The head is expected to move **once** more, when the §14.1 correction lands; that move is
-  why §14's four quantities are bound as duties and not as literals (§14.0), and a fresh Stage B on
-  this revision and a fresh Stage D at the resulting head are then owed.
+  verdict. The head moved once, as revision 5 predicted, when the §14.1 correction landed as
+  `2e523622`; the second commit to that head (`8608431267`) is the metadata pass, which moved no head.
+  The remaining work this plan binds — §14.6's remedy — is body-only and moves no head.
 - **Editing this file after capture voids an ACCEPT that named the captured revision.**
 - **This plan has more than one revision, and this file is not the register of all of them.** Each
   revision was captured separately on the branch above and held by its own immutable comment on PR
@@ -820,6 +826,7 @@ implying a fresh measurement.
   commit `0cce5b33aada3a979795be915148ada0863b00c5`, held as comment `6215856084`. **Revision 5 — this
   one — is the revision whose identifiers are recorded in the PR #771 body, for the reason given above;
   it supersedes revisions 1, 2, 3 and 4, and they must not be bound.**
+- **Revision 5** is blob `c9973e2dde58f8ca0a6fb702e1e2193db2379ebc` (102,349 bytes, 1,217 newline-terminated lines) at capturing commit `e2da1947ebc22a4d9fb8965bcf09375229fd39e0`, held as comment `6216580973`. **Revision 6 — this one — supersedes revisions 1, 2, 3, 4 and 5**, and the identifiers of the captured revision 6 (its blob SHA, its capturing commit and the id of its holding comment) are recorded in the PR #771 body and in that comment itself, for the reason given two bullets above: a file cannot contain its own content hash.
 - **How the verbatim claim is verified (method declared, because the newline variant decides the hash).**
   The holding comment wraps the plan in a fence **longer than any backtick run inside the plan**, so
   the plan's own three-backtick fences cannot close it and a reader cannot find the block by taking
@@ -1082,11 +1089,11 @@ Binding (time-qualified, so the sentence is true whenever it is read):
 (1) As measured at the head this receipt was written for (`0bd37e4d…`), the **record** (not this body) printed `445 added / 0 deleted` at its then-L508-509 — that is the `base..f6a4e418` scope, and it was false of that head, where `base..head` measured **689 added / 0 deleted** (`556 0` record + `133 0` ledger; 691 `+` lines in the raw patch minus 2 file headers; 0 deleted lines; 2 `-` header lines; 3 hunks). At the head this text is read at, the record's diff-scope paragraph sits at L526-528 and the live figures are the validation rows' own, re-derived in the final metadata pass.
 ```
 
-**Digest line (L192-205) and validation row 21 (L231).** Present value `4cd96b537eb398a1` with
-normalized lengths `1262 / 17182 / 40`. Binding: `b78221cc2ae8f394` with lengths `1262 / 19172 / 40`
-— the value §14.2b produces — and the paragraph records the head `H` the pass ran at and the moment,
-so that the "when" of every number is recorded **outside** the bound fields, where it cannot go stale
-inside a hashed payload.
+**Digest line (body L189-205 at this head) and validation row 21 (L231).** Present value
+`b78221cc2ae8f394` with normalized lengths `1262 / 19172 / 40` — the value §14.2b bound and the pass
+produced. Binding: `ccfe63ff90cfdb04` with lengths `1262 / 20030 / 40`, the value §14.6.3's remedy
+produces, published with the head `H` the pass ran at and the moment, so that the "when" of every
+number is recorded **outside** the bound fields, where it cannot go stale inside a hashed payload.
 
 **The pass publishes its own receipt** — `H`, the moment, and the derived values — in the digest line's
 paragraph and in the validation table, so that the "when" of every number is recorded **outside** the
@@ -1138,12 +1145,12 @@ payloads and a later in-field edit would invalidate a digest published earlier:
    is read at**, re-derived by command. That is §14.0's "invariant to the move" limb, and it is why the
    digest below can be a literal.
 
-**The recomputable value.** Applying exactly those three edits to the body at `2e523622` — whose
-three-field digest is `4cd96b537eb398a1` with normalized lengths 1262 / 17182 / 40 — produces:
-
-- **digest `b78221cc2ae8f394`** (full SHA-256
-  `b78221cc2ae8f394c34c26ad1dace7a722c6e4ec456faf61057f6b03c8b5ef4d`), normalized payload lengths
-  **1262 / 19172 / 40** (witness / skills / security).
+**The recomputable value — it held, and it is superseded by §14.6.** Applying exactly those three
+edits to the body at `2e523622` — whose three-field digest was `4cd96b537eb398a1` with normalized
+lengths 1262 / 17182 / 40 — produced **digest `b78221cc2ae8f394`** (full SHA-256
+`b78221cc2ae8f394c34c26ad1dace7a722c6e4ec456faf61057f6b03c8b5ef4d`), normalized payload lengths
+**1262 / 19172 / 40** (witness / skills / security) — re-measured this turn on the live body at
+`8608431267`. **That body does not parse**, so this literal is not the operative one: §14.6 governs.
 
 **The one token that moved, and the value it moved from.** Revision 4 bound this same guard with the
 digest **`e6d9809812112231`** (full
@@ -1171,7 +1178,7 @@ other byte inside the three payloads has changed between this plan's capture and
 is superseded: the pass publishes the recomputed value, states that the precondition failed, and names
 the differing bytes. It must **not** publish `b78221cc2ae8f394` on a body it did not compute it from —
 that is the receipt defect this programme has already seen six times (five receipts, and this plan's
-own revision 4, whose digest moved when its Stage A row's revision token changed).
+own revision 4, whose digest moved when its Stage A row's revision token changed). **Revision 6's correction:** the precondition held and the value was produced, and the body that carries it **fails `scripts/ci/check_pr_body_skills.py`** — a check §14.2b never ran. The operative literal is §14.6.4's, and the pass that publishes it runs the checker on its own readback first.
 
 **What the pass must not do to the fields.** It edits nothing else inside the three payloads: not the
 Row source comments (L133-L144), which are provenance and state the head each row was authored at; not
@@ -1193,7 +1200,7 @@ rebuilt; no tool, workflow, approval, script or test byte changes; the correctio
 paths already in this PR's diff (§14.1) plus PR metadata (§14.2, §14.2b). **The three bound fields are
 edited only by §14.2b, in the final metadata pass, with the digest recomputed and republished**. **No
 further head-moving commit may follow the §14.1 commit**, or the pass's numbers are superseded and the
-pass must be re-run at the new head.
+pass must be re-run at the new head. **Revision 6 adds exactly one line inside the skills field** (the thirteenth `Row source` record, §14.6.3 edit B) and rewrites two in-field lines in place, so the body grows by one line and 858 characters inside the fields; it edits no existing `Row source` comment, no page, no tool, no workflow, no approval and no script, and it moves no head.
 
 ### 14.5 When it becomes decidable, and the two-phase order
 
@@ -1202,16 +1209,368 @@ at this head for this reason — N1 and N2; criterion 11 is now verifiable and i
 record's bytes become decidable at the §14.1 commit; the body's rows and the republished digest become
 decidable at the final metadata pass; the pass's own state — that it contained no head-moving commit —
 is decidable by comparing `git rev-parse refs/pull/771/head` before and after it. **Order: (1) the
-§14.1 commit; (2) the final metadata pass, body only, containing §14.2 and §14.2b; (3) a fresh Stage B
+§14.1 commit; (2) the final metadata pass, body only, containing §14.2, §14.2b and §14.6; (3) a fresh Stage B
 on this plan's revision and a fresh Stage D at the head those two steps produce.** The correction moves
 the head deliberately and visibly at Stage C rather than as a side effect of this plan's own capture,
 which is exactly why this planner does not apply them here.
 
+### 14.6 The checker conflict — measured by running the checker, and the remedy this revision binds
+
+**Why this section exists.** Revision 5's §14.2b bound three in-field edits and a post-insertion digest.
+Stage C applied them (report comment `6217678182`), the head moved to
+`8608431267f7959d6921a4181d9ed6fdbc1f669c`, and the digest moved **exactly** to the bound
+`b78221cc2ae8f394` (re-measured this turn). The executor then ran the repository's own body checker on
+the body it had produced, got **exit 1**, and declined to invent a fix — correctly, because either remedy
+moves the digest away from the value the accepted Stage B audit measured. Revision 5 asserted two things
+that cannot both hold — criterion 15's "the body's bound fields still parse" and §14.2b's digest literal —
+because the digest was computed over a body that has not had the parse fixes applied. This section measures
+the conflict, binds the remedy, and states how the two requirements are jointly satisfiable. **It holds
+Stage A only: it binds, it does not apply, and it moves no head.**
+
+**14.6.1 What was measured, by running the checker (not by reading it).** Entry point:
+`python -P scripts/ci/check_pr_body_skills.py --body-file <file> --author ModernNomad-98`, run 2026-10-16 at
+this head in this planner's fresh HTTPS clone; the checker's own blob at this head is
+`e8caae8b3b67df52c539bb9b1397341d99f80fb9` (23,963 bytes).
+
+| Body put to the checker | Exit | Output |
+| --- | --- | --- |
+| the live body at `8608431267` (66,155 characters, sha256 `630446050cc7582eb07db5e55dee648072a406a1f5f04ff20d02acb0749d3c69`) | **1** | `PR body bound fields: skills rows without a Row source record: block 1 rows 1..13 have no … record` (one failure; the elided fragment is the checker's own inline sample of a `Row source` record) |
+| the pre-edit body, reconstructed by reversing §14.2b's three edits | **0** | `PR body bound fields: OK` — and its digest recomputes to `4cd96b537eb398a1` / 1262 / 17182 / 40, the value revision 5 published for the pre-insertion body, so the reconstruction is the right body |
+| the live body with **only** edit A (the owed-note line) applied | **1** | the message **changes**: `… the block's Row source record(s) name 12 source row(s) but the block publishes 13 data rows` |
+| the live body with **only** edit B (the thirteenth record) applied | **1** | the message is **byte-identical** to the live body's |
+| the live body with edits A and B | **0** | `PR body bound fields: OK` |
+| the live body with edits A, B and C (the remedy below) | **0** | `PR body bound fields: OK` |
+
+**14.6.2 The two causes, and why "isolated" is the wrong word for them.** The checker's own code at this
+head decides this, and the measurements above confirm it. `_skills_field_failures` (L420-471) walks the
+lines **after** the skills table and collects `Row source` records only while each intervening line is blank,
+a `Row source` record, or a line matching `OWED_NOTE_RE` — and `OWED_NOTE_RE` (L57-59) is
+`^Stage A \(plan author\) and Stage B \(plan auditor\) rows are owed`, case-insensitive, anchored at the start
+of the stripped line. Cause **(b)** — the bound owed note begins `Stage A (plan author) is recorded:` — stops
+that walk on the **first line after the table**, so the block collects **no** tokens and the checker reports
+that rows 1..13 have no record at all. That message is produced by cause (b) **alone**: adding the
+thirteenth record alone leaves it byte-identical. Cause **(a)** — the bound thirteenth row has no
+`Row source` record — is a real, separate defect, but (b) **masks** it, and it becomes visible only once
+(b) is fixed, as a *different* failure (`name 12 source row(s) but the block publishes 13 data rows`).
+**Neither fix alone returns exit 0; both are necessary.** The Stage C report's "two independent, isolated
+causes" is right about the count and wrong about the isolation, and the difference is what makes a one-edit
+remedy impossible. **What is not the cause:** the twelve existing `Row source` records (body L133-L144 at
+this head) are valid. The remedy **adds** a thirteenth record; it edits no existing `Row source` comment, so
+§14.4's "not the Row source comments (L133-L144), which are provenance" is honoured to the byte.
+
+**14.6.3 The remedy: three exact edits to the live body, each with its text, its line, and its occurrence
+count.** Each present string below was taken from the live body's own bytes this turn and its occurrence
+count verified with `str.count`; each binding string is given in a fenced block, so no markdown escape
+character is part of any string.
+
+**Edit A — the owed-records note. Present: body L131, whole line, occurs exactly 1 time.**
+
+```text
+Stage A (plan author) is recorded: the row inserted above is this plan's Stage A skills record, and the plan's captured blob SHA, capturing commit and holding comment id are published in this body's "Captured Stage A plan" section, outside the bound fields. Stage B (plan auditor) is owed — no plan-auditor skills record was produced for this lane's pass at any head. Stage D, Stage E and Stage F rows are owed for the head this note is read at: every stage re-runs after the head moves, so the operative head is re-derived at reading time with `git rev-parse refs/pull/771/head` and never carried in this field.
+```
+
+Binding (the whole line, 1-for-1):
+
+```text
+Stage A (plan author) and Stage B (plan auditor) rows are owed — that opening clause is the skills-field protocol’s own sentence, and `scripts/ci/check_pr_body_skills.py` tolerates a note placed here only when the line begins with it (its OWED_NOTE_RE), so the clause is quoted first and corrected immediately afterwards: Stage A (plan author) is recorded — the row inserted above is this plan’s Stage A skills record, and the plan’s captured blob SHA, capturing commit and holding comment id are published in this body’s "Captured Stage A plan" section, outside the bound fields — and only Stage B (plan auditor) remains owed, because no plan-auditor skills record was produced for this lane’s pass at any head. Stage D, Stage E and Stage F rows are owed for the head this note is read at: every stage re-runs after the head moves, so the operative head is re-derived at reading time with `git rev-parse refs/pull/771/head` and never carried in this field.
+```
+
+Why this text: its first clause is the protocol sentence `OWED_NOTE_RE` requires at the start of a note in
+this position, and the rest of the line corrects that clause's substance, which is now false (the Stage A row
+**is** the row inserted above). The edit replaces one line with one line.
+
+**Edit B — the thirteenth `Row source` record. Present: none — `row=13;` occurs 0 times in the live body.
+Inserted directly after body L144, before the blank line that follows it.**
+
+```text
+<!-- Row source: agent=readability-lane-a-stage-a-planner; stage=A; round=5 (the plan revision that authored this row); row=13; target=candidate head 2e5236222080dc6064df0b493ab83a8a94441176; source=plan revision 5’s section 14.2b, tracked blob c9973e2dde58f8ca0a6fb702e1e2193db2379ebc, held verbatim as issue comment 6216580973; binding=that comment’s fenced block plus the single trailing newline the fence line replaces, git hash-object = c9973e2dde58f8ca0a6fb702e1e2193db2379ebc -->
+```
+
+Why this text: it names the row it covers (`row=13`), carries all six structural fields the checker requires
+with non-empty values (`agent`, `stage`, `round`, `target`, `source`, `binding`), contains no `-->` before its
+own terminator, and binds that row to the artifact that authored it — plan revision 5's §14.2b, blob
+`c9973e2dde58f8ca0a6fb702e1e2193db2379ebc`, held as issue comment `6216580973`, whose verbatim method this
+plan declares in §13. It names **no** revision-6 blob, because a file cannot contain its own content hash
+and this body text is bound by this file.
+
+**Edit C — the thirteenth row's stage cell. Present substring, occurs exactly 1 time (body L129).**
+
+```text
+(DeepSeek-4.1-Flash, deepseek-flash), plan revision 5 |
+```
+
+Binding substring:
+
+```text
+(DeepSeek-4.1-Flash, deepseek-flash), plan revision 5, bound by plan revision 6 |
+```
+
+Why: the row's text was authored under revision 5 and is bound — with its `Row source` record and the digest
+literal — by revision 6, which is the revision the body's "Captured Stage A plan" section records as current.
+Leaving the cell at `plan revision 5` alone would leave the body contradicting its own capture receipt. This
+is the same kind of edit as revision 4's single-token move, and it is why the digest below differs from
+revision 5's by more than the two parse fixes.
+
+**Line-number effect.** Edit B adds **one** line at body L145; edits A and C replace their lines 1-for-1. The
+body therefore goes 497 → 498 lines, and **every published line number below L145 shifts by one**: the digest
+line (L189-205 → L190-206), validation rows 15/21/22 (L225/L231/L232 → L226/L232/L233), the "Captured Stage A
+plan" heading (L298 → L299) and the revision-1 receipt (L323-336 → L324-337). The anchors in this section are
+the numbers **at revision 6's head**; the edits locate by exact text, so a shift cannot misplace them.
+
+**14.6.4 The digest, reproduced from bound inputs.** Applying exactly edits A, B and C to the live body of
+PR #771 — fetched this turn by `gh pr view 771 --json body --jq .body`, **66,155 characters**, sha256
+`630446050cc7582eb07db5e55dee648072a406a1f5f04ff20d02acb0749d3c69`, whose three payloads hash to
+`b78221cc2ae8f394` (1262 / 19172 / 40) — gives, by the body's own declared method:
+
+- **digest `ccfe63ff90cfdb04`** (full `ccfe63ff90cfdb04dabc3bb9c992945a2ca6042e91b7a7d43cd83a266907270c`),
+  normalized payload lengths **1262 / 20030 / 40** (witness / skills / security); the remedied body measures
+  67,013 characters.
+
+The inputs are bound: the base body by PR number, fetch command, character count and sha256; the three edits
+by their exact present and binding strings and their occurrence counts; the method by the body's own digest
+line. This planner applied them to a scratch copy and ran the checker on that copy (**exit 0**, table above),
+so the digest and the parse are two measurements of one byte string, not a projection of one from the other.
+The capture receipt this revision appends to the body lies **outside** all three fields, so this value is
+invariant under it; that is re-verified against the body as posted, after the capture, in §14.6.9, which re-measures it on the posted body.
+**The coordinator's brief cited a checker-passing shape measuring `7bf295a61d708008` with lengths
+1262 / 19326 / 40; this planner did not reproduce that value and does not bind it** — its input text is not
+bound in the brief, and by §14.0's own rule a digest whose input bytes are unnamed is not a measurement. The
+value bound here is the one these three named edits produce.
+
+**14.6.5 How the two requirements are jointly satisfiable — the standing rule, and this PR's instance.** The
+two requirements are (i) *the body's bound fields parse* (criterion 15, limb 3) and (ii) *the digest literal
+equals the body's own digest* (§14.2b/§14.6.4, criterion 14). They are jointly satisfiable **because the
+digest is a function of the body's final bytes and of nothing else**, so the order can be fixed and bound:
+**(1)** apply the parse-fixing edits to the body; **(2)** run the checker on the resulting bytes and record the
+exit code; **(3)** compute the digest over those same bytes; **(4)** publish the value step 3 returned. Steps
+1-4 act on one byte string, so (i) and (ii) cannot disagree. What revision 5 did instead was compute the
+digest at step 3 from a body that had **not** had the parse fixes applied and assert at step 1 that the body
+parses: the two requirements then described *different byte strings*, which is exactly the unsatisfiable
+shape. The rule this plan states, for every later revision: **when two requirements are bound on the same
+artifact, the plan names the order in which they are evaluated and the single byte string they are evaluated
+on, or it declares the interaction untested.** Here the order is bound in §14.5 step (2) and the byte string is
+named in §14.6.4 by fetch, character count and sha256.
+
+**14.6.6 The five residue items the Stage C report listed, each bound or declined.**
+
+| # | Residue as reported | Measured this turn | Disposition |
+| --- | --- | --- | --- |
+| 1 | the `**What.**` paragraph says **Four commits** where there are SIX | `git rev-list --count origin/main..HEAD` = **6**; body L8 reads `Four commits` (1 occurrence) and L8-L12 names four commits | **bound** — edit D below |
+| 2 | the revision-1 receipt's items (2) and (3) still say HEAD is `0bd37e4d` / 4 commits | body L324-L336; item (1) was time-qualified by §14.2's binding, items (2)/(3) were not | **bound** — edit E below |
+| 3 | the digest line's "so no head-bound verdict is voided" is true only of the earlier movement | body L200-L203; and the SD-D verdict at comment `6210951972` **does** name a digest — `4cd96b537eb398a1` at head `0bd37e4d` (re-read this turn) | **bound** — edit F, carried inside edit H |
+| 4 | validation rows 15 and 22 still claim the checker exits 0 | body L225 and L232; the claim was true of the pre-§14.2b body and is false at this head (measured, §14.6.1) | **bound** — edit G below |
+| 5 | a duplicated sentence sits at L204/L205 | measured: body L204 and L205 are byte-identical | **bound** — edit H below |
+
+**One further count defect, found here by cross-checking every statement of the same count** (the standing
+rule) and not listed by the Stage C report: **validation row 2 claims 6 commits and names 5** — it omits
+`2e5236222080dc6064df0b493ab83a8a94441176`. Its text came from §14.2's own bound Row 2 binding, which named
+four commits plus the derived `<H>`. **Bound** — edit L below.
+
+Each edit below is line-neutral (it replaces the same number of lines it removes) and lies **outside** all
+three bound fields, so none of them moves the digest; both properties were verified after applying all of
+them: the digest recomputes unchanged at `b78221cc2ae8f394` and the body's line count is 497 before and
+after.
+
+**Edit D — the `**What.**` paragraph, body L8-L12 (5 lines → 5 lines).**
+
+```text
+**What.** Four commits on `docs/readability-lane-a-batch-1-20261015`: the original record commit
+`09a7ee1c9beefbb16d7fab0a608fa3a155879d5a`, the Stage F REVISE repair commit
+`f6a4e4189ecfbe874f97ec9b6b09bf8fe14f49ad`, this Stage C repair commit
+`7b010eeab20901c1ce5450dd5db0e5cb955189ea`, and its citation-correction commit
+`0bd37e4d…` (the head when this repair landed, DCO-signed). This repair corrects the
+```
+
+Binding:
+
+```text
+**What.** Six commits on `docs/readability-lane-a-batch-1-20261015`: the original record commit
+`09a7ee1c9beefbb16d7fab0a608fa3a155879d5a`, the Stage F REVISE repair commit `f6a4e4189ecfbe874f97ec9b6b09bf8fe14f49ad`, the Stage C repair commit `7b010eeab20901c1ce5450dd5db0e5cb955189ea` and its citation-correction commit `0bd37e4d…`,
+then the two commits that applied the accepted plan’s bound corrections — `2e5236222080dc6064df0b493ab83a8a94441176` (the record’s diff-scope paragraph, line-neutral 3-for-3, and the one-line citation edit) and
+`8608431267f7959d6921a4181d9ed6fdbc1f669c` (the same paragraph rewritten there, and this metadata pass)
+(the head this body is posted at) — all DCO-signed; count by command, not by reading: `git rev-list --count origin/main..HEAD` = `6`, and `python -B scripts/check_dco.py --range origin/main..HEAD` reports `OK: 6 commit(s) checked, all signed off or exempt`. The Stage C repair corrected the
+```
+
+**Edit E — the revision-1 receipt's items (2) and (3), body L324-L336 (13 lines → 13 lines).**
+
+```text
+(2) **This body contradicts itself**: validation row 4 gives the same command as row 16 but reads
+`334 0` + `111 0` (the `f6a4e418` scope, summing to 445), while row 16 reads `556 0` + `133 0`;
+rows 1, 2 and 13 also still bind the pass-2 head (row 1 names `f6a4e418`, row 2 says "2 commits", row
+13 says "three commits" — measured: HEAD is `0bd37e4d`, the range holds **4** commits, and
+`check_dco.py --range origin/main..0bd37e4d` reports `OK: 4 commit(s) checked`). (3) The record's
+next-batch list names the eight lane-A paths at sorted indices **8..15** and calls them "the first
+eight entries of the unread sequence at this base" — those are the eight pages **lane A batch 2 has
+already read** (8/8, measured from that record's own bytes); under the read set this section's own
+cross-check asserts (lane A's reads = indices 0..39, contiguous, from batch records 1-5) the first
+eight **unread** are indices **40..47**. **All three are bound in the plan's §14 with exact
+replacement text**, and are declared there as **not verifiable at this head**, because a Stage A
+planner must not edit the files this PR itself adds — doing so would move the head and void every
+head-bound verdict downstream.
+```
+
+Binding:
+
+```text
+(2) **At revision 1’s head this body contradicted itself**: validation row 4 gave the same command as row 16 but read
+`334 0` + `111 0` (the `f6a4e418` scope, summing to 445), while row 16 read `556 0` + `133 0`;
+rows 1, 2 and 13 also still bound the pass-2 head (row 1 named `f6a4e418`, row 2 said "2 commits", row
+13 said "three commits" — measured then: HEAD was `0bd37e4d`, the range held **4** commits, and
+`check_dco.py --range origin/main..0bd37e4d` reported `OK: 4 commit(s) checked`). **Superseded at the head this
+body is read at**, where `git rev-list --count origin/main..HEAD` = **6** and rows 1, 2, 4, 13, 16 and 21 carry the
+metadata pass’s values. (3) **At that same head** the record’s
+next-batch list named the eight lane-A paths at sorted indices **8..15** and called them "the first
+eight entries of the unread sequence at this base" — those are the eight pages **lane A batch 2 has
+already read** (8/8, measured from that record’s own bytes); under the read set this section’s own
+cross-check asserts (lane A’s reads = indices 0..39, contiguous, from batch records 1-5) the first
+eight **unread** are indices **40..47** — unchanged at this head. **Every receipt in this section is a historical
+record of the head and moment it names**; where an earlier receipt states a digest, a head or a commit count in the present tense, the operative values at the head this body is read at are the digest line above and the revision-6 receipt below. **All three were bound in the plan’s §14 with exact replacement text**, and were declared there as **not verifiable at that head**, because a Stage A planner must not edit the files this PR itself adds.
+```
+
+**Edit F — the digest paragraph's verdict-voiding sentence: carried inside edit H, body L189-L205.**
+
+**Edit G — validation rows 15, 21 and 22, body L225, L231 and L232 (1 line each).**
+
+```text
+| 15 | `python -P scripts/ci/check_pr_body_skills.py --body-file <the posted body>` | exit 0: `PR body bound fields: OK` (run on the readback of this body) |
+```
+
+Binding:
+
+```text
+| 15 | `python -P scripts/ci/check_pr_body_skills.py --body-file <the posted body>` | **exit 1 at this head, measured 2026-10-16 on the live body at `8608431267`**: `PR body bound fields: skills rows without a Row source record: block 1 rows 1..13 have no … record` (one failure; the elided fragment is the checker’s own inline sample of a Row source record, written here with `<` `!--` — `--` `>` so that this table row carries no HTML comment). The `exit 0` published here was true of the pre-`b78221cc2ae8f394` body and is false at this head; the three parse-fixing edits the accepted plan’s revision 6 binds make it exit 0 again, and the pass re-runs the checker on its own readback (plan section 14.6.2) |
+```
+
+```text
+| 21 | bound-field digest | chain: `b1acc2b2f5817fab` (lengths 1262 / 11819 / 40) at `f6a4e418` then `76e7f6f2e9c86b04` (1262 / 17182 / 40) at `7b010eea` then `4cd96b537eb398a1` (1262 / 17182 / 40) at `0bd37e4d`, then `b78221cc2ae8f394` (1262 / 19172 / 40) at `8608431267f7959d6921a4181d9ed6fdbc1f669c` (2026-10-16T14:24:50Z); calibration recomputed first on four live bodies (all exact) |
+```
+
+Binding:
+
+```text
+| 21 | bound-field digest | chain: `b1acc2b2f5817fab` (lengths 1262 / 11819 / 40) at `f6a4e418` then `76e7f6f2e9c86b04` (1262 / 17182 / 40) at `7b010eea` then `4cd96b537eb398a1` (1262 / 17182 / 40) at `0bd37e4d`, then `b78221cc2ae8f394` (1262 / 19172 / 40) at `8608431267f7959d6921a4181d9ed6fdbc1f669c` (2026-10-16T14:24:50Z); then `ccfe63ff90cfdb04` (1262 / 20030 / 40) by the accepted plan’s revision-6 remedy edits (section 14.6.2) — re-measured 2026-10-16 from the live body of 66,155 characters (sha256 `630446050cc7582eb07db5e55dee648072a406a1f5f04ff20d02acb0749d3c69`) plus those three edits; calibration recomputed first on four live bodies (all exact) |
+```
+
+```text
+| 22 | `python -P scripts/ci/check_pr_body_skills.py --body-file <the posted readback>` | exit 0: `PR body bound fields: OK` (run on the readback of this body) |
+```
+
+Binding:
+
+```text
+| 22 | `python -P scripts/ci/check_pr_body_skills.py --body-file <the posted readback>` | exit 0 **on this pass’s own readback after the accepted plan’s revision-6 parse-fixing edits** — the same body whose digest row 21 publishes; the `exit 0` this row previously claimed for the un-remedied body is corrected in row 15, which records the measured `exit 1` |
+```
+
+**Edit H — the digest paragraph, body L189-L205 (17 lines → 17 lines). It carries edit F (the verdict
+sentence), the republished digest of §14.6.4 and row 21's chain, and it removes the duplicated sentence: the
+present L204 and L205 are byte-identical, so the binding keeps one of them.**
+
+```text
+**Stage C bound-field digest — the PR #760 convention, not a verdict.** Computed from the
+readback of this body as posted, over the three payloads in the published order (witness, skills,
+security; each field's whitespace runs collapsed to single spaces and trimmed, joined with single
+newlines, SHA-256 over the UTF-8 string, first 16 hex): `b78221cc2ae8f394` (full sha256 `b78221cc2ae8f394c34c26ad1dace7a722c6e4ec456faf61057f6b03c8b5ef4d`, 64 hex
+characters — the hex length was checked by hand, and no checker tests it; normalized payload lengths
+this turn: 1262 / 19172 / 40). **Movement this Stage C pass:** the same three fields hashed to
+`b1acc2b2f5817fab` (lengths 1262 / 11819 / 40) at head `f6a4e418`, then to `76e7f6f2e9c86b04`
+(lengths 1262 / 17182 / 40) at the repair commit `7b010eea`, and then to `4cd96b537eb398a1` after the
+citation-correction commit `0bd37e4d` (which edits the ledger section's citation inside the skills
+field's source binding and row text), and now to `b78221cc2ae8f394` (1262 / 19172 / 40) at head `8608431267f7959d6921a4181d9ed6fdbc1f669c` in this final metadata pass on 2026-10-16T14:24:50Z. Calibration was recomputed **first**, each from its own live
+posted body: #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`, #792 `88300e711714200a`, #795
+`5fabf87b2df899e9` — all four exact. **What the movement voids:** any verdict that named an earlier
+value against this head's body. Measured: the first Stage D audit (comment 6209064290) named no
+digest, and the batch record makes no digest claim of that kind, so no head-bound verdict is voided;
+Stage F names its own hash in its verdict and the merge agent records the current value at merge.
+This line is **outside** all three fields, so editing it does not change the figure. This line is
+**outside** all three fields, so editing it does not change the figure.
+```
+
+Binding:
+
+```text
+**Stage C bound-field digest — the PR #760 convention, not a verdict.** Computed from the
+readback of this body as posted, over the three payloads in the published order (witness, skills,
+security; each field’s whitespace runs collapsed to single spaces and trimmed, joined with single
+newlines, SHA-256 over the UTF-8 string, first 16 hex): `ccfe63ff90cfdb04` (full sha256 `ccfe63ff90cfdb04dabc3bb9c992945a2ca6042e91b7a7d43cd83a266907270c`, 64 hex
+characters — the hex length was checked by hand, and no checker tests it; normalized payload lengths
+for the remedied body: 1262 / 20030 / 40; the live un-remedied body at this head measures `b78221cc2ae8f394` with 1262 / 19172 / 40). **Movement:**
+the same three fields hashed to `b1acc2b2f5817fab` (1262 / 11819 / 40) at `f6a4e418`, then to `76e7f6f2e9c86b04`
+(1262 / 17182 / 40) at `7b010eea`, then to `4cd96b537eb398a1` after the citation-correction commit `0bd37e4d` (which edits the ledger section’s
+citation inside the skills field’s source binding and row text), then to `b78221cc2ae8f394` (1262 / 19172 / 40) at head `8608431267f7959d6921a4181d9ed6fdbc1f669c`
+in the 2026-10-16T14:24:50Z metadata pass, and now to `ccfe63ff90cfdb04` (1262 / 20030 / 40) by the three parse-fixing edits the accepted plan’s
+revision 6 binds (plan section 14.6.2). Calibration was recomputed **first**, each from its own live posted
+body: #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`, #792 `88300e711714200a`, #795 `5fabf87b2df899e9` — all four exact.
+**What the movement voids:** any verdict that named an earlier value against the body it measured.
+Measured: the first Stage D audit (comment 6209064290) named no digest, so the movement to `4cd96b537eb398a1`
+voided nothing; the second, SD-D verdict at comment 6210951972 *did* name `4cd96b537eb398a1` at head `0bd37e4d` — its object is a REVISE at a superseded
+head, so the later movements supersede that verdict’s digest clause and void no ACCEPT;
+Stage F names its own hash at the head it reviews and the merge agent records the current value at merge. This line is **outside** all three fields, so editing it does not change the figure.
+```
+
+**Edit L — validation row 2, body L212 (1 line → 1 line).**
+
+```text
+| 2 | `git log --oneline e2a3e20b7c20ef8385b219b39c6405237163406f..HEAD` | 6 commits (the record commit 09a7ee1c9beefbb16d7fab0a608fa3a155879d5a, the Stage F repair f6a4e4189ecfbe874f97ec9b6b09bf8fe14f49ad, the Stage C repair 7b010eeab20901c1ce5450dd5db0e5cb955189ea and its citation correction 0bd37e4dbb27ef108ca13ccbc0cbf4a673ef6b27, and this correction commit 8608431267f7959d6921a4181d9ed6fdbc1f669c - all DCO-signed) |
+```
+
+Binding:
+
+```text
+| 2 | `git log --oneline e2a3e20b7c20ef8385b219b39c6405237163406f..HEAD` | 6 commits (the record commit 09a7ee1c9beefbb16d7fab0a608fa3a155879d5a, the Stage F repair f6a4e4189ecfbe874f97ec9b6b09bf8fe14f49ad, the Stage C repair 7b010eeab20901c1ce5450dd5db0e5cb955189ea and its citation correction 0bd37e4dbb27ef108ca13ccbc0cbf4a673ef6b27, the record’s bound diff-scope correction 2e5236222080dc6064df0b493ab83a8a94441176, and this correction commit 8608431267f7959d6921a4181d9ed6fdbc1f669c — all DCO-signed; the count is `git rev-list --count origin/main..HEAD` and the six SHAs are `git log --oneline` over the same range) |
+```
+
+**Edit K — the revision-5 receipt's self-description, body L436 (substring inside one line).** Present
+substring: `**Revision 5 (the current captured revision)**` — occurs exactly 1 time. Binding: `**Revision 5 (superseded by revision 6 below)**`.
+
+**14.6.7 The body-size ceiling: measured, and not binding here.** The body posted at `8608431267` measures
+**66,155 characters** (this turn, from the API), which is **619 past the 65,536 figure** earlier plans in this
+programme budgeted against, **and the post was accepted**. No file in this repository states a
+65,536-character PR-body limit: `git grep -n -E '65,536|65536'` over the tree at this head returns one hit,
+`README.md` L399, about a serialized checkpoint, not a PR body. **The figure therefore does not constrain this
+remedy.** The remedy makes the body *longer* — 66,155 → 67,013 characters for edits A-C, plus this revision's
+capture receipt — and the plan does not assume a limit it cannot check: the pass **measures the posted body's
+length after its edit and publishes it beside the digest**. If a limit does bind there, the consequence is a
+rejected PATCH, not a silent truncation, and the pass reports it rather than trimming a bound field.
+
+**14.6.8 The two standing checks this revision ran, and one correction to the brief.**
+
+- **FLAG 3 (is the capture commit an ancestor of the PR head?).** **Trigger absent**, measured:
+  `git merge-base --is-ancestor <capture commit> 8608431267f7959d6921a4181d9ed6fdbc1f669c` exits non-zero,
+  and `git merge-base <capture commit> 8608431267` is `0bd37e4d…`, the head current when revision 1 was
+  captured. The capture commit is a child of revision 5's commit on the plan branch, not an ancestor of the
+  head; the PR head did not move.
+- **The sharp APR-117 test — does any text attach the word `re-record`, or any recording act, to a citation of
+  `AEGIS-APR-117`? Run over this revision's own added text: no site.** The sections this revision adds or
+  rewrites name `AEGIS-APR-117` **nowhere** except in this check sentence and in §12's own sweep row — three
+  added lines in all, counted by a line diff against revision 5 — and neither
+  attaches a recording act to it. The live body's own seven occurrences (L28, L41, L51, L119, L124, L128,
+  L465) are untouched by every edit bound here — none of the edits D-K lands on those lines, and none of the
+  in-field edits A-C does either.
+- **One correction to the brief, not propagated.** The brief that commissioned this revision cited
+  "section 16.2". **There is no section 16 in the accepted plan:** it has 14 sections, ending at §14.5, and
+  with this revision at §14.6. The off-head disposition and the duty to re-derive live in **§14.0, §14.2's
+  command block and §14.5** — those are the sections this revision amends, and the wrong number is carried
+  nowhere in this file or in the body.
+
+**14.6.9 The capture, and what this revision does not do.** Revision 6 is captured on the same plan branch,
+as a child of revision 5's commit, so the PR head does not move; its blob SHA, capturing commit and holding
+comment are recorded in the PR #771 body and in that comment. The body edit this revision makes is
+**out-of-field only** (edits D-K) plus the receipt appended at the end: it does not apply the remedy. The
+pass that applies edits A-C is §14.5 step (2), and it publishes the digest it computes. **The invariance
+§14.6.4 relies on was measured, not assumed:** appending an out-of-field receipt of the same shape to the body
+leaves the three payloads hashing to `b78221cc2ae8f394`, and re-applying edits A-C to that body still returns
+`ccfe63ff90cfdb04` with lengths 1262 / 20030 / 40. This planner also re-measures the posted body after the
+capture and records the result in the capture receipt; the receipt's own length is not bound, and nothing in
+it can move the digest, because it lies outside all three fields.
+
+
 *Prepared by a **DeepSeek-4.1-Flash** agent (`deepseek-flash`), Stage A only, under the owner account
-as the repository's attribution rule requires. Revision 5 (2026-10-16) — re-captured on the **SD-B**
-REVISE at comment `6216259175` (the independent plan audit of revision 4), which found the ledger's
-keeper table called "8 columns" where it is **9**, two line counts stated under a method that returns a
-different number, and a residual inventory narrower than the defect it describes. All three are fixed
-here, each measured by command; nothing the earlier audits accepted was undone. This plan holds no
-Stage B, D, E, F or G on this change; it audited nothing, edited no file of the PR's diff, moved no head
-and merged nothing.*
+as the repository's attribution rule requires. Revision 6 (2026-10-16) — re-captured after the Stage C
+execution of revision 5 (report comment `6217678182`) reported the finding revision 5 could not have seen
+from its own inputs: the body revision 5 bound **fails `scripts/ci/check_pr_body_skills.py`**, so criterion
+15's third limb and §14.2b's digest literal could not both hold. Revision 6 measures the conflict by running
+the checker, binds the three parse-fixing edits and the digest **re-measured** from the live body plus them,
+corrects criteria 9, 10, 14 and 15, §6's N1/N2 and §14.2b's literal, binds the five residue items the Stage C
+report listed plus one count defect found here, and states how the two requirements are jointly satisfiable.
+Nothing the earlier audits accepted as correct was undone. This plan holds no Stage B, D, E, F or G on this
+change; it audited nothing, edited no file of the PR's diff, moved no head and merged nothing.*
