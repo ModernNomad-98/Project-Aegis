@@ -56,7 +56,7 @@ status; the dated proposals and evidence pages further down are history.
 - [Aegis SCIF naming and the necessity/reuse check](aegis-scif-naming-and-necessity.md):
   the framework's name and its forms, the five questions Stage A owes and Stage B
   tests, and the residual-occurrence inventory.
-- [Evidence reading guide](evidence/README.md): routes to 17 dated decision and
+- [Evidence reading guide](evidence/README.md): routes to 18 dated decision and
   delivery records, with current-status boundaries.
 - [Documentation readability backlog](roadmaps/aegis-documentation-readability-backlog.md):
   the plan to explain each component in plain language, define project shorthand,
