@@ -336,6 +336,24 @@ page of this batch is partial.
   No index is pinned for a following batch and no arithmetic selects it (section 9 records the
   measurement commands and output).
 
+**Which state each list belongs to (2026-10-16 Stage A measurement).** The eight paths above are the
+first eight **unread** entries of lane A's quarter **when batch 1 was lane A's only committed record**
+(post-batch-1 frontier, sorted index 7). Lane A batch 2 has since read exactly those eight paths
+(8/8 measured from that record's own bytes), so they are **not** unread at the later state this
+section's cross-check measures. Under the read set this section's cross-check asserts (lane A's
+reads = sorted indices 0..39, contiguous, from batch records 1-5), the first eight unread at the base
+`e2a3e20b` are, by path:
+`.claude/skills/ai-closeout-reporter/SKILL.md`,
+`.claude/skills/ai-closeout-reporter/assets/closeout-template.md`,
+`.claude/skills/ai-cost-guardrail-designer/SKILL.md`,
+`.claude/skills/ai-cost-guardrail-designer/references/cost-guardrail-patterns.md`,
+`.claude/skills/ai-evaluation-harness/SKILL.md`,
+`.claude/skills/ai-evaluation-harness/references/eval-harness-design.md`,
+`.claude/skills/ai-governance-risk-reviewer/SKILL.md`,
+`.claude/skills/ai-governance-risk-reviewer/references/ai-governance-framework.md`.
+Both lists are re-measurement **outputs at one base, not pinned ranges**: the next batch re-runs the
+three-step derivation at its own base and only that run's output is binding.
+
 ## 7. Validation actually run (commands and their real results)
 
 | # | Command | Result |
@@ -505,11 +523,13 @@ payload, and therefore the bound-field digest, is unchanged by them, exactly as 
   acceptance; applying C-4 to it would have wrongly withdrawn the good acceptance K-089. No
   other page of the eight was recorded partial at any point.
 
-**Diff scopes, counted by hand (not by regex).** `base..head` remains **insert-only**:
-**445 added / 0 deleted** over two file headers, and with no deleted line at all, no deleted line
+**Diff scopes, counted by hand (not by regex).** `base..head` is **insert-only**:
+**689 added / 0 deleted** over two file headers and three hunks, and with no deleted line at all, no
+deleted line
 begins with two dashes. The **intra-branch correction commit** `f6a4e418` is **not** insert-only
 against its parent `09a7ee1c`: **145 added / 51 deleted** — disclosed because the two scopes
-differ and an insert-only claim that silently covered that commit would be false. This pass's own
+differ and an insert-only claim that silently covered that commit would be false. (`445 added / 0 deleted` is the **`base..f6a4e418`** figure — the scope before this pass's own two
+commits; it is superseded by the head figure above and is not a count of this head.) This pass's own
 commits are a third scope (the repair commit and its follow-up citation-correction
 commit); their counts are in the PR body's validation table. **Dated correction inside this
 pass:** the first cut of section 8 and of the ledger section cited `main`'s K-105

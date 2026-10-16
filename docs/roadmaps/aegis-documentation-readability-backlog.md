@@ -5218,6 +5218,24 @@ base: `.claude/skills/ab-test-designer/SKILL.md`,
 `.claude/skills/admin-console-architect/SKILL.md`,
 `.claude/skills/adr-sequencer/references/adr-corpus-sheet.md`.
 
+**Which state each list belongs to (2026-10-16 Stage A measurement).** The eight paths above are the
+first eight **unread** entries of lane A's quarter **when batch 1 was lane A's only committed record**
+(post-batch-1 frontier, sorted index 7). Lane A batch 2 has since read exactly those eight paths
+(8/8 measured from that record's own bytes), so they are **not** unread at the later state this
+section's cross-check measures. Under the read set this section's cross-check asserts (lane A's
+reads = sorted indices 0..39, contiguous, from batch records 1-5), the first eight unread at the base
+`e2a3e20b` are, by path:
+`.claude/skills/ai-closeout-reporter/SKILL.md`,
+`.claude/skills/ai-closeout-reporter/assets/closeout-template.md`,
+`.claude/skills/ai-cost-guardrail-designer/SKILL.md`,
+`.claude/skills/ai-cost-guardrail-designer/references/cost-guardrail-patterns.md`,
+`.claude/skills/ai-evaluation-harness/SKILL.md`,
+`.claude/skills/ai-evaluation-harness/references/eval-harness-design.md`,
+`.claude/skills/ai-governance-risk-reviewer/SKILL.md`,
+`.claude/skills/ai-governance-risk-reviewer/references/ai-governance-framework.md`.
+Both lists are re-measurement **outputs at one base, not pinned ranges**: the next batch re-runs the
+three-step derivation at its own base and only that run's output is binding.
+
 **Repair passes 2026-10-15 (pre-merge corrections by different agents).** The
 eight rows below are recorded by `readability-lane-a-implementer-c` (this PR's
 one reader and row author); they are **not green** for that reason alone
