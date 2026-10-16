@@ -87,7 +87,7 @@ Two complete, complementary passes were made over each page:
 1. **Mechanical pass.** `python -B scripts/ci/check-markdown-links.py <page>` per page — 12 links
    total across the eight pages, **0 broken, 0 dead** (per-page outputs in section 9); every
    40-character SHA counted — **0 on every page**; every backtick-named skill reference checked to
-   exist under `.claude/skills/` — **every one present** (39 occurrences across the pages); the
+   exist under `.claude/skills/` — **every one present** (**39** per-page-distinct names; **77** literal occurrences); the
    named `evals` files and `references` files existence-checked — **every one present**. No page
    carries an in-page anchor link, so the bad-anchor count is zero by enumeration. There are **no
    external links** on any of the eight pages, so none was fetched (zero by enumeration, not an
@@ -283,7 +283,7 @@ not consulted — no retention entry exists for `docs/evidence/documentation/` p
 creates none, and the lane's skills record is stated inline in this section rather than through the
 ledger's six-field format; no other skill in the catalog owns any step of this batch.
 
-## 7. The keeper-independence deviation, stated plainly (APR-117 route)
+## 7. The keeper-independence deviation, stated plainly (withdrawal APR-117; recording APR-101)
 
 **This lane does not claim the AEGIS-APR-101 keeper-independence condition is satisfied.**
 AEGIS-APR-101 requires the ledger keeper to be a different agent from the page's author and
@@ -292,11 +292,11 @@ performed all eight reads and authors the keeper rows K-181–K-188, so the cond
 satisfied** and the rows are **not green on it**. (The first clause is satisfied — the pages'
 authors are other agents, evidenced by the last-touching commits in section 3.)
 
-The owner's 2026-10-15 decision 3 (`OWNER-DECISIONS-2026-10-15.md`, "NO ratification. Use the
-APR-117 route instead") directs: **the same-agent rows are withdrawn and re-recorded by a
-different agent from the same evidence; no page needs re-reading.** AEGIS-APR-117 grants the
-ledger keeper the right to append withdrawal rows bound to evidence after the switch; the
-withdrawal and the re-recording are performed by an eligible keeper at merge, not by this lane.
+The owner's 2026-10-15 decision 3 (`OWNER-DECISIONS-2026-10-15.md`, "NO ratification. Use the APR-117 route
+instead") directs: **the same-agent rows are withdrawn under AEGIS-APR-117 (withdrawal-only) and a fresh acceptance
+row is recorded under AEGIS-APR-101 by a different agent from the same evidence; no page needs re-reading.**
+AEGIS-APR-117 grants the ledger keeper the right to append withdrawal rows bound to evidence after the switch, and
+the fresh recording is AEGIS-APR-101's recording act; an eligible keeper performs both at merge, not by this lane.
 
 This lane states the deviation plainly in this record and in the pull request body, and **leaves
 the disposition to the merge holder**. The rows are authored as K-181–K-188 in lane B's allocated
@@ -347,8 +347,8 @@ stage's verdict that rework is required before merge. **Stage C** = the implemen
 this record. **Bound-field digest** = the 16-hex sha256 over a pull request body's three
 machine-checked bound fields (witness, skills, security). **`userContentEdits`** = GitHub's own edit
 counter for a pull request body, read through the GraphQL API. **AEGIS-APR-101 / 117** = the
-approval-register entries governing who may record an acceptance row, and the withdraw-and-re-record
-route.*
+approval-register entries governing who may record an acceptance row — **APR-101** the recording
+act, **APR-117** the withdrawal-only correction — and the two-act route they authorize.*
 
 **What the audit found, and what this repair changed.** The Stage D audit of this pull request
 returned **REVISE** against `78af4ef2d0421a16341865402efcdeeb06ca922c`. It raised two defects: one in
@@ -389,10 +389,10 @@ four: 5feb / 2e44 / 4d99 / 8034) over payload lengths witness **1926** / skills 
 method reproduces the published digests of #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`, #792
 `88300e711714200a` and #795 `5fabf87b2df899e9` from each body's own live readback, plus #790's
 current live value `1d69dc6f748f945f`. **The published figure was never true of any posted body under
-the body's declared method.** GitHub's `userContentEdits` for this body returns `totalCount: 0`
-(measured 2026-10-15; the same call returns 7 for #783, 3 for #787, 6 for #790, 2 for #792, 5 for #795
-and 4 for #796), so the body has never been edited and no earlier posted revision exists for the
-figure to have been true of. This is not staleness: there is no revision at which that figure is the
+the body's declared method.** GitHub's `userContentEdits` for this body returned `totalCount: 2` when measured 2026-10-16
+(the same call returns 7 for #783, 3 for #787, 6 for #790, 2 for #792, 5 for #795 and 4 for #796): both posted revisions
+— pre-repair 21,676 chars and post-repair 27,637 chars — yield `5feb2e444d998034` under the declared method, so no posted
+revision carries the old figure. This is not staleness: there is no revision at which that figure is the
 value the declared method produces. *Measured refinement:* the old figure is reproducible from the
 same posted body under a **different** normalization — each field collapsed line by line with no trim
 (payload lengths 1930 / 7086 / 481) — which identifies it as a method-implementation mismatch rather
@@ -410,8 +410,8 @@ of any base revision.
 
 **What this repair round did not verify.**
 
-1. **The authoring-time basis of the old figure.** GitHub exposes no superseded body revisions and
-   `userContentEdits` shows there were none, so no candidate posted body exists for it to have been
+1. **The authoring-time basis of the old figure.** GitHub's `userContentEdits` exposes two body revisions and
+   neither yields the old figure under the declared method, so no candidate posted body exists for it to have been
    true of, and the exact procedure that produced it is not observable from any repository ref. The
    undeclared normalization above reproduces it from the current body — the closest available
    explanation, not a proven provenance.

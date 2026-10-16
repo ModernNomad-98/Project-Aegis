@@ -5167,13 +5167,13 @@ from the page's author and accepting reviewer. The same agent that performed
 all eight reads (`readability-lane-b-implementer-c`) also authors these keeper
 rows, so **the APR-101 keeper-independence condition is not satisfied and the
 rows are not claimed green on it.** The owner's 2026-10-15 decision 3
-(`OWNER-DECISIONS-2026-10-15.md`) directs the **APR-117 route**: the
-same-agent rows are withdrawn and re-recorded by a different agent from the
-same evidence — **no page needs re-reading**. AEGIS-APR-117 grants the ledger
-keeper the right to append withdrawal rows bound to evidence (active after the
-switch named in AEGIS-APR-114); the withdrawal and the re-recording are
-performed by an eligible keeper at merge, not by this lane. This lane states
-the deviation plainly and leaves the disposition to the merge holder.
+(`OWNER-DECISIONS-2026-10-15.md`) directs the **withdraw-then-record-afresh route**: the
+same-agent rows are withdrawn under **AEGIS-APR-117** (withdrawal-only) and a fresh acceptance
+row is recorded under **AEGIS-APR-101** by a different agent from the same evidence — **no
+page needs re-reading**. AEGIS-APR-117 grants the ledger keeper the right to append withdrawal
+rows bound to evidence (active after the switch named in AEGIS-APR-114); the fresh recording
+is AEGIS-APR-101's, and an eligible keeper performs both at merge, not by this lane. This lane
+states the deviation plainly and leaves the disposition to the merge holder.
 
 **Cross-lane note.** The sibling lanes append keeper rows from the same base;
 the allocation file's bands and the serial-merge protocol
