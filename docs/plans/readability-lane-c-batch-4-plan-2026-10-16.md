@@ -100,7 +100,7 @@ pages were edited.
 | Official pending count, measured at the PR head | **599 → 600** (+1) | `official_pending_count` base **599**, head **600**; `no_recorded_acceptance` 588 → 589 (E2) |
 | Accepted pages | **unchanged at 56** — the record records no row, so no page moves bucket | accepted at base **56**, at head **56** (E2) |
 | Code / workflow / script / test / config / data / lock paths | **0** | the one added path is `.md` under `docs/`; no path under `scripts/`, `tools/`, `.github/` or `.claude/` appears (E1) |
-| Ledger | **byte-identical** base vs head — 0 ledger lines in the diff | ledger blob `14b2bcf6fd7ea2d530f1c37dbf2b5ea24826b454` at **both** revisions; `git diff BASE HEAD -- docs/roadmaps/aegis-documentation-readability-backlog.md` prints **0 bytes** (E10) |
+| Ledger | **byte-identical** base vs head — 0 ledger lines in the diff | ledger blob `f8bcfaa66bfa23ee1297bf5203cf6bbc2f954728` at **both** revisions; `git diff BASE HEAD -- docs/roadmaps/aegis-documentation-readability-backlog.md` prints **0 bytes** (E10) |
 | Keeper rows | **none authored**; **0 `K-` id tokens** consumed | grep over the added record for `K-` → **0** occurrences (E10) |
 | Required checks on `main` | **unchanged**: `gate-guard` and `validate-skills` | branch protection `required_status_checks.contexts` = `["gate-guard","validate-skills"]`; both **success** at the head (E11) |
 | The eight read pages | **not modified** — all eight are page properties, and the lane edits nothing | no read page appears in `git diff --name-status BASE HEAD` (E1) |
@@ -178,11 +178,19 @@ The following are therefore declared now, not discovered later.
    **because the record never names the fixed expansion string each count was taken over.** The
    record states the *rule* ("A page *expands* a term when the term's fixed expansion string also
    occurs on it") but not the *strings*. Measured this session with the most natural candidate
-   strings, at the base, over the 655 reader pages: `SaaS` via "software as a service" → **31**
-   (published 42); `HTTP` via "Hypertext Transfer Protocol" → **13** (published 17); `404` via
-   "Not Found" → **14** (published 7); `403` via "Forbidden" → **90** (published 13). Every candidate
-   misses, several by a wide margin, so the published figures can be neither confirmed nor refuted
-   from the record's own text. **This is recorded, not cured**: curing it would require editing the
+    strings, at the base, over the 655 reader pages **and** — for each term — over the pages that
+    *use* it, the domain the record's own rule names, since it says the expansion string **also**
+    occurs on the page (E15): \`SaaS\` via "software as a service" → **31** of the **63** pages that
+    use \`SaaS\` (published 42); \`HTTP\` via "Hypertext Transfer Protocol" → **13** of the **34** that
+    use \`HTTP\` (published 17); \`404\` via "Not Found" → **6** of the **29** that use \`404\` (published
+    7); \`500\` via "Internal Server Error" → **0** of the **38** that use \`500\` (published 0,
+    reproduced); \`403\` via "Forbidden" → **13** of the **23** that use \`403\` (published 13). So
+    **three** of the four candidates miss, several by a wide margin, and the fourth, \`403\`, does
+    **not**: its published cell is reproduced exactly in the rule's own domain, and only there —
+    over all 655 pages the same string occurs on **90**. Those three published figures can be
+    neither confirmed nor refuted from the record's own text, while \`403\`'s can be confirmed by
+    the natural candidate; and all four cells stay unreproducible **from the record**, which names
+    no expansion string at all. **This is recorded, not cured**: curing it would require editing the
    record, which is out of scope for a plan and would void the record's footer digest and every
    verdict bound to the record's blob. The gap belongs to the record's author and to the audit trail
    that already disclosed it. A stage may therefore return `UNRUN` for these four cells alone,
@@ -298,11 +306,12 @@ All commands were run in a fresh HTTPS clone
 | E7 | the eight pages: blob IDs, line counts, non-ASCII bytes | `git rev-parse BASE:PAGE`; `git cat-file blob BASE:PAGE` | **8/8 blob IDs and 8/8 line counts reproduce** (97, 224, 83, 231, 73, 338, 224, 350 lines) and **8/8 non-ASCII byte counts** reproduce (57, 192, 72, 131, 24, 186, 84, 174); longest line across the batch **1,030 bytes / 1,028 characters** |
 | E8 | the record's 17 measurement rows | whole-token match, not flanked by `[A-Za-z0-9_]`; case-sensitive for `SaaS` and `HTTP`, case-insensitive for the lower-case words; regular plural folded; an `HTTP` inside a URL not counted — over the 655 reader pages at `BASE` | **all 17 rows reproduce exactly**, including the stated sensitivities: `SaaS` 63 case-sensitive / **107** case-insensitive, `HTTP` 34 / **42** (with the URL exclusion; 43 without), `parity` **38** case-insensitive / 36 case-sensitive |
 | E9 | quarter boundaries; batch 4; the next batch | sorted union, by repository path | balanced 148/148/148/149 → lane C = **296–443**, first `.claude/skills/skill-deprecation-planner/SKILL.md`, last `docs/evidence/documentation/full-page-readability-batch-after-230-2026-09-24.md`; alternative 149/149/149/146 → lane C = **298–446**, first `.claude/skills/skill-quality-reviewer/SKILL.md`, last `docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md`; **batch 4 = union indices 320–327** = the record's eight pages in order; **batches 1/2/3 = 296–303 / 304–311 / 312–319**; **next batch = union indices 328–335**, first `…/supply-chain-checklist.md`, eighth `.claude/skills/tenant-isolation-reviewer/SKILL.md`; all eight batch pages lie inside lane C under **both** conventions |
-| E10 | ledger and keeper rows | `git rev-parse BASE:LEDGER`; `git rev-parse HEAD:LEDGER`; `git diff BASE HEAD -- LEDGER`; grep for `K-` | ledger blob `14b2bcf6fd7ea2d530f1c37dbf2b5ea24826b454` at **both** revisions (the second ledger, `readability-ledger-selfcost-2026-10-13.md`, is `1a70a714bcc317930cc8accb873ea642989cca5b` at both); ledger diff **0 bytes**; `K-` occurrences in the record: **0** |
+| E10 | ledger and keeper rows | `git rev-parse BASE:LEDGER`; `git rev-parse HEAD:LEDGER`; `git diff BASE HEAD -- LEDGER`; grep for `K-` | ledger blob `f8bcfaa66bfa23ee1297bf5203cf6bbc2f954728` at **both** revisions (the second ledger, `readability-ledger-selfcost-2026-10-13.md`, is `1a70a714bcc317930cc8accb873ea642989cca5b` at both); ledger diff **0 bytes**; `K-` occurrences in the record: **0** |
 | E11 | checks and mergeability | `gh api repos/ModernNomad-98/Project-Aegis/commits/HEAD/check-runs`; `gh api repos/ModernNomad-98/Project-Aegis/branches/main/protection` | required contexts `["gate-guard","validate-skills"]` — both **success** at `HEAD`; `windows-offline-checks`, `tools-tests-windows`, `tools-tests-linux` **skipped** by design; `mergeable: true`, `mergeStateStatus: BLOCKED`, `reviewDecision: REVIEW_REQUIRED` (1 required approving review) |
 | E12 | the record's footer digest | sha256 over bytes 0–90200 inclusive of the record's blob | `040ddd6afafeb154ea169ee3f6dfa4b8a94fed61cab6b0bf333ff3c377f10bc4` over **90,201** bytes, lines **1–955** — **reproduces exactly**. The record total is 975 lines / 91,642 bytes; the two earlier named digests (`2e7c9ed3…` and `7e1b59e7…`) cover **earlier blobs** and are not reproducible from this blob, as expected |
 | E13 | the PR body's bound-field digest, and its calibration | the three marker-delimited payloads (witness → skills → security), each whitespace-collapsed and trimmed, joined with single newlines, sha256, first 16 hex | **`1d69dc6f748f945f` — reproduces exactly**; the **same procedure over PR #783's body reproduces that PR's published `3913683c686e6e71`**, so the published order and normalization are confirmed, not assumed |
 | E14 | hex lengths, counted by hand | written out in groups of four | `788f5b03 5ffe7071 81931380 d01b0016 5f8d0304` = 10 groups = **40 hex**; `f490c16f 9ed23f3d 489e42f7 696323bf fcce6fd3` = **40**; `fdbcddce e0496ce1 7f69cd12 7f8613e5 4e410490` = **40**; `040ddd6a fafeb154 ea169ee3 f6dfa4b8 a94fed61 cab6b0bf 333ff3c3 77f10bc4` = 16 groups = **64**; `1d69dc6f 748f945f` = 4 groups = **16** |
+| E15 | the four expansion cells, read in the rule's own domain | \`git cat-file --batch\` over the 655 reader pages at \`BASE\`, whole-token match as at E8, split by whether the page uses the term | pages using \`403\` **23**, of which **13** also carry "Forbidden" (published **13**, so this cell reproduces); \`404\` **6** of **29** (published 7); \`HTTP\` **13** of **34** (published 17); \`SaaS\` **31** of **63** (published 42); \`500\` **0** of **38** (published 0) |
 
 ### 9.2 What this plan does not decide (non-decisions)
 
@@ -328,6 +337,19 @@ All commands were run in a fresh HTTPS clone
   over the file's raw bytes and confirmed by `git cat-file -t` as a `blob`. The blob ID and the
   capturing commit are published in **both** the PR body (appended, line-neutral) **and** one fresh
   immutable comment.
+- **Re-capture, and what it supersedes.** This is the **second** capture of this file on the same
+  side branch. It supersedes blob \`f71c38a73389c75ee605b9dc11675de3948565a3\` (38,358 bytes, **345**
+  lines) added by commit \`bfd975d83d9dff5c9c13a794dcc06807901469fb\`, the revision the first \`SD-B\`
+  read: that text named the ledger's blob wrongly in two places and overstated one \`NV-1\`
+  measurement, and this revision corrects those bytes only. The supersession is **not** an append —
+  the superseded blob is not a byte prefix of this one — so the change is shown to be confined to
+  the intended bytes by diffing the two blobs and naming every changed offset, in the PR body and
+  in the fresh capture comment. This revision's blob ID and its capturing commit are published in
+  both of those places; no earlier comment is edited and no pull request head is moved.
+- **Where \`AC10\` and \`AC11\` bind after a re-capture.** Both name \`CAPTURE\`, the commit that *first*
+  added this file. Run at \`CAPTURE\` those commands return the superseded blob named just above;
+  run at this re-captured revision they return this revision's blob. Each is \`git cat-file -t\` →
+  \`blob\`, and both results are named here rather than one silently replacing the other.
 - **Matching newline variant:** **LF** (`0x0A`) only, with **0** carriage returns, matching the
   repository's `.gitattributes` policy `* text=auto eol=lf`.
 - **Verbatim publication.** The comment embeds this file's bytes between two digest markers, inside a
