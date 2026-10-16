@@ -463,10 +463,15 @@ above is corrected here.
   dispositions recorded against them.
 - **CI at the implementation head** — owed to GitHub Actions after the capture push, and never
   self-graded (AC12, declared in 3.3).
-- **The PR body's pre-edit bytes.** The body has five recorded edits and their earlier states are not
-  retrievable to this agent; the only retained measurements of the pre-capture text are the SD-B
-  verdict's read-time SHA-256 values (full body `f34c1059…`, plan block `971118e6…`), which are
-  read-time measurements and are **not** a captured revision.
+- **The PR body's full revision history, and what it does and does not settle.** The body's
+  revisions **are** retrievable, contrary to what revision 1 assumed: `userContentEdits` returns every
+  revision with its text, oldest first, and 12.3(a) below uses them to date the 11:23:42Z swap. The
+  count is not fixed, so no revision of this plan can state a number that stays true: it was **five**
+  recorded revisions when revision 1 was written and is **nine** as measured for revision 3. What the
+  list settles is *which* revisions exist and what each said; what it does not settle is authorship,
+  because GitHub shows one posting account for all of them. The SD-B verdict's read-time SHA-256 values
+  (full body `f34c1059…`, plan block `971118e6…`) remain read-time measurements and are **not** a
+  captured revision.
 - **That a future keeper is a different agent.** GitHub shows one posting account and the workflow
   records that agent identity is not separable there; the separation is a constraint on the recording
   act, checked by the process, not by a mechanism this plan can run.
