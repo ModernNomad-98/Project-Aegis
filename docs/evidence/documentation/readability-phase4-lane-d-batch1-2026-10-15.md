@@ -106,7 +106,7 @@ PR #771 used for its P8/K-089 partial page. Section 18 records the commands behi
 + 56 + 54 + 63 + 24 + 41 + 38 = **391 lines** in total (largest page 71 lines), extracted from the
 exact revision with `git show e2a3e20b:<page>` and read with line numbers. **No display elision
 occurred and no range was skipped**: each page fit a single read pass, so the read depth is the whole
-page for all eight — there is no "unchanged remainder" limit to state here, unlike the 2026-10-12
+page for all eight — there is no unchanged remainder limit to state here, unlike the 2026-10-12
 batch's large pages.
 
 **The mechanical pass** ran over the same exact-revision bytes. For each page it enumerated: every
@@ -267,8 +267,11 @@ real-host or deployment authority" (ledger L3018-3020).
 
 `change-classification-gate` — classified the change `docs-only` (evidence record + ledger
 additions, Markdown only) before writing, which is what keeps the lighter review path applicable and
-the diff inside the no-code tier. `acceptance-criteria-reviewer` — the six acceptance bullets
-applied to each of the eight pages, each bullet addressed with line cites rather than asserted.
+the diff inside the no-code tier. `acceptance-criteria-reviewer` — used inside its contract: the
+ledger's six acceptance bullets are criteria, and each is addressed with line cites rather than
+asserted (section 6). That skill returns one verdict per criterion and states that it "never decides
+whether work is done", so the accept/partial dispositions are the lane's own recorded decision
+(section 4), not this skill's output.
 `source-of-truth-reconciler` — the four observations resolved against the repository (stale anchors,
 the `D9` decision, the non-resolving plan tokens, the historical link count) instead of against the
 pages' own prose. `scoped-approval-register` — established this change records under
@@ -284,7 +287,7 @@ the skills-manifest hashes.
 
 ```text
 skill@08d91a834460beebc9c66fa896b8b422f064bf1d7524f6e5b1512cda3afdc996 / reason: classify before writing, the class decides the tier and review path / applied: classified docs-only before any write / result: docs-only tier asserted in the PR body with the file set / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
-skill@c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 / reason: the acceptance contract's six bullets are criteria and were checked one by one / applied: each bullet per page with line cites in section 6 / result: 7/8 accepted unchanged, 1/8 partial (LD-4: `D9` at page L30 unglossed — acceptance bullet 2) / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
+skill@c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 / reason: the acceptance contract's six bullets are criteria and were checked one by one / applied: each bullet per page with line cites in section 6 / result: the six bullets checked as criteria; this skill issued no acceptance verdict — its contract states it "never decides whether work is done" — so the 7/8 accepted unchanged, 1/8 partial dispositions are the lane's own recorded decision (section 4) / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
 skill@b5fd9feda97235430259913aedd33447ab06e1c0ded281e9e131fa6bf9b78be2 / reason: four page items needed resolution against the repo, not the page's prose / applied: observations O-1..O-4 sourced to repo artifacts / result: all four dispositioned unchanged / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
 skill@a74d2a22579cf93f737725aa0c54197b5d496a9f33a291a93c2cf2073cd7d076 / reason: recording requires knowing which grant covers what / applied: read AEGIS-APR-039, -101, -113..-118, -125, -129 at the base (register entries; one-line descriptions in section 17) / result: recording-only under APR-101; no grant consumed, extended or requested / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
 skill@141b7036469f9f99ef6b8e152299619a6d0ab572656a5ba307062551d311d8a5 / reason: a new page may owe a retention entry / applied: checked for a retention registry and per-doc frontmatter practice / result: none exists for this directory; no retention change needed, recorded not skipped / incomplete: None / by: readability-phase4-lane-d-implementer-c (Stage C)
@@ -533,6 +536,45 @@ commit; their total wall time is reported to the owner at completion.
 *Repair drafted by **DeepSeek V4** (`deepseek-v4-pro`, DeepSeek Harness), the Stage C repairing
 agent (fourth round), under the owner account, as the repository's 2026-10-13 attribution rule
 requires.*
+
+## 19. Pre-merge Codex-triage repair note (2026-10-15; 2026-10-16 UTC)
+
+**This is the pre-merge triage AEGIS-APR-050 requires** (the register entry "Merges wait for the
+automated Codex review": wait for the Codex review, then triage every P1 and P2 finding before
+merging — fix it, or record in the pull request why it is not a defect). The pull request carries
+**1** Codex review and **3** review comments (`gh api
+repos/ModernNomad-98/Project-Aegis/pulls/774/reviews` prints one object; `.../pulls/774/comments`
+three; all `chatgpt-codex-connector[bot]`, all `original_commit_id` =
+`370bc8db75faf251b28ad0e328e559cbcd320866`). **Three findings, three recorded dispositions**, in the
+pull-request body's triage section. Two are answered without a change here: the separate-keeper
+finding is answered on main by merged PR #781 (rows K-381W..K-388W withdraw K-090..K-097 and rows
+K-389..K-396 re-record them, keeper `deepseek-v4-pro-apr117-keeper`, a different agent from the
+accepting reviewer), and the `D9` finding is answered by LD-4's **partial** disposition and K-093's
+declared non-standing (section 4). **One is fixed here:** the third finding (P1) reads the skills
+record as crediting `acceptance-criteria-reviewer` with the acceptance verdict, so section 13 and
+its six-field row now describe what that skill's contract permits — one verdict per criterion, since
+it "never decides whether work is done"
+(`.claude/skills/acceptance-criteria-reviewer/SKILL.md` L25-33; `docs/delivery-workflow.md` L98
+records it as a partial fit only) — and state that the accept/partial dispositions are the lane's own
+recorded decision (section 4).
+
+**The second correction is a quotation with no source.** Section 5's two quotation marks around
+`unchanged remainder` are **removed**: the 2026-10-12 batch record states its limit as "the
+*unchanged* remainder of each large page was covered by pass 1"
+(`docs/evidence/documentation/readability-reread-batches-2026-10-12.md` L126), so the quoted
+two-word form is verbatim nowhere in the tree, and a quotation with no source is the defect class
+this branch has been repairing. No keeper row, no withdrawal row, no row-quote string (section 10),
+no date-stamped page and no protected ledger section was touched — this repair edits this record only.
+
+**Timing (the name-and-time rule).** Item: the pre-merge Codex triage of PR #774 under AEGIS-APR-050
+and this record's two wording corrections. Start 2026-10-15T18:28:46-07:00 (2026-10-16T01:28:46Z,
+harness-sampled at the first work step). ETA: none was given in the coordinator's brief — recorded as
+unavailable, not invented. Finish (edit phase, through this commit):
+2026-10-15T18:35:48.7476998-07:00 (2026-10-16T01:35:48.7476998Z, measured by command immediately
+before the commit). Wall time (edit phase): 7 minutes 2.7 seconds.
+
+*Repair drafted by **DeepSeek-4.1-Flash** (`deepseek-flash`, DeepSeek Harness), the Stage C repairing
+agent, under the owner account, as the repository's 2026-10-13 attribution rule requires.*
 
 ---
 
