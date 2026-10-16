@@ -221,7 +221,7 @@ and the term's prevalence is recorded as an observation instead.
 
 | ID | Criterion (observable outcome) | Pass/fail threshold | Evidence | Verdict | Verifiable at the implementation head? |
 | --- | --- | --- | --- | --- | --- |
-| AC1 | The plan of record is a tracked file, not a body section. | The PR body names the plan path and a 40-hex blob ID, and `git rev-parse <head>:docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` equals that value character for character. | the body's capture block; `git rev-parse`; `git cat-file -s` | TESTABLE | Yes |
+| AC1 | The plan of record is a tracked file, not a body section. | The PR body names the plan path and a 40-hex blob ID, and `git rev-parse <capture commit>:docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` equals that value character for character. The equality holds **at the capture revision**, which the change head does not carry: at the head the same path resolves to revision 1's blob `ac8da53e011796bc9086a355b14e4cc9fca8eb81`, and 16.2 states what merges. | the body's capture block; `git rev-parse`; `git cat-file -s` | TESTABLE | Yes |
 | AC2 | The capture does not disturb the evidence record. | `git rev-parse <head>:docs/evidence/documentation/readability-lane-a-batch-4-2026-10-15.md` = `493c48414d3c97c97cdffa8bc422415284d899f9`, and the record's numstat against the base is `675 0`. | `git rev-parse`; `git diff --numstat <base>..<head>` | TESTABLE | Yes |
 | AC3 | No page is edited and nothing code-bearing is added. | At the change head `0c994d77…`, `git diff --name-only <base>..<head>` returns exactly **three** added `docs/` paths — the evidence record, the skills-records file and the plan — with 0 modified and 0 deleted; 0 deleted lines; no path under `scripts/`, `tools/`, `.github/` or `.claude/`, and no lock, configuration or data file. The same command at this plan's capture revision returns the same three added paths, 0 modified and 0 deleted. | `git diff --name-only`; `git diff --numstat` | TESTABLE | Yes |
 | AC4 | The lane derivation reproduces from the instrument at the base. | Summary exactly `reader_pages_in_tree 655, accepted_on_recorded_review 56, provably_pending 5, no_recorded_acceptance 588, cannot_decide 6, official_pending_count 599`; union **593**; lane A = first `ceil(593/4) = 149` sorted pending paths; first `.claude/agents/ai-security-red-team-reviewer.md`; last `.claude/skills/file-upload-storage-architect/SKILL.md`. | `python -P -B tools/readability_acceptance/check_index.py --json --ref f490c16f…` plus the tree/index re-derivation; output quoted in the record's section 1 and in section 10 here | TESTABLE | Yes |
@@ -229,7 +229,7 @@ and the term's prevalence is recorded as an observation instead.
 | AC6 | The record's per-page verdicts are complete, consistent and honest. | Exactly **4 FULL / 4 PARTIAL**; every one of the 8 pages has a verdict, a read range and (in the record's section 5) one quote line; every recorded defect names its page line; **no page carries a defect with a FULL verdict**; the four PARTIAL quote lines say "partial"; the record states that only the four FULL pages are row-eligible. | the record's sections 3-5, counted | TESTABLE | Yes |
 | AC7 | No recorded unglossed-term defect rests on a library-wide convention (the C-1 screen of 3.1). | For P1 (`WIP`) and P4 (`Phase 1.5`) the measured prevalence is below 12 of 655, so each defect stands; for P8 the recorded defect is the referent ambiguity, and the term's 23-of-655 prevalence is recorded as an observation, not as the defect. | the measurements in 3.1; the record's sections 3-4 | TESTABLE | Yes |
 | AC8 | The record's keeper handoff states the non-author test as a constraint, not as a claimed fact. | The record states that only a different agent — not the page's author, not the accepting reviewer, not any other stage of this PR, and not the coordinator — may record an acceptance row; that this batch authors no rows; and that it consumes no keeper-row ID. | the record's keeper statement; `docs/approvals/APPROVAL_REGISTER.md` L3149-L3159 (APR-101) | TESTABLE | Yes |
-| AC9 | The evidence the work produced exists, is tracked, and is where this plan says. | The record path exists at the head with the blob ID of AC2; the plan path exists with the blob ID of AC1; both are tracked. | `git ls-files`; `git rev-parse <head>:<path>` | TESTABLE | Yes |
+| AC9 | The evidence the work produced exists, is tracked, and is where this plan says. | The record path exists **at the head** with the blob ID of AC2; the plan path exists with the blob ID of AC1 **at AC1's capture revision**, and at the change head it resolves to revision 1's blob; both are tracked. | `git ls-files`; `git rev-parse <ref>:<path>` | TESTABLE | Yes |
 | AC10 | The PR body carries the capture reference and the "not decided" list, and stays structurally valid. | The posted body names the plan path and blob ID and lists what the plan does not decide; `python -P scripts/ci/check_pr_body_skills.py --body-file <posted body>` exits 0. | read-back of the posted body; the checker's exit code | TESTABLE | Yes |
 | AC11 | The repository's own checks pass at the implementation head. | `git diff --check` exit 0; `python -P scripts/validate-skills.py` exit 0; `python scripts/tests/test_validator.py` exit 0; `python -P scripts/ci/check-markdown-links.py` over the added paths reports `broken 0` and `dead 0`; `python -B scripts/check_dco.py --range <base>..<head>` reports SIGNED for every commit. | the commands and their observed output, in the record's section 7 and this plan's section 10 | TESTABLE | Yes |
 | AC12 | CI at the exact implementation head. | Every required job (`changes`, `validate-skills`, `gate-guard`) concludes success at the head that carries the capture commit; jobs that do not apply are recorded skipped, never passed. | the GitHub Actions run for that head | TESTABLE | **No — declared not verifiable at this head; see 3.3.** |
@@ -386,18 +386,23 @@ Named rather than left implicit:
 
 ## 9. This plan's own revision and how it is captured
 
-- **This is captured revision 3 of this plan.** Revision 1 was blob
+- **This is captured revision 4 of this plan.** Revision 1 was blob
   `ac8da53e011796bc9086a355b14e4cc9fca8eb81`, added by commit
   `44d8f43169b0dbe822a08c838d7b5249e384dd0c`; revision 2 was blob
   `cbac865eb3541cadbffd604dc584865c6b8709ed`, added by commit
   `2df74c860b94abdd541df390483ec2916c092f8b`, whose predecessor blob
   `cdd7fd4583eafb25e88074ae83cac78868810026` at commit
-  `dc92153ba0f951d3d7c304241890619efaedf73b` is **superseded** and was never the plan of record.
-  Revision 2 is **superseded** by this revision for a recorded reason: the second SD-B verdict of
-  2026-10-16 (issue comment `6214669507`, `REVISE`) found four false statements about live artefacts
-  inside the captured text — 12.3(a), 12.3(b), section 10 and section 13, with the same stale head also
-  in the section 3 preamble — and returned the plan to Stage A. What revision 3 changes is listed
-  exactly in 15.1, and nothing else in this file moved.
+  `dc92153ba0f951d3d7c304241890619efaedf73b` is **superseded** and was never the plan of record;
+  revision 3 was blob `659f0794c6c2a1080015b165dee5d739248dcab4` (**75,123** bytes, 775 lines), added
+  by commit `c21dce40d0b6bd4d0a62b78aaf5ee1c9649c7387` at committer time **2026-10-16T12:00:19Z**.
+  **Revisions 2 and 3 are superseded** by this revision, each for a recorded reason: the second SD-B
+  verdict of 2026-10-16 (issue comment `6214669507`, `REVISE`) found four false statements about live
+  artefacts inside revision 2's captured text — 12.3(a), 12.3(b), section 10 and section 13, with the
+  same stale head also in the section 3 preamble — and returned the plan to Stage A; the third
+  (issue comment `6215491017`, `REVISE`, 2026-10-16T12:27:36Z) found that revision 3's sections 12.3(a)
+  and 15.2 stated a body-revision count their own capture round had already superseded. What revision 4
+  changes is listed exactly in 16.1, and nothing else in this file moved. **The capture is off-head at
+  this revision exactly as at revision 3**, and 16.2 states what merging this pull request lands.
 - **Capture mechanism:** this file is committed as a **tracked file** on a **side branch** whose parent
   chain reaches the change head `0c994d77ad491bb329e07c056065b4d9bb8401ed`; the commit
   (`git commit -s`, DCO-signed) is the capture, and it changes **only** this file. **The change head is
@@ -465,13 +470,16 @@ above is corrected here.
   self-graded (AC12, declared in 3.3).
 - **The PR body's full revision history, and what it does and does not settle.** The body's
   revisions **are** retrievable, contrary to what revision 1 assumed: `userContentEdits` returns every
-  revision with its text, oldest first, and 12.3(a) below uses them to date the 11:23:42Z swap. The
-  count is not fixed, so no revision of this plan can state a number that stays true: it was **five**
-  recorded revisions when revision 1 was written and is **nine** as measured for revision 3. What the
-  list settles is *which* revisions exist and what each said; what it does not settle is authorship,
-  because GitHub shows one posting account for all of them. The SD-B verdict's read-time SHA-256 values
-  (full body `f34c1059…`, plan block `971118e6…`) remain read-time measurements and are **not** a
-  captured revision.
+  revision with its text, and 12.3(a) below reads them by timestamp to date the 11:23:42Z swap — the
+  order the connection returns is relied on nowhere in this plan. The count is not fixed, so no revision
+  of this plan can state a number that stays true. It is recorded as a chain of readings, each with its
+  moment: **five** when revision 1 was written; **nine** as measured for revision 3, inside the window
+  **2026-10-16T11:26:13Z to 11:56:37Z**; **twelve** by revision 3's own capture commit at
+  **2026-10-16T12:00:19Z**; and **thirteen** with `totalCount` 13 when re-measured with `first: 100` at
+  **2026-10-16T12:30:54Z**. What the list settles is *which* revisions exist and what each said; what it
+  does not settle is authorship, because GitHub shows one posting account for all of them. The SD-B
+  verdict's read-time SHA-256 values (full body `f34c1059…`, plan block `971118e6…`) remain read-time
+  measurements and are **not** a captured revision.
 - **That a future keeper is a different agent.** GitHub shows one posting account and the workflow
   records that agent identity is not separable there; the separation is a constraint on the recording
   act, checked by the process, not by a mechanism this plan can run.
@@ -605,7 +613,7 @@ body: changing the table voids the Stage F verdict even though the head has not 
 
 **(a) The placeholders in the PR body — the work is already done, and this prescription is withdrawn (corrected at revision 3).** Revision 2 stated here that "Body lines 112, 116 and 118 name `REPAIRCOMMIT` and `REPAIRBLOB` where the real values belong", and gave an exact five-token substitution to apply. **That statement is false against the posted body, and the work it assigns was already complete before revision 2 was captured.** Measured by command on the posted body: `REPAIRCOMMIT` occurs **0** times and `REPAIRBLOB` occurs **0** times, and the real values are already there — `0c994d77ad491bb329e07c056065b4d9bb8401ed` at body lines 112, 116 and 118, and `405dfd44295428064a0b603639b0e30614d29da1` at body lines 112 and 116.
 
-**How the staleness happened — measured by direct body-revision comparison, not by an edit count.** The body's own revision history (`userContentEdits`, oldest first, 9 revisions, totalCount 9) gives the two revisions either side of the change:
+**How the staleness happened — measured by direct body-revision comparison, not by an edit count.** The body's own revision history gives the two revisions either side of the change, and they are read by their **timestamps** below, so nothing here depends on the order the query returns. The ordering claim revision 2 made ("oldest first") is withdrawn as not reproducible: measured at 2026-10-16T12:30:54Z, a `userContentEdits` query with `first: 3` returned the three **newest** edits and one with `last: 3` the three oldest. **The count is not fixed, so no number is stated unqualified.** Queried with `first: 100`, the list held **9 revisions, `totalCount` 9** only inside the window **2026-10-16T11:26:13Z to 11:56:37Z** — the honest reading while revision 2 was drafted — and it was already **12** by this plan's revision-3 capture commit at **2026-10-16T12:00:19Z**, three of the four publishing edits preceding it. Re-measured at **2026-10-16T12:30:54Z** it returns **13 nodes with `totalCount` 13**. The two revisions used below are present in all of those readings:
 
 | Body revision | `REPAIRCOMMIT` | `REPAIRBLOB` | body characters | body bytes |
 | --- | ---: | ---: | ---: | ---: |
@@ -761,10 +769,19 @@ three bound fields, so the digest and the projection survive it unchanged.
   PR-body cap, including [a ClickHouse change that truncates issue bodies to it](https://github.com/ClickHouse/ClickHouse/pull/97567)).
   What **is** measured here is that the ceiling binds **characters, not bytes**: the live body is
   **65,705** UTF-8 bytes and is accepted, while its **65,531** characters sit 5 under the limit.
-- **That the body's revision list is complete.** `userContentEdits` returned `totalCount 9` with 9
-  nodes, so the list is not truncated by the query — but the API is the only witness to body revisions
-  and no earlier body byte is retained locally. The two revisions this section relies on
-  (10:55:30Z and 11:23:42Z) are both present and both quoted by their measured token counts and lengths.
+- **That the body's revision list is complete — a claim made only of the moment it describes.** The
+  list grows, so "not truncated" cannot be stated once and left standing. At the moment revision 2
+  recorded it — the window **2026-10-16T11:26:13Z to 11:56:37Z** — `userContentEdits`, queried with
+  `first: 100`, returned **`totalCount` 9** with **9** nodes, and 9 = 9 below the page size, so the list
+  was **not truncated at that moment**. That reading does not survive this plan's own capture round: by
+  the revision-3 capture commit at **2026-10-16T12:00:19Z** the count was already **12**, and re-measured
+  with the same query at **2026-10-16T12:30:54Z** the list returns **13 nodes with `totalCount` 13**. A
+  nine-node list against a `totalCount` of 13 **would** be truncated, so the earlier sentence must not be
+  read as current. What stands in its place is the equality, re-run at the moment of reading: **the list
+  is complete when the returned node count equals `totalCount` and both are below the page size** —
+  9 = 9 then, 13 = 13 now, both under 100. The API is the only witness to body revisions and no earlier
+  body byte is retained locally. The two revisions this section relies on (10:55:30Z and 11:23:42Z) are
+  both present in the 13-node reading and both are quoted by their measured token counts and lengths.
 - **That the applying agent will accept the 12.2 deletion.** It is a judgment about whether removing a
   duplicated method restatement is worth the space it frees. The plan states the fallback and its
   measured cost rather than deciding it for the applier; what the plan **does** decide is that the
@@ -773,3 +790,142 @@ three bound fields, so the digest and the projection survive it unchanged.
 - **CI at the implementation head** — owed to GitHub Actions after the capture push, and never
   self-graded (AC12, declared in 3.3). Unchanged from revision 2.
 - Plus every item already listed in sections 11 and 14, which this revision does not weaken.
+
+---
+
+# Part III — revision 4 additions (2026-10-16)
+
+Every line above this heading is revisions 1 to 3's text with the six corrections listed in 16.1
+applied; no other byte of it changed. Section 16 is new at revision 4.
+
+## 16. Revision 4 — the third REVISE, answered, and the off-head disposition stated
+
+**Why this revision exists.** The third independent plan audit — SD-B, issue comment `6215491017`,
+posted 2026-10-16T12:27:36Z by **DeepSeek-4.1-Flash (deepseek-flash)** — returned `REVISE` on one
+blocking finding: the captured revision-3 text stated **a body-revision count its own capture round had
+already superseded**. Section 12.3(a) read "`userContentEdits`, oldest first, **9 revisions, totalCount
+9**", and section 15.2 read "returned **`totalCount 9`** with 9 nodes, **so the list is not truncated by
+the query**". Nine was true only inside the window **2026-10-16T11:26:13Z to 11:56:37Z**; the count was
+already **12** by revision 3's own capture commit at **2026-10-16T12:00:19Z**, three of the four
+publishing edits preceding it; and a nine-node list against a live `totalCount` of 13 **would** be
+truncated, so 15.2's completeness inference asserted the opposite of what the query shows. Section 11
+had received the time-qualification at revision 3; 12.3(a) and 15.2 had not, which made the correction
+internally inconsistent with itself.
+
+*Gloss: SD-B = the independent plan audit, the second of the seven delivery stages; REVISE = its
+non-affirmative verdict, which returns the work to Stage A; `userContentEdits` = the GraphQL field that
+lists a pull request body's recorded revisions; capture = committing this plan as a tracked file so its
+exact text has an immutable content hash; blob = the content hash Git computes for one file revision;
+head = a branch's exact latest commit; off-head = the captured revision is committed on a side branch,
+so the pull request's own head does not contain it; Stage C = the implement stage.*
+
+### 16.1 The six corrections applied above, and every byte they cover
+
+| # | Revision 3 location | Defect the audit measured | Correction applied in revision 4 |
+| --- | --- | --- | --- |
+| 1 | section 12.3(a) | "9 revisions, totalCount 9" stated as a bare fact about the live artefact, and the list called "oldest first" | time-qualified and method-stated: **9** inside the window **11:26:13Z to 11:56:37Z**, already **12** by the capture commit at 12:00:19Z, **13** at 12:30:54Z; the query shape (`first: 100`) is named; the two revisions the paragraph uses are identified by timestamp, so the reading does not depend on list order |
+| 2 | section 15.2, second bullet | "returned totalCount 9 with 9 nodes, so the list is not truncated by the query" — not reproducible, and false as written against a 13-node list | the completeness claim is now made only of the moment it describes, and the standing test is the **equality** node count = `totalCount` below the page size, re-run at the moment of reading; the 12:30:54Z reading (13 = 13) is recorded beside it |
+| 3 | section 11, third bullet | "is **nine** as measured for revision 3" left the then-current count in the present tense, and the same "oldest first" ordering claim stood here too | the qualification now runs **five, then nine (11:26:13Z to 11:56:37Z), then twelve (12:00:19Z), then thirteen (12:30:54Z)**, each with its moment; the ordering claim is withdrawn here as well and the list is read by timestamp |
+| 4 | section 3.2, **AC1** and **AC9** | AC1's own threshold (`git rev-parse <head>:<path>` equals the blob the body names) returns **false** at the change head, which carries revision 1's blob; only AC3 said "at this plan's capture revision" | both now name the **capture revision** as the ref at which the equality holds, and state the head's value explicitly (revision 1's blob `ac8da53e...`) |
+| 5 | section 9, the capture record | it described revision 3 as current while this revision supersedes it, and did not name revision 3 among the superseded blobs | now the revision-4 capture record: it names revision 3's blob, byte count, line count, capturing commit and committer time, and records both superseding verdicts |
+| 6 | sections 16.2 and 16.3 | no disposition existed for the fact that the capture is **off-head**, which both prior audits recorded as a note and left to the drafter | 16.2 states the disposition, the blob that merges, and the duty a head-moving round inherits; 16.3 records what remains unverified |
+
+**Corrections 1 and 2 are the audit's ground. Corrections 3 to 6 were found here, at revision 4.**
+Correction 3 removes the inconsistency the ground itself names — its complaint was that section 11 got
+the time-qualification and 12.3(a) and 15.2 did not, and extending section 11's chain to the fresh
+reading is what makes the three statements one statement. Correction 4 is the note the audit recorded
+and expressly left to the drafter ("the one criterion a reader can run and get a false answer from").
+Correction 5 is mechanical: the capture record must describe the revision it is in. Correction 6 is the
+second note; the audit asked for a disposition, not a fix, and 16.2 gives one. **No superseded value is
+erased:** each is named in the table above, which is the same treatment 12.1 gave revision 1's text and
+15.1 gave revision 2's.
+
+**What the audit verified, and what this revision re-measured rather than inherited.** Every figure
+below was re-derived by command while writing revision 4, and none of them moved:
+
+- the **404-character deletion** the 12.2 disposition authors: the two strings are **204** and **200**
+  characters, each occurs **exactly once**, at body line **247** and body line **249**; the three bound
+  fields occupy body lines **148-192** (skills), **196-201** (security) and **218-231** (witness), so
+  both deletions lie **outside all three**; the body is **65,127** characters after them and the digest
+  is **unchanged** at `9d8d2f26e69cca4b`;
+- the **five substitutions**, each gaining exactly **50** characters, giving **65,377** characters,
+  **159 under** the ceiling, digest `c00e879d68f7c9c0` with the skills payload at **30,216**;
+- the ceiling binds **characters, not bytes**: the live body is **65,705** UTF-8 bytes and is accepted,
+  while its **65,531** characters sit 5 under the limit;
+- the **18 of 18** exact-copy property holds now and holds after the repair, and the file-only fallback
+  is **13 of 18**, as 12.2 states with its cost and does not apply;
+- the **digest method** self-pins **4 of 4** on the sibling pull requests, each read from its own live
+  body and normalised to LF after fetch: #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`,
+  #792 `88300e711714200a`, #795 `5fabf87b2df899e9`; #789 then reproduces `9d8d2f26e69cca4b` with
+  payload lengths **1,259 / 29,966 / 40**;
+- the **instrument** at the base reads `reader_pages_in_tree 655, accepted_on_recorded_review 56,
+  provably_pending 5, no_recorded_acceptance 588, cannot_decide 6, official_pending_count 599`, and at
+  the live `main` tip `658 / 56 / 5 / 591 / 6 / 602`; pending **593** and **596**, `ceil(593/4) = 149`
+  and `ceil(596/4) = 149`;
+- the lane A records of batches 1 to 4 concatenate to **exactly lane A's first 32 paths, in order, with
+  0 duplicates**, and the eight paths section 5 names for the next batch are **exactly lane A's paths
+  33 to 40**;
+- the **APR-117 pairing sweep** is clean at this revision: `APR-117` is offered nowhere as authority to
+  record, and the recording authority is `APR-101` everywhere it is named.
+
+### 16.2 The off-head capture, and what merging this pull request lands
+
+**The fact, re-derived by command.** The plan path resolves to **revision 1's** blob at the change head,
+not to the revision the PR body names: `git rev-parse
+0c994d77ad491bb329e07c056065b4d9bb8401ed:docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md`
+returns `ac8da53e011796bc9086a355b14e4cc9fca8eb81`, while this capture is committed on the side branch
+`docs/readability-lane-a-batch-4-plan-rev4-20261016`, whose parent chain reaches that head. The branch
+that carries the pull request is `docs/readability-lane-a-batch-4-20261015`, and it is **not** where a
+capture lands. Neither audit made this a ground; both recorded it as a note and left the disposition to
+this stage, and this is that disposition.
+
+**The disposition: the accepted revision is off-head, and what merges is revision 1.** Merging this pull
+request as it stands lands **revision 1's blob `ac8da53e...`** at that path — the text revisions 2, 3
+and 4 exist to supersede — while the PR body advertises revision 4 as the plan of record. That is a
+disclosed property of capturing on a side branch, not a falsehood; but revision 1 does not itself
+disclose its supersession, because its own section 9 tells the reader that "the head that carries the
+capture is the implementation head for the following stages", which the PR body and the later revisions
+now contradict. **So the of-record revision is named in the PR body and in the capture comment, and this
+section is where the plan states, in its own bytes, which revision the pull request carries.**
+
+1. **The revision this plan's audits bind is the side-branch blob named in the PR body**, not the blob
+   at the change head.
+2. **What merges under this pull request is revision 1's blob
+   `ac8da53e011796bc9086a355b14e4cc9fca8eb81`** unless and until a later, separate round carries a later
+   revision into the pull request's own branch.
+3. **Carrying a later revision into the pull request is a head-moving act, and it is NOT performed
+   here.** It would move the change head and void the head-bound verdicts, and it would make this text
+   stale in exactly the way this revision is answering: at a head carrying this file, section 2's
+   file-set row, its per-commit scopes and its 1282/0 total, section 10's rows 1-2, 9 and 12, and AC1,
+   AC3 and AC9 all change — the plan path would become **modified** rather than added, and the commit
+   and sign-off counts would both grow. **A round that moves the head must re-derive those values at the
+   head it produces**, and must re-audit there; that is a duty this section states, not a forecast it
+   makes.
+4. **The values this plan binds as final are bound to a named head, and this round moves none.** The
+   head `0c994d77...`, the diff scope, the commit count (**5**) and the sign-off count (`OK: 5 commit(s)
+   checked, all signed off or exempt.`) recorded above are true **at that head** and at this capture
+   revision. **This round contains no head-moving commit** — the capture lands on a side branch and the
+   change head is unmoved — so nothing here supersedes them. A rule of this programme holds that a plan
+   may not bind a head, a diff scope, a commit count or a sign-off count as a final value **in the same
+   round as a head-moving commit**; this round moves no head, and the duty that any later head-moving
+   round inherits is stated in item 3 above, by content rather than by any label.
+
+**What this disposition does not do.** It does not move the head, does not edit the pull request's
+branch, does not apply the Stage C repair text of section 12, decides no page's acceptance, and confers
+no merge authority. It records, inside the plan, which revision the pull request carries and which
+revision its audits bind, and it names the one act that would change that together with its cost.
+
+### 16.3 What revision 4 could not verify
+
+- **That GitHub's body ceiling is exactly 65,536 characters.** Unchanged from 15.2 and from the audit's
+  own concession: the negative **is** measured — the live body is **65,705** UTF-8 bytes and is
+  accepted, so the ceiling cannot bind bytes — while the exact figure is not, because testing it means
+  editing the body. The plan keeps the figure it was audited against and claims only what it measured.
+- **That the page size behind revision 2's original `userContentEdits` reading was `first: 100`.** The
+  page size now recorded in 12.3(a) and 15.2 is the one **this revision** used; revision 2 did not state
+  its own, which is exactly why 15.2's completeness inference is now stated as an equality to be re-run
+  rather than as a number.
+- **That no further body revision will be recorded after the 12:30:54Z reading.** The count is not
+  fixed; every figure this revision records carries the moment it was taken for that reason.
+- **That the eight pages were read "whole, line by line, in one read"**, and every other item already
+  listed in sections 11, 14 and 15.2, none of which this revision weakens.
