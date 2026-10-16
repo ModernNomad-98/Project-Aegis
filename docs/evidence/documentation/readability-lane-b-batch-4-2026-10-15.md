@@ -268,21 +268,26 @@ examples exist on B4-1 (the severity ladder table L14–19 and the finding-dispo
 B4-2 (the output template L116–134 and the false-confidence gotcha L158–161, "a 200 with the wrong
 row persisted"), B4-3 (the classification table L10–19 and the hand-inserted-row example L33–35),
 B4-4 (the output template L119–136 and the template-field glosses L16–19), B4-5 (the per-transport
-table L11–17 and the seven-case red-team catalog L79–88), B4-6 (the worked predicate L108–109 and
+table L11–17 and the eight-case red-team catalog L79–88), B4-6 (the worked predicate L108–109 and
 the "UI already filters" IDOR gotcha L197–198), B4-7 (the clause checklist L21–29 and the Annex A
 theme walk L37–42), B4-8 (the three-assessments table L25–31 and the shipped-mechanism map L48–58).
-(d) *Shipped behaviour separated from proposed or blocked behaviour* — B4-1 marks its clause map a
-"planning map" and keeps the licensed-text verification boundary (L16–17); B4-2 states the skill
+(d) *Shipped behaviour separated from proposed or blocked behaviour* — B4-1 is a load-on-demand
+detail file (L3) that ships **template wording and the severity ladder** and defers the
+runbook-authoring workflow and its authority limits to its own parent skill (L9–10), and it keeps an
+unowned action item open and escalated until an authorized owner explicitly accepts a named risk
+(L55–56); B4-2 states the skill
 "does not provision either environment" (L103–104) and routes live failures to Stop Conditions
 (L171–186); B4-3 defers provider shape-drift detection to `api-contract-test-designer` (L51–53);
 B4-4 states "authenticated ≠ trusted" and that approval text is inert unless verified against the
 system of record (L160–165); B4-5 labels its expected outcome "accepted-but-inert" and routes
 enforcement to a harness (L74–77); B4-6 states the migration is "DESIGNED, not executed" (L145–147)
 and defers RLS SQL correctness (L172–173); B4-7 keeps "verification items against the licensed text"
-(L4–5) and warns against citing counts (L34–35); B4-8 keeps "Annex A counts are never stated"
+(L4–5), labels its clause structure "a planning map" that retains that licensed-text verification
+boundary (L16–17), and warns against citing counts (L34–35); B4-8 keeps "Annex A counts are never stated"
 (L8–9) and the licensed-text check (L20–21). (e) *Navigation links current and every referenced file
-or command existing* — the mechanical pass above: 9 local links, 0 broken, 0 dead; 69 backticked
-skill-name occurrences across 36 distinct skills, all present at the base; every named
+or command existing* — the mechanical pass above: 9 local links, 0 broken, 0 dead; 92 backticked
+skill-name occurrences across 36 distinct skills, all present at the base (this figure was "69" in
+the first version of this record; it is re-measured and corrected in section 11); every named
 `references`/`evals` file present; the 3 external `iso.org` links counted but not fetched.
 (f) *The non-author review itself* — this record; the reader wrote none of the eight pages. The
 last-touching commit per page is by another author in every case: B4-1 `93f61627` Peter Nguyen,
@@ -335,6 +340,87 @@ test).**
   `iso-42001-aims-architect` to plan AIMS artifacts, keep the three assessments distinct, and reuse
   existing mechanisms instead of rebuilding them.
 
+### 3b. Which of the flagged terms are library conventions — measured at the base
+
+**Why this subsection exists.** Section 3a flags eight pages. Some of the terms it flags are left
+unglossed across much of this library, so a gap on one of them is weak evidence that *this* page is
+the defective one. The measurement below separates the two classes, so the keeper and later readers
+can weigh each PARTIAL instead of treating all eight as equal. **It changes no disposition here** —
+see the disposition note at the end of this subsection.
+
+**Method, stated so it can be re-run.** The page set is the one section 2 derives (every `.md` in
+the tree at `f490c16f9ed23f3d489e42f7696323bffcce6fd3`, minus the `scripts/` fixtures except
+`scripts/tests/fixtures/README.md`, minus `docs/audits/skill-contract-audit-baseline.md`). My run
+derives **655** paths, equal to the checker's own `reader_pages_in_tree` 655. Every page's bytes were
+read from its git blob at the base (`git cat-file --batch`), never from a working tree. A page
+"uses" a term when the term matches there as a word; a page "leaves it unglossed" when the term's
+expansion does not appear **at or before the term's first use on that page** — the same "at first
+use" shape the section 3a test applies, so this table measures the thing the dispositions measure.
+
+**Class rule, stated so it can be challenged:** a term is a **library convention** when at least 50 of
+the 655 pages use it **and** at least half of those pages leave it unglossed at first use. Otherwise
+a gap on it is treated as page-specific.
+
+| Flagged term | Pages that use it (of 655) | Pages that leave it unglossed at first use | Class under the stated rule |
+| --- | ---: | ---: | --- |
+| `authz` | 51 | 29 (57%) | **library convention** |
+| `SaaS` | 63 | 53 (84%) | **library convention** |
+| `E2E` | 50 | 39 (78%) | **library convention** |
+| `API` | 205 | 176 (86%) | **library convention** |
+| `LLM` | 59 | 26 (44%) | not a convention — below the half-way mark |
+| `ambient` | 11 | — (page-specific label) | not a convention |
+| `PDF` | 9 | 9 | not a convention — rare term |
+| `5xx` | 5 | — (page-specific label) | not a convention |
+| `mgmt` | 5 | 1 (B4-7 is that one page) | not a convention |
+| `stdio` | 3 | 3 | not a convention — rare term |
+| `non-prod` | 2 | 2 | not a convention — rare term |
+| `TCP` | 1 | 1 | not a convention — rare term |
+
+**Honest note on the four headline rows: the Stage D audit published different figures for two of
+them, and I record both runs rather than harmonising them silently.** The audit's published
+measurement is `authz` 38 of 51, `SaaS` 32 of 63, `E2E` 39 of 50 and `API` 176 of 205. I
+reproduce all four figures by running the audit's own scripts, but **they do not all come from one
+definition**: its `authz` figure counts pages with no *explicit definitional pairing* ("authorization
+(authz)", or "authz means/is/denotes"), its `SaaS` figure counts pages where the expansion text
+appears nowhere, and its `E2E` and `API` figures use the "not expanded at or before first use"
+definition this table uses. Re-run under this table's single definition, the same 655 pages give
+`authz` **29**/51 and `SaaS` **53**/63, with `E2E` 39/50 and `API` 176/205 unchanged. A later
+reader who re-derives one row and gets a different number should know that the two published
+`authz`/`SaaS` figures were produced under a stricter test, not that one of the runs is wrong. The
+classification is the same under either run.
+
+**Which pages of this batch the conventions affect — exactly two.** `authz`, `SaaS`, `E2E` and
+`API` appear as flags on **B4-6** (`authz`, `SaaS` — and nothing else) and **B4-2** (`E2E`,
+`API`, `authz` — and nothing else). **Every other page in the batch keeps at least one gap that is
+not a library convention:**
+
+- **B4-1** — `non-prod` (2 of 655 pages use it, both unglossed) and the one-letter `h` placeholder.
+- **B4-3** — `LLM` (59 pages use it, 26 leave it unglossed — under the half-way mark), plus
+  `ambient` (11 pages) and `5xx` (5 pages), both page-local table labels.
+- **B4-4** — `stdio` (3 of 655 pages) and the internal review codes `ASI07`/`ASI04`.
+- **B4-5** — `ASI07` in the page title, `stdio` (3 of 655) and `TCP` (1 of 655).
+- **B4-7** — `mgmt` (5 pages use it; B4-7 is the one page that leaves it unglossed), `PDF` (9
+  pages, unglossed on all 9), the internal code `D28` and the internal label "shipped Phase 3/4 packs".
+- **B4-8** — the internal label "Phase 7 + 7.5 packs" and the named scheme
+  `GOVERN/MAP/MEASURE/MANAGE`.
+
+**Disposition on the convention flags — stated explicitly, and deliberately not changed here.** Read
+strictly, this measurement says **B4-6's PARTIAL rests on exactly two flags, both library
+conventions, with no page-specific gap behind it**; under the ruling that an unglossed library
+convention is not a defect, **B4-6 is an over-flag and its disposition would be `full`, not
+partial**. **B4-2** rests on `E2E`, `API` and `authz` — all three conventions — and additionally on
+the frontmatter-description rule batch 3 applied to B3-3/B3-5/B3-6/B3-8, so it is
+methodology-dependent twice over. **This repair changes neither disposition**, for three reasons:
+(1) "an unglossed library convention is not a defect" is a process ruling the owner has not made,
+and a Stage C lane cannot make it; (2) changing a disposition would move a page between the accepted
+and pending buckets, which a repair of an evidence record has no authority to do; and (3)
+`0 full / 8 partial` is this batch's audited claim, and a repair must not quietly rewrite an audited
+claim into a different one. **A re-audit is owed for B4-6** before any keeper acts on it: the parent
+should rule on the convention question first, and a fresh, independent audit at the then-current head
+must confirm any changed disposition. **If the frontmatter-position rule is relaxed as well, B4-2
+owes the same re-audit**; if it is not, B4-2's PARTIAL stands on that rule regardless of the
+conventions.
+
 ## 4. Count honesty
 
 - **0 full / 8 partial.** No page in this batch carries a full acceptance. **B4-1 is the nearest to
@@ -346,10 +432,35 @@ test).**
   switch requires. This batch records **no rows**, so nothing moves at this lane's head except this
   record itself, which enters `no_recorded_acceptance` (+1 reader page, +1 official pending —
   656 / 600 at the lane's head).
-- **The eight partial dispositions must not move pages out of pending on rows that ignore the
-  partials.** The eight pages stay pending until a keeper records them as partial (row type per
-  **AEGIS-APR-116**, the approval that lets the ledger keeper record targeted reviews in the
-  acceptance table).
+- **A page marked PARTIAL gets no acceptance row.** All eight pages of this batch are **partial**,
+  so **no row of any kind is recorded for any of them, and all eight stay PENDING.** The ledger's
+  fixed-format contract names four event kinds — `full-page-acceptance`, `targeted-review`,
+  `withdrawal` and `lost-commit` — and has **no partial-acceptance kind**; of its own partial pages
+  the ledger says they "keep only their withdrawal rows and stay **pending**" and "carry no acceptance
+  row" (ledger L5136–5142), and the PARTIAL rule is explicit: **"a page a lane marked PARTIAL is
+  never recorded as a full-page-acceptance"** (ledger L5144–5155).
+- **AEGIS-APR-116 is not the row type for these pages and does not apply to them.** That approval is
+  scoped to "an independent reviewer's check of a small edit of 10 lines or fewer, on the exact
+  revision, **so the page stays accepted**" (register L5002–5006, applying the existing small-edit
+  rule): it presumes a page that is, or remains, accepted. This lane edited none of the eight pages
+  and accepted none of them, so the targeted-review row that approval authorises is not available
+  for them. **An earlier version of this section said "row type per AEGIS-APR-116"; that was wrong
+  and is corrected here.**
+- **Why the distinction is not pedantic.** `check_index.py` L181–184 classifies a **zero-drift**
+  page carrying any non-`lost-commit` row as **`accepted`**, so a targeted-review row authored for
+  a partial page would read as an acceptance at the next rebuild, move the page out of pending, and
+  undercount the official pending total — the laundering class the 2026-10-15 correction exists to
+  stop.
+- **What this record now tells the keeper, in one sentence: record no acceptance row, of any event
+  kind, for any of the eight pages — every one is PARTIAL and every one stays PENDING.** The handoff
+  under AEGIS-APR-101 / AEGIS-APR-117 is therefore **no rows for this batch**, not rows of a different
+  type; a page leaves pending only when a later, independent reviewer records a **full** acceptance
+  supported by fresh evidence. This agrees with section 5 — every verbatim row-quote string begins
+  `partial`, and "a line that says `partial` must never be copied into a full-page-acceptance row" —
+  and with the pull request body, which now states the same rule in the same words ("Partial
+  dispositions keep the eight pages **pending** until the keeper records them; they must not be
+  recorded as full acceptances. **A page marked PARTIAL gets no acceptance row of any kind — no
+  `full-page-acceptance` row and no `targeted-review` row.**").
 - The instrument figures at the base are quoted in section 1 and are not re-derived here.
 
 ## 5. The row-quote strings, verbatim
@@ -372,8 +483,10 @@ B4-8 partial: .claude/skills/iso-42001-aims-architect/references/aims-clause-map
 
 ## 6. Skills applied and not applied (this lane, Stage C)
 
-All six skills below were read in full this session and applied at the step each names. None is
-padded.
+**Five** skills below were read in full this session and **applied** at the step each names. **A
+sixth — `skill-quality-reviewer` — was read and is recorded as NOT applied** (validator gate only):
+its substantive checks and its ship/revise/reject verdict were not performed, so counting it as
+applied would report work that did not occur. None is padded.
 
 - **`change-classification-gate`** (the skill that decides what class of change this is) —
   **applied.** Classified this change `docs-only` before writing: one new evidence record under
@@ -397,23 +510,30 @@ padded.
   for an approval already granted) — **applied.** Read **AEGIS-APR-039** (the standing owner
   approval for backlog work: commits, pushes and pull requests), **AEGIS-APR-101** (keeper
   independence), **AEGIS-APR-116** (targeted-review rows) and **AEGIS-APR-117** (the withdrawal and
-  re-record route) at the base. Result: this change records under AEGIS-APR-101 and delivers under
-  AEGIS-APR-039; it consumes, extends and requests no grant; it authors no rows.
-- **`skill-quality-reviewer`** (the skill that reviews a skill document for quality) — **applied
-  in its validator-first role only.** Its validator-first rule was followed:
-  `scripts/validate-skills.py` ran to exit 0 (`OK: 205 skill(s) valid, 0 warning(s)`) before any
-  judgment, and no validator check was re-scored. Its stop condition ("this skill reviews and
-  changes nothing") held: zero edits to any read page. The eight pages were read for acceptance, not
-  quality-scored; no ship/revise/reject verdict is claimed here.
+  re-record route) at the base. Result: **AEGIS-APR-101 was consulted for the later keeper handoff,
+  not exercised by this write** — this agent authors no row, so the evidence write itself is
+  delivered under **AEGIS-APR-039**; it consumes, extends and requests no grant; it authors no
+  keeper rows.
 - **`ai-closeout-reporter`** (the skill that shapes the end-of-work report) — **applied to the
   pull-request body.** Its closeout sections shape the PR body: an explicit "Intentionally not done /
   omitted" list, files touched from git output, validation with the actual commands and results,
   skipped validation with reasons, and the next-action handoff.
 
-Not applied, and why: `docs-retention-index` and `skill-usage-ledger` (used by sibling lanes)
-were not consulted — no retention entry exists for `docs/evidence/documentation/` pages and this
-record creates none, and the lane's skills record is stated inline in this section rather than
-through the ledger's six-field format; no other skill in the catalog owns any step of this batch.
+Not applied, and why:
+
+- **`skill-quality-reviewer`** (the skill that reviews a skill document for quality) — **NOT
+  applied; validator gate only.** Its validator-first gate was honoured (`scripts/validate-skills.py`
+  ran to exit 0, `OK: 205 skill(s) valid, 0 warning(s)`, before any judgment, and no validator check
+  was re-scored) and its stop condition ("this skill reviews and changes nothing") held — but the
+  gate is the skill's entry ticket, not its workflow. Its substantive quality checks and its
+  ship/revise/reject verdict were **not** performed: the eight pages were read **for acceptance**,
+  not quality-scored, and no verdict is claimed. Recording it as applied would report work that did
+  not occur, so it is recorded here instead, labelled "validator gate only".
+- **`docs-retention-index`** and **`skill-usage-ledger`** (used by sibling lanes) — not consulted:
+  no retention entry exists for `docs/evidence/documentation/` pages and this record creates none,
+  and the lane's skills record is stated inline in this section rather than through the ledger's
+  six-field format.
+- No other skill in the catalog owns any step of this batch.
 
 ## 7. Keeper rows — withheld, by design (the AEGIS-APR-117 route)
 
@@ -465,7 +585,7 @@ deployment authority" (ledger, batching section). The reader is the **DeepSeek-4
 | 7 | `python -B scripts/validate-skills.py` | exit 0 — "OK: 205 skill(s) valid, 0 warning(s)" |
 | 8 | `python -B scripts/tests/test_validator.py` | exit 0 — "OK: 181 gate self-test assertion(s) passed." |
 | 9 | 40-hex token scan over the 8 pages | 0 on every page |
-| 10 | backticked skill-name existence check against the tree at the base | 69 occurrences, 36 distinct, 0 missing |
+| 10 | backticked skill-name existence check against the tree at the base | 92 occurrences, 36 distinct, 0 missing (corrected in section 11; was "69") |
 | 11 | per-path check against `tools/readability_acceptance/acceptance-index.json` `reader_pages` | all 8 paths absent from the emitted lists (pending, as derived) |
 | 12 | `git log -1 --format="%h %an %s" f490c16f9ed23f3d489e42f7696323bffcce6fd3 -- <page>` × 8 | other authors only (section 3, bullet f) |
 | 13 | whole-file line count, twice by independent means (git object bytes; read tool end-of-file) | 75/195/53/215/88/229/74/71 — agree |
@@ -475,12 +595,94 @@ deployment authority" (ledger, batching section). The reader is the **DeepSeek-4
 
 ## 10. Timing
 
-- **Work item name:** Phase 4 re-read — Lane B, Batch 4 (pages 25–32 of lane B's quarter; sorted
-  indices 172–179, 1-based 173–180, of the pending list).
+- **Work item name:** Phase 4 re-read — Lane B, Batch 4. **Page numbers, disambiguated:** these are
+  **positions 24–31 inside lane B's current quarter** (0-based sorted indices 172–179 of the pending
+  list, 1-based 173–180), **not 25–32**. "Pages 25–32" is true only as the **cumulative** count of
+  pages this lane has now read — batches 1–3 read 24 — and it is the older boundary at index 148 that
+  makes the two readings differ. A later batch resuming from this label resumes at **lane position
+  32** (index 180), not 33.
 - **Start:** **2026-10-15T18:29:31-07:00** (harness clock at this lane's first turn).
 - **Finish and measured wall time** are recorded in the pull-request body closeout. **Active time
   was not instrumented**; wall time is labelled an imperfect comparison with any active-time
   expectation, and no per-page active rate is claimed.
+
+## 11. Repair round — 2026-10-15 (Stage C repair after SD-D: REVISE)
+
+**SD-D** is the independent implementation-audit stage's verdict on this batch (gloss: the Stage D
+audit reads the change and returns ACCEPT or REVISE; it does not fix it). It returned **REVISE** at
+head `6443ff870be4df5a03fd1cc04b818fead20af468`. The automated reviewer **Codex** raised **1 P1 +
+4 P2** comments on this PR (five review comments in total) — all five bound to `original_commit_id`
+`b03e6bc4c9dfe4c433b0b1ea967347e93769e254`, the **pre-correction** head — and the correction commit
+`6443ff87` addresses **none** of them: it changes only the keeper-ID-allocation citation, adds
+section 2a and adds validation rows 15–16. This section records every finding and its disposition.
+The repairs were made by **DeepSeek-4.1-Flash (deepseek-flash)** — the same model as the original
+Stage C lane — stated per the repository's 2026-10-13 attribution rule.
+
+- **Codex P1 (r4290065866) — "Do not record partial reviews as targeted reviews": CONFIRMED and
+  fixed.** The reasoning is in section 4, which now states that **a page marked PARTIAL gets no
+  acceptance row of any kind** and that all eight pages stay pending. The P1's own evidence is
+  reproduced in section 4 from the artifacts (ledger L5136–5142, ledger L5144–5155, register
+  L5002–5006, `check_index.py` L181–184).
+- **Codex P2 (r4290065869) — "Replace the copied B4-1 criterion evidence": CONFIRMED and fixed.**
+  Section 3(d) now cites B4-1's own text (L3, L9–10, L55–56). The "planning map"/"licensed-text
+  verification boundary" wording was **B4-7's** at B4-7 L16–17 and is now cited to B4-7 there.
+- **Codex P2 (r4290065880) — "Correct the batch's lane-relative page numbers": PARTLY VALID;
+  disambiguated.** "Pages 25–32" was true as the cumulative count of pages this lane has read
+  (batches 1–3 read 24) and false as a position inside the current quarter, which is **24–31**.
+  Section 10 now states both readings and the resume point (lane position 32, index 180). The
+  finding is right that the bare label could make a later batch skip index 180.
+- **Codex P2 (r4290065875) — "Do not count the validator gate as a skill-quality review":
+  CONFIRMED and fixed.** Section 6 now records `skill-quality-reviewer` as **NOT applied —
+  validator gate only** (its gate was honoured, its substantive checks and its ship/revise/reject
+  verdict were not performed), and section 6's applied list is five skills, not six.
+- **Codex P2 (r4290065886) — "Do not claim APR-101 for the reader's evidence write": CONFIRMED as
+  loose wording; fixed.** Section 6 now says AEGIS-APR-101 was **consulted for the later keeper
+  handoff, not exercised by this write**, and that the evidence write itself is delivered under
+  AEGIS-APR-039. The pull-request body's row says the same.
+- **SD-D finding, not in Codex — the body's DCO count: CONFIRMED and fixed.** The body's checklist
+  said `OK: 2 commit(s) checked` while its validation table said `OK: 1 commit(s) checked`. Measured:
+  `python -P scripts/check_dco.py --range f490c16f..HEAD` → exit 0, `OK: 2 commit(s) checked, all
+  signed off or exempt.`, and `git rev-list --count f490c16f..HEAD` → 2. The table's copy was stale
+  from before the correction commit; it now reads 2.
+- **SD-D finding, not in Codex — the seven-case/eight-case catalog contradiction: CONFIRMED and
+  fixed.** Section 3(c) said "seven-case" while section 3(e) said "eight-case". Measured on the page:
+  B4-5's catalog table at L79–88 has **8** data rows (Peer spoof … Off-map edge). Section 3(c) now
+  reads "eight-case"; the two copies agree.
+- **SD-D finding — library-norm over-flags: MEASURED, recorded in section 3b, and no disposition
+  changed.** Section 3b states the counts (the audit's published `authz` 38/51, `SaaS` 32/63,
+  `E2E` 39/50, `API` 176/205, and my single-definition re-run `authz` 29/51, `SaaS` 53/63, `E2E`
+  39/50, `API` 176/205), names the two pages they affect (**B4-6**, **B4-2**), and states the
+  disposition explicitly: neither page's disposition is changed here — **a re-audit is owed for
+  B4-6**, which now stands as the record's one over-flag candidate, and conditionally for B4-2 if the
+  frontmatter-position rule is relaxed.
+- **SD-D finding — body label glosses: CONFIRMED and fixed.** The pull-request body's witness rows 1–2
+  now gloss the `MG` and `SD` blocks in the same words PR #783 uses, and the `scoped-approval-register`
+  row now glosses `AEGIS-APR-039`, `AEGIS-APR-101`, `AEGIS-APR-116` and `AEGIS-APR-117` rather than
+  listing bare IDs.
+
+- **SD-D "could not verify" item — the backticked-skill occurrence count: CONFIRMED
+  unreproducible; corrected.** Section 3(e) and validation row 10 said "69 occurrences, 36 distinct
+  names". Re-measured over the same eight pages with the same skill-name set (every
+  `.claude/skills/<name>` directory at the base, read from `git ls-tree`), counting every backticked
+  token that is a skill name: **92 occurrences, 36 distinct** — the distinct figure reproduces
+  exactly, the occurrence figure does not. Variants tried (excluding markdown link destinations,
+  excluding frontmatter, excluding fenced code — all still 92; counting once per (page, name), 55; the
+  audit's own variants, 92/85/75/55) produce no reading of 69, so the figure is **corrected to the
+  measured one** rather than left standing.
+
+**The two bound-field edits this repair makes are inside the body's `witness` and `skills` fields**
+(the witness rows 1–2 and the `scoped-approval-register` row), so **the body's Stage C bound-field
+digest moves**. That is stated in the body at its digest line, with the consequence the repository's
+protocol requires: **a bound-field edit voids any verdict that named the old figure, and fresh
+verdicts are owed at the new head.** No page, ledger, tool, workflow or approval file was touched by
+this repair; no keeper row was authored or edited; nothing was merged.
+
+**Repair arithmetic, counted not regexed.** Against the audited head `6443ff87` this repair
+**replaces** text: enumerating every raw diff line beginning with `-` (excluding the `---` file
+header) gives **27 deleted** lines and **229 added** lines; three of the deleted lines themselves begin
+with `--`, which a naive pattern misses. Against the named base `f490c16f` the pull request is
+still **additions only** — this record does not exist at that base, so the tree-to-tree diff is
+**690 insertions and 0 deletions**, and the record's own length is **690 lines**.
 
 ---
 
