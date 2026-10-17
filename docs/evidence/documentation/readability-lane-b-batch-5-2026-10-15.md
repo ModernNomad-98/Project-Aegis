@@ -58,6 +58,25 @@
   row. No page was edited and the changed-path set is unchanged. No verdict posted at `29e5bd2c…`
   is reused — its Stage D, E and F verdicts and its Codex review are void for this rewrite.
 
+- **Fifth correction — the Stage C round-4 record repair, made after Stage F REVISE (comment
+  6238768566) on head 63b607561dea60ea8f4f8aef5a7391fde7da2f5e, disclosed rather than hidden.**
+  Stage F's minor finding F-2 recorded two stale footer figures; both are corrected forward here,
+  with the superseded values kept visible rather than rewritten, and no other record line is
+  changed. **D-1 — the #792 drift note.** The footer stated that GitHub edited pull request
+  #792's body **8** times, most recently at **2026-10-17T07:57:42Z**, with live digest
+  `0121693ca2786800`. Re-measured live this round: `userContentEdits.totalCount` is **9**, the
+  latest `editedAt` is **2026-10-17T15:31:10Z**, and the canonical live digest over the three
+  bound fields (whole-line sentinels, whitespace collapsed, joined witness → skills → security) is
+  **`8693e9d0bd134cc9`** at payload lengths **1,943 / 58,940 / 40**. The 8-edit / 07:57:42Z /
+  `0121693ca2786800` figures are the prior round's dated measurement and remain recorded as
+  **superseded, not rewritten**. **D-2 — the `c140672e` predecessor extent.** The footer stated
+  that predecessor digest over **70,043** bytes and lines 1-821. Re-derived this round, it
+  reproduces over **65,395** bytes and lines 1-821 (sha256
+  `c140672e82fe94a4e6a3df7e316b8022b4335809263e509dd96ea372b5439dff`); **70,043** is that
+  predecessor edition's own whole-file size (881 LF lines), not the digest's coverage. The footer
+  below carries both dated forward corrections; this round's footer digest is recomputed over the
+  corrected bytes and stated there.
+
 - **Lane:** PHASE 4 RE-READ LANE B. *Phase 4 re-read* is the fourth phase of the documentation
   readability backlog — a whole-page re-read of every page that has no recorded full-page
   acceptance; *lane B* is the second of the four contiguous count-based quarters of that sorted
@@ -1062,11 +1081,11 @@ message to the coordinator so that a later auditor can read it in the artifact.
 
 ## Footer
 
-sha256: 3e07e1eb64b7979c6c48dbcc5aac70cb2bfcd6714f53d4287f075696421a6a58
+sha256: 6696eee123fecb2cc86bf8ab60c2e403a6505eef1246e7fdfc7220c5f37fa56b
 
 This digest covers the batch record's bytes from the first line through the closing `---` rule line
-and its terminating newline, encoded UTF-8 with LF line endings: exactly 97944 bytes, byte offsets
-0 through 97943 inclusive, lines 1-1061. It does not cover the blank
+and its terminating newline, encoded UTF-8 with LF line endings: exactly 99556 bytes, byte offsets
+0 through 99555 inclusive, lines 1-1080. It does not cover the blank
 separator line between that rule and the `## Footer` heading, nor this footer. Any edit above the
 rule needs a fresh validation. **This footer digest is recomputed at this head** over the bytes the
 plan-revision-2 Stage C rewrite corrected (the header's fourth disclosure bullet, the pinned
@@ -1074,12 +1093,16 @@ frontier provenance and its 144-path inventory, the UNVERIFIED independence meas
 PARTIAL dispositions with their named first-use defects, the quoted controlling criterion with the
 waiver paragraphs removed, the withheld rows, the honest count, the new validation items and
 section 9's new subsection); its predecessors are
-`c140672e82fe94a4e6a3df7e316b8022b4335809263e509dd96ea372b5439dff` over **70,043** bytes and
-lines 1-821 (the Stage C B-findings repair),
+`3e07e1eb64b7979c6c48dbcc5aac70cb2bfcd6714f53d4287f075696421a6a58` over **97,944** bytes and
+lines 1-1061 (the plan-revision-2 Stage C rewrite; superseded by this repair),
+`c140672e82fe94a4e6a3df7e316b8022b4335809263e509dd96ea372b5439dff` over **65,395** bytes and
+lines 1-821 (the Stage C B-findings repair; **corrected 2026-10-17**: the earlier edition of this
+footer stated 70,043 bytes, which is that edition's whole-file size, not the digest's coverage —
+the digest reproduces over the 65,395-byte prefix, lines 1-821),
 `833cbf82dc007eb1410ef51b55d5cb97081c4e7a330772db366edcdf5aa9354d` over **60,048** bytes and
 lines 1-761 (the Stage D REVISE repair) and
 `5b5c499b3b914598717787efc600a6747de95981fb3757ca96025ed85056fb38` over **53,845** bytes and
-lines 1–693, and all three are now superseded rather than re-used.
+lines 1–693, and all four are now superseded rather than re-used.
 
 **The calibration sentence that stood here was inherited, and it was false at this head — corrected
 here rather than kept.** The sentence "and the same collapse-and-hash method reproduces the four
@@ -1109,7 +1132,7 @@ head (2026-10-17), that set has moved and is not restated as present-tense:** #7
 longer does** — GitHub reports its body edited **8** times, most recently at **2026-10-17T07:57:42Z**,
 and its live body now yields `0121693ca2786800` — so #792's repair-round value `88300e711714200a`
 is named here as **SUPERSEDED, with its live value beside it**, exactly as #790 is; the four-body
-figure is the repair round's dated measurement, not a guarantee about the future. The rule the
+figure is the repair round's dated measurement, not a guarantee about the future. **Dated forward correction (2026-10-17, Stage C round 4).** Re-measured live for this round, the same source reports **9** body edits, the latest `editedAt` at **2026-10-17T15:31:10Z**, and canonical live digest **`8693e9d0bd134cc9`** at payload lengths 1,943 / 58,940 / 40; the 8-edit / 2026-10-17T07:57:42Z / `0121693ca2786800` values above remain recorded as the prior round's dated measurement — superseded, not rewritten. The rule the
 failure teaches is recorded with it: **a calibration list must be re-measured against each body it
 names, never copied from another record**, because a claim that is true when it is written becomes
 false when the body it names is replaced.
@@ -1125,4 +1148,6 @@ this record — the AEGIS-APR-101/AEGIS-APR-117 separation, the corrected checke
 results, the head-identity bullet, the `userContentEdits` narrowing and the #792 drift note — is
 drafted by **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**. The plan-revision-2 Stage C
 rewrite of this record and of the pull-request body is drafted by **DeepSeek V4 Flash (deepseek-flash,
+DeepSeek Harness)**. The Stage C round-4 record repair of this record — the two dated
+forward corrections above and the recomputed footer digest — is drafted by **DeepSeek V4 Flash (deepseek-flash,
 DeepSeek Harness)**.
