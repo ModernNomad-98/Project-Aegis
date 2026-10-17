@@ -61,6 +61,22 @@
   empty for all eight, re-measured this session), so the bytes each reader read are the bytes the
   merge receives and the acceptance is not voided by it. Main was still at the base when the drift
   check ran (`git rev-parse origin/main` = the base).
+- **This record's own head identity — named, with its self-reference limit.** *Head* is the pull
+  request's exact latest commit, the 40-character Git object ID that fixes the bytes. A file cannot
+  contain the SHA of the commit that contains it: writing that SHA here would change the very bytes
+  the SHA names. What is exact, and is stated: the record's text **as audited at Stage B** is blob
+  `3e77346d614808bf66c32c38a9f721b565c19f86` at head
+  `13a2485fbbfffe0fa80b193af664ec131bc49f9d` — the fourth commit, the repair of the Stage D REVISE
+  posted against `3a2546b45275a86b54382b8759666dbfb611bf3a`; the three earlier heads were
+  `39a3e5d03a73f0c89de7b250a10b554ea5c2412e`, `4b830eb4d06f33e398a097f66223625cbe5fb228` and
+  `3a2546b45275a86b54382b8759666dbfb611bf3a`. The Stage C B-findings repair that follows
+  `13a2485f` moves the head again, and **its successor head is not named inside this file for the
+  same self-reference reason**: it is recorded in the pull-request commit list and in the Stage C
+  handoff comment on PR #796, and a reader can re-derive it read-only with
+  `git log -1 --format=%H -- docs/evidence/documentation/readability-lane-b-batch-5-2026-10-15.md`
+  at the branch head. Every measured fact in this record is base-relative — it names `988b5067…`
+  where it says "at the base", and the acceptance revision where it says "at the bound revision" —
+  so no claim here depends on the record's own SHA.
 - **Reader:** `readability-lane-b-batch5-reader-a` — *a reader label* is the name this record gives
   the single Stage C agent that performed the eight reads, so the record can name who read what
   without naming a human who did not; the label denotes one agent, model
@@ -81,13 +97,22 @@
   [the documentation readability backlog](../../roadmaps/aegis-documentation-readability-backlog.md),
   the tracked page that carries the acceptance record for every reader page.
 - **This batch authors NO keeper rows and appends NOTHING to the ledger.** The diff against the base
-  adds exactly this record file. Under **AEGIS-APR-101** — *AEGIS-APR-101* is the owner's register
-  entry establishing the standing ledger-keeper role, whose first condition is that the keeper must
-  be a different agent from the page's author **and** from the accepting reviewer — the rows for this
-  batch's eligible pages are recorded later by a separate eligible keeper from this evidence, under
-  **AEGIS-APR-117** (*AEGIS-APR-117* is the owner's decision that a wrong or same-agent row is
-  cancelled by an appended withdrawal row and the page is re-recorded by a different agent from the
-  same evidence), so **no page needs re-reading**.
+  adds exactly this record file. Two separate register entries govern a future keeper, and this
+  record keeps them apart. **AEGIS-APR-101** — *AEGIS-APR-101* is the owner's register entry
+  establishing the standing ledger-keeper role and its **recording** act, whose first condition is
+  that the keeper must be a different agent from the page's author **and** from the accepting
+  reviewer — is the authority for recording a fresh acceptance row. **AEGIS-APR-117** — *AEGIS-APR-117*
+  is the owner's separate entry for the **withdrawal-only** act: the keeper may append a withdrawal
+  row that cancels a recorded acceptance row that turns out to be wrong, and the entry grants nothing
+  about recording — is the authority for cancelling one. The ledger states that chain itself at
+  `origin/main` `f459e93f762993071f99716780ece9c5a9448dc8`, L5630–5632: same-agent rows are withdrawn
+  under AEGIS-APR-117 (withdrawal-only) and a fresh acceptance row is recorded under AEGIS-APR-101 by
+  a different agent from the same evidence — **no page needs re-reading**. That paragraph is not in
+  the ledger at this batch's base or at this record's first head, where the ledger is 5,622 LF lines;
+  the citation therefore names `origin/main` (6,320 LF lines), where it is. This PR authors no row
+  and performs neither act, so it exercises no keeper authority and requests none; the rows for this
+  batch's eligible pages are a separate eligible keeper's later work under AEGIS-APR-101, with
+  AEGIS-APR-117 available only if a recorded row later needs cancelling.
 - **AEGIS-APR-039** is the standing grant for authorized Project Aegis backlog work (commits,
   pushes, pull requests and merges); this batch uses the commit, push and pull-request part only and
   **does not merge**. **AEGIS-APR-137** is the owner's merged approval of the eight defaults this
@@ -640,7 +665,8 @@ P8 accepted: .claude/skills/load-test-planner/SKILL.md read whole at 988b50673cd
 ```
 
 No line above is a keeper row and no row ID is allocated by this record; the lines become row
-material only in a separate eligible keeper's hands, under AEGIS-APR-101 and AEGIS-APR-117.
+material only in a separate eligible keeper's hands, under AEGIS-APR-101 for recording, with
+AEGIS-APR-117 available only if a recorded row later needs a withdrawal.
 
 ## 7. Count honesty, the machine-visibility note, and the self-cost
 
@@ -694,9 +720,13 @@ material only in a separate eligible keeper's hands, under AEGIS-APR-101 and AEG
 9. **DCO** — `python -B scripts/check_dco.py --range <base>..HEAD` after the commit; the trailer is
    `Signed-off-by: Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>`. Result quoted in
    the pull-request body.
-10. **Record link check** — `python -P scripts/check-markdown-links.py` over this new record, so the
-    record's own three relative links are proven to resolve rather than assumed. Result quoted in the
-    pull-request body.
+10. **Record link check** — `python -P -B scripts/ci/check-markdown-links.py` (the checker's real
+    path; the text of this item previously printed `scripts/check-markdown-links.py`, which does not
+    exist at the base or at the head — the failed path is named here once so the correction is
+    auditable rather than silent) over this new record: **files 1, links checked 3, anchors checked 1,
+    broken 0, dead 0, external-skipped 0**, exit 0. The same command over the record together with the
+    eight read pages during this repair returned **files 9, links checked 18, anchors checked 1,
+    broken 0, dead 0, external-skipped 0**, exit 0. Result quoted in the pull-request body.
 
 ## 9. What this batch could not verify (stated, not hidden)
 
@@ -732,12 +762,16 @@ auditor can read it in the artifact.
   Stated exactly: **no finding bodies, a flag bound to a superseded commit, and a P1-class item that
   cannot be triaged from this pull request's artifacts.** This round did not resolve it and does not
   record it as a pass.
-- **GitHub's revision history for pull request #790's body was not obtained.** GitHub exposes only
-  the current body: `GET /pulls/790` returns one body and no edit history. The evidence that #790's
-  body had been replaced before this record was written is therefore (a) local snapshot **mtime** for
-  the pre-repair and post-repair captures on this machine — 20:03:35 and 20:21:41 PT — plus
-  (b) #790's own live body, which names its first Stage C repair's digest `15328d3c5603fe61` and
-  its second's `1d69dc6f748f945f`. **The exact replacement instant is not verified from GitHub.**
+- **GitHub's revision history for pull request #790's body: prior *content* was not obtained, but the
+  edit *timestamps* were.** The earlier text of this bullet said GitHub exposes "one body and no edit
+  history"; the Stage B audit corrected that as too strong, and this record narrows it. The REST
+  pull-request object returns the current body only, but GitHub's GraphQL `userContentEdits` exposes
+  the timestamp of every edit. Measured this round: #790 has **10** edits, one at
+  **2026-10-16T03:21:46Z** — 2026-10-15 **20:21:46 PT**, five seconds after this record's local
+  pre-repair snapshot mtime of **20:21:41 PT** — and this pull request (#796) has **4**, the last at
+  **2026-10-16T05:32:19Z**. The replacement *instant* is therefore corroborated from GitHub; the prior
+  *bytes* are still not retrievable, so the evidence that #790's body carried `15328d3c5603fe61`
+  before that edit remains #790's own live body plus the local snapshot.
 - **This record's intermediate footer digests were not re-verified against the body revisions that
   published them.** The first and second commits' footer digests are recomputable from those
   commits' own bytes, which are in this branch's history; but GitHub exposes no pull-request body
@@ -758,21 +792,48 @@ auditor can read it in the artifact.
   commit of this branch carries the explicit identity
   `Peter Nguyen <263130032+ModernNomad-98@users.noreply.github.com>`.
 
+### What the Stage C B-findings repair changed (and did not re-verify)
+
+This subsection is about the repair made after the **Stage B ACCEPT** posted as comment `6231517691`
+of plan revision 1, posted as comment `6231343545` (digest `23c261cd…`); it is not about the eight
+re-reads. It sits in the record rather than only in a message to the coordinator so that a later
+auditor can read it in the artifact.
+
+- **What changed.** Four things, and only these: (1) the AEGIS-APR-101/AEGIS-APR-117 paragraph in the
+  header now separates the recording act from the withdrawal-only act and cites the ledger's own
+  wording at `origin/main` L5630–5632; (2) section 8 item 10 now names
+  `scripts/ci/check-markdown-links.py` and its counted results; (3) a head-identity bullet in the
+  header names the record's Stage B blob and the four branch heads its text has had, and states why
+  the record cannot name its own successor head; (4) the section-9 bullet about #790's body now
+  narrows "no edit history" to "no prior body content" and cites `userContentEdits`, and the footer's
+  calibration paragraph names #792's repair-round value as superseded with its live value, because
+  #792's body drifted again after the repair round. The record's structure, the eight page analyses,
+  the dispositions (**8 FULL / 0 PARTIAL**), the quote lines, the norm table and every per-page figure
+  are unchanged; the footer digest is recomputed over the corrected bytes.
+- **What was not re-verified this round.** The eight pages were not re-read; the reading act is not
+  machine-verifiable and is unchanged. The 56-term norm table and the frontmatter sub-figures 183 and
+  168 were not re-measured. The evals were still not executed. Codex is still **unavailable, not
+  clean**: 0 reviews, 0 review comments, and a state block bound to `39a3e5d0`, the branch's first
+  commit. The new head's own checks are recorded in the Stage C handoff comment on PR #796, not in
+  this tracked file.
+
 ---
 
 ## Footer
 
-sha256: 833cbf82dc007eb1410ef51b55d5cb97081c4e7a330772db366edcdf5aa9354d
+sha256: 17e17a5838b0b7a6b342c27d83f8477d08978b509439bb49b5821ade70e1d014
 
 This digest covers the batch record's bytes from the first line through the closing `---` rule line
-and its terminating newline, encoded UTF-8 with LF line endings: exactly 60,048 bytes, byte offsets
-0 through 60,047 inclusive, lines 1-761. It does not cover the blank
+and its terminating newline, encoded UTF-8 with LF line endings: exactly 65,294 bytes, byte offsets
+0 through 65,293 inclusive, lines 1-820. It does not cover the blank
 separator line between that rule and the `## Footer` heading, nor this footer. Any edit above the
 rule needs a fresh validation. **This footer digest is recomputed at this head** over the bytes the
-Stage D REVISE repair corrected (the five quotations, the P2 count phrase, the header correction
-bullet and the new section-9 subsection); its predecessor was
+Stage C B-findings repair corrected (the AEGIS-APR-101/AEGIS-APR-117 paragraph, section 8 item 10,
+the head-identity bullet, the section-9 `userContentEdits` bullet and the new section-9 subsection);
+its predecessors are `833cbf82dc007eb1410ef51b55d5cb97081c4e7a330772db366edcdf5aa9354d` over
+60,048 bytes and lines 1-761 (the Stage D REVISE repair) and
 `5b5c499b3b914598717787efc600a6747de95981fb3757ca96025ed85056fb38` over 53,845 bytes and lines 1–693,
-and that earlier figure is now superseded rather than re-used.
+and both are now superseded rather than re-used.
 
 **The calibration sentence that stood here was inherited, and it was false at this head — corrected
 here rather than kept.** The sentence "and the same collapse-and-hash method reproduces the four
@@ -792,17 +853,27 @@ characters: the same-lengths, different-bytes hazard, measured rather than asser
 `15328d3c5603fe61` is kept here **as the superseded value, with that reason**, and is **not**
 counted as reproducing.
 
-**The count, reconciled.** The pull-request body named **five** calibrated bodies; this footer named
-**four**. The correct figure, re-measured this round over the **live posted bodies**, is **four**
-bodies whose digest reproduces: #783 `3913683c686e6e71`, #787 `82ed906d2f228f0e`, #792
-`88300e711714200a` and #795 `5fabf87b2df899e9` — with **#790 named as superseded and
-excluded**, not silently dropped. The rule the failure teaches is recorded with it: **a calibration
-list must be re-measured against each body it names, never copied from another record**, because a
-claim that is true when it is written becomes false when the body it names is replaced.
+**The count, reconciled, and re-measured at this head.** The pull-request body named **five**
+calibrated bodies; this footer named **four**. Re-measured at the Stage D REVISE repair round over
+the **live posted bodies**, the figure was **four** bodies whose digest reproduced: #783
+`3913683c686e6e71`, #787 `82ed906d2f228f0e`, #792 `88300e711714200a` and #795 `5fabf87b2df899e9` —
+with **#790 named as superseded and excluded**, not silently dropped. **Re-measured again at this
+head (2026-10-17), that set has moved and is not restated as present-tense:** #783
+`3913683c686e6e71`, #787 `82ed906d2f228f0e` and #795 `5fabf87b2df899e9` still reproduce; **#792 no
+longer does** — GitHub reports its body edited **8** times, most recently at **2026-10-17T07:57:42Z**,
+and its live body now yields `0121693ca2786800` — so #792's repair-round value `88300e711714200a`
+is named here as **SUPERSEDED, with its live value beside it**, exactly as #790 is; the four-body
+figure is the repair round's dated measurement, not a guarantee about the future. The rule the
+failure teaches is recorded with it: **a calibration list must be re-measured against each body it
+names, never copied from another record**, because a claim that is true when it is written becomes
+false when the body it names is replaced.
 
 **Footer-digest calibration, re-measured this round.** Applying this footer method to lane A batch
 5's committed record reproduces its published value
 `6342e38b3cf2adfddf72b51d4bee4311afd990d2a730445f331771ce6c739727` (53,301 bytes, lines 1–650), and
 to lane C batch 3's committed record its published value
 `db9796c63ac8ab53022d8c4c237e62484cb4786ce19a261b81bbe36d9f58e2f8` (66,134 bytes, lines 1–721).
-Drafted by **DeepSeek-4.1-Flash (deepseek-flash)**.
+Batch record drafted by **DeepSeek-4.1-Flash (deepseek-flash)**. The Stage C B-findings repair of
+this record — the AEGIS-APR-101/AEGIS-APR-117 separation, the corrected checker path and its counted
+results, the head-identity bullet, the `userContentEdits` narrowing and the #792 drift note — is
+drafted by **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**.
