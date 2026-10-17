@@ -810,6 +810,1206 @@
       "reviewer": "ledger-selfcost-stagec-c",
       "evidence_source": "docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md",
       "date": "2026-10-13"
+    },
+    {
+      "path": ".claude/agents/ai-security-red-team-reviewer.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/full-codebase-auditor.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/principal-architecture-reviewer.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/qa-automation-lead.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/release-readiness-reviewer.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/secure-saas-reviewer.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/senior-troubleshooting-lead.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/_template/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-sample-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/governance-poisoning-routing-correction-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/historical-evidence-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch1-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/ai-security-red-team-reviewer.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/full-codebase-auditor.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/principal-architecture-reviewer.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/qa-automation-lead.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/release-readiness-reviewer.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/secure-saas-reviewer.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/senior-troubleshooting-lead.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/_template/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/ai-security-red-team-reviewer.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/full-codebase-auditor.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/principal-architecture-reviewer.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/qa-automation-lead.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/release-readiness-reviewer.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/secure-saas-reviewer.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/agents/senior-troubleshooting-lead.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/file-upload-storage-architect/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/flaky-test-detective/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/flaky-test-detective/references/flake-taxonomy.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/framework-edition-tracker/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/framework-edition-tracker/references/edition-tracking-sheet.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/framework-mapping-refresher/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/framework-mapping-refresher/references/mapping-refresh-sheet.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/frontend-perf-engineer/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/file-upload-storage-architect/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/flaky-test-detective/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/flaky-test-detective/references/flake-taxonomy.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/framework-edition-tracker/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/framework-edition-tracker/references/edition-tracking-sheet.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/framework-mapping-refresher/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/framework-mapping-refresher/references/mapping-refresh-sheet.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/frontend-perf-engineer/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-deprecation-planner/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-quality-reviewer/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-quality-reviewer/references/quality-review-checklist.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-usage-instrumenter/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-usage-ledger/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/slo-reliability-architect/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-deprecation-planner/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-deprecation-planner/references/deprecation-stage-playbook.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-usage-instrumenter/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-usage-instrumenter/references/usage-signal-catalog.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-usage-ledger/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/slo-reliability-architect/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-sample-2026-09-23.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/governance-poisoning-routing-correction-2026-09-23.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/historical-evidence-reading-2026-09-23.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-batch-after-234-2026-09-24.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-batch-after-713-2026-10-10.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-sample-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/governance-poisoning-routing-correction-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/historical-evidence-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/legacy-prompts-current-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/legacy-roadmap-ber-design-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-sample-2026-09-23.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/ab-test-designer/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/ab-test-designer/references/ab-test-sheet.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/acceptance-criteria-reviewer/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/accessibility-test-harness/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/accessibility-test-harness/references/a11y-checklists.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/admin-console-architect/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/adr-sequencer/references/adr-corpus-sheet.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-a-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/ab-test-designer/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/ab-test-designer/references/ab-test-sheet.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/acceptance-criteria-reviewer/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/accessibility-test-harness/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/accessibility-test-harness/references/a11y-checklists.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/admin-console-architect/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/adr-sequencer/references/adr-corpus-sheet.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/ab-test-designer/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/ab-test-designer/references/ab-test-sheet.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/acceptance-criteria-reviewer/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/accessibility-test-harness/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/accessibility-test-harness/references/a11y-checklists.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/admin-console-architect/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/adr-sequencer/references/adr-corpus-sheet.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/frontend-perf-engineer/references/frontend-metric-budget-sheet.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-b-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/full-codebase-auditor/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-b-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/full-codebase-auditor/references/audit-inventory-checklist.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-b-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/funnel-definition-designer/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-b-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/funnel-definition-designer/references/funnel-sheet.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-b-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-b-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/gated-deployment-prompt-template/references/deployment-prompt-template.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-b-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/hidden-context-exposure-reviewer/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-lane-b-implementer-c",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/frontend-perf-engineer/references/frontend-metric-budget-sheet.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/full-codebase-auditor/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/full-codebase-auditor/references/audit-inventory-checklist.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/funnel-definition-designer/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/funnel-definition-designer/references/funnel-sheet.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/gated-deployment-prompt-template/references/deployment-prompt-template.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/hidden-context-exposure-reviewer/SKILL.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/frontend-perf-engineer/references/frontend-metric-budget-sheet.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/full-codebase-auditor/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/full-codebase-auditor/references/audit-inventory-checklist.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/funnel-definition-designer/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/funnel-definition-designer/references/funnel-sheet.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/gated-deployment-prompt-template/references/deployment-prompt-template.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": ".claude/skills/hidden-context-exposure-reviewer/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/open-decisions-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c2",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/operational-guides-seven-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c2",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/operational-proposals-five-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c2",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-closeout-reread-2026-10-12.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c2",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c2",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c2",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-ledger-reread-2026-10-13.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c2",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "readability-phase4-lane-d-implementer-c2",
+      "evidence_source": "docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/open-decisions-readability-2026-09-23.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/operational-guides-seven-readability-2026-09-23.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/operational-proposals-five-readability-2026-09-23.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-closeout-reread-2026-10-12.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-ledger-reread-2026-10-13.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md",
+      "event_kind": "withdrawal",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/open-decisions-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/operational-guides-seven-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/operational-proposals-five-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-closeout-reread-2026-10-12.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-ledger-reread-2026-10-13.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
+    },
+    {
+      "path": "docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "reviewer": "deepseek-flash-apr117-keeper",
+      "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
+      "date": "2026-10-16"
     }
   ]
 }
