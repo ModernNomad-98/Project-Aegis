@@ -799,12 +799,13 @@ of plan revision 1, posted as comment `6231343545` (digest `23c261cd…`); it is
 re-reads. It sits in the record rather than only in a message to the coordinator so that a later
 auditor can read it in the artifact.
 
-- **What changed.** Four things, and only these: (1) the AEGIS-APR-101/AEGIS-APR-117 paragraph in the
-  header now separates the recording act from the withdrawal-only act and cites the ledger's own
-  wording at `origin/main` L5630–5632; (2) section 8 item 10 now names
-  `scripts/ci/check-markdown-links.py` and its counted results; (3) a head-identity bullet in the
+- **What changed.** These sites, and only these: (1) the header's AEGIS-APR-101/AEGIS-APR-117
+  paragraph now separates the recording act from the withdrawal-only act and cites the ledger's own
+  wording at `origin/main` L5630–5632; (2) the section-6 cross-reference now states the same split
+  instead of naming both entries for one act; (3) section 8 item 10 now names
+  `scripts/ci/check-markdown-links.py` and its counted results; (4) a head-identity bullet in the
   header names the record's Stage B blob and the four branch heads its text has had, and states why
-  the record cannot name its own successor head; (4) the section-9 bullet about #790's body now
+  the record cannot name its own successor head; (5) the section-9 bullet about #790's body now
   narrows "no edit history" to "no prior body content" and cites `userContentEdits`, and the footer's
   calibration paragraph names #792's repair-round value as superseded with its live value, because
   #792's body drifted again after the repair round. The record's structure, the eight page analyses,
@@ -821,15 +822,16 @@ auditor can read it in the artifact.
 
 ## Footer
 
-sha256: 17e17a5838b0b7a6b342c27d83f8477d08978b509439bb49b5821ade70e1d014
+sha256: c140672e82fe94a4e6a3df7e316b8022b4335809263e509dd96ea372b5439dff
 
 This digest covers the batch record's bytes from the first line through the closing `---` rule line
-and its terminating newline, encoded UTF-8 with LF line endings: exactly 65,294 bytes, byte offsets
-0 through 65,293 inclusive, lines 1-820. It does not cover the blank
+and its terminating newline, encoded UTF-8 with LF line endings: exactly 65,395 bytes, byte offsets
+0 through 65,394 inclusive, lines 1-821. It does not cover the blank
 separator line between that rule and the `## Footer` heading, nor this footer. Any edit above the
 rule needs a fresh validation. **This footer digest is recomputed at this head** over the bytes the
-Stage C B-findings repair corrected (the AEGIS-APR-101/AEGIS-APR-117 paragraph, section 8 item 10,
-the head-identity bullet, the section-9 `userContentEdits` bullet and the new section-9 subsection);
+Stage C B-findings repair corrected (the AEGIS-APR-101/AEGIS-APR-117 paragraph, the section-6
+cross-reference, section 8 item 10, the head-identity bullet, the section-9 `userContentEdits` bullet
+and the new section-9 subsection);
 its predecessors are `833cbf82dc007eb1410ef51b55d5cb97081c4e7a330772db366edcdf5aa9354d` over
 60,048 bytes and lines 1-761 (the Stage D REVISE repair) and
 `5b5c499b3b914598717787efc600a6747de95981fb3757ca96025ed85056fb38` over 53,845 bytes and lines 1–693,
