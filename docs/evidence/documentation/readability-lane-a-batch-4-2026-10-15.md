@@ -38,23 +38,16 @@ the other (Stage D F2).** *Derivation base* `f490c16f9ed23f3d489e42f7696323bffcc
   **readability-coordinate figures true only there** — historical measurements, not replacement-head
   values; `main` has moved repeatedly since the re-read, so a diff against a newer `main` would show
   other pull requests' additions as this batch's deletions.
-- **Current-main numstat — the second coordinate the owner's rule requires.**
-  [OWNER-DECISIONS-2026-10-15.md L301–303](../../roadmaps/OWNER-DECISIONS-2026-10-15.md) makes a
-  lane record state **both** numstats, labelled by coordinate: the diff against the derivation base
-  **and** the diff against current `main` (which may show phantom deletions). Measured this round at
-  the head that carried it, `f848b1a902d67e1b40c325587df6455daa17771e`, with the live `main` tip
-  `5dc96edad8b8d3715446079af9d552f8eb9e6a07` (**102** commits after the derivation base;
-  `git rev-list --count f490c16f..5dc96eda`): `git diff --shortstat 5dc96eda..f848b1a9` returns
-  **60 files changed, `1,290` insertions(+), `15,919` deletions(-)**; the same command's
-  `--numstat` form shows **the branch's three added paths carry `675 / 0`, `165 / 0` and
-  `442 / 0`**, and the other **57** files are `main`'s own
-  intervening changes, whose `15,919` lines appear as deletions **only because this branch does not
-  carry them** — the phantom deletions the owner's rule names, **not** removals by this batch. The
-  insert-only property is therefore stated against the derivation base (three added paths,
-  `+1,282 / −0`), and the moving coordinate is stated here, separately labelled, exactly as the
-  rule requires. These figures are at that head; this round's own commit adds lines to the same
-  three paths and therefore moves the current-main insertion count by its own inserted lines,
-  measured and stated in the Stage C round-7 handoff comment.
+- **Insert-only status against the replacement branch base (round 2, F2).** The branch derivation base is
+  the `main` commit this branch was created from: **`648ac7670bec2e260279a74716289b39f7cf2c9a`**. Measured
+  at this head with `git diff --name-status 648ac767…HEAD` and `git diff --numstat 648ac767…HEAD`:
+  exactly **one added `docs/` path** (this record) carrying **+1025 / −0**; **0 modified and 0 deleted**
+  base paths — the insert-only property holds against the branch's own derivation base. The moving-`main`
+  coordinate the owner's rule also requires is stated separately in the PR body/Stage C handoff; at this
+  head current `main` equals the derivation base `648ac767…`, so no phantom deletions exist. The
+  superseded `f490c16f..f848b1a9` three-path measurement and the `f7ae12a3` `858 0` / `451 0` figures were
+  measured at those historical heads and are **history only**, not this replacement's branch-base
+  measurement.
 
 - **Replacement file set and measured figures — stated in the PR body, not in this record.** At this
   replacement head the tree adds exactly **one `docs/` path** — this record — and deletes the
@@ -1019,3 +1012,14 @@ after old line 959.
   the 28 bounded hunks. **Both hashes and byte counts are carried here as content (AC2)**, so the
   derivation is reproducible from this record's own text without a bare `git cat-file` of the base blob
   in a clean checkout. #789's D3 stays history. No merge is performed or authorized by this section.
+- **Operative plan of record and its fixed digest (round 2, F1).** The operative plan is the **lean plan**, PR
+  #808 issue comment **`6242584888`**. Its body is the fixed copy this record binds: **14,414 bytes**, sha256
+  **`880ebf4381e1b7521bf057b30c8f7fbe154981af5783ffc4ed8fb43cd1427015`**, measured from the live
+  comment; captured **2026-10-17T22:50:57Z** with `created_at = updated_at` and never edited (immutable by
+  protocol — a correction would be a new comment with its own capture). That content digest plus the
+  comment locator is the reproducible fixed-copy binding the delivery workflow requires
+  (`docs/delivery-workflow.md` **L681-689**: a mutable URL or comment ID alone does not bind, while a
+  retained exact capture with a content digest and locator does; a digest checks captured content, not
+  human identity). The plan is **intentionally not a committed file** per the owner decision
+  **`6242532417` / ODR-1**: no plan file is added or re-added at this head, the plan lives only in that
+  comment, and this record carries its digest and locator for reproducible binding.
