@@ -634,6 +634,14 @@ class ReadmePinnedRefCommandStillRuns(unittest.TestCase):
                          base_summary["accepted_on_recorded_review"],
                          "the two checkers must agree on the pinned ref's "
                          "acceptances")
+        pinned_reader_pages = len(check_index.classify_tree(
+            git("rev-parse", README_REF), ROOT)["reader"])
+        self.assertEqual(
+            (base_summary["reader_pages_in_tree"],
+             current_summary["reader_pages_in_tree"]),
+            (pinned_reader_pages, pinned_reader_pages),
+            "the pinned ref's reader-page count derived from its own tree ("
+            + str(pinned_reader_pages) + ") must equal both checkers' count")
     def test_the_sidecar_changes_no_count_at_that_ref(self):
         """Not-applicable declarations are inert, not absorbed."""
         with tempfile.TemporaryDirectory() as tmp:
