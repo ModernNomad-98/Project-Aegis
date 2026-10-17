@@ -8,7 +8,7 @@ record or comment drafted by an AI agent says so, and names the model).
 appended, not substituted: every superseded value it names stays readable where it was
 published, and the correction sits beside it. No pull-request (PR) body was edited to
 produce this record, and no merged artifact was rewritten to produce it. **This record's
-own text has been corrected in place four times. First on its Stage D repair round
+own text has been corrected in place five times. First on its Stage D repair round
 (§1, §2, §4.5, §4.6, §5, §6, §7 items 1 and 2, §8 and §9 changed; §10 quotes every
 sentence that was replaced and names the reason). Then on its Stage F repair round
 (§4.1, §4.5, §4.6, §4.7, §4.8, §7 item 2, §7 item 3, §10.2, §10.6 and this preamble
@@ -16,16 +16,23 @@ changed; §11 quotes every sentence that was replaced and names the reason). The
 **Stage D re-audit repair round** (the round that answers the second `SD-D: REVISE`
 verdict, issue comment 6207351316), which corrects §4.5, §8, §10.8, §11's introduction,
 §11.1 and §11.4 and appends §11.5–§11.8; §11.5 quotes every sentence that round replaced and names the
-reason. Then on the **Stage C handoff round** (this round), which corrects §8, §11.4 and
-§11.5 and appends §11.9; §11.9 quotes every sentence that round replaced. This change's
+reason. Then on the **Stage C handoff round**, which corrects §8, §11.4 and
+§11.5 and appends §11.9; §11.9 quotes every sentence that round replaced. Then on the
+**AC10/AC14 repair round** (this round, 2026-10-17), which corrects §2, §4.2, §7 item 1,
+§7's first bullet, §11.7 and §11.9 gap 3 and appends §11.10; §11.10 quotes every
+sentence this round replaced. This change's
 own PR body was edited once as well, for a stale figure sitting
 inside its own bound skills field (§8, §10); its Stage F repair round added plain-English
 label glosses to the body **outside** all three bound fields and left the bound-field
 digest unchanged at `078ec42572ff330a` (§11); and the Stage D re-audit repair round
 corrected one further body figure **outside** every bound field — the false deletion
-count in its Blast-radius section — leaving the same digest (§11.7). The Stage C handoff
+count in its Blast-radius section — leaving the same digest (§11.7); and the Stage C handoff
 round edited the body once more, outside every bound field, to refresh the head's numstat
-and to name the head it produced; the digest is unchanged (§11.9). No other pull
+and to name the head it produced, leaving the digest unchanged (§11.9). The AC10/AC14
+repair round edited it again: outside every bound field for the head, the stage chain and
+the round counts, and **inside** the bound skills field for one new Stage C row and its
+`Row source` record, which moved the digest from `078ec42572ff330a` to the value the
+published body states (§11.10). No other pull
 request's body was touched.**
 
 **Reading key (one line per internal label, in plain English).**
@@ -126,18 +133,28 @@ sweep existed, so they are independent of it:
 
 | Known-good published value | Where it was published | Reproduced? |
 | --- | --- | --- |
-| `3913683c686e6e71` | PR #783 body (its current Stage C figure) | yes, exactly |
-| `8d441a1bfdff46d9` | PR #774 body (its fourth-round figure, now superseded there) | yes, exactly |
-| `b1acc2b2f5817fab` | PR #771 body (current) | yes, exactly |
-| `7cf3094b11ba4339` | PR #772 body (current) | yes, exactly |
-| `d10fb1e4977b8ccb` | PR #774 body (current) | yes, exactly |
-| `bd9ccf55efbead2d` | PR #790 body (current) | yes, exactly |
-| `1fcd0143e13198a3` | PR #791 body (current) | yes, exactly |
-| `4e50d937ea45ee8e`, `340a14ee6921277a`, `71a73c01f92b23eb`, `82ed906d2f228f0e`, `00092958ec2cc906`, `70ef1815189fe918`, `121a60bce86cff98` | PR #773, #775, #779, #787, #788, #777, #782 bodies (all current) | yes, exactly |
+| `3913683c686e6e71` | PR #783 body — the **live** body still reproduces it (re-measured 2026-10-17) | yes, exactly |
+| `8d441a1bfdff46d9` | PR #774 body — its fourth-round figure, superseded there since `2026-10-16T04:50:31Z` | yes, exactly |
+| `b1acc2b2f5817fab` | PR #771 body at the `2026-10-15T20:58:34Z` revision (§3's window); the body has since moved — live now `ccfe63ff90cfdb04` | yes, exactly |
+| `7cf3094b11ba4339` | PR #772 body — the **live** body still reproduces it | yes, exactly |
+| `d10fb1e4977b8ccb` | PR #774 body at the `2026-10-16T01:41:20Z` revision (§11.2); the live body now computes `755e1656024f75f9` | yes, exactly |
+| `bd9ccf55efbead2d` | PR #790 body at the `2026-10-16T01:43:57Z` revision (anchor `83e5d149314467e3…` = §3's); the live body has moved inside its bound fields | yes, exactly |
+| `1fcd0143e13198a3` | PR #791 body at the `2026-10-16T01:48:55Z` revision (anchor `8f2196d6684174ef…` = §3's); the live body has moved inside its bound fields | yes, exactly |
+| `4e50d937ea45ee8e`, `340a14ee6921277a`, `71a73c01f92b23eb`, `82ed906d2f228f0e`, `00092958ec2cc906`, `70ef1815189fe918`, `121a60bce86cff98` | PR #773, #775, #779, #787, #788, #777, #782 bodies. Only #787's **live** body still reproduces its value; #773 reproduces at the `2026-10-15T22:06:06Z` revision, #775 at its creation (`2026-10-15T18:32:37Z`), #779 at its creation (`2026-10-15T19:05:22Z`), #777 at its creation (`2026-10-15T19:03:36Z`), #782 at its creation (`2026-10-15T20:57:26Z`), and #788 at the `2026-10-16T01:45:01Z` revision (anchor `e71eeab75d0c0b76…` = §3's); the other six have moved (§11.2, §11.9 gap 3, §11.10) | yes, exactly |
 
 **The method is validated against fourteen independent published values before it is
 used to contradict anyone.** The discrepancies reported in §4 are therefore in the
 artifacts, not in the measurement.
+
+**Which of the fourteen still reproduce from the live body — re-measured 2026-10-17.**
+**Three** do: #783's `3913683c686e6e71`, #772's `7cf3094b11ba4339` and #787's
+`82ed906d2f228f0e`. The other **eleven** reproduce at a recorded revision of the body they
+name: one (`8d441a1bfdff46d9`) was already labelled superseded at the sweep, three (#790,
+#791, #788) had already moved inside their bound fields before §11.2's measurement, and
+seven (#771, #773, #774's `d10fb1e4977b8ccb`, #775, #777, #779 and #782) have moved since
+it. **No row above asserts that its value is current at the body now.** Each names the
+revision, or the live body, at which it was measured, so a reader can re-derive it; an
+earlier version of this table labelled six of them as current and is quoted in §11.10.
 
 **What the calibration deliberately does NOT rest on.** It does not rest on the
 "current" figures asserted by the two defect comments (those are the figures under
@@ -239,10 +256,15 @@ on #789 — was true when it was taken and is recorded as disclosed drift in §1
 | Recomputed by the canonical method | `70ef1815189fe918` — **identical** |
 | Published normalized payload lengths | `1262 / 6413 / 40` |
 | Recomputed normalized payload lengths | `1262 / 6413 / 40` — **identical** |
-| Body edits recorded by the API | **0** |
+| Body edits recorded by the API (`userContentEdits.totalCount`) | **0** at the §4.1 control (`2026-10-16T03:00:16Z`); **2** re-measured 2026-10-17 — the creation plus one edit at `2026-10-16T07:34:58Z` |
 | Body anchor | `377237991cfdb9f0d0e843ade738534c21ca271aa32fdc68f6b787f667d554f0` |
 
-**Current: `70ef1815189fe918`. Superseded: none.** Same refutation as §4.1.
+**Value at the `2026-10-15T19:03:36Z` revision: `70ef1815189fe918`. Superseded: none.** Same
+refutation as §4.1, on the same dated control. The body has since moved:
+`userContentEdits.totalCount` is **2** — its creation `2026-10-15T19:03:36Z` plus one edit at
+`2026-10-16T07:34:58Z` — so the value reproduces at that recorded revision and not from the
+live body, which computes `8aed60d23098b041`. The refutation is unchanged; what moved is the
+body (§11.2, §11.9 gap 3, §11.10).
 
 ### 4.3 PR #776 — the figure is current for its body, but it is not the method the body names
 
@@ -483,10 +505,12 @@ text, collapse not applied", same reason as #780.
 ## 7. What this record did not do, and what it could not verify
 
 - **No corrected PR body was edited.** Zero of the four bodies in §4.3–§4.6 were
-  touched. Two PR bodies were edited by this change's own lane, and both are its own:
-  PR #793's body, once on the addendum round and once on this repair round, the second
-  time to correct a stale figure inside its own bound skills field (§8, §10). §6 offers
-  the append text for the four.
+  touched. **One** PR body was edited by this change's own lane — this pull request's own
+  — and it carries **10** recorded revisions at this measurement: its creation at
+  `2026-10-16T02:01:52Z` plus nine edits, the last at `2026-10-17T07:08:37Z`
+  (`userContentEdits.totalCount` = 10, re-measured 2026-10-17). §11.10 quotes the earlier
+  two-bodies, once-and-once wording and corrects it. §6 offers the append text for the
+  four.
 - **No merged record was rewritten.** Nothing under `docs/` on `main` was edited by
   this change except the addition of this new file.
 - **No keeper row was authored**, and none was withdrawn; this record is not an
@@ -500,11 +524,16 @@ text, collapse not applied", same reason as #780.
 1. **Why #780's and #785's figures are not the canonical ones is not established.**
    Both readings are now named and both reproduce, so what is unexplained is the
    authoring path, not the value. The candidate explanations in §4.5 are stated as
-   possibilities; the API records zero body edits for both, and this record cannot
-   distinguish "computed by a script that resolved sentinels by substring and skipped the
-   collapse" from "an edit the API does not record" — the latter is **not** ruled out for
-   #780, whose `updated_at` is 15 s after its `created_at` with a recorded edit count of
-   **0**. Neither explanation is offered as fact.
+   possibilities. At the `2026-10-16T03:00:16Z` control the API recorded **zero** body
+   edits for both; re-measured on **2026-10-17**, #780 carries
+   `userContentEdits.totalCount` **3** (its creation `2026-10-15T19:07:51Z` plus edits at
+   `2026-10-16T06:56:17Z` and `2026-10-16T16:17:55Z`) and #785 **10** (its creation
+   `2026-10-15T21:01:18Z` plus nine edits, the last at `2026-10-16T14:00:20Z`), so the zero
+   is a dated measurement and not present state. This record therefore cannot
+   distinguish a script that resolved sentinels by substring and skipped the collapse from
+   an edit the API does not record — the latter is **not** ruled out for
+   #780, whose `updated_at` was 15 s after its `created_at` at that control with a recorded
+   edit count of **0**. Neither explanation is offered as fact.
 2. **The pre-edit text of #771's body IS recoverable, and the superseded figure has been
    re-derived from it.** The GraphQL `userContentEdits.diff` field **does** return the
    **full body text** at each recorded revision. Read for #771: the revision at
@@ -542,7 +571,9 @@ text, collapse not applied", same reason as #780.
   `git rev-list --first-parent --count f490c16f..origin/main` reports 18 merges at the
   Stage C handoff round's measurement** — through `87d6b460` (PR #787) and
   `988b50673cdd0e9ab0c15df891744cd02d1d2d2b` (PR #783), the two tips earlier rounds saw, to
-  `9e418c8c63e45caa4bca7fb608d45d0df4d44409` (PR #801) now. The **merge base of
+  `9e418c8c63e45caa4bca7fb608d45d0df4d44409` (PR #801) at that measurement, and to
+  `f459e93f762993071f99716780ece9c5a9448dc8` (PR #791) with **19** first-parent merges at the
+  AC10/AC14 repair round's measurement (§11.10). The **merge base of
   this head and the current `main` is still `f490c16f`** (`git merge-base HEAD origin/main`,
   re-derived on the Stage C handoff round), and `git merge-base --is-ancestor
   f490c16f HEAD` exits 0, so **nothing is voided and no figure here depends on `main`'s
@@ -1207,8 +1238,10 @@ figure. **The discrepancy is stated instead, in both places a reader meets it:**
   wrong figure; and
 - **here**, in this record: commit `6d4295a9`'s message says "counts this round's deleted
   lines (**16**, sited, set-equality both ways)"; the figure that commit's own diff
-  measures is **`22`** (`85 + 22 − 91 = 16`), and this round's own deleted-line count is
-  the separate **`19`** §11.6 measures.
+  measures is **`22`**, and **16 is not that figure but a subset of it** — it is what
+  remains of the 22 once the 91 lines the Stage D repair round had introduced are netted
+  out (`85 + 22 − 91 = 16`) — while this round's own deleted-line count is the separate
+  **`19`** §11.6 measures.
 
 That is the forward-correction discipline this repository uses for dated records: **a
 dated record is never rewritten, it is corrected by appending.** A commit message is the
@@ -1312,12 +1345,25 @@ base is still `f490c16f9ed23f3d489e42f7696323bffcce6fd3`.
    `repos/…/pulls/793/reviews` returns 0 and `repos/…/pulls/793/comments` returns 0. A P1
    cannot be ruled out, and this round does not report the surface as clean.
 2. **The 5,400-combination space and the 92,580 deletion variants of §10.3** — not re-run.
-3. **Other pull requests' live bodies** — not re-measured as a claim. Two movements since
-   §11.2's measurement are recorded so its present-tense split is not read as current:
-   #774's body was edited at 2026-10-16T04:50:31Z and 04:51:25Z, and its witness payload now
-   measures **2543** characters where `d10fb1e4977b8ccb` needs **3075**: that value reproduces
-   at the `01:41:20Z` revision (`3075 / 5792 / 738`) and not from the live body
-   (`755e1656024f75f9` at `2543 / 5792 / 738`); #785's body carries nine edits after
+3. **Other pull requests' live bodies** — not re-measured as a claim, but the fourteen
+   calibration values were re-measured on **2026-10-17**, and **seven of §11.2's ten "live"
+   values no longer reproduce from the live body**. #774 is one: its body was edited at
+   `2026-10-16T04:50:31Z` and `04:51:25Z`, and its witness payload now
+   measures **2543** characters where `d10fb1e4977b8ccb` needs **3075**; that value reproduces
+   at the `2026-10-16T01:41:20Z` revision (`3075 / 5792 / 738`) and not from the live body
+   (`755e1656024f75f9` at `2543 / 5792 / 738`). **Six further movements were undisclosed
+   here, and are named now** — each moved on 2026-10-16, and each published value still
+   reproduces at the revision named: #771, live `ccfe63ff90cfdb04` (`b1acc2b2f5817fab` at
+   `2026-10-15T20:58:34Z`); #773, live `9c5e5539e551738f` (`4e50d937ea45ee8e` at
+   `2026-10-15T22:06:06Z`); #775, live `4d99ca3bc873c8a6` (`340a14ee6921277a` at its
+   creation, `2026-10-15T18:32:37Z`); #777, live `8aed60d23098b041` (`70ef1815189fe918` at
+   its creation, `2026-10-15T19:03:36Z`); #779, live `9cc73216e1ba17a1` (`71a73c01f92b23eb`
+   at its creation, `2026-10-15T19:05:22Z`); #782, live `14a96bd772f6083e`
+   (`121a60bce86cff98` at its creation, `2026-10-15T20:57:26Z`). **Of §11.2's ten, only
+   #772 (`7cf3094b11ba4339`), #783 (`3913683c686e6e71`) and #787 (`82ed906d2f228f0e`) still
+   reproduce from the live body**; the ten-live count was true when it was measured and is a
+   snapshot, and §2's table now names each value's artifact instead of calling it current
+   (§11.10). #785's body carries nine edits after
    its `21:01:18Z` revision (latest `14:00:20Z`), so `45db39e238a3a4e6` reproduces at the
    anchor `2afc2d18…` §4.6 names — **re-derived by this round**, `1819 / 7340 / 384` — and
    not from the live body. §7 item 4 already governs what a move does to an entry; no figure
@@ -1360,3 +1406,99 @@ comment posted after this push. **What is owed:** a fresh Stage D and a fresh St
 head. The handoff comment posted for `ec2f70f1…` is superseded by this correction, and its
 own two wrong counts ("`main` has moved three times"; "the two `Row source` records") are
 corrected in that appended comment.
+
+### 11.10 The AC10/AC14 repair round — the movement set, the stale labels and the edit counts corrected
+
+**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Appended 2026-10-17 by
+the Stage C (the implementation stage) agent at the head this round repaired
+(`4ff17269d681571947dfc9d2e055a8fcdc1152a6`). It answers the Stage B ACCEPT of **plan
+revision 3** (issue comment **6231713872**; plan capture **6231638564**, frozen digest
+`50cf08763e280dbc`) and, through it, that plan's **AC10(b)** and **AC14(i)**, **(ii)**,
+**(vii)** and **(xi)**, together with the Stage D verdict **6231225676**'s findings **F-2**,
+**F-3** and **F-4** and its note on the 16-line parenthetical. Each superseded sentence is
+quoted below and the measured replacement is stated beside it; nothing else in this record
+is changed.
+
+| Site (line numbers at `4ff17269`) | What it said | What is true, measured 2026-10-17 |
+| --- | --- | --- |
+| §11.9 gap 3, L1315–1320 | "Two movements since §11.2's measurement are recorded so its present-tense split is not read as current", naming #774 and #785 | **Seven** of §11.2's ten "live" values no longer reproduced at that round, and **six were undisclosed**: #771 (live `ccfe63ff90cfdb04`), #773 (`9c5e5539e551738f`), #775 (`4d99ca3bc873c8a6`), #777 (`8aed60d23098b041`), #779 (`9cc73216e1ba17a1`) and #782 (`14a96bd772f6083e`), each edited on 2026-10-16. Only #772, #783 and #787 of the ten still reproduce from the live body. The gap now names all seven movements and each value's revision. This is plan **AC10(b)**, which the plan predicted would be `NOT MET` at the previous head |
+| §2's calibration table, L129 and L136 (and the eight data rows between them) | six entries labelled "(current)", and seven "(all current)" | **Three** of the fourteen values reproduce from the live body (#783, #772, #787). The table now names, per value, the revision or the live body it was measured at, and a paragraph after it states the live count and the eleven revision-only values. Plan **AC14(i)** |
+| §4.2's API-edit row, L242, and its refutation sentence, L245 | "Body edits recorded by the API" = **0**, and "Same refutation as §4.1" with no date of its own | the zero is true of the **`2026-10-16T03:00:16Z`** control §4.1 dates; re-measured, #777 carries `userContentEdits.totalCount` **2** — creation `2026-10-15T19:03:36Z` plus one edit at `2026-10-16T07:34:58Z` — so the value reproduces at that revision (`70ef1815189fe918`), not from the live body (`8aed60d23098b041`). Both the row and the sentence now carry the control date and the later measurement. Plan **AC14(ii-b)** |
+| §7's first bullet, L486–L489 | "**Two PR bodies** were edited by this change's own lane, and both are its own: PR #793's body, once on the addendum round and once on this repair round" | **one** body — this pull request's own — carrying **10** recorded revisions: creation `2026-10-16T02:01:52Z` plus nine edits, the last `2026-10-17T07:08:37Z`. Plan **AC14(xi)**, and Stage D finding **F-3** |
+| §7's not-verified item 1, L503–507 | "the API records zero body edits for both", with no date, and #780's "`updated_at` is 15 s after its `created_at`" in the present tense | the zero is true of the **`2026-10-16T03:00:16Z`** control; re-measured, #780 is **3** (creation `2026-10-15T19:07:51Z` plus edits at `2026-10-16T06:56:17Z` and `2026-10-16T16:17:55Z`) and #785 is **10** (creation `2026-10-15T21:01:18Z` plus nine edits, the last `2026-10-16T14:00:20Z`). The clause now reads as a dated measurement. Plan **AC14(ii-a)** |
+| §11.7's parenthetical, L1210–1211 | "the figure that commit's own diff measures is **`22`** (`85 + 22 − 91 = 16`)" | 22 is the figure the commit's diff measures; **16 is a subset** of it — what remains of the 22 once the 91 lines the Stage D round had introduced are netted out. The sentence now says so, and the separate 19 of §11.6 is unchanged. Plan **AC14(vii)**, Stage D finding **F-4** |
+| §8's derivation-base bullet, L545 (a supporting count, not one of the plan's criteria) | "to `9e418c8c63e45caa4bca7fb608d45d0df4d44409` (PR #801) now" | `main`'s tip is `f459e93f762993071f99716780ece9c5a9448dc8` (PR #791) with **19** first-parent merges from `f490c16f` at this round's measurement; the earlier tip and its count stay as the dated statement they were, and the new measurement is added beside them |
+
+**The preamble's own count was corrected with them.** It said this record's text had been
+corrected in place **four** times and called the handoff round "this round"; a fifth round
+makes the first figure false and the second clause ambiguous, so both are corrected and the
+rounds are named in order.
+
+**This round's deleted lines, counted and sited.** Replacing a statement deletes the text it
+replaced. Counted as **every deletion line** in
+`git diff -U0 4ff17269d681571947dfc9d2e055a8fcdc1152a6..<this round's commit> -- docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md`,
+excluding only the `---` diff header and taken from `-U0` hunks so no deletion is
+hidden by context, the deletion lines number **33** and the site table totals 33. The
+commit hash is published in this pull request's body and in the Stage C handoff, because a
+file cannot name the commit that contains it. **The addition count grows when this section is
+appended; the deletion count does not** — measured against the working tree immediately
+before this section was appended, `git diff --numstat 4ff17269 -- <this path>` read
+`79  33`; this section adds lines and deletes none, so the 33 and the site set above stand
+unchanged, while the addition count moves.
+
+| Site (line numbers at `4ff17269`) | Lines deleted |
+| --- | --- |
+| Preamble L11 — "four times" | 1 |
+| Preamble L19–L20 — "(this round)" and the insertion point for the fifth round | 2 |
+| Preamble L26 — the conjunction before the handoff round's clause | 1 |
+| Preamble L28 — the closing clause the fifth round is named in | 1 |
+| §2's calibration table, L129–L136 — the eight data rows whose labels changed | 8 |
+| §4.2's API-edit row, L242 | 1 |
+| §4.2's refutation sentence, L245 | 1 |
+| §7's first bullet, L486–L489 | 4 |
+| §7's not-verified item 1, L503–L507 | 5 |
+| §8's derivation-base bullet, L545 | 1 |
+| §11.7's parenthetical, L1210–L1211 | 2 |
+| §11.9's gap 3, L1315–L1320 | 6 |
+| **Total deleted** | **33** |
+
+**The set is exact in both directions, measured the way §10.7's, §11.3's, §11.6's and
+§11.9's were**: the old-line numbers parsed from the `-U0` hunks are exactly the
+ranges above — measured-minus-claimed empty and claimed-minus-measured empty — and the
+claimed counts sum to 33. **This round does not claim to be insert-only**; it deleted 33
+lines to correct the seven sites above and appended this section.
+
+**The body's edit, and the digest.** This round edits the pull-request body outside every
+bound field — the head, tree and stage chain, and the round counts — and **inside** the bound
+skills field, where it adds one Stage C round-5 row with its `Row source` record and marks
+the three round-1 source records historical. Those are bound-field edits, so **the digest
+moves**: it was `078ec42572ff330a` at normalized payload lengths `1380 / 3868 / 40`
+immediately before this round, and the value after the edit is published in the body's own
+digest paragraph and in the Stage C handoff comment. The record does not name it here
+because the body is edited after this commit, and a committed file cannot state a value
+produced after its own commit — the same limit §11.9 states for the commit hash. **A bound-field
+edit voids every verdict that named the old value**: the Stage F verdict 6206966415 and the
+Stage D verdicts 6206838331 and 6207351316 are already void on the head move, and this round
+voids nothing that was still live, because no verdict binds the head it produces.
+
+**What this round did not verify, stated as gaps.**
+
+1. **Codex's unresolved findings at `8e9392f8`** — still not retrievable:
+   `repos/…/pulls/793/reviews` returns 0 and `repos/…/pulls/793/comments` returns 0. A P1
+   cannot be ruled out, and this round does not report the surface as clean.
+2. **The 5,400-combination space and the 92,580 deletion variants of §10.3** — not re-run.
+3. **The bodies' state between the measurement and this commit** — every value was read
+   from the live API on 2026-10-17; a body edited after that read is not observable here.
+4. **The historical measurement windows** — §3's `01:50:47Z–01:51:00Z` window and §9's
+   `02:02Z` window are not re-observable; the anchors and the named revisions are what is
+   checkable, and they were used instead.
+
+**What is owed.** This round moves the head, so **a fresh Stage D** (the per-criterion
+`MET` / `NOT MET` / `UNRUN` audit) and **a fresh Stage F** (the final independent
+review, which names the exact 40-character head and the bound-field digest) are owed at the
+head this round produces; Stage E (validation) sits between them, and the automated
+reviewer's result for that head is owed for the merge gate in any case. The Stage D verdict
+**6231225676** and its addendum **6231229604** bind `4ff17269`, so they are void at the new head
+with every other head-bound verdict; nothing else is
+voided: the Stage B ACCEPT **6231713872** binds **plan revision 3**, not a head, and that plan
+comment is not edited by this round, so the ACCEPT still stands.
