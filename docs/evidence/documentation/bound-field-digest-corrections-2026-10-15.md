@@ -506,11 +506,11 @@ text, collapse not applied", same reason as #780.
 
 - **No corrected PR body was edited.** Zero of the four bodies in §4.3–§4.6 were
   touched. **One** PR body was edited by this change's own lane — this pull request's own
-  — and it carries **10** recorded revisions at this measurement: its creation at
-  `2026-10-16T02:01:52Z` plus nine edits, the last at `2026-10-17T07:08:37Z`
-  (`userContentEdits.totalCount` = 10, re-measured 2026-10-17). §11.10 quotes the earlier
-  two-bodies, once-and-once wording and corrects it. §6 offers the append text for the
-  four.
+  — and it **carried 10** recorded revisions when this round measured it: its creation at
+  `2026-10-16T02:01:52Z` plus nine edits, the last at `2026-10-17T07:08:37Z`. This round's
+  own body edits follow — `userContentEdits.totalCount` read **11** after the first,
+  re-measured 2026-10-17. §11.10 quotes the earlier two-bodies, once-and-once wording and
+  corrects it; §6 offers the append text for the four.
 - **No merged record was rewritten.** Nothing under `docs/` on `main` was edited by
   this change except the addition of this new file.
 - **No keeper row was authored**, and none was withdrawn; this record is not an
@@ -1470,7 +1470,7 @@ lines to correct the seven sites above and appended this section.
 
 **The body's edit, and the digest.** This round edits the pull-request body outside every
 bound field — the head, tree and stage chain, and the round counts — and **inside** the bound
-skills field, where it adds one Stage C round-5 row with its `Row source` record and marks
+skills field, where it adds one Stage C round-6 row with its `Row source` record and marks
 the three round-1 source records historical. Those are bound-field edits, so **the digest
 moves**: it was `078ec42572ff330a` at normalized payload lengths `1380 / 3868 / 40`
 immediately before this round, and the value after the edit is published in the body's own
