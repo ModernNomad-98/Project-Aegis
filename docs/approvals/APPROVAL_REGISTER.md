@@ -6431,3 +6431,207 @@ the entry governs.
   event is the only way to correct it. **No grant is in force, so no use limit
   exists for this entry**; the scoped grant it records remains owed, and the
   receipt-posting definition remains owed with it.
+
+#### Lifecycle event: AEGIS-APR-138-E1 — the owner's grant of AEGIS-APR-138, recorded 2026-10-17
+
+**One appended event, whose kind is GRANT.** This block is one appended event
+under AEGIS-APR-138: the register's own form for a later fact about an entry,
+carried by the `#### Lifecycle event:` heading the register uses at L6062 and
+L6091. Its **kind is GRANT** — the event type the preamble lists for authority
+a named human gives (L30-L32) — because what it records is authority, not the
+end of it. The carrier is the appended-event form because the entry must not
+be rewritten (preamble L8-L10); the field set is the GRANT set (Event, Status
+at recording, Date / Grantor, Reason, Scope allowed, Scope FORBIDDEN, Evidence,
+Expiry / use limit) because the event confers authority, followed by the three
+linkage fields an appended event owes its target (Target grant, Successor
+grant, Effective at, Recorded at / By) and by New authority. **It is not a
+GRANT entry**: it adds no `### AEGIS-APR-nnn` heading, no ID in that sequence,
+and no second home for this entry's grant. It is not a POLICY DECISION
+(records a ruling and grants no work) and not a supersession (retires an
+earlier grant by naming a distinct, already-recorded successor); it retires no
+entry.
+
+- **Event:** GRANT; unique ID **AEGIS-APR-138-E1**; target entry
+  AEGIS-APR-138. The ID is the heading's identifier token, and it occurs in
+  this file exactly twice: in that heading and in this Event field. `E1` is
+  the first appended event under entry 138, so a later event under the same
+  entry would take `E2`; the scheme is stated here because the register has
+  no earlier sub-entry ID, and the two precedents identify their events by
+  their heading titles alone (L6062, L6091). The entry-ID sequence is
+  untouched: `### AEGIS-APR-nnn` headings stay 138, contiguous 1-138, no gap
+  and no duplicate — the numbering check AEGIS-APR-138 itself records at
+  L6424-L6426.
+- **Target grant:** AEGIS-APR-138 — the entry this event appends under, and
+  the affected grant ID the preamble requires (L8-L10). That entry is a
+  POLICY DECISION whose Status at recording is **OWED**; the grant is
+  conferred by this event, not by that entry.
+- **Successor grant:** none. This event retires nothing and names no
+  successor; it records the grant the target entry records as owed.
+- **Status at recording:** **ACTIVE within the scope stated below, and no
+  wider**; granted 2026-10-17. This is the grant's state as this event is
+  written; a later appended owner event is the only way to change it.
+- **Date / Grantor:** 2026-10-17 / Peter Nguyen.
+- **Effective at:** 2026-10-17, the date the owner gave the sentence quoted
+  under Scope allowed. The effective time and the transcription time are
+  recorded separately, as the register's format requires.
+- **Recorded at / By:** the date this append is committed / the Stage C
+  implementing agent, which names its exact model in the pull request body
+  and the commit message that carry this append. The recorder is named here
+  as a stage role rather than a model, so that these bytes are fixed when the
+  plan is frozen and not when the commit is made; the model-naming duty is
+  discharged in those two published texts.
+- **Reason:** AEGIS-APR-138 records the scoped grant as **OWED** — "No owner
+  grant for this entry is recorded" (L6113-L6118) — and clarification (e)
+  makes recording it the condition of the directive's own effect ("A REGISTER
+  ENTRY IS OWED", L6167-L6170). The owner has now given that grant, in the
+  sentence quoted under Scope allowed, and directed that the sentence be
+  recorded as the grant. Recording it is what makes it citable: the register
+  covers an action only by an effectively ACTIVE human grant whose scope
+  includes it (L10-L13).
+- **Scope allowed:** **the owner's sentence, verbatim, and the scope it
+  names.** The sentence is reproduced on one line so the quotation is not
+  sensitive to line wrapping, as AEGIS-APR-105 and AEGIS-APR-138 reproduce
+  their own quotations:
+
+  > I grant AEGIS-APR-138 as recorded in the register at main 9e418c8c, for the scope the entry states. Record this sentence as the owner's grant.
+
+  **The scope that sentence names is the scope AEGIS-APR-138 states**, quoted
+  verbatim from the owner decision the entry records — clarification (e), on
+  one line for the same reason:
+
+  > **The directive must be captured as a register entry: a SCOPED GRANT covering (i) the receipt-posting and (ii) the governance correction it makes.**
+
+  **That scope, in the entry's own two subjects. Subject (i), the
+  receipt-posting:** recorded **named-pending** — named, given no definition,
+  and granted nothing (L6172-L6183) — so the grant covers that subject as
+  named and identifies no act under it. **Subject (ii), the governance
+  correction**, limb by limb as the entry rules it: **(a)** the seven
+  delivery stages remain binding, and a directive's shorter stage list is a
+  floor, not a replacement; **(b)** the acceptance index is regenerated only
+  in its own AEGIS-APR-115 rebuild pull request and never inside a batch pull
+  request, and the skills manifest is regenerated in the same pull request as
+  the skill change; **(c)** three classes — AEGIS-APR-115 index rebuilds,
+  five-merge forecast and metrics checkpoints, and ledger self-cost re-reads
+  — are pre-approved record pull requests that continue without further
+  authorisation, on the entry's own statement that their authority "is part
+  of the outstanding grant" and that the entry "confers none of it"
+  (L6261-L6265); **(d)** the loop-end question stays **UNRESOLVED**, with one
+  owner decision named and neither text operationalized (L6269-L6324).
+  **The entry's recorded silence travels with limb (c):** the directive
+  exempts those three classes from "Section 4" and does not say what
+  Section 4 is, and the entry identifies no section (L6265-L6268,
+  L6367-L6378). This event preserves that silence, identifies no section, and
+  reads the exemption no wider than the owner stated it.
+- **Scope FORBIDDEN:** **nothing outside the scope above is authorized, and
+  no other entry's standing changes.** This event authorizes no pull request,
+  no commit, no push and no merge of its own: recording a grant is not a
+  delivery grant, and every pull request still owes its own authority and
+  every MG1-MG5 condition. It authorizes no act under the undefined
+  receipt-posting name, because a name with no definition identifies no act,
+  and the definition stays owed with the entry (L6172-L6183). It answers no
+  part of the loop-end question, which the entry records as UNRESOLVED with
+  neither text operationalized (L6269-L6324). It defines the receipt-posting
+  no further than subject (i) states, and it does not decide what "Section 4"
+  is (L6361). It does not widen, weaken or reinterpret AEGIS-APR-105,
+  AEGIS-APR-113, AEGIS-APR-114, AEGIS-APR-115, AEGIS-APR-116, AEGIS-APR-117,
+  AEGIS-APR-129 or AEGIS-APR-137, and it re-grants nothing those entries
+  record — in particular the index-rebuild authority stands on AEGIS-APR-115
+  alone. It waives no check, no `gate-guard` requirement, no DCO sign-off and
+  no MG1-MG5 condition. It changes no branch protection, no protected-path
+  pattern, no workflow, no code and no harness configuration. It authorizes no
+  provider call, host proof, private input, deployment, spend or evidence
+  deletion. **No restriction, expiry or one-use limit beyond those stated in
+  this event was additionally stated by the owner**, and none is invented
+  here.
+- **What the grant displaces, and what it does not.** Two statements in
+  AEGIS-APR-138 conflict with a recorded grant and **yield to it, within the
+  scope above and only there**: the Status field's "must not be cited as a
+  grant for any action" (L6116-L6117), and the Scope FORBIDDEN clause's
+  opening bar, quoted on one line so the quotation is not sensitive to line
+  wrapping:
+
+  > **Nothing may cite this entry as authority for any action, and it is needed for none.**
+
+  Outside that scope each stands as written. **Two further statements neither
+  yield nor need to**, because each describes what **that entry** did when it
+  was written, and each stays true after this append: the Scope allowed
+  field's closing sentence, "No authority, permission, work item or lifecycle
+  effect is created by this record" — the closing sentence of the Scope
+  **allowed** field, which opens at L6341 and ends where Scope FORBIDDEN
+  begins at L6348 — and the Scope FORBIDDEN clause's "It creates no
+  supersession, appends no lifecycle event and retires no entry"
+  (L6351-L6352). That entry created nothing and appended nothing; a later
+  work item appends this event, and the entry's own Expiry field names "a
+  later appended owner event" as the only way to correct it (L6429-L6433).
+  Reading those two sentences as bars this event must break would misread
+  whose act they describe, and this plan corrects that reading rather than
+  repeating it.
+- **Three bars do not yield:** AEGIS-APR-105's own bar — that entry "grants
+  nothing, so nothing may cite `AEGIS-APR-105` as authority for any action"
+  (L3425-L3426) — which guards a different entry and is untouched; the
+  entry's "No work item may cite this entry as deciding when the loop stops"
+  (L6321-L6322), because this grant answers neither loop text; and the Scope
+  FORBIDDEN clause's remaining prohibitions, restated in this event's own
+  Scope FORBIDDEN field above and unchanged. This event appends under
+  AEGIS-APR-138 and cites AEGIS-APR-138's grant; it cites AEGIS-APR-105 for
+  nothing.
+- **Evidence:** the owner's sentence, quoted verbatim under Scope allowed, as
+  relayed in session on 2026-10-17 and recorded in the workspace file
+  `_A/WAITING-ON-OWNER.md` **L12**, under the heading "OWNER DIRECTION
+  2026-10-17 — #801 / AEGIS-APR-138: GRANTED" (L11). That file sits outside
+  the tracked tree and is **mutable**, so this event cites it by path, heading
+  and line, asserts no size, line count or digest for it, and does not claim a
+  retrievable repository artifact. **The wording is a relay and is recorded as
+  one:** the owner did not type into this register, and the sentence is not a
+  tracked repository artifact; the register preamble L12-L13 makes a current
+  direct owner instruction valid source evidence before transcription, so no
+  second consent is needed and none is asked. **9e418c8c** is the commit the
+  entry was merged at, `9e418c8c63e45caa4bca7fb608d45d0df4d44409`, the merge
+  of pull request #801 (merged 2026-10-17T05:46:14Z). **The register blob is
+  `4863287d6099f3240ae895562d0e165f88b603fc`** — 434,493 bytes, 6,433 LF,
+  0 CR — identical at that commit and at main
+  `5dc96edad8b8d3715446079af9d552f8eb9e6a07` when this plan was written, and
+  this append leaves exactly those bytes as the file's prefix, so the entry
+  quoted here is still the text in place.
+- **Expiry / use limit:** **no expiry, use count or one-use limit was stated
+  by the owner**, and none is invented here. The grant stands until a later
+  appended owner event revokes, expires or supersedes it.
+- **New authority:** the scoped grant AEGIS-APR-138 states, now recorded and
+  ACTIVE within the scope above. Nothing beyond that scope is created, no
+  other entry's standing changes, and no authority beyond the owner's
+  sentence is requested or granted.
+- **Glosses for the labels this event uses**, one plain-English line each, as
+  the standing naming rule requires. **AEGIS-APR-nnn / APR-nnn** — a register
+  entry identifier; a lookup key, never the subject of a sentence. **GRANT** —
+  the event type for authority a named human gives. **POLICY DECISION** — the
+  event type that records a ruling and grants no work. **Lifecycle event** —
+  an appended record of a later fact about an entry, which changes that
+  entry's standing without rewriting it. **OWED** — requested and not yet
+  given. **ACTIVE** — in force for the scope stated. **named-pending** — a
+  subject that is named, has no definition yet, and is not granted.
+  **UNRESOLVED** — a recorded state where two owner-sourced texts disagree and
+  the record picks no winner. **The receipt-posting** — the undefined practice
+  named as subject (i). **The governance correction** — the four limbs (a)-(d)
+  this entry records. **The acceptance index** —
+  `tools/readability_acceptance/acceptance-index.json`, the generated record
+  of which pages are accepted and which remain pending. **The skills
+  manifest** — `tools/skills-manifest.json`, the generated list of the skills
+  under `.claude/skills/`. **A batch pull request** — a readability
+  reading-lane pull request that carries an evidence record of eight pages
+  read. **A record pull request** — the directive's own phrase for the three
+  classes it lists in clarification (c). **A five-merge forecast and metrics
+  checkpoint** — the five-merge re-estimation the execution-measurement log
+  keeps. **A ledger self-cost re-read** — the other pre-approved class; the
+  entry defines it no further, and this event does not either. **MG1-MG5** —
+  the five merge-gate conditions in `docs/delivery-workflow.md`.
+  **`gate-guard`** — the protected-path continuous-integration check that
+  fails when a pull request changes a protected path. **DCO** — the Developer
+  Certificate of Origin sign-off every commit carries. **Pull request (PR)** —
+  a proposed repository change reviewed before it merges. **Clarification
+  (e)** — the fifth paragraph of the owner's 2026-10-16 clarifications, quoted
+  in the entry above.
+
+**Text drafted by:** DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness), the
+Stage A planning agent. **Recorded by:** the Stage C implementing agent, which
+names its exact model in the pull request body and the commit message that
+carry this append, as the register's naming rule requires.
