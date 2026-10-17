@@ -4,24 +4,32 @@
   "re-read" means reading each page whole and judging it against the acceptance contract, not
   rewriting it). **Stage:** C (IMPLEMENT — the stage that does the work and records it).
   **Derivation base:** `f490c16f9ed23f3d489e42f7696323bffcce6fd3` (`origin/main`, the pull
-  request (PR) #781 merge). **This batch's eight pages are unchanged between the lane's original
-  batch base `e2a3e20b7c20ef8385b219b39c6405237163406f` and this base** (verified per path with
-  `git diff --numstat`; all eight report no change).
+  request (PR) #781 merge). **Seven of this batch's eight pages are unchanged between the lane's
+  original batch base `e2a3e20b7c20ef8385b219b39c6405237163406f` and this base** (`git diff --numstat`
+  is empty for each of the seven). **LD-33 is the exception:** it did not exist at `e2a3e20b`
+  (`git cat-file -e e2a3e20b:<path>` exits 128) and is **453 added lines** at this base — it is the
+  page this batch was created to recover.
 - **Agent / model attribution (the repository's 2026-10-13 rule).** This record and every text this
   batch publishes are drafted by **DeepSeek-4.1-Flash (deepseek-flash)**, an AI agent operating under
   the owner account; the agent identity for this batch is
   `readability-phase4-lane-d-batch5-implementer`.
-- **What this page is.** The lane's tracked batch record for its fifth batch. It is the **evidence
-  source** a **separate eligible keeper** reads under AEGIS-APR-117 (the owner's approval-register
-  item letting a different agent re-record rows from the same evidence when the original recorder's
-  independence failed; no page needs re-reading for that). **This batch authors no keeper rows and
-  edits no ledger section** — see section 12.
-- **Acceptance revision bound by the whole batch and named by every row-quote string:**
+- **Repair pass, 2026-10-17 (Stage C).** The whole-page readings, dispositions, gaps and counts
+  below are this batch's own. The three corrections its first independent implementation audit
+  required (findings R1, R2 and R3 in comment 6209709073) were applied on 2026-10-17, in a repair
+  commit on this branch, by a **different** Stage C agent — **DeepSeek V4 Flash (deepseek-flash,
+  DeepSeek Harness)**. That pass withdrew section 10's row offer, replaced section 2's causal
+  explanation and O-3 with measured facts, and stated the LD-33 exception in this header; it changed
+  no reading, disposition, gap or count.
+- **What this page is.** The lane's tracked batch record for its fifth batch: **evidence of a
+  reading, not an acceptance**. **No keeper may author an acceptance row for any of the eight
+  pages**, and **all eight stay pending** — the ledger's PARTIAL rule, quoted in section 10. **This
+  batch authors no keeper rows and edits no ledger section** — see section 12.
+- **Acceptance revision bound by the whole batch and named by every per-page line in section 10:**
   `f490c16f9ed23f3d489e42f7696323bffcce6fd3`. It resolves to itself and is contained in
   `refs/remotes/origin/main` (`git merge-base --is-ancestor f490c16f… refs/remotes/origin/main`
   exits 0, observed in this batch's fresh clone).
 - **This batch changed none of the eight read pages**, so the bytes read are the bytes `main`
-  carries, and the acceptance is not voided by the merge.
+  carries, and the reading is not voided by the merge.
 - **This batch's headline finding: an unread page was sitting behind the read frontier, and this
   batch reads it first** (section 2). It is the page at sorted index **456** of the 593-path pending
   set, `docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md`.
@@ -41,8 +49,9 @@
 - **AEGIS-APR-039** — the owner's standing grant for backlog work, commits, pushes and PRs.
 - **AEGIS-APR-101** — the keeper-independence rule: the agent that records an acceptance row must
   differ from the page's author **and** from the accepting reviewer.
-- **AEGIS-APR-117** — the route that lets a different eligible agent re-record rows from the same
-  evidence after a withdrawal; **no page needs re-reading** for it.
+- **AEGIS-APR-117** — the owner's route by which the ledger keeper may append a **withdrawal row**
+  cancelling an earlier recorded acceptance row that turns out to be wrong; it is **not** a route to
+  a first acceptance row, and **none of this batch's eight pages has a row to withdraw**.
 - **AEGIS-APR-115** — the standing index-rebuild PR scope (it rebuilds `tools/` JSON; this batch
   does not run it).
 - **AEGIS-APR-118** — the owner's classification of the readability acceptance tool as
@@ -114,17 +123,28 @@ figures above as the instrument's, not as its own measurement.
    ```
 
    **Why it happened, stated rather than smoothed over.** Batches 1-3 derived at `e2a3e20b`, where
-   the pending set was **590** and the quarters were `148/148/148/146`, so lane D began at index
-   **444** and their 24 pages were 590-indices 444-467. Batch 4 continued contiguously from that
-   derivation (**590-indices 468-475**) rather than from the *current* quarter. Between the two bases
-   PR #781 added **three** paths to the pending set and none left it —
-   `docs/delivery-workflow.md` (new index **377**),
-   `docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md` (new index
-   **456**) and `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` (new index **531**). Two of the three
-   sort before index 444, so the quarter start moved **444 → 447** and the whole read set shifted
-   +2; the third (**456**) landed *inside* lane D's quarter, *below* the frontier batch 4 then
-   established, and **no batch in any lane has read it**. This batch's independent mapping agrees
-   with lane B batch 4's record, which names the same page at index 456 (PR #788, record line 74).
+   the pending set was **590** and the quarters were `148/148/148/146` (`ceil(590/4)` = 148), so lane
+   D began at index **444** and their 24 pages were 590-indices 444-467. Batch 4 continued
+   contiguously from that derivation (**590-indices 468-475**) rather than from the *current*
+   quarter. Between the two bases **three paths entered** the pending set and **none left it**, and
+   they did not all arrive the same way:
+   - `docs/delivery-workflow.md` (new index **377**) was **not added by any of them**: the file has
+     existed since commit `c3527560` (PR #653) and entered the pending set by a **24-line
+     acceptance drift** (the instrument records `changed_lines` 24 for it);
+   - `docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md` (new
+     index **456**) was added by **PR #781** — the only one of the three that PR #781 added;
+   - `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` (new index **531**) was added by commit
+     `08856b64` and merged in **PR #786**.
+
+   **One of the three sorts before index 444** (**377**); the other two are at **456** and **531**.
+   The quarter start nevertheless moved **444 → 447**, because the count-based quarter size changed
+   **148 → 149** (`ceil(590/4)` → `ceil(593/4)`): 444 = 3 × 148 and 447 = 3 × 149. **The read
+   set shifted +1 for LD-1 … LD-11** (the eleven read pages at old indices 444-454, below the 456
+   insertion) **and +2 for LD-12 … LD-32** (the twenty-one at old indices 455-475, above it); the
+   531 insertion sorts beyond the whole read set and moves none of it. The **456** path landed
+   *inside* lane D's quarter, *below* the frontier batch 4 then established, and **no batch in any
+   lane has read it**. This batch's independent mapping agrees with lane B batch 4's record, which
+   names the same page at index 456 (PR #788, record line 76, in the block at L73-77).
 4. **The three readings, and why R2 is the one used.** **R1** (the eight contiguous unread pages
    after the frontier) would start at 478 and leave **456** permanently unread — it skips nothing
    *relative to the frontier* but does leave an unread page behind it. **R3** (quarter start 447 +
@@ -157,8 +177,8 @@ figures above as the instrument's, not as its own measurement.
   (deepseek-flash)**), Stage C, working alone in a fresh clone. **Declared deviation: none** — no
   page of this batch had a keeper row recorded by this batch or by any prior batch (all eight are in
   the `no_recorded_acceptance` bucket), so the AEGIS-APR-101 keeper-independence question does not
-  arise for this batch's own act of recording evidence: **this batch records evidence only and
-  authors no rows at all.**
+  arise for this batch's own act of recording evidence: **this batch records evidence only, authors
+  no rows at all, and no keeper may author one for any of the eight (section 10).**
 - **Scope lock:** the eight pages named in section 2 plus this one new record file. Nothing else.
 - **Tier:** `docs-only` (one new Markdown page; no skill frontmatter, no Security Rules, no Stop
   Conditions, no script, workflow, test, configuration or lock file).
@@ -368,7 +388,7 @@ full disposition alongside it.
 | --- | --- | --- | --- |
 | O-1 | **An unread page sits behind lane D's read frontier**: 593-index 456, `readability-apr117-withdrawals-and-rerecord-2026-10-15.md`, inside lane D's quarter (447-592, position 10) and below the frontier (477). No batch in any lane has read it; checked against every batch record at every open PR head (17 PR heads fetched; the only three records that mention the path mention it as a *pending-set arrival*, never as a read page). | **read first in this batch.** The batch selects by the unread sequence (R2), so the page is read and no page is skipped. | The read-set extraction from the four lane D batch records at their PR heads; the 593-set index map; `git grep` over all 17 fetched PR heads. |
 | O-2 | Lane D's first two batch pages (`full-page-readability-batch-after-233`, `…-234`) now sit at 593-indices 445 and 446 — inside **lane C's** quarter — while lane D's own quarter begins at 447. | **unchanged — reported, not decided.** This batch touches neither page; the overlap is a cross-lane boundary question for the coordinator. | The 593-set index map; `ceil(593/4)` quarter arithmetic. |
-| O-3 | PR #781 added three paths to the pending set, at indices 377 (`docs/delivery-workflow.md`), 456 (the APR-117 record) and 531 (`docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`). Two sort before index 444, which is what moved the quarter start 444 to 447 and created O-1. | **unchanged — recorded as the cause.** | The 590-set/593-set set difference; lane B batch 4's record (PR #788 line 74) independently names the same three indices. |
+| O-3 | Three paths entered the pending set between `e2a3e20b` and this base and none left it, at indices 377 (`docs/delivery-workflow.md`, which has existed since `c3527560`/PR #653 and entered by a 24-line acceptance drift), 456 (the APR-117 record, added by PR #781) and 531 (`docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`, added by `08856b64`/PR #786). **One** sorts before index 444 (377); the quarter start moved 444 → 447 because the count-based quarter size changed 148 → 149 (`ceil(590/4)` → `ceil(593/4)`), not because insertions precede 444. The read set shifted +1 for LD-1 … LD-11 and +2 for LD-12 … LD-32. | **unchanged — recorded as the cause.** | The 590-set/593-set set difference; lane B batch 4's record (PR #788 line 76) independently names the same three indices and states "`ceil(593/4) = 149` is what moves the boundary, not the three insertions". |
 | O-4 | The six `cannot_decide` lost-commit pages (`cloud-security-baseline-reviewer/references/{aws,azure,gcp,supabase,vercel}-baseline.md` and `database-backup-verifier/SKILL.md`) are in the instrument's `cannot_decide` bucket, not in the 593-path pending set, and therefore in **no lane**. | **excluded, and stated.** This batch picked up none of them; all six are outside the 593-set and the intersection with lane D's 146 paths is **empty** (measured). | `check_index.py --json` `undecided` array at the base; the intersection check. |
 | O-5 | The library norm for each term this batch considered flagging. | **measured, then applied as section 6's standard**: norms (`manual-only` 206/655, `UTC` 222, `frontmatter` 53, `disable-model-invocation` 55, `Stage C` 49, `Playwright` 44, `receipt` 74, `screen` 148, `DCO` 71) are observations, never gaps; `isolated worktree` (26), `AEGIS-APR-101` (12), `AEGIS-APR-117` (7) and `code-fence` (2) are below norm and are counted. | `git grep -l -i -F` per term at `f490c16f`, intersected with the instrument's own 655-page reader set. **This differs from lane D batch 4's treatment**, which counted `manual-only` and `frontmatter` as gaps; recorded here as an observation for the coordinator, not a correction of that batch. |
 | O-6 | LD-33's count sentence (L448-451) renders "568 = 596 - 29 + 1" and defers the explanation to "the ledger section's Count honesty note". A reader cannot evaluate the "+ 1" from LD-33 alone. | **not a gap — the pointer resolves.** The ledger explains the term in full: "base pending 596, 29 pages accepted by fresh rows, +1 for the new evidence file, a new reader page with no acceptance row" (ledger L5246-5252), with both printed figures measured by command at that head (L5297-5302). | Ledger L5238-5252 and L5297-5302 at the base. |
@@ -393,22 +413,38 @@ full disposition alongside it.
   `tools/`, which is not Markdown and would break this change's `docs-only` tier; the rebuild is
   the standing AEGIS-APR-115 pull request's own scope (D73 row 8).
 
-## 10. The row-quote strings, verbatim (offered for the separate keeper)
+## 10. Why no row is offered for any of the eight pages, and the per-page lines verbatim
 
-Each line below appears in this file byte-for-byte and is **offered** for the separate eligible
-keeper's rows under AEGIS-APR-117 — **this batch authors no rows and claims no row IDs.** Every line
-contains the full 40-character acceptance revision, and **every line names its partial disposition**
-so that a keeper row cannot silently read as full.
+**The rule this section follows.** The ledger's PARTIAL rule (quoted from the page read here as
+LD-33, L402-414, and repeated in the ledger at L5239-5240 and L5303-5304) is that **a page a lane
+marked PARTIAL is never recorded as a full-page-acceptance**, carries **no acceptance row**, and
+**stays pending**. **No keeper may author an acceptance row for any of the eight pages this batch
+read**, and **all eight stay pending** — 0 full / 8 partial, as section 4 records.
+
+**Why the wording matters, measured.** `check_index.py` buckets a page as accepted when its recorded
+row's revision shows a **zero-line** difference and no new section (`check_index.py` L181-184; the
+accepted branch is `elif total == 0: accepted.append(record)`), whatever the row's kind. The ledger
+documents the consequence at its L5243-5246: three PARTIAL pages stay in the printed accepted bucket
+only because the instrument classifies each page's withdrawal row as an acceptance at zero drift,
+although the bucket's documented definition requires a full-page-acceptance row. A row-shaped string
+for a PARTIAL page therefore does not stay "merely partial" if someone pastes it: the page would
+leave the published pending count with nothing downstream to catch it. This batch **offers no rows
+and claims no row IDs**, and words its lines so that none can be pasted as one — the shape lane D's
+batch 4 used for its own eight pages (`PAGE LD-25 partial, no acceptance row, stays pending; …`,
+PR #791).
+
+Each line below appears in this file byte-for-byte, names its page's partial disposition and its gaps
+with the page line numbers given in section 6, and is **not** a row:
 
 ```text
-LD-33 accepted (partial; gaps G-33.1..G-33.4, section 6): docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-34 accepted (partial; gaps G-34.1..G-34.3, section 6): docs/evidence/documentation/skill-docs-fourth-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-35 accepted (partial; gaps G-35.1..G-35.2, section 6): docs/evidence/documentation/skill-docs-seventh-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-36 accepted (partial; gaps G-36.1..G-36.3, section 6): docs/evidence/documentation/skill-docs-sixth-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-37 accepted (partial; gaps G-37.1..G-37.3, section 6): docs/evidence/documentation/skill-docs-third-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-38 accepted (partial; gaps G-38.1..G-38.3, section 6): docs/evidence/documentation/skill-references-fifth-a-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-39 accepted (partial; gaps G-39.1..G-39.2, section 6): docs/evidence/documentation/skill-references-fifth-b-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
-LD-40 accepted (partial; gaps G-40.1..G-40.2, section 6): docs/evidence/documentation/skill-references-final-16-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
+PAGE LD-33 partial, no acceptance row, stays pending; gaps G-33.1..G-33.4 (section 6); docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
+PAGE LD-34 partial, no acceptance row, stays pending; gaps G-34.1..G-34.3 (section 6); docs/evidence/documentation/skill-docs-fourth-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
+PAGE LD-35 partial, no acceptance row, stays pending; gaps G-35.1..G-35.2 (section 6); docs/evidence/documentation/skill-docs-seventh-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
+PAGE LD-36 partial, no acceptance row, stays pending; gaps G-36.1..G-36.3 (section 6); docs/evidence/documentation/skill-docs-sixth-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
+PAGE LD-37 partial, no acceptance row, stays pending; gaps G-37.1..G-37.3 (section 6); docs/evidence/documentation/skill-docs-third-20-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
+PAGE LD-38 partial, no acceptance row, stays pending; gaps G-38.1..G-38.3 (section 6); docs/evidence/documentation/skill-references-fifth-a-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
+PAGE LD-39 partial, no acceptance row, stays pending; gaps G-39.1..G-39.2 (section 6); docs/evidence/documentation/skill-references-fifth-b-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
+PAGE LD-40 partial, no acceptance row, stays pending; gaps G-40.1..G-40.2 (section 6); docs/evidence/documentation/skill-references-final-16-readability-2026-09-23.md read whole at f490c16f9ed23f3d489e42f7696323bffcce6fd3
 ```
 
 ## 11. Verification commands (run at the head; outputs in the pull-request body)
@@ -421,8 +457,9 @@ origin/main..HEAD`, and `python -P scripts/ci/check_pr_body_skills.py --body-fil
 
 ## 12. What this batch did not do
 
-It **authored no keeper row and edited no ledger section** (AEGIS-APR-101's corrected posture; the
-rows are a separate eligible keeper's work under AEGIS-APR-117); edited none of the eight read pages
+It **authored no keeper row and edited no ledger section** (AEGIS-APR-101's keeper-independence rule;
+and **no keeper may author an acceptance row for any of the eight pages** — the ledger's PARTIAL
+rule, section 10); edited none of the eight read pages
 (no-rewrite discipline); rewrote no dated snapshot; bound no acceptance row to this batch's own
 unmerged head; ran no `build_index.py --write` and rebuilt no `tools/` artifact; touched no page
 outside lane D's quarter; touched no other lane's branch, PR or clone; picked up none of the six
@@ -442,8 +479,9 @@ bullet addressed with line cites rather than asserted; every gap named, never sm
 rather than against prose) — the read frontier, the quarter bounds, the norm measurements and the
 count-note pointer were all resolved against the repository. `scoped-approval-register` (the skill
 that establishes which recorded approval covers an action) — established this batch records under
-AEGIS-APR-101 and delivers under AEGIS-APR-039, consumes, extends and requests no grant, and that the
-rows are the separate keeper's AEGIS-APR-117 scope. `docs-retention-index` (the skill that decides
+AEGIS-APR-101 and delivers under AEGIS-APR-039, consumes, extends and requests no grant, and that no
+acceptance row may be authored for any of the eight pages (section 10). `docs-retention-index` (the
+skill that decides
 whether a new page owes a retention entry) — consulted; no retention entry or frontmatter mechanism
 exists for `docs/evidence/documentation/` (**0 of its 99 files carry `retention:` frontmatter**
 at the base), so the new page follows the established shape and creates no retention row; recorded as
@@ -470,16 +508,18 @@ skill@6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 / reason:
   requirement and no per-page active rate is claimed.
 
 *Prepared by a **DeepSeek** agent (**DeepSeek-4.1-Flash (deepseek-flash)**) operating under the
-owner account, as the repository's attribution rule (2026-10-13) requires.*
+owner account, as the repository's attribution rule (2026-10-13) requires; the 2026-10-17 Stage C
+repair pass named in the header is by **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**.*
 
 ---
 
 ## Footer
 
-sha256: 05ce579f8bac7a55b4ee6b538f50d0652303d43f85d2006408e75a28751ceac2
+sha256: 98bb3431d29f13a8f3d1866a247b3ccbc25b264edc11eb04916e858d825e6a94
 
 This digest covers the batch record's bytes from the first line through the closing rule line and its
-terminating newline, encoded UTF-8 with LF line endings: exactly 42,016 bytes, byte offsets
-0 through 42,015 inclusive, lines 1-475. It does not cover the blank separator line between that rule and
+terminating newline, encoded UTF-8 with LF line endings: exactly 46,021 bytes, byte offsets
+0 through 46,020 inclusive, lines 1-513. It does not cover the blank separator line between that rule and
 the `## Footer` heading, nor this footer. Any edit above the rule needs a fresh validation. Computed by
-**DeepSeek-4.1-Flash (deepseek-flash)** at this Stage C head.
+**DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)** at this Stage C head, after the 2026-10-17
+repair pass.
