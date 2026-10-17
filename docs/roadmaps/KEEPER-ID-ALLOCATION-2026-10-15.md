@@ -33,6 +33,12 @@ this repository, and nothing here claims a repository provenance the source does
 by **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**, the Stage C repair agent. The
 transcription and the 2026-10-15 measurements above remain DeepSeek-4.1-Flash's, as stated above.
 
+**Second-repair attribution (2026-10-17).** The four further Codex-review corrections in this
+revision — the exact-head merge pin in S4, the `main`-inclusive ID maximum in S6, the
+provisional-ID distinction in S2/S4/S10, and the corrected S2/S8 measurement claim — were also
+drafted by **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**, the Stage C repair agent.
+All earlier text and measurements remain attributed as stated above.
+
 ## S1. Source, authority and provenance
 
 - **Original source — outside the repository, said plainly.** The allocation, the merge protocol and
@@ -60,11 +66,14 @@ transcription and the 2026-10-15 measurements above remain DeepSeek-4.1-Flash's,
   itself.** The [approval register](../approvals/APPROVAL_REGISTER.md) remains the sole documentary
   grant register for this repository: an action is covered only by an effectively ACTIVE human grant
   whose scope includes it.
-- **Status of the numbers on this page.** Every figure in S2, S3, S4, S6 and S8 was measured by
-  command this session (the commands and their observed output are in S8). The **rules** are the
-  coordinating agent's and are transcribed; the **numbers** are this session's measurements, and
-  they move as pull requests merge. Where the source file's own figures differ from the
-  measurement, the difference is recorded in S3 and S9 rather than smoothed over.
+- **Status of the numbers on this page.** Every figure in S3, S4, S6 and S8 was measured by
+  command this session (the commands and their observed output are in S8). **S2's two pending-list
+  figures — the sort cut at `t` and the six `cannot_decide` pages — are transcribed from the source
+  record, not re-derived here**: they describe its 2026-10-15 pending list, which moves with every
+  merge, and S8 row 10 records that limit instead of implying a command it does not contain. The
+  **rules** are the coordinating agent's and are transcribed; the **numbers** this page measures are
+  this session's, and they move as pull requests merge. Where the source file's own figures differ
+  from the measurement, the difference is recorded in S3 and S9 rather than smoothed over.
 
 ## S2. The keeper-ID band allocation
 
@@ -88,6 +97,9 @@ transcription and the 2026-10-15 measurements above remain DeepSeek-4.1-Flash's,
   revision>:<Page>`. A slip while renumbering would bind the wrong acceptance to a page — a silent,
   plausible-looking error of exactly the class this repository has spent a week removing. **Fixing
   it at authoring time costs nothing; fixing it at merge costs a re-derivation of every row.**"*
+  (The quoted "stable ID" is the column's name in the source. Under the S2 gloss below, the value
+  that renumber rewrites before the row is recorded is the **provisional** ID; the stable ID
+  recorded on `main` is never rewritten.)
 - **Two rulings the source file attaches to the allocation, transcribed:** (1) the operative
   partition is **sort-and-quarter** — sort the pending paths, split into four contiguous count-based
   quarters, take your quarter — and the letter ranges in the early lane briefs (`A–F / G–N / O–S /
@@ -101,7 +113,10 @@ transcription and the 2026-10-15 measurements above remain DeepSeek-4.1-Flash's,
   here**.
 - **Glosses in this section.** *Keeper row*: one row of the consolidated keeper table that binds a
   page's acceptance to its evidence, recording agent and blob ID. *Stable ID*: the row's permanent
-  identifier, never reused and never rewritten. *Blob ID*: the Git blob hash a row binds to an
+  identifier **once the row is recorded on `main`**; it is never reused and never rewritten there.
+  Before that, the same column on an unmerged lane branch holds a **provisional ID** — a claim the
+  merge protocol (S4 step 3) renumbers into the lane's band; only the recorded ID is stable.
+  *Blob ID*: the Git blob hash a row binds to an
   acceptance, recomputed with `git rev-parse <revision>:<page>`. *Pending list*: the pages the
   instrument reports as having no recorded acceptance. *Lane quarter*: one of the four contiguous
   count-based slices of that sorted pending list.
@@ -180,18 +195,26 @@ C, D**. The merge holder, for every lane pull request after the first:
 1. **Reconcile against the moved base without rewriting the reviewed head.** Do **not** rebase the
    branch and do **not** merge `main` into it: either moves the head that the implementation audit,
    validation record and final review name, and voids every head-bound verdict. **The merge is a merge
-   commit into the current `origin/main`** (`gh pr merge <number> --merge`), which leaves the reviewed
-   head in place. **If reaching that merge needs a commit on the branch — a conflict at the two ledger
-   points (step 2) or the renumber (step 3) — that commit is a new head**: every head-bound verdict at
-   the old head is void, and the complete chain (implementation audit, validation, final review and a
-   fresh automated review) runs again at the new head before the merge.
+   commit into the current `origin/main`** — the command is
+   `gh pr merge <number> --merge --match-head-commit <reviewed-head>` — which leaves the reviewed
+   head in place and **refuses the merge if the branch has moved past it**
+   (`--match-head-commit` requires the pull request's head to equal the SHA given). **Merge the exact
+   reviewed head; any new commit is a new head requiring a fresh D/E/F chain** — a new implementation
+   audit, validation record and final review (Stages D, E and F of the delivery workflow) at that
+   head, before the merge. **If reaching that merge needs a commit on the branch — a conflict at the
+   two ledger points (step 2) or the renumber (step 3) — that commit is a new head**: every
+   head-bound verdict at the old head is void, and the complete chain (implementation audit,
+   validation, final review and a fresh automated review) runs again at the new head before the
+   merge.
 2. **If a conflict must be resolved, resolve the two ledger conflicts by KEEPING BOTH SIDES** — all
    dated keeper sections kept, in lane order; all rows kept. Both pull requests insert a dated keeper
    section at the same pre-sentinel point and append their rows at the same table tail, so the second
    merge would otherwise be a real text conflict at both points. Nothing on either side is deleted,
    so there is no judgement call about which side wins.
-3. **Renumber the lane's rows into that lane's allocated band** (S2). **Renumber the stable
-   ID only — never the `Blob ID`.** Recompute each `Blob ID` afterwards with
+3. **Renumber the lane's provisional IDs into that lane's allocated band** (S2). **Renumber the
+   provisional ID only — never the `Blob ID`.** The rows are not yet recorded on `main`, so this is
+   the one permitted ID rewrite; the stable ID a row receives when it lands is permanent (S2).
+   Recompute each `Blob ID` afterwards with
    `git rev-parse <Acceptance revision>:<Page>` and confirm it is unchanged. A wrong blob binds the
    wrong acceptance to a page: silent, plausible, and exactly the defect class this repository spent
    the preceding week removing.
@@ -265,10 +288,14 @@ raised by lane B's batch 4 after the boundary moved under it:
 - **The rule, verbatim: "new keeper IDs must be checked against every OPEN pull request, not just
   `main`."** Checking only `main` is not enough once parallel pull requests are open — two pull
   requests authored in the same band collide at merge. Until every prior batch is renumbered and
-  merged, **new batches take IDs above the highest ID any open pull request claims inside their own
-  lane's band** — a claim outside the band does not move them, and the band's upper bound still binds
-  (S2): an open lane-D claim in `K-381`–`K-480` cannot push a lane-A batch past `K-180`. The merge
-  holder normalises the whole table at merge.
+  merged, **new batches take IDs above the highest ID claimed inside their own lane's band by `main`
+  or by any open pull request — the maximum over the union of `main` and all open heads, not the
+  open heads alone** — a claim outside the band does not move them, and the band's upper bound still
+  binds (S2): an open lane-D claim in `K-381`–`K-480` cannot push a lane-A batch past `K-180`.
+  **Measured at the recorded base (S3 and the S8 row-5 output): lane A's open claims end at `K-097`
+  (#774 and #777), while `main` already owns `K-098…K-104`; an open-heads-only maximum would select
+  the occupied `K-098`, whereas the union maximum is `K-104`.** The merge holder normalises the
+  whole table at merge.
 - **Why the rule exists, in the source file's own account:** the band allocation assumed a lane's
   rows would be *renumbered into* the band at merge, while a later batch's brief told the lane to
   *author into* it. **Both instructions were followed and they met** — which is how #772 and #780
@@ -297,8 +324,9 @@ names it bare, or as a repository path, is not.
 
 Measured in the Stage C clone `_stagec-keeperalloc-pub-clone`, a full HTTPS clone of
 `https://github.com/ModernNomad-98/Project-Aegis.git` created for this publication. Each line is the
-command's observed output. The row-5 block below is a 2026-10-17 re-run of the same measurement from
-the pinned heads; its output matches the row-5 result.
+command's observed output, except row 10, which records figures this page does **not** re-derive and
+names why. The row-5 block below is a 2026-10-17 re-run of the same measurement from the pinned
+heads; its output matches the row-5 result.
 
 | # | What was measured | Command | Observed |
 | --- | --- | --- | --- |
@@ -311,6 +339,7 @@ the pinned heads; its output matches the row-5 result.
 | 7 | The blank-line truncation, demonstrated | scratch branch adding one blank line after the third keeper row; `build_index.py --ref <scratch> --report` | exit **0**; `table_rows 3` (not 162) |
 | 8 | The allocation file's own length and content | read of `_resume-2026-10-09/KEEPER-ID-ALLOCATION.md` | 445 lines; band table at its L24-29; open-PR rule at its L386-391; merge protocol at its L139-176 |
 | 9 | The quarter ruling's own text | read of `_resume-2026-10-09/_quarter-ruling.md` | 34 lines; the two readings at its L8-12; the three rulings at its L14-18 |
+| 10 | The two S2 pending-list figures — the sort cut at `t` and the `cannot_decide` count | **none here**; read of `_resume-2026-10-09/KEEPER-ID-ALLOCATION.md` (a workspace file outside the repository) | **transcribed, not re-derived here**: the source record states "only three pending paths sort at or above `t`" and six `cannot_decide` pages for its 2026-10-15 pending list; no command in this page reproduces them, and that list moves. Row 4's `lost_commit_events 10` is a different counter at a later base and does not reproduce the six. |
 
 **S8 row 5, executable.** Run from the repository root in a full clone. The nineteen values are the
 heads S3 records, pinned by full commit ID so the run reproduces after the pull-request refs move. The
@@ -467,7 +496,7 @@ One-line plain-English gloss for every internal label used on this page (the own
 | **derivation base** | The `main` commit a branch was created from; the coordinate against which insert-only is measured. |
 | **keeper** | The distinct agent role that records acceptance rows in the keeper table. |
 | **keeper row** | One row of the consolidated keeper table binding a page acceptance to evidence, reviewer and blob ID. |
-| **K-id (stable ID)** | The permanent identifier in a keeper row's first column; never reused and never rewritten. |
+| **K-id (stable ID)** | The permanent identifier in a keeper row's first column **once the row is recorded on `main`**; never reused and never rewritten there. An unmerged branch row's ID is provisional until the S4 step-3 renumber (S2). |
 | **lane A / B / C / D** | The four parallel full-page re-read lanes of Phase 4 of the documentation readability programme. |
 | **lost-commit** | A recorded acceptance whose commit can no longer be resolved; the page stays pending. |
 | **official_pending_count** | The instrument's own count of reader pages awaiting acceptance; it rises when a new evidence page is added. |
