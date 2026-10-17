@@ -5111,6 +5111,165 @@ six lost-commit rows' cells, rebuilds no `tools/` artifact, runs no
 authority. The batching procedure does not grant provider, private-input,
 real-host or deployment authority (L3018-3020).
 
+## Ledger-keeper recording + batch update — readability Phase 4 re-read lane D, batch 2, 2026-10-15
+
+**Under AEGIS-APR-101 (recording only).** This note records Phase 4 re-read lane D's second batch —
+eight full-page re-reads of dated evidence notes in the lane's fixed range, under the standing
+backlog delivery grant AEGIS-APR-039. It is additions only: it rewrites no dated text, edits no
+existing keeper row, and **confers nothing**. Its tracked evidence source is
+[the batch record](../evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md), which
+names every row's full 40-character acceptance revision verbatim.
+
+**The lane's fixed range.** The pending set at the base is the instrument's `no_recorded_acceptance`
+(586) plus `provably_pending` (4) buckets: **590 paths** (`python -P -B
+tools/readability_acceptance/check_index.py --json --ref e2a3e20b` at `e2a3e20b`). Sorted and split
+into four contiguous quarters by count, **lane D takes the last quarter: 146 pages, first
+`docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md`, last
+`tools/behavioral_eval_runner/README.md`.** Batch 1 = the first eight (sorted indices 444-451, PR
+#774); **batch 2 = the next eight (sorted indices 452-459)**, re-checked against the instrument at
+the base: all eight in `no_recorded_acceptance`, so none is already accepted and none is outside the
+lane's range.
+
+**What was read.** Eight dated evidence notes, 45-366 lines each, read **whole, line by line, as
+prose** at the base `e2a3e20b7c20ef8385b219b39c6405237163406f` (1,842 lines total; no display elision),
+plus the mechanical pass: 23 local links with zero broken paths and zero bad anchors; 30 forty-hex
+SHAs with one self-disclosed non-resolving revision; 27 backtick tokens all resolving; 4 external
+links not fetched; 4 footer digests recomputed and matching. All eight pass as they stand; **no page
+was edited** (the no-rewrite discipline forbids edits to dated records). Per-page dispositions, the
+six acceptance bullets addressed per page, the six recorded observations (O-1..O-6) and the depth
+record are in the batch record.
+
+**Eight full-page-acceptance rows are appended** (K-381 to K-388), one per page, bound to the
+main-contained base revision. The appended count is therefore **8**, with no withheld or owed row —
+none of the eight pages is this ledger, so the self-cost question does not arise for them. The batch
+record itself is a new reader page and enters `no_recorded_acceptance` pending its own later review.
+
+**Stable IDs — the lane's allocated band, used as directed.** Lane D's band is **K-381..K-480**,
+recorded in section S4 of `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` — not in a tracked
+`KEEPER-ID-ALLOCATION.md`, a name no ref binds and no path matches. Batch 1 authored
+K-090..K-097 before the bands existed; batch 2 starts at the band's first free id and goes up
+(**K-381..K-388**, verified absent at the base by command). A merge-holder renumber of batch 1
+must not collide with these (for example K-389..K-396) and touches the stable ID, never the Blob ID.
+
+**Count honesty (unchanged; no count of this lane's own).** This ledger publishes no count of its
+own and cites the index (D84). The eight rows change nothing until a rebuild, and the builder can
+only be rebuilt after the commit that carries the rows because it stamps its own `built_at_ref`; the
+resolvers this ledger already names apply (a two-commit follow-up, or a merger-side rebuild at the
+merged tip, D73 row 8). The rebuild itself is the standing AEGIS-APR-115 rebuild pull request's own
+scope and is not part of this change.
+
+**Self-cost.** This section changes this ledger by more than 10 lines and adds a section, so this
+page returns to **pending** at the new head and owes a subsequent independent full-page re-read by a
+reader who did not write it — the self-cost every prior update states.
+
+**Declared deviation, stated plainly (the owner's APR-117 route).** The reader of these eight pages
+is the same agent that writes this section and the eight rows, so the AEGIS-APR-101 keeper
+independence condition is **not satisfied and is not claimed satisfied**. Per the owner's Decision 3
+of 2026-10-15, the rows are to be withdrawn and re-recorded by a different agent from the same
+evidence — no page needs re-reading — under AEGIS-APR-117. The disposition of that withdrawal and
+re-record is left to the merge holder.
+
+**What this note does not do.** It rewrites no dated snapshot, reorders or deletes no existing row,
+binds no row to this lane's unmerged head, edits none of the eight read pages, rebuilds no `tools/`
+artifact, and confers no authority. The batching procedure "does not grant provider, private-input,
+real-host or deployment authority" (L3018-3020). Prepared by a **DeepSeek agent**
+(`deepseek-v4-pro`) operating under the owner account, as the repository's attribution rule
+(2026-10-13) requires.
+## Ledger-keeper AEGIS-APR-117 withdrawal and re-record — Phase 4 re-read lane D, batch 2, 2026-10-16
+
+**Recorded by an eligible keeper, not by the lane's reader.** This section is written by
+**DeepSeek-4.1-Flash (deepseek-flash)**, keeper identity `deepseek-flash-apr117-keeper` — an agent that
+ran none of the eight reads, wrote none of the eight pages, wrote none of the eight withdrawn
+rows, and holds no other stage of pull request (PR) #778. It records under **AEGIS-APR-101** (the
+register entry defining the recording-only ledger-keeper role and its keeper-independence
+condition: the keeper must be a **different agent** from the page's author and accepting
+reviewer) and under **AEGIS-APR-117** (the register entry that lets the ledger keeper append a
+withdrawal row cancelling a recorded acceptance row, bound to evidence). It is a **Stage C**
+recording act — Stage C is the implementation step of the seven-stage delivery workflow — and it
+**appends only: it rewrites nothing.**
+
+**The defect this act cures.** The lane D batch 2 rows **K-381..K-388**, appended by the section
+above on 2026-10-15, carry `readability-phase4-lane-d-implementer-c2` in their `Reviewer`
+cell — the same agent that read the eight pages and wrote those rows. AEGIS-APR-101's
+keeper-independence condition is therefore **not satisfied** for those eight rows, and
+AEGIS-APR-101's Scope FORBIDDEN begins 'No self-review'. The section above declares exactly that
+and leaves 'the disposition of that withdrawal and re-record ... to the merge holder'; that
+disposition had not been performed. It is performed here, on the route **owner decision 3 of
+2026-10-15** directed — no ratification of the carry; use the AEGIS-APR-117 route — the same
+route PR #777 (lane A batch 2) and PR #787 (lane D batch 1) already used. *Glosses:*
+**AEGIS-APR-101** is the owner-approval-register entry that created the keeper role;
+**AEGIS-APR-117** is the entry that lets the keeper cancel a wrong recorded row by appending a
+withdrawal row; **keeper** is the distinct agent role that records acceptance rows; **lane D
+batch 2** is the second group of eight pages assigned to the fourth of four re-read workstreams.
+
+**What is appended, in two blocks.**
+
+1. **Eight withdrawal rows** — `K-389W`, `K-390W`, `K-391W`, `K-393W`, `K-394W`,
+   `K-395W`, `K-396W`, `K-397W` — each naming the row it cancels (K-381..K-388) and that
+   row's accepting reviewer in its `Quote`, so the cancellation survives any later renumbering.
+   A `W` suffix marks a withdrawal row. Their `Reviewer` cell is `deepseek-flash-apr117-keeper`.
+2. **Eight fresh `full-page-acceptance` rows** — `K-397`..`K-404`, one per page, same page,
+   same acceptance revision e2a3e20b7c20ef8385b219b39c6405237163406f, same `Blob ID`, recorded by
+   `deepseek-flash-apr117-keeper`. **No page is re-read.** The reads stand; only the recording
+   authority changes, from the same evidence.
+
+**Stable-id derivation, measured, and the ordering property this act must satisfy.**
+`build_index.py` selects a page's latest event by **string comparison of the stable id**
+(`derive_reader_pages`: `if cur is None or ev[stable_id] > cur[stable_id]`), so for each page
+the recorded ids must satisfy **withdrawn < withdrawal < fresh** lexically, or the fresh row is
+not that page's latest event and the page does not read as accepted.
+
+- **Fresh block, measured:** `K-397`..`K-404` is the first free contiguous eight in lane D's
+  allocated band **K-381..K-480** (band table in S4 of the owner decisions page
+  `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`, which is on `main` and is not a path at this
+  branch's base, so it is named here rather than linked; no tracked
+  `KEEPER-ID-ALLOCATION.md` exists). Across `main` and every fetched pull-request head, band
+  D's highest row id is **K-396**, so K-397..K-404 are free; `K-480` is the band bound, not a
+  row.
+- **Withdrawal block, measured:** the first free `W`-suffixed ids above the withdrawn rows are
+  `K-389W`, `K-390W`, `K-391W`, `K-393W`, `K-394W`, `K-395W`, `K-396W`, `K-397W`.
+  **`K-392W` is skipped because a merged row holds it** (PR #787's withdrawal of K-392, lane D
+  batch 1); re-using it would fail the build loudly with a duplicate stable id. `K-381W`..`K-388W`
+  are likewise already held, so the mirror-style withdrawal ids are unavailable.
+- **Absence measured, not assumed** (the standing rule is to check every OPEN pull request, not
+  only `main`): all sixteen ids were checked against `refs/remotes/origin/main` and every
+  fetched `refs/pull/*/head` — **1,571 refs / 797 pull-request heads** on 2026-10-16 — and occur
+  in no keeper-table row in any of them.
+- **The ordering property verified by running the builder, not by reasoning about it:** for all
+  eight pages the latest event is the **fresh** row (`K-397`..`K-404`), with event kind
+  `full-page-acceptance` and reviewer `deepseek-flash-apr117-keeper` — never the withdrawal row
+  and never the withdrawn row. The eight per-page results, the commands and their exit codes are
+  in the evidence record
+  [readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md](../evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md).
+
+**Count honesty (unchanged; no count of this lane's own).** This ledger publishes no readability
+count of its own (D84 — *D84* is the 2026-10-10 official-count switch that made the acceptance
+index, not the ledger, the source of the pending count). The appended rows are not
+machine-visible until the routine index rebuild, which is the standing AEGIS-APR-115
+index-rebuild pull request's own scope and is not part of this change. The builder's measured
+`table_rows` at this head is in the evidence record; the eight withdrawn rows remain physically
+present and are never deleted.
+
+**Cost of this note.** It changes this ledger by more than 10 lines, so this page returns to
+**pending** at the new head and owes a subsequent independent full-page re-read by a reader who
+did not write it — the self-cost every prior update states.
+
+**What this act does not do.** It edits none of the eight read pages, rewrites no dated text,
+deletes or reorders no existing row, re-reads no page, confers no acceptance the reviewer did not
+give (AEGIS-APR-101: the keeper records an existing qualifying review decision; it may not
+independently confer acceptance), rebuilds no `tools/` artifact, and **merges nothing** -
+AEGIS-APR-101's Scope FORBIDDEN includes 'merging by the keeper'. It also does not move this
+branch's head by merging `main` into it: rule (b) of the 2026-10-15 owner decisions (*rule (b)*:
+insert-only is measured against a branch's own derivation base, so a lane branch is not rebased
+or merged with `main`) forbids that route. Because this act produces new bytes on the branch,
+the **Stage D ACCEPT at `89dd380847ca5d59027781f2ca84b3f2bbb8d0a9` is void** for the head this
+act produces: that verdict names a head this act replaces, so a fresh Stage D audit, Stage E
+validation and Stage F final independent review are owed at the new head. Drafted by
+**DeepSeek-4.1-Flash (deepseek-flash)**, an AI agent operating under the owner account, as the
+repository's model-naming rule (2026-10-13) requires.
+
+
+
 ## Ledger-keeper recording + batch update — Phase 4 re-read lane A, first batch, 2026-10-15
 
 The ledger keeper records under AEGIS-APR-101 (the owner-approval-register
@@ -6135,3 +6294,27 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-210 | .claude/skills/gated-deployment-prompt-template/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 0582c3a6d7b9e8137d9f9e767d2d904b73995429 | B2-6 accepted: .claude/skills/gated-deployment-prompt-template/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
 | K-211 | .claude/skills/gated-deployment-prompt-template/references/deployment-prompt-template.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 59c065326306befe862aa8cd60b30d1f4c05b62b | B2-7 accepted: .claude/skills/gated-deployment-prompt-template/references/deployment-prompt-template.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
 | K-212 | .claude/skills/hidden-context-exposure-reviewer/SKILL.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 43ba5d0990dc63c290866ad6b2239c0cff2e3c8f | B2-8 accepted: .claude/skills/hidden-context-exposure-reviewer/SKILL.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-b-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-381 | docs/evidence/documentation/open-decisions-readability-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | c47a06701f15a0a97f4f5872008f0d97848166ff | LD-9 accepted: docs/evidence/documentation/open-decisions-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c2 | docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md | 2026-10-15 |
+| K-382 | docs/evidence/documentation/operational-guides-seven-readability-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 98d84943913fc7cc52c3d96735e72c673c5bbee0 | LD-10 accepted: docs/evidence/documentation/operational-guides-seven-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c2 | docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md | 2026-10-15 |
+| K-383 | docs/evidence/documentation/operational-proposals-five-readability-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 5cf92ad55a628ea5568d5c6b70591104a84e99bf | LD-11 accepted: docs/evidence/documentation/operational-proposals-five-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c2 | docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md | 2026-10-15 |
+| K-384 | docs/evidence/documentation/readability-closeout-reread-2026-10-12.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 8b64260babe8846a3c75d9ea062cdf804a19a072 | LD-12 accepted: docs/evidence/documentation/readability-closeout-reread-2026-10-12.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c2 | docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md | 2026-10-15 |
+| K-385 | docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 68ecfd1ec0a2bbcac08854bb36f2ffd17cc0b5a5 | LD-13 accepted: docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c2 | docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md | 2026-10-15 |
+| K-386 | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 4acfb53f8963f54db0029d088bff14b519c867ca | LD-14 accepted: docs/evidence/documentation/readability-final3-reread-2026-10-12.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c2 | docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md | 2026-10-15 |
+| K-387 | docs/evidence/documentation/readability-ledger-reread-2026-10-13.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 14b2bcf6fd7ea2d530f1c37dbf2b5ea24826b454 | LD-15 accepted: docs/evidence/documentation/readability-ledger-reread-2026-10-13.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c2 | docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md | 2026-10-15 |
+| K-388 | docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 1a70a714bcc317930cc8accb873ea642989cca5b | LD-16 accepted: docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | readability-phase4-lane-d-implementer-c2 | docs/evidence/documentation/readability-phase4-lane-d-batch2-2026-10-15.md | 2026-10-15 |
+| K-389W | docs/evidence/documentation/open-decisions-readability-2026-09-23.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | c47a06701f15a0a97f4f5872008f0d97848166ff | WD-D2-1 withdraws K-381 (readability-phase4-lane-d-implementer-c2): LD-9 accepted: docs/evidence/documentation/open-decisions-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-390W | docs/evidence/documentation/operational-guides-seven-readability-2026-09-23.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 98d84943913fc7cc52c3d96735e72c673c5bbee0 | WD-D2-2 withdraws K-382 (readability-phase4-lane-d-implementer-c2): LD-10 accepted: docs/evidence/documentation/operational-guides-seven-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-391W | docs/evidence/documentation/operational-proposals-five-readability-2026-09-23.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 5cf92ad55a628ea5568d5c6b70591104a84e99bf | WD-D2-3 withdraws K-383 (readability-phase4-lane-d-implementer-c2): LD-11 accepted: docs/evidence/documentation/operational-proposals-five-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-393W | docs/evidence/documentation/readability-closeout-reread-2026-10-12.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 8b64260babe8846a3c75d9ea062cdf804a19a072 | WD-D2-4 withdraws K-384 (readability-phase4-lane-d-implementer-c2): LD-12 accepted: docs/evidence/documentation/readability-closeout-reread-2026-10-12.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-394W | docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 68ecfd1ec0a2bbcac08854bb36f2ffd17cc0b5a5 | WD-D2-5 withdraws K-385 (readability-phase4-lane-d-implementer-c2): LD-13 accepted: docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-395W | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 4acfb53f8963f54db0029d088bff14b519c867ca | WD-D2-6 withdraws K-386 (readability-phase4-lane-d-implementer-c2): LD-14 accepted: docs/evidence/documentation/readability-final3-reread-2026-10-12.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-396W | docs/evidence/documentation/readability-ledger-reread-2026-10-13.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 14b2bcf6fd7ea2d530f1c37dbf2b5ea24826b454 | WD-D2-7 withdraws K-387 (readability-phase4-lane-d-implementer-c2): LD-15 accepted: docs/evidence/documentation/readability-ledger-reread-2026-10-13.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-397W | docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md | withdrawal | e2a3e20b7c20ef8385b219b39c6405237163406f | 1a70a714bcc317930cc8accb873ea642989cca5b | WD-D2-8 withdraws K-388 (readability-phase4-lane-d-implementer-c2): LD-16 accepted: docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-397 | docs/evidence/documentation/open-decisions-readability-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | c47a06701f15a0a97f4f5872008f0d97848166ff | LD-9 accepted: docs/evidence/documentation/open-decisions-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-398 | docs/evidence/documentation/operational-guides-seven-readability-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 98d84943913fc7cc52c3d96735e72c673c5bbee0 | LD-10 accepted: docs/evidence/documentation/operational-guides-seven-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-399 | docs/evidence/documentation/operational-proposals-five-readability-2026-09-23.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 5cf92ad55a628ea5568d5c6b70591104a84e99bf | LD-11 accepted: docs/evidence/documentation/operational-proposals-five-readability-2026-09-23.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-400 | docs/evidence/documentation/readability-closeout-reread-2026-10-12.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 8b64260babe8846a3c75d9ea062cdf804a19a072 | LD-12 accepted: docs/evidence/documentation/readability-closeout-reread-2026-10-12.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-401 | docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 68ecfd1ec0a2bbcac08854bb36f2ffd17cc0b5a5 | LD-13 accepted: docs/evidence/documentation/readability-f1f5-reread-2026-10-12.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-402 | docs/evidence/documentation/readability-final3-reread-2026-10-12.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 4acfb53f8963f54db0029d088bff14b519c867ca | LD-14 accepted: docs/evidence/documentation/readability-final3-reread-2026-10-12.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-403 | docs/evidence/documentation/readability-ledger-reread-2026-10-13.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 14b2bcf6fd7ea2d530f1c37dbf2b5ea24826b454 | LD-15 accepted: docs/evidence/documentation/readability-ledger-reread-2026-10-13.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
+| K-404 | docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md | full-page-acceptance | e2a3e20b7c20ef8385b219b39c6405237163406f | 1a70a714bcc317930cc8accb873ea642989cca5b | LD-16 accepted: docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md read whole at e2a3e20b7c20ef8385b219b39c6405237163406f | deepseek-flash-apr117-keeper | docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | 2026-10-16 |
