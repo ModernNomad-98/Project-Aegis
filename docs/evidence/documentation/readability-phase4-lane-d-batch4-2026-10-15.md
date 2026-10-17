@@ -20,14 +20,14 @@
   model, so the two names stay distinct. The agent identity for the original batch is
   `readability-phase4-lane-d-batch4-implementer`.
 - **What this page is.** The lane's tracked batch record for its fourth batch. It is the
-  **evidence source** a **separate eligible keeper** reads under AEGIS-APR-117 (the owner's
-  approval-register item letting a different agent re-record rows from the same evidence when the
-  original recorder's independence failed; no page needs re-reading for that). **That keeper records no
-  row for any of these eight pages**: all eight are partial, and the ledger's PARTIAL rule
-  (L5133-5137, L5149-5150 — **base-scoped** line numbers: at today's `main` (`71795e6e`) the same two
-  passages are L5584-5588 and L5600-5601) gives a partial page no acceptance row — so the eight **stay
-  pending**
-  (section 10). **This batch authors no keeper rows and edits no ledger section** — see section 12.
+  **evidence source** a **separate eligible keeper** reads under **AEGIS-APR-101** (register L3155:
+  the keeper "may record an existing qualifying review decision, bound to the exact reviewed revision
+  and its posted evidence"). **AEGIS-APR-117 adds withdrawal rows only**: its `Scope allowed`
+  (L5038-5042) is a withdrawal row cancelling a wrong acceptance row, and "AEGIS-APR-101's limits
+  continue" (L5043-5044), so it is **not** the re-recording route. **That keeper records no row here**:
+  all eight are partial, and the ledger's PARTIAL rule (L5133-5137, L5149-5150 — at main `71795e6e`
+  L5584-5588 and L5600-5601) gives a partial page no acceptance row — so the eight **stay pending**
+  (section 10). **This batch authors no keeper rows and edits no ledger section** — section 12.
 - **Acceptance revision bound by the whole batch and named by every section 10 disposition line:**
   `f490c16f9ed23f3d489e42f7696323bffcce6fd3`. It resolves to itself and is contained in
   `refs/remotes/origin/main` (`git merge-base --is-ancestor f490c16f… refs/remotes/origin/main` exits 0,
@@ -67,10 +67,11 @@
 - **AEGIS-APR-039** — the owner's standing grant for backlog work, commits, pushes and PRs.
 - **AEGIS-APR-101** — the keeper-independence rule: the agent that records an acceptance row must
   differ from the page's author **and** from the accepting reviewer.
-- **AEGIS-APR-117** — the route that lets a different eligible agent re-record rows from the same
-  evidence after a withdrawal; **no page needs re-reading** for it, and for the eight pages here it
-  records **no** row, because all eight are partial and the ledger has no partial-acceptance kind
-  (section 10).
+- **AEGIS-APR-117** — the grant that lets the keeper append a **withdrawal** row cancelling a wrong
+  acceptance row after the switch (L5038-5044); it is **not** the recording route — recording an
+  existing qualifying review is AEGIS-APR-101's route (L3155); **no page needs re-reading** for that
+  route; for the eight pages here it records **no** row, because all eight are partial and the ledger
+  has no partial-acceptance kind (section 10).
 - **AEGIS-APR-115** — the standing index-rebuild PR scope (it rebuilds `tools/` JSON; this batch
   does not run it).
 - **AEGIS-APR-118** — the owner's classification of the readability acceptance tool as
@@ -234,7 +235,7 @@ eight pages (each is a dated 2026-09-23 record whose last-touching commit is ano
 last-touching commits are named in section 5). The **second** is **not** claimed: this batch's
 single agent is both the accepting reader and the writer of this record. **The rows are not this
 batch's work**: this record authors no keeper row and edits no ledger section. The rows for these pages
-are a separate eligible keeper's work under AEGIS-APR-117 — **and under the ledger's PARTIAL rule that
+are a separate eligible keeper's work under AEGIS-APR-101 — **and under the ledger's PARTIAL rule that
 keeper records no row for any of the eight, because all eight are partial: the ledger's fixed-format
 contract has "no partial-acceptance kind" (ledger L5133-5137 at the base; `main` L5584-5588) and
 "a page a lane marked PARTIAL is never recorded as a full-page-acceptance" (L5149-5150 at the base;
@@ -593,7 +594,7 @@ depends on where the line is drawn.**
 ## 10. The eight disposition lines, verbatim (evidence, NOT rows)
 
 **No keeper may author an acceptance row for any of these eight pages, and not one of them leaves the
-official pending count.** The ledger that governs the AEGIS-APR-117 keeper is the same file this record
+official pending count.** The ledger that governs the AEGIS-APR-101 keeper is the same file this record
 cites, and it says the opposite of a row offer: the ledger's fixed-format contract "names four event
 kinds — `full-page-acceptance`, `targeted-review`, `withdrawal` and `lost-commit` — and has **no
 partial-acceptance kind**" (ledger L5133-5137 at the base; `main` L5584-5588), and the rule the ledger
@@ -629,12 +630,13 @@ PAGE LD-32 partial, no acceptance row, stays pending; gaps G-32.1..G-32.3 (secti
 `build_index.py --ref <head> --report` (no row change versus the base), the changed-path Markdown
 link check, `scripts/validate-skills.py`, `scripts/tests/test_validator.py`,
 `git diff --check`, the numstat check (the Stage C commit is insert-only against the derivation
-base, 455 added / 0 deleted; the first Stage D repair commit adds 45 and deletes 19 of those lines;
-the second adds 167 and deletes 56; the third adds 73 and deletes 20; the fourth adds 91 and deletes
-47; **the fifth, `61371fa5`, adds 4 and deletes 4** — every figure counted over every `-` line
-excluding the `---` headers, so **none of the five repairs is insert-only**, while the base-relative
-figure is **752 added / 0 deleted** because the record file is new at the base — the file has
-grown, and this record states the current figure rather than leaving the first repair's 481 standing.
+base, 455 added / 0 deleted; the first repair adds 45 and deletes 19; the second adds 167 and
+deletes 56; the third adds 73 and deletes 20; the fourth adds 91 and deletes 47; **the fifth,
+`61371fa5`, adds 4 and deletes 4; the sixth, `e31adcc3`, adds 96 and deletes 33; the seventh,
+`2c0b0157`, adds 27 and deletes 11** — every figure counted over every `-` line except
+the `---` headers, so **none of the seven repairs is insert-only**, while the base-relative figure
+is **768 added / 0 deleted** because the record file is new at the base — the file has grown, and this
+record states the current figure, not the first repair's 481.
 **The third repair's 20 deleted lines sit at these sites (old-side line numbers at `c4a55185`):**
 L97-98 (the false PR #781 provenance sentence), L115-119 (the second provenance clause and the
 index-figure paragraph), L430 (O-1's provenance parenthetical), L477-478 and L480-483 (the "changes
@@ -651,19 +653,17 @@ L569-580 (this numstat paragraph itself) and L637-638 (the timing section's repa
 re-wrapped lines whose sentences are unchanged are deletions of line breaks, not of content, and none
 of them begins with a second `-`** either, so the two-dash trap did not fire in that round.
 **The fifth repair (`61371fa5`) rewrote section 12 item 3 in place — four lines added and four
-deleted, old-side line numbers at `d1f02a0a`: L636-639** — replacing the "no snapshot survives …
-unverified here" sentence with the measured sibling digests and the three surviving snapshots; the
-record stayed at **689 lines** across that commit. **Five repair commits are therefore counted here,
-and the branch carries a sixth after this round's commit** — that round's own figures are stated in the
-pull-request body's head-pinned gate table and in the Stage C handoff, because a commit cannot measure
-the bytes it is committing),
+deleted, old-side lines at `d1f02a0a`: L636-639** — replacing the "no snapshot survives … unverified
+here" sentence with the measured sibling digests and the three surviving snapshots; the record stayed
+at **689 lines** across it. **Seven repair commits are counted here; this round adds the eighth** — the
+eighth's figures are in the Stage C handoff, since a commit cannot measure its own bytes),
 `scripts/check_dco.py --range
 origin/main..HEAD`, and `python -P scripts/ci/check_pr_body_skills.py --body-file <f>`.
 
 ## 12. What this batch did not do
 
 It **authored no keeper row and edited no ledger section** (AEGIS-APR-101's corrected posture; the
-rows are a separate eligible keeper's work under AEGIS-APR-117) — and it states plainly that under the
+rows are a separate eligible keeper's work under that grant) — and it states plainly that under the
 ledger's PARTIAL rule (L5133-5137, "no partial-acceptance kind"; L5149-5150 — **base-scoped**: at `main`
 `71795e6e` those passages are L5584-5588 and L5600-5601) the eight partial pages get
 **no acceptance row** and stay **pending**, so no keeper authors one from this evidence; edited none of
@@ -726,7 +726,7 @@ quarter boundary, the position-24 skip, the historical validation figures, the t
 commit abbreviations). `scoped-approval-register` (the skill that establishes which recorded
 approval covers an action) — established this batch records under AEGIS-APR-101 and delivers under
 AEGIS-APR-039, consumes, extends and requests no grant, and that the rows are the separate keeper's
-AEGIS-APR-117 scope. `docs-retention-index` (the skill that decides whether a new page owes a
+AEGIS-APR-101 scope. `docs-retention-index` (the skill that decides whether a new page owes a
 retention entry) — consulted; no retention entry or frontmatter mechanism exists for
 `docs/evidence/documentation/` (zero files there carry `retention:` frontmatter at the base), so the
 new page follows the established shape and creates no retention row; recorded as
