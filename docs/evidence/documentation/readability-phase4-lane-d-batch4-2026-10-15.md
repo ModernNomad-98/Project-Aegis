@@ -633,10 +633,10 @@ here, in the record, and every future round does the same.
    the 590-path set are exactly lane D batches 1, 2 and 3's pages. Those batches' records are in neither
    ref, so their published page lists cannot be read; the position arithmetic and the set relations are
    verified, the three comparisons are not.
-3. **The historical snapshot windows** — why the live bodies of PRs #783, #792, #770, #766 and #774 no
-   longer yield the digests recorded for them. Every recorded value reproduces from a saved snapshot of
-   the revision it names, but those pull requests' body edit histories were not read, so "the body has
-   moved since" is an attribution, not a confirmed edit-by-edit history. **One value in the digest history was not reproduced at all this round: `54d5e1e9a06ccbbc` at `d784c4dc`. No snapshot of that body revision survives in this workspace and the API serves only the current revision, so it is carried as the previous round recorded it (payload lengths 1,175 / 5,197 / 567) and labelled **unverified here** rather than silently re-asserted. The other eleven values in the history were re-measured and reproduced exactly.**
+3. **The historical snapshot windows** — the batch did not read the body edit histories of the five
+   pull requests this item names, so no digest movement is traced edit by edit. **Re-measured from the
+   live bodies by API: four of the five still yield the digests recorded for them — PR #783 `3913683c686e6e71`
+   (payload lengths 2,701 / 3,771 / 40), PR #792 `88300e711714200a` (1,565 / 3,824 / 40), PR #770 `75a3627ae62d0cb4` (1,989 / 4,567 / 165) and PR #766 `76e465ae8f2ba6e9` (1,468 / 111,039 / 45) — and only PR #774 has moved: its live body now yields `755e1656024f75f9` at payload lengths 2,543 / 5,792 / 738, its last body edit dated **2026-10-16T04:51:25Z**. `54d5e1e9a06ccbbc` at `d784c4dc` is reproduced, not carried: three snapshots of that body revision survive in this workspace and each re-derives it at payload lengths 1,175 / 5,197 / 567 — `_sc791-repair-20261015/_cal_791.txt` and `_pr791_body_live.txt` (both 22,605 bytes, content hash `sha256 7425ae896da0b8550b0f2930543106c27029c839f3bed23a2e9031e63e8ec33a`) and `_r791_live_791_body.md` (22,602 bytes, `sha256 a99e791956bba3b8666065372253aa2a9fd06c1523e28cf4aea8445739f13c4a`) — workspace files, not git objects, so those two values are content hashes of the file bytes and not git object ids.**
 4. **Codex's security review** — its embedded state is
    `security_review {status: null, commit_sha: null, has_any_findings: null, has_unresolved_findings: null}`,
    so no security finding is retrievable either way. **That is unavailability, not a clean result.**
