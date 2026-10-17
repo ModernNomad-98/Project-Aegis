@@ -1,11 +1,12 @@
 # Keeper-ID allocation of 2026-10-15 — on-main record (transcription; the source is outside this repository)
 
-This page is the repository artifact that lane records cite as `KEEPER-ID-ALLOCATION.md`. It
-transcribes the coordinating agent's keeper-ID band allocation, merge protocol and quarter ruling of
-**2026-10-15** (America/Los_Angeles) so that a reader of this repository can retrieve them. It
-follows the form of the [owner-decisions record](OWNER-DECISIONS-2026-10-15.md): a dated
-transcription, sections that quote verbatim where a quote exists, gaps flagged rather than filled,
-and **it records rather than grants** — it closes nothing and grants nothing.
+This page is the repository artifact published for the keeper-ID allocation that lane records cite as
+`KEEPER-ID-ALLOCATION.md`. It transcribes the coordinating agent's keeper-ID band allocation, merge
+protocol and quarter ruling of **2026-10-15** (America/Los_Angeles) so that a reader of this repository
+can retrieve them. It follows the form of the
+[owner-decisions record](OWNER-DECISIONS-2026-10-15.md): a dated transcription, sections that quote
+verbatim where a quote exists, gaps flagged rather than filled, and **it records rather than grants** —
+it closes nothing and grants nothing.
 
 **Why this file exists.** Twelve refs — `origin/main` and eleven of the nineteen open pull-request
 heads measured on 2026-10-15 — cite a keeper-ID allocation file, and **no repository file of that
@@ -14,14 +15,23 @@ and at every open pull-request head lists no path containing `KEEPER-ID-ALLOCATI
 cite it by bare filename therefore read as though the file were in the tree when it is not, and a
 reader cannot retrieve the allocation they rest on. This is the same defect class as the
 owner-decisions gap that [PR #786](https://github.com/ModernNomad-98/Project-Aegis/pull/786) fixed
-by publishing that file; **this page is the fix for the allocation**: publish the artifact, and the
-citations resolve.
+by publishing that file. **This page makes the allocation's content retrievable at a real path, but it
+does not make the existing citations resolve.** It is a one-file change: it edits none of the records
+that name the bare `KEEPER-ID-ALLOCATION.md`, so a lookup of that name still finds no path after this
+merge. The **follow-up this page does not perform** is a separate documentation change that rewrites
+those citations — 23 files across 12 refs at recording (S7) — to
+`docs/roadmaps/KEEPER-ID-ALLOCATION-2026-10-15.md`. Until that change lands, a reader must apply the
+S7 mapping rather than follow the bare name.
 
 **Model attribution (the 2026-10-13 rule).** This file was drafted by **DeepSeek-4.1-Flash
 (deepseek-flash, DeepSeek Harness)**, the Stage C implementing agent (Stage C = the implement stage
 of the delivery workflow), operating under the owner account, transcribing the coordinating agent's
 relay of its own rulings and its own measurements. Nothing in this file claims the owner typed into
 this repository, and nothing here claims a repository provenance the source does not have.
+
+**Repair attribution (2026-10-17).** The six Codex-review corrections in this revision were drafted
+by **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**, the Stage C repair agent. The
+transcription and the 2026-10-15 measurements above remain DeepSeek-4.1-Flash's, as stated above.
 
 ## S1. Source, authority and provenance
 
@@ -128,6 +138,18 @@ match the ref — it is **K-297, K-298, K-301…K-304**, not a contiguous K-297�
 are unused, per the PARTIAL rule above), and **K-289…K-296 is not held by PR #781 at all**; it is
 the band that **open PR #779** claims. Neither `K-105` nor `K-299`/`K-300` appears at `main`.
 
+**A repository source that still says otherwise, and is not corrected here.** The
+[owner-decisions record](OWNER-DECISIONS-2026-10-15.md), section S4 (L184–L230 at `f490c16f`), is the
+record that already answers the bare `KEEPER-ID-ALLOCATION.md` filename. It reports **`K-105`**,
+**`K-299`** and **`K-300`** as occupied and **`K-197…K-204`** as PR #780's merge position — the three
+points on which this page's measurement of the same ref differs. This change adds one file and edits
+no existing record, so that section is **not** corrected, amended or superseded here, and the
+repository carries two sources with incompatible ID state. **What would resolve it** is a separate
+documentation change that appends a dated correction and a pointer to this page in that section (or
+retires the section); this page cannot do it from inside its own one-file diff. Until that change
+lands, the measured values above are the state this page records, and S4's three points are
+**contradicted by the ref**.
+
 **Ids claimed by open pull requests that are absent from `main`** (19 open heads measured; the ids
 below are each head's own table minus `main`'s):
 
@@ -155,20 +177,35 @@ renumber at merge rather than a rule against colliding in the first place.
 Transcribed from the source file. The lanes **read in parallel; merge serially, in lane order A, B,
 C, D**. The merge holder, for every lane pull request after the first:
 
-1. **Rebase the pull request on the current `origin/main`** (the tip that includes the previous
-   lane's merge).
-2. **Resolve the two ledger conflicts by KEEPING BOTH SIDES** — all dated keeper sections kept, in
-   lane order; all rows kept. Both pull requests insert a dated keeper section at the same
-   pre-sentinel point and append their rows at the same table tail, so the second merge would
-   otherwise be a real text conflict at both points. Nothing on either side is deleted, so there is
-   no judgement call about which side wins.
-3. **Renumber the rebased lane's rows into that lane's allocated band** (S2). **Renumber the stable
+1. **Reconcile against the moved base without rewriting the reviewed head.** Do **not** rebase the
+   branch and do **not** merge `main` into it: either moves the head that the implementation audit,
+   validation record and final review name, and voids every head-bound verdict. **The merge is a merge
+   commit into the current `origin/main`** (`gh pr merge <number> --merge`), which leaves the reviewed
+   head in place. **If reaching that merge needs a commit on the branch — a conflict at the two ledger
+   points (step 2) or the renumber (step 3) — that commit is a new head**: every head-bound verdict at
+   the old head is void, and the complete chain (implementation audit, validation, final review and a
+   fresh automated review) runs again at the new head before the merge.
+2. **If a conflict must be resolved, resolve the two ledger conflicts by KEEPING BOTH SIDES** — all
+   dated keeper sections kept, in lane order; all rows kept. Both pull requests insert a dated keeper
+   section at the same pre-sentinel point and append their rows at the same table tail, so the second
+   merge would otherwise be a real text conflict at both points. Nothing on either side is deleted,
+   so there is no judgement call about which side wins.
+3. **Renumber the lane's rows into that lane's allocated band** (S2). **Renumber the stable
    ID only — never the `Blob ID`.** Recompute each `Blob ID` afterwards with
    `git rev-parse <Acceptance revision>:<Page>` and confirm it is unchanged. A wrong blob binds the
    wrong acceptance to a page: silent, plausible, and exactly the defect class this repository spent
    the preceding week removing.
-4. **Re-run `build_index.py` and the checker.** A missed renumber or a dropped row fails loudly
-   here — that is the point of running it.
+4. **Re-run `build_index.py` and the checker, then assert what they do not check.** The build fails
+   loudly on a **duplicate** stable ID (`BuildError("duplicate stable ID")`), an unknown event kind,
+   an acceptance revision that does not resolve or is not contained in `origin/main`, a page that is
+   not tracked Markdown, a blob ID that does not match `git rev-parse <revision>:<page>`, and a quote
+   or revision absent from its evidence source
+   ([build_index.py](../../tools/readability_acceptance/build_index.py) L206–285). It does **not**
+   enforce the lane band, the expected ID set or the row count: a unique but wrong-band ID passes, and
+   deleting a valid row leaves a table that still builds. **So the build catches a collision, not a
+   missed renumber or a dropped row.** Assert both independently — every new ID against its lane's
+   band (S2), and the exact expected `table_rows` (the blank-line trap below) — and only then treat
+   the run as a pass.
 5. **Record in the merge receipt**: the new head, the before/after ids, the row count gained, and
    the `official_pending_count` (the instrument's own count of pages awaiting acceptance) before
    and after.
@@ -228,7 +265,9 @@ raised by lane B's batch 4 after the boundary moved under it:
 - **The rule, verbatim: "new keeper IDs must be checked against every OPEN pull request, not just
   `main`."** Checking only `main` is not enough once parallel pull requests are open — two pull
   requests authored in the same band collide at merge. Until every prior batch is renumbered and
-  merged, **new batches take IDs above the highest ID any open pull request claims**, and the merge
+  merged, **new batches take IDs above the highest ID any open pull request claims inside their own
+  lane's band** — a claim outside the band does not move them, and the band's upper bound still binds
+  (S2): an open lane-D claim in `K-381`–`K-480` cannot push a lane-A batch past `K-180`. The merge
   holder normalises the whole table at merge.
 - **Why the rule exists, in the source file's own account:** the band allocation assumed a lane's
   rows would be *renumbered into* the band at merge, while a later batch's brief told the lane to
@@ -258,7 +297,8 @@ names it bare, or as a repository path, is not.
 
 Measured in the Stage C clone `_stagec-keeperalloc-pub-clone`, a full HTTPS clone of
 `https://github.com/ModernNomad-98/Project-Aegis.git` created for this publication. Each line is the
-command's observed output.
+command's observed output. The row-5 block below is a 2026-10-17 re-run of the same measurement from
+the pinned heads; its output matches the row-5 result.
 
 | # | What was measured | Command | Observed |
 | --- | --- | --- | --- |
@@ -266,11 +306,114 @@ command's observed output.
 | 2 | The repository has no such path | `git ls-tree -r --name-only <ref> \| Select-String KEEPER-ID-ALLOCATION` | no match at `main` or at any of the 19 open heads |
 | 3 | Who cites it, and how many files | `git grep -l -F KEEPER-ID-ALLOCATION <ref>` over `main` + 19 open heads | 23 files over 12 refs (`main`, #777, #778, #779, #780, #782, #785, #787, #788, #789, #790, #791) |
 | 4 | The table's row count at `main` | `python -P -B tools/readability_acceptance/build_index.py --ref f490c16f… --report` | exit 0; `table_rows 162`, `events 162`, `full_page_acceptances 110`, `lost_commit_events 10` |
-| 5 | The `K-` occupancy at `main` and at 19 open heads | fetch `+refs/pull/<n>/head`, then each ref's table through `build_index.py`'s own `find_table` | the table in S3; `K-105`, `K-299`, `K-300` absent |
+| 5 | The `K-` occupancy at `main` and at 19 open heads | the executable block below the table: it fetches the 19 pinned heads, parses each with `build_index.py`'s own `find_table`, and subtracts `main`'s ID set | the raw output below — the table in S3 reproduced exactly; `K-105`, `K-299`, `K-300` absent |
 | 6 | What the merged PR #781 added | `find_table` at `7abb98eb` vs at `f490c16f` | 101 → 162 rows; 61 ids added, 0 removed |
 | 7 | The blank-line truncation, demonstrated | scratch branch adding one blank line after the third keeper row; `build_index.py --ref <scratch> --report` | exit **0**; `table_rows 3` (not 162) |
 | 8 | The allocation file's own length and content | read of `_resume-2026-10-09/KEEPER-ID-ALLOCATION.md` | 445 lines; band table at its L24-29; open-PR rule at its L386-391; merge protocol at its L139-176 |
 | 9 | The quarter ruling's own text | read of `_resume-2026-10-09/_quarter-ruling.md` | 34 lines; the two readings at its L8-12; the three rulings at its L14-18 |
+
+**S8 row 5, executable.** Run from the repository root in a full clone. The nineteen values are the
+heads S3 records, pinned by full commit ID so the run reproduces after the pull-request refs move. The
+Python body prints each head's IDs that are absent from `main`, then every ID claimed by more than one
+head.
+
+```powershell
+$heads = @(
+  '771=f6a4e4189ecfbe874f97ec9b6b09bf8fe14f49ad',
+  '772=a94dc5ea2f996f47cdaeb10f8995d8f68e232950',
+  '773=bf948c721260e084454ccb0af55f2ac32ac5a894',
+  '774=a1136582f4ceb8004d2066cd67b8ad96e20ec889',
+  '775=56a8e603578351cd21f192a25eb858a0efca91a0',
+  '776=aa88923f2517ebf2b0b3b56c3891fabe53d20b4c',
+  '777=05ad76072d12070164aaf9135223e49e28a296ae',
+  '778=7dcef8fc177226e62d1c7cb7546c746362b09880',
+  '779=d1de329646f1e0c4a69b6af95b8b6226c97c8ac7',
+  '780=78af4ef2d0421a16341865402efcdeeb06ca922c',
+  '782=27ee6291711cef95ebd7d97a00479e12a0a968fb',
+  '783=baeca0208487b2fae7f25bd742651849467dd786',
+  '784=99d46d752357c6cb127274944ce2ac2ff0b9b78e',
+  '785=ab9d048186ce5f181e1c4d7f60fe74cdb2684f9f',
+  '787=97c61f35da634236a4495119f5b0cc62b4689cf7',
+  '788=6443ff870be4df5a03fd1cc04b818fead20af468',
+  '789=e8c8a67c7f99feb4a02c6b334f4ca1a8aea83c5c',
+  '790=7d5154282915c57f5e727f7fb9d82bf5e665b094',
+  '791=cac5c67deaad9cf2b8ec353757b165558d5e7cde'
+)
+git fetch --no-tags origin ($heads | ForEach-Object { ($_ -split '=')[1] }) | Out-Null
+$env:KEEPER_HEADS = $heads -join ';'
+@'
+import os, sys
+sys.path.insert(0, 'tools/readability_acceptance')
+import build_index as b
+base_rows, _ = b.find_table('.', 'f490c16f9ed23f3d489e42f7696323bffcce6fd3')
+base = {r['stable_id'] for r in base_rows}
+print('main f490c16f table_rows=%d K=%d' % (len(base_rows), len([s for s in base if s.startswith('K-')])))
+heads = [h.split('=', 1) for h in os.environ['KEEPER_HEADS'].split(';')]
+ids = {}
+for pr, sha in heads:
+    rows, _ = b.find_table('.', sha)
+    ids[pr] = {r['stable_id'] for r in rows} - base
+    print('#%s %s new=%s' % (pr, sha[:12], ','.join(sorted(ids[pr])) or 'none'))
+print('--- collisions ---')
+for i in sorted({i for v in ids.values() for i in v}):
+    who = [p for p in ids if i in ids[p]]
+    if len(who) > 1:
+        print(i, ' '.join('#' + p for p in who))
+print('absent at main:', ' '.join(s for s in ('K-105','K-299','K-300','K-105W','K-299W','K-300W') if s not in base))
+'@ | python -P -B -
+```
+
+Observed (raw stdout, re-run at the repair head on 2026-10-17 against the same pinned heads; it
+reproduces every ID set in the 2026-10-15 table in S3):
+
+```text
+main f490c16f table_rows=162 K=142
+#771 f6a4e4189ecf new=K-082,K-083,K-084,K-085,K-086,K-087,K-088,K-089
+#772 a94dc5ea2f99 new=K-181,K-182,K-183,K-184,K-185,K-186,K-187,K-188
+#773 bf948c721260 new=none
+#774 a1136582f4ce new=K-090,K-091,K-092,K-093,K-094,K-095,K-096,K-097
+#775 56a8e6035783 new=none
+#776 aa88923f2517 new=K-082,K-083,K-084,K-085,K-086,K-087,K-088,K-089
+#777 05ad76072d12 new=K-090,K-091,K-092,K-093,K-094,K-095,K-096,K-097
+#778 7dcef8fc1772 new=K-381,K-382,K-383,K-384,K-385,K-386,K-387,K-388
+#779 d1de329646f1 new=K-289,K-290,K-291,K-292,K-293,K-294,K-295,K-296
+#780 78af4ef2d042 new=K-181,K-182,K-183,K-184,K-185,K-186,K-187,K-188
+#782 27ee6291711c new=none
+#783 baeca0208487 new=none
+#784 99d46d752357 new=none
+#785 ab9d048186ce new=none
+#787 97c61f35da63 new=K-392W
+#788 6443ff870be4 new=none
+#789 e8c8a67c7f99 new=none
+#790 7d5154282915 new=none
+#791 cac5c67deaad new=none
+--- collisions ---
+K-082 #771 #776
+K-083 #771 #776
+K-084 #771 #776
+K-085 #771 #776
+K-086 #771 #776
+K-087 #771 #776
+K-088 #771 #776
+K-089 #771 #776
+K-090 #774 #777
+K-091 #774 #777
+K-092 #774 #777
+K-093 #774 #777
+K-094 #774 #777
+K-095 #774 #777
+K-096 #774 #777
+K-097 #774 #777
+K-181 #772 #780
+K-182 #772 #780
+K-183 #772 #780
+K-184 #772 #780
+K-185 #772 #780
+K-186 #772 #780
+K-187 #772 #780
+K-188 #772 #780
+absent at main: K-105 K-299 K-300 K-105W K-299W K-300W
+```
 
 ## S9. Gaps stated, not filled
 
@@ -287,6 +430,11 @@ command's observed output.
   K-181…K-188**, and `main`'s own ledger records that an earlier draft's K-197…K-204 position was
   corrected "because no fetched ref names it". This page therefore records the resolution as a
   **plan, not an applied state**.
+- **Two repository sources give incompatible ID state, and this page does not resolve it.** The
+  owner-decisions record's S4 reports `K-105` and `K-299`/`K-300` as occupied and `K-197…K-204` as
+  PR #780's merge position, where this page's measurement of the same ref does not; S3 records the
+  difference and names the separate correction that would remove it. This page is one file and cannot
+  edit that section, so the conflict is recorded here, not repaired here.
 - **The source file's own summary of the merge it predicted for PR #781 differs from the merge that
   happened** (see S3). The measurement decides, and the difference is stated rather than copied.
 - **What this page deliberately does not transcribe.** The source file is 445 lines and includes
@@ -340,4 +488,4 @@ its own precedent is the [P0-B FAST SAVE directive record](p0b-fast-save-directi
 
 *Drafted and published by **DeepSeek-4.1-Flash (deepseek-flash, DeepSeek Harness)**, the Stage C
 implementing agent, operating under the owner account, as required by the attribution rule this
-repository adopted on 2026-10-13.*
+repository adopted on 2026-10-13; the 2026-10-17 Codex-finding corrections are attributed above.*
