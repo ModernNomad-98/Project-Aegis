@@ -8,7 +8,7 @@ record or comment drafted by an AI agent says so, and names the model).
 appended, not substituted: every superseded value it names stays readable where it was
 published, and the correction sits beside it. No pull-request (PR) body was edited to
 produce this record, and no merged artifact was rewritten to produce it. **This record's
-own text has been corrected in place three times. First on its Stage D repair round
+own text has been corrected in place four times. First on its Stage D repair round
 (§1, §2, §4.5, §4.6, §5, §6, §7 items 1 and 2, §8 and §9 changed; §10 quotes every
 sentence that was replaced and names the reason). Then on its Stage F repair round
 (§4.1, §4.5, §4.6, §4.7, §4.8, §7 item 2, §7 item 3, §10.2, §10.6 and this preamble
@@ -16,12 +16,16 @@ changed; §11 quotes every sentence that was replaced and names the reason). The
 **Stage D re-audit repair round** (the round that answers the second `SD-D: REVISE`
 verdict, issue comment 6207351316), which corrects §4.5, §8, §10.8, §11's introduction,
 §11.1 and §11.4 and appends §11.5–§11.8; §11.5 quotes every sentence that round replaced and names the
-reason. This change's own PR body was edited once as well, for a stale figure sitting
+reason. Then on the **Stage C handoff round** (this round), which corrects §8, §11.4 and
+§11.5 and appends §11.9; §11.9 quotes every sentence that round replaced. This change's
+own PR body was edited once as well, for a stale figure sitting
 inside its own bound skills field (§8, §10); its Stage F repair round added plain-English
 label glosses to the body **outside** all three bound fields and left the bound-field
 digest unchanged at `078ec42572ff330a` (§11); and the Stage D re-audit repair round
 corrected one further body figure **outside** every bound field — the false deletion
-count in its Blast-radius section — leaving the same digest (§11.7). No other pull
+count in its Blast-radius section — leaving the same digest (§11.7). The Stage C handoff
+round edited the body once more, outside every bound field, to refresh the head's numstat
+and to name the head it produced; the digest is unchanged (§11.9). No other pull
 request's body was touched.**
 
 **Reading key (one line per internal label, in plain English).**
@@ -534,11 +538,12 @@ text, collapse not applied", same reason as #780.
 - **Derivation base SHA:** `f490c16f9ed23f3d489e42f7696323bffcce6fd3` — the
   `origin/main` tip at clone time and re-verified immediately before this file was
   written (2026-10-15, local date). **That clause read "the repository's `main` has not
-  moved" when it was written, and it is now stale: `main` has moved twice since** — to
-  `87d6b460` (the merge of PR #787) and to
-  `988b50673cdd0e9ab0c15df891744cd02d1d2d2b` (the merge of PR #783). The **merge base of
+  moved" when it was written, and it is now stale: `main` has moved three times since, as
+  measured on the Stage C handoff round** — to `87d6b460` (the merge of PR #787), to
+  `988b50673cdd0e9ab0c15df891744cd02d1d2d2b` (the merge of PR #783), and to
+  `9e418c8c63e45caa4bca7fb608d45d0df4d44409` (the merge of PR #801). The **merge base of
   this head and the current `main` is still `f490c16f`** (`git merge-base HEAD origin/main`,
-  re-derived on the Stage D re-audit repair round), and `git merge-base --is-ancestor
+  re-derived on the Stage C handoff round), and `git merge-base --is-ancestor
   f490c16f HEAD` exits 0, so **nothing is voided and no figure here depends on `main`'s
   tip**; the drift is recorded rather than edited away, because a measurement is a
   snapshot (§7 item 4).
@@ -548,13 +553,17 @@ text, collapse not applied", same reason as #780.
   Stage D re-audit repair round's head — with a **single** `-U0` hunk (`@@ -0,0 +1,1026 @@`,
   and `@@ -0,0 +1,1228 @@` at the newer head), because the path does not exist at
   `f490c16f`; that is this change's shape. The **two-dot** form
-  `git diff --numstat origin/main..HEAD` reports **four** rows — this record added
-  (`1228	0`), `docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md`
+  `git diff --numstat origin/main..HEAD` compares against `main`'s **moving tip**, so it is
+  a snapshot and not a property of this change: measured at the Stage D re-audit repair
+  round's head (`ff975270`) against then-`main` `988b5067` it reported **four** rows — this
+  record added (`1228	0`), `docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md`
   modified (`0	67`), `docs/evidence/documentation/readability-lane-c-batch-3-2026-10-15.md`
   deleted (`0	731`) and `docs/roadmaps/aegis-documentation-readability-backlog.md` modified
-  (`0	132`) — because `main` advanced past this branch. **A reader must not read the
-  four-row two-dot form as this change's shape, nor the one-row merge-base form as a
-  statement about `main`'s tip.**
+  (`0	132`) — and at the Stage C handoff round's measurement against `main` `9e418c8c` the
+  same form reports **56** rows, because `main` advanced past this branch again. **Both
+  enumerations are snapshots of `main`'s tip, not statements about this change; a reader
+  must not read the multi-row two-dot form as this change's shape, nor the one-row
+  merge-base form as a statement about `main`'s tip.**
 - **Change shape:** **one new file added** —
   `docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md` — with a
   re-verification addendum appended in a second commit and the Stage D repair round in
@@ -1055,8 +1064,14 @@ implementation stage)` occurs **four** times (body L71, L103, L164, L189), `Stag
 independent implementation-audit stage)` **three** times (L43, L73, L179), and “`SD-D`
 labels a Stage D audit” **twice** (L74, L185) — nine in all. All nine score **0** in the
 body revision before this round's edit (`userContentEdits`, 2026-10-16T02:31:50Z, 16,455
-characters) and **4 / 3 / 2** in the live body, which is the `02:01:52Z → 03:09:57Z`
-revision walk §11.2's method describes. **The one exception to "every occurrence":** this
+characters) and **4 / 3 / 2** in the body at the end of that round's edit walk
+(`03:09:57Z`, the revision the second Stage D verdict audited at `03:12Z`). **At the Stage C
+handoff round's head the same three patterns read `4 / 5 / 3` — twelve glossed occurrences,
+not nine** — because the Stage D re-audit repair round glossed one further `Stage D`
+occurrence while rewriting the Blast-radius paragraph (body L34), and its new paragraph at
+body L197 carries one more `Stage D` and one more `SD-D`. The nine this round added are
+unchanged; §11.9 records both counts side by side so neither is read as the other.
+**The one exception to "every occurrence":** this
 round's own new paragraph at body **L195** uses `Stage D`, `SD-D` and `Stage F` with no
 in-item gloss, the `Stage F` gloss living in a different item (the acceptance criteria,
 body L60). The claim "at every occurrence" was therefore too strong as first written; it
@@ -1119,11 +1134,11 @@ fourteen of §2's calibration values, ten reproducing from their **live** bodies
 | The head commit message of `6d4295a938705546160f7a44af12c6391570f8c9` | "counts this round's deleted lines (**16**, sited, set-equality both ways)" | the same measured **22**. **A commit message is immutable and is NOT rewritten here** — the forward correction is stated in the body and in this record instead; see §11.7 |
 | §11.1's last row, L898 | "the verdict's §2 table repeats the claim" | **two** verdicts repeat the sentinel claim, not one: the `SD-F: REVISE` verdict (issue comment **6206966415**) and the `SD-D: ACCEPT` verdict (issue comment **6206838331**). Both are dated records and neither is edited; **a fresh Stage F must read this record's corrected reason, not either verdict** |
 | §11's introduction, L879–880 | "a claim the verdict's own §2 table repeats", singular | the same singular attribution at the section's own head; it now names **both** verdicts and points a fresh Stage F at this record |
-| §8's derivation-base bullet, L528–530 | "the repository's `main` has not moved" | stale: `main` has moved twice since (`f490c16f` → `87d6b460` → `988b5067`). The **merge base of this head and the current `main` is unchanged** at `f490c16f`, so nothing is voided and no figure here depends on `main`'s tip. §8 now also states that the one-path shape is a property of the **merge base**, while the two-dot form `main..HEAD` shows four paths |
+| §8's derivation-base bullet, L528–530 | "the repository's `main` has not moved" | stale: `main` has moved twice since (`f490c16f` → `87d6b460` → `988b5067`). The **merge base of this head and the current `main` is unchanged** at `f490c16f`, so nothing is voided and no figure here depends on `main`'s tip. §8 now also states that the one-path shape is a property of the **merge base**, while the two-dot form `main..HEAD` showed four paths at `ff975270` against then-`main` `988b5067`; against current `main` `9e418c8c` it shows **56**, which §8's bullet and §11.9 record |
 | §10.8's Codex bullet, L843–844 | "its review did not run (usage limit, issue comment 6206352377)" | the connector's state block on issue comment **6206351959** says the code review **ran and FAILED** at `8e9392f8` with `has_any_findings: true` and `has_unresolved_findings: true`; the usage-limit comment **6206352377** explains why it failed. The finding **text** is not retrievable by any API this round could read (0 reviews, 0 review comments), so a P1 cannot be ruled out. Recorded as confirmed unavailability, never as clean |
 | The preamble's enumeration of the Stage F round's changed sections | "§4.1, §4.5, §4.6, §4.7, §4.8, §7 item 3 and this preamble changed" | **§7 item 2, §10.2 and §10.6 were changed by that round too**, and all three are listed in §11.3's own site table. The enumeration now names them |
-| §11.4's first paragraph | the glosses "were added at every occurrence of those labels **outside** the three bound fields" | true of every item **except** that round's own new paragraph at body **L195**, which uses `Stage D`, `SD-D` and `Stage F` with no in-item gloss (the `Stage F` gloss lives in a different item, the acceptance criteria at body L60). The count is **nine** gloss phrases — four `Stage C`, three `Stage D`, two `SD-D` — **not the eight that round's brief carried**, and all nine score 0 in the pre-edit body revision and 4 / 3 / 2 in the live body |
-| The PR body's Paths section, body L48 | "The Stage F repair round replaced sentences at **nine** sites in the same file" | **eleven** sites, which is this record's own count in §11.3; the nine are §11.1's nine *wording rows*, and those eleven sites fall into them. A figure found while making the required 16 → 22 correction and corrected with it |
+| §11.4's first paragraph | the glosses "were added at every occurrence of those labels **outside** the three bound fields" | true of every item **except** that round's own new paragraph at body **L195**, which uses `Stage D`, `SD-D` and `Stage F` with no in-item gloss (the `Stage F` gloss lives in a different item, the acceptance criteria at body L60). The count is **nine** gloss phrases — four `Stage C`, three `Stage D`, two `SD-D` — **not the eight that round's brief carried**, and all nine score 0 in the pre-edit body revision and 4 / 3 / 2 in the body at that round's end (`03:09:57Z`); the live body at the Stage C handoff round's head reads **4 / 5 / 3**, as §11.4 and §11.9 record |
+| The PR body's Paths section, body L48 | "The Stage F repair round replaced sentences at **nine** sites in the same file" | **eleven** sites, which is this record's own count in §11.3. **Ten** of them are quoted in §11.1's nine *wording rows* — the last row pairs §4.5's boundary paragraph with §10.2 — and the **eleventh**, the preamble edit, is listed and quoted in §11.3 only. The clause this row first published, that "those eleven sites fall into" the nine rows, was false of the preamble site; §11.9 records the correction |
 
 **What this round did not change.** The central claim, §10.5's routing, §7 item 2's
 retraction, the ten-live/four-revision-only calibration split, the sentinel count's
@@ -1226,3 +1241,89 @@ body**, so nothing further is voided by the body edit.
    not reproduced here, so the value is the audit's, not this round's.
 6. **Whether any other open PR body carries a reading §10.3's space does not contain** —
    unverified, as §10.8 says.
+
+### 11.9 The Stage C handoff round — three stale statements corrected, and this round's own deletions
+
+**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Appended 2026-10-16
+by the Stage C (the implementation stage) agent, at the head the Stage D re-audit repair
+round produced (`ff975270`). This round's task was the Stage C handoff; before writing it,
+the record and the posted body were re-measured, and **three statements no longer held at
+that head** and are corrected here; the §11.5 row that restates §8's movement is corrected
+with it, because leaving "moved twice" beside a §8 that says "three times" would be a new
+contradiction. Each superseded sentence is quoted, the discipline
+§10.9, §11.1 and §11.5 apply, and **nothing the second Stage D verdict verified is
+changed**: its two grounds were repaired in `ff975270` and re-verified in this round
+(§4.5's and §11.1's corrected base, and the body's 22-line figure), and this round
+re-measured the sentinel counts and the 22-line and 19-line deletion counts where §11.9
+relies on them. The ten-live / four-revision-only calibration split is a **snapshot** whose
+two movements are recorded in gap 3 below, not re-asserted here.
+
+| Site (line numbers at `ff975270`) | What it said | What is true, measured 2026-10-16 |
+| --- | --- | --- |
+| §11.5's row for the body's Paths section, L1126 | "the nine are §11.1's nine *wording rows*, and those eleven sites fall into them" | §11.1 quotes **ten** of §11.3's eleven sites in nine wording rows — its last row pairs §4.5's boundary paragraph with §10.2 — and the **eleventh**, the preamble edit, is listed and quoted in §11.3 only. Mapped row by row: §11.3's eleven ranges are the preamble, §4.1, §4.5's row, §4.6's row, §4.7's row 1, §4.8's row, §7 item 2, §7 item 3, §10.6, §4.5's boundary paragraph and §10.2; §11.1 has no preamble row. The body's Paths sentence at L48 repeated the same clause and is corrected to match |
+| §11.4's gloss-count sentence, L1056–1059 | "**4 / 3 / 2** in the live body" | at `ff975270` the whitespace-collapsed body reads **4 / 5 / 3** — four `Stage C (the implementation stage)`, five `Stage D (the independent implementation-audit stage)`, three "`SD-D` labels a Stage D audit" — **twelve** glossed occurrences, not nine. `4 / 3 / 2` is the body at **`03:09:57Z`**, the end of the Stage F repair round's edit walk and the body the second Stage D verdict audited. The growth is this record's own: the Stage D re-audit repair round glossed one further `Stage D` while rewriting the Blast-radius paragraph (body L34), and its new paragraph at body L197 carries one more `Stage D` and one more `SD-D`. The nine phrases that round added are unchanged and still score 0 in the `02:31:50Z` revision |
+| §8's derivation-base bullet, L537–539 and L541, its two-dot paragraph, L551–557, and §11.5's restatement of the movement, L1122 | "`main` has moved twice since … the **two-dot** form … reports **four** rows" | `main` had moved **twice** at `ff975270` and has moved **three** times at this round's measurement: `f490c16f` → `87d6b460` (PR #787) → `988b5067` (PR #783) → `9e418c8c` (PR #801). The four-row two-dot result was measured against `988b5067`; against `main` `9e418c8c` the same form reports **56** rows. Both are snapshots of `main`'s **moving tip**, not of this change; the **merge base is still `f490c16f`** (`git merge-base HEAD origin/main`), so nothing is voided and no figure in this record depends on `main`'s tip |
+
+**This round's deleted lines, counted and sited.** Replacing a statement deletes the text it
+replaced. Counted as **every deletion line** in
+`git diff ff975270..HEAD -- docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md`,
+excluding only the `---` diff header and taken from `-U0` hunks so no deletion is hidden by
+context, the range reports `--numstat` `118	17`, the deletion lines number
+**17**, and the site table totals **17**:
+
+| Site (line numbers at `ff975270`) | Lines deleted |
+| --- | --- |
+| Preamble L11, L19 and L24 — the "three times" count and the two insertion points for the fourth round and the body edit | 3 |
+| §8's derivation-base bullet, L537–539 and L541 | 4 |
+| §8's two-dot paragraph, L551–552 and L555–557 | 5 |
+| §11.4's gloss-count sentence, L1058–1059 | 2 |
+| §11.5's row for §8, L1122 | 1 |
+| §11.5's row for §11.4, L1125 | 1 |
+| §11.5's row for the body's Paths section, L1126 | 1 |
+| **Total deleted** | **17** |
+
+**The set is exact in both directions, measured the way §10.7's, §11.3's and §11.6's were**:
+the old-line numbers parsed from the `-U0` hunks are exactly the numbers the ranges above
+claim — measured-minus-claimed empty and claimed-minus-measured empty — and the claimed
+counts sum to 17. **This round does not claim to be insert-only** — it is not; it
+deleted 17 lines to correct the three statements above, and appended this
+section.
+
+**The PR body's edit, and the digest.** This round edits the body **outside** all three
+bound fields only: it refreshes the Blast-radius and Paths figures to this head's measured
+`--numstat`, corrects the "eleven sites fall into nine rows" clause, and appends a paragraph
+naming the head this round produced. **The bound-field digest did not move: it is
+`078ec42572ff330a` at normalized payload lengths `1380 / 3868 / 40`, recomputed from the
+posted body read back from the API before and after the edit.** The three bound fields were
+not edited, and the skills table's round-1 rows and their `Row source` records are
+untouched, so no body binding is voided by this round.
+
+**A file cannot name the commit that contains it.** The exact 40-character head this round
+produced, with its tree and base, is therefore published in the body paragraph appended
+after the push and in the Stage C handoff comment, not here; the two must agree. Nothing else
+about the artifact changed: the path is still the one file this change adds, and the merge
+base is still `f490c16f9ed23f3d489e42f7696323bffcce6fd3`.
+
+**What this round did not verify, stated as gaps.**
+
+1. **Codex's unresolved findings at `8e9392f8`** — still not retrievable:
+   `repos/…/pulls/793/reviews` returns 0 and `repos/…/pulls/793/comments` returns 0. A P1
+   cannot be ruled out, and this round does not report the surface as clean.
+2. **The 5,400-combination space and the 92,580 deletion variants of §10.3** — not re-run.
+3. **Other pull requests' live bodies** — not re-measured as a claim. Two movements since
+   §11.2's measurement are recorded so its present-tense split is not read as current:
+   #774's body was edited at 2026-10-16T04:50:31Z and 04:51:25Z, and its witness payload now
+   measures **2543** characters where `d10fb1e4977b8ccb` needs **3075**: that value reproduces
+   at the `01:41:20Z` revision (`3075 / 5792 / 738`) and not from the live body
+   (`755e1656024f75f9` at `2543 / 5792 / 738`); #785's body carries nine edits after
+   its `21:01:18Z` revision (latest `14:00:20Z`), so `45db39e238a3a4e6` reproduces at the
+   anchor `2afc2d18…` §4.6 names — **re-derived by this round**, `1819 / 7340 / 384` — and
+   not from the live body. §7 item 4 already governs what a move does to an entry; no figure
+   of this change depends on those bodies' current state.
+4. **The second Stage D verdict's remaining claims** — read and used as before; not
+   re-adjudicated in full, and void at this head in any case.
+
+**What is owed.** This round moves the head, so the second `SD-D: REVISE` verdict
+(`6207351316`), the `SD-D: ACCEPT` verdict (`6206838331`) and the `SD-F: REVISE` verdict
+(`6206966415`) no longer cover the artifact: **a fresh Stage D and a fresh Stage F are owed
+at the head this round produced**, with the unchanged digest `078ec42572ff330a`.
