@@ -6103,40 +6103,52 @@ the entry governs.
   until an owner decision reopens it.
 - **New authority:** none.
 
-### AEGIS-APR-138: Governance Correction Register Entry — a scoped grant for the receipt-posting and the 2026-10-16 governance correction
+### AEGIS-APR-138: The 2026-10-16 governance correction, recorded — the scoped grant recorded as owed
 
-- **Event:** GRANT; scoped to exactly the two subjects stated under "Scope allowed"
-  and to nothing else. It is not a work grant, not a merge grant, not an
-  administrator merge, not a `gate-guard` exception and not a waiver of any check.
-  It carries **one appended lifecycle event** — a partial SUPERSEDED naming
-  AEGIS-APR-039 and limited to its stopping condition. **No existing entry's text is
-  edited**; this entry is an append.
-- **Status at recording:** Owner directed; **ACTIVE on recording**.
+- **Event:** POLICY DECISION — records the owner's 2026-10-16 third-set
+  clarifications and the coverage ruling for each limb; **grants no work, no
+  permission and no supersession**. It is **not a GRANT**; the scoped grant the
+  directive describes is **owed, not conferred**. No lifecycle event is
+  appended by this entry.
+- **Status at recording:** **OWED — recorded, not granted.** No owner grant for
+  this entry is recorded. Clarification (e) states that the register entry "IS
+  OWED" and was "dispatched as its own work item for the owner's grant". This
+  entry therefore confers no authority, must not be cited as a grant for any
+  action, and the scoped grant it describes remains outstanding. It is a record
+  made by this register merge; it is not a grant, and no grant is in force.
 - **Date / Grantor:** 2026-10-16 / Peter Nguyen.
-- **Glosses for the labels this entry uses** (one plain-English line each, as the
-  standing naming rule requires). **The receipt-posting** — the practice the directive
-  names as one of this grant's two subjects; the directive does not define it, and
-  subject (i) below records that. **AEGIS-APR-nnn / APR-nnn** — a register entry
-  identifier; a lookup key, never the subject of a sentence. **The delivery workflow**
-  — the seven-stage chain in `docs/delivery-workflow.md`. **The acceptance index** —
-  `tools/readability_acceptance/acceptance-index.json`, the generated record of which
-  pages are accepted and which remain pending. **The skills manifest** —
+- **Glosses for the labels this entry uses** (one plain-English line each, as
+  the standing naming rule requires). **AEGIS-APR-nnn / APR-nnn** — a register
+  entry identifier; a lookup key, never the subject of a sentence. **The
+  delivery workflow** — the seven-stage chain in `docs/delivery-workflow.md`.
+  **The acceptance index** —
+  `tools/readability_acceptance/acceptance-index.json`, the generated record of
+  which pages are accepted and which remain pending. **The skills manifest** —
   `tools/skills-manifest.json`, the generated list of the skills under
   `.claude/skills/`. **A batch pull request** — a readability reading-lane pull
   request that carries an evidence record of eight pages read. **A record pull
   request** — the directive's own phrase for the three classes it lists in
-  clarification (c); this entry does not widen it beyond those three. **The stop
-  list** — the five events that halt the loop and need the owner, given as "safety
-  boundary; approval-entry change; `gate-guard` exception; repeated page refusal;
-  host/provider/spend need" in the workspace file
-  `_resume-2026-10-09/OWNER-DECISIONS-2026-10-15.md` L187, which is not a
-  repository artifact.
+  clarification (c); this entry does not widen it beyond those three. **POLICY
+  DECISION** — a register event type that records a decision and grants no
+  work. **OWED** — the status this entry records: the request is made and the
+  grant is not given. **named-pending** — a subject that is named, has no
+  definition yet, and is not granted. **UNRESOLVED** — a recorded state where
+  two sources disagree and this record does not pick a winner.
+  **operationalizes** — gives a text practical effect in this record. **The
+  receipt-posting** — the practice the directive names as this grant's first
+  subject and does not define; subject (i) records that. **S3** — section S3 of
+  [`docs/roadmaps/OWNER-DECISIONS-2026-10-15.md`](../roadmaps/OWNER-DECISIONS-2026-10-15.md),
+  the tracked standing instruction that work does not stop while a decision
+  waits on the owner. **The stop list** — the five events that need the owner:
+  a safety boundary, an approval-entry change, a gate-guard exception, a
+  repeated page refusal, and a host/provider/spend need. They are tracked at
+  that page **L150-L182**, with the five items at **L179-L181**; the workspace
+  file named under "Evidence" is the source of the owner's words only.
 - **Owner decision, in the owner's own words.** The directive is the owner's
-  clarifications of 2026-10-16, third set. Quoted verbatim from the source named under
-  "Evidence"; nothing in the block below is a paraphrase. Each paragraph is reproduced
-  on one line so the quotation is not sensitive to line wrapping, as AEGIS-APR-105
-  does with its own quotation:
-
+  clarifications of 2026-10-16, third set. Quoted verbatim from the source named
+  under "Evidence"; nothing in the block below is a paraphrase. Each paragraph
+  is reproduced on one line so the quotation is not sensitive to line wrapping,
+  as AEGIS-APR-105 does with its own quotation:
   > ### (a) THE SEVEN BINDING STAGES STAND — THE DIRECTIVE'S STAGE LIST IS A MINIMUM, NOT A REPLACEMENT
   > **`docs/delivery-workflow.md`'s seven stages remain binding, INCLUDING THE SEPARATE INDEPENDENT IMPLEMENTATION AUDIT.** Any stage list given in a directive is a **floor**, not a substitute. **A work item may not collapse two stages into one, and may not treat a directive's shorter list as licence to skip a stage.**
   > **WHY THIS MATTERS HERE:** this loop's largest error was reading a bounded-mode directive as replacing the chain, and four work items were merged without their validation and final-review stages. **The owner has now ruled that the opposite reading is correct: the chain is the floor.**
@@ -6157,211 +6169,257 @@ the entry governs.
   > **AND THE GOVERNANCE RULE THAT GOVERNS THE REGISTER ITSELF: a conflicting entry is retired by APPENDING A SUPERSESSION, NEVER by editing the existing entry.** This matches the ledger's own rule that it is never rewritten, and the withdrawal-and-re-record pattern already applied three times tonight.
   > **STATUS: A REGISTER ENTRY IS OWED. It is not this loop's to write unilaterally - a register entry is an approval-surface change and is therefore stop-list adjacent. It is recorded here as owed with the shape specified, and dispatched as its own work item for the owner's grant.**
 
-- **Subject (i) — the receipt-posting, and the definition the directive does not give.**
-  The directive names the receipt-posting as one of the two subjects this grant must
-  cover. **It does not say what the receipt-posting is, and neither this register nor
-  the repository defines it.** Measured: a search of this register for the practice
-  returns no entry naming it, and `git grep -n -i -E 'receipt.post|posting a receipt'`
-  over the whole tree at `origin/main` returns **one hit**,
-  `docs/evidence/fu3-record-publication-2026-10-13/FU3-RECORD-stage-g-summary.md` L194,
-  which records a merge receipt's posting time on one pull request and defines no
-  standing practice. **This entry therefore grants the receipt-posting under the name
-  the directive gives it and records the definition as OPEN for the owner.** It does
-  not invent one, and it does not narrow the subject the owner named.
+- **Subject (i) — the receipt-posting: named, undefined, and not granted.**
+  **Named-pending: named, undefined, and not granted.** The directive names the
+  receipt-posting as one of the two subjects its grant must cover. **It does not
+  say what the receipt-posting is, and neither this register nor the repository
+  defines it.** Measured: a search of this register for the practice finds no
+  entry naming it, and `git grep -n -i -E 'receipt.post|posting a receipt'` over
+  the whole tree at `origin/main` returns **one hit**,
+  `docs/evidence/fu3-record-publication-2026-10-13/FU3-RECORD-stage-g-summary.md`
+  L194, which records a merge receipt's posting time on one pull request and
+  defines no standing practice. **No grant is made under that name.** The name is
+  recorded; the definition is not given; the definition and any grant under it
+  are owed together, with the scoped grant this entry records as owed.
 
-  **The relay this work item carried, recorded as a relay and not as the owner's
-  words.** The dispatching brief for this entry glossed the receipt-posting as *"the
-  standing practice by which the coordinator appends an evidence receipt to a workspace
-  record after each act."* That sentence is the coordinator's; it is not in the
-  directive, and no command reproduces it as the owner's text. It is recorded here so
-  the owner can confirm, correct or replace it — the same form AEGIS-APR-105 uses when
-  it records that its own quotation is "a transcription of that relay, not the owner's
-  own signed text".
+  **The relay this work item carried, recorded as a relay and not as the
+  owner's words.** The dispatching brief for this entry glossed the
+  receipt-posting as *"the standing practice by which the coordinator appends an
+  evidence receipt to a workspace record after each act."* That sentence is the
+  coordinator's; it is not in the directive, and no command reproduces it as the
+  owner's text. It is recorded here so the owner can confirm, correct or replace
+  it — the same form AEGIS-APR-105 uses when it records that its own quotation
+  is a transcription of a relay, not the owner's own signed text.
 
-  **What is observable, stated as an observation and not as the owner's definition.**
-  The workspace file `_resume-2026-10-09/WAITING-ON-OWNER.md` is 145,027 bytes and
-  1,337 lines and carries dated receipt sections appended after acts — for example its
-  closure receipt for the closed lane-B batch-4 pull request, and its two 2026-10-16
-  correction receipts. That file is **not a repository artifact**, and this observation
-  grants nothing.
+  **What is observable, stated as an observation and not as the owner's
+  definition.** The workspace file named under "Evidence" carries dated receipt
+  sections appended after acts — for example its closure receipt for the closed
+  lane-B batch-4 pull request, and its two 2026-10-16 correction receipts. The
+  file sits outside the tracked tree and is mutable, so this entry cites it by
+  path, heading and line range and asserts no size or line count for it. That
+  observation grants nothing.
 
-- **Subject (ii) — the governance correction, limb by limb, with this entry's ruling on
-  existing coverage for each.**
+- **Subject (ii) — the governance correction, limb by limb, with this entry's
+  ruling on existing coverage for each.**
 
-  - **(a) The seven stages, and a directive's shorter list as a floor.** The seven
-    stages selected by AEGIS-APR-105 and stated at `docs/delivery-workflow.md` remain
-    binding, including the separate independent implementation audit. **Already
-    covered, and not re-granted here:** AEGIS-APR-105 selects that policy target
-    including "the stage order and stage separation", and at `origin/main`
-    `docs/delivery-workflow.md` L22-23 reads "Every change moves through these seven
-    stages, in this order. The names are the binding ones." **Genuinely new, and granted
-    here:** the precedence rule that **a stage list given in a directive is a floor, not
-    a replacement**, that no work item may collapse two stages into one, and that a
-    directive's shorter list is never licence to skip a stage. Measured: a search of
-    this register for the word "floor" returns **no entry**; a search of
-    `docs/delivery-workflow.md`, `AGENTS.md` and `CONTRIBUTING.md` for "floor"
-    returns **two** uses, at L360 and L429, concerning finding-severity levels and a
-    reduced review set, neither about a directive's stage list. **This rule constrains
-    any shorter list. It grants no stage, no shortcut and no exception to the chain.**
-  - **(b) Which artifact is regenerated in which pull request.** **The acceptance index
-    is regenerated only in its own AEGIS-APR-115 rebuild pull request, and never inside
-    a batch pull request. Partly covered:** AEGIS-APR-115 grants work and merge
-    authority for rebuild pull requests that regenerate
-    `tools/readability_acceptance/acceptance-index.json` and
-    `tools/readability_acceptance/acceptance-verdicts-stage-1.json` and no other path,
-    and states "Nothing else is covered" — **but it does not forbid a batch pull request
-    from regenerating the index, so the prohibition is new.** **Granted here:** the
-    prohibition, and the operational consequence the directive states — a batch work
-    item that finds the committed index stale must not regenerate it, the stale index is
-    expected between rebuilds and is not a defect in the batch, and a batch work item
-    that wants the index current must note it and let the next rebuild carry it. **The
-    skills manifest is regenerated in the same pull request as the skill change. Already
-    enforced, and therefore not new authority:** at `origin/main`,
-    `scripts/validate-skills.py` L660-664 fails continuous integration with "skills
-    manifest drift - a SKILL.md changed without a refreshed manifest; run: python
-    scripts/validate-skills.py --refresh-skills-manifest", against
-    `tools/skills-manifest.json`. **No register entry states this rule**, so this entry
-    records it — **as a restatement of an already-enforced continuous-integration
-    requirement, not as a new permission**, which is what the directive itself says
-    ("as continuous integration already requires").
+  - **(a) The seven stages, and a directive's shorter list as a floor.** The
+    seven stages selected by AEGIS-APR-105 and stated at
+    `docs/delivery-workflow.md` remain binding, including the separate
+    independent implementation audit. **Already covered, and not re-granted by
+    this entry:** AEGIS-APR-105 selects that policy target including "the stage order
+    and stage separation", and `docs/delivery-workflow.md` L22-L23 reads "Every
+    change moves through these seven stages, in this order. The names are the
+    binding ones." **Genuinely new, and recorded here as the owner's rule of
+    interpretation:** the precedence rule that **a stage list given in a
+    directive is a floor, not a replacement**, that no work item may collapse
+    two stages into one, and that a directive's shorter list is never licence to
+    skip a stage. Measured: a search of this register for the word "floor"
+    returns **one hit, at L1483**, where the **pinned 49/12 test counts become
+    floors** (`scripts/tests/test_validator.py`) — not audit counts and not a
+    directive's stage list; a search of `docs/delivery-workflow.md` for "floor"
+    returns **two** uses, at L360 (a finding-severity floor) and L429 (a reduced
+    review set floor). **This rule constrains any shorter list. It grants no
+    stage, no shortcut and no exception to the chain.**
+  - **(b) Which artifact is regenerated in which pull request.** **The
+    acceptance index is regenerated only in its own AEGIS-APR-115 rebuild pull
+    request, and never inside a batch pull request.** **Partly covered:**
+    AEGIS-APR-115 grants work and merge authority for rebuild pull requests that
+    regenerate `tools/readability_acceptance/acceptance-index.json` and
+    `tools/readability_acceptance/acceptance-verdicts-stage-1.json` and no other
+    path, and states "Nothing else is covered" — but it does not forbid a batch
+    pull request from regenerating the index, so the prohibition is new. **The
+    prohibition is recorded here as the owner's rule, not as a grant:** the
+    operational consequence the directive states — a batch work item that finds
+    the committed index stale must not regenerate it, the stale index is
+    expected between rebuilds and is not a defect in the batch, and a batch work
+    item that wants the index current must note it and let the next rebuild
+    carry it. **The skills manifest is regenerated in the same pull request as
+    the skill change. Already enforced, and therefore not new authority:** at
+    `origin/main`, `scripts/validate-skills.py` **L664-L666** fails continuous
+    integration with "skills manifest drift - a SKILL.md changed without a
+    refreshed manifest; run: python scripts/validate-skills.py
+    --refresh-skills-manifest", against `tools/skills-manifest.json`. **No
+    register entry states this rule**, so this entry records it — **as a
+    restatement of an already-enforced continuous-integration requirement, not
+    as a new permission**, which is what the directive itself says ("as
+    continuous integration already requires").
   - **(c) Three classes are pre-approved record pull requests and continue. The
-    index-rebuild class is already granted and is not re-granted here:** AEGIS-APR-115
-    already makes routine index rebuilds a standing approval of work and merge "without
-    asking the owner each time", "revocable at any time". Measured: a search of this
-    register for "self-cost", for "forecast" and for "metrics checkpoint" returns **no
-    entry**, and for "checkpoint" returns **no entry at all**. **Genuinely new, and
-    granted here:** the two classes with no existing coverage — **five-merge forecast
-    and metrics checkpoints**, and **ledger self-cost re-reads** — are pre-approved
-    record pull requests that continue without further authorisation. **The referent of
-    the exemption is not stated:** the directive exempts these three classes from
-    "Section 4", and **does not say what Section 4 is**; see "Silences recorded rather
-    than filled".
-  - **(d) "Next" means the next approved backlog item, and the loop does not stop after
-    a merge. The persistence half is already granted and is not re-granted here:**
-    AEGIS-APR-039 pre-approves ongoing backlog delivery and quotes the owner's "Loop
-    through all backlogs and issues until all are resolved. Pre-approve for all commit,
-    push, and merge including admin merges. Do not stop until everything is completed".
-    **Genuinely new, and granted here:** that a merge is a step and not a stopping
-    condition, and that after a merge the next action is the next approved backlog item
-    in order. **And the stopping condition differs from AEGIS-APR-039's quoted
-    instruction, which is why this entry appends a partial supersession for it** — see
-    the appended lifecycle event at the end of this entry.
-  - **(e) Conflicts are retired by appended supersession, never by editing an entry.
-    Already the register's own rule, and not re-granted here:** the preamble at L8-10
-    reads "Grant entries are immutable. Append later revocation, expiry, consumption or
-    supersession events with unique IDs and the affected grant ID; do not edit old
-    entries." This entry follows that rule, records the directive's confirmation of it,
-    and adds nothing to it.
+    index-rebuild class is already granted and is not re-granted by this entry:**
+    AEGIS-APR-115 already makes routine index rebuilds a standing approval of
+    work and merge "without asking the owner each time", "revocable at any
+    time". Measured: a search of this register for "self-cost", for "forecast"
+    and for "metrics checkpoint" each finds **no matching entry**, and for
+    "checkpoint" finds **no matching entry at all**. **Recorded here as the
+    owner's words, and granted nothing:** the two classes with no existing
+    coverage — **five-merge forecast and metrics checkpoints**, and **ledger
+    self-cost re-reads** — are pre-approved record pull requests that continue
+    without further authorisation. **Their authority is part of the outstanding
+    grant; this entry confers none of it.** **The referent of the exemption is
+    not stated:** the directive exempts these three classes from "Section 4",
+    and **does not say what Section 4 is**; see "Silences recorded rather than
+    filled".
+  - **(d) "Next" means the next approved backlog item, and the loop does not
+    stop after a merge — recorded as UNRESOLVED, with one owner decision named
+    and neither text operationalized.** The persistence half is already granted
+    and is not re-granted by this entry: AEGIS-APR-039 pre-approves ongoing
+    backlog delivery and quotes the owner's "Loop through all backlogs and issues until
+    all are resolved. Pre-approve for all commit, push, and merge including
+    admin merges. Do not stop until everything is completed". **Two
+    owner-sourced texts speak to when the continuous loop ends, and this entry
+    quotes both and decides neither.** Text 1 is clarification (d), quoted
+    verbatim in the owner decision earlier in this entry: **the continuous loop
+    ends only on a stop-list event or when the owner says stop.** Text 2 is the
+    tracked S3 standing instruction at
+    `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` **L150-L182**, quoted here
+    with its own line anchors:
 
-- **Scope allowed:** Two subjects, and only these two. **(i)** The receipt-posting, under
-  that name, as a standing practice of the coordinator — its definition recorded as open
-  above, so that this grant covers the practice the owner names and nothing this entry
-  has inferred. **(ii)** The governance correction of 2026-10-16: the floor rule for a
-  directive's stage list; the batch prohibition on regenerating the acceptance index and
-  the restatement of the skills-manifest rule; the pre-approval of five-merge forecast
-  and metrics checkpoints and of ledger self-cost re-reads as record pull requests that
-  continue; and the rule that a merge is not a stopping condition and that "next" means
-  the next approved backlog item in order. **Plus one appended lifecycle event**, a
-  partial SUPERSEDED naming AEGIS-APR-039 and limited to its stopping condition.
-- **Scope FORBIDDEN:** It grants no work of any kind on any named artifact — **it
-  authorises no pull request, no commit, no push and no merge, and it is not needed for
-  any**: the delivery authority for those is AEGIS-APR-039, AEGIS-APR-100 and
-  AEGIS-APR-115, unchanged. It waives no check, no `gate-guard` requirement, no DCO
-  sign-off and no `MG1`-`MG5` condition. It does not widen, weaken or reinterpret
-  AEGIS-APR-105, AEGIS-APR-113, AEGIS-APR-114, AEGIS-APR-115, AEGIS-APR-116,
-  AEGIS-APR-117 or AEGIS-APR-129, and **it does not re-grant anything those entries
-  already grant** — in particular the index-rebuild authority stands on AEGIS-APR-115
-  alone. It does not extend the supersession of AEGIS-APR-039 beyond the stopping
-  condition: **AEGIS-APR-039's delivery grant, its green-check conditions and every
-  other part of it stand unchanged.** It defines the receipt-posting no further than
-  subject (i) states. It does not decide what "Section 4" is. It changes no branch
-  protection, no protected-path pattern, no workflow, no code and no harness
-  configuration. It authorises no provider call, host proof, private input, deployment,
-  spend or evidence deletion. **No restriction, expiry or one-use limit beyond those
-  stated in this entry was additionally stated by the owner**, and none is invented
-  here.
-- **Silences recorded rather than filled.** Two, and neither is guessed at.
-  1. **The receipt-posting is named and not defined.** Its content is recorded as open
-     under subject (i).
-  2. **"Section 4" is named and not identified.** Clarification (c) exempts the three
-     classes from "Section 4", and the directive does not say which document's section
-     4, or what it requires. Measured: a search of the workspace record
-     `_resume-2026-10-09/WAITING-ON-OWNER.md` for "Section 4" returns the directive's
-     own line and four unrelated hits about a lane record's numbered sections; a search
-     of this register returns **none**. **This entry grants the exemption's operative
-     effect — the three classes continue without further authorisation — and does not
-     identify the section.**
-- **Reason:** The directive orders this entry and makes recording it the condition of
-  its own effect ("A REGISTER ENTRY IS OWED"). It is the only durable home for a
-  governance correction that otherwise lives only in a workspace file: this register is
-  what `AGENTS.md` sends every agent to before asking for consent, so a rule that
-  governs how a directive's stage list is read, which artifact a pull request may
-  regenerate, which classes continue, and when the loop stops must be checkable from
-  the repository rather than from session state. The separate work item exists because
-  a register entry is an approval-surface change and is therefore stop-list adjacent.
+    > L150: ## S3. Standing instruction — do not stop for decisions (owner directive 4 of 2026-10-15)
+    > L152-L155: - **What was decided, in one sentence:** the programme must **not stop work while a decision waits on the owner** — it continues working on everything the pending decision does not block, and reports the waiting list when the owner returns.
+    > L156-L158: - **The owner's words, verbatim (spelling preserved):** *"make sure deepseek doesn't stop work if there are decisions need to be made. It is to continue to work until I get back and ask if there's anything waiting on me."*
+    > L161-L162: - **The rule in one line:** *A pending decision is a reason to work on something else, not a reason to stop.*
+    > L166-L167: 2. **Almost nothing is fully blocked** — enumerate what remains authorized before idling, and do it.
+    > L176-L182: - **What this does NOT change:** it does **not invent authority** (a decision genuinely requiring the owner — a new grant, a protected-path exception, a scope change — is recorded as pending and worked around, never assumed); stop-list events (a safety boundary, an approval-entry change, a gate-guard exception, a repeated page refusal, a host/provider/spend need) are still reported when they happen; and a merge never happens without the required review posted at the exact head.
+
+    **The reading this record relies on, stated so it cannot be mistaken for a
+    rule.** "Ends only on" is read literally: the only events that end the
+    continuous loop are a stop-list event or the owner's stop. On that reading,
+    (d) makes a stop-list event a loop-ending condition, while S3 says stop-list
+    events "are still reported when they happen" and keeps unaffected work
+    going, so the texts differ on loop termination. The alternative reading —
+    "ends only on" states permissible terminal conditions and imposes no
+    mandate — is recorded because a reader may hold it, and the owner decision
+    below settles which reading stands. **This entry operationalizes neither
+    text and gives neither precedence. It grants no effect to either.**
+
+    **Verdict: UNRESOLVED.** Both texts are owner-sourced, and this register
+    cannot allocate effect between two owner instructions. It records the
+    question and submits it once rather than picking a winner; recency and
+    confidence are not authority.
+
+    **The one owner decision this record names, in plain words:**
+
+    > **Which rule ends the continuous loop?**
+    > **(1) Confirm (d) as a stopping rule that qualifies S3** — a stop-list event ends the loop, and S3's continue-work posture is qualified accordingly.
+    > **(2) Confirm S3 and retire (d)'s loop-end clause** — the loop does not end on a stop-list event; stop-list events are reported, and work continues on what is not blocked (the rest of (d), "a merge is a step", can stand).
+    > **(3) Give a third rule.**
+
+    **No option is recommended and none is preferred.** Both texts are the
+    owner's, and this record cannot choose between them. The entry names this
+    decision; it does not answer it.
+
+    **What waits while the decision is pending.** **No new loop-termination
+    behaviour is adopted from (d) by this record. Existing tracked policy is
+    unchanged. This record is not the instrument of either text.** No work item
+    may cite this entry as deciding when the loop stops; no stage of this pull
+    request treats either reading as settled. The question is recorded as
+    UNRESOLVED and submitted once. This entry starts, stops, authorizes and
+    forbids nothing.
+
+    **No lifecycle event is appended for this limb, and why.** The register
+    format requires a supersession to name a distinct, already-recorded
+    successor GRANT with actual human evidence that explicitly replaces the
+    predecessor; no such grant exists. The earlier claim that AEGIS-APR-039 and
+    (d) name different and incompatible terminal conditions **is withdrawn**:
+    AEGIS-APR-039's own Interpretation at **L1023-L1026** reads "Continue other
+    authorized backlog work while a separate decision is pending", which is the
+    same posture as (d)'s "a merge is a step". **AEGIS-APR-039's text, its
+    delivery grant and its green-check conditions are untouched.**
+  - **(e) Conflicts are retired by appended supersession, never by editing an
+    entry. Already the register's own rule, and not re-granted by this
+    entry:** the preamble at L8-L10 reads "Grant entries are immutable. Append later
+    revocation, expiry, consumption or supersession events with unique IDs and
+    the affected grant ID; do not edit old entries." This entry follows that
+    rule, records the directive's confirmation of it, and adds nothing to it.
+- **Scope allowed:** **Nothing is granted by this entry.** It records the
+  owner's 2026-10-16 third-set clarifications verbatim, the coverage ruling for
+  each limb above, the receipt-posting as named-pending, the loop-end question
+  as UNRESOLVED with one owner decision named and neither text operationalized,
+  and the scoped grant the directive describes as **owed, not conferred**. **No
+  authority, permission, work item or lifecycle effect is created by this
+  record.**
+- **Scope FORBIDDEN:** **Nothing may cite this entry as authority for any
+  action, and it is needed for none.** It permits no work of any kind on any
+  named artifact: it authorises no pull request, no commit, no push and no
+  merge. It grants nothing under the undefined receipt-posting name. It creates
+  no supersession, appends no lifecycle event and retires no entry. It decides
+  neither loop text: **AEGIS-APR-039's text, delivery grant and green-check
+  conditions stand unchanged**, and no reader may cite this entry as reducing
+  them. It waives no check, no `gate-guard` requirement, no DCO sign-off and no
+  `MG1`-`MG5` condition. It does not widen, weaken or reinterpret AEGIS-APR-105,
+  AEGIS-APR-113, AEGIS-APR-114, AEGIS-APR-115, AEGIS-APR-116, AEGIS-APR-117,
+  AEGIS-APR-129 or AEGIS-APR-137, and **it does not re-grant anything those
+  entries already record or grant** — in particular the index-rebuild authority
+  stands on AEGIS-APR-115 alone. It defines the receipt-posting no further than
+  subject (i) states. It does not decide what "Section 4" is. It changes no
+  branch protection, no protected-path pattern, no workflow, no code and no
+  harness configuration. It authorises no provider call, host proof, private
+  input, deployment, spend or evidence deletion. **No restriction, expiry or
+  one-use limit beyond those stated in this entry was additionally stated by the
+  owner**, and none is invented here.
+- **Silences recorded rather than filled, and one open decision that is not a
+  silence.** 1. **The receipt-posting is named and not defined.** Its content is
+  recorded as open under subject (i). 2. **"Section 4" is named and not
+  identified.** Clarification (c) exempts the three classes from "Section 4",
+  and the directive does not say which document's section 4, or what it
+  requires. Measured, with both methods stated: a search of this register is
+  **0 case-sensitive** and **2 case-insensitive**, at **L3139 and L3142** (both
+  another page's section 4); a search of the workspace record named under
+  "Evidence" is **1 case-sensitive** (the directive's own L1329) and **4
+  case-insensitive** (that line plus L753, L762 and L780, which are a lane
+  record's numbered sections). This entry records the exemption as the owner
+  states it and identifies no section. **3. The loop-end question is an open
+  owner decision, not a silence**: it is recorded under subject (ii)(d). **The
+  owed grant is the outstanding item** this record names in its Status field.
+- **Reason:** The directive orders this entry and makes recording it the
+  condition of its own effect ("A REGISTER ENTRY IS OWED"). It is the only
+  durable home for a governance correction that otherwise lives only in a
+  workspace file: this register is the surface `CONTRIBUTING.md` **L246** names
+  for approvals, and `AGENTS.md` sends every agent here before asking for
+  consent, so a rule that governs how a directive's stage list is read, which
+  artifact a pull request may regenerate, which classes continue, and when the
+  loop stops is checkable from the repository rather than from session state.
+  **A non-authorizing record does not manufacture the owed grant:** it preserves
+  the direction and the open question, and leaves the grant where the owner's
+  words leave it. The separate work item exists because a register entry is an
+  approval-surface change and is therefore stop-list adjacent.
 - **Evidence:** The directive is the workspace record
-  `_resume-2026-10-09/WAITING-ON-OWNER.md` **L1315-L1337**, under the heading "OWNER
-  CLARIFICATIONS (2026-10-16, third set) — BINDING, PERMANENT". Verified: the file is
-  **145,027 bytes** (`Get-Item ... | Select-Object Length`) and **1,337 lines**
-  (`(Get-Content ...).Count`). **It is not a repository artifact** and is not
-  retrievable from this repository; the quotation above is a transcription read at
-  source, not relayed from a summary. The register preamble L12-13 makes a current
-  direct owner instruction valid source evidence before transcription. Read in this
-  register for the coverage rulings above: AEGIS-APR-039 (L1003-L1030), AEGIS-APR-105,
-  AEGIS-APR-113, AEGIS-APR-114, AEGIS-APR-115 and AEGIS-APR-129. Read at
-  `origin/main`: `docs/delivery-workflow.md` L22-23 and L404-407,
-  `scripts/validate-skills.py` L660-664, and `tools/skills-manifest.json`. The
-  coverage searches are named with their observed results in the limbs above. The
-  register at the base of this change is blob
-  `7b2a0411fc4c408c713d4a4959fd192f3f978c01` — `git cat-file -t` returns **blob**,
-  `git cat-file -s` returns **408,612** bytes, the raw blob carries **6,104** LF bytes
-  and **0** CR bytes, and `git hash-object --no-filters
-  docs/approvals/APPROVAL_REGISTER.md` returns the same value, so the file this entry
-  was appended to is byte-identical to that blob. Numbering check at that blob: **137**
-  `AEGIS-APR-nnn` headings, the numbers contiguous **1-137** with **no gap** and **no
-  duplicate**, so the next free identifier is **AEGIS-APR-138** and this entry is
-  appended after AEGIS-APR-137, which begins at L5969.
-- **Expiry / use limit:** The rules it records are permanent by the directive's own
-  words ("BINDING, PERMANENT"). The grant itself is standing; no one-use limit and no
-  calendar expiry stated. It is revocable or supersedable only by a later appended
-  owner event. **The receipt-posting limb remains standing but undefined until the
-  owner states what the receipt-posting is.**
-
-#### Lifecycle event appended by this entry: AEGIS-APR-039's stopping condition, and only that
-
-- **Event:** SUPERSEDED (partial).
-- **Target:** AEGIS-APR-039 — its stopping condition only. AEGIS-APR-039's entry text is
-  untouched (immutability, preamble L8-10).
-- **Successor:** AEGIS-APR-138, the grant recorded above — a distinct grant, recorded by
-  this same append. **No second new grant is created by this event.**
-- **Effective at:** 2026-10-16, on recording.
-- **What is superseded, quoted:** AEGIS-APR-039 quotes the owner's instruction "Loop
-  through all backlogs and issues until all are resolved. Pre-approve for all commit,
-  push, and merge including admin merges. Do not stop until everything is completed".
-  Read as a stopping condition, **"Do not stop until everything is completed" stops the
-  loop when the backlog is complete.**
-- **What supersedes it:** the rule granted under subject (ii), limb (d) — a merge is a
-  step and not a stopping condition; after a merge the next action is the next approved
-  backlog item in order; **the continuous loop ends only on a stop-list event or when
-  the owner says stop.**
-- **Why this is a replacement and not merely an overlap:** the two clauses name
-  **different and incompatible terminal conditions for the same loop** — completion of
-  the backlog on one side, a stop-list event or the owner's word on the other. A reader
-  who reaches backlog completion holding AEGIS-APR-039 alone would stop the loop, which
-  the owner's later instruction forbids. **Two stopping conditions cannot both govern,
-  so this event records which one does.**
-- **What is NOT superseded, stated expressly:** everything else in AEGIS-APR-039 stands
-  unchanged — its delivery grant, its pre-approval of commits, pushes, pull requests and
-  merges including administrator merges, its green-check conditions, and its "Scope
-  FORBIDDEN". **This event does not widen the supersession to the grant, and no reader
-  may cite it as reducing AEGIS-APR-039's authority.**
-- **Reason:** the register preamble requires a supersession to be appended with a unique
-  ID and the affected grant ID rather than applied by editing the affected entry; the
-  directive restates that rule itself ("a conflicting entry is retired by APPENDING A
-  SUPERSESSION, NEVER by editing the existing entry").
-- **New authority:** none. This event records which stopping condition governs; it
-  confers nothing by itself.
-- **Recorded inside this entry rather than as a second entry**, because the directive
-  asks for one register entry — "a SCOPED GRANT covering (i) the receipt-posting and
-  (ii) the governance correction it makes" — and the register's own in-entry lifecycle
-  heading is an established form, as AEGIS-APR-137 uses with its two lifecycle events.
+  `_resume-2026-10-09/WAITING-ON-OWNER.md` **L1315-L1337**, under the heading
+  "OWNER CLARIFICATIONS (2026-10-16, third set) — BINDING, PERMANENT" (L1315),
+  with (d) at L1331-L1332 and (e) at L1334-L1337. The file sits outside the
+  tracked tree and is mutable, so this entry cites it by path, heading and line
+  range, and **asserts no byte or line count for it**; the quotation above is a
+  transcription read at source, and each of its paragraphs is reproduced on one
+  line so the quotation is not sensitive to line wrapping. The register
+  preamble L8-L10 and L15-L17 record that this register preserves the owner's
+  decisions rather than creating them, and L12-L13 make a current direct owner
+  instruction valid source evidence before transcription. Tracked citations used
+  above: `docs/delivery-workflow.md` L22-L23 (the seven stages) and L618-L620
+  (the governance-text deeper audit, the validation depth this change takes);
+  `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` L150-L182 (S3, with the five
+  stop items at L179-L181); `CONTRIBUTING.md` L246 (this register as a named
+  security-relevant surface) and L253-L258 ("Every PR, from the maintainer or
+  an outside contributor" must answer the security question); and
+  `docs/delivery-workflow.md` L378-L379 (the additional security review is
+  scoped to outside contributions, so no extra review is owed under `MG5` for
+  this in-repo pull request, while the pull request's own answer to the
+  security question is **Yes** because this register is a named surface). Read
+  in this register for the coverage rulings above: AEGIS-APR-039 (L1003-L1030,
+  including "Do not stop until everything is completed" at L1010-L1013 and
+  "Continue other authorized backlog work while a separate decision is
+  pending" at L1023-L1026), AEGIS-APR-105, AEGIS-APR-113, AEGIS-APR-114,
+  AEGIS-APR-115, AEGIS-APR-129 and AEGIS-APR-137. The register at the base of
+  this change is blob `7b2a0411fc4c408c713d4a4959fd192f3f978c01` — `git
+  cat-file -t` returns **blob**, `git cat-file -s` returns **408,612** bytes,
+  the raw blob carries **6,104** LF bytes and **0** CR bytes, and `git
+  hash-object --no-filters docs/approvals/APPROVAL_REGISTER.md` returns the same
+  value, so the file this entry was appended to is byte-identical to that blob.
+  Numbering check at that blob: **137** `AEGIS-APR-nnn` headings, the numbers
+  contiguous **1-137** with **no gap** and **no duplicate**, so the next free
+  identifier is **AEGIS-APR-138** and this entry is appended after
+  AEGIS-APR-137, which begins at L5969. **Recorded by the Stage C implementing
+  agent, DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
+- **Expiry / use limit:** The record is append-only and permanent by the
+  directive's own words ("BINDING, PERMANENT"), and a later appended owner
+  event is the only way to correct it. **No grant is in force, so no use limit
+  exists for this entry**; the scoped grant it records remains owed, and the
+  receipt-posting definition remains owed with it.
