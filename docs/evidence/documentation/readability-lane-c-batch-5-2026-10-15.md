@@ -845,7 +845,7 @@ C5-8 PARTIAL - NO ROW AND NO ACCEPTANCE OF ANY KIND: .claude/skills/tenant-isola
 | 14 | page-claim measurement | C5-8's "fifteen-surface checklist" = **15** measured rows; C5-2's "No `references/`" = **true** |
 | 15 | `git log -1 --format="%h %an %s" -- <page>` × 8 | other authors only (section 3 table) |
 | 16 | `git log --all --author="F reviewer" --oneline -- <page>` × 8 | **0** commits for every page (the stale identity never touched them) |
-| 17 | `git log --all --author="F reviewer" --oneline` | **11** commits, all on other lanes' branches or open pull requests; disclosed in section 3 |
+| 17 | `git log --all --author="F reviewer" --oneline` | **11** commits: **6** already ancestors of `main` (`97c61f35`, `baeca020`, `95d7737c`, `4b7e1a10`, `1419d480`, `bfcf402a`, each `git merge-base --is-ancestor` exit 0) and **5** on other lanes' branches or open pull requests; disclosed in section 3 |
 | 18 | batch-record extraction and cross-check (19 records at their branch heads) | **152** read slots, **152** distinct pages; lane A→0–39, lane B→148–187, lane C→296–327, lane D→445–486 (gaps 460, 461); lane C's 32 match exactly, in order, no gap |
 | 19 | library-norm measurement over the 657 reader pages (section 6) | 40-term convention table plus 17 below-norm terms measured with their page-resolves-it justification |
 | 20 | `git diff --check` | exit 0 — no output |
@@ -914,11 +914,11 @@ quoted in section 9.
 
 ## Footer
 
-sha256: 58728608ebaa6f9db51f6a3fbcfd2808b764ebbd2f69d288b7d8d217d8fbd303
+sha256: b0817d6b566cf2c5833b1670fd93e7c720469b6598a3dae36285c7d9625e75a6
 
 This digest covers the batch record's bytes from the first line through the closing `---` rule line
-and its terminating newline, encoded UTF-8 with LF line endings: exactly 91,084 bytes, byte offsets
-0 through 91,083 inclusive, lines 1-913. It does not cover the blank separator line between that
+and its terminating newline, encoded UTF-8 with LF line endings: exactly 91,241 bytes, byte offsets
+0 through 91,240 inclusive, lines 1-913. It does not cover the blank separator line between that
 rule and the `## Footer` heading, nor this footer. Any edit above the rule needs a fresh validation.
 The method was calibrated before it was trusted: applying it to lane C batch 3's committed record reproduces
 its published value `db9796c63ac8ab53022d8c4c237e62484cb4786ce19a261b81bbe36d9f58e2f8` exactly, and the same
