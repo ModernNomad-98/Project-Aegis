@@ -25,10 +25,11 @@ contributions to it receive the additional security review.
 | `acceptance-verdicts-stage-1.json` | Stage 1: the same events as verdict rows. |
 | `stated-acceptances.json` | **RETIRED as an input (D84).** The repaired builder never reads it; the prose harvester is gone. Kept for history with its purpose note updated. |
 | `build_index.py` | Re-runnable builder: parses ONLY the consolidated keeper table (sentinel `<!-- acceptance-index-schema: 1 -->` in the ledger), validates every row per event kind, refuses shallow clones, enforces main-containment, and writes the two JSON files at the pinned `--ref`. |
-| `check_index.py` | The official-count decision procedure: prints accepted / provably pending / no recorded acceptance / within-10 / cannot-decide buckets and the official pending count, at the pinned `--ref`. |
+| `check_index.py` | The official-count decision procedure: prints accepted / provably pending / no recorded acceptance / within-10 / cannot-decide / withdrawn-pending-re-review / partial-disposition buckets and the official pending count, at the pinned `--ref`. A latest withdrawal is never an acceptance, and an active partial disposition is decided before the withdrawal bucket. |
+| `partial-dispositions.json` | Schema 1: the instrument-level partial-disposition record. One row per page: the page, `"partial"`, the cancelling `withdrawal_id` and `withdrawal_revision`, the evidence source and a fixed 40-hex `evidence_ref`, the verbatim `quote`, and the reviewer/date attribution from the keeper row. It records a gap, never an acceptance, and it is validated through the builder's own `find_table`/`validate_rows`. |
 | `verify_ground_truth.py` | Checks the index against the 19-page relabel set, the fixture/report exclusions, the row-count reconciliation, and the six lost commits. |
 | `scan_*.py`, `investigate_commits.py` | Historical diagnostics from the frozen builder; no longer inputs. They write nothing and apply nothing. |
-| `tests/` | `test_verify_ground_truth.py` (failed-diff-is-never-zero and the schema-v2 format) and `test_index_schema.py` (the four prose blind spots and the three named misreadings as negative cases; per-row blob/quote/containment checks; loud malformed-row failure; lost-commit rules; shallow refusal). |
+| `tests/` | `test_verify_ground_truth.py` (failed-diff-is-never-zero and the schema-v2 format), `test_index_schema.py` (the four prose blind spots and the three named misreadings as negative cases; per-row blob/quote/containment checks; loud malformed-row failure; lost-commit rules; shallow refusal) and `test_check_index.py` (a fabricated zero-drift withdrawal is never accepted, with a mutation control that runs the base checker on the same case; the active-partial precedence; an inactive disposition moves no count; every sidecar error exits 2; the C4 identities on the committed index). |
 
 ## Reproduce (rebuilds are pinned to a base ref; D73 row 8)
 
@@ -50,8 +51,30 @@ an owner-choice item, flagged in D84).
 
 `check_index.py` prints every bucket and then the official pending count,
 computed as provably_pending + no_recorded_acceptance + cannot_decide +
+withdrawn_pending_rereview + partial_disposition_pending +
 (recorded_acceptance_within_10_lines not covered by a recorded targeted-review
 row). The tool states its basis; no bucket is silently collapsed.
+
+A page whose latest recorded keeper event is a **withdrawal** (AEGIS-APR-117)
+is never an acceptance: it is classified into `withdrawn_pending_rereview`
+before reachability and drift, so neither a zero drift nor a reachable
+revision can turn a cancellation into an acceptance. A **partial
+disposition** recorded in `partial-dispositions.json` is decided **before**
+the withdrawal bucket: a withdrawal **with** an ACTIVE disposition is
+`partial_disposition_pending`, and **without** one it is
+`withdrawn_pending_rereview`. A disposition is active only when the page has
+no index row, or when the index's effective event is that withdrawal at that
+revision; a disposition on a page the index records as an acceptance is
+INACTIVE, prints as declared but not applied, and changes no count, so a
+stale disposition can never demote an accepted page. The two buckets are
+disjoint — `withdrawn + partial` equals the number of latest-withdrawal pages
+— so no page is counted twice. A malformed or unreadable record, an unknown
+disposition, a duplicate page, an unreadable evidence source, an
+`evidence_ref` that is not a fixed 40-hex commit contained in
+`refs/remotes/origin/main`, a quote that is not verbatim at that ref, or a
+`withdrawal_id` that is not exactly one withdrawal row for that page makes
+the checker exit 2 with the reason; a misconfigured `--partial-dispositions`
+path fails the same way instead of silently disabling the feature.
 
 ## Known limits
 
@@ -62,6 +85,23 @@ row). The tool states its basis; no bucket is silently collapsed.
   acceptances only (lead decision 1), so none exist yet.
 * Historical targeted reviews were not transcribed; transcribing them later
   is a flagged Open item (D73 row 4, D84).
+* **The docstring's accepted sentence is narrower than the code, and this
+  change does not close that gap.** At main, 10 accepted pages rest on
+  `targeted-review` rows (AEGIS-APR-116) although the docstring requires a
+  `full-page-acceptance` row; this change removes the four withdrawal
+  acceptances and leaves the targeted-review divergence disclosed here, with
+  no count movement caused by that disclosure.
+* **A withdrawal's revision is stored in the generated view's
+  `last_acceptance_sha` field.** For a withdrawal that field holds the
+  cancelling row's revision, not an acceptance; the checker ignores it for a
+  withdrawal. Renaming it would change generated content, which belongs to the
+  separate rebuild (AEGIS-APR-115), not to this instrument change.
+* **A partial disposition is instrument-level.** The ledger's four event
+  kinds have no partial kind (the consolidated contract names
+  `full-page-acceptance`, `targeted-review`, `withdrawal` and
+  `lost-commit`), so a partial verdict is recorded beside the checker and
+  bound to the keeper row's evidence rather than as a fifth keeper kind. No
+  keeper row is added, edited or re-typed by that record.
 
 ## Official count reference (pinned)
 

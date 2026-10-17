@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "dispositions": [
+    {
+      "path": ".claude/skills/_template/SKILL.md",
+      "disposition": "partial",
+      "withdrawal_id": "K-089W",
+      "withdrawal_revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "evidence_ref": "97c61f35da634236a4495119f5b0cc62b4689cf7",
+      "quote": "disposition table records the verdict **partial** (record line 113)",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-quality-reviewer/SKILL.md",
+      "disposition": "partial",
+      "withdrawal_id": "K-283W",
+      "withdrawal_revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "evidence_ref": "97c61f35da634236a4495119f5b0cc62b4689cf7",
+      "quote": "lines 130-136 and 224 record the abbreviation bullet\n   **partial** (bare D13/D22, LLM/ASI unexpanded)",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "date": "2026-10-15"
+    },
+    {
+      "path": ".claude/skills/skill-quality-reviewer/references/quality-review-checklist.md",
+      "disposition": "partial",
+      "withdrawal_id": "K-284W",
+      "withdrawal_revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "evidence_ref": "97c61f35da634236a4495119f5b0cc62b4689cf7",
+      "quote": "line 255 records the abbreviation bullet\n   **partial** (RBAC and DDL unexpanded)",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "date": "2026-10-15"
+    },
+    {
+      "path": "docs/evidence/documentation/full-page-readability-sample-2026-09-23.md",
+      "disposition": "partial",
+      "withdrawal_id": "K-392W",
+      "withdrawal_revision": "e2a3e20b7c20ef8385b219b39c6405237163406f",
+      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
+      "evidence_ref": "97c61f35da634236a4495119f5b0cc62b4689cf7",
+      "quote": "LD-4's disposition is PARTIAL and the page stays pending",
+      "reviewer": "deepseek-v4-pro-apr117-keeper",
+      "date": "2026-10-15"
+    }
+  ]
+}

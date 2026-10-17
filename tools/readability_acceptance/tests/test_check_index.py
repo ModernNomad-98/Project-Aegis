@@ -1,0 +1,479 @@
+#!/usr/bin/env python3
+"""Regression tests for the withdrawal bucket and the recordable partial
+disposition (AEGIS-APR-117; the owner-approved check_index.py fix).
+
+Three rules are pinned here, and each is a behavioural rule rather than a
+snapshot of today's numbers:
+
+1. A page whose latest recorded keeper event is a WITHDRAWAL is never an
+   acceptance. It is classified into the withdrawal bucket before
+   reachability and drift, so a zero-drift withdrawal cannot print as
+   accepted. The mutation control extracts the pre-fix checker from the
+   implementation base commit and shows that the same fabricated case is
+   ACCEPTED there - the test fails without the fix.
+2. A partial disposition recorded in partial-dispositions.json is
+   recordable and attributable, and it is decided BEFORE the withdrawal
+   bucket: a withdrawal with an active disposition is partial, without one
+   it is withdrawn. An active partial is never an acceptance and never
+   offsets a pending page; it is counted exactly once.
+3. A disposition whose page the index records as an acceptance is INACTIVE:
+   it prints as declared but not applied and changes no count.
+
+The arithmetic identities in CommittedIndexIsBackwardCompatible are the
+plan's C4 identities, asserted against the committed (stale) index so the
+suite needs no rebuild and writes no tracked JSON.
+
+    python -B -m unittest discover -s tools/readability_acceptance/tests \
+        -p "test_*.py" -v
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+from tools.readability_acceptance import build_index, check_index
+
+ROOT = Path(__file__).resolve().parents[3]
+CHECKER = ROOT / "tools/readability_acceptance/check_index.py"
+INDEX_ABS = ROOT / "tools/readability_acceptance/acceptance-index.json"
+PARTIAL_ABS = ROOT / "tools/readability_acceptance/partial-dispositions.json"
+
+# The implementation base commit: the checker before this change. The mutation
+# control reads that exact blob and verifies its content digest, so the control
+# cannot silently drift to a fixed checker.
+BASE_SHA = "47af10f24a3f98587e235089f047f03c5f77bdbc"
+BASE_CHECKER_SHA256 = (
+    "5efc3ea9bed8ee06a67d7ed700b2614ec9e72f3c113f3f65003fad83d113bd4a")
+WITHDRAWAL_REVISION = "e2a3e20b7c20ef8385b219b39c6405237163406f"
+EVIDENCE_REF = "97c61f35da634236a4495119f5b0cc62b4689cf7"
+EVIDENCE_SOURCE = ("docs/evidence/documentation/"
+                   "readability-apr117-withdrawals-and-rerecord-2026-10-15.md")
+
+# A page this change does not touch: the fabricated zero-drift case needs a
+# page whose content is identical at the compared ref and the withdrawal
+# revision, and using the ref itself as the revision makes drift exactly 0.
+STABLE_PAGE = ".claude/skills/cloud-security-baseline-reviewer/SKILL.md"
+
+# The four pages whose latest keeper event is a withdrawal and whose lane
+# records mark them PARTIAL, with the cancelling row for each.
+PARTIAL_PAGES = {
+    ".claude/skills/_template/SKILL.md": "K-089W",
+    ".claude/skills/skill-quality-reviewer/SKILL.md": "K-283W",
+    ".claude/skills/skill-quality-reviewer/references/"
+    "quality-review-checklist.md": "K-284W",
+    "docs/evidence/documentation/full-page-readability-sample-2026-09-23.md":
+        "K-392W",
+}
+
+
+def git(*args):
+    proc = subprocess.run(["git", "-C", str(ROOT), *args],
+                          capture_output=True, text=True, encoding="utf-8",
+                          errors="replace")
+    return proc.stdout.strip() if proc.returncode == 0 else ""
+
+
+def main_tip():
+    """The compared ref. A full clone is required (fetch-depth: 0 in CI)."""
+    sha = git("rev-parse", "refs/remotes/origin/main")
+    if not sha:
+        raise AssertionError(
+            "refs/remotes/origin/main must resolve: the readability suite "
+            "requires a full clone with refs/remotes/** (the tools-tests jobs "
+            "check out with fetch-depth: 0)")
+    return sha
+
+
+def run_checker(checker, index, ref, partial=None, page=None, as_json=True):
+    """Run one checker. The child emits UTF-8 whatever the host locale is."""
+    command = [sys.executable, "-B", str(checker), "--repo", str(ROOT),
+               "--ref", ref, "--index", str(index)]
+    if partial is not None:
+        command += ["--partial-dispositions", str(partial)]
+    if page is not None:
+        command += ["--path", page]
+    if as_json:
+        command += ["--json"]
+    env = dict(os.environ, PYTHONIOENCODING="utf-8")
+    return subprocess.run(command, capture_output=True, text=True,
+                          encoding="utf-8", errors="replace", env=env)
+
+
+def index_row(page, kind, revision):
+    return {"path": page, "event_kind": kind,
+            "last_acceptance_sha": revision, "blob_id": "0" * 40,
+            "reviewer": "fixture-reviewer",
+            "evidence_source": EVIDENCE_SOURCE, "date": "2026-10-15",
+            "acceptance_reachable": True}
+
+
+def write_json(dirpath, name, payload):
+    path = Path(dirpath) / name
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def write_index(dirpath, rows, ref):
+    return write_json(dirpath, "index.json", {
+        "schema_version": 2, "built_at_ref": ref, "events": [],
+        "reader_pages": rows})
+
+
+def write_empty_dispositions(dirpath):
+    return write_json(dirpath, "empty-dispositions.json", {
+        "schema_version": 1, "dispositions": []})
+
+
+def payload_of(proc):
+    return json.loads(proc.stdout)
+
+
+class WithdrawalIsNeverAccepted(unittest.TestCase):
+    """A latest withdrawal is a withdrawal, not an acceptance (C3)."""
+
+    def test_fabricated_zero_drift_withdrawal_is_withdrawn(self):
+        ref = main_tip()
+        with tempfile.TemporaryDirectory() as tmp:
+            index = write_index(
+                tmp, [index_row(STABLE_PAGE, "withdrawal", ref)], ref)
+            empty = write_empty_dispositions(tmp)
+            proc = run_checker(CHECKER, index, ref, empty, page=STABLE_PAGE)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            payload = payload_of(proc)
+            summary = payload["summary"]
+            self.assertEqual(summary["accepted_on_recorded_review"], 0)
+            self.assertEqual(summary["withdrawn_pending_rereview"], 1)
+            self.assertEqual(summary["partial_disposition_pending"], 0)
+            self.assertEqual(summary["official_pending_count"], 1)
+            self.assertEqual(payload["accepted"], [])
+            self.assertEqual([r["path"] for r in payload["withdrawn"]],
+                             [STABLE_PAGE])
+            self.assertEqual(payload["withdrawn"][0]["event_kind"],
+                             "withdrawal")
+            self.assertIn("withdrawn_pending_rereview",
+                          summary["official_pending_count_definition"])
+            text = run_checker(CHECKER, index, ref, empty, page=STABLE_PAGE,
+                               as_json=False)
+            self.assertEqual(text.returncode, 0, text.stderr)
+            self.assertIn("WITHDRAWN \u2014 PENDING RE-REVIEW", text.stdout)
+            self.assertIn(EVIDENCE_SOURCE, text.stdout)
+
+    def test_mutation_control_the_base_checker_accepts_the_same_page(self):
+        """The control: without the fix the identical case is ACCEPTED."""
+        ref = main_tip()
+        with tempfile.TemporaryDirectory() as tmp:
+            index = write_index(
+                tmp, [index_row(STABLE_PAGE, "withdrawal", ref)], ref)
+            blob = subprocess.run(
+                ["git", "-C", str(ROOT), "show",
+                 BASE_SHA + ":tools/readability_acceptance/check_index.py"],
+                capture_output=True)
+            self.assertEqual(
+                blob.returncode, 0,
+                "the base checker " + BASE_SHA[:12] + " must be retrievable "
+                "from this clone: the mutation control reads that exact blob")
+            self.assertEqual(
+                hashlib.sha256(blob.stdout).hexdigest(),
+                BASE_CHECKER_SHA256,
+                "the extracted base checker must be the pre-change checker "
+                "this control was written against")
+            base = Path(tmp) / "check_index_base.py"
+            base.write_bytes(blob.stdout)
+            proc = run_checker(base, index, ref, None, page=STABLE_PAGE)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            payload = payload_of(proc)
+            summary = payload["summary"]
+            self.assertEqual(summary["accepted_on_recorded_review"], 1)
+            self.assertEqual([r["path"] for r in payload["accepted"]],
+                             [STABLE_PAGE])
+            self.assertNotIn(
+                "withdrawn_pending_rereview", summary,
+                "the base checker has no withdrawal bucket, so the head test "
+                "above fails on it - that is the mutation control")
+
+
+class PartialDispositionRecordsAGap(unittest.TestCase):
+    """An active partial disposition is partial, never withdrawn/accepted."""
+
+    def test_active_partial_is_decided_before_the_withdrawal_bucket(self):
+        ref = main_tip()
+        with tempfile.TemporaryDirectory() as tmp:
+            rows = [index_row(page, "withdrawal", WITHDRAWAL_REVISION)
+                    for page in PARTIAL_PAGES]
+            index = write_index(tmp, rows, ref)
+            for page, withdrawal_id in sorted(PARTIAL_PAGES.items()):
+                proc = run_checker(CHECKER, index, ref, PARTIAL_ABS,
+                                   page=page)
+                self.assertEqual(proc.returncode, 0, proc.stderr)
+                payload = payload_of(proc)
+                summary = payload["summary"]
+                self.assertEqual(summary["partial_disposition_pending"], 1,
+                                 page)
+                self.assertEqual(summary["withdrawn_pending_rereview"], 0,
+                                 page)
+                self.assertEqual(summary["accepted_on_recorded_review"], 0,
+                                 page)
+                self.assertEqual(summary["official_pending_count"], 1, page)
+                self.assertEqual([r["path"] for r in payload["partial"]],
+                                 [page])
+                record = payload["partial"][0]
+                self.assertEqual(record["disposition"], "partial")
+                self.assertEqual(record["withdrawal_id"], withdrawal_id)
+                self.assertEqual(record["withdrawal_revision"],
+                                 WITHDRAWAL_REVISION)
+                self.assertEqual(record["evidence_ref"], EVIDENCE_REF)
+                self.assertTrue(record["quote"])
+                self.assertEqual(record["reviewer"],
+                                 "deepseek-v4-pro-apr117-keeper")
+                self.assertEqual(record["date"], "2026-10-15")
+
+    def test_the_printed_record_names_page_quote_source_and_withdrawal(self):
+        ref = main_tip()
+        page = ".claude/skills/_template/SKILL.md"
+        with tempfile.TemporaryDirectory() as tmp:
+            index = write_index(
+                tmp, [index_row(page, "withdrawal", WITHDRAWAL_REVISION)],
+                ref)
+            proc = run_checker(CHECKER, index, ref, PARTIAL_ABS, page=page,
+                               as_json=False)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            self.assertIn("PARTIAL DISPOSITION \u2014 RECORDED GAP",
+                          proc.stdout)
+            self.assertIn(page, proc.stdout)
+            self.assertIn("K-089W", proc.stdout)
+            self.assertIn("disposition table records the verdict **partial**",
+                          proc.stdout)
+            self.assertIn(EVIDENCE_SOURCE, proc.stdout)
+            self.assertIn(EVIDENCE_REF, proc.stdout)
+            self.assertIn("deepseek-v4-pro-apr117-keeper", proc.stdout)
+
+    def test_without_an_active_disposition_the_same_page_is_withdrawn(self):
+        ref = main_tip()
+        page = ".claude/skills/_template/SKILL.md"
+        with tempfile.TemporaryDirectory() as tmp:
+            index = write_index(
+                tmp, [index_row(page, "withdrawal", WITHDRAWAL_REVISION)],
+                ref)
+            empty = write_empty_dispositions(tmp)
+            proc = run_checker(CHECKER, index, ref, empty, page=page)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            summary = payload_of(proc)["summary"]
+            self.assertEqual(summary["withdrawn_pending_rereview"], 1)
+            self.assertEqual(summary["partial_disposition_pending"], 0)
+            self.assertEqual(summary["accepted_on_recorded_review"], 0)
+
+    def test_the_committed_record_has_four_ledger_bound_rows(self):
+        ref = main_tip()
+        dispositions, error = check_index.load_partial_dispositions(
+            PARTIAL_ABS, ROOT, ref)
+        self.assertEqual(error, "")
+        self.assertEqual(len(dispositions), 4)
+        self.assertEqual(len({d["path"] for d in dispositions}), 4)
+        rows, _tracker_sha = build_index.find_table(ROOT, ref)
+        for disposition in dispositions:
+            matches = [r for r in rows
+                       if r["stable_id"] == disposition["withdrawal_id"]]
+            self.assertEqual(len(matches), 1,
+                             disposition["withdrawal_id"])
+            self.assertEqual(matches[0]["event_kind"], "withdrawal")
+            self.assertEqual(matches[0]["path"], disposition["path"])
+            self.assertEqual(matches[0]["revision"],
+                             disposition["withdrawal_revision"])
+            self.assertEqual(disposition["evidence_ref"], EVIDENCE_REF)
+
+
+class InactiveDispositionChangesNoCount(unittest.TestCase):
+    """A stale disposition can never demote a page the index accepts."""
+
+    def test_an_inactive_disposition_prints_but_moves_no_count(self):
+        ref = main_tip()
+        page = ".claude/skills/_template/SKILL.md"
+        with tempfile.TemporaryDirectory() as tmp:
+            index = write_index(
+                tmp, [index_row(page, "full-page-acceptance", ref)], ref)
+            empty = write_empty_dispositions(tmp)
+            applied = payload_of(run_checker(CHECKER, index, ref, PARTIAL_ABS,
+                                             page=page))["summary"]
+            plain = payload_of(run_checker(CHECKER, index, ref, empty,
+                                           page=page))["summary"]
+            self.assertEqual(applied["accepted_on_recorded_review"], 1)
+            self.assertEqual(applied["partial_disposition_pending"], 0)
+            self.assertEqual(applied["partial_dispositions_declared"], 4)
+            self.assertEqual(applied["partial_dispositions_inactive"], 1)
+            self.assertEqual(plain["partial_dispositions_declared"], 0)
+            self.assertEqual(plain["partial_dispositions_inactive"], 0)
+            for key in ("accepted_on_recorded_review", "provably_pending",
+                        "no_recorded_acceptance", "cannot_decide",
+                        "withdrawn_pending_rereview",
+                        "partial_disposition_pending",
+                        "official_pending_count"):
+                self.assertEqual(applied[key], plain[key], key)
+            text = run_checker(CHECKER, index, ref, PARTIAL_ABS, page=page,
+                               as_json=False)
+            self.assertEqual(text.returncode, 0, text.stderr)
+            self.assertIn("DECLARED BUT NOT APPLIED", text.stdout)
+            self.assertIn("K-089W", text.stdout)
+            self.assertIn("not the declared withdrawal at that revision",
+                          text.stdout)
+
+
+class PartialDispositionFailsLoud(unittest.TestCase):
+    """Every malformed record exits 2 with its reason; nothing is skipped."""
+
+    def _assert_exit_two(self, payload, expected, name="partials.json"):
+        ref = main_tip()
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / name
+            if isinstance(payload, str):
+                path.write_text(payload, encoding="utf-8")
+            else:
+                path.write_text(json.dumps(payload), encoding="utf-8")
+            proc = run_checker(CHECKER, INDEX_ABS, ref, path,
+                               page=STABLE_PAGE)
+            self.assertEqual(proc.returncode, 2,
+                             name + ": " + proc.stdout + proc.stderr)
+            self.assertIn("partial dispositions:", proc.stderr)
+            self.assertIn(expected, proc.stderr)
+            self.assertEqual(proc.stdout.strip(), "",
+                             name + ": a failed load must print no summary")
+
+    def test_invalid_json(self):
+        self._assert_exit_two("{", "is not valid JSON")
+
+    def test_unknown_schema_version(self):
+        self._assert_exit_two({"schema_version": 2, "dispositions": []},
+                              "schema_version must be 1")
+
+    def test_unknown_disposition(self):
+        payload = json.loads(PARTIAL_ABS.read_text(encoding="utf-8"))
+        payload["dispositions"][0]["disposition"] = "acceptance"
+        self._assert_exit_two(payload, "unknown disposition")
+
+    def test_duplicate_path(self):
+        payload = json.loads(PARTIAL_ABS.read_text(encoding="utf-8"))
+        payload["dispositions"].append(dict(payload["dispositions"][0]))
+        self._assert_exit_two(payload, "duplicate path")
+
+    def test_quote_not_verbatim(self):
+        payload = json.loads(PARTIAL_ABS.read_text(encoding="utf-8"))
+        payload["dispositions"][0]["quote"] += " (mutated)"
+        self._assert_exit_two(payload, "quote is not found verbatim")
+
+    def test_withdrawal_id_names_no_row(self):
+        payload = json.loads(PARTIAL_ABS.read_text(encoding="utf-8"))
+        payload["dispositions"][0]["withdrawal_id"] = "K-999Z"
+        self._assert_exit_two(payload, "names 0 keeper row(s)")
+
+    def test_withdrawal_id_names_a_non_withdrawal_row(self):
+        payload = json.loads(PARTIAL_ABS.read_text(encoding="utf-8"))
+        payload["dispositions"][0]["withdrawal_id"] = "K-089"
+        self._assert_exit_two(payload, "not a withdrawal")
+
+    def test_withdrawal_revision_mismatch(self):
+        payload = json.loads(PARTIAL_ABS.read_text(encoding="utf-8"))
+        payload["dispositions"][0]["withdrawal_revision"] = "1" * 40
+        self._assert_exit_two(payload,
+                              "is not the keeper row's validated revision")
+
+    def test_evidence_ref_is_not_a_fixed_commit(self):
+        payload = json.loads(PARTIAL_ABS.read_text(encoding="utf-8"))
+        payload["dispositions"][0]["evidence_ref"] = "97c61f3"
+        self._assert_exit_two(payload, "is not a fixed 40-hex commit id")
+
+    def test_evidence_ref_does_not_resolve(self):
+        payload = json.loads(PARTIAL_ABS.read_text(encoding="utf-8"))
+        payload["dispositions"][0]["evidence_ref"] = "0" * 40
+        self._assert_exit_two(payload, "does not resolve")
+
+    def test_evidence_source_unreadable(self):
+        payload = json.loads(PARTIAL_ABS.read_text(encoding="utf-8"))
+        payload["dispositions"][0]["evidence_source"] = (
+            "docs/evidence/documentation/nope.md")
+        self._assert_exit_two(payload, "is not readable at")
+
+    def test_misconfigured_path_fails_loudly(self):
+        ref = main_tip()
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = Path(tmp) / "absent.json"
+            proc = run_checker(CHECKER, INDEX_ABS, ref, missing,
+                               page=STABLE_PAGE)
+            self.assertEqual(proc.returncode, 2)
+            self.assertIn("cannot read", proc.stderr)
+            self.assertIn("misconfigured --partial-dispositions path",
+                          proc.stderr)
+
+
+class CommittedIndexIsBackwardCompatible(unittest.TestCase):
+    """C10 and the C4 identities at the committed (stale) index."""
+
+    def test_committed_index_partitions_and_counts_the_four_partials(self):
+        ref = main_tip()
+        proc = run_checker(CHECKER, INDEX_ABS, ref, PARTIAL_ABS)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        payload = payload_of(proc)
+        summary = payload["summary"]
+        self.assertEqual(summary["partial_disposition_pending"], 4)
+        self.assertEqual(summary["withdrawn_pending_rereview"], 0)
+        self.assertEqual(summary["partial_dispositions_declared"], 4)
+        self.assertEqual(summary["partial_dispositions_inactive"], 0)
+        self.assertEqual(
+            summary["accepted_on_recorded_review"]
+            + summary["provably_pending"]
+            + summary["no_recorded_acceptance"]
+            + summary["cannot_decide"]
+            + summary["withdrawn_pending_rereview"]
+            + summary["partial_disposition_pending"]
+            + summary["recorded_acceptance_within_10_lines"],
+            summary["reader_pages_in_tree"],
+            "identity (i): every reader page is in exactly one bucket")
+        self.assertEqual(
+            summary["official_pending_count"],
+            summary["provably_pending"]
+            + summary["no_recorded_acceptance"]
+            + summary["cannot_decide"]
+            + summary["withdrawn_pending_rereview"]
+            + summary["partial_disposition_pending"]
+            + summary["within_10_not_covered_by_targeted_review"],
+            "identity (ii): the official count is the declared formula")
+        self.assertIn("withdrawn_pending_rereview",
+                      summary["official_pending_count_definition"])
+        self.assertIn("partial_disposition_pending",
+                      summary["official_pending_count_definition"])
+        accepted = {r["path"] for r in payload["accepted"]}
+        partial = {r["path"] for r in payload["partial"]}
+        for page in PARTIAL_PAGES:
+            self.assertNotIn(page, accepted,
+                             page + " must not be an acceptance")
+            self.assertIn(page, partial, page + " must be a partial")
+        self.assertEqual(len(partial), 4)
+
+    def test_the_committed_index_cannot_count_a_page_twice(self):
+        """Count-once: the two new buckets are disjoint over the four pages."""
+        ref = main_tip()
+        with tempfile.TemporaryDirectory() as tmp:
+            empty = write_empty_dispositions(tmp)
+            plain = payload_of(run_checker(CHECKER, INDEX_ABS, ref,
+                                           empty))["summary"]
+            applied = payload_of(run_checker(CHECKER, INDEX_ABS, ref,
+                                             PARTIAL_ABS))["summary"]
+            self.assertEqual(applied["partial_disposition_pending"], 4)
+            self.assertEqual(applied["withdrawn_pending_rereview"], 0)
+            self.assertEqual(
+                applied["no_recorded_acceptance"] + 4,
+                plain["no_recorded_acceptance"],
+                "the four partial pages come out of exactly one bucket")
+            self.assertEqual(applied["official_pending_count"],
+                             plain["official_pending_count"],
+                             "the stale index keeps its official count: four "
+                             "pages move from no-recorded to partial")
+
+
+if __name__ == "__main__":
+    unittest.main()
