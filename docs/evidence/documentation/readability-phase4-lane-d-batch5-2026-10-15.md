@@ -515,11 +515,11 @@ repair pass named in the header is by **DeepSeek V4 Flash (deepseek-flash, DeepS
 
 ## Footer
 
-sha256: 98bb3431d29f13a8f3d1866a247b3ccbc25b264edc11eb04916e858d825e6a94
+sha256: f9537b0d55702fd569ddf4c89a0a351468f759fba645ee5c5c28717389105830
 
 This digest covers the batch record's bytes from the first line through the closing rule line and its
-terminating newline, encoded UTF-8 with LF line endings: exactly 46,021 bytes, byte offsets
-0 through 46,020 inclusive, lines 1-513. It does not cover the blank separator line between that rule and
+terminating newline, encoded UTF-8 with LF line endings: exactly 46,025 bytes, byte offsets
+0 through 46,024 inclusive, lines 1-514. It does not cover the blank separator line between that rule and
 the `## Footer` heading, nor this footer. Any edit above the rule needs a fresh validation. Computed by
 **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)** at this Stage C head, after the 2026-10-17
 repair pass.
