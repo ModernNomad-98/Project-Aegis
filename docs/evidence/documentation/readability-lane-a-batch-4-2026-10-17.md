@@ -8,7 +8,7 @@ Agent: **sd-c-read-fresh1-c1** (true identity **sd-e-802-r1**; DeepSeek V4 Flash
 
 - **Added: exactly one path** — `docs/evidence/documentation/readability-lane-a-batch-4-2026-10-17.md`. **Modified: 0. Deleted: 0.**
 - **No** keeper row, index JSON edit, ledger edit, page edit, register edit, manifest edit, tool/test/workflow change. Change class **`docs-only`**; this is an evidence-only change.
-- **Eight pages read, zero pages edited**; every page's net line change is 0. One DCO-signed, model-attributed commit; the commit carries this record plus nothing else.
+- **Eight pages read, zero pages edited**; every page's net line change is 0. **Three DCO-signed, model-attributed commits** carry this record: `725bac3c` (initial record), `c4f53575` (Codex round-1 repairs) and `a2df10bb` (Codex round-2 repairs); all three touch only the one added path, and none edits a page.
 - This record itself is not counted as an accepted page: it is a new reader page and enters the pending set on its own (the self-cost every batch record states).
 
 ## 2. Lane derivation at this base — re-run, not handed down
@@ -51,9 +51,9 @@ Every page was read **whole, line by line, as prose**, at the bound revision `64
 
 **P1 — `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md`** — read whole, **L1–88**, one read, no display elision. Purpose and normal use (restated from the page alone): a manual-only skill's six recovery playbooks (failed tests; dirty/conflicted tree; interrupted rebase/merge/cherry-pick; partial/wrong unpushed commit; broken or mis-based branch; blocked permission) each following the fixed order diagnose (read-only) → preserve → recover → verify, plus a safe-versus-destructive command risk table.
 
-Bullets: B1 satisfied — L1 title **Recovery Playbooks**; L3 'Use this with the Agent Failure Recovery skill … A manual-only skill requires explicit human invocation'; L5-8 name the supporting-detail role and the fixed order. **B2 gap — `WIP` at page L17** ('leave it on a labeled stash or WIP branch') is never expanded on the page; work-in-progress is a coded abbreviation and B2 requires it at first use. B3 satisfied with a command gap — headings, bullet steps, examples and the risk table hold, but the example **`git stash push -u -m` at page L15 and in the table at page L84 omits the required `<message>` operand** (`git stash -h`: `(-m | --message) <message>`), so the copyable command is incomplete. B4 satisfied — guidance page, no shipped-versus-proposed claim about a running system. B5 satisfied with the same command caveat — the one companion link resolves and no named skill is missing. **B6 not established — reader independence is UNVERIFIED (section 6).**
+Bullets: B1 satisfied — L1 title **Recovery Playbooks**; L3 'Use this with the Agent Failure Recovery skill … A manual-only skill requires explicit human invocation'; L5-8 name the supporting-detail role and the fixed order. **B2 gap — `WIP` at page L17** ('leave it on a labeled stash or WIP branch') is never expanded on the page; work-in-progress is a coded abbreviation and B2 requires it at first use. B3 satisfied with a command gap — headings, bullet steps, examples and the risk table hold, but the example **`git stash push -u -m` at page L15 and in the table at page L84 omits the required `<message>` operand** (`git stash -h`: `(-m | --message) <message>`), so the copyable command is incomplete. B4 satisfied — guidance page, no shipped-versus-proposed claim about a running system. **B3/B5 gap — the quick-reference table at page L88 names `rebase/merge --abort`, which is not a git command** (`git rebase -h` documents `git rebase --abort`; `git merge -h` documents `git merge --abort`; neither provides `rebase/merge`), so a reader copying the entry fails. B5 otherwise holds — the one companion link resolves and no named skill is missing. **B6 not established — reader independence is UNVERIFIED (section 6).**
 
-**Verdict: PARTIAL, no edit.** Named gaps: **page L17 (`WIP` unexpanded)** and **page L15/L84 (`git stash push -u -m` missing the message operand)**.
+**Verdict: PARTIAL, no edit.** Named gaps: **page L17 (`WIP` unexpanded)**, **page L15/L84 (`git stash push -u -m` missing the message operand)** and **page L88 (`rebase/merge --abort` is not a git command)**.
 
 **P2 — `.claude/skills/agent-goal-hijack-defender/SKILL.md`** — read whole, **L1–198**, one read, no display elision. Purpose and normal use (restated from the page alone): a manual-only design skill for goal/plan integrity under the OWASP agentic goal-hijack category ASI01 — a goal record pinned outside the model context and mutable only through an authenticated principal channel, per-step tracing, deviation detection, drift response, and a per-channel red-team suite.
 
@@ -87,9 +87,9 @@ Bullets: B1 satisfied — L1 title; L3 description; Reading key L8-11; Purpose L
 
 **P7 — `.claude/skills/agent-identity-privilege-reviewer/SKILL.md`** — read whole, **L1–192**, one read, no display elision. Purpose and normal use (restated from the page alone): a review skill for agent identity and privilege architecture under OWASP agentic identifier ASI03 — inventory identities and privilege-versus-need, trace delegation hop by hop for attenuation, hunt confused-deputy paths, check credential lifetime/binding, verify dual attribution, and rank findings by escalation path.
 
-Bullets: B1 satisfied — L1 title; L3 description; Reading key L8-13; Purpose L15-27; Use When L29-46. B2 satisfied in part — OWASP, ASI03, API, SDLC, RBAC, IAM and DB expanded L8-13, **but a B2 gap remains: `URL` at page L156 is unexpanded**. B3 satisfied — workflow L66-97; Output Format L99-113; checklist L115-130; Gotchas L144-165. B4 satisfied — L21-27 separation from custody/per-tool enforcement; Stop Conditions L167-181 keep live IAM changes proposed and approved. B5 satisfied — both companion links resolve; evals exist; all 9 named skills exist; no shell command contract. **B6 not established — reader independence is UNVERIFIED.**
+Bullets: B1 satisfied — L1 title; L3 description; Reading key L8-13; Purpose L15-27; Use When L29-46. B2 satisfied in part — OWASP, ASI03, API, SDLC, RBAC, IAM and DB expanded L8-13, **but B2 gaps remain: `URL` at page L156 and `[SEV]` (severity) at page L107 are unexpanded**. B3 satisfied — workflow L66-97; Output Format L99-113; checklist L115-130; Gotchas L144-165. B4 satisfied — L21-27 separation from custody/per-tool enforcement; Stop Conditions L167-181 keep live IAM changes proposed and approved. B5 satisfied — both companion links resolve; evals exist; all 9 named skills exist; no shell command contract. **B6 not established — reader independence is UNVERIFIED.**
 
-**Verdict: PARTIAL, no edit.** Named gaps: **page L156 (`URL` unexpanded)** and B6 (independence UNVERIFIED).
+**Verdict: PARTIAL, no edit.** Named gaps: **page L156 (`URL` unexpanded)**, **page L107 (`[SEV]` unexpanded)** and B6 (independence UNVERIFIED).
 
 **P8 — `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md`** — read whole, **L1–82**, one read, no display elision. Purpose and normal use (restated from the page alone): the owning skill's reference sheet — identity models from weakest to strongest, short-lived task-scoped issuance, the delegation/attenuation trace method, the confused-deputy catalog, the dual-attribution audit schema, and the escalation-path severity rubric.
 
@@ -103,13 +103,13 @@ Bullets: B1 satisfied — L1 title (ASI03); L3 use with the owning skill; L5-10 
 
 | # | Page | Verdict | Named gaps (page line) | Edits |
 | --- | --- | --- | --- | ---: |
-| P1 | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | **PARTIAL** | L17 (`WIP` unexpanded); L15/L84 (`git stash push -u -m` missing the `<message>` operand); B6 independence UNVERIFIED | 0 |
+| P1 | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | **PARTIAL** | L17 (`WIP` unexpanded); L15/L84 (`git stash push -u -m` missing `<message>`); L88 (`rebase/merge --abort` not a git command); B6 independence UNVERIFIED | 0 |
 | P2 | `.claude/skills/agent-goal-hijack-defender/SKILL.md` | **PARTIAL** | L145 (`authz` unexpanded); B6 independence UNVERIFIED | 0 |
 | P3 | `.claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | **PARTIAL** | L83 (`API` unexpanded); B6 independence UNVERIFIED | 0 |
 | P4 | `.claude/skills/agent-governance-audit/SKILL.md` | **PARTIAL** | L58-61 (timeline command lacks `--paginate`); B6 independence UNVERIFIED | 0 |
 | P5 | `.claude/skills/agent-governance-audit/references/audit-control-checklist.md` | **PARTIAL** | L14 (`prod` unexpanded); L25 (timeline command lacks `--paginate`); B6 independence UNVERIFIED | 0 |
 | P6 | `.claude/skills/agent-harness-architect/SKILL.md` | **PARTIAL** | L3/L17 (`AI` first use precedes expansion); B6 independence UNVERIFIED | 0 |
-| P7 | `.claude/skills/agent-identity-privilege-reviewer/SKILL.md` | **PARTIAL** | L156 (`URL` unexpanded); B6 independence UNVERIFIED | 0 |
+| P7 | `.claude/skills/agent-identity-privilege-reviewer/SKILL.md` | **PARTIAL** | L156 (`URL` unexpanded); L107 (`[SEV]` unexpanded); B6 independence UNVERIFIED | 0 |
 | P8 | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | **PARTIAL** | L1/L6 (`ASI03` first use precedes definition); B6 independence UNVERIFIED | 0 |
 
 **Counts: 0 FULL / 8 PARTIAL, named gaps as above, zero page edits.** The eight pages total **66,248 bytes / 1,116 LF** at the bound revision. **No page is eligible for a full-page-acceptance row from this evidence**, so **a keeper records no acceptance rows from it** (section 9); no page is held back by an unpublished partial rule — the partial pages simply stay pending. This is the honest count, not a rounded-up one.
@@ -134,6 +134,9 @@ Bullets: B1 satisfied — L1 title (ASI03); L3 use with the owning skill; L5-10 
 | 6 | `grep -n 'WIP'` on P1 | page L17 — unexpanded abbreviation (gap named in P1) |
 | 7 | `git stash -h` | `(-m \| --message) <message>` — the page's `git stash push -u -m` example lacks the operand (gap named in P1) |
 | 8 | `gh api --help` | documents `--paginate`; the P4/P5 timeline commands do not request it (gaps named in P4/P5) |
+| 8c | `git log --oneline 648ac767..a2df10bb` | three commits (`725bac3c`, `c4f53575`, `a2df10bb`) — scope accounting in §1 now names all three |
+| 8d | `git rebase -h` / `git merge -h` | no `rebase/merge` command; P1 L88 entry named as a gap |
+| 8e | `grep -n SEV` on P7 | page L107 `[SEV]` unexpanded — named as a P7 B2 gap |
 | 8b | `grep -n` per cited line: `authz` (P2 L145), `API` (P3 L83), `prod` (P5 L14), `AI` (P6 L3 and L17), `URL` (P7 L156), `ASI03` (P8 L1 and L6) | each is a first-use/unexpanded abbreviation gap named in §4/§5 |
 | 9 | `python -B scripts/ci/check-markdown-links.py <8 pages>` | exit 0 — files 8, links checked 10, broken 0, dead 0, external 0 |
 | 10 | `python -P scripts/validate-skills.py` | exit 0 — `OK: 205 skill(s) valid, 0 warning(s)` |
