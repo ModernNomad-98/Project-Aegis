@@ -57,15 +57,15 @@ Bullets: B1 satisfied — L1 title **Recovery Playbooks**; L3 'Use this with the
 
 **P2 — `.claude/skills/agent-goal-hijack-defender/SKILL.md`** — read whole, **L1–198**, one read, no display elision. Purpose and normal use (restated from the page alone): a manual-only design skill for goal/plan integrity under the OWASP agentic goal-hijack category ASI01 — a goal record pinned outside the model context and mutable only through an authenticated principal channel, per-step tracing, deviation detection, drift response, and a per-channel red-team suite.
 
-Bullets: B1 satisfied — L1 title; L3 frontmatter description; Reading key L9-12; Purpose L14-26; Use When L28-43. B2 satisfied — OWASP, LLM, LLM01 and ASI01 expanded at L9-15; MANUAL-ONLY explained L25-26; the backticked identifiers are defined vocabulary. B3 satisfied — eight-step Workflow L62-103; copyable Output Format L105-119; Validation Checklist L121-136; concrete examples. B4 satisfied — L10-12 designs defenses, not incident response; Stop Conditions L172-189 separate propose from apply. B5 satisfied — both companion links resolve; `evals/evals.json` and `evals/trigger-evals.json` exist; all 12 named skills exist; no shell command. **B6 not established — reader independence is UNVERIFIED.**
+Bullets: B1 satisfied — L1 title; L3 frontmatter description; Reading key L9-12; Purpose L14-26; Use When L28-43. B2 satisfied in part — OWASP, LLM, LLM01 and ASI01 expanded at L9-15 and MANUAL-ONLY explained L25-26, **but a B2 gap remains: `authz` at page L145 is unexpanded**.  B3 satisfied — eight-step Workflow L62-103; copyable Output Format L105-119; Validation Checklist L121-136; concrete examples. B4 satisfied — L10-12 designs defenses, not incident response; Stop Conditions L172-189 separate propose from apply. B5 satisfied — both companion links resolve; `evals/evals.json` and `evals/trigger-evals.json` exist; all 12 named skills exist; no shell command. **B6 not established — reader independence is UNVERIFIED.**
 
-**Verdict: PARTIAL, no edit.** Named gap: B6 (independence UNVERIFIED).
+**Verdict: PARTIAL, no edit.** Named gaps: **page L145 (`authz` unexpanded)** and B6 (independence UNVERIFIED).
 
 **P3 — `.claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md`** — read whole, **L1–88**, one read, no display elision. Purpose and normal use (restated from the page alone): the owning skill's reference sheet — goal-record schema, deterministic-versus-model-mediated step-tracing checks, the deviation-signal catalog, drift-response design, the mutation-channel rules, and the hijack red-team payload catalog per channel.
 
-Bullets: B1 satisfied — L1 title (ASI01); L3 'Use this with the Agent Goal Hijack Defender'; L5 'Detail file … Read on demand.'; the opening sentence names the category. B2 satisfied — ASI01 and OWASP expanded L3; 10 named skills exist; table columns self-defined. B3 satisfied — schema table L12-18; step-tracing bullets L25-34; signal table L38-45; response L52-61; mutation rules L63-73; payload table L80-87. B4 satisfied — guidance page, no running-system claim. B5 satisfied — the one companion link resolves; all named skills exist; no shell command. **B6 not established — reader independence is UNVERIFIED.**
+Bullets: B1 satisfied — L1 title (ASI01); L3 'Use this with the Agent Goal Hijack Defender'; L5 'Detail file … Read on demand.'; the opening sentence names the category. B2 satisfied in part — ASI01 and OWASP expanded L3, **but a B2 gap remains: `API` at page L83 is unexpanded**.  B3 satisfied — schema table L12-18; step-tracing bullets L25-34; signal table L38-45; response L52-61; mutation rules L63-73; payload table L80-87. B4 satisfied — guidance page, no running-system claim. B5 satisfied — the one companion link resolves; all named skills exist; no shell command. **B6 not established — reader independence is UNVERIFIED.**
 
-**Verdict: PARTIAL, no edit.** Named gap: B6 (independence UNVERIFIED).
+**Verdict: PARTIAL, no edit.** Named gaps: **page L83 (`API` unexpanded)** and B6 (independence UNVERIFIED).
 
 **P4 — `.claude/skills/agent-governance-audit/SKILL.md`** — read whole, **L1–167**, one read, no display elision. Purpose and normal use (restated from the page alone): a read-only retrospective audit skill — score each governance control PASS / FAIL / UNVERIFIABLE with primary evidence, deliver an overall verdict and findings, and route the closing control; it audits one change's process, not code health or diff correctness.
 
@@ -75,27 +75,27 @@ Bullets: B1 satisfied — L1 title; L3 description; Reading key L8-12; Purpose L
 
 **P5 — `.claude/skills/agent-governance-audit/references/audit-control-checklist.md`** — read whole, **L1–55**, one read, no display elision. Purpose and normal use (restated from the page alone): the owning skill's control catalog — seven governance controls with primary evidence sources and PASS criteria, retrieval commands, verdict discipline, and known evidence traps.
 
-Bullets: B1 satisfied — L1 title; L3 'Use this with the Agent Governance Audit'; L5-7 state the ground rule. B2 satisfied — PR, RLS, CI and SHA expanded L3. B3 satisfied — control table L11-19; retrieval block L23-28; merge-strategy note L30-34; verdict discipline L36-45; traps L47-54. B4 satisfied — guidance page, no running-system claim. **B5 gap — the retrieval command at page L25 (`gh api repos/{owner}/{repo}/issues/<n>/timeline`) is documented without `--paginate`, so the complete timeline (including a strategy-specific auto-merge event) is not guaranteed; the command contract is incomplete.** **B6 not established — reader independence is UNVERIFIED.**
+Bullets: B1 satisfied — L1 title; L3 'Use this with the Agent Governance Audit'; L5-7 state the ground rule. B2 satisfied in part — PR, RLS, CI and SHA expanded L3, **but a B2 gap remains: `prod` at page L14 (production data) is unexpanded**. B3 satisfied — control table L11-19; retrieval block L23-28; merge-strategy note L30-34; verdict discipline L36-45; traps L47-54. B4 satisfied — guidance page, no running-system claim. **B5 gap — the retrieval command at page L25 (`gh api repos/{owner}/{repo}/issues/<n>/timeline`) is documented without `--paginate`, so the complete timeline (including a strategy-specific auto-merge event) is not guaranteed; the command contract is incomplete.** **B6 not established — reader independence is UNVERIFIED.**
 
-**Verdict: PARTIAL, no edit.** Named gaps: **page L25 (timeline command lacks `--paginate`)** and B6 (independence UNVERIFIED).
+**Verdict: PARTIAL, no edit.** Named gaps: **page L14 (`prod` unexpanded)**, **page L25 (timeline command lacks `--paginate`)** and B6 (independence UNVERIFIED).
 
 **P6 — `.claude/skills/agent-harness-architect/SKILL.md`** — read whole, **L1–246**, one read, no display elision. Purpose and normal use (restated from the page alone): a design skill for a governed agent harness — one server-side mediation point, credential-only identity propagated to every downstream check, a deny-by-default pre-flight ladder before the model, a closed tool/provider registry, server-side versioned instructions, and a fail-closed audit write.
 
-Bullets: B1 satisfied — L1 title; L3 description; Reading key L8-11; Purpose L13-31; Use When L33-67. B2 satisfied — LLM and SDK expanded L8-9; AI expanded L17; backticked identifiers defined or named skills. B3 satisfied — eight-step Workflow L94-139; Output Format L141-166; checklist L168-189; Gotchas L191-211. B4 satisfied — L10-11 design vs implementation/live authority; L27-31 and Stop Conditions L213-230 make proposals-versus-applied explicit. B5 satisfied — the page's 'No `references/`' statement is true (path absent at the bound revision, checked by command); evals exist; all 12 named skills exist; no shell command. **B6 not established — reader independence is UNVERIFIED.**
+Bullets: B1 satisfied — L1 title; L3 description; Reading key L8-11; Purpose L13-31; Use When L33-67. B2 satisfied in part — LLM and SDK expanded L8-9 and AI expanded L17, **but a B2 gap remains: the frontmatter description at page L3 uses `AI` before that L17 expansion**. B3 satisfied — eight-step Workflow L94-139; Output Format L141-166; checklist L168-189; Gotchas L191-211. B4 satisfied — L10-11 design vs implementation/live authority; L27-31 and Stop Conditions L213-230 make proposals-versus-applied explicit. B5 satisfied — the page's 'No `references/`' statement is true (path absent at the bound revision, checked by command); evals exist; all 12 named skills exist; no shell command. **B6 not established — reader independence is UNVERIFIED.**
 
-**Verdict: PARTIAL, no edit.** Named gap: B6 (independence UNVERIFIED).
+**Verdict: PARTIAL, no edit.** Named gaps: **page L3/L17 (`AI` first use precedes expansion)** and B6 (independence UNVERIFIED).
 
 **P7 — `.claude/skills/agent-identity-privilege-reviewer/SKILL.md`** — read whole, **L1–192**, one read, no display elision. Purpose and normal use (restated from the page alone): a review skill for agent identity and privilege architecture under OWASP agentic identifier ASI03 — inventory identities and privilege-versus-need, trace delegation hop by hop for attenuation, hunt confused-deputy paths, check credential lifetime/binding, verify dual attribution, and rank findings by escalation path.
 
-Bullets: B1 satisfied — L1 title; L3 description; Reading key L8-13; Purpose L15-27; Use When L29-46. B2 satisfied — OWASP, ASI03, API, SDLC, RBAC, IAM and DB expanded L8-13. B3 satisfied — workflow L66-97; Output Format L99-113; checklist L115-130; Gotchas L144-165. B4 satisfied — L21-27 separation from custody/per-tool enforcement; Stop Conditions L167-181 keep live IAM changes proposed and approved. B5 satisfied — both companion links resolve; evals exist; all 9 named skills exist; no shell command contract. **B6 not established — reader independence is UNVERIFIED.**
+Bullets: B1 satisfied — L1 title; L3 description; Reading key L8-13; Purpose L15-27; Use When L29-46. B2 satisfied in part — OWASP, ASI03, API, SDLC, RBAC, IAM and DB expanded L8-13, **but a B2 gap remains: `URL` at page L156 is unexpanded**. B3 satisfied — workflow L66-97; Output Format L99-113; checklist L115-130; Gotchas L144-165. B4 satisfied — L21-27 separation from custody/per-tool enforcement; Stop Conditions L167-181 keep live IAM changes proposed and approved. B5 satisfied — both companion links resolve; evals exist; all 9 named skills exist; no shell command contract. **B6 not established — reader independence is UNVERIFIED.**
 
-**Verdict: PARTIAL, no edit.** Named gap: B6 (independence UNVERIFIED).
+**Verdict: PARTIAL, no edit.** Named gaps: **page L156 (`URL` unexpanded)** and B6 (independence UNVERIFIED).
 
 **P8 — `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md`** — read whole, **L1–82**, one read, no display elision. Purpose and normal use (restated from the page alone): the owning skill's reference sheet — identity models from weakest to strongest, short-lived task-scoped issuance, the delegation/attenuation trace method, the confused-deputy catalog, the dual-attribution audit schema, and the escalation-path severity rubric.
 
-Bullets: B1 satisfied — L1 title (ASI03); L3 use with the owning skill; L5-10 the supporting-detail role and category expansion. B2 satisfied — A0-A3 defined L3; OWASP, ASI03, VM, OIDC, STS and A2A expanded L6-10. B3 satisfied — identity-model table L14-20; issuance bullets L24-32; trace L36-49; confused-deputy table L53-59; dual-attribution schema L63-71; rubric L76-82. B4 satisfied — guidance page, no running-system claim. B5 satisfied — the one companion link resolves; all 7 named skills exist; no shell command. **B6 not established — reader independence is UNVERIFIED.**
+Bullets: B1 satisfied — L1 title (ASI03); L3 use with the owning skill; L5-10 the supporting-detail role and category expansion. B2 satisfied in part — A0-A3 defined L3 and OWASP, ASI03, VM, OIDC, STS and A2A expanded L6-10, **but a B2 gap remains: `ASI03` appears in the page title at L1 before its L6 definition**. B3 satisfied — identity-model table L14-20; issuance bullets L24-32; trace L36-49; confused-deputy table L53-59; dual-attribution schema L63-71; rubric L76-82. B4 satisfied — guidance page, no running-system claim. B5 satisfied — the one companion link resolves; all 7 named skills exist; no shell command. **B6 not established — reader independence is UNVERIFIED.**
 
-**Verdict: PARTIAL, no edit.** Named gap: B6 (independence UNVERIFIED).
+**Verdict: PARTIAL, no edit.** Named gaps: **page L1/L6 (`ASI03` first use precedes definition)** and B6 (independence UNVERIFIED).
 
 **Observations (not gaps, not counted):** P2's MANUAL-ONLY marker is the library's own convention and is explained on the page; P6's 'No `references/`' statement is true at the bound revision; P8 defines A0-A3 in its opening paragraph.
 
@@ -104,13 +104,13 @@ Bullets: B1 satisfied — L1 title (ASI03); L3 use with the owning skill; L5-10 
 | # | Page | Verdict | Named gaps (page line) | Edits |
 | --- | --- | --- | --- | ---: |
 | P1 | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | **PARTIAL** | L17 (`WIP` unexpanded); L15/L84 (`git stash push -u -m` missing the `<message>` operand); B6 independence UNVERIFIED | 0 |
-| P2 | `.claude/skills/agent-goal-hijack-defender/SKILL.md` | **PARTIAL** | B6 independence UNVERIFIED | 0 |
-| P3 | `.claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | **PARTIAL** | B6 independence UNVERIFIED | 0 |
+| P2 | `.claude/skills/agent-goal-hijack-defender/SKILL.md` | **PARTIAL** | L145 (`authz` unexpanded); B6 independence UNVERIFIED | 0 |
+| P3 | `.claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | **PARTIAL** | L83 (`API` unexpanded); B6 independence UNVERIFIED | 0 |
 | P4 | `.claude/skills/agent-governance-audit/SKILL.md` | **PARTIAL** | L58-61 (timeline command lacks `--paginate`); B6 independence UNVERIFIED | 0 |
-| P5 | `.claude/skills/agent-governance-audit/references/audit-control-checklist.md` | **PARTIAL** | L25 (timeline command lacks `--paginate`); B6 independence UNVERIFIED | 0 |
-| P6 | `.claude/skills/agent-harness-architect/SKILL.md` | **PARTIAL** | B6 independence UNVERIFIED | 0 |
-| P7 | `.claude/skills/agent-identity-privilege-reviewer/SKILL.md` | **PARTIAL** | B6 independence UNVERIFIED | 0 |
-| P8 | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | **PARTIAL** | B6 independence UNVERIFIED | 0 |
+| P5 | `.claude/skills/agent-governance-audit/references/audit-control-checklist.md` | **PARTIAL** | L14 (`prod` unexpanded); L25 (timeline command lacks `--paginate`); B6 independence UNVERIFIED | 0 |
+| P6 | `.claude/skills/agent-harness-architect/SKILL.md` | **PARTIAL** | L3/L17 (`AI` first use precedes expansion); B6 independence UNVERIFIED | 0 |
+| P7 | `.claude/skills/agent-identity-privilege-reviewer/SKILL.md` | **PARTIAL** | L156 (`URL` unexpanded); B6 independence UNVERIFIED | 0 |
+| P8 | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | **PARTIAL** | L1/L6 (`ASI03` first use precedes definition); B6 independence UNVERIFIED | 0 |
 
 **Counts: 0 FULL / 8 PARTIAL, named gaps as above, zero page edits.** The eight pages total **66,248 bytes / 1,116 LF** at the bound revision. **No page is eligible for a full-page-acceptance row from this evidence**, so **a keeper records no acceptance rows from it** (section 9); no page is held back by an unpublished partial rule — the partial pages simply stay pending. This is the honest count, not a rounded-up one.
 
@@ -134,6 +134,7 @@ Bullets: B1 satisfied — L1 title (ASI03); L3 use with the owning skill; L5-10 
 | 6 | `grep -n 'WIP'` on P1 | page L17 — unexpanded abbreviation (gap named in P1) |
 | 7 | `git stash -h` | `(-m \| --message) <message>` — the page's `git stash push -u -m` example lacks the operand (gap named in P1) |
 | 8 | `gh api --help` | documents `--paginate`; the P4/P5 timeline commands do not request it (gaps named in P4/P5) |
+| 8b | `grep -n` per cited line: `authz` (P2 L145), `API` (P3 L83), `prod` (P5 L14), `AI` (P6 L3 and L17), `URL` (P7 L156), `ASI03` (P8 L1 and L6) | each is a first-use/unexpanded abbreviation gap named in §4/§5 |
 | 9 | `python -B scripts/ci/check-markdown-links.py <8 pages>` | exit 0 — files 8, links checked 10, broken 0, dead 0, external 0 |
 | 10 | `python -P scripts/validate-skills.py` | exit 0 — `OK: 205 skill(s) valid, 0 warning(s)` |
 | 11 | `git cat-file -e 2db1ffb7…:.claude/skills/agent-harness-architect/references` | exit 128 (absent) — P6's claim true |
