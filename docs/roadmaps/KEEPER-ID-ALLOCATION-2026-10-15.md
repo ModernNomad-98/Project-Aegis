@@ -39,6 +39,12 @@ provisional-ID distinction in S2/S4/S10, and the corrected S2/S8 measurement cla
 drafted by **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**, the Stage C repair agent.
 All earlier text and measurements remain attributed as stated above.
 
+**Third-repair attribution (2026-10-17).** The one further Codex-review correction in this revision —
+the S4/S6 split that hands the merge-time branch commit to a **separate Stage C implementer** and
+leaves the merge holder with only the exact reviewed head — was also drafted by **DeepSeek V4 Flash
+(deepseek-flash, DeepSeek Harness)**, the Stage C repair agent. The transcribed protocol and every
+measurement remain as attributed above.
+
 ## S1. Source, authority and provenance
 
 - **Original source — outside the repository, said plainly.** The allocation, the merge protocol and
@@ -190,48 +196,55 @@ renumber at merge rather than a rule against colliding in the first place.
 ## S4. The merge protocol for parallel lane pull requests
 
 Transcribed from the source file. The lanes **read in parallel; merge serially, in lane order A, B,
-C, D**. The merge holder, for every lane pull request after the first:
+C, D**. The source file gives this sequence to the merge holder alone; **that actor assignment is
+corrected here**, because [AGENTS.md](../../AGENTS.md) L88–L96 forbids one agent from doing two
+stages on the same change ("the author never reviews or merges its own work"). **Two agents act, and
+neither does the other's work:** the **merge holder** (the agent that performs the merge) merges only
+the exact reviewed head and edits no file, and a **separate Stage C implementer** (Stage C = the
+implement stage of the delivery workflow) makes any commit that reaching the merge requires. **The
+implementer of a new head is always a different agent from the merge holder.**
 
-1. **Reconcile against the moved base without rewriting the reviewed head.** Do **not** rebase the
-   branch and do **not** merge `main` into it: either moves the head that the implementation audit,
-   validation record and final review name, and voids every head-bound verdict. **The merge is a merge
-   commit into the current `origin/main`** — the command is
+1. **Merge holder — reconcile against the moved base without rewriting the reviewed head.** Do **not**
+   rebase the branch and do **not** merge `main` into it: either moves the head that the implementation
+   audit, validation record and final review name, and voids every head-bound verdict. **The merge is a
+   merge commit into the current `origin/main`** — the command is
    `gh pr merge <number> --merge --match-head-commit <reviewed-head>` — which leaves the reviewed
    head in place and **refuses the merge if the branch has moved past it**
    (`--match-head-commit` requires the pull request's head to equal the SHA given). **Merge the exact
    reviewed head; any new commit is a new head requiring a fresh D/E/F chain** — a new implementation
    audit, validation record and final review (Stages D, E and F of the delivery workflow) at that
    head, before the merge. **If reaching that merge needs a commit on the branch — a conflict at the
-   two ledger points (step 2) or the renumber (step 3) — that commit is a new head**: every
-   head-bound verdict at the old head is void, and the complete chain (implementation audit,
-   validation, final review and a fresh automated review) runs again at the new head before the
-   merge.
-2. **If a conflict must be resolved, resolve the two ledger conflicts by KEEPING BOTH SIDES** — all
-   dated keeper sections kept, in lane order; all rows kept. Both pull requests insert a dated keeper
-   section at the same pre-sentinel point and append their rows at the same table tail, so the second
-   merge would otherwise be a real text conflict at both points. Nothing on either side is deleted,
-   so there is no judgement call about which side wins.
-3. **Renumber the lane's provisional IDs into that lane's allocated band** (S2). **Renumber the
-   provisional ID only — never the `Blob ID`.** The rows are not yet recorded on `main`, so this is
-   the one permitted ID rewrite; the stable ID a row receives when it lands is permanent (S2).
-   Recompute each `Blob ID` afterwards with
+   two ledger points (step 2) or the renumber (step 3) — that commit is a new head, and it is made by
+   the separate Stage C implementer, not by the merge holder**: every head-bound verdict at the old
+   head is void, the complete chain (implementation audit, validation, final review and a fresh
+   automated review — the Codex review of that head) runs again at the new head, and only that fully
+   re-reviewed head is returned to the merge holder, who did not make the commit.
+2. **Stage C implementer — if a conflict must be resolved, resolve the two ledger conflicts by
+   KEEPING BOTH SIDES** — all dated keeper sections kept, in lane order; all rows kept. Both pull
+   requests insert a dated keeper section at the same pre-sentinel point and append their rows at the
+   same table tail, so the second merge would otherwise be a real text conflict at both points.
+   Nothing on either side is deleted, so there is no judgement call about which side wins.
+3. **Stage C implementer — renumber the lane's provisional IDs into that lane's allocated band**
+   (S2). **Renumber the provisional ID only — never the `Blob ID`.** The rows are not yet recorded on
+   `main`, so this is the one permitted ID rewrite; the stable ID a row receives when it lands is
+   permanent (S2). Recompute each `Blob ID` afterwards with
    `git rev-parse <Acceptance revision>:<Page>` and confirm it is unchanged. A wrong blob binds the
    wrong acceptance to a page: silent, plausible, and exactly the defect class this repository spent
    the preceding week removing.
-4. **Re-run `build_index.py` and the checker, then assert what they do not check.** The build fails
-   loudly on a **duplicate** stable ID (`BuildError("duplicate stable ID")`), an unknown event kind,
-   an acceptance revision that does not resolve or is not contained in `origin/main`, a page that is
-   not tracked Markdown, a blob ID that does not match `git rev-parse <revision>:<page>`, and a quote
-   or revision absent from its evidence source
+4. **Stage C implementer — re-run `build_index.py` and the checker, then assert what they do not
+   check.** The build fails loudly on a **duplicate** stable ID (`BuildError("duplicate stable ID")`),
+   an unknown event kind, an acceptance revision that does not resolve or is not contained in
+   `origin/main`, a page that is not tracked Markdown, a blob ID that does not match
+   `git rev-parse <revision>:<page>`, and a quote or revision absent from its evidence source
    ([build_index.py](../../tools/readability_acceptance/build_index.py) L206–285). It does **not**
    enforce the lane band, the expected ID set or the row count: a unique but wrong-band ID passes, and
    deleting a valid row leaves a table that still builds. **So the build catches a collision, not a
    missed renumber or a dropped row.** Assert both independently — every new ID against its lane's
    band (S2), and the exact expected `table_rows` (the blank-line trap below) — and only then treat
    the run as a pass.
-5. **Record in the merge receipt**: the new head, the before/after ids, the row count gained, and
-   the `official_pending_count` (the instrument's own count of pages awaiting acceptance) before
-   and after.
+5. **Merge holder — record in the merge receipt**: the new head, the before/after ids, the row count
+   gained, and the `official_pending_count` (the instrument's own count of pages awaiting acceptance)
+   before and after.
 
 **Do NOT merge two lane pull requests in one step. Do NOT merge with duplicate ids and renumber
 later.** And **do not rebase or merge `main` into a lane branch's own history** — the audits bind
@@ -294,8 +307,10 @@ raised by lane B's batch 4 after the boundary moved under it:
   binds (S2): an open lane-D claim in `K-381`–`K-480` cannot push a lane-A batch past `K-180`.
   **Measured at the recorded base (S3 and the S8 row-5 output): lane A's open claims end at `K-097`
   (#774 and #777), while `main` already owns `K-098…K-104`; an open-heads-only maximum would select
-  the occupied `K-098`, whereas the union maximum is `K-104`.** The merge holder normalises the
-  whole table at merge.
+  the occupied `K-098`, whereas the union maximum is `K-104`.** **Normalising the whole table is a
+  branch commit by the separate Stage C implementer, not by the merge holder** (S4 steps 2–4): the
+  merge holder merges only the exact head the chain re-reviewed, and any new commit is a new head
+  that re-runs the complete chain (S4).
 - **Why the rule exists, in the source file's own account:** the band allocation assumed a lane's
   rows would be *renumbered into* the band at merge, while a later batch's brief told the lane to
   *author into* it. **Both instructions were followed and they met** — which is how #772 and #780
