@@ -25,14 +25,27 @@ computed at the pinned --ref. The buckets:
   check, so a withdrawal whose revision is null stays a withdrawal.
 * PARTIAL DISPOSITION - RECORDED GAP - a partial disposition for the page is
   recorded in partial-dispositions.json and is ACTIVE: the page has no index
-  row, or the index effective event IS the declared withdrawal at the
-  declared revision. The page is never accepted and counts pending, and the
-  recorded gap prints with its evidence (page, withdrawal id, quote, source,
-  evidence ref, reviewer, date). An ACTIVE partial is decided BEFORE the
-  withdrawal bucket: a withdrawal WITH an active disposition is partial,
-  WITHOUT one it is withdrawn. A disposition whose page the index records as
-  an acceptance is INACTIVE: it prints as declared but not applied and
-  changes no count, so a stale disposition can never demote an accepted page.
+  acceptance row AND the keeper table at the compared ref makes the declared
+  withdrawal the page's EFFECTIVE row (the row with the highest stable ID for
+  that page, the same rule build_index.derive_reader_pages applies), or the
+  index effective event is that declared row at the declared revision. The
+  page is never accepted and counts pending, and the recorded gap prints
+  with its evidence (page, withdrawal id, quote, source, evidence ref,
+  reviewer, date). An ACTIVE partial is decided BEFORE the withdrawal
+  bucket: a withdrawal WITH an active disposition is partial, WITHOUT one it
+  is withdrawn. A disposition whose page the index records as an acceptance,
+  or whose declared ID is not the ref's effective row for that page, is
+  INACTIVE: it prints as declared but not applied and changes no count, so a
+  stale disposition can never demote an accepted page and an older
+  withdrawal ID can never stand in for the current one.
+* NOT APPLICABLE AT THIS REF - a pinned ref that predates the bound keeper
+  row cannot apply its declaration. The load is REF-AWARE: when the keeper
+  table at the compared ref has no row for the declared withdrawal ID, but
+  refs/remotes/origin/main records exactly that row for that page and
+  revision, the declaration is NOT APPLICABLE at this ref. It prints in its
+  own list and changes no count, so a historical ref keeps working. A
+  withdrawal ID that is absent from BOTH tables is still malformed (exit 2):
+  a typo is never silently disabled.
 
 The official pending count is
 
@@ -178,12 +191,20 @@ def load_partial_dispositions(path, root, ref_sha):
     40-hex commit contained in refs/remotes/origin/main, a quote not found
     verbatim, or a withdrawal_id that is not exactly one withdrawal row for
     that page (checked through the builder's own find_table/validate_rows)
-    is an error. The caller exits 2.
+    is an error. The caller exits 2. A withdrawal_id that exists in BOTH
+    tables as nothing is still an error, so a typo is never silently
+    disabled.
 
-    The one deliberate non-error lives in the caller: a disposition whose
-    page the index records as an acceptance is INACTIVE and printed, because
-    the ledger may be ahead of the index and the safe action changes no
-    count.
+    Two deliberate non-errors change no count. (1) A disposition whose page
+    the index records as an acceptance, or whose declared ID is not the
+    ref's effective row, is INACTIVE and printed by the caller. (2) A
+    disposition whose bound row is absent from the keeper table at the
+    compared ref, but present for that page and revision at
+    refs/remotes/origin/main, is NOT APPLICABLE at this ref and is returned
+    with applicable=False: a pinned historical ref keeps working instead of
+    failing on a declaration that post-dates it. Its row is still validated
+    at refs/remotes/origin/main, so "not applicable" never means
+    "unchecked".
     """
     try:
         raw = Path(path).read_text(encoding="utf-8")
@@ -208,6 +229,26 @@ def load_partial_dispositions(path, root, ref_sha):
         rows, _tracker_sha = build_index.find_table(root, ref_sha)
     except build_index.BuildError as exc:
         return [], "cannot read the keeper table: " + str(exc)
+
+    main_rows = []
+    main_loaded = False
+
+    def rows_at_main():
+        """The keeper rows at refs/remotes/origin/main, read once."""
+        nonlocal main_loaded
+        if not main_loaded:
+            main_loaded = True
+            try:
+                main_rows.extend(
+                    build_index.find_table(
+                        root, "refs/remotes/origin/main")[0])
+            except build_index.BuildError:
+                pass
+        return main_rows
+
+    def ref_is_ancestor_of_main():
+        return run(["merge-base", "--is-ancestor", ref_sha,
+                    "refs/remotes/origin/main"], root)[0] == 0
 
     dispositions = []
     seen_paths = set()
@@ -240,20 +281,45 @@ def load_partial_dispositions(path, root, ref_sha):
                 raise DispositionError(
                     "disposition " + str(index) + ": " + repr(page)
                     + " is not a Markdown page")
-            code, _, _ = run(["cat-file", "-e", ref_sha + ":" + page], root)
-            if code != 0:
-                raise DispositionError(
-                    "disposition " + str(index) + ": page " + repr(page)
-                    + " is not a tracked file at " + ref_sha[:12])
             candidates = [r for r in rows if r["stable_id"] == withdrawal_id]
+            validated_at = ref_sha
+            applicable = True
+            not_applicable_reason = ""
+            if not candidates:
+                later = [r for r in rows_at_main()
+                         if r["stable_id"] == withdrawal_id]
+                if len(later) != 1 or later[0]["path"] != page:
+                    raise DispositionError(
+                        "disposition " + str(index) + ": withdrawal_id "
+                        + repr(withdrawal_id) + " names 0 keeper row(s) at "
+                        + ref_sha[:12] + " and " + str(len(later))
+                        + " for this page at refs/remotes/origin/main; "
+                        "exactly one is required")
+                candidates = later
+                validated_at = "refs/remotes/origin/main"
+                applicable = False
+                not_applicable_reason = (
+                    "the keeper table at " + ref_sha[:12] + " has no row "
+                    + repr(withdrawal_id) + "; the row is recorded at "
+                    "refs/remotes/origin/main"
+                    + (", after this ref" if ref_is_ancestor_of_main()
+                       else ", but not at this ref")
+                    + ", so the declaration is not applicable here")
             if len(candidates) != 1:
                 raise DispositionError(
                     "disposition " + str(index) + ": withdrawal_id "
                     + repr(withdrawal_id) + " names " + str(len(candidates))
                     + " keeper row(s); exactly one is required")
+            if applicable:
+                code, _, _ = run(["cat-file", "-e", ref_sha + ":" + page],
+                                 root)
+                if code != 0:
+                    raise DispositionError(
+                        "disposition " + str(index) + ": page " + repr(page)
+                        + " is not a tracked file at " + ref_sha[:12])
             try:
                 event = build_index.validate_rows(candidates, root,
-                                                  ref_sha)[0]
+                                                  validated_at)[0]
             except build_index.BuildError as exc:
                 raise DispositionError(
                     "disposition " + str(index) + ": withdrawal row "
@@ -326,18 +392,52 @@ def load_partial_dispositions(path, root, ref_sha):
             "quote": quote,
             "reviewer": reviewer,
             "date": date,
+            "applicable": applicable,
+            "not_applicable_reason": not_applicable_reason,
         })
     return dispositions, ""
 
 
-def disposition_is_active(disposition, row):
+PUBLIC_FIELDS = ("path", "disposition", "withdrawal_id",
+                 "withdrawal_revision", "evidence_source", "evidence_ref",
+                 "quote", "reviewer", "date")
+
+
+def effective_stable_ids(rows):
+    """The page's effective keeper row: its highest stable ID.
+
+    This is the rule build_index.derive_reader_pages applies to the same
+    rows when it builds the index's per-page view. Judging a declaration
+    against it means an older withdrawal ID cannot stand in for the row the
+    builder actually uses (plan section 5(b); Codex P2).
+    """
+    best = {}
+    for row in rows:
+        current = best.get(row["path"])
+        if current is None or row["stable_id"] > current:
+            best[row["path"]] = row["stable_id"]
+    return best
+
+
+def public_disposition(disposition):
+    """One partial record as the JSON has always printed it."""
+    return {field: disposition[field] for field in PUBLIC_FIELDS}
+
+
+def disposition_is_active(disposition, row, effective_id):
     """Whether a declared partial disposition applies to this page.
 
-    Active when the page has NO index row, or when the index's effective
-    event is that withdrawal at that revision. It is NEVER applied to a page
-    whose index row is an acceptance, so a stale disposition cannot demote
-    an accepted page (plan section 5(b)).
+    Active when the declared withdrawal IS the keeper table's effective row
+    for the page (same stable ID, same revision) and the page has NO index
+    row, or when the index's effective event is that withdrawal at that
+    revision. It is NEVER applied to a page whose index row is an
+    acceptance, and an older withdrawal ID cannot stand in for the current
+    one, so a stale disposition can neither demote an accepted page nor
+    relabel a later withdrawal (plan section 5(b); Codex P2).
     """
+    if (effective_id is not None
+            and effective_id != disposition["withdrawal_id"]):
+        return False
     if row is None:
         return True
     return (row.get("event_kind") == "withdrawal"
@@ -345,8 +445,13 @@ def disposition_is_active(disposition, row):
             == disposition["withdrawal_revision"])
 
 
-def inactive_reason(row):
-    """The index-recorded reason a declared disposition is not applied."""
+def inactive_reason(row, effective_id, disposition):
+    """The recorded reason a declared disposition is not applied."""
+    if (effective_id is not None
+            and effective_id != disposition["withdrawal_id"]):
+        return ("the keeper table's effective row for this page is "
+                + repr(effective_id) + ", not the declared "
+                + repr(disposition["withdrawal_id"]))
     if row is None:
         return "the index has no row for this page"
     return ("the index records " + str(row.get("event_kind")) + " at "
@@ -389,20 +494,33 @@ def main():
         print("partial dispositions: " + disposition_error, file=sys.stderr)
         return 2
     dispositions_by_path = {d["path"]: d for d in dispositions}
+    try:
+        effective_id_by_path = effective_stable_ids(
+            build_index.find_table(root, ref_sha)[0])
+    except build_index.BuildError as exc:
+        print("partial dispositions: cannot read the keeper table: "
+              + str(exc), file=sys.stderr)
+        return 2
 
     pending, unknown, undecided, small, accepted = [], [], [], [], []
     withdrawn, partial, not_applied = [], [], []
+    not_applicable = []
     for path in reader_pages:
         if args.path and path != args.path:
             continue
         row = rows_by_path.get(path)
         disposition = dispositions_by_path.get(path)
+        effective_id = effective_id_by_path.get(path)
         if disposition is not None:
-            if disposition_is_active(disposition, row):
-                partial.append(dict(disposition))
+            if not disposition["applicable"]:
+                not_applicable.append(dict(disposition))
+            elif disposition_is_active(disposition, row, effective_id):
+                partial.append(public_disposition(disposition))
                 continue
-            not_applied.append(dict(disposition,
-                                    reason=inactive_reason(row)))
+            else:
+                not_applied.append(dict(
+                    disposition,
+                    reason=inactive_reason(row, effective_id, disposition)))
         if row is None:
             unknown.append({"path": path,
                             "reason": "no recorded acceptance row"})
@@ -480,6 +598,7 @@ def main():
         "partial_disposition_pending": len(partial),
         "partial_dispositions_declared": len(dispositions),
         "partial_dispositions_inactive": len(not_applied),
+        "partial_dispositions_not_applicable": len(not_applicable),
         "official_pending_count": official_pending,
         "official_pending_count_definition": (
             "provably_pending + no_recorded_acceptance + cannot_decide + "
@@ -531,6 +650,16 @@ def main():
                       + rec["evidence_ref"])
                 print("      reviewer " + rec["reviewer"] + " on "
                       + rec["date"])
+        if not_applicable:
+            print("")
+            print("DECLARED BUT NOT APPLICABLE AT THIS REF (the keeper table "
+                  "at the compared ref has no bound row, so the declaration "
+                  "changes no count)")
+            for rec in not_applicable:
+                print("  " + rec["path"])
+                print("      " + rec["withdrawal_id"] + " at "
+                      + rec["withdrawal_revision"][:12] + ": "
+                      + rec["not_applicable_reason"])
         if not_applied:
             print("")
             print("DECLARED BUT NOT APPLIED (an inactive partial disposition "

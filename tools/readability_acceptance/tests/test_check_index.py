@@ -2,7 +2,7 @@
 """Regression tests for the withdrawal bucket and the recordable partial
 disposition (AEGIS-APR-117; the owner-approved check_index.py fix).
 
-Three rules are pinned here, and each is a behavioural rule rather than a
+Five rules are pinned here, and each is a behavioural rule rather than a
 snapshot of today's numbers:
 
 1. A page whose latest recorded keeper event is a WITHDRAWAL is never an
@@ -18,6 +18,14 @@ snapshot of today's numbers:
    offsets a pending page; it is counted exactly once.
 3. A disposition whose page the index records as an acceptance is INACTIVE:
    it prints as declared but not applied and changes no count.
+4. A declaration is REF-AWARE: at a pinned ref whose keeper table predates
+   the bound row, the declaration is NOT APPLICABLE, prints in its own list
+   and changes no count, so the README's published historical command still
+   exits 0 with the base checker's page and acceptance counts (Codex P1).
+5. A declaration is matched against the page's EFFECTIVE keeper row - the
+   row with the highest stable ID, the rule the builder uses - so an older
+   withdrawal ID for the same page cannot stand in for the current one
+   (Codex P2: K-384W declared, K-392W effective).
 
 The arithmetic identities in CommittedIndexIsBackwardCompatible are the
 plan's C4 identities, asserted against the committed (stale) index so the
@@ -61,6 +69,19 @@ EVIDENCE_SOURCE = ("docs/evidence/documentation/"
 # revision, and using the ref itself as the revision makes drift exactly 0.
 STABLE_PAGE = ".claude/skills/cloud-security-baseline-reviewer/SKILL.md"
 
+# The README's published durable citation point (README.md, "Official count
+# reference (pinned)"). Its published command is the F1 regression: the
+# worktree sidecar post-dates this ref, so its declarations must be NOT
+# APPLICABLE here instead of malformed.
+README_REF = "408e4d6a2046b37afe7912e9c8643474df7ab037"
+
+# The page whose keeper table carries two withdrawal rows for the same
+# revision (K-384W then K-392W); K-392W is the effective row.
+SAMPLE_PAGE = ("docs/evidence/documentation/"
+               "full-page-readability-sample-2026-09-23.md")
+EFFECTIVE_ID = "K-392W"
+OLDER_ID = "K-384W"
+
 # The four pages whose latest keeper event is a withdrawal and whose lane
 # records mark them PARTIAL, with the cancelling row for each.
 PARTIAL_PAGES = {
@@ -89,6 +110,19 @@ def main_tip():
             "requires a full clone with refs/remotes/** (the tools-tests jobs "
             "check out with fetch-depth: 0)")
     return sha
+
+
+def run_published_command(ref):
+    """The README's exact published command, with no test-only flags.
+
+    The checker resolves the repository from its own __file__, so the cwd is
+    the published invocation's working directory rather than an input.
+    """
+    env = dict(os.environ, PYTHONIOENCODING="utf-8")
+    return subprocess.run(
+        [sys.executable, "-B", str(CHECKER), "--ref", ref],
+        cwd=str(ROOT), capture_output=True, text=True, encoding="utf-8",
+        errors="replace", env=env)
 
 
 def run_checker(checker, index, ref, partial=None, page=None, as_json=True):
@@ -133,6 +167,12 @@ def write_empty_dispositions(dirpath):
 
 def payload_of(proc):
     return json.loads(proc.stdout)
+
+
+def published_summary(stdout):
+    """The summary block the published command prints after its buckets."""
+    marker = '{\n  "compared_ref"'
+    return json.loads(stdout[stdout.index(marker):])
 
 
 class WithdrawalIsNeverAccepted(unittest.TestCase):
@@ -366,7 +406,9 @@ class PartialDispositionFailsLoud(unittest.TestCase):
         payload["dispositions"][0]["quote"] += " (mutated)"
         self._assert_exit_two(payload, "quote is not found verbatim")
 
-    def test_withdrawal_id_names_no_row(self):
+    def test_withdrawal_id_names_no_row_in_either_table(self):
+        # An ID absent from the ref AND from refs/remotes/origin/main is not
+        # a pinned-ref case: it is a typo, and it stays loud (F1).
         payload = json.loads(PARTIAL_ABS.read_text(encoding="utf-8"))
         payload["dispositions"][0]["withdrawal_id"] = "K-999Z"
         self._assert_exit_two(payload, "names 0 keeper row(s)")
@@ -408,6 +450,112 @@ class PartialDispositionFailsLoud(unittest.TestCase):
             self.assertIn("cannot read", proc.stderr)
             self.assertIn("misconfigured --partial-dispositions path",
                           proc.stderr)
+
+
+class ReadmePinnedRefCommandStillRuns(unittest.TestCase):
+    """F1 (Codex P1): the README's published historical ref keeps working.
+
+    The sidecar lives in the worktree and its rows post-date the pinned ref.
+    Requiring those rows at the compared ref made the README's own published
+    command exit 2. The ref-aware load treats an absent-but-recorded-at-main
+    row as NOT APPLICABLE at that ref, prints it, and changes no count.
+    """
+
+    def test_published_command_exits_zero_with_the_base_counts(self):
+        published = run_published_command(README_REF)
+        self.assertEqual(published.returncode, 0, published.stderr)
+        self.assertIn("DECLARED BUT NOT APPLICABLE AT THIS REF",
+                      published.stdout)
+        summary = published_summary(published.stdout)
+        self.assertEqual(summary["compared_ref"], README_REF)
+        self.assertEqual(summary["reader_pages_in_tree"], 631)
+        self.assertEqual(summary["accepted_on_recorded_review"], 47)
+        self.assertEqual(summary["partial_disposition_pending"], 0)
+        self.assertEqual(summary["withdrawn_pending_rereview"], 0)
+        self.assertEqual(summary["partial_dispositions_declared"], 4)
+        self.assertEqual(summary["partial_dispositions_inactive"], 0)
+        self.assertEqual(summary["partial_dispositions_not_applicable"], 4)
+
+    def test_the_base_checker_reports_the_same_pages_and_acceptances(self):
+        """The regression compares against the checker before this change."""
+        blob = subprocess.run(
+            ["git", "-C", str(ROOT), "show",
+             BASE_SHA + ":tools/readability_acceptance/check_index.py"],
+            capture_output=True)
+        self.assertEqual(blob.returncode, 0,
+                         "the base checker must be retrievable from this "
+                         "clone: the regression reads that exact blob")
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp) / "check_index_base.py"
+            base.write_bytes(blob.stdout)
+            proc = run_checker(base, INDEX_ABS, README_REF)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            base_summary = payload_of(proc)["summary"]
+        published = run_published_command(README_REF)
+        self.assertEqual(published.returncode, 0, published.stderr)
+        summary = published_summary(published.stdout)
+        self.assertEqual(summary["reader_pages_in_tree"],
+                         base_summary["reader_pages_in_tree"],
+                         "the pinned ref must keep the base page count")
+        self.assertEqual(summary["accepted_on_recorded_review"],
+                         base_summary["accepted_on_recorded_review"],
+                         "the pinned ref must keep the base acceptance count")
+        self.assertEqual(base_summary["reader_pages_in_tree"], 631)
+        self.assertEqual(base_summary["accepted_on_recorded_review"], 47)
+
+    def test_the_sidecar_changes_no_count_at_that_ref(self):
+        """Not-applicable declarations are inert, not absorbed."""
+        with tempfile.TemporaryDirectory() as tmp:
+            empty = write_empty_dispositions(tmp)
+            empty_summary = payload_of(
+                run_checker(CHECKER, INDEX_ABS, README_REF, empty))["summary"]
+        published = run_published_command(README_REF)
+        self.assertEqual(published.returncode, 0, published.stderr)
+        summary = published_summary(published.stdout)
+        for key in ("reader_pages_in_tree", "accepted_on_recorded_review",
+                    "provably_pending", "no_recorded_acceptance",
+                    "recorded_acceptance_within_10_lines",
+                    "within_10_not_covered_by_targeted_review",
+                    "cannot_decide", "withdrawn_pending_rereview",
+                    "partial_disposition_pending", "official_pending_count"):
+            self.assertEqual(summary[key], empty_summary[key], key)
+
+
+class PartialDispositionMatchesTheEffectiveRow(unittest.TestCase):
+    """F2 (Codex P2): the declared ID must be the page's effective row."""
+
+    def test_k_384w_does_not_stand_in_for_the_effective_k_392w(self):
+        ref = main_tip()
+        rows, _tracker_sha = build_index.find_table(ROOT, ref)
+        effective = check_index.effective_stable_ids(rows)[SAMPLE_PAGE]
+        self.assertEqual(effective, EFFECTIVE_ID,
+                         "the keeper table's effective row for this page is "
+                         "the highest stable ID, which the builder uses")
+        payload = json.loads(PARTIAL_ABS.read_text(encoding="utf-8"))
+        record = next(d for d in payload["dispositions"]
+                      if d["path"] == SAMPLE_PAGE)
+        self.assertEqual(record["withdrawal_id"], EFFECTIVE_ID)
+        record["withdrawal_id"] = OLDER_ID
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture = write_json(tmp, "older-withdrawal-id.json", payload)
+            applied = payload_of(run_checker(CHECKER, INDEX_ABS, ref, fixture,
+                                             page=SAMPLE_PAGE))
+            text = run_checker(CHECKER, INDEX_ABS, ref, fixture,
+                               page=SAMPLE_PAGE, as_json=False)
+            committed = payload_of(run_checker(CHECKER, INDEX_ABS, ref,
+                                               PARTIAL_ABS, page=SAMPLE_PAGE))
+        self.assertEqual(text.returncode, 0, text.stderr)
+        summary = applied["summary"]
+        self.assertEqual(summary["partial_disposition_pending"], 0)
+        self.assertEqual(summary["partial_dispositions_inactive"], 1)
+        self.assertEqual(summary["partial_dispositions_not_applicable"], 0)
+        self.assertEqual(summary["official_pending_count"], 1)
+        self.assertEqual(applied["partial"], [])
+        self.assertIn("DECLARED BUT NOT APPLIED", text.stdout)
+        self.assertIn("effective row for this page is 'K-392W'", text.stdout)
+        self.assertIn("not the declared 'K-384W'", text.stdout)
+        self.assertEqual(committed["summary"]["partial_disposition_pending"], 1)
+        self.assertEqual(committed["partial"][0]["withdrawal_id"], EFFECTIVE_ID)
 
 
 class CommittedIndexIsBackwardCompatible(unittest.TestCase):
