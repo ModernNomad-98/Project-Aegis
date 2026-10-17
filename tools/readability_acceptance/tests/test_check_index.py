@@ -26,6 +26,19 @@ snapshot of today's numbers:
    row with the highest stable ID, the rule the builder uses - so an older
    withdrawal ID for the same page cannot stand in for the current one
    (Codex P2: K-384W declared, K-392W effective).
+6. The withdrawal bucket is REF-AWARE. A withdrawal whose cancelling
+   revision the compared ref does not contain postdates that ref and is
+   ignored there, so a rebuilt index cannot mark a historical ref's accepted
+   pages pending (Codex P2 4303657420). The mutation control runs the
+   pre-repair checker at this PR's previous head on the same fixture.
+7. The ref-aware NOT APPLICABLE fallback is only for a ref that predates
+   main. On a ref that is not contained in origin/main a declared row missing
+   from that ref's append-only keeper table is malformed (exit 2), so a branch
+   that deletes a declared withdrawal row cannot re-activate the acceptance
+   (Codex P2 4303657425).
+8. A sidecar that is not valid UTF-8 takes the same reasoned exit 2 as every
+   other malformed record instead of a traceback and exit 1 (Codex P2
+   4303657435).
 
 The arithmetic identities in CommittedIndexIsBackwardCompatible are the
 plan's C4 identities, asserted against the committed (stale) index so the
@@ -40,6 +53,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -59,6 +73,12 @@ PARTIAL_ABS = ROOT / "tools/readability_acceptance/partial-dispositions.json"
 BASE_SHA = "47af10f24a3f98587e235089f047f03c5f77bdbc"
 BASE_CHECKER_SHA256 = (
     "5efc3ea9bed8ee06a67d7ed700b2614ec9e72f3c113f3f65003fad83d113bd4a")
+# This PR's previous head: the checker that applied a rebuilt index's future
+# withdrawal rows at a historical ref. The repair control reads that exact
+# blob and verifies its digest, so the control cannot drift to a fixed file.
+PRE_REPAIR_SHA = "39e487fb632aac68a6a64a45feb018d45fbd4672"
+PRE_REPAIR_CHECKER_SHA256 = (
+    "84de591be7ae91ef6e5a6b227cf60a2358f089401d6e92bd639d94090b062a04")
 WITHDRAWAL_REVISION = "e2a3e20b7c20ef8385b219b39c6405237163406f"
 EVIDENCE_REF = "97c61f35da634236a4495119f5b0cc62b4689cf7"
 EVIDENCE_SOURCE = ("docs/evidence/documentation/"
@@ -173,6 +193,32 @@ def published_summary(stdout):
     """The summary block the published command prints after its buckets."""
     marker = '{\n  "compared_ref"'
     return json.loads(stdout[stdout.index(marker):])
+
+
+def extract_checker(sha, digest, dirpath):
+    """A historical checker blob, byte-verified, importable in its own dir.
+
+    The pre-repair checker imports the builder module for its keeper-table
+    parse, so the current builder is copied beside it. The blob's SHA-256 is
+    checked, so a control can never silently read a different file.
+    """
+    blob = subprocess.run(
+        ["git", "-C", str(ROOT), "show",
+         sha + ":tools/readability_acceptance/check_index.py"],
+        capture_output=True)
+    if blob.returncode != 0:
+        raise AssertionError(
+            "the checker at " + sha[:12] + " must be retrievable from this "
+            "clone: the control reads that exact blob")
+    if hashlib.sha256(blob.stdout).hexdigest() != digest:
+        raise AssertionError(
+            "the extracted checker at " + sha[:12] + " is not the blob this "
+            "control was written against")
+    path = Path(dirpath) / ("check_index_" + sha[:12] + ".py")
+    path.write_bytes(blob.stdout)
+    shutil.copyfile(ROOT / "tools/readability_acceptance/build_index.py",
+                    Path(dirpath) / "build_index.py")
+    return path
 
 
 class WithdrawalIsNeverAccepted(unittest.TestCase):
@@ -621,6 +667,160 @@ class CommittedIndexIsBackwardCompatible(unittest.TestCase):
                              plain["official_pending_count"],
                              "the stale index keeps its official count: four "
                              "pages move from no-recorded to partial")
+
+
+class WithdrawalPostdatingTheRefIsIgnored(unittest.TestCase):
+    """F3 (Codex P2 4303657420): a future withdrawal is inert at a pinned ref.
+
+    A rebuilt index at a revision that contains the four withdrawal rows still
+    serves the README's historical command. Each cancelling row is bound to
+    e2a3e20b..., which the pinned ref does not contain, so at that ref the row
+    postdates it and is not in force: the checker judges every page by the
+    ref's own keeper table (no row there -> no recorded acceptance). The
+    mutation control runs the pre-repair checker at this PR's previous head on
+    the identical fixture and shows the four pages withdrawn there.
+    """
+
+    REBUILT_AT = "9e418c8c63e45caa4bca7fb608d45d0df4d44409"
+
+    def _fixture_index(self, dirpath, name, rows):
+        return write_json(dirpath, name, {
+            "schema_version": 2, "built_at_ref": self.REBUILT_AT,
+            "events": [], "reader_pages": rows})
+
+    def _summaries(self, dirpath):
+        rows = [index_row(page, "withdrawal", WITHDRAWAL_REVISION)
+                for page in PARTIAL_PAGES]
+        rebuilt = self._fixture_index(dirpath, "rebuilt-index.json", rows)
+        inert = self._fixture_index(dirpath, "inert-index.json", [])
+        with_rows = payload_of(
+            run_checker(CHECKER, rebuilt, README_REF))["summary"]
+        without_rows = payload_of(
+            run_checker(CHECKER, inert, README_REF))["summary"]
+        return rebuilt, with_rows, without_rows
+
+    def test_the_four_postdating_withdrawals_change_no_count_at_that_ref(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _rebuilt, with_rows, without_rows = self._summaries(tmp)
+        self.assertEqual(with_rows["compared_ref"], README_REF)
+        self.assertEqual(with_rows["withdrawn_pending_rereview"], 0,
+                         "a withdrawal the ref does not contain cannot cancel "
+                         "a page there")
+        for key in ("reader_pages_in_tree", "accepted_on_recorded_review",
+                    "provably_pending", "no_recorded_acceptance",
+                    "recorded_acceptance_within_10_lines",
+                    "within_10_not_covered_by_targeted_review",
+                    "cannot_decide", "withdrawn_pending_rereview",
+                    "partial_disposition_pending", "official_pending_count",
+                    "partial_dispositions_not_applicable"):
+            self.assertEqual(with_rows[key], without_rows[key], key)
+
+    def test_the_mutation_control_the_pre_repair_checker_withdraws_all_four(self):
+        """Without this repair the same fixture marks the four withdrawn."""
+        with tempfile.TemporaryDirectory() as tmp:
+            rebuilt, with_rows, _without = self._summaries(tmp)
+            pre = extract_checker(PRE_REPAIR_SHA, PRE_REPAIR_CHECKER_SHA256,
+                                  tmp)
+            control = payload_of(run_checker(pre, rebuilt, README_REF))
+        self.assertEqual(control["summary"]["withdrawn_pending_rereview"], 4,
+                         "the pre-repair checker applies the future rows")
+        self.assertEqual(with_rows["withdrawn_pending_rereview"], 0,
+                         "the repaired checker does not")
+        self.assertEqual(
+            control["summary"]["no_recorded_acceptance"] + 4,
+            with_rows["no_recorded_acceptance"],
+            "the four pages leave the withdrawn bucket, not the record")
+
+
+class MissingRowOnARefThatDoesNotPredateMainIsMalformed(unittest.TestCase):
+    """F4 (Codex P2 4303657425): the fallback is only for a ref predating main.
+
+    A branch based on current main that deletes a declared withdrawal row must
+    fail loudly. The ref-aware NOT APPLICABLE fallback is what would otherwise
+    re-activate the acceptance: the row is still on origin/main, so the
+    declaration looked merely historical.
+    """
+
+    def _branch_that_deletes_the_row(self, dirpath):
+        """A commit based on main whose tree predates the withdrawal rows."""
+        tree = git("rev-parse", README_REF + "^{tree}")
+        self.assertTrue(tree, "the pinned ref's tree must resolve")
+        stamp = "2026-10-17T00:00:00 +0000"
+        env = dict(os.environ,
+                   GIT_AUTHOR_NAME="aegis-readability-suite",
+                   GIT_AUTHOR_EMAIL="aegis-readability-suite@example.invalid",
+                   GIT_COMMITTER_NAME="aegis-readability-suite",
+                   GIT_COMMITTER_EMAIL="aegis-readability-suite@example.invalid",
+                   GIT_AUTHOR_DATE=stamp, GIT_COMMITTER_DATE=stamp)
+        proc = subprocess.run(
+            ["git", "-C", str(ROOT), "commit-tree", tree, "-p", main_tip(),
+             "-m", "test fixture: a branch that deletes the declared row"],
+            capture_output=True, text=True, encoding="utf-8",
+            errors="replace", env=env)
+        self.assertEqual(proc.returncode, 0,
+                         "the fixture commit must be creatable: "
+                         + proc.stderr.strip())
+        return proc.stdout.strip()
+
+    def test_a_deleted_row_on_a_ref_that_does_not_predate_main_exits_two(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            branch = self._branch_that_deletes_the_row(tmp)
+            self.assertNotEqual(
+                subprocess.run(["git", "-C", str(ROOT), "merge-base",
+                                "--is-ancestor", branch, main_tip()],
+                               capture_output=True).returncode, 0,
+                "the fixture ref must NOT be an ancestor of origin/main")
+            proc = run_checker(CHECKER, INDEX_ABS, branch)
+            self.assertEqual(proc.returncode, 2,
+                             "a declared row missing from a ref that is not "
+                             "contained in origin/main is malformed: "
+                             + proc.stdout + proc.stderr)
+            self.assertIn("names 0 keeper row(s)", proc.stderr)
+            self.assertIn("fallback applies only to a ref contained in",
+                          proc.stderr)
+            self.assertEqual(proc.stdout.strip(), "",
+                             "a failed load must print no summary")
+        # Control: the same fixture at a ref that DOES predate main stays not
+        # applicable and still exits 0 with its historical counts.
+        published = run_published_command(README_REF)
+        self.assertEqual(published.returncode, 0, published.stderr)
+        self.assertEqual(
+            published_summary(published.stdout)["partial_dispositions_not_"
+                                                 "applicable"], 4)
+
+
+class NonUtf8SidecarIsADispositionError(unittest.TestCase):
+    """F5 (Codex P2 4303657435): a decoding failure is exit 2, not a crash."""
+
+    def test_a_sidecar_that_is_not_utf8_exits_two_with_a_reason(self):
+        ref = main_tip()
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "not-utf8.json"
+            path.write_bytes(PARTIAL_ABS.read_bytes() + b"\x80")
+            proc = run_checker(CHECKER, INDEX_ABS, ref, path,
+                               page=STABLE_PAGE)
+            self.assertEqual(proc.returncode, 2, proc.stdout + proc.stderr)
+            self.assertNotIn("Traceback", proc.stderr,
+                             "a malformed sidecar is a reasoned exit 2, not a "
+                             "traceback")
+            self.assertIn("partial dispositions:", proc.stderr)
+            self.assertIn("not valid UTF-8", proc.stderr)
+            self.assertEqual(proc.stdout.strip(), "",
+                             "a failed load must print no summary")
+
+    def test_the_mutation_control_the_pre_repair_checker_crashes(self):
+        """Without this repair the same bytes raise and exit 1."""
+        ref = main_tip()
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "not-utf8.json"
+            path.write_bytes(PARTIAL_ABS.read_bytes() + b"\x80")
+            pre = extract_checker(PRE_REPAIR_SHA, PRE_REPAIR_CHECKER_SHA256,
+                                  tmp)
+            proc = run_checker(pre, INDEX_ABS, ref, path, page=STABLE_PAGE)
+        self.assertEqual(proc.returncode, 1,
+                         "the pre-repair checker exits 1 on the decode error")
+        self.assertIn("UnicodeDecodeError", proc.stderr,
+                      "the pre-repair checker emits the traceback")
 
 
 if __name__ == "__main__":

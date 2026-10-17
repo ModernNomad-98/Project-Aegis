@@ -22,7 +22,12 @@ computed at the pinned --ref. The buckets:
   for it: the page is not accepted, and re-review is the only exit. A
   withdrawal cancels regardless of drift or reachability, so this bucket is
   decided BEFORE reachability and drift; it also precedes the lost-commit
-  check, so a withdrawal whose revision is null stays a withdrawal.
+  check, so a withdrawal whose revision is null stays a withdrawal. It is
+  also REF-AWARE: a withdrawal whose cancelling revision the compared ref
+  does not contain postdates that ref and is ignored there (the page is
+  judged by the ref's own effective keeper event, or as no recorded
+  acceptance when the ref has no row for it), so a rebuilt index cannot
+  apply a future withdrawal to a historical --ref.
 * PARTIAL DISPOSITION - RECORDED GAP - a partial disposition for the page is
   recorded in partial-dispositions.json and is ACTIVE: the page has no index
   acceptance row AND the keeper table at the compared ref makes the declared
@@ -39,13 +44,18 @@ computed at the pinned --ref. The buckets:
   stale disposition can never demote an accepted page and an older
   withdrawal ID can never stand in for the current one.
 * NOT APPLICABLE AT THIS REF - a pinned ref that predates the bound keeper
-  row cannot apply its declaration. The load is REF-AWARE: when the keeper
-  table at the compared ref has no row for the declared withdrawal ID, but
+  row cannot apply its declaration. The load is REF-AWARE: when the compared
+  ref is contained in refs/remotes/origin/main, and the keeper table at that
+  ref has no row for the declared withdrawal ID, but
   refs/remotes/origin/main records exactly that row for that page and
   revision, the declaration is NOT APPLICABLE at this ref. It prints in its
-  own list and changes no count, so a historical ref keeps working. A
-  withdrawal ID that is absent from BOTH tables is still malformed (exit 2):
-  a typo is never silently disabled.
+  own list and changes no count, so a historical ref keeps working. The
+  fallback applies ONLY to a ref contained in origin/main: on a ref that is
+  not (a feature branch based on current main) the keeper table is
+  append-only, so a declared row missing there is malformed (exit 2) and a
+  deleted keeper row can never re-activate an acceptance. A withdrawal ID
+  that is absent from BOTH tables is malformed the same way: a typo is never
+  silently disabled.
 
 The official pending count is
 
@@ -204,10 +214,20 @@ def load_partial_dispositions(path, root, ref_sha):
     with applicable=False: a pinned historical ref keeps working instead of
     failing on a declaration that post-dates it. Its row is still validated
     at refs/remotes/origin/main, so "not applicable" never means
-    "unchecked".
+    "unchecked". The fallback is only for a ref that PREDATES main (a ref
+    contained in refs/remotes/origin/main): on any other ref the keeper
+    table is append-only, so a missing declared row is malformed and the
+    load fails loudly (exit 2) instead of silently re-activating an
+    acceptance.
     """
     try:
         raw = Path(path).read_text(encoding="utf-8")
+    except UnicodeDecodeError as exc:
+        # A sidecar that is not UTF-8 is malformed, not a crash: it takes the
+        # same reasoned exit 2 as every other bad record (Codex P2).
+        return [], ("cannot read " + str(path) + ": not valid UTF-8 ("
+                    + str(exc) + "); a malformed sidecar fails loudly rather "
+                      "than silently disabling the feature")
     except OSError as exc:
         return [], ("cannot read " + str(path) + ": " + exc.strerror
                     + " (a misconfigured --partial-dispositions path fails "
@@ -286,6 +306,19 @@ def load_partial_dispositions(path, root, ref_sha):
             applicable = True
             not_applicable_reason = ""
             if not candidates:
+                if not ref_is_ancestor_of_main():
+                    # The fallback is for a ref that PREDATES the row. On a ref
+                    # that does not (a feature branch based on current main) the
+                    # keeper table is append-only, so a declared row missing
+                    # there means the row was deleted or the ID is wrong: both
+                    # are malformed, never "not applicable" (Codex P2).
+                    raise DispositionError(
+                        "disposition " + str(index) + ": withdrawal_id "
+                        + repr(withdrawal_id) + " names 0 keeper row(s) at "
+                        + ref_sha[:12] + "; the historical not-applicable "
+                        "fallback applies only to a ref contained in "
+                        "refs/remotes/origin/main, and " + ref_sha[:12]
+                        + " is not, so a missing keeper row here is malformed")
                 later = [r for r in rows_at_main()
                          if r["stable_id"] == withdrawal_id]
                 if len(later) != 1 or later[0]["path"] != page:
@@ -403,20 +436,55 @@ PUBLIC_FIELDS = ("path", "disposition", "withdrawal_id",
                  "quote", "reviewer", "date")
 
 
-def effective_stable_ids(rows):
-    """The page's effective keeper row: its highest stable ID.
+def effective_rows(rows):
+    """Each page's effective keeper row: the row with its highest stable ID.
 
     This is the rule build_index.derive_reader_pages applies to the same
-    rows when it builds the index's per-page view. Judging a declaration
-    against it means an older withdrawal ID cannot stand in for the row the
-    builder actually uses (plan section 5(b); Codex P2).
+    rows when it builds the index's per-page view.
     """
     best = {}
     for row in rows:
         current = best.get(row["path"])
-        if current is None or row["stable_id"] > current:
-            best[row["path"]] = row["stable_id"]
+        if current is None or row["stable_id"] > current["stable_id"]:
+            best[row["path"]] = row
     return best
+
+
+def effective_stable_ids(rows):
+    """The page's effective keeper ID: its highest stable ID.
+
+    Judging a declaration against it means an older withdrawal ID cannot
+    stand in for the row the builder actually uses (plan section 5(b)).
+    """
+    return {path: row["stable_id"] for path, row in effective_rows(rows).items()}
+
+
+def withdrawal_cancels_at_ref(index_row, ref_sha, root):
+    """Whether the index's withdrawal is in force at the compared ref.
+
+    A withdrawal cancels at a ref only when that ref CONTAINS the cancelling
+    revision. A row bound to a revision the ref does not contain postdates it:
+    applying it there would turn a page the ref records as accepted into a
+    pending one, so the page is judged by the ref's own effective keeper event
+    instead (Codex P2). A withdrawal whose revision is null stays a
+    withdrawal, as the docstring says.
+    """
+    revision = index_row.get("last_acceptance_sha")
+    if revision is None:
+        return True
+    return revision_reachable(revision, ref_sha, root)
+
+
+def ref_effective_row(index_row, ref_row):
+    """The judged row for a page whose index withdrawal postdates the ref."""
+    return {
+        "path": index_row["path"],
+        "event_kind": ref_row["event_kind"],
+        "last_acceptance_sha": ref_row["revision"],
+        "evidence_source": ref_row["evidence_source"],
+        "reviewer": ref_row["reviewer"],
+        "date": ref_row["date"],
+    }
 
 
 def public_disposition(disposition):
@@ -495,12 +563,14 @@ def main():
         return 2
     dispositions_by_path = {d["path"]: d for d in dispositions}
     try:
-        effective_id_by_path = effective_stable_ids(
-            build_index.find_table(root, ref_sha)[0])
+        ref_rows = build_index.find_table(root, ref_sha)[0]
     except build_index.BuildError as exc:
         print("partial dispositions: cannot read the keeper table: "
               + str(exc), file=sys.stderr)
         return 2
+    effective_by_path = effective_rows(ref_rows)
+    effective_id_by_path = {path: row["stable_id"]
+                            for path, row in effective_by_path.items()}
 
     pending, unknown, undecided, small, accepted = [], [], [], [], []
     withdrawn, partial, not_applied = [], [], []
@@ -525,6 +595,21 @@ def main():
             unknown.append({"path": path,
                             "reason": "no recorded acceptance row"})
             continue
+        if row.get("event_kind") == "withdrawal":
+            ref_row = effective_by_path.get(path)
+            if not withdrawal_cancels_at_ref(row, ref_sha, root):
+                # The index's withdrawal postdates this ref (rebuilt index at a
+                # later revision, historical --ref): judge the page by the ref's
+                # own effective keeper event, never by the future withdrawal.
+                if ref_row is None:
+                    unknown.append({
+                        "path": path,
+                        "reason": ("no recorded acceptance row; the index's "
+                                   "withdrawal at "
+                                   + str(row.get("last_acceptance_sha"))[:12]
+                                   + " postdates this ref")})
+                    continue
+                row = ref_effective_row(row, ref_row)
         if row.get("event_kind") == "withdrawal":
             # A withdrawal cancels the acceptance whatever the drift or the
             # reachability of its revision (AEGIS-APR-117; plan 5(a) step 3).
