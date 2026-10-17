@@ -221,6 +221,36 @@ def extract_checker(sha, digest, dirpath):
     return path
 
 
+def is_ancestor(sha, ref):
+    """Whether ref contains sha (the D73 containment rule the checker applies)."""
+    proc = subprocess.run(
+        ["git", "-C", str(ROOT), "merge-base", "--is-ancestor", sha, ref],
+        capture_output=True)
+    return proc.returncode == 0
+
+
+def declared_partial_pages():
+    """The pages the committed partial-disposition sidecar declares (data, no literal)."""
+    payload = json.loads(PARTIAL_ABS.read_text(encoding="utf-8"))
+    return {record["path"] for record in payload["dispositions"]}
+
+
+def index_reader_rows():
+    """The reader-page rows of the worktree index, keyed by path."""
+    payload = json.loads(INDEX_ABS.read_text(encoding="utf-8"))
+    return {row["path"]: row for row in payload.get("reader_pages", [])}
+
+
+def published_partition(summary):
+    """Identity (i): the named buckets partition the reader pages by definition."""
+    return (summary["accepted_on_recorded_review"]
+            + summary["provably_pending"]
+            + summary["no_recorded_acceptance"]
+            + summary["cannot_decide"]
+            + summary["withdrawn_pending_rereview"]
+            + summary["partial_disposition_pending"]
+            + summary["recorded_acceptance_within_10_lines"])
+
 class WithdrawalIsNeverAccepted(unittest.TestCase):
     """A latest withdrawal is a withdrawal, not an acceptance (C3)."""
 
@@ -514,41 +544,104 @@ class ReadmePinnedRefCommandStillRuns(unittest.TestCase):
                       published.stdout)
         summary = published_summary(published.stdout)
         self.assertEqual(summary["compared_ref"], README_REF)
-        self.assertEqual(summary["reader_pages_in_tree"], 631)
-        self.assertEqual(summary["accepted_on_recorded_review"], 47)
-        self.assertEqual(summary["partial_disposition_pending"], 0)
-        self.assertEqual(summary["withdrawn_pending_rereview"], 0)
-        self.assertEqual(summary["partial_dispositions_declared"], 4)
-        self.assertEqual(summary["partial_dispositions_inactive"], 0)
-        self.assertEqual(summary["partial_dispositions_not_applicable"], 4)
-
-    def test_the_base_checker_reports_the_same_pages_and_acceptances(self):
-        """The regression compares against the checker before this change."""
+        # The legacy counts are derived at the pinned ref, never copied from a
+        # prior committed index: the pre-change checker at BASE_SHA reads the
+        # same index handed in, and the only intended difference at this ref is
+        # the ref-aware withholding of index withdrawal rows that postdate it.
         blob = subprocess.run(
             ["git", "-C", str(ROOT), "show",
              BASE_SHA + ":tools/readability_acceptance/check_index.py"],
             capture_output=True)
         self.assertEqual(blob.returncode, 0,
-                         "the base checker must be retrievable from this "
-                         "clone: the regression reads that exact blob")
+                         "the base checker must be retrievable from this clone")
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp) / "check_index_base.py"
             base.write_bytes(blob.stdout)
-            proc = run_checker(base, INDEX_ABS, README_REF)
-            self.assertEqual(proc.returncode, 0, proc.stderr)
-            base_summary = payload_of(proc)["summary"]
-        published = run_published_command(README_REF)
-        self.assertEqual(published.returncode, 0, published.stderr)
-        summary = published_summary(published.stdout)
-        self.assertEqual(summary["reader_pages_in_tree"],
-                         base_summary["reader_pages_in_tree"],
-                         "the pinned ref must keep the base page count")
-        self.assertEqual(summary["accepted_on_recorded_review"],
-                         base_summary["accepted_on_recorded_review"],
-                         "the pinned ref must keep the base acceptance count")
-        self.assertEqual(base_summary["reader_pages_in_tree"], 631)
-        self.assertEqual(base_summary["accepted_on_recorded_review"], 47)
+            base_proc = subprocess.run(
+                [sys.executable, "-B", str(base), "--repo", str(ROOT),
+                 "--ref", README_REF, "--index", str(INDEX_ABS), "--json"],
+                capture_output=True, text=True, encoding="utf-8",
+                errors="replace",
+                env=dict(os.environ, PYTHONIOENCODING="utf-8"))
+        self.assertEqual(base_proc.returncode, 0, base_proc.stderr)
+        base_summary = json.loads(base_proc.stdout)["summary"]
+        postdating = [row for row in index_reader_rows().values()
+                      if row.get("event_kind") == "withdrawal"
+                      and row.get("last_acceptance_sha")
+                      and not is_ancestor(row["last_acceptance_sha"],
+                                          README_REF)]
+        self.assertEqual(
+            summary["reader_pages_in_tree"],
+            base_summary["reader_pages_in_tree"],
+            "the pinned ref's reader-page count is derived from the tree, not "
+            "from the mutable index")
+        self.assertEqual(
+            summary["accepted_on_recorded_review"],
+            base_summary["accepted_on_recorded_review"] - len(postdating),
+            "the pinned ref's acceptance count is the base count less the "
+            "withdrawal rows that postdate this ref")
+        self.assertEqual(published_partition(summary),
+                         summary["reader_pages_in_tree"],
+                         "identity (i): every reader page is in exactly one "
+                         "bucket")
+        declared = declared_partial_pages()
+        self.assertEqual(summary["partial_disposition_pending"], 0)
+        self.assertEqual(summary["withdrawn_pending_rereview"], 0)
+        self.assertEqual(summary["partial_dispositions_declared"],
+                         len(declared))
+        self.assertEqual(summary["partial_dispositions_inactive"], 0)
+        self.assertEqual(summary["partial_dispositions_not_applicable"],
+                         len(declared))
+    def test_the_base_checker_reports_the_same_pages_and_acceptances(self):
+        """The regression compares the two checkers on ONE fixed index input.
 
+        Both checkers read the index committed at the pinned README_REF (an
+        immutable historical revision, extracted with git), so a rebuild of the
+        mutable committed index cannot fail this test; a checker regression
+        still does.
+        """
+        blob = subprocess.run(
+            ["git", "-C", str(ROOT), "show",
+             BASE_SHA + ":tools/readability_acceptance/check_index.py"],
+            capture_output=True)
+        self.assertEqual(blob.returncode, 0,
+                         "the base checker must be retrievable from this clone")
+        index_blob = subprocess.run(
+            ["git", "-C", str(ROOT), "show",
+             README_REF + ":tools/readability_acceptance/acceptance-index.json"],
+            capture_output=True)
+        self.assertEqual(index_blob.returncode, 0,
+                         "the pinned ref's index must be retrievable from this "
+                         "clone")
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp) / "check_index_base.py"
+            base.write_bytes(blob.stdout)
+            fixed_index = Path(tmp) / "pinned-index.json"
+            fixed_index.write_bytes(index_blob.stdout)
+            empty = write_empty_dispositions(tmp)
+            base_proc = run_checker(base, fixed_index, README_REF)
+            current_proc = run_checker(CHECKER, fixed_index, README_REF,
+                                       partial=empty)
+        self.assertEqual(base_proc.returncode, 0, base_proc.stderr)
+        self.assertEqual(current_proc.returncode, 0, current_proc.stderr)
+        base_summary = payload_of(base_proc)["summary"]
+        current_summary = payload_of(current_proc)["summary"]
+        self.assertEqual(current_summary["reader_pages_in_tree"],
+                         base_summary["reader_pages_in_tree"],
+                         "the two checkers must agree on the pinned ref's "
+                         "reader pages")
+        self.assertEqual(current_summary["accepted_on_recorded_review"],
+                         base_summary["accepted_on_recorded_review"],
+                         "the two checkers must agree on the pinned ref's "
+                         "acceptances")
+        pinned_reader_pages = len(check_index.classify_tree(
+            git("rev-parse", README_REF), ROOT)["reader"])
+        self.assertEqual(
+            (base_summary["reader_pages_in_tree"],
+             current_summary["reader_pages_in_tree"]),
+            (pinned_reader_pages, pinned_reader_pages),
+            "the pinned ref's reader-page count derived from its own tree ("
+            + str(pinned_reader_pages) + ") must equal both checkers' count")
     def test_the_sidecar_changes_no_count_at_that_ref(self):
         """Not-applicable declarations are inert, not absorbed."""
         with tempfile.TemporaryDirectory() as tmp:
@@ -649,26 +742,129 @@ class CommittedIndexIsBackwardCompatible(unittest.TestCase):
         self.assertEqual(len(partial), 4)
 
     def test_the_committed_index_cannot_count_a_page_twice(self):
-        """Count-once: the two new buckets are disjoint over the four pages."""
+        """Count-once: the partial bucket is disjoint over the declared pages.
+
+        Every quantity is derived from the index and sidecar handed in, in one
+        code path: the test proves single counting on the stale committed index
+        (declared pages unexposed, in plain no-recorded) and on a correctly
+        rebuilt index (declared pages in plain withdrawn) without knowing which
+        state it is in.
+        """
         ref = main_tip()
+        declared = declared_partial_pages()
         with tempfile.TemporaryDirectory() as tmp:
             empty = write_empty_dispositions(tmp)
-            plain = payload_of(run_checker(CHECKER, INDEX_ABS, ref,
-                                           empty))["summary"]
-            applied = payload_of(run_checker(CHECKER, INDEX_ABS, ref,
-                                             PARTIAL_ABS))["summary"]
-            self.assertEqual(applied["partial_disposition_pending"], 4)
-            self.assertEqual(applied["withdrawn_pending_rereview"], 0)
+            plain_payload = payload_of(
+                run_checker(CHECKER, INDEX_ABS, ref, empty))
+            applied_payload = payload_of(
+                run_checker(CHECKER, INDEX_ABS, ref, PARTIAL_ABS))
+        plain = plain_payload["summary"]
+        applied = applied_payload["summary"]
+        buckets = ("pending", "undecided", "small_drift", "accepted",
+                   "withdrawn")
+        plain_paths = {b: {r["path"] for r in plain_payload[b]}
+                       for b in buckets}
+        applied_paths = {b: {r["path"] for r in applied_payload[b]}
+                         for b in buckets}
+        self.assertEqual({r["path"] for r in applied_payload["partial"]},
+                         declared,
+                         "the applied run's partial pages are exactly the "
+                         "declared pages: declared=" + str(sorted(declared)))
+        self.assertEqual(applied["partial_disposition_pending"],
+                         len(declared),
+                         "every declared page lands in the partial bucket: "
+                         "declared=" + str(sorted(declared)))
+        self.assertEqual(applied["partial_dispositions_declared"],
+                         len(declared),
+                         "the sidecar declares exactly the derived set")
+        exposed = set().union(*plain_paths.values())
+        moved_exposed = declared & exposed
+        moved_from_withdrawn = declared & plain_paths["withdrawn"]
+        moved_from_unexposed = len(declared) - len(moved_exposed)
+        for index, first in enumerate(buckets):
+            for second in buckets[index + 1:]:
+                self.assertFalse(
+                    plain_paths[first] & plain_paths[second],
+                    "plain buckets overlap: " + first + "/" + second
+                    + " -> " + str(sorted(plain_paths[first]
+                                         & plain_paths[second])))
+                self.assertFalse(
+                    applied_paths[first] & applied_paths[second],
+                    "applied buckets overlap: " + first + "/" + second
+                    + " -> " + str(sorted(applied_paths[first]
+                                         & applied_paths[second])))
+        self.assertEqual(
+            [page for page in declared
+             if sum(page in plain_paths[b] for b in buckets) > 1],
+            [],
+            "a declared page appears more than once in the plain buckets: "
+            "declared=" + str(sorted(declared)))
+        self.assertEqual(
+            moved_exposed, moved_from_withdrawn,
+            "declared pages are either unexposed or in the plain withdrawn "
+            "bucket: declared=" + str(sorted(declared))
+            + " exposed=" + str(sorted(moved_exposed))
+            + " withdrawn=" + str(sorted(moved_from_withdrawn)))
+        self.assertEqual(
+            plain["withdrawn_pending_rereview"]
+            - applied["withdrawn_pending_rereview"],
+            len(moved_from_withdrawn),
+            "withdrawn delta must be the declared pages moved out of "
+            "withdrawn: declared=" + str(sorted(declared))
+            + " moved_from_withdrawn=" + str(len(moved_from_withdrawn)))
+        self.assertEqual(
+            plain["no_recorded_acceptance"]
+            - applied["no_recorded_acceptance"],
+            moved_from_unexposed,
+            "no-recorded delta must be the declared pages moved out of the "
+            "unexposed bucket: declared=" + str(sorted(declared))
+            + " moved_from_unexposed=" + str(moved_from_unexposed))
+        summary_keys = {
+            "pending": "provably_pending",
+            "undecided": "cannot_decide",
+            "small_drift": "recorded_acceptance_within_10_lines",
+            "accepted": "accepted_on_recorded_review",
+            "withdrawn": "withdrawn_pending_rereview",
+        }
+        for bucket in buckets:
             self.assertEqual(
-                applied["no_recorded_acceptance"] + 4,
-                plain["no_recorded_acceptance"],
-                "the four partial pages come out of exactly one bucket")
-            self.assertEqual(applied["official_pending_count"],
-                             plain["official_pending_count"],
-                             "the stale index keeps its official count: four "
-                             "pages move from no-recorded to partial")
-
-
+                plain[summary_keys[bucket]] - applied[summary_keys[bucket]],
+                len(declared & plain_paths[bucket]),
+                "bucket delta must equal the declared pages in "
+                + bucket + ": exposed=" + str(sorted(plain_paths[bucket]))
+                + " declared=" + str(sorted(declared)))
+        official_formula = (
+            "provably_pending", "no_recorded_acceptance", "cannot_decide",
+            "withdrawn_pending_rereview", "partial_disposition_pending",
+            "within_10_not_covered_by_targeted_review")
+        self.assertEqual(applied["official_pending_count"],
+                         plain["official_pending_count"],
+                         "official count conservation: plain="
+                         + str(plain["official_pending_count"])
+                         + " applied=" + str(applied["official_pending_count"]))
+        self.assertEqual(sum(plain[key] for key in official_formula),
+                         plain["official_pending_count"],
+                         "the published definition recomputes for the plain "
+                         "run: derived="
+                         + str(sum(plain[key] for key in official_formula)))
+        self.assertEqual(sum(applied[key] for key in official_formula),
+                         applied["official_pending_count"],
+                         "the published definition recomputes for the applied "
+                         "run: derived="
+                         + str(sum(applied[key] for key in official_formula)))
+        for key in ("provably_pending", "no_recorded_acceptance",
+                    "cannot_decide", "withdrawn_pending_rereview",
+                    "partial_disposition_pending"):
+            self.assertIn(key, applied["official_pending_count_definition"],
+                          "the published definition must name " + key)
+        self.assertFalse(declared & plain_paths["accepted"],
+                         "no declared page is an acceptance in the plain run")
+        self.assertFalse(declared & plain_paths["undecided"],
+                         "no declared page is undecided in the plain run")
+        self.assertFalse(declared & applied_paths["accepted"],
+                         "no declared page is an acceptance in the applied run")
+        self.assertFalse(declared & applied_paths["undecided"],
+                         "no declared page is undecided in the applied run")
 class WithdrawalPostdatingTheRefIsIgnored(unittest.TestCase):
     """F3 (Codex P2 4303657420): a future withdrawal is inert at a pinned ref.
 
