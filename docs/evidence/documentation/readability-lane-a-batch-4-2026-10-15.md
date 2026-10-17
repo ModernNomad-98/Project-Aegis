@@ -56,16 +56,15 @@ the other (Stage D F2).** *Derivation base* `f490c16f9ed23f3d489e42f7696323bffcc
   three paths and therefore moves the current-main insertion count by its own inserted lines,
   measured and stated in the Stage C round-7 handoff comment.
 
-- **Replacement file set and measured figures — stated in the PR body, not in this record.** This
-  replacement adds **exactly two `docs/` paths** — this record and
-  `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` — and nothing else. The record base is blob
-  `e632b3a1735af56c17282eee47f442f6206e8f75` = **85,003 B / 959 LF / 0 CR**; the replacement record is
-  that base blob with exactly the bounded hunks applied, and its final blob/bytes/LF/CR, the plan file's
-  final blob/bytes/LF/CR and the **capture commit** are recorded in the replacement pull request's body
-  and Stage C handoff, because a record cannot contain its own final digest. The figures at `f848b1a9`
-  (three paths) and at `f7ae12a3` (`858 0`
-    / `451 0`) are **historical measurements at those heads**, kept
-  for the record of how the file set changed and not presented as this replacement's figures (Stage D F2).
+- **Replacement file set and measured figures — stated in the PR body, not in this record.** At this
+  replacement head the tree adds exactly **one `docs/` path** — this record — and deletes the
+  previously committed plan file `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` (the plan of
+  record lives only in PR #808 comment `6242584888`). The record base is blob `e632b3a1…` = **85,003 B /
+  959 LF / 0 CR**; the replacement record is that base blob with exactly the bounded hunks applied, and
+  its final blob/bytes/LF/CR and the lean capture comment are recorded in the replacement PR body (a
+  record cannot contain its own final digest). The figures at `f848b1a9` (three paths) and at `f7ae12a3`
+  (`858 0` / `451 0`) are **historical measurements at those heads**, not this replacement's figures
+  (Stage D F2).
 - **This round's own moves, stated so no reader mistakes them for drift.** The Stage C repair
   round 7 (2026-10-17) edits this record's prose and the tracked plan's self-description, and
   **edits none of the eight pages**; its dispositions are in section 10, and the eight page blob
@@ -76,20 +75,29 @@ the other (Stage D F2).** *Derivation base* `f490c16f9ed23f3d489e42f7696323bffcc
   current tip (`git diff --numstat <base> refs/remotes/origin/main -- <page>` is empty for all
   eight), so the bytes each reader read are the bytes the merge receives and the acceptance is not
   voided by the merge.
-- **Agent / model attribution (the 2026-10-13 rule).** This record and every text this item
-  publishes are drafted by **DeepSeek-4.1-Flash (deepseek-flash)**, an AI agent operating under the
-  owner account, in a Stage C session. The lane's agent identity string for git operations is the
-  shared Stage-C identity `F reviewer <reviewer@example.invalid>` (see section 2 for the honest
-  disclosure about that shared string).
+- **Agent / model attribution (the 2026-10-13 rule), scoped to its actual author.** The historical body
+  of this record (its original committed sections) was drafted by **DeepSeek-4.1-Flash
+  (deepseek-flash)**, an AI agent operating under the owner account, in the original Stage C sessions.
+  The replacement append and repair sections (11 and 12) were drafted by **DeepSeek V4 Flash
+  (deepseek-flash, DeepSeek Harness)** as Stage C of the #789 replacement under the lean plan of record
+  capture `6242584888`. The lane's agent identity string for git operations is the shared Stage-C
+  identity `F reviewer <reviewer@example.invalid>` (see section 2 for the honest disclosure about that
+  shared string).
 - **What this page is.** The batch's tracked evidence record. *Tracked* means committed to the
   repository rather than left in a working directory. It is the **evidence source** the separate
   keeper cites when it records this batch's pages: a *keeper row* is one row of the ledger's
   consolidated acceptance table, and the *ledger* is
   [the documentation readability backlog](../../roadmaps/aegis-documentation-readability-backlog.md),
   the tracked page that carries the acceptance record for every reader page.
-- **This batch authors NO keeper rows and appends NOTHING to the ledger.** The diff against the
-replacement git base adds exactly **two `docs/` paths** — this record and `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` — and nothing else (Stage D F6a).
-Under **AEGIS-APR-101** (L3149-L3159; the separation rule at **L3155**) the keeper who records a full-page-acceptance row must be a different agent from the page's author, the accepting reviewer, **any other stage of this PR**, and **is not the coordinator**; only **P5 and P6** may receive a
+- **This batch authors NO keeper rows and appends NOTHING to the ledger.** At this replacement head the
+  tree adds exactly **one `docs/` path** — this record — and nothing else (AC1); the previously committed
+  plan file `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` is **deleted** under the lean plan,
+  because the plan of record lives only in PR #808 comment `6242584888` (Stage D F6a; lean plan §4/AC1).
+Under **AEGIS-APR-101** (L3149-L3159; the separation rule at **L3155**) the keeper who records a
+full-page-acceptance row must be a different agent from the page's author and the accepting reviewer,
+and **is not the coordinator**. Separately, this batch's own plan constrains its keeper also to differ
+from **any other stage of this replacement PR**; that extra exclusion is a **plan-specific constraint**,
+not part of the owner's APR-101 grant. Only **P5 and P6** may receive a
   full-page-acceptance row from this evidence, and the **six PARTIAL pages (P1, P2, P3, P4, P7 and P8)**
   receive **no row of any kind** and stay pending, exactly as section 3's eligibility rule after the
   replacement revision-2 reclassification states, so this opening handoff cannot be read as covering all
@@ -334,7 +342,9 @@ whole, **L1–88**. Purpose and normal use: the reference sheet the skill reads 
 record schema, the deterministic-versus-model-mediated step-tracing checks, the deviation-signal
 catalog, the drift-response ladder, the mutation-channel rules, and the per-channel hijack red-team
 payload catalog.
-Bullets: **B1** satisfied — L3 "Use this with the Agent Goal Hijack Defender" and L5
+Bullets: **B1** satisfied — L3 "Use this with the Agent Goal Hijack Defender" names the companion skill,
+and L5 completes the statement by scoping the page to a goal that can be changed by untrusted content,
+so the reader can see what L5 proves before the audit turns to the identifiers.
 **B2** **fails at the bound revision — measured,
   not waived.** `OWASP` and `ASI01` are explained in L3
 and the page's field names (`objective`,
@@ -772,7 +782,8 @@ complete B2 reading and left a term out. *After:* the bullet names `API` at L83,
 never expands it, and records the measurement that decides it under the record's own **C-1** rule
 (section 9, D1): over the **383** `.claude/skills` Markdown pages at the bound revision, **136** use
 the token `API`, **80** carry the expansion "application programming interface" somewhere, and
-**56** use it with no expansion at all — far above C-1's ~12-page convention, so a bare use is not a
+  **56** use it with no expansion at all — far above C-1's ~12-page convention, so a bare use is not a
+  **defect under C-1** (that is the historical conclusion this paragraph preserves as history).
 *Why PARTIAL now:* the Codex rule requires a **P1 to be fixed, not rebutted**; the audit bullet's
 completeness is fixed by naming the term and the
   measurement, and the page with a standing named defect
@@ -930,26 +941,25 @@ rows. *Requirement:* `docs/delivery-workflow.md` **L656-L664** requires skills-t
 pull-request metadata and states "Do not create a separate document merely to list skills". *After:* the
 path is **absent from this replacement — not added and not deleted**; the replacement diff is two `A`
 paths and contains no `D`. Its historical blobs are **history only and not a source**; nothing is
-restored. The rows stay where the protocol puts them — in the pull-request body's skills field — and
-this record keeps the stage work (Stage D F4). *Command:* `git diff --name-status f490c16f…..HEAD` →
-two `A` paths and no `D`; the one historical `D` is visible only on the superseded #789 head; against
-against the previous head `f7ae12a3` the same command reports the one `D`.
+  restored. The rows stay where the protocol puts them — in the pull-request body's skills field — and
+  this record keeps the stage work (Stage D F4). *Command:* `git diff --name-status <base>..HEAD` with
+  `<base>` = the replacement base `648ac767…` → the record's added path and the committed plan file's
+  deletion, and nothing else; the one historical `D` (the deleted skills-records file) is visible only
+  on the superseded #789 head and is not a replacement-head change.
 
 **11.3 — the file set and the diff figures, restated for this replacement.**
-- Paths against the replacement git base `<base>`: **2
-  added, 0 modified, 0 deleted** — this record and
-  `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md`. The record base is blob
-  `e632b3a1735af56c17282eee47f442f6206e8f75` (85,003 B / 959 LF / 0 CR); the replacement record is that
-  blob with exactly the bounded hunks applied, so it contains no deletion.
-- The replacement plan's **frozen blob/bytes/LF/CR and its capture commit** are recorded in the
-  replacement pull-request body and Stage C handoff; `git rev-parse <capture commit>:<plan>` equals the
-  plan blob. The plan base `3b29014f…` is **#789 history**, not this replacement's base.
+- Paths against the replacement git base `<base>` = `648ac767…`: **one added `docs/` path** — this record
+  — and the **deletion** of the previously committed plan file
+  `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md`; 0 modified. The record base is blob
+  `e632b3a1…` (85,003 B / 959 LF / 0 CR); the replacement record is that blob with exactly the bounded
+  hunks applied.
+- The lean plan of record lives only in PR #808 comment `6242584888` (14,414 B, immutable); it
+  supersedes fresh re-open #7 plan revision 1 capture `6242008717` / ACCEPT `6242064103` and requires
+  the committed plan file's deletion. No committed plan file exists at this head.
 - **#789 history, quoted only as history:** accepted plan revision 8 and #789's tracked plan revision 1
   are **superseded history**; the capture-era record blob `493c4841…` and its `675 0` numstat are
-  capture-era figures, not replacement-head values. The replacement file set is the two paths above;
-  **AC3 of this plan names two paths**, and
-    the record's current dispositions are **2 FULL / 6 PARTIAL**
-  (P5, P6 FULL; P1-P4, P7, P8 PARTIAL) per the replacement revision-2 reclassification (H11-H13).
+  capture-era figures, not replacement-head values. The record's current dispositions are **2 FULL / 6
+  PARTIAL** (P5, P6 FULL; P1-P4, P7, P8 PARTIAL) per the replacement revision-2 reclassification (H11-H13).
 
 **11.4 — what this round did not do.** It did not edit any of the eight pages, re-read a page, change
 a page verdict or count, author a keeper row, edit the ledger or the index, run
@@ -962,15 +972,19 @@ self-graded.
 
 **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** This section was authored by the
 Stage C (IMPLEMENT) agent of the closed PR #807 replacement attempt – true identity `sd-b-789-repl-r1`,
-stage role `sd-c-789-repl2-r1` – and is carried into this fresh replacement by its Stage C agent, true
-identity `sd-a-789-repl-r2`, stage role `sd-c-789-repl3-r1`. It is a pure append: the record is the base blob
-`e632b3a1735af56c17282eee47f442f6206e8f75` with exactly **27 edit hunks** applied and **no other line
-changed**; this section is the 28th hunk and the only insertion, after old line 959.
+stage role `sd-c-789-repl2-r1` – and is carried into this replacement by its **current carrier**, true
+identity `sd-b-789-repl-r1`, stage role `sd-c-789-fresh7-c1`, and repaired in round 1 of the owner's
+two-round cap by stage role `sd-c-789-lean1-c1` (same true identity). The earlier fresh #3 agent
+(`sd-a-789-repl-r2` / `sd-c-789-repl3-r1`) is labelled **historical provenance only**. It is a pure
+append: the record is the base blob `e632b3a1735af56c17282eee47f442f6206e8f75` with exactly **27 edit
+hunks** applied and **no other line changed**; this section is the 28th hunk and the only insertion,
+after old line 959.
 
-- **File set.** The replacement adds exactly **two `docs/` paths** — this record and
-  `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` — with **0 modified and 0 deleted**. Nothing
-  under `scripts/`, `tools/`, `.github/`, `.claude/` or `AGENTS.md`; no ledger, index, register, manifest
-  or keeper row; no skills-records file. The class stays `docs-only`.
+- **File set.** The replacement head adds exactly **one `docs/` path** — this record — and deletes the
+  previously committed plan file `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` (the plan of
+  record lives only in PR #808 comment `6242584888`); **0 modified**. Nothing under `scripts/`, `tools/`,
+  `.github/`, `.claude/` or `AGENTS.md`; no ledger, index, register, manifest or keeper row; no
+  skills-records file. The class stays `docs-only`.
 - **Rows 1-18 are UNAVAILABLE, not reconstructed.** Every rows-1-18 `Row source` record in the
   replacement PR body reads `source=UNAVAILABLE; binding=none`. The cited `0c994d77` / `405dfd44` blob
   matches only 13/18 rows and carries the literal ` + BY + ` placeholder on the other five; the
@@ -994,8 +1008,14 @@ changed**; this section is the 28th hunk and the only insertion, after old line 
 - **Carried sections 9-11 are #789 history, not re-run here.** The fourteen #789 Codex threads were
   replied to and resolved on the already-closed #789 under the plan's section 8 ledger; this replacement
   PR runs its own automated-review round at its own head.
-- **Stage C entry.** This replacement's Stage C entry is the **fresh Stage B ACCEPT** bound to the fresh
-re-open #3 plan revision 3 capture (comment `6240473164`, frozen sha256
-`d9369d60a5ea78aa0936c5de169793ee4977f23bea10b8c67c15300537ba4c1f`; ACCEPT comment `6240539073`), and
-#789's D3 stays history. The plan file at the plan path is this capture's frozen span, byte for byte. No
-merge is performed or authorized by this section.
+- **Stage C entry and plan of record.** This replacement's Stage C entry is the fresh Stage B ACCEPT
+  `6242664603` bound to the **lean plan of record** capture `6242584888` (immutable PR #808 issue
+  comment, 14,414 B; it supersedes fresh re-open #7 plan revision 1 capture `6242008717` / ACCEPT
+  `6242064103` and requires the committed plan file's deletion). The record's **frozen derivation
+  boundary** is blob `3e23bc83f7b73166e44c6b1d8f4e79da784f6fb8` (sha256
+  `4bbf733d7cdabda425dc7ab1b608388a07ce0c0f8d39bb7b83a74bfaaaac1153`, 89,892 B / 1,001 LF / 0 CR),
+  derived from the **base provenance** blob `e632b3a1735af56c17282eee47f442f6206e8f75` (sha256
+  `34c5c251018666eb6fc8d25b10278807fd6eea64b7fe238c6dcb263626b608cf`, 85,003 B / 959 LF / 0 CR) by
+  the 28 bounded hunks. **Both hashes and byte counts are carried here as content (AC2)**, so the
+  derivation is reproducible from this record's own text without a bare `git cat-file` of the base blob
+  in a clean checkout. #789's D3 stays history. No merge is performed or authorized by this section.
