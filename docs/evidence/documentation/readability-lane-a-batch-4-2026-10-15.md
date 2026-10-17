@@ -55,6 +55,17 @@ reported in the pull-request body).
   rule requires. These figures are at that head; this round's own commit adds lines to the same
   three paths and therefore moves the current-main insertion count by its own inserted lines,
   measured and stated in the Stage C round-7 handoff comment.
+
+- **Dated correction, 2026-10-17 (Stage C repair round 8) — the branch adds TWO paths, not three.**
+  Round 8 **deleted** `docs/evidence/documentation/readability-lane-a-batch-4-skills-records-2026-10-16.md`
+  under Codex P2 comment `4303397270` and `docs/delivery-workflow.md` **L664** ("Do not create a
+  separate document merely to list skills"), so the derivation-base coordinate at the pre-edit head
+  `f7ae12a3…` is **two added paths**: `git diff --numstat f490c16f9ed23f3d489e42f7696323bffcce6fd3..HEAD`
+  → `858 0` (this record) and `451 0` (the tracked plan), i.e. **+1,309 / −0**, 0 modified and
+  0 deleted against the base. This round's own commit adds lines to this record, so the post-commit
+  numstat and the re-measured current-main coordinate are stated in the Stage C round-8 handoff
+  comment. The figures in the two bullets above remain as the measurement they were at `f848b1a9`;
+  section 11 restates every live figure and every reference to the removed file.
 - **This round's own moves, stated so no reader mistakes them for drift.** The Stage C repair
   round 7 (2026-10-17) edits this record's prose and the tracked plan's self-description, and
   **edits none of the eight pages**; its dispositions are in section 10, and the eight page blob
@@ -719,6 +730,11 @@ edits **no page**. *Codex* is the automated reviewer `chatgpt-codex-connector[bo
 is read by `original_commit_id` — the head a finding was written against — never by a re-anchored
 `commit_id`.
 
+*(Dated correction, 2026-10-17, Stage C repair round 8: the "skills-records file" named here was
+**removed from the pull request** in round 8 — see 11.2 — so the three-path repair described in this
+section is, at this head, a two-path branch plus one deletion. This paragraph is kept as the round-7
+state; section 11 carries the current one.)*
+
 **Receipts, and a second review the merge receipt did not see.** Two Codex reviews are bound to the
 superseded head `f848b1a902d67e1b40c325587df6455daa17771e`:
 
@@ -746,7 +762,7 @@ F chain is owed at the new head.
 | 3 | `4303335228` — "Stage B audit is not posted" | P2 | **Fixed** — the section-8 item now records the ten posted verdicts and their IDs, and preserves the retroactivity conclusion (10.3) | `gh api …/issues/789/comments` filtered on `SD-B` → **10** |
 | 4 | `4303335235` — plan L3 calls itself "plan of record" | P2 | **Fixed** — the tracked plan now marks itself revision 1, historical and superseded, and points at accepted revision 8 (10.4) | `git diff --stat` on the plan; read of L3 |
 | 5 | `4303335244` — moving-main numstat missing | P2 | **Fixed** — the derivation-base coordinate is retained and a second, labelled current-main coordinate is added (10.5) | `git diff --numstat 5dc96eda..f848b1a9`; `git rev-list --count f490c16f..5dc96eda` |
-| 6 | `4303335257` — false "0 `Row source` / 0 `WHAT:`" count | P2 | **Fixed** — the skills-records file now reports the per-comment counts it measured (10.6) | per-comment `Row source` / `WHAT:` counts over the saved comment bodies |
+| 6 | `4303335257` — false "0 `Row source` / 0 `WHAT:`" count | P2 | **Fixed** — the skills-records file now reports the per-comment counts it measured (10.6). *(Dated correction, round 8: that file was removed under `4303397270`; the counts stay reproducible from the live comment bodies by the stated command — see 11.2.)* | per-comment `Row source` / `WHAT:` counts over the saved comment bodies |
 
 **10.1 — P1 `4303335249`, P3's `API`: fixed by completing the audit bullet, not by moving the
 verdict.** *Before:* the P3 `B2` bullet said "**B2** satisfied — OWASP and ASI01 are explained in
@@ -783,6 +799,10 @@ its own `Row source` record. The row is a **correction record authored at round 
 round-4 self-authored usage account — the round-4 agent did not author one and this repair does not
 invent its account; the row says so in its own text. **Limit:** the row records the file set and the
 class; it does not retroactively supply a round-4 skills-usage account.
+
+*(Dated correction, 2026-10-17, Stage C repair round 8: the `44d8f431..f848b1a9` coordinate above
+remains a true measurement of that past diff — it is history, not a live file set — but the path it
+names as "1 added (the skills-records file, `165/0`)" no longer exists at this head. See 11.3.)*
 
 **10.3 — P2 `4303335228`, the "not posted" Stage B assertion: corrected in place.** *Before*
 (section 8, item iii): "The contents of the Stage B plan audit — it is not posted, so the PR's Stage C
@@ -821,6 +841,11 @@ the rule names. *Commands:* the two `git diff --numstat` invocations and
 round's own commit adds lines to the same three paths, and the post-commit figure is stated in the
 Stage C handoff.
 
+*(Dated correction, 2026-10-17, Stage C repair round 8: the derivation-base coordinate is now
+**two** added paths — `858/0` and `451/0`, **+1,309/−0** — and the current-main coordinate is
+re-measured after this round's commit and stated in the Stage C round-8 handoff comment. The
+three-path figures above remain as the measurement they were at `f848b1a9`. See 11.3.)*
+
 **10.6 — P2 `4303335257`, the false search count: corrected with the measured values.** *Before*
 (skills-records file, section 5): the four posted stage records "each carry 0 occurrences of the
 skills-table header, 0 of the string `Row source` and 0 of `WHAT:`". *Measured, by command, over the
@@ -832,6 +857,11 @@ not a skills row. *After:* the file states those per-comment counts and keeps th
 *Command:* `rg -o 'Row source' …` / a Python `re.finditer` count over each saved comment body;
 the numbers above are the counts observed. **Limit:** the file's own earlier claim was false for one
 of the four comments, and this round corrects it rather than deleting the history.
+
+*(Dated correction, 2026-10-17, Stage C repair round 8: this correction lived in the skills-records
+file the finding names, and that file was **removed** in round 8 under finding `4303397270`, so no
+tracked artifact now carries the per-comment counts. They remain reproducible from the live comment
+bodies by the command stated above; the no-row conclusion is unchanged. See 11.2.)*
 
 **10.7 — the two later findings: recorded, not fixed.** Review `5558680242` (16:09:44Z) adds two P2
 comments, both anchored in the tracked skills-records file:
@@ -850,9 +880,80 @@ They are **voided as head-bound verdicts** by the new head under exact-head inva
 substance is open and the fresh Stage D/E/F chain must see it. This record states them so that the
 handoff cannot read as "everything at `f848b1a9` was addressed".
 
+**Dated correction, 2026-10-17, Stage C repair round 8 — both findings are now FIXED, not open.**
+The paragraph above records the round-7 state and is kept as history. Round 8 fixed both under
+coordinator decision D789-R8: the dedicated file was **removed** (`4303397270`), and the eighteen
+`Row source` records in the pull-request body that named it now state their sources truthfully —
+**UNAVAILABLE** for rows 1-9, whose original author record was the mutable PR body, and a removed
+capture still retrievable at commit `0c994d77` for rows 10-18, whose author record that file was
+(`4303397265`). Section 11 carries the dispositions, the commands and the new coordinates.
+
 **10.8 — what this round did not do.** It did not edit any of the eight pages, re-read any page,
 change any page verdict or count, author a keeper row, edit the ledger or the index, run
 `build_index.py --write`, move the head by any means other than one DCO-signed commit, or merge. It
 did not re-audit the acceptance criteria, re-run Stage E, or post a stage verdict; those belong to the
 fresh D/E/F chain at the new head. Continuous integration at the new head is **UNRUN** here and owed
 to GitHub Actions, never self-graded.
+
+## 11. Stage C repair round 8 — the two later Codex findings, fixed (2026-10-17)
+
+**Written by DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**, the Stage C (IMPLEMENT) agent of
+round 8. I held no other stage of this change: I did not audit, review or merge it. This section
+forward-corrects, by dated correction rather than silent rewrite, every reference in this record to
+`docs/evidence/documentation/readability-lane-a-batch-4-skills-records-2026-10-16.md` — a path round
+8 **removed from the pull request**. Nothing above is deleted.
+
+**11.1 — P2 `4303397265` (rows 1-9's provenance): fixed by marking those rows UNAVAILABLE.**
+*Before:* the eighteen `Row source` records in the pull-request body's skills field named the
+skills-records file as each row's source and binding, and the file's own section 1 said it was a
+verbatim transcription whose original author record was the mutable pull-request body. *Why that was
+a defect:* `docs/delivery-workflow.md` **L681-L690** permits publication only from an existing fixed,
+self-authored source or a retained exact capture with a content digest and locator, and requires a
+lost capture to be treated as **unavailable** rather than reconstructed from a rendered table or
+memory. A transcription written after the fact cannot supply the missing author record, so byte
+equality with it never bound rows 1-9 to their claimed authors, stages or rounds. *After:* the
+eighteen records were rewritten. **Rows 1-9 are marked UNAVAILABLE** — the dedicated transcription
+was removed because `docs/delivery-workflow.md` **L664** forbids a separate document merely to list
+skills, and their original author record was the mutable pull-request body, which the protocol
+excludes; they are **not recovered and not reconstructed**. **Rows 10-18 are differentiated, because
+their author record was not the body:** that file *was* their self-authored capture, committed in the
+same commit that first published them (`0c994d77ad491bb329e07c056065b4d9bb8401ed`, blob
+`405dfd44295428064a0b603639b0e30614d29da1`), and that commit is immutable and still retrievable. Their
+records therefore name that commit revision as the locator and state that the capture was removed
+from the tree at this head but is retained at that revision — **not** reconstructed. No row string in
+the skills table changed.
+
+**11.2 — P2 `4303397270` (remove the dedicated document): fixed by removing it.** *Before:*
+`docs/evidence/documentation/readability-lane-a-batch-4-skills-records-2026-10-16.md` — 173 LF lines
+and 28,808 bytes at `f7ae12a3`, blob `68cf014782a96fe58ff6524599719b0c812ddb8d` — existed only to
+hold copies of skills-table rows. *Requirement:* `docs/delivery-workflow.md` **L656-L664** requires
+skills-table maintenance through pull-request metadata and states "Do not create a separate document
+merely to list skills"; calling the file an "author record" changed neither its contents nor its
+purpose. *After:* the path is **deleted** in this round's single commit. The rows themselves stay
+where the protocol puts them — in the pull-request body's skills field, which this round rewrote
+without moving the head for that rewrite — and this record keeps the stage work. *Command:*
+`git diff --name-status f490c16f9ed23f3d489e42f7696323bffcce6fd3..HEAD` → two `A` paths and no `D`;
+against the previous head `f7ae12a3` the same command reports the one `D`.
+
+**11.3 — the file set and the diff figures, restated at this head.**
+- Paths against the derivation base `f490c16f9ed23f3d489e42f7696323bffcce6fd3`: **2 added, 0
+  modified, 0 deleted** — this record and
+  `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md`. The deleted path never existed at the
+  base, so nothing is deleted against it.
+- `git diff --numstat f490c16f..HEAD` at the pre-edit head `f7ae12a3`: `858 0` (this record) and
+  `451 0` (the plan), i.e. **+1,309 / −0**. This round's commit adds lines to this record, so the
+  post-commit numstat and the re-measured current-main coordinate against `main`
+  `5dc96edad8b8d3715446079af9d552f8eb9e6a07` are stated in the Stage C round-8 handoff comment.
+- **The plan is not edited.** Measured: `git grep -n 'skills-records' f7ae12a3 -- docs/plans/` returns
+  no match, so deleting that path changes no statement in the accepted plan revision 8, its blob
+  stays `3b29014f7e800d9cb051788558ca4440cac101c3`, and revision 8 remains the accepted plan. The
+  plan's **AC3** asks for "exactly two added `docs/` paths", which this head satisfies literally
+  again; its **AC2** capture-era blob `493c4841…` and `675/0` numstat were already disclosed
+  post-plan repairs and remain so.
+
+**11.4 — what this round did not do.** It did not edit any of the eight pages, re-read a page, change
+a page verdict or count, author a keeper row, edit the ledger or the index, run
+`build_index.py --write`, or merge. It did not edit the plan. It did not re-audit the acceptance
+criteria, re-run Stage E, or post a stage verdict; those belong to the fresh Stage D/E/F chain at
+this head. Continuous integration at this head is **UNRUN** here and owed to GitHub Actions, never
+self-graded.
