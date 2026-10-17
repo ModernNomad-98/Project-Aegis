@@ -8,7 +8,7 @@ Agent: **sd-c-read-fresh1-c1** (true identity **sd-e-802-r1**; DeepSeek V4 Flash
 
 - **Added: exactly one path** — `docs/evidence/documentation/readability-lane-a-batch-4-2026-10-17.md`. **Modified: 0. Deleted: 0.**
 - **No** keeper row, index JSON edit, ledger edit, page edit, register edit, manifest edit, tool/test/workflow change. Change class **`docs-only`**; this is an evidence-only change.
-- **Eight pages read, zero pages edited**; every page's net line change is 0. **Three DCO-signed, model-attributed commits** carry this record: `725bac3c` (initial record), `c4f53575` (Codex round-1 repairs) and `a2df10bb` (Codex round-2 repairs); all three touch only the one added path, and none edits a page.
+- **Eight pages read, zero pages edited**; every page's net line change is 0. **Four DCO-signed, model-attributed commits** carried this record **through head `8fa0b89d`**: `725bac3c` (initial record), `c4f53575` (Codex round-1 repairs), `a2df10bb` (Codex round-2 repairs) and `8fa0b89d` (Codex round-3 repairs); all four touch only the one added path, and none edits a page. **The repair commit at the reviewed head updates this paragraph** (it adds itself, and any later repair commits, to this statement), so this provenance line stays true as the branch gains repair commits.
 - This record itself is not counted as an accepted page: it is a new reader page and enters the pending set on its own (the self-cost every batch record states).
 
 ## 2. Lane derivation at this base — re-run, not handed down
@@ -134,7 +134,7 @@ Bullets: B1 satisfied — L1 title (ASI03); L3 use with the owning skill; L5-10 
 | 6 | `grep -n 'WIP'` on P1 | page L17 — unexpanded abbreviation (gap named in P1) |
 | 7 | `git stash -h` | `(-m \| --message) <message>` — the page's `git stash push -u -m` example lacks the operand (gap named in P1) |
 | 8 | `gh api --help` | documents `--paginate`; the P4/P5 timeline commands do not request it (gaps named in P4/P5) |
-| 8c | `git log --oneline 648ac767..a2df10bb` | three commits (`725bac3c`, `c4f53575`, `a2df10bb`) — scope accounting in §1 now names all three |
+| 8c | `git log --oneline 648ac767..8fa0b89d` | four commits (`725bac3c`, `c4f53575`, `a2df10bb`, `8fa0b89d`) — scope accounting in §1 names all four through that head and carries the repair-commit qualifier |
 | 8d | `git rebase -h` / `git merge -h` | no `rebase/merge` command; P1 L88 entry named as a gap |
 | 8e | `grep -n SEV` on P7 | page L107 `[SEV]` unexpanded — named as a P7 B2 gap |
 | 8b | `grep -n` per cited line: `authz` (P2 L145), `API` (P3 L83), `prod` (P5 L14), `AI` (P6 L3 and L17), `URL` (P7 L156), `ASI03` (P8 L1 and L6) | each is a first-use/unexpanded abbreviation gap named in §4/§5 |
