@@ -1435,16 +1435,18 @@ makes the first figure false and the second clause ambiguous, so both are correc
 rounds are named in order.
 
 **This round's deleted lines, counted and sited.** Replacing a statement deletes the text it
-replaced. Counted as **every deletion line** in
-`git diff -U0 4ff17269d681571947dfc9d2e055a8fcdc1152a6..<this round's commit> -- docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md`,
-excluding only the `---` diff header and taken from `-U0` hunks so no deletion is
-hidden by context, the deletion lines number **33** and the site table totals 33. The
-commit hash is published in this pull request's body and in the Stage C handoff, because a
-file cannot name the commit that contains it. **The addition count grows when this section is
-appended; the deletion count does not** — measured against the working tree immediately
-before this section was appended, `git diff --numstat 4ff17269 -- <this path>` read
-`79  33`; this section adds lines and deletes none, so the 33 and the site set above stand
-unchanged, while the addition count moves.
+replaced. Measured against the working tree immediately before this section was appended,
+`git diff --numstat 4ff17269 -- <this path>` read `79  33`; this section adds lines and
+deletes none, so its own append moved no deletion count. Counted as **every deletion line**
+in the round's first commit,
+`git diff -U0 4ff17269d681571947dfc9d2e055a8fcdc1152a6..1e9b1ccfc4827835747cc8e847494a838b9af257 -- docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md`,
+(the commit that carries this section), excluding only the `---` diff header and taken from
+`-U0` hunks so no deletion is hidden by context, the deletion lines number **33** and the
+site table below totals 33. **Two later commits of the same round correct this section in
+place** — the body's row numbered 5 where it is round 6, §7's first bullet's present-tense
+edit count, and the per-commit counts this sentence states — and each is counted the same
+way against its own parent; the round's total at the head it produced is recorded in the
+Stage C handoff, because a later commit of the round cannot be named by text it contains.
 
 | Site (line numbers at `4ff17269`) | Lines deleted |
 | --- | --- |
