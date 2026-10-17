@@ -6182,6 +6182,14 @@ the entry governs.
   recorded; the definition is not given; the definition and any grant under it
   are owed together, with the scoped grant this entry records as owed.
 
+  **Every register-wide search count in this entry — the search above, those
+  under subject (ii)(a) and subject (ii)(c), and the register search under the
+  silences — was taken against the register blob at this entry's base**, blob
+  `7b2a0411fc4c408c713d4a4959fd192f3f978c01`, which is `origin/main` at
+  `248baec9` before this entry was appended (the one tree-wide search likewise
+  read that commit), **and is not a claim about the post-append head**, where
+  each search returns its base count plus the lines this entry adds.
+
   **The relay this work item carried, recorded as a relay and not as the
   owner's words.** The dispatching brief for this entry glossed the
   receipt-posting as *"the standing practice by which the coordinator appends an
