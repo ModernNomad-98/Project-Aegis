@@ -1,12 +1,21 @@
 # Stage A plan — Phase 4 re-read, lane A, batch 4 (pull request #789)
 
-**What this file is.** This is the Stage A **plan of record** for pull request (PR) #789 in the
-Project Aegis source library (Role A — the repository that ships the skills library). It is a
-**tracked file** so that its exact text has an immutable revision: the Git **blob ID** (the content
-hash Git computes for one file revision) this file carries when it is captured. The blob ID is
-recorded in the PR body, and the commit that adds this file is the capture. Editing this file after
-capture changes the blob ID and voids an ACCEPT that named the old one — the captured-revision rule
-of [the delivery workflow](../delivery-workflow.md) L611-L616.
+**What this file is.** This is the Stage A **plan for pull request (PR) #789, revision 1 —
+historical and superseded; it is not the operative plan of record.** The accepted plan is
+**revision 8**, bound to immutable PR comment `6230945952` (blob
+`55a8d119fb4b401925007413db44eeda1a456975`, sha256
+`dee55afa14ee9855e766238645cb387fa1a3266aad68d9d79c2c48ac76d270c0`), which the Stage B audit
+accepted in comment `6231090198`; revisions 2–7 are superseded in turn, and revision 1 stays in
+the tree as the captured first text. The plan belongs to the Project Aegis source library (Role A —
+the repository that ships the skills library). It is a **tracked file** so that its exact text has
+an immutable revision: the Git **blob ID** (the content hash Git computes for one file revision)
+this file carries when it is captured. The blob ID is recorded in the PR body, and the commit that
+adds this file is the capture. Editing this file after capture changes the blob ID and voids an
+ACCEPT that named the old one — the captured-revision rule of
+[the delivery workflow](../delivery-workflow.md) L611-L616. (This header sentence was amended by
+the Stage C repair round 7 on 2026-10-17 to mark this revision superseded — Codex P2 comment
+`4303335235`. The amendment changes this file's blob and alters no other sentence's claim; the
+accepted revision 8 is not restated or re-cut here.)
 
 **Reading key — one plain-English gloss per internal label used here.** *PR* = pull request, a
 proposed repository change. *head* = the PR branch's exact latest commit (a 40-character Git object

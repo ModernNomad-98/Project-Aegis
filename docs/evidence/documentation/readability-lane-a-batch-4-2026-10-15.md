@@ -38,6 +38,27 @@ reported in the pull-request body).
   added/deleted-line figure in this record is a diff against **this** revision, not against
   whatever `main` happens to be later, because main has moved repeatedly today and a diff against
   a newer main would show other pull requests' additions as this batch's deletions.
+- **Current-main numstat — the second coordinate the owner's rule requires.**
+  [OWNER-DECISIONS-2026-10-15.md L301–303](../../roadmaps/OWNER-DECISIONS-2026-10-15.md) makes a
+  lane record state **both** numstats, labelled by coordinate: the diff against the derivation base
+  **and** the diff against current `main` (which may show phantom deletions). Measured this round at
+  the head that carried it, `f848b1a902d67e1b40c325587df6455daa17771e`, with the live `main` tip
+  `5dc96edad8b8d3715446079af9d552f8eb9e6a07` (**102** commits after the derivation base;
+  `git rev-list --count f490c16f..5dc96eda`): `git diff --shortstat 5dc96eda..f848b1a9` returns
+  **60 files changed, `1,290` insertions(+), `15,919` deletions(-)**; the same command's
+  `--numstat` form shows **the branch's three added paths carry `675 / 0`, `165 / 0` and
+  `442 / 0`**, and the other **57** files are `main`'s own
+  intervening changes, whose `15,919` lines appear as deletions **only because this branch does not
+  carry them** — the phantom deletions the owner's rule names, **not** removals by this batch. The
+  insert-only property is therefore stated against the derivation base (three added paths,
+  `+1,282 / −0`), and the moving coordinate is stated here, separately labelled, exactly as the
+  rule requires. These figures are at that head; this round's own commit adds lines to the same
+  three paths and therefore moves the current-main insertion count by its own inserted lines,
+  measured and stated in the Stage C round-7 handoff comment.
+- **This round's own moves, stated so no reader mistakes them for drift.** The Stage C repair
+  round 7 (2026-10-17) edits this record's prose and the tracked plan's self-description, and
+  **edits none of the eight pages**; its dispositions are in section 10, and the eight page blob
+  IDs recorded in section 3 are the bound-revision blobs, which no commit of this branch changes.
 - **Acceptance revision bound by all eight reads:**
   `f490c16f9ed23f3d489e42f7696323bffcce6fd3`. *Acceptance revision* is the named 40-character
   revision a reader actually read; all eight pages are byte-identical at this revision and at the
@@ -306,7 +327,16 @@ Bullets: **B1** satisfied — L3 "Use this with the Agent Goal Hijack Defender" 
 "Detail file for `agent-goal-hijack-defender`. Read on demand." **B2** satisfied — OWASP and ASI01
 are explained in L3, and the page's field names (`objective`, `scope`, `constraints`,
 `principal`, `provenance`) are defined by the schema table at L12–18; `SAFE` (L77) is a template
-token, the same non-defining case the lane's batch-3 record recorded for `SEV`. **B3** satisfied —
+token, the same non-defining case the lane's batch-3 record recorded for `SEV`; and `API` at
+**L83** ("API/tool returns …") is the one term this bullet **left out when the page was first
+audited** — recorded now rather than hidden. The page never expands it, but over the **383**
+`.claude/skills` Markdown pages at the bound revision **136 use the token `API`**, **80** carry the
+expansion "application programming interface" somewhere, and **56** use it with no expansion at all
+— far above C-1's ~12-page convention, which is the standing ruling this record applies to `authz`
+in section 9 (D1), so under C-1 the bare use is **not counted as a defect** and the verdict stays
+FULL. (Codex P1 comment `4303335249`, disposed in section 10: what was defective was the audit
+bullet's completeness claim, not the page or the verdict — the bullet said B2 was satisfied while
+leaving this term unmentioned, and it now names the term and the measurement.) **B3** satisfied —
 the schema, signal and payload tables each carry a worked example (L41 ""migrate" run starts
 exporting", L82 the retrieved-doc payload), and L47–48 and L65–67 state what the controls produce
 and refuse. **B4** satisfied with note — the page is a design reference and makes no
@@ -543,8 +573,14 @@ P8 partial: .claude/skills/agent-identity-privilege-reviewer/references/agent-id
   corrected five-body calibration replaces it. (ii) That each of the eight pages was read whole "in
   one read with no display elision" — a claim about a session no later agent can observe; only its
   checkable consequences (line counts, ranges, per-bullet content, defect lines) were verified.
-  (iii) The contents of the Stage B plan audit — it is not posted, so the PR's Stage C entry
-  condition remains unmet (section 9, D3) and the ordering breach cannot be cured retroactively.
+  (iii) The contents of the Stage B plan audit — **corrected in place (dated correction,
+  2026-10-17, Stage C repair round 7): ten Stage B verdicts ARE posted on this PR** —
+  `6211547391`, `6212640376`, `6214235532`, `6214669507`, `6215491017`, `6216381457`,
+  `6217383697`, `6218833659`, `6230854823` and `6231090198`, counted by command in section 10 —
+  and the latest is an **`SD-B: ACCEPT` at plan revision 8** (comment `6231090198`). The separate
+  conclusion stands unchanged: a later audit **cannot** retroactively satisfy the Stage C entry
+  condition, so the ordering breach is recorded as history and cannot be cured retroactively
+  (section 9, D3).
   (iv) Continuous integration at this round's head: owed to GitHub Actions after the push and
   recorded in the pull-request body, never claimed here.
 - **The six `cannot_decide` pages remain undecided.** This batch did not investigate whether their
@@ -622,7 +658,7 @@ pure-docs path (L404–416), and routes a non-affirmative disposition back rathe
 point is accepted: a plan audit performed later cannot retroactively satisfy the Stage C entry
 condition. **No Stage B verdict is posted on this PR** (PR #789's issue comments are the Codex
 summary and the Stage D verdict, and its only review is Codex's), so this item's Stage C entry
-condition is **unmet**. **(Dated correction, 2026-10-16 - SD-B (the independent plan audit: the stage that reviews the plan before implementation begins) has posted three verdicts on this PR, each verified with `gh api repos/ModernNomad-98/Project-Aegis/issues/comments/<id>`: `6211547391` (SD-B: REVISE, 2026-10-16T08:37:37Z), `6212640376` (SD-B: ACCEPT, 2026-10-16T09:38:47Z) and `6218833659` (SD-B: REVISE, 2026-10-16T15:28:08Z). The parenthetical above was therefore false when it was committed and is false at this head; the latest of the three is a REVISE, so the conclusion this item draws is unchanged and still holds. The historical sentence is corrected in place, never deleted.)** This Stage C repair cannot self-issue the audit — no agent performs two
+condition is **unmet**. **(Dated correction, 2026-10-16 - SD-B (the independent plan audit: the stage that reviews the plan before implementation begins) has posted three verdicts on this PR, each verified with `gh api repos/ModernNomad-98/Project-Aegis/issues/comments/<id>`: `6211547391` (SD-B: REVISE, 2026-10-16T08:37:37Z), `6212640376` (SD-B: ACCEPT, 2026-10-16T09:38:47Z) and `6218833659` (SD-B: REVISE, 2026-10-16T15:28:08Z). The parenthetical above was therefore false when it was committed and is false at this head; the latest of the three is a REVISE, so the conclusion this item draws is unchanged and still holds. The historical sentence is corrected in place, never deleted.)** **(Dated correction, 2026-10-17, Stage C repair round 7 - the count in the parenthetical above is stale: **ten** Stage B verdicts are posted on this PR, the latest an `SD-B: ACCEPT` at plan revision 8 (comment `6231090198`), not "three" with "the latest ... a REVISE"; counted by command in section 10. The requirement this item names was subsequently satisfied by that ACCEPT — posted at revision 8 before the Stage C round-4 disposition (`6231324438`) and the Stage D round-2 audit (`6231575941`) — while the retroactivity point above is unchanged: no later audit can satisfy the entry condition after the fact.)** This Stage C repair cannot self-issue the audit — no agent performs two
 stages — so the required step is an **independent Stage B ACCEPT bound to the captured plan
 revision**, posted before merge; until it is posted this PR **must not merge**. This is a recorded,
 unresolved gate, not a waiver.
@@ -673,3 +709,150 @@ no row of any kind), so it stays **PARTIAL** and no page's eligibility changes.
 (**10** before this round's own commit in this full clone; the Stage D audit's clone measured
 **11** on the same fetch pattern) instead of the earlier clone-dependent "6"; the load-bearing half
 (**0** of those commits touch any of the eight pages) is unchanged and verified per path.
+
+## 10. Stage C repair round 7 — the Codex findings at `f848b1a9…`, disposed (2026-10-17)
+
+**Written by DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**, the Stage C repair agent of
+round 7. *Stage C* is the implementation stage of the delivery workflow; this round repairs this
+record, the tracked plan's self-description and the skills-records file's one false measurement, and
+edits **no page**. *Codex* is the automated reviewer `chatgpt-codex-connector[bot]`; every finding
+is read by `original_commit_id` — the head a finding was written against — never by a re-anchored
+`commit_id`.
+
+**Receipts, and a second review the merge receipt did not see.** Two Codex reviews are bound to the
+superseded head `f848b1a902d67e1b40c325587df6455daa17771e`:
+
+| Review | State | Submitted | Comments | Findings |
+| --- | --- | --- | ---: | --- |
+| `5558604135` | COMMENTED | 2026-10-17T15:52:26Z | 6 | **1 P1** (`4303335249`) + **5 P2** (`4303335212`, `4303335228`, `4303335235`, `4303335244`, `4303335257`), all `original_commit_id = f848b1a9…` |
+| `5558680242` | COMMENTED | 2026-10-17T16:09:44Z | 2 | **2 P2** (`4303397265`, `4303397270`), both `original_commit_id = f848b1a9…` |
+
+The second review landed **17 minutes after** the Stage G `NOT MERGED` receipt (comment
+`6236306995`, 2026-10-17T16:05:33Z) and its erratum (`6236313003`, 16:05:59Z), so neither the
+receipt nor the brief that assigned this repair could account for it. This round disposes the **six**
+findings that review `5558604135` carries; the two later findings are **recorded, not fixed**, in
+section 10.7 with their reason, so that no reader mistakes this round for a complete disposition of
+everything at that head.
+
+**Disposition vocabulary.** *Fixed* = the artifact now states the measured fact the finding asks
+for, with the verifying command named. *Recorded, not fixed* = the finding stands open with its
+reason. Nothing here is a stage disposition; this is Stage C's own record, and a fresh Stage D, E and
+F chain is owed at the new head.
+
+| # | Finding | Badge | Disposition | Verifying command |
+| --- | --- | --- | --- | --- |
+| 1 | `4303335249` — P3's B2 audit omits `API` | P1 | **Fixed** — the P3 B2 bullet now names `API` at L83 and its measured prevalence, and applies C-1's convention ruling explicitly; P3 stays FULL and no count changes (10.1) | `git show f490c16f:….claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` + the `git grep` counts |
+| 2 | `4303335212` — no round-4 classification row | P2 | **Fixed** — a round-4 `change-classification-gate` row is published as body row 27, bound to the measured round-4 diff (10.2) | `git diff --name-status 0c994d77 f848b1a9`; `git diff --name-status 44d8f431 f848b1a9` |
+| 3 | `4303335228` — "Stage B audit is not posted" | P2 | **Fixed** — the section-8 item now records the ten posted verdicts and their IDs, and preserves the retroactivity conclusion (10.3) | `gh api …/issues/789/comments` filtered on `SD-B` → **10** |
+| 4 | `4303335235` — plan L3 calls itself "plan of record" | P2 | **Fixed** — the tracked plan now marks itself revision 1, historical and superseded, and points at accepted revision 8 (10.4) | `git diff --stat` on the plan; read of L3 |
+| 5 | `4303335244` — moving-main numstat missing | P2 | **Fixed** — the derivation-base coordinate is retained and a second, labelled current-main coordinate is added (10.5) | `git diff --numstat 5dc96eda..f848b1a9`; `git rev-list --count f490c16f..5dc96eda` |
+| 6 | `4303335257` — false "0 `Row source` / 0 `WHAT:`" count | P2 | **Fixed** — the skills-records file now reports the per-comment counts it measured (10.6) | per-comment `Row source` / `WHAT:` counts over the saved comment bodies |
+
+**10.1 — P1 `4303335249`, P3's `API`: fixed by completing the audit bullet, not by moving the
+verdict.** *Before:* the P3 `B2` bullet said "**B2** satisfied — OWASP and ASI01 are explained in
+L3, …; `SAFE` (L77) is a template token …", and it did not mention `API`, which the page uses once
+at **L83** ("API/tool returns …") and never expands. The finding is right that the bullet claimed a
+complete B2 reading and left a term out. *After:* the bullet names `API` at L83, states that the page
+never expands it, and records the measurement that decides it under the record's own **C-1** rule
+(section 9, D1): over the **383** `.claude/skills` Markdown pages at the bound revision, **136** use
+the token `API`, **80** carry the expansion "application programming interface" somewhere, and
+**56** use it with no expansion at all — far above C-1's ~12-page convention, so a bare use is not a
+defect. *Why not PARTIAL:* the accepted plan revision 8's **AC6** requires **exactly 4 FULL / 4
+PARTIAL** and **no page carrying a defect with a FULL verdict**; reclassifying P3 would make AC6
+false against the accepted plan, which this round may not amend. The defect the finding actually
+identifies is the audit bullet's completeness, and that is what changed. *Commands:*
+`git show f490c16f9ed23f3d489e42f7696323bffcce6fd3:.claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md`
+→ `API` occurs **once**, at L83, and "application programming interface" **0** times;
+`git grep -l -I -E '\\bAPI\\b' f490c16f… -- '.claude/skills'` → **136** pages;
+`git grep -l -i -I -E 'application programming interface' …` → **80**; and the difference → **56**
+pages using it with no expansion. **Limit:** C-1 is this record's own standing ruling (stated in the
+plan's reading key and applied in D1); a reviewer who rejects C-1 itself would read the same page as
+PARTIAL, which is why the measurement is published beside the ruling rather than asserted.
+
+**10.2 — P2 `4303335212`, the missing round-4 classification row: fixed by publishing it.** *Before:*
+the only `change-classification-gate` row bound to Stage C was row 16, which described the **round-3**
+file set ("one added Markdown path …, 0 modified, 0 deleted"), while the final repair commit
+`f848b1a9` modified two tracked files. *Measured:* `git diff --name-status 0c994d77 f848b1a9` →
+**2 modified (`M`), 0 added, 0 deleted**, `git diff --numstat` → **1/1** and **5/5** (six insertions,
+six deletions); `git diff --name-status 44d8f431 f848b1a9` (the Stage D round-1 target) → **1 added**
+(the skills-records file, 165/0) **+ 1 modified** (this record, 1/1). *After:* body skills-field
+**row 27** is a round-4 `change-classification-gate` record whose RESULT states those two
+coordinates and classifies them **`docs-only`** (all paths are Markdown under `docs/`; nothing under
+`scripts/`, `.github/`, `.claude/`, `tools/`, `AGENTS.md`; no lock, data or generated file), with
+its own `Row source` record. The row is a **correction record authored at round 7** from git, not a
+round-4 self-authored usage account — the round-4 agent did not author one and this repair does not
+invent its account; the row says so in its own text. **Limit:** the row records the file set and the
+class; it does not retroactively supply a round-4 skills-usage account.
+
+**10.3 — P2 `4303335228`, the "not posted" Stage B assertion: corrected in place.** *Before*
+(section 8, item iii): "The contents of the Stage B plan audit — it is not posted, so the PR's Stage C
+entry condition remains unmet … and the ordering breach cannot be cured retroactively." *After:* the
+same item records that **ten** Stage B verdicts are posted — `6211547391`, `6212640376`,
+`6214235532`, `6214669507`, `6215491017`, `6216381457`, `6217383697`, `6218833659`,
+`6230854823`, `6231090198` — the latest an `SD-B: ACCEPT` at plan revision 8, and **preserves the
+separate conclusion**: a later audit cannot retroactively satisfy the Stage C entry condition. The
+same stale count in section 9's D3 parenthetical (it said "three" verdicts, "the latest … a REVISE")
+carries its own dated correction. *Command:* the live issue-comment list, filtered on a first line
+beginning `SD-B`, returns exactly those **10** IDs (measured by command in the Stage C handoff).
+**Limit:** the section-8 sentence and the D3 parenthetical are corrected in place, dated; the
+historical text is kept, as this record's convention requires.
+
+**10.4 — P2 `4303335235`, the tracked plan's self-description: corrected.** *Before*, plan L3: "This
+is the Stage A **plan of record** for pull request (PR) #789 …", while the accepted plan is
+**revision 8** (immutable comment `6230945952`, blob `55a8d119…`) and the tracked file is revision
+1 (`ac8da53e…`). *After:* L3 calls the file "the Stage A **plan, revision 1 — historical and
+superseded; it is not the operative plan of record**", names accepted revision 8 and comment
+`6230945952`, and keeps the capture-mechanism explanation that follows it. Editing the file changes
+its blob; the body names the head's new blob and keeps `ac8da53e…` as the historical revision-1
+blob. *Commands:* `git rev-parse f848b1a9:docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md`
+before the edit → `ac8da53e011796bc9086a355b14e4cc9fca8eb81`; after the commit, the new blob is
+recorded in the Stage C handoff and the body. **Limit:** the accepted revision 8 is not restated or
+re-cut here; no verdict named `ac8da53e…` as the accepted revision.
+
+**10.5 — P2 `4303335244`, the moving-main numstat: added, labelled.** The rule is
+`docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` **L301–303**: state both numstats, labelled by
+coordinate. The record's opening bullets now carry (i) the derivation-base coordinate — three added
+paths, `675/0`, `165/0`, `442/0`, `+1,282/−0` — and (ii) the **current-main** coordinate measured
+at `f848b1a9` with main at `5dc96eda`: `git diff --numstat 5dc96eda..f848b1a9` → **60 files,
+`1,290` insertions, `15,919` deletions**, of which this branch's three paths carry values above and
+the other **57** files are main's own intervening changes, whose deletions are the phantom deletions
+the rule names. *Commands:* the two `git diff --numstat` invocations and
+`git rev-list --count f490c16f..5dc96eda` → **102**. **Limit:** the figures are at `f848b1a9`; this
+round's own commit adds lines to the same three paths, and the post-commit figure is stated in the
+Stage C handoff.
+
+**10.6 — P2 `4303335257`, the false search count: corrected with the measured values.** *Before*
+(skills-records file, section 5): the four posted stage records "each carry 0 occurrences of the
+skills-table header, 0 of the string `Row source` and 0 of `WHAT:`". *Measured, by command, over the
+live comment bodies:* `6212640376` → **0 / 0 / 0**; `6213003590` → **0 / 0 / 0**;
+`6213436600` → **0 / 0 / 0**; `6213567787` (Stage F) → **0 four-column skills-table rows, but 3
+mentions of "Aegis skills used", 7 `Row source` occurrences (3 of them backticked) and 1
+`WHAT:`**, all of them argument text (a quoted search string and a discussion of the record shape),
+not a skills row. *After:* the file states those per-comment counts and keeps the no-row conclusion.
+*Command:* `rg -o 'Row source' …` / a Python `re.finditer` count over each saved comment body;
+the numbers above are the counts observed. **Limit:** the file's own earlier claim was false for one
+of the four comments, and this round corrects it rather than deleting the history.
+
+**10.7 — the two later findings: recorded, not fixed.** Review `5558680242` (16:09:44Z) adds two P2
+comments, both anchored in the tracked skills-records file:
+- `4303397265` (P2, file L9) — rows 1–9's provenance: a retroactive transcription cannot bind those
+  rows to their authors, and the file should mark them **unavailable** or obtain new author
+  revisions.
+- `4303397270` (P2, file L7) — "Remove the dedicated skills-row document": the 165-line file exists
+  only to preserve copies of skills-table rows, which `docs/delivery-workflow.md` L656–664 forbids as
+  a separate document.
+
+Both are **unfixed** at the new head, deliberately: each restructures the provenance design of the
+PR's third tracked path — deleting the file or re-marking rows 1–9 unavailable changes the PR's path
+set, every `Row source` record and the plan's file-set premise — which is outside this round's
+assigned scope (minimal record/plan edits) and outside Stage C's authority to decide unilaterally.
+They are **voided as head-bound verdicts** by the new head under exact-head invalidation, but their
+substance is open and the fresh Stage D/E/F chain must see it. This record states them so that the
+handoff cannot read as "everything at `f848b1a9` was addressed".
+
+**10.8 — what this round did not do.** It did not edit any of the eight pages, re-read any page,
+change any page verdict or count, author a keeper row, edit the ledger or the index, run
+`build_index.py --write`, move the head by any means other than one DCO-signed commit, or merge. It
+did not re-audit the acceptance criteria, re-run Stage E, or post a stage verdict; those belong to the
+fresh D/E/F chain at the new head. Continuous integration at the new head is **UNRUN** here and owed
+to GitHub Actions, never self-graded.
