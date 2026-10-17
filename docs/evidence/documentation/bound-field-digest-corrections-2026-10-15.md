@@ -8,7 +8,7 @@ record or comment drafted by an AI agent says so, and names the model).
 appended, not substituted: every superseded value it names stays readable where it was
 published, and the correction sits beside it. No pull-request (PR) body was edited to
 produce this record, and no merged artifact was rewritten to produce it. **This record's
-own text has been corrected in place five times. First on its Stage D repair round
+own text has been corrected in place six times. First on its Stage D repair round
 (§1, §2, §4.5, §4.6, §5, §6, §7 items 1 and 2, §8 and §9 changed; §10 quotes every
 sentence that was replaced and names the reason). Then on its Stage F repair round
 (§4.1, §4.5, §4.6, §4.7, §4.8, §7 item 2, §7 item 3, §10.2, §10.6 and this preamble
@@ -20,7 +20,7 @@ reason. Then on the **Stage C handoff round**, which corrects §8, §11.4 and
 §11.5 and appends §11.9; §11.9 quotes every sentence that round replaced. Then on the
 **AC10/AC14 repair round** (this round, 2026-10-17), which corrects §2, §4.2, §7 item 1,
 §7's first bullet, §11.7 and §11.9 gap 3 and appends §11.10; §11.10 quotes every
-sentence this round replaced. This change's
+sentence this round replaced. Then on the **Stage C round-2 repair round** (this round, 2026-10-17, answering the Stage F round-2 verdict `SD-F: REVISE`, issue comment 6237455039), which corrects §4.1, §4.2, §4.5, §4.6, §5, §7's first bullet, §7 items 1 and 2, §10.6, §10.8 and §11.10 and appends §11.11; §11.11 quotes every sentence this round replaced. This change's
 own PR body was edited once as well, for a stale figure sitting
 inside its own bound skills field (§8, §10); its Stage F repair round added plain-English
 label glosses to the body **outside** all three bound fields and left the bound-field
@@ -32,8 +32,7 @@ and to name the head it produced, leaving the digest unchanged (§11.9). The AC1
 repair round edited it again: outside every bound field for the head, the stage chain and
 the round counts, and **inside** the bound skills field for one new Stage C row and its
 `Row source` record, which moved the digest from `078ec42572ff330a` to the value the
-published body states (§11.10). No other pull
-request's body was touched.**
+published body states (§11.10). The Stage F round-2 review then edited the body again, **inside** the bound skills field, adding its own Stage F rows and two unavailable-evidence gap records and moving the digest from `7da4fe63b26219de` to `14f1cc5d96ee42c6`; and this **Stage C round-2 repair round** edits it once more — outside every bound field (the head, the stage chain, the round counts, the F-3 endpoint figure and the F-4 `Row source` count) and **inside** the bound skills field (four Stage C round-7 rows, one group `Row source` record, and historical marks) — with the resulting digest published in the body's closing paragraph (§11.11). No other pull request's body was touched.**
 
 **Reading key (one line per internal label, in plain English).**
 
@@ -233,20 +232,15 @@ stated purpose)**, the **current value (marked current)**, and why they differ.
 
 | | |
 | --- | --- |
-| Published value, PR #782 body | `121a60bce86cff98` |
-| Recomputed by the canonical method | `121a60bce86cff98` — **identical** |
+| Published value, PR #782 body (creation revision `2026-10-15T20:57:26Z`) | `121a60bce86cff98` |
+| Recomputed by the canonical method at that revision | `121a60bce86cff98` — **identical** |
 | Published normalized payload lengths (witness / skills / security) | `1259 / 6855 / 40` |
-| Recomputed normalized payload lengths | `1259 / 6855 / 40` — **identical** |
-| Body edits recorded by the API (`userContentEdits.totalCount`) | **0** |
-| Body anchor | `f4a229eda2cd60937a8fbe0121065c3b39ca5e9a7de9e7dee4bf324a18fc9073` |
+| Recomputed normalized payload lengths at that revision | `1259 / 6855 / 40` — **identical** |
+| Live-body recompute (re-measured 2026-10-17) | `14a96bd772f6083e` at `1259 / 7063 / 40` — the **skills** payload grew from 6855 to 7063, so the published digest no longer covers the live body |
+| Body edits recorded by the API (`userContentEdits.totalCount`) | **0** at the dated control `2026-10-16T03:00:16Z`; **2** re-measured 2026-10-17 — the creation plus one edit, `lastEditedAt` `2026-10-16T06:26:45Z`. Method: `totalCount`, per-entry `editedAt` and `lastEditedAt`; the PR object's `updatedAt` is NOT used, because it advances on metadata-only updates (Codex finding 4303650442, §11.11) |
+| Body anchor | `f4a229eda2cd60937a8fbe0121065c3b39ca5e9a7de9e7dee4bf324a18fc9073` (creation revision; §3's anchor) |
 
-**Current: `121a60bce86cff98`. Superseded: none.** The claim that the published digest
-"no longer reproduces" is **false for this body**, as is the claim that the body was
-edited after the digest was written: the API records **zero** body edits on #782
-(control, re-measured for the Stage F repair round at **2026-10-16T03:00:16Z**: the same
-API records **7** on #783, **4** on #789, 2 on #776 and 2 on #771, so a zero is a
-measurement, not a missing field; the earlier reading of this control — 6 on #783 and 3
-on #789 — was true when it was taken and is recorded as disclosed drift in §11).
+**Published value `121a60bce86cff98` is superseded as the current body value by the live body's `14a96bd772f6083e`.** It reproduces exactly at the creation revision `2026-10-15T20:57:26Z` (re-derived 2026-10-17 from that revision's retained text) and not from the live body. Because the bound skills field changed after the digest was written, the published value no longer binds the live body: **#782 owes a fresh Stage F at its current body and current digest.** The claim that the published digest "no longer reproduces" is **false for the creation revision**, and the claim that the body was never edited was true only of the dated control: the API recorded **zero** body edits at **2026-10-16T03:00:16Z** (the same API records **7** on #783, **4** on #789, 2 on #776 and 2 on #771 there, so a zero is a measurement, not a missing field; the earlier reading of this control — 6 on #783 and 3 on #789 — was true when it was taken and is recorded as disclosed drift in §11). §4.7's refutation of the defect comment stands for the comment's own date; what changed afterwards is the body.
 
 ### 4.2 PR #777 — no correction is owed on the digest; the defect claim is refuted
 
@@ -259,7 +253,7 @@ on #789 — was true when it was taken and is recorded as disclosed drift in §1
 | Body edits recorded by the API (`userContentEdits.totalCount`) | **0** at the §4.1 control (`2026-10-16T03:00:16Z`); **2** re-measured 2026-10-17 — the creation plus one edit at `2026-10-16T07:34:58Z` |
 | Body anchor | `377237991cfdb9f0d0e843ade738534c21ca271aa32fdc68f6b787f667d554f0` |
 
-**Value at the `2026-10-15T19:03:36Z` revision: `70ef1815189fe918`. Superseded: none.** Same
+**Value at the `2026-10-15T19:03:36Z` revision: `70ef1815189fe918`; superseded as the current body value by the live body's `8aed60d23098b041` (§5's row is updated).** Same
 refutation as §4.1, on the same dated control. The body has since moved:
 `userContentEdits.totalCount` is **2** — its creation `2026-10-15T19:03:36Z` plus one edit at
 `2026-10-16T07:34:58Z` — so the value reproduces at that recorded revision and not from the
@@ -316,7 +310,7 @@ consequence: none from this entry.**
 | Reproduces exactly under that reading? | **yes** — re-derived for this repair, twice, in Python `hashlib` and in Node `crypto` |
 | Recomputed normalized payload lengths (canonical) | `1926 / 7081 / 477` |
 | Raw payload lengths under the published reading | `1930 / 7086 / 481` — **+4 / +5 / +4 against the canonical row directly above**, which is the base these deltas are measured against: the naive split keeps the newline that ends the opening sentinel *line* and the newline that begins the closing sentinel line, two newlines per end, so +4 per field, plus the skills payload's one internal blank line, which the canonical collapse absorbs and this reading keeps (+5 there). The earlier version of this row read "each field exactly +2" with no base named. Against the **verbatim** reading §4.6 names (`1928 / 7084 / 479`) these payloads measure **+2 / +2 / +2** — every field exactly +2, so that superseded sentence was in fact true of this row's figures against the *verbatim* base and false against canonical — while **+2 / +3 / +2** is what the **verbatim** reading measures against canonical, and belongs to §4.6's own row alone. §11 records the correction; §11.5 quotes this row's superseded wording and records the correction of the correction. |
-| Body edits recorded by the API | **0** — weak evidence, not proof: the body's `updated_at` is 19:08:06Z, 15 s after its `created_at` at 19:07:51Z, so this body moved and the API recorded no edit for it |
+| Body edits recorded by the API | **0** at the dated control `2026-10-16T03:00:16Z`; **3** re-measured 2026-10-17 — the creation `2026-10-15T19:07:51Z` plus edits at `2026-10-16T06:56:17Z` and `2026-10-16T16:17:55Z`, `lastEditedAt` `2026-10-16T16:17:55Z` — and the three bound fields are byte-unchanged, so the live body still recomputes to `5feb2e444d998034` at `1926 / 7081 / 477` (re-measured this round) |
 | Body anchor | `2d1363e0a7f7bb1b8693f503f5f04e63c81746d1a7e24998893eef57b9f1afac` |
 
 **Current (canonical recompute of the posted body): `5feb2e444d998034`. Superseded (for
@@ -345,18 +339,11 @@ assertion.
 
 **Why the figure differs from the body's own sentence — stated as possibilities, not as
 facts.** Either the figure was computed by a script that resolved sentinels by substring
-and skipped the collapse, or it was computed from a draft. What **is** established is
-that the API's zero for this body is not proof the body never moved: `updated_at`
-(19:08:06Z) is 15 s later than `created_at` (19:07:51Z) while
-`userContentEdits.totalCount` reads 0. This record does not pretend to distinguish the
-possibilities.
+and skipped the collapse, or it was computed from a draft. What **is** established is that the API's zero for this body at the dated control is not proof the body never moved: re-measured 2026-10-17, `userContentEdits.totalCount` reads **3**, `lastEditedAt` reads `2026-10-16T16:17:55Z`, and the three bound fields are byte-unchanged, so the live body still recomputes to `5feb2e444d998034` at `1926 / 7081 / 477`. **The method matters here (PROC-04): a body edit is established from GraphQL `userContentEdits` (`totalCount`, per-entry `editedAt`) and `lastEditedAt`, together with the §3 body anchor; the PR object's `updatedAt` is NOT used, because it advances on metadata-only updates.** An earlier version of this entry inferred a body edit from `updated_at` being 15 s after `created_at` at the old control; that inference is withdrawn here (Codex finding 4303650442, §11.11). This record does not pretend to distinguish the possibilities.
 
 **Verdict consequence for #780: none from this entry, and no fresh Stage F is owed on
 the void-binding ground.** The figure **is** re-derivable from the artifact it names, so
-the invalidation rule this entry invoked does not engage. No bound field changed, and a
-verdict naming `64bf6a407e23e47f` — *with its normalization named* — still covers the
-current body, because the figure is a hash of this body's three bound fields: change any
-one of them and the figure changes. No Stage F verdict or Stage D verdict on #780
+the invalidation rule this entry invoked does not engage. No bound field changed at this body, and the published figure remains a valid hash of this body's three bound fields under its own named reading: change any one of them and the figure changes. **But a Stage F binding must name the canonical value: `docs/delivery-workflow.md` defines the bound-field binding together with one canonical normalization and says the line-preserving variant is not that method, so any Stage F verdict must carry `5feb2e444d998034`, recomputed from the body it binds; `64bf6a407e23e47f` is retained only as a labelled forensic control and is never a Stage F binding (Codex finding 4303650444, §11.11).** No Stage F verdict or Stage D verdict on #780
 currently names that value in any case (its comments and reviews were checked). **What is
 owed is the corrected statement of what the figure is** — a receipt, not a re-review. The
 earlier version of this entry owed "a fresh Stage F before merge"; that route rested on
@@ -367,24 +354,22 @@ the refuted premise and is withdrawn in §10.
 | | |
 | --- | --- |
 | Published value, PR #785 body | `45db39e238a3a4e6` |
-| Canonical recompute | `6682e8afc5f8ac5e` |
+| Canonical recompute (creation revision `2026-10-15T21:01:18Z`) | `6682e8afc5f8ac5e` |
 | What the published value **is** | the SHA-256 first-16 of the **same three payloads taken verbatim** — the lines strictly between each sentinel pair, **unmodified**, so the blank line after the opening sentinel and the blank line before the closing sentinel survive as a leading and a trailing newline — joined witness → skills → security with `\n`, hashed as UTF-8. Equivalently `body.split(openMarker + "\n")[1].split("\n" + closeMarker)[0]` per field. The sentinel boundaries are the **correct** ones; **the collapse step is simply not applied** |
 | Reproduces exactly under that reading? | **yes** — re-derived for this repair, twice, in Python `hashlib` and in Node `crypto` |
 | Recomputed normalized payload lengths (canonical) | `1817 / 7337 / 382` |
 | Raw payload lengths under the published reading | `1819 / 7340 / 384` — **+2 / +3 / +2 against the canonical row directly above**, which is the base these deltas are measured against: the verbatim reading keeps the blank line after the opening sentinel and the blank line before the closing sentinel as a leading and a trailing newline (+2 per field), and the skills payload's one internal blank line, which the canonical collapse absorbs, survives as a newline (+3 there). The earlier version of this row read "each field exactly +2", which holds for the witness and the security payloads and not for the skills payload, whose delta is +3. §11 records the correction. |
-| Body edits recorded by the API | **0** — weak evidence for the same reason as §4.5 |
+| Body edits recorded by the API | **0** at the dated control `2026-10-16T03:00:16Z`; **10** re-measured 2026-10-17 — the creation `2026-10-15T21:01:18Z` plus nine edits, the last `lastEditedAt` `2026-10-16T14:00:20Z` (method as §4.1) — and this entry's values are measured at the creation revision, §3's anchor |
+| Live-body recompute (re-measured 2026-10-17) | `1e2150fefd6c2ea9` at `1917 / 7406 / 382` — the live body has moved **inside** its bound fields since this entry's revision, so this entry's canonical figure is revision-bound, not a current-body figure |
 | Body anchor | `2afc2d18e8147fc4f89d8fd3bee5c0f2506b38236009a436b46a44347665083a` |
 
-**Current (canonical recompute of the posted body): `6682e8afc5f8ac5e`. Superseded (for
-comparison): `45db39e238a3a4e6`.** The published value is **not** bound to text this body
+**Current at the creation revision this entry measures (canonical recompute): `6682e8afc5f8ac5e`. Superseded (for comparison): `45db39e238a3a4e6`; the live body's canonical value is `1e2150fefd6c2ea9`, so no figure in this entry is current at the live body.** The published value is **not** bound to text this body
 does not contain: it is a valid hash of **this** body's three bound fields under a
 reading the body's own sentence does not name. **Class: the same defect as §4.3, §4.4 and
 §4.5.**
 
 **Verdict consequence for #785: none from this entry, and no fresh Stage F is owed on the
-void-binding ground.** The reasoning is §4.5's exactly: the figure is re-derivable, no
-bound field changed, and a verdict naming `45db39e238a3a4e6` *with its normalization
-named* still covers the current body. **What is owed is the corrected statement of what
+void-binding ground.** **The reasoning is §4.5's exactly: the figure is re-derivable at the revision this entry measures, and no bound field changed at that revision. But a Stage F binding must name the canonical value of the body it binds: at the creation revision this entry measures that is `6682e8afc5f8ac5e`; on the live body — which has moved inside its bound fields since — it is `1e2150fefd6c2ea9`, and any verdict must recompute from the body it names. `45db39e238a3a4e6` is retained only as a labelled forensic control and is never a Stage F binding (Codex finding 4303650444, §11.11).** **What is owed is the corrected statement of what
 the figure is** — a receipt, not a re-review. The earlier version of this entry owed a
 fresh Stage F; that route is withdrawn in §10.
 
@@ -458,9 +443,9 @@ Stage F at the current body and the current figure.**
 | Artifact | Current value | Superseded value | What the reader should use |
 | --- | --- | --- | --- |
 | PR #776 body | `30b62d11a991abcf` (canonical) | `c34e4d0057b09a3f` (breaks-kept) | the canonical one for comparison; the other only as a labelled control |
-| PR #777 body | `70ef1815189fe918` | — none — | the published value; it reproduces |
+| PR #777 body | `8aed60d23098b041` (live; `1379 / 8966 / 40`) | `70ef1815189fe918` (creation revision `2026-10-15T19:03:36Z`) | the live canonical value for comparison; the published one binds only its creation revision, not the live body |
 | PR #780 body | `5feb2e444d998034` (canonical) | `64bf6a407e23e47f` (naive marker-string split) | the canonical one for comparison; the other only as a labelled control — it binds this body under its own named reading |
-| PR #782 body | `121a60bce86cff98` | — none — | the published value; it reproduces |
+| PR #782 body | `14a96bd772f6083e` (live; `1259 / 7063 / 40`) | `121a60bce86cff98` (creation revision `2026-10-15T20:57:26Z`) | the live canonical value for comparison; the published one binds only its creation revision, and **#782 owes a fresh Stage F at its current body and digest** |
 | PR #785 body | `6682e8afc5f8ac5e` (canonical) | `45db39e238a3a4e6` (verbatim between-sentinel text) | the canonical one for comparison; the other only as a labelled control — it binds this body under its own named reading |
 | PR #789 body | `086faa099024ee57` (canonical) | `7c5d5bc30a8e4301` (breaks-kept) | the canonical one for comparison; the other only as a labelled control |
 | PR #771 verdicts | `b1acc2b2f5817fab` (body) | `b8e293e668e5b525` (verdicts) | the body's figure; the verdicts are void at the current body |
@@ -470,7 +455,7 @@ Stage F at the current body and the current figure.**
 Each published value in the third column is the SHA-256 first-16 of its own body's three
 bound fields under the reading named beside it, so it changes if any of those fields
 changes. It is superseded **for comparison with canonical figures**, which is the harm
-the delivery workflow's naming rule exists to prevent.
+the delivery workflow's naming rule exists to prevent. For #777 and #782 the third-column values are the canonical digests of their **creation** revisions: they bind those revisions only, not the live bodies.
 
 **No merged record is rewritten by this table.** Every superseded value in it remains
 readable at its original location.
@@ -506,10 +491,7 @@ text, collapse not applied", same reason as #780.
 
 - **No corrected PR body was edited.** Zero of the four bodies in §4.3–§4.6 were
   touched. **One** PR body was edited by this change's own lane — this pull request's own
-  — and it **carried 10** recorded revisions when this round measured it: its creation at
-  `2026-10-16T02:01:52Z` plus nine edits, the last at `2026-10-17T07:08:37Z`. This round's
-  own body edits follow — `userContentEdits.totalCount` read **11** after the first,
-  re-measured 2026-10-17. §11.10 quotes the earlier two-bodies, once-and-once wording and
+  — and it **carried 15** recorded revisions when this round measured it: its creation at `2026-10-16T02:01:52Z` plus fourteen edits, the last at `2026-10-17T17:17:30Z`. This round edits it once more; the count after that edit and the digest it produces are published in the body's closing paragraph, not here, because a committed file cannot state a value produced after its own commit (§11.9, §11.11). §11.10 quotes the earlier two-bodies, once-and-once wording and
   corrects it; §6 offers the append text for the four.
 - **No merged record was rewritten.** Nothing under `docs/` on `main` was edited by
   this change except the addition of this new file.
@@ -531,12 +513,8 @@ text, collapse not applied", same reason as #780.
    `2026-10-15T21:01:18Z` plus nine edits, the last at `2026-10-16T14:00:20Z`), so the zero
    is a dated measurement and not present state. This record therefore cannot
    distinguish a script that resolved sentinels by substring and skipped the collapse from
-   an edit the API does not record — the latter is **not** ruled out for
-   #780, whose `updated_at` was 15 s after its `created_at` at that control with a recorded
-   edit count of **0**. Neither explanation is offered as fact.
-2. **The pre-edit text of #771's body IS recoverable, and the superseded figure has been
-   re-derived from it.** The GraphQL `userContentEdits.diff` field **does** return the
-   **full body text** at each recorded revision. Read for #771: the revision at
+   an edit the API does not record — the latter is **not** ruled out for #780 (its recorded edit count was **0** at the dated control and is **3** re-measured 2026-10-17, with `lastEditedAt` `2026-10-16T16:17:55Z`; the `updated_at`/`created_at` gap this item once cited is withdrawn as evidence, because the PR object's `updatedAt` is not a body-edit signal — Codex finding 4303650442, §11.11). Neither explanation is offered as fact.
+2. **The pre-edit text of #771's body IS recoverable, and the superseded figure has been re-derived from it — on a retained snapshot, not on the field's contract.** For this pull request, GraphQL `userContentEdits.diff` returned text that is the **full body text** at the revisions measured: the newest edit node's text is **byte-identical** to the live body (76,906 characters, sha256 `f2f1ee17cca7458f…`), which is the completeness check that makes a historical node usable, and the historical revision's text is **retained** as a snapshot at `C:/src/Project Aegis/_A/evidence/793-c2/retained/uc-771-2026-10-15T18-24-59Z.md` (sha256 `8356d7b4c2488102…`). The field is documented as a nullable diff, so the claim is scoped **to the measured revisions only**, not offered as a general guarantee — Codex finding 4303650454, §11.11. Read for #771: the revision at
    **2026-10-15T18:24:59Z** (18,781 characters; body anchor
    `8356d7b4c2488102ddd3c925c6ef28473480f23a5f71c5915e0abc8fff389cc1`) computes
    canonically to **`b8e293e668e5b525`** with normalized payload lengths
@@ -814,10 +792,7 @@ move and no grep reaches it.
 
 ### 10.6 The gap in §7 item 2 is retracted — the method exists
 
-§7 item 2 recorded that #771's pre-edit body text "was not recovered". **That was wrong,
-and this record already depended on the capability it denied** — §2's calibration value
-`8d441a1bfdff46d9` is derivable only from a superseded #774 revision. GraphQL's
-`userContentEdits.diff` **does** return the full body text at each recorded revision.
+§7 item 2 recorded that #771's pre-edit body text "was not recovered". **That was wrong, and this record already depended on the capability it denied** — §2's calibration value `8d441a1bfdff46d9` is derivable only from a superseded #774 revision. For the revisions this record measured, GraphQL's `userContentEdits.diff` returned the full body text, **verified by a completeness check** (for #771 the newest edit node equals the live body byte for byte) and **retained as a snapshot**, not assumed from the field's documented type (Codex finding 4303650454, §11.11).
 Read for #771:
 
 | #771 revision | Characters | Body anchor (SHA-256) | Canonical digest | Normalized lengths |
@@ -834,7 +809,7 @@ comment (issue comment 6199939375, never edited) carries the value alone and con
 wording. **§4.8's conclusion is unchanged and is now independently confirmed
 rather than merely asserted.** The same field yields #774's 2026-10-16T01:05:24Z revision
 (anchor `d07319919fff1732…`), which computes to `8d441a1bfdff46d9` at
-`2707 / 5594 / 738` — the fourteenth value in §2's calibration table.
+`2707 / 5594 / 738` — the fourteenth value in §2's calibration table. **Both historical texts are retained** under `C:/src/Project Aegis/_A/evidence/793-c2/retained/` with their sha256 published: #771's revision is 18,781 characters at `8356d7b4c2488102…` and #774's is 38,255 characters at `d0731991…`; this round re-derived both digests from those retained bytes.
 
 ### 10.7 What this repair round changed, and its deleted-line count
 
@@ -903,11 +878,7 @@ fix, and only for a count that contradicted the table those comments themselves 
   unlisted normalization falls outside it. All four non-canonical figures in §3 are
   produced within it; that is a statement about those four, not a proof about every figure
   in the repository.
-- **The record's own §9 snapshot.** §9 is a measurement at 2026-10-16T02:02Z and is not
-  re-measured here. Several bodies have moved since (their `updated_at` values are later
-  than 02:02Z: #774 02:06:59Z, #783 02:09:14Z, #788 02:11:32Z, #790 02:09:35Z, #791
-  02:05:07Z, #792 02:08:19Z, #777 02:02:31Z, #782 02:02:32Z); §10.2's derivations use the
-  anchors §3 names, which are unchanged for #780 and #785.
+- **The record's own §9 snapshot.** §9 is a measurement at 2026-10-16T02:02Z and is not re-measured here. Several bodies have moved since; measured on 2026-10-17 from `userContentEdits.totalCount` and `lastEditedAt`, later than 02:02Z: #774 `2026-10-16T04:51:25Z`, #783 `2026-10-16T02:09:14Z`, #777 `2026-10-16T07:34:58Z`, #782 `2026-10-16T06:26:45Z`, #780 `2026-10-16T16:17:55Z` and #785 `2026-10-16T14:00:20Z`. The nine `updated_at` timestamps this bullet first printed are withdrawn as edit evidence (Codex finding 4303650442, §11.11); §10.2's derivations use the anchors §3 names, which are unchanged for #780 and #785.
 - **Codex — CONFIRMED UNAVAILABILITY of the finding TEXT, with the connector's own
   state disclosed.** Two Codex artifacts exist on this PR, both posted by
   `chatgpt-codex-connector[bot]`. **(1)** The review-summary comment **6206351959**
@@ -1442,11 +1413,7 @@ in the round's first commit,
 `git diff -U0 4ff17269d681571947dfc9d2e055a8fcdc1152a6..1e9b1ccfc4827835747cc8e847494a838b9af257 -- docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md`,
 (the commit that carries this section), excluding only the `---` diff header and taken from
 `-U0` hunks so no deletion is hidden by context, the deletion lines number **33** and the
-site table below totals 33. **Two later commits of the same round correct this section in
-place** — the body's row numbered 5 where it is round 6, §7's first bullet's present-tense
-edit count, and the per-commit counts this sentence states — and each is counted the same
-way against its own parent; the round's total at the head it produced is recorded in the
-Stage C handoff, because a later commit of the round cannot be named by text it contains.
+site table below totals 33. **Two later commits of the same round correct this section in place** — the body's row numbered 5 where it is round 6, §7's first bullet's present-tense edit count, and the per-commit counts this sentence states — and each is counted the same way against its own parent. **At the endpoint this round produced, the measured figures are `177 / 33`:** `git diff --numstat 4ff17269d681571947dfc9d2e055a8fcdc1152a6..349ca6bff98b6f539d9b59f4ed47f16633cdc343 -- <this path>` reports `177  33`, and the file grows from 1,362 to 1,506 lines (net **144**). The first commit `1e9b1ccf` measures `175 / 33`; the two later commits measure `6 / 6` and `12 / 10`. The endpoint is not the sum of those rows because a later commit's deletion removed lines the first commit had added within the same round. This answers Codex finding 4303650448; §11.11 records it.
 
 | Site (line numbers at `4ff17269`) | Lines deleted |
 | --- | --- |
@@ -1504,3 +1471,69 @@ reviewer's result for that head is owed for the merge gate in any case. The Stag
 with every other head-bound verdict; nothing else is
 voided: the Stage B ACCEPT **6231713872** binds **plan revision 3**, not a head, and that plan
 comment is not edited by this round, so the ACCEPT still stands.
+
+### 11.11 The Stage C round-2 repair — the Stage F round-2 findings answered, and this round's own deletions
+
+**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Appended 2026-10-17 by the Stage C (the implementation stage) agent at the head this round repairs (`349ca6bff98b6f539d9b59f4ed47f16633cdc343`). It answers the Stage F round-2 verdict **`SD-F: REVISE`** (issue comment **6237455039**, bound to that head and bound-field digest `14f1cc5d96ee42c6`) — findings **F-1**, **F-2**, **F-3** and **F-4** — and the automated reviewer's five P2 findings (review **5558983941** at the same head): findings **4303650436** and **4303650444** are F-1's and F-2's subjects, **4303650448** is F-3's, and **4303650442** and **4303650454** are answered here in their own right. **F-5 and F-6 are recorded as not repaired:** F-5 (rows 1-3's raw comparison is UNRUN because their source records bind the page or a committed diff, not a row-text capture) and F-6 (rows 1-6 use bare backticks instead of a link; the skills-row protocol forbids changing a copied row's characters) both stay as the verdict recorded them, and this round does not reconstruct or rewrite those rows. Each superseded sentence is quoted below with its measured replacement; nothing else in this record is changed.
+
+**The review disposition the F-1 repair produces.** #782's published value `121a60bce86cff98` is now marked superseded as the current body value: it reproduces exactly at the creation revision `2026-10-15T20:57:26Z` and its live body computes `14a96bd772f6083e` at `1259 / 7063 / 40`, so the published digest no longer covers the body it names — **#782 needs a fresh Stage F at its current body and current figure.** #777's published value `70ef1815189fe918` reproduces exactly at its creation revision `2026-10-15T19:03:36Z` and its live body computes `8aed60d23098b041` at `1379 / 8966 / 40`, so the same supersession is recorded. Neither body is this pull request's; the record states the disposition and edits neither body.
+
+| Site (line numbers at `349ca6bf`) | What it said | What is true, measured 2026-10-17 |
+| --- | --- | --- |
+| Preamble L11 and L23 | "corrected in place five times"; the round list ended at the AC10/AC14 round | six times, with this Stage C round-2 repair round named and its sections listed |
+| Preamble L35–L36 | the body-edit sentence ended at the AC10/AC14 round | the Stage F round-2 body edit and this round's body edit are named, with the Stage F digest move `7da4fe63b26219de` to `14f1cc5d96ee42c6` |
+| §4.1's table and conclusion, L236–L237 and L239–L249 | "Recomputed by the canonical method `121a60bce86cff98` — **identical**"; "Body edits recorded by the API = **0**"; "**Current: `121a60bce86cff98`. Superseded: none.**" | the creation revision `2026-10-15T20:57:26Z` computes `121a60bce86cff98` at `1259 / 6855 / 40`; the live body computes `14a96bd772f6083e` at `1259 / 7063 / 40`; `userContentEdits.totalCount` is **2** and `lastEditedAt` is `2026-10-16T06:26:45Z`; the published value is marked superseded as the current body value and the fresh-Stage-F consequence is stated. **F-1**, automated finding 4303650436 |
+| §4.2's closing sentence, L262 | "**Value at the `2026-10-15T19:03:36Z` revision: `70ef1815189fe918`. Superseded: none.**" | the creation revision reproduces the published value and the live body computes `8aed60d23098b041`; the sentence now marks the published value superseded as the current body value. **F-1** |
+| §4.5's body-edit row, L319, and its "what is established" paragraph, L348–L352 | "the body's `updated_at` is 19:08:06Z, 15 s after its `created_at` ... so this body moved and the API recorded no edit for it" / "`updated_at` ... while `userContentEdits.totalCount` reads 0" | the body's edit signal is measured with `userContentEdits` and `lastEditedAt` (**3** recorded revisions, last `2026-10-16T16:17:55Z`), and the three bound fields are byte-unchanged so the live body still computes `5feb2e444d998034` at `1926 / 7081 / 477`; the `updated_at` inference is withdrawn and the method is stated (PROC-04). **Codex finding 4303650442** |
+| §4.5's verdict consequence, L356–L359 | "No bound field changed, and a verdict naming `64bf6a407e23e47f` — *with its normalization named* — still covers the current body" | a Stage F binding must name the canonical value `5feb2e444d998034` recomputed from the body it binds; `64bf6a407e23e47f` is retained only as a labelled forensic control. **F-2**, automated finding 4303650444 |
+| §4.6's canonical row L370, body-edit row L375, and "Current" paragraph L378–L379 | "Canonical recompute `6682e8afc5f8ac5e`"; "Body edits recorded by the API = **0** — weak evidence for the same reason as §4.5"; "**Current (canonical recompute of the posted body): `6682e8afc5f8ac5e`" | the entry is measured at the creation revision `2026-10-15T21:01:18Z` (canonical `6682e8afc5f8ac5e`, verbatim `45db39e238a3a4e6`); the live body has moved inside its bound fields and computes `1e2150fefd6c2ea9` at `1917 / 7406 / 382`; `totalCount` is **10** and `lastEditedAt` is `2026-10-16T14:00:20Z`; every figure is now dated. **Codex finding 4303650442** (the edited updated_at clause) |
+| §4.6's verdict consequence, L385–L387 | "a verdict naming `45db39e238a3a4e6` *with its normalization named* still covers the current body" | a Stage F binding must name the canonical value of the body it binds — `6682e8afc5f8ac5e` at the measured revision, or a recomputation for a later body; `45db39e238a3a4e6` is retained only as a labelled forensic control. **F-2**, automated finding 4303650444 |
+| §5's rows for #777 and #782, L461 and L463, and the paragraph at L473 | "`70ef1815189fe918` \| — none — \| the published value; it reproduces"; "`121a60bce86cff98` \| — none — \| the published value; it reproduces" | the rows now carry the live values `8aed60d23098b041` and `14a96bd772f6083e`, mark the published values superseded at their creation revisions, and state #782's fresh-Stage-F consequence; the paragraph records that the third-column values bind those revisions only. **F-1** |
+| §7's first bullet, L509–L512 | "**carried 10** recorded revisions ... plus nine edits, the last at `2026-10-17T07:08:37Z`" | the body carried **15** recorded revisions when this round measured it (creation `2026-10-16T02:01:52Z` plus fourteen edits, last `2026-10-17T17:17:30Z`); this round edits it once more and publishes the resulting count and digest in the body. **AC14(xi) consistency** |
+| §7's not-verified items 1 and 2, L534–L539 | "the latter is **not** ruled out for #780, whose `updated_at` was 15 s after its `created_at` ..."; "The GraphQL `userContentEdits.diff` field **does** return the **full body text** at each recorded revision" | the `updated_at` clause is replaced by the measured `totalCount`/`lastEditedAt` method of the §4.5 row; the diff-field claim is scoped to the measured revision and backed by a retained snapshot plus a completeness check. **Codex findings 4303650442 and 4303650454** |
+| §10.6's opening paragraph L817–L820 and its #774 sentence L837 | "GraphQL's `userContentEdits.diff` **does** return the full body text at each recorded revision" | for the two revisions this record measured the field returned the full body text, verified by a completeness check (for #771 the newest edit node equals the live body byte for byte) and retained as a snapshot; the general guarantee is withdrawn. **Codex finding 4303650454** |
+| §10.8's §9-snapshot bullet, L906–L910 | "Several bodies have moved since (their `updated_at` values are later than 02:02Z: #774 02:06:59Z, ...)" | the movement is now measured from `userContentEdits.totalCount` and `lastEditedAt` (six bodies named with their measured times), and the nine `updated_at` timestamps are withdrawn as edit evidence. **Codex finding 4303650442** |
+| §11.10's endpoint sentence, L1445–L1449 | "the round's total at the head it produced is recorded in the Stage C handoff, because a later commit of the round cannot be named by text it contains" | the endpoint is measured and published here: `git diff --numstat 4ff17269..349ca6bf -- <this path>` reports `177  33`, the file grows from 1,362 to 1,506 lines (net **144**), and the three commits measure `175 / 33`, `6 / 6` and `12 / 10`. **F-3**, automated finding 4303650448 |
+
+**Calibration evidence retained, not assumed (Codex finding 4303650454).** The two historical texts this record's calibration rests on are **retained as full snapshots** under `C:/src/Project Aegis/_A/evidence/793-c2/retained/`: #771's `2026-10-15T18:24:59Z` revision (18,781 characters, sha256 `8356d7b4c2488102ddd3c925c6ef28473480f23a5f71c5915e0abc8fff389cc1`, which is also the body anchor the record publishes) and #774's `2026-10-16T01:05:24Z` revision (38,255 characters, sha256 `d07319919fff1732210429b62ad050c81398ecb98f432515e304f59e3d9080a6`). This round re-derived both canonical digests from those retained bytes: #771 gives `b8e293e668e5b525` at `1262 / 6276 / 40`, #774 gives `8d441a1bfdff46d9` at `2707 / 5594 / 738`; the `2026-10-15T20:58:34Z` #771 revision also reproduces its recorded 26,202 characters, anchor `a5386f24…` and digest `b1acc2b2f5817fab` at `1262 / 11819 / 40`. **The completeness check** that makes the retained text usable is measured rather than assumed: for #771 the newest edit node's text is byte-identical to the live body (76,906 characters, sha256 `f2f1ee17cca7458fba5941c37832871fe6ee2311793e683ee5242e734453b044`), so the field returned a complete body for that revision of that pull request; because the field is documented as a nullable diff, the record now claims this only for the revisions measured. **The calibration values are therefore verified on retained snapshots, not marked UNVERIFIED.**
+
+**This round's deleted lines, counted and sited.** Replacing a statement deletes the text it replaced. Counted as **every deletion line** in `git diff -U0 349ca6bff98b6f539d9b59f4ed47f16633cdc343 -- docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md`, excluding only the `---` diff header and taken from `-U0` hunks so no deletion is hidden by context, the deletion lines number **63** and the site table totals 63:
+
+| Site (line numbers at `349ca6bf`) | Lines deleted |
+| --- | --- |
+| Preamble L11 — "five times" | 1 |
+| Preamble L23 — the insertion point for the sixth round | 1 |
+| Preamble L35–L36 — the closing body-edit sentence | 2 |
+| §4.1's table and conclusion, L236–L237 and L239–L249 | 13 |
+| §4.2's closing sentence, L262 | 1 |
+| §4.5's body-edit row, L319 | 1 |
+| §4.5's "what is established" paragraph, L348–L352 | 5 |
+| §4.5's verdict consequence, L356–L359 | 4 |
+| §4.6's canonical row, L370 | 1 |
+| §4.6's body-edit row, L375 | 1 |
+| §4.6's "Current" paragraph, L378–L379 | 2 |
+| §4.6's verdict consequence, L385–L387 | 3 |
+| §5's row for #777, L461 | 1 |
+| §5's row for #782, L463 | 1 |
+| §5's paragraph after the table, L473 | 1 |
+| §7's first bullet, L509–L512 | 4 |
+| §7's not-verified items 1 and 2, L534–L539 | 6 |
+| §10.6's opening paragraph, L817–L820 | 4 |
+| §10.6's #774 sentence, L837 | 1 |
+| §10.8's §9-snapshot bullet, L906–L910 | 5 |
+| §11.10's endpoint sentence, L1445–L1449 | 5 |
+| **Total deleted** | **63** |
+
+**The set is exact in both directions**, measured the way §10.7's, §11.3's, §11.6's, §11.9's and §11.10's were: the 63 old-line numbers parsed from the `-U0` hunks are exactly the ranges above — measured-minus-claimed empty and claimed-minus-measured empty — and the claimed counts sum to 63. **This round does not claim to be insert-only**; it deleted 63 lines to correct the sites above and appended this section.
+
+**The body's edit, and the digest.** This round edits the pull-request body outside every bound field — the head, tree and base, the stage chain, the round counts, the F-3 endpoint figure and the F-4 `Row source` count — and **inside** the bound skills field, where it adds four Stage C round-7 rows with one group `Row source` record, marks the Stage C round-1 and round-6 source records historical, and marks the round-2 Stage F source record historical/superseded. Those are bound-field edits, so **the digest moves**: it was `14f1cc5d96ee42c6` at normalized payload lengths `1761 / 17258 / 40` immediately before this round; the value after the edit, and the body's recorded revision count after the edit, are published in the body's closing paragraph and in the Stage C handoff comment, because a committed file cannot state a value produced after its own commit (§11.9's limit). **A bound-field edit voids every verdict that named the old value**, including the Stage F round-2 verdict `6237455039` that this round answers: a fresh Stage D, Stage E and Stage F are owed at the head this round produces.
+
+**What this round did not verify, stated as gaps.**
+
+1. **F-5 and F-6** — recorded by the Stage F verdict as UNRUN / not repaired; this round neither reconstructs rows 1-3's raw comparison nor rewrites rows 1-6 to add links (the skills-row protocol forbids changing a copied row's characters).
+2. **The 5,400-combination space and the 92,580 deletion variants of §10.3** — not re-run.
+3. **The bodies' state between the measurement and this commit** — every value was read from the live API on 2026-10-17; a body edited after that read is not observable here.
+4. **The historical measurement windows** — §3's `01:50:47Z–01:51:00Z` window and §9's `02:02Z` window are not re-observable; the anchors, last-edited times and named revisions are what is checkable, and they were used instead.
+5. **The other three automated findings** (4303650436, 4303650444, 4303650448) were triaged by the Stage F round; this round re-derived their subjects as F-1, F-2 and F-3 above — the page anchors they name are the sites corrected here.
+
+**What is owed.** This round moves the head, so **a fresh Stage D** (the per-criterion `MET` / `NOT MET` / `UNRUN` audit), **a fresh Stage E** (validation) and **a fresh Stage F** (the final independent review, which names the exact 40-character head and the bound-field digest) are owed at the head this round produces, and **a fresh automated review at that head** is owed for the merge gate in any case. The Stage D verdict **6231225676** and its addendum **6231229604** bind `4ff17269`; the Stage F round-2 verdict **6237455039** binds `349ca6bf` and bound-field digest `14f1cc5d96ee42c6`; all are void at the new head and at the new digest. Nothing else is voided: the Stage B ACCEPT **6231713872** binds **plan revision 3**, not a head, and that plan comment is not edited by this round, so the ACCEPT still stands.
