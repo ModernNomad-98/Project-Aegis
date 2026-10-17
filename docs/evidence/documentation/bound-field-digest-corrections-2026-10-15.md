@@ -538,10 +538,11 @@ text, collapse not applied", same reason as #780.
 - **Derivation base SHA:** `f490c16f9ed23f3d489e42f7696323bffcce6fd3` — the
   `origin/main` tip at clone time and re-verified immediately before this file was
   written (2026-10-15, local date). **That clause read "the repository's `main` has not
-  moved" when it was written, and it is now stale: `main` has moved three times since, as
-  measured on the Stage C handoff round** — to `87d6b460` (the merge of PR #787), to
-  `988b50673cdd0e9ab0c15df891744cd02d1d2d2b` (the merge of PR #783), and to
-  `9e418c8c63e45caa4bca7fb608d45d0df4d44409` (the merge of PR #801). The **merge base of
+  moved" when it was written, and it is now stale: `main`'s tip has advanced far past it —
+  `git rev-list --first-parent --count f490c16f..origin/main` reports 18 merges at the
+  Stage C handoff round's measurement** — through `87d6b460` (PR #787) and
+  `988b50673cdd0e9ab0c15df891744cd02d1d2d2b` (PR #783), the two tips earlier rounds saw, to
+  `9e418c8c63e45caa4bca7fb608d45d0df4d44409` (PR #801) now. The **merge base of
   this head and the current `main` is still `f490c16f`** (`git merge-base HEAD origin/main`,
   re-derived on the Stage C handoff round), and `git merge-base --is-ancestor
   f490c16f HEAD` exits 0, so **nothing is voided and no figure here depends on `main`'s
@@ -1197,7 +1198,7 @@ recomputed from the posted body read back from the API both before and after the
 **The commit message of `6d4295a938705546160f7a44af12c6391570f8c9` cannot be corrected in
 place, and it is not.** A commit message is immutable: it is covered by that commit's own
 hash, and this branch's earlier commits and the verdicts that name them are bound through
-those hashes — including the two `Row source` records **inside** the body's bound skills
+those hashes — including the three `Row source` records **inside** the body's bound skills
 field, whose head names would have to be re-pointed, which would move the digest. Rewriting
 history to repair one figure would therefore destroy bindings that matter more than the
 figure. **The discrepancy is stated instead, in both places a reader meets it:**
@@ -1262,11 +1263,12 @@ two movements are recorded in gap 3 below, not re-asserted here.
 | --- | --- | --- |
 | §11.5's row for the body's Paths section, L1126 | "the nine are §11.1's nine *wording rows*, and those eleven sites fall into them" | §11.1 quotes **ten** of §11.3's eleven sites in nine wording rows — its last row pairs §4.5's boundary paragraph with §10.2 — and the **eleventh**, the preamble edit, is listed and quoted in §11.3 only. Mapped row by row: §11.3's eleven ranges are the preamble, §4.1, §4.5's row, §4.6's row, §4.7's row 1, §4.8's row, §7 item 2, §7 item 3, §10.6, §4.5's boundary paragraph and §10.2; §11.1 has no preamble row. The body's Paths sentence at L48 repeated the same clause and is corrected to match |
 | §11.4's gloss-count sentence, L1056–1059 | "**4 / 3 / 2** in the live body" | at `ff975270` the whitespace-collapsed body reads **4 / 5 / 3** — four `Stage C (the implementation stage)`, five `Stage D (the independent implementation-audit stage)`, three "`SD-D` labels a Stage D audit" — **twelve** glossed occurrences, not nine. `4 / 3 / 2` is the body at **`03:09:57Z`**, the end of the Stage F repair round's edit walk and the body the second Stage D verdict audited. The growth is this record's own: the Stage D re-audit repair round glossed one further `Stage D` while rewriting the Blast-radius paragraph (body L34), and its new paragraph at body L197 carries one more `Stage D` and one more `SD-D`. The nine phrases that round added are unchanged and still score 0 in the `02:31:50Z` revision |
-| §8's derivation-base bullet, L537–539 and L541, its two-dot paragraph, L551–557, and §11.5's restatement of the movement, L1122 | "`main` has moved twice since … the **two-dot** form … reports **four** rows" | `main` had moved **twice** at `ff975270` and has moved **three** times at this round's measurement: `f490c16f` → `87d6b460` (PR #787) → `988b5067` (PR #783) → `9e418c8c` (PR #801). The four-row two-dot result was measured against `988b5067`; against `main` `9e418c8c` the same form reports **56** rows. Both are snapshots of `main`'s **moving tip**, not of this change; the **merge base is still `f490c16f`** (`git merge-base HEAD origin/main`), so nothing is voided and no figure in this record depends on `main`'s tip |
+| §8's derivation-base bullet, L537–539 and L541, its two-dot paragraph, L551–557, and §11.5's restatement of the movement, L1122 | "`main` has moved twice since … the **two-dot** form … reports **four** rows" | `main`'s tip had moved **twice** at `ff975270` (the first-parent chain was `f490c16f` → `87d6b460` → `988b5067`) and has advanced by **18 first-parent merges** at this round's measurement (`git rev-list --first-parent --count f490c16f..origin/main` = 18; the tips earlier rounds saw are `87d6b460` and `988b5067`, the tip now `9e418c8c`). The four-row two-dot result was measured against `988b5067`; against `main` `9e418c8c` the same form reports **56** rows. Both are snapshots of `main`'s **moving tip**, not of this change; the **merge base is still `f490c16f`** (`git merge-base HEAD origin/main`), so nothing is voided and no figure in this record depends on `main`'s tip |
 
 **This round's deleted lines, counted and sited.** Replacing a statement deletes the text it
 replaced. Counted as **every deletion line** in
-`git diff ff975270..HEAD -- docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md`,
+`git diff ff975270..ec2f70f116efe3c82e16831684221bcd102bd5e4 -- docs/evidence/documentation/bound-field-digest-corrections-2026-10-15.md`,
+pinned at this round's first commit because `..HEAD` now also contains the second commit below,
 excluding only the `---` diff header and taken from `-U0` hunks so no deletion is hidden by
 context, the range reports `--numstat` `118	17`, the deletion lines number
 **17**, and the site table totals **17**:
@@ -1327,3 +1329,34 @@ base is still `f490c16f9ed23f3d489e42f7696323bffcce6fd3`.
 (`6207351316`), the `SD-D: ACCEPT` verdict (`6206838331`) and the `SD-F: REVISE` verdict
 (`6206966415`) no longer cover the artifact: **a fresh Stage D and a fresh Stage F are owed
 at the head this round produced**, with the unchanged digest `078ec42572ff330a`.
+
+**Post-commit corrections in the same round (second commit).** Re-reading this section
+against the artifacts after it was committed as `ec2f70f1…` found **two supporting counts**
+that did not hold, and both are corrected in this second commit of the same round — quoted
+here rather than silently overwritten, the discipline §10.9 applies:
+
+| Site (line numbers at `ec2f70f1`) | What it said | What is true, measured |
+| --- | --- | --- |
+| §8's derivation-base bullet, L541–544, and §11.9's row 3, L1265 | "`main` has moved three times since" / "has moved **three** times at this round's measurement", naming `f490c16f` → `87d6b460` → `988b5067` → `9e418c8c` | `git rev-list --first-parent --count f490c16f..origin/main` reports **18** merges at this measurement: the two tips earlier rounds saw (`87d6b460`, PR #787, and `988b5067`, PR #783) are the first two of eighteen, and `9e418c8c` (PR #801) is the current tip. The count is corrected to **18 first-parent merges**; the named tips and the unchanged merge base (`f490c16f`) stand |
+| §11.7, L1200 | "the two `Row source` records **inside** the body's bound skills field" | the bound skills field carries **three** `Row source` records — rows 1–3, body L114, L116 and L118, one per skills row — not two. The body repeated "two" in three further sentences (L34, L173 and L213), all corrected in the same round; the count is **three** |
+
+**This second commit's deleted lines, counted and sited.** At this commit's head,
+`git diff --numstat ec2f70f1..HEAD` on this path reports `40	7`; the `-U0`
+deletion lines number **7**, exactly the ranges above: §8's L541–544 (4), §11.7's L1200 (1),
+§11.9's row 3 at L1265 (1) and §11.9's range sentence at L1269 (1). Set equality holds in
+both directions. **This commit does not claim to be insert-only** — it deleted 7 lines to
+correct two false counts and appended this paragraph.
+
+**The PR body's second edit, and the digest.** The body's three "two `Row source`
+records" sentences are corrected to "three" (L34, L173, L213), and the closing paragraph's
+head and tree are replaced with this second commit's — every edit **outside** the three
+bound fields. **The bound-field digest did not move: `078ec42572ff330a` at
+`1380 / 3868 / 40`**, recomputed from the posted body read back from the API before and
+after this second edit.
+
+**The final head this round produced is this second commit**; a file cannot name its own
+commit, so it is published in the body's closing paragraph and in the Stage C correction
+comment posted after this push. **What is owed:** a fresh Stage D and a fresh Stage F at that
+head. The handoff comment posted for `ec2f70f1…` is superseded by this correction, and its
+own two wrong counts ("`main` has moved three times"; "the two `Row source` records") are
+corrected in that appended comment.
