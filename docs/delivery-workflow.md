@@ -481,6 +481,30 @@ and as `D103` in the [recorded decisions
 log](reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions). **This
 section is the authority for the path itself.**
 
+**Extension, adopted 2026-10-15 (owner decision D-5, recorded as AEGIS-APR-137):
+the AEGIS-APR-115 index-rebuild pull request.** One subject class is added to
+this path, as an exception to the "Who may use it" rule above: a pull request
+whose diff is **exactly** the two generated JSON files AEGIS-APR-115 names —
+`tools/readability_acceptance/acceptance-index.json` and
+`tools/readability_acceptance/acceptance-verdicts-stage-1.json` — and no other
+path may use this path even though those two files are data files. Any other
+path in the diff — a script, a configuration file, documentation, or a third
+data file — makes the pull request code-bearing, and a code-bearing pull
+request takes the full path, as above. Everything this section states still
+applies: all seven stages run in order with a different holder per stage,
+every merge-gate condition in [Before merging: Stage G entry
+conditions](#before-merging-stage-g-entry-conditions) is met, and no
+repair-and-re-audit round is skipped. **Stage E validation for this class is
+the independent reproduction instead of a prose review:** an independent
+agent rebuilds the index with `build_index.py` at the same ref the pull
+request used, and the two files must prove **byte-identical** to the
+committed ones — `build_index.py` pins LF newlines so a Windows rebuild
+reproduces them, per D84's amendment. A rebuild that does not reproduce
+byte-identically fails Stage E and returns to its author under [the chain
+rule](#the-seven-stages). This extension's text was drafted by the Phase 1
+Stage C implementing agent, DeepSeek V4, transcribing the owner's 2026-10-15
+reply.
+
 ## Pre-authored diffs: an intake condition, not a new stage
 
 Some changes arrive with the diff already written: the weekly Dependabot pull

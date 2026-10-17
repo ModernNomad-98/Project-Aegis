@@ -385,6 +385,13 @@ MG2 - because a rewritten commit ceases to exist. **And it would still not free 
 remain in tracked files at the base revision. **A partial purge that produces a clean-looking result without removing the
 exposure is worse than an honest statement of the limit.** The owner's goal explicitly permits carried open publication
 items; this is one, named so a future change can act on it.
+
+**Correction (2026-10-15), appended beside the original claim - the claim above is not edited.** The "eleven
+Stage D records, eight Stage E validations" counts in the paragraph above are unreproducible and are withdrawn:
+a tree-wide search finds the two figures nowhere else in the repository, and the stage records they counted live
+only in the session workspace archive (`_resume-2026-10-09/evidence/workspace-citation-durability-2026-10-13/`),
+which is not retrievable from a fresh checkout (Codex finding 4264432721 on PR #766).
+
 ## 7. How to verify this page
 
 From a clone of the candidate head, with the session workspace archive unavailable:
