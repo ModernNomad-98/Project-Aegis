@@ -7,9 +7,17 @@
   (PR) #781 merge, "AEGIS-APR-117 withdrawals and fresh re-records"). **This batch's eight pages are
   unchanged between the lane's original batch base `e2a3e20b7c20ef8385b219b39c6405237163406f` and this base**
   (verified per path with `git diff --numstat`; all eight report no change).
-- **Agent / model attribution (the repository's 2026-10-13 rule).** This record and every text this
-  batch publishes are drafted by **DeepSeek-4.1-Flash (deepseek-flash)**, an AI agent operating under
-  the owner account; the agent identity for this batch is
+- **Agent / model attribution (the repository's 2026-10-13 rule).** The record was written in parts
+  by different named agents, and each part is attributed only as far as its artifact states it. The
+  original batch text (commit `cac5c67d`, 2026-10-15) and the four repairs whose own commit messages
+  name their model (`c4a55185`, `5e336ea2`, `d1f02a0a`, `61371fa5`) were drafted by
+  **DeepSeek-4.1-Flash (deepseek-flash)**, as those messages state. The repair text added at
+  `e31adcc3` (96 added / 33 deleted = 129 lines) and at this round's commit was drafted by
+  **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**, as those commit messages state. Commit
+  `d784c4dc`'s changes carry **no** model attribution in their message and no other artifact
+  inspected names one, so that round's text is recorded as **unattributed** rather than assigned.
+  No artifact inspected establishes that `DeepSeek-4.1-Flash` and `DeepSeek V4 Flash` are the same
+  model, so the two names stay distinct. The agent identity for the original batch is
   `readability-phase4-lane-d-batch4-implementer`.
 - **What this page is.** The lane's tracked batch record for its fourth batch. It is the
   **evidence source** a **separate eligible keeper** reads under AEGIS-APR-117 (the owner's
@@ -45,11 +53,12 @@
   candidate-head SHA and all six skills rows' `target=` SHAs are 40 hex characters replaced by 40 hex
   characters. **A guard that watches payload length alone passes while the digest moves.** **Any
   edit to a bound field voids that figure and requires a fresh one, exactly as a moved head does —
-  so all three prior Stage D verdicts are void at the head this repair produces, and a fresh Stage
-  D/F is owed there.** This repair's own body revision moves the figure again (its witness names the
-  new head), so the post-repair value must be re-derived from the live body and is stated there,
-  outside all three bound fields; **this record asserts no bound-field digest of its own and names
-  no verdict as covering it.**
+  so all three prior Stage D (independent implementation audit) verdicts are void at the head this
+  repair produces, and a fresh Stage D (independent implementation audit) and Stage F (final
+  independent PR code review) are owed there.** This repair's own body revision moves the figure
+  again (its witness names the new head), so the post-repair value must be re-derived from the live
+  body and is stated there, outside all three bound fields; **this record asserts no bound-field
+  digest of its own and names no verdict as covering it.**
 
 ## Labels used in this record, glossed (plain-English description beside every internal label)
 
@@ -80,6 +89,10 @@
 - **DCO** — Developer Certificate of Origin; the sign-off trailer every commit here carries.
 - **LD-25 … LD-32** — this batch's eight row labels, continuing the lane's sequence (batch 1 =
   LD-1…LD-8, batch 2 = LD-9…LD-16, batch 3 = LD-17…LD-24).
+- **Stage D / Stage F** — delivery-workflow stages: Stage D is the independent implementation audit
+  (a different agent checks the change against the plan's acceptance criteria one by one); Stage F
+  is the final independent pull-request (PR) code review (another different agent reviews the exact
+  head and the PR's skills table, then posts ACCEPT or REVISE).
 
 ## 0. Pre-flight (run before the first edit of this repair round)
 
@@ -90,7 +103,7 @@ that any claim in this record is true, and not that any count is right.
 | Item | Observed | Command |
 | --- | --- | --- |
 | Branch and head | `docs/readability-phase4-lane-d-batch4-20261015` at `61371fa5b3014c95922fb9f2b2a07f6a3f953fbe`; the API and `git rev-parse HEAD` in this round's fresh clone agree on the same 40 characters | `git rev-parse HEAD`; `gh api pulls/791` |
-| Merge base | `f490c16f9ed23f3d489e42f7696323bffcce6fd3` (`git cat-file -t` = `commit`); the head is **not** an ancestor of `origin/main` (`merge-base --is-ancestor` exits 1), so the branch is unmerged | `git merge-base 61371fa5 origin/main` |
+| Merge base | `f490c16f9ed23f3d489e42f7696323bffcce6fd3` (`git cat-file -t` = `commit`, exit 0); the head `61371fa5` is **not** an ancestor of `origin/main` (`git merge-base --is-ancestor` exits 1), so the branch is unmerged | `git merge-base 61371fa5 origin/main` → `f490c16f9ed23f3d489e42f7696323bffcce6fd3`, exit 0; `git cat-file -t f490c16f` → `commit`, exit 0; `git merge-base --is-ancestor 61371fa5 origin/main` → no output, exit 1 |
 | Record at the head | blob `be2f7fc6ee5371343d2c601cd4843a38b13de314`, **66,015 bytes**, **689 LF / 0 CR** | `git rev-parse HEAD:<path>`; `git cat-file -s <blob>` |
 | Record at the merge base | absent — `git cat-file -e f490c16f:<path>` exits 128, so the change is a pure addition | `git cat-file -e` |
 | Live body before this round's edit | **56,046 UTF-8 bytes / 55,778 characters**, `sha256 b1ff423e6d58a8e24d7260dcc99afcfa728daca4840a1dab70eb8133356332b6`, last edited **2026-10-17T02:14:40Z** (the 11th of 11 edits) | `gh api pulls/791`; GraphQL `userContentEdits` |
@@ -748,5 +761,8 @@ skill@6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 / reason:
 
 ---
 
-*Prepared by a **DeepSeek** agent (**DeepSeek-4.1-Flash (deepseek-flash)**) operating under the
-owner account, as the repository's attribution rule (2026-10-13) requires.*
+*Prepared by **DeepSeek-4.1-Flash (deepseek-flash)** for the original batch text and its four
+self-naming repairs, and by **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)** for the
+`e31adcc3` repair and this round's repair; commit `d784c4dc`'s changes are recorded as unattributed
+because no artifact inspected names their model. All operated under the owner account, as the
+repository's attribution rule (2026-10-13) requires.*
