@@ -246,21 +246,22 @@ eight read pages — the last commit touching each names another author
 | C5-7 | `.claude/skills/tech-spec-writer/references/tech-spec-sheet.md` | `02e88b18` Peter Nguyen ("Explain owner choices in technical specifications") |
 | C5-8 | `.claude/skills/tenant-isolation-reviewer/SKILL.md` | `8459ac73` Peter Nguyen ("docs: spell out artificial intelligence (AI) at first body use") |
 
-**Honest disclosure about the shared identity string.** `git log --all --author="F reviewer"` returns
-**11** commits in this clone — the count is measured, and an earlier draft of this record said 12, which was
-wrong. All 11 sit on other Stage C/D lanes' branches or open pull requests: lane A batch 4 and its link
-repair (`origin/docs/readability-lane-a-batch-4-20261015`), lane B batch 4 and its citation repair, lane C batch
-3 and its repairs, the APR-117 withdrawal work, and a CI-label repair. **Zero** of those commits touch any of
-the eight pages in this batch (checked per path by command: 0 commits for every page), and this session made
-no other commit in this repository before this batch. The string is the host's stale global identity and is
-disclosed here rather than used.
+**Honest disclosure about the shared identity string.** `git log --all --author="F reviewer"` returns **11**
+commits in this clone — the count is measured, and an earlier draft of this record said 12, which was wrong.
+**Six of the 11 are ancestors of `main`** — `97c61f35`, `baeca020`, `95d7737c`, `4b7e1a10`, `1419d480` and
+`bfcf402a`, each `git merge-base --is-ancestor` exit 0 — so the placeholder identity is **already inscribed in
+`main`**, not prospective. The other **5** are not ancestors: **3** on lane A batch 4's branch (open pull
+request **#789**), **2** on lane B batch 4's branch (pull request **#788**, closed unmerged). **Zero** of those
+commits touch any of the eight pages here (checked per path: 0 commits each), and this session made no other
+commit here before this batch. The string is the host's stale global identity, disclosed not used.
 
-**One of those 11 is a live hazard and is reported, not amended.** Branch
-`origin/docs/readability-lane-a-batch-4-20261015` (open pull request **#789**, lane A batch 4) carries **2**
-commits authored `F reviewer <reviewer@example.invalid>` (head `de2bfe72`, base commit `e8c8a67c`), and a
-merge would inscribe that placeholder identity into `main`. It is another lane's branch and pull request, so
-this batch does not touch, amend or force-push it; the measurement is reported for the coordinator. (Sibling
-lane A batch 5 made the same disclosure at its own head; it is still true here.)
+**The lane A batch 4 branch is a live hazard, reported not amended.**
+`origin/docs/readability-lane-a-batch-4-20261015` (pull request **#789**, open) carries **6** commits at head
+`f848b1a902d67e1b40c325587df6455daa17771e`, **3** authored `F reviewer <reviewer@example.invalid>`; the earlier
+"**2** commits at `de2bfe72`" was true when typed and is **superseded**, not fabricated. A merge would inscribe
+that identity into `main`. This batch does not touch, amend or force-push it — another lane's branch and pull
+request — and reports the measurement for the coordinator. (Sibling lane A batch 5 disclosed the same at its own
+head; still true here.)
 
 **Keeper IDs — none allocated here.** This batch records evidence only and consumes no keeper-row identifier;
 the separate keeper assigns the IDs when recording from this evidence.
@@ -913,11 +914,11 @@ quoted in section 9.
 
 ## Footer
 
-sha256: 2fbcd4d7875e9c839971071472b79c92a5c5e8d3a4983d2cca1378772295943a
+sha256: 58728608ebaa6f9db51f6a3fbcfd2808b764ebbd2f69d288b7d8d217d8fbd303
 
 This digest covers the batch record's bytes from the first line through the closing `---` rule line
-and its terminating newline, encoded UTF-8 with LF line endings: exactly 90,939 bytes, byte offsets
-0 through 90,938 inclusive, lines 1-912. It does not cover the blank separator line between that
+and its terminating newline, encoded UTF-8 with LF line endings: exactly 91,084 bytes, byte offsets
+0 through 91,083 inclusive, lines 1-913. It does not cover the blank separator line between that
 rule and the `## Footer` heading, nor this footer. Any edit above the rule needs a fresh validation.
 The method was calibrated before it was trusted: applying it to lane C batch 3's committed record reproduces
 its published value `db9796c63ac8ab53022d8c4c237e62484cb4786ce19a261b81bbe36d9f58e2f8` exactly, and the same
