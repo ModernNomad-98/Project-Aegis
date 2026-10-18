@@ -8,7 +8,7 @@ Agent: **sd-c-read-b16-c1** (stage role) - true identity **sd-c-802-r4-codex** -
 
 **Implementation base and pinned ref.** Derivation base = current main **84a5295daa35d9df027da2dba56e6de52cb8a44a** (the **32nd** session record merge = PR #831, merged 2026-10-18T09:14:34Z; merge parents **655e40ea** + **df0249e2**; #828 was the 31st at 655e40ea and #832 the 30th at 883bf690). Pinned measurement ref = **2db1ffb7985ddc1c087c455740fd59e962967461**.
 
-**Change class: docs-only.** Exactly **one added path**: `docs/evidence/documentation/readability-lane-b-batch-16-2026-10-18.md` - this record. **No other added, modified or deleted tracked path**; no keeper row, acceptance-index row, ledger, register, manifest, tool, test or workflow change; no page edit; **no committed plan file**. `git diff --name-status 84a5295d..<head>` shows exactly this one A path; `--numstat` is the record's own line count. Stage D/E/F/G remain separate; no merge happens here.
+**Change class: docs-only.** Exactly **one added path**: `docs/evidence/documentation/readability-lane-b-batch-16-2026-10-18.md` - this record. **No other added, modified or deleted tracked path**; no keeper row, acceptance-index row, ledger, register, manifest, tool, test or workflow change; no page edit; **no committed plan file**. `git diff --name-status 84a5295d..HEAD` shows exactly this one A path; `--numstat` is the record's own line count. Stage D/E/F/G remain separate; no merge happens here.
 
 ## 2. Lane derivation at this implementation base - re-run, not handed down
 
@@ -18,7 +18,7 @@ Agent: **sd-c-read-b16-c1** (stage role) - true identity **sd-c-802-r4-codex** -
 python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740fd59e962967461 --json
 ```
 
-Observed summary: **690 reader pages / 107 accepted / 6 provably pending / 567 no-record / 0 recorded-within-10-lines / 6 cannot decide / 0 withdrawn / 4 partial / official pending 583**; pending set = 567 + 6 = **573** sorted paths. **Lane A = indices 0-143 (complete); lane B = 144-287.** **Merged lane-B rows at this base are 144-199** (144-167 + 168-183 + 184-191 via #831 + 192-199 via #832). **Reservations:** #833 **200-207**, #834 **208-215**, #835 **216-223**, #836 **224-231**. This block is **232-239** (lane B batch 16); the next unread page after the block is **240** `.claude/skills/saas-platform-architect/SKILL.md`. The record path does not exist at the base (checked with `git cat-file -e`). All eight pages are pending, unread by merged lane records, outside reservations, have **no keeper row**, and are **zero-drift** between pinned ref and base.
+Observed summary: **690 reader pages / 107 accepted / 6 provably pending / 567 no-record / 0 recorded-within-10-lines / 6 cannot decide / 0 withdrawn / 4 partial / official pending 583** (the official count also includes the 4 partial-disposition paths plus the 6 cannot-decide paths); the lane-derivation pending set = 567 + 6 = **573** sorted paths. **Lane A = indices 0-143 (complete); lane B = 144-287.** **Merged lane-B rows at this base are 144-199** (144-167 + 168-183 + 184-191 via #831 + 192-199 via #832). **Reservations:** #833 **200-207**, #834 **208-215**, #835 **216-223**, #836 **224-231**. This block is **232-239** (lane B batch 16); the next unread page after the block is **240** `.claude/skills/saas-platform-architect/SKILL.md`. The record path does not exist at the base (checked with `git cat-file -e`). All eight pages are pending, unread by merged lane records, outside reservations, have **no keeper row**, and are **zero-drift** between pinned ref and base.
 
 ## 3. The eight frozen pages - measured at pinned ref 2db1ffb7
 
@@ -44,9 +44,9 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 **Purpose/normal use (from the page alone):** L1 title and L3-7 opening state the page's job (a per-command RLS audit checklist and wrong-tenant negative-test plan) and its reader (the RLS policy auditor).
 
-**Canonical B1 satisfied** - L1 title and L3-7 opening state the page's job (a per-command RLS audit checklist and wrong-tenant negative-test plan) and its reader (the RLS policy auditor); L4-6 define RLS, JWT and API at first use.
+**Canonical B1 satisfied** - L1 title and L3-7 opening state the page's job (a per-command RLS audit checklist and wrong-tenant negative-test plan) and its reader (the RLS policy auditor); L1 title first uses RLS; L4-6 define JWT and API at first use and expand RLS at L4-5 (so the L1 title use is a first-use gap).
 
-**Canonical B2** - Named B2 gap(s): L1 `RLS`, L61 `SQL`, L40 `BYPASSRLS`, L43 `DEFINER`, L44 `search_path` All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
+**Canonical B2** - Named B2 gap(s): L1 `RLS`, L61 `SQL`, L40 `BYPASSRLS`, L43 `DEFINER`, L44 `search_path`. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
 
 **Canonical B3 satisfied** - The page uses descriptive headings, short paragraphs, lists, tables and concrete examples/commands/templates; no display elision. Whole-page range is L1-108.
 
@@ -60,11 +60,11 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 ### P2 - `.claude/skills/roadmap-to-commitments-translator/SKILL.md` - read whole, L1-304
 
-**Purpose/normal use (from the page alone):** L6 title, L8-9 reading key, L11-24 Purpose and L26-44 Use When state the page's job (translate a directional roadmap into the committable subset) and its reader (the planner/stakeholder-facing team)..
+**Purpose/normal use (from the page alone):** L6 title, L8-9 reading key, L11-24 Purpose and L26-44 Use When state the page's job (translate a directional roadmap into the committable subset) and its reader (the planner/stakeholder-facing team).
 
 **Canonical B1 satisfied** - L6 title, L8-9 reading key, L11-24 Purpose and L26-44 Use When state the page's job (translate a directional roadmap into the committable subset) and its reader (the planner/stakeholder-facing team).
 
-**Canonical B2** - Named B2 gap(s): L75 `COMMIT-ABLE`, L144 `HUMAN-APPROVED` All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
+**Canonical B2** - Named B2 gap(s): L75 `COMMIT-ABLE`, L144 `HUMAN-APPROVED`. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
 
 **Canonical B3 satisfied** - The page uses descriptive headings, short paragraphs, lists, tables and concrete examples/commands/templates; no display elision. Whole-page range is L1-304.
 
@@ -78,11 +78,11 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 ### P3 - `.claude/skills/roadmap-to-commitments-translator/references/commitments-sheet.md` - read whole, L1-86
 
-**Purpose/normal use (from the page alone):** L1 title and L3-5 opening state the page's job (the commitments worksheet behind the translator) and its reader (the team preparing candidate commitments)..
+**Purpose/normal use (from the page alone):** L1 title and L3-5 opening state the page's job (the commitments worksheet behind the translator) and its reader (the team preparing candidate commitments).
 
 **Canonical B1 satisfied** - L1 title and L3-5 opening state the page's job (the commitments worksheet behind the translator) and its reader (the team preparing candidate commitments).
 
-**Canonical B2** - Named B2 gap(s): No named B2 gap; every candidate is inventoried as defined-at-first-use or documented exclusion. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
+**Canonical B2** - Named B2 gap(s): No named B2 gap; every candidate is inventoried as defined-at-first-use or documented exclusion.. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
 
 **Canonical B3 satisfied** - The page uses descriptive headings, short paragraphs, lists, tables and concrete examples/commands/templates; no display elision. Whole-page range is L1-86.
 
@@ -96,11 +96,11 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 ### P4 - `.claude/skills/roadmap-under-uncertainty-planner/SKILL.md` - read whole, L1-202
 
-**Purpose/normal use (from the page alone):** L6 title, L8-9 reading key, L11-24 Purpose and L26-48 Use When state the page's job (plan a roadmap under uncertainty) and its reader (the planner/communicator)..
+**Purpose/normal use (from the page alone):** L6 title, L8-9 reading key, L11-24 Purpose and L26-48 Use When state the page's job (plan a roadmap under uncertainty) and its reader (the planner/communicator).
 
 **Canonical B1 satisfied** - L6 title, L8-9 reading key, L11-24 Purpose and L26-48 Use When state the page's job (plan a roadmap under uncertainty) and its reader (the planner/communicator).
 
-**Canonical B2** - Named B2 gap(s): No named B2 gap; every candidate is inventoried as defined-at-first-use or documented exclusion. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
+**Canonical B2** - Named B2 gap(s): No named B2 gap; every candidate is inventoried as defined-at-first-use or documented exclusion.. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
 
 **Canonical B3 satisfied** - The page uses descriptive headings, short paragraphs, lists, tables and concrete examples/commands/templates; no display elision. Whole-page range is L1-202.
 
@@ -114,11 +114,11 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 ### P5 - `.claude/skills/roadmap-under-uncertainty-planner/references/roadmap-uncertainty-sheet.md` - read whole, L1-75
 
-**Purpose/normal use (from the page alone):** L1 title and L3-9 opening state the page's job (the horizon/confidence/capacity reference sheet) and its reader (the roadmap planner)..
+**Purpose/normal use (from the page alone):** L1 title and L3-9 opening state the page's job (the horizon/confidence/capacity reference sheet) and its reader (the roadmap planner).
 
 **Canonical B1 satisfied** - L1 title and L3-9 opening state the page's job (the horizon/confidence/capacity reference sheet) and its reader (the roadmap planner).
 
-**Canonical B2** - Named B2 gap(s): L35 `COMMIT-ABLE` All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
+**Canonical B2** - Named B2 gap(s): L35 `COMMIT-ABLE`. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
 
 **Canonical B3 satisfied** - The page uses descriptive headings, short paragraphs, lists, tables and concrete examples/commands/templates; no display elision. Whole-page range is L1-75.
 
@@ -132,11 +132,11 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 ### P6 - `.claude/skills/rollback-runbook-author/SKILL.md` - read whole, L1-195
 
-**Purpose/normal use (from the page alone):** L6 title, L8-18 Purpose and L20-44 Use When state the page's job (author a rollback strategy and runbook) and its reader (the change owner/operator who must execute under pressure)..
+**Purpose/normal use (from the page alone):** L6 title, L8-18 Purpose and L20-44 Use When state the page's job (author a rollback strategy and runbook) and its reader (the change owner/operator who must execute under pressure).
 
 **Canonical B1 satisfied** - L6 title, L8-18 Purpose and L20-44 Use When state the page's job (author a rollback strategy and runbook) and its reader (the change owner/operator who must execute under pressure).
 
-**Canonical B2** - Named B2 gap(s): No named B2 gap; every candidate is inventoried as defined-at-first-use or documented exclusion. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
+**Canonical B2** - Named B2 gap(s): No named B2 gap; every candidate is inventoried as defined-at-first-use or documented exclusion.. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
 
 **Canonical B3 satisfied** - The page uses descriptive headings, short paragraphs, lists, tables and concrete examples/commands/templates; no display elision. Whole-page range is L1-195.
 
@@ -150,11 +150,11 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 ### P7 - `.claude/skills/rollback-runbook-author/references/rollback-runbook-template.md` - read whole, L1-74
 
-**Purpose/normal use (from the page alone):** L1 title and L3-8 opening state the page's job (the rollback runbook skeleton and rehearsal log) and its reader (the rollback author/executor)..
+**Purpose/normal use (from the page alone):** L1 title and L3-8 opening state the page's job (the rollback runbook skeleton and rehearsal log) and its reader (the rollback author/executor).
 
 **Canonical B1 satisfied** - L1 title and L3-8 opening state the page's job (the rollback runbook skeleton and rehearsal log) and its reader (the rollback author/executor).
 
-**Canonical B2** - Named B2 gap(s): L28 `DRAFT`, L28 `CURRENT`, L28 `STALE`, L18 `expand-phase`, L18 `contract-phase` All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
+**Canonical B2** - Named B2 gap(s): L28 `DRAFT`, L28 `CURRENT`, L28 `STALE`, L18 `expand-phase`, L18 `contract-phase`. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
 
 **Canonical B3 satisfied** - The page uses descriptive headings, short paragraphs, lists, tables and concrete examples/commands/templates; no display elision. Whole-page range is L1-74.
 
@@ -168,11 +168,11 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 ### P8 - `.claude/skills/saas-cost-architect/SKILL.md` - read whole, L1-212
 
-**Purpose/normal use (from the page alone):** L6 title, L8-11 reading key, L13-22 Purpose and L24-52 Use When state the page's job (build a multi-tenant SaaS cost model) and its reader (the cost/architecture owner)..
+**Purpose/normal use (from the page alone):** L6 title, L8-11 reading key, L13-22 Purpose and L24-52 Use When state the page's job (build a multi-tenant SaaS cost model) and its reader (the cost/architecture owner).
 
 **Canonical B1 satisfied** - L6 title, L8-11 reading key, L13-22 Purpose and L24-52 Use When state the page's job (build a multi-tenant SaaS cost model) and its reader (the cost/architecture owner).
 
-**Canonical B2** - Named B2 gap(s): L3 `SaaS`, L3 `AI` All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
+**Canonical B2** - Named B2 gap(s): L3 `SaaS`, L3 `AI`. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
 
 **Canonical B3 satisfied** - The page uses descriptive headings, short paragraphs, lists, tables and concrete examples/commands/templates; no display elision. Whole-page range is L1-212.
 
@@ -323,9 +323,9 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 ## 8. Hunk/line accounting and local validation performed while authoring
 
-**Hunks.** One added record file, zero modified files, zero deleted files (`git diff --name-status 84a5295d..<head>`). The record has one terminal LF, no CR, no trailing-whitespace line, no blank line at EOF, and never contains its own digest. Final record bytes/LF/CR/sha256/blob are measured outside the record and published in the PR body and SD-C handoff.
+**Hunks.** One added record file, zero modified files, zero deleted files (`git diff --name-status 84a5295d..HEAD`). The record has one terminal LF, no CR, no trailing-whitespace line, no blank line at EOF, and never contains its own digest. Final record bytes/LF/CR/sha256/blob are measured outside the record and published in the PR body and SD-C handoff.
 
-**Local validation actually run before the Stage C handoff:** `git diff --check`; `python -B scripts/check_dco.py --range 84a5295d..<head>`; `python -P scripts/validate-skills.py`; `python -P -B scripts/ci/check-markdown-links.py <record>`; the PR-body bound-field checker on the final body; the record integrity check (bytes/LF/CR/trailing whitespace/EOF). Hosted CI and Codex are recorded in the SD-C handoff, not asserted here; anything not run is UNRUN, never passed.
+**Local validation actually run before the Stage C handoff:** `git diff --check`; `python -B scripts/check_dco.py --range 84a5295d..HEAD`; `python -P scripts/validate-skills.py`; `python -P -B scripts/ci/check-markdown-links.py <record>`; the PR-body bound-field checker on the final body; the record integrity check (bytes/LF/CR/trailing whitespace/EOF). Hosted CI and Codex are recorded in the SD-C handoff, not asserted here; anything not run is UNRUN, never passed.
 
 ## 9. Stage C declaration against AC1-AC8 and self-state consistency
 
@@ -335,7 +335,7 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | **AC2** | Eight pages 232-239 bound by 40-hex blob, bytes/LF and totals 69,755 B / 1,256 LF at pinned ref 2db1ffb7; zero drift; no outside page read. |
 | **AC3** | Whole-page ranges L1-last; canonical B1-B6 per page with B4 per page and B6 handling; one contiguous exact-once five-class inventory above with real tokens/lines, zero duplicates and one reconciliation section. |
 | **AC4** | Honest dispositions under the strict FULL bar: **0 FULL / 8 PARTIAL / 0 UNRUN**; B6 UNVERIFIED and never FULL-supporting; no silent upgrade; every PARTIAL names its basis. |
-| **AC5** | Record integrity; body binds plan/head/record facts outside the record; PROC-04 published == live-body recompute (SD-C handoff); self-authored skills rows/Row sources with round and row=<n>; six-field lines outside bound fields. |
+| **AC5** | Record integrity; body binds plan/head/record facts outside the record; PROC-04 published == live-body recompute (SD-C handoff); self-authored skills rows/protocol Row sources (round and row=<n>) and the manifest-bound six-field skill-usage lines outside the bound fields, per AEGIS-APR-101/117. |
 | **AC6** | Codex loop is run at the exact head and triaged per the owner loop rule; no pass claim; SD-C handoff records the head-bound state/unavailability. |
 | **AC7** | Plan binding 6248180046 + B ACCEPT 6248227748; derivation base 84a5295d (**#831 32nd**, **655e40ea = #828 31st**, **883bf690 = #832 30th**); merged lane-B rows 144-199; reservations 200-207/208-215/216-223/224-231; block 232-239; next 240; official count re-stated; zero drift. |
 | **AC8** | C acts only on the fresh B ACCEPT bound to this plan, branches from then-current main 84a5295d, adds exactly the one record path, records base/head/tree/objects, posts SD-C COMPLETE; D/E/F/G separate; no merge here. |
