@@ -40,6 +40,6 @@ jobs:
        (github.event_name == 'issue_comment' && github.event.issue.pull_request != null &&
         contains(github.event.comment.body, '@deepseek') &&
         contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)))
-    uses: ModernNomad-98/ci-workflows/.github/workflows/deepseek-review.yml@9f528fa77ac33edf69019cc5e6ee88b02bccb8d3 # main 2026-10-18 (v1.0.0 + empty exclude-patterns: awk deadlock fix)
+    uses: ModernNomad-98/ci-workflows/.github/workflows/deepseek-review.yml@2354f2e650d9cf803f88cdc223e39ed26ad8cfbc # Sherlock v2: vendored tool, deepseek-flash, thinking max, signed reviews
     secrets:
       CHAT_TOKEN: ${{ secrets.CHAT_TOKEN }}
