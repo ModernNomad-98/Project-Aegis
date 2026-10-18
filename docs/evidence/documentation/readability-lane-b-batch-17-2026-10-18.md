@@ -6,13 +6,13 @@ Agent: **sd-c-793-r2** (true identity) - stage role **sd-c-read-b17-c1** - DeepS
 
 **Plan of record.** Lane-B batch-17 lean plan, merged PR #834 issue comment **6248316313** (capture timestamp 2026-10-18T02:35:34-07:00; immutable; 15,270 B) with **B ACCEPT 6248356089** (frontier 240-247 / lane B batch 17 confirmed; eight pages reproduce; canonical B1/B4/B6 quotes verified). This record is the one evidence artifact the plan governs; there is no committed plan file.
 
-**Implementation base.** Branch base = **a141c64f52e3ca62300e6afbd6204dfd4a17c670** (the #836 batch-15 record merge; 34th session record merge). **Live main at repair-3 finish = a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3 (#835 batch-14 record merge, 35th, parents a141c64f + efaf156a); G discloses this drift.** #834 batch-13 33rd at e7acaca4; #831 batch-10 32nd at 84a5295d; #828 batch-7 31st at 655e40ea; #832 batch-11 30th at 883bf690. Pinned measurement ref = **2db1ffb7985ddc1c087c455740fd59e962967461**.
+**Implementation base.** Branch base = **a141c64f52e3ca62300e6afbd6204dfd4a17c670** (the #836 batch-15 record merge; 34th session record merge). **Live main at repair-4 finish = 6f584c9dd187b84e3175472906fe7553a2c1bc97 (#833 batch-12 record merge, 36th; parent a06360d4; #835 batch-14 35th at a06360d4; #836 34th at a141c64f); G discloses this drift; no rebase.** #834 batch-13 33rd at e7acaca4; #831 batch-10 32nd at 84a5295d; #828 batch-7 31st at 655e40ea; #832 batch-11 30th at 883bf690. Pinned measurement ref = **2db1ffb7985ddc1c087c455740fd59e962967461**.
 
 **Change class: docs-only.** Exactly **one added path**: docs/evidence/documentation/readability-lane-b-batch-17-2026-10-18.md - this record. No other added, modified or deleted tracked path; no keeper row, acceptance-index row, ledger, register, manifest, tool, test or workflow change; no page edit; no committed plan file. The record is authored at the branch head; head/tree/record facts are published in the PR body and SD-C handoff, not inside this record.
 
 ## 2. Lane derivation at this base - re-run, not handed down
 
-**Merged lane-B rows at live main a06360d4:** **144-199 + 208-215 + 216-223 + 224-231** (144-167 + 168-183 + 184-191 via #831 + 192-199 via #832 + 208-215 via #834 + 216-223 via #835 + 224-231 via #836). **Open reservations:** #833 200-207, #837 232-239, #839 248-255. **R2 next-block rule:** the next eight unread pages in the sorted unread sequence, excluding merged rows and every reservation, are **240-247**, inside lane B's quarter. **Lane letter: B. Per-lane batch number: 17** - merged lane-B batches are 2, 2-rerecord, 3, 5, 6, 7, 8, 9, 10 (#831), 11 (#832), 13 (#834); in-flight #833=12, #835=14, #836=15, #837=16; next per-lane number is 17. **Record path:** docs/evidence/documentation/readability-lane-b-batch-17-2026-10-18.md (does not exist at main). **Block last page:** 247; next unread page after the block is 256. **Official count:** 690/107/6/567/0/6/0/4/583.
+**Merged lane-B rows at live main 6f584c9d:** **144-199 + 200-207 + 208-215 + 216-223 + 224-231** (144-167 + 168-183 + 184-191 via #831 + 192-199 via #832 + 200-207 via #833 + 208-215 via #834 + 216-223 via #835 + 224-231 via #836). **Open reservations:** #837 232-239, #839 248-255. **R2 next-block rule:** the next eight unread pages in the sorted unread sequence, excluding merged rows and every reservation, are **240-247**, inside lane B's quarter. **Lane letter: B. Per-lane batch number: 17** - merged lane-B batches are 2, 2-rerecord, 3, 5, 6, 7, 8, 9, 10 (#831), 11 (#832), 13 (#834); in-flight #833=12, #835=14, #836=15, #837=16; next per-lane number is 17. **Record path:** docs/evidence/documentation/readability-lane-b-batch-17-2026-10-18.md (does not exist at main). **Block last page:** 247; next unread page after the block is 256. **Official count:** 690/107/6/567/0/6/0/4/583.
 
 **Scheduling dependency.** #833/#835/#836/#837 remain in flight; a later stage must re-derive the pending set at its own base (AC7/AC8); a changed page set stops the batch to Stage A/owner. No page outside 240-247 is read or claimed.
 
@@ -103,7 +103,7 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 
 ## 4A. Systematic five-class per-page token audit
 
-**Method (reproducible read-only scan of the eight pinned pages).** Classes: **U** uppercase/acronym tokens; **M** mixed-case/file/plural coded identifiers; **L** lowercase technical abbreviations/compounds; **B** backticked identifiers, placeholders, units and operators; **F** lifecycle/status/format codes. Every row below is one real token from the pinned page text with its real first-use line; ordinary English words, bare numbers, grouped phrases, rows without a resolvable page line and fabricated rows are excluded. Dispositions: **defined at first use** when the page expands/defines the token at the same or an earlier line; **named gap** when first use precedes any definition on this page; **documented exclusion** when the token is a proper name, filename, template placeholder, external ID/register code or ordinary prose compound and no B2 expansion is owed. This is the only inventory table: one row per unique (page, token, first-use line) key; no second inventory table (the counts table is derived from the inventory) and no rows after the reconciliation/proof section. **Repair-3 note:** the 20 added class-B rows are the omitted self-describing placeholders from the DOTALL five-class scan; all are documented exclusions, so no section 4 B2/verdict named-gap line changes.
+**Method (reproducible read-only scan of the eight pinned pages).** Classes: **U** uppercase/acronym tokens; **M** mixed-case/file/plural coded identifiers; **L** lowercase technical abbreviations/compounds; **B** backticked identifiers, placeholders, units and operators; **F** lifecycle/status/format codes. Every row below is one real token from the pinned page text with its real first-use line; ordinary English words, bare numbers, grouped phrases, rows without a resolvable page line and fabricated rows are excluded. Dispositions: **defined at first use** when the page expands/defines the token at the same or an earlier line; **named gap** when first use precedes any definition on this page; **documented exclusion** when the token is a proper name, filename, template placeholder, external ID/register code or ordinary prose compound and no B2 expansion is owed. This is the only inventory table: one row per unique (page, token, first-use line) key; no second inventory table (the counts table is derived from the inventory) and no rows after the reconciliation/proof section. **Repair-3 note:** the 20 added class-B rows are the omitted self-describing placeholders from the DOTALL five-class scan; all are documented exclusions, so no section 4 B2/verdict named-gap line changes. **Repair-4 note:** the 45 added class-B first-use placeholders (P1 4, P3 8, P4 7, P6 13, P7 7, P8 6) are documented exclusions; five nested components of the already-inventoried P8 L73 composite naming pattern remain excluded and are not separate rows; no new named gap.
 
 | Page | Token | First-use line | Class | Disposition (reason) |
 | --- | --- | ---: | --- | --- |
@@ -218,28 +218,73 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 | P8 | <always-masked list; method (block-out); enforcement point; cross-tenant rule> | L112 | B | documented exclusion - self-describing output-template placeholder |
 | P8 | <terms \| viable options and reasons \| verified/unknown dollar and effort costs \| pros/cons \| recommendation and why> | L116 | B | documented exclusion - self-describing output-template placeholder |
 | P8 | <which producers follow this (manual/clickthrough/playwright) + migration note for existing evidence> | L120 | B | documented exclusion - self-describing output-template placeholder |
+| P1 | <capability — present/partial/missing — build/buy/defer> | L109 | B | documented exclusion - self-describing output-template placeholder |
+| P1 | <option + why it fits + reversal condition> | L113 | B | documented exclusion - self-describing output-template placeholder |
+| P1 | <increment → verification → rollback> | L116 | B | documented exclusion - self-describing output-template placeholder |
+| P1 | <each with risk-if-wrong / who answers> | L117 | B | documented exclusion - self-describing output-template placeholder |
+| P3 | <language/framework → SAST analyzer category; unsupported = stated GAP> | L117 | B | documented exclusion - self-describing SAST output-template placeholder |
+| P3 | <enabled rule classes, severity thresholds, custom rules; versioned in-repo> | L118 | B | documented exclusion - self-describing SAST output-template placeholder |
+| P3 | <baseline capture; PR gate = NEW-since-baseline; full-scan cadence; refresh/burn-down policy> | L119 | B | documented exclusion - self-describing SAST output-template placeholder |
+| P3 | <entry = rule id + location + written rationale + owner + date + expiry/review> | L121 | B | documented exclusion - self-describing SAST output-template placeholder |
+| P3 | <incremental (PR/changed-files) + full (cadence); CI latency-budget fit> | L123 | B | documented exclusion - self-describing SAST output-template placeholder |
+| P3 | <stage placement; merge-blocking on NEW findings> | L124 | B | documented exclusion - self-describing SAST output-template placeholder |
+| P3 | <scan error/timeout/skipped-language ⇒ gate FAILS / GAP surfaced; the proof it fires> | L125 | B | documented exclusion - self-describing SAST output-template placeholder |
+| P3 | <each with risk-if-wrong / who answers> | L129 | B | documented exclusion - self-describing SAST output-template placeholder |
+| P4 | <N readers / M writers enumerated, incl. events + analytics> | L140 | B | documented exclusion - self-describing output-template placeholder |
+| P4 | <dual-write + backfill + read-switch> | L142 | B | documented exclusion - self-describing output-template placeholder |
+| P4 | <stop dual-write; deprecation-register entry; drop schedule> | L143 | B | documented exclusion - self-describing output-template placeholder |
+| P4 | <zero-reader evidence over window> | L143 | B | documented exclusion - self-describing output-template placeholder |
+| P4 | <stage → deploy/release boundary> | L144 | B | documented exclusion - self-describing output-template placeholder |
+| P4 | <per stage; point of no return = physical drop> | L147 | B | documented exclusion - self-describing output-template placeholder |
+| P4 | <explicitly out of scope for this plan> | L149 | B | documented exclusion - self-describing output-template placeholder |
+| P6 | <register-id — sequential or date-based> | L106 | B | documented exclusion - self-describing register-template placeholder |
+| P6 | <grant ID for lifecycle events; none for a new grant> | L108 | B | documented exclusion - self-describing register-template placeholder |
+| P6 | <new grant ID for SUPERSEDED; otherwise none> | L109 | B | documented exclusion - self-describing register-template placeholder |
+| P6 | <state recorded by THIS immutable event, not a mutable field> | L110 | B | documented exclusion - self-describing register-template placeholder |
+| P6 | <grant only: ISO timestamp / human or accountable role> | L111 | B | documented exclusion - self-describing register-template placeholder |
+| P6 | <lifecycle only: timestamp or ordered condition> | L112 | B | documented exclusion - self-describing register-template placeholder |
+| P6 | <lifecycle only: transcription timestamp / recorder> | L113 | B | documented exclusion - self-describing register-template placeholder |
+| P6 | <lifecycle only: none; scope fields refer to target grant> | L114 | B | documented exclusion - self-describing register-template placeholder |
+| P6 | <why this authorization exists> | L115 | B | documented exclusion - self-describing register-template placeholder |
+| P6 | <exact actions, files, branches, environments — as worded by the grantor> | L116 | B | documented exclusion - self-describing register-template placeholder |
+| P6 | <actual prohibitions and scope limits; no invented restriction> | L117 | B | documented exclusion - self-describing register-template placeholder |
+| P6 | <link: PR comment / issue / chat record / commit> | L118 | B | documented exclusion - self-describing register-template placeholder |
+| P6 | <actual date/condition/use limit; none stated if absent> | L119 | B | documented exclusion - self-describing register-template placeholder |
+| P7 | <named human or accountable role> | L13 | B | documented exclusion - self-describing register-format placeholder |
+| P7 | <why this authorization was given> | L14 | B | documented exclusion - self-describing register-format placeholder |
+| P7 | <verbatim grant plus the exact proposal it answered> | L15 | B | documented exclusion - self-describing register-format placeholder |
+| P7 | <human source and retrievable pointer or dated verbatim record> | L18 | B | documented exclusion - self-describing register-format placeholder |
+| P7 | <actual date, condition or use count; none stated if absent> | L19 | B | documented exclusion - self-describing register-format placeholder |
+| P7 | <ISO timestamp or unambiguous ordered condition> | L35 | B | documented exclusion - self-describing register-format placeholder |
+| P7 | <actual action or human decision, with source> | L37 | B | documented exclusion - self-describing register-format placeholder |
+| P8 | <who needs evidence, for what, incl. compliance> | L108 | B | documented exclusion - self-describing output-template placeholder |
+| P8 | <pattern + 2 valid examples + 1 counter-example> | L111 | B | documented exclusion - self-describing output-template placeholder |
+| P8 | <required fields + where recorded (sidecar/report table)> | L114 | B | documented exclusion - self-describing output-template placeholder |
+| P8 | <class → location → retention → access rule> | L115 | B | documented exclusion - self-describing output-template placeholder |
+| P8 | <checkpoint ↔ case/session/PR/closeout wiring> | L118 | B | documented exclusion - self-describing output-template placeholder |
+| P8 | <viewport(s), data stability, framing> | L119 | B | documented exclusion - self-describing output-template placeholder |
 
 **Counts recomputed from the FINAL table above.**
 
 | Page | Rows | U | M | L | B | F | Named gaps | Defined | Exclusions |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P1 | 13 | 4 | 4 | 0 | 5 | 0 | 0 | 4 | 9 |
+| P1 | 17 | 4 | 4 | 0 | 9 | 0 | 0 | 4 | 13 |
 | P2 | 7 | 3 | 3 | 0 | 0 | 1 | 3 | 0 | 4 |
-| P3 | 13 | 8 | 1 | 1 | 1 | 2 | 1 | 7 | 5 |
-| P4 | 17 | 5 | 0 | 2 | 7 | 3 | 0 | 4 | 13 |
+| P3 | 21 | 8 | 1 | 1 | 9 | 2 | 1 | 7 | 13 |
+| P4 | 24 | 5 | 0 | 2 | 14 | 3 | 0 | 4 | 20 |
 | P5 | 12 | 4 | 0 | 2 | 6 | 0 | 2 | 0 | 10 |
-| P6 | 17 | 8 | 2 | 2 | 1 | 4 | 4 | 1 | 12 |
-| P7 | 17 | 4 | 2 | 1 | 4 | 6 | 3 | 0 | 14 |
-| P8 | 15 | 5 | 1 | 1 | 8 | 0 | 2 | 3 | 10 |
-| **Total** | **111** | **41** | **13** | **9** | **32** | **16** | **15** | **19** | **77** |
+| P6 | 30 | 8 | 2 | 2 | 14 | 4 | 4 | 1 | 25 |
+| P7 | 24 | 4 | 2 | 1 | 11 | 6 | 3 | 0 | 21 |
+| P8 | 21 | 5 | 1 | 1 | 14 | 0 | 2 | 3 | 16 |
+| **Total** | **156** | **41** | **13** | **9** | **77** | **16** | **15** | **19** | **122** |
 
-**Zero-duplicate proof.** The final table has **111 data rows** and **111 unique (page, token, first-use line) keys**; duplicate keys = **0**; extra rows = **0**. Disposition sums equal rows: **15 named gaps + 19 defined at first use + 77 documented exclusions = 111**. Class sums equal rows: **41 U + 13 M + 9 L + 32 B + 16 F = 111**. Page sums equal rows: **13 + 7 + 13 + 17 + 12 + 17 + 17 + 15 = 111**. Page-line resolution sample: P1 SaaS L8; P2 RLS L10; P3 SAST L8; P4 DDL L8; P5 FK L47; P6 PR L26; P7 GRANT L11; P8 PII L3.
+**Zero-duplicate proof.** The final table has **156 data rows** and **156 unique (page, token, first-use line) keys**; duplicate keys = **0**; extra rows = **0**. Disposition sums equal rows: **15 named gaps + 19 defined at first use + 122 documented exclusions = 156**. Class sums equal rows: **41 U + 13 M + 9 L + 77 B + 16 F = 156**. Page sums equal rows: **17 + 7 + 21 + 24 + 12 + 30 + 24 + 21 = 156**. Page-line resolution sample: P1 SaaS L8; P2 RLS L10; P3 SAST L8; P4 DDL L8; P5 FK L47; P6 PR L26; P7 GRANT L11; P8 PII L3.
 
 ## 5. Dispositions, keeper exclusion and continuation
 
-**Disposition tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages were read whole; no page is UNRUN. No page is FULL: each lacks canonical B6 independent read-only evidence, and six pages also have named B2 gaps. Named-gap pages: **P2 L10 RLS, L23 IdP, L28 DB; P3 L54 IaC; P5 L23 DDL, L47 FK; P6 L46 ADRs, L100 IDs, L108 ID, L111 ISO; P7 L13 ISO, L22 ID, L56 IDs; P8 L3 PII, L3 E2E.** **Repair-3:** the 20 added class-B placeholder rows are documented exclusions only; the named-gap list above is unchanged. No keeper/acceptance row; no page upgraded.
+**Disposition tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages were read whole; no page is UNRUN. No page is FULL: each lacks canonical B6 independent read-only evidence, and six pages also have named B2 gaps. Named-gap pages: **P2 L10 RLS, L23 IdP, L28 DB; P3 L54 IaC; P5 L23 DDL, L47 FK; P6 L46 ADRs, L100 IDs, L108 ID, L111 ISO; P7 L13 ISO, L22 ID, L56 IDs; P8 L3 PII, L3 E2E.** **Repair-3:** the 20 added class-B placeholder rows are documented exclusions only; the named-gap list above is unchanged. **Repair-4:** the 45 added first-use placeholders are also documented exclusions only; the named-gap list above is unchanged. No keeper/acceptance row; no page upgraded.
 
-**Continuation.** Lane A complete (0-143); merged lane-B evidence covers 144-199 + 208-215 + 216-223 + 224-231; reservations #833 200-207, #837 232-239, #839 248-255; this record covers 240-247. The next page after the block is 256; later stages re-derive the pending set at their own base. No page, plan, keeper or index change is made by this record.
+**Continuation.** Lane A complete (0-143); merged lane-B evidence covers 144-199 + 200-207 + 208-215 + 216-223 + 224-231; reservations #837 232-239, #839 248-255; this record covers 240-247. The next page after the block is 256; later stages re-derive the pending set at their own base. No page, plan, keeper or index change is made by this record.
 
 ## 6. Provenance, page authorship, zero drift and reader independence
 
@@ -268,15 +313,21 @@ One added record file, zero modified/deleted files (git diff --name-status a141c
 | --- | --- | --- |
 | AC1 one-path | MET | exactly one added record path; no other tracked path |
 | AC2 pages | MET | eight pages 240-247 by blob; totals 73,139/1,245; zero drift; no keeper |
-| AC3 whole-page + exact-once inventory | MET | section 4 tests B1-B6 per page; section 4A one contiguous 91-row table, 91 unique keys, zero duplicates, one reconciliation/proof |
+| AC3 whole-page + exact-once inventory | MET | section 4 tests B1-B6 per page; section 4A one contiguous **156-row** table, **156 unique keys**, zero duplicates, one reconciliation/proof |
 | AC4 honest dispositions | MET | 0 FULL / 8 PARTIAL / 0 UNRUN; B6 unverified; named gaps listed; no keeper |
 | AC5 record/body/PROC + provenance | MET in handoff | record facts; body PROC-04 published==recomputed; skills rows/Row sources/six in body and SD-C comment; self-state consistent |
 | AC6 Codex loop | MET in handoff | re-trigger at final head; head-bound unavailability only after triage; never a pass; two-round stop |
 | AC7 provenance | MET | plan binding, base a141c64f, lane derivation, merged rows/reservations, zero drift, absent record path |
 | AC8 stages | MET for C | acted on fresh B ACCEPT 6248356089; one record path; D/E/F/G separate; no merge |
 
-**Limits:** canonical B6 is unverified for all pages; B4 is assessed for instructional/reference content only; hosted CI/Codex states are observed in the SD-C handoff; this record cannot verify its own final hash. ## 9. Repair-3 disclosure (answers SD-D REVISE 6248652652)
+**Limits:** canonical B6 is unverified for all pages; B4 is assessed for instructional/reference content only; hosted CI/Codex states are observed in the SD-C handoff; this record cannot verify its own final hash.
+
+## 9. Repair-3 disclosure (answers SD-D REVISE 6248652652)
 
 **Repair-3 (stage role sd-c-read-b17-c4, true identity sd-a-789-repl-r2)** rebased this branch onto live main **a141c64f** (#836 merged 34th) and added the 20 omitted class-B placeholder rows found by the DOTALL five-class scan: P1 L106/L111/L114; P4 L141 (DDL intent, old×new guarantee, check), L142 (both directions, parity evidence), L145; P5 L59 (new shape, window, source, role); P7 L16, L36; P8 L107, L110, L112, L116, L120. Each row is a real self-describing template placeholder at its real first-use line; each is a documented exclusion, not a named gap. Final table: **111 rows = 111 unique keys, 0 duplicates**; per-page **13/7/13/17/12/17/17/15**; classes **U41/M13/L9/B32/F16**; dispositions **15 named-gap / 19 defined / 77 documented exclusion**; no new named gap; **0 FULL / 8 PARTIAL / 0 UNRUN**, canonical B4 per page, **B6 UNVERIFIED**, no keeper; pages 240-247 / totals 73,139 B / 1,245 LF unchanged. Base refresh: branch base a141c64f (#836 34th); **live main at finish a06360d4 (#835 35th, parents a141c64f + efaf156a); G discloses this drift**; merged lane-B rows **144-199 + 208-215 + 216-223 + 224-231**; reservations #833 200-207, #837 232-239, #839 248-255; block 240-247; next unread 256; #834 33rd at e7acaca4, #831 32nd at 84a5295d. No page/plan/keeper/index/ledger/register/manifest/tool/test/workflow/other path change; no merge. **Signed with both names: repair-3 true identity sd-a-789-repl-r2; stage role sd-c-read-b17-c4.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
 
-**Signed with both names: true identity sd-c-793-r2; stage role sd-c-read-b17-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
+## 10. Repair-4 disclosure (answers SD-D REVISE 6248781092)
+
+**Repair-4 (stage role sd-c-read-b17-c5, true identity sd-a-789-repl-r2)** did **not rebase**; branch base remains a141c64f and live main 6f584c9d is G-disclosed drift. It added the 45 real class-B first-use angle placeholders omitted from section 4A: P1 L109/L113/L116/L117; P3 L117/L118/L119/L121/L123/L124/L125/L129; P4 L140/L142/L143 (two)/L144/L147/L149; P6 L106/L108-L119; P7 L13/L14/L15/L18/L19/L35/L37; P8 L108/L111/L114/L115/L118/L119. Each token was verified at the pinned page text at its real first-use line; each added row is a documented exclusion (self-describing placeholder), not a named gap. Five nested components of the already-inventoried P8 L73 composite naming pattern remain excluded and are not invented as separate rows. Section 8 AC3 stale text was fixed from the old 91-row/91-key claim to the actual final **156 rows / 156 unique keys**. No page, plan, keeper, index, ledger, register, manifest, tool, test or workflow path changed; no merge.
+
+**Signed with both names: repair-4 true identity sd-a-789-repl-r2; stage role sd-c-read-b17-c5.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
