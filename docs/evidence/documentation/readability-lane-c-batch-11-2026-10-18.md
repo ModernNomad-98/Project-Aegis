@@ -234,6 +234,7 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | P2 | 84 | iii | test_calibration_gates.py | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P2 | 86 | iii | 2/2 | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P2 | 86 | iii | 6/6 | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
+| P2 | 87 | v | CRITICAL | documented exclusion - lifecycle/status or risk-class code defined by the repository, not a prose abbreviation |
 | P2 | 87 | v | FAIL | documented exclusion - lifecycle/status code defined by the repository, not a prose abbreviation |
 | P2 | 88 | iii | 20/20 | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P2 | 89 | iii | freeze/dataset/item | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
@@ -434,6 +435,7 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | P4 | 47 | iii | tools/behavioral_eval_runner/ | documented exclusion - inline exact file/path/identifier reference, not a prose abbreviation |
 | P4 | 48 | i | SDK | named gap - first use before any expansion on this page |
 | P4 | 52 | iii | enums.py | documented exclusion - inline exact file/path/identifier reference, not a prose abbreviation |
+| P4 | 52 | v | ⇒ | documented exclusion - operator token, not a prose abbreviation |
 | P4 | 53 | i | JSON | named gap - first use before any expansion on this page |
 | P4 | 53 | iii | canonical.py | documented exclusion - inline exact file/path/identifier reference, not a prose abbreviation |
 | P4 | 54 | i | S25 | named gap - first use before any expansion on this page |
@@ -549,6 +551,8 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | P4 | 192 | iii | evals.json | documented exclusion - inline exact file/path/identifier reference, not a prose abbreviation |
 | P4 | 193 | iii | trigger-evals.json | documented exclusion - inline exact file/path/identifier reference, not a prose abbreviation |
 | P4 | 198 | i | MANUAL | named gap - first use before any expansion on this page |
+| P4 | 201 | v | CRITICAL | documented exclusion - lifecycle/status or risk-class code defined by the repository, not a prose abbreviation |
+| P4 | 201 | v | HIGH | documented exclusion - lifecycle/status or risk-class code defined by the repository, not a prose abbreviation |
 | P4 | 201 | i | PROPOSED | named gap - first use before any expansion on this page |
 | P4 | 201 | i | STANDARD | named gap - first use before any expansion on this page |
 | P4 | 208 | i | OD | named gap - first use before any expansion on this page |
@@ -579,6 +583,7 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | P4 | 276 | iii | NaN/ | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P4 | 276 | iv | latest_* | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
 | P4 | 276 | iii | output/hashes | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
+| P4 | 276 | v | ± | documented exclusion - operator token, not a prose abbreviation |
 | P4 | 277 | iii | durations/timeouts/deadlines | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P4 | 278 | iv | required_files | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
 | P4 | 279 | iv | required_tool_permissions | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
@@ -613,6 +618,7 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | P4 | 318 | iv | subagent_count | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
 | P4 | 319 | iv | claim_scope | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
 | P4 | 319 | iv | workspace_role | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
+| P4 | 319 | v | ↔ | documented exclusion - operator token, not a prose abbreviation |
 | P4 | 324 | i | UNVERIFIED | named gap - first use before any expansion on this page |
 | P4 | 324 | i | VERIFIED | documented exclusion - inline code/identifier/status reference, not a prose abbreviation |
 | P4 | 326 | iv | onerror | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
@@ -843,6 +849,7 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | P5 | 69 | iv | offending_span | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
 | P5 | 69 | iv | parse_judge_output | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
 | P5 | 69 | iii | verdict.py | documented exclusion - inline exact file/path/identifier reference, not a prose abbreviation |
+| P5 | 70 | v | CRITICAL | documented exclusion - lifecycle/status or risk-class code defined by the repository, not a prose abbreviation |
 | P5 | 70 | i | MOCK_UNRATIFIED | defined at first use - expansion present on the first-use line |
 | P5 | 70 | i | RATIFIED | named gap - first use before any expansion on this page |
 | P5 | 70 | i | ROLE | named gap - first use before any expansion on this page |
@@ -1131,6 +1138,7 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | P6 | 58 | iv | telemetry_missing | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
 | P6 | 58 | v | · | documented exclusion - operator/unit token, not a prose abbreviation |
 | P6 | 59 | iii | 20/ | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
+| P6 | 59 | v | CRITICAL | documented exclusion - lifecycle/status or risk-class code defined by the repository, not a prose abbreviation |
 | P6 | 59 | iii | CRITICAL/adversarial | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P6 | 59 | iv | CalibrationItemContent | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
 | P6 | 59 | v | FAIL | documented exclusion - lifecycle/status code defined by the repository, not a prose abbreviation |
@@ -1222,6 +1230,7 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | P6 | 151 | iii | H-h-f1/H-h-f4 | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P6 | 152 | iii | A/C/D/J/N/O | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P6 | 152 | iii | G/H/I | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
+| P6 | 152 | v | HIGH | documented exclusion - lifecycle/status or risk-class code defined by the repository, not a prose abbreviation |
 | P6 | 152 | iii | destructive/unsafe | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P6 | 153 | iii | flags/kinds | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P6 | 154 | iii | 0/120 | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
@@ -1500,20 +1509,20 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | Page | Rows | i | ii | iii | iv | v | Defined | Named gaps | Exclusions |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P1 | 53 | 18 | 2 | 20 | 10 | 3 | 0 | 16 | 37 |
-| P2 | 127 | 30 | 4 | 76 | 11 | 6 | 0 | 33 | 94 |
+| P2 | 128 | 30 | 4 | 76 | 11 | 7 | 0 | 33 | 95 |
 | P3 | 113 | 49 | 4 | 39 | 13 | 8 | 5 | 47 | 61 |
-| P4 | 315 | 82 | 5 | 98 | 118 | 12 | 1 | 78 | 236 |
-| P5 | 298 | 83 | 3 | 132 | 73 | 7 | 2 | 81 | 215 |
-| P6 | 389 | 134 | 4 | 132 | 108 | 11 | 5 | 120 | 264 |
+| P4 | 320 | 82 | 5 | 98 | 118 | 17 | 1 | 78 | 241 |
+| P5 | 299 | 83 | 3 | 132 | 73 | 8 | 2 | 81 | 216 |
+| P6 | 391 | 134 | 4 | 132 | 108 | 13 | 5 | 120 | 266 |
 | P7 | 40 | 16 | 2 | 10 | 12 | 0 | 0 | 16 | 24 |
 | P8 | 45 | 12 | 2 | 19 | 11 | 1 | 0 | 12 | 33 |
-| **Total** | **1380** | **424** | **26** | **526** | **356** | **48** | **13** | **403** | **964** |
+| **Total** | **1389** | **424** | **26** | **526** | **356** | **57** | **13** | **403** | **973** |
 
-**Zero-duplicate proof:** final table rows = **1380** = unique (page, first-use line, normalized token) keys = **1380**; duplicate keys = **0**; extra rows after the final table = **0**; per-page/class/disposition sums equal the row count; one contiguous table only. **Five-column cell-count proof:** all **1380** rows parse exactly five columns with in-token pipes escaped and **0** bad rows. **Reconciliation:** section 3 B2/verdicts and section 5 named-gap list agree with this final table; every row resolves to real pinned/main page text at its real first occurrence; no fabricated/placeholder/stale row.
+**Zero-duplicate proof:** final table rows = **1389** = unique (page, first-use line, normalized token) keys = **1389**; duplicate keys = **0**; extra rows after the final table = **0**; per-page/class/disposition sums equal the row count; one contiguous table only. **Five-column cell-count proof:** all **1389** rows parse exactly five columns with in-token pipes escaped and **0** bad rows. **Reconciliation:** section 3 B2/verdicts and section 5 named-gap list agree with this final table; every row resolves to real pinned/main page text at its real first occurrence; no fabricated/placeholder/stale row.
 
 ## 6. Dispositions, verdicts, keeper exclusion and continuation
 
-**Disposition tally: 13 defined at first use / 403 named gaps / 964 documented exclusions = 1380 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED for every page; named B2 gaps force PARTIAL where present. **No keeper/acceptance row** is created; a later keeper decides.
+**Disposition tally: 13 defined at first use / 403 named gaps / 973 documented exclusions = 1389 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED for every page; named B2 gaps force PARTIAL where present. **No keeper/acceptance row** is created; a later keeper decides.
 
 **Continuation:** lane A complete; lane B complete 144-279; lane C batches 1-10 merged; this record covers 344-351 (batch 11); next unread 352-359, stated not read. Exactly one added path; no plan file, keeper/index/ledger/register/manifest/tool/test/workflow change.
 
@@ -1523,7 +1532,7 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | --- | --- | --- |
 | AC1 one-path | MET in this record | exactly one added record path; no other path; DCO-signed commit(s) measured post-commit |
 | AC2 frozen pages | MET | eight pages above; blobs/bytes/LF; all zero-drift at main; no page outside set |
-| AC3 whole-page + inventory | MET | whole-page B1-B6; ONE 1380-row table; five-cell/zero-duplicate proof; final-table counts |
+| AC3 whole-page + inventory | MET | whole-page B1-B6; ONE 1389-row table; five-cell/zero-duplicate proof; final-table counts |
 | AC4 dispositions | MET | strict FULL bar; B6 UNVERIFIED; 0F/8P/0 UNRUN; named gaps; no keeper |
 | AC5 record/body/PROC | MET in handoff | record facts outside; body witness/skills/security; PROC-04 live-final-body published==recomputed literal; checker 0 |
 | AC6 Codex | honest at C handoff | Codex never a pass; trigger/triage/thread state reported in PR body/SD-C handoff; MG3 G-only |
@@ -1543,10 +1552,10 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 
 **Row source records (four separate; required round; per-row row=<n>; non-zero binding).**
 
-<!-- Row source: agent=sd-c-read-lc-344-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=this record on PR #849 head a862f670 / base 55151039 / block 344-351; source=_A/evidence/read-lc344-c1/Crows.txt line 1 of 4; binding=sha256 aeea424c64218c766b96f5127f4e2aee97bdb1cf417ab4752a03cce9e43bddb7 over the four-row capture (908 B, 4 LF, non-zero); manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; limits=digest binds captured text, not human identity; status=current. -->
-<!-- Row source: agent=sd-c-read-lc-344-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=this record on PR #849 head a862f670 / base 55151039 / block 344-351; source=_A/evidence/read-lc344-c1/Crows.txt line 2 of 4; binding=sha256 aeea424c64218c766b96f5127f4e2aee97bdb1cf417ab4752a03cce9e43bddb7 over the four-row capture (908 B, 4 LF, non-zero); manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; limits=digest binds captured text, not human identity; status=current. -->
-<!-- Row source: agent=sd-c-read-lc-344-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=this record on PR #849 head a862f670 / base 55151039 / block 344-351; source=_A/evidence/read-lc344-c1/Crows.txt line 3 of 4; binding=sha256 aeea424c64218c766b96f5127f4e2aee97bdb1cf417ab4752a03cce9e43bddb7 over the four-row capture (908 B, 4 LF, non-zero); manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; limits=digest binds captured text, not human identity; status=current. -->
-<!-- Row source: agent=sd-c-read-lc-344-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=this record on PR #849 head a862f670 / base 55151039 / block 344-351; source=_A/evidence/read-lc344-c1/Crows.txt line 4 of 4; binding=sha256 aeea424c64218c766b96f5127f4e2aee97bdb1cf417ab4752a03cce9e43bddb7 over the four-row capture (908 B, 4 LF, non-zero); manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; limits=digest binds captured text, not human identity; status=current. -->
+<!-- Row source: agent=sd-c-read-lc-344-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=this record on PR #850 head 815578eaab2fb71d97fc38533dd7cda1182c68de / base 55151039 / block 344-351; source=_A/evidence/read-lc344-c1/Crows.txt line 1 of 4; binding=sha256 aeea424c64218c766b96f5127f4e2aee97bdb1cf417ab4752a03cce9e43bddb7 over the four-row capture (908 B, 4 LF, non-zero); manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; limits=digest binds captured text, not human identity; status=current. -->
+<!-- Row source: agent=sd-c-read-lc-344-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=this record on PR #850 head 815578eaab2fb71d97fc38533dd7cda1182c68de / base 55151039 / block 344-351; source=_A/evidence/read-lc344-c1/Crows.txt line 2 of 4; binding=sha256 aeea424c64218c766b96f5127f4e2aee97bdb1cf417ab4752a03cce9e43bddb7 over the four-row capture (908 B, 4 LF, non-zero); manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; limits=digest binds captured text, not human identity; status=current. -->
+<!-- Row source: agent=sd-c-read-lc-344-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=this record on PR #850 head 815578eaab2fb71d97fc38533dd7cda1182c68de / base 55151039 / block 344-351; source=_A/evidence/read-lc344-c1/Crows.txt line 3 of 4; binding=sha256 aeea424c64218c766b96f5127f4e2aee97bdb1cf417ab4752a03cce9e43bddb7 over the four-row capture (908 B, 4 LF, non-zero); manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; limits=digest binds captured text, not human identity; status=current. -->
+<!-- Row source: agent=sd-c-read-lc-344-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=this record on PR #850 head 815578eaab2fb71d97fc38533dd7cda1182c68de / base 55151039 / block 344-351; source=_A/evidence/read-lc344-c1/Crows.txt line 4 of 4; binding=sha256 aeea424c64218c766b96f5127f4e2aee97bdb1cf417ab4752a03cce9e43bddb7 over the four-row capture (908 B, 4 LF, non-zero); manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; limits=digest binds captured text, not human identity; status=current. -->
 
 **Six-field lines (outside the Row source records; each names its actual skill).**
 
