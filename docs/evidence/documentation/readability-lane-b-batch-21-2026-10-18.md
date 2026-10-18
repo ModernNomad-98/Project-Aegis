@@ -12,7 +12,7 @@
 
 **Pinned reference:** `2db1ffb7985ddc1c087c455740fd59e962967461`. Instrument: `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7 --json`. Observed **690 reader pages / 107 accepted / 6 cannot-decide / 4 partial / official pending 583**; pending **573**. **Lane A complete 0-143**; **lane B = 144-287**. **Merged lane-B rows at base 4b99f69f:** **144-199 + 200-207 + 208-215 + 216-223 + 224-231 + 232-239 + 240-247 + 248-255 + 256-263 + 264-271** (all merged; #841 merged as 41st at 4b99f69f). **Open reservations:** none; this record's own block is 272-279. **This record's own block: 272-279; next unread page 280.**
 
-**Batch number:** merged lane-B batches 2/2-rerecord/3/5/6/7/8/9/10/11/12/13/14/15; in-flight 16/17/18/19/20 -> **batch 21**. **R2:** next eight sorted unread pages after merged rows and all reservations are **272-279**. **Lane letter B.** No page outside 272-279 is read or claimed.
+**Batch number:** merged lane-B batches 2/2-rerecord/3/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20 -> **batch 21**. **R2:** next eight sorted unread pages after merged rows and all reservations are **272-279**. **Lane letter B.** No page outside 272-279 is read or claimed.
 
 ## 3. The eight frozen pages — measured at pinned ref 2db1ffb7
 
@@ -60,7 +60,7 @@
 
 **Canonical B1 satisfied** — the title and opening state the page's job and its reader; read L1-20 whole.
 **Canonical B2** — reading-key/terms material: **Reading key:** a pull request (PR) proposes a branch's changes for review; Named B2 first-use gaps in the exact-once inventory: L9 PR; L10 CI.
-**Canonical B3 satisfied** — descriptive headings: Purpose; Use When; Inputs to Inspect; Workflow; Output Format; Validation Checklist; 0 table/list rows supply concrete operational detail.
+**Canonical B3 satisfied** — descriptive headings: Purpose; Use When; Inputs to Inspect; Workflow; Output Format; Validation Checklist; **0 table rows; 42 Markdown list items** supply concrete operational detail (metric names table rows separately from list items).
 **Canonical B4 satisfied (canonical test)** — this is instructional/reference material; it states behavior to check or action to take, not a deployed integration, passing check, synthetic test or measured model result. No shipped-vs-proposed claim is misrepresented.
 **Canonical B5 satisfied** — navigation/reference links and file references: ../../../docs/research/aegis-workflow-extraction-report.md, references/standing-approval-policy.md, references/standing-approval-policy.md; referenced paths exist at the base; technical contract and safety boundaries retained; zero page edits.
 **Canonical B6 UNVERIFIED** — no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship. B6 does not support FULL.
@@ -94,25 +94,25 @@
 
 **Purpose/normal use (from the page alone):** Statement of Applicability — template. The page opens with its job and reader in the heading/opening lines.
 
-**Canonical B1 satisfied** — the title and opening state the page's job and its reader; read L1-20 whole.
-**Canonical B2** — no reading-key/glossary block; named B2 first-use gaps in the exact-once inventory: L4 ISO; L4 IEC.
-**Canonical B3 satisfied** — descriptive headings: Header block; Row template; Justification patterns; Per-standard notes; 2 table/list rows supply concrete operational detail.
+**Canonical B1 NOT fully satisfied — audience gap:** the title and opening describe a Statement of Applicability template and row sourcing, but do not state who should read/use it; the later Author/Approver fields are document fields, not audience. B1 gap recorded.
+**Canonical B2** — no reading-key/glossary block; named B2 first-use gaps in the exact-once inventory: L4 ISO; L4 IEC; L10 ISMS-AIMS.
+**Canonical B3 satisfied** — descriptive headings: Header block; Row template; Justification patterns; Per-standard notes; 2 table rows plus list items supply concrete operational detail.
 **Canonical B4 satisfied (canonical test)** — this is instructional/reference material; it states behavior to check or action to take, not a deployed integration, passing check, synthetic test or measured model result. No shipped-vs-proposed claim is misrepresented.
 **Canonical B5 satisfied** — navigation/reference links and file references: none beyond the parent workflow; referenced paths exist at the base; technical contract and safety boundaries retained; zero page edits.
 **Canonical B6 UNVERIFIED** — no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship. B6 does not support FULL.
-**Verdict: PARTIAL** — basis: named B2 gaps L4 ISO; L4 IEC; canonical B6 unverified.
+**Verdict: PARTIAL** — basis: named B2 gaps L4 ISO; L4 IEC; L10 ISMS-AIMS; plus canonical B1 audience gap; canonical B6 unverified.
 
 ### P6 — `.claude/skills/static-analysis-reviewer/SKILL.md` — read whole, L1-185 (10,634 B / 185 LF)
 
 **Purpose/normal use (from the page alone):** Static Analysis Reviewer. Turn a wall of scanner findings into a short, trustworthy, prioritized list.
 
 **Canonical B1 satisfied** — the title and opening state the page's job and its reader; read L1-20 whole.
-**Canonical B2** — reading-key/terms material: Terms used below: **SAST** means static application security testing; **CVE** means Common Vulnerabilities and Exposures. **TP** and **FP** shorten Named B2 first-use gaps in the exact-once inventory: L3 SAST; L3 SARIF; L3 CI; L22 TP; L22 FP; L58 PII; L151 ORM; L152 SQL; L152 XSS.
+**Canonical B2** — reading-key/terms material: Terms used below: **SAST** means static application security testing; **CVE** means Common Vulnerabilities and Exposures. **TP** and **FP** shorten named B2 first-use gaps in the exact-once inventory: L3 SAST; L3 SARIF; L3 CI; L22 TP; L22 FP; L58 SaaS; L58 PII; L151 ORM; L152 SQL; L152 XSS.
 **Canonical B3 satisfied** — descriptive headings: Purpose; Use When; Inputs to Inspect; Workflow; Output Format; Validation Checklist; 0 table/list rows supply concrete operational detail.
 **Canonical B4 satisfied (canonical test)** — this is instructional/reference material; it states behavior to check or action to take, not a deployed integration, passing check, synthetic test or measured model result. No shipped-vs-proposed claim is misrepresented.
 **Canonical B5 satisfied** — navigation/reference links and file references: references/triage-rubric.md, ../../../docs/prompts/claude-skills-master-generation-prompts-v4.md, references/triage-rubric.md; referenced paths exist at the base; technical contract and safety boundaries retained; zero page edits.
 **Canonical B6 UNVERIFIED** — no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship. B6 does not support FULL.
-**Verdict: PARTIAL** — basis: named B2 gaps L3 SAST; L3 SARIF; L3 CI; L22 TP; L22 FP; L58 PII; L151 ORM; L152 SQL; L152 XSS; canonical B6 unverified.
+**Verdict: PARTIAL** — basis: named B2 gaps L3 SAST; L3 SARIF; L3 CI; L22 TP; L22 FP; L58 SaaS; L58 PII; L151 ORM; L152 SQL; L152 XSS; canonical B6 unverified.
 
 ### P7 — `.claude/skills/static-analysis-reviewer/references/triage-rubric.md` — read whole, L1-82 (3,763 B / 82 LF)
 
@@ -304,7 +304,7 @@
 | P5 | B | `<ref>` | L37 | documented exclusion — inline code/path/placeholder/operator, not a prose abbreviation |
 | P5 | B | `<law/contract/policy ref>` | L40 | documented exclusion — inline code/path/placeholder/operator, not a prose abbreviation |
 | P5 | B | `→` | L26 | documented exclusion — inline code/path/placeholder/operator, not a prose abbreviation |
-| P5 | F | `ISMS-AIMS` | L10 | documented exclusion — self-describing lifecycle/format code |
+| P5 | U | `ISMS-AIMS` | L10 | named gap — acronym/coded identifier used before any expansion on this page |
 | P5 | F | `YYYY-MM-DD` | L12 | documented exclusion — self-describing lifecycle/format code |
 | P5 | U | `LICENSED` | L3 | documented exclusion — ordinary all-caps emphasis word, heading or proper name, not an abbreviation |
 | P5 | U | `ISO` | L4 | named gap — acronym/coded identifier used before any expansion on this page |
@@ -342,7 +342,7 @@
 | P6 | M | `references/triage-rubric.md` | L78 | documented exclusion — file/path/mixed-case identifier, not a prose abbreviation |
 | P6 | M | `../../../docs/prompts/claude-skills-master-generation-prompts-v4.md` | L134 | documented exclusion — file/path/mixed-case identifier, not a prose abbreviation |
 | P6 | M | `CodeQL` | L3 | documented exclusion — file/path/mixed-case identifier, not a prose abbreviation |
-| P6 | M | `SaaS` | L58 | documented exclusion — file/path/mixed-case identifier, not a prose abbreviation |
+| P6 | M | `SaaS` | L58 | named gap — acronym/coded identifier used before any expansion on this page |
 | P6 | M | `CVEs` | L33 | documented exclusion — file/path/mixed-case identifier, not a prose abbreviation |
 | P6 | U | `SAST` | L3 | named gap — acronym/coded identifier used before any expansion on this page |
 | P6 | U | `SARIF` | L3 | named gap — acronym/coded identifier used before any expansion on this page |
@@ -361,7 +361,7 @@
 | P6 | U | `ORM` | L151 | named gap — acronym/coded identifier used before any expansion on this page |
 | P6 | U | `SQL` | L152 | named gap — acronym/coded identifier used before any expansion on this page |
 | P6 | U | `XSS` | L152 | named gap — acronym/coded identifier used before any expansion on this page |
-| P6 | U | `MISSED` | L159 | defined at first use — acronym expanded at or before first use |
+| P6 | U | `MISSED` | L159 | documented exclusion — ordinary all-caps emphasis word, not an abbreviation |
 | P6 | L | `ids` | L50 | documented exclusion — lowercase technical/format token, not a prose abbreviation |
 | P6 | L | `auth` | L57 | documented exclusion — lowercase technical/format token, not a prose abbreviation |
 | P6 | L | `id` | L87 | documented exclusion — lowercase technical/format token, not a prose abbreviation |
@@ -424,7 +424,7 @@
 | P8 | B | `<lag thresholds/owners; producer behavior when slow>` | L169 | documented exclusion — inline code/path/placeholder/operator, not a prose abbreviation |
 | P8 | B | `<what this design does NOT promise (e.g., cross-key ordering)>` | L172 | documented exclusion — inline code/path/placeholder/operator, not a prose abbreviation |
 | P8 | B | `<scope>` | L180 | documented exclusion — inline code/path/placeholder/operator, not a prose abbreviation |
-| P8 | B | `→` | L170 | documented exclusion — inline code/path/placeholder/operator, not a prose abbreviation |
+| P8 | B | `→` | L95 | documented exclusion — inline code/path/placeholder/operator, not a prose abbreviation |
 | P8 | M | `references/backbone-decision-sheet.md` | L150 | documented exclusion — file/path/mixed-case identifier, not a prose abbreviation |
 | P8 | M | `DLQs` | L208 | documented exclusion — file/path/mixed-case identifier, not a prose abbreviation |
 | P8 | U | `INTERNAL` | L3 | documented exclusion — ordinary all-caps emphasis word, heading or proper name, not an abbreviation |
@@ -463,19 +463,19 @@
 | P2 | 44 | 15 | 3 | 3 | 20 | 3 | 2 | 2 | 40 |
 | P3 | 35 | 11 | 3 | 2 | 18 | 1 | 4 | 1 | 30 |
 | P4 | 48 | 13 | 5 | 2 | 28 | 0 | 5 | 4 | 39 |
-| P5 | 27 | 3 | 0 | 1 | 21 | 2 | 0 | 2 | 25 |
-| P6 | 57 | 18 | 5 | 5 | 25 | 4 | 5 | 9 | 43 |
+| P5 | 27 | 4 | 0 | 1 | 21 | 1 | 0 | 3 | 24 |
+| P6 | 57 | 18 | 5 | 5 | 25 | 4 | 4 | 10 | 43 |
 | P7 | 28 | 8 | 2 | 2 | 12 | 4 | 5 | 0 | 23 |
 | P8 | 57 | 20 | 2 | 5 | 30 | 0 | 0 | 5 | 52 |
-| **Total** | **308** | **91** | **21** | **20** | **162** | **14** | **21** | **23** | **264** |
+| **Total** | **308** | **92** | **21** | **20** | **162** | **13** | **20** | **25** | **263** |
 
 **Reconciliation and proof.** Row sum **308** equals class sum **308** and disposition sum **308**; page sums equal the row count. The named-gap rows below are exactly the named gaps cited in section 5; every row resolves to pinned page text at its stated first occurrence; zero duplicates and zero fabricated rows.
 
-**Named-gap list aligned with section 5:** P1 none; P2 L9 PR, L10 CI; P3 L63 ID; P4 L3 ISO, L3 SOC, L11 AICPA, L12 AI; P5 L4 ISO, L4 IEC; P6 L3 SAST, L3 SARIF, L3 CI, L22 TP, L22 FP, L58 PII, L151 ORM, L152 SQL, L152 XSS; P7 none; P8 L3 CDC, L3 PIPELINE, L8 DLQ, L8 SLA, L9 DDL;
+**Named-gap list aligned with section 5:** P1 none; P2 L9 PR, L10 CI; P3 L63 ID; P4 L3 ISO, L3 SOC, L11 AICPA, L12 AI; P5 L10 ISMS-AIMS, L4 ISO, L4 IEC; P6 L58 SaaS, L3 SAST, L3 SARIF, L3 CI, L22 TP, L22 FP, L58 PII, L151 ORM, L152 SQL, L152 XSS; P7 none; P8 L3 CDC, L3 PIPELINE, L8 DLQ, L8 SLA, L9 DDL;
 
 ## 7. Dispositions, keeper exclusion and continuation
 
-**Disposition tally: 21 defined at first use / 23 named gaps / 264 documented exclusions = 308 rows.** **Disposition tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages were read whole; no page is UNRUN. No page is FULL because canonical B6 is unverified for every page; named B2 gaps independently force PARTIAL where present. **No keeper/acceptance row:** this record creates no acceptance rows; a later keeper decides.
+**Disposition tally: 20 defined at first use / 25 named gaps / 263 documented exclusions = 308 rows.** **Disposition tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages were read whole; no page is UNRUN. No page is FULL because canonical B6 is unverified for every page; named B2 gaps independently force PARTIAL where present. **No keeper/acceptance row:** this record creates no acceptance rows; a later keeper decides.
 
 **Continuation.** Lane A is complete 0-143; merged lane-B rows **144-199 + 200-207 + 208-215 + 216-223 + 224-231 + 232-239 + 240-247 + 248-255 + 256-263 + 264-271**; no open reservations; this record covers **272-279**; next unread page is **280**.
 
@@ -487,16 +487,16 @@
 
 | AC | Status | Evidence |
 | --- | --- | --- |
-| AC1 one-path | MET in this record | exactly one added record path; no other tracked path; **two DCO-signed model commits** (initial 0107e5bc + this repair commit) |
+| AC1 one-path | MET in this record | exactly one added record path; no other tracked path; **three DCO-signed model commits** (initial 0107e5bc + repair cc46de87 + this triage repair commit) |
 | AC2 pages | MET in this record | eight pages 272-279 by blob; totals 70,286/1,234; zero drift; no keeper |
 | AC3 inventory | MET in this record | one contiguous **308-row table; 308 unique keys**; zero duplicates/extra; five-cell proof; counts recomputed; no fabricated rows |
 | AC4 dispositions | MET in this record | strict FULL bar; 0 FULL/8 PARTIAL/0 UNRUN; B6 unverified; named gaps aligned |
 | AC5 record/body/PROC | MET in this record | record bytes/LF/sha/blob measured in handoff; body binds facts; PROC-04 published == live-body recompute; body checker 0 |
-| AC6 Codex loop | MET at handoff | exact-head trigger; triage all P1/P2; never a pass; head-bound only after triage |
+| AC6 Codex loop | **NOT CLAIMED — head-bound unavailable; never a pass** | prior-head Codex findings triaged; replies/resolutions recorded after this repair; current-head Codex review unavailable; D/G decides AC6; no pass claimed |
 | AC7 provenance | MET in this record | plan/B lineage, base and reservations, merge attribution, zero drift, absent path |
 | AC8 stages | MET for C | C only acts here; D/E/F/G separate; no merge |
 
-**Self-state consistency.** Section 2's scheduling facts, section 6's counts and this table agree: base 4b99f69f; merged lane-B 144-271; no open reservations; this block 272-279; next 280; batch 21. **Merge attribution:** 4b99f69f = #841 41st; 2c3c6ffe = #840 40th; 38212595 = #839 39th; f325daac = #838 38th; 7cea211e = #837 37th; 6f584c9d = #833 36th; a06360d4 = #835 35th; a141c64f = #836 34th; e7acaca4 = #834 33rd; 84a5295d = #831 32nd; 655e40ea = #828 31st; 883bf690 = #832 30th. No unresolved head placeholder; **actual commit count = two DCO-signed model commits** (initial 0107e5bc + this repair commit).
+**Self-state consistency.** Section 2's scheduling facts, section 6's counts and this table agree: base 4b99f69f; merged lane-B 144-271; no open reservations; this block 272-279; next 280; batch 21. **Merge attribution:** 4b99f69f = #841 41st; 2c3c6ffe = #840 40th; 38212595 = #839 39th; f325daac = #838 38th; 7cea211e = #837 37th; 6f584c9d = #833 36th; a06360d4 = #835 35th; a141c64f = #836 34th; e7acaca4 = #834 33rd; 84a5295d = #831 32nd; 655e40ea = #828 31st; 883bf690 = #832 30th. No unresolved head placeholder; **actual commit count = three DCO-signed model commits** (initial 0107e5bc + repair cc46de87 + this triage repair commit).
 
 
 ## 10. My Stage C skills rows, Row sources and six-field lines
