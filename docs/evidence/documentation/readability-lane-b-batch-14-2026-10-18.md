@@ -26,7 +26,7 @@ python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c0
 
 - **Merged lane-B read rows at base:** **144-199 AND 208-215** (batches 2/2r/3/5/6/7/8/9/10/11 plus merged batch 13; #828 contributes 160-167; #831 batch 10; #834 batch 13 merged at e7acaca4).
 - **Open reservations:** #833 reserves **200-207**; #836 reserves **224-231**; #837 reserves **232-239**. Open PR heads are scheduling citations only and were not read or touched.
-- **R2 next eight unread:** excluding merged rows 144-199 and reservations 200-207 / 208-215 / 224-231, the next eight in the sorted unread sequence are **216-223**, all inside lane B quarter 144-287. The next unread after this block is **240** (`.claude/skills/regression-suite-curator/references/curation-rules.md`), reserved by #836 and not read here.
+- **R2 next eight unread:** excluding merged rows 144-199 and 208-215 and open reservations 200-207 / 224-231 / 232-239, the next eight in the sorted unread sequence are **216-223**, all inside lane B quarter 144-287. The next unread after this block is **240** (`.claude/skills/regression-suite-curator/references/curation-rules.md`), reserved by #836 and not read here.
 - **Batch number:** merged lane-B batches are 2, 2-rerecord, 3, 5, 6, 7, 8, 9, 10, 11; #834 batch 13 merged, #833 batch 12 open, this PR batch 14, #836 batch 15, #837 batch 16. The next per-lane number is **lane B batch 14** - confirmed, not assumed. The added path does not exist at main; no conflict.
 
 ## 3. The frozen page set - eight pages, measured at the pinned ref
@@ -157,7 +157,7 @@ The canonical six bullets are the repository's "Acceptance for each page" at `do
 **Documented-exclusion placeholders added in this repair (SD-D REVISE 6248304594):** P7 L147-148, L153-154, L155-156, L159-160 and P8 L102-103, L114-115 are six class-(v) multiline angle-bracket template placeholders; each is self-describing fill-in text, not an abbreviation, so each is a documented exclusion in the final table and not a named B2 gap. This resolves the only D2 condition; all other rows/counts/base facts are unchanged except the stated +6 exclusions and base refresh.
 
 
-**Zero-duplicate check.** A retained local check asserted: `rows == len(unique(page,line,token)) == len(unique(page,token)) == 373`, duplicate rows `0`, and no key whose normalized form appears both backticked and unbackticked; output: `367 rows / 367 keys / 0 duplicates / 0 normalization collisions`. This is the explicit exact-once proof; the final table is below and the per-page/class counts above are computed from it.
+**Zero-duplicate check.** A retained local check asserted: `rows == len(unique(page,line,token)) == len(unique(page,token)) == 373`, duplicate rows `0`, and no key whose normalized form appears both backticked and unbackticked; output: `373 rows / 373 keys / 0 duplicates / 0 normalization collisions`. This is the explicit exact-once proof; the final table is below and the per-page/class counts above are computed from it.
 
 | Page | Line | Class | Token | Disposition |
 | --- | ---: | --- | --- | --- |
@@ -572,10 +572,10 @@ The canonical six bullets are the repository's "Acceptance for each page" at `do
 | AC4 Honest per-page disposition | **MET in this record** - **0 FULL / 8 PARTIAL / 0 UNRUN**; B6 unverified and B2 gaps named; no acceptance/keeper row. |
 | AC5 Record integrity/body/PROC-04 | **OWED after this file freezes** - PR body binds plan/record facts; PROC-04 recomputed; checker at head; record one terminal LF/no CR/no trailing whitespace/no blank EOF. |
 | AC6 Codex loop plan | **OWED after the PR exists at its head** - trigger, fetch, fix P1/P2 with replies naming fixing SHA, resolve, retrigger; head-bound unavailability only after triage; never a pass. |
-| AC7 Provenance and no regression | **MET in this record** - plan binding 6247908528 + correction 6247913133 + B ACCEPT 6247952220; derivation base e7acaca4; merged rows 144-199; reservations #833 200-207 / #834 208-215 / #836 224-231; block 216-223; next 224; zero drift; no keeper/index/ledger/register/manifest change. |
-| AC8 Stage entry conditions | **SATISFIED for C** - only on fresh B ACCEPT 6247952220 bound to plan 6247908528; branched from live main e7acaca4; one added record path; one DCO model commit; D/E/F/G separate; no merge. |
+| AC7 Provenance and no regression | **MET in this record** - plan binding 6247908528 + correction 6247913133 + B ACCEPT 6247952220; derivation base e7acaca4; merged rows 144-199 AND 208-215; open reservations #833 200-207 / #836 224-231 / #837 232-239; block 216-223; next unread 240; zero drift; no keeper/index/ledger/register/manifest change. |
+| AC8 Stage entry conditions | **SATISFIED for C** - only on fresh B ACCEPT 6247952220 bound to plan 6247908528; branched from live main e7acaca4; one added record path; two DCO commits before this repair (c5eb2b58 + 40f7866a); this repair-4 adds a third; D/E/F/G separate; no merge. |
 
-**Self-state consistency:** section 2 (base e7acaca4, merged rows 144-199, reservations 200-207/208-215/224-231, block 216-223, batch 14), section 3 (eight pages, totals 72,464 B / 1,275 LF), section 4 (0 FULL / 8 PARTIAL / 0 UNRUN) and section 9 (same AC7/AC8 facts) agree; the authorship chain is plan 6247908528 (sd-c-796-r1 / sd-a-read-b14-r1), B ACCEPT 6247952220 (sd-c-793-r2 / sd-b-read-b14-b1), C this record (sd-d-802-r3 / sd-c-read-b14-c1; repair edited under sd-c-read-b14-c2), with D/E/F/G separate. No stale count or contradictory range is carried.
+**Self-state consistency:** section 2 (base e7acaca4, merged rows 144-199 and 208-215, open reservations 200-207/224-231/232-239, block 216-223, batch 14), section 3 (eight pages, totals 72,464 B / 1,275 LF), section 4 (0 FULL / 8 PARTIAL / 0 UNRUN) and section 9 (same AC7/AC8 facts) agree; the authorship chain is plan 6247908528 (sd-c-796-r1 / sd-a-read-b14-r1), B ACCEPT 6247952220 (sd-c-793-r2 / sd-b-read-b14-b1), C this record (sd-d-802-r3 / sd-c-read-b14-c1; repair edited under sd-c-read-b14-c2), with D/E/F/G separate. No stale count or contradictory range is carried.
 
 ## 10. Validation actually run while authoring
 
@@ -599,8 +599,10 @@ The canonical six bullets are the repository's "Acceptance for each page" at `do
 - **Prose reading is not a usability study:** the record lists what each page says and where; the canonical six bullets are the bar.
 - **External comment-ID bindings:** the plan, correction, B ACCEPT, Codex and DeepSeek review IDs are external bindings that the record cannot independently prove immutable; they are verified against live GitHub at the exact head, not self-proved here.
 
-The record is the only added path; it carries one DCO-signed model-attributed commit. Stage D independently audits AC1-AC8 at the exact head; Stage E records checks/UNRUN honestly; Stage F reviews exact head/PROC-04; Stage G applies merge gates including MG3 under the recorded reading; no merge before G. **Lane A is complete; this is a lane-B block and does not reopen lane A.** Any need outside one path stops and returns to Stage A/owner.
+The record is the only added path; it carries three DCO-signed model-attributed commits (c5eb2b58, 40f7866a, and this repair-4 commit). Stage D independently audits AC1-AC8 at the exact head; Stage E records checks/UNRUN honestly; Stage F reviews exact head/PROC-04; Stage G applies merge gates including MG3 under the recorded reading; no merge before G. **Lane A is complete; this is a lane-B block and does not reopen lane A.** Any need outside one path stops and returns to Stage A/owner.
 
 **Boundary.** Stage C only: no page edited; no keeper/ledger/index/register/manifest/tool/test/workflow change; no other PR touched; no merge.
 
 **Signed with both names: true identity sd-d-802-r3; stage role sd-c-read-b14-c2 (repair).** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
+
+**Repair-4 disclosure (SD-D REVISE 6248389556):** this repair is a consistency/metadata fix only. It updates the explicit zero-duplicate proof line to 373 rows / 373 keys / 0 duplicates / 0 extra (the table was already 373 rows), reconciles section 2/5/9 counts, and corrects section 9 self-state to merged lane-B rows 144-199 AND 208-215, open reservations #833 200-207 / #836 224-231 / #837 232-239, block 216-223, next unread 240, and the actual commit count (2 before this repair; 3 after). No inventory row, page, plan, keeper or disposition changed; 0 FULL / 8 PARTIAL / 0 UNRUN, canonical B4 per page, B6 UNVERIFIED, pages 216-223 totals 72,464 B / 1,275 LF unchanged.
