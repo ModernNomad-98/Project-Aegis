@@ -1,14 +1,14 @@
 # DeepSeek PR review — caller for the shared reusable workflow.
 #
 # Review logic lives in ModernNomad-98/ci-workflows (.github/workflows/deepseek-review.yml).
-# This file only declares triggers and passes the DeepSeek API key; keep it identical
-# across repositories apart from the OWNER/REPO note below.
+# This file declares triggers, gates the @deepseek mention, and passes the API key.
+# KEEP THE `uses:` LINE PINNED TO A FULL 40-HEX COMMIT SHA + version comment.
 #
 # TURN OFF
 #   This repo, immediately : gh workflow disable "DeepSeek Code Review" -R ModernNomad-98/Project-Aegis
 #   This repo, no-code     : gh variable set DEEPSEEK_REVIEW_ENABLED --body false -R ModernNomad-98/Project-Aegis
-#   All repos, mention-only: ci-workflows/deepseek-review.yml -> set `auto` default to false
-#   All repos, fully off   : ci-workflows/deepseek-review.yml -> set `enabled` default to false
+#   All repos, mention-only: pwsh ./review.ps1 -Action mention-only   (sets {"auto": false})
+#   All repos, fully off   : pwsh ./review.ps1 -Action hold           (sets {"enabled": false})
 #   Permanent removal      : delete this file (optionally also the CHAT_TOKEN secret)
 #
 # REQUIRED: repository secret CHAT_TOKEN = DeepSeek API key (platform.deepseek.com -> API keys)
@@ -38,6 +38,6 @@ jobs:
        (github.event_name == 'issue_comment' && github.event.issue.pull_request != null &&
         contains(github.event.comment.body, '@deepseek') &&
         contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)))
-    uses: ModernNomad-98/ci-workflows/.github/workflows/deepseek-review.yml@main
+    uses: ModernNomad-98/ci-workflows/.github/workflows/deepseek-review.yml@643dc9a3d30ec5bed0467445a134df74ef459543 # v1.0.0
     secrets:
       CHAT_TOKEN: ${{ secrets.CHAT_TOKEN }}
