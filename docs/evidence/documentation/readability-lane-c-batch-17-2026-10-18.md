@@ -555,6 +555,7 @@ Known-defect-class scan at extraction time: class-v lifecycle/status tokens are 
 | AC8 stage entry | MET for C | fresh B ACCEPT 6256438977; one record; D/E/F/G separate; no merge |
 
 ## In-plan Stage A account (exact accepted text; capture binding db2bff16 over 1,497 B / 4 LF)
+```text
 ## Stage A self-authored account
 
 | Skill | Stage / agent | How applied | Result / evidence |
@@ -564,6 +565,7 @@ Known-defect-class scan at extraction time: class-v lifecycle/status tokens are 
 | [`change-classification-gate`](.claude/skills/change-classification-gate/SKILL.md) @ `08d91a834460` | Stage A plan / `sd-a-read-lc-next-b17` (true identity `sd-c-802-r4-codex`; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Docs-only one added record path | one record path; absent at main |
 | [`skill-usage-ledger`](.claude/skills/skill-usage-ledger/SKILL.md) @ `6a27b5c8e690` | Stage A plan / `sd-a-read-lc-next-b17` (true identity `sd-c-802-r4-codex`; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Authored account/capture | four rows/sources; non-zero binding |
 
+```
 ```text
 <!-- Row source: agent=sd-a-read-lc-next-b17; stage=A; round=1; row=1; target=plan PR #855 / main a222d930289111aae32e2ba95880ffe6e52c100c / block 392-399; source=_A/evidence/read-lc-next-b17/A-rows.txt line 1 of 4; binding=sha256 db2bff16a2c7d2707b42a15dffe08622968e5b1dae092e0b8444717abdd3f9ad over 1497 B / 4 LF; capture-basis=a222d930289111aae32e2ba95880ffe6e52c100c; status=current. -->
 <!-- Row source: agent=sd-a-read-lc-next-b17; stage=A; round=1; row=2; target=plan PR #855 / main a222d930289111aae32e2ba95880ffe6e52c100c / block 392-399; source=_A/evidence/read-lc-next-b17/A-rows.txt line 2 of 4; binding=sha256 db2bff16a2c7d2707b42a15dffe08622968e5b1dae092e0b8444717abdd3f9ad over 1497 B / 4 LF; capture-basis=a222d930289111aae32e2ba95880ffe6e52c100c; status=current. -->
