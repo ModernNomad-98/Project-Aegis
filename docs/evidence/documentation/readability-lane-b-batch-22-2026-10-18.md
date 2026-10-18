@@ -42,7 +42,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B6 (L2860-2862):** Obtain a read-only review from someone who did not write the page. Ask the reviewer to explain the component's purpose and normal use from the page alone, and correct gaps before marking that batch complete.
 
-**Application:** B4 tested explicitly per page; **B6 VERIFIED** for all eight via the existing non-author review; B2 named gaps remain, so B6 is not the blocker but no page reaches FULL; B1/B2/B3/B5 evidenced per page. 0 FULL / 8 PARTIAL / 0 UNRUN; no keeper.
+**Application:** B4 tested explicitly per page; **B6 VERIFIED** for all eight via the existing non-author review; B2 named gaps remain, so B6 is not the blocker but no page reaches FULL; B1/B2/B3/B5 evidenced per page. 1 FULL (P1) / 7 PARTIAL / 0 UNRUN; no keeper.
 
 ## 5. Whole-page re-read evidence and canonical B1-B6 per page
 
@@ -50,7 +50,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B1:** Backbone Decision Sheet - decision tables for stream-vs-queue, delivery/retention and per-flow guarantees; the page states its purpose and intended readers.
 
-**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `https`. First-use lines are in section 6.
+**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: none. First-use lines are in section 6.
 
 **B3:** descriptive headings, tables/lists and concrete operational examples are present; inputs, workflow, outputs and stop conditions are distinguished where applicable.
 
@@ -64,7 +64,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B1:** Structured Output Validator - schema and validation design for LLM structured output; the page states its purpose and intended readers.
 
-**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `LLM`, `JSON`, `AI`, `authz`, `URL`, `API`, `id`. First-use lines are in section 6.
+**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `AI`, `authz`, `JSON`, `LLM`, `id`, `URL`, `API`. First-use lines are in section 6.
 
 **B3:** descriptive headings, tables/lists and concrete operational examples are present; inputs, workflow, outputs and stop conditions are distinguished where applicable.
 
@@ -92,7 +92,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B1:** Sunset & Deprecation Communicator - planning and drafting a humane product/API sunset; the page states its purpose and intended readers.
 
-**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `json`. First-use lines are in section 6.
+**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `API`. First-use lines are in section 6.
 
 **B3:** descriptive headings, tables/lists and concrete operational examples are present; inputs, workflow, outputs and stop conditions are distinguished where applicable.
 
@@ -106,7 +106,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B1:** Sunset Comms Sheet - impact/window/escalation sheets for retirement communications; the page states its purpose and intended readers.
 
-**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `HTTP`. First-use lines are in section 6.
+**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `HTTP`, `T-2d`, `T-2wk`, `404`, `500`. First-use lines are in section 6.
 
 **B3:** descriptive headings, tables/lists and concrete operational examples are present; inputs, workflow, outputs and stop conditions are distinguished where applicable.
 
@@ -120,7 +120,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B1:** Superadmin Observability Console Designer - cross-tenant superadmin console architecture/read-security design; the page states its purpose and intended readers.
 
-**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `SaaS`, `URL`, `json`. First-use lines are in section 6.
+**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `DB`, `IA`, `RLS`, `SaaS`, `UI`, `SECURITY-DEFINER`, `URL`. First-use lines are in section 6.
 
 **B3:** descriptive headings, tables/lists and concrete operational examples are present; inputs, workflow, outputs and stop conditions are distinguished where applicable.
 
@@ -134,7 +134,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B1:** Panel taxonomy & cross-tenant read-security model - read-security model, panel menu, read model and panel spec; the page states its purpose and intended readers.
 
-**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `id`. First-use lines are in section 6.
+**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `403`, `SECURITY-DEFINER`, `id`. First-use lines are in section 6.
 
 **B3:** descriptive headings, tables/lists and concrete operational examples are present; inputs, workflow, outputs and stop conditions are distinguished where applicable.
 
@@ -148,7 +148,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B1:** Supply-Chain Security Reviewer - supply-chain review: dependencies, lockfiles, builds, CI/CD, artifacts; the page states its purpose and intended readers.
 
-**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `CVEs`, `json`, `https`, `GITHUB_TOKEN`, `pull_request_target`. First-use lines are in section 6.
+**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `A2A`, `AI/ML`, `ASI04`, `CI/CD`, `CVEs`, `LLM04`, `MCP`, `PR`, `SAST`, `SLSA`, `pull_request_target`, `GITHUB_TOKEN`. First-use lines are in section 6.
 
 **B3:** descriptive headings, tables/lists and concrete operational examples are present; inputs, workflow, outputs and stop conditions are distinguished where applicable.
 
@@ -172,7 +172,6 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P1 | 10 | i | `SLA` | defined at first use — expansion/definition present on this page |
 | P1 | 11 | ii | `id` | defined at first use — expansion/definition present on this page |
 | P1 | 25 | v | `→` | documented exclusion — operator token, not an abbreviation |
-| P1 | 46 | ii | `https` | named gap — first use before any expansion on this page |
 | P1 | 60 | v | `≥` | documented exclusion — operator token, not an abbreviation |
 | P1 | 84 | iv | `schema-evolution-planner` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P1 | 90 | v | `<classification>` | documented exclusion — self-describing placeholder, not an abbreviation |
@@ -190,13 +189,13 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P1 | 96 | v | `<field(s) carried>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P2 | 3 | v | `→` | documented exclusion — operator token, not an abbreviation |
 | P2 | 3 | iv | `agent-tool-safety-guard` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P2 | 3 | i | `AI` | named gap — first use before any expansion on this page |
 | P2 | 3 | iv | `ai-misinformation-guard` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P2 | 3 | iv | `ai-router-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P2 | 3 | i | `AI` | named gap — first use before any expansion on this page |
 | P2 | 3 | ii | `authz` | named gap — first use before any expansion on this page |
 | P2 | 3 | i | `JSON` | named gap — first use before any expansion on this page |
-| P2 | 3 | iv | `llm-output-safety-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P2 | 3 | i | `LLM` | named gap — first use before any expansion on this page |
+| P2 | 3 | iv | `llm-output-safety-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P2 | 9 | i | `XSS` | defined at first use — expansion/definition present on this page |
 | P2 | 24 | v | `≠` | documented exclusion — operator token, not an abbreviation |
 | P2 | 49 | iv | `JSON.parse` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
@@ -242,11 +241,11 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P3 | 65 | iv | `llm-output-safety-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P3 | 68 | iv | `ai-evaluation-harness` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P3 | 75 | v | `→` | documented exclusion — operator token, not an abbreviation |
-| P4 | 3 | i | `API` | defined at first use — expansion/definition present on this page |
+| P4 | 3 | i | `API` | named gap — first use before any expansion on this page |
+| P4 | 3 | iv | `api-event-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P4 | 3 | iv | `skill-deprecation-planner` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P4 | 16 | v | `404` | defined at first use — HTTP status code explained as not found on this line |
-| P4 | 26 | iv | `skill-deprecation-planner` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P4 | 39 | v | `→` | documented exclusion — operator token, not an abbreviation |
-| P4 | 46 | iv | `api-event-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P4 | 50 | iv | `notification-webhook-ux-designer` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P4 | 63 | iv | `schema-evolution-planner` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P4 | 94 | iv | `Deprecation` | documented exclusion — inline code identifier, not a prose abbreviation |
@@ -263,7 +262,6 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P4 | 147 | v | `<named account → expiry date>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P4 | 202 | iv | `.claude/skills/` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P4 | 227 | iv | `evals/evals.json` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
-| P4 | 227 | ii | `json` | named gap — first use before any expansion on this page |
 | P4 | 229 | iv | `evals/trigger-evals.json` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P5 | 3 | iii | `SKILL.md` | documented exclusion — exact file/path identifier, not a prose abbreviation |
 | P5 | 4 | i | `API` | defined at first use — expansion/definition present on this page |
@@ -272,20 +270,23 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P5 | 13 | v | `→` | documented exclusion — operator token, not an abbreviation |
 | P5 | 22 | v | `≥` | documented exclusion — operator token, not an abbreviation |
 | P5 | 27 | iv | `api-event-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P5 | 38 | v | `T-2d` | documented exclusion — timeline/lifecycle code token, not an abbreviation |
-| P5 | 38 | v | `T-2wk` | documented exclusion — timeline/lifecycle code token, not an abbreviation |
+| P5 | 38 | v | `T-2d` | named gap — lifecycle/status code first use; no plain-language expansion on this page |
+| P5 | 38 | v | `T-2wk` | named gap — lifecycle/status code first use; no plain-language expansion on this page |
 | P5 | 45 | iv | `Deprecation: @1688169599` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P5 | 46 | iv | `Sunset: Sun, 31 Dec 2023 23:59:59 GMT` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P5 | 48 | iv | `Link` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P5 | 58 | v | `404` | documented exclusion — HTTP status code token, not an abbreviation |
-| P5 | 58 | v | `500` | documented exclusion — HTTP status code token, not an abbreviation |
+| P5 | 58 | v | `404` | named gap — lifecycle/status code first use; no plain-language expansion on this page |
+| P5 | 58 | v | `500` | named gap — lifecycle/status code first use; no plain-language expansion on this page |
 | P5 | 71 | iv | `notification-webhook-ux-designer` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P5 | 73 | iv | `skill-deprecation-planner` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P6 | 3 | i | `DB` | defined at first use — expansion/definition present on this page |
-| P6 | 3 | i | `IA` | defined at first use — expansion/definition present on this page |
-| P6 | 3 | i | `RLS` | defined at first use — expansion/definition present on this page |
+| P6 | 3 | iv | `admin-console-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P6 | 3 | i | `DB` | named gap — first use before any expansion on this page |
+| P6 | 3 | i | `IA` | named gap — first use before any expansion on this page |
+| P6 | 3 | iv | `observability-operator` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P6 | 3 | i | `RLS` | named gap — first use before any expansion on this page |
 | P6 | 3 | i | `SaaS` | named gap — first use before any expansion on this page |
-| P6 | 3 | i | `UI` | defined at first use — expansion/definition present on this page |
+| P6 | 3 | iv | `slo-reliability-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P6 | 3 | i | `UI` | named gap — first use before any expansion on this page |
 | P6 | 9 | i | `ETL` | defined at first use — expansion/definition present on this page |
 | P6 | 9 | i | `OLTP` | defined at first use — expansion/definition present on this page |
 | P6 | 10 | i | `APM` | defined at first use — expansion/definition present on this page |
@@ -293,9 +294,6 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P6 | 11 | i | `API` | defined at first use — expansion/definition present on this page |
 | P6 | 12 | i | `CORS` | defined at first use — expansion/definition present on this page |
 | P6 | 12 | i | `QA` | defined at first use — expansion/definition present on this page |
-| P6 | 23 | iv | `admin-console-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P6 | 24 | iv | `observability-operator` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P6 | 25 | iv | `slo-reliability-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P6 | 58 | v | `→` | documented exclusion — operator token, not an abbreviation |
 | P6 | 59 | iv | `audit-log-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P6 | 61 | iv | `security-logging-alerting-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
@@ -304,7 +302,9 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P6 | 64 | iv | `authorization-matrix-designer` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P6 | 86 | iv | `incident-response-runbook` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P6 | 107 | iv | `human-approval-boundary` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P6 | 113 | i | `SECURITY-DEFINER` | named gap — internal SQL role/class identifier first use; no plain expansion on this page |
 | P6 | 114 | iv | `is_platform_admin(uid)` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P6 | 147 | i | `AI` | defined at first use — expansion/definition present on this page |
 | P6 | 147 | iv | `ai-cost-guardrail-designer` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P6 | 148 | iv | `product-analytics-instrumenter` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P6 | 150 | v | `{feed-owner, read-scope, wired?}` | documented exclusion — placeholder/operator/unit token, not a prose abbreviation |
@@ -334,7 +334,6 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P6 | 279 | i | `URL` | named gap — first use before any expansion on this page |
 | P6 | 329 | iv | `references/panel-taxonomy-and-read-security.md` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P6 | 332 | iv | `evals/evals.json` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
-| P6 | 332 | ii | `json` | named gap — first use before any expansion on this page |
 | P6 | 335 | iv | `evals/trigger-evals.json` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P7 | 3 | iii | `SKILL.md` | documented exclusion — exact file/path identifier, not a prose abbreviation |
 | P7 | 12 | i | `API` | defined at first use — expansion/definition present on this page |
@@ -353,7 +352,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P7 | 34 | iv | `note` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P7 | 36 | iv | `USING (false)` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P7 | 59 | v | `→` | documented exclusion — operator token, not an abbreviation |
-| P7 | 59 | v | `403` | documented exclusion — HTTP status code token, not an abbreviation |
+| P7 | 59 | v | `403` | named gap — HTTP status code first use; no plain-language expansion on this page |
 | P7 | 64 | iv | `is_platform_admin(uid)` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P7 | 64 | i | `SECURITY-DEFINER` | named gap — internal SQL role/class identifier first use; no plain expansion on this page |
 | P7 | 79 | iv | `admin-console-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
@@ -378,16 +377,20 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P7 | 164 | v | `90%` | documented exclusion — unit token, not an abbreviation |
 | P7 | 164 | v | `95%` | documented exclusion — unit token, not an abbreviation |
 | P7 | 217 | iv | `wired: false` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
-| P8 | 3 | i | `A2A` | defined at first use — expansion/definition present on this page |
-| P8 | 3 | i | `AI/ML` | defined at first use — expansion/definition present on this page |
-| P8 | 3 | v | `ASI04` | defined at first use — expansion/definition present on this page |
-| P8 | 3 | i | `CI/CD` | defined at first use — expansion/definition present on this page |
+| P8 | 3 | i | `A2A` | named gap — first use before any expansion on this page |
+| P8 | 3 | i | `AI/ML` | named gap — first use before any expansion on this page |
+| P8 | 3 | v | `ASI04` | named gap — first use before any expansion on this page |
+| P8 | 3 | i | `CI/CD` | named gap — first use before any expansion on this page |
 | P8 | 3 | i | `CVEs` | named gap — first use before any expansion on this page |
-| P8 | 3 | v | `LLM04` | defined at first use — expansion/definition present on this page |
-| P8 | 3 | i | `MCP` | defined at first use — expansion/definition present on this page |
-| P8 | 3 | i | `PR` | defined at first use — expansion/definition present on this page |
-| P8 | 3 | i | `SAST` | defined at first use — expansion/definition present on this page |
-| P8 | 3 | i | `SLSA` | defined at first use — expansion/definition present on this page |
+| P8 | 3 | v | `LLM04` | named gap — first use before any expansion on this page |
+| P8 | 3 | i | `MCP` | named gap — first use before any expansion on this page |
+| P8 | 3 | iv | `postinstall` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P8 | 3 | i | `PR` | named gap — first use before any expansion on this page |
+| P8 | 3 | i | `SAST` | named gap — first use before any expansion on this page |
+| P8 | 3 | iv | `security-pr-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P8 | 3 | i | `SLSA` | named gap — first use before any expansion on this page |
+| P8 | 3 | iv | `static-analysis-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P8 | 3 | iv | `threat-modeler` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P8 | 9 | i | `CVE` | defined at first use — expansion/definition present on this page |
 | P8 | 10 | i | `CVSS` | defined at first use — expansion/definition present on this page |
 | P8 | 11 | i | `OSV` | defined at first use — expansion/definition present on this page |
@@ -402,15 +405,10 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P8 | 26 | i | `FP` | defined at first use — expansion/definition present on this page |
 | P8 | 26 | i | `RAG` | defined at first use — expansion/definition present on this page |
 | P8 | 26 | i | `TP` | defined at first use — expansion/definition present on this page |
-| P8 | 39 | iv | `postinstall` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P8 | 51 | iv | `npm audit` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P8 | 67 | iv | `inter-agent-comms-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P8 | 71 | iv | `model-poisoning-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P8 | 78 | iv | `static-analysis-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P8 | 80 | iv | `security-pr-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P8 | 81 | iv | `threat-modeler` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P8 | 83 | iv | `release-readiness-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P8 | 89 | ii | `json` | named gap — first use before any expansion on this page |
 | P8 | 89 | iv | `package-lock.json` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P8 | 89 | iv | `package.json` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P8 | 89 | iv | `pnpm-lock` | documented exclusion — inline code identifier, not a prose abbreviation |
@@ -452,28 +450,27 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P8 | 287 | iv | `.bin` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P8 | 287 | iv | `.ckpt` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P8 | 287 | iv | `.pt` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
-| P8 | 288 | ii | `https` | named gap — first use before any expansion on this page |
 | P8 | 346 | iv | `evals/evals.json` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P8 | 347 | iv | `evals/trigger-evals.json` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P8 | 348 | iv | `secure-migration-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
 
 ### 6.1 Reconciliation and independent cell-count proof (ONE proof section)
 
-**Counts from the FINAL table:** **292 data rows**; **292 unique (page, first-use line, token) keys**; **0 duplicate keys / 0 extra rows**; per-page: P1: 24, P2: 32, P3: 22, P4: 23, P5: 16, P6: 55, P7: 42, P8: 78; classes: i: 61, ii: 11, iii: 10, iv: 113, v: 97; dispositions: defined at first use: 60, named gap: 21, documented exclusion: 211. All sums equal 292.
+**Counts from the FINAL table:** **289 data rows**; **289 unique (page, first-use line, token) keys**; **0 duplicate keys / 0 extra rows**; per-page: P1: 23, P2: 32, P3: 22, P4: 22, P5: 16, P6: 56, P7: 42, P8: 76; classes: i: 63, ii: 6, iii: 10, iv: 113, v: 97; dispositions: defined at first use: 47, named gap: 36, documented exclusion: 206. All sums equal 289.
 
-**Five-column parse proof:** hide escaped pipes `\|`, split each row on remaining Markdown delimiters, and require exactly five cells. The final table has **292 data rows and 0 bad rows**; a literal pipe would produce more than five cells. **Zero-duplicate proof:** unique-key count equals row count after stripping backticks and unescaping pipes; no inventory rows exist after this proof.
+**Five-column parse proof:** hide escaped pipes `\|`, split each row on remaining Markdown delimiters, and require exactly five cells. The final table has **289 data rows and 0 bad rows**; a literal pipe would produce more than five cells. **Zero-duplicate proof:** unique-key count equals row count after stripping backticks and unescaping pipes; no inventory rows exist after this proof.
 
 ## 7. Dispositions, named gaps, keeper exclusion and continuation
 
-**Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages read whole; B6 is verified by the existing review; B2 first-use gaps remain, so no page is FULL; no acceptance/keeper row. **Named gaps from the final table:**
-- **P1**: `https`.
-- **P2**: `LLM`, `JSON`, `AI`, `authz`, `URL`, `API`, `id`.
+**Verdict tally: 1 FULL (P1) / 7 PARTIAL / 0 UNRUN.** All eight pages read whole; B6 is verified by the existing review; P1 has no remaining B2 gap and is FULL; the other seven keep named gaps and are PARTIAL; no acceptance/keeper row. **Named gaps from the final table:**
+- **P1**: none.
+- **P2**: `AI`, `authz`, `JSON`, `LLM`, `id`, `URL`, `API`.
 - **P3**: `id`.
-- **P4**: `json`.
-- **P5**: `HTTP`.
-- **P6**: `SaaS`, `URL`, `json`.
-- **P7**: `id`.
-- **P8**: `CVEs`, `json`, `https`, `GITHUB_TOKEN`, `pull_request_target`.
+- **P4**: `API`.
+- **P5**: `HTTP`, `T-2d`, `T-2wk`, `404`, `500`.
+- **P6**: `DB`, `IA`, `RLS`, `SaaS`, `UI`, `SECURITY-DEFINER`, `URL`.
+- **P7**: `403`, `SECURITY-DEFINER`, `id`.
+- **P8**: `A2A`, `AI/ML`, `ASI04`, `CI/CD`, `CVEs`, `LLM04`, `MCP`, `PR`, `SAST`, `SLSA`, `pull_request_target`, `GITHUB_TOKEN`.
 
 **Continuation:** this block exhausts lane B pending at 287; first unread after block is 288 `.claude/skills/supply-chain-security-reviewer/references/supply-chain-checklist.md`, outside lane B. Later work requires a fresh lane/block decision; no lane-B batch 23 block exists.
 
@@ -483,14 +480,14 @@ Pages were read at pinned ref 2db1ffb7 from the tree rather than from plan text;
 
 ## 9. Stage C declaration, AC statuses and self-state
 
-Authored by **sd-c-read-b22-c1** / true identity sd-e-794-r1, branch from main 6afc845a, five DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + repair-2 da202e42 + repair-3 2e9ed37c + this repair-4 commit; exact repair-4 SHA in PR body/handoff) and exactly one added path; no merge. **AC statuses:**
+Authored by **sd-c-read-b22-c1** / true identity sd-e-794-r1, branch from main 6afc845a, six DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + repair-2 da202e42 + repair-3 2e9ed37c + repair-4 3c3de2b7 + this repair-5 commit; exact repair-5 SHA in PR body/handoff) and exactly one added path; no merge. **AC statuses:**
 
 | AC | Status | Basis |
 | --- | --- | --- |
-| AC1 | MET in PR diff | one added record path vs 6afc845a; five DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + repair-2 da202e42 + this repair-3 commit; exact repair-3 SHA in PR body/handoff); no other tracked path |
+| AC1 | MET in PR diff | one added record path vs 6afc845a; six DCO-signed model commits after repair (7b52ce2e, 377c2def, da202e42, 2e9ed37c, 3c3de2b7, this repair-5 commit; exact repair-5 SHA in PR body/handoff); no other tracked path |
 | AC2 | MET | eight blobs/bytes/LF above; zero drift; pending/unread |
 | AC3 | MET in this record | whole-page B1-B6; ONE contiguous table; five-cell/zero-duplicate proof; no fabricated rows |
-| AC4 | MET | strict FULL bar; B6 verified via existing review; B2 gaps keep 0F/8P/0 UNRUN; no keeper |
+| AC4 | MET | strict FULL bar; B6 verified via existing review; P1 has no B2 gap and is FULL; other pages keep named gaps and are PARTIAL; no keeper |
 | AC5 | asserted in PR body/handoff | record facts outside record; body witness/skills/security fields + live-final-body PROC-04 published==recomputed proof |
 | AC6 | asserted in PR body/handoff | head-bound Codex trigger/triage; never a pass; no unresolved threads; MG3 belongs to G |
 | AC7 | MET | plan/B binding; base 6afc845a; lane-end/288; merge attribution; zero drift; one path |
@@ -527,6 +524,6 @@ skill-usage-ledger@6a27b5c8e690 / reason: C account owes manifest-bound provenan
 
 ## 11. Limits, unverifiable items and boundary
 
-Canonical B6 is **VERIFIED** for all eight pages via the existing non-author read-only review (same blobs at f490c16f; review line 770 confirms non-authorship); B2 named gaps remain, so every page is PARTIAL and no page is FULL/keeper-eligible. No page text was edited. This record is evidence-only, not a keeper/index/ledger/register/manifest change, verdict or merge; Stage D/E/F/G remain separate. No synthetic test/passing check/approved design is presented as deployed or measured.
+Canonical B6 is **VERIFIED** for all eight pages via the existing non-author read-only review (same blobs at f490c16f; review line 770 confirms non-authorship); B2 named gaps remain, so P1 has no remaining B2 gap and is FULL; the other seven keep named gaps and are PARTIAL; no page is keeper-eligible (no keeper row). No page text was edited. This record is evidence-only, not a keeper/index/ledger/register/manifest change, verdict or merge; Stage D/E/F/G remain separate. No synthetic test/passing check/approved design is presented as deployed or measured.
 
 **Signed with both names: true identity sd-e-794-r1 - stage role sd-c-read-b22-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
