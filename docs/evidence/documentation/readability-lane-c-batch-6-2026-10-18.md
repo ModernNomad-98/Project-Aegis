@@ -441,7 +441,14 @@ Canonical acceptance is quoted from backlog L2841-2862 at the base: B1 purpose/r
 | P6 | 135 | i | USAGE | named gap - first use before any expansion on this page |
 | P6 | 135 | v | <system/domain> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 136 | ii | payload | named gap - first use before any expansion on this page |
+| P6 | 136 | v | <fields; no payload or direct personal data; minimized user-linked identifiers with access/retention controls; immutable> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 138 | v | <metric → price; [valid_from, valid_to); rate at occurred_at, not current; versioned, past cards immutable> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 140 | v | <exact/estimated/allocated labeled; idempotency key = event_id + rate-card version; re-processing produces same entry> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 142 | v | <daily/tenant/metric SUM of entries; additive; reconstructable projection, not source of truth; analytical placement → operational-vs-analytical-splitter> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 144 | v | <thresholds vs rollups; alert-before-gone + owners; forecast> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 145 | i | ENFORCEMENT | defined at first use - line 145 contains the expansion |
+| P6 | 146 | v | <aggregate totals vs invoice at available granularity; tenant allocation validation; drift + tolerance; discrepancy → recompute/audit/missing-event hunt> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 149 | v | <late events + refunds/voids as additive adjustments; period close/lock; post-close → next period> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 153 | v | <each with risk-if-wrong / who answers> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 213 | i | DESIGNS | named gap - first use before any expansion on this page |
 | P6 | 214 | ii | repo | named gap - first use before any expansion on this page |
@@ -513,10 +520,13 @@ Canonical acceptance is quoted from backlog L2841-2862 at the base: B1 purpose/r
 | P7 | 110 | v | <import.meta.env / define / plugins> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P7 | 111 | v | <exact command + mode> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P7 | 111 | v | <result, warnings triaged> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P7 | 112 | v | <what was searched (values/patterns/files) → findings or "none found by this method"> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P7 | 114 | v | <route/asset/deep-link/mode results under preview + base> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P7 | 115 | v | <sizes vs budget, unexpected inclusions, sourcemap policy> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P7 | 116 | v | <plain terms; viable options and reasons; debugging/source-exposure pros/cons; money/setup/upkeep or unknowns; recommendation and why; one owner question; policy pending> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P7 | 119 | v | <severity-ranked, each with file/location and redacted fingerprint; no secret bytes> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P7 | 120 | v | <scripts + placement, or handoff to automation blueprint> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P7 | 121 | v | <confirmed secrets → secrets-identity-hardener (relocate+rotate); app bugs → systematic-debugger> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P7 | 130 | i | REAL | named gap - first use before any expansion on this page |
 | P7 | 149 | i | COMPROMISED | named gap - first use before any expansion on this page |
 | P7 | 159 | iii | `.env.local` | documented exclusion - inline code/path/command identifier, not a prose abbreviation |
@@ -558,6 +568,7 @@ Canonical acceptance is quoted from backlog L2841-2862 at the base: B1 purpose/r
 | P8 | 21 | ii | js | named gap - first use before any expansion on this page |
 | P8 | 21 | ii | json | named gap - first use before any expansion on this page |
 | P8 | 21 | iii | `dist/**/*.{js,mjs,css,html,json,map}` | documented exclusion - inline code/path/command identifier, not a prose abbreviation |
+| P8 | 24 | v | <file classes> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P8 | 27 | iv | `EXAMPLE_SERVER_TOKEN` | documented exclusion - inline code/path/command identifier, not a prose abbreviation |
 | P8 | 29 | iii | `dist/assets/app.js: presence` | documented exclusion - inline code/path/command identifier, not a prose abbreviation |
 | P8 | 29 | iii | app.js | documented exclusion - inline code/path/command identifier, not a prose abbreviation |
@@ -591,16 +602,16 @@ Canonical acceptance is quoted from backlog L2841-2862 at the base: B1 purpose/r
 | P3 | 15 | 13 | 9 | 8 | 6 | 51 | 19 | 9 | 23 |
 | P4 | 20 | 8 | 7 | 9 | 21 | 65 | 15 | 13 | 37 |
 | P5 | 8 | 6 | 1 | 7 | 4 | 26 | 11 | 3 | 12 |
-| P6 | 24 | 12 | 5 | 12 | 3 | 56 | 27 | 9 | 20 |
-| P7 | 19 | 16 | 16 | 16 | 11 | 78 | 23 | 12 | 43 |
-| P8 | 13 | 14 | 10 | 13 | 2 | 52 | 19 | 8 | 25 |
-| **Total** | **138** | **92** | **59** | **103** | **71** | **463** | **145** | **85** | **233** |
+| P6 | 24 | 12 | 5 | 12 | 10 | 63 | 27 | 9 | 27 |
+| P7 | 19 | 16 | 16 | 16 | 14 | 81 | 23 | 12 | 46 |
+| P8 | 13 | 14 | 10 | 13 | 3 | 53 | 19 | 8 | 26 |
+| **Total** | **138** | **92** | **59** | **103** | **82** | **474** | **145** | **85** | **244** |
 
-**Zero-duplicate proof:** final table rows = **463** = unique (page, first-use line, normalized token) keys = **463**; duplicate keys = **0**; extra rows after the final table = **0**; per-page/class/disposition sums equal the row count; one contiguous inventory table only; five-column cell-count proof: all 463 rows parse exactly five cells with in-token pipes escaped and 0 bad rows. **Reconciliation:** section 3 B2/verdicts and section 5 named-gap list agree with this final table; no row is fabricated or placeholder.
+**Zero-duplicate proof:** final table rows = **474** = unique (page, first-use line, normalized token) keys = **474**; duplicate keys = **0**; extra rows after the final table = **0**; per-page/class/disposition sums equal the row count; one contiguous inventory table only; five-column cell-count proof: all 474 rows parse exactly five cells with in-token pipes escaped and 0 bad rows. **Reconciliation:** section 3 B2/verdicts and section 5 named-gap list agree with this final table; no row is fabricated or placeholder.
 
 ## 6. Dispositions, verdicts, keeper exclusion and continuation
 
-**Disposition tally: 85 defined at first use / 145 named gaps / 233 documented exclusions = 463 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED for every page; named B2 gaps force PARTIAL where present. **No keeper/acceptance row** is created; a later keeper decides.
+**Disposition tally: 85 defined at first use / 145 named gaps / 244 documented exclusions = 474 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED for every page; named B2 gaps force PARTIAL where present. **No keeper/acceptance row** is created; a later keeper decides.
 
 **Named-gap list (from the final table):**
 - P1 (304): tenant L17, POST L29, payload L30, json L47, P0 L55, C1 L58, C4 L58
@@ -624,7 +635,7 @@ Canonical acceptance is quoted from backlog L2841-2862 at the base: B1 purpose/r
 | --- | --- | --- |
 | AC1 one-path | MET in branch | exactly one added record path; no other tracked path; no plan file; DCO-signed model commit(s) measured post-commit |
 | AC2 frozen pages | MET | eight 40-hex blobs, bytes/LF, zero drift, pending/unread by lane-batch records, outside reservations |
-| AC3 whole-page + inventory | MET in this record | whole-page B1-B6; ONE contiguous 463-row table; five-cell/zero-duplicate proof; counts from final table; no fabricated rows |
+| AC3 whole-page + inventory | MET in this record | whole-page B1-B6; ONE contiguous 474-row table; five-cell/zero-duplicate proof; counts from final table; no fabricated rows |
 | AC4 dispositions | MET | strict FULL bar; B6 UNVERIFIED and not FULL-supporting; 0F/8P; named gaps; no keeper |
 | AC5 record/body/PROC | asserted in PR body/handoff | record facts outside record; body witness/skills/security fields; PROC-04 from live final body with published==recomputed and literal presence; checker 0 |
 | AC6 Codex | pending/guarded at C handoff | Codex is never a pass; trigger/triage/thread state truthfully reported in the PR body/SD-C handoff; MG3 belongs to G |
@@ -635,18 +646,18 @@ Canonical acceptance is quoted from backlog L2841-2862 at the base: B1 purpose/r
 
 | Skill | Stage / agent | How applied | Result / evidence |
 | --- | --- | --- | --- |
-| [acceptance-criteria-reviewer](../../../.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ c6e5d5649bf8 | C batch-6 / sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole at 2db1ffb7; applied canonical B1-B6, B4 per page and B6 UNVERIFIED; built one exact-once inventory. | 0 FULL / 8 PARTIAL / 0 UNRUN; 463-row inventory; no keeper |
-| [source-of-truth-reconciler](../../../.claude/skills/source-of-truth-reconciler/SKILL.md) @ b5fd9feda972 | C batch-6 / sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main 6afc845a; re-derived frontier, pages/blobs/totals, zero drift and record-path absence. | block 304-311 / lane C batch 6; 72,594 B / 1,259 LF; no drift; record path absent |
-| [change-classification-gate](../../../.claude/skills/change-classification-gate/SKILL.md) @ 08d91a834460 | C batch-6 / sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main; classified the change as docs-only exactly one added path. | one added docs/evidence/documentation/readability-lane-c-batch-6-2026-10-18.md; no other path |
-| [skill-usage-ledger](../../../.claude/skills/skill-usage-ledger/SKILL.md) @ 6a27b5c8e690 | C batch-6 / sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main; resolved manifest hashes and authored these rows/Row sources/six fields. | 4 rows / 4 per-row sources / 4 six-field lines |
+| acceptance-criteria-reviewer @ c6e5d5649bf8 | C batch-6 / sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole at 2db1ffb7; applied canonical B1-B6, B4 per page and B6 UNVERIFIED; built one exact-once inventory. | 0 FULL / 8 PARTIAL / 0 UNRUN; 474-row inventory; no keeper |
+| source-of-truth-reconciler @ b5fd9feda972 | C batch-6 / sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main 6afc845a; re-derived frontier, pages/blobs/totals, zero drift and record-path absence. | block 304-311 / lane C batch 6; 72,594 B / 1,259 LF; no drift; record path absent |
+| change-classification-gate @ 08d91a834460 | C batch-6 / sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main; classified the change as docs-only exactly one added path. | one added docs/evidence/documentation/readability-lane-c-batch-6-2026-10-18.md; no other path |
+| skill-usage-ledger @ 6a27b5c8e690 | C batch-6 / sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main; resolved manifest hashes and authored these rows/Row sources/six fields. | 4 rows / 4 per-row sources / 4 six-field lines |
 
-<!-- Row source: agent=sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=this batch-6 record commit on branch from 6afc845a, plan 6250892357 / B ACCEPT 6250927547; source=_A/evidence/read-lc-304-c1/Crows.txt line 1 of 4; binding=sha256 89c0bb971583f177652fb563d218df576c87c79980852bf08d93838a4cc0d5fc over the four-row capture (1538 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=this batch-6 record commit on branch from 6afc845a, plan 6250892357 / B ACCEPT 6250927547; source=_A/evidence/read-lc-304-c1/Crows.txt line 2 of 4; binding=sha256 89c0bb971583f177652fb563d218df576c87c79980852bf08d93838a4cc0d5fc over the four-row capture (1538 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=this batch-6 record commit on branch from 6afc845a, plan 6250892357 / B ACCEPT 6250927547; source=_A/evidence/read-lc-304-c1/Crows.txt line 3 of 4; binding=sha256 89c0bb971583f177652fb563d218df576c87c79980852bf08d93838a4cc0d5fc over the four-row capture (1538 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=this batch-6 record commit on branch from 6afc845a, plan 6250892357 / B ACCEPT 6250927547; source=_A/evidence/read-lc-304-c1/Crows.txt line 4 of 4; binding=sha256 89c0bb971583f177652fb563d218df576c87c79980852bf08d93838a4cc0d5fc over the four-row capture (1538 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=this batch-6 record commit on branch from 6afc845a, plan 6250892357 / B ACCEPT 6250927547; source=_A/evidence/read-lc-304-c1/Crows.txt line 1 of 4; binding=sha256 b0311ef617f1087b8cab14e9c603df6aedde73d64639497243503fa5cc44838e over the four-row capture (1538 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=this batch-6 record commit on branch from 6afc845a, plan 6250892357 / B ACCEPT 6250927547; source=_A/evidence/read-lc-304-c1/Crows.txt line 2 of 4; binding=sha256 b0311ef617f1087b8cab14e9c603df6aedde73d64639497243503fa5cc44838e over the four-row capture (1538 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=this batch-6 record commit on branch from 6afc845a, plan 6250892357 / B ACCEPT 6250927547; source=_A/evidence/read-lc-304-c1/Crows.txt line 3 of 4; binding=sha256 b0311ef617f1087b8cab14e9c603df6aedde73d64639497243503fa5cc44838e over the four-row capture (1538 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-304-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=this batch-6 record commit on branch from 6afc845a, plan 6250892357 / B ACCEPT 6250927547; source=_A/evidence/read-lc-304-c1/Crows.txt line 4 of 4; binding=sha256 b0311ef617f1087b8cab14e9c603df6aedde73d64639497243503fa5cc44838e over the four-row capture (1538 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
 
 **Six-field lines (outside any bound field):**
-acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C owes canonical acceptance evidence / applied: read eight pages whole, B1-B6, B4 per page, B6 unverified, inventory / result: 0F/8P; 463 rows; no keeper / incomplete: D/E/F/G / by: C, sd-c-read-lc-304-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
+acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C owes canonical acceptance evidence / applied: read eight pages whole, B1-B6, B4 per page, B6 unverified, inventory / result: 0F/8P; 474 rows; no keeper / incomplete: D/E/F/G / by: C, sd-c-read-lc-304-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 source-of-truth-reconciler@b5fd9feda972 / reason: derivation/pages must come from owning artifacts / applied: fresh main 6afc845a, pinned pages, blobs/bytes/LF, record-path check / result: block304-311; 72,594/1,259; no drift / incomplete: hosted states / by: C, sd-c-read-lc-304-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 change-classification-gate@08d91a834460 / reason: scope must be docs-only one path / applied: checked one added record path and no other change / result: one-path / incomplete: none / by: C, sd-c-read-lc-304-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 skill-usage-ledger@6a27b5c8e690 / reason: C handoff owes manifest-bound provenance / applied: resolved names at main 6afc845a, authored rows/Row sources/six fields / result: 4 rows/4 sources/4 lines / incomplete: none / by: C, sd-c-read-lc-304-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
