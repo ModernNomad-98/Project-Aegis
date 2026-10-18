@@ -4,7 +4,7 @@
 
 **Plan of record.** Lean plan revision 1, merged PR #826 issue comment **6246150867** (created = updated 2026-10-18T05:35:01Z; immutable; 14,869 bytes), with Stage B **ACCEPT 6246170800** (derivation 160-167 / lane B batch 7 CONFIRMED; eight pages reproduce; freshness PASS; no defects). The plan is operative only on that fresh B ACCEPT bound to that comment; there is no committed plan file and no plan file in this change.
 
-**Implementation base.** main = **c8942134a9bb6d2eb6aec739a4dbe9e245194026** (28 session record merges; parents f5cde4b7 + the merged #829 batch-8 record; #826 batch-20 and #827 lane-B batch-6 records also merged; LANE A COMPLETE 0-143). **Pinned measurement ref** = **2db1ffb7985ddc1c087c455740fd59e962967461**, at which the eight frozen pages are bound by Git blob id below.
+**Implementation base.** main = **bc1972aa3f37057aa4338dd34d8cc00c10faa577** (the #830 batch-9 record merge after the owner #819 workflow merge; #829 batch-8, #827 lane-B batch-6 and #826 batch-20 records also merged; the plan was captured at 06613a02; LANE A COMPLETE 0-143). **Pinned measurement ref** = **2db1ffb7985ddc1c087c455740fd59e962967461**, at which the eight frozen pages are bound by Git blob id below.
 
  **Agent, model and stage.** Written by **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**; agent identity **sd-c-796-r1**, stage role **sd-c-read-b7-c1** for the original Stage C, with later repair stages recording their own role in the PR body/SD-C comments. Stage C scope: I read each frozen page whole at the pinned blob, authored this record, and did not edit any page, keep any ledger row, rebuild any index, open any other pull request, or merge. Codex-thread triage is recorded in the PR body and SD-C repair comment, not performed by the original authoring pass. The record is signed with both names at its footer.
 
@@ -16,7 +16,7 @@
 
 ## 2. Lane derivation at this implementation base - re-run, not handed down
 
-**Command (fresh clone of live main c8942134, working tree at the merged index; plan capture saw 06613a02):**
+**Command (fresh clone of live main bc1972aa, working tree at the merged index; plan capture saw 06613a02):**
 
 ```text
 python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740fd59e962967461 --json
@@ -24,9 +24,9 @@ python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c0
 
 **Observed summary:** compared_ref **2db1ffb7**; reader_pages_in_tree **690**; accepted_on_recorded_review **107**; provably_pending **6**; no_recorded_acceptance **567**; recorded_acceptance_within_10_lines **0**; cannot_decide **6**; withdrawn_pending_rereview **0**; partial_disposition_pending **4**; official_pending_count **583**. Lane-arithmetic pending set: **567 + 6 = 573** sorted paths. **Lane A is complete (0-143)**. This item is the next lane-B block, pending indices **160-167**, eight pages. Block starts: 160 `.claude/skills/memory-context-poisoning-reviewer/SKILL.md`; 168 `.claude/skills/observability-operator/SKILL.md` (first path after this block).
 
-**Derivation detail (plan AC7).** The merged lane-B records (batches 2, 2-rerecord, 3 and 5) account for read rows **148-155** (batch-5's eight P1-P8 rows map exactly to 148-155). The **in-flight lane-B batch-6 record (#827 at plan capture)** reserves the unread-sequence block **{144,145,146,147,156,157,158,159}**. Excluding merged read rows and that reservation, the R2 next eight unread pages are **160-167** - the frozen block here. This is the plan-required derivation detail, not index arithmetic.
+**Derivation detail (plan AC7).** At plan capture the merged lane-B records (batches 2, 2-rerecord, 3 and 5) accounted for read rows **148-155** (batch-5's eight P1-P8 rows map exactly to 148-155) and the then-in-flight lane-B batch-6 record (#827) reserved **{144,145,146,147,156,157,158,159}**; excluding those, the R2 next eight unread pages were **160-167**, the block frozen here and confirmed by B ACCEPT 6246170800. At this implementation base **bc1972aa3f37057aa4338dd34d8cc00c10faa577** the same block remains the frozen item: merged lane-B rows are now **144-159** (#827 batch-6), **168-175** (#829 batch-8) and **176-183** (#830 batch-9), and the open lane-B batch-10 record (#831) reserves **184-191** - no merged row and no reservation touches 160-167. This is the plan-required derivation detail, not index arithmetic.
 
-**Eligibility (precise).** Each page is in the 573-path pending set at the pinned ref (no keeper row), in lane B's pending span after lane A (0-143), **unread in the merged or in-flight lane-B records at the plan capture** (the plan's operative narrower condition), and zero-drift to live implementation base **c8942134a9bb6d2eb6aec739a4dbe9e245194026**. Seven of the eight pages do appear in **older merged full-page readability records** (after-219 for P1; after-220 for P4/P6/P8; after-230 for P2/P3/P5), which is why the older formulation named-in-no-merged-batch-record is false as written; the merged/in-flight lane-B unread test the plan uses is satisfied by all eight. No page outside the frozen eight is read or claimed.
+**Eligibility (precise).** Each page is in the 573-path pending set at the pinned ref (no keeper row), in lane B's pending span after lane A (0-143), **unread in the merged or in-flight lane-B records at the plan capture** (the plan's operative narrower condition), and zero-drift to live implementation base **bc1972aa3f37057aa4338dd34d8cc00c10faa577**. Seven of the eight pages do appear in **older merged full-page readability records** (after-219 for P1; after-220 for P4/P6/P8; after-230 for P2/P3/P5), which is why the older formulation named-in-no-merged-batch-record is false as written; the merged/in-flight lane-B unread test the plan uses is satisfied by all eight. No page outside the frozen eight is read or claimed.
 
 ## 3. The frozen page set - eight pages, measured at the pinned ref
 
@@ -37,11 +37,11 @@ python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c0
 | P3 | 162 | `.claude/skills/merge-is-deploy-governance/references/governance-doc-template.md` | `14a14f2f0b1674530a93356a5d834aa84e67a1a4` | 6,386 / 114 | **PARTIAL** | L97 GitOps and coded identifier `Application` unexpanded | 0 |
 | P4 | 163 | `.claude/skills/mobile-viewport-craft/SKILL.md` | `19060f70173406573863955b9df3f28b1d58c020` | 14,201 / 234 | **PARTIAL** | L3 UI/URL and 100vh/vh/svh/lvh/dvh before definitions (vh L8; svh/lvh/dvh L9-L11) | 0 |
 | P5 | 164 | `.claude/skills/mobile-viewport-craft/references/mobile-viewport-sheet.md` | `91c3fa278e5b1347c505c1a8501ea680126b4076` | 3,818 / 92 | **PARTIAL** | L20 100vh before L24 definition; L45 CSS unexpanded | 0 |
-| P6 | 165 | `.claude/skills/model-context-designer/SKILL.md` | `1f1f7d9dcdd8a48072ce0d05f85504ff1fc088bf` | 19,611 / 316 | **PARTIAL** | L144 PERSISTED/TRANSIENT; L192 template enum; L223 validation | 0 |
+| P6 | 165 | `.claude/skills/model-context-designer/SKILL.md` | `1f1f7d9dcdd8a48072ce0d05f85504ff1fc088bf` | 19,611 / 316 | **PARTIAL** | L144 PERSISTED/TRANSIENT; L192 template enum; L203 template `<instruction id - version - owner>`; L223 validation | 0 |
 | P7 | 166 | `.claude/skills/model-context-designer/references/prompt-contract-template.md` | `a76d91e7180e8f2ea2c694b63f57407f516b0ee1` | 4,238 / 87 | **PARTIAL** | L14 `<instruction id>`; L26 `<suite id>`; L70 POST and `{id}` unexpanded | 0 |
-| P8 | 167 | `.claude/skills/model-poisoning-reviewer/SKILL.md` | `b1d8caff733611442df2e1ef7304d7747e865e34` | 11,702 / 190 | **PARTIAL** | L3 OWASP/LLM05/RLHF/RAG; L18 LLM04; L38 LLM09; L45 ASI06; L107 [SEV] | 0 |
+| P8 | 167 | `.claude/skills/model-poisoning-reviewer/SKILL.md` | `b1d8caff733611442df2e1ef7304d7747e865e34` | 11,702 / 190 | **PARTIAL** | L3 OWASP/LLM05/RLHF/RAG; L18 LLM04; L38 LLM09; L45 ASI06; L107 [SEV]; L108 template `<provenance | curation gate | feedback id/rate | ...>` | 0 |
 
-**Totals: 8 pages / 77,293 bytes / 1,325 LF / **0 FULL / 8 PARTIAL / 0 UNRUN** / 0 edits.** Values were measured by command at the pinned ref and sum to the plan's totals; every page's blob is identical at live main c8942134 (zero drift; live main advanced by the merged #827 batch-6 record, the owner #819 merge and the merged #829 batch-8 record).
+**Totals: 8 pages / 77,293 bytes / 1,325 LF / **0 FULL / 8 PARTIAL / 0 UNRUN** / 0 edits.** Values were measured by command at the pinned ref and sum to the plan's totals; every page's blob is identical at live main bc1972aa (zero drift; live main advanced by the merged #827 batch-6, #829 batch-8 and #830 batch-9 records and the owner #819 merge).
 
 ## 4. Per-page read detail - ranges, six acceptance bullets, purpose restatements, defects
 
@@ -79,9 +79,9 @@ The six bullets are the repository's "Acceptance for each page": **B1** purpose/
 
 ### P6 - `.claude/skills/model-context-designer/SKILL.md` - read whole, L1-316
 **Purpose/normal use:** design what enters and leaves a model context window - server-side assembly, caps, closed schemas, sensitive-data minimization, retention, reconstructibility, excluded-by-design segments - plus the per-call prompt contract.
-**B1 satisfied** - description L3, Purpose L15-37, Use When L39-84. **B2 partial** - the reading key L8-13 defines context window/segment/prompt contract/evaluation rerun; AI at L43 and PII at L95 are expanded in place at first use; but **L144 uses the status tokens `PERSISTED` and `TRANSIENT` without expansion**, **L192 uses the template enum `<PERSISTED|TRANSIENT>`**, and **L223 uses a validation instruction with `PERSISTED`/`TRANSIENT`** - all first uses before any definition on the page. **B3 satisfied** - Workflow L108-179, Output L181-216, validation L218-244, gotchas L246-273. **B4 satisfied** - design only; provider retention and exclusions explicit; no shipped claim. **B5 satisfied** - 2 internal links resolve; no concrete shell command. **B6 basis** - git metadata differs from reader identity; **limit** - metadata cannot prove non-authorship of owner-account commits or that a human read; **this is PARTIAL on the named B2 gaps, not FULL**.
+**B1 satisfied** - description L3, Purpose L15-37, Use When L39-84. **B2 partial** - the reading key L8-13 defines context window/segment/prompt contract/evaluation rerun; AI at L43 and PII at L95 are expanded in place at first use; but **L144 uses the status tokens `PERSISTED` and `TRANSIENT` without expansion**, **L192 uses the template enum `<PERSISTED|TRANSIENT>`**, and **L223 uses a validation instruction with `PERSISTED`/`TRANSIENT`**, and **L203 uses the coded template `<instruction id - version - owner>` whose id/version/owner fields are unexpanded** - all first uses before any definition on the page. **B3 satisfied** - Workflow L108-179, Output L181-216, validation L218-244, gotchas L246-273. **B4 satisfied** - design only; provider retention and exclusions explicit; no shipped claim. **B5 satisfied** - 2 internal links resolve; no concrete shell command. **B6 basis** - git metadata differs from reader identity; **limit** - metadata cannot prove non-authorship of owner-account commits or that a human read; **this is PARTIAL on the named B2 gaps, not FULL**.
 **Quoted evidence (L8-13):** reading key defining context window, segment, prompt contract and evaluation rerun.
-**Verdict: PARTIAL, no edit. Named gaps: L144 PERSISTED/TRANSIENT; L192 template enum; L223 validation.**
+**Verdict: PARTIAL, no edit. Named gaps: L144 PERSISTED/TRANSIENT; L192 template enum; L203 `<instruction id - version - owner>`; L223 validation.**
 
 ### P7 - `.claude/skills/model-context-designer/references/prompt-contract-template.md` - read whole, L1-87
 **Purpose/normal use:** the prompt-contract template - instruction id/version/owner, call site, declared inputs, output contract pointer, decline conditions, change policy, last evaluation run and agent instruction custody.
@@ -93,11 +93,11 @@ The six bullets are the repository's "Acceptance for each page": **B1** purpose/
 **Purpose/normal use:** review the integrity of data and pipelines shaping a model's behavior against data/model poisoning (OWASP LLM05) - training/fine-tuning datasets, RLHF/feedback loops, RAG/embedding ingestion and backdoor/trigger risk - with severity-ranked findings and controls.
 **B1 satisfied** - description L3, Purpose L8-26, Use When L28-45. **B2 partial** - L11-14 expands OWASP, LLM, RLHF and RAG, but the **L3 description already uses OWASP, LLM05, RLHF and RAG before L11-14**, and **L45 uses ASI06, L38 uses LLM09, L18 uses LLM04 and L107 uses the [SEV] template token** without first-use expansions on this page. **B3 satisfied** - Workflow L62-98, Output L100-113, validation L115-130, Security Rules L132-142, gotchas L144-163. **B4 satisfied** - review-only; no shipped claim. **B5 satisfied** - 2 internal links resolve; no concrete shell command. **B6 basis/limit** - metadata differs; PARTIAL.
 **Quoted evidence (L3 vs L11):** description `... (OWASP LLM05) ... RLHF ... RAG ...` before `Open Worldwide Application Security Project (OWASP) ... RLHF ... RAG ...`.
-**Verdict: PARTIAL, no edit. Named defects: L3 OWASP/LLM05/RLHF/RAG; L18 LLM04; L38 LLM09; L45 ASI06; L107 [SEV] unexpanded.**
+**Verdict: PARTIAL, no edit. Named defects: L3 OWASP/LLM05/RLHF/RAG; L18 LLM04; L38 LLM09; L45 ASI06; L107 [SEV]; L108 coded template unexpanded.**
 
 ## 4A. Scripted token audit (convergence requirement)
 
-**Method (clean, reproducible).** A read-only Python audit reads each of the eight pinned-ref pages and extracts four token classes: (1) uppercase and mixed-case/plural coded identifiers (`\b[A-Z][A-Z0-9]{1,15}\b` plus `\b[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9]*\b`, so unbackticked GitOps and plural IDs are captured; the earlier 5/8-character cap was removed in repair-8); (2) backticked identifiers; (3) angle- and brace-placeholders; (4) viewport unit tokens `\b\d*(?:svh|lvh|dvh|vh)\b`. It records each token's first line and compares it with the page's Terms/reading-key block and any in-place expansion. The command names all eight pinned pages explicitly so the extraction is reproducible without hidden arguments. **Repair-10 adds a fifth class - lowercase technical abbreviations and shorthand** - judged in context rather than by case alone; the widened rerun found the P1 L3 `authz` and P2 L29 `ids` gaps recorded below.
+**Method (clean, reproducible).** A read-only Python audit reads each of the eight pinned-ref pages and extracts five token classes: (1) uppercase and mixed-case/plural coded identifiers (`\b[A-Z][A-Z0-9]{1,15}\b` plus `\b[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9]*\b`, so unbackticked GitOps and plural IDs are captured; the earlier 5/8-character cap was removed in repair-8); (2) backticked identifiers; (3) angle- and brace-placeholders; (4) viewport unit tokens `\b\d*(?:svh|lvh|dvh|vh)\b`; (5) **lowercase technical abbreviations and shorthand**, extracted by `\b[a-z][a-z0-9]{1,11}\b` and judged in context (ordinary English words are excluded only after reading their context). It records each token's first line and compares it with the page's Terms/reading-key block and any in-place expansion. The command names all eight pinned pages explicitly so the extraction is reproducible without hidden arguments. **Repair-11 implements the lowercase class in the method AND the script (not merely naming it) and reruns the scan.**
 
 **Classification rule (explicit, consistent).** A typed token, abbreviation, coded identifier/field or template field token is a **B2 first-use gap** when it is not expanded at or before first use. Template field tokens such as `[SEV]`, `<instruction id>`, `<suite id>` and `{id}` are **in scope**; plain self-describing fill-in holes (`<owner>`, `<repo>`, `<date>`, `<n>`, `<yes/no>`, `<feature / endpoint / job>`), heading/emphasis words and the path `SKILL.md` are **not** B2 abbreviations and are excluded. This explicitly resolves the earlier `[SEV]`/emphasis-word inconsistency: the carve-out is for self-describing holes, not for template tokens.
 
@@ -115,7 +115,7 @@ pages = [
     ".claude/skills/model-context-designer/references/prompt-contract-template.md",
     ".claude/skills/model-poisoning-reviewer/SKILL.md",
 ]
-pattern = r"\b[A-Z][A-Z0-9]{1,15}\b|\b[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9]*\b|`[^`]+`|<[^>]+>|\{[^}]+\}|\b\d*(?:svh|lvh|dvh|vh)\b"
+pattern = r"\b[A-Z][A-Z0-9]{1,15}\b|\b[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9]*\b|`[^`]+`|<[^>]+>|\{[^}]+\}|\b\d*(?:svh|lvh|dvh|vh)\b|\b[a-z][a-z0-9]{1,11}\b"
 for page in pages:
     text = subprocess.run(["git", "show", ref + ":" + page], capture_output=True, text=True, check=True).stdout
     for n, line in enumerate(text.splitlines(), 1):
@@ -129,21 +129,23 @@ The first-use layer then applies the rule above; the resulting unexpanded set is
 | Page | Token classes inspected | Unexpanded first-use token(s) | Covered in named gaps |
 | --- | --- | --- | --- |
 | P1 | uppercase + mixed-case/plural + backticked + placeholders + units + lowercase shorthand in L1-205 | **L3 OWASP, ASI06, TTL, LLM05, LLM09; L28 LLM04; L29 LLM08/IDs; L120 [SEV]; L147 AI; L3 authz (twice before L30)** | yes |
-| P2 | uppercase + backticked + placeholders + units in L1-87 | **L1 ASI06; L8 LLM08; L29 ids (no expansion)** | yes |
-| P3 | uppercase + backticked + placeholders + units in L1-114 | **L97 GitOps; L97 `Application`** (no later expansion on the page) | yes |
-| P4 | uppercase + backticked + placeholders + units in L1-234 | **L3 UI; L3 URL; L3 100vh; L3 vh; L3 svh; L3 lvh; L3 dvh** | yes |
-| P5 | uppercase + backticked + placeholders + units in L1-92 | **L20 100vh; L45 CSS** | yes |
-| P6 | uppercase + backticked + placeholders + units in L1-316 | **L144 PERSISTED/TRANSIENT; L192 template enum `<PERSISTED|TRANSIENT>`; L223 validation** | yes |
-| P7 | uppercase + backticked + placeholders + units in L1-87 | **L14 `<instruction id>`; L26 `<suite id>`; L70 POST; L70 `{id}`** | yes |
-| P8 | uppercase + backticked + placeholders + units in L1-190 | **L3 OWASP, LLM05, RLHF, RAG; L18 LLM04; L38 LLM09; L45 ASI06; L107 [SEV]** | yes |
+| P2 | uppercase + mixed-case/plural + backticked + placeholders + units + lowercase shorthand in L1-87 | **L1 ASI06; L8 LLM08; L29 ids (no expansion)** | yes |
+| P3 | uppercase + mixed-case/plural + backticked + placeholders + units + lowercase shorthand in L1-114 | **L97 GitOps; L97 `Application`** (no later expansion on the page) | yes |
+| P4 | uppercase + mixed-case/plural + backticked + placeholders + units + lowercase shorthand in L1-234 | **L3 UI; L3 URL; L3 100vh; L3 vh; L3 svh; L3 lvh; L3 dvh** | yes |
+| P5 | uppercase + mixed-case/plural + backticked + placeholders + units + lowercase shorthand in L1-92 | **L20 100vh; L45 CSS** | yes |
+| P6 | uppercase + mixed-case/plural + backticked + placeholders + units + lowercase shorthand in L1-316 | **L144 PERSISTED/TRANSIENT; L192 template enum `<PERSISTED|TRANSIENT>`; L203 template `<instruction id - version - owner>`; L223 validation** | yes |
+| P7 | uppercase + mixed-case/plural + backticked + placeholders + units + lowercase shorthand in L1-87 | **L14 `<instruction id>`; L26 `<suite id>`; L70 POST; L70 `{id}`** | yes |
+| P8 | uppercase + mixed-case/plural + backticked + placeholders + units + lowercase shorthand in L1-190 | **L3 OWASP, LLM05, RLHF, RAG; L18 LLM04; L38 LLM09; L45 ASI06; L107 [SEV]; L108 template `<provenance | curation gate | feedback id/rate | anomaly detect | holdout eval | purge/rollback>`** | yes |
 
-**Audit result (scoped completeness, restated after repair-10):** eight pages audited with the widened five-class method/scope/exclusions. The named-gap sets now include **every unexpanded first-use token found by that method**, including the lowercase-class additions **P1 L3 authz** and **P2 L29 ids**, plus **P1 L29 IDs** and the unbackticked **P3 L97 GitOps** from the mixed-case/plural class, plus all previous additions. No absolute completeness beyond the stated scope is claimed. All eight pages remain PARTIAL, tally **0 FULL / 8 PARTIAL / 0 UNRUN**, no keeper, no page edits.
+**Audit result (scoped completeness, restated after repair-11):** eight pages audited with the five-class method now implemented in both the prose and the script. The named-gap sets include **every unexpanded first-use token found by that method**, including the lowercase-class additions **P1 L3 authz** and **P2 L29 ids**, the coded template-token additions **P6 L203 `<instruction id - version - owner>`** and **P8 L108 `<provenance | curation gate | feedback id/rate | anomaly detect | holdout eval | purge/rollback>`**, plus **P1 L29 IDs** and the unbackticked **P3 L97 GitOps** from the mixed-case/plural class, plus all previous additions. The rerun found no further unexcluded missed token. No absolute completeness beyond the stated scope is claimed. All eight pages remain PARTIAL, tally **0 FULL / 8 PARTIAL / 0 UNRUN**, no keeper, no page edits.
 
 **Repair-8 (answer to SD-D 6246959221):** the prior audit cap missed the 9-character status tokens. The scan was widened to 2-16 characters and **P6 L144 `PERSISTED`/`TRANSIENT`, L192 template enum and L223 validation** were added to sections 3/4/4A/6; P6 is downgraded **FULL -> PARTIAL**, the tally is **0 FULL / 8 PARTIAL / 0 UNRUN**, and no page is keeper-eligible. This is a correction of a silent upgrade, not a new page defect discovery; P6's bytes/LF and all other page facts are unchanged. **Additional valid Codex P2s at this head were also fixed:** the §4A command now passes the eight pinned-page paths explicitly (reproducible extraction), and the link accounting is corrected to **11 relative internal / 0 broken; 3 external git-scm.com links not fetched**; both threads are replied to and resolved with this repair's SHA.
 
 **Repair-9 (Codex P2 triage at head 308b967):** added **P1 L29 IDs** to the named gaps; the audit command now captures mixed-case/plural identifiers (so unbackticked **P3 L97 GitOps** and plural **IDs** are emitted); eligibility is rebound to **c8942134** with after-220 for P4/P6/P8 and after-230 for P2/P3/P5; section 8 restores the **AC6** row, AC5/AC6 are final-head declarations, the code fence is opened, and the limitations count is **eight** PARTIAL pages. No disposition/page/plan changes: **0 FULL / 8 PARTIAL / 0 UNRUN**, no keeper.
 
 **Repair-10 (answer to SD-D REVISE 6247240969):** the audit method now includes the **lowercase class** (lowercase technical abbreviations/shorthand judged in context), the scan was rerun, and the two omitted gaps are added in record sections 3/4/4A and the body P1/P2 rows: **P1 L3 `authz`** (twice, before its only expansion at L30) and **P2 L29 `ids`** (Run/session/document ids, no expansion). Both pages remain **PARTIAL**; tally stays **0 FULL / 8 PARTIAL / 0 UNRUN**; no keeper; the scoped-completeness statement is restated for the five-class method. All repair-9 fixes (opening code fence, AC6 row, eight-PARTIAL limitation, mixed-case/plural scan and P1 L29 IDs, eligibility rebound to c8942134, P8 after-220 attribution) are retained.
+
+**Repair-11 (answer to SD-D REVISE 6247328179):** the branch was rebased onto live main **bc1972aa3f37057aa4338dd34d8cc00c10faa577** after the #830 batch-9 record merged, and the live-base diff is exactly **one A batch-7 record, +220/-0 with no D of merged work**; base facts/eligibility/zero-drift statements now name bc1972aa3f37057aa4338dd34d8cc00c10faa577 and the merged rows are **144-159 + 168-175 + 176-183** with #831 reserving 184-191. The lowercase class is now **implemented in the method and the script** (fifth extraction class) and the scan was rerun; the two coded template tokens **P6 L203 `<instruction id - version - owner>`** and **P8 L108 `<provenance | curation gate | feedback id/rate | anomaly detect | holdout eval | purge/rollback>`** are added in sections 3/4/4A and the body. All dispositions remain **0 FULL / 8 PARTIAL / 0 UNRUN**, no keeper; all repair-9/10 fixes are retained.
 
 
 ## 5. Disposition tally and keeper exclusion
@@ -169,7 +171,7 @@ The first-use layer then applies the rule above; the resulting unexpanded set is
 
 ## 7. Hunk and line accounting
 
-- **Tracked change:** exactly **one added path** - this record - no other tracked path; **0 modified, 0 deleted, 0 renames**; branch rebased onto live main c8942134 so the live-base PR hunk is only this file.
+- **Tracked change:** exactly **one added path** - this record - no other tracked path; **0 modified, 0 deleted, 0 renames**; branch rebased onto live main bc1972aa so the live-base PR hunk is only this file.
 - **Page accounting:** zero hunks touch any of the eight pages; every page diff is empty; no keeper/ledger/index/register/manifest/tool/test/workflow change.
 - **Record measurement:** the record self-measures the page totals (**77,293 bytes / 1,325 LF** at the pinned ref) here and in section 3; the **final record bytes/LF/sha** are bound in the PR body outside the record. The earlier "no self-computed size claim" sentence was self-contradictory and is corrected.
 
@@ -184,7 +186,7 @@ The first-use layer then applies the rule above; the resulting unexpanded set is
 | AC5 Record integrity, body and PROC-04 | **MET at the final head** - PR body binds plan/record facts; PROC-04 recomputed and checked; checker at head; record one terminal LF/no CR/no trailing whitespace/no blank EOF. |
 | AC6 Codex loop plan | **MET after repair-9 triage** - all P1/P2 inline threads fixed/replied/resolved; Codex re-triggered at the final head; head-bound state/notice recorded; never a pass |
 | AC7 Provenance and no regression | **MET in this record** - plan binding, derivation base, no page/keeper/index/ledger/register/manifest change; zero drift. |
-| AC8 Stage entry conditions | **SATISFIED for C** - only on fresh B ACCEPT 6246170800 bound to plan 6246150867; rebased onto live main c8942134 (after the #829 batch-8 merge); live-base one record path; one DCO commit; D/E/F/G separate. |
+| AC8 Stage entry conditions | **SATISFIED for C** - only on fresh B ACCEPT 6246170800 bound to plan 6246150867; rebased onto live main bc1972aa (after the #830 batch-9 merge); live-base one record path; one DCO commit; D/E/F/G separate. |
 
 ## 9. Validation actually run while authoring
 
@@ -192,7 +194,7 @@ The first-use layer then applies the rule above; the resulting unexpanded set is
 | --- | --- | --- |
 | Instrument at pinned ref | check_index.py --ref 2db1ffb7 in fresh clone of capture base 06613a02 (historical derivation) | exit 0; summary above |
 | Blobs/bytes/LF | git rev-parse/cat-file/newline counts for all eight | plan blobs match; totals 77,293 B / 1,325 LF |
-| Zero drift | git diff --numstat 2db1ffb7..c8942134 -- page | empty for all eight |
+| Zero drift | git diff --numstat 2db1ffb7..bc1972aa -- page | empty for all eight |
 | Internal links | resolve every relative link at main | 14 links, 0 broken |
 | Commands | inventory command contracts in P3 L91-104 and the other pages | **P3 has command contracts** (`gh auth status`; `gh api` x4; `git log`; `git revert` x2; `git rev-list` x3; `gh pr view`); syntax/consistency inspected read-only, no execution claimed. The earlier "no concrete shell command" result was false and is corrected. |
 | Authorship | git log -1 per page | recorded in section 6 |
@@ -205,13 +207,13 @@ The first-use layer then applies the rule above; the resulting unexpanded set is
 - **B6 as a human act** is unverifiable from git metadata; the batch independence claim is limited to that metadata basis and declared limit.
 - **Future keeper acceptance:** this record creates no acceptance rows; a later keeper decides. All eight PARTIAL pages are excluded now.
 - **Hosted/Codex checks:** no PR/head existed while authoring; owed at the head, not claimed here.
-- **Drift after base:** frozen blobs are at the pinned ref and live main c8942134; later movement reopens the batch.
+- **Drift after base:** frozen blobs are at the pinned ref and live main bc1972aa; later movement reopens the batch.
 - **Prose reading is not a usability study:** the record lists what each page says and where; the six bullets are the bar.
 - **External comment-ID bindings:** the plan, B ACCEPT, Codex and DeepSeek review IDs are external bindings that the record cannot independently prove immutable; they are verified against live GitHub at the exact head, not self-proved here.
 
 ## 11. Continuation
 
-The record is the only added path; the branch is rebased onto live main c8942134 and carries one DCO-signed model-attributed commit. Stage D independently audits AC1-AC8 at the exact head; Stage E records checks/UNRUN honestly; Stage F reviews exact head/PROC-04; Stage G applies merge gates including MG3 under the recorded reading; no merge before G. **Lane A is complete; this is a lane-B block and does not reopen lane A.** Any need outside one path stops and returns to Stage A/owner.
+The record is the only added path; the branch is rebased onto live main bc1972aa and carries DCO-signed model-attributed commits (initial authoring plus the repair chain). Stage D independently audits AC1-AC8 at the exact head; Stage E records checks/UNRUN honestly; Stage F reviews exact head/PROC-04; Stage G applies merge gates including MG3 under the recorded reading; no merge before G. **Lane A is complete; this is a lane-B block and does not reopen lane A.** Any need outside one path stops and returns to Stage A/owner.
 
 **Boundary.** Stage C scope: no page edited; no keeper/ledger/index/register/manifest/tool/test/workflow change; no other PR touched; no merge. Codex-thread replies and resolutions are recorded in the PR body/SD-C repair comment, not in this record.
 
