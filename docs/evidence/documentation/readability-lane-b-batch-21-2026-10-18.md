@@ -6,7 +6,7 @@
 
 **Plan of record:** lane-B batch-21 lean plan comment **6249596669** (immutable 14,964 B) captured on merged PR #841 at main **4b99f69f**, plus **B ACCEPT 6249612964**. **Change class: docs-only.** Exactly **one added path**: `docs/evidence/documentation/readability-lane-b-batch-21-2026-10-18.md` (this record). No other added, modified or deleted tracked path; no keeper, index, ledger, register, manifest, tool, test or workflow change; no page edit; no plan file. **Base:** `4b99f69f` (41st session record merge = PR #841).
 
-**Record facts:** measured at handoff after the DCO commit: bytes/LF/CR/sha256/blob are reported in the PR body and the SD-C COMPLETE comment outside this file; this record never contains its own digest. The eight page blobs in section 3 are different objects and are stated.
+**Record facts:** measured at handoff after the DCO commits: bytes/LF/CR/sha256/blob are reported in the PR body and the SD-C COMPLETE comment outside this file; this record never contains its own digest. The eight page blobs in section 3 are different objects and are stated.
 
 ## 2. Lane derivation at this implementation base — re-run, not handed down
 
@@ -487,16 +487,16 @@
 
 | AC | Status | Evidence |
 | --- | --- | --- |
-| AC1 one-path | MET in this record | exactly one added record path; no other tracked path; one DCO model commit (actual count reported in the handoff) |
+| AC1 one-path | MET in this record | exactly one added record path; no other tracked path; **two DCO-signed model commits** (initial 0107e5bc + this repair commit) |
 | AC2 pages | MET in this record | eight pages 272-279 by blob; totals 70,286/1,234; zero drift; no keeper |
-| AC3 inventory | MET in this record | one contiguous XXX-row table; XXX unique keys; zero duplicates/extra; five-cell proof; counts recomputed; no fabricated rows |
+| AC3 inventory | MET in this record | one contiguous **308-row table; 308 unique keys**; zero duplicates/extra; five-cell proof; counts recomputed; no fabricated rows |
 | AC4 dispositions | MET in this record | strict FULL bar; 0 FULL/8 PARTIAL/0 UNRUN; B6 unverified; named gaps aligned |
 | AC5 record/body/PROC | MET in this record | record bytes/LF/sha/blob measured in handoff; body binds facts; PROC-04 published == live-body recompute; body checker 0 |
 | AC6 Codex loop | MET at handoff | exact-head trigger; triage all P1/P2; never a pass; head-bound only after triage |
 | AC7 provenance | MET in this record | plan/B lineage, base and reservations, merge attribution, zero drift, absent path |
 | AC8 stages | MET for C | C only acts here; D/E/F/G separate; no merge |
 
-**Self-state consistency.** Section 2's scheduling facts, section 6's counts and this table agree: base 4b99f69f; merged lane-B 144-271; no open reservations; this block 272-279; next 280; batch 21. **Merge attribution:** 4b99f69f = #841 41st; 2c3c6ffe = #840 40th; 38212595 = #839 39th; f325daac = #838 38th; 7cea211e = #837 37th; 6f584c9d = #833 36th; a06360d4 = #835 35th; a141c64f = #836 34th; e7acaca4 = #834 33rd; 84a5295d = #831 32nd; 655e40ea = #828 31st; 883bf690 = #832 30th. No unresolved head placeholder; **actual commit count = one DCO-signed model commit**.
+**Self-state consistency.** Section 2's scheduling facts, section 6's counts and this table agree: base 4b99f69f; merged lane-B 144-271; no open reservations; this block 272-279; next 280; batch 21. **Merge attribution:** 4b99f69f = #841 41st; 2c3c6ffe = #840 40th; 38212595 = #839 39th; f325daac = #838 38th; 7cea211e = #837 37th; 6f584c9d = #833 36th; a06360d4 = #835 35th; a141c64f = #836 34th; e7acaca4 = #834 33rd; 84a5295d = #831 32nd; 655e40ea = #828 31st; 883bf690 = #832 30th. No unresolved head placeholder; **actual commit count = two DCO-signed model commits** (initial 0107e5bc + this repair commit).
 
 
 ## 10. My Stage C skills rows, Row sources and six-field lines
