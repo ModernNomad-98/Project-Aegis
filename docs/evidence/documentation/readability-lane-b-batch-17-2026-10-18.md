@@ -103,7 +103,7 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 
 ## 4A. Systematic five-class per-page token audit
 
-**Method (reproducible read-only scan of the eight pinned pages).** Classes: **U** uppercase/acronym tokens; **M** mixed-case/file/plural coded identifiers; **L** lowercase technical abbreviations/compounds; **B** backticked identifiers, placeholders, units and operators; **F** lifecycle/status/format codes. Every row below is one real token from the pinned page text with its real first-use line; ordinary English words, bare numbers, grouped phrases, rows without a resolvable page line and fabricated rows are excluded. Dispositions: **defined at first use** when the page expands/defines the token at the same or an earlier line; **named gap** when first use precedes any definition on this page; **documented exclusion** when the token is a proper name, filename, template placeholder, external ID/register code or ordinary prose compound and no B2 expansion is owed. This is the only inventory table: one row per unique (page, token, first-use line) key; no second table and no rows after the reconciliation/proof section.
+**Method (reproducible read-only scan of the eight pinned pages).** Classes: **U** uppercase/acronym tokens; **M** mixed-case/file/plural coded identifiers; **L** lowercase technical abbreviations/compounds; **B** backticked identifiers, placeholders, units and operators; **F** lifecycle/status/format codes. Every row below is one real token from the pinned page text with its real first-use line; ordinary English words, bare numbers, grouped phrases, rows without a resolvable page line and fabricated rows are excluded. Dispositions: **defined at first use** when the page expands/defines the token at the same or an earlier line; **named gap** when first use precedes any definition on this page; **documented exclusion** when the token is a proper name, filename, template placeholder, external ID/register code or ordinary prose compound and no B2 expansion is owed. This is the only inventory table: one row per unique (page, token, first-use line) key; no second inventory table (the counts table is derived from the inventory) and no rows after the reconciliation/proof section.
 
 | Page | Token | First-use line | Class | Disposition (reason) |
 | --- | --- | ---: | --- | --- |
@@ -117,9 +117,9 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 | P1 | UI | L10 | U | defined at first use - reading key L10: user interface |
 | P1 | <product/scope> | L103 | B | documented exclusion - self-describing output-template placeholder |
 | P1 | <capability → plane; straddlers flagged> | L108 | B | documented exclusion - self-describing output-template placeholder |
-| P2 | RLS | L10 | U | **named gap** - - pooled model names RLS before any expansion on this page |
+| P2 | RLS | L10 | U | **named gap** - pooled model names RLS before any expansion on this page |
 | P2 | tenant-modeler | L24 | M | documented exclusion - proper skill name |
-| P2 | DB | L28 | U | **named gap** - - support-tooling line uses DB without expanding database on this page |
+| P2 | DB | L28 | U | **named gap** - support-tooling line uses DB without expanding database on this page |
 | P2 | multi-tenant | L36 | M | documented exclusion - plain compound adjective in a heading |
 | P2 | single-tenant | L39 | M | documented exclusion - plain compound adjective in a sentence |
 | P2 | N-1 | L52 | F | documented exclusion - step-label operator (prior step), not an abbreviation |
@@ -132,7 +132,7 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 | P3 | PR | L11 | U | defined at first use - L11: pull request |
 | P3 | TP | L11 | U | defined at first use - L11: true positive |
 | P3 | full-repo | L44 | L | documented exclusion - plain descriptive compound, explained by the line |
-| P3 | IaC | L54 | U | **named gap** - - line uses IaC without expansion on this page |
+| P3 | IaC | L54 | U | **named gap** - line uses IaC without expansion on this page |
 | P3 | <repo> | L116 | B | documented exclusion - self-describing output-template placeholder |
 | P3 | GAP | L117 | F | documented exclusion - output-template status word, explained by its line |
 | P4 | dual-read | L3 | L | documented exclusion - plain hyphenated technical compound explained in context |
@@ -146,44 +146,44 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 | P4 | EXPAND | L141 | F | documented exclusion - stage label defined by the output template |
 | P4 | MIGRATE | L142 | F | documented exclusion - stage label defined by the output template |
 | P4 | CONTRACT | L143 | F | documented exclusion - stage label defined by the output template |
-| P5 | DDL | L23 | U | **named gap** - - playbook uses DDL before any expansion on this page |
+| P5 | DDL | L23 | U | **named gap** - playbook uses DDL before any expansion on this page |
 | P5 | NULL | L25 | U | documented exclusion - SQL keyword named as a constraint kind |
 | P5 | dual-write | L31 | L | documented exclusion - plain hyphenated technical compound explained by the line |
 | P5 | pre-existing | L34 | L | documented exclusion - plain descriptive compound |
 | P5 | FULL | L39 | U | documented exclusion - ordinary uppercase emphasis word, not an abbreviation |
-| P5 | FK | L47 | U | **named gap** - - FK used without expanding foreign key on this page |
+| P5 | FK | L47 | U | **named gap** - FK used without expanding foreign key on this page |
 | P5 | <release> | L59 | B | documented exclusion - self-describing register-template placeholder |
 | P5 | <table.column> | L59 | B | documented exclusion - self-describing register-template placeholder |
 | P6 | FORBIDDEN | L16 | U | documented exclusion - register field label, defined by its field context |
 | P6 | human-approval-boundary | L19 | M | documented exclusion - proper skill name |
 | P6 | PR | L26 | U | defined at first use - L26: pull request (PR) |
 | P6 | agent-authorization-matrix | L42 | M | documented exclusion - proper skill name |
-| P6 | ADRs | L46 | U | **named gap** - - first use before any expansion on this page |
+| P6 | ADRs | L46 | U | **named gap** - first use before any expansion on this page |
 | P6 | docs/approvals/ | L53 | B | documented exclusion - repository path |
 | P6 | one-time | L60 | L | documented exclusion - plain descriptive compound |
 | P6 | append-only | L71 | L | documented exclusion - plain descriptive compound |
 | P6 | SUPERSEDED | L85 | U | documented exclusion - lifecycle status word defined by the register protocol |
 | P6 | ACTIVE | L91 | U | documented exclusion - lifecycle status word defined by the register protocol |
-| P6 | IDs | L100 | U | **named gap** - - entry IDs before any expansion on this page |
+| P6 | IDs | L100 | U | **named gap** - entry IDs before any expansion on this page |
 | P6 | GRANT | L107 | F | documented exclusion - lifecycle event label defined by the register template/protocol |
-| P6 | ID | L108 | U | **named gap** - - grant ID before any identifier expansion on this page |
-| P6 | ISO | L111 | U | **named gap** - - ISO timestamp without expansion on this page |
+| P6 | ID | L108 | U | **named gap** - grant ID before any identifier expansion on this page |
+| P6 | ISO | L111 | U | **named gap** - ISO timestamp without expansion on this page |
 | P7 | APR-013 | L9 | M | documented exclusion - concrete register ID in a template example |
 | P7 | GRANT | L11 | F | documented exclusion - lifecycle event label defined by the template |
 | P7 | ACTIVE | L12 | F | documented exclusion - lifecycle status label defined by the template |
 | P7 | <ISO timestamp> | L13 | B | documented exclusion - self-describing template placeholder |
-| P7 | ISO | L13 | U | **named gap** - - ISO timestamp without expansion on this page |
-| P7 | ID | L22 | U | **named gap** - - entry ID before any identifier expansion on this page |
+| P7 | ISO | L13 | U | **named gap** - ISO timestamp without expansion on this page |
+| P7 | ID | L22 | U | **named gap** - entry ID before any identifier expansion on this page |
 | P7 | APR-014 | L30 | M | documented exclusion - concrete register ID in a template example |
 | P7 | CONSUMED | L32 | F | documented exclusion - lifecycle event label defined by the template |
 | P7 | EXPIRED | L41 | F | documented exclusion - lifecycle event label defined by the template |
 | P7 | REVOKED | L41 | F | documented exclusion - lifecycle event label defined by the template |
 | P7 | SUPERSEDED | L41 | F | documented exclusion - lifecycle event label defined by the template |
-| P7 | IDs | L56 | U | **named gap** - - unique record IDs without expansion on this page |
+| P7 | IDs | L56 | U | **named gap** - unique record IDs without expansion on this page |
 | P7 | append-only | L85 | L | documented exclusion - plain descriptive compound |
 | P7 | docs/approvals/APPROVAL_REGISTER.md | L102 | B | documented exclusion - repository path |
-| P8 | E2E | L3 | U | **named gap** - - description uses E2E before any expansion on this page |
-| P8 | PII | L3 | U | **named gap** - - description uses PII before any expansion on this page |
+| P8 | E2E | L3 | U | **named gap** - description uses E2E before any expansion on this page |
+| P8 | PII | L3 | U | **named gap** - description uses PII before any expansion on this page |
 | P8 | risk-worthy | L3 | L | documented exclusion - plain descriptive compound explained by context |
 | P8 | Screenshot (47).png | L11 | B | documented exclusion - proper example filename in backticks |
 | P8 | qa-automation-architect | L34 | M | documented exclusion - proper skill name |
@@ -242,7 +242,7 @@ One added record file, zero modified/deleted files (git diff --name-status e7aca
 | --- | --- | --- |
 | AC1 one-path | MET | exactly one added record path; no other tracked path |
 | AC2 pages | MET | eight pages 240-247 by blob; totals 73,139/1,245; zero drift; no keeper |
-| AC3 whole-page + exact-once inventory | MET | section 4 tests B1-B6 per page; section 4A one contiguous 76-row table, 76 unique keys, zero duplicates, one reconciliation/proof |
+| AC3 whole-page + exact-once inventory | MET | section 4 tests B1-B6 per page; section 4A one contiguous 85-row table, 85 unique keys, zero duplicates, one reconciliation/proof |
 | AC4 honest dispositions | MET | 0 FULL / 8 PARTIAL / 0 UNRUN; B6 unverified; named gaps listed; no keeper |
 | AC5 record/body/PROC + provenance | MET in handoff | record facts; body PROC-04 published==recomputed; skills rows/Row sources/six in body and SD-C comment; self-state consistent |
 | AC6 Codex loop | MET in handoff | re-trigger at final head; head-bound unavailability only after triage; never a pass; two-round stop |
