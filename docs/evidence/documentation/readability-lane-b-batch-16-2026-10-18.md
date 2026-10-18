@@ -46,7 +46,7 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 **Canonical B1 satisfied** - L1 title and L3-7 opening state the page's job (a per-command RLS audit checklist and wrong-tenant negative-test plan) and its reader (the RLS policy auditor); L1 title first uses RLS, and RLS is expanded only at L4-5 — after that title use — so the L1 use is a named first-use gap; L4-6 define JWT and API at first use.
 
-**Canonical B2** - Named B2 gap(s): L1 `RLS`, L61 `SQL`, L40 `BYPASSRLS`, L43 `DEFINER`, L44 `search_path`. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
+**Canonical B2** - Named B2 gap(s): L1 `RLS`, L5 `JSON`, L40 `BYPASSRLS`, L43 `DEFINER`, L44 `search_path`, L61 `SQL`. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
 
 **Canonical B3 satisfied** - The page uses descriptive headings, short paragraphs, lists, tables and concrete examples/commands/templates; no display elision. Whole-page range is L1-108.
 
@@ -56,7 +56,7 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 **Canonical B6 UNVERIFIED** - no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship, so B6 cannot support FULL.
 
-**Verdict: PARTIAL** - basis: L1 RLS, L61 SQL, L40 BYPASSRLS, L43 DEFINER, L44 search_path first-use gap(s); canonical B6 unverified.
+**Verdict: PARTIAL** - basis: L1 RLS, L5 JSON, L61 SQL, L40 BYPASSRLS, L43 DEFINER, L44 search_path first-use gap(s); canonical B6 unverified.
 
 ### P2 - `.claude/skills/roadmap-to-commitments-translator/SKILL.md` - read whole, L1-304
 
@@ -154,7 +154,7 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 **Canonical B1 satisfied** - L1 title and L3-8 opening state the page's job (the rollback runbook skeleton and rehearsal log) and its reader (the rollback author/executor).
 
-**Canonical B2** - Named B2 gap(s): L28 `DRAFT`, L28 `CURRENT`, L28 `STALE`, L18 `expand-phase`, L18 `contract-phase`. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
+**Canonical B2** - Named B2 gap(s): L15 `ID`, L18 `expand-phase`, L18 `contract-phase`, L28 `DRAFT`/`CURRENT`/`STALE`. All other technical candidates are defined at first use or documented exclusions in section 5; no undocumented first use is omitted there.
 
 **Canonical B3 satisfied** - The page uses descriptive headings, short paragraphs, lists, tables and concrete examples/commands/templates; no display elision. Whole-page range is L1-74.
 
@@ -164,7 +164,7 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 **Canonical B6 UNVERIFIED** - no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship, so B6 cannot support FULL.
 
-**Verdict: PARTIAL** - basis: L28 DRAFT, L28 CURRENT, L28 STALE, L18 expand-phase, L18 contract-phase first-use gap(s); canonical B6 unverified.
+**Verdict: PARTIAL** - basis: L15 ID, L18 expand-phase, L18 contract-phase, L28 DRAFT/CURRENT/STALE first-use gap(s); canonical B6 unverified.
 
 ### P8 - `.claude/skills/saas-cost-architect/SKILL.md` - read whole, L1-212
 
@@ -187,12 +187,14 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 ## 5. Systematic five-class token audit - ONE contiguous exact-once inventory
 
-**Method.** Candidates were extracted from the eight pinned pages under the five required classes: (i) uppercase any length, (ii) lowercase technical abbreviations, (iii) mixed-case/plural coded identifiers, (iv) backticked identifiers, (v) placeholders/operators/units. The retained table below has **one row per real token at its real first-use line**, keyed by normalized (page, token) so backticked and unbackticked variants collapse to one row; every row resolves to page text. Dispositions are **defined at first use**, **named gap** (unexpanded first use) or **documented exclusion** (with a one-line reason category below). No fabricated, placeholder, numeric-artifact or grouped rows exist; no row is duplicated. All counts below are recomputed from this final table.
+**Method and scope rule.** Candidates were extracted from the eight pinned pages under the five required classes: (i) uppercase any length (scoped to acronyms and uppercase SQL/role/command tokens; ordinary all-caps English emphasis is out of scope), (ii) lowercase technical abbreviations, (iii) mixed-case/plural/file identifiers, (iv) every backticked identifier, field-name literal and link-target file identifier, (v) every angle/brace placeholder, typographic arrow/operator and unit present in the pages. Ordinary English prose, sentence punctuation and pure numeric values are out of scope; backticked/unbackticked variants collapse to one normalized (page, token) row and line-wrapped placeholder tokens have internal whitespace normalized to single spaces at their real first-use line. Under this stated rule every in-scope token resolves to page text. The retained table below has **one row per real token at its real first-use line**, keyed by normalized (page, token) so backticked and unbackticked variants collapse to one row; every row resolves to page text. The retained table below has **one row per real token at its real first-use line**, keyed by normalized (page, token) so backticked and unbackticked variants collapse to one row; every row resolves to page text. Dispositions are **defined at first use**, **named gap** (unexpanded first use) or **documented exclusion** (with a one-line reason category below). No fabricated, placeholder, numeric-artifact or grouped rows exist; no row is duplicated. All counts below are recomputed from this final table.
 
 | Page | Class | Token | First-use line | Disposition | Reason |
 | --- | --- | --- | --- | --- | --- |
 | P1 | (i) | `RLS` | L1 | **named gap** | — |
+| P1 | (iii) | `SKILL.md` | L3 | documented exclusion | link-target file identifier, not an abbreviation |
 | P1 | (i) | `API` | L5 | defined at first use | — |
+| P1 | (i) | `JSON` | L5 | **named gap** | named gap: unexpanded first use (JSON inside JWT expansion only) |
 | P1 | (i) | `JWT` | L5 | defined at first use | — |
 | P1 | (iii) | `Postgres` | L6 | documented exclusion | proper product name, not an abbreviation |
 | P1 | (i) | `SELECT` | L11 | documented exclusion | SQL keyword/role directive, not an abbreviation |
@@ -200,21 +202,35 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | P1 | (ii) | `current_setting` | L13 | documented exclusion | self-describing code/role identifier named on its line |
 | P1 | (iv) | `auth.uid()` | L14 | documented exclusion | self-describing code/role identifier named on its line |
 | P1 | (i) | `INSERT` | L18 | documented exclusion | SQL keyword/role directive, not an abbreviation |
+| P1 | (iv) | `WITH CHECK` | L18 | documented exclusion | backticked SQL directive, self-describing |
 | P1 | (i) | `ALL` | L19 | documented exclusion | SQL keyword/role directive, not an abbreviation |
 | P1 | (v) | `<server-derived caller tenant>` | L22 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
 | P1 | (ii) | `tenant_id` | L22 | documented exclusion | self-describing code/role identifier named on its line |
 | P1 | (ii) | `owner_id` | L23 | documented exclusion | self-describing code/role identifier named on its line |
+| P1 | (i) | `AND` | L25 | documented exclusion | SQL keyword/command/role directive, not an abbreviation |
 | P1 | (i) | `UPDATE` | L25 | documented exclusion | SQL keyword/role directive, not an abbreviation |
 | P1 | (i) | `DELETE` | L31 | documented exclusion | SQL keyword/role directive, not an abbreviation |
+| P1 | (v) | `→` | L35 | documented exclusion | typographic arrow/operator, not an abbreviation |
+| P1 | (v) | `<server ctx>` | L38 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P1 | (i) | `BYPASSRLS` | L40 | **named gap** | — |
 | P1 | (i) | `DEFINER` | L43 | **named gap** | — |
 | P1 | (ii) | `search_path` | L44 | **named gap** | — |
 | P1 | (i) | `INVOKER` | L48 | documented exclusion | SQL keyword/role directive, not an abbreviation |
 | P1 | (i) | `GRANT` | L49 | documented exclusion | SQL keyword/role directive, not an abbreviation |
+| P1 | (i) | `TO` | L49 | documented exclusion | SQL keyword/command/role directive, not an abbreviation |
 | P1 | (ii) | `service_role` | L51 | documented exclusion | self-describing code/role identifier named on its line |
 | P1 | (i) | `SQL` | L61 | **named gap** | — |
+| P1 | (i) | `EXPECT` | L78 | documented exclusion | SQL keyword/command/role directive, not an abbreviation |
+| P1 | (i) | `FROM` | L78 | documented exclusion | SQL keyword/command/role directive, not an abbreviation |
+| P1 | (i) | `WHERE` | L78 | documented exclusion | SQL keyword/command/role directive, not an abbreviation |
+| P1 | (i) | `INTO` | L84 | documented exclusion | SQL keyword/command/role directive, not an abbreviation |
+| P1 | (i) | `VALUES` | L84 | documented exclusion | SQL keyword/command/role directive, not an abbreviation |
 | P1 | (v) | `<A-row>` | L87 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
+| P1 | (i) | `ROLE` | L92 | documented exclusion | SQL keyword/command/role directive, not an abbreviation |
+| P1 | (i) | `DB` | L93 | documented exclusion | SQL keyword/command/role directive, not an abbreviation |
+| P1 | (i) | `RESET` | L93 | documented exclusion | SQL keyword/command/role directive, not an abbreviation |
 | P1 | (v) | `×` | L98 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
+| P1 | (i) | `LOCAL` | L98 | documented exclusion | SQL keyword/command/role directive, not an abbreviation |
 | P1 | (iv) | `secure-migration-reviewer` | L107 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P1 | (iv) | `multi-tenant-security-tester` | L108 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P2 | (iv) | `cross-team-dependency-negotiator` | L3 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
@@ -223,16 +239,31 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | P2 | (iii) | `OKRs` | L8 | defined at first use | — |
 | P2 | (i) | `COMMIT-ABLE` | L75 | **named gap** | — |
 | P2 | (iv) | `references/commitments-sheet.md` | L133 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
+| P2 | (v) | `→` | L138 | documented exclusion | typographic arrow/operator, not an abbreviation |
 | P2 | (v) | `<team/horizon>` | L138 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
 | P2 | (v) | `<named list \| none>` | L141 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
+| P2 | (iv) | `Missing evidence` | L141 | documented exclusion | field-name literal in output template, not an abbreviation |
+| P2 | (v) | `<stage or evidence milestone>` | L143 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P2 | (i) | `HUMAN-APPROVED` | L144 | **named gap** | — |
+| P2 | (ii) | `n/a` | L147 | documented exclusion | self-describing template field value, not an abbreviation |
+| P2 | (iv) | `Approval reference` | L148 | documented exclusion | field-name literal in output template, not an abbreviation |
+| P2 | (iv) | `Approval scope + date` | L151 | documented exclusion | field-name literal in output template, not an abbreviation |
+| P2 | (v) | `<unverified targets \| none>` | L154 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P2 | (iv) | `Capacity basis` | L155 | documented exclusion | field-name literal in output template, not an abbreviation |
+| P2 | (v) | `<named capacity evidence>` | L156 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P2 | (iv) | `Committed` | L157 | documented exclusion | field-name literal in output template, not an abbreviation |
+| P2 | (v) | `<if asked for more: commit-less \| add-capacity \| accept-lower-confidence>` | L170 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P2 | (v) | `<terms, option costs/unknowns, pros/cons, recommendation + why>` | L171 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P2 | (iv) | `evals/evals.json` | L300 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P2 | (iv) | `evals/trigger-evals.json` | L302 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P3 | (iv) | `SKILL.md` | L3 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P3 | (i) | `COMMIT-ABLE` | L8 | defined at first use | — |
+| P3 | (v) | `→` | L13 | documented exclusion | typographic arrow/operator, not an abbreviation |
 | P3 | (v) | `weeks 6–8` | L42 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
 | P3 | (v) | `50%` | L43 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
 | P3 | (i) | `AI` | L44 | defined at first use | — |
+| P3 | (v) | `<...>` | L60 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P3 | (v) | `<item — capacity \| dependency \| uncertainty>` | L61 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P4 | (iv) | `roadmap-under-uncertainty-planner` | L2 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P4 | (iv) | `feature-flag-rollout-strategist` | L3 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P4 | (iv) | `prioritization-frame-picker` | L3 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
@@ -241,12 +272,24 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | P4 | (iii) | `Gantt` | L8 | defined at first use | — |
 | P4 | (i) | `COMMIT-ABLE` | L101 | defined at first use | — |
 | P4 | (iv) | `references/roadmap-uncertainty-sheet.md` | L111 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
+| P4 | (v) | `<now/next/later \| ...>` | L119 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P4 | (v) | `<product/team>` | L119 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
 | P4 | (v) | `<the outcomes this roadmap serves>` | L120 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
+| P4 | (v) | `<specific items, confidence and estimated date-range if supported>` | L121 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P4 | (v) | `<directional, quarter-grained, medium confidence>` | L122 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P4 | (v) | `<themes/directions, low confidence, "intend to explore">` | L123 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P4 | (v) | `<...>` | L124 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P4 | (v) | `<high\|med\|low>` | L124 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P4 | (v) | `<none \| human decision + evidence>` | L124 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P4 | (v) | `<cheap experiments/spikes front-loaded to retire the biggest unknowns>` | L125 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P4 | (v) | `<planned allocation vs slack vs maintenance; trade-offs if over capacity>` | L126 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P4 | (v) | `<what the plan rests on — changing these changes the plan>` | L127 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P4 | (v) | `<cadence + off-cadence triggers + how changes are communicated>` | L128 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P4 | (v) | `→` | L129 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
 | P4 | (i) | `RICE` | L180 | defined at first use | — |
 | P4 | (iv) | `evals/evals.json` | L199 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P4 | (iv) | `evals/trigger-evals.json` | L201 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
+| P5 | (iii) | `SKILL.md` | L3 | documented exclusion | link-target file identifier, not an abbreviation |
 | P5 | (iv) | `roadmap-under-uncertainty-planner` | L5 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P5 | (i) | `H2+` | L7 | defined at first use | — |
 | P5 | (i) | `Q` | L7 | defined at first use | — |
@@ -257,28 +300,57 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | P6 | (iv) | `release-readiness-reviewer` | L3 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P6 | (iv) | `secure-migration-reviewer` | L3 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P6 | (iv) | `ci-pipeline-architect` | L27 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
+| P6 | (v) | `→` | L53 | documented exclusion | typographic arrow/operator, not an abbreviation |
 | P6 | (i) | `SLIs` | L59 | defined at first use | — |
 | P6 | (iv) | `slo-reliability-architect` | L59 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P6 | (iv) | `human-approval-boundary` | L93 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P6 | (iv) | `observability-operator` | L106 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P6 | (v) | `<change/release id>` | L111 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
+| P6 | (v) | `<rollback-vs-fix-forward symptoms/thresholds; time-box; decider role>` | L112 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P6 | (v) | `<layer → primitive → order of reversal → why this order>` | L114 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
+| P6 | (v) | `<access, tools, permissions the executor must have>` | L117 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P6 | (v) | `<action — exact command/path — expected observable result — verification before next step>` | L118 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P6 | (v) | `<who/when/channel at start + completion; status-page posture>` | L125 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P6 | (v) | `<dry-run requirement; log (date, executor, result); staleness triggers>` | L126 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P6 | (v) | `<release-readiness-reviewer (evidence); observability-operator (rollback-worked signals)>` | L128 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P6 | (iv) | `manual-test-case-creator` | L143 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P6 | (iv) | `evals/evals.json` | L191 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P6 | (iv) | `evals/trigger-evals.json` | L192 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
+| P7 | (iii) | `SKILL.md` | L3 | documented exclusion | link-target file identifier, not an abbreviation |
 | P7 | (i) | `CLI` | L6 | defined at first use | — |
 | P7 | (i) | `LB` | L6 | defined at first use | — |
 | P7 | (i) | `COMMS` | L7 | defined at first use | — |
 | P7 | (i) | `SLI` | L7 | defined at first use | — |
+| P7 | (i) | `ID` | L15 | **named gap** | named gap: unexpanded first use |
 | P7 | (ii) | `contract-phase` | L18 | **named gap** | — |
 | P7 | (ii) | `expand-phase` | L18 | **named gap** | — |
 | P7 | (iv) | `secure-migration-reviewer` | L18 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P7 | (v) | `→` | L21 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
 | P7 | (v) | `<change id>` | L28 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
+| P7 | (v) | `<trigger hit>` | L28 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P7 | (i) | `CURRENT` | L28 | **named gap** | — |
 | P7 | (i) | `DRAFT` | L28 | **named gap** | — |
 | P7 | (i) | `STALE` | L28 | **named gap** | — |
+| P7 | (v) | `<date — executor — env — result>` | L29 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<symptom/threshold list, tied to dashboards>` | L32 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<criteria>` | L33 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<N>` | L34 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<role>` | L34 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<systems + permission level the executor must confirm FIRST>` | L37 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<CLI/console paths>` | L38 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<how>` | L39 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<mechanism>` | L39 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<action>` | L42 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P7 | (v) | `<exact command>` | L42 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
+| P7 | (v) | `<observable result>` | L42 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<check>` | L43 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<SLI/dashboard — expected reading>` | L45 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<what>` | L49 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<safely / unsafely because …>` | L50 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<steps / "none needed" + reason>` | L51 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<who/channel/template>` | L56 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<posture>` | L58 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P7 | (v) | `<tables>` | L61 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P8 | (i) | `AI` | L3 | **named gap** | — |
 | P8 | (iv) | `plan-entitlement-architect` | L3 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P8 | (i) | `SaaS` | L3 | **named gap** | — |
@@ -289,28 +361,36 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | P8 | (iv) | `ai-cost-guardrail-designer` | L51 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P8 | (v) | `→` | L81 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
 | P8 | (i) | `P95` | L95 | defined at first use | — |
+| P8 | (iv) | `human-approval-boundary` | L112 | documented exclusion | exact repository skill reference, not an abbreviation |
 | P8 | (v) | `<product/scope>` | L123 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
+| P8 | (v) | `<driver — service — fixed/stepped/variable — monthly $ from real bills (or ESTIMATE label)>` | L124 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P8 | (v) | `<missing tag/counter — dollars it would attribute — ranked>` | L128 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P8 | (v) | `<unbounded drivers with worst-case math; noisy-neighbor concentration; allowance arbitrage>` | L132 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P8 | (v) | `<guardrail — threshold — behavior (alert/degrade/stop) — tenant-visible effect — owner>` | L134 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P8 | (v) | `<reconciliation cadence, tolerance, reopen trigger>` | L138 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P8 | (v) | `<each with risk-if-wrong / who answers>` | L139 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P8 | (iv) | `evals/evals.json` | L205 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P8 | (iv) | `evals/trigger-evals.json` | L206 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
+
 
 
 **Reconciliation and proof (single section after the table).**
 
 | Page | (i) | (ii) | (iii) | (iv) | (v) | Total |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| P1 | 14 | 5 | 1 | 3 | 3 | 26 |
-| P2 | 2 | 0 | 1 | 6 | 2 | 11 |
-| P3 | 2 | 0 | 0 | 1 | 2 | 5 |
-| P4 | 2 | 0 | 1 | 8 | 3 | 14 |
-| P5 | 3 | 0 | 0 | 1 | 1 | 5 |
-| P6 | 1 | 0 | 0 | 11 | 2 | 14 |
-| P7 | 7 | 2 | 0 | 1 | 3 | 13 |
-| P8 | 5 | 0 | 0 | 6 | 2 | 13 |
-| **Total** | 36 | 7 | 3 | 37 | 18 | **101** |
+| P1 | 26 | 5 | 2 | 4 | 5 | 42 |
+| P2 | 2 | 1 | 1 | 11 | 8 | 23 |
+| P3 | 2 | 0 | 0 | 1 | 5 | 8 |
+| P4 | 2 | 0 | 1 | 8 | 14 | 25 |
+| P5 | 3 | 0 | 1 | 1 | 1 | 6 |
+| P6 | 1 | 0 | 0 | 11 | 9 | 21 |
+| P7 | 8 | 2 | 1 | 1 | 23 | 35 |
+| P8 | 5 | 0 | 0 | 7 | 8 | 20 |
+| **Total** | 49 | 8 | 6 | 44 | 73 | **180** |
 
-**Disposition totals recomputed from the table:** **15 named gaps / 18 defined at first use / 68 documented exclusions = 101**. **Zero-duplicate check:** normalized (page, token) keys = **101**, rows = **101**, duplicates = **0**, extra rows = **0**; a token appears at most once per page and its first-use line is the table's line. Documented-exclusion reasons: SQL keywords/commands and proper language/product names; exact repository skill/path/evals references; self-describing code identifiers; placeholders and typographic operators/units - each is named in the table's class/disposition context and none is an abbreviation first use.
+**Disposition totals recomputed from the table:** **17 named gaps / 18 defined at first use / 145 documented exclusions = 180**. **Zero-duplicate check:** normalized (page, token) keys = **180**, rows = **180**, duplicates = **0**, extra rows = **0**; a token appears at most once per page and its first-use line is the table's line. Documented-exclusion reasons are recorded per row in the Reason column: SQL keywords/commands and proper product/language names; exact repository skill/path/evals references; link-target/file identifiers; self-describing code identifiers and output-template field names; and self-describing placeholders/operators/units - none is an abbreviation first use.
 
-**Named-gap list (aligned with section 4 and section 6):** P1 L1 `RLS`, L40 `BYPASSRLS`, L43 `DEFINER`, L44 `search_path`, L61 `SQL`; P2 L75 `COMMIT-ABLE`, L144 `HUMAN-APPROVED`; P5 L35 `COMMIT-ABLE`; P7 L18 `expand-phase`, `contract-phase`, L28 `DRAFT`/`CURRENT`/`STALE`; P8 L3 `SaaS`, `AI`. P3, P4 and P6 have no named B2 gap.
+**Named-gap list (aligned with section 4 and section 6):** P1 L1 `RLS`, L5 `JSON`, L40 `BYPASSRLS`, L43 `DEFINER`, L44 `search_path`, L61 `SQL`; P2 L75 `COMMIT-ABLE`, L144 `HUMAN-APPROVED`; P5 L35 `COMMIT-ABLE`; P7 L15 `ID`, L18 `expand-phase`, `contract-phase`, L28 `DRAFT`/`CURRENT`/`STALE`; P8 L3 `SaaS`, `AI`. P3, P4 and P6 have no named B2 gap.
 
 ## 6. Dispositions, keeper exclusion and continuation
 
@@ -347,6 +427,7 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 - **Canonical B6:** UNVERIFIED for all eight pages; no non-author read-only review is available here, so no page is FULL or keeper-eligible.
 - **Named B2 gaps** are first-use-before-expansion gaps on their pages; they are not page-edit proposals and do not authorize file changes in this stage.
+- **D1 REVISE 6248394619 repair:** this table was expanded with the real omitted candidates from D1's independent scan (P1 `JSON` L5 and SQL/role directives, P7 `ID` L15, `SKILL.md` link targets P1/P5/P7, `WITH CHECK` P1 L18, `human-approval-boundary` P8 L112, P2 field-name backticks and `n/a`, plus the full in-scope angle-placeholder/arrow sets for all pages); counts are recomputed from the final 180-row table.
 - **Hosted CI, Codex and DeepSeek** states are recorded in the SD-C handoff at the exact head; this record does not assert them.
 - **This record cannot verify its own final hash** (it never contains its own digest); the PR body and SD-C handoff state the measured bytes/LF/CR/sha256/blob outside the record.
 
