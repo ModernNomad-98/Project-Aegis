@@ -1,18 +1,18 @@
 # Readability Phase 4 re-read — lane B batch 20 evidence record
 
-**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Stage C repair, role **sd-c-read-b20-c2**; true identity **sd-f-794-r1**. Both names signed. Implementation base **f325daac145a2844e4ead078cffe38264a5df3d9** (38th session record merge, PR #838); block **264-271**; batch **20**; one added docs evidence path. Original PR base was 7cea211e (37th); rebase onto current main is disclosed.
+**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Stage C repair-4, role **sd-c-read-b20-c5**; true identity **sd-f-794-r1**. Role history: C-initial reader/account author **sd-c-read-b20-c1** (true identity sd-e-802-r1); C repair holder **sd-c-read-b20-c2** (sd-f-794-r1); this repair **sd-c-read-b20-c5** (sd-f-794-r1). Both names signed. Rebased implementation base **3821259533d73eae862b452e348886f3c0249ac8** (#839 39th); original PR base 7cea211e (37th); live main **2c3c6ffe** (#840 40th); block **264-271**; batch **20**; one added docs evidence path.
 
 ## 1. Scope, plan binding and diff accounting
 
-**Plan of record:** lane-B batch-20 lean plan comment **6248840176** (immutable 14,792 B) captured on merged PR #833 at main **6f584c9d**, plus **B ACCEPT 6248870170**. **Change class: docs-only.** Exactly **one added path**: docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md (this record). No other added, modified or deleted tracked path; no keeper, index, ledger, register, manifest, tool, test or workflow change; no page edit; no plan file. **Implementation base (after rebase):** **f325daac145a2844e4ead078cffe38264a5df3d9** (38th session record merge = PR #838 batch-17 record, merged 10:54:03Z; parents 7cea211e + fcc58121); original PR base was 7cea211e (37th); the rebase onto current main is disclosed. Plan captured at 6f584c9d (#833, 36th).
+**Plan of record:** lane-B batch-20 lean plan comment **6248840176** (immutable, 14,792 B) captured at main 6f584c9d (#833 36th), plus **B ACCEPT 6248870170**. **Change class: docs-only.** Exactly **one added path**: docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md (this record). No other added, modified or deleted tracked path; no keeper, index, ledger, register, manifest, tool, test or workflow change; no page edit; no plan file. **Rebased implementation base:** **3821259533** (39th merge #839, parents f325daac + 95bd9364); original PR base 7cea211e (#837 37th); current live main **2c3c6ffe** (#840 40th). This repair does not rebase; it validates/fixes record facts at the already-rebased head.
 
 **Record facts:** measured at handoff after the DCO commit: bytes/LF/CR/sha256/blob are reported in the PR body and the SD-C COMPLETE comment outside this file; this record never contains its own digest. The eight page blobs in section 3 are different objects and are stated.
 
 ## 2. Lane derivation at this implementation base — re-run, not handed down
 
-**Pinned reference:** 2db1ffb7985ddc1c087c455740fd59e962967461. Instrument: python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7 --json. Observed **690 reader pages / 107 accepted / 6 cannot-decide / 4 partial / official pending 583**; pending **573**. **Lane A complete 0-143**; **lane B = 144-287**. **Merged lane-B rows at current live main f325daac:** **144-199 + 200-207 + 208-215 + 216-223 + 224-231 + 232-239 + 240-247** (batch 12 merged as #833 = 36th; #837 37th at 7cea211e; **#838 38th at f325daac = this rebase base**; #836 34th at a141c64f; #835 35th at a06360d4; #834 33rd at e7acaca4; #831 32nd at 84a5295d; #828 31st at 655e40ea; #832 30th at 883bf690). **Open reservations:** #839 248-255, #840 256-263. **This record own block: 264-271; next unread page 272.**
+**Pinned reference:** 2db1ffb7985ddc1c087c455740fd59e962967461. Instrument: python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7 --json. Observed **690 reader pages / 107 accepted / 6 cannot-decide / 4 partial / official pending 583**; pending **573**. **Lane A complete 0-143**; **lane B = 144-287**. **Merged lane-B rows at current live main 2c3c6ffe:** **144-199 + 200-207 + 208-215 + 216-223 + 224-231 + 232-239 + 240-247 + 248-255 + 256-263** (batch 12 merged as #833 = 36th; #837 37th at 7cea211e; #838 38th at f325daac; #839 39th at 38212595; **#840 40th at 2c3c6ffe**; #836 34th at a141c64f; #835 35th at a06360d4; #834 33rd at e7acaca4; #831 32nd at 84a5295d; #828 31st at 655e40ea; #832 30th at 883bf690). **Open reservations:** none in 240-263; this record is the open 264-271 block. **This record own block: 264-271; next unread page 272.**
 
-**Batch number:** merged lane-B batches 2/2-rerecord/3/5/6/7/8/9/10/11/12/13/14/15; in-flight 16/17/18/19 -> **batch 20**. **R2:** next eight sorted unread pages after merged rows and all reservations are **264-271**. **Lane letter B.** No page outside 264-271 is read or claimed.
+**Batch number:** merged lane-B batches 2/2-rerecord/3/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19; this record is batch 20. **R2:** next eight sorted unread pages after merged rows and reservations are **264-271**. **Lane letter B.** No page outside 264-271 is read or claimed.
 
 ## 3. The eight frozen pages — measured at pinned ref 2db1ffb7
 
@@ -27,7 +27,7 @@
 | P7 | 270 | `.claude/skills/source-of-truth-reconciler/references/conflict-resolution-examples.md` | `f37223718a08214ae1ae1fbca13f6076f054f774` | 3,003 / 60 |
 | P8 | 271 | `.claude/skills/staff-scope-selector/SKILL.md` | `4508a953e0223d96c506aecc124173f265e4e533` | 11,549 / 196 |
 
-**Totals: 57,263 B / 1,027 LF.** Every full 40-hex blob resolves at the pinned ref and is identical at implementation base f325daac (zero drift, verified by content sha); all eight are pending, unread in merged/open records, outside the reservations, no keeper, and belong to this block 264-271; no page outside the set is read.
+**Totals: 57,263 B / 1,027 LF.** Every full 40-hex blob resolves at the pinned ref and is identical at rebased base 3821259533 (zero drift, verified by content sha); all eight are pending, unread in merged/open records, outside reservations, no keeper, and belong to this block 264-271; no page outside the set is read.
 
 ## 4. Canonical acceptance — quoted verbatim from backlog L2841-2862 at main f325daac
 
@@ -400,39 +400,41 @@
 
 **Reconciliation and proof.** Row sum **237** equals class sum **237** and disposition sum **237**; page sums equal the row count. The named-gap rows below are exactly the named gaps cited in section 5; every row resolves to pinned page text at its stated first occurrence; zero duplicates and zero fabricated rows.
 
-**Named-gap list aligned with section 5:** P1 L1 SLO, L7 SLA; P2 L3 SOC, L3 AICPA, L3 CPA, L3 TSC, L3 ASEC, L3 ISO; P3 L1 TSC, L1 SOC, L3 AICPA, L16 SLA; P4 L70 SUPERSEDED, L70 BROKEN, L72 UNVERIFIED; P5 none; P6 L129 CURRENT, L3 PR, L9 API; P7 L25 PR; P8 none;
+**Named-gap list aligned with section 5:** P1 L1 SLO, L7 SLA; P2 L3 SOC, L3 AICPA, L3 CPA, L3 TSC, L3 ASEC, L3 ISO; P3 L1 TSC, L1 SOC, L3 AICPA, L16 SLA; P4 L70 SUPERSEDED, L70 BROKEN, L72 UNVERIFIED; P5 none; P6 L129 CURRENT, L3 PR, L9 API; P7 L25 PR; P8 none.
 
 ## 7. Dispositions, keeper exclusion and continuation
 
-**Disposition tally: 21 defined at first use / 19 named gaps / 194 documented exclusions = 237 rows.** **Disposition tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages were read whole; no page is UNRUN. No page is FULL because canonical B6 is unverified for every page; named B2 gaps independently force PARTIAL where present. **No keeper/acceptance row:** this record creates no acceptance rows; a later keeper decides.
+**Disposition tally: 21 defined at first use / 19 named gaps / 197 documented exclusions = 237 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages were read whole; no page is UNRUN. No page is FULL because canonical B6 is unverified for every page; named B2 gaps independently force PARTIAL where present. **No keeper/acceptance row:** this record creates no acceptance rows; a later keeper decides.
 
-**Continuation.** Lane A is complete 0-143; merged lane-B rows **144-199 + 200-207 + 208-215 + 216-223 + 224-231 + 232-239 + 240-247**; open reservations **#839 248-255, #840 256-263**; this record covers **264-271**; next unread page is **272**.
+**Continuation.** Lane A is complete 0-143; merged lane-B rows **144-199 + 200-207 + 208-215 + 216-223 + 224-231 + 232-239 + 240-247 + 248-255 + 256-263**; no open reservations remain in 240-263; this record covers **264-271**; next unread page is **272**.
 
 ## 8. Provenance, page authorship, zero drift and reader independence
 
-**Base:** f325daac (merge commit of #838, 38th session record merge; parents 7cea211e + fcc58121); original PR base 7cea211e (#837, 37th); plan captured at 6f584c9d (#833, 36th). **Plan:** 6248840176 + B ACCEPT 6248870170. **Reader:** sd-c-read-b20-c1 read all eight pages whole at the pinned blob; no display elision. **Page authors are not this reader** (git metadata only; not B6 proof). **Witness rows:** section 3 is the per-page witness (index, path, pinned blob, measured bytes/LF); each blob resolves at 2db1ffb7 and is identical at base f325daac (zero drift). **Author metadata only — NOT B6 evidence.**
+**Base:** 3821259533 (merge commit of #839, 39th session record merge; parents f325daac + 95bd9364); original PR base 7cea211e (#837, 37th); live main currently 2c3c6ffe (#840, 40th); plan captured at 6f584c9d (#833, 36th). **Plan:** 6248840176 + B ACCEPT 6248870170. **Reader:** sd-c-read-b20-c1 (true identity sd-e-802-r1) read all eight pages whole at the pinned blob; no display elision. **Current record repair:** sd-c-read-b20-c5 (true identity sd-f-794-r1); C repair holder history c1 initial + c2 repair. **Page authors are not this reader** (git metadata only; not B6 proof). **Witness rows:** section 3 is the per-page witness; each blob resolves at 2db1ffb7 and is identical at base 3821259533 (zero drift). **Author metadata only - NOT B6 evidence.**
 
 ## 9. Stage C declaration, AC statuses and self-state consistency
 
 | AC | Status | Evidence |
 | --- | --- | --- |
-| AC1 one-path | MET in this record | exactly one added record path; no other tracked path; **one DCO-signed model commit** |
+| AC1 one-path | MET in this record | exactly one added record path; no other tracked path; **two DCO-signed model commits** (original C commit 4dab131f + repair/rebase commit de127649) |
 | AC2 pages | MET in this record | eight pages 264-271 by blob; totals 57,263/1,027; zero drift; no keeper |
 | AC3 inventory | MET in this record | one contiguous 237-row table; 237 unique keys; zero duplicates/extra; five-cell proof; counts recomputed; no fabricated rows |
 | AC4 dispositions | MET in this record | strict FULL bar; 0 FULL/8 PARTIAL/0 UNRUN; B6 unverified; named gaps aligned |
-| AC5 record/body/PROC | MET in this record | record bytes/LF/sha/blob measured in handoff; body binds facts; PROC-04 published == live-body recompute; body checker 0 |
-| AC6 Codex loop | MET at handoff | exact-head trigger; triage all P1/P2; never a pass; head-bound only after triage |
+| AC5 record/body/PROC | asserted here; verified in handoff | record bytes/LF/sha/blob measured in handoff; body binds facts; PROC-04 published == live-body recompute; body checker 0 |
+| AC6 Codex loop | asserted here; verified in handoff | exact-head trigger; triage all P1/P2; never a pass; head-bound only after triage |
 | AC7 provenance | MET in this record | plan/B lineage, base and reservations, merge attribution, zero drift, absent path |
 | AC8 stages | MET for C | C only acts here; D/E/F/G separate; no merge |
 
-**Self-state consistency.** Section 2 scheduling facts, section 6 counts and this table agree: base f325daac; merged lane-B 144-239 plus 240-247; open reservations 248-263; this block 264-271; next 272; batch 20. **Merge attribution:** f325daac = #838 38th; 7cea211e = #837 37th; 6f584c9d = #833 36th; a06360d4 = #835 35th; a141c64f = #836 34th; e7acaca4 = #834 33rd; 84a5295d = #831 32nd; 655e40ea = #828 31st; 883bf690 = #832 30th. No unresolved head placeholder; **actual commit count = two DCO-signed model commits after rebase (original C commit + repair commit)**.
+**Self-state consistency.** Section 2 scheduling facts, section 6 counts and this table agree: base 3821259533; merged lane-B 144-263; no open reservation in 240-263; this block 264-271; next 272; batch 20. **Merge attribution:** 2c3c6ffe = #840 40th; 38212595 = #839 39th; f325daac = #838 38th; 7cea211e = #837 37th; 6f584c9d = #833 36th; a06360d4 = #835 35th; a141c64f = #836 34th; e7acaca4 = #834 33rd; 84a5295d = #831 32nd; 655e40ea = #828 31st; 883bf690 = #832 30th. No unresolved head placeholder; **actual commit count = two DCO-signed model commits after rebase (original C commit + repair/rebase commit)**; this repair adds one DCO commit, head moves.
 
+
+**Provenance note.** The C-initial skills account below is preserved as authored by **sd-c-read-b20-c1 / true identity sd-e-802-r1** at its historical base f325daac; its Row source targets are historical and are not rewritten. The current record repair is **sd-c-read-b20-c5 / sd-f-794-r1**; the header, section 8 and closing signature identify the current repair and distinguish the C-initial author. This resolves the role/identity inconsistency without fabricating provenance.
 
 ## 10. My Stage C skills rows, Row sources and six-field lines
 
 | Skill | Stage / agent | How applied | Result / evidence |
 | --- | --- | --- | --- |
-| acceptance-criteria-reviewer @ c6e5d5649bf8 | C batch-20 / sd-c-read-b20-c1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pinned pages; bound AC1-AC8 and canonical B1-B6, B4 per page, B6 UNVERIFIED; built the exact-once inventory. | 237-row inventory / 234 unique keys; B4 per page; B6 UNVERIFIED |
+| acceptance-criteria-reviewer @ c6e5d5649bf8 | C batch-20 / sd-c-read-b20-c1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pinned pages; bound AC1-AC8 and canonical B1-B6, B4 per page, B6 UNVERIFIED; built the exact-once inventory. | 237-row inventory / 237 unique keys; B4 per page; B6 UNVERIFIED |
 | source-of-truth-reconciler @ b5fd9feda972 | C batch-20 / sd-c-read-b20-c1 (DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Re-derived the pinned index/pending set, base f325daac, merged rows 144-239 plus 240-247, reservations 248-263, block 264-271; measured eight blobs/totals and zero drift. | 573 pending; pages 264-271 57,263 B / 1,027 LF; zero drift |
 | change-classification-gate @ 08d91a834460 | C batch-20 / sd-c-read-b20-c1 (DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified the work docs-only with exactly one added record path and no other tracked change. | one A docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md |
 | skill-usage-ledger @ 6a27b5c8e690 | C batch-20 / sd-c-read-b20-c1 (DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Resolved four manifest names at main 7cea211e and authored these C rows, per-row Row sources and six-field lines. | four rows / four per-row sources / four six-field lines |
@@ -452,6 +454,40 @@ change-classification-gate@08d91a834460 / stage=C row=3 / reason: C owes docs-on
 skill-usage-ledger@6a27b5c8e690 / stage=C row=4 / reason: C owes self-authored provenance / applied: four names at main 7cea211e; rows/per-row sources/six fields; binding sha256 27b67531057cbef82f443d1db0a61b947d599eb340fd00714edd457e68cdebda / result: four rows/four sources/four six-field lines / incomplete: publisher/body insertion / by: C, sd-c-read-b20-c1 (true identity sd-e-802-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 ~~~
 
-## 11. Limits and unverifiable items
+## 11. DeepSeek review triage (SD-C repair-4)
 
-Canonical B6 is unverified for all eight pages; no page is FULL and no keeper is created. B4 is assessed for instructional/reference content only; no synthetic test, passing check or approved design is described as deployed or measured. Hosted CI/Codex states are observed in the handoff. **Signed with both names: true identity sd-e-802-r1; stage role sd-c-read-b20-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
+Reviews are advisory comments, not approvals. GraphQL reports **0 review threads** on PR #841, so there are no thread objects to resolve; dispositions below name the fixing commit SHA (new repair commit on the PR) and are non-blocking where explicitly justified.
+
+| Review | Finding | Disposition |
+| --- | --- | --- |
+| 5562605718 | Truncated purpose/normal-use fields | Non-blocking presentation: these are deliberately bounded first-line excerpts supporting B1 presence; no full quote is claimed. Excerpt boundary noted here; page text unchanged. |
+| 5562605718 | B2 prose run-on format | Non-blocking presentation: reading-key clause and named-gap list are semicolon-separated; inventory remains authoritative. |
+| 5562605718 | B3 0 table/list rows | Non-blocking; counts are markdown table rows/list items only. Headings are not counted as rows; 0 verified for P2/P4/P6/P8. |
+| 5562605718 | Five-cell parse proof unverified | Re-verified by E2 and retained: 237/237 rows parse as exactly five cells after escaping literal pipes; proof is machine-checkable. |
+| 5562605718 | Duplicate disposition tally label | Fixed: second tally renamed Verdict tally in section 7. |
+| 5562605718 | Trailing semicolon in named-gap list | Fixed: named-gap list now ends with a period. |
+| 5562605718 | Self-referential digest design | Non-blocking design: record facts are intentionally published in the PR body/SD-C comments; record never embeds its own digest. Row-source bindings are different objects. |
+| 5562605718 | B6 PARTIAL informational note | Non-blocking: B6 unverified is the stated basis for PARTIAL on all eight pages; no rows change. |
+| 5562608286 | B2 defined vs named-gap prose contradiction | Non-blocking clarification: section 5 is a reading-key summary, not a per-token expansion proof; section 6 inventory rows are authoritative and were checked against page text. |
+| 5562608286 | Truncated purpose/normal-use prose | Non-blocking as above; explicitly bounded excerpts, not extraction errors. |
+| 5562608286 | 0 table/list rows suspicious | Non-blocking as above; markdown rows/items only. |
+| 5562608286 | Digest binding fragility | Non-blocking design; E/Stage F independently recompute the live body/PROC. |
+| 5562608286 | AC in-this-record wording | Fixed: AC5/AC6 now say asserted here; verified in handoff; AC1 commit count corrected. |
+| 5562608286 | Table cell escaping/readability | Non-blocking: escaped pipes are deliberate and parsed; long cells are verbatim page text. |
+| 5562608286 | One-DCO assertion unevidenced | Fixed: AC1 now states two DCO commits with hashes; actual DCO check is two signed. |
+| 5562632523 | Row/unique-key count contradiction | Fixed: section 10 C account now says 237 unique keys, matching 237/237/0. |
+| 5562632523 | Disposition tally arithmetic | Fixed: section 7 exclusions corrected 194 -> 197; 21+19+197=237. |
+| 5562632523 | Header/reader identity inconsistency | Fixed: header and closing signature identify current repair c5/sd-f; C-initial account/reader c1/sd-e is explicitly retained as historical provenance. |
+| 5562632523 | Commit-count contradiction | Fixed: AC1 two DCO commits; self-state two commits; this repair adds one commit. |
+| 5562632523 | Truncated purpose prose | Non-blocking bounded excerpts as above. |
+| 5562632523 | B2 defined claims lack per-token evidence | Non-blocking: defined rows rely on pinned first-use text and reasons; section 5 prose is not a citation layer. No row disposition changes without page evidence. |
+| 5562632523 | SLIs/M-class exclusion rationale wording | Non-blocking: class M/L exclusion covers mixed-case/plural acronym forms; rationale wording coarse, token keys/dispositions unchanged. |
+| 5562632523 | Five-cell proof method | Re-verified 237/237 five-cell parse after pipe escaping; retained. |
+| 5562632523 | B2 quote illustrative codes | Non-blocking: CP-WP-003/OD-1/T03 quote is the canonical rule text, not a page-content claim. |
+| 5562632523 | Long table/three representations | Non-blocking: inline table required by plan; markdown/comment/text block are the ledger format, not duplicate data. |
+
+**Fixing commit for the factual fixes:** the new Stage C repair-4 commit on PR #841 (SHA published in the SD-C REPAIR-4 comment; record cannot embed its own future SHA).
+
+## 12. Limits and unverifiable items
+
+Canonical B6 is unverified for all eight pages; no page is FULL and no keeper is created. B4 is assessed for instructional/reference content only; no synthetic test, passing check or approved design is described as deployed or measured. Hosted CI/Codex states are observed in the handoff. **Signed with both names: true identity sd-f-794-r1; stage role sd-c-read-b20-c5.** C-initial account/reader rows retain their self-authored sd-e-802-r1 provenance. **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
