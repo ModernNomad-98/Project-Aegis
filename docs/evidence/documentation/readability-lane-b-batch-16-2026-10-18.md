@@ -187,7 +187,7 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 ## 5. Systematic five-class token audit - ONE contiguous exact-once inventory
 
-**Method and scope rule.** Candidates were extracted from the eight pinned pages under the five required classes: (i) uppercase any length (scoped to acronyms and uppercase SQL/role/command tokens; ordinary all-caps English emphasis is out of scope), (ii) lowercase technical abbreviations, (iii) mixed-case/plural/file identifiers, (iv) every backticked identifier, field-name literal and link-target file identifier, (v) every angle/brace placeholder, typographic arrow/operator and unit present in the pages. Ordinary English prose, sentence punctuation and pure numeric values are out of scope; backticked/unbackticked variants collapse to one normalized (page, token) row and line-wrapped placeholder tokens have internal whitespace normalized to single spaces at their real first-use line. Under this stated rule every in-scope token resolves to page text. The retained table below has **one row per real token at its real first-use line**, keyed by normalized (page, token) so backticked and unbackticked variants collapse to one row; every row resolves to page text. Dispositions are **defined at first use**, **named gap** (unexpanded first use) or **documented exclusion** (with a one-line reason category below). No fabricated, placeholder, numeric-artifact or grouped rows exist; no row is duplicated. All counts below are recomputed from this final table.
+**Method and scope rule.** Candidates were extracted from the eight pinned pages under the five required classes: (i) uppercase any length (scoped to acronyms and uppercase SQL/role/command tokens; ordinary all-caps English emphasis is out of scope), (ii) lowercase technical abbreviations, (iii) mixed-case/plural/file identifiers, (iv) every backticked identifier, field-name literal and link-target file identifier, (v) every angle/brace placeholder, typographic arrow/operator and unit present in the pages. Ordinary English prose, sentence punctuation and pure numeric values are out of scope; backticked/unbackticked variants collapse to one normalized (page, token) row and line-wrapped placeholder tokens (including DOTALL multiline angle placeholders) have internal whitespace normalized to single spaces at their real first-use line. Under this stated rule every in-scope token resolves to page text. The retained table below has **one row per real token at its real first-use line**, keyed by normalized (page, token) so backticked and unbackticked variants collapse to one row; every row resolves to page text. Dispositions are **defined at first use**, **named gap** (unexpanded first use) or **documented exclusion** (with a one-line reason category below). No fabricated, placeholder, numeric-artifact or grouped rows exist; no row is duplicated. All counts below are recomputed from this final table.
 
 | Page | Class | Token | First-use line | Disposition | Reason |
 | --- | --- | --- | --- | --- | --- |
@@ -245,13 +245,21 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | P2 | (iv) | `Missing evidence` | L141 | documented exclusion | field-name literal in output template, not an abbreviation |
 | P2 | (v) | `<stage or evidence milestone>` | L143 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P2 | (i) | `HUMAN-APPROVED` | L144 | **named gap** | — |
+| P2 | (v) | `<named human approver — role + name/handle — who made the commitment decision; REQUIRED and non-empty when Commitment status = HUMAN-APPROVED \| n/a — no final commitment approved (status NONE or HUMAN DECISION REQUIRED)>` | L145 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P2 | (ii) | `n/a` | L147 | documented exclusion | self-describing template field value, not an abbreviation |
+| P2 | (v) | `<durable evidence of that approval — recorded Approval id / decision-log entry id / dated message link — so a later reader can verify it, not just read a status; REQUIRED when HUMAN-APPROVED \| n/a>` | L148 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P2 | (iv) | `Approval reference` | L148 | documented exclusion | field-name literal in output template, not an abbreviation |
+| P2 | (v) | `<exactly which deliverables + date RANGES the named human approved, and the approval date — bounds the binding commitment; a scope change needs a NEW approval \| n/a>` | L151 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P2 | (iv) | `Approval scope + date` | L151 | documented exclusion | field-name literal in output template, not an abbreviation |
 | P2 | (v) | `<unverified targets \| none>` | L154 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P2 | (v) | `<verified velocity evidence + calculation (minus maintenance/interrupts, buffer) \| none — missing <named capacity evidence>` | L155 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P2 | (iv) | `Capacity basis` | L155 | documented exclusion | field-name literal in output template, not an abbreviation |
 | P2 | (v) | `<named capacity evidence>` | L156 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P2 | (v) | `<deliverable — date RANGE — capacity-backed, dependency-clear, high-confidence \| none — readiness is NOT COMMIT-ABLE \| none — awaiting named human decision>` | L157 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P2 | (iv) | `Committed` | L157 | documented exclusion | field-name literal in output template, not an abbreviation |
+| P2 | (v) | `<deliverables + honest date RANGES proposed for the named human's commitment decision — shown when Readiness = COMMIT-ABLE and Commitment status = HUMAN DECISION REQUIRED \| none — readiness is NOT COMMIT-ABLE \| n/a — final commitment already HUMAN-APPROVED>` | L160 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
+| P2 | (v) | `<known dependencies + state → cross-team-dependency-negotiator (secured?) \| unknown — discovery incomplete \| none verified>` | L165 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
+| P2 | (v) | `<excluded roadmap items + reason (capacity/dependency/uncertainty) \| all delivery items — readiness is NOT COMMIT-ABLE>` | L168 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P2 | (v) | `<if asked for more: commit-less \| add-capacity \| accept-lower-confidence>` | L170 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P2 | (v) | `<terms, option costs/unknowns, pros/cons, recommendation + why>` | L171 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P2 | (iv) | `evals/evals.json` | L300 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
@@ -270,6 +278,7 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | P4 | (iv) | `product-spec-writer` | L3 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P4 | (iv) | `roadmap-to-commitments-translator` | L3 | documented exclusion | self-describing code/role identifier named on its line |
 | P4 | (iii) | `Gantt` | L8 | defined at first use | — |
+| P4 | (v) | `100%` | L88 | documented exclusion | percent unit, not an abbreviation |
 | P4 | (i) | `COMMIT-ABLE` | L101 | defined at first use | — |
 | P4 | (iv) | `references/roadmap-uncertainty-sheet.md` | L111 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P4 | (v) | `<now/next/later \| ...>` | L119 | documented exclusion | self-describing angle placeholder, supplied by the author |
@@ -294,6 +303,7 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | P5 | (i) | `H2+` | L7 | defined at first use | — |
 | P5 | (i) | `Q` | L7 | defined at first use | — |
 | P5 | (i) | `COMMIT-ABLE` | L35 | **named gap** | — |
+| P5 | (v) | `100%` | L64 | documented exclusion | percent unit, not an abbreviation |
 | P5 | (v) | `e.g.` | L71 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
 | P6 | (iv) | `data-migration-runbook-author` | L3 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P6 | (iv) | `incident-response-runbook` | L3 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
@@ -308,8 +318,10 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | P6 | (v) | `<change/release id>` | L111 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
 | P6 | (v) | `<rollback-vs-fix-forward symptoms/thresholds; time-box; decider role>` | L112 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P6 | (v) | `<layer → primitive → order of reversal → why this order>` | L114 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
+| P6 | (v) | `<artifact id + registry path; old-version/schema compatibility statement; backup/restore points verified>` | L115 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P6 | (v) | `<access, tools, permissions the executor must have>` | L117 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P6 | (v) | `<action — exact command/path — expected observable result — verification before next step>` | L118 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P6 | (v) | `<what the new version wrote; old-version read safety; repair steps or "none needed" with reason; approval gates for destructive repair>` | L122 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P6 | (v) | `<who/when/channel at start + completion; status-page posture>` | L125 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P6 | (v) | `<dry-run requirement; log (date, executor, result); staleness triggers>` | L126 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P6 | (v) | `<release-readiness-reviewer (evidence); observability-operator (rollback-worked signals)>` | L128 | documented exclusion | self-describing angle placeholder, supplied by the author |
@@ -364,13 +376,17 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | P8 | (iv) | `human-approval-boundary` | L112 | documented exclusion | exact repository skill reference, not an abbreviation |
 | P8 | (v) | `<product/scope>` | L123 | documented exclusion | self-describing placeholder/operator/unit supplied by the author |
 | P8 | (v) | `<driver — service — fixed/stepped/variable — monthly $ from real bills (or ESTIMATE label)>` | L124 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P8 | (v) | `<driver → mechanism (tag/counter/prefix/proxy) → unattributable overhead listed separately with total>` | L126 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P8 | (v) | `<missing tag/counter — dollars it would attribute — ranked>` | L128 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P8 | (v) | `<per plan: revenue vs attributed cost + overhead share; distribution incl. P95 tenant; unprofitable tenants named by criteria>` | L130 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P8 | (v) | `<unbounded drivers with worst-case math; noisy-neighbor concentration; allowance arbitrage>` | L132 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P8 | (v) | `<guardrail — threshold — behavior (alert/degrade/stop) — tenant-visible effect — owner>` | L134 | documented exclusion | self-describing angle placeholder, supplied by the author |
+| P8 | (v) | `<observe-only → tune → enforce; per-guardrail disable; approval gates for service-degrading enforcement>` | L136 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P8 | (v) | `<reconciliation cadence, tolerance, reopen trigger>` | L138 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P8 | (v) | `<each with risk-if-wrong / who answers>` | L139 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P8 | (iv) | `evals/evals.json` | L205 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
 | P8 | (iv) | `evals/trigger-evals.json` | L206 | documented exclusion | exact repository skill name/path reference, not an abbreviation |
+
 
 
 
@@ -379,16 +395,16 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | Page | (i) | (ii) | (iii) | (iv) | (v) | Total |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | P1 | 26 | 5 | 2 | 4 | 5 | 42 |
-| P2 | 2 | 1 | 1 | 11 | 8 | 23 |
+| P2 | 2 | 1 | 1 | 11 | 16 | 31 |
 | P3 | 2 | 0 | 0 | 1 | 5 | 8 |
-| P4 | 2 | 0 | 1 | 8 | 14 | 25 |
-| P5 | 3 | 0 | 1 | 1 | 1 | 6 |
-| P6 | 1 | 0 | 0 | 11 | 9 | 21 |
+| P4 | 2 | 0 | 1 | 8 | 15 | 26 |
+| P5 | 3 | 0 | 1 | 1 | 2 | 7 |
+| P6 | 1 | 0 | 0 | 11 | 11 | 23 |
 | P7 | 8 | 2 | 1 | 1 | 23 | 35 |
-| P8 | 5 | 0 | 0 | 7 | 8 | 20 |
-| **Total** | 49 | 8 | 6 | 44 | 73 | **180** |
+| P8 | 5 | 0 | 0 | 7 | 11 | 23 |
+| **Total** | 49 | 8 | 6 | 44 | 88 | **195** |
 
-**Disposition totals recomputed from the table:** **17 named gaps / 18 defined at first use / 145 documented exclusions = 180**. **Zero-duplicate check:** normalized (page, token) keys = **180**, rows = **180**, duplicates = **0**, extra rows = **0**; a token appears at most once per page and its first-use line is the table's line. Documented-exclusion reasons are recorded per row in the Reason column: SQL keywords/commands and proper product/language names; exact repository skill/path/evals references; link-target/file identifiers; self-describing code identifiers and output-template field names; and self-describing placeholders/operators/units - none is an abbreviation first use.
+**Disposition totals recomputed from the table:** **17 named gaps / 18 defined at first use / 160 documented exclusions = 195**. **Zero-duplicate check:** normalized (page, token) keys = **195**, rows = **195**, duplicates = **0**, extra rows = **0**; a token appears at most once per page and its first-use line is the table's line. Documented-exclusion reasons are recorded per row in the Reason column: SQL keywords/commands and proper product/language names; exact repository skill/path/evals references; link-target/file identifiers; self-describing code identifiers and output-template field names; and self-describing placeholders/operators/units - none is an abbreviation first use.
 
 **Named-gap list (aligned with section 4 and section 6):** P1 L1 `RLS`, L5 `JSON`, L40 `BYPASSRLS`, L43 `DEFINER`, L44 `search_path`, L61 `SQL`; P2 L75 `COMMIT-ABLE`, L144 `HUMAN-APPROVED`; P5 L35 `COMMIT-ABLE`; P7 L15 `ID`, L18 `expand-phase`, `contract-phase`, L28 `DRAFT`/`CURRENT`/`STALE`; P8 L3 `SaaS`, `AI`. **Tally: P1 6 + P2 2 + P5 1 + P7 6 + P8 2 = 17 named gaps**, matching the reconciliation table. **COMMIT-ABLE per-page note:** P3 L8 and P4 L101 define/expand COMMIT-ABLE inline at first use; P2 L75 and P5 L35 use it before any inline expansion, so the per-page dispositions differ (P2/P5 named gaps). P3, P4 and P6 have no other named B2 gap.
 
@@ -427,7 +443,7 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 - **Canonical B6:** UNVERIFIED for all eight pages; no non-author read-only review is available here, so no page is FULL or keeper-eligible.
 - **Named B2 gaps** are first-use-before-expansion gaps on their pages; they are not page-edit proposals and do not authorize file changes in this stage.
-- **D1 REVISE 6248394619 repair:** this table was expanded with the real omitted candidates from D1's independent scan (P1 `JSON` L5 and SQL/role directives, P7 `ID` L15, `SKILL.md` link targets P1/P5/P7, `WITH CHECK` P1 L18, `human-approval-boundary` P8 L112, P2 field-name backticks and `n/a`, plus the full in-scope angle-placeholder/arrow sets for all pages); counts are recomputed from the final 180-row table.
+- **D1 REVISE 6248394619 / D2 REVISE 6248507784 repair:** the table was expanded with the real omitted candidates from D1's independent scan (P1 `JSON` L5 and SQL/role directives, P7 `ID` L15, `SKILL.md` link targets P1/P5/P7, `WITH CHECK` P1 L18, `human-approval-boundary` P8 L112, P2 field-name backticks and `n/a`, plus the in-scope angle-placeholder/arrow sets), then with D2's 13 multiline DOTALL angle placeholders (P2 L145/148/151/155/157/160/165/168; P6 L115/L122; P8 L126/L130/L136) and the P4 L88 / P5 L64 `100%` units; counts are recomputed from the final 195-row table.
 - **Hosted CI, Codex and DeepSeek** states are recorded in the SD-C handoff at the exact head; this record does not assert them.
 - **This record cannot verify its own final hash** (it never contains its own digest); the PR body and SD-C handoff state the measured bytes/LF/CR/sha256/blob outside the record.
 
