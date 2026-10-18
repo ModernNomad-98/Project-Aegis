@@ -42,7 +42,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B6 (L2860-2862):** Obtain a read-only review from someone who did not write the page. Ask the reviewer to explain the component's purpose and normal use from the page alone, and correct gaps before marking that batch complete.
 
-**Application:** B4 tested explicitly per page; **B6 VERIFIED** for all eight via the existing non-author review; B2 named gaps remain, so B6 is not the blocker but no page reaches FULL; B1/B2/B3/B5 evidenced per page. 1 FULL (P1) / 7 PARTIAL / 0 UNRUN; no keeper.
+**Application:** B4 tested explicitly per page; **B6 VERIFIED** for all eight via the existing non-author review, but B6 evidence alone does not satisfy the strict FULL bar; P1's B4 evidence is generic reference/no-deployment, not concrete behavioral evidence, and the other pages retain B2 named gaps. **0 FULL / 8 PARTIAL / 0 UNRUN; no keeper.**
 
 ## 5. Whole-page re-read evidence and canonical B1-B6 per page
 
@@ -58,7 +58,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B5:** navigation links and referenced files were checked; no broken in-page reference or removed safety boundary found.
 
-**B6:** **VERIFIED** via existing non-author read-only review evidence in `docs/evidence/documentation/readability-lane-c-batch-4-2026-10-15.md` (same eight blobs at f490c16f; line 770 records that the reviewing agent authored none of the pages). B2 named gaps remain, so the page is still PARTIAL and not FULL/keeper.
+**B6:** **VERIFIED** via existing non-author read-only review evidence in `docs/evidence/documentation/readability-lane-c-batch-4-2026-10-15.md` (same eight blobs at f490c16f; line 770 records that the reviewing agent authored none of the pages), but this review evidence does not satisfy the strict FULL bar; P1's B4 evidence is generic reference/no-deployment, so the page is **PARTIAL**, not FULL/keeper.
 
 ### P2 - index 281 - `.claude/skills/structured-output-validator/SKILL.md` - read whole L1-224 (13329 B / 224 LF)
 
@@ -393,6 +393,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P8 | 3 | iv | `threat-modeler` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P8 | 9 | i | `CVE` | defined at first use — expansion/definition present on this page |
 | P8 | 10 | i | `CVSS` | defined at first use — expansion/definition present on this page |
+| P8 | 10 | i | `ID` | named gap — first use before any expansion on this page |
 | P8 | 11 | i | `OSV` | defined at first use — expansion/definition present on this page |
 | P8 | 13 | i | `SHA` | defined at first use — expansion/definition present on this page |
 | P8 | 17 | i | `OWASP` | defined at first use — expansion/definition present on this page |
@@ -456,13 +457,13 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 ### 6.1 Reconciliation and independent cell-count proof (ONE proof section)
 
-**Counts from the FINAL table:** **289 data rows**; **289 unique (page, first-use line, token) keys**; **0 duplicate keys / 0 extra rows**; per-page: P1: 23, P2: 32, P3: 22, P4: 22, P5: 16, P6: 56, P7: 42, P8: 76; classes: i: 63, ii: 6, iii: 10, iv: 113, v: 97; dispositions: defined at first use: 47, named gap: 36, documented exclusion: 206. All sums equal 289.
+**Counts from the FINAL table:** **290 data rows**; **290 unique (page, first-use line, token) keys**; **0 duplicate keys / 0 extra rows**; per-page: P1: 23, P2: 32, P3: 22, P4: 22, P5: 16, P6: 56, P7: 42, P8: 77; classes: i: 64, ii: 6, iii: 10, iv: 113, v: 97; dispositions: defined at first use: 47, named gap: 37, documented exclusion: 206. All sums equal 290.
 
-**Five-column parse proof:** hide escaped pipes `\|`, split each row on remaining Markdown delimiters, and require exactly five cells. The final table has **289 data rows and 0 bad rows**; a literal pipe would produce more than five cells. **Zero-duplicate proof:** unique-key count equals row count after stripping backticks and unescaping pipes; no inventory rows exist after this proof.
+**Five-column parse proof:** hide escaped pipes `\|`, split each row on remaining Markdown delimiters, and require exactly five cells. The final table has **290 data rows and 0 bad rows**; a literal pipe would produce more than five cells. **Zero-duplicate proof:** unique-key count equals row count after stripping backticks and unescaping pipes; no inventory rows exist after this proof.
 
 ## 7. Dispositions, named gaps, keeper exclusion and continuation
 
-**Verdict tally: 1 FULL (P1) / 7 PARTIAL / 0 UNRUN.** All eight pages read whole; B6 is verified by the existing review; P1 has no remaining B2 gap and is FULL; the other seven keep named gaps and are PARTIAL; no acceptance/keeper row. **Named gaps from the final table:**
+**Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages read whole; B6 is verified by the existing review but is not by itself enough for FULL; P1's B4 evidence is generic reference/no-deployment rather than concrete behavioral evidence, and the other seven retain B2 named gaps; no acceptance/keeper row. **Named gaps from the final table:**
 - **P1**: none.
 - **P2**: `AI`, `authz`, `JSON`, `LLM`, `id`, `URL`, `API`.
 - **P3**: `id`.
@@ -470,7 +471,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 - **P5**: `HTTP`, `T-2d`, `T-2wk`, `404`, `500`.
 - **P6**: `DB`, `IA`, `RLS`, `SaaS`, `UI`, `SECURITY-DEFINER`, `URL`.
 - **P7**: `403`, `SECURITY-DEFINER`, `id`.
-- **P8**: `A2A`, `AI/ML`, `ASI04`, `CI/CD`, `CVEs`, `LLM04`, `MCP`, `PR`, `SAST`, `SLSA`, `pull_request_target`, `GITHUB_TOKEN`.
+- **P8**: `A2A`, `AI/ML`, `ASI04`, `CI/CD`, `CVEs`, `LLM04`, `MCP`, `PR`, `SAST`, `SLSA`, `ID`, `pull_request_target`, `GITHUB_TOKEN`.
 
 **Continuation:** this block exhausts lane B pending at 287; first unread after block is 288 `.claude/skills/supply-chain-security-reviewer/references/supply-chain-checklist.md`, outside lane B. Later work requires a fresh lane/block decision; no lane-B batch 23 block exists.
 
@@ -480,16 +481,16 @@ Pages were read at pinned ref 2db1ffb7 from the tree rather than from plan text;
 
 ## 9. Stage C declaration, AC statuses and self-state
 
-Authored by **sd-c-read-b22-c1** / true identity sd-e-794-r1, branch from main 6afc845a, six DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + repair-2 da202e42 + repair-3 2e9ed37c + repair-4 3c3de2b7 + this repair-5 commit; exact repair-5 SHA in PR body/handoff) and exactly one added path; no merge. **AC statuses:**
+Authored by **sd-c-read-b22-c1** / true identity sd-e-794-r1, branch from main 6afc845a, **seven DCO-signed model commits after repair** (7b52ce2e, 377c2def, da202e42, 2e9ed37c, 3c3de2b7, ec8931e3, and this repair-6 commit; exact final SHA in PR body/handoff) and exactly one added path; no merge. **AC statuses:**
 
 | AC | Status | Basis |
 | --- | --- | --- |
-| AC1 | MET in PR diff | one added record path vs 6afc845a; six DCO-signed model commits after repair (7b52ce2e, 377c2def, da202e42, 2e9ed37c, 3c3de2b7, this repair-5 commit; exact repair-5 SHA in PR body/handoff); no other tracked path |
+| AC1 | MET in PR diff | one added record path vs 6afc845a; **seven DCO-signed model commits after repair** (7b52ce2e, 377c2def, da202e42, 2e9ed37c, 3c3de2b7, ec8931e3, and this repair-6 commit; exact final SHA in PR body/handoff); no other tracked path |
 | AC2 | MET | eight blobs/bytes/LF above; zero drift; pending/unread |
 | AC3 | MET in this record | whole-page B1-B6; ONE contiguous table; five-cell/zero-duplicate proof; no fabricated rows |
-| AC4 | MET | strict FULL bar; B6 verified via existing review; P1 has no B2 gap and is FULL; other pages keep named gaps and are PARTIAL; no keeper |
-| AC5 | asserted in PR body/handoff | record facts outside record; body witness/skills/security fields + live-final-body PROC-04 published==recomputed proof |
-| AC6 | asserted in PR body/handoff | head-bound Codex trigger/triage; never a pass; no unresolved threads; MG3 belongs to G |
+| AC4 | MET | strict FULL bar; B6 verified via existing review but insufficient for FULL; P1 B4 is generic/no-deployment and other pages retain B2 named gaps; **0F/8P**; no keeper |
+| AC5 | asserted in PR body/handoff | record facts outside record; body witness/skills/security fields + live-final-body **PROC-04** (prose-witness digest procedure: whole-line witness/skills/security, whitespace-collapse, LF-join, SHA-256, first 16 hex) published==recomputed proof |
+| AC6 | asserted in PR body/handoff | head-bound Codex trigger/triage; never a pass; at repair start **16 total/5 unresolved**, all five replied with fixing SHA then resolved; final count in handoff; **MG3** (merge-gate stage-G owner/Codex decision) belongs to Stage G |
 | AC7 | MET | plan/B binding; base 6afc845a; lane-end/288; merge attribution; zero drift; one path |
 | AC8 | MET | C only; D/E/F/G separate; no merge |
 
@@ -507,16 +508,27 @@ Self-state consistency: section 2 facts, section 3 totals and section 6 counts d
 **Row source records (per-row):**
 
 ```text
-<!-- Row source: agent=sd-c-read-b22-c1 (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=docs/evidence/documentation/readability-lane-b-batch-22-2026-10-18.md / plan 6250020057 / B 6250055127 / base 6afc845a; source=_A/evidence/read-b22-c1/C-rows.txt line 1 of 4; binding=sha256 a3a7dc519875d27c988918e84aae7cddc19d7adda6f581a608aaa683c8f7be45 over four-row capture; manifest=tools/skills-manifest.json sha256 9497950a (205 skills) at main 6afc845a; limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-b22-c1 (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=docs/evidence/documentation/readability-lane-b-batch-22-2026-10-18.md / plan 6250020057 / B 6250055127 / base 6afc845a; source=_A/evidence/read-b22-c1/C-rows.txt line 2 of 4; binding=sha256 a3a7dc519875d27c988918e84aae7cddc19d7adda6f581a608aaa683c8f7be45 over four-row capture; manifest=tools/skills-manifest.json sha256 9497950a (205 skills) at main 6afc845a; limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-b22-c1 (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=docs/evidence/documentation/readability-lane-b-batch-22-2026-10-18.md / plan 6250020057 / B 6250055127 / base 6afc845a; source=_A/evidence/read-b22-c1/C-rows.txt line 3 of 4; binding=sha256 a3a7dc519875d27c988918e84aae7cddc19d7adda6f581a608aaa683c8f7be45 over four-row capture; manifest=tools/skills-manifest.json sha256 9497950a (205 skills) at main 6afc845a; limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-b22-c1 (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=docs/evidence/documentation/readability-lane-b-batch-22-2026-10-18.md / plan 6250020057 / B 6250055127 / base 6afc845a; source=_A/evidence/read-b22-c1/C-rows.txt line 4 of 4; binding=sha256 a3a7dc519875d27c988918e84aae7cddc19d7adda6f581a608aaa683c8f7be45 over four-row capture; manifest=tools/skills-manifest.json sha256 9497950a (205 skills) at main 6afc845a; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-b22-c1 (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=docs/evidence/documentation/readability-lane-b-batch-22-2026-10-18.md / plan 6250020057 / B 6250055127 / base 6afc845a; source=record §10.1 embedded four-row capture line 1 of 4; binding=sha256 a3a7dc519875d27c988918e84aae7cddc19d7adda6f581a608aaa683c8f7be45 over four-row capture; manifest=tools/skills-manifest.json sha256 9497950a (205 skills) at main 6afc845a; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-b22-c1 (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=docs/evidence/documentation/readability-lane-b-batch-22-2026-10-18.md / plan 6250020057 / B 6250055127 / base 6afc845a; source=record §10.1 embedded four-row capture line 2 of 4; binding=sha256 a3a7dc519875d27c988918e84aae7cddc19d7adda6f581a608aaa683c8f7be45 over four-row capture; manifest=tools/skills-manifest.json sha256 9497950a (205 skills) at main 6afc845a; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-b22-c1 (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=docs/evidence/documentation/readability-lane-b-batch-22-2026-10-18.md / plan 6250020057 / B 6250055127 / base 6afc845a; source=record §10.1 embedded four-row capture line 3 of 4; binding=sha256 a3a7dc519875d27c988918e84aae7cddc19d7adda6f581a608aaa683c8f7be45 over four-row capture; manifest=tools/skills-manifest.json sha256 9497950a (205 skills) at main 6afc845a; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-b22-c1 (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=docs/evidence/documentation/readability-lane-b-batch-22-2026-10-18.md / plan 6250020057 / B 6250055127 / base 6afc845a; source=record §10.1 embedded four-row capture line 4 of 4; binding=sha256 a3a7dc519875d27c988918e84aae7cddc19d7adda6f581a608aaa683c8f7be45 over four-row capture; manifest=tools/skills-manifest.json sha256 9497950a (205 skills) at main 6afc845a; limits=digest binds captured text, not human identity; status=current -->
+```
+
+### 10.1 Skill-row source capture (embedded, retrievable)
+
+The four-row capture bound by the Row sources above is reproduced verbatim here so it is retrievable in-repo; SHA-256 of the fenced bytes below is `a3a7dc519875d27c988918e84aae7cddc19d7adda6f581a608aaa683c8f7be45`. The capture's first row records the historical `B6 UNVERIFIED` wording at capture time; the live B6 text was later updated after crediting the non-author review. The digest binds the historical captured text, not the current row text.
+
+```text
+| `acceptance-criteria-reviewer` @ `c6e5d5649bf8` | C batch-22 / `sd-c-read-b22-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pinned pages; tested AC1-AC8, B1-B6, B4 per page and B6 UNVERIFIED; built the inventory. | AC statuses and final-table counts recorded. |
+| `source-of-truth-reconciler` @ `b5fd9feda972` | C batch-22 / `sd-c-read-b22-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Re-derived live main 6afc845a, lane/batch, page blobs/bytes/LF, zero drift and one-path base. | 96,025/1,620; no drift; base/main 6afc845a. |
+| `change-classification-gate` @ `08d91a834460` | C batch-22 / `sd-c-read-b22-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only exactly one added record path. | one A path; no other tracked change. |
+| `skill-usage-ledger` @ `6a27b5c8e690` | C batch-22 / `sd-c-read-b22-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Resolved four manifest names at main 6afc845a; authored C account and retained capture. | four rows/four per-row sources/four six-field lines. |
 ```
 
 **Six-field lines (outside bound fields):**
 
 ```text
-acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C owes canonical/AC evidence / applied: read eight pages; B1-B6; B4 per page; inventory / result: 0F/8P; counts match / incomplete: D/E/F/G / by: C, sd-c-read-b22-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
+acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C owes canonical/AC evidence / applied: read eight pages; B1-B6; B4 per page; inventory / result: 0F/8P; counts match / incomplete: D, E, F, G (separate downstream stages; MG3 belongs to Stage G merge gate) / by: C, sd-c-read-b22-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 source-of-truth-reconciler@b5fd9feda972 / reason: base/pages must be re-derived / applied: live main 6afc845a; blobs/totals; no drift / result: 96,025/1,620; one path / incomplete: none / by: C, sd-c-read-b22-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 change-classification-gate@08d91a834460 / reason: docs-only one path / applied: branch diff / result: one A record path; no other change / incomplete: none / by: C, sd-c-read-b22-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 skill-usage-ledger@6a27b5c8e690 / reason: C account owes manifest-bound provenance / applied: four names at main 6afc845a; rows/sources/six fields; capture / result: four rows/four sources/four six fields / incomplete: none / by: C, sd-c-read-b22-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
@@ -524,6 +536,6 @@ skill-usage-ledger@6a27b5c8e690 / reason: C account owes manifest-bound provenan
 
 ## 11. Limits, unverifiable items and boundary
 
-Canonical B6 is **VERIFIED** for all eight pages via the existing non-author read-only review (same blobs at f490c16f; review line 770 confirms non-authorship); B2 named gaps remain, so P1 has no remaining B2 gap and is FULL; the other seven keep named gaps and are PARTIAL; no page is keeper-eligible (no keeper row). No page text was edited. This record is evidence-only, not a keeper/index/ledger/register/manifest change, verdict or merge; Stage D/E/F/G remain separate. No synthetic test/passing check/approved design is presented as deployed or measured.
+Canonical B6 is **VERIFIED** for all eight pages via the existing non-author read-only review (same blobs at f490c16f; review line 770 confirms non-authorship), but this evidence alone does not satisfy the strict FULL bar: P1's B4 evidence is generic reference/no-deployment and the other pages retain B2 named gaps, so **0 FULL / 8 PARTIAL / 0 UNRUN** and no page is keeper-eligible. **Label definitions used above:** `PROC-04` = the prose-witness digest procedure (whole-line witness/skills/security sentinels, whitespace-collapse, LF-join, SHA-256, first 16 hex); `MG3` = the merge-gate Stage G owner/Codex decision; `D/E/F/G` = the separate downstream Aegis stages D, E, F and G (G owns MG3), with A/B/C the evidence chain. No page text was edited. This record is evidence-only, not a keeper/index/ledger/register/manifest change, verdict or merge; Stage D/E/F/G remain separate. No synthetic test/passing check/approved design is presented as deployed or measured.
 
 **Signed with both names: true identity sd-e-794-r1 - stage role sd-c-read-b22-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
