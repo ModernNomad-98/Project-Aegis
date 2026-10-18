@@ -39,7 +39,7 @@ python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c0
 | # | Idx | Page | Git blob at 2db1ffb7 | Bytes / LF | Disposition | Named gaps (page line) |
 | --- | ---: | --- | --- | ---: | --- | --- |
 | P1 | 168 | `.claude/skills/model-poisoning-reviewer/references/poisoning-controls.md` | `7e1037624fe784eb970ea5f3c555de9d2e9af0d5` | 4,704 / 96 | **PARTIAL** | L6 `LLM04` before its L8 definition; L8 `LLM03` prior-edition code unexpanded |
-| P2 | 169 | `.claude/skills/multi-framework-crosswalk/SKILL.md` | `eef354211bd7cc239201eed913cc938f3e5ace39` | 10,475 / 186 | **PARTIAL** | L3 frontmatter `ISO`/`SOC`/`NIST AI RMF` before the L10-15 reading key (`ISO`/`SOC` never expanded); L68 `ID`; L106 `CC`; L139 `AICPA`; L150 `GRC` |
+| P2 | 169 | `.claude/skills/multi-framework-crosswalk/SKILL.md` | `eef354211bd7cc239201eed913cc938f3e5ace39` | 10,475 / 186 | **PARTIAL** | L3 frontmatter `ISO`/`SOC`/`NIST AI RMF` before the L10-15 reading key (`ISO`/`SOC` never expanded); L49 `IEC`; L68 `ID`; L106 `CC`; L139 `AICPA`; L150 `GRC` |
 | P3 | 170 | `.claude/skills/multi-framework-crosswalk/assets/crosswalk-row-template.md` | `e34042003a1eabc365a6dd025d6fec46a64cfe70` | 2,697 / 57 | **PARTIAL** | L17 `ISO/IEC` unexpanded; L20 `NIST` unexpanded; L28 `SOC` unexpanded |
 | P4 | 171 | `.claude/skills/multi-tenant-data-architect/SKILL.md` | `88b17a48094acbc299fa9e061e455887081d4015` | 12,867 / 217 | **PARTIAL** | L3 frontmatter `RLS` before its L35 expansion |
 | P5 | 172 | `.claude/skills/multi-tenant-data-architect/references/scoping-strategy-tradeoffs.md` | `112327fafa24d32d884015a5579cdf1bfd7c70d4` | 3,562 / 59 | **FULL** | none |
