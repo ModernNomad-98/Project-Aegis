@@ -41,11 +41,11 @@
 
 **Totals: 8 pages / 64,622 bytes / 1,174 LF / 0 FULL / 8 PARTIAL / 0 UNRUN / 0 edits.** Every full 40-hex blob resolves at the pinned ref and is identical at the implementation base (zero drift, verified by command); each page is in the 573-path pending set with no keeper row; no page is a read row in any merged lane record and none is in the #828/#829 reservations; no page outside the frozen eight is read or claimed.
 
-## 4.1 Systematic per-page token audit (convergence requirement)
+## 4A. Systematic per-page token audit (convergence requirement)
 
-**Method.** A read-only Python pass over the eight pages at pinned ref 2db1ffb7 extracted, per page, every uppercase token (`[A-Z][A-Z0-9]{1,5}`), every backticked coded identifier, and the viewport/edition-code classes; recorded the first-use line; and compared each first use against (a) a terms/reading-key block, (b) an in-place expansion on the first-use line, and (c) an expansion at or before that line. A token is **unexpanded** only when none of those exist at first use. Exclusions, applied uniformly: markdown heading structure, SQL/language keywords and code identifiers (e.g. `SELECT`, `COUNT`, `SUM`, `GROUP BY`, attribute names such as `inputmode`), file/path names (e.g. `SKILL.md`, `evals/evals.json`, `CONTRIBUTING`), uppercase emphasis words (e.g. MANUAL, BEFORE, DRAWS ON), placeholders (`<...>`), and product/protocol proper names (IndexedDB, SQLite, WebSocket, Diátaxis).
+**Method.** A read-only Python pass over the eight pages at pinned ref 2db1ffb7 extracted, per page, every uppercase token (`[A-Z][A-Z0-9]{1,7}`, length 2-8), every backticked coded identifier, and the viewport/edition-code classes; recorded the first-use line; and compared each first use against (a) a terms/reading-key block, (b) an in-place expansion on the first-use line, and (c) an expansion at or before that line. A token is **unexpanded** only when none of those exist at first use. Exclusions, applied uniformly: markdown heading structure, SQL/language keywords and code identifiers (e.g. `SELECT`, `COUNT`, `SUM`, `GROUP BY`, attribute names such as `inputmode`), file/path names (e.g. `SKILL.md`, `evals/evals.json`, `CONTRIBUTING`), uppercase emphasis words (e.g. MANUAL, BEFORE, DRAWS ON), placeholders (`<...>`), and product/protocol proper names (IndexedDB, SQLite, WebSocket, Diátaxis).
 
-| Page | Tokens inspected at first use | Unexpanded first-use token(s) found | Named in §3? |
+| Page | Tokens inspected at first use | Unexpanded first-use token(s) found | Named in §5? |
 | --- | --- | --- | --- |
 | P1 | all uppercase/backticked tokens L1-94 | **L3 N+1 (before the L4 definition)** | yes |
 | P2 | all uppercase/backticked tokens L1-245 | **L3 UX (reading key defines it only at L8)** | yes |
@@ -56,14 +56,14 @@
 | P7 | all uppercase/backticked tokens L1-175 | **L3 README; L33 PR; L53 comms** | yes |
 | P8 | all uppercase/backticked tokens L1-75 | **L7 API (defined only at L8); L47 comms** | yes |
 
-**Audit result:** 8 pages audited; the named-gap sets above are the complete unexpanded-first-use sets found at this pinned ref; every other abbreviation/acronym/coded identifier either is defined at or before first use or falls in the declared exclusions. The tally remains **0 FULL / 8 PARTIAL / 0 UNRUN** and no page needed an edit (none was made).
+**Audit result:** 8 pages audited; the named-gap sets above are the complete unexpanded-first-use sets **under the stated method and exclusions** at this pinned ref; every other abbreviation/acronym/coded identifier either is defined at or before first use or falls in the declared exclusions. The tally remains **0 FULL / 8 PARTIAL / 0 UNRUN** and no page needed an edit (none was made).
 
 ## 5. Page-level evidence (whole-page reads; B1-B6)
 
 ### P1 — `.claude/skills/n-plus-one-detector/references/chatty-access-patterns.md` (176; 4,820 B / 94 LF; read L1-94)
 **Purpose/normal use:** a companion catalog of chatty data-access patterns — N+1 classes, their evidence signatures and fix templates, IN-list chunking, counter instrumentation options, query-budget assertion patterns and static review cues — used with the N+1 detector skill.
 **B1 satisfied** — the H1 L1 and the L3-10 read-on-demand + terms paragraph state the page's role and how it is used; headings L12-84 structure it. **B2 partial** — **N+1 is used at L3 in the link text before its definition at L4**; ORM/SQL/APM/TTL are defined at L7-9 before their later uses; SQL keywords/code identifiers are excluded code tokens. **B3 satisfied** — pattern classes table L14-21, fix templates L23-46, IN-list chunking L48-54, counter options L56-63, assertion patterns L65-82 and static review cues L84-94 are concrete. **B4 satisfied** — reference/catalog page; no shipped-versus-proposed claim. **B5 satisfied** — the only link (L3, `../SKILL.md`) resolves; the code fence L67-76 contains assertion pseudo-calls, not executable shell commands. **B6 basis/limit** — git metadata differs from the reader identity but cannot prove non-authorship of owner-account commits or that a human performed the reading; **B6 independence UNVERIFIED**.
-**Quoted evidence (L3-9):** "Use these patterns with the [N+1 detector](../SKILL.md) ... **N+1** means one parent query followed by one child query for each of N results ... **ORM** means object-relational mapper, **SQL** means Structured Query Language, **APM** means application performance monitoring, and **TTL** means time to live."
+**Quoted evidence (L3-9):** "Use these patterns with the N+1 detector (../SKILL.md) ... **N+1** means one parent query followed by one child query for each of N results ... **ORM** means object-relational mapper, **SQL** means Structured Query Language, **APM** means application performance monitoring, and **TTL** means time to live."
 **Verdict: PARTIAL, no page edit. Named gaps: L3 N+1 before the L4 definition; B6 independence UNVERIFIED.**
 
 ### P2 — `.claude/skills/notification-webhook-ux-designer/SKILL.md` (177; 14,199 B / 245 LF; read L1-245)
@@ -75,7 +75,7 @@
 ### P3 — `.claude/skills/notification-webhook-ux-designer/references/notification-webhook-sheet.md` (178; 3,617 B / 80 LF; read L1-80)
 **Purpose/normal use:** companion tables for the notification/webhook designer — channel/default posture matrix, realtime-vs-digest decision guide, collapse/dedup patterns, webhook delivery-log fields and signing-secret rotation UX.
 **B1 satisfied** — H1 L1 and the L3-9 use/terms paragraph state the page's role and its use with the parent skill. **B2 partial** — **UX is first used in the L1 title before it is expanded at L3-4**; DM is defined at L5; HTTP and 2xx/4xx/5xx are expanded/defined at L6-7 before their L53 use; **UI is used at L56 without expansion**; skill names are excluded. **B3 satisfied** — the channel matrix L11-22, realtime/digest table L24-35, collapse/dedup L37-44, delivery-log fields L46-61, rotation UX L63-72 and boundaries L74-80 are concrete. **B4 satisfied** — reference tables; no shipped claim. **B5 satisfied** — the parent-skill link L3 resolves; no shell command. **B6 basis/limit** — metadata cannot prove non-authorship/human reading; **UNVERIFIED**.
-**Quoted evidence (L3-7):** "Use these tables with the [notification and webhook designer](../SKILL.md) to choose user-experience (UX) defaults ... **DM** means direct message. In Hypertext Transfer Protocol (HTTP), **2xx**, **4xx**, and **5xx** are success, client-error, and server-error response classes, respectively."
+**Quoted evidence (L3-7):** "Use these tables with the notification and webhook designer (../SKILL.md) to choose user-experience (UX) defaults ... **DM** means direct message. In Hypertext Transfer Protocol (HTTP), **2xx**, **4xx**, and **5xx** are success, client-error, and server-error response classes, respectively."
 **Verdict: PARTIAL, no page edit. Named gaps: L1 UX (expanded only at L3-4); L56 UI; B6 independence UNVERIFIED.**
 
 ### P4 — `.claude/skills/observability-operator/SKILL.md` (179; 11,094 B / 195 LF; read L1-195)
@@ -116,10 +116,10 @@
 
 ## 7. Provenance, no regression and declared limits
 
-- **Plan provenance:** plan comment **6246622264** (capture 2026-10-18T06:35:38Z; immutable by protocol) and Stage B ACCEPT **6246654264**; this record follows the plan's AC1-AC8 literally, including the §4.1 systematic token-audit requirement and the strict-B2 FULL bar.
+- **Plan provenance:** plan comment **6246622264** (capture 2026-10-18T06:35:38Z; immutable by protocol) and Stage B ACCEPT **6246654264**; this record follows the plan's AC1-AC8 literally, including the §4A systematic token-audit requirement and the strict-B2 FULL bar.
 - **Derivation base:** implementation base **f5cde4b7e269b5300080267f9c6f17ec27360f38**; pinned measurement ref **2db1ffb7**; lane derivation re-run at this base (§2).
 - **No regression:** no page, keeper, index, ledger, register, manifest, tool, test, workflow or plan file was changed; every page's blob at the pinned ref is identical at the implementation base (zero drift).
-- **Declared limits:** B6 is metadata-level and cannot prove a human read; the token audit's exclusions are stated in §4.1; placeholders are not abbreviations; no execution authority is claimed or granted.
+- **Declared limits:** B6 is metadata-level and cannot prove a human read; the token audit's exclusions are stated in §4A; placeholders are not abbreviations; no execution authority is claimed or granted.
 - **Lane status:** lane A complete (0-143); this is a lane-B block (176-183); reservations 160-167 (#828) and 168-175 (#829) are not touched; next block starts at 184.
 
 ## 8. AC status at this Stage C
@@ -128,9 +128,9 @@
 | --- | --- | --- |
 | AC1 One-path tree proof | **MET in this record/commit** | exactly one added record path; 0 modified/deleted; no plan file; the PR body states the live-base diff and base/head |
 | AC2 Frozen eight-page set by blob hash | **MET** | §4: eight paths with full 40-hex blobs and bytes/LF at pinned ref; zero drift at the implementation base; no page outside the set read |
-| AC3 Whole-page re-read evidence + systematic token audit | **MET** | §5: all eight pages read L1-last with B1-B6 page-line cites and quoted evidence; §4.1 systematic per-page token audit with method, coverage table, complete unexpanded set and conclusion |
+| AC3 Whole-page re-read evidence + systematic token audit | **MET** | §5: all eight pages read L1-last with B1-B6 page-line cites and quoted evidence; §4A systematic per-page token audit with method, coverage table, complete unexpanded set and conclusion |
 | AC4 Honest per-page disposition under the strict FULL bar | **MET** | 0 FULL / 8 PARTIAL / 0 UNRUN; every PARTIAL names its gaps; no upgrade; no acceptance/keeper row |
-| AC5 Record integrity, body and PROC-04 | **OWED after this file freezes** | record has one terminal LF, no CR, no trailing-whitespace line, no blank EOF; the PR body binds the plan, states the record facts outside this record and carries the recomputed PROC-04 |
+| AC5 Record integrity, body and PROC-04 | **OWED after this file freezes** | record has one terminal LF, no CR, no trailing-whitespace line, no blank EOF (these four byte-level properties were verified by command on the committed blob; the record never contains its own digest); the PR body binds the plan, states the record facts outside this record and carries the recomputed PROC-04 |
 | AC6 Codex loop plan | **OWED to Stage C/PR** | Codex is triggered at the exact head and its findings are triaged under AEGIS-APR-050 (fix + reply naming the fixing SHA + resolve, or head-bound unavailability after triage); the owner-merged DeepSeek review is not a Codex pass |
 | AC7 Provenance and no regression | **MET** | §1/§2/§7: plan binding, derivation base, lane/block derivation with reservations, zero drift, no page/keeper/index/ledger/register/manifest change |
 | AC8 Stage entry conditions | **MET for C** | C acts only on fresh B ACCEPT 6246654264 bound to plan 6246622264, branches from then-current main f5cde4b7, re-derives the pending set/lane/block, adds exactly the one record path in one DCO-signed model-attributed commit; D/E/F/G follow; no merge |
@@ -156,4 +156,4 @@ Stage D audits AC1-AC8 at this exact head; Stage E runs checks and records UNRUN
 
 **Boundary.** Stage C only: no page edited; no keeper/ledger/index/register/manifest/tool/test/workflow change; no committed plan file; no other PR touched (#828 and #829 read only); no Codex thread replied to or resolved; no merge.
 
-**Signed with both names: true identity sd-f-794-r1; stage role sd-c-read-b9-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
+**Signed with both names — true identity: sd-f-794-r1; stage role: sd-c-read-b9-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
