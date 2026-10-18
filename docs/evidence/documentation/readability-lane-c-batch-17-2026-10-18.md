@@ -1,7 +1,7 @@
 # Readability Phase 4 re-read lane C - Stage C batch record, batch 17, 2026-10-18
 
 **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Agent true identity **sd-f-794-r1**; stage role **sd-c-read-lc-392-c2**. Both names signed: sd-f-794-r1 (true identity) - sd-c-read-lc-392-c1 (stage role). Stage C only: one added record path; no plan file/other path/edit/merge.
-**Repair note (SD-C c2, answers SD-D 6256647818):** reclassified P8 L26 USING from class i/named gap to class iv/documented exclusion; refreshed dependent counts to i41/ii219/iii172/iv9/v25 and 8 defined/226 named/232 documented = 466; DCO enumeration now covers all three distinct commits (7e8dee49, 0cb14b59, this repair commit); no other content changed.
+**Repair note (SD-C c2, answers SD-D 6256647818 and Codex findings 4309139018/4309139026/4309139034):** reclassified P8 L26 USING from class i/named gap to class iv/documented exclusion; moved P2 L14 N row to its real first-use line L24; marked P1 L50 JSON defined at first use; restored the four Stage A rows byte-exactly from A-rows capture (1,497 B/4 LF, sha db2bff16); final counts i41/ii219/iii172/iv9/v25 and 9 defined/225 named/232 documented = 466; DCO enumeration now covers all four distinct commits over base..new head (7e8dee49, 0cb14b59, 01a2d35d, this repair commit); no other content changed.
 
 **Plan binding.** Accepted plan r1 **6256421522** (15,340 B / 120 LF, author sd-c-802-r4-codex / sd-a-read-lc-next-b17) + Stage B ACCEPT **6256438977**. Base/live main **a222d930289111aae32e2ba95880ffe6e52c100c** (53rd session record merge; PR #855 merged 2026-10-18T23:16:16Z; tree 3ec240a4). Pinned ref **2db1ffb7**. Branch head/tree/DCO/cumulative diff are measured from pushed git AFTER commit and echoed in the PR body and SD-C handoff; this record embeds no own digest or head placeholder.
 
@@ -134,7 +134,7 @@ Known-defect-class scan at extraction time: class-v lifecycle/status tokens are 
 | P1 | 44 | iii | docs/evidence/documentation/full-page-readability-batch-after-211-2026-09-24.md | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P1 | 45 | iii | docs/evidence/documentation/full-page-readability-batch-after-213-2026-09-24.md | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P1 | 49 | ii | inventory | named gap - first use before any expansion on this page |
-| P1 | 50 | i | JSON | named gap - first use before any expansion on this page |
+| P1 | 50 | i | JSON | defined at first use - expansion present on the first-use line |
 | P2 | 1 | ii | batch | named gap - first use before any expansion on this page |
 | P2 | 1 | ii | page | named gap - first use before any expansion on this page |
 | P2 | 3 | ii | records | named gap - first use before any expansion on this page |
@@ -171,7 +171,7 @@ Known-defect-class scan at extraction time: class-v lifecycle/status tokens are 
 | P2 | 23 | iii | .claude/skills/file-upload-storage-architect/SKILL.md | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P2 | 23 | ii | model | named gap - first use before any expansion on this page |
 | P2 | 24 | iii | .claude/skills/flaky-test-detective/SKILL.md | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
-| P2 | 14 | i | N | named gap - first use before any expansion on this page |
+| P2 | 24 | i | N | named gap - first use before any expansion on this page |
 | P2 | 24 | i | TALI | named gap - first use before any expansion on this page |
 | P2 | 25 | iii | .claude/skills/framework-edition-tracker/SKILL.md | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
 | P2 | 26 | iii | .claude/skills/framework-mapping-refresher/SKILL.md | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
@@ -541,15 +541,15 @@ Known-defect-class scan at extraction time: class-v lifecycle/status tokens are 
 | P8 | 42 | ii | inventory | named gap - first use before any expansion on this page |
 | P8 | 29 | ii | provider | named gap - first use before any expansion on this page |
 
-**Reconciliation and proof.** Total **466 rows = 466 unique keys / 0 duplicate normalized tokens**. Classes: i41 / ii219 / iii172 / iv9 / v25 = 466. Dispositions: 8 defined / 226 named gaps / 232 documented exclusions = 466. Per-page: P1 61; P2 62; P3 56; P4 59; P5 53; P6 55; P7 58; P8 62. Five-cell parse: 0 bad rows; every row token resolves to its real first-use line; section 4 dispositions and section 5 counts are aligned.
+**Reconciliation and proof.** Total **466 rows = 466 unique keys / 0 duplicate normalized tokens**. Classes: i41 / ii219 / iii172 / iv9 / v25 = 466. Dispositions: 9 defined / 225 named gaps / 232 documented exclusions = 466. Per-page: P1 61; P2 62; P3 56; P4 59; P5 53; P6 55; P7 58; P8 62. Five-cell parse: 0 bad rows; every row token resolves to its real first-use line; section 4 dispositions and section 5 counts are aligned.
 
 ## AC1-AC8 (record-side statuses)
 | AC | Status | Evidence |
 | --- | --- | --- |
-| AC1 one-path | MET in branch | exactly one added record path; no other tracked path; no plan file; three distinct DCO-signed commits over base..new head: 7e8dee49 (initial), 0cb14b59 (link-fence repair), and this repair commit; actual post-commit count/SHA measured from pushed git in PR body/SD-C handoff |
+| AC1 one-path | MET in branch | exactly one added record path; no other tracked path; no plan file; four distinct DCO-signed commits over base..new head: 7e8dee49 (initial), 0cb14b59 (link-fence repair), 01a2d35d (classification/DCO repair), and this repair commit; actual post-commit count/SHA measured from pushed git in PR body/SD-C handoff |
 | AC2 frozen pages | MET | eight 40-hex pinned blobs, bytes/LF; all resolve at 2db1ffb7 and are byte-identical at base a222d930; zero drift/no re-pin |
 | AC3 whole-page + inventory | MET | whole-page L1-last and B1-B6 per page; ONE contiguous five-class inventory; real first-use lines; zero duplicates; five-cell proof; known defect classes checked |
-| AC4 dispositions | MET | 8 defined / 226 named gaps / 232 documented exclusions = 466; B4 per page; B6 UNVERIFIED; 0F/8P/0U; no keeper upgrade |
+| AC4 dispositions | MET | 9 defined / 225 named gaps / 232 documented exclusions = 466; B4 per page; B6 UNVERIFIED; 0F/8P/0U; no keeper upgrade |
 | AC5 record/body/PROC | MET in body | record facts outside; witness/skills/security bound fields; PROC-04 recomputed from live final body and published with literal full+short digest; checker 0 |
 | AC6 Codex | honest post-C | Codex never a pass; trigger/triage/thread state reported in SD-C handoff; MG3 G-only |
 | AC7 provenance | MET | plan/B binding; base a222d930; 53 merges; block392-399 batch 17; one path; capture basis a222d930; no head placeholder |
@@ -561,10 +561,10 @@ Known-defect-class scan at extraction time: class-v lifecycle/status tokens are 
 
 | Skill | Stage / agent | How applied | Result / evidence |
 | --- | --- | --- | --- |
-| [`acceptance-criteria-reviewer`](.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ `c6e5d5649bf8` | Stage A plan / `sd-a-read-lc-next-b17` (true identity `sd-c-802-r4-codex`; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Bound canonical/ACs to block 392-399; B4 per page; B6 UNVERIFIED | canonical exact; B4 per page; B6 unverified |
-| [`source-of-truth-reconciler`](.claude/skills/source-of-truth-reconciler/SKILL.md) @ `b5fd9feda972` | Stage A plan / `sd-a-read-lc-next-b17` (true identity `sd-c-802-r4-codex`; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Re-ran check_index; 155 quarters; 59 records; eight pages | 734/107/6/611/6/4/627; union617; block392-399; 41,849/378; 0 read-row hits |
-| [`change-classification-gate`](.claude/skills/change-classification-gate/SKILL.md) @ `08d91a834460` | Stage A plan / `sd-a-read-lc-next-b17` (true identity `sd-c-802-r4-codex`; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Docs-only one added record path | one record path; absent at main |
-| [`skill-usage-ledger`](.claude/skills/skill-usage-ledger/SKILL.md) @ `6a27b5c8e690` | Stage A plan / `sd-a-read-lc-next-b17` (true identity `sd-c-802-r4-codex`; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Authored account/capture | four rows/sources; non-zero binding |
+| [`acceptance-criteria-reviewer`](.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ `c6e5d5649bf8` | Stage A plan / `sd-a-read-lc-next-b17` (true identity `sd-c-802-r4-codex`; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Bound canonical B1-B6/AC1-AC8 to derived lane C block 392-399 plan; B4 per page, B6 UNVERIFIED. | canonical exact; B4 per page; B6 unverified |
+| [`source-of-truth-reconciler`](.claude/skills/source-of-truth-reconciler/SKILL.md) @ `b5fd9feda972` | Stage A plan / `sd-a-read-lc-next-b17` (true identity `sd-c-802-r4-codex`; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Re-ran check_index at a222d930289111aae32e2ba95880ffe6e52c100c; derived fresh 155 quarters, lane/block/batch, 59 lane records, eight pages. | 734/107/6/611/6/4/627; union617; block392-399; 41,849/378; 0 read-row hits |
+| [`change-classification-gate`](.claude/skills/change-classification-gate/SKILL.md) @ `08d91a834460` | Stage A plan / `sd-a-read-lc-next-b17` (true identity `sd-c-802-r4-codex`; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only one added record path; no other change. | one record path; absent at main |
+| [`skill-usage-ledger`](.claude/skills/skill-usage-ledger/SKILL.md) @ `6a27b5c8e690` | Stage A plan / `sd-a-read-lc-next-b17` (true identity `sd-c-802-r4-codex`; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Authored Stage A account; rows/sources/six fields; retained capture. | four rows/sources; non-zero binding |
 
 ```
 ```text
