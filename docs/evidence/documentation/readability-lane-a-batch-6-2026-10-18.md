@@ -7,7 +7,7 @@ Agent: **sd-d-802-r3** (stage role **sd-c-read-b6-c1**; DeepSeek V4 Flash (deeps
 ## 1. Scope and diff accounting
 
 - **Added: exactly one path** — `docs/evidence/documentation/readability-lane-a-batch-6-2026-10-18.md`. **Modified: 0. Deleted: 0.** No keeper row, index JSON edit, ledger edit, page edit, register edit, manifest edit, tool/test/workflow change, plan file or other documentation change. Change class **`docs-only`**.
-- **Eight pages read, zero pages edited**; every page's net line change is 0. The record's own commit is DCO-signed and model-attributed; a repair commit at the reviewed head, if any, updates this provenance paragraph and adds itself to the commit list so the line cannot go stale.
+This record is carried by two DCO-signed commits: the initial commit at `7fd41cf3f8cd0c902f99cef1beaaefb34ec8cbf8` and this repair commit, whose message also carries the explicit model-attribution line (`Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).`); this paragraph is updated by that repair commit so the line cannot go stale.
 - The record itself is not an accepted page: it is a new reader page and enters the pending set as **no_recorded_acceptance** pending its own later review — the self-cost every batch record states.
 
 ## 2. Lane derivation at this base — re-run, not handed down
@@ -20,11 +20,11 @@ python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c0
 
 **Observed summary:** compared_ref **2db1ffb7985ddc1c087c455740fd59e962967461**; reader_pages_in_tree **690**; accepted_on_recorded_review **107**; provably_pending **6**; no_recorded_acceptance **567**; recorded_acceptance_within_10_lines **0**; cannot_decide **6**; withdrawn_pending_rereview **0**; partial_disposition_pending **4**; official_pending_count **583**. The pinned ref is the merged index's own `built_at_ref`.
 
-**Lane arithmetic (computed):** the pending set is `no_recorded_acceptance + provably_pending` = **567 + 6 = 573** paths sorted by repository path; `ceil(573 / 4)` = **144**. **Lane A = indices 0–143** (first `docs/approvals/APPROVAL_REGISTER.md`, last `tools/readability_acceptance/README.md`); lanes B/C/D partition the remainder. The six `cannot_decide` pages belong to no lane; the four partial pages are gaps and are not in the lane buckets.
+**Lane A = indices 0–143** (first `.claude/skills/adr-writer/assets/adr-template.md`, last `.claude/skills/inter-agent-comms-reviewer/SKILL.md`); lanes B/C/D partition the remainder. The six `cannot_decide` pages belong to no lane; the four partial pages are gaps and are not in the lane buckets.
 
 **Read set and this batch's frontier.** The merged lane A batch records on main are A1, A2, A3, A4 (two batch-4 records) and A5; their per-page read rows name the lane A read set. The contiguous read frontier is **index 23**: batches 3, 4 and 5 read indices **0–7**, **8–15** and **16–23** (the batch-1 and batch-5 records also name this block only as a **next-batch candidate list**, a mention that is not a read row and is not counted — the rule that excluded the erroneous 0–31 derivation). The next eight contiguous unread pages are therefore **lane A indices 24–31**, and they are the eight pages of this batch (P1–P8).
 
-**Eligibility of the eight candidates (re-checked, not assumed):** for each page, `check_index.py --path <page> --ref 2db1ffb7 --json` reports `no_recorded_acceptance` = **1** and `official_pending_count` = **1** — each is pending, has **no keeper row**, and is not in the accepted/provably-pending/cannot-decide/partial/withdrawn buckets. None of the eight appears as a **read row** in any lane A batch record (the only occurrences are the candidate-list mentions in batch 1 and batch 5, which are not reads), and **zero drift** is measured for all eight (`git diff --numstat 2db1ffb7?..HEAD -- <page>` is empty).
+**Eligibility of the eight candidates (re-checked, not assumed):** for each page, `check_index.py --path <page> --ref 2db1ffb7 --json` reports `no_recorded_acceptance` = **1** and `official_pending_count` = **1** — each is pending, has **no keeper row**, and is not in the accepted/provably-pending/cannot-decide/partial/withdrawn buckets. None of the eight appears as a **read row** in any lane A batch record (the only occurrences are the candidate-list mentions in batch 1 and batch 5, which are not reads), and **zero drift** is measured for all eight (`git diff --numstat 2db1ffb7985ddc1c087c455740fd59e962967461..HEAD -- <page>` is empty).
 
 ## 3. The eight pages — eligibility, blob IDs, bytes/LF, provenance
 
@@ -39,7 +39,7 @@ python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c0
 | P7 | `.claude/skills/ai-governance-risk-reviewer/SKILL.md` | 30 | no_recorded_acceptance | `bce27076c53775f7c0fd237c077852c9c44dce50` | 10,630 / 178 | `5b4d2018afbb` | Peter Nguyen | 6 |
 | P8 | `.claude/skills/ai-governance-risk-reviewer/references/ai-governance-framework.md` | 31 | no_recorded_acceptance | `415f87f4a665863bfffd5ed970ecf7e724a9d500` | 5,047 / 98 | `8459ac73ba6e` | Peter Nguyen | 5 |
 
-**Totals: 75,487 B / 1,323 LF** across the eight pages, measured per page with `git cat-file -s` and a newline count (not transcribed); the per-page figures above match the plan's frozen table. All eight full 40-hex blob IDs were computed with `git rev-parse 2db1ffb7?:<page>` and resolve at the pinned ref. Each last-touching commit and author was measured with `git log -1 --format='%H|%an|%ad|%s' -- <page>` and the all-author commit count with `git rev-list --count 2db1ffb7 -- <page>`; the only author identity in these pages' histories is Peter Nguyen, who is not the Stage C agent.
+**Totals: 75,487 B / 1,323 LF** across the eight pages, measured per page with `git cat-file -s` and a newline count (not transcribed); the per-page figures above match the plan's frozen table. All eight full 40-hex blob IDs were computed with `git rev-parse 2db1ffb7985ddc1c087c455740fd59e962967461:<page>` and resolve at the pinned ref. Each last-touching commit and author was measured with `git log -1 --format='%H|%an|%ad|%s' -- <page>` and the all-author commit count with `git rev-list --count 2db1ffb7985ddc1c087c455740fd59e962967461 -- <page>`; the page histories include two author identities, Peter Nguyen and nguyenpv1980-wq; the last-touching author column is Peter Nguyen, and neither identity is the Stage C agent.
 
 ## 4. Per-page read detail — ranges, the six acceptance bullets, purpose restatements, verdicts
 
@@ -49,9 +49,9 @@ Every page was read **whole, line by line, as prose**, at the bound revision (ma
 
 **P1 — `.claude/skills/ai-closeout-reporter/SKILL.md`** — read whole, **L1–170**, one read, no display elision. Purpose and normal use (restated from the page alone): a task-closeout reporting skill whose report makes scope reductions explicit — eight sections always present (summary; intentionally not done/omitted; files touched; tests and validation actually run; evidence trace; risks; skipped validation; next actions), with mandatory 'None.' when nothing was omitted and evidence tied to the exact commit SHA or CI run.
 
-Quoted evidence: The page states at L13: `The report's defining feature is mandatory disclosure of scope reductions`.
+Quoted evidence: The page states at L16–L17: `The report's defining feature is mandatory disclosure of scope reductions`.
 
-Bullets: B1 satisfied — L1 title; L3 frontmatter description; L8 reading key; L13 Purpose; L20 Use When. B2 satisfied — PR, CI and SHA are expanded in the reading key L8; AI is expanded in the title L6 and the description; no unexpanded coded identifier found. B3 satisfied — eight-section output block L57–L78, per-deliverable trace guidance L45–L56, concrete example commands (`git status`, `git diff --stat`) L24–L28. B4 satisfied — guidance about reporting, no shipped-versus-proposed claim about a running system. B5 satisfied — the asset link `assets/closeout-template.md` resolves (checked, section 7), the evals files exist, and all named neighbouring skills exist in the manifest. **B6 not established — reader independence is UNVERIFIED (section 6).**
+Bullets: B1 satisfied — L6 title; L3 frontmatter description; L8 reading key; L12 Purpose; L21 Use When. B2 satisfied — PR, CI and SHA are expanded in the reading key L8; AI is expanded in the title L6 and the description L3; no unexpanded coded identifier found. B3 satisfied — the eight-section output block L88–L105, per-deliverable trace guidance L100–L101, concrete example commands (`git status`, `git diff --stat`) L42–L43.
 
 **Verdict: PARTIAL, no edit.** Named gap: **B6 independence UNVERIFIED**. No page line is edited.
 
@@ -59,15 +59,15 @@ Bullets: B1 satisfied — L1 title; L3 frontmatter description; L8 reading key; 
 
 Quoted evidence: The page states at L3: `Use all eight headings in this order.`
 
-Bullets: B1 satisfied — L1 title; L3 'Use all eight headings in this order'; L70 'REQUIRED ALWAYS'. B2 satisfied — the reading key L7–L8 defines PR, CI, URL, SHA, head, diff, exit code and migration; ID appears only inside the plain phrase 'unique ID'. B3 satisfied — the template shows all eight headings with concrete table headers and placeholder examples L45–L55. B4 satisfied — template guidance only; no running-system claim. B5 satisfied — no relative links to resolve (the owning SKILL links this asset; the asset links nothing that is missing); all placeholders are angle-bracket text, not dead paths. **B6 not established — reader independence is UNVERIFIED.**
+B1 satisfied — L1 title; L3 'Use all eight headings in this order'; L18 'REQUIRED ALWAYS'. B2 satisfied — the definitions sentence L7–L8 expands PR, CI, URL, SHA, head, diff and exit code; ID appears only inside the plain phrase 'unique ID'. B3 satisfied — the template shows all eight headings (headings L12–L77) with concrete table headers and angle-bracket placeholder rows (for example the evidence table L49–L61).
 
 **Verdict: PARTIAL, no edit.** Named gap: **B6 independence UNVERIFIED**. No page line is edited.
 
 **P3 — `.claude/skills/ai-cost-guardrail-designer/SKILL.md`** — read whole, **L1–322**, one read, no display elision. Purpose and normal use (restated from the page alone): a design skill for LLM cost and consumption guardrails under OWASP LLM06 — per-request caps, per-principal budgets and token/cost-aware rate limits (estimate then true-up), tenant-scoped FIFO queues, concurrency/loop bounds, fail-closed checks (CWE-636), kill switch, degraded mode, provider-side spend backstop, LLMjacking credential handling, attribution telemetry and residual-exposure acceptance.
 
-Quoted evidence: The page states at L25–L27: `every guardrail must FAIL CLOSED ... or it becomes the denial-of-wallet vector it was meant to stop (CWE-636)`.
+Quoted evidence: The page states at L28–L29: `a cost/rate/budget check that errors DENIES the call, or it becomes the denial-of-wallet vector it was meant to stop (CWE-636)`.
 
-Bullets: B1 satisfied — L1 title; L3 description; L7 reading key; L18 Purpose; L30 Use When. B2 satisfied — LLM, OWASP, CWE, API, CI, LLMjacking and FIFO are expanded in the description/reading key L3–L16; IP is expanded at L258 ('Internet Protocol (IP)'); no unexpanded coded identifier found. B3 satisfied — ten-step workflow L62–L157, copyable output block L160–L186, validation checklist L188–L211, AI Security Rules L213–L247 and concrete examples. B4 satisfied — L3–L16 and Stop Conditions L281–L306 separate design from applied enforcement; provider backstop is flagged as verify-at-design-time, not built. B5 satisfied — `references/cost-guardrail-patterns.md` resolves, the evals files exist, all named skills exist in the manifest, and no shell command contract is asserted. **B6 not established — reader independence is UNVERIFIED.**
+B1 satisfied — L6 title; L3 description; L8 reading key; L19 Purpose; L40 Use When. B2 satisfied — LLM, OWASP, CWE, API, CI, LLMjacking and FIFO are expanded in the description/reading key L3–L16; IP is expanded at L258 ('Internet Protocol (IP)'); no unexpanded coded identifier found. B3 satisfied — ten-step workflow L85–L179, copyable output block L181–L199, validation checklist L201–L227, AI Security Rules L229–L259 and concrete examples. B4 satisfied — L3–L16 and Stop Conditions L291–L308 separate design from applied enforcement; provider backstop is flagged as verify-at-design-time, not built.
 
 **Verdict: PARTIAL, no edit.** Named gap: **B6 independence UNVERIFIED**. No page line is edited.
 
@@ -83,31 +83,31 @@ Bullets: B1 satisfied — L1 title; L3 'Detail for the owning AI Cost Guardrail 
 
 Quoted evidence: The page states at L84: `JavaScript Object Notation (JSON) assertions` and at L3 `MANUAL-ONLY; never auto-invoke`.
 
-Bullets: B1 satisfied — L1 title; L3 description (manual-only); L10 reading key; L20 Purpose; L29 Use When. B2 satisfied — LLM and CI are expanded in the description/reading key L3–L10; JSON is expanded at L84 ('JavaScript Object Notation (JSON)'); D3 is explained in the reading key L10; MANUAL-ONLY is explained in the description L3 and purpose L20. B3 satisfied — seven-step workflow L57–L120, copyable output block L122–L136, validation checklist L138–L160, concrete grader examples and cost formula L62–L70. B4 satisfied — the manual-only boundary, the not-run/deferred output field and Stop Conditions L188–L201 separate design from execution. B5 satisfied — `references/eval-harness-design.md` resolves, the evals files exist, all named skills exist in the manifest (the `ai-security-red-team-reviewer` reference is a repository agent, checked present), and no shell command contract is asserted. **B6 not established — reader independence is UNVERIFIED.**
+B1 satisfied — L7 title; L3 description (manual-only); L9 reading key; L15 Purpose; L30 Use When. B2 satisfied — LLM and CI are expanded in the description/reading key L3–L10; JSON is expanded at L84 ('JavaScript Object Notation (JSON)'); D3 is explained in the reading key L10; MANUAL-ONLY is explained in the description L3 and purpose L15. B3 satisfied — seven-step workflow L61–L105, copyable output block L107–L118, validation checklist L120–L134, concrete grader examples and the cost formula L63–L76. B4 satisfied — the manual-only boundary, the not-run/deferred output field L116–L117 and Stop Conditions L166–L179 separate design from execution.
 
 **Verdict: PARTIAL, no edit.** Named gap: **B6 independence UNVERIFIED**. No page line is edited.
 
 **P6 — `.claude/skills/ai-evaluation-harness/references/eval-harness-design.md`** — read whole, **L1–115**, one read, no display elision. Purpose and normal use (restated from the page alone): the owning skill's design reference — dataset composition (representative/adversarial/regression), dimensions and thresholds, grader selection, security-suite assertion patterns, CI gate design, non-determinism handling and D3 honesty.
 
-Quoted evidence: The page states at L113–L125: `Report only runs that actually executed, with real numbers and real spend.`
+Quoted evidence: The page states at L113–L114: `Report only runs that actually executed, with real numbers and real spend.`.
 
-Bullets: B1 satisfied — L1 title; L3 'This reference helps developers design...'; L5–L7 owning-skill and security-source orientation. B2 satisfied — AI, LLM, CI, PR, p95, ROUGE and N are defined in the reading key L11–L15 and at first use. B3 satisfied — three case classes with required fields L23–L34, dimension/threshold table L36–L46, grader rubric and security assertion patterns L48–L83, gate and non-determinism sections, concrete examples. B4 satisfied — design guidance only; the D3 section L108–L115 states what must not be claimed. B5 satisfied — the `../SKILL.md` link, the reconciliation section link and the behavioral-eval-runner README link all resolve at the pinned ref (checked, section 7); no shell command contract is asserted. **B6 not established — reader independence is UNVERIFIED.**
+B1 satisfied — L1 title; L3–L8 orientation (owning skill, security source and the manual-only execution boundary). B2 satisfied — AI, LLM, CI, PR, p95, ROUGE and N are defined in the reading key L10–L19 and at first use. B3 satisfied — three case classes with required fields L21–L43, the dimensions/thresholds section L45–L57, the grader rubric and security assertion patterns L59–L88, the CI-gate and non-determinism sections L90–L107, and concrete examples. B4 satisfied — design guidance only; the D3 section L109–L116 states what must not be claimed.
 
 **Verdict: PARTIAL, no edit.** Named gap: **B6 independence UNVERIFIED**. No page line is edited.
 
 **P7 — `.claude/skills/ai-governance-risk-reviewer/SKILL.md`** — read whole, **L1–178**, one read, no display elision. Purpose and normal use (restated from the page alone): a governance-and-risk review skill — internal impact tiering, oversight matched to tier, accountable owner, transparency/consent, data governance, model/feature card, obligation-to-control mapping and a PASS/CONDITIONAL/BLOCK verdict with named gaps routed to owners.
 
-Quoted evidence: The page states at L49: `Set an internal impact tier.` and at L51 `This heuristic does not classify the system under the EU AI Act; route that legal determination to counsel.`
+Quoted evidence: The page states at L66: `Set an internal impact tier.` and at L70–L71: `This heuristic does not classify the system under the EU AI Act; route that legal determination to counsel.`.
 
-Bullets: B1 satisfied — L1 title; L3 description; L8 reading key; L20 Purpose; L28 Use When. B2 satisfied — EU, NIST AI RMF, HITL, HOTL, PII, UX, PR and SDLC are expanded in the reading key L8–L18 and the description L3; no unexpanded coded identifier found that this page relies on. B3 satisfied — eight-step workflow L49–L84, copyable output block L86–L98, validation checklist L100–L112, concrete examples and Gotchas. B4 satisfied — L3 and Purpose L20 distinguish the organizational/risk layer from technical threat modeling and one-change process audit; Stop Conditions L154–L167 separate review from live response. B5 satisfied — `references/ai-governance-framework.md` resolves, the evals files exist, all named skills/agents exist in the manifest or agent tree, and no shell command contract is asserted. **B6 not established — reader independence is UNVERIFIED.**
+B1 satisfied — L6 title; L3 description; L8–L16 reading key; L18 Purpose; L31 Use When. B2 satisfied — EU, NIST AI RMF, HITL, HOTL, PII, UX, PR and SDLC are expanded in the reading key L8–L16 and the description L3; no unexpanded coded identifier found that this page relies on. B3 satisfied — eight-step workflow L64–L102, copyable output block L104–L119, validation checklist L121–L135, concrete examples and Gotchas L137–L155. B4 satisfied — L3 and Purpose L18–L29 distinguish the organizational/risk layer from technical threat modeling and one-change process audit; Stop Conditions L157–L168 separate review from live response.
 
 **Verdict: PARTIAL, no edit.** Named gap: **B6 independence UNVERIFIED**. No page line is edited.
 
 **P8 — `.claude/skills/ai-governance-risk-reviewer/references/ai-governance-framework.md`** — read whole, **L1–98**, one read, no display elision. Purpose and normal use (restated from the page alone): the owning skill's framework reference — internal risk-tiering rubric and review bands, oversight-to-tier matrix, model/feature card template, NIST AI RMF obligation-to-control scaffold, data-governance checks and verdict discipline, with the EU AI Act explicitly flagged for legal review.
 
-Quoted evidence: The page states at L8–L13: `This is a mapping scaffold, NOT legal advice ? flag items for counsel.`
+Quoted evidence: The page states at L14–L15: `This is a mapping scaffold, NOT legal advice — flag items for counsel.`.
 
-Bullets: B1 satisfied — L1 title; L3 use-with-owning-skill orientation; L4–L9 method and legal-boundary statement. B2 satisfied — AI, NIST, AI RMF, EU, PII, HITL and HOTL are expanded in the opening lines L2–L13; PASS/CONDITIONAL/BLOCK are defined in the Verdict discipline section L93–L96; the RMF function names are explained in the mapping table L68–L76. B3 satisfied — six-axis rubric table L14–L21, oversight matrix L36–L41, card template L43–L53, obligation table L68–L76, data-governance checklist and verdict discipline, with concrete examples. B4 satisfied — the text states the tier rubric is an internal heuristic, not an EU AI Act classification (L8–L13), and flags legal review; the external consolidated-text link is a pointer, not a claim of compliance. B5 satisfied — `../SKILL.md` link resolves; the two external EU regulation links cannot be checked offline and are declared in section 8; no shell command contract is asserted. **B6 not established — reader independence is UNVERIFIED.**
+B1 satisfied — L1 title; L3–L4 use-with-owning-skill orientation; L4–L15 method and legal-boundary statement. B2 satisfied — AI, NIST, AI RMF, EU, PII, HITL and HOTL are expanded in the opening lines L3–L15; PASS/CONDITIONAL/BLOCK are defined in the Verdict discipline section L93–L96; the RMF function names are explained in the mapping table L68–L81. B3 satisfied — six-axis rubric table L22–L29 (section L17–L40), oversight-to-tier matrix L41–L53, card template L55–L66, obligation table L68–L81, data-governance checklist L82–L92 and verdict discipline L93–L96, with concrete examples. B4 satisfied — the text states the tier rubric is an internal heuristic, not an EU AI Act classification (L8–L15), and flags legal review; the external consolidated-text link is a pointer, not a claim of compliance.
 
 **Verdict: PARTIAL, no edit.** Named gap: **B6 independence UNVERIFIED**; the external-link reachability is an unverified external dependency (section 8). No page line is edited.
 
@@ -128,9 +128,9 @@ Bullets: B1 satisfied — L1 title; L3 use-with-owning-skill orientation; L4–L
 
 ## 6. Provenance and independence (stated, not assumed)
 
-- **Blob IDs:** the eight full 40-hex IDs in section 3 were computed with `git rev-parse 2db1ffb7?:<page>` and each resolves at the pinned ref.
+- **Blob IDs:** the eight full 40-hex IDs in section 3 were computed with `git rev-parse 2db1ffb7985ddc1c087c455740fd59e962967461:<page>` and each resolves at the pinned ref.
 - **Last-touching commits:** measured with `git log -1 --format='%H|%an|%ad|%s' -- <page>`; abbreviated commit and author are in section 3, full hashes and subjects in the SD-C handoff. Per-page commit-attribution counts are the 'Commits touching' column.
-- **Author identity in the page histories:** Peter Nguyen; not the Stage C agent, and no page was edited by this PR.
+- **Author identities in the page histories:** Peter Nguyen and nguyenpv1980-wq (last-touching author: Peter Nguyen); neither is the Stage C agent, and no page was edited by this PR.
 - **Independence is UNVERIFIED.** Git author metadata cannot prove that the reader is not an author; no claim is made that the reader never wrote any of the pages. **B6 therefore fails for all eight pages**, which is why every disposition is PARTIAL and no keeper row is offered (section 5). A later re-read can clear B6 only with evidence outside git metadata.
 - **Prior-attempt history:** no prior batch-6 record exists on main; the eight candidates appear in batch 1 and batch 5 only as candidate-list mentions, not as read rows, and this record does not reuse any row material from them.
 
@@ -139,18 +139,18 @@ Bullets: B1 satisfied — L1 title; L3 use-with-owning-skill orientation; L4–L
 | # | Command | Result |
 | --- | --- | --- |
 | 1 | `git rev-parse origin/main` in the fresh clone | `147479583fc498c50028f1b7dbf8311c8708544e` |
-| 2 | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7? --json` | exit 0; summary in section 2 (690 / 107 / 6 / 567 / 0 / 6 / 0 / 4 / 583) |
-| 3 | `python -P -B tools/readability_acceptance/check_index.py --path <page> --ref 2db1ffb7? --json` × 8 | exit 0; each page: `no_recorded_acceptance` 1, `official_pending_count` 1 |
-| 4 | `git rev-parse 2db1ffb7?:<page>` × 8 | eight full blob IDs in section 3 |
-| 5 | `git cat-file -s 2db1ffb7?:<page>` × 8 and newline count | bytes/LF in section 3; per-page figures match the plan's frozen table |
-| 6 | `git diff --numstat 2db1ffb7?..HEAD -- <page>` × 8 | empty for all eight — zero drift |
-| 7 | `git log -1 --format='%H|%an|%ad|%s' -- <page>` × 8; `git rev-list --count 2db1ffb7 -- <page>` × 8 | provenance table in section 3 |
-| 8 | `git show 2db1ffb7?:<page>` and full-line reads of each page | purpose restatements and B1–B6 verdicts in section 4 |
+| 2 | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740fd59e962967461 --json` | exit 0; summary in section 2 (690 / 107 / 6 / 567 / 0 / 6 / 0 / 4 / 583) |
+| 3 | `python -P -B tools/readability_acceptance/check_index.py --path <page> --ref 2db1ffb7985ddc1c087c455740fd59e962967461 --json` × 8 | exit 0; each page: `no_recorded_acceptance` 1, `official_pending_count` 1 |
+| 4 | `git rev-parse 2db1ffb7985ddc1c087c455740fd59e962967461:<page>` × 8 | eight full blob IDs in section 3 |
+| 5 | `git cat-file -s 2db1ffb7985ddc1c087c455740fd59e962967461:<page>` × 8 and newline count | bytes/LF in section 3; per-page figures match the plan's frozen table |
+| 6 | `git diff --numstat 2db1ffb7985ddc1c087c455740fd59e962967461..HEAD -- <page>` × 8 | empty for all eight — zero drift |
+| 7 | `git log -1 --format='%H|%an|%ad|%s' -- <page>` × 8; `git rev-list --count 2db1ffb7985ddc1c087c455740fd59e962967461 -- <page>` × 8 | provenance table in section 3 |
+| 8 | `git show 2db1ffb7985ddc1c087c455740fd59e962967461:<page>` and full-line reads of each page | purpose restatements and B1–B6 verdicts in section 4 |
 | 9 | grep line checks: `FIFO` (P4 L36), `URL` (P4 L54), `API` (P4 L61), `CWE` (P4 L64) | each is a first-use/unexpanded abbreviation gap named in §4/§5 |
-| 10 | relative-link existence checks for every link in the eight pages (`git cat-file -e 2db1ffb7?:<target>`) | all 14 relative links resolve; two external EU regulation URLs are unverified external dependencies (section 8) |
+| 10 | relative-link existence checks for every link in the eight pages (`git cat-file -e 2db1ffb7985ddc1c087c455740fd59e962967461:<target>`) | all 14 relative links resolve; two external EU regulation URLs are unverified external dependencies (section 8) |
 | 11 | `python -B scripts/ci/check-markdown-links.py <8 pages>` | exit 0 |
 | 12 | `python -P scripts/validate-skills.py` | exit 0 — `OK: 205 skill(s) valid, 0 warning(s)` |
-| 13 | `git diff --check`, DCO, PR-body bound-field checker, hosted CI at the head, Codex ledger | recorded in the pull request body and the SD-C handoff after the commit (a record cannot cite its own not-yet-made commit) |
+| 13 | `git diff --check`, DCO, PR-body bound-field checker, hosted CI at the new head, Codex ledger | recorded in the pull request body and the repair SD-C handoff after the repair commit (a record cannot cite its own not-yet-made commit) |
 
 ## 8. What this batch could not verify (stated, not hidden)
 
