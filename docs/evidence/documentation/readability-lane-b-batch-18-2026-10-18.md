@@ -10,10 +10,11 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | --- | --- |
 | Plan of record | merged PR #834 issue comment **6248432832** (14,619 B; immutable; author sd-e-802-r1 / sd-a-read-b18-r1) |
 | Stage B audit | **6248458364 ACCEPT** - canonical B1-B6 verbatim; frontier 248-255/batch 18 confirmed; eight pages 63,988 B / 1,085 LF reproduce |
-| Live base | main **e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f** = 33rd session record merge (PR #834 merged; first parent 84a5295d) |
-| Merge attribution | e7acaca4 = #834 33rd; 84a5295d = #831 32nd; 655e40ea = #828 31st; 883bf690 = #832 30th |
+| Live base | main **a141c64f52e3ca62300e6afbd6204dfd4a17c670** = 34th session record merge (PR #836 merged at 2026-10-18T10:16:27Z; first parent e7acaca4) |
+| Merge attribution | a141c64f = #836 34th; e7acaca4 = #834 33rd; 84a5295d = #831 32nd; 655e40ea = #828 31st; 883bf690 = #832 30th |
 | Merged lane-B rows | **144-199 AND 208-215** (batches 2/2r/3/5/6/7/8/9/10/11/13) |
-| Open reservations (not read) | **#833 200-207; #835 216-223; #836 224-231; #837 232-239; #838 240-247** |
+| Merged lane-B rows | **144-199 + 208-215 + 224-231** (batch 15 #836 merged at 34th) |
+| Open reservations (not read) | **#833 200-207; #835 216-223; #837 232-239; #838 240-247** |
 | This block | **P1-P8 = pending indices 248-255**, lane B batch **18** |
 | Next unread after block | **256** .claude/skills/security-pr-reviewer/SKILL.md (not read here) |
 | Pinned ref / instrument | 2db1ffb7; instrument run at base: 690 / 107 / 6 / 567 / 0 / 6 / 0 / 4 / official 583; pending 573; lane A 0-143 complete; lane B 144-287 |
@@ -32,7 +33,7 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | P8 | 255 | .claude/skills/security-logging-alerting-architect/references/security-event-coverage-sheet.md | d6fb69dd169f25bcd6c6944f464277c4fa4b7a86 | 4,187 / 55 | pending; no keeper; unread; outside reservations; zero drift |
 | **Totals** | | **eight pages** | | **63,988 / 1,085** | |
 
-**Totals: 8 pages / 63,988 bytes / 1,085 LF / 0 FULL / 8 PARTIAL / 0 UNRUN / 0 edits.** Every 40-hex blob resolves at pinned ref 2db1ffb7 and is identical at live base e7acaca4 (zero drift); all eight are pending with no keeper and outside the open reservations.
+**Totals: 8 pages / 63,988 bytes / 1,085 LF / 0 FULL / 8 PARTIAL / 0 UNRUN / 0 edits.** Every 40-hex blob resolves at pinned ref 2db1ffb7 and is identical at live base a141c64f52e3ca62300e6afbd6204dfd4a17c670 (zero drift); all eight are pending with no keeper and outside the open reservations.
 
 ## 3. Whole-page evidence and per-page canonical B1-B6
 
@@ -184,7 +185,7 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | P2 | 135 | v | <system/domain> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P2 | 135 | i | ARCHITECTURE | named gap — first use before any expansion on this page |
 | P2 | 135 | i | SEARCH | named gap — first use before any expansion on this page |
-| P2 | 136 | v | <in-DB full-text (tsvector/pg_trgm) \| dedicated engine> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
+| P2 | 136 | v | <in-DB full-text (tsvector/pg_trgm) | dedicated engine> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P2 | 138 | v | <entities, per-tenant + total size, query volume, result type> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P2 | 139 | i | FRESHNESS | named gap — first use before any expansion on this page |
 | P2 | 139 | i | LAG | named gap — first use before any expansion on this page |
@@ -243,7 +244,7 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | P3 | 96 | i | HARDENING | named gap — first use before any expansion on this page |
 | P3 | 96 | i | IDENTITY | named gap — first use before any expansion on this page |
 | P3 | 96 | i | SECRETS | named gap — first use before any expansion on this page |
-| P3 | 97 | v | <var — public \| server-only \| CI-only \| deploy-only> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
+| P3 | 97 | v | <var — public | server-only | CI-only | deploy-only> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 98 | v | <name/location — how exposed> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 99 | v | <class> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 99 | v | <path / obtained?> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
@@ -253,7 +254,7 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | P3 | 101 | v | <how> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 101 | v | <proxy> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 101 | v | <secret — moved to <store> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
-| P3 | 102 | v | <credential — rotated? (approval) \| rotation still required> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
+| P3 | 102 | v | <credential — rotated? (approval) | rotation still required> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 103 | v | <identity — grants removed → least privilege> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 104 | v | <flags/expiry/revocation added + tests> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 105 | v | <git history, secrets not yet rotated, out-of-scope stores> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
@@ -382,7 +383,7 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | P5 | 104 | v | <op — data loss? reversible?> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P5 | 105 | v | <expand/contract respected? breaks live code?> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P5 | 106 | v | <hot-table lock risk + online alternative> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
-| P5 | 107 | v | <reversible cleanly \| forward-fix only \| irreversible (accepted?)> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
+| P5 | 107 | v | <reversible cleanly | forward-fix only | irreversible (accepted?)> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P5 | 108 | v | <tenant/authz change → test> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P5 | 108 | ii | authz | named gap — lowercase technical shorthand first use; no expansion on this page |
 | P5 | 109 | v | <...> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
@@ -505,27 +506,39 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | P8 | 27 | ii | ids | named gap — lowercase technical shorthand first use; no expansion on this page |
 | P8 | 30 | i | SSRF- | named gap — first use before any expansion on this page |
 | P8 | 30 | i | WAF- | named gap — first use before any expansion on this page |
-| P2 | 139 | D backticked/placeholder/unit/operator | <sync vs async; write→searchable path; FRESHNESS LAG stated; reindex/backfill; delete + permission-change propagation to index> | documented exclusion — self-describing multiline template placeholder (fill-in hole), not an abbreviation |
-| P2 | 148 | D backticked/placeholder/unit/operator | <index growth, reindex cost, freshness/error monitoring, engine-down degrade behavior> | documented exclusion — self-describing multiline template placeholder (fill-in hole), not an abbreviation |
+| P2 | 139 | v | <sync vs async; write→searchable path; FRESHNESS LAG stated; reindex/backfill; delete + permission-change propagation to index> | documented exclusion — self-describing multiline template placeholder (fill-in hole), not an abbreviation |
+| P2 | 148 | v | <index growth, reindex cost, freshness/error monitoring, engine-down degrade behavior> | documented exclusion — self-describing multiline template placeholder (fill-in hole), not an abbreviation |
+| P2 | 66 | v | % | documented exclusion — percent/SQL-like wildcard operator token, not an abbreviation |
+| P2 | 139 | v | → | documented exclusion — arrow operator token, not an abbreviation |
+| P3 | 100 | v | → | documented exclusion — arrow operator token, not an abbreviation |
+| P4 | 83 | v | → | documented exclusion — arrow operator token, not an abbreviation |
+| P5 | 41 | v | → | documented exclusion — arrow operator token, not an abbreviation |
+| P6 | 18 | v | → | documented exclusion — arrow operator token, not an abbreviation |
+| P7 | 110 | v | → | documented exclusion — arrow operator token, not an abbreviation |
+| P7 | 127 | v | × | documented exclusion — multiplication/operator token, not an abbreviation |
+| P8 | 26 | v | → | documented exclusion — arrow operator token, not an abbreviation |
 
 ## 5. Inventory counts, reconciliation and zero-duplicate proof
 
 | Page | (i) | (ii) | (iii) | (iv) | (v) | Rows | Named gaps | Defined | Exclusions |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P1 | 9 | 2 | 2 | 11 | 8 | 32 | 11 | 0 | 21 |
-| P2 | 20 | 4 | 5 | 12 | 11 | 52 | 19 | 1 | 32 |
-| P3 | 22 | 4 | 6 | 11 | 14 | 57 | 19 | 4 | 34 |
-| P4 | 20 | 2 | 4 | 10 | 0 | 36 | 17 | 2 | 17 |
-| P5 | 40 | 5 | 9 | 21 | 19 | 94 | 36 | 1 | 57 |
-| P6 | 32 | 1 | 2 | 20 | 0 | 55 | 24 | 6 | 25 |
-| P7 | 16 | 5 | 3 | 8 | 0 | 32 | 16 | 3 | 13 |
-| P8 | 12 | 3 | 2 | 1 | 1 | 19 | 14 | 1 | 4 |
-| **Total** | **171** | **26** | **33** | **94** | **53** | **377** | **156** | **18** | **203** |
+| P2 | 20 | 4 | 5 | 10 | 15 | 54 | 19 | 1 | 34 |
+| P3 | 22 | 4 | 6 | 11 | 15 | 58 | 19 | 4 | 35 |
+| P4 | 20 | 2 | 4 | 10 | 1 | 37 | 17 | 2 | 18 |
+| P5 | 40 | 5 | 9 | 21 | 20 | 95 | 36 | 1 | 58 |
+| P6 | 32 | 1 | 2 | 20 | 1 | 56 | 24 | 6 | 26 |
+| P7 | 16 | 5 | 3 | 8 | 2 | 34 | 16 | 3 | 15 |
+| P8 | 12 | 3 | 2 | 1 | 2 | 20 | 14 | 1 | 5 |
+| **Total** | **171** | **26** | **33** | **92** | **64** | **386** | **156** | **18** | **212** |
 
-**Zero-duplicate proof:** final table rows = 377 = unique (page, line, token) keys = 377; duplicate keys = 0; extra rows after the final table = 0; per-page/class/disposition sums equal the row count; one contiguous table only, no second inventory table.
+**Zero-duplicate proof:** final table rows = 386 = unique (page, line, token) keys = 386; duplicate keys = 0; extra rows after the final table = 0; per-page/class/disposition sums equal the row count; one contiguous table only, no second inventory table.
 
 
 **Documented-exclusion placeholders added in this repair (SD-D REVISE 6248561626):** P2 (249) L139-140 and L148-149 are two self-describing multiline class-D template placeholders; each is a documented exclusion in the final table and not a named B2 gap. This is the only table change; both rows resolve to the pinned page text.
+
+
+**Class-v operator/unit rule applied in this repair:** the first-use operator/unit tokens % (P2 L66), → (P2 L139, P3 L100, P4 L83, P5 L41, P6 L18, P7 L110, P8 L26) and × (P7 L127) are class-v documented exclusions at their real first-use lines; four previously escaped-pipe placeholder rows (P2 L136, P3 L97, P3 L102, P5 L107) now use the exact page pipe character; the two repair-2 multiline placeholders at P2 L139/L148 have class v instead of a malformed class cell. These changes are metadata/real-token fixes only and do not alter pages or dispositions of unchanged rows.
 
 **Reconciliation:** section 3 B2/verdicts and section 5 named-gap list agree with this table: every page is PARTIAL under the strict FULL bar because canonical B6 is UNVERIFIED and named B2 gaps are named; no page is FULL/keeper-eligible, and no undocumented first use is omitted.
 
@@ -539,8 +552,8 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | AC4 honest dispositions | MET in this record | 0 FULL / 8 PARTIAL / 0 UNRUN; B6 UNVERIFIED; no keeper |
 | AC5 record/body/PROC-04 + self-state | C handoff | record facts and body binding; PROC-04 and self-state proof in PR body/handoff |
 | AC6 Codex | C handoff | trigger/state recorded; never a pass; D/E/F/G own final audit |
-| AC7 provenance | MET | plan 6248432832 + B 6248458364; base e7acaca4; merge attribution/reservations accurate; no keeper/index/etc. change |
-| AC8 stage entry | MET | fresh B ACCEPT bound to plan; branch from live main e7acaca4; one DCO model commit; D/E/F/G separate; no merge |
+| AC7 provenance | MET | plan 6248432832 + B 6248458364; base a141c64f52e3ca62300e6afbd6204dfd4a17c670; merge attribution/reservations accurate; no keeper/index/etc. change |
+| AC8 stage entry | MET | fresh B ACCEPT bound to plan; branch from live main a141c64f52e3ca62300e6afbd6204dfd4a17c670; one DCO model commit; D/E/F/G separate; no merge |
 
 ## 7. Authorship chain and stage boundary
 
