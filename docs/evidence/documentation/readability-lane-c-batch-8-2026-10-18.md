@@ -179,6 +179,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | P2 | 161 | iv | `MANUAL-ONLY; never auto-invoke.` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P2 | 165 | v | `3d` | documented exclusion — placeholder/unit/operator/lifecycle/status token, not a prose abbreviation |
 | P2 | 168 | iv | `docs/skills-catalog.md` | documented exclusion — inline code identifier/command, not a prose abbreviation |
+| P2 | 170 | v | `→` | documented exclusion — operator token, not a prose abbreviation |
 | P2 | 170 | iii | `README.md` | documented exclusion — exact file/identifier reference, not a prose abbreviation |
 | P2 | 174 | iv | `*(Phase/D, N)*` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P2 | 174 | iv | `*e.g.*` | documented exclusion — inline code identifier/command, not a prose abbreviation |
@@ -309,6 +310,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | P3 | 88 | iv | `admin-console-architect` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P3 | 88 | iv | `superadmin-observability-console-designer` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P3 | 93 | i | `CLI` | named gap — first use before any expansion on this page |
+| P3 | 100 | v | `→` | documented exclusion — operator token, not a prose abbreviation |
 | P3 | 104 | iii | `docs/paths/check-your-app.md` | documented exclusion — exact file/identifier reference, not a prose abbreviation |
 | P3 | 108 | iii | `docs/paths/something-is-broken.md` | documented exclusion — exact file/identifier reference, not a prose abbreviation |
 | P3 | 112 | iii | `docs/paths/add-ai-safely.md` | documented exclusion — exact file/identifier reference, not a prose abbreviation |
@@ -351,6 +353,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | P3 | 327 | iv | `Project-Aegis` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P3 | 333 | iv | `) and run` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P3 | 333 | iv | `/` | documented exclusion — inline code identifier/command, not a prose abbreviation |
+| P3 | 333 | iv | `claude` | documented exclusion — inline code command identifier, not a prose abbreviation |
 | P3 | 333 | iv | `Cmd+` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P3 | 333 | iv | `Ctrl+` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P3 | 336 | i | `VSX` | defined at first use — expansion/definition present on this page |
@@ -656,6 +659,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | P3 | 1020 | i | `WS` | named gap — first use before any expansion on this page |
 | P3 | 1021 | i | `WSJF` | named gap — first use before any expansion on this page |
 | P3 | 1022 | i | `XSS` | named gap — first use before any expansion on this page |
+| P3 | 1023 | v | `≠` | documented exclusion — operator token, not a prose abbreviation |
 | P3 | 1034 | iv | `_template` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P3 | 1036 | i | `P0/P1` | named gap — first use before any expansion on this page |
 | P3 | 1042 | i | `D6` | named gap — first use before any expansion on this page |
@@ -755,6 +759,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | P3 | 1097 | iv | `source-of-truth-reconciler` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P3 | 1103 | iv | `agent-failure-recovery` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P3 | 1104 | iv | `agent-instruction-consolidator` | documented exclusion — inline code identifier/command, not a prose abbreviation |
+| P3 | 1113 | v | `×` | documented exclusion — operator token, not a prose abbreviation |
 | P3 | 1114 | i | `WRITE/TRUST/HYGIENE` | named gap — first use before any expansion on this page |
 | P3 | 1115 | i | `PASS` | defined at first use — expansion/definition present on this page |
 | P3 | 1115 | i | `PASS/FAIL/UNVERIFIABLE` | defined at first use — expansion/definition present on this page |
@@ -1175,6 +1180,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | P8 | 85 | i | `D36` | named gap — first use before any expansion on this page |
 | P8 | 88 | i | `D38` | named gap — first use before any expansion on this page |
 | P8 | 89 | iv | `project-orchestrator` | documented exclusion — inline code identifier/command, not a prose abbreviation |
+| P8 | 90 | v | `→` | documented exclusion — operator token, not a prose abbreviation |
 | P8 | 92 | i | `CONSTRAIN/CURATE` | named gap — first use before any expansion on this page |
 | P8 | 92 | i | `D42` | named gap — first use before any expansion on this page |
 | P8 | 93 | iv | `agent-harness-architect` | documented exclusion — inline code identifier/command, not a prose abbreviation |
@@ -1190,6 +1196,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | P8 | 102 | i | `SAST/DAST` | named gap — first use before any expansion on this page |
 | P8 | 103 | iv | `cloud-architecture-decider` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P8 | 103 | i | `D45` | named gap — first use before any expansion on this page |
+| P8 | 104 | v | `×` | documented exclusion — operator token, not a prose abbreviation |
 | P8 | 107 | iv | `authority-invalidation-architect` | documented exclusion — inline code identifier/command, not a prose abbreviation |
 | P8 | 107 | i | `D46` | named gap — first use before any expansion on this page |
 | P8 | 112 | iv | `superadmin-observability-console-designer` | documented exclusion — inline code identifier/command, not a prose abbreviation |
@@ -1205,20 +1212,20 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | Page | (i) | (ii) | (iii) | (iv) | (v) | Rows | Named gaps | Defined | Exclusions |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P1 | 1 | 2 | 2 | 0 | 0 | 5 | 3 | 0 | 2 |
-| P2 | 21 | 15 | 13 | 51 | 7 | 107 | 24 | 12 | 71 |
-| P3 | 367 | 29 | 60 | 333 | 21 | 810 | 248 | 148 | 414 |
+| P2 | 21 | 15 | 13 | 51 | 8 | 108 | 24 | 12 | 72 |
+| P3 | 367 | 29 | 60 | 334 | 24 | 814 | 248 | 148 | 418 |
 | P4 | 3 | 2 | 3 | 1 | 1 | 10 | 4 | 1 | 5 |
 | P5 | 1 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 |
 | P6 | 2 | 0 | 3 | 2 | 0 | 7 | 2 | 0 | 5 |
 | P7 | 13 | 2 | 15 | 11 | 1 | 42 | 11 | 4 | 27 |
-| P8 | 60 | 3 | 8 | 28 | 0 | 99 | 49 | 14 | 36 |
-| **Total** | **468** | **53** | **104** | **426** | **30** | **1081** | **342** | **179** | **560** |
+| P8 | 60 | 3 | 8 | 28 | 2 | 101 | 49 | 14 | 38 |
+| **Total** | **468** | **53** | **104** | **427** | **36** | **1088** | **342** | **179** | **567** |
 
-**Zero-duplicate proof:** final table rows = **1081** = unique (page, first-use line, normalized token) keys = **1081**; duplicate keys = **0**; extra rows after the final table = **0**; per-page/class/disposition sums equal the row count; one contiguous inventory table only. **Five-column cell-count proof:** all **1081** data rows parse exactly five cells with in-token pipes escaped and **0** bad rows. **Reconciliation:** section 3 B2/verdicts and section 6 named-gap list agree with this final table; no row is fabricated or placeholder.
+**Zero-duplicate proof:** final table rows = **1088** = unique (page, first-use line, normalized token) keys = **1088**; duplicate keys = **0**; extra rows after the final table = **0**; per-page/class/disposition sums equal the row count; one contiguous inventory table only. **Five-column cell-count proof:** all **1088** data rows parse exactly five cells with in-token pipes escaped and **0** bad rows. **Reconciliation:** section 3 B2/verdicts and section 6 named-gap list agree with this final table; no row is fabricated or placeholder.
 
 ## 6. Dispositions, verdicts, keeper exclusion and continuation
 
-**Disposition tally: 179 defined at first use / 342 named gaps / 560 documented exclusions = 1081 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED for every page; named B2 gaps force PARTIAL where present. **No keeper/acceptance row** is created.
+**Disposition tally: 179 defined at first use / 342 named gaps / 567 documented exclusions = 1088 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED for every page; named B2 gaps force PARTIAL where present. **No keeper/acceptance row** is created.
 
 **Named-gap list (from the final table):**
 - **P1 (320)**: https L65, html L126, FAQ L131
@@ -1242,7 +1249,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | --- | --- | --- |
 | AC1 one-path | MET in branch | exactly one added record path; no other tracked path; no plan file; DCO-signed model commit(s) measured post-commit |
 | AC2 frozen pages | MET | eight 40-hex blobs, bytes/LF, zero drift, pending/unread by lane-batch records, outside reservations |
-| AC3 whole-page + inventory | MET in this record | whole-page B1-B6; ONE contiguous 1081-row table; five-cell/zero-duplicate proof; counts from final table; no fabricated rows |
+| AC3 whole-page + inventory | MET in this record | whole-page B1-B6; ONE contiguous 1088-row table; five-cell/zero-duplicate proof; counts from final table; no fabricated rows |
 | AC4 dispositions | MET | strict FULL bar; B6 UNVERIFIED and not FULL-supporting; 0F/8P; named gaps; no keeper |
 | AC5 record/body/PROC | asserted in PR body/handoff | record facts outside record; body witness/skills/security fields; PROC-04 from live final body with published==recomputed and literal presence; checker 0 |
 | AC6 Codex | pending/guarded at C handoff | Codex is never a pass; trigger/triage/thread state truthfully reported in PR body/SD-C handoff; MG3 belongs to G |
@@ -1253,7 +1260,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 
 | Skill | Stage / agent | How applied | Result / evidence |
 | --- | --- | --- | --- |
-| [acceptance-criteria-reviewer](../../../.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ `c6e5d5649bf8` | C batch-8 / `sd-c-read-lc-320-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole at pinned ref; applied canonical B1-B6, B4 per page and B6 UNVERIFIED; built the exact-once five-class inventory. | 0 FULL / 8 PARTIAL; 1,081-row inventory; no keeper |
+| [acceptance-criteria-reviewer](../../../.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ `c6e5d5649bf8` | C batch-8 / `sd-c-read-lc-320-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole at pinned ref; applied canonical B1-B6, B4 per page and B6 UNVERIFIED; built the exact-once five-class inventory. | 0 FULL / 8 PARTIAL; 1,088-row inventory; no keeper |
 | [source-of-truth-reconciler](../../../.claude/skills/source-of-truth-reconciler/SKILL.md) @ `b5fd9feda972` | C batch-8 / `sd-c-read-lc-320-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Re-derived base e3f535e4, union 608/quarters, page blobs/bytes/LF, duplicate-read disclosure and zero drift. | block 320-327; 226,045 B / 2,457 LF; zero drift; 0/55 lane-batch hits |
 | [change-classification-gate](../../../.claude/skills/change-classification-gate/SKILL.md) @ `08d91a834460` | C batch-8 / `sd-c-read-lc-320-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only exactly one added record path; no plan file/other path. | one A path; no plan file |
 | [skill-usage-ledger](../../../.claude/skills/skill-usage-ledger/SKILL.md) @ `6a27b5c8e690` | C batch-8 / `sd-c-read-lc-320-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Authored this Stage C account with four-column rows, per-row Row sources and six-field lines; resolved manifest at e3f535e4. | 4 rows / 4 sources / 4 lines; non-zero binding |
@@ -1272,7 +1279,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 The four-row capture bound by the Row sources above is reproduced verbatim here so it is retrievable in-repo; SHA-256 of the fenced bytes is `93bb98a9668a4979ca88a1226ee1eee58712c671e883244ea1c23c39bbf55bea` (1565 B / 4 LF, non-zero). The digest binds the captured text, not human identity.
 
 ```text
-| [acceptance-criteria-reviewer](../../../.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ `c6e5d5649bf8` | C batch-8 / `sd-c-read-lc-320-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole at pinned ref; applied canonical B1-B6, B4 per page and B6 UNVERIFIED; built the exact-once five-class inventory. | 0 FULL / 8 PARTIAL; 1,081-row inventory; no keeper |
+| [acceptance-criteria-reviewer](../../../.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ `c6e5d5649bf8` | C batch-8 / `sd-c-read-lc-320-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole at pinned ref; applied canonical B1-B6, B4 per page and B6 UNVERIFIED; built the exact-once five-class inventory. | 0 FULL / 8 PARTIAL; 1,088-row inventory; no keeper |
 | [source-of-truth-reconciler](../../../.claude/skills/source-of-truth-reconciler/SKILL.md) @ `b5fd9feda972` | C batch-8 / `sd-c-read-lc-320-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Re-derived base e3f535e4, union 608/quarters, page blobs/bytes/LF, duplicate-read disclosure and zero drift. | block 320-327; 226,045 B / 2,457 LF; zero drift; 0/55 lane-batch hits |
 | [change-classification-gate](../../../.claude/skills/change-classification-gate/SKILL.md) @ `08d91a834460` | C batch-8 / `sd-c-read-lc-320-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only exactly one added record path; no plan file/other path. | one A path; no plan file |
 | [skill-usage-ledger](../../../.claude/skills/skill-usage-ledger/SKILL.md) @ `6a27b5c8e690` | C batch-8 / `sd-c-read-lc-320-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Authored this Stage C account with four-column rows, per-row Row sources and six-field lines; resolved manifest at e3f535e4. | 4 rows / 4 sources / 4 lines; non-zero binding |
@@ -1281,7 +1288,7 @@ The four-row capture bound by the Row sources above is reproduced verbatim here 
 **Six-field lines (outside bound fields).**
 
 ```text
-acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C must apply the canonical bar / applied: read eight whole pages; B1-B6; B4 per page; exact-once inventory / result: 0F/8P; 1081 rows; no keeper / incomplete: D/E/F/G / by: Stage C sd-c-read-lc-320-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
+acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C must apply the canonical bar / applied: read eight whole pages; B1-B6; B4 per page; exact-once inventory / result: 0F/8P; 1088 rows; no keeper / incomplete: D/E/F/G / by: Stage C sd-c-read-lc-320-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 source-of-truth-reconciler@b5fd9feda972 / reason: pages/base must be re-derived / applied: base e3f535e4; union 608/quarters; page blobs/bytes/LF; duplicate audit / result: block 320-327; 226,045/2,457; zero drift; 0/55 lane hits / incomplete: none / by: Stage C sd-c-read-lc-320-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 change-classification-gate@08d91a834460 / reason: scope must be docs-only one path / applied: record path absent; branch diff / result: one added record path; no other path / incomplete: none / by: Stage C sd-c-read-lc-320-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 skill-usage-ledger@6a27b5c8e690 / reason: C owes manifest-bound provenance / applied: four names at base; rows/sources/six fields; capture / result: four rows/four sources/four lines; binding 93bb98a9668a4979ca88a1226ee1eee58712c671e883244ea1c23c39bbf55bea / incomplete: none / by: Stage C sd-c-read-lc-320-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
