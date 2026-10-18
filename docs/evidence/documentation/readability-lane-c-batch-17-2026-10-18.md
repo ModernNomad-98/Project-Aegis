@@ -1,6 +1,7 @@
 # Readability Phase 4 re-read lane C - Stage C batch record, batch 17, 2026-10-18
 
-**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Agent true identity **sd-f-794-r1**; stage role **sd-c-read-lc-392-c1**. Both names signed: sd-f-794-r1 (true identity) - sd-c-read-lc-392-c1 (stage role). Stage C only: one added record path; no plan file/other path/edit/merge.
+**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Agent true identity **sd-f-794-r1**; stage role **sd-c-read-lc-392-c2**. Both names signed: sd-f-794-r1 (true identity) - sd-c-read-lc-392-c1 (stage role). Stage C only: one added record path; no plan file/other path/edit/merge.
+**Repair note (SD-C c2, answers SD-D 6256647818):** reclassified P8 L26 USING from class i/named gap to class iv/documented exclusion; refreshed dependent counts to i41/ii219/iii172/iv9/v25 and 8 defined/226 named/232 documented = 466; DCO enumeration now covers all three distinct commits (7e8dee49, 0cb14b59, this repair commit); no other content changed.
 
 **Plan binding.** Accepted plan r1 **6256421522** (15,340 B / 120 LF, author sd-c-802-r4-codex / sd-a-read-lc-next-b17) + Stage B ACCEPT **6256438977**. Base/live main **a222d930289111aae32e2ba95880ffe6e52c100c** (53rd session record merge; PR #855 merged 2026-10-18T23:16:16Z; tree 3ec240a4). Pinned ref **2db1ffb7**. Branch head/tree/DCO/cumulative diff are measured from pushed git AFTER commit and echoed in the PR body and SD-C handoff; this record embeds no own digest or head placeholder.
 
@@ -516,7 +517,7 @@ Known-defect-class scan at extraction time: class-v lifecycle/status tokens are 
 | P8 | 13 | ii | diff | named gap - first use before any expansion on this page |
 | P8 | 25 | ii | paths | named gap - first use before any expansion on this page |
 | P8 | 26 | iii | .claude/skills/rls-policy-auditor/SKILL.md | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
-| P8 | 26 | i | USING | named gap - first use before any expansion on this page |
+| P8 | 26 | iv | USING | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
 | P8 | 3 | ii | check | named gap - first use before any expansion on this page |
 | P8 | 19 | ii | per | named gap - first use before any expansion on this page |
 | P8 | 27 | iii | .claude/skills/roadmap-to-commitments-translator/SKILL.md | documented exclusion - exact file/path/identifier reference, not a prose abbreviation |
@@ -540,15 +541,15 @@ Known-defect-class scan at extraction time: class-v lifecycle/status tokens are 
 | P8 | 42 | ii | inventory | named gap - first use before any expansion on this page |
 | P8 | 29 | ii | provider | named gap - first use before any expansion on this page |
 
-**Reconciliation and proof.** Total **466 rows = 466 unique keys / 0 duplicate normalized tokens**. Classes: i42 / ii219 / iii172 / iv8 / v25 = 466. Dispositions: 8 defined / 227 named gaps / 231 documented exclusions = 466. Per-page: P1 61; P2 62; P3 56; P4 59; P5 53; P6 55; P7 58; P8 62. Five-cell parse: 0 bad rows; every row token resolves to its real first-use line; section 4 dispositions and section 5 counts are aligned.
+**Reconciliation and proof.** Total **466 rows = 466 unique keys / 0 duplicate normalized tokens**. Classes: i41 / ii219 / iii172 / iv9 / v25 = 466. Dispositions: 8 defined / 226 named gaps / 232 documented exclusions = 466. Per-page: P1 61; P2 62; P3 56; P4 59; P5 53; P6 55; P7 58; P8 62. Five-cell parse: 0 bad rows; every row token resolves to its real first-use line; section 4 dispositions and section 5 counts are aligned.
 
 ## AC1-AC8 (record-side statuses)
 | AC | Status | Evidence |
 | --- | --- | --- |
-| AC1 one-path | MET in branch | exactly one added record path; no other tracked path; no plan file; DCO-signed model commit(s), post-commit count/SHA measured in PR body/SD-C handoff |
+| AC1 one-path | MET in branch | exactly one added record path; no other tracked path; no plan file; three distinct DCO-signed commits over base..new head: 7e8dee49 (initial), 0cb14b59 (link-fence repair), and this repair commit; actual post-commit count/SHA measured from pushed git in PR body/SD-C handoff |
 | AC2 frozen pages | MET | eight 40-hex pinned blobs, bytes/LF; all resolve at 2db1ffb7 and are byte-identical at base a222d930; zero drift/no re-pin |
 | AC3 whole-page + inventory | MET | whole-page L1-last and B1-B6 per page; ONE contiguous five-class inventory; real first-use lines; zero duplicates; five-cell proof; known defect classes checked |
-| AC4 dispositions | MET | 8 defined / 227 named gaps / 231 documented exclusions = 466; B4 per page; B6 UNVERIFIED; 0F/8P/0U; no keeper upgrade |
+| AC4 dispositions | MET | 8 defined / 226 named gaps / 232 documented exclusions = 466; B4 per page; B6 UNVERIFIED; 0F/8P/0U; no keeper upgrade |
 | AC5 record/body/PROC | MET in body | record facts outside; witness/skills/security bound fields; PROC-04 recomputed from live final body and published with literal full+short digest; checker 0 |
 | AC6 Codex | honest post-C | Codex never a pass; trigger/triage/thread state reported in SD-C handoff; MG3 G-only |
 | AC7 provenance | MET | plan/B binding; base a222d930; 53 merges; block392-399 batch 17; one path; capture basis a222d930; no head placeholder |
@@ -608,4 +609,4 @@ skill-usage-ledger@6a27b5c8e690 / reason: C handoff owes provenance / applied: r
 
 **Boundary.** Stage C only: one added record; no plan/keeper/index/ledger/register/manifest/tool/test/workflow change; no page edit; no merge. Stage D exact-head audit follows; E/F/G separate.
 
-**Signed with both names - true identity: sd-f-794-r1; stage role: sd-c-read-lc-392-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
+**Signed with both names - true identity: sd-f-794-r1; stage role: sd-c-read-lc-392-c2.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
