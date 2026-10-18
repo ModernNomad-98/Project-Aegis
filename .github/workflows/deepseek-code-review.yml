@@ -25,13 +25,15 @@ permissions:
   contents: read
   pull-requests: write
 
-concurrency:
-  group: deepseek-review-${{ github.event.pull_request.number || github.event.issue.number }}
-  cancel-in-progress: true
-
 jobs:
   review:
     name: DeepSeek review
+    # Job-level on purpose: a workflow-level group is entered even by runs whose only job is
+    # skipped, so any PR comment (e.g. a bot summary) would cancel an in-progress review.
+    # A job that fails its `if` never enters a job-level group.
+    concurrency:
+      group: deepseek-review-${{ github.event.pull_request.number || github.event.issue.number }}
+      cancel-in-progress: true
     if: |
       vars.DEEPSEEK_REVIEW_ENABLED != 'false' &&
       ((github.event_name == 'pull_request_target' && github.event.pull_request.draft == false) ||
