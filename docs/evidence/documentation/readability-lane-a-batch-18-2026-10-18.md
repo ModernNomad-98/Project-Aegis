@@ -4,7 +4,7 @@
 
 **Plan of record.** Lean plan revision 1, merged PR #821 issue comment **6245468389** (created = updated 2026-10-18T04:04:27Z; immutable; 15,305 bytes), with Stage B **ACCEPT 6245487566** (freshness PASS; frontier independently resolved). The plan is operative only on that fresh B ACCEPT bound to that comment; there is no committed plan file and no plan file in this change.
 
-**Implementation base.** main = **cbaf0fbe8ed895ce90d575f4c07230b6f4e36de5**; **pinned measurement ref** = **2db1ffb7985ddc1c087c455740fd59e962967461**, at which the eight frozen pages are bound by Git blob id below.
+**Implementation base (live-base currency).** Plan capture saw main = **cbaf0fbe8ed895ce90d575f4c07230b6f4e36de5**; the repair branch is **rebased onto current live main 0e28bc8c0a6d34bb63e35f6024cc7409495ea08c**, which is the implementation base and PR base ref. The live-base diff `0e28bc8c..HEAD` is exactly one added batch-18 record path, +161/-0, after the D batch-16 record became main. **Pinned measurement ref** = **2db1ffb7985ddc1c087c455740fd59e962967461**, at which the eight frozen pages are bound by Git blob id below.
 
 **Agent, model and stage.** Written by **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**; agent identity **sd-c-796-r1**, stage role **sd-c-read-b18-c1**. Stage C only: I read each frozen page whole at the pinned blob, authored this record, and did not edit any page, keep any ledger row, rebuild any index, open any other pull request, reply to/resolve any Codex thread, or merge. The record is signed with both names at its footer.
 
@@ -24,22 +24,22 @@ python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c0
 
 **Observed summary:** compared_ref **2db1ffb7**; reader_pages_in_tree **690**; accepted_on_recorded_review **107**; provably_pending **6**; no_recorded_acceptance **567**; recorded_acceptance_within_10_lines **0**; cannot_decide **6**; withdrawn_pending_rereview **0**; partial_disposition_pending **4**; official_pending_count **583**. The lane-arithmetic pending set is the two pending buckets: **567 + 6 = 573** sorted paths. **Lane A = indices 0-143**. The merged lane-A records on main cbaf0fbe name only their actual read rows; mapped into the 573-path lane-A range they cover **0-103**. In-flight PR #822 covers **104-111** and PR #823 covers **112-119**; neither is merged and neither is read-row evidence. The next eight contiguous unread lane-A pages are **120-127** - this batch. Re-derived block starts: 120 `.claude/skills/error-handling-security-reviewer/SKILL.md`; 128 `.claude/skills/feature-flag-rollout-planner/SKILL.md` (first path after this batch).
 
-**Eligibility.** Each page is in the 573-path pending set at the pinned ref (no keeper row), in lane A 0-143, named as a read page in no merged lane-A batch record, and zero-drift to main cbaf0fbe. No page outside the frozen eight is read or claimed.
+**Eligibility.** Each page is in the 573-path pending set at the pinned ref (no keeper row), in lane A 0-143, named as a read page in no merged lane-A batch record, and zero-drift to live main 0e28bc8c. No page outside the frozen eight is read or claimed.
 
 ## 3. The frozen page set - eight pages, measured at the pinned ref
 
 | # | Lane A index | Page (path) | Git blob at 2db1ffb7 | Bytes / LF | Verdict | Gaps named (page line) | Edits |
 | --- | ---: | --- | --- | ---: | --- | --- | ---: |
 | P1 | 120 | `.claude/skills/error-handling-security-reviewer/SKILL.md` | `418dfdef2d37272d5959b6c4b0497cceae1faa79` | 13,651 / 222 | **PARTIAL** | L3 OWASP/authz before L10 terms; L103 SQL, L171 UX unexpanded | 0 |
-| P2 | 121 | `.claude/skills/error-handling-security-reviewer/references/error-path-review-sheet.md` | `2559c8a2c8d97695f80633601f1910249555f31c` | 4,237 / 92 | **FULL** | none | 0 |
+| P2 | 121 | `.claude/skills/error-handling-security-reviewer/references/error-path-review-sheet.md` | `2559c8a2c8d97695f80633601f1910249555f31c` | 4,237 / 92 | **PARTIAL** | L68 HTTP status codes 403/404 unexpanded | 0 |
 | P3 | 122 | `.claude/skills/error-taxonomy-designer/SKILL.md` | `6fcabd0bb155012f5acab709a5bc0b483362a07d` | 12,115 / 206 | **PARTIAL** | L3 API before L8 terms | 0 |
 | P4 | 123 | `.claude/skills/error-taxonomy-designer/references/error-model-sheet.md` | `c514d182f658d383c82ea94e0cb69b1e1d0adcf0` | 4,085 / 96 | **PARTIAL** | L5 HTTP/4xx before L8 HTTP definition | 0 |
 | P5 | 124 | `.claude/skills/eval-runner-designer/SKILL.md` | `130c8f016426fe0dc35eafaddbe2e97b90b8fd8b` | 13,583 / 224 | **PARTIAL** | L3 CI/AI before L10 terms | 0 |
-| P6 | 125 | `.claude/skills/eval-runner-designer/references/runner-design-blueprint.md` | `f074fe0bb49f2ed2ed28e7722b26d0f025989366` | 5,529 / 106 | **PARTIAL** | L25 LLM unexpanded (and L90 CI) | 0 |
+| P6 | 125 | `.claude/skills/eval-runner-designer/references/runner-design-blueprint.md` | `f074fe0bb49f2ed2ed28e7722b26d0f025989366` | 5,529 / 106 | **PARTIAL** | L25 LLM; L68 PR; L90 CI unexpanded | 0 |
 | P7 | 126 | `.claude/skills/event-schema-architect/SKILL.md` | `1287795cc4ef3fab52ff8c378c428054e1eecf54` | 11,765 / 203 | **PARTIAL** | L3 PII before L8 terms | 0 |
-| P8 | 127 | `.claude/skills/event-schema-architect/references/event-schema-sheet.md` | `1f59d2439a7435b26c805028306513fa6acfab79` | 3,257 / 80 | **FULL** | none | 0 |
+| P8 | 127 | `.claude/skills/event-schema-architect/references/event-schema-sheet.md` | `1f59d2439a7435b26c805028306513fa6acfab79` | 3,257 / 80 | **PARTIAL** | L37 currency codes USD/EUR/GBP unexpanded | 0 |
 
-**Totals: 8 pages / 68,222 bytes / 1,229 LF / 2 FULL / 6 PARTIAL / 0 UNRUN / 0 edits.** Values were measured by command at the pinned ref and sum to the plan's totals; every page's blob is identical at main cbaf0fbe (zero drift). The table deliberately abbreviates full 40-hex blob IDs; the PR body carries the full IDs.
+**Totals: 8 pages / 68,222 bytes / 1,229 LF / 0 FULL / 8 PARTIAL / 0 UNRUN / 0 edits.** Values were measured by command at the pinned ref and sum to the plan's totals; every page's blob is identical at live main 0e28bc8c (zero drift; live main advanced only by the batch-16 record). The table deliberately abbreviates full 40-hex blob IDs; the PR body carries the full IDs.
 
 ## 4. Per-page read detail - ranges, six acceptance bullets, purpose restatements, defects
 
@@ -53,8 +53,8 @@ The six bullets are the repository's "Acceptance for each page": **B1** purpose/
 
 ### P2 - `.claude/skills/error-handling-security-reviewer/references/error-path-review-sheet.md` - read whole, L1-92
 **Purpose/normal use:** the four concrete error-path lenses and their patterns - fail-open defaults, error-path authorization, exception-driven bypass and leak-free responses - plus a fail-closed matrix and severity guide.
-**B1 satisfied** - L1 title and L3-4 reader brief; L6-7 owning-skill link. **B2 satisfied** - L7-8 defines authz, SQL, IP and tenant before use; remaining uppercase forms are row/emphasis words (DENY, HERE, BEFORE), not undocumented abbreviations. **B3 satisfied** - the four lens sections L10-75, matrix L77-84 and severity guide L86-92 are concrete. **B4 satisfied** - reference/template page; no shipped-versus-proposed claim. **B5 satisfied** - only link L6 resolves; no concrete shell command. **B6 basis** - git metadata differs from reader identity; **limit** - same metadata limit; this FULL rests on the page alone meeting B1-B5 plus the declared B6 metadata basis. **No defect recorded.**
-**Verdict: FULL, no edit.**
+**B1 satisfied** - L1 title and L3-4 reader brief; L6-7 owning-skill link. **B2 partial** - L7-8 defines authz, SQL, IP and tenant before use, but **L68 uses the coded HTTP status identifiers 403/404 (`403-vs-404 asymmetry`) without expanding what those status codes mean**; remaining uppercase forms are row/emphasis words. **B3 satisfied** - the four lens sections L10-75, matrix L77-84 and severity guide L86-92 are concrete. **B4 satisfied** - reference/template page; no shipped-versus-proposed claim. **B5 satisfied** - only link L6 resolves; no concrete shell command. **B6 basis** - git metadata differs from reader identity; **limit** - same metadata limit; this FULL rests on the page alone meeting B1-B5 plus the declared B6 metadata basis. **No defect recorded.**
+**Verdict: PARTIAL, no edit. Named defect: L68 HTTP status codes 403/404 unexpanded.**
 
 ### P3 - `.claude/skills/error-taxonomy-designer/SKILL.md` - read whole, L1-206
 **Purpose/normal use:** design a finite, stable taxonomy of error categories with machine-readable codes, one envelope, fault/retry classification, actionable message discipline and a single mapping boundary.
@@ -76,9 +76,9 @@ The six bullets are the repository's "Acceptance for each page": **B1** purpose/
 
 ### P6 - `.claude/skills/eval-runner-designer/references/runner-design-blueprint.md` - read whole, L1-106
 **Purpose/normal use:** reusable blueprint tables for a runner spec - execution semantics per case type, judging decision table, report schema, sampling/cost arithmetic, flake policy, CI posture and non-claims language.
-**B1 satisfied** - L1 title and L3-5 companion/reader brief. **B2 partial** - the page has no terms block; **LLM at L25** is used without a first-use expansion, and **CI at L90** is likewise unexpanded on this page. **B3 satisfied** - execution table L7-17, judging L19-36, report L38-54, sampling L56-75, flake L77-88, CI posture L90-98, non-claims L100-106. **B4 satisfied** - blueprint explicitly marks open decisions and non-claims; no shipped claim. **B5 satisfied** - only companion link L3 resolves; no concrete shell command. **B6 basis/limit** - metadata differs; PARTIAL.
+**B1 satisfied** - L1 title and L3-5 companion/reader brief. **B2 partial** - the page has no terms block; **LLM at L25**, **PR at L68** (`PR tier ... CHANGED in the PR`) and **CI at L90** are used without first-use expansions on this page. **B3 satisfied** - execution table L7-17, judging L19-36, report L38-54, sampling L56-75, flake L77-88, CI posture L90-98, non-claims L100-106. **B4 satisfied** - blueprint explicitly marks open decisions and non-claims; no shipped claim. **B5 satisfied** - only companion link L3 resolves; no concrete shell command. **B6 basis/limit** - metadata differs; PARTIAL.
 **Quoted evidence (L25):** `Semantic - content ... | LLM judge with rubric derived from the assertion text |`.
-**Verdict: PARTIAL, no edit. Named defect: L25 LLM unexpanded (and L90 CI).**
+**Verdict: PARTIAL, no edit. Named defects: L25 LLM, L68 PR and L90 CI unexpanded.**
 
 ### P7 - `.claude/skills/event-schema-architect/SKILL.md` - read whole, L1-203
 **Purpose/normal use:** design the analytics event schema and tracking plan - naming taxonomy, typed property schema, shared globals, identity stitching, versioning/governance and PII minimization - distinct from external API/webhook and internal streaming events.
@@ -88,14 +88,14 @@ The six bullets are the repository's "Acceptance for each page": **B1** purpose/
 
 ### P8 - `.claude/skills/event-schema-architect/references/event-schema-sheet.md` - read whole, L1-80
 **Purpose/normal use:** the event-schema reference - which event skill owns which kind, naming convention, property schema template, global properties, identity stitching, governance/versioning and PII minimization.
-**B1 satisfied** - L1 title, L3 `Detail for event-schema-architect. Read on demand.` and L5 owning-skill link. **B2 satisfied** - L6-7 defines API, PII, enum and B2B before use; no other undocumented abbreviation. **B3 satisfied** - three-way ownership L9-18, naming L20-33, property template L35-46, globals L48-55, identity L57-64, governance L66-72, PII L74-80. **B4 satisfied** - reference/template; no shipped-versus-proposed claim. **B5 satisfied** - only link L5 resolves; no concrete shell command. **B6 basis** - git metadata differs from reader identity; **limit** - same metadata limit; this FULL rests on B1-B5 plus the declared B6 basis. **No defect recorded.**
-**Verdict: FULL, no edit.**
+**B1 satisfied** - L1 title, L3 `Detail for event-schema-architect. Read on demand.` and L5 owning-skill link. **B2 partial** - L6-7 defines API, PII, enum and B2B before use, but **L37 uses the currency codes USD/EUR/GBP (`currency enum ... [USD, EUR, GBP, ...]`) without expanding the ISO currency codes**; no other undocumented abbreviation. **B3 satisfied** - three-way ownership L9-18, naming L20-33, property template L35-46, globals L48-55, identity L57-64, governance L66-72, PII L74-80. **B4 satisfied** - reference/template; no shipped-versus-proposed claim. **B5 satisfied** - only link L5 resolves; no concrete shell command. **B6 basis** - git metadata differs from reader identity; **limit** - same metadata limit; this FULL rests on B1-B5 plus the declared B6 basis. **No defect recorded.**
+**Verdict: PARTIAL, no edit. Named defect: L37 currency codes USD/EUR/GBP unexpanded.**
 
 ## 5. Disposition tally and keeper exclusion
 
-**Disposition tally: 2 FULL / 6 PARTIAL / 0 UNRUN.** Only P2 and P8 are eligible for a later keeper's acceptance row; the six PARTIAL pages receive no acceptance row. This record authors no acceptance/keeper row and carries no acceptance-row authority. No page needed an edit and none was made.
+**Disposition tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page in this batch is eligible for a later keeper acceptance row; all eight PARTIAL pages receive no acceptance row. This record authors no acceptance/keeper row and carries no acceptance-row authority. No page needed an edit and none was made.
 
-**Keeper exclusion.** P2 and P8 are the only pages eligible for a later keeper row; the six PARTIAL pages are excluded from any acceptance/keeper row. The record adds no keeper row, ledger row, acceptance-index change or targeted-review row.
+**Keeper exclusion.** No page in this batch is eligible for a later keeper row; all eight PARTIAL pages are excluded from any acceptance/keeper row. The record adds no keeper row, ledger row, acceptance-index change or targeted-review row.
 
 ## 6. Provenance and reader-independence witness rows
 
@@ -110,11 +110,11 @@ The six bullets are the repository's "Acceptance for each page": **B1** purpose/
 | P7 | event-schema-architect/SKILL.md | `1287795cc4ef3fab52ff8c378c428054e1eecf54` | `64047fa8e55f67dfd745510f95310364fdedfaab` | Peter Nguyen | 2026-09-23 | sd-c-796-r1 / sd-c-read-b18-c1 |
 | P8 | event-schema-sheet.md | `1f59d2439a7435b26c805028306513fa6acfab79` | `f3a9c70e3a5ca56765a0505e86e4a8b2011f95a4` | Peter Nguyen | 2026-09-23 | sd-c-796-r1 / sd-c-read-b18-c1 |
 
-**B6 witness.** For every page the reader identity differs from the git-metadata author. **Basis:** page author Peter Nguyen; this reader stage identity committed none of these pages. **Limit:** git metadata cannot prove non-authorship of owner-account commits or that a human performed the reading; the record does not claim more. The two FULL pages state that basis; the six PARTIAL pages are PARTIAL on their named B2 gaps.
+**B6 witness.** For every page the reader identity differs from the git-metadata author. **Basis:** page author Peter Nguyen; this reader stage identity committed none of these pages. **Limit:** git metadata cannot prove non-authorship of owner-account commits or that a human performed the reading; the record does not claim more. **No FULL survives in this record:** all eight pages are PARTIAL on B6 independence plus their named B2/first-use gaps; the metadata-level B6 basis/limit is stated for every page and is not itself the reason for a disposition.
 
 ## 7. Hunk and line accounting
 
-- **Tracked change:** exactly **one added path** - this record - no other tracked path; **0 modified, 0 deleted, 0 renames**; branch from main cbaf0fbe so the only PR hunk is this file.
+- **Tracked change:** exactly **one added path** - this record - no other tracked path; **0 modified, 0 deleted, 0 renames**; branch rebased onto live main 0e28bc8c so the live-base PR hunk is only this file.
 - **Page accounting:** zero hunks touch any of the eight pages; every page diff is empty; no keeper/ledger/index/register/manifest/tool/test/workflow change.
 - **Record measurement:** final bytes/LF/sha are stated in the PR body binding outside this record; no self-computed size claim is made here.
 
@@ -125,19 +125,19 @@ The six bullets are the repository's "Acceptance for each page": **B1** purpose/
 | AC1 One-path tree proof | **MET at the final head by construction** - exactly one added path; 0 modified/deleted; exact head/tree/base in the handoff and PR body. |
 | AC2 Frozen page set by blob hash | **MET in this record** - eight paths, indices 120-127, blobs/bytes/LF at pinned ref; identical at base. |
 | AC3 Whole-page re-read evidence | **MET in this record** - each page read whole L1-last; six bullets addressed with page-line cites; strict B2 first-use checked. |
-| AC4 Honest per-page disposition | **MET in this record** - 2 FULL / 6 PARTIAL / 0 UNRUN with named page lines; FULL only after strict B2 check; no acceptance row for PARTIAL pages. |
+| AC4 Honest per-page disposition | **MET in this record** - **0 FULL / 8 PARTIAL / 0 UNRUN** with named page lines; no FULL survives strict B2; no acceptance row for any page. |
 | AC5 Record integrity, body and PROC-04 | **OWED after this file freezes** - PR body binds plan/record facts; PROC-04 recomputed; checker at head; record one terminal LF/no CR/no trailing whitespace/no blank EOF. |
 | AC6 Codex loop plan | **OWED after the PR exists at its head** - trigger, fetch, fix P1/P2 in repair commits with replies naming fixing SHA, resolve, retrigger; head-bound unavailability only after triage; never a pass. |
 | AC7 Provenance and no regression | **MET in this record** - plan binding, derivation base, no page/keeper/index/ledger/register/manifest change; zero drift. |
-| AC8 Stage entry conditions | **SATISFIED for C** - only on fresh B ACCEPT 6245487566 bound to plan 6245468389; branch from then-current main; one record path; one DCO commit; D/E/F/G separate. |
+| AC8 Stage entry conditions | **SATISFIED for C** - only on fresh B ACCEPT 6245487566 bound to plan 6245468389; rebased onto then-current live main 0e28bc8c; live-base one record path; two DCO commits (initial + repair); D/E/F/G separate. |
 
 ## 9. Validation actually run while authoring
 
 | Check | Method | Result |
 | --- | --- | --- |
-| Instrument at pinned ref | check_index.py --ref 2db1ffb7 in fresh clone of cbaf0fbe | exit 0; summary above |
+| Instrument at pinned ref | check_index.py --ref 2db1ffb7 in fresh clone of capture base cbaf0fbe (historical derivation) | exit 0; summary above |
 | Blobs/bytes/LF | git rev-parse/cat-file/newline counts for all eight | plan blobs match; totals 68,222 B / 1,229 LF |
-| Zero drift | git diff --numstat 2db1ffb7..cbaf0fbe -- page | empty for all eight |
+| Zero drift | git diff --numstat 2db1ffb7..0e28bc8c -- page | empty for all eight |
 | Internal links | resolve every relative link at main | 16 links, 0 broken |
 | Commands | search for concrete shell commands in eight pages | no concrete shell command given |
 | Authorship | git log -1 per page | recorded in section 6 |
@@ -147,14 +147,14 @@ The six bullets are the repository's "Acceptance for each page": **B1** purpose/
 ## 10. What this batch could not verify (stated, not hidden)
 
 - **B6 as a human act** is unverifiable from git metadata; the batch independence claim is limited to that metadata basis and declared limit.
-- **Future keeper acceptance:** this record creates no acceptance rows; a later keeper decides. The six PARTIAL pages are excluded now.
+- **Future keeper acceptance:** this record creates no acceptance rows; a later keeper decides. No page in this batch is eligible now.
 - **Hosted/Codex checks:** no PR/head existed while authoring; owed at the head, not claimed here.
-- **Drift after base:** frozen blobs are at the pinned ref and cbaf0fbe; later movement reopens the batch.
+- **Drift after base:** frozen blobs are at the pinned ref and live main 0e28bc8c; later movement reopens the batch.
 - **Prose reading is not a usability study:** the record lists what each page says and where; the six bullets are the bar.
 
 ## 11. Continuation
 
-The record is the only added path; the branch is from cbaf0fbe and needs one DCO-signed model-attributed commit. Stage D independently audits AC1-AC8 at the exact head; Stage E records checks/UNRUN honestly; Stage F reviews exact head/PROC-04; Stage G applies merge gates including MG3 under the recorded reading; no merge before G; any need outside one path stops and returns to Stage A/owner.
+The record is the only added path; the branch is rebased onto live main 0e28bc8c and carries DCO-signed model-attributed commits (initial + repair). Stage D independently audits AC1-AC8 at the exact head; Stage E records checks/UNRUN honestly; Stage F reviews exact head/PROC-04; Stage G applies merge gates including MG3 under the recorded reading; no merge before G; any need outside one path stops and returns to Stage A/owner.
 
 **Boundary.** Stage C only: no page edited; no keeper/ledger/index/register/manifest/tool/test/workflow change; no other PR touched; no Codex thread replied to/resolved; no merge.
 
