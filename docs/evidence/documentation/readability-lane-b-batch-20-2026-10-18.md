@@ -1,16 +1,16 @@
 # Readability Phase 4 re-read — lane B batch 20 evidence record
 
-**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Stage C implementation, role **sd-c-read-b20-c1**; true identity **sd-e-802-r1**. Both names signed. Base **7cea211eb1bd67911c5f83265ebe1ba356db9c7e**; block **264-271**; batch **20**; one added docs evidence path.
+**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Stage C repair, role **sd-c-read-b20-c2**; true identity **sd-f-794-r1**. Both names signed. Implementation base **f325daac145a2844e4ead078cffe38264a5df3d9** (38th session record merge, PR #838); block **264-271**; batch **20**; one added docs evidence path. Original PR base was 7cea211e (37th); rebase onto current main is disclosed.
 
 ## 1. Scope, plan binding and diff accounting
 
-**Plan of record:** lane-B batch-20 lean plan comment **6248840176** (immutable 14,792 B) captured on merged PR #833 at main **6f584c9d**, plus **B ACCEPT 6248870170**; implemented from live main **7cea211e** (37th session record merge, PR #837). **Change class: docs-only.** Exactly **one added path**: `docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md` (this record). No other added, modified or deleted tracked path; no keeper, index, ledger, register, manifest, tool, test or workflow change; no page edit; no plan file. **Base:** `7cea211e` (37th session record merge = PR #837); plan captured at `6f584c9d` (#833, 36th).
+**Plan of record:** lane-B batch-20 lean plan comment **6248840176** (immutable 14,792 B) captured on merged PR #833 at main **6f584c9d**, plus **B ACCEPT 6248870170**. **Change class: docs-only.** Exactly **one added path**: docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md (this record). No other added, modified or deleted tracked path; no keeper, index, ledger, register, manifest, tool, test or workflow change; no page edit; no plan file. **Implementation base (after rebase):** **f325daac145a2844e4ead078cffe38264a5df3d9** (38th session record merge = PR #838 batch-17 record, merged 10:54:03Z; parents 7cea211e + fcc58121); original PR base was 7cea211e (37th); the rebase onto current main is disclosed. Plan captured at 6f584c9d (#833, 36th).
 
 **Record facts:** measured at handoff after the DCO commit: bytes/LF/CR/sha256/blob are reported in the PR body and the SD-C COMPLETE comment outside this file; this record never contains its own digest. The eight page blobs in section 3 are different objects and are stated.
 
 ## 2. Lane derivation at this implementation base — re-run, not handed down
 
-**Pinned reference:** `2db1ffb7985ddc1c087c455740fd59e962967461`. Instrument: `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7 --json`. Observed **690 reader pages / 107 accepted / 6 cannot-decide / 4 partial / official pending 583**; pending **573**. **Lane A complete 0-143**; **lane B = 144-287**. **Merged lane-B rows at base 7cea211e:** **144-199 + 200-207 + 208-215 + 216-223 + 224-231 + 232-239** (batch 12 merged as #833 = 36th; #837 merged as 37th at 7cea211e; #836 34th at a141c64f; #835 35th at a06360d4; #834 33rd at e7acaca4; #831 32nd at 84a5295d; #828 31st at 655e40ea; #832 30th at 883bf690). **Open reservations:** #838 240-247, #839 248-255, #840 256-263. **This record's own block: 264-271; next unread page 272.**
+**Pinned reference:** 2db1ffb7985ddc1c087c455740fd59e962967461. Instrument: python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7 --json. Observed **690 reader pages / 107 accepted / 6 cannot-decide / 4 partial / official pending 583**; pending **573**. **Lane A complete 0-143**; **lane B = 144-287**. **Merged lane-B rows at current live main f325daac:** **144-199 + 200-207 + 208-215 + 216-223 + 224-231 + 232-239 + 240-247** (batch 12 merged as #833 = 36th; #837 37th at 7cea211e; **#838 38th at f325daac = this rebase base**; #836 34th at a141c64f; #835 35th at a06360d4; #834 33rd at e7acaca4; #831 32nd at 84a5295d; #828 31st at 655e40ea; #832 30th at 883bf690). **Open reservations:** #839 248-255, #840 256-263. **This record own block: 264-271; next unread page 272.**
 
 **Batch number:** merged lane-B batches 2/2-rerecord/3/5/6/7/8/9/10/11/12/13/14/15; in-flight 16/17/18/19 -> **batch 20**. **R2:** next eight sorted unread pages after merged rows and all reservations are **264-271**. **Lane letter B.** No page outside 264-271 is read or claimed.
 
@@ -27,9 +27,9 @@
 | P7 | 270 | `.claude/skills/source-of-truth-reconciler/references/conflict-resolution-examples.md` | `f37223718a08214ae1ae1fbca13f6076f054f774` | 3,003 / 60 |
 | P8 | 271 | `.claude/skills/staff-scope-selector/SKILL.md` | `4508a953e0223d96c506aecc124173f265e4e533` | 11,549 / 196 |
 
-**Totals: 57,263 B / 1,027 LF.** Every full 40-hex blob resolves at the pinned ref and is identical at main 7cea211e (zero drift, verified by content sha); all eight are pending, unread in merged/open records, outside the reservations, no keeper, and belong to this block 264-271; no page outside the set is read.
+**Totals: 57,263 B / 1,027 LF.** Every full 40-hex blob resolves at the pinned ref and is identical at implementation base f325daac (zero drift, verified by content sha); all eight are pending, unread in merged/open records, outside the reservations, no keeper, and belong to this block 264-271; no page outside the set is read.
 
-## 4. Canonical acceptance — quoted verbatim from backlog L2841-2862 at main 7cea211e
+## 4. Canonical acceptance — quoted verbatim from backlog L2841-2862 at main f325daac
 
 - **B1 (L2843):** Open with what the page or component is for and who should read it.
 - **B2 (L2844-2849):** Define an abbreviation or coded identifier at first use. For example, "Behavioral Eval Runner (BER)" and "work package (WP)" are explained before later shorthand. Explain lifecycle/status codes in plain words or link to a nearby glossary; do not assume a reader knows CP-WP-003 (control-plane work package 003), OD-1 (owner decision 1), T03 (transition 03), or internal class names.
@@ -378,36 +378,39 @@
 | P8 | U | `AND` | L137 | documented exclusion — ordinary all-caps emphasis word, heading or proper name, not an abbreviation |
 | P8 | U | `PAST` | L170 | documented exclusion — ordinary all-caps emphasis word, heading or proper name, not an abbreviation |
 | P8 | L | `json` | L192 | documented exclusion — lowercase technical/format token, not a prose abbreviation |
+| P2 | B | `≠` | L199 | documented exclusion — operator/unit token, not a prose abbreviation |
+| P7 | B | `80%` | L37 | documented exclusion — operator/unit token, not a prose abbreviation |
+| P7 | B | `70%` | L38 | documented exclusion — operator/unit token, not a prose abbreviation |
 
-**Zero-duplicate proof.** Final table rows = **234**; unique (page, first-use line, normalized token) keys = **234**; duplicates = **0**; extra rows = **0**. **Independent cell-count proof:** every row above parses as exactly five pipe-delimited cells after escaping literal pipes (escaped tokens/reasons), **234/234 rows = five cells**, zero malformed rows; the count table below was derived from this final table.
+**Zero-duplicate proof.** Final table rows = **237**; unique (page, first-use line, normalized token) keys = **237**; duplicates = **0**; extra rows = **0**. **Independent cell-count proof:** every row above parses as exactly five pipe-delimited cells after escaping literal pipes (escaped tokens/reasons), **237/237 rows = five cells**, zero malformed rows; the count table below was derived from this final table.
 
 **Counts recomputed from the FINAL table above.**
 
 | Page | Rows | U | M | L | B | F | Defined | Named gaps | Exclusions |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P1 | 22 | 6 | 2 | 0 | 13 | 1 | 4 | 2 | 16 |
-| P2 | 52 | 22 | 6 | 1 | 22 | 1 | 4 | 6 | 42 |
+| P2 | 53 | 22 | 6 | 1 | 23 | 1 | 4 | 6 | 43 |
 | P3 | 32 | 9 | 2 | 1 | 20 | 0 | 4 | 4 | 24 |
 | P4 | 27 | 9 | 2 | 3 | 9 | 4 | 1 | 3 | 23 |
 | P5 | 17 | 4 | 2 | 1 | 6 | 4 | 6 | 0 | 11 |
 | P6 | 33 | 12 | 1 | 2 | 16 | 2 | 0 | 3 | 30 |
-| P7 | 21 | 6 | 3 | 1 | 10 | 1 | 1 | 1 | 19 |
+| P7 | 23 | 6 | 3 | 1 | 12 | 1 | 1 | 1 | 21 |
 | P8 | 30 | 14 | 1 | 1 | 13 | 1 | 1 | 0 | 29 |
-| **Total** | **234** | **82** | **19** | **10** | **109** | **14** | **21** | **19** | **194** |
+| **Total** | **237** | **82** | **19** | **10** | **112** | **14** | **21** | **19** | **197** |
 
-**Reconciliation and proof.** Row sum **234** equals class sum **234** and disposition sum **234**; page sums equal the row count. The named-gap rows below are exactly the named gaps cited in section 5; every row resolves to pinned page text at its stated first occurrence; zero duplicates and zero fabricated rows.
+**Reconciliation and proof.** Row sum **237** equals class sum **237** and disposition sum **237**; page sums equal the row count. The named-gap rows below are exactly the named gaps cited in section 5; every row resolves to pinned page text at its stated first occurrence; zero duplicates and zero fabricated rows.
 
 **Named-gap list aligned with section 5:** P1 L1 SLO, L7 SLA; P2 L3 SOC, L3 AICPA, L3 CPA, L3 TSC, L3 ASEC, L3 ISO; P3 L1 TSC, L1 SOC, L3 AICPA, L16 SLA; P4 L70 SUPERSEDED, L70 BROKEN, L72 UNVERIFIED; P5 none; P6 L129 CURRENT, L3 PR, L9 API; P7 L25 PR; P8 none;
 
 ## 7. Dispositions, keeper exclusion and continuation
 
-**Disposition tally: 21 defined at first use / 19 named gaps / 194 documented exclusions = 234 rows.** **Disposition tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages were read whole; no page is UNRUN. No page is FULL because canonical B6 is unverified for every page; named B2 gaps independently force PARTIAL where present. **No keeper/acceptance row:** this record creates no acceptance rows; a later keeper decides.
+**Disposition tally: 21 defined at first use / 19 named gaps / 194 documented exclusions = 237 rows.** **Disposition tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages were read whole; no page is UNRUN. No page is FULL because canonical B6 is unverified for every page; named B2 gaps independently force PARTIAL where present. **No keeper/acceptance row:** this record creates no acceptance rows; a later keeper decides.
 
-**Continuation.** Lane A is complete 0-143; merged lane-B rows **144-199 + 200-207 + 208-215 + 216-223 + 224-231 + 232-239**; open reservations **#838 240-247, #839 248-255, #840 256-263**; this record covers **264-271**; next unread page is **272**.
+**Continuation.** Lane A is complete 0-143; merged lane-B rows **144-199 + 200-207 + 208-215 + 216-223 + 224-231 + 232-239 + 240-247**; open reservations **#839 248-255, #840 256-263**; this record covers **264-271**; next unread page is **272**.
 
 ## 8. Provenance, page authorship, zero drift and reader independence
 
-**Base:** 7cea211e (merge commit of #837, 37th session record merge); plan captured at 6f584c9d (#833, 36th). **Plan:** 6248840176 + B ACCEPT 6248870170. **Reader:** sd-c-read-b20-c1 read all eight pages whole at the pinned blob; no display elision. **Page authors are not this reader** (git metadata only; not B6 proof). **Witness rows:** section 3 is the per-page witness (index, path, pinned blob, measured bytes/LF); each blob resolves at 2db1ffb7 and is identical at base 7cea211e (zero drift). **Author metadata only — NOT B6 evidence.**
+**Base:** f325daac (merge commit of #838, 38th session record merge; parents 7cea211e + fcc58121); original PR base 7cea211e (#837, 37th); plan captured at 6f584c9d (#833, 36th). **Plan:** 6248840176 + B ACCEPT 6248870170. **Reader:** sd-c-read-b20-c1 read all eight pages whole at the pinned blob; no display elision. **Page authors are not this reader** (git metadata only; not B6 proof). **Witness rows:** section 3 is the per-page witness (index, path, pinned blob, measured bytes/LF); each blob resolves at 2db1ffb7 and is identical at base f325daac (zero drift). **Author metadata only — NOT B6 evidence.**
 
 ## 9. Stage C declaration, AC statuses and self-state consistency
 
@@ -415,36 +418,36 @@
 | --- | --- | --- |
 | AC1 one-path | MET in this record | exactly one added record path; no other tracked path; **one DCO-signed model commit** |
 | AC2 pages | MET in this record | eight pages 264-271 by blob; totals 57,263/1,027; zero drift; no keeper |
-| AC3 inventory | MET in this record | one contiguous 234-row table; 234 unique keys; zero duplicates/extra; five-cell proof; counts recomputed; no fabricated rows |
+| AC3 inventory | MET in this record | one contiguous 237-row table; 237 unique keys; zero duplicates/extra; five-cell proof; counts recomputed; no fabricated rows |
 | AC4 dispositions | MET in this record | strict FULL bar; 0 FULL/8 PARTIAL/0 UNRUN; B6 unverified; named gaps aligned |
 | AC5 record/body/PROC | MET in this record | record bytes/LF/sha/blob measured in handoff; body binds facts; PROC-04 published == live-body recompute; body checker 0 |
 | AC6 Codex loop | MET at handoff | exact-head trigger; triage all P1/P2; never a pass; head-bound only after triage |
 | AC7 provenance | MET in this record | plan/B lineage, base and reservations, merge attribution, zero drift, absent path |
 | AC8 stages | MET for C | C only acts here; D/E/F/G separate; no merge |
 
-**Self-state consistency.** Section 2's scheduling facts, section 6's counts and this table agree: base 7cea211e; merged lane-B 144-239; open 240-263; this block 264-271; next 272; batch 20. **Merge attribution:** 7cea211e = #837 37th; 6f584c9d = #833 36th; a06360d4 = #835 35th; a141c64f = #836 34th; e7acaca4 = #834 33rd; 84a5295d = #831 32nd; 655e40ea = #828 31st; 883bf690 = #832 30th. No unresolved head placeholder; **actual commit count = one DCO-signed model commit**.
+**Self-state consistency.** Section 2 scheduling facts, section 6 counts and this table agree: base f325daac; merged lane-B 144-239 plus 240-247; open reservations 248-263; this block 264-271; next 272; batch 20. **Merge attribution:** f325daac = #838 38th; 7cea211e = #837 37th; 6f584c9d = #833 36th; a06360d4 = #835 35th; a141c64f = #836 34th; e7acaca4 = #834 33rd; 84a5295d = #831 32nd; 655e40ea = #828 31st; 883bf690 = #832 30th. No unresolved head placeholder; **actual commit count = two DCO-signed model commits after rebase (original C commit + repair commit)**.
 
 
 ## 10. My Stage C skills rows, Row sources and six-field lines
 
 | Skill | Stage / agent | How applied | Result / evidence |
 | --- | --- | --- | --- |
-| acceptance-criteria-reviewer @ c6e5d5649bf8 | C batch-20 / sd-c-read-b20-c1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pinned pages; bound AC1-AC8 and canonical B1-B6, B4 per page, B6 UNVERIFIED; built the exact-once inventory. | 234-row inventory / 234 unique keys; B4 per page; B6 UNVERIFIED |
-| source-of-truth-reconciler @ b5fd9feda972 | C batch-20 / sd-c-read-b20-c1 (DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Re-derived the pinned index/pending set, base 7cea211e, merged rows 144-239, reservations 240-263, block 264-271; measured eight blobs/totals and zero drift. | 573 pending; pages 264-271 57,263 B / 1,027 LF; zero drift |
+| acceptance-criteria-reviewer @ c6e5d5649bf8 | C batch-20 / sd-c-read-b20-c1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pinned pages; bound AC1-AC8 and canonical B1-B6, B4 per page, B6 UNVERIFIED; built the exact-once inventory. | 237-row inventory / 234 unique keys; B4 per page; B6 UNVERIFIED |
+| source-of-truth-reconciler @ b5fd9feda972 | C batch-20 / sd-c-read-b20-c1 (DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Re-derived the pinned index/pending set, base f325daac, merged rows 144-239 plus 240-247, reservations 248-263, block 264-271; measured eight blobs/totals and zero drift. | 573 pending; pages 264-271 57,263 B / 1,027 LF; zero drift |
 | change-classification-gate @ 08d91a834460 | C batch-20 / sd-c-read-b20-c1 (DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified the work docs-only with exactly one added record path and no other tracked change. | one A docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md |
 | skill-usage-ledger @ 6a27b5c8e690 | C batch-20 / sd-c-read-b20-c1 (DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Resolved four manifest names at main 7cea211e and authored these C rows, per-row Row sources and six-field lines. | four rows / four per-row sources / four six-field lines |
 
-<!-- Row source: agent=sd-c-read-b20-c1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=lane-B batch-20 plan 6248840176 / B ACCEPT 6248870170 / base 7cea211e / block 264-271 / record path docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md; source=_A/evidence/read-b20-c1/C-rows.txt row 1; binding=sha256 27b67531057cbef82f443d1db0a61b947d599eb340fd00714edd457e68cdebda; limits=this per-row record binds its retained row, not human identity; this stage only. -->
+<!-- Row source: agent=sd-c-read-b20-c1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=lane-B batch-20 plan 6248840176 / B ACCEPT 6248870170 / base f325daac / block 264-271 / record path docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md; source=_A/evidence/read-b20-c1/C-rows.txt row 1; binding=sha256 27b67531057cbef82f443d1db0a61b947d599eb340fd00714edd457e68cdebda; limits=this per-row record binds its retained row, not human identity; this stage only. -->
 
-<!-- Row source: agent=sd-c-read-b20-c1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=lane-B batch-20 plan 6248840176 / B ACCEPT 6248870170 / base 7cea211e / block 264-271 / record path docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md; source=_A/evidence/read-b20-c1/C-rows.txt row 2; binding=sha256 ed401184f47238ccfe767706c771fe98343818f9bbdebaa3167f56d19ca3025c; limits=this per-row record binds its retained row, not human identity; this stage only. -->
+<!-- Row source: agent=sd-c-read-b20-c1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=lane-B batch-20 plan 6248840176 / B ACCEPT 6248870170 / base f325daac / block 264-271 / record path docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md; source=_A/evidence/read-b20-c1/C-rows.txt row 2; binding=sha256 ed401184f47238ccfe767706c771fe98343818f9bbdebaa3167f56d19ca3025c; limits=this per-row record binds its retained row, not human identity; this stage only. -->
 
-<!-- Row source: agent=sd-c-read-b20-c1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=lane-B batch-20 plan 6248840176 / B ACCEPT 6248870170 / base 7cea211e / block 264-271 / record path docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md; source=_A/evidence/read-b20-c1/C-rows.txt row 3; binding=sha256 8b79c1d42ca07439fe640591f1b5ed768f78e2ecd4fe95b58e0fb18204a6b176; limits=this per-row record binds its retained row, not human identity; this stage only. -->
+<!-- Row source: agent=sd-c-read-b20-c1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=lane-B batch-20 plan 6248840176 / B ACCEPT 6248870170 / base f325daac / block 264-271 / record path docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md; source=_A/evidence/read-b20-c1/C-rows.txt row 3; binding=sha256 8b79c1d42ca07439fe640591f1b5ed768f78e2ecd4fe95b58e0fb18204a6b176; limits=this per-row record binds its retained row, not human identity; this stage only. -->
 
-<!-- Row source: agent=sd-c-read-b20-c1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=lane-B batch-20 plan 6248840176 / B ACCEPT 6248870170 / base 7cea211e / block 264-271 / record path docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md; source=_A/evidence/read-b20-c1/C-rows.txt row 4; binding=sha256 80ce91f2e6bead20e45fbdadfdce01b98300d5d91c8208e5b147964cd7b06dfb; limits=this per-row record binds its retained row, not human identity; this stage only. -->
+<!-- Row source: agent=sd-c-read-b20-c1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=lane-B batch-20 plan 6248840176 / B ACCEPT 6248870170 / base f325daac / block 264-271 / record path docs/evidence/documentation/readability-lane-b-batch-20-2026-10-18.md; source=_A/evidence/read-b20-c1/C-rows.txt row 4; binding=sha256 80ce91f2e6bead20e45fbdadfdce01b98300d5d91c8208e5b147964cd7b06dfb; limits=this per-row record binds its retained row, not human identity; this stage only. -->
 
 ~~~text
-acceptance-criteria-reviewer@c6e5d5649bf8 / stage=C row=1 / reason: C owes the canonical AC/inventory proof / applied: read eight pages whole, tested B1-B6, B4 per page, B6 UNVERIFIED, built 234-row inventory / result: AC3/AC4 evidence complete in record / incomplete: D/E/F/G follow / by: C, sd-c-read-b20-c1 (true identity sd-e-802-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
-source-of-truth-reconciler@b5fd9feda972 / stage=C row=2 / reason: C owes base/object truth / applied: re-derived pending 573, base 7cea211e, merged 144-239, reservations 240-263, block 264-271, blobs/totals / result: 57,263/1,027; zero drift / incomplete: D/E/F/G follow / by: C, sd-c-read-b20-c1 (true identity sd-e-802-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
+acceptance-criteria-reviewer@c6e5d5649bf8 / stage=C row=1 / reason: C owes the canonical AC/inventory proof / applied: read eight pages whole, tested B1-B6, B4 per page, B6 UNVERIFIED, built 237-row inventory / result: AC3/AC4 evidence complete in record / incomplete: D/E/F/G follow / by: C, sd-c-read-b20-c1 (true identity sd-e-802-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
+source-of-truth-reconciler@b5fd9feda972 / stage=C row=2 / reason: C owes base/object truth / applied: re-derived pending 573, base f325daac, merged 144-239, reservations 240-263, block 264-271, blobs/totals / result: 57,263/1,027; zero drift / incomplete: D/E/F/G follow / by: C, sd-c-read-b20-c1 (true identity sd-e-802-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 change-classification-gate@08d91a834460 / stage=C row=3 / reason: C owes docs-only one-path proof / applied: checked one added record path and no other tracked change / result: one A record path / incomplete: D/E/F/G follow / by: C, sd-c-read-b20-c1 (true identity sd-e-802-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 skill-usage-ledger@6a27b5c8e690 / stage=C row=4 / reason: C owes self-authored provenance / applied: four names at main 7cea211e; rows/per-row sources/six fields; binding sha256 27b67531057cbef82f443d1db0a61b947d599eb340fd00714edd457e68cdebda / result: four rows/four sources/four six-field lines / incomplete: publisher/body insertion / by: C, sd-c-read-b20-c1 (true identity sd-e-802-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 ~~~
