@@ -42,7 +42,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B6 (L2860-2862):** Obtain a read-only review from someone who did not write the page. Ask the reviewer to explain the component's purpose and normal use from the page alone, and correct gaps before marking that batch complete.
 
-**Application:** B4 tested explicitly per page; **B6 UNVERIFIED** for all eight and never FULL-supporting; B1/B2/B3/B5 evidenced per page. 0 FULL / 8 PARTIAL / 0 UNRUN; no keeper.
+**Application:** B4 tested explicitly per page; **B6 VERIFIED** for all eight via the existing non-author review; B2 named gaps remain, so B6 is not the blocker but no page reaches FULL; B1/B2/B3/B5 evidenced per page. 0 FULL / 8 PARTIAL / 0 UNRUN; no keeper.
 
 ## 5. Whole-page re-read evidence and canonical B1-B6 per page
 
@@ -58,13 +58,13 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B5:** navigation links and referenced files were checked; no broken in-page reference or removed safety boundary found.
 
-**B6:** **UNVERIFIED** - no non-author read-only review obtainable; page is PARTIAL and never FULL-supporting on B6.
+**B6:** **VERIFIED** via existing non-author read-only review evidence in `docs/evidence/documentation/readability-lane-c-batch-4-2026-10-15.md` (same eight blobs at f490c16f; line 770 records that the reviewing agent authored none of the pages). B2 named gaps remain, so the page is still PARTIAL and not FULL/keeper.
 
 ### P2 - index 281 - `.claude/skills/structured-output-validator/SKILL.md` - read whole L1-224 (13329 B / 224 LF)
 
 **B1:** Structured Output Validator - schema and validation design for LLM structured output; the page states its purpose and intended readers.
 
-**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `XSS`, `id`, `URL`, `API`. First-use lines are in section 6.
+**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `LLM`, `JSON`, `AI`, `authz`, `URL`, `API`, `id`. First-use lines are in section 6.
 
 **B3:** descriptive headings, tables/lists and concrete operational examples are present; inputs, workflow, outputs and stop conditions are distinguished where applicable.
 
@@ -72,7 +72,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B5:** navigation links and referenced files were checked; no broken in-page reference or removed safety boundary found.
 
-**B6:** **UNVERIFIED** - no non-author read-only review obtainable; page is PARTIAL and never FULL-supporting on B6.
+**B6:** **VERIFIED** via existing non-author read-only review evidence in `docs/evidence/documentation/readability-lane-c-batch-4-2026-10-15.md` (same eight blobs at f490c16f; line 770 records that the reviewing agent authored none of the pages). B2 named gaps remain, so the page is still PARTIAL and not FULL/keeper.
 
 ### P3 - index 282 - `.claude/skills/structured-output-validator/references/output-validation-patterns.md` - read whole L1-83 (3995 B / 83 LF)
 
@@ -86,7 +86,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B5:** navigation links and referenced files were checked; no broken in-page reference or removed safety boundary found.
 
-**B6:** **UNVERIFIED** - no non-author read-only review obtainable; page is PARTIAL and never FULL-supporting on B6.
+**B6:** **VERIFIED** via existing non-author read-only review evidence in `docs/evidence/documentation/readability-lane-c-batch-4-2026-10-15.md` (same eight blobs at f490c16f; line 770 records that the reviewing agent authored none of the pages). B2 named gaps remain, so the page is still PARTIAL and not FULL/keeper.
 
 ### P4 - index 283 - `.claude/skills/sunset-deprecation-communicator/SKILL.md` - read whole L1-231 (13894 B / 231 LF)
 
@@ -100,7 +100,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B5:** navigation links and referenced files were checked; no broken in-page reference or removed safety boundary found.
 
-**B6:** **UNVERIFIED** - no non-author read-only review obtainable; page is PARTIAL and never FULL-supporting on B6.
+**B6:** **VERIFIED** via existing non-author read-only review evidence in `docs/evidence/documentation/readability-lane-c-batch-4-2026-10-15.md` (same eight blobs at f490c16f; line 770 records that the reviewing agent authored none of the pages). B2 named gaps remain, so the page is still PARTIAL and not FULL/keeper.
 
 ### P5 - index 284 - `.claude/skills/sunset-deprecation-communicator/references/sunset-comms-sheet.md` - read whole L1-73 (3392 B / 73 LF)
 
@@ -114,7 +114,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B5:** navigation links and referenced files were checked; no broken in-page reference or removed safety boundary found.
 
-**B6:** **UNVERIFIED** - no non-author read-only review obtainable; page is PARTIAL and never FULL-supporting on B6.
+**B6:** **VERIFIED** via existing non-author read-only review evidence in `docs/evidence/documentation/readability-lane-c-batch-4-2026-10-15.md` (same eight blobs at f490c16f; line 770 records that the reviewing agent authored none of the pages). B2 named gaps remain, so the page is still PARTIAL and not FULL/keeper.
 
 ### P6 - index 285 - `.claude/skills/superadmin-observability-console-designer/SKILL.md` - read whole L1-338 (21311 B / 338 LF)
 
@@ -128,7 +128,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B5:** navigation links and referenced files were checked; no broken in-page reference or removed safety boundary found.
 
-**B6:** **UNVERIFIED** - no non-author read-only review obtainable; page is PARTIAL and never FULL-supporting on B6.
+**B6:** **VERIFIED** via existing non-author read-only review evidence in `docs/evidence/documentation/readability-lane-c-batch-4-2026-10-15.md` (same eight blobs at f490c16f; line 770 records that the reviewing agent authored none of the pages). B2 named gaps remain, so the page is still PARTIAL and not FULL/keeper.
 
 ### P7 - index 286 - `.claude/skills/superadmin-observability-console-designer/references/panel-taxonomy-and-read-security.md` - read whole L1-224 (12149 B / 224 LF)
 
@@ -142,7 +142,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B5:** navigation links and referenced files were checked; no broken in-page reference or removed safety boundary found.
 
-**B6:** **UNVERIFIED** - no non-author read-only review obtainable; page is PARTIAL and never FULL-supporting on B6.
+**B6:** **VERIFIED** via existing non-author read-only review evidence in `docs/evidence/documentation/readability-lane-c-batch-4-2026-10-15.md` (same eight blobs at f490c16f; line 770 records that the reviewing agent authored none of the pages). B2 named gaps remain, so the page is still PARTIAL and not FULL/keeper.
 
 ### P8 - index 287 - `.claude/skills/supply-chain-security-reviewer/SKILL.md` - read whole L1-350 (22340 B / 350 LF)
 
@@ -156,7 +156,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B5:** navigation links and referenced files were checked; no broken in-page reference or removed safety boundary found.
 
-**B6:** **UNVERIFIED** - no non-author read-only review obtainable; page is PARTIAL and never FULL-supporting on B6.
+**B6:** **VERIFIED** via existing non-author read-only review evidence in `docs/evidence/documentation/readability-lane-c-batch-4-2026-10-15.md` (same eight blobs at f490c16f; line 770 records that the reviewing agent authored none of the pages). B2 named gaps remain, so the page is still PARTIAL and not FULL/keeper.
 
 ## 6. Systematic five-class exact-once token inventory - ONE contiguous table
 
@@ -189,16 +189,16 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P1 | 96 | v | `<assessment>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P1 | 96 | v | `<field(s) carried>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P2 | 3 | v | `→` | documented exclusion — operator token, not an abbreviation |
-| P2 | 3 | i | `AI` | defined at first use — expansion/definition present on this page |
-| P2 | 3 | ii | `authz` | defined at first use — expansion/definition present on this page |
-| P2 | 3 | i | `JSON` | defined at first use — expansion/definition present on this page |
-| P2 | 3 | i | `LLM` | defined at first use — expansion/definition present on this page |
-| P2 | 9 | i | `XSS` | named gap — first use before any expansion on this page |
+| P2 | 3 | iv | `agent-tool-safety-guard` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P2 | 3 | i | `AI` | named gap — first use before any expansion on this page |
+| P2 | 3 | iv | `ai-misinformation-guard` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P2 | 3 | iv | `ai-router-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P2 | 3 | ii | `authz` | named gap — first use before any expansion on this page |
+| P2 | 3 | i | `JSON` | named gap — first use before any expansion on this page |
+| P2 | 3 | i | `LLM` | named gap — first use before any expansion on this page |
+| P2 | 3 | iv | `llm-output-safety-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P2 | 9 | i | `XSS` | defined at first use — expansion/definition present on this page |
 | P2 | 24 | v | `≠` | documented exclusion — operator token, not an abbreviation |
-| P2 | 25 | iv | `agent-tool-safety-guard` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P2 | 25 | iv | `llm-output-safety-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P2 | 41 | iv | `ai-misinformation-guard` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P2 | 42 | iv | `ai-router-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P2 | 49 | iv | `JSON.parse` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P2 | 54 | ii | `id` | named gap — first use before any expansion on this page |
 | P2 | 82 | iii | `references/output-validation-patterns.md` | documented exclusion — exact file/path identifier, not a prose abbreviation |
@@ -206,8 +206,10 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P2 | 112 | iv | `ai-evaluation-harness` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P2 | 118 | v | `<feature>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P2 | 119 | v | `<fields: required/type/enum/range/format \| nesting \| array bounds>` | documented exclusion — self-describing placeholder, not an abbreviation |
+| P2 | 120 | v | `<what the types make unrepresentable \| where the runtime schema still guards the wire>` | documented exclusion — self-describing multiline placeholder, not an abbreviation |
 | P2 | 123 | v | `<where it runs, before which action>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P2 | 124 | v | `<value allowlists \| tenant-scoped ids \| cross-field/referential>` | documented exclusion — self-describing placeholder, not an abbreviation |
+| P2 | 125 | v | `<banned classes \| failures logged as safety evidence + rejected, never repaired \| proven able to fail (fixture)>` | documented exclusion — self-describing multiline placeholder, not an abbreviation |
 | P2 | 127 | v | `<reject \| bounded repair-retry (cap, shape-only) \| fallback>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P2 | 129 | v | `<JSON-mode/tool-schema used — still validated>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P2 | 131 | v | `<malformed + banned-content cases → expected handling>` | documented exclusion — self-describing placeholder, not an abbreviation |
@@ -308,15 +310,20 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P6 | 194 | v | `≠` | documented exclusion — operator token, not an abbreviation |
 | P6 | 204 | v | `<platform>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P6 | 207 | v | `<table, deny-all RLS, provenance columns, out-of-band grant path>` | documented exclusion — self-describing placeholder, not an abbreviation |
+| P6 | 208 | v | `<UI guard (cosmetic) / endpoint (verified token → registry) / table RLS — one SECURITY-DEFINER membership function across all three>` | documented exclusion — self-describing multiline placeholder, not an abbreviation |
+| P6 | 210 | v | `<human token lane / machine secret lane; narrowing-only filters on destructive batch ops>` | documented exclusion — self-describing multiline placeholder, not an abbreviation |
 | P6 | 212 | v | `<telemetry/audit/alert tables privileged-write-only>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P6 | 213 | v | `<the one health answer; groups + escalation badges; restraint statement>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P6 | 214 | v | `{feed-owner (skill), read-scope, wired: bool}` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P6 | 214 | v | `<per panel — {feed-owner (skill), read-scope, wired: bool}>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P6 | 215 | v | `<the server-composed summary call(s); split plan once oversized>` | documented exclusion — self-describing placeholder, not an abbreviation |
+| P6 | 216 | v | `<metrics + thresholds; snapshot cron + retention; honest limits (sub-tick sampling gap; cumulative stats pairing)>` | documented exclusion — self-describing multiline placeholder, not an abbreviation |
 | P6 | 218 | v | `<which scans/probes/runs are displayed as posture>` | documented exclusion — self-describing placeholder, not an abbreviation |
+| P6 | 219 | v | `<DB-native plus external probes vs external backend; terms, fit, benefits/blind spots, data/security risks, money/setup/upkeep or unknowns, recommendation and why, one question; implementation separately authorized>` | documented exclusion — self-describing multiline placeholder, not an abbreviation |
 | P6 | 223 | v | `<the five properties, in enforcement order>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P6 | 224 | v | `<where denials surface in the console>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P6 | 225 | v | `<the wired:false list + the known-gaps page>` | documented exclusion — self-describing placeholder, not an abbreviation |
+| P6 | 226 | v | `<actions → admin-console-architect; backend wiring → observability-operator; feed changes → the named feed owners>` | documented exclusion — self-describing multiline placeholder, not an abbreviation |
 | P6 | 279 | i | `URL` | named gap — first use before any expansion on this page |
 | P6 | 329 | iv | `references/panel-taxonomy-and-read-security.md` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P6 | 332 | iv | `evals/evals.json` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
@@ -412,13 +419,16 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P8 | 152 | iv | `weights_only` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P8 | 200 | v | `<repo/scope>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 201 | v | `<direct N / transitive M — from lockfile>` | documented exclusion — self-describing placeholder, not an abbreviation |
+| P8 | 202 | v | `<n>` | documented exclusion — placeholder count token, not an abbreviation |
 | P8 | 204 | v | `<area: dep / script / CI / artifact>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 205 | v | `<weakness → attacker action → material impact>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 206 | v | `<reachable/exploitable \| install-time \| latent>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 207 | v | `<pin SHA / upgrade to <v>` | documented exclusion — self-describing placeholder, not an abbreviation |
+| P8 | 207 | v | `<v>` | documented exclusion — nested placeholder token, not an abbreviation |
 | P8 | 208 | v | `<scripts that run + risk>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 209 | v | `<triggers, token scope, action pinning, secret exposure>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 210 | v | `<lockfile pinned? integrity hashes? signing/attestation? SLSA frame>` | documented exclusion — self-describing placeholder, not an abbreviation |
+| P8 | 211 | v | `<served digest = approved digest? signature verified at promote/load? format; registry write/promote access; gate bound to digest? model card/license; AI-BOM>` | documented exclusion — self-describing multiline placeholder, not an abbreviation |
 | P8 | 212 | v | `<finding — written rationale>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 213 | v | `<areas + why>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 247 | iii | `docs/prompts/claude-skills-master-generation-prompts-v4.md` | documented exclusion — exact file/path identifier, not a prose abbreviation |
@@ -436,15 +446,15 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 ### 6.1 Reconciliation and independent cell-count proof (ONE proof section)
 
-**Counts from the FINAL table:** **269 data rows**; **269 unique (page, first-use line, token) keys**; **0 duplicate keys / 0 extra rows**; per-page: P1: 24, P2: 30, P3: 22, P4: 22, P5: 12, P6: 48, P7: 36, P8: 75; classes: i: 60, ii: 11, iii: 10, iv: 113, v: 75; dispositions: defined at first use: 53, named gap: 24, documented exclusion: 192. All sums equal 269.
+**Counts from the FINAL table:** **279 data rows**; **279 unique (page, first-use line, token) keys**; **0 duplicate keys / 0 extra rows**; per-page: P1: 24, P2: 32, P3: 22, P4: 22, P5: 12, P6: 53, P7: 36, P8: 78; classes: i: 60, ii: 11, iii: 10, iv: 113, v: 85; dispositions: defined at first use: 50, named gap: 27, documented exclusion: 202. All sums equal 279.
 
-**Five-column parse proof:** hide escaped pipes `\|`, split each row on remaining Markdown delimiters, and require exactly five cells. The final table has **269 data rows and 0 bad rows**; a literal pipe would produce more than five cells. **Zero-duplicate proof:** unique-key count equals row count after stripping backticks and unescaping pipes; no inventory rows exist after this proof.
+**Five-column parse proof:** hide escaped pipes `\|`, split each row on remaining Markdown delimiters, and require exactly five cells. The final table has **279 data rows and 0 bad rows**; a literal pipe would produce more than five cells. **Zero-duplicate proof:** unique-key count equals row count after stripping backticks and unescaping pipes; no inventory rows exist after this proof.
 
 ## 7. Dispositions, named gaps, keeper exclusion and continuation
 
-**Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages read whole; B6 unverified and first-use gaps remain, so no page is FULL; no acceptance/keeper row. **Named gaps from the final table:**
+**Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages read whole; B6 is verified by the existing review; B2 first-use gaps remain, so no page is FULL; no acceptance/keeper row. **Named gaps from the final table:**
 - **P1**: `https`.
-- **P2**: `XSS`, `id`, `URL`, `API`.
+- **P2**: `LLM`, `JSON`, `AI`, `authz`, `URL`, `API`, `id`.
 - **P3**: `id`.
 - **P4**: `json`.
 - **P5**: `HTTP`.
@@ -460,14 +470,14 @@ Pages were read at pinned ref 2db1ffb7 from the tree rather than from plan text;
 
 ## 9. Stage C declaration, AC statuses and self-state
 
-Authored by **sd-c-read-b22-c1** / true identity sd-e-794-r1, branch from main 6afc845a, one DCO-signed model commit and exactly one added path; no merge. **AC statuses:**
+Authored by **sd-c-read-b22-c1** / true identity sd-e-794-r1, branch from main 6afc845a, two DCO-signed model commits after repair (initial 7b52ce2e + this repair commit; exact repair SHA in PR body/handoff) and exactly one added path; no merge. **AC statuses:**
 
 | AC | Status | Basis |
 | --- | --- | --- |
-| AC1 | MET in PR diff | one added record path vs 6afc845a; one DCO model commit; no other tracked path |
+| AC1 | MET in PR diff | one added record path vs 6afc845a; two DCO-signed model commits after repair (initial 7b52ce2e + this repair commit; exact repair SHA in PR body/handoff); no other tracked path |
 | AC2 | MET | eight blobs/bytes/LF above; zero drift; pending/unread |
 | AC3 | MET in this record | whole-page B1-B6; ONE contiguous table; five-cell/zero-duplicate proof; no fabricated rows |
-| AC4 | MET | strict FULL bar; B6 unverified; 0F/8P/0 UNRUN; no keeper |
+| AC4 | MET | strict FULL bar; B6 verified via existing review; B2 gaps keep 0F/8P/0 UNRUN; no keeper |
 | AC5 | asserted in PR body/handoff | record facts outside record; body witness/skills/security fields + live-final-body PROC-04 published==recomputed proof |
 | AC6 | asserted in PR body/handoff | head-bound Codex trigger/triage; never a pass; no unresolved threads; MG3 belongs to G |
 | AC7 | MET | plan/B binding; base 6afc845a; lane-end/288; merge attribution; zero drift; one path |
@@ -479,7 +489,7 @@ Self-state consistency: section 2 facts, section 3 totals and section 6 counts d
 
 | Skill | Stage / agent | How applied | Result / evidence |
 | --- | --- | --- | --- |
-| `acceptance-criteria-reviewer` @ `c6e5d5649bf8` | C batch-22 / `sd-c-read-b22-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pinned pages; tested AC1-AC8, B1-B6, B4 per page and B6 UNVERIFIED; built the inventory. | AC statuses and final-table counts recorded. |
+| `acceptance-criteria-reviewer` @ `c6e5d5649bf8` | C batch-22 / `sd-c-read-b22-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pinned pages; tested AC1-AC8, B1-B6, B4 per page; B6 VERIFIED via existing review; built the inventory. | AC statuses and final-table counts recorded. |
 | `source-of-truth-reconciler` @ `b5fd9feda972` | C batch-22 / `sd-c-read-b22-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Re-derived live main 6afc845a, lane/batch, page blobs/bytes/LF, zero drift and one-path base. | 96,025/1,620; no drift; base/main 6afc845a. |
 | `change-classification-gate` @ `08d91a834460` | C batch-22 / `sd-c-read-b22-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only exactly one added record path. | one A path; no other tracked change. |
 | `skill-usage-ledger` @ `6a27b5c8e690` | C batch-22 / `sd-c-read-b22-c1` (true identity sd-e-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Resolved four manifest names at main 6afc845a; authored C account and retained capture. | four rows/four per-row sources/four six-field lines. |
@@ -504,6 +514,6 @@ skill-usage-ledger@6a27b5c8e690 / reason: C account owes manifest-bound provenan
 
 ## 11. Limits, unverifiable items and boundary
 
-Canonical B6 is **UNVERIFIED** for all eight pages (non-author read-only review unavailable); every page is PARTIAL and no page is FULL/keeper-eligible. No page text was edited. This record is evidence-only, not a keeper/index/ledger/register/manifest change, verdict or merge; Stage D/E/F/G remain separate. No synthetic test/passing check/approved design is presented as deployed or measured.
+Canonical B6 is **VERIFIED** for all eight pages via the existing non-author read-only review (same blobs at f490c16f; review line 770 confirms non-authorship); B2 named gaps remain, so every page is PARTIAL and no page is FULL/keeper-eligible. No page text was edited. This record is evidence-only, not a keeper/index/ledger/register/manifest change, verdict or merge; Stage D/E/F/G remain separate. No synthetic test/passing check/approved design is presented as deployed or measured.
 
 **Signed with both names: true identity sd-e-794-r1 - stage role sd-c-read-b22-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
